@@ -297,6 +297,27 @@ void R3BNeulandMapped2Cal::FinishTask()
 Double_t R3BNeulandMapped2Cal::WalkCorrection(Double_t x)
 {
     Double_t y = 0;
+    Double_t y0 = 0;
+    Double_t y1 = 0;
+
+    x = x * 17.2278 / 162.464;
+
+    y0 = -4.29359 + 17.3841 / sqrt(x) + 0.073181; // veronika 3
+
+    y1 = 1.59667 + 78.5274 * pow(x, -1.97051) - 4.00192 / x - 0.125473 * x + 0.00130958 * x * x; // veronika 2
+
+    y = (y0 + y1) / 2.;
+
+    if (x > 25.0000)
+        y = y0;
+    // y = -4.29359 + 17.3841/sqrt(x)+0.073181;  // veronika 3
+
+    return -1. * y;
+}
+
+/*Double_t R3BNeulandMapped2Cal::WalkCorrection(Double_t x)
+{
+    Double_t y = 0;
 
     if (x < 0.)
         return y;
@@ -354,5 +375,6 @@ Double_t R3BNeulandMapped2Cal::WalkCorrection(Double_t x)
 
     return 58.6 - y;
 }
+*/
 
 ClassImp(R3BNeulandMapped2Cal)

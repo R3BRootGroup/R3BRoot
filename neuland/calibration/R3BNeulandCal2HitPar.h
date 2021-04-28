@@ -28,12 +28,14 @@ class R3BEventHeader;
 class R3BNeulandHitPar;
 class R3BNeulandHitModulePar;
 
-namespace Neuland{
-  namespace Calibration{
-    class HitCalibrationEngine;
-    class CosmicTracker;
-  }
-}
+namespace Neuland
+{
+    namespace Calibration
+    {
+        class HitCalibrationEngine;
+        class CosmicTracker;
+    } // namespace Calibration
+} // namespace Neuland
 
 class R3BNeulandCal2HitPar : public FairTask
 {
@@ -49,13 +51,15 @@ class R3BNeulandCal2HitPar : public FairTask
 
     virtual void FinishTask();
 
-    void SavePlots(Bool_t savePlots = true) { fSavePlots = savePlots;}
+    void SetTpat(UInt_t CosmicTpat = 0) { fCosmicTpat = CosmicTpat; }
+
+    void SavePlots(Bool_t savePlots = true) { fSavePlots = savePlots; }
 
   private:
     bool IsCosmicEvent() const;
 
-    std::unique_ptr<Neuland::Calibration::HitCalibrationEngine> fHitCalEngine;   //!
-    std::unique_ptr<Neuland::Calibration::CosmicTracker> fCosmicTracker;         //!
+    std::unique_ptr<Neuland::Calibration::HitCalibrationEngine> fHitCalEngine; //!
+    std::unique_ptr<Neuland::Calibration::CosmicTracker> fCosmicTracker;       //!
 
     TClonesArray* fCalNeuland;        //!
     TClonesArray* fMappedLos;         //!
@@ -64,6 +68,12 @@ class R3BNeulandCal2HitPar : public FairTask
 
     UInt_t fEventNumber = 0;
     UInt_t fAcceptedEventNumber = 0;
+
+    UInt_t fIgorcnt0 = 0;
+    UInt_t fIgorcnt1 = 0;
+    UInt_t fIgorcnt2 = 0;
+
+    UInt_t fCosmicTpat = 0;
 
     Bool_t fSavePlots;
 

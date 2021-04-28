@@ -39,6 +39,12 @@ class R3BNeulandCal2Hit : public FairTask
 
     inline void SetFirstPlaneHorizontal() { fFirstPlaneHorizontal = kTRUE; }
 
+    // Distance to target in cm
+    inline void SetDistanceToTarget(Double_t d) { fDistanceToTarget = d; }
+
+    // Global time offset in ns
+    inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
+
   private:
     void SetParameter();
     Double_t GetUnsaturatedEnergy(const Int_t qdc, const Double_t gain, const Double_t saturation) const;

@@ -105,6 +105,9 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
     auto calData = fCalData.Retrieve();
 
+    const auto start = fEventHeader->GetTStart();
+    const bool beam = !std::isnan(start);
+
     for (auto calDataPtrPtr = calData.begin(); calDataPtrPtr != calData.end(); calDataPtrPtr++)
     {
         const auto barID = (*calDataPtrPtr)->GetBarId() - 1;
@@ -137,11 +140,14 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
         const auto energy = TMath::Sqrt(fAttenuationValues[barID] * unsatEnergy[0] * unsatEnergy[1]);
 
-        if (energy < fEnergyCutoff)
-            continue;
+        // ig if (energy < fEnergyCutoff)
+        // ig     continue;
 
-        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
-                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+        // ig std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
+        // ig                                 cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+
+        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1) - 2 * parameter.GetTSync(),
+                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) - 2 * parameter.GetTSync() };
 
         // FIXME this should be done in Mapped2Cal
         // In Cal2Hit the difference between all bars should be checked
@@ -150,10 +156,24 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         else if (tdc[0] - tdc[1] > 0.5 * Neuland::MaxCalTime)
             tdc[0] -= Neuland::MaxCalTime;
 
-        const auto time = (tdc[0] + tdc[1]) * 0.5 - fGlobalTimeOffset;
+        auto time = (tdc[0] + tdc[1]) * 0.5 - fGlobalTimeOffset;
 
-        const auto plane = Neuland::GetPlaneNumber(barID - 1);
-        const auto bar = (barID - 1) % 50;
+        // cout << "global        " << fGlobalTimeOffset << endl;
+
+        if (beam)
+        {
+            // the shift is to get fmod to work as indented: 4 peaks -> 1 peak w/o stray data (e.g. at 5 * 2048)
+            // tdc = fmod(tdc - start - 3000, 5 * 2048) + 3000;
+            time = remainder(time - start - 3000, 5 * 2048) + 3000; // fmod 3000 default
+            // time = remainder(time - start - 2000, 5 * 2048) + 2000; // fmod 1000
+        }
+        else
+        {
+            time = std::numeric_limits<double>::quiet_NaN();
+        }
+
+        const auto plane = Neuland::GetPlaneNumber(barID); // ig -1
+        const auto bar = (barID) % 50;                     // ig -1
 
         TVector3 pos;
         TVector3 pixel;
@@ -175,7 +195,7 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
             pixel[1] = std::min(std::max(0., pos[1] / 5. + 25), 49.);
         }
 
-        pos[2] = (plane + 0.5) * Neuland::BarSize_Z + fDistanceToTarget + fDistancesToFirstPlane[plane];
+        pos[2] = (plane + 0.5) * Neuland::BarSize_Z + fDistanceToTarget; // ig + fDistancesToFirstPlane[plane];
         pixel[2] = plane;
 
         fHits.Insert({ barID, tdc[0], tdc[1], time, unsatEnergy[0], unsatEnergy[1], energy, pos, pixel });
