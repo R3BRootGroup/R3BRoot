@@ -327,7 +327,10 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
         }
     }
     Int_t nPartLOS = 0;
-    Int_t nPartc[fNofLosDetectors] = { 0 };
+    Int_t nPartc[fNofLosDetectors];
+    for (Int_t d = 0; d < fNofLosDetectors; d++)
+        nPartc[d] = 0;
+    
     Bool_t iLOSType[fNofLosDetectors][32];
     Bool_t iLOSPileUp[fNofLosDetectors][32];
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
