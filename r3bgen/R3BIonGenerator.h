@@ -22,12 +22,8 @@
 #ifndef R3BIONGENERATOR_H
 #define R3BIONGENERATOR_H
 
-#include "R3BBeamProperties.h"
-
 #include "FairGenerator.h"
 #include "FairIon.h"
-
-#include "TRandom3.h"
 
 #include <iostream>
 
@@ -38,7 +34,7 @@ class R3BIonGenerator : public FairGenerator
 
   public:
     /** Default constructor **/
-    R3BIonGenerator(UInt_t seed = 0U);
+    R3BIonGenerator();
 
     /** Constructor with ion name
      ** For the generation of ions with pre-defined FairIon
@@ -49,7 +45,7 @@ class R3BIonGenerator : public FairGenerator
      **@param px,py,pz  Momentum components [GeV] per nucleon!
      **@param vx,vy,vz  Vertex coordinates [cm]
      **/
-    R3BIonGenerator(const Char_t* ionName, Int_t mult, Double_t momentum_AGeV_per_c, UInt_t seed = 0U);
+    R3BIonGenerator(const Char_t* ionName, Int_t mult, Double_t px, Double_t py, Double_t pz);
 
     /** Default constructor
      ** For the generation of ions with atomic number z and mass number a.
@@ -63,7 +59,7 @@ class R3BIonGenerator : public FairGenerator
      **@param px,py,pz  Momentum components [GeV] per nucleon!
      **@param vx,vy,vz  Vertex coordinates [cm]
      **/
-    R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult, Double_t momentum_AGeV_per_c, UInt_t seed = 0U);
+    R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult, Double_t px, Double_t py, Double_t pz);
 
     R3BIonGenerator(const R3BIonGenerator&);
 
@@ -73,25 +69,43 @@ class R3BIonGenerator : public FairGenerator
     virtual ~R3BIonGenerator();
 
     /** Modifiers **/
+    void SetCharge(Int_t charge) { fQ = charge; }
     void SetExcitationEnergy(Double_t eExc);
     void SetMass(Double_t mass);
 
-    Bool_t Init() override;
+    void SetSpotRadius(Double32_t r = 0, Double32_t z = 0, Double32_t off = 0)
+    {
+        fR = r;
+        fz = z;
+        fOffset = off;
+        fBeamSpotIsSet = kTRUE;
+    }
+
+    void SetBeamParameter(Double32_t sigmaP = 0, Double32_t angle = 0)
+    {
+        fSigmaP = sigmaP;
+        fAngle = angle;
+    }
 
     /** Method ReadEvent
      ** Generates <mult> of the specified ions and hands hem to the
      ** FairPrimaryGenerator.
      **/
-    virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
-
-    R3BBeamProperties Beam; //!
+    virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
 
   private:
-    Int_t fMult;         // Multiplicity per event
-    FairIon* fIon;       // Pointer to the FairIon to be generated
+    static Int_t fgNIon;        //! Number of the instance of this class
+    Int_t fMult;                // Multiplicity per event
+    Double_t fPx, fPy, fPz;     // Momentum components [GeV] per nucleon
+    Double32_t fR, fz, fOffset; // beam Spot radius [cm], z source, y source
+    Double_t fVx, fVy, fVz;     // Vertex coordinates [cm]
+    FairIon* fIon;              // Pointer to the FairIon to be generated
+    Int_t fQ;                   // Electric charge [e]
+    Double32_t fSigmaP, fAngle; // beam variation in momentum, angle of emittance
 
-    TRandom3 fRNG; // the RNG
-    ClassDefOverride(R3BIonGenerator, 1)
+    Bool_t fBeamSpotIsSet; // True if point beamspot is set
+
+    ClassDef(R3BIonGenerator, 1)
 };
 
 #endif

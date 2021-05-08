@@ -53,7 +53,6 @@ R3BLosReader::~R3BLosReader()
 
 Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 {
-
     int ok;
 
     // try to get a handle on the EventHeader. EventHeader may not be
@@ -96,6 +95,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTCTM = 0;
         // data->LOS[d].MTM = 0;
     }
+
     return kTRUE;
 }
 

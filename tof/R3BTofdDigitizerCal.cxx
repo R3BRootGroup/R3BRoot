@@ -78,6 +78,9 @@ InitStatus R3BTofdDigitizerCal::Init()
     // Get random number for smearing in y, t, ELoss
     prnd = new TRandom3();
 
+    fhMultTofd = new TH1F("multTofd", "Multiplicity ToFD", 20, 0, 20);
+    fhMultTofd->GetXaxis()->SetTitle("Multiplicity");
+
     return kSUCCESS;
 }
 
@@ -185,6 +188,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
         int paddle_number=0;
         Double_t yrnd, yns, ToT_up, ToT_down, ernd, ens, timernd, timeL_up = -1., timeL_down = -1., timeT_up = -1.,
                                                                   timeT_down = -1.;
+		Int_t mult = 0;
 
         for (Int_t i = 0; i < NumOfChannels; ++i)
         {
@@ -192,6 +196,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
             {
                 if (energyl > 0.0001)
                 {
+					mult++;
                     if (i < 200) // ch: 101-144, layer: 0, paddle_number: 0-43
                     {
                         layer_label = 0;
@@ -260,6 +265,8 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                 }
             }
         }
+        
+		fhMultTofd->Fill(mult);
 
         delete[] energy;
         delete[] time;
@@ -287,6 +294,9 @@ void R3BTofdDigitizerCal::Reset()
         fCalTriggerItems->Clear();
 }
 
-void R3BTofdDigitizerCal::Finish() {}
+void R3BTofdDigitizerCal::Finish() 
+{
+	fhMultTofd->Write();
+}
 
 ClassImp(R3BTofdDigitizerCal)

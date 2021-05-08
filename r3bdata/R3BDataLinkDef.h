@@ -59,6 +59,7 @@
 #pragma link C++ class R3BWRMasterData+;
 #pragma link C++ class R3BWRCalifaData+;
 #pragma link C++ class R3BWRAmsData+;
+#pragma link C++ class R3BWRLosData+;
 
 #pragma link C++ class R3BMusicPoint+;
 #pragma link C++ class R3BMusicMappedData+;

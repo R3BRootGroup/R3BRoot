@@ -46,6 +46,11 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BSOF_SOURCE_DIR}/sofdata/sciData
+${R3BSOF_SOURCE_DIR}/sci
+${R3BSOF_SOURCE_DIR}/sofdata/twimData
+${R3BSOF_SOURCE_DIR}/twim
+${R3BSOF_SOURCE_DIR}/sofsource
 )
 
 set(LINK_DIRECTORIES
@@ -69,6 +74,7 @@ R3BWhiterabbitNeulandReader.cxx
 R3BWhiterabbitAmsReader.cxx
 R3BWhiterabbitS2Reader.cxx
 R3BWhiterabbitS8Reader.cxx
+R3BWhiterabbitLosReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
 R3BTimestampMasterReader.cxx
@@ -126,6 +132,7 @@ ext/ext_h101_bmon.h
 ext/ext_h101_fibzero.h
 ext/ext_h101_fibonea.h
 ext/ext_h101_fiboneb.h
+ext_h101_wrlos.h
 #ext_h101_fibtwoa.h
 #ext_h101_fibtwob.h
 ext/ext_h101_fibthreea.h

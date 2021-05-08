@@ -78,6 +78,8 @@ class R3BTofdDigitizerCal : public FairTask
     Float_t detector_width = number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + paddle_width;
     Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
 
+    TH1F *fhMultTofd;
+
     ClassDef(R3BTofdDigitizerCal, 1);
 };
 

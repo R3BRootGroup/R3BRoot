@@ -95,7 +95,7 @@ typedef struct EXT_STR_h101_timestamp_master_layout_t
     uint32_t _xor;
     const char *_name;
   } _items[1];
-  uint32_t _pack_list[7];
+  uint32_t _pack_list[14];
 } EXT_STR_h101_timestamp_master_layout;
 
 #define EXT_STR_h101_timestamp_master_LAYOUT_INIT { \
@@ -103,14 +103,16 @@ typedef struct EXT_STR_h101_timestamp_master_layout_t
   sizeof(EXT_STR_h101_timestamp_master_layout), \
   sizeof(EXT_STR_h101_timestamp_master), \
   sizeof(EXT_STR_h101_timestamp_master_onion), \
-  7, \
+  14, \
   1, \
   { \
     { 0, sizeof(EXT_STR_h101_timestamp_master), 0x29fa1535, "h101_timestamp_master" }, \
   }, \
   { \
-    0x40000000, 0x40000004, 0x40000008, 0x4000000c, \
-    0x40000010, 0x40000014, 0x40000018, \
+   /*    0 */ 0x40a52000, 0x00000000, 0x40a52000, 0x00000004, \
+   /*    4 */ 0x40a50000, 0x00000008, 0x40a50000, 0x0000000c, \
+   /*    8 */ 0x40a50000, 0x00000010, 0x40a50000, 0x00000014, \
+   /*   12 */ 0x40a50000, 0x00000018, \
   } \
 };
 
