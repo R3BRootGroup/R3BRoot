@@ -11,14 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTofdDigitizerCal.h"
+#include "R3BTofiDigitizerCal.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "R3BMCTrack.h"
-#include "R3BTofd.h"
-#include "R3BTofdPoint.h"
+#include "R3BTofi.h"
+#include "R3BTofiPoint.h"
 #include "TClonesArray.h"
 
 // includes for modeling
@@ -44,56 +44,57 @@
 #include <string>
 #include <vector>
 
-R3BTofdDigitizerCal::R3BTofdDigitizerCal()
-    : FairTask("R3B Tofd Digitization scheme ")
-    , fTofdPoints(NULL)
+using std::cout;
+using std::endl;
+
+R3BTofiDigitizerCal::R3BTofiDigitizerCal()
+    : FairTask("R3B Tofi Digitization scheme ")
+    , fTofiPoints(NULL)
 {
 }
 
-R3BTofdDigitizerCal::~R3BTofdDigitizerCal() {
-if( fTofdPoints)
- delete  fTofdPoints;
-}
+R3BTofiDigitizerCal::~R3BTofiDigitizerCal() {}
 
-InitStatus R3BTofdDigitizerCal::Init()
+InitStatus R3BTofiDigitizerCal::Init()
 {
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
 
-    fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
+    fTofiPoints = (TClonesArray*)ioman->GetObject("TOFiPoint");
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
+    // fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    // ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
 
-    // Register output array fTofdCals
-    fTofdCals = new TClonesArray("R3BTofdCalData", 1000);
-    ioman->Register("TofdCal", "Digital response in Tofd", fTofdCals, kTRUE);
+    // Register output array fTofiCals
+    fTofiCals = new TClonesArray("R3BTofiCalData", 1000);
+    ioman->Register("TofiCal", "Digital response in Tofi", fTofiCals, kTRUE);
     maxevent = ioman->CheckMaxEventNo();
 
-    fCalTriggerItems = new TClonesArray("R3BTofdCalData", 1000);
-    ioman->Register("TofdTriggerCal", "Land", fCalTriggerItems, kTRUE);
+    fCalTriggerItems = new TClonesArray("R3BTofiCalData", 1000);
+    ioman->Register("TofiTriggerCal", "Land", fCalTriggerItems, kTRUE);
 
     // Get random number for smearing in y, t, ELoss
     prnd = new TRandom3();
 
-    fhMultTofd = new TH1F("multTofd", "Multiplicity ToFD", 20, 0, 20);
-    fhMultTofd->GetXaxis()->SetTitle("Multiplicity");
+    fhMultTofi = new TH1F("multTofi", "Multiplicity ToFI", 20, 0, 20);
+    fhMultTofi->GetXaxis()->SetTitle("Multiplicity");
 
     return kSUCCESS;
 }
 
-void R3BTofdDigitizerCal::Exec(Option_t* opt)
+void R3BTofiDigitizerCal::Exec(Option_t* opt)
 {
-    //	cout<<"R3BTofdDigitizerCal Exec Entry"<<endl;
+    //	cout<<"R3BTofiDigitizerCal Exec Entry"<<endl;
     if (counter / 10000. == (int)counter / 10000)
-        LOG(INFO) << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) ";
+        std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
+                  << std::flush;
     counter += 1;
 
     Reset();
 
-    //    cout<<"R3BTofdDigitizerCal Exec Before Digitize"<<endl;
+    //    cout<<"R3BTofiDigitizerCal Exec Before Digitize"<<endl;
 
     auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels) {
         Int_t entryNum = Points->GetEntries();
@@ -141,7 +142,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
         for (Int_t i = 0; i < entryNum; ++i)
         {
-            R3BTofdPoint* data_element = (R3BTofdPoint*)Points->At(i);
+            R3BTofiPoint* data_element = (R3BTofiPoint*)Points->At(i);
 
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // channel nummer
                                        data_element->GetEnergyLoss(),
@@ -184,8 +185,8 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
         // creating the final hits
 
-        int layer_label=0;
-        int paddle_number=0;
+        int layer_label;
+        int paddle_number;
         Double_t yrnd, yns, ToT_up, ToT_down, ernd, ens, timernd, timeL_up = -1., timeL_down = -1., timeT_up = -1.,
                                                                   timeT_down = -1.;
         Int_t mult = 0;
@@ -245,55 +246,54 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                         <<" tT_down= "<<timeT_down<<endl;
                     */
                     /*   CalData format:      --> in Tree:
-                        fPlane(detector) 1-4  --> TofdCal.fDetector
-                      , fBar(channel)    1-44 --> TofdCal.fBar
-                      , fSide(side)      1-2  --> TofdCal.fSide
-                      , fLeading_ns(lead)     --> TofdCal.fLeading_ns
-                      , fTrailing_ns(trail)   --> TofdCal.fTrailing_ns
+                        fPlane(detector) 1-4  --> TofiCal.fDetector
+                      , fBar(channel)    1-44 --> TofiCal.fBar
+                      , fSide(side)      1-2  --> TofiCal.fSide
+                      , fLeading_ns(lead)     --> TofiCal.fLeading_ns
+                      , fTrailing_ns(trail)   --> TofiCal.fTrailing_ns
                     */
                     new ((*Hits)[Hits->GetEntries()])
-                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 1, timeL_up, timeT_up);
+                        R3BTofiCalData(layer_label + 1, paddle_number + 1, 1, timeL_up, timeT_up);
 
                     new ((*Hits)[Hits->GetEntries()])
-                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
+                        R3BTofiCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
 
                     // Int_t card = (int)paddle_number/8.+layer_label*6;
                     for (Int_t j = 0; j < 12; j++)
                     {
-                        new ((*Trigger)[Trigger->GetEntries()]) R3BTofdCalData(5, j + 1, 1, 0., 0.);
+                        new ((*Trigger)[Trigger->GetEntries()]) R3BTofiCalData(5, j + 1, 1, 0., 0.);
                     }
                 }
             }
         }
-
-        fhMultTofd->Fill(mult);
+        fhMultTofi->Fill(mult);
 
         delete[] energy;
         delete[] time;
         delete[] y;
     };
 
-    // running the digitizer for the tofd
+    // running the digitizer for the Tofi
 
-    if (fTofdPoints)
+    if (fTofiPoints)
     {
-        Digitize(fTofdPoints, fTofdCals, fCalTriggerItems, number_channels);
+        Digitize(fTofiPoints, fTofiCals, fCalTriggerItems, number_channels);
     }
 }
 
 // -------------------------------------------------------------------------
 
-void R3BTofdDigitizerCal::Reset()
+void R3BTofiDigitizerCal::Reset()
 {
     // Clear the structure
     //   cout << " -I- Digit Reset() called " << endl;
 
-    if (fTofdCals)
-        fTofdCals->Clear();
+    if (fTofiCals)
+        fTofiCals->Clear();
     if (fCalTriggerItems)
         fCalTriggerItems->Clear();
 }
 
-void R3BTofdDigitizerCal::Finish() { fhMultTofd->Write(); }
+void R3BTofiDigitizerCal::Finish() { fhMultTofi->Write(); }
 
-ClassImp(R3BTofdDigitizerCal)
+ClassImp(R3BTofiDigitizerCal)

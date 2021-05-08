@@ -74,7 +74,7 @@ Bool_t R3BTrloiiSampReader::Read()
 
         new ((*fArray)[fArray->GetEntriesFast()]) R3BSamplerMappedData(v);
 
-        //std::cout << "Test" << v << '\n';
+        // std::cout << "Test" << v << '\n';
     }
 
     return kTRUE;
