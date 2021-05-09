@@ -50,7 +50,19 @@ Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 # set cmake policies
 cmake_policy(VERSION 3.11...3.14)
 
-find_package(FairRoot)
+find_package(FairCMakeModules 0.1 QUIET)
+if(FairCMakeModules_FOUND)
+  include(FairFindPackage2)
+else()
+  message(STATUS "Could not find FairCMakeModules. "
+          "It is recommended to install https://github.com/FairRootGroup/FairCMakeModules")
+endif()
+
+if(COMMAND find_package2)
+  find_package2(PUBLIC FairRoot)
+else()
+  find_package(FairRoot)
+endif()
 
 execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version OUTPUT_VARIABLE FR_MAJOR_VERSION)
 execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version OUTPUT_VARIABLE FR_MINOR_VERSION)
