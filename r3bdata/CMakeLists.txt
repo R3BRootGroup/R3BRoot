@@ -162,6 +162,7 @@ pdcData/R3BPdcHitData.cxx
 fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx
 fibData/R3BBunchedFiberMappedData.cxx
+fibData/R3BFiberMAPMTMappedData.cxx
 fibData/R3BFi4Point.cxx
 fibData/R3BFi4CalItem.cxx
 fibData/R3BFi4HitItem.cxx

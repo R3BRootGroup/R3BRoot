@@ -82,6 +82,7 @@ R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
 R3BBunchedFiberSPMTTrigReader.cxx
 R3BBeamMonitorReader.cxx
+R3BFiberMAPMTReader.cxx
 R3BFi0Reader.cxx
 R3BFi1aReader.cxx
 R3BFi1bReader.cxx
@@ -99,6 +100,7 @@ R3BFi10Reader.cxx
 R3BFi11Reader.cxx
 R3BFi12Reader.cxx
 R3BFi13Reader.cxx
+R3BFi31Reader.cxx
 R3BLosReader.cxx
 R3BRoluReader.cxx
 R3BSci2Reader.cxx
@@ -149,6 +151,7 @@ ext/ext_h101_fibtwelve.h
 ext/ext_h101_fibthirteen.h
 #ext_h101_los_dez19.h
 ext/ext_h101_los_s515.h
+ext/ext_h101_fib31.h
 ext/ext_h101_rolu.h
 ext/ext_h101_sci2.h
 ext/ext_h101_sci8.h
