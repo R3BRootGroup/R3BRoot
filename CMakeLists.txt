@@ -91,6 +91,11 @@ endif()
 
 find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
+foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
+  if(NOT dep STREQUAL "Boost")
+    find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
+  endif()
+endforeach()
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 
