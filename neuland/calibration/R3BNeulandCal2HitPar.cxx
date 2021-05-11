@@ -23,6 +23,7 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 
+#include "TROOT.h"
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH2F.h"

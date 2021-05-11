@@ -29,6 +29,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TF1.h"
 #include <cstdlib>
 
 class TClonesArray;
