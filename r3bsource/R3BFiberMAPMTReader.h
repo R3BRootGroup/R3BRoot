@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // This is generic class for the fibers 30, 31, 32 33 used in s494 experiment
-// based on the R3BBunchedFiber code
+// modified from  R3BBunchedFiber code
 // Boiler-plate code for bunched fiber detectors with multi-hit electronics on
 // both ends.
 // In the UCESB unpacker, signals should be mapped like:

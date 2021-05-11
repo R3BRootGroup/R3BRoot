@@ -80,7 +80,7 @@ typedef struct EXT_STR_h101_FIBEO_t
   uint32_t FIBEO_TRIGF /* [0,8] */;
   uint32_t FIBEO_TRIGFv[8 EXT_STRUCT_CTRL(FIBEO_TRIGF)] /* [0,65535] */;
 
-} EXT_STR_h101_fib30;
+} EXT_STR_h101_FIBEO;
 
 /********************************************************
  *
@@ -142,11 +142,11 @@ typedef struct EXT_STR_h101_FIBEO_onion_t
   uint32_t FIBEO_TRIGF;
   uint32_t FIBEO_TRIGFv[8 /* FIBEO_TRIGF */];
 
-} EXT_STR_h101_fib30_onion;
+} EXT_STR_h101_FIBEO_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_fib30_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
+#define EXT_STR_h101_FIBEO_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* RAW */ \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
