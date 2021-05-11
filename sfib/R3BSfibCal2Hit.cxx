@@ -11,6 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <iostream>
 #include <TClonesArray.h>
 #include "FairLogger.h"
 #include "R3BSfibCal2Hit.h"
