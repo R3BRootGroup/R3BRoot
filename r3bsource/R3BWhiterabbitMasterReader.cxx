@@ -45,6 +45,8 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
     {
         delete fArray;
     }
+    if (fEventHeader)
+        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
@@ -59,8 +61,15 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // Looking for the R3BEventHeader
+    FairRootManager* frm = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fEventHeader)
+    {
+        LOG(WARNING) << "R3BWhiterabbitMasterReader::Init() R3BEventHeader not found";
+    }
+    else
+        LOG(INFO) << "R3BWhiterabbitMasterReader::Init() R3BEventHeader found";
 
     // Register output array in tree
     if (!fOnline)
@@ -106,6 +115,7 @@ Bool_t R3BWhiterabbitMasterReader::Read()
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T3 << 32) |
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_MASTER_WR_T1;
         fNEvent = fEventHeader->GetEventno();
+        fEventHeader->SetTimeStamp(timestamp);
         new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
     }
     else

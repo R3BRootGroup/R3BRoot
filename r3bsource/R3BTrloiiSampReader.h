@@ -10,29 +10,29 @@ class R3BEventHeader;
 
 class R3BTrloiiSampReader : public R3BReader
 {
-	public:
-		R3BTrloiiSampReader(EXT_STR_h101_SAMP *, UInt_t);
-		~R3BTrloiiSampReader();
+  public:
+    R3BTrloiiSampReader(EXT_STR_h101_SAMP*, UInt_t);
+    ~R3BTrloiiSampReader();
 
-		Bool_t Init(ext_data_struct_info *);
-		Bool_t Read();
-		void Reset();
+    Bool_t Init(ext_data_struct_info*);
+    Bool_t Read();
+    void Reset();
 
-	private:
-		/* An event counter */
-		UInt_t fNEvent;
-		/* Reader specific data structure from ucesb */
-		EXT_STR_h101_SAMP* fData;
-		/* Offset of detector specific data in full data structure */
-		UInt_t fOffset;
-		/* FairLogger */
-		FairLogger *fLogger;
-		/* A pointer to the R3BEventHeader structure */
-		R3BEventHeader *fEventHeader;
-		TClonesArray* fArray; /**< Output array. */
+  private:
+    /* An event counter */
+    UInt_t fNEvent;
+    /* Reader specific data structure from ucesb */
+    EXT_STR_h101_SAMP* fData;
+    /* Offset of detector specific data in full data structure */
+    UInt_t fOffset;
+    /* FairLogger */
+    FairLogger* fLogger;
+    /* A pointer to the R3BEventHeader structure */
+    R3BEventHeader* fEventHeader;
+    TClonesArray* fArray; /**< Output array. */
 
-	public:
-		ClassDef(R3BTrloiiSampReader, 0);
+  public:
+    ClassDef(R3BTrloiiSampReader, 0);
 };
 
 #endif

@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BEVENTHEADER
-#define R3BEVENTHEADER
+#ifndef R3BEVENTHEADER_h
+#define R3BEVENTHEADER_h
 
 #include "FairEventHeader.h"
 
@@ -22,26 +22,27 @@ class R3BEventHeader : public FairEventHeader
     R3BEventHeader();
     virtual ~R3BEventHeader();
 
-    inline void SetEventno(const UInt_t eventno) { fEventno = eventno; }
-    inline void SetTrigger(const UInt_t trigger) { fTrigger = trigger; }
-    inline void SetTimeStamp(const ULong_t timeStamp) { fTimeStamp = timeStamp; }
-    inline void SetTpat(const UShort_t tpat) { fTpat = tpat; }
-    inline void SetTStart(const Double_t tStart) { fTStart = tStart; }
+    void SetEventno(const Int_t eventno) { fEventno = eventno; }
+    void SetTrigger(const Int_t trigger) { fTrigger = trigger; }
+    void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
+    void SetTpat(const Int_t tpat) { fTpat = tpat; }
+    void SetTStart(const Double_t tStart) { fTStart = tStart; }
 
-    inline UInt_t GetEventno() const { return fEventno; }
-    inline UInt_t GetTrigger() const { return fTrigger; }
-    inline ULong_t GetTimeStamp() const { return fTimeStamp; }
-    inline UShort_t GetTpat() const { return fTpat; }
-    inline Double_t GetTStart() const { return fTStart; }
+    Int_t GetEventno() const { return fEventno; }
+    Int_t GetTrigger() const { return fTrigger; }
+    uint64_t GetTimeStamp() const { return fTimeStamp; }
+    Int_t GetTpat() const { return fTpat; }
+    Double_t GetTStart() const { return fTStart; }
+
+    virtual void Register(Bool_t Persistance = kTRUE);
 
   private:
-    UInt_t fEventno;
-    UInt_t fTrigger;
-    ULong_t fTimeStamp;
-    UShort_t fTpat;
+    Int_t fEventno;
+    Int_t fTrigger;
+    uint64_t fTimeStamp;
+    Int_t fTpat;
     Double_t fTStart;
 
-  public:
     ClassDef(R3BEventHeader, 5)
 };
 

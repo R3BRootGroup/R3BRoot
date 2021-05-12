@@ -99,6 +99,9 @@ InitStatus R3BOnlineSpectraLosStandalone::Init()
         LOG(fatal) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 

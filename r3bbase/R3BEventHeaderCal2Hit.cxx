@@ -17,33 +17,40 @@
 // ------------------------------------------------------------
 
 #include "R3BEventHeaderCal2Hit.h"
+#include "FairLogger.h"
 
 R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit(int a_verbose)
     : FairTask("R3BEventHeaderCal2Hit", a_verbose)
     , fName("R3BEventHeaderCal2Hit")
-    , fHeader(new R3BEventHeader)
+    , fHeader(nullptr)
 {
 }
 
 R3BEventHeaderCal2Hit::~R3BEventHeaderCal2Hit()
 {
-    delete fHeader;
+    if (fHeader)
+        delete fHeader;
 }
 
 InitStatus R3BEventHeaderCal2Hit::Init()
 {
-    FairRootManager* mgr = FairRootManager::Instance();
-    fHeader = (R3BEventHeader *)mgr->GetObject("R3BEventHeader");
-    mgr->Register("R3BEventHeaderCal2Hit", "EventHeader", fHeader, kTRUE);
+    FairRootManager* frm = FairRootManager::Instance();
+    fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fHeader)
+    {
+        fHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        LOG(WARNING) << "R3BEventHeaderCal2Hit::Init() FairEventHeader not found";
+    }
+    else
+        LOG(INFO) << "R3BEventHeaderCal2Hit::Init() FairEventHeader found";
+
+    frm->Register("R3BEventHeaderCal2Hit", "EventHeader", fHeader, kTRUE);
     return kSUCCESS;
 }
 
 void R3BEventHeaderCal2Hit::SetParContainers() {}
 
-InitStatus R3BEventHeaderCal2Hit::ReInit()
-{
-    return kSUCCESS;
-}
+InitStatus R3BEventHeaderCal2Hit::ReInit() { return kSUCCESS; }
 
 void R3BEventHeaderCal2Hit::Exec(Option_t* option) {}
 

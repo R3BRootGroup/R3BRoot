@@ -12,8 +12,10 @@
  ******************************************************************************/
 
 #include "R3BUnpackReader.h"
+#include "FairEventHeader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "FairRunOnline.h"
 #include "R3BEventHeader.h"
 
 extern "C"
@@ -25,13 +27,15 @@ extern "C"
 
 using namespace std;
 
+int r = 1;
+
 R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, UInt_t offset)
     : R3BReader("R3BUnpackReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fLogger(FairLogger::GetLogger())
-    , fHeader(new R3BEventHeader())
+    , fHeader(NULL)
 {
 }
 
@@ -45,8 +49,8 @@ R3BUnpackReader::~R3BUnpackReader()
 
 Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BUnpackReader::Init";
     EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_unpack, 0);
 
     if (!ok)
@@ -56,8 +60,17 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    mgr->Register("R3BEventHeader", "EventHeader", fHeader, kTRUE);
+    // Look for the R3BEventHeader
+    auto frm = FairRootManager::Instance();
+    fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fHeader)
+    {
+        fHeader = new R3BEventHeader();
+        fHeader->Register(kTRUE);
+        LOG(WARNING) << "R3BUnpackReader::Init() R3BEventHeader not found";
+    }
+    else
+        LOG(info) << "R3BUnpackReader::Init() R3BEventHeader found";
 
     return kTRUE;
 }

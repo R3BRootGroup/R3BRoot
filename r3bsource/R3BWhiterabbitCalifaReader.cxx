@@ -47,6 +47,8 @@ R3BWhiterabbitCalifaReader::~R3BWhiterabbitCalifaReader()
     {
         delete fArray;
     }
+    if (fEventHeader)
+        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
@@ -61,8 +63,15 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // Look for the R3BEventHeader
+    FairRootManager* frm = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fEventHeader)
+    {
+        LOG(WARNING) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader not found";
+    }
+    else
+        LOG(INFO) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader found";
 
     // Register output array in tree
     if (!fOnline)
