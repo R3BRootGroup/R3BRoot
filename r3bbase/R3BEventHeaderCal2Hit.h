@@ -91,7 +91,7 @@ class R3BEventHeaderCal2Hit : public FairTask
 
   private:
     TString fName;
-    R3BEventHeader *fHeader;
+    R3BEventHeader* fHeader;
 
   public:
     ClassDef(R3BEventHeaderCal2Hit, 0)

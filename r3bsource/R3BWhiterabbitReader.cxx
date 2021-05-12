@@ -33,12 +33,16 @@ R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, UInt_
 {
 }
 
-R3BWhiterabbitReader::~R3BWhiterabbitReader() {}
+R3BWhiterabbitReader::~R3BWhiterabbitReader()
+{
+    if (fEventHeader)
+        delete fEventHeader;
+}
 
 Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BWhiterabbitReader::Init";
     EXT_STR_h101_whiterabbit_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_whiterabbit, 0);
 
     if (!ok)
@@ -48,8 +52,15 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // Look for the R3BEventHeader
+    FairRootManager* frm = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fEventHeader)
+    {
+        LOG(WARNING) << "R3BWhiterabbitReader::Init() R3BEventHeader not found";
+    }
+    else
+        LOG(INFO) << "R3BWhiterabbitReader::Init() R3BEventHeader found";
 
     fData->TIMESTAMP_MASTER_ID = 0;
 

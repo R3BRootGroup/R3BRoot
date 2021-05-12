@@ -26,6 +26,9 @@
 #include "TObjArray.h"
 #include "TString.h"
 
+#include <fstream>
+#include <list>
+
 /* External data client interface (ucesb) */
 #include "ext_data_clnt.hh"
 #include "ext_data_struct_info.hh"
@@ -39,6 +42,7 @@ typedef struct EXT_STR_h101_t EXT_STR_h101;
 /*#include "ext_h101.h"*/
 
 class FairLogger;
+class R3BEventHeader;
 
 class R3BUcesbSource : public FairSource
 {
@@ -68,6 +72,10 @@ class R3BUcesbSource : public FairSource
     /* Get readers */
     const TObjArray* GetReaders() const { return fReaders; }
 
+    virtual void FillEventHeader(FairEventHeader* feh);
+
+    void SetInputFileName(TString tstr) { fInputFileName = tstr; }
+
   private:
     /* File descriptor returned from popen() */
     FILE* fFd;
@@ -92,6 +100,13 @@ class R3BUcesbSource : public FairSource
     FairLogger* fLogger;
     /* The array of readers */
     TObjArray* fReaders;
+    /* R3B header */
+    R3BEventHeader* fEventHeader;
+    Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
+    TString fInputFileName;
+    std::ifstream fInputFile;
+    Int_t fRunId;
+    Int_t fEntryMax;
 
   public:
     /* Create dictionary */

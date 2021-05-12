@@ -33,12 +33,16 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, UInt_t offset)
 {
 }
 
-R3BTrloiiTpatReader::~R3BTrloiiTpatReader() {}
+R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
+{
+    if (fEventHeader)
+        delete fEventHeader;
+}
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BTrloiiTpatReader::Init";
     EXT_STR_h101_TPAT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TPAT, 0);
 
     if (!ok)
@@ -48,8 +52,14 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    auto mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    FairRootManager* frm = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (!fEventHeader)
+    {
+        LOG(WARNING) << "R3BTrloiiTpatReader::Init() R3BEventHeader not found";
+    }
+    else
+        LOG(INFO) << "R3BTrloiiTpatReader::Init() R3BEventHeader found";
 
     return kTRUE;
 }
@@ -73,7 +83,6 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     if (0 == (fNEvent % 1000000))
     {
-
         LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent;
     }
 

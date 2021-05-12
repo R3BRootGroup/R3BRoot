@@ -21,6 +21,8 @@ typedef struct EXT_STR_h101_unpack_t EXT_STR_h101_unpack;
 
 class FairLogger;
 class R3BEventHeader;
+class FairEventHeader;
+class FairRunOnline;
 
 class R3BUnpackReader : public R3BReader
 {
@@ -43,6 +45,10 @@ class R3BUnpackReader : public R3BReader
     FairLogger* fLogger;
 
     R3BEventHeader* fHeader;
+
+    FairEventHeader* evt;
+
+    FairRunOnline* fair;
 
   public:
     ClassDef(R3BUnpackReader, 0);

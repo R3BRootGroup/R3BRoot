@@ -36,5 +36,6 @@
 #pragma link C++ class R3BOnlineSpectraLosStandalone+;
 #pragma link C++ class R3BOnlineSpectraSci2+;
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
+#pragma link C++ class R3BFileSource+;
 
 #endif

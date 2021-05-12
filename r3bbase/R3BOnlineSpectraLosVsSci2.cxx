@@ -44,8 +44,8 @@
 #include "THttpServer.h"
 
 #include "TClonesArray.h"
-#include "TMath.h"
 #include "TFolder.h"
+#include "TMath.h"
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <algorithm>
@@ -151,6 +151,9 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
         LOG(fatal) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("", this);

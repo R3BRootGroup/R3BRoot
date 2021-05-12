@@ -164,8 +164,8 @@ void R3BStartrackMapped2Cal::Exec(Option_t* option)
     Int_t my_strip_id = 0;
     Double32_t my_energy = 0.;
 
-    ULong64_t my_new_ts = 0.; //
-    ULong64_t my_prev_ts;     //
+    ULong64_t my_new_ts = 0.;  //
+    ULong64_t my_prev_ts = 0.; //
     ULong64_t my_new_ts_ext = 0.;
     Int_t my_new_ladderId = -1;
     Int_t my_new_side = -1;
