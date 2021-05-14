@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,25 +11,39 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+// Adapted from R3BunchedFiber class by V. Panin, May 2021
+// This class contains calibrated data for single MAPMT channels of
+// R3BFiberMAPMT detectors i.e. fib30,31,32,33,23A(B)
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BFIBERMAPMTCALDATA_H
+#define R3BFIBERMAPMTCALDATA_H
 
-#pragma link C++ class R3BBunchedFiberCal2Hit+;
-#pragma link C++ class R3BBunchedFiberCal2Hit_s494+;
-#pragma link C++ class R3BBunchedFiberCal2HitEngRun2019+;
-#pragma link C++ class R3BBunchedFiberMapped2CalPar+;
-#pragma link C++ class R3BBunchedFiberMapped2Cal+;
-#pragma link C++ class R3BBunchedFiberHitModulePar+;
-#pragma link C++ class R3BBunchedFiberHitPar+;
-#pragma link C++ class R3BFiberContFact+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigMapped2CalPar+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigMapped2Cal+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigDigitizerCal+;
-#pragma link C++ class R3BFiberMAPMTMapped2Cal+;
-#pragma link C++ class R3BFiberMAPMTMapped2CalPar+;
+#include "TObject.h"
 
+class R3BFiberMAPMTCalData : public TObject
+{
+	public:
+		R3BFiberMAPMTCalData();
+		R3BFiberMAPMTCalData(Int_t, Int_t, Bool_t, Double_t);
+		virtual ~R3BFiberMAPMTCalData();
+
+		Int_t GetChannel() const;
+		Double_t GetTime_ns() const;
+		Int_t  GetSide() const;
+		Bool_t IsBottom() const;
+		Bool_t IsTop() const;
+		Bool_t IsTrigger() const;
+		Bool_t IsLeading() const;
+		Bool_t IsTrailing() const;
+		Bool_t IsSortable() const;
+
+	private:
+		Int_t fSide;      // 0 = bottom, 1 = top, 2 = MAPMT trigger
+		Int_t fChannel;
+		Bool_t fIsLeading;
+		Double_t fTime_ns;
+
+		ClassDef(R3BFiberMAPMTCalData, 1)
+};
 
 #endif

@@ -88,91 +88,106 @@ void R3BTCalContFact::setAllContainers()
     ADD_FIBER(Fi8, FI8);
     ADD_FIBER(Fi9, FI9);
     ADD_FIBER(Fi10, FI10);
-    ADD_FIBER(Fi11, FI11);
-    ADD_FIBER(Fi12, FI12);
-    ADD_FIBER(Fi13, FI13);
-    ADD_FIBER(Fi23a, FI23a);
-    ADD_FIBER(Fi23b, FI23b);
-    ADD_FIBER(Fi30, FI30);
-    ADD_FIBER(Fi31, FI31);
-    ADD_FIBER(Fi32, FI32);
-    ADD_FIBER(Fi33, FI33);
-    addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
-    addContainer("Sci2TCalPar", "S2 TCAL Calibration Parameters");
-    addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
+		ADD_FIBER(Fi11, FI11);
+		ADD_FIBER(Fi12, FI12);
+		ADD_FIBER(Fi13, FI13);
+
+#define ADD_FIBER_MAPMT(Name, NAME)                                                                       \
+		do                                                                                              \
+		{                                                                                               \
+			addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");             \
+			addContainer(#Name "MAPMTTrigTCalPar", #NAME " MAPMT Trigger TCAL Calibration Parameters"); \
+		} while (0)
+		ADD_FIBER_MAPMT(Fi30, FI30);
+		ADD_FIBER_MAPMT(Fi31, FI31);
+		ADD_FIBER_MAPMT(Fi32, FI32);
+		ADD_FIBER_MAPMT(Fi33, FI34);
+		ADD_FIBER_MAPMT(Fi23a, FI23a);
+		ADD_FIBER_MAPMT(Fi23b, FI23b);
+
+		addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
+		addContainer("Sci2TCalPar", "S2 TCAL Calibration Parameters");
+		addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
 {
-    /** Calls the constructor of the corresponding parameter container.
-     * For an actual context, which is not an empty string and not the default context
-     * of this container, the name is concatinated with the context. */
+	/** Calls the constructor of the corresponding parameter container.
+	 * For an actual context, which is not an empty string and not the default context
+	 * of this container, the name is concatinated with the context. */
 
-    const char* name = c->GetName();
-    LOG(INFO) << "R3BTCalContFact::createContainer : " << name;
+	const char* name = c->GetName();
+	LOG(INFO) << "R3BTCalContFact::createContainer : " << name;
 
-    vector<const char*> containerNames;
-    containerNames.push_back("LandTCalPar");
-    containerNames.push_back("LosTCalPar");
-    containerNames.push_back("RoluTCalPar");
-    containerNames.push_back("Sci2TCalPar");
-    containerNames.push_back("Sci8TCalPar");
-    containerNames.push_back("TofdTCalPar");
-    containerNames.push_back("TofiTCalPar");
-    containerNames.push_back("PdcTCalPar");
-    containerNames.push_back("StrawtubesTCalPar");
-    containerNames.push_back("BunchedFiberSPMTTrigTCalPar");
-    containerNames.push_back("SfibTCalPar");
+	vector<const char*> containerNames;
+	containerNames.push_back("LandTCalPar");
+	containerNames.push_back("LosTCalPar");
+	containerNames.push_back("RoluTCalPar");
+	containerNames.push_back("Sci2TCalPar");
+	containerNames.push_back("Sci8TCalPar");
+	containerNames.push_back("TofdTCalPar");
+	containerNames.push_back("PdcTCalPar");
+	containerNames.push_back("StrawtubesTCalPar");
+	containerNames.push_back("BunchedFiberSPMTTrigTCalPar");
+	containerNames.push_back("SfibTCalPar");
 #define PUSH_FIBER(Name)                                    \
-    do                                                      \
-    {                                                       \
-        containerNames.push_back(#Name "MAPMTTCalPar");     \
-        containerNames.push_back(#Name "SPMTTCalPar");      \
-        containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
-    } while (0)
-    PUSH_FIBER(Fi0);
-    PUSH_FIBER(Fi1a);
-    PUSH_FIBER(Fi1b);
-    PUSH_FIBER(Fi2a);
-    PUSH_FIBER(Fi2b);
-    PUSH_FIBER(Fi3a);
-    PUSH_FIBER(Fi3b);
-    PUSH_FIBER(Fi4);
-    PUSH_FIBER(Fi5);
-    PUSH_FIBER(Fi6);
-    PUSH_FIBER(Fi7);
-    PUSH_FIBER(Fi8);
-    PUSH_FIBER(Fi9);
-    PUSH_FIBER(Fi10);
-    PUSH_FIBER(Fi11);
-    PUSH_FIBER(Fi12);
-    PUSH_FIBER(Fi13);
-    PUSH_FIBER(Fi23a);
-    PUSH_FIBER(Fi23b);
-    PUSH_FIBER(Fi30);
-    PUSH_FIBER(Fi31);
-    PUSH_FIBER(Fi32);
-    PUSH_FIBER(Fi33);
-    containerNames.push_back("PtofTCalPar");
-    containerNames.push_back("Sci2TCalPar");
-    containerNames.push_back("Sci8TCalPar");
+	do                                                      \
+	{                                                       \
+		containerNames.push_back(#Name "MAPMTTCalPar");     \
+		containerNames.push_back(#Name "SPMTTCalPar");      \
+		containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
+	} while (0)
+	PUSH_FIBER(Fi0);
+	PUSH_FIBER(Fi1a);
+	PUSH_FIBER(Fi1b);
+	PUSH_FIBER(Fi2a);
+	PUSH_FIBER(Fi2b);
+	PUSH_FIBER(Fi3a);
+	PUSH_FIBER(Fi3b);
+	PUSH_FIBER(Fi4);
+	PUSH_FIBER(Fi5);
+	PUSH_FIBER(Fi6);
+	PUSH_FIBER(Fi7);
+	PUSH_FIBER(Fi8);
+	PUSH_FIBER(Fi9);
+	PUSH_FIBER(Fi10);
+	PUSH_FIBER(Fi11);
+	PUSH_FIBER(Fi12);
+	PUSH_FIBER(Fi13);
 
-    bool found = false;
-    for (auto containerName : containerNames)
-    {
-        if (strncmp(name, containerName, strlen(containerName)) == 0)
-        {
-            found = true;
-            break;
-        }
-    }
+#define PUSH_FIBER_MAPMT(Name)                                    \
+	do                                                      \
+	{                                                       \
+		containerNames.push_back(#Name "MAPMTTCalPar");     \
+		containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
+	} while (0)
+	PUSH_FIBER_MAPMT(Fi30);
+	PUSH_FIBER_MAPMT(Fi31);
+	PUSH_FIBER_MAPMT(Fi32);
+	PUSH_FIBER_MAPMT(Fi33);
+	PUSH_FIBER_MAPMT(Fi23a);
+	PUSH_FIBER_MAPMT(Fi23b);
 
-    if (found == true)
-    {
-        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else
-    {
-        return nullptr;
-    }
+	containerNames.push_back("PtofTCalPar");
+	containerNames.push_back("Sci2TCalPar");
+	containerNames.push_back("Sci8TCalPar");
+
+	bool found = false;
+	for (auto containerName : containerNames)
+	{
+		if (strncmp(name, containerName, strlen(containerName)) == 0)
+		{
+			found = true;
+			break;
+		}
+	}
+
+	if (found == true)
+	{
+		return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+	}
+	else
+	{
+		return nullptr;
+	}
 }

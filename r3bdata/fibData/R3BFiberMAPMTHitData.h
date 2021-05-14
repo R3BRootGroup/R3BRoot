@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,25 +11,42 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+//
+// This class contains hit-level data for one fiber with MAPMT
+// readout on both ends
+//
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BFIBERMAPMTHITDATA_H
+#define R3BFIBERMAPMTHITDATA_H
 
-#pragma link C++ class R3BBunchedFiberCal2Hit+;
-#pragma link C++ class R3BBunchedFiberCal2Hit_s494+;
-#pragma link C++ class R3BBunchedFiberCal2HitEngRun2019+;
-#pragma link C++ class R3BBunchedFiberMapped2CalPar+;
-#pragma link C++ class R3BBunchedFiberMapped2Cal+;
-#pragma link C++ class R3BBunchedFiberHitModulePar+;
-#pragma link C++ class R3BBunchedFiberHitPar+;
-#pragma link C++ class R3BFiberContFact+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigMapped2CalPar+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigMapped2Cal+;
-#pragma link C++ class R3BBunchedFiberSPMTTrigDigitizerCal+;
-#pragma link C++ class R3BFiberMAPMTMapped2Cal+;
-#pragma link C++ class R3BFiberMAPMTMapped2CalPar+;
+#include "R3BHit.h"
 
+class R3BFiberMAPMTHitData : public R3BHit
+{
+  public:
+    R3BFiberMAPMTHitData();
+    R3BFiberMAPMTHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t a_fiber_id, Double_t
+    a_bottom_time_ns, Double_t a_top_time_ns, Double_t a_bottom_tot_ns, Double_t a_top_tot_ns);
+    
+    virtual ~R3BFiberMAPMTHitData();
+
+    Int_t GetFiberId() const;
+    Double_t GetBottomTime_ns() const;
+    Double_t GetTopTime_ns() const;
+    Double_t GetTime_ns() const;
+    Double_t GetBottomToT_ns() const;
+    Double_t GetTopToT_ns() const;
+
+  private:
+    Int_t fFiberId;
+    Double_t fBottomTime_ns;
+    Double_t fTopTime_ns;
+    Double_t fTime_ns;
+    Double_t fBottomToT_ns;
+    Double_t fTopToT_ns;
+
+    ClassDef(R3BFiberMAPMTHitData, 2)
+};
 
 #endif
+
