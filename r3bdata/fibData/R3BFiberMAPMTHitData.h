@@ -45,7 +45,7 @@ class R3BFiberMAPMTHitData : public R3BHit
     Double_t fBottomToT_ns;
     Double_t fTopToT_ns;
 
-    ClassDef(R3BFiberMAPMTHitData, 2)
+    ClassDef(R3BFiberMAPMTHitData, 1)
 };
 
 #endif
