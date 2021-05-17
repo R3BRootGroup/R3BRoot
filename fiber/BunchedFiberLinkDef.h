@@ -32,6 +32,6 @@
 #pragma link C++ class R3BBunchedFiberSPMTTrigDigitizerCal+;
 #pragma link C++ class R3BFiberMAPMTMapped2Cal+;
 #pragma link C++ class R3BFiberMAPMTMapped2CalPar+;
-
+#pragma link C++ class R3BFiberMAPMTCal2Hit+;
 
 #endif

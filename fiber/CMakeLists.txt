@@ -53,6 +53,7 @@ R3BBunchedFiberSPMTTrigMapped2Cal.cxx
 R3BBunchedFiberSPMTTrigDigitizerCal.cxx
 R3BFiberMAPMTMapped2Cal.cxx
 R3BFiberMAPMTMapped2CalPar.cxx
+R3BFiberMAPMTCal2Hit.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
