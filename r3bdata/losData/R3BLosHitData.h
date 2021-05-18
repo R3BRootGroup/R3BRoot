@@ -13,7 +13,29 @@
 
 #ifndef R3BLOSHITITEM_H
 #define R3BLOSHITITEM_H
+#include "R3BHit.h"
 
+// for the data analysis of the Los.
+// Introduced by M.Heil, May 2016
+
+class R3BLosHitData : public R3BHit
+{
+  public:
+    // Default Constructor
+    R3BLosHitData();
+
+    // Standard Constructor
+    R3BLosHitData(Int_t detId, Double_t x, Double_t y, Double_t Eloss, Double_t t, Int_t hitId );
+ 
+    // Destructor
+    virtual ~R3BLosHitData() {}
+
+    ClassDef(R3BLosHitData, 2)
+};
+
+#endif
+
+/*
 #include "TObject.h"
 
 // for the data analysis of the LOS detectors.
@@ -48,3 +70,4 @@ class R3BLosHitData : public TObject
 };
 
 #endif
+*/

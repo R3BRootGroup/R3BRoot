@@ -55,8 +55,12 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Read()
 {
     EXT_STR_h101_FIB_onion* data = (EXT_STR_h101_FIB_onion*)fData;
 
+    //   LOG(INFO)<<"!!!!!!!!!! IN TRIGGER READER";
+
     // Leading TAMEX trigger times.
     auto numChannels = data->FIB_TRIGSLF;
+    //    LOG(INFO)<<"TRIGGER channel: "<<numChannels;
+
     for (uint32_t i = 0; i < numChannels; i++)
     {
         uint32_t channel = data->FIB_TRIGSLFI[i];

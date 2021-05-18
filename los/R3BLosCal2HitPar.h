@@ -63,18 +63,12 @@ class R3BLosCal2HitPar : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Fit();
-
-    /**
-     * Method fitting the data.
-     * Is called by the framework after events are read.
-     * @param option an execution option.
-     */
     virtual void Exec(Option_t* option);
-
-    virtual Double_t walk_correction(Int_t PMT, Double_t TOT, const Double_t* par);
-
-    virtual Double_t calc_time_residual(const Double_t* par);
+    
+    virtual Double_t walk_correction(Int_t PMT,Double_t TOT,const Double_t *par);
+    
+    virtual Double_t calc_time_residual(const Double_t *par); 
+    virtual Double_t calc_time_residualv2(const Double_t *par);
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
@@ -90,20 +84,25 @@ class R3BLosCal2HitPar : public FairTask
 
     /**
      * Method for setting required statistics per module.
-     */
-
-    inline void SetStats(Int_t nStats)
-    {
-        fStats = nStats;
-        tvftx.resize(fStats, std::vector<Double_t>(8, 0));
-        tlead.resize(fStats, std::vector<Double_t>(8, 0));
-        ttrai.resize(fStats, std::vector<Double_t>(8, 0));
-        energ.resize(fStats, std::vector<Double_t>(8, 0));
-    }
+     */   
+	
+	 inline void SetStats(Int_t nStats) 
+	 { 
+		fStats = nStats; 
+     }    
 
     /* Method for setting which LOS detector to calibrate */
-    inline void SetWhichLos(Int_t nDet) { fidentDet = nDet; }
-
+    inline void SetWhichLos(Int_t DetID)
+    {
+        fidentDet = DetID;
+    }
+    
+    inline void SetAlghoritm(const char *minNamein, const char *algoNamein)
+    {
+	  minName =  minNamein;
+	  algoName = algoNamein;	
+	} 
+           
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
@@ -121,19 +120,33 @@ class R3BLosCal2HitPar : public FairTask
     Int_t fidentDet; /**< Number of LOS detectors. */
     Int_t fStats;
     Int_t NPM = 8;
-    Int_t icount = 2;
-    Int_t NPAR = NPM * icount;
+    Int_t icount = 3;
+   // Int_t NPAR = NPM * icount;
+    Int_t NPAR = icount;
     Double_t fClockFreq;
     TH1F* hfit;
-
-    // creating the storage for energy and time for each PMTs
-    std::vector<std::vector<Double_t>> tvftx; //(fStats, vector<Double_t> (8, 0));
-    std::vector<std::vector<Double_t>> tlead; //(fStats, vector<Double_t> (8, 0));
-    std::vector<std::vector<Double_t>> ttrai; //(fStats, vector<Double_t> (8, 0));
-    std::vector<std::vector<Double_t>> energ; //(fStats, vector<Double_t> (8, 0));
-
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
-
+    TH1F* hwalk;
+    TH1F* horig;
+    TH1F* htres;
+    TH1F* htres_corr;
+    TH2F* hwalk_cor[8];
+    TH2F* htot_ipm;
+    TH1F* htot;
+    
+    	       // creating the storage for energy and time for each PMTs         
+    std::vector<std::vector<Double_t>> tvftx; 
+    std::vector<std::vector<Double_t>> tlead; 
+    std::vector<std::vector<Double_t>> ttrai; 
+    std::vector<std::vector<Double_t>> energ; 
+    std::vector<Double_t> tempVftx;
+    std::vector<Double_t> tempLead;
+    std::vector<Double_t> tempTrai;
+    std::vector<Double_t> tempEner;     
+    
+    unsigned long fNEvents = 0, fNEvents_start = 0;         /**< Event counter. */
+    const char *minName ;
+    const char *algoName;   
+    
   public:
     ClassDef(R3BLosCal2HitPar, 2)
 };

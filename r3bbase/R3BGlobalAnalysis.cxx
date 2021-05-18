@@ -539,14 +539,14 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BLosHitData* hitData = (R3BLosHitData*)det->At(ihit);
-            timeLos[ihit] = hitData->fTime_ns;
+            timeLos[ihit] = hitData->GetTime();
 
-            fh_los_pos->Fill(hitData->fX_cm, hitData->fY_cm);
+            fh_los_pos->Fill(hitData->GetX(), hitData->GetY());
 
-            fh_Cave_position->Fill(0., hitData->fX_cm);
+            fh_Cave_position->Fill(0., hitData->GetX());
 
-            if (hitData->fZ > LosQ)
-                LosQ = hitData->fZ;
+            if (hitData->GetEloss() > LosQ)
+                LosQ = hitData->GetEloss();
         }
     }
 

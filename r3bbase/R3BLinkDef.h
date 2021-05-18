@@ -24,9 +24,12 @@
 #pragma link C++ class R3BEventHeader+;
 #pragma link C++ class R3BEventHeaderCal2Hit+;
 #pragma link C++ class R3BOnlineSpectra+;
+#pragma link C++ class R3BOnlineSpectraLosEngRun2019+;
 #pragma link C++ class R3BOnlineSpectraDec2019+;
 #pragma link C++ class R3BOnlineSpectraPdc+;
 #pragma link C++ class R3BOnlineSpectraSfib+;
+#pragma link C++ class R3BOnlineSpectraLosStandalone+;
+#pragma link C++ class R3BOnlineSpectraPID+;
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
 #pragma link C++ class R3BGlobalAnalysisS494+;
@@ -41,4 +44,7 @@
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
 #pragma link C++ class R3BTrackerPreparationS454+;
 #pragma link C++ class R3BTrackerPreparationS494+;
+#pragma link C++ class R3BOnlineSpectraFibvsToFDS494+;
+#pragma link C++ class R3BOnlineSpectraFiber_s494+;
+
 #endif

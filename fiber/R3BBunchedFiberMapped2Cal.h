@@ -35,6 +35,12 @@ class R3BTCalPar;
 class R3BBunchedFiberMapped2Cal : public FairTask
 {
   public:
+  
+  enum Electronics
+    {
+        CTDC,
+        TAMEX
+    };
     /**
      * Standard constructor.
      * Creates an instance of the task.
@@ -43,7 +49,11 @@ class R3BBunchedFiberMapped2Cal : public FairTask
      * @param a_variant CTDC firmware variant, see R3BTCalEngine.
      * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
-    R3BBunchedFiberMapped2Cal(const char*, Int_t, enum R3BTCalEngine::CTDCVariant, Bool_t = false);
+    R3BBunchedFiberMapped2Cal(const char*, 
+                                    Int_t, 
+                                    enum Electronics,
+                                    enum R3BTCalEngine::CTDCVariant, 
+                                    Bool_t = false);
 
     /**
      * Destructor.
@@ -92,6 +102,8 @@ class R3BBunchedFiberMapped2Cal : public FairTask
     virtual void FinishTask();
 
   private:
+    enum Electronics fSPMTElectronics;
+    enum R3BTCalEngine::CTDCVariant fCTDCVariant;
     TString fName;
     UInt_t fSideNum[2];
     Bool_t fSkipSPMT;

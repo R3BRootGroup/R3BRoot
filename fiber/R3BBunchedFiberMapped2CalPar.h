@@ -44,7 +44,7 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
      */
     R3BBunchedFiberMapped2CalPar(const char*,
                                  Int_t,
-                                 enum Electronics = TAMEX,
+                                 enum Electronics = CTDC,
                                  enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_16_BWD_150,
                                  Int_t = 1e6,
                                  Int_t = 1e5);

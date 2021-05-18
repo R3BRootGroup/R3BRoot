@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_FIBONEA__U_MHEIL_R3BROOT_R3BSOURCE_EXT_H101_FIBONEA_H__
-#define __GUARD_H101_FIBONEA__U_MHEIL_R3BROOT_R3BSOURCE_EXT_H101_FIBONEA_H__
+#ifndef __GUARD_H101_FIBONEA_EXT_H101_FIBONEA_H__
+#define __GUARD_H101_FIBONEA_EXT_H101_FIBONEA_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -17352,6 +17352,6 @@ typedef struct EXT_STR_h101_FIBONEA_layout_t
   } \
 };
 
-#endif/*__GUARD_H101_FIBONEA__U_MHEIL_R3BROOT_R3BSOURCE_EXT_H101_FIBONEA_H__*/
+#endif/*__GUARD_H101_FIBONEB_EXT_H101_FIBONEA_H__*/
 
 /*******************************************************/

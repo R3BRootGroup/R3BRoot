@@ -23,6 +23,7 @@
 #pragma link C++ class R3BLosMapped2CalPar+;
 #pragma link C++ class R3BLosCal2Hit+;
 #pragma link C++ class R3BLosProvideTStart+;
+#pragma link C++ class R3BLosCal2HitPar+;
 
 #endif
 

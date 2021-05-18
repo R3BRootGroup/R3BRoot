@@ -25,13 +25,13 @@ R3BFi33Cal2Hit::R3BFi33Cal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                                   VERTICAL,
                                   2,
                                   256,
-                                  1,
+                                  256,
                                   a_is_calibrator,
                                   a_is_gain,
                                   a_is_tsync)
 {
     fib33_trig_map_setup();
-    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib33m_trig_map, g_fib33s_trig_map);
+    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib33m_trig_map, g_fib33m_trig_map); //, g_fib33s_trig_map);
 }
 
 R3BFi33Cal2Hit::~R3BFi33Cal2Hit() {}

@@ -99,33 +99,57 @@ class R3BLosCal2Hit : public FairTask
      **/
     void FillHisto();
 
+    /* Method for setting number of LOS detectors */
+    inline void SetNofLosModules(Int_t nDets)
+    {
+        fNofLosDetectors = nDets;
+    }
     /**
      * Methods for setting position offset and effective velocity of light
      */
-    inline void SetLosParamMCFD(Double_t offsetX, Double_t offsetY, Double_t veffX, Double_t veffY)
+   /**
+     * Methods for setting position offset and effective velocity of light
+     */
+    inline void SetLosXYMCFD(Double_t offsetX1,
+                             Double_t offsetY1,
+                             Double_t veffX1,
+                             Double_t veffY1,
+                             Double_t offsetX2,
+                             Double_t offsetY2,
+                             Double_t veffX2,
+                             Double_t veffY2)
     {
-        flosOffsetX = offsetX;
-        flosOffsetY = offsetY;
-        flosVeffX = veffX;
-        flosVeffY = veffY;
+        flosOffsetXV[0] = offsetX1;
+        flosOffsetYV[0] = offsetY1;
+        flosVeffXV[0] = veffX1;
+        flosVeffYV[0] = veffY1;
+        flosOffsetXV[1] = offsetX2;
+        flosOffsetYV[1] = offsetY2;
+        flosVeffXV[1] = veffX2;
+        flosVeffYV[1] = veffY2;
     }
 
-    inline void SetLosParamToT(Double_t offsetXQ, Double_t offsetYQ, Double_t veffXQ, Double_t veffYQ)
-    {
-        flosOffsetXQ = offsetXQ;
-        flosOffsetYQ = offsetYQ;
-        flosVeffXQ = veffXQ;
-        flosVeffYQ = veffYQ;
-    }
 
-    inline void SetLosParamTAMEX(Double_t offsetXT, Double_t offsetYT, Double_t veffXT, Double_t veffYT)
+    inline void SetLosXYToT(Double_t offsetXQ1,
+                            Double_t offsetYQ1,
+                            Double_t veffXQ1,
+                            Double_t veffYQ1,
+                            Double_t offsetXQ2,
+                            Double_t offsetYQ2,
+                            Double_t veffXQ2,
+                            Double_t veffYQ2)
     {
-        flosOffsetXT = offsetXT;
-        flosOffsetYT = offsetYT;
-        flosVeffXT = veffXT;
-        flosVeffYT = veffYT;
+        flosOffsetXQ[0] = offsetXQ1;
+        flosOffsetYQ[0] = offsetYQ1;
+        flosVeffXQ[0] = veffXQ1;
+        flosVeffYQ[0] = veffYQ1;
+        flosOffsetXQ[1] = offsetXQ2;
+        flosOffsetYQ[1] = offsetYQ2;
+        flosVeffXQ[1] = veffXQ2;
+        flosVeffYQ[1] = veffYQ2;
     }
-
+   /* Method for pile-up */
+    inline void SetEpileup(Double_t Epileup) { fEpileup = Epileup; }
     /**
      * Methods for setting input files
      */
@@ -167,29 +191,30 @@ class R3BLosCal2Hit : public FairTask
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
-
+ 
+    Int_t fNofLosDetectors; /**< Number of LOS detectors. */
     UInt_t fNofHitItems; /**< Number of hit items for cur event. */
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    Double_t flosVeffX;
-    Double_t flosVeffY;
-    Double_t flosOffsetX;
-    Double_t flosOffsetY;
-    Double_t flosVeffXQ;
-    Double_t flosVeffYQ;
-    Double_t flosOffsetXQ;
-    Double_t flosOffsetYQ;
-    Double_t flosVeffXT;
-    Double_t flosVeffYT;
-    Double_t flosOffsetXT;
-    Double_t flosOffsetYT;
+    Double_t flosVeffXV[2];
+    Double_t flosVeffYV[2];
+    Double_t flosOffsetXV[2];
+    Double_t flosOffsetYV[2];
+    Double_t flosVeffXQ[2];
+    Double_t flosVeffYQ[2];
+    Double_t flosOffsetXQ[2];
+    Double_t flosOffsetYQ[2];
     Double_t walk_par[16][11]{}; // Array containing walk parameters: x=PM, y=min,max,p0...p9; MCFD and TAMEX considered
     Double_t tot_par[8][4]{};    // Array containing walk parameters: x=PM, y=p0...p3;
     Int_t OptHisto;
+    Double_t fEpileup;
     std::string fwalk_param_file;
     std::string ftot_param_file;
 
     TClonesArray* fMapped; /**< Array with mapped data - input data. */
-
+            Double_t x_cm1 = 0;
+            Double_t y_cm1 = 0;
+            Double_t t_hit1 = 0;
+            Double_t totsum1 = 0;
     TH1F* fhTres_M;
     TH1F* fhTres_T;
     TH1F* fhTres_M_corr;

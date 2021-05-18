@@ -168,6 +168,7 @@ class R3BBunchedFiberReader : public R3BReader
 
   private:
     TString fShortName; // e.g. "Fi1a", "Fi2", ...
+    TString fShortNameTemp;
     // [0=MAPMT,1=SPMT].
     UInt_t fChannelNum[2];
     TClonesArray* fMappedArray;

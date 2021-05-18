@@ -47,18 +47,6 @@ R3BLosCal2Hit::R3BLosCal2Hit()
     , fNofHitItems(0)
     , fTrigger(-1)
     , fTpat(-1)
-    , flosVeffX(1.)
-    , flosVeffY(1.)
-    , flosOffsetX(0.)
-    , flosOffsetY(0.)
-    , flosVeffXT(1.)
-    , flosVeffYT(1.)
-    , flosOffsetXT(0.)
-    , flosOffsetYT(0.)
-    , flosVeffXQ(1.)
-    , flosVeffYQ(1.)
-    , flosOffsetXQ(0.)
-    , flosOffsetYQ(0.)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
     fhTres_M = NULL;
@@ -133,18 +121,6 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
     , fNofHitItems(0)
     , fTrigger(-1)
     , fTpat(-1)
-    , flosVeffX(1.)
-    , flosVeffY(1.)
-    , flosOffsetX(0.)
-    , flosOffsetY(0.)
-    , flosVeffXT(1.)
-    , flosVeffYT(1.)
-    , flosOffsetXT(0.)
-    , flosOffsetYT(0.)
-    , flosVeffXQ(1.)
-    , flosVeffYQ(1.)
-    , flosOffsetXQ(0.)
-    , flosOffsetYQ(0.)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
     fhTres_M = NULL;
@@ -373,11 +349,11 @@ InitStatus R3BLosCal2Hit::Init()
              ************* Parameters 0-7 MCFD  **********************
              ************* Parameters 8-15 TAMEX *********************
              */
-
-            infile >> walk_par[ivec][0] >> walk_par[ivec][1] >> walk_par[ivec][2] >> walk_par[ivec][3] >>
-                walk_par[ivec][4] >> walk_par[ivec][5] >> walk_par[ivec][6] >> walk_par[ivec][7] >> walk_par[ivec][8] >>
-                walk_par[ivec][9] >> walk_par[ivec][10];
-
+            /*
+                        infile >> walk_par[ivec][0] >> walk_par[ivec][1] >> walk_par[ivec][2] >> walk_par[ivec][3] >>
+                            walk_par[ivec][4] >> walk_par[ivec][5] >> walk_par[ivec][6] >> walk_par[ivec][7] >>
+               walk_par[ivec][8] >> walk_par[ivec][9] >> walk_par[ivec][10];
+            */
             /*
                  cout<<setprecision(10)<< ivec<<", "<< walk_par[ivec][0] <<", "<< walk_par[ivec][1] <<", "<<
                walk_par[ivec][2] <<", "<< walk_par[ivec][3] <<", "<< walk_par[ivec][4] <<", "<< walk_par[ivec][5] <<",
@@ -467,386 +443,587 @@ void R3BLosCal2Hit::Exec(Option_t* option)
     // missing times are NAN, hence other times will also
     // be NAN if one time is missing.
     //  cout<<nHits<<"; "<<narr<<endl;
+    // Time nomenclature for LOS:
+    //
+    //   7 / \0
+    //  6/     \1
+    //  5\     /2
+    //   4 \ /3
 
-    Double_t time_V[nHits][8]; // [multihit][pm]
-    Double_t time_V_temp[nHits][8];
-    Double_t time_L[nHits][8];
-    Double_t time_T[nHits][8];
-    Double_t time_V_corr[nHits][8]; // [multihit][pm]
-    Double_t time_L_corr[nHits][8];
-    Double_t timeLosM[nHits];
-    Double_t LosTresM[nHits];
-    Double_t timeLosT[nHits];
-    Double_t LosTresT[nHits];
-    Double_t timeLos[nHits];
-    Double_t timeLosM_corr[nHits];
-    Double_t LosTresM_corr[nHits];
-    Double_t timeLosT_corr[nHits];
-    Double_t LosTresT_corr[nHits];
-    Double_t timeLos_corr[nHits];
-    Double_t totsum[nHits];
-    Double_t tot[nHits][8];
-    Double_t totsum_corr[nHits];
-    Double_t tot_corr[nHits][8];
-    Double_t xT_cm[nHits];
-    Double_t yT_cm[nHits];
-    Double_t xV_cm[nHits];
-    Double_t yV_cm[nHits];
-    Double_t xToT_cm[nHits];
-    Double_t yToT_cm[nHits];
-    Double_t x_cm[nHits];
-    Double_t y_cm[nHits];
-    Double_t Z[nHits];
-    Double_t t_hit[nHits]; // NAN
+    Double_t timeLos[fNofLosDetectors][32];
+    Double_t totsum[fNofLosDetectors][32];
+    Double_t x_cm[fNofLosDetectors][32];
+    Double_t y_cm[fNofLosDetectors][32];
+    Double_t timeLosV[fNofLosDetectors][32];
+    Double_t LosTresV[fNofLosDetectors][32];
+    Double_t timeLosT[fNofLosDetectors][32];
+    Double_t LosTresT[fNofLosDetectors][32];
+    Double_t timeLosV_corr[fNofLosDetectors][32];
+    Double_t LosTresV_corr[fNofLosDetectors][32];
+    Double_t timeLosT_corr[fNofLosDetectors][32];
+    Double_t LosTresT_corr[fNofLosDetectors][32];
+    Double_t timeLos_corr[fNofLosDetectors][32];
+    Double_t totsum_corr[fNofLosDetectors][32];
+    Double_t xV_cm[fNofLosDetectors][32];
+    Double_t yV_cm[fNofLosDetectors][32];
+    Double_t xT_cm[fNofLosDetectors][32];
+    Double_t yT_cm[fNofLosDetectors][32];
+    Double_t xToT_cm[fNofLosDetectors][32];
+    Double_t yToT_cm[fNofLosDetectors][32];
+    Double_t Z[fNofLosDetectors][32];
+    Double_t t_hit[fNofLosDetectors][32];
+    Double_t time_V[fNofLosDetectors][32][8]; // [multihit][pm]
+    Double_t time_V_temp[fNofLosDetectors][32][8];
+    Double_t time_L[fNofLosDetectors][32][8];
+    Double_t time_T[fNofLosDetectors][32][8];
+    Double_t time_V_corr[fNofLosDetectors][32][8]; // [multihit][pm]
+    Double_t time_L_corr[fNofLosDetectors][32][8];
+    Double_t tot[fNofLosDetectors][32][8];
+    Double_t tot_corr[fNofLosDetectors][32][8];
+    Double_t time_V_LOS1[32][8];
+    Double_t time_V_LOS2[32][8];
+    Bool_t iLOSType[fNofLosDetectors][32];
+    Bool_t iLOSPileUp[fNofLosDetectors][32];
 
-    memset(time_V, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(time_V_temp, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(time_L, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(time_T, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(time_V_corr, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(time_L_corr, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(timeLosM, 0., nHits * sizeof(Double_t));
-    memset(LosTresM, 0. / 0., nHits * sizeof(Double_t));
-    memset(timeLosT, 0., nHits * sizeof(Double_t));
-    memset(LosTresT, 0. / 0., nHits * sizeof(Double_t));
-    memset(timeLos, 0., nHits * sizeof(Double_t));
-    memset(timeLosM_corr, 0., nHits * sizeof(Double_t));
-    memset(LosTresM_corr, 0. / 0., nHits * sizeof(Double_t));
-    memset(timeLosT_corr, 0., nHits * sizeof(Double_t));
-    memset(LosTresT_corr, 0. / 0., nHits * sizeof(Double_t));
-    memset(timeLos_corr, 0., nHits * sizeof(Double_t));
-    memset(totsum, 0., nHits * sizeof(Double_t));
-    memset(tot, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(totsum_corr, 0., nHits * sizeof(Double_t));
-    memset(tot_corr, 0. / 0., nHits * 8 * sizeof(Double_t));
-    memset(xT_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(yT_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(xV_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(yV_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(xToT_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(yToT_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(x_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(y_cm, 0. / 0., nHits * sizeof(Double_t));
-    memset(Z, 0., nHits * sizeof(Double_t));
-    memset(t_hit, 0. / 0., nHits * sizeof(Double_t));
+    for (Int_t i = 0; i < fNofLosDetectors; i++)
+    {
+        for (Int_t k = 0; k < 32; k++)
+        {
+            totsum[i][k] = 0.;
+            timeLosV[i][k] = 0.;
+            LosTresV[i][k] = 0. / 0.;
+            timeLosT[i][k] = 0.;
+            LosTresT[i][k] = 0. / 0.;
+            timeLosV_corr[i][k] = 0.;
+            LosTresV_corr[i][k] = 0. / 0.;
+            timeLosT_corr[i][k] = 0.;
+            LosTresT_corr[i][k] = 0. / 0.;
+            timeLos_corr[i][k] = 0.;
+            totsum_corr[i][k] = 0.;
+            xV_cm[i][k] = 0. / 0.;
+            yV_cm[i][k] = 0. / 0.;
+            xT_cm[i][k] = 0. / 0.;
+            yT_cm[i][k] = 0. / 0.;
+            x_cm[i][k] = 0. / 0.;
+            y_cm[i][k] = 0. / 0.;
+            xToT_cm[i][k] = 0. / 0.;
+            yToT_cm[i][k] = 0. / 0.;
+            Z[i][k] = 0. / 0.;
+            t_hit[i][k] = 0. / 0.;
+            iLOSType[i][k] = false;
+            iLOSPileUp[i][k] = false;
 
-    Int_t nDet = 0;
+            for (Int_t j = 0; j < 8; j++)
+            {
+                time_V[i][k][j] = 0. / 0.;
+                time_V_temp[i][k][j] = 0. / 0.;
+                time_L[i][k][j] = 0. / 0.;
+                time_T[i][k][j] = 0. / 0.;
+                time_V_corr[i][k][j] = 0. / 0.;
+                time_L_corr[i][k][j] = 0. / 0.;
+                tot[i][k][j] = 0. / 0.;
+                tot_corr[i][k][j] = 0. / 0.;
+            }
+        }
+    }
+    for (Int_t i = 0; i < 32; i++)
+    {
+        for (Int_t k = 0; k < 8; k++)
+        {
+            time_V_LOS1[i][k] = 0.;
+            time_V_LOS2[i][k] = 0.;
+        }
+    }
 
     // if OptHisto = true histograms are created
     if (OptHisto)
         CreateHisto();
 
+    Int_t iDet = -1;
+
+    Int_t nPartLos[fNofLosDetectors];
+    for (int i = 0; i < fNofLosDetectors; i++)
+    {
+        nPartLos[i] = 0;
+    }
+
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
-        R3BLosCalData* calItem = (R3BLosCalData*)fCalItems->At(ihit);
+        R3BLosCalData* calData = (R3BLosCalData*)fCalItems->At(ihit);
 
-        nDet = calItem->GetDetector();
+        iDet = calData->GetDetector();
 
-        // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7
+        Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;
         for (Int_t iCha = 0; iCha < 8; iCha++)
         {
-            time_V[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeV_ns(iCha))))
-            { // VFTX
-                time_V[ihit][iCha] = calItem->GetTimeV_ns(iCha);
+            sumvtemp += calData->GetTimeV_ns(iCha);
+            sumltemp += calData->GetTimeL_ns(iCha);
+            sumttemp += calData->GetTimeT_ns(iCha);
+        }
+        if (!(IS_NAN(sumvtemp)) && !(IS_NAN(sumltemp)) && !(IS_NAN(sumttemp)) && // all times are there
+            sumvtemp > 0 && sumltemp > 0 && sumltemp > 0)                        // and > 0
+        {
+            nPartLos[iDet - 1]++;
+        }
+        else
+        {
+            continue;
+        }
+
+        for (Int_t iCha = 0; iCha < 8; iCha++)
+        {
+            if (iDet == 1)
+            {
+                time_V_LOS1[nPartLos[iDet - 1]][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeV_ns(iCha)))) // VFTX times are written in time-reversed order.
+                { // VFTX                                                                  // Thus, we first create temp
+                  // variable, which will
+                    time_V_LOS1[nPartLos[iDet - 1] - 1][iCha] =
+                        calData->GetTimeV_ns(iCha); // then be time-sorted and put in time_V variable.
+                }
+                time_L[iDet - 1][nPartLos[iDet - 1] - 1][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                { // TAMEX leading
+                    time_L[iDet - 1][nPartLos[iDet - 1] - 1][iCha] = calData->GetTimeL_ns(iCha);
+                }
+
+                time_T[iDet - 1][nPartLos[iDet - 1] - 1][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                { // TAMEX trailing
+                    time_T[iDet - 1][nPartLos[iDet - 1] - 1][iCha] = calData->GetTimeT_ns(iCha);
+                }
+                // cout<<"time Tamex trailing LOS1: "<<calData->GetTimeT_ns(iCha)<<endl;
             }
-            time_L[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeL_ns(iCha))))
-            { // TAMEX leading
-                time_L[ihit][iCha] = calItem->GetTimeL_ns(iCha);
-            }
-            time_T[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeT_ns(iCha))))
-            { // TAMEX trailing
-                time_T[ihit][iCha] = calItem->GetTimeT_ns(iCha);
+            if (iDet == 2)
+            {
+                time_V_LOS2[nPartLos[iDet - 1]][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeV_ns(iCha))))
+                { // VFTX
+                    time_V_LOS2[nPartLos[iDet - 1]][iCha] = calData->GetTimeV_ns(iCha);
+                }
+                // cout<<"time_V_LOS2: "<<calData->GetTimeV_ns(iCha)<<endl;
+                time_L[iDet - 1][nPartLos[iDet - 1]][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                { // TAMEX leading
+                    time_L[iDet - 1][nPartLos[iDet - 1]][iCha] = calData->GetTimeL_ns(iCha);
+                }
+
+                time_T[iDet - 1][nPartLos[iDet - 1]][iCha] = 0. / 0.;
+                if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                { // TAMEX trailing
+                    time_T[iDet - 1][nPartLos[iDet - 1]][iCha] = calData->GetTimeT_ns(iCha);
+                }
             }
         }
-        if (!calItem)
+
+        if (!calData)
         {
-            cout << " !calItem" << endl;
+            cout << "LOS !calData" << endl;
             continue; // can this happen?
         }
     }
 
     // Sorting VFTX data:
+    for (Int_t iDetcount = 1; iDetcount < fNofLosDetectors + 1; iDetcount++)
+    {
+        // detector 1
+        if (iDetcount == 1)
+        {
+            if (nPartLos[iDetcount - 1] > 0)
+            {
+                std::qsort(time_V_LOS1,
+                           nPartLos[iDetcount - 1],
+                           sizeof(*time_V_LOS1),
+                           [](const void* arg1, const void* arg2) -> int {
+                               double const* lhs = static_cast<double const*>(arg1);
+                               double const* rhs = static_cast<double const*>(arg2);
 
-    std::qsort(time_V, nHits, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
-        double const* lhs = static_cast<double const*>(arg1);
-        double const* rhs = static_cast<double const*>(arg2);
+                               return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                           });
+                for (Int_t iPart = 0; iPart < nPartLos[iDet - 1]; iPart++)
+                {
+                    for (int ipm = 0; ipm < 8; ipm++)
+                    {
+                        time_V[iDetcount - 1][iPart][ipm] = time_V_LOS1[iPart][ipm];
+                        //	cout<<"Test_sort Det1"<<Icount<<"; "<<nPartLos[iDetcount-1]<<", "<<ipm <<"  "<<iPart<<"  "<<
+                        //time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
+                    }
+                }
+            }
+        }
 
-        return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-    });
+        // detector 2
+        if (fNofLosDetectors > 1 && iDetcount == 2 && nPartLos[iDetcount - 1] > 0)
+        {
+            std::qsort(time_V_LOS2,
+                       nPartLos[iDetcount - 1],
+                       sizeof(*time_V_LOS2),
+                       [](const void* arg1, const void* arg2) -> int {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
+
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
+            for (Int_t iPart = 0; iPart < nPartLos[iDetcount - 1]; iPart++)
+            {
+                for (int ipm = 0; ipm < 8; ipm++)
+                {
+                    time_V[iDetcount - 1][iPart][ipm] = time_V_LOS2[iPart][ipm];
+                    //	cout<<"Test_sort Det2"<<Icount<<"; "<<nPartLos[iDetcount-1]<<", "<<ipm <<"  "<<iPart<<"  "<<
+                    //time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
+                }
+            }
+        }
+    }
     // End sorting
 
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    std::vector<double_t> time_first(fNofLosDetectors, -1.);
+    std::vector<double_t> time0(fNofLosDetectors, -1.);
+    std::vector<double_t> time1(fNofLosDetectors, -1.);
+    std::vector<double_t> time_abs(fNofLosDetectors, -1.);
+
+    for (iDet = 1; iDet < fNofLosDetectors + 1; iDet++)
     {
-        Bool_t iLOSTypeMCFD = false;
-        Bool_t iLOSTypeTAMEX = false;
-        Bool_t iLOSType = false;
-        UInt_t Igood_event = 0;
-
-        if (time_V[ihit][0] > 0. && !(IS_NAN(time_V[ihit][0])) && time_V[ihit][1] > 0. && !(IS_NAN(time_V[ihit][1])) &&
-            time_V[ihit][2] > 0. && !(IS_NAN(time_V[ihit][2])) && time_V[ihit][3] > 0. && !(IS_NAN(time_V[ihit][3])) &&
-            time_V[ihit][4] > 0. && !(IS_NAN(time_V[ihit][4])) && time_V[ihit][5] > 0. && !(IS_NAN(time_V[ihit][5])) &&
-            time_V[ihit][6] > 0. && !(IS_NAN(time_V[ihit][6])) && time_V[ihit][7] > 0. && !(IS_NAN(time_V[ihit][7])))
+        for (Int_t iPart = 0; iPart < nPartLos[iDet - 1]; iPart++)
         {
-            iLOSTypeMCFD = true; // all 8 MCFD times
-        }
+            Bool_t iLOSTypeTAMEX = false;
+            Bool_t iLOSTypeMCFD = false;
 
-        if (time_L[ihit][0] > 0. && !(IS_NAN(time_L[ihit][0])) && time_L[ihit][1] > 0. && !(IS_NAN(time_L[ihit][1])) &&
-            time_L[ihit][2] > 0. && !(IS_NAN(time_L[ihit][2])) && time_L[ihit][3] > 0. && !(IS_NAN(time_L[ihit][3])) &&
-            time_L[ihit][4] > 0. && !(IS_NAN(time_L[ihit][4])) && time_L[ihit][5] > 0. && !(IS_NAN(time_L[ihit][5])) &&
-            time_L[ihit][6] > 0. && !(IS_NAN(time_L[ihit][6])) && time_L[ihit][7] > 0. && !(IS_NAN(time_L[ihit][7])) &&
-
-            time_T[ihit][0] > 0. && !(IS_NAN(time_T[ihit][0])) && time_T[ihit][1] > 0. && !(IS_NAN(time_T[ihit][1])) &&
-            time_T[ihit][2] > 0. && !(IS_NAN(time_T[ihit][2])) && time_T[ihit][3] > 0. && !(IS_NAN(time_T[ihit][3])) &&
-            time_T[ihit][4] > 0. && !(IS_NAN(time_T[ihit][4])) && time_T[ihit][5] > 0. && !(IS_NAN(time_T[ihit][5])) &&
-            time_T[ihit][6] > 0. && !(IS_NAN(time_T[ihit][6])) && time_T[ihit][7] > 0. && !(IS_NAN(time_T[ihit][7])))
-        {
-            iLOSTypeTAMEX = true; // all 8 leading and trailing times
-        }
-
-        // We will consider only events in which booth MCFD and TAMEX see same number of channels:
-        if (iLOSTypeTAMEX && iLOSTypeMCFD)
-            iLOSType = true;
-        //   if(iLOSTypeMCFD ) LOSType = true;
-
-        if (iLOSType)
-        {
-            // calculate time over threshold and check if clock counter went out of range
-
-            Igood_event = 1;
-
-            int nPMT = 0;
-            int nPMV = 0;
-            for (int ipm = 0; ipm < 8; ipm++)
+            if (time_V[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][0])) &&
+                time_V[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][1])) &&
+                time_V[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][2])) &&
+                time_V[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][3])) &&
+                time_V[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][4])) &&
+                time_V[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][5])) &&
+                time_V[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][6])) &&
+                time_V[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][7])))
             {
-                tot[ihit][ipm] = 0. / 0.;
-                if (time_T[ihit][ipm] > 0. && time_L[ihit][ipm] > 0. && !(IS_NAN(time_T[ihit][ipm])) &&
-                    !(IS_NAN(time_L[ihit][ipm])))
-                {
-                    while (time_T[ihit][ipm] - time_L[ihit][ipm] <= 0.)
-                    {
-                        time_T[ihit][ipm] = time_T[ihit][ipm] + 2048. * fClockFreq;
-                    }
-
-                    nPMT = nPMT + 1;
-                    tot[ihit][ipm] = time_T[ihit][ipm] - time_L[ihit][ipm];
-                }
-
-                if (tot[ihit][ipm] != 0. && !(IS_NAN(tot[ihit][ipm])))
-                    totsum[ihit] += tot[ihit][ipm];
-
-                // Corrected for saturation and absorption
-                if (ihit > 0)
-                {
-                    Double_t dthit = time_V[ihit][ipm] - time_V[ihit - 1][ipm];
-                    tot_corr[ihit][ipm] = satu(ipm, tot[ihit][ipm], dthit);
-                }
-                else
-                    tot_corr[ihit][ipm] = tot[ihit][ipm];
-
-                totsum_corr[ihit] += tot_corr[ihit][ipm];
-
-                if (time_L[ihit][ipm] > 0. && !(IS_NAN(time_L[ihit][ipm])))
-                    timeLosT[ihit] += time_L[ihit][ipm];
-
-                if (time_V[ihit][ipm] > 0. && !(IS_NAN(time_V[ihit][ipm])))
-                {
-                    timeLosM[ihit] += time_V[ihit][ipm];
-                    nPMV = nPMV + 1;
-                }
+                iLOSTypeMCFD = true; // all 8 MCFD times
             }
 
-            timeLosM[ihit] = timeLosM[ihit] / nPMV;
-            timeLosT[ihit] = timeLosT[ihit] / nPMT;
+            if (time_L[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][0])) &&
+                time_L[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][1])) &&
+                time_L[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][2])) &&
+                time_L[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][3])) &&
+                time_L[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][4])) &&
+                time_L[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][5])) &&
+                time_L[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][6])) &&
+                time_L[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][7])) &&
 
-            totsum[ihit] = totsum[ihit] / nPMT;
-            totsum_corr[ihit] = totsum_corr[ihit] / nPMT;
-
-            // Time resolution TAMEX
-            LosTresT[ihit] = ((time_L[ihit][0] + time_L[ihit][2] + time_L[ihit][4] + time_L[ihit][6]) -
-                              (time_L[ihit][1] + time_L[ihit][3] + time_L[ihit][5] + time_L[ihit][7])) /
-                             4.;
-
-            // Time resolution MCFD
-            LosTresM[ihit] = ((time_V[ihit][0] + time_V[ihit][2] + time_V[ihit][4] + time_V[ihit][6]) -
-                              (time_V[ihit][1] + time_V[ihit][3] + time_V[ihit][5] + time_V[ihit][7])) /
-                             4.;
-
-            // Position TAMEX:
-            xT_cm[ihit] = ((time_L[ihit][5] + time_L[ihit][6]) / 2. - (time_L[ihit][1] + time_L[ihit][2]) / 2.) * (-1.);
-            yT_cm[ihit] = ((time_L[ihit][7] + time_L[ihit][0]) / 2. - (time_L[ihit][3] + time_L[ihit][4]) / 2.) * (-1.);
-            xT_cm[ihit] = (xT_cm[ihit] - flosOffsetXT) * flosVeffXT;
-            yT_cm[ihit] = (yT_cm[ihit] - flosOffsetYT) * flosVeffYT;
-
-            // Position MCFD:
-            xV_cm[ihit] = ((time_V[ihit][5] + time_V[ihit][6]) / 2. - (time_V[ihit][1] + time_V[ihit][2]) / 2.) * (-1.);
-            yV_cm[ihit] = ((time_V[ihit][7] + time_V[ihit][0]) / 2. - (time_V[ihit][3] + time_V[ihit][4]) / 2.) * (-1.);
-            xV_cm[ihit] = (xV_cm[ihit] - flosOffsetX) * flosVeffX;
-            yV_cm[ihit] = (yV_cm[ihit] - flosOffsetY) * flosVeffY;
-
-            /*
-                    for(int ipm=0; ipm<8; ipm++)
-                    {
-                              if(Icount < 500000)
-                     {
-                        myFile<<setprecision(10)<<ihit<<" "<<ipm<<" "<<time_V[ihit][ipm]<<" "<<time_L[ihit][ipm]<<"
-               "<<tot[ihit][ipm]<<endl;
-                      }
-                    }
-            */
-
-            // Walk correction for MCFD and TAMEX
-            for (int ipm = 0; ipm < 8; ipm++)
+                time_T[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][0])) &&
+                time_T[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][1])) &&
+                time_T[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][2])) &&
+                time_T[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][3])) &&
+                time_T[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][4])) &&
+                time_T[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][5])) &&
+                time_T[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][6])) &&
+                time_T[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][7])))
             {
-                time_V_corr[ihit][ipm] = time_V[ihit][ipm] - walk(ipm, tot[ihit][ipm]);
-                time_L_corr[ihit][ipm] = time_L[ihit][ipm] - walk(ipm + 8, tot[ihit][ipm]);
-                timeLosM_corr[ihit] += time_V_corr[ihit][ipm];
-                timeLosT_corr[ihit] += time_L_corr[ihit][ipm];
+                iLOSTypeTAMEX = true; // all 8 leading and trailing times
             }
 
-            // Walk-corrected time-properties
+            // We will consider only events in which booth MCFD and TAMEX see same number of channels:
+            if (iLOSTypeTAMEX && iLOSTypeMCFD)
+                iLOSType[iDet - 1][iPart] = true;
 
-            // TAMEX:
-            LosTresT_corr[ihit] =
-                ((time_L_corr[ihit][0] + time_L_corr[ihit][2] + time_L_corr[ihit][4] + time_L_corr[ihit][6]) -
-                 (time_L_corr[ihit][1] + time_L_corr[ihit][3] + time_L_corr[ihit][5] + time_L_corr[ihit][7])) /
-                4.;
-            timeLosT_corr[ihit] = timeLosT_corr[ihit] / nPMT;
-
-            // MCFD
-            LosTresM_corr[ihit] = ((time_V_corr[ihit][0] + time_V[ihit][2] + time_V[ihit][4] + time_V[ihit][6]) -
-                                   (time_V_corr[ihit][1] + time_V[ihit][3] + time_V[ihit][5] + time_V[ihit][7])) /
-                                  4.;
-            timeLosM_corr[ihit] = timeLosM_corr[ihit] / nPMV;
-
-            // Position from ToT:
-            xToT_cm[ihit] = (((tot[ihit][5] + tot[ihit][6]) / 2. - (tot[ihit][1] + tot[ihit][2]) / 2.) /
-                             ((tot[ihit][1] + tot[ihit][2] + tot[ihit][5] + tot[ihit][6]) / 4.));
-
-            yToT_cm[ihit] = (((tot[ihit][0] + tot[ihit][7]) / 2. - (tot[ihit][3] + tot[ihit][4]) / 2.) /
-                             ((tot[ihit][7] + tot[ihit][0] + tot[ihit][3] + tot[ihit][4]) / 4.));
-
-            xToT_cm[ihit] = (xToT_cm[ihit] - flosOffsetXQ) * flosVeffXQ;
-            yToT_cm[ihit] = (yToT_cm[ihit] - flosOffsetYQ) * flosVeffYQ;
-
-            x_cm[ihit] = xV_cm[ihit];
-            y_cm[ihit] = yV_cm[ihit];
-            Z[ihit] = totsum_corr[ihit];
-            t_hit[ihit] = timeLosM_corr[ihit];
-
-            if (OptHisto && nPMV == 8 && nPMT == 8 && Igood_event)
+            if (1 == 1) // iLOSType[iDet - 1][iPart])
             {
-                // MCFD times:
-                fhTres_M->Fill(LosTresM[ihit]);
-                // fhTresMvsIcount->Fill(Icount,LosTresM[ihit]);
-                fhTresMvsIcount->Fill(Icount, LosTresM[ihit]);
-                // MCFD walk corrected times:
-                fhTres_M_corr->Fill(LosTresM_corr[ihit]);
-                if (ihit > 0)
-                    fhTreswcMvsIcount->Fill(timeLosM[ihit] - timeLosM[ihit - 1], LosTresM[ihit]);
-                // TAMEX times:
-                fhTres_T->Fill(LosTresT[ihit]);
-                // fhTresTvsIcount->Fill(Icount,LosTresT[ihit]);
-                fhTresTvsIcount->Fill(Icount, LosTresT[ihit]);
-                // TAMEX walk corrected times:
-                fhTres_T_corr->Fill(LosTresT_corr[ihit]);
-                if (ihit > 0)
-                    fhTreswcTvsIcount->Fill(timeLosM[ihit] - timeLosM[ihit - 1], LosTresT_corr[ihit]);
-                // x,y from MCFD:
-                fhXY->Fill(xV_cm[ihit], yV_cm[ihit]);
-                // x,y from TAMEX:
-                fhXYT->Fill(xT_cm[ihit], yT_cm[ihit]);
-                // x,y from ToT:
-                fhXY_ToT->Fill(xToT_cm[ihit], yToT_cm[ihit]);
-                // Average of three:
-                fhXYproj->Fill(((xToT_cm[ihit] + xV_cm[ihit] + xT_cm[ihit]) / 3.),
-                               (yToT_cm[ihit] + yV_cm[ihit] + yT_cm[ihit]) / 3.);
-                // Mean value between TAMEX and MCFD:
-                fhXYmean->Fill(((xV_cm[ihit] + xT_cm[ihit]) / 2.), (yV_cm[ihit] + yT_cm[ihit]) / 2.);
+                // calculate time over threshold and check if clock counter went out of range
 
-                // ToT
-                fhQ->Fill(totsum[ihit]);
-                fhQtest->Fill(totsum_corr[ihit]);
-                fh_los_ihit_ToTcorr->Fill(ihit, totsum_corr[ihit]);
+                Int_t Igood_event = 1;
+
+                int nPMT = 0;
+                int nPMV = 0;
 
                 for (int ipm = 0; ipm < 8; ipm++)
                 {
-                    //  fhQcorrvsIcount[ipm]->Fill(Icount,tot_corr[ihit][ipm]);
-                    fhQvsIcount[ipm]->Fill(Icount, tot[ihit][ipm]);
-                    if (ihit > 0)
+
+                    if (time_T[iDet - 1][iPart][ipm] > 0. && time_L[iDet - 1][iPart][ipm] > 0. &&
+                        !(IS_NAN(time_T[iDet - 1][iPart][ipm])) && !(IS_NAN(time_L[iDet - 1][iPart][ipm])))
                     {
-                        fh_los_dt_hits_ToT_corr->Fill(time_V[ihit][ipm] - time_V[ihit - 1][ipm], tot_corr[ihit][ipm]);
-                        fhQvsdt[ipm]->Fill(time_V[ihit][ipm] - time_V[ihit - 1][ipm], tot[ihit][ipm]);
-                        fhQcorrvsIcount[ipm]->Fill(time_V[ihit][ipm] - time_V[ihit - 1][ipm], tot_corr[ihit][ipm]);
+                        while (time_T[iDet - 1][iPart][ipm] - time_L[iDet - 1][iPart][ipm] <=
+                               0.) // This is already done in Reader, but as a back up it is still done.
+                        {
+                            time_T[iDet - 1][iPart][ipm] = time_T[iDet - 1][iPart][ipm] + 2048. * fClockFreq;
+                        }
+
+                        nPMT = nPMT + 1;
+                        tot[iDet - 1][iPart][ipm] = time_T[iDet - 1][iPart][ipm] - time_L[iDet - 1][iPart][ipm];
+
+                        // pileup rejection
+                        if (tot[iDet - 1][iPart][ipm] > fEpileup)
+                            iLOSPileUp[iDet - 1][iPart] = true;
+                    }
+
+                    if (tot[iDet - 1][iPart][ipm] != 0. && !(IS_NAN(tot[iDet - 1][iPart][ipm])))
+                        totsum[iDet - 1][iPart] += tot[iDet - 1][iPart][ipm];
+
+                    // Corrected for saturation and absorption
+                    if (iPart > 0)
+                    {
+                        Double_t dthit = time_V[iDet - 1][iPart][ipm] - time_V[iDet - 1][iPart][ipm];
+                        tot_corr[iDet - 1][iPart][ipm] = satu(ipm, tot[iDet - 1][iPart][ipm], dthit);
+                    }
+                    else
+                        tot_corr[iDet - 1][iPart][ipm] = tot[iDet - 1][iPart][ipm];
+
+                    totsum_corr[iDet - 1][iPart] += tot_corr[iDet - 1][iPart][ipm];
+
+                    if (time_L[iDet - 1][iPart][ipm] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][ipm])))
+                        timeLosT[iDet - 1][iPart] += time_L[iDet - 1][iPart][ipm];
+
+                    // Calculate detector time
+                    if (time_V[iDet - 1][iPart][ipm] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][ipm])))
+                    {
+                        timeLosV[iDet - 1][iPart] += time_V[iDet - 1][iPart][ipm];
+                        nPMV = nPMV + 1;
                     }
                 }
 
-                fhQ1_vs_Q5->Fill(tot[ihit][0], tot[ihit][4]);
-                fhQ3_vs_Q7->Fill(tot[ihit][2], tot[ihit][6]);
-                fhQ2_vs_Q6->Fill(tot[ihit][1], tot[ihit][5]);
-                fhQ4_vs_Q8->Fill(tot[ihit][3], tot[ihit][7]);
+                totsum[iDet - 1][iPart] = totsum[iDet - 1][iPart] / nPMT;
 
-                fhQ1_vs_Q5_corr->Fill(tot_corr[ihit][0], tot_corr[ihit][4]);
-                fhQ3_vs_Q7_corr->Fill(tot_corr[ihit][2], tot_corr[ihit][6]);
-                fhQ2_vs_Q6_corr->Fill(tot_corr[ihit][1], tot_corr[ihit][5]);
-                fhQ4_vs_Q8_corr->Fill(tot_corr[ihit][3], tot_corr[ihit][7]);
+                totsum_corr[iDet - 1][iPart] = totsum_corr[iDet - 1][iPart] / nPMT;
 
-                fhQ_T->Fill(y_cm[ihit], tot[ihit][7]);
-                fhQ_L->Fill(x_cm[ihit], tot[ihit][1]);
-                fhQ_B->Fill(y_cm[ihit], tot[ihit][3]);
-                fhQ_R->Fill(x_cm[ihit], tot[ihit][5]);
+                timeLosV[iDet - 1][iPart] = timeLosV[iDet - 1][iPart] / nPMV;
 
-                fhQ_RT->Fill(x_cm[ihit], tot[ihit][6]);
-                fhQ_LT->Fill(y_cm[ihit], tot[ihit][0]);
-                fhQ_LB->Fill(x_cm[ihit], tot[ihit][2]);
-                fhQ_RB->Fill(y_cm[ihit], tot[ihit][4]);
+                timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] / nPMT;
 
-                fhQ_T_corr->Fill(y_cm[ihit], tot_corr[ihit][7]);
-                fhQ_L_corr->Fill(x_cm[ihit], tot_corr[ihit][1]);
-                fhQ_B_corr->Fill(y_cm[ihit], tot_corr[ihit][3]);
-                fhQ_R_corr->Fill(x_cm[ihit], tot_corr[ihit][4]);
+                timeLos[iDet - 1][iPart] = timeLosV[iDet - 1][iPart];
 
-                fhQ_RT_corr->Fill(x_cm[ihit], tot_corr[ihit][6]);
-                fhQ_LT_corr->Fill(y_cm[ihit], tot_corr[ihit][0]);
-                fhQ_LB_corr->Fill(y_cm[ihit], tot_corr[ihit][2]);
-                fhQ_RB_corr->Fill(y_cm[ihit], tot_corr[ihit][4]);
+                // Time resolution TAMEX
+                LosTresT[iDet - 1][iPart] = ((time_L[iDet - 1][iPart][0] + time_L[iDet - 1][iPart][2] +
+                                              time_L[iDet - 1][iPart][4] + time_L[iDet - 1][iPart][6]) -
+                                             (time_L[iDet - 1][iPart][1] + time_L[iDet - 1][iPart][3] +
+                                              time_L[iDet - 1][iPart][5] + time_L[iDet - 1][iPart][7])) /
+                                            4.;
 
-                // Correlations:
-                fhTresX_M->Fill(x_cm[ihit], LosTresM[ihit]);
-                fhTresY_M->Fill(y_cm[ihit], LosTresM[ihit]);
-                fhTresX_M_corr->Fill(x_cm[ihit], LosTresM_corr[ihit]);
-                fhTresY_M_corr->Fill(y_cm[ihit], LosTresM_corr[ihit]);
+                // Time resolution MCFD
+                LosTresV[iDet - 1][iPart] = ((time_V[iDet - 1][iPart][0] + time_V[iDet - 1][iPart][2] +
+                                              time_V[iDet - 1][iPart][4] + time_V[iDet - 1][iPart][6]) -
+                                             (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][3] +
+                                              time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][7])) /
+                                            4.;
 
-                fhTresX_T->Fill(x_cm[ihit], LosTresT[ihit]);
-                fhTresY_T->Fill(y_cm[ihit], LosTresT[ihit]);
-                fhTresX_T_corr->Fill(x_cm[ihit], LosTresT_corr[ihit]);
-                fhTresY_T_corr->Fill(y_cm[ihit], LosTresT_corr[ihit]);
+                // right koord.-system, Z-axis beam direction
+                // Position from VFTX:
+                xV_cm[iDet - 1][iPart] = (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][2]) / 2. -
+                                         (time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][6]) / 2.;
+                yV_cm[iDet - 1][iPart] = (time_V[iDet - 1][iPart][3] + time_V[iDet - 1][iPart][4]) / 2. -
+                                         (time_V[iDet - 1][iPart][7] + time_V[iDet - 1][iPart][0]) / 2.;
+                xV_cm[iDet - 1][iPart] = (xV_cm[iDet - 1][iPart] - flosOffsetXV[iDet - 1]) * flosVeffXV[iDet - 1];
+                yV_cm[iDet - 1][iPart] = (yV_cm[iDet - 1][iPart] - flosOffsetYV[iDet - 1]) * flosVeffYV[iDet - 1];
 
-                fhTM_vs_Q->Fill(totsum[ihit], LosTresM[ihit]);
-                fhTM_vs_Q_corr->Fill(totsum[ihit], LosTresM_corr[ihit]);
+                // Position from ToT:
+                if (tot[iDet - 1][iPart][1] > 0. && tot[iDet - 1][iPart][2] > 0. && tot[iDet - 1][iPart][5] > 0. &&
+                    tot[iDet - 1][iPart][6] > 0. && tot[iDet - 1][iPart][0] > 0. && tot[iDet - 1][iPart][3] > 0. &&
+                    tot[iDet - 1][iPart][4] > 0. && tot[iDet - 1][iPart][7] > 0.)
+                {
+                    xToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) / 2. -
+                                                 (tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2]) / 2.) /
+                                                ((tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2] +
+                                                  tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) /
+                                                 4.));
 
-                fhTT_vs_Q->Fill(totsum[ihit], LosTresT[ihit]);
-                fhTT_vs_Q_corr->Fill(totsum[ihit], LosTresT_corr[ihit]);
+                    yToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][0] + tot[iDet - 1][iPart][7]) / 2. -
+                                                 (tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) / 2.) /
+                                                ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][0] +
+                                                  tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) /
+                                                 4.));
+                }
 
-                fhQ_vs_X->Fill(x_cm[ihit], totsum[ihit]);
-                fhQ_vs_Y->Fill(y_cm[ihit], totsum[ihit]);
+                xToT_cm[iDet - 1][iPart] = (xToT_cm[iDet - 1][iPart] - flosOffsetXQ[iDet - 1]) * flosVeffXQ[iDet - 1];
+                yToT_cm[iDet - 1][iPart] = (yToT_cm[iDet - 1][iPart] - flosOffsetYQ[iDet - 1]) * flosVeffYQ[iDet - 1];
 
-                fhQ_vs_X_corr->Fill(x_cm[ihit], totsum_corr[ihit]);
-                fhQ_vs_Y_corr->Fill(y_cm[ihit], totsum_corr[ihit]);
-            }
+                /*
+                        for(int ipm=0; ipm<8; ipm++)
+                        {
+                                  if(Icount < 500000)
+                         {
+                            myFile<<setprecision(10)<<ihit<<" "<<ipm<<" "<<time_V[ihit][ipm]<<" "<<time_L[ihit][ipm]<<"
+                   "<<tot[ihit][ipm]<<endl;
+                          }
+                        }
+                */
 
-        } // end of LOSTYPE = true
+                // Walk correction for MCFD and TAMEX
+                for (int ipm = 0; ipm < 8; ipm++)
+                {
+                    time_V_corr[iDet - 1][iPart][ipm] =
+                        time_V[iDet - 1][iPart][ipm] - walk(ipm, tot[iDet - 1][iPart][ipm]);
+                    time_L_corr[iDet - 1][iPart][ipm] =
+                        time_L[iDet - 1][iPart][ipm] - walk(ipm + 8, tot[iDet - 1][iPart][ipm]);
+                    timeLosV_corr[iDet - 1][iPart] += time_V_corr[iDet - 1][iPart][ipm];
+                    timeLosT_corr[iDet - 1][iPart] += time_L_corr[iDet - 1][iPart][ipm];
+                }
 
-        new ((*fHitItems)[fNofHitItems]) R3BLosHitData(nDet, t_hit[ihit], x_cm[ihit], y_cm[ihit], Z[ihit]);
-        fNofHitItems += 1;
+                // Walk-corrected time-properties
 
-        Icount++;
-    }
+                // TAMEX:
+                LosTresT_corr[iDet - 1][iPart] = ((time_L_corr[iDet - 1][iPart][0] + time_L_corr[iDet - 1][iPart][2] +
+                                                   time_L_corr[iDet - 1][iPart][4] + time_L_corr[iDet - 1][iPart][6]) -
+                                                  (time_L_corr[iDet - 1][iPart][1] + time_L_corr[iDet - 1][iPart][3] +
+                                                   time_L_corr[iDet - 1][iPart][5] + time_L_corr[iDet - 1][iPart][7])) /
+                                                 4.;
+                timeLosT_corr[iDet - 1][iPart] = timeLosT_corr[iDet - 1][iPart] / nPMT;
+
+                // MCFD
+                LosTresV_corr[iDet - 1][iPart] = ((time_V_corr[iDet - 1][iPart][0] + time_V_corr[iDet - 1][iPart][2] +
+                                                   time_V_corr[iDet - 1][iPart][4] + time_V_corr[iDet - 1][iPart][6]) -
+                                                  (time_V_corr[iDet - 1][iPart][1] + time_V_corr[iDet - 1][iPart][3] +
+                                                   time_V_corr[iDet - 1][iPart][5] + time_V_corr[iDet - 1][iPart][7])) /
+                                                 4.;
+                timeLosV_corr[iDet - 1][iPart] = timeLosV_corr[iDet - 1][iPart] / nPMV;
+
+                // Position from ToT:
+                xToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) / 2. -
+                                             (tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2]) / 2.) /
+                                            ((tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2] +
+                                              tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) /
+                                             4.));
+
+                yToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][0] + tot[iDet - 1][iPart][7]) / 2. -
+                                             (tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) / 2.) /
+                                            ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][0] +
+                                              tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) /
+                                             4.));
+
+                xToT_cm[iDet - 1][iPart] = (xToT_cm[iDet - 1][iPart] - flosOffsetXQ[iDet - 1]) * flosVeffXQ[iDet - 1];
+                yToT_cm[iDet - 1][iPart] = (yToT_cm[iDet - 1][iPart] - flosOffsetYQ[iDet - 1]) * flosVeffYQ[iDet - 1];
+
+                x_cm[iDet - 1][iPart] = xV_cm[iDet - 1][iPart];
+                y_cm[iDet - 1][iPart] = yV_cm[iDet - 1][iPart];
+                Z[iDet - 1][iPart] = totsum[iDet - 1][iPart];
+                t_hit[iDet - 1][iPart] = timeLosV[iDet - 1][iPart];
+
+                if (OptHisto && nPMV == 8 && nPMT == 8 && Igood_event)
+                {
+                    // MCFD times:
+                    fhTres_M->Fill(LosTresV[iDet - 1][iPart]);
+                    // fhTresMvsIcount->Fill(Icount,LosTresV[iDet - 1][iPart]);
+                    fhTresMvsIcount->Fill(Icount, LosTresV[iDet - 1][iPart]);
+                    // MCFD walk corrected times:
+                    fhTres_M_corr->Fill(LosTresV_corr[iDet - 1][iPart]);
+                    if (iPart > 0)
+                        fhTreswcMvsIcount->Fill(timeLosV[iDet - 1][iPart] - timeLosV[iDet - 1][iPart - 1],
+                                                LosTresV[iDet - 1][iPart]);
+                    // TAMEX times:
+                    fhTres_T->Fill(LosTresT[iDet - 1][iPart]);
+                    // fhTresTvsIcount->Fill(Icount,LosTresT[iDet - 1][iPart]);
+                    fhTresTvsIcount->Fill(Icount, LosTresT[iDet - 1][iPart]);
+                    // TAMEX walk corrected times:
+                    fhTres_T_corr->Fill(LosTresT_corr[iDet - 1][iPart]);
+                    if (iPart > 0)
+                        fhTreswcTvsIcount->Fill(timeLosV[iDet - 1][iPart] - timeLosV[iDet - 1][iPart - 1],
+                                                LosTresT_corr[iDet - 1][iPart]);
+                    // x,y from MCFD:
+                    fhXY->Fill(xV_cm[iDet - 1][iPart], yV_cm[iDet - 1][iPart]);
+                    // x,y from TAMEX:
+                    fhXYT->Fill(xT_cm[iDet - 1][iPart], yT_cm[iDet - 1][iPart]);
+                    // x,y from ToT:
+                    fhXY_ToT->Fill(xToT_cm[iDet - 1][iPart], yToT_cm[iDet - 1][iPart]);
+                    // Average of three:
+                    fhXYproj->Fill(((xToT_cm[iDet - 1][iPart] + xV_cm[iDet - 1][iPart] + xT_cm[iDet - 1][iPart]) / 3.),
+                                   (yToT_cm[iDet - 1][iPart] + yV_cm[iDet - 1][iPart] + yT_cm[iDet - 1][iPart]) / 3.);
+                    // Mean value between TAMEX and MCFD:
+                    fhXYmean->Fill(((xV_cm[iDet - 1][iPart] + xT_cm[iDet - 1][iPart]) / 2.),
+                                   (yV_cm[iDet - 1][iPart] + yT_cm[iDet - 1][iPart]) / 2.);
+
+                    // ToT
+                    fhQ->Fill(totsum[iDet - 1][iPart]);
+                    fhQtest->Fill(totsum_corr[iDet - 1][iPart]);
+                    fh_los_ihit_ToTcorr->Fill(iPart, totsum_corr[iDet - 1][iPart]);
+
+                    for (int ipm = 0; ipm < 8; ipm++)
+                    {
+                        //  fhQcorrvsIcount[ipm]->Fill(Icount,tot_corr[iDet - 1][iPart][ipm]);
+                        fhQvsIcount[ipm]->Fill(Icount, tot[iDet - 1][iPart][ipm]);
+                        if (iPart > 0)
+                        {
+                            fh_los_dt_hits_ToT_corr->Fill(
+                                time_V[iDet - 1][iPart][ipm] - time_V[iDet - 1][iPart - 1][ipm],
+                                tot_corr[iDet - 1][iPart][ipm]);
+                            fhQvsdt[ipm]->Fill(time_V[iDet - 1][iPart][ipm] - time_V[iDet - 1][iPart - 1][ipm],
+                                               tot[iDet - 1][iPart][ipm]);
+                            fhQcorrvsIcount[ipm]->Fill(time_V[iDet - 1][iPart][ipm] - time_V[iDet - 1][iPart - 1][ipm],
+                                                       tot_corr[iDet - 1][iPart][ipm]);
+                        }
+                    }
+
+                    fhQ1_vs_Q5->Fill(tot[iDet - 1][iPart][0], tot[iDet - 1][iPart][4]);
+                    fhQ3_vs_Q7->Fill(tot[iDet - 1][iPart][2], tot[iDet - 1][iPart][6]);
+                    fhQ2_vs_Q6->Fill(tot[iDet - 1][iPart][1], tot[iDet - 1][iPart][5]);
+                    fhQ4_vs_Q8->Fill(tot[iDet - 1][iPart][3], tot[iDet - 1][iPart][7]);
+
+                    fhQ1_vs_Q5_corr->Fill(tot_corr[iDet - 1][iPart][0], tot_corr[iDet - 1][iPart][4]);
+                    fhQ3_vs_Q7_corr->Fill(tot_corr[iDet - 1][iPart][2], tot_corr[iDet - 1][iPart][6]);
+                    fhQ2_vs_Q6_corr->Fill(tot_corr[iDet - 1][iPart][1], tot_corr[iDet - 1][iPart][5]);
+                    fhQ4_vs_Q8_corr->Fill(tot_corr[iDet - 1][iPart][3], tot_corr[iDet - 1][iPart][7]);
+
+                    fhQ_T->Fill(y_cm[iDet - 1][iPart], tot[iDet - 1][iPart][7]);
+                    fhQ_L->Fill(x_cm[iDet - 1][iPart], tot[iDet - 1][iPart][1]);
+                    fhQ_B->Fill(y_cm[iDet - 1][iPart], tot[iDet - 1][iPart][3]);
+                    fhQ_R->Fill(x_cm[iDet - 1][iPart], tot[iDet - 1][iPart][5]);
+
+                    fhQ_RT->Fill(x_cm[iDet - 1][iPart], tot[iDet - 1][iPart][6]);
+                    fhQ_LT->Fill(y_cm[iDet - 1][iPart], tot[iDet - 1][iPart][0]);
+                    fhQ_LB->Fill(x_cm[iDet - 1][iPart], tot[iDet - 1][iPart][2]);
+                    fhQ_RB->Fill(y_cm[iDet - 1][iPart], tot[iDet - 1][iPart][4]);
+
+                    fhQ_T_corr->Fill(y_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][7]);
+                    fhQ_L_corr->Fill(x_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][1]);
+                    fhQ_B_corr->Fill(y_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][3]);
+                    fhQ_R_corr->Fill(x_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][4]);
+
+                    fhQ_RT_corr->Fill(x_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][6]);
+                    fhQ_LT_corr->Fill(y_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][0]);
+                    fhQ_LB_corr->Fill(y_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][2]);
+                    fhQ_RB_corr->Fill(y_cm[iDet - 1][iPart], tot_corr[iDet - 1][iPart][4]);
+
+                    // Correlations:
+                    fhTresX_M->Fill(x_cm[iDet - 1][iPart], LosTresV[iDet - 1][iPart]);
+                    fhTresY_M->Fill(y_cm[iDet - 1][iPart], LosTresV[iDet - 1][iPart]);
+                    fhTresX_M_corr->Fill(x_cm[iDet - 1][iPart], LosTresV_corr[iDet - 1][iPart]);
+                    fhTresY_M_corr->Fill(y_cm[iDet - 1][iPart], LosTresV_corr[iDet - 1][iPart]);
+
+                    fhTresX_T->Fill(x_cm[iDet - 1][iPart], LosTresT[iDet - 1][iPart]);
+                    fhTresY_T->Fill(y_cm[iDet - 1][iPart], LosTresT[iDet - 1][iPart]);
+                    fhTresX_T_corr->Fill(x_cm[iDet - 1][iPart], LosTresT_corr[iDet - 1][iPart]);
+                    fhTresY_T_corr->Fill(y_cm[iDet - 1][iPart], LosTresT_corr[iDet - 1][iPart]);
+
+                    fhTM_vs_Q->Fill(totsum[iDet - 1][iPart], LosTresV[iDet - 1][iPart]);
+                    fhTM_vs_Q_corr->Fill(totsum[iDet - 1][iPart], LosTresV_corr[iDet - 1][iPart]);
+
+                    fhTT_vs_Q->Fill(totsum[iDet - 1][iPart], LosTresT[iDet - 1][iPart]);
+                    fhTT_vs_Q_corr->Fill(totsum[iDet - 1][iPart], LosTresT_corr[iDet - 1][iPart]);
+
+                    fhQ_vs_X->Fill(x_cm[iDet - 1][iPart], totsum[iDet - 1][iPart]);
+                    fhQ_vs_Y->Fill(y_cm[iDet - 1][iPart], totsum[iDet - 1][iPart]);
+
+                    fhQ_vs_X_corr->Fill(x_cm[iDet - 1][iPart], totsum_corr[iDet - 1][iPart]);
+                    fhQ_vs_Y_corr->Fill(y_cm[iDet - 1][iPart], totsum_corr[iDet - 1][iPart]);
+                }
+            } // end of LOSTYPE = true
+              //       Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t hitId = -1
+            new ((*fHitItems)[fNofHitItems]) R3BLosHitData(iDet,
+                                                           xV_cm[iDet - 1][iPart],
+                                                           yV_cm[iDet - 1][iPart],
+                                                           totsum[iDet - 1][iPart],
+                                                           timeLosV[iDet - 1][iPart],
+                                                           -1);
+
+            //       cout<<"HitItems: "<<Icount<<", "<<fNofHitItems<<", "<<iDet<<", "<<x_cm[iDet - 1][iPart]<<",
+            //       "<<y_cm[iDet - 1][iPart]
+            //        <<", "<<totsum[iDet - 1][iPart]<<", "<<timeLos[iDet - 1][iPart]<<endl;
+
+            fNofHitItems += 1;
+
+            Icount++;
+        } // for iPart
+    }     // for iDet
+
     //  myFile.close();
-    // cout << "R3BLosCal2Hit::Exec END: " << Icount << endl;
+    //    cout << "R3BLosCal2Hit::Exec END: " << Icount << endl;
 }
 
 void R3BLosCal2Hit::CreateHisto()

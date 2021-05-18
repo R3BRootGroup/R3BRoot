@@ -172,6 +172,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
 
         // ... and add clock time
         Double_t times_ns = fClockFreq - times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
+
         AddTcalData(iDet, iCha, times_ns);
     }
 

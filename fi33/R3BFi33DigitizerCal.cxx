@@ -196,11 +196,13 @@ void R3BFi33DigitizerCal::Exec(Option_t* opt)
                      */
 
                     ichanMA = i + 1; // iFib = 0...., iCha=1...
-                    if (i < 256)
-                        ichanSA = 1;
-                    if (i > 255)
-                        ichanSA = 2;
-
+                    ichanSA = ichanMA;
+                    /*
+                     if (i < 256)
+                         ichanSA = 1;
+                     if (i > 255)
+                         ichanSA = 2;
+                     */
                     /* From y-position get ToT_MA and ToT_SA only considering absorption;
                      * ToT_MA = energyl*exp(-l/labs), labs assume 100cm
                      *
@@ -229,19 +231,20 @@ void R3BFi33DigitizerCal::Exec(Option_t* opt)
                        ,fChannel(a_channel)  1-SubNum*256   --> FibXYCal.fChannel
                        ,fIsLeading(a_is_leading) 0-1        --> FibXY.fIsLeading
                        ,fTime_ns(a_time_ns)                 --> FibXY.fTime_ns
+                        0-bottom, 1-top, 2-trigger
                     */
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
-                        R3BBunchedFiberCalData(0, ichanMA, 1, timeMA_lead);
+                        R3BBunchedFiberCalData(1, ichanMA, 1, timeMA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT trailing
-                        R3BBunchedFiberCalData(0, ichanMA, 0, timeMA_trail);
+                        R3BBunchedFiberCalData(1, ichanMA, 0, timeMA_trail);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT leading
-                        R3BBunchedFiberCalData(1, ichanSA, 1, timeSA_lead);
+                        R3BBunchedFiberCalData(0, ichanSA, 1, timeSA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT trailing
-                        R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
+                        R3BBunchedFiberCalData(0, ichanSA, 0, timeSA_trail);
                     if (first)
                     {
                         for (Int_t j = 0; j < 4; j++)

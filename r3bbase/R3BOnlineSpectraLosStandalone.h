@@ -166,6 +166,7 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     fh_losY_vs_Events.resize(nDets);
     fh_losMCFD_vs_Events.resize(nDets);
     fh_los_vftx_tamex.resize(nDets);
+    fh_los_tot_vs_tot.resize(nDets);
     } 
  
     /**
@@ -221,7 +222,8 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     Double_t flosOffsetXQ[2];
     Double_t flosOffsetYQ[2];
     Int_t    foptcond;
-
+    Bool_t wrlos_bool = true;
+    
     unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0, ts_los = 0,time_start_wrlos=0;
     std::vector<unsigned long long> time_prev;
     unsigned long long time_prev_read = 0, time_to_read = 0;
@@ -242,7 +244,7 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     TH1F *fh_spill_length;
     TH1F *fhTrigger;
     TH1F *fh_dt;
-       
+
     std::vector<TH1F *> fh_los_channels;    
     std::vector<TH1F *> fh_los_tres_MCFD;
     std::vector<TH1F *> fh_los_tres_TAMEX;
@@ -262,6 +264,7 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     std::vector<TH2F *> fh_losY_vs_Events;
     std::vector<TH2F *> fh_losMCFD_vs_Events; 
     std::vector<TH1F *> fh_los_vftx_tamex;
+    std::vector<TH2F *> fh_los_tot_vs_tot;
     
   public:
     ClassDef(R3BOnlineSpectraLosStandalone, 2)

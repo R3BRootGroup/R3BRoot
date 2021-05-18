@@ -30,6 +30,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
+${R3BROOT_SOURCE_DIR}/r3bdata/musicData/
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData/
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/rolu
@@ -68,6 +70,9 @@ R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BOnlineSpectraPdc.cxx
 R3BOnlineSpectraSfib.cxx
+R3BOnlineSpectraLosEngRun2019.cxx
+R3BOnlineSpectraLosStandalone.cxx
+R3BOnlineSpectraPID.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
 R3BGlobalAnalysisS494.cxx
@@ -82,6 +87,8 @@ R3BTrackerPreparationS494.cxx
 R3BOnlineSpectraLosStandalone.cxx
 R3BOnlineSpectraSci2.cxx
 R3BOnlineSpectraLosVsSci2.cxx
+R3BOnlineSpectraFibvsToFDS494.cxx
+R3BOnlineSpectraFiber_s494.cxx
 )
 
 # fill list of header files from list of source files

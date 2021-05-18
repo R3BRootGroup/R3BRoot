@@ -26,11 +26,11 @@ class TH2F;
 class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
+class R3BEventHeader;
 
 #define BUNCHED_FIBER_TRIGGER_MAP_SET(mapmt_arr, spmt_arr) \
   MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);\
   SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
-
 /**
  * Transforms bunched fiber Cal level data to Hit level.
  *
@@ -52,12 +52,14 @@ class R3BBunchedFiberCal2Hit : public FairTask
         HORIZONTAL,
         VERTICAL
     };
+    
+                                 
     struct ToT
     {
-        ToT(R3BBunchedFiberCalData const*, R3BBunchedFiberCalData const*, Double_t, Double_t, Double_t);
+        ToT(R3BBunchedFiberCalData const*, R3BBunchedFiberCalData const*, Double_t, Double_t, Double_t, Double_t, Double_t, Double_t, Double_t);
         R3BBunchedFiberCalData const* lead;
         R3BBunchedFiberCalData const* trail;
-        Double_t lead_ns, tail_ns, tot_ns;
+        Double_t lead_raw, trail_raw, lead_ns, trail_ns, tot_ns, lead_trig_ns, trail_trig_ns;
     };
     struct Channel
     {
@@ -124,7 +126,9 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
-
+  //  inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+  //  inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    
     R3BBunchedFiberHitModulePar* GetModuleParAt(Int_t fiber);
 
     /**
@@ -143,24 +147,67 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
   private:
     TString fName;
-    Int_t fnEvents;
+    unsigned long fnEvents = 0, fnEvents_start = 0; /**< Event counter. */
     Int_t maxevent;
     Int_t fnEventsfill = 0;
 
 	Int_t multi=0;
+	Int_t summmpt_ac = 0;
+    Int_t summsm1_ac = 0;
+    Int_t summsm2_ac = 0;
+    Int_t summsm3_ac = 0;
+    Int_t summsm4_ac = 0;
+    Int_t summmpt = 0;
+    Int_t summsm1 = 0;
+    Int_t summsm2 = 0;
+    Int_t summsm3 = 0;
+    Int_t summsm4 = 0;
+    Bool_t cond = true;
+    Bool_t cut = false;
+    
 	Double_t energy[2048];
 	Int_t counts[2048];
-	Double_t tsync_temp[2048]={0};
-	Double_t  gain_temp[2048]={10};
-    Bool_t tofdin;
+	Double_t tsync_temp[2048];
+	Double_t  gainM_temp[2048];
+	Double_t  gainS_temp[2048];
+	Double_t  offset1_temp[2048];
+	Double_t  offset2_temp[2048];
+	double s1 = -99.;
+	double s2 = -99.;
+    double s3 = -99.;
+    double s4 = -99.;
+    double s1_ac = -99.;
+    double s2_ac = -99.;
+    double s3_ac = -99.;
+    double s4_ac = -99.;
+	Bool_t tofdin;
+    double tot_mapmt_max = -1 ;
+    double tot_spmt_max = -1;
+    int tot_mapmt_max_fiber_id = 0;
+    int tot_spmt_max_fiber_id = 0;
+    double ttemp[100][512],etemp[100][512];
+    int    mtemp[512];
+    int ichan = 254;
+    Bool_t ctest;
+    size_t cal_num;
+    
+    std::vector<Double_t> mpmt_ch;
+    std::vector<Double_t> spmt_ch; 
+    
+    unsigned long long time_start = 0, time = 0, time_spill_start = 0;
+    Bool_t spill_on = false;
 
     double fClockFreq;
+    double fClockPeriod;
     Direction fDirection;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;
     Bool_t fIsGain;
     Bool_t fIsTsync;
+    R3BEventHeader* header;                     /**< Event header. */
+    Int_t fTrigger = 0;                             /**< Trigger value. */
+    Int_t fTpat = 1;
     TClonesArray* fCalItems;
     TClonesArray* fMAPMTCalTriggerItems;
     TClonesArray* fSPMTCalTriggerItems;
@@ -177,16 +224,43 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
     // histograms for gain matching
     TH2F* fh_ToT_MA_Fib;
+    TH2F* fh_ToT_MA_Fib_ac;   
+    TH2F* fh_ToT_MA_Fib_max;
     TH2F* fh_ToT_Single_Fib;
-    TH2F* fh_ToT_s_Fib[4];
-    TH2F* fh_time_s_Fib;
-    TH2F* fh_ToT_ToT;
+    TH2F* fh_ToT_Single_Fib_ac;
     TH2F* fh_dt_Fib;
     TH2F* fh_Fib_ToF;
-    TH2F* fh_Test;
+    TH2F* fh_dt_Fib_ac;
+    TH2F* fh_Fib_ToF_ac;
+    TH2F* fh_ecorell;
+    TH2F* fh_tcorell;
+    TH2F* fh_hit1;
+    TH2F* fh_hit2;
+    TH2F* fh_hit1_ac;
+    TH2F* fh_hit2_ac;
+    TH2F* fh_tmapmt;
+    TH2F* fh_tsapmt;
+    TH2F* fh_tmapmt_ac;
+    TH2F* fh_tsapmt_ac;
+    TH2F* fh_dttrig_all;
+    TH2F* fh_ToT_MA_Fib_raw;
+    TH2F* fh_ToT_SA_Fib_raw;
+    TH2F* fh_x_vs_y;
+    TH2F* fh_ch_corr;
+    TH2F* fh_ToT_ifib;
+    TH2F* fh_tot_SA_ch;
+    TH2F* fh_iFib_nHit;
+    TH2F* fh_iFib_nHit_ac;
+    TH2F* fh_ToT_s_Fib[4];
+    TH2F* fh_ToT1_ToT2;
+    TH2F* fh_ToT1_ToT3;
+    TH2F* fh_ToT1_ToT4;
+    TH2F* fh_ToT1_ToT2_ac;
+    TH2F* fh_ToT1_ToT3_ac;
+    TH2F* fh_ToT1_ToT4_ac;      
     TH1F* fh_multi;
-    TH2F* fh_time_Fib;
-    
+    TH2F* fh_lowMtot;
+    TH2F* fh_Mtot_vs_NEvents;
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

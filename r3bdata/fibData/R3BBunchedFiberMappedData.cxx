@@ -17,7 +17,9 @@
 // ----------------------------------------------------------------
 
 #include "R3BBunchedFiberMappedData.h"
-
+#include "FairLogger.h"
+#include <iostream>
+using namespace std;
 R3BBunchedFiberMappedData::R3BBunchedFiberMappedData()
     : fSide(-1)
     , fChannel(-1)
@@ -38,6 +40,8 @@ R3BBunchedFiberMappedData::R3BBunchedFiberMappedData(Int_t a_side,
     , fCoarse(a_coarse)
     , fFine(a_fine)
 {
+    //	if(fSide == 1) cout <<"Mapped *** Channel: "<<fChannel<<", IsLead: "<<fIsLeading<<", fineT: "<<fFine<<",
+    //coarseT: "<<fCoarse<<endl;
 }
 
 R3BBunchedFiberMappedData::~R3BBunchedFiberMappedData() {}

@@ -7,10 +7,12 @@
  * This task determine walk paramters
  *
  */
-
 #include "R3BLosCal2HitPar.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRunOnline.h"
+#include "FairRuntimeDb.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
@@ -22,8 +24,14 @@
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+#include "TAttText.h"
+#include "TAxis.h"
 #include "TCanvas.h"
+#include "TChain.h"
 #include "TClonesArray.h"
+#include "TCut.h"
+#include "TError.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TGaxis.h"
 #include "TGraph.h"
@@ -47,13 +55,18 @@
 #include "TPoint.h"
 #include "TROOT.h"
 #include "TRandom.h"
+#include "TRandom2.h"
 #include "TRint.h"
 #include "TString.h"
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TTree.h"
+#include <TCanvas.h>
+#include <TH2.h>
+#include <TLegend.h>
 #include <TRandom3.h>
 #include <TRandomGen.h>
+#include <TStyle.h>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -123,7 +136,50 @@ InitStatus R3BLosCal2HitPar::Init()
     // Los detector
 
     // TCanvas* cLos;
-    hfit = new TH1F("fit", "fit", 20000, -10, 10);
+    hfit = new TH1F("fit", "fit", 2000, -10, 10);
+    hwalk = new TH1F("sigma walk", "sigma walk", 2000, -10, 10);
+    horig = new TH1F("sigma orig", "sigma orig", 2000, -10, 10);
+    htres = new TH1F("Tres", "Tres", 2000, -10, 10);
+    htres_corr = new TH1F("Tres_corr", "Tres", 4000, -20, 20);
+    for (Int_t k = 0; k < 8; k++)
+    {
+        char strNamen[255];
+        sprintf(strNamen, "walk_%d_PM", k);
+        hwalk_cor[k] = new TH2F(strNamen, " ", 250, 0, 250, 800, 0, 400);
+    }
+    htot_ipm = new TH2F("ToT_vs_PM", "ToT vs PM", 10, 0, 10, 1500, 0., 300.);
+    htot_ipm->GetXaxis()->SetTitle("PMT number");
+    htot_ipm->GetYaxis()->SetTitle("ToT / ns");
+    htot = new TH1F("ToT", "ToT", 1500, 0., 300.);
+    htot->GetYaxis()->SetTitle("Counts");
+    htot->GetXaxis()->SetTitle("ToT / ns");
+
+    TCanvas* cdata = new TCanvas("cdata", "data", 0, 0, 600, 800);
+    cdata->Clear();
+    cdata->Divide(2, 3);
+    cdata->cd(1);
+    gPad->SetLogy();
+    htot->Draw();
+    cdata->cd(2);
+    gPad->SetLogz();
+    htot_ipm->Draw("colz");
+    cdata->cd(3);
+    horig->Draw();
+    cdata->cd(4);
+    hwalk->Draw();
+    cdata->cd(5);
+    htres->Draw();
+    cdata->cd(6);
+    htres_corr->Draw();
+
+    TCanvas* cfit_walk = new TCanvas("cfit_walk", "fit walk", 600, 0, 800, 800);
+    cfit_walk->Clear();
+    cfit_walk->Divide(3, 3);
+    for (Int_t k = 0; k < NPM; k++)
+    {
+        cfit_walk->cd(k + 1);
+        hwalk_cor[k]->Draw();
+    }
 
     return kSUCCESS;
 }
@@ -302,7 +358,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
                 if (iLOSTypeTAMEX && iLOSTypeMCFD)
                     iLOSType[iPart] = true;
 
-                if (iLOSType[iPart])
+                if (iLOSTypeTAMEX && iLOSTypeMCFD)
                 {
                     int nPMT = 0;
                     int nPMV = 0;
@@ -320,8 +376,8 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
 
                             nPMT = nPMT + 1;
                             tot[iPart][ipm] = time_T[iPart][ipm] - time_L[iPart][ipm];
-
-                            if (tot[iPart][ipm] > 100.)
+                            htot_ipm->Fill(ipm, tot[iPart][ipm]);
+                            if (tot[iPart][ipm] > 120.)
                                 iLOSType[iPart] = false; // pileup rejection
                         }
 
@@ -330,6 +386,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
                     }
 
                     totsum[iPart] = totsum[iPart] / nPMT;
+                    htot->Fill(totsum[iPart]);
 
                     LosTresV[iPart] = ((time_V[iPart][0] + time_V[iPart][2] + time_V[iPart][4] + time_V[iPart][6]) -
                                        (time_V[iPart][1] + time_V[iPart][3] + time_V[iPart][5] + time_V[iPart][7])) /
@@ -338,52 +395,155 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
                     LosTresT[iPart] = ((time_L[iPart][0] + time_L[iPart][2] + time_L[iPart][4] + time_L[iPart][6]) -
                                        (time_L[iPart][1] + time_L[iPart][3] + time_L[iPart][5] + time_L[iPart][7])) /
                                       4.;
-
-                    if (fNEvents < fStats)
+                    if (iLOSType[iPart])
                     {
-                        vector<Double_t> tempVftx;
-                        vector<Double_t> tempLead;
-                        vector<Double_t> tempTrai;
-                        vector<Double_t> tempEner;
-
-                        for (int j = 0; j < 8; j++)
+                        if (fNEvents < fStats)
                         {
-                            tempVftx.push_back(time_V[iPart][j]);
-                            tempLead.push_back(time_L[iPart][j]);
-                            tempTrai.push_back(time_T[iPart][j]);
-                            tempEner.push_back(tot[iPart][j]);
+
+                            for (int j = 0; j < 8; j++)
+                            {
+                                // if(j==0)   cout<<"IN: "<<fNEvents<<", "<<time_V[iPart][j]<<endl;
+
+                                tempVftx.push_back(time_V[iPart][j]);
+                                tempLead.push_back(time_L[iPart][j]);
+                                tempTrai.push_back(time_T[iPart][j]);
+                                tempEner.push_back(tot[iPart][j]);
+
+                                //  if(j==0)   cout<<"OUT: "<<tempVftx.at(j)<<endl;
+                            }
+
+                            tvftx.push_back(tempVftx);
+                            tlead.push_back(tempLead);
+                            ttrai.push_back(tempTrai);
+                            energ.push_back(tempEner);
+
+                            //  cout<<"TEMP: "<<tvftx[fNEvents][0]<<endl;
+
+                            tempVftx.erase(tempVftx.begin(), tempVftx.begin() + 8);
+                            tempLead.erase(tempLead.begin(), tempLead.begin() + 8);
+                            tempTrai.erase(tempTrai.begin(), tempTrai.begin() + 8);
+                            tempEner.erase(tempEner.begin(), tempEner.begin() + 8);
+                            ;
+                        }
+                        else
+                        {
+                            cout << "****** FINISHED WITH READING EVENT! *****" << endl;
+                            break;
                         }
 
-                        tvftx.push_back(tempVftx);
-                        tlead.push_back(tempLead);
-                        ttrai.push_back(tempTrai);
-                        energ.push_back(tempEner);
+                        fNEvents += 1;
                     }
-                    else
-                    {
-                        cout << "****** FINISHED WITH READING EVENT! *****" << endl;
-                        break;
-                    }
-
-                    fNEvents += 1;
-
                 } // if iLosType
 
             } // for iPart
         }     // for iDet
     }
-
-    for (Int_t i = 0; i < fStats; i++)
-    {
-
-        for (int j = 0; j < 8; j++)
-        {
-            cout << i << ", " << j << ", " << tvftx[i][j] << ", " << energ[i][j] << endl;
-        }
-    }
 }
 
-void R3BLosCal2HitPar::Fit()
+Double_t R3BLosCal2HitPar::walk_correction(Int_t iPM, Double_t Q, const Double_t* p)
+{
+    Int_t ia1, ia2, ia3;
+    Double_t y;
+
+    ia1 = icount * iPM;
+    ia2 = icount * iPM + 1;
+    //  ia3 = icount * iPM + 2;
+
+    //  y = p[ia1] * TMath::Power(Q, p[ia2]);
+
+    // y = p[0] / sqrt(Q + p[1]) + p[2]*Q + 70.;//p[3];
+
+    // y = p[0] / TMath::Power((Q + p[1]),p[3]) + p[2]*Q + 70.;//p[3];
+    y = p[0] / sqrt(Q + p[1]) + p[2] * Q + 70.; // p[3];
+
+    // if (IS_NAN(y))
+    //   cout << "In walk_corr: "<<iPM << ", " << p[ia1] << ", " << p[ia2] << ", " << Q << endl;
+
+    return y;
+}
+Double_t R3BLosCal2HitPar::calc_time_residual(const double* params)
+{
+    Double_t residual_T = 0.;
+    Double_t avr = 0.;
+    Double_t res = 0., dtime;
+    Double_t stddev = 0.;
+    Double_t correct_time[8] = { 0. };
+
+    // calc deltaT for each event and sum up the absolute values into residual_T.
+    // Ideally, residual_T should be 0 which is to be minified.
+
+    for (Int_t e = 0; e < fNEvents; e++)
+    {
+        for (Int_t j = 0; j < 8; j++)
+        {
+
+            correct_time[j] = tvftx[e][j] - walk_correction(j, energ[e][j], params);
+        }
+
+        dtime = ((correct_time[0] + correct_time[2] + correct_time[4] + correct_time[6]) -
+                 (correct_time[1] + correct_time[3] + correct_time[5] + correct_time[7])) /
+                4.;
+
+        hfit->Fill(dtime);
+    }
+
+    stddev = hfit->GetStdDev();
+
+    //   cout<<"stddev = "<<stddev <<endl;
+    res = (stddev - 0.0865) * (stddev - 0.0865);
+
+    residual_T = res;
+
+    //   cout<<"Residual: "<< residual_T<<endl;
+
+    hfit->Reset("ICESM");
+
+    return residual_T;
+}
+
+Double_t R3BLosCal2HitPar::calc_time_residualv2(const double* params)
+{
+    Double_t residual_T = 0.;
+    Double_t avr = 0.;
+    Double_t res = 0., dtime;
+    Double_t stddev = 0.;
+    Double_t correct_time[8] = { 0. };
+
+    // calc deltaT for each event and sum up the absolute values into residual_T.
+    // Ideally, residual_T should be 0 which is to be minified.
+
+    for (Int_t e = 0; e < fNEvents; e++)
+    {
+        for (Int_t j = 0; j < 8; j++)
+        {
+
+            correct_time[j] = tvftx[e][j] - walk_correction(j, energ[e][j], params);
+        }
+
+        dtime = ((correct_time[0] + correct_time[1] + correct_time[4] + correct_time[5]) -
+                 (correct_time[2] + correct_time[3] + correct_time[6] + correct_time[7])) /
+                4.;
+
+        hfit->Fill(dtime);
+    }
+
+    stddev = hfit->GetStdDev();
+
+    //   cout<<"stddev = "<<stddev <<endl;
+    res = stddev * stddev;
+
+    residual_T = res;
+
+    //   cout<<"Residual: "<< residual_T<<endl;
+
+    hfit->Reset("ICESM");
+
+    return residual_T;
+}
+
+void R3BLosCal2HitPar::FinishEvent() {}
+
+void R3BLosCal2HitPar::FinishTask()
 {
     time_t time_start, time_stop;
 
@@ -399,39 +559,41 @@ void R3BLosCal2HitPar::Fit()
 
     // default values for the walk curve
     Double_t params[NPAR];
-    for (Int_t i = 0; i < NPM; i++)
+    for (Int_t i = 0; i < 1; i++)
     {
         Int_t kcount = i * icount;
-        params[kcount] = 20.;
-        params[kcount + 1] = -0.5;
+        params[kcount] = 100.;
+        params[kcount + 1] = 100.;
+        params[kcount + 2] = 0.;
+        //  params[kcount + 3] = 0.8;
     }
 
     // Define step
     Double_t step[NPAR];
 
-    for (Int_t i = 0; i < NPM; i++)
+    for (Int_t i = 0; i < 1; i++)
     {
         Int_t kcount = i * icount;
-        step[kcount] = 0.1;
-        step[kcount + 1] = 0.001;
+        step[kcount] = 1.;
+        step[kcount + 1] = 1.;
+        step[kcount + 2] = 0.01;
+        //  step[kcount + 3] = 0.1;
     }
 
     for (Int_t k = 0; k < NPAR; k++)
         cout << setprecision(10) << k << " " << params[k] << " " << step[k] << endl;
 
-    //  ROOT::Math::GSLMinimizer min( ROOT::Math::kVectorBFGS );
-
     // Choose method upon creation between:
-    // kMigrad, kSimplex, kCombined,
-    // kScan, kFumili
+    // Migrad, Simplex, Combined,
+    // Scan, Fumili
 
     // ROOT::Minuit2::Minuit2Minimizer min( ROOT::Minuit2::kMigrad );
-    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "kMigrad");
+    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer(minName, algoName);
 
-    min->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
-    min->SetMaxIterations(1000000);    // for GSL
-    min->SetTolerance(0.001);
-    min->SetPrintLevel(2);
+    min->SetMaxFunctionCalls(100000000); // for Minuit/Minuit2
+    min->SetMaxIterations(100000000);    // for GSL
+    min->SetTolerance(0.0001);
+    min->SetPrintLevel(3);
     // set precision setPrecision(double eps) 1.e-5 - 1.e-14
     min->SetPrecision(1.e-14);
     // set minimization quality level for low (0), medium (1) and high (2) quality
@@ -443,7 +605,7 @@ void R3BLosCal2HitPar::Fit()
 
     //  ROOT::Math::Functor f(&R3BLosCal2HitPar::calc_time_residual, NPAR);
 
-    ROOT::Math::Functor f([&](const Double_t* d) { return calc_time_residual(d); }, NPAR);
+    ROOT::Math::Functor f([&](const Double_t* par) { return calc_time_residual(par); }, NPAR);
 
     min->SetFunction(f);
 
@@ -454,17 +616,47 @@ void R3BLosCal2HitPar::Fit()
         sprintf(strName, "c%d", i);
         min->SetVariable(i, strName, params[i], step[i]);
     }
-    for (Int_t i = 0; i < NPM; i++)
-    {
-        Int_t kcount = i * icount;
-        min->SetVariableLowerLimit(kcount, 0.);
-        min->SetVariableUpperLimit(kcount + 1, 0.);
-    }
 
+    min->SetFixedVariable(2, "c2", 0);
+    //     min->SetVariableLowerLimit(2, 0.);
+
+    /*
+        for (Int_t i = 0; i < NPM; i++)
+        {
+            Int_t kcount = i * icount;
+            min->SetVariableLowerLimit(kcount, 0.);
+            min->SetVariableUpperLimit(kcount + 1, 0.);
+        }
+    */
     // do the minimization
     min->Minimize();
 
-    // Commented lines are printred by command  min.PrintResults();
+    cout << " " << endl;
+    int cmStatus = min->CovMatrixStatus();
+    // return status of covariance matrix
+    //-1 - not available (inversion failed or Hesse failed)
+    // 0 - available but not positive defined
+    // 1 - covariance only approximate
+    // 2 - full matrix but forced pos def
+    // 3 - full accurate matrix
+    cout << setprecision(10) << "CovMatrixStatus = " << cmStatus << endl;
+
+    double corr[6];
+    for (Int_t i = 0; i < NPAR - 1; i++)
+    {
+        for (Int_t j = i + 1; j < NPAR; j++)
+        {
+            corr[i] = min->Correlation(i, j);
+            cout << "Correlation between params " << i << " and " << j << " is " << corr[i] << endl;
+        }
+    }
+
+    int fitStatus = min->Status();
+    cout << setprecision(10) << "Fit status = " << fitStatus << endl;
+
+    cout << " " << endl;
+
+    // Commented lines are printed by command  min.PrintResults();
     const double fmin = min->MinValue();
     // cout<<setprecision(10)<<"Fmin= "<<fmin<<endl;
 
@@ -482,10 +674,18 @@ void R3BLosCal2HitPar::Fit()
     // status = 1 : hesse failed status = 2 : matrix inversion failed status = 3 : matrix is not pos defined
     min->PrintResults();
 
-    cout << "Minimum: f " << calc_time_residual(xs) << " using " << fStats << " events." << endl;
+    cout << "Minimum: f " << calc_time_residual(xs) << " using " << fNEvents << " events." << endl;
     for (Int_t k = 0; k < NPAR; k++)
         cout << setprecision(10) << " par" << k << "=" << xs[k] << ", error= " << err[k] << endl;
     cout << endl;
+
+    // expected minimum is 0
+    if (fmin < 1.E-4 && calc_time_residual(xs) < 1.E-4)
+        cout << "Minimizer " << minName << " - " << algoName << " converged to the right minimum" << endl;
+    else
+    {
+        cout << "Minimizer " << minName << " - " << algoName << "   failed to converge !!!" << endl;
+    }
 
     // Stores stop time in time_stop
     time(&time_stop);
@@ -510,174 +710,84 @@ void R3BLosCal2HitPar::Fit()
         cout << "out.open() failed!" << endl;
     // Finished writing output file
 
-    /*
-    TH2F* hdt[NPM];
-    TH2F* hwalk_cor[NPM];
-    for(Int_t k=0;k<NPM;k++)
+    // Original data
+    Double_t avr_orig = 0;
+    Double_t tres;
+    Double_t res_orig;
+    for (Int_t e = 0; e < fNEvents; e++)
     {
-      char strName[255];
-      sprintf(strName, "walk_%d_PM", k);
-      hwalk_cor[k]=new TH2F(strName," ",250,0,250,800,-20,20);
+        avr_orig += ((tvftx[e][0] + tvftx[e][2] + tvftx[e][4] + tvftx[e][6]) -
+                     (tvftx[e][1] + tvftx[e][3] + tvftx[e][5] + tvftx[e][7])) /
+                    4.;
     }
 
-        // Original data
-        Double_t avr_orig=0;
-        Double_t tres;
-        for (Int_t e=0;e<fStats;e++)
-        {
-          avr_orig += ((led_time[e][0]+led_time[e][2]+led_time[e][4]+led_time[e][6])-
-                       (led_time[e][1]+led_time[e][3]+led_time[e][5]+led_time[e][7]))/4.;
-        }
+    avr_orig /= float(fNEvents);
 
-        avr_orig /=float(fStats);
+    for (Int_t e = 0; e < fNEvents; e++)
+    {
+        res_orig = avr_orig - ((tvftx[e][0] + tvftx[e][2] + tvftx[e][4] + tvftx[e][6]) -
+                               (tvftx[e][1] + tvftx[e][3] + tvftx[e][5] + tvftx[e][7])) /
+                                  4.;
 
-        for (Int_t e=0;e<fStats;e++)
-        {
-         Double_t res_orig = avr_orig - ((led_time[e][0]+led_time[e][2]+led_time[e][4]+led_time[e][6])-
-                                         (led_time[e][1]+led_time[e][3]+led_time[e][5]+led_time[e][7]))/4.;
+        tres = ((tvftx[e][0] + tvftx[e][2] + tvftx[e][4] + tvftx[e][6]) -
+                (tvftx[e][1] + tvftx[e][3] + tvftx[e][5] + tvftx[e][7])) /
+               4.;
 
+        horig->Fill(res_orig);
+        htres->Fill(tres);
+    }
 
-         tres= ((led_time[e][0]+led_time[e][2]+led_time[e][4]+led_time[e][6])-
-                (led_time[e][1]+led_time[e][3]+led_time[e][5]+led_time[e][7]))/4.;
-
-         horig->Fill(res_orig);
-         htres->Fill(tres);
-        }
-
-
-        TCanvas *cdata=new TCanvas("cdata","data",0,0,600,600);
-        cdata->Clear();
-        cdata->Divide(2,2);
-        cdata->cd(1);
-        horig->Draw();
-
-        Double_t resi=0.;
-        Double_t avr=0.;
-        Double_t ct[8];
-        Double_t tres_corr;
-
+    Double_t resi = 0.;
+    Double_t avr = 0.;
+    Double_t ct[8];
+    Double_t tres_corr;
 
     // Corrected data
-        for (Int_t e=0;e<fStats;e++)
+    for (Int_t e = 0; e < fNEvents; e++)
+    {
+        for (Int_t j = 0; j < NPM; j++)
         {
-            for (Int_t j=0;j<NPM;j++)
-            {
-              ct[j]=led_time[e][j]-walk_correction(j,num_photons[e][j],xs);
-
-            }
-
-            tres_corr=(ct[0]+ct[2]+ct[4]+ct[6])/4.-(ct[1]+ct[3]+ct[5]+ct[7])/4.;
-
-            //cout<<"****"<<tres_corr<<endl;
-
-            htres_corr->Fill(tres_corr);//+1390884);
-
-            avr+=(ct[0]+ct[2]+ct[4]+ct[6])/4.-(ct[1]+ct[3]+ct[5]+ct[7])/4.;
-
-
-        }
-        avr /=float(fStats);
-
-
-
-        for (Int_t e=0;e<fStats;e++)
-        {
-                  resi = avr - ((ct[0]+ct[2]+ct[4]+ct[6])/4.-(ct[1]+ct[3]+ct[5]+ct[7])/4.);
-
-                  hwalk->Fill(resi);
+            ct[j] = tvftx[e][j] - walk_correction(j, energ[e][j], xs);
         }
 
+        tres_corr = (ct[0] + ct[2] + ct[4] + ct[6]) / 4. - (ct[1] + ct[3] + ct[5] + ct[7]) / 4.;
+
+        htres_corr->Fill(tres_corr);
+
+        avr += tres_corr;
+    }
+    avr /= float(fNEvents);
+
+    for (Int_t e = 0; e < fNEvents; e++)
+    {
+        for (Int_t j = 0; j < NPM; j++)
+        {
+            ct[j] = tvftx[e][j] - walk_correction(j, energ[e][j], xs);
+        }
+        resi = avr - ((ct[0] + ct[2] + ct[4] + ct[6]) / 4. - (ct[1] + ct[3] + ct[5] + ct[7]) / 4.);
 
         hwalk->Fill(resi);
-
-        cdata->cd(2);
-        hwalk->Draw();
-        cdata->cd(3);
-        htres->Draw();
-        cdata->cd(4);
-        htres_corr->Draw();
-
-
-     TCanvas *cfit_walk=new TCanvas("cfit_walk","fit walk",0,0,800,800);
-     cfit_walk->Clear();
-     cfit_walk->Divide(3,3);
-
-
-        Double_t x[500];
-        Double_t y[500];
-
-      for (Int_t k=0;k<NPM;k++)
-      {
-         Double_t q=20.;
-        for (Int_t i=0;i<250;i++)
-        {
-            x[i]=q;
-            y[i]=walk_correction(k,q,xs);
-            //if(k == 1) y[i]=10.4+0.001073364567*q;
-            //cout << q << " : " << y[i] << endl;
-            q+=0.5;
-         hwalk_cor[k]->Fill(x[i],y[i]);
-
-        }
-        cfit_walk->cd(k+1);
-         hwalk_cor[k]->Draw();
-      }*/
-}
-
-Double_t R3BLosCal2HitPar::walk_correction(Int_t iPM, Double_t Q, const Double_t* p)
-{
-    Int_t ia1, ia2;
-    Double_t y;
-
-    ia1 = icount * iPM;
-    ia2 = icount * iPM + 1;
-
-    y = p[ia1] * TMath::Power(Q, p[ia2]);
-    if (IS_NAN(y))
-        cout << iPM << ", " << p[ia1] << ", " << p[ia2] << ", " << Q << endl;
-
-    return y;
-}
-Double_t R3BLosCal2HitPar::calc_time_residual(const double* params)
-{
-    Double_t residual_T = 0.;
-    Double_t avr = 0.;
-    Double_t res = 0., dtime;
-
-    // calc deltaT for each event and sum up the absolute values into residual_T.
-    // Ideally, residual_T should be 0 which is to be minified.
-    for (Int_t e = 0; e < fStats; e++)
-    {
-        Double_t correct_time[8] = { 0. };
-
-        for (Int_t j = 0; j < 8; j++)
-        {
-
-            correct_time[j] = tvftx[e][j] - walk_correction(j, energ[e][j], params);
-        }
-
-        dtime = ((correct_time[0] + correct_time[2] + correct_time[4] + correct_time[6]) -
-                 (correct_time[1] + correct_time[3] + correct_time[5] + correct_time[7])) /
-                4.;
-
-        hfit->Fill(dtime);
     }
 
-    Double_t stddev = hfit->GetStdDev();
+    hwalk->Fill(resi);
 
-    res = stddev * stddev;
+    Double_t x[500];
+    Double_t y[500];
 
-    residual_T = res;
-
-    // printf("Residual: %f\n",residual_T);
-
-    hfit->Reset("ICESM");
-
-    return residual_T;
+    for (Int_t k = 0; k < NPM; k++)
+    {
+        Double_t q = 20.;
+        for (Int_t i = 0; i < 250; i++)
+        {
+            x[i] = q;
+            y[i] = walk_correction(k, q, xs);
+            // cout << q << " : " << y[i] << endl;
+            q += 1.;
+            hwalk_cor[k]->Fill(x[i], y[i]);
+        }
+        //        cfit_walk->cd(k+1);
+        //         hwalk_cor[k]->Draw();
+    }
 }
-
-void R3BLosCal2HitPar::FinishEvent() {}
-
-void R3BLosCal2HitPar::FinishTask() {}
 
 ClassImp(R3BLosCal2HitPar)

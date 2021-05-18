@@ -390,7 +390,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             LOG(WARNING) << "LOS Ihit  " << ihit << " " << nHits;
             R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
             if (ihit == 0)
-                timeLos = hitData->fTime_ns;
+                timeLos = hitData->GetTime();
             LOG(WARNING) << "LOS Time " << timeLos;
             if (std::isnan(timeLos))
                 return; /// in s444 run2930 Event 22333208
@@ -401,10 +401,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 //     fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);
                 fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);
             }
-            fh_los_pos->Fill(hitData->fX_cm, hitData->fY_cm);
+            fh_los_pos->Fill(hitData->GetX(), hitData->GetY());
 
             if (ihit == 0)
-                LosQ = hitData->fZ;
+                LosQ = hitData->GetEloss();
             if (NULL == fhChargeLosTofD)
             {
                 char strName[255];
@@ -1725,6 +1725,7 @@ void R3BTofdCal2Hit::FinishTask()
         // if (fhQp12) fhQp12->Write();
         // if (fhQp34) fhQp34->Write();
     }
+
     std::cout << "\n\nSome statistics:\n"
               << "Total number of events in tree  " << maxevent << "\n"
               << "Max Event analyzed              " << fnEvents + wrongtrigger + wrongtpat << "\n"

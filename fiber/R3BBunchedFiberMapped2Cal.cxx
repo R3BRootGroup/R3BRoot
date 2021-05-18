@@ -27,10 +27,13 @@
 
 R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
                                                      Int_t a_verbose,
+                                                     enum Electronics a_spmt_electronics,
                                                      enum R3BTCalEngine::CTDCVariant a_variant,
                                                      Bool_t a_skip_spmt)
     : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
     , fName(a_name)
+    , fSPMTElectronics(a_spmt_electronics)
+    , fCTDCVariant(a_variant)
     , fSkipSPMT(a_skip_spmt)
     , fMAPMTTCalPar(nullptr)
     , fMAPMTTrigTCalPar(nullptr)
@@ -38,10 +41,12 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
     , fMappedItems(nullptr)
     , fCalItems(new TClonesArray("R3BBunchedFiberCalData"))
     , fCalTriggerItems(new TClonesArray("R3BBunchedFiberCalData"))
-    , fClockFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250))
-    , fTamexFreq(1000. / VFTX_CLOCK_MHZ)
+    //    , fClockFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250))
+    //    , fTamexFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250)) //VFTX_CLOCK_MHZ)
     , fnEvents(0)
 {
+
+    //	cout<<"FIBER MAPPED TO CAL FOR FIB: "<<a_name<<endl;
 }
 
 R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
@@ -52,6 +57,20 @@ R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
+
+    switch (fSPMTElectronics)
+    {
+        case CTDC:
+            fTamexFreq = 1000. / (R3BTCalEngine::CTDC_16_BWD_150 == fCTDCVariant ? 150 : 250);
+            break;
+        case TAMEX:
+            fTamexFreq = 1000. / VFTX_CLOCK_MHZ;
+            break;
+        default:
+            assert(0 && "This should not happen!");
+    }
+    fClockFreq = 1000. / (R3BTCalEngine::CTDC_16_BWD_150 == fCTDCVariant ? 150 : 250);
+
     if (!fMAPMTTCalPar || !(fSkipSPMT || fSPMTTCalPar))
     {
         LOG(ERROR) << "TCal parameter containers missing, "
@@ -117,6 +136,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         auto channel = mapped->GetChannel();
         LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
+
+        //      cout<<"Mapped2Cal:  iHit: "<< i<<"; Side: "<<mapped->GetSide()<<", iChan: "<<mapped->GetChannel()<<",
+        //      isLead: "<<mapped->IsLeading()<<", time:"<<mapped->GetFine()<<"; "<<mapped->GetCoarse()<<endl;
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;

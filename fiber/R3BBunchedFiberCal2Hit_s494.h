@@ -28,8 +28,10 @@ class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
 
 #define BUNCHED_FIBER_TRIGGER_MAP_SET(mapmt_arr, spmt_arr) \
-  MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);\
-  SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
+  MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr); \
+  MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr)
+  
+//  SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
 
 /**
  * Transforms bunched fiber Cal level data to Hit level.
@@ -150,8 +152,11 @@ class R3BBunchedFiberCal2Hit_s494 : public FairTask
 	Int_t multi=0;
 	Double_t energy[2048];
 	Int_t counts[2048];
-	Double_t tsync_temp[2048]={0};
-	Double_t  gain_temp[2048]={10};
+	Double_t tsync;
+	Double_t  gainMA;
+	Double_t  gainSA;
+	Double_t  offset1;
+	Double_t  offset2;
     Bool_t tofdin;
 
     double fClockFreq;
@@ -163,11 +168,11 @@ class R3BBunchedFiberCal2Hit_s494 : public FairTask
     Bool_t fIsTsync;
     TClonesArray* fCalItems;
     TClonesArray* fMAPMTCalTriggerItems;
-    TClonesArray* fSPMTCalTriggerItems;
+//    TClonesArray* fSPMTCalTriggerItems;
     TClonesArray* fHitItems;
     TClonesArray* fTofdHitItems;
     unsigned const *fMAPMTTriggerMap;
-    unsigned const *fSPMTTriggerMap;
+//    unsigned const *fSPMTTriggerMap;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */
@@ -177,15 +182,13 @@ class R3BBunchedFiberCal2Hit_s494 : public FairTask
 
     // histograms for gain matching
     TH2F* fh_ToT_MA_Fib;
-    TH2F* fh_ToT_Single_Fib;
-    TH2F* fh_ToT_s_Fib[4];
-    TH2F* fh_time_s_Fib;
-    TH2F* fh_ToT_ToT;
+    TH2F* fh_ToT_SA_Fib;
+    TH2F* fh_time_SA_Fib;
     TH2F* fh_dt_Fib;
     TH2F* fh_Fib_ToF;
     TH2F* fh_Test;
     TH1F* fh_multi;
-    TH2F* fh_time_Fib;
+    TH2F* fh_time_MA_Fib;
     
 
   public:

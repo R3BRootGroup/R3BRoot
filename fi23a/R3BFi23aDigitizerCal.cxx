@@ -186,7 +186,7 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                 {
 
                     /* ifib num -> ichan num: Based on what Hans did in BunchedFiberCal2Hit:
-                     * How to get a fiber ID for a fiber detector defined as:
+                     * How to get a fiber ID for a fiber detector Fib1a-Fib13 defined as:
                      *  SubNum = 2
                      *  MAPMT = 256
                      *  SPMT = 2
@@ -206,10 +206,13 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                     */
 
                     ichanMA = i + 1; // iFib = 0...., iCha=1...
-                    if (i < 256)
-                        ichanSA = 1;
-                    if (i > 255)
-                        ichanSA = 2;
+                    ichanSA = ichanMA;
+                    /*
+                      if (i < 256)
+                          ichanSA = 1;
+                      if (i > 255)
+                          ichanSA = 2;
+                     */
 
                     /* From y-position get ToT_MA and ToT_SA only considering absorption;
                      * ToT_MA = energyl*exp(-l/labs), labs assume 100cm
@@ -242,16 +245,16 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
 
                     // cout << "Registered " << ichanMA << endl;
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
-                        R3BBunchedFiberCalData(0, ichanMA, 1, timeMA_lead);
+                        R3BBunchedFiberCalData(1, ichanMA, 1, timeMA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT trailing
-                        R3BBunchedFiberCalData(0, ichanMA, 0, timeMA_trail);
+                        R3BBunchedFiberCalData(1, ichanMA, 0, timeMA_trail);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT leading
-                        R3BBunchedFiberCalData(1, ichanSA, 1, timeSA_lead);
+                        R3BBunchedFiberCalData(0, ichanSA, 1, timeSA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT trailing
-                        R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
+                        R3BBunchedFiberCalData(0, ichanSA, 0, timeSA_trail);
                     if (first)
                     {
                         for (Int_t j = 0; j < 4; j++)

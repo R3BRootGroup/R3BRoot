@@ -25,7 +25,7 @@ R3BFi30Cal2Hit::R3BFi30Cal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                                   VERTICAL,
                                   2,
                                   256,
-                                  1,
+                                  256,
                                   a_is_calibrator,
                                   a_is_gain,
                                   a_is_tsync)

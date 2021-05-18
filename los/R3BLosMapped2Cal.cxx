@@ -45,9 +45,9 @@
 #include "TMath.h"
 
 #define LOS_COINC_WINDOW_V_NS 200;
-#define LOS_COINC_WINDOW_TL_NS 200;  // leading
-#define LOS_COINC_WINDOW_TT_NS 1000; // trailing, longer because of pileup
-#define LOS_COINC_WINDOW_M_NS 400;   // 200  // ???
+#define LOS_COINC_WINDOW_TL_NS 200; // leading
+#define LOS_COINC_WINDOW_TT_NS 400; // trailing, longer because of pileup
+#define LOS_COINC_WINDOW_M_NS 400;  // 200  // ???
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosMapped2Cal::R3BLosMapped2Cal()
@@ -187,6 +187,12 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
             LOG(INFO) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << iDet;
+            continue;
+        }
+
+        if (hit->GetTimeCoarse() > 8192)
+        {
+            LOG(WARNING) << "R3BLosMapped2Cal::Exec : coarse counter > 8192: " << iDet;
             continue;
         }
 

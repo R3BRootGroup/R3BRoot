@@ -63,6 +63,7 @@ enum DetectorId
     kFI33,
     kSFI,
     kMUSIC,
+    kLOS,
 #ifdef SOFIA
     kSOFSCI,
     kSOFAT,

@@ -14,22 +14,37 @@
 #include "R3BLosHitData.h"
 
 // for the data analysis of the Los detector.
-// Introduced by Ralf, Feb 2016
 
-R3BLosHitData::R3BLosHitData()
-    : fDetector(0)
+// Introduced by M.Heil, May 2016
+
+R3BLosHitData::R3BLosHitData() {}
+
+R3BLosHitData::R3BLosHitData(Int_t detId, Double_t x, Double_t y, Double_t Eloss, Double_t t, Int_t hitId)
+    : R3BHit(detId, x, y, Eloss, t)
 {
 }
-
-R3BLosHitData::R3BLosHitData(UChar_t detector, Double_t t, Double_t x, Double_t y, Double_t Z)
-
-    : fDetector(detector)
-    , fTime_ns(t)
-    , fX_cm(x)
-    , fY_cm(y)
-    , fZ(Z)
-//    , fTimeDiff2Ref_ns( diff )
-{
-}
-
 ClassImp(R3BLosHitData)
+    /*
+    // Introduced by Ralf, Feb 2016
+
+    R3BLosHitData::R3BLosHitData()
+        : fDetector(0)
+        , fTime_ns(0)
+        , fX_cm(0)
+        , fY_cm(0)
+        , fZ(0)
+    {
+    }
+
+    R3BLosHitData::R3BLosHitData(UChar_t detector, Double_t t, Double_t x, Double_t y, Double_t Z)
+
+        : fDetector(detector)
+        , fTime_ns(t)
+        , fX_cm(x)
+        , fY_cm(y)
+        , fZ(Z)
+    {
+    }
+
+    ClassImp(R3BLosHitData)
+    */

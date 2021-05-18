@@ -53,6 +53,7 @@ R3BLosMapped2Cal.cxx
 R3BLosMapped2CalPar.cxx
 R3BLosCal2Hit.cxx
 R3BLosProvideTStart.cxx
+R3BLosCal2HitPar.cxx
 )
 
 # fill list of header files from list of source files

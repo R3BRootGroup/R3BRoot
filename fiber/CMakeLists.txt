@@ -21,6 +21,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
+${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/fiber
@@ -42,6 +43,7 @@ set(SRCS
 R3BBunchedFiberMapped2CalPar.cxx
 R3BBunchedFiberMapped2Cal.cxx
 R3BBunchedFiberCal2Hit.cxx
+R3BBunchedFiberCal2HitEngRun2019.cxx
 R3BBunchedFiberCal2Hit_s494.cxx
 R3BBunchedFiberHitModulePar.cxx
 R3BBunchedFiberHitPar.cxx

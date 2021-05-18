@@ -13,8 +13,10 @@
 
 #include "R3BFi0Mapped2Cal.h"
 
-R3BFi0Mapped2Cal::R3BFi0Mapped2Cal(Int_t a_verbose, enum R3BTCalEngine::CTDCVariant a_variant)
-    : R3BBunchedFiberMapped2Cal("Fi0", a_verbose, R3BTCalEngine::CTDC_8_12_FWD_250)
+R3BFi0Mapped2Cal::R3BFi0Mapped2Cal(Int_t a_verbose,
+                                   enum Electronics a_electronics,
+                                   enum R3BTCalEngine::CTDCVariant a_variant)
+    : R3BBunchedFiberMapped2Cal("Fi0", a_verbose, a_electronics, a_variant, false)
 {
 }
 

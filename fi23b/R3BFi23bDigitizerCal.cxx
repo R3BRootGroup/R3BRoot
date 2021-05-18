@@ -200,10 +200,12 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                      */
 
                     ichanMA = i + 1; // iFib = 0...., iCha=1...
-                    if (i < 256)
-                        ichanSA = 1;
-                    if (i > 255)
-                        ichanSA = 2;
+                    ichanSA = ichanMA;
+
+                    /*   if (i < 256)
+                           ichanSA = 1;
+                       if (i > 255)
+                           ichanSA = 2;*/
 
                     /*
                                         ichanMA = (i % 2 == 0) ? (i / 2 + 1) : (i + 1) / 2; // iFib = 0...., iCha=1...
@@ -247,16 +249,16 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                     */
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
-                        R3BBunchedFiberCalData(0, ichanMA, 1, timeMA_lead);
+                        R3BBunchedFiberCalData(1, ichanMA, 1, timeMA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT trailing
-                        R3BBunchedFiberCalData(0, ichanMA, 0, timeMA_trail);
+                        R3BBunchedFiberCalData(1, ichanMA, 0, timeMA_trail);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT leading
-                        R3BBunchedFiberCalData(1, ichanSA, 1, timeSA_lead);
+                        R3BBunchedFiberCalData(0, ichanSA, 1, timeSA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT trailing
-                        R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
+                        R3BBunchedFiberCalData(0, ichanSA, 0, timeSA_trail);
                     if (first)
                     {
                         for (Int_t j = 0; j < 4; j++)
