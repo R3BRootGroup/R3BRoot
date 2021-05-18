@@ -77,17 +77,17 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BWhiterabbitLosReader::Read()
 {
-	
+
     if (!fData->TIMESTAMP_LOS_ID)
     {
         return kTRUE;
     }
-/*    
-    printf("Los %08x %08x %08x %08x %08x \n",
-    fData->TIMESTAMP_LOS_ID,
-    fData->TIMESTAMP_LOS_WR_T4, fData->TIMESTAMP_LOS_WR_T3,
-    fData->TIMESTAMP_LOS_WR_T2, fData->TIMESTAMP_LOS_WR_T1);
-*/   
+    /*
+        printf("Los %08x %08x %08x %08x %08x \n",
+        fData->TIMESTAMP_LOS_ID,
+        fData->TIMESTAMP_LOS_WR_T4, fData->TIMESTAMP_LOS_WR_T3,
+        fData->TIMESTAMP_LOS_WR_T2, fData->TIMESTAMP_LOS_WR_T1);
+    */
     if (fWhiterabbitId != fData->TIMESTAMP_LOS_ID)
     {
         char strMessage[1000];
@@ -105,20 +105,19 @@ Bool_t R3BWhiterabbitLosReader::Read()
         uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_LOS_WR_T4 << 48) |
                              ((uint64_t)fData->TIMESTAMP_LOS_WR_T3 << 32) |
                              ((uint64_t)fData->TIMESTAMP_LOS_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_LOS_WR_T1;
-        //fEventHeader->SetTimeStamp(timestamp);
+        // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
         new ((*fArray)[fArray->GetEntriesFast()]) R3BWRLosData(timestamp);
-        
-        //cout<<"WRLOS READER TIME: "<<timestamp<<", "<<fArray->GetEntriesFast()<<endl;
+
+        // cout<<"WRLOS READER TIME: "<<timestamp<<", "<<fArray->GetEntriesFast()<<endl;
     }
     else
     {
         fNEvent++;
     }
-    
-    
+
     fData->TIMESTAMP_LOS_ID = 0;
-    
+
     return kTRUE;
 }
 
