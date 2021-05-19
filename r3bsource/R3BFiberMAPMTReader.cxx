@@ -17,14 +17,11 @@
 #include "R3BFiberMAPMTMappedData.h"
 #include "TClonesArray.h"
 
-R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name,
-                                             UInt_t a_offset,
-                                             UInt_t fiber_num
-                                             )
+R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name, UInt_t a_offset, UInt_t fiber_num)
     : R3BReader(TString("R3B") + a_name + "Reader")
     , fOffset(a_offset)
     , fShortName(a_name)
-		, fFiberNum(fiber_num)
+    , fFiberNum(fiber_num)
     , fMappedArray(new TClonesArray("R3BFiberMAPMTMappedData"))
 {
 }
@@ -40,7 +37,8 @@ Bool_t R3BFiberMAPMTReader::Init()
                 auto const& ch = fMHL[side_i][edge_i][prec_i];
                 if (fFiberNum != ch._MI_len)
                 {
-                    LOG(FATAL) << "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum << " != MI-len=" << ch._MI_len << ").";
+                    LOG(FATAL) << "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum
+                               << " != MI-len=" << ch._MI_len << ").";
                     return kFALSE;
                 }
             }
@@ -52,7 +50,7 @@ Bool_t R3BFiberMAPMTReader::Init()
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
-    // LOG(ERROR) << "R3BFiberMAPMTReader::Read BEGIN";
+    //  LOG(WARNING) << "R3BFiberMAPMTReader::Read BEGIN for fib "<<fShortName;
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
@@ -91,6 +89,8 @@ Bool_t R3BFiberMAPMTReader::Read()
                 uint32_t f_MI = e[1]._MI[i];
                 uint32_t c_ME = e[0]._ME[i];
                 uint32_t f_ME = e[1]._ME[i];
+
+                //    LOG(WARNING)<<"Start: "<<side_i<<"; "<<edge_i<<", "<<c_MI<<", "<<f_MI<<", "<<c_ME<<", "<<f_ME;
 
                 if (c_MI != f_MI || c_ME != f_ME)
                 {

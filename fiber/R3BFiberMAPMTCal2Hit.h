@@ -19,7 +19,8 @@
 class TH1F;
 class TH2F;
 class R3BFiberMAPMTCalData;
-//class R3BFiberMAPMTHitPar;
+class R3BFiberMAPMTHitPar;
+class R3BFiberMAPMTHitModulePar;
 
 class R3BFiberMAPMTCal2Hit : public FairTask
 {
@@ -30,18 +31,19 @@ class R3BFiberMAPMTCal2Hit : public FairTask
         VERTICAL
     };
 
-   // struct ToT
-   // {
-   //     ToT(R3BFiberMAPMTCalData const*, R3BFiberMAPMTCalData const*, Double_t, Double_t, Double_t);
-   //     R3BFiberMAPMTCalData const* lead;
-   //     R3BFiberMAPMTCalData const* trail;
-   //     Double_t lead_ns, tail_ns, tot_ns;
-   // };
-   // struct Channel
-   // {
-   //     std::list<R3BFiberMAPMTCalData const*> lead_list;
-   //     std::list<ToT> tot_list;
-	 // };
+     struct ToT
+    {
+        ToT(R3BFiberMAPMTCalData const*, R3BFiberMAPMTCalData const*, Double_t, Double_t, Double_t);
+        R3BFiberMAPMTCalData const* lead;
+        R3BFiberMAPMTCalData const* trail;
+        Double_t lead_ns, tail_ns, tot_ns;
+    };
+    struct Channel
+    {
+        std::list<R3BFiberMAPMTCalData const*> lead_list;
+        std::list<ToT> tot_list;
+    };
+
 
 		struct Fib_Hit
 		{
@@ -51,9 +53,10 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		};
 
 		R3BFiberMAPMTCal2Hit(const char*,
-				Int_t,//verbosity
-				//Direction,
-				UInt_t//fiber number
+				Int_t,     //verbosity
+				Direction,
+				UInt_t,    //fiber number 
+				Bool_t     // is calib
 				);
 
 		virtual ~R3BFiberMAPMTCal2Hit();
@@ -68,7 +71,9 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		virtual void Exec(Option_t*);
 		virtual void FinishEvent();
 		virtual void FinishTask();
-
+ 
+       R3BFiberMAPMTHitModulePar* GetModuleParAt(Int_t fiber);
+    
 	private:
 		TString fName;
 		Int_t fnEvents;
@@ -77,19 +82,37 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		Int_t multi;
 		double fClockFreq;
 		double fGate_ns;
-
+	
+		Double_t tsync;
+		Double_t  gainMA;
+		Double_t  gainSA;
+		Double_t  offset1;
+		Double_t  offset2;
+		Bool_t fIsCalibrator;
+    	
 		Direction fDirection;
 		TClonesArray* fCalItems;
 		TClonesArray* fCalTriggerItems;
 		TClonesArray* fHitItems;
 		unsigned const *fTriggerMap[2];
-		Int_t fNofHitItems;
-		//R3BFiberMAPMTHitPar* fCalPar;
-		// [0=bottom,1=top][Channel].
-		//std::vector<Channel> fChannelArray[2];
-
+		R3BFiberMAPMTHitPar* fCalPar; /**< Parameter container. */
+		R3BFiberMAPMTHitPar* fHitPar; /**< Hit parameter container. */
+        Int_t fNofHitPars;              /**< Number of modules in parameter file. */
+        Int_t fNofHitItems;
+    		// [0=bottom,1=top][Channel].
+		std::vector<Channel> fChannelArray[2];
+  
+   // histograms for gain matching
+    TH2F* fh_ToT_MA_Fib;
+    TH2F* fh_ToT_SA_Fib;
+    TH2F* fh_time_SA_Fib;
+    TH2F* fh_dt_Fib;
+    TH2F* fh_Fib_ToF;
+    TH2F* fh_Test;
+    TH1F* fh_multi;
+    TH2F* fh_time_MA_Fib;
 	public:
-		ClassDef(R3BFiberMAPMTCal2Hit, 1)
+		ClassDef(R3BFiberMAPMTCal2Hit, 3)
 };
 
 #endif

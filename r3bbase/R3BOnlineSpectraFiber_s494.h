@@ -98,9 +98,6 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     std::vector<TClonesArray *> fCalItems;
     std::vector<TClonesArray *> fHitItems;
     
-    TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
-    TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
-    TClonesArray* fHitItemsTwim;    /**< Array with hit items. */
 
    enum DetectorInstances
     {
@@ -143,8 +140,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     TH2F *fh_time_Fib[NOF_FIB_DET];
     TH2F *fh_multihit_m_Fib[NOF_FIB_DET];   
     TH2F *fh_multihit_s_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
+    TH2F *fh_ToT_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
     TH2F *fh_ToTmax_Fibmax[NOF_FIB_DET];
     TH2F *fh_chan_corell[NOF_FIB_DET];
