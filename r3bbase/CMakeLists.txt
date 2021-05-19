@@ -89,6 +89,7 @@ R3BOnlineSpectraSci2.cxx
 R3BOnlineSpectraLosVsSci2.cxx
 R3BOnlineSpectraFibvsToFDS494.cxx
 R3BOnlineSpectraFiber_s494.cxx
+R3BOnlineSpectraToFD_S494.cxx
 )
 
 # fill list of header files from list of source files
