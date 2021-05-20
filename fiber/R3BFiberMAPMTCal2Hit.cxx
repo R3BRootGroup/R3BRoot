@@ -259,7 +259,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
         }
     }
 
-    cout << "NOW I WILL START" << endl;
     //  R3BFiberMAPMTCalData* cur_cal;
     double trig_time[8];
     //------ Collecting cal trigger hits --------

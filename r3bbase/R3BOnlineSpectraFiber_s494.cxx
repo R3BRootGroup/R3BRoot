@@ -298,47 +298,51 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_ToTmax_Fibmax[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
             FibCanvas[ifibcount]->Divide(4, 4);
-
-            FibCanvas[ifibcount]->cd(1);
-            fh_channels_Fib[ifibcount]->Draw();
-            FibCanvas[ifibcount]->cd(2);
-            gPad->SetLogz();
-            fh_multihit_m_Fib[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(3);
-            fh_channels_single_Fib[ifibcount]->Draw();
-            FibCanvas[ifibcount]->cd(4);
-            gPad->SetLogz();
-            fh_multihit_s_Fib[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(5);
-            gPad->SetLogz();
-            fh_chan_corell[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(6);
-            gPad->SetLogz();
-            fh_raw_tot_up[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(7);
-            gPad->SetLogz();
-            fh_raw_tot_down[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(9);
-            fh_fibers_Fib[ifibcount]->Draw();
-            FibCanvas[ifibcount]->cd(10);
-            fh_mult_Fib[ifibcount]->Draw();
-            FibCanvas[ifibcount]->cd(11);
-            gPad->SetLogz();
-            fh_ToT_Fib[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(12);
-            gPad->SetLogz();
-            fh_ToTmax_Fibmax[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(13);
-            gPad->SetLogz();
-            fh_time_Fib[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(14);
-            gPad->SetLogz();
-            fh_Fib_vs_Events[ifibcount]->Draw("colz");
-            FibCanvas[ifibcount]->cd(15);
-            gPad->SetLogz();
-            fh_Fib_pos[ifibcount]->Draw("colz");
-
-            //   FibCanvas[ifibcount]->cd(0);
+            if (fCalItems.at(DET_FI_FIRST + ifibcount))
+            {
+                FibCanvas[ifibcount]->cd(1);
+                fh_channels_Fib[ifibcount]->Draw();
+                FibCanvas[ifibcount]->cd(2);
+                gPad->SetLogz();
+                fh_multihit_m_Fib[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(3);
+                fh_channels_single_Fib[ifibcount]->Draw();
+                FibCanvas[ifibcount]->cd(4);
+                gPad->SetLogz();
+                fh_multihit_s_Fib[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(5);
+                gPad->SetLogz();
+                fh_chan_corell[ifibcount]->Draw("colz");
+            }
+            if (fHitItems.at(DET_FI_FIRST + ifibcount))
+            {
+                FibCanvas[ifibcount]->cd(6);
+                gPad->SetLogz();
+                fh_raw_tot_up[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(7);
+                gPad->SetLogz();
+                fh_raw_tot_down[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(9);
+                fh_fibers_Fib[ifibcount]->Draw();
+                FibCanvas[ifibcount]->cd(10);
+                fh_mult_Fib[ifibcount]->Draw();
+                FibCanvas[ifibcount]->cd(11);
+                gPad->SetLogz();
+                fh_ToT_Fib[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(12);
+                gPad->SetLogz();
+                fh_ToTmax_Fibmax[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(13);
+                gPad->SetLogz();
+                fh_time_Fib[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(14);
+                gPad->SetLogz();
+                fh_Fib_vs_Events[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(15);
+                gPad->SetLogz();
+                fh_Fib_pos[ifibcount]->Draw("colz");
+            }
+            FibCanvas[ifibcount]->cd(0);
             // uncomment lines below when ucesb avaliable
             run->AddObject(FibCanvas[ifibcount]);
             run->GetHttpServer()->RegisterCommand("Reset_Fiber", Form("/Tasks/%s/->Reset_Fiber_Histo()", GetName()));
@@ -354,22 +358,27 @@ void R3BOnlineSpectraFiber_s494::Reset_Fiber()
 {
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
-
-        fh_channels_Fib[ifibcount]->Reset();
-        fh_fibers_Fib[ifibcount]->Reset();
-        fh_mult_Fib[ifibcount]->Reset();
-        fh_time_Fib[ifibcount]->Reset();
-        fh_multihit_m_Fib[ifibcount]->Reset();
-        fh_multihit_s_Fib[ifibcount]->Reset();
-        fh_ToT_Fib[ifibcount]->Reset();
-        fh_Fib_vs_Events[ifibcount]->Reset();
-        fh_channels_single_Fib[ifibcount]->Reset();
-        fh_Fib_pos[ifibcount]->Reset();
-        fh_Fib_vs_Events[ifibcount]->Reset();
-        fh_ToTmax_Fibmax[ifibcount]->Reset();
-        fh_chan_corell[ifibcount]->Reset();
-        fh_raw_tot_up[ifibcount]->Reset();
-        fh_raw_tot_down[ifibcount]->Reset();
+        if (fCalItems.at(DET_FI_FIRST + ifibcount))
+        {
+            fh_channels_Fib[ifibcount]->Reset();
+            fh_mult_Fib[ifibcount]->Reset();
+            fh_multihit_m_Fib[ifibcount]->Reset();
+            fh_multihit_s_Fib[ifibcount]->Reset();
+            fh_channels_single_Fib[ifibcount]->Reset();
+        }
+        if (fHitItems.at(DET_FI_FIRST + ifibcount))
+        {
+            fh_time_Fib[ifibcount]->Reset();
+            fh_fibers_Fib[ifibcount]->Reset();
+            fh_ToT_Fib[ifibcount]->Reset();
+            fh_Fib_vs_Events[ifibcount]->Reset();
+            fh_Fib_pos[ifibcount]->Reset();
+            fh_Fib_vs_Events[ifibcount]->Reset();
+            fh_ToTmax_Fibmax[ifibcount]->Reset();
+            fh_chan_corell[ifibcount]->Reset();
+            fh_raw_tot_up[ifibcount]->Reset();
+            fh_raw_tot_down[ifibcount]->Reset();
+        }
     }
 }
 void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
@@ -576,22 +585,27 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
-
-        fh_channels_Fib[ifibcount]->Write();
-        fh_fibers_Fib[ifibcount]->Write();
-        fh_mult_Fib[ifibcount]->Write();
-        fh_time_Fib[ifibcount]->Write();
-        fh_multihit_m_Fib[ifibcount]->Write();
-        fh_multihit_s_Fib[ifibcount]->Write();
-        fh_ToT_Fib[ifibcount]->Write();
-        fh_Fib_vs_Events[ifibcount]->Write();
-        fh_channels_single_Fib[ifibcount]->Write();
-        fh_Fib_pos[ifibcount]->Write();
-        fh_Fib_vs_Events[ifibcount]->Write();
-        fh_ToTmax_Fibmax[ifibcount]->Write();
-        fh_chan_corell[ifibcount]->Write();
-        fh_raw_tot_up[ifibcount]->Write();
-        fh_raw_tot_down[ifibcount]->Write();
+        if (fCalItems.at(DET_FI_FIRST + ifibcount))
+        {
+            fh_channels_Fib[ifibcount]->Write();
+            fh_mult_Fib[ifibcount]->Write();
+            fh_multihit_m_Fib[ifibcount]->Write();
+            fh_multihit_s_Fib[ifibcount]->Write();
+            fh_channels_single_Fib[ifibcount]->Write();
+        }
+        if (fHitItems.at(DET_FI_FIRST + ifibcount))
+        {
+            fh_time_Fib[ifibcount]->Write();
+            fh_fibers_Fib[ifibcount]->Write();
+            fh_ToT_Fib[ifibcount]->Write();
+            fh_Fib_vs_Events[ifibcount]->Write();
+            fh_Fib_pos[ifibcount]->Write();
+            fh_Fib_vs_Events[ifibcount]->Write();
+            fh_ToTmax_Fibmax[ifibcount]->Write();
+            fh_chan_corell[ifibcount]->Write();
+            fh_raw_tot_up[ifibcount]->Write();
+            fh_raw_tot_down[ifibcount]->Write();
+        }
     }
 }
 
