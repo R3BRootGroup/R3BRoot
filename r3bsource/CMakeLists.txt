@@ -100,6 +100,8 @@ R3BFi10Reader.cxx
 R3BFi11Reader.cxx
 R3BFi12Reader.cxx
 R3BFi13Reader.cxx
+R3BFi23aReader.cxx
+R3BFi23bReader.cxx
 R3BFi30Reader.cxx
 R3BFi31Reader.cxx
 R3BFi32Reader.cxx
@@ -154,6 +156,8 @@ ext/ext_h101_fibtwelve.h
 ext/ext_h101_fibthirteen.h
 #ext_h101_los_dez19.h
 ext/ext_h101_los_s515.h
+ext/ext_h101_fib23a.h
+ext/ext_h101_fib23b.h
 ext/ext_h101_fib30.h
 ext/ext_h101_fib31.h
 ext/ext_h101_fib32.h
