@@ -43,7 +43,7 @@
 // So do some forward declaration for now, and keep the include in just one
 // place, for now R3BTofiCal2Histo.cxx.
 //#include "mapping_tofi_trig.hh"
-extern unsigned g_tofi_trig_map[4][2][48];
+extern unsigned g_tofi_trig_map[2][24];
 void tofi_trig_map_setup();
 
 using namespace std;
@@ -363,8 +363,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         {
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
-            auto top_trig_i = g_tofi_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
-            auto bot_trig_i = g_tofi_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+            auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
+            auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {

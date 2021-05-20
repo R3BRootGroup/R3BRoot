@@ -44,7 +44,7 @@
 #include <vector>
 
 #define IS_NAN(x) TMath::IsNaN(x)
-// using namespace std;
+using namespace std;
 
 R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
     : FairTask("OnlineSpectraFiber_s494", 1)
@@ -193,7 +193,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
 
             // Multihit SAPMT:
             fh_multihit_s_Fib[ifibcount] = new TH2F(
-                Form("%sCal_multihit_down", detName), Form("%sCal multihits down", detName), 16, 0., 16., 20, 0., 20.);
+                Form("%sCal_multihit_down", detName), Form("%sCal multihits down", detName), 520, 0., 520, 20, 0., 20.);
             fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("Channel");
             fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
 
@@ -311,8 +311,8 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 gPad->SetLogz();
                 fh_multihit_s_Fib[ifibcount]->Draw("colz");
                 FibCanvas[ifibcount]->cd(5);
-                gPad->SetLogz();
-                fh_chan_corell[ifibcount]->Draw("colz");
+                // gPad->SetLogz();
+                // fh_chan_corell[ifibcount]->Draw("colz");
             }
             if (fHitItems.at(DET_FI_FIRST + ifibcount))
             {
@@ -375,7 +375,7 @@ void R3BOnlineSpectraFiber_s494::Reset_Fiber()
             fh_Fib_pos[ifibcount]->Reset();
             fh_Fib_vs_Events[ifibcount]->Reset();
             fh_ToTmax_Fibmax[ifibcount]->Reset();
-            fh_chan_corell[ifibcount]->Reset();
+            //  fh_chan_corell[ifibcount]->Reset();
             fh_raw_tot_up[ifibcount]->Reset();
             fh_raw_tot_down[ifibcount]->Reset();
         }
@@ -439,8 +439,8 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
         {
 
             Int_t nCals = detCal->GetEntriesFast();
-            if (nCals > 100)
-                continue;
+            //       if (nCals > 100)
+            //          continue;
 
             std::vector<UInt_t> upmt_num(512); // up
             std::vector<UInt_t> dpmt_num(512); // down
@@ -466,9 +466,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                     fh_channels_single_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
                     ++dpmt_num.at(iCha - 1);                       // multihit of a given down killom channel
                 }
-
-                fh_chan_corell[ifibcount]->Fill(iCha_down, iCha_up);
             }
+
+            //     fh_chan_corell[ifibcount]->Fill(iCha_down, iCha_up);
 
             for (int i = 0; i < 512; ++i)
             {

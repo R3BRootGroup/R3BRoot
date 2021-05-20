@@ -25,7 +25,6 @@ typedef          int  int32_t;
  *
  * Plain structure (layout as ntuple/root file):
  */
-
 typedef struct EXT_STR_h101_LOS_t
 {
   /* RAW */

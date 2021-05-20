@@ -275,8 +275,8 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
 
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
-            auto top_trig_i = g_tofi_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
-            auto bot_trig_i = g_tofi_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+            auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
+            auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
             // cout << "Triger mapping: " << top_trig_i << "  "  << bot_trig_i << endl;
             // cout << "Trigger num: " << trig_num << endl;
             Double_t top_trig_ns = 0, bot_trig_ns = 0;

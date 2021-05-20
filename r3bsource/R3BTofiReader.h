@@ -15,15 +15,16 @@
 #define R3BTOFIREADER_H
 
 #include "R3BReader.h"
+#include "FairTask.h"
 
-struct EXT_STR_h101_TOFD_t;
-typedef struct EXT_STR_h101_TOFD_t EXT_STR_h101_TOFD;
+struct EXT_STR_h101_TOFI_t;
+typedef struct EXT_STR_h101_TOFI_t EXT_STR_h101_TOFI;
 class FairLogger;
 
 class R3BTofiReader : public R3BReader
 {
   public:
-    R3BTofiReader(EXT_STR_h101_TOFD*, UInt_t);
+    R3BTofiReader(EXT_STR_h101_TOFI*, UInt_t);
     ~R3BTofiReader();
 
     Bool_t Init(ext_data_struct_info*);
@@ -32,7 +33,7 @@ class R3BTofiReader : public R3BReader
 
   private:
     /* Reader specific data structure from ucesb */
-    EXT_STR_h101_TOFD* fData;
+    EXT_STR_h101_TOFI* fData;
     /* Data offset */
     UInt_t fOffset;
     /* FairLogger */
@@ -40,6 +41,7 @@ class R3BTofiReader : public R3BReader
     /* the structs of type R3BTofixMappedItem */
     TClonesArray* fArray; /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */
+    R3BEventHeader* header;
 
   public:
     ClassDef(R3BTofiReader, 0);

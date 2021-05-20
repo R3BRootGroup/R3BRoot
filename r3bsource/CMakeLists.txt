@@ -167,6 +167,7 @@ ext/ext_h101_sci2.h
 ext/ext_h101_sci8.h
 ext/ext_h101_sfib.h
 ext/ext_h101_tofd.h
+ext/ext_h101_tofd.h
 ext/ext_h101_ptof.h
 ext/ext_h101_psp.h
 ext/ext_h101_raw_califa_febex.h

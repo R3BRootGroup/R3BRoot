@@ -97,31 +97,31 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     std::vector<TClonesArray *> fMappedItems;
     std::vector<TClonesArray *> fCalItems;
     std::vector<TClonesArray *> fHitItems;
+    std::vector<TClonesArray *> fCalTriggerItems;
     
 
    enum DetectorInstances
     {
         DET_FI_FIRST,
-        DET_FI23A = DET_FI_FIRST,
-        DET_FI23B,
-        DET_FI30,
+        DET_FI30 = DET_FI_FIRST,
         DET_FI31,
         DET_FI32,
         DET_FI33,
-        DET_FI_LAST = DET_FI33,
+        DET_FI23A,
+        DET_FI23B,
+        DET_FI_LAST = DET_FI23B,
         DET_MAX
     };
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",  "Fi31",  
-                                                 "Fi32", "Fi33",   NULL };
+    const char* fDetectorNames[DET_MAX + 1] = {  "Fi30",  "Fi31", "Fi32", "Fi33",  
+                                                 "Fi23a", "Fi23b", NULL };
 
     // If FiberI is present or not:
     Int_t  ifibdet;           
     // Number of fibers per detector
-    Double_t n_fiber[NOF_FIB_DET] = { 384., 384., 512., 512., 512., 512. };
-        
+    Double_t n_fiber[NOF_FIB_DET] = {  512., 512., 512., 512., 384., 384.};
      
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */

@@ -5,9 +5,10 @@
 // ------------------------------------------------------------
 
 #ifndef R3BONLINESPECTRATOFD_S494
-#define R3BONLINESPECTRASTOFD_494
+#define R3BONLINESPECTRATOFD_S494
+
 #define N_PLANE_MAX_TOFD 4
-#define N_PADDLE_MAX_TOFD 50
+#define N_PADDLE_MAX_TOFD 44
 
 
 #include "FairTask.h"
@@ -20,7 +21,7 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 #include <cstdlib>
-
+#include <map>
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -107,8 +108,9 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
-    std::vector<TClonesArray*> fHitItems;
-
+    
+    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+   
     enum DetectorInstances
     {
         DET_TOFD,
@@ -147,7 +149,6 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
 
     TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_ToF[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_dt[3];
     TH1F* fh_TimePreviousEvent;
