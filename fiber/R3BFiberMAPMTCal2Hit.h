@@ -84,10 +84,10 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		double fGate_ns;
 	
 		Double_t tsync;
-		Double_t  gainMA;
-		Double_t  gainSA;
-		Double_t  offset1;
-		Double_t  offset2;
+		Double_t  gainUp;
+		Double_t  gainDown;
+		Double_t  offsetUp;
+		Double_t  offsetDown;
 		Bool_t fIsCalibrator;
     	
 		Direction fDirection;

@@ -30,12 +30,12 @@ R3BFiberMAPMTHitModulePar::R3BFiberMAPMTHitModulePar(const char* name,
                                                      Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fFiber(0)
-    , fOffset1(0)
-    , fOffset2(0)
+    , fOffsetUp(0)
+    , fOffsetDown(0)
     , fVeff(0)
     , fSync(0)
-    , fGainMA(0)
-    , fGainS(0)
+    , fGainUp(0)
+    , fGainDown(0)
 {
     // Reset all parameters
     clear();
@@ -52,8 +52,8 @@ void R3BFiberMAPMTHitModulePar::putParams(FairParamList* list)
     }
     list->add("fiber", fFiber);
     /*
-        list->add("Offset1", fOffset1);
-        list->add("Offset2", fOffset2);
+        list->add("OffsetUp", fOffsetUp);
+        list->add("OffsetDown", fOffsetDown);
         list->add("Veff", fOffset2);
     */
 }
@@ -77,11 +77,11 @@ void R3BFiberMAPMTHitModulePar::printParams()
 {
     LOG(INFO) << "   R3BFiberMAPMTHitModulePar: FIBER HIT Calibration Parameters: ";
     LOG(INFO) << "   fFiber: " << fFiber;
-    LOG(INFO) << "   fOffset1: " << fOffset1;
-    LOG(INFO) << "   fOffset2: " << fOffset2;
+    LOG(INFO) << "   fOffset1: " << fOffsetUp;
+    LOG(INFO) << "   fOffset2: " << fOffsetDown;
     LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fGainMA: " << fGainMA;
-    LOG(INFO) << "   fGainS: " << fGainS;
+    LOG(INFO) << "   fGainMA: " << fGainUp;
+    LOG(INFO) << "   fGainS: " << fGainDown;
     LOG(INFO) << "   fSync: " << fSync;
 }
 

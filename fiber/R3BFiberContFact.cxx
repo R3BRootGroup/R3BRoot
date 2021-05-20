@@ -26,6 +26,7 @@
 
 //#include "R3BGeoTofPar.h" //still to do
 #include "R3BBunchedFiberHitPar.h"
+#include "R3BFiberMAPMTHitPar.h"
 
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
@@ -151,9 +152,16 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
     if (strcmp(name,"CbmGeoStsPar")==0) {
       p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     }*/
-    //  if (strcmp(name,"FiberdHitPar")==0) {
-    p = new R3BBunchedFiberHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    //  }
+
+    if (strcmp(name, "Fi30HitPar") == 0 || strcmp(name, "Fi31HitPar") == 0 || strcmp(name, "Fi32HitPar") == 0 ||
+        strcmp(name, "Fi33HitPar") == 0 || strcmp(name, "Fi23aHitPar") == 0 || strcmp(name, "Fi23bHitPar") == 0)
+    {
+        p = new R3BFiberMAPMTHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else
+    { // if (strcmp(name,"FiberHitPar")==0) {
+        p = new R3BBunchedFiberHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
     return p;
 }
 

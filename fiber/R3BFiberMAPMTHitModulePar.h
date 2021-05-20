@@ -78,28 +78,28 @@ class R3BFiberMAPMTHitModulePar : public FairParGenericSet
     /** Accessor functions **/
     Int_t GetFiber() const { return fFiber; }
     Double_t GetSync() const { return fSync; }
-    Double_t GetOffset1() const { return fOffset1; }
-    Double_t GetOffset2() const { return fOffset2; }
+    Double_t GetOffsetUp() const { return fOffsetUp; }
+    Double_t GetOffsetDown() const { return fOffsetDown; }
     Double_t GetVeff() const { return fVeff; }
-    Double_t GetGainMA() const { return fGainMA; }
-    Double_t GetGainS() const { return fGainS; }
+    Double_t GetGainUp() const { return fGainUp; }
+    Double_t GetGainDown() const { return fGainDown; }
 
     void SetFiber(Int_t i) { fFiber = i; }
     void SetSync(Double_t t) { fSync = t; }
-    void SetOffset1(Double_t t) { fOffset1 = t; }
-    void SetOffset2(Double_t t) { fOffset2 = t; }
-    void SetGainMA(Double_t gainMA) { fGainMA = gainMA; }
-    void SetGainS(Double_t gainS) { fGainS = gainS; }
+    void SetOffsetUp(Double_t t) { fOffsetUp = t; }
+    void SetOffsetDown(Double_t t) { fOffsetDown = t; }
+    void SetGainUp(Double_t gainUp) { fGainUp = gainUp; }
+    void SetGainDown(Double_t gainDown) { fGainDown = gainDown; }
     void SetVeff(Double_t v) { fVeff = v; }
 
   private:
     Int_t fFiber;      /**< Index of a fiber. */
-    Double_t fOffset1; /**< time offset of PM1 */
-    Double_t fOffset2; /**< time offset of PM2 */
+    Double_t fOffsetUp; /**< time offset of PM1 */
+    Double_t fOffsetDown; /**< time offset of PM2 */
     Double_t fVeff;    /**< effective velocity of light in paddle for position determination */
     Double_t fSync;    /**< time offset between paddles */
-    Double_t fGainMA;
-    Double_t fGainS;
+    Double_t fGainUp;
+    Double_t fGainDown;
 
     ClassDef(R3BFiberMAPMTHitModulePar, 1);
 };
