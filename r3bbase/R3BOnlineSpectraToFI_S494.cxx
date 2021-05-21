@@ -118,7 +118,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
     if (fMappedItems.at(DET_TOFI))
     {
         TCanvas* ctofi_planes = new TCanvas("TOFI_planes", "TOFI planes", 10, 10, 1100, 1000);
-        ctofi_planes->Divide(4,1);
+        ctofi_planes->Divide(2,2);
 
         for (Int_t j = 0; j < N_PLANE_MAX_TOFI; j++)
         {
@@ -147,9 +147,9 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             fh_tofi_multihit[j]->GetYaxis()->SetTitle("Multihit");
         }
  
-         fh_tofi_dt = new TH2F("tofi_dt", "Tofi dt", 25, 0, 25, 2000, -100., 100);
-         fh_tofi_dt->GetXaxis()->SetTitle("Bar number");
-         fh_tofi_dt->GetYaxis()->SetTitle("dt / ns");
+        fh_tofi_dt = new TH2F("tofi_dt", "Tofi dt", 25, 0, 25, 2000, -100., 100);
+        fh_tofi_dt->GetXaxis()->SetTitle("Bar number");
+        fh_tofi_dt->GetYaxis()->SetTitle("dt / ns");
            
         ctofi_planes->cd(1);
         fh_tofi_channels[0]->Draw();
@@ -440,7 +440,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         {    
             for (Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFI; ibr++)
             {
-				fh_tofi_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
+				if (vmultihits[ipl+1][ibr+1] > 0) fh_tofi_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
 			
 			}
 		} 		   

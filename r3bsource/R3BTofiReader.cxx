@@ -68,25 +68,13 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
         LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
-    puts("1");
     // Register output array in tree
     FairRootManager::Instance()->Register("TofiMapped", "Land", fArray, kTRUE);
     FairRootManager::Instance()->Register("TofiTriggerMapped", "Land", fArrayTrigger, kTRUE);
-    puts("2");
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFI_onion* data = (EXT_STR_h101_TOFI_onion*)fData;
-
-    for (int p = 0; p < 24; p++)
-    {
-        for (int t = 0; t < 2; t++) // tube
-        {
-            data->TOFI_T[t].LC[p] = 0;
-            data->TOFI_T[t].LF[p] = 0;
-            data->TOFI_T[t].TC[p] = 0;
-            data->TOFI_T[t].TF[p] = 0;
-        }
-    }
+    memset(data, 0, sizeof *data);
 
     return kTRUE;
 }
@@ -97,43 +85,49 @@ Bool_t R3BTofiReader::Read()
     EXT_STR_h101_TOFI_onion* data = (EXT_STR_h101_TOFI_onion*)fData;
 
     // puts("NEW Event");
-    for (uint32_t d = 0; d < MAX_TOFI_PADDLES; d++)
-    {
-        for (uint32_t t = 0; t < 2; t++)
-        {
-            auto const& side = data->TOFI_T[t];
-            // Leading.
-
-            //    if(side.LC[d] > 0) std::cout<<"LEADING: "<<d+1<<", "<<t+1<<", "<<side.LC[d]<<",
-            //    "<<side.LF[d]<<std::endl;
-            if (side.LC[d] > 0)
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BTofiMappedData(1, t + 1, d + 1, 1, side.LC[d], side.LF[d]);
-        }
+    // Leading.
+    for (uint32_t t = 0; t < 2; t++)
+    { 
+		auto const& side = data->TOFI_T[t];
+		
+		uint32_t j = 0;
+		for (uint32_t i = 0; i < side.TCLM; i++)
+		{
+			uint32_t ch_i = side.TCLMI[i];
+			uint32_t end = side.TCLME[i];
+			for (; j < end; j++)
+			{
+				new ((*fArray)[fArray->GetEntriesFast()])
+					R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCLv[j], side.TFLv[j]);
+			}
+		}
     }
 
-    for (uint32_t d = 0; d < MAX_TOFI_PADDLES; d++)
-    {
-        for (uint32_t t = 0; t < 2; t++)
-        {
-            auto const& side = data->TOFI_T[t];
-            // Trailing.
-            //      if(side.TC[d] > 0)   std::cout<<"Trailing: "<<d+1<<", "<<t+1<<", "<<side.TC[d]<<",
-            //      "<<side.TF[d]<<std::endl;
-            if (side.TC[d] > 0)
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BTofiMappedData(1, t + 1, d + 1, 2, side.TC[d], side.TF[d]);
-        }
+    // Trailing.
+    for (uint32_t t = 0; t < 2; t++)
+    { 
+		auto const& side = data->TOFI_T[t];
+		
+		uint32_t j = 0;
+		for (uint32_t i = 0; i < side.TCLM; i++)
+		{
+			uint32_t ch_i = side.TCLMI[i];
+			uint32_t end = side.TCLME[i];
+			for (; j < end; j++)
+			{
+				new ((*fArray)[fArray->GetEntriesFast()])
+					R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCTv[j], side.TFTv[j]);
+			}
+		}
     }
-
-    // Leading TAMEX trigger times.
+    
+    // Triggers.
     {
-        auto numChannels = data->TOFI_TRIGFL;
-        for (uint32_t i = 0; i < numChannels; i++)
+        for (uint32_t i = 0; i < data->TOFI_TRIGFL; i++)
         {
-            uint32_t channel = data->TOFI_TRIGFLI[i];
-            //    std::cout<<"Tigger: "<<channel<<", "<<i<<", "<< data->TOFI_TRIGCLv[i]<<",
-            //    "<<data->TOFI_TRIGFLv[i]<<std::endl;
+            uint32_t ch_i = data->TOFI_TRIGFLI[i];
             new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
-                R3BTofiMappedData(MAX_TOFI_PLANES + 1, 1, channel, 1, data->TOFI_TRIGCLv[i], data->TOFI_TRIGFLv[i]);
+                R3BTofiMappedData(MAX_TOFI_PLANES + 1, 1, ch_i, 1, data->TOFI_TRIGCLv[i], data->TOFI_TRIGFLv[i]);
         }
     }
 
