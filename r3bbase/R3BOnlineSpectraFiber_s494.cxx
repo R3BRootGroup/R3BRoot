@@ -48,7 +48,7 @@ using namespace std;
 
 R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
     : FairTask("OnlineSpectraFiber_s494", 1)
-    , fTrigger(-1)
+    , fTrigger(1)
     , fTpat(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
@@ -439,9 +439,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
         {
 
             Int_t nCals = detCal->GetEntriesFast();
-            //       if (nCals > 100)
-            //          continue;
 
+            //if (nCals > 1000)
+                //continue;
             std::vector<UInt_t> upmt_num(512); // up
             std::vector<UInt_t> dpmt_num(512); // down
             for (Int_t ical = 0; ical < nCals; ical++)
