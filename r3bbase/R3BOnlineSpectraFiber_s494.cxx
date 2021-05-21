@@ -31,6 +31,12 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "mapping_fib23a_trig.hh"
+#include "mapping_fib23b_trig.hh"
+#include "mapping_fib30_trig.hh"
+#include "mapping_fib31_trig.hh"
+#include "mapping_fib32_trig.hh"
+#include "mapping_fib33_trig.hh"
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <algorithm>
@@ -40,18 +46,25 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <vector>
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
-
+namespace
+{
+    double c_period = 4096 * 1000. / 150;
+    double c_fiber_coincidence_ns = 20; // nanoseconds.
+    double c_tot_coincidence_ns = 100;  // nanoseconds
+} // namespace
 R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
     : FairTask("OnlineSpectraFiber_s494", 1)
     , fTrigger(1)
     , fTpat(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
+    , fChannelArray()
 {
 }
 
@@ -61,6 +74,7 @@ R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494(const char* name, Int_t i
     , fTpat(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
+    , fChannelArray()
 {
 }
 
@@ -126,21 +140,72 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
     printf("**** Have %d fiber detectors ==>.\n", NOF_FIB_DET);
     for (int det = 0; det < DET_MAX; det++)
     {
-        //       fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
-
-        //       if (NULL == fMappedItems.at(det))
-        //       {
-        //           printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
-        //       }
+        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        if (NULL == fMappedItems.at(det))
+        {
+            printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
+        }
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
         if (NULL == fCalItems.at(det))
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
+        fCalTriggerItems.push_back((TClonesArray*)mgr->GetObject(Form("%sTriggerCal", fDetectorNames[det])));
+        if (NULL == fCalTriggerItems.at(det))
+        {
+            printf("Could not find CalTrigger data for '%s'.\n", fDetectorNames[det]);
+        }
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
         if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
+        }
+    }
+
+    // Trigger mappin from included mapping files for each det.
+    const char* name;
+    for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
+    {
+        if (fCalItems.at(DET_FI_FIRST + ifibcount))
+        {
+            name = fDetectorNames[DET_FI_FIRST + ifibcount];
+            if ((strcmp(name, "Fi30") == 0))
+            {
+                fib30_trig_map_setup();
+                fTriggerMap[0] = g_fib30_trig_map[0];
+                fTriggerMap[1] = g_fib30_trig_map[1];
+            }
+            if ((strcmp(name, "Fi31") == 0))
+            {
+                fib31_trig_map_setup();
+                fTriggerMap[0] = g_fib31_trig_map[0];
+                fTriggerMap[1] = g_fib31_trig_map[1];
+            }
+
+            if ((strcmp(name, "Fi32") == 0))
+            {
+                fib32_trig_map_setup();
+                fTriggerMap[0] = g_fib32_trig_map[0];
+                fTriggerMap[1] = g_fib32_trig_map[1];
+            }
+            if ((strcmp(name, "Fi33") == 0))
+            {
+                fib33_trig_map_setup();
+                fTriggerMap[0] = g_fib33_trig_map[0];
+                fTriggerMap[1] = g_fib33_trig_map[1];
+            }
+            if ((strcmp(name, "Fi23a") == 0))
+            {
+                fib23a_trig_map_setup();
+                fTriggerMap[0] = g_fib23a_trig_map[0];
+                fTriggerMap[1] = g_fib23a_trig_map[1];
+            }
+            if ((strcmp(name, "Fi23b") == 0))
+            {
+                fib23b_trig_map_setup();
+                fTriggerMap[0] = g_fib23b_trig_map[0];
+                fTriggerMap[1] = g_fib23b_trig_map[1];
+            }
         }
     }
 
@@ -232,6 +297,17 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_chan_corell[ifibcount]->GetXaxis()->SetTitle("Channel number down");
             fh_chan_corell[ifibcount]->GetYaxis()->SetTitle("Channel number up");
 
+            fh_chan_dt_cal[ifibcount] = new TH2F(Form("%sCal_TimevsChannel", detName),
+                                                 Form("%sCal Time vs Channel", detName),
+                                                 N_FIBER_PLOT,
+                                                 0.,
+                                                 N_FIBER_PLOT,
+                                                 4096,
+                                                 -2048.,
+                                                 2048.);
+            fh_chan_dt_cal[ifibcount]->GetXaxis()->SetTitle("Channel number");
+            fh_chan_dt_cal[ifibcount]->GetYaxis()->SetTitle("tUp-tDown");
+
             // Hit level
             // Fibers:
             fh_fibers_Fib[ifibcount] =
@@ -245,8 +321,14 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_mult_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // ToT :
-            fh_ToT_Fib[ifibcount] = new TH2F(
-                Form("%sHit_tot", detName), Form("%sHit ToT", detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 100.);
+            fh_ToT_Fib[ifibcount] = new TH2F(Form("%sHit_ToTup_iFib", detName),
+                                             Form("%sHit ToTup vs Fib", detName),
+                                             N_FIBER_PLOT,
+                                             0.,
+                                             N_FIBER_PLOT,
+                                             400,
+                                             0.,
+                                             100.);
             fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -256,11 +338,11 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                                               N_FIBER_PLOT,
                                               0.,
                                               N_FIBER_PLOT,
-                                              2048,
-                                              -1024.,
-                                              1024.);
+                                              4096,
+                                              -2048.,
+                                              2048.);
             fh_time_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tMAPMT-tSPMT");
+            fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tUp-tDown");
 
             // Not-calibrated position:
             fh_Fib_pos[ifibcount] = new TH2F(Form("%sHit_pos", detName),
@@ -286,8 +368,8 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
             fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
 
-            fh_ToTmax_Fibmax[ifibcount] = new TH2F(Form("%sHit_totMax_iFibMax", detName),
-                                                   Form("%sHit ToTMax vs iFIbMax", detName),
+            fh_ToTmax_Fibmax[ifibcount] = new TH2F(Form("%sHit_ToTdown_iFib", detName),
+                                                   Form("%sHit ToTdown vs iFib", detName),
                                                    N_FIBER_PLOT,
                                                    0.,
                                                    N_FIBER_PLOT,
@@ -311,17 +393,21 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 gPad->SetLogz();
                 fh_multihit_s_Fib[ifibcount]->Draw("colz");
                 FibCanvas[ifibcount]->cd(5);
-                // gPad->SetLogz();
-                // fh_chan_corell[ifibcount]->Draw("colz");
+                gPad->SetLogz();
+                fh_chan_corell[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(6);
+                gPad->SetLogz();
+                fh_chan_dt_cal[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(7);
+                gPad->SetLogz();
+                fh_raw_tot_up[ifibcount]->Draw("colz");
+                FibCanvas[ifibcount]->cd(8);
+                gPad->SetLogz();
+                fh_raw_tot_down[ifibcount]->Draw("colz");
             }
             if (fHitItems.at(DET_FI_FIRST + ifibcount))
             {
-                FibCanvas[ifibcount]->cd(6);
-                gPad->SetLogz();
-                fh_raw_tot_up[ifibcount]->Draw("colz");
-                FibCanvas[ifibcount]->cd(7);
-                gPad->SetLogz();
-                fh_raw_tot_down[ifibcount]->Draw("colz");
+
                 FibCanvas[ifibcount]->cd(9);
                 fh_fibers_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(10);
@@ -354,7 +440,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
 
     return kSUCCESS;
 }
-void R3BOnlineSpectraFiber_s494::Reset_Fiber()
+void R3BOnlineSpectraFiber_s494::Reset_Fiber_Histo()
 {
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
@@ -364,7 +450,11 @@ void R3BOnlineSpectraFiber_s494::Reset_Fiber()
             fh_mult_Fib[ifibcount]->Reset();
             fh_multihit_m_Fib[ifibcount]->Reset();
             fh_multihit_s_Fib[ifibcount]->Reset();
+            fh_chan_corell[ifibcount]->Reset();
             fh_channels_single_Fib[ifibcount]->Reset();
+            fh_raw_tot_up[ifibcount]->Reset();
+            fh_raw_tot_down[ifibcount]->Reset();
+            fh_chan_dt_cal[ifibcount]->Reset();
         }
         if (fHitItems.at(DET_FI_FIRST + ifibcount))
         {
@@ -375,9 +465,6 @@ void R3BOnlineSpectraFiber_s494::Reset_Fiber()
             fh_Fib_pos[ifibcount]->Reset();
             fh_Fib_vs_Events[ifibcount]->Reset();
             fh_ToTmax_Fibmax[ifibcount]->Reset();
-            //  fh_chan_corell[ifibcount]->Reset();
-            fh_raw_tot_up[ifibcount]->Reset();
-            fh_raw_tot_down[ifibcount]->Reset();
         }
     }
 }
@@ -434,55 +521,255 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
         auto detCal = fCalItems.at(DET_FI_FIRST + ifibcount);
         auto detHit = fHitItems.at(DET_FI_FIRST + ifibcount);
+        auto detTrig = fCalTriggerItems.at(DET_FI_FIRST + ifibcount);
 
-        if (detCal)
+        //  cout<<"DETECTOR: "<<fDetectorNames[DET_FI_FIRST + ifibcount]<<endl;
+
+        if (detCal && detCal->GetEntriesFast() > 0)
         {
-
-            Int_t nCals = detCal->GetEntriesFast();
-
-            //if (nCals > 1000)
-                //continue;
-            std::vector<UInt_t> upmt_num(512); // up
-            std::vector<UInt_t> dpmt_num(512); // down
-            for (Int_t ical = 0; ical < nCals; ical++)
+            Int_t fc = n_fiber[ifibcount];
+            UInt_t vmultihits_top[fc], vmultihits_bot[fc];
+            for (Int_t i = 0; i < fc; i++)
             {
-                R3BFiberMAPMTCalData* hit = (R3BFiberMAPMTCalData*)detCal->At(ical);
-                if (!hit)
-                    continue;
+                vmultihits_top[i] = 0;
+                vmultihits_bot[i] = 0;
+            }
+            // Resize per-channel info arrays.
+            for (auto i = 0; i < 2; ++i)
+            {
+                fChannelArray[i].resize(fc);
+            }
 
-                // channel numbers are stored 1-based (1..n)
-                iCha = hit->GetChannel(); // 1..
-                iSide = hit->GetSide();   // 0 = down, 1=up, 2=trigegr
-                if (iSide == 1 && hit->IsLeading())
+            double trig_time[8] = { 0 };
+
+            //------ Collecting cal trigger hits --------
+            size_t cal_num = detTrig->GetEntriesFast();
+            Double_t tl, tt; // lead and trail times of the trigger
+            for (UInt_t j = 0; j < cal_num; ++j)
+            {
+                auto cur_cal = (R3BFiberMAPMTCalData const*)detTrig->At(j);
+                auto ch = cur_cal->GetChannel() - 1;
+                tl = cur_cal->GetTime_ns();
+                trig_time[ch] = tl;
+            }
+
+            Int_t nCals = detCal->GetEntries();
+
+            for (auto side_i = 0; side_i < 2; ++side_i)
+            {
+                // Clear local helper containers.
+                auto& array = fChannelArray[side_i];
+                for (auto it = array.begin(); array.end() != it; ++it)
                 {
-                    iCha_up = iCha;
-                    fh_channels_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
-                    ++upmt_num.at(iCha - 1);                // multihit of a given up killom channel
+                    it->lead_list.clear();
                 }
+            }
+            //		cout<<"1111111 "<<endl;
 
-                if (iSide == 0 && hit->IsLeading())
+            for (size_t j = 0; j < nCals; ++j)
+            {
+                auto cur_cal_lead = (R3BFiberMAPMTCalData const*)detCal->At(j);
+
+                if (cur_cal_lead->IsLeading())
                 {
-                    iCha_down = iCha;
-                    fh_channels_single_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
-                    ++dpmt_num.at(iCha - 1);                       // multihit of a given down killom channel
+                    auto side_i = cur_cal_lead->GetSide();
+                    auto ch_i = cur_cal_lead->GetChannel() - 1;
+
+                    //		cout<<"bbbbbb "<<side_i<<", "<<ch_i<<endl;
+
+                    if (side_i == 1)
+                    {
+                        fh_channels_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
+                        vmultihits_top[ch_i] += 1;              // multihit of a given up killom channel
+                    }
+
+                    //		cout<<"cccccc"<<endl;
+
+                    if (side_i == 0)
+                    {
+                        fh_channels_single_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
+                        vmultihits_bot[ch_i] += 1;                     // multihit of a given down killom channel
+                    }
+
+                    //		cout<<"ddddd "<<side_i<<", "<<ch_i<<", "<<fDetectorNames[DET_FI_FIRST + ifibcount]<<endl;
+
+                    auto& channel = fChannelArray[side_i].at(ch_i);
+
+                    //			cout<<"eeeeee"<<endl;
+
+                    channel.lead_list.push_back(cur_cal_lead); // make list with leading times
+                }
+            }
+            //	cout<<"222222"<<endl;
+
+            for (int i = 0; i < fc; ++i)
+            {
+
+                if (vmultihits_top[i] > 0)
+                    fh_multihit_m_Fib[ifibcount]->Fill(i + 1,
+                                                       vmultihits_top[i]); // multihit of a given up killom channel
+
+                if (vmultihits_bot[i] > 0)
+                    fh_multihit_s_Fib[ifibcount]->Fill(i + 1,
+                                                       vmultihits_bot[i]); // multihit of a given down killom channel
+            }
+            //     cout<<"33333"<<endl;
+
+            for (size_t j = 0; j < nCals; ++j)
+            {
+                auto cur_cal_trail = (R3BFiberMAPMTCalData const*)detCal->At(j);
+
+                if (cur_cal_trail->IsTrailing())
+                {
+                    auto side_i = cur_cal_trail->GetSide();
+                    auto ch_i = cur_cal_trail->GetChannel() - 1;
+
+                    auto& channel = fChannelArray[side_i].at(ch_i);
+                    if (channel.lead_list.empty())
+                    {
+                        continue;
+                    }
+                    auto lead = channel.lead_list.front();
+                    Double_t lead_raw = 0;
+                    Double_t trail_raw = 0;
+
+                    lead_raw = lead->GetTime_ns();
+                    trail_raw = cur_cal_trail->GetTime_ns();
+
+                    auto tot_ns = fmod(trail_raw - lead_raw + c_period + c_period / 2, c_period) - c_period / 2;
+
+                    if (tot_ns < c_tot_coincidence_ns && tot_ns > 0.)
+                    {
+                        if (cur_cal_trail->GetSide() == 1)
+                            fh_raw_tot_up[ifibcount]->Fill(cur_cal_trail->GetChannel(), tot_ns);
+                        if (cur_cal_trail->GetSide() == 0)
+                            fh_raw_tot_down[ifibcount]->Fill(cur_cal_trail->GetChannel(), tot_ns);
+                    }
+                }
+            }
+            //		cout<<"44444"<<endl;
+            auto cht_temp = -1;
+            auto chb_temp = -1;
+            for (size_t j = 0; j < nCals; ++j)
+            {
+                auto cur_cal_top = (R3BFiberMAPMTCalData const*)detCal->At(j);
+                //   auto top_trig = 0;
+                if (cur_cal_top->IsLeading() && cur_cal_top->GetSide() == 1) // choose leading top times
+                {
+                    auto cht_i = cur_cal_top->GetChannel() - 1;
+                    if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+                    {
+                        cht_temp = cht_i;
+                    }
+                    else
+                    {
+                        if (cht_i < 128)
+                            cht_temp = int(cht_i / 2.);
+                        if (cht_i > 127 && cht_i < 256)
+                            cht_temp = cht_i - 64;
+                        if (cht_i > 255)
+                            cht_temp = int(cht_i / 2.) + 64;
+                    }
+                    auto time_trig_top = trig_time[fTriggerMap[cur_cal_top->GetSide()][cht_temp]];
+                    auto time_top =
+                        fmod(cur_cal_top->GetTime_ns() - time_trig_top + c_period + c_period / 2, c_period) -
+                        c_period / 2;
+                    // auto time_top = cur_cal_top->GetTime_ns();
+                    for (size_t k = 0; k < nCals; ++k)
+                    {
+                        auto cur_cal_bot = (R3BFiberMAPMTCalData const*)detCal->At(k);
+                        if (cur_cal_bot->IsLeading() && cur_cal_bot->GetSide() == 0) // choose leading bottom times
+                        {
+                            auto chb_i = cur_cal_bot->GetChannel() - 1;
+                            if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+                            {
+                                chb_temp = chb_i;
+                            }
+                            else
+                            {
+                                if (chb_i < 128)
+                                    chb_temp = int(chb_i / 2.);
+                                if (chb_i > 127 && chb_i < 256)
+                                    chb_temp = chb_i - 64;
+                                if (chb_i > 255)
+                                    chb_temp = int(chb_i / 2.) + 64;
+                            }
+                            auto time_trig_bot = trig_time[fTriggerMap[cur_cal_bot->GetSide()][chb_temp]];
+                            auto time_bot =
+                                fmod(cur_cal_bot->GetTime_ns() - time_trig_bot + c_period + c_period / 2, c_period) -
+                                c_period / 2;
+                            // auto time_bot = cur_cal_bot->GetTime_ns();
+                            // if(cur_cal_bot->GetChannel() == cur_cal_top->GetChannel())
+                            // fh_chan_dt_cal[ifibcount]->Fill(cur_cal_top->GetChannel(), dt);
+                            auto dt = time_top - time_bot;
+                            auto dt_mod = fmod(dt + c_period, c_period);
+                            if (dt < 0)
+                            {
+                                // We're only interested in the short time-differences, so we
+                                // want to move the upper part of the coarse counter range close
+                                // to the lower range, i.e. we cut the middle of the range and
+                                // glue zero and the largest values together.
+                                dt_mod -= c_period;
+                            }
+                            fh_chan_dt_cal[ifibcount]->Fill(cur_cal_top->GetChannel(), dt_mod);
+                            if (std::abs(dt_mod) < c_fiber_coincidence_ns)
+                                fh_chan_corell[ifibcount]->Fill(cur_cal_bot->GetChannel(), cur_cal_top->GetChannel());
+                        }
+                    }
                 }
             }
 
-            //     fh_chan_corell[ifibcount]->Fill(iCha_down, iCha_up);
+            // cout<<"55555"<<endl;
 
-            for (int i = 0; i < 512; ++i)
-            {
-                auto m = upmt_num.at(i);
-                if (m > 0)
-                    fh_multihit_m_Fib[ifibcount]->Fill(i + 1, m); // multihit of a given up killom channel
+            fChannelArray[0].clear();
+            fChannelArray[1].clear();
 
-                auto s = dpmt_num.at(i);
-                if (s > 0)
-                {
-                    fh_multihit_s_Fib[ifibcount]->Fill(i + 1, s);
-                } // multihit of a given down killom channel
-            }
-        }
+            //	cout<<"66666"<<endl;
+            /*
+                        Int_t nCals = detCal->GetEntriesFast();
+                        std::vector<UInt_t> upmt_num(512); // up
+                        std::vector<UInt_t> dpmt_num(512); // down
+                        for (Int_t ical = 0; ical < nCals; ical++)
+                        {
+                            R3BFiberMAPMTCalData* hit = (R3BFiberMAPMTCalData*)detCal->At(ical);
+                            if (!hit)
+                                continue;
+
+                            // channel numbers are stored 1-based (1..n)
+                            iCha = hit->GetChannel(); // 1..
+                            iSide = hit->GetSide();   // 0 = down, 1=up, 2=trigegr
+                            if (iSide == 1 && hit->IsLeading())
+                            {
+                                iCha_up = iCha;
+                                fh_channels_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
+                                ++upmt_num.at(iCha - 1);                // multihit of a given up killom channel
+                            }
+
+                            if (iSide == 0 && hit->IsLeading())
+                            {
+                                iCha_down = iCha;
+                                fh_channels_single_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
+                                ++dpmt_num.at(iCha - 1);                       // multihit of a given down killom
+               channel
+                            }
+                        }
+
+                        //     fh_chan_corell[ifibcount]->Fill(iCha_down, iCha_up);
+
+                        for (int i = 0; i < 512; ++i)
+                        {
+                            auto m = upmt_num.at(i);
+                            if (m > 0)
+                                fh_multihit_m_Fib[ifibcount]->Fill(i + 1, m); // multihit of a given up killom channel
+
+                            auto s = dpmt_num.at(i);
+                            if (s > 0)
+                            {
+                                fh_multihit_s_Fib[ifibcount]->Fill(i + 1, s);
+                            } // multihit of a given down killom channel
+                        }
+             */
+        } // if Cal
 
         if (detHit)
         {
@@ -520,11 +807,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                 // if not resonable y-position, go to next
                 //  if (ypos < 70. || ypos > 100.)  continue;
 
-                // non-calibrated ToT from up and down MAPMT:
+                // ToT from up and down MAPMT:
                 Double_t ToT_up = hit->GetTopToT_ns();
                 Double_t ToT_down = hit->GetBottomToT_ns();
-                fh_raw_tot_up[ifibcount]->Fill(iFib, ToT_up);
-                fh_raw_tot_down[ifibcount]->Fill(iFib, ToT_down);
 
                 Double_t ToT = hit->GetEloss();
                 Double_t xpos = hit->GetX();
@@ -543,7 +828,8 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
                 //    if(hit->GetSPMTToT_ns() > 0){
                 fh_fibers_Fib[ifibcount]->Fill(iFib);
-                fh_ToT_Fib[ifibcount]->Fill(iFib, ToT);
+                fh_ToT_Fib[ifibcount]->Fill(iFib, ToT_up);
+                fh_ToTmax_Fibmax[ifibcount]->Fill(iFib, ToT_down);
                 fh_time_Fib[ifibcount]->Fill(iFib, tfib);
                 fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
 
@@ -553,7 +839,6 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                 //    if (!(tMAPMT > 0.) || !(tSPMT > 0.))  continue;
             } // end for(ihit)
 
-            fh_ToTmax_Fibmax[ifibcount]->Fill(iFibMax, totMax);
             fh_Fib_pos[ifibcount]->Fill(xposMax, yposMax);
 
             if (nHits > 0)

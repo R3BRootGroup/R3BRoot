@@ -119,7 +119,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
 
     if (fMappedItems.at(DET_TOFD))
     {
-        TCanvas* cTofd_planes = new TCanvas("TOFD_planes", "TOFD planes", 10, 10, 1100, 1000);
+        TCanvas* cTofd_planes = new TCanvas("TOFD_planes_CalLevel", "TOFD planes CAL Level", 10, 10, 1100, 1000);
         cTofd_planes->Divide(5, 4);
 
         for (Int_t j = 0; j < 4; j++)
@@ -365,14 +365,16 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         };
 
         std::map<size_t, Entry> bar_map;
-        // puts("Event");
+        //   puts("Event");
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto* hit = (R3BTofdCalData*)det->At(ihit);
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+
+            // hit->GetSideId() gives 1 for bottom and 2 for top
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
             vec.push_back(hit);
         }
 
@@ -390,6 +392,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 auto bot = bot_vec.at(bot_i);
                 auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
                 auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+
                 Double_t top_trig_ns = 0, bot_trig_ns = 0;
                 if (top_trig_i < trig_num && bot_trig_i < trig_num)
                 {
@@ -462,8 +465,8 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
 
                     // register multi hits
-                    vmultihits[iPlane][iBar] += 1;
-                    time_bar[iPlane][iBar] = (top_ns + bot_ns) / 2.;
+                    vmultihits[iPlane - 1][iBar - 1] += 1;
+                    time_bar[iPlane - 1][iBar - 1] = (top_ns + bot_ns) / 2.;
 
                     ++top_i;
                     ++bot_i;

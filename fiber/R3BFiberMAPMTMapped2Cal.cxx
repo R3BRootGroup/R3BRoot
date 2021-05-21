@@ -25,8 +25,7 @@
 #include "TClonesArray.h"
 #include <cassert>
 
-R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name,
-                                                     Int_t a_verbose)
+R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_verbose)
     : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
     , fName(a_name)
     , fMAPMTTCalPar(nullptr)
@@ -108,8 +107,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec:Channel=" << channel
-                   << ":Side=" << mapped->GetSide()
+        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec:Channel=" << channel << ":Side=" << mapped->GetSide()
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -121,7 +119,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         else
         {
             auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
-            par = fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, mapped->GetSide()+1);
+            par = fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, mapped->GetSide() + 1);
         }
         if (!par)
         {
@@ -138,44 +136,114 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-				LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
-				// we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
-				Double_t time_ns = -1;
-				if (fine_ns < 0. || fine_ns >= fClockFreq)
-				{
-					LOG(ERROR) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
-						<< ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
-					continue;
-				}
+        // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
+        Double_t time_ns = -1;
+        if (fine_ns < 0. || fine_ns >= fClockFreq)
+        {
+            LOG(ERROR) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
+                       << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
+            continue;
+        }
 
-				// Calculate final time with clock cycles.
-				//		time_ns = mapped->GetCoarse() * fClockFreq +
-				//		(mapped->IsLeading() ? -fine_ns : fine_ns);
-				// new clock TDC firmware need here a minus
-				time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
+        // Calculate final time with clock cycles.
+        //		time_ns = mapped->GetCoarse() * fClockFreq +
+        //		(mapped->IsLeading() ? -fine_ns : fine_ns);
+        // new clock TDC firmware need here a minus
+        time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-				LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
-					<< ": Time=" << time_ns << "ns.";
-
-				if (mapped->IsTrigger())
-				{
-					new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-						R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
-				}
-				else
-				{
-					new ((*fCalItems)[fCalItems->GetEntriesFast()])
-						R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
-				}
-		}
-		fnEvents++;
+        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" << time_ns
+                   << "ns.";
+        if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+        {
+            if (2 == mapped->GetSide())
+            {
+                new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                    R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            }
+            else
+            {
+                new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                    R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            }
+        }
+        else
+        {
+            Int_t iFib = 0;
+            if (channel < 65)
+            {
+                iFib = channel * 2;
+                if (2 == mapped->GetSide())
+                {
+                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+                else
+                {
+                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+            }
+            else if (channel > 64 && channel < 193)
+            {
+                iFib = 64 + channel;
+                if (2 == mapped->GetSide())
+                {
+                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+                else
+                {
+                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+            }
+            else if (channel > 192 && channel < 257)
+            {
+                iFib = 258 + (channel - 193) * 2;
+                if (2 == mapped->GetSide())
+                {
+                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+                else
+                {
+                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                }
+            }
+            //	cout<<"CAL "<<fName<<"; "<<channel<<", "<<iFib<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<",
+            //"<<time_ns<<endl;
+        } // end fibdet selection
+          /*
+                          if (mapped->IsTrigger())
+                          {
+                              new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                                  R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+                          }
+                          else
+                          {
+                              new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                                  R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+                          }
+          */
+    }
+    fnEvents++;
 }
 
 void R3BFiberMAPMTMapped2Cal::FinishEvent()
 {
-	fCalItems->Clear();
-	fCalTriggerItems->Clear();
+    fCalItems->Clear();
+    fCalTriggerItems->Clear();
 }
 
 void R3BFiberMAPMTMapped2Cal::FinishTask() {}

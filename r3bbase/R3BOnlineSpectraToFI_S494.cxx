@@ -30,6 +30,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <algorithm>
@@ -40,7 +41,9 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+
 #include "mapping_tofi_trig.hh"
+
 extern unsigned g_tofi_trig_map[2][24];
 void tofi_trig_map_setup();
 
@@ -90,11 +93,11 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
-  
+
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofiTriggerCal");
     if (NULL == fCalTriggerItems)
         printf("Branch TofiTriggerCal not found.\n");
-        
+
     // Get objects for detectors on all levels
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     for (int det = 0; det < DET_MAX; det++)
@@ -105,11 +108,10 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        
     }
-    
+
     tofi_trig_map_setup();
-    
+
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
@@ -118,7 +120,8 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
     if (fMappedItems.at(DET_TOFI))
     {
         TCanvas* ctofi_planes = new TCanvas("TOFI_planes", "TOFI planes", 10, 10, 1100, 1000);
-        ctofi_planes->Divide(2,2);
+
+        ctofi_planes->Divide(2, 2);
 
         for (Int_t j = 0; j < N_PLANE_MAX_TOFI; j++)
         {
@@ -146,11 +149,11 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             fh_tofi_multihit[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofi_multihit[j]->GetYaxis()->SetTitle("Multihit");
         }
- 
+
         fh_tofi_dt = new TH2F("tofi_dt", "Tofi dt", 25, 0, 25, 2000, -100., 100);
         fh_tofi_dt->GetXaxis()->SetTitle("Bar number");
         fh_tofi_dt->GetYaxis()->SetTitle("dt / ns");
-           
+
         ctofi_planes->cd(1);
         fh_tofi_channels[0]->Draw();
         ctofi_planes->cd(2);
@@ -162,8 +165,6 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
         ctofi_planes->cd(4);
         gPad->SetLogz();
         fh_tofi_dt->Draw("colz");
-
-
 
         ctofi_planes->cd(0);
         run->AddObject(ctofi_planes);
@@ -185,7 +186,6 @@ void R3BOnlineSpectraToFI_S494::Reset_TOFI_Histo()
         fh_tofi_TotPm[i]->Reset();
     }
     fh_tofi_dt->Reset();
-    
 }
 
 namespace
@@ -248,12 +248,12 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
             return;
     }
 
-
     //----------------------------------------------------------------------
     // TOFI
     //----------------------------------------------------------------------
 
-    Int_t NumPaddles =  0;
+    Int_t NumPaddles = 0;
+
     if (fMappedItems.at(DET_TOFI))
     {
         auto det = fMappedItems.at(DET_TOFI);
@@ -274,7 +274,6 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 iBarMem = 0;
             if (iPlane == 1 && iBarMem != iBar && iSide == 1 && iEdge == 1)
                 NumPaddles += 1;
- 
             //  cout<<imapped<<", "<<iPlane<<"; "<<iPlaneMem<<"; "<<iBar<<"; "<<iBarMem<<",
             //  "<<NumPaddles[iPlane-1]<<endl;
 
@@ -294,158 +293,157 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
     if (fCalItems.at(DET_TOFI))
     {
 
-    UInt_t vmultihits[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
-    Double_t time_bar[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
-    for (Int_t i = 0; i <= fNofPlanes; i++)
-    {
-        for (Int_t j = 0; j <= N_PADDLE_MAX_TOFI; j++)
+        UInt_t vmultihits[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
+        Double_t time_bar[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
+        for (Int_t i = 0; i <= fNofPlanes; i++)
         {
-            vmultihits[i][j] = 0;
-            time_bar[i][j] = 0;
-        }
-    }
-
-    //    std::cout<<"new event!*************************************\n";
-    auto det = fCalItems.at(DET_TOFI);
-    Int_t nHits = det->GetEntries();
-   
-
-    Int_t nHitsEvent = 0;
-    // Organize cals into bars.
-    struct Entry
-    {
-        std::vector<R3BTofiCalData*> top;
-        std::vector<R3BTofiCalData*> bot;
-    };
-    std::map<size_t, Entry> bar_map;
-    // puts("Event");
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
-    {
-        auto* hit = (R3BTofiCalData*)det->At(ihit);
-        size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
-
-        auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;  // if side=1 -> top, if side=2 -> bottom
-        vec.push_back(hit);
-    }
-
-    static bool s_was_trig_missing = false;
-    auto trig_num = fCalTriggerItems->GetEntries();
-    for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
-    {
-        auto const& top_vec = it->second.top;
-        auto const& bot_vec = it->second.bot;
-        size_t top_i = 0;
-        size_t bot_i = 0;
-        for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
-        {
-            auto top = top_vec.at(top_i);
-            auto bot = bot_vec.at(bot_i);
-            auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
-            auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
-            Double_t top_trig_ns = 0, bot_trig_ns = 0;
-            if (top_trig_i < trig_num && bot_trig_i < trig_num)
+            for (Int_t j = 0; j <= N_PADDLE_MAX_TOFI; j++)
             {
-                auto top_trig = (R3BTofiCalData const*)fCalTriggerItems->At(top_trig_i);
-                auto bot_trig = (R3BTofiCalData const*)fCalTriggerItems->At(bot_trig_i);
-                top_trig_ns = top_trig->GetTimeLeading_ns();
-                bot_trig_ns = bot_trig->GetTimeLeading_ns();
-                ++n1;
-            }
-            else
-            {
-                if (!s_was_trig_missing)
-                {
-                    LOG(ERROR) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
-                    s_was_trig_missing = true;
-                }
-                ++n2;
-            }
-
-            // Shift the cyclic difference window by half a window-length and move it back,
-            // this way the trigger time will be at 0.
-            auto top_ns =
-                fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
-            auto bot_ns =
-                fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
-            /*
-                        if(top_ns>2000 || bot_ns>2000){
-                            std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
-                            std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
-                        }
-            */
-            auto dt = top_ns - bot_ns;
-            // Handle wrap-around.
-            auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
-                
-            if (dt < 0)
-            {
-                // We're only interested in the short time-differences, so we
-                // want to move the upper part of the coarse counter range close
-                // to the lower range, i.e. we cut the middle of the range and
-                // glue zero and the largest values together.
-                dt_mod -= c_range_ns;
-            }
-            fh_tofi_dt->Fill(top->GetBarId(),dt_mod);
-            
-            // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
-            // std::abs(dt_mod) << '\n';
-            if (std::abs(dt_mod) < c_bar_coincidence_ns)
-            {
-                // Hit!
-                // std::cout << "Hit!\n";
-                Int_t iPlane = top->GetDetectorId(); // 1..n
-                Int_t iBar = top->GetBarId();        // 1..n
-                if (iPlane > fNofPlanes)             // this also errors for iDetector==0
-                {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more detectors than expected! Det: " << iPlane
-                               << " allowed are 1.." << fNofPlanes;
-                    continue;
-                }
-                if (iBar > fPaddlesPerPlane) // same here
-                {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more bars then expected! Det: " << iBar
-                               << " allowed are 1.." << fPaddlesPerPlane;
-                    continue;
-                }
-
-                auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-                auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-                
-                fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
-                fh_tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
-                
-                 
-                // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
-
-                // register multi hits
-                vmultihits[iPlane][iBar] += 1;
-                time_bar[iPlane][iBar]  = (top_ns + bot_ns)/2.;
-                                
-                ++top_i;
-                ++bot_i;
-               
-            }
-            else if (dt < 0 && dt > -c_range_ns / 2)
-            {
-                ++top_i;
-            }
-            else
-            {
-                ++bot_i;
+                vmultihits[i][j] = 0;
+                time_bar[i][j] = 0;
             }
         }
-    }
-		for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFI; ipl++)
-        {    
+
+        //    std::cout<<"new event!*************************************\n";
+        auto det = fCalItems.at(DET_TOFI);
+        Int_t nHits = det->GetEntries();
+
+        Int_t nHitsEvent = 0;
+        // Organize cals into bars.
+        struct Entry
+        {
+            std::vector<R3BTofiCalData*> top;
+            std::vector<R3BTofiCalData*> bot;
+        };
+        std::map<size_t, Entry> bar_map;
+        // puts("Event");
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            auto* hit = (R3BTofiCalData*)det->At(ihit);
+            size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
+
+            auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top
+                                              : ret.first->second.bot; // if side=1 -> top, if side=2 -> bottom
+            vec.push_back(hit);
+        }
+
+        static bool s_was_trig_missing = false;
+        auto trig_num = fCalTriggerItems->GetEntries();
+        for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
+        {
+            auto const& top_vec = it->second.top;
+            auto const& bot_vec = it->second.bot;
+            size_t top_i = 0;
+            size_t bot_i = 0;
+            for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
+            {
+                auto top = top_vec.at(top_i);
+                auto bot = bot_vec.at(bot_i);
+                auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
+                auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
+                Double_t top_trig_ns = 0, bot_trig_ns = 0;
+                if (top_trig_i < trig_num && bot_trig_i < trig_num)
+                {
+                    auto top_trig = (R3BTofiCalData const*)fCalTriggerItems->At(top_trig_i);
+                    auto bot_trig = (R3BTofiCalData const*)fCalTriggerItems->At(bot_trig_i);
+                    top_trig_ns = top_trig->GetTimeLeading_ns();
+                    bot_trig_ns = bot_trig->GetTimeLeading_ns();
+                    ++n1;
+                }
+                else
+                {
+                    if (!s_was_trig_missing)
+                    {
+                        LOG(ERROR) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
+                        s_was_trig_missing = true;
+                    }
+                    ++n2;
+                }
+
+                // Shift the cyclic difference window by half a window-length and move it back,
+                // this way the trigger time will be at 0.
+                auto top_ns = fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
+                              c_range_ns / 2;
+                auto bot_ns = fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
+                              c_range_ns / 2;
+                /*
+                            if(top_ns>2000 || bot_ns>2000){
+                                std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns <<
+                   std::endl; std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
+                            }
+                */
+                auto dt = top_ns - bot_ns;
+                // Handle wrap-around.
+                auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
+
+                if (dt < 0)
+                {
+                    // We're only interested in the short time-differences, so we
+                    // want to move the upper part of the coarse counter range close
+                    // to the lower range, i.e. we cut the middle of the range and
+                    // glue zero and the largest values together.
+                    dt_mod -= c_range_ns;
+                }
+                fh_tofi_dt->Fill(top->GetBarId(), dt_mod);
+
+                // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
+                // std::abs(dt_mod) << '\n';
+                if (std::abs(dt_mod) < c_bar_coincidence_ns)
+                {
+                    // Hit!
+                    // std::cout << "Hit!\n";
+                    Int_t iPlane = top->GetDetectorId(); // 1..n
+                    Int_t iBar = top->GetBarId();        // 1..n
+                    if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+                    {
+                        LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more detectors than expected! Det: " << iPlane
+                                   << " allowed are 1.." << fNofPlanes;
+                        continue;
+                    }
+                    if (iBar > fPaddlesPerPlane) // same here
+                    {
+                        LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more bars then expected! Det: " << iBar
+                                   << " allowed are 1.." << fPaddlesPerPlane;
+                        continue;
+                    }
+
+                    auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                    auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+
+                    fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
+                    fh_tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
+
+                    // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
+
+                    // register multi hits
+                    vmultihits[iPlane][iBar] += 1;
+                    time_bar[iPlane][iBar] = (top_ns + bot_ns) / 2.;
+
+                    ++top_i;
+                    ++bot_i;
+                }
+                else if (dt < 0 && dt > -c_range_ns / 2)
+                {
+                    ++top_i;
+                }
+                else
+                {
+                    ++bot_i;
+                }
+            }
+        }
+        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFI; ipl++)
+        {
             for (Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFI; ibr++)
             {
-				if (vmultihits[ipl+1][ibr+1] > 0) fh_tofi_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
-			
-			}
-		} 		   
-	
-   }// endi if fCalItems 
+
+                if (vmultihits[ipl + 1][ibr + 1] > 0)
+                    fh_tofi_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
+            }
+        }
+
+    } // endi if fCalItems
 
     fNEvents += 1;
 }
@@ -473,10 +471,10 @@ void R3BOnlineSpectraToFI_S494::FinishTask()
         for (Int_t i = 0; i < N_PLANE_MAX_TOFI; i++)
         {
             fh_tofi_TotPm[i]->Write();
-            fh_tofi_channels[i]->Write();       
-            fh_tofi_multihit[i]->Write();       
-            }
-            fh_tofi_dt->Write();
+            fh_tofi_channels[i]->Write();
+            fh_tofi_multihit[i]->Write();
+        }
+        fh_tofi_dt->Write();
     }
 }
 

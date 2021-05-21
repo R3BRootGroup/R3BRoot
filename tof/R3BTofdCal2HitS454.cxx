@@ -525,28 +525,33 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 para[3] = par->GetPar1d();
 
                 Double_t qb = 0.;
-                if (fTofdTotPos)
+                if (fTofdQ > 0)
                 {
-                    // via pol3
-                    qb = TMath::Sqrt(top_tot * bot_tot) /
-                         (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
-                    qb = qb * fTofdQ;
+                    if (fTofdTotPos)
+                    {
+                        // via pol3
+                        qb = TMath::Sqrt(top_tot * bot_tot) /
+                             (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                        qb = qb * fTofdQ;
+                    }
+                    else
+                    {
+                        // via double exponential:
+                        auto q1 = bot_tot /
+                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                        para[0] = par->GetPar2a();
+                        para[1] = par->GetPar2b();
+                        para[2] = par->GetPar2c();
+                        para[3] = par->GetPar2d();
+                        auto q2 = top_tot /
+                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                        q1 = q1 * fTofdQ;
+                        q2 = q2 * fTofdQ;
+                        qb = (q1 + q2) / 2.;
+                    }
                 }
                 else
-                {
-                    // via double exponential:
-                    auto q1 =
-                        bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                    para[0] = par->GetPar2a();
-                    para[1] = par->GetPar2b();
-                    para[2] = par->GetPar2c();
-                    para[3] = par->GetPar2d();
-                    auto q2 =
-                        top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                    q1 = q1 * fTofdQ;
-                    q2 = q2 * fTofdQ;
-                    qb = (q1 + q2) / 2.;
-                }
+                    qb = TMath::Sqrt(top_tot * bot_tot);
 
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();

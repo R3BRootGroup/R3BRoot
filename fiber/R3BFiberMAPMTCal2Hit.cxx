@@ -259,7 +259,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
         }
     }
 
-    //cout << "NOW I WILL START" << endl;
+    // cout << "NOW I WILL START" << endl;
     //  R3BFiberMAPMTCalData* cur_cal;
     double trig_time[8];
     //------ Collecting cal trigger hits --------
@@ -279,6 +279,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal_lead = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+
         if (cur_cal_lead->IsLeading())
         {
             auto side_i = cur_cal_lead->GetSide();
@@ -313,9 +314,33 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             Double_t lead_raw = 0;
             Double_t trail_raw = 0;
             Double_t trail_trig_ns = 0;
+            auto ch_temp = -1;
+            auto chlead_temp = -1;
+            auto chlead_i = lead->GetChannel() - 1;
+            if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+            {
+                ch_temp = ch_i;
+                chlead_temp = ch_i;
+            }
+            else
+            {
+                if (ch_i < 128)
+                    ch_temp = int(ch_i / 2.);
+                if (ch_i > 127 && ch_i < 256)
+                    ch_temp = ch_i - 64;
+                if (ch_i > 255)
+                    ch_temp = int(ch_i / 2.) + 64;
 
-            cur_cal_trig_ns = trig_time[fTriggerMap[side_i][ch_i]];
-            lead_trig_ns = trig_time[fTriggerMap[side_i][lead->GetChannel() - 1]];
+                if (chlead_i < 128)
+                    chlead_temp = int(chlead_i / 2.);
+                if (chlead_i > 127 && chlead_i < 256)
+                    chlead_temp = chlead_i - 64;
+                if (chlead_i > 255)
+                    chlead_temp = int(chlead_i / 2.) + 64;
+            }
+
+            cur_cal_trig_ns = trig_time[fTriggerMap[side_i][ch_temp]];
+            lead_trig_ns = trig_time[fTriggerMap[side_i][chlead_temp]];
 
             auto cur_cal_ns =
                 fmod(cur_cal_trail->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
@@ -490,7 +515,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         new ((*fHitItems)[fNofHitItems++])
                             //  R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down_raw,
                             //  tot_up_raw);
-                            R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down_raw, tot_up_raw);
+                            R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
 
                         // cout << fName << " x: " << x << " y: " << y << endl;
                     }

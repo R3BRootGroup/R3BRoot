@@ -30,6 +30,8 @@ class R3BFiberMAPMTCalData : public TObject
 		Int_t GetChannel() const;
 		Double_t GetTime_ns() const;
 		Int_t  GetSide() const;
+		Double_t GetTimeLeading_ns() const;
+		Double_t GetTimeTrailing_ns() const;
 		Bool_t IsBottom() const;
 		Bool_t IsTop() const;
 		Bool_t IsTrigger() const;

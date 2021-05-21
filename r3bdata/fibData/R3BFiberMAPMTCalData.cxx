@@ -37,6 +37,10 @@ Double_t R3BFiberMAPMTCalData::GetTime_ns() const { return fTime_ns; }
 
 Int_t R3BFiberMAPMTCalData::GetSide() const { return fSide; }
 
+Double_t R3BFiberMAPMTCalData::GetTimeLeading_ns() const { return fIsLeading ? fTime_ns : 0; }
+
+Double_t R3BFiberMAPMTCalData::GetTimeTrailing_ns() const { return fIsLeading ? 0 : fTime_ns; }
+
 Bool_t R3BFiberMAPMTCalData::IsBottom() const { return 0 == fSide; }
 
 Bool_t R3BFiberMAPMTCalData::IsTop() const { return 1 == fSide; }
@@ -48,7 +52,5 @@ Bool_t R3BFiberMAPMTCalData::IsLeading() const { return fIsLeading; }
 Bool_t R3BFiberMAPMTCalData::IsTrailing() const { return !fIsLeading; }
 
 Bool_t R3BFiberMAPMTCalData::IsSortable() const { return kTRUE; }
-
-
 
 ClassImp(R3BFiberMAPMTCalData)

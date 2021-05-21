@@ -70,7 +70,7 @@ R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BOnlineSpectraPdc.cxx
 R3BOnlineSpectraSfib.cxx
-#R3BOnlineSpectraLosEngRun2019.cxx
+R3BOnlineSpectraLosEngRun2019.cxx
 R3BOnlineSpectraLosStandalone.cxx
 R3BOnlineSpectraPID.cxx
 R3BGlobalAnalysis.cxx
@@ -91,6 +91,7 @@ R3BOnlineSpectraFibvsToFDS494.cxx
 R3BOnlineSpectraFiber_s494.cxx
 R3BOnlineSpectraToFD_S494.cxx
 R3BOnlineSpectraToFI_S494.cxx
+R3BOnlineSpectraBMON_S494.cxx
 )
 
 # fill list of header files from list of source files

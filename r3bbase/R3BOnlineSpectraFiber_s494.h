@@ -25,8 +25,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
-class R3BBunchedFiberCalData;
-
+class R3BFiberMAPMTCalData;
 /**
  * This taks reads all detector data items and plots histograms
  * for online checks.
@@ -35,7 +34,12 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
 {
 
   public:    
-    /**
+ 
+     struct Channel
+    {
+        std::list<R3BFiberMAPMTCalData const*> lead_list;
+    };
+       /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
@@ -91,8 +95,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
-    void Reset_Fiber();
- 
+    void Reset_Fiber_Histo();
   private:
     std::vector<TClonesArray *> fMappedItems;
     std::vector<TClonesArray *> fCalItems;
@@ -122,14 +125,14 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     Int_t  ifibdet;           
     // Number of fibers per detector
     Double_t n_fiber[NOF_FIB_DET] = {  512., 512., 512., 512., 384., 384.};
-     
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
     Int_t fTpat;
     Int_t fSamp;
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    
+    std::vector<Channel> fChannelArray[2];
+    unsigned const *fTriggerMap[2];
     unsigned long fNEvents = 0, fNEvents_start = 0;         /**< Event counter. */
     
     TH1F *fh_channels_Fib[NOF_FIB_DET];
@@ -146,6 +149,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     TH2F *fh_chan_corell[NOF_FIB_DET];
     TH2F *fh_raw_tot_up[NOF_FIB_DET];
     TH2F *fh_raw_tot_down[NOF_FIB_DET];
+    TH2F *fh_chan_dt_cal[NOF_FIB_DET];
   public:
     ClassDef(R3BOnlineSpectraFiber_s494, 2)
 };

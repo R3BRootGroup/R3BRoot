@@ -87,40 +87,40 @@ Bool_t R3BTofiReader::Read()
     // puts("NEW Event");
     // Leading.
     for (uint32_t t = 0; t < 2; t++)
-    { 
-		auto const& side = data->TOFI_T[t];
-		
-		uint32_t j = 0;
-		for (uint32_t i = 0; i < side.TCLM; i++)
-		{
-			uint32_t ch_i = side.TCLMI[i];
-			uint32_t end = side.TCLME[i];
-			for (; j < end; j++)
-			{
-				new ((*fArray)[fArray->GetEntriesFast()])
-					R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCLv[j], side.TFLv[j]);
-			}
-		}
+    {
+        auto const& side = data->TOFI_T[t];
+
+        uint32_t j = 0;
+        for (uint32_t i = 0; i < side.TCLM; i++)
+        {
+            uint32_t ch_i = side.TCLMI[i];
+            uint32_t end = side.TCLME[i];
+            for (; j < end; j++)
+            {
+                new ((*fArray)[fArray->GetEntriesFast()])
+                    R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCLv[j], side.TFLv[j]);
+            }
+        }
     }
 
     // Trailing.
     for (uint32_t t = 0; t < 2; t++)
-    { 
-		auto const& side = data->TOFI_T[t];
-		
-		uint32_t j = 0;
-		for (uint32_t i = 0; i < side.TCLM; i++)
-		{
-			uint32_t ch_i = side.TCLMI[i];
-			uint32_t end = side.TCLME[i];
-			for (; j < end; j++)
-			{
-				new ((*fArray)[fArray->GetEntriesFast()])
-					R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCTv[j], side.TFTv[j]);
-			}
-		}
+    {
+        auto const& side = data->TOFI_T[t];
+
+        uint32_t j = 0;
+        for (uint32_t i = 0; i < side.TCLM; i++)
+        {
+            uint32_t ch_i = side.TCLMI[i];
+            uint32_t end = side.TCLME[i];
+            for (; j < end; j++)
+            {
+                new ((*fArray)[fArray->GetEntriesFast()])
+                    R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCTv[j], side.TFTv[j]);
+            }
+        }
     }
-    
+
     // Triggers.
     {
         for (uint32_t i = 0; i < data->TOFI_TRIGFL; i++)
