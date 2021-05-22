@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+// ---- Standard Constructor ---------------------------------------------------
 R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
     , fNumCrystals(4864)
@@ -42,6 +43,7 @@ R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, co
     fIn_use = new TArrayI(fNumCrystals);
 }
 
+// ----  Destructor ------------------------------------------------------------
 R3BCalifaMappingPar::~R3BCalifaMappingPar()
 {
     clear();
@@ -77,12 +79,14 @@ R3BCalifaMappingPar::~R3BCalifaMappingPar()
         delete fIn_use;
 }
 
+// ----  Method clear ----------------------------------------------------------
 void R3BCalifaMappingPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
 
+// ----  Method putParams ------------------------------------------------------
 void R3BCalifaMappingPar::putParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaMappingPar::putParams() called";
@@ -123,6 +127,7 @@ void R3BCalifaMappingPar::putParams(FairParamList* list)
     list->add("califaCrystalNumberPar", fNumCrystals);
 }
 
+// ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaMappingPar::getParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaMappingPar::getParams() called";
@@ -228,9 +233,13 @@ Bool_t R3BCalifaMappingPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BCalifaMappingPar::print() { printParams(); }
+
+// ----  Method printParams ----------------------------------------------------
 void R3BCalifaMappingPar::printParams()
 {
-    LOG(INFO) << "R3BCalifaMappingPar: Califa Mapping Parameters: ";
+    LOG(INFO) << "R3BCalifaMappingPar: Califa Mapping Parameters:";
 
     LOG(INFO) << "crystal_id"
               << " "

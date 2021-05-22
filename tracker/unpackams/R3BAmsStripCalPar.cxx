@@ -27,9 +27,6 @@
 
 #include <iostream>
 
-using std::cout;
-using std::endl;
-
 // ---- Standard Constructor ---------------------------------------------------
 R3BAmsStripCalPar::R3BAmsStripCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
@@ -125,6 +122,9 @@ Bool_t R3BAmsStripCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BAmsStripCalPar::print() { printParams(); }
+
 // ----  Method printParams ----------------------------------------------------
 void R3BAmsStripCalPar::printParams()
 {
@@ -133,16 +133,17 @@ void R3BAmsStripCalPar::printParams()
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
-        cout << "AMS detector number: " << d << endl;
+        LOG(INFO) << "AMS detector number: " << d;
         for (Int_t i = 0; i < fNumStrips; i++)
         {
-            cout << "AMS Strip number: " << i << endl;
+            LOG(INFO) << "AMS Strip number: " << i;
             for (Int_t j = 0; j < fNumParamsFit; j++)
             {
-                cout << "FitParam(" << j
-                     << ") = " << fStripCalParams->GetAt(d * fNumParamsFit * fNumStrips + i * fNumParamsFit + j)
-                     << endl;
+                LOG(INFO) << "FitParam(" << j
+                          << ") = " << fStripCalParams->GetAt(d * fNumParamsFit * fNumStrips + i * fNumParamsFit + j);
             }
         }
     }
 }
+
+ClassImp(R3BAmsStripCalPar)

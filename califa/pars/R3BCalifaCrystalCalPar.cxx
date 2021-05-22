@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+// ---- Standard Constructor ---------------------------------------------------
 R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
     , fNumCrystals(4864)
@@ -29,6 +30,7 @@ R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* tit
     fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
 }
 
+// ----  Destructor ------------------------------------------------------------
 R3BCalifaCrystalCalPar::~R3BCalifaCrystalCalPar()
 {
     clear();
@@ -36,12 +38,14 @@ R3BCalifaCrystalCalPar::~R3BCalifaCrystalCalPar()
         delete fCryCalParams;
 }
 
+// ----  Method clear ----------------------------------------------------------
 void R3BCalifaCrystalCalPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
 
+// ----  Method putParams ------------------------------------------------------
 void R3BCalifaCrystalCalPar::putParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaCrystalCalPar::putParams() called";
@@ -60,6 +64,7 @@ void R3BCalifaCrystalCalPar::putParams(FairParamList* list)
     list->add("califaCrystalParamsFitPar", fNumParamsFit);
 }
 
+// ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaCrystalCalPar::getParams() called";
@@ -79,7 +84,7 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumCrystals * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(INFO) << "Nb_crystals * Nb_pars: " << array_size;
     fCryCalParams->Set(array_size);
 
     if (!(list->fill("califaCrystalCalPar", fCryCalParams)))
@@ -91,9 +96,13 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BCalifaCrystalCalPar::print() { printParams(); }
+
+// ----  Method printParams ----------------------------------------------------
 void R3BCalifaCrystalCalPar::printParams()
 {
-    LOG(INFO) << "R3BCalifaCrystalCalPar: Califa Crystal Calibration Parameters: ";
+    LOG(INFO) << "R3BCalifaCrystalCalPar::Califa Crystal Calibration Parameters: ";
     Int_t array_size = fNumCrystals * fNumParamsFit;
 
     for (Int_t i = 0; i < fNumCrystals; i++)
@@ -105,3 +114,5 @@ void R3BCalifaCrystalCalPar::printParams()
         }
     }
 }
+
+ClassImp(R3BCalifaCrystalCalPar)

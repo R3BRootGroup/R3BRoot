@@ -15,13 +15,11 @@
 #define R3BCalifaTotCalPar_H
 
 #include "FairParGenericSet.h"
+#include "TObject.h"
 
 #include "TArrayF.h"
 #include "TObjArray.h"
-#include "TObject.h"
 #include <TObjString.h>
-
-using namespace std;
 
 class FairParamList;
 
@@ -47,6 +45,7 @@ class R3BCalifaTotCalPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Method to print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -67,11 +66,10 @@ class R3BCalifaTotCalPar : public FairParGenericSet
                   pol1: A_fit & B_fit
                   pol2: A_fit, B_fit & C_fit>*/
 
-    const R3BCalifaTotCalPar& operator=(const R3BCalifaTotCalPar&); /*< an assignment operator>*/
-
-    R3BCalifaTotCalPar(const R3BCalifaTotCalPar&); /*< a copy constructor >*/
+    const R3BCalifaTotCalPar& operator=(const R3BCalifaTotCalPar&);
+    R3BCalifaTotCalPar(const R3BCalifaTotCalPar&);
 
     ClassDef(R3BCalifaTotCalPar, 1);
 };
 
-#endif
+#endif /* R3BCalifaTotCalPar_H */

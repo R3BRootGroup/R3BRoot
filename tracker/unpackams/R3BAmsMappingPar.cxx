@@ -14,7 +14,7 @@
 // ----------------------------------------------------------------
 // -----        R3BAmsMappingPar source file                  -----
 // -----    Created 20/01/20  by J.L. Rodriguez-Sanchez       -----
-// -----    for the info from the lookup table		      -----
+// -----    for the info from the lookup table	        -----
 // ----------------------------------------------------------------
 
 #include "R3BAmsMappingPar.h"
@@ -27,6 +27,7 @@
 
 #include <iostream>
 
+// ---- Standard Constructor ---------------------------------------------------
 R3BAmsMappingPar::R3BAmsMappingPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
     , fNumDet(6)
@@ -40,6 +41,7 @@ R3BAmsMappingPar::R3BAmsMappingPar(const TString& name, const TString& title, co
     fOffsetY = new TArrayF(fNumDet);
 }
 
+// ----  Destructor ------------------------------------------------------------
 R3BAmsMappingPar::~R3BAmsMappingPar()
 {
     clear();
@@ -57,12 +59,14 @@ R3BAmsMappingPar::~R3BAmsMappingPar()
         delete fOffsetY;
 }
 
+// ----  Method clear ----------------------------------------------------------
 void R3BAmsMappingPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
 
+// ----  Method putParams ------------------------------------------------------
 void R3BAmsMappingPar::putParams(FairParamList* list)
 {
     LOG(INFO) << "R3BAmsMappingPar::putParams() called";
@@ -86,6 +90,7 @@ void R3BAmsMappingPar::putParams(FairParamList* list)
     list->add("amsOffsetYPar", *fOffsetY);
 }
 
+// ----  Method getParams ------------------------------------------------------
 Bool_t R3BAmsMappingPar::getParams(FairParamList* list)
 {
     LOG(INFO) << "R3BAmsMappingPar::getParams() called";
@@ -141,6 +146,10 @@ Bool_t R3BAmsMappingPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BAmsMappingPar::print() { printParams(); }
+
+// ----  Method printParams ----------------------------------------------------
 void R3BAmsMappingPar::printParams()
 {
     LOG(INFO) << "R3BAmsMappingPar: AMS Mapping Parameters for Geometry " << fGeo << ": ";
@@ -166,4 +175,4 @@ void R3BAmsMappingPar::printParams()
     }
 }
 
-ClassImp(R3BAmsMappingPar);
+ClassImp(R3BAmsMappingPar)

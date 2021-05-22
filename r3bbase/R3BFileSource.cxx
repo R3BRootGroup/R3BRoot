@@ -41,8 +41,6 @@
 using std::map;
 using std::set;
 
-//_____________________________________________________________________________
-
 R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     : FairSource()
     , fInputTitle(Title)
@@ -87,9 +85,7 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     }
     LOG(debug) << "R3BFileSource created------------";
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UInt_t)
     : FairSource()
     , fInputTitle(Title)
@@ -135,9 +131,7 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     }
     LOG(debug) << "R3BFileSource created------------";
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt_t)
     : FairSource()
     , fInputTitle(Title)
@@ -183,11 +177,8 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     }
     LOG(debug) << "R3BFileSource created------------";
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 R3BFileSource::~R3BFileSource() {}
-//_____________________________________________________________________________
 
 Int_t R3BFileSource::ReadIntFromString(const std::string& wholestr, const std::string& pattern)
 {
@@ -197,7 +188,6 @@ Int_t R3BFileSource::ReadIntFromString(const std::string& wholestr, const std::s
     return atoi(tempstr.c_str());
 }
 
-//_____________________________________________________________________________
 Bool_t R3BFileSource::Init()
 {
     LOG(INFO) << "R3BFileSource::Init()";
@@ -369,9 +359,7 @@ Bool_t R3BFileSource::Init()
 
     return kTRUE;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetInTree(TTree* tempTree)
 {
     fInTree = NULL;
@@ -381,12 +369,16 @@ void R3BFileSource::SetInTree(TTree* tempTree)
     IsInitialized = kFALSE;
     Init();
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
+// ----  Method ReadEvent ----------------------------------------------------
 Int_t R3BFileSource::ReadEvent(UInt_t i)
 {
-    fCurrentEntryNo = i;
+    /** TODO
+     ** We should use here the timestamp from the header to look for the right runId
+     ** and set up the parameters for the analysis of the root files.
+     ** std::cout << fEvtHeader->GetTimeStamp() << std::endl;
+     ** Below an example with the event number, just for tests.
+     **/
 
     if (i > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
@@ -412,32 +404,22 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
         } while (fInputFile && buffer.compare("EVENT END"));
     }
 
-    // std::cout<<i<<std::endl;
+    fCurrentEntryNo = i;
     fEventTime = GetEventTime();
     if (fInChain->GetEntry(i))
         return 0;
 
     return 1;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::Close() { CloseInFile(); }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::Reset() {}
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::AddFriend(TString fName) { fFriendFileList.push_back(fName); }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::AddFile(TString FileName) { fInputChainList.push_back(FileName); }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::AddFriendsToChain()
 {
     // Loop over all Friend files and extract the type. The type is defined by
@@ -527,9 +509,7 @@ void R3BFileSource::AddFriendsToChain()
     // Print some output about the input structure
     PrintFriendList();
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::PrintFriendList()
 {
     // Print information about the input structure
@@ -559,9 +539,7 @@ void R3BFileSource::PrintFriendList()
         }
     }
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::CheckFriendChains()
 {
     std::multimap<TString, std::multimap<TString, TArrayI>>::iterator it1;
@@ -651,9 +629,7 @@ void R3BFileSource::CheckFriendChains()
         LOG(fatal) << "Event structure mismatch";
     }
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::CreateNewFriendChain(TString inputFile, TString inputLevel)
 {
 
@@ -708,9 +684,7 @@ void R3BFileSource::CreateNewFriendChain(TString inputFile, TString inputLevel)
     f->Close();
     gFile = temp;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 Bool_t R3BFileSource::CompareBranchList(TFile* fileHandle, TString inputLevel)
 {
     // fill a set with the original branch structure
@@ -766,9 +740,7 @@ Bool_t R3BFileSource::CompareBranchList(TFile* fileHandle, TString inputLevel)
 
     return kTRUE;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 Bool_t R3BFileSource::ActivateObject(TObject** obj, const char* BrName)
 {
     if (fInTree)
@@ -784,7 +756,6 @@ Bool_t R3BFileSource::ActivateObject(TObject** obj, const char* BrName)
 
     return kTRUE;
 }
-//_____________________________________________________________________________
 
 namespace
 {
@@ -825,7 +796,6 @@ namespace
 
 } // namespace
 
-//_____________________________________________________________________________
 Bool_t R3BFileSource::ActivateObjectAny(void** obj, const std::type_info& info, const char* BrName)
 {
     if (fInTree)
@@ -838,9 +808,7 @@ Bool_t R3BFileSource::ActivateObjectAny(void** obj, const std::type_info& info, 
     }
     return kFALSE;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetInputFile(TString name)
 {
     fRootFile = TFile::Open(name.Data());
@@ -850,9 +818,7 @@ void R3BFileSource::SetInputFile(TString name)
     }
     LOG(info) << "R3BFileSource set------------";
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 Int_t R3BFileSource::CheckMaxEventNo(Int_t EvtEnd)
 {
     Int_t MaxEventNo = 0;
@@ -866,9 +832,7 @@ Int_t R3BFileSource::CheckMaxEventNo(Int_t EvtEnd)
     }
     return MaxEventNo;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetEventMeanTime(Double_t mean)
 {
     fEventMeanTime = mean;
@@ -885,27 +849,21 @@ void R3BFileSource::SetEventMeanTime(Double_t mean)
     fTimeProb->GetRandom();
     fEventTimeInMCHeader = kFALSE;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetEventTimeInterval(Double_t min, Double_t max)
 {
     fEventTimeMin = min;
     fEventTimeMax = max;
-    fEventMeanTime = (fEventTimeMin + fEventTimeMax) / 2;
+    fEventMeanTime = (fEventTimeMin + fEventTimeMax) / 2.0;
     fEventTimeInMCHeader = kFALSE;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetBeamTime(Double_t beamTime, Double_t gapTime)
 {
     fBeamTime = beamTime;
     fGapTime = gapTime;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::SetEventTime()
 {
     // Check if the time for the current entry is already set
@@ -927,9 +885,7 @@ void R3BFileSource::SetEventTime()
     LOG(debug) << "New time = " << fEventTime;
     fTimeforEntryNo = fCurrentEntryNo;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 Double_t R3BFileSource::GetDeltaEventTime()
 {
     Double_t deltaTime = 0;
@@ -945,9 +901,7 @@ Double_t R3BFileSource::GetDeltaEventTime()
     }
     return deltaTime;
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 Double_t R3BFileSource::GetEventTime()
 {
     LOG(debug) << "-- Get Event Time --";
@@ -982,9 +936,7 @@ Double_t R3BFileSource::GetEventTime()
         return fEventTime;
     }
 }
-//_____________________________________________________________________________
 
-//_____________________________________________________________________________
 void R3BFileSource::ReadBranchEvent(const char* BrName)
 {
     /**fill the object with content if the other branches in this tree entry were already read**/
@@ -1006,7 +958,7 @@ void R3BFileSource::ReadBranchEvent(const char* BrName)
     }
     return;
 }
-//_____________________________________________________________________________
+
 void R3BFileSource::ReadBranchEvent(const char* BrName, Int_t Entry)
 {
     fCurrentEntryNo = Entry;
@@ -1025,7 +977,6 @@ void R3BFileSource::ReadBranchEvent(const char* BrName, Int_t Entry)
     return;
 }
 
-//_____________________________________________________________________________
 void R3BFileSource::FillEventHeader(R3BEventHeader* feh)
 {
     feh->SetEventTime(fEventTime);
@@ -1037,6 +988,5 @@ void R3BFileSource::FillEventHeader(R3BEventHeader* feh)
     feh->SetInputFileId(0);
     return;
 }
-//_____________________________________________________________________________
 
 ClassImp(R3BFileSource)

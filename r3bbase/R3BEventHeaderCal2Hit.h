@@ -34,13 +34,14 @@ class R3BEventHeaderCal2Hit : public FairTask
 {
   public:
     /**
-     * Standard constructor.
+     * Standard constructors.
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      * @param a_variant CTDC firmware variant, see R3BTCalEngine.
      * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
+    R3BEventHeaderCal2Hit();
     R3BEventHeaderCal2Hit(int);
 
     /**
