@@ -20,13 +20,11 @@
 #define R3BAmsStripCalPar_H
 
 #include "FairParGenericSet.h" // for FairParGenericSet
+#include "TObject.h"
 
 #include "TArrayF.h"
 #include "TObjArray.h"
-#include "TObject.h"
 #include <TObjString.h>
-
-using namespace std;
 
 class FairParamList;
 
@@ -52,6 +50,7 @@ class R3BAmsStripCalPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Method to print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -80,11 +79,10 @@ class R3BAmsStripCalPar : public FairParGenericSet
     Int_t fNumParamsFit;      /* number of cal parameters in the fit
                     gaus: A_fit & B_fit & C_fit*/
 
-    const R3BAmsStripCalPar& operator=(const R3BAmsStripCalPar&); /*< an assignment operator>*/
-
-    R3BAmsStripCalPar(const R3BAmsStripCalPar&); /*< a copy constructor >*/
+    const R3BAmsStripCalPar& operator=(const R3BAmsStripCalPar&);
+    R3BAmsStripCalPar(const R3BAmsStripCalPar&);
 
     ClassDef(R3BAmsStripCalPar, 1);
 };
 
-#endif
+#endif /* R3BAmsStripCalPar_H */

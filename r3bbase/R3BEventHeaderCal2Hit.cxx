@@ -19,9 +19,14 @@
 #include "R3BEventHeaderCal2Hit.h"
 #include "FairLogger.h"
 
+R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit()
+    : FairTask("R3BEventHeaderCal2Hit", 1)
+    , fHeader(nullptr)
+{
+}
+
 R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit(int a_verbose)
     : FairTask("R3BEventHeaderCal2Hit", a_verbose)
-    , fName("R3BEventHeaderCal2Hit")
     , fHeader(nullptr)
 {
 }
@@ -44,7 +49,7 @@ InitStatus R3BEventHeaderCal2Hit::Init()
     else
         LOG(INFO) << "R3BEventHeaderCal2Hit::Init() FairEventHeader found";
 
-    frm->Register("R3BEventHeaderCal2Hit", "EventHeader", fHeader, kTRUE);
+    frm->Register("EventHeader.", "EventHeader", fHeader, kTRUE);
     return kSUCCESS;
 }
 

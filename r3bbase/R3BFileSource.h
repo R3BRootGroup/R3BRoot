@@ -168,7 +168,7 @@ class R3BFileSource : public FairSource
     FairMCEventHeader* fMCHeader; //!
 
     /**Event Header*/
-    FairEventHeader* fEvtHeader; //!
+    R3BEventHeader* fEvtHeader; //!
 
     /**File Header*/
     FairFileHeader* fFileHeader; //!

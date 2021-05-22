@@ -15,14 +15,12 @@
 #define R3BCALIFAMAPPINGPAR_H
 
 #include "FairParGenericSet.h"
+#include "TObject.h"
 
 #include "TArrayF.h"
 #include "TArrayI.h"
 #include "TObjArray.h"
-#include "TObject.h"
 #include <TObjString.h>
-
-using namespace std;
 
 class FairParamList;
 
@@ -47,6 +45,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -105,7 +104,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     const R3BCalifaMappingPar& operator=(const R3BCalifaMappingPar&); /*< an assignment operator>*/
     R3BCalifaMappingPar(const R3BCalifaMappingPar&);                  /*< a copy constructor >*/
 
-    ClassDef(R3BCalifaMappingPar, 1); //
+    ClassDef(R3BCalifaMappingPar, 1);
 };
 
-#endif /* !R3BCALIFAMAPPINGPAR_H*/
+#endif /* !R3BCALIFAMAPPINGPAR_H */

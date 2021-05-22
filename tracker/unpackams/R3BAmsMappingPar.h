@@ -20,14 +20,12 @@
 #define R3BAmsMappingPar_H
 
 #include "FairParGenericSet.h"
+#include "TObject.h"
 
 #include "TArrayF.h"
 #include "TArrayI.h"
 #include "TObjArray.h"
-#include "TObject.h"
 #include <TObjString.h>
-
-using namespace std;
 
 class FairParamList;
 
@@ -52,6 +50,7 @@ class R3BAmsMappingPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -83,10 +82,10 @@ class R3BAmsMappingPar : public FairParGenericSet
     TArrayF* fAngleTheta;      // Angle with respect to beam direction (-45 and 45 degrees)
     TArrayF* fOffsetY;         // offset for y (-20, 0 or 20 mm)
 
-    const R3BAmsMappingPar& operator=(const R3BAmsMappingPar&); /*< an assignment operator>*/
-    R3BAmsMappingPar(const R3BAmsMappingPar&);                  /*< a copy constructor >*/
+    const R3BAmsMappingPar& operator=(const R3BAmsMappingPar&);
+    R3BAmsMappingPar(const R3BAmsMappingPar&);
 
-    ClassDef(R3BAmsMappingPar, 1); //
+    ClassDef(R3BAmsMappingPar, 1);
 };
 
-#endif /* !R3BAmsMappingPar_H*/
+#endif /* R3BAmsMappingPar_H */

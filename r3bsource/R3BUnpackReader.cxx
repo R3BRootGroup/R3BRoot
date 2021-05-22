@@ -66,7 +66,7 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
     if (!fHeader)
     {
         fHeader = new R3BEventHeader();
-        fHeader->Register(kTRUE);
+        frm->Register("EventHeader.", "R3BEvtHeader", fHeader, kTRUE);
         LOG(WARNING) << "R3BUnpackReader::Init() R3BEventHeader not found";
     }
     else
