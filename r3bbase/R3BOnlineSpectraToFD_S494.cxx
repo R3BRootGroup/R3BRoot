@@ -168,6 +168,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         fh_tofd_TotPm[0]->Draw("colz");
         cTofd_planes->cd(3);
         gPad->SetLogz();
+        fh_tofd_multihit[0]->SetAxisRange(1,10,"Y");
         fh_tofd_multihit[0]->Draw("colz");
 
         cTofd_planes->cd(6);
@@ -177,6 +178,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         fh_tofd_TotPm[1]->Draw("colz");
         cTofd_planes->cd(8);
         gPad->SetLogz();
+        fh_tofd_multihit[1]->SetAxisRange(1,10,"Y");
         fh_tofd_multihit[1]->Draw("colz");
         cTofd_planes->cd(9);
         gPad->SetLogz();
@@ -189,6 +191,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         fh_tofd_TotPm[2]->Draw("colz");
         cTofd_planes->cd(13);
         gPad->SetLogz();
+        fh_tofd_multihit[2]->SetAxisRange(1,10,"Y");
         fh_tofd_multihit[2]->Draw("colz");
         cTofd_planes->cd(14);
         gPad->SetLogz();
@@ -201,6 +204,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         fh_tofd_TotPm[3]->Draw("colz");
         cTofd_planes->cd(18);
         gPad->SetLogz();
+        fh_tofd_multihit[3]->SetAxisRange(1,10,"Y");
         fh_tofd_multihit[3]->Draw("colz");
         cTofd_planes->cd(19);
         gPad->SetLogz();

@@ -161,6 +161,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
         fh_tofi_TotPm[0]->Draw("colz");
         ctofi_planes->cd(3);
         gPad->SetLogz();
+        fh_tofi_multihit[0]->SetAxisRange(1,10,"Y");
         fh_tofi_multihit[0]->Draw("colz");
         ctofi_planes->cd(4);
         gPad->SetLogz();
@@ -443,7 +444,6 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         {
             for (Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFI; ibr++)
             {
-
                 if (vmultihits[ipl + 1][ibr + 1] > 0)
                     fh_tofi_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
             }
