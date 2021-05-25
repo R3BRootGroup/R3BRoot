@@ -24,7 +24,7 @@ extern "C"
 }
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
-#define NUM_ROLU_DETECTORS 2
+#define NUM_ROLU_DETECTORS (sizeof data->ROLU / sizeof data->ROLU[0])
 #define NUM_ROLU_CHANNELS 4
 #include <iostream>
 
@@ -84,6 +84,7 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     // for channels that are unknown to the current ucesb config.
     EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
 
+    cout << "ROLU num Dets: " << NUM_ROLU_DETECTORS << endl;
     for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
     {
         data->ROLU[d].TTFLM = 0;
@@ -120,7 +121,7 @@ Bool_t R3BRoluReader::Read()
 
     // loop over all detectors
 
-    for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
+    for (uint32_t d = 0; d < 2; d++)
     {
 
         // Coarse counter reset recovery:
@@ -131,12 +132,13 @@ Bool_t R3BRoluReader::Read()
         bool do_increment = false;
         uint32_t const c_tamex3_range = 2048;
 
-        if (data->ROLU[d].TTCL < 1)
-            return kFALSE;
+        // if (data->ROLU[d].TTCL < 1)
+        //   return kFALSE;
 
-        //   cout<<" **** NEW EVENT **** "<<endl;
+        //      if(d==1)   cout<<" **** NEW EVENT **** "<<endl;
 
-        //  cout<<"NUM DATA: "<<data->ROLU[d].TTCL<<"; NUM CHANNELS: "<<data->ROLU[d].TTCLM<<endl;
+        //     if(d==1)  cout<<"NUM DATA Coar: "<<data->ROLU[d].TTCL<<"; NUM CHANNELS: "<<data->ROLU[d].TTCLM<<endl;
+        //    if(d==1)  cout<<"NUM DATA Fine: "<<data->ROLU[d].TTFL<<"; NUM CHANNELS: "<<data->ROLU[d].TTFLM<<endl;
 
         uint32_t numData = data->ROLU[d].TTCL;
         uint32_t numChannels = data->ROLU[d].TTCLM;
@@ -167,7 +169,7 @@ Bool_t R3BRoluReader::Read()
         // Leading mapping.
         numChannels = data->ROLU[d].TTCLM;
         uint32_t curChannelStart = 0;
-        // cout<<"numChannels: "<<numChannels<<", "<<curChannelStart<<endl;
+        //   if(d==1) cout<<"numChannels: "<<numChannels<<", "<<curChannelStart<<endl;
         for (uint32_t i = 0; i < numChannels; i++)
         {
             uint32_t channel = data->ROLU[d].TTCLMI[i];
@@ -182,7 +184,8 @@ Bool_t R3BRoluReader::Read()
                 new ((*fArray)[fArray->GetEntriesFast()])
                     R3BRoluMappedData(d + 1, channel, 0, data->ROLU[d].TTFLv[j], coarse_leading);
 
-                //    cout<<"TAMEX leading: "<< channel<<", "<<data->ROLU[d].TTFLv[j]<<", "<<  coarse_leading<<endl;
+                //       if(d==1)     cout<<"TAMEX leading: "<< d+1<<", "<<channel<<", "<<data->ROLU[d].TTFLv[j]<<", "<<
+                //       coarse_leading<<endl;
             }
             curChannelStart = nextChannelStart;
         }
@@ -226,8 +229,8 @@ Bool_t R3BRoluReader::Read()
                             new ((*fArray)[fArray->GetEntriesFast()])
                                 R3BRoluMappedData(d + 1, channel, 1, data->ROLU[d].TTFTv[j], coarse_trailing);
 
-                            //           cout<<"TAMEX trailing: "<< channel<<", "<<data->ROLU[d].TTFTv[j]<<", "<<
-                            //           coarse_trailing<<endl;
+                            //      cout<<"TAMEX trailing: "<< d+1<<", "<<channel<<", "<<data->ROLU[d].TTFTv[j]<<", "<<
+                            //         coarse_trailing<<endl;
 
                             break;
                         }

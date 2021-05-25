@@ -37,9 +37,7 @@
 
 #include <iostream>
 
-
-
-#define Rolu_COINC_WINDOW_T_NS 190    
+#define Rolu_COINC_WINDOW_T_NS 100
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BRoluMapped2Cal::R3BRoluMapped2Cal()
@@ -330,8 +328,8 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
 
         continue;
     skip_event_pileup:
-        LOG(WARNING) << "R3BRoluMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                     << " iCal: " << iCal << " Skip event because of pileup.";
+        LOG(DEBUG) << "R3BRoluMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
+                   << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     ++fNEvent;

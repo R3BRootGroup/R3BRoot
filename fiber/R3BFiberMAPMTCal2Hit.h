@@ -103,6 +103,8 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		std::vector<Channel> fChannelArray[2];
   
    // histograms for gain matching
+    TH2F* fh_ToT_MA_Fib_raw;
+    TH2F* fh_ToT_SA_Fib_raw;
     TH2F* fh_ToT_MA_Fib;
     TH2F* fh_ToT_SA_Fib;
     TH2F* fh_time_SA_Fib;

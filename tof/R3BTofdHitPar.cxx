@@ -48,11 +48,11 @@ Bool_t R3BTofdHitPar::getParams(FairParamList* list)
 {
     if (!list)
     {
-        return kFALSE;
+        // return kFALSE;
     }
     if (!list->fillObject(GetName(), fHitParams))
     {
-        return kFALSE;
+        // return kFALSE;
     }
     return kTRUE;
 }

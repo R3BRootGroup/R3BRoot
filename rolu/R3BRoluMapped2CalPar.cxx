@@ -138,6 +138,8 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
         UInt_t iChannel = hit->GetChannel() - 1;   // now 0..n-1
         UInt_t iType = hit->GetType();             // 0,1
 
+        //   cout<<"ROLU: "<<iDetector<<", "<<iChannel+1<<", "<<iType<<", "<<hit->GetTimeFine()<<endl;
+
         if (iDetector > (fNofDetectors - 1))
         {
             LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)

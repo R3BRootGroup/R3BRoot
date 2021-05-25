@@ -196,33 +196,104 @@ void R3BTofdChangePar::FinishTask()
 
 void R3BTofdChangePar::changeAll0(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
-    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
-    par->SetOffset1(0.);
-    par->SetOffset2(0.);
-    par->SetToTOffset1(0.);
-    par->SetToTOffset2(0.);
-    par->SetSync(0.);
-    par->SetVeff(0.);
-    par->SetLambda(0.);
-    par->SetPar1a(0.);
-    par->SetPar1b(0.);
-    par->SetPar1c(0.);
-    par->SetPar1d(0.);
-    par->SetPar1za(0.);
-    par->SetPar1zb(0.);
-    par->SetPar1zc(0.);
-    par->SetPar2a(0.);
-    par->SetPar2b(0.);
-    par->SetPar2c(0.);
-    par->SetPar2d(0.);
-    par->SetPar1za(0.);
-    par->SetPar1zb(0.);
-    par->SetPar1zc(0.);
-    par->SetPar1Walk(0.);
-    par->SetPar2Walk(0.);
-    par->SetPar3Walk(0.);
-    par->SetPar4Walk(0.);
-    par->SetPar5Walk(0.);
+    auto container = "TofdHitPar";
+    fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer(container);
+    if (!fCal_Par)
+    {
+        R3BTofdHitModulePar* mpar;
+        mpar = new R3BTofdHitModulePar();
+        mpar->SetPlane(plane);
+        mpar->SetPaddle(bar);
+
+        mpar->SetOffset1(0.);
+        mpar->SetOffset2(0.);
+        mpar->SetToTOffset1(0.);
+        mpar->SetToTOffset2(0.);
+        mpar->SetSync(0.);
+        mpar->SetVeff(0.);
+        mpar->SetLambda(0.);
+        mpar->SetPar1a(0.);
+        mpar->SetPar1b(0.);
+        mpar->SetPar1c(0.);
+        mpar->SetPar1d(0.);
+        mpar->SetPar1za(0.);
+        mpar->SetPar1zb(0.);
+        mpar->SetPar1zc(0.);
+        mpar->SetPar2a(0.);
+        mpar->SetPar2b(0.);
+        mpar->SetPar2c(0.);
+        mpar->SetPar2d(0.);
+        mpar->SetPar1za(0.);
+        mpar->SetPar1zb(0.);
+        mpar->SetPar1zc(0.);
+        mpar->SetPar1Walk(0.);
+        mpar->SetPar2Walk(0.);
+        mpar->SetPar3Walk(0.);
+        mpar->SetPar4Walk(0.);
+        mpar->SetPar5Walk(0.);
+
+        fCal_Par->AddModulePar(mpar);
+    }
+    else
+    {
+        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
+        par->SetOffset1(0.);
+        par->SetOffset2(0.);
+        par->SetToTOffset1(0.);
+        par->SetToTOffset2(0.);
+        par->SetSync(0.);
+        par->SetVeff(0.);
+        par->SetLambda(0.);
+        par->SetPar1a(0.);
+        par->SetPar1b(0.);
+        par->SetPar1c(0.);
+        par->SetPar1d(0.);
+        par->SetPar1za(0.);
+        par->SetPar1zb(0.);
+        par->SetPar1zc(0.);
+        par->SetPar2a(0.);
+        par->SetPar2b(0.);
+        par->SetPar2c(0.);
+        par->SetPar2d(0.);
+        par->SetPar1za(0.);
+        par->SetPar1zb(0.);
+        par->SetPar1zc(0.);
+        par->SetPar1Walk(0.);
+        par->SetPar2Walk(0.);
+        par->SetPar3Walk(0.);
+        par->SetPar4Walk(0.);
+        par->SetPar5Walk(0.);
+    }
+
+    /*
+        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
+        par->SetOffset1(0.);
+        par->SetOffset2(0.);
+        par->SetToTOffset1(0.);
+        par->SetToTOffset2(0.);
+        par->SetSync(0.);
+        par->SetVeff(0.);
+        par->SetLambda(0.);
+        par->SetPar1a(0.);
+        par->SetPar1b(0.);
+        par->SetPar1c(0.);
+        par->SetPar1d(0.);
+        par->SetPar1za(0.);
+        par->SetPar1zb(0.);
+        par->SetPar1zc(0.);
+        par->SetPar2a(0.);
+        par->SetPar2b(0.);
+        par->SetPar2c(0.);
+        par->SetPar2d(0.);
+        par->SetPar1za(0.);
+        par->SetPar1zb(0.);
+        par->SetPar1zc(0.);
+        par->SetPar1Walk(0.);
+        par->SetPar2Walk(0.);
+        par->SetPar3Walk(0.);
+        par->SetPar4Walk(0.);
+        par->SetPar5Walk(0.);
+     */
 }
 
 void R3BTofdChangePar::changeOffset(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)

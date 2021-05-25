@@ -168,59 +168,116 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
             }
         }
-        else
+        else // FIb23a/23b
         {
             Int_t iFib = 0;
-            if (channel < 65)
+            if (mapped->GetSide() != 0)
             {
-                iFib = channel * 2;
-                if (2 == mapped->GetSide())
+                if (channel < 65) // up channels
                 {
-                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    iFib = channel * 2;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
                 }
-                else
+                else if (channel > 64 && channel < 193)
                 {
-                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    iFib = 64 + channel;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
+                }
+                else if (channel > 192 && channel < 257)
+                {
+                    iFib = 258 + (channel - 193) * 2;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
                 }
             }
-            else if (channel > 64 && channel < 193)
+            else if (mapped->GetSide() != 1) // down channels
             {
-                iFib = 64 + channel;
-                if (2 == mapped->GetSide())
+                if (channel < 65)
                 {
-                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    iFib = channel + int((channel - 1) / 4) * 4;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
+                    }
                 }
-                else
+                else if (channel > 64 && channel < 193)
                 {
-                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    iFib = 64 + channel;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    }
                 }
-            }
-            else if (channel > 192 && channel < 257)
-            {
-                iFib = 258 + (channel - 193) * 2;
-                if (2 == mapped->GetSide())
+                else if (channel > 192 && channel < 257)
                 {
-                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                    new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                    iFib = 64 + channel + int((channel - 193) / 4) * 4;
+                    if (2 == mapped->GetSide())
+                    {
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
+                    }
+                    else
+                    {
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                            R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
+                    }
                 }
-                else
-                {
-                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                    new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
-                }
-            }
+
+            } // end selection top or bottom
             //	cout<<"CAL "<<fName<<"; "<<channel<<", "<<iFib<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<",
             //"<<time_ns<<endl;
         } // end fibdet selection

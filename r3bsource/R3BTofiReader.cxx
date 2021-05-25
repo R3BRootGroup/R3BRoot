@@ -99,6 +99,9 @@ Bool_t R3BTofiReader::Read()
             {
                 new ((*fArray)[fArray->GetEntriesFast()])
                     R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCLv[j], side.TFLv[j]);
+
+                //   std::cout<<"TOFI READER leading: "<<t + 1<<", "<< ch_i<<", "<<  side.TCLv[j]<<", "<<
+                //   side.TFLv[j]<<std::endl;
             }
         }
     }
@@ -116,7 +119,9 @@ Bool_t R3BTofiReader::Read()
             for (; j < end; j++)
             {
                 new ((*fArray)[fArray->GetEntriesFast()])
-                    R3BTofiMappedData(1, t + 1, ch_i, 1, side.TCTv[j], side.TFTv[j]);
+                    R3BTofiMappedData(1, t + 1, ch_i, 2, side.TCTv[j], side.TFTv[j]);
+                //    std::cout<<"TOFI READER trailing: "<<t + 1<<", "<< ch_i<<", "<<  side.TCTv[j]<<", "<<
+                //    side.TFTv[j]<<std::endl;
             }
         }
     }

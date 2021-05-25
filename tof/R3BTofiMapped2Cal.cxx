@@ -204,6 +204,9 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
         // ... and subtract it from the next clock cycle.
         time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
 
+        //       cout<<"time_ns: "<<time_ns<<". "<<mapped->GetBarId()<<"; "<<mapped->GetSideId()<<",
+        //       "<<mapped->GetEdgeId()<<endl;
+
         auto& entry = cal_vec.at(((mapped->GetDetectorId() - 1) * fPaddlesPerPlane + mapped->GetBarId() - 1) * 2 +
                                  mapped->GetSideId() - 1);
         entry.push_back(Cal(mapped, time_ns));
@@ -273,12 +276,12 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
                                                                                       lead->GetSideId(),
                                                                                       ch.at(lead_i).time_ns,
                                                                                       ch.at(trail_i).time_ns);
-            /*
-                        cout << "stored Det:" << lead->GetDetectorId() << " Bar: " << lead->GetBarId()
-                             << " Side: " << lead->GetSideId() <<" lead: " << ch.at(lead_i).time_ns
-                             << " trail: " << ch.at(trail_i).time_ns
-                             << " ToT: " << ch.at(trail_i).time_ns - ch.at(lead_i).time_ns << endl;
-            */
+
+            //    cout << "stored Det:" << lead->GetDetectorId() << " Bar: " << lead->GetBarId()
+            //         << " Side: " << lead->GetSideId() <<" lead: " << ch.at(lead_i).time_ns
+            //         << " trail: " << ch.at(trail_i).time_ns
+            //         << " ToT: " << ch.at(trail_i).time_ns - ch.at(lead_i).time_ns << endl;
+
             ++lead_i;
             ++trail_i;
         }

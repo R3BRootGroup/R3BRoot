@@ -304,9 +304,10 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
             }
         }
 
-        //    std::cout<<"new event!*************************************\n";
         auto det = fCalItems.at(DET_TOFI);
         Int_t nHits = det->GetEntries();
+
+        //    cout<<"new event!************************************* "<<nHits<<endl;
 
         Int_t nHitsEvent = 0;
         // Organize cals into bars.
@@ -316,15 +317,15 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
             std::vector<R3BTofiCalData*> bot;
         };
         std::map<size_t, Entry> bar_map;
-        // puts("Event");
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto* hit = (R3BTofiCalData*)det->At(ihit);
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top
-                                              : ret.first->second.bot; // if side=1 -> top, if side=2 -> bottom
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot
+                                              : ret.first->second.top; // if side=1 -> top, if side=2 -> bottom
             vec.push_back(hit);
         }
 
@@ -373,6 +374,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                    std::endl; std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
                             }
                 */
+
+                //      cout<<"Time: "<<top_ns<<"; "<<bot_ns<<endl;
+
                 auto dt = top_ns - bot_ns;
                 // Handle wrap-around.
                 auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
@@ -385,6 +389,8 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                     // glue zero and the largest values together.
                     dt_mod -= c_range_ns;
                 }
+
+                //       cout<<"dt_mod: "<<dt_mod <<endl;
                 fh_tofi_dt->Fill(top->GetBarId(), dt_mod);
 
                 // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<

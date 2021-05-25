@@ -127,6 +127,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
         DET_FI32,
         DET_FI33,
         DET_FI_LAST = DET_FI33,
+        DET_TOFI,
         DET_TOFD,
         DET_MAX
     };
@@ -134,7 +135,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
     const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",  "Fi31",  
-                                                 "Fi32", "Fi33",  "Tofd",   NULL };
+                                                 "Fi32", "Fi33",  "Tofi", "Tofd",   NULL };
 
     // If FiberI is present or not:
     Int_t ifibdet;
@@ -181,14 +182,17 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Double_t events33 = 0; 
     Double_t nHitstemp;
     
-	Int_t n_det = 12;
+	Int_t n_det = 13;
 	
 	Double_t ncounts_tofd[70]={0};
 	Double_t ncounts_fi30[70]={0};
 	Double_t ncounts_fi31[70]={0};
 	Double_t ncounts_fi32[70]={0};
 	Double_t ncounts_fi33[70]={0};
-	
+    
+    TH1F* fh_Tofi_ToF;
+    TH1F* fh_Tofi_ToF_ac;
+    	
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
     TH1F* fh_Fib_ToF[NOF_FIB_DET];
