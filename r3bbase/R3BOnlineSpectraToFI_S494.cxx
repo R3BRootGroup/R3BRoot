@@ -293,7 +293,6 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 
     if (fCalItems.at(DET_TOFI))
     {
-
         UInt_t vmultihits[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
         Double_t time_bar[N_PLANE_MAX_TOFI + 1][N_PADDLE_MAX_TOFI + 1];
         for (Int_t i = 0; i <= fNofPlanes; i++)
@@ -321,6 +320,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
+			std::cout<<"0\n";
             auto* hit = (R3BTofiCalData*)det->At(ihit);
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
@@ -329,17 +329,19 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                                               : ret.first->second.top; // if side=1 -> top, if side=2 -> bottom
             vec.push_back(hit);
         }
-
+		std::cout<<"1\n";
         static bool s_was_trig_missing = false;
         auto trig_num = fCalTriggerItems->GetEntries();
         for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
         {
+			std::cout<<"2\n";
             auto const& top_vec = it->second.top;
             auto const& bot_vec = it->second.bot;
             size_t top_i = 0;
             size_t bot_i = 0;
             for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
             {
+				std::cout<<"3\n";
                 auto top = top_vec.at(top_i);
                 auto bot = bot_vec.at(bot_i);
                 auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
@@ -398,6 +400,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 // std::abs(dt_mod) << '\n';
                 if (std::abs(dt_mod) < c_bar_coincidence_ns)
                 {
+					std::cout<<"4\n";
                     // Hit!
                     // std::cout << "Hit!\n";
                     Int_t iPlane = top->GetDetectorId(); // 1..n
@@ -417,7 +420,8 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 
                     auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                     auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-
+					
+					std::cout<<"ToT top "<<top_tot<<" bot "<<bot_tot<<"\n";
                     fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
                     fh_tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
 
