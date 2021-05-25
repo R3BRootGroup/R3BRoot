@@ -224,6 +224,10 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
         fh_xy_global = new TH2F("xy_Fib23", "X vs Y from Fib23", 500, -10, 10, 500, -10, 10);
         fh_xy_global->GetXaxis()->SetTitle("x position / cm");
         fh_xy_global->GetYaxis()->SetTitle("y position / cm");
+
+        fh_dtime_Fib23 = new TH2F("dt_Fib23", "dTime from Fib23", 500, -10, 10, 4096, -2048, 2048);
+        fh_dtime_Fib23->GetXaxis()->SetTitle("Y Fib23b / cm");
+        fh_dtime_Fib23->GetYaxis()->SetTitle("dTime / ns");
     }
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
@@ -432,14 +436,20 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 FibCanvas[ifibcount]->cd(14);
                 gPad->SetLogz();
                 fh_Fib_vs_Events[ifibcount]->Draw("colz");
-                FibCanvas[ifibcount]->cd(15);
-                gPad->SetLogz();
-                fh_Fib_pos[ifibcount]->Draw("colz");
                 if (ifibcount > 3)
                 {
+                    FibCanvas[ifibcount]->cd(15);
+                    gPad->SetLogz();
+                    fh_dtime_Fib23->Draw("colz");
                     FibCanvas[ifibcount]->cd(16);
                     gPad->SetLogz();
                     fh_xy_global->Draw("colz");
+                }
+                else
+                {
+                    FibCanvas[ifibcount]->cd(15);
+                    gPad->SetLogz();
+                    fh_Fib_pos[ifibcount]->Draw("colz");
                 }
             }
             FibCanvas[ifibcount]->cd(0);
@@ -457,7 +467,10 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
 void R3BOnlineSpectraFiber_s494::Reset_Fiber_Histo()
 {
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
+    {
         fh_xy_global->Reset();
+        fh_dtime_Fib23->Reset();
+    }
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
@@ -519,8 +532,8 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // Fiber detectors
     //----------------------------------------------------------------------
-    Double_t xpos_global = -1000;
-    Double_t ypos_global = -1000;
+    Double_t xpos_global;
+    Double_t ypos_global;
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
         Int_t iFib = 0;
@@ -775,9 +788,6 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                 // Not-calibrated ToF:
                 tfib = hit->GetTime();
 
-                // if not resonable y-position, go to next
-                //  if (ypos < 70. || ypos > 100.)  continue;
-
                 // ToT from up and down MAPMT:
                 Double_t ToT_up = hit->GetTopToT_ns();
                 Double_t ToT_down = hit->GetBottomToT_ns();
@@ -785,7 +795,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                 Double_t ToT = hit->GetEloss();
                 Double_t xpos = hit->GetX();
                 Double_t ypos = hit->GetY();
-                //  if(ypos>70. && ypos<100.){
+
+                fh_Fib_pos[ifibcount]->Fill(xpos, ypos);
+
                 if (ToT > totMax)
                 {
                     totMax = ToT;
@@ -795,33 +807,25 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                     xposMax = xpos;
                     yposMax = ypos;
                 }
-                //  }
 
                 if ((strcmp(fDetectorNames[DET_FI_FIRST + ifibcount], "Fi23a") == 0))
                 {
-                    xpos_global = xposMax;
+                    //    xpos_global = xposMax;
                     //		cout<<"xmax: "<<xpos_global<<endl;
                 }
                 if ((strcmp(fDetectorNames[DET_FI_FIRST + ifibcount], "Fi23b") == 0))
                 {
-                    ypos_global = yposMax;
+                    //   ypos_global = yposMax;
                     //		cout<<"ymax: "<<ypos_global<<endl;
                 }
 
-                //    if(hit->GetSPMTToT_ns() > 0){
                 fh_fibers_Fib[ifibcount]->Fill(iFib);
                 fh_ToT_Fib[ifibcount]->Fill(iFib, ToT_up);
                 fh_ToTmax_Fibmax[ifibcount]->Fill(iFib, ToT_down);
                 fh_time_Fib[ifibcount]->Fill(iFib, tfib);
                 fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
 
-                // }
-
-                // if not both times present, go to next
-                //    if (!(tMAPMT > 0.) || !(tSPMT > 0.))  continue;
             } // end for(ihit)
-
-            fh_Fib_pos[ifibcount]->Fill(xposMax, yposMax);
 
             if (nHits > 0)
                 fh_mult_Fib[ifibcount]->Fill(nHits);
@@ -829,30 +833,29 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
         } // end if(aHit[ifibcount])
     }     // end for(ifibcount)
 
-    if (xpos_global > -1000 && ypos_global > -1000)
-        fh_xy_global->Fill(xpos_global, ypos_global);
-    /*
-     auto detFib23a = fHitItems.at(DET_FI23A);
-     Int_t nHitsa = detFib23a->GetEntriesFast();
-     for (Int_t ihita = 0; ihita < nHitsa; ihita++)
-     {
-         R3BFiberMAPMTHitData* hitFi23a = (R3BFiberMAPMTHitData*)detFib23a->At(ihita);
-         xpos_global=hitFi23a->GetX();
+    auto detFib23a = fHitItems.at(DET_FI23A);
+    Int_t nHitsa = detFib23a->GetEntriesFast();
+    for (Int_t ihita = 0; ihita < nHitsa; ihita++)
+    {
+        xpos_global = 0. / 0.;
+        R3BFiberMAPMTHitData* hitFi23a = (R3BFiberMAPMTHitData*)detFib23a->At(ihita);
+        xpos_global = hitFi23a->GetX();
 
-         auto detFib23b = fHitItems.at(DET_FI23B);
-         Int_t nHitsb = detFib23b->GetEntriesFast();
-         for (Int_t ihitb = 0; ihitb < nHitsb; ihitb++)
-         {
-             R3BFiberMAPMTHitData* hitFi23b = (R3BFiberMAPMTHitData*)detFib23b->At(ihitb);
-             ypos_global=hitFi23b->GetY();
+        auto detFib23b = fHitItems.at(DET_FI23B);
+        Int_t nHitsb = detFib23b->GetEntriesFast();
+        for (Int_t ihitb = 0; ihitb < nHitsb; ihitb++)
+        {
+            ypos_global = 0. / 0.;
+            R3BFiberMAPMTHitData* hitFi23b = (R3BFiberMAPMTHitData*)detFib23b->At(ihitb);
+            ypos_global = hitFi23b->GetY();
+            auto dtime =
+                fmod(hitFi23a->GetTime() - hitFi23b->GetTime() + c_period + c_period / 2, c_period) - c_period / 2;
+            fh_dtime_Fib23->Fill(hitFi23b->GetY(), dtime);
 
-             if(xpos_global>-1000 && ypos_global>-1000)fh_xy_global->Fill(xpos_global,ypos_global);
-         }
-     }
-     */
-    //  if(xpos_global>-1000 && ypos_global>-1000) cout<<"globaL: "<<xpos_global<<"; "<<ypos_global<<endl;
-
-    //
+            if (std::abs(dtime) < c_fiber_coincidence_ns)
+                fh_xy_global->Fill(xpos_global, ypos_global);
+        }
+    }
 }
 
 void R3BOnlineSpectraFiber_s494::FinishEvent()
@@ -900,7 +903,10 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
         }
     }
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
+    {
         fh_xy_global->Write();
+        fh_dtime_Fib23->Write();
+    }
 }
 
 ClassImp(R3BOnlineSpectraFiber_s494)
