@@ -41,6 +41,10 @@
 using std::map;
 using std::set;
 
+#include <cstdlib>
+#include <iostream>
+using namespace std;
+
 R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     : FairSource()
     , fInputTitle(Title)
@@ -77,8 +81,16 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fEntryMax(0)
+    , fexpid(0)
+    , array_size(0)
+    , nextts(0)
 {
+    for (Int_t j = 0; j < 99999999; j++)
+    {
+        frunid[j] = 0;
+        ftimestamp[j] = 0;
+    }
+
     if (fRootFile->IsZombie())
     {
         LOG(fatal) << "Error opening the Input file";
@@ -122,8 +134,15 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fEntryMax(0)
+    , fexpid(0)
+    , array_size(0)
+    , nextts(0)
 {
+    for (Int_t j = 0; j < 99999999; j++)
+    {
+        frunid[j] = 0;
+        ftimestamp[j] = 0;
+    }
     fRootFile = TFile::Open(RootFileName->Data());
     if (fRootFile->IsZombie())
     {
@@ -168,8 +187,15 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fEntryMax(0)
+    , fexpid(0)
+    , array_size(0)
+    , nextts(0)
 {
+    for (Int_t j = 0; j < 99999999; j++)
+    {
+        frunid[j] = 0;
+        ftimestamp[j] = 0;
+    }
     fRootFile = TFile::Open(RootFileName.Data());
     if (fRootFile->IsZombie())
     {
@@ -180,21 +206,13 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
 
 R3BFileSource::~R3BFileSource() {}
 
-Int_t R3BFileSource::ReadIntFromString(const std::string& wholestr, const std::string& pattern)
-{
-    std::string tempstr = wholestr;
-    tempstr.replace(0, tempstr.find(pattern) + pattern.length(), "");
-    tempstr.replace(0, tempstr.find('=') + 1, "");
-    return atoi(tempstr.c_str());
-}
-
 Bool_t R3BFileSource::Init()
 {
     LOG(INFO) << "R3BFileSource::Init()";
 
     if (IsInitialized)
     {
-        LOG(info) << "R3BFileSource already initialized";
+        LOG(INFO) << "R3BFileSource already initialized";
         return kTRUE;
     }
     if (!fInChain)
@@ -357,6 +375,45 @@ Bool_t R3BFileSource::Init()
         fInputFile.seekg(0, std::ios::beg);
     }
 
+    if (fInputFile.is_open())
+    {
+        LOG(INFO) << "R3BFileSource::Init() Reading RunId file";
+        std::string buffer;
+        char* p;
+        do
+        {
+            getline(fInputFile, buffer);
+            LOG(INFO) << "read from file: \"" << buffer << "\"";
+            if (buffer.find("fRunID") == 0)
+            {
+                buffer.erase(0, buffer.find('=') + 1);
+
+                frunid[array_size] = strtol(buffer.c_str(), &p, 16);
+                LOG(DEBUG) << "RuniD= " << frunid[array_size];
+            }
+            if (buffer.find("FILE") == 0)
+                continue;
+
+            getline(fInputFile, buffer);
+            LOG(INFO) << "read from file: \"" << buffer << "\"";
+
+            std::string buf1 = buffer.c_str();
+            buf1.erase(buf1.find(' '), buf1.length());
+            buffer.erase(0, buffer.find(' ') + 1);
+            fexpid = strtol(buf1.c_str(), &p, 16);
+            ftimestamp[array_size] = strtol(buffer.c_str(), &p, 16);
+            LOG(DEBUG) << fexpid << " / " << ftimestamp[array_size];
+            array_size++;
+
+        } while (fInputFile && buffer.compare("FILE END"));
+        LOG(INFO) << "R3BFileSource::Init() End of reading RunId file";
+        fInputFile.close();
+    }
+    else
+    {
+        nextts = -1;
+    }
+
     return kTRUE;
 }
 
@@ -370,6 +427,31 @@ void R3BFileSource::SetInTree(TTree* tempTree)
     Init();
 }
 
+// ----  Method getrunid -----------------------------------------------------
+Int_t R3BFileSource::getrunid(uint64_t st)
+{
+    for (Int_t i = 0; i < array_size - 1; i++)
+        if (st >= ftimestamp[i] && st < ftimestamp[i + 1])
+        {
+            nextts = ftimestamp[i + 1];
+            LOG(DEBUG) << "New timestamp " << nextts << " for runid " << frunid[i];
+            return frunid[i];
+        }
+
+    if (st >= ftimestamp[array_size - 1])
+    {
+        nextts = ftimestamp[array_size - 1];
+        LOG(DEBUG) << "Final timestamp " << nextts << " for runid " << frunid[array_size - 1];
+        return frunid[array_size - 1];
+    }
+
+    if (nextts > 0)
+        LOG(WARNING) << "R3BFileSource::ReadEvent() RunId was not found, it will be 1";
+    nextts = -1;
+
+    return 1;
+}
+
 // ----  Method ReadEvent ----------------------------------------------------
 Int_t R3BFileSource::ReadEvent(UInt_t i)
 {
@@ -377,31 +459,17 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
      ** We should use here the timestamp from the header to look for the right runId
      ** and set up the parameters for the analysis of the root files.
      ** std::cout << fEvtHeader->GetTimeStamp() << std::endl;
-     ** Below an example with the event number, just for tests.
      **/
 
-    if (i > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
+    if (nextts == 0 && fEvtHeader->GetTimeStamp() > nextts)
     {
-
-        LOG(INFO) << "R3BFileSource::ReadEvent()";
-
-        std::string buffer;
-        do
-        {
-            getline(fInputFile, buffer);
-            LOG(INFO) << "read from file: \"" << buffer << "\"";
-            if (buffer.find("EVENT BEGIN") == 0)
-            {
-                fRunId = ReadIntFromString(buffer, "RUNID");
-                fEvtHeader->SetRunId(fRunId);
-            }
-            if (buffer.find("EVENT") == 0)
-                continue;
-            Int_t fInit = atoi(buffer.c_str());
-            buffer.erase(0, buffer.find(' ') + 1);
-            fEntryMax = atoi(buffer.c_str());
-
-        } while (fInputFile && buffer.compare("EVENT END"));
+        fRunId = getrunid(fEvtHeader->GetTimeStamp());
+        fEvtHeader->SetRunId(fRunId);
+    }
+    else if (nextts > 0 && fEvtHeader->GetTimeStamp() > nextts)
+    {
+        fRunId = getrunid(fEvtHeader->GetTimeStamp());
+        fEvtHeader->SetRunId(fRunId);
     }
 
     fCurrentEntryNo = i;
@@ -516,26 +584,26 @@ void R3BFileSource::PrintFriendList()
     // List files from the input chain together with all files of
     // all friend chains
 
-    LOG(info) << "The input consists out of the following trees and files: ";
-    LOG(info) << " - " << fInChain->GetName();
+    LOG(INFO) << "The input consists out of the following trees and files: ";
+    LOG(INFO) << " - " << fInChain->GetName();
     TObjArray* fileElements = fInChain->GetListOfFiles();
     TIter next(fileElements);
     TChainElement* chEl = 0;
     while ((chEl = static_cast<TChainElement*>(next())))
     {
-        LOG(info) << "    - " << chEl->GetTitle();
+        LOG(INFO) << "    - " << chEl->GetTitle();
     }
 
     for (const auto& mi : fFriendTypeList)
     {
         TChain* chain = static_cast<TChain*>(mi.second);
-        LOG(info) << " - " << chain->GetName();
+        LOG(INFO) << " - " << chain->GetName();
         fileElements = chain->GetListOfFiles();
         TIter next1(fileElements);
         chEl = 0;
         while ((chEl = static_cast<TChainElement*>(next1())))
         {
-            LOG(info) << "    - " << chEl->GetTitle();
+            LOG(INFO) << "    - " << chEl->GetTitle();
         }
     }
 }
@@ -732,9 +800,9 @@ Bool_t R3BFileSource::CompareBranchList(TFile* fileHandle, TString inputLevel)
     // same
     if (branches.size() != 0)
     {
-        LOG(info) << "Compare Branch List will return kFALSE. The list has " << branches.size() << " branches:";
+        LOG(INFO) << "Compare Branch List will return kFALSE. The list has " << branches.size() << " branches:";
         for (auto branchName : branches)
-            LOG(info) << "  -> " << branchName;
+            LOG(INFO) << "  -> " << branchName;
         return kFALSE;
     }
 
@@ -784,7 +852,7 @@ namespace
         // check consistency of types
         if (info.hash_code() != storedtype->hash_code())
         {
-            LOG(info) << "Trying to read from branch " << brname << " with wrong type " << info.name()
+            LOG(INFO) << "Trying to read from branch " << brname << " with wrong type " << info.name()
                       << " (expected: " << storedtype->name() << " )\n";
             return false;
         }
@@ -816,7 +884,7 @@ void R3BFileSource::SetInputFile(TString name)
     {
         LOG(fatal) << "Error opening the Input file";
     }
-    LOG(info) << "R3BFileSource set------------";
+    LOG(INFO) << "R3BFileSource set------------";
 }
 
 Int_t R3BFileSource::CheckMaxEventNo(Int_t EvtEnd)
