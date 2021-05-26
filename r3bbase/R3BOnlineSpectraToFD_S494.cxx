@@ -120,7 +120,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     if (fMappedItems.at(DET_TOFD))
     {
         TCanvas* cTofd_planes = new TCanvas("TOFD_planes_CalLevel", "TOFD planes CAL Level", 10, 10, 1100, 1000);
-        cTofd_planes->Divide(5, 4);
+        cTofd_planes->Divide(6, 4);
 
         for (Int_t j = 0; j < 4; j++)
         {
@@ -140,22 +140,38 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             fh_tofd_TotPm[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_TotPm[j]->GetYaxis()->SetTitle("ToT / ns");
 
-            char strName9[255];
-            sprintf(strName9, "tofd_multihit_plane_%d", j + 1);
-            char strName10[255];
-            sprintf(strName10, "Tofd multihit plane %d", j + 1);
-            fh_tofd_multihit[j] = new TH2F(strName9, strName10, 45, 0., 45., 10, 0, 10);
+            char strName5[255];
+            sprintf(strName5, "tofd_ToT_coinc_plane_%d", j + 1);
+            char strName6[255];
+            sprintf(strName6, "Tofd ToT coinc plane %d", j + 1);
+            fh_tofd_TotPm_coinc[j] = new TH2F(strName5, strName6, 90, -45, 45, 3000, 0., 300.);
+            fh_tofd_TotPm_coinc[j]->GetXaxis()->SetTitle("Bar number");
+            fh_tofd_TotPm_coinc[j]->GetYaxis()->SetTitle("ToT / ns");
+
+            char strName7[255];
+            sprintf(strName7, "tofd_multihit_plane_%d", j + 1);
+            char strName8[255];
+            sprintf(strName8, "Tofd multihit plane %d", j + 1);
+            fh_tofd_multihit[j] = new TH2F(strName7, strName8, 45, 0., 45., 10, 0, 10);
             fh_tofd_multihit[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_multihit[j]->GetYaxis()->SetTitle("Multihit");
+
+            char strName9[255];
+            sprintf(strName9, "tofd_multihit_coinc_plane_%d", j + 1);
+            char strName10[255];
+            sprintf(strName10, "Tofd multihit coinc plane %d", j + 1);
+            fh_tofd_multihit_coinc[j] = new TH2F(strName9, strName10, 45, 0., 45., 10, 0, 10);
+            fh_tofd_multihit_coinc[j]->GetXaxis()->SetTitle("Bar number");
+            fh_tofd_multihit_coinc[j]->GetYaxis()->SetTitle("Multihit");
 
             if (j < 3)
             {
                 int jk = j + 1;
-                char strName5[255];
-                sprintf(strName5, "tofd_ToF_plane_%d_%d", jk, jk + 1);
-                char strName6[255];
-                sprintf(strName6, "Tofd ToF plane %d and %d ", jk, jk + 1);
-                fh_tofd_dt[j] = new TH2F(strName5, strName6, 50, 0, 50, 800, -40., 40);
+                char strName11[255];
+                sprintf(strName11, "tofd_ToF_plane_%d_%d", jk, jk + 1);
+                char strName12[255];
+                sprintf(strName12, "Tofd ToF plane %d and %d ", jk, jk + 1);
+                fh_tofd_dt[j] = new TH2F(strName11, strName12, 50, 0, 50, 800, -40., 40);
                 fh_tofd_dt[j]->GetXaxis()->SetTitle("Bar number");
                 fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
             }
@@ -168,45 +184,73 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         fh_tofd_TotPm[0]->Draw("colz");
         cTofd_planes->cd(3);
         gPad->SetLogz();
-        fh_tofd_multihit[0]->SetAxisRange(1,10,"Y");
+        fh_tofd_multihit[0]->SetAxisRange(1, 10, "Y");
         fh_tofd_multihit[0]->Draw("colz");
-
-        cTofd_planes->cd(6);
-        fh_tofd_channels[1]->Draw();
-        cTofd_planes->cd(7);
+        cTofd_planes->cd(4);
         gPad->SetLogz();
-        fh_tofd_TotPm[1]->Draw("colz");
+        fh_tofd_TotPm_coinc[0]->Draw("colz");
+        cTofd_planes->cd(5);
+        gPad->SetLogz();
+        fh_tofd_multihit_coinc[0]->SetAxisRange(1, 10, "Y");
+        fh_tofd_multihit_coinc[0]->Draw("colz");
+
+        cTofd_planes->cd(7);
+        fh_tofd_channels[1]->Draw();
         cTofd_planes->cd(8);
         gPad->SetLogz();
-        fh_tofd_multihit[1]->SetAxisRange(1,10,"Y");
-        fh_tofd_multihit[1]->Draw("colz");
+        fh_tofd_TotPm[1]->Draw("colz");
         cTofd_planes->cd(9);
+        gPad->SetLogz();
+        fh_tofd_multihit[1]->SetAxisRange(1, 10, "Y");
+        fh_tofd_multihit[1]->Draw("colz");
+        cTofd_planes->cd(10);
+        gPad->SetLogz();
+        fh_tofd_TotPm_coinc[1]->Draw("colz");
+        cTofd_planes->cd(11);
+        gPad->SetLogz();
+        fh_tofd_multihit_coinc[1]->SetAxisRange(1, 10, "Y");
+        fh_tofd_multihit_coinc[1]->Draw("colz");
+        cTofd_planes->cd(12);
         gPad->SetLogz();
         fh_tofd_dt[0]->Draw("colz");
 
-        cTofd_planes->cd(11);
+        cTofd_planes->cd(13);
         fh_tofd_channels[2]->Draw();
-        cTofd_planes->cd(12);
+        cTofd_planes->cd(14);
         gPad->SetLogz();
         fh_tofd_TotPm[2]->Draw("colz");
-        cTofd_planes->cd(13);
+        cTofd_planes->cd(15);
         gPad->SetLogz();
-        fh_tofd_multihit[2]->SetAxisRange(1,10,"Y");
+        fh_tofd_multihit[2]->SetAxisRange(1, 10, "Y");
         fh_tofd_multihit[2]->Draw("colz");
-        cTofd_planes->cd(14);
+        cTofd_planes->cd(16);
+        gPad->SetLogz();
+        fh_tofd_TotPm_coinc[2]->Draw("colz");
+        cTofd_planes->cd(17);
+        gPad->SetLogz();
+        fh_tofd_multihit_coinc[2]->SetAxisRange(1, 10, "Y");
+        fh_tofd_multihit_coinc[2]->Draw("colz");
+        cTofd_planes->cd(18);
         gPad->SetLogz();
         fh_tofd_dt[1]->Draw("colz");
 
-        cTofd_planes->cd(16);
+        cTofd_planes->cd(19);
         fh_tofd_channels[3]->Draw();
-        cTofd_planes->cd(17);
+        cTofd_planes->cd(20);
         gPad->SetLogz();
         fh_tofd_TotPm[3]->Draw("colz");
-        cTofd_planes->cd(18);
+        cTofd_planes->cd(21);
         gPad->SetLogz();
-        fh_tofd_multihit[3]->SetAxisRange(1,10,"Y");
+        fh_tofd_multihit[3]->SetAxisRange(1, 10, "Y");
         fh_tofd_multihit[3]->Draw("colz");
-        cTofd_planes->cd(19);
+        cTofd_planes->cd(22);
+        gPad->SetLogz();
+        fh_tofd_TotPm_coinc[3]->Draw("colz");
+        cTofd_planes->cd(23);
+        gPad->SetLogz();
+        fh_tofd_multihit_coinc[3]->SetAxisRange(1, 10, "Y");
+        fh_tofd_multihit_coinc[3]->Draw("colz");
+        cTofd_planes->cd(24);
         gPad->SetLogz();
         fh_tofd_dt[2]->Draw("colz");
 
@@ -228,6 +272,8 @@ void R3BOnlineSpectraToFD_S494::Reset_TOFD_Histo()
         fh_tofd_channels[i]->Reset();
         fh_tofd_multihit[i]->Reset();
         fh_tofd_TotPm[i]->Reset();
+        fh_tofd_multihit_coinc[i]->Reset();
+        fh_tofd_TotPm_coinc[i]->Reset();
     }
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
@@ -345,13 +391,17 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
     if (fCalItems.at(DET_TOFD))
     {
 
-        UInt_t vmultihits[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD + 1];
-        Double_t time_bar[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD + 1];
-        for (Int_t i = 0; i <= fNofPlanes; i++)
+        UInt_t vmultihits[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
+        UInt_t vmultihits_top[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
+        UInt_t vmultihits_bot[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
+        Double_t time_bar[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
+        for (Int_t i = 0; i < fNofPlanes + 1; i++)
         {
-            for (Int_t j = 0; j <= N_PADDLE_MAX_TOFD; j++)
+            for (Int_t j = 0; j < N_PADDLE_MAX_TOFD; j++)
             {
                 vmultihits[i][j] = 0;
+                vmultihits_top[i][j] = 0;
+                vmultihits_bot[i][j] = 0;
                 time_bar[i][j] = 0;
             }
         }
@@ -382,29 +432,26 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             vec.push_back(hit);
         }
 
+        // Without coincidences
         static bool s_was_trig_missing = false;
         auto trig_num = fCalTriggerItems->GetEntries();
+
         for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
         {
             auto const& top_vec = it->second.top;
-            auto const& bot_vec = it->second.bot;
             size_t top_i = 0;
+            auto const& bot_vec = it->second.bot;
             size_t bot_i = 0;
-            for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
+            for (; top_i < top_vec.size();)
             {
                 auto top = top_vec.at(top_i);
-                auto bot = bot_vec.at(bot_i);
                 auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
-                auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
 
-                Double_t top_trig_ns = 0, bot_trig_ns = 0;
-                if (top_trig_i < trig_num && bot_trig_i < trig_num)
+                Double_t top_trig_ns = 0;
+                if (top_trig_i < trig_num)
                 {
                     auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
-                    auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
                     top_trig_ns = top_trig->GetTimeLeading_ns();
-                    bot_trig_ns = bot_trig->GetTimeLeading_ns();
-                    ++n1;
                 }
                 else
                 {
@@ -413,22 +460,136 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                         LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
                         s_was_trig_missing = true;
                     }
+                }
+
+                Int_t iPlane = top->GetDetectorId(); // 1..n
+                Int_t iBar = top->GetBarId();        // 1..n
+                if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+                {
+                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more detectors than expected! Det: " << iPlane
+                               << " allowed are 1.." << fNofPlanes;
+                    continue;
+                }
+                if (iBar > fPaddlesPerPlane) // same here
+                {
+                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more bars then expected! Det: " << iBar
+                               << " allowed are 1.." << fPaddlesPerPlane;
+                    continue;
+                }
+
+                auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
+                vmultihits_top[iPlane - 1][iBar - 1] += 1;
+
+                ++top_i;
+            }
+
+            for (; bot_i < bot_vec.size();)
+            {
+                auto bot = bot_vec.at(bot_i);
+                auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+
+                Double_t bot_trig_ns = 0;
+                if (bot_trig_i < trig_num)
+                {
+                    auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                    bot_trig_ns = bot_trig->GetTimeLeading_ns();
+                }
+                else
+                {
+                    if (!s_was_trig_missing)
+                    {
+                        LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
+                        s_was_trig_missing = true;
+                    }
+                }
+
+                // Shift the cyclic difference window by half a window-length and move it back,
+                // this way the trigger time will be at 0.
+                auto bot_ns = fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
+                              c_range_ns / 2;
+
+                Int_t iPlane = bot->GetDetectorId(); // 1..n
+                Int_t iBar = bot->GetBarId();        // 1..n
+                if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+                {
+                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more detectors than expected! Det: " << iPlane
+                               << " allowed are 1.." << fNofPlanes;
+                    continue;
+                }
+                if (iBar > fPaddlesPerPlane) // same here
+                {
+                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more bars then expected! Det: " << iBar
+                               << " allowed are 1.." << fPaddlesPerPlane;
+                    continue;
+                }
+
+                auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+
+                fh_tofd_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
+
+                // register multi hits
+                vmultihits_bot[iPlane - 1][iBar - 1] += 1;
+
+                ++bot_i;
+            }
+        }
+
+        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
+        {
+            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD + 1; ibr++)
+            {
+                fh_tofd_multihit[ipl]->Fill(ibr, vmultihits_bot[ipl][ibr - 1]);
+                fh_tofd_multihit[ipl]->Fill(-ibr - 1, vmultihits_top[ipl][ibr - 1]);
+            }
+        }
+
+        // With coincidences:
+        static bool s_was_trig_missingc = false;
+        for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
+        {
+            auto const& topc_vec = it->second.top;
+            auto const& botc_vec = it->second.bot;
+            size_t topc_i = 0;
+            size_t botc_i = 0;
+            for (; topc_i < topc_vec.size() && botc_i < botc_vec.size();)
+            {
+                auto topc = topc_vec.at(topc_i);
+                auto botc = botc_vec.at(botc_i);
+                auto topc_trig_i =
+                    g_tofd_trig_map[topc->GetDetectorId() - 1][topc->GetSideId() - 1][topc->GetBarId() - 1];
+                auto botc_trig_i =
+                    g_tofd_trig_map[botc->GetDetectorId() - 1][botc->GetSideId() - 1][botc->GetBarId() - 1];
+
+                Double_t topc_trig_ns = 0, botc_trig_ns = 0;
+                if (topc_trig_i < trig_num && botc_trig_i < trig_num)
+                {
+                    auto topc_trig = (R3BTofdCalData const*)fCalTriggerItems->At(topc_trig_i);
+                    auto botc_trig = (R3BTofdCalData const*)fCalTriggerItems->At(botc_trig_i);
+                    topc_trig_ns = topc_trig->GetTimeLeading_ns();
+                    botc_trig_ns = botc_trig->GetTimeLeading_ns();
+                    ++n1;
+                }
+                else
+                {
+                    if (!s_was_trig_missingc)
+                    {
+                        LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
+                        s_was_trig_missingc = true;
+                    }
                     ++n2;
                 }
 
                 // Shift the cyclic difference window by half a window-length and move it back,
                 // this way the trigger time will be at 0.
-                auto top_ns = fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
-                              c_range_ns / 2;
-                auto bot_ns = fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
-                              c_range_ns / 2;
-                /*
-                            if(top_ns>2000 || bot_ns>2000){
-                                std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns <<
-                   std::endl; std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
-                            }
-                */
-                auto dt = top_ns - bot_ns;
+                auto topc_ns =
+                    fmod(topc->GetTimeLeading_ns() - topc_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
+                    c_range_ns / 2;
+                auto botc_ns =
+                    fmod(botc->GetTimeLeading_ns() - botc_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
+                    c_range_ns / 2;
+
+                auto dt = topc_ns - botc_ns;
                 // Handle wrap-around.
                 auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
                 if (dt < 0)
@@ -439,15 +600,14 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     // glue zero and the largest values together.
                     dt_mod -= c_range_ns;
                 }
-                // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
-                // std::abs(dt_mod) << '\n';
+
                 if (std::abs(dt_mod) < c_bar_coincidence_ns)
                 {
                     // Hit!
                     // std::cout << "Hit!\n";
-                    Int_t iPlane = top->GetDetectorId(); // 1..n
-                    Int_t iBar = top->GetBarId();        // 1..n
-                    if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+                    Int_t iPlane = topc->GetDetectorId(); // 1..n
+                    Int_t iBar = topc->GetBarId();        // 1..n
+                    if (iPlane > fNofPlanes)              // this also errors for iDetector==0
                     {
                         LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more detectors than expected! Det: " << iPlane
                                    << " allowed are 1.." << fNofPlanes;
@@ -460,41 +620,46 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                         continue;
                     }
 
-                    auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-                    auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                    auto topc_tot =
+                        fmod(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                    auto botc_tot =
+                        fmod(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
-                    fh_tofd_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
-                    fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
+                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, botc_tot);
+                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, topc_tot);
 
                     // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
 
                     // register multi hits
                     vmultihits[iPlane - 1][iBar - 1] += 1;
-                    time_bar[iPlane - 1][iBar - 1] = (top_ns + bot_ns) / 2.;
+                    time_bar[iPlane - 1][iBar - 1] = (topc_ns + botc_ns) / 2.;
 
-                    ++top_i;
-                    ++bot_i;
+                    ++topc_i;
+                    ++botc_i;
                 }
                 else if (dt < 0 && dt > -c_range_ns / 2)
                 {
-                    ++top_i;
+                    ++topc_i;
                 }
                 else
                 {
-                    ++bot_i;
+                    ++botc_i;
                 }
             }
         }
 
         for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
         {
-            for (Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFD; ibr++)
+            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD + 1; ibr++)
             {
-                fh_tofd_multihit[ipl]->Fill(ibr + 1, vmultihits[ipl][ibr]);
+                fh_tofd_multihit_coinc[ipl]->Fill(ibr, vmultihits[ipl][ibr - 1]);
                 if (ipl > 0)
                 {
-                    Double_t tof_plane = fmod(time_bar[ipl][ibr] - time_bar[ipl - 1][ibr] + c_range_ns, c_range_ns);
-                    fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
+                    Double_t tof_plane =
+                        fmod(time_bar[ipl][ibr - 1] - time_bar[ipl - 1][ibr - 1] + c_range_ns, c_range_ns);
+
+                    if (tof_plane > 0)
+                        fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
                 }
             }
         }
@@ -527,6 +692,7 @@ void R3BOnlineSpectraToFD_S494::FinishTask()
         for (Int_t i = 0; i < 4; i++)
         {
             fh_tofd_TotPm[i]->Write();
+            fh_tofd_TotPm_coinc[i]->Write();
             fh_tofd_channels[i]->Write();
         }
         for (Int_t i = 0; i < 3; i++)
