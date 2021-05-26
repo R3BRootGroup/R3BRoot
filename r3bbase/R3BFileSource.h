@@ -43,7 +43,7 @@ class R3BFileSource : public FairSource
     R3BFileSource(TFile* f, const char* Title = "InputRootFile", UInt_t identifier = 0);
     R3BFileSource(const TString* RootFileName, const char* Title = "InputRootFile", UInt_t identifier = 0);
     R3BFileSource(const TString RootFileName, const char* Title = "InputRootFile", UInt_t identifier = 0);
-    //  R3BFileSource(const R3BFileSource& file);
+
     virtual ~R3BFileSource();
 
     Bool_t Init();
@@ -93,8 +93,6 @@ class R3BFileSource : public FairSource
     TFolder* GetBranchDescriptionFolder() { return fCbmroot; }
     UInt_t GetEntries() { return fNoOfEntries; }
 
-    //    TList*              GetBranchNameList() {return fBranchNameList;}
-
     void SetInputFile(TString name);
 
     /** Set the repetition time of the beam when it can interact (beamTime) and when no interaction happen (gapTime).
@@ -108,9 +106,6 @@ class R3BFileSource : public FairSource
     Double_t GetDeltaEventTime();
     void SetFileHeader(FairFileHeader* f) { fFileHeader = f; }
     Double_t GetEventTime();
-
-    //    virtual Bool_t   SetObject(TObject* obj, const char* ObjType);
-    //    virtual void     SetObjectName(const char* ObjName, const char* ObjType);
 
     virtual Bool_t ActivateObject(TObject** obj, const char* BrName);
     virtual Bool_t ActivateObjectAny(void**, const std::type_info&, const char*);
@@ -161,9 +156,6 @@ class R3BFileSource : public FairSource
     /**Initialization flag, true if initialized*/
     Bool_t IsInitialized;
 
-    R3BFileSource(const R3BFileSource&);
-    R3BFileSource operator=(const R3BFileSource&);
-
     /** MC Event header */
     FairMCEventHeader* fMCHeader; //!
 
@@ -205,11 +197,21 @@ class R3BFileSource : public FairSource
      */
     Bool_t fCheckFileLayout; //!
 
+    /** getrunid method to obtain the runid as function of timestamps */
+    Int_t getrunid(uint64_t ts);
+
+    /** input file with runids */
     std::ifstream fInputFile;
     TString fInputFileName;
-    Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
-    R3BEventHeader* fEventHeader;
-    Int_t fEntryMax;
+
+    UInt_t fexpid;
+    Int_t array_size;
+    uint32_t frunid[99999999];
+    uint64_t ftimestamp[99999999];
+    int64_t nextts;
+
+    R3BFileSource(const R3BFileSource&);
+    R3BFileSource operator=(const R3BFileSource&);
 
     ClassDef(R3BFileSource, 0)
 };
