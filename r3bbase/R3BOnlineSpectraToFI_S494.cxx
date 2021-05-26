@@ -225,6 +225,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
         fh_tofi_multihit_coinc[0]->Draw("colz");
         ctofi_planes->cd(11);
         gPad->SetLogz();
+        fh_tofi_dt->SetAxisRange(1,25,"X");
         fh_tofi_dt->Draw("colz");
         ctofi_planes->cd(12);
         gPad->SetLogz();
@@ -372,6 +373,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 if (iSide == 2 && iEdge == 1 && iPlane == 1)
                     fh_tofi_channels[iPlane - 1]->Fill(iBar);
             }
+            Int_t maxentry = fh_tofi_channels[0]->GetBinContent(fh_tofi_channels[0]->GetMaximumBin());
         }
         fh_num_bars->Fill(NumPaddles);
         fh_num_side->Fill(nsum_bot, nsum_top);
