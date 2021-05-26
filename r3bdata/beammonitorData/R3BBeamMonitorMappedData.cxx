@@ -23,13 +23,15 @@ R3BBeamMonitorMappedData::R3BBeamMonitorMappedData()
     : fIC(-1)      // IC
     , fSEETRAM(-1) // SEETRAM
     , fTOFDOR(-1)  // TOFD or
+    , fSROLU0S0(-1)
 {
 }
 
-R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(UInt_t IC, UInt_t SEETRAM, UInt_t TOFDOR)
+R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(UInt_t IC, UInt_t SEETRAM, UInt_t TOFDOR, UInt_t SROLU0S0)
     : fIC(IC)
     , fSEETRAM(SEETRAM)
     , fTOFDOR(TOFDOR)
+    , fSROLU0S0(SROLU0S0)
 {
     /*
      LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
@@ -42,5 +44,7 @@ UInt_t R3BBeamMonitorMappedData::GetIC() const { return fIC; }
 UInt_t R3BBeamMonitorMappedData::GetSEETRAM() const { return fSEETRAM; }
 
 UInt_t R3BBeamMonitorMappedData::GetTOFDOR() const { return fTOFDOR; }
+
+UInt_t R3BBeamMonitorMappedData::GetSROLU() const { return fSROLU0S0; }
 
 ClassImp(R3BBeamMonitorMappedData)

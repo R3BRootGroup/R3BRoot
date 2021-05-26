@@ -31,6 +31,7 @@ typedef struct EXT_STR_h101_BMON_t
   /* RAW */
   uint32_t IC /* [-1,-1] */;
   uint32_t SEETRAM /* [-1,-1] */;
+  uint32_t TOFDOR /* [-1,-1] */;  
   uint32_t SROLU1S1 /* [-1,-1] */;
   uint32_t SROLU1S2 /* [-1,-1] */;
   uint32_t SROLU1S3 /* [-1,-1] */;
@@ -53,6 +54,7 @@ typedef struct EXT_STR_h101_BMON_onion_t
   /* RAW */
   uint32_t IC;
   uint32_t SEETRAM;
+  uint32_t TOFDOR; 
   struct {
     uint32_t S[4];
   } SROLU[2];
@@ -70,6 +72,9 @@ typedef struct EXT_STR_h101_BMON_onion_t
   EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
                      SEETRAM,                         UINT32,\
                     "SEETRAM"); \
+  EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
+                     TOFDOR,                         UINT32,\
+                    "TOFDOR"); \
   EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
                      SROLU1S1,                        UINT32,\
                     "SROLU1S1"); \

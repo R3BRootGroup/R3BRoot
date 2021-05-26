@@ -72,6 +72,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
     EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;
     data->IC = 0;
     data->SEETRAM = 0;
+    data->TOFDOR = 0;
     for (int d = 0; d < MAX_ROLU_DET; d++)
     {
         for (int t = 0; t < 4; t++)
@@ -89,7 +90,8 @@ Bool_t R3BBeamMonitorReader::Read()
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;
 
-    new ((*fArray)[fArray->GetEntriesFast()]) R3BBeamMonitorMappedData(data->IC, data->SEETRAM, data->SROLU[2].S[4]);
+    new ((*fArray)[fArray->GetEntriesFast()])
+        R3BBeamMonitorMappedData(data->IC, data->SEETRAM, data->TOFDOR, data->SROLU[0].S[1]);
 
     fNEvents += 1;
 

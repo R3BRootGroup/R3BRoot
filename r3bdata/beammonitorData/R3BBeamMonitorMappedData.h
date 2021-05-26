@@ -23,17 +23,18 @@ class R3BBeamMonitorMappedData : public TObject
     R3BBeamMonitorMappedData();
 
     // Standard Constructor
-    R3BBeamMonitorMappedData(UInt_t, UInt_t, UInt_t);
-
+    R3BBeamMonitorMappedData(UInt_t, UInt_t, UInt_t, UInt_t);
+    
     UInt_t GetIC() const;
     UInt_t GetSEETRAM() const;
     UInt_t GetTOFDOR() const;
+    UInt_t GetSROLU() const;
 
   public:
     UInt_t fIC;
     UInt_t fSEETRAM;
     UInt_t fTOFDOR;
-
+    UInt_t fSROLU0S0;
   public:
     ClassDef(R3BBeamMonitorMappedData, 1)
 };

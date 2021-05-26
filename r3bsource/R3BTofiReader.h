@@ -19,6 +19,7 @@
 
 struct EXT_STR_h101_TOFI_t;
 typedef struct EXT_STR_h101_TOFI_t EXT_STR_h101_TOFI;
+typedef struct EXT_STR_h101_TOFI_onion_t EXT_STR_h101_TOFI_onion;
 class FairLogger;
 
 class R3BTofiReader : public R3BReader
