@@ -33,6 +33,8 @@ R3BTofiCalData::R3BTofiCalData(UInt_t detector, UInt_t channel, UInt_t side, Dou
     , fLeading_ns(lead)
     , fTrailing_ns(trail)
 {
+    //	if(fDetector<2) std::cout<<"Cal leading        : "<<fSide<<"; "<<fBar<<", "<<fLeading_ns<<",
+    //"<<fTrailing_ns<<std::endl;
 }
 
 UInt_t R3BTofiCalData::GetDetectorId() const { return fDetector; }

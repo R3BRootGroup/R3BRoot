@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BTofiMappedData.h"
+#include <iostream>
 
 R3BTofiMappedData::R3BTofiMappedData()
     : fDetector(-1)
@@ -35,6 +36,8 @@ R3BTofiMappedData::R3BTofiMappedData(UInt_t detector,
     , fTimeCoarse(timeCoarse)
     , fTimeFine(timeFine)
 {
+    // if(fDetector < 2) std::cout<<"Mapped data        : "<<fSide<<"; "<<fBar<<"; "<<fEdge<<",
+    // "<<fTimeCoarse<<std::endl;
 }
 
 UInt_t R3BTofiMappedData::GetDetectorId() const { return fDetector; }
