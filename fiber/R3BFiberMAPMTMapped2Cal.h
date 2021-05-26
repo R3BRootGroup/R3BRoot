@@ -100,6 +100,8 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
     TClonesArray* fCalTriggerItems;
     Double_t fClockFreq;
     Int_t fnEvents;
+    Double_t tmaxfib23a[256]={-4096};
+//    Double_t t
 
   public:
     ClassDef(R3BFiberMAPMTMapped2Cal, 1)

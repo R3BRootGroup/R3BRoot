@@ -428,7 +428,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
 
             // hit->GetSideId() gives 1 for bottom and 2 for top
-            auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
             vec.push_back(hit);
         }
 

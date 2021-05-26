@@ -362,8 +362,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-            auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot
-                                              : ret.first->second.top; // if side=2 -> top, if side=1 -> bottom
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
             vec.push_back(hit);
         }
 
