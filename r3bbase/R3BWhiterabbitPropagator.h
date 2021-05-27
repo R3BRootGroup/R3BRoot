@@ -11,45 +11,40 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----                R3BEventHeaderCal2Hit             -----
-// -----            Created Jan 13th 2021 by M.Heil       -----
-// ----- Convert mapped data to time calibrated data      -----
-// ------------------------------------------------------------
+// --------------------------------------------------------------
+// -----             R3BWhiterabbitPropagator               -----
+// -----   Created May 28th 2021 by J.L. Rodriguez-Sanchez  -----
+// --------------------------------------------------------------
 
-#ifndef R3BEVENTHEADERMAPPED2CAL
-#define R3BEVENTHEADERMAPPED2CAL
+#ifndef R3BWhiterabbitPropagator_H
+#define R3BWhiterabbitPropagator_H
 
 #include "FairTask.h"
-#include "R3BEventHeader.h"
-#include "R3BFileSource.h"
 
-/**
- * An analysis task to apply TCAL calibration.
- * This class reads mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BEventHeaderCal2HitPar task.
- */
-class R3BEventHeaderCal2Hit : public FairTask
+class TClonesArray;
+
+class R3BWhiterabbitPropagator : public FairTask
 {
   public:
     /**
-     * Standard constructors.
+     * Default constructor.
+     * Creates an instance of the task with default parameters.
+     */
+    R3BWhiterabbitPropagator();
+
+    /**
+     * Standard constructor.
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
-     * @param a_variant CTDC firmware variant, see R3BTCalEngine.
-     * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
+     * @param namewr a name of the whiterabbit.
      */
-    R3BEventHeaderCal2Hit();
-    R3BEventHeaderCal2Hit(int);
+    R3BWhiterabbitPropagator(const TString& name, Int_t iVerbose = 1, const TString& namewr = "WRMaster");
 
     /**
      * Destructor.
-     * Frees the memory used by the object.
      */
-    virtual ~R3BEventHeaderCal2Hit();
+    virtual ~R3BWhiterabbitPropagator();
 
     /**
      * Method for task initialization.
@@ -92,12 +87,12 @@ class R3BEventHeaderCal2Hit : public FairTask
     virtual void FinishTask();
 
   private:
-    TString fName;
-    R3BEventHeader* fHeader;
-    R3BFileSource* fSource;
+    TString fNameWR;
+    TClonesArray* fInputItem;  // Array with input items
+    TClonesArray* fOutputItem; // Array with output items
 
   public:
-    ClassDef(R3BEventHeaderCal2Hit, 0)
+    ClassDef(R3BWhiterabbitPropagator, 0)
 };
 
-#endif
+#endif // R3BWhiterabbitPropagator_H

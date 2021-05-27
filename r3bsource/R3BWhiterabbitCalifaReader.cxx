@@ -129,7 +129,6 @@ Bool_t R3BWhiterabbitCalifaReader::Read()
                               ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T3 << 32) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA1WR_T1;
 
-        // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
         new ((*fArray)[fArray->GetEntriesFast()]) R3BWRCalifaData(timestamp1);
 

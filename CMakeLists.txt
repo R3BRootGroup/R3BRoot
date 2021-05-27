@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# The name of our project is “R3BBROOT”.  CMakeLists files in this project can refer to the root
+# The name of our project is “R3BROOT”.  CMakeLists files in this project can refer to the root
 # source directory of the project as ${R3BROOT_SOURCE_DIR} or as ${CMAKE_SOURCE_DIR} and to the root
 # binary directory of the project as ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}. This difference
 # is is important for the base classes which are in R3BROOT and PANDAROOT.

@@ -45,6 +45,8 @@ using std::set;
 #include <iostream>
 using namespace std;
 
+TMCThreadLocal R3BFileSource* R3BFileSource::fSourceInstance = 0;
+
 R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     : FairSource()
     , fInputTitle(Title)
@@ -81,15 +83,16 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fexpid(0)
-    , array_size(0)
+    , fExpid(0)
+    , prevts(0)
     , nextts(0)
 {
-    for (Int_t j = 0; j < 99999999; j++)
+    if (fSourceInstance)
     {
-        frunid[j] = 0;
-        ftimestamp[j] = 0;
+        Fatal("R3BFileSource", "Singleton instance already exists.");
+        return;
     }
+    fSourceInstance = this;
 
     if (fRootFile->IsZombie())
     {
@@ -134,15 +137,17 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fexpid(0)
-    , array_size(0)
+    , fExpid(0)
+    , prevts(0)
     , nextts(0)
 {
-    for (Int_t j = 0; j < 99999999; j++)
+    if (fSourceInstance)
     {
-        frunid[j] = 0;
-        ftimestamp[j] = 0;
+        Fatal("R3BFileSource", "Singleton instance already exists.");
+        return;
     }
+    fSourceInstance = this;
+
     fRootFile = TFile::Open(RootFileName->Data());
     if (fRootFile->IsZombie())
     {
@@ -187,15 +192,17 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
-    , fexpid(0)
-    , array_size(0)
+    , fExpid(0)
+    , prevts(0)
     , nextts(0)
 {
-    for (Int_t j = 0; j < 99999999; j++)
+    if (fSourceInstance)
     {
-        frunid[j] = 0;
-        ftimestamp[j] = 0;
+        Fatal("R3BFileSource", "Singleton instance already exists.");
+        return;
     }
+    fSourceInstance = this;
+
     fRootFile = TFile::Open(RootFileName.Data());
     if (fRootFile->IsZombie())
     {
@@ -204,7 +211,14 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     LOG(debug) << "R3BFileSource created------------";
 }
 
-R3BFileSource::~R3BFileSource() {}
+R3BFileSource* R3BFileSource::Instance() { return fSourceInstance; }
+
+R3BFileSource::~R3BFileSource()
+{
+    LOG(debug) << "Enter Destructor of R3BFileSource";
+    delete fEvtHeader;
+    LOG(debug) << "Leave Destructor of R3BFileSource";
+}
 
 Bool_t R3BFileSource::Init()
 {
@@ -366,7 +380,7 @@ Bool_t R3BFileSource::Init()
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
     {
-        LOG(WARNING) << "R3BFileSource::Init() Input file for RunIds could not be open, it is Ok!";
+        LOG(WARNING) << "R3BFileSource::Init() Input file for RunIds was not found, it is Ok!";
     }
     else
     {
@@ -379,7 +393,7 @@ Bool_t R3BFileSource::Init()
     {
         LOG(INFO) << "R3BFileSource::Init() Reading RunId file";
         std::string buffer;
-        char* p;
+        char *p1, *p2, *p3;
         do
         {
             getline(fInputFile, buffer);
@@ -387,9 +401,17 @@ Bool_t R3BFileSource::Init()
             if (buffer.find("fRunID") == 0)
             {
                 buffer.erase(0, buffer.find('=') + 1);
-
-                frunid[array_size] = strtol(buffer.c_str(), &p, 16);
-                LOG(DEBUG) << "RuniD= " << frunid[array_size];
+                UInt_t rid = strtol(buffer.c_str(), &p1, 16);
+                if (buffer.c_str() == p1)
+                {
+                    LOG(ERROR) << "R3BFileSource::Init() Bad structure for RunId file, \n"
+                               << "it must be (hex format): \n"
+                               << "fRunID = a \n"
+                               << "expid timestamp \n";
+                    return kFALSE;
+                }
+                fRunid.push_back(rid);
+                LOG(DEBUG) << "RuniD= " << rid;
             }
             if (buffer.find("FILE") == 0)
                 continue;
@@ -400,10 +422,19 @@ Bool_t R3BFileSource::Init()
             std::string buf1 = buffer.c_str();
             buf1.erase(buf1.find(' '), buf1.length());
             buffer.erase(0, buffer.find(' ') + 1);
-            fexpid = strtol(buf1.c_str(), &p, 16);
-            ftimestamp[array_size] = strtol(buffer.c_str(), &p, 16);
-            LOG(DEBUG) << fexpid << " / " << ftimestamp[array_size];
-            array_size++;
+            fExpid = strtol(buf1.c_str(), &p2, 16);
+            uint64_t ts = strtol(buffer.c_str(), &p3, 16);
+
+            if (buf1.c_str() == p2 || buffer.c_str() == p3)
+            {
+                LOG(ERROR) << "R3BFileSource::Init() Bad structure for RunId file, \n"
+                           << "it must be (hex format): \n"
+                           << "fRunID = a \n"
+                           << "expid timestamp \n";
+                return kFALSE;
+            }
+            fTimestamp.push_back(ts);
+            LOG(DEBUG) << fExpid << " / " << ts;
 
         } while (fInputFile && buffer.compare("FILE END"));
         LOG(INFO) << "R3BFileSource::Init() End of reading RunId file";
@@ -427,26 +458,38 @@ void R3BFileSource::SetInTree(TTree* tempTree)
     Init();
 }
 
-// ----  Method getrunid -----------------------------------------------------
-Int_t R3BFileSource::getrunid(uint64_t st)
+// ----  Method GetRunid -----------------------------------------------------
+Int_t R3BFileSource::GetRunid(uint64_t st)
 {
-    for (Int_t i = 0; i < array_size - 1; i++)
-        if (st >= ftimestamp[i] && st < ftimestamp[i + 1])
+    UInt_t fArray = fTimestamp.size();
+    if (fArray != fRunid.size())
+    {
+        LOG(ERROR) << "R3BFileSource::GetRunid() Different number of RunIds and timestamps";
+        prevts = -1;
+        nextts = -1;
+        return 1;
+    }
+
+    for (Int_t j = 0; j < fArray - 1; j++)
+        if (st >= fTimestamp[j] && st < fTimestamp[j + 1])
         {
-            nextts = ftimestamp[i + 1];
-            LOG(DEBUG) << "New timestamp " << nextts << " for runid " << frunid[i];
-            return frunid[i];
+            prevts = fTimestamp[j];
+            nextts = fTimestamp[j + 1];
+            LOG(DEBUG) << "New timestamp " << nextts << " for RunId " << fRunid[j];
+            return fRunid[j];
         }
 
-    if (st >= ftimestamp[array_size - 1])
+    if (st >= fTimestamp[fArray - 1])
     {
-        nextts = ftimestamp[array_size - 1];
-        LOG(DEBUG) << "Final timestamp " << nextts << " for runid " << frunid[array_size - 1];
-        return frunid[array_size - 1];
+        prevts = fTimestamp[fArray - 1];
+        nextts = fTimestamp[fArray - 1];
+        LOG(DEBUG) << "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArray - 1];
+        return fRunid[fArray - 1];
     }
 
     if (nextts > 0)
-        LOG(WARNING) << "R3BFileSource::ReadEvent() RunId was not found, it will be 1";
+        LOG(WARNING) << "R3BFileSource::GetRunid() RunId was not found, it will be 1";
+    prevts = -1;
     nextts = -1;
 
     return 1;
@@ -461,15 +504,16 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
      ** std::cout << fEvtHeader->GetTimeStamp() << std::endl;
      **/
 
-    if (nextts == 0 && fEvtHeader->GetTimeStamp() > nextts)
+    printf("Processed: %d of %d (%.2f of 100), current RunId %d \r",
+           i,
+           fNoOfEntries,
+           100. * i / (double)(fNoOfEntries),
+           fRunId);
+    fflush(stdout);
+
+    if (nextts >= 0 && prevts >= 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
     {
-        fRunId = getrunid(fEvtHeader->GetTimeStamp());
-        fEvtHeader->SetRunId(fRunId);
-    }
-    else if (nextts > 0 && fEvtHeader->GetTimeStamp() > nextts)
-    {
-        fRunId = getrunid(fEvtHeader->GetTimeStamp());
-        fEvtHeader->SetRunId(fRunId);
+        fRunId = GetRunid(fEvtHeader->GetTimeStamp());
     }
 
     fCurrentEntryNo = i;

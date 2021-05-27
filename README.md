@@ -10,6 +10,9 @@ For the software-related user support you can post a new topic on our [forum](ht
 git clone https://github.com/R3BRootGroup/R3BRoot.git
 cd R3BRoot
 git checkout dev
+git clone https://github.com/R3BRootGroup/macros.git
+cd macros
+git checkout dev
 ~~~
 
 # Install
