@@ -621,9 +621,11 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     }
 
                     auto topc_tot =
-                        fmod(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                        fmod(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns() + c_range_ns + c_range_ns / 2, c_range_ns) -
+                    c_range_ns / 2;
                     auto botc_tot =
-                        fmod(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                        fmod(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns() + c_range_ns + c_range_ns / 2, c_range_ns) -
+                    c_range_ns / 2;
 
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, botc_tot);
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, topc_tot);
@@ -656,10 +658,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 if (ipl > 0)
                 {
                     Double_t tof_plane =
-                        fmod(time_bar[ipl][ibr - 1] - time_bar[ipl - 1][ibr - 1] + c_range_ns, c_range_ns);
-
-                    if (tof_plane > 0)
-                        fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
+                        fmod(time_bar[ipl][ibr - 1] - time_bar[ipl - 1][ibr - 1] + c_range_ns + c_range_ns / 2, c_range_ns) -
+                    c_range_ns / 2;
+                    fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
                 }
             }
         }
