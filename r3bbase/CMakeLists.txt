@@ -51,6 +51,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
 )
 
@@ -77,6 +78,7 @@ R3BOnlineSpectraFiberTofds515.cxx
 R3BOnlineSpectraLosStandalone.cxx
 R3BOnlineSpectraSci2.cxx
 R3BOnlineSpectraLosVsSci2.cxx
+R3BWhiterabbitPropagator.cxx
 R3BFileSource.cxx
 )
 

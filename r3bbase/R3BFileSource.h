@@ -26,6 +26,7 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TFolder.h"
+#include "TMCtls.h"
 #include <fstream>
 #include <list>
 
@@ -45,6 +46,11 @@ class R3BFileSource : public FairSource
     R3BFileSource(const TString RootFileName, const char* Title = "InputRootFile", UInt_t identifier = 0);
 
     virtual ~R3BFileSource();
+
+    /**
+     * static instance
+     */
+    static R3BFileSource* Instance();
 
     Bool_t Init();
     Int_t ReadEvent(UInt_t i = 0);
@@ -124,6 +130,8 @@ class R3BFileSource : public FairSource
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
   private:
+    // static pointer to this class
+    static TMCThreadLocal R3BFileSource* fSourceInstance;
     /** Title of input source, could be input, background or signal*/
     TString fInputTitle;
     /**ROOT file*/
@@ -197,18 +205,17 @@ class R3BFileSource : public FairSource
      */
     Bool_t fCheckFileLayout; //!
 
-    /** getrunid method to obtain the runid as function of timestamps */
-    Int_t getrunid(uint64_t ts);
+    /** GetRunid method to obtain the runid as function of timestamps */
+    Int_t GetRunid(uint64_t ts);
 
     /** input file with runids */
     std::ifstream fInputFile;
     TString fInputFileName;
 
-    UInt_t fexpid;
-    Int_t array_size;
-    uint32_t frunid[99999999];
-    uint64_t ftimestamp[99999999];
-    int64_t nextts;
+    UInt_t fExpid;
+    std::vector<UInt_t> fRunid;
+    std::vector<uint64_t> fTimestamp;
+    uint64_t prevts, nextts;
 
     R3BFileSource(const R3BFileSource&);
     R3BFileSource operator=(const R3BFileSource&);
