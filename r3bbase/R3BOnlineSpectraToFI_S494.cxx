@@ -121,7 +121,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
     {
         TCanvas* ctofi_planes = new TCanvas("TOFI_planes", "TOFI planes", 10, 10, 1100, 1000);
 
-        ctofi_planes->Divide(3, 3);
+        ctofi_planes->Divide(4, 3);
 
         for (Int_t j = 0; j < N_PLANE_MAX_TOFI; j++)
         {
@@ -145,14 +145,13 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             sprintf(strName9, "tofi_multihit_plane_%d", j + 1);
             char strName10[255];
             sprintf(strName10, "Tofi multihit plane %d", j + 1);
-            fh_tofi_multihit[j] = new TH2F(strName9, strName10, 30, 0., 30., 10, 0, 10);
+            fh_tofi_multihit[j] = new TH2F(strName9, strName10, 60, -30., 30., 10, 0, 10);
             fh_tofi_multihit[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofi_multihit[j]->GetYaxis()->SetTitle("Multihit");
 
-            fh_tofi_TotPm_coinc[j] =
-                new TH2F("TOFI_ToT_with_coinc", "ToFI ToT with coinc", 60, -30, 30, 3000, 0., 300.);
+            fh_tofi_TotPm_coinc[j] = new TH2F("TOFI_ToT_with_coinc", "ToFI ToT with coinc", 30, 0, 30, 3000, 0., 300.);
             fh_tofi_TotPm_coinc[j]->GetXaxis()->SetTitle("Bar number");
-            fh_tofi_TotPm_coinc[j]->GetYaxis()->SetTitle("ToT / ns");
+            fh_tofi_TotPm_coinc[j]->GetYaxis()->SetTitle("sqrt(ToT1*ToT2) / ns");
 
             fh_tofi_multihit_coinc[j] =
                 new TH2F("ToFI_multihit_with_coinc", "ToFI multihit with coinc", 30, 0., 30., 10, 0, 10);
@@ -164,24 +163,45 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
         fh_tofi_dt->GetXaxis()->SetTitle("Bar number");
         fh_tofi_dt->GetYaxis()->SetTitle("dt / ns");
 
+        fh_num_bars = new TH1F("tofi_numBars", "Tofi num bars", 20, 0, 20);
+        fh_num_bars->GetXaxis()->SetTitle("Num of bars with hit");
+        fh_num_bars->GetYaxis()->SetTitle("Counts");
+
+        fh_test = new TH2F("tofi_ToT_numBars_eq_1", "Tofi ToT for numBars==1", 60, -30., 30., 3000, 0., 300.);
+        fh_test->GetXaxis()->SetTitle("Bar number");
+        fh_test->GetYaxis()->SetTitle("ToT  / ns");
+
+        fh_test1 = new TH2F("tofi_ToT_vs_dt", "Tofi ToT fvs dt", 400, -20., 20., 1500, 0., 300.);
+        fh_test1->GetXaxis()->SetTitle("tUp-tBottom / ns");
+        fh_test1->GetYaxis()->SetTitle("ToT  / ns");
+
         ctofi_planes->cd(1);
         fh_tofi_channels[0]->Draw();
-        ctofi_planes->cd(4);
+        ctofi_planes->cd(2);
+        gPad->SetLogy();
+        fh_num_bars->Draw();
+        ctofi_planes->cd(5);
         gPad->SetLogz();
         fh_tofi_TotPm[0]->Draw("colz");
-        ctofi_planes->cd(5);
+        ctofi_planes->cd(6);
         gPad->SetLogz();
         fh_tofi_multihit[0]->SetAxisRange(1, 10, "Y");
         fh_tofi_multihit[0]->Draw("colz");
         ctofi_planes->cd(7);
         gPad->SetLogz();
-        fh_tofi_TotPm_coinc[0]->Draw("colz");
-        ctofi_planes->cd(8);
-        gPad->SetLogz();
-        fh_tofi_multihit_coinc[0]->Draw("colz");
+        fh_test->Draw("colz");
         ctofi_planes->cd(9);
         gPad->SetLogz();
+        fh_tofi_TotPm_coinc[0]->Draw("colz");
+        ctofi_planes->cd(10);
+        gPad->SetLogz();
+        fh_tofi_multihit_coinc[0]->Draw("colz");
+        ctofi_planes->cd(11);
+        gPad->SetLogz();
         fh_tofi_dt->Draw("colz");
+        ctofi_planes->cd(12);
+        gPad->SetLogz();
+        fh_test1->Draw("colz");
 
         ctofi_planes->cd(0);
         run->AddObject(ctofi_planes);
@@ -205,6 +225,9 @@ void R3BOnlineSpectraToFI_S494::Reset_TOFI_Histo()
         fh_tofi_TotPm_coinc[i]->Reset();
     }
     fh_tofi_dt->Reset();
+    fh_num_bars->Reset();
+    fh_test->Reset();
+    fh_test1->Reset();
 }
 
 namespace
@@ -302,14 +325,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
             if (iSide == 2)
                 nsum_top += 1;
 
-            if (iPlaneMem != iPlane)
-                iBarMem = 0;
-            if (iPlane == 1 && iBarMem != iBar && iSide == 1 && iEdge == 1)
+            if (iBarMem != iBar && iSide == 1 && iEdge == 1)
                 NumPaddles += 1;
-            //  cout<<imapped<<", "<<iPlane<<"; "<<iPlaneMem<<"; "<<iBar<<"; "<<iBarMem<<",
-            //  "<<NumPaddles[iPlane-1]<<endl;
 
-            iPlaneMem = iPlane;
             iBarMem = iBar;
             if (iPlane <= fNofPlanes)
             {
@@ -319,9 +337,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                     fh_tofi_channels[iPlane - 1]->Fill(iBar);
             }
         }
-        //     if(nsum_lead != nsum_trail) cout<<"Online: TOFI mapped -- nsum_lead != nsum_trail: "<<nsum_lead <<", "<<
-        //     nsum_trail<<endl; if(nsum_top != nsum_bot) cout<<"Online: TOFI mapped -- nsum_top != nsum_bot:
-        //     "<<nsum_top <<", "<< nsum_bot<<endl;
+        fh_num_bars->Fill(NumPaddles);
     }
 
     if (fCalItems.at(DET_TOFI)) // without coincidances top/bottom
@@ -331,6 +347,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         UInt_t vmultihits_top[N_PLANE_MAX_TOFI][N_PADDLE_MAX_TOFI];
         UInt_t vmultihits_bot[N_PLANE_MAX_TOFI][N_PADDLE_MAX_TOFI];
         Double_t time_bar[N_PLANE_MAX_TOFI][N_PADDLE_MAX_TOFI];
+        Double_t tot_bar[N_PLANE_MAX_TOFI][N_PADDLE_MAX_TOFI];
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < N_PADDLE_MAX_TOFI; j++)
@@ -339,6 +356,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 vmultihits_top[i][j] = 0;
                 vmultihits_bot[i][j] = 0;
                 time_bar[i][j] = 0;
+                tot_bar[i][j] = 0;
             }
         }
 
@@ -407,6 +425,8 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
                 fh_tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
+                if (NumPaddles == 1)
+                    fh_test->Fill(-iBar - 1, top_tot);
                 // register multi hits
                 vmultihits_top[iPlane - 1][iBar - 1] += 1;
 
@@ -443,8 +463,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
                 fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
+                if (NumPaddles == 1)
+                    fh_test->Fill(iBar, bot_tot);
                 // register multi hits
-
                 vmultihits_bot[iPlane - 1][iBar - 1] += 1;
 
                 ++bot_i;
@@ -517,9 +538,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                     // glue zero and the largest values together.
                     dt_mod -= c_range_ns;
                 }
+                fh_tofi_dt->Fill(topc->GetBarId(), dt_mod);
 
                 //       cout<<"dt_mod: "<<dt_mod <<endl;
-                fh_tofi_dt->Fill(topc->GetBarId(), dt_mod);
 
                 // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
                 // std::abs(dt_mod) << '\n';
@@ -546,9 +567,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                         fmod(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                     auto botc_tot =
                         fmod(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-
-                    fh_tofi_TotPm_coinc[iPlane - 1]->Fill(iBar, botc_tot);
-                    fh_tofi_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, topc_tot);
+                    tot_bar[iPlane - 1][iBar - 1] = sqrt(topc_tot * botc_tot);
+                    fh_tofi_TotPm_coinc[iPlane - 1]->Fill(iBar, tot_bar[iPlane - 1][iBar - 1]);
+                    fh_test1->Fill(dt_mod, tot_bar[iPlane - 1][iBar - 1]);
 
                     // register multi hits
                     vmultihits[iPlane - 1][iBar - 1] += 1;
@@ -567,6 +588,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 }
             }
         }
+
         for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFI; ipl++)
         {
             for (Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFI; ibr++)
@@ -611,6 +633,9 @@ void R3BOnlineSpectraToFI_S494::FinishTask()
             fh_tofi_multihit_coinc[i]->Write();
         }
         fh_tofi_dt->Write();
+        fh_num_bars->Write();
+        fh_test->Write();
+        fh_test1->Write();
     }
 }
 

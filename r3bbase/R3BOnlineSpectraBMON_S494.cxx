@@ -191,12 +191,6 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         TCanvas* cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 900);
         Int_t Nbin_bmon = reset_time / read_time;
 
-        fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
-        fhTpat->GetXaxis()->SetTitle("Tpat value");
-
-        fhTrigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
-        fhTrigger->GetXaxis()->SetTitle("Trigger value");
-
         fh_spill_length = new TH1F("spill_length", "Spill ", Nbin_bmon, 0, reset_time);
         fh_spill_length->GetXaxis()->SetTitle("time / sec");
 
@@ -227,12 +221,11 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cbmon->Divide(3, 3);
         cbmon->cd(1);
         gPad->SetLogy();
-        fhTrigger->Draw();
+
         cbmon->cd(2);
-        gPad->SetLogy();
-        fhTpat->Draw();
-        cbmon->cd(3);
         fh_spill_length->Draw();
+        cbmon->cd(3);
+
         cbmon->cd(4);
         fh_IC->Draw("hist");
         cbmon->cd(5);
@@ -242,6 +235,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cbmon->cd(7);
         fh_IC_spill->Draw("hist");
         cbmon->cd(8);
+        fh_SEE_spill->SetAxisRange(1, 1e4, "Y");
         fh_SEE_spill->Draw("hist");
         cbmon->cd(9);
         fh_TOFDOR_spill->Draw("hist");
@@ -259,12 +253,13 @@ void R3BOnlineSpectraBMON_S494::Reset_ROLU_Histo()
 {
     fh_rolu_channels->Reset();
     fh_rolu_tot->Reset();
+    fhTrigger->Reset();
+    fhTpat->Reset();
 }
 
 void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
 {
-    fhTrigger->Reset();
-    fhTpat->Reset();
+
     fh_spill_length->Reset();
     fh_IC->Reset();
     fh_IC_spill->Reset();
@@ -287,17 +282,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     }
 
     time = header->GetTimeStamp();
-
-    if (time_start == 0 && time > 0)
-    {
-        time_start = time;
-        fNEvents_start = fNEvents;
-    }
-
-    time = header->GetTimeStamp();
     // time = 0;
 
-    if (time_start == 0 && time > 0)
+    if (time_start == -1 && time > 0)
     {
         time_start = time;
         fNEvents_start = fNEvents;
@@ -309,14 +296,11 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
 
     if (header->GetTrigger() == 12)
-        cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec" << endl;
+        cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec " << endl;
     if (header->GetTrigger() == 13)
-        cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec" << endl;
+        cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec " << endl;
 
     fhTrigger->Fill(header->GetTrigger());
-
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
 
     Int_t tpatbin;
     for (int i = 0; i < 16; i++)
@@ -325,6 +309,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         if (tpatbin != 0)
             fhTpat->Fill(i + 1);
     }
+
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
     Int_t fTpat_bit = fTpat - 1;
@@ -338,7 +325,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             return;
     }
 
-    if (fMappedItems.at(DET_BMON))
+    if (fMappedItems.at(DET_BMON) && fMappedItems.at(DET_BMON)->GetEntriesFast() > 0)
     {
 
         Bool_t spectra_clear = false;
@@ -415,6 +402,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
                     // TOFDOR:
                     Int_t yTOFDOR = TOFDOR - tofdor_start;
+
+                    //     cout<<"TOFDOR: "<<TOFDOR <<"; "<< tofdor_start<<endl;
                     fh_TOFDOR->Fill(tdiff, yTOFDOR);
                     fh_TOFDOR_spill->Fill(tdiff, (TOFDOR - tofdor_mem) * fNorm);
                     tofdor_mem = TOFDOR;

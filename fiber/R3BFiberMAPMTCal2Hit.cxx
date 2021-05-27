@@ -275,9 +275,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
     double trig_time[8];
     //------ Collecting cal trigger hits --------
-    size_t cal_num = fCalTriggerItems->GetEntriesFast();
+    size_t cal_num_trig = fCalTriggerItems->GetEntriesFast();
     Double_t tl, tt; // lead and trile times of the trigger
-    for (UInt_t j = 0; j < cal_num; ++j)
+    for (UInt_t j = 0; j < cal_num_trig; ++j)
     {
         auto cur_cal = (R3BFiberMAPMTCalData*)fCalTriggerItems->At(j);
         auto ch = cur_cal->GetChannel() - 1;
@@ -285,7 +285,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
         trig_time[ch] = tl;
     }
 
-    cal_num = fCalItems->GetEntriesFast();
+    size_t cal_num = fCalItems->GetEntriesFast();
+
+    //   if(cal_num>0 ) cout<<"calNum: "<<fName<<", "<<cal_num<<", "<<endl;
+
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal_lead = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
@@ -323,33 +326,27 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             Double_t lead_raw = 0;
             Double_t trail_raw = 0;
             Double_t trail_trig_ns = 0;
+            Double_t lead_ns = 0. / 0., tot_ns = 0. / 0.;
+
             auto chlead_i = lead->GetChannel() - 1;
             cur_cal_trig_ns = trig_time[fTriggerMap[side_i][ch_i]];
             lead_trig_ns = trig_time[fTriggerMap[side_i][chlead_i]];
 
             auto cur_cal_ns =
                 fmod(cur_cal_trail->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
+            lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
+            tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
 
-            auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
-            auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
-
+            if (tot_ns < 0)
+                tot_ns = tot_ns * (-1.);
             lead_raw = lead->GetTime_ns();
             trail_raw = cur_cal_trail->GetTime_ns();
             trail_trig_ns = cur_cal_trig_ns;
-
-            //         cout<<"lead_time: "<<side_i<<", "<<ch_i<<", "<<lead_ns<<"; "<<lead->GetTime_ns()<<",
-            //         "<<lead_trig_ns<<", "<<fTriggerMap[side_i][ch_i]<<endl; cout<<"tot      : "<<side_i<<",
-            //         "<<ch_i<<", "<<tot_ns<<", "<<cur_cal_ns<<", "<<lead_ns<<endl;
 
             if (tot_ns < fGate_ns && tot_ns > 0.)
             {
                 channel.tot_list.push_back(ToT(lead, cur_cal_trail, lead_ns, cur_cal_ns, tot_ns));
                 channel.lead_list.pop_front();
-
-                if (lead->GetSide() == 0)
-                    fh_ToT_MA_Fib_raw->Fill(lead->GetChannel(), tot_ns);
-                if (lead->GetSide() == 1)
-                    fh_ToT_SA_Fib_raw->Fill(lead->GetChannel(), tot_ns);
             }
         }
     }
@@ -357,143 +354,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
     auto const& down_array = fChannelArray[0];
     auto const& up_array = fChannelArray[1];
 
-    /*
-        // Treating the hole in Fi23a/b  => to be done
-        if (fName == "Fi23a" || fName == "Fi23b")
-        {
-            for (auto it_down = down_array.begin(); down_array.end() != it_down; ++it_down) // over down channel
-       0...nmax-1;
-            {
-                auto const& down = *it_down;
-                for (auto it_down_tot = down.tot_list.begin(); down.tot_list.end() != it_down_tot;
-                     ++it_down_tot) // over ihit(channel)
-                {
-                    auto const& down_tot = *it_down_tot;
-                    auto fiber_down_ch = down_tot.lead->GetChannel();
-                    if (fiber_down_ch > 187 && fiber_down_ch < 198)
-                    {
-                        // Calibrate hit fiber.
-                        Double_t tot_down_raw = down_tot.tot_ns;
-                        auto tot_down = down_tot.tot_ns;
-                        auto tof = down_tot.lead_ns;
-                        fh_Fib_ToF->Fill(fiber_down_ch, tof);
-                        gainUp = 10.;
-                        tsync = 0.;
-                        if (!fIsCalibrator && fHitPar)
-                        {
-                            R3BFiberMAPMTHitModulePar* par = fHitPar->GetModuleParAt(fiber_down_ch);
-                            if (par)
-                            {
-                                gainDown = par->GetGainDown();
-                           //     if(gainDown == 0) gainDown = 10.;
-                                tsync = par->GetSync();
-                            }
-                        }
-
-                        tot_down *= 10. / gainDown;
-                        tof -=  tsync;
-
-                        fh_ToT_MA_Fib->Fill(fiber_down_ch, tot_down);
-                        Float_t fiber_thickness = 0.028000;
-                        Int_t fiber_nbr = 384;
-                        Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
-                        Double_t x = -10000.;
-                        Double_t y = -10000.;
-                        Double_t randx = (std::rand() / (float)RAND_MAX);
-                        if (fDirection == VERTICAL)
-                        {
-                            x = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_down_ch - 1) + (double(fiber_down_ch - 1) * air_layer)) * fiber_thickness;
-                            if (!fIsCalibrator)
-                            {
-                                new ((*fHitItems)[fNofHitItems++]) R3BFiberMAPMTHitData(
-                                    0, x, y, tot_down, tof, fiber_down_ch, 0, 0, tot_down, 0);
-                            }
-                        }
-                        else
-                        {
-                            y = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_down_ch - 1) + (double(fiber_down_ch - 1) * air_layer)) * fiber_thickness;
-                            if (!fIsCalibrator)
-                            {
-                                new ((*fHitItems)[fNofHitItems++]) R3BFiberMAPMTHitData(
-                                    0, x, y, tot_down, tof, fiber_down_ch, 0, 0, tot_down, 0);
-                            }
-                        }
-                    }
-                }
-            }
-            for (auto it_up = up_array.begin(); up_array.end() != it_up; ++it_up) // over up channel 0...nmax-1;
-            {
-                auto const& up = *it_up;
-                for (auto it_up_tot = up.tot_list.begin(); up.tot_list.end() != it_up_tot;
-                     ++it_up_tot) // over ihit(channel)
-                {
-                    auto const& up_tot = *it_up_tot;
-                    auto fiber_up_ch = up_tot.lead->GetChannel();
-                    if (fiber_up_ch > 187 && fiber_up_ch < 198)
-                    {
-                        // Calibrate hit fiber.
-                        Double_t tot_up_raw = up_tot.tot_ns;
-                        auto tot_up = up_tot.tot_ns;
-                        auto tof = up_tot.lead_ns;
-                        fh_Fib_ToF->Fill(fiber_up_ch, tof);
-                        gainUp = 10.;
-                        tsync = 0.;
-                        if (!fIsCalibrator&& fHitPar)
-                        {
-                            R3BFiberMAPMTHitModulePar* par = fHitPar->GetModuleParAt(fiber_up_ch);
-                            if (par)
-                            {
-                                gainUp = par->GetGainUp();
-                           //     if(gainUp == 0) gainUp = 10;
-                                tsync = par->GetSync();
-                            }
-                        }
-
-                        tot_up *= 10. / gainUp;
-                        tof -= tsync;
-
-                        fh_ToT_SA_Fib->Fill(fiber_up_ch, tot_up);
-
-
-                        Float_t fiber_thickness = 0.028000;
-                        Int_t fiber_nbr = 384;
-                        Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
-                        Double_t x = -10000.;
-                        Double_t y = -10000.;
-                        Double_t randx = (std::rand() / (float)RAND_MAX);
-                        if (fDirection == VERTICAL)
-                        {
-                            x = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_up_ch - 1) + (double(fiber_up_ch - 1.) * air_layer)) * fiber_thickness;
-                            if (!fIsCalibrator)
-                            {
-                                new ((*fHitItems)[fNofHitItems++])
-                                    R3BFiberMAPMTHitData(0, x, y, tot_up, tof, fiber_up_ch, 0, 0, 0, tot_up);
-
-                            }
-                        }
-                        else
-                        {
-                            y = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_up_ch - 1) + (double(fiber_up_ch - 1) * air_layer)) * fiber_thickness;
-                            if (!fIsCalibrator)
-                            {
-                                new ((*fHitItems)[fNofHitItems++])
-                                    R3BFiberMAPMTHitData(0, x, y, tot_up, tof, fiber_up_ch, 0, 0, 0, tot_up);
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    */
     for (auto it_down = down_array.begin(); down_array.end() != it_down; ++it_down) // over down channel 0...nmax-1;
     {
         auto const& down = *it_down;
@@ -503,9 +363,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             auto const& down_tot = *it_down_tot;
             auto down_sub_id = (down_tot.lead->GetChannel() - 1) / fNumFibers;
             auto fiber_down_ch = down_tot.lead->GetChannel();
-
-            // if ((fName == "Fi23a" || fName == "Fi23b") && (fiber_down_ch > 187 && fiber_down_ch < 198))
-            //   continue; // dealing with a hole in the middle will be done below
 
             for (auto it_up = up_array.begin(); up_array.end() != it_up; ++it_up) // over up channel 0...nmax-1;
             {
@@ -523,7 +380,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         continue;
                     }
 
-                    auto fiber_up_ch = up_tot.lead->GetChannel();
+                    auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
+
                     Int_t fiber_id = -1000;
                     if (fiber_down_ch == fiber_up_ch)
                         fiber_id = fiber_down_ch;
@@ -540,6 +398,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     fh_time_MA_Fib->Fill(fiber_down_ch, t_down);
                     fh_time_SA_Fib->Fill(fiber_up_ch, t_up);
+
+                    fh_ToT_MA_Fib_raw->Fill(fiber_id, tot_down);
+                    fh_ToT_SA_Fib_raw->Fill(fiber_id, tot_up);
 
                     gainUp = 10.;
                     gainDown = 10.;
@@ -562,6 +423,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     tot_down *= 10. / gainDown;
                     tot_up *= 10. / gainUp;
+
                     Double_t tof = (t_down + t_up) / 2.;
                     tof -= tsync;
                     t_down += offsetDown;
@@ -585,21 +447,23 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         Float_t fiber_thickness = 0.028000;
                         Int_t fiber_nbr = 384;
                         Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
+                        Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
                         if (fDirection == VERTICAL)
                         {
 
-                            x = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
+                            x = -detector_width / 2. +
+                                (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer) + (0.5 - randx)) *
+                                    fiber_thickness;
                             y = (t_up - t_down) * veff;
                         }
                         else
                         {
                             x = (t_up - t_down) * veff;
 
-                            y = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            y = -detector_width / 2. +
+                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer) + (0.5 - randx)) *
+                                    fiber_thickness;
                         }
                     }
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
@@ -607,7 +471,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         Float_t fiber_thickness = 0.10000; // cm
                         Int_t fiber_nbr = 512;
                         Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
+                        Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 
                         if (fDirection == VERTICAL)
@@ -643,11 +507,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     if (!fIsCalibrator)
                     {
                         new ((*fHitItems)[fNofHitItems++])
-                            //  R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down_raw,
-                            //  tot_up_raw);
                             R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
-
-                        // cout << fName << " x: " << x << " y: " << y << endl;
                     }
                 }
             }

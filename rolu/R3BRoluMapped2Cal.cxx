@@ -37,7 +37,7 @@
 
 #include <iostream>
 
-#define Rolu_COINC_WINDOW_T_NS 100
+#define Rolu_COINC_WINDOW_T_NS 200
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BRoluMapped2Cal::R3BRoluMapped2Cal()

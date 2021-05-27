@@ -128,7 +128,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     //   TClonesArray *fbmonMappedItems;
 
-   unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
+   unsigned long long  time_start = -1, time = 0, time_mem = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
     unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;

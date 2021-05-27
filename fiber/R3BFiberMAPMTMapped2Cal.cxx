@@ -34,6 +34,8 @@ R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_ver
     , fCalItems(new TClonesArray("R3BFiberMAPMTCalData"))
     , fCalTriggerItems(new TClonesArray("R3BFiberMAPMTCalData"))
     , fClockFreq(1000. / 150)
+    , fNoCalItems(0)
+    , fNoCalTrigItems(0)
     , fnEvents(0)
 {
 }
@@ -101,6 +103,9 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
     LOG(DEBUG) << "R3BFiberMAPMTMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+
+    // if(mapped_num > 0) cout<<"Mapped Items: "<<fName<<", "<<mapped_num-8<<endl;
+
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BFiberMAPMTMappedData*)fMappedItems->At(i);
@@ -152,57 +157,86 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         //		(mapped->IsLeading() ? -fine_ns : fine_ns);
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
+        /*
+                if(fName == "Fi23a" && mapped->GetSide() == 0)
+                {
+                    if(time_ns > tmaxfib23a[channel-1]) tmaxfib23a[channel-1] = time_ns;
+                    if(time_ns < tminfib23a[channel-1]) tminfib23a[channel-1] = time_ns;
+                }
 
+        */
         LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" << time_ns
                    << "ns.";
+
+        //       cout<<"Input M2C: "<<fName<<", "<<  i<<", "<<fCalItems->GetEntriesFast()<<", "<<channel<<",
+        //       "<<mapped->IsTrigger()<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<endl;
+
         if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
         {
             if (2 == mapped->GetSide())
             {
-                new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                     R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
             }
             else
             {
-                new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                     R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
             }
         }
         else // FIb23a/23b
         {
             Int_t iFib = 0;
-            if (mapped->GetSide() != 0)
+            if (mapped->GetSide() != 0) // up channels
             {
-                if (channel < 65) // up channels
+                if (channel < 65)
                 {
                     iFib = channel * 2;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                 }
+
                 else if (channel > 64 && channel < 193)
                 {
                     iFib = 64 + channel;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+
+                        if (channel > 123 && channel < 134)
+                        {
+                            //	 cout<<"Mapped2Cal orig : "<<fName<<", "<<", "<<iFib<<"; "<<mapped->GetSide()<<",
+                            //"<<mapped->IsLeading()<<"; "<<time_ns<<endl;
+
+                            auto time_ghost = time_ns;
+                            auto side_ghost = 1 - mapped->GetSide();
+                            new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                                R3BFiberMAPMTCalData(side_ghost,
+                                                     iFib,
+                                                     mapped->IsLeading(),
+                                                     time_ghost); // add ghost fiber to treat the hole
+
+                            //   cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
+                            //   "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
+                        }
                     }
                 }
                 else if (channel > 192 && channel < 257)
@@ -210,16 +244,16 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     iFib = 258 + (channel - 193) * 2;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                 }
@@ -231,16 +265,16 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     iFib = channel + int((channel - 1) / 4) * 4;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
                     }
                 }
@@ -249,13 +283,30 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     iFib = 64 + channel;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+
+                        if (channel > 123 && channel < 134)
+                        {
+                            //		cout<<"Mapped2Cal orig : "<<fName<<", "<<", "<<iFib<<"; "<<mapped->GetSide()<<",
+                            //"<<mapped->IsLeading()<<"; "<<time_ns<<endl;
+
+                            auto time_ghost = time_ns;
+                            auto side_ghost = 1 - mapped->GetSide();
+                            new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                                R3BFiberMAPMTCalData(side_ghost,
+                                                     iFib,
+                                                     mapped->IsLeading(),
+                                                     time_ghost); // add ghost fiber to treat the hole
+
+                            //      cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
+                            //      "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
+                        }
                     }
                 }
                 else if (channel > 192 && channel < 257)
@@ -263,16 +314,16 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     iFib = 64 + channel + int((channel - 193) / 4) * 4;
                     if (2 == mapped->GetSide())
                     {
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
-                        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                        new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
                     }
                     else
                     {
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
-                        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                             R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
                     }
                 }
@@ -281,26 +332,30 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             //	cout<<"CAL "<<fName<<"; "<<channel<<", "<<iFib<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<",
             //"<<time_ns<<endl;
         } // end fibdet selection
-          /*
-                          if (mapped->IsTrigger())
-                          {
-                              new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
-                                  R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
-                          }
-                          else
-                          {
-                              new ((*fCalItems)[fCalItems->GetEntriesFast()])
-                                  R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
-                          }
-          */
+
+        /*
+                        if (mapped->IsTrigger())
+                        {
+                            new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                                R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+                        }
+                        else
+                        {
+                            new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                                R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+                        }
+        */
     }
     fnEvents++;
+    //  if (fNoCalItems > 0) cout<<"cal_num in M2C !: "<<fName<<", "<<fNoCalItems<<", "<<endl;
 }
 
 void R3BFiberMAPMTMapped2Cal::FinishEvent()
 {
     fCalItems->Clear();
     fCalTriggerItems->Clear();
+    fNoCalItems = 0;
+    fNoCalTrigItems = 0;
 }
 
 void R3BFiberMAPMTMapped2Cal::FinishTask() {}

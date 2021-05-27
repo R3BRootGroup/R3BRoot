@@ -145,7 +145,7 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
 
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
-
+    TH1F* fh_num_bars;
     TH1F* fh_tofi_channels[N_PLANE_MAX_TOFI];
     TH2F* fh_tofi_multihit[N_PLANE_MAX_TOFI];
     TH2F* fh_tofi_TotPm[N_PLANE_MAX_TOFI];
@@ -153,7 +153,8 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
     TH1F* fh_TimePreviousEvent;
     TH2F* fh_tofi_multihit_coinc[N_PLANE_MAX_TOFI];
     TH2F* fh_tofi_TotPm_coinc[N_PLANE_MAX_TOFI];
-
+    TH2F* fh_test;
+    TH2F* fh_test1;
   public:
     ClassDef(R3BOnlineSpectraToFI_S494, 2)
 };

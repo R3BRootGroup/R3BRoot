@@ -152,7 +152,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             sprintf(strName7, "tofd_multihit_plane_%d", j + 1);
             char strName8[255];
             sprintf(strName8, "Tofd multihit plane %d", j + 1);
-            fh_tofd_multihit[j] = new TH2F(strName7, strName8, 45, 0., 45., 10, 0, 10);
+            fh_tofd_multihit[j] = new TH2F(strName7, strName8, 90, -45., 45., 10, 0, 10);
             fh_tofd_multihit[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_multihit[j]->GetYaxis()->SetTitle("Multihit");
 
