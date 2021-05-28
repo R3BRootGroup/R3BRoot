@@ -251,16 +251,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
     } // end for(ifibcount)
 
-    fh_counter_fi30 = new TH2F("Counts_Fi30_vs_ToFD", "Fib30 efficiency", 1000, 0, Nmax, 200, 65., 105.);
+    fh_counter_fi30 = new TH2F("Counts_Fi30_vs_ToFD", "Fib30 efficiency", 1000, 0, Nmax, 210, 0., 105.);
     fh_counter_fi30->GetXaxis()->SetTitle("Event number");
     fh_counter_fi30->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi31 = new TH2F("Counts_Fi31_vs_ToFD", "Fib31 efficiency", 1000, 0, Nmax, 200, 65., 105.);
+    fh_counter_fi31 = new TH2F("Counts_Fi31_vs_ToFD", "Fib31 efficiency", 1000, 0, Nmax, 210, 0., 105.);
     fh_counter_fi31->GetXaxis()->SetTitle("Event number");
     fh_counter_fi31->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi32 = new TH2F("Counts_Fi32_vs_ToFD", "Fib32 efficiency", 1000, 0, Nmax, 200, 65., 105.);
+    fh_counter_fi32 = new TH2F("Counts_Fi32_vs_ToFD", "Fib32 efficiency", 1000, 0, Nmax, 210, 0., 105.);
     fh_counter_fi32->GetXaxis()->SetTitle("Event number");
     fh_counter_fi32->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi33 = new TH2F("Counts_Fi33_vs_ToFD", "Fib33 efficiency", 1000, 0, Nmax, 200, 65., 105.);
+    fh_counter_fi33 = new TH2F("Counts_Fi33_vs_ToFD", "Fib33 efficiency", 1000, 0, Nmax, 210, 0., 105.);
     fh_counter_fi33->GetXaxis()->SetTitle("Event number");
     fh_counter_fi33->GetYaxis()->SetTitle("Efficiency / % ");
 
