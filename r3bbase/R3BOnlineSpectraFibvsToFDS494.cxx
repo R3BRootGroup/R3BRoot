@@ -48,6 +48,7 @@
 #include <array>
 #include <cstdlib>
 #include <ctime>
+#include <deque>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -230,14 +231,8 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         fh_ToF_vs_Events[ifibcount]->GetXaxis()->SetTitle("event number");
 
         // xfib vs. TofD position:
-        fh_Fibs_vs_Tofd[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX", detName),
-                                              Form("%s Fiber # vs. Tofd x-pos", detName),
-                                              400,
-                                              -60,
-                                              60,
-                                              600,
-                                              -30.,
-                                              30.);
+        fh_Fibs_vs_Tofd[ifibcount] = new TH2F(
+            Form("%s_fib_vs_TofdX", detName), Form("%s Fiber # vs. Tofd x-pos", detName), 400, -60, 60, 600, -30., 30.);
         fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
         fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
@@ -256,44 +251,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
     } // end for(ifibcount)
 
-    fh_counter_fi30 = new TH2F("Counts_Fi30_vs_ToFD",
-                               "Fib30 efficiency",
-                               10000,
-                               0,
-                               100000, // Nmax,
-                               2000,
-                               70.,
-                               110.);
+    fh_counter_fi30 = new TH2F("Counts_Fi30_vs_ToFD", "Fib30 efficiency", 1000, 0, Nmax, 200, 65., 105.);
     fh_counter_fi30->GetXaxis()->SetTitle("Event number");
     fh_counter_fi30->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi31 = new TH2F("Counts_Fi31_vs_ToFD",
-                               "Fib31 efficiency",
-                               10000,
-                               0,
-                               100000, // Nmax,
-                               2000,
-                               70.,
-                               110.);
+    fh_counter_fi31 = new TH2F("Counts_Fi31_vs_ToFD", "Fib31 efficiency", 1000, 0, Nmax, 200, 65., 105.);
     fh_counter_fi31->GetXaxis()->SetTitle("Event number");
     fh_counter_fi31->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi32 = new TH2F("Counts_Fi32_vs_ToFD",
-                               "Fib32 efficiency",
-                               10000,
-                               0,
-                               100000, // Nmax,
-                               2000,
-                               70.,
-                               110.);
+    fh_counter_fi32 = new TH2F("Counts_Fi32_vs_ToFD", "Fib32 efficiency", 1000, 0, Nmax, 200, 65., 105.);
     fh_counter_fi32->GetXaxis()->SetTitle("Event number");
     fh_counter_fi32->GetYaxis()->SetTitle("Efficiency / % ");
-    fh_counter_fi33 = new TH2F("Counts_Fi33_vs_ToFD",
-                               "Fib33 efficiency",
-                               10000,
-                               0,
-                               100000, // Nmax,
-                               2000,
-                               70.,
-                               110.);
+    fh_counter_fi33 = new TH2F("Counts_Fi33_vs_ToFD", "Fib33 efficiency", 1000, 0, Nmax, 200, 65., 105.);
     fh_counter_fi33->GetXaxis()->SetTitle("Event number");
     fh_counter_fi33->GetYaxis()->SetTitle("Efficiency / % ");
 
@@ -426,12 +393,6 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_Fib()
 void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 {
 
-    fNEvents += 1;
-
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::flush;
-
     Bool_t debug2 = false;
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -441,6 +402,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     if (header)
     {
         time = header->GetTimeStamp();
+        if (time == 0)
+            return;
+
         //		if (time > 0) cout << "header time: " << time << endl;
         if (time_start == 0 && time > 0)
         {
@@ -471,6 +435,27 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             }
         }
     }
+
+    fNEvents += 1;
+
+    if (fNEvents / 10000. == (int)fNEvents / 10000)
+        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+                  << " %) " << std::flush;
+
+    std::size_t window_mv = 10000;
+    std::deque<int> windowToFDl;
+    std::deque<int> windowToFDr;
+    std::deque<int> windowFi30;
+    std::deque<int> windowFi31;
+    std::deque<int> windowFi32;
+    std::deque<int> windowFi33;
+
+    summ_tofdr = 0;
+    summ_tofdl = 0;
+    events30 = 0;
+    events31 = 0;
+    events32 = 0;
+    events33 = 0;
 
     Double_t x1[n_det];
     Double_t y1[n_det];
@@ -992,38 +977,110 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         }
 
     } // end ToFD loop
-      /*
-         Double_t sum1l=0.,  sum1r=0., sum30=0.,sum31=0.,sum32=0.,sum33=0.;
-         for(Int_t i = 0; i < 60; i++)
-         {
-             if(i>30) {
-                 sum1l = sum1l + ncounts_tofd[i];
-                 sum30 = sum30 + ncounts_fi30[i];
-                 sum32 = sum32 + ncounts_fi32[i];
-             }
-  
-             if(i<30) {
-                 sum1r = sum1r + ncounts_tofd[i];
-                 sum31 = sum31 + ncounts_fi31[i];
-                 sum33 = sum33 + ncounts_fi33[i];
-             }
-  
-          }
-         for(Int_t i = 0; i < 60; i++)
-         {
-             if(ncounts_tofd[i] > 0)
-             {
-                  fh_counter_fi30->Fill(double(-60+2*i),ncounts_fi30[i]/ncounts_tofd[i]/(sum30/sum1l));
-                  fh_counter_fi31->Fill(double(-60+2*i),ncounts_fi31[i]/ncounts_tofd[i]/(sum31/sum1r));
-                  fh_counter_fi32->Fill(double(-60+2*i),ncounts_fi32[i]/ncounts_tofd[i]/(sum32/sum1l));
-                  fh_counter_fi33->Fill(double(-60+2*i),ncounts_fi33[i]/ncounts_tofd[i]/(sum33/sum1r));
-              }
-          }
-      */
-    fh_counter_fi30->Fill(fNEvents, events30 / summ_tofdl * 100.);
-    fh_counter_fi31->Fill(fNEvents, events31 / summ_tofdr * 100.);
-    fh_counter_fi32->Fill(fNEvents, events32 / summ_tofdl * 100.);
-    fh_counter_fi33->Fill(fNEvents, events33 / summ_tofdr * 100.);
+
+    Double_t effFi30 = 0, effFi31 = 0, effFi32 = 0, effFi33 = 0;
+
+    while (windowToFDl.size() < window_mv)
+        windowToFDl.push_back(summ_tofdl);
+    while (windowToFDr.size() < window_mv)
+        windowToFDr.push_back(summ_tofdr);
+    while (windowFi30.size() < window_mv)
+        windowFi30.push_back(events30);
+    while (windowFi31.size() < window_mv)
+        windowFi31.push_back(events31);
+    while (windowFi32.size() < window_mv)
+        windowFi32.push_back(events32);
+    while (windowFi33.size() < window_mv)
+        windowFi33.push_back(events33);
+
+    if (fNEvents < window_mv)
+    {
+        totalToFDl += summ_tofdl;
+
+        totalToFDr += summ_tofdr;
+        totalFi30 += events30;
+        totalFi31 += events31;
+        totalFi32 += events32;
+        totalFi33 += events33;
+    }
+    else
+    {
+        totalToFDl -= windowToFDl.front();
+        totalToFDl += summ_tofdl;
+        windowToFDl.pop_front();
+        windowToFDl.push_back(summ_tofdl);
+
+        totalToFDr -= windowToFDr.front();
+        totalToFDr += summ_tofdr;
+        windowToFDr.pop_front();
+        windowToFDr.push_back(summ_tofdr);
+
+        totalFi30 -= windowFi30.front();
+        totalFi30 += events30;
+        windowFi30.pop_front();
+        windowFi30.push_back(events30);
+
+        totalFi31 -= windowFi31.front();
+        totalFi31 += events31;
+        windowFi31.pop_front();
+        windowFi31.push_back(events31);
+
+        totalFi32 -= windowFi32.front();
+        totalFi32 += events32;
+        windowFi32.pop_front();
+        windowFi32.push_back(events32);
+
+        totalFi33 -= windowFi33.front();
+        totalFi33 += events33;
+        windowFi33.pop_front();
+        windowFi33.push_back(events33);
+    }
+
+    effFi30 = double(totalFi30) / double(totalToFDl);
+    effFi31 = double(totalFi31) / double(totalToFDr);
+    effFi32 = double(totalFi32) / double(totalToFDl);
+    effFi33 = double(totalFi33) / double(totalToFDr);
+
+    fh_counter_fi30->Fill(fNEvents, effFi30 * 100.);
+    fh_counter_fi31->Fill(fNEvents, effFi31 * 100.);
+    fh_counter_fi32->Fill(fNEvents, effFi32 * 100.);
+    fh_counter_fi33->Fill(fNEvents, effFi33 * 100.);
+
+    Nsumm_tofdr += summ_tofdr;
+    Nsumm_tofdl += summ_tofdl;
+    Nevents30 += events30;
+    Nevents31 += events31;
+    Nevents32 += events32;
+    Nevents33 += events33;
+
+    /*
+       Double_t sum1l=0.,  sum1r=0., sum30=0.,sum31=0.,sum32=0.,sum33=0.;
+       for(Int_t i = 0; i < 60; i++)
+       {
+           if(i>30) {
+               sum1l = sum1l + ncounts_tofd[i];
+               sum30 = sum30 + ncounts_fi30[i];
+               sum32 = sum32 + ncounts_fi32[i];
+           }
+
+           if(i<30) {
+               sum1r = sum1r + ncounts_tofd[i];
+               sum31 = sum31 + ncounts_fi31[i];
+               sum33 = sum33 + ncounts_fi33[i];
+           }
+
+        }
+       for(Int_t i = 0; i < 60; i++)
+       {
+           if(ncounts_tofd[i] > 0)
+           {
+                fh_counter_fi30->Fill(double(-60+2*i),ncounts_fi30[i]/ncounts_tofd[i]/(sum30/sum1l));
+                fh_counter_fi31->Fill(double(-60+2*i),ncounts_fi31[i]/ncounts_tofd[i]/(sum31/sum1r));
+                fh_counter_fi32->Fill(double(-60+2*i),ncounts_fi32[i]/ncounts_tofd[i]/(sum32/sum1l));
+                fh_counter_fi33->Fill(double(-60+2*i),ncounts_fi33[i]/ncounts_tofd[i]/(sum33/sum1r));
+            }
+        }
+    */
 }
 
 void R3BOnlineSpectraFibvsToFDS494::FinishEvent()
@@ -1052,12 +1109,12 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     cout << "TofD: " << counterTofd << endl;
     cout << "TofD multi: " << counterTofdMulti << endl;
     cout << "TofD multi - "
-         << "left: " << summ_tofdl << ", right: " << summ_tofdr << endl;
+         << "left: " << Nsumm_tofdl << ", right: " << Nsumm_tofdr << endl;
 
-    cout << "Eff. Fi30: " << events30 << "  " << events30 / summ_tofdl << endl;
-    cout << "Eff. Fi31: " << events31 << "  " << events31 / summ_tofdr << endl;
-    cout << "Eff. Fi32: " << events32 << "  " << events32 / summ_tofdl << endl;
-    cout << "Eff. Fi33: " << events33 << "  " << events33 / summ_tofdr << endl;
+    cout << "Eff. Fi30: " << Nevents30 << "  " << Nevents30 / Nsumm_tofdl << endl;
+    cout << "Eff. Fi31: " << Nevents31 << "  " << Nevents31 / Nsumm_tofdr << endl;
+    cout << "Eff. Fi32: " << Nevents32 << "  " << Nevents32 / Nsumm_tofdl << endl;
+    cout << "Eff. Fi33: " << Nevents33 << "  " << Nevents33 / Nsumm_tofdr << endl;
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {

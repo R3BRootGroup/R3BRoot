@@ -221,7 +221,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
         fh_tofi_multihit_coinc[0]->Draw("colz");
         ctofi_planes->cd(11);
         gPad->SetLogz();
-        fh_tofi_dt->SetAxisRange(1,25,"X");
+        fh_tofi_dt->SetAxisRange(1, 25, "X");
         fh_tofi_dt->Draw("colz");
         ctofi_planes->cd(12);
         gPad->SetLogz();
@@ -512,8 +512,8 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 //      cout<<"Time: "<<top_ns<<"; "<<bot_ns<<endl;
                 Int_t iPlane = bot->GetDetectorId(); // 1..n
                 Int_t iBar = bot->GetBarId();        // 1..n
-                //auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-                auto bot_tot = bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() ;
+                // auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                auto bot_tot = bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns();
 
                 fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
                 if (nHitsEvent == 1)

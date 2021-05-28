@@ -181,7 +181,18 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Double_t events32 = 0;
     Double_t events33 = 0; 
     Double_t nHitstemp;
-    
+    long long totalToFDl = 0;
+    long long totalToFDr = 0;
+    long long totalFi30 = 0;
+    long long totalFi31 = 0;
+    long long totalFi32 = 0;
+    long long totalFi33 = 0;
+    Double_t Nsumm_tofdr = 0;
+    Double_t Nsumm_tofdl = 0;
+    Double_t Nevents30 = 0;
+    Double_t Nevents31 = 0;
+    Double_t Nevents32 = 0;
+    Double_t Nevents33 = 0;        
 	Int_t n_det = 13;
 	
 	Double_t ncounts_tofd[70]={0};
