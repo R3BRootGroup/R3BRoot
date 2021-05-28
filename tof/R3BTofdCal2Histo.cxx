@@ -80,10 +80,8 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
             fhLogTot1vsLogTot2[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
-            if (!fTofdSmiley)
-                fhTot1vsPos[i][j] = NULL;
-            if (!fTofdSmiley)
-                fhTot2vsPos[i][j] = NULL;
+            fhTot1vsPos[i][j] = NULL;
+            fhTot2vsPos[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
         }
     }
@@ -118,10 +116,8 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
             fhLogTot1vsLogTot2[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
-            if (!fTofdSmiley)
-                fhTot1vsPos[i][j] = NULL;
-            if (!fTofdSmiley)
-                fhTot2vsPos[i][j] = NULL;
+            fhTot1vsPos[i][j] = NULL;
+            fhTot2vsPos[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
         }
     }
@@ -446,32 +442,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
 
                 // prepare double exponential fit
-                if (!fTofdSmiley)
+                if (!fTofdSmiley && fTofdQ > 0.1)
                 {
-                    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
-                    {
-
-                        char strName[255];
-                        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-                        if (iPlane < 3)
-                            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        if (iPlane > 2)
-                            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
-                    }
-                    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
-                    {
-                        char strName[255];
-                        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-                        if (iPlane < 3)
-                            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        if (iPlane > 2)
-                            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
-                    }
-
                     LOG(DEBUG) << "Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
@@ -483,10 +455,10 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 
                     // calculate y position
                     auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-
+                    //cout<<"pos "<<pos<<" bot_tot "<<bot_tot<<" top_tot "<<top_tot<<"\n";
                     // fill fitting histograms and smiley histogram
                     fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    //fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
 
                 // prepare charge fit / quench correction
@@ -567,6 +539,24 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
     Double_t max_charge = 60.;
+    
+    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+    }
+    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
+    }
+                    
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];
@@ -654,7 +644,7 @@ void R3BTofdCal2Histo::FinishTask()
                 fhSqrtQvsPosToT[i][j]->Write(); // histogram for ToT offset calculation
             if (fhQvsPos[i][j])
                 fhQvsPos[i][j]->Write(); // histogram for charge fit
-            if (!fTofdSmiley)
+            if (!fTofdSmiley && fTofdQ > 0.1)
             {
                 if (fhTot1vsPos[i][j])
                     fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
