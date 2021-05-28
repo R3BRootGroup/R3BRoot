@@ -127,21 +127,8 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
 
-    unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
-    unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem = 0, see_mem = 0, tofior_mem = 0;
-    unsigned long ic_start = 0, see_start = 0, tofior_start = 0;
-    unsigned long long time_spill_start = 0, time_spill_end = 0;
+    unsigned long long time_spill_start = 0, time_spill_end = 0, time = 0, time_prev = -1, time_start = 0, time_mem = 0;
     unsigned long long time_previous_event = 0;
-    Double_t time_clear = -1.;
-    Double_t tdiff = 0.;
-    Double_t fNorm = 1.;
-    Int_t iclear_count = 1;
-    UInt_t reset_time;         // time after which bmon spectra are reseted
-    Double_t read_time;        // step in which scalers are read, in sec
-    Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
-    Double_t calib_SEE = 1.;   // SEETRAM calibration factor
-    Double_t see_offset = 7.1; // SEETRAM offset in kHz
 
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
@@ -155,6 +142,10 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
     TH2F* fh_tofi_TotPm_coinc[N_PLANE_MAX_TOFI];
     TH2F* fh_test;
     TH2F* fh_test1;
+    TH2F* fh_test2;
+    TH2F* fh_num_side;
+    TH2F* fh_dt_hits_ToT_top;
+    TH2F* fh_dt_hits_ToT_bot;
   public:
     ClassDef(R3BOnlineSpectraToFI_S494, 2)
 };

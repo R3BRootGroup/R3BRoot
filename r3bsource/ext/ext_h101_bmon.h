@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_BMON__TMP_TMP_NFXJEUG1R1_H__
-#define __GUARD_H101_BMON__TMP_TMP_NFXJEUG1R1_H__
+#ifndef __GUARD_H101_BMON__TMP_TMP_XINVEIMUXX_H__
+#define __GUARD_H101_BMON__TMP_TMP_XINVEIMUXX_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -31,7 +31,7 @@ typedef struct EXT_STR_h101_BMON_t
   /* RAW */
   uint32_t IC /* [-1,-1] */;
   uint32_t SEETRAM /* [-1,-1] */;
-  uint32_t TOFDOR /* [-1,-1] */;  
+  uint32_t TOFDOR /* [-1,-1] */;
   uint32_t SROLU1S1 /* [-1,-1] */;
   uint32_t SROLU1S2 /* [-1,-1] */;
   uint32_t SROLU1S3 /* [-1,-1] */;
@@ -54,7 +54,7 @@ typedef struct EXT_STR_h101_BMON_onion_t
   /* RAW */
   uint32_t IC;
   uint32_t SEETRAM;
-  uint32_t TOFDOR; 
+  uint32_t TOFDOR;
   struct {
     uint32_t S[4];
   } SROLU[2];
@@ -73,7 +73,7 @@ typedef struct EXT_STR_h101_BMON_onion_t
                      SEETRAM,                         UINT32,\
                     "SEETRAM"); \
   EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
-                     TOFDOR,                         UINT32,\
+                     TOFDOR,                          UINT32,\
                     "TOFDOR"); \
   EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
                      SROLU1S1,                        UINT32,\
@@ -101,6 +101,6 @@ typedef struct EXT_STR_h101_BMON_onion_t
                     "SROLU2S4"); \
   \
 } while (0);
-#endif/*__GUARD_H101_BMON__TMP_TMP_NFXJEUG1R1_H__*/
+#endif/*__GUARD_H101_BMON__TMP_TMP_XINVEIMUXX_H__*/
 
 /*******************************************************/

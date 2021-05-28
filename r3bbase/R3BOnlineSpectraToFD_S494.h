@@ -154,6 +154,7 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
     TH1F* fh_TimePreviousEvent;
     TH2F* fh_tofd_multihit_coinc[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_TotPm_coinc[N_PLANE_MAX_TOFD];
+    TH2F* fh_num_side[N_PLANE_MAX_TOFD];
   public:
     ClassDef(R3BOnlineSpectraToFD_S494, 2)
 };
