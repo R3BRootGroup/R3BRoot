@@ -206,6 +206,14 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_TOFDOR->GetXaxis()->SetTitle("time / sec");
         fh_TOFDOR->GetYaxis()->SetTitle("TOFDOR counts");
 
+        fh_SROLU1 = new TH1F("SROLU1", "SROLU1 ", Nbin_bmon, 0, reset_time);
+        fh_SROLU1->GetXaxis()->SetTitle("time / sec");
+        fh_SROLU1->GetYaxis()->SetTitle("SROLU1 counts");
+
+        fh_SROLU2 = new TH1F("SROLU2", "SROLU2 ", Nbin_bmon, 0, reset_time);
+        fh_SROLU2->GetXaxis()->SetTitle("time / sec");
+        fh_SROLU2->GetYaxis()->SetTitle("SROLU2 counts");
+
         fh_IC_spill = new TH1F("IC_spill", "IC rate in kHz ", Nbin_bmon, 0, reset_time);
         fh_IC_spill->GetXaxis()->SetTitle("time / sec");
         fh_IC_spill->GetYaxis()->SetTitle("IC rate / kHz");
@@ -218,7 +226,15 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_TOFDOR_spill->GetXaxis()->SetTitle("time / sec");
         fh_TOFDOR_spill->GetYaxis()->SetTitle("TOFDOR rate / kHz");
 
-        cbmon->Divide(3, 3);
+        fh_SROLU1_spill = new TH1F("SROLU1_spill", "SROLU1 rate in kHz ", Nbin_bmon, 0, reset_time);
+        fh_SROLU1_spill->GetXaxis()->SetTitle("time / sec");
+        fh_SROLU1_spill->GetYaxis()->SetTitle("SROLU1 rate / kHz");
+
+        fh_SROLU2_spill = new TH1F("SROLU2_spill", "SROLU2 rate in kHz ", Nbin_bmon, 0, reset_time);
+        fh_SROLU2_spill->GetXaxis()->SetTitle("time / sec");
+        fh_SROLU2_spill->GetYaxis()->SetTitle("SROLU2 rate / kHz");
+
+        cbmon->Divide(5, 3);
         cbmon->cd(1);
         gPad->SetLogy();
 
@@ -226,19 +242,28 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_spill_length->Draw();
         cbmon->cd(3);
 
-        cbmon->cd(4);
-        fh_IC->Draw("hist");
-        cbmon->cd(5);
-        fh_SEE->Draw("hist");
         cbmon->cd(6);
-        fh_TOFDOR->Draw("hist");
+        fh_IC->Draw("hist");
         cbmon->cd(7);
-        fh_IC_spill->Draw("hist");
+        fh_SEE->Draw("hist");
         cbmon->cd(8);
+        fh_TOFDOR->Draw("hist");
+        cbmon->cd(9);
+        fh_SROLU1->Draw("hist");
+        cbmon->cd(10);
+        fh_SROLU2->Draw("hist");
+        cbmon->cd(11);
+        fh_IC_spill->Draw("hist");
+        cbmon->cd(12);
         fh_SEE_spill->SetAxisRange(1, 1e4, "Y");
         fh_SEE_spill->Draw("hist");
-        cbmon->cd(9);
+        cbmon->cd(13);
         fh_TOFDOR_spill->Draw("hist");
+        cbmon->cd(14);
+        fh_SROLU1_spill->Draw("hist");
+        cbmon->cd(15);
+        fh_SROLU2_spill->Draw("hist");
+
         cbmon->cd(0);
 
         run->AddObject(cbmon);
@@ -267,6 +292,10 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_SEE_spill->Reset();
     fh_TOFDOR->Reset();
     fh_TOFDOR_spill->Reset();
+    fh_SROLU1->Reset();
+    fh_SROLU1_spill->Reset();
+    fh_SROLU2->Reset();
+    fh_SROLU2_spill->Reset();
 }
 
 void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
@@ -340,6 +369,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         unsigned long IC;
         unsigned long SEETRAM;
         unsigned long TOFDOR;
+        unsigned long SROLU1;
+        unsigned long SROLU2;
         Bool_t bmon_read = false;
 
         auto det = fMappedItems.at(DET_BMON);
@@ -354,6 +385,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             IC = hit->GetIC();           // negative values if offset not high enough
             SEETRAM = hit->GetSEETRAM(); // negative values if offset not high enough
             TOFDOR = hit->GetTOFDOR();   // only positive values possible
+            SROLU1 = hit->GetSROLU1();
+            SROLU2 = hit->GetSROLU2();
 
             //     unsigned long long time = header->GetTimeStamp();
 
@@ -362,10 +395,14 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 see_mem = SEETRAM;
                 ic_mem = IC;
                 tofdor_mem = TOFDOR;
+                srolu1_mem = SROLU1;
+                srolu2_mem = SROLU2;
                 time_mem = time_start;
                 see_start = SEETRAM;
                 ic_start = IC;
                 tofdor_start = TOFDOR;
+                srolu1_start = SROLU1;
+                srolu2_start = SROLU2;
                 time_prev_read = time_start;
             }
 
@@ -402,11 +439,21 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
                     // TOFDOR:
                     Int_t yTOFDOR = TOFDOR - tofdor_start;
-
-                    //     cout<<"TOFDOR: "<<TOFDOR <<"; "<< tofdor_start<<endl;
                     fh_TOFDOR->Fill(tdiff, yTOFDOR);
                     fh_TOFDOR_spill->Fill(tdiff, (TOFDOR - tofdor_mem) * fNorm);
                     tofdor_mem = TOFDOR;
+
+                    // SROLU1:
+                    Int_t ySROLU1 = SROLU1 - srolu1_start;
+                    fh_SROLU1->Fill(tdiff, ySROLU1);
+                    fh_SROLU1_spill->Fill(tdiff, (SROLU1 - srolu1_mem) * fNorm);
+                    srolu1_mem = SROLU1;
+
+                    // SROLU2:
+                    Int_t ySROLU2 = SROLU2 - srolu2_start;
+                    fh_SROLU2->Fill(tdiff, ySROLU2);
+                    fh_SROLU2_spill->Fill(tdiff, (SROLU2 - srolu2_mem) * fNorm);
+                    srolu1_mem = SROLU2;
 
                     time_to_read = 0;
                     time_prev_read = time;
@@ -419,9 +466,13 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_IC_spill->Reset("ICESM");
                     fh_SEE_spill->Reset("ICESM");
                     fh_TOFDOR_spill->Reset("ICESM");
+                    fh_SROLU1_spill->Reset("ICESM");
+                    fh_SROLU2_spill->Reset("ICESM");
                     fh_IC->Reset("ICESM");
                     fh_SEE->Reset("ICESM");
                     fh_TOFDOR->Reset("ICESM");
+                    fh_SROLU1->Reset("ICESM");
+                    fh_SROLU2->Reset("ICESM");
                     time_mem = time;
                     time_clear = -1.;
                     iclear_count = iclear_count + 1;
@@ -429,6 +480,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     see_start = SEETRAM;
                     ic_start = IC;
                     tofdor_start = TOFDOR;
+                    srolu1_start = SROLU1;
+                    srolu2_start = SROLU2;
                 }
             }
         }

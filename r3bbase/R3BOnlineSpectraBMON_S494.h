@@ -128,10 +128,10 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     //   TClonesArray *fbmonMappedItems;
 
-   unsigned long long  time_start = -1, time = 0, time_mem = 0;
+    unsigned long long  time_start = -1, time = 0, time_mem = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
-    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
+    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
+    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
     unsigned long long time_spill_start = 0, time_spill_end = 0;
 
     unsigned long long time_previous_event = 0;
@@ -157,9 +157,12 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fh_IC;
     TH1F* fh_SEE;
     TH1F* fh_TOFDOR;
+    TH1F* fh_SROLU1;
+    TH1F* fh_SROLU2;
     TH2F* fh_IC_cal;
     TH2F* fh_SEE_cal;
-
+    TH1F* fh_SROLU1_spill;
+    TH1F* fh_SROLU2_spill;
 
     TH2F* fh_rolu_tot;
     TH1F* fh_rolu_channels;

@@ -127,7 +127,7 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
 
-    unsigned long long time_spill_start = 0, time_spill_end = 0, time = 0, time_prev = -1, time_start = 0, time_mem = 0;
+    unsigned long long time_spill_start = 0, time_spill_end = 0, time = 0, time_prev = -1, time_prev1 = -1, time_start = 0, time_mem = 0;
     unsigned long long time_previous_event = 0;
 
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
@@ -143,6 +143,8 @@ class R3BOnlineSpectraToFI_S494 : public FairTask
     TH2F* fh_test;
     TH2F* fh_test1;
     TH2F* fh_test2;
+    TH2F* fh_test3;
+    TH2F* fh_test4;
     TH2F* fh_num_side;
     TH2F* fh_dt_hits_ToT_top;
     TH2F* fh_dt_hits_ToT_bot;
