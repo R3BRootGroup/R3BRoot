@@ -232,7 +232,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         // xfib vs. TofD position:
         fh_Fibs_vs_Tofd[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX", detName),
                                               Form("%s Fiber # vs. Tofd x-pos", detName),
-                                              1200,
+                                              400,
                                               -60,
                                               60,
                                               600,
@@ -243,7 +243,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
         fh_Fibs_vs_Tofd_ac[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX_ac", detName),
                                                  Form("%s Fiber # vs. Tofd x-pos after cuts", detName),
-                                                 1200,
+                                                 400,
                                                  -60,
                                                  60,
                                                  600,

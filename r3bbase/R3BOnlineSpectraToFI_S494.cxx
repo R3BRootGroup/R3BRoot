@@ -529,7 +529,8 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 //      cout<<"Time: "<<top_ns<<"; "<<bot_ns<<endl;
                 Int_t iPlane = bot->GetDetectorId(); // 1..n
                 Int_t iBar = bot->GetBarId();        // 1..n
-                auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                //auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                auto bot_tot = bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() ;
 
                 fh_tofi_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
                 if (nHitsEvent == 1)
