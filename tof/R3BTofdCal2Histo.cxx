@@ -458,7 +458,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     //cout<<"pos "<<pos<<" bot_tot "<<bot_tot<<" top_tot "<<top_tot<<"\n";
                     // fill fitting histograms and smiley histogram
                     fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    //fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
 
                 // prepare charge fit / quench correction
