@@ -718,6 +718,8 @@ void R3BOnlineSpectraToFD_S494::FinishTask()
             fh_tofd_TotPm_coinc[i]->Write();
             fh_tofd_channels[i]->Write();
             fh_num_side[i]->Write();
+            fh_tofd_multihit[i]->Write();
+            fh_tofd_multihit_coinc[i]->Write();
         }
         for (Int_t i = 0; i < 3; i++)
         {
