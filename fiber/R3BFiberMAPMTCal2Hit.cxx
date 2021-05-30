@@ -179,20 +179,19 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // create histograms
     TString chistName;
     TString chistTitle;
-    // ToT single PMT raw:
-    chistName = fName + "_ToT_down_raw";
-    chistTitle = fName + " ToTdown raw of fibers";
-    fh_ToT_MA_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 250, 0., 100.);
-    fh_ToT_MA_Fib_raw->GetXaxis()->SetTitle("Fiber number");
-    fh_ToT_MA_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
+    // ToT bottom PMT raw:
+    chistName = fName + "_ToT_bottom_raw";
+    chistTitle = fName + " ToTbottom raw of fibers";
+    fh_ToT_bottom_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, 0., 100.);
+    fh_ToT_bottom_Fib_raw->GetXaxis()->SetTitle("Fiber number");
+    fh_ToT_bottom_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
-    // ToT MAPMT:
-    chistName = fName + "_ToT_down";
-    chistTitle = fName + " ToTdown of fibers";
-    //    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 100, 0., 41.666667);
-    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 250, 0., 100.);
-    fh_ToT_MA_Fib->GetXaxis()->SetTitle("Fiber number");
-    fh_ToT_MA_Fib->GetYaxis()->SetTitle("ToT / ns");
+    // ToT bottom gainmatched:
+    chistName = fName + "_ToT_bottom";
+    chistTitle = fName + " ToTbottom of fibers";
+    fh_ToT_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 400, 0., 100.);
+    fh_ToT_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
+    fh_ToT_bottom_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     // ToF Tofd -> Fiber:
     chistName = fName + "_time";
@@ -215,25 +214,25 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     fh_Test->GetYaxis()->SetTitle("Tsync / ns");
     fh_Test->GetXaxis()->SetTitle("Fiber ID");
 
-    // ToT single PMT raw:
-    chistName = fName + "_ToT_up_raw";
-    chistTitle = fName + " ToTup raw of fibers";
-    fh_ToT_SA_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 250, 0., 100.);
-    fh_ToT_SA_Fib_raw->GetXaxis()->SetTitle("Fiber number");
-    fh_ToT_SA_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
+    // ToT top MAPMT raw:
+    chistName = fName + "_ToT_top_raw";
+    chistTitle = fName + " ToTtop raw of fibers";
+    fh_ToT_top_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, 0., 100.);
+    fh_ToT_top_Fib_raw->GetXaxis()->SetTitle("Fiber number");
+    fh_ToT_top_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
-    // ToT single PMT:
-    chistName = fName + "_ToT_up";
-    chistTitle = fName + " ToTup of fibers";
-    fh_ToT_SA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 250, 0., 100.);
-    fh_ToT_SA_Fib->GetXaxis()->SetTitle("Fiber number");
-    fh_ToT_SA_Fib->GetYaxis()->SetTitle("ToT / ns");
+    // ToT top MAPMT gainmatched:
+    chistName = fName + "_ToT_top";
+    chistTitle = fName + " ToTtop of fibers";
+    fh_ToT_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 400, 0., 100.);
+    fh_ToT_top_Fib->GetXaxis()->SetTitle("Fiber number");
+    fh_ToT_top_Fib->GetYaxis()->SetTitle("ToT / ns");
 
-    chistName = fName + "_time_SA";
-    chistTitle = fName + " time of single PMTs ";
-    fh_time_SA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
-    fh_time_SA_Fib->GetXaxis()->SetTitle("single number");
-    fh_time_SA_Fib->GetYaxis()->SetTitle("time / ns");
+    chistName = fName + "_time_top";
+    chistTitle = fName + " time of top MAPMTs ";
+    fh_time_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_time_top_Fib->GetXaxis()->SetTitle("single number");
+    fh_time_top_Fib->GetYaxis()->SetTitle("time / ns");
 
     // time difference top-bottom:
     chistName = fName + "_dt";
@@ -245,16 +244,16 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // time difference top-bottom for offsets:
     chistName = fName + "_dt_raw";
     chistTitle = fName + " dt_raw of fibers";
-    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, -5000., 5000.);
+    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 10000, -2000., 2000.);
     fh_dt_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib_raw->GetYaxis()->SetTitle("dt / ns");
 
     // time of MAPMT:
-    chistName = fName + "_time_MA";
-    chistTitle = fName + " time of fibers";
-    fh_time_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
-    fh_time_MA_Fib->GetXaxis()->SetTitle("Fiber number");
-    fh_time_MA_Fib->GetYaxis()->SetTitle("time / ns");
+    chistName = fName + "_time_bottom";
+    chistTitle = fName + " time of bottom MAPMTs";
+    fh_time_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_time_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
+    fh_time_bottom_Fib->GetYaxis()->SetTitle("time / ns");
 
     return kSUCCESS;
 }
@@ -353,8 +352,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
             tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
 
-            if (tot_ns < 0)
-                tot_ns = tot_ns * (-1.);
             lead_raw = lead->GetTime_ns();
             trail_raw = cur_cal_trail->GetTime_ns();
             trail_trig_ns = cur_cal_trig_ns;
@@ -412,11 +409,11 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Double_t t_down = down_tot.lead_ns;
                     Double_t t_up = up_tot.lead_ns;
                     Double_t dtime = t_up - t_down;
-                    Double_t tof = t_up + t_down;
+                    Double_t tof = (t_up + t_down) / 2.;
 
                     // Fill histograms for gain match, offset and sync.
-                    fh_ToT_MA_Fib_raw->Fill(fiber_id, tot_down);
-                    fh_ToT_SA_Fib_raw->Fill(fiber_id, tot_up);
+                    fh_ToT_bottom_Fib_raw->Fill(fiber_id, tot_down);
+                    fh_ToT_top_Fib_raw->Fill(fiber_id, tot_up);
                     fh_dt_Fib_raw->Fill(fiber_id, dtime);
                     fh_Fib_ToF_raw->Fill(fiber_id, tof);
 
@@ -450,10 +447,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     // histogram after gain match, sync....
                     fh_dt_Fib->Fill(fiber_id, dtime);
                     fh_Fib_ToF->Fill(fiber_id, tof);
-                    fh_ToT_MA_Fib->Fill(fiber_id, tot_down);
-                    fh_ToT_SA_Fib->Fill(fiber_id, tot_up);
-                    fh_time_MA_Fib->Fill(fiber_id, t_down);
-                    fh_time_SA_Fib->Fill(fiber_id, t_up);
+                    fh_ToT_bottom_Fib->Fill(fiber_id, tot_down);
+                    fh_ToT_top_Fib->Fill(fiber_id, tot_up);
+                    fh_time_bottom_Fib->Fill(fiber_id, t_down);
+                    fh_time_top_Fib->Fill(fiber_id, t_up);
 
                     Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
@@ -540,15 +537,15 @@ void R3BFiberMAPMTCal2Hit::FinishEvent()
 
 void R3BFiberMAPMTCal2Hit::FinishTask()
 {
-    fh_ToT_MA_Fib->Write();
-    fh_ToT_SA_Fib->Write();
-    fh_ToT_MA_Fib_raw->Write();
-    fh_ToT_SA_Fib_raw->Write();
+    fh_ToT_bottom_Fib->Write();
+    fh_ToT_top_Fib->Write();
+    fh_ToT_bottom_Fib_raw->Write();
+    fh_ToT_top_Fib_raw->Write();
     fh_dt_Fib->Write();
-    fh_time_SA_Fib->Write();
+    fh_time_top_Fib->Write();
     fh_Fib_ToF->Write();
     fh_Test->Write();
-    fh_time_MA_Fib->Write();
+    fh_time_bottom_Fib->Write();
     fh_dt_Fib_raw->Write();
     fh_Fib_ToF_raw->Write();
 
@@ -558,8 +555,8 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
         R3BFiberMAPMTHitModulePar* mpar;
 
         UInt_t max = N_FIBER_MAX;
-        if (fh_ToT_MA_Fib->GetNbinsX() < N_FIBER_MAX)
-            max = fh_ToT_MA_Fib->GetNbinsX();
+        if (fh_ToT_bottom_Fib->GetNbinsX() < N_FIBER_MAX)
+            max = fh_ToT_bottom_Fib->GetNbinsX();
 
         for (UInt_t i = 1; i <= max; i++)
         {
@@ -570,8 +567,8 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
         for (UInt_t i = 1; i <= max; i++)
         {
-            // gain MA
-            TH1D* proj = fh_ToT_MA_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
+            // gain bottom MAPMTs
+            TH1D* proj = fh_ToT_bottom_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
             for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
             {
                 if (j == 2)
@@ -581,15 +578,15 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 if (proj->GetBinContent(j) > proj->GetMaximum() * 10. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
-                    par->SetGainUp(proj->GetBinCenter(j));
+                    par->SetGainDown(proj->GetBinCenter(j));
 
-                    cout << fName << " fiberId: " << i << ",gainUp: " << proj->GetBinCenter(j) << endl;
+                    cout << fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j) << endl;
 
                     break;
                 }
             }
-            // gain SA
-            TH1D* proj1 = fh_ToT_SA_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
+            // gain top MAPMT
+            TH1D* proj1 = fh_ToT_top_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
             for (UInt_t j = proj1->GetNbinsX() - 2; j > 2; j--)
             {
                 if (j == 2)
@@ -599,9 +596,9 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 if (proj1->GetBinContent(j) > proj1->GetMaximum() * 10. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
-                    par1->SetGainDown(proj->GetBinCenter(j));
+                    par1->SetGainUp(proj->GetBinCenter(j));
 
-                    cout << fName << " fiberId: " << i << ",gainDown: " << proj1->GetBinCenter(j) << endl;
+                    cout << fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j) << endl;
 
                     break;
                 }

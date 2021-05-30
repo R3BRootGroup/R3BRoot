@@ -145,7 +145,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     TH2F *fh_multihit_s_Fib[NOF_FIB_DET];
     TH2F *fh_ToT_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
-    TH2F *fh_ToTmax_Fibmax[NOF_FIB_DET];
+    TH2F *fh_ToTup_vs_ToTdown[NOF_FIB_DET];
     TH2F *fh_chan_corell[NOF_FIB_DET];
     TH2F *fh_raw_tot_up[NOF_FIB_DET];
     TH2F *fh_raw_tot_down[NOF_FIB_DET];

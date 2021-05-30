@@ -740,8 +740,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
 
-            //      if (t1[det] < -800 || t1[det] > -700)
-            //       continue;
+            if ((t1[det] < -800 || t1[det] > -700))
+                continue;
+            //      if (tof < -20 || tof > 80)
+            //    continue;
 
             if (q1[det] > tot_max31) //&& tofd_right)
             {
@@ -1042,12 +1044,11 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     fiberFi30.pop_front();
     fiberFi30.push_back(fibMaxFi30);
 
-    Double_t fib31temp = fibMaxFi31;
-    if (totalFi31 > 0)
-        fib31temp = double(totalfibFi31) / double(totalFi31);
+    //  Double_t fib31temp = fibMaxFi31;
+    // if (totalFi31 > 0)
+    //    fib31temp = double(totalfibFi31) / double(totalFi31);
 
-    //   cout<<"fibers:"<<fib31temp<<", "<<fibMaxFi31<<", "<<totalFi31<<endl;
-    //   if(std::abs(fib31temp-fibMaxFi31) < 20)
+    // if((events31 > 0 && std::abs(fib31temp-fibMaxFi31) < 50) || events31 < 1 )
     // {
     totalFi31 -= windowFi31.front();
     totalFi31 += events31;
@@ -1058,7 +1059,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     totalfibFi31 += fibMaxFi31;
     fiberFi31.pop_front();
     fiberFi31.push_back(fibMaxFi31);
-    //}
+    //  }
 
     totalFi32 -= windowFi32.front();
     totalFi32 += events32;
@@ -1097,6 +1098,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         fh_counter_fi32->Fill(avr_fib32, effFi32 * 100.);
         fh_counter_fi33->Fill(avr_fib33, effFi33 * 100.);
     }
+
+    // if (fibMaxFi31 > 0 && std::abs(fib31temp-fibMaxFi31) < 50)
     if (fibMaxFi31 > 0)
         fh_test->Fill(fNEvents, fibMaxFi31);
     fh_test1->Fill(fNEvents, avr_fib31);

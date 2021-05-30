@@ -74,6 +74,10 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		virtual void Exec(Option_t*);
 		virtual void FinishEvent();
 		virtual void FinishTask();
+		inline void SetTimeWindow(Double_t tmin, Double_t tmax){
+			ftofmin = tmin;
+			ftofmax = tmax;
+		}
  
        R3BFiberMAPMTHitModulePar* GetModuleParAt(Int_t fiber);
     
@@ -107,18 +111,18 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		std::vector<Channel> fChannelArray[2];
   
    // histograms for gain matching
-    TH2F* fh_ToT_MA_Fib_raw;
-    TH2F* fh_ToT_SA_Fib_raw;
-    TH2F* fh_ToT_MA_Fib;
-    TH2F* fh_ToT_SA_Fib;
-    TH2F* fh_time_SA_Fib;
+    TH2F* fh_ToT_bottom_Fib_raw;
+    TH2F* fh_ToT_top_Fib_raw;
+    TH2F* fh_ToT_bottom_Fib;
+    TH2F* fh_ToT_top_Fib;
+    TH2F* fh_time_top_Fib;
     TH2F* fh_dt_Fib;
     TH2F* fh_Fib_ToF;
     TH2F* fh_dt_Fib_raw;
     TH2F* fh_Fib_ToF_raw;
     TH2F* fh_Test;
     TH1F* fh_multi;
-    TH2F* fh_time_MA_Fib;
+    TH2F* fh_time_bottom_Fib;
 	public:
 		ClassDef(R3BFiberMAPMTCal2Hit, 3)
 };

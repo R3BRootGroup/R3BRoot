@@ -234,34 +234,32 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_SROLU2_spill->GetXaxis()->SetTitle("time / sec");
         fh_SROLU2_spill->GetYaxis()->SetTitle("SROLU2 rate / kHz");
 
-        cbmon->Divide(5, 3);
+        cbmon->Divide(6, 2);
         cbmon->cd(1);
         gPad->SetLogy();
 
-        cbmon->cd(2);
+        cbmon->cd(1);
         fh_spill_length->Draw();
-        cbmon->cd(3);
-
-        cbmon->cd(6);
+        cbmon->cd(2);
         fh_IC->Draw("hist");
-        cbmon->cd(7);
+        cbmon->cd(3);
         fh_SEE->Draw("hist");
-        cbmon->cd(8);
+        cbmon->cd(4);
         fh_TOFDOR->Draw("hist");
-        cbmon->cd(9);
+        cbmon->cd(5);
         fh_SROLU1->Draw("hist");
-        cbmon->cd(10);
+        cbmon->cd(6);
         fh_SROLU2->Draw("hist");
-        cbmon->cd(11);
+        cbmon->cd(8);
         fh_IC_spill->Draw("hist");
-        cbmon->cd(12);
+        cbmon->cd(9);
         fh_SEE_spill->SetAxisRange(1, 1e4, "Y");
         fh_SEE_spill->Draw("hist");
-        cbmon->cd(13);
+        cbmon->cd(10);
         fh_TOFDOR_spill->Draw("hist");
-        cbmon->cd(14);
+        cbmon->cd(11);
         fh_SROLU1_spill->Draw("hist");
-        cbmon->cd(15);
+        cbmon->cd(12);
         fh_SROLU2_spill->Draw("hist");
 
         cbmon->cd(0);
