@@ -171,7 +171,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
                 sprintf(strName11, "tofd_ToF_plane_%d_%d", jk, jk + 1);
                 char strName12[255];
                 sprintf(strName12, "Tofd ToF plane %d and %d ", jk, jk + 1);
-                fh_tofd_dt[j] = new TH2F(strName11, strName12, 50, 0, 50, 800, -40., 40);
+                fh_tofd_dt[j] = new TH2F(strName11, strName12, 50, 0, 50, 2000, -1000., 1000);
                 fh_tofd_dt[j]->GetXaxis()->SetTitle("Bar number");
                 fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
             }
