@@ -13,6 +13,9 @@
 #ifndef R3BFIBERMAPMTCAL2HIT
 #define R3BFIBERMAPMTCAL2HIT
 
+#define TOF_MIN -1000
+#define TOF_MAX  1000
+
 #include "FairTask.h"
 #include <list>
 
@@ -89,6 +92,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		Double_t  offsetUp;
 		Double_t  offsetDown;
 		Bool_t fIsCalibrator;
+		Double_t ftofmin, ftofmax;
     	
 		Direction fDirection;
 		TClonesArray* fCalItems;
@@ -110,6 +114,8 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     TH2F* fh_time_SA_Fib;
     TH2F* fh_dt_Fib;
     TH2F* fh_Fib_ToF;
+    TH2F* fh_dt_Fib_raw;
+    TH2F* fh_Fib_ToF_raw;
     TH2F* fh_Test;
     TH1F* fh_multi;
     TH2F* fh_time_MA_Fib;

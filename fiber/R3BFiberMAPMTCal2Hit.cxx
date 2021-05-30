@@ -72,6 +72,8 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fNofHitItems()
     , fChannelArray()
     , fnEvents(0)
+    , ftofmin(TOF_MIN)
+    , ftofmax(TOF_MAX)
     , fGate_ns(100.) // make it constructor parameter
 {
     // Trigger mappin from included mapping files for each det.
@@ -199,6 +201,13 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     fh_Fib_ToF->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF->GetXaxis()->SetTitle("Fiber ID");
 
+    // ToF Fiber for sync:
+    chistName = fName + "_time_raw";
+    chistTitle = fName + " Time raw";
+    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 44000, -1100., 1100.);
+    fh_Fib_ToF_raw->GetYaxis()->SetTitle("Time/ ns");
+    fh_Fib_ToF_raw->GetXaxis()->SetTitle("Fiber ID");
+
     // Test:
     chistName = fName + "_test";
     chistTitle = fName + " Tsync test";
@@ -226,12 +235,19 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     fh_time_SA_Fib->GetXaxis()->SetTitle("single number");
     fh_time_SA_Fib->GetYaxis()->SetTitle("time / ns");
 
-    // time difference SPMT - MAPMT:
+    // time difference top-bottom:
     chistName = fName + "_dt";
     chistTitle = fName + " dt of fibers";
     fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, -5000., 5000.);
     fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
+
+    // time difference top-bottom for offsets:
+    chistName = fName + "_dt_raw";
+    chistTitle = fName + " dt_raw of fibers";
+    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, -5000., 5000.);
+    fh_dt_Fib_raw->GetXaxis()->SetTitle("Fiber number");
+    fh_dt_Fib_raw->GetYaxis()->SetTitle("dt / ns");
 
     // time of MAPMT:
     chistName = fName + "_time_MA";
@@ -383,7 +399,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
 
                     Int_t fiber_id = -1000;
-                    if (fiber_down_ch == fiber_up_ch && std::abs(up_tot.lead_ns - down_tot.lead_ns) < 40)
+                    if (fiber_down_ch == fiber_up_ch)
                         fiber_id = fiber_down_ch;
                     else
                         continue;
@@ -395,12 +411,14 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto tot_up = up_tot.tot_ns;
                     Double_t t_down = down_tot.lead_ns;
                     Double_t t_up = up_tot.lead_ns;
+                    Double_t dtime = t_up - t_down;
+                    Double_t tof = t_up + t_down;
 
-                    fh_time_MA_Fib->Fill(fiber_down_ch, t_down);
-                    fh_time_SA_Fib->Fill(fiber_up_ch, t_up);
-
+                    // Fill histograms for gain match, offset and sync.
                     fh_ToT_MA_Fib_raw->Fill(fiber_id, tot_down);
                     fh_ToT_SA_Fib_raw->Fill(fiber_id, tot_up);
+                    fh_dt_Fib_raw->Fill(fiber_id, dtime);
+                    fh_Fib_ToF_raw->Fill(fiber_id, tof);
 
                     gainUp = 10.;
                     gainDown = 10.;
@@ -424,23 +442,23 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     tot_down *= 10. / gainDown;
                     tot_up *= 10. / gainUp;
 
-                    Double_t tof = (t_down + t_up) / 2.;
                     tof -= tsync;
                     t_down += offsetDown;
                     t_up += offsetUp;
+                    dtime = t_up - t_down;
 
-                    // histogram for offset determination
-                    fh_dt_Fib->Fill(fiber_id, t_up - t_down);
-
-                    // Fill histograms for gain match, and for debugging.
+                    // histogram after gain match, sync....
+                    fh_dt_Fib->Fill(fiber_id, dtime);
                     fh_Fib_ToF->Fill(fiber_id, tof);
                     fh_ToT_MA_Fib->Fill(fiber_id, tot_down);
                     fh_ToT_SA_Fib->Fill(fiber_id, tot_up);
+                    fh_time_MA_Fib->Fill(fiber_id, t_down);
+                    fh_time_SA_Fib->Fill(fiber_id, t_up);
 
                     Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
                     Double_t y = -10000.;
-                    Double_t veff = 12. / 2.; // cm/ns
+                    Double_t veff = 12. / 4.; // cm/ns
                     Double_t randx = (std::rand() / (float)RAND_MAX);
                     if (fName == "Fi23a" || fName == "Fi23b")
                     {
@@ -453,8 +471,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         {
 
                             x = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer) + (0.5 - randx)) *
-                                    fiber_thickness;
+                                (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
                             y = (t_up - t_down) * veff;
                         }
                         else
@@ -462,8 +479,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                             x = (t_up - t_down) * veff;
 
                             y = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer) + (0.5 - randx)) *
-                                    fiber_thickness;
+                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
                     }
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
@@ -476,7 +492,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                         if (fDirection == VERTICAL)
                         {
-                            x = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
+                            x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                             y = (t_up - t_down) * veff;
                             // y = 0.;
@@ -485,7 +501,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         {
                             x = (t_up - t_down) * veff;
                             // x = 0.;
-                            y = -detector_width / 2. + fiber_thickness * (0.5 - randx) +
+                            y = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
                     }
@@ -494,20 +510,19 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     {
                         // continue;
                     }
-                    if (tof < -20 || tof > 20)
-                    {
-                        // continue;
-                    }
+
                     Double_t eloss = sqrt(tot_down * tot_up);
                     Double_t t = tof;
 
                     multi++;
 
-                    //  cout << "save fiber " << fName<< "  "  << fiber_id << " pos " << x << endl;
                     if (!fIsCalibrator)
                     {
-                        new ((*fHitItems)[fNofHitItems++])
-                            R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
+                        if (tof >= ftofmin && tof <= ftofmax)
+                        {
+                            new ((*fHitItems)[fNofHitItems++])
+                                R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
+                        }
                     }
                 }
             }
@@ -534,11 +549,8 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
     fh_Fib_ToF->Write();
     fh_Test->Write();
     fh_time_MA_Fib->Write();
-
-    /*
-
-        fh_multi->Write();
-    */
+    fh_dt_Fib_raw->Write();
+    fh_Fib_ToF_raw->Write();
 
     if (fIsCalibrator)
     {
@@ -558,8 +570,6 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
         for (UInt_t i = 1; i <= max; i++)
         {
-            //   R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
-
             // gain MA
             TH1D* proj = fh_ToT_MA_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
             for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
@@ -573,8 +583,6 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                     R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
                     par->SetGainUp(proj->GetBinCenter(j));
 
-                    if (i < 0)
-                        cout << fName << " Fiber: " << i << " gain up: " << proj->GetBinCenter(j) << endl;
                     break;
                 }
             }
@@ -591,28 +599,32 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                     R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
                     par1->SetGainDown(proj->GetBinCenter(j));
 
-                    if (i < 0)
-                        cout << fName << " Fiber: " << i << " gain down: " << proj1->GetBinCenter(j) << endl;
                     break;
                 }
             }
             // time offset
             R3BFiberMAPMTHitModulePar* par2 = fCalPar->GetModuleParAt(i);
-            TH1D* proj2 = fh_dt_Fib->ProjectionY("", i + 1, i + 1, 0);
+            TH1D* proj2 = fh_dt_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
             par2->SetOffsetUp(0.5 * proj2->GetBinCenter(proj2->GetMaximumBin()));
             par2->SetOffsetDown(-0.5 * proj2->GetBinCenter(proj2->GetMaximumBin()));
 
             // tsync
             R3BFiberMAPMTHitModulePar* par3 = fCalPar->GetModuleParAt(i);
-            TH1D* proj3 = fh_Fib_ToF->ProjectionY("", i + 1, i + 1, 0);
+            TH1D* proj3 = fh_Fib_ToF_raw->ProjectionY("", i + 1, i + 1, 0);
             par3->SetSync(proj3->GetBinCenter(proj3->GetMaximumBin()));
-
-            if (i < 0)
-                cout << fName << " Fiber: " << i << ", tsync" << proj3->GetBinCenter(proj3->GetMaximumBin())
-                     << ", offset: " << 0.5 * proj2->GetBinCenter(proj2->GetMaximumBin()) << endl;
         }
 
         fCalPar->setChanged();
+        for (UInt_t i = 1; i <= max; i++)
+        {
+            R3BFiberMAPMTHitModulePar* par = fHitPar->GetModuleParAt(i);
+            if (par)
+            {
+                cout << fName << " Fiber: " << i << ", gainUp: " << par->GetGainUp()
+                     << ", gainDown: " << par->GetGainDown() << ", tsync : " << par->GetSync()
+                     << ", offset: " << par->GetOffsetUp() << endl;
+            }
+        }
     }
 }
 

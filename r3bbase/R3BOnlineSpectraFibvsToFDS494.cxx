@@ -268,6 +268,8 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_counter_fi33->GetXaxis()->SetTitle("Fiber number");
     fh_counter_fi33->GetYaxis()->SetTitle("Efficiency / % ");
 
+    fh_test = new TH2F("Fi31_fibMax_vs_fNevent", "Fi31 fibMax vsfNevent", 10000, 0, 5e6, 520, 0., 526);
+    fh_test1 = new TH2F("Fi31_fibavr_vs_fNevent", "Fi31 fibavr vsfNevent", 10000, 0, 5e6, 520, 0., 526);
     cFib->cd(1);
     // gPad->SetLogy();
     fh_Fib_ToF[0]->Draw();
@@ -322,7 +324,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[4]->Draw("colz");
     cFib->cd(26);
-    fh_counter_fi32->Draw("colz");
+    fh_test->Draw("colz"); // fh_counter_fi32->Draw("colz");
 
     cFib->cd(6);
     //  gPad->SetLogy();
@@ -334,7 +336,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[5]->Draw("colz");
     cFib->cd(27);
-    fh_counter_fi33->Draw("colz");
+    fh_test1->Draw("colz"); // fh_counter_fi33->Draw("colz");
 
     cFib->cd(7);
     //  gPad->SetLogy();
@@ -367,7 +369,8 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
     fh_counter_fi31->Reset();
     fh_counter_fi32->Reset();
     fh_counter_fi33->Reset();
-
+    fh_test->Reset();
+    fh_test1->Reset();
     if (fHitItems.at(DET_TOFI))
         fh_Tofi_ToF->Reset();
 }
@@ -488,6 +491,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     Double_t tof = 0.;
     Double_t tStart = 0.;
     Bool_t first = true;
+    Double_t time_tofd_mem = 0. / 0.;
 
     Bool_t debug_in = false;
 
@@ -544,7 +548,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         id2 = hitTofd->GetDetId();
 
         if (nHitstemp == 1)
+        {
             summ_tofd += 1;
+            time_tofd_mem = ttt;
+        }
         if (hitTofd->GetX() <= 0.)
         {
             // tof rechts
@@ -717,6 +724,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         auto detHit31 = fHitItems.at(DET_FI31);
         Int_t nHits31 = detHit31->GetEntriesFast();
         Double_t tot_max31 = 0.;
+
         fibMaxFi31 = 0;
         LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
         if (nHitstemp == 1 && nHits31 > 0) //&& tofd_right)
@@ -731,6 +739,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             q1[det] = hit31->GetEloss();
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
+
+            if (t1[det] < -20 || t1[det] > 100)
+                continue;
 
             if (q1[det] > tot_max31) //&& tofd_right)
             {
@@ -1080,9 +1091,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 cout << fiberFi31[i] << ' ';
             }
             cout<<endl;
-
-            cout<<"Fib31: "<<events31<<", "<<totalfibFi31<<"; "<<totalFi31<<", "<<NfibFi31<<", "<<avr_fib31<<",
-       "<<double(totalfibFi31)/double(totalFi31)<<endl;
+        if(fNEvents > 5e5){
+          cout<<"Fib31: "<<events31<<", "<<fibMaxFi31<<", "<<totalfibFi31<<"; "<<totalFi31<<", "<<avr_fib31<<", "
+       <<double(totalfibFi31)/double(totalFi31)<<endl;
+   }
     */
 
     //   cout<<"Eff: "<<fNEvents<<": "<<effFi30<<", "<<effFi31<<"; "<<effFi32<<", "<<effFi33<<endl;
@@ -1093,6 +1105,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         fh_counter_fi32->Fill(avr_fib32, effFi32 * 100.);
         fh_counter_fi33->Fill(avr_fib33, effFi33 * 100.);
     }
+    if (fibMaxFi31 > 0)
+        fh_test->Fill(fNEvents, fibMaxFi31);
+    fh_test1->Fill(fNEvents, avr_fib31);
 
     Nsumm_tofd += summ_tofd;
     Nsumm_tofdr += summ_tofdr;
@@ -1155,6 +1170,8 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     fh_counter_fi31->Write();
     fh_counter_fi32->Write();
     fh_counter_fi33->Write();
+    fh_test->Write();
+    fh_test1->Write();
 }
 
 ClassImp(R3BOnlineSpectraFibvsToFDS494)

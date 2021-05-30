@@ -245,6 +245,8 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_counter_fi32;
     TH2F* fh_counter_fi33;
     
+    TH2F* fh_test;
+	TH2F* fh_test1;
 	
   public:
     ClassDef(R3BOnlineSpectraFibvsToFDS494, 2)
