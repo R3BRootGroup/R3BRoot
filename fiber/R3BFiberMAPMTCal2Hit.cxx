@@ -383,7 +383,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
 
                     Int_t fiber_id = -1000;
-                    if (fiber_down_ch == fiber_up_ch)
+                    if (fiber_down_ch == fiber_up_ch && std::abs(up_tot.lead_ns - down_tot.lead_ns) < 40)
                         fiber_id = fiber_down_ch;
                     else
                         continue;

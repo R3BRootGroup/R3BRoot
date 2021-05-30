@@ -228,12 +228,12 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
                             auto time_ghost = time_ns;
                             auto side_ghost = 1 - mapped->GetSide();
-                            new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
-                                R3BFiberMAPMTCalData(side_ghost,
-                                                     iFib,
-                                                     mapped->IsLeading(),
-                                                     time_ghost); // add ghost fiber to treat the hole
-
+                            /*        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                                        R3BFiberMAPMTCalData(side_ghost,
+                                                             iFib,
+                                                             mapped->IsLeading(),
+                                                             time_ghost); // add ghost fiber to treat the hole
+                             */
                             //   cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
                             //   "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
                         }
@@ -298,12 +298,12 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
                             auto time_ghost = time_ns;
                             auto side_ghost = 1 - mapped->GetSide();
-                            new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
-                                R3BFiberMAPMTCalData(side_ghost,
-                                                     iFib,
-                                                     mapped->IsLeading(),
-                                                     time_ghost); // add ghost fiber to treat the hole
-
+                            /*          new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                                          R3BFiberMAPMTCalData(side_ghost,
+                                                               iFib,
+                                                               mapped->IsLeading(),
+                                                               time_ghost); // add ghost fiber to treat the hole
+                             */
                             //      cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
                             //      "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
                         }

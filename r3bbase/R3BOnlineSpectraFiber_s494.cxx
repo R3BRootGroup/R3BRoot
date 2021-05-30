@@ -252,25 +252,25 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             // Channels:
             fh_channels_Fib[ifibcount] =
                 new TH1F(Form("%sCal_channels_up", detName), Form("%sCal channels up", detName), 520, 0., 520.);
-            fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
+            fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Channels:
             fh_channels_single_Fib[ifibcount] =
                 new TH1F(Form("%sCal_channels_down", detName), Form("%sCal channels down", detName), 520, 0., 520.);
-            fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
+            fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Multihit MAPMT:
             fh_multihit_m_Fib[ifibcount] = new TH2F(
                 Form("%sCal_multihit_up", detName), Form("%sCal multihits up", detName), 520, 0., 520., 20, 0., 20.);
-            fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("Channel");
+            fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_multihit_m_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
 
             // Multihit SAPMT:
             fh_multihit_s_Fib[ifibcount] = new TH2F(
                 Form("%sCal_multihit_down", detName), Form("%sCal multihits down", detName), 520, 0., 520, 20, 0., 20.);
-            fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("Channel");
+            fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
 
             // ToT raw up:
@@ -305,19 +305,20 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                                                  512,
                                                  0.,
                                                  512.);
-            fh_chan_corell[ifibcount]->GetXaxis()->SetTitle("Channel number down");
-            fh_chan_corell[ifibcount]->GetYaxis()->SetTitle("Channel number up");
+            fh_chan_corell[ifibcount]->GetXaxis()->SetTitle("Fiber number down");
+            fh_chan_corell[ifibcount]->GetYaxis()->SetTitle("Fiber number up");
 
-            fh_chan_dt_cal[ifibcount] = new TH2F(Form("%sCal_TimevsChannel", detName),
-                                                 Form("%sCal Time vs Channel", detName),
-                                                 N_FIBER_PLOT,
-                                                 0.,
-                                                 N_FIBER_PLOT,
-                                                 4096,
-                                                 -2048.,
-                                                 2048.);
-            fh_chan_dt_cal[ifibcount]->GetXaxis()->SetTitle("Channel number");
-            fh_chan_dt_cal[ifibcount]->GetYaxis()->SetTitle("tUp-tDown");
+            fh_chan_dt_cal[ifibcount] =
+                new TH2F(Form("%sCal_TimevsChannel", detName),
+                         Form("%sCal Time bottom or top vs fiber number (+ bot, - top)", detName),
+                         2 * N_FIBER_PLOT,
+                         -N_FIBER_PLOT,
+                         N_FIBER_PLOT,
+                         2600,
+                         -2400.,
+                         200.);
+            fh_chan_dt_cal[ifibcount]->GetXaxis()->SetTitle("Fiber number");
+            fh_chan_dt_cal[ifibcount]->GetYaxis()->SetTitle("time(up/down)-time_trigger / ns");
 
             // Hit level
             // Fibers:
@@ -650,6 +651,15 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                         vmultihits_bot[ch_i] += 1;                     // multihit of a given down killom channel
                     }
 
+                    auto time_trig = trig_time[fTriggerMap[side_i][ch_i]];
+                    auto time_ns =
+                        fmod(cur_cal_lead->GetTime_ns() - time_trig + c_period + c_period / 2, c_period) - c_period / 2;
+
+                    if (side_i == 0)
+                        fh_chan_dt_cal[ifibcount]->Fill(ch_i + 1, time_ns);
+                    if (side_i == 1)
+                        fh_chan_dt_cal[ifibcount]->Fill(-ch_i - 1, time_ns);
+
                     auto& channel = fChannelArray[side_i].at(ch_i);
 
                     channel.lead_list.push_back(cur_cal_lead); // make list with leading times
@@ -731,7 +741,6 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                                 // glue zero and the largest values together.
                                 dt_mod -= c_period;
                             }
-                            fh_chan_dt_cal[ifibcount]->Fill(cur_cal_top->GetChannel(), dt_mod);
                             if (std::abs(dt_mod) < c_fiber_coincidence_ns)
                                 fh_chan_corell[ifibcount]->Fill(cur_cal_bot->GetChannel(), cur_cal_top->GetChannel());
                         }
@@ -741,51 +750,6 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
             fChannelArray[0].clear();
             fChannelArray[1].clear();
-
-            /*
-                        Int_t nCals = detCal->GetEntriesFast();
-                        std::vector<UInt_t> upmt_num(512); // up
-                        std::vector<UInt_t> dpmt_num(512); // down
-                        for (Int_t ical = 0; ical < nCals; ical++)
-                        {
-                            R3BFiberMAPMTCalData* hit = (R3BFiberMAPMTCalData*)detCal->At(ical);
-                            if (!hit)
-                                continue;
-
-                            // channel numbers are stored 1-based (1..n)
-                            iCha = hit->GetChannel(); // 1..
-                            iSide = hit->GetSide();   // 0 = down, 1=up, 2=trigegr
-                            if (iSide == 1 && hit->IsLeading())
-                            {
-                                iCha_up = iCha;
-                                fh_channels_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
-                                ++upmt_num.at(iCha - 1);                // multihit of a given up killom channel
-                            }
-
-                            if (iSide == 0 && hit->IsLeading())
-                            {
-                                iCha_down = iCha;
-                                fh_channels_single_Fib[ifibcount]->Fill(iCha); // Fill which channel has events
-                                ++dpmt_num.at(iCha - 1);                       // multihit of a given down killom
-               channel
-                            }
-                        }
-
-                        //     fh_chan_corell[ifibcount]->Fill(iCha_down, iCha_up);
-
-                        for (int i = 0; i < 512; ++i)
-                        {
-                            auto m = upmt_num.at(i);
-                            if (m > 0)
-                                fh_multihit_m_Fib[ifibcount]->Fill(i + 1, m); // multihit of a given up killom channel
-
-                            auto s = dpmt_num.at(i);
-                            if (s > 0)
-                            {
-                                fh_multihit_s_Fib[ifibcount]->Fill(i + 1, s);
-                            } // multihit of a given down killom channel
-                        }
-             */
         } // if Cal
 
         if (detHit)
@@ -891,7 +855,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
                 //	cout<<"INput: "<<hitFi23b->GetFiberId()<<", "<<hitFi23a->GetFiberId()<<"; "<<dtime<<endl;
 
-                if (std::abs(dtime) < c_fiber_coincidence_ns / 2.)
+                if (std::abs(dtime) < c_fiber_coincidence_ns)
                 {
                     fh_xy_global->Fill(xpos_global, ypos_global);
                     // if(std::abs(xpos_global)<0.2 && std::abs(ypos_global)<0.2) cout<<"Selected:

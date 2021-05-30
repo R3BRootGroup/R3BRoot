@@ -101,7 +101,16 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
-
+    
+    /**
+     * Method for setting the window width for calculating fibers
+     * efficiency
+     */
+    inline void SetMovingWindow(size_t window_mv){ fwindow_mv = window_mv;}
+    inline void SetXwindow(Double_t xmin, Double_t xmax){
+		fxmin=xmin;
+		fxmax=xmax;
+	}
     /**
      * Methods for setting cuts
      */
@@ -110,7 +119,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
         fCuts = cuts;
     }
 
-    void Reset_Fib();
+    void Reset_All();
     
   private:
     std::vector<TClonesArray*> fCalItems;
@@ -174,19 +183,36 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
 	Double_t hits32bc = 0;
 	Double_t hits33 = 0;
 	Double_t hits33bc = 0;
-    Double_t summ_tofdr = 0;
-    Double_t summ_tofdl = 0;
-    Double_t events30 = 0;
-    Double_t events31 = 0;
-    Double_t events32 = 0;
-    Double_t events33 = 0; 
+
     Double_t nHitstemp;
+    long long totalToFD = 0;
     long long totalToFDl = 0;
     long long totalToFDr = 0;
     long long totalFi30 = 0;
     long long totalFi31 = 0;
     long long totalFi32 = 0;
     long long totalFi33 = 0;
+    long long totalfibFi30 = 0;
+    long long totalfibFi31 = 0;
+    long long totalfibFi32 = 0;
+    long long totalfibFi33 = 0;
+   
+    std::size_t fwindow_mv ;
+    std::deque<int> windowToFD;
+    std::deque<int> windowToFDl;
+    std::deque<int> windowToFDr;
+    std::deque<int> windowFi30;
+    std::deque<int> windowFi31;
+    std::deque<int> windowFi32;
+    std::deque<int> windowFi33;
+    
+    std::deque<int> fiberFi30;
+    std::deque<int> fiberFi31;
+    std::deque<int> fiberFi32;
+    std::deque<int> fiberFi33;
+
+    Double_t fxmin, fxmax;
+    Double_t Nsumm_tofd = 0;
     Double_t Nsumm_tofdr = 0;
     Double_t Nsumm_tofdl = 0;
     Double_t Nevents30 = 0;

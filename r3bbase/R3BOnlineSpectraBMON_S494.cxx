@@ -453,7 +453,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     Int_t ySROLU2 = SROLU2 - srolu2_start;
                     fh_SROLU2->Fill(tdiff, ySROLU2);
                     fh_SROLU2_spill->Fill(tdiff, (SROLU2 - srolu2_mem) * fNorm);
-                    srolu1_mem = SROLU2;
+                    srolu2_mem = SROLU2;
 
                     time_to_read = 0;
                     time_prev_read = time;
