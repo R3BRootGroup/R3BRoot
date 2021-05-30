@@ -359,12 +359,12 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             // Not-calibrated position:
             fh_Fib_pos[ifibcount] = new TH2F(Form("%sHit_pos", detName),
                                              Form("%sHit Not-calibrated position", detName),
+                                             600,
+                                             -30,
+                                             30,
                                              1000,
-                                             -50,
-                                             50,
-                                             1000,
-                                             -50,
-                                             50);
+                                             -500,
+                                             500);
             fh_Fib_pos[ifibcount]->GetXaxis()->SetTitle("x position");
             fh_Fib_pos[ifibcount]->GetYaxis()->SetTitle("y position");
 
