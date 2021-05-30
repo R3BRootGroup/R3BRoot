@@ -740,8 +740,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
 
-            if (t1[det] < -20 || t1[det] > 100)
-                continue;
+            //      if (t1[det] < -800 || t1[det] > -700)
+            //       continue;
 
             if (q1[det] > tot_max31) //&& tofd_right)
             {
@@ -1016,6 +1016,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         totalfibFi31 += fibMaxFi31;
         totalfibFi33 += fibMaxFi33;
     }
+
     totalToFDl -= windowToFDl.front();
     totalToFDl += summ_tofdl;
     windowToFDl.pop_front();
@@ -1036,35 +1037,43 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     windowFi30.pop_front();
     windowFi30.push_back(events30);
 
+    totalfibFi30 -= fiberFi30.front();
+    totalfibFi30 += fibMaxFi30;
+    fiberFi30.pop_front();
+    fiberFi30.push_back(fibMaxFi30);
+
+    Double_t fib31temp = fibMaxFi31;
+    if (totalFi31 > 0)
+        fib31temp = double(totalfibFi31) / double(totalFi31);
+
+    //   cout<<"fibers:"<<fib31temp<<", "<<fibMaxFi31<<", "<<totalFi31<<endl;
+    //   if(std::abs(fib31temp-fibMaxFi31) < 20)
+    // {
     totalFi31 -= windowFi31.front();
     totalFi31 += events31;
     windowFi31.pop_front();
     windowFi31.push_back(events31);
+
+    totalfibFi31 -= fiberFi31.front();
+    totalfibFi31 += fibMaxFi31;
+    fiberFi31.pop_front();
+    fiberFi31.push_back(fibMaxFi31);
+    //}
 
     totalFi32 -= windowFi32.front();
     totalFi32 += events32;
     windowFi32.pop_front();
     windowFi32.push_back(events32);
 
-    totalFi33 -= windowFi33.front();
-    totalFi33 += events33;
-    windowFi33.pop_front();
-    windowFi33.push_back(events33);
-
-    totalfibFi30 -= fiberFi30.front();
-    totalfibFi30 += fibMaxFi30;
-    fiberFi30.pop_front();
-    fiberFi30.push_back(fibMaxFi30);
-
-    totalfibFi31 -= fiberFi31.front();
-    totalfibFi31 += fibMaxFi31;
-    fiberFi31.pop_front();
-    fiberFi31.push_back(fibMaxFi31);
-
     totalfibFi32 -= fiberFi32.front();
     totalfibFi32 += fibMaxFi32;
     fiberFi32.pop_front();
     fiberFi32.push_back(fibMaxFi32);
+
+    totalFi33 -= windowFi33.front();
+    totalFi33 += events33;
+    windowFi33.pop_front();
+    windowFi33.push_back(events33);
 
     totalfibFi33 -= fiberFi33.front();
     totalfibFi33 += fibMaxFi33;
@@ -1081,23 +1090,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     auto avr_fib32 = double(totalfibFi32) / double(totalFi32);
     auto avr_fib33 = double(totalfibFi33) / double(totalFi33);
 
-    /*
-            cout<<"********* Fi31 window el:"<<endl;
-            for (int i=0; i<windowFi31.size();++i) {
-                cout << windowFi31[i] << ' ';
-            }
-            cout<<endl;
-            for (int i=0; i<fiberFi31.size(); ++i) {
-                cout << fiberFi31[i] << ' ';
-            }
-            cout<<endl;
-        if(fNEvents > 5e5){
-          cout<<"Fib31: "<<events31<<", "<<fibMaxFi31<<", "<<totalfibFi31<<"; "<<totalFi31<<", "<<avr_fib31<<", "
-       <<double(totalfibFi31)/double(totalFi31)<<endl;
-   }
-    */
-
-    //   cout<<"Eff: "<<fNEvents<<": "<<effFi30<<", "<<effFi31<<"; "<<effFi32<<", "<<effFi33<<endl;
     if (fNEvents > fwindow_mv)
     {
         fh_counter_fi30->Fill(avr_fib30, effFi30 * 100.);
