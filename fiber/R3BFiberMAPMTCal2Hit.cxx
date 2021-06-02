@@ -196,21 +196,21 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // ToF Tofd -> Fiber:
     chistName = fName + "_time";
     chistTitle = fName + " Time";
-    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 44000, -1100., 1100.);
+    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2200, -1100., 1100.);
     fh_Fib_ToF->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF->GetXaxis()->SetTitle("Fiber ID");
 
     // ToF Fiber for sync:
     chistName = fName + "_time_raw";
     chistTitle = fName + " Time raw";
-    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 44000, -1100., 1100.);
+    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2200, -1100., 1100.);
     fh_Fib_ToF_raw->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF_raw->GetXaxis()->SetTitle("Fiber ID");
 
     // Test:
     chistName = fName + "_test";
-    chistTitle = fName + " Tsync test";
-    fh_Test = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 50, -1024., 1024.);
+    chistTitle = fName + " time test";
+    fh_Test = new TH2F(chistName.Data(), chistTitle.Data(), 10000, 0, 1e6, 4000, -2000., -2000.);
     fh_Test->GetYaxis()->SetTitle("Tsync / ns");
     fh_Test->GetXaxis()->SetTitle("Fiber ID");
 
@@ -237,14 +237,14 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // time difference top-bottom:
     chistName = fName + "_dt";
     chistTitle = fName + " dt of fibers";
-    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, -5000., 5000.);
+    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
     fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
 
     // time difference top-bottom for offsets:
     chistName = fName + "_dt_raw";
     chistTitle = fName + " dt_raw of fibers";
-    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 10000, -2000., 2000.);
+    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
     fh_dt_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib_raw->GetYaxis()->SetTitle("dt / ns");
 
@@ -358,6 +358,12 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
             if (tot_ns < fGate_ns && tot_ns > 0.)
             {
+                //	if(chlead_i == 0 && fName=="Fi31") cout<<"Side: "<<side_i<<", "<<lead_raw<<", "<<lead_trig_ns<<",
+                //"<< 	lead_ns<<"; "<<fTriggerMap[side_i][chlead_i]<<endl;
+
+                if (chlead_i == 0 && fName == "Fi31" && side_i == 1)
+                    fh_Test->Fill(fnEvents, lead_ns);
+
                 channel.tot_list.push_back(ToT(lead, cur_cal_trail, lead_ns, cur_cal_ns, tot_ns));
                 channel.lead_list.pop_front();
             }
@@ -396,7 +402,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
 
                     Int_t fiber_id = -1000;
-                    if (fiber_down_ch == fiber_up_ch)
+                    if (fiber_down_ch == fiber_up_ch && std::abs(up_tot.lead_ns - down_tot.lead_ns) < 20)
                         fiber_id = fiber_down_ch;
                     else
                         continue;

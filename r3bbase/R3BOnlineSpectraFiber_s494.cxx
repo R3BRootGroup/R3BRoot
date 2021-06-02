@@ -230,6 +230,8 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
         fh_dtime_Fib23->GetYaxis()->SetTitle("dTime / ns");
     }
 
+    fh_test2 = new TH2F("Fi31_fib88_vs_Trigger", "Fi31 fib88timedown vs TPAT", 15, 0., 15., 1000, -1000, 0);
+
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
 
@@ -279,7 +281,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                                                 N_FIBER_PLOT,
                                                 0.,
                                                 N_FIBER_PLOT,
-                                                250,
+                                                200,
                                                 0.,
                                                 100.);
             fh_raw_tot_up[ifibcount]->GetXaxis()->SetTitle("Fiber number");
@@ -291,7 +293,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                                                   N_FIBER_PLOT,
                                                   0.,
                                                   N_FIBER_PLOT,
-                                                  250,
+                                                  200,
                                                   0.,
                                                   100.);
             fh_raw_tot_down[ifibcount]->GetXaxis()->SetTitle("Fiber number");
@@ -338,7 +340,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                                              N_FIBER_PLOT,
                                              0.,
                                              N_FIBER_PLOT,
-                                             250,
+                                             200,
                                              0.,
                                              100.);
             fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
@@ -359,10 +361,10 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             // Not-calibrated position:
             fh_Fib_pos[ifibcount] = new TH2F(Form("%sHit_pos", detName),
                                              Form("%sHit Not-calibrated position", detName),
-                                             600,
+                                             300,
                                              -30,
                                              30,
-                                             1000,
+                                             500,
                                              -500,
                                              500);
             fh_Fib_pos[ifibcount]->GetXaxis()->SetTitle("x position");
@@ -380,16 +382,16 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
             fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
 
-            fh_ToTup_vs_ToTdown[ifibcount] = new TH2F(Form("%sHit_ToTup_vs_ToTdown", detName),
-                                                      Form("%sHit ToTup vs ToTdown", detName),
-                                                      400,
-                                                      0.,
+            fh_ToTup_vs_ToTdown[ifibcount] = new TH2F(Form("%sHit_tup_vs_tdown", detName),
+                                                      Form("%sHit tup vs tdown", detName),
+                                                      200,
+                                                      0,
                                                       100,
-                                                      400,
-                                                      0.,
-                                                      100.);
-            fh_ToTup_vs_ToTdown[ifibcount]->GetXaxis()->SetTitle("ToT bottom / ns");
-            fh_ToTup_vs_ToTdown[ifibcount]->GetYaxis()->SetTitle("ToT top / ns");
+                                                      1000,
+                                                      -1000.,
+                                                      0.);
+            fh_ToTup_vs_ToTdown[ifibcount]->GetXaxis()->SetTitle("Time bottom / ns");
+            fh_ToTup_vs_ToTdown[ifibcount]->GetYaxis()->SetTitle("Time top / ns");
 
             FibCanvas[ifibcount]->Divide(4, 4);
             if (fCalItems.at(DET_FI_FIRST + ifibcount))
@@ -416,6 +418,10 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 FibCanvas[ifibcount]->cd(8);
                 gPad->SetLogz();
                 fh_raw_tot_down[ifibcount]->Draw("colz");
+                //   FibCanvas[ifibcount]->cd(16);
+                //  gPad->SetLogz();
+                // if (ifibcount == 1)
+                //   fh_test2->Draw("colz");
             }
             if (fHitItems.at(DET_FI_FIRST + ifibcount))
             {
@@ -513,23 +519,23 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
         return;
     }
 
-    if (header)
-    {
-        if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-            return;
+    //   if (header)
+    //   {
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
-        // fTpat = 1-16; fTpat_bit = 0-15
-        Int_t fTpat_bit = fTpat - 1;
-        Int_t itpat;
-        Int_t tpatvalue;
-        if (fTpat_bit >= 0)
-        {
-            itpat = header->GetTpat();
-            tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-            if ((tpatvalue == 0))
-                return;
-        }
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit = fTpat - 1;
+    Int_t itpat;
+    Int_t tpatvalue;
+    if (fTpat_bit >= 0)
+    {
+        itpat = header->GetTpat();
+        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+        if ((tpatvalue == 0))
+            return;
     }
+    // }
     //----------------------------------------------------------------------
     // Fiber detectors
     //----------------------------------------------------------------------
@@ -699,7 +705,33 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                     lead_raw = lead->GetTime_ns();
                     trail_raw = cur_cal_trail->GetTime_ns();
 
-                    auto tot_ns = fmod(trail_raw - lead_raw + c_period + c_period / 2, c_period) - c_period / 2;
+                    auto time_trig_lead = trig_time[fTriggerMap[lead->GetSide()][lead->GetChannel() - 1]];
+                    auto tlead_ns =
+                        fmod(lead->GetTime_ns() - time_trig_lead + c_period + c_period / 2, c_period) - c_period / 2;
+
+                    auto time_trig_trail = trig_time[fTriggerMap[side_i][ch_i]];
+                    auto ttrail_ns =
+                        fmod(cur_cal_trail->GetTime_ns() - time_trig_trail + c_period + c_period / 2, c_period) -
+                        c_period / 2;
+
+                    auto tot_ns = fmod(ttrail_ns - tlead_ns + c_period + c_period / 2, c_period) - c_period / 2;
+
+                    if (side_i == 1 && ch_i < 180)
+                        fh_ToTup_vs_ToTdown[ifibcount]->Fill(tot_ns, tlead_ns);
+
+                    if (side_i == 0 && ifibcount == 1 && ch_i == 200)
+                    {
+                        Int_t tpatbin;
+                        for (int i = 0; i < 16; i++)
+                        {
+                            tpatbin = (header->GetTpat() & (1 << i));
+
+                            if (tpatbin != 0)
+
+                                //	cout<<"Side: "<<side_i<<"; "<<tlead_ns<<", "<<i+1<<endl;
+                                fh_test2->Fill(i + 1, tlead_ns);
+                        }
+                    }
 
                     if (tot_ns < c_tot_coincidence_ns && tot_ns > 0.)
                     {
@@ -818,7 +850,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
                 fh_fibers_Fib[ifibcount]->Fill(iFib);
                 fh_ToT_Fib[ifibcount]->Fill(iFib, ToT);
-                fh_ToTup_vs_ToTdown[ifibcount]->Fill(ToT_down, ToT_up);
+                // fh_ToTup_vs_ToTdown[ifibcount]->Fill(ToT_down, ToT_up);
                 fh_time_Fib[ifibcount]->Fill(iFib, tfib);
                 fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
 
@@ -895,6 +927,7 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
             fh_multihit_m_Fib[ifibcount]->Write();
             fh_multihit_s_Fib[ifibcount]->Write();
             fh_channels_single_Fib[ifibcount]->Write();
+            fh_test2->Write();
         }
         if (fHitItems.at(DET_FI_FIRST + ifibcount))
         {

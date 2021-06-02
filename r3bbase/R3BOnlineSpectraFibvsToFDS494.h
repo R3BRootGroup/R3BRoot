@@ -21,7 +21,8 @@
 #define R3BONLINESPECTRAFIBVSTOFDS494
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 44
-#define N_PADDLE_MAX_PTOF 100
+#define T_TOF_MIN -10000
+#define T_TOF_MAX  10000
 
 #include "FairTask.h"
 #include <array>
@@ -111,6 +112,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
 		fxmin=xmin;
 		fxmax=xmax;
 	}
+	inline void SetTofLimits(Double_t tofmin, Double_t tofmax){
+		ftofmin=tofmin;
+		ftofmax=tofmax;
+	}
     /**
      * Methods for setting cuts
      */
@@ -160,7 +165,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     unsigned long long time_start = 0, time = 0;
     unsigned long long tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
-
+	Double_t ftofmin, ftofmax;
     Int_t maxevent;
 	
 	Int_t Q = 0;
@@ -196,6 +201,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     long long totalfibFi31 = 0;
     long long totalfibFi32 = 0;
     long long totalfibFi33 = 0;
+    long long NfibFi30 = 0;
+    long long NfibFi31 = 0;
+    long long NfibFi32 = 0;
+    long long NfibFi33 = 0;
    
     std::size_t fwindow_mv ;
     std::deque<int> windowToFD;
@@ -247,7 +256,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     
     TH2F* fh_test;
 	TH2F* fh_test1;
-	
+	TH2F* fh_test2;
   public:
     ClassDef(R3BOnlineSpectraFibvsToFDS494, 2)
 };

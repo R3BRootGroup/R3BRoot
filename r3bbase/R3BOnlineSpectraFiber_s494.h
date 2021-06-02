@@ -152,6 +152,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     TH2F *fh_chan_dt_cal[NOF_FIB_DET];
     TH2F *fh_xy_global;
     TH2F *fh_dtime_Fib23;
+    TH2F* fh_test2;
   public:
     ClassDef(R3BOnlineSpectraFiber_s494, 2)
 };

@@ -66,6 +66,8 @@ R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494()
     , fwindow_mv(10000)
     , fxmin(-1000)
     , fxmax(1000)
+    , ftofmin(T_TOF_MIN)
+    , ftofmax(T_TOF_MAX)
     , fNEvents(0)
 
 {
@@ -79,6 +81,8 @@ R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494(const char* name, I
     , fwindow_mv(10000)
     , fxmin(-1000)
     , fxmax(1000)
+    , ftofmin(T_TOF_MIN)
+    , ftofmax(T_TOF_MAX)
     , fNEvents(0)
 {
 }
@@ -268,8 +272,10 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_counter_fi33->GetXaxis()->SetTitle("Fiber number");
     fh_counter_fi33->GetYaxis()->SetTitle("Efficiency / % ");
 
-    fh_test = new TH2F("Fi31_fibMax_vs_fNevent", "Fi31 fibMax vsfNevent", 10000, 0, 5e6, 520, 0., 526);
-    fh_test1 = new TH2F("Fi31_fibavr_vs_fNevent", "Fi31 fibavr vsfNevent", 10000, 0, 5e6, 520, 0., 526);
+    fh_test = new TH2F("Fi31_fibMax_vs_fNevent", "Fi31 fibMax vs fNevent", 10000, 0, 5e6, 520, 0., 526);
+    fh_test1 = new TH2F("Fi31_fibavr_vs_fNevent", "Fi31 fibavr vs fNevent", 10000, 0, 5e6, 520, 0., 526);
+    fh_test2 = new TH2F("Fi31_fib88_vs_Trigger", "Fi31 fib88timedown vs Trigger", 520, 0., 520., 2200, -5100, 5100);
+
     cFib->cd(1);
     // gPad->SetLogy();
     fh_Fib_ToF[0]->Draw();
@@ -324,7 +330,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[4]->Draw("colz");
     cFib->cd(26);
-    fh_test->Draw("colz"); // fh_counter_fi32->Draw("colz");
+    fh_counter_fi32->Draw("colz");
 
     cFib->cd(6);
     //  gPad->SetLogy();
@@ -336,7 +342,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[5]->Draw("colz");
     cFib->cd(27);
-    fh_test1->Draw("colz"); // fh_counter_fi33->Draw("colz");
+    fh_counter_fi33->Draw("colz");
 
     cFib->cd(7);
     //  gPad->SetLogy();
@@ -369,8 +375,7 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
     fh_counter_fi31->Reset();
     fh_counter_fi32->Reset();
     fh_counter_fi33->Reset();
-    fh_test->Reset();
-    fh_test1->Reset();
+
     if (fHitItems.at(DET_TOFI))
         fh_Tofi_ToF->Reset();
 }
@@ -492,7 +497,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     Double_t tStart = 0.;
     Bool_t first = true;
     Double_t time_tofd_mem = 0. / 0.;
-
+    Double_t randx;
     Bool_t debug_in = false;
 
     nHitstemp = 0;
@@ -513,6 +518,57 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     if (nHits > 100)
         return;
 
+    // Find good events = plane 1 && plane 2
+    Bool_t tofd_good = false;
+    Double_t xplane[2][100], tplane[2][100], qplane[2][100];
+    for (Int_t i = 0; i < 2; i++)
+    {
+        for (Int_t k = 0; k < 100; k++)
+        {
+            xplane[i][k] = -10000.;
+            tplane[i][k] = -10000;
+            qplane[i][k] = -10000;
+        }
+    }
+    Int_t iCountPl1 = 0, iCountPl2 = 0;
+    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    {
+        R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+        if (IS_NAN(hitTofd->GetTime()))
+            continue;
+        Int_t iPlane = hitTofd->GetDetId();
+        randx = (std::rand() / (float)RAND_MAX) - 0.5;
+        Double_t xtemp = hitTofd->GetX() + 2.7 * randx;
+        Double_t qtemp = hitTofd->GetEloss();
+        Double_t ttemp = hitTofd->GetTime();
+        if (iPlane == 1)
+        {
+            xplane[0][iCountPl1] = xtemp;
+            tplane[0][iCountPl1] = ttemp;
+            qplane[0][iCountPl1] = qtemp;
+            if (!IS_NAN(qtemp))
+                iCountPl1 += 1;
+        }
+        else if (iPlane == 2)
+        {
+            xplane[1][iCountPl2] = xtemp;
+            tplane[1][iCountPl2] = ttemp;
+            qplane[1][iCountPl2] = qtemp;
+            if (!IS_NAN(qtemp))
+                iCountPl2 += 1;
+        }
+    }
+    for (Int_t ipl1 = 0; ipl1 < iCountPl1; ipl1++)
+    {
+        for (Int_t ipl2 = 0; ipl2 < iCountPl2; ipl2++)
+        {
+            if (std::abs(xplane[0][ipl1] - xplane[1][ipl2]) < 2. && std::abs(qplane[0][ipl1] - qplane[1][ipl2] < 10.))
+                tofd_good = true;
+        }
+    }
+
+    //  if(!tofd_good) return;
+
     Int_t multTofd = 0;
 
     // loop over ToFD
@@ -529,10 +585,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                  << hitTofd->GetTime() << endl;
         }
 
-        //     if (hitTofd->GetDetId() != 1)
-        //      continue; // both planes 1&2 have hit
-
-        Double_t randx;
         randx = (std::rand() / (float)RAND_MAX) - 0.5;
         Double_t xxx = hitTofd->GetX() + 2.7 * randx;
         Double_t yyy = hitTofd->GetY();
@@ -540,8 +592,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         tStart = ttt;
         Double_t qqq = hitTofd->GetEloss();
 
-        if (xxx >= fxmin || xxx <= fxmax)
-            nHitstemp += 1;
+        if (xxx < fxmin || xxx > fxmax)
+            continue;
+        //  if (xxx >= fxmin && xxx <= fxmax)
+        nHitstemp += 1;
 
         Bool_t tofd_left = false;
         Bool_t tofd_right = false;
@@ -664,7 +718,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         fibMaxFi33 = 0;
         LOG(DEBUG) << "Fi33 hits: " << nHits33 << endl;
 
-        if (nHitstemp == 1 && nHits33 > 0) //&& tofd_right)
+        if (nHitstemp == 1 && nHits33 > 0)
             events33++;
 
         for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
@@ -679,20 +733,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit33->GetTime();
             tof = tStart - t1[det];
 
-            if (q1[det] > tot_max33) //&& tofd_right)
-            {
-                tot_max33 = q1[det];
-                fibMaxFi33 = hit33->GetFiberId();
-            }
-
             // Fill histograms before cuts
-            if (1 == 1) // tofd_right)
-            {
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-            }
+            fh_Fib_ToF[det]->Fill(tof);
+            fh_xy_Fib[det]->Fill(xxx, q1[det]);
+            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
             fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
             hits33bc++;
 
@@ -704,8 +750,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                 continue;
-            if (fCuts && (tof < -100000 || tof > 10000))
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
+
+            if (q1[det] > tot_max33)
+            {
+                tot_max33 = q1[det];
+                fibMaxFi33 = hit33->GetFiberId();
+            }
 
             hits33++;
 
@@ -727,7 +779,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
         fibMaxFi31 = 0;
         LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
-        if (nHitstemp == 1 && nHits31 > 0) //&& tofd_right)
+        if (nHitstemp == 1 && nHits31 > 0)
             events31++;
         for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
         {
@@ -740,25 +792,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
 
-            if ((t1[det] < -800 || t1[det] > -700))
-                continue;
-            //      if (tof < -20 || tof > 80)
-            //    continue;
-
-            if (q1[det] > tot_max31) //&& tofd_right)
-            {
-                tot_max31 = q1[det];
-                fibMaxFi31 = hit31->GetFiberId();
-            }
+            fh_test2->Fill(hit31->GetFiberId(), tof);
 
             // Fill histograms before cuts
-            if (1 == 1) // tofd_right)
-            {
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-            }
+            fh_xy_Fib[det]->Fill(xxx, q1[det]);
+            fh_Fib_ToF[det]->Fill(tof);
+            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
             fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
             hits31bc++;
 
@@ -770,8 +811,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                 continue;
-            if (fCuts && (tof < -100000 || tof > 10000))
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
+
+            if (q1[det] > tot_max31) //&& tofd_right)
+            {
+                tot_max31 = q1[det];
+                fibMaxFi31 = hit31->GetFiberId();
+            }
 
             hits31++;
 
@@ -805,20 +852,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit30->GetTime();
             tof = tStart - t1[det];
 
-            if (q1[det] > tot_max30) //&& tofd_left)
-            {
-                tot_max30 = q1[det];
-                fibMaxFi30 = hit30->GetFiberId();
-            }
-
             // Fill histograms before cuts
-            if (1 == 1) // tofd_left)
-            {
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            }
+            fh_Fib_ToF[det]->Fill(tof);
+            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+            fh_xy_Fib[det]->Fill(xxx, q1[det]);
+
             fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
             hits30bc++;
 
@@ -829,8 +868,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                 continue;
-            if (tof < -10000 || tof > 10000)
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
+
+            if (q1[det] > tot_max30) //&& tofd_left)
+            {
+                tot_max30 = q1[det];
+                fibMaxFi30 = hit30->GetFiberId();
+            }
 
             hits30++;
 
@@ -864,20 +909,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             t1[det] = hit32->GetTime();
             tof = tStart - t1[det];
 
-            if (q1[det] > tot_max32) //&& tofd_left)
-            {
-                tot_max32 = q1[det];
-                fibMaxFi32 = hit32->GetFiberId();
-            }
-
             // Fill histograms before cuts
-            if (1 == 1) // tofd_left)
-            {
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-            }
+            fh_Fib_ToF[det]->Fill(tof);
+            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+            fh_xy_Fib[det]->Fill(xxx, q1[det]);
+            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
             fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
             hits32bc++;
 
@@ -888,8 +925,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                 continue;
-            if (tof < -10000 || tof > 10000)
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
+
+            if (q1[det] > tot_max32) //&& tofd_left)
+            {
+                tot_max32 = q1[det];
+                fibMaxFi32 = hit32->GetFiberId();
+            }
 
             hits32++;
 
@@ -929,7 +972,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (x1[det] < -10000 || x1[det] > 10000)
                 continue;
-            if (tof < -10000 || tof > 100000)
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
 
             // Fill histograms
@@ -970,7 +1013,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 continue;
             if (y1[det] < -10000 || y1[det] > 10000)
                 continue;
-            if (tof < -10000 || tof > 10000)
+            if ((tof < ftofmin || tof > ftofmax))
                 continue;
 
             // Fill histograms
@@ -985,7 +1028,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         }
 
     } // end ToFD loop
-
     while (windowToFD.size() < fwindow_mv)
     {
         windowToFD.push_back(summ_tofd);
@@ -1003,6 +1045,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         totalFi32 += events32;
         totalfibFi30 += fibMaxFi30;
         totalfibFi32 += fibMaxFi32;
+        if (fibMaxFi30 > 0)
+            NfibFi30 += 1;
+        if (fibMaxFi32 > 0)
+            NfibFi32 += 1;
         //}
         // while (windowToFDr.size() < fwindow_mv)
         //{
@@ -1013,10 +1059,15 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         fiberFi33.push_back(fibMaxFi33);
 
         totalToFDr += summ_tofdr;
+
         totalFi31 += events31;
         totalFi33 += events33;
         totalfibFi31 += fibMaxFi31;
         totalfibFi33 += fibMaxFi33;
+        if (fibMaxFi31 > 0)
+            NfibFi31 += 1;
+        if (fibMaxFi33 > 0)
+            NfibFi33 += 1;
     }
 
     totalToFDl -= windowToFDl.front();
@@ -1039,32 +1090,40 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     windowFi30.pop_front();
     windowFi30.push_back(events30);
 
+    if (fiberFi30.front() > 0)
+        NfibFi30 -= 1;
+    if (fibMaxFi30 > 0)
+        NfibFi30 += 1;
+
     totalfibFi30 -= fiberFi30.front();
     totalfibFi30 += fibMaxFi30;
     fiberFi30.pop_front();
     fiberFi30.push_back(fibMaxFi30);
 
-    //  Double_t fib31temp = fibMaxFi31;
-    // if (totalFi31 > 0)
-    //    fib31temp = double(totalfibFi31) / double(totalFi31);
-
-    // if((events31 > 0 && std::abs(fib31temp-fibMaxFi31) < 50) || events31 < 1 )
-    // {
     totalFi31 -= windowFi31.front();
     totalFi31 += events31;
     windowFi31.pop_front();
     windowFi31.push_back(events31);
 
+    if (fiberFi31.front() > 0)
+        NfibFi31 -= 1;
+    if (fibMaxFi31 > 0)
+        NfibFi31 += 1;
+
     totalfibFi31 -= fiberFi31.front();
     totalfibFi31 += fibMaxFi31;
     fiberFi31.pop_front();
     fiberFi31.push_back(fibMaxFi31);
-    //  }
 
     totalFi32 -= windowFi32.front();
     totalFi32 += events32;
     windowFi32.pop_front();
     windowFi32.push_back(events32);
+
+    if (fiberFi32.front() > 0)
+        NfibFi32 -= 1;
+    if (fibMaxFi32 > 0)
+        NfibFi32 += 1;
 
     totalfibFi32 -= fiberFi32.front();
     totalfibFi32 += fibMaxFi32;
@@ -1076,6 +1135,11 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     windowFi33.pop_front();
     windowFi33.push_back(events33);
 
+    if (fiberFi33.front() > 0)
+        NfibFi33 -= 1;
+    if (fibMaxFi33 > 0)
+        NfibFi33 += 1;
+
     totalfibFi33 -= fiberFi33.front();
     totalfibFi33 += fibMaxFi33;
     fiberFi33.pop_front();
@@ -1086,10 +1150,11 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     auto effFi32 = double(totalFi32) / double(totalToFD);
     auto effFi33 = double(totalFi33) / double(totalToFD);
 
-    auto avr_fib30 = double(totalfibFi30) / double(totalFi30);
-    auto avr_fib31 = double(totalfibFi31) / double(totalFi31);
-    auto avr_fib32 = double(totalfibFi32) / double(totalFi32);
-    auto avr_fib33 = double(totalfibFi33) / double(totalFi33);
+    // cout<<"TEST: "<<NfibFi30<<", "<<NfibFi31<<", "<<NfibFi32<<", "<<NfibFi33<<endl;
+    auto avr_fib30 = double(totalfibFi30) / double(NfibFi30);
+    auto avr_fib31 = double(totalfibFi31) / double(NfibFi31);
+    auto avr_fib32 = double(totalfibFi32) / double(NfibFi32);
+    auto avr_fib33 = double(totalfibFi33) / double(NfibFi33);
 
     if (fNEvents > fwindow_mv)
     {
@@ -1099,7 +1164,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         fh_counter_fi33->Fill(avr_fib33, effFi33 * 100.);
     }
 
-    // if (fibMaxFi31 > 0 && std::abs(fib31temp-fibMaxFi31) < 50)
+    //  if (fibMaxFi31 > 0 && ((fibMaxFi31-fib31temp) < 3.*sqrt(fib31temp) || (fib31temp-fibMaxFi31)
+    //  < 3.*sqrt(fib31temp)))
     if (fibMaxFi31 > 0)
         fh_test->Fill(fNEvents, fibMaxFi31);
     fh_test1->Fill(fNEvents, avr_fib31);
@@ -1167,6 +1233,7 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     fh_counter_fi33->Write();
     fh_test->Write();
     fh_test1->Write();
+    fh_test2->Write();
 }
 
 ClassImp(R3BOnlineSpectraFibvsToFDS494)
