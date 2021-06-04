@@ -162,9 +162,11 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Int_t fTpat;
 	Double_t delta;
 	Bool_t fCuts;
+	Bool_t spill_start = false;
     unsigned long long time_start = 0, time = 0;
     unsigned long long tofdor_start = 0;
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0; /**< Event counter. */
+    unsigned long long time_spill_start = 0, time_spill_end = 0;
 	Double_t ftofmin, ftofmax;
     Int_t maxevent;
 	
@@ -197,14 +199,20 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     long long totalFi31 = 0;
     long long totalFi32 = 0;
     long long totalFi33 = 0;
+    long long totalFi23a = 0;
+    long long totalFi23b = 0;
     long long totalfibFi30 = 0;
     long long totalfibFi31 = 0;
     long long totalfibFi32 = 0;
     long long totalfibFi33 = 0;
+    long long totalfibFi23a = 0;
+    long long totalfibFi23b = 0;
     long long NfibFi30 = 0;
     long long NfibFi31 = 0;
     long long NfibFi32 = 0;
     long long NfibFi33 = 0;
+    long long NfibFi23a = 0;
+    long long NfibFi23b = 0;
    
     std::size_t fwindow_mv ;
     std::deque<int> windowToFD;
@@ -214,11 +222,15 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     std::deque<int> windowFi31;
     std::deque<int> windowFi32;
     std::deque<int> windowFi33;
+    std::deque<int> windowFi23a;
+    std::deque<int> windowFi23b;
     
     std::deque<int> fiberFi30;
     std::deque<int> fiberFi31;
     std::deque<int> fiberFi32;
     std::deque<int> fiberFi33;
+    std::deque<int> fiberFi23a;
+    std::deque<int> fiberFi23b;
 
     Double_t fxmin, fxmax;
     Double_t Nsumm_tofd = 0;
@@ -228,13 +240,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Double_t Nevents31 = 0;
     Double_t Nevents32 = 0;
     Double_t Nevents33 = 0;        
+    Double_t Nevents23a = 0;
+    Double_t Nevents23b = 0;
+    
 	Int_t n_det = 13;
-	
-	Double_t ncounts_tofd[70]={0};
-	Double_t ncounts_fi30[70]={0};
-	Double_t ncounts_fi31[70]={0};
-	Double_t ncounts_fi32[70]={0};
-	Double_t ncounts_fi33[70]={0};
     
     TH1F* fh_Tofi_ToF;
     TH1F* fh_Tofi_ToF_ac;
@@ -253,7 +262,9 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_counter_fi31;
     TH2F* fh_counter_fi32;
     TH2F* fh_counter_fi33;
-    
+    TH2F* fh_counter_fi23a;
+    TH2F* fh_counter_fi23b;
+   
     TH2F* fh_test;
 	TH2F* fh_test1;
 	TH2F* fh_test2;

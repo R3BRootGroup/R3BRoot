@@ -271,6 +271,12 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_counter_fi33 = new TH2F("Counts_Fi33_vs_ToFD", "Fib33 efficiency", 520, 0, 520, 105, 0., 105.);
     fh_counter_fi33->GetXaxis()->SetTitle("Fiber number");
     fh_counter_fi33->GetYaxis()->SetTitle("Efficiency / % ");
+    fh_counter_fi23a = new TH2F("Counts_Fi23a_vs_ToFD", "Fib23a efficiency", 400, 0, 400, 105, 0., 105.);
+    fh_counter_fi23a->GetXaxis()->SetTitle("Fiber number");
+    fh_counter_fi23a->GetYaxis()->SetTitle("Efficiency / % ");
+    fh_counter_fi23b = new TH2F("Counts_Fi23b_vs_ToFD", "Fib23b efficiency", 400, 0, 400, 105, 0., 105.);
+    fh_counter_fi23b->GetXaxis()->SetTitle("Fiber number");
+    fh_counter_fi23b->GetYaxis()->SetTitle("Efficiency / % ");
 
     fh_test = new TH2F("Fi31_fibMax_vs_fNevent", "Fi31 fibMax vs fNevent", 10000, 0, 5e6, 520, 0., 526);
     fh_test1 = new TH2F("Fi31_fibavr_vs_fNevent", "Fi31 fibavr vs fNevent", 10000, 0, 5e6, 520, 0., 526);
@@ -285,6 +291,8 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     cFib->cd(15);
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[0]->Draw("colz");
+    cFib->cd(22);
+    fh_counter_fi23a->Draw("colz");
 
     cFib->cd(2);
     // gPad->SetLogy();
@@ -295,6 +303,8 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     cFib->cd(16);
     gPad->SetLogz();
     fh_Fibs_vs_Tofd[1]->Draw("colz");
+    cFib->cd(23);
+    fh_counter_fi23b->Draw("colz");
 
     cFib->cd(3);
     //  gPad->SetLogy();
@@ -375,6 +385,8 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
     fh_counter_fi31->Reset();
     fh_counter_fi32->Reset();
     fh_counter_fi33->Reset();
+    fh_counter_fi23a->Reset();
+    fh_counter_fi23b->Reset();
 
     if (fHitItems.at(DET_TOFI))
         fh_Tofi_ToF->Reset();
@@ -384,6 +396,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 {
 
     Bool_t debug2 = false;
+    Bool_t counter_reset = false;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -392,8 +405,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     if (header)
     {
         time = header->GetTimeStamp();
-        if (time == 0)
-            return;
+        //   if (time == 0)
+        //     return;
 
         //		if (time > 0) cout << "header time: " << time << endl;
         if (time_start == 0 && time > 0)
@@ -401,6 +414,35 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             time_start = time;
             fNEvents_start = fNEvents;
             // cout << "Start event number " << fNEvents_start << endl;
+        }
+
+        if (header->GetTrigger() == 12)
+            time_spill_start = header->GetTimeStamp(); // spill start in nsec
+        if (header->GetTrigger() == 13)
+            time_spill_end = header->GetTimeStamp(); // spill end  in nsec
+
+        if (header->GetTrigger() == 12)
+            cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec" << endl;
+        if (header->GetTrigger() == 13)
+            cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec" << endl;
+
+        if (header->GetTrigger() == 13)
+        {
+            spill_start = true;
+        }
+        if (header->GetTrigger() == 12)
+        {
+
+            fNEvents_local = 0;
+        }
+        if (header->GetTrigger() == fTrigger && spill_start && !(counter_reset))
+        {
+            spill_start = false;
+            counter_reset = true;
+        }
+        if (header->GetTrigger() == fTrigger && !(spill_start) && counter_reset)
+        {
+            counter_reset = false;
         }
 
         //   check for requested trigger (Todo: should be done globablly / somewhere else)
@@ -426,13 +468,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         }
     }
 
-    fNEvents += 1;
-
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::flush;
-
-    Int_t fibMaxFi30 = 0, fibMaxFi31 = 0, fibMaxFi32 = 0, fibMaxFi33 = 0;
+    Int_t fibMaxFi30 = 0, fibMaxFi31 = 0, fibMaxFi32 = 0, fibMaxFi33 = 0, fibMaxFi23a = 0, fibMaxFi23b = 0;
 
     Int_t summ_tofd = 0;
     Int_t summ_tofdr = 0;
@@ -441,6 +477,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
     Int_t events31 = 0;
     Int_t events32 = 0;
     Int_t events33 = 0;
+    Int_t events23a = 0;
+    Int_t events23b = 0;
 
     Double_t x1[n_det];
     Double_t y1[n_det];
@@ -507,190 +545,198 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
     if (nHits > 0)
     {
+        fNEvents += 1;
+        fNEvents_local += 1;
+
+        if (fNEvents / 10000. == (int)fNEvents / 10000)
+            std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+                      << " %) " << std::flush;
+
         counterTofd++;
         if (debug_in)
         {
             cout << "********************************" << endl;
             cout << "ToFD hits: " << nHits << endl;
         }
-    }
+        // }
 
-    if (nHits > 100)
-        return;
+        // if (nHits > 100)
+        //   return;
 
-    // Find good events = plane 1 && plane 2
-    Bool_t tofd_good = false;
-    Double_t xplane[2][100], tplane[2][100], qplane[2][100];
-    for (Int_t i = 0; i < 2; i++)
-    {
-        for (Int_t k = 0; k < 100; k++)
+        Int_t multTofd = 0;
+
+        // loop over ToFD
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            xplane[i][k] = -10000.;
-            tplane[i][k] = -10000;
-            qplane[i][k] = -10000;
-        }
-    }
-    Int_t iCountPl1 = 0, iCountPl2 = 0;
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
-    {
-        R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
-        if (IS_NAN(hitTofd->GetTime()))
-            continue;
-        Int_t iPlane = hitTofd->GetDetId();
-        randx = (std::rand() / (float)RAND_MAX) - 0.5;
-        Double_t xtemp = hitTofd->GetX() + 2.7 * randx;
-        Double_t qtemp = hitTofd->GetEloss();
-        Double_t ttemp = hitTofd->GetTime();
-        if (iPlane == 1)
-        {
-            xplane[0][iCountPl1] = xtemp;
-            tplane[0][iCountPl1] = ttemp;
-            qplane[0][iCountPl1] = qtemp;
-            if (!IS_NAN(qtemp))
-                iCountPl1 += 1;
-        }
-        else if (iPlane == 2)
-        {
-            xplane[1][iCountPl2] = xtemp;
-            tplane[1][iCountPl2] = ttemp;
-            qplane[1][iCountPl2] = qtemp;
-            if (!IS_NAN(qtemp))
-                iCountPl2 += 1;
-        }
-    }
-    for (Int_t ipl1 = 0; ipl1 < iCountPl1; ipl1++)
-    {
-        for (Int_t ipl2 = 0; ipl2 < iCountPl2; ipl2++)
-        {
-            if (std::abs(xplane[0][ipl1] - xplane[1][ipl2]) < 2. && std::abs(qplane[0][ipl1] - qplane[1][ipl2] < 10.))
-                tofd_good = true;
-        }
-    }
 
-    //  if(!tofd_good) return;
+            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
 
-    Int_t multTofd = 0;
+            if (IS_NAN(hitTofd->GetTime()))
+                continue;
+            if (debug_in)
+            {
+                cout << "Hit " << ihit << " of " << nHits << " charge " << hitTofd->GetEloss() << " time "
+                     << hitTofd->GetTime() << endl;
+            }
 
-    // loop over ToFD
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
-    {
+            randx = (std::rand() / (float)RAND_MAX) - 0.5;
+            Double_t xxx = hitTofd->GetX() + 2.7 * randx;
+            Double_t yyy = hitTofd->GetY();
+            Double_t ttt = hitTofd->GetTime();
+            tStart = ttt;
+            Double_t qqq = hitTofd->GetEloss();
 
-        R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+            // if (xxx < fxmin || xxx > fxmax)
+            //   continue;
+            if (xxx >= fxmin && xxx <= fxmax)
+                nHitstemp += 1;
 
-        if (IS_NAN(hitTofd->GetTime()))
-            continue;
-        if (debug_in)
-        {
-            cout << "Hit " << ihit << " of " << nHits << " charge " << hitTofd->GetEloss() << " time "
-                 << hitTofd->GetTime() << endl;
-        }
+            Bool_t tofd_left = false;
+            Bool_t tofd_right = false;
+            id2 = hitTofd->GetDetId();
 
-        randx = (std::rand() / (float)RAND_MAX) - 0.5;
-        Double_t xxx = hitTofd->GetX() + 2.7 * randx;
-        Double_t yyy = hitTofd->GetY();
-        Double_t ttt = hitTofd->GetTime();
-        tStart = ttt;
-        Double_t qqq = hitTofd->GetEloss();
-
-        if (xxx < fxmin || xxx > fxmax)
-            continue;
-        //  if (xxx >= fxmin && xxx <= fxmax)
-        nHitstemp += 1;
-
-        Bool_t tofd_left = false;
-        Bool_t tofd_right = false;
-        id2 = hitTofd->GetDetId();
-
-        if (nHitstemp == 1)
-        {
-            summ_tofd += 1;
-            time_tofd_mem = ttt;
-        }
-        if (hitTofd->GetX() <= 0.)
-        {
-            // tof rechts
-            tofd_right = true;
-            nHitsright += 1;
             if (nHitstemp == 1)
-                summ_tofdr += 1;
-            if (id2 == 1)
             {
-                det = tofd1r;
+                summ_tofd += 1;
+                time_tofd_mem = ttt;
             }
-            else if (id2 == 2)
+            if (hitTofd->GetX() <= 0.)
             {
-                det = tofd2r;
+                // tof rechts
+                tofd_right = true;
+                nHitsright += 1;
+                if (nHitstemp == 1)
+                    summ_tofdr += 1;
+                if (id2 == 1)
+                {
+                    det = tofd1r;
+                }
+                else if (id2 == 2)
+                {
+                    det = tofd2r;
+                }
+                else if (id2 == 12)
+                {
+                    det = tofdgoodr;
+                }
+                x1[det] = hitTofd->GetX();
+                y1[det] = hitTofd->GetY();
+                q1[det] = hitTofd->GetEloss();
+                t1[det] = hitTofd->GetTime();
             }
-            else if (id2 == 12)
+            else
             {
-                det = tofdgoodr;
-            }
-            x1[det] = hitTofd->GetX();
-            y1[det] = hitTofd->GetY();
-            q1[det] = hitTofd->GetEloss();
-            t1[det] = hitTofd->GetTime();
-        }
-        else
-        {
-            // tof links
-            nHitsleft += 1;
-            if (nHitstemp == 1)
-                summ_tofdl += 1;
-            tofd_left = true;
-            if (id2 == 1)
-            {
-                det = tofd1l;
-            }
-            else if (id2 == 2)
-            {
-                det = tofd2l;
-            }
-            else if (id2 == 2)
-            {
-                det = tofdgoodl;
+                // tof links
+                nHitsleft += 1;
+                if (nHitstemp == 1)
+                    summ_tofdl += 1;
+                tofd_left = true;
+                if (id2 == 1)
+                {
+                    det = tofd1l;
+                }
+                else if (id2 == 2)
+                {
+                    det = tofd2l;
+                }
+                else if (id2 == 2)
+                {
+                    det = tofdgoodl;
+                }
+
+                x2[det] = hitTofd->GetX();
+                y2[det] = hitTofd->GetY();
+                q2[det] = hitTofd->GetEloss();
+                t2[det] = hitTofd->GetTime();
             }
 
-            x2[det] = hitTofd->GetX();
-            y2[det] = hitTofd->GetY();
-            q2[det] = hitTofd->GetEloss();
-            t2[det] = hitTofd->GetTime();
-        }
+            if (fCuts && (qqq < 0 || qqq > 1000))
+                continue;
+            if (fCuts && (xxx < -10000 || xxx > 10000))
+                continue;
 
-        if (fCuts && (qqq < 0 || qqq > 1000))
-            continue;
-        if (fCuts && (xxx < -10000 || xxx > 10000))
-            continue;
+            multTofd++;
 
-        multTofd++;
+            counterTofdMulti++;
 
-        counterTofdMulti++;
+            // cut in ToT for Fibers
+            Double_t cutQ = 0.;
 
-        // cut in ToT for Fibers
-        Double_t cutQ = 0.;
-
-        // loop over TOFI
-        if (fHitItems.at(DET_TOFI))
-        {
-            auto detHitTofi = fHitItems.at(DET_TOFI);
-            Int_t nHitsTofi = detHitTofi->GetEntriesFast();
-            LOG(DEBUG) << "Tofi hits: " << nHitsTofi << endl;
-
-            for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
+            // loop over TOFI
+            if (fHitItems.at(DET_TOFI))
             {
-                det = tofi;
-                R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
-                x1[det] = hitTofi->GetX(); // cm
-                y1[det] = hitTofi->GetY(); // cm
+                auto detHitTofi = fHitItems.at(DET_TOFI);
+                Int_t nHitsTofi = detHitTofi->GetEntriesFast();
+                LOG(DEBUG) << "Tofi hits: " << nHitsTofi << endl;
+
+                for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
+                {
+                    det = tofi;
+                    R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
+                    x1[det] = hitTofi->GetX(); // cm
+                    y1[det] = hitTofi->GetY(); // cm
+                    z1[det] = 0.;
+                    q1[det] = hitTofi->GetEloss();
+
+                    t1[det] = hitTofi->GetTime();
+                    tof = tStart - t1[det];
+
+                    // Fill histograms before cuts
+                    fh_Tofi_ToF->Fill(tof);
+
+                    // Cuts on Tofi
+
+                    if (fCuts && x1[det] * 100. < -10000)
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue;
+                    if (fCuts && (tof < -100000 || tof > 10000))
+                        continue;
+
+                    // Fill histograms after cuts
+                    fh_Tofi_ToF_ac->Fill(tof);
+
+                    if (debug2)
+                        cout << "FiTofi: " << ihitTofi << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                             << " t1: " << t1[det] << endl;
+                }
+            }
+
+            // loop over fiber 33
+            auto detHit33 = fHitItems.at(DET_FI33);
+            Int_t nHits33 = detHit33->GetEntriesFast();
+            Double_t tot_max33 = 0;
+            fibMaxFi33 = 0;
+            fibMaxFi33 = 0;
+            LOG(DEBUG) << "Fi33 hits: " << nHits33 << endl;
+
+            if (nHitstemp == 1 && nHits33 > 0)
+                events33++;
+
+            for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
+            {
+                det = fi33;
+                R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
+                x1[det] = hit33->GetX(); // cm
+                y1[det] = hit33->GetY(); // cm
                 z1[det] = 0.;
-                q1[det] = hitTofi->GetEloss();
+                q1[det] = hit33->GetEloss();
 
-                t1[det] = hitTofi->GetTime();
+                t1[det] = hit33->GetTime();
                 tof = tStart - t1[det];
 
                 // Fill histograms before cuts
-                fh_Tofi_ToF->Fill(tof);
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-                // Cuts on Tofi
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                hits33bc++;
+
+                // Cuts on Fi33
 
                 if (fCuts && x1[det] * 100. < -10000)
                     continue;
@@ -698,485 +744,546 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                     continue;
                 if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                     continue;
-                if (fCuts && (tof < -100000 || tof > 10000))
+                if ((tof < ftofmin || tof > ftofmax))
                     continue;
 
+                if (q1[det] > tot_max33)
+                {
+                    tot_max33 = q1[det];
+                    fibMaxFi33 = hit33->GetFiberId();
+                }
+
+                hits33++;
+
                 // Fill histograms after cuts
-                fh_Tofi_ToF_ac->Fill(tof);
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
 
                 if (debug2)
-                    cout << "FiTofi: " << ihitTofi << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                    cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                          << " t1: " << t1[det] << endl;
             }
-        }
 
-        // loop over fiber 33
-        auto detHit33 = fHitItems.at(DET_FI33);
-        Int_t nHits33 = detHit33->GetEntriesFast();
-        Double_t tot_max33 = 0;
-        fibMaxFi33 = 0;
-        fibMaxFi33 = 0;
-        LOG(DEBUG) << "Fi33 hits: " << nHits33 << endl;
+            // loop over fiber 31
+            auto detHit31 = fHitItems.at(DET_FI31);
+            Int_t nHits31 = detHit31->GetEntriesFast();
+            Double_t tot_max31 = 0.;
 
-        if (nHitstemp == 1 && nHits33 > 0)
-            events33++;
-
-        for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
-        {
-            det = fi33;
-            R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
-            x1[det] = hit33->GetX(); // cm
-            y1[det] = hit33->GetY(); // cm
-            z1[det] = 0.;
-            q1[det] = hit33->GetEloss();
-
-            t1[det] = hit33->GetTime();
-            tof = tStart - t1[det];
-
-            // Fill histograms before cuts
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-            hits33bc++;
-
-            // Cuts on Fi33
-
-            if (fCuts && x1[det] * 100. < -10000)
-                continue;
-            if (fCuts && q1[det] < cutQ)
-                continue;
-            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
-
-            if (q1[det] > tot_max33)
+            fibMaxFi31 = 0;
+            LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
+            if (nHitstemp == 1 && nHits31 > 0)
+                events31++;
+            for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
             {
-                tot_max33 = q1[det];
-                fibMaxFi33 = hit33->GetFiberId();
+                det = fi31;
+                R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
+                x1[det] = hit31->GetX();
+                y1[det] = hit31->GetY();
+                z1[det] = 0.;
+                q1[det] = hit31->GetEloss();
+                t1[det] = hit31->GetTime();
+                tof = tStart - t1[det];
+
+                fh_test2->Fill(hit31->GetFiberId(), tof);
+
+                // Fill histograms before cuts
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                hits31bc++;
+
+                // Cuts on Fi31
+
+                if (fCuts && x1[det] < -10000)
+                    continue;
+                if (fCuts && q1[det] < cutQ)
+                    continue;
+                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                    continue;
+                if ((tof < ftofmin || tof > ftofmax))
+                    continue;
+
+                if (q1[det] > tot_max31)
+                {
+                    tot_max31 = q1[det];
+                    fibMaxFi31 = hit31->GetFiberId();
+                }
+
+                hits31++;
+
+                // Fill histograms
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+
+                if (debug2)
+                    cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                         << " t1: " << t1[det] << endl;
             }
 
-            hits33++;
-
-            // Fill histograms after cuts
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-
-            if (debug2)
-                cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
-        }
-
-        // loop over fiber 31
-        auto detHit31 = fHitItems.at(DET_FI31);
-        Int_t nHits31 = detHit31->GetEntriesFast();
-        Double_t tot_max31 = 0.;
-
-        fibMaxFi31 = 0;
-        LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
-        if (nHitstemp == 1 && nHits31 > 0)
-            events31++;
-        for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
-        {
-            det = fi31;
-            R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
-            x1[det] = hit31->GetX();
-            y1[det] = hit31->GetY();
-            z1[det] = 0.;
-            q1[det] = hit31->GetEloss();
-            t1[det] = hit31->GetTime();
-            tof = tStart - t1[det];
-
-            fh_test2->Fill(hit31->GetFiberId(), tof);
-
-            // Fill histograms before cuts
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-            hits31bc++;
-
-            // Cuts on Fi31
-
-            if (fCuts && x1[det] < -10000)
-                continue;
-            if (fCuts && q1[det] < cutQ)
-                continue;
-            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
-
-            if (q1[det] > tot_max31) //&& tofd_right)
+            // loop over fiber 30
+            auto detHit30 = fHitItems.at(DET_FI30);
+            Int_t nHits30 = detHit30->GetEntriesFast();
+            Double_t tot_max30 = 0.;
+            fibMaxFi30 = 0;
+            LOG(DEBUG) << "Fi30 hits: " << nHits30 << endl;
+            if (nHitstemp == 1 && nHits30 > 0)
+                events30++;
+            for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
             {
-                tot_max31 = q1[det];
-                fibMaxFi31 = hit31->GetFiberId();
+                det = fi30;
+                R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
+                x1[det] = hit30->GetX();
+                y1[det] = hit30->GetY();
+                z1[det] = 0.;
+                q1[det] = hit30->GetEloss();
+                t1[det] = hit30->GetTime();
+                tof = tStart - t1[det];
+
+                // Fill histograms before cuts
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                hits30bc++;
+
+                // Cuts on Fi30
+                if (fCuts && q1[det] < cutQ)
+                    continue;
+                if (fCuts && x1[det] < -10000)
+                    continue;
+                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                    continue;
+                if ((tof < ftofmin || tof > ftofmax))
+                    continue;
+
+                if (q1[det] > tot_max30)
+                {
+                    tot_max30 = q1[det];
+                    fibMaxFi30 = hit30->GetFiberId();
+                }
+
+                hits30++;
+
+                // Fill histograms
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+
+                if (debug2)
+                    cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                         << " t1: " << t1[det] << endl;
             }
 
-            hits31++;
-
-            // Fill histograms
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-
-            if (debug2)
-                cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
-        }
-
-        // loop over fiber 30
-        auto detHit30 = fHitItems.at(DET_FI30);
-        Int_t nHits30 = detHit30->GetEntriesFast();
-        Double_t tot_max30 = 0.;
-        fibMaxFi30 = 0;
-        LOG(DEBUG) << "Fi30 hits: " << nHits30 << endl;
-        if (nHitstemp == 1 && nHits30 > 0) // && tofd_left)
-            events30++;
-        for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
-        {
-            det = fi30;
-            R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
-            x1[det] = hit30->GetX();
-            y1[det] = hit30->GetY();
-            z1[det] = 0.;
-            q1[det] = hit30->GetEloss();
-            t1[det] = hit30->GetTime();
-            tof = tStart - t1[det];
-
-            // Fill histograms before cuts
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-            hits30bc++;
-
-            // Cuts on Fi30
-            if (fCuts && q1[det] < cutQ)
-                continue;
-            if (fCuts && x1[det] < -10000)
-                continue;
-            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
-
-            if (q1[det] > tot_max30) //&& tofd_left)
+            // loop over fiber 32
+            auto detHit32 = fHitItems.at(DET_FI32);
+            Int_t nHits32 = detHit32->GetEntriesFast();
+            Double_t tot_max32 = 0.;
+            fibMaxFi32 = 0;
+            LOG(DEBUG) << "Fi32 hits: " << nHits32 << endl;
+            if (nHitstemp == 1 && nHits32 > 0)
+                events32++;
+            for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
             {
-                tot_max30 = q1[det];
-                fibMaxFi30 = hit30->GetFiberId();
+                det = fi32;
+                R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
+                x1[det] = hit32->GetX();
+                y1[det] = hit32->GetY();
+                z1[det] = 0.;
+                q1[det] = hit32->GetEloss();
+                t1[det] = hit32->GetTime();
+                tof = tStart - t1[det];
+
+                // Fill histograms before cuts
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                hits32bc++;
+
+                // Cuts on Fi32
+                if (q1[det] < cutQ)
+                    continue;
+                if (fCuts && x1[det] < -10000)
+                    continue;
+                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                    continue;
+                if ((tof < ftofmin || tof > ftofmax))
+                    continue;
+
+                if (q1[det] > tot_max32)
+                {
+                    tot_max32 = q1[det];
+                    fibMaxFi32 = hit32->GetFiberId();
+                }
+
+                hits32++;
+
+                // Fill histograms
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+
+                if (debug2)
+                    cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                         << " t1: " << t1[det] << endl;
             }
 
-            hits30++;
-
-            // Fill histograms
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-
-            if (debug2)
-                cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
-        }
-
-        // loop over fiber 32
-        auto detHit32 = fHitItems.at(DET_FI32);
-        Int_t nHits32 = detHit32->GetEntriesFast();
-        Double_t tot_max32 = 0.;
-        fibMaxFi32 = 0;
-        LOG(DEBUG) << "Fi32 hits: " << nHits32 << endl;
-        if (nHitstemp == 1 && nHits32) //> 0 && tofd_left)
-            events32++;
-        for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
-        {
-            det = fi32;
-            R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
-            x1[det] = hit32->GetX();
-            y1[det] = hit32->GetY();
-            z1[det] = 0.;
-            q1[det] = hit32->GetEloss();
-            t1[det] = hit32->GetTime();
-            tof = tStart - t1[det];
-
-            // Fill histograms before cuts
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-            hits32bc++;
-
-            // Cuts on Fi32
-            if (q1[det] < cutQ)
-                continue;
-            if (fCuts && x1[det] < -10000)
-                continue;
-            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
-
-            if (q1[det] > tot_max32) //&& tofd_left)
+            // loop over fiber 23a
+            auto detHit23a = fHitItems.at(DET_FI23A);
+            Int_t nHits23a = detHit23a->GetEntriesFast();
+            Double_t tot_max23a = 0.;
+            fibMaxFi23a = 0;
+            LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+            if (nHitstemp == 1 && nHits23a > 0)
+                events23a++;
+            for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
             {
-                tot_max32 = q1[det];
-                fibMaxFi32 = hit32->GetFiberId();
+                det = fi23a;
+                R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                x1[det] = hit23a->GetX();
+                y1[det] = hit23a->GetY();
+                q1[det] = hit23a->GetEloss();
+                t1[det] = hit23a->GetTime();
+                tof = tStart - t1[det];
+
+                // Fill histograms before cuts
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
+                if (q1[det] < cutQ)
+                    continue;
+                if (x1[det] < -10000 || x1[det] > 10000)
+                    continue;
+                if ((tof < ftofmin || tof > ftofmax))
+                    continue;
+
+                if (q1[det] > tot_max23a)
+                {
+                    tot_max23a = q1[det];
+                    fibMaxFi23a = hit23a->GetFiberId();
+                }
+
+                // Fill histograms
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+
+                if (debug2)
+                    cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                         << " t1: " << tof << endl;
             }
 
-            hits32++;
+            // loop over fiber 23b
+            auto detHit23b = fHitItems.at(DET_FI23B);
+            Int_t nHits23b = detHit23b->GetEntriesFast();
+            Double_t tot_max23b = 0.;
+            fibMaxFi23b = 0;
+            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+            if (nHitstemp == 1 && nHits23b > 0)
+                events23b++;
+            for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+            {
+                det = fi23b;
+                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                x1[det] = hit23b->GetX();
+                y1[det] = hit23b->GetY();
+                z1[det] = 0.;
+                q1[det] = hit23b->GetEloss();
+                t1[det] = hit23b->GetTime();
+                tof = tStart - t1[det];
 
-            // Fill histograms
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                // Fill histograms before cuts
+                fh_Fib_ToF[det]->Fill(tof);
+                fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
+                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-            if (debug2)
-                cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
-        }
+                // Cuts on Fi23b
+                if (q1[det] < cutQ)
+                    continue;
+                if (y1[det] < -10000 || y1[det] > 10000)
+                    continue;
+                if ((tof < ftofmin || tof > ftofmax))
+                    continue;
 
-        // loop over fiber 23a
-        auto detHit23a = fHitItems.at(DET_FI23A);
-        Int_t nHits23a = detHit23a->GetEntriesFast();
-        LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
-        for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
+                if (q1[det] > tot_max23b)
+                {
+                    tot_max23b = q1[det];
+                    fibMaxFi23b = hit23b->GetFiberId();
+                }
+
+                // Fill histograms
+                fh_Fib_ToF_ac[det]->Fill(tof);
+                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
+
+                if (debug2)
+                    cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                         << " t1: " << tof << endl;
+            }
+
+        } // end ToFD loop
+
+        /*
+                    if(fNEvents_local == 1)  // reset everything at the beginning of the spill
+                    {
+                        windowToFD.clear();
+                        windowToFDl.clear();
+                        windowToFDr.clear();
+                        windowFi30.clear();
+                        windowFi31.clear();
+                        windowFi32.clear();
+                        windowFi33.clear();
+                        windowFi23a.clear();
+                        windowFi23b.clear();
+                        fiberFi30.clear();
+                        fiberFi31.clear();
+                        fiberFi32.clear();
+                        fiberFi33.clear();
+                        fiberFi23a.clear();
+                        fiberFi23b.clear();
+                        totalToFD = 0;
+                        totalToFDl = 0;
+                        totalToFDr = 0;
+                        totalFi30 = 0;
+                        totalFi31 = 0;
+                        totalFi32 = 0;
+                        totalFi33 = 0;
+                        totalFi23a = 0;
+                        totalFi23b = 0;
+                        totalfibFi30 = 0;
+                        totalfibFi31 = 0;
+                        totalfibFi32 = 0;
+                        totalfibFi33 = 0;
+                        totalfibFi23a = 0;
+                        totalfibFi23b = 0;
+                        NfibFi30 = 0;
+                        NfibFi31 = 0;
+                        NfibFi32 = 0;
+                        NfibFi33 = 0;
+                        NfibFi23a = 0;
+                        NfibFi23b = 0;
+                    }
+        */
+        while (windowToFD.size() < fwindow_mv)
         {
-            det = fi23a;
-            R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-            x1[det] = hit23a->GetX();
-            y1[det] = hit23a->GetY();
-            q1[det] = hit23a->GetEloss();
-            t1[det] = hit23a->GetTime();
-            tof = tStart - t1[det];
+            windowToFD.push_back(summ_tofd);
 
-            // Fill histograms before cuts
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+            windowFi23a.push_back(events23a);
+            windowFi23b.push_back(events23b);
+            fiberFi23a.push_back(fibMaxFi23a);
+            fiberFi23b.push_back(fibMaxFi23b);
 
-            if (q1[det] < cutQ)
-                continue;
-            if (x1[det] < -10000 || x1[det] > 10000)
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
+            windowToFDl.push_back(summ_tofdl);
+            windowFi30.push_back(events30);
+            windowFi32.push_back(events32);
 
-            // Fill histograms
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+            fiberFi30.push_back(fibMaxFi30);
+            fiberFi32.push_back(fibMaxFi32);
 
-            if (debug2)
-                cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << tof << endl;
+            totalToFD += summ_tofd;
+            totalFi23a += events23a;
+            totalFi23b += events23b;
+            if (fibMaxFi23a > 0)
+                NfibFi23a += 1;
+            if (fibMaxFi23b > 0)
+                NfibFi23b += 1;
+
+            totalToFDl += summ_tofdl;
+            totalFi30 += events30;
+            totalFi32 += events32;
+            totalfibFi30 += fibMaxFi30;
+            totalfibFi32 += fibMaxFi32;
+            if (fibMaxFi30 > 0)
+                NfibFi30 += 1;
+            if (fibMaxFi32 > 0)
+                NfibFi32 += 1;
+
+            windowToFDr.push_back(summ_tofdr);
+            windowFi31.push_back(events31);
+            windowFi33.push_back(events33);
+            fiberFi31.push_back(fibMaxFi31);
+            fiberFi33.push_back(fibMaxFi33);
+
+            totalToFDr += summ_tofdr;
+
+            totalFi31 += events31;
+            totalFi33 += events33;
+            totalfibFi31 += fibMaxFi31;
+            totalfibFi33 += fibMaxFi33;
+            if (fibMaxFi31 > 0)
+                NfibFi31 += 1;
+            if (fibMaxFi33 > 0)
+                NfibFi33 += 1;
         }
 
-        // loop over fiber 23b
-        auto detHit23b = fHitItems.at(DET_FI23B);
-        Int_t nHits23b = detHit23b->GetEntriesFast();
-        LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-        for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-        {
-            det = fi23b;
-            R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-            x1[det] = hit23b->GetX();
-            y1[det] = hit23b->GetY();
-            z1[det] = 0.;
-            q1[det] = hit23b->GetEloss();
-            t1[det] = hit23b->GetTime();
-            tof = tStart - t1[det];
+        totalToFDl -= windowToFDl.front();
+        totalToFDl += summ_tofdl;
+        windowToFDl.pop_front();
+        windowToFDl.push_back(summ_tofdl);
 
-            // Fill histograms before cuts
-            fh_Fib_ToF[det]->Fill(tof);
-            fh_xy_Fib[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
-            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-
-            // Cuts on Fi23b
-            if (q1[det] < cutQ)
-                continue;
-            if (y1[det] < -10000 || y1[det] > 10000)
-                continue;
-            if ((tof < ftofmin || tof > ftofmax))
-                continue;
-
-            // Fill histograms
-            fh_Fib_ToF_ac[det]->Fill(tof);
-            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
-
-            if (debug2)
-                cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << tof << endl;
-        }
-
-    } // end ToFD loop
-    while (windowToFD.size() < fwindow_mv)
-    {
+        totalToFD -= windowToFD.front();
+        totalToFD += summ_tofd;
+        windowToFD.pop_front();
         windowToFD.push_back(summ_tofd);
 
-        windowToFDl.push_back(summ_tofdl);
-        windowFi30.push_back(events30);
-        windowFi32.push_back(events32);
-        fiberFi30.push_back(fibMaxFi30);
-        fiberFi32.push_back(fibMaxFi32);
+        totalToFDr -= windowToFDr.front();
+        totalToFDr += summ_tofdr;
+        windowToFDr.pop_front();
+        windowToFDr.push_back(summ_tofdr);
 
-        totalToFD += summ_tofd;
-
-        totalToFDl += summ_tofdl;
+        totalFi30 -= windowFi30.front();
         totalFi30 += events30;
-        totalFi32 += events32;
-        totalfibFi30 += fibMaxFi30;
-        totalfibFi32 += fibMaxFi32;
+        windowFi30.pop_front();
+        windowFi30.push_back(events30);
+
+        if (fiberFi30.front() > 0)
+            NfibFi30 -= 1;
         if (fibMaxFi30 > 0)
             NfibFi30 += 1;
-        if (fibMaxFi32 > 0)
-            NfibFi32 += 1;
-        //}
-        // while (windowToFDr.size() < fwindow_mv)
-        //{
-        windowToFDr.push_back(summ_tofdr);
-        windowFi31.push_back(events31);
-        windowFi33.push_back(events33);
-        fiberFi31.push_back(fibMaxFi31);
-        fiberFi33.push_back(fibMaxFi33);
 
-        totalToFDr += summ_tofdr;
+        totalfibFi30 -= fiberFi30.front();
+        totalfibFi30 += fibMaxFi30;
+        fiberFi30.pop_front();
+        fiberFi30.push_back(fibMaxFi30);
 
+        totalFi31 -= windowFi31.front();
         totalFi31 += events31;
-        totalFi33 += events33;
-        totalfibFi31 += fibMaxFi31;
-        totalfibFi33 += fibMaxFi33;
+        windowFi31.pop_front();
+        windowFi31.push_back(events31);
+
+        if (fiberFi31.front() > 0)
+            NfibFi31 -= 1;
         if (fibMaxFi31 > 0)
             NfibFi31 += 1;
+
+        totalfibFi31 -= fiberFi31.front();
+        totalfibFi31 += fibMaxFi31;
+        fiberFi31.pop_front();
+        fiberFi31.push_back(fibMaxFi31);
+
+        totalFi32 -= windowFi32.front();
+        totalFi32 += events32;
+        windowFi32.pop_front();
+        windowFi32.push_back(events32);
+
+        if (fiberFi32.front() > 0)
+            NfibFi32 -= 1;
+        if (fibMaxFi32 > 0)
+            NfibFi32 += 1;
+
+        totalfibFi32 -= fiberFi32.front();
+        totalfibFi32 += fibMaxFi32;
+        fiberFi32.pop_front();
+        fiberFi32.push_back(fibMaxFi32);
+
+        totalFi33 -= windowFi33.front();
+        totalFi33 += events33;
+        windowFi33.pop_front();
+        windowFi33.push_back(events33);
+
+        if (fiberFi33.front() > 0)
+            NfibFi33 -= 1;
         if (fibMaxFi33 > 0)
             NfibFi33 += 1;
-    }
 
-    totalToFDl -= windowToFDl.front();
-    totalToFDl += summ_tofdl;
-    windowToFDl.pop_front();
-    windowToFDl.push_back(summ_tofdl);
+        totalfibFi33 -= fiberFi33.front();
+        totalfibFi33 += fibMaxFi33;
+        fiberFi33.pop_front();
+        fiberFi33.push_back(fibMaxFi33);
 
-    totalToFD -= windowToFD.front();
-    totalToFD += summ_tofd;
-    windowToFD.pop_front();
-    windowToFD.push_back(summ_tofd);
+        totalFi23a -= windowFi23a.front();
+        totalFi23a += events23a;
+        windowFi23a.pop_front();
+        windowFi23a.push_back(events23a);
 
-    totalToFDr -= windowToFDr.front();
-    totalToFDr += summ_tofdr;
-    windowToFDr.pop_front();
-    windowToFDr.push_back(summ_tofdr);
+        if (fiberFi23a.front() > 0)
+            NfibFi23a -= 1;
+        if (fibMaxFi23a > 0)
+            NfibFi23a += 1;
 
-    totalFi30 -= windowFi30.front();
-    totalFi30 += events30;
-    windowFi30.pop_front();
-    windowFi30.push_back(events30);
+        totalfibFi23a -= fiberFi23a.front();
+        totalfibFi23a += fibMaxFi23a;
+        fiberFi23a.pop_front();
+        fiberFi23a.push_back(fibMaxFi23a);
 
-    if (fiberFi30.front() > 0)
-        NfibFi30 -= 1;
-    if (fibMaxFi30 > 0)
-        NfibFi30 += 1;
+        totalFi23b -= windowFi23b.front();
+        totalFi23b += events23b;
+        windowFi23b.pop_front();
+        windowFi23b.push_back(events23b);
 
-    totalfibFi30 -= fiberFi30.front();
-    totalfibFi30 += fibMaxFi30;
-    fiberFi30.pop_front();
-    fiberFi30.push_back(fibMaxFi30);
+        if (fiberFi23b.front() > 0)
+            NfibFi23b -= 1;
+        if (fibMaxFi23b > 0)
+            NfibFi23b += 1;
 
-    totalFi31 -= windowFi31.front();
-    totalFi31 += events31;
-    windowFi31.pop_front();
-    windowFi31.push_back(events31);
+        totalfibFi23b -= fiberFi23b.front();
+        totalfibFi23b += fibMaxFi23b;
+        fiberFi23b.pop_front();
+        fiberFi23b.push_back(fibMaxFi23b);
 
-    if (fiberFi31.front() > 0)
-        NfibFi31 -= 1;
-    if (fibMaxFi31 > 0)
-        NfibFi31 += 1;
+        Double_t effFi30 = -1, effFi31 = -1, effFi32 = -1, effFi33 = -1, effFi23a = -1, effFi23b = -1;
 
-    totalfibFi31 -= fiberFi31.front();
-    totalfibFi31 += fibMaxFi31;
-    fiberFi31.pop_front();
-    fiberFi31.push_back(fibMaxFi31);
+        effFi30 = double(totalFi30) / double(totalToFD);
+        effFi31 = double(totalFi31) / double(totalToFD);
+        effFi32 = double(totalFi32) / double(totalToFD);
+        effFi33 = double(totalFi33) / double(totalToFD);
+        effFi23a = double(totalFi23a) / double(totalToFD);
+        effFi23b = double(totalFi23b) / double(totalToFD);
 
-    totalFi32 -= windowFi32.front();
-    totalFi32 += events32;
-    windowFi32.pop_front();
-    windowFi32.push_back(events32);
+        auto avr_fib30 = double(totalfibFi30) / double(NfibFi30);
+        auto avr_fib31 = double(totalfibFi31) / double(NfibFi31);
+        auto avr_fib32 = double(totalfibFi32) / double(NfibFi32);
+        auto avr_fib33 = double(totalfibFi33) / double(NfibFi33);
+        auto avr_fib23a = double(totalfibFi23a) / double(NfibFi23a);
+        auto avr_fib23b = double(totalfibFi23b) / double(NfibFi23b);
 
-    if (fiberFi32.front() > 0)
-        NfibFi32 -= 1;
-    if (fibMaxFi32 > 0)
-        NfibFi32 += 1;
+        if (fNEvents > fwindow_mv)
+        {
+            fh_counter_fi30->Fill(avr_fib30, effFi30 * 100.);
+            fh_counter_fi31->Fill(avr_fib31, effFi31 * 100.);
+            fh_counter_fi32->Fill(avr_fib32, effFi32 * 100.);
+            fh_counter_fi33->Fill(avr_fib33, effFi33 * 100.);
+            fh_counter_fi23a->Fill(avr_fib23a, effFi23a * 100.);
+            fh_counter_fi23b->Fill(avr_fib23b, effFi23b * 100.);
+        }
 
-    totalfibFi32 -= fiberFi32.front();
-    totalfibFi32 += fibMaxFi32;
-    fiberFi32.pop_front();
-    fiberFi32.push_back(fibMaxFi32);
+        //  if (fibMaxFi31 > 0 && ((fibMaxFi31-fib31temp) < 3.*sqrt(fib31temp) || (fib31temp-fibMaxFi31)
+        //  < 3.*sqrt(fib31temp)))
+        if (fibMaxFi32 > 0)
+            fh_test->Fill(fNEvents, fibMaxFi32);
+        fh_test1->Fill(fNEvents, avr_fib32);
 
-    totalFi33 -= windowFi33.front();
-    totalFi33 += events33;
-    windowFi33.pop_front();
-    windowFi33.push_back(events33);
+        Nsumm_tofd += summ_tofd;
+        Nsumm_tofdr += summ_tofdr;
+        Nsumm_tofdl += summ_tofdl;
+        Nevents30 += events30;
+        Nevents31 += events31;
+        Nevents32 += events32;
+        Nevents33 += events33;
+        Nevents23a += events23a;
+        Nevents23b += events23b;
 
-    if (fiberFi33.front() > 0)
-        NfibFi33 -= 1;
-    if (fibMaxFi33 > 0)
-        NfibFi33 += 1;
-
-    totalfibFi33 -= fiberFi33.front();
-    totalfibFi33 += fibMaxFi33;
-    fiberFi33.pop_front();
-    fiberFi33.push_back(fibMaxFi33);
-
-    auto effFi30 = double(totalFi30) / double(totalToFD);
-    auto effFi31 = double(totalFi31) / double(totalToFD);
-    auto effFi32 = double(totalFi32) / double(totalToFD);
-    auto effFi33 = double(totalFi33) / double(totalToFD);
-
-    // cout<<"TEST: "<<NfibFi30<<", "<<NfibFi31<<", "<<NfibFi32<<", "<<NfibFi33<<endl;
-    auto avr_fib30 = double(totalfibFi30) / double(NfibFi30);
-    auto avr_fib31 = double(totalfibFi31) / double(NfibFi31);
-    auto avr_fib32 = double(totalfibFi32) / double(NfibFi32);
-    auto avr_fib33 = double(totalfibFi33) / double(NfibFi33);
-
-    if (fNEvents > fwindow_mv)
-    {
-        fh_counter_fi30->Fill(avr_fib30, effFi30 * 100.);
-        fh_counter_fi31->Fill(avr_fib31, effFi31 * 100.);
-        fh_counter_fi32->Fill(avr_fib32, effFi32 * 100.);
-        fh_counter_fi33->Fill(avr_fib33, effFi33 * 100.);
-    }
-
-    //  if (fibMaxFi31 > 0 && ((fibMaxFi31-fib31temp) < 3.*sqrt(fib31temp) || (fib31temp-fibMaxFi31)
-    //  < 3.*sqrt(fib31temp)))
-    if (fibMaxFi31 > 0)
-        fh_test->Fill(fNEvents, fibMaxFi31);
-    fh_test1->Fill(fNEvents, avr_fib31);
-
-    Nsumm_tofd += summ_tofd;
-    Nsumm_tofdr += summ_tofdr;
-    Nsumm_tofdl += summ_tofdl;
-    Nevents30 += events30;
-    Nevents31 += events31;
-    Nevents32 += events32;
-    Nevents33 += events33;
+    } // end of if nHitsTofd > 0
 }
 
 void R3BOnlineSpectraFibvsToFDS494::FinishEvent()
@@ -1231,6 +1338,8 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     fh_counter_fi31->Write();
     fh_counter_fi32->Write();
     fh_counter_fi33->Write();
+    fh_counter_fi23a->Write();
+    fh_counter_fi23b->Write();
     fh_test->Write();
     fh_test1->Write();
     fh_test2->Write();
