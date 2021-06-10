@@ -219,10 +219,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
                         Double_t sync = par->GetSync();
-                        par->SetPar1a(para2[0]);
-                        par->SetPar1b(para2[1]);
-                        par->SetPar1c(para2[2]);
-                        par->SetPar1d(para2[3]);
+                        par->SetPola(para2[0]);
+                        par->SetPolb(para2[1]);
+                        par->SetPolc(para2[2]);
+                        par->SetPold(para2[3]);
                     }
                 }
             }
