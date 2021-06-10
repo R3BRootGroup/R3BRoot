@@ -43,6 +43,10 @@ R3BTofiHitModulePar::R3BTofiHitModulePar(const char* name, const char* title, co
     , fPar2b(0)
     , fPar2c(0)
     , fPar2d(0)
+    , fPola(0)
+    , fPolb(0)
+    , fPolc(0)
+    , fPold(0)
     , fPar1za(0)
     , fPar1zb(0)
     , fPar1zc(0)
@@ -107,6 +111,7 @@ void R3BTofiHitModulePar::printParams()
     LOG(INFO) << "   fLambda: " << fLambda;
     LOG(INFO) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
     LOG(INFO) << "   fDoubleExp2: " << fPar2a << "  " << fPar2b << "  " << fPar2c << "  " << fPar2d;
+    LOG(INFO) << "   fPol3: " << fPola << "  " << fPolb << "  " << fPolc << "  " << fPold;
     LOG(INFO) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
     LOG(INFO) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
               << fPar5walk;

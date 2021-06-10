@@ -93,6 +93,10 @@ class R3BTofiHitModulePar : public FairParGenericSet
     Double_t GetPar2b() const { return fPar2b; }
     Double_t GetPar2c() const { return fPar2c; }
     Double_t GetPar2d() const { return fPar2d; }
+    Double_t GetPola() const { return fPola; }
+    Double_t GetPolb() const { return fPolb; }
+    Double_t GetPolc() const { return fPolc; }
+    Double_t GetPold() const { return fPold; }
     Double_t GetPar1za() const { return fPar1za; }
     Double_t GetPar1zb() const { return fPar1zb; }
     Double_t GetPar1zc() const { return fPar1zc; }
@@ -118,6 +122,10 @@ class R3BTofiHitModulePar : public FairParGenericSet
     void SetPar2b(Double_t par2b) { fPar2b = par2b; }
     void SetPar2c(Double_t par2c) { fPar2c = par2c; }
     void SetPar2d(Double_t par2d) { fPar2d = par2d; }
+    void SetPola(Double_t pola) { fPola = pola; }
+    void SetPolb(Double_t polb) { fPolb = polb; }
+    void SetPolc(Double_t polc) { fPolc = polc; }
+    void SetPold(Double_t pold) { fPold = pold; }
     void SetPar1za(Double_t par1za) { fPar1za = par1za; }
     void SetPar1zb(Double_t par1zb) { fPar1zb = par1zb; }
     void SetPar1zc(Double_t par1zc) { fPar1zc = par1zc; }
@@ -139,6 +147,7 @@ class R3BTofiHitModulePar : public FairParGenericSet
     Double_t fSync;    /**< time offset between paddles */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d;
     Double_t fPar2a, fPar2b, fPar2c, fPar2d;
+    Double_t fPola, fPolb, fPolc, fPold;  /**< polynomial parameters for position dependent charge */
     Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;
     Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk;
 

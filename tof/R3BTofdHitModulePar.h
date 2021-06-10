@@ -147,7 +147,7 @@ class R3BTofdHitModulePar : public FairParGenericSet
     Double_t fSync;       /**< time offset between paddles */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d;  /**< double exponential parameters for position dependent charge */
     Double_t fPar2a, fPar2b, fPar2c, fPar2d;  /**< double exponential parameters for position dependent charge */
-    Double_t fPola, fPolb, fPolc, fPold;  /**< polonomial parameters for position dependent charge */
+    Double_t fPola, fPolb, fPolc, fPold;  /**< polynomial parameters for position dependent charge */
     Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;  /**< quench correction parameters */
     Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk;  /**< walk correction parameters */
 
