@@ -35,6 +35,7 @@
 #pragma link C++ class R3BTofiCal2Histo+;
 #pragma link C++ class R3BTofdCal2Histo+;
 #pragma link C++ class R3BTofdCal2HistoPar+;
+#pragma link C++ class R3BTofdHisto2HitPar+;
 #pragma link C++ class R3BTofdChangePar+;
 #pragma link C++ class R3BTofdCal2Hit+;
 #pragma link C++ class R3BTofdCal2HitS454+;
