@@ -13,7 +13,6 @@
 
 #include "TClonesArray.h"
 #include "TF1.h"
-#include "TGeoMatrix.h"
 #include "TGraph.h"
 #include "TH1F.h"
 #include "TMath.h"
@@ -26,38 +25,17 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "TGeoManager.h"
 
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaMapped2CrystalCalPar.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
-#include "R3BEventHeader.h"
 
 #include <iostream>
 #include <stdlib.h>
 
-using namespace std;
-
 R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar()
-    : FairTask("R3B CALIFA Calibration Parameters Finder ", 1)
-    , fMap_Par(NULL)
-    , fCal_Par(NULL)
-    , fCalifaMappedDataCA(NULL)
-    , fNumCrystals(0)
-    , fNumParam(0)
-    , fMinStadistics(0)
-    , fMapHistos_left(0)
-    , fMapHistos_right(0)
-    , fMapHistos_bins(0)
-    , fMapHistos_leftp(0)
-    , fMapHistos_rightp(0)
-    , fMapHistos_binsp(0)
-    , fNumPeaks(0)
-    , fSigma(0)
-    , fThreshold(0)
-    , fEnergyPeaks(NULL)
-    , fDebugMode(0)
+    : R3BCalifaMapped2CrystalCalPar("R3B CALIFA Calibration Parameters Finder ", 1)
 {
 }
 
@@ -66,9 +44,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar(const char* name, I
     , fMap_Par(NULL)
     , fCal_Par(NULL)
     , fCalifaMappedDataCA(NULL)
-    , fNumCrystals(0)
+    , fNumCrystals(1)
     , fNumParam(0)
-    , fMinStadistics(0)
+    , fMinStadistics(100)
     , fMapHistos_left(0)
     , fMapHistos_right(0)
     , fMapHistos_bins(0)
@@ -127,7 +105,7 @@ void R3BCalifaMapped2CrystalCalPar::SetParameter()
 
 InitStatus R3BCalifaMapped2CrystalCalPar::Init()
 {
-    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar::Init";
+    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar::Init()";
 
     if (!fEnergyPeaks)
     {
@@ -138,21 +116,21 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on FairRootManager.";
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on CalifaMappedData.";
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on FairRuntimeDb.";
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
@@ -266,7 +244,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold); // number of peaks
                 else
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "goff", fThreshold);
-                // std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;
+                LOG(DEBUG) << "CrystalId=" << i + 1 << " " << nfound << " " << fThreshold;
                 fChannelPeaks = (Double_t*)ss->GetPositionX();
 
                 Int_t idx[nfound];
@@ -280,7 +258,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 {
                     X[j] = fChannelPeaks[idx[nfound - j - 1]];
                     Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
-                    // std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
+                    LOG(DEBUG) << "CrystalId=" << i + 1 << " " << j + 1 << " " << X[j + 1];
                 }
                 X[nfound] = 0.;
                 Y[nfound] = 0.;
@@ -328,7 +306,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 }
                 else
                 {
-                    LOG(INFO)
+                    LOG(WARNING)
                         << "R3BCalifaMapped2CrystalCalPar:: No imput number of fit parameters, therefore, by default "
                            "NumberParameters=2";
                     f1 = new TF1("f1", "[0]+[1]*x", fleft, fright);
@@ -344,7 +322,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
             }
             else
             {
-                LOG(WARNING) << "R3BCalifaMapped2CrystalCalPar::Histogram NO Fitted number " << i;
+                LOG(WARNING) << "R3BCalifaMapped2CrystalCalPar::Histogram number " << i + 1 << "not Fitted";
             }
         }
 

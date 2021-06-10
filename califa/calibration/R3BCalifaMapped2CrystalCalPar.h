@@ -85,7 +85,7 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
     void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
 
-    void SetDebugMode(Int_t debug) { fDebugMode = debug; }
+    void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
     void SetEnergyPeaks(TArrayF* thePeaks)
     {
@@ -93,9 +93,9 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
         fNumPeaks = thePeaks->GetSize();
     }
 
-  protected:
+  private:
     void SetParameter();
-    Int_t fDebugMode;
+    Bool_t fDebugMode;
     Int_t fNumCrystals;
     Int_t fMapHistos_left; // gamma range
     Int_t fMapHistos_right;

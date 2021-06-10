@@ -69,15 +69,24 @@ class R3BCalifaCrystalCal2TotCalPar : public FairTask
     void SetThreshold(Double_t threshold) { fThreshold = threshold; }
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
     void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
+    void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
+    void SetRange(Double_t H_left, Double_t H_right)
+    {
+        fLeft = H_left;
+        fRight = H_right;
+    }
 
-  protected:
+  private:
     void SetParameter();
+    Bool_t fDebugMode;
     Int_t fNumCrystals;
     Int_t fNumParam;
     Int_t fMinStadistics;
     Int_t* idx;
 
     Double_t fThreshold;
+    Double_t fLeft;
+    Double_t fRight;
 
     R3BCalifaMappingPar* fMap_Par;   /**< Parameter container with mapping. >*/
     R3BCalifaTotCalPar* fTotCal_Par; /**< Container for Tot-Cal parameters. >*/

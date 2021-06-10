@@ -461,8 +461,8 @@ void R3BFileSource::SetInTree(TTree* tempTree)
 // ----  Method GetRunid -----------------------------------------------------
 Int_t R3BFileSource::GetRunid(uint64_t st)
 {
-    UInt_t fArray = fTimestamp.size();
-    if (fArray != fRunid.size())
+    UInt_t fArraysize = fTimestamp.size();
+    if (fArraysize != fRunid.size())
     {
         LOG(ERROR) << "R3BFileSource::GetRunid() Different number of RunIds and timestamps";
         prevts = -1;
@@ -470,7 +470,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
         return 1;
     }
 
-    for (Int_t j = 0; j < fArray - 1; j++)
+    for (Int_t j = 0; j < fArraysize - 1; j++)
         if (st >= fTimestamp[j] && st < fTimestamp[j + 1])
         {
             prevts = fTimestamp[j];
@@ -479,12 +479,12 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
             return fRunid[j];
         }
 
-    if (st >= fTimestamp[fArray - 1])
+    if (st >= fTimestamp[fArraysize - 1])
     {
-        prevts = fTimestamp[fArray - 1];
-        nextts = fTimestamp[fArray - 1];
-        LOG(DEBUG) << "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArray - 1];
-        return fRunid[fArray - 1];
+        prevts = fTimestamp[fArraysize - 1];
+        nextts = fTimestamp[fArraysize - 1];
+        LOG(DEBUG) << "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1];
+        return fRunid[fArraysize - 1];
     }
 
     if (nextts > 0)
