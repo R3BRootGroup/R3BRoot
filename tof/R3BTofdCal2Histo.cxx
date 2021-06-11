@@ -495,7 +495,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     }
                     else
                     {
-                        // double exponential
+                         // double exponential
                         auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
                         auto q1 = bot_tot /
                                   (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
