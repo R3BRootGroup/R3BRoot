@@ -719,15 +719,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 x[iPlane][iBar * 2 - 1].push_back(iBar * 2.8 - 21. * 2.8 - 1.4 * randx);
                 // correct for position dependence and calculate nuclear charge Z
                 Double_t para[4];
-                para[0] = par->GetPar1a();
-                para[1] = par->GetPar1b();
-                para[2] = par->GetPar1c();
-                para[3] = par->GetPar1d();
 
                 Double_t qb = 0.;
                 if (fTofdTotPos)
                 {
                     // via pol3
+                    para[0] = par->GetPola();
+                    para[1] = par->GetPolb();
+                    para[2] = par->GetPolc();
+                    para[3] = par->GetPold();
                     qb = TMath::Sqrt(top_tot * bot_tot) /
                          (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                     qb = qb * fTofdQ;
@@ -735,6 +735,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 else
                 {
                     // via double exponential:
+                    para[0] = par->GetPar1a();
+                    para[1] = par->GetPar1b();
+                    para[2] = par->GetPar1c();
+                    para[3] = par->GetPar1d();
                     auto q1 =
                         bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                     para[0] = par->GetPar2a();

@@ -537,15 +537,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                                                   (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer);
                 }
                 Double_t para[4];
-                para[0] = par->GetPar1a();
-                para[1] = par->GetPar1b();
-                para[2] = par->GetPar1c();
-                para[3] = par->GetPar1d();
 
                 Double_t qb = 0.;
                 if (fTofiTotPos)
                 {
                     // via pol3
+                    para[0] = par->GetPola();
+                    para[1] = par->GetPolb();
+                    para[2] = par->GetPolc();
+                    para[3] = par->GetPold();
                     qb = TMath::Sqrt(top_tot * bot_tot) /
                          (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                     qb = qb * fTofiQ;
@@ -553,6 +553,10 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 else
                 {
                     // via double exponential:
+                    para[0] = par->GetPar1a();
+                    para[1] = par->GetPar1b();
+                    para[2] = par->GetPar1c();
+                    para[3] = par->GetPar1d();
                     auto q1 =
                         bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                     para[0] = par->GetPar2a();
