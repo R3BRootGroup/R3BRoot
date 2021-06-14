@@ -549,6 +549,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     qb = TMath::Sqrt(top_tot * bot_tot) /
                          (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                     qb = qb * fTofiQ;
+
                 }
                 else
                 {

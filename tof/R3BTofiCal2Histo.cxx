@@ -42,6 +42,8 @@
 #include <stdlib.h>
 
 #include "mapping_tofi_trig.hh"
+extern unsigned g_tofi_trig_map[2][24];
+void tofi_trig_map_setup();
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
@@ -54,7 +56,6 @@ namespace
 
 R3BTofiCal2Histo::R3BTofiCal2Histo()
     : FairTask("R3BTofiCal2Histo", 1)
-    , fCalTriggerItems(NULL)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -89,7 +90,6 @@ R3BTofiCal2Histo::R3BTofiCal2Histo()
 
 R3BTofiCal2Histo::R3BTofiCal2Histo(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalTriggerItems(NULL)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -251,7 +251,8 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
     }
 
     static bool s_was_trig_missing = false;
-    auto trig_num = fCalTriggerItems->GetEntries();
+    UInt_t trig_num = fCalTriggerItems->GetEntriesFast();
+    //if (trig_num>0) cout << "Trigger information: " << trig_num << endl;
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -312,7 +313,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
             auto bot_ns =
                 fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             /*
-                        if(top_ns>2000 || bot_ns>2000){
+                        if(top_ns>0 || bot_ns>0){
                             std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
                             std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
                         }
@@ -386,7 +387,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
-                            LOG(ERROR) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                            LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                        << ", Bar: " << top->GetBarId();
                             ++top_i;
                             ++bot_i;
@@ -408,7 +409,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     R3BTofiHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(ERROR) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                    << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
@@ -595,7 +596,7 @@ void R3BTofiCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
         sprintf(strName2, "Time Sync Plane %d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -2000, 2000.);
+        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 4000, -2000, 2000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }
