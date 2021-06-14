@@ -7,8 +7,8 @@
 #ifndef R3BONLINESPECTRATOFD_S494
 #define R3BONLINESPECTRATOFD_S494
 
-#define N_PLANE_MAX_TOFD 4
-#define N_PADDLE_MAX_TOFD 44
+#define N_PLANE_MAX_TOFD_S494 4
+#define N_PADDLE_MAX_TOFD_S494 44
 
 
 #include "FairTask.h"
@@ -148,17 +148,19 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
 
-    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_dt[N_PLANE_MAX_TOFD-1];
+    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_dt[N_PLANE_MAX_TOFD_S494-1];
     TH1F* fh_TimePreviousEvent;
-    TH2F* fh_tofd_multihit_coinc[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_TotPm_coinc[N_PLANE_MAX_TOFD];
-    TH2F* fh_num_side[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_Tot_hit[N_PLANE_MAX_TOFD];
-    TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD-1];
+    TH2F* fh_tofd_multihit_coinc[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_TotPm_coinc[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_num_side[N_PLANE_MAX_TOFD_S494];
+    TH1F* fh_tofd_bars[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_Tot_hit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_time_hit[N_PLANE_MAX_TOFD_S494];
+    TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD_S494-1];
     
   public:
     ClassDef(R3BOnlineSpectraToFD_S494, 2)

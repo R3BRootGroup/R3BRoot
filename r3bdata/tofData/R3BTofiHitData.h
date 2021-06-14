@@ -26,10 +26,15 @@ class R3BTofiHitData : public R3BHit
     R3BTofiHitData();
 
     // Standard Constructor
-    R3BTofiHitData(Double_t t, Double_t x, Double_t y, Double_t Z, Double_t tdiff, Double_t ELoss = 0, Double_t ID = 0);
+    R3BTofiHitData(Double_t t, Double_t x, Double_t y, Double_t Z, Double_t tdiff, Double_t ELoss = 0, Double_t ID = 0, Int_t iBar = 0);
 
     // Destructor
-    virtual ~R3BTofiHitData() {}
+    virtual ~R3BTofiHitData() {}   
+    
+    Int_t GetBarId() const;
+
+private:
+    Int_t fBarId;
 
     ClassDef(R3BTofiHitData, 2)
 };

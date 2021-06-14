@@ -826,13 +826,13 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             singlehit++;
             if (fTofiTotPos)
             {
-                new ((*fHitItems)[fNofHitItems++])
-                    R3BTofiHitData(tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
+                    tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
             }
             else
             {
-                new ((*fHitItems)[fNofHitItems++])
-                    R3BTofiHitData(tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
+                    tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
             }
         }
     }

@@ -6,7 +6,7 @@
 
 #ifndef R3BONLINESPECTRAFIBER_S494
 #define R3BONLINESPECTRAFIBER_S494
-#define N_FIBER_PLOT 520 // range to plot
+#define N_FIBER_PLOT_S494 520 // range to plot
 #define NbSections 1
 #define NbAnodes 16
 

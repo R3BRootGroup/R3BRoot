@@ -26,11 +26,16 @@ class R3BTofdHitData : public R3BHit
     R3BTofdHitData();
 
     // Standard Constructor
-    R3BTofdHitData(Double_t t, Double_t x, Double_t y, Double_t Z, Double_t tdiff, Double_t ELoss = 0, Double_t ID = 0);
+    R3BTofdHitData(Double_t t, Double_t x, Double_t y, Double_t Z, Double_t tdiff, Double_t ELoss = 0, Double_t ID = 0, Int_t iBar = 0);
 
     // Destructor
     virtual ~R3BTofdHitData() {}
 
+   Int_t GetBarId() const;
+
+private:
+    Int_t fBarId;
+    
     ClassDef(R3BTofdHitData, 2)
 };
 

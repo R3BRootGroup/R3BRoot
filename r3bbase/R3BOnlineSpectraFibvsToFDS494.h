@@ -19,8 +19,8 @@
 
 #ifndef R3BONLINESPECTRAFIBVSTOFDS494
 #define R3BONLINESPECTRAFIBVSTOFDS494
-#define N_PLANE_MAX_TOFD 4
-#define N_PADDLE_MAX_TOFD 44
+#define N_PLANE_MAX_TOFD_S494 4
+#define N_PADDLE_MAX_TOFD_S494 44
 #define T_TOF_MIN -10000
 #define T_TOF_MAX  10000
 
@@ -116,6 +116,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
 		ftofmin=tofmin;
 		ftofmax=tofmax;
 	}
+	inline void SetQLimits(Double_t qmin, Double_t qmax){
+		fqtofdmin=qmin;
+		fqtofdmax=qmax;
+	}
     /**
      * Methods for setting cuts
      */
@@ -167,7 +171,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     unsigned long long tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0; /**< Event counter. */
     unsigned long long time_spill_start = 0, time_spill_end = 0;
-	Double_t ftofmin, ftofmax;
+	Double_t ftofmin, ftofmax, fqtofdmin, fqtofdmax;
     Int_t maxevent;
 	
 	Int_t Q = 0;
@@ -201,18 +205,21 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     long long totalFi33 = 0;
     long long totalFi23a = 0;
     long long totalFi23b = 0;
+    long long totalTofi = 0;
     long long totalfibFi30 = 0;
     long long totalfibFi31 = 0;
     long long totalfibFi32 = 0;
     long long totalfibFi33 = 0;
     long long totalfibFi23a = 0;
     long long totalfibFi23b = 0;
+    long long totalfibTofi = 0;
     long long NfibFi30 = 0;
     long long NfibFi31 = 0;
     long long NfibFi32 = 0;
     long long NfibFi33 = 0;
     long long NfibFi23a = 0;
     long long NfibFi23b = 0;
+    long long NfibTofi = 0;
    
     std::size_t fwindow_mv ;
     std::deque<int> windowToFD;
@@ -224,6 +231,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     std::deque<int> windowFi33;
     std::deque<int> windowFi23a;
     std::deque<int> windowFi23b;
+    std::deque<int> windowTofi;
     
     std::deque<int> fiberFi30;
     std::deque<int> fiberFi31;
@@ -231,6 +239,9 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     std::deque<int> fiberFi33;
     std::deque<int> fiberFi23a;
     std::deque<int> fiberFi23b;
+	std::deque<int> fiberTofi;
+
+    Double_t avr_fib30 = 0, avr_fib31 = 0, avr_fib32 = 0, avr_fib33 = 0, avr_fib23a = 0, avr_fib23b = 0, avr_fibtofi=0; 
 
     Double_t fxmin, fxmax;
     Double_t Nsumm_tofd = 0;
@@ -242,7 +253,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Double_t Nevents33 = 0;        
     Double_t Nevents23a = 0;
     Double_t Nevents23b = 0;
-    
+    Double_t Neventstofi = 0;
 	Int_t n_det = 13;
     
     TH1F* fh_Tofi_ToF;
@@ -264,6 +275,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_counter_fi33;
     TH2F* fh_counter_fi23a;
     TH2F* fh_counter_fi23b;
+    TH2F* fh_counter_tofi;
    
     TH2F* fh_test;
 	TH2F* fh_test1;

@@ -1,6 +1,7 @@
 // ------------------------------------------------------------
-// -----                  R3BOnlineSpectraToFD_S494                -----
+// -----                  R3BOnlineSpectraToFD_S494       -----
 // -----          Created April 13th 2016 by M.Heil       -----
+// -----          Modify 2021 by A.Kelic-Heil             -----
 // ------------------------------------------------------------
 
 /*
@@ -67,8 +68,8 @@ R3BOnlineSpectraToFD_S494::R3BOnlineSpectraToFD_S494(const char* name, Int_t iVe
     , fTrigger(-1)
     , fTpat(-1)
     , fCalTriggerItems(NULL)
-    , fNofPlanes(N_PLANE_MAX_TOFD)
-    , fPaddlesPerPlane(N_PADDLE_MAX_TOFD)
+    , fNofPlanes(N_PLANE_MAX_TOFD_S494)
+    , fPaddlesPerPlane(N_PADDLE_MAX_TOFD_S494)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -173,7 +174,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
                 sprintf(strName11, "tofd_ToF_plane_%d_%d", jk, jk + 1);
                 char strName12[255];
                 sprintf(strName12, "Tofd ToF plane %d and %d ", jk, jk + 1);
-                fh_tofd_dt[j] = new TH2F(strName11, strName12, 50, 0, 50, 2000, -1000., 1000);
+                fh_tofd_dt[j] = new TH2F(strName11, strName12, 50, 0, 50, 4000, -2000., 2000);
                 fh_tofd_dt[j]->GetXaxis()->SetTitle("Bar number");
                 fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
             }
@@ -272,7 +273,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     if (fHitItems.at(DET_TOFD))
     {
         TCanvas* cTofd_planes_hit = new TCanvas("TOFD_planes_HitLevel", "TOFD planes HIT Level", 20, 20, 1120, 1020);
-        cTofd_planes_hit->Divide(3, 4);
+        cTofd_planes_hit->Divide(5, 4);
 
         for (Int_t j = 0; j < 4; j++)
         {
@@ -281,8 +282,8 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             sprintf(strName3, "tofd_hit_ToT_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "Tofd hit ToT plane %d", j + 1);
-            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 200, -50, 50, 3000, 0., 300.);
-            fh_tofd_Tot_hit[j]->GetXaxis()->SetTitle("x / cm");
+            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 3000, 0., 300.);
+            fh_tofd_Tot_hit[j]->GetXaxis()->SetTitle("BarId");
             fh_tofd_Tot_hit[j]->GetYaxis()->SetTitle("ToT / ns");
 
             char strName7[255];
@@ -292,6 +293,22 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             fh_tofd_multihit_hit[j] = new TH1F(strName7, strName8, 100, 0, 100);
             fh_tofd_multihit_hit[j]->GetXaxis()->SetTitle("Multihit");
 
+            char strName21[255];
+            sprintf(strName21, "tofd_bars_plane_%d", j + 1);
+            char strName22[255];
+            sprintf(strName22, "Tofd bars plane %d", j + 1);
+            fh_tofd_bars[j] = new TH1F(strName21, strName22, 45, 0., 45.);
+            fh_tofd_bars[j]->GetXaxis()->SetTitle("BarId");
+            fh_tofd_bars[j]->GetYaxis()->SetTitle("Counts");
+
+            char strName23[255];
+            sprintf(strName23, "tofd_hit_time_plane_%d", j + 1);
+            char strName24[255];
+            sprintf(strName24, "Tofd hit time plane %d", j + 1);
+            fh_tofd_time_hit[j] = new TH2F(strName23, strName24, 45, 0, 45, 4000, -2000., 2000.);
+            fh_tofd_time_hit[j]->GetXaxis()->SetTitle("BarId");
+            fh_tofd_time_hit[j]->GetYaxis()->SetTitle("time / ns");
+
             if (j < 3)
             {
                 int jk = j + 1;
@@ -299,9 +316,9 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
                 sprintf(strName11, "tofd_hit_ToF_dt_plane_%d_%d", jk, jk + 1);
                 char strName12[255];
                 sprintf(strName12, "Tofd hit ToF dt plane %d and %d ", jk, jk + 1);
-                fh_tofd_dt_hit[j] = new TH2F(strName11, strName12, 200, -50, 50, 2000, -1000., 1000);
+                fh_tofd_dt_hit[j] = new TH2F(strName11, strName12, 45, 0, 45, 4000, -2000., 2000);
                 char strName9[255];
-                sprintf(strName9, "x plane %d / cm", j + 1);
+                sprintf(strName9, "BarId plane %d ", j + 1);
                 fh_tofd_dt_hit[j]->GetXaxis()->SetTitle(strName9);
                 fh_tofd_dt_hit[j]->GetYaxis()->SetTitle("dt / ns");
             }
@@ -310,37 +327,61 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         cTofd_planes_hit->cd(1);
         gPad->SetLogy();
         fh_tofd_multihit_hit[0]->Draw();
-        cTofd_planes_hit->cd(2);
+        cTofd_planes_hit->cd(3);
         gPad->SetLogz();
         fh_tofd_Tot_hit[0]->Draw("colz");
-
+        cTofd_planes_hit->cd(2);
+        gPad->SetLogy();
+        fh_tofd_bars[0]->Draw();
         cTofd_planes_hit->cd(4);
+        gPad->SetLogz();
+        fh_tofd_time_hit[0]->Draw("colz");
+
+        cTofd_planes_hit->cd(6);
         gPad->SetLogy();
         fh_tofd_multihit_hit[1]->Draw();
-        cTofd_planes_hit->cd(5);
+        cTofd_planes_hit->cd(8);
         gPad->SetLogz();
         fh_tofd_Tot_hit[1]->Draw("colz");
-        cTofd_planes_hit->cd(6);
+        cTofd_planes_hit->cd(7);
+        gPad->SetLogy();
+        fh_tofd_bars[1]->Draw();
+        cTofd_planes_hit->cd(9);
+        gPad->SetLogz();
+        fh_tofd_time_hit[1]->Draw("colz");
+        cTofd_planes_hit->cd(10);
         gPad->SetLogz();
         fh_tofd_dt_hit[0]->Draw("colz");
 
-        cTofd_planes_hit->cd(7);
+        cTofd_planes_hit->cd(11);
         gPad->SetLogy();
         fh_tofd_multihit_hit[2]->Draw();
-        cTofd_planes_hit->cd(8);
+        cTofd_planes_hit->cd(13);
         gPad->SetLogz();
         fh_tofd_Tot_hit[2]->Draw("colz");
-        cTofd_planes_hit->cd(9);
+        cTofd_planes_hit->cd(12);
+        gPad->SetLogy();
+        fh_tofd_bars[2]->Draw();
+        cTofd_planes_hit->cd(14);
+        gPad->SetLogz();
+        fh_tofd_time_hit[2]->Draw("colz");
+        cTofd_planes_hit->cd(15);
         gPad->SetLogz();
         fh_tofd_dt_hit[1]->Draw("colz");
 
-        cTofd_planes_hit->cd(10);
+        cTofd_planes_hit->cd(16);
         gPad->SetLogy();
         fh_tofd_multihit_hit[3]->Draw();
-        cTofd_planes_hit->cd(11);
+        cTofd_planes_hit->cd(18);
         gPad->SetLogz();
         fh_tofd_Tot_hit[3]->Draw("colz");
-        cTofd_planes_hit->cd(12);
+        cTofd_planes_hit->cd(17);
+        gPad->SetLogy();
+        fh_tofd_bars[3]->Draw();
+        cTofd_planes_hit->cd(19);
+        gPad->SetLogz();
+        fh_tofd_time_hit[3]->Draw("colz");
+        cTofd_planes_hit->cd(20);
         gPad->SetLogz();
         fh_tofd_dt_hit[2]->Draw("colz");
 
@@ -357,7 +398,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
 
 void R3BOnlineSpectraToFD_S494::Reset_TOFD_Histo()
 {
-    for (int i = 0; i < N_PLANE_MAX_TOFD; i++)
+    for (int i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
     {
         fh_tofd_channels[i]->Reset();
         fh_tofd_multihit[i]->Reset();
@@ -371,12 +412,14 @@ void R3BOnlineSpectraToFD_S494::Reset_TOFD_Histo()
 
     if (fHitItems.at(DET_TOFD))
     {
-        for (int i = 0; i < N_PLANE_MAX_TOFD; i++)
+        for (int i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             fh_tofd_Tot_hit[i]->Reset();
+            fh_tofd_time_hit[i]->Reset();
             fh_tofd_multihit_hit[i]->Reset();
+            fh_tofd_bars[i]->Reset();
         }
-        for (int i = 0; i < N_PLANE_MAX_TOFD - 1; i++)
+        for (int i = 0; i < N_PLANE_MAX_TOFD_S494 - 1; i++)
         {
             fh_tofd_dt_hit[i]->Reset();
         }
@@ -453,8 +496,8 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         auto det = fMappedItems.at(DET_TOFD);
         Int_t nMapped = det->GetEntriesFast();
         Int_t iPlaneMem = 1, iBarMem = 0;
-        Int_t nsum_top[N_PLANE_MAX_TOFD] = { 0 };
-        Int_t nsum_bot[N_PLANE_MAX_TOFD] = { 0 };
+        Int_t nsum_top[N_PLANE_MAX_TOFD_S494] = { 0 };
+        Int_t nsum_bot[N_PLANE_MAX_TOFD_S494] = { 0 };
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
             auto mapped = (R3BTofdMappedData const*)det->At(imapped);
@@ -466,9 +509,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             Int_t const iSide = mapped->GetSideId();      // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
 
-            if (iSide == 1 && iEdge == 1 && iPlane < N_PLANE_MAX_TOFD)
+            if (iSide == 1 && iEdge == 1 && iPlane < N_PLANE_MAX_TOFD_S494)
                 nsum_bot[iPlane - 1] += 1;
-            if (iSide == 2 && iEdge == 1 && iPlane < N_PLANE_MAX_TOFD)
+            if (iSide == 2 && iEdge == 1 && iPlane < N_PLANE_MAX_TOFD_S494)
                 nsum_top[iPlane - 1] += 1;
 
             if (iPlaneMem != iPlane)
@@ -496,7 +539,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     fh_tofd_channels[iPlane - 1]->Fill(iBar);
             }
         }
-        for (Int_t i = 0; i < N_PLANE_MAX_TOFD; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             fh_num_side[i]->Fill(nsum_bot[i], nsum_top[i]);
         }
@@ -505,13 +548,13 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
     if (fCalItems.at(DET_TOFD))
     {
 
-        UInt_t vmultihits[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
-        UInt_t vmultihits_top[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
-        UInt_t vmultihits_bot[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD];
-        Double_t time_bar[N_PLANE_MAX_TOFD + 1][N_PADDLE_MAX_TOFD][100];
+        UInt_t vmultihits[N_PLANE_MAX_TOFD_S494 + 1][N_PADDLE_MAX_TOFD_S494];
+        UInt_t vmultihits_top[N_PLANE_MAX_TOFD_S494 + 1][N_PADDLE_MAX_TOFD_S494];
+        UInt_t vmultihits_bot[N_PLANE_MAX_TOFD_S494 + 1][N_PADDLE_MAX_TOFD_S494];
+        Double_t time_bar[N_PLANE_MAX_TOFD_S494 + 1][N_PADDLE_MAX_TOFD_S494][100];
         for (Int_t i = 0; i < fNofPlanes + 1; i++)
         {
-            for (Int_t j = 0; j < N_PADDLE_MAX_TOFD; j++)
+            for (Int_t j = 0; j < N_PADDLE_MAX_TOFD_S494; j++)
             {
                 vmultihits[i][j] = 0;
                 vmultihits_top[i][j] = 0;
@@ -652,9 +695,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             }
         }
 
-        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
+        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD_S494; ipl++)
         {
-            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD + 1; ibr++)
+            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD_S494 + 1; ibr++)
             {
                 fh_tofd_multihit[ipl]->Fill(ibr, vmultihits_bot[ipl][ibr - 1]);
                 fh_tofd_multihit[ipl]->Fill(-ibr - 1, vmultihits_top[ipl][ibr - 1]);
@@ -770,9 +813,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             }
         }
 
-        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
+        for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD_S494; ipl++)
         {
-            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD + 1; ibr++)
+            for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD_S494 + 1; ibr++)
             {
                 fh_tofd_multihit_coinc[ipl]->Fill(ibr, vmultihits[ipl][ibr - 1]);
                 if (ipl > 0)
@@ -803,8 +846,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         if (nHits > 100)
             return;
 
-        Double_t x[N_PLANE_MAX_TOFD][10], y[N_PLANE_MAX_TOFD][10], t[N_PLANE_MAX_TOFD][10], q[N_PLANE_MAX_TOFD][10];
-        for (Int_t i = 0; i < N_PLANE_MAX_TOFD; i++)
+        Double_t x[N_PLANE_MAX_TOFD_S494][10], y[N_PLANE_MAX_TOFD_S494][10], t[N_PLANE_MAX_TOFD_S494][10],
+            q[N_PLANE_MAX_TOFD_S494][10], bar[N_PLANE_MAX_TOFD_S494][10];
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             for (Int_t k = 0; k < 10; k++)
             {
@@ -812,9 +856,10 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 y[i][k] = -1000.;
                 q[i][k] = -1000.;
                 t[i][k] = 0. / 0.;
+                bar[i][k] = 0;
             }
         }
-        Int_t nMulti[N_PLANE_MAX_TOFD] = { 0 }, iCounts[N_PLANE_MAX_TOFD] = { 0 };
+        Int_t nMulti[N_PLANE_MAX_TOFD_S494] = { 0 }, iCounts[N_PLANE_MAX_TOFD_S494] = { 0 };
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
@@ -829,12 +874,15 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             y[iPlane - 1][ictemp] = hitTofd->GetY();
             t[iPlane - 1][ictemp] = hitTofd->GetTime();
             q[iPlane - 1][ictemp] = hitTofd->GetEloss();
-            fh_tofd_Tot_hit[iPlane - 1]->Fill(x[iPlane - 1][ictemp], q[iPlane - 1][ictemp]);
+            bar[iPlane - 1][ictemp] = hitTofd->GetBarId();
+            fh_tofd_Tot_hit[iPlane - 1]->Fill(bar[iPlane - 1][ictemp], q[iPlane - 1][ictemp]);
+            fh_tofd_time_hit[iPlane - 1]->Fill(bar[iPlane - 1][ictemp], t[iPlane - 1][ictemp]);
+            fh_tofd_bars[iPlane - 1]->Fill(bar[iPlane - 1][ictemp]);
             iCounts[iPlane - 1] += 1;
             nMulti[iPlane - 1] += 1;
         }
 
-        for (Int_t i = 0; i < N_PLANE_MAX_TOFD; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             fh_tofd_multihit_hit[i]->Fill(nMulti[i]);
             if (i > 0)
@@ -845,7 +893,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     {
                         Double_t tdif =
                             fmod(t[i][im1] - t[i - 1][im2] + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
-                        fh_tofd_dt_hit[i - 1]->Fill(x[i][im1], tdif);
+                        fh_tofd_dt_hit[i - 1]->Fill(bar[i][im1], tdif);
                     }
                 }
             }
@@ -879,7 +927,7 @@ void R3BOnlineSpectraToFD_S494::FinishTask()
 {
     if (fCalItems.at(DET_TOFD))
     {
-        for (Int_t i = 0; i < 4; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             fh_tofd_TotPm[i]->Write();
             fh_tofd_TotPm_coinc[i]->Write();
@@ -888,19 +936,22 @@ void R3BOnlineSpectraToFD_S494::FinishTask()
             fh_tofd_multihit[i]->Write();
             fh_tofd_multihit_coinc[i]->Write();
         }
-        for (Int_t i = 0; i < 3; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494 - 1; i++)
         {
             fh_tofd_dt[i]->Write();
         }
     }
-    if (fCalItems.at(DET_TOFD))
+    if (fHitItems.at(DET_TOFD))
     {
-        for (Int_t i = 0; i < 4; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
         {
             fh_tofd_Tot_hit[i]->Write();
+            fh_tofd_time_hit[i]->Write();
             fh_tofd_multihit_hit[i]->Write();
+            fh_tofd_bars[i]->Write();
+            fh_tofd_time_hit[i]->Write();
         }
-        for (Int_t i = 0; i < 3; i++)
+        for (Int_t i = 0; i < N_PLANE_MAX_TOFD_S494 - 1; i++)
         {
             fh_tofd_dt_hit[i]->Write();
         }

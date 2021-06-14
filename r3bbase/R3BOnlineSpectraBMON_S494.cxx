@@ -236,9 +236,6 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
         cbmon->Divide(6, 2);
         cbmon->cd(1);
-        gPad->SetLogy();
-
-        cbmon->cd(1);
         fh_spill_length->Draw();
         cbmon->cd(2);
         fh_IC->Draw("hist");
@@ -418,7 +415,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
                 if (bmon_read)
                 {
-
                     tdiff = double(time - time_mem) / 1.e9;
                     fNorm = 1.e-3 / (double(time - time_prev_read) / 1.e9); // kHz
 
@@ -431,7 +427,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     // SEETRAM:
                     Int_t ySEE = SEETRAM - see_start;
                     fh_SEE->Fill(tdiff, ySEE);
-                    Double_t ySEE_part = (SEETRAM - see_mem) * fNorm * 1.e+3 - see_offset * calib_SEE;
+                    Double_t ySEE_part = ((SEETRAM - see_mem) * fNorm - see_offset * 0.) * calib_SEE;
                     fh_SEE_spill->Fill(tdiff, ySEE_part);
                     see_mem = SEETRAM;
 
