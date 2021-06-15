@@ -518,7 +518,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     x[iPlane][iBar].push_back(-detector_width / 2 + (paddle_width + air_gap_paddles) +
                                               (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
                 }
-                
+
                 Double_t para[4];
                 Double_t qb = 0.;
                 if (fTofdQ > 0)

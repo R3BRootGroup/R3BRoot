@@ -310,15 +310,14 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_chan_corell[ifibcount]->GetXaxis()->SetTitle("Fiber number down");
             fh_chan_corell[ifibcount]->GetYaxis()->SetTitle("Fiber number up");
 
-            fh_chan_dt_cal[ifibcount] =
-                new TH2F(Form("%sCal_TimevsChannel", detName),
-                         Form("%sCal Time bottom or top vs fiber number (+ bot, - top)", detName),
-                         2 * N_FIBER_PLOT_S494,
-                         -N_FIBER_PLOT_S494,
-                         N_FIBER_PLOT_S494,
-                         1700,
-                         -1500.,
-                         200.);
+            fh_chan_dt_cal[ifibcount] = new TH2F(Form("%sCal_TimevsChannel", detName),
+                                                 Form("%sCal Time bottom and top vs fiber number", detName),
+                                                 2 * N_FIBER_PLOT_S494,
+                                                 -N_FIBER_PLOT_S494,
+                                                 N_FIBER_PLOT_S494,
+                                                 1700,
+                                                 -1500.,
+                                                 200.);
             fh_chan_dt_cal[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_chan_dt_cal[ifibcount]->GetYaxis()->SetTitle("time(up/down)-time_trigger / ns");
 
@@ -658,9 +657,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                         fmod(cur_cal_lead->GetTime_ns() - time_trig + c_period + c_period / 2, c_period) - c_period / 2;
 
                     if (side_i == 0)
-                        fh_chan_dt_cal[ifibcount]->Fill(ch_i + 1, time_ns);
-                    if (side_i == 1)
                         fh_chan_dt_cal[ifibcount]->Fill(-ch_i - 1, time_ns);
+                    if (side_i == 1)
+                        fh_chan_dt_cal[ifibcount]->Fill(ch_i + 1, time_ns);
 
                     auto& channel = fChannelArray[side_i].at(ch_i);
 

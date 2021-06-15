@@ -533,9 +533,9 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
 
             if (iPlane <= fNofPlanes)
             {
-                if (iSide == 1)
+                if (iSide == 1) // bottom
                     fh_tofd_channels[iPlane - 1]->Fill(-iBar - 1);
-                if (iSide == 2)
+                if (iSide == 2) // top
                     fh_tofd_channels[iPlane - 1]->Fill(iBar);
             }
         }
@@ -588,7 +588,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
 
             // hit->GetSideId() gives 1 for bottom and 2 for top
-            auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+            auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
             vec.push_back(hit);
         }
 
@@ -638,7 +638,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 }
 
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
-                fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, top_tot);
+                fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                 vmultihits_top[iPlane - 1][iBar - 1] += 1;
 
                 ++top_i;
@@ -686,7 +686,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
 
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
-                fh_tofd_TotPm[iPlane - 1]->Fill(iBar, bot_tot);
+                fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
                 // register multi hits
                 vmultihits_bot[iPlane - 1][iBar - 1] += 1;
@@ -699,8 +699,8 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         {
             for (Int_t ibr = 1; ibr < N_PADDLE_MAX_TOFD_S494 + 1; ibr++)
             {
-                fh_tofd_multihit[ipl]->Fill(ibr, vmultihits_bot[ipl][ibr - 1]);
-                fh_tofd_multihit[ipl]->Fill(-ibr - 1, vmultihits_top[ipl][ibr - 1]);
+                fh_tofd_multihit[ipl]->Fill(-ibr - 1, vmultihits_bot[ipl][ibr - 1]);
+                fh_tofd_multihit[ipl]->Fill(ibr, vmultihits_top[ipl][ibr - 1]);
             }
         }
 
@@ -789,8 +789,8 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                              c_range_ns) -
                         c_range_ns / 2;
 
-                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, botc_tot);
-                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, topc_tot);
+                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, botc_tot);
+                    fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, topc_tot);
 
                     // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
 
