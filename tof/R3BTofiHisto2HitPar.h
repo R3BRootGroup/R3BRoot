@@ -18,7 +18,7 @@
 #ifndef R3BTOFIHISTO2HITPAR_H
 #define R3BTOFIHISTO2HITPAR_H
 
-#define N_TOFI_HIT_PLANE_MAX 2
+#define N_TOFI_HIT_PLANE_MAX 1
 #define N_TOFI_HIT_PADDLE_MAX 24
 
 #include "FairTask.h"

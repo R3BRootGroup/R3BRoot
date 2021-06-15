@@ -791,6 +791,9 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
             totMax = 0.;
             dtimeMax = 0. / 0.;
 
+            if (nHits > 1)
+                return;
+
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
                 Double_t tDown = 0. / 0.;
