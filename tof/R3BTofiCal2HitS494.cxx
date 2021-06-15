@@ -335,7 +335,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                           << ' ' << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
         */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
         events_in_cal_level++;
     }
@@ -549,7 +549,6 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     qb = TMath::Sqrt(top_tot * bot_tot) /
                          (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                     qb = qb * fTofiQ;
-
                 }
                 else
                 {

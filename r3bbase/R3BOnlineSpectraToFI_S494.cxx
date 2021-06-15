@@ -527,8 +527,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         // ******************* Without coincidences ****************************************************************
         static bool s_was_trig_missing = false;
         auto trig_num = fCalTriggerItems->GetEntries();
-        if (trig_num>0) cout << "Trigger information: " << trig_num << endl;
-        
+        if (trig_num > 0)
+            cout << "Trigger information: " << trig_num << endl;
+
         for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
         {
             auto const& top_vec = it->second.top;

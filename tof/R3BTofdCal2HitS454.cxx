@@ -330,7 +330,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                   << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
         */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
         events_in_cal_level++;
     }

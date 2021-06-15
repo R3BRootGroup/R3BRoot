@@ -465,7 +465,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
         events_in_cal_level++;
     }
