@@ -369,7 +369,7 @@ namespace
 
 void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 {
-      cout << "fNEvents " << fNEvents << endl;
+    //cout << "fNEvents " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
