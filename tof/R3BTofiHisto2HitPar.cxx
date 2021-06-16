@@ -344,6 +344,8 @@ void R3BTofiHisto2HitPar::calcOffset()
                 cout << "2\n";
                 fCal_Par->AddModulePar(mpar);
                 cout << "3\n";
+                //gPad->WaitPrimitive();
+
             }
         }
     }
@@ -380,6 +382,7 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 h->SetAxisRange(Max - .5, Max + .5, "X");
                 h->SetAxisRange(totLow, totHigh, "Y");
                 cToTOffset->Update();
+                //gPad->WaitPrimitive();
                 delete fgaus;
                 delete h;
                 delete histo_py;
@@ -411,12 +414,14 @@ void R3BTofiHisto2HitPar::calcSync()
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t MaxEntry = histo_py->GetBinContent(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 10., Max + 10.);
-                fgaus->SetParameters(MaxEntry, Max, 20);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 20., Max + 20.);
+                fgaus->SetParameters(MaxEntry, Max, 50);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
                 LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                //gPad->WaitPrimitive();
+
             }
         }
     }
@@ -449,8 +454,8 @@ void R3BTofiHisto2HitPar::calcVeff()
                 Int_t binmax = histo_py->GetMaximumBin();
                 max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t maxEntry = histo_py->GetBinContent(binmax);
-                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 0.3, max + 0.3); /// TODO: find best range
-                fgaus->SetParameters(maxEntry, max, 20);
+                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 10., max + 10.); /// TODO: find best range
+                fgaus->SetParameters(maxEntry, max, 50);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t offset1 = par->GetOffset1();
                 Double_t offset2 = par->GetOffset2();

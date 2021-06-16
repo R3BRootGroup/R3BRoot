@@ -110,7 +110,15 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        if (NULL == fCalItems.at(det))
+        {
+            printf("Could not find cal data for '%s'.\n", fDetectorNames[det]);
+        }
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        if (NULL == fHitItems.at(det))
+        {
+            printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
+        }
     }
 
     tofi_trig_map_setup();
@@ -361,7 +369,7 @@ namespace
 
 void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 {
-    //  cout << "fNEvents " << fNEvents << endl;
+      cout << "fNEvents " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
