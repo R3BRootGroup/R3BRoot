@@ -140,7 +140,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             sprintf(strName3, "tofi_ToT_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "Tofi ToT plane %d", j + 1);
-            fh_tofi_TotPm[j] = new TH2F(strName3, strName4, 60, -30, 30, 3000, 0., 300.);
+            fh_tofi_TotPm[j] = new TH2F(strName3, strName4, 60, -30, 30, 1500, 0., 300.);
             fh_tofi_TotPm[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofi_TotPm[j]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -148,9 +148,9 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             sprintf(strName30, "tofi_time_plane_%d", j + 1);
             char strName40[255];
             sprintf(strName40, "Tofi time plane %d", j + 1);
-            fh_tofi_TotPm[j] = new TH2F(strName30, strName40, 60, -30, 30, 3000, 0., 300.);
-            fh_tofi_TotPm[j]->GetXaxis()->SetTitle("Bar number");
-            fh_tofi_TotPm[j]->GetYaxis()->SetTitle("ToT / ns");
+            fh_tofi_timePm[j] = new TH2F(strName30, strName40, 4000, -2000., 2000, 1500, 0., 300.);
+            fh_tofi_timePm[j]->GetXaxis()->SetTitle("Bar number");
+            fh_tofi_timePm[j]->GetYaxis()->SetTitle("time / ns");
 
             char strName9[255];
             sprintf(strName9, "tofi_multihit_plane_%d", j + 1);
@@ -527,8 +527,6 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         // ******************* Without coincidences ****************************************************************
         static bool s_was_trig_missing = false;
         auto trig_num = fCalTriggerItems->GetEntries();
-        if (trig_num > 0)
-            cout << "Trigger information: " << trig_num << endl;
 
         for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
         {
