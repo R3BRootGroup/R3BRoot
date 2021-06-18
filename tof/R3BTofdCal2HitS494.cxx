@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -11,12 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // ------------------------------------------------------------
-// -----                 R3BTofdCal2HitS454                   -----
+// -----                 R3BTofdCal2HitS494                   -----
 // -----            Created May 2016 by M.Heil            -----
 // -----           Modified Mar 2020 by L.Bott            -----
 // ------------------------------------------------------------
 
-#include "R3BTofdCal2HitS454.h"
+#include "R3BTofdCal2HitS494.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
 #include "R3BTofdCalData.h"
@@ -58,7 +58,7 @@ namespace
     double c_bar_coincidence_ns = 20; // nanoseconds.
 } // namespace
 
-R3BTofdCal2HitS454::R3BTofdCal2HitS454()
+R3BTofdCal2HitS494::R3BTofdCal2HitS494()
     : FairTask("TofdCal2Hit", 1)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
@@ -106,7 +106,7 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454()
     }
 }
 
-R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
+R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
@@ -154,7 +154,7 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
     }
 }
 
-R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
+R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
 {
     if (fTofdHisto)
     {
@@ -192,7 +192,7 @@ R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
     }
 }
 
-InitStatus R3BTofdCal2HitS454::Init()
+InitStatus R3BTofdCal2HitS494::Init()
 {
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
@@ -230,7 +230,7 @@ InitStatus R3BTofdCal2HitS454::Init()
 }
 
 // Note that the container may still be empty at this point.
-void R3BTofdCal2HitS454::SetParContainers()
+void R3BTofdCal2HitS494::SetParContainers()
 {
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
@@ -241,7 +241,7 @@ void R3BTofdCal2HitS454::SetParContainers()
     }
 }
 
-InitStatus R3BTofdCal2HitS454::ReInit()
+InitStatus R3BTofdCal2HitS494::ReInit()
 {
     SetParContainers();
     return kSUCCESS;
@@ -252,7 +252,7 @@ namespace
     uint64_t n1, n2;
 };
 
-void R3BTofdCal2HitS454::Exec(Option_t* option)
+void R3BTofdCal2HitS494::Exec(Option_t* option)
 {
     static uint32_t counter = 0;
     if (0 == counter % 10000)
@@ -330,7 +330,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                   << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
         */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
         events_in_cal_level++;
     }
@@ -382,7 +382,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    LOG(ERROR) << "R3BTofdCal2HitS494Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -422,13 +422,13 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(ERROR) << "R3BTofdCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more bars then expected! Det: " << iBar
+                    LOG(ERROR) << "R3BTofdCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -445,7 +445,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofdCal2HitS454::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(INFO) << "R3BTofdCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     continue;
                 }
@@ -521,36 +521,41 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
 
                 Double_t para[4];
                 Double_t qb = 0.;
-                if (fTofdTotPos)
+                if (fTofdQ > 0)
                 {
-                    // via pol3
-                    para[0] = par->GetPola();
-                    para[1] = par->GetPolb();
-                    para[2] = par->GetPolc();
-                    para[3] = par->GetPold();
-                    qb = TMath::Sqrt(top_tot * bot_tot) /
-                         (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
-                    qb = qb * fTofdQ;
+                    if (fTofdTotPos)
+                    {
+                        // via pol3
+                        para[0] = par->GetPola();
+                        para[1] = par->GetPolb();
+                        para[2] = par->GetPolc();
+                        para[3] = par->GetPold();
+                        qb = TMath::Sqrt(top_tot * bot_tot) /
+                             (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                        qb = qb * fTofdQ;
+                    }
+                    else
+                    {
+                        // via double exponential:
+                        para[0] = par->GetPar1a();
+                        para[1] = par->GetPar1b();
+                        para[2] = par->GetPar1c();
+                        para[3] = par->GetPar1d();
+                        auto q1 = bot_tot /
+                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                        para[0] = par->GetPar2a();
+                        para[1] = par->GetPar2b();
+                        para[2] = par->GetPar2c();
+                        para[3] = par->GetPar2d();
+                        auto q2 = top_tot /
+                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                        q1 = q1 * fTofdQ;
+                        q2 = q2 * fTofdQ;
+                        qb = (q1 + q2) / 2.;
+                    }
                 }
                 else
-                {
-                    // via double exponential:
-                    para[0] = par->GetPar1a();
-                    para[1] = par->GetPar1b();
-                    para[2] = par->GetPar1c();
-                    para[3] = par->GetPar1d();
-                    auto q1 =
-                        bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                    para[0] = par->GetPar2a();
-                    para[1] = par->GetPar2b();
-                    para[2] = par->GetPar2c();
-                    para[3] = par->GetPar2d();
-                    auto q2 =
-                        top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                    q1 = q1 * fTofdQ;
-                    q2 = q2 * fTofdQ;
-                    qb = (q1 + q2) / 2.;
-                }
+                    qb = TMath::Sqrt(top_tot * bot_tot);
 
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();
@@ -817,7 +822,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     fnEvents++;
 }
 
-void R3BTofdCal2HitS454::CreateHistograms(Int_t iPlane, Int_t iBar)
+void R3BTofdCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
     Double_t max_charge = 80.;
     // create histograms if not already existing
@@ -914,7 +919,7 @@ void R3BTofdCal2HitS454::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
     }
 }
-void R3BTofdCal2HitS454::FinishEvent()
+void R3BTofdCal2HitS494::FinishEvent()
 {
     if (fHitItems)
     {
@@ -923,7 +928,7 @@ void R3BTofdCal2HitS454::FinishEvent()
     }
 }
 
-void R3BTofdCal2HitS454::FinishTask()
+void R3BTofdCal2HitS494::FinishTask()
 {
     if (fTofdHisto)
     {
@@ -975,7 +980,7 @@ void R3BTofdCal2HitS454::FinishTask()
     std::cout << "n1=" << n1 << " n2=" << n2 << std::endl;
 }
 
-Double_t R3BTofdCal2HitS454::betaCorr(Double_t delta)
+Double_t R3BTofdCal2HitS494::betaCorr(Double_t delta)
 {
     //    Double_t corr=-3.*delta;  //correction for Ag
 
@@ -984,7 +989,7 @@ Double_t R3BTofdCal2HitS454::betaCorr(Double_t delta)
     return corr;
 }
 /* old method
-Double_t R3BTofdCal2HitS454::walk(Double_t q)
+Double_t R3BTofdCal2HitS494::walk(Double_t q)
 {
     Double_t y;
     //
@@ -1024,7 +1029,7 @@ Double_t R3BTofdCal2HitS454::walk(Double_t q)
     return y;
 }
 */
-Double_t R3BTofdCal2HitS454::walk(Double_t Q,
+Double_t R3BTofdCal2HitS494::walk(Double_t Q,
                                   Double_t par1,
                                   Double_t par2,
                                   Double_t par3,
@@ -1035,7 +1040,7 @@ Double_t R3BTofdCal2HitS454::walk(Double_t Q,
     y = -30.2 + par1 * TMath::Power(Q, par2) + par3 / Q + par4 * Q + par5 * Q * Q;
     return y;
 }
-Double_t R3BTofdCal2HitS454::saturation(Double_t x)
+Double_t R3BTofdCal2HitS494::saturation(Double_t x)
 {
     Double_t kor;
     Int_t voltage = 600;
@@ -1088,7 +1093,7 @@ Double_t R3BTofdCal2HitS454::saturation(Double_t x)
     return kor;
 }
 
-Double_t* R3BTofdCal2HitS454::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
+Double_t* R3BTofdCal2HitS494::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
 {
     Int_t i;
 
@@ -1105,4 +1110,4 @@ Double_t* R3BTofdCal2HitS454::insertX(Int_t n, Double_t arr[], Double_t x, Int_t
     return arr;
 }
 
-ClassImp(R3BTofdCal2HitS454)
+ClassImp(R3BTofdCal2HitS494)

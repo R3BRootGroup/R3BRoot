@@ -39,6 +39,7 @@
 #pragma link C++ class R3BTofdChangePar+;
 #pragma link C++ class R3BTofdCal2Hit+;
 #pragma link C++ class R3BTofdCal2HitS454+;
+#pragma link C++ class R3BTofdCal2HitS494+;
 #pragma link C++ class R3BTofiCal2HitS494+;
 #pragma link C++ class R3BTofdHitModulePar+;
 #pragma link C++ class R3BTofiHitModulePar+;
