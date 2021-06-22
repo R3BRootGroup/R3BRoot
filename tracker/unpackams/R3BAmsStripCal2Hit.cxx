@@ -97,7 +97,7 @@ void R3BAmsStripCal2Hit::SetParContainers()
     }
     else
     {
-        LOG(INFO) << "R3BAmsStripCal2Hit:: amsMappingPar container open";
+        LOG(INFO) << "R3BAmsStripCal2Hit::amsMappingPar found";
     }
 }
 
@@ -116,7 +116,7 @@ void R3BAmsStripCal2Hit::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsStripCal2Hit::Init()
 {
-    LOG(INFO) << "R3BAmsStripCal2Hit: Init";
+    LOG(INFO) << "R3BAmsStripCal2Hit::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -138,14 +138,7 @@ InitStatus R3BAmsStripCal2Hit::Init()
     // Hit data
     fAmsHitDataCA = new TClonesArray("R3BAmsHitData", fMaxNumDet * fMaxNumClusters);
 
-    if (!fOnline)
-    {
-        rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, kTRUE);
-    }
-    else
-    {
-        rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, kFALSE);
-    }
+    rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, !fOnline);
 
     char Name[255];
     for (Int_t i = 0; i < fMaxNumDet * 2; i++)
@@ -363,8 +356,6 @@ void R3BAmsStripCal2Hit::DefineClusters(Int_t* nfoundhits,
                                         TH1F* hsst,
                                         Double_t cluster[][2])
 {
-    // std::cout << "Search " << std::endl;
-
     Int_t nfound = *nfoundhits;
     *nfoundhits = 0;
 
