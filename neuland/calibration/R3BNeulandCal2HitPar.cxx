@@ -29,7 +29,6 @@
 #include "TH2F.h"
 
 using namespace Neuland;
-using std::isnan;
 
 R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, const Int_t iVerbose)
     : FairTask(name, iVerbose)
