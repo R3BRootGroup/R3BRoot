@@ -21,6 +21,7 @@
 
 #include <iostream>
 
+// ---- Standard Constructor ---------------------------------------------------
 R3BCalifaTotCalPar::R3BCalifaTotCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
     , fNumCrystals(4864)
@@ -29,6 +30,7 @@ R3BCalifaTotCalPar::R3BCalifaTotCalPar(const char* name, const char* title, cons
     fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
 }
 
+// ----  Destructor ------------------------------------------------------------
 R3BCalifaTotCalPar::~R3BCalifaTotCalPar()
 {
     clear();
@@ -42,6 +44,7 @@ void R3BCalifaTotCalPar::clear()
     resetInputVersions();
 }
 
+// ----  Method putParams ------------------------------------------------------
 void R3BCalifaTotCalPar::putParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaTotCalPar::putParams() called";
@@ -60,6 +63,7 @@ void R3BCalifaTotCalPar::putParams(FairParamList* list)
     list->add("califaTotParamsFitPar", fNumParamsFit);
 }
 
+// ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaTotCalPar::getParams(FairParamList* list)
 {
     LOG(INFO) << "R3BCalifaTotCalPar::getParams() called";
@@ -91,6 +95,10 @@ Bool_t R3BCalifaTotCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BCalifaTotCalPar::print() { printParams(); }
+
+// ----  Method printParams ----------------------------------------------------
 void R3BCalifaTotCalPar::printParams()
 {
     LOG(INFO) << "R3BCalifaTotCalPar: Califa Crystal Calibration Parameters: ";
@@ -105,3 +113,5 @@ void R3BCalifaTotCalPar::printParams()
         }
     }
 }
+
+ClassImp(R3BCalifaTotCalPar)

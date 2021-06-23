@@ -15,13 +15,11 @@
 #define R3BCALIFACRYSTALCALPAR_H
 
 #include "FairParGenericSet.h"
+#include "TObject.h"
 
 #include "TArrayF.h"
 #include "TObjArray.h"
-#include "TObject.h"
 #include <TObjString.h>
-
-using namespace std;
 
 class FairParamList;
 
@@ -47,6 +45,7 @@ class R3BCalifaCrystalCalPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Method to print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -67,11 +66,10 @@ class R3BCalifaCrystalCalPar : public FairParGenericSet
                   pol1: A_fit & B_fit
                   pol2: A_fit, B_fit & C_fit>*/
 
-    const R3BCalifaCrystalCalPar& operator=(const R3BCalifaCrystalCalPar&); /*< an assignment operator>*/
-
-    R3BCalifaCrystalCalPar(const R3BCalifaCrystalCalPar&); /*< a copy constructor >*/
+    const R3BCalifaCrystalCalPar& operator=(const R3BCalifaCrystalCalPar&);
+    R3BCalifaCrystalCalPar(const R3BCalifaCrystalCalPar&);
 
     ClassDef(R3BCalifaCrystalCalPar, 1);
 };
 
-#endif
+#endif /* R3BCALIFACRYSTALCALPAR_H */
