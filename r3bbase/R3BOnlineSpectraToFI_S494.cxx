@@ -369,7 +369,7 @@ namespace
 
 void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
 {
-    //cout << "fNEvents " << fNEvents << endl;
+    // cout << "fNEvents " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -533,13 +533,15 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         //     if(NumPaddles > 0)cout <<"nHits cal level: "<<nHitsEvent<<", "<<NumPaddles<<endl;
 
         // Build trigger map.
-        std::vector<R3BTofiCalData const *> trig_map;
-        for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
-          auto trig = (R3BTofiCalData const *)fCalTriggerItems->At(i);
-          if (trig_map.size() < trig->GetBarId()) {
-            trig_map.resize(trig->GetBarId());
-          }
-          trig_map.at(trig->GetBarId() - 1) = trig;
+        std::vector<R3BTofiCalData*> trig_map;
+        for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
+        {
+            auto trig = (R3BTofiCalData*)fCalTriggerItems->At(i);
+            if (trig_map.size() < trig->GetBarId())
+            {
+                trig_map.resize(trig->GetBarId());
+            }
+            trig_map.at(trig->GetBarId() - 1) = trig;
         }
 
         // ******************* Without coincidences ****************************************************************
@@ -558,8 +560,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 auto top = top_vec.at(top_i);
                 auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
                 Double_t top_trig_ns = 0;
-                if (top_trig_i < trig_map.size() &&
-                    trig_map.at(top_trig_i))
+                if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i))
                 {
                     auto top_trig = trig_map.at(top_trig_i);
                     top_trig_ns = top_trig->GetTimeLeading_ns();
@@ -605,8 +606,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 auto bot = bot_vec.at(bot_i);
                 auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
                 Double_t bot_trig_ns = 0;
-                if (bot_trig_i < trig_map.size() &&
-                    trig_map.at(bot_trig_i))
+                if (bot_trig_i < trig_map.size() && trig_map.at(bot_trig_i))
                 {
                     auto bot_trig = trig_map.at(bot_trig_i);
                     bot_trig_ns = bot_trig->GetTimeLeading_ns();
@@ -670,9 +670,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 auto topc_trig_i = g_tofi_trig_map[topc->GetSideId() - 1][topc->GetBarId() - 1];
                 auto botc_trig_i = g_tofi_trig_map[botc->GetSideId() - 1][botc->GetBarId() - 1];
                 Double_t topc_trig_ns = 0, botc_trig_ns = 0;
-                if (topc_trig_i < trig_map.size() &&
-                    trig_map.at(topc_trig_i) &&
-                    botc_trig_i < trig_map.size() &&
+                if (topc_trig_i < trig_map.size() && trig_map.at(topc_trig_i) && botc_trig_i < trig_map.size() &&
                     trig_map.at(botc_trig_i))
                 {
                     auto topc_trig = trig_map.at(topc_trig_i);

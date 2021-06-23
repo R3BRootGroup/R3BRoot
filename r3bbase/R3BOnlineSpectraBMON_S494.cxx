@@ -315,14 +315,15 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     }
 
     if (header->GetTrigger() == 12)
+    {
         time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
-    if (header->GetTrigger() == 13)
-        time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
-
-    if (header->GetTrigger() == 12)
         cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec " << endl;
+    }
     if (header->GetTrigger() == 13)
+    {
+        time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
         cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec " << endl;
+    }
 
     fhTrigger->Fill(header->GetTrigger());
 
@@ -404,10 +405,10 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             if (time > 0)
             {
 
-                fh_spill_length->Fill((time - time_mem) / 1e9);
+                fh_spill_length->Fill(double(time - time_mem) / 1e9);
 
                 // Spectra below are filled every read_time (secs)
-                if (time_to_read == 0 && (time - time_prev_read) >= read_time * 1000000000)
+                if (time_to_read == 0 && (time - time_prev_read) >= read_time * 1000000000) // in nsec
                 {
                     time_to_read = time;
                     bmon_read = true;
@@ -427,7 +428,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     // SEETRAM:
                     Int_t ySEE = SEETRAM - see_start;
                     fh_SEE->Fill(tdiff, ySEE);
-                    Double_t ySEE_part = ((SEETRAM - see_mem) * fNorm - see_offset * 0.) * calib_SEE;
+                    Double_t ySEE_part = double(SEETRAM - see_mem) * fNorm * calib_SEE;
                     fh_SEE_spill->Fill(tdiff, ySEE_part);
                     see_mem = SEETRAM;
 

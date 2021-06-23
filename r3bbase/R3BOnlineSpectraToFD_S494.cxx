@@ -591,13 +591,15 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         }
 
         // Build trigger map.
-        std::vector<R3BTofdCalData const *> trig_map;
-        for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
-          auto trig = (R3BTofdCalData const *)fCalTriggerItems->At(i);
-          if (trig_map.size() < trig->GetBarId()) {
-            trig_map.resize(trig->GetBarId());
-          }
-          trig_map.at(trig->GetBarId() - 1) = trig;
+        std::vector<R3BTofdCalData*> trig_map;
+        for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
+        {
+            auto trig = (R3BTofdCalData*)fCalTriggerItems->At(i);
+            if (trig_map.size() < trig->GetBarId())
+            {
+                trig_map.resize(trig->GetBarId());
+            }
+            trig_map.at(trig->GetBarId() - 1) = trig;
         }
 
         // Without coincidences
@@ -615,8 +617,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
 
                 Double_t top_trig_ns = 0;
-                if (top_trig_i < trig_map.size() &&
-                    trig_map.at(top_trig_i))
+                if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i))
                 {
                     auto top_trig = trig_map.at(top_trig_i);
                     top_trig_ns = top_trig->GetTimeLeading_ns();
@@ -658,8 +659,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                 auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
 
                 Double_t bot_trig_ns = 0;
-                if (bot_trig_i < trig_map.size() &&
-                    trig_map.at(bot_trig_i))
+                if (bot_trig_i < trig_map.size() && trig_map.at(bot_trig_i))
                 {
                     auto bot_trig = trig_map.at(bot_trig_i);
                     bot_trig_ns = bot_trig->GetTimeLeading_ns();
@@ -731,9 +731,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
                     g_tofd_trig_map[botc->GetDetectorId() - 1][botc->GetSideId() - 1][botc->GetBarId() - 1];
 
                 Double_t topc_trig_ns = 0, botc_trig_ns = 0;
-                if (topc_trig_i < trig_map.size() &&
-                    trig_map.at(topc_trig_i) &&
-                    botc_trig_i < trig_map.size() &&
+                if (topc_trig_i < trig_map.size() && trig_map.at(topc_trig_i) && botc_trig_i < trig_map.size() &&
                     trig_map.at(botc_trig_i))
                 {
                     auto topc_trig = trig_map.at(topc_trig_i);
