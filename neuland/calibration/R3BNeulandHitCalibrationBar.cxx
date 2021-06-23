@@ -28,7 +28,6 @@
 #include <string>
 
 using DPair = std::array<Double_t, 2>;
-using std::isnan;
 
 // FIXME namespace Neuland::Calibration { with c++17
 namespace Neuland
@@ -190,14 +189,14 @@ namespace Neuland
 
         void HitCalibrationBar::Update(const R3BNeulandHitModulePar* par)
         {
-            if (!isnan(par->GetTimeOffset(1)))
+            if (!std::isnan(par->GetTimeOffset(1)))
             {
                 TimeDifference = par->GetTDiff();
                 EffectiveSpeed = par->GetEffectiveSpeed();
                 SetStatus(Validity, PosCalibrationBit);
             }
 
-            if (!isnan(par->GetEnergyGain(1)))
+            if (!std::isnan(par->GetEnergyGain(1)))
             {
                 Gain[0] = par->GetEnergyGain(1);
                 Gain[1] = par->GetEnergyGain(2);
@@ -207,20 +206,20 @@ namespace Neuland
                 SetStatus(Validity, EnergyCalibrationBit);
             }
 
-            if (!isnan(par->GetPMTThreshold(1)))
+            if (!std::isnan(par->GetPMTThreshold(1)))
             {
                 Threshold[0] = par->GetPMTThreshold(1);
                 Threshold[1] = par->GetPMTThreshold(2);
                 SetStatus(Validity, ThresholdCalibrationBit);
             }
 
-            if (!isnan(par->GetPMTSaturation(1)))
+            if (!std::isnan(par->GetPMTSaturation(1)))
             {
                 Saturation[0] = par->GetPMTSaturation(1);
                 Saturation[1] = par->GetPMTSaturation(2);
             }
 
-            if (!isnan(par->GetPedestal(1)))
+            if (!std::isnan(par->GetPedestal(1)))
             {
                 Pedestal[0] = par->GetPedestal(1);
                 Pedestal[1] = par->GetPedestal(2);
@@ -276,7 +275,7 @@ namespace Neuland
         void HitCalibrationBar::SetGlobalTSync(const Double_t value, const Double_t error)
         {
             TimeSync = { value, error };
-            if (isnan(value))
+            if (std::isnan(value))
                 ClearStatus(Validity, TSyncCalibrationBit);
             else
                 SetStatus(Validity, TSyncCalibrationBit);

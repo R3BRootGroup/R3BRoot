@@ -25,7 +25,6 @@ constexpr auto NextPlaneLogSize = 64;
 constexpr auto NBins = 256;
 
 using namespace Neuland;
-using std::isnan;
 
 namespace Neuland
 {
@@ -176,7 +175,7 @@ namespace Neuland
             UInt_t numberOfEquations = 0;
             for (auto b = 0; b < nBars; ++b)
             {
-                if (!isnan(Data[b].TSyncNextBar.Value))
+                if (!std::isnan(Data[b].TSyncNextBar.Value))
                 {
                     scaleFactors[b] += 1. / Sqr(Data[b].TSyncNextBar.Error);
                     scaleFactors[b + 1] += 1. / Sqr(Data[b].TSyncNextBar.Error);
@@ -189,7 +188,7 @@ namespace Neuland
 
                 for (auto ob = 0; ob < BarsPerPlane; ++ob)
                 {
-                    if (!isnan(Data[b].TSyncNextPlane[ob].Value))
+                    if (!std::isnan(Data[b].TSyncNextPlane[ob].Value))
                     {
                         scaleFactors[b] += 1. / Sqr(Data[b].TSyncNextPlane[ob].Error);
                         scaleFactors[plane * BarsPerPlane + ob] += 1. / Sqr(Data[b].TSyncNextPlane[ob].Error);
@@ -279,7 +278,7 @@ namespace Neuland
             for (UInt_t id = 0; id < Data.size(); ++id)
             {
                 const auto plane = GetPlaneNumber(id);
-                if (!isnan(Data[id].TSyncNextBar.Value))
+                if (!std::isnan(Data[id].TSyncNextBar.Value))
                 {
                     const auto weight = 1. / Data[id].TSyncNextBar.Error;
                     lhs[nEQ] = { { id, id + 1U }, { -weight * scaleFactors[id], weight * scaleFactors[id + 1U] } };
@@ -288,7 +287,7 @@ namespace Neuland
                 }
                 for (UInt_t barInNextPlane = 0; barInNextPlane < BarsPerPlane; ++barInNextPlane)
                 {
-                    if (!isnan(Data[id].TSyncNextPlane[barInNextPlane].Value))
+                    if (!std::isnan(Data[id].TSyncNextPlane[barInNextPlane].Value))
                     {
                         const auto barInNextPlaneID = BarsPerPlane * (plane + 1) + barInNextPlane;
                         const auto weight = 1. / Data[id].TSyncNextPlane[barInNextPlane].Error;
