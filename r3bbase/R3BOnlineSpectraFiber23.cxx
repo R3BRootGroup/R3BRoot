@@ -70,9 +70,7 @@ R3BOnlineSpectraFiber23::R3BOnlineSpectraFiber23(const char* name, Int_t iVerbos
 {
 }
 
-R3BOnlineSpectraFiber23::~R3BOnlineSpectraFiber23()
-{
-}
+R3BOnlineSpectraFiber23::~R3BOnlineSpectraFiber23() {}
 
 InitStatus R3BOnlineSpectraFiber23::Init()
 {
@@ -130,38 +128,48 @@ InitStatus R3BOnlineSpectraFiber23::Init()
     // Fiber Detectors 1-NOF_FIB_DET
 
     TCanvas* cXY = new TCanvas("XY_Fib23", "XvsY FIb23", 10, 10, 1100, 1100);
-    cXY->Divide(2,2);
-        
+    cXY->Divide(2, 2);
+
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
     {
-        fh_xy_global = new TH2F("xy_Fib23", "X vs Y from Fib23", 300, -6, 6, 300, -6, 6);
+        fh_xy_global = new TH2F("xy_Fib23", "X vs Y from Fib23", 500, -7, 7, 500, -7, 7);
         fh_xy_global->GetXaxis()->SetTitle("x position / cm");
         fh_xy_global->GetYaxis()->SetTitle("y position / cm");
 
-        fh_dtime_Fib23 = new TH2F("dt_Fib23", "dTime from Fib23", 500, -10, 10, 4096, -2048, 2048);
+        fh_xy_fiber = new TH2F("xFibyFib_Fib23", "xFib vs yFib from Fib23", 384, 0, 384, 384, 0, 384);
+        fh_xy_fiber->GetXaxis()->SetTitle("Fib23a FiberId");
+        fh_xy_fiber->GetYaxis()->SetTitle("Fib23b FiberId");
+
+        fh_dtime_Fib23 = new TH2F("dt_Fib23", "dTime from Fib23", 500, -7, 7, 4096, -2048, 2048);
         fh_dtime_Fib23->GetXaxis()->SetTitle("Y Fib23b / cm");
         fh_dtime_Fib23->GetYaxis()->SetTitle("dTime / ns");
-        
-        fh_x = new TH1F("x_Fib23", "X from Fib23", 300, -6, 6);
+
+        fh_x = new TH1F("x_Fib23", "X from Fib23a", 500, -7, 7);
         fh_x->GetXaxis()->SetTitle("x position / cm");
         fh_x->GetYaxis()->SetTitle("counts");
-        
-        fh_y = new TH1F("y_Fib23", "Y from Fib23", 300, -6, 6);
+
+        fh_y = new TH1F("y_Fib23", "Y from Fib23b", 500, -7, 7);
         fh_y->GetXaxis()->SetTitle("y position / cm");
         fh_y->GetYaxis()->SetTitle("counts");
-        
+
         cXY->cd(1);
         gPad->SetLogz();
         fh_xy_global->Draw("colz");
         cXY->cd(2);
+        fh_y->SetAxisRange(-1, 1, "X");
         fh_y->Draw();
         cXY->cd(3);
+        fh_x->SetAxisRange(-1, 1, "X");
         fh_x->Draw();
-        
+        cXY->cd(4);
+        gPad->SetLogz();
+        fh_xy_fiber->SetAxisRange(150, 234, "X");
+        fh_xy_fiber->SetAxisRange(150, 234, "Y");
+        fh_xy_fiber->Draw("colz");
+
         cXY->cd(0);
         run->AddObject(cXY);
         run->GetHttpServer()->RegisterCommand("Reset_Fiber", Form("/Tasks/%s/->Reset_Fiber_Histo()", GetName()));
-
     }
 
     // -------------------------------------------------------------------------
@@ -173,6 +181,7 @@ void R3BOnlineSpectraFiber23::Reset_Fiber_Histo()
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
     {
         fh_xy_global->Reset();
+        fh_xy_fiber->Reset();
         fh_dtime_Fib23->Reset();
         fh_x->Reset();
         fh_y->Reset();
@@ -238,9 +247,14 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
 
                 if (std::abs(dtime) < c_fiber_coincidence_ns)
                 {
-                    fh_xy_global->Fill(xpos_global, ypos_global);
-                    fh_x->Fill(xpos_global);
-                    fh_y->Fill(ypos_global);
+                    if ((hitFi23a->GetFiberId() < 188 || hitFi23a->GetFiberId() > 197) &&
+                        (hitFi23b->GetFiberId() < 188 || hitFi23b->GetFiberId() > 197))
+                    {
+                        fh_xy_global->Fill(xpos_global, ypos_global);
+                        fh_xy_fiber->Fill(hitFi23a->GetFiberId(), hitFi23b->GetFiberId());
+                        fh_x->Fill(xpos_global);
+                        fh_y->Fill(ypos_global);
+                    }
                 }
             }
         }
@@ -269,6 +283,7 @@ void R3BOnlineSpectraFiber23::FinishTask()
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
     {
         fh_xy_global->Write();
+        fh_xy_fiber->Write();
         fh_dtime_Fib23->Write();
         fh_x->Write();
         fh_y->Write();

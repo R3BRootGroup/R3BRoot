@@ -127,6 +127,7 @@ class R3BOnlineSpectraFiber23 : public FairTask
     unsigned long fNEvents = 0, fNEvents_start = 0;         /**< Event counter. */
     
     TH2F *fh_xy_global;
+    TH2F *fh_xy_fiber;
     TH1F *fh_x;
     TH1F* fh_y;
     TH2F *fh_dtime_Fib23;
