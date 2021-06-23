@@ -112,6 +112,7 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
 
 R3BCalifaGeometry::~R3BCalifaGeometry()
 {
+    LOG(INFO) << "R3BCalifaGeometry::Delete instance";
     if (gGeoManager)
         delete gGeoManager;
     if (f)

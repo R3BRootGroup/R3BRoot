@@ -716,6 +716,52 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_Califa_wr->SetLineWidth(2);
     fh1_Califa_wr->Draw("");
 
+    // Difference between Califa Syncro. channels
+    sprintf(Name1, "Diff_Sync_Ch");
+    sprintf(Name2, "fh1_diffsync_Califa");
+    sprintf(Name3, "Wixhausen - Messel");
+    cCalifa_sync = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+    cCalifa_sync->Divide(1, 3);
+    cCalifa_sync->cd(1);
+    fh1_Califa_sync[0] = new TH1F(Name2, Name3, 1200, -4100, 4100);
+    fh1_Califa_sync[0]->GetXaxis()->SetTitle("Difference of Califa Syncro. channels");
+    fh1_Califa_sync[0]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_sync[0]->GetYaxis()->SetTitleOffset(1.3);
+    fh1_Califa_sync[0]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_sync[0]->GetYaxis()->CenterTitle(true);
+    fh1_Califa_sync[0]->SetFillColor(29);
+    fh1_Califa_sync[0]->SetLineColor(1);
+    fh1_Califa_sync[0]->SetLineWidth(2);
+    fh1_Califa_sync[0]->Draw("");
+
+    sprintf(Name2, "fh1_diffsyncM_Califa");
+    sprintf(Name3, "Messel: WR - Syncro.");
+    cCalifa_sync->cd(2);
+    fh1_Califa_sync[1] = new TH1F(Name2, Name3, 1200, -4100, 4100);
+    fh1_Califa_sync[1]->GetXaxis()->SetTitle("Difference of Califa WR and Syncro. channel");
+    fh1_Califa_sync[1]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_sync[1]->GetYaxis()->SetTitleOffset(1.3);
+    fh1_Califa_sync[1]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_sync[1]->GetYaxis()->CenterTitle(true);
+    fh1_Califa_sync[1]->SetFillColor(29);
+    fh1_Califa_sync[1]->SetLineColor(1);
+    fh1_Califa_sync[1]->SetLineWidth(2);
+    fh1_Califa_sync[1]->Draw("");
+
+    sprintf(Name2, "fh1_diffsyncW_Califa");
+    sprintf(Name3, "Wixhausen: WR - Syncro.");
+    cCalifa_sync->cd(3);
+    fh1_Califa_sync[2] = new TH1F(Name2, Name3, 1200, -4100, 4100);
+    fh1_Califa_sync[2]->GetXaxis()->SetTitle("Difference of Califa WR and Syncro. channel");
+    fh1_Califa_sync[2]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_sync[2]->GetYaxis()->SetTitleOffset(1.3);
+    fh1_Califa_sync[2]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_sync[2]->GetYaxis()->CenterTitle(true);
+    fh1_Califa_sync[2]->SetFillColor(29);
+    fh1_Califa_sync[2]->SetLineColor(1);
+    fh1_Califa_sync[2]->SetLineWidth(2);
+    fh1_Califa_sync[2]->Draw("");
+
     // Difference between Califa-Master WRs
     sprintf(Name1, "WR_Master_Califa");
     cWrs = new TCanvas(Name1, Name1, 10, 10, 500, 500);
@@ -729,15 +775,15 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_wrs[0]->GetYaxis()->CenterTitle(true);
     fh1_wrs[0]->SetLineColor(4);
     fh1_wrs[0]->SetLineWidth(3);
-    // fh1_wrs[0]->Draw("");
+    fh1_wrs[0]->Draw("");
     fh1_wrs[1] = new TH1F("fh1_WR_Master_Califa_Messel", "", 1200, -4100, 4100);
     fh1_wrs[1]->SetLineColor(2);
     fh1_wrs[1]->SetLineWidth(3);
-    // fh1_wrs[1]->Draw("same");
-    stack_wrs = new THStack("stack_wrs", Name3);
-    stack_wrs->Add(fh1_wrs[0]);
-    stack_wrs->Add(fh1_wrs[1]);
-    stack_wrs->Draw("nostack");
+    fh1_wrs[1]->Draw("same");
+    // stack_wrs = new THStack("stack_wrs", Name3);
+    // stack_wrs->Add(fh1_wrs[0]);
+    // stack_wrs->Add(fh1_wrs[1]);
+    // stack_wrs->Draw("nostack");
 
     // CANVAS energy vs wrs
     sprintf(Name1, "Califa_wr_vs_energy");
@@ -850,12 +896,21 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // MAIN FOLDER-Califa
     TFolder* mainfolCalifa = new TFolder("CALIFA", "CALIFA info");
-    if (fWRItemsCalifa)
-        mainfolCalifa->Add(cCalifa_wr);
-    if (fWRItemsCalifa && fWRItemsMaster)
-        mainfolCalifa->Add(cWrs);
     mainfolCalifa->Add(cCalifaMult);
     mainfolCalifa->Add(cCalifa_cry_energy);
+
+    TFolder* folder_wrs = new TFolder("WRs", "CALIFA white-rabbit info");
+
+    if (fWRItemsCalifa && fWRItemsMaster)
+        folder_wrs->Add(cWrs);
+    if (fWRItemsCalifa)
+    {
+        folder_wrs->Add(cCalifa_wr);
+        folder_wrs->Add(cCalifa_sync);
+    }
+    if (fWRItemsCalifa)
+        mainfolCalifa->Add(folder_wrs);
+
     mainfolCalifa->Add(folder_sta);
     mainfolCalifa->Add(folder_el);
     mainfolCalifa->Add(folder_eprl);
@@ -933,6 +988,8 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     if (fMappedItemsCalifa)
     {
         fh1_Califa_Mult->Reset();
+        for (Int_t s = 0; s < 3; s++)
+            fh1_Califa_sync[s]->Reset();
         fh2_Califa_cryId_energy->Reset();
         for (Int_t i = 0; i < fNumRings; i++)
         {
@@ -1302,12 +1359,14 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
     int64_t wrdif[fNumSides];
     Int_t wrdifinUse = 0;
+    int64_t wr[2];
+    for (int i = 0; i < 2; i++)
+        wr[i] = 0;
     // WR data
     if (fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast() > 0)
     {
         // Califa
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
-        int64_t wr[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BWRCalifaData* hit = (R3BWRCalifaData*)fWRItemsCalifa->At(ihit);
@@ -1339,8 +1398,13 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     }
 
     // Mapped data
+    // int64_t meansync=0.;
     if (fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast() > 0)
     {
+        int64_t synch[2];
+        synch[0] = 0.;
+        synch[1] = 0.;
+
         Int_t nHits = fMappedItemsCalifa->GetEntriesFast();
         Int_t Crymult = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
@@ -1350,6 +1414,12 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                 continue;
 
             Int_t cryId = hit->GetCrystalId();
+
+            if (cryId == 1)
+                synch[0] = hit->GetTime();
+            if (cryId == 2)
+                synch[1] = hit->GetTime();
+
             if ((fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2) ||
                 (cryId > fNbCalifaCrystals / 2 &&
                  fMap_Par->GetInUse(cryId) != fMap_Par->GetInUse(cryId - fNbCalifaCrystals / 2)))
@@ -1385,6 +1455,15 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             }
         }
         fh1_Califa_Mult->Fill(Crymult);
+        if ((synch[0] > 0. || synch[1] > 0.) && wr[0] > 0.)
+        {
+            fh1_Califa_sync[0]->Fill(synch[1] - synch[0]); // Wixh - Messel
+            fh1_Califa_sync[1]->Fill(wr[0] - synch[0]);    // Messel
+            fh1_Califa_sync[2]->Fill(wr[1] - synch[1]);    // Wixhausen
+            // meansync=wr[0]-synch[0];
+            // LOG(INFO)<<wrdif[0] + wr[0] << " "<<wr[0] <<" "<< wr[1] <<" "<<synch[0]<<" "<<synch[1] <<" "<<
+            // fWRItemsCalifa->GetEntriesFast();
+        }
     }
 
     // Cal data
@@ -1490,6 +1569,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     }
 
     fNEvents += 1;
+
+    // if(fNEvents==100)fh1_Califa_sync[1]->SetAxisRange(meansync*0.85,meansync*1.1);
 }
 
 void R3BCalifaOnlineSpectra::FinishEvent()
@@ -1536,6 +1617,7 @@ void R3BCalifaOnlineSpectra::FinishTask()
     if (fMappedItemsCalifa)
     {
         cCalifaMult->Write();
+        cCalifa_sync->Write();
         cCalifa_cry_energy->Write();
         for (Int_t i = 0; i < fNumRings; i++)
         {

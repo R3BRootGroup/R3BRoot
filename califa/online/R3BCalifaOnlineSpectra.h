@@ -220,6 +220,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_Califa_wr;
     TCanvas* cWrs;
     TH1F* fh1_wrs[2];
+    TCanvas* cCalifa_sync;
+    TH1F* fh1_Califa_sync[3];
     THStack* stack_wrs;
     TCanvas* cCalifa_wr_energy;
 
