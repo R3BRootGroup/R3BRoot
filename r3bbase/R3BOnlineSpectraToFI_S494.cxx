@@ -533,9 +533,9 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
         //     if(NumPaddles > 0)cout <<"nHits cal level: "<<nHitsEvent<<", "<<NumPaddles<<endl;
 
         // Build trigger map.
-        std::vector<R3BTofdCalData const *> trig_map;
+        std::vector<R3BTofiCalData const *> trig_map;
         for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
-          auto trig = (R3BTofdCalData const *)fCalTriggerItems->At(i);
+          auto trig = (R3BTofiCalData const *)fCalTriggerItems->At(i);
           if (trig_map.size() < trig->GetBarId()) {
             trig_map.resize(trig->GetBarId());
           }
