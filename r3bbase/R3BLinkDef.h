@@ -47,6 +47,7 @@
 #pragma link C++ class R3BTrackerPreparationS494+;
 #pragma link C++ class R3BOnlineSpectraFibvsToFDS494+;
 #pragma link C++ class R3BOnlineSpectraFiber_s494+;
+#pragma link C++ class R3BOnlineSpectraFiber23+;
 #pragma link C++ class R3BOnlineSpectraToFD_S494+;
 #pragma link C++ class R3BOnlineSpectraToFI_S494+;
 #pragma link C++ class R3BOnlineSpectraBMON_S494+;
