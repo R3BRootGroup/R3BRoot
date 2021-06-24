@@ -130,12 +130,13 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     unsigned long long  time_start = -1, time = 0, time_mem = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
+    unsigned long ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
     unsigned long long time_spill_start = 0, time_spill_end = 0;
-
+    Double_t see_spill = 0, ic_spill = 0, tofdor_spill = 0;
     unsigned long long time_previous_event = 0;
 
+    Bool_t spill_on = false;
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
     Double_t fNorm = 1.;
@@ -144,7 +145,10 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     Double_t read_time;        // step in which scalers are read, in sec
     Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
     Double_t calib_SEE = 1.;   // SEETRAM calibration factor
-    Double_t see_offset = 7.1; // SEETRAM offset in kHz
+    Double_t see_offset = 0.2; // SEETRAM offset in kHz
+	Double_t calib_IC = 1.;   // SEETRAM calibration factor
+    Double_t ic_offset = 0; // SEETRAM offset in kHz
+    Int_t in_spill_off = 0;
 
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
@@ -163,6 +167,8 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH2F* fh_SEE_cal;
     TH1F* fh_SROLU1_spill;
     TH1F* fh_SROLU2_spill;
+    TH1F* fh_IC_TOFDOR;
+    TH1F* fh_SEE_TOFDOR;
 
     TH2F* fh_rolu_tot;
     TH1F* fh_rolu_channels;

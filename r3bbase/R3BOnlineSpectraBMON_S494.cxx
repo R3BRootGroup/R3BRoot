@@ -185,8 +185,13 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         // get the theoretical calib factors for SEETRAM
         Double_t fexp = float(fsens_SEE + 9);
         Double_t fpow = float(pow(10., fexp));
-        calib_SEE = 135641.7786 * fpow;
-        cout << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
+        calib_SEE = 104457.9 * fpow;
+        cout << "SEETRAM: " << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
+        // get the theoretical calib factors for IC
+        Double_t fexp_ic = float(fsens_IC + 9);
+        Double_t fpow_ic = float(pow(10., fexp_ic));
+        calib_IC = 1.; // 104457.9 * fpow_ic;
+        cout << "IC     : " << fsens_IC << ", " << fexp_ic << ", " << fpow_ic << ", " << calib_IC << endl;
 
         TCanvas* cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 900);
         Int_t Nbin_bmon = reset_time / read_time;
@@ -220,7 +225,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
         fh_SEE_spill = new TH1F("SEE_spill", "SEE particle rate ", Nbin_bmon, 0, reset_time);
         fh_SEE_spill->GetXaxis()->SetTitle("time / sec");
-        fh_SEE_spill->GetYaxis()->SetTitle("Particles / sec");
+        fh_SEE_spill->GetYaxis()->SetTitle("Particles / kHz");
 
         fh_TOFDOR_spill = new TH1F("TOFDOR_spill", "TOFDOR rate in kHz ", Nbin_bmon, 0, reset_time);
         fh_TOFDOR_spill->GetXaxis()->SetTitle("time / sec");
@@ -234,7 +239,15 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_SROLU2_spill->GetXaxis()->SetTitle("time / sec");
         fh_SROLU2_spill->GetYaxis()->SetTitle("SROLU2 rate / kHz");
 
-        cbmon->Divide(6, 2);
+        fh_SEE_TOFDOR = new TH1F("SEE_vs_TOFDOR", "SEETRAM vs TOFDOR ", 20000, 0, 20000);
+        fh_SEE_TOFDOR->GetYaxis()->SetTitle("SEETRAM counts/spill");
+        fh_SEE_TOFDOR->GetXaxis()->SetTitle("TOFDOR counts/spill");
+
+        fh_IC_TOFDOR = new TH1F("IC_vs_TOFDOR", "IC vs TOFDOR ", 20000, 0, 20000);
+        fh_IC_TOFDOR->GetYaxis()->SetTitle("IC counts/spill");
+        fh_IC_TOFDOR->GetXaxis()->SetTitle("TOFDOR counts/spill");
+
+        cbmon->Divide(6, 3);
         cbmon->cd(1);
         fh_spill_length->Draw();
         cbmon->cd(2);
@@ -258,6 +271,14 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_SROLU1_spill->Draw("hist");
         cbmon->cd(12);
         fh_SROLU2_spill->Draw("hist");
+        cbmon->cd(14);
+        fh_IC_TOFDOR->SetMarkerSize(0.5);
+        fh_IC_TOFDOR->SetMarkerStyle(21);
+        fh_IC_TOFDOR->Draw("hist p");
+        cbmon->cd(15);
+        fh_SEE_TOFDOR->SetMarkerSize(0.5);
+        fh_SEE_TOFDOR->SetMarkerStyle(21);
+        fh_SEE_TOFDOR->Draw("hist p");
 
         cbmon->cd(0);
 
@@ -291,10 +312,13 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_SROLU1_spill->Reset();
     fh_SROLU2->Reset();
     fh_SROLU2_spill->Reset();
+    fh_SEE_TOFDOR->Reset();
+    fh_IC_TOFDOR->Reset();
 }
 
 void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 {
+    fNEvents += 1;
     //  cout << "fNEvents " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -318,11 +342,18 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     {
         time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
         cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec " << endl;
+        // reset counters:
+        see_spill = 0;
+        ic_spill = 0;
+        tofdor_spill = 0;
+        spill_on = true;
+        in_spill_off = 0;
     }
     if (header->GetTrigger() == 13)
     {
         time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
         cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec " << endl;
+        spill_on = false;
     }
 
     fhTrigger->Fill(header->GetTrigger());
@@ -394,6 +425,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 srolu1_mem = SROLU1;
                 srolu2_mem = SROLU2;
                 time_mem = time_start;
+                see_first = SEETRAM;
                 see_start = SEETRAM;
                 ic_start = IC;
                 tofdor_start = TOFDOR;
@@ -422,21 +454,44 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     // IC:
                     Int_t yIC = IC - ic_start;
                     fh_IC->Fill(tdiff, yIC);
-                    fh_IC_spill->Fill(tdiff, (IC - ic_mem) * fNorm);
+                    Double_t yIC_part = (double(IC - ic_mem) * fNorm) * calib_IC;
+                    fh_IC_spill->Fill(tdiff, yIC_part);
                     ic_mem = IC;
 
-                    // SEETRAM:
+                    // SEETRAM:SEETRAM
                     Int_t ySEE = SEETRAM - see_start;
                     fh_SEE->Fill(tdiff, ySEE);
-                    Double_t ySEE_part = double(SEETRAM - see_mem) * fNorm * calib_SEE;
+                    Double_t ySEE_part = (double(SEETRAM - see_mem) * fNorm) * calib_SEE;
                     fh_SEE_spill->Fill(tdiff, ySEE_part);
                     see_mem = SEETRAM;
 
                     // TOFDOR:
                     Int_t yTOFDOR = TOFDOR - tofdor_start;
                     fh_TOFDOR->Fill(tdiff, yTOFDOR);
-                    fh_TOFDOR_spill->Fill(tdiff, (TOFDOR - tofdor_mem) * fNorm);
+                    Double_t yTOFDOR_part = double(TOFDOR - tofdor_mem) * fNorm;
+                    fh_TOFDOR_spill->Fill(tdiff, yTOFDOR_part);
                     tofdor_mem = TOFDOR;
+
+                    // correlations:
+                    if (spill_on)
+                    {
+                        see_spill += ySEE_part;
+                        ic_spill += yIC_part;
+                        tofdor_spill += yTOFDOR_part;
+                    }
+                    if (!spill_on && time_spill_start > 0 && time_spill_end > 0)
+                    {
+                        in_spill_off += 1;
+                        if (in_spill_off == 1)
+                        {
+                            Double_t spill_length = double(time_spill_end - time_spill_start) / 1.e9;
+                            tofdor_spill = tofdor_spill / spill_length;
+                            ic_spill = ic_spill / spill_length;
+                            see_spill = see_spill / spill_length;
+                            fh_IC_TOFDOR->Fill(tofdor_spill, ic_spill);
+                            fh_SEE_TOFDOR->Fill(tofdor_spill, see_spill);
+                        }
+                    }
 
                     // SROLU1:
                     Int_t ySROLU1 = SROLU1 - srolu1_start;
@@ -576,8 +631,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             }
         }
     }
-
-    fNEvents += 1;
 }
 
 void R3BOnlineSpectraBMON_S494::FinishEvent()
@@ -620,5 +673,7 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fh_IC_spill->Write();
         fh_SEE_spill->Write();
         fh_TOFDOR_spill->Write();
+        fh_SEE_TOFDOR->Write();
+        fh_IC_TOFDOR->Write();
     }
 }
