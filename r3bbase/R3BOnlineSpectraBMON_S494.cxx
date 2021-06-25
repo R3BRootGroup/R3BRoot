@@ -188,9 +188,9 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         calib_SEE = 104457.9 * fpow;
         cout << "SEETRAM: " << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
         // get the theoretical calib factors for IC
-        Double_t fexp_ic = float(fsens_IC + 9);
+        Double_t fexp_ic = float(fsens_IC + 7);
         Double_t fpow_ic = float(pow(10., fexp_ic));
-        calib_IC = 1.; // 104457.9 * fpow_ic;
+        calib_IC = 5551. * fpow_ic;
         cout << "IC     : " << fsens_IC << ", " << fexp_ic << ", " << fpow_ic << ", " << calib_IC << endl;
 
         TCanvas* cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 900);
@@ -223,9 +223,13 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_IC_spill->GetXaxis()->SetTitle("time / sec");
         fh_IC_spill->GetYaxis()->SetTitle("IC rate / kHz");
 
-        fh_SEE_spill = new TH1F("SEE_spill", "SEE particle rate ", Nbin_bmon, 0, reset_time);
+        fh_SEE_spill = new TH1F("SEE_spill", "SEE particle rate in kHz", Nbin_bmon, 0, reset_time);
         fh_SEE_spill->GetXaxis()->SetTitle("time / sec");
         fh_SEE_spill->GetYaxis()->SetTitle("Particles / kHz");
+
+        fh_SEE_spill_raw = new TH1F("SEE_spill_raw", "SEE count rate in kHz", Nbin_bmon, 0, reset_time);
+        fh_SEE_spill_raw->GetXaxis()->SetTitle("time / sec");
+        fh_SEE_spill_raw->GetYaxis()->SetTitle("Counts / kHz");
 
         fh_TOFDOR_spill = new TH1F("TOFDOR_spill", "TOFDOR rate in kHz ", Nbin_bmon, 0, reset_time);
         fh_TOFDOR_spill->GetXaxis()->SetTitle("time / sec");
@@ -263,7 +267,6 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cbmon->cd(8);
         fh_IC_spill->Draw("hist");
         cbmon->cd(9);
-        fh_SEE_spill->SetAxisRange(1, 1e4, "Y");
         fh_SEE_spill->Draw("hist");
         cbmon->cd(10);
         fh_TOFDOR_spill->Draw("hist");
@@ -272,13 +275,13 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cbmon->cd(12);
         fh_SROLU2_spill->Draw("hist");
         cbmon->cd(14);
-        fh_IC_TOFDOR->SetMarkerSize(0.5);
         fh_IC_TOFDOR->SetMarkerStyle(21);
         fh_IC_TOFDOR->Draw("hist p");
         cbmon->cd(15);
-        fh_SEE_TOFDOR->SetMarkerSize(0.5);
         fh_SEE_TOFDOR->SetMarkerStyle(21);
         fh_SEE_TOFDOR->Draw("hist p");
+        cbmon->cd(17);
+        fh_SEE_spill_raw->Draw("hist");
 
         cbmon->cd(0);
 
@@ -306,6 +309,7 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_IC_spill->Reset();
     fh_SEE->Reset();
     fh_SEE_spill->Reset();
+    fh_SEE_spill_raw->Reset();
     fh_TOFDOR->Reset();
     fh_TOFDOR_spill->Reset();
     fh_SROLU1->Reset();
@@ -393,11 +397,12 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             time_clear = xtime;
             spectra_clear = true;
         }
-        unsigned long IC;
-        unsigned long SEETRAM;
-        unsigned long TOFDOR;
-        unsigned long SROLU1;
-        unsigned long SROLU2;
+        unsigned long int IC;
+        unsigned long int SEETRAM;
+        unsigned long int TOFDOR;
+        unsigned long int SROLU1;
+        unsigned long int SROLU2;
+
         Bool_t bmon_read = false;
 
         auto det = fMappedItems.at(DET_BMON);
@@ -452,25 +457,39 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fNorm = 1.e-3 / (double(time - time_prev_read) / 1.e9); // kHz
 
                     // IC:
-                    Int_t yIC = IC - ic_start;
-                    fh_IC->Fill(tdiff, yIC);
-                    Double_t yIC_part = (double(IC - ic_mem) * fNorm) * calib_IC;
-                    fh_IC_spill->Fill(tdiff, yIC_part);
+                    int yIC = (IC - ic_start);
+                    int yIC_mem = (IC - ic_mem);
+                    if (yIC > 0)
+                        fh_IC->Fill(tdiff, yIC);
+                    Double_t yIC_part = ((double)yIC_mem * fNorm) * calib_IC;
+                    if (yIC_mem > 0 && yIC_mem_mem > 0)
+                        fh_IC_spill->Fill(tdiff, yIC_part);
                     ic_mem = IC;
+                    yIC_mem_mem = yIC_mem;
 
                     // SEETRAM:SEETRAM
-                    Int_t ySEE = SEETRAM - see_start;
-                    fh_SEE->Fill(tdiff, ySEE);
-                    Double_t ySEE_part = (double(SEETRAM - see_mem) * fNorm) * calib_SEE;
-                    fh_SEE_spill->Fill(tdiff, ySEE_part);
+                    int ySEE = (SEETRAM - see_start);
+                    int ySEE_mem = (SEETRAM - see_mem);
+                    if (ySEE > 0)
+                        fh_SEE->Fill(tdiff, ySEE);
+                    Double_t ySEE_part = ((double)ySEE_mem * fNorm) * calib_SEE;
+                    if (ySEE_mem > 0 && ySEE_mem_mem > 0)
+                        fh_SEE_spill->Fill(tdiff, ySEE_part);
+                    if (ySEE_mem > 0 && ySEE_mem_mem > 0)
+                        fh_SEE_spill_raw->Fill(tdiff, ySEE_part / calib_SEE);
                     see_mem = SEETRAM;
+                    ySEE_mem_mem = ySEE_mem;
 
                     // TOFDOR:
-                    Int_t yTOFDOR = TOFDOR - tofdor_start;
-                    fh_TOFDOR->Fill(tdiff, yTOFDOR);
-                    Double_t yTOFDOR_part = double(TOFDOR - tofdor_mem) * fNorm;
-                    fh_TOFDOR_spill->Fill(tdiff, yTOFDOR_part);
+                    int yTOFDOR = (TOFDOR - tofdor_start);
+                    int yTOFDOR_mem = (TOFDOR - tofdor_mem);
+                    if (yTOFDOR > 0)
+                        fh_TOFDOR->Fill(tdiff, yTOFDOR);
+                    Double_t yTOFDOR_part = (double)yTOFDOR_mem * fNorm;
+                    if (yTOFDOR_mem > 0 && yTOFDOR_mem_mem > 0)
+                        fh_TOFDOR_spill->Fill(tdiff, yTOFDOR_part);
                     tofdor_mem = TOFDOR;
+                    yTOFDOR_mem_mem = yTOFDOR_mem;
 
                     // correlations:
                     if (spill_on)
@@ -494,16 +513,24 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     }
 
                     // SROLU1:
-                    Int_t ySROLU1 = SROLU1 - srolu1_start;
-                    fh_SROLU1->Fill(tdiff, ySROLU1);
-                    fh_SROLU1_spill->Fill(tdiff, (SROLU1 - srolu1_mem) * fNorm);
+                    int ySROLU1 = (SROLU1 - srolu1_start);
+                    int ySROLU1_mem = (SROLU1 - srolu1_mem);
+                    if (ySROLU1 > 0)
+                        fh_SROLU1->Fill(tdiff, ySROLU1);
+                    if (ySROLU1_mem > 0 && ySROLU1_mem_mem > 0)
+                        fh_SROLU1_spill->Fill(tdiff, (double)ySROLU1_mem * fNorm);
                     srolu1_mem = SROLU1;
+                    ySROLU1_mem_mem = ySROLU1_mem;
 
                     // SROLU2:
-                    Int_t ySROLU2 = SROLU2 - srolu2_start;
-                    fh_SROLU2->Fill(tdiff, ySROLU2);
-                    fh_SROLU2_spill->Fill(tdiff, (SROLU2 - srolu2_mem) * fNorm);
+                    int ySROLU2 = (SROLU2 - srolu2_start);
+                    int ySROLU2_mem = (SROLU2 - srolu2_mem);
+                    if (ySROLU2 > 0)
+                        fh_SROLU2->Fill(tdiff, ySROLU2);
+                    if ((double)ySROLU2_mem > 0 && ySROLU2_mem_mem > 0)
+                        fh_SROLU2_spill->Fill(tdiff, (double)ySROLU2_mem * fNorm);
                     srolu2_mem = SROLU2;
+                    ySROLU2_mem_mem = ySROLU2_mem;
 
                     time_to_read = 0;
                     time_prev_read = time;
@@ -672,6 +699,7 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fh_TOFDOR->Write();
         fh_IC_spill->Write();
         fh_SEE_spill->Write();
+        fh_SEE_spill_raw->Write();
         fh_TOFDOR_spill->Write();
         fh_SEE_TOFDOR->Write();
         fh_IC_TOFDOR->Write();

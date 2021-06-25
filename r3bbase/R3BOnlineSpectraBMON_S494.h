@@ -130,11 +130,12 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     unsigned long long  time_start = -1, time = 0, time_mem = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
-    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
+    unsigned long int ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
+    unsigned long int ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
     unsigned long long time_spill_start = 0, time_spill_end = 0;
     Double_t see_spill = 0, ic_spill = 0, tofdor_spill = 0;
     unsigned long long time_previous_event = 0;
+    int yIC_mem_mem=0, ySEE_mem_mem=0,yTOFDOR_mem_mem=0,ySROLU1_mem_mem=0,ySROLU2_mem_mem=0;
 
     Bool_t spill_on = false;
     Double_t time_clear = -1.;
@@ -157,6 +158,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fhTrigger;
     TH1F* fh_IC_spill;
     TH1F* fh_SEE_spill;
+    TH1F* fh_SEE_spill_raw;
     TH1F* fh_TOFDOR_spill;
     TH1F* fh_IC;
     TH1F* fh_SEE;
