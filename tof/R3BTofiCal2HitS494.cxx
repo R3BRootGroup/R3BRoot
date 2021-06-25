@@ -68,7 +68,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494()
     , fHitPar(NULL)
     , fTrigger(-1)
     , fTpat(-1)
-    , fNofPlanes(5)
+    , fNofPlanes(2)
     , fPaddlesPerPlane(6)
     , fTofiQ(1)
     , fTofiGap(0)
@@ -119,7 +119,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     , fHitPar(NULL)
     , fTrigger(-1)
     , fTpat(-1)
-    , fNofPlanes(5)
+    , fNofPlanes(2)
     , fPaddlesPerPlane(6)
     , fTofiQ(1)
     , fTofiGap(0)
@@ -144,7 +144,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     {
         for (Int_t i = 0; i < N_TOFI_HIT_PLANE_MAX; i++)
         {
-			fh_Tofi_TotPm[i] = NULL;
+	    fh_Tofi_TotPm[i] = NULL;
             fhQ[i] = NULL;
             fhxy[i] = NULL;
             fhQvsEvent[i] = NULL;
@@ -177,7 +177,7 @@ R3BTofiCal2HitS494::~R3BTofiCal2HitS494()
             if (fhTsync[i])
                 delete fhTsync[i];
             if (fh_Tofi_TotPm[i])
-				delete fh_Tofi_TotPm[i];
+		delete fh_Tofi_TotPm[i];
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
@@ -344,8 +344,17 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         events_in_cal_level++;
     }
 
-    static bool s_was_trig_missing = false;
-    auto trig_num = fCalTriggerItems->GetEntries();
+    // Build trigger map.
+    std::vector<R3BTofiCalData const *> trig_map;
+    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
+	    auto trig = (R3BTofiCalData const *)fCalTriggerItems->At(i);
+      if (trig_map.size() < trig->GetBarId()) {
+        trig_map.resize(trig->GetBarId());
+      }
+      trig_map.at(trig->GetBarId() - 1) = trig;
+    }
+
+    bool s_was_trig_missing = false;
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -370,10 +379,13 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
-            if (top_trig_i < trig_num && bot_trig_i < trig_num)
+            if (top_trig_i < trig_map.size() &&
+                trig_map.at(top_trig_i) &&
+                bot_trig_i < trig_map.size() &&
+                trig_map.at(bot_trig_i))
             {
-                auto top_trig = (R3BTofiCalData const*)fCalTriggerItems->At(top_trig_i);
-                auto bot_trig = (R3BTofiCalData const*)fCalTriggerItems->At(bot_trig_i);
+                auto top_trig = trig_map.at(top_trig_i);
+                auto bot_trig = trig_map.at(bot_trig_i);
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
                 /*
@@ -445,6 +457,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     ++bot_i;
                     continue;
                 }
+
+		CreateHistograms(iPlane, iBar);
 
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
@@ -635,7 +649,6 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (fTofiHisto)
                 {
                     // fill control histograms
-                    CreateHistograms(iPlane, iBar);
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
@@ -959,6 +972,16 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e5, 0, 2e9, max_charge * 10, 0., max_charge);
         fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
+    }
+    if (NULL == fh_Tofi_TotPm[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "ToTVsPM_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "ToT vs PM # Plane %d ", iPlane);
+        fh_Tofi_TotPm[iPlane - 1] = new TH2F(strName1, strName2, 50, -25, 25, 300, 0, 300);
+        fh_Tofi_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT");
+        fh_Tofi_TotPm[iPlane - 1]->GetXaxis()->SetTitle("PM");
     }
 }
 void R3BTofiCal2HitS494::FinishEvent()
