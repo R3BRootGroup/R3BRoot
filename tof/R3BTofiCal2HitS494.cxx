@@ -98,6 +98,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494()
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
             fhTsync[i] = NULL;
+            fh_Tofi_TotPm[i] = NULL;
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
@@ -143,6 +144,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     {
         for (Int_t i = 0; i < N_TOFI_HIT_PLANE_MAX; i++)
         {
+			fh_Tofi_TotPm[i] = NULL;
             fhQ[i] = NULL;
             fhxy[i] = NULL;
             fhQvsEvent[i] = NULL;
@@ -174,6 +176,8 @@ R3BTofiCal2HitS494::~R3BTofiCal2HitS494()
                 delete fhTdiff[i];
             if (fhTsync[i])
                 delete fhTsync[i];
+            if (fh_Tofi_TotPm[i])
+				delete fh_Tofi_TotPm[i];
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
@@ -445,6 +449,9 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
+                fh_Tofi_TotPm[iPlane - 1]->Fill(iBar, top_tot);
+                fh_Tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
+
                 // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
 
                 // register multi hits
@@ -499,6 +506,11 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
                 yToT[iPlane][iBar].push_back(posToT);
 
+
+//cout << posToT << endl;
+//cout << top-> GetBarId() << "  pos  " << posToT << "   Lambda:   " << par->GetLambda()  << ",  top TOT | Totoffset:  " << top_tot << "   " << par->GetToTOffset2()
+//<< ",  bottom TOT| TotOffset:  " << bot_tot  << "   " <<  par->GetToTOffset1() << endl;
+
                 if (fTofiTotPos)
                     pos = posToT;
 
@@ -510,7 +522,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (fTofiGap > 0.)
                     gap_center_layer = fTofiGap;
                 // define number of layers and paddles with sizes of the detector
-                Int_t number_layers = 2;   // number of layers
+                Int_t number_layers = 1; //Sabina 2;   // number of layers
                 Int_t number_paddles = 24; // number of paddles per layer
                 Float_t detector_width =
                     number_paddles * paddle_width + (number_paddles - 2) * air_gap_paddles + gap_center_layer;
@@ -974,6 +986,8 @@ void R3BTofiCal2HitS494::FinishTask()
                 fhTdiff[i]->Write();
             if (fhTsync[i])
                 fhTsync[i]->Write();
+            if (fh_Tofi_TotPm[i])
+				fh_Tofi_TotPm[i]->Write(); // control histogram for ToT
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
 

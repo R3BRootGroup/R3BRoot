@@ -313,6 +313,7 @@ void R3BTofiHisto2HitPar::FinishTask()
 
 void R3BTofiHisto2HitPar::calcOffset()
 {
+	std::cout << "Hallo 1" << endl;
     TCanvas* cOffset = new TCanvas("cOffset", "cOffset", 10, 10, 1000, 900);
     cOffset->Divide(2, 2);
     R3BTofiHitModulePar* mpar;
@@ -333,7 +334,8 @@ void R3BTofiHisto2HitPar::calcOffset()
                 histo_py->Rebin(4);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
+        //        TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3); // Original
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 5.0, Max + 5.0); // Anderung Sabina
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
@@ -353,6 +355,7 @@ void R3BTofiHisto2HitPar::calcOffset()
 }
 void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
 {
+	std::cout << "Hallo 2" << endl;
     TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
     cToTOffset->Divide(1, 2);
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -374,7 +377,7 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 TF1* fgaus = new TF1(
-                    "fgaus", "gaus(0)", Max - 0.2, Max + 0.2); // new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                    "fgaus", "gaus(0)", Max - 0.3, Max + 0.3); // 0.2 //new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1);
                 fgaus->Draw("SAME");
@@ -397,6 +400,7 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
 
 void R3BTofiHisto2HitPar::calcSync()
 {
+		std::cout << "Hallo 3" << endl;
     TCanvas* cSync = new TCanvas("cSync", "cSync", 10, 10, 1000, 900);
     cSync->Divide(2, 2);
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -414,7 +418,7 @@ void R3BTofiHisto2HitPar::calcSync()
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t MaxEntry = histo_py->GetBinContent(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 20., Max + 20.);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 25., Max + 25.);
                 fgaus->SetParameters(MaxEntry, Max, 50);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -454,7 +458,8 @@ void R3BTofiHisto2HitPar::calcVeff()
                 Int_t binmax = histo_py->GetMaximumBin();
                 max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t maxEntry = histo_py->GetBinContent(binmax);
-                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 10., max + 10.); /// TODO: find best range
+               // auto* fgaus = new TF1("fgaus", "gaus(0)", max - 10., max + 10.);
+                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 30., max + 30.); /// TODO: find best range   /// Sabina:10-->30
                 fgaus->SetParameters(maxEntry, max, 50);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t offset1 = par->GetOffset1();
@@ -493,7 +498,8 @@ void R3BTofiHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
                 histo_py->Draw();
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+//                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.30, Max + 0.30); //
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1);
                 fgaus->Draw("SAME");

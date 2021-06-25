@@ -195,6 +195,7 @@ class R3BTofiCal2HitS494 : public FairTask
     TH2F* fhQvsEvent[N_TOFI_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFI_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFI_HIT_PLANE_MAX];
+    TH2F* fh_Tofi_TotPm[N_TOFI_HIT_PLANE_MAX];
 
   public:
     ClassDef(R3BTofiCal2HitS494, 1)
