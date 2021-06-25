@@ -372,7 +372,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             // hit fiber number vs. event number:
             fh_Fib_vs_Events[ifibcount] = new TH2F(Form("%sHit_fib_vs_event", detName),
                                                    Form("%sHit Fiber # vs. Event #", detName),
-                                                   10000,
+                                                   100,
                                                    0,
                                                    5e6,
                                                    N_FIBER_PLOT_S494,
@@ -383,7 +383,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
 
             fh_ToTup_vs_ToTdown[ifibcount] = new TH2F(Form("%sHit_time_vs_event", detName),
                                                       Form("%sHit time # vs. Event #", detName),
-                                                      20000,
+                                                      200,
                                                       0,
                                                       5e6,
                                                       2000,
@@ -392,7 +392,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_ToTup_vs_ToTdown[ifibcount]->GetXaxis()->SetTitle("Event number");
             fh_ToTup_vs_ToTdown[ifibcount]->GetYaxis()->SetTitle("Time  / ns");
 
-            FibCanvas[ifibcount]->Divide(4, 4);
+            FibCanvas[ifibcount]->Divide(4, 3);
             if (fCalItems.at(DET_FI_FIRST + ifibcount))
             {
                 FibCanvas[ifibcount]->cd(1);
@@ -426,9 +426,9 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             if (fHitItems.at(DET_FI_FIRST + ifibcount))
             {
 
-                FibCanvas[ifibcount]->cd(13);
-                gPad->SetLogz();
-                fh_ToTup_vs_ToTdown[ifibcount]->Draw("colz");
+                // FibCanvas[ifibcount]->cd(13);
+                // gPad->SetLogz();
+                // fh_ToTup_vs_ToTdown[ifibcount]->Draw("colz");
                 FibCanvas[ifibcount]->cd(9);
                 fh_fibers_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(10);
@@ -441,17 +441,17 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 FibCanvas[ifibcount]->cd(11);
                 gPad->SetLogz();
                 fh_time_Fib[ifibcount]->Draw("colz");
-                FibCanvas[ifibcount]->cd(14);
-                gPad->SetLogz();
-                fh_Fib_vs_Events[ifibcount]->Draw("colz");
-                FibCanvas[ifibcount]->cd(15);
-                gPad->SetLogz();
-                fh_Fib_pos[ifibcount]->Draw("colz");
+                // FibCanvas[ifibcount]->cd(14);
+                // gPad->SetLogz();
+                // fh_Fib_vs_Events[ifibcount]->Draw("colz");
+                // FibCanvas[ifibcount]->cd(15);
+                // gPad->SetLogz();
+                // fh_Fib_pos[ifibcount]->Draw("colz");
                 if (ifibcount > 3)
                 {
-                    FibCanvas[ifibcount]->cd(16);
-                    gPad->SetLogz();
-                    fh_xy_global->Draw("colz");
+                    //  FibCanvas[ifibcount]->cd(16);
+                    // gPad->SetLogz();
+                    // fh_xy_global->Draw("colz");
                 }
             }
             FibCanvas[ifibcount]->cd(0);
