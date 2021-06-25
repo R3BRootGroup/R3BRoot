@@ -219,11 +219,11 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_SROLU2->GetXaxis()->SetTitle("time / sec");
         fh_SROLU2->GetYaxis()->SetTitle("SROLU2 counts");
 
-        fh_IC_spill = new TH1F("IC_spill", "IC rate in kHz ", Nbin_bmon, 0, reset_time);
+        fh_IC_spill = new TH1F("IC_spill", "IC particles rate in kHz ", Nbin_bmon, 0, reset_time);
         fh_IC_spill->GetXaxis()->SetTitle("time / sec");
-        fh_IC_spill->GetYaxis()->SetTitle("IC rate / kHz");
+        fh_IC_spill->GetYaxis()->SetTitle("Particles / kHz");
 
-        fh_SEE_spill = new TH1F("SEE_spill", "SEE particle rate in kHz", Nbin_bmon, 0, reset_time);
+        fh_SEE_spill = new TH1F("SEE_spill", "SEE particles rate in kHz", Nbin_bmon, 0, reset_time);
         fh_SEE_spill->GetXaxis()->SetTitle("time / sec");
         fh_SEE_spill->GetYaxis()->SetTitle("Particles / kHz");
 
@@ -465,7 +465,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     if (yIC_mem > 0 && yIC_mem_mem > 0)
                         fh_IC_spill->Fill(tdiff, yIC_part);
                     ic_mem = IC;
-                    yIC_mem_mem = yIC_mem;
 
                     // SEETRAM:SEETRAM
                     int ySEE = (SEETRAM - see_start);
@@ -478,25 +477,26 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     if (ySEE_mem > 0 && ySEE_mem_mem > 0)
                         fh_SEE_spill_raw->Fill(tdiff, ySEE_part / calib_SEE);
                     see_mem = SEETRAM;
-                    ySEE_mem_mem = ySEE_mem;
 
-                    // TOFDOR:
+                    // TOFDOR: here bewusst ySEE in if!
                     int yTOFDOR = (TOFDOR - tofdor_start);
                     int yTOFDOR_mem = (TOFDOR - tofdor_mem);
-                    if (yTOFDOR > 0)
+                    if (ySEE > 0)
                         fh_TOFDOR->Fill(tdiff, yTOFDOR);
                     Double_t yTOFDOR_part = (double)yTOFDOR_mem * fNorm;
-                    if (yTOFDOR_mem > 0 && yTOFDOR_mem_mem > 0)
+                    if (ySEE_mem > 0 && ySEE_mem_mem > 0)
                         fh_TOFDOR_spill->Fill(tdiff, yTOFDOR_part);
                     tofdor_mem = TOFDOR;
-                    yTOFDOR_mem_mem = yTOFDOR_mem;
 
                     // correlations:
                     if (spill_on)
                     {
-                        see_spill += ySEE_part;
-                        ic_spill += yIC_part;
-                        tofdor_spill += yTOFDOR_part;
+                        if (ySEE_mem > 0 && ySEE_mem_mem > 0 && yIC_mem > 0 && yIC_mem_mem > 0)
+                        {
+                            see_spill += ySEE_part;
+                            ic_spill += yIC_part;
+                            tofdor_spill += yTOFDOR_part;
+                        }
                     }
                     if (!spill_on && time_spill_start > 0 && time_spill_end > 0)
                     {
@@ -511,6 +511,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             fh_SEE_TOFDOR->Fill(tofdor_spill, see_spill);
                         }
                     }
+                    yTOFDOR_mem_mem = yTOFDOR_mem;
+                    ySEE_mem_mem = ySEE_mem;
+                    yIC_mem_mem = yIC_mem;
 
                     // SROLU1:
                     int ySROLU1 = (SROLU1 - srolu1_start);
@@ -550,6 +553,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_TOFDOR->Reset("ICESM");
                     fh_SROLU1->Reset("ICESM");
                     fh_SROLU2->Reset("ICESM");
+                    fh_SEE_spill_raw->Reset("ICESM");
                     time_mem = time;
                     time_clear = -1.;
                     iclear_count = iclear_count + 1;

@@ -156,7 +156,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
             sprintf(strName30, "tofi_time_plane_%d", j + 1);
             char strName40[255];
             sprintf(strName40, "Tofi time plane %d", j + 1);
-            fh_tofi_timePm[j] = new TH2F(strName30, strName40, 4000, -2000., 2000, 1500, 0., 300.);
+            fh_tofi_timePm[j] = new TH2F(strName30, strName40, 60, -30, 30, 3000, -2000., 1000);
             fh_tofi_timePm[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofi_timePm[j]->GetYaxis()->SetTitle("time / ns");
 
