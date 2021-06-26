@@ -393,7 +393,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         Double_t xtime = double(time - time_start) / 1.e9;
         // for reseting spectra
         Int_t icount = iclear_count * reset_time; // reset after reset_time (sec)
-        if (time_clear < 0. && xtime > reset_time)
+        if (xtime > reset_time)
         {
             time_clear = xtime;
             spectra_clear = true;
@@ -557,6 +557,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_SEE_spill_raw->Reset("ICESM");
                     time_mem = time;
                     time_clear = -1.;
+		    time_start = -1;
                     iclear_count = iclear_count + 1;
                     spectra_clear = false;
                     see_start = SEETRAM;
