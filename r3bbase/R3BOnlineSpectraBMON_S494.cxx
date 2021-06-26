@@ -318,6 +318,7 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_SROLU2_spill->Reset();
     fh_SEE_TOFDOR->Reset();
     fh_IC_TOFDOR->Reset();
+    time_start = -1;
 }
 
 void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
@@ -392,7 +393,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         Double_t xtime = double(time - time_start) / 1.e9;
         // for reseting spectra
         Int_t icount = iclear_count * reset_time; // reset after reset_time (sec)
-        if (time_clear < 0. && int(xtime) % icount == 0 && xtime > 1.)
+        if (time_clear < 0. && xtime > reset_time)
         {
             time_clear = xtime;
             spectra_clear = true;
