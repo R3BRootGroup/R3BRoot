@@ -67,6 +67,7 @@ R3BMCTrack.cxx
 wrData/R3BWRMasterData.cxx
 wrData/R3BWRCalifaData.cxx
 wrData/R3BWRAmsData.cxx
+wrData/R3BWRPspData.cxx
 R3BHit.cxx
 R3BTrack.cxx
 R3BDouble.cxx
