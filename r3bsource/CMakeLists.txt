@@ -69,6 +69,7 @@ R3BWhiterabbitNeulandReader.cxx
 R3BWhiterabbitAmsReader.cxx
 R3BWhiterabbitS2Reader.cxx
 R3BWhiterabbitS8Reader.cxx
+R3BWhiterabbitPspReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
 R3BTimestampMasterReader.cxx
@@ -117,6 +118,7 @@ ext/ext_h101_wrmaster.h
 ext/ext_h101_wrcalifa.h
 ext/ext_h101_wrneuland.h
 ext/ext_h101_wrams.h
+ext/ext_h101_timestamp_pspx.h
 ext/ext_h101_wrs2.h
 ext/ext_h101_wrs8.h
 ext/ext_h101_tpat.h
