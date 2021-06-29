@@ -247,9 +247,21 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
     }
-
+//new
+    // Build trigger map.
+    std::vector<R3BTofdCalData const *> trig_map;
+    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
+    {
+        auto trig = (R3BTofdCalData const *)fCalTriggerItems->At(i);
+        if (trig_map.size() < trig->GetBarId())
+        {
+            trig_map.resize(trig->GetBarId());
+        }
+        trig_map.at(trig->GetBarId() - 1) = trig;
+    }
+//end new
     static bool s_was_trig_missing = false;
-    auto trig_num = fCalTriggerItems->GetEntries();
+    //auto trig_num = fCalTriggerItems->GetEntries(); //old
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -273,10 +285,31 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
             auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
+            /* //old
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {
                 auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
                 auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                top_trig_ns = top_trig->GetTimeLeading_ns();
+                bot_trig_ns = bot_trig->GetTimeLeading_ns();
+                //
+                //                std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' <<
+                //   top->GetBarId() << ' '
+                //                << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl;
+                //                std::cout << "Bot: " <<
+                //                bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' <<
+                //   bot_trig_i << ' '
+                //                << bot_trig->GetTimeLeading_ns() << std::endl;
+                
+                ++n1;
+            }
+            */ //end old
+            // new
+            if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i) && bot_trig_i < trig_map.size() &&
+                trig_map.at(bot_trig_i))
+            {
+                auto top_trig = trig_map.at(top_trig_i);
+                auto bot_trig = trig_map.at(bot_trig_i);
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
                 /*
@@ -290,6 +323,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 */
                 ++n1;
             }
+            //end new
             else
             {
                 if (!s_was_trig_missing)
@@ -370,9 +404,13 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     // offset histo via ToT
                     auto posToT = 0.;
                     if (fTofdY == 0.)
+                    {
+                        LOG(INFO)<<"Will prepare for offset and sync calculation";
                         posToT = TMath::Log(top_tot / bot_tot);
+                    }
                     else
                     {
+                        LOG(INFO)<<"Will prepare for veff and lambda calculation";
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
@@ -392,6 +430,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
                 else
                 {
+                    LOG(INFO)<<"Will prepare for position dependent charge calculation";
                     // get parameter
                     R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
@@ -444,7 +483,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare double exponential fit
                 if (!fTofdSmiley && fTofdQ > 0.1)
                 {
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(INFO) << "Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -464,7 +503,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(INFO) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
