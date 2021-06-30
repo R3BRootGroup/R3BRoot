@@ -277,12 +277,12 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         {
 
             char strName3[255];
-            sprintf(strName3, "tofd_hit_ToT_plane_%d", j + 1);
+            sprintf(strName3, "tofd_hit_Q_plane_%d", j + 1);
             char strName4[255];
-            sprintf(strName4, "Tofd hit ToT plane %d", j + 1);
+            sprintf(strName4, "Tofd hit Charge plane %d", j + 1);
             fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 200, 0., 20.);
             fh_tofd_Tot_hit[j]->GetXaxis()->SetTitle("BarId");
-            fh_tofd_Tot_hit[j]->GetYaxis()->SetTitle("ToT / ns");
+            fh_tofd_Tot_hit[j]->GetYaxis()->SetTitle("Charge");
 
             char strName7[255];
             sprintf(strName7, "tofd_hit_multihit_plane_%d", j + 1);
