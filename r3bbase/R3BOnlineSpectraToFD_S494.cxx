@@ -137,7 +137,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             sprintf(strName3, "tofd_ToT_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "Tofd ToT plane %d", j + 1);
-            fh_tofd_TotPm[j] = new TH2F(strName3, strName4, 90, -45, 45, 3000, 0., 300.);
+            fh_tofd_TotPm[j] = new TH2F(strName3, strName4, 90, -45, 45, 900, 0., 300.);
             fh_tofd_TotPm[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_TotPm[j]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -145,7 +145,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             sprintf(strName5, "tofd_ToT_coinc_plane_%d", j + 1);
             char strName6[255];
             sprintf(strName6, "Tofd ToT coinc plane %d", j + 1);
-            fh_tofd_TotPm_coinc[j] = new TH2F(strName5, strName6, 90, -45, 45, 3000, 0., 300.);
+            fh_tofd_TotPm_coinc[j] = new TH2F(strName5, strName6, 90, -45, 45, 900, 0., 300.);
             fh_tofd_TotPm_coinc[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_TotPm_coinc[j]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -280,7 +280,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
             sprintf(strName3, "tofd_hit_ToT_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "Tofd hit ToT plane %d", j + 1);
-            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 3000, 0., 300.);
+            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 200, 0., 20.);
             fh_tofd_Tot_hit[j]->GetXaxis()->SetTitle("BarId");
             fh_tofd_Tot_hit[j]->GetYaxis()->SetTitle("ToT / ns");
 
