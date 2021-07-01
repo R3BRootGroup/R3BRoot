@@ -169,7 +169,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
 
-        fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 7000, -7000, 7000);
+        fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 6000, -6000, 6000);
         fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tof->GetYaxis()->SetTitle("ToF / ns");
 
@@ -687,9 +687,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             if (IS_NAN(hitTofd->GetTimeRaw()))
                                 continue;
                             Double_t ttt = hitTofd->GetTimeRaw();
-                            auto tof =
-                                fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
-                                c_period / 2;
+                            auto tof = 0. / 0.;
+                            tof = fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
+                                  c_period / 2;
                             if (iDet < 2)
                                 fh_rolu_tof->Fill(iCha + 1, tof);
                             if (iDet > 1)
