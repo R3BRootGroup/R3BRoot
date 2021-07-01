@@ -13,8 +13,8 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BOnlineSpectraBMON_S494                -----
-// -----          Created April 13th 2016 by M.Heil       -----
+// -----                  R3BOnlineSpectraBMON_S494       -----
+// -----          Created May 2021 by A. Kelic-Heil       -----
 // ------------------------------------------------------------
 
 /*
@@ -28,6 +28,10 @@
 #include "R3BRoluMappedData.h"
 
 #include "R3BBeamMonitorMappedData.h"
+
+#include "R3BTofdCalData.h"
+#include "R3BTofdHitData.h"
+#include "R3BTofdMappedData.h"
 
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
@@ -73,7 +77,10 @@ static void init_array(T& array, double init)
 }
 
 using namespace std;
-
+namespace
+{
+    double c_period = 2048 * 5;
+} // namespace
 R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494()
     : R3BOnlineSpectraBMON_S494("OnlineSpectra", 1)
 {
@@ -158,21 +165,29 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     {
         TCanvas* cRolu = new TCanvas("Rolu", "Rolu", 10, 10, 800, 400);
 
-        fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT", 10, 0, 10, 3000, 0, 300);
+        fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT", 10, 0, 10, 600, 0, 300);
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
+
+        fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 7000, -7000, 7000);
+        fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
+        fh_rolu_tof->GetYaxis()->SetTitle("ToF / ns");
 
         fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels", 10, 0, 10);
         fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
         fh_rolu_channels->GetYaxis()->SetTitle("Counts");
 
-        cRolu->Divide(2, 1);
+        cRolu->Divide(3, 1);
         cRolu->cd(1);
         gPad->SetLogy();
         fh_rolu_channels->Draw();
         cRolu->cd(2);
         gPad->SetLogz();
         fh_rolu_tot->Draw("colz");
+        cRolu->cd(3);
+        gPad->SetLogz();
+        if (fHitItems.at(DET_TOFD))
+            fh_rolu_tof->Draw("colz");
         cRolu->cd(0);
         run->AddObject(cRolu);
 
@@ -299,6 +314,8 @@ void R3BOnlineSpectraBMON_S494::Reset_ROLU_Histo()
     fh_rolu_tot->Reset();
     fhTrigger->Reset();
     fhTpat->Reset();
+    if (fHitItems.at(DET_TOFD))
+        fh_rolu_tof->Reset();
 }
 
 void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
@@ -557,7 +574,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_SEE_spill_raw->Reset("ICESM");
                     time_mem = time;
                     time_clear = -1.;
-		    time_start = -1;
+                    time_start = -1;
                     iclear_count = iclear_count + 1;
                     spectra_clear = false;
                     see_start = SEETRAM;
@@ -655,6 +672,31 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
                 if (iDet > 1)
                     fh_rolu_tot->Fill(iCha + 5, totRolu[iPart][iDet - 1][iCha]);
+
+                if (fHitItems.at(DET_TOFD))
+                {
+                    auto detTofd = fHitItems.at(DET_TOFD);
+                    Int_t nHits = detTofd->GetEntriesFast();
+
+                    if (nHits > 0)
+                    {
+                        for (Int_t ihit = 0; ihit < nHits; ihit++)
+                        {
+                            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+
+                            if (IS_NAN(hitTofd->GetTimeRaw()))
+                                continue;
+                            Double_t ttt = hitTofd->GetTimeRaw();
+                            auto tof =
+                                fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
+                                c_period / 2;
+                            if (iDet < 2)
+                                fh_rolu_tof->Fill(iCha + 1, tof);
+                            if (iDet > 1)
+                                fh_rolu_tof->Fill(iCha + 5, tof);
+                        }
+                    }
+                } // end if fHitItems(TOFD)
             }
 
             if (!calData)
@@ -663,7 +705,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 continue; // can this happen?
             }
         }
-    }
+    } // end if fCalItems(ROLU)
 }
 
 void R3BOnlineSpectraBMON_S494::FinishEvent()
@@ -693,6 +735,8 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     {
         fh_rolu_channels->Write();
         fh_rolu_tot->Write();
+        if (fHitItems.at(DET_TOFD))
+            fh_rolu_tof->Write();
     }
 
     if (fMappedItems.at(DET_BMON))

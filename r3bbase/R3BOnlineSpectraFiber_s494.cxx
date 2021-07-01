@@ -396,11 +396,13 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             if (fCalItems.at(DET_FI_FIRST + ifibcount))
             {
                 FibCanvas[ifibcount]->cd(1);
+                gPad->SetLogy();
                 fh_channels_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(2);
                 gPad->SetLogz();
                 fh_multihit_m_Fib[ifibcount]->Draw("colz");
                 FibCanvas[ifibcount]->cd(3);
+                gPad->SetLogy();
                 fh_channels_single_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(4);
                 gPad->SetLogz();
@@ -430,6 +432,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 // gPad->SetLogz();
                 // fh_ToTup_vs_ToTdown[ifibcount]->Draw("colz");
                 FibCanvas[ifibcount]->cd(9);
+                gPad->SetLogy();
                 fh_fibers_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(10);
                 gPad->SetLogy();
@@ -559,38 +562,32 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
         //  cout<<"DETECTOR: "<<fDetectorNames[DET_FI_FIRST + ifibcount]<<endl;
 
-        /*
-                if(detMap && detMap->GetEntriesFast() > 0)
+        if (detMap && detMap->GetEntriesFast() > 0)
+        {
+            auto nMapp = detMap->GetEntries();
+            for (Int_t i = 0; i < nMapp; i++)
+            {
+
+                auto map_lead = (R3BFiberMAPMTMappedData const*)detMap->At(i);
+
+                if (map_lead->IsLeading())
                 {
-                    auto nMapp = detMap->GetEntries();
-                    for(Int_t i=0; i<nMapp;i++)
+                    auto side_i = map_lead->GetSide();
+                    auto ch_i = map_lead->GetChannel() - 1;
+
+                    if (side_i == 1)
                     {
+                        fh_channels_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
+                    }
 
-                        auto map_lead = (R3BFiberMAPMTMappedData const*)detMap->At(i);
-
-                        if (map_lead->IsLeading())
-                        {
-                            auto side_i = map_lead->GetSide();
-                            auto ch_i = map_lead->GetChannel() - 1;
-
-                            if (side_i == 1)
-                            {
-                                fh_channels_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
-
-                            }
-
-                            if (side_i == 0)
-                            {
-                                fh_channels_single_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
-
-                            }
-
-
-                        }
-
+                    if (side_i == 0)
+                    {
+                        fh_channels_single_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
                     }
                 }
-        */
+            }
+        }
+
         if (detCal && detCal->GetEntriesFast() > 0)
         {
             Int_t fc = n_fiber[ifibcount];
@@ -642,14 +639,14 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
                     if (side_i == 1)
                     {
-                        fh_channels_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
-                        vmultihits_top[ch_i] += 1;              // multihit of a given up killom channel
+                        //   fh_channels_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
+                        vmultihits_top[ch_i] += 1; // multihit of a given up killom channel
                     }
 
                     if (side_i == 0)
                     {
-                        fh_channels_single_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
-                        vmultihits_bot[ch_i] += 1;                     // multihit of a given down killom channel
+                        //  fh_channels_single_Fib[ifibcount]->Fill(ch_i); // Fill which channel has events
+                        vmultihits_bot[ch_i] += 1; // multihit of a given down killom channel
                     }
 
                     auto time_trig = trig_time[fTriggerMap[side_i][ch_i]];

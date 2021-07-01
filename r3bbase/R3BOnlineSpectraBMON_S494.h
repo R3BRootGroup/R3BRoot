@@ -112,10 +112,11 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     {
         DET_BMON,
         DET_ROLU,
+        DET_TOFD,
         DET_MAX
     };
 
-    const char* fDetectorNames[DET_MAX + 1] = { "BeamMonitor", "Rolu",  NULL };
+    const char* fDetectorNames[DET_MAX + 1] = { "BeamMonitor", "Rolu", "Tofd", NULL };
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -173,6 +174,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fh_SEE_TOFDOR;
 
     TH2F* fh_rolu_tot;
+    TH2F* fh_rolu_tof;
     TH1F* fh_rolu_channels;
 
 

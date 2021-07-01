@@ -283,6 +283,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     Double_t randx;
     std::vector<std::vector<std::vector<Double_t>>> q;
     std::vector<std::vector<std::vector<Double_t>>> thit;
+    std::vector<std::vector<std::vector<Double_t>>> thit_raw;
     std::vector<std::vector<std::vector<Double_t>>> x;
     std::vector<std::vector<std::vector<Double_t>>> y;
     std::vector<std::vector<std::vector<Double_t>>> yToT;
@@ -291,6 +292,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     {
         q.push_back(std::vector<std::vector<Double_t>>());
         thit.push_back(std::vector<std::vector<Double_t>>());
+        thit_raw.push_back(std::vector<std::vector<Double_t>>());
         x.push_back(std::vector<std::vector<Double_t>>());
         y.push_back(std::vector<std::vector<Double_t>>());
         yToT.push_back(std::vector<std::vector<Double_t>>());
@@ -299,6 +301,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             vmultihits[i][j] = 0;
             q[i].push_back(std::vector<Double_t>());
             thit[i].push_back(std::vector<Double_t>());
+            thit_raw[i].push_back(std::vector<Double_t>());
             x[i].push_back(std::vector<Double_t>());
             y[i].push_back(std::vector<Double_t>());
             yToT[i].push_back(std::vector<Double_t>());
@@ -336,13 +339,15 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     }
 
     // Build trigger map.
-    std::vector<R3BTofdCalData const *> trig_map;
-    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
-	    auto trig = (R3BTofdCalData const *)fCalTriggerItems->At(i);
-      if (trig_map.size() < trig->GetBarId()) {
-        trig_map.resize(trig->GetBarId());
-      }
-      trig_map.at(trig->GetBarId() - 1) = trig;
+    std::vector<R3BTofdCalData const*> trig_map;
+    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
+    {
+        auto trig = (R3BTofdCalData const*)fCalTriggerItems->At(i);
+        if (trig_map.size() < trig->GetBarId())
+        {
+            trig_map.resize(trig->GetBarId());
+        }
+        trig_map.at(trig->GetBarId() - 1) = trig;
     }
 
     bool s_was_trig_missing = false;
@@ -370,9 +375,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
-            if (top_trig_i < trig_map.size() &&
-                trig_map.at(top_trig_i) &&
-                bot_trig_i < trig_map.size() &&
+            if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i) && bot_trig_i < trig_map.size() &&
                 trig_map.at(bot_trig_i))
             {
                 auto top_trig = trig_map.at(top_trig_i);
@@ -406,6 +409,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             auto bot_ns =
                 fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+
             /*
                         if(top_ns>2000 || bot_ns>2000){
                             std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
@@ -447,6 +451,8 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
 
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+
+                auto THit_raw = (bot->GetTimeLeading_ns() + top->GetTimeLeading_ns()) / 2.; // needed for TOF for ROLUs
 
                 // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
 
@@ -490,6 +496,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                     timeP0 = THit;
 
                 thit[iPlane][iBar].push_back(THit);
+                thit_raw[iPlane][iBar].push_back(THit_raw);
 
                 // calculate y-position
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
@@ -640,6 +647,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     // init arrays to store hits
     Double_t tArrQ[nHitsEvent + 1];
     Double_t tArrT[nHitsEvent + 1];
+    Double_t tArrTraw[nHitsEvent + 1];
     Double_t tArrX[nHitsEvent + 1];
     Double_t tArrY[nHitsEvent + 1];
     Double_t tArrYT[nHitsEvent + 1];
@@ -650,6 +658,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     {
         tArrQ[i] = -1.;
         tArrT[i] = -1.;
+        tArrTraw[i] = -1.;
         tArrX[i] = -1.;
         tArrY[i] = -1.;
         tArrYT[i] = -1.;
@@ -690,6 +699,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                         tArrYT[0] = yToT[i][j].at(m);
                         tArrP[0] = i;
                         tArrB[0] = j;
+                        tArrTraw[0] = thit_raw[i][j].at(m);
                     }
                     else
                     {
@@ -698,6 +708,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                             LOG(DEBUG) << "Insert new first " << i << "/" << j;
                             insertX(nHitsEvent, tArrQ, q[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrT, thit[i][j].at(m), 1);
+                            insertX(nHitsEvent, tArrTraw, thit_raw[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrX, x[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrY, y[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), 1);
@@ -719,6 +730,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                                 LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrTraw, thit_raw[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
@@ -733,6 +745,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                                 LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrTraw, thit_raw[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
@@ -811,13 +824,27 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             singlehit++;
             if (fTofdTotPos)
             {
-                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(
-                    tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(tArrT[hit],
+                                                                  tArrX[hit],
+                                                                  tArrYT[hit],
+                                                                  tArrQ[hit],
+                                                                  -1.,
+                                                                  tArrQ[hit],
+                                                                  tArrP[hit],
+                                                                  tArrB[hit],
+                                                                  tArrTraw[hit]);
             }
             else
             {
-                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(
-                    tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(tArrT[hit],
+                                                                  tArrX[hit],
+                                                                  tArrY[hit],
+                                                                  tArrQ[hit],
+                                                                  -1.,
+                                                                  tArrQ[hit],
+                                                                  tArrP[hit],
+                                                                  tArrB[hit],
+                                                                  tArrTraw[hit]);
             }
         }
     }
