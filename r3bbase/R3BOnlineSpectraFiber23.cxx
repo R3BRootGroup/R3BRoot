@@ -50,7 +50,7 @@ using namespace std;
 namespace
 {
     double c_period = 4096 * 1000. / 150;
-    double c_fiber_coincidence_ns = 20; // nanoseconds.
+    double c_fiber_coincidence_ns = 200000; // nanoseconds.
 } // namespace
 R3BOnlineSpectraFiber23::R3BOnlineSpectraFiber23()
     : FairTask("OnlineSpectraFiber23", 1)
