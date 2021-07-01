@@ -296,10 +296,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[0]->Draw();
     cFib->cd(8);
     gPad->SetLogz();
-    fh_ToT_Fib[0]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[0]->Draw("colz");
+    else
+        fh_ToT_Fib[0]->Draw("colz");
     cFib->cd(15);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[0]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd_ac[0]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[0]->Draw("colz");
     cFib->cd(22);
     fh_counter_fi23a->Draw("colz");
 
@@ -308,10 +314,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[1]->Draw();
     cFib->cd(9);
     gPad->SetLogz();
-    fh_ToT_Fib[1]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[1]->Draw("colz");
+    else
+        fh_ToT_Fib[1]->Draw("colz");
     cFib->cd(16);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[1]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd_ac[1]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[1]->Draw("colz");
     cFib->cd(23);
     fh_counter_fi23b->Draw("colz");
 
@@ -320,10 +332,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[2]->Draw();
     cFib->cd(10);
     gPad->SetLogz();
-    fh_ToT_Fib[2]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[2]->Draw("colz");
+    else
+        fh_ToT_Fib[2]->Draw("colz");
     cFib->cd(17);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[2]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd_ac[2]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[2]->Draw("colz");
     cFib->cd(24);
     fh_counter_fi30->Draw("colz");
 
@@ -332,10 +350,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[3]->Draw();
     cFib->cd(11);
     gPad->SetLogz();
-    fh_ToT_Fib[3]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[3]->Draw("colz");
+    else
+        fh_ToT_Fib[3]->Draw("colz");
     cFib->cd(18);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[3]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd[3]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[3]->Draw("colz");
     cFib->cd(25);
     fh_counter_fi31->Draw("colz");
 
@@ -344,10 +368,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[4]->Draw();
     cFib->cd(12);
     gPad->SetLogz();
-    fh_ToT_Fib[4]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[4]->Draw("colz");
+    else
+        fh_ToT_Fib[4]->Draw("colz");
     cFib->cd(19);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[4]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd_ac[4]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[4]->Draw("colz");
     cFib->cd(26);
     fh_counter_fi32->Draw("colz");
 
@@ -356,10 +386,16 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fh_Fib_ToF[5]->Draw();
     cFib->cd(13);
     gPad->SetLogz();
-    fh_ToT_Fib[5]->Draw("colz");
+    if (fCuts)
+        fh_ToT_Fib_ac[5]->Draw("colz");
+    else
+        fh_ToT_Fib[5]->Draw("colz");
     cFib->cd(20);
     gPad->SetLogz();
-    fh_Fibs_vs_Tofd[5]->Draw("colz");
+    if (fCuts)
+        fh_Fibs_vs_Tofd_ac[5]->Draw("colz");
+    else
+        fh_Fibs_vs_Tofd[5]->Draw("colz");
     cFib->cd(27);
     fh_counter_fi33->Draw("colz");
 
@@ -691,13 +727,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
                     // Cuts on Tofi
 
-                    if (fCuts && x1[det] * 100. < -10000)
-                        continue;
-                    if (fCuts && q1[det] < cutQ)
-                        continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue;
-                    if (fCuts && (tof < -100000 || tof > 10000))
+                    /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                           continue;
+                       if (fCuts && q1[det] < cutQ)
+                           continue;
+                       if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                           continue; */
+                    if (fCuts && (tof < ftofmin || tof > ftofmax))
                         continue;
 
                     // Fill histograms after cuts
@@ -730,19 +766,19 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_xy_Fib[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib[det]->Fill(qqq, q1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+
                 hits33bc++;
 
                 // Cuts on Fi33
 
-                if (fCuts && x1[det] * 100. < -10000)
-                    continue;
-                if (fCuts && q1[det] < cutQ)
-                    continue;
-                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 hits33++;
@@ -783,13 +819,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
                 // Cuts on Fi31
 
-                if (fCuts && x1[det] < -10000)
-                    continue;
-                if (fCuts && q1[det] < cutQ)
-                    continue;
-                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 hits31++;
@@ -830,13 +866,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 hits30bc++;
 
                 // Cuts on Fi30
-                if (fCuts && q1[det] < cutQ)
-                    continue;
-                if (fCuts && x1[det] < -10000)
-                    continue;
-                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 hits30++;
@@ -877,13 +913,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 hits32bc++;
 
                 // Cuts on Fi32
-                if (q1[det] < cutQ)
-                    continue;
-                if (fCuts && x1[det] < -10000)
-                    continue;
-                if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 hits32++;
@@ -920,11 +956,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-                if (fCuts && q1[det] < cutQ)
-                    continue;
-                if (fCuts && (x1[det] < -10000 || x1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 // Fill histograms
@@ -961,11 +999,13 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
                 // Cuts on Fi23b
-                if (fCuts && q1[det] < cutQ)
-                    continue;
-                if (fCuts && (x1[det] < -10000 || x1[det] > 10000))
-                    continue;
-                if (fCuts && (tof < -10000 || tof > 10000))
+                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                        continue;
+                    if (fCuts && q1[det] < cutQ)
+                        continue;
+                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                        continue; */
+                if (fCuts && (tof < ftofmin || tof > ftofmax))
                     continue;
 
                 // Fill histograms
@@ -1322,47 +1362,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
         } // end ToFD loop
 
-        /*
-                    if(fNEvents_local == 1)  // reset everything at the beginning of the spill
-                    {
-                        windowToFD.clear();
-                        windowToFDl.clear();
-                        windowToFDr.clear();
-                        windowFi30.clear();
-                        windowFi31.clear();
-                        windowFi32.clear();
-                        windowFi33.clear();
-                        windowFi23a.clear();
-                        windowFi23b.clear();
-                        fiberFi30.clear();
-                        fiberFi31.clear();
-                        fiberFi32.clear();
-                        fiberFi33.clear();
-                        fiberFi23a.clear();
-                        fiberFi23b.clear();
-                        totalToFD = 0;
-                        totalToFDl = 0;
-                        totalToFDr = 0;
-                        totalFi30 = 0;
-                        totalFi31 = 0;
-                        totalFi32 = 0;
-                        totalFi33 = 0;
-                        totalFi23a = 0;
-                        totalFi23b = 0;
-                        totalfibFi30 = 0;
-                        totalfibFi31 = 0;
-                        totalfibFi32 = 0;
-                        totalfibFi33 = 0;
-                        totalfibFi23a = 0;
-                        totalfibFi23b = 0;
-                        NfibFi30 = 0;
-                        NfibFi31 = 0;
-                        NfibFi32 = 0;
-                        NfibFi33 = 0;
-                        NfibFi23a = 0;
-                        NfibFi23b = 0;
-                    }
-        */
         while (windowToFD.size() < fwindow_mv)
         {
             windowToFD.push_back(summ_tofd);

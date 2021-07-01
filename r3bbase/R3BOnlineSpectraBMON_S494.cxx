@@ -690,10 +690,13 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             auto tof = 0. / 0.;
                             tof = fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
                                   c_period / 2;
-                            if (iDet < 2)
-                                fh_rolu_tof->Fill(iCha + 1, tof);
-                            if (iDet > 1)
-                                fh_rolu_tof->Fill(iCha + 5, tof);
+                            if (hitTofd->GetDetId() > 0)
+                            {
+                                if (iDet < 2)
+                                    fh_rolu_tof->Fill(iCha + 1, tof);
+                                if (iDet > 1)
+                                    fh_rolu_tof->Fill(iCha + 5, tof);
+                            }
                         }
                     }
                 } // end if fHitItems(TOFD)
