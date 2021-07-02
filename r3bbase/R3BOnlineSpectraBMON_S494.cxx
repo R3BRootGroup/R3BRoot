@@ -380,27 +380,27 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     fhTrigger->Fill(header->GetTrigger());
 
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
+
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit = fTpat - 1;
+    Int_t itpat = 0;
+    Int_t tpatvalue = 0;
+    if (fTpat_bit >= 0)
+    {
+        itpat = header->GetTpat();
+        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+        if ((tpatvalue != 0))
+            return;
+    }
+
     Int_t tpatbin;
     for (int i = 0; i < 16; i++)
     {
         tpatbin = (header->GetTpat() & (1 << i));
         if (tpatbin != 0)
             fhTpat->Fill(i + 1);
-    }
-
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
-
-    // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat;
-    Int_t tpatvalue;
-    if (fTpat_bit >= 0)
-    {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue == 0))
-            return;
     }
 
     if (fMappedItems.at(DET_BMON) && fMappedItems.at(DET_BMON)->GetEntriesFast() > 0)
@@ -617,6 +617,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
         auto det = fCalItems.at(DET_ROLU);
         nParts = det->GetEntriesFast();
+        if (nParts > 0)
+            fNEventsRolu += 1;
 
         if (nParts < 1)
             return;
@@ -690,7 +692,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             auto tof = 0. / 0.;
                             tof = fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
                                   c_period / 2;
-                            if (hitTofd->GetDetId() > 0)
+                            if (hitTofd->GetTime() > 210 && hitTofd->GetTime() < 281)
                             {
                                 if (iDet < 2)
                                     fh_rolu_tof->Fill(iCha + 1, tof);
@@ -733,6 +735,10 @@ void R3BOnlineSpectraBMON_S494::FinishEvent()
 
 void R3BOnlineSpectraBMON_S494::FinishTask()
 {
+
+    cout << " " << endl;
+    cout << "nEvents total " << fNEvents << endl;
+    cout << "nEvents Rolu " << fNEventsRolu << endl;
 
     if (fMappedItems.at(DET_ROLU))
     {

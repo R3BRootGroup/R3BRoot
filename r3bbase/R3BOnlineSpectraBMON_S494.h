@@ -152,7 +152,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     Double_t ic_offset = 0; // SEETRAM offset in kHz
     Int_t in_spill_off = 0;
 
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0; /**< Event counter. */
 
     TH1F* fhTpat;
     TH1F* fh_spill_length;

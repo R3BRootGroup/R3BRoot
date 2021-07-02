@@ -194,7 +194,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
         // xy:
         fh_xy_Fib[ifibcount] = new TH2F(
-            Form("%s_xToFDtotFib", detName), Form("%s ToTFib vs xToFD", detName), 1200, -60., 60., 400, 0., 100.);
+            Form("%s_xToFDtotFib", detName), Form("%s ToTFib vs xToFD", detName), 1200, -60., 60., 200, 0., 50.);
         fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("xToFD / cm ");
         fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("ToT Fib / ns");
 
@@ -211,7 +211,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
         // ToT vs xToFD:
         fh_ToT_Fib[ifibcount] = new TH2F(
-            Form("%s_totFib_vs_totToFD", detName), Form("%s ToTFib vs totToFD", detName), 800, 0., 200., 400, 0., 100.);
+            Form("%s_totFib_vs_totToFD", detName), Form("%s ToTFib vs totToFD", detName), 800, 0., 200., 200, 0., 50.);
         fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("ToFD ToT / ns");
         fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("Fib ToT / ns");
 
@@ -220,9 +220,9 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
                                             800,
                                             0.,
                                             200,
-                                            400,
+                                            200,
                                             0.,
-                                            100.);
+                                            50.);
         fh_ToT_Fib_ac[ifibcount]->GetXaxis()->SetTitle("ToFD ToT / ns");
         fh_ToT_Fib_ac[ifibcount]->GetYaxis()->SetTitle("Fib ToT / ns");
 
