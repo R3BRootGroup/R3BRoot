@@ -253,14 +253,14 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             // Cal level
             // Channels:
             fh_channels_Fib[ifibcount] =
-                new TH1F(Form("%sCal_channels_up", detName), Form("%sCal channels up", detName), 520, 0., 520.);
-            fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
+                new TH1F(Form("%sMapped_channels_up", detName), Form("%sMapped channels up", detName), 520, 0., 520.);
+            fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("PMT channel number");
             fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Channels:
-            fh_channels_single_Fib[ifibcount] =
-                new TH1F(Form("%sCal_channels_down", detName), Form("%sCal channels down", detName), 520, 0., 520.);
-            fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
+            fh_channels_single_Fib[ifibcount] = new TH1F(
+                Form("%sMapped_channels_down", detName), Form("%sMapped channels down", detName), 520, 0., 520.);
+            fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("PMT channel number");
             fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Multihit MAPMT:
@@ -393,17 +393,20 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             fh_ToTup_vs_ToTdown[ifibcount]->GetYaxis()->SetTitle("Time  / ns");
 
             FibCanvas[ifibcount]->Divide(4, 3);
+
+            FibCanvas[ifibcount]->cd(1);
+            gPad->SetLogy();
+            fh_channels_Fib[ifibcount]->Draw();
+            FibCanvas[ifibcount]->cd(2);
+            gPad->SetLogy();
+            fh_channels_single_Fib[ifibcount]->Draw();
+
             if (fCalItems.at(DET_FI_FIRST + ifibcount))
             {
-                FibCanvas[ifibcount]->cd(1);
-                gPad->SetLogy();
-                fh_channels_Fib[ifibcount]->Draw();
-                FibCanvas[ifibcount]->cd(2);
+
+                FibCanvas[ifibcount]->cd(3);
                 gPad->SetLogz();
                 fh_multihit_m_Fib[ifibcount]->Draw("colz");
-                FibCanvas[ifibcount]->cd(3);
-                gPad->SetLogy();
-                fh_channels_single_Fib[ifibcount]->Draw();
                 FibCanvas[ifibcount]->cd(4);
                 gPad->SetLogz();
                 fh_multihit_s_Fib[ifibcount]->Draw("colz");
