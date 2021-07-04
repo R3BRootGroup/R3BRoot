@@ -594,7 +594,7 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
 void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 {
 
-    Bool_t debug2 = false;
+    Bool_t debug2 = true;
     Bool_t counter_reset = false;
 
     FairRootManager* mgr = FairRootManager::Instance();
