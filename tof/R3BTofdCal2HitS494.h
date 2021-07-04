@@ -140,7 +140,7 @@ class R3BTofdCal2HitS494 : public FairTask
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
     /**
      * Methods for setting number of planes and paddles
      */
@@ -160,7 +160,8 @@ class R3BTofdCal2HitS494 : public FairTask
     R3BEventHeader* header;         /**< Event header - input data. */
     Double_t fClockFreq;            /**< Clock cycle in [ns]. */
     Int_t fTrigger;                 /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1;
+    Int_t fTpat2;
     Double_t fTofdQ;
     Bool_t fTofdHisto;
     Bool_t fTofdTotPos;
@@ -180,6 +181,7 @@ class R3BTofdCal2HitS494 : public FairTask
     UInt_t events_wo_tofd_hits;
 
     // arrays of control histograms
+    TH1F* fhTpat;
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     // TH2F* fhQvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     // TH2F* fhTvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
@@ -188,6 +190,7 @@ class R3BTofdCal2HitS494 : public FairTask
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhQ0Qt[N_TOFD_HIT_PLANE_MAX];
 
   public:
     ClassDef(R3BTofdCal2HitS494, 1)

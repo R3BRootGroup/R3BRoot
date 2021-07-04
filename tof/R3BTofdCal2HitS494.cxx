@@ -67,7 +67,8 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494()
     , fNofHitPars(0)
     , fHitPar(NULL)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
@@ -89,6 +90,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494()
 {
     if (fTofdHisto)
     {
+        fhTpat = NULL;
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
@@ -96,6 +98,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494()
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
             fhTsync[i] = NULL;
+            fhQ0Qt[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
@@ -115,7 +118,8 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
     , fNofHitPars(0)
     , fHitPar(NULL)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
@@ -137,6 +141,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
 {
     if (fTofdHisto)
     {
+        fhTpat = NULL;
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
@@ -144,6 +149,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
             fhTsync[i] = NULL;
+            fhQ0Qt[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
@@ -158,6 +164,8 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
 {
     if (fTofdHisto)
     {
+        if (fhTpat)
+            delete fhTpat;
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             if (fhQ[i])
@@ -170,6 +178,8 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
                 delete fhTdiff[i];
             if (fhTsync[i])
                 delete fhTsync[i];
+            if (fhQ0Qt[i])
+                delete fhQ0Qt[i];
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
@@ -267,17 +277,41 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
         return;
     }
     // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    for (int i = 0; i < 16; i++)
+    {
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
+            wrongtpat++;
+            return;
+        }
+        if (tpatbin != 0)
+        {
+            fhTpat->Fill(i+1);
+            //std::cout<<"Accepted Tpat: "<<i+1<<"\n";
+        }
+    }
+    /*
     Int_t fTpat_bit = fTpat - 1;
     if (fTpat_bit >= 0)
     {
         Int_t itpat = header->GetTpat();
+        
         Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+        Int_t t1 = 1 << fTpat_bit;
+        Int_t t2 = itpat & (1 << fTpat_bit);
+        Int_t t3 = tpatvalue;
+        std::cout<<itpat<<" "<<t1<<" "<<t2<<" "<<t3<<"\n";
         if ((header) && (tpatvalue == 0))
         {
             wrongtpat++;
             return;
         }
     }
+    */
     headertpat++;
     Double_t timeP0 = 0.;
     Double_t randx;
@@ -793,6 +827,49 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
 
     // Now we can analyze the hits in this event
 
+    // select events with feasible times
+    Double_t hit_coinc = 20.; // coincidence window for hits in one event in ns. physics says max 250 ps
+    Double_t time0;
+    for (Int_t ihit = 0; ihit < nHitsEvent;)
+    { // loop over all hits in this event
+        LOG(WARNING) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
+                     << " " << tArrQ[ihit];
+        time0 = tArrT[ihit];            // time of first hit in coincidence window
+        Double_t charge0 = tArrQ[ihit]; // charge of first hit in coincidence window
+        Double_t plane0 = tArrP[ihit];  // plane of first hit in coincidence window
+
+        while (tArrT[ihit] < time0 + hit_coinc)
+        { // check if in coincidence window
+            /*
+            std::cout<<"Hits in this coincidence window:\n";
+            for(Int_t a=0; a<nHitsEvent; a++)
+                std::cout << tArrP[a] << " ";
+            std::cout << "\n";
+            for(Int_t a=0; a<nHitsEvent; a++)
+                std::cout << tArrB[a] << " ";
+            std::cout << "\n";
+            for(Int_t a=0; a<nHitsEvent; a++)
+                std::cout << tArrQ[a] << " ";
+            std::cout << "\n";
+            */
+
+            if (fTofdHisto)
+            {
+                if (tArrP[ihit] == plane0 && charge0 != tArrQ[ihit])
+                {
+                    fhQ0Qt[(Int_t)tArrP[ihit] - 1]->Fill(charge0, tArrQ[ihit]);
+                }
+            }
+
+            LOG(DEBUG) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
+                       << " " << tArrQ[ihit];
+
+            ihit++;
+            if (ihit >= nHitsEvent)
+                break;
+        }
+        
+    }
     if (fTofdHisto)
     {
         for (Int_t a = 0; a < nHitsEvent; a++)
@@ -866,6 +943,12 @@ void R3BTofdCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     Double_t max_charge = 80.;
     // create histograms if not already existing
 
+    if (NULL == fhTpat)
+    {
+        fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+        fhTpat->GetXaxis()->SetTitle("Tpat value");
+    }
+    
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
@@ -957,6 +1040,17 @@ void R3BTofdCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
     }
+    if (NULL == fhQ0Qt[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "QvsQt0_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Q vs Q_time0 Plane %d ", iPlane);
+        fhQ0Qt[iPlane - 1] =
+            new TH2F(strName1, strName2, max_charge * 10, 0., max_charge, max_charge * 10, 0., max_charge);
+        fhQ0Qt[iPlane - 1]->GetYaxis()->SetTitle("Charge particle i");
+        fhQ0Qt[iPlane - 1]->GetXaxis()->SetTitle("Charge first particle");
+    }
 }
 void R3BTofdCal2HitS494::FinishEvent()
 {
@@ -971,6 +1065,8 @@ void R3BTofdCal2HitS494::FinishTask()
 {
     if (fTofdHisto)
     {
+        if (fhTpat)
+            fhTpat->Write();
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             if (fhQ[i])
@@ -983,6 +1079,8 @@ void R3BTofdCal2HitS494::FinishTask()
                 fhTdiff[i]->Write();
             if (fhTsync[i])
                 fhTsync[i]->Write();
+            if (fhQ0Qt[i])
+                fhQ0Qt[i]->Write();
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
 

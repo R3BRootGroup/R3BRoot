@@ -1229,7 +1229,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             { // loop over hits in coincidence
 
                 Int_t bar = tArrB[ihit];
-                if (bar > 27 && bar < 41)
+                if (bar > 0 && bar < 89)
                 {
                     // cout << "ihit: " << ihit << " plane: " << tArrP[ihit] << " bar: " << tArrB[ihit]
                     //	<< "  Q: " << tArrQ[ihit] << endl;
@@ -1312,7 +1312,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     {
         // std::cout << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL);
+            LOG(FATAL)<<"Not all hits were analyzed!";
     }
     // std::cout << "\n";
 
