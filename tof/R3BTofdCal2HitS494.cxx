@@ -828,7 +828,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     // Now we can analyze the hits in this event
 
     // select events with feasible times
-    Double_t hit_coinc = 20.; // coincidence window for hits in one event in ns. physics says max 250 ps
+    Double_t hit_coinc = 5.; // coincidence window for hits in one event in ns. physics says max 250 ps
     Double_t time0;
     for (Int_t ihit = 0; ihit < nHitsEvent;)
     { // loop over all hits in this event

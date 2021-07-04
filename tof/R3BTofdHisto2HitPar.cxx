@@ -279,7 +279,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         LOG(WARNING) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
-        Int_t min = 10, max = 60; // select range for peak search
+        Int_t min = 0, max = 10; // select range for peak search
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
