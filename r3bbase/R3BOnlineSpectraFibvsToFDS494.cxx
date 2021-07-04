@@ -357,7 +357,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     cFib->cd(18);
     gPad->SetLogz();
     if (fCuts)
-        fh_Fibs_vs_Tofd[3]->Draw("colz");
+        fh_Fibs_vs_Tofd_ac[3]->Draw("colz");
     else
         fh_Fibs_vs_Tofd[3]->Draw("colz");
     cFib->cd(25);
@@ -419,15 +419,21 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
 {
     for (Int_t i_FIB_DET = 0; i_FIB_DET < NOF_FIB_DET; i_FIB_DET++)
     {
-        fh_xy_Fib[i_FIB_DET]->Reset();
-        fh_xy_Fib_ac[i_FIB_DET]->Reset();
-        fh_Fib_ToF[i_FIB_DET]->Reset();
-        fh_Fib_ToF_ac[i_FIB_DET]->Reset();
-        fh_ToT_Fib[i_FIB_DET]->Reset();
-        fh_ToT_Fib_ac[i_FIB_DET]->Reset();
-        fh_Fibs_vs_Tofd[i_FIB_DET]->Reset();
-        fh_Fibs_vs_Tofd_ac[i_FIB_DET]->Reset();
-        fh_ToF_vs_Events[i_FIB_DET]->Reset();
+        if (fCuts)
+        {
+            fh_Fibs_vs_Tofd_ac[i_FIB_DET]->Reset();
+            fh_xy_Fib_ac[i_FIB_DET]->Reset();
+            fh_Fib_ToF_ac[i_FIB_DET]->Reset();
+            fh_ToT_Fib_ac[i_FIB_DET]->Reset();
+        }
+        else
+        {
+            fh_xy_Fib[i_FIB_DET]->Reset();
+            fh_Fib_ToF[i_FIB_DET]->Reset();
+            fh_ToT_Fib[i_FIB_DET]->Reset();
+            fh_Fibs_vs_Tofd[i_FIB_DET]->Reset();
+            fh_ToF_vs_Events[i_FIB_DET]->Reset();
+        }
     }
 
     fh_counter_fi30->Reset();
@@ -1634,15 +1640,21 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     {
         if (fHitItems.at(DET_FI_FIRST + ifibcount))
         {
-            fh_xy_Fib[ifibcount]->Write();
-            fh_xy_Fib_ac[ifibcount]->Write();
-            fh_ToT_Fib[ifibcount]->Write();
-            fh_ToT_Fib_ac[ifibcount]->Write();
-            fh_Fibs_vs_Tofd[ifibcount]->Write();
-            fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
-            fh_Fib_ToF[ifibcount]->Write();
-            fh_Fib_ToF_ac[ifibcount]->Write();
-            fh_ToF_vs_Events[ifibcount]->Write();
+            if (fCuts)
+            {
+                fh_xy_Fib_ac[ifibcount]->Write();
+                fh_ToT_Fib_ac[ifibcount]->Write();
+                fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
+                fh_Fib_ToF_ac[ifibcount]->Write();
+            }
+            else
+            {
+                fh_xy_Fib[ifibcount]->Write();
+                fh_ToT_Fib[ifibcount]->Write();
+                fh_Fibs_vs_Tofd[ifibcount]->Write();
+                fh_Fib_ToF[ifibcount]->Write();
+                fh_ToF_vs_Events[ifibcount]->Write();
+            }
         }
     }
 
