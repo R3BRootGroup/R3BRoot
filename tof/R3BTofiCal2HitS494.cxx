@@ -67,7 +67,8 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494()
     , fNofHitPars(0)
     , fHitPar(NULL)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(2)
     , fPaddlesPerPlane(6)
     , fTofiQ(1)
@@ -118,7 +119,8 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     , fNofHitPars(0)
     , fHitPar(NULL)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(2)
     , fPaddlesPerPlane(6)
     , fTofiQ(1)
@@ -144,7 +146,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     {
         for (Int_t i = 0; i < N_TOFI_HIT_PLANE_MAX; i++)
         {
-	    fh_Tofi_TotPm[i] = NULL;
+            fh_Tofi_TotPm[i] = NULL;
             fhQ[i] = NULL;
             fhxy[i] = NULL;
             fhQvsEvent[i] = NULL;
@@ -177,7 +179,7 @@ R3BTofiCal2HitS494::~R3BTofiCal2HitS494()
             if (fhTsync[i])
                 delete fhTsync[i];
             if (fh_Tofi_TotPm[i])
-		delete fh_Tofi_TotPm[i];
+                delete fh_Tofi_TotPm[i];
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
@@ -278,17 +280,31 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         return;
     }
     // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    if (fTpat_bit >= 0)
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    for (int i = 0; i < 16; i++)
     {
-        Int_t itpat = header->GetTpat();
-        Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
-        if ((header) && (tpatvalue == 0))
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
         {
-            wrongtpat++;
             return;
         }
     }
+    /*
+        // fTpat = 1-16; fTpat_bit = 0-15
+        Int_t fTpat_bit = fTpat - 1;
+        if (fTpat_bit >= 0)
+        {
+            Int_t itpat = header->GetTpat();
+            Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+            if ((header) && (tpatvalue == 0))
+            {
+                wrongtpat++;
+                return;
+            }
+        }
+    */
     headertpat++;
     Double_t timeP0 = 0.;
     Double_t randx;
@@ -345,13 +361,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     }
 
     // Build trigger map.
-    std::vector<R3BTofiCalData const *> trig_map;
-    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i) {
-	    auto trig = (R3BTofiCalData const *)fCalTriggerItems->At(i);
-      if (trig_map.size() < trig->GetBarId()) {
-        trig_map.resize(trig->GetBarId());
-      }
-      trig_map.at(trig->GetBarId() - 1) = trig;
+    std::vector<R3BTofiCalData const*> trig_map;
+    for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
+    {
+        auto trig = (R3BTofiCalData const*)fCalTriggerItems->At(i);
+        if (trig_map.size() < trig->GetBarId())
+        {
+            trig_map.resize(trig->GetBarId());
+        }
+        trig_map.at(trig->GetBarId() - 1) = trig;
     }
 
     bool s_was_trig_missing = false;
@@ -379,9 +397,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
-            if (top_trig_i < trig_map.size() &&
-                trig_map.at(top_trig_i) &&
-                bot_trig_i < trig_map.size() &&
+            if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i) && bot_trig_i < trig_map.size() &&
                 trig_map.at(bot_trig_i))
             {
                 auto top_trig = trig_map.at(top_trig_i);
@@ -458,7 +474,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     continue;
                 }
 
-		CreateHistograms(iPlane, iBar);
+                CreateHistograms(iPlane, iBar);
 
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
@@ -520,10 +536,10 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
                 yToT[iPlane][iBar].push_back(posToT);
 
-
-//cout << posToT << endl;
-//cout << top-> GetBarId() << "  pos  " << posToT << "   Lambda:   " << par->GetLambda()  << ",  top TOT | Totoffset:  " << top_tot << "   " << par->GetToTOffset2()
-//<< ",  bottom TOT| TotOffset:  " << bot_tot  << "   " <<  par->GetToTOffset1() << endl;
+                // cout << posToT << endl;
+                // cout << top-> GetBarId() << "  pos  " << posToT << "   Lambda:   " << par->GetLambda()  << ",  top
+                // TOT | Totoffset:  " << top_tot << "   " << par->GetToTOffset2()
+                //<< ",  bottom TOT| TotOffset:  " << bot_tot  << "   " <<  par->GetToTOffset1() << endl;
 
                 if (fTofiTotPos)
                     pos = posToT;
@@ -532,20 +548,23 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Float_t paddle_thickness = 0.50000;
                 Float_t air_gap_paddles = 0.04;
                 Float_t air_gap_layer = 5.;
-                Float_t gap_center_layer = air_gap_paddles;
+                Float_t gap_center_layer = 6.;
                 if (fTofiGap > 0.)
                     gap_center_layer = fTofiGap;
                 // define number of layers and paddles with sizes of the detector
-                Int_t number_layers = 1; //Sabina 2;   // number of layers
-                Int_t number_paddles = 24; // number of paddles per layer
+                Int_t number_layers = N_TOFI_HIT_PLANE_MAX;   // Sabina 2;   // number of layers
+                Int_t number_paddles = N_TOFI_HIT_PADDLE_MAX; // number of paddles per layer
                 Float_t detector_width =
-                    number_paddles * paddle_width + (number_paddles - 2) * air_gap_paddles + gap_center_layer;
+                    number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + gap_center_layer;
                 Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
 
                 // calculate x-position
                 randx = (std::rand() / (float)RAND_MAX);
                 if (iPlane == 1 || iPlane == 3)
                 {
+                    //	-detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
+                    //                            (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
+
                     if (iBar <= number_paddles / 2)
                         x[iPlane][iBar].push_back(-detector_width / 2 + paddle_width / 2 +
                                                   (iBar - 1) * (paddle_width + air_gap_paddles));
@@ -1010,7 +1029,7 @@ void R3BTofiCal2HitS494::FinishTask()
             if (fhTsync[i])
                 fhTsync[i]->Write();
             if (fh_Tofi_TotPm[i])
-				fh_Tofi_TotPm[i]->Write(); // control histogram for ToT
+                fh_Tofi_TotPm[i]->Write(); // control histogram for ToT
             for (Int_t j = 0; j < N_TOFI_HIT_PADDLE_MAX; j++)
             {
 

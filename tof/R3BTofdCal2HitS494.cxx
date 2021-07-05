@@ -90,7 +90,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494()
 {
     if (fTofdHisto)
     {
-        fhTpat = NULL;
+        // fhTpat = NULL;
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
@@ -141,7 +141,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
 {
     if (fTofdHisto)
     {
-        fhTpat = NULL;
+        //  fhTpat = NULL;
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
@@ -164,8 +164,8 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
 {
     if (fTofdHisto)
     {
-        if (fhTpat)
-            delete fhTpat;
+        // if (fhTpat)
+        //   delete fhTpat;
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             if (fhQ[i])
@@ -290,8 +290,8 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
         }
         if (tpatbin != 0)
         {
-            fhTpat->Fill(i+1);
-            //std::cout<<"Accepted Tpat: "<<i+1<<"\n";
+            //  fhTpat->Fill(i+1);
+            // std::cout<<"Accepted Tpat: "<<i+1<<"\n";
         }
     }
     /*
@@ -299,7 +299,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     if (fTpat_bit >= 0)
     {
         Int_t itpat = header->GetTpat();
-        
+
         Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         Int_t t1 = 1 << fTpat_bit;
         Int_t t2 = itpat & (1 << fTpat_bit);
@@ -868,7 +868,6 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             if (ihit >= nHitsEvent)
                 break;
         }
-        
     }
     if (fTofdHisto)
     {
@@ -943,12 +942,12 @@ void R3BTofdCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     Double_t max_charge = 80.;
     // create histograms if not already existing
 
-    if (NULL == fhTpat)
-    {
-        fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
-        fhTpat->GetXaxis()->SetTitle("Tpat value");
-    }
-    
+    /*    if (NULL == fhTpat)
+        {
+            fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+            fhTpat->GetXaxis()->SetTitle("Tpat value");
+        }
+    */
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
@@ -1065,8 +1064,8 @@ void R3BTofdCal2HitS494::FinishTask()
 {
     if (fTofdHisto)
     {
-        if (fhTpat)
-            fhTpat->Write();
+        //   if (fhTpat)
+        //     fhTpat->Write();
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             if (fhQ[i])

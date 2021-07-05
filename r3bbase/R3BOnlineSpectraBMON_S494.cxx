@@ -25,6 +25,7 @@
 #include "R3BOnlineSpectraBMON_S494.h"
 
 #include "R3BRoluCalData.h"
+#include "R3BRoluHitData.h"
 #include "R3BRoluMappedData.h"
 
 #include "R3BBeamMonitorMappedData.h"
@@ -89,7 +90,8 @@ R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494()
 R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -380,21 +382,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     fhTrigger->Fill(header->GetTrigger());
 
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
-
-    // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat = 0;
-    Int_t tpatvalue = 0;
-    if (fTpat_bit >= 0)
-    {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue != 0))
-            return;
-    }
-
     Int_t tpatbin;
     for (int i = 0; i < 16; i++)
     {
@@ -403,9 +390,35 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             fhTpat->Fill(i + 1);
     }
 
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
+
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    for (int i = 0; i < 16; i++)
+    {
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
+            return;
+        }
+    }
+    /*
+        // fTpat = 1-16; fTpat_bit = 0-15
+        Int_t fTpat_bit = fTpat - 1;
+        Int_t itpat = 0;
+        Int_t tpatvalue = 0;
+        if (fTpat_bit >= 0)
+        {
+            itpat = header->GetTpat();
+            tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+            if ((tpatvalue != 0))
+                return;
+        }
+    */
     if (fMappedItems.at(DET_BMON) && fMappedItems.at(DET_BMON)->GetEntriesFast() > 0)
     {
-
         Bool_t spectra_clear = false;
         Double_t xtime = double(time - time_start) / 1.e9;
         // for reseting spectra
@@ -674,34 +687,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
                 if (iDet > 1)
                     fh_rolu_tot->Fill(iCha + 5, totRolu[iPart][iDet - 1][iCha]);
-
-                if (fHitItems.at(DET_TOFD))
-                {
-                    auto detTofd = fHitItems.at(DET_TOFD);
-                    Int_t nHits = detTofd->GetEntriesFast();
-
-                    if (nHits > 0)
-                    {
-                        for (Int_t ihit = 0; ihit < nHits; ihit++)
-                        {
-                            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
-
-                            if (IS_NAN(hitTofd->GetTimeRaw()))
-                                continue;
-                            Double_t ttt = hitTofd->GetTimeRaw();
-                            auto tof = 0. / 0.;
-                            tof = fmod(ttt - timeRolu_T[iPart][iDet - 1][iCha] + c_period + c_period / 2, c_period) -
-                                  c_period / 2;
-                            if (hitTofd->GetTime() > 210 && hitTofd->GetTime() < 281)
-                            {
-                                if (iDet < 2)
-                                    fh_rolu_tof->Fill(iCha + 1, tof);
-                                if (iDet > 1)
-                                    fh_rolu_tof->Fill(iCha + 5, tof);
-                            }
-                        }
-                    }
-                } // end if fHitItems(TOFD)
             }
 
             if (!calData)
@@ -711,6 +696,47 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             }
         }
     } // end if fCalItems(ROLU)
+
+    if (fHitItems.at(DET_TOFD))
+    {
+        auto detTofd = fHitItems.at(DET_TOFD);
+        Int_t nHits = detTofd->GetEntriesFast();
+
+        if (nHits > 0)
+        {
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+
+                if (IS_NAN(hitTofd->GetTimeRaw()))
+                    continue;
+                Double_t ttt = hitTofd->GetTimeRaw();
+
+                if (fHitItems.at(DET_ROLU))
+                {
+                    auto detHitRolu = fHitItems.at(DET_ROLU);
+                    Int_t nHitsRolu = detHitRolu->GetEntriesFast();
+                    for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
+                    {
+                        R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                        Int_t iDetRolu = hitRolu->GetDetector();
+                        Int_t iCha = hitRolu->GetChannel() - 1;
+                        Double_t timeRolu = hitRolu->GetTime();
+                        Double_t totRolu = hitRolu->GetToT();
+                        Double_t tof = 0. / 0.;
+                        tof = fmod(ttt - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+
+                        if (std::abs(hitTofd->GetY()) < 60)
+                            continue; // trigger events in tofd
+                        if (iDetRolu < 2)
+                            fh_rolu_tof->Fill(iCha + 1, tof);
+                        if (iDetRolu > 1)
+                            fh_rolu_tof->Fill(iCha + 5, tof);
+                    }
+                } // end if fHitItems(ROLU)
+            }
+        }
+    } // end if fHitItems(TOFD)
 }
 
 void R3BOnlineSpectraBMON_S494::FinishEvent()

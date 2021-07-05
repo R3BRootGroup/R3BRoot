@@ -25,22 +25,23 @@ class R3BRoluHitData : public TObject
     R3BRoluHitData();
 
     // Standard Constructor
-    R3BRoluHitData(UChar_t detector, Double_t tot_r, Double_t tot_o, Double_t tot_l, Double_t tot_u);
+    R3BRoluHitData(Int_t detector, Int_t channel, Double_t time, Double_t tot);
 
     // Destructor
     virtual ~R3BRoluHitData() {}
 
     // Getters
-    inline const UChar_t& GetDetector() const { return fDetector; }
-
+    inline const Int_t& GetDetector() const { return fDetector; }
+    inline const Int_t& GetChannel() const { return fChannel; }
+    inline const Double_t& GetTime() const { return ftime; }
+    inline const Double_t& GetToT() const { return ftot; }
   private:
-    UChar_t fDetector; // 1..n
-
-  public:
-    Double_t ftot_r;
-    Double_t ftot_o;
-    Double_t ftot_l;
-    Double_t ftot_u;
+    Int_t fDetector; // 1..n
+    Int_t fChannel;
+//  public:
+    Double_t ftot;
+    Double_t ftime;
+   
 
     ClassDef(R3BRoluHitData, 1)
 };

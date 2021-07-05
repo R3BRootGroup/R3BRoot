@@ -78,6 +78,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 			ftofmin = tmin;
 			ftofmax = tmax;
 		}
+		inline void SetWriteHisto(Bool_t write){fWrite = write;}
  
        R3BFiberMAPMTHitModulePar* GetModuleParAt(Int_t fiber);
     
@@ -97,6 +98,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 		Double_t  offsetDown;
 		Bool_t fIsCalibrator;
 		Double_t ftofmin, ftofmax;
+    	Bool_t fWrite;
     	
 		Direction fDirection;
 		TClonesArray* fCalItems;

@@ -101,7 +101,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
     
     /**
      * Method for setting the window width for calculating fibers
@@ -147,13 +147,14 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
         DET_FI_LAST = DET_FI33,
         DET_TOFI,
         DET_TOFD,
+        DET_ROLU,
         DET_MAX
     };
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
     const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",  "Fi31",  
-                                                 "Fi32", "Fi33",  "Tofi", "Tofd",   NULL };
+                                                 "Fi32", "Fi33",  "Tofi", "Tofd", "Rolu",  NULL };
 
     // If FiberI is present or not:
     Int_t ifibdet;
@@ -163,7 +164,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1, fTpat2;
 	Double_t delta;
 	Bool_t fCuts;
 	Bool_t spill_start = false;
@@ -258,6 +259,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     
     TH1F* fh_Tofi_ToF;
     TH1F* fh_Tofi_ToF_ac;
+    TH2F* fh_ToT_Tofi;
+    TH2F* fh_ToT_Tofi_ac;
+    TH2F* fh_xy_Tofi;
+    TH2F* fh_xy_Tofi_ac;
     	
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
@@ -268,6 +273,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
     TH2F* fh_Fibs_vs_Tofd_ac[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
+    
+    TH2F* fh_ToT_Rolu[2];
+    TH2F* fh_ToT_Rolu_ac[2];
+    TH2F* fh_Rolu_ToF[2];
     
     TH2F* fh_counter_fi30;
     TH2F* fh_counter_fi31;

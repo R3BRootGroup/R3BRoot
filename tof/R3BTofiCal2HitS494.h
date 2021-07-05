@@ -145,7 +145,7 @@ class R3BTofiCal2HitS494 : public FairTask
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
     /**
      * Methods for setting number of planes and paddles
      */
@@ -165,7 +165,7 @@ class R3BTofiCal2HitS494 : public FairTask
     R3BEventHeader* header;     /**< Event header - input data. */
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Int_t fTrigger;             /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1,fTpat2;
     Double_t fTofiQ;
     Float_t fTofiGap;
     Bool_t fTofiHisto;

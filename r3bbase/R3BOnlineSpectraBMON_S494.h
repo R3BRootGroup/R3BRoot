@@ -86,7 +86,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+   inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
 
     /**
      * Methods for setting reset and readout times for Bmon
@@ -121,7 +121,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1, fTpat2;
     Int_t fSamp;
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;

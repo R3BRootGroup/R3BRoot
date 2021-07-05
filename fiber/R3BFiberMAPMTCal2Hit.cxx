@@ -74,6 +74,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fnEvents(0)
     , ftofmin(TOF_MIN)
     , ftofmax(TOF_MAX)
+    , fWrite(true)
     , fGate_ns(100.) // make it constructor parameter
 {
     // Trigger mappin from included mapping files for each det.
@@ -543,17 +544,20 @@ void R3BFiberMAPMTCal2Hit::FinishEvent()
 
 void R3BFiberMAPMTCal2Hit::FinishTask()
 {
-    fh_ToT_bottom_Fib->Write();
-    fh_ToT_top_Fib->Write();
-    fh_ToT_bottom_Fib_raw->Write();
-    fh_ToT_top_Fib_raw->Write();
-    fh_dt_Fib->Write();
-    fh_time_top_Fib->Write();
-    fh_Fib_ToF->Write();
-    fh_Test->Write();
-    fh_time_bottom_Fib->Write();
-    fh_dt_Fib_raw->Write();
-    fh_Fib_ToF_raw->Write();
+    if (fWrite)
+    {
+        fh_ToT_bottom_Fib->Write();
+        fh_ToT_top_Fib->Write();
+        fh_ToT_bottom_Fib_raw->Write();
+        fh_ToT_top_Fib_raw->Write();
+        fh_dt_Fib->Write();
+        fh_time_top_Fib->Write();
+        fh_Fib_ToF->Write();
+        fh_Test->Write();
+        fh_time_bottom_Fib->Write();
+        fh_dt_Fib_raw->Write();
+        fh_Fib_ToF_raw->Write();
+    }
 
     if (fIsCalibrator)
     {

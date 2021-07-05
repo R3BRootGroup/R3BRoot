@@ -61,7 +61,8 @@ namespace
 R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
     : FairTask("OnlineSpectraFiber_s494", 1)
     , fTrigger(1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
     , fChannelArray()
@@ -71,7 +72,8 @@ R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
 R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
     , fChannelArray()
@@ -229,8 +231,6 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
         fh_dtime_Fib23->GetXaxis()->SetTitle("Y Fib23b / cm");
         fh_dtime_Fib23->GetYaxis()->SetTitle("dTime / ns");
     }
-
-    fh_test2 = new TH2F("Fi31_fib88_vs_Trigger", "Fi31 fib88timedown vs TPAT", 15, 0., 15., 1000, -1000, 0);
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
@@ -422,11 +422,6 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
                 FibCanvas[ifibcount]->cd(8);
                 gPad->SetLogz();
                 fh_raw_tot_down[ifibcount]->Draw("colz");
-
-                //   FibCanvas[ifibcount]->cd(16);
-                //  gPad->SetLogz();
-                // if (ifibcount == 1)
-                //   fh_test2->Draw("colz");
             }
             if (fHitItems.at(DET_FI_FIRST + ifibcount))
             {
@@ -526,16 +521,30 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat;
-    Int_t tpatvalue;
-    if (fTpat_bit >= 0)
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    for (int i = 0; i < 16; i++)
     {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue == 0))
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
             return;
+        }
     }
+    /*
+        // fTpat = 1-16; fTpat_bit = 0-15
+        Int_t fTpat_bit = fTpat - 1;
+        Int_t itpat;
+        Int_t tpatvalue;
+        if (fTpat_bit >= 0)
+        {
+            itpat = header->GetTpat();
+            tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+            if ((tpatvalue == 0))
+                return;
+        }
+    */
     // }
     //----------------------------------------------------------------------
     // Fiber detectors
@@ -710,20 +719,6 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                         c_period / 2;
 
                     auto tot_ns = fmod(ttrail_ns - tlead_ns + c_period + c_period / 2, c_period) - c_period / 2;
-
-                    if (side_i == 0 && ifibcount == 1 && ch_i == 200)
-                    {
-                        Int_t tpatbin;
-                        for (int i = 0; i < 16; i++)
-                        {
-                            tpatbin = (header->GetTpat() & (1 << i));
-
-                            if (tpatbin != 0)
-
-                                //	cout<<"Side: "<<side_i<<"; "<<tlead_ns<<", "<<i+1<<endl;
-                                fh_test2->Fill(i + 1, tlead_ns);
-                        }
-                    }
 
                     if (tot_ns < c_tot_coincidence_ns && tot_ns > 0.)
                     {
@@ -925,7 +920,6 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
             fh_multihit_m_Fib[ifibcount]->Write();
             fh_multihit_s_Fib[ifibcount]->Write();
             fh_channels_single_Fib[ifibcount]->Write();
-            fh_test2->Write();
             fh_ToTup_vs_ToTdown[ifibcount]->Write();
         }
         if (fHitItems.at(DET_FI_FIRST + ifibcount))

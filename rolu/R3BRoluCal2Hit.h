@@ -94,18 +94,25 @@ class R3BRoluCal2Hit : public FairTask
      */
     virtual void FinishTask();
 
+    inline void SetNofModules(Int_t nDets, Int_t nChs)
+    {
+        fNofDetectors = nDets;
+        fNofChannels = nChs; //=4
+    }
   private:
     TClonesArray* fCalItems; /* < Array with Cal items - input data. */
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
     UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
-
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    
     TClonesArray* fMapped; /* < Array with mapped data - input data. */
 
-    TH1F* fhQ_R;
-    TH1F* fhQ_O;
-    TH1F* fhQ_L;
-    TH1F* fhQ_U;
+    TH1F* fhQ_R[2];
+    TH1F* fhQ_O[2];
+    TH1F* fhQ_L[2];
+    TH1F* fhQ_U[2];
 
     Int_t Icount = 0;
 

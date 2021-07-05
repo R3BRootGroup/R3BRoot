@@ -55,7 +55,8 @@ namespace
 R3BOnlineSpectraFiber23::R3BOnlineSpectraFiber23()
     : FairTask("OnlineSpectraFiber23", 1)
     , fTrigger(1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -64,7 +65,8 @@ R3BOnlineSpectraFiber23::R3BOnlineSpectraFiber23()
 R3BOnlineSpectraFiber23::R3BOnlineSpectraFiber23(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -207,16 +209,30 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat;
-    Int_t tpatvalue;
-    if (fTpat_bit >= 0)
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    for (int i = 0; i < 16; i++)
     {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue == 0))
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
             return;
+        }
     }
+    /*
+        // fTpat = 1-16; fTpat_bit = 0-15
+        Int_t fTpat_bit = fTpat - 1;
+        Int_t itpat;
+        Int_t tpatvalue;
+        if (fTpat_bit >= 0)
+        {
+            itpat = header->GetTpat();
+            tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+            if ((tpatvalue == 0))
+                return;
+        }
+    */
     // }
     //----------------------------------------------------------------------
     // Fiber detectors
