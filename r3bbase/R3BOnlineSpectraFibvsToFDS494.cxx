@@ -594,7 +594,7 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
 void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 {
 
-    Bool_t debug2 = true;
+    Bool_t debug2 = false;
     Bool_t counter_reset = false;
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -826,11 +826,16 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 t2[det] = hitTofd->GetTime();
             }
 
-            if (fCuts && (qqq < 0 || qqq > 1000))
+            if (fCuts && (qqq < 6 || qqq > 8))
+            {
+				//cout << "Cut because of charge: " << qqq << endl;
                 continue;
+            }
             if (fCuts && (xxx < -10000 || xxx > 10000))
+			{
+				//cout << "Cut because of x" << endl;
                 continue;
-
+			}
             multTofd++;
 
             counterTofdMulti++;
@@ -872,8 +877,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                        if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                            continue; */
                     if (fCuts && (tof < ftofmin || tof > ftofmax))
+					{
+						//cout << "Cut because of ToF ToFI" << endl;                    
                         continue;
-
+					}
                     // Fill histograms after cuts
                     fh_Tofi_ToF_ac->Fill(tof);
                     fh_ToT_Tofi_ac->Fill(qqq, q1[det]);
@@ -918,9 +925,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 220 || tof > 280))
+                {
+					//cout << "Cut because of ToF fi33" << endl;
                     continue;
-
+				}
                 hits33++;
 
                 // Fill histograms after cuts
@@ -965,9 +975,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 230 || tof > 275))
+				{
+					//cout << "Cut because of ToF fi31" << endl;
                     continue;
-
+				}
                 hits31++;
 
                 // Fill histograms
@@ -1012,9 +1025,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 225 || tof > 280))
+                {
+					//cout << "Cut because of ToF fi30" << endl;				
                     continue;
-
+				}
                 hits30++;
 
                 // Fill histograms
@@ -1059,9 +1075,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 220 || tof > 280))
+                {
+					//cout << "Cut because of ToF fi32" << endl;
                     continue;
-
+				}
                 hits32++;
 
                 // Fill histograms
@@ -1096,15 +1115,25 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
+				//cout << "Time: " << t1[det] << endl;
+                if (fCuts && (t1[det] < 110 || t1[det] > 150))
+                    continue;
+                if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
+					continue;
+                    
+				
                 /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
                         continue;
                     if (fCuts && q1[det] < cutQ)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 90 || tof > 140))
+                {
+					//cout << "Cut because of ToF fi23a" << endl;
                     continue;
-
+				}
                 // Fill histograms
                 fh_Fib_ToF_ac[det]->Fill(tof);
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
@@ -1137,6 +1166,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToT_Fib[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                if (fCuts && (t1[det] < 110 || t1[det] > 150))
+                    continue;
+                if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+					continue;
 
                 // Cuts on Fi23b
                 /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
@@ -1145,9 +1178,12 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                //if (fCuts && (tof < ftofmin || tof > ftofmax))
+                if (fCuts && (tof < 90 || tof > 140))
+                {
+					//cout << "Cut because of ToF fi23b" << endl;
                     continue;
-
+				}
                 // Fill histograms
                 fh_Fib_ToF_ac[det]->Fill(tof);
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
