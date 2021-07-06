@@ -1116,7 +1116,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
 				//cout << "Time: " << t1[det] << endl;
-                if (fCuts && (t1[det] < 110 || t1[det] > 150))
+                if (fCuts && (t1[det] < 90 || t1[det] > 150))
                     continue;
                 if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
 					continue;
@@ -1166,7 +1166,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToT_Fib[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-                if (fCuts && (t1[det] < 110 || t1[det] > 150))
+                if (fCuts && (t1[det] < 100 || t1[det] > 150))
                     continue;
                 if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
 					continue;
