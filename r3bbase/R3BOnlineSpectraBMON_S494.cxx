@@ -171,7 +171,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
 
-        fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 6000, -6000, 6000);
+        fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 4000, -2000, 2000);
         fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tof->GetYaxis()->SetTitle("ToF / ns");
 
@@ -268,6 +268,10 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_IC_TOFDOR->GetYaxis()->SetTitle("IC counts/spill");
         fh_IC_TOFDOR->GetXaxis()->SetTitle("TOFDOR counts/spill");
 
+        fh_IC_SEE = new TH1F("IC_vs_SEE", "IC vs SEE ", 500000, 0, 500000);
+        fh_IC_SEE->GetYaxis()->SetTitle("SEE counts/spill");
+        fh_IC_SEE->GetXaxis()->SetTitle("IC counts /spill");
+
         cbmon->Divide(6, 3);
         cbmon->cd(1);
         fh_spill_length->Draw();
@@ -297,6 +301,9 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cbmon->cd(15);
         fh_SEE_TOFDOR->SetMarkerStyle(21);
         fh_SEE_TOFDOR->Draw("hist p");
+        cbmon->cd(16);
+        fh_IC_SEE->SetMarkerStyle(21);
+        fh_IC_SEE->Draw("hist p");
         cbmon->cd(17);
         fh_SEE_spill_raw->Draw("hist");
 
@@ -356,6 +363,11 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     time = header->GetTimeStamp();
     // time = 0;
 
+    if (time_begin == -1 && time > 0 && time_end < 1)
+    {
+        time_begin = time;
+    }
+
     if (time_start == -1 && time > 0)
     {
         time_start = time;
@@ -365,18 +377,19 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     if (header->GetTrigger() == 12)
     {
         time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
-        cout << "Spill start: " << double(time_spill_start - time_start) / 1.e9 << " sec " << endl;
+        cout << "Spill start: " << double(time_spill_start - time_begin) / 1.e9 << " sec " << endl;
         // reset counters:
         see_spill = 0;
         ic_spill = 0;
         tofdor_spill = 0;
         spill_on = true;
         in_spill_off = 0;
+        fNSpills += 1;
     }
     if (header->GetTrigger() == 13)
     {
         time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
-        cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec " << endl;
+        cout << "Spill stop: " << double(time_spill_end - time_begin) / 1.e9 << " sec " << endl;
         spill_on = false;
     }
 
@@ -538,8 +551,12 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             tofdor_spill = tofdor_spill / spill_length;
                             ic_spill = ic_spill / spill_length;
                             see_spill = see_spill / spill_length;
+                            nBeamParticle += see_spill;
+                            //     cout<<"Spill counts: "<<ic_spill<<", "<<see_spill<<", "<<spill_length<<endl;
+
                             fh_IC_TOFDOR->Fill(tofdor_spill, ic_spill);
                             fh_SEE_TOFDOR->Fill(tofdor_spill, see_spill);
+                            fh_IC_SEE->Fill(ic_spill, see_spill);
                         }
                     }
                     yTOFDOR_mem_mem = yTOFDOR_mem;
@@ -708,9 +725,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             {
                 R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
 
-                if (IS_NAN(hitTofd->GetTimeRaw()))
+                if (IS_NAN(hitTofd->GetTime()))
                     continue;
-                Double_t ttt = hitTofd->GetTimeRaw();
+                Double_t ttt = hitTofd->GetTime();
 
                 if (fHitItems.at(DET_ROLU))
                 {
@@ -724,7 +741,9 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                         Double_t timeRolu = hitRolu->GetTime();
                         Double_t totRolu = hitRolu->GetToT();
                         Double_t tof = 0. / 0.;
-                        tof = fmod(ttt - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+                        //  tof = fmod(ttt - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+
+                        tof = ttt - timeRolu;
 
                         if (std::abs(hitTofd->GetY()) < 60)
                             continue; // trigger events in tofd
@@ -737,6 +756,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             }
         }
     } // end if fHitItems(TOFD)
+    time_end = header->GetTimeStamp();
 }
 
 void R3BOnlineSpectraBMON_S494::FinishEvent()
@@ -765,6 +785,11 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     cout << " " << endl;
     cout << "nEvents total " << fNEvents << endl;
     cout << "nEvents Rolu " << fNEventsRolu << endl;
+    cout << "Time_start      : " << time_begin << endl;
+    cout << "Time end        : " << time_end << endl;
+    cout << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec" << endl;
+    cout << "nSpill          : " << fNSpills << endl;
+    cout << "Total num of 18O: " << nBeamParticle << endl;
 
     if (fMappedItems.at(DET_ROLU))
     {
@@ -788,5 +813,6 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fh_TOFDOR_spill->Write();
         fh_SEE_TOFDOR->Write();
         fh_IC_TOFDOR->Write();
+        fh_IC_SEE->Write();
     }
 }

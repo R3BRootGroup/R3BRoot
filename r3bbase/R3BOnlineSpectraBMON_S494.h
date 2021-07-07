@@ -129,9 +129,9 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     //   TClonesArray *fbmonMappedItems;
 
-    unsigned long long  time_start = -1, time = 0, time_mem = 0;
+    unsigned long long  time_start = -1, time_begin = -1, time = 0, time_mem = 0, time_end = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long int ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0;
+    unsigned long int ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0, nBeamParticle=0;
     unsigned long int ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
     unsigned long long time_spill_start = 0, time_spill_end = 0;
     Double_t see_spill = 0, ic_spill = 0, tofdor_spill = 0;
@@ -152,7 +152,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     Double_t ic_offset = 0; // SEETRAM offset in kHz
     Int_t in_spill_off = 0;
 
-    unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0, fNSpills = 0; /**< Event counter. */
 
     TH1F* fhTpat;
     TH1F* fh_spill_length;
@@ -171,6 +171,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fh_SROLU1_spill;
     TH1F* fh_SROLU2_spill;
     TH1F* fh_IC_TOFDOR;
+    TH1F* fh_IC_SEE;
     TH1F* fh_SEE_TOFDOR;
 
     TH2F* fh_rolu_tot;

@@ -102,6 +102,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
+    inline void SetVeto(Bool_t veto) { fVeto = veto; }
     
     /**
      * Method for setting the window width for calculating fibers
@@ -112,10 +113,18 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
 		fxmin=xmin;
 		fxmax=xmax;
 	}
-	inline void SetTofLimits(Double_t tofmin, Double_t tofmax){
-		ftofmin=tofmin;
-		ftofmax=tofmax;
+	inline void SetTofLimitsFib2x(Double_t tofmin, Double_t tofmax){
+		ftofminFib2x=tofmin;
+		ftofmaxFib2x=tofmax;
 	}
+	inline void SetTofLimitsFib3x(Double_t tofmin, Double_t tofmax){
+		ftofminFib3x=tofmin;
+		ftofmaxFib3x=tofmax;
+	}	
+	inline void SetTofLimitsTofi(Double_t tofmin, Double_t tofmax){
+		ftofminTofi=tofmin;
+		ftofmaxTofi=tofmax;
+	}	
 	inline void SetQLimits(Double_t qmin, Double_t qmax){
 		fqtofdmin=qmin;
 		fqtofdmax=qmax;
@@ -131,9 +140,10 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     void Reset_All();
     
   private:
+    std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
-
+    TClonesArray* fMappedItemsCalifa;
 
     enum DetectorInstances
     {
@@ -167,12 +177,14 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     Int_t fTpat1, fTpat2;
 	Double_t delta;
 	Bool_t fCuts;
+	Bool_t fVeto;
 	Bool_t spill_start = false;
     unsigned long long time_start = 0, time = 0;
     unsigned long long tofdor_start = 0;
-    unsigned long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0, fNEvents_veto = 0, fNEvents_califa = 0,
+    fNEvents_tofi = 0, fNEvents_fibers = 0, fNEvents_zeroToFD = 0; /**< Event counter. */
     unsigned long long time_spill_start = 0, time_spill_end = 0;
-	Double_t ftofmin, ftofmax, fqtofdmin, fqtofdmax;
+	Double_t ftofminFib2x, ftofmaxFib2x, ftofminFib3x, ftofmaxFib3x, ftofminTofi, ftofmaxTofi, fqtofdmin, fqtofdmax;
     Int_t maxevent;
 	
 	Int_t Q = 0;
@@ -273,6 +285,8 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
     TH2F* fh_Fibs_vs_Tofd_ac[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
+    TH2F* fh_ToTy_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_TOF_Fib_ac[NOF_FIB_DET];
     
     TH2F* fh_ToT_Rolu[2];
     TH2F* fh_ToT_Rolu_ac[2];
@@ -289,6 +303,8 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     TH2F* fh_test;
 	TH2F* fh_test1;
 	TH2F* fh_test2;
+	
+	TH1F* fhTpat;
   public:
     ClassDef(R3BOnlineSpectraFibvsToFDS494, 2)
 };

@@ -16,6 +16,8 @@
 #include "R3BTofdHitData.h"
 #include "R3BTofdMappedData.h"
 
+#include "R3BCalifaMappedData.h"
+
 #include "R3BTofiCalData.h"
 #include "R3BTofiHitData.h"
 #include "R3BTofiMappedData.h"
@@ -86,14 +88,20 @@ R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494()
     , fTpat1(-1)
     , fTpat2(-1)
     , fCuts(0)
+    , fVeto(false)
     , fwindow_mv(10000)
     , fxmin(-1000)
     , fxmax(1000)
-    , ftofmin(T_TOF_MIN)
-    , ftofmax(T_TOF_MAX)
+    , ftofminFib2x(T_TOF_MIN)
+    , ftofmaxFib2x(T_TOF_MAX)
+    , ftofminFib3x(T_TOF_MIN)
+    , ftofmaxFib3x(T_TOF_MAX)
+    , ftofminTofi(T_TOF_MIN)
+    , ftofmaxTofi(T_TOF_MAX)
     , fqtofdmin(0)
     , fqtofdmax(200)
     , fNEvents(0)
+    , fMappedItemsCalifa(NULL)
 
 {
 }
@@ -104,14 +112,20 @@ R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494(const char* name, I
     , fTpat1(-1)
     , fTpat2(-1)
     , fCuts(0)
+    , fVeto(false)
     , fwindow_mv(10000)
     , fxmin(-1000)
     , fxmax(1000)
-    , ftofmin(T_TOF_MIN)
-    , ftofmax(T_TOF_MAX)
+    , ftofminFib2x(T_TOF_MIN)
+    , ftofmaxFib2x(T_TOF_MAX)
+    , ftofminFib3x(T_TOF_MIN)
+    , ftofmaxFib3x(T_TOF_MAX)
+    , ftofminTofi(T_TOF_MIN)
+    , ftofmaxTofi(T_TOF_MAX)
     , fqtofdmin(0)
     , fqtofdmax(200)
     , fNEvents(0)
+    , fMappedItemsCalifa(NULL)
 {
 }
 
@@ -179,13 +193,13 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
     for (int det = 0; det < DET_MAX; det++)
     {
-        /*
-                fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
-                if (NULL == fMappedItems.at(det))
-                {
-                    printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
-                }
-        */
+
+        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        if (NULL == fMappedItems.at(det))
+        {
+            printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
+        }
+
         if (det == 7)
             maxevent = mgr->CheckMaxEventNo();
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
@@ -199,6 +213,12 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
+    }
+    // get access to mapped data of the CALIFA
+    fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
+    if (!fMappedItemsCalifa)
+    {
+        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found"; // return kFATAL;
     }
 
     //-----------------------------------------------------------------------
@@ -220,11 +240,11 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         fh_Tofi_ToF_ac->GetXaxis()->SetTitle("ToF / ns");
         fh_Tofi_ToF_ac->GetYaxis()->SetTitle("counts");
 
-        fh_ToT_Tofi = new TH2F("totTofi_vs_totToFD", "totTofi vs totToFD", 800, 0., 200., 900, 0., 300.);
+        fh_ToT_Tofi = new TH2F("totTofi_vs_totToFD", "totTofi vs totToFD", 200, 0., 20., 200, 0., 20.);
         fh_ToT_Tofi->GetXaxis()->SetTitle("ToFD ToT / ns");
         fh_ToT_Tofi->GetYaxis()->SetTitle("Tofi ToT / ns");
 
-        fh_ToT_Tofi_ac = new TH2F("totTofi_vs_totToFD_ac", "totTofi vs totToFD ac", 800, 0., 200., 900, 0., 300.);
+        fh_ToT_Tofi_ac = new TH2F("totTofi_vs_totToFD_ac", "totTofi vs totToFD ac", 200, 0., 20., 200, 0., 20.);
         fh_ToT_Tofi_ac->GetXaxis()->SetTitle("ToFD ToT / ns");
         fh_ToT_Tofi_ac->GetYaxis()->SetTitle("Tofi ToT / ns");
 
@@ -250,19 +270,19 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
             fh_Rolu_ToF[i]->GetXaxis()->SetTitle("Channel");
 
             fh_ToT_Rolu[i] = new TH2F(
-                Form("totRolu%d_vs_totToFD", i + 1), Form("totRolu%d vs totToFD", i + 1), 800, 0., 200., 600, 0., 300.);
-            fh_ToT_Rolu[i]->GetXaxis()->SetTitle("ToFD ToT / ns");
+                Form("totRolu%d_vs_Ztofd", i + 1), Form("totRolu%d vs Ztofd", i + 1), 200, 0., 20., 600, 0., 300.);
+            fh_ToT_Rolu[i]->GetXaxis()->SetTitle("Nuclear charge ToFD");
             fh_ToT_Rolu[i]->GetYaxis()->SetTitle("Rolu ToT / ns");
 
-            fh_ToT_Rolu_ac[i] = new TH2F(Form("totRolu%d_vs_totToFD_ac", i + 1),
-                                         Form("totRolu%d vs totToFD C", i + 1),
-                                         800,
+            fh_ToT_Rolu_ac[i] = new TH2F(Form("totRolu%d_vs_Ztofd_ac", i + 1),
+                                         Form("totRolu%d vs Ztofd ac", i + 1),
+                                         200,
                                          0.,
-                                         200.,
+                                         20.,
                                          600,
                                          0.,
                                          300.);
-            fh_ToT_Rolu_ac[i]->GetXaxis()->SetTitle("ToFD ToT / ns");
+            fh_ToT_Rolu_ac[i]->GetXaxis()->SetTitle("Nuclear charge ToFD");
             fh_ToT_Rolu_ac[i]->GetYaxis()->SetTitle("Rolu ToT / ns");
         }
     }
@@ -276,38 +296,49 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         detName = fDetectorNames[DET_FI_FIRST + ifibcount];
 
         // xy:
-        fh_xy_Fib[ifibcount] = new TH2F(
-            Form("%s_xToFDtotFib", detName), Form("%s ToTFib vs xToFD", detName), 1200, -60., 60., 200, 0., 50.);
+        fh_xy_Fib[ifibcount] =
+            new TH2F(Form("%s_xToFDZfib", detName), Form("%s Zfib vs xToFD", detName), 1200, -60., 60., 200, 0., 20.);
         fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("xToFD / cm ");
-        fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("ToT Fib / ns");
+        fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("Nuclear charge fiber");
 
-        fh_xy_Fib_ac[ifibcount] = new TH2F(Form("%s_xToFDtotFib_ac", detName),
-                                           Form("%s ToTFib vs xToFD after cuts", detName),
+        fh_xy_Fib_ac[ifibcount] = new TH2F(Form("%s_xToFDZfib_ac", detName),
+                                           Form("%s Zfib vs xToFD after cuts", detName),
                                            1200,
                                            -60.,
                                            60.,
-                                           400,
+                                           200,
                                            0.,
-                                           100.);
+                                           20.);
         fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("xToFD / cm ");
-        fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("ToT Fib / ns");
+        fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("Nuclear charge fiber");
 
         // ToT vs xToFD:
-        fh_ToT_Fib[ifibcount] = new TH2F(
-            Form("%s_totFib_vs_totToFD", detName), Form("%s ToTFib vs totToFD", detName), 800, 0., 200., 200, 0., 50.);
-        fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("ToFD ToT / ns");
-        fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("Fib ToT / ns");
+        fh_ToT_Fib[ifibcount] =
+            new TH2F(Form("%s_Zfib_vs_Ztofd", detName), Form("%s Zfib vs Ztofd", detName), 200, 0., 20., 200, 0., 20.);
+        fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("Nuclear charge ToFD");
+        fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("Nuclear charge fiber");
 
-        fh_ToT_Fib_ac[ifibcount] = new TH2F(Form("%s_totFib_vs_totToFDD_ac", detName),
-                                            Form("%s oTFib vs totToFD after cuts", detName),
-                                            800,
-                                            0.,
-                                            200,
+        fh_ToT_Fib_ac[ifibcount] = new TH2F(Form("%s_Zfib_vs_Ztofd_ac", detName),
+                                            Form("%s Zfib vs Ztofd after cuts", detName),
                                             200,
                                             0.,
-                                            50.);
-        fh_ToT_Fib_ac[ifibcount]->GetXaxis()->SetTitle("ToFD ToT / ns");
-        fh_ToT_Fib_ac[ifibcount]->GetYaxis()->SetTitle("Fib ToT / ns");
+                                            20.,
+                                            200,
+                                            0.,
+                                            20.);
+        fh_ToT_Fib_ac[ifibcount]->GetXaxis()->SetTitle("Nuclear charge ToFD");
+        fh_ToT_Fib_ac[ifibcount]->GetYaxis()->SetTitle("Nuclear charge fiber");
+
+        fh_ToT_TOF_Fib_ac[ifibcount] = new TH2F(Form("%s_TOF_vs_xFib_ac", detName),
+                                                Form("%s TOF vs xFib after cuts", detName),
+                                                600,
+                                                -30.,
+                                                30.,
+                                                1200,
+                                                -100.,
+                                                500.);
+        fh_ToT_TOF_Fib_ac[ifibcount]->GetXaxis()->SetTitle("xFib / cm");
+        fh_ToT_TOF_Fib_ac[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
 
         // ToF Tofd -> Fiber:
         fh_Fib_ToF[ifibcount] =
@@ -333,19 +364,47 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         fh_ToF_vs_Events[ifibcount]->GetXaxis()->SetTitle("event number");
 
         // xfib vs. TofD position:
-        fh_Fibs_vs_Tofd[ifibcount] = new TH2F(
-            Form("%s_fib_vs_TofdX", detName), Form("%s Fiber # vs. Tofd x-pos", detName), 400, -60, 60, 600, -30., 30.);
+        if (ifibcount < 2)
+            fh_Fibs_vs_Tofd[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX", detName),
+                                                  Form("%s Fiber # vs. Tofd x-pos", detName),
+                                                  400,
+                                                  -60,
+                                                  60,
+                                                  120,
+                                                  -6.,
+                                                  6.);
+        else
+            fh_Fibs_vs_Tofd[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX", detName),
+                                                  Form("%s Fiber # vs. Tofd x-pos", detName),
+                                                  400,
+                                                  -60,
+                                                  60,
+                                                  600,
+                                                  -30.,
+                                                  30.);
+
         fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
         fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
-        fh_Fibs_vs_Tofd_ac[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX_ac", detName),
-                                                 Form("%s Fiber # vs. Tofd x-pos after cuts", detName),
-                                                 400,
-                                                 -60,
-                                                 60,
-                                                 600,
-                                                 -30.,
-                                                 30.);
+        if (ifibcount < 2)
+            fh_Fibs_vs_Tofd_ac[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX_ac", detName),
+                                                     Form("%s Fiber # vs. Tofd x-pos after cuts", detName),
+                                                     400,
+                                                     -60,
+                                                     60,
+                                                     120,
+                                                     -6.,
+                                                     6.);
+        else
+            fh_Fibs_vs_Tofd_ac[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX_ac", detName),
+                                                     Form("%s Fiber # vs. Tofd x-pos after cuts", detName),
+                                                     400,
+                                                     -60,
+                                                     60,
+                                                     600,
+                                                     -30.,
+                                                     30.);
+
         fh_Fibs_vs_Tofd_ac[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
         fh_Fibs_vs_Tofd_ac[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
@@ -372,6 +431,9 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 
     fh_test = new TH2F("Fi31_fibMax_vs_fNevent", "Fi31 fibMax vs fNevent", 10000, 0, 5e6, 520, 0., 526);
     fh_test1 = new TH2F("Fi31_fibavr_vs_fNevent", "Fi31 fibavr vs fNevent", 10000, 0, 5e6, 520, 0., 526);
+
+    fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+    fhTpat->GetXaxis()->SetTitle("Tpat value");
 
     cFib->cd(1);
     // gPad->SetLogy();
@@ -563,7 +625,7 @@ void R3BOnlineSpectraFibvsToFDS494::Reset_All()
     if (fHitItems.at(DET_TOFI))
     {
         fh_Tofi_ToF->Reset();
-        //  fh_counter_tofi->Reset();
+        fh_counter_tofi->Reset();
         if (fCuts)
         {
             fh_ToT_Tofi_ac->Reset();
@@ -647,11 +709,18 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             tpatbin = (header->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
-				//cout << "wrong Tpat: " << header->GetTpat() << endl;
+                // cout << "wrong Tpat: " << header->GetTpat() << endl;
                 counterWrongTpat++;
                 return;
             }
-			//cout << "Tpat: " << header->GetTpat() << endl;
+            // cout << "Tpat: " << header->GetTpat() << endl;
+        }
+
+        for (int i = 0; i < 16; i++)
+        {
+            tpatbin = (header->GetTpat() & (1 << i));
+            if (tpatbin != 0)
+                fhTpat->Fill(i + 1);
         }
     }
 
@@ -729,19 +798,38 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
     nHitstemp = 0;
 
+    fNEvents += 1;
+    if (fNEvents / 10000. == (int)fNEvents / 10000)
+        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+                  << " %) " << std::flush;
+
+    // Software Veto cut:
+    if (fVeto && fHitItems.at(DET_ROLU)->GetEntriesFast() > 0)
+        return;
+
+    fNEvents_veto += 1;
+
     auto detTofd = fHitItems.at(DET_TOFD);
     Int_t nHits = detTofd->GetEntriesFast();
 
     //    cout<<"TOFD nHits: "<<nHits<<endl;
 
+    if (fHitItems.at(DET_TOFD)->GetEntriesFast() > 0)
+        fNEvents_local += 1;
+    if (fHitItems.at(DET_TOFD)->GetEntriesFast() < 1)
+        fNEvents_zeroToFD += 1;
+    if (fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast() > 0)
+        fNEvents_califa += 1;
+    if (fHitItems.at(DET_TOFI)->GetEntriesFast() > 0)
+        fNEvents_tofi += 1;
+    for (Int_t detfib = 0; detfib < 2; detfib++)
+    {
+        if (fHitItems.at(detfib)->GetEntriesFast() > 0)
+            fNEvents_fibers += 1;
+    }
+
     if (nHits > 0)
     {
-
-        fNEvents_local += 1;
-        fNEvents += 1;
-        if (fNEvents / 10000. == (int)fNEvents / 10000)
-            std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                      << " %) " << std::flush;
 
         counterTofd++;
         if (debug_in)
@@ -781,6 +869,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             Bool_t tofd_left = false;
             Bool_t tofd_right = false;
             id2 = hitTofd->GetDetId();
+
+            if ((id2 == 2 && hitTofd->GetBarId() == 24) || (id2 == 2 && hitTofd->GetBarId() == 21))
+                continue;
 
             if (hitTofd->GetX() <= 0.)
             {
@@ -830,14 +921,14 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
             if (fCuts && (qqq < 0 || qqq > 20))
             {
-				//cout << "Cut because of charge: " << qqq << endl;
+                // cout << "Cut because of charge: " << qqq << endl;
                 continue;
             }
             if (fCuts && (xxx < -10000 || xxx > 10000))
-			{
-				//cout << "Cut because of x" << endl;
+            {
+                // cout << "Cut because of x" << endl;
                 continue;
-			}
+            }
             multTofd++;
 
             counterTofdMulti++;
@@ -845,50 +936,43 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             // cut in ToT for Fibers
             Double_t cutQ = 0.;
 
+            /*
+                        Bool_t ROLU_cut = false;
+                        Int_t nParts;
+                        if (fHitItems.at(DET_ROLU))
+                        {
 
-			Bool_t ROLU_cut = false;
-            Int_t nParts;
-            if (fHitItems.at(DET_ROLU))
-            {
-                
-                auto detHitRolu = fHitItems.at(DET_ROLU);
-                Int_t nHitsRolu = detHitRolu->GetEntriesFast();
-                LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
-/*
-                if(nHitsRolu>0) 
-                {
-					ROLU_cut = true;
-					nHitsRolu = 0;
-				}
-*/					
-                for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
-                {
-                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
-                    Int_t iDetRolu = hitRolu->GetDetector();
-                    Int_t iCha = hitRolu->GetChannel();
-                    Double_t timeRolu = hitRolu->GetTime();
-                    Double_t totRolu = hitRolu->GetToT();
+                            auto detHitRolu = fHitItems.at(DET_ROLU);
+                            Int_t nHitsRolu = detHitRolu->GetEntriesFast();
+                            LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
 
-                    tof = fmod(hitTofd->GetTimeRaw() - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
-                    if (tof > -100 && tof < 100) 
-                    {
-						ROLU_cut = true;
-						break;
-					}
-                    //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
-                    fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
-                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
+                            for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
+                            {
+                                R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                                Int_t iDetRolu = hitRolu->GetDetector();
+                                Int_t iCha = hitRolu->GetChannel();
+                                Double_t timeRolu = hitRolu->GetTime();
+                                Double_t totRolu = hitRolu->GetToT();
 
-                    if (fCuts && (tof < ftofmin || tof > ftofmax))
-                        continue;
+                                tof = fmod(hitTofd->GetTimeRaw() - timeRolu + c_period + c_period / 2, c_period) -
+               c_period / 2; if (tof > -100 && tof < 100)
+                                {
+                                    ROLU_cut = true;
+                                    break;
+                                }
+                                //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
+                                fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
+                                fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
 
-                    fh_ToT_Rolu_ac[iDetRolu - 1]->Fill(qqq, totRolu);
-                }
-            } // end if fHitItems(ROLU)
+                                if (fCuts && (tof < ftofmin || tof > ftofmax))
+                                    continue;
 
-			if(ROLU_cut) continue;
+                                fh_ToT_Rolu_ac[iDetRolu - 1]->Fill(qqq, totRolu);
+                            }
+                        } // end if fHitItems(ROLU)
 
-
+                        if(ROLU_cut) continue;
+            */
 
             // loop over TOFI
             if (fHitItems.at(DET_TOFI))
@@ -923,11 +1007,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                            continue;
                        if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                            continue; */
-                    if (fCuts && (tof < ftofmin || tof > ftofmax))
-					{
-						//cout << "Cut because of ToF ToFI" << endl;                    
+
+                    if (fCuts && (tof < ftofminTofi || tof > ftofmaxTofi))
                         continue;
-					}
                     // Fill histograms after cuts
                     fh_Tofi_ToF_ac->Fill(tof);
                     fh_ToT_Tofi_ac->Fill(qqq, q1[det]);
@@ -947,8 +1029,9 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi33;
                 R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
-                x1[det] = hit33->GetX(); // cm
-                y1[det] = hit33->GetY(); // cm
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit33->GetX() + 0.1 * randx; // cm
+                y1[det] = hit33->GetY();               // cm
                 z1[det] = 0.;
                 q1[det] = hit33->GetEloss();
 
@@ -972,12 +1055,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 220 || tof > 280))
-                {
-					//cout << "Cut because of ToF fi33" << endl;
+
+                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
-				}
+
                 hits33++;
 
                 // Fill histograms after cuts
@@ -985,6 +1066,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], t1[det]); // tof);
 
                 if (debug2)
                     cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
@@ -999,7 +1081,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi31;
                 R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
-                x1[det] = hit31->GetX();
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit31->GetX() + 0.1 * randx; // cm
                 y1[det] = hit31->GetY();
                 z1[det] = 0.;
                 q1[det] = hit31->GetEloss();
@@ -1022,12 +1105,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 230 || tof > 275))
-				{
-					//cout << "Cut because of ToF fi31" << endl;
+
+                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
-				}
+
                 hits31++;
 
                 // Fill histograms
@@ -1035,6 +1116,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
                 if (debug2)
                     cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
@@ -1049,7 +1131,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi30;
                 R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
-                x1[det] = hit30->GetX();
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit30->GetX() + 0.1 * randx; // cm
                 y1[det] = hit30->GetY();
                 z1[det] = 0.;
                 q1[det] = hit30->GetEloss();
@@ -1072,12 +1155,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 225 || tof > 280))
-                {
-					//cout << "Cut because of ToF fi30" << endl;				
+
+                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
-				}
+
                 hits30++;
 
                 // Fill histograms
@@ -1085,6 +1166,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
                 if (debug2)
                     cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
@@ -1099,7 +1181,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi32;
                 R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
-                x1[det] = hit32->GetX();
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit32->GetX() + 0.1 * randx; // cm
                 y1[det] = hit32->GetY();
                 z1[det] = 0.;
                 q1[det] = hit32->GetEloss();
@@ -1122,12 +1205,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 220 || tof > 280))
-                {
-					//cout << "Cut because of ToF fi32" << endl;
+
+                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
-				}
+
                 hits32++;
 
                 // Fill histograms
@@ -1135,6 +1216,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
                 if (debug2)
                     cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
@@ -1149,7 +1231,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi23a;
                 R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-                x1[det] = hit23a->GetX();
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit23a->GetX() + 0.028 * randx; // cm
                 y1[det] = hit23a->GetY();
                 q1[det] = hit23a->GetEloss();
                 t1[det] = hit23a->GetTime();
@@ -1162,30 +1245,28 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-				//cout << "Time: " << t1[det] << endl;
+                // cout << "Time: " << t1[det] << endl;
                 if (fCuts && (t1[det] < -20 || t1[det] > 20))
                     continue;
                 if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
-					continue;
-                    
-				
+                    continue;
+
                 /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
                         continue;
                     if (fCuts && q1[det] < cutQ)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 200 || tof > 300))
-                {
-					//cout << "Cut because of ToF fi23a" << endl;
+
+                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
                     continue;
-				}
+
                 // Fill histograms
                 fh_Fib_ToF_ac[det]->Fill(tof);
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
                 if (debug2)
                     cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
@@ -1200,7 +1281,8 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             {
                 det = fi23b;
                 R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-                x1[det] = hit23b->GetX();
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit23b->GetX() + 0.028 * randx; // cm
                 y1[det] = hit23b->GetY();
                 z1[det] = 0.;
                 q1[det] = hit23b->GetEloss();
@@ -1216,7 +1298,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 if (fCuts && (t1[det] < -20 || t1[det] > 20))
                     continue;
                 if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-					continue;
+                    continue;
 
                 // Cuts on Fi23b
                 /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
@@ -1225,23 +1307,47 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-                //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 200 || tof > 300))
-                {
-					//cout << "Cut because of ToF fi23b" << endl;
+
+                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
                     continue;
-				}
+
                 // Fill histograms
                 fh_Fib_ToF_ac[det]->Fill(tof);
                 fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
+                fh_ToT_TOF_Fib_ac[det]->Fill(y1[det], tof);
 
                 if (debug2)
                     cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                          << " t1: " << tof << endl;
             }
 
+            Int_t nParts;
+            if (fHitItems.at(DET_ROLU))
+            {
+                auto detHitRolu = fHitItems.at(DET_ROLU);
+                Int_t nHitsRolu = detHitRolu->GetEntriesFast();
+                LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
+                for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
+                {
+                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                    Int_t iDetRolu = hitRolu->GetDetector();
+                    Int_t iCha = hitRolu->GetChannel();
+                    Double_t timeRolu = hitRolu->GetTime();
+                    Double_t totRolu = hitRolu->GetToT();
+
+                    tof = fmod(tStart - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+                    //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
+                    fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
+                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
+
+                    if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                        continue;
+
+                    fh_ToT_Rolu_ac[iDetRolu - 1]->Fill(qqq, totRolu);
+                }
+            } // end if fHitItems(ROLU)
 
         } // end ToFD loop
 
@@ -1319,7 +1425,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                     tof = tStart - t1[det];
                     // Cuts on Tofi
 
-                    if ((tof < ftofmin || tof > ftofmax))
+                    if ((tof < ftofminTofi || tof > ftofmaxTofi))
                         continue;
                     Int_t ifibtofi = hitTofi->GetBarId();
 
@@ -1360,7 +1466,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi33
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
                 Int_t ifib33 = hit33->GetFiberId();
@@ -1401,7 +1507,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi31
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
                 Int_t ifib31 = hit31->GetFiberId();
@@ -1442,7 +1548,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi30
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
                 Int_t ifib30 = hit30->GetFiberId();
@@ -1483,7 +1589,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi32
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
                 Int_t ifib32 = hit32->GetFiberId();
@@ -1524,7 +1630,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi23a
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib2x || tof > ftofmaxFib2x))
                     continue;
 
                 Int_t ifib23a = hit23a->GetFiberId();
@@ -1565,7 +1671,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 // Cuts on Fi23b
                 if (q1[det] < cutQ)
                     continue;
-                if ((tof < ftofmin || tof > ftofmax))
+                if ((tof < ftofminFib2x || tof > ftofmaxFib2x))
                     continue;
 
                 Int_t ifib23b = hit23b->GetFiberId();
@@ -1842,7 +1948,14 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
 {
 
     cout << "Statistics:" << endl;
-    cout << "Events: " << fNEvents << endl;
+    cout << "Events with correct trigger & tpat : " << fNEvents << endl;
+    cout << "Events w/o Rolu                    : " << fNEvents_veto << endl;
+    cout << "Events w/o Rolu and with ToFD      : " << fNEvents_local << endl;
+    cout << "Events w/o Rolu and w/o ToFD       : " << fNEvents_zeroToFD << endl;
+    cout << "Events w/o Rolu and with Califa    : " << fNEvents_califa << endl;
+    cout << "Events w/o Rolu and with ToFI      : " << fNEvents_tofi << endl;
+    cout << "Events w/o Rolu and with fibers23  : " << fNEvents_fibers << endl;
+    cout << "  " << endl;
     cout << "Wrong Trigger: " << counterWrongTrigger << endl;
     cout << "Wrong Tpat: " << counterWrongTpat << endl;
     cout << "TofD: " << counterTofd << endl;
@@ -1868,6 +1981,7 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
                 fh_ToT_Fib_ac[ifibcount]->Write();
                 fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
                 fh_Fib_ToF_ac[ifibcount]->Write();
+                fh_ToT_TOF_Fib_ac[ifibcount]->Write();
             }
             else
             {

@@ -516,6 +516,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     }
 
                     Double_t eloss = sqrt(tot_down * tot_up);
+                    //  eloss = 2.069*eloss-10.414;  // testing Q
                     Double_t t = tof;
 
                     multi++;

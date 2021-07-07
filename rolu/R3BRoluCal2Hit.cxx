@@ -49,11 +49,16 @@ static void init_array(T& array, double init)
         *e = init;
 }
 using namespace std;
+namespace
+{
+    double c_period = 2048 * 5;
+} // namespace
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BRoluCal2Hit::R3BRoluCal2Hit()
     : FairTask("RoluCal2Hit", 1)
     , fCalItems(NULL)
+    , fCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BRoluHitData"))
     , fNofHitItems(0)
     , fNofDetectors(2)
@@ -71,6 +76,7 @@ R3BRoluCal2Hit::R3BRoluCal2Hit()
 R3BRoluCal2Hit::R3BRoluCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
+    , fCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BRoluHitData"))
     , fNofHitItems(0)
     , fNofDetectors(2)
@@ -117,6 +123,10 @@ InitStatus R3BRoluCal2Hit::Init()
     if (NULL == fCalItems)
         LOG(fatal) << "Branch RoluCal not found";
 
+    fCalTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerCal");
+    if (NULL == fCalTriggerItems)
+        LOG(fatal) << "Branch RoluTriggerCal not found";
+
     // request storage of Hit data in output tree
     mgr->Register("RoluHit", "Land", fHitItems, kTRUE);
 
@@ -161,17 +171,20 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
         }
     }
 
+    Int_t nTrig = fCalTriggerItems->GetEntriesFast();
+    Double_t lead_trig_ns = 0. / 0.;
+    for (UInt_t j = 0; j < nTrig; ++j)
+    {
+        auto cur_cal = (R3BRoluCalData*)fCalTriggerItems->At(j);
+        lead_trig_ns = cur_cal->GetTimeL_ns(0);
+        // cout<<"Trigger: "<<lead_trig_ns<<endl;
+    }
     Int_t nParts = fCalItems->GetEntriesFast();
 
-    if (nParts < 1)
+    if (nParts < 1 || nTrig < 1)
         return;
 
     Int_t iDet = 0;
-    /*
-     * Note: double x[nParts][2][4]={NAN};
-     * will initialize everything other than x[0][0][0] to 0.0.
-     * (and also not compile with our ancient gcc 4.8.5.)
-     */
     using A = boost::multi_array<double, 3>;
     auto dims = boost::extents[nParts][fNofDetectors][4];
     A timeRolu_L(dims);
@@ -212,10 +225,14 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
                 totRolu[iPart][iDet - 1][iCha] = timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
             }
 
+            Double_t time_to_trig =
+                fmod(timeRolu_L[iPart][iDet - 1][iCha] - lead_trig_ns + c_period + c_period / 2, c_period) -
+                c_period / 2;
+
             // cout<<"ROLU cal2hit: "<<iDet<<", "<<iCha+1<<"; "<<timeRolu_L[iPart][iDet - 1][iCha]<<",
             // "<<totRolu[iPart][iDet - 1][iCha]<<endl;
             new ((*fHitItems)[fNofHitItems])
-                R3BRoluHitData(iDet, iCha + 1, timeRolu_L[iPart][iDet - 1][iCha], totRolu[iPart][iDet - 1][iCha]);
+                R3BRoluHitData(iDet, iCha + 1, time_to_trig, totRolu[iPart][iDet - 1][iCha]);
             fNofHitItems += 1;
         }
 

@@ -102,6 +102,7 @@ class R3BRoluCal2Hit : public FairTask
   private:
     TClonesArray* fCalItems; /* < Array with Cal items - input data. */
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
+    TClonesArray* fCalTriggerItems;
     UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
     UInt_t fNofDetectors; /**< Number of detectors. */
