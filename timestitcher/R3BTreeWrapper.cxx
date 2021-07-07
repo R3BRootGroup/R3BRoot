@@ -69,7 +69,7 @@ namespace R3BCalifaTimestitcher
                 if (!rawHit)
                     throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaMappedData!");
 
-                return rawHit->GetTime();
+                return rawHit->GetWRTS();
                 break;
             }
 

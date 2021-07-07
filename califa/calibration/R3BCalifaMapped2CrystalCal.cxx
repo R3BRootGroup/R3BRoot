@@ -183,16 +183,16 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     //   b      QPID Nf     Nf
 
     //   c      QPID Ns     Ns
-    const uint16_t ANY_ERRORS = 0x061e;
-    const uint16_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
-    const uint16_t EN_ERRORS = 0x0020 | ANY_ERRORS;
+    const uint32_t ANY_ERRORS = 0x061e;
+    const uint32_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
+    const uint32_t EN_ERRORS = 0x0020 | ANY_ERRORS;
 
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
         auto crystalId = mappedData[i]->GetCrystalId();
-        auto Time = mappedData[i]->GetTime();
-        auto Erro = mappedData[i]->GetError();
+        auto wrts = mappedData[i]->GetWRTS();
+        auto ov = mappedData[i]->GetOverflow();
         auto Tot = mappedData[i]->GetTot();
         auto validate_smear = [](uint16_t err_cond, double raw) {
             return err_cond ? NAN : raw + gRandom->Rndm() - 0.5;
@@ -204,9 +204,9 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             Ns = 2
         };
         double raw[3];
-        raw[en] = validate_smear(Erro & EN_ERRORS, mappedData[i]->GetEnergy());
-        raw[Nf] = validate_smear(Erro & QPID_ERRORS, mappedData[i]->GetNf());
-        raw[Ns] = validate_smear(Erro & QPID_ERRORS, mappedData[i]->GetNs());
+        raw[en] = validate_smear(ov & EN_ERRORS, mappedData[i]->GetEnergy());
+        raw[Nf] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNf());
+        raw[Ns] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNs());
         double cal[3] = { 0, 0, 0 };
 
         if (0 < crystalId && crystalId <= NumCrystals)
@@ -227,7 +227,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             double a1 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1) + 1);
             TotCal = a0 * TMath::Exp(Tot / a1);
         }
-        AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], Time, TotCal);
+        AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);
     }
 
     if (mappedData)
