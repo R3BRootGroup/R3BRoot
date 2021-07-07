@@ -45,6 +45,7 @@ class R3BRoluReader : public R3BReader
     FairLogger* fLogger;
     /* the structs of type R3BRoluxMappedItem */
     TClonesArray* fArray; /**< Output array. */
+    TClonesArray* fArrayTrigger; /**< Output array for triggers. */
     // Don't store data for online
     Bool_t fOnline;
     Int_t fNEvents = 0;

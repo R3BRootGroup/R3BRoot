@@ -125,7 +125,9 @@ class R3BRoluMapped2Cal : public FairTask
   private:
     // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
+    TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */
     TClonesArray* fCalItems;    /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems;    /**< Array with cal items - output data. */
     Int_t fNofCalItems;         /**< Number of produced time items per event. */
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
@@ -143,7 +145,7 @@ class R3BRoluMapped2Cal : public FairTask
     UInt_t fNEvent;
 
   public:
-    ClassDef(R3BRoluMapped2Cal, 1)
+    ClassDef(R3BRoluMapped2Cal, 2)
 };
 
 #endif

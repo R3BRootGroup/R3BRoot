@@ -647,9 +647,11 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             tpatbin = (header->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
+				//cout << "wrong Tpat: " << header->GetTpat() << endl;
                 counterWrongTpat++;
                 return;
             }
+			//cout << "Tpat: " << header->GetTpat() << endl;
         }
     }
 
@@ -826,7 +828,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 t2[det] = hitTofd->GetTime();
             }
 
-            if (fCuts && (qqq < 6 || qqq > 8))
+            if (fCuts && (qqq < 0 || qqq > 20))
             {
 				//cout << "Cut because of charge: " << qqq << endl;
                 continue;
@@ -842,6 +844,51 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
             // cut in ToT for Fibers
             Double_t cutQ = 0.;
+
+
+			Bool_t ROLU_cut = false;
+            Int_t nParts;
+            if (fHitItems.at(DET_ROLU))
+            {
+                
+                auto detHitRolu = fHitItems.at(DET_ROLU);
+                Int_t nHitsRolu = detHitRolu->GetEntriesFast();
+                LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
+/*
+                if(nHitsRolu>0) 
+                {
+					ROLU_cut = true;
+					nHitsRolu = 0;
+				}
+*/					
+                for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
+                {
+                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                    Int_t iDetRolu = hitRolu->GetDetector();
+                    Int_t iCha = hitRolu->GetChannel();
+                    Double_t timeRolu = hitRolu->GetTime();
+                    Double_t totRolu = hitRolu->GetToT();
+
+                    tof = fmod(hitTofd->GetTimeRaw() - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+                    if (tof > -100 && tof < 100) 
+                    {
+						ROLU_cut = true;
+						break;
+					}
+                    //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
+                    fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
+                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
+
+                    if (fCuts && (tof < ftofmin || tof > ftofmax))
+                        continue;
+
+                    fh_ToT_Rolu_ac[iDetRolu - 1]->Fill(qqq, totRolu);
+                }
+            } // end if fHitItems(ROLU)
+
+			if(ROLU_cut) continue;
+
+
 
             // loop over TOFI
             if (fHitItems.at(DET_TOFI))
@@ -1116,7 +1163,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
 				//cout << "Time: " << t1[det] << endl;
-                if (fCuts && (t1[det] < 90 || t1[det] > 150))
+                if (fCuts && (t1[det] < -20 || t1[det] > 20))
                     continue;
                 if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
 					continue;
@@ -1129,7 +1176,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
                 //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 90 || tof > 140))
+                if (fCuts && (tof < 200 || tof > 300))
                 {
 					//cout << "Cut because of ToF fi23a" << endl;
                     continue;
@@ -1166,7 +1213,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 fh_ToT_Fib[det]->Fill(qqq, q1[det]);
                 fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-                if (fCuts && (t1[det] < 100 || t1[det] > 150))
+                if (fCuts && (t1[det] < -20 || t1[det] > 20))
                     continue;
                 if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
 					continue;
@@ -1179,7 +1226,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
                 //if (fCuts && (tof < ftofmin || tof > ftofmax))
-                if (fCuts && (tof < 90 || tof > 140))
+                if (fCuts && (tof < 200 || tof > 300))
                 {
 					//cout << "Cut because of ToF fi23b" << endl;
                     continue;
@@ -1195,31 +1242,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                          << " t1: " << tof << endl;
             }
 
-            Int_t nParts;
-            if (fHitItems.at(DET_ROLU))
-            {
-                auto detHitRolu = fHitItems.at(DET_ROLU);
-                Int_t nHitsRolu = detHitRolu->GetEntriesFast();
-                LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
-                for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
-                {
-                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
-                    Int_t iDetRolu = hitRolu->GetDetector();
-                    Int_t iCha = hitRolu->GetChannel();
-                    Double_t timeRolu = hitRolu->GetTime();
-                    Double_t totRolu = hitRolu->GetToT();
-
-                    tof = fmod(hitTofd->GetTimeRaw() - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
-                    //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
-                    fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
-                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
-
-                    if (fCuts && (tof < ftofmin || tof > ftofmax))
-                        continue;
-
-                    fh_ToT_Rolu_ac[iDetRolu - 1]->Fill(qqq, totRolu);
-                }
-            } // end if fHitItems(ROLU)
 
         } // end ToFD loop
 

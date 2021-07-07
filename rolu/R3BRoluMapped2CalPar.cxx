@@ -73,14 +73,8 @@ R3BRoluMapped2CalPar::R3BRoluMapped2CalPar(const char* name, Int_t iVerbose)
 
 R3BRoluMapped2CalPar::~R3BRoluMapped2CalPar()
 {
-    if (fCal_Par)
-    {
-        delete fCal_Par;
-    }
-    if (fEngine)
-    {
-        delete fEngine;
-    }
+  delete fCal_Par;
+  delete fEngine;
 }
 
 InitStatus R3BRoluMapped2CalPar::Init()
@@ -96,6 +90,11 @@ InitStatus R3BRoluMapped2CalPar::Init()
     // may be = NULL!
 
     fMapped = (TClonesArray*)rm->GetObject("RoluMapped");
+    if (!fMapped)
+    {
+        return kFATAL;
+    }
+    fMappedTrigger = (TClonesArray*)rm->GetObject("RoluTriggerMapped");
     if (!fMapped)
     {
         return kFATAL;
@@ -163,6 +162,15 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
         // Fill TAC histogram for VFTX and TAMEX
 
         fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
+    }
+
+    nHits = fMappedTrigger->GetEntries();
+
+    // Loop over mapped triggers
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        auto mapped = (R3BRoluMappedData const*)fMappedTrigger->At(i);
+        fEngine->Fill(3, 1, 1, mapped->GetTimeFine());
     }
 
     // Increment events

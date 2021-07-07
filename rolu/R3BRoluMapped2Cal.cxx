@@ -43,7 +43,9 @@
 R3BRoluMapped2Cal::R3BRoluMapped2Cal()
     : FairTask("RoluTcal", 1)
     , fMappedItems(NULL)
+    , fMappedTriggerItems(NULL)
     , fCalItems(new TClonesArray("R3BRoluCalData"))
+    , fCalTriggerItems(new TClonesArray("R3BRoluCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fNofModules(0)
@@ -57,7 +59,9 @@ R3BRoluMapped2Cal::R3BRoluMapped2Cal()
 R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
+    , fMappedTriggerItems(NULL)
     , fCalItems(new TClonesArray("R3BRoluCalData"))
+    , fCalTriggerItems(new TClonesArray("R3BRoluCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fNofModules(0)
@@ -68,7 +72,11 @@ R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, Int_t iVerbose)
 {
 }
 
-R3BRoluMapped2Cal::~R3BRoluMapped2Cal() { delete fCalItems; }
+R3BRoluMapped2Cal::~R3BRoluMapped2Cal()
+{
+  delete fCalItems;
+  delete fCalTriggerItems;
+}
 
 InitStatus R3BRoluMapped2Cal::Init()
 {
@@ -96,17 +104,15 @@ InitStatus R3BRoluMapped2Cal::Init()
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("RoluMapped");
-
     if (NULL == fMappedItems)
-    {
-        //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch RoluMapped not found");
-        LOG(ERROR) << "Branch RoluMapped not found";
-        return kFATAL;
-    }
+        LOG(fatal) << "Branch RoluMapped not found";
+    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerMapped");
+    if (NULL == fMappedTriggerItems)
+        LOG(fatal) << "Branch RoluTriggerMapped not found";
 
     // request storage of Cal data in output tree
     mgr->Register("RoluCal", "Land", fCalItems, kTRUE);
-    fCalItems->Clear();
+    mgr->Register("RoluTriggerCal", "Land", fCalTriggerItems, kTRUE);
 
     return kSUCCESS;
 }
@@ -332,16 +338,38 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
                    << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
+    // Calibrate trigger channels.
+    auto mapped_num = fMappedTriggerItems->GetEntriesFast();
+    for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+    {
+        auto mapped = (R3BRoluMappedData const*)fMappedTriggerItems->At(mapped_i);
+
+        // Tcal parameters.
+        auto* par = fTcalPar->GetModuleParAt(3, 1, 1);
+        if (!par)
+        {
+            LOG(INFO) << "R3BRoluMapped2Cal::Exec : Trigger Tcal par not found.";
+            continue;
+        }
+
+        // Convert TDC to [ns] ...
+        Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
+        // ... and subtract it from the next clock cycle.
+        time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
+
+        auto cal = new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+            R3BRoluCalData(1);
+        cal->fTimeL_ns[0] = time_ns;
+    }
+
     ++fNEvent;
 }
 
 void R3BRoluMapped2Cal::FinishEvent()
 {
-    if (fCalItems)
-    {
-        fCalItems->Clear();
-        fNofCalItems = 0;
-    }
+  fCalItems->Clear();
+  fCalTriggerItems->Clear();
+  fNofCalItems = 0;
 }
 
 void R3BRoluMapped2Cal::FinishTask() {}

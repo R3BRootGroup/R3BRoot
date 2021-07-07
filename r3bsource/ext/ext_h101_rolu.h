@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_ROLU__TMP_TMP_ASXSJ45HOH_H__
-#define __GUARD_H101_ROLU__TMP_TMP_ASXSJ45HOH_H__
+#ifndef __GUARD_H101_ROLU__TMP_TMP_NVZ1SP0YLX_H__
+#define __GUARD_H101_ROLU__TMP_TMP_NVZ1SP0YLX_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -49,6 +49,12 @@ typedef struct EXT_STR_h101_ROLU_t
   uint32_t ROLU1TTCTME[4 EXT_STRUCT_CTRL(ROLU1TTCTM)] /* [1,256] */;
   uint32_t ROLU1TTCT /* [0,256] */;
   uint32_t ROLU1TTCTv[256 EXT_STRUCT_CTRL(ROLU1TTCT)] /* [0,65535] */;
+  uint32_t ROLU1TRIGCL /* [0,1] */;
+  uint32_t ROLU1TRIGCLI[1 EXT_STRUCT_CTRL(ROLU1TRIGCL)] /* [1,1] */;
+  uint32_t ROLU1TRIGCLv[1 EXT_STRUCT_CTRL(ROLU1TRIGCL)] /* [0,65535] */;
+  uint32_t ROLU1TRIGFL /* [0,1] */;
+  uint32_t ROLU1TRIGFLI[1 EXT_STRUCT_CTRL(ROLU1TRIGFL)] /* [1,1] */;
+  uint32_t ROLU1TRIGFLv[1 EXT_STRUCT_CTRL(ROLU1TRIGFL)] /* [0,65535] */;
   uint32_t ROLU2TTFLM /* [1,4] */;
   uint32_t ROLU2TTFLMI[4 EXT_STRUCT_CTRL(ROLU2TTFLM)] /* [1,4] */;
   uint32_t ROLU2TTFLME[4 EXT_STRUCT_CTRL(ROLU2TTFLM)] /* [1,256] */;
@@ -69,6 +75,12 @@ typedef struct EXT_STR_h101_ROLU_t
   uint32_t ROLU2TTCTME[4 EXT_STRUCT_CTRL(ROLU2TTCTM)] /* [1,256] */;
   uint32_t ROLU2TTCT /* [0,256] */;
   uint32_t ROLU2TTCTv[256 EXT_STRUCT_CTRL(ROLU2TTCT)] /* [0,65535] */;
+  uint32_t ROLU2TRIGCL /* [0,1] */;
+  uint32_t ROLU2TRIGCLI[1 EXT_STRUCT_CTRL(ROLU2TRIGCL)] /* [1,1] */;
+  uint32_t ROLU2TRIGCLv[1 EXT_STRUCT_CTRL(ROLU2TRIGCL)] /* [0,65535] */;
+  uint32_t ROLU2TRIGFL /* [0,1] */;
+  uint32_t ROLU2TRIGFLI[1 EXT_STRUCT_CTRL(ROLU2TRIGFL)] /* [1,1] */;
+  uint32_t ROLU2TRIGFLv[1 EXT_STRUCT_CTRL(ROLU2TRIGFL)] /* [0,65535] */;
 
 } EXT_STR_h101_ROLU;
 
@@ -102,6 +114,12 @@ typedef struct EXT_STR_h101_ROLU_onion_t
     uint32_t TTCTME[4 /* TTCTM */];
     uint32_t TTCT;
     uint32_t TTCTv[256 /* TTCT */];
+    uint32_t TRIGCL;
+    uint32_t TRIGCLI[1 /* TRIGCL */];
+    uint32_t TRIGCLv[1 /* TRIGCL */];
+    uint32_t TRIGFL;
+    uint32_t TRIGFLI[1 /* TRIGFL */];
+    uint32_t TRIGFLv[1 /* TRIGFL */];
   } ROLU[2];
 
 } EXT_STR_h101_ROLU_onion;
@@ -172,6 +190,24 @@ typedef struct EXT_STR_h101_ROLU_onion_t
                      ROLU1TTCTv,                      UINT32,\
                     "ROLU1TTCTv",                      "ROLU1TTCT"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGCL,                     UINT32,\
+                    "ROLU1TRIGCL",1); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGCLI,                    UINT32,\
+                    "ROLU1TRIGCLI",                    "ROLU1TRIGCL"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGCLv,                    UINT32,\
+                    "ROLU1TRIGCLv",                    "ROLU1TRIGCL"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGFL,                     UINT32,\
+                    "ROLU1TRIGFL",1); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGFLI,                    UINT32,\
+                    "ROLU1TRIGFLI",                    "ROLU1TRIGFL"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU1TRIGFLv,                    UINT32,\
+                    "ROLU1TRIGFLv",                    "ROLU1TRIGFL"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      ROLU2TTFLM,                      UINT32,\
                     "ROLU2TTFLM",4); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
@@ -231,8 +267,26 @@ typedef struct EXT_STR_h101_ROLU_onion_t
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      ROLU2TTCTv,                      UINT32,\
                     "ROLU2TTCTv",                      "ROLU2TTCT"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGCL,                     UINT32,\
+                    "ROLU2TRIGCL",1); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGCLI,                    UINT32,\
+                    "ROLU2TRIGCLI",                    "ROLU2TRIGCL"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGCLv,                    UINT32,\
+                    "ROLU2TRIGCLv",                    "ROLU2TRIGCL"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGFL,                     UINT32,\
+                    "ROLU2TRIGFL",1); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGFLI,                    UINT32,\
+                    "ROLU2TRIGFLI",                    "ROLU2TRIGFL"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     ROLU2TRIGFLv,                    UINT32,\
+                    "ROLU2TRIGFLv",                    "ROLU2TRIGFL"); \
   \
 } while (0);
-#endif/*__GUARD_H101_ROLU__TMP_TMP_ASXSJ45HOH_H__*/
+#endif/*__GUARD_H101_ROLU__TMP_TMP_NVZ1SP0YLX_H__*/
 
 /*******************************************************/

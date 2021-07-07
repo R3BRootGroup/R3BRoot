@@ -37,15 +37,14 @@ R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU* data, UInt_t offset)
     , fOnline(kFALSE)
     , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BRoluMappedData"))
+    , fArrayTrigger(new TClonesArray("R3BRoluMappedData"))
 {
 }
 
 R3BRoluReader::~R3BRoluReader()
 {
-    if (fArray)
-    {
-        delete fArray;
-    }
+  delete fArray;
+  delete fArrayTrigger;
 }
 
 Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
@@ -73,10 +72,12 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     if (!fOnline)
     {
         FairRootManager::Instance()->Register("RoluMapped", "Land", fArray, kTRUE);
+        FairRootManager::Instance()->Register("RoluTriggerMapped", "Land", fArrayTrigger, kTRUE);
     }
     else
     {
         FairRootManager::Instance()->Register("RoluMapped", "Land", fArray, kFALSE);
+        FairRootManager::Instance()->Register("RoluTriggerMapped", "Land", fArrayTrigger, kFALSE);
     }
     fArray->Clear();
 
@@ -241,6 +242,16 @@ Bool_t R3BRoluReader::Read()
         }
     }
 
+    // Triggers.
+    {
+        for (uint32_t i = 0; i < data->ROLU[0].TRIGFL; i++)
+        {
+            uint32_t ch_i = data->ROLU[0].TRIGFLI[i];
+            new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                R3BRoluMappedData(3, 1, 1, data->ROLU[0].TRIGFLv[i], data->ROLU[0].TRIGCLv[i]);
+        }
+    }
+
     fNEvents += 1;
 
     return kTRUE;
@@ -252,6 +263,7 @@ void R3BRoluReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
+    fArrayTrigger->Clear();
 }
 
 ClassImp(R3BRoluReader)
