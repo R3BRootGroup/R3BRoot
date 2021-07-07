@@ -167,7 +167,6 @@ class R3BCalifaOnlineSpectra : public FairTask
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
     TClonesArray* fCalItemsCalifa;    /**< Array with cal items.       */
     TClonesArray* fHitItemsCalifa;    /**< Array with hit items.       */
-    TClonesArray* fWRItemsCalifa;     /**< Array with WR-Califa items. */
     TClonesArray* fWRItemsMaster;     /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
@@ -219,7 +218,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_wr;
     TH1F* fh1_Califa_wr;
     TCanvas* cWrs;
-    TH1F* fh1_wrs[2];
+    TH1I* fh1_wrs[2];
     TCanvas* cCalifa_sync;
     TH1F* fh1_Califa_sync[3];
     THStack* stack_wrs;

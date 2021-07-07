@@ -34,6 +34,9 @@
 # Storage files
 *.gam
 
+#emacs
+*~
+
 # Generated folders and files 
 geometry/neuland_v*.root
 build/
