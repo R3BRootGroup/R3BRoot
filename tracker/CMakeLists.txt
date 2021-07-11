@@ -1,3 +1,4 @@
+
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019 Members of R3B Collaboration                          #
@@ -11,7 +12,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BCal" which includes the source files given in
+# Create a library called "libR3BTra" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -25,9 +26,8 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/xball
 ${R3BROOT_SOURCE_DIR}/califa
-${R3BROOT_SOURCE_DIR}/tracker
-${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -36,8 +36,13 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/tracker/unpackams
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+${R3BROOT_SOURCE_DIR}/tracker
+${R3BROOT_SOURCE_DIR}/tracker/sim
+${R3BROOT_SOURCE_DIR}/tracker/digi
+${R3BROOT_SOURCE_DIR}/tracker/pars
+${R3BROOT_SOURCE_DIR}/tracker/calibration
+${R3BROOT_SOURCE_DIR}/tracker/online
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -52,28 +57,28 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-R3BTra.cxx  
-R3BGeoTra.cxx   
-R3BGeoTraPar.cxx   
-R3BTraContFact.cxx
-R3BTraDigiPar.cxx
-R3BTraDigitizer.cxx
-R3BTargetDigiPar.cxx
-R3BTargetDigitizer.cxx
-R3BTra2pDigiPar.cxx
-R3BTra2pDigitizer.cxx
-R3BTraFraDigiPar.cxx
-R3BTraFraDigitizer.cxx
-R3BTarget2pDigiPar.cxx
-R3BTarget2pDigitizer.cxx   
-R3BTraHitFinder.cxx
-unpackams/R3BAmsStripCalPar.cxx
-unpackams/R3BAmsMappingPar.cxx
-unpackams/R3BAmsMapped2StripCalPar.cxx
-unpackams/R3BAmsMapped2StripCal.cxx
-unpackams/R3BAmsStripCal2Hit.cxx
-unpackams/R3BAmsOnlineSpectra.cxx
-unpackams/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
+./sim/R3BTra.cxx
+./sim/R3BTraHitFinder.cxx
+./pars/R3BGeoTra.cxx   
+./pars/R3BGeoTraPar.cxx
+./pars/R3BAmsMappingPar.cxx
+./pars/R3BAmsStripCalPar.cxx
+./pars/R3BTraContFact.cxx
+./digi/R3BTraDigiPar.cxx
+./digi/R3BTraDigitizer.cxx
+./digi/R3BTargetDigiPar.cxx
+./digi/R3BTargetDigitizer.cxx
+./digi/R3BTra2pDigiPar.cxx
+./digi/R3BTra2pDigitizer.cxx
+./digi/R3BTraFraDigiPar.cxx
+./digi/R3BTraFraDigitizer.cxx
+./digi/R3BTarget2pDigiPar.cxx
+./digi/R3BTarget2pDigitizer.cxx   
+./calibration/R3BAmsMapped2StripCalPar.cxx
+./calibration/R3BAmsMapped2StripCal.cxx
+./calibration/R3BAmsStripCal2Hit.cxx
+./online/R3BAmsOnlineSpectra.cxx
+./online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files
@@ -85,13 +90,4 @@ set(LIBRARY_NAME R3BTra)
 set(DEPENDENCIES
     Spectrum R3Bbase R3BData)
 
-if(FAIRDB_FOUND)
-set(DEPENDENCIES
-    ${DEPENDENCIES} FairDB)
-endif(FAIRDB_FOUND)
-
-
-
 GENERATE_LIBRARY()
-
-
