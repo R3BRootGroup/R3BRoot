@@ -56,14 +56,7 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, !fOnline);
 
     return kTRUE;
 }

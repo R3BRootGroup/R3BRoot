@@ -419,7 +419,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Double_t px, py, pz;
     Double_t theta_16, theta_26;
     Double_t costh26;
-    Double_t chiHex, chiHey, chiCx, chiCy;
+    Double_t chiHex = 0., chiHey = 0., chiCx = 0., chiCy = 0.;
 
     Bool_t is_alpha = false;
     Bool_t is_carbon = false;

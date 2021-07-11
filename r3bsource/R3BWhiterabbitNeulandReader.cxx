@@ -72,14 +72,7 @@ Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
         LOG(INFO) << "R3BWhiterabbitNeulandReader::Init() R3BEventHeader found";
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("WRNeulandData", "WRNeuland", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("WRNeulandData", "WRNeuland", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("WRNeulandData", "WRNeuland", fArray, !fOnline);
 
     fData->NN_WR_ID = 0;
 

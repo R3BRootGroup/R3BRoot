@@ -32,6 +32,7 @@
 #include "TROOT.h"
 #include "TRandom.h"
 #include "TString.h"
+#include <TObjString.h>
 #include <algorithm>
 #include <list>
 #include <map>
@@ -869,6 +870,7 @@ Bool_t R3BFileSource::ActivateObject(TObject** obj, const char* BrName)
     return kTRUE;
 }
 
+// remove it for new fairroot versions > Jun 2021
 namespace
 {
 

@@ -72,14 +72,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
         LOG(INFO) << "R3BWhiterabbitMasterReader::Init() R3BEventHeader found";
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
 
     fData->TIMESTAMP_MASTER_ID = 0;
 

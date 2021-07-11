@@ -70,14 +70,7 @@ Bool_t R3BWhiterabbitAmsReader::Init(ext_data_struct_info* a_struct_info)
         LOG(INFO) << "R3BWhiterabbitAmsReader::Init() R3BEventHeader found";
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("WRAmsData", "WRAms", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("WRAmsData", "WRAms", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("WRAmsData", "WRAms", fArray, !fOnline);
 
     fData->TIMESTAMP_AMS_ID = 0;
 

@@ -595,8 +595,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // CANVAS Multiplicity
     cCalifaMult = new TCanvas("Califa_Multiplicity", "Califa_Multiplicity", 10, 10, 500, 500);
-    fh1_Califa_Mult = new TH1F("fh1_Califa_Mult", "Califa multiplicity (crystal:blue, cluster:red)", 21, -0.5, 20.5);
-    fh1_Califa_MultHit = new TH1F("fh1_Califa_MultHit", "Califa multiplicity", 21, -0.5, 20.5);
+    fh1_Califa_Mult = new TH1F("fh1_Califa_Mult", "Califa multiplicity (crystal:blue, cluster:red)", 141, -0.5, 140.5);
+    fh1_Califa_MultHit = new TH1F("fh1_Califa_MultHit", "Califa multiplicity", 141, -0.5, 140.5);
     fh1_Califa_Mult->GetXaxis()->SetTitle("Multiplicity");
     fh1_Califa_Mult->GetXaxis()->CenterTitle(true);
     fh1_Califa_Mult->GetYaxis()->CenterTitle(true);
@@ -1455,11 +1455,11 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             }
         }
         fh1_Califa_Mult->Fill(Crymult);
-        if ((synch[0] > 0. || synch[1] > 0.) && wr[0] > 0.)
+        if ((synch[0] > 0. || synch[1] > 0.))
         {
             fh1_Califa_sync[0]->Fill(synch[1] - synch[0]); // Wixh - Messel
-            fh1_Califa_sync[1]->Fill(wr[0] - synch[0]);    // Messel
-            fh1_Califa_sync[2]->Fill(wr[1] - synch[1]);    // Wixhausen
+            fh1_Califa_sync[1]->Fill(wrdif[0]);            // Messel
+            fh1_Califa_sync[2]->Fill(wrdif[1]);            // Wixhausen
             // meansync=wr[0]-synch[0];
             // LOG(INFO)<<wrdif[0] + wr[0] << " "<<wr[0] <<" "<< wr[1] <<" "<<synch[0]<<" "<<synch[1] <<" "<<
             // fWRItemsCalifa->GetEntriesFast();

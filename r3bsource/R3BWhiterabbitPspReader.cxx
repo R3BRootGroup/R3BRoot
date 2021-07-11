@@ -24,7 +24,9 @@ extern "C"
 #include "ext_h101_timestamp_pspx.h"
 }
 
-R3BWhiterabbitPspReader::R3BWhiterabbitPspReader(EXT_STR_h101_TIMESTAMP_PSPX* data, UInt_t offset, UInt_t whiterabbit_id)
+R3BWhiterabbitPspReader::R3BWhiterabbitPspReader(EXT_STR_h101_TIMESTAMP_PSPX* data,
+                                                 UInt_t offset,
+                                                 UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitPspReader")
     , fNEvent(0)
     , fData(data)
@@ -70,14 +72,7 @@ Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)
         LOG(INFO) << "R3BWhiterabbitPspReader::Init() R3BEventHeader found";
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("WRPspData", "WRPsp", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("WRPspData", "WRPsp", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("WRPspData", "WRPsp", fArray, !fOnline);
 
     fData->TIMESTAMP_PSPX_ID = 0;
 
