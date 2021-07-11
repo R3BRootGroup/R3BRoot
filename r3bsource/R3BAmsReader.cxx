@@ -59,14 +59,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, !fOnline);
 
     return kTRUE;
 }

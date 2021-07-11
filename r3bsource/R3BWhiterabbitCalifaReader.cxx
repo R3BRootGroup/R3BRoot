@@ -74,14 +74,7 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
         LOG(INFO) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader found";
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, !fOnline);
 
     fData->TIMESTAMP_CALIFA1ID = 0;
     fData->TIMESTAMP_CALIFA2ID = 0;

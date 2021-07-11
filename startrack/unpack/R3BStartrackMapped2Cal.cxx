@@ -351,7 +351,7 @@ void R3BStartrackMapped2Cal::FinishTask()
 // The following ordering function only works if the number of entries of the tree (input_Tree->GetEntries()) is the
 // total number of hits in the data stream and not the number of data blocks
 // void R3BStartrackMapped2Cal::InsertionSort(vector<long long> & v_ts, vector<long long> & v_index){
-void R3BStartrackMapped2Cal::InsertionSort(vector<ULong64_t>& v_ts, vector<ULong64_t>& v_index)
+void R3BStartrackMapped2Cal::InsertionSort(std::vector<ULong64_t>& v_ts, std::vector<ULong64_t>& v_index)
 {
 
     int v_n = v_ts.size();
@@ -391,9 +391,9 @@ void R3BStartrackMapped2Cal::InsertionSort(vector<ULong64_t>& v_ts, vector<ULong
 
 // The following ordering function only works if the number of entries of the tree (input_Tree->GetEntries()) is the the
 // number of data blocks and not total number of hits in the data stream
-void R3BStartrackMapped2Cal::InsertionSort2(vector<long long>& v_ts,
-                                            vector<long long>& v_block_index,
-                                            vector<long long>& v_hit_index)
+void R3BStartrackMapped2Cal::InsertionSort2(std::vector<long long>& v_ts,
+                                            std::vector<long long>& v_block_index,
+                                            std::vector<long long>& v_hit_index)
 {
 
     int v_n = v_ts.size();

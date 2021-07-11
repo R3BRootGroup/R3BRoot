@@ -25,11 +25,11 @@
 #define N_PSPX_S454 4
 
 #include "FairTask.h"
+#include "TCutG.h"
 #include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "TCutG.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -118,34 +118,16 @@ class R3BTrackS454 : public FairTask
     /**
      * Methods for setting cuts
      */
-    inline void SetCuts(Bool_t cuts)
-    {
-        fCuts = cuts;
-    }
+    inline void SetCuts(Bool_t cuts) { fCuts = cuts; }
 
-    inline void SetGraphicalCuts(Bool_t graphCuts)
-    {
-        fGraphCuts = graphCuts;
-    }
+    inline void SetGraphicalCuts(Bool_t graphCuts) { fGraphCuts = graphCuts; }
 
-    inline void SetGhost(Bool_t ghost)
-    {
-        fGhost = ghost;
-    }
+    inline void SetGhost(Bool_t ghost) { fGhost = ghost; }
 
-    inline void SetPairs(Bool_t p)
-    {
-        fPairs = p;
-    }
+    inline void SetPairs(Bool_t p) { fPairs = p; }
 
-    inline void SetBfield(Int_t B)
-    {
-        fB = B;
-    }
-    inline void SetSimu(Int_t simu)
-    {
-        fSimu = simu;
-    }
+    inline void SetBfield(Int_t B) { fB = B; }
+    inline void SetSimu(Int_t simu) { fSimu = simu; }
 
   private:
     std::vector<TClonesArray*> fMappedItems;
@@ -154,7 +136,6 @@ class R3BTrackS454 : public FairTask
     TClonesArray* fMCTrack;
     TClonesArray* fTrackItems;
     Int_t fNofTrackItems;
-
 
     enum DetectorInstances
     {
@@ -187,20 +168,20 @@ class R3BTrackS454 : public FairTask
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
-	Bool_t fCuts;
-	Bool_t fGhost;
-	Bool_t fPairs;
-	Bool_t fGraphCuts;
-	Bool_t fSimu;
-	Int_t fB;
-	Bool_t tracker = true;
-	Double_t delta;
+    Bool_t fCuts;
+    Bool_t fGhost;
+    Bool_t fPairs;
+    Bool_t fGraphCuts;
+    Bool_t fSimu;
+    Int_t fB;
+    Bool_t tracker = true;
+    Double_t delta;
 
-	TCutG *cut_fi11_fi3a;
-	TCutG *cut_fi12_fi3b;
-	TCutG *cut_Fi13vsFi11;
-	TCutG *cut_Fi10vsFi12;
-	
+    TCutG* cut_fi11_fi3a;
+    TCutG* cut_fi12_fi3b;
+    TCutG* cut_Fi13vsFi11;
+    TCutG* cut_Fi10vsFi12;
+
     unsigned long long time_start = 0, time = 0;
     unsigned long long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
@@ -214,47 +195,47 @@ class R3BTrackS454 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHes, YHes, ZHes, XCs, YCs, ZCs, THes, TCs;
-	Double_t pHexs, pHeys, pHezs, pCxs, pCys, pCzs, pHes, pCs;
-	
-	Double_t amu = 931.49410242;
-	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
-	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
-//	Double_t mHe = 4.00260325413*amu;
-//	Double_t mC = 12. * amu;
-	Double_t mHe = 3727.409;
-	Double_t mC = 11174.950;
-	
-	Int_t Q = 0;
-	Double_t tPrev[10];
-	Int_t detPrev[10];
-	
-	Int_t counter1 = 0;
-	Int_t counter2 = 0;
-	Int_t counter3 = 0;
-	Int_t counter4 = 0;
-	Int_t counterTofd = 0;
-	Int_t counterTofdMulti = 0;
-	Int_t counterCalifa = 0;
-	Int_t counterWrongTpat = 0;
-	Int_t counterWrongTrigger = 0;
-	Int_t counterRolu = 0;
-	Int_t counterTracker = 0;
-	Int_t countdet;
-	Double_t hits1 = 0;
-	Double_t hits10 = 0;
-	Double_t hits10bc = 0;
-	Double_t hits11 = 0;
-	Double_t hits11bc = 0;
-	Double_t hits12 = 0;
-	Double_t hits12bc = 0;
-	Double_t hits13 = 0;
-	Double_t hits13bc = 0;
+    Double_t XHes, YHes, ZHes, XCs, YCs, ZCs, THes, TCs;
+    Double_t pHexs, pHeys, pHezs, pCxs, pCys, pCzs, pHes, pCs;
+
+    Double_t amu = 931.49410242;
+    Double_t pHex, pHey, pHez, pCx, pCy, pCz;
+    Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
+    //	Double_t mHe = 4.00260325413*amu;
+    //	Double_t mC = 12. * amu;
+    Double_t mHe = 3727.409;
+    Double_t mC = 11174.950;
+
+    Int_t Q = 0;
+    Double_t tPrev[10];
+    Int_t detPrev[10];
+
+    Int_t counter1 = 0;
+    Int_t counter2 = 0;
+    Int_t counter3 = 0;
+    Int_t counter4 = 0;
+    Int_t counterTofd = 0;
+    Int_t counterTofdMulti = 0;
+    Int_t counterCalifa = 0;
+    Int_t counterWrongTpat = 0;
+    Int_t counterWrongTrigger = 0;
+    Int_t counterRolu = 0;
+    Int_t counterTracker = 0;
+    Int_t countdet;
+    Double_t hits1 = 0;
+    Double_t hits10 = 0;
+    Double_t hits10bc = 0;
+    Double_t hits11 = 0;
+    Double_t hits11bc = 0;
+    Double_t hits12 = 0;
+    Double_t hits12bc = 0;
+    Double_t hits13 = 0;
+    Double_t hits13bc = 0;
 
     UInt_t num_spills = 0;
 
-	Int_t ndet = 10;
-	
+    Int_t ndet = 10;
+
     TH1F* fh_Tpat;
     TH1F* fh_Trigger;
     TH1F* fh_IC;
@@ -262,7 +243,7 @@ class R3BTrackS454 : public FairTask
     TH1F* fh_TOFDOR;
 
     TH2F* fh_califa_energy;
-	
+
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
     TH1F* fh_mult_Fib[NOF_FIB_DET];
@@ -280,23 +261,23 @@ class R3BTrackS454 : public FairTask
     TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events_ac[NOF_FIB_DET];
 
-	TH2F* fh_Fib13_vs_Fib11;
-	TH2F* fh_Fib13_vs_Fib11_dx;
-	TH2F* fh_Fib11_vs_Fib3a;
-	TH2F* fh_Fib11_vs_Fib3a_dx;
-	TH2F* fh_Fib10_vs_Fib12;
-	TH2F* fh_Fib10_vs_Fib12_dx;
-	TH2F* fh_Fib12_vs_Fib3b;
-	TH2F* fh_Fib12_vs_Fib3b_dx;
+    TH2F* fh_Fib13_vs_Fib11;
+    TH2F* fh_Fib13_vs_Fib11_dx;
+    TH2F* fh_Fib11_vs_Fib3a;
+    TH2F* fh_Fib11_vs_Fib3a_dx;
+    TH2F* fh_Fib10_vs_Fib12;
+    TH2F* fh_Fib10_vs_Fib12_dx;
+    TH2F* fh_Fib12_vs_Fib3b;
+    TH2F* fh_Fib12_vs_Fib3b_dx;
 
-	TH2F* fh_Fib13_vs_Fib11_back;
-	TH2F* fh_Fib13_vs_Fib11_dx_back;
-	TH2F* fh_Fib11_vs_Fib3a_back;
-	TH2F* fh_Fib11_vs_Fib3a_dx_back;
-	TH2F* fh_Fib10_vs_Fib12_back;
-	TH2F* fh_Fib10_vs_Fib12_dx_back;
-	TH2F* fh_Fib12_vs_Fib3b_back;
-	TH2F* fh_Fib12_vs_Fib3b_dx_back;
+    TH2F* fh_Fib13_vs_Fib11_back;
+    TH2F* fh_Fib13_vs_Fib11_dx_back;
+    TH2F* fh_Fib11_vs_Fib3a_back;
+    TH2F* fh_Fib11_vs_Fib3a_dx_back;
+    TH2F* fh_Fib10_vs_Fib12_back;
+    TH2F* fh_Fib10_vs_Fib12_dx_back;
+    TH2F* fh_Fib12_vs_Fib3b_back;
+    TH2F* fh_Fib12_vs_Fib3b_dx_back;
 
     TH2F* fh_Cave_position;
 
@@ -309,8 +290,8 @@ class R3BTrackS454 : public FairTask
     TH1F* fh_TimePreviousEvent;
     TH1F* fh_tofd_mult;
     TH1F* fh_tofd_mult_ac;
-	TH2F* fh_tofd_q2_vs_q1;
-	TH2F* fh_tofd_q2_vs_q1_ac;
+    TH2F* fh_tofd_q2_vs_q1;
+    TH2F* fh_tofd_q2_vs_q1_ac;
 
     TH2F* fh_target_xy;
     TH1F* fh_target_px;
@@ -328,7 +309,6 @@ class R3BTrackS454 : public FairTask
     TH1F* fh_p_C;
 
     TH2F* fh_chiy_vs_chix;
-    
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -346,18 +326,18 @@ class R3BTrackS454 : public FairTask
     TH2F* fh_thetay_dpx;
     TH2F* fh_dpy_dpx;
 
-	TH1F* fh_theta26_simu;
-	TH1F* fh_Erel_simu;
-	TH1F* fh_theta26;
-	TH1F* fh_Erel;
+    TH1F* fh_theta26_simu;
+    TH1F* fh_Erel_simu;
+    TH1F* fh_theta26;
+    TH1F* fh_Erel;
 
-	TH2F* fh_dErel_vs_x;
-	TH2F* fh_dErel_vs_y;
-	
-	TH2F* fh_xy[10];
-	TH2F* fh_p_vs_x[10];
-	TH2F* fh_p_vs_x_test[10];
-	
+    TH2F* fh_dErel_vs_x;
+    TH2F* fh_dErel_vs_y;
+
+    TH2F* fh_xy[10];
+    TH2F* fh_p_vs_x[10];
+    TH2F* fh_p_vs_x_test[10];
+
   public:
     ClassDef(R3BTrackS454, 1)
 };

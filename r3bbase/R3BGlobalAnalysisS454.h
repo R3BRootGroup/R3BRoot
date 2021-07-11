@@ -92,7 +92,6 @@ class R3BGlobalAnalysisS454 : public FairTask
      */
     virtual void FinishTask();
 
-
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
@@ -112,25 +111,13 @@ class R3BGlobalAnalysisS454 : public FairTask
     /**
      * Methods for setting cuts
      */
-    inline void SetCuts(Bool_t cuts)
-    {
-        fCuts = cuts;
-    }
+    inline void SetCuts(Bool_t cuts) { fCuts = cuts; }
 
-    inline void SetGhost(Bool_t ghost)
-    {
-        fGhost = ghost;
-    }
+    inline void SetGhost(Bool_t ghost) { fGhost = ghost; }
 
-    inline void SetPairs(Bool_t p)
-    {
-        fPairs = p;
-    }
+    inline void SetPairs(Bool_t p) { fPairs = p; }
 
-    inline void SetBfield(Int_t B)
-    {
-        fB = B;
-    }
+    inline void SetBfield(Int_t B) { fB = B; }
 
   private:
     std::vector<TClonesArray*> fMappedItems;
@@ -139,17 +126,16 @@ class R3BGlobalAnalysisS454 : public FairTask
     TClonesArray* fMCTrack;
     TClonesArray* fTrack;
 
-
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
-	Bool_t fCuts;
-	Bool_t fGhost;
-	Bool_t fPairs;
-	Int_t fB;
-	Bool_t tracker = true;
-	
+    Bool_t fCuts;
+    Bool_t fGhost;
+    Bool_t fPairs;
+    Int_t fB;
+    Bool_t tracker = true;
+
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
@@ -163,31 +149,31 @@ class R3BGlobalAnalysisS454 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;	
-	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
-	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
+    Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;
+    Double_t pHex, pHey, pHez, pCx, pCy, pCz;
+    Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
 
-	Double_t amu = 931.49410242;
-//	Double_t mHe = 4.00260325413*amu;
-//	Double_t mC = 12. * amu;
-	Double_t mHe = 3727.409;
-	Double_t mC = 11174.950;
-	Double_t mO = 15.99065084 * amu;
-	
+    Double_t amu = 931.49410242;
+    //	Double_t mHe = 4.00260325413*amu;
+    //	Double_t mC = 12. * amu;
+    Double_t mHe = 3727.409;
+    Double_t mC = 11174.950;
+    Double_t mO = 15.99065084 * amu;
+
     TLorentzVector alpha, carbon, oxygen;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector photon;
 
-	Int_t Q = 0;
-	Double_t tPrev[10];
-	Int_t detPrev[10];
-	
-	Int_t counter1 = 0;
-	Int_t counter2 = 0;
-	Int_t counter3 = 0;
-	Int_t counter4 = 0;
-	Int_t countdet;
-	
+    Int_t Q = 0;
+    Double_t tPrev[10];
+    Int_t detPrev[10];
+
+    Int_t counter1 = 0;
+    Int_t counter2 = 0;
+    Int_t counter3 = 0;
+    Int_t counter4 = 0;
+    Int_t countdet;
+
     UInt_t num_spills = 0;
 
     TH1F* fh_Tpat;
@@ -213,7 +199,6 @@ class R3BGlobalAnalysisS454 : public FairTask
 
     TH2F* fh_chiy_vs_chix_He;
     TH2F* fh_chiy_vs_chix_C;
-    
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -236,30 +221,29 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH2F* fh_px_px;
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
-    
 
-	TH1F* fh_theta26_simu;
-	TH1F* fh_Erel_simu;
-	TH1F* fh_theta26;
-	TH1F* fh_theta_16O;	
-	TH1F* fh_phi_16O;	
-	TH1F* fh_theta26_cm;	
-	TH1F* fh_phi26_cm;
-	TH1F* fh_theta_4He_cm;
-	TH1F* fh_phi_4He_cm;
-	TH1F* fh_phi_bc_cm;
-	TH1F* fh_theta_bc_cm;
-	TH1F* fh_theta_12C_cm;
-	TH1F* fh_phi_12C_cm;
-	TH1F* fh_Erel;
-	TH1F* fh_ErelL;
-	TH1F* fh_ErelR;
-	TH1F* fh_ErelB;
-	TH2F* fh_phi_bc_cm_polar;
+    TH1F* fh_theta26_simu;
+    TH1F* fh_Erel_simu;
+    TH1F* fh_theta26;
+    TH1F* fh_theta_16O;
+    TH1F* fh_phi_16O;
+    TH1F* fh_theta26_cm;
+    TH1F* fh_phi26_cm;
+    TH1F* fh_theta_4He_cm;
+    TH1F* fh_phi_4He_cm;
+    TH1F* fh_phi_bc_cm;
+    TH1F* fh_theta_bc_cm;
+    TH1F* fh_theta_12C_cm;
+    TH1F* fh_phi_12C_cm;
+    TH1F* fh_Erel;
+    TH1F* fh_ErelL;
+    TH1F* fh_ErelR;
+    TH1F* fh_ErelB;
+    TH2F* fh_phi_bc_cm_polar;
 
-	TH2F* fh_dErel_vs_x;
-	TH2F* fh_dErel_vs_y;
-	
+    TH2F* fh_dErel_vs_x;
+    TH2F* fh_dErel_vs_y;
+
   public:
     ClassDef(R3BGlobalAnalysisS454, 1)
 };

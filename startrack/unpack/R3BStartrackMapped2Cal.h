@@ -25,6 +25,7 @@
 // ROOt headers:
 #include "TGraph.h"
 #include "TH2F.h"
+#include <vector>
 
 #include "FairTask.h"
 #include "R3BStartrackMapped2CalPar.h"
@@ -120,10 +121,10 @@ class R3BStartrackMapped2Cal : public FairTask
     // virtual void InsertionSort(vector<long long> & v_ts, vector<long long> & v_index);
     // virtual void InsertionSort2(vector<long long> & v_ts, vector<long long> & v_block_index, vector<long long> &
     // v_hit_index);
-    virtual void InsertionSort(vector<ULong64_t>& v_ts, vector<ULong64_t>& v_index);
-    virtual void InsertionSort2(vector<long long>& v_ts,
-                                vector<long long>& v_block_index,
-                                vector<long long>& v_hit_index);
+    virtual void InsertionSort(std::vector<ULong64_t>& v_ts, std::vector<ULong64_t>& v_index);
+    virtual void InsertionSort2(std::vector<long long>& v_ts,
+                                std::vector<long long>& v_block_index,
+                                std::vector<long long>& v_hit_index);
 
   private:
     // check for trigger should be done globablly (somewhere else)
