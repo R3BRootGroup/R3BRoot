@@ -688,7 +688,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
 
                 for(Int_t e=0; e<event.size(); e++)
                 {
-                    cout<<event[e].charge<<" "<<
+                    LOG(DEBUG)<<event[e].charge<<" "<<
                     event[e].time<<" "<<
                     event[e].xpos<<" "<<
                     event[e].ypos<<" "<<
@@ -727,7 +727,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             {
                 bars_with_multihit++;
                 multihit += vmultihits[i][j] - 1;
-                cout<<vmultihits[i][j] - 1<<"\n";
+                //if(vmultihits[i][j]>3)cout<<vmultihits[i][j] - 1<<"\n";
             }
         }
     }
@@ -819,12 +819,12 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 {
                     if (accumulate(goodplane.begin(),goodplane.end(),0) == 6.)
                     {
-                        LOG(ERROR)<<"Found good pair 2 times in all planes";
+                        LOG(DEBUG)<<"Found good pair 2 times in all planes";
                         for (Int_t g = 0; g < goodcharge.size(); g++)
                         {
-                            LOG(ERROR)<<goodcharge.at(g);
-                            LOG(ERROR)<<goodplane.at(g);
-                            LOG(ERROR)<<goodbar.at(g);
+                            LOG(DEBUG)<<goodcharge.at(g);
+                            LOG(DEBUG)<<goodplane.at(g);
+                            LOG(DEBUG)<<goodbar.at(g);
                             goodevents.push_back({goodcharge.at(g),goodplane.at(g),goodbar.at(g)});
                         }
                         goodpair++;
@@ -877,7 +877,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                     LOG(DEBUG)<<"Found good pair in different planes";
                     for (Int_t g = 0; g < goodcharge.size(); g++)
                     {
-                        cout<<goodcharge.at(g);
+                        LOG(DEBUG)<<goodcharge.at(g);
                     }
                     goodpair++;
                     goodpair2++;
@@ -887,9 +887,9 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
         std::sort(goodevents.begin(), goodevents.end(), [](goodhit const &a, goodhit const &b) { return a.goodq < b.goodq; });
         for (Int_t g = 0; g < goodevents.size(); g++)
         {
-            LOG(ERROR)<<goodevents[g].goodq;
-            LOG(ERROR)<<goodevents[g].goodp;
-            LOG(ERROR)<<goodevents[g].goodb;
+            LOG(DEBUG)<<goodevents[g].goodq;
+            LOG(DEBUG)<<goodevents[g].goodp;
+            LOG(DEBUG)<<goodevents[g].goodb;
         }
     }
 
