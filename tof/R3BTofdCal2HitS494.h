@@ -166,11 +166,13 @@ class R3BTofdCal2HitS494 : public FairTask
     Bool_t fTofdHisto;
     Bool_t fTofdTotPos;
     UInt_t fnEvents;
+    UInt_t lasttpatevent=0;
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
     UInt_t maxevent;
     UInt_t wrongtrigger;
     UInt_t wrongtpat;
+    UInt_t notpat;
     UInt_t headertpat;
     UInt_t events_in_cal_level;
     UInt_t inbarcoincidence;
@@ -179,9 +181,18 @@ class R3BTofdCal2HitS494 : public FairTask
     UInt_t multihit;
     UInt_t bars_with_multihit;
     UInt_t events_wo_tofd_hits;
+    UInt_t goodpair=0;
+    UInt_t goodpair4=0;
+    UInt_t goodpair3=0;
+    UInt_t goodpair1=0;
+    UInt_t goodpair2=0;
+    UInt_t goodpair5=0;
+    UInt_t goodpair6=0;
+    UInt_t goodpair7=0;
 
     // arrays of control histograms
     TH1F* fhTpat;
+    TH1F* fhNoTpat;
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     // TH2F* fhQvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     // TH2F* fhTvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
