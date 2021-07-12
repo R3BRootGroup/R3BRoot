@@ -374,7 +374,6 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     if (nHits == 0)
         events_wo_tofd_hits++;
 
-    Int_t nHitsEvent = 0;
     // Organize cals into bars.
     struct Entry
     {
@@ -519,7 +518,6 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
 
-                nHitsEvent += 1;
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
@@ -719,10 +717,10 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
+    LOG(DEBUG) << "Hits in this event: " << event.size();
 
-    Bool_t tArrU[nHitsEvent + 1];
-    for (int i = 0; i < (nHitsEvent + 1); i++) tArrU[i] = kFALSE;
+    Bool_t tArrU[event.size() + 1];
+    for (int i = 0; i < (event.size() + 1); i++) tArrU[i] = kFALSE;
 
     for (Int_t i = 1; i <= fNofPlanes; i++)
     {

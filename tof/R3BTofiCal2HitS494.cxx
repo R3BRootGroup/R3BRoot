@@ -330,7 +330,6 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     std::vector<hit> event;
     
     Int_t nHits = fCalItems->GetEntries();
-    Int_t nHitsEvent = 0;
     // Organize cals into bars.
     struct Entry
     {
@@ -482,7 +481,6 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
 
-                nHitsEvent += 1;
                 R3BTofiHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
@@ -699,13 +697,13 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
-    if (nHitsEvent == 0)
+    LOG(DEBUG) << "Hits in this event: " << event.size();
+    if (event.empty())
         events_wo_tofi_hits++;
 
     // init arrays to store hits
-    Bool_t tArrU[nHitsEvent + 1];
-    for (int i = 0; i < (nHitsEvent + 1); i++) tArrU[i] = kFALSE;
+    Bool_t tArrU[event.size() + 1];
+    for (int i = 0; i < (event.size() + 1); i++) tArrU[i] = kFALSE;
 
     for (Int_t i = 1; i <= fNofPlanes; i++)
     {
