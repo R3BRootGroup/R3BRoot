@@ -202,6 +202,7 @@ class R3BTofdCal2HitS494 : public FairTask
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQ0Qt[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTvsQ[N_TOFD_HIT_PLANE_MAX];
 
   public:
     ClassDef(R3BTofdCal2HitS494, 1)
