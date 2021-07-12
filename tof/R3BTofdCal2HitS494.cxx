@@ -1253,21 +1253,4 @@ Double_t R3BTofdCal2HitS494::saturation(Double_t x)
     return kor;
 }
 
-Double_t* R3BTofdCal2HitS494::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
-{
-    Int_t i;
-
-    // increase the size by 1
-    n++;
-
-    // shift elements forward
-    for (i = n; i >= pos; i--)
-        arr[i] = arr[i - 1];
-
-    // insert x at pos
-    arr[pos - 1] = x;
-
-    return arr;
-}
-
 ClassImp(R3BTofdCal2HitS494)

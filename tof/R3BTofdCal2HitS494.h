@@ -130,10 +130,6 @@ class R3BTofdCal2HitS494 : public FairTask
      * Method for calculation of saturation.
      */
     virtual Double_t saturation(Double_t x);
-    /**
-     * Method for insert.
-     */
-    virtual Double_t* insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos);
 
     /**
      * Method for selecting events with certain trigger value.
