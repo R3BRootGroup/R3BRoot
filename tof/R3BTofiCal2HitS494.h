@@ -136,11 +136,6 @@ class R3BTofiCal2HitS494 : public FairTask
      */
     virtual Double_t saturation(Double_t x);
     /**
-     * Method for insert.
-     */
-    virtual Double_t* insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos);
-
-    /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */

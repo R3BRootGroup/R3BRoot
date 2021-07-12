@@ -308,32 +308,27 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     headertpat++;
     Double_t timeP0 = 0.;
     Double_t randx;
-    std::vector<std::vector<std::vector<Double_t>>> q;
-    std::vector<std::vector<std::vector<Double_t>>> thit;
-    std::vector<std::vector<std::vector<Double_t>>> x;
-    std::vector<std::vector<std::vector<Double_t>>> y;
-    std::vector<std::vector<std::vector<Double_t>>> yToT;
+
     UInt_t vmultihits[N_TOFI_HIT_PLANE_MAX + 1][N_TOFI_HIT_PADDLE_MAX + 1];
     for (Int_t i = 0; i <= fNofPlanes; i++)
     {
-        q.push_back(std::vector<std::vector<Double_t>>());
-        thit.push_back(std::vector<std::vector<Double_t>>());
-        x.push_back(std::vector<std::vector<Double_t>>());
-        y.push_back(std::vector<std::vector<Double_t>>());
-        yToT.push_back(std::vector<std::vector<Double_t>>());
         for (Int_t j = 0; j <= N_TOFI_HIT_PADDLE_MAX; j++)
         {
             vmultihits[i][j] = 0;
-            q[i].push_back(std::vector<Double_t>());
-            thit[i].push_back(std::vector<Double_t>());
-            x[i].push_back(std::vector<Double_t>());
-            y[i].push_back(std::vector<Double_t>());
-            yToT[i].push_back(std::vector<Double_t>());
         }
     }
+    struct hit {
+        Double_t charge;
+        Double_t time;
+        Double_t xpos;
+        Double_t ypos;
+        Int_t plane;
+        Int_t bar;
+    };
 
     //    std::cout<<"new event!*************************************\n";
-
+    std::vector<hit> event;
+    
     Int_t nHits = fCalItems->GetEntries();
     Int_t nHitsEvent = 0;
     // Organize cals into bars.
@@ -525,16 +520,12 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (timeP0 == 0.)
                     timeP0 = THit;
 
-                thit[iPlane][iBar].push_back(THit);
-
                 // calculate y-position
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-                y[iPlane][iBar].push_back(pos);
 
                 // calculate y-position from ToT
                 auto posToT =
                     par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
-                yToT[iPlane][iBar].push_back(posToT);
 
                 // cout << posToT << endl;
                 // cout << top-> GetBarId() << "  pos  " << posToT << "   Lambda:   " << par->GetLambda()  << ",  top
@@ -560,29 +551,30 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
                 // calculate x-position
                 randx = (std::rand() / (float)RAND_MAX);
+                Double_t xp=-1000.;
                 if (iPlane == 1 || iPlane == 3)
                 {
                     //	-detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
                     //                            (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
 
                     if (iBar <= number_paddles / 2)
-                        x[iPlane][iBar].push_back(-detector_width / 2 + paddle_width / 2 +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles));
+                        xp = -detector_width / 2 + paddle_width / 2 +
+                                                  (iBar - 1) * (paddle_width + air_gap_paddles);
                     else
-                        x[iPlane][iBar].push_back(-detector_width / 2 + paddle_width / 2 - air_gap_paddles +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer);
+                        xp = -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
+                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
                 }
                 if (iPlane == 2 || iPlane == 4)
                 {
                     if (iBar <= number_paddles / 2)
-                        x[iPlane][iBar].push_back(-detector_width / 2 + paddle_width +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles));
+                        xp = -detector_width / 2 + paddle_width +
+                                                  (iBar - 1) * (paddle_width + air_gap_paddles);
                     else
-                        x[iPlane][iBar].push_back(-detector_width / 2 + paddle_width - air_gap_paddles +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer);
+                        xp = -detector_width / 2 + paddle_width - air_gap_paddles +
+                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
                 }
-                Double_t para[4];
 
+                Double_t para[4];
                 Double_t qb = 0.;
                 if (fTofiTotPos)
                 {
@@ -632,12 +624,12 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                         LOG(DEBUG) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 +
                                           (iBar - 1) * (paddle_width + air_gap_paddles)
-                                   << " ibar " << iBar;
+                                   << " plane " << iPlane << " ibar " << iBar;
                     else
                         LOG(DEBUG) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
-                                   << " ibar " << iBar;
+                                   << " plane " << iPlane << " ibar " << iBar;
                 }
                 if (iPlane == 2 || iPlane == 4)
                 {
@@ -655,14 +647,28 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
-                    q[iPlane][iBar].push_back(parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                   event.push_back({
+                       parz[0] * TMath::Power(qb, parz[2]) + parz[1],
+                       THit,
+                       xp,
+                       pos,
+                       iPlane,
+                       iBar
+                       });
                 }
                 else
                 {
-                    q[iPlane][iBar].push_back(qb);
                     parz[0] = 1.;
                     parz[1] = 0.;
                     parz[2] = 1.;
+                    event.push_back({
+                        qb,
+                        THit,
+                        xp,
+                        pos,
+                        iPlane,
+                        iBar
+                        });
                 }
 
                 if (fTofiHisto)
@@ -698,25 +704,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         events_wo_tofi_hits++;
 
     // init arrays to store hits
-    Double_t tArrQ[nHitsEvent + 1];
-    Double_t tArrT[nHitsEvent + 1];
-    Double_t tArrX[nHitsEvent + 1];
-    Double_t tArrY[nHitsEvent + 1];
-    Double_t tArrYT[nHitsEvent + 1];
-    Double_t tArrP[nHitsEvent + 1];
-    Double_t tArrB[nHitsEvent + 1];
     Bool_t tArrU[nHitsEvent + 1];
-    for (int i = 0; i < (nHitsEvent + 1); i++)
-    {
-        tArrQ[i] = -1.;
-        tArrT[i] = -1.;
-        tArrX[i] = -1.;
-        tArrY[i] = -1.;
-        tArrYT[i] = -1.;
-        tArrP[i] = -1.;
-        tArrB[i] = -1.;
-        tArrU[i] = kFALSE;
-    }
+    for (int i = 0; i < (nHitsEvent + 1); i++) tArrU[i] = kFALSE;
 
     for (Int_t i = 1; i <= fNofPlanes; i++)
     {
@@ -730,159 +719,55 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         }
     }
 
-    // sort hits for time
-    for (Int_t i = 1; i <= fNofPlanes; i++)
-    { // loop over planes i
-        for (Int_t j = 1; j < fPaddlesPerPlane + 1; j++)
-        { // loop over virtual paddles j
-            if (thit[i][j].empty() == false)
-            { // check paddle for entries
-                for (Int_t m = 0; m < thit[i][j].size(); m++)
-                { // loop over multihits m
-                    Int_t p = 0;
-                    if (tArrT[0] == -1.)
-                    { // first entry
-                        LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
-                        tArrQ[0] = q[i][j].at(m);
-                        tArrT[0] = thit[i][j].at(m);
-                        tArrX[0] = x[i][j].at(m);
-                        tArrY[0] = y[i][j].at(m);
-                        tArrYT[0] = yToT[i][j].at(m);
-                        tArrP[0] = i;
-                        tArrB[0] = j;
-                    }
-                    else
-                    {
-                        if (thit[i][j].at(m) < tArrT[0])
-                        { // new first entry with smaller time
-                            LOG(DEBUG) << "Insert new first " << i << "/" << j;
-                            insertX(nHitsEvent, tArrQ, q[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrT, thit[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrX, x[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrY, y[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrP, i, 1);
-                            insertX(nHitsEvent, tArrB, j, 1);
-                        }
-                        else
-                        {
-                            while (thit[i][j].at(m) > tArrT[p] && tArrT[p] != -1.)
-                            {
-                                p++; // find insert position
-                                if (p > nHitsEvent + 1)
-                                    LOG(FATAL) << "Insert position oor"; // should not happen
-                            }
-
-                            LOG(DEBUG) << "Will insert at " << p;
-                            if (p > 0 && thit[i][j].at(m) > tArrT[p - 1] && thit[i][j].at(m) != tArrT[p])
-                            { // insert at right position
-                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
-                                insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrP, i, p + 1);
-                                insertX(nHitsEvent, tArrB, j, p + 1);
-                            }
-                            else
-                            {
-
-                                LOG(ERROR) << "Insert event with exact same time " << fnEvents;
-                                p = p + 1;
-                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
-                                insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrP, i, p + 1);
-                                insertX(nHitsEvent, tArrB, j, p + 1);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    std::sort(event.begin(), event.end(), [](hit const &a, hit const &b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    // print events
-    std::stringstream ss;
-    ss << "Time sorted hits:\n [CHARGE] ";
-    if (tArrT[0] != -1.)
+    LOG(DEBUG)<<"Charge Time xpos ypos plane bar";
+    for(Int_t hit=0; hit<event.size(); hit++)
     {
-        for (Int_t a = 0; a < nHitsEvent; a++)
-            ss << tArrQ[a] << " ";
-        ss << "\n [TIME] ";
-        for (Int_t a = 0; a < nHitsEvent; a++)
-            ss << tArrT[a] << " ";
-        ss << "\n [XPOS] ";
-        for (Int_t a = 0; a < nHitsEvent; a++)
-            ss << tArrX[a] << " ";
-        ss << "\n [YPOS] ";
-        for (Int_t a = 0; a < nHitsEvent; a++)
-        {
-            if (fTofiTotPos)
-                ss << tArrYT[a] << " ";
-            else
-                ss << tArrY[a] << " ";
-        }
-        ss << "\n [PLANE] ";
-        for (Int_t a = 0; a < nHitsEvent; a++)
-            ss << tArrP[a] << " ";
-        ss << "\n [BAR] ";
-        for (Int_t a = 0; a < nHitsEvent; a++)
-            ss << tArrB[a] << " ";
+        LOG(DEBUG)<<event[hit].charge<<" "<<
+        event[hit].time<<" "<<
+        event[hit].xpos<<" "<<
+        event[hit].ypos<<" "<<
+        event[hit].plane<<" "<<
+        event[hit].bar;
     }
-    LOG(DEBUG) << ss.str() << "\n";
 
     // Now we can analyze the hits in this event
 
     if (fTofiHisto)
     {
-        for (Int_t a = 0; a < nHitsEvent; a++)
+        size_t ihit=0;
+        for (; ihit < event.size();)
         { // loop over all hits
             eventstore++;
-            fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
-            fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
-            if (fTofiTotPos)
-            {
-                fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrYT[a]); // xy of plane
-                // std::cout<<"Use ToT y Position\n";
-            }
-            else
-            {
-                fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrY[a]); // xy of plane
-                // std::cout<<"Use DEXP y Position\n";
-            }
+            fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge);        // charge per plane
+            fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge); // charge vs event #
+            fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos); // xy of plane
         }
     }
 
-    for (Int_t hit = 0; hit < nHitsEvent; hit++)
+    for (Int_t hit = 0; hit < event.size(); hit++)
     { // loop over hits
         if (tArrU[hit] == false)
         {
-            LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = true;
             // store single hits
             singlehit++;
-            if (fTofiTotPos)
-            {
-                new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
-                    tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
-            }
-            else
-            {
-                new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
-                    tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
-            }
+            new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
+                    event[hit].time,
+                    event[hit].xpos,
+                    event[hit].ypos,
+                    event[hit].charge,
+                    -1.,
+                    event[hit].charge,
+                    event[hit].plane,
+                    event[hit].bar);
         }
     }
 
     LOG(DEBUG) << "Used up hits in this event:";
-    for (Int_t a = 0; a < nHitsEvent; a++)
+    for (Int_t a = 0; a < event.size(); a++)
     {
         LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
@@ -1177,23 +1062,6 @@ Double_t R3BTofiCal2HitS494::saturation(Double_t x)
         }
     }
     return kor;
-}
-
-Double_t* R3BTofiCal2HitS494::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
-{
-    Int_t i;
-
-    // increase the size by 1
-    n++;
-
-    // shift elements forward
-    for (i = n; i >= pos; i--)
-        arr[i] = arr[i - 1];
-
-    // insert x at pos
-    arr[pos - 1] = x;
-
-    return arr;
 }
 
 ClassImp(R3BTofiCal2HitS494)
