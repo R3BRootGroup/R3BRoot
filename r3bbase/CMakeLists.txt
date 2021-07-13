@@ -23,8 +23,7 @@ Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
-${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
@@ -52,7 +51,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
-${R3BROOT_SOURCE_DIR}/tracker_rene
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -65,19 +63,6 @@ R3BModule.cxx
 R3BDetector.cxx 
 R3BEventHeader.cxx
 R3BEventHeaderCal2Hit.cxx
-R3BOnlineSpectra.cxx
-R3BOnlineSpectraDec2019.cxx
-R3BOnlineSpectraPdc.cxx
-R3BOnlineSpectraSfib.cxx
-R3BGlobalAnalysis.cxx
-R3BGlobalAnalysisS454.cxx
-R3BTrackS454.cxx
-R3BTrackerTestS454.cxx
-R3BOnlineSpillAnalysis.cxx
-R3BOnlineSpectraFiberTofds515.cxx
-R3BOnlineSpectraLosStandalone.cxx
-R3BOnlineSpectraSci2.cxx
-R3BOnlineSpectraLosVsSci2.cxx
 R3BWhiterabbitPropagator.cxx
 R3BFileSource.cxx
 )
@@ -89,7 +74,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF R3BLinkDef.h)
 
 Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene)
+    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
 
 Set(LIBRARY_NAME R3Bbase)
 

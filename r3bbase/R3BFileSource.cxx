@@ -465,7 +465,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     UInt_t fArraysize = fTimestamp.size();
     if (fArraysize != fRunid.size())
     {
-        LOG(ERROR) << "R3BFileSource::GetRunid() Different number of RunIds and timestamps";
+        LOG(ERROR) << "\033[5m\033[31m R3BFileSource::GetRunid() Different number of RunIds and timestamps \033[0m";
         prevts = -1;
         nextts = -1;
         return 1;
@@ -489,7 +489,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     }
 
     if (nextts > 0)
-        LOG(WARNING) << "R3BFileSource::GetRunid() RunId was not found, it will be 1";
+        LOG(WARNING) << "\033[5m\033[33m R3BFileSource::GetRunid() RunId was not found, it will be 1 \033[0m";
     prevts = -1;
     nextts = -1;
 
@@ -505,8 +505,9 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
      ** std::cout << fEvtHeader->GetTimeStamp() << std::endl;
      **/
 
-    printf("Processed: %d of %d (%.2f of 100), current RunId %d \r",
-           i,
+    printf("Processed: \033[32m %d \033[0m of \033[34m %d \033[0m (\033[33m %.2f \033[0m of 100), current RunId "
+           "\033[31m %d \033[0m \r",
+           i + 1,
            fNoOfEntries,
            100. * i / (double)(fNoOfEntries),
            fRunId);

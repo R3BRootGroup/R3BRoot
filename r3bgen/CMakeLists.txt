@@ -63,7 +63,9 @@ set(SRCS
     R3BDistribution3D.cxx
     R3Bp2pevtGenerator.cxx
     R3BParticleSelector.cxx
-    R3BBeamProperties.cxx)
+    R3BBeamProperties.cxx
+    R3BINCLRootGenerator.cxx
+    )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
