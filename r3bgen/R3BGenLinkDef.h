@@ -13,8 +13,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
-
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -37,11 +35,12 @@
 #pragma link C++ class  R3BIonGenerator+;
 #pragma link C++ class  R3BGammaGenerator+;
 #pragma link C++ class  R3BPhaseSpaceGenerator+;
-#pragma link C++ class 	R3Bp2pevtGenerator+;
-#pragma link C++ class 	R3BDistribution1D+;
-#pragma link C++ class 	R3BDistribution2D+;
-#pragma link C++ class 	R3BDistribution3D+;
+#pragma link C++ class  R3Bp2pevtGenerator+;
+#pragma link C++ class  R3BDistribution1D+;
+#pragma link C++ class  R3BDistribution2D+;
+#pragma link C++ class  R3BDistribution3D+;
 #pragma link C++ class  R3BParticleSelector+;
 #pragma link C++ class  R3BBeamProperties+;
+#pragma link C++ class  R3BINCLRootGenerator+;
 
 #endif
