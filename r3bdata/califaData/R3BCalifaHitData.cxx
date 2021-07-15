@@ -13,12 +13,6 @@
 
 #include "R3BCalifaHitData.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
-
 R3BCalifaHitData::R3BCalifaHitData()
     : FairMultiLinkedData()
     , fNbOfCrystalHits(0)
@@ -59,13 +53,4 @@ R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
 {
 }
 
-R3BCalifaHitData::~R3BCalifaHitData() {}
-
-void R3BCalifaHitData::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BCalifaHitData: a CALIFA Hit made of " << fNbOfCrystalHits << " crystalHits. Energy = " << fEnergy
-         << " GeV" << endl;
-    cout << "    Theta(polar) " << fTheta << " deg  " << endl;
-    cout << "    Phi(azimuthal) " << fPhi << " deg  " << endl;
-}
-// -------------------------------------------------------------------------
+ClassImp(R3BCalifaHitData);

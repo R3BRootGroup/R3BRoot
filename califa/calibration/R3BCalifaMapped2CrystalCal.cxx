@@ -58,7 +58,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened!";
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened";
     }
 
     fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
@@ -111,26 +111,22 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        LOG(FATAL) << "R3BCalifaMapped2CrystalCal::FairRootManager not found";
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
+        LOG(FATAL) << "R3BCalifaMapped2CrystalCal::CalifaMappedData not found";
         return kFATAL;
     }
 
     // OUTPUT DATA
     // Calibrated data
     fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData", 50);
-    if (!fOnline)
-    {
-        rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
-    }
-    else
-    {
-        rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kFALSE);
-    }
+
+    rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, !fOnline);
 
     SetParameter();
     return kSUCCESS;
@@ -139,6 +135,7 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
 InitStatus R3BCalifaMapped2CrystalCal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -149,7 +146,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 
     if (!fCal_Par)
     {
-        LOG(WARNING) << "R3BCalifaMapped2CrystalCal::NO Container Parameter!!";
+        LOG(WARNING) << "R3BCalifaMapped2CrystalCal::Parameter container not found";
     }
 
     // Reading the Input -- Mapped Data --
@@ -183,16 +180,16 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     //   b      QPID Nf     Nf
 
     //   c      QPID Ns     Ns
-    const uint16_t ANY_ERRORS = 0x061e;
-    const uint16_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
-    const uint16_t EN_ERRORS = 0x0020 | ANY_ERRORS;
+    const uint32_t ANY_ERRORS = 0x061e;
+    const uint32_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
+    const uint32_t EN_ERRORS = 0x0020 | ANY_ERRORS;
 
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
         auto crystalId = mappedData[i]->GetCrystalId();
-        auto Time = mappedData[i]->GetTime();
-        auto Erro = mappedData[i]->GetError();
+        auto wrts = mappedData[i]->GetWrts();
+        auto ov = mappedData[i]->GetOverFlow();
         auto Tot = mappedData[i]->GetTot();
         auto validate_smear = [](uint16_t err_cond, double raw) {
             return err_cond ? NAN : raw + gRandom->Rndm() - 0.5;
@@ -204,9 +201,9 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             Ns = 2
         };
         double raw[3];
-        raw[en] = validate_smear(Erro & EN_ERRORS, mappedData[i]->GetEnergy());
-        raw[Nf] = validate_smear(Erro & QPID_ERRORS, mappedData[i]->GetNf());
-        raw[Ns] = validate_smear(Erro & QPID_ERRORS, mappedData[i]->GetNs());
+        raw[en] = validate_smear(ov & EN_ERRORS, mappedData[i]->GetEnergy());
+        raw[Nf] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNf());
+        raw[Ns] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNs());
         double cal[3] = { 0, 0, 0 };
 
         if (0 < crystalId && crystalId <= NumCrystals)
@@ -227,7 +224,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             double a1 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1) + 1);
             TotCal = a0 * TMath::Exp(Tot / a1);
         }
-        AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], Time, TotCal);
+        AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);
     }
 
     if (mappedData)
@@ -248,13 +245,13 @@ R3BCalifaCrystalCalData* R3BCalifaMapped2CrystalCal::AddCalData(Int_t id,
                                                                 Double_t energy,
                                                                 Double_t Nf,
                                                                 Double_t Ns,
-                                                                ULong64_t time,
+                                                                uint64_t wrts,
                                                                 Double_t tot_energy = 0)
 {
     // It fills the R3BCalifaCrystalCalData
     TClonesArray& clref = *fCalifaCryCalDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BCalifaCrystalCalData(id, energy, Nf, Ns, time, tot_energy);
+    return new (clref[size]) R3BCalifaCrystalCalData(id, energy, Nf, Ns, wrts, tot_energy);
 }
 
 ClassImp(R3BCalifaMapped2CrystalCal)

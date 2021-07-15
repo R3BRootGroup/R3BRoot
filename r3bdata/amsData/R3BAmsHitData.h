@@ -60,7 +60,7 @@ class R3BAmsHitData : public FairMultiLinkedData
     R3BAmsHitData& operator=(const R3BAmsHitData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BAmsHitData();
+    virtual ~R3BAmsHitData() {}
 
     /** Accessors **/
     inline const Int_t& GetDetId() const { return fDetId; }
@@ -76,9 +76,6 @@ class R3BAmsHitData : public FairMultiLinkedData
     inline const TVector3 GetPosLab() const { return fmaster; }
     inline const Double_t& GetEnergyS() const { return fEnergyS; }
     inline const Double_t& GetEnergyK() const { return fEnergyK; }
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Int_t fDetId;

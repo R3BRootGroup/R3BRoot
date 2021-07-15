@@ -16,7 +16,6 @@
 
 #include "FairTask.h"
 #include "TCanvas.h"
-#include "THStack.h"
 #include "TMath.h"
 #include <array>
 #include <cstdlib>
@@ -32,6 +31,7 @@
 class TClonesArray;
 class R3BCalifaMappingPar;
 class TH1F;
+class TH1I;
 class TH2F;
 class R3BEventHeader;
 
@@ -217,12 +217,11 @@ class R3BCalifaOnlineSpectra : public FairTask
 
     // WR data
     TCanvas* cCalifa_wr;
-    TH1F* fh1_Califa_wr;
+    TH1I* fh1_Califa_wr;
     TCanvas* cWrs;
-    TH1F* fh1_wrs[2];
+    TH1I* fh1_wrs[2];
     TCanvas* cCalifa_sync;
     TH1F* fh1_Califa_sync[3];
-    THStack* stack_wrs;
     TCanvas* cCalifa_wr_energy;
 
     // Histograms

@@ -36,4 +36,4 @@ R3BAmsMappedData::R3BAmsMappedData(Int_t detId, Int_t stripId, Int_t energy)
 {
 }
 
-ClassImp(R3BAmsMappedData)
+ClassImp(R3BAmsMappedData);

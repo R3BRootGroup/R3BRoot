@@ -13,6 +13,7 @@
 
 #ifndef R3BCALIFAMAPPEDDATA_H
 #define R3BCALIFAMAPPEDDATA_H
+
 #include "TObject.h"
 #include <stdint.h>
 
@@ -28,31 +29,50 @@ class R3BCalifaMappedData : public TObject
      *@param energy      Total energy deposited in the crystal [GeV]
      *@param nf          Total fast amplitude deposited in the crystal [a.u.]
      *@param ns          Total slow amplitude deposited on the crystal [a.u.]
-     *@param time        Time since event start [ns]
-     *@param tot         Time over threshold
+     *@param febextime   Internal febex time per crystal [ns]
+     *@param wrts        Timestamp per crystal or time since event start in simulation [ns]
+     *@param ov          Overflow bits
+     *@param pu          Pileup bits
+     *@param dc          Discard bits
+     *@param tot         Time-over-threshold
      **/
-    R3BCalifaMappedData(UShort_t crystalId, Int_t energy, Int_t nf, Int_t ns, uint64_t time, UChar_t error, Int_t tot);
+    R3BCalifaMappedData(UShort_t crystalId,
+                        int16_t energy,
+                        int16_t nf,
+                        int16_t ns,
+                        uint64_t febextime,
+                        uint64_t wrts,
+                        uint32_t ov,
+                        uint16_t pu,
+                        uint16_t dc,
+                        uint16_t tot);
 
     // Destructor
     virtual ~R3BCalifaMappedData() {}
 
     // Getters
     inline const UShort_t& GetCrystalId() const { return fCrystalId; }
-    inline const Int_t& GetEnergy() const { return fEnergy; }
-    inline const Int_t& GetNf() const { return fNf; }
-    inline const Int_t& GetNs() const { return fNs; }
-    inline const uint64_t& GetTime() const { return fTime; }
-    inline const UChar_t& GetError() const { return fError; }
-    inline const Int_t& GetTot() const { return fTot; }
+    inline const int16_t& GetEnergy() const { return fEnergy; }
+    inline const int16_t& GetNf() const { return fNf; }
+    inline const int16_t& GetNs() const { return fNs; }
+    inline const uint64_t& GetFebexTime() const { return fFebexTime; }
+    inline const uint64_t& GetWrts() const { return fWrts; }
+    inline const uint32_t& GetOverFlow() const { return fOverFlow; }
+    inline const uint16_t& GetPileup() const { return fPileup; }
+    inline const uint16_t& GetDiscard() const { return fDiscard; }
+    inline const uint16_t& GetTot() const { return fTot; }
 
   protected:
-    UShort_t fCrystalId; // crystal unique identifier
-    Int_t fEnergy;       // total energy in the crystal
-    Int_t fNf;           // total fast amplitude in the crystal
-    Int_t fNs;           // total slow amplitude in the crystal
-    uint64_t fTime;      // time-stamp (common to all the hits in the event)
-    UChar_t fError;      // bit coded error flag
-    Int_t fTot;          // time-over-treshold
+    UShort_t fCrystalId; // Crystal unique identifier
+    int16_t fEnergy;     // Total energy in the crystal
+    int16_t fNf;         // Total fast amplitude in the crystal
+    int16_t fNs;         // Total slow amplitude in the crystal
+    uint64_t fFebexTime; // Internal febex time
+    uint64_t fWrts;      // Timestamp per crystal
+    uint32_t fOverFlow;  // Overflow bits
+    uint16_t fPileup;    // Pileup bits
+    uint16_t fDiscard;   // Discard bits
+    uint16_t fTot;       // Time-over-treshold
 
   public:
     ClassDef(R3BCalifaMappedData, 3)

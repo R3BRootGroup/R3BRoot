@@ -47,7 +47,7 @@ class R3BAmsStripCalData : public FairMultiLinkedData
     R3BAmsStripCalData& operator=(const R3BAmsStripCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BAmsStripCalData();
+    virtual ~R3BAmsStripCalData() {}
 
     /** Accessors **/
     inline const Int_t& GetDetId() const { return fDetId; }
@@ -60,9 +60,6 @@ class R3BAmsStripCalData : public FairMultiLinkedData
     void SetSideId(Int_t sideid) { fSideId = sideid; }
     void SetStripId(Int_t stripid) { fStripId = stripid; }
     void SetEnergy(Double32_t energy) { fEnergy = energy; }
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Int_t fDetId;     // detector unique identifier
