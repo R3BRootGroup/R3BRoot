@@ -12,16 +12,10 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----            R3BAmsStripCalData source file                -----
+// -----            R3BAmsStripCalData source file                     -----
 // -------------------------------------------------------------------------
 
 #include "R3BAmsStripCalData.h"
-
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BAmsStripCalData::R3BAmsStripCalData()
@@ -53,14 +47,4 @@ R3BAmsStripCalData::R3BAmsStripCalData(const R3BAmsStripCalData& right)
 {
 }
 
-// -----   Destructor   ----------------------------------------------------
-R3BAmsStripCalData::~R3BAmsStripCalData() {}
-
-// -----   Public method Print   -------------------------------------------
-void R3BAmsStripCalData::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BAmsStripCalData: a stripCalData level hit in detector " << fDetId << " side " << fSideId
-         << " strip identifier " << fStripId << endl;
-    cout << " Energy = " << fEnergy << " (GeV in sim)" << endl;
-}
-// -------------------------------------------------------------------------
+ClassImp(R3BAmsStripCalData);

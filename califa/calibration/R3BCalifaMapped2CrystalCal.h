@@ -28,13 +28,11 @@
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMapped2CrystalCalPar.h"
 #include "R3BCalifaMappedData.h"
-#include "TH1F.h"
-//#include "R3BCalifaCrystalCalPar.h"
-#include "R3BCalifaTotCalPar.h"
 #include <TRandom.h>
 
 class TClonesArray;
 class R3BCalifaCrystalCalPar;
+class R3BCalifaTotCalPar;
 
 class R3BCalifaMapped2CrystalCal : public FairTask
 {
@@ -90,7 +88,7 @@ class R3BCalifaMapped2CrystalCal : public FairTask
                                         Double_t energy,
                                         Double_t Nf,
                                         Double_t Ns,
-                                        ULong64_t time,
+                                        uint64_t wrts,
                                         Double_t tot_energy);
 
   public:

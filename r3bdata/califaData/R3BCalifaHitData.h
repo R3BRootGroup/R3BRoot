@@ -62,7 +62,7 @@ class R3BCalifaHitData : public FairMultiLinkedData
     R3BCalifaHitData& operator=(const R3BCalifaHitData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BCalifaHitData();
+    virtual ~R3BCalifaHitData() {}
 
     /** Accessors **/
     UInt_t GetNbOfCrystalHits() const { return fNbOfCrystalHits; }
@@ -83,9 +83,6 @@ class R3BCalifaHitData : public FairMultiLinkedData
     void SetPhi(Double_t phi) { fPhi = phi; }
     void SetTime(ULong64_t time) { fTime = time; }
     void SetClusterId(uint32_t id) { fClusterId = id; }
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     // Basic Hit information

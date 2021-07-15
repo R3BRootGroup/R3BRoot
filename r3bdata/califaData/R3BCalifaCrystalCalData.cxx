@@ -13,12 +13,6 @@
 
 #include "R3BCalifaCrystalCalData.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
-
 R3BCalifaCrystalCalData::R3BCalifaCrystalCalData()
     : FairMultiLinkedData()
     , fEnergy(-1.)
@@ -34,7 +28,7 @@ R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(Int_t ident,
                                                  Double_t energy,
                                                  Double_t Nf,
                                                  Double_t Ns,
-                                                 ULong64_t time,
+                                                 uint64_t time,
                                                  Double_t tot_energy)
     : FairMultiLinkedData()
     , fEnergy(energy)
@@ -57,11 +51,4 @@ R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData& 
 {
 }
 
-void R3BCalifaCrystalCalData::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BCalifaCrystalCalData: a crystalCalData level hit in crystal identifier " << fCrystalId << endl;
-    cout << "    Energy = " << fEnergy << " (GeV in sim)" << endl;
-    cout << "    ToT_Energy = " << fToT_Energy << " (GeV in sim)" << endl;
-    cout << "    Nf = " << fNf << " (GeV in sim); fNs =" << fNs << " (GeV in sim)" << endl;
-    cout << "    Time =" << fTime << " ns  " << endl;
-}
+ClassImp(R3BCalifaCrystalCalData);

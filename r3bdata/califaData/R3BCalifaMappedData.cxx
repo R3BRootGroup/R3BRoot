@@ -18,27 +18,36 @@ R3BCalifaMappedData::R3BCalifaMappedData()
     , fEnergy(0)
     , fNf(0)
     , fNs(0)
-    , fTime(0)
-    , fError(0)
+    , fFebexTime(0)
+    , fWrts(0)
+    , fOverFlow(0)
+    , fPileup(0)
+    , fDiscard(0)
     , fTot(0)
 {
 }
 
 R3BCalifaMappedData::R3BCalifaMappedData(UShort_t crystalId,
-                                         Int_t energy,
-                                         Int_t nf,
-                                         Int_t ns,
-                                         uint64_t time,
-                                         UChar_t error,
-                                         Int_t tot)
+                                         int16_t energy,
+                                         int16_t nf,
+                                         int16_t ns,
+                                         uint64_t febextime,
+                                         uint64_t wrts,
+                                         uint32_t ov,
+                                         uint16_t pu,
+                                         uint16_t dc,
+                                         uint16_t tot)
     : fCrystalId(crystalId)
     , fEnergy(energy)
     , fNf(nf)
     , fNs(ns)
-    , fTime(time)
-    , fError(error)
+    , fFebexTime(febextime)
+    , fWrts(wrts)
+    , fOverFlow(ov)
+    , fPileup(pu)
+    , fDiscard(dc)
     , fTot(tot)
 {
 }
 
-ClassImp(R3BCalifaMappedData)
+ClassImp(R3BCalifaMappedData);

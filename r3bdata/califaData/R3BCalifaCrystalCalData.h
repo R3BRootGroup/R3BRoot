@@ -35,7 +35,7 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
                             Double_t energy,
                             Double_t Nf,
                             Double_t Ns,
-                            ULong64_t time,
+                            uint64_t time,
                             Double_t tot_energy = 0);
 
     /** Copy constructor **/
@@ -52,7 +52,7 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
     inline const Double_t& GetToT_Energy() const { return fToT_Energy; }
     inline const Double_t& GetNf() const { return fNf; }
     inline const Double_t& GetNs() const { return fNs; }
-    inline const ULong64_t& GetTime() const { return fTime; }
+    inline const uint64_t& GetTime() const { return fTime; }
 
     /** Modifiers **/
     void SetCrystalId(Int_t ident) { fCrystalId = ident; }
@@ -60,19 +60,17 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
     void SetToT_Energy(Double32_t energy) { fToT_Energy = energy; }
     void SetNf(Double32_t Nf) { fNf = Nf; }
     void SetNs(Double32_t Ns) { fNs = Ns; }
-    void SetTime(ULong64_t time) { fTime = time; }
+    void SetTime(uint64_t time) { fTime = time; }
     void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
     void AddMoreNf(Double32_t moreNf) { fNf += moreNf; }
     void AddMoreNs(Double32_t moreNs) { fNs += moreNs; }
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Double32_t fEnergy;     // total energy in the crystal
     Double32_t fNf;         // total Nf in the crystal
     Double32_t fNs;         // total Nf in the crystal
     Double32_t fToT_Energy; // total energy in the crystal from ToT
-    ULong64_t fTime;        // time of the interaction
+    uint64_t fTime;         // time of the interaction
     Int_t fCrystalId;       // crystal unique identifier
 
   public:
