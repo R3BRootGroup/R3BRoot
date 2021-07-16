@@ -20,8 +20,6 @@
 #include "TMath.h"
 #include "TRandom.h"
 
-Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10 * 1000 * z + 10 * a; }
-
 R3BINCLRootGenerator::R3BINCLRootGenerator()
     : fFileName()
     , fX(0.)
@@ -108,7 +106,7 @@ newevt:
     {
         Bool_t check = kFALSE;
         for (Int_t j = 0; j < fParticles; j++)
-            if (fOrigin[j] == 1)
+            if (fOrigin[j] == 1 || fOrigin[j] == 101)
                 check = kTRUE;
         if (!check)
         {
@@ -126,7 +124,7 @@ newevt:
         Int_t nbp = 0;
         Bool_t check = kFALSE;
         for (Int_t j = 0; j < fParticles; j++)
-            if (fOrigin[j] == 1)
+            if (fOrigin[j] == 1 || fOrigin[j] == 101)
                 check = kTRUE;
         if (!check)
         {
@@ -217,7 +215,7 @@ void R3BINCLRootGenerator::RegisterIons()
         Tree->GetEntry(ie);
 
         for (Int_t j = 0; j < fParticles; j++)
-            if (fMass[j] > 1)
+            if (fMass[j] > 1 && fCharge[j] > 1)
             {
                 iA = fMass[j];
                 iZ = fCharge[j];

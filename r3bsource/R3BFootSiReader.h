@@ -12,28 +12,28 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------------
-// -----                         R3BAmsReader                       -----
-// -----             Created 12/05/18  by J.L. Rodriguez-Sanchez    -----
+// -----                         R3BFootSiReader                    -----
+// -----             Created 19/07/21  by J.L. Rodriguez-Sanchez    -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BAMSREADER_H
-#define R3BAMSREADER_H
+#ifndef R3BFootSiReader_H
+#define R3BFootSiReader_H
 
 #include "R3BReader.h"
 
 class TClonesArray;
 
-struct EXT_STR_h101_AMS_t;
-typedef struct EXT_STR_h101_AMS_t EXT_STR_h101_AMS;
-typedef struct EXT_STR_h101_AMS_onion_t EXT_STR_h101_AMS_onion;
+struct EXT_STR_h101_FOOT_t;
+typedef struct EXT_STR_h101_FOOT_t EXT_STR_h101_FOOT;
+typedef struct EXT_STR_h101_FOOT_onion_t EXT_STR_h101_FOOT_onion;
 class ext_data_struct_info;
 
-class R3BAmsReader : public R3BReader
+class R3BFootSiReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BAmsReader(EXT_STR_h101_AMS_onion*, size_t);
-    virtual ~R3BAmsReader();
+    R3BFootSiReader(EXT_STR_h101_FOOT_onion*, size_t);
+    virtual ~R3BFootSiReader();
 
     Bool_t Init(ext_data_struct_info*);
     Bool_t Read();
@@ -42,20 +42,25 @@ class R3BAmsReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Accessor to select number of detectors
+    void SetNbDet(Int_t nb) { fNbDet = nb; }
+
   private:
     // An event counter
     unsigned int fNEvent;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_AMS_onion* fData;
+    EXT_STR_h101_FOOT_onion* fData;
     // Data offset
     size_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
+    // Number of silicon detectors
+    Int_t fNbDet;
     // Output array
     TClonesArray* fArray;
 
   public:
-    ClassDef(R3BAmsReader, 0);
+    ClassDef(R3BFootSiReader, 0);
 };
 
-#endif /* R3BAmsReader_H */
+#endif /* R3BFootSiReader_H */

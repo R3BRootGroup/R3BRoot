@@ -19,12 +19,15 @@
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
 
+/**
+ ** ext_h101_califa.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:CALIFA,id=h101_CALIFA,NOTRIGEVENTNO,ext_h101_califa.h
+ **/
+
 extern "C"
 {
 #include "ext_data_client.h"
 #include "ext_h101_califa.h"
-    // for future reference: ext_h101_califa.h was created by running
-    // $unpacker --ntuple=STRUCT_HH,RAW:CALIFA,id=h101_CALIFA,NOTRIGEVENTNO,ext_h101_califa.h
 }
 
 R3BCalifaFebexReader::R3BCalifaFebexReader(EXT_STR_h101_CALIFA* data, size_t offset)

@@ -37,6 +37,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/tracker
 ${R3BROOT_SOURCE_DIR}/tracker/sim
 ${R3BROOT_SOURCE_DIR}/tracker/digi
@@ -79,6 +80,7 @@ set(SRCS
 ./calibration/R3BAmsStripCal2Hit.cxx
 ./online/R3BAmsOnlineSpectra.cxx
 ./online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
+./online/R3BFootSiOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

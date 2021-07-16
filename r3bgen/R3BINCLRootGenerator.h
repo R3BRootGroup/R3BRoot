@@ -84,6 +84,8 @@ class R3BINCLRootGenerator : public FairGenerator
      ** any ion needed. TODO: Should not be needed by FairRoot. **/
     void RegisterIons();
 
+    inline Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10 * 1000 * z + 10 * a; }
+
     Int_t fEvt;
     TTree* Tree;
     Int_t fEvtRoot;
