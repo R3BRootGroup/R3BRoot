@@ -43,6 +43,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
@@ -108,6 +109,7 @@ R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
 R3BStartrackReader.cxx
 R3BAmsReader.cxx
+R3BFootSiReader.cxx
 R3BMusicReader.cxx
 )
 
@@ -156,6 +158,7 @@ ext/ext_h101_strawtubes.h
 ext/ext_h101_star.h
 ext/ext_h101_fibfour.h
 ext/ext_h101_ams.h
+ext/ext_h101_foot.h
 ext/ext_h101_music.h
 ext/ext_h101_samp.h
 ext/ext_h101_pdc.h

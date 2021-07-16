@@ -46,6 +46,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
@@ -177,6 +178,9 @@ sfibData/R3BSfibMappedData.cxx
 sfibData/R3BSfibCalData.cxx
 sfibData/R3BSfibHitData.cxx
 frsData/R3BFrsData.cxx
+footData/R3BFootSiMappedData.cxx
+footData/R3BFootSiCalData.cxx
+footData/R3BFootSiHitData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

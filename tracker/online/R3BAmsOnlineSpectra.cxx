@@ -119,16 +119,11 @@ void R3BAmsOnlineSpectra::SetParameter()
 
 InitStatus R3BAmsOnlineSpectra::Init()
 {
-
-    LOG(INFO) << "R3BAmsOnlineSpectra::Init ";
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
+    LOG(INFO) << "R3BAmsOnlineSpectra::Init()";
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "R3BAmsOnlineSpectra::Init FairRootManager not found";
-    // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -139,18 +134,19 @@ InitStatus R3BAmsOnlineSpectra::Init()
     fMappedItemsAms = (TClonesArray*)mgr->GetObject("AmsMappedData");
     if (!fMappedItemsAms)
     {
+        LOG(FATAL) << "R3BAmsOnlineSpectra::AmsMappedData not found";
         return kFATAL;
     }
 
     // get access to Cal data
     fCalItemsAms = (TClonesArray*)mgr->GetObject("AmsStripCalData");
     if (!fCalItemsAms)
-        LOG(WARNING) << "R3BAmsOnlineSpectra: AmsStripCalData not found";
+        LOG(WARNING) << "R3BAmsOnlineSpectra::AmsStripCalData not found";
 
     // get access to Hit data
     fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
     if (!fHitItemsAms)
-        LOG(WARNING) << "R3BAmsOnlineSpectra: AmsHitData not found";
+        LOG(WARNING) << "R3BAmsOnlineSpectra::AmsHitData not found";
 
     SetParameter();
 
@@ -548,11 +544,6 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
 
 void R3BAmsOnlineSpectra::Exec(Option_t* option)
 {
-
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(FATAL) << "R3BAmsOnlineSpectra::Exec FairRootManager not found";
-
     // Fill mapped data
     if (fMappedItemsAms && fMappedItemsAms->GetEntriesFast() > 0)
     {
