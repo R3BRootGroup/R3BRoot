@@ -17,7 +17,7 @@
 #include "FairParGenericSet.h"
 #include "FairParamList.h"
 #include "R3BNeulandMultiplicity.h"
-#include "TArrayI.h"
+#include "TArrayD.h"
 #include <array>
 
 class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
@@ -37,10 +37,16 @@ class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
     bool CheckIfProperlyLoaded() const;
     R3BNeulandMultiplicity::MultiplicityProbabilities GetProbabilities(int nHits, int nClusters, int Edep) const;
 
+    TArrayD GetHitDensity(int n) const {return fHits.at(n);}
+    TArrayD GetClusterDensity(int n) const {return fClusters.at(n);}
+    TArrayD GetEdepDensity(int n) const {return fEdep.at(n);}
+
+    void Finish();
+
   private:
-    std::array<TArrayI, NEULAND_MAX_MULT> fHits;
-    std::array<TArrayI, NEULAND_MAX_MULT> fClusters;
-    std::array<TArrayI, NEULAND_MAX_MULT> fEdep;
+    std::array<TArrayD, NEULAND_MAX_MULT> fHits;
+    std::array<TArrayD, NEULAND_MAX_MULT> fClusters;
+    std::array<TArrayD, NEULAND_MAX_MULT> fEdep;
     mutable bool fIsProperlyLoaded;
 
     R3BNeulandMultiplicityBayesPar(const R3BNeulandMultiplicityBayesPar&);

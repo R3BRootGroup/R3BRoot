@@ -31,9 +31,10 @@
 #pragma link C++ class R3BNeulandMultiplicityCalorimetricTrain+;
 #pragma link C++ class R3BNeulandMultiplicityCheat+;
 #pragma link C++ class R3BNeulandMultiplicityFixed+;
-//#pragma link C++ class R3BNeulandMultiplicityScikit+;
+// #pragma link C++ class R3BNeulandMultiplicityScikit+;
 #pragma link C++ class R3BNeulandNeutronsCheat+;
 #pragma link C++ class R3BNeulandNeutronsRValue+;
-//#pragma link C++ class R3BNeulandNeutronsScikit+;
+// #pragma link C++ class R3BNeulandNeutronsScikit+;
+// #pragma link C++ class R3BNeulandNeutronsKeras+;
 
 #endif

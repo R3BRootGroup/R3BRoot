@@ -22,6 +22,7 @@ set(INCLUDE_DIRECTORIES
     ${R3BROOT_SOURCE_DIR}/neuland/reconstruction/multiplicity
     ${R3BROOT_SOURCE_DIR}/neuland/reconstruction/neutrons)
 include_directories(${INCLUDE_DIRECTORIES})
+# link_libraries(/home/jmayer/.pyenv/versions/3.7.6/lib/libpython3.7m.so.1.0)
 
 set(SRCS
     multiplicity/R3BNeulandMultiplicityBayes.cxx
@@ -36,6 +37,7 @@ set(SRCS
     neutrons/R3BNeulandNeutronsCheat.cxx
     neutrons/R3BNeulandNeutronsRValue.cxx
     # neutrons/R3BNeulandNeutronsScikit.cxx
+    # neutrons/R3BNeulandNeutronsKeras.cxx
     R3BNeulandReconstructionContFact.cxx
     R3BNeulandNeutronReconstructionMon.cxx
     R3BNeulandNeutronReconstructionStatistics.cxx)
