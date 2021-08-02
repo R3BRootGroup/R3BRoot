@@ -16,6 +16,32 @@
 #include <numeric>
 #include <string>
 
+void normalize_TArrayD(TArrayD& a){
+    const auto s = a.GetSum();
+    const auto l = a.GetSize();
+    if(s > 0.)
+    {
+        for (int j = 0; j < l; j++)
+        {
+            a[j] = a[j] / s;
+        }
+    }
+}
+
+void R3BNeulandMultiplicityBayesPar::Finish()
+{
+    for (int i = 0; i < NEULAND_MAX_MULT; i++)
+    {
+        // to density (Normalize)
+        fHits.at(i)[0] = 0;
+        fClusters.at(i)[0] = 0;
+        fEdep.at(i)[0] = 0;
+        normalize_TArrayD(fHits.at(i));
+        normalize_TArrayD(fClusters.at(i));
+        normalize_TArrayD(fEdep.at(i));
+    }
+}
+
 R3BNeulandMultiplicityBayesPar::R3BNeulandMultiplicityBayesPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
     , fHits({ 1000, 1000, 1000, 1000, 1000, 1000, 1000 })
@@ -80,7 +106,7 @@ R3BNeulandMultiplicity::MultiplicityProbabilities R3BNeulandMultiplicityBayesPar
         fIsProperlyLoaded = CheckIfProperlyLoaded();
     }
 
-    R3BNeulandMultiplicity::MultiplicityProbabilities mult = { 0, 0, 0, 0, 0, 0, 0 };
+    R3BNeulandMultiplicity::MultiplicityProbabilities mult = { 1, 0, 0, 0, 0, 0, 0 };
     if (nHits == 0)
     {
         return mult;
@@ -89,8 +115,7 @@ R3BNeulandMultiplicity::MultiplicityProbabilities R3BNeulandMultiplicityBayesPar
     double sum = 0;
     for (size_t i = 0; i < mult.size(); i++)
     {
-        mult[i] =
-            (double)fHits.at(i).At(nHits) * (double)fClusters.at(i).At(nClusters) * (double)fEdep.at(i).At(Edep / 10);
+        mult[i] = fHits.at(i).At(nHits) * fClusters.at(i).At(nClusters) * fEdep.at(i).At(Edep / 10);
         sum += mult[i];
     }
 
@@ -104,7 +129,7 @@ R3BNeulandMultiplicity::MultiplicityProbabilities R3BNeulandMultiplicityBayesPar
 
 bool R3BNeulandMultiplicityBayesPar::CheckIfProperlyLoaded() const
 {
-    if (std::accumulate(fHits.cbegin(), fHits.cend(), 0, [](int i, const TArrayI& a) { return i + a.GetSum(); }) < 1)
+    if (std::accumulate(fHits.cbegin(), fHits.cend(), 0, [](int i, const TArrayD& a) { return i + a.GetSum(); }) < 0.1)
     {
         LOG(FATAL) << "R3BNeulandMultiplicityBayesPar: Empty dataset -> Not properly loaded!";
     }

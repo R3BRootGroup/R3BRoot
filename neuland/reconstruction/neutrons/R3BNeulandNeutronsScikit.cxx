@@ -120,7 +120,7 @@ void R3BNeulandNeutronsScikit::Exec(Option_t*)
         }
     }
 
-    // With the multiplicty from somewhere else, take the n clusters with the highest prob as neutrons
+    // With the multiplicity from somewhere else, take the n clusters with the highest prob as neutrons
     const auto mult = fMultiplicity->GetMultiplicity();
     for (size_t n = 0; n < cwps.size() && n < mult; n++)
     {

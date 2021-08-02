@@ -63,6 +63,7 @@ void R3BNeulandMultiplicityBayesTrain::Exec(Option_t*)
 
 void R3BNeulandMultiplicityBayesTrain::FinishTask()
 {
+    fPar->Finish();
     auto rtdb = FairRuntimeDb::instance();
     rtdb->addRun(1);
     fPar->setChanged();

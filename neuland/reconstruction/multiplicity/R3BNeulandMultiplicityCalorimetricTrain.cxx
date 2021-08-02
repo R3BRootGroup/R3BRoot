@@ -6,6 +6,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
+//#include "Math/GeneticMinimizer.h"
 #include "TDirectory.h"
 #include <iostream>
 #include <numeric>
@@ -25,13 +26,17 @@
  *                   edep
  */
 
-R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(TString clusters, TString tracks)
+R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(TString clusters, TString tracks, TString phits)
     : FairTask("R3BNeulandMultiplicityCalorimetricTrain")
     , fClusters(std::move(clusters))
     , fTracks(std::move(tracks))
+    , fPHits(std::move(phits))
     , fPar(nullptr)
+    , fUseHits(false)
     , fEdepOpt({ 200, 25, 50, 1500 })
+    , fEdepOffOpt({ 5, 1, 0, 250 })
     , fNclusterOpt({ 10, 5, 5, 50 })
+    , fNclusterOffOpt({ 2, 1, 0, 10 })
     , fWeight(0)
 {
 }
@@ -49,6 +54,7 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
     // Input
     fClusters.Init();
     fTracks.Init();
+    fPHits.Init();
 
     // Output Parameter Container
     auto ioman = FairRootManager::Instance();
@@ -78,7 +84,7 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
 
 void R3BNeulandMultiplicityCalorimetricTrain::Exec(Option_t*)
 {
-    const int nPN = fTracks.Retrieve().size();
+    const int nPN = fUseHits ? fPHits.Retrieve().size() : fTracks.Retrieve().size();
 
     const auto clusters = fClusters.Retrieve();
     const int nClusters = clusters.size();
@@ -125,17 +131,15 @@ void R3BNeulandMultiplicityCalorimetricTrain::FinishTask()
 
 void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 {
-    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
-    // min->SetMaxFunctionCalls(100000);
-    // min->SetMaxIterations(100000);
-    // min->SetTolerance(0.05);
+    ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Genetic");
 
-    ROOT::Math::Functor f([&](const double* d) { return WastedEfficiency(d); }, 2);
+    ROOT::Math::Functor f([&](const double* d) { return WastedEfficiency(d); }, 4);
     min->SetFunction(f);
 
     min->SetLimitedVariable(0, "edep", fEdepOpt.at(0), fEdepOpt.at(1), fEdepOpt.at(2), fEdepOpt.at(3));
-    min->SetLimitedVariable(
-        1, "ncluster", fNclusterOpt.at(0), fNclusterOpt.at(1), fNclusterOpt.at(2), fNclusterOpt.at(3));
+    min->SetLimitedVariable(1, "edepoff", fEdepOffOpt.at(0), fEdepOffOpt.at(1), fEdepOffOpt.at(2), fEdepOffOpt.at(3));
+    min->SetLimitedVariable(2, "ncluster", fNclusterOpt.at(0), fNclusterOpt.at(1), fNclusterOpt.at(2), fNclusterOpt.at(3));
+    min->SetLimitedVariable(3, "nclusteroff", fNclusterOffOpt.at(0), fNclusterOffOpt.at(1), fNclusterOffOpt.at(2), fNclusterOffOpt.at(3));
 
     min->Minimize();
 
@@ -144,7 +148,9 @@ void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 
 TCutG* R3BNeulandMultiplicityCalorimetricTrain::GetCut(const unsigned int nNeutrons,
                                                        const double edep,
-                                                       const double ncluster)
+                                                       const double edepoff,
+                                                       const double ncluster,
+                                                       const double nclusteroff)
 {
     if (!fCuts[nNeutrons])
     {
@@ -162,8 +168,8 @@ TCutG* R3BNeulandMultiplicityCalorimetricTrain::GetCut(const unsigned int nNeutr
     }
     else
     {
-        cut->SetPoint(0, -1, ncluster * (nNeutrons - 1));
-        cut->SetPoint(1, edep * (nNeutrons - 1), -1);
+        cut->SetPoint(0, -1, ncluster * (nNeutrons - 1) + nclusteroff);
+        cut->SetPoint(1, edep * (nNeutrons - 1) + edepoff, -1);
     }
 
     // nmax: p2 (inf, -1) p3 (-1, inf)
@@ -174,8 +180,8 @@ TCutG* R3BNeulandMultiplicityCalorimetricTrain::GetCut(const unsigned int nNeutr
     }
     else
     {
-        cut->SetPoint(2, edep * nNeutrons, -1);
-        cut->SetPoint(3, -1, ncluster * nNeutrons);
+        cut->SetPoint(2, edep * nNeutrons + edepoff, -1);
+        cut->SetPoint(3, -1, ncluster * nNeutrons + nclusteroff);
     }
 
     return cut;
@@ -184,14 +190,16 @@ TCutG* R3BNeulandMultiplicityCalorimetricTrain::GetCut(const unsigned int nNeutr
 double R3BNeulandMultiplicityCalorimetricTrain::WastedEfficiency(const double* d)
 {
     double edep = d[0];
-    double ncluster = d[1];
+    double edepoff = d[1];
+    double ncluster = d[2];
+    double nclusteroff = d[3];
 
     double wasted_efficiency = 0;
     for (auto& nh : fHists)
     {
         const unsigned int nNeutrons = nh.first;
         const double efficiency =
-            ((double)GetCut(nNeutrons, edep, ncluster)->IntegralHist(nh.second) / (double)nh.second->GetEntries());
+            ((double)GetCut(nNeutrons, edep, edepoff, ncluster, nclusteroff)->IntegralHist(nh.second) / (double)nh.second->GetEntries());
         wasted_efficiency += (1. - efficiency) * (1. + fWeight * nNeutrons);
     }
     return wasted_efficiency;
@@ -226,7 +234,7 @@ TH2D* R3BNeulandMultiplicityCalorimetricTrain::GetOrBuildHist(const unsigned int
     if (fHists.find(i) == fHists.end())
     {
         const TString name = "hnPN" + std::to_string(i);
-        fHists[i] = new TH2D(name, name, 250, 0, 5000, 50, 0, 100);
+        fHists[i] = new TH2D(name, name, 150, 0, 5000, 50, 0, 100);
         fHists.at(i)->GetXaxis()->SetTitle("Total Energy [MeV]");
         fHists.at(i)->GetYaxis()->SetTitle("Number of Clusters");
     }
