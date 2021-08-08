@@ -39,6 +39,7 @@
 
 # Generated folders and files 
 geometry/neuland_v*.root
+geometry/*.geo.root
 build/
 input/
 

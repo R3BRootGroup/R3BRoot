@@ -1,10 +1,16 @@
- ################################################################################
- #    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    #
- #                                                                              #
- #              This software is distributed under the terms of the             # 
- #         GNU Lesser General Public Licence version 3 (LGPL) version 3,        #  
- #                  copied verbatim in the file "LICENSE"                       #
- ################################################################################
+################################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
+#   Copyright (C) 2019 Members of R3B Collaboration                            #
+#                                                                              #
+#             This software is distributed under the terms of the              #
+#                 GNU General Public Licence (GPL) version 3,                  #
+#                    copied verbatim in the file "LICENSE".                    #
+#                                                                              #
+# In applying this license GSI does not waive the privileges and immunities    #
+# granted to it by virtue of its status as an Intergovernmental Organization   #
+# or submit itself to any jurisdiction.                                        #
+################################################################################
+ 
 MACRO (WRITE_ENV_CACHE filename)
   configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/env_cache.sh.in
 	             ${CMAKE_CURRENT_BINARY_DIR}/${filename}
