@@ -67,7 +67,7 @@ Run ucesb with the struct_writer header generation option
 
     ./sNNN --ntuple=<signals>,STRUCT_HH,ext_h101.h
 
-with <signals> something like UNPACK:EVENTNO,UNPACK:TRIGGER,RAW.
+with <signals> something like RAW:Detector_name,NOTRIGEVENTNO.
 This will produce the header file called 'ext_h101.h'.
 It contains the structure information for R3BROOT.
 The data coming from ucesb will adhere to this format.
@@ -76,7 +76,7 @@ You can skip parts of the following step, if you do the header writing like this
 
     ./sNNN --ntuple=<signals>,id=h101_<detector>,ext_h101_<detector>.h
     # Example
-    ./s483 --ntuple=RAW:TOFD,id=h101_tofd,ext_h101_tofd.h
+    ./s483 --ntuple=RAW:TOFD,NOTRIGEVENTNO,id=h101_tofd,ext_h101_tofd.h
 
 This will already insert the correct detector names for you, if you like and only extract signals related to the specific detector.
 

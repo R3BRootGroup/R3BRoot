@@ -1,24 +1,27 @@
- ################################################################################
- #    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    #
- #                                                                              #
- #              This software is distributed under the terms of the             # 
- #         GNU Lesser General Public Licence version 3 (LGPL) version 3,        #  
- #                  copied verbatim in the file "LICENSE"                       #
- ################################################################################
+################################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
+#   Copyright (C) 2019 Members of R3B Collaboration                            #
+#                                                                              #
+#             This software is distributed under the terms of the              #
+#                 GNU General Public Licence (GPL) version 3,                  #
+#                    copied verbatim in the file "LICENSE".                    #
+#                                                                              #
+# In applying this license GSI does not waive the privileges and immunities    #
+# granted to it by virtue of its status as an Intergovernmental Organization   #
+# or submit itself to any jurisdiction.                                        #
+################################################################################
 
- ################################################################
- # For this script to succeed, you need to install ucesb:
- # Check out the CVS repository and compile:
- #  export CVS_RSH="ssh"
- #  cvs -d :ext:land@lxgs08.gsi.de:/u/johansso/CVS co unpacker
- #  cvs -d :ext:land@lxgs08.gsi.de:/u/landcvs/CVS co unpackexp
- #  cd unpacker
- #  make -j empty
- # Make sure to use the same ROOT version as for R3BROOT
- # After installation export an environment variable UCESB_DIR
- # which points to the 'unpacker' directory you have checked out.
- # More information: http://fy.chalmers.se/~f96hajo/ucesb/
- ################################################################
+################################################################################
+# For this script to succeed, you need to install ucesb:                       #
+# Check out the git repository and compile:                                    #
+#  git clone http://fy.chalmers.se/~f96hajo/ucesb/ucesb.git                    #
+#  cd ucesb                                                                    #
+#  make -j empty/empty								  #
+# Make sure to use the same ROOT version as for R3BROOT			  #
+# After installation export an environment variable UCESB_DIR                  #
+# which points to the 'unpacker' directory you have checked out.               #
+# More information: http://fy.chalmers.se/~f96hajo/ucesb/                      #
+################################################################################
 
 message(STATUS "Looking for ucesb...")
 
@@ -69,11 +72,11 @@ endif(ucesb_INCLUDE_DIR
 	AND ucesb_LIBRARY_DIR
 )
 
-message("    - UCESB_DIR = $ENV{UCESB_DIR}")
-message("    - ucesb_INCLUDE_DIR = ${ucesb_INCLUDE_DIR}")
-message("    - ucesb_LIBRARY_SHARED = ${ucesb_LIBRARY_SHARED}")
-message("    - ucesb_LIBRARY_STATIC = ${ucesb_LIBRARY_STATIC}")
-message("    - ucesb_LIBRARY_DIR = ${ucesb_LIBRARY_DIR}")
+message("    - ${Cyan}UCESB_DIR${CR} = ${BGreen}$ENV{UCESB_DIR}${CR}")
+message("    - ${Cyan}ucesb_INCLUDE_DIR${CR} = ${BGreen}${ucesb_INCLUDE_DIR}${CR}")
+message("    - ${Cyan}ucesb_LIBRARY_SHARED${CR} = ${BGreen}${ucesb_LIBRARY_SHARED}${CR}")
+message("    - ${Cyan}ucesb_LIBRARY_STATIC${CR} = ${BGreen}${ucesb_LIBRARY_STATIC}${CR}")
+message("    - ${Cyan}ucesb_LIBRARY_DIR${CR} = ${BGreen}${ucesb_LIBRARY_DIR}${CR}")
 
 if(ucesb_FOUND)
   add_definitions(-DWITH_UCESB)
@@ -81,13 +84,13 @@ if(ucesb_FOUND)
   if(NOT ucesb_FIND_QUIETLY)
     	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${ucesb_LIBRARY_DIR})
   endif(NOT ucesb_FIND_QUIETLY)
-  message("-- Looking for ucesb... - found ucesb")
+  message(STATUS "${BBlue}UCESB was FOUND${CR}")
 else(ucesb_FOUND)
   if(NOT ucesb_FIND_QUIETLY)
     if(ucesb_FIND_REQUIRED)
-      message(FATAL_ERROR "Looking for ucesb... - Not found")
+      message(FATAL_ERROR "${BRed}Could not find package UCESB${CR}")
     else(ucesb_FIND_REQUIRED)
-      message(STATUS "Looking for ucesb... - Not found")
+      message(STATUS "${BYellow}Could not find package UCESB${CR}")
     endif(ucesb_FIND_REQUIRED)
   endif(NOT ucesb_FIND_QUIETLY)
 endif(ucesb_FOUND)

@@ -1,3 +1,16 @@
+################################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
+#   Copyright (C) 2019 Members of R3B Collaboration                            #
+#                                                                              #
+#             This software is distributed under the terms of the              #
+#                 GNU General Public Licence (GPL) version 3,                  #
+#                    copied verbatim in the file "LICENSE".                    #
+#                                                                              #
+# In applying this license GSI does not waive the privileges and immunities    #
+# granted to it by virtue of its status as an Intergovernmental Organization   #
+# or submit itself to any jurisdiction.                                        #
+################################################################################
+
 # FindAtima.cmake
 #
 # Finds the Atima library
@@ -11,6 +24,8 @@
 # Atima::Atima
 #
 
+message(STATUS "Looking for Atima...")
+
 find_library(Atima_LIBRARY
              NAMES Atima
              HINTS $ENV{ATIMAPATH})
@@ -23,7 +38,7 @@ find_package_handle_standard_args(Atima
                                   Atima_LIBRARY)
 
 if(Atima_FOUND AND NOT TARGET Atima::Atima)
-    message("-- Found Atima: ${Atima_LIBRARY}")
+    message(STATUS "Found Atima: ${Atima_LIBRARY}")
     add_library(Atima::Atima UNKNOWN IMPORTED)
     set_target_properties(Atima::Atima PROPERTIES
         IMPORTED_LINK_INTERFACE_LANGUAGES "C"

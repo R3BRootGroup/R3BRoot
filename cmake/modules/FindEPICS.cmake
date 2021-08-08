@@ -1,3 +1,15 @@
+################################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
+#   Copyright (C) 2019 Members of R3B Collaboration                            #
+#                                                                              #
+#             This software is distributed under the terms of the              #
+#                 GNU General Public Licence (GPL) version 3,                  #
+#                    copied verbatim in the file "LICENSE".                    #
+#                                                                              #
+# In applying this license GSI does not waive the privileges and immunities    #
+# granted to it by virtue of its status as an Intergovernmental Organization   #
+# or submit itself to any jurisdiction.                                        #
+################################################################################
 #
 # Plox to install EPICS base and set EPICS_BASE and EPICS_HOST_ARCH.
 #
@@ -43,14 +55,14 @@ else(EPICS_INCLUDE_DIR AND EPICS_OS_INCLUDE_DIR AND EPICS_LIBRARY_DIR)
     set(EPICS_FOUND false)
 endif(EPICS_INCLUDE_DIR AND EPICS_OS_INCLUDE_DIR AND EPICS_LIBRARY_DIR)
 
-message("    - EPICS_BASE = $ENV{EPICS_BASE}")
-message("    - EPICS_INCLUDE_DIR   = ${EPICS_INCLUDE_DIR}")
-message("    - EPICS_OSINCLUDE_DIR = ${EPICS_OS_INCLUDE_DIR}")
-message("    - EPICS_LIBRARY_DIR   = ${EPICS_LIBRARY_DIR}")
+message("    - ${Cyan}EPICS_BASE${CR} = ${BGreen}$ENV{EPICS_BASE}${CR}")
+message("    - ${Cyan}EPICS_INCLUDE_DIR${CR}   = ${BGreen}${EPICS_INCLUDE_DIR}${CR}")
+message("    - ${Cyan}EPICS_OSINCLUDE_DIR${CR} = ${BGreen}${EPICS_OS_INCLUDE_DIR}${CR}")
+message("    - ${Cyan}EPICS_LIBRARY_DIR${CR}   = ${BGreen}${EPICS_LIBRARY_DIR}${CR}")
 
 if(EPICS_FOUND)
     add_definitions(-DWITH_EPICS)
-    message("-- Looking for EPICS... - FOUND")
+    message(STATUS "${BGreen}EPICS was FOUND${CR}")
 else(EPICS_FOUND)
-    message("-- Looking for EPICS... - MISSING")
+    message(STATUS "${BYellow}Could not find package EPICS${CR}")
 endif(EPICS_FOUND)
