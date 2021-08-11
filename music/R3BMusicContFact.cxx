@@ -79,21 +79,15 @@ FairParSet* R3BMusicContFact::createContainer(FairContainer* c)
     {
         p = new R3BMusicCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "musicHitPar") == 0)
+    else if (strcmp(name, "musicHitPar") == 0)
     {
         p = new R3BMusicHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "MusicGeoPar") == 0)
+    else if (strcmp(name, "MusicGeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-void R3BMusicContFact::activateParIo(FairParIo* io)
-{
-    // activates the input/output class for the parameters
-    // needed by the Sts
-}
-
-ClassImp(R3BMusicContFact)
+ClassImp(R3BMusicContFact);

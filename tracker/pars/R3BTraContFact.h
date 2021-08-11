@@ -27,7 +27,6 @@ class R3BTraContFact : public FairContFact
     R3BTraContFact();
     ~R3BTraContFact() {}
     FairParSet* createContainer(FairContainer*);
-    void activateParIo(FairParIo* io);
     ClassDef(R3BTraContFact, 0) // Factory for all TRA parameter containers
 };
 

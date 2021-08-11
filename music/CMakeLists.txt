@@ -11,11 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BMusic" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BMusic" which includes the source files given 
+# in the array. The extension is already found. Any number of sources could be 
+# listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES} )
+Set(SYSTEM_INCLUDE_DIRECTORIES 
+${SYSTEM_INCLUDE_DIRECTORIES} 
+${BASE_INCLUDE_DIRECTORIES}
+)
 
 if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
 set(WITH_SOFIA true)
@@ -70,10 +73,5 @@ set(LINKDEF MusicLinkDef.h)
 set(LIBRARY_NAME R3BMusic)
 set(DEPENDENCIES
           R3Bbase R3BData R3BTracking)
-
-if(FAIRDB_FOUND)
-set(DEPENDENCIES
-    ${DEPENDENCIES} FairDB)
-endif(FAIRDB_FOUND)
 
 GENERATE_LIBRARY()

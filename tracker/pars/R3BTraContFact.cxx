@@ -15,29 +15,21 @@
 //*-- Created : 20/03/2009
 //*-- Modified: 29/05/2018, J.L. Rodriguez
 
-/////////////////////////////////////////////////////////////
-//
-//  R3BTraContFact
-//
-//  Factory for the parameter containers in libR3BTra
-//
-/////////////////////////////////////////////////////////////
+//-----------------------------------------------------------
+//  R3BTraContFact                                      -----
+//  Factory for the parameter containers in libR3BTra   -----
+//-----------------------------------------------------------
 
 #include "R3BTraContFact.h"
-
-//#include "R3BTraParRootFileIo.h"
-//#include "R3BTraParAsciiFileIo.h"
 #include "R3BGeoTraPar.h"
 //#include "R3BTraDigiPar.h"
 
-#include "FairRuntimeDb.h"
-//#include "CbmParTest.h"
 #include "FairLogger.h"
-#include "FairParAsciiFileIo.h"
-#include "FairParRootFileIo.h"
+#include "FairRuntimeDb.h"
 
 #include "R3BAmsMappingPar.h"
 #include "R3BAmsStripCalPar.h"
+#include "R3BTGeoPar.h"
 
 #include "TClass.h"
 
@@ -73,13 +65,15 @@ void R3BTraContFact::setAllContainers()
 
     FairContainer* p1 = new FairContainer("amsStripCalPar", "AMS Strip Parameters", "AMSCalParContext");
     p1->addContext("AMSCalParContext");
-
     containers->Add(p1);
 
     FairContainer* p2 = new FairContainer("amsMappingPar", "AMS Mapping Parameters", "AmsMappingContext");
     p2->addContext("AmsMappingContext");
-
     containers->Add(p2);
+
+    FairContainer* p3 = new FairContainer("amsGeoPar", "AMS Geometry Parameters", "GeometryParameterContext");
+    p3->addContext("GeometryParameterContext");
+    containers->Add(p3);
 }
 
 FairParSet* R3BTraContFact::createContainer(FairContainer* c)
@@ -111,25 +105,11 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c)
     {
         p = new R3BAmsMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    return p;
-
-    // return NULL;
-}
-
-void R3BTraContFact::activateParIo(FairParIo* io)
-{
-    // activates the input/output class for the parameters
-    // needed by the Sts
-    /*
-    if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BTraParRootFileIo* p=new R3BTraParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
-      io->setDetParIo(p);
+    else if (strcmp(name, "amsGeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BTraParAsciiFileIo* p=new R3BTraParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
-      io->setDetParIo(p);
-      }
-    */
+    return p;
 }
 
-ClassImp(R3BTraContFact)
+ClassImp(R3BTraContFact);
