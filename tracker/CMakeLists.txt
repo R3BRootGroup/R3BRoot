@@ -12,9 +12,9 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BTra" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BTra" which includes the source files given
+# in the array. The extension is already found. Any number of sources could be 
+# listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
@@ -38,6 +38,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/tracker
 ${R3BROOT_SOURCE_DIR}/tracker/sim
 ${R3BROOT_SOURCE_DIR}/tracker/digi
@@ -90,6 +91,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TraLinkDef.h)
 set(LIBRARY_NAME R3BTra)
 set(DEPENDENCIES
-    Spectrum R3Bbase R3BData)
+    Spectrum R3Bbase R3BData R3BTracking)
 
 GENERATE_LIBRARY()

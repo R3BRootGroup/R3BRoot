@@ -27,7 +27,6 @@ class R3BCalifaContFact : public FairContFact
     R3BCalifaContFact();
     ~R3BCalifaContFact() {}
     FairParSet* createContainer(FairContainer*);
-    void activateParIo(FairParIo* io);
     ClassDef(R3BCalifaContFact, 0) // Factory for all CALIFA parameter containers
 };
 

@@ -11,9 +11,9 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BCalifa" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BCalifa" which includes the source files given
+# in the array. The extension is already found. Any number of sources could be 
+# listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
@@ -78,11 +78,5 @@ set(LIBRARY_NAME R3BCalifa)
 set(DEPENDENCIES
   Spectrum R3Bbase R3BData R3BPassive R3BTracking Boost::regex)
 #  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
-
-if(FAIRDB_FOUND)
-set(DEPENDENCIES
-    ${DEPENDENCIES} FairDB)
-endif(FAIRDB_FOUND)
-
 
 GENERATE_LIBRARY()

@@ -32,7 +32,6 @@ class R3BMusicContFact : public FairContFact
     R3BMusicContFact();
     ~R3BMusicContFact() {}
     FairParSet* createContainer(FairContainer*);
-    void activateParIo(FairParIo* io);
     ClassDef(R3BMusicContFact, 0) // Factory for all R3BMUSIC parameter containers
 };
 

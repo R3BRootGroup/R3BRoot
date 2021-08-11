@@ -17,27 +17,19 @@
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
+
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaCrystalPars4Sim.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BCalifaTotCalPar.h"
 #include "R3BTGeoPar.h"
-
 #include "TClass.h"
 
-#include <iomanip>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
-ClassImp(R3BCalifaContFact)
-
-    static R3BCalifaContFact gR3BCalifaContFact;
+static R3BCalifaContFact gR3BCalifaContFact;
 
 R3BCalifaContFact::R3BCalifaContFact()
 {
-    /** Constructor (called when the library is loaded) */
+    // Constructor (called when the library is loaded)
     fName = "R3BCalifaContFact";
     fTitle = "Factory for parameter containers in libR3BCalifa";
     setAllContainers();
@@ -46,35 +38,29 @@ R3BCalifaContFact::R3BCalifaContFact()
 
 void R3BCalifaContFact::setAllContainers()
 {
-    /** Creates the Container objects with all accepted contexts and adds them
-        to the list of containers for the CALIFA library.
-    */
+    // Creates the Container objects with all accepted contexts and adds them
+    // to the list of containers for the CALIFA library.
 
     FairContainer* p1 =
         new FairContainer("califaCrystalCalPar", "Califa Calibration Parameters", "CalifaCalParContext");
     p1->addContext("CalifaCalParContext");
-
     containers->Add(p1);
 
     FairContainer* p2 = new FairContainer("califaMappingPar", "Califa Mapping Parameters", "CalifaMappingContext");
     p2->addContext("CalifaMappingContext");
-
     containers->Add(p2);
 
     FairContainer* p3 =
         new FairContainer("califaCrystalPars4Sim", "Califa Crystal Parameters for Sim", "CalifaSimParContext");
     p3->addContext("CalifaSimParContext");
-
     containers->Add(p3);
 
     FairContainer* p4 = new FairContainer("CalifaTotCalPar", "Califa Tot Cal parameters", "CalifaTotCalParContext");
     p4->addContext("CalifaTotCalParContext");
-
     containers->Add(p4);
 
     FairContainer* p5 = new FairContainer("CalifaGeoPar", "Califa geometry parameters", "GeometryParameterContext");
     p5->addContext("GeometryParameterContext");
-
     containers->Add(p5);
 }
 
@@ -92,38 +78,23 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
     {
         p = new R3BCalifaCrystalCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "califaMappingPar") == 0)
+    else if (strcmp(name, "califaMappingPar") == 0)
     {
         p = new R3BCalifaMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-
-    if (strcmp(name, "califaCrystalPars4Sim") == 0)
+    else if (strcmp(name, "califaCrystalPars4Sim") == 0)
     {
         p = new R3BCalifaCrystalPars4Sim(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "CalifaTotCalPar") == 0)
+    else if (strcmp(name, "CalifaTotCalPar") == 0)
     {
         p = new R3BCalifaTotCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "CalifaGeoPar") == 0)
+    else if (strcmp(name, "CalifaGeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-void R3BCalifaContFact::activateParIo(FairParIo* io)
-{
-    // activates the input/output class for the parameters
-    // needed by the Sts
-    /*
-      if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BCalifaParRootFileIo* p=new R3BCalifaParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
-      io->setDetParIo(p);
-      }
-      if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BCalifaParAsciiFileIo* p=new R3BCalifaParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
-      io->setDetParIo(p);
-      }
-    */
-}
+ClassImp(R3BCalifaContFact);
