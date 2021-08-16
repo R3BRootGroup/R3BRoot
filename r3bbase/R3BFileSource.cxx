@@ -871,7 +871,7 @@ Bool_t R3BFileSource::ActivateObject(TObject** obj, const char* BrName)
     return kTRUE;
 }
 
-// remove it for new fairroot versions > Jun 2021
+#ifndef ACTIVATEOBJECTANYIMPLDEFINED
 namespace
 {
 
@@ -910,6 +910,7 @@ namespace
     }
 
 } // namespace
+#endif
 
 Bool_t R3BFileSource::ActivateObjectAny(void** obj, const std::type_info& info, const char* BrName)
 {

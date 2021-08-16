@@ -15,11 +15,15 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
 Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
+
+if(${FR_MAJOR_VERSION} GREATER_EQUAL 18 AND ${FR_MINOR_VERSION} GREATER_EQUAL 4)
+  add_definitions(-DACTIVATEOBJECTANYIMPLDEFINED)
+endif()
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
@@ -59,8 +63,8 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
-R3BModule.cxx 
-R3BDetector.cxx 
+R3BModule.cxx
+R3BDetector.cxx
 R3BEventHeader.cxx
 R3BEventHeaderCal2Hit.cxx
 R3BWhiterabbitPropagator.cxx
