@@ -17,6 +17,7 @@
 #include "FairPrimaryGenerator.h"
 #include "FairRunSim.h"
 #include "G4NistManager.hh"
+#include "TFile.h"
 #include "TMath.h"
 #include "TRandom.h"
 

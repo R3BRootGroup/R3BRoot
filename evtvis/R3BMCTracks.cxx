@@ -13,23 +13,53 @@
 
 #include "R3BMCTracks.h"
 #include "R3BEventManager.h"
-#include "TClonesArray.h"
-#include "TEveManager.h"
-#include "TEveTrack.h"
-#include "TEveTrackPropagator.h"
-#include "TGeoTrack.h"
-#include "TObjArray.h"
-#include "TParticle.h"
+
+#include "FairEventManager.h" // for FairEventManager
+#include "FairLogger.h"
+#include "FairRootManager.h" // for FairRootManager
+
+#include <TClonesArray.h>        // for TClonesArray
+#include <TEveManager.h>         // for TEveManager, gEve
+#include <TEvePathMark.h>        // for TEvePathMark
+#include <TEveTrack.h>           // for TEveTrackList, TEveTrack
+#include <TEveTrackPropagator.h> // for TEveTrackPropagator
+#include <TEveVector.h>          // for TEveVector, TEveVectorT
+#include <TGeoTrack.h>           // for TGeoTrack
+#include <TMathBase.h>           // for Max, Min
+#include <TObjArray.h>           // for TObjArray
+#include <TParticle.h>           // for TParticle
+#include <cstring>               // for strcmp
 
 #include <iostream>
 using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-R3BMCTracks::R3BMCTracks() {}
+R3BMCTracks::R3BMCTracks()
+    : FairTask("R3BMCTracks", 0)
+    , fTrackList(nullptr)
+    , fTrPr(nullptr)
+    , fEventManager(nullptr)
+    , fEveTrList(nullptr)
+    , fEvent("")
+    , fTrList(nullptr)
+    , MinEnergyLimit(-1.)
+    , MaxEnergyLimit(-1.)
+    , PEnergy(-1.)
+{
+}
 
 R3BMCTracks::R3BMCTracks(const char* name, Int_t iVerbose)
-    : FairMCTracks(name, iVerbose)
+    : FairTask(name, iVerbose)
+    , fTrackList(nullptr)
+    , fTrPr(nullptr)
+    , fEventManager(nullptr)
+    , fEveTrList(new TObjArray(16))
+    , fEvent("")
+    , fTrList(nullptr)
+    , MinEnergyLimit(-1.)
+    , MaxEnergyLimit(-1.)
+    , PEnergy(-1.)
 {
 }
 
@@ -198,3 +228,45 @@ void R3BMCTracks::Exec(Option_t* option)
         gEve->Redraw3D(kFALSE);
     }
 }
+
+R3BMCTracks::~R3BMCTracks() {}
+
+void R3BMCTracks::SetParContainers() {}
+
+void R3BMCTracks::Finish() {}
+
+void R3BMCTracks::Reset()
+{
+    for (Int_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
+    {
+        TEveTrackList* ele = static_cast<TEveTrackList*>(fEveTrList->At(i));
+        gEve->RemoveElement(ele, fEventManager);
+    }
+    fEveTrList->Clear();
+}
+
+TEveTrackList* R3BMCTracks::GetTrGroup(TParticle* P)
+{
+    fTrList = 0;
+    for (Int_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
+    {
+        TEveTrackList* TrListIn = static_cast<TEveTrackList*>(fEveTrList->At(i));
+        if (strcmp(TrListIn->GetName(), P->GetName()) == 0)
+        {
+            fTrList = TrListIn;
+            break;
+        }
+    }
+    if (fTrList == 0)
+    {
+        fTrPr = new TEveTrackPropagator();
+        fTrList = new TEveTrackList(P->GetName(), fTrPr);
+        fTrList->SetMainColor(fEventManager->Color(P->GetPdgCode()));
+        fEveTrList->Add(fTrList);
+        gEve->AddElement(fTrList, fEventManager);
+        fTrList->SetRnrLine(kTRUE);
+    }
+    return fTrList;
+}
+
+ClassImp(R3BMCTracks);
