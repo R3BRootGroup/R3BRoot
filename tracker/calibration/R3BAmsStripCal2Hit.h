@@ -21,9 +21,12 @@
 #define R3BAmsStripCal2Hit_H
 
 #include "FairTask.h"
+
 #include "R3BAmsHitData.h"
 #include "R3BAmsStripCal2Hit.h"
 #include "R3BAmsStripCalData.h"
+
+#include <Rtypes.h>
 #include "TVector3.h"
 
 class TClonesArray;

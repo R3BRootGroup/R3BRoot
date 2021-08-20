@@ -21,10 +21,12 @@
 #define R3BAmsMapped2StripCal_H
 
 #include "FairTask.h"
+
 #include "R3BAmsMapped2StripCalPar.h"
 #include "R3BAmsMappedData.h"
 #include "R3BAmsStripCalData.h"
-#include "TH1F.h"
+
+#include <Rtypes.h>
 #include <TRandom.h>
 
 class TClonesArray;

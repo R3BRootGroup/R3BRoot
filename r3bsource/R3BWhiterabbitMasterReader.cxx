@@ -11,11 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BWhiterabbitMasterReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
 #include "R3BWRMasterData.h"
+#include "R3BWhiterabbitMasterReader.h"
 #include "TClonesArray.h"
 
 extern "C"
@@ -25,14 +26,13 @@ extern "C"
 }
 
 R3BWhiterabbitMasterReader::R3BWhiterabbitMasterReader(EXT_STR_h101_WRMASTER* data,
-                                                       UInt_t offset,
+                                                       size_t offset,
                                                        UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitMasterReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
     , fArray(new TClonesArray("R3BWRMasterData"))
@@ -127,4 +127,4 @@ void R3BWhiterabbitMasterReader::Reset()
     fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitMasterReader)
+ClassImp(R3BWhiterabbitMasterReader);

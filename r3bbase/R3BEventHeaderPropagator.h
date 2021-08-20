@@ -11,41 +11,37 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// --------------------------------------------------------------
-// -----             R3BWhiterabbitPropagator               -----
-// -----   Created May 28th 2021 by J.L. Rodriguez-Sanchez  -----
-// --------------------------------------------------------------
-
-#ifndef R3BWhiterabbitPropagator_H
-#define R3BWhiterabbitPropagator_H
+#ifndef R3BEVENTHEADERPROPAGATOR_H
+#define R3BEVENTHEADERPROPAGATOR_H
 
 #include "FairTask.h"
 #include <Rtypes.h>
 
-class TClonesArray;
+#include "R3BEventHeader.h"
+#include "R3BFileSource.h"
 
-class R3BWhiterabbitPropagator : public FairTask
+class R3BEventHeaderPropagator : public FairTask
 {
   public:
     /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BWhiterabbitPropagator();
+    R3BEventHeaderPropagator();
 
     /**
      * Standard constructor.
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
-     * @param namewr a name of the whiterabbit.
      */
-    R3BWhiterabbitPropagator(const TString& name, Int_t iVerbose = 1, const TString& namewr = "WRMaster");
+    R3BEventHeaderPropagator(const TString& name, Int_t iVerbose = 1, const TString& nameheader = "EventHeader.");
 
     /**
      * Destructor.
+     * Frees the memory used by the object.
      */
-    virtual ~R3BWhiterabbitPropagator();
+    virtual ~R3BEventHeaderPropagator();
 
     /**
      * Method for task initialization.
@@ -63,12 +59,12 @@ class R3BWhiterabbitPropagator : public FairTask
     virtual void Exec(Option_t* option) override;
 
   private:
-    TString fNameWR;
-    TClonesArray* fInputItem;  // Array with input items
-    TClonesArray* fOutputItem; // Array with output items
+    TString fNameHeader;
+    R3BEventHeader* fHeader;
+    R3BFileSource* fSource;
 
   public:
-    ClassDefOverride(R3BWhiterabbitPropagator, 0)
+    ClassDefOverride(R3BEventHeaderPropagator, 0)
 };
 
-#endif // R3BWhiterabbitPropagator_H
+#endif // R3BEVENTHEADERPROPAGATOR_H

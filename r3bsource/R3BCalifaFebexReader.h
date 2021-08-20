@@ -15,6 +15,7 @@
 #define R3BCALIFAFEBEXREADER_H
 
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 class TClonesArray;
 
@@ -38,29 +39,36 @@ class R3BCalifaFebexReader : public R3BReader
      * in the overall event structure.
      */
     R3BCalifaFebexReader(EXT_STR_h101_CALIFA*, size_t);
-    ~R3BCalifaFebexReader();
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BCalifaFebexReader();
 
-    /** Accessor to select online mode **/
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
+
+    // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    /* An event counter */
+    // An event counter
     unsigned int fNEvent;
-    /* Reader specific data structure from ucesb */
+    // Reader specific data structure from ucesb
     EXT_STR_h101_CALIFA* fData;
-    /* Data offset */
+    // Data offset
     size_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
-    /**< Output array. */
+    // Output array
     TClonesArray* fArray;
 
   public:
-    ClassDef(R3BCalifaFebexReader, 0);
+    ClassDefOverride(R3BCalifaFebexReader, 0);
 };
 
-#endif /* R3BCALIFAFEBEXREADER_H */
+#endif // R3BCALIFAFEBEXREADER_H

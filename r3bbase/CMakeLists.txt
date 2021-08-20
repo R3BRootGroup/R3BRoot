@@ -11,15 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3B" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3Bbase" which includes the source files given in
+# the array. The extension is already found. Any number of sources could be 
+# listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
-Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 if(${FR_MAJOR_VERSION} GREATER_EQUAL 18 AND ${FR_MINOR_VERSION} GREATER_EQUAL 4)
   add_definitions(-DACTIVATEOBJECTANYIMPLDEFINED)
@@ -28,32 +27,8 @@ endif()
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
-${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
-${R3BROOT_SOURCE_DIR}/los
-${R3BROOT_SOURCE_DIR}/r3bdata/losData
-${R3BROOT_SOURCE_DIR}/rolu
-${R3BROOT_SOURCE_DIR}/r3bdata/roluData
-${R3BROOT_SOURCE_DIR}/sci2
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/sci8
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
-${R3BROOT_SOURCE_DIR}/tof
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
-${R3BROOT_SOURCE_DIR}/r3bdata/pspData
-${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
-${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
-${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
-${R3BROOT_SOURCE_DIR}/r3bdata/musicData
-${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 )
 
@@ -66,7 +41,7 @@ set(SRCS
 R3BModule.cxx
 R3BDetector.cxx
 R3BEventHeader.cxx
-R3BEventHeaderCal2Hit.cxx
+R3BEventHeaderPropagator.cxx
 R3BWhiterabbitPropagator.cxx
 R3BFileSource.cxx
 )

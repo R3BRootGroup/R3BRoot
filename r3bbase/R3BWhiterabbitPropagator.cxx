@@ -72,14 +72,6 @@ InitStatus R3BWhiterabbitPropagator::Init()
     return kSUCCESS;
 }
 
-void R3BWhiterabbitPropagator::SetParContainers() {}
-
-InitStatus R3BWhiterabbitPropagator::ReInit() { return kSUCCESS; }
-
 void R3BWhiterabbitPropagator::Exec(Option_t* option) { return; }
 
-void R3BWhiterabbitPropagator::FinishEvent() {}
-
-void R3BWhiterabbitPropagator::FinishTask() {}
-
-ClassImp(R3BWhiterabbitPropagator)
+ClassImp(R3BWhiterabbitPropagator);
