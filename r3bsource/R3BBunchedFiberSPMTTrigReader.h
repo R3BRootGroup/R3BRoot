@@ -29,13 +29,13 @@ class TClonesArray;
 class R3BBunchedFiberSPMTTrigReader : public R3BReader
 {
   public:
-    R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB *, UInt_t);
-    Bool_t Init(ext_data_struct_info *);
+    R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB*, UInt_t);
+    Bool_t Init(ext_data_struct_info*);
     Bool_t Read();
     void Reset();
 
   private:
-    EXT_STR_h101_FIB *fData;
+    EXT_STR_h101_FIB* fData;
     UInt_t fOffset;
     TClonesArray* fMappedArray;
 

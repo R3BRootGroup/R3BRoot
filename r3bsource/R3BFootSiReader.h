@@ -20,6 +20,7 @@
 #define R3BFootSiReader_H
 
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 class TClonesArray;
 
@@ -33,11 +34,18 @@ class R3BFootSiReader : public R3BReader
   public:
     // Standard constructor
     R3BFootSiReader(EXT_STR_h101_FOOT_onion*, size_t);
+
+    // Destructor
     virtual ~R3BFootSiReader();
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
 
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -60,7 +68,7 @@ class R3BFootSiReader : public R3BReader
     TClonesArray* fArray;
 
   public:
-    ClassDef(R3BFootSiReader, 0);
+    ClassDefOverride(R3BFootSiReader, 0);
 };
 
 #endif /* R3BFootSiReader_H */

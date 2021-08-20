@@ -22,7 +22,7 @@
 #pragma link C++ class R3BModule+;
 #pragma link C++ class R3BDetector+;
 #pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
+#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BWhiterabbitPropagator+;
 #pragma link C++ class R3BFileSource+;
 

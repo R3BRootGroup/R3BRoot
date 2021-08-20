@@ -21,6 +21,7 @@
 #define R3BFootSiOnlineSpectra_H
 
 #include "FairTask.h"
+
 #include "TCanvas.h"
 #include "TMath.h"
 #include <array>
@@ -28,6 +29,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <Rtypes.h>
 #include <vector>
 
 class TClonesArray;
@@ -68,27 +70,27 @@ class R3BFootSiOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    virtual InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t* option) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    virtual void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    virtual void FinishTask() override;
 
     /** Virtual method SetParContainers **/
     // virtual void SetParContainers();
@@ -112,7 +114,7 @@ class R3BFootSiOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_EnergyVsStrip;
 
   public:
-    ClassDef(R3BFootSiOnlineSpectra, 0)
+    ClassDefOverride(R3BFootSiOnlineSpectra, 0)
 };
 
 #endif /* R3BFootSiOnlineSpectra_H */

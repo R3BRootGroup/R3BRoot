@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
-
 #include "FairRootManager.h"
+
 #include "R3BMusicMappedData.h"
 #include "R3BMusicReader.h"
 
@@ -24,12 +24,11 @@ extern "C"
 }
 
 #include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
 #include <iostream>
 
 using namespace std;
 
-R3BMusicReader::R3BMusicReader(EXT_STR_h101_MUSIC* data, UInt_t offset)
+R3BMusicReader::R3BMusicReader(EXT_STR_h101_MUSIC* data, size_t offset)
     : R3BReader("R3BMusicReader")
     , fData(data)
     , fOffset(offset)
@@ -180,4 +179,4 @@ Bool_t R3BMusicReader::ReadData201911()
     return kTRUE;
 }
 
-ClassImp(R3BMusicReader)
+ClassImp(R3BMusicReader);

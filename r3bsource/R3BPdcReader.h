@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3BPDCREADER_H
 #define R3BPDCREADER_H
 
@@ -36,9 +35,9 @@ class R3BPdcReader : public R3BReader
     UInt_t fOffset;
 
     TClonesArray* fMappedArray;
+
   public:
     ClassDef(R3BPdcReader, 1);
 };
 
 #endif
-

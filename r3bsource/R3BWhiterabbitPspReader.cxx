@@ -11,11 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BWhiterabbitPspReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
 #include "R3BWRPspData.h"
+#include "R3BWhiterabbitPspReader.h"
 #include "TClonesArray.h"
 
 extern "C"
@@ -25,14 +26,13 @@ extern "C"
 }
 
 R3BWhiterabbitPspReader::R3BWhiterabbitPspReader(EXT_STR_h101_TIMESTAMP_PSPX* data,
-                                                 UInt_t offset,
+                                                 size_t offset,
                                                  UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitPspReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
     , fArray(new TClonesArray("R3BWRPspData"))
@@ -123,4 +123,4 @@ void R3BWhiterabbitPspReader::Reset()
     fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitPspReader)
+ClassImp(R3BWhiterabbitPspReader);

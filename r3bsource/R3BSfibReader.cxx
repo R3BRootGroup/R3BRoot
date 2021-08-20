@@ -14,9 +14,9 @@
 #include "R3BSfibReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "TClonesArray.h"
 #include "R3BEventHeader.h"
 #include "R3BSfibMappedData.h"
+#include "TClonesArray.h"
 
 extern "C"
 {
@@ -58,32 +58,34 @@ Bool_t R3BSfibReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BSfibReader::Read()
 {
-#define PERM(side, side_i, edge, edge_i) do {\
-	uint32_t c_M = fData->SFIB_##side##T##edge##CM;\
-	uint32_t cur_entry = 0;\
-	for (uint32_t i = 0; i < c_M; i++)\
-	{\
-		uint32_t c_MI = fData->SFIB_##side##T##edge##CMI[i];\
-		uint32_t c_ME = fData->SFIB_##side##T##edge##CME[i];\
-		for (; cur_entry < c_ME; cur_entry++)\
-		{\
-			new ((*fMappedArray)[fMappedArray->GetEntriesFast()])\
-				R3BSfibMappedData(side_i, c_MI, 0 ==\
-						edge_i, fData->SFIB_##side##T##edge##Cv[i],\
-						fData->SFIB_##side##T##edge##Fv[i]);\
-		}\
-	}\
-} while (0)
-	PERM(B, 0, L, 0);
-	PERM(B, 0, T, 1);
-	PERM(T, 1, L, 0);
-	PERM(T, 1, T, 1);
+#define PERM(side, side_i, edge, edge_i)                                   \
+    do                                                                     \
+    {                                                                      \
+        uint32_t c_M = fData->SFIB_##side##T##edge##CM;                    \
+        uint32_t cur_entry = 0;                                            \
+        for (uint32_t i = 0; i < c_M; i++)                                 \
+        {                                                                  \
+            uint32_t c_MI = fData->SFIB_##side##T##edge##CMI[i];           \
+            uint32_t c_ME = fData->SFIB_##side##T##edge##CME[i];           \
+            for (; cur_entry < c_ME; cur_entry++)                          \
+            {                                                              \
+                new ((*fMappedArray)[fMappedArray->GetEntriesFast()])      \
+                    R3BSfibMappedData(side_i,                              \
+                                      c_MI,                                \
+                                      0 == edge_i,                         \
+                                      fData->SFIB_##side##T##edge##Cv[i],  \
+                                      fData->SFIB_##side##T##edge##Fv[i]); \
+            }                                                              \
+        }                                                                  \
+    } while (0)
+    PERM(B, 0, L, 0);
+    PERM(B, 0, T, 1);
+    PERM(T, 1, L, 0);
+    PERM(T, 1, T, 1);
 
     return kTRUE;
 }
 
-void R3BSfibReader::Reset() {
-    fMappedArray->Clear();
-}
+void R3BSfibReader::Reset() { fMappedArray->Clear(); }
 
 ClassImp(R3BSfibReader)

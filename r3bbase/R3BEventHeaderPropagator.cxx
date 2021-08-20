@@ -11,30 +11,27 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----             R3BEventHeaderMapped2TCal            -----
-// -----          Created Feb 13th 2021 by M.Heil         -----
-// ------------------------------------------------------------
-
-#include "R3BEventHeaderCal2Hit.h"
+#include "R3BEventHeaderPropagator.h"
 #include "FairLogger.h"
 #include "R3BFileSource.h"
 
-R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit()
-    : FairTask("R3BEventHeaderCal2Hit", 1)
+R3BEventHeaderPropagator::R3BEventHeaderPropagator()
+    : FairTask("R3BEventHeaderPropagator", 1)
+    , fNameHeader("EventHeader.")
     , fHeader(nullptr)
     , fSource(nullptr)
 {
 }
 
-R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit(int a_verbose)
-    : FairTask("R3BEventHeaderCal2Hit", a_verbose)
+R3BEventHeaderPropagator::R3BEventHeaderPropagator(const TString& name, Int_t iVerbose, const TString& nameheader)
+    : FairTask(name, iVerbose)
+    , fNameHeader(nameheader)
     , fHeader(nullptr)
     , fSource(nullptr)
 {
 }
 
-R3BEventHeaderCal2Hit::~R3BEventHeaderCal2Hit()
+R3BEventHeaderPropagator::~R3BEventHeaderPropagator()
 {
     if (fHeader)
         delete fHeader;
@@ -42,44 +39,34 @@ R3BEventHeaderCal2Hit::~R3BEventHeaderCal2Hit()
         delete fSource;
 }
 
-InitStatus R3BEventHeaderCal2Hit::Init()
+InitStatus R3BEventHeaderPropagator::Init()
 {
-    LOG(INFO) << "R3BEventHeaderCal2Hit::Init()";
+    LOG(INFO) << "R3BEventHeaderPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fHeader)
     {
         fHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
-        LOG(WARNING) << "R3BEventHeaderCal2Hit::Init() FairEventHeader not found";
+        LOG(WARNING) << "R3BEventHeaderPropagator::Init() FairEventHeader not found";
     }
     else
-        LOG(INFO) << "R3BEventHeaderCal2Hit::Init() EventHeader found";
+        LOG(INFO) << "R3BEventHeaderPropagator::Init() EventHeader found";
 
-    frm->Register("EventHeader.", "EventHeader", fHeader, kTRUE);
+    frm->Register(fNameHeader, "EventHeader", fHeader, kTRUE);
 
     fSource = R3BFileSource::Instance();
     if (!fSource)
     {
-        LOG(WARNING) << "R3BEventHeaderCal2Hit::Init() R3BFileSource not found";
+        LOG(WARNING) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
     }
-
     return kSUCCESS;
 }
 
-void R3BEventHeaderCal2Hit::SetParContainers() {}
-
-InitStatus R3BEventHeaderCal2Hit::ReInit() { return kSUCCESS; }
-
-void R3BEventHeaderCal2Hit::Exec(Option_t* option)
+void R3BEventHeaderPropagator::Exec(Option_t* option)
 {
     if (fSource)
         fHeader->SetRunId(fSource->GetRunId());
-
     return;
 }
 
-void R3BEventHeaderCal2Hit::FinishEvent() {}
-
-void R3BEventHeaderCal2Hit::FinishTask() {}
-
-ClassImp(R3BEventHeaderCal2Hit)
+ClassImp(R3BEventHeaderPropagator);

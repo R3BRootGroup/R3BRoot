@@ -11,13 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaFebexReader.h"
 #include "FairLogger.h"
-
 #include "FairRootManager.h"
+
+#include "R3BCalifaFebexReader.h"
 #include "R3BCalifaMappedData.h"
 #include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
 
 /**
  ** ext_h101_califa.h was created by running

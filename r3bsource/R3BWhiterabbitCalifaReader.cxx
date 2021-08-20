@@ -11,11 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BWhiterabbitCalifaReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
 #include "R3BWRCalifaData.h"
+#include "R3BWhiterabbitCalifaReader.h"
 #include "TClonesArray.h"
 
 extern "C"
@@ -25,7 +26,7 @@ extern "C"
 }
 
 R3BWhiterabbitCalifaReader::R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA* data,
-                                                       UInt_t offset,
+                                                       size_t offset,
                                                        UInt_t whiterabbit_id1,
                                                        UInt_t whiterabbit_id2)
     : R3BReader("R3BWhiterabbitCalifaReader")
@@ -33,7 +34,6 @@ R3BWhiterabbitCalifaReader::R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA* da
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fWhiterabbitId1(whiterabbit_id1)
     , fWhiterabbitId2(whiterabbit_id2)
     , fEventHeader(nullptr)
@@ -147,4 +147,4 @@ void R3BWhiterabbitCalifaReader::Reset()
     fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitCalifaReader)
+ClassImp(R3BWhiterabbitCalifaReader);

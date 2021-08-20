@@ -15,6 +15,7 @@
 #define R3BMUSICREADER_H
 
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 class TClonesArray;
 
@@ -26,18 +27,23 @@ struct EXT_STR_h101_MUSIC_t;
 typedef struct EXT_STR_h101_MUSIC_t EXT_STR_h101_MUSIC;
 typedef struct EXT_STR_h101_MUSIC_onion_t EXT_STR_h101_MUSIC_onion;
 
-class FairLogger;
-
 class R3BMusicReader : public R3BReader
 {
   public:
-    R3BMusicReader(EXT_STR_h101_MUSIC*, UInt_t);
-    ~R3BMusicReader();
+    // Standard constructor
+    R3BMusicReader(EXT_STR_h101_MUSIC*, size_t);
 
-  public:
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BMusicReader();
+
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -45,20 +51,17 @@ class R3BMusicReader : public R3BReader
   private:
     Bool_t ReadData201911();
     uint32_t multPerAnode[NUM_MUSIC_ANODES];
-
     // Don't store data for online
     Bool_t fOnline;
-    /* Reader specific data structure from ucesb */
+    // Reader specific data structure from ucesb
     EXT_STR_h101_MUSIC* fData;
-    /* Data offset */
-    UInt_t fOffset;
-    /* FairLogger */
-    FairLogger* fLogger;
-    /* the structs of type R3BMusicMappedData Item */
-    TClonesArray* fArray; /**< Output array. */
+    // Data offset
+    size_t fOffset;
+    // Output array of type R3BMusicMappedData
+    TClonesArray* fArray;
 
   public:
-    ClassDef(R3BMusicReader, 0);
+    ClassDefOverride(R3BMusicReader, 0);
 };
 
-#endif
+#endif // R3BMUSICREADER_H
