@@ -298,7 +298,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    LOG(ERROR) << "R3BTofdCal2Histo::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
