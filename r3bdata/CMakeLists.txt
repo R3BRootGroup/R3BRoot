@@ -178,9 +178,9 @@ sfibData/R3BSfibMappedData.cxx
 sfibData/R3BSfibCalData.cxx
 sfibData/R3BSfibHitData.cxx
 frsData/R3BFrsData.cxx
-footData/R3BFootSiMappedData.cxx
-footData/R3BFootSiCalData.cxx
-footData/R3BFootSiHitData.cxx
+footData/R3BFootMappedData.cxx
+footData/R3BFootCalData.cxx
+footData/R3BFootHitData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

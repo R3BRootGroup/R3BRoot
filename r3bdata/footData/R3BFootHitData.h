@@ -11,23 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// --------------------------------------------------------------------
-// -----            R3BFootSiHitData header file                  -----
-// -----       Created 16/07/21  by J.L. Rodriguez-Sanchez        -----
-// --------------------------------------------------------------------
+// ------------------------------------------------------------------
+// -----            R3BFootHitData header file                  -----
+// -----       Created 16/07/21  by J.L. Rodriguez-Sanchez      -----
+// ------------------------------------------------------------------
 
-#ifndef R3BFootSiHitData_H
-#define R3BFootSiHitData_H
+#ifndef R3BFootHitData_H
+#define R3BFootHitData_H
 
 #include "FairMultiLinkedData.h"
 #include "TObject.h"
 #include "TVector3.h"
 
-class R3BFootSiHitData : public FairMultiLinkedData
+class R3BFootHitData : public FairMultiLinkedData
 {
   public:
     /** Default constructor **/
-    R3BFootSiHitData();
+    R3BFootHitData();
 
     /** Constructor with arguments
      *@param fDetId     Detector unique identifier
@@ -39,21 +39,21 @@ class R3BFootSiHitData : public FairMultiLinkedData
      *@param fPhi       Master: Angle Phi [rad] (lab frame)
      *@param fEnergy    Total energy deposited by the hit ([GeV] in sim)
      **/
-    R3BFootSiHitData(Int_t detid,
-                     Int_t nbhit,
-                     Double_t x,
-                     Double_t y,
-                     TVector3 master,
-                     Double_t energy,
-                     Int_t mulstrip = 0);
+    R3BFootHitData(Int_t detid,
+                   Int_t nbhit,
+                   Double_t x,
+                   Double_t y,
+                   TVector3 master,
+                   Double_t energy,
+                   Int_t mulstrip = 0);
 
     /** Copy constructor **/
-    R3BFootSiHitData(const R3BFootSiHitData&);
+    R3BFootHitData(const R3BFootHitData&);
 
-    R3BFootSiHitData& operator=(const R3BFootSiHitData&) { return *this; }
+    R3BFootHitData& operator=(const R3BFootHitData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BFootSiHitData() {}
+    virtual ~R3BFootHitData() {}
 
     /** Accessors **/
     inline const Int_t& GetDetId() const { return fDetId; }
@@ -75,7 +75,7 @@ class R3BFootSiHitData : public FairMultiLinkedData
     TVector3 fmaster;
     Double_t fEnergy;
 
-    ClassDef(R3BFootSiHitData, 0)
+    ClassDef(R3BFootHitData, 0)
 };
 
-#endif /* R3BFootSiHitData_H */
+#endif /* R3BFootHitData_H */

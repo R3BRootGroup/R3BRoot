@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----             R3BFootSiOnlineSpectra               -----
+// -----             R3BFootOnlineSpectra                 -----
 // -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
@@ -21,9 +21,9 @@
  * This task should fill histograms with FOOT online data
  */
 
-#include "R3BFootSiOnlineSpectra.h"
+#include "R3BFootOnlineSpectra.h"
 
-#include "R3BFootSiMappedData.h"
+#include "R3BFootMappedData.h"
 
 #include "R3BEventHeader.h"
 #include "THttpServer.h"
@@ -45,7 +45,7 @@
 #include <iostream>
 #include <sstream>
 
-R3BFootSiOnlineSpectra::R3BFootSiOnlineSpectra()
+R3BFootOnlineSpectra::R3BFootOnlineSpectra()
     : FairTask("FootOnlineSpectra", 1)
     , fMappedItems(NULL)
     , fCalItems(NULL)
@@ -56,7 +56,7 @@ R3BFootSiOnlineSpectra::R3BFootSiOnlineSpectra()
 {
 }
 
-R3BFootSiOnlineSpectra::R3BFootSiOnlineSpectra(const TString& name, Int_t iVerbose)
+R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
     , fCalItems(NULL)
@@ -67,9 +67,9 @@ R3BFootSiOnlineSpectra::R3BFootSiOnlineSpectra(const TString& name, Int_t iVerbo
 {
 }
 
-R3BFootSiOnlineSpectra::~R3BFootSiOnlineSpectra()
+R3BFootOnlineSpectra::~R3BFootOnlineSpectra()
 {
-    LOG(DEBUG) << "R3BFootSiOnlineSpectra::Delete instance";
+    LOG(DEBUG) << "R3BFootOnlineSpectra::Delete instance";
     if (fMappedItems)
         delete fMappedItems;
     if (fCalItems)
@@ -78,34 +78,34 @@ R3BFootSiOnlineSpectra::~R3BFootSiOnlineSpectra()
         delete fHitItems;
 }
 
-InitStatus R3BFootSiOnlineSpectra::Init()
+InitStatus R3BFootOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BFootSiOnlineSpectra::Init()";
+    LOG(INFO) << "R3BFootOnlineSpectra::Init()";
 
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BFootSiOnlineSpectra::FairRootManager not found";
+        LOG(FATAL) << "R3BFootOnlineSpectra::FairRootManager not found";
 
     // Create histograms for all the detectors
 
     // Get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("FootSiMappedData");
+    fMappedItems = (TClonesArray*)mgr->GetObject("FootMappedData");
     if (!fMappedItems)
     {
-        LOG(FATAL) << "R3BFootSiOnlineSpectra::FootSiMappedData not found";
+        LOG(FATAL) << "R3BFootOnlineSpectra::FootMappedData not found";
         return kFATAL;
     }
 
     // Get access to Cal data
     fCalItems = (TClonesArray*)mgr->GetObject("FootSiCalData");
     if (!fCalItems)
-        LOG(WARNING) << "R3BFootSiOnlineSpectra::FootSiCalData not found";
+        LOG(WARNING) << "R3BFootOnlineSpectra::FootSiCalData not found";
 
     // Get access to Hit data
     fHitItems = (TClonesArray*)mgr->GetObject("FootSiHitData");
     if (!fHitItems)
-        LOG(WARNING) << "R3BFootSiOnlineSpectra::FootSiHitData not found";
+        LOG(WARNING) << "R3BFootOnlineSpectra::FootSiHitData not found";
 
     // Energy range for strips
     Double_t binsE = 200;
@@ -162,9 +162,9 @@ InitStatus R3BFootSiOnlineSpectra::Init()
     return kSUCCESS;
 }
 
-void R3BFootSiOnlineSpectra::Reset_FOOT_Histo()
+void R3BFootOnlineSpectra::Reset_FOOT_Histo()
 {
-    LOG(INFO) << "R3BFootSiOnlineSpectra::Reset_FOOT_Histo";
+    LOG(INFO) << "R3BFootOnlineSpectra::Reset_FOOT_Histo";
 
     // Mapped data
     for (Int_t i = 0; i < fNbDet; i++)
@@ -173,7 +173,7 @@ void R3BFootSiOnlineSpectra::Reset_FOOT_Histo()
     }
 }
 
-void R3BFootSiOnlineSpectra::Exec(Option_t* option)
+void R3BFootOnlineSpectra::Exec(Option_t* option)
 {
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
@@ -181,7 +181,7 @@ void R3BFootSiOnlineSpectra::Exec(Option_t* option)
         auto nHits = fMappedItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFootSiMappedData* hit = (R3BFootSiMappedData*)fMappedItems->At(ihit);
+            R3BFootMappedData* hit = (R3BFootMappedData*)fMappedItems->At(ihit);
             if (!hit)
                 continue;
             fh2_EnergyVsStrip[hit->GetDetId()]->Fill(hit->GetStripId(), hit->GetEnergy());
@@ -191,7 +191,7 @@ void R3BFootSiOnlineSpectra::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BFootSiOnlineSpectra::FinishEvent()
+void R3BFootOnlineSpectra::FinishEvent()
 {
     if (fMappedItems)
     {
@@ -207,7 +207,7 @@ void R3BFootSiOnlineSpectra::FinishEvent()
     }
 }
 
-void R3BFootSiOnlineSpectra::FinishTask()
+void R3BFootOnlineSpectra::FinishTask()
 {
     if (fMappedItems)
     {
@@ -216,4 +216,4 @@ void R3BFootSiOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BFootSiOnlineSpectra);
+ClassImp(R3BFootOnlineSpectra);

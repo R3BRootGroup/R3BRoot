@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------------
-// -----           R3BFootSiHitData source file                     -----
+// -----           R3BFootHitData source file                       -----
 // ----------------------------------------------------------------------
 
-#include "R3BFootSiHitData.h"
+#include "R3BFootHitData.h"
 
 // -----   Default constructor   ----------------------------------------
-R3BFootSiHitData::R3BFootSiHitData()
+R3BFootHitData::R3BFootHitData()
     : FairMultiLinkedData()
     , fDetId(-1)
     , fNbHit(0)
@@ -33,13 +33,13 @@ R3BFootSiHitData::R3BFootSiHitData()
 }
 
 // -----   Standard constructor   ---------------------------------------
-R3BFootSiHitData::R3BFootSiHitData(Int_t detid,
-                                   Int_t nbhit,
-                                   Double_t x,
-                                   Double_t y,
-                                   TVector3 master,
-                                   Double_t energy,
-                                   Int_t mulstrip)
+R3BFootHitData::R3BFootHitData(Int_t detid,
+                               Int_t nbhit,
+                               Double_t x,
+                               Double_t y,
+                               TVector3 master,
+                               Double_t energy,
+                               Int_t mulstrip)
     : FairMultiLinkedData()
     , fDetId(detid)
     , fNbHit(nbhit)
@@ -54,7 +54,7 @@ R3BFootSiHitData::R3BFootSiHitData(Int_t detid,
 }
 
 // ----------------------------------------------------------------------
-R3BFootSiHitData::R3BFootSiHitData(const R3BFootSiHitData& right)
+R3BFootHitData::R3BFootHitData(const R3BFootHitData& right)
     : FairMultiLinkedData(right)
     , fDetId(right.fDetId)
     , fNbHit(right.fNbHit)
@@ -68,4 +68,4 @@ R3BFootSiHitData::R3BFootSiHitData(const R3BFootSiHitData& right)
 {
 }
 
-ClassImp(R3BFootSiHitData);
+ClassImp(R3BFootHitData);

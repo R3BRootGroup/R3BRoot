@@ -11,37 +11,37 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ----------------------------------------------------------------------
-// -----              R3BFootSiCalData header file                  -----
-// -----       Created 16/07/21  by J.L. Rodriguez-Sanchez          -----
-// ----------------------------------------------------------------------
+// --------------------------------------------------------------------
+// -----              R3BFootCalData header file                  -----
+// -----       Created 16/07/21  by J.L. Rodriguez-Sanchez        -----
+// --------------------------------------------------------------------
 
-#ifndef R3BFootSiCalData_H
-#define R3BFootSiCalData_H
+#ifndef R3BFootCalData_H
+#define R3BFootCalData_H
 
 #include "FairMultiLinkedData.h"
 #include "TObject.h"
 
-class R3BFootSiCalData : public FairMultiLinkedData
+class R3BFootCalData : public FairMultiLinkedData
 {
   public:
     /** Default constructor **/
-    R3BFootSiCalData();
+    R3BFootCalData();
 
     /** Constructor with arguments
      *@param fDetId    Detector unique identifier
      *@param fStripId  Strip unique identifier
      *@param fEnergy   Total energy deposited on the strip ([GeV] in sim)
      **/
-    R3BFootSiCalData(Int_t detid, Int_t stripid, Double_t energy);
+    R3BFootCalData(Int_t detid, Int_t stripid, Double_t energy);
 
     /** Copy constructor **/
-    R3BFootSiCalData(const R3BFootSiCalData&);
+    R3BFootCalData(const R3BFootCalData&);
 
-    R3BFootSiCalData& operator=(const R3BFootSiCalData&) { return *this; }
+    R3BFootCalData& operator=(const R3BFootCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BFootSiCalData() {}
+    virtual ~R3BFootCalData() {}
 
     /** Accessors **/
     inline const Int_t& GetDetId() const { return fDetId; }
@@ -58,7 +58,7 @@ class R3BFootSiCalData : public FairMultiLinkedData
     Int_t fStripId;   // strip unique identifier
     Double_t fEnergy; // total energy in the strip
 
-    ClassDef(R3BFootSiCalData, 0)
+    ClassDef(R3BFootCalData, 0)
 };
 
-#endif /* R3BFootSiCalData_H */
+#endif /* R3BFootCalData_H */

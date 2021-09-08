@@ -61,7 +61,9 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     if (NULL == mgr)
         LOG(ERROR) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
@@ -72,14 +74,8 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("LosMapped", "Land", fArray, !fOnline);
+
     fArray->Clear();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that

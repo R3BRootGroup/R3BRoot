@@ -58,7 +58,7 @@ set(SRCS
 ./pars/R3BGeoTraPar.cxx
 ./pars/R3BAmsMappingPar.cxx
 ./pars/R3BAmsStripCalPar.cxx
-./pars/R3BTraContFact.cxx
+./pars/R3BSsdContFact.cxx
 ./digi/R3BTraDigiPar.cxx
 ./digi/R3BTraDigitizer.cxx
 ./digi/R3BTargetDigiPar.cxx
@@ -74,7 +74,9 @@ set(SRCS
 ./calibration/R3BAmsStripCal2Hit.cxx
 ./online/R3BAmsOnlineSpectra.cxx
 ./online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
-./online/R3BFootSiOnlineSpectra.cxx
+./online/R3BFootOnlineSpectra.cxx
+./pars/R3BFootCalPar.cxx
+./calibration/R3BFootMapped2StripCal.cxx
 )
 
 # fill list of header files from list of source files

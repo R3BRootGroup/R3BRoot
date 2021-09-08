@@ -12,30 +12,30 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------------
-// -----                   R3BFootSiMappedData                 -----
+// -----                   R3BFootMappedData                   -----
 // -----          Created 16/07/2021 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BFootSiMappedData_H
-#define R3BFootSiMappedData_H
+#ifndef R3BFootMappedData_H
+#define R3BFootMappedData_H
 
 #include "TObject.h"
 
-class R3BFootSiMappedData : public TObject
+class R3BFootMappedData : public TObject
 {
   public:
     // Default Constructor
-    R3BFootSiMappedData();
+    R3BFootMappedData();
 
     /** Standard Constructor
      *@param detId       Detector unique identifier
      *@param stripId     Strip unique identifier
      *@param energy      Total energy deposited in the strip
      **/
-    R3BFootSiMappedData(Int_t detId, Int_t stripId, Int_t energy);
+    R3BFootMappedData(Int_t detId, Int_t stripId, Int_t energy);
 
     // Destructor
-    virtual ~R3BFootSiMappedData() {}
+    virtual ~R3BFootMappedData() {}
 
     // Getters
     inline const Int_t& GetDetId() const { return fDetId; }
@@ -48,7 +48,7 @@ class R3BFootSiMappedData : public TObject
     Int_t fEnergy;  // Energy per strip
 
   public:
-    ClassDef(R3BFootSiMappedData, 0)
+    ClassDef(R3BFootMappedData, 0)
 };
 
-#endif /* R3BFootSiMappedData */
+#endif /* R3BFootMappedData */

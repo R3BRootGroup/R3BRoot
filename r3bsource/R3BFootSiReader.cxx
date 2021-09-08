@@ -14,7 +14,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
-#include "R3BFootSiMappedData.h"
+#include "R3BFootMappedData.h"
 #include "R3BFootSiReader.h"
 
 #include "TClonesArray.h"
@@ -38,7 +38,7 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fNbDet(10)
-    , fArray(new TClonesArray("R3BFootSiMappedData"))
+    , fArray(new TClonesArray("R3BFootMappedData"))
 {
 }
 
@@ -61,7 +61,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("FootSiMappedData", "FootSi", fArray, !fOnline);
+    FairRootManager::Instance()->Register("FootMappedData", "Foot mapped data", fArray, !fOnline);
 
     return kTRUE;
 }
@@ -74,7 +74,7 @@ Bool_t R3BFootSiReader::Read()
         if (fData->SST[d]._ == 634)
             for (Int_t strip = 0; strip < fData->SST[d]._; ++strip)
             {
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootSiMappedData(d + 1, strip + 1, fData->SST[d].E[strip]);
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->SST[d].E[strip]);
             }
         else
         {

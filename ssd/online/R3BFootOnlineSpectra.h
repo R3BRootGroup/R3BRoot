@@ -12,24 +12,24 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----             R3BFootSiOnlineSpectra               -----
+// -----             R3BFootOnlineSpectra                 -----
 // -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BFootSiOnlineSpectra_H
-#define R3BFootSiOnlineSpectra_H
+#ifndef R3BFootOnlineSpectra_H
+#define R3BFootOnlineSpectra_H
 
 #include "FairTask.h"
 
 #include "TCanvas.h"
 #include "TMath.h"
+#include <Rtypes.h>
 #include <array>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <Rtypes.h>
 #include <vector>
 
 class TClonesArray;
@@ -40,7 +40,7 @@ class TH2F;
 /**
  * This taks reads FOOT data and plots online histograms
  */
-class R3BFootSiOnlineSpectra : public FairTask
+class R3BFootOnlineSpectra : public FairTask
 {
 
   public:
@@ -48,7 +48,7 @@ class R3BFootSiOnlineSpectra : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BFootSiOnlineSpectra();
+    R3BFootOnlineSpectra();
 
     /**
      * Standard constructor.
@@ -56,13 +56,13 @@ class R3BFootSiOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BFootSiOnlineSpectra(const TString& name, Int_t iVerbose = 1);
+    R3BFootOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BFootSiOnlineSpectra();
+    virtual ~R3BFootOnlineSpectra();
 
     /**
      * Method for task initialization.
@@ -114,7 +114,7 @@ class R3BFootSiOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_EnergyVsStrip;
 
   public:
-    ClassDefOverride(R3BFootSiOnlineSpectra, 0)
+    ClassDefOverride(R3BFootOnlineSpectra, 0)
 };
 
-#endif /* R3BFootSiOnlineSpectra_H */
+#endif /* R3BFootOnlineSpectra_H */

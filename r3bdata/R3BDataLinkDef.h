@@ -53,9 +53,9 @@
 #pragma link C++ class R3BAmsMappedData+;
 #pragma link C++ class R3BAmsStripCalData+;
 #pragma link C++ class R3BAmsHitData+;
-#pragma link C++ class R3BFootSiMappedData+;
-#pragma link C++ class R3BFootSiCalData+;
-#pragma link C++ class R3BFootSiHitData+;
+#pragma link C++ class R3BFootMappedData+;
+#pragma link C++ class R3BFootCalData+;
+#pragma link C++ class R3BFootHitData+;
 
 #pragma link C++ class R3BWRMasterData+;
 #pragma link C++ class R3BWRCalifaData+;
