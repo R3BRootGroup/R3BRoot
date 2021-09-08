@@ -26,8 +26,8 @@
 #include "R3BAmsStripCal2Hit.h"
 #include "R3BAmsStripCalData.h"
 
-#include <Rtypes.h>
 #include "TVector3.h"
+#include <Rtypes.h>
 
 class TClonesArray;
 class R3BAmsMappingPar;

@@ -100,12 +100,6 @@ class R3BLosMapped2Cal : public FairTask
     void FinishEvent();
 
     /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    void FinishTask();
-
-    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */

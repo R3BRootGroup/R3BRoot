@@ -51,15 +51,7 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosMapped2Cal::R3BLosMapped2Cal()
-    : FairTask("LosTcal", 1)
-    , fMappedItems(NULL)
-    , fCalItems(new TClonesArray("R3BLosCalData"))
-    , fNofCalItems(0)
-    , fNofTcalPars(0)
-    , fTcalPar(NULL)
-    , fTrigger(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvent(0)
+    : R3BLosMapped2Cal("LosTcal", 1)
 {
 }
 
@@ -70,9 +62,10 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fTcalPar(NULL)
-    , fTrigger(1) // trigger 1 - onspill, 2 - offspill, -1 - all events
+    , fTrigger(-1) // trigger 1 - onspill, 2 - offspill, -1 - all events
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvent(0)
+    , fOnline(kFALSE)
 {
 }
 
@@ -104,7 +97,9 @@ InitStatus R3BLosMapped2Cal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
@@ -116,15 +111,8 @@ InitStatus R3BLosMapped2Cal::Init()
         return kFATAL;
     }
 
-    // request storage of Cal data in output tree
-    if (!fOnline)
-    {
-        mgr->Register("LosCal", "Land", fCalItems, kTRUE);
-    }
-    else
-    {
-        mgr->Register("LosCal", "Land", fCalItems, kFALSE);
-    }
+    // Request storage of Cal data in output tree
+    mgr->Register("LosCal", "Land", fCalItems, !fOnline);
 
     fCalItems->Clear();
 
@@ -319,7 +307,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 3:
-                    {   // change to 3
+                    { // change to 3
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))
@@ -329,7 +317,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 5:
-                    {   // change to 5
+                    { // change to 5
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))
@@ -339,7 +327,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 7:
-                    {   // change to 7
+                    { // change to 7
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6)))
@@ -349,7 +337,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 2:
-                    {   // change to 2
+                    { // change to 2
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))
@@ -457,6 +445,4 @@ void R3BLosMapped2Cal::FinishEvent()
     }
 }
 
-void R3BLosMapped2Cal::FinishTask() {}
-
-ClassImp(R3BLosMapped2Cal)
+ClassImp(R3BLosMapped2Cal);

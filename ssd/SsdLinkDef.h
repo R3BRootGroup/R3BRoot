@@ -24,7 +24,7 @@
 #pragma link C++ class R3BTra+;
 #pragma link C++ class R3BTraDigitizer+;
 #pragma link C++ class R3BTraDigiPar+;
-#pragma link C++ class R3BTraContFact+;
+#pragma link C++ class R3BSsdContFact+;
 #pragma link C++ class R3BTargetDigitizer+;
 #pragma link C++ class R3BTargetDigiPar+;
 #pragma link C++ class R3BTra2pDigitizer+;
@@ -42,7 +42,10 @@
 #pragma link C++ class R3BAmsStripCal2Hit+;
 #pragma link C++ class R3BAmsOnlineSpectra+;
 #pragma link C++ class R3BAmsCalifaCorrelatedOnlineSpectra+;
-#pragma link C++ class R3BFootSiOnlineSpectra+;
+
+#pragma link C++ class R3BFootCalPar+;
+#pragma link C++ class R3BFootMapped2StripCal+;
+#pragma link C++ class R3BFootOnlineSpectra+;
 
 #endif
 

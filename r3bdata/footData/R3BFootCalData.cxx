@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------------------
-// -----            R3BFootSiCalData source file                     -----
+// -----            R3BFootCalData source file                       -----
 // -----------------------------------------------------------------------
 
-#include "R3BFootSiCalData.h"
+#include "R3BFootCalData.h"
 
 // -----   Default constructor   -------------------------------------------
-R3BFootSiCalData::R3BFootSiCalData()
+R3BFootCalData::R3BFootCalData()
     : FairMultiLinkedData()
     , fDetId(0)
     , fStripId(0)
@@ -27,7 +27,7 @@ R3BFootSiCalData::R3BFootSiCalData()
 }
 
 // -----   Standard constructor   ------------------------------------------
-R3BFootSiCalData::R3BFootSiCalData(Int_t detid, Int_t stripid, Double_t energy)
+R3BFootCalData::R3BFootCalData(Int_t detid, Int_t stripid, Double_t energy)
     : FairMultiLinkedData()
     , fDetId(detid)
     , fStripId(stripid)
@@ -36,7 +36,7 @@ R3BFootSiCalData::R3BFootSiCalData(Int_t detid, Int_t stripid, Double_t energy)
 }
 // -------------------------------------------------------------------------
 
-R3BFootSiCalData::R3BFootSiCalData(const R3BFootSiCalData& right)
+R3BFootCalData::R3BFootCalData(const R3BFootCalData& right)
     : FairMultiLinkedData(right)
     , fDetId(right.fDetId)
     , fStripId(right.fStripId)
@@ -44,4 +44,4 @@ R3BFootSiCalData::R3BFootSiCalData(const R3BFootSiCalData& right)
 {
 }
 
-ClassImp(R3BFootSiCalData);
+ClassImp(R3BFootCalData);

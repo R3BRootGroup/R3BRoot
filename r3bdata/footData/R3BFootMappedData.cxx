@@ -12,23 +12,23 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------------------
-// -----            R3BFootSiMappedData source file                  -----
+// -----            R3BFootMappedData source file                    -----
 // -----------------------------------------------------------------------
 
-#include "R3BFootSiMappedData.h"
+#include "R3BFootMappedData.h"
 
-R3BFootSiMappedData::R3BFootSiMappedData()
+R3BFootMappedData::R3BFootMappedData()
     : fDetId(0)
     , fStripId(0)
     , fEnergy(0)
 {
 }
 
-R3BFootSiMappedData::R3BFootSiMappedData(Int_t detId, Int_t stripId, Int_t energy)
+R3BFootMappedData::R3BFootMappedData(Int_t detId, Int_t stripId, Int_t energy)
     : fDetId(detId)
     , fStripId(stripId)
     , fEnergy(energy)
 {
 }
 
-ClassImp(R3BFootSiMappedData);
+ClassImp(R3BFootMappedData);

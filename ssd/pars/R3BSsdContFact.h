@@ -11,23 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTRACONTFACT_H
-#define R3BTRACONTFACT_H
+#ifndef R3BSsdContFact_H
+#define R3BSsdContFact_H
 
 #include "FairContFact.h"
 
 class FairContainer;
 
-class R3BTraContFact : public FairContFact
+class R3BSsdContFact : public FairContFact
 {
   private:
     void setAllContainers();
 
   public:
-    R3BTraContFact();
-    ~R3BTraContFact() {}
+    R3BSsdContFact();
+    ~R3BSsdContFact() {}
     FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BTraContFact, 0) // Factory for all TRA parameter containers
+    ClassDef(R3BSsdContFact, 0) // Factory for all SSD parameter containers
 };
 
-#endif /* !R3BTRACONTFACT_H */
+#endif /* R3BSsdContFact_H */
