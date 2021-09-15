@@ -13,36 +13,44 @@
 
 #ifndef R3BTRLOIITPATREADER_H
 #define R3BTRLOIITPATREADER_H
+
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 struct EXT_STR_h101_TPAT_t;
 typedef struct EXT_STR_h101_TPAT_t EXT_STR_h101_TPAT;
 
-class FairLogger;
 class R3BEventHeader;
 
 class R3BTrloiiTpatReader : public R3BReader
 {
   public:
-    R3BTrloiiTpatReader(EXT_STR_h101_TPAT*, UInt_t);
-    ~R3BTrloiiTpatReader();
+    R3BTrloiiTpatReader(EXT_STR_h101_TPAT*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BTrloiiTpatReader();
+
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
 
   private:
-    /* An event counter */
+    // An event counter
     UInt_t fNEvent;
-    /* Reader specific data structure from ucesb */
+    // Reader specific data structure from ucesb
     EXT_STR_h101_TPAT* fData;
-    /* Offset of detector specific data in full data structure */
-    UInt_t fOffset;
-    /* A pointer to the R3BEventHeader structure */
+    // Offset of detector specific data in full data structure
+    size_t fOffset;
+    // A pointer to the R3BEventHeader structure
     R3BEventHeader* fEventHeader;
 
   public:
-    ClassDef(R3BTrloiiTpatReader, 0);
+    ClassDefOverride(R3BTrloiiTpatReader, 0);
 };
 
-#endif
+#endif /* R3BTRLOIITPATREADER_H */

@@ -39,7 +39,6 @@
  * */
 struct EXT_STR_h101_t;
 typedef struct EXT_STR_h101_t EXT_STR_h101;
-/*#include "ext_h101.h"*/
 
 class FairLogger;
 class R3BEventHeader;
@@ -53,7 +52,7 @@ class R3BUcesbSource : public FairSource
     Source_Type GetSourceType() { return kONLINE; }
 
     /* Init() will fork a ucesb instance to deliver the unpacked data for
-     * R3Broot. It makes use of the ext_data_ interface of ucesb.
+     * R3BRoot. It makes use of the ext_data_ interface of ucesb.
      * */
     Bool_t Init();
     Bool_t InitUnpackers();
@@ -105,12 +104,11 @@ class R3BUcesbSource : public FairSource
     Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
     TString fInputFileName;
     std::ifstream fInputFile;
-    Int_t fRunId;
     Int_t fEntryMax;
 
   public:
-    /* Create dictionary */
+    // Create dictionary
     ClassDef(R3BUcesbSource, 1)
 };
 
-#endif
+#endif /* __R3BROOT__R3BUCESBSOURCE__ */

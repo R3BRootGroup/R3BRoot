@@ -11,10 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTrloiiTpatReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
+#include "R3BTrloiiTpatReader.h"
 
 extern "C"
 {
@@ -22,9 +23,7 @@ extern "C"
 #include "ext_h101_tpat.h"
 }
 
-using namespace std;
-
-R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, UInt_t offset)
+R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
     : R3BReader("R3BTrloiiTpatReader")
     , fNEvent(0)
     , fData(data)
@@ -42,7 +41,7 @@ R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTrloiiTpatReader::Init";
+    LOG(INFO) << "R3BTrloiiTpatReader::Init()";
     EXT_STR_h101_TPAT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TPAT, 0);
 
     if (!ok)
@@ -98,4 +97,4 @@ Bool_t R3BTrloiiTpatReader::Read()
 
 void R3BTrloiiTpatReader::Reset() { fNEvent = 0; }
 
-ClassImp(R3BTrloiiTpatReader)
+ClassImp(R3BTrloiiTpatReader);

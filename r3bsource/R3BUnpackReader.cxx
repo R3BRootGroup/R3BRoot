@@ -11,12 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BUnpackReader.h"
 #include "FairEventHeader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
+
 #include "R3BEventHeader.h"
+#include "R3BUnpackReader.h"
 
 extern "C"
 {
@@ -25,16 +26,11 @@ extern "C"
 }
 #include <iostream>
 
-using namespace std;
-
-int r = 1;
-
-R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, UInt_t offset)
+R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, size_t offset)
     : R3BReader("R3BUnpackReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
     , fHeader(NULL)
 {
 }
@@ -50,7 +46,7 @@ R3BUnpackReader::~R3BUnpackReader()
 Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BUnpackReader::Init";
+    LOG(INFO) << "R3BUnpackReader::Init()";
     EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_unpack, 0);
 
     if (!ok)
@@ -103,4 +99,4 @@ Bool_t R3BUnpackReader::Read()
 
 void R3BUnpackReader::Reset() { fNEvent = 0; }
 
-ClassImp(R3BUnpackReader)
+ClassImp(R3BUnpackReader);
