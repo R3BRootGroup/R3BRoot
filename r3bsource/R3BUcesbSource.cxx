@@ -329,4 +329,4 @@ void R3BUcesbSource::Reset()
 //_____________________________________________________________________________
 void R3BUcesbSource::FillEventHeader(FairEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
 
-ClassImp(R3BUcesbSource)
+ClassImp(R3BUcesbSource);
