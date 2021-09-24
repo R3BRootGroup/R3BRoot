@@ -129,7 +129,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
     //   TClonesArray *fbmonMappedItems;
 
-    unsigned long long  time_start = -1, time_begin = -1, time = 0, time_mem = 0, time_end = 0;
+    unsigned long long  time_start = -1, time_begin = -1, time = 0, time_mem = 0, time_end = 0, time_mem_long = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
     unsigned long int ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0, nBeamParticle=0;
     unsigned long int ic_start = 0, see_start = 0, tofdor_start = 0, srolu1_start = 0, srolu2_start = 0;
@@ -141,6 +141,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     Bool_t spill_on = false;
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
+    Double_t tdiff_long = 0.;
     Double_t fNorm = 1.;
     Int_t iclear_count = 1;
     UInt_t reset_time;         // time after which bmon spectra are reseted
@@ -159,6 +160,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fhTrigger;
     TH1F* fh_IC_spill;
     TH1F* fh_SEE_spill;
+    TH1F* fh_SEE_spill_long;
     TH1F* fh_SEE_spill_raw;
     TH1F* fh_TOFDOR_spill;
     TH1F* fh_IC;

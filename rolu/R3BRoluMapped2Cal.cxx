@@ -165,8 +165,6 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         UInt_t iCha = hit->GetChannel();  // 1..4
         UInt_t iType = hit->GetType();    // 0,1
 
-        cout<<"TEST 1: "<<iDet<<", "<<iCha<<"; "<<iType<<endl;
-
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
             LOG(INFO) << "R3BRoluMapped2Cal::Exec : Detector number out of range: " << iDet;

@@ -244,6 +244,10 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_SEE_spill->GetXaxis()->SetTitle("time / sec");
         fh_SEE_spill->GetYaxis()->SetTitle("Particles / kHz");
 
+        fh_SEE_spill_long = new TH1F("SEE_spill_long", "SEE particles rate in kHz", 3600, 0, 3600);
+        fh_SEE_spill_long->GetXaxis()->SetTitle("time / min");
+        fh_SEE_spill_long->GetYaxis()->SetTitle("Particles / MHz");
+
         fh_SEE_spill_raw = new TH1F("SEE_spill_raw", "SEE count rate in kHz", Nbin_bmon, 0, reset_time);
         fh_SEE_spill_raw->GetXaxis()->SetTitle("time / sec");
         fh_SEE_spill_raw->GetYaxis()->SetTitle("Counts / kHz");
@@ -306,6 +310,8 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_IC_SEE->Draw("hist p");
         cbmon->cd(17);
         fh_SEE_spill_raw->Draw("hist");
+        cbmon->cd(18);
+        fh_SEE_spill_long->Draw("hist");
 
         cbmon->cd(0);
 
@@ -335,6 +341,7 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_IC_spill->Reset();
     fh_SEE->Reset();
     fh_SEE_spill->Reset();
+    fh_SEE_spill_long->Reset();
     fh_SEE_spill_raw->Reset();
     fh_TOFDOR->Reset();
     fh_TOFDOR_spill->Reset();
@@ -466,6 +473,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
             //     unsigned long long time = header->GetTimeStamp();
 
+			if (fNEvents<100) time_mem_long = time_start;
+
             if (fNEvents == fNEvents_start)
             {
                 see_mem = SEETRAM;
@@ -498,6 +507,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 if (bmon_read)
                 {
                     tdiff = double(time - time_mem) / 1.e9;
+                    tdiff_long = double(time - time_mem_long) / 1.e9 / 60.;
                     fNorm = 1.e-3 / (double(time - time_prev_read) / 1.e9); // kHz
 
                     // IC:
@@ -516,8 +526,17 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     if (ySEE > 0)
                         fh_SEE->Fill(tdiff, ySEE);
                     Double_t ySEE_part = ((double)ySEE_mem * fNorm) * calib_SEE;
-                    if (ySEE_mem > 0 && ySEE_mem_mem > 0)
+                    if (ySEE_mem > 0 && ySEE_mem_mem > 0){
                         fh_SEE_spill->Fill(tdiff, ySEE_part);
+					}
+					if (ySEE_part > 0 && ySEE_part/60./10./1000. < 1000) {
+						fh_SEE_spill_long->Fill(tdiff_long, ySEE_part/60./10./1000.);
+					}
+					else
+					{
+						
+					}
+					//cout << "Test: " << tdiff_long/60./10. << "  " << ySEE_part/60./10./1000. << endl;
                     if (ySEE_mem > 0 && ySEE_mem_mem > 0)
                         fh_SEE_spill_raw->Fill(tdiff, ySEE_part / calib_SEE);
                     see_mem = SEETRAM;
@@ -808,6 +827,7 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fh_SEE->Write();
         fh_TOFDOR->Write();
         fh_IC_spill->Write();
+        fh_SEE_spill_long->Write();
         fh_SEE_spill->Write();
         fh_SEE_spill_raw->Write();
         fh_TOFDOR_spill->Write();

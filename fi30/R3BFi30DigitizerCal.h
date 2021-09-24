@@ -17,7 +17,7 @@
 #define R3BFI30DIGITIZERCAL_H 1
 
 #include "FairTask.h"
-#include "R3BBunchedFiberCalData.h"
+#include "R3BFiberMAPMTCalData.h"
 #include <TRandom3.h>
 #include <map>
 #include <string>

@@ -184,6 +184,43 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
             }
         }
+        if (fName == "Fi23a" || fName == "Fi23b") 
+        {
+			// for Fib23a and Fib23b some anode schannels have two fibers. Here the channel number is not the fiber number!
+            if (2 == mapped->GetSide())
+            {
+                new ((*fCalTriggerItems)[fNoCalTrigItems++]) // fCalTriggerItems->GetEntriesFast()])
+                    R3BFiberMAPMTCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            }
+            else
+            {
+				Int_t iFib = 0;
+                if (channel < 65)
+                {
+                    iFib = channel * 2;
+					new ((*fCalItems)[fNoCalItems++]) 
+						R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+					new ((*fCalItems)[fNoCalItems++]) 
+						R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+				}
+                else if (channel > 64 && channel < 193)
+                {
+                    iFib = 64 + channel;
+                    new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                        R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+				}
+                else if (channel > 192 && channel < 257)
+                {
+                    iFib = 258 + (channel - 193) * 2;
+					new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+						R3BFiberMAPMTCalData(mapped->GetSide(), iFib - 1, mapped->IsLeading(), time_ns);
+					new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+						R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
+				}
+            }
+        }
+        
+/*        
         else // FIb23a/23b
         {
             Int_t iFib = 0;
@@ -228,12 +265,12 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
                             auto time_ghost = time_ns;
                             auto side_ghost = 1 - mapped->GetSide();
-                            /*        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
-                                        R3BFiberMAPMTCalData(side_ghost,
-                                                             iFib,
-                                                             mapped->IsLeading(),
-                                                             time_ghost); // add ghost fiber to treat the hole
-                             */
+                            //        new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                            //            R3BFiberMAPMTCalData(side_ghost,
+                            //                                 iFib,
+                            //                                 mapped->IsLeading(),
+                            //                                 time_ghost); // add ghost fiber to treat the hole
+                            //
                             //   cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
                             //   "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
                         }
@@ -298,12 +335,12 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
                             auto time_ghost = time_ns;
                             auto side_ghost = 1 - mapped->GetSide();
-                            /*          new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
-                                          R3BFiberMAPMTCalData(side_ghost,
-                                                               iFib,
-                                                               mapped->IsLeading(),
-                                                               time_ghost); // add ghost fiber to treat the hole
-                             */
+                            //          new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
+                            //              R3BFiberMAPMTCalData(side_ghost,
+                            //                                   iFib,
+                            //                                   mapped->IsLeading(),
+                            //                                   time_ghost); // add ghost fiber to treat the hole
+                            //
                             //      cout<<"Mapped2Cal ghost: "<<fName<<", "<<", "<<iFib<<"; "<<side_ghost<<",
                             //      "<<mapped->IsLeading()<<"; "<<time_ghost<<endl;
                         }
@@ -332,7 +369,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             //	cout<<"CAL "<<fName<<"; "<<channel<<", "<<iFib<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<",
             //"<<time_ns<<endl;
         } // end fibdet selection
-
+		*/
         /*
                         if (mapped->IsTrigger())
                         {

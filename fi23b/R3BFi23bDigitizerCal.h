@@ -17,7 +17,7 @@
 #define R3BFI23BDIGITIZERCAL_H 1
 
 #include "FairTask.h"
-#include "R3BBunchedFiberCalData.h"
+#include "R3BFiberMAPMTCalData.h"
 #include <TRandom3.h>
 #include <map>
 #include <string>
@@ -75,9 +75,9 @@ class R3BFi23bDigitizerCal : public FairTask
     Double_t tsigma;
     Double_t ysigma;
 
-   Float_t detector_height = 10.000000;
-    Float_t fiber_thickness = 0.025000;
-    Int_t fiber_nbr = 512;
+   Float_t detector_height = 10.752;
+    Float_t fiber_thickness = 0.028000;
+    Int_t fiber_nbr = 384;
     Float_t dead_layer = 0.9;
     Float_t air_layer = 0.01; // relative to fiber_thickness
     Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);

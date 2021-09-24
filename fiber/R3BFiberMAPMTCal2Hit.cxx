@@ -586,7 +586,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 {
                     // could not find maximum
                 }
-                if (proj->GetBinContent(j) > proj->GetMaximum() * 10. / 100.)
+                if (proj->GetBinContent(j) > proj->GetMaximum() * 50. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
                     par->SetGainDown(proj->GetBinCenter(j));
@@ -604,7 +604,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 {
                     // could not find maximum
                 }
-                if (proj1->GetBinContent(j) > proj1->GetMaximum() * 10. / 100.)
+                if (proj1->GetBinContent(j) > proj1->GetMaximum() * 50. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
                     par1->SetGainUp(proj->GetBinCenter(j));

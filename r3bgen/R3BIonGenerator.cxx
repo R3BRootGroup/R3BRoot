@@ -229,8 +229,15 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     {
         fVx = fOffset + SpotR * cos(Phi); // gRandom->Uniform(-fx,fx);
         fVy = SpotR * sin(Phi);           // gRandom->Uniform(-fy,fy);
-        //    fVy   = 0.;
         fVz = fz;
+		//cout << "x, y :" << fVx << "  "  << fVy << endl;
+		
+		// Special for experiment s494. we make a focus on the hole of fib23
+        Double_t p = sqrt(fPx * fPx + fPy * fPy + fPz * fPz);
+        fPx = -atan(fVx / 245.05) * fPz;
+        fPy = -atan(fVy / 245.05) * fPz;
+		//cout << "Px, Py :" << fPx << "  "  << fPy << endl;
+        fPz = sqrt(p * p - fPx * fPx - fPy * fPy);
     }
     else
     {
@@ -248,17 +255,23 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     if (fAngle > 0.)
     {
         Double_t p = sqrt(fPx * fPx + fPy * fPy + fPz * fPz);
-        Double_t thetaX = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
-        // Double_t thetaX = fAngle;
 
-        fPx = tan(thetaX) * fPz;
-
-        // Double_t thetaY = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
-        Double_t thetaY = 0.;
-        fPy = tan(thetaY) * fPz;
-
+		Double_t test = gRandom->Uniform(-1, 1);	
+		if(test < 0) 
+		{
+        
+			Double_t thetaX = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
+			// Double_t thetaX = fAngle;
+			fPx = tan(thetaX) * fPz;
+		}
+		else
+		{
+			Double_t thetaY = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
+			//Double_t thetaY = 0.;
+			fPy = tan(thetaY) * fPz;
+		}
+			
         fPz = sqrt(p * p - fPx * fPx - fPy * fPy);
-
         // cout<< " theta "<< thetaX << "  " << thetaY << "  "<<endl;
         // cout << "p alt: "<< p << " p neu: " << sqrt(fPx*fPx+fPy*fPy+fPz*fPz) << endl;
     }

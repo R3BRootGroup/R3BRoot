@@ -41,7 +41,7 @@ module vars
  double precision   :: b_field(3), v(3)                            ! magnetic field, velocity
  double precision   :: b_field_position_in_lab(4)                ! position of magnetic field coordinate system in lab-frame (x,y,z,rotation_around_y-axis)
  double precision   :: glad_current                                ! magnetic field map will be multiplied with this number divided by 3584...
- double precision,parameter   :: glad_current_nominal_current=3584.d0        ! current for which the field map is calculated
+ double precision,parameter   :: glad_current_nominal_current=3547.d0        ! previous 3584, current for which the field map is calculated
  double precision   :: a_over_q, m, m2                                !A/Z in AMU/e
  double precision   :: q_e, q                                      ! charge of particle in elementary unit + SI 
  double precision   :: master_borders(3,2)                         ! borders of master volume ((xmin,xmax),(ymin,ymax),(zmin,zmax))

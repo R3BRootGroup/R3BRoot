@@ -72,10 +72,10 @@ InitStatus R3BFi30DigitizerCal::Init()
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array Fib13Digi
-    fFi30Cals = new TClonesArray("R3BBunchedFiberCalData", 1000);
+    fFi30Cals = new TClonesArray("R3BFiberMAPMTCalData", 1000);
     ioman->Register("Fi30Cal", "Digital response in Fi30", fFi30Cals, kTRUE);
 
-    fFi30TriggerCals = new TClonesArray("R3BBunchedFiberCalData", 1000);
+    fFi30TriggerCals = new TClonesArray("R3BFiberMAPMTCalData", 1000);
     ioman->Register("Fi30TriggerCal", "Digital response in Fi30", fFi30TriggerCals, kTRUE);
 
     // for sigmas
@@ -236,21 +236,21 @@ void R3BFi30DigitizerCal::Exec(Option_t* opt)
                     0-bottom, 1-top, 2-trigger */
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
-                        R3BBunchedFiberCalData(1, ichanMA, 1, timeMA_lead);
+                        R3BFiberMAPMTCalData(1, ichanMA, 1, timeMA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT trailing
-                        R3BBunchedFiberCalData(1, ichanMA, 0, timeMA_trail);
+                        R3BFiberMAPMTCalData(1, ichanMA, 0, timeMA_trail);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT leading
-                        R3BBunchedFiberCalData(0, ichanSA, 1, timeSA_lead);
+                        R3BFiberMAPMTCalData(0, ichanMA, 1, timeSA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT trailing
-                        R3BBunchedFiberCalData(0, ichanSA, 0, timeSA_trail);
+                        R3BFiberMAPMTCalData(0, ichanMA, 0, timeSA_trail);
                     if (first)
                     {
-                        for (Int_t j = 0; j < 4; j++)
+                        for (Int_t j = 0; j < 8; j++)
                         {
-                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BBunchedFiberCalData(2, j + 1, 1, 0.);
+                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, 0.);
                         }
                         first = false;
                     }
