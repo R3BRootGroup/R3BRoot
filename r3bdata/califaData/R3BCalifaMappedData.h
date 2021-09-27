@@ -75,7 +75,7 @@ class R3BCalifaMappedData : public TObject
     uint16_t fTot;       // Time-over-treshold
 
   public:
-    ClassDef(R3BCalifaMappedData, 3)
+    ClassDef(R3BCalifaMappedData, 4)
 };
 
 #endif

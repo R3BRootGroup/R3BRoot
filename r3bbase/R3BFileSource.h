@@ -85,6 +85,8 @@ class R3BFileSource : public FairFileSource
     TFolder* GetBranchDescriptionFolder() { return fCbmroot; }
     UInt_t GetEntries() { return fNoOfEntries; }
 
+    virtual Bool_t ActivateObject(TObject** obj, const char* BrName) override;
+
     void SetInputFile(TString name);
 
     void SetFileHeader(FairFileHeader* f) { fFileHeader = f; }

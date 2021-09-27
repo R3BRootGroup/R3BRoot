@@ -830,6 +830,22 @@ Bool_t R3BFileSource::CompareBranchList(TFile* fileHandle, TString inputLevel)
     return kTRUE;
 }
 
+Bool_t R3BFileSource::ActivateObject(TObject** obj, const char* BrName)
+{
+    if (fInTree)
+    {
+        fInTree->SetBranchStatus(BrName, 1);
+        fInTree->SetBranchAddress(BrName, obj);
+    }
+    if (fInChain)
+    {
+        fInChain->SetBranchStatus(BrName, 1);
+        fInChain->SetBranchAddress(BrName, obj);
+    }
+
+    return kTRUE;
+}
+
 void R3BFileSource::SetInputFile(TString name)
 {
     fRootFile = TFile::Open(name.Data());
