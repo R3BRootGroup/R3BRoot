@@ -43,7 +43,7 @@ class R3BEventHeader : public FairEventHeader
     Int_t fTpat;
     Double_t fTStart;
 
-    ClassDef(R3BEventHeader, 5)
+    ClassDef(R3BEventHeader, 6)
 };
 
 #endif
