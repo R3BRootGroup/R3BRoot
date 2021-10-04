@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BBunchedFiberCal2Hit+;
+#pragma link C++ class R3BBunchedFiberCal2Hit_s494+;
 #pragma link C++ class R3BBunchedFiberMapped2CalPar+;
 #pragma link C++ class R3BBunchedFiberMapped2Cal+;
 #pragma link C++ class R3BBunchedFiberHitModulePar+;
@@ -28,4 +29,9 @@
 #pragma link C++ class R3BBunchedFiberSPMTTrigMapped2CalPar+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigMapped2Cal+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigDigitizerCal+;
+#pragma link C++ class R3BFiberMAPMTMapped2Cal+;
+#pragma link C++ class R3BFiberMAPMTMapped2CalPar+;
+#pragma link C++ class R3BFiberMAPMTCal2Hit+;
+#pragma link C++ class R3BFiberMAPMTHitPar+;
+#pragma link C++ class R3BFiberMAPMTHitModulePar+;
 #endif

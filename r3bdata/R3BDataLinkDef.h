@@ -136,6 +136,9 @@
 #pragma link C++ class R3BFibMappedData+;
 #pragma link C++ class R3BFibCalData+;
 #pragma link C++ class R3BFibPoint+;
+#pragma link C++ class R3BFiberMAPMTMappedData+;
+#pragma link C++ class R3BFiberMAPMTCalData+;
+#pragma link C++ class R3BFiberMAPMTHitData+;
 #pragma link C++ class R3BSci8MappedData+;
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;

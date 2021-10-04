@@ -42,12 +42,18 @@ set(SRCS
 R3BBunchedFiberMapped2CalPar.cxx
 R3BBunchedFiberMapped2Cal.cxx
 R3BBunchedFiberCal2Hit.cxx
+R3BBunchedFiberCal2Hit_s494.cxx
 R3BBunchedFiberHitModulePar.cxx
 R3BBunchedFiberHitPar.cxx
 R3BFiberContFact.cxx
 R3BBunchedFiberSPMTTrigMapped2CalPar.cxx
 R3BBunchedFiberSPMTTrigMapped2Cal.cxx
 R3BBunchedFiberSPMTTrigDigitizerCal.cxx
+R3BFiberMAPMTMapped2Cal.cxx
+R3BFiberMAPMTMapped2CalPar.cxx
+R3BFiberMAPMTCal2Hit.cxx
+R3BFiberMAPMTHitPar.cxx
+R3BFiberMAPMTHitModulePar.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
