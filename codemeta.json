@@ -10,7 +10,7 @@
   "downloadUrl": "https://github.com/R3BRootGroup/R3BRoot/archive/refs/tags/may21.tar.gz",
   "issueTracker": "https://github.com/R3BRootGroup/R3BRoot/issues",
   "name": "R3BRoot",
-  "version": "may21",
+  "version": "oct21",
   "description": "Software for simulations and data analysis of Reactions with Relativistic Radioactive Beams experiment at FAIR",
   "applicationCategory": "Nuclear physics",
   "developmentStatus": "active",
