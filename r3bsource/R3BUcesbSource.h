@@ -40,30 +40,30 @@
 struct EXT_STR_h101_t;
 typedef struct EXT_STR_h101_t EXT_STR_h101;
 
-class FairLogger;
 class R3BEventHeader;
 
 class R3BUcesbSource : public FairSource
 {
   public:
     R3BUcesbSource(const TString&, const TString&, const TString&, EXT_STR_h101*, size_t);
-    ~R3BUcesbSource();
+    virtual ~R3BUcesbSource();
 
     Source_Type GetSourceType() { return kONLINE; }
 
     /* Init() will fork a ucesb instance to deliver the unpacked data for
      * R3BRoot. It makes use of the ext_data_ interface of ucesb.
      * */
-    Bool_t Init();
-    Bool_t InitUnpackers();
-    void SetParUnpackers();
-    Bool_t ReInitUnpackers();
+    virtual Bool_t Init();
+    virtual Bool_t SpecifyRunId();
+    virtual Bool_t InitUnpackers();
+    virtual void SetParUnpackers();
+    virtual Bool_t ReInitUnpackers();
     /* A wrapper for ext_data_fetch_event() */
     Int_t ReadEvent(UInt_t);
     /* Close the ext_data_ interface */
-    void Close();
+    virtual void Close();
     /* Reset the readers */
-    void Reset();
+    virtual void Reset();
     /* The reader interface */
     void AddReader(R3BReader* a_reader) { fReaders->Add(a_reader); }
     /* Limit the number of events */
@@ -95,8 +95,6 @@ class R3BUcesbSource : public FairSource
     size_t fEventSize;
     /* Last event requested */
     int fLastEventNo;
-    /* FairLogger */
-    FairLogger* fLogger;
     /* The array of readers */
     TObjArray* fReaders;
     /* R3B header */
