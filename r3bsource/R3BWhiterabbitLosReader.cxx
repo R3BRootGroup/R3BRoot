@@ -1,5 +1,6 @@
+
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -11,80 +12,77 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include "R3BWhiterabbitLosReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
-
 #include "R3BEventHeader.h"
-#include "R3BWRMasterData.h"
-#include "R3BWhiterabbitS2Reader.h"
+#include "R3BWRLosData.h"
 #include "TClonesArray.h"
 
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_wrs2.h"
+#include "ext_h101_wrlos.h"
 }
 
-R3BWhiterabbitS2Reader::R3BWhiterabbitS2Reader(EXT_STR_h101_WRS2* data, size_t offset, UInt_t whiterabbit_id)
-    : R3BReader("R3BWhiterabbitS2Reader")
+R3BWhiterabbitLosReader::R3BWhiterabbitLosReader(EXT_STR_h101_WRLOS* data, size_t offset, UInt_t whiterabbit_id)
+    : R3BReader("R3BWhiterabbitLosReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRMasterData"))
+    , fArray(new TClonesArray("R3BWRLosData"))
 {
 }
 
-R3BWhiterabbitS2Reader::~R3BWhiterabbitS2Reader()
+R3BWhiterabbitLosReader::~R3BWhiterabbitLosReader()
 {
     if (fArray)
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
-Bool_t R3BWhiterabbitS2Reader::Init(ext_data_struct_info* a_struct_info)
+Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitS2Reader::Init()";
-    EXT_STR_h101_WRS2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRS2, 0);
+    LOG(INFO) << "R3BWhiterabbitLosReader::Init()";
+    EXT_STR_h101_WRLOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRLOS, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitS2Reader::Failed to setup structure information.";
+        LOG(ERROR) << "R3BWhiterabbitLosReader::Failed to setup structure information.";
         return kFALSE;
     }
-
-    // Look for the R3BEventHeader
-    FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    FairRootManager* mgr = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
-    {
-        LOG(WARNING) << "R3BWhiterabbitS2Reader::Init() R3BEventHeader not found";
-        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
-    }
-    else
-        LOG(INFO) << "R3BWhiterabbitS2Reader::Init() R3BEventHeader found";
+        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("WRS2Data", "WRS2", fArray, !fOnline);
+    FairRootManager::Instance()->Register("WRLosData", "WRLos", fArray, !fOnline);
 
-    fData->TIMESTAMP_SCITWO_ID = 0;
+    fData->TIMESTAMP_LOS_ID = 0;
+
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitS2Reader::Read()
+Bool_t R3BWhiterabbitLosReader::Read()
 {
-    if (!fData->TIMESTAMP_SCITWO_ID)
+
+    if (!fData->TIMESTAMP_LOS_ID)
     {
         return kTRUE;
     }
-
-    if (fWhiterabbitId != fData->TIMESTAMP_SCITWO_ID)
+    /*
+        printf("Los %08x %08x %08x %08x %08x \n",
+        fData->TIMESTAMP_LOS_ID,
+        fData->TIMESTAMP_LOS_WR_T4, fData->TIMESTAMP_LOS_WR_T3,
+        fData->TIMESTAMP_LOS_WR_T2, fData->TIMESTAMP_LOS_WR_T1);
+    */
+    if (fWhiterabbitId != fData->TIMESTAMP_LOS_ID)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -92,34 +90,36 @@ Bool_t R3BWhiterabbitS2Reader::Read()
                  "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
-                 fData->TIMESTAMP_SCITWO_ID);
+                 fData->TIMESTAMP_LOS_ID);
         LOG(error) << strMessage;
     }
 
     if (fEventHeader != nullptr)
     {
-        uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_SCITWO_WR_T4 << 48) |
-                             ((uint64_t)fData->TIMESTAMP_SCITWO_WR_T3 << 32) |
-                             ((uint64_t)fData->TIMESTAMP_SCITWO_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_SCITWO_WR_T1;
-
+        uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_LOS_WR_T4 << 48) |
+                             ((uint64_t)fData->TIMESTAMP_LOS_WR_T3 << 32) |
+                             ((uint64_t)fData->TIMESTAMP_LOS_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_LOS_WR_T1;
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRLosData(timestamp);
+
+        // cout<<"WRLOS READER TIME: "<<timestamp<<", "<<fArray->GetEntriesFast()<<endl;
     }
     else
     {
         fNEvent++;
     }
 
-    fData->TIMESTAMP_SCITWO_ID = 0;
+    fData->TIMESTAMP_LOS_ID = 0;
+
     return kTRUE;
 }
 
-void R3BWhiterabbitS2Reader::Reset()
+void R3BWhiterabbitLosReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
     fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitS2Reader);
+ClassImp(R3BWhiterabbitLosReader);

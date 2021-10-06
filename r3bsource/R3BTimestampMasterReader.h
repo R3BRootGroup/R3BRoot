@@ -20,13 +20,12 @@
 struct EXT_STR_h101_timestamp_master_t;
 typedef struct EXT_STR_h101_timestamp_master_t EXT_STR_h101_timestamp_master;
 
-class FairLogger;
 class R3BEventHeader;
 
 class R3BTimestampMasterReader : public R3BReader
 {
   public:
-    R3BTimestampMasterReader(EXT_STR_h101_timestamp_master*, UInt_t);
+    R3BTimestampMasterReader(EXT_STR_h101_timestamp_master*, size_t);
 
     Bool_t Init(ext_data_struct_info*);
     Bool_t Read();
@@ -35,8 +34,7 @@ class R3BTimestampMasterReader : public R3BReader
   private:
     UInt_t fNEvent;
     EXT_STR_h101_timestamp_master* fData;
-    UInt_t fOffset;
-    FairLogger* fLogger;
+    size_t fOffset;
     UInt_t fWhiterabbitId;
     R3BEventHeader* fEventHeader;
 

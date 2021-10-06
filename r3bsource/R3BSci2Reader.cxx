@@ -12,10 +12,11 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
-
 #include "FairRootManager.h"
+
 #include "R3BSci2MappedData.h"
 #include "R3BSci2Reader.h"
+
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
 
@@ -30,22 +31,26 @@ extern "C"
 //#define NUM_SCI2_CHANNELS 3 // 1=RIGHT, 2=LEFT, 3=Tref
 #include <iostream>
 
-using namespace std;
-
-R3BSci2Reader::R3BSci2Reader(EXT_STR_h101_SCI2* data, UInt_t offset)
+R3BSci2Reader::R3BSci2Reader(EXT_STR_h101_SCI2* data, size_t offset)
     : R3BReader("R3BSci2Reader")
+    , fNEvent(0)
     , fData(data)
     , fOffset(offset)
+    , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BSci2MappedData"))
 {
 }
 
-R3BSci2Reader::~R3BSci2Reader() {}
+R3BSci2Reader::~R3BSci2Reader()
+{
+    if (fArray)
+        delete fArray;
+}
 
 Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BSci2Reader::Init";
+    LOG(INFO) << "R3BSci2Reader::Init()";
     EXT_STR_h101_SCI2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SCI2, 0);
 
     if (!ok)
@@ -56,7 +61,7 @@ Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("Sci2Mapped", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("Sci2Mapped", "Sci at S2", fArray, !fOnline);
     fArray->Clear();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
@@ -124,7 +129,7 @@ Bool_t R3BSci2Reader::Read()
 
         Int_t Sum = data->SCITWO_VTF; // no Tamex present+data->SCITWO_TTFT+data->SCITWO_TTFL;
         // if(data->S2TTFT != data->S2TTFL) fprint = true;
-        // if(fNEvents == 9698 || fNEvents == 9701 || fNEvents == 9704) fprint = true;
+        // if(fNEvent == 9698 || fNEvent == 9701 || fNEvent == 9704) fprint = true;
         // First, we prepare time arrays for VFTX
 
         // VFTX first:
@@ -167,7 +172,7 @@ Bool_t R3BSci2Reader::Read()
                     coarse_vftx = coarse_vftx + 8192;
 
                 if (fprint)
-                    LOG(INFO) << "SCI2 READER VFTX: " << fNEvents << ", " << Sum << ", " << channel << ", "
+                    LOG(INFO) << "SCI2 READER VFTX: " << fNEvent << ", " << Sum << ", " << channel << ", "
                               << data->SCITWO_VTFv[j] << ", " << data->SCITWO_VTCv[j] << ", " << coarse_vftx << ", "
                               << mean_coarse_vftx;
 
@@ -231,7 +236,7 @@ Bool_t R3BSci2Reader::Read()
                     mean_coarse_lead = mean_coarse_lead + coarse_leading;
                     sum_coarse_lead = sum_coarse_lead + 1;
 
-                    if(fprint) cout<<"SCI2 READER leading edges: "<<fNEvents<<", "<<Sum<<", "<<channel<<",
+                    if(fprint) cout<<"SCI2 READER leading edges: "<<fNEvent<<", "<<Sum<<", "<<channel<<",
            "<<data->SCITWO_TTFLv[j]<<", "<<data->SCITWO_TTCLv[j]<<
                                      ", "<<coarse_leading<<"; "<<mean_coarse_leading<<endl;
 
@@ -268,7 +273,7 @@ Bool_t R3BSci2Reader::Read()
 
                     if(coarse <= 25 && mean_coarse_lead >= 2023) coarse = coarse + 2048;
 
-                    if(fprint) cout<<"SCI2 Reader trailing before sorting: "<<fNEvents<<", "<<Sum<<", "<<channel<<",
+                    if(fprint) cout<<"SCI2 Reader trailing before sorting: "<<fNEvent<<", "<<Sum<<", "<<channel<<",
            "<<data->SCITWO_TTFTv[j]<<"; "<< coarse<<", "<<mean_coarse_lead <<endl;
 
                      R3BSci2MappedData* mapped=NULL;
@@ -303,7 +308,7 @@ Bool_t R3BSci2Reader::Read()
                                 coarse
                                 );
 
-                                if(fprint) cout<<"SCI2 Reader trailing edges: "<<fNEvents<<", "<<Sum<<", "<<channel<<",
+                                if(fprint) cout<<"SCI2 Reader trailing edges: "<<fNEvent<<", "<<Sum<<", "<<channel<<",
            "<<data->SCITWO_TTFTv[j]<<"; "<< coarse<<", "<<tot<<endl;
 
                             break;
@@ -316,12 +321,10 @@ Bool_t R3BSci2Reader::Read()
                 }
         */
     }
-    fNEvents += 1;
+    fNEvent += 1;
 
     return kTRUE;
 }
-
-void R3BSci2Reader::FinishTask() {}
 
 void R3BSci2Reader::Reset()
 {
@@ -329,4 +332,4 @@ void R3BSci2Reader::Reset()
     fArray->Clear();
 }
 
-ClassImp(R3BSci2Reader)
+ClassImp(R3BSci2Reader);

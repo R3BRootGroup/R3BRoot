@@ -56,11 +56,14 @@
 #pragma link C++ class R3BFootMappedData+;
 #pragma link C++ class R3BFootCalData+;
 #pragma link C++ class R3BFootHitData+;
+#pragma link C++ class R3BAlpidePoint+;
+#pragma link C++ class R3BAlpideMappedData+;
 
 #pragma link C++ class R3BWRMasterData+;
 #pragma link C++ class R3BWRCalifaData+;
 #pragma link C++ class R3BWRAmsData+;
 #pragma link C++ class R3BWRPspData+;
+#pragma link C++ class R3BWRLosData+;
 
 #pragma link C++ class R3BMusicPoint+;
 #pragma link C++ class R3BMusicMappedData+;

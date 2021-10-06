@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -11,25 +11,33 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BSCI2READER_H
-#define R3BSCI2READER_H
+#ifndef R3BWhiterabbitLosReader_H
+#define R3BWhiterabbitLosReader_H
 
-#include "FairTask.h"
 #include "R3BReader.h"
 #include <Rtypes.h>
 
-struct EXT_STR_h101_SCI2_t;
-typedef struct EXT_STR_h101_SCI2_t EXT_STR_h101_SCI2;
-class ext_data_struct_info;
+struct EXT_STR_h101_WRLOS_t;
+typedef struct EXT_STR_h101_WRLOS_t EXT_STR_h101_WRLOS;
 
-class R3BSci2Reader : public R3BReader
+class TClonesArray;
+class R3BEventHeader;
+
+/**
+ * A reader of LOS white rabbit data with UCESB.
+ * Receives mapped raw data and converts it to R3BRoot objects.
+ * @author J.L. Rodriguez
+ * @since Feb 28, 2019
+ */
+
+class R3BWhiterabbitLosReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BSci2Reader(EXT_STR_h101_SCI2*, size_t);
+    R3BWhiterabbitLosReader(EXT_STR_h101_WRLOS*, size_t, UInt_t);
 
     // Destructor
-    virtual ~R3BSci2Reader();
+    virtual ~R3BWhiterabbitLosReader();
 
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
@@ -45,18 +53,21 @@ class R3BSci2Reader : public R3BReader
 
   private:
     // An event counter
-    unsigned int fNEvent;
+    UInt_t fNEvent;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_SCI2* fData;
-    // Data offset
+    EXT_STR_h101_WRLOS* fData;
+    // Offset of detector specific data in full data structure
     size_t fOffset;
+    // The whiterabbit subsystem ID
+    UInt_t fWhiterabbitId;
+    // A pointer to the R3BEventHeader structure
+    R3BEventHeader* fEventHeader;
     // Don't store data for online
     Bool_t fOnline;
-    // Output array of type R3BSci2xMappedItem
+    // Output array
     TClonesArray* fArray;
 
   public:
-    ClassDefOverride(R3BSci2Reader, 0);
+    ClassDefOverride(R3BWhiterabbitLosReader, 0);
 };
-
-#endif /* R3BSCI2READER_H */
+#endif // R3BWhiterabbitLosReader_H

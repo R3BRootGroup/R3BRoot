@@ -48,7 +48,7 @@ class R3BWhiterabbitAmsReader : public R3BReader
     // Reset
     virtual void Reset() override;
 
-    /** Accessor to select online mode **/
+    // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
