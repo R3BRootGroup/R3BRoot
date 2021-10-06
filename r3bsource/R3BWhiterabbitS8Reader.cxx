@@ -65,6 +65,7 @@ Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
     if (!fEventHeader)
     {
         LOG(WARNING) << "R3BWhiterabbitS8Reader::Init() R3BEventHeader not found";
+        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
         LOG(INFO) << "R3BWhiterabbitS8Reader::Init() R3BEventHeader found";

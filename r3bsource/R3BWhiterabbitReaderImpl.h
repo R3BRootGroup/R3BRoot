@@ -15,12 +15,11 @@
 #define R3BWHITERABBITREADERIMPL_H
 
 #define R3B_WHITERABBIT_READER_IMPL(ClassName, struct_name, id)                                                     \
-    R3B##ClassName##Reader::R3B##ClassName##Reader(EXT_STR_h101_##struct_name* a_data, UInt_t a_offset)             \
+    R3B##ClassName##Reader::R3B##ClassName##Reader(EXT_STR_h101_##struct_name* a_data, size_t a_offset)             \
         : R3BReader("R3B" #ClassName "Reader")                                                                      \
         , fNEvent(0)                                                                                                \
         , fData(a_data)                                                                                             \
         , fOffset(a_offset)                                                                                         \
-        , fLogger(FairLogger::GetLogger())                                                                          \
         , fWhiterabbitId(id)                                                                                        \
         , fEventHeader(nullptr)                                                                                     \
     {                                                                                                               \

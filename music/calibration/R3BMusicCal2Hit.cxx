@@ -40,18 +40,7 @@
 
 // R3BMusicCal2Hit: Default Constructor --------------------------
 R3BMusicCal2Hit::R3BMusicCal2Hit()
-    : FairTask("R3B Music Hit Calibrator", 1)
-    , fNumAnodes(8)
-    , fNumAnodesAngleFit(0)
-    , fNumParams(2)
-    , CalZParams(NULL)
-    , fCal_Par(NULL)
-    , fMusicHitDataCA(NULL)
-    , fMusicCalDataCA(NULL)
-    , fZ0(0)
-    , fZ1(0)
-    , fZ2(0)
-    , fOnline(kFALSE)
+    : R3BMusicCal2Hit("R3B Music Hit Calibrator", 1)
 {
 }
 
@@ -145,7 +134,7 @@ void R3BMusicCal2Hit::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicCal2Hit::Init()
 {
-    LOG(INFO) << "R3BMusicCal2Hit: Init";
+    LOG(INFO) << "R3BMusicCal2Hit::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -162,14 +151,7 @@ InitStatus R3BMusicCal2Hit::Init()
 
     // OUTPUT DATA
     fMusicHitDataCA = new TClonesArray("R3BMusicHitData", 10);
-    if (!fOnline)
-    {
-        rootManager->Register("MusicHitData", "Music Hit", fMusicHitDataCA, kTRUE);
-    }
-    else
-    {
-        rootManager->Register("MusicHitData", "Music Hit", fMusicHitDataCA, kFALSE);
-    }
+    rootManager->Register("MusicHitData", "Music Hit", fMusicHitDataCA, !fOnline);
 
     SetParameter();
     return kSUCCESS;
@@ -265,9 +247,6 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
     return;
 }
 
-// -----   Protected method Finish   --------------------------------------------
-void R3BMusicCal2Hit::Finish() {}
-
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicCal2Hit::Reset()
 {
@@ -292,3 +271,5 @@ R3BMusicHitData* R3BMusicCal2Hit::AddHitData(Double_t theta, Double_t charge_z, 
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BMusicHitData(theta, charge_z, ene_ave);
 }
+
+ClassImp(R3BMusicCal2Hit);

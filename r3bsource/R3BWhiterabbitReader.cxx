@@ -22,12 +22,11 @@ extern "C"
 #include "ext_h101_whiterabbit.h"
 }
 
-R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, UInt_t offset, UInt_t whiterabbit_id)
+R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, size_t offset, UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
 {
@@ -42,7 +41,7 @@ R3BWhiterabbitReader::~R3BWhiterabbitReader()
 Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitReader::Init";
+    LOG(INFO) << "R3BWhiterabbitReader::Init()";
     EXT_STR_h101_whiterabbit_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_whiterabbit, 0);
 
     if (!ok)
@@ -58,6 +57,7 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
     if (!fEventHeader)
     {
         LOG(WARNING) << "R3BWhiterabbitReader::Init() R3BEventHeader not found";
+        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
         LOG(INFO) << "R3BWhiterabbitReader::Init() R3BEventHeader found";

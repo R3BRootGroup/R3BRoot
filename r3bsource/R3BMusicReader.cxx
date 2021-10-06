@@ -17,16 +17,14 @@
 #include "R3BMusicMappedData.h"
 #include "R3BMusicReader.h"
 
+#include "TClonesArray.h"
+#include <iostream>
+
 extern "C"
 {
 #include "ext_data_client.h"
 #include "ext_h101_music.h"
 }
-
-#include "TClonesArray.h"
-#include <iostream>
-
-using namespace std;
 
 R3BMusicReader::R3BMusicReader(EXT_STR_h101_MUSIC* data, size_t offset)
     : R3BReader("R3BMusicReader")
@@ -48,7 +46,7 @@ R3BMusicReader::~R3BMusicReader()
 Bool_t R3BMusicReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BMusicReader::Init";
+    LOG(INFO) << "R3BMusicReader::Init()";
     EXT_STR_h101_MUSIC_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_MUSIC, 0);
     if (!ok)
     {
@@ -58,14 +56,8 @@ Bool_t R3BMusicReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("MusicMappedData", "MUSIC", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("MusicMappedData", "MUSIC", fArray, kFALSE);
-    }
+    FairRootManager::Instance()->Register("MusicMappedData", "MUSIC", fArray, !fOnline);
+    Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.

@@ -38,7 +38,6 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fEvent(event)
     , fEventSize(event_size)
     , fLastEventNo(-1)
-    , fLogger(FairLogger::GetLogger())
     , fEventHeader(nullptr)
     , fInputFile()
     , fEntryMax(0)
@@ -324,6 +323,14 @@ void R3BUcesbSource::Reset()
     {
         ((R3BReader*)fReaders->At(i))->Reset();
     }
+}
+
+Bool_t R3BUcesbSource::SpecifyRunId()
+{
+    if (ReadEvent(0) == 0)
+        return true;
+
+    return false;
 }
 
 //_____________________________________________________________________________

@@ -37,19 +37,7 @@
 
 // R3BMusicMapped2Cal: Default Constructor --------------------------
 R3BMusicMapped2Cal::R3BMusicMapped2Cal()
-    : FairTask("R3B Music Calibrator", 1)
-    , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
-    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
-    , fMaxMult(MAX_MULT_MUSIC_CAL)
-    , fNumParams(3)
-    , fNumPosParams(2)
-    , fMaxSigma(200)
-    , CalParams(NULL)
-    , PosParams(NULL)
-    , fCal_Par(NULL)
-    , fMusicMappedDataCA(NULL)
-    , fMusicCalDataCA(NULL)
-    , fOnline(kFALSE)
+    : R3BMusicMapped2Cal("R3B Music Calibrator", 1)
 {
 }
 
@@ -154,14 +142,7 @@ InitStatus R3BMusicMapped2Cal::Init()
     // OUTPUT DATA
     // Calibrated data
     fMusicCalDataCA = new TClonesArray("R3BMusicCalData", MAX_MULT_MUSIC_CAL * (fNumAnodes + fNumAnodesRef));
-    if (!fOnline)
-    {
-        rootManager->Register("MusicCalData", "MUSIC Cal", fMusicCalDataCA, kTRUE);
-    }
-    else
-    {
-        rootManager->Register("MusicCalData", "MUSIC Cal", fMusicCalDataCA, kFALSE);
-    }
+    rootManager->Register("MusicCalData", "MUSIC Cal", fMusicCalDataCA, !fOnline);
 
     SetParameters();
     return kSUCCESS;
@@ -250,9 +231,6 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
     return;
 }
 
-// -----   Protected method Finish   --------------------------------------------
-void R3BMusicMapped2Cal::Finish() {}
-
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicMapped2Cal::Reset()
 {
@@ -270,4 +248,4 @@ R3BMusicCalData* R3BMusicMapped2Cal::AddCalData(UShort_t aid, Double_t dt, Doubl
     return new (clref[size]) R3BMusicCalData(aid, dt, e);
 }
 
-ClassImp(R3BMusicMapped2Cal)
+ClassImp(R3BMusicMapped2Cal);

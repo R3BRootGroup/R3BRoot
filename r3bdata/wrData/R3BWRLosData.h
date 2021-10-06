@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,19 +11,40 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+// ---------------------------------------------------------------------------
+// -----                                                                 -----
+// -----                      R3BWRLosData                               -----
+// -----                  Created 28/02/2019 by J.L. Rodriguez           -----
+// -----                                                                 -----
+// ---------------------------------------------------------------------------
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BWRLosData_H
+#define R3BWRLosData_H
+#include "TObject.h"
 
-#pragma link C++ class R3BMusic+;
-#pragma link C++ class R3BMusicCalPar+;
-#pragma link C++ class R3BMusicHitPar+;
-#pragma link C++ class R3BMusicContFact+;
-#pragma link C++ class R3BMusicMapped2Cal+;
-#pragma link C++ class R3BMusicMapped2CalPar+;
-#pragma link C++ class R3BMusicCal2Hit+;
-#pragma link C++ class R3BMusicOnlineSpectra+;
+class R3BWRLosData : public TObject
+{
+
+  public:
+    // Default Constructor
+    R3BWRLosData();
+
+    /** Standard Constructor
+     *@param timestamp
+     **/
+    R3BWRLosData(uint64_t timestamp);
+
+    // Destructor
+    virtual ~R3BWRLosData() {}
+
+    // Getters
+    inline const uint64_t GetTimeStamp() const { return fTimeStamp; }
+
+  protected:
+    uint64_t fTimeStamp; // timestamp
+
+  public:
+    ClassDef(R3BWRLosData, 1)
+};
 
 #endif

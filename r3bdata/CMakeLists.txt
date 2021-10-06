@@ -47,6 +47,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
+${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
@@ -69,6 +70,7 @@ wrData/R3BWRMasterData.cxx
 wrData/R3BWRCalifaData.cxx
 wrData/R3BWRAmsData.cxx
 wrData/R3BWRPspData.cxx
+wrData/R3BWRLosData.cxx
 R3BHit.cxx
 R3BTrack.cxx
 R3BDouble.cxx
@@ -181,6 +183,8 @@ frsData/R3BFrsData.cxx
 footData/R3BFootMappedData.cxx
 footData/R3BFootCalData.cxx
 footData/R3BFootHitData.cxx
+alpideData/R3BAlpidePoint.cxx
+alpideData/R3BAlpideMappedData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

@@ -70,6 +70,7 @@ R3BWhiterabbitNeulandReader.cxx
 R3BWhiterabbitAmsReader.cxx
 R3BWhiterabbitS2Reader.cxx
 R3BWhiterabbitS8Reader.cxx
+R3BWhiterabbitLosReader.cxx
 R3BWhiterabbitPspReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
@@ -123,6 +124,7 @@ ext/ext_h101_wrams.h
 ext/ext_h101_timestamp_pspx.h
 ext/ext_h101_wrs2.h
 ext/ext_h101_wrs8.h
+ext/ext_h101_wrlos.h
 ext/ext_h101_tpat.h
 ext/ext_h101_timestamp_master.h
 ext/ext_h101_bmon.h
@@ -169,7 +171,7 @@ ext/ext_h101_pdc.h
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
 
-set(LINKDEF_FILE R3BLinkDef.h)
+set(LINKDEF_FILE SourceLinkDef.h)
 set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools
     R3Bbase R3BData Core Geom GenVector

@@ -52,7 +52,7 @@ R3BWhiterabbitNeulandReader::~R3BWhiterabbitNeulandReader()
 Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitNeulandReader::Init";
+    LOG(INFO) << "R3BWhiterabbitNeulandReader::Init()";
     EXT_STR_h101_WRNEULAND_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRNEULAND, 0);
 
     if (!ok)
@@ -67,6 +67,7 @@ Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
     if (!fEventHeader)
     {
         LOG(WARNING) << "R3BWhiterabbitNeulandReader::Init() R3BEventHeader not found";
+        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
         LOG(INFO) << "R3BWhiterabbitNeulandReader::Init() R3BEventHeader found";
