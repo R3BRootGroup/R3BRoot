@@ -14,44 +14,52 @@
 #ifndef R3BLOSREADER_H
 #define R3BLOSREADER_H
 
-#include "FairTask.h"
 #include "R3BReader.h"
+#include <Rtypes.h>
+
+class TClonesArray;
+
 struct EXT_STR_h101_LOS_t;
 typedef struct EXT_STR_h101_LOS_t EXT_STR_h101_LOS;
-class FairLogger;
-class TH1F;
-class TH2F;
+class ext_data_struct_info;
 
 class R3BLosReader : public R3BReader
 {
   public:
-    R3BLosReader(EXT_STR_h101_LOS*, UInt_t);
-    ~R3BLosReader();
+    // Standard constructor
+    R3BLosReader(EXT_STR_h101_LOS*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
-    virtual void FinishTask();
+    // Destructor
+    virtual ~R3BLosReader();
 
-    /** Accessor to select online mode **/
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
+
+    // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    /* Reader specific data structure from ucesb */
+    // An event counter
+    unsigned int fNEvents;
+    //  Reader specific data structure from ucesb
     EXT_STR_h101_LOS* fData;
-    /* Data offset */
-    UInt_t fOffset;
-    /* FairLogger */
-    FairLogger* fLogger;
-    /* the structs of type R3BLosxMappedItem */
-    TClonesArray* fArray; /**< Output array. */
+    // Data offset
+    size_t fOffset;
+    // Output array of R3BLosxMappedItem
+    TClonesArray* fArray;
     // Don't store data for online
     Bool_t fOnline;
-    Int_t fNEvents = 0;
+    // EventHeader
     R3BEventHeader* header;
 
   public:
-    ClassDef(R3BLosReader, 0);
+    ClassDefOverride(R3BLosReader, 0);
 };
 
-#endif
+#endif /* R3BLOSREADER_H */
