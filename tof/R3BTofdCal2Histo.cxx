@@ -58,7 +58,8 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fNEvents(0)
@@ -93,7 +94,8 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fNEvents(0)
@@ -218,13 +220,37 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    if (fTpat_bit >= 0)
+    //Int_t fTpat_bit = fTpat - 1;
+    //if (fTpat_bit >= 0)
+    //{
+    //    Int_t itpat = header->GetTpat();
+    //    Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+    //    if ((header) && (tpatvalue == 0))
+    //        return;
+    //}
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    Int_t tpatsum=0;
+    for (int i = 0; i < 16; i++)
     {
-        Int_t itpat = header->GetTpat();
-        Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
-        if ((header) && (tpatvalue == 0))
+        tpatbin = (header->GetTpat() & (1 << i));
+        LOG(DEBUG)<<"tpatbin "<<tpatbin;
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
             return;
+        }
+        if (tpatbin != 0)
+        {
+            LOG(DEBUG)<<"Accepted Tpat: "<<i+1;
+        }
+        tpatsum+=tpatbin;
+    }
+    if(tpatsum < 1)
+    {
+        LOG(DEBUG)<<"No Tpat info";
+        return;
+        
     }
 
     // ToFD detector

@@ -180,7 +180,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
-        LOG(ERROR) << "Call walk correction before next step!";
+        LOG(INFO) << "Call walk correction before next step!";
     }
 
     if (fParameter == 2)
@@ -370,14 +370,16 @@ void R3BTofdHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 TF1* fgaus = new TF1(
-                    "fgaus", "gaus(0)", Max - 0.2, Max + 0.2); // new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                    "fgaus", "gaus(0)", Max - .7, Max + .7); // new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1);
                 fgaus->Draw("SAME");
-                histo_py->SetAxisRange(Max - .5, Max + .5, "X");
-                h->SetAxisRange(Max - .5, Max + .5, "X");
+                histo_py->SetAxisRange(Max - 1.4, Max + 1.4, "X");
+                h->SetAxisRange(Max - 1.4, Max + 1.4, "X");
                 h->SetAxisRange(totLow, totHigh, "Y");
+                std::cout<<"Mean: "<<offset<<"\n";
                 cToTOffset->Update();
+                gPad->WaitPrimitive();
                 delete fgaus;
                 delete h;
                 delete histo_py;

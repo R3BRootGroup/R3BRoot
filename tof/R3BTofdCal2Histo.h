@@ -110,7 +110,7 @@ class R3BTofdCal2Histo : public FairTask
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
 
     /**
      * Method for setting number of LOS detectors and channels.
@@ -165,7 +165,8 @@ class R3BTofdCal2Histo : public FairTask
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1;
+    Int_t fTpat2;
 
     UInt_t fNofPlanes;       /**< Number of planes. */
     UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */

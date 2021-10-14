@@ -137,6 +137,7 @@ class R3BTofdChangePar : public FairTask
     virtual void changeVeff(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeLambda(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_t*);
+    virtual void changePol3(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeZ(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeWalk(Int_t plane, Int_t bar, Int_t pm, Double_t*);
 

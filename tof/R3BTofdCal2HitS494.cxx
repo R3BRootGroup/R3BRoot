@@ -747,7 +747,8 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
         event[hit].ypos<<" "<<
         event[hit].plane<<" "<<
         event[hit].bar;
-        if (event[hit].plane == 2 && (event[hit].bar < 21 || event[hit].bar > 24)) fhTvsQ[event[hit].plane - 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
+        //if (event[hit].plane == 2 && (event[hit].bar < 21 || event[hit].bar > 24)) fhTvsQ[event[hit].plane - 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
+        if (event[hit].plane == 2 && (event[hit].bar == 18)) fhTvsQ[event[hit].plane - 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
     }
 
     // Now we can analyze the hits in this event
