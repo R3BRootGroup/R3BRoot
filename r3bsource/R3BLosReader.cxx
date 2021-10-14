@@ -12,32 +12,35 @@
  ******************************************************************************/
 
 #include "R3BLosReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BLosMappedData.h"
+
+#include "FairLogger.h"
+#include "FairRootManager.h"
+
 #include "TClonesArray.h"
+#include "TMath.h"
+#include <iostream>
+
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_los_dez19.h"
-    //#include "ext_h101_los.h"
+//#include "ext_h101_los_dez19.h"
+#include "ext_h101_los.h"
 }
-#include "TMath.h"
+
 #define IS_NAN(x) TMath::IsNaN(x)
-//#define NUM_LOS_DETECTORS 1
 #define NUM_LOS_DETECTORS (sizeof data->LOS / sizeof data->LOS[0])
 #define NUM_LOS_CHANNELS 8
-#include <iostream>
 
 using namespace std;
 
-R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, UInt_t offset)
+R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
     : R3BReader("R3BLosReader")
+    , fNEvents(0)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BLosMappedData"))
 {
 }
@@ -52,9 +55,8 @@ R3BLosReader::~R3BLosReader()
 
 Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 {
-
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BLosReader::Init()";
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
@@ -63,7 +65,10 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
+    {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        LOG(WARNING) << "R3BLosReader::Init() R3BEventHeader not found";
+    }
 
     EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
@@ -74,7 +79,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("LosMapped", "Land", fArray, !fOnline);
+    FairRootManager::Instance()->Register("LosMapped", "Los detector", fArray, !fOnline);
 
     fArray->Clear();
 
@@ -89,8 +94,9 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTFTM = 0;
         data->LOS[d].TTCLM = 0;
         data->LOS[d].TTCTM = 0;
-        data->LOS[d].MTM = 0;
+        // data->LOS[d].MTM = 0;
     }
+
     return kTRUE;
 }
 
@@ -327,7 +333,7 @@ Bool_t R3BLosReader::Read()
         //
         // MTDC32
         //
-
+#if 0
         numChannels = data->LOS[d].MTM;
         curChannelStart = 0;
         // cout<<data->LOS[d].MTM<<endl;
@@ -350,6 +356,7 @@ Bool_t R3BLosReader::Read()
                }*/
             curChannelStart = nextChannelStart;
         }
+#endif
         if (data->LOS[d].VTF > 0)
         {
             // cout<<"nsumv & data->LOS[d].VTF "<<d+1<<"; "<<nsumv<<"; "<< data->LOS[d].VTF<<endl;
@@ -363,12 +370,10 @@ Bool_t R3BLosReader::Read()
     return kTRUE;
 }
 
-void R3BLosReader::FinishTask() {}
-
 void R3BLosReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
 }
 
-ClassImp(R3BLosReader)
+ClassImp(R3BLosReader);

@@ -39,9 +39,9 @@
         }                                                                                                           \
                                                                                                                     \
         FairRootManager* mgr = FairRootManager::Instance();                                                         \
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");                                           \
+        fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");                                             \
         if (!fEventHeader)                                                                                          \
-            fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");                                         \
+            fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");                                       \
                                                                                                                     \
         return kTRUE;                                                                                               \
     }                                                                                                               \
