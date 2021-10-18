@@ -250,7 +250,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
     {
         LOG(DEBUG)<<"No Tpat info";
         return;
-        
+
     }
 
     // ToFD detector
@@ -326,7 +326,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 //                bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' <<
                 //   bot_trig_i << ' '
                 //                << bot_trig->GetTimeLeading_ns() << std::endl;
-                
+
                 ++n1;
             }
             */ //end old
@@ -542,9 +542,9 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     // calculate y position
                     auto posToT =
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+                    if (!fTofdSmiley) posToT = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
 
                     Double_t parq[4];
-                    
 
                     // calculate charge
                     Double_t qb = 0.;
@@ -609,7 +609,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
     Double_t max_charge = 60.;
-    
+
     if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -626,7 +626,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
     }
-                    
+
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];

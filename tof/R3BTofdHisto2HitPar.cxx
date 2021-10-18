@@ -215,7 +215,9 @@ void R3BTofdHisto2HitPar::FinishTask()
                         smiley((TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
                                min2,
                                max2,
-                               para2);
+                               para2,
+                               i,
+                               j);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -282,16 +284,16 @@ void R3BTofdHisto2HitPar::FinishTask()
         LOG(WARNING) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
-        Int_t min = 0, max = 10; // select range for peak search
-        for (Int_t i = 0; i < fNofPlanes; i++)
+        Int_t min = 0.1, max = 14; // select range for peak search
+        for (Int_t i = 1; i < fNofPlanes; i++)
         {
-            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            for (Int_t j = 32; j < fPaddlesPerPlane; j++)
             {
                 if (histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    zcorr((TH2F*)histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars);
+                    zcorr((TH2F*)histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars, i, j);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
                     Double_t veff = par->GetVeff();
@@ -609,7 +611,7 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     delete f2;
     delete cfit_exp;
 }
-void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para)
+void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para, Int_t p, Int_t b)
 {
     // This fits the smiley: Sqrt(q1*q2) returns position dependent charge, we fit that via pol3 and try to correct
     Double_t y[1000], x[1000];
@@ -664,11 +666,11 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         delete histo_py;
     }
     gr1 = new TGraph(n, x, y);
-    gr1->SetTitle("Points found for fitting; x position in cm; sqrt(tot1*tot2)");
+    gr1->SetTitle("Points found for fitting;y position in cm; sqrt(tot1*tot2)");
     gr1->Draw("A*");
     std::cout << "Start fitting\n";
     TF1* f1 = new TF1("f1", "pol3", min, max);
-    f1->SetLineColor(2);
+    f1->SetLineColor(kGreen);
     gr1->Fit("f1", "Q", "", min, max);
     for (Int_t j = 0; j <= 3; j++)
     {
@@ -695,12 +697,12 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         delete histo_py;
     }
     gr2 = new TGraph(n, x, y);
-    gr2->SetTitle("More information;x position in cm;sqrt(q1*q2)");
+    gr2->SetTitle("More information;y position in cm;sqrt(q1*q2)");
     gr2->Draw("A*");
     f1->DrawCopy("SAME");
     TF1* f2 = new TF1("f2", "pol3", min, max);
     f2->SetParameters(para[0], para[1], para[2], para[3]);
-    f2->SetLineColor(3);
+    f2->SetLineColor(kRed);
     gr2->Fit("f2", "0Q", "", min, max);
     f2->Draw("SAME");
     std::cout << "Will write:\n";
@@ -714,7 +716,16 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
     legend->AddEntry("f1", "First Fit", "l");
     legend->AddEntry("f2", "Second Fit", "l");
     legend->Draw();
+    cfit_smiley->cd(2);
+    f1->Draw("SAME");
+    f2->Draw("SAME");
+    cfit_smiley->cd(1);
+    f1->Draw("SAME");
+    f2->Draw("SAME");
     cfit_smiley->Update();
+    TImage *img = TImage::Create();
+    img->FromPad(cfit_smiley);
+    img->WriteImage(Form("./calib/pol3/pol3_%i_%i.png",p,b));
     // gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete histo1;
@@ -725,36 +736,40 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
     delete f2;
     delete cfit_smiley;
 }
-void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars)
+void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars, Int_t pl, Int_t b)
 {
     Double_t par[3000] = { 0 };
     Int_t maxplane = 1, maxbar = 44, nPeaks = 180;
     Double_t x[3000] = { 0 };
-    TCanvas* c1 = new TCanvas("c1", "c1", 100, 100, 800, 800);
-    c1->Divide(1, 3);
-    c1->cd(1);
+    TCanvas* czcorr = new TCanvas("czcorr", "czcorr", 100, 100, 800, 800);
+    czcorr->Divide(1, 3);
+    czcorr->cd(1);
     auto* h = (TH2F*)histo->Clone();
     h->Draw("colz");
     h->SetAxisRange(min, max, "Y");
     // Projection of charge axis
     auto* h1 = h->ProjectionY("p_y");
-    c1->cd(2);
+    czcorr->cd(2);
     h1->Draw();
     // Use TSpectrum to find the peak candidates
     TSpectrum* s = new TSpectrum(nPeaks);
     Int_t nfound = s->Search(h1, 1, "", 0.005); // lower threshold than default 0.05
     std::cout << "Found " << nfound << " candidate peaks to fit\n";
-    c1->Update();
+    czcorr->Update();
     // Eliminate background peaks
     nPeaks = 0;
-    Double_t* xpeaks = s->GetPositionX();
+    Double_t *xpeaks = s->GetPositionX();
     for (Int_t p = 0; p <= nfound; p++)
     {
         Float_t xp = xpeaks[p];
         Int_t bin = h1->GetXaxis()->FindBin(xp);
         Float_t yp = h1->GetBinContent(bin);
         if (yp - TMath::Sqrt(yp) < 1.)
+        {
+            //std::cout<<"peak @ "<<xp<<" to small, continue\n";
             continue;
+        }
+        //std::cout<<"peak @ "<<xp<<"\n";
         par[2 * nPeaks] = yp;
         par[2 * nPeaks + 1] = xp;
         nPeaks++;
@@ -762,14 +777,14 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     if (nPeaks < 2)
         return;
 
-    Double_t peaks[nPeaks];
+    Double_t peaks[nPeaks] = {0};
 
     for (Int_t i = 0; i < nPeaks; i++)
     {
-        // printf("Found peak @ %f\n",xpeaks[i]);
+        printf("Found peak @ %f\n",xpeaks[i]);
         peaks[i] = par[2 * i + 1];
     }
-    c1->Update();
+    czcorr->Update();
 
     // select useful peaks
     sort(peaks, peaks + nPeaks);
@@ -802,7 +817,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     if (nfp < 2)
     {
         delete s;
-        delete c1;
+        delete czcorr;
         return;
     }
     // fit charge axis
@@ -810,7 +825,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     auto* gr1 = new TGraph();
     TF1* fitz = new TF1("fitz", "[0]*TMath::Power(x,[2])+[1]", min, max);
     fitz->SetParameters(1.5, 2., .1);
-    c1->cd(3);
+    czcorr->cd(3);
     gr1 = new TGraph(nfp, zpeaks, x);
     gr1->Draw("A*");
     gr1->Fit("fitz", "Q", "", min, max);
@@ -823,12 +838,17 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         pars[j] = fitzr->GetParameter(j);
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
     }
+    czcorr->Update();
+    TImage *img = TImage::Create();
+    img->FromPad(czcorr);
+    img->WriteImage(Form("./calib/zcorrpol3/888_zcorr_pol3_%i_%i.png",pl,b));
     // gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete s;
     delete gr1;
-    delete c1;
+    delete czcorr;
     delete fitz;
+    delete xpeaks;
 }
 
 ClassImp(R3BTofdHisto2HitPar)
