@@ -246,7 +246,7 @@ void R3BTofdHisto2HitPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, cutmin, cutmax, para, i, j, 1);
+                            (TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para, i, j, 1);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -260,7 +260,7 @@ void R3BTofdHisto2HitPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, cutmin, cutmax, para, i, j, 2);
+                            (TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para, i, j, 2);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -513,7 +513,7 @@ void R3BTofdHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
     }
     fCal_Par->setChanged();
 }
-void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t totmin, Double_t totmax, Double_t* para, Int_t p, Int_t b, Int_t s)
+void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para, Int_t p, Int_t b, Int_t s)
 {
     // This fits the exponential decay of the light in a paddle. The 2 PMTs are fit with the same function but one
     // side will deliver negative attenuation parameters and the other positive.
@@ -533,13 +533,13 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     TH2F* histo2 = (TH2F*)histo->Clone();
     histo1->Draw("colz");
     histo1->RebinY(2);
-    histo1->SetAxisRange(totmin, totmax, "Y");
+    histo1->SetAxisRange(fTofdTotLow, fTofdTotHigh, "Y");
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
     {
         TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
-        histo_py->SetAxisRange(totmin, totmax, "X");
+        histo_py->SetAxisRange(fTofdTotLow, fTofdTotHigh, "X");
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);

@@ -178,7 +178,7 @@ class R3BTofdHisto2HitPar : public FairTask
     /**
      * Method for calculation of position dependence charge of scintillator.
      */
-    virtual void doubleExp(TH2F* histo, Double_t min, Double_t maxo, Double_t totmin, Double_t totmax, Double_t*, Int_t p, Int_t b, Int_t s);
+    virtual void doubleExp(TH2F* histo, Double_t min, Double_t maxo, Double_t*, Int_t p, Int_t b, Int_t s);
 
     /**
      * Method for calculation of position dependent charge of scintillator.
