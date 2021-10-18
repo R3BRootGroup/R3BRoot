@@ -46,6 +46,7 @@
 #include "TProfile.h"
 #include "TSpectrum.h"
 #include "TVirtualFitter.h"
+#include "TImage.h"
 
 #include <iostream>
 #include <limits>
@@ -232,8 +233,10 @@ void R3BTofdHisto2HitPar::FinishTask()
         {
             LOG(WARNING) << "Calling function doubleExp";
             Double_t para[4];
-            Double_t min = -40.; // effective bar length
-            Double_t max = 40.;  // effective bar length = 80 cm
+            Double_t min = -50.; // effective bar length
+            Double_t max = 50.;  // effective bar length = 80 cm
+            Double_t cutmin = 20.;  // cut on ToT/charge
+            Double_t cutmax = 70.;  //
 
             for (Int_t i = 0; i < fNofPlanes; i++)
             {
@@ -243,7 +246,7 @@ void R3BTofdHisto2HitPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                            (TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, cutmin, cutmax, para, i, j, 1);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -257,7 +260,7 @@ void R3BTofdHisto2HitPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                            (TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, cutmin, cutmax, para, i, j, 2);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -510,7 +513,7 @@ void R3BTofdHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
     }
     fCal_Par->setChanged();
 }
-void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para)
+void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t totmin, Double_t totmax, Double_t* para, Int_t p, Int_t b, Int_t s)
 {
     // This fits the exponential decay of the light in a paddle. The 2 PMTs are fit with the same function but one
     // side will deliver negative attenuation parameters and the other positive.
@@ -529,28 +532,32 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     TH2F* histo1 = (TH2F*)histo->Clone();
     TH2F* histo2 = (TH2F*)histo->Clone();
     histo1->Draw("colz");
+    histo1->RebinY(2);
+    histo1->SetAxisRange(totmin, totmax, "Y");
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
     {
         TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
+        histo_py->SetAxisRange(totmin, totmax, "X");
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
-        if ((x[n] < -40. || x[n] > 40.) || y[n] < 50.)
+        if ((x[n] < -40. || x[n] > 40.))// || y[n] < 40.)
         {
             delete histo_py;
             continue;
         }
-        if (histo_py->GetMaximum() > 5)
+        if (histo_py->GetMaximum() > 20)
             n++;
         delete histo_py;
     }
     gr1 = new TGraph(n, x, y);
+    gr1->SetTitle("First guess;pos in cm;ToT in ns");
     gr1->Draw("A*");
     TF1* f1 = new TF1("f1", "[0]*(exp(-[1]*(x+100.))+exp(-[2]*(x+100.)))+[3]", min, max);
     f1->SetParameters(520., 0.001, 17234, -485.);
-    f1->SetLineColor(2);
+    f1->SetLineColor(kGreen);
     gr1->Fit("f1", "", "", min, max);
     for (Int_t j = 0; j <= 3; j++)
     {
@@ -576,23 +583,31 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
         delete histo_py;
     }
     gr2 = new TGraph(n, x, y);
+    gr2->SetTitle("More information and better cuts;pos in cm;ToT in ns");
     gr2->Draw("A*");
     TF1* f2 = new TF1("f2", "[0]*(exp(-[1]*(x+100.))+exp(-[2]*(x+100.)))+[3]", min, max);
     f2->SetParameters(para[0], para[1], para[2], para[3]);
-    f2->SetLineColor(2);
+    f2->SetLineColor(kRed);
     gr2->Fit("f2", "", "", min, max);
     for (Int_t j = 0; j <= 3; j++)
     {
         para[j] = f2->GetParameter(j);
         std::cout << "Parameter: " << para[j] << "\n";
     }
+    cfit_exp->cd(1);
+    f1->Draw("SAME");
+    f2->Draw("SAME");
     cfit_exp->Update();
+    //TImage *img = TImage::Create();
+    //img->FromPad(cfit_exp);
+    //img->WriteImage(Form("./calib/dexp/dexp_%i_%i_%i.png",p,b,s));
     // gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete gr1;
     delete gr2;
     delete f1;
     delete f2;
+    delete cfit_exp;
 }
 void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para)
 {
