@@ -742,6 +742,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge);        // charge per plane
             fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge); // charge vs event #
             fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos); // xy of plane
+            ihit++;
         }
     }
 
