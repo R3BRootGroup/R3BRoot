@@ -128,6 +128,8 @@ void R3BGladFieldMap::Init()
     //  if      (fFileName.EndsWith(".root")) ReadRootFile(fFileName, fName);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
+    else if(fFileName.EndsWith(".root"))
+        ReadRootFile(fFileName);
     else
     {
         cerr << "-E- R3BGladFieldMap::Init: No proper file name defined! (" << fFileName << ")" << endl;
@@ -557,6 +559,31 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
     //  exit(0);
 }
 // ------------------------------------------------------------------------
+
+void R3BGladFieldMap::ReadRootFile(const char* fileName)
+{
+  // Opening root file
+  cout << "-I- R3BGladFieldMap: Reading field map from ROOT file "<< fileName << endl;
+  TFile* file = new TFile(fileName, "READ");
+  if (!(file->IsOpen())) 
+  {
+    cerr << "-E- R3BGladFieldMap::ReadRootfile: Cannot read from file! "<< endl;
+    LOG(fatal) << "ReadRootFile: Cannot read from file";
+  }
+
+  // Get the field data object
+  R3BGladFieldMapData* data = NULL;
+  file->GetObject(mapName, data);
+  if ( ! data ) {
+    cout << "-E- R3BGladFieldMap::ReadRootFile: data object " << fileName
+     << " not found in file! " << endl;
+    exit(-1);
+  }
+
+  // Close the root file and delete the data object
+  file->Close();
+  delete data;
+}
 
 // -------------   Read field map from ROOT file (private)  ---------------
 /*

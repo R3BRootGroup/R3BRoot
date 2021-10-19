@@ -126,7 +126,7 @@ class R3BGladFieldMap : public FairField
     void ReadAsciiFile(const char* fileName);
 
     /** Read field map from a ROOT file **/
-    // void ReadRootFile(const char* fileName, const char* mapName);
+     void ReadRootFile(const char* fileName);
 
     /** Set field parameters and data **/
     // void SetField(const R3BGladFieldMapData* data);
@@ -172,7 +172,7 @@ class R3BGladFieldMap : public FairField
     TRotation* gRot;  //!
     TVector3* gTrans; //!
 
-    ClassDef(R3BGladFieldMap, 2)
+    ClassDef(R3BGladFieldMap, 3)
 };
 
 #endif
