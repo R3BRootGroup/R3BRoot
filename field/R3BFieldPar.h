@@ -67,6 +67,7 @@ class R3BFieldPar : public FairParGenericSet
     Double_t GetBy() const { return fBy; }
     Double_t GetBz() const { return fBz; }
     void MapName(TString& name) { name = fMapName; }
+    TString GetFileName() { return fMapFileName; }
     Double_t GetPositionX() const { return fPosX; }
     Double_t GetPositionY() const { return fPosY; }
     Double_t GetPositionZ() const { return fPosZ; }
@@ -90,6 +91,7 @@ class R3BFieldPar : public FairParGenericSet
 
     /** Field map name in case of field map **/
     TString fMapName;
+    TString fMapFileName;
 
     /** Field centre position for field map **/
     Double_t fPosX, fPosY, fPosZ;
@@ -99,7 +101,7 @@ class R3BFieldPar : public FairParGenericSet
 
     Double_t fCurrent;
 
-    ClassDef(R3BFieldPar, 1);
+    ClassDef(R3BFieldPar, 2);
 };
 
 #endif
