@@ -372,52 +372,21 @@ Bool_t R3BFileSource::Init()
     if (fInputFile.is_open())
     {
         LOG(INFO) << "R3BFileSource::Init() Reading RunId file";
-        std::string buffer;
-        char *p1, *p2, *p3;
-        do
+
+        Int_t rid;
+        Int_t expRun;
+        int64_t ts;
+        Int_t dummy;
+
+        while (fInputFile >> hex >> rid >> expRun >> ts >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
+               dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
+               dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy)
         {
-            getline(fInputFile, buffer);
-            LOG(INFO) << "read from file: \"" << buffer << "\"";
-            if (buffer.find("fRunID") == 0)
-            {
-                buffer.erase(0, buffer.find('=') + 1);
-                UInt_t rid = strtol(buffer.c_str(), &p1, 16);
-                if (buffer.c_str() == p1)
-                {
-                    LOG(ERROR) << "R3BFileSource::Init() Bad structure for RunId file, \n"
-                               << "it must be (hex format): \n"
-                               << "fRunID = a \n"
-                               << "expid timestamp \n";
-                    return kFALSE;
-                }
-                fRunid.push_back(rid);
-                LOG(DEBUG) << "RuniD= " << rid;
-            }
-            if (buffer.find("FILE") == 0)
-                continue;
 
-            getline(fInputFile, buffer);
-            LOG(INFO) << "read from file: \"" << buffer << "\"";
-
-            std::string buf1 = buffer.c_str();
-            buf1.erase(buf1.find(' '), buf1.length());
-            buffer.erase(0, buffer.find(' ') + 1);
-            fExpid = strtol(buf1.c_str(), &p2, 16);
-            uint64_t ts = strtol(buffer.c_str(), &p3, 16);
-
-            if (buf1.c_str() == p2 || buffer.c_str() == p3)
-            {
-                LOG(ERROR) << "R3BFileSource::Init() Bad structure for RunId file, \n"
-                           << "it must be (hex format): \n"
-                           << "fRunID = a \n"
-                           << "expid timestamp \n";
-                return kFALSE;
-            }
+            fRunid.push_back(rid);
             fTimestamp.push_back(ts);
-            LOG(DEBUG) << fExpid << " / " << ts;
+        }
 
-        } while (fInputFile && buffer.compare("FILE END"));
-        LOG(INFO) << "R3BFileSource::Init() End of reading RunId file";
         fInputFile.close();
     }
     else
