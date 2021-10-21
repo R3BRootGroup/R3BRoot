@@ -16,8 +16,7 @@
 #include "R3BCalifaHitData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BEventHeader.h"
-#include "R3BWRCalifaData.h"
-#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
 #include "THttpServer.h"
 
 #include "FairLogger.h"
@@ -93,7 +92,6 @@ R3BCalifaDemoOnlineSpectra::~R3BCalifaDemoOnlineSpectra()
 
 InitStatus R3BCalifaDemoOnlineSpectra::Init()
 {
-
     LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
@@ -111,7 +109,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     }
     Int_t BinsChannelFebex = 65535;
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("", this);
@@ -1078,7 +1076,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRCalifaData* hit = (R3BWRCalifaData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             wrc = hit->GetTimeStamp();
@@ -1090,7 +1088,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsMaster->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRMasterData* hit = (R3BWRMasterData*)fWRItemsMaster->At(ihit);
+            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
             if (!hit)
                 continue;
             wrm = hit->GetTimeStamp();

@@ -66,19 +66,16 @@ void R3BMusicHitPar::putParams(FairParamList* list)
         return;
     }
 
+    LOG(INFO) << "Nb Anodes: " << fNumAnodes;
     list->add("musicAnodeNumberPar", fNumAnodes);
-    Int_t array_anodes = fNumAnodes;
-    LOG(INFO) << "Array Size Anodes: " << array_anodes;
-    fIn_use->Set(array_anodes);
+    fIn_use->Set(fNumAnodes);
     list->add("musicInUsePar", *fIn_use);
-
-    fAnode_pos->Set(array_anodes);
+    fAnode_pos->Set(fNumAnodes);
     list->add("musicAnodePosPar", *fAnode_pos);
 
+    LOG(INFO) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
     list->add("musicZHitParamsFitPar", fNumParamsZFit);
-    Int_t array_size = fNumParamsZFit;
-    LOG(INFO) << "Number of parameters for charge-Z: " << array_size;
-    fDetZHitParams->Set(array_size);
+    fDetZHitParams->Set(fNumParamsZFit);
     list->add("musicZHitPar", *fDetZHitParams);
 }
 
@@ -88,39 +85,42 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
     LOG(INFO) << "R3BMusicHitPar::getParams() called";
     if (!list)
     {
+        LOG(ERROR) << "Could not initialize FairParamList";
         return kFALSE;
     }
 
     if (!list->fill("musicAnodeNumberPar", &fNumAnodes))
     {
-        return kFALSE;
-    }
-    Int_t array_anode = fNumAnodes;
-    LOG(INFO) << "Array Size: " << array_anode;
-    fIn_use->Set(array_anode);
-    if (!(list->fill("musicInUsePar", fIn_use)))
-    {
-        LOG(INFO) << "---Could not initialize musicInUsePar";
+        LOG(ERROR) << "Could not initialize musicAnodeNumberPar";
         return kFALSE;
     }
 
-    fAnode_pos->Set(array_anode);
+    LOG(INFO) << "Nb Anodes: " << fNumAnodes;
+    fIn_use->Set(fNumAnodes);
+    if (!(list->fill("musicInUsePar", fIn_use)))
+    {
+        LOG(ERROR) << "Could not initialize musicInUsePar";
+        return kFALSE;
+    }
+
+    fAnode_pos->Set(fNumAnodes);
     if (!(list->fill("musicAnodePosPar", fAnode_pos)))
     {
-        LOG(INFO) << "---Could not initialize musicAnodePosPar";
+        LOG(ERROR) << "Could not initialize musicAnodePosPar";
         return kFALSE;
     }
 
     if (!list->fill("musicZHitParamsFitPar", &fNumParamsZFit))
     {
+        LOG(ERROR) << "Could not initialize musicZHitParamsFitPar";
         return kFALSE;
     }
-    Int_t array_size = fNumParamsZFit;
-    LOG(INFO) << "Array Size: " << array_size;
-    fDetZHitParams->Set(array_size);
+
+    LOG(INFO) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
+    fDetZHitParams->Set(fNumParamsZFit);
     if (!(list->fill("musicZHitPar", fDetZHitParams)))
     {
-        LOG(INFO) << "---Could not initialize musicZHitPar";
+        LOG(ERROR) << "Could not initialize musicZHitPar";
         return kFALSE;
     }
 
@@ -130,8 +130,8 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
 // ----  Method printParams ----------------------------------------------------
 void R3BMusicHitPar::printParams()
 {
-    LOG(INFO) << "R3BMusicHitPar: music detector Parameters";
-    LOG(INFO) << "R3BMusicHitPar: music anodes in use: ";
+    LOG(INFO) << "R3BMusicHitPar::Music detector Parameters";
+    LOG(INFO) << "R3BMusicHitPar::Music anodes in use: ";
     for (Int_t j = 0; j < fNumAnodes; j++)
     {
         LOG(INFO) << "Anode " << j + 1 << " in use " << fIn_use->GetAt(j) << ", Position-Z: " << fAnode_pos->GetAt(j);
@@ -143,3 +143,5 @@ void R3BMusicHitPar::printParams()
         LOG(INFO) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
     }
 }
+
+ClassImp(R3BMusicHitPar);

@@ -82,4 +82,4 @@ class R3BMusicHitPar : public FairParGenericSet
     ClassDef(R3BMusicHitPar, 1);
 };
 
-#endif
+#endif /* R3BMusicHitPar_H */

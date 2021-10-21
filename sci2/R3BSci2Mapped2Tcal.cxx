@@ -1,3 +1,21 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+// -------------------------------------------------------------
+// -----         R3BSci2Mapped2Tcal source file            -----
+// -----    Created 25/10/21  by J.L. Rodriguez-Sanchez    -----
+// -------------------------------------------------------------
+
 #include "R3BSci2Mapped2Tcal.h"
 
 #include "R3BEventHeader.h"
@@ -7,11 +25,7 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -20,16 +34,7 @@
 
 // --- Default Constructor
 R3BSci2Mapped2Tcal::R3BSci2Mapped2Tcal()
-    : FairTask("Sci2Map2Tcal", 1)
-    , fMapped(NULL)
-    , fTcal(NULL)
-    , fNofTcalItems(0)
-    , fNofTcalPars(0)
-    , fNofModules(0)
-    , fTcalPar(NULL)
-    , fTrigger(-1)
-    , fClockFreq(5.)
-    , fNEvent(0)
+    : R3BSci2Mapped2Tcal("Sci2Map2Tcal", 1)
 {
 }
 
@@ -38,19 +43,19 @@ R3BSci2Mapped2Tcal::R3BSci2Mapped2Tcal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapped(NULL)
     , fTcal(NULL)
-    , fNofTcalItems(0)
     , fNofTcalPars(0)
     , fNofModules(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
     , fClockFreq(5.)
     , fNEvent(0)
+    , fOnline(kFALSE)
 {
 }
 
 R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
 {
-    LOG(INFO) << "R3BSci2Mapped2Tcal: Delete instance";
+    LOG(DEBUG) << "R3BSci2Mapped2Tcal: Delete instance";
     if (fMapped)
     {
         delete fMapped;
@@ -58,48 +63,55 @@ R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
     if (fTcal)
     {
         delete fTcal;
-        fNofTcalItems = 0;
     }
 }
 
-InitStatus R3BSci2Mapped2Tcal::Init()
+void R3BSci2Mapped2Tcal::SetParameter()
 {
-    LOG(INFO) << "R3BSci2Mapped2Tcal: Init";
-
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (!mgr)
-    {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
-    }
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
-    // --- get access to Mapped data --- //
-    fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
-    if (!fMapped)
-    {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't get handle on Sci2Mappe container";
-    }
-    else
-    {
-        LOG(INFO) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped found";
-    }
-
-    // --- output tcal data --- //
-    fTcal = new TClonesArray("R3BSci2TcalData", 25);
-    mgr->Register("Sci2Tcal", "Land", fTcal, kTRUE);
-    fTcal->Clear();
-
     // --- tcal parameters --- //
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
         LOG(ERROR) << "There are no TCal parameters in container Sci2TCalPar";
+    }
+    LOG(INFO) << "R3BSci2Mapped2Tcal::SetParameter() : read " << fNofModules << " modules";
+
+    return;
+}
+
+InitStatus R3BSci2Mapped2Tcal::Init()
+{
+    LOG(INFO) << "R3BSci2Mapped2Tcal::Init()";
+
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (!mgr)
+    {
+        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
         return kFATAL;
     }
-    LOG(INFO) << "R3BSci2Mapped2Tcal::Init : read " << fNofModules << " modules";
+
+    // try to get a handle on the EventHeader.
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+    {
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        LOG(WARNING) << "R3BSci2Mapped2Tcal::Init() EventHeader. not found";
+    }
+
+    // --- get access to Mapped data --- //
+    fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
+    if (!fMapped)
+    {
+        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped Data not found.";
+        return kFATAL;
+    }
+
+    // OUTPUT DATA
+    fTcal = new TClonesArray("R3BSci2TcalData", 25);
+    mgr->Register("Sci2Tcal", "Sci2 Tcal data", fTcal, !fOnline);
+    fTcal->Clear();
+
+    SetParameter();
 
     return kSUCCESS;
 }
@@ -110,15 +122,16 @@ void R3BSci2Mapped2Tcal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to Sci2TCalPar-Container.";
+        LOG(ERROR) << "Could not get access to Sci2TCalPar container.";
         fNofTcalPars = 0;
-        return;
     }
+    return;
 }
 
 InitStatus R3BSci2Mapped2Tcal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -176,6 +189,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
     }
 
     ++fNEvent;
+    return;
 }
 
 void R3BSci2Mapped2Tcal::FinishEvent()
@@ -183,11 +197,9 @@ void R3BSci2Mapped2Tcal::FinishEvent()
     if (fTcal)
     {
         fTcal->Clear();
-        fNofTcalItems = 0;
     }
+    return;
 }
-
-void R3BSci2Mapped2Tcal::FinishTask() {}
 
 // -----   Private method AddTcalData  --------------------------------------------
 R3BSci2TcalData* R3BSci2Mapped2Tcal::AddTcalData(Int_t det, Int_t ch, Double_t tns)
@@ -197,4 +209,4 @@ R3BSci2TcalData* R3BSci2Mapped2Tcal::AddTcalData(Int_t det, Int_t ch, Double_t t
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BSci2TcalData(det, ch, tns);
 }
-ClassImp(R3BSci2Mapped2Tcal)
+ClassImp(R3BSci2Mapped2Tcal);

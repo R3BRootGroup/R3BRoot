@@ -17,8 +17,7 @@
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
-#include "R3BWRCalifaData.h"
-#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
 #include "THttpServer.h"
 
 #include "FairLogger.h"
@@ -1322,7 +1321,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRCalifaData* hit = (R3BWRCalifaData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             wr[ihit] = hit->GetTimeStamp();
@@ -1336,7 +1335,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             nHits = fWRItemsMaster->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BWRMasterData* hit = (R3BWRMasterData*)fWRItemsMaster->At(ihit);
+                R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
                 if (!hit)
                     continue;
                 wrm = hit->GetTimeStamp();

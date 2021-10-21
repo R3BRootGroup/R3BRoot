@@ -16,7 +16,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
-#include "R3BWRLosData.h"
+#include "R3BWRData.h"
 #include "TClonesArray.h"
 
 extern "C"
@@ -33,7 +33,7 @@ R3BWhiterabbitLosReader::R3BWhiterabbitLosReader(EXT_STR_h101_WRLOS* data, size_
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRLosData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -59,7 +59,10 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
     FairRootManager* mgr = FairRootManager::Instance();
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
+    {
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        LOG(WARNING) << "R3BWhiterabbitLosReader::Init() EventHeader. not found";
+    }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRLosData", "WRLos", fArray, !fOnline);
@@ -101,7 +104,7 @@ Bool_t R3BWhiterabbitLosReader::Read()
                              ((uint64_t)fData->TIMESTAMP_LOS_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_LOS_WR_T1;
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRLosData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
 
         // cout<<"WRLOS READER TIME: "<<timestamp<<", "<<fArray->GetEntriesFast()<<endl;
     }

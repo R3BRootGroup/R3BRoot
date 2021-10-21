@@ -54,6 +54,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 ./sim/R3BMusic.cxx
+./sim/R3BMusicDigitizer.cxx
 ./pars/R3BMusicCalPar.cxx
 ./pars/R3BMusicHitPar.cxx
 ./pars/R3BMusicContFact.cxx

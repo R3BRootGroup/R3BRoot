@@ -17,7 +17,7 @@
 // --------------------------------------------------------------
 
 #include "R3BWhiterabbitPropagator.h"
-#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -25,28 +25,22 @@
 #include "TClonesArray.h"
 
 R3BWhiterabbitPropagator::R3BWhiterabbitPropagator()
-    : FairTask("R3BWhiterabbitPropagator", 1)
-    , fInputItem(NULL)
-    , fOutputItem(NULL)
-    , fNameWR("WRMaster")
+    : R3BWhiterabbitPropagator("R3BWhiterabbitPropagator", 1, "WRMaster")
 {
 }
 
 R3BWhiterabbitPropagator::R3BWhiterabbitPropagator(const TString& name, Int_t iVerbose, const TString& namewr)
     : FairTask(name, iVerbose)
     , fInputItem(NULL)
-    , fOutputItem(NULL)
     , fNameWR(namewr)
 {
 }
 
 R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 {
-    LOG(INFO) << "R3BWhiterabbitPropagator::Delete instance";
+    LOG(DEBUG) << "R3BWhiterabbitPropagator::Delete instance";
     if (fInputItem)
         delete fInputItem;
-    if (fOutputItem)
-        delete fOutputItem;
 }
 
 InitStatus R3BWhiterabbitPropagator::Init()

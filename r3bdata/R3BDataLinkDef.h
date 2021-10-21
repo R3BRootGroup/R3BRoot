@@ -13,8 +13,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//2005/06/23 07:14:26 dbertini Exp $
-
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -59,11 +57,7 @@
 #pragma link C++ class R3BAlpidePoint+;
 #pragma link C++ class R3BAlpideMappedData+;
 
-#pragma link C++ class R3BWRMasterData+;
-#pragma link C++ class R3BWRCalifaData+;
-#pragma link C++ class R3BWRAmsData+;
-#pragma link C++ class R3BWRPspData+;
-#pragma link C++ class R3BWRLosData+;
+#pragma link C++ class R3BWRData+;
 
 #pragma link C++ class R3BMusicPoint+;
 #pragma link C++ class R3BMusicMappedData+;

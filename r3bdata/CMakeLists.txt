@@ -11,8 +11,8 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BDATA" which includes the source files given in the array . The
-# extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BData" which includes the source files given in the array.
+# The extension is already found. Any number of sources could be listed here.
 
 # Set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overloaded-virtual") Set(CMAKE_CXX_FLAGS
 # "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat-security -march=native")
@@ -66,11 +66,7 @@ link_directories(${LINK_DIRECTORIES})
 set(SRCS
 R3BMCStack.cxx
 R3BMCTrack.cxx
-wrData/R3BWRMasterData.cxx
-wrData/R3BWRCalifaData.cxx
-wrData/R3BWRAmsData.cxx
-wrData/R3BWRPspData.cxx
-wrData/R3BWRLosData.cxx
+wrData/R3BWRData.cxx
 R3BHit.cxx
 R3BTrack.cxx
 R3BDouble.cxx
