@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #ifndef R3BSCI2HITITEM_H
 #define R3BSCI2HITITEM_H
 
@@ -12,19 +25,19 @@ class R3BSci2HitData : public TObject
     R3BSci2HitData();
 
     // Standard Constructor
-    R3BSci2HitData(UChar_t detector, Double_t t, Double_t x, Double_t Z);
+    R3BSci2HitData(Int_t detid, Double_t xpos, Double_t time);
 
     // Destructor
     virtual ~R3BSci2HitData() {}
 
-    // Getters
-    inline const UChar_t& GetDetector() const { return fDetector; }
+    /** Accessors **/
+    inline const Int_t& GetSciId() const { return fSciId; }
+    inline const Double_t& GetX() const { return fX; }
+    inline const Double_t& GetTof() const { return fTime; }
 
-  private:
-    UChar_t fDetector; // 1..n
-    Double_t fTime_ns; // average time of the scintillators
-    Double_t fX_cm;    // position in cm
-    Double_t fZ;       // Charge
+  protected:
+    Int_t fSciId;
+    Double_t fX, fTime;
 
   public:
     ClassDef(R3BSci2HitData, 1)

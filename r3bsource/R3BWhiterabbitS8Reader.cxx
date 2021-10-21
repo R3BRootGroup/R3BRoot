@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
-#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
 #include "R3BWhiterabbitS8Reader.h"
 #include "TClonesArray.h"
 
@@ -33,7 +33,7 @@ R3BWhiterabbitS8Reader::R3BWhiterabbitS8Reader(EXT_STR_h101_WRS8* data, size_t o
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRMasterData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -50,7 +50,7 @@ R3BWhiterabbitS8Reader::~R3BWhiterabbitS8Reader()
 Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitS8Reader::Init";
+    LOG(INFO) << "R3BWhiterabbitS8Reader::Init()";
     EXT_STR_h101_WRS8_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRS8, 0);
 
     if (!ok)
@@ -64,7 +64,7 @@ Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitS8Reader::Init() R3BEventHeader not found";
+        LOG(WARNING) << "R3BWhiterabbitS8Reader::Init() EventHeader. not found";
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
@@ -104,7 +104,7 @@ Bool_t R3BWhiterabbitS8Reader::Read()
 
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
     }
     else
     {

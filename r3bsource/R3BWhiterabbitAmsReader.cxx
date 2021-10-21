@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
-#include "R3BWRAmsData.h"
+#include "R3BWRData.h"
 #include "R3BWhiterabbitAmsReader.h"
 #include "TClonesArray.h"
 
@@ -33,7 +33,7 @@ R3BWhiterabbitAmsReader::R3BWhiterabbitAmsReader(EXT_STR_h101_WRAMS* data, size_
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRAmsData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -64,7 +64,7 @@ Bool_t R3BWhiterabbitAmsReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitAmsReader::Init() R3BEventHeader not found";
+        LOG(WARNING) << "R3BWhiterabbitAmsReader::Init() EventHeader. not found";
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
@@ -108,7 +108,7 @@ Bool_t R3BWhiterabbitAmsReader::Read()
                              ((uint64_t)fData->TIMESTAMP_AMS_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_AMS_WR_T1;
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRAmsData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
     }
     else
     {

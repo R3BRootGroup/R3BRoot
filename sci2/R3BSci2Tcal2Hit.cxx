@@ -1,0 +1,137 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+// -------------------------------------------------------------
+// -----         R3BSci2Tcal2Hit source file               -----
+// -----    Created 25/10/21  by J.L. Rodriguez-Sanchez    -----
+// -------------------------------------------------------------
+
+#include "R3BSci2Tcal2Hit.h"
+#include "FairLogger.h"
+#include "R3BSci2HitData.h"
+#include "R3BSci2Mapped2Cal.h"
+#include "R3BSci2MappedData.h"
+#include "R3BSci2TcalData.h"
+#include "R3BTCalEngine.h"
+#include "R3BTCalPar.h"
+
+#include "TClonesArray.h"
+
+R3BSci2Tcal2Hit::R3BSci2Tcal2Hit()
+    : R3BSci2Tcal2Hit("Sci2Cal2Hit", 1)
+{
+}
+
+R3BSci2Tcal2Hit::R3BSci2Tcal2Hit(const char* name, Int_t iVerbose)
+    : FairTask(name, iVerbose)
+    , fCalItems(NULL)
+    , fHitItems(NULL)
+    , fsci2VeffX(1.)
+    , fsci2OffsetX(0.)
+    , fsci2VeffXT(1.)
+    , fsci2OffsetXT(0.)
+    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
+    , fOnline(kFALSE)
+{
+}
+
+R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
+{
+    if (fHitItems)
+    {
+        delete fHitItems;
+        fHitItems = NULL;
+    }
+}
+
+InitStatus R3BSci2Tcal2Hit::Init()
+{
+    // get access to Cal data
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+        LOG(fatal) << "FairRootManager not found";
+
+    fCalItems = (TClonesArray*)mgr->GetObject("Sci2Tcal");
+    if (NULL == fCalItems)
+        LOG(fatal) << "R3BSci2Tcal2Hit::Init() Sci2Tcal not found";
+
+    // request storage of Hit data in output tree
+    fHitItems = new TClonesArray("R3BSci2HitData");
+    mgr->Register("Sci2Hit", "Sci2 hit data", fHitItems, !fOnline);
+
+    Icount = 0;
+
+    return kSUCCESS;
+}
+
+InitStatus R3BSci2Tcal2Hit::ReInit() { return kSUCCESS; }
+
+void R3BSci2Tcal2Hit::Exec(Option_t* option)
+{
+    UInt_t nHits = 0, iDet = 0, iCh = 0;
+    Int_t multTcal[2][3];
+    Double_t iRawTimeNs[2][3][64];
+    for (UShort_t d = 0; d < 2; d++)
+        for (UShort_t pmt = 0; pmt < 3; pmt++)
+        {
+            multTcal[d][pmt] = 0;
+            for (UShort_t m = 0; m < 64; m++)
+                iRawTimeNs[d][pmt][m] = 0.;
+        }
+
+    // --- -------------- --- //
+    // --- read tcal data --- //
+    // --- -------------- --- //
+    if (fCalItems && fCalItems->GetEntriesFast())
+    {
+        nHits = fCalItems->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fCalItems->At(ihit);
+            if (!hittcal)
+                continue;
+            iDet = hittcal->GetDetector();
+            iCh = hittcal->GetChannel() - 1;
+            iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]] = hittcal->GetRawTimeNs();
+            multTcal[iDet][iCh]++;
+        } // --- end of loop over Tcal data --- //
+
+        for (UShort_t d = 0; d < 2; d++)
+            if (multTcal[d][0] > 0 && multTcal[d][1] > 0) // just for mult=1
+                AddHitData(d + 1,
+                           iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0],
+                           0.5 * (iRawTimeNs[d][0][0] + iRawTimeNs[d][1][0]));
+    }
+
+    return;
+}
+
+void R3BSci2Tcal2Hit::FinishEvent()
+{
+
+    if (fHitItems)
+    {
+        fHitItems->Clear();
+    }
+}
+
+// -----   Private method AddHitData  --------------------------------------------
+R3BSci2HitData* R3BSci2Tcal2Hit::AddHitData(Int_t sci, Double_t x, Double_t tof)
+{
+    // It fills the R3BSofSciHitData
+    TClonesArray& clref = *fHitItems;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BSci2HitData(sci, x, tof);
+}
+
+ClassImp(R3BSci2Tcal2Hit);

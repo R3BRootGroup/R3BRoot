@@ -11,40 +11,41 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ---------------------------------------------------------------------------
-// -----                                                                 -----
-// -----                      R3BWRPspData                               -----
-// -----                  Created 28/06/2021 by J.L. Rodriguez           -----
-// -----                                                                 -----
-// ---------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -----                                                              -----
+// -----                      R3BWRData                               -----
+// -----          Created 28/02/2019 by J.L. Rodriguez                -----
+// -----                                                              -----
+// ------------------------------------------------------------------------
 
-#ifndef R3BWRPspData_H
-#define R3BWRPspData_H
+#ifndef R3BWRData_H
+#define R3BWRData_H
+
 #include "TObject.h"
 
-class R3BWRPspData : public TObject
+class R3BWRData : public TObject
 {
 
   public:
     // Default Constructor
-    R3BWRPspData();
+    R3BWRData();
 
     /** Standard Constructor
      *@param timestamp
      **/
-    R3BWRPspData(uint64_t timestamp);
+    R3BWRData(uint64_t timestamp);
 
     // Destructor
-    virtual ~R3BWRPspData() {}
+    virtual ~R3BWRData() {}
 
     // Getters
-    inline const uint64_t GetTimeStamp() const { return fTimeStamp; }
+    inline const uint64_t& GetTimeStamp() const { return fTimeStamp; }
 
   protected:
     uint64_t fTimeStamp; // timestamp for master
 
   public:
-    ClassDef(R3BWRPspData, 1)
+    ClassDef(R3BWRData, 1)
 };
 
-#endif
+#endif /* R3BWRData_H */

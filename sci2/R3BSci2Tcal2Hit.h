@@ -1,29 +1,25 @@
-// ------------------------------------------------------------------
-// -----                  R3BSci2Cal2Hit                         -----
-// -----            Created December 6th 2019 by M. Heil     -----
-// ----- Convert time calibrated data to hit level (single time) ----
-// ----- Following R3BLosCal2Hit
-// ------------------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 
-#ifndef R3BSCI2CAL2HIT
-#define R3BSCI2CAL2HIT
-
-#include <map>
+#ifndef R3BSci2Tcal2Hit_H
+#define R3BSci2Tcal2Hit_H
 
 #include "FairTask.h"
+#include "R3BSci2HitData.h"
 
 class TClonesArray;
-class TH1F;
-class TH2F;
-/*
- * TODO: This explanation is humbug.
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BSci2Cal2HitFill task.
- */
-class R3BSci2Cal2Hit : public FairTask
+
+class R3BSci2Tcal2Hit : public FairTask
 {
 
   public:
@@ -31,7 +27,7 @@ class R3BSci2Cal2Hit : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BSci2Cal2Hit();
+    R3BSci2Tcal2Hit();
 
     /*
      * Standard constructor.
@@ -39,13 +35,13 @@ class R3BSci2Cal2Hit : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BSci2Cal2Hit(const char* name, Int_t iVerbose = 1);
+    R3BSci2Tcal2Hit(const char* name, Int_t iVerbose = 1);
 
     /*
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BSci2Cal2Hit();
+    virtual ~R3BSci2Tcal2Hit();
 
     /*
      * Method for task initialization.
@@ -90,37 +86,26 @@ class R3BSci2Cal2Hit : public FairTask
         fsci2VeffXT = veffXT;
     }
 
-    /*
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
+    // Method to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
+    Bool_t fOnline;          // Don't store data for online
     TClonesArray* fCalItems; /* < Array with Cal items - input data. */
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
-    UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
     Double_t fsci2VeffX;
     Double_t fsci2OffsetX;
     Double_t fsci2OffsetXT;
     Double_t fsci2VeffXT;
 
-    TClonesArray* fMapped; /* < Array with mapped data - input data. */
-
-    TH1F* fhTres_M;
-    TH1F* fhTres_T;
-    TH1F* fhQ;
-
-    TH2F* fhQ_L;
-    TH2F* fhQ_R;
-    TH2F* fhQ_vs_X;
-    TH2F* fhQ1_vs_Q2;
-
     Int_t Icount = 0;
 
+    /** Private method AddHitData **/
+    R3BSci2HitData* AddHitData(Int_t sci, Double_t x, Double_t tof);
+
   public:
-    ClassDef(R3BSci2Cal2Hit, 1)
+    ClassDef(R3BSci2Tcal2Hit, 1)
 };
 
-#endif
+#endif /* R3BSci2Tcal2Hit_H */

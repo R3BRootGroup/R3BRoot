@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
-#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
 #include "R3BWhiterabbitS2Reader.h"
 #include "TClonesArray.h"
 
@@ -33,7 +33,7 @@ R3BWhiterabbitS2Reader::R3BWhiterabbitS2Reader(EXT_STR_h101_WRS2* data, size_t o
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRMasterData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -104,7 +104,7 @@ Bool_t R3BWhiterabbitS2Reader::Read()
 
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
     }
     else
     {

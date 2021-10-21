@@ -37,7 +37,7 @@
 
 // R3BMusicMapped2Cal: Default Constructor --------------------------
 R3BMusicMapped2Cal::R3BMusicMapped2Cal()
-    : R3BMusicMapped2Cal("R3B Music Calibrator", 1)
+    : R3BMusicMapped2Cal("R3BMusic Calibrator", 1)
 {
 }
 
@@ -82,11 +82,11 @@ void R3BMusicMapped2Cal::SetParContainers()
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar::Init() Couldn't get handle on musicCalPar container";
+        LOG(ERROR) << "R3BMusicMapped2Cal::SetParContainers() Couldn't get handle on musicCalPar container";
     }
     else
     {
-        LOG(INFO) << "R3BMusicMapped2CalPar:: musicCalPar container open";
+        LOG(INFO) << "R3BMusicMapped2Cal::SetParContainers() musicCalPar container open";
     }
 }
 
@@ -97,15 +97,15 @@ void R3BMusicMapped2Cal::SetParameters()
     fNumParams = fCal_Par->GetNumParamsEFit();      // Number of Parameters
     fNumPosParams = fCal_Par->GetNumParamsPosFit(); // Number of Parameters
 
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb anodes: " << fNumAnodes;
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters from pedestal fit: " << fNumParams;
+    LOG(INFO) << "R3BMusicMapped2Cal::SetParameters() Nb anodes: " << fNumAnodes;
+    LOG(INFO) << "R3BMusicMapped2Cal::SetParameters() Nb parameters from pedestal fit: " << fNumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = fNumAnodes * fNumParams;
     CalParams->Set(array_size);
     CalParams = fCal_Par->GetAnodeCalParams(); // Array with the Cal parameters
 
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters for position fit: " << fNumPosParams;
+    LOG(INFO) << "R3BMusicMapped2Cal::SetParameters() Nb parameters for position fit: " << fNumPosParams;
     PosParams = new TArrayF();
     Int_t array_pos = fNumAnodes * fNumPosParams;
     PosParams->Set(array_pos);
@@ -116,7 +116,7 @@ void R3BMusicMapped2Cal::SetParameters()
     for (Int_t i = 0; i < fNumAnodes; i++)
         if (CalParams->GetAt(fNumParams * i + 1) == -1)
             numdeadanodes++;
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb of dead anodes in MUSIC : " << numdeadanodes;
+    LOG(INFO) << "R3BMusicMapped2Cal::SetParameters() Nb of dead anodes in MUSIC : " << numdeadanodes;
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -161,11 +161,6 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
 {
     // Reset entries in output arrays, local arrays
     Reset();
-
-    if (!fCal_Par)
-    {
-        LOG(ERROR) << "R3BMusicMapped2Cal: NOT Container Parameter!!";
-    }
 
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMusicMappedDataCA->GetEntries();

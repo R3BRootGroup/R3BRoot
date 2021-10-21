@@ -1,15 +1,24 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #ifndef R3BSCI2MAPPED2TCAL
 #define R3BSCI2MAPPED2TCAL
-
-#include <map>
 
 #include "FairTask.h"
 
 #include "R3BSci2TcalData.h"
 
 class TClonesArray;
-class TH1F;
-class TH2F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
@@ -73,12 +82,6 @@ class R3BSci2Mapped2Tcal : public FairTask
     virtual void FinishEvent();
 
     /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
-
-    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
@@ -93,11 +96,14 @@ class R3BSci2Mapped2Tcal : public FairTask
         fNofModules = nChs * nDets * 3;
     }
 
+    // Method to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
-    // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
+    void SetParameter();
+    Bool_t fOnline;        // Don't store data for online
     TClonesArray* fMapped; /**< Array with mapped items - input data. */
     TClonesArray* fTcal;   /**< Array with cal items - output data. */
-    Int_t fNofTcalItems;   /**< Number of produced time items per event. */
     Int_t Icounts_good = 0;
     Int_t Icounts_tot = 0;
 
@@ -121,4 +127,4 @@ class R3BSci2Mapped2Tcal : public FairTask
     ClassDef(R3BSci2Mapped2Tcal, 1)
 };
 
-#endif
+#endif /* R3BSCI2MAPPED2TCAL */

@@ -13,23 +13,23 @@
 
 // ---------------------------------------------------------------------------
 // -----                                                                 -----
-// -----                      R3BWRCalifaData                            -----
+// -----                      R3BWRData                            -----
 // -----                  Created 28/02/2019 by J.L. Rodriguez           -----
 // -----                                                                 -----
 // ---------------------------------------------------------------------------
 
-#include "R3BWRCalifaData.h"
+#include "R3BWRData.h"
 
-R3BWRCalifaData::R3BWRCalifaData()
-    : fTimeStamp(0.)
+R3BWRData::R3BWRData()
+    : fTimeStamp(0)
 {
 }
 
 //------------------------------
 
-R3BWRCalifaData::R3BWRCalifaData(uint64_t timestamp)
+R3BWRData::R3BWRData(uint64_t timestamp)
     : fTimeStamp(timestamp)
 {
 }
 
-ClassImp(R3BWRCalifaData)
+ClassImp(R3BWRData);

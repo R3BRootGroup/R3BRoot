@@ -86,4 +86,4 @@ class R3BMusicCalPar : public FairParGenericSet
     ClassDef(R3BMusicCalPar, 1);
 };
 
-#endif
+#endif /* R3BMusicCalPar_H */

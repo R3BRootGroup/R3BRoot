@@ -64,8 +64,7 @@ class R3BWhiterabbitPropagator : public FairTask
 
   private:
     TString fNameWR;
-    TClonesArray* fInputItem;  // Array with input items
-    TClonesArray* fOutputItem; // Array with output items
+    TClonesArray* fInputItem; // Array with input items
 
   public:
     ClassDefOverride(R3BWhiterabbitPropagator, 0)

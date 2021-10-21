@@ -40,7 +40,7 @@
 
 // R3BMusicCal2Hit: Default Constructor --------------------------
 R3BMusicCal2Hit::R3BMusicCal2Hit()
-    : R3BMusicCal2Hit("R3B Music Hit Calibrator", 1)
+    : R3BMusicCal2Hit("R3BMusic Hit Calibrator", 1)
 {
 }
 
@@ -54,9 +54,9 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
     , fCal_Par(NULL)
     , fMusicHitDataCA(NULL)
     , fMusicCalDataCA(NULL)
-    , fZ0(0)
-    , fZ1(0)
-    , fZ2(0)
+    , fZ0(0.)
+    , fZ1(0.)
+    , fZ2(0.)
     , fOnline(kFALSE)
 {
 }
@@ -104,7 +104,7 @@ void R3BMusicCal2Hit::SetParameter()
     }
 
     fNumParams = fCal_Par->GetNumParZFit(); // Number of Parameters
-    LOG(INFO) << "R3BMusicCal2Hit: Nb parameters for charge-Z: " << fNumParams;
+    LOG(INFO) << "R3BMusicCal2Hit::SetParameter() Nb parameters for charge-Z: " << fNumParams;
     CalZParams = new TArrayF();
     CalZParams->Set(fNumParams);
     CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
@@ -112,7 +112,7 @@ void R3BMusicCal2Hit::SetParameter()
     // Parameters detector
     if (fNumParams == 2)
     {
-        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z:" << CalZParams->GetAt(0) << " : "
+        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z: " << CalZParams->GetAt(0) << " : "
                   << CalZParams->GetAt(1);
         fZ0 = CalZParams->GetAt(0);
         fZ1 = CalZParams->GetAt(1);
@@ -140,12 +140,14 @@ InitStatus R3BMusicCal2Hit::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        LOG(ERROR) << "R3BMusicCal2Hit::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicCalDataCA = (TClonesArray*)rootManager->GetObject("MusicCalData");
     if (!fMusicCalDataCA)
     {
+        LOG(ERROR) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
         return kFATAL;
     }
 
@@ -170,11 +172,6 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
 {
     // Reset entries in output arrays, local arrays
     Reset();
-
-    if (!fCal_Par)
-    {
-        LOG(ERROR) << "NO Container Parameter!!";
-    }
 
     Int_t nHits = fMusicCalDataCA->GetEntries();
     if (!nHits)
