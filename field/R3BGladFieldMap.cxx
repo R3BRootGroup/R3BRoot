@@ -604,7 +604,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
 
     Long64_t Nentries = fTreeMap->GetEntries();
 
-    cout << "-I- Reading GLAD field data from root tree" << endl;
+    cout << "\n-I- Reading GLAD field data from root tree" << endl;
 
     TVector3 fBvec;
 
