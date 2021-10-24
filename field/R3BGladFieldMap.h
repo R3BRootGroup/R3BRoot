@@ -20,7 +20,7 @@
 #include "TVector3.h"
 #include "TTree.h"
 
-class TArrayF;
+class TArrayD;
 
 class R3BGladFieldMap : public FairField
 {
@@ -113,9 +113,6 @@ class R3BGladFieldMap : public FairField
     TArrayD* GetBy() const { return fBy; }
     TArrayD* GetBz() const { return fBz; }
 
-     /** Function used insisde GetFieldValue **/
-    Double_t GetGridComponent(UInt_t Entry, UInt_t Component);//component: 0=X, 1=Y, 2=Z
-
     /** Accessor to field map file **/
     const char* GetFileName() { return fFileName.Data(); }
 
@@ -178,7 +175,6 @@ class R3BGladFieldMap : public FairField
 
     //TTree with the map data when reading a ROOT file
     TFile* fFile; // root file with the map data
-
 
     ClassDef(R3BGladFieldMap, 3)
 };
