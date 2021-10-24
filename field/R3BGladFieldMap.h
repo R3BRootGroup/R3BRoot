@@ -18,6 +18,7 @@
 #include "R3BFieldPar.h"
 #include "TRotation.h"
 #include "TVector3.h"
+#include "TTree.h"
 
 class TArrayF;
 
@@ -108,9 +109,12 @@ class R3BGladFieldMap : public FairField
     Double_t GetScale() const { return fScale; }
 
     /** Accessors to the field value arrays **/
-    TArrayF* GetBx() const { return fBx; }
-    TArrayF* GetBy() const { return fBy; }
-    TArrayF* GetBz() const { return fBz; }
+    TArrayD* GetBx() const { return fBx; }
+    TArrayD* GetBy() const { return fBy; }
+    TArrayD* GetBz() const { return fBz; }
+
+     /** Function used insisde GetFieldValue **/
+    Double_t GetGridComponent(UInt_t Entry, UInt_t Component);//component: 0=X, 1=Y, 2=Z
 
     /** Accessor to field map file **/
     const char* GetFileName() { return fFileName.Data(); }
@@ -156,10 +160,10 @@ class R3BGladFieldMap : public FairField
     /** Number of grid points  **/
     Int_t fNx, fNy, fNz; //
 
-    /** Arrays with the field values  **/
-    TArrayF* fBx; //!
-    TArrayF* fBy; //!
-    TArrayF* fBz; //!
+    /** Arrays of floats with the field values  **/
+    TArrayD* fBx; //!
+    TArrayD* fBy; //!
+    TArrayD* fBz; //!
 
     /** Variables for temporary storage
      ** Used in the very frequently called method GetFieldValue  **/
@@ -171,6 +175,10 @@ class R3BGladFieldMap : public FairField
      **/
     TRotation* gRot;  //!
     TVector3* gTrans; //!
+
+    //TTree with the map data when reading a ROOT file
+    TFile* fFile; // root file with the map data
+
 
     ClassDef(R3BGladFieldMap, 3)
 };
