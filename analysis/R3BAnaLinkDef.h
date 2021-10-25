@@ -20,6 +20,9 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BAnalysisIncomingFrs+;
+#pragma link C++ class R3BAnalysisIncomingID+;
+#pragma link C++ class R3BIncomingIDPar+;
+#pragma link C++ class R3BAnalysisIncomingIDContFact+;
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
 #pragma link C++ class R3BTrackS454+;
@@ -32,7 +35,7 @@
 #pragma link C++ class R3BOnlineSpillAnalysis+;
 #pragma link C++ class R3BOnlineSpectraFiberTofds515+;
 #pragma link C++ class R3BOnlineSpectraLosStandalone+;
-#pragma link C++ class R3BOnlineSpectraSci2+;
+//#pragma link C++ class R3BOnlineSpectraSci2+;
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
 
 #endif

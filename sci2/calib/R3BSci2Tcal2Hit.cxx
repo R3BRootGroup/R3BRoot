@@ -18,7 +18,9 @@
 
 #include "R3BSci2Tcal2Hit.h"
 #include "FairLogger.h"
+#include "FairRuntimeDb.h"
 #include "R3BSci2HitData.h"
+#include "R3BSci2HitPar.h"
 #include "R3BSci2Mapped2Cal.h"
 #include "R3BSci2MappedData.h"
 #include "R3BSci2TcalData.h"
@@ -54,6 +56,34 @@ R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
     }
 }
 
+void R3BSci2Tcal2Hit::SetParContainers()
+{
+    LOG(INFO) << "R3BSci2Tcal2Hit::SetParContainers()";
+    // Parameter Container
+    // Reading IncomingIDPar from FairRuntimeDb
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "FairRuntimeDb not opened!";
+    }
+    fSci2Hit_Par = (R3BSci2HitPar*)rtdb->getContainer("Sci2HitPar");
+    if (!fSci2Hit_Par)
+    {
+        LOG(ERROR) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BSci2Tcal2Hit:: R3BSci2HitPar container open";
+    }
+}
+
+void R3BSci2Tcal2Hit::SetParameter()
+{
+    //--- Parameter Container ---
+    fPos_p0 = fSci2Hit_Par->GetPos_p0();
+    fPos_p1 = fSci2Hit_Par->GetPos_p1();
+}
+
 InitStatus R3BSci2Tcal2Hit::Init()
 {
     // get access to Cal data
@@ -70,11 +100,16 @@ InitStatus R3BSci2Tcal2Hit::Init()
     mgr->Register("Sci2Hit", "Sci2 hit data", fHitItems, !fOnline);
 
     Icount = 0;
-
+    SetParameter();
     return kSUCCESS;
 }
 
-InitStatus R3BSci2Tcal2Hit::ReInit() { return kSUCCESS; }
+InitStatus R3BSci2Tcal2Hit::ReInit()
+{
+    SetParContainers();
+    SetParameter();
+    return kSUCCESS;
+}
 
 void R3BSci2Tcal2Hit::Exec(Option_t* option)
 {
@@ -100,7 +135,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fCalItems->At(ihit);
             if (!hittcal)
                 continue;
-            iDet = hittcal->GetDetector();
+            iDet = hittcal->GetDetector() - 1;
             iCh = hittcal->GetChannel() - 1;
             iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]] = hittcal->GetRawTimeNs();
             multTcal[iDet][iCh]++;
@@ -109,7 +144,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
         for (UShort_t d = 0; d < 2; d++)
             if (multTcal[d][0] > 0 && multTcal[d][1] > 0) // just for mult=1
                 AddHitData(d + 1,
-                           iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0],
+                           fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0]),
                            0.5 * (iRawTimeNs[d][0][0] + iRawTimeNs[d][1][0]));
     }
 

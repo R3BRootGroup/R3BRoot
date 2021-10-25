@@ -18,6 +18,7 @@
 #include "R3BSci2HitData.h"
 
 class TClonesArray;
+class R3BSci2HitPar;
 
 class R3BSci2Tcal2Hit : public FairTask
 {
@@ -88,16 +89,20 @@ class R3BSci2Tcal2Hit : public FairTask
 
     // Method to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
+    virtual void SetParContainers();
 
   private:
-    Bool_t fOnline;          // Don't store data for online
-    TClonesArray* fCalItems; /* < Array with Cal items - input data. */
-    TClonesArray* fHitItems; /* < Array with Hit items - output data. */
-    Double_t fClockFreq;     /* < Clock cycle in [ns]. */
+    void SetParameter();
+    R3BSci2HitPar* fSci2Hit_Par; // Parameter container
+    Bool_t fOnline;              // Don't store data for online
+    TClonesArray* fCalItems;     /* < Array with Cal items - input data. */
+    TClonesArray* fHitItems;     /* < Array with Hit items - output data. */
+    Double_t fClockFreq;         /* < Clock cycle in [ns]. */
     Double_t fsci2VeffX;
     Double_t fsci2OffsetX;
     Double_t fsci2OffsetXT;
     Double_t fsci2VeffXT;
+    Float_t fPos_p0, fPos_p1;
 
     Int_t Icount = 0;
 

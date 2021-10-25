@@ -15,16 +15,18 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/los
+${R3BROOT_SOURCE_DIR}/los/calib
+${R3BROOT_SOURCE_DIR}/los/params
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -44,15 +46,17 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-) 
+)
 
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BLosMapped2Cal.cxx
-R3BLosMapped2CalPar.cxx
-R3BLosCal2Hit.cxx
+calib/R3BLosMapped2Cal.cxx
+params/R3BLosMapped2CalPar.cxx
+calib/R3BLosCal2Hit.cxx
 R3BLosProvideTStart.cxx
+params/R3BLosHitPar.cxx
+params/R3BLosContFact.cxx
 )
 
 # fill list of header files from list of source files
@@ -65,4 +69,3 @@ Set(DEPENDENCIES
     R3Bbase R3BData R3BPassive R3BTCal)
 
 GENERATE_LIBRARY()
-
