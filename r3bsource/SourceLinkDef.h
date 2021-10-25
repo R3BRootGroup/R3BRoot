@@ -69,6 +69,7 @@
 #pragma link C++ class R3BAmsReader+;
 #pragma link C++ class R3BMusicReader+;
 #pragma link C++ class R3BFootSiReader+;
+#pragma link C++ class R3BCalifaJulichReader+;
 
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;

@@ -33,7 +33,7 @@ class R3BSci2HitData : public TObject
     /** Accessors **/
     inline const Int_t& GetSciId() const { return fSciId; }
     inline const Double_t& GetX() const { return fX; }
-    inline const Double_t& GetTof() const { return fTime; }
+    inline const Double_t& GetTime() const { return fTime; }
 
   protected:
     Int_t fSciId;

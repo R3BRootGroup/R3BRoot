@@ -28,6 +28,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
+class R3BLosHitPar;
 
 /**
  * TODO: This explanation is humbug.
@@ -158,10 +159,14 @@ class R3BLosCal2Hit : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
+    virtual void SetParContainers();
 
   private:
-    TClonesArray* fCalItems; /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems; /**< Array with Hit items - output data. */
+    void SetParameter();
+    R3BLosHitPar* fLosHit_Par; // Parameter container
+    TClonesArray* fCalItems;   /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems;   /**< Array with Hit items - output data. */
+    Float_t fp0, fp1;
 
     // check for trigger
     R3BEventHeader* header; /**< Event header. */
