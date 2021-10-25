@@ -18,9 +18,11 @@
 
 #include "R3BLosCal2Hit.h"
 #include "FairLogger.h"
+#include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
+#include "R3BLosHitPar.h"
 #include "R3BLosMapped2Cal.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
@@ -41,89 +43,8 @@ using namespace std;
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosCal2Hit::R3BLosCal2Hit()
-    : FairTask("LosCal2Hit", 1)
-    , fCalItems(NULL)
-    , fHitItems(new TClonesArray("R3BLosHitData"))
-    , fNofHitItems(0)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , flosVeffX(1.)
-    , flosVeffY(1.)
-    , flosOffsetX(0.)
-    , flosOffsetY(0.)
-    , flosVeffXT(1.)
-    , flosVeffYT(1.)
-    , flosOffsetXT(0.)
-    , flosOffsetYT(0.)
-    , flosVeffXQ(1.)
-    , flosVeffYQ(1.)
-    , flosOffsetXQ(0.)
-    , flosOffsetYQ(0.)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
+    : R3BLosCal2Hit("LosCal2Hit", 1)
 {
-    fhTres_M = NULL;
-    fhTres_T = NULL;
-    fhTres_T_corr = NULL;
-    fhTres_M_corr = NULL;
-    fhQ_L = NULL;
-    fhQ_B = NULL;
-    fhQ_R = NULL;
-    fhQ_T = NULL;
-    fhQ_L_corr = NULL;
-    fhQ_B_corr = NULL;
-    fhQ_R_corr = NULL;
-    fhQ_T_corr = NULL;
-    fhQ_LT = NULL;
-    fhQ_LB = NULL;
-    fhQ_RB = NULL;
-    fhQ_RT = NULL;
-    fhQ_LT_corr = NULL;
-    fhQ_LB_corr = NULL;
-    fhQ_RB_corr = NULL;
-    fhQ_RT_corr = NULL;
-    fhQ = NULL;
-    fhQtest = NULL;
-    fhQ_vs_X = NULL;
-    fhQ_vs_Y = NULL;
-    fhQ_vs_X_corr = NULL;
-    fhQ_vs_Y_corr = NULL;
-    fhTM_vs_Q = NULL;
-    fhTT_vs_Q = NULL;
-    fhTM_vs_Q_corr = NULL;
-    fhTT_vs_Q_corr = NULL;
-    fhXY = NULL;
-    fhXYmean = NULL;
-    fhXY_ToT = NULL;
-    fhXYproj = NULL;
-    fhXYT = NULL;
-    fhQ1_vs_Q5 = NULL;
-    fhQ1_vs_Q5_corr = NULL;
-    fhQ2_vs_Q6 = NULL;
-    fhQ2_vs_Q6_corr = NULL;
-    fhQ3_vs_Q7 = NULL;
-    fhQ3_vs_Q7_corr = NULL;
-    fhQ4_vs_Q8 = NULL;
-    fhQ4_vs_Q8_corr = NULL;
-    fhTresX_M = NULL;
-    fhTresY_M = NULL;
-    fhTresX_M_corr = NULL;
-    fhTresY_M_corr = NULL;
-    fhTresX_T = NULL;
-    fhTresY_T = NULL;
-    fhTresX_T_corr = NULL;
-    fhTresY_T_corr = NULL;
-    fhTresMvsIcount = NULL;
-    fhTresTvsIcount = NULL;
-    fhTreswcMvsIcount = NULL;
-    fhTreswcTvsIcount = NULL;
-    fh_los_dt_hits_ToT_corr = NULL;
-    fh_los_ihit_ToTcorr = NULL;
-    for (Int_t j = 0; j < 8; j++)
-    {
-        fhQvsdt[j] = NULL;
-        fhQcorrvsIcount[j] = NULL;
-        fhQvsIcount[j] = NULL;
-    }
 }
 
 R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
@@ -345,6 +266,38 @@ R3BLosCal2Hit::~R3BLosCal2Hit()
     }
 }
 
+void R3BLosCal2Hit::SetParContainers()
+{
+    LOG(INFO) << "R3BLosTcal2Hit::SetParContainers()";
+    // Parameter Container
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "FairRuntimeDb not opened!";
+    }
+    fLosHit_Par = (R3BLosHitPar*)rtdb->getContainer("LosHitPar");
+    if (!fLosHit_Par)
+    {
+        LOG(ERROR) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BLosTcal2Hit:: R3BLosHitPar container open";
+    }
+}
+
+void R3BLosCal2Hit::SetParameter()
+{
+    //--- Parameter Container ---
+    fp0 = fLosHit_Par->Getp0();
+    fp1 = fLosHit_Par->Getp1();
+
+    flosOffsetX = fLosHit_Par->Getxoffset_MCFD();
+    flosOffsetY = fLosHit_Par->Getyoffset_MCFD();
+    flosVeffX = fLosHit_Par->Getxveff_MCFD();
+    flosVeffY = fLosHit_Par->Getyveff_MCFD();
+}
+
 InitStatus R3BLosCal2Hit::Init()
 {
     // get access to Cal data
@@ -427,10 +380,16 @@ InitStatus R3BLosCal2Hit::Init()
     }
 
     // cout << "R3BLosCal2Hit::Init END" << endl;
+    SetParameter();
     return kSUCCESS;
 }
 
-InitStatus R3BLosCal2Hit::ReInit() { return kSUCCESS; }
+InitStatus R3BLosCal2Hit::ReInit()
+{
+    SetParContainers();
+    SetParameter();
+    return kSUCCESS;
+}
 
 /* Calculate a single hit time for each LOS detector
  *
@@ -734,7 +693,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
             x_cm[ihit] = xV_cm[ihit];
             y_cm[ihit] = yV_cm[ihit];
-            Z[ihit] = totsum_corr[ihit];
+            Z[ihit] = totsum_corr[ihit] * fp1 + fp0;
             t_hit[ihit] = timeLosM_corr[ihit];
 
             if (OptHisto && nPMV == 8 && nPMT == 8 && Igood_event)

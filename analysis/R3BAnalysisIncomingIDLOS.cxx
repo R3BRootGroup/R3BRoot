@@ -1,0 +1,375 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+// ----------------------------------------------------------------
+// -----           R3BAnalysisIncomingID source file              -----
+// -----        Created 03/05/21  by J.L. Rodriguez-Sanchez        -----
+// ---------------------------------------------------------------------
+
+/*
+ * This task should make the analysis of the incoming projectiles from FRS
+ *
+ */
+
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRunOnline.h"
+#include "FairRuntimeDb.h"
+
+#include "R3BAnalysisIncomingID.h"
+#include "R3BEventHeader.h"
+#include "R3BIncomingIDPar.h"
+#include "R3BLosCalData.h"
+#include "R3BLosHitData.h"
+#include "R3BLosMappedData.h"
+#include "R3BMusicHitData.h"
+#include "R3BMusicHitPar.h"
+#include "R3BSamplerMappedData.h"
+#include "R3BSci2HitData.h"
+#include "R3BSci2TcalData.h"
+#include "R3BTCalEngine.h"
+
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <TRandom3.h>
+#include <TRandomGen.h>
+#include <algorithm>
+#include <array>
+#include <vector>
+#define IS_NAN(x) TMath::IsNaN(x)
+using namespace std;
+
+#define SPEED_OF_LIGHT_MNS 0.299792458
+
+R3BAnalysisIncomingID::R3BAnalysisIncomingID()
+    : R3BAnalysisIncomingID("AnalysisIncomingID", 1)
+{
+}
+
+R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
+    : FairTask(name, iVerbose)
+    , fHitSci2(NULL)
+    , fHitItemsMus(NULL)
+    , fFrsDataCA(NULL)
+    , fPos_p0(-11)
+    , fPos_p1(54.7)
+    , fP0(-2.12371e7)
+    , fP1(4.9473e7)
+    , fP2(-2.87635e7)
+    , fZprimary(50.)
+    , fZoffset(-1.3)
+    , fOnline(kFALSE)
+    , fIncomingID_Par(NULL)
+    , fNumDet(1)
+{
+    fToFoffset = new TArrayF(fNumDet);
+    fPosS2Left = new TArrayF(fNumDet);
+    fPosS2Right = new TArrayF(fNumDet);
+    fBrho0_S2toCC = new TArrayF(fNumDet);
+    fDispersionS2 = new TArrayF(fNumDet);
+    fTof2InvV_p0 = new TArrayF(fNumDet);
+    fTof2InvV_p1 = new TArrayF(fNumDet);
+}
+
+R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
+{
+    if (fHitSci2)
+        delete fHitSci2;
+    if (fHitItemsMus)
+        delete fHitItemsMus;
+    if (fFrsDataCA)
+        delete fFrsDataCA;
+}
+
+void R3BAnalysisIncomingID::SetParContainers()
+{
+    LOG(INFO) << "R3BAnalysisIncomingID::SetParContainers()";
+    // Parameter Container
+    // Reading IncomingIDPar from FairRuntimeDb
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "FairRuntimeDb not opened!";
+    }
+
+    fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
+
+    if (!fIncomingID_Par)
+    {
+        LOG(ERROR) << "R3BAnalysisIncomingIDPar:: Couldn't get handle on R3BincomingIDPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BAnalysisIncomingIDPar:: R3BincomingIDParcontainer open";
+    }
+
+    R3BMusicHitPar* fCal_Par; /// **< Parameter container. >* //
+    fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
+    if (!fCal_Par)
+    {
+        LOG(ERROR) << "R3BAnalysisIncomingIDPar::Init() Couldn't get handle on musicHitPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BAnalysisIncomingIDPar:: musicHitPar container open";
+    }
+
+    //--- Parameter Container ---
+    fNumMusicParams = fCal_Par->GetNumParZFit(); // Number of Parameters
+    LOG(INFO) << "R3BAnalysisIncomingIDPar:: R3BMusicCal2Hit: Nb parameters for charge-Z: " << (Int_t)fNumMusicParams;
+    CalZParams = new TArrayF();
+    CalZParams->Set(fNumMusicParams);
+    CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
+
+    // Parameters detector
+    if (fNumMusicParams == 2)
+    {
+        fZ0 = CalZParams->GetAt(0);
+        fZ1 = CalZParams->GetAt(1);
+    }
+    else if (fNumMusicParams == 3)
+    {
+        fZ0 = CalZParams->GetAt(0);
+        fZ1 = CalZParams->GetAt(1);
+        fZ2 = CalZParams->GetAt(2);
+    }
+    else
+        LOG(INFO)
+            << "R3BAnalysisIncomingIDPar:: R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of "
+               "parameters: "
+            << fNumMusicParams;
+}
+
+void R3BAnalysisIncomingID::SetParameter()
+{
+    //--- Parameter Container ---
+    fx0_point = fIncomingID_Par->Getx0_point();
+    fy0_point = fIncomingID_Par->Gety0_point();
+    frot_ang = fIncomingID_Par->Getrot_ang();
+
+    for (Int_t i = 1; i < fNumDet + 1; i++)
+    {
+        fToFoffset->AddAt(fIncomingID_Par->GetToFoffset(i), i - 1);
+        fPosS2Left->AddAt(fIncomingID_Par->GetPosS2Left(i), i - 1);
+        fPosS2Right->AddAt(fIncomingID_Par->GetPosS2Right(i), i - 1);
+        fTof2InvV_p0->AddAt(fIncomingID_Par->GetTof2InvV_p0(i), i - 1);
+        fTof2InvV_p1->AddAt(fIncomingID_Par->GetTof2InvV_p1(i), i - 1);
+        fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
+        fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
+    }
+}
+
+InitStatus R3BAnalysisIncomingID::Init()
+{
+    // Initialize random number:
+    std::srand(std::time(0)); // use current time as seed for random generator
+
+    LOG(INFO) << "R3BAnalysisIncomingID::Init ";
+
+    // try to get a handle on the EventHeader. EventHeader may not be
+    // present though and hence may be null. Take care when using.
+
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+        LOG(fatal) << "FairRootManager not found";
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+
+    // --- Get access to Sci2 data at hit level --- //
+    fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
+    if (!fHitSci2)
+    {
+        LOG(INFO) << "R3BAnalysisIncomingID::Init()  Could not find Sci2Hit";
+    }
+
+    // get access to hit data of the MUSIC
+    fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
+    if (!fHitItemsMus)
+        LOG(WARNING) << "R3BAnalysisIncomingID: MusicHitData not found";
+
+    // get access to hit data of the LOS
+    fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
+    if (!fHitLos)
+        LOG(WARNING) << "R3BAnalysisIncomingID: LosHit not found";
+
+    // OUTPUT DATA
+    fFrsDataCA = new TClonesArray("R3BFrsData", 5);
+    if (!fOnline)
+    {
+        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kTRUE);
+    }
+    else
+    {
+        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kFALSE);
+    }
+
+    SetParameter();
+
+    return kSUCCESS;
+}
+
+InitStatus R3BAnalysisIncomingID::ReInit()
+{
+    SetParContainers();
+    SetParameter();
+    return kSUCCESS;
+}
+
+void R3BAnalysisIncomingID::Exec(Option_t* option)
+{
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+    {
+        // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(ERROR) << "FairRootManager not found";
+        return;
+    }
+
+    double Zmusic = 0., Music_ang = 0.;
+    if (fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
+    {
+        Int_t nHits = fHitItemsMus->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            if (!hit)
+                continue;
+            Zmusic = hit->GetZcharge();
+            Music_ang = hit->GetTheta() * 1000.; // mrad
+        }
+    }
+
+    // --- local variables --- //
+    Double_t timeLosV[fNumDet];
+    Double_t TimeSci2_m1[fNumDet];
+    Double_t PosSci2_m1[fNumDet];
+    UInt_t nHits = 0;
+    Double_t ToFraw_m1 = 0., PosCal_m1 = 0.;
+    Double_t Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
+
+    Int_t multSci2[fNumDet];
+    Int_t multLos[fNumDet];
+
+    for (Int_t i = 0; i < fNumDet; i++)
+    {
+        multSci2[i] = 0;
+        multLos[i] = 0;
+    }
+
+    // --- read hit from Sci2 data --- //
+    if (fHitSci2 && fHitSci2->GetEntriesFast())
+    {
+        Int_t numDet;
+        for (Int_t i = 0; i < fNumDet; i++)
+        {
+            PosSci2_m1[i] = 0.;
+            TimeSci2_m1[i] = 0.;
+        }
+
+        nHits = fHitSci2->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BSci2HitData* hittcal = (R3BSci2HitData*)fHitSci2->At(ihit);
+            numDet = hittcal->GetSciId();
+            if (multSci2[numDet - 1] == 0)
+            {
+                PosSci2_m1[numDet - 1] = hittcal->GetX();
+                TimeSci2_m1[numDet - 1] = hittcal->GetTime();
+                multSci2[numDet - 1]++;
+            }
+        } // --- end of loop over hit data --- //
+    }
+
+    // --- read hit from LOS data --- //
+    if (fHitLos && fHitLos->GetEntriesFast())
+    {
+        Int_t numDet;
+        for (Int_t i = 0; i < fNumDet; i++)
+        {
+            timeLosV[i] = 0.;
+        }
+
+        nHits = fHitLos->GetEntriesFast();
+
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BLosHitData* hittcal = (R3BLosHitData*)fHitLos->At(ihit);
+            numDet = hittcal->GetDetector();
+
+            if (multLos[numDet - 1] == 0)
+            {
+                timeLosV[numDet - 1] = hittcal->GetTime();
+                multLos[numDet - 1]++;
+            }
+        } // --- end of loop over hit data --- //
+    }
+
+    for (int i = 0; i < fNumDet; i++)
+    {
+        // --- secondary beam identification ---
+
+        // if X is increasing from left to right:
+        //    Brho = fBhro0 * (1 - xMwpc0/fDCC + xS2/fDS2)
+        // in R3BRoot, X is increasing from right to left
+        //    Bro = fBrho0 * (1 + xMwpc0/fDCC - xS2/fDS2)
+
+        if (multLos[i] >= 1 && multSci2[i] >= 1)
+        {
+            ToFraw_m1 = timeLosV[i] - TimeSci2_m1[i];
+            Velo_m1 =
+                1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
+            Beta_m1 = Velo_m1 / 0.299792458;
+            Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(Beta_m1, 2)));
+            PosCal_m1 = PosSci2_m1[i]; // [mm] at S2
+            Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. - PosCal_m1 / fDispersionS2->GetAt(i));
+            AoQ_m1 = Brho_m1 / (3.10716 * Beta_m1 * Gamma_m1);
+            if (Zmusic > 0.)
+            {
+                double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                double zcorang =
+                    fy0_point + (Music_ang - fx0_point) * sin(frot_ang) + (zcor - fy0_point) * cos(frot_ang) + 0.2;
+                AddData(1, 2, zcorang, AoQ_m1, Beta_m1, Brho_m1, PosCal_m1, 0.);
+            }
+        }
+    }
+}
+
+void R3BAnalysisIncomingID::FinishEvent()
+{
+    if (fHitSci2)
+        fHitSci2->Clear();
+    if (fHitItemsMus)
+        fHitItemsMus->Clear();
+}
+
+void R3BAnalysisIncomingID::FinishTask() {}
+
+// -----   Private method AddData  --------------------------------------------
+R3BFrsData* R3BAnalysisIncomingID::AddData(Int_t StaId,
+                                           Int_t StoId,
+                                           Double_t z,
+                                           Double_t aq,
+                                           Double_t beta,
+                                           Double_t brho,
+                                           Double_t xs2,
+                                           Double_t xc)
+{
+    // It fills the R3BSofFrsData
+    TClonesArray& clref = *fFrsDataCA;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc);
+}
+
+ClassImp(R3BAnalysisIncomingID)

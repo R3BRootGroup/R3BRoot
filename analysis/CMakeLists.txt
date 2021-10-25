@@ -11,11 +11,11 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BAnalysis" which includes the source files given 
-# in the array. The extension is already found. Any number of sources could be 
+# Create a library called "libR3BAnalysis" which includes the source files given
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
@@ -24,10 +24,12 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/analysis
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/rolu
 ${R3BROOT_SOURCE_DIR}/sci2
 ${R3BROOT_SOURCE_DIR}/sci8
+${R3BROOT_SOURCE_DIR}/music/pars
 ${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/fiber
@@ -60,6 +62,9 @@ link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
 R3BAnalysisIncomingFrs.cxx
+R3BAnalysisIncomingID.cxx
+R3BAnalysisIncomingIDContFact.cxx
+R3BIncomingIDPar.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
 R3BTrackS454.cxx
@@ -71,7 +76,7 @@ R3BOnlineSpectraSfib.cxx
 R3BOnlineSpillAnalysis.cxx
 R3BOnlineSpectraFiberTofds515.cxx
 R3BOnlineSpectraLosStandalone.cxx
-R3BOnlineSpectraSci2.cxx
+#R3BOnlineSpectraSci2.cxx
 R3BOnlineSpectraLosVsSci2.cxx
 )
 
@@ -87,4 +92,3 @@ Set(DEPENDENCIES
 Set(LIBRARY_NAME R3BAnalysis)
 
 GENERATE_LIBRARY()
-

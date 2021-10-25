@@ -23,6 +23,8 @@
 #pragma link C++ class R3BSci2Mapped2Cal+;
 #pragma link C++ class R3BSci2Mapped2CalPar+;
 #pragma link C++ class R3BSci2Tcal2Hit+;
+#pragma link C++ class R3BSci2HitPar+;
+#pragma link C++ class R3BSci2ContFact+;
 
 #endif
 

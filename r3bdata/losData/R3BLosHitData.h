@@ -33,6 +33,9 @@ class R3BLosHitData : public TObject
 
     // Getters
     inline const UChar_t& GetDetector() const { return fDetector; }
+    inline const Double_t& GetTime() const { return fTime_ns; }
+    inline const Double_t& GetZ() const { return fZ; }
+    inline const Double_t& GetX_cm() const { return fX_cm; }
 
   private:
     UChar_t fDetector; // 1..n
