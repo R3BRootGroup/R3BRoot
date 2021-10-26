@@ -118,7 +118,6 @@ Set(STRUCT_HEADERS
 ext/ext_h101_unpack.h
 ext/ext_h101_whiterabbit.h
 ext/ext_h101_wrmaster.h
-ext/ext_h101_wrcalifa.h
 ext/ext_h101_wrneuland.h
 ext/ext_h101_wrams.h
 ext/ext_h101_timestamp_pspx.h
@@ -153,7 +152,7 @@ ext/ext_h101_sfib.h
 ext/ext_h101_tofd.h
 ext/ext_h101_ptof.h
 ext/ext_h101_psp.h
-ext/ext_h101_raw_califa_febex.h
+ext/ext_h101_califa.h
 ext/ext_h101_raw_nnp_tacquila.h
 ext/ext_h101_raw_nnp_tamex.h
 ext/ext_h101_strawtubes.h
