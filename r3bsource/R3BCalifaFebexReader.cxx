@@ -49,11 +49,12 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
     LOG(INFO) << "R3BCalifaFebexReader::Init()";
-    EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 0);
+    EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 1);
 
     if (!ok)
     {
         LOG(ERROR) << "R3BCalifaFebexReader::Failed to setup structure information.";
+        //LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
         return kFALSE;
     }
 

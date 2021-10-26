@@ -88,7 +88,7 @@ Bool_t R3BUcesbSource::Init()
     {
         perror("ext_data_clnt::connect()");
         LOG(error) << "ext_data_clnt::connect() failed";
-        LOG(fatal) << "ucesb: " << fClient.last_error();
+        LOG(fatal) << __PRETTY_FUNCTION__ << "ucesb error: " << fClient.last_error();
         return kFALSE;
     }
 
@@ -123,7 +123,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     {
         if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
         {
-            LOG(fatal) << "ucesb: " << fClient.last_error();
+          LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
             return kFALSE;
         }
     }
@@ -140,7 +140,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     {
         perror("ext_data_clnt::setup()");
         LOG(error) << "ext_data_clnt::setup() failed";
-        LOG(fatal) << "ucesb: %s" << fClient.last_error();
+        LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
         return kFALSE;
     }
 #ifdef EXT_DATA_ITEM_MAP_MATCH
@@ -247,7 +247,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     {
         perror("ext_data_clnt::fetch_event()");
         LOG(error) << "ext_data_clnt::fetch_event() failed";
-        LOG(fatal) << "ucesb: " << fClient.last_error();
+        LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
         return 0;
     }
 
