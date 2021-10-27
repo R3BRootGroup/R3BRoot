@@ -24,34 +24,16 @@
 #include <iostream>
 #include <stdlib.h>
 
-using std::cerr;
-using std::cout;
-using std::endl;
-
 R3BCalifaDigitizer::R3BCalifaDigitizer()
     : FairTask("R3B CALIFA Digitizer")
     , fCalifaPointDataCA(NULL)
     , fCalifaCryCalDataCA(NULL)
-    , fNonUniformity(0)
     , fRealConfig(0)
+    , fNonUniformity(0.) // perfect crystals
+    , fResolution(0.)    // perfect crystals
+    , fComponentRes(0.)  // perfect crystals
+    , fThreshold(0.)     // no threshold
 {
-    fNonUniformity = 0.; // perfect crystals
-    fResolution = 0.;    // perfect crystals
-    fComponentRes = 0.;  // perfect crystals
-    fThreshold = 0.;     // no threshold
-}
-
-R3BCalifaDigitizer::R3BCalifaDigitizer(const TString& geoFile)
-    : FairTask("R3B CALIFA Digitizer")
-    , fCalifaPointDataCA(NULL)
-    , fCalifaCryCalDataCA(NULL)
-    , fNonUniformity(0)
-    , fRealConfig(0)
-{
-    fNonUniformity = 0.; // perfect crystals
-    fResolution = 0.;    // perfect crystals
-    fComponentRes = 0.;  // perfect crystals
-    fThreshold = 0.;     // no threshold
 }
 
 R3BCalifaDigitizer::~R3BCalifaDigitizer()
@@ -387,3 +369,5 @@ Double_t R3BCalifaDigitizer::CompSmearing(Double_t inputComponent)
     else
         return inputComponent;
 }
+
+ClassImp(R3BCalifaDigitizer);

@@ -29,10 +29,6 @@
 #include <iostream>
 #include <stdlib.h>
 
-// using std::cerr;
-// using std::cout;
-// using std::endl;
-
 #define U_MEV 931.4940954
 
 inline double BETA(const double M, const double E_kin) { return sqrt(1. - M * M / ((M + E_kin) * (M + E_kin))); }
@@ -51,15 +47,14 @@ R3BCalifa::R3BCalifa(const TString& geoFile, const TGeoTranslation& trans, const
 
 R3BCalifa::R3BCalifa(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BCalifa", kCALIFA, geoFile, combi)
+    , fCsIDensity(0.)
+    , fCalifaGeo(NULL)
 {
     ResetParameters();
     fCalifaCollection = new TClonesArray("R3BCalifaPoint");
-    fPosIndex = 0;
     flGeoPar = new TList();
     flGeoPar->SetName(GetName());
-    fCsIDensity = 0.;
     fGeometryVersion = 2020; // final BARREL+iPhos: 2020
-    fCalifaGeo = NULL;       // later initialization in case geometry version is not default
 }
 
 R3BCalifa::~R3BCalifa()
@@ -79,13 +74,15 @@ void R3BCalifa::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BCalifa: initialisation";
-    LOG(DEBUG) << "-I- R3BCalifa: Vol (McId) def";
+    LOG(INFO) << "R3BCalifa::Initialize()";
+    LOG(DEBUG) << "R3BCalifa: Vol (McId) def";
 
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
 
-    // fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
+    if (!R3BCalifaGeometry::Instance()->Init(fGeometryVersion))
+        LOG(ERROR) << "R3BCalifa::Initialize() Califa geometry not found";
+    return;
 }
 
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
@@ -220,8 +217,6 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     return kTRUE;
 }
 
-void R3BCalifa::BeginEvent() {}
-
 void R3BCalifa::EndOfEvent()
 {
     // if (fVerboseLevel > 1)
@@ -305,4 +300,4 @@ Bool_t R3BCalifa::CheckIfSensitive(std::string name)
     return kFALSE;
 }
 
-ClassImp(R3BCalifa)
+ClassImp(R3BCalifa);

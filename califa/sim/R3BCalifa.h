@@ -15,7 +15,6 @@
 #define R3BCALIFA_H
 
 #include "R3BDetector.h"
-#include "TF1.h"
 #include "TLorentzVector.h"
 #include <map>
 
@@ -27,7 +26,6 @@ class R3BCalifaGeometry;
 
 class R3BCalifa : public R3BDetector
 {
-
   public:
     /** Default constructor */
     R3BCalifa();
@@ -46,7 +44,7 @@ class R3BCalifa : public R3BDetector
     R3BCalifa(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    ~R3BCalifa();
+    virtual ~R3BCalifa();
 
     /** Virtual method ProcessHits
      **
@@ -55,13 +53,6 @@ class R3BCalifa : public R3BDetector
      *@param vol  Pointer to the active volume
      **/
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
-
-    /** Virtual method BeginEvent
-     **
-     ** If verbosity level is set, print hit collection at the
-     ** end of the event and resets it afterwards.
-     **/
-    virtual void BeginEvent();
 
     /** Virtual method EndOfEvent
      **
@@ -177,4 +168,4 @@ inline void R3BCalifa::ResetParameters()
     fNSteps = 0;
 };
 
-#endif
+#endif /* R3BCALIFA_H */

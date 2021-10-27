@@ -118,6 +118,7 @@ Set(STRUCT_HEADERS
 ext/ext_h101_unpack.h
 ext/ext_h101_whiterabbit.h
 ext/ext_h101_wrmaster.h
+ext/ext_h101_wrcalifa.h
 ext/ext_h101_wrneuland.h
 ext/ext_h101_wrams.h
 ext/ext_h101_timestamp_pspx.h

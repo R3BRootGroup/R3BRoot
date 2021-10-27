@@ -79,7 +79,7 @@ void R3BTra::Initialize()
 
 void R3BTra::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BTra: Adding customized Physics cut ... ";
+    LOG(INFO) << "R3BTra: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -103,7 +103,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -148,7 +148,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for LiH Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pLiH->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -183,7 +183,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Vac
             gMC->Gstpar(pVac->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -218,7 +218,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Gold
             gMC->Gstpar(pGold->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -253,7 +253,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Mylar Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Mylar
             gMC->Gstpar(pM->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -288,7 +288,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for aluminium Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Al
             gMC->Gstpar(pAl->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -323,7 +323,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // C
             gMC->Gstpar(pC->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -358,7 +358,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BTra: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BTra: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Helium
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/

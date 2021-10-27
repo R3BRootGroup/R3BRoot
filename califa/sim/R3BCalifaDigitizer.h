@@ -26,14 +26,11 @@ class R3BCalifaDigitizer : public FairTask
 {
 
   public:
-    /** Default constructor **/
+    /** Standard contructor **/
     R3BCalifaDigitizer();
 
-    /** Standard contructor **/
-    R3BCalifaDigitizer(const TString& geoFile);
-
     /** Destructor **/
-    ~R3BCalifaDigitizer();
+    virtual ~R3BCalifaDigitizer();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -148,4 +145,4 @@ class R3BCalifaDigitizer : public FairTask
     ClassDef(R3BCalifaDigitizer, 1);
 };
 
-#endif
+#endif /* R3BCALIFADIGITIZER_H */
