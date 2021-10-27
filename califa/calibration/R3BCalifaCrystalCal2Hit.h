@@ -17,6 +17,7 @@
 #include "FairTask.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaHitData.h"
+#include "Rtypes.h"
 
 #include <TVector3.h>
 
@@ -32,7 +33,7 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     R3BCalifaCrystalCal2Hit();
 
     /** Destructor **/
-    ~R3BCalifaCrystalCal2Hit();
+    virtual ~R3BCalifaCrystalCal2Hit();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -151,35 +152,18 @@ class R3BCalifaCrystalCal2Hit : public FairTask
         }
     }
 
-  protected:
     /** Virtual method Init **/
     virtual InitStatus Init();
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
+  protected:
     /** Method GetAnglesVector (calls R3BCalifaGeometry::GetAngles(id)) **/
     TVector3 GetAnglesVector(int id);
     TVector3 fTargetPos;
     TVector3 fCalifaPos;
     TVector3 fCalifatoTargetPos;
-
-    TClonesArray* fCrystalHitCA;
-    TClonesArray* fCalifaHitCA;
-
-    R3BTGeoPar* fTargetGeoPar;
-    R3BTGeoPar* fCalifaGeoPar;
-
-    Bool_t fOnline;              // Selector for online data storage
-    Int_t fGeometryVersion;      // Selecting the geometry of the CALIFA calorimeter
-    Int_t fNbCrystalsGammaRange; // Define max. number of crystals with gamma range
-    Double_t fDeltaPolar;        // Angular window (polar angle)
-    Double_t fDeltaAzimuthal;    // Angular window (azimuthal angle)
-    Double_t fDeltaAngleClust;   // Angular opening used for the cluster condition
-    Double_t fParCluster1;       // Clustering parameter 1
-    Double_t fThreshold;         // Minimum energy requested in a crystal to be included in a Cal
-    Double_t fDRThreshold;       // Threshold for selecting gamma or proton branch in double reading channels
-    Double_t energyFactor;
 
     // Clustering algorithm selector
     enum
@@ -194,12 +178,28 @@ class R3BCalifaCrystalCal2Hit : public FairTask
         PETAL = 7
     } fClusterAlgorithmSelector; // Clustering algorithm selector
 
+  private:
+    TClonesArray* fCrystalCalData;
+    TClonesArray* fCalifaHitData;
+
+    R3BTGeoPar* fTargetGeoPar;
+    R3BTGeoPar* fCalifaGeoPar;
+
+    Bool_t fOnline;              // Selector for online data storage
+    Int_t fGeometryVersion;      // Selecting the geometry of the CALIFA calorimeter
+    Int_t fNbCrystalsGammaRange; // Define max. number of crystals with gamma range
+    Double_t fDeltaPolar;        // Angular window (polar angle)
+    Double_t fDeltaAzimuthal;    // Angular window (azimuthal angle)
+    Double_t fDeltaAngleClust;   // Angular opening used for the cluster condition
+    Double_t fParCluster1;       // Clustering parameter 1
+    Double_t fThreshold;         // Minimum energy requested in a crystal to be included in a Cal
+    Double_t fDRThreshold;       // Threshold for selecting gamma or proton branch in double reading channels
+    Double_t energyFactor;
     // Parameter class
     // R3BCalifaHitPar* fCalifaHitPar;
 
     R3BCalifaGeometry* fCalifaGeo;
 
-  private:
     /** Private method AddHit
      **
      ** Adds a CalifaHit to the HitCollection
@@ -221,4 +221,4 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     ClassDef(R3BCalifaCrystalCal2Hit, 2);
 };
 
-#endif
+#endif /* R3BCALIFACRYSTALCAL2HIT_H */

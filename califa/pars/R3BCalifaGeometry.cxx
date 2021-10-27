@@ -29,34 +29,27 @@
 
 #include <boost/regex.hpp>
 
-R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
-
-R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version)
+R3BCalifaGeometry* R3BCalifaGeometry::Instance()
 {
-    LOG(DEBUG) << "R3BCalifaGeometry::Instance ";
-    if (!inst)
-        inst = new R3BCalifaGeometry(version);
-    else if (inst->fGeometryVersion != version)
-    {
-        LOG(ERROR)
-            << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
-            << "Undefined beheaviour possible!";
-
-        inst = new R3BCalifaGeometry(version);
-    }
-    return inst;
+    // Returns singleton instance
+    static thread_local R3BCalifaGeometry instance;
+    return &instance;
 }
 
 R3BCalifaGeometry::R3BCalifaGeometry()
-    : R3BCalifaGeometry(2020)
+    : TObject()
+    , IsInitialize(kFALSE)
 {
 }
 
-R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
-    : fGeometryVersion(version)
+bool R3BCalifaGeometry::Init(Int_t version)
 {
-    LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
+    if (!IsInitialize)
+        IsInitialize = kTRUE;
+    else
+        return kTRUE;
 
+    LOG(INFO) << "R3BCalifaGeometry::Init()";
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
     geoPath += "/geometry/";
 
@@ -81,17 +74,17 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
             break;
 
         default:
-            LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version;
-            return;
+            LOG(ERROR) << "R3BCalifaGeometry::Unsupported geometry version: " << version;
+            return kFALSE;
     }
 
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
         // Already set up (MC mode)
-        LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry";
-        LOG(INFO) << "R3BCalifaGeometry::Open geometry file " << geoPath;
+        LOG(INFO) << "R3BCalifaGeometry::Using existing geometry";
+        // LOG(INFO) << "R3BCalifaGeometry::Opened geometry file " << geoPath;
         fIsSimulation = kTRUE;
-        return;
+        return kTRUE;
     }
 
     // Stand alone mode
@@ -100,14 +93,16 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
     {
-        LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume";
-        return;
+        LOG(ERROR) << "R3BCalifaGeometry::Could not open CALIFA geometry file: No TOP volume";
+        return kFALSE;
     }
+
     v->SetName("cave");
     if (!gGeoManager)
         gGeoManager = new TGeoManager();
     gGeoManager->SetTopVolume(v);
     fIsSimulation = kFALSE;
+    return kTRUE;
 }
 
 R3BCalifaGeometry::~R3BCalifaGeometry()
