@@ -457,6 +457,8 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 if (!s_was_trig_missing)
                 {
                     LOG(ERROR) << "R3BTofdCal2HitS494Par::Exec() : Missing trigger information!";
+                    LOG(ERROR) << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId();
+                    LOG(ERROR) << "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId();
                     s_was_trig_missing = true;
                 }
                 ++n2;

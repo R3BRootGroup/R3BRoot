@@ -24,6 +24,7 @@
 #include "FairTask.h"
 #include "R3BTCalEngine.h"
 #include "TObject.h"
+#include "TCanvas.h"
 
 class R3BTofdHitPar;
 class TClonesArray;
@@ -188,7 +189,7 @@ class R3BTofdHisto2HitPar : public FairTask
     /**
      * Method for calculation of z correction.
      */
-    virtual void zcorr(TH2F* histo, Int_t min, Int_t max, Double_t*, Int_t p, Int_t b);
+    virtual void zcorr(TH2F* histo, Int_t min, Int_t max, Double_t*, Int_t p, Int_t b, TCanvas*);
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
