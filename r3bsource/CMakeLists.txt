@@ -105,6 +105,7 @@ R3BSfibReader.cxx
 R3BTofdReader.cxx
 R3BPdcReader.cxx
 R3BCalifaFebexReader.cxx
+R3BCalifaJulichReader.cxx
 R3BPtofReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx

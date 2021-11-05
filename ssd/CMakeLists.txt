@@ -13,10 +13,10 @@
 ##############################################################################
 
 # Create a library called "libR3BSsd" which includes the source files given
-# in the array. The extension is already found. Any number of sources could be 
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
@@ -46,7 +46,7 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-) 
+)
 
 link_directories( ${LINK_DIRECTORIES})
 
@@ -54,7 +54,7 @@ set(SRCS
 #Put here your sourcefiles
 ./sim/R3BTra.cxx
 ./sim/R3BTraHitFinder.cxx
-./pars/R3BGeoTra.cxx   
+./pars/R3BGeoTra.cxx
 ./pars/R3BGeoTraPar.cxx
 ./pars/R3BAmsMappingPar.cxx
 ./pars/R3BAmsStripCalPar.cxx
@@ -68,7 +68,7 @@ set(SRCS
 ./digi/R3BTraFraDigiPar.cxx
 ./digi/R3BTraFraDigitizer.cxx
 ./digi/R3BTarget2pDigiPar.cxx
-./digi/R3BTarget2pDigitizer.cxx   
+./digi/R3BTarget2pDigitizer.cxx
 ./calibration/R3BAmsMapped2StripCalPar.cxx
 ./calibration/R3BAmsMapped2StripCal.cxx
 ./calibration/R3BAmsStripCal2Hit.cxx
