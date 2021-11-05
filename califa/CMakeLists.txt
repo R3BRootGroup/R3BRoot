@@ -12,7 +12,7 @@
 ##############################################################################
 
 # Create a library called "libR3BCalifa" which includes the source files given
-# in the array. The extension is already found. Any number of sources could be 
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES
@@ -33,6 +33,7 @@ ${R3BROOT_SOURCE_DIR}/califa/ana
 ${R3BROOT_SOURCE_DIR}/califa/pars
 ${R3BROOT_SOURCE_DIR}/califa/sim
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
+${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 )
@@ -64,6 +65,7 @@ set(SRCS
 ./calibration/R3BCalifaCrystalCal2Hit.cxx
 ./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
 ./online/R3BCalifaOnlineSpectra.cxx
+./online/R3BCalifaJulichOnlineSpectra.cxx
 ./online/R3BCalifaDemoOnlineSpectra.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 )
