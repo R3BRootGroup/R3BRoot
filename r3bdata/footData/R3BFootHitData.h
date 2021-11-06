@@ -34,18 +34,11 @@ class R3BFootHitData : public FairMultiLinkedData
      *@param fNbHit     Number of hits
      *@param fMulStrip  Number of strips with signals
      *@param fX         Position X [mm] local coordinate (detector frame)
-     *@param fY         Position Y [mm] local coordinate (detector frame)
      *@param fTheta     Master: Angle theta [rad] (lab frame)
      *@param fPhi       Master: Angle Phi [rad] (lab frame)
      *@param fEnergy    Total energy deposited by the hit ([GeV] in sim)
      **/
-    R3BFootHitData(Int_t detid,
-                   Int_t nbhit,
-                   Double_t x,
-                   Double_t y,
-                   TVector3 master,
-                   Double_t energy,
-                   Int_t mulstrip = 0);
+    R3BFootHitData(Int_t detid, Int_t nbhit, Double_t x, TVector3 master, Double_t energy, Int_t mulstrip = 0);
 
     /** Copy constructor **/
     R3BFootHitData(const R3BFootHitData&);
@@ -60,7 +53,6 @@ class R3BFootHitData : public FairMultiLinkedData
     inline const Int_t& GetNbHit() const { return fNbHit; }
     inline const Int_t& GetMulStrip() const { return fMulStrip; }
     inline const Double_t& GetX() const { return fX; }
-    inline const Double_t& GetY() const { return fY; }
     inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetPhi() const { return fPhi; }
     inline const TVector3 GetPosLab() const { return fmaster; }
@@ -70,7 +62,7 @@ class R3BFootHitData : public FairMultiLinkedData
     Int_t fDetId;
     Int_t fNbHit;
     Int_t fMulStrip;
-    Double_t fX, fY;
+    Double_t fX;
     Double_t fTheta, fPhi;
     TVector3 fmaster;
     Double_t fEnergy;

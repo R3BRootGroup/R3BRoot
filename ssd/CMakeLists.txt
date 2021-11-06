@@ -75,8 +75,10 @@ set(SRCS
 ./online/R3BAmsOnlineSpectra.cxx
 ./online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
 ./online/R3BFootOnlineSpectra.cxx
+./pars/R3BFootMappingPar.cxx
 ./pars/R3BFootCalPar.cxx
 ./calibration/R3BFootMapped2StripCal.cxx
+./calibration/R3BFootStripCal2Hit.cxx
 )
 
 # fill list of header files from list of source files

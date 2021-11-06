@@ -43,8 +43,10 @@
 #pragma link C++ class R3BAmsOnlineSpectra+;
 #pragma link C++ class R3BAmsCalifaCorrelatedOnlineSpectra+;
 
+#pragma link C++ class R3BFootMappingPar+;
 #pragma link C++ class R3BFootCalPar+;
 #pragma link C++ class R3BFootMapped2StripCal+;
+#pragma link C++ class R3BFootStripCal2Hit+;
 #pragma link C++ class R3BFootOnlineSpectra+;
 
 #endif

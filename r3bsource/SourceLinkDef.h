@@ -31,6 +31,7 @@
 #pragma link C++ class R3BWhiterabbitPspReader+;
 #pragma link C++ class R3BWhiterabbitLosReader+;
 #pragma link C++ class R3BWhiterabbitPspReader+;
+#pragma link C++ class R3BWhiterabbitMusicReader+;
 #pragma link C++ class R3BWhiterabbitReader+;
 #pragma link C++ class R3BTrloiiTpatReader+;
 #pragma link C++ class R3BTrloiiSampReader+;
