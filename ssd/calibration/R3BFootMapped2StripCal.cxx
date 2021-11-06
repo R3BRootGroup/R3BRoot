@@ -37,7 +37,7 @@
 
 // R3BFootMapped2StripCal: Default Constructor --------------------------
 R3BFootMapped2StripCal::R3BFootMapped2StripCal()
-    : R3BFootMapped2StripCal("R3B FOOT Calibrator", 1)
+    : R3BFootMapped2StripCal("R3BFootMapped2StripCal", 1)
 {
 }
 
@@ -45,7 +45,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal()
 R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , NumDets(1)
-    , NumStrips(640)
+    , NumStrips(634)
     , NumParams(2)
     , MaxSigma(5)
     , fTimesSigma(3.)
@@ -60,7 +60,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
 // Virtual R3BFootMapped2StripCal: Destructor
 R3BFootMapped2StripCal::~R3BFootMapped2StripCal()
 {
-    LOG(DEBUG) << "R3BFootMapped2StripCal: Delete instance";
+    LOG(DEBUG) << "R3BFootMapped2StripCal::Delete instance";
     if (fFootMappedData)
         delete fFootMappedData;
     if (fFootCalData)
@@ -126,12 +126,14 @@ InitStatus R3BFootMapped2StripCal::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        LOG(FATAL) << "R3BFootMapped2StripCal::FairRootManager not found";
         return kFATAL;
     }
 
     fFootMappedData = (TClonesArray*)rootManager->GetObject("FootMappedData");
     if (!fFootMappedData)
     {
+        LOG(FATAL) << "R3BFootMapped2StripCal::FootMappedData not found";
         return kFATAL;
     }
 
@@ -160,8 +162,6 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 
     // Reading the Input -- Mapped Data --
     Int_t nHits = fFootMappedData->GetEntries();
-    if (nHits != NumStrips * NumDets && nHits > 0)
-        LOG(WARNING) << "R3BFootMapped2StripCal: nHits!=NumStrips*NumDets";
     if (!nHits)
         return;
 
@@ -172,30 +172,27 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
     Double_t pedestal = 0.;
     Double_t sigma = 0.;
 
-    Int_t nbadc = 0;
-    Int_t minnb = 4;
-    Double_t h = 0;
-
-    nbadc = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BFootMappedData*)(fFootMappedData->At(i));
         detId = mappedData[i]->GetDetId();
         stripId = mappedData[i]->GetStripId();
 
-        pedestal = CalParams->GetAt(NumParams * stripId + detId * NumParams * NumStrips);
-        sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
+        if (CalParams)
+        {
+            pedestal = CalParams->GetAt(NumParams * stripId + detId * NumParams * NumStrips);
+            sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
+        }
 
         energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma;
 
-        // We accept the hit if the energy is larger than 5 times the sigma of the pedestal
+        // We accept the hit if the energy is larger than 3 times the sigma of the pedestal
         // and the strip is not dead
         if (energy > 0. && pedestal != -1)
         {
             AddCalData(detId, stripId, energy);
         }
     }
-
     if (mappedData)
         delete mappedData;
     return;

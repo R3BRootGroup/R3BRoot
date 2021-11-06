@@ -69,7 +69,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BFootSiReader::Read()
 {
     LOG(DEBUG) << "R3BFootSiReader::Read() Event data.";
-    // Read AMS detectors
+    // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
         if (fData->SST[d]._ == 634)
             for (Int_t strip = 0; strip < fData->SST[d]._; ++strip)

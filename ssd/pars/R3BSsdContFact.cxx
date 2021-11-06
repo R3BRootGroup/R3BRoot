@@ -27,6 +27,7 @@
 #include "R3BAmsStripCalPar.h"
 
 #include "R3BFootCalPar.h"
+#include "R3BFootMappingPar.h"
 
 #include "R3BTGeoPar.h"
 
@@ -48,25 +49,29 @@ void R3BSsdContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the SSD library.
 
-    FairContainer* p1 = new FairContainer("amsStripCalPar", "AMS StripCal Parameters", "AmsCalParContext");
-    p1->addContext("AmsCalParContext");
+    FairContainer* p1 = new FairContainer("amsMappingPar", "AMS Mapping Parameters", "AmsMappingParContext");
+    p1->addContext("AmsMappingParContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("amsMappingPar", "AMS Mapping Parameters", "AmsMappingContext");
-    p2->addContext("AmsMappingContext");
+    FairContainer* p2 = new FairContainer("amsStripCalPar", "AMS StripCal Parameters", "AmsCalParContext");
+    p2->addContext("AmsCalParContext");
     containers->Add(p2);
 
     FairContainer* p3 = new FairContainer("amsGeoPar", "AMS Geometry Parameters", "GeometryParameterContext");
     p3->addContext("GeometryParameterContext");
     containers->Add(p3);
 
-    FairContainer* p4 = new FairContainer("footCalPar", "FOOT StripCal Parameters", "FootCalParContext");
-    p4->addContext("FootCalParContext");
+    FairContainer* p4 = new FairContainer("footMappingPar", "FOOT Mapping Parameters", "FootMappingParContext");
+    p4->addContext("FootMappingParContext");
     containers->Add(p4);
 
-    FairContainer* p5 = new FairContainer("footGeoPar", "FOOT Geometry Parameters", "GeometryParameterContext");
-    p5->addContext("GeometryParameterContext");
+    FairContainer* p5 = new FairContainer("footCalPar", "FOOT StripCal Parameters", "FootCalParContext");
+    p5->addContext("FootCalParContext");
     containers->Add(p5);
+
+    FairContainer* p6 = new FairContainer("footGeoPar", "FOOT Geometry Parameters", "GeometryParameterContext");
+    p6->addContext("GeometryParameterContext");
+    containers->Add(p6);
 }
 
 FairParSet* R3BSsdContFact::createContainer(FairContainer* c)
@@ -77,13 +82,17 @@ FairParSet* R3BSsdContFact::createContainer(FairContainer* c)
     const char* name = c->GetName();
     LOG(INFO) << "R3BSsdContFact: Create container name: " << name;
     FairParSet* p = 0;
-    if (strcmp(name, "amsStripCalPar") == 0)
+    if (strcmp(name, "amsMappingPar") == 0)
+    {
+        p = new R3BAmsMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "amsStripCalPar") == 0)
     {
         p = new R3BAmsStripCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "amsMappingPar") == 0)
+    else if (strcmp(name, "footMappingPar") == 0)
     {
-        p = new R3BAmsMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+        p = new R3BFootMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     else if (strcmp(name, "footCalPar") == 0)
     {

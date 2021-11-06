@@ -31,8 +31,8 @@ R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* co
     : FairParGenericSet(name, title, context)
 {
     detName = "FootCal";
-    fNumDets = 8;
-    fNumStrips = 640;
+    fNumDets = 10;
+    fNumStrips = 634;
     fNumParsFit = 2;
     fStripCalParams = new TArrayF(fNumDets * fNumStrips * fNumParsFit);
 }

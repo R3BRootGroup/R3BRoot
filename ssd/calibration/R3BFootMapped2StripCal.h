@@ -23,7 +23,6 @@
 #include "FairTask.h"
 
 #include "R3BFootCalData.h"
-#include "R3BFootMappedData.h"
 
 #include <Rtypes.h>
 #include <TRandom.h>

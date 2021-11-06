@@ -33,7 +33,7 @@ R3BWhiterabbitMusicReader::R3BWhiterabbitMusicReader(EXT_STR_h101_WRMUSIC* data,
     , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRMasterData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -48,7 +48,7 @@ R3BWhiterabbitMusicReader::~R3BWhiterabbitMusicReader()
 Bool_t R3BWhiterabbitMusicReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitMusicReader::Init";
+    LOG(INFO) << "R3BWhiterabbitMusicReader::Init()";
     EXT_STR_h101_WRMUSIC_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMUSIC, 0);
 
     if (!ok)
@@ -70,7 +70,6 @@ Bool_t R3BWhiterabbitMusicReader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     FairRootManager::Instance()->Register("WRMusicData", "WRMusic", fArray, !fOnline);
 
-    fArray->Clear();
     fData->TIMESTAMP_MUSIC_ID = 0;
 
     return kTRUE;

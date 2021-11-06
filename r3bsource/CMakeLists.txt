@@ -11,16 +11,16 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3B" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3Bsource" which includes the source files given 
+# in the array. The extension is already found. Any number of sources could be 
+# listed here.
 
 set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${ucesb_INCLUDE_DIR}
 )
-Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
+# Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
