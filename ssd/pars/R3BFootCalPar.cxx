@@ -32,7 +32,7 @@ R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* co
 {
     detName = "FootCal";
     fNumDets = 10;
-    fNumStrips = 634;
+    fNumStrips = 640;
     fNumParsFit = 2;
     fStripCalParams = new TArrayF(fNumDets * fNumStrips * fNumParsFit);
 }
@@ -82,16 +82,19 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
 
     if (!list->fill("footDetNumberPar", &fNumDets))
     {
+        LOG(FATAL) << "R3BFootCalPar::Could not initialize footDetNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("footStripNumberPar", &fNumStrips))
     {
+        LOG(FATAL) << "R3BFootCalPar::Could not initialize footStripNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("footNumberParsFit", &fNumParsFit))
     {
+        LOG(FATAL) << "R3BFootCalPar::Could not initialize footNumberParsFit";
         return kFALSE;
     }
 
@@ -101,7 +104,7 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
 
     if (!(list->fill("footStripCalPar", fStripCalParams)))
     {
-        LOG(ERROR) << "R3BFootCalPar:Could not initialize footStripCalPar";
+        LOG(FATAL) << "R3BFootCalPar::Could not initialize footStripCalPar";
         return kFALSE;
     }
 

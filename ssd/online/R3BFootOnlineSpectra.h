@@ -120,6 +120,10 @@ class R3BFootOnlineSpectra : public FairTask
 
     // Histograms for map data
     std::vector<TH2F*> fh2_EnergyVsStrip;
+    // Histograms for cal data
+    std::vector<TH2F*> fh2_EnergyVsStrip_cal;
+    // Histograms for hit data
+    std::vector<TH1F*> fh1_pos;
 
   public:
     ClassDefOverride(R3BFootOnlineSpectra, 1)
