@@ -48,7 +48,7 @@ class R3BFootMappedData : public TObject
     Int_t fEnergy;  // Energy per strip
 
   public:
-    ClassDef(R3BFootMappedData, 0)
+    ClassDef(R3BFootMappedData, 1)
 };
 
 #endif /* R3BFootMappedData */

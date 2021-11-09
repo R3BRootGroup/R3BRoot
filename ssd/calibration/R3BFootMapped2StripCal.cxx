@@ -113,7 +113,7 @@ void R3BFootMapped2StripCal::SetParameter()
             if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
                 numdeadstrips++;
         }
-        LOG(INFO) << "R3BFootMapped2StripCal: Nb of dead strips in FOOT detector " << d << ": " << numdeadstrips;
+        LOG(INFO) << "R3BFootMapped2StripCal: Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
     }
 }
 

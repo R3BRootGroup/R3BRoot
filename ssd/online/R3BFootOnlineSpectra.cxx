@@ -46,24 +46,19 @@
 #include <sstream>
 
 R3BFootOnlineSpectra::R3BFootOnlineSpectra()
-    : FairTask("FootOnlineSpectra", 1)
-    , fMappedItems(NULL)
-    , fCalItems(NULL)
-    , fHitItems(NULL)
-    , fTrigger(-1)
-    , fNEvents(0)
-    , fNbDet(1)
+    : R3BFootOnlineSpectra("FootOnlineSpectra", 1)
 {
 }
 
 R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fEventHeader(nullptr)
     , fMappedItems(NULL)
     , fCalItems(NULL)
     , fHitItems(NULL)
     , fTrigger(-1)
     , fNEvents(0)
-    , fNbDet(1)
+    , fNbDet(10)
 {
 }
 
@@ -87,7 +82,15 @@ InitStatus R3BFootOnlineSpectra::Init()
     if (NULL == mgr)
         LOG(FATAL) << "R3BFootOnlineSpectra::FairRootManager not found";
 
-    // Create histograms for all the detectors
+    // Look for the R3BEventHeader
+    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!fEventHeader)
+    {
+        LOG(WARNING) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
+        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(INFO) << "R3BFootOnlineSpectra::Init() EventHeader. found";
 
     // Get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("FootMappedData");
@@ -98,19 +101,21 @@ InitStatus R3BFootOnlineSpectra::Init()
     }
 
     // Get access to Cal data
-    fCalItems = (TClonesArray*)mgr->GetObject("FootSiCalData");
+    fCalItems = (TClonesArray*)mgr->GetObject("FootCalData");
     if (!fCalItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootSiCalData not found";
+        LOG(WARNING) << "R3BFootOnlineSpectra::FootCalData not found";
 
     // Get access to Hit data
-    fHitItems = (TClonesArray*)mgr->GetObject("FootSiHitData");
+    fHitItems = (TClonesArray*)mgr->GetObject("FootHitData");
     if (!fHitItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootSiHitData not found";
+        LOG(WARNING) << "R3BFootOnlineSpectra::FootHitData not found";
+
+    // Create histograms for all the detectors
 
     // Energy range for strips
     Double_t binsE = 200;
     Double_t minE = 0;
-    Double_t maxE = 3500;
+    Double_t maxE = 5500;
 
     char Name1[255];
     char Name2[255];
@@ -126,7 +131,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     { // one histo per detector
         sprintf(Name1, "fh2_energy_vs_strip_det_%d", i + 1);
         sprintf(Name2, "Energy vs strip number for FOOT Det: %d", i + 1);
-        fh2_EnergyVsStrip[i] = new TH2F(Name1, Name2, 1024, 0, 1024, binsE, minE, maxE);
+        fh2_EnergyVsStrip[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
         fh2_EnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -171,10 +176,15 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
     {
         fh2_EnergyVsStrip[i]->Reset();
     }
+    return;
 }
 
 void R3BFootOnlineSpectra::Exec(Option_t* option)
 {
+
+    if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
+        return;
+
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -184,11 +194,12 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             R3BFootMappedData* hit = (R3BFootMappedData*)fMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_EnergyVsStrip[hit->GetDetId()]->Fill(hit->GetStripId(), hit->GetEnergy());
+            fh2_EnergyVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
         }
     }
 
     fNEvents += 1;
+    return;
 }
 
 void R3BFootOnlineSpectra::FinishEvent()
@@ -205,6 +216,7 @@ void R3BFootOnlineSpectra::FinishEvent()
     {
         fHitItems->Clear();
     }
+    return;
 }
 
 void R3BFootOnlineSpectra::FinishTask()
@@ -214,6 +226,7 @@ void R3BFootOnlineSpectra::FinishTask()
         for (Int_t i = 0; i < fNbDet; i++)
             fh2_EnergyVsStrip[i]->Write();
     }
+    return;
 }
 
 ClassImp(R3BFootOnlineSpectra);

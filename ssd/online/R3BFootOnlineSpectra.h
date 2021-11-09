@@ -92,18 +92,26 @@ class R3BFootOnlineSpectra : public FairTask
      */
     virtual void FinishTask() override;
 
-    /** Virtual method SetParContainers **/
-    // virtual void SetParContainers();
-
     /**
      * Method to reset histograms
      */
     void Reset_FOOT_Histo();
 
+    /**
+     * Method to set the number of detectors
+     */
+    void SetNbDet(Int_t ndet) { fNbDet = ndet; }
+
+    /**
+     * Method to set the trigger
+     */
+    void SetTrigger(Int_t trigg) { fTrigger = trigg; }
+
   private:
-    TClonesArray* fMappedItems; // Array with mapped items.
-    TClonesArray* fCalItems;    // Array with cal items.
-    TClonesArray* fHitItems;    // Array with hit items.
+    R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
+    TClonesArray* fMappedItems;   // Array with mapped items.
+    TClonesArray* fCalItems;      // Array with cal items.
+    TClonesArray* fHitItems;      // Array with hit items.
 
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
@@ -114,7 +122,7 @@ class R3BFootOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_EnergyVsStrip;
 
   public:
-    ClassDefOverride(R3BFootOnlineSpectra, 0)
+    ClassDefOverride(R3BFootOnlineSpectra, 1)
 };
 
 #endif /* R3BFootOnlineSpectra_H */
