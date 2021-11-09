@@ -22,7 +22,7 @@
 
 /**
  ** ext_h101_foot.h was created by running
- ** $unpacker --ntuple=STRUCT_HH,RAW:SST,id=h101_FOOT,NOTRIGEVENTNO,ext_h101_foot.h
+ ** $unpacker --ntuple=STRUCT_HH,RAW:FOOT,id=h101_FOOT,NOTRIGEVENTNO,ext_h101_foot.h
  **/
 
 extern "C"
@@ -37,7 +37,7 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fNbDet(10)
+    , fNbDet(1)
     , fArray(new TClonesArray("R3BFootMappedData"))
 {
 }
@@ -62,6 +62,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("FootMappedData", "Foot mapped data", fArray, !fOnline);
+    fArray->Clear();
 
     return kTRUE;
 }
@@ -71,16 +72,24 @@ Bool_t R3BFootSiReader::Read()
     LOG(DEBUG) << "R3BFootSiReader::Read() Event data.";
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
-        if (fData->SST[d]._ == 634)
-            for (Int_t strip = 0; strip < fData->SST[d]._; ++strip)
+    {
+        if (fData->FOOT[d]._ == 640)
+        {
+            for (Int_t strip = 0; strip < fData->FOOT[d]._; ++strip)
             {
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->SST[d].E[strip]);
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->FOOT[d].E[strip]);
             }
+            if (fNEvent == 0)
+                fNbDet++;
+        }
         else
         {
-            LOG(FATAL) << "\033[5m\033[31m R3BFootSiReader::Failed number of strips per detector. \033[0m";
+            if (fNEvent > 0)
+                LOG(FATAL) << "\033[5m\033[31m R3BFootSiReader::Failed number of strips per detector. \033[0m";
         }
-
+    }
+    if (fNEvent == 0)
+        fNbDet--;
     fNEvent += 1;
     return kTRUE;
 }

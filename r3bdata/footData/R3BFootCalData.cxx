@@ -19,8 +19,7 @@
 
 // -----   Default constructor   -------------------------------------------
 R3BFootCalData::R3BFootCalData()
-    : FairMultiLinkedData()
-    , fDetId(0)
+    : fDetId(0)
     , fStripId(0)
     , fEnergy(0.)
 {
@@ -28,19 +27,9 @@ R3BFootCalData::R3BFootCalData()
 
 // -----   Standard constructor   ------------------------------------------
 R3BFootCalData::R3BFootCalData(Int_t detid, Int_t stripid, Double_t energy)
-    : FairMultiLinkedData()
-    , fDetId(detid)
+    : fDetId(detid)
     , fStripId(stripid)
     , fEnergy(energy)
-{
-}
-// -------------------------------------------------------------------------
-
-R3BFootCalData::R3BFootCalData(const R3BFootCalData& right)
-    : FairMultiLinkedData(right)
-    , fDetId(right.fDetId)
-    , fStripId(right.fStripId)
-    , fEnergy(right.fEnergy)
 {
 }
 

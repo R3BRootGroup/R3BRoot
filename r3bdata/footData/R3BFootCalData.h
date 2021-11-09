@@ -19,10 +19,9 @@
 #ifndef R3BFootCalData_H
 #define R3BFootCalData_H
 
-#include "FairMultiLinkedData.h"
 #include "TObject.h"
 
-class R3BFootCalData : public FairMultiLinkedData
+class R3BFootCalData : public TObject
 {
   public:
     /** Default constructor **/
@@ -34,11 +33,6 @@ class R3BFootCalData : public FairMultiLinkedData
      *@param fEnergy   Total energy deposited on the strip ([GeV] in sim)
      **/
     R3BFootCalData(Int_t detid, Int_t stripid, Double_t energy);
-
-    /** Copy constructor **/
-    R3BFootCalData(const R3BFootCalData&);
-
-    R3BFootCalData& operator=(const R3BFootCalData&) { return *this; }
 
     /** Destructor **/
     virtual ~R3BFootCalData() {}
@@ -58,7 +52,7 @@ class R3BFootCalData : public FairMultiLinkedData
     Int_t fStripId;   // strip unique identifier
     Double_t fEnergy; // total energy in the strip
 
-    ClassDef(R3BFootCalData, 0)
+    ClassDef(R3BFootCalData, 1)
 };
 
 #endif /* R3BFootCalData_H */
