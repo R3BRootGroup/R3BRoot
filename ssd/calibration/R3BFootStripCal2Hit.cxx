@@ -131,7 +131,7 @@ InitStatus R3BFootStripCal2Hit::Init()
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
         sprintf(Name, "hssd_%d", i + 1);
-        hssd[i] = new TH1F(Name, "", 634, -0.5, 633.5);
+        hssd[i] = new TH1F(Name, "", 640, -0.5, 640.5);
     }
 
     return kSUCCESS;
@@ -166,7 +166,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     {
         calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
         detId = calData[i]->GetDetId() - 1;
-        stripId = calData[i]->GetStripId();
+        stripId = calData[i]->GetStripId() - 1;
         energy = calData[i]->GetEnergy();
         hssd[detId]->SetBinContent(stripId, energy);
         // std::cout << stripId <<" "<< energy << std::endl;
@@ -256,14 +256,14 @@ void R3BFootStripCal2Hit::DefineClusters(Int_t* nfoundhits,
         Int_t finalstrip = fChannels[i] + 1;
         for (Int_t strip = initstrip; strip < finalstrip; strip++)
         {
-            energy = hsst->GetBinContent(strip);
-            if (hsst->GetBinContent(strip + 1) > 0)
+            energy = hsst->GetBinContent(strip + 1);
+            if (hsst->GetBinContent(strip + 2) > 0)
                 finalstrip++;
             // std::cout<< strip <<" "<< energy <<std::endl;
             CoG[0] = CoG[0] + energy * strip;
             CoG[1] = CoG[1] + energy;
             SumEnergy[i] = SumEnergy[i] + energy;
-            hsst->SetBinContent(strip, 0.);
+            hsst->SetBinContent(strip + 1, 0.);
         }
         Position[i] = CoG[0] / CoG[1] * fPitchs / 1000.;
     }
