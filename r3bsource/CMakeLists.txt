@@ -45,6 +45,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 )
@@ -75,6 +76,7 @@ R3BWhiterabbitPspReader.cxx
 R3BWhiterabbitMusicReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
+R3BTrloiiScalerReader.cxx
 R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
@@ -129,6 +131,7 @@ ext/ext_h101_wrs2.h
 ext/ext_h101_wrs8.h
 ext/ext_h101_wrlos.h
 ext/ext_h101_tpat.h
+ext/ext_h101_trlo.h
 ext/ext_h101_timestamp_master.h
 ext/ext_h101_bmon.h
 ext/ext_h101_fibzero.h

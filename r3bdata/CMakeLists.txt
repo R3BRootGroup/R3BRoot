@@ -67,6 +67,7 @@ set(SRCS
 R3BMCStack.cxx
 R3BMCTrack.cxx
 wrData/R3BWRData.cxx
+trloiiData/R3BTrloiiData.cxx
 R3BHit.cxx
 R3BTrack.cxx
 R3BDouble.cxx
