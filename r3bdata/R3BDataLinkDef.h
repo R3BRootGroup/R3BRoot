@@ -58,6 +58,7 @@
 #pragma link C++ class R3BAlpideMappedData+;
 
 #pragma link C++ class R3BWRData+;
+#pragma link C++ class R3BTrloiiData+;
 
 #pragma link C++ class R3BMusicPoint+;
 #pragma link C++ class R3BMusicMappedData+;

@@ -35,6 +35,7 @@
 #pragma link C++ class R3BWhiterabbitReader+;
 #pragma link C++ class R3BTrloiiTpatReader+;
 #pragma link C++ class R3BTrloiiSampReader+;
+#pragma link C++ class R3BTrloiiScalerReader+;
 #pragma link C++ class R3BTimestampMasterReader+;
 #pragma link C++ class R3BBeamMonitorReader+;
 #pragma link C++ class R3BPspxReader+;
@@ -114,6 +115,7 @@
 #pragma link C++ class EXT_STR_h101_WRS8_onion_t;
 #pragma link C++ class EXT_STR_h101_WRLOS_onion_t;
 #pragma link C++ class EXT_STR_h101_WRMUSIC_onion_t;
+#pragma link C++ class EXT_STR_h101_TRLO_onion_t;
 #pragma link C++ class EXT_STR_h101_TIMESTAMP_PSPX_onion_t;
 #pragma link C++ class EXT_STR_h101_MUSIC_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
