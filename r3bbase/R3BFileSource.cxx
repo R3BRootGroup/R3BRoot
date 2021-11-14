@@ -438,8 +438,8 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
 
     if (nextts > 0)
         LOG(WARNING) << "\033[5m\033[33m R3BFileSource::GetRunid() RunId was not found, it will be 1 \033[0m";
-    prevts = -1;
-    nextts = -1;
+    prevts = 0;
+    nextts = 0;
 
     return 1;
 }
@@ -461,7 +461,7 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
            fRunId);
     fflush(stdout);
 
-    if (nextts >= 0 && prevts >= 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
+    if (nextts > 0 && prevts > 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
     {
         fRunId = GetRunid(fEvtHeader->GetTimeStamp());
     }
