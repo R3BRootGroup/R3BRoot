@@ -36,6 +36,7 @@
 #pragma link C++ class R3BTrloiiTpatReader+;
 #pragma link C++ class R3BTrloiiSampReader+;
 #pragma link C++ class R3BTrloiiScalerReader+;
+#pragma link C++ class R3BTrloiiScalerReader_s467+;
 #pragma link C++ class R3BTimestampMasterReader+;
 #pragma link C++ class R3BBeamMonitorReader+;
 #pragma link C++ class R3BPspxReader+;

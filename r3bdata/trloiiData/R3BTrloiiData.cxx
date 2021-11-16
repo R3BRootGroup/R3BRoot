@@ -24,7 +24,7 @@ R3BTrloiiData::R3BTrloiiData()
 {
 }
 
-R3BTrloiiData::R3BTrloiiData(UInt_t type, Int_t ch, int32_t counts)
+R3BTrloiiData::R3BTrloiiData(UInt_t type, Int_t ch, uint32_t counts)
     : fType(type)
     , fCh(ch)
     , fCounts(counts)

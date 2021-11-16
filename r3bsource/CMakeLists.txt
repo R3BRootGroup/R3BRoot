@@ -77,6 +77,7 @@ R3BWhiterabbitMusicReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
 R3BTrloiiScalerReader.cxx
+R3BTrloiiScalerReader_s467.cxx
 R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
@@ -132,6 +133,7 @@ ext/ext_h101_wrs8.h
 ext/ext_h101_wrlos.h
 ext/ext_h101_tpat.h
 ext/ext_h101_trlo.h
+ext/ext_h101_trlo_s467.h
 ext/ext_h101_timestamp_master.h
 ext/ext_h101_bmon.h
 ext/ext_h101_fibzero.h
