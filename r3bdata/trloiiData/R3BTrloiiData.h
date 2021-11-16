@@ -32,7 +32,7 @@ class R3BTrloiiData : public TObject
      *@param ch         Scaler channel
      *@param counts     Number of counts
      **/
-    R3BTrloiiData(UInt_t type, Int_t ch, int32_t counts);
+    R3BTrloiiData(UInt_t type, Int_t ch, uint32_t counts);
 
     // Destructor
     virtual ~R3BTrloiiData() {}
@@ -40,12 +40,12 @@ class R3BTrloiiData : public TObject
     // Getters
     inline const UInt_t& GetType() const { return fType; }
     inline const Int_t& GetCh() const { return fCh; }
-    inline const int32_t& GetCounts() const { return fCounts; }
+    inline const uint32_t& GetCounts() const { return fCounts; }
 
   protected:
     UInt_t fType;    // Type of data
     Int_t fCh;       // Scaler channel
-    int32_t fCounts; // Number of counts
+    uint32_t fCounts; // Number of counts
 
   public:
     ClassDef(R3BTrloiiData, 1)
