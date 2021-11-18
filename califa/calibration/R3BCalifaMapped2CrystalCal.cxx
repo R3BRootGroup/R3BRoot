@@ -29,6 +29,10 @@
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaTotCalPar.h"
 
+#ifndef PLOG
+#define PLOG(LVL) LOG(LVL) << __PRETTY_FUNCTION__ << ": "
+#endif
+
 // R3BCalifaMapped2CrystalCal: Constructor
 R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
     : FairTask("R3B CALIFA Calibrator")
@@ -45,8 +49,14 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
 R3BCalifaMapped2CrystalCal::~R3BCalifaMapped2CrystalCal()
 {
     LOG(INFO) << "R3BCalifaMapped2CrystalCal: Delete instance";
-    if (fCalifaMappedDataCA)
-        delete fCalifaMappedDataCA;
+
+    /*
+     * Note to whomever felt in neccessary to add: "delete fCalifaMappedDataCA;"
+     * This will cause a double free because  R3BCalifaFebexReader (reasonably)
+     * considers itself the owner of that object.
+     * Short version: if your class did not allocate the object with new,
+     * it also (typically) may not delete it. -- pklenze
+     */
     if (fCalifaCryCalDataCA)
         delete fCalifaCryCalDataCA;
 }
@@ -84,11 +94,25 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
 
 void R3BCalifaMapped2CrystalCal::SetParameter()
 {
+    // NB: the handling of calibration parameters should be redone from the scratch.
+    // The par-file format  is not really human-readable (the root file even is worse).
+    // Luckily, this does not matter because the choice to store the values in the
+    // class using two one-dimensional array precludes any possibility of humans groking
+    // it.
+    // A sensible reimplementation might store the calibration in csv lines (with the crID
+    // coming first) or go down the json rabbit hole.
+    // For using the calibration here,  an std::vector of some struct {m, c, totAmp, totTime}
+    // would be convenient. Nobody wants higher order polynomials for calibration.
+    // Also, if you insist on crIDs starting from one (that ship has long sailed), then
+    // please just leave the first array entry undefined and use params(id) == a[id], instead
+    // of bothering with params(id)==a[id-1].
+    // See also: https://github.com/R3BRootGroup/R3BRoot/issues/473
+    // Just my 2 cents. -- pklenze
+
     //--- Parameter Container ---
     NumCrystals = fCal_Par->GetNumCrystals();    // Number of Crystals
     NumParams = fCal_Par->GetNumParametersFit(); // Number of Parameters
 
-    fCalParams = new TArrayF();
     fCalParams = fCal_Par->GetCryCalParams(); // Array with the Cal parameters
     assert(fCalParams->GetSize() >= NumCrystals * NumParams);
 
@@ -98,9 +122,44 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     //--- Parameter Container --- Tot
     NumTotParams = fTotCal_Par->GetNumParametersFit(); // Number of Parameters
 
-    fCalTotParams = new TArrayF();
     fCalTotParams = fTotCal_Par->GetCryCalParams(); // Array with the Tot Cal parameters
     assert(fCalTotParams->GetSize() >= NumCrystals * NumTotParams);
+
+    // handle old calibrations which mapped to barrel protons to crId+2432:
+    // If you cal[id] is zero or nan (you wish),
+    // And cal[id+2432] is nonzero,
+    // Then make cal[id]=cal[id+2432] in case you are using the new unpacker
+    // (where barrel is always in [1, 1952]) with an old calibration
+
+    constexpr int offset = 2432;
+    auto& cal = *fCalParams; // because (*ptr)[i] is ugly and error-prone
+    auto& tot = *fCalTotParams;
+    if (NumParams != 2 || NumCrystals < 2 * offset)
+    {
+        PLOG(WARNING) << "Not checking calibration in former proton range.";
+        return;
+    }
+    auto invalid = [&cal](int id) {
+        auto a = cal.GetAt(2 * (id - 1) + 0);
+        auto b = cal.GetAt(2 * (id - 1) + 1);
+        return (std::isnan(a) || a == 0.0) && (std::isnan(a) || a == 0.0);
+    };
+
+    int replaced{};
+    for (int id = 1; id <= 1952; id++) // barrel range, formerly barrel gamma range
+        if (invalid(id) && !invalid(id + offset))
+        {
+            ++replaced;
+            // Note:  (*a)[n]=...
+            for (int p = 0; p < NumParams; p++)
+                cal[NumParams * (id - 1) + p] = cal[NumParams * (id - 1 + offset) + p];
+            for (int p = 0; p < NumTotParams; p++)
+                tot[NumTotParams * (id - 1) + p] = tot[NumTotParams * (id - 1 + offset) + p];
+        }
+    if (replaced)
+        PLOG(WARNING) << replaced
+                      << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
+                         "barrel range.";
 }
 
 InitStatus R3BCalifaMapped2CrystalCal::Init()
@@ -228,7 +287,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     }
 
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData; // FTFY
     return;
 }
 
