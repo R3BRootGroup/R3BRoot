@@ -40,6 +40,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     void ResetHistosMapped();
     void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
 
+    void SetCosmicTpat(UInt_t CosmicTpat = 0) { fCosmicTpat = CosmicTpat; }
+
   private:
     static const unsigned int fNPlanes = 24;
     static const unsigned int fNBars = fNPlanes * 50;
@@ -54,6 +56,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH1D* hNstart;
 
     TH2D* hTestJump;
+    TH2D* hJumpsvsEvnt;
+    TH2D* hJumpsvsEvntzoom;
 
     std::array<TH1D*, 4> ahMappedBar1;
     std::array<TH1D*, 4> ahMappedBar2;
@@ -93,6 +97,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     double fDistanceToTarget;
 
     bool fIsOnline;
+
+    UInt_t fCosmicTpat = 0;
 
   private:
     bool IsBeam() const;
