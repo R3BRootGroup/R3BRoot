@@ -108,7 +108,7 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
     if (checkcounts == fNofPMTs)
     {
         std::cout << "done " << std::endl;
-        raise(SIGINT);
+        //    raise(SIGINT);
     }
 
     if (fTrigger >= 0)

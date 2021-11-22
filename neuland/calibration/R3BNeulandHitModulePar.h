@@ -77,7 +77,7 @@ class R3BNeulandHitModulePar : public FairParGenericSet
     Double_t GetTimeOffset(const Int_t side) const
     {
         assert(side == 1 || side == 2);
-        return fTSync + (1.5 - side) * fTDiff;
+        return -fTSync + (1.5 - side) * fTDiff;
     }
     Double_t GetEffectiveSpeed() const { return fEffectiveSpeed; }
     Int_t GetPedestal(const Int_t side) const

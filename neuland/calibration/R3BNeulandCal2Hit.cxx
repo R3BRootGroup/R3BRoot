@@ -36,6 +36,10 @@ R3BNeulandCal2Hit::R3BNeulandCal2Hit(const char* name, const Int_t iVerbose)
     , fCalData("NeulandCalData")
     , fHits("NeulandHits")
     , fFirstPlaneHorizontal(true)
+    , fDistanceToTarget(Neuland::NaN)
+    , fGlobalTimeOffset(Neuland::NaN)
+    , fEnergyCutoff(Neuland::NaN)
+    , fWalkEnabled(kFALSE)
 {
 }
 
@@ -69,11 +73,35 @@ void R3BNeulandCal2Hit::SetParameter()
 {
     fParMap.clear();
 
+    if (std::isnan(fDistanceToTarget))
+    {
+        fDistanceToTarget = fPar->GetDistanceToTarget();
+    }
+    else
+    {
+        fPar->SetDistanceToTarget(fDistanceToTarget);
+    }
+
+    if (std::isnan(fGlobalTimeOffset))
+    {
+        fGlobalTimeOffset = fPar->GetGlobalTimeOffset();
+    }
+    else
+    {
+        fPar->SetGlobalTimeOffset(fGlobalTimeOffset);
+    }
+
+    if (std::isnan(fEnergyCutoff))
+    {
+        fEnergyCutoff = fPar->GetEnergyCutoff();
+    }
+    else
+    {
+        fPar->SetEnergyCutoff(fEnergyCutoff);
+    }
+
     fNumberOfPlanes = fPar->GetNumberOfPlanes();
-    fDistanceToTarget = fPar->GetDistanceToTarget();
     fDistancesToFirstPlane = fPar->GetDistancesToFirstPlane();
-    fGlobalTimeOffset = fPar->GetGlobalTimeOffset();
-    fEnergyCutoff = fPar->GetEnergyCutoff();
     fAttenuationValues.resize(fNumberOfPlanes * Neuland::BarsPerPlane, 0.);
     const auto nPars = fPar->GetNumModulePar();
 
@@ -140,14 +168,11 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
         const auto energy = TMath::Sqrt(fAttenuationValues[barID] * unsatEnergy[0] * unsatEnergy[1]);
 
-        // ig if (energy < fEnergyCutoff)
-        // ig     continue;
+        if (energy < fEnergyCutoff)
+            continue;
 
-        // ig std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
-        // ig                                 cal[1]->GetTime() + parameter.GetTimeOffset(2) };
-
-        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1) - 2 * parameter.GetTSync(),
-                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) - 2 * parameter.GetTSync() };
+        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
+                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) };
 
         // FIXME this should be done in Mapped2Cal
         // In Cal2Hit the difference between all bars should be checked
@@ -158,22 +183,23 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
         auto time = (tdc[0] + tdc[1]) * 0.5 - fGlobalTimeOffset;
 
-        // cout << "global        " << fGlobalTimeOffset << endl;
+        if (fWalkEnabled)
+            time = time + WalkCorrection(energy);
 
         if (beam)
         {
             // the shift is to get fmod to work as indented: 4 peaks -> 1 peak w/o stray data (e.g. at 5 * 2048)
-            // tdc = fmod(tdc - start - 3000, 5 * 2048) + 3000;
-            time = remainder(time - start - 3000, 5 * 2048) + 3000; // fmod 3000 default
-            // time = remainder(time - start - 2000, 5 * 2048) + 2000; // fmod 1000
+            // fmod gives the time between 0 and 5*2048
+            // remainder() gives the time between -0.5*5*2048 and +0.5*5*2048
+            time = remainder(time - start, Neuland::MaxCalTime);
         }
         else
         {
-            time = std::numeric_limits<double>::quiet_NaN();
+            time = Neuland::NaN;
         }
 
-        const auto plane = Neuland::GetPlaneNumber(barID); // ig -1
-        const auto bar = (barID) % 50;                     // ig -1
+        const auto plane = Neuland::GetPlaneNumber(barID);
+        const auto bar = (barID) % 50;
 
         TVector3 pos;
         TVector3 pixel;
@@ -195,10 +221,10 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
             pixel[1] = std::min(std::max(0., pos[1] / 5. + 25), 49.);
         }
 
-        pos[2] = (plane + 0.5) * Neuland::BarSize_Z + fDistanceToTarget; // ig + fDistancesToFirstPlane[plane];
+        pos[2] = fDistanceToTarget + fDistancesToFirstPlane[plane];
         pixel[2] = plane;
 
-        fHits.Insert({ barID, tdc[0], tdc[1], time, unsatEnergy[0], unsatEnergy[1], energy, pos, pixel });
+        fHits.Insert({ barID + 1, tdc[0], tdc[1], time, unsatEnergy[0], unsatEnergy[1], energy, pos, pixel });
     }
 }
 
@@ -211,6 +237,21 @@ void R3BNeulandCal2Hit::FinishTask()
 Double_t R3BNeulandCal2Hit::GetUnsaturatedEnergy(const Int_t qdc, const Double_t gain, const Double_t saturation) const
 {
     return qdc / (gain - saturation * qdc);
+}
+
+Double_t R3BNeulandCal2Hit::WalkCorrection(Double_t x)
+{
+    Double_t y = 0;
+
+    // if (x<=12.) y=24.78;
+
+    if (x <= 12.)
+        y = 35. - 7.1897575 * log(x) + 1.2 * log(x) * log(x) + 0.23616;
+
+    if (x > 12.)
+        y = 25.5 - 0.055 * x;
+
+    return 24.78 - y;
 }
 
 ClassImp(R3BNeulandCal2Hit)

@@ -103,7 +103,14 @@ namespace Neuland
 
                     if ((bar < BarsPerPlane - 1) && (HitMask[plane] & (1UL << (bar + 1))))
                     {
-                        const auto tdiff = EventData[barID + 1] - EventData[barID];
+                        auto tdiff = EventData[barID + 1] - EventData[barID];
+                        if (fabs(tdiff) > 0.5 * MaxCalTime)
+                        {
+                            if (tdiff < 0)
+                                tdiff += MaxCalTime;
+                            else
+                                tdiff -= MaxCalTime;
+                        }
 
                         if (barData.NextBarLog.size() < NextBarLogSize)
                         {
@@ -136,7 +143,14 @@ namespace Neuland
                             continue;
 
                         const auto nextPlaneBarID = nextPlane * BarsPerPlane + barInNextPlane;
-                        const auto tdiff = EventData[nextPlaneBarID] - EventData[barID];
+                        auto tdiff = EventData[nextPlaneBarID] - EventData[barID];
+                        if (fabs(tdiff) > 0.5 * MaxCalTime)
+                        {
+                            if (tdiff < 0)
+                                tdiff += MaxCalTime;
+                            else
+                                tdiff -= MaxCalTime;
+                        }
 
                         if (barData.NextPlaneLog[barInNextPlane].size() < NextPlaneLogSize)
                         {

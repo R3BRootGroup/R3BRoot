@@ -45,6 +45,12 @@ class R3BNeulandCal2Hit : public FairTask
     // Global time offset in ns
     inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
 
+    // Energy cutoff in MeV
+    inline void SetEnergyCutoff(Double_t enecut) { fEnergyCutoff = enecut; }
+
+    // Walk correction
+    inline void EnableWalk(Bool_t walk = kFALSE) { fWalkEnabled = walk; }
+
   private:
     void SetParameter();
     Double_t GetUnsaturatedEnergy(const Int_t qdc, const Double_t gain, const Double_t saturation) const;
@@ -63,6 +69,9 @@ class R3BNeulandCal2Hit : public FairTask
     std::vector<Double_t> fAttenuationValues;
     Double_t fGlobalTimeOffset;
     Double_t fEnergyCutoff;
+
+    Bool_t fWalkEnabled;
+    Double_t WalkCorrection(Double_t);
 
     std::map<Int_t, R3BNeulandHitModulePar> fParMap;
 
