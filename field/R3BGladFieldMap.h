@@ -18,8 +18,9 @@
 #include "R3BFieldPar.h"
 #include "TRotation.h"
 #include "TVector3.h"
+#include "TTree.h"
 
-class TArrayF;
+class TArrayD;
 
 class R3BGladFieldMap : public FairField
 {
@@ -110,12 +111,14 @@ class R3BGladFieldMap : public FairField
     Double_t GetScale() const { return fScale; }
 
     /** Accessors to the field value arrays **/
-    TArrayF* GetBx() const { return fBx; }
-    TArrayF* GetBy() const { return fBy; }
-    TArrayF* GetBz() const { return fBz; }
+    TArrayD* GetBx() const { return fBx; }
+    TArrayD* GetBy() const { return fBy; }
+    TArrayD* GetBz() const { return fBz; }
 
     /** Accessor to field map file **/
-    const char* GetFileName() { return fFileName.Data(); }
+    //const char* GetFileName() { return fFileName.Data(); }
+    TString GetFileName() { return fFileName; }
+    //TString* GetFileNameString() { return fFileName.Data(); }
 
     /** Screen output **/
     virtual void Print(Option_t* option = "") const;
@@ -128,7 +131,7 @@ class R3BGladFieldMap : public FairField
     void ReadAsciiFile(const char* fileName);
 
     /** Read field map from a ROOT file **/
-    // void ReadRootFile(const char* fileName, const char* mapName);
+     void ReadRootFile(const char* fileName);
 
     /** Set field parameters and data **/
     // void SetField(const R3BGladFieldMapData* data);
@@ -158,10 +161,10 @@ class R3BGladFieldMap : public FairField
     /** Number of grid points  **/
     Int_t fNx, fNy, fNz; //
 
-    /** Arrays with the field values  **/
-    TArrayF* fBx; //!
-    TArrayF* fBy; //!
-    TArrayF* fBz; //!
+    /** Arrays of floats with the field values  **/
+    TArrayD* fBx; //!
+    TArrayD* fBy; //!
+    TArrayD* fBz; //!
 
     /** Variables for temporary storage
      ** Used in the very frequently called method GetFieldValue  **/
@@ -174,9 +177,12 @@ class R3BGladFieldMap : public FairField
     TRotation* gRot;  //!
     TVector3* gTrans; //!
 
-    Double_t fTrackerCorr;
+    //TTree with the map data when reading a ROOT file
+    TFile* fFile; // root file with the map data
 
-    ClassDef(R3BGladFieldMap, 2)
+    Double_t fTrackerCorr; 
+
+    ClassDef(R3BGladFieldMap, 3)
 };
 
 #endif

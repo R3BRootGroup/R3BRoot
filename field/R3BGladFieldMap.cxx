@@ -1,6 +1,4 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+/*   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,6 +15,7 @@
 #include <iostream>
 
 // Includes from ROOT
+#include "TArrayD.h"
 #include "TArrayF.h"
 #include "TFile.h"
 #include "TMath.h"
@@ -47,7 +46,7 @@ R3BGladFieldMap::R3BGladFieldMap()
     fPosX = fPosY = fPosZ = 0.;
     fName = "";
     fFileName = "";
-    fType = 1;
+    fType = 2;
     fTrackerCorr = 1.;
 }
 // ------------------------------------------------------------------------
@@ -70,7 +69,8 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
         fFileName += ".root";
     else
         fFileName += ".dat";
-    fType = 1;
+
+    fType=2;
     fTrackerCorr = 1.;
 }
 
@@ -78,7 +78,7 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
 
 R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar)
 {
-    fType = 1;
+    fType = 2;
     fPosX = fPosY = fPosZ = 0.;
     fXmin = fYmin = fZmin = 0.;
     fXmax = fYmax = fZmax = 0.;
@@ -96,14 +96,15 @@ R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar)
     else
     {
         fieldPar->MapName(fName);
+        fFileName = fieldPar->GetFileName();
         fPosX = fieldPar->GetPositionX();
         fPosY = fieldPar->GetPositionY();
         fPosZ = fieldPar->GetPositionZ();
         fScale = fieldPar->GetScale();
-        TString dir = getenv("VMCWORKDIR");
-        fFileName = dir + "/field/magField/R3B/" + fName;
-        fFileName += ".dat";
-        // fType = fieldPar->GetType();
+        //TString dir = getenv("VMCWORKDIR");
+        //fFileName = dir + "/field/magField/R3B/" + fName;
+        //fFileName += ".dat";
+        fType = fieldPar->GetType();
     }
     fTrackerCorr = 1.;
 }
@@ -124,13 +125,14 @@ R3BGladFieldMap::~R3BGladFieldMap()
 void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
-    fPosY = 2.0;
+    fPosY = 0.0;
     fPosZ = 163.4;
     fYAngle = -14.;
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
-    //  if      (fFileName.EndsWith(".root")) ReadRootFile(fFileName, fName);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
+    else if(fFileName.EndsWith(".root"))
+        ReadRootFile(fFileName);
     else
     {
         cerr << "-E- R3BGladFieldMap::Init: No proper file name defined! (" << fFileName << ")" << endl;
@@ -160,7 +162,6 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
 
     if (IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz))
     {
-
         // Get Bx field values at grid cell corners
         fHa[0][0][0] = fBx->At(ix * fNy * fNz + iy * fNz + iz);
         fHa[1][0][0] = fBx->At((ix + 1) * fNy * fNz + iy * fNz + iz);
@@ -174,10 +175,9 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (X) interpolated " << val << endl;
-        return (fTrackerCorr * val);
+        return (fTrackerCorr*val);
     }
-
-    return 0.;
+    return 0;
 }
 // ------------------------------------------------------------------------
 
@@ -185,6 +185,7 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
 Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 {
 
+    // cout << "-I- get By called " << endl;
     // transform to local coordinates
     // local to global
     TVector3 localPoint(x, y, z);
@@ -201,7 +202,6 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 
     if (IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz))
     {
-
         // Get By field values at grid cell corners
         fHa[0][0][0] = fBy->At(ix * fNy * fNz + iy * fNz + iz);
         fHa[1][0][0] = fBy->At((ix + 1) * fNy * fNz + iy * fNz + iz);
@@ -214,10 +214,9 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
-        // cout << " (Y) interpolated " << val << endl;
-        return (fTrackerCorr * val);
+        //cout << " (Y) interpolated " << val << endl;
+        return (fTrackerCorr*val);
     }
-
     return 0.;
 }
 // ------------------------------------------------------------------------
@@ -226,13 +225,7 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
 {
 
-    Int_t ix = 0;
-    Int_t iy = 0;
-    Int_t iz = 0;
-    Double_t dx = 0.;
-    Double_t dy = 0.;
-    Double_t dz = 0.;
-
+    // cout << "-I- get Bz called " << endl;
     // transform to local coordinates
     // local to global
     TVector3 localPoint(x, y, z);
@@ -240,9 +233,15 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
     localPoint = localPoint + (*gTrans);
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
 
+    Int_t ix = 0;
+    Int_t iy = 0;
+    Int_t iz = 0;
+    Double_t dx = 0.;
+    Double_t dy = 0.;
+    Double_t dz = 0.;
+
     if (IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz))
     {
-
         // Get Bz field values at grid cell corners
         fHa[0][0][0] = fBz->At(ix * fNy * fNz + iy * fNz + iz);
         fHa[1][0][0] = fBz->At((ix + 1) * fNy * fNz + iy * fNz + iz);
@@ -256,7 +255,7 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (Z) interpolated " << val << endl;
-        return (fTrackerCorr * val);
+        return (fTrackerCorr*val);
     }
 
     return 0.;
@@ -265,14 +264,14 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
 
 // -----------   Check whether a point is inside the map   ----------------
 Bool_t R3BGladFieldMap::IsInside(Double_t x,
-                                 Double_t y,
-                                 Double_t z,
-                                 Int_t& ix,
-                                 Int_t& iy,
-                                 Int_t& iz,
-                                 Double_t& dx,
-                                 Double_t& dy,
-                                 Double_t& dz)
+        Double_t y, 
+        Double_t z,
+        Int_t& ix,
+        Int_t& iy,
+        Int_t& iz,
+        Double_t& dx,
+        Double_t& dy,
+        Double_t& dz)
 {
 
     // --- Transform into local coordinate system
@@ -313,7 +312,7 @@ void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
     ofstream mapFile(fileName);
     if (!mapFile.is_open())
     {
-        cerr << "-E- R3BGladFieldMap:ReadAsciiFile: Could not open file! " << endl;
+        cerr << "-E- R3BGladFieldMap:WriteAsciiFile: Could not open file! " << endl;
         return;
     }
 
@@ -352,7 +351,7 @@ void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
                     cout << "\b\b\b\b\b\b" << setw(3) << perc << " % " << flush;
                 }
                 mapFile << fBx->At(index) / factor << " " << fBy->At(index) / factor << " " << fBz->At(index) / factor
-                        << endl;
+                    << endl;
             } // z-Loop
         }     // y-Loop
     }         // x-Loop
@@ -363,18 +362,18 @@ void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
 
 // -------   Write field map to a ROOT file   -----------------------------
 /*
-void R3BGladFieldMap::WriteRootFile(const char* fileName,
-                const char* mapName) {
+   void R3BGladFieldMap::WriteRootFile(const char* fileName,
+   const char* mapName) {
 
-  R3BGladFieldMapData* data = new R3BGladFieldMapData(mapName, *this);
-  TFile* oldFile = gFile;
-  TFile* file = new TFile(fileName, "RECREATE");
-  data->Write();
-  file->Close();
-  if(oldFile) oldFile->cd();
+   R3BGladFieldMapData* data = new R3BGladFieldMapData(mapName, *this);
+   TFile* oldFile = gFile;
+   TFile* file = new TFile(fileName, "RECREATE");
+   data->Write();
+   file->Close();
+   if(oldFile) oldFile->cd();
 
-}
-*/
+   }
+   */
 
 // ------------------------------------------------------------------------
 
@@ -404,14 +403,14 @@ void R3BGladFieldMap::Print(Option_t* option) const
     cout << "----" << endl;
     cout << "----  Field map grid : " << endl;
     cout << "----  x = " << setw(4) << fXmin << " to " << setw(4) << fXmax << " cm, " << fNx
-         << " grid points, dx = " << fXstep << " cm" << endl;
+        << " grid points, dx = " << fXstep << " cm" << endl;
     cout << "----  y = " << setw(4) << fYmin << " to " << setw(4) << fYmax << " cm, " << fNy
-         << " grid points, dy = " << fYstep << " cm" << endl;
+        << " grid points, dy = " << fYstep << " cm" << endl;
     cout << "----  z = " << setw(4) << fZmin << " to " << setw(4) << fZmax << " cm, " << fNz
-         << " grid points, dz = " << fZstep << " cm" << endl;
+        << " grid points, dz = " << fZstep << " cm" << endl;
     cout << endl;
     cout << "----  Field centre position: ( " << setw(6) << fPosX << ", " << setw(6) << fPosY << ", " << setw(6)
-         << fPosZ << ") cm" << endl;
+        << fPosZ << ") cm" << endl;
     cout << "----  Field rotation Y: " << setw(6) << fYAngle << " deg" << endl;
     cout << "----  Field scaling factor: " << fScale << endl;
     //  Double_t bx = GetBx(0.,0.,0.);
@@ -476,12 +475,12 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
         iType = 2;
     if (type == "sym3")
         iType = 3;
-    if (fType != iType)
-    {
-        cout << "-E- R3BGladFieldMap::ReadAsciiFile: Incompatible map types!" << endl;
-        cout << "    Field map is of type " << fType << " but map on file is of type " << iType << endl;
-        LOG(fatal) << "ReadAsciiFile: Incompatible map types";
-    }
+    //if (fType != iType)
+    //{
+    //    cout << "-E- R3BGladFieldMap::ReadAsciiFile: Incompatible map types!" << endl;
+    //    cout << "    Field map is of type " << fType << " but map on file is of type " << iType << endl;
+    //    LOG(fatal) << "ReadAsciiFile: Incompatible map types";
+    //}
 
     // Read grid parameters
     mapFile >> fXmin >> fXmax >> fNx;
@@ -495,9 +494,9 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
     fNx += 1;
     fNy += 1;
     fNz += 1;
-    fBx = new TArrayF(fNx * fNy * fNz);
-    fBy = new TArrayF(fNx * fNy * fNz);
-    fBz = new TArrayF(fNx * fNy * fNz);
+    fBx = new TArrayD(fNx * fNy * fNz);
+    fBy = new TArrayD(fNx * fNy * fNz);
+    fBz = new TArrayD(fNx * fNy * fNz);
 
     // Read the field values
     Double_t factor = fScale * 10.; // Factor 10 for T -> kG
@@ -515,7 +514,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
             {
                 if (!mapFile.good())
                     cerr << "-E- R3BGladFieldMap::ReadAsciiFile: "
-                         << "I/O Error at " << ix << " " << iy << " " << iz << endl;
+                        << "I/O Error at " << ix << " " << iy << " " << iz << endl;
                 index = ix * fNy * fNz + iy * fNz + iz;
                 modul = div(index, iDiv);
                 if (modul.rem == 0)
@@ -531,7 +530,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
                 Double_t z = az;
 
                 Int_t index1 = Int_t((x - fXmin) / fXstep) * fNy * fNz + Int_t((y - fYmin) / fYstep) * fNz +
-                               Int_t((z - fZmin) / fZstep);
+                    Int_t((z - fZmin) / fZstep);
 
                 TVector3 B(bx, by, bz);
                 B.RotateY(fYAngle * TMath::DegToRad());
@@ -545,8 +544,8 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
                 if (mapFile.eof())
                 {
                     cerr << endl
-                         << "-E- R3BGladFieldMap::ReadAsciiFile: EOF"
-                         << " reached at " << ix << " " << iy << " " << iz << endl;
+                        << "-E- R3BGladFieldMap::ReadAsciiFile: EOF"
+                        << " reached at " << ix << " " << iy << " " << iz << endl;
                     mapFile.close();
                     break;
                 }
@@ -561,99 +560,105 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
 }
 // ------------------------------------------------------------------------
 
-// -------------   Read field map from ROOT file (private)  ---------------
-/*
-void R3BGladFieldMap::ReadRootFile(const char* fileName,
-                   const char* mapName) {
+void R3BGladFieldMap::ReadRootFile(const char* fileName)
+{
+    // Opening root file
+    cout << "-I- R3BGladFieldMap: Reading field map from ROOT file "<< fileName;
+    fFile = new TFile(fileName, "READ");
+    if (!(fFile->IsOpen())) 
+    {
+        cerr << "-E- R3BGladFieldMap::ReadRootFile: Cannot read from file! "<< endl;
+        LOG(fatal) << "ReadRootFile: Cannot read from file";
+    }
 
-  // Store gFile pointer
-  TFile* oldFile = gFile;
+    TTree * fTreeMap = NULL;
+    fTreeMap = (TTree*)fFile->Get("tree");
+    //fTreeMap = (TTree*)fFile->Get("tree")->Clone("fTreeMap");
 
-  // Open root file
-  cout << "-I- R3BGladFieldMap: Reading field map from ROOT file "
-       << fileName << endl;
-  TFile* file = new TFile(fileName, "READ");
-  if (!(file->IsOpen())) {
-    cerr << "-E- R3BGladFieldMap::ReadRootfile: Cannot read from file! "
-     << endl;
-    LOG(fatal) << "ReadRootFile: Cannot read from file";
-  }
+    if(!fTreeMap)
+    {
+        cerr << "-E- R3BGladFieldMap::ReadRootFile: no TTree named 'tree' found in the file" << fileName;
+        LOG(fatal) << "No field map data";
+    }
 
-  // Get the field data object
-  R3BGladFieldMapData* data = NULL;
-  file->GetObject(mapName, data);
-  if ( ! data ) {
-    cout << "-E- R3BGladFieldMap::ReadRootFile: data object " << fileName
-     << " not found in file! " << endl;
-    exit(-1);
-  }
+    Double_t tBx, tBy, tBz;//branches
+    fTreeMap->SetBranchAddress("Bx",&tBx);
+    fTreeMap->SetBranchAddress("By",&tBy);
+    fTreeMap->SetBranchAddress("Bz",&tBz);
 
-  // Get the field parameters
-  SetField(data);
+    //Read map info from the first three entries in the tree
+    fTreeMap->GetEntry(0);
+    fXmin = tBx; fXmax=tBy; fNx=tBz; 
 
-  // Close the root file and delete the data object
-  file->Close();
-  delete data;
-  if ( oldFile ) oldFile->cd();
+    fTreeMap->GetEntry(1);
+    fYmin = tBx; fYmax=tBy; fNy=tBz; 
 
+    fTreeMap->GetEntry(2);
+    fZmin = tBx; fZmax=tBy; fNz=tBz; 
+
+    fXstep = (fXmax - fXmin) / Double_t(fNx-1);
+    fYstep = (fYmax - fYmin) / Double_t(fNy-1);
+    fZstep = (fZmax - fZmin) / Double_t(fNz-1);
+
+    Double_t factor = fScale * 10.; // Factor 10 for T -> kG
+
+    // Create field arrays
+    fBx = new TArrayD(fNx * fNy * fNz);
+    fBy = new TArrayD(fNx * fNy * fNz);
+    fBz = new TArrayD(fNx * fNy * fNz);
+
+    Long64_t Nentries = fTreeMap->GetEntries();
+
+    cout << "\n-I- Reading GLAD field data from root tree" << endl;
+
+    TVector3 fBvec;
+
+    for(Long64_t ev = 3; ev<Nentries; ev++)//first 3 entries aremap info 
+    {
+        if(ev%100000==0)
+            cout << "\rProcessed " << ev << " entries..." << flush;
+
+        fTreeMap->GetEntry(ev);
+
+        fBvec.SetXYZ(tBx*factor, tBy*factor ,tBz*factor);
+        fBvec.RotateY(fYAngle * TMath::DegToRad());
+
+        fBx->AddAt(fBvec.X(), ev-3);
+        fBy->AddAt(fBvec.Y(), ev-3);
+        fBz->AddAt(fBvec.Z(), ev-3);
+    }
+    cout << "\n-I- Finished reading root tree" << endl;
+
+    return;
 }
+
+/*
+// Get the field parameters
+SetField(data);
+
 */
 
 // ------------------------------------------------------------------------
 
 // ------------   Set field parameters and data (private)  ----------------
 /*
-void R3BGladFieldMap::SetField(const R3BGladFieldMapData* data) {
+   void R3BGladFieldMap::SetField(const R3BGladFieldMapData* data) {
 
-  // Check compatibility
-  if ( data->GetType() != fType ) {
-    if (!((data->GetType()==3)&&(fType==5)))                   // E.Litvinenko
-      {
-    cout << "-E- R3BGladFieldMap::SetField: Incompatible map types!"
-         << endl;
-    cout << "    Field map is of type " << fType
-         << " but map on file is of type " << data->GetType() << endl;
-    LOG(fatal) << "SetField: Incompatible map types";
-      }
-    else
-      cout << "   R3BGladFieldMap::SetField: Warning:  You are using PosDepScaled map (original map type = 3)" << endl;
-  }
-
-
-  fXmin = data->GetXmin();
-  fYmin = data->GetYmin();
-  fZmin = data->GetZmin();
-  fXmax = data->GetXmax();
-  fYmax = data->GetYmax();
-  fZmax = data->GetZmax();
-  fNx = data->GetNx();
-  fNy = data->GetNy();
-  fNz = data->GetNz();
-  fXstep = ( fXmax - fXmin ) / Double_t( fNx - 1 );
-  fYstep = ( fYmax - fYmin ) / Double_t( fNy - 1 );
-  fZstep = ( fZmax - fZmin ) / Double_t( fNz - 1 );
-  if ( fBx ) delete fBx;
-  if ( fBy ) delete fBy;
-  if ( fBz ) delete fBz;
-  fBx = new TArrayF(*(data->GetBx()));
-  fBy = new TArrayF(*(data->GetBy()));
-  fBz = new TArrayF(*(data->GetBz()));
-
-  // Scale and convert from T to kG
-  Double_t factor = fScale * 10.;
-  Int_t index = 0;
-  for (Int_t ix=0; ix<fNx; ix++) {
-    for (Int_t iy=0; iy<fNy; iy++) {
-      for (Int_t iz=0; iz<fNz; iz++) {
-    index = ix*fNy*fNz + iy*fNz + iz;
-    if ( fBx ) (*fBx)[index] = (*fBx)[index] * factor;
-    if ( fBy ) (*fBy)[index] = (*fBy)[index] * factor;
-    if ( fBz ) (*fBz)[index] = (*fBz)[index] * factor;
-      }
-    }
-  }
-
+// Check compatibility
+if ( data->GetType() != fType ) {
+if (!((data->GetType()==3)&&(fType==5)))                   // E.Litvinenko
+{
+cout << "-E- R3BGladFieldMap::SetField: Incompatible map types!"
+<< endl;
+cout << "    Field map is of type " << fType
+<< " but map on file is of type " << data->GetType() << endl;
+LOG(fatal) << "SetField: Incompatible map types";
 }
+else
+cout << "   R3BGladFieldMap::SetField: Warning:  You are using PosDepScaled map (original map type = 3)" << endl;
+}
+
+
 */
 
 // ------------   Interpolation in a grid cell (private)  -----------------
