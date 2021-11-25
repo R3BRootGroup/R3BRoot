@@ -28,6 +28,7 @@
 
 #include <fstream>
 #include <list>
+#include "FairRunOnline.h"
 
 /* External data client interface (ucesb) */
 #include "ext_data_clnt.hh"
@@ -75,6 +76,9 @@ class R3BUcesbSource : public FairSource
 
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
+    void SetSkipEvents(Bool_t skip){fSkip=skip;}
+
+
   private:
     /* File descriptor returned from popen() */
     FILE* fFd;
@@ -103,6 +107,7 @@ class R3BUcesbSource : public FairSource
     TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
+    Bool_t fSkip;
 
   public:
     // Create dictionary
