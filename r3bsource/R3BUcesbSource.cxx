@@ -42,6 +42,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fInputFile()
     , fEntryMax(0)
     , fReaders(new TObjArray())
+    , fSkip(0)
 {
 }
 
@@ -205,6 +206,26 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     LOG(debug1) << "R3BUcesbSource::ReadEvent " << fNEvent;
 
     fNEvent++;
+
+    Int_t tpatbin, fTPat = 0;
+
+    if (fSkip)
+    {
+
+        if (fEventHeader->GetTpat() > 0)
+        {
+
+            FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+
+        else
+        {
+
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
+
+
 
     if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
