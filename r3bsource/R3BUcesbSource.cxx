@@ -42,6 +42,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fInputFile()
     , fEntryMax(0)
     , fReaders(new TObjArray())
+    , fSkip(0)
 {
 }
 
@@ -123,7 +124,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     {
         if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
         {
-          LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
+            LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
             return kFALSE;
         }
     }
@@ -206,6 +207,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     fNEvent++;
 
+
     if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
 
@@ -284,6 +286,24 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
             printf("\n");
         }
     }
+
+    
+    if (fSkip)
+    {
+
+        if (fEventHeader->GetTpat() > 0)
+        {
+
+            FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+
+        else
+        {
+
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
+
 
     return 0;
 }
