@@ -423,7 +423,7 @@ endif(NOT R3BROOT_MINIMAL)
 
 if(NOT MODULE)
     if(WITH_SOFIA)
-        execute_process(COMMAND . config.sh)
+        set(ENV{VMCWORKDIR} ${CMAKE_CURRENT_SOURCE_DIR})
         add_subdirectory(sofia)
     endif(WITH_SOFIA)
 endif(NOT MODULE)

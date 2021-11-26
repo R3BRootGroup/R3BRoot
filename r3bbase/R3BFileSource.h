@@ -21,13 +21,12 @@
 #ifndef R3BFileSource_H
 #define R3BFileSource_H
 
-#include "FairFileSource.h"
+#include "FairSource.h"
 #include "TChain.h"
 #include "TF1.h"
 #include "TFile.h"
 #include "TFolder.h"
 #include "TMCtls.h"
-#include <Rtypes.h>
 #include <fstream>
 #include <list>
 
@@ -39,7 +38,7 @@ class FairLogger;
 class FairRuntimeDb;
 class R3BEventHeader;
 
-class R3BFileSource : public FairFileSource
+class R3BFileSource : public FairSource
 {
   public:
     R3BFileSource(TFile* f, const char* Title = "InputRootFile", UInt_t identifier = 0);
@@ -55,9 +54,24 @@ class R3BFileSource : public FairFileSource
 
     Bool_t Init() override;
     Int_t ReadEvent(UInt_t i = 0) override;
+    void Close() override;
+    void Reset() override;
+
+    virtual Source_Type GetSourceType() override { return kFILE; }
+
+    virtual void SetParUnpackers() override {}
+
+    virtual Bool_t InitUnpackers() override { return kTRUE; }
+
+    virtual Bool_t ReInitUnpackers() override { return kTRUE; }
 
     /**Check the maximum event number we can run to*/
     virtual Int_t CheckMaxEventNo(Int_t EvtEnd = 0) override;
+    /**Read the tree entry on one branch**/
+    virtual void ReadBranchEvent(const char* BrName) override;
+    /**Read specific tree entry on one branch**/
+    virtual void ReadBranchEvent(const char* BrName, Int_t Entry) override;
+    virtual void FillEventHeader(FairEventHeader* feh) override;
 
     const TFile* GetRootFile() { return fRootFile; }
     /** Add a friend file (input) by name)*/
@@ -85,11 +99,21 @@ class R3BFileSource : public FairFileSource
     TFolder* GetBranchDescriptionFolder() { return fCbmroot; }
     UInt_t GetEntries() { return fNoOfEntries; }
 
-    virtual Bool_t ActivateObject(TObject** obj, const char* BrName) override;
-
     void SetInputFile(TString name);
 
+    /** Set the repetition time of the beam when it can interact (beamTime) and when no interaction happen (gapTime).
+     * The total repetition time is beamTime + gapTime */
+    void SetBeamTime(Double_t beamTime, Double_t gapTime);
+    /** Set the min and max limit for event time in ns */
+    void SetEventTimeInterval(Double_t min, Double_t max);
+    /** Set the mean time for the event in ns */
+    void SetEventMeanTime(Double_t mean);
+    void SetEventTime();
+    Double_t GetDeltaEventTime();
     void SetFileHeader(FairFileHeader* f) { fFileHeader = f; }
+    Double_t GetEventTime();
+
+    virtual Bool_t ActivateObject(TObject** obj, const char* BrName) override;
 
     /**Set the status of the EvtHeader
      *@param Status:  True: The header was creatged in this session and has to be filled
@@ -103,6 +127,9 @@ class R3BFileSource : public FairFileSource
     void SetCheckFileLayout(Bool_t enable) { fCheckFileLayout = enable; }
 
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
+
+    /**Read one event from source to find out which RunId to use*/
+    Bool_t SpecifyRunId();
 
   private:
     // static pointer to this class
@@ -161,8 +188,20 @@ class R3BFileSource : public FairFileSource
     /** for internal use, to return the same event time for the same entry*/
     UInt_t fTimeforEntryNo; //!
 
+    /** min time for one event (ns) */
+    Double_t fEventTimeMin; //!
+    /** max time for one Event (ns) */
+    Double_t fEventTimeMax; //!
     /** Time of event since th start (ns) */
-    Double_t fEventTime; //
+    Double_t fEventTime; //!
+    /** Time of particles in beam (ns) */
+    Double_t fBeamTime; //!
+    /** Time without particles in beam (gap) (ns) */
+    Double_t fGapTime; //!
+    /** EventMean time used (P(t)=1/fEventMeanTime*Exp(-t/fEventMeanTime) */
+    Double_t fEventMeanTime; //!
+    /** used to generate random numbers for event time; */
+    TF1* fTimeProb; //!
     /** True if the file layout should be checked when adding files to a chain.
      *  Default value is true.
      */
@@ -179,6 +218,9 @@ class R3BFileSource : public FairFileSource
     std::vector<UInt_t> fRunid;
     std::vector<uint64_t> fTimestamp;
     uint64_t prevts, nextts;
+
+    R3BFileSource(const R3BFileSource&);
+    R3BFileSource operator=(const R3BFileSource&);
 
     ClassDefOverride(R3BFileSource, 0)
 };

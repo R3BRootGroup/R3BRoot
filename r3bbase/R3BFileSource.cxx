@@ -49,7 +49,7 @@ using namespace std;
 TMCThreadLocal R3BFileSource* R3BFileSource::fSourceInstance = 0;
 
 R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
-    : FairFileSource(f, Title)
+    : FairSource()
     , fInputTitle(Title)
     , fRootFile(f)
     , fCurrentEntryNr(0)
@@ -71,10 +71,17 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     , fMCHeader(0)
     , fEvtHeader(0)
     , fFileHeader(0)
+    , fEventTimeInMCHeader(kTRUE)
     , fEvtHeaderIsNew(kFALSE)
     , fCurrentEntryNo(0)
     , fTimeforEntryNo(-1)
+    , fEventTimeMin(0.)
+    , fEventTimeMax(0.)
     , fEventTime(0.)
+    , fBeamTime(-1.)
+    , fGapTime(-1.)
+    , fEventMeanTime(0.)
+    , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
     , fExpid(0)
@@ -96,7 +103,7 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
 }
 
 R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UInt_t)
-    : FairFileSource(RootFileName, Title)
+    : FairSource()
     , fInputTitle(Title)
     , fRootFile(0)
     , fCurrentEntryNr(0)
@@ -118,10 +125,17 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     , fMCHeader(0)
     , fEvtHeader(0)
     , fFileHeader(0)
+    , fEventTimeInMCHeader(kTRUE)
     , fEvtHeaderIsNew(kFALSE)
     , fCurrentEntryNo(0)
     , fTimeforEntryNo(-1)
+    , fEventTimeMin(0.)
+    , fEventTimeMax(0.)
     , fEventTime(0.)
+    , fBeamTime(-1.)
+    , fGapTime(-1.)
+    , fEventMeanTime(0.)
+    , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
     , fExpid(0)
@@ -144,7 +158,7 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
 }
 
 R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt_t)
-    : FairFileSource(RootFileName, Title)
+    : FairSource()
     , fInputTitle(Title)
     , fRootFile(0)
     , fCurrentEntryNr(0)
@@ -166,10 +180,17 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     , fMCHeader(0)
     , fEvtHeader(0)
     , fFileHeader(0)
+    , fEventTimeInMCHeader(kTRUE)
     , fEvtHeaderIsNew(kFALSE)
     , fCurrentEntryNo(0)
     , fTimeforEntryNo(-1)
+    , fEventTimeMin(0.)
+    , fEventTimeMax(0.)
     , fEventTime(0.)
+    , fBeamTime(-1.)
+    , fGapTime(-1.)
+    , fEventMeanTime(0.)
+    , fTimeProb(0)
     , fCheckFileLayout(kTRUE)
     , fInputFile()
     , fExpid(0)
@@ -387,11 +408,12 @@ Bool_t R3BFileSource::Init()
             fTimestamp.push_back(ts);
         }
 
+        LOG(INFO) << "R3BFileSource::Init() End of reading RunId file";
         fInputFile.close();
     }
     else
     {
-        nextts = -1;
+        nextts = 0;
     }
 
     return kTRUE;
@@ -414,8 +436,8 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     if (fArraysize != fRunid.size())
     {
         LOG(ERROR) << "\033[5m\033[31m R3BFileSource::GetRunid() Different number of RunIds and timestamps \033[0m";
-        prevts = -1;
-        nextts = -1;
+        prevts = 0;
+        nextts = 0;
         return 1;
     }
 
@@ -473,6 +495,10 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
 
     return 1;
 }
+
+void R3BFileSource::Close() { CloseInFile(); }
+
+void R3BFileSource::Reset() {}
 
 void R3BFileSource::AddFriend(TString fName) { fFriendFileList.push_back(fName); }
 
@@ -837,6 +863,157 @@ Int_t R3BFileSource::CheckMaxEventNo(Int_t EvtEnd)
         MaxEventNo = fInChain->GetEntries();
     }
     return MaxEventNo;
+}
+
+void R3BFileSource::SetEventMeanTime(Double_t mean)
+{
+    fEventMeanTime = mean;
+    fTimeProb = new TF1("TimeProb", "(1/[0])*exp(-x/[0])", 0., mean * 10);
+    fTimeProb->SetParameter(0, mean);
+    fTimeProb->GetRandom();
+    fEventTimeInMCHeader = kFALSE;
+}
+
+void R3BFileSource::SetEventTimeInterval(Double_t min, Double_t max)
+{
+    fEventTimeMin = min;
+    fEventTimeMax = max;
+    fEventMeanTime = (fEventTimeMin + fEventTimeMax) / 2.0;
+    fEventTimeInMCHeader = kFALSE;
+}
+
+void R3BFileSource::SetBeamTime(Double_t beamTime, Double_t gapTime)
+{
+    fBeamTime = beamTime;
+    fGapTime = gapTime;
+}
+
+void R3BFileSource::SetEventTime()
+{
+    // Check if the time for the current entry is already set
+    if (fTimeforEntryNo == fCurrentEntryNo)
+        return;
+    LOG(debug) << "Set event time for Entry = " << fTimeforEntryNo << " , where the current entry is "
+               << fCurrentEntryNo << " and eventTime is " << fEventTime;
+    if (fBeamTime < 0)
+    {
+        fEventTime += GetDeltaEventTime();
+    }
+    else
+    {
+        do
+        {
+            fEventTime += GetDeltaEventTime();
+        } while (fmod(fEventTime, fBeamTime + fGapTime) > fBeamTime);
+    }
+    LOG(debug) << "New time = " << fEventTime;
+    fTimeforEntryNo = fCurrentEntryNo;
+}
+
+Double_t R3BFileSource::GetDeltaEventTime()
+{
+    Double_t deltaTime = 0;
+    if (fTimeProb != 0)
+    {
+        deltaTime = fTimeProb->GetRandom();
+        LOG(debug) << "Time set via sampling method : " << deltaTime;
+    }
+    else
+    {
+        deltaTime = gRandom->Uniform(fEventTimeMin, fEventTimeMax);
+        LOG(debug) << "Time set via Uniform Random : " << deltaTime;
+    }
+    return deltaTime;
+}
+
+Double_t R3BFileSource::GetEventTime()
+{
+    LOG(debug) << "-- Get Event Time --";
+    if (!fEvtHeaderIsNew && fEvtHeader != 0)
+    {
+        Double_t EvtTime = fEvtHeader->GetEventTime();
+        if (!(EvtTime < 0))
+        {
+            return EvtTime;
+        }
+    }
+
+    if (fEventTimeInMCHeader && !fMCHeader)
+    {
+        LOG(debug) << "No MCEventHeader, time is set to 0";
+        return 0;
+    }
+    else if (fEventTimeInMCHeader && fMCHeader)
+    {
+        fEventTime = fMCHeader->GetT();
+        LOG(debug) << "Get event time from MCEventHeader : " << fEventTime << " ns";
+        return fEventTime;
+    }
+    else
+    {
+
+        if (fTimeforEntryNo != fCurrentEntryNo)
+        {
+            SetEventTime();
+        }
+        LOG(debug) << "Calculate event time from user input : " << fEventTime << " ns";
+        return fEventTime;
+    }
+}
+
+void R3BFileSource::ReadBranchEvent(const char* BrName)
+{
+    /**fill the object with content if the other branches in this tree entry were already read**/
+    if (fEvtHeader == 0)
+    {
+        return;
+    } // No event header, Reading will start later
+    if (fInTree)
+    {
+        fInTree->FindBranch(BrName)->GetEntry(fEvtHeader->GetMCEntryNumber());
+        fEventTime = GetEventTime();
+        return;
+    }
+    if (fInChain)
+    {
+        fInChain->FindBranch(BrName)->GetEntry(fEvtHeader->GetMCEntryNumber());
+        fEventTime = GetEventTime();
+        return;
+    }
+    return;
+}
+
+void R3BFileSource::ReadBranchEvent(const char* BrName, Int_t Entry)
+{
+    fCurrentEntryNo = Entry;
+    if (fInTree)
+    {
+        fInTree->FindBranch(BrName)->GetEntry(Entry);
+        fEventTime = GetEventTime();
+        return;
+    }
+    if (fInChain)
+    {
+        fInChain->FindBranch(BrName)->GetEntry(Entry);
+        fEventTime = GetEventTime();
+        return;
+    }
+    return;
+}
+
+Bool_t R3BFileSource::SpecifyRunId()
+{
+    if (ReadEvent(0) == 0)
+        return true;
+
+    return false;
+}
+
+void R3BFileSource::FillEventHeader(FairEventHeader* feh)
+{
+    ((R3BEventHeader*)feh)->SetRunId(fRunId);
+    ((R3BEventHeader*)feh)->SetInputFileId(0);
+    return;
 }
 
 ClassImp(R3BFileSource);
