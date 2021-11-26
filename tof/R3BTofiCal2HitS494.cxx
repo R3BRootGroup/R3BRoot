@@ -75,7 +75,6 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494()
     , fTofiGap(0)
     , fTofiHisto(true)
     , fTofiTotPos(true)
-    , cal_hand(false)
     , fShowProgress(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -128,7 +127,6 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
     , fTofiGap(0)
     , fTofiHisto(true)
     , fTofiTotPos(true)
-    , cal_hand(false)
     , fShowProgress(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -270,9 +268,9 @@ namespace
 void R3BTofiCal2HitS494::Exec(Option_t* option)
 {
     static uint32_t counter = 0;
-    // if (0 == counter % 10000 && fShowProgress)
-    //   std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
-    //           << std::flush;
+    if (0 == counter % 10000 && fShowProgress)
+        std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
+                  << std::flush;
     ++counter;
 
     // test for requested trigger (if possible)
@@ -508,20 +506,11 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                                                  par->GetPar3Walk(),
                                                  par->GetPar4Walk(),
                                                  par->GetPar5Walk());
-                Double_t tdiff, THit;
-                if (!cal_hand)
-                {
-                    // calculate tdiff
-                    tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
-                    // calculate time of hit
-                    THit = (bot_ns + top_ns) / 2. - par->GetSync();
-                }
-                else
-                {
-                    tdiff = ((bot_ns + par_hand_offset1(iBar)) - (top_ns + par_hand_offset2(iBar)));
-                    THit = (bot_ns + top_ns) / 2. - par_hand_tsync(iBar);
-                }
+                // calculate tdiff
+                auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
 
+                // calculate time of hit
+                Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
                     LOG(FATAL) << "ToFi THit not found";
@@ -530,12 +519,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                     timeP0 = THit;
 
                 // calculate y-position
-<<<<<<< HEAD
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-=======
-                auto pos = tdiff * par->GetVeff();
-                y[iPlane][iBar].push_back(pos);
->>>>>>> 3e348dc0... small changes
 
                 // calculate y-position from ToT
                 auto posToT =
@@ -587,59 +571,44 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                         xp = -detector_width / 2 + paddle_width - air_gap_paddles +
                                                   (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
                 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 3e348dc0... small changes
                 Double_t para[4];
                 Double_t qb = 0.;
-                Double_t parz[3];
-                if (!cal_hand)
+                if (fTofiTotPos)
                 {
-                    if (fTofiTotPos)
-                    {
-                        // via pol3
-                        para[0] = par->GetPola();
-                        para[1] = par->GetPolb();
-                        para[2] = par->GetPolc();
-                        para[3] = par->GetPold();
-                        qb = TMath::Sqrt(top_tot * bot_tot) /
-                             (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
-                        qb = qb * fTofiQ;
-                    }
-                    else
-                    {
-                        // via double exponential:
-                        para[0] = par->GetPar1a();
-                        para[1] = par->GetPar1b();
-                        para[2] = par->GetPar1c();
-                        para[3] = par->GetPar1d();
-                        auto q1 = bot_tot /
-                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                        para[0] = par->GetPar2a();
-                        para[1] = par->GetPar2b();
-                        para[2] = par->GetPar2c();
-                        para[3] = par->GetPar2d();
-                        auto q2 = top_tot /
-                                  (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                        q1 = q1 * fTofiQ;
-                        q2 = q2 * fTofiQ;
-                        qb = (q1 + q2) / 2.;
-                    }
-
-                    // parz[0] * TMath::Power(qb, parz[2]) + parz[1]
-
-                    parz[0] = par->GetPar1za();
-                    parz[1] = par->GetPar1zb();
-                    parz[2] = par->GetPar1zc();
+                    // via pol3
+                    para[0] = par->GetPola();
+                    para[1] = par->GetPolb();
+                    para[2] = par->GetPolc();
+                    para[3] = par->GetPold();
+                    qb = TMath::Sqrt(top_tot * bot_tot) /
+                         (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                    qb = qb * fTofiQ;
                 }
                 else
                 {
-                    qb = TMath::Sqrt(top_tot * bot_tot);
-                    parz[0] = par_hand_z0(iBar);
-                    parz[1] = par_hand_z1(iBar);
-                    parz[2] = 1;
+                    // via double exponential:
+                    para[0] = par->GetPar1a();
+                    para[1] = par->GetPar1b();
+                    para[2] = par->GetPar1c();
+                    para[3] = par->GetPar1d();
+                    auto q1 =
+                        bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                    para[0] = par->GetPar2a();
+                    para[1] = par->GetPar2b();
+                    para[2] = par->GetPar2c();
+                    para[3] = par->GetPar2d();
+                    auto q2 =
+                        top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                    q1 = q1 * fTofiQ;
+                    q2 = q2 * fTofiQ;
+                    qb = (q1 + q2) / 2.;
                 }
+
+                Double_t parz[3];
+                parz[0] = par->GetPar1za();
+                parz[1] = par->GetPar1zb();
+                parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
                     LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
@@ -1094,183 +1063,4 @@ Double_t R3BTofiCal2HitS494::saturation(Double_t x)
     return kor;
 }
 
-<<<<<<< HEAD
-=======
-Double_t* R3BTofiCal2HitS494::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
-{
-    Int_t i;
-
-    // increase the size by 1
-    n++;
-
-    // shift elements forward
-    for (i = n; i >= pos; i--)
-        arr[i] = arr[i - 1];
-
-    // insert x at pos
-    arr[pos - 1] = x;
-
-    return arr;
-}
-// Parameters from "per-hand-calibration" using run 733
-Double_t R3BTofiCal2HitS494::par_hand_tsync(Int_t ibar)
-{
-    Double_t tsync = -100000;
-    if (ibar == 7)
-        tsync = -5.17562e+02;
-    if (ibar == 8)
-        tsync = -5.16876e+02;
-    if (ibar == 9)
-        tsync = -5.15215e+02;
-    if (ibar == 10)
-        tsync = -5.20256e+02;
-    if (ibar == 12)
-        tsync = -5.18244e+02;
-    if (ibar == 13)
-        tsync = -5.19232e+02;
-    if (ibar == 14)
-        tsync = -5.20084e+02;
-    if (ibar == 16)
-        tsync = -5.15419e+02;
-    if (ibar == 17)
-        tsync = -5.18870e+02;
-    if (ibar == 18)
-        tsync = -5.20508e+02;
-
-    return tsync;
-}
-Double_t R3BTofiCal2HitS494::par_hand_offset1(Int_t ibar)
-{
-    Double_t offset1 = -100000, offset = -100000;
-    if (ibar == 7)
-        offset = 2.08234e+00;
-    if (ibar == 8)
-        offset = -1.40398e+00;
-    if (ibar == 9)
-        offset = -3.74038e+00;
-    if (ibar == 10)
-        offset = -1.02994e+00;
-    if (ibar == 12)
-        offset = -4.80451e+00;
-    if (ibar == 13)
-        offset = -3.16849e+00;
-    if (ibar == 14)
-        offset = -4.45574e+00;
-    if (ibar == 16)
-        offset = -4.45243e+00;
-    if (ibar == 17)
-        offset = 5.98254e-01;
-    if (ibar == 18)
-        offset = -2.11175e+00;
-    offset1 = offset / 2.;
-
-    return offset1;
-}
-Double_t R3BTofiCal2HitS494::par_hand_offset2(Int_t ibar)
-{
-    Double_t offset2 = -100000, offset = -100000;
-    if (ibar == 7)
-        offset = 2.08234e+00;
-    if (ibar == 8)
-        offset = -1.40398e+00;
-    if (ibar == 9)
-        offset = -3.74038e+00;
-    if (ibar == 10)
-        offset = -1.02994e+00;
-    if (ibar == 12)
-        offset = -4.80451e+00;
-    if (ibar == 13)
-        offset = -3.16849e+00;
-    if (ibar == 14)
-        offset = -4.45574e+00;
-    if (ibar == 16)
-        offset = -4.45243e+00;
-    if (ibar == 17)
-        offset = -5.86291e-01;
-    if (ibar == 18)
-        offset = -2.11175e+00;
-    offset2 = -offset / 2.;
-
-    return offset2;
-}
-Double_t R3BTofiCal2HitS494::par_hand_z0(Int_t ibar)
-{
-    Double_t pz0 = 0.;
-    // run773
-    /*
-        if(ibar == 7)  pz0 = 0.03726;
-        if(ibar == 8)  pz0 = 0.035;
-        if(ibar == 9)  pz0 = 0.03999;
-        if(ibar == 10) pz0 = 0.04397;
-        if(ibar == 12) pz0 = 0.04065;
-        if(ibar == 13) pz0 = 0.042167;
-        if(ibar == 14) pz0 = 0.0369;
-        if(ibar == 16) pz0 = 0.0407;
-        if(ibar == 17) pz0 = 0.034;
-        if(ibar == 18) pz0 = 0.0359;
-    */
-    // run 888
-    if (ibar == 7)
-        pz0 = 0.0459909;
-    if (ibar == 8)
-        pz0 = 0.0406258;
-    if (ibar == 9)
-        pz0 = 0.0415913;
-    if (ibar == 10)
-        pz0 = 0.0558919;
-    if (ibar == 12)
-        pz0 = 0.042745;
-    if (ibar == 13)
-        pz0 = 0.048281;
-    if (ibar == 14)
-        pz0 = 0.0430772;
-    if (ibar == 16)
-        pz0 = 0.0433941;
-    if (ibar == 17)
-        pz0 = 0.0399835;
-    if (ibar == 18)
-        pz0 = 0.0459427;
-    return pz0;
-}
-Double_t R3BTofiCal2HitS494::par_hand_z1(Int_t ibar)
-{
-    Double_t pz1 = -10000.;
-    // run773
-    /*
-        if(ibar == 7)  pz1 = 0.8244;
-        if(ibar == 8)  pz1 = 0.69992;
-        if(ibar == 9)  pz1 = 0.3775;
-        if(ibar == 10) pz1 = 0.713;
-        if(ibar == 12) pz1 = 0.3453;
-        if(ibar == 13) pz1 = 0.3231;
-        if(ibar == 14) pz1 = 0.7604;
-        if(ibar == 16) pz1 = 0.4214;
-        if(ibar == 17) pz1 = 0.7348;
-        if(ibar == 18) pz1 = 0.8659;
-    */
-    // run 888
-    if (ibar == 7)
-        pz1 = 1.40193;
-    if (ibar == 8)
-        pz1 = 1.18128;
-    if (ibar == 9)
-        pz1 = 0.844289;
-    if (ibar == 10)
-        pz1 = 0.92245;
-    if (ibar == 12)
-        pz1 = 0.847642;
-    if (ibar == 13)
-        pz1 = 0.886767;
-    if (ibar == 14)
-        pz1 = 1.22044;
-    if (ibar == 16)
-        pz1 = 0.925259;
-    if (ibar == 17)
-        pz1 = 1.27328;
-    if (ibar == 18)
-        pz1 = 1.39018;
-    return pz1 - 0.5;
-}
-
->>>>>>> 3e348dc0... small changes
 ClassImp(R3BTofiCal2HitS494)

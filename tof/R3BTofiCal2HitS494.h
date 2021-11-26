@@ -138,21 +138,7 @@ class R3BTofiCal2HitS494 : public FairTask
      */
     virtual Double_t saturation(Double_t x);
     /**
-<<<<<<< HEAD
-=======
-     * Method for insert.
-     */
-    virtual Double_t* insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos);
 
-    /* per-hand hit parameetrs */
-    virtual Double_t par_hand_tsync(Int_t ibar);
-    virtual Double_t par_hand_offset1(Int_t ibar);
-    virtual Double_t par_hand_offset2(Int_t ibar);
-    virtual Double_t par_hand_z0(Int_t ibar);
-    virtual Double_t par_hand_z1(Int_t ibar);
-
-    /**
->>>>>>> 3e348dc0... small changes
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
