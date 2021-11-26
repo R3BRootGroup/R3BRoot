@@ -276,9 +276,10 @@ namespace
 void R3BTofdCal2HitS494::Exec(Option_t* option)
 {
     static uint32_t counter = 0;
-    if (0 == counter % 10000)
-        std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
-                  << std::flush;
+    //  if (0 == counter % 10000)
+    //     std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %)
+    //     "
+    //              << std::flush;
     ++counter;
     
     // test for requested trigger (if possible)

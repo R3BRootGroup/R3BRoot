@@ -173,7 +173,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
         fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 4000, -2000, 2000);
         fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
-        fh_rolu_tof->GetYaxis()->SetTitle("ToF / ns");
+        fh_rolu_tof->GetYaxis()->SetTitle("Rolu time / ns");
 
         fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels", 10, 0, 10);
         fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
@@ -207,7 +207,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         // get the theoretical calib factors for IC
         Double_t fexp_ic = float(fsens_IC + 7);
         Double_t fpow_ic = float(pow(10., fexp_ic));
-        calib_IC = 5551. * fpow_ic;
+        calib_IC = 1; // 5551. * fpow_ic;
         cout << "IC     : " << fsens_IC << ", " << fexp_ic << ", " << fpow_ic << ", " << calib_IC << endl;
 
         TCanvas* cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 900);
@@ -272,8 +272,8 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_IC_TOFDOR->GetYaxis()->SetTitle("IC counts/spill");
         fh_IC_TOFDOR->GetXaxis()->SetTitle("TOFDOR counts/spill");
 
-        fh_IC_SEE = new TH1F("IC_vs_SEE", "IC vs SEE ", 500000, 0, 500000);
-        fh_IC_SEE->GetYaxis()->SetTitle("SEE counts/spill");
+        fh_IC_SEE = new TH1F("IC_vs_SEE", "IC vs SEE ", 10000, 0, 10000);
+        fh_IC_SEE->GetYaxis()->SetTitle("SEE particles/spill");
         fh_IC_SEE->GetXaxis()->SetTitle("IC counts /spill");
 
         cbmon->Divide(6, 3);
@@ -351,6 +351,7 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
     fh_SROLU2_spill->Reset();
     fh_SEE_TOFDOR->Reset();
     fh_IC_TOFDOR->Reset();
+    fh_IC_SEE->Reset();
     time_start = -1;
 }
 
@@ -567,9 +568,10 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                         if (in_spill_off == 1)
                         {
                             Double_t spill_length = double(time_spill_end - time_spill_start) / 1.e9;
-                            tofdor_spill = tofdor_spill / spill_length;
-                            ic_spill = ic_spill / spill_length;
-                            see_spill = see_spill / spill_length;
+                            //  *1e3 while yDet_part is in kHz
+                            tofdor_spill = tofdor_spill * 1e3; // / spill_length;
+                            ic_spill = ic_spill * 1e3;         // / spill_length;
+                            see_spill = see_spill * 1e3;       // / spill_length;
                             nBeamParticle += see_spill;
                             //     cout<<"Spill counts: "<<ic_spill<<", "<<see_spill<<", "<<spill_length<<endl;
 
@@ -733,7 +735,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         }
     } // end if fCalItems(ROLU)
 
-    if (fHitItems.at(DET_TOFD))
+    if (fHitItems.at(DET_TOFD) && fHitItems.at(DET_ROLU))
     {
         auto detTofd = fHitItems.at(DET_TOFD);
         Int_t nHits = detTofd->GetEntriesFast();
@@ -747,31 +749,27 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 if (IS_NAN(hitTofd->GetTime()))
                     continue;
                 Double_t ttt = hitTofd->GetTime();
-
-                if (fHitItems.at(DET_ROLU))
+                auto detHitRolu = fHitItems.at(DET_ROLU);
+                Int_t nHitsRolu = detHitRolu->GetEntriesFast();
+                for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
                 {
-                    auto detHitRolu = fHitItems.at(DET_ROLU);
-                    Int_t nHitsRolu = detHitRolu->GetEntriesFast();
-                    for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
-                    {
-                        R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
-                        Int_t iDetRolu = hitRolu->GetDetector();
-                        Int_t iCha = hitRolu->GetChannel() - 1;
-                        Double_t timeRolu = hitRolu->GetTime();
-                        Double_t totRolu = hitRolu->GetToT();
-                        Double_t tof = 0. / 0.;
-                        //  tof = fmod(ttt - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                    Int_t iDetRolu = hitRolu->GetDetector();
+                    Int_t iCha = hitRolu->GetChannel() - 1;
+                    Double_t timeRolu = hitRolu->GetTime();
+                    Double_t totRolu = hitRolu->GetToT();
+                    Double_t tof = 0. / 0.;
+                    //  tof = fmod(ttt - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
 
-                        tof = ttt - timeRolu;
+                    tof = ttt - timeRolu;
 
-                        if (std::abs(hitTofd->GetY()) < 60)
-                            continue; // trigger events in tofd
-                        if (iDetRolu < 2)
-                            fh_rolu_tof->Fill(iCha + 1, tof);
-                        if (iDetRolu > 1)
-                            fh_rolu_tof->Fill(iCha + 5, tof);
-                    }
-                } // end if fHitItems(ROLU)
+                    if (std::abs(hitTofd->GetY()) < 60)
+                        continue; // trigger events in tofd
+                    if (iDetRolu < 2)
+                        fh_rolu_tof->Fill(iCha + 1, timeRolu);
+                    if (iDetRolu > 1)
+                        fh_rolu_tof->Fill(iCha + 5, timeRolu);
+                }
             }
         }
     } // end if fHitItems(TOFD)

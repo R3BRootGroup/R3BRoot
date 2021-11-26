@@ -218,7 +218,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found"; // return kFATAL;
+        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found";
     }
 
     //-----------------------------------------------------------------------
@@ -265,8 +265,8 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         for (Int_t i = 0; i < 2; i++)
         {
             fh_Rolu_ToF[i] =
-                new TH2F(Form("tofRolu%d", i + 1), Form("tofRolu%d", i + 1), 5, 0, 5, 12000, -6000., 6000.);
-            fh_Rolu_ToF[i]->GetYaxis()->SetTitle("ToF / ns");
+                new TH2F(Form("timeRolu%d", i + 1), Form("timeRolu%d", i + 1), 5, 0, 5, 12000, -6000., 6000.);
+            fh_Rolu_ToF[i]->GetYaxis()->SetTitle("Time / ns");
             fh_Rolu_ToF[i]->GetXaxis()->SetTitle("Channel");
 
             fh_ToT_Rolu[i] = new TH2F(
@@ -814,19 +814,22 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
     //    cout<<"TOFD nHits: "<<nHits<<endl;
 
-    if (fHitItems.at(DET_TOFD)->GetEntriesFast() > 0)
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() > 0)
         fNEvents_local += 1;
-    if (fHitItems.at(DET_TOFD)->GetEntriesFast() < 1)
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() < 1)
         fNEvents_zeroToFD += 1;
-    if (fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast() > 0)
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast() > 0)
         fNEvents_califa += 1;
-    if (fHitItems.at(DET_TOFI)->GetEntriesFast() > 0)
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFI)->GetEntriesFast() > 0)
         fNEvents_tofi += 1;
-    for (Int_t detfib = 0; detfib < 2; detfib++)
-    {
-        if (fHitItems.at(detfib)->GetEntriesFast() > 0)
-            fNEvents_fibers += 1;
-    }
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(0)->GetEntriesFast() > 0 &&
+        fHitItems.at(1)->GetEntriesFast() > 0) // fib23a && 23b
+        fNEvents_fibers += 1;
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() > 3 &&
+        fHitItems.at(0)->GetEntriesFast() > 0 && fHitItems.at(1)->GetEntriesFast() > 0 &&
+        fHitItems.at(2)->GetEntriesFast() > 0 && fHitItems.at(3)->GetEntriesFast() > 0 &&
+        fHitItems.at(4)->GetEntriesFast() > 0 && fHitItems.at(5)->GetEntriesFast() > 0)
+        fNEvents_pair += 1;
 
     if (nHits > 0)
     {
@@ -1337,10 +1340,10 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                     Double_t timeRolu = hitRolu->GetTime();
                     Double_t totRolu = hitRolu->GetToT();
 
-                    tof = fmod(tStart - timeRolu + c_period + c_period / 2, c_period) - c_period / 2;
+                    tof = tStart - timeRolu;
                     //   if(std::abs(hitTofd->GetY()) < 60) continue;   // trigger events in tofd
                     fh_ToT_Rolu[iDetRolu - 1]->Fill(qqq, totRolu);
-                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, tof);
+                    fh_Rolu_ToF[iDetRolu - 1]->Fill(iCha, timeRolu);
 
                     if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
                         continue;
@@ -1955,6 +1958,7 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     cout << "Events w/o Rolu and with Califa    : " << fNEvents_califa << endl;
     cout << "Events w/o Rolu and with ToFI      : " << fNEvents_tofi << endl;
     cout << "Events w/o Rolu and with fibers23  : " << fNEvents_fibers << endl;
+    cout << "Events with two particles          : " << fNEvents_pair << endl;
     cout << "  " << endl;
     cout << "Wrong Trigger: " << counterWrongTrigger << endl;
     cout << "Wrong Tpat: " << counterWrongTpat << endl;

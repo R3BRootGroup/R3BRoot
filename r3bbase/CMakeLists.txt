@@ -76,6 +76,7 @@ R3BOnlineSpectraPID.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
 R3BGlobalAnalysisS494.cxx
+R3BGlobalCorrelationsS494.cxx
 R3BTrackS454.cxx
 R3BTrackS494.cxx
 R3BTrackerTestS454.cxx

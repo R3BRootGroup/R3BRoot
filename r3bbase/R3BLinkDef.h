@@ -34,6 +34,7 @@
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
 #pragma link C++ class R3BGlobalAnalysisS494+;
+#pragma link C++ class R3BGlobalCorrelationsS494+;
 #pragma link C++ class R3BTrackS454+;
 #pragma link C++ class R3BTrackS494+;
 #pragma link C++ class R3BTrackerTestS454+;

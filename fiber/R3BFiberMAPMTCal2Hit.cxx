@@ -521,6 +521,14 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     Double_t eloss = sqrt(tot_down * tot_up);
                     //  eloss = 2.069*eloss-10.414;  // testing Q
+                    // Z calib, run 773
+                    // if (fName == "Fi30") eloss =
+                    // -415.06629+174.67595*eloss-24.234506*eloss*eloss+1.1193663*eloss*eloss*eloss; if (fName ==
+                    // "Fi31") eloss = -197.91146+90.109359*eloss-13.516177*eloss*eloss+0.68043217*eloss*eloss*eloss; if
+                    // (fName == "Fi32") eloss =
+                    // -156.00382+70.021718*eloss-10.350304*eloss*eloss+0.51455325*eloss*eloss*eloss; if (fName ==
+                    // "Fi33") eloss = -298.60978+130.07812*eloss-18.699849*eloss*eloss+0.89852388*eloss*eloss*eloss;
+
                     Double_t t = tof;
 
                     multi++;

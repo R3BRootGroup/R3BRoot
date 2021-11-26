@@ -119,6 +119,8 @@ class R3BTofiCal2HitS494 : public FairTask
     inline void SetTofiGap(Float_t Gap) { fTofiGap = Gap; }
 
     inline void SetShowProgress(Float_t progress) { fShowProgress = progress; }
+    
+    inline void SetCalOpt(Bool_t cal) {cal_hand = cal;}
     /**
      * Old Method for walk calculation.
      */
@@ -136,6 +138,21 @@ class R3BTofiCal2HitS494 : public FairTask
      */
     virtual Double_t saturation(Double_t x);
     /**
+<<<<<<< HEAD
+=======
+     * Method for insert.
+     */
+    virtual Double_t* insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos);
+
+    /* per-hand hit parameetrs */
+    virtual Double_t par_hand_tsync(Int_t ibar);
+    virtual Double_t par_hand_offset1(Int_t ibar);
+    virtual Double_t par_hand_offset2(Int_t ibar);
+    virtual Double_t par_hand_z0(Int_t ibar);
+    virtual Double_t par_hand_z1(Int_t ibar);
+
+    /**
+>>>>>>> 3e348dc0... small changes
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
@@ -162,6 +179,7 @@ class R3BTofiCal2HitS494 : public FairTask
     Int_t fTrigger;             /**< Trigger value. */
     Int_t fTpat1,fTpat2;
     Double_t fTofiQ;
+    Bool_t cal_hand;
     Float_t fTofiGap;
     Bool_t fTofiHisto;
     Bool_t fTofiTotPos;

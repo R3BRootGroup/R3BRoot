@@ -182,7 +182,7 @@ class R3BOnlineSpectraFibvsToFDS494 : public FairTask
     unsigned long long time_start = 0, time = 0;
     unsigned long long tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0, fNEvents_veto = 0, fNEvents_califa = 0,
-    fNEvents_tofi = 0, fNEvents_fibers = 0, fNEvents_zeroToFD = 0; /**< Event counter. */
+    fNEvents_tofi = 0, fNEvents_fibers = 0, fNEvents_pair = 0,fNEvents_zeroToFD = 0; /**< Event counter. */
     unsigned long long time_spill_start = 0, time_spill_end = 0;
 	Double_t ftofminFib2x, ftofmaxFib2x, ftofminFib3x, ftofmaxFib3x, ftofminTofi, ftofmaxTofi, fqtofdmin, fqtofdmax;
     Int_t maxevent;
