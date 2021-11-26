@@ -375,7 +375,12 @@ class R3BTrackS494 : public FairTask
 	TH1F* fh_Erel_simu;
 	TH1F* fh_theta26;
 	TH1F* fh_Erel;
-
+	
+	TH1F* fh_res_xA[10];
+	TH1F* fh_res_xC[10];
+	TH1F* fh_res_yA[10];
+	TH1F* fh_res_yC[10];
+	
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	

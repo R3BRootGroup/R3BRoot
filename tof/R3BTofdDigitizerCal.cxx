@@ -44,6 +44,9 @@
 #include <string>
 #include <vector>
 
+using std::cout;
+using std::endl;
+
 R3BTofdDigitizerCal::R3BTofdDigitizerCal()
     : FairTask("R3B Tofd Digitization scheme ")
     , fTofdPoints(NULL)
@@ -240,9 +243,10 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                     timeT_up = timeL_up + ToT_up;
                     timeT_down = timeL_down + ToT_down;
 
-                    /*cout<<"layer= "<<layer_label<<" paddle= "<<paddle_number<<" elos= "<<ernd<<"  time= "
+                    /*
+                    cout<<"layer= "<<layer_label<<" paddle= "<<paddle_number<<" elos= "<<ernd<<"  time= "
                         <<timernd<< " tL_up= "<<timeL_up<<" tT_up= "<<timeT_up<<" tL_down= "<<timeL_down
-                        <<" tT_down= "<<timeT_down<<endl;
+                        <<" tT_down= "<<timeT_down<<" yrnd="<<yrnd<<endl;
                     */
                     /*   CalData format:      --> in Tree:
                         fPlane(detector) 1-4  --> TofdCal.fDetector
@@ -252,10 +256,10 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                       , fTrailing_ns(trail)   --> TofdCal.fTrailing_ns
                     */
                     new ((*Hits)[Hits->GetEntries()])
-                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 1, timeL_up, timeT_up);
+                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_up, timeT_up);
 
                     new ((*Hits)[Hits->GetEntries()])
-                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
+                        R3BTofdCalData(layer_label + 1, paddle_number + 1, 1, timeL_down, timeT_down);
 
                     // Int_t card = (int)paddle_number/8.+layer_label*6;
                     for (Int_t j = 0; j < 12; j++)

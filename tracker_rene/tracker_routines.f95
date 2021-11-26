@@ -41,14 +41,14 @@ module vars
  double precision   :: b_field(3), v(3)                            ! magnetic field, velocity
  double precision   :: b_field_position_in_lab(4)                ! position of magnetic field coordinate system in lab-frame (x,y,z,rotation_around_y-axis)
  double precision   :: glad_current                                ! magnetic field map will be multiplied with this number divided by 3584...
- double precision,parameter   :: glad_current_nominal_current=3547.d0        ! previous 3584, current for which the field map is calculated
+ double precision,parameter   :: glad_current_nominal_current=3545.   !3547.   !3584.d0        ! current for which the field map is calculated
  double precision   :: a_over_q, m, m2                                !A/Z in AMU/e
  double precision   :: q_e, q                                      ! charge of particle in elementary unit + SI 
  double precision   :: master_borders(3,2)                         ! borders of master volume ((xmin,xmax),(ymin,ymax),(zmin,zmax))
  double precision   :: b_field_borders(3,2)                     ! borders of magnetic field ((xmin,xmax),(ymin,ymax),(zmin,zmax))
  double precision   :: spatial_resolution                         ! spatial resolution of the entire geometry, given by best detector resolution...
  double precision   :: max_momentum_deviation(3)                   ! constrains the possible solutions when multiple tracks are possible
- double precision,parameter,dimension(2)   :: crossing_resolution=(/5.d-3,1.d-3/)                          ! spatial resolution allowed for crossing tracks x,y direction
+ double precision,parameter,dimension(2)   :: crossing_resolution=(/5.,1./)                          ! spatial resolution allowed for crossing tracks x,y direction
  double precision   :: slope_parameter(4)                         ! parameters of the linear slope describing the particle track outside the magnetic field area
  double precision,parameter,dimension(3) :: norm_x = (/1.d0,0.d0,0.d0/)  ! norm-vector in x-direction ...
  double precision,parameter,dimension(3) :: norm_y = (/0.d0,1.d0,0.d0/)  ! norm-vector in y-direction ...
@@ -407,12 +407,12 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
    track_points_charge(d,new_hit)      = charge_in(i)
  end do  
  if (debug_track) then
-   write(output_unit,*) 'multi: sorted events'
+   write(output_unit,*) 'multi: sorted events (charge, det-frame, lab-frame)'
    do d=1,nbr_detectors 
      write(output_unit,*)
      write(output_unit,*) detector_name(d)
      do i=1,nbr_hits_per_detector(d)
-       write(output_unit,*) track_points_charge(d,i), track_points_det_frame(d,i,:)
+       write(output_unit,*) track_points_charge(d,i), track_points_det_frame(d,i,:), track_points_lab_frame(d,i,:)
      end do
    end do
  end if

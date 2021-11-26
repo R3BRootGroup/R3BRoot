@@ -36,7 +36,7 @@ class R3BFi23aDigitizerCal : public FairTask
     R3BFi23aDigitizerCal(const char* name, Int_t iVerbose = 1);
    
     /** Destructor **/
-   virtual  ~R3BFi23aDigitizerCal();
+    virtual  ~R3BFi23aDigitizerCal();
 
     /** Virtual method Init **/
     virtual InitStatus Init();

@@ -256,10 +256,10 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     {
         Double_t p = sqrt(fPx * fPx + fPy * fPy + fPz * fPz);
 
-		Double_t test = gRandom->Uniform(-1, 1);	
+		//Double_t test = gRandom->Uniform(-1, 1);	
+		Double_t test = -1;
 		if(test < 0) 
-		{
-        
+		{        
 			Double_t thetaX = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
 			// Double_t thetaX = fAngle;
 			fPx = tan(thetaX) * fPz;
@@ -270,6 +270,9 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 			//Double_t thetaY = 0.;
 			fPy = tan(thetaY) * fPz;
 		}
+
+		//Double_t thetaY = 0.04;
+		//fPy = tan(thetaY) * fPz;
 			
         fPz = sqrt(p * p - fPx * fPx - fPy * fPy);
         // cout<< " theta "<< thetaX << "  " << thetaY << "  "<<endl;

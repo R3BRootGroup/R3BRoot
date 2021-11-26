@@ -259,6 +259,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
+	TH1F* fh_sum_pz;
 	
   public:
     ClassDef(R3BGlobalAnalysisS454, 1)

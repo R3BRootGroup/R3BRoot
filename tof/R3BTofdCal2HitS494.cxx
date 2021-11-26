@@ -560,9 +560,15 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 // calculate y-position
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
 
+				// cout << "Test1: " << pos << " bot: " << bot_ns << " top: " << top_ns << " offsets: " << par->GetOffset1() <<
+				// "  " << par->GetOffset2() << " veff: " << par->GetVeff() << endl;
+				
                 // calculate y-position from ToT
                 auto posToT =
                     par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+
+				// cout << "Test2: " << posToT << " bot: " << bot_tot << " top: " << top_tot << " offsets: " << par->GetToTOffset1() <<
+				// "  " << par->GetToTOffset2() << " lambda: " << par->GetLambda() << endl;
 
                 if (fTofdTotPos)
                     pos = posToT;
@@ -617,7 +623,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                         para[0] = par->GetPar2a();
                         para[1] = par->GetPar2b();
                         para[2] = par->GetPar2c();
-                        para[3] = par->GetPar2d();
+                        para[3] = par->GetPar2d(); 
                         auto q2 = top_tot /
                                   (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                         q1 = q1 * fTofdQ;
@@ -626,8 +632,10 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                     }
                 }
                 else
+                {
                     qb = TMath::Sqrt(top_tot * bot_tot);
-
+				}
+				
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();
                 parz[1] = par->GetPar1zb();

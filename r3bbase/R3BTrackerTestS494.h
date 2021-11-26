@@ -307,14 +307,24 @@ class R3BTrackerTestS494 : public FairTask
     TH1F* fh_target_pz;
     TH1F* fh_target_p;
     TH1F* fh_chi2;
+
     TH1F* fh_px_He;
     TH1F* fh_py_He;
     TH1F* fh_pz_He;
     TH1F* fh_p_He;
+    TH1F* fh_dpx_He;
+    TH1F* fh_dpy_He;
+    TH1F* fh_dpz_He;
+    TH1F* fh_dp_He;
+
     TH1F* fh_px_C;
     TH1F* fh_py_C;
     TH1F* fh_pz_C;
     TH1F* fh_p_C;
+    TH1F* fh_dpx_C;
+    TH1F* fh_dpy_C;
+    TH1F* fh_dpz_C;
+    TH1F* fh_dp_C;
 
     TH2F* fh_chiy_vs_chix;
     TH2F* fh_chi2_vs_Erel;
@@ -343,13 +353,19 @@ class R3BTrackerTestS494 : public FairTask
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	
-	TH1F* fh_res_x[10];
-	TH1F* fh_res_y[10];
+	TH1F* fh_res_xA[10];
+	TH1F* fh_res_yA[10];
+	TH1F* fh_res_xC[10];
+	TH1F* fh_res_yC[10];
 	
 	TH2F* fh_xy[10];
 	TH2F* fh_p_vs_x[10];
 	TH2F* fh_p_vs_x_test[10];
 	TH2F* fh_Erel_vs_xfh_Erel_vs_x;
+
+	TH1F* fh_totalPz;
+	TH1F* fh_totalPz_reco;
+	
 	
   public:
     ClassDef(R3BTrackerTestS494, 1)

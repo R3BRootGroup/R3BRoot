@@ -643,7 +643,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
         sprintf(strName2, "Time Sync Plane %d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -2000, 2000.);
+        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -500, 500.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }

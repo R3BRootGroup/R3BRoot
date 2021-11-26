@@ -462,7 +462,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
                     Double_t y = -10000.;
-                    Double_t veff = 12. / 4.; // cm/ns
+                    Double_t veff = 12. / 2.; // cm/ns
                     Double_t randx = (std::rand() / (float)RAND_MAX);
                     if (fName == "Fi23a" || fName == "Fi23b")
                     {
@@ -476,11 +476,11 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                             x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
-                            y = (t_up - t_down) * veff;
+                            y = (t_down - t_up) * veff; 
                         }
                         else
                         {
-                            x = (t_up - t_down) * veff;
+                            x = (t_down - t_up) * veff;
 
                             y = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
@@ -489,6 +489,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
                     {
                         Float_t fiber_thickness = 0.10000; // cm
+                        if (fName == "Fi30") fiber_thickness = 0.1034;
+                        if (fName == "Fi31") fiber_thickness = 0.1033;
+                        if (fName == "Fi32") fiber_thickness = 0.1024;
+                        if (fName == "Fi33") fiber_thickness = 0.1025;
                         Int_t fiber_nbr = 512;
                         Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
@@ -498,12 +502,12 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         {
                             x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_up - t_down) * veff;
+                            y = (t_down - t_up) * veff;
                             // y = 0.;
                         }
                         else
                         {
-                            x = (t_up - t_down) * veff;
+                            x = (t_down - t_up) * veff;
                             // x = 0.;
                             y = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;

@@ -360,6 +360,10 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_theta26_simu = new TH1F("theta26_simu", "theta 26 simulation", 500, 0., 5);
     fh_theta26_simu->GetXaxis()->SetTitle("angle / degree");
     fh_theta26_simu->GetYaxis()->SetTitle("counts");
+    
+    fh_sum_pz = new TH1F("fh_sum_pz", "Sum pz He and C ", 5000, -10., 10);
+    fh_sum_pz->GetXaxis()->SetTitle("total Pz / MeV/c");
+    fh_sum_pz->GetYaxis()->SetTitle("counts");
 
     fh_Erel = new TH1F("Erel", "Erel ", 5000, 0., 100);
     fh_Erel->GetXaxis()->SetTitle("Erel / MeV");
@@ -425,7 +429,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Bool_t is_carbon = false;
 
     // Choose original MC data or exp. data
-    Bool_t simData = false;
+    Bool_t simData = true;
 
     if (fTrack && !simData)
     {
@@ -675,6 +679,8 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 phi_bc_cm += 360.;
             fh_phi_bc_cm->Fill(phi_bc_cm);
             fh_phi_bc_cm_polar->Fill(phi_bc_cm, 1);
+
+			fh_sum_pz->Fill(alpha_cm.Pz() + carbon_cm.Pz());
 
             /*
                         // rotation in oxygen direction
@@ -1097,7 +1103,9 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_px_px_cm->Fill(pHex_cm, pCx_cm);
             fh_py_py_cm->Fill(pHey_cm, pCy_cm);
             fh_pz_pz_cm->Fill(pHez_cm, pCz_cm);
-
+			
+			fh_sum_pz->Fill(pHez_cm + pCz_cm);
+			
         } // end if chi2
     }     // end if trackHits>1
 
@@ -1183,5 +1191,6 @@ void R3BGlobalAnalysisS454::FinishTask()
     fh_px_px_cm->Write();
     fh_py_py_cm->Write();
     fh_pz_pz_cm->Write();
+    fh_sum_pz->Write();
 }
 ClassImp(R3BGlobalAnalysisS454)

@@ -409,11 +409,13 @@ void R3BTofdCal2HistoPar::calcSync()
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t MaxEntry = histo_py->GetBinContent(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 10., Max + 10.);
-                fgaus->SetParameters(MaxEntry, Max, 20);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 2., Max + 2.);
+                fgaus->SetParameters(MaxEntry, Max, 0.05);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
+                //cout << "old value: " << par << " binmax: " <<  binmax << " Max: " << Max << " Maxentry: " << MaxEntry
+                //<< " sync: " << sync << endl;
                 LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
