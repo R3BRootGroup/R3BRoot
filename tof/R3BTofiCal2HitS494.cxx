@@ -317,7 +317,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             vmultihits[i][j] = 0;
         }
     }
-    struct hit {
+    struct hit
+    {
         Double_t charge;
         Double_t time;
         Double_t xpos;
@@ -328,7 +329,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
     //    std::cout<<"new event!*************************************\n";
     std::vector<hit> event;
-    
+
     Int_t nHits = fCalItems->GetEntries();
     // Organize cals into bars.
     struct Entry
@@ -549,27 +550,25 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
                 // calculate x-position
                 randx = (std::rand() / (float)RAND_MAX);
-                Double_t xp=-1000.;
+                Double_t xp = -1000.;
                 if (iPlane == 1 || iPlane == 3)
                 {
                     //	-detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
                     //                            (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
 
                     if (iBar <= number_paddles / 2)
-                        xp = -detector_width / 2 + paddle_width / 2 +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles);
+                        xp = -detector_width / 2 + paddle_width / 2 + (iBar - 1) * (paddle_width + air_gap_paddles);
                     else
                         xp = -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
+                             (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
                 }
                 if (iPlane == 2 || iPlane == 4)
                 {
                     if (iBar <= number_paddles / 2)
-                        xp = -detector_width / 2 + paddle_width +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles);
+                        xp = -detector_width / 2 + paddle_width + (iBar - 1) * (paddle_width + air_gap_paddles);
                     else
                         xp = -detector_width / 2 + paddle_width - air_gap_paddles +
-                                                  (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
+                             (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer;
                 }
 
                 Double_t para[4];
@@ -645,28 +644,14 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
-                   event.push_back({
-                       parz[0] * TMath::Power(qb, parz[2]) + parz[1],
-                       THit,
-                       xp,
-                       pos,
-                       iPlane,
-                       iBar
-                       });
+                    event.push_back({ parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar });
                 }
                 else
                 {
                     parz[0] = 1.;
                     parz[1] = 0.;
                     parz[2] = 1.;
-                    event.push_back({
-                        qb,
-                        THit,
-                        xp,
-                        pos,
-                        iPlane,
-                        iBar
-                        });
+                    event.push_back({ qb, THit, xp, pos, iPlane, iBar });
                 }
 
                 if (fTofiHisto)
@@ -703,7 +688,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
 
     // init arrays to store hits
     Bool_t tArrU[event.size() + 1];
-    for (int i = 0; i < (event.size() + 1); i++) tArrU[i] = kFALSE;
+    for (int i = 0; i < (event.size() + 1); i++)
+        tArrU[i] = kFALSE;
 
     for (Int_t i = 1; i <= fNofPlanes; i++)
     {
@@ -717,31 +703,27 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         }
     }
 
-    std::sort(event.begin(), event.end(), [](hit const &a, hit const &b) { return a.time < b.time; });
+    std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    LOG(DEBUG)<<"Charge Time xpos ypos plane bar";
-    for(Int_t hit=0; hit<event.size(); hit++)
+    LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+    for (Int_t hit = 0; hit < event.size(); hit++)
     {
-        LOG(DEBUG)<<event[hit].charge<<" "<<
-        event[hit].time<<" "<<
-        event[hit].xpos<<" "<<
-        event[hit].ypos<<" "<<
-        event[hit].plane<<" "<<
-        event[hit].bar;
+        LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
+                   << " " << event[hit].plane << " " << event[hit].bar;
     }
 
     // Now we can analyze the hits in this event
 
     if (fTofiHisto)
     {
-        size_t ihit=0;
+        size_t ihit = 0;
         for (; ihit < event.size();)
         { // loop over all hits
             eventstore++;
-            fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge);        // charge per plane
+            fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge); // charge per plane
             fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge); // charge vs event #
-            fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos); // xy of plane
+            fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos);  // xy of plane
             ihit++;
         }
     }
@@ -753,15 +735,14 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             tArrU[hit] = true;
             // store single hits
             singlehit++;
-            new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(
-                    event[hit].time,
-                    event[hit].xpos,
-                    event[hit].ypos,
-                    event[hit].charge,
-                    -1.,
-                    event[hit].charge,
-                    event[hit].plane,
-                    event[hit].bar);
+            new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(event[hit].time,
+                                                              event[hit].xpos,
+                                                              event[hit].ypos,
+                                                              event[hit].charge,
+                                                              -1.,
+                                                              event[hit].charge,
+                                                              event[hit].plane,
+                                                              event[hit].bar);
         }
     }
 

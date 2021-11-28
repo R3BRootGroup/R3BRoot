@@ -185,8 +185,8 @@ void R3BTofiDigitizerCal::Exec(Option_t* opt)
 
         // creating the final hits
 
-        int layer_label;
-        int paddle_number;
+        int layer_label = -100;
+        int paddle_number = -100;
         Double_t yrnd, yns, ToT_up, ToT_down, ernd, ens, timernd, timeL_up = -1., timeL_down = -1., timeT_up = -1.,
                                                                   timeT_down = -1.;
         Int_t mult = 0;
