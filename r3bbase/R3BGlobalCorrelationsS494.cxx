@@ -16,8 +16,8 @@
 #include "R3BTofdHitData.h"
 #include "R3BTofdMappedData.h"
 
-#include "R3BCalifaMappedData.h"
 #include "R3BBeamMonitorMappedData.h"
+#include "R3BCalifaMappedData.h"
 
 #include "R3BTofiCalData.h"
 #include "R3BTofiHitData.h"
@@ -152,8 +152,8 @@ R3BGlobalCorrelationsS494::~R3BGlobalCorrelationsS494()
     delete fh_ToT_Tofi;
     for (Int_t i = 0; i < 7; i++)
     {
-		delete fh_xy_Tofi[i];
-	}
+        delete fh_xy_Tofi[i];
+    }
 
     for (Int_t i = 0; i < 2; i++)
     {
@@ -181,7 +181,7 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
-    run->GetHttpServer()->Register("/Tasks", this);
+    //   run->GetHttpServer()->Register("/Tasks", this);
 
     // Get objects for detectors on all levels
 
@@ -215,10 +215,9 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found"; 
+        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found";
     }
 
-    
     //-----------------------------------------------------------------------
     // Fiber Detectors 1-NOF_FIB_DET
 
@@ -226,7 +225,7 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     UInt_t Nmax = 1e7;
     TCanvas* cFib = new TCanvas("Fib", "Fib", 10, 10, 910, 910);
     cFib->Divide(8, 4);
-    
+
     Double_t fexp = float(fsens_SEE + 9);
     Double_t fpow = float(pow(10., fexp));
     calib_SEE = 104457.9 * fpow;
@@ -238,31 +237,31 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     fh_IC_spill = new TH1F("IC_spill", "IC particles rate in kHz ", Nbin_bmon, 0, reset_time);
     fh_IC_spill->GetXaxis()->SetTitle("time / sec");
     fh_IC_spill->GetYaxis()->SetTitle("Particles / kHz");
-    
+
     fh_IC_SEE = new TH1F("IC_vs_SEE", "IC vs SEE ", 10000, 0, 10000);
     fh_IC_SEE->GetYaxis()->SetTitle("SEE particles/spill");
     fh_IC_SEE->GetXaxis()->SetTitle("IC counts /spill");
-    
+
     TCanvas* cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 300);
-    cbmon->Divide(3,1);
-        cbmon->cd(1);
-        fh_SEE_spill->Draw("hist");
-        cbmon->cd(2);
-        fh_IC_spill->Draw("hist");
-        cbmon->cd(3);
-        fh_IC_SEE->SetMarkerStyle(21);
-        fh_IC_SEE->Draw("hist p");
-      
-        cbmon->cd(0);
+    cbmon->Divide(3, 1);
+    cbmon->cd(1);
+    fh_SEE_spill->Draw("hist");
+    cbmon->cd(2);
+    fh_IC_spill->Draw("hist");
+    cbmon->cd(3);
+    fh_IC_SEE->SetMarkerStyle(21);
+    fh_IC_SEE->Draw("hist p");
 
-        run->AddObject(cbmon);
+    cbmon->cd(0);
 
-        run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
-        
+    //    run->AddObject(cbmon);
+
+    //  run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
+
     if (fHitItems.at(DET_TOFI))
     {
         // ToF Tofd -> Fiber:
-        fh_Tofi_ToF = new TH2F("t1_t2", "t1-t2", 2000, -1000., 1000.,400,0,20);
+        fh_Tofi_ToF = new TH2F("t1_t2", "t1-t2", 2000, -1000., 1000., 400, 0, 20);
         fh_Tofi_ToF->GetXaxis()->SetTitle("t1-t2 / ns");
         fh_Tofi_ToF->GetYaxis()->SetTitle("Z1+Z2");
 
@@ -277,52 +276,50 @@ InitStatus R3BGlobalCorrelationsS494::Init()
         fh_ToT_Tofi_ac = new TH2F("Zsum_eq_8", "Z1 + Z2 = 8", 400, 0., 20., 400, 0., 20.);
         fh_ToT_Tofi_ac->GetXaxis()->SetTitle("Z1");
         fh_ToT_Tofi_ac->GetYaxis()->SetTitle("Z2");
-		
-		for (Int_t i = 0; i < 7; i++)
-        {
-			fh_xy_Tofi[i] = new TH2F(Form("X_vs_Dx_Z%d",i+2),Form( "x vs Dx for z%d",i+2), 1600, -80., 80., 1200, -60., 60.);
-			fh_xy_Tofi[i]->GetYaxis()->SetTitle("Dx fib3x / cm ");
-			fh_xy_Tofi[i]->GetXaxis()->SetTitle("x / cm");
-		}
 
-        fh_xy_Tofi_ac = new TH2F("Z_vs_Dx_x", "Z vs Dx/x",400, 0., 20., 2000, -1., 1.);
+        for (Int_t i = 0; i < 7; i++)
+        {
+            fh_xy_Tofi[i] =
+                new TH2F(Form("X_vs_Dx_Z%d", i + 2), Form("x vs Dx for z%d", i + 2), 1600, -80., 80., 1200, -60., 60.);
+            fh_xy_Tofi[i]->GetYaxis()->SetTitle("Dx fib3x / cm ");
+            fh_xy_Tofi[i]->GetXaxis()->SetTitle("x / cm");
+        }
+
+        fh_xy_Tofi_ac = new TH2F("Z_vs_Dx_x", "Z vs Dx/x", 400, 0., 20., 2000, -1., 1.);
         fh_xy_Tofi_ac->GetYaxis()->SetTitle("Dx/x fib3x");
         fh_xy_Tofi_ac->GetXaxis()->SetTitle("Nuclear charge ");
-        
+
         fh_Z_vs_x = new TH2F("Z_vs_x", "Z vs x ", 1600, -80., 80, 400, 0., 20.);
         fh_Z_vs_x->GetXaxis()->SetTitle("x / cm");
         fh_Z_vs_x->GetYaxis()->SetTitle("Z");
-        
+
         fh_Z_vs_dthit = new TH2F("Z_vs_dthit", "Z vs dthit", 2400, -400., 800, 400, 0., 20.);
         fh_Z_vs_dthit->GetXaxis()->SetTitle("time between two hits / ns");
-        fh_Z_vs_dthit->GetYaxis()->SetTitle("Z");        
-        
+        fh_Z_vs_dthit->GetYaxis()->SetTitle("Z");
+
         fh_ztofi = new TH2F("Z_vs_x_tofi", "Z vs x toFI", 200, -10., 10, 400, 0., 20.);
         fh_ztofi->GetXaxis()->SetTitle("x / cm");
         fh_ztofi->GetYaxis()->SetTitle("Z");
-        
-        
     }
-        fh_ztofd = new TH2F("Z_vs_y_tofd", "Z vs y toFD", 1600, -80., 80, 400, 0., 20.);
-        fh_ztofd->GetXaxis()->SetTitle("y / cm");
-        fh_ztofd->GetYaxis()->SetTitle("Z");
-        
-        for (Int_t i = 0; i < 3; i++)
-        {
-			fh_time_tofd[i] = new TH1F(Form("timeToFD%d", i + 1), Form("TimeToFD%d", i + 1), 2000, -1000., 1000.);
-			fh_time_tofd[i]->GetXaxis()->SetTitle("time / ns");
-			fh_time_tofd[i]->GetYaxis()->SetTitle("counts");
-		}
-		
-		fh_yy= new TH2F("yToFD_vs_yFib23b", "yToFD vs yFib23b", 320, -80., 80.,1600, -80., 80);
-        fh_yy->GetXaxis()->SetTitle("yFib23b / cm ");
-        fh_yy->GetYaxis()->SetTitle("yToFD / cm ");
-        
-        fh_xy_tofd= new TH2F("yToFD_vs_xToFD", "yToFD vs xToFD", 1600, -80., 80.,1600, -80., 80);
-        fh_xy_tofd->GetXaxis()->SetTitle("xToFD / cm ");
-        fh_xy_tofd->GetYaxis()->SetTitle("yToFD / cm ");
-        
-        
+    fh_ztofd = new TH2F("Z_vs_y_tofd", "Z vs y toFD", 1600, -80., 80, 400, 0., 20.);
+    fh_ztofd->GetXaxis()->SetTitle("y / cm");
+    fh_ztofd->GetYaxis()->SetTitle("Z");
+
+    for (Int_t i = 0; i < 3; i++)
+    {
+        fh_time_tofd[i] = new TH1F(Form("timeToFD%d", i + 1), Form("TimeToFD%d", i + 1), 2000, -1000., 1000.);
+        fh_time_tofd[i]->GetXaxis()->SetTitle("time / ns");
+        fh_time_tofd[i]->GetYaxis()->SetTitle("counts");
+    }
+
+    fh_yy = new TH2F("yToFD_vs_yFib23b", "yToFD vs yFib23b", 320, -80., 80., 1600, -80., 80);
+    fh_yy->GetXaxis()->SetTitle("yFib23b / cm ");
+    fh_yy->GetYaxis()->SetTitle("yToFD / cm ");
+
+    fh_xy_tofd = new TH2F("yToFD_vs_xToFD", "yToFD vs xToFD", 1600, -80., 80., 1600, -80., 80);
+    fh_xy_tofd->GetXaxis()->SetTitle("xToFD / cm ");
+    fh_xy_tofd->GetYaxis()->SetTitle("yToFD / cm ");
+
     if (fCalItems.at(DET_ROLU))
     {
         for (Int_t i = 0; i < 2; i++)
@@ -349,19 +346,20 @@ InitStatus R3BGlobalCorrelationsS494::Init()
             fh_ToT_Rolu_ac[i]->GetYaxis()->SetTitle("Rolu ToT / ns");
         }
     }
-    
-    fh_xy_target_ac= new TH2F("xtarget_vs_ytarget_Zsum8", "xtarget vs ytarget for Z1+Z2=8", 1200, -6., 6.,1200, -6., 6);
+
+    fh_xy_target_ac =
+        new TH2F("xtarget_vs_ytarget_Zsum8", "xtarget vs ytarget for Z1+Z2=8", 1200, -6., 6., 1200, -6., 6);
     fh_xy_target_ac->GetXaxis()->SetTitle("xtarget / cm ");
     fh_xy_target_ac->GetYaxis()->SetTitle("ytarget / cm ");
-    
-    fh_xy_target= new TH2F("xtarget_vs_ytarget", "xtarget vs ytarget", 1200, -6., 6.,1200, -6., 6);
+
+    fh_xy_target = new TH2F("xtarget_vs_ytarget", "xtarget vs ytarget", 1200, -6., 6., 1200, -6., 6);
     fh_xy_target->GetXaxis()->SetTitle("xtarget / cm ");
     fh_xy_target->GetYaxis()->SetTitle("ytarget / cm ");
-    
-    fh_Fib32_ToF= new TH2F("tfib32_vs_ttofd", "tfib32 vs ttofd", 1000, -500, 500.,1000, -500., 500);
+
+    fh_Fib32_ToF = new TH2F("tfib32_vs_ttofd", "tfib32 vs ttofd", 1000, -500, 500., 1000, -500., 500);
     fh_Fib32_ToF->GetXaxis()->SetTitle("time fi32 /ns");
     fh_Fib32_ToF->GetYaxis()->SetTitle("time tofd / ns ");
-    
+
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
         // cout<<"In the loop for ifibcout= "<<ifibcount<<endl;
@@ -485,7 +483,6 @@ InitStatus R3BGlobalCorrelationsS494::Init()
 
     } // end for(ifibcount)
 
-
     fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
     fhTpat->GetXaxis()->SetTitle("Tpat value");
 
@@ -523,7 +520,7 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     gPad->SetLogz();
     fh_xy_Tofi[2]->Draw("colz");
     cFib->cd(19);
-    //gPad->SetLogz();
+    // gPad->SetLogz();
     fh_time_tofd[0]->Draw();
     cFib->cd(27);
     gPad->SetLogz();
@@ -537,10 +534,9 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     fh_xy_Tofi[3]->Draw("colz");
     cFib->cd(20);
     gPad->SetLogz();
-  //gPad->SetLogz();
+    // gPad->SetLogz();
     fh_time_tofd[1]->Draw();
     cFib->cd(28);
-    
 
     cFib->cd(5);
     //  gPad->SetLogy();
@@ -549,10 +545,9 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     gPad->SetLogz();
     fh_xy_Tofi[4]->Draw("colz");
     cFib->cd(21);
-    //gPad->SetLogz();
+    // gPad->SetLogz();
     fh_time_tofd[2]->Draw();
     cFib->cd(29);
-    
 
     cFib->cd(6);
     //  gPad->SetLogy();
@@ -562,48 +557,48 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     fh_xy_Tofi[5]->Draw("colz");
     cFib->cd(22);
     gPad->SetLogz();
-  /*  if (fCuts)
-        fh_Fibs_vs_Tofd_ac[5]->Draw("colz");
-    else
-        fh_Fibs_vs_Tofd[5]->Draw("colz");
-    cFib->cd(30);
-    fh_counter_fi33->Draw("colz");*/
+    /*  if (fCuts)
+          fh_Fibs_vs_Tofd_ac[5]->Draw("colz");
+      else
+          fh_Fibs_vs_Tofd[5]->Draw("colz");
+      cFib->cd(30);
+      fh_counter_fi33->Draw("colz");*/
 
-        cFib->cd(7);
-        gPad->SetLogz();
-        fh_ToT_Tofi->Draw("colz");
-        cFib->cd(15);
-        gPad->SetLogz();
-        fh_xy_Tofi[6]->Draw("colz");
-        cFib->cd(23);
-        gPad->SetLogz();
-        fh_xy_Tofi_ac->Draw("colz");
-        cFib->cd(31);
-        gPad->SetLogz();
-        fh_xy_target->Draw("colz");
-   
-        cFib->cd(8);
-        gPad->SetLogz();
-        fh_ToT_Tofi_ac->Draw("colz"); 
-        cFib->cd(16);
-        gPad->SetLogz();
-        fh_Z_vs_x->Draw("colz");  
-        cFib->cd(24);
-        gPad->SetLogz();
-		fh_Z_vs_dthit->Draw("colz");
-		cFib->cd(32);
-        gPad->SetLogz();
-		fh_xy_target_ac->Draw("colz");			
+    cFib->cd(7);
+    gPad->SetLogz();
+    fh_ToT_Tofi->Draw("colz");
+    cFib->cd(15);
+    gPad->SetLogz();
+    fh_xy_Tofi[6]->Draw("colz");
+    cFib->cd(23);
+    gPad->SetLogz();
+    fh_xy_Tofi_ac->Draw("colz");
+    cFib->cd(31);
+    gPad->SetLogz();
+    fh_xy_target->Draw("colz");
 
+    cFib->cd(8);
+    gPad->SetLogz();
+    fh_ToT_Tofi_ac->Draw("colz");
+    cFib->cd(16);
+    gPad->SetLogz();
+    fh_Z_vs_x->Draw("colz");
+    cFib->cd(24);
+    gPad->SetLogz();
+    fh_Z_vs_dthit->Draw("colz");
+    cFib->cd(32);
+    gPad->SetLogz();
+    fh_xy_target_ac->Draw("colz");
 
     cFib->cd(0);
 
     //   cout<<"****** Finished with spectra def ******* "<<endl;
-    run->AddObject(cFib);
-    run->GetHttpServer()->RegisterCommand("Reset_Fib", Form("/Tasks/%s/->Reset_All()", GetName()));
+    //   run->AddObject(cFib);
+    //  run->GetHttpServer()->RegisterCommand("Reset_Fib", Form("/Tasks/%s/->Reset_All()", GetName()));
 
     return kSUCCESS;
 }
+/*
 void R3BGlobalCorrelationsS494::Reset_BMON_Histo()
 {
     fh_SEE_spill->Reset();
@@ -615,19 +610,19 @@ void R3BGlobalCorrelationsS494::Reset_All()
 {
     for (Int_t i_FIB_DET = 0; i_FIB_DET < NOF_FIB_DET; i_FIB_DET++)
     {
-        
+
             fh_Fibs_vs_Tofd_ac[i_FIB_DET]->Reset();
             fh_xy_Fib_ac[i_FIB_DET]->Reset();
             fh_Fib_ToF_ac[i_FIB_DET]->Reset();
             fh_ToT_Fib_ac[i_FIB_DET]->Reset();
-        
-        
+
+
             fh_xy_Fib[i_FIB_DET]->Reset();
             fh_Fib_ToF[i_FIB_DET]->Reset();
             fh_ToT_Fib[i_FIB_DET]->Reset();
             fh_Fibs_vs_Tofd[i_FIB_DET]->Reset();
             fh_ToF_vs_Events[i_FIB_DET]->Reset();
-        
+
     }
     fh_xy_target_ac->Reset();
     fh_xy_target->Reset();
@@ -638,12 +633,12 @@ void R3BGlobalCorrelationsS494::Reset_All()
     if (fHitItems.at(DET_TOFI))
     {
         fh_Tofi_ToF->Reset();
-        
+
             fh_ToT_Tofi_ac->Reset();
             fh_xy_Tofi_ac->Reset();
             fh_ToT_Tofi->Reset();
           //  fh_xy_Tofi->Reset();
-        
+
     }
 
     if (fCalItems.at(DET_ROLU))
@@ -660,7 +655,7 @@ void R3BGlobalCorrelationsS494::Reset_All()
         }
     }
 }
-
+*/
 void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 {
     Bool_t debug2 = false;
@@ -670,57 +665,56 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-        time = header->GetTimeStamp();
-       //   if (time == 0 && time > 1.e19)
-        //  return;
-    
-       fNEvents_total += 1;
-    
-       if (time_begin == -1 && time > 0 && time_end < 1 )
-		{
-			time_begin = time;
-		}
+    time = header->GetTimeStamp();
+    //   if (time == 0 && time > 1.e19)
+    //  return;
 
-		if (time_start == -1 && time > 0)
-		{
-			time_start = time;
-			fNEvents_start = fNEvents_total;
-		}
+    fNEvents_total += 1;
 
-		if (header->GetTrigger() == 12)
-		{
-			time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
-			cout << "Spill start: " << double(time_spill_start - time_begin) / 1.e9 << " sec "<<endl;
-			// reset counters:
-			see_spill = 0;
-			ic_spill = 0;
-			spill_on = true;
-			in_spill_off = 0;
-			fNSpills += 1;
-		}
-		if (header->GetTrigger() == 13)
-		{
-			time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
-			cout << "Spill stop: " << double(time_spill_end - time_begin) / 1.e9 << " sec " << endl;
-			spill_on = false;
-		}
+    if (time_begin == -1 && time > 0 && time_end < 1)
+    {
+        time_begin = time;
+    }
 
-		Int_t tpatbin;
-		for (int i = 0; i < 16; i++)
-		{
-			tpatbin = (header->GetTpat() & (1 << i));
-			if (tpatbin != 0)
-				fhTpat->Fill(i + 1);
-		}
+    if (time_start == -1 && time > 0)
+    {
+        time_start = time;
+        fNEvents_start = fNEvents_total;
+    }
 
-    
-     if (fMappedItems.at(DET_BMON) && fMappedItems.at(DET_BMON)->GetEntriesFast() > 0)
+    if (header->GetTrigger() == 12)
+    {
+        time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
+        cout << "Spill start: " << double(time_spill_start - time_begin) / 1.e9 << " sec " << endl;
+        // reset counters:
+        see_spill = 0;
+        ic_spill = 0;
+        spill_on = true;
+        in_spill_off = 0;
+        fNSpills += 1;
+    }
+    if (header->GetTrigger() == 13)
+    {
+        time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
+        cout << "Spill stop: " << double(time_spill_end - time_begin) / 1.e9 << " sec " << endl;
+        spill_on = false;
+    }
+
+    Int_t tpatbin;
+    for (int i = 0; i < 16; i++)
+    {
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0)
+            fhTpat->Fill(i + 1);
+    }
+
+    if (fMappedItems.at(DET_BMON) && fMappedItems.at(DET_BMON)->GetEntriesFast() > 0)
     {
         Bool_t spectra_clear = false;
         Double_t xtime = double(time - time_start) / 1.e9;
         // for reseting spectra
         Int_t icount = iclear_count * reset_time; // reset after reset_time (sec)
-        
+
         if (xtime > reset_time)
         {
             time_clear = xtime;
@@ -742,15 +736,15 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 
             IC = hit->GetIC();           // negative values if offset not high enough
             SEETRAM = hit->GetSEETRAM(); // negative values if offset not high enough
-            
+
             if (fNEvents_total == fNEvents_start)
             {
                 see_mem = SEETRAM;
-                ic_mem = IC;               
+                ic_mem = IC;
                 time_mem = time_start;
                 see_first = SEETRAM;
                 see_start = SEETRAM;
-                ic_start = IC;               
+                ic_start = IC;
                 time_prev_read = time_start;
             }
 
@@ -788,11 +782,11 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     // correlations:
                     if (spill_on)
                     {
-						if (ySEE_mem > 0 && ySEE_mem_mem > 0 && yIC_mem > 0 && yIC_mem_mem > 0)
+                        if (ySEE_mem > 0 && ySEE_mem_mem > 0 && yIC_mem > 0 && yIC_mem_mem > 0)
                         {
-						    see_spill += ySEE_part;
+                            see_spill += ySEE_part;
                             ic_spill += yIC_part;
-                            nBeamParticle += ySEE_part*1e3; // / spill_length;                           
+                            nBeamParticle += ySEE_part * 1e3; // / spill_length;
                         }
                     }
                     if (!spill_on && time_spill_start > 0 && time_spill_end > 0)
@@ -801,14 +795,14 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                         if (in_spill_off == 1)
                         {
                             Double_t spill_length = double(time_spill_end - time_spill_start) / 1.e9;
-                           //  *1e3 while yDet_part is in kHz
-                            ic_spill = ic_spill *1e3; // / spill_length;
-                            see_spill = see_spill *1e3; // / spill_length;
-                            //     cout<<"Spill counts: "<<ic_spill<<", "<<see_spill<<", "<<spill_length<<endl;                           
+                            //  *1e3 while yDet_part is in kHz
+                            ic_spill = ic_spill * 1e3;   // / spill_length;
+                            see_spill = see_spill * 1e3; // / spill_length;
+                            //     cout<<"Spill counts: "<<ic_spill<<", "<<see_spill<<", "<<spill_length<<endl;
                             fh_IC_SEE->Fill(ic_spill, see_spill);
                         }
                     }
-                    nOffSpillParticle += ySEE_part*1e3; // / spill_length; 
+                    nOffSpillParticle += ySEE_part * 1e3; // / spill_length;
                     ySEE_mem_mem = ySEE_mem;
                     yIC_mem_mem = yIC_mem;
 
@@ -818,39 +812,38 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 }
 
                 if (spectra_clear)
-                {                    
+                {
                     fh_IC_spill->Reset("ICESM");
-                    fh_SEE_spill->Reset("ICESM");                   
+                    fh_SEE_spill->Reset("ICESM");
                     time_mem = time;
                     time_clear = -1.;
                     time_start = -1;
                     iclear_count = iclear_count + 1;
                     spectra_clear = false;
                     see_start = SEETRAM;
-                    ic_start = IC;                    
+                    ic_start = IC;
                 }
             }
         }
     }
-    
-    	if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-		{
-			counterWrongTrigger++;
-			return;
-		 }		 
-		// fTpat = 1-16; fTpat_bit = 0-15
-		Int_t fTpat_bit1 = fTpat1 - 1;
-		Int_t fTpat_bit2 = fTpat2 - 1;
-		for (int i = 0; i < 16; i++)
-		{
-			tpatbin = (header->GetTpat() & (1 << i));
-			if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
-			{
-				counterWrongTpat++;
-				return;
-			}
-		}   
-   
+
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    {
+        counterWrongTrigger++;
+        return;
+    }
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    for (int i = 0; i < 16; i++)
+    {
+        tpatbin = (header->GetTpat() & (1 << i));
+        if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+        {
+            counterWrongTpat++;
+            return;
+        }
+    }
 
     Int_t fibMaxFi30 = 0, fibMaxFi31 = 0, fibMaxFi32 = 0, fibMaxFi33 = 0, fibMaxFi23a = 0, fibMaxFi23b = 0,
           fibMaxTofi = 0;
@@ -869,7 +862,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
     Double_t z2[n_det];
     Double_t q2[n_det];
     Double_t t2[n_det];
- 
+
     Int_t id, id1, id2;
 
     Int_t det = 0;
@@ -917,9 +910,9 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
     nHitstemp = 0;
 
     fNEvents += 1;
-  //  if (fNEvents / 10000. == (int)fNEvents / 10000)
-  //      std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-   //               << " %) " << std::flush;
+    //  if (fNEvents / 10000. == (int)fNEvents / 10000)
+    //      std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+    //               << " %) " << std::flush;
 
     // Software Veto cut:
     if (fVeto && fHitItems.at(DET_ROLU)->GetEntriesFast() > 0)
@@ -935,19 +928,19 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
     Double_t qtemp[n_det][nHits];
     Double_t ttemp[n_det][nHits];
     Double_t ttraw[n_det][nHits];
-    for(Int_t i =0; i<n_det; i++)
+    for (Int_t i = 0; i < n_det; i++)
     {
-		for(Int_t k=0; k< nHits; k++)
-		{
-			xtemp[i][k] = 0./0.;
-			ytemp[i][k] = 0./0.;
-			ztemp[i][k] = 0./0.;
-			qtemp[i][k] = 0./0.;
-			ttemp[i][k] = 0./0.;
-			ttraw[i][k] = 0./0.;
-		}
-	}
-    
+        for (Int_t k = 0; k < nHits; k++)
+        {
+            xtemp[i][k] = 0. / 0.;
+            ytemp[i][k] = 0. / 0.;
+            ztemp[i][k] = 0. / 0.;
+            qtemp[i][k] = 0. / 0.;
+            ttemp[i][k] = 0. / 0.;
+            ttraw[i][k] = 0. / 0.;
+        }
+    }
+
     //    cout<<"TOFD nHits: "<<nHits<<endl;
 
     if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() > 0)
@@ -958,12 +951,14 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
         fNEvents_califa += 1;
     if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFI)->GetEntriesFast() > 0)
         fNEvents_tofi += 1;
-    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(0)->GetEntriesFast() > 0 && fHitItems.at(1)->GetEntriesFast() > 0)  // fib23a && 23b
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(0)->GetEntriesFast() > 0 &&
+        fHitItems.at(1)->GetEntriesFast() > 0) // fib23a && 23b
         fNEvents_fibers += 1;
-    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() > 3 && fHitItems.at(0)->GetEntriesFast() > 0 && 
-        fHitItems.at(1)->GetEntriesFast() > 0 && fHitItems.at(2)->GetEntriesFast() > 0 && 
-        fHitItems.at(3)->GetEntriesFast() > 0 && fHitItems.at(4)->GetEntriesFast() > 0 && 
-        fHitItems.at(5)->GetEntriesFast() > 0) fNEvents_pair += 1;
+    if (fHitItems.at(DET_ROLU)->GetEntriesFast() < 1 && fHitItems.at(DET_TOFD)->GetEntriesFast() > 3 &&
+        fHitItems.at(0)->GetEntriesFast() > 0 && fHitItems.at(1)->GetEntriesFast() > 0 &&
+        fHitItems.at(2)->GetEntriesFast() > 0 && fHitItems.at(3)->GetEntriesFast() > 0 &&
+        fHitItems.at(4)->GetEntriesFast() > 0 && fHitItems.at(5)->GetEntriesFast() > 0)
+        fNEvents_pair += 1;
 
     if (nHits > 0)
     {
@@ -977,9 +972,9 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 
         // if (nHits > 100)
         //   return;
- // create tofd_ && tofdr hits
+        // create tofd_ && tofdr hits
 
-        Int_t nSumtofd1l = 0, nSumtofd2l = 0,nSumtofd1r = 0, nSumtofd2r = 0; 
+        Int_t nSumtofd1l = 0, nSumtofd2l = 0, nSumtofd1r = 0, nSumtofd2r = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
@@ -998,35 +993,33 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             Double_t ttt = hitTofd->GetTime();
             tStart = ttt;
             Double_t qqq = hitTofd->GetEloss();
-            fh_ztofd->Fill(yyy,qqq);
-            fh_xy_tofd->Fill(xxx,yyy);
-            
+            fh_ztofd->Fill(yyy, qqq);
+            fh_xy_tofd->Fill(xxx, yyy);
+
             // loop over fiber 23b
-						auto detHit23b = fHitItems.at(DET_FI23B);
-						Int_t nHits23b = detHit23b->GetEntriesFast();
-						LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-						for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-						{
-							det = fi23b;
-							R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-							randx = (std::rand() / (float)RAND_MAX) - 0.5;
-							x1[det] = hit23b->GetX() ; // cm
-							y1[det] = hit23b->GetY() + 0.028 * randx;
-							z1[det] = 0.;
-							q1[det] = hit23b->GetEloss();
-							t1[det] = hit23b->GetTime();
-                            tof = tStart -t1[det];
-                            
-						//	if (fCuts && (t1[det] < -20 || t1[det] > 20))
-							//	continue;
-							if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-							continue;
-							
-							
-							if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-								continue;							                           
-						}
-            
+            auto detHit23b = fHitItems.at(DET_FI23B);
+            Int_t nHits23b = detHit23b->GetEntriesFast();
+            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+            for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+            {
+                det = fi23b;
+                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                x1[det] = hit23b->GetX(); // cm
+                y1[det] = hit23b->GetY() + 0.028 * randx;
+                z1[det] = 0.;
+                q1[det] = hit23b->GetEloss();
+                t1[det] = hit23b->GetTime();
+                tof = tStart - t1[det];
+
+                //	if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                //	continue;
+                if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+                    continue;
+
+                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                    continue;
+            }
 
             Bool_t tofd_left = false;
             Bool_t tofd_right = false;
@@ -1035,7 +1028,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             if ((id2 == 2 && hitTofd->GetBarId() == 24) || (id2 == 2 && hitTofd->GetBarId() == 21))
                 continue;
 
-            if (xxx <= 0. ) //hitTofd->GetX() < 0.)
+            if (xxx <= 0.) // hitTofd->GetX() < 0.)
             {
                 // tof rechts
                 tofd_right = true;
@@ -1050,7 +1043,6 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     ttraw[tofd1r][nSumtofd1r] = hitTofd->GetTimeRaw();
                     nSumtofd1r += 1;
                     fh_time_tofd[0]->Fill(hitTofd->GetTime());
-                    
                 }
                 else if (id2 == 2)
                 {
@@ -1062,7 +1054,6 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     ttraw[tofd2r][nSumtofd2r] = hitTofd->GetTimeRaw();
                     nSumtofd2r += 1;
                     fh_time_tofd[1]->Fill(hitTofd->GetTime());
-                    
                 }
                 else if (id2 == 12)
                 {
@@ -1084,7 +1075,6 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     ttraw[tofd1l][nSumtofd1l] = hitTofd->GetTimeRaw();
                     nSumtofd1l += 1;
                     fh_time_tofd[0]->Fill(hitTofd->GetTime());
-                    
                 }
                 else if (id2 == 2)
                 {
@@ -1096,7 +1086,6 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     ttraw[tofd2l][nSumtofd2l] = hitTofd->GetTimeRaw();
                     nSumtofd2l += 1;
                     fh_time_tofd[1]->Fill(hitTofd->GetTime());
-                    
                 }
                 else if (id2 == 12)
                 {
@@ -1105,248 +1094,245 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             }
 
             counterTofdMulti++;
-
-	     }
-	     Double_t xl[100], tl[100],yl[100],ql[100];
-	     Double_t xr[100], tr[100],yr[100],qr[100];
-	     for(Int_t i=0; i<100; i++)
-	     {
-			xl[i]=0./0.;
-			yl[i]=0./0.;
-			tl[i]=0./0.;
-			ql[i]=0./0.;
-			xr[i]=0./0.;
-			yr[i]=0./0.;
-			tr[i]=0./0.;
-			qr[i]=0./0.; 
-		 }
-	     
- // create goot tofdl and tofdr hits	     
-	     Int_t nSuml = 0;
-	     for(Int_t il2 = 0; il2 <tofd2l; il2++)
-	     {
-			 for(Int_t il1 = 0; il1 <tofd1l; il1++)
-			 {
-				 if(std::abs(ttemp[tofd2l][il2]-ttemp[tofd1l][il1]) < 20. &&
-				    std::abs(xtemp[tofd2l][il2]-xtemp[tofd1l][il1]) < 2.  &&
-				    std::abs(qtemp[tofd2l][il2]-qtemp[tofd1l][il1]) < 1. )				 
-				 {
-					 xl[nSuml]=(xtemp[tofd2l][il2]+xtemp[tofd1l][il1])/2.;
-					 tl[nSuml]=(ttemp[tofd2l][il2]+ttemp[tofd1l][il1])/2.;
-					 yl[nSuml]=(ytemp[tofd2l][il2]+ytemp[tofd1l][il1])/2.;
-					 ql[nSuml]=(qtemp[tofd2l][il2]+qtemp[tofd1l][il1])/2.;
-					 nSuml += 1;
-				 }
-			 }
-		 }
-		 Int_t nSumr = 0;
-	     for(Int_t ir2 = 0; ir2 <tofd2r; ir2++)
-	     {
-			 for(Int_t ir1 = 0; ir1 <tofd1r; ir1++)
-			 {
-				 if(std::abs(ttemp[tofd2r][ir2]-ttemp[tofd1r][ir1]) < 20. &&
-				    std::abs(xtemp[tofd2r][ir2]-xtemp[tofd1r][ir1]) < 2.  &&
-				    std::abs(qtemp[tofd2r][ir2]-qtemp[tofd1r][ir1]) < 1.  &&
-				    xtemp[tofd2r][ir2]<= 0. && xtemp[tofd1r][ir1] <= 0.)				 
-				 {
-					 xr[nSumr]=(xtemp[tofd2r][ir2]+xtemp[tofd1r][ir1])/2.;
-					 tr[nSumr]=(ttemp[tofd2r][ir2]+ttemp[tofd1r][ir1])/2.;
-					 yr[nSumr]=(ytemp[tofd2r][ir2]+ytemp[tofd1r][ir1])/2.;
-					 qr[nSumr]=(qtemp[tofd2r][ir2]+qtemp[tofd1r][ir1])/2.;
-					 nSumr += 1;
-				 }
-			 }
-		 }
-// add to tofdr / tofdl hits tofi hits
-
-            // loop over TOFI
-      /*     if (fHitItems.at(DET_TOFI))
-            {
-                auto detHitTofi = fHitItems.at(DET_TOFI);
-                Int_t nHitsTofi = detHitTofi->GetEntriesFast();
-                LOG(DEBUG) << "Tofi hits: " << nHitsTofi << endl;
-
-                Int_t icl=0, icr=0;
-                for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
-                {
-                    det = tofi;
-                    R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
-                    randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                    x1[det] = hitTofi->GetX() + 0.5 * randx; // cm
-                    y1[det] = hitTofi->GetY();               // cm
-                    z1[det] = 0.;
-                    q1[det] = hitTofi->GetEloss();
-                    t1[det] = hitTofi->GetTime()+249.;  
-                    fh_ztofi->Fill(x1[det],q1[det]);
-                    fh_time_tofd[2]->Fill(hitTofi->GetTime());
-                    
-                // tof rechts
-                    if (x1[det] <= 0.)
-                    {
- 						 xr[nSumr+icr]=x1[det];
-						 tr[nSumr+icr]=t1[det];
-						 yr[nSumr+icr]=y1[det];
-						 qr[nSumr+icr]=q1[det] ;
-						 icr += 1;
-					 }
-					 else
-					 {
-						 xl[nSuml+icl]=x1[det];
-						 tl[nSuml+icl]=t1[det];
-						 yl[nSuml+icl]=y1[det];
-						 ql[nSuml+icl]=q1[det]; 
-						 icl += 1;
-					 }
-                    
-                }
-                nSumr = nSumr+icr;
-                nSuml = nSuml+icl;
-            }*/		 
-         Double_t tmem = 0;   
-         for (Int_t ihitr = 0; ihitr < nSumr; ihitr++)
+        }
+        Double_t xl[100], tl[100], yl[100], ql[100];
+        Double_t xr[100], tr[100], yr[100], qr[100];
+        for (Int_t i = 0; i < 100; i++)
         {
-			fh_Z_vs_x->Fill(xr[ihitr],qr[ihitr]);
-			if(ihitr > 0) fh_Z_vs_dthit->Fill(tr[ihitr]-tmem,qr[ihitr]);
-			tmem = tr[ihitr];
-		}
-		tmem = 0;
-		 for (Int_t ihitl = 0; ihitl < nSuml; ihitl++)
-		{
-			fh_Z_vs_x->Fill(xl[ihitl],ql[ihitl]);
-			if(ihitl > 0) fh_Z_vs_dthit->Fill(tl[ihitl]-tmem,ql[ihitl]);
-			tmem = tl[ihitl];
-	     }
-	     
-// correlations left-right tofd / fib23	     		  
+            xl[i] = 0. / 0.;
+            yl[i] = 0. / 0.;
+            tl[i] = 0. / 0.;
+            ql[i] = 0. / 0.;
+            xr[i] = 0. / 0.;
+            yr[i] = 0. / 0.;
+            tr[i] = 0. / 0.;
+            qr[i] = 0. / 0.;
+        }
+
+        // create goot tofdl and tofdr hits
+        Int_t nSuml = 0;
+        for (Int_t il2 = 0; il2 < tofd2l; il2++)
+        {
+            for (Int_t il1 = 0; il1 < tofd1l; il1++)
+            {
+                if (std::abs(ttemp[tofd2l][il2] - ttemp[tofd1l][il1]) < 20. &&
+                    std::abs(xtemp[tofd2l][il2] - xtemp[tofd1l][il1]) < 2. &&
+                    std::abs(qtemp[tofd2l][il2] - qtemp[tofd1l][il1]) < 1.)
+                {
+                    xl[nSuml] = (xtemp[tofd2l][il2] + xtemp[tofd1l][il1]) / 2.;
+                    tl[nSuml] = (ttemp[tofd2l][il2] + ttemp[tofd1l][il1]) / 2.;
+                    yl[nSuml] = (ytemp[tofd2l][il2] + ytemp[tofd1l][il1]) / 2.;
+                    ql[nSuml] = (qtemp[tofd2l][il2] + qtemp[tofd1l][il1]) / 2.;
+                    nSuml += 1;
+                }
+            }
+        }
+        Int_t nSumr = 0;
+        for (Int_t ir2 = 0; ir2 < tofd2r; ir2++)
+        {
+            for (Int_t ir1 = 0; ir1 < tofd1r; ir1++)
+            {
+                if (std::abs(ttemp[tofd2r][ir2] - ttemp[tofd1r][ir1]) < 20. &&
+                    std::abs(xtemp[tofd2r][ir2] - xtemp[tofd1r][ir1]) < 2. &&
+                    std::abs(qtemp[tofd2r][ir2] - qtemp[tofd1r][ir1]) < 1. && xtemp[tofd2r][ir2] <= 0. &&
+                    xtemp[tofd1r][ir1] <= 0.)
+                {
+                    xr[nSumr] = (xtemp[tofd2r][ir2] + xtemp[tofd1r][ir1]) / 2.;
+                    tr[nSumr] = (ttemp[tofd2r][ir2] + ttemp[tofd1r][ir1]) / 2.;
+                    yr[nSumr] = (ytemp[tofd2r][ir2] + ytemp[tofd1r][ir1]) / 2.;
+                    qr[nSumr] = (qtemp[tofd2r][ir2] + qtemp[tofd1r][ir1]) / 2.;
+                    nSumr += 1;
+                }
+            }
+        }
+        // add to tofdr / tofdl hits tofi hits
+
+        // loop over TOFI
+        /*     if (fHitItems.at(DET_TOFI))
+              {
+                  auto detHitTofi = fHitItems.at(DET_TOFI);
+                  Int_t nHitsTofi = detHitTofi->GetEntriesFast();
+                  LOG(DEBUG) << "Tofi hits: " << nHitsTofi << endl;
+
+                  Int_t icl=0, icr=0;
+                  for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
+                  {
+                      det = tofi;
+                      R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
+                      randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                      x1[det] = hitTofi->GetX() + 0.5 * randx; // cm
+                      y1[det] = hitTofi->GetY();               // cm
+                      z1[det] = 0.;
+                      q1[det] = hitTofi->GetEloss();
+                      t1[det] = hitTofi->GetTime()+249.;
+                      fh_ztofi->Fill(x1[det],q1[det]);
+                      fh_time_tofd[2]->Fill(hitTofi->GetTime());
+
+                  // tof rechts
+                      if (x1[det] <= 0.)
+                      {
+                           xr[nSumr+icr]=x1[det];
+                           tr[nSumr+icr]=t1[det];
+                           yr[nSumr+icr]=y1[det];
+                           qr[nSumr+icr]=q1[det] ;
+                           icr += 1;
+                       }
+                       else
+                       {
+                           xl[nSuml+icl]=x1[det];
+                           tl[nSuml+icl]=t1[det];
+                           yl[nSuml+icl]=y1[det];
+                           ql[nSuml+icl]=q1[det];
+                           icl += 1;
+                       }
+
+                  }
+                  nSumr = nSumr+icr;
+                  nSuml = nSuml+icl;
+              }*/
+        Double_t tmem = 0;
         for (Int_t ihitr = 0; ihitr < nSumr; ihitr++)
         {
-			for (Int_t ihitl = 0; ihitl < nSuml; ihitl++)
-			{
-				//fh_Tofi_ToF->Fill(tr[ihitr]-tl[ihitl],qr[ihitr]+ql[ihitl]);
-				fh_Tofi_ToF->Fill(ttraw[tofd1r][ihitr]-ttraw[tofd1l][ihitl],qr[ihitr]+ql[ihitl]);
-				if((tr[ihitr]-tl[ihitl]) >-1500. && (tr[ihitr]-tl[ihitl]) <3000 )
-				{
-					fh_ToT_Tofi->Fill(qr[ihitr],ql[ihitl]);
-					
-					    auto detHit23a = fHitItems.at(DET_FI23A);
-						Int_t nHits23a = detHit23a->GetEntriesFast();
-						for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
-						{
-							det = fi23a;
-							R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-							randx = (std::rand() / (float)RAND_MAX) - 0.5;
-							x1[det] = hit23a->GetX() + 0.028 * randx; // cm
-							y1[det] = hit23a->GetY();
-							q1[det] = hit23a->GetEloss();
-							t1[det] = hit23a->GetTime();
-							tof = tStart - t1[det];
+            fh_Z_vs_x->Fill(xr[ihitr], qr[ihitr]);
+            if (ihitr > 0)
+                fh_Z_vs_dthit->Fill(tr[ihitr] - tmem, qr[ihitr]);
+            tmem = tr[ihitr];
+        }
+        tmem = 0;
+        for (Int_t ihitl = 0; ihitl < nSuml; ihitl++)
+        {
+            fh_Z_vs_x->Fill(xl[ihitl], ql[ihitl]);
+            if (ihitl > 0)
+                fh_Z_vs_dthit->Fill(tl[ihitl] - tmem, ql[ihitl]);
+            tmem = tl[ihitl];
+        }
 
-						//	if (fCuts && (t1[det] < -20 || t1[det] > 20))
-							//	continue;
-							if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
-								continue;						  
-							if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-								continue;
+        // correlations left-right tofd / fib23
+        for (Int_t ihitr = 0; ihitr < nSumr; ihitr++)
+        {
+            for (Int_t ihitl = 0; ihitl < nSuml; ihitl++)
+            {
+                // fh_Tofi_ToF->Fill(tr[ihitr]-tl[ihitl],qr[ihitr]+ql[ihitl]);
+                fh_Tofi_ToF->Fill(ttraw[tofd1r][ihitr] - ttraw[tofd1l][ihitl], qr[ihitr] + ql[ihitl]);
+                if ((tr[ihitr] - tl[ihitl]) > -1500. && (tr[ihitr] - tl[ihitl]) < 3000)
+                {
+                    fh_ToT_Tofi->Fill(qr[ihitr], ql[ihitl]);
 
-						// loop over fiber 23b
-						auto detHit23b = fHitItems.at(DET_FI23B);
-						Int_t nHits23b = detHit23b->GetEntriesFast();
-						LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-						for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-						{
-							det = fi23b;
-							R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-							randx = (std::rand() / (float)RAND_MAX) - 0.5;
-							x1[det] = hit23b->GetX() ; // cm
-							y1[det] = hit23b->GetY() + 0.028 * randx;
-							z1[det] = 0.;
-							q1[det] = hit23b->GetEloss();
-							t1[det] = hit23b->GetTime();
-							tof = tStart - t1[det];
+                    auto detHit23a = fHitItems.at(DET_FI23A);
+                    Int_t nHits23a = detHit23a->GetEntriesFast();
+                    for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
+                    {
+                        det = fi23a;
+                        R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                        randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                        x1[det] = hit23a->GetX() + 0.028 * randx; // cm
+                        y1[det] = hit23a->GetY();
+                        q1[det] = hit23a->GetEloss();
+                        t1[det] = hit23a->GetTime();
+                        tof = tStart - t1[det];
 
-						//	if (fCuts && (t1[det] < -20 || t1[det] > 20))
-							//	continue;
-							if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-							continue;
-							if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-								continue;
+                        //	if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                        //	continue;
+                        if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
+                            continue;
+                        if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                            continue;
 
-                            fh_xy_target->Fill(x1[fi23a],y1[fi23b]);
-                           
-						}
-					  }
-					
-					
-					if((qr[ihitr]+ql[ihitl]) > 7.5 && (qr[ihitr]+ql[ihitl]) < 8.5)
-					{
-						fh_ToT_Tofi_ac->Fill(qr[ihitr],ql[ihitl]);
-						fh_Tofi_ToF_ac->Fill(tr[ihitr]-tl[ihitl]);
-					//fh_xy_Tofi_ac->Fill(xr[ihitr],xl[ihitl]);
-						           // loop over fiber 23a
-						detHit23a = fHitItems.at(DET_FI23A);
-						nHits23a = detHit23a->GetEntriesFast();
-						for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
-						{
-							det = fi23a;
-							R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-							randx = (std::rand() / (float)RAND_MAX) - 0.5;
-							x1[det] = hit23a->GetX() + 0.028 * randx; // cm
-							y1[det] = hit23a->GetY();
-							q1[det] = hit23a->GetEloss();
-							t1[det] = hit23a->GetTime();
-							tof = tStart - t1[det];
+                        // loop over fiber 23b
+                        auto detHit23b = fHitItems.at(DET_FI23B);
+                        Int_t nHits23b = detHit23b->GetEntriesFast();
+                        LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                        for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+                        {
+                            det = fi23b;
+                            R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                            randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                            x1[det] = hit23b->GetX(); // cm
+                            y1[det] = hit23b->GetY() + 0.028 * randx;
+                            z1[det] = 0.;
+                            q1[det] = hit23b->GetEloss();
+                            t1[det] = hit23b->GetTime();
+                            tof = tStart - t1[det];
 
-							// cout << "Time: " << t1[det] << endl;
-						//	if (fCuts && (t1[det] < -20 || t1[det] > 20))
-							//	continue;
-							if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
-								continue;						  
-							if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-								continue;
+                            //	if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                            //	continue;
+                            if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+                                continue;
+                            if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                                continue;
 
-						// loop over fiber 23b
-						auto detHit23b = fHitItems.at(DET_FI23B);
-						Int_t nHits23b = detHit23b->GetEntriesFast();
-						LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-						for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-						{
-							det = fi23b;
-							R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-							randx = (std::rand() / (float)RAND_MAX) - 0.5;
-							x1[det] = hit23b->GetX() ; // cm
-							y1[det] = hit23b->GetY() + 0.028 * randx;
-							z1[det] = 0.;
-							q1[det] = hit23b->GetEloss();
-							t1[det] = hit23b->GetTime();
-							tof = tStart - t1[det];
+                            fh_xy_target->Fill(x1[fi23a], y1[fi23b]);
+                        }
+                    }
 
-						//	if (fCuts && (t1[det] < -20 || t1[det] > 20))
-							//	continue;
-							if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-							continue;
-							if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-								continue;
+                    if ((qr[ihitr] + ql[ihitl]) > 7.5 && (qr[ihitr] + ql[ihitl]) < 8.5)
+                    {
+                        fh_ToT_Tofi_ac->Fill(qr[ihitr], ql[ihitl]);
+                        fh_Tofi_ToF_ac->Fill(tr[ihitr] - tl[ihitl]);
+                        // fh_xy_Tofi_ac->Fill(xr[ihitr],xl[ihitl]);
+                        // loop over fiber 23a
+                        detHit23a = fHitItems.at(DET_FI23A);
+                        nHits23a = detHit23a->GetEntriesFast();
+                        for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
+                        {
+                            det = fi23a;
+                            R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                            randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                            x1[det] = hit23a->GetX() + 0.028 * randx; // cm
+                            y1[det] = hit23a->GetY();
+                            q1[det] = hit23a->GetEloss();
+                            t1[det] = hit23a->GetTime();
+                            tof = tStart - t1[det];
 
-                            fh_xy_target_ac->Fill(x1[fi23a],y1[fi23b]);
-                            
-						}
-					  }
-					
-					}
-				}
-			}
-		}   
-            
-         Double_t xxx, yyy, qqq;
+                            // cout << "Time: " << t1[det] << endl;
+                            //	if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                            //	continue;
+                            if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
+                                continue;
+                            if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                                continue;
+
+                            // loop over fiber 23b
+                            auto detHit23b = fHitItems.at(DET_FI23B);
+                            Int_t nHits23b = detHit23b->GetEntriesFast();
+                            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                            for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+                            {
+                                det = fi23b;
+                                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                                randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                                x1[det] = hit23b->GetX(); // cm
+                                y1[det] = hit23b->GetY() + 0.028 * randx;
+                                z1[det] = 0.;
+                                q1[det] = hit23b->GetEloss();
+                                t1[det] = hit23b->GetTime();
+                                tof = tStart - t1[det];
+
+                                //	if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                                //	continue;
+                                if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+                                    continue;
+                                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                                    continue;
+
+                                fh_xy_target_ac->Fill(x1[fi23a], y1[fi23b]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Double_t xxx, yyy, qqq;
         // ***********************************************
         // loop over right side
         // ***********************************************
-         for (Int_t ihit = 0; ihit < nSumr; ihit++)
+        for (Int_t ihit = 0; ihit < nSumr; ihit++)
         {
             xxx = xr[ihit];
             qqq = qr[ihit];
             yyy = yr[ihit];
-            tStart= tr[ihit];
+            tStart = tr[ihit];
             if (fCuts && (qqq < 0 || qqq > 20))
             {
                 // cout << "Cut because of charge: " << qqq << endl;
@@ -1380,7 +1366,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 
                 // Fill histograms before cuts
                 fh_Fib_ToF[det]->Fill(tof);
-                fh_Fib32_ToF->Fill(t1[det],tStart);
+                fh_Fib32_ToF->Fill(t1[det], tStart);
                 fh_xy_Fib[det]->Fill(xxx, q1[det]);
                 fh_ToT_Fib[det]->Fill(qqq, q1[det]);
                 fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
@@ -1394,8 +1380,8 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-               // if (fCuts && std::abs(q1[det]-qqq) > 2.)
-                 //       continue;
+                // if (fCuts && std::abs(q1[det]-qqq) > 2.)
+                //       continue;
                 if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
@@ -1411,162 +1397,158 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 if (debug2)
                     cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                          << " t1: " << t1[det] << endl;
-            
-               if(qqq > 1.5 && qqq < 2.5) fh_yy->Fill(y1[fi33],yyy);
 
-            // loop over fiber 31
-            auto detHit31 = fHitItems.at(DET_FI31);
-            Int_t nHits31 = detHit31->GetEntriesFast();
-            LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
-            for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
-            {
-                det = fi31;
-                R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit31->GetX() + 0.1 * randx; // cm
-                y1[det] = hit31->GetY();
-                z1[det] = 0.;
-                q1[det] = hit31->GetEloss();
-                t1[det] = hit31->GetTime();
-                tof = tStart - t1[det];
+                if (qqq > 1.5 && qqq < 2.5)
+                    fh_yy->Fill(y1[fi33], yyy);
 
-                // Fill histograms before cuts
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-                hits31bc++;
+                // loop over fiber 31
+                auto detHit31 = fHitItems.at(DET_FI31);
+                Int_t nHits31 = detHit31->GetEntriesFast();
+                LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
+                for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
+                {
+                    det = fi31;
+                    R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
+                    randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                    x1[det] = hit31->GetX() + 0.1 * randx; // cm
+                    y1[det] = hit31->GetY();
+                    z1[det] = 0.;
+                    q1[det] = hit31->GetEloss();
+                    t1[det] = hit31->GetTime();
+                    tof = tStart - t1[det];
 
-                // Cuts on Fi31
+                    // Fill histograms before cuts
+                    fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                    fh_Fib_ToF[det]->Fill(tof);
+                    fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                    hits31bc++;
 
-                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                    // Cuts on Fi31
+
+                    /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                            continue;
+                        if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                            continue; */
+                    // if (fCuts && std::abs(q1[det]-qqq) > 2.)
+                    //       continue;
+                    if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                         continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue; */
-               // if (fCuts && std::abs(q1[det]-qqq) > 2.)
-                 //       continue;
-                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
-                    continue;
 
-                hits31++;
+                    hits31++;
 
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(tof);
+                    fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                    fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                    fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
-                if (debug2)
-                    cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << t1[det] << endl;
-            
-				for(Int_t iCharge=0; iCharge < 7; iCharge++)
-				{
-					if(qr[ihit]>(float(iCharge)+1.5) && qr[ihit]<(float(iCharge)+2.5))
-					fh_xy_Tofi[iCharge]->Fill(x1[fi33],x1[fi33]-x1[fi31]);
-				}
-				fh_xy_Tofi_ac->Fill(qr[ihit],(x1[fi33]-x1[fi31])/x1[fi33]);   
-				
-				            // loop over fiber 23a
-            auto detHit23a = fHitItems.at(DET_FI23A);
-            Int_t nHits23a = detHit23a->GetEntriesFast();
-            LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
-            for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
-            {
-                det = fi23a;
-                R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit23a->GetX() + 0.028 * randx; // cm
-                y1[det] = hit23a->GetY();
-                q1[det] = hit23a->GetEloss();
-                t1[det] = hit23a->GetTime();
-                tof = tStart - t1[det];
+                    if (debug2)
+                        cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                             << " t1: " << t1[det] << endl;
 
-                // Fill histograms before cuts
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    for (Int_t iCharge = 0; iCharge < 7; iCharge++)
+                    {
+                        if (qr[ihit] > (float(iCharge) + 1.5) && qr[ihit] < (float(iCharge) + 2.5))
+                            fh_xy_Tofi[iCharge]->Fill(x1[fi33], x1[fi33] - x1[fi31]);
+                    }
+                    fh_xy_Tofi_ac->Fill(qr[ihit], (x1[fi33] - x1[fi31]) / x1[fi33]);
 
-                // cout << "Time: " << t1[det] << endl;
-              //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
-                //    continue;
-                if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
-                    continue;
+                    // loop over fiber 23a
+                    auto detHit23a = fHitItems.at(DET_FI23A);
+                    Int_t nHits23a = detHit23a->GetEntriesFast();
+                    LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+                    for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
+                    {
+                        det = fi23a;
+                        R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                        randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                        x1[det] = hit23a->GetX() + 0.028 * randx; // cm
+                        y1[det] = hit23a->GetY();
+                        q1[det] = hit23a->GetEloss();
+                        t1[det] = hit23a->GetTime();
+                        tof = tStart - t1[det];
 
-                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
-                        continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue; */
-              
-                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-                    continue;
+                        // Fill histograms before cuts
+                        fh_Fib_ToF[det]->Fill(tof);
+                        fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                        fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
+                        // cout << "Time: " << t1[det] << endl;
+                        //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                        //    continue;
+                        if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
+                            continue;
 
-                if (debug2)
-                    cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << tof << endl;
+                        /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                                continue;
+                            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                                continue; */
 
-            // loop over fiber 23b
-            auto detHit23b = fHitItems.at(DET_FI23B);
-            Int_t nHits23b = detHit23b->GetEntriesFast();
-            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-            for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-            {
-                det = fi23b;
-                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit23b->GetX() + 0.028 * randx; // cm
-                y1[det] = hit23b->GetY();
-                z1[det] = 0.;
-                q1[det] = hit23b->GetEloss();
-                t1[det] = hit23b->GetTime();
-                tof = tStart - t1[det];
+                        if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                            continue;
 
-                // Fill histograms before cuts
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-              //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
-                //    continue;
-                if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-                    continue;
+                        // Fill histograms
+                        fh_Fib_ToF_ac[det]->Fill(tof);
+                        fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                        fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
-                
-                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-                    continue;
+                        if (debug2)
+                            cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det]
+                                 << " q1: " << q1[det] << " t1: " << tof << endl;
 
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(y1[det], tof);
+                        // loop over fiber 23b
+                        auto detHit23b = fHitItems.at(DET_FI23B);
+                        Int_t nHits23b = detHit23b->GetEntriesFast();
+                        LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                        for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+                        {
+                            det = fi23b;
+                            R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                            randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                            x1[det] = hit23b->GetX() + 0.028 * randx; // cm
+                            y1[det] = hit23b->GetY();
+                            z1[det] = 0.;
+                            q1[det] = hit23b->GetEloss();
+                            t1[det] = hit23b->GetTime();
+                            tof = tStart - t1[det];
 
-                if (debug2)
-                    cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << tof << endl;
-            
-               
+                            // Fill histograms before cuts
+                            fh_Fib_ToF[det]->Fill(tof);
+                            fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                            fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                            fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
+                            fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                            //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                            //    continue;
+                            if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+                                continue;
+
+                            if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                                continue;
+
+                            // Fill histograms
+                            fh_Fib_ToF_ac[det]->Fill(tof);
+                            fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                            fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                            fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
+                            fh_ToT_TOF_Fib_ac[det]->Fill(y1[det], tof);
+
+                            if (debug2)
+                                cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det]
+                                     << " q1: " << q1[det] << " t1: " << tof << endl;
+                        }
+                    }
+                }
             }
-		    }             				
-            }
-           }
+        }
 
-		}
-               
-        
         // ***********************************************
         // loop over left side
         // ***********************************************
@@ -1575,7 +1557,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             xxx = xl[ihit];
             qqq = ql[ihit];
             yyy = yl[ihit];
-            tStart= tl[ihit];
+            tStart = tl[ihit];
             if (fCuts && (qqq < 0 || qqq > 20))
             {
                 // cout << "Cut because of charge: " << qqq << endl;
@@ -1594,7 +1576,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             auto detHit32 = fHitItems.at(DET_FI32);
             Int_t nHits32 = detHit32->GetEntriesFast();
             LOG(DEBUG) << "Fi32 hits: " << nHits32 << endl;
-            for (Int_t ihit32 = 0; ihit32< nHits32; ihit32++)
+            for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
             {
                 det = fi32;
                 R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
@@ -1622,8 +1604,8 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                         continue;
                     if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
                         continue; */
-             //   if (fCuts && std::abs(q1[det]-qqq) > 2.)
-               //         continue;
+                //   if (fCuts && std::abs(q1[det]-qqq) > 2.)
+                //         continue;
                 if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                     continue;
 
@@ -1636,172 +1618,171 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
                 fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], t1[det]); // tof);
 
-                if(qqq > 1.5 && qqq < 2.5) fh_yy->Fill(y1[fi32],yyy);
-                
+                if (qqq > 1.5 && qqq < 2.5)
+                    fh_yy->Fill(y1[fi32], yyy);
+
                 if (debug2)
                     cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                          << " t1: " << t1[det] << endl;
-            
 
-            // loop over fiber 30
-            auto detHit30 = fHitItems.at(DET_FI30);
-            Int_t nHits30 = detHit30->GetEntriesFast();
-            LOG(DEBUG) << "Fi30 hits: " << nHits30 << endl;
-            for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
-            {
-                det = fi30;
-                R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit30->GetX() + 0.1 * randx; // cm
-                y1[det] = hit30->GetY();
-                z1[det] = 0.;
-                q1[det] = hit30->GetEloss();
-                t1[det] = hit30->GetTime();
-                tof = tStart - t1[det];
+                // loop over fiber 30
+                auto detHit30 = fHitItems.at(DET_FI30);
+                Int_t nHits30 = detHit30->GetEntriesFast();
+                LOG(DEBUG) << "Fi30 hits: " << nHits30 << endl;
+                for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
+                {
+                    det = fi30;
+                    R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
+                    randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                    x1[det] = hit30->GetX() + 0.1 * randx; // cm
+                    y1[det] = hit30->GetY();
+                    z1[det] = 0.;
+                    q1[det] = hit30->GetEloss();
+                    t1[det] = hit30->GetTime();
+                    tof = tStart - t1[det];
 
-                // Fill histograms before cuts
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-                hits30bc++;
+                    // Fill histograms before cuts
+                    fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                    fh_Fib_ToF[det]->Fill(tof);
+                    fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                    hits30bc++;
 
-                // Cuts on Fi30
+                    // Cuts on Fi30
 
-                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                    /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                            continue;
+                        if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                            continue; */
+                    //    if (fCuts && std::abs(q1[det]-qqq) > 2.)
+                    //          continue;
+                    if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
                         continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue; */
-            //    if (fCuts && std::abs(q1[det]-qqq) > 2.)
-              //          continue;
-                if (fCuts && (tof < ftofminFib3x || tof > ftofmaxFib3x))
-                    continue;
 
-                hits30++;
+                    hits30++;
 
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(tof);
+                    fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                    fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                    fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
 
-                if (debug2)
-                    cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << t1[det] << endl;
-             
-              for(Int_t iCharge=0; iCharge < 7; iCharge++)
-				{
-					if(ql[ihit]>(float(iCharge)+1.5) && ql[ihit]<(float(iCharge)+2.5))
-					fh_xy_Tofi[iCharge]->Fill(x1[fi32],x1[fi32]-x1[fi30]);
-				}
-				fh_xy_Tofi_ac->Fill(ql[ihit],(x1[fi32]-x1[fi30])/x1[fi32]);   
-				//cout<<x1[fi32]-x1[fi30]/x1[fi32]<<endl;
-				
-				            // loop over fiber 23a
-            auto detHit23a = fHitItems.at(DET_FI23A);
-            Int_t nHits23a = detHit23a->GetEntriesFast();
-            LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
-            for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
-            {
-                det = fi23a;
-                R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit23a->GetX() + 0.028 * randx; // cm
-                y1[det] = hit23a->GetY();
-                q1[det] = hit23a->GetEloss();
-                t1[det] = hit23a->GetTime();
-                tof = tStart - t1[det];
+                    if (debug2)
+                        cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                             << " t1: " << t1[det] << endl;
 
-                // Fill histograms before cuts
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    for (Int_t iCharge = 0; iCharge < 7; iCharge++)
+                    {
+                        if (ql[ihit] > (float(iCharge) + 1.5) && ql[ihit] < (float(iCharge) + 2.5))
+                            fh_xy_Tofi[iCharge]->Fill(x1[fi32], x1[fi32] - x1[fi30]);
+                    }
+                    fh_xy_Tofi_ac->Fill(ql[ihit], (x1[fi32] - x1[fi30]) / x1[fi32]);
+                    // cout<<x1[fi32]-x1[fi30]/x1[fi32]<<endl;
 
-                // cout << "Time: " << t1[det] << endl;
-              //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
-                //    continue;
-                if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
-                    continue;
+                    // loop over fiber 23a
+                    auto detHit23a = fHitItems.at(DET_FI23A);
+                    Int_t nHits23a = detHit23a->GetEntriesFast();
+                    LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+                    for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
+                    {
+                        det = fi23a;
+                        R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                        randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                        x1[det] = hit23a->GetX() + 0.028 * randx; // cm
+                        y1[det] = hit23a->GetY();
+                        q1[det] = hit23a->GetEloss();
+                        t1[det] = hit23a->GetTime();
+                        tof = tStart - t1[det];
 
-                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
-                        continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue; */
-                
-                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-                    continue;
+                        // Fill histograms before cuts
+                        fh_Fib_ToF[det]->Fill(tof);
+                        fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd[det]->Fill(xxx, x1[det]);
+                        fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
 
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
+                        // cout << "Time: " << t1[det] << endl;
+                        //  if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                        //    continue;
+                        if ((hit23a->GetFiberId() > 188 && hit23a->GetFiberId() < 197))
+                            continue;
 
-                if (debug2)
-                    cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << tof << endl;
+                        /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                                continue;
+                            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                                continue; */
+
+                        if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                            continue;
+
+                        // Fill histograms
+                        fh_Fib_ToF_ac[det]->Fill(tof);
+                        fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, x1[det]);
+                        fh_ToT_TOF_Fib_ac[det]->Fill(x1[det], tof);
+
+                        if (debug2)
+                            cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det]
+                                 << " q1: " << q1[det] << " t1: " << tof << endl;
+                    }
+
+                    // loop over fiber 23b
+                    auto detHit23b = fHitItems.at(DET_FI23B);
+                    Int_t nHits23b = detHit23b->GetEntriesFast();
+                    LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                    for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
+                    {
+                        det = fi23b;
+                        R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                        randx = (std::rand() / (float)RAND_MAX) - 0.5;
+                        x1[det] = hit23b->GetX() + 0.028 * randx; // cm
+                        y1[det] = hit23b->GetY();
+                        z1[det] = 0.;
+                        q1[det] = hit23b->GetEloss();
+                        t1[det] = hit23b->GetTime();
+                        tof = tStart - t1[det];
+
+                        // Fill histograms before cuts
+                        fh_Fib_ToF[det]->Fill(tof);
+                        fh_xy_Fib[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
+                        fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                        //   if (fCuts && (t1[det] < -20 || t1[det] > 20))
+                        //     continue;
+                        if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
+                            continue;
+
+                        // Cuts on Fi23b
+                        /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
+                                continue;
+                            if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
+                                continue; */
+
+                        if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
+                            continue;
+
+                        // Fill histograms
+                        fh_Fib_ToF_ac[det]->Fill(tof);
+                        fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
+                        fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
+                        fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
+                        fh_ToT_TOF_Fib_ac[det]->Fill(y1[det], tof);
+
+                        if (debug2)
+                            cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det]
+                                 << " q1: " << q1[det] << " t1: " << tof << endl;
+                    }
+                }
             }
-
-            // loop over fiber 23b
-            auto detHit23b = fHitItems.at(DET_FI23B);
-            Int_t nHits23b = detHit23b->GetEntriesFast();
-            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
-            for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
-            {
-                det = fi23b;
-                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-                randx = (std::rand() / (float)RAND_MAX) - 0.5;
-                x1[det] = hit23b->GetX() + 0.028 * randx; // cm
-                y1[det] = hit23b->GetY();
-                z1[det] = 0.;
-                q1[det] = hit23b->GetEloss();
-                t1[det] = hit23b->GetTime();
-                tof = tStart - t1[det];
-
-                // Fill histograms before cuts
-                fh_Fib_ToF[det]->Fill(tof);
-                fh_xy_Fib[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd[det]->Fill(xxx, y1[det]);
-                fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
-             //   if (fCuts && (t1[det] < -20 || t1[det] > 20))
-               //     continue;
-                if ((hit23b->GetFiberId() > 188 && hit23b->GetFiberId() < 197))
-                    continue;
-
-                // Cuts on Fi23b
-                /*   if (fCuts && (x1[det] * 100. < -10000 || x1[det] * 100. > 10000))
-                        continue;
-                    if (fCuts && (y1[det] < -10000 || y1[det] > 10000))
-                        continue; */
-               
-                if (fCuts && (tof < ftofminFib2x || tof > ftofmaxFib2x))
-                    continue;
-
-                // Fill histograms
-                fh_Fib_ToF_ac[det]->Fill(tof);
-                fh_xy_Fib_ac[det]->Fill(xxx, q1[det]);
-                fh_ToT_Fib_ac[det]->Fill(qqq, q1[det]);
-                fh_Fibs_vs_Tofd_ac[det]->Fill(xxx, y1[det]);
-                fh_ToT_TOF_Fib_ac[det]->Fill(y1[det], tof);
-
-                if (debug2)
-                    cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                         << " t1: " << tof << endl;
-            }
-            }
-           }
-   
-		}
-        
+        }
 
     } // end of if nHitsTofd > 0
-    if(header->GetTimeStamp() > 0) time_end = header->GetTimeStamp();
+    if (header->GetTimeStamp() > 0)
+        time_end = header->GetTimeStamp();
 }
 
 void R3BGlobalCorrelationsS494::FinishEvent()
@@ -1824,7 +1805,7 @@ void R3BGlobalCorrelationsS494::FinishTask()
 {
 
     cout << "Statistics:" << endl;
-    cout << "Total number of events             : " <<fNEvents_total<<endl;
+    cout << "Total number of events             : " << fNEvents_total << endl;
     cout << "Events with correct trigger & tpat : " << fNEvents << endl;
     cout << "Events w/o Rolu                    : " << fNEvents_veto << endl;
     cout << "Events w/o Rolu and with ToFD      : " << fNEvents_local << endl;
@@ -1832,12 +1813,12 @@ void R3BGlobalCorrelationsS494::FinishTask()
     cout << "Events w/o Rolu and with Califa    : " << fNEvents_califa << endl;
     cout << "Events w/o Rolu and with ToFI      : " << fNEvents_tofi << endl;
     cout << "Events w/o Rolu and with fibers23  : " << fNEvents_fibers << endl;
-    cout << "Events with two particles          : "<< fNEvents_pair <<endl;
+    cout << "Events with two particles          : " << fNEvents_pair << endl;
     cout << "Time duration                      : " << (time_end - time_begin) / 1.e9 << " sec" << endl;
-    cout<<  "testing: "<<time_end <<", "<< time_begin<<endl;
+    cout << "testing: " << time_end << ", " << time_begin << endl;
     cout << "nSpill                             : " << fNSpills << endl;
     cout << "Total num of 18O                   : " << nBeamParticle << endl;
-    cout << "Total off-spill particles          : " <<  nOffSpillParticle- nBeamParticle<<endl;
+    cout << "Total off-spill particles          : " << nOffSpillParticle - nBeamParticle << endl;
     cout << "  " << endl;
     cout << "Wrong Trigger: " << counterWrongTrigger << endl;
     cout << "Wrong Tpat: " << counterWrongTpat << endl;
@@ -1845,46 +1826,48 @@ void R3BGlobalCorrelationsS494::FinishTask()
     cout << "TofD multi: " << counterTofdMulti << endl;
     cout << "TofDr multi: " << counterTofdMultir << endl;
     cout << "TofDl multi: " << counterTofdMultil << endl;
-    
-    ofstream outfile(fcounter_file.c_str(),ios_base::out|ios_base::app);
-//    ofstream outfile(fcounter_file.c_str());
-    if (!(outfile.is_open())) cout<<"Warning: unable to open outpu file "<<fcounter_file<<endl;
-       
+
+    ofstream outfile(fcounter_file.c_str(), ios_base::out | ios_base::app);
+    //    ofstream outfile(fcounter_file.c_str());
+    if (!(outfile.is_open()))
+        cout << "Warning: unable to open outpu file " << fcounter_file << endl;
+
     if (outfile.is_open())
-    {	  
-		outfile<<setprecision(10) << "Total number of events             : " <<fNEvents_total<<endl;
-        outfile<<setprecision(10) << "Events with correct trigger & tpat : " << fNEvents << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu                    : " << fNEvents_veto << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu and with ToFD      : " << fNEvents_local << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu and w/o ToFD       : " << fNEvents_zeroToFD << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu and with Califa    : " << fNEvents_califa << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu and with ToFI      : " << fNEvents_tofi << endl;
-		outfile<<setprecision(10) << "Events w/o Rolu and with fibers23  : " << fNEvents_fibers << endl;
-		outfile<<setprecision(10) << "Events with two particles          : " << fNEvents_pair <<endl;
-		outfile<<setprecision(10) << "Time duration                      : " << (time_end - time_begin) / 1.e9 << " sec" << endl;
-		outfile<<setprecision(10) << "nSpill                             : " << fNSpills << endl;
-		outfile<<setprecision(10) << "Total num of 18O                   : " << nBeamParticle << endl;
-		outfile<<setprecision(10) << "Total off-spill particles          : " <<  nOffSpillParticle <<endl;
-        outfile<<setprecision(10) << "Wrong Trigger                      : " << counterWrongTrigger << endl;
-		outfile<<setprecision(10) << "Wrong Tpat                         : " << counterWrongTpat << endl;		
-	}
+    {
+        outfile << setprecision(10) << "Total number of events             : " << fNEvents_total << endl;
+        outfile << setprecision(10) << "Events with correct trigger & tpat : " << fNEvents << endl;
+        outfile << setprecision(10) << "Events w/o Rolu                    : " << fNEvents_veto << endl;
+        outfile << setprecision(10) << "Events w/o Rolu and with ToFD      : " << fNEvents_local << endl;
+        outfile << setprecision(10) << "Events w/o Rolu and w/o ToFD       : " << fNEvents_zeroToFD << endl;
+        outfile << setprecision(10) << "Events w/o Rolu and with Califa    : " << fNEvents_califa << endl;
+        outfile << setprecision(10) << "Events w/o Rolu and with ToFI      : " << fNEvents_tofi << endl;
+        outfile << setprecision(10) << "Events w/o Rolu and with fibers23  : " << fNEvents_fibers << endl;
+        outfile << setprecision(10) << "Events with two particles          : " << fNEvents_pair << endl;
+        outfile << setprecision(10) << "Time duration                      : " << (time_end - time_begin) / 1.e9
+                << " sec" << endl;
+        outfile << setprecision(10) << "nSpill                             : " << fNSpills << endl;
+        outfile << setprecision(10) << "Total num of 18O                   : " << nBeamParticle << endl;
+        outfile << setprecision(10) << "Total off-spill particles          : " << nOffSpillParticle << endl;
+        outfile << setprecision(10) << "Wrong Trigger                      : " << counterWrongTrigger << endl;
+        outfile << setprecision(10) << "Wrong Tpat                         : " << counterWrongTpat << endl;
+    }
 
     outfile.close();
-    
+
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
         if (fHitItems.at(DET_FI_FIRST + ifibcount))
         {
-                fh_xy_Fib_ac[ifibcount]->Write();
-                fh_ToT_Fib_ac[ifibcount]->Write();
-                fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
-                fh_Fib_ToF_ac[ifibcount]->Write();
-                fh_ToT_TOF_Fib_ac[ifibcount]->Write();
-                fh_xy_Fib[ifibcount]->Write();
-                fh_ToT_Fib[ifibcount]->Write();
-                fh_Fibs_vs_Tofd[ifibcount]->Write();
-                fh_Fib_ToF[ifibcount]->Write();
-                fh_ToF_vs_Events[ifibcount]->Write();
+            fh_xy_Fib_ac[ifibcount]->Write();
+            fh_ToT_Fib_ac[ifibcount]->Write();
+            fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
+            fh_Fib_ToF_ac[ifibcount]->Write();
+            fh_ToT_TOF_Fib_ac[ifibcount]->Write();
+            fh_xy_Fib[ifibcount]->Write();
+            fh_ToT_Fib[ifibcount]->Write();
+            fh_Fibs_vs_Tofd[ifibcount]->Write();
+            fh_Fib_ToF[ifibcount]->Write();
+            fh_ToF_vs_Events[ifibcount]->Write();
         }
     }
     fh_xy_target_ac->Write();
@@ -1896,17 +1879,16 @@ void R3BGlobalCorrelationsS494::FinishTask()
     fh_yy->Write();
     if (fHitItems.at(DET_TOFI))
     {
-        
-            fh_ToT_Tofi_ac->Write();
-            fh_xy_Tofi_ac->Write();
-            for (Int_t i = 0; i < 7; i++)
-			{
-				fh_xy_Tofi[i]->Write();
-			}
-            
-            fh_ToT_Tofi->Write();
-            fh_Tofi_ToF->Write();
-        
+
+        fh_ToT_Tofi_ac->Write();
+        fh_xy_Tofi_ac->Write();
+        for (Int_t i = 0; i < 7; i++)
+        {
+            fh_xy_Tofi[i]->Write();
+        }
+
+        fh_ToT_Tofi->Write();
+        fh_Tofi_ToF->Write();
     }
     if (fCalItems.at(DET_ROLU))
     {
@@ -1925,4 +1907,3 @@ void R3BGlobalCorrelationsS494::FinishTask()
 }
 
 ClassImp(R3BGlobalCorrelationsS494)
-

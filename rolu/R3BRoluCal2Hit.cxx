@@ -62,6 +62,7 @@ R3BRoluCal2Hit::R3BRoluCal2Hit()
     , fHitItems(new TClonesArray("R3BRoluHitData"))
     , fNofHitItems(0)
     , fNofDetectors(2)
+    , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
     for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
@@ -80,6 +81,7 @@ R3BRoluCal2Hit::R3BRoluCal2Hit(const char* name, Int_t iVerbose)
     , fHitItems(new TClonesArray("R3BRoluHitData"))
     , fNofHitItems(0)
     , fNofDetectors(2)
+    , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
     for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
@@ -129,8 +131,7 @@ InitStatus R3BRoluCal2Hit::Init()
 
     // request storage of Hit data in output tree
     mgr->Register("RoluHit", "Land", fHitItems, kTRUE);
-
-    Icount = 0;
+    maxevent = mgr->CheckMaxEventNo();
 
     return kSUCCESS;
 }
@@ -142,7 +143,9 @@ InitStatus R3BRoluCal2Hit::ReInit() { return kSUCCESS; }
  */
 void R3BRoluCal2Hit::Exec(Option_t* option)
 {
-    Icount++;
+    if (fnEvents / 100000. == (int)fnEvents / 100000)
+        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
+                  << " %) " << std::flush;
 
     // min,max,Nbins for ToT spectra
     Double_t fhQmin = 0.;
@@ -241,6 +244,8 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
         fhQ_L[iDet - 1]->Fill(totRolu[iPart][iDet - 1][2]);
         fhQ_U[iDet - 1]->Fill(totRolu[iPart][iDet - 1][3]);
     }
+
+    fnEvents++;
 }
 
 void R3BRoluCal2Hit::FinishEvent()

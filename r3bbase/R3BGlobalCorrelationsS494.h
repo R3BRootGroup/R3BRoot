@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BOnlineSpectra                -----
+// -----                  R3BGlobalCorrelations                -----
 // -----            Created July 2021 A. Kelic-Heil       -----
 // -----                                                  -----
 // ------------------------------------------------------------
@@ -147,8 +147,8 @@ class R3BGlobalCorrelationsS494 : public FairTask
     {
         fcounter_file = counter_file;
     }
-    void Reset_All();
-    void Reset_BMON_Histo();
+  //  void Reset_All();
+  //  void Reset_BMON_Histo();
     
   private:
     std::vector<TClonesArray*> fMappedItems;

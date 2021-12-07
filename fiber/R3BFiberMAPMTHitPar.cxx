@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 #include "R3BFiberMAPMTHitPar.h"
-
 #include "FairLogger.h"
 #include "FairParamList.h" // for FairParamList
+#include "R3BFiberMAPMTHitModulePar.h"
 
 ClassImp(R3BFiberMAPMTHitPar);
 

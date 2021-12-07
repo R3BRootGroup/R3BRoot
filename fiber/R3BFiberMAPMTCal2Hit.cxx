@@ -183,14 +183,14 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // ToT bottom PMT raw:
     chistName = fName + "_ToT_bottom_raw";
     chistTitle = fName + " ToTbottom raw of fibers";
-    fh_ToT_bottom_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, 0., 100.);
+    fh_ToT_bottom_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
     fh_ToT_bottom_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_bottom_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
     // ToT bottom gainmatched:
     chistName = fName + "_ToT_bottom";
     chistTitle = fName + " ToTbottom of fibers";
-    fh_ToT_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 400, 0., 100.);
+    fh_ToT_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
     fh_ToT_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_bottom_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -204,57 +204,57 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // ToF Fiber for sync:
     chistName = fName + "_time_raw";
     chistTitle = fName + " Time raw";
-    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2200, -1100., 1100.);
+    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
     fh_Fib_ToF_raw->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF_raw->GetXaxis()->SetTitle("Fiber ID");
-
-    // Test:
-    chistName = fName + "_test";
-    chistTitle = fName + " time test";
-    fh_Test = new TH2F(chistName.Data(), chistTitle.Data(), 10000, 0, 1e6, 4000, -2000., -2000.);
-    fh_Test->GetYaxis()->SetTitle("Tsync / ns");
-    fh_Test->GetXaxis()->SetTitle("Fiber ID");
 
     // ToT top MAPMT raw:
     chistName = fName + "_ToT_top_raw";
     chistTitle = fName + " ToTtop raw of fibers";
-    fh_ToT_top_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 1000, 0., 100.);
+    fh_ToT_top_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
     fh_ToT_top_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_top_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
     // ToT top MAPMT gainmatched:
     chistName = fName + "_ToT_top";
     chistTitle = fName + " ToTtop of fibers";
-    fh_ToT_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 400, 0., 100.);
+    fh_ToT_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
     fh_ToT_top_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_top_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     chistName = fName + "_time_top";
     chistTitle = fName + " time of top MAPMTs ";
-    fh_time_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_time_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
     fh_time_top_Fib->GetXaxis()->SetTitle("single number");
     fh_time_top_Fib->GetYaxis()->SetTitle("time / ns");
 
     // time difference top-bottom:
     chistName = fName + "_dt";
     chistTitle = fName + " dt of fibers";
-    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4400, -1100., 1100.);
     fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
 
     // time difference top-bottom for offsets:
     chistName = fName + "_dt_raw";
     chistTitle = fName + " dt_raw of fibers";
-    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4400, -1100., 1100.);
     fh_dt_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib_raw->GetYaxis()->SetTitle("dt / ns");
 
     // time of MAPMT:
     chistName = fName + "_time_bottom";
     chistTitle = fName + " time of bottom MAPMTs";
-    fh_time_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4000, -2000., 2000.);
+    fh_time_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
     fh_time_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_time_bottom_Fib->GetYaxis()->SetTitle("time / ns");
+
+    // histos to check hit parameters
+    chistName = fName + "_check_tsync";
+    chistTitle = fName + " check tsync for fiberNum 10";
+    fh_time_check_tsync = new TH2F(chistName.Data(), chistTitle.Data(), 50000, 0, 1e6, 400, -100., 100.);
+    fh_time_check_tsync->GetXaxis()->SetTitle("Event number");
+    fh_time_check_tsync->GetYaxis()->SetTitle("dt / ns");
 
     return kSUCCESS;
 }
@@ -266,6 +266,8 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
     fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    if (fCalPar)
+        cout << "R3BFiberCal2Hit::Init() container " << fName << "HitPar initialized. " << endl;
     if (!fCalPar)
     {
         LOG(ERROR) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
@@ -274,6 +276,9 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
 
 void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 {
+
+    // cout<<"R3BFiberMAPMTCal2Hit::Exec entering"<<endl;
+
     if (fnEvents / 100000. == (int)fnEvents / 100000)
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
                   << " %) " << std::flush;
@@ -362,9 +367,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                 //	if(chlead_i == 0 && fName=="Fi31") cout<<"Side: "<<side_i<<", "<<lead_raw<<", "<<lead_trig_ns<<",
                 //"<< 	lead_ns<<"; "<<fTriggerMap[side_i][chlead_i]<<endl;
 
-                if (chlead_i == 0 && fName == "Fi31" && side_i == 1)
-                    fh_Test->Fill(fnEvents, lead_ns);
-
                 channel.tot_list.push_back(ToT(lead, cur_cal_trail, lead_ns, cur_cal_ns, tot_ns));
                 channel.lead_list.pop_front();
             }
@@ -403,14 +405,14 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
 
                     Int_t fiber_id = -1000;
-                    if (fiber_down_ch == fiber_up_ch) //&& std::abs(up_tot.lead_ns - down_tot.lead_ns) < 20)
+                    if (fiber_down_ch == fiber_up_ch)
                         fiber_id = fiber_down_ch;
                     else
                         continue;
 
                     // Calibrate hit fiber.
-                    Double_t tot_down_raw = down_tot.tot_ns;
-                    Double_t tot_up_raw = up_tot.tot_ns;
+                    auto tot_down_raw = down_tot.tot_ns;
+                    auto tot_up_raw = up_tot.tot_ns;
                     auto tot_down = down_tot.tot_ns;
                     auto tot_up = up_tot.tot_ns;
                     Double_t t_down = down_tot.lead_ns;
@@ -446,10 +448,13 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     tot_down *= 10. / gainDown;
                     tot_up *= 10. / gainUp;
 
-                    tof -= tsync;
-                    t_down += offsetDown;
-                    t_up += offsetUp;
+                    //  tof -= tsync;
+                    t_down -= offsetDown;
+                    t_down -= tsync;
+                    t_up -= offsetUp;
+                    t_up -= tsync;
                     dtime = t_up - t_down;
+                    tof = (t_up + t_down) / 2.;
 
                     // histogram after gain match, sync....
                     fh_dt_Fib->Fill(fiber_id, dtime);
@@ -458,6 +463,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     fh_ToT_top_Fib->Fill(fiber_id, tot_up);
                     fh_time_bottom_Fib->Fill(fiber_id, t_down);
                     fh_time_top_Fib->Fill(fiber_id, t_up);
+
+                    if (fiber_id == 10)
+                        fh_time_check_tsync->Fill(fnEvents, tof);
 
                     Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
@@ -476,7 +484,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                             x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
-                            y = (t_down - t_up) * veff; 
+                            y = (t_down - t_up) * veff;
                         }
                         else
                         {
@@ -489,10 +497,14 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
                     {
                         Float_t fiber_thickness = 0.10000; // cm
-                        if (fName == "Fi30") fiber_thickness = 0.1034;
-                        if (fName == "Fi31") fiber_thickness = 0.1033;
-                        if (fName == "Fi32") fiber_thickness = 0.1024;
-                        if (fName == "Fi33") fiber_thickness = 0.1025;
+                        if (fName == "Fi30")
+                            fiber_thickness = 0.1034;
+                        if (fName == "Fi31")
+                            fiber_thickness = 0.1033;
+                        if (fName == "Fi32")
+                            fiber_thickness = 0.1024;
+                        if (fName == "Fi33")
+                            fiber_thickness = 0.1025;
                         Int_t fiber_nbr = 512;
                         Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
@@ -566,10 +578,10 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
         fh_dt_Fib->Write();
         fh_time_top_Fib->Write();
         fh_Fib_ToF->Write();
-        fh_Test->Write();
         fh_time_bottom_Fib->Write();
         fh_dt_Fib_raw->Write();
         fh_Fib_ToF_raw->Write();
+        fh_time_check_tsync->Write();
     }
 
     if (fIsCalibrator)
@@ -598,7 +610,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 {
                     // could not find maximum
                 }
-                if (proj->GetBinContent(j) > proj->GetMaximum() * 50. / 100.)
+                if (proj->GetBinContent(j) > proj->GetMaximum() * 10. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
                     par->SetGainDown(proj->GetBinCenter(j));
@@ -616,7 +628,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                 {
                     // could not find maximum
                 }
-                if (proj1->GetBinContent(j) > proj1->GetMaximum() * 50. / 100.)
+                if (proj1->GetBinContent(j) > proj1->GetMaximum() * 10. / 100.)
                 {
                     R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
                     par1->SetGainUp(proj->GetBinCenter(j));

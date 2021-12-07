@@ -122,7 +122,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     TH2F* fh_Fib_ToF;
     TH2F* fh_dt_Fib_raw;
     TH2F* fh_Fib_ToF_raw;
-    TH2F* fh_Test;
+    TH2F* fh_time_check_tsync;
     TH1F* fh_multi;
     TH2F* fh_time_bottom_Fib;
 	public:

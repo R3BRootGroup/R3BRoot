@@ -77,11 +77,11 @@ void R3BFiberMAPMTHitModulePar::printParams()
 {
     LOG(INFO) << "   R3BFiberMAPMTHitModulePar: FIBER HIT Calibration Parameters: ";
     LOG(INFO) << "   fFiber: " << fFiber;
-    LOG(INFO) << "   fOffset1: " << fOffsetUp;
-    LOG(INFO) << "   fOffset2: " << fOffsetDown;
+    LOG(INFO) << "   fOffsetUp: " << fOffsetUp;
+    LOG(INFO) << "   fOffsetDown: " << fOffsetDown;
     LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fGainMA: " << fGainUp;
-    LOG(INFO) << "   fGainS: " << fGainDown;
+    LOG(INFO) << "   fGainUp: " << fGainUp;
+    LOG(INFO) << "   fGainDown: " << fGainDown;
     LOG(INFO) << "   fSync: " << fSync;
 }
 

@@ -107,7 +107,7 @@ class R3BRoluCal2Hit : public FairTask
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
     UInt_t fNofDetectors; /**< Number of detectors. */
     UInt_t fNofChannels;  /**< Number of channels per detector. */
-    
+    Int_t fnEvents;
     TClonesArray* fMapped; /* < Array with mapped data - input data. */
 
     TH1F* fhQ_R[2];
@@ -115,7 +115,7 @@ class R3BRoluCal2Hit : public FairTask
     TH1F* fhQ_L[2];
     TH1F* fhQ_U[2];
 
-    Int_t Icount = 0;
+    Int_t maxevent;
 
   public:
     ClassDef(R3BRoluCal2Hit, 1)

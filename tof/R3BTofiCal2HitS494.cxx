@@ -766,7 +766,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
-        sprintf(strName, "Time_Sync_Plane_%d", iPlane);
+        sprintf(strName, "Time_sync_Plane_%d", iPlane);
         fhTsync[iPlane - 1] =
             new TH2F(strName, "", fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 10000, -2000., 2000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
@@ -777,8 +777,8 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName1[255];
         char strName2[255];
-        sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
-        sprintf(strName2, "Time Diff Plane %d", iPlane);
+        sprintf(strName1, "Time_diff_Plane_%d", iPlane);
+        sprintf(strName2, "Time diff Plane %d", iPlane);
         fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 400, -8., 8.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
@@ -787,7 +787,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        sprintf(strName, "Z_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
         fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, -100, 100, max_charge * 10, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
@@ -815,9 +815,9 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQ[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "Q_Plane_%d", iPlane);
+        sprintf(strName1, "Z_Plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "Q Plane %d ", iPlane);
+        sprintf(strName2, "Z Plane %d ", iPlane);
         fhQ[iPlane - 1] = new TH2F(
             strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, max_charge * 10, 0., max_charge);
         fhQ[iPlane - 1]->GetYaxis()->SetTitle("Charge");
@@ -838,9 +838,9 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhxy[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "xy_Plane_%d", iPlane);
+        sprintf(strName1, "xy_plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "xy of Plane %d ", iPlane);
+        sprintf(strName2, "xy of plane %d ", iPlane);
         fhxy[iPlane - 1] =
             new TH2F(strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 400, -100., 100.);
         fhxy[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
@@ -850,7 +850,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQvsEvent[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "QvsEvent_Plane_%d", iPlane);
+        sprintf(strName1, "ZvsEvent_Plane_%d", iPlane);
         char strName2[255];
         sprintf(strName2, "Charge vs Event # Plane %d ", iPlane);
         fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e5, 0, 2e9, max_charge * 10, 0., max_charge);
