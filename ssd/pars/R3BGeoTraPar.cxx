@@ -15,14 +15,10 @@
 //*-- Created : 21/06/2005
 
 #include "R3BGeoTraPar.h"
-
 #include "FairParamList.h"
-
 #include "TObjArray.h"
 
-ClassImp(R3BGeoTraPar)
-
-    R3BGeoTraPar::R3BGeoTraPar(const char* name, const char* title, const char* context)
+R3BGeoTraPar::R3BGeoTraPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
 
@@ -59,3 +55,5 @@ Bool_t R3BGeoTraPar::getParams(FairParamList* l)
 
     return kTRUE;
 }
+
+ClassImp(R3BGeoTraPar);

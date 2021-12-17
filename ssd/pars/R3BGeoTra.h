@@ -27,7 +27,7 @@ class R3BGeoTra : public FairGeoSet
     const char* getModuleName(Int_t);
     const char* getEleName(Int_t);
     inline Int_t getModNumInMod(const TString&);
-    ClassDef(R3BGeoTra, 0) // Class for STS
+    ClassDef(R3BGeoTra, 0)
 };
 
 inline Int_t R3BGeoTra::getModNumInMod(const TString& name)
@@ -36,4 +36,4 @@ inline Int_t R3BGeoTra::getModNumInMod(const TString& name)
     return (Int_t)(name[3] - '0') - 1;
 }
 
-#endif /* !R3BGEOTRA_H */
+#endif /* R3BGEOTRA_H */

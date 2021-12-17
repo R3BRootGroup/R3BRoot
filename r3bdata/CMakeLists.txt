@@ -152,6 +152,11 @@ tofData/R3BPaddleCalData.cxx
 tofData/R3BTofdPoint.cxx
 tofData/R3BTofdDigi.cxx
 tofData/R3BPtofHit.cxx
+tofiData/R3BTofiMappedData.cxx
+tofiData/R3BTofiCalData.cxx
+tofiData/R3BTofiHitData.cxx
+tofiData/R3BTofiPoint.cxx
+tofiData/R3BTofiDigi.cxx
 pdcData/R3BPdcMappedData.cxx
 pdcData/R3BPdcCalData.cxx
 pdcData/R3BPdcHitData.cxx
@@ -164,6 +169,9 @@ fibData/R3BFi4HitItem.cxx
 fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
 fibData/R3BFibPoint.cxx
+fibData/R3BFiberMAPMTCalData.cxx
+fibData/R3BFiberMAPMTHitData.cxx
+fibData/R3BFiberMAPMTMappedData.cxx
 amsData/R3BAmsMappedData.cxx
 amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx

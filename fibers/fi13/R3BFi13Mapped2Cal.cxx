@@ -18,6 +18,13 @@ R3BFi13Mapped2Cal::R3BFi13Mapped2Cal(Int_t a_verbose, enum R3BTCalEngine::CTDCVa
 {
 }
 
+R3BFi13Mapped2Cal::R3BFi13Mapped2Cal(Int_t a_verbose,
+                                     enum Electronics a_electronics,
+                                     enum R3BTCalEngine::CTDCVariant a_variant)
+    : R3BBunchedFiberMapped2Cal("Fi13", a_verbose, a_electronics, a_variant, false)
+{
+}
+
 R3BFi13Mapped2Cal::~R3BFi13Mapped2Cal() {}
 
-ClassImp(R3BFi13Mapped2Cal)
+ClassImp(R3BFi13Mapped2Cal);

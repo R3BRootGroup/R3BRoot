@@ -31,6 +31,7 @@ class R3BBunchedFiberCalData : public TObject
 
     Int_t GetChannel() const;
     Double_t GetTime_ns() const;
+    Int_t GetSide() const;
     Bool_t IsMAPMT() const;
     Bool_t IsSPMT() const;
     Bool_t IsMAPMTTrigger() const;

@@ -28,8 +28,8 @@ class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
 
 #define BUNCHED_FIBER_TRIGGER_MAP_SET(mapmt_arr, spmt_arr) \
-  MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);\
-  SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
+    MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);       \
+    SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
 
 /**
  * Transforms bunched fiber Cal level data to Hit level.
@@ -78,9 +78,9 @@ class R3BBunchedFiberCal2Hit : public FairTask
                            UInt_t,
                            UInt_t,
                            UInt_t,
-                           Bool_t,   // is calib
-                           Bool_t,   // is gain
-                           Bool_t);  // is tsync
+                           Bool_t,  // is calib
+                           Bool_t,  // is gain
+                           Bool_t); // is tsync
 
     /**
      * Destructor.
@@ -101,7 +101,6 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * in case the Run ID has changed.
      */
     virtual InitStatus ReInit();
-
 
     virtual void SetParContainers();
 
@@ -138,8 +137,8 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * fiber!) the entry in the <name>TriggerCal TClonesArray for trigger
      * times.
      */
-    void MAPMTTriggerMapSet(unsigned const *, size_t);
-    void SPMTTriggerMapSet(unsigned const *, size_t);
+    void MAPMTTriggerMapSet(unsigned const*, size_t);
+    void SPMTTriggerMapSet(unsigned const*, size_t);
 
   private:
     TString fName;
@@ -147,11 +146,11 @@ class R3BBunchedFiberCal2Hit : public FairTask
     Int_t maxevent;
     Int_t fnEventsfill = 0;
 
-	Int_t multi=0;
-	Double_t energy[2048];
-	Int_t counts[2048];
-	Double_t tsync_temp[2048]={0};
-	Double_t  gain_temp[2048]={10};
+    Int_t multi = 0;
+    Double_t energy[2048];
+    Int_t counts[2048];
+    Double_t tsync_temp[2048] = { 0 };
+    Double_t gain_temp[2048] = { 10 };
     Bool_t tofdin;
 
     double fClockFreq;
@@ -166,8 +165,8 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TClonesArray* fSPMTCalTriggerItems;
     TClonesArray* fHitItems;
     TClonesArray* fTofdHitItems;
-    unsigned const *fMAPMTTriggerMap;
-    unsigned const *fSPMTTriggerMap;
+    unsigned const* fMAPMTTriggerMap;
+    unsigned const* fSPMTTriggerMap;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */
@@ -186,7 +185,6 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_Test;
     TH1F* fh_multi;
     TH2F* fh_time_Fib;
-    
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

@@ -34,9 +34,9 @@ class R3BBunchedFiberSPMTTrigDigitizerCal : public FairTask
     R3BBunchedFiberSPMTTrigDigitizerCal();
 
     R3BBunchedFiberSPMTTrigDigitizerCal(const char* name, Int_t iVerbose = 1);
-   
+
     /** Destructor **/
-   virtual  ~R3BBunchedFiberSPMTTrigDigitizerCal();
+    virtual ~R3BBunchedFiberSPMTTrigDigitizerCal();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -45,16 +45,14 @@ class R3BBunchedFiberSPMTTrigDigitizerCal : public FairTask
     virtual void Exec(Option_t* opt);
 
     virtual void Finish();
-    
-    virtual void Reset();
 
+    virtual void Reset();
 
   protected:
     TClonesArray* fFiberTriggerSingleCals;
     TClonesArray* fMCTrack;
 
   private:
-
     ClassDef(R3BBunchedFiberSPMTTrigDigitizerCal, 1);
 };
 

@@ -13,7 +13,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// clang-format off
 #ifdef __CINT__
 
 #pragma link off all globals;
