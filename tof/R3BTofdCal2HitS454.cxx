@@ -518,16 +518,16 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     x[iPlane][iBar].push_back(-detector_width / 2 + (paddle_width + air_gap_paddles) +
                                               (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
                 }
-                Double_t para[4];
-                para[0] = par->GetPar1a();
-                para[1] = par->GetPar1b();
-                para[2] = par->GetPar1c();
-                para[3] = par->GetPar1d();
 
+                Double_t para[4];
                 Double_t qb = 0.;
                 if (fTofdTotPos)
                 {
                     // via pol3
+                    para[0] = par->GetPola();
+                    para[1] = par->GetPolb();
+                    para[2] = par->GetPolc();
+                    para[3] = par->GetPold();
                     qb = TMath::Sqrt(top_tot * bot_tot) /
                          (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                     qb = qb * fTofdQ;
@@ -535,6 +535,10 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 else
                 {
                     // via double exponential:
+                    para[0] = par->GetPar1a();
+                    para[1] = par->GetPar1b();
+                    para[2] = par->GetPar1c();
+                    para[3] = par->GetPar1d();
                     auto q1 =
                         bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                     para[0] = par->GetPar2a();
@@ -790,13 +794,13 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             singlehit++;
             if (fTofdTotPos)
             {
-                new ((*fHitItems)[fNofHitItems++])
-                    R3BTofdHitData(tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(
+                    tArrT[hit], tArrX[hit], tArrYT[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
             }
             else
             {
-                new ((*fHitItems)[fNofHitItems++])
-                    R3BTofdHitData(tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit]);
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(
+                    tArrT[hit], tArrX[hit], tArrY[hit], tArrQ[hit], -1., tArrQ[hit], tArrP[hit], tArrB[hit]);
             }
         }
     }

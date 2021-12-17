@@ -27,8 +27,7 @@ class R3BFiberContFact : public FairContFact
     R3BFiberContFact();
     ~R3BFiberContFact() {}
     FairParSet* createContainer(FairContainer*);
-    void activateParIo(FairParIo* io);
     ClassDef(R3BFiberContFact, 0) // Factory for all Fiber parameter containers
 };
 
-#endif /* !R3BTOFCONTFACT_H */
+#endif /* R3BFIBERCONTFACT_H */

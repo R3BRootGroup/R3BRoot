@@ -69,6 +69,7 @@ R3BTofdCal2HistoPar.cxx
 R3BTofdChangePar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdCal2HitS454.cxx
+R3BTofdCal2HitS494.cxx
 R3BTofdHitModulePar.cxx
 R3BTofdHitPar.cxx
 R3BTofd.cxx

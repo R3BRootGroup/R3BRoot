@@ -34,9 +34,9 @@ class R3BFi3bDigitizerCal : public FairTask
     R3BFi3bDigitizerCal();
 
     R3BFi3bDigitizerCal(const char* name, Int_t iVerbose = 1);
-   
+
     /** Destructor **/
-   virtual  ~R3BFi3bDigitizerCal();
+    virtual ~R3BFi3bDigitizerCal();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -45,21 +45,12 @@ class R3BFi3bDigitizerCal : public FairTask
     virtual void Exec(Option_t* opt);
 
     virtual void Finish();
-    
+
     virtual void Reset();
 
-    inline void SetEnergyResolution(Double_t e)
-    {
-		esigma = e;
-    }    
-    inline void SetTimeResolution(Double_t t)
-    {
-	    tsigma = t;	
-	}	
-    inline void SetYPositionResolution(Double_t y)
-    {
-		ysigma = y;
-	}	
+    inline void SetEnergyResolution(Double_t e) { esigma = e; }
+    inline void SetTimeResolution(Double_t t) { tsigma = t; }
+    inline void SetYPositionResolution(Double_t y) { ysigma = y; }
 
   protected:
     TClonesArray* fFi3bPoints;
@@ -75,7 +66,7 @@ class R3BFi3bDigitizerCal : public FairTask
     Double_t tsigma;
     Double_t ysigma;
 
-   Float_t detector_height = 10.000000;
+    Float_t detector_height = 10.000000;
     Float_t fiber_thickness = 0.021000;
     Int_t fiber_nbr = 512;
     Float_t dead_layer = 0.9;

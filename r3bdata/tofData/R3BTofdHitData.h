@@ -26,10 +26,25 @@ class R3BTofdHitData : public R3BHit
     R3BTofdHitData();
 
     // Standard Constructor
-    R3BTofdHitData(Double_t t, Double_t x, Double_t y, Double_t Z, Double_t tdiff, Double_t ELoss = 0, Double_t ID = 0);
+    R3BTofdHitData(Double_t t,
+                   Double_t x,
+                   Double_t y,
+                   Double_t Z,
+                   Double_t tdiff,
+                   Double_t ELoss = 0,
+                   Double_t ID = 0,
+                   Int_t iBar = 0,
+                   Double_t traw = -1000);
 
     // Destructor
     virtual ~R3BTofdHitData() {}
+
+    Int_t GetBarId() const;
+    Double_t GetTimeRaw() const; // Get paddle time without trigger
+
+  private:
+    Int_t fBarId;
+    Double_t fTimeRaw;
 
     ClassDef(R3BTofdHitData, 2)
 };

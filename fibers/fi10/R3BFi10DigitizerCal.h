@@ -34,9 +34,9 @@ class R3BFi10DigitizerCal : public FairTask
     R3BFi10DigitizerCal();
 
     R3BFi10DigitizerCal(const char* name, Int_t iVerbose = 1);
-   
+
     /** Destructor **/
-   virtual  ~R3BFi10DigitizerCal();
+    virtual ~R3BFi10DigitizerCal();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -45,21 +45,12 @@ class R3BFi10DigitizerCal : public FairTask
     virtual void Exec(Option_t* opt);
 
     virtual void Finish();
-    
+
     virtual void Reset();
 
-    inline void SetEnergyResolution(Double_t e)
-    {
-		esigma = e;
-    }    
-    inline void SetTimeResolution(Double_t t)
-    {
-	    tsigma = t;	
-	}	
-    inline void SetYPositionResolution(Double_t y)
-    {
-		ysigma = y;
-	}	
+    inline void SetEnergyResolution(Double_t e) { esigma = e; }
+    inline void SetTimeResolution(Double_t t) { tsigma = t; }
+    inline void SetYPositionResolution(Double_t y) { ysigma = y; }
 
   protected:
     TClonesArray* fFi10Points;

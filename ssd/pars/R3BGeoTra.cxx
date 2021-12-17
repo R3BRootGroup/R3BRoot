@@ -25,7 +25,7 @@
 R3BGeoTra::R3BGeoTra()
 {
     // Constructor
-    fName = "sts";
+    fName = "ssd";
     maxSectors = 0;
     maxModules = 99;
 }
@@ -56,4 +56,4 @@ const char* R3BGeoTra::getEleName(Int_t m)
     return eleName;
 }
 
-ClassImp(R3BGeoTra)
+ClassImp(R3BGeoTra);

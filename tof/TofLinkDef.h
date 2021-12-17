@@ -20,7 +20,7 @@
 #pragma link off all functions;
  
 #pragma link C++ class R3BGeoTof+;
-#pragma link C++ class R3BGeoTofPar;
+#pragma link C++ class R3BGeoTofPar+;
 #pragma link C++ class R3BTof+;
 #pragma link C++ class R3BTofContFact+;
 #pragma link C++ class R3BTofDigiPar+;
@@ -35,14 +35,15 @@
 #pragma link C++ class R3BTofdChangePar+;
 #pragma link C++ class R3BTofdCal2Hit+;
 #pragma link C++ class R3BTofdCal2HitS454+;
+#pragma link C++ class R3BTofdCal2HitS494+;
 #pragma link C++ class R3BTofdHitModulePar+;
 #pragma link C++ class R3BTofd+;
 #pragma link C++ class R3BTofdDigitizer+;
 #pragma link C++ class R3BTofdDigitizerCal+;
 #pragma link C++ class R3BGeoTofd+;
-#pragma link C++ class R3BGeoTofdPar;
+#pragma link C++ class R3BGeoTofdPar+;
 #pragma link C++ class R3BTofdDigiPar+;
-#pragma link C++ class R3BTofdContFact;
+#pragma link C++ class R3BTofdContFact+;
 #pragma link C++ class R3BTofdHitPar+;
 #pragma link C++ class R3BPtofMapped2CalPar+;
 #pragma link C++ class R3BPtofMapped2Cal+;
@@ -50,7 +51,6 @@
 #pragma link C++ class R3BPtofCal2Hit+;
 #pragma link C++ class R3BPtofHitPar+;
 #pragma link C++ class R3BPtofParFact+;
-
 
 #endif
 

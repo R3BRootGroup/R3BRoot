@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BBunchedFiberMapped2TCal                -----
-// -----          Created Feb 13th 2018 by M.Heil          -----
+// -----             R3BBunchedFiberMapped2TCal           -----
+// -----          Created Feb 13th 2018 by M.Heil         -----
 // ------------------------------------------------------------
 
 #include "R3BBunchedFiberMapped2Cal.h"
@@ -44,14 +44,54 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
 {
 }
 
+R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
+                                                     Int_t a_verbose,
+                                                     enum Electronics a_spmt_electronics,
+                                                     enum R3BTCalEngine::CTDCVariant a_variant,
+                                                     Bool_t a_skip_spmt)
+    : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
+    , fName(a_name)
+    , fSPMTElectronics(a_spmt_electronics)
+    , fCTDCVariant(a_variant)
+    , fSkipSPMT(a_skip_spmt)
+    , fMAPMTTCalPar(nullptr)
+    , fMAPMTTrigTCalPar(nullptr)
+    , fSPMTTCalPar(nullptr)
+    , fMappedItems(nullptr)
+    , fCalItems(new TClonesArray("R3BBunchedFiberCalData"))
+    , fCalTriggerItems(new TClonesArray("R3BBunchedFiberCalData"))
+    , fnEvents(0)
+{
+
+    //	cout<<"FIBER MAPPED TO CAL FOR FIB: "<<a_name<<endl;
+}
+
 R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 {
-    delete fCalItems;
-    delete fCalTriggerItems;
+    if (fCalItems)
+        delete fCalItems;
+    if (fCalTriggerItems)
+        delete fCalTriggerItems;
 }
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
+    if (fSPMTElectronics)
+    {
+        switch (fSPMTElectronics)
+        {
+            case CTDC:
+                fTamexFreq = 1000. / (R3BTCalEngine::CTDC_16_BWD_150 == fCTDCVariant ? 150 : 250);
+                break;
+            case TAMEX:
+                fTamexFreq = 1000. / VFTX_CLOCK_MHZ;
+                break;
+            default:
+                assert(0 && "This should not happen!");
+        }
+        fClockFreq = 1000. / (R3BTCalEngine::CTDC_16_BWD_150 == fCTDCVariant ? 150 : 250);
+    }
+
     if (!fMAPMTTCalPar || !(fSkipSPMT || fSPMTTCalPar))
     {
         LOG(ERROR) << "TCal parameter containers missing, "
@@ -204,6 +244,4 @@ void R3BBunchedFiberMapped2Cal::FinishEvent()
     fCalTriggerItems->Clear();
 }
 
-void R3BBunchedFiberMapped2Cal::FinishTask() {}
-
-ClassImp(R3BBunchedFiberMapped2Cal)
+ClassImp(R3BBunchedFiberMapped2Cal);

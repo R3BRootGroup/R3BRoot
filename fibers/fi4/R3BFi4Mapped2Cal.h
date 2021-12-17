@@ -26,6 +26,7 @@ class R3BFi4Mapped2Cal : public R3BBunchedFiberMapped2Cal
 {
   public:
     R3BFi4Mapped2Cal(Int_t, enum R3BTCalEngine::CTDCVariant);
+    R3BFi4Mapped2Cal(Int_t, enum Electronics, enum R3BTCalEngine::CTDCVariant);
     virtual ~R3BFi4Mapped2Cal();
 
     ClassDef(R3BFi4Mapped2Cal, 1)
