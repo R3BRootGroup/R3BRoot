@@ -45,7 +45,7 @@ class R3BBunchedFiberMappedData : public TObject
     Bool_t IsTrailing() const;
 
   protected:
-    Int_t fSide;       // 0 = MAPMT, 1 = SPMT, 2 = MAPMT trigger, 3 = SPMT trigger.
+    Int_t fSide; // 0 = MAPMT, 1 = SPMT, 2 = MAPMT trigger, 3 = SPMT trigger.
     Int_t fChannel;
     Bool_t fIsLeading;
     Int_t fCoarse;

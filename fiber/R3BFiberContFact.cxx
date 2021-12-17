@@ -11,9 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//*-- AUTHOR : Denis Bertini
-//*-- Created : 20/03/2009
-
 /////////////////////////////////////////////////////////////
 //
 //  R3BFiberContFact
@@ -22,26 +19,17 @@
 //
 /////////////////////////////////////////////////////////////
 
+#include "FairLogger.h"
+#include "FairRuntimeDb.h"
+
 #include "R3BFiberContFact.h"
 
-//#include "R3BGeoTofPar.h" //still to do
 #include "R3BBunchedFiberHitPar.h"
-
-#include "FairParAsciiFileIo.h"
-#include "FairParRootFileIo.h"
-#include "FairRuntimeDb.h"
+#include "R3BFiberMAPMTHitPar.h"
 
 #include "TClass.h"
 
-#include <iomanip>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
-ClassImp(R3BFiberContFact)
-
-    static R3BFiberContFact gR3BFiberContFact;
+static R3BFiberContFact gR3BFiberContFact;
 
 R3BFiberContFact::R3BFiberContFact()
 {
@@ -61,14 +49,7 @@ void R3BFiberContFact::setAllContainers()
                                            "Sts Digitisation Parameters",
                                            "TestDefaultContext");
      p1->addContext("TestNonDefaultContext");
-
-     FairContainer* p2= new FairContainer("CbmGeoStsPar",
-                                           "Sts Geometry Parameters",
-                                           "TestDefaultContext");
-     p2->addContext("TestNonDefaultContext");
-
      containers->Add(p1);
-     containers->Add(p2);
      */
     FairContainer* p1 = new FairContainer("Fi3aHitPar", "Fi3a Hit Parameters", "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
@@ -109,6 +90,30 @@ void R3BFiberContFact::setAllContainers()
     FairContainer* p10 = new FairContainer("Fi1bHitPar", "Fi1b Hit Parameters", "TestDefaultContext");
     p10->addContext("TestNonDefaultContext");
     containers->Add(p10);
+
+    FairContainer* p11 = new FairContainer("Fi30HitPar", "Fi30 Hit Parameters", "TestDefaultContext");
+    p11->addContext("TestNonDefaultContext");
+    containers->Add(p11);
+
+    FairContainer* p12 = new FairContainer("Fi31HitPar", "Fi31 Hit Parameters", "TestDefaultContext");
+    p12->addContext("TestNonDefaultContext");
+    containers->Add(p12);
+
+    FairContainer* p13 = new FairContainer("Fi32HitPar", "Fi32 Hit Parameters", "TestDefaultContext");
+    p13->addContext("TestNonDefaultContext");
+    containers->Add(p13);
+
+    FairContainer* p14 = new FairContainer("Fi33HitPar", "Fi33 Hit Parameters", "TestDefaultContext");
+    p14->addContext("TestNonDefaultContext");
+    containers->Add(p14);
+
+    FairContainer* p15 = new FairContainer("Fi23aHitPar", "Fi23a Hit Parameters", "TestDefaultContext");
+    p15->addContext("TestNonDefaultContext");
+    containers->Add(p15);
+
+    FairContainer* p16 = new FairContainer("Fi23bHitPar", "Fi23b Hit Parameters", "TestDefaultContext");
+    p16->addContext("TestNonDefaultContext");
+    containers->Add(p16);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
@@ -118,33 +123,19 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    cout << " -I container name " << name << endl;
+    LOG(INFO) << "R3BFiberContFact: Create container name " << name;
     FairParSet* p = 0;
-    /*
-    if (strcmp(name,"R3BFiberDigiPar")==0) {
-      p=new R3BFiberDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+
+    if (strcmp(name, "Fi30HitPar") == 0 || strcmp(name, "Fi31HitPar") == 0 || strcmp(name, "Fi32HitPar") == 0 ||
+        strcmp(name, "Fi33HitPar") == 0 || strcmp(name, "Fi23aHitPar") == 0 || strcmp(name, "Fi23bHitPar") == 0)
+    {
+        p = new R3BFiberMAPMTHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name,"CbmGeoStsPar")==0) {
-      p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
-    }*/
-    //  if (strcmp(name,"FiberdHitPar")==0) {
-    p = new R3BBunchedFiberHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    //  }
+    else
+    {
+        p = new R3BBunchedFiberHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
     return p;
 }
 
-void R3BFiberContFact::activateParIo(FairParIo* io)
-{
-    // activates the input/output class for the parameters
-    // needed by the Sts
-    /*
-    if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BFiberParRootFileIo* p=new R3BFiberParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
-      io->setDetParIo(p);
-    }
-    if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BFiberParAsciiFileIo* p=new R3BFiberParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
-      io->setDetParIo(p);
-      }
-    */
-}
+ClassImp(R3BFiberContFact);

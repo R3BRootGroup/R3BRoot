@@ -36,9 +36,7 @@ class R3BBunchedFiberSPMTTrigMapped2CalPar : public FairTask
      * @param a_update_rate a update rate for online histograms.
      * @param a_min_stats a minimum statistics for calibration.
      */
-    R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t,
-                                 Int_t = 1e6,
-                                 Int_t = 1e5);
+    R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t, Int_t = 1e6, Int_t = 1e5);
 
     /**
      * Destructor.

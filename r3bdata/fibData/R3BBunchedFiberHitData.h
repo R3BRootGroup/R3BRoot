@@ -20,13 +20,21 @@
 
 #include "R3BHit.h"
 
-class R3BBunchedFiberHitData: public R3BHit
+class R3BBunchedFiberHitData : public R3BHit
 {
   public:
     R3BBunchedFiberHitData();
-    R3BBunchedFiberHitData(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t a_fiber_id, Double_t
-    a_mapmt_time_ns, Double_t a_spmt_time_ns, Double_t a_mapmt_tot_ns, Double_t a_spmt_tot_ns);
-    
+    R3BBunchedFiberHitData(Int_t detId,
+                           Double_t x,
+                           Double_t y,
+                           Double_t eloss,
+                           Double_t time,
+                           Int_t a_fiber_id,
+                           Double_t a_mapmt_time_ns,
+                           Double_t a_spmt_time_ns,
+                           Double_t a_mapmt_tot_ns,
+                           Double_t a_spmt_tot_ns);
+
     virtual ~R3BBunchedFiberHitData();
 
     Int_t GetFiberId() const;
@@ -48,7 +56,3 @@ class R3BBunchedFiberHitData: public R3BHit
 };
 
 #endif
-
-    
-
-
