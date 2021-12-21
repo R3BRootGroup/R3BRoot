@@ -119,6 +119,7 @@ class R3BAnalysisIncomingID : public FairTask
 
     R3BEventHeader* header; /**< Event header. */
     Bool_t fOnline;         // Don't store data for online
+    Bool_t fUseLOS;         // Use LOS charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;
@@ -132,6 +133,7 @@ class R3BAnalysisIncomingID : public FairTask
     TArrayF* fDispersionS2;
     Float_t fx0_point, fy0_point, frot_ang;
     Float_t fx0_Aq, fy0_Aq, fang_Aq;
+    Float_t fBeta_max, fBeta_min;
 
     // Parameter containers for R3BMusicPar
     UChar_t fNumMusicParams;

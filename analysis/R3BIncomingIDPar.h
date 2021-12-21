@@ -49,6 +49,8 @@ class R3BIncomingIDPar : public FairParGenericSet
     const Float_t Getang_Aq() { return fang_Aq; }
     const Float_t GetTof2InvV_p0(Int_t det) { return fTof2InvV_p0->GetAt(det - 1); }
     const Float_t GetTof2InvV_p1(Int_t det) { return fTof2InvV_p1->GetAt(det - 1); }
+    const Float_t GetBeta_min() { return fBeta_min; }
+    const Float_t GetBeta_max() { return fBeta_max; }
 
     void SetToFoffset(Float_t value, Int_t det) { fToFoffset->AddAt(value, det - 1); }
     void SetPosS2Left(Float_t value, Int_t det) { fPosS2Left->AddAt(value, det - 1); }
@@ -70,6 +72,7 @@ class R3BIncomingIDPar : public FairParGenericSet
     TArrayF* fDispersionS2;
     Float_t fx0_point, fy0_point, frot_ang;
     Float_t fx0_Aq, fy0_Aq, fang_Aq;
+    Float_t fBeta_max, fBeta_min;
 
     const R3BIncomingIDPar& operator=(const R3BIncomingIDPar&);
     R3BIncomingIDPar(const R3BIncomingIDPar&);
