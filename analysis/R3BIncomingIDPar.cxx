@@ -78,6 +78,8 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
     list->add("x0_Aq", fx0_Aq);
     list->add("y0_Aq", fy0_Aq);
     list->add("ang_Aq", fang_Aq);
+    list->add("Beta_min", fBeta_min);
+    list->add("Beta_max", fBeta_max);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -166,6 +168,19 @@ Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
         LOG(INFO) << "---Could not initialize incomingIDang_AqPar";
         return kFALSE;
     }
+
+    if (!(list->fill("Beta_min", &fBeta_min)))
+    {
+        LOG(INFO) << "---Could not initialize incomingID Beta_min Par";
+        return kFALSE;
+    }
+
+    if (!(list->fill("Beta_max", &fBeta_max)))
+    {
+        LOG(INFO) << "---Could not initialize incomingID Beta_max Par";
+        return kFALSE;
+    }
+
     return kTRUE;
 }
 

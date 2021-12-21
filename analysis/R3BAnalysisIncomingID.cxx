@@ -72,6 +72,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fOnline(kFALSE)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
+    , fUseLOS(kTRUE)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);
@@ -162,6 +163,8 @@ void R3BAnalysisIncomingID::SetParameter()
     fx0_Aq = fIncomingID_Par->Getx0_Aq();
     fy0_Aq = fIncomingID_Par->Gety0_Aq();
     fang_Aq = fIncomingID_Par->Getang_Aq();
+    fBeta_min = fIncomingID_Par->GetBeta_min();
+    fBeta_max = fIncomingID_Par->GetBeta_max();
 
     for (Int_t i = 1; i < fNumDet + 1; i++)
     {
@@ -254,6 +257,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
     // --- local variables --- //
     Double_t timeLosV[fNumDet];
     Double_t posLosX_cm[fNumDet];
+    Double_t Zlos[fNumDet];
     Double_t TimeSci2_m1[fNumDet];
     Double_t PosSci2_m1[fNumDet];
     UInt_t nHits = 0;
@@ -314,6 +318,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             {
                 timeLosV[numDet - 1] = hittcal->GetTime();
                 posLosX_cm[numDet - 1] = hittcal->GetX_cm();
+                Zlos[numDet - 1] = hittcal->GetZ();
                 multLos[numDet - 1]++;
             }
         } // --- end of loop over hit data --- //
@@ -331,21 +336,34 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         if (multLos[i] >= 1 && multSci2[i] >= 1)
         {
             ToFraw_m1 = timeLosV[i] - TimeSci2_m1[i];
+            if (ToFraw_m1 > 0)
+                ToFraw_m1 = ToFraw_m1 - 40960.;
             Velo_m1 =
                 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
             Beta_m1 = Velo_m1 / 0.299792458;
-            Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(Beta_m1, 2)));
-            PosCal_m1 = PosSci2_m1[i]; // [mm] at S2
-            Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. - PosCal_m1 / fDispersionS2->GetAt(i));
-            AoQ_m1 = Brho_m1 / (3.10716 * Beta_m1 * Gamma_m1);
-            AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
-            if (Zmusic > 0.)
+
+            if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
             {
-                double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                double zcor = sqrt(Emus * Beta_m1) * 0.277;
-                double zcorang =
-                    fy0_point + (Music_ang - fx0_point) * sin(frot_ang) + (zcor - fy0_point) * cos(frot_ang) + 0.2;
-                AddData(1, 2, zcorang, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(Beta_m1, 2)));
+                PosCal_m1 = PosSci2_m1[i]; // [mm] at S2
+                Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. - PosCal_m1 / fDispersionS2->GetAt(i));
+                AoQ_m1 = Brho_m1 / (3.10716 * Beta_m1 * Gamma_m1);
+                AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
+
+                if (Zmusic > 0. && !fUseLOS)
+                {
+                    double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                    double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                    double zcorang =
+                        fy0_point + (Music_ang - fx0_point) * sin(frot_ang) + (zcor - fy0_point) * cos(frot_ang) + 0.2;
+
+                    AddData(1, 2, zcorang, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                }
+
+                if (Zlos[i] > 0. && fUseLOS)
+                {
+                    AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                }
             }
         }
     }
