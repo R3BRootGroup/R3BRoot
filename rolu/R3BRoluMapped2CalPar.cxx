@@ -11,11 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ----------------------------------------------------------------
-// -----            R3BRoluMapped2CalPar                      -----
-// -----           Created July 2019 by A. Kelic-Heil         -----
-// -----           Following R3BLosMapped2CalPar              -----
-// ----------------------------------------------------------------
+// ---------------------------------------------------------------
+// -----                R3BRoluMapped2CalPar                 -----
+// -----        Created July 2019 by A. Kelic-Heil           -----
+// -----          Following R3BLosMapped2CalPar              -----
+// ---------------------------------------------------------------
 
 /* Some notes:
  *
@@ -46,15 +46,7 @@
 using namespace std;
 
 R3BRoluMapped2CalPar::R3BRoluMapped2CalPar()
-    : FairTask("R3BRoluMapped2CalPar", 1)
-    , fUpdateRate(1000000)
-    , fMinStats(100000)
-    , fTrigger(-1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
-    , fNofTypes(0)
-    , fNEvents(0)
-    , fCal_Par(NULL)
+    : R3BRoluMapped2CalPar("R3BRoluMapped2CalPar", 1)
 {
 }
 
@@ -89,16 +81,31 @@ InitStatus R3BRoluMapped2CalPar::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
+        LOG(FATAL) << "R3BRoluMapped2CalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
     // may be = NULL!
+    if (!header)
+    {
+        LOG(WARNING) << "R3BRoluMapped2CalPar::Init() EventHeader. not found";
+        header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(INFO) << "R3BRoluMapped2CalPar::Init() R3BEventHeader found";
 
     fMapped = (TClonesArray*)rm->GetObject("RoluMapped");
     if (!fMapped)
     {
+        LOG(FATAL) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
         return kFATAL;
+    }
+
+    fMappedTrigger = (TClonesArray*)rm->GetObject("RoluTriggerMapped");
+    if (!fMappedTrigger)
+    {
+        LOG(WARNING) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
     }
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
@@ -106,7 +113,7 @@ InitStatus R3BRoluMapped2CalPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BRoluMapped2CalPar::Init() Number of modules not set. ";
+        LOG(FATAL) << "R3BRoluMapped2CalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -163,11 +170,20 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
         fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
     }
 
+    if (fMappedTrigger)
+    {
+        nHits = fMappedTrigger->GetEntries();
+        // Loop over mapped triggers
+        for (Int_t i = 0; i < nHits; i++)
+        {
+            auto mapped = (R3BRoluMappedData const*)fMappedTrigger->At(i);
+            fEngine->Fill(3, 1, 1, mapped->GetTimeFine());
+        }
+    }
+
     // Increment events
     fNEvents += 1;
 }
-
-void R3BRoluMapped2CalPar::FinishEvent() {}
 
 void R3BRoluMapped2CalPar::FinishTask()
 {
@@ -176,4 +192,4 @@ void R3BRoluMapped2CalPar::FinishTask()
     fCal_Par->printParams();
 }
 
-ClassImp(R3BRoluMapped2CalPar)
+ClassImp(R3BRoluMapped2CalPar);

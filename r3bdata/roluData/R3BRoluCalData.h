@@ -52,4 +52,4 @@ class R3BRoluCalData : public TObject
     ClassDef(R3BRoluCalData, 1)
 };
 
-#endif
+#endif // R3BROLUCALITEM_H

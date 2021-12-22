@@ -187,6 +187,16 @@
       "@type": "Person",
       "givenName": "Lorenzo",
       "familyName": "Zanetti"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Martina",
+      "familyName": "Feijoo"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Valerii",
+      "familyName": "Panin"
     }
   ]
 }

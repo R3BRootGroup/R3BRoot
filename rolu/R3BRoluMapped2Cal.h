@@ -12,14 +12,14 @@
  ******************************************************************************/
 
 // ---------------------------------------------------------------
-// -----                  R3BRoluMapped2Cal                  -----
-// -----            Created July 2019 by A. Kelic-Heil       -----
-// ----- Convert mapped data to time calibrated data         -----
-// ----- Following R3BLosMapped2Cal                          -----
+// -----                   R3BRoluMapped2Cal                 -----
+// -----          Created July 2019 by A. Kelic-Heil         -----
+// -----      Convert mapped data to time calibrated data    -----
+// -----              Following R3BLosMapped2Cal             -----
 // ---------------------------------------------------------------
 
-#ifndef R3BROLUMAPPED2CAL
-#define R3BROLUMAPPED2CAL
+#ifndef R3BROLUMAPPED2CAL_H
+#define R3BROLUMAPPED2CAL_H
 
 #include <map>
 
@@ -27,8 +27,6 @@
 #include "R3BRoluCalData.h"
 
 class TClonesArray;
-class TH1F;
-class TH2F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
@@ -99,12 +97,6 @@ class R3BRoluMapped2Cal : public FairTask
     virtual void FinishEvent();
 
     /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
-
-    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
@@ -122,11 +114,15 @@ class R3BRoluMapped2Cal : public FairTask
         fNofModules = nChs * nDets * 2;
     }
 
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
-    // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
-    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;         /**< Number of produced time items per event. */
+    TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
+    TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;           /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems;    /**< Array with cal items - output data. */
+    Int_t fNofCalItems;                /**< Number of produced time items per event. */
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
     UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
@@ -141,9 +137,11 @@ class R3BRoluMapped2Cal : public FairTask
     UInt_t fNofModules;  /**< Total number of channels. */
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
+    // Don't store data for online
+    Bool_t fOnline;
 
   public:
-    ClassDef(R3BRoluMapped2Cal, 1)
+    ClassDef(R3BRoluMapped2Cal, 2)
 };
 
-#endif
+#endif // R3BROLUMAPPED2CAL_H

@@ -12,14 +12,14 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------------
-// -----                  R3BRoluCal2Hit                         -----
-// -----            Created July 2019 by A. Kelic-Heil     -----
-// ----- Convert time calibrated data to hit level (single time) ----
-// ----- Following R3BLosCal2Hit
+// -----                      R3BRoluCal2Hit                    -----
+// -----            Created July 2019 by A. Kelic-Heil          -----
+// ----- Convert calibrated data to hit level (single time)     -----
+// -----                  Following R3BLosCal2Hit               -----
 // ------------------------------------------------------------------
 
-#ifndef R3BRoluCAL2HIT
-#define R3BRoluCAL2HIT
+#ifndef R3BRoluCAL2HIT_H
+#define R3BRoluCAL2HIT_H
 
 #include <map>
 
@@ -94,23 +94,30 @@ class R3BRoluCal2Hit : public FairTask
      */
     virtual void FinishTask();
 
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     TClonesArray* fCalItems; /* < Array with Cal items - input data. */
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
-    UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
-    Double_t fClockFreq;     /* < Clock cycle in [ns]. */
-
+    TClonesArray* fCalTriggerItems;
+    Double_t fClockFreq;  /* < Clock cycle in [ns]. */
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    Int_t fnEvents;
     TClonesArray* fMapped; /* < Array with mapped data - input data. */
 
-    TH1F* fhQ_R;
-    TH1F* fhQ_O;
-    TH1F* fhQ_L;
-    TH1F* fhQ_U;
+    TH1F* fhQ_R[2];
+    TH1F* fhQ_O[2];
+    TH1F* fhQ_L[2];
+    TH1F* fhQ_U[2];
 
-    Int_t Icount = 0;
+    Int_t maxevent;
+    // Don't store data for online
+    Bool_t fOnline;
 
   public:
-    ClassDef(R3BRoluCal2Hit, 1)
+    ClassDef(R3BRoluCal2Hit, 2)
 };
 
-#endif
+#endif // R3BRoluCAL2HIT_H

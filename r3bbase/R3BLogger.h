@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -12,18 +10,42 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+ 
+#ifndef R3BLogger_H
+#define R3BLogger_H
 
-#ifdef __CINT__
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <cstdlib>
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "FairLogger.h"
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderPropagator+;
-#pragma link C++ class R3BWhiterabbitPropagator+;
-#pragma link C++ class R3BFileSource+;
+class R3BLogger : public FairLogger
+{
+  public:
+    R3BLogger();
+    
+   private:
+     ~R3BLogger();
 
-#endif
+  public:
+    ClassDefOverride(R3BLogger, 0)
+};
+
+#define R3BLOG(severity) \
+    std::string fileName_(__FILE__);\
+    std::string fileName2_(fileName_.substr(fileName_.find_last_of("/")+1));\
+    std::stringstream ss_;\
+    ss_ << fileName2_ << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: ";\
+    LOG(severity) << ss_.str()\
+    
+#define R3BLOG_IF(severity, condition) \
+    std::string fileName_(__FILE__);\
+    std::string fileName2_(fileName_.substr(fileName_.find_last_of("/")+1));\
+    std::stringstream ss_;\
+    ss_ << fileName2_ << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: ";\
+    LOG_IF(severity, condition) << ss_.str()\
+
+#endif // R3BLogger_H

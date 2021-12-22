@@ -290,7 +290,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     
     if (fSkip)
     {
-
         if (fEventHeader->GetTpat() > 0)
         {
 
@@ -303,7 +302,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
             FairRunOnline::Instance()->MarkFill(kFALSE);
         }
     }
-
 
     return 0;
 }

@@ -11,9 +11,9 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BCal" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BRolu" which includes the source files given in
+# the array. The extension is already found. Any number of sources could be 
+# listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
@@ -22,19 +22,9 @@ ${BASE_INCLUDE_DIRECTORIES}
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
-${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/rolu
-${R3BROOT_SOURCE_DIR}/r3bdata/
-${R3BROOT_SOURCE_DIR}/r3bdata/calData
-${R3BROOT_SOURCE_DIR}/r3bdata/dchData
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
@@ -61,7 +51,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF RoluLinkDef.h)
 Set(LIBRARY_NAME R3BRolu)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BTCal)
+    R3Bbase R3BData R3BTCal)
 
 GENERATE_LIBRARY()
 
