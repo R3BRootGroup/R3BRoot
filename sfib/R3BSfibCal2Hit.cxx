@@ -11,18 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include <iostream>
-#include <TClonesArray.h>
-#include "FairLogger.h"
 #include "R3BSfibCal2Hit.h"
+#include "FairLogger.h"
 #include "R3BSfibCalData.h"
 #include "R3BSfibHitData.h"
+#include <TClonesArray.h>
+#include <iostream>
 
 R3BSfibCal2Hit::ToT::ToT(R3BSfibCalData const* a_lead,
-                                 R3BSfibCalData const* a_trail,
-                                 Double_t a_lead_ns,
-                                 Double_t a_tail_ns,
-                                 Double_t a_tot_ns)
+                         R3BSfibCalData const* a_trail,
+                         Double_t a_lead_ns,
+                         Double_t a_tail_ns,
+                         Double_t a_tot_ns)
     : lead(a_lead)
     , trail(a_trail)
     , lead_ns(a_lead_ns)
@@ -31,8 +31,7 @@ R3BSfibCal2Hit::ToT::ToT(R3BSfibCalData const* a_lead,
 {
 }
 
-R3BSfibCal2Hit::R3BSfibCal2Hit(Int_t a_verbose,
-                                               enum R3BTCalEngine::CTDCVariant a_ctdc_variant)
+R3BSfibCal2Hit::R3BSfibCal2Hit(Int_t a_verbose, enum R3BTCalEngine::CTDCVariant a_ctdc_variant)
     : FairTask("R3BSfibCal2Hit", a_verbose)
     , fnEvents()
     , fClockFreq(R3BTCalEngine::CTDC_16_BWD_150 == a_ctdc_variant ? 150 : 250)
@@ -47,10 +46,7 @@ R3BSfibCal2Hit::R3BSfibCal2Hit(Int_t a_verbose,
 {
 }
 
-R3BSfibCal2Hit::~R3BSfibCal2Hit()
-{
-    delete fHitItems;
-}
+R3BSfibCal2Hit::~R3BSfibCal2Hit() { delete fHitItems; }
 
 InitStatus R3BSfibCal2Hit::Init()
 {
@@ -81,9 +77,7 @@ InitStatus R3BSfibCal2Hit::Init()
 
 InitStatus R3BSfibCal2Hit::ReInit() { return kSUCCESS; }
 
-void R3BSfibCal2Hit::SetParContainers()
-{
-}
+void R3BSfibCal2Hit::SetParContainers() {}
 
 void R3BSfibCal2Hit::Exec(Option_t* option)
 {
@@ -220,40 +214,35 @@ void R3BSfibCal2Hit::Exec(Option_t* option)
     for (auto it_top = top_array.begin(); top_array.end() != it_top; ++it_top)
     {
         auto const& top = *it_top;
-        for (auto it_top_tot = top.tot_list.begin(); top.tot_list.end() != it_top_tot;
-             ++it_top_tot)
+        for (auto it_top_tot = top.tot_list.begin(); top.tot_list.end() != it_top_tot; ++it_top_tot)
         {
             auto const& top_tot = *it_top_tot;
-	    auto top_i = top_tot.lead->GetChannel() - 1;
+            auto top_i = top_tot.lead->GetChannel() - 1;
             for (auto it_bot = bot_array.begin(); bot_array.end() != it_bot; ++it_bot)
             {
-               auto const& bot = *it_bot;
-               for (auto it_bot_tot = bot.tot_list.begin(); bot.tot_list.end() != it_bot_tot;
-			       ++it_bot_tot)
-               {
-                 auto const& bot_tot = *it_bot_tot;
-		 auto bot_i = bot_tot.lead->GetChannel() - 1;
+                auto const& bot = *it_bot;
+                for (auto it_bot_tot = bot.tot_list.begin(); bot.tot_list.end() != it_bot_tot; ++it_bot_tot)
+                {
+                    auto const& bot_tot = *it_bot_tot;
+                    auto bot_i = bot_tot.lead->GetChannel() - 1;
 
-		 // Check that the combo is inside one block of 8x8 sorting.
-		 auto top_sub_i = top_i / 64;
-		 auto bot_sub_i = bot_i / 64;
-		 if (top_sub_i != bot_sub_i) continue;
+                    // Check that the combo is inside one block of 8x8 sorting.
+                    auto top_sub_i = top_i / 64;
+                    auto bot_sub_i = bot_i / 64;
+                    if (top_sub_i != bot_sub_i)
+                        continue;
 
-		 auto fiber_id = (bot_i & 7) + (top_i * 8);
+                    auto fiber_id = (bot_i & 7) + (top_i * 8);
 
-		 auto tot_top = top_tot.tot_ns;
-		 Double_t t_top = top_tot.lead_ns;
+                    auto tot_top = top_tot.tot_ns;
+                    Double_t t_top = top_tot.lead_ns;
 
-		 Double_t t_top1 = top_tot.lead->GetTime_ns();
+                    Double_t t_top1 = top_tot.lead->GetTime_ns();
 
-		 new ((*fHitItems)[fNofHitItems++])
-			 R3BSfibHitData(fiber_id,
-					 top_tot.lead_ns,
-					 bot_tot.lead_ns,
-					 top_tot.tot_ns,
-					 bot_tot.tot_ns);
-	       }
-	    }
+                    new ((*fHitItems)[fNofHitItems++])
+                        R3BSfibHitData(fiber_id, top_tot.lead_ns, bot_tot.lead_ns, top_tot.tot_ns, bot_tot.tot_ns);
+                }
+            }
         }
     }
     fnEvents++;
@@ -265,8 +254,6 @@ void R3BSfibCal2Hit::FinishEvent()
     fNofHitItems = 0;
 }
 
-void R3BSfibCal2Hit::FinishTask()
-{
-}
+void R3BSfibCal2Hit::FinishTask() {}
 
 ClassImp(R3BSfibCal2Hit)

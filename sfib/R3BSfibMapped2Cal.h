@@ -40,8 +40,7 @@ class R3BSfibMapped2Cal : public FairTask
      * Creates an instance of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BSfibMapped2Cal(Int_t,
-		    enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_8_12_FWD_250);
+    R3BSfibMapped2Cal(Int_t, enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_8_12_FWD_250);
 
     /**
      * Destructor.

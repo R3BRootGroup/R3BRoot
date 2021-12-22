@@ -19,11 +19,12 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class R3Bsfi+;
+#pragma link C++ class R3BsfiDigitizer+;
 
 #pragma link C++ class R3BSfibMapped2Cal+;
 #pragma link C++ class R3BSfibMapped2CalPar+;
 #pragma link C++ class R3BSfibCal2Hit+;
 //#pragma link C++ class R3BSfibCal2HitPar+;
-
 
 #endif

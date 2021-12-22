@@ -88,7 +88,6 @@ class R3BSfibCal2Hit : public FairTask
      */
     virtual InitStatus ReInit();
 
-
     virtual void SetParContainers();
 
     /**
@@ -119,8 +118,8 @@ class R3BSfibCal2Hit : public FairTask
     TClonesArray* fTopCalTriggerItems;
     TClonesArray* fBotCalTriggerItems;
     TClonesArray* fHitItems;
-    unsigned const *fTopTriggerMap;
-    unsigned const *fBotTriggerMap;
+    unsigned const* fTopTriggerMap;
+    unsigned const* fBotTriggerMap;
     Int_t fNofHitItems;
     // [0=Bot,1=Top][Channel].
     std::vector<Channel> fChannelArray[2];
