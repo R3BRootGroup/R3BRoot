@@ -50,7 +50,7 @@ R3BFileSource.cxx
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF R3BLinkDef.h)
+Set(LINKDEF BaseLinkDef.h)
 
 Set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)

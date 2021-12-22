@@ -1,3 +1,5 @@
+// clang-format off
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -11,36 +13,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROLUHITITEM_H
-#define R3BROLUHITITEM_H
+#ifdef __CINT__
 
-#include "TObject.h"
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
 
-class R3BRoluHitData : public TObject
-{
-  public:
-    // Default Constructor
-    R3BRoluHitData();
-
-    // Standard Constructor
-    R3BRoluHitData(Int_t detector, Int_t channel, Double_t time, Double_t tot);
-
-    // Destructor
-    virtual ~R3BRoluHitData() {}
-
-    // Getters
-    inline const Int_t& GetDetector() const { return fDetector; }
-    inline const Int_t& GetChannel() const { return fChannel; }
-    inline const Double_t& GetTime() const { return ftime; }
-    inline const Double_t& GetToT() const { return ftot; }
-
-  private:
-    Int_t fDetector; // 1..n
-    Int_t fChannel;
-    Double_t ftot;
-    Double_t ftime;
-
-    ClassDef(R3BRoluHitData, 1)
-};
+#pragma link C++ class R3BModule+;
+#pragma link C++ class R3BDetector+;
+#pragma link C++ class R3BEventHeader+;
+#pragma link C++ class R3BEventHeaderPropagator+;
+#pragma link C++ class R3BWhiterabbitPropagator+;
+#pragma link C++ class R3BFileSource+;
+#pragma link C++ class R3BLogger+;
 
 #endif

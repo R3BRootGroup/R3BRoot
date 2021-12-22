@@ -13,8 +13,8 @@
 
 // ----------------------------------------------------------------
 // -----     Create time calib parameters for Rolu via        -----
-// ------          Created July 2019 by A. Kelic-Heil         -----
-// -----           Following R3BLosMapped2CalPar              -----
+// ------         Created July 2019 by A. Kelic-Heil          -----
+// -----            Following R3BLosMapped2CalPar             -----
 // ----------------------------------------------------------------
 
 #ifndef R3BROLUMAPPED2CALPAR_H
@@ -75,13 +75,6 @@ class R3BRoluMapped2CalPar : public FairTask
     virtual void Exec(Option_t* option);
 
     /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
-
-    /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
@@ -131,10 +124,11 @@ class R3BRoluMapped2CalPar : public FairTask
     UInt_t fNofTypes = 2; /**< Number of time-types per channel ( TAMEX leading/trailing). */
     UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
 
-    Int_t fNEvents;         /**< Event counter. */
-    R3BTCalPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fMapped;  /**< Array with mapped data - input data. */
-    R3BEventHeader* header; /**< Event header - input data. */
+    Int_t fNEvents;               /**< Event counter. */
+    R3BTCalPar* fCal_Par;         /**< Parameter container. */
+    TClonesArray* fMapped;        /**< Array with mapped data - input data. */
+    TClonesArray* fMappedTrigger; /**< Array with mapped trigger data - input data. */
+    R3BEventHeader* header;       /**< Event header - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 

@@ -35,14 +35,13 @@
 namespace
 {
     double const c_range_TAMEX = 5 * 2048;
-
 }
 /*
  * for the data analysis of the Rolu detector following LOS
  */
 
 R3BRoluCalData::R3BRoluCalData()
-    : fDetector(-1)
+    : fDetector(0)
 
 {
     Reset();
@@ -156,4 +155,4 @@ UInt_t R3BRoluCalData::GetTAMEXTNcha()
     return num_times;
 }
 
-ClassImp(R3BRoluCalData)
+ClassImp(R3BRoluCalData);

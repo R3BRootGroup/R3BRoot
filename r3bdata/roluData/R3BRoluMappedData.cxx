@@ -19,18 +19,16 @@
 
 using namespace std;
 
-// for the data analysis of ROLU following LOS
-
 R3BRoluMappedData::R3BRoluMappedData()
-    : fDetector(-1)   // Detector number: 1...n
-    , fChannel(-1)    // Channel number:  1...n (n = 4 )
-    , fType(-1)       // Type: 0 =  TAMEX leading edge, 1 = TAMEX trailing edge
-    , fTimeFine(-1)   // Fine time
-    , fTimeCoarse(-1) // Coarse time
+    : fDetector(0)   // Detector number: 1...n
+    , fChannel(0)    // Channel number:  1...n (n = 4 )
+    , fType(-1)      // Type: 0 =  TAMEX leading edge, 1 = TAMEX trailing edge
+    , fTimeFine(0)   // Fine time
+    , fTimeCoarse(0) // Coarse time
 {
 }
 
-R3BRoluMappedData::R3BRoluMappedData(UInt_t detector, UInt_t channel, UInt_t type, UInt_t timeFine, UInt_t timeCoarse)
+R3BRoluMappedData::R3BRoluMappedData(UInt_t detector, UInt_t channel, Int_t type, UInt_t timeFine, UInt_t timeCoarse)
     : fDetector(detector)
     , fChannel(channel)
     , fType(type)
@@ -44,9 +42,9 @@ UInt_t R3BRoluMappedData::GetDetector() const { return fDetector; }
 
 UInt_t R3BRoluMappedData::GetChannel() const { return fChannel; }
 
-UInt_t R3BRoluMappedData::GetType() const { return fType; }
+Int_t R3BRoluMappedData::GetType() const { return fType; }
 UInt_t R3BRoluMappedData::GetTimeCoarse() const { return fTimeCoarse; }
 
 UInt_t R3BRoluMappedData::GetTimeFine() const { return fTimeFine; }
 
-ClassImp(R3BRoluMappedData)
+ClassImp(R3BRoluMappedData);

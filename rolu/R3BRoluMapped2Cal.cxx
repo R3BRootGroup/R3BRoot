@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BRoluMapped2Cal                -----
+// -----                  R3BRoluMapped2Cal               -----
 // -----          Created July 2019 A. Kelic-Heil         -----
 // -----                   following LOS                  -----
 // ------------------------------------------------------------
@@ -29,37 +29,26 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
 
 #include <iostream>
 
-
-
-#define Rolu_COINC_WINDOW_T_NS 190    
+#define Rolu_COINC_WINDOW_T_NS 200
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BRoluMapped2Cal::R3BRoluMapped2Cal()
-    : FairTask("RoluTcal", 1)
-    , fMappedItems(NULL)
-    , fCalItems(new TClonesArray("R3BRoluCalData"))
-    , fNofCalItems(0)
-    , fNofTcalPars(0)
-    , fNofModules(0)
-    , fTcalPar(NULL)
-    , fTrigger(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvent(0)
+    : R3BRoluMapped2Cal("RoluTcal", 1)
 {
 }
 
 R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
+    , fMappedTriggerItems(NULL)
     , fCalItems(new TClonesArray("R3BRoluCalData"))
+    , fCalTriggerItems(new TClonesArray("R3BRoluCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fNofModules(0)
@@ -67,48 +56,73 @@ R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, Int_t iVerbose)
     , fTrigger(1) // trigger 1 - onspill, 2 - offspill, -1 - all events
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvent(0)
+    , fOnline(kFALSE)
 {
 }
 
-R3BRoluMapped2Cal::~R3BRoluMapped2Cal() { delete fCalItems; }
+R3BRoluMapped2Cal::~R3BRoluMapped2Cal()
+{
+    if (fCalItems)
+    {
+        delete fCalItems;
+    }
+    if (fCalTriggerItems)
+    {
+        delete fCalTriggerItems;
+    }
+}
 
 InitStatus R3BRoluMapped2Cal::Init()
 {
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container RoluTCalPar";
+        LOG(FATAL) << "There are no TCal parameters in container RoluTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BRoluMapped2Cal::Init : read " << fNofModules << " modules";
+    LOG(INFO) << "R3BRoluMapped2Cal::Init()::read " << fNofModules << " modules";
+
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+    {
+        LOG(FATAL) << "R3BRoluMapped2Cal::Init() FairRootManager not found";
+        return kFATAL;
+    }
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
     {
-        //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
-        return kFATAL;
+        LOG(WARNING) << "R3BRoluMapped2Cal::Init() EventHeader. not found";
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
-
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    else
+        LOG(INFO) << "R3BRoluMapped2Cal::Init() R3BEventHeader found";
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("RoluMapped");
-
     if (NULL == fMappedItems)
     {
-        //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch RoluMapped not found");
-        LOG(ERROR) << "Branch RoluMapped not found";
+        LOG(FATAL) << "R3BRoluMapped2Cal::Branch RoluMapped not found";
         return kFATAL;
     }
 
+    // get access to Trigger Mapped data
+    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerMapped");
+    if (!fMappedTriggerItems)
+        LOG(WARNING) << "R3BRoluMapped2Cal::Branch RoluTriggerMapped not found";
+
     // request storage of Cal data in output tree
-    mgr->Register("RoluCal", "Land", fCalItems, kTRUE);
+    mgr->Register("RoluCal", "RoluCal", fCalItems, !fOnline);
     fCalItems->Clear();
+
+    if (fMappedTriggerItems)
+    {
+        mgr->Register("RoluTriggerCal", "RoluTriggerCal", fCalTriggerItems, !fOnline);
+        fCalTriggerItems->Clear();
+    }
 
     return kSUCCESS;
 }
@@ -118,7 +132,7 @@ void R3BRoluMapped2Cal::SetParContainers()
 {
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
 
-    cout << "ROLU TCAL PARAMETERS SET" << endl;
+    LOG(INFO) << "R3BRoluMapped2Cal::SetParContainers() ROLU TCAL PARAMETERS SET";
 
     if (!fTcalPar)
     {
@@ -161,36 +175,30 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         UInt_t iCha = hit->GetChannel();  // 1..4
         UInt_t iType = hit->GetType();    // 0,1
 
-        // cout<<"TEST 1: "<<iDet<<", "<<iCha<<"; "<<iType<<endl;
-
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(INFO) << "R3BRoluMapped2Cal::Exec : Detector number out of range: " << iDet;
+            LOG(ERROR) << "R3BRoluMapped2Cal::Exec : Detector number out of range: " << iDet;
             continue;
         }
 
         // Fetch calib data for current channel
-        // new:
-
         R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
-
         if (!par)
         {
-            LOG(INFO) << "R3BRoluMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
-                      << ", Type: " << iType;
+            LOG(WARNING) << "R3BRoluMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
+                         << ", Type: " << iType;
             continue;
         }
 
         // Convert TDC to [ns] ...
-
         times_raw_ns = par->GetTimeVFTX(hit->GetTimeFine());
 
         if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
         {
 
-            LOG(INFO) << "R3BRoluMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
-                      << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
-                      << ", time in ns = " << times_raw_ns;
+            LOG(WARNING) << "R3BRoluMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
+                         << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
+                         << ", time in ns = " << times_raw_ns;
             continue;
         }
 
@@ -312,8 +320,8 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeL_ns[iCha - 1] = times_ns;
             if (calItem->fTimeL_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
-                          << endl;
+                LOG(WARNING) << "Problem with fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
+                             << endl;
 
             //		cout<<" TEST2: "<<iCha<<", "<<iType<<", "<<calItem->fTimeL_ns[iCha-1]<<endl;
         }
@@ -322,8 +330,8 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
-                          << endl;
+                LOG(WARNING) << "Problem with fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
+                             << endl;
 
             //		cout<<" TEST3: "<<iCha<<", "<<iType<<", "<<calItem->fTimeT_ns[iCha-1]<<endl;
         }
@@ -334,18 +342,47 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
                      << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
+    // Calibrate trigger channels.
+    if (fMappedTriggerItems)
+    {
+        auto mapped_num = fMappedTriggerItems->GetEntriesFast();
+        for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+        {
+            auto mapped = (R3BRoluMappedData const*)fMappedTriggerItems->At(mapped_i);
+
+            // Tcal parameters.
+            auto* par = fTcalPar->GetModuleParAt(3, 1, 1);
+            if (!par)
+            {
+                LOG(INFO) << "R3BRoluMapped2Cal::Exec : Trigger Tcal par not found.";
+                continue;
+            }
+
+            // Convert TDC to [ns] ...
+            Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
+            // ... and subtract it from the next clock cycle.
+            time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
+
+            auto cal = new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()]) R3BRoluCalData(1);
+            cal->fTimeL_ns[0] = time_ns;
+        }
+    }
+
     ++fNEvent;
 }
 
 void R3BRoluMapped2Cal::FinishEvent()
 {
+    fNofCalItems = 0;
     if (fCalItems)
     {
         fCalItems->Clear();
-        fNofCalItems = 0;
+    }
+
+    if (fCalTriggerItems)
+    {
+        fCalTriggerItems->Clear();
     }
 }
 
-void R3BRoluMapped2Cal::FinishTask() {}
-
-ClassImp(R3BRoluMapped2Cal)
+ClassImp(R3BRoluMapped2Cal);
