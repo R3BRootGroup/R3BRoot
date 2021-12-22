@@ -48,9 +48,9 @@ class R3BSfibHitPar : public FairParGenericSet
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
     R3BSfibHitPar(const char* name = "BunchedFiberHitPar",
-                          const char* title = "fiber HIT calibration",
-                          const char* context = "TestDefaultContext",
-                          Bool_t own = kTRUE);
+                  const char* title = "fiber HIT calibration",
+                  const char* context = "TestDefaultContext",
+                  Bool_t own = kTRUE);
     /**
      * Destructor. Cleares the memory used by the object.
      */

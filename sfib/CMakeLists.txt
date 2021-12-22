@@ -11,9 +11,9 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BPSP" which includes the source files
-#given in # the array .  # The extension is already found.  Any number
-#of sources could be listed here.
+# Create a library called "libR3BSfib" which includes the source files given 
+# in the array. The extension is already found. Any number of sources could 
+# be listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
@@ -22,9 +22,11 @@ ${BASE_INCLUDE_DIRECTORIES}
 
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/sfib
+${R3BROOT_SOURCE_DIR}/sfib/sim
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
@@ -39,6 +41,8 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories(${LINK_DIRECTORIES})
 
 set(SRCS
+./sim/R3Bsfi.cxx
+./sim/R3BsfiDigitizer.cxx
 R3BSfibMapped2Cal.cxx
 R3BSfibMapped2CalPar.cxx
 R3BSfibCal2Hit.cxx

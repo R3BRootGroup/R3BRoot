@@ -37,9 +37,9 @@ class R3BSfibMapped2CalPar : public FairTask
      * @param a_min_stats a minimum statistics for calibration.
      */
     R3BSfibMapped2CalPar(Int_t,
-                                 enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_8_12_FWD_250,
-                                 Int_t = 1e6,
-                                 Int_t = 1e5);
+                         enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_8_12_FWD_250,
+                         Int_t = 1e6,
+                         Int_t = 1e5);
 
     /**
      * Destructor.

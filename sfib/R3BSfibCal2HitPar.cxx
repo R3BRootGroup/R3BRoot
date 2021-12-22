@@ -25,10 +25,7 @@ R3BSfibHitPar::R3BSfibHitPar(const char* name, const char* title, const char* co
 {
 }
 
-R3BSfibHitPar::~R3BSfibHitPar()
-{
-	delete fHitParams;
-}
+R3BSfibHitPar::~R3BSfibHitPar() { delete fHitParams; }
 
 void R3BSfibHitPar::putParams(FairParamList* list)
 {
