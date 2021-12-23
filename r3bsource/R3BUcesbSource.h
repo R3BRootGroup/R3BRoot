@@ -26,9 +26,9 @@
 #include "TObjArray.h"
 #include "TString.h"
 
+#include "FairRunOnline.h"
 #include <fstream>
 #include <list>
-#include "FairRunOnline.h"
 
 /* External data client interface (ucesb) */
 #include "ext_data_clnt.hh"
@@ -76,8 +76,7 @@ class R3BUcesbSource : public FairSource
 
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
-    void SetSkipEvents(Bool_t skip){fSkip=skip;}
-
+    void SetSkipEvents(Bool_t skip) { fSkip = skip; }
 
   private:
     /* File descriptor returned from popen() */

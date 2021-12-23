@@ -11,32 +11,40 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRoluReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
 #include "R3BRoluMappedData.h"
+#include "R3BRoluReader.h"
 #include "TClonesArray.h"
+
+/**
+ ** ext_h101_rolu.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:ROLU,id=h101_ROLU,NOTRIGEVENTNO,ext_h101_rolu.h
+ **/
+
 extern "C"
 {
 #include "ext_data_client.h"
 #include "ext_h101_rolu.h"
 }
+
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
-#define NUM_ROLU_DETECTORS 2
+#define NUM_ROLU_DETECTORS (sizeof data->ROLU / sizeof data->ROLU[0])
 #define NUM_ROLU_CHANNELS 4
 #include <iostream>
 
 using namespace std;
 
-R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU* data, UInt_t offset)
+R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU* data, size_t offset)
     : R3BReader("R3BRoluReader")
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BRoluMappedData"))
+    , fArrayTrigger(new TClonesArray("R3BRoluMappedData"))
 {
 }
 
@@ -46,44 +54,35 @@ R3BRoluReader::~R3BRoluReader()
     {
         delete fArray;
     }
+    if (fArrayTrigger)
+    {
+        delete fArrayTrigger;
+    }
 }
 
 Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
 {
 
     int ok;
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
-
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
     EXT_STR_h101_ROLU_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_ROLU, 0);
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup ROLU structure information.";
+        LOG(ERROR) << "Failed to setup ROLU structure information.";
         return kFALSE;
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("RoluMapped", "Land", fArray, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("RoluMapped", "Land", fArray, kFALSE);
-    }
-    fArray->Clear();
+    FairRootManager::Instance()->Register("RoluMapped", "Rolu Mapped", fArray, !fOnline);
+    FairRootManager::Instance()->Register("RoluTriggerMapped", "Rolu Trigger Mappe", fArrayTrigger, !fOnline);
+
+    Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
     EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
 
+    LOG(INFO) << "ROLU num Dets: " << NUM_ROLU_DETECTORS;
     for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
     {
         data->ROLU[d].TTFLM = 0;
@@ -238,17 +237,24 @@ Bool_t R3BRoluReader::Read()
         }
     }
 
+    // Triggers
+    for (uint32_t i = 0; i < data->ROLU[0].TRIGFL; i++)
+    {
+        uint32_t ch_i = data->ROLU[0].TRIGFLI[i];
+        new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+            R3BRoluMappedData(3, 1, 1, data->ROLU[0].TRIGFLv[i], data->ROLU[0].TRIGCLv[i]);
+    }
+
     fNEvents += 1;
 
     return kTRUE;
 }
 
-void R3BRoluReader::FinishTask() {}
-
 void R3BRoluReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
+    fArrayTrigger->Clear();
 }
 
-ClassImp(R3BRoluReader)
+ClassImp(R3BRoluReader);

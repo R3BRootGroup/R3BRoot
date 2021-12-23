@@ -54,7 +54,7 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         LOG(ERROR) << "R3BCalifaFebexReader::Failed to setup structure information.";
-        //LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
+        // LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
         return kFALSE;
     }
 
