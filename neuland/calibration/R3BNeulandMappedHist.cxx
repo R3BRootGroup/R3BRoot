@@ -50,7 +50,7 @@ R3BNeulandMappedHist::~R3BNeulandMappedHist() {}
 InitStatus R3BNeulandMappedHist::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
-    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    fHeader = (R3BEventHeader*)fMan->GetObject("EventHeader.");
     fLandMappedData = (TClonesArray*)fMan->GetObject("NeulandTacquilaMappedData");
     fLosMappedData = (TClonesArray*)fMan->GetObject("LosMapped");
     fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandMappedData");
