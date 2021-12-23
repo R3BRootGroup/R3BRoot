@@ -55,7 +55,7 @@ InitStatus R3BNeulandCal2HitPar::Init()
         return kFATAL;
     }
 
-    fEventHeader = static_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
+    fEventHeader = static_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     if (!fEventHeader)
     {

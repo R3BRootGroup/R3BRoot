@@ -52,7 +52,7 @@ InitStatus R3BNeulandCheckMapping::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
 
     fMapped = (TClonesArray*)rm->GetObject("NeulandMappedData");
     if (!fMapped)

@@ -51,7 +51,7 @@ InitStatus R3BNeulandCal2Hit::Init()
         throw std::runtime_error("R3BNeulandCal2Hit: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
     if (fEventHeader == nullptr)
     {
         throw std::runtime_error("R3BNeulandCal2Hit: No R3BEventHeader");

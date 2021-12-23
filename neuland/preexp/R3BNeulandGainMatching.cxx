@@ -64,7 +64,7 @@ InitStatus R3BNeulandGainMatching::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
     if (!header)
     {
         return kFATAL;
@@ -88,7 +88,7 @@ InitStatus R3BNeulandGainMatching::Init()
                 oss << "r3b:nl:hv:p" << pln + 1 << "b" << bar + 1 << "t" << pmt + 1;
 
                 auto vmon = oss.str() + ":vmon";
-                auto vtarget = oss.str() + ":vtarget.A";
+                auto vtarget = oss.str() + ":vtarget";
 
                 auto& entry = ca[pln][bar][pmt];
                 entry.group = epics.CreateGroup();

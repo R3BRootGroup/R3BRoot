@@ -58,7 +58,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         throw std::runtime_error("R3BNeulandOnlineSpectra: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
     if (fEventHeader == nullptr)
     {
         throw std::runtime_error("R3BNeulandOnlineSpectra: No R3BEventHeader");
@@ -287,7 +287,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
 
     const double start = fEventHeader->GetTStart();
 
-    if ((fEventHeader->GetEventno() % 10000000) < 10000)
+    if (((UInt_t)fEventHeader->GetEventno() % 10000000) < 10000)
     {
         hJumpsvsEvnt->Reset();
         hJumpsvsEvntzoom->Reset();
@@ -337,8 +337,8 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             if (barx != bar)
             {
                 hTestJump->Fill(barx, data->GetTime() - datax->GetTime());
-                hJumpsvsEvnt->Fill(fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
-                hJumpsvsEvntzoom->Fill(fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
+                hJumpsvsEvnt->Fill((UInt_t)fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
+                hJumpsvsEvntzoom->Fill((UInt_t)fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
             }
         }
     }
@@ -425,6 +425,8 @@ void R3BNeulandOnlineSpectra::FinishTask()
     hNstart->Write();
 
     hTestJump->Write();
+    hJumpsvsEvnt->Write();
+    hJumpsvsEvntzoom->Write();
 
     ahCalTvsBar[0]->Write();
     ahCalTvsBar[1]->Write();
