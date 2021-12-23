@@ -67,6 +67,7 @@ class R3BCalifaJulichReader : public R3BReader
     // Output array
     TClonesArray* fArrayCalifa;
     TClonesArray* fArraySi;
+
   public:
     ClassDefOverride(R3BCalifaJulichReader, 0);
 };

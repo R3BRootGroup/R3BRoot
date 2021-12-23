@@ -14,9 +14,9 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BAmsMappedData.h"
 #include "R3BCalifaJulichReader.h"
 #include "R3BCalifaMappedData.h"
-#include "R3BAmsMappedData.h"
 #include "TClonesArray.h"
 
 /**
@@ -58,7 +58,7 @@ Bool_t R3BCalifaJulichReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         LOG(ERROR) << "R3BCalifaJulichReader::Failed to setup structure information.";
-        //LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
+        // LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
         return kFALSE;
     }
 

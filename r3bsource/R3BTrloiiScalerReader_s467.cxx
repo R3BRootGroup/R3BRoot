@@ -22,7 +22,8 @@
 
 /**
  ** ext_h101_trlo.h was created by running
- ** ./202002_s467 --ntuple=STRUCT_HH,RAW:TRLORAW,RAW:TRLOADT,RAW:TRLOBDT,RAW:TRLOARD,id=h101_TRLO,NOTRIGEVENTNO,ext_h101_trlo_s467.h
+ ** ./202002_s467
+ *--ntuple=STRUCT_HH,RAW:TRLORAW,RAW:TRLOADT,RAW:TRLOBDT,RAW:TRLOARD,id=h101_TRLO,NOTRIGEVENTNO,ext_h101_trlo_s467.h
  **/
 
 extern "C"

@@ -14,9 +14,9 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BAmsMappedData.h"
 #include "R3BCalifaJulichReader.h"
 #include "R3BCalifaMappedData.h"
-#include "R3BAmsMappedData.h"
 #include "TClonesArray.h"
 
 /**
@@ -37,7 +37,7 @@ R3BCalifaJulichReader::R3BCalifaJulichReader(EXT_STR_h101_CALIFA* data, size_t o
     , fOffset(offset)
     , fOnline(kFALSE)
     , fArrayCalifa(new TClonesArray("R3BCalifaMappedData"))
-    //, fArraySi(new TClonesArray("R3BAmsMappedData"))
+//, fArraySi(new TClonesArray("R3BAmsMappedData"))
 {
 }
 
@@ -58,13 +58,13 @@ Bool_t R3BCalifaJulichReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         LOG(ERROR) << "R3BCalifaJulichReader::Failed to setup structure information.";
-        //LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
+        // LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArrayCalifa, !fOnline);
-    //FairRootManager::Instance()->Register("AmsMappedData", "Ams", fArraySi, !fOnline);
+    // FairRootManager::Instance()->Register("AmsMappedData", "Ams", fArraySi, !fOnline);
     return kTRUE;
 }
 
@@ -98,7 +98,6 @@ Bool_t R3BCalifaJulichReader::Read()
         else if (crystal>63)*/
         new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])
             R3BCalifaMappedData(crystal, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
-
     }
     fNEvent += 1;
     return kTRUE;
@@ -108,7 +107,7 @@ void R3BCalifaJulichReader::Reset()
 {
     // Reset the output array
     fArrayCalifa->Clear();
-    //fArraySi->Clear();
+    // fArraySi->Clear();
 }
 
 ClassImp(R3BCalifaJulichReader);

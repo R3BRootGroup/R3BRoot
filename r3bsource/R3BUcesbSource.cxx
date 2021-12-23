@@ -207,7 +207,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     fNEvent++;
 
-
     if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
 
@@ -287,7 +286,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
         }
     }
 
-    
     if (fSkip)
     {
         if (fEventHeader->GetTpat() > 0)
