@@ -76,7 +76,7 @@ InitStatus R3BNeulandTcalFill::Init()
     {
         return kFATAL;
     }
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
     /*   if (!header)
        {
            return kFATAL;

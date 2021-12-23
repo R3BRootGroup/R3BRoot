@@ -63,7 +63,7 @@ InitStatus R3BNeulandTacquilaMapped2QCalPar::Init()
         LOG(fatal) << " Branch: NeulandTacquilaMappedData not found in Tree.";
         return kFATAL;
     }
-    header = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)fMan->GetObject("EventHeader.");
     if (!header)
     {
         LOG(fatal) << " Branch: R3BEventHeader not found in Tree.";

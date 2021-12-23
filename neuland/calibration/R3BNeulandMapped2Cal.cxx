@@ -81,7 +81,7 @@ InitStatus R3BNeulandMapped2Cal::Init()
         LOG(FATAL) << "FairRootManager not found";
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (NULL == header)
     {
         LOG(FATAL) << "Branch R3BEventHeader not found";
