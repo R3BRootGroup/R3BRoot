@@ -83,24 +83,23 @@ Bool_t R3BCalifaJulichReader::Read()
 
         uint64_t febextime = ((uint64_t)fData->CALIFA_TSMSBv[crystal] << 32) | (uint64_t)fData->CALIFA_TSLSBv[crystal];
 
-        uint64_t wrts = 0;//((uint64_t)fData->CALIFA_WRTS_T4v[crystal] << 48) |
-      //                  ((uint64_t)fData->CALIFA_WRTS_T3v[crystal] << 32) |
-      //                  ((uint64_t)fData->CALIFA_WRTS_T2v[crystal] << 16) | (uint64_t)fData->CALIFA_WRTS_T1v[crystal];
+        uint64_t wrts = 0; //((uint64_t)fData->CALIFA_WRTS_T4v[crystal] << 48) |
+                           //                  ((uint64_t)fData->CALIFA_WRTS_T3v[crystal] << 32) |
+                           //                  ((uint64_t)fData->CALIFA_WRTS_T2v[crystal] << 16) |
+                           //                  (uint64_t)fData->CALIFA_WRTS_T1v[crystal];
 
-        int32_t ov = 0;//fData->CALIFA_OVv[crystal];
-        int16_t pu = 0;//fData->CALIFA_PILEUPv[crystal];
-        int16_t dc = 0;//fData->CALIFA_DISCARDv[crystal];
+        int32_t ov = 0; // fData->CALIFA_OVv[crystal];
+        int16_t pu = 0; // fData->CALIFA_PILEUPv[crystal];
+        int16_t dc = 0; // fData->CALIFA_DISCARDv[crystal];
 
-        int16_t tot = 0;//fData->CALIFA_TOTv[crystal];
-
+        int16_t tot = 0; // fData->CALIFA_TOTv[crystal];
 
         if (channelNumber < 384)
-        new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
+            new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])
+                R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
 
         else if (channelNumber < 448)
-        new ((*fArrayAms)[fArrayAms->GetEntriesFast()])
-            R3BAmsMappedData(0,channelNumber-384, energy);
-
+            new ((*fArrayAms)[fArrayAms->GetEntriesFast()]) R3BAmsMappedData(0, channelNumber - 384, energy);
     }
     fNEvent += 1;
     return kTRUE;

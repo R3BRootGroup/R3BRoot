@@ -23,29 +23,34 @@ extern "C"
 #include "ext_h101_fib.h"
 }
 
-R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a_data, UInt_t a_offset)
+R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a_data, size_t a_offset)
     : R3BReader("R3BBunchedFiberSPMTTrigReader")
     , fData(a_data)
     , fOffset(a_offset)
+    , fOnline(kFALSE)
     , fMappedArray(new TClonesArray("R3BBunchedFiberMappedData"))
 {
+}
+
+R3BBunchedFiberSPMTTrigReader::~R3BBunchedFiberSPMTTrigReader()
+{
+    if (fMappedArray)
+        delete fMappedArray;
 }
 
 Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
-
     EXT_STR_h101_FIB_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FIB, 0);
-
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        LOG(FATAL) << "Failed to setup structure information.";
         return kFALSE;
     }
 
-    FairRootManager::Instance()->Register("BunchedFiberSPMTTrigMapped", "Land", fMappedArray, kTRUE);
-
+    FairRootManager::Instance()->Register(
+        "BunchedFiberSPMTTrigMapped", "BunchedFiberSPMTTrigMapped", fMappedArray, !fOnline);
     memset(fData, 0, sizeof *fData);
 
     return kTRUE;
@@ -67,6 +72,10 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Read()
     return kTRUE;
 }
 
-void R3BBunchedFiberSPMTTrigReader::Reset() { fMappedArray->Clear(); }
+void R3BBunchedFiberSPMTTrigReader::Reset()
+{
+    // Reset the output array
+    fMappedArray->Clear();
+}
 
-ClassImp(R3BBunchedFiberSPMTTrigReader)
+ClassImp(R3BBunchedFiberSPMTTrigReader);

@@ -1,3 +1,15 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 
 #include "R3BIncomingIDPar.h"
 
@@ -56,6 +68,7 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
     LOG(INFO) << "R3BIncomingIDPar::putParams() called";
     if (!list)
     {
+        LOG(FATAL) << "Could not find FairParamList";
         return;
     }
     fToFoffset->Set(fNumDet);
@@ -88,96 +101,97 @@ Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
     LOG(INFO) << "R3BIncomingIDPar::getParams() called";
     if (!list)
     {
+        LOG(FATAL) << "Could not initialize FairParamList";
         return kFALSE;
     }
 
     if (!(list->fill("TofOffset", fToFoffset)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDTofOffsetPar";
+        LOG(ERROR) << "Could not initialize incomingIDTofOffsetPar";
         return kFALSE;
     }
 
     if (!(list->fill("PosS2Left", fPosS2Left)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDPosS2LeftPar";
+        LOG(ERROR) << "Could not initialize incomingIDPosS2LeftPar";
         return kFALSE;
     }
 
     if (!(list->fill("PosS2Right", fPosS2Right)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDPosS2RightPar";
+        LOG(ERROR) << "Could not initialize incomingIDPosS2RightPar";
         return kFALSE;
     }
 
     if (!(list->fill("Brho0_S2toCC", fBrho0_S2toCC)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDBrho0_S2toCCPar";
+        LOG(ERROR) << "Could not initialize incomingIDBrho0_S2toCCPar";
         return kFALSE;
     }
 
     if (!(list->fill("DispersionS2", fDispersionS2)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDDispersionS2Par";
+        LOG(ERROR) << "---Could not initialize incomingIDDispersionS2Par";
         return kFALSE;
     }
 
     if (!(list->fill("Tof2InvV_p0", fTof2InvV_p0)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDTof2InvV_p0Par";
+        LOG(ERROR) << "Could not initialize incomingIDTof2InvV_p0Par";
         return kFALSE;
     }
 
     if (!(list->fill("Tof2InvV_p1", fTof2InvV_p1)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDTof2InvV_p1Par";
+        LOG(ERROR) << "Could not initialize incomingIDTof2InvV_p1Par";
         return kFALSE;
     }
 
     if (!(list->fill("x0_point", &fx0_point)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDx0_pointPar";
+        LOG(ERROR) << "Could not initialize incomingIDx0_pointPar";
         return kFALSE;
     }
 
     if (!(list->fill("y0_point", &fy0_point)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDy0_pointPar";
+        LOG(ERROR) << "Could not initialize incomingIDy0_pointPar";
         return kFALSE;
     }
 
     if (!(list->fill("rot_ang", &frot_ang)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDrot_angPar";
+        LOG(ERROR) << "Could not initialize incomingIDrot_angPar";
         return kFALSE;
     }
 
     if (!(list->fill("x0_Aq", &fx0_Aq)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDx0_AqPar";
+        LOG(ERROR) << "Could not initialize incomingIDx0_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("y0_Aq", &fy0_Aq)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDy0_AqPar";
+        LOG(ERROR) << "Could not initialize incomingIDy0_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("ang_Aq", &fang_Aq)))
     {
-        LOG(INFO) << "---Could not initialize incomingIDang_AqPar";
+        LOG(ERROR) << "Could not initialize incomingIDang_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("Beta_min", &fBeta_min)))
     {
-        LOG(INFO) << "---Could not initialize incomingID Beta_min Par";
+        LOG(ERROR) << "Could not initialize incomingID Beta_min Par";
         return kFALSE;
     }
 
     if (!(list->fill("Beta_max", &fBeta_max)))
     {
-        LOG(INFO) << "---Could not initialize incomingID Beta_max Par";
+        LOG(ERROR) << "Could not initialize incomingID Beta_max Par";
         return kFALSE;
     }
 
@@ -190,18 +204,13 @@ void R3BIncomingIDPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BIncomingIDPar::printParams()
 {
-    LOG(INFO) << "R3BIncomingIDPar: Incoming ID parameters :";
+    LOG(INFO) << "R3BIncomingIDPar::Incoming ID parameters";
 
-    // LOG(INFO) << "Brho"
-    //           << " "
-    //           << "TofOffset"
-    //           << " "
-    //           << " PosS2Left"
-    //           << " "
-    //           << " PosS2Right" ;
+    LOG(INFO) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
 
-    // LOG(INFO) <<  fBrho << "\t" <<  fToFoffset[0] << "\t" <<
-    //          fPosS2Left[0]<< "\t" << fPosS2Right[0];
+    for (Int_t d = 0; d < fNumDet; d++)
+        LOG(INFO) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d) << " PosS2Left" << fPosS2Left->GetAt(d)
+                  << ", PosS2Right: " << fPosS2Right->GetAt(d);
 }
 
-ClassImp(R3BIncomingIDPar)
+ClassImp(R3BIncomingIDPar);

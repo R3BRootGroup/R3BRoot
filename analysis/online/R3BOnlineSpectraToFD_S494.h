@@ -11,14 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----                  R3BOnlineSpectraSfib                -----
-// -----            Created 13-04-2016 by M.Heil          -----
-// -----               Fill online histograms             -----
-// ------------------------------------------------------------
+#ifndef R3BONLINESPECTRATOFD_S494
+#define R3BONLINESPECTRATOFD_S494
 
-#ifndef R3BONLINESPECTRASFIB
-#define R3BONLINESPECTRASFIB
+#define N_PLANE_MAX_TOFD_S494 4
+#define N_PADDLE_MAX_TOFD_S494 44
 
 #include "FairTask.h"
 #include <array>
@@ -28,10 +25,9 @@
 #include <vector>
 
 #include "TClonesArray.h"
-#include "TF1.h"
 #include "TMath.h"
 #include <cstdlib>
-
+#include <map>
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -41,7 +37,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms
  * for online checks.
  */
-class R3BOnlineSpectraSfib : public FairTask
+class R3BOnlineSpectraToFD_S494 : public FairTask
 {
 
   public:
@@ -49,7 +45,7 @@ class R3BOnlineSpectraSfib : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BOnlineSpectraSfib();
+    R3BOnlineSpectraToFD_S494();
 
     /**
      * Standard constructor.
@@ -57,13 +53,13 @@ class R3BOnlineSpectraSfib : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BOnlineSpectraSfib(const char* name, Int_t iVerbose = 1);
+    R3BOnlineSpectraToFD_S494(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BOnlineSpectraSfib();
+    virtual ~R3BOnlineSpectraToFD_S494();
 
     /**
      * Method for task initialization.
@@ -94,83 +90,88 @@ class R3BOnlineSpectraSfib : public FairTask
     virtual void FinishTask();
 
     /**
+     * Methods for setting position offset and effective velocity of light
+     */
+
+    /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat1, Int_t tpat2)
+    {
+        fTpat1 = tpat1;
+        fTpat2 = tpat2;
+    }
 
-    void Reset_SFIB_Histo();
+    /**
+     * Methods for setting number of planes and paddles
+     */
+    inline void SetNofModules(Int_t planes, Int_t ppp)
+    {
+        fNofPlanes = planes;
+        fPaddlesPerPlane = ppp;
+    }
+
+    void Reset_TOFD_Histo();
 
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
 
+    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+
     enum DetectorInstances
     {
-        DET_SFIB,
+        DET_TOFD,
         DET_MAX
     };
-    const char* fDetectorNames[DET_MAX + 1] = { "Sfib", NULL };
+
+    const char* fDetectorNames[DET_MAX + 1] = { "Tofd", NULL };
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat;
+    Int_t fTpat1, fTpat2;
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
+    unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
+    unsigned long long time_prev_read = 0, time_to_read = 0;
+    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
+    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
+    unsigned long long time_spill_start = 0, time_spill_end = 0;
+    unsigned long long time_previous_event = 0;
+    Double_t time_clear = -1.;
+    Double_t tdiff = 0.;
+    Double_t fNorm = 1.;
+    Int_t iclear_count = 1;
+    UInt_t reset_time;         // time after which bmon spectra are reseted
+    Double_t read_time;        // step in which scalers are read, in sec
+    Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
+    Double_t calib_SEE = 1.;   // SEETRAM calibration factor
+    Double_t see_offset = 7.1; // SEETRAM offset in kHz
+
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
-    TF1* xyline;
-
-    TH2F* fh_sfib_Tot_top;
-    TH1F* fh_sfib_Tot_top1d;
-    TH2F* fh_sfib_Tot_top_g;
-    TH1F* fh_sfib_Tot_top1d_g;
-
-    TH2F* fh_sfib_Tot_bot;
-    TH1F* fh_sfib_Tot_bot1d;
-    TH2F* fh_sfib_Tot_bot_g;
-    TH1F* fh_sfib_Tot_bot1d_g;
-
-    TH1F* fh_sfib_channels;
-    TH1F* fh_sfib_channels_top;
-    TH1F* fh_sfib_channels_bot;
-    TH2F* fh_sfib_channels_topvsbot;
-
-    TH2F* fh_sfib_tot_tvb;
-
-    TH1F* fh_sfib_channels_g;
-    // TH2F* fh_sfib_tofd;
-    // TH2F* fh_sfib_pspx;
-    TH1F* fh_sfib_fmult;
-    TH1F* fh_sfib_cmult;
-    TH1F* fh_sfib_fmult_g;
-    TH1F* fh_sfib_cmult_g;
-    TH1F* fh_sfib_tot_ch_top1;
-    TH1F* fh_sfib_tot_ch_top2;
-    TH1F* fh_sfib_tot_ch_bot1;
-    TH1F* fh_sfib_tot_ch_bot2;
-    TH1F* fh_sfib_tot_max_top1;
-    TH1F* fh_sfib_tot_max_top2;
-    TH1F* fh_sfib_tot_max_bot1;
-    TH1F* fh_sfib_tot_max_bot2;
-    TH2F* fh_sfib_tot_ch_max_top1;
-    TH2F* fh_sfib_tot_ch_max_top2;
-    TH2F* fh_sfib_tot_ch_max_bot1;
-    TH2F* fh_sfib_tot_ch_max_bot2;
-    TH2F* fh_sfib_tot_ch_topbot1;
-    TH1F* fh_sfib_multi;
-    TH1F* fh_sfib_clus;
-    TH2F* fh_sfib_multi_clus;
-    TH2F* fh_sfib_multi_ch_topbot1;
-    TH1F* fh_sfib_tot_top_multi1;
-    TH1F* fh_sfib_tot_top_multi2;
+    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_dt[N_PLANE_MAX_TOFD_S494 - 1];
+    TH1F* fh_TimePreviousEvent;
+    TH2F* fh_tofd_multihit_coinc[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_TotPm_coinc[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_num_side[N_PLANE_MAX_TOFD_S494];
+    TH1F* fh_tofd_bars[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_Tot_hit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_time_hit[N_PLANE_MAX_TOFD_S494];
+    TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD_S494];
+    TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD_S494 - 1];
 
   public:
-    ClassDef(R3BOnlineSpectraSfib, 1)
+    ClassDef(R3BOnlineSpectraToFD_S494, 2)
 };
 
 #endif
