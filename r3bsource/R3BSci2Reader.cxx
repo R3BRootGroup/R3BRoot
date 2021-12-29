@@ -139,7 +139,8 @@ Bool_t R3BSci2Reader::Read()
     //     Double_t mean_coarse_vftx = 0.;
     //     int sum_coarse_vftx = 0;
     //     // First get the average coarse time to shift all coarse counters in the same cycle (by calculateing, in the
-    //     // second step, deviations from the mean value. If the coarse time is smaller than mean value by more than 200,
+    //     // second step, deviations from the mean value. If the coarse time is smaller than mean value by more than
+    //     200,
     //     // then coarse counter was reseted, and thus, to its value 8192 (in case of VFTX) will be added.
     //     for (int i = 0; i < numChannels; i++)
     //     {
@@ -187,7 +188,8 @@ Bool_t R3BSci2Reader::Read()
     //         curChannelStart = nextChannelStart;
     //     }
     //
-    //     // Next, TAMEX leading; first, first get the average coarse time to shift all coarse counters in the same cycle
+    //     // Next, TAMEX leading; first, first get the average coarse time to shift all coarse counters in the same
+    //     cycle
     //     // (the same as for VFTX, only here on adds 2048).
     //     //   if(data->S2TTFT == data->S2TTFL && data->S2TTCT == data->S2TTCL && data->S2TTFL == data->S2TTCL)
     //
@@ -230,7 +232,8 @@ Bool_t R3BSci2Reader::Read()
     //
     //                 int coarse_leading = data->SCITWO_TTCLv[j];
     //                 if((mean_coarse_leading - float(coarse_leading)) > 200.) coarse_leading = coarse_leading + 2048;
-    //             // We now calculate again meanv alue of the "shifted" coarse leading times; this will be needed at the
+    //             // We now calculate again meanv alue of the "shifted" coarse leading times; this will be needed at
+    //             the
     //        next step in order to
     //             // shift coarse trailing times in the same clock cycle as coarse leading
     //                 mean_coarse_lead = mean_coarse_lead + coarse_leading;
@@ -308,7 +311,8 @@ Bool_t R3BSci2Reader::Read()
     //                             coarse
     //                             );
     //
-    //                             if(fprint) cout<<"SCI2 Reader trailing edges: "<<fNEvent<<", "<<Sum<<", "<<channel<<",
+    //                             if(fprint) cout<<"SCI2 Reader trailing edges: "<<fNEvent<<", "<<Sum<<",
+    //                             "<<channel<<",
     //        "<<data->SCITWO_TTFTv[j]<<"; "<< coarse<<", "<<tot<<endl;
     //
     //                         break;
@@ -323,13 +327,12 @@ Bool_t R3BSci2Reader::Read()
     // }
     // fNEvent += 1;
 
-    //return kTRUE;
-
+    // return kTRUE;
 
     // loop over all detectors
     for (Int_t d = 0; d < NUM_SCI2_DETECTORS; d++)
     {
-       uint32_t numberOfPMTsWithHits_TF = data->SCITWO_VTFM;
+        uint32_t numberOfPMTsWithHits_TF = data->SCITWO_VTFM;
         uint32_t numberOfPMTsWithHits_TC = data->SCITWO_VTCM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
@@ -352,16 +355,16 @@ Bool_t R3BSci2Reader::Read()
                 // put the mapped items {det,pmt,finetime, coarsetime} one after the other in the fArray
                 for (Int_t hit = curChannelStart; hit < nextChannelStart; hit++)
                 {
-                   // auto item =
+                    // auto item =
                     //    new ((*fArray)[fArray->GetEntriesFast()]) R3BSofSciMappedData(d + 1, // 1-based numbering
-                      //                                                                ,
+                    //                                                                ,
 
                     new ((*fArray)[fArray->GetEntriesFast()])
-                    R3BSci2MappedData(d + 1,                // detector number
-                                      pmtid_TF,              // channel number: 1-8
-                                      0,                    // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
-                                      data->SCITWO_VTFv[hit],
-                                      data->SCITWO_VTCv[hit]);
+                        R3BSci2MappedData(d + 1,    // detector number
+                                          pmtid_TF, // channel number: 1-8
+                                          0,        // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
+                                          data->SCITWO_VTFv[hit],
+                                          data->SCITWO_VTCv[hit]);
                 }
                 curChannelStart = nextChannelStart;
             }

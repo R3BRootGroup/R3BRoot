@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,29 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BAnalysisContFact_H
+#define R3BAnalysisContFact_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "FairContFact.h"
 
-#pragma link C++ class R3BAnalysisIncomingFrs+;
-#pragma link C++ class R3BAnalysisIncomingID+;
-#pragma link C++ class R3BIncomingIDPar+;
-#pragma link C++ class R3BAnalysisIncomingIDContFact+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
+class FairContainer;
 
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BOnlineSpectraSfib+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
-#pragma link C++ class R3BOnlineSpectraFiberTofds515+;
-#pragma link C++ class R3BOnlineSpectraLosStandalone+;
-//#pragma link C++ class R3BOnlineSpectraSci2+;
-#pragma link C++ class R3BOnlineSpectraLosVsSci2+;
+class R3BAnalysisContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
 
-#endif
+  public:
+    R3BAnalysisContFact();
+    ~R3BAnalysisContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    ClassDef(R3BAnalysisContFact, 0)
+};
+
+#endif /* R3BAnalysisContFact_H */

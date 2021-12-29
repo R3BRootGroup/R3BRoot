@@ -19,12 +19,14 @@
 
 struct EXT_STR_h101_TPAT_t;
 typedef struct EXT_STR_h101_TPAT_t EXT_STR_h101_TPAT;
+class ext_data_struct_info;
 
 class R3BEventHeader;
 
 class R3BTrloiiTpatReader : public R3BReader
 {
   public:
+    // Standard constructor
     R3BTrloiiTpatReader(EXT_STR_h101_TPAT*, size_t);
 
     // Destructor
