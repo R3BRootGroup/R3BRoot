@@ -19,13 +19,14 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-#include "R3BEventHeader.h"
-#include "R3BFrsData.h"
-#include "TClonesArray.h"
 #include "TMath.h"
 #include <TArrayF.h>
 #include <cstdlib>
+
+// R3B headers
+#include "R3BEventHeader.h"
+#include "R3BMusicHitData.h"
+#include "R3BFrsData.h"
 
 // Fair headers
 #include "FairLogger.h"
@@ -33,15 +34,14 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "FairTask.h"
-#include "R3BMusicHitData.h"
 
 class R3BIncomingIDPar;
 class TClonesArray;
-// class R3BEventHeader;
+class R3BEventHeader;
 
 /**
- * This taks reads all detector data items and plots histograms
- * for online checks.
+ * This taks reads all detector data items for the analysis of incoming 
+ * projectiles from FRS.
  */
 class R3BAnalysisIncomingID : public FairTask
 {
@@ -89,12 +89,10 @@ class R3BAnalysisIncomingID : public FairTask
      */
     virtual void FinishEvent();
 
-    /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
+    virtual void SetParContainers();
+
     virtual void Reset();
+
     void SetBetaCorrectionForZ(Double_t p0, Double_t p1, Double_t p2, Double_t Zprimary, Double_t Zoffset)
     {
         fP0 = p0;
@@ -104,9 +102,11 @@ class R3BAnalysisIncomingID : public FairTask
         fZoffset = Zoffset;
     }
 
-    /** Accessor to select online mode **/
+    // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
-    virtual void SetParContainers();
+
+    // Accessor to select the LOS for the incoming ID
+    void SetLosForPID() { fUseLOS = kTRUE; }
 
   private:
     void SetParameter();
@@ -117,9 +117,9 @@ class R3BAnalysisIncomingID : public FairTask
     TClonesArray* fHitSci2; /**< Array with Tcal items. */
     TClonesArray* fHitLos;
 
-    R3BEventHeader* header; /**< Event header. */
-    Bool_t fOnline;         // Don't store data for online
-    Bool_t fUseLOS;         // Use LOS charge (otherwise MUSIC charge)
+    R3BEventHeader* fHeader; // Event header
+    Bool_t fOnline;          // Don't store data for online
+    Bool_t fUseLOS;          // Use LOS charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;
@@ -155,4 +155,4 @@ class R3BAnalysisIncomingID : public FairTask
     ClassDef(R3BAnalysisIncomingID, 1)
 };
 
-#endif
+#endif // R3BAnalysisIncomingID_H
