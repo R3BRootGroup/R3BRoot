@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------
-// -----           R3BAnalysisIncomingID source file              -----
-// -----        Created 03/05/21  by J.L. Rodriguez-Sanchez        -----
-// ---------------------------------------------------------------------
+// -----         R3BAnalysisIncomingID source file            -----
+// -----     Created 01/11/21 by M. Feijoo Fontan             -----
+// ----------------------------------------------------------------
 
 /*
  * This task should make the analysis of the incoming projectiles from FRS
@@ -59,6 +59,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID()
 
 R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fHeader(NULL)
     , fHitSci2(NULL)
     , fHitItemsMus(NULL)
     , fFrsDataCA(NULL)
@@ -181,47 +182,28 @@ void R3BAnalysisIncomingID::SetParameter()
 
 InitStatus R3BAnalysisIncomingID::Init()
 {
-    // Initialize random number:
-    std::srand(std::time(0)); // use current time as seed for random generator
-
-    LOG(INFO) << "R3BAnalysisIncomingID::Init ";
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
+    LOG(INFO) << "R3BAnalysisIncomingID::Init()";
 
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
+    LOG_IF(FATAL, NULL == mgr) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    // fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
-    // --- Get access to Sci2 data at hit level --- //
+    // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
-    if (!fHitSci2)
-    {
-        LOG(INFO) << "R3BAnalysisIncomingID::Init()  Could not find Sci2Hit";
-    }
+    LOG_IF(WARNING, !fHitSci2) << "R3BAnalysisIncomingID::Init()  Could not find Sci2Hit";
 
-    // get access to hit data of the MUSIC
+    // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
-    if (!fHitItemsMus)
-        LOG(WARNING) << "R3BAnalysisIncomingID: MusicHitData not found";
+    LOG_IF(WARNING, !fHitItemsMus) << "R3BAnalysisIncomingID: MusicHitData not found";
 
-    // get access to hit data of the LOS
+    // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    if (!fHitLos)
-        LOG(WARNING) << "R3BAnalysisIncomingID: LosHit not found";
+    LOG_IF(WARNING, !fHitLos) << "R3BAnalysisIncomingID: LosHit not found";
 
-    // OUTPUT DATA
-    fFrsDataCA = new TClonesArray("R3BFrsData", 5);
-    if (!fOnline)
-    {
-        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kTRUE);
-    }
-    else
-    {
-        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kFALSE);
-    }
+    // Output data
+    fFrsDataCA = new TClonesArray("R3BFrsData", 1);
+    mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
 
     SetParameter();
 
@@ -237,7 +219,7 @@ InitStatus R3BAnalysisIncomingID::ReInit()
 
 void R3BAnalysisIncomingID::Exec(Option_t* option)
 {
-    // Reset entries in output arrays, local arrays
+    // Reset entries in output arrays
     Reset();
 
     double Zmusic = 0., Music_ang = 0.;
@@ -377,8 +359,6 @@ void R3BAnalysisIncomingID::FinishEvent()
         fHitItemsMus->Clear();
 }
 
-void R3BAnalysisIncomingID::FinishTask() {}
-
 void R3BAnalysisIncomingID::Reset()
 {
     LOG(DEBUG) << "Clearing FrsData Structure";
@@ -396,10 +376,10 @@ R3BFrsData* R3BAnalysisIncomingID::AddData(Int_t StaId,
                                            Double_t xs2,
                                            Double_t xc)
 {
-    // It fills the R3BSofFrsData
+    // It fills the R3BFrsData
     TClonesArray& clref = *fFrsDataCA;
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc);
 }
 
-ClassImp(R3BAnalysisIncomingID)
+ClassImp(R3BAnalysisIncomingID);
