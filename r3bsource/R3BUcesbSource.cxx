@@ -18,6 +18,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BUcesbSource.h"
 
 #include "ext_data_client.h"
@@ -48,6 +49,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
 
 R3BUcesbSource::~R3BUcesbSource()
 {
+    R3BLOG(DEBUG1, "R3BUcesbSource destructor.");
     if (fReaders)
     {
         fReaders->Delete();
@@ -79,7 +81,7 @@ Bool_t R3BUcesbSource::Init()
     if (nullptr == fFd)
     {
         perror("popen()");
-        LOG(fatal) << "popen() failed";
+        R3BLOG(fatal, "popen() failed");
         return kFALSE;
     }
 
@@ -88,16 +90,16 @@ Bool_t R3BUcesbSource::Init()
     if (kFALSE == status)
     {
         perror("ext_data_clnt::connect()");
-        LOG(error) << "ext_data_clnt::connect() failed";
+        R3BLOG(error, "ext_data_clnt::connect() failed");
         LOG(fatal) << __PRETTY_FUNCTION__ << "ucesb error: " << fClient.last_error();
         return kFALSE;
     }
 
     // Register of R3BEventHeader in the output root file
     FairRootManager* frm = FairRootManager::Instance();
-    if (!frm)
-        LOG(FATAL) << "R3BUcesbSource::FairRootManager no found";
-    LOG(INFO) << "R3BUcesbSource::Register of R3BEventHeader";
+    R3BLOG_IF(FATAL, !frm, "FairRootManager no found");
+
+    R3BLOG(INFO, "Register of R3BEventHeader");
     fEventHeader = new R3BEventHeader();
     frm->Register("EventHeader.", "R3BEvtHeader", fEventHeader, kTRUE);
 
@@ -105,11 +107,11 @@ Bool_t R3BUcesbSource::Init()
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
     {
-        LOG(WARNING) << "R3BUcesbSource::Init() Input file for RunIds could not be open, it is Ok!";
+        R3BLOG(WARNING, "Input file for RunIds could not be open, it is Ok!");
     }
     else
     {
-        LOG(INFO) << "R3BUcesbSource::Init() Input file for RunIds " << fInputFileName.Data() << " is open!";
+        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " is open!");
         fInputFile.clear();
         fInputFile.seekg(0, std::ios::beg);
     }
@@ -140,7 +142,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     if (status != 0)
     {
         perror("ext_data_clnt::setup()");
-        LOG(error) << "ext_data_clnt::setup() failed";
+        R3BLOG(ERROR, "ext_data_clnt::setup() failed");
         LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
         return kFALSE;
     }
@@ -155,7 +157,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     if (struct_map_success & ~(map_ok))
     {
         perror("ext_data_clnt::setup()");
-        LOG(error) << "ext_data_clnt::setup() failed";
+        R3BLOG(ERROR, "ext_data_clnt::setup() failed");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
         return kFALSE;
     }
@@ -179,7 +181,7 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     {
         if (!((R3BReader*)fReaders->At(i))->ReInit())
         {
-            LOG(fatal) << "ReInit of a reader failed.";
+            R3BLOG(fatal, "ReInit of a reader failed.");
             return kFALSE;
         }
     }
@@ -203,14 +205,14 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     int ret;
     (void)i; /* Why is i not used? Outer loop seems not to use it. */
 
-    LOG(debug1) << "R3BUcesbSource::ReadEvent " << fNEvent;
+    R3BLOG(debug1, "ReadEvent " << fNEvent);
 
     fNEvent++;
 
     if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
 
-        LOG(INFO) << "R3BUcesbSource::ReadEvent()";
+        R3BLOG(INFO, "ReadEvent()");
 
         std::string buffer;
         do
@@ -241,13 +243,13 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     ret = fClient.fetch_event(fEvent, fEventSize);
     if (0 == ret)
     {
-        LOG(info) << "R3BUcesbSource::End of input";
+        LOG(info) << "End of input";
         return 1;
     }
     if (-1 == ret)
     {
         perror("ext_data_clnt::fetch_event()");
-        LOG(error) << "ext_data_clnt::fetch_event() failed";
+        R3BLOG(error, "ext_data_clnt::fetch_event() failed");
         LOG(fatal) << __PRETTY_FUNCTION__ << ": ucesb error: " << fClient.last_error();
         return 0;
     }
@@ -257,7 +259,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     if (0 != ret)
     {
         perror("ext_data_clnt::get_raw_data()");
-        LOG(fatal) << "Failed to get raw data.";
+        R3BLOG(fatal, "Failed to get raw data.");
         return 0;
     }
 
@@ -313,7 +315,7 @@ void R3BUcesbSource::Close()
     if (0 != ret)
     {
         perror("ext_data_clnt::close()");
-        LOG(fatal) << "ext_data_clnt::close() failed";
+        R3BLOG(fatal, "ext_data_clnt::close() failed");
     }
 
     /* Close pipe */
@@ -324,7 +326,7 @@ void R3BUcesbSource::Close()
         if (-1 == status)
         {
             perror("pclose()");
-            LOG(fatal) << "pclose() failed";
+            R3BLOG(fatal, "pclose() failed");
             abort();
         }
     }

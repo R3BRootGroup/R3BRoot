@@ -25,6 +25,7 @@
 #include "R3BReader.h"
 #include "TObjArray.h"
 #include "TString.h"
+#include <Rtypes.h>
 
 #include "FairRunOnline.h"
 #include <fstream>
