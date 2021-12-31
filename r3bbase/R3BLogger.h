@@ -11,14 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
  
+// ----------------------------------------------------------------------
+// -----                          R3BLogger                         -----
+// -----             Created 15/12/21 by J.L. Rodriguez-Sanchez     -----
+// ----------------------------------------------------------------------
+
 #ifndef R3BLogger_H
 #define R3BLogger_H
 
-#include <iostream>
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <cstdlib>
 
 #include "FairLogger.h"
 
@@ -26,26 +31,35 @@ class R3BLogger : public FairLogger
 {
   public:
     R3BLogger();
-    
-   private:
-     ~R3BLogger();
+
+#define R3BLOG(severity, x)                                                                                          \
+    if (true)                                                                                                        \
+    {                                                                                                                \
+        std::string fileName(__FILE__);                                                                              \
+        std::stringstream ss;                                                                                        \
+        ss << fileName.substr(fileName.find_last_of("/") + 1) << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: "; \
+        LOG(severity) << ss.str() << x;                                                                              \
+    }                                                                                                                \
+    else                                                                                                             \
+        (void)0
+
+#define R3BLOG_IF(severity, condition, x)                                                                        \
+    if (true)                                                                                                    \
+    {                                                                                                            \
+        std::string fileNameif(__FILE__);                                                                        \
+        std::stringstream ssif;                                                                                  \
+        ssif << fileNameif.substr(fileNameif.find_last_of("/") + 1) << "::" << __FUNCTION__ << "()[" << __LINE__ \
+             << "]: ";                                                                                           \
+        LOG_IF(severity, condition) << ssif.str() << x;                                                          \
+    }                                                                                                            \
+    else                                                                                                         \
+        (void)0
+
+  private:
+    ~R3BLogger();
 
   public:
     ClassDefOverride(R3BLogger, 0)
 };
-
-#define R3BLOG(severity) \
-    std::string fileName_(__FILE__);\
-    std::string fileName2_(fileName_.substr(fileName_.find_last_of("/")+1));\
-    std::stringstream ss_;\
-    ss_ << fileName2_ << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: ";\
-    LOG(severity) << ss_.str()\
-    
-#define R3BLOG_IF(severity, condition) \
-    std::string fileName_(__FILE__);\
-    std::string fileName2_(fileName_.substr(fileName_.find_last_of("/")+1));\
-    std::stringstream ss_;\
-    ss_ << fileName2_ << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: ";\
-    LOG_IF(severity, condition) << ss_.str()\
 
 #endif // R3BLogger_H
