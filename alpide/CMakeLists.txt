@@ -40,9 +40,10 @@ ${FAIRROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SRCS
-#Put here your sourcefiles
-./sim/R3BAlpide.cxx
+file(GLOB SRCS 
+./sim/*.cxx 
+#./pars/*.cxx 
+#./calibration/*.cxx
 )
 
 # fill list of header files from list of source files

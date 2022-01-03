@@ -20,6 +20,7 @@
 #define R3BAlpide_H
 
 #include "R3BDetector.h"
+#include "Rtypes.h"
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -46,7 +47,7 @@ class R3BAlpide : public R3BDetector
     R3BAlpide(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    ~R3BAlpide();
+    virtual ~R3BAlpide();
 
     /** Virtual method ProcessHits
      **
@@ -55,9 +56,9 @@ class R3BAlpide : public R3BDetector
      ** collection.
      *@param vol  Pointer to the active volume
      **/
-    virtual Bool_t ProcessHits(FairVolume* vol = 0);
+    virtual Bool_t ProcessHits(FairVolume* vol = 0) override;
 
-    virtual Bool_t CheckIfSensitive(std::string name);
+    virtual Bool_t CheckIfSensitive(std::string name) override;
 
     /** Virtual method EndOfEvent
      **
@@ -65,28 +66,28 @@ class R3BAlpide : public R3BDetector
      ** end of the event and resets it afterwards.
      **/
 
-    virtual void EndOfEvent();
+    virtual void EndOfEvent() override;
 
     /** Virtual method Register
      **
      ** Registers the hit collection in the ROOT manager.
      **/
-    virtual void Register();
+    virtual void Register() override;
 
     /** Accessor to the hit collection **/
-    virtual TClonesArray* GetCollection(Int_t iColl) const;
+    virtual TClonesArray* GetCollection(Int_t iColl) const override;
 
     /** Virtual method Print
      **
      ** Screen output of hit collection.
      **/
-    virtual void Print(Option_t* option = "") const;
+    virtual void Print(Option_t* option = "") const override;
 
     /** Virtual method Reset
      **
      ** Clears the hit collection
      **/
-    virtual void Reset();
+    virtual void Reset() override;
 
     /** Virtual method CopyClones
      **
@@ -95,17 +96,18 @@ class R3BAlpide : public R3BDetector
      *@param cl2     Target
      *@param offset  Index offset
      **/
-    virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
+    virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) override;
 
-    virtual void Initialize();
-    virtual void SetSpecialPhysicsCuts();
+    virtual void Initialize() override;
+
+    virtual void SetSpecialPhysicsCuts() override;
 
   private:
     /** Track information to be stored until the track leaves the
     active volume. **/
     Int_t fTrackID;                 //  track index
     Int_t fVolumeID;                //  volume id
-    Int_t fDetCopyID;               //  Det volume id  // added by Marc
+    Int_t fDetCopyID;               //  Det volume id
     Int_t fsector;                  //  volume id
     TLorentzVector fPosIn, fPosOut; //  position
     TLorentzVector fMomIn, fMomOut; //  momentum
@@ -141,7 +143,8 @@ class R3BAlpide : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BAlpide, 0);
+  public:
+    ClassDefOverride(R3BAlpide, 0);
 };
 
 inline void R3BAlpide::ResetParameters()

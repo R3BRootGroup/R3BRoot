@@ -56,12 +56,8 @@ void R3BCalifaDigitizer::SetParContainers()
 {
     if (fRealConfig)
     {
-
         FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-        if (!rtdb)
-        {
-            LOG(ERROR) << "R3BCalifaDigitizer:: FairRuntimeDb not opened!";
-        }
+        LOG_IF(ERROR, !rtdb) << "R3BCalifaDigitizer::FairRuntimeDb not opened!";
 
         fSim_Par = (R3BCalifaCrystalPars4Sim*)rtdb->getContainer("califaCrystalPars4Sim");
         if (!fSim_Par)
@@ -69,7 +65,7 @@ void R3BCalifaDigitizer::SetParContainers()
             LOG(ERROR) << "R3BCalifaDigitizer::Init() Couldn't get handle on "
                           "califaCrystalPars4Sim container";
         }
-        if (fSim_Par)
+        else
         {
             LOG(INFO) << "R3BCalifaDigitizer:: califaCrystalPars4Sim container opened";
         }
@@ -250,19 +246,6 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     }
 }
 
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BCalifaDigitizer::EndOfEvent()
-{
-    // fCalifaPointDataCA->Clear();
-    // fCalifaCryCalDataCA->Clear();
-    ResetParameters();
-}
-
-void R3BCalifaDigitizer::Register()
-{
-    FairRootManager::Instance()->Register("CrystalCal", GetName(), fCalifaCryCalDataCA, kTRUE);
-}
-
 void R3BCalifaDigitizer::Reset()
 {
     // Clear the CA structure
@@ -272,8 +255,6 @@ void R3BCalifaDigitizer::Reset()
 
     ResetParameters();
 }
-
-void R3BCalifaDigitizer::FinishEvent() {}
 
 void R3BCalifaDigitizer::SetDetectionThreshold(Double_t thresholdEne)
 {
