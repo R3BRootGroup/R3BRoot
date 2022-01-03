@@ -63,6 +63,13 @@ set(SRCS
 ./online/R3BMusicOnlineSpectra.cxx
 )
 
+#file(GLOB SRCS 
+#./sim/*.cxx 
+#./pars/*.cxx 
+#./calibration/*.cxx 
+#./online/*.cxx
+#)
+
 if(WITH_SOFIA)
 set(SRCS
 ${SRCS}

@@ -15,6 +15,7 @@
 #define R3BCALIFA_H
 
 #include "R3BDetector.h"
+#include "Rtypes.h"
 #include "TLorentzVector.h"
 #include <map>
 
@@ -153,8 +154,7 @@ class R3BCalifa : public R3BDetector
      **/
     void ResetParameters();
 
-    TGeoRotation* createMatrix(Double_t phi, Double_t theta, Double_t psi);
-
+  public:
     ClassDef(R3BCalifa, 7);
 };
 

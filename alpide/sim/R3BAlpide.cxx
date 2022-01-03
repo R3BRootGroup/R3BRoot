@@ -11,22 +11,17 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BAlpide.h"
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
-#include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
+#include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
 #include "FairVolume.h"
+
+#include "R3BAlpide.h"
 #include "R3BAlpidePoint.h"
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
+
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
 #include "TGeoManager.h"
-#include "TObjArray.h"
-#include "TParticle.h"
 #include "TVirtualMC.h"
 #include <stdlib.h>
 
@@ -61,13 +56,13 @@ void R3BAlpide::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BAlpide: initialisation";
-    LOG(DEBUG) << "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide");
+    R3BLOG(INFO, " ");
+    R3BLOG(DEBUG, "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide"));
 }
 
 void R3BAlpide::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "R3BAlpide: Adding customized Physics cut ... ";
+    R3BLOG(INFO, "Adding customized Physics cut.");
 
     if (gGeoManager)
     {
@@ -91,7 +86,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -136,7 +131,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for LiH Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pLiH->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -171,7 +166,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Vac
             gMC->Gstpar(pVac->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -206,7 +201,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Gold
             gMC->Gstpar(pGold->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -241,7 +236,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Mylar Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Mylar
             gMC->Gstpar(pM->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -276,8 +271,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for aluminium Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE
-                      << " GeV";
+            LOG(INFO) << "R3BAlpide: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Al
             gMC->Gstpar(pAl->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -312,7 +306,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // C
             gMC->Gstpar(pC->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -347,7 +341,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "-I- R3BAlpide: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(INFO) << "R3BAlpide: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Helium
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -473,7 +467,7 @@ TClonesArray* R3BAlpide::GetCollection(Int_t iColl) const
 void R3BAlpide::Print(Option_t* option) const
 {
     Int_t nHits = fAlpidePoint->GetEntriesFast();
-    LOG(INFO) << "R3BAlpide: " << nHits << " points registered in this event";
+    R3BLOG(INFO, nHits << " points registered in this event");
 }
 // ----------------------------------------------------------------------------
 

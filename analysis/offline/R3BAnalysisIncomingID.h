@@ -105,8 +105,8 @@ class R3BAnalysisIncomingID : public FairTask
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
-    // Accessor to select the LOS for the incoming ID
-    void SetLosForPID() { fUseLOS = kTRUE; }
+    // Accessor to select the MUSIC for the incoming ID
+    void SetMusicForPID() { fUseLOS = kFALSE; }
 
   private:
     void SetParameter();

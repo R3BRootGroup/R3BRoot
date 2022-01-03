@@ -19,12 +19,12 @@
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaCrystalPars4Sim.h"
 #include "R3BCalifaPoint.h"
-#include "TClonesArray.h"
-#include "string"
+#include "Rtypes.h"
+
+class TClonesArray;
 
 class R3BCalifaDigitizer : public FairTask
 {
-
   public:
     /** Standard contructor **/
     R3BCalifaDigitizer();
@@ -38,17 +38,8 @@ class R3BCalifaDigitizer : public FairTask
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
-    /** Virtual method EndOffEvent **/
-    virtual void EndOfEvent();
-
-    /** Virtual method Register **/
-    virtual void Register();
-
     /** Virtual method Reset **/
     virtual void Reset();
-
-    /** Virtual method FinishEvent **/
-    virtual void FinishEvent();
 
     virtual void SetParContainers();
 
@@ -90,19 +81,6 @@ class R3BCalifaDigitizer : public FairTask
      **/
     void SetNonUniformity(Double_t nonU);
 
-    inline void ResetParameters(){};
-
-    /** Private method AddCrystalCal
-     **
-     ** Adds a CalifaCrystalCal data
-     **/
-    R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident,
-                                           Double_t energy,
-                                           Double_t Nf,
-                                           Double_t Ns,
-                                           ULong64_t time,
-                                           Double_t tot_energy = 0.);
-
   private:
     void SetParameter();
 
@@ -142,6 +120,20 @@ class R3BCalifaDigitizer : public FairTask
      **/
     Double_t CompSmearing(Double_t inputComponent);
 
+    /** Private method AddCrystalCal
+     **
+     ** Adds a CalifaCrystalCal data
+     **/
+    R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident,
+                                           Double_t energy,
+                                           Double_t Nf,
+                                           Double_t Ns,
+                                           ULong64_t time,
+                                           Double_t tot_energy = 0.);
+
+    inline void ResetParameters(){};
+
+  public:
     ClassDef(R3BCalifaDigitizer, 1);
 };
 
