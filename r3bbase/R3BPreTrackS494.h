@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BTrackS494                -----
-// -----            Created 13-04-2016 by M.Heil          -----
-// -----               Fill online histograms             -----
+// -----                  R3BPreTrackS494                 -----
+// -----            Created 04.01.2022 by A.Kelic-Heil    -----
+// -----               Prepare hit level data for tracker -----
 // ------------------------------------------------------------
 
-#ifndef R3BTRACKS494
-#define R3BTRACKS494
+#ifndef PRER3BTRACKS494
+#define PRER3BTRACKS494
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
@@ -44,7 +44,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms
  * for online checks.
  */
-class R3BTrackS494 : public FairTask
+class R3BPreTrackS494 : public FairTask
 {
 
   public:
@@ -52,7 +52,7 @@ class R3BTrackS494 : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BTrackS494();
+    R3BPreTrackS494();
 
     /**
      * Standard constructor.
@@ -60,13 +60,13 @@ class R3BTrackS494 : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTrackS494(const char* name, Int_t iVerbose = 1);
+    R3BPreTrackS494(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BTrackS494();
+    virtual ~R3BPreTrackS494();
 
     /**
      * Method for task initialization.
@@ -95,9 +95,6 @@ class R3BTrackS494 : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
-
-    virtual void Output1(Double_t tracker[6], Double_t chi2[2]);
-    virtual void Output2(Double_t tracker[6], Double_t chi2[2]);
 
     /**
      * Method for setting the trigger value.
@@ -141,15 +138,29 @@ class R3BTrackS494 : public FairTask
     {
         fSimu = simu;
     }
-
+    inline void SetTracker(Bool_t trackerType)
+    {
+        ftrackerType = trackerType;   // 0 == Rene, 1 == Dima
+    }
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
-    TClonesArray* fTrackItems;
-    Int_t fNofTrackItems;
-
+    TClonesArray* fTofdHitItems;       
+    Int_t fNofTofdHitItems;
+    TClonesArray* fFi23aHitItems;       
+    Int_t fNofFi23aHitItems;
+    TClonesArray* fFi23bHitItems;       
+    Int_t fNofFi23bHitItems;
+    TClonesArray* fFi30HitItems;       
+    Int_t fNofFi30HitItems;
+    TClonesArray* fFi31HitItems;       
+    Int_t fNofFi31HitItems;
+    TClonesArray* fFi32HitItems;       
+    Int_t fNofFi32HitItems;
+    TClonesArray* fFi33HitItems;       
+    Int_t fNofFi33HitItems;
 
     enum DetectorInstances
     {
@@ -189,6 +200,7 @@ class R3BTrackS494 : public FairTask
 	Int_t fB;
 	Bool_t tracker = true;
 	Double_t delta;
+	Bool_t ftrackerType;
 
 	TCutG *cut_fi31_fi23a;
 	TCutG *cut_fi30_fi23b;
@@ -313,80 +325,13 @@ class R3BTrackS494 : public FairTask
     TH1F* fh_tofd_mult_ac;
 	TH2F* fh_tofd_q2_vs_q1;
 	TH2F* fh_tofd_q2_vs_q1_ac;
+	TH2F* fh_check_QvsX[7];
+	TH2F* fh_check_TvsX[7];
+	TH2F* fh_check_XvsY[7];
 
-    TH2F* fh_target_xy;
-    TH1F* fh_target_px;
-    TH1F* fh_target_py;
-    TH1F* fh_target_pz;
-    TH1F* fh_target_p;
-    TH1F* fh_chi2;
-    
-    TH1F* fh_px_He;
-    TH1F* fh_py_He;
-    TH1F* fh_pz_He;
-    TH1F* fh_p_He;
-    
-    TH1F* fh_dpx_He;
-    TH1F* fh_dpy_He;
-    TH1F* fh_dpz_He;
-    TH1F* fh_dp_He;
-
-    TH1F* fh_px_C;
-    TH1F* fh_py_C;
-    TH1F* fh_pz_C;
-    TH1F* fh_p_C;
-
-    TH1F* fh_dpx_C;
-    TH1F* fh_dpy_C;
-    TH1F* fh_dpz_C;
-    TH1F* fh_dp_C;
-    
-
-    TH2F* fh_chiy_vs_chix;
-    
-
-    TH1F* fh_dx;
-    TH1F* fh_dy;
-    TH1F* fh_dz;
-    TH1F* fh_dpx;
-    TH1F* fh_dpy;
-    TH1F* fh_dpz;
-    TH1F* fh_dp;
-    TH2F* fh_thetax_dpx;
-    TH2F* fh_thetax_dpx_abs;
-    TH2F* fh_thetay_dpy;
-    TH2F* fh_x_dpx;
-    TH2F* fh_y_dpy;
-    TH2F* fh_thetax_dpy;
-    TH2F* fh_thetay_dpx;
-    TH2F* fh_dpy_dpx;
-    TH2F* fh_px_px;
-    TH2F* fh_p_p_simu;
-    TH1F* fh_sum_p_simu;
-    TH2F* fh_p_p;
-    TH1F* fh_sum_p;
-
-	TH1F* fh_theta26_simu;
-	TH1F* fh_Erel_simu;
-	TH1F* fh_theta26;
-	TH1F* fh_Erel;
-	
-	TH1F* fh_res_xA[10];
-	TH1F* fh_res_xC[10];
-	TH1F* fh_res_yA[10];
-	TH1F* fh_res_yC[10];
-	
-	TH1F* fh_dErel;
-	TH1F* fh_dtheta;
-	
-	TH2F* fh_xy[10];
-	TH2F* fh_p_vs_x[10];
-	TH2F* fh_p_vs_x_test[10];
-	
-    TH2F* fh_x4He_vs_x12C;
 	
   public:
-    ClassDef(R3BTrackS494, 1)
+    ClassDef(R3BPreTrackS494, 1)
 };
 
 #endif

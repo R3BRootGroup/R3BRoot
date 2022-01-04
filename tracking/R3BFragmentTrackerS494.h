@@ -52,7 +52,7 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetSimu(Int_t simu) {fSimu = simu;}
     void SetForward(Bool_t forward) {fForward = forward;}
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
-
+    
   private:
     Bool_t InitPropagator();
 
@@ -65,19 +65,41 @@ class R3BFragmentTrackerS494 : public FairTask
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;
     TClonesArray* fTrackItems;
+    std::vector<TClonesArray*> fMappedItems;
+    std::vector<TClonesArray*> fCalItems;
+    std::vector<TClonesArray*> fArrayHits;
     Int_t fNofTrackItems;    
     Int_t fNEvents;
     Int_t fNEventsLeft;
     Int_t fNEventsRight;
     Int_t counter1 = 0;
+    
+    enum DetectorInstances
+    {
+        DET_FI_FIRST,
+        DET_FI23A = DET_FI_FIRST,
+        DET_FI23B,
+        DET_FI30,
+        DET_FI31,
+        DET_FI32,
+        DET_FI33,
+        DET_FI_LAST = DET_FI33,
+        DET_TOFD,
+        DET_MAX
+    };
 
+#define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
+
+    const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",
+                                                "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
+                                                
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
    	Double_t amu = 0.931494028;   // Gev/c**2
    	//0.938272;
    	Double_t totalChi2Mass = 0;
    	Double_t totalChi2P = 0;
-
+    Int_t maxevent;
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;
     Bool_t fSimu;
@@ -108,6 +130,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_ncand;
     TH1F* fh_x_res[7];
     TH1F* fh_x_pull[7];
+    TH1F* fh_y_res[7];
+    TH1F* fh_y_pull[7];
     TH1F* fh_A_reco1;
     TH1F* fh_A_reco2;
     TH1F* fh_mom_res;

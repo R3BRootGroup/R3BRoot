@@ -38,7 +38,7 @@
 #include "TMath.h"
 #include <TRandom3.h>
 #include <TRandomGen.h>
-#include <iostream> 
+#include <iostream>
 
 R3BFiberMAPMTCal2Hit::ToT::ToT(R3BFiberMAPMTCalData const* a_lead,
                                R3BFiberMAPMTCalData const* a_trail,
@@ -176,7 +176,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
             }
         }
     }
- 
+
     // create histograms
     TString chistName;
     TString chistTitle;
@@ -283,7 +283,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
                   << " %) " << std::flush;
 
-    for (auto side_i = 0; side_i < 2; ++side_i)
+    for (auto side_i = 0; side_i < 2; ++side_i) // 0=top, 1=bottom
     {
         // Clear local helper containers.
         auto& array = fChannelArray[side_i];
@@ -386,6 +386,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             auto down_sub_id = (down_tot.lead->GetChannel() - 1) / fNumFibers;
             auto fiber_down_ch = down_tot.lead->GetChannel();
 
+            if ((fName == "Fi23a" || fName == "Fi23b") && (fiber_down_ch > 187 && fiber_down_ch < 197))
+                continue;
+
             for (auto it_up = up_array.begin(); up_array.end() != it_up; ++it_up) // over up channel 0...nmax-1;
             {
                 auto const& up = *it_up;
@@ -403,6 +406,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     }
 
                     auto fiber_up_ch = up_tot.lead->GetChannel(); // 1...
+                    if ((fName == "Fi23a" || fName == "Fi23b") && (fiber_up_ch > 187 && fiber_up_ch < 197))
+                        continue;
 
                     Int_t fiber_id = -1000;
                     if (fiber_down_ch == fiber_up_ch)
@@ -470,7 +475,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
                     Double_t y = -10000.;
-                    Double_t veff = 12. / 2.; // cm/ns
+                    Double_t veff = 0.333; // cm/ns
                     Double_t randx = (std::rand() / (float)RAND_MAX);
                     if (fName == "Fi23a" || fName == "Fi23b")
                     {
@@ -496,6 +501,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     }
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
                     {
+                        veff = 5. * 0.333;
                         Float_t fiber_thickness = 0.10000; // cm
                         if (fName == "Fi30")
                             fiber_thickness = 0.1034;

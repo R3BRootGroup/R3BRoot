@@ -79,6 +79,8 @@ R3BGlobalAnalysisS494.cxx
 R3BGlobalCorrelationsS494.cxx
 R3BTrackS454.cxx
 R3BTrackS494.cxx
+R3BTrackDoubleS494.cxx
+R3BPreTrackS494.cxx
 R3BTrackerTestS454.cxx
 R3BTrackerTestS494.cxx
 R3BOnlineSpillAnalysis.cxx

@@ -92,7 +92,10 @@ R3BGlobalAnalysisS494::R3BGlobalAnalysisS494(const char* name, Int_t iVerbose)
     , fCuts(0)
     , fGhost(0)
     , fPairs(0)
-    , fB(-1672)
+    , fSimu(0)
+    , fB(-1710)
+    , fcut_chiX(5000)
+    , fcut_chiY(5000)
     , fNEvents(0)
 {
 }
@@ -187,7 +190,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_pz_He->GetXaxis()->SetTitle("pz / MeV/c");
     fh_pz_He->GetYaxis()->SetTitle("counts");
 
-    fh_p_He = new TH1F("p_He", " p He", 30000, 0., 30000.);
+    fh_p_He = new TH1F("p_He", " p He", 10000, 0., 30000.);
     fh_p_He->GetXaxis()->SetTitle("pz / MeV/c");
     fh_p_He->GetYaxis()->SetTitle("counts");
 
@@ -203,15 +206,15 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_pz_C->GetXaxis()->SetTitle("pz / MeV/c");
     fh_pz_C->GetYaxis()->SetTitle("counts");
 
-    fh_p_C = new TH1F("p_C", " p C", 30000, 0., 30000.);
+    fh_p_C = new TH1F("p_C", " p C", 10000, 0., 30000.);
     fh_p_C->GetXaxis()->SetTitle("pz / MeV/c");
     fh_p_C->GetYaxis()->SetTitle("counts");
 
-    fh_target_xy = new TH2F("target_xy", "target xy ", 1000, -0.5, 0.5, 1000, -0.5, 0.5);
+    fh_target_xy = new TH2F("target_xy", "target xy ", 500, -5, 5, 500, -5, 5);
     fh_target_xy->GetXaxis()->SetTitle("x / cm");
     fh_target_xy->GetYaxis()->SetTitle("y / cm");
 
-    fh_chi2 = new TH1F("chi2", "chi2 ", 1000, 0., 100);
+    fh_chi2 = new TH1F("chi2", "chi2 ", 500, 0., 500);
     fh_chi2->GetXaxis()->SetTitle("Chi2");
     fh_chi2->GetYaxis()->SetTitle("counts");
 
@@ -227,21 +230,37 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_dz->GetXaxis()->SetTitle("dz / cm");
     fh_dz->GetYaxis()->SetTitle("counts");
 
-    fh_dpx = new TH1F("tracker_dpx", "tracker dpx ", 2000, -10, 10);
-    fh_dpx->GetXaxis()->SetTitle("dpx / percent");
-    fh_dpx->GetYaxis()->SetTitle("counts");
+    fh_dpxC = new TH1F("tracker_dpxC", "tracker dpx C", 1000, -50, 50);
+    fh_dpxC->GetXaxis()->SetTitle("dpx / percent");
+    fh_dpxC->GetYaxis()->SetTitle("counts");
 
-    fh_dpy = new TH1F("tracker_dpy", "tracker dpy ", 2000, -10, 10);
-    fh_dpy->GetXaxis()->SetTitle("dpy / percent");
-    fh_dpy->GetYaxis()->SetTitle("counts");
+    fh_dpyC = new TH1F("tracker_dpyC", "tracker dpy C", 1000, -50, 50);
+    fh_dpyC->GetXaxis()->SetTitle("dpy / percent");
+    fh_dpyC->GetYaxis()->SetTitle("counts");
 
-    fh_dpz = new TH1F("tracker_dpz", "tracker dpz ", 2000, -10, 10);
-    fh_dpz->GetXaxis()->SetTitle("dpz / percent");
-    fh_dpz->GetYaxis()->SetTitle("counts");
+    fh_dpzC = new TH1F("tracker_dpzC", "tracker dpz C", 1000, -50, 50);
+    fh_dpzC->GetXaxis()->SetTitle("dpz / percent");
+    fh_dpzC->GetYaxis()->SetTitle("counts");
 
-    fh_dp = new TH1F("tracker_dp", "tracker dp ", 2000, -10, 10);
-    fh_dp->GetXaxis()->SetTitle("dp / percent");
-    fh_dp->GetYaxis()->SetTitle("counts");
+    fh_dpC = new TH1F("tracker_dpC", "tracker dp C", 1000, -50, 50);
+    fh_dpC->GetXaxis()->SetTitle("dp / percent");
+    fh_dpC->GetYaxis()->SetTitle("counts");
+
+    fh_dpxHe = new TH1F("tracker_dpxHe", "tracker Hedpx ", 1000, -50, 50);
+    fh_dpxHe->GetXaxis()->SetTitle("dpx / percent");
+    fh_dpxHe->GetYaxis()->SetTitle("counts");
+
+    fh_dpyHe = new TH1F("tracker_dpyHe", "tracker Hedpy ", 1000, -50, 50);
+    fh_dpyHe->GetXaxis()->SetTitle("dpy / percent");
+    fh_dpyHe->GetYaxis()->SetTitle("counts");
+
+    fh_dpzHe = new TH1F("tracker_dpzHe", "tracker dpz He", 1000, -50, 50);
+    fh_dpzHe->GetXaxis()->SetTitle("dpz / percent");
+    fh_dpzHe->GetYaxis()->SetTitle("counts");
+
+    fh_dpHe = new TH1F("tracker_dpHe", "tracker dp He", 1000, -50, 50);
+    fh_dpHe->GetXaxis()->SetTitle("dp / percent");
+    fh_dpHe->GetYaxis()->SetTitle("counts");
 
     fh_thetax_dpx = new TH2F("tracker_thethax_dpx", "tracker theta_x vs dpx ", 1000, -50, 50, 200, -100., 100.);
     fh_thetax_dpx->GetXaxis()->SetTitle("dpx / percent");
@@ -268,23 +287,23 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_thetax_dpx_abs->GetXaxis()->SetTitle("dpx");
     fh_thetax_dpx_abs->GetYaxis()->SetTitle("theta_x / mrad");
 
-    fh_x_dpx = new TH2F("tracker_x_dpx", "tracker x vs dpx ", 1000, -50, 50, 200, -10., 10.);
+    fh_x_dpx = new TH2F("tracker_x_dpx", "tracker x vs dpx ", 1000, -100, 100, 200, -1., 1.);
     fh_x_dpx->GetXaxis()->SetTitle("dpx / percent");
     fh_x_dpx->GetYaxis()->SetTitle("x / cm");
 
-    fh_y_dpy = new TH2F("tracker_y_dpy", "tracker y vs dpy ", 1000, -50, 50, 200, -10., 10.);
+    fh_y_dpy = new TH2F("tracker_y_dpy", "tracker y vs dpy ", 2000, -200, 200, 200, -1., 1.);
     fh_y_dpy->GetXaxis()->SetTitle("dpy / percent");
     fh_y_dpy->GetYaxis()->SetTitle("y / cm");
 
-    fh_px_px = new TH2F("px_px", "px He vs. px C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_px_px = new TH2F("px_px", "px He vs. px C", 400, -1000, 400, 1000, -1000., 1000.);
     fh_px_px->GetXaxis()->SetTitle("px / MeV/c");
     fh_px_px->GetYaxis()->SetTitle("px / MeV/c");
 
-    fh_py_py = new TH2F("py_py", "py He vs. py C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_py_py = new TH2F("py_py", "py He vs. py C", 400, -1000, 1000, 400, -1000., 1000.);
     fh_py_py->GetXaxis()->SetTitle("py / MeV/c");
     fh_py_py->GetYaxis()->SetTitle("py / MeV/c");
 
-    fh_pz_pz = new TH2F("pz_pz", "pz He vs. pz C", 1000, 0, 10000, 2000, 0., 20000.);
+    fh_pz_pz = new TH2F("pz_pz", "pz He vs. pz C", 400, 0, 10000, 800, 0., 20000.);
     fh_pz_pz->GetXaxis()->SetTitle("pz / MeV/c");
     fh_pz_pz->GetYaxis()->SetTitle("pz / MeV/c");
 
@@ -301,11 +320,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_pz_pz_cm->GetYaxis()->SetTitle("pz / MeV/c");
 
     // Analysis
-    fh_chiy_vs_chix_He = new TH2F("chiy_vs_chix_He", "chi y vs. chi x for He", 500, 0., 500., 500, 0., 500.);
+    fh_chiy_vs_chix_He = new TH2F("chiy_vs_chix_He", "chi y vs. chi x for He", 250, 0., 500., 250, 0., 500.);
     fh_chiy_vs_chix_He->GetXaxis()->SetTitle("chi x");
     fh_chiy_vs_chix_He->GetYaxis()->SetTitle("chi y");
 
-    fh_chiy_vs_chix_C = new TH2F("chiy_vs_chix_C", "chi y vs. chi x for C", 500, 0., 500., 500, 0., 500.);
+    fh_chiy_vs_chix_C = new TH2F("chiy_vs_chix_C", "chi y vs. chi x for C", 250, 0., 500., 250, 0., 500.);
     fh_chiy_vs_chix_C->GetXaxis()->SetTitle("chi x");
     fh_chiy_vs_chix_C->GetYaxis()->SetTitle("chi y");
 
@@ -361,33 +380,129 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_theta26_simu->GetXaxis()->SetTitle("angle / degree");
     fh_theta26_simu->GetYaxis()->SetTitle("counts");
 
-    fh_Erel = new TH1F("Erel", "Erel ", 5000, 0., 100);
+    fh_Erel = new TH1F("Erel", "Erel ", 1000, 0., 100);
     fh_Erel->GetXaxis()->SetTitle("Erel / MeV");
     fh_Erel->GetYaxis()->SetTitle("counts");
 
-    fh_ErelL = new TH1F("ErelL", "Erel links", 5000, 0., 100);
+    fh_ErelL = new TH1F("ErelL", "Erel links", 1000, 0., 100);
     fh_ErelL->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelL->GetYaxis()->SetTitle("counts");
 
-    fh_ErelR = new TH1F("ErelR", "Erel rechts ", 5000, 0., 100);
+    fh_ErelR = new TH1F("ErelR", "Erel rechts ", 1000, 0., 100);
     fh_ErelR->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelR->GetYaxis()->SetTitle("counts");
 
-    fh_ErelB = new TH1F("ErelB", "Erel both sides ", 5000, 0., 100);
+    fh_ErelB = new TH1F("ErelB", "Erel both sides ", 1000, 0., 100);
     fh_ErelB->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelB->GetYaxis()->SetTitle("counts");
 
-    fh_Erel_simu = new TH1F("Erel_simu", "Erel simulation", 600, -10., 50);
+    fh_Erel_simu = new TH1F("Erel_simu", "Erel simulation", 1000, 0., 100);
     fh_Erel_simu->GetXaxis()->SetTitle("Erel / MeV");
     fh_Erel_simu->GetYaxis()->SetTitle("counts");
 
-    fh_dErel_vs_x = new TH2F("dErel_vs_x", "delta Erel vs. x", 200, -100., 100., 100, -5., 5.);
-    fh_dErel_vs_x->GetXaxis()->SetTitle("TofD x / cm");
-    fh_dErel_vs_x->GetYaxis()->SetTitle("Delta Erel / MeV");
+    fh_dErel_vs_x = new TH2F("Erel_vs_px", "Erel vs. px", 2000, -500., 500, 500, 0, 50.);
+    fh_dErel_vs_x->GetXaxis()->SetTitle("px / MeV/c");
+    fh_dErel_vs_x->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_dErel_vs_y = new TH2F("dErel_vs_y", "delta Erel vs. y", 200, -100., 100., 100, -5., 5.);
-    fh_dErel_vs_y->GetXaxis()->SetTitle("TofD y / cm");
-    fh_dErel_vs_y->GetYaxis()->SetTitle("Delta Erel / MeV");
+    fh_dErel_vs_y = new TH2F("Erel_vs_py", "Erel vs. py", 2000, -500., 500, 500, 0, 50.);
+    fh_dErel_vs_y->GetXaxis()->SetTitle("py / MeV/c");
+    fh_dErel_vs_y->GetYaxis()->SetTitle(" Erel / MeV");
+
+    fh_p_vs_p = new TH1F("sum_p", "sum_p", 2000, 16500., 18500.);
+    fh_p_vs_p->GetXaxis()->SetTitle("p / MeV/c");
+    fh_p_vs_p->GetYaxis()->SetTitle("count");
+
+    fh_dErel = new TH1F("dErel", "delta Erel ", 100, -5., 5.);
+    fh_dErel->GetYaxis()->SetTitle("counts");
+    fh_dErel->GetXaxis()->SetTitle("Delta Erel / MeV");
+
+    fh_dtheta = new TH1F("dphi_bc_cm", "delta phi_bc_cm ", 1000, -5., 5.);
+    fh_dtheta->GetYaxis()->SetTitle("counts");
+    fh_dtheta->GetXaxis()->SetTitle("Delta phi_bc_cm / deg");
+
+    fh_Erel_vs_pC = new TH2F("Erel_vs_theta", "Erel both sides vs. theta", 500, 0., 5, 500, 0, 50.);
+    fh_Erel_vs_pC->GetXaxis()->SetTitle("angle / deg");
+    fh_Erel_vs_pC->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_Erel_vs_thetabc = new TH2F("Erel_vs_phibccm", "Erel both sides vs. phi_bc_cm", 1000, 0, 100., 400, 0., 400.);
+    fh_Erel_vs_thetabc->GetYaxis()->SetTitle("phi angle bc / deg");
+    fh_Erel_vs_thetabc->GetXaxis()->SetTitle("Erel / MeV");
+
+    fh_Erel_vs_thetabcMC =
+        new TH2F("Erel_vs_phibccmMC", "Erel both sides vs. phi_bc_cm MCtrack", 1000, 0, 100., 400, 0., 400.);
+    fh_Erel_vs_thetabcMC->GetYaxis()->SetTitle("phi angle bc / deg");
+    fh_Erel_vs_thetabcMC->GetXaxis()->SetTitle("Erel / MeV");
+
+    TCanvas* check = new TCanvas("CheckingGlobal", "CheckingGlobal", 10, 10, 900, 900);
+    check->Divide(4, 4);
+    check->cd(1);
+    fh_chiy_vs_chix_He->Draw("colz");
+    check->cd(2);
+    fh_chiy_vs_chix_C->Draw("colz");
+    check->cd(3);
+    gPad->SetLogz();
+    fh_Erel_vs_thetabc->Draw("colz");
+    check->cd(4);
+    gPad->SetLogz();
+    fh_target_xy->Draw("colz");
+    check->cd(5);
+    fh_p_He->Draw();
+    check->cd(6);
+    fh_p_C->Draw();
+    check->cd(7);
+    // fh_ErelB->SetAxisRange(0., 50.,"X");
+    fh_ErelB->Draw();
+    check->cd(8);
+    // fh_Erel->SetAxisRange(0., 50.,"X");
+    fh_Erel->Draw();
+    check->cd(9);
+    fh_theta26->Draw();
+    check->cd(10);
+    fh_theta_bc_cm->Draw();
+    check->cd(11);
+    fh_phi_bc_cm->Draw();
+    check->cd(12);
+    gPad->SetLogz();
+    fh_px_px->Draw("colz");
+    check->cd(13);
+    gPad->SetLogz();
+    fh_py_py->Draw("colz");
+    check->cd(14);
+    gPad->SetLogz();
+    fh_pz_pz->Draw("colz");
+    check->cd(15);
+    gPad->SetLogz();
+    fh_p_vs_p->Draw("colz");
+    check->cd(16);
+    gPad->SetLogz();
+    fh_Erel_vs_pC->Draw("colz");
+
+    if (fSimu)
+    {
+        TCanvas* checkMC = new TCanvas("CheckingGlobalMC", "CheckingGlobalMC", 10, 10, 900, 900);
+        checkMC->Divide(3, 3);
+        checkMC->cd(1);
+        fh_dx->Draw();
+        checkMC->cd(2);
+        fh_dy->Draw();
+        checkMC->cd(3);
+        fh_dpxC->Draw();
+        checkMC->cd(4);
+        fh_dpyC->Draw();
+        checkMC->cd(5);
+        fh_dpzC->Draw();
+        checkMC->cd(6);
+        fh_dpC->Draw();
+        checkMC->cd(7);
+        gPad->SetLogz();
+        fh_x_dpx->Draw("colz");
+        checkMC->cd(8);
+        gPad->SetLogz();
+        fh_y_dpy->Draw("colz");
+        checkMC->cd(9);
+        gPad->SetLogz();
+        fh_dpy_dpx->Draw("colz");
+    }
 
     return kSUCCESS;
 }
@@ -416,23 +531,36 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     XC = -100;
     YC = -100;
     ZC = -100;
+    pHex_mc = -100.;
+    pHey_mc = -100.;
+    pHez_mc = -100.;
+    pCx_mc = -100.;
+    pCy_mc = -100.;
+    pCz_mc = -100.;
+    XHe_mc = -100;
+    YHe_mc = -100;
+    ZHe_mc = -100;
+    XC_mc = -100;
+    YC_mc = -100;
+    ZC_mc = -100;
     Double_t px, py, pz;
     Double_t theta_16, theta_26;
     Double_t costh26;
-    Double_t chiHex, chiHey, chiCx, chiCy;
+    Double_t chiHex, chiHey = 1.e+36, chiCx = 1.e+36, chiCy = 1.e+36;
 
     Bool_t is_alpha = false;
     Bool_t is_carbon = false;
+    Bool_t is_tracked = false;
 
-    // Choose original MC data or exp. data
-    Bool_t simData = false;
+    Int_t nHitsTrack = 0;
+    Int_t nHitsMCTrack = 0;
 
-    if (fTrack && !simData)
+    if (fTrack)
     {
 
         // read in Track parameter
-        Int_t nHitsTrack = fTrack->GetEntriesFast();
-        // if(nHitsTrack>0) cout << "Track hits: " << nHitsTrack << endl;
+        nHitsTrack = fTrack->GetEntriesFast();
+        // cout << "Track hits: " << nHitsTrack << endl;
         for (Int_t l = 0; l < nHitsTrack; l++)
         {
             R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
@@ -455,11 +583,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 is_alpha = true;
                 alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
-
-                cout << "******************************************" << endl;
-                cout << "Track In 4He"
-                          << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                /*
+                   cout << "******************************************" << endl;
+                   cout << "Track In 4He"
+                             << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
+                   cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                 */
             }
             if (aTrack->GetQ() == 6)
             {
@@ -477,11 +606,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 is_carbon = true;
                 carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
-
-                cout << "******************************************" << endl;
-                cout << "Track In 12C"
-                          << "x " << XC << " y " << YC << " z " << ZC << endl;
-                cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                /*
+                  cout << "******************************************" << endl;
+                  cout << "Track In 12C"
+                            << "x " << XC << " y " << YC << " z " << ZC << endl;
+                  cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                 */
             }
             if (aTrack->GetQ() == 8)
             {
@@ -501,12 +631,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             }
         }
     }
-    if (fMCTrack && simData)
+    if (fMCTrack && fSimu)
     {
         // read in Monte Carlo Track parameter
 
-        Int_t nHitsMCTrack = fMCTrack->GetEntriesFast();
-        // cout << "MCTrack hits: " << nHitsMCTrack << endl;
+        nHitsMCTrack = fMCTrack->GetEntriesFast();
+        //  cout << "MCTrack hits: " << nHitsMCTrack << endl;
 
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
@@ -521,59 +651,63 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 if (PID == 1000020040)
                 {
                     // 4He
-                    XHe = aTrack->GetStartX();
-                    YHe = aTrack->GetStartY();
-                    ZHe = aTrack->GetStartZ();
-                    THe = aTrack->GetStartT();
+                    XHe_mc = aTrack->GetStartX();
+                    YHe_mc = aTrack->GetStartY();
+                    ZHe_mc = aTrack->GetStartZ();
+                    THe_mc = aTrack->GetStartT();
 
-                    pHex = aTrack->GetPx() * 1000.;
-                    pHey = aTrack->GetPy() * 1000.;
-                    pHez = aTrack->GetPz() * 1000.;
+                    pHex_mc = aTrack->GetPx() * 1000.;
+                    pHey_mc = aTrack->GetPy() * 1000.;
+                    pHez_mc = aTrack->GetPz() * 1000.;
 
                     is_alpha = true;
-                    alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
+                    alphaMC.SetPxPyPzE(pHex_mc,
+                                       pHey_mc,
+                                       pHez_mc,
+                                       sqrt(pow(pHex_mc, 2) + pow(pHey_mc, 2) + pow(pHez_mc, 2) + pow(mHe, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
                     LOG(DEBUG) << "Track In 4He"
-                               << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                    LOG(DEBUG) << "px " << pHex << " py " << pHey << " pz " << pHez << endl;
+                               << "x " << XHe_mc << " y " << YHe_mc << " z " << ZHe_mc << endl;
+                    LOG(DEBUG) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
                 }
                 if (PID == 1000060120)
                 {
                     // 12C
-                    XC = aTrack->GetStartX();
-                    YC = aTrack->GetStartY();
-                    ZC = aTrack->GetStartZ();
-                    TC = aTrack->GetStartT();
+                    XC_mc = aTrack->GetStartX();
+                    YC_mc = aTrack->GetStartY();
+                    ZC_mc = aTrack->GetStartZ();
+                    TC_mc = aTrack->GetStartT();
 
-                    pCx = aTrack->GetPx() * 1000.;
-                    pCy = aTrack->GetPy() * 1000.;
-                    pCz = aTrack->GetPz() * 1000.;
+                    pCx_mc = aTrack->GetPx() * 1000.;
+                    pCy_mc = aTrack->GetPy() * 1000.;
+                    pCz_mc = aTrack->GetPz() * 1000.;
 
                     is_carbon = true;
-                    carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
+                    carbonMC.SetPxPyPzE(
+                        pCx_mc, pCy_mc, pCz_mc, sqrt(pow(pCx_mc, 2) + pow(pCy_mc, 2) + pow(pCz_mc, 2) + pow(mC, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
                     LOG(DEBUG) << "Track In 12C"
-                               << "x " << XC << " y " << YC << " z " << ZC << endl;
-                    LOG(DEBUG) << "px " << pCx << " py " << pCy << " pz " << pCz << endl;
+                               << "x " << XC_mc << " y " << YC_mc << " z " << ZC_mc << endl;
+                    LOG(DEBUG) << "px " << pCx_mc << " py " << pCy_mc << " pz " << pCz_mc << endl;
                 }
                 if (PID == 1000080160)
                 {
                     // 16O
-                    Xf = aTrack->GetStartX();
-                    Yf = aTrack->GetStartY();
-                    Zf = aTrack->GetStartZ();
+                    Xf_mc = aTrack->GetStartX();
+                    Yf_mc = aTrack->GetStartY();
+                    Zf_mc = aTrack->GetStartZ();
 
-                    Pxf = aTrack->GetPx() * 1000.;
-                    Pyf = aTrack->GetPy() * 1000.;
-                    Pzf = aTrack->GetPz() * 1000.;
-                    Pf_tot = sqrt((Pxf * Pxf) + (Pyf * Pyf) + (Pzf * Pzf));
+                    Pxf_mc = aTrack->GetPx() * 1000.;
+                    Pyf_mc = aTrack->GetPy() * 1000.;
+                    Pzf_mc = aTrack->GetPz() * 1000.;
+                    Pf_tot_mc = sqrt((Pxf_mc * Pxf_mc) + (Pyf_mc * Pyf_mc) + (Pzf_mc * Pzf_mc));
 
                     LOG(DEBUG) << "******************************************" << endl;
                     LOG(DEBUG) << "Track In 16O"
-                               << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                    LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                               << "x " << Xf_mc << " y " << Yf_mc << " z " << Zf_mc << endl;
+                    LOG(DEBUG) << "px " << Pxf_mc << " py " << Pyf_mc << " z " << Pzf_mc << endl;
                 }
             }
         }
@@ -584,10 +718,14 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     {
         fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
         fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
-        Double_t cut_chi = 100.;
-        if (chiHex < cut_chi && chiHey < cut_chi && chiCx < cut_chi && chiCy < cut_chi)
+        fh_chi2->Fill(chiHex + chiHey);
+        fh_chi2->Fill(chiCx + chiCy);
+
+        if (chiHex < fcut_chiX && chiHey < fcut_chiY && chiCx < fcut_chiX && chiCy < fcut_chiY)
         //			&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
         {
+            is_tracked = true;
+
             fh_target_xy->Fill(XHe * 100., YHe * 100.);
 
             fh_px_He->Fill(alpha.Px());
@@ -602,29 +740,42 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             fh_py_py->Fill(alpha.Py(), carbon.Py());
             fh_pz_pz->Fill(alpha.Pz(), carbon.Pz());
 
-            TVector3 pa = alpha.Vect();
+            pa = alpha.Vect();
             fh_p_He->Fill(pa.Mag());
-            TVector3 pc = carbon.Vect();
+            pc = carbon.Vect();
             fh_p_C->Fill(pc.Mag());
 
             // Calculate angle between alpha and C
             if (alpha.Pz() == 0 || carbon.Pz() == 0)
                 return;
+            if (alpha.Pz() < 3700 || alpha.Pz() > 5000)
+                return;
+            if (carbon.Pz() < 12700 || carbon.Pz() > 13300)
+                return;
 
+            fh_p_vs_p->Fill(pa.Mag() + pc.Mag());
             theta_26 = alpha.Angle(carbon.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
             fh_theta26->Fill(theta_26);
 
             /** Calculate invariant mass and relative energy **/
-            Double_t m_inva = (alpha + carbon).M(); // invariant mass
-            Double_t Erel = m_inva - mHe - mC;      // relative Energy
-            fh_Erel->Fill(Erel);                    // relative Energy plot
+            m_inva = (alpha + carbon).M(); // invariant mass
+            Erel = m_inva - mHe - mC;      // relative Energy
+            fh_Erel->Fill(Erel);           // relative Energy plot
 
             if (alpha.Px() < 0. && carbon.Px() < 0.)
                 fh_ErelR->Fill(Erel);
             if (alpha.Px() > 0. && carbon.Px() > 0.)
                 fh_ErelL->Fill(Erel);
             if ((alpha.Px() > 0. && carbon.Px() < 0.) || (alpha.Px() < 0. && carbon.Px() > 0.))
-                fh_ErelB->Fill(Erel);
+            {
+                fh_Erel_vs_pC->Fill(theta_26, Erel);
+                if (theta_26 > 0.7)
+                    fh_ErelB->Fill(Erel);
+            }
+            fh_dErel_vs_x->Fill(carbon.Px(), Erel);
+            fh_dErel_vs_y->Fill(carbon.Py(), Erel);
+            fh_dErel_vs_x->Fill(alpha.Px(), Erel);
+            fh_dErel_vs_y->Fill(alpha.Py(), Erel);
 
             /** transfer to cm system and rotate **/
 
@@ -670,11 +821,17 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             fh_phi_12C_cm->Fill(carbon_cm.Phi() * TMath::RadToDeg());
 
             fh_theta_bc_cm->Fill(alpha_cm.Theta() * TMath::RadToDeg());
-            Double_t phi_bc_cm = (oxygen.Phi() - alpha_cm.Phi()) * TMath::RadToDeg();
+
+            phi_bc_cm = (oxygen.Phi() - alpha_cm.Phi()) * TMath::RadToDeg();
             if (phi_bc_cm < 0)
                 phi_bc_cm += 360.;
             fh_phi_bc_cm->Fill(phi_bc_cm);
             fh_phi_bc_cm_polar->Fill(phi_bc_cm, 1);
+            fh_Erel_vs_thetabc->Fill(Erel, phi_bc_cm);
+
+            fh_px_px_cm->Fill(alpha_cm.Px(), carbon_cm.Px());
+            fh_py_py_cm->Fill(alpha_cm.Py(), carbon_cm.Py());
+            fh_pz_pz_cm->Fill(alpha_cm.Pz(), carbon_cm.Pz());
 
             /*
                         // rotation in oxygen direction
@@ -708,6 +865,71 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
         } // end if chi2
     }     // end if trackHits>1
+
+    if (fSimu && nHitsMCTrack > 0)
+    {
+
+        paMC = alphaMC.Vect();
+        pcMC = carbonMC.Vect();
+        Double_t theta_26MC = alphaMC.Angle(carbonMC.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
+        /** Calculate invariant mass and relative energy **/
+        m_invaMC = (alphaMC + carbonMC).M(); // invariant mass
+        ErelMC = m_invaMC - mHe - mC;        // relative Energy
+
+        /** transfer to cm system and rotate **/
+
+        oxygenMC = alphaMC + carbonMC; // excited oxygen
+        // cout<<"gamma "<<oxygen.Gamma()<<endl;
+        Double_t thetaMC_16O = oxygenMC.Theta() * TMath::RadToDeg();
+        Double_t phiMC_16O = oxygenMC.Phi() * TMath::RadToDeg();
+        if (phiMC_16O < 0)
+            phiMC_16O += 360.;
+
+        // transfer to cm system and make some rotations
+        // boost them to centre of mass
+        alphaMC_cm = alphaMC;
+        carbonMC_cm = carbonMC;
+        oxygenMC_cm = oxygenMC;
+        alphaMC_cm.Boost(-oxygenMC.BoostVector());
+        carbonMC_cm.Boost(-oxygenMC.BoostVector());
+        oxygenMC_cm.Boost(-oxygenMC.BoostVector());
+
+        Double_t phiMC = (alphaMC_cm.Phi() - carbonMC_cm.Phi()) * TMath::RadToDeg();
+        Double_t thetaMC = alphaMC_cm.Angle(carbonMC_cm.Vect()) * TMath::RadToDeg();
+
+        phiMC_bc_cm = (oxygenMC.Phi() - alphaMC_cm.Phi()) * TMath::RadToDeg();
+        if (phiMC_bc_cm < 0)
+            phiMC_bc_cm += 360.;
+        fh_Erel_vs_thetabcMC->Fill(ErelMC, phiMC_bc_cm);
+        fh_Erel_simu->Fill(ErelMC);
+
+        if (is_tracked)
+        {
+            fh_dErel->Fill(ErelMC - Erel);
+            fh_dtheta->Fill(phiMC_bc_cm - phi_bc_cm);
+
+            fh_dx->Fill((XHe_mc - XHe) * 100.);
+            fh_dx->Fill((XC_mc - XC) * 100.);
+            fh_dy->Fill((YHe_mc - YHe) * 100.);
+            fh_dy->Fill((YC_mc - YC) * 100.);
+
+            fh_dpxC->Fill((pCx_mc - pCx) / pCx_mc * 100.);
+            fh_dpxHe->Fill((pHex_mc - pHex) / pHex_mc * 100.);
+            fh_dpyC->Fill((pCy_mc - pCy) / pCy_mc * 100.);
+            fh_dpyHe->Fill((pHey_mc - pHey) / pHey_mc * 100.);
+            fh_dpzC->Fill((pCz_mc - pCz) / pCz_mc * 100.);
+            fh_dpzHe->Fill((pHez_mc - pHez) / pHez_mc * 100.);
+            fh_dpC->Fill((pcMC.Mag() - pc.Mag()) / pcMC.Mag() * 100.);
+            fh_dpHe->Fill((paMC.Mag() - pa.Mag()) / paMC.Mag() * 100.);
+
+            fh_x_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., XC);
+            fh_x_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., XHe);
+            fh_y_dpy->Fill((pCy_mc - pCy) / pCy_mc * 100., YC);
+            fh_y_dpy->Fill((pHey_mc - pHey) / pHey_mc * 100., YHe);
+            fh_dpy_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., (pCy_mc - pCy) / pCy_mc * 100.);
+            fh_dpy_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., (pHey_mc - pHey) / pHey_mc * 100.);
+        }
+    }
 
     // second, old version of analysis
     if (is_carbon && is_alpha && 1 == 0)
@@ -1142,10 +1364,15 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_dx->Write();
     fh_dy->Write();
     fh_dz->Write();
-    fh_dpx->Write();
-    fh_dpy->Write();
-    fh_dpz->Write();
-    fh_dp->Write();
+    fh_dpxC->Write();
+    fh_dpyC->Write();
+    fh_dpzC->Write();
+    fh_dpC->Write();
+    fh_dpxHe->Write();
+    fh_dpyHe->Write();
+    fh_dpzHe->Write();
+    fh_dpHe->Write();
+
     fh_thetax_dpx->Write();
     fh_thetax_dpx_abs->Write();
     fh_thetay_dpy->Write();
@@ -1183,5 +1410,11 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_px_px_cm->Write();
     fh_py_py_cm->Write();
     fh_pz_pz_cm->Write();
+    fh_Erel_vs_pC->Write();
+    fh_dErel->Write();
+    fh_dtheta->Write();
+    fh_p_vs_p->Write();
+    fh_Erel_vs_thetabc->Write();
+    fh_Erel_vs_thetabcMC->Write();
 }
 ClassImp(R3BGlobalAnalysisS494)

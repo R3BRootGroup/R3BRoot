@@ -136,12 +136,18 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     unsigned long long time_spill_start = 0, time_spill_end = 0;
     Double_t see_spill = 0, ic_spill = 0, tofdor_spill = 0;
     unsigned long long time_previous_event = 0;
+    unsigned long ySEE = 0, ySEE_mem = 0;
     int yIC_mem_mem=0, ySEE_mem_mem=0,yTOFDOR_mem_mem=0,ySROLU1_mem_mem=0,ySROLU2_mem_mem=0;
-
+    
+    Int_t maxevent;
+    
+    Bool_t newSpill = false;
     Bool_t spill_on = false;
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
     Double_t tdiff_long = 0.;
+	Int_t counterWrongTpat = 0;
+	Int_t counterWrongTrigger = 0;
     Double_t fNorm = 1.;
     Int_t iclear_count = 1;
     UInt_t reset_time;         // time after which bmon spectra are reseted
@@ -152,12 +158,18 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 	Double_t calib_IC = 1.;   // SEETRAM calibration factor
     Double_t ic_offset = 0; // SEETRAM offset in kHz
     Int_t in_spill_off = 0;
-
+    unsigned long seeLastSpill = 0, time_lastSpill = 0;
+    UInt_t num_spills = 0;
+    UInt_t num_spills_prev = 0;
+    Double_t spilltime = 0.;
+    Double_t counts_SEE = 0;
+    Double_t counts_IC = 0;
+    Double_t counts_TofD = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0, fNSpills = 0; /**< Event counter. */
 
-    TH1F* fhTpat;
+    TH1F* fh_Tpat;
     TH1F* fh_spill_length;
-    TH1F* fhTrigger;
+    TH1F* fh_Trigger;
     TH1F* fh_IC_spill;
     TH1F* fh_SEE_spill;
     TH1F* fh_SEE_spill_long;
@@ -165,6 +177,8 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fh_TOFDOR_spill;
     TH1F* fh_IC;
     TH1F* fh_SEE;
+    TH1F* fh_SEEPS;
+    TH1F* fh_SEER;
     TH1F* fh_TOFDOR;
     TH1F* fh_SROLU1;
     TH1F* fh_SROLU2;

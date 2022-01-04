@@ -104,15 +104,6 @@ class R3BGlobalCorrelationsS494 : public FairTask
     inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
     inline void SetVeto(Bool_t veto) { fVeto = veto; }
     
-    /**
-     * Method for setting the window width for calculating fibers
-     * efficiency
-     */
-    inline void SetMovingWindow(size_t window_mv){ fwindow_mv = window_mv;}
-    inline void SetXwindow(Double_t xmin, Double_t xmax){
-		fxmin=xmin;
-		fxmax=xmax;
-	}
 	inline void SetTofLimitsFib2x(Double_t tofmin, Double_t tofmax){
 		ftofminFib2x=tofmin;
 		ftofmaxFib2x=tofmax;
@@ -205,8 +196,8 @@ class R3BGlobalCorrelationsS494 : public FairTask
     
     long long tofdor_start = 0;
     long long fNEvents = 0, fNEvents_start = 0, fNEvents_local = 0, fNEvents_veto = 0, fNEvents_califa = 0, fNEvents_total=0,
-    fNEvents_tofi = 0, fNEvents_fibers = 0, fNEvents_pair = 0,fNEvents_zeroToFD = 0, fNSpills = 0; /**< Event counter. */
-    
+    fNEvents_tofi = 0, fNEvents_fibers = 0, fNEvents_pair = 0,fNEvents_zeroToFD = 0, fNSpills = 0, nAccepted=0; /**< Event counter. */
+    unsigned long seeLastSpill = 0, seeCount=0;
     Double_t ftofminFib2x, ftofmaxFib2x, ftofminFib3x, ftofmaxFib3x, ftofminTofi, ftofmaxTofi, fqtofdmin, fqtofdmax;
     Int_t maxevent;
     Bool_t spill_on = false;
@@ -248,47 +239,108 @@ class R3BGlobalCorrelationsS494 : public FairTask
 
     Double_t nHitstemp;
 
-	Int_t n_det = 13;
-    TH1F* fh_time_tofd[3];
-    TH2F* fh_Fib32_ToF;
-    TH2F* fh_yy;
-    TH2F* fh_xy_tofd;
-    TH2F* fh_Tofi_ToF;
-    TH1F* fh_Tofi_ToF_ac;
-    TH2F* fh_ToT_Tofi;
-    TH2F* fh_ToT_Tofi_ac;
-    TH2F* fh_xy_Tofi[7];
-    TH2F* fh_xy_Tofi_ac;
-    TH2F* fh_ztofd;
-    TH2F* fh_ztofi;	
-    TH2F* fh_xy_Fib[NOF_FIB_DET];
-    TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
-    TH1F* fh_Fib_ToF[NOF_FIB_DET];
-    TH1F* fh_Fib_ToF_ac[NOF_FIB_DET];
-    TH2F* fh_ToT_Fib[NOF_FIB_DET];
-    TH2F* fh_ToT_Fib_ac[NOF_FIB_DET];
-    TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
-    TH2F* fh_Fibs_vs_Tofd_ac[NOF_FIB_DET];
-    TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
-    TH2F* fh_ToTy_Fib[NOF_FIB_DET];
-    TH2F* fh_ToT_TOF_Fib_ac[NOF_FIB_DET];
-    TH2F* fh_xy_target_ac;
-    TH2F* fh_xy_target;
-    TH2F* fh_Z_vs_x;
-    TH2F* fh_Z_vs_dthit;
-    
-    TH2F* fh_ToT_Rolu[2];
-    TH2F* fh_ToT_Rolu_ac[2];
-    TH2F* fh_Rolu_ToF[2];
-   
-    TH2F* fh_test;
-	TH2F* fh_test1;
-	TH2F* fh_test2;
-	
-	TH1F* fhTpat;
-	TH1F* fh_IC_spill;
-    TH1F* fh_SEE_spill;
-    TH1F* fh_IC_SEE;
+			Int_t n_det = 14;
+            TH2F* fh_ztofd;
+            TH2F* fh_ztofd_ac;
+            TH2F* fh_xy_tofd;
+            TH1F* fh_time_tofd[2];
+            TH2F* fh_Z_vs_x;
+            TH2F* fh_Z_vs_time;
+            TH2F* fh_Z_vs_dthit;
+            TH2F* fh_dqvsdt_Tofd;
+            TH2F* fh_ql_vs_qr_Tofd;
+            TH2F* fh_xl_vs_xr_Tofd;
+            TH2F* fh_xy_target;
+            TH2F* fh_ql_vs_qr_Tofd_Zsum8;
+            TH2F* fh_dt_Tofd_Zsum8;
+            TH2F* fh_xl_vs_xr_Tofd_Zsum8;
+            TH2F* fh_xy_target_Zsum8;
+            TH2F* fh_qr_Tofd;
+            TH2F* fh_xr_Tofd;
+            TH2F* fh_ql_Tofd;
+            TH2F* fh_xl_Tofd;
+            TH2F* fh_q_vs_tofFib23aTofd;
+            TH2F* fh_qplane1_vs_qplane2_l;
+            TH2F* fh_qplane1_vs_qplane2_r;
+            
+            
+            TH1F* fh_Fib_ToF[NOF_FIB_DET];
+            TH2F* fh_xFib_vs_xTofd[NOF_FIB_DET];
+            TH2F* fh_yFib_vs_yTofd[NOF_FIB_DET];
+            TH2F* fh_qFib_vs_qTofd[NOF_FIB_DET];
+            TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
+            TH2F* fh_x_vs_Events[NOF_FIB_DET];
+            TH1F* fh_Fib_ToF_ac[NOF_FIB_DET];
+            TH2F* fh_xFib_vs_xTofd_ac[NOF_FIB_DET];
+            TH2F* fh_yFib_vs_yTofd_ac[NOF_FIB_DET];
+            TH2F* fh_qFib_vs_qTofd_ac[NOF_FIB_DET];
+                
+            TH2F* fh_xFib31_vs_xFib33;
+			TH2F* fh_yFib31_vs_yFib33;
+			TH2F* fh_qFib31_vs_qFib33;
+			TH2F* fh_tFib31_diff_tFib33;
+			
+			TH2F* fh_xFib31_vs_xFib33_ac;
+			TH2F* fh_yFib31_vs_yFib33_ac;
+			TH2F* fh_qFib31_vs_qFib33_ac;
+			TH2F* fh_tFib31_diff_tFib33_ac;
+					
+            TH2F* fh_xFib23a_vs_xFib31;
+			TH2F* fh_yFib23a_vs_yFib31;
+			TH2F* fh_qFib23a_vs_qFib31;
+			TH2F* fh_tFib23a_diff_tFib31; 
+			
+			TH2F* fh_xFib23a_vs_xFib31_ac;
+			TH2F* fh_yFib23a_vs_yFib31_ac;
+			TH2F* fh_qFib23a_vs_qFib31_ac;
+			TH2F* fh_tFib23a_diff_tFib31_ac;
+			
+			TH2F* fh_xFib23b_vs_xFib31;
+			TH2F* fh_yFib23b_vs_yFib31;
+			TH2F* fh_qFib23b_vs_qFib31;
+			TH2F* fh_tFib23b_diff_tFib31;
+							
+			TH2F* fh_xFib23b_vs_xFib31_ac;
+			TH2F* fh_yFib23b_vs_yFib31_ac;
+			TH2F* fh_qFib23b_vs_qFib31_ac;
+			TH2F* fh_tFib23b_diff_tFib31_ac;	
+			
+			TH2F* fh_xFib30_vs_xFib32;
+			TH2F* fh_yFib30_vs_yFib32;
+			TH2F* fh_qFib30_vs_qFib32;
+			TH2F* fh_tFib30_diff_tFib32;
+			
+			TH2F* fh_xFib30_vs_xFib32_ac;
+			TH2F* fh_yFib30_vs_yFib32_ac;
+			TH2F* fh_qFib30_vs_qFib32_ac;
+			TH2F* fh_tFib30_diff_tFib32_ac;
+			
+			TH2F* fh_xFib23a_vs_xFib30;
+			TH2F* fh_yFib23a_vs_yFib30;
+			TH2F* fh_qFib23a_vs_qFib30;
+			TH2F* fh_tFib23a_diff_tFib30;
+			
+			TH2F* fh_xFib23a_vs_xFib30_ac;
+			TH2F* fh_yFib23a_vs_yFib30_ac;
+			TH2F* fh_qFib23a_vs_qFib30_ac;
+			TH2F* fh_tFib23a_diff_tFib30_ac;
+						
+			TH2F* fh_xFib23b_vs_xFib30;
+			TH2F* fh_yFib23b_vs_yFib30;
+			TH2F* fh_qFib23b_vs_qFib30;
+			TH2F* fh_tFib23b_diff_tFib30;	
+			
+			TH2F* fh_xFib23b_vs_xFib30_ac;
+			TH2F* fh_yFib23b_vs_yFib30_ac;
+			TH2F* fh_qFib23b_vs_qFib30_ac;
+			TH2F* fh_tFib23b_diff_tFib30_ac;				
+			
+
+			TH1F* fh_Tpat;
+			TH1F* fh_Trigger;
+			TH1F* fh_IC_spill;
+			TH1F* fh_SEE_spill;
+			TH1F* fh_IC_SEE;
   public:
     ClassDef(R3BGlobalCorrelationsS494, 2)
 };
