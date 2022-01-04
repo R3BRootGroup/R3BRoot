@@ -537,8 +537,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 //fieldScale = -1710.0 / 3545. / scale * 1.0;
                 //fieldScale = scale * 1.0;
-                cout << "Setting field to " << fieldScale << endl;
-                ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
+                //cout << "Setting field to " << fieldScale << endl;
+                //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 cout << "Field after:" << field << endl;
 
