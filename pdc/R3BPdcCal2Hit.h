@@ -24,6 +24,9 @@
 #include "FairTask.h"
 #include "THnSparse.h"
 
+#define N_PLANE_MAX_PDC 4
+#define wire_distance 7.8
+
 class TClonesArray;
 class R3BPdcHitModulePar;
 class R3BPdcHitPar;
@@ -64,7 +67,7 @@ class R3BPdcCal2Hit : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BPdcCal2Hit(const char* name, Int_t iVerbose = 1);
+    R3BPdcCal2Hit(const char* name, Bool_t, Int_t iVerbose = 1);
 
     /**
      * Destructor.
@@ -113,16 +116,26 @@ class R3BPdcCal2Hit : public FairTask
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
     TClonesArray* fHitItems;        /**< Array with Hit items - output data. */
     UInt_t fNofHitItems;            /**< Number of hit items for cur event. */
-                                    //    R3BPdcHitPar* fHitPar;     /**< Hit parameter container. */
+    R3BPdcHitPar* fHitPar;     /**< Hit parameter container. */
+	//R3BPdcHitPar* fCalPar; /**< Parameter container. */
     UInt_t fNofHitPars;             /**< Number of modules in parameter file. */
     R3BEventHeader* header;         /**< Event header - input data. */
     Double_t fClockFreq;            /**< Clock cycle in [ns]. */
     UInt_t maxevent;
     UInt_t fnEvents;
+	Bool_t fIsCalibrator;
 
     typedef std::vector<Channel> ChannelArray;
     std::vector<ChannelArray> fPlaneArray;
 
+    // histograms for gain matching
+    TH2F* fh_time_raw[N_PLANE_MAX_PDC];
+    TH2F* fh_time_drift[N_PLANE_MAX_PDC];
+    TH1F* fh_running_sum;
+    TH1F* fh_radius;
+    
+	TH2F* fh_wire_cor;
+	
   public:
     ClassDef(R3BPdcCal2Hit, 1)
 };

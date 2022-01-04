@@ -24,6 +24,8 @@
 #include "R3BGeoPdcPar.h"
 #include "R3BTGeoPar.h"
 
+#include "R3BPdcHitPar.h"
+
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
@@ -65,8 +67,11 @@ void R3BPdcContFact::setAllContainers()
      p2->addContext("TestNonDefaultContext");
 
      containers->Add(p1);
-     containers->Add(p2);
+     containers->Add(p2); 
      */
+    FairContainer* p1 = new FairContainer("PdcHitPar", "Pdc Hit Parameters", "TestDefaultContext");
+    p1->addContext("TestNonDefaultContext");
+    containers->Add(p1);
 
     FairContainer* p2 = new FairContainer("PdcGeoPar", "Pdc geometry parameters", "TestDefaultContext");
     p2->addContext("TestNonDefaultContext");
@@ -92,6 +97,11 @@ FairParSet* R3BPdcContFact::createContainer(FairContainer* c)
     if (strcmp(name, "PdcGeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+
+    if (strcmp(name,"PdcHitPar")==0) 
+    {
+        p = new R3BPdcHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
 
     return p;

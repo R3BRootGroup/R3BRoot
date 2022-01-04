@@ -60,7 +60,6 @@ Bool_t R3BPdcReader::Read()
     // Convert plain raw data to multi-dimensional array
     auto data = (EXT_STR_h101_PDC_onion*)fData;
 
-    puts("Event");
     for (uint32_t p = 0; p < LENGTH(data->PDC_P); p++)
     {
         auto const& side = data->PDC_P[p];
@@ -77,7 +76,7 @@ Bool_t R3BPdcReader::Read()
             uint32_t nextChannelStart = side.TLCME[i];
             for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
             {
-                cout << "p: " << p+1 << "  channel: " << channel << "  edge: 1   coarse: " <<   side.TLCv[j] << endl;
+                //cout << "p: " << p+1 << "  channel: " << channel << "  edge: 1   coarse: " <<   side.TLCv[j] << endl;
                 new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                     R3BPdcMappedData(p + 1, channel, 1, side.TLCv[j], side.TLFv[j]);
             }
@@ -93,7 +92,7 @@ Bool_t R3BPdcReader::Read()
             uint32_t nextChannelStart = side.TTCME[i];
             for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
             {
-                // cout << "p: " << p+1 << "  channel: " << channel << "  edge: 2   coarse: " <<   side.TTCv[j] << endl;
+                //cout << "p: " << p+1 << "  channel: " << channel << "  edge: 2   coarse: " <<   side.TTCv[j] << endl;
                 new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                     R3BPdcMappedData(p + 1, channel, 2, side.TTCv[j], side.TTFv[j]);
             }
@@ -107,6 +106,7 @@ Bool_t R3BPdcReader::Read()
         for (uint32_t i = 0; i < numChannels; i++)
         {
             uint32_t channel = data->PDC_TRIGLCI[i];
+            //cout << "trigger: " << LENGTH(data->PDC_P) + 1 << "  channel: " << channel << " coarse: " <<   data->PDC_TRIGLCv[i] << endl;
             new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                 R3BPdcMappedData(LENGTH(data->PDC_P) + 1, channel, 1, data->PDC_TRIGLCv[i], data->PDC_TRIGLFv[i]);
         }

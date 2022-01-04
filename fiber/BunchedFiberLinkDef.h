@@ -20,7 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BBunchedFiberCal2Hit+;
-//#pragma link C++ class R3BBunchedFiberCal2Hit_s494+;
+#pragma link C++ class R3BBunchedFiberCal2Hit_s494+;
 #pragma link C++ class R3BBunchedFiberCal2HitEngRun2019+;
 #pragma link C++ class R3BBunchedFiberMapped2CalPar+;
 #pragma link C++ class R3BBunchedFiberMapped2Cal+;

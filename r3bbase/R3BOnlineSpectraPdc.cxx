@@ -75,6 +75,8 @@ R3BOnlineSpectraPdc::~R3BOnlineSpectraPdc()
         delete fh_Pdc_Tot[i];
         delete fh_Pdc_ToF[i];
         delete fh_Pdc_xy[i];
+        delete fh_Pdc_x[i];
+        delete fh_Pdc_y[i];
         delete fh_Pdc_Time[i];
         delete fh_Pdc_Wire_vs_Events[i];
     }
@@ -118,7 +120,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
     //------------------------------------------------------------------------
 
     // Trigger and Tpat
-    TCanvas* cTrigg = new TCanvas("Trigg", "Triggers", 10, 10, 650, 350);
+    TCanvas* cTrigg = new TCanvas("Trigg", "Triggers", 50, 50, 500, 500);
     fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
     fhTpat->GetXaxis()->SetTitle("Tpat value");
 
@@ -139,8 +141,8 @@ InitStatus R3BOnlineSpectraPdc::Init()
 
     if (fMappedItems)
     {
-        TCanvas* cPdc_planes = new TCanvas("PDC_planes", "PDC planes", 10, 10, 1100, 1000);
-        cPdc_planes->Divide(4, 4);
+        TCanvas* cPdc_planes = new TCanvas("PDC_planes", "PDC planes", 50, 50, 500, 500);
+        cPdc_planes->Divide(5, 4);
 
         for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
         {
@@ -151,6 +153,22 @@ InitStatus R3BOnlineSpectraPdc::Init()
             fh_Pdc_Wire[j] = new TH1F(strName1, strName2, 150, 0., 150.);
             fh_Pdc_Wire[j]->GetXaxis()->SetTitle("Wire");
             fh_Pdc_Wire[j]->GetYaxis()->SetTitle("Counts");
+
+            char strName11[255];
+            sprintf(strName11, "pdc_x_plane_%d", j + 1);
+            char strName12[255];
+            sprintf(strName12, "PDC x plane %d", j + 1);
+            fh_Pdc_x[j] = new TH1F(strName11, strName12, 1500, 0., 1500.);
+            fh_Pdc_x[j]->GetXaxis()->SetTitle("x in mm");
+            fh_Pdc_x[j]->GetYaxis()->SetTitle("Counts");
+
+            char strName13[255];
+            sprintf(strName13, "pdc_y_plane_%d", j + 1);
+            char strName14[255];
+            sprintf(strName14, "PDC y plane %d", j + 1);
+            fh_Pdc_y[j] = new TH1F(strName13, strName14, 1500, 0., 1500.);
+            fh_Pdc_y[j]->GetXaxis()->SetTitle("y in mm");
+            fh_Pdc_y[j]->GetYaxis()->SetTitle("Counts");
 
             char strName3[255];
             sprintf(strName3, "pdc_ToT_plane_%d", j + 1);
@@ -180,7 +198,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
             sprintf(strName9, "pdc_xy_plane_%d", j + 1);
             char strName10[255];
             sprintf(strName10, "PDC xy plane %d", j + 1);
-            fh_Pdc_xy[j] = new TH2F(strName9, strName10, 1500, 0, 150, 1000, 0, 100);
+            fh_Pdc_xy[j] = new TH2F(strName9, strName10, 1500, 0, 1500, 1000, 0, 1000);
             fh_Pdc_xy[j]->GetXaxis()->SetTitle("x in cm");
             fh_Pdc_xy[j]->GetYaxis()->SetTitle("y in cm");
 
@@ -197,15 +215,24 @@ InitStatus R3BOnlineSpectraPdc::Init()
 
         for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
         {
-            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 1);
+            cPdc_planes->cd(j * 5 + 1);
             fh_Pdc_Wire[j]->Draw();
-            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 2);
+            cPdc_planes->cd(j * 5 + 2);
             // gPad->SetLogz();
             fh_Pdc_Tot[j]->Draw("colz");
-            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 3);
+            cPdc_planes->cd(j * 5 + 3);
             // gPad->SetLogz();
             fh_Pdc_Time[j]->Draw("colz");
-            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 4);
+            cPdc_planes->cd(j * 5 + 4);
+            if(j == 0 || j == 2)
+            {
+				fh_Pdc_x[j]->Draw();
+			}
+			else
+			{
+				fh_Pdc_y[j]->Draw();
+			}
+            cPdc_planes->cd(j * 5 + 5);
             // gPad->SetLogz();
             fh_Pdc_xy[j]->Draw("colz");
         }
@@ -228,6 +255,8 @@ void R3BOnlineSpectraPdc::Reset_PDC_Histo()
         fh_Pdc_ToF[i]->Reset();
         fh_Pdc_Tot[i]->Reset();
         fh_Pdc_xy[i]->Reset();
+        fh_Pdc_x[i]->Reset();
+        fh_Pdc_y[i]->Reset();
     }
 }
 
@@ -291,7 +320,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Int_t const iPlane = mapped->GetPlaneId(); // 1..n
             Int_t const iWire = mapped->GetWireId();   // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
-            cout << "Plane: " << iPlane << " Wire: " << iWire << endl;
+            //cout << "Plane: " << iPlane << " Wire: " << iWire << endl;
             if (iPlane <= N_PLANE_MAX_PDC)
             {
                 fh_Pdc_Wire[iPlane - 1]->Fill(iWire);
@@ -323,9 +352,9 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
     if (fHitItems)
     {
-        // cout << "HitItems" << endl;
         auto det = fHitItems;
         Int_t nHits = det->GetEntriesFast();
+        cout << "HitItems: " << nHits << endl;
         Double_t t0 = -10000.;
         Int_t plane = 0;
         Int_t wire = 0;
@@ -338,50 +367,53 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             t[i] = -10000.;
         }
 
+		Double_t x_prev = -10.;
+		Double_t y_prev = -10.;
+		Double_t xPair = -10.;
+		Double_t yPair = -10.;
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BPdcHitData const*)det->At(ihit);
             if (!hit)
                 continue; // should not happen
-            if (t0 == -10000.)
+            if (t0 == -10000.) 
+            {
                 t0 = hit->GetTime();
+			}
 
-            if (abs(hit->GetTime() - t0) < 20)
-            {
-                plane = hit->GetDetId();
-                wire = hit->GetWireId();
-                x[plane - 1] = hit->GetX();
-                y[plane - 1] = hit->GetY();
-                eloss[plane - 1] = hit->GetEloss();
-                t[plane - 1] = hit->GetTime();
-                // cout << "Hit plane: " << plane << " x: " << x[plane] << " y: "
-                //     << y[plane] << " t: " << t[plane] << " ToT: " << eloss[plane] << endl;
-                if (plane & 1)
-                {
-                    fh_Pdc_Tot[plane - 1]->Fill(x[plane - 1], eloss[plane - 1]);
-                }
-                else
-                {
-                    fh_Pdc_Tot[plane - 1]->Fill(y[plane - 1], eloss[plane - 1]);
-                }
-                fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
-            }
-            else
-            {
-                // Draw histograms
-                /*
-                                for(Int_t i = 0 ; i < 5 ; i++){
-                                    //fh_Pdc_ToF[i]->Fill();
-                                    if(i == 0) fh_Pdc_xy[i]->Fill(x[1],y[2]);
-                                    if(i == 2) fh_Pdc_xy[i]->Fill(x[3],y[4]);
-                                    fh_Pdc_Tot[i]->Fill(x[i+1],eloss[i+1]);
-                                    //fh_Pdc_Wire_vs_Events[i]->Write();
-                                }
-                */
-                t0 = hit->GetTime();
-                ihit--;
-            }
+			plane = hit->GetDetId();
+			wire = hit->GetWireId();
+			x[plane - 1] = hit->GetX();
+			y[plane - 1] = hit->GetY();
+			eloss[plane - 1] = hit->GetEloss();
+			t[plane - 1] = hit->GetTime();
+			if (plane & 1)
+			{
+				fh_Pdc_Tot[plane - 1]->Fill(x[plane - 1], eloss[plane - 1]);
+			}
+			else
+			{
+				fh_Pdc_Tot[plane - 1]->Fill(y[plane - 1], eloss[plane - 1]);
+			}
+			fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
+
+			if (hit->GetX() > 0 )
+			{				
+				fh_Pdc_x[hit->GetDetId() - 1]->Fill(x[plane - 1]);			
+				xPair = x[plane - 1];
+			}
+			
+			if (hit->GetY() > 0 )
+			{
+				fh_Pdc_y[hit->GetDetId() - 1]->Fill(y[plane - 1]);	
+				yPair = y[plane - 1];	
+			}
         }
+		if (xPair > 0 && yPair > 0)
+		{
+			fh_Pdc_xy[1]->Fill(xPair,yPair);   
+		}
     }
     fNEvents += 1;
 }
@@ -400,14 +432,15 @@ void R3BOnlineSpectraPdc::FinishTask()
         for (Int_t i = 0; i < 4; i++)
         {
             // fh_Pdc_ToF[i]->Write();
-            // fh_Pdc_xy[i]->Write();
+            fh_Pdc_x[i]->Write();
+            fh_Pdc_y[i]->Write();
+            fh_Pdc_xy[i]->Write();
             fh_Pdc_Wire[i]->Write();
             fh_Pdc_Tot[i]->Write();
             fh_Pdc_Time[i]->Write();
             // fh_Pdc_Wire_vs_Events[i]->Write();
         }
     }
-    puts("4");
 }
 
 ClassImp(R3BOnlineSpectraPdc)

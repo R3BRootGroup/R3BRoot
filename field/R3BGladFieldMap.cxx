@@ -126,8 +126,8 @@ void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
     fPosY = 0.0;
-    fPosZ = 163.4;
-    fYAngle = -14.;
+    fPosZ = 163.2;
+    fYAngle = -14.1;
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);

@@ -38,7 +38,7 @@
 #include "TMath.h"
 #include <TRandom3.h>
 #include <TRandomGen.h>
-#include <iostream>
+#include <iostream> 
 
 R3BFiberMAPMTCal2Hit::ToT::ToT(R3BFiberMAPMTCalData const* a_lead,
                                R3BFiberMAPMTCalData const* a_trail,
@@ -176,7 +176,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
             }
         }
     }
-
+ 
     // create histograms
     TString chistName;
     TString chistTitle;

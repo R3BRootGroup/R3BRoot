@@ -23,7 +23,7 @@ class TH1F;
 class TH2F;
 class R3BEventHeader;
 
-#define N_PLANE_MAX_PDC 4
+#define N_PLANE_MAX_PDC 4 
 /**
  * This taks reads all detector data items and plots histograms
  * for online checks.
@@ -104,6 +104,8 @@ class R3BOnlineSpectraPdc : public FairTask
     TH1F* fh_Pdc_Wire[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Tot[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_ToF[N_PLANE_MAX_PDC];
+    TH1F* fh_Pdc_x[N_PLANE_MAX_PDC];
+    TH1F* fh_Pdc_y[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_xy[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Time[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Wire_vs_Events[N_PLANE_MAX_PDC];

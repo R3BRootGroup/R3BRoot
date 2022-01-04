@@ -52,6 +52,8 @@ R3BPdcContFact.cxx
 R3BPdcMapped2CalPar.cxx
 R3BPdcMapped2Cal.cxx
 R3BPdcCal2Hit.cxx
+R3BPdcHitModulePar.cxx
+R3BPdcHitPar.cxx
 )
 
 # fill list of header files from list of source files

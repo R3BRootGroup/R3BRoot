@@ -760,16 +760,13 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
     minimum_m->SetLimitedVariable(0, "px", variable[0], step[0], -1., 1.);
     minimum_m->SetLimitedVariable(1, "py", variable[1], step[1], -1., 1.);
-    minimum_m->SetLimitedVariable(2,
-                                  "pz",
-                                  variable[2],
-                                  step[2],
+    minimum_m->SetLimitedVariable(2, "pz", variable[2], step[2],
                                   gCandidate->GetStartMomentum().Z() - 2.,
                                   gCandidate->GetStartMomentum().Z() + 2.);
 
     minimum_m->SetLimitedVariable(3, "x0", variable[3], step[3], -1., 1.);
     minimum_m->SetLimitedVariable(4, "y0", variable[4], step[4], -1., 1.);
-    minimum_m->SetLimitedVariable(5, "z0", variable[5], step[5], -1., 1.);
+    minimum_m->SetLimitedVariable(5, "z0", variable[5], step[5], z0 - 1., z0 + 1.);
 
     TVector3 startMomentum(
         gCandidate->GetStartMomentum().X(), gCandidate->GetStartMomentum().Y(), gCandidate->GetStartMomentum().Z());

@@ -274,7 +274,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t beta = 0.;
     Double_t x0 = 0.;
     Double_t y0 = 0.;
-    Double_t z0 = 0.;
+    Double_t z0 = -16.2;
     Double_t px0 = 0;
     Double_t py0 = 0.;
     Double_t pz0 = 0.;
@@ -461,6 +461,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         Double_t Charge = 0;
         Double_t m0 = 0.;
         Double_t p0 = 0.;
+        
         if (l == 0)
         {
             charge_requested = 8;
@@ -492,25 +493,25 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
             if (charge != charge_requested)
                 continue;
-
-            Double_t beta0 = 0.65; // velocity could eventually be calculated from ToF
+			
+            Double_t beta0 = 0.7593; // velocity could eventually be calculated from ToF
             tof->res_t = 0.03;
             // Double_t m0 = charge * 2. * 0.931494028; // First guess of mass
 
             if (charge == 8)
             {
                 m0 = 15.0124;
-                p0 = 12.888;
+                p0 = 17.3915;
             }
             if (charge == 6)
             {
                 m0 = 11.1749;
-                p0 = 9.666;
+                p0 = 13.043625;
             }
             if (charge == 2)
             {
                 m0 = 3.7284;
-                p0 = 3.222;
+                p0 = 4.347875;
             }
 
             cout << "Mass: " << m0 << endl;
@@ -529,12 +530,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 if (fNEventsLeft == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
-                Double_t fieldScale = 1245.0 / 3584. * 1.0; // standard
+                Double_t fieldScale = -1710.0 / 3545. * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 cout << "Field:" << field << " scale: " << scale << endl;
 
-                fieldScale = -1245.0 / 3584. / scale * 1.0;
+                //fieldScale = -1710.0 / 3545. / scale * 1.0;
+                //fieldScale = scale * 1.0;
                 cout << "Setting field to " << fieldScale << endl;
                 ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
@@ -584,7 +586,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 // Create object for particle which will be fitted
                                 R3BTrackingParticle* candidate =
-                                    new R3BTrackingParticle(charge, 0., 0., 0., 0., 0., p0, beta0, m0);
+                                    new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
 
                                 cout << "left side of setup" << endl;
                                 cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
@@ -758,7 +760,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 // Create object for particle which will be fitted
                                 R3BTrackingParticle* candidate =
-                                    new R3BTrackingParticle(charge, 0., 0., 0., 0., 0., p0, beta0, m0);
+                                    new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
 
                                 cout << "right side of setup" << endl;
                                 cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()

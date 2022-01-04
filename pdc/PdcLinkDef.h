@@ -24,6 +24,8 @@
 #pragma link C++ class R3BPdcMapped2Cal+;
 #pragma link C++ class R3BPdcCal2Hit+;
 #pragma link C++ class R3BPdcContFact+;
+#pragma link C++ class R3BPdcHitModulePar+;
+#pragma link C++ class R3BPdcHitPar+;
 
 
 #endif

@@ -65,7 +65,6 @@ R3BTrackerTestS494::R3BTrackerTestS494(const char* name, Int_t iVerbose)
     , fTpat(-1)
     , fCuts(0)
     , fGraphCuts(0)
-    , fGhost(0)
     , fPairs(0)
     , fB(-1672)
     , fSimu(0)
@@ -752,8 +751,6 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     Double_t chi_s[6];    // x,y,z, px, py, pz
 
     Int_t n_det = 10;
-    if (fGhost)
-        n_det = 11;
 
     Double_t res1_det_x[n_det];
     Double_t res1_det_y[n_det];
@@ -859,7 +856,6 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     Int_t tofd1l = 7;
     Int_t tofd2r = 8;
     Int_t tofd2l = 9;
-    Int_t ghost = 10;
 
     Double_t tof = 0.;
     Bool_t pair = false;
@@ -1412,25 +1408,45 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         {
             //qdet[i] = 0;
         }
+		if (detector[i] == 0)
+		{
+			ydet[i] = 0;
+		}
+		if (detector[i] == 1 )
+		{
+			xdet[i] = 0;
+		}
+		if (detector[i] > 1 && detector[i] < 6)
+		{
+			ydet[i] = 0;
+		}
+		if (detector[i] > 5 )
+		{
+			//ydet[i] = 0;
+		}
 	
 		// introduce granularity		
-		//cout << "Before: " << i << "  " << xdet[i] << "  " << ydet[i] << endl;
-		Int_t xtemp = 0;
-		Int_t ytemp = 0;
-        if (detector[i] < 2)
-        {
-			xtemp = (int)(xdet[i] * 4000.);
-			ytemp = (int)(ydet[i] * 4000.);
-            xdet[i] = xtemp / 4000.;
-            ydet[i] = ytemp / 4000.;
-        }
-        if (detector[i] > 1 && detector[i] < 6)
-        {
-			xtemp = (int)(xdet[i] * 1000.);
-            xdet[i] = xtemp / 1000.;
-        }
-		//cout << "After: " << i << "  " << xdet[i] << "  " << ydet[i] << endl;
+		Bool_t granularity = true;
 		
+		if(granularity)
+		{
+			//cout << "Before: " << i << "  " << xdet[i] << "  " << ydet[i] << endl;
+			Int_t xtemp = 0;
+			Int_t ytemp = 0;
+			if (detector[i] < 2)
+			{
+				xtemp = (int)(xdet[i] * 4000.);
+				ytemp = (int)(ydet[i] * 4000.);
+				xdet[i] = xtemp / 4000.;
+				ydet[i] = ytemp / 4000.;
+			}
+			if (detector[i] > 1 && detector[i] < 6)
+			{
+				xtemp = (int)(xdet[i] * 1000.);
+				xdet[i] = xtemp / 1000.;
+			}
+			//cout << "After: " << i << "  " << xdet[i] << "  " << ydet[i] << endl;
+		}
 
         // Fill temp array
         xdet_s[i] = xdet[i];
@@ -1818,8 +1834,13 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     {
         // double track
         counter2++;
-        Bool_t det_coord = false;
+        Bool_t det_coord = false; // 
         Bool_t dt = true;
+		target[0] = 0.;
+		target[1] = 0.;
+		target[2] = -0.162;
+
+        
         multi_track_extended_output_from_cpp_(&max,
                                               &countdet,
                                               &det_coord,
@@ -1906,25 +1927,22 @@ void R3BTrackerTestS494::Exec(Option_t* option)
                 qTrack[detector[i]] = qdet[i];
             }
             // plot hits of the track
-            if (detector[i] != ghost)
-            {
-				if (qdet[i] == 2)
-				{
-					fh_res_xA[i]->Fill(res1_det_x[i] * 100.);
-					fh_res_yA[i]->Fill(res1_det_y[i] * 100.);
-                }
-				if (qdet[i] == 6)
-				{
-					fh_res_xC[i]->Fill(res1_det_x[i] * 100.);
-					fh_res_yC[i]->Fill(res1_det_y[i] * 100.);
-                }
-                fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
-                fh_p_vs_x[detector[i]]->Fill(xdet[i] * 100. + randx, track[5]);
-                fh_p_vs_x_test[detector[i]]->Fill(
-                    xdet[i] * 100., sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
-                fh_p_vs_x_test[detector[i]]->Fill(
-                    xdet[i] * 100., sqrt(track[9] * track[9] + track[10] * track[10] + track[11] * track[11]));
-            }
+			if (qdet[i] == 2)
+			{
+				fh_res_xA[i]->Fill(res1_det_x[i] * 100.);
+				fh_res_yA[i]->Fill(res1_det_y[i] * 100.);
+			}
+			if (qdet[i] == 6)
+			{
+				fh_res_xC[i]->Fill(res1_det_x[i] * 100.);
+				fh_res_yC[i]->Fill(res1_det_y[i] * 100.);
+			}
+			fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
+			fh_p_vs_x[detector[i]]->Fill(xdet[i] * 100. + randx, track[5]);
+			fh_p_vs_x_test[detector[i]]->Fill(
+				xdet[i] * 100., sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
+			fh_p_vs_x_test[detector[i]]->Fill(
+				xdet[i] * 100., sqrt(track[9] * track[9] + track[10] * track[10] + track[11] * track[11]));
             if (sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]) > 4450)
             {
                 cout << " ***************************** high momentum ***********************************" << endl;

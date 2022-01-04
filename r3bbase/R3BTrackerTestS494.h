@@ -113,11 +113,6 @@ class R3BTrackerTestS494 : public FairTask
         fGraphCuts = graphCuts;
     }
 
-    inline void SetGhost(Bool_t ghost)
-    {
-        fGhost = ghost;
-    }
-
     inline void SetPairs(Bool_t p)
     {
         fPairs = p;
@@ -177,7 +172,6 @@ class R3BTrackerTestS494 : public FairTask
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
 	Bool_t fCuts;
-	Bool_t fGhost;
 	Bool_t fPairs;
 	Bool_t fGraphCuts;
 	Bool_t fSimu;
