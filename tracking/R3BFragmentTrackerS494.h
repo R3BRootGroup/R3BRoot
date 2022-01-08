@@ -50,6 +50,7 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetFragmentFitter(R3BFragmentFitterGeneric* fitter) { fFitter = fitter; }
     void SetEnergyLoss(Bool_t energyLoss) { fEnergyLoss = energyLoss; }
     void SetSimu(Int_t simu) {fSimu = simu;}
+    void SetForward(Bool_t forward) {fForward = forward;}
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
 
   private:
@@ -80,6 +81,7 @@ class R3BFragmentTrackerS494 : public FairTask
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;
     Bool_t fSimu;
+    Bool_t fForward;
     Bool_t fOptimizeGeometry;
     Double_t fAfterGladResolution;
     Int_t eventCounter = 0;
