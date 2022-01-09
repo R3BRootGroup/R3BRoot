@@ -65,6 +65,7 @@ class R3BFragmentTrackerS494 : public FairTask
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;
     TClonesArray* fTrackItems;
+    TClonesArray* fMCTrack;
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fArrayHits;

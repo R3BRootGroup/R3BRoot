@@ -424,6 +424,10 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Erel_vs_pC->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_pC->GetYaxis()->SetTitle("Erel / MeV");
 
+    fh_Erel_vs_thetaMC = new TH2F("Erel_vs_thetaMC", "Erel both sides vs. theta MC", 500, 0., 5, 500, 0, 50.);
+    fh_Erel_vs_thetaMC->GetXaxis()->SetTitle("angle / deg");
+    fh_Erel_vs_thetaMC->GetYaxis()->SetTitle("Erel / MeV");
+
     fh_Erel_vs_thetabc = new TH2F("Erel_vs_phibccm", "Erel both sides vs. phi_bc_cm", 1000, 0, 100., 400, 0., 400.);
     fh_Erel_vs_thetabc->GetYaxis()->SetTitle("phi angle bc / deg");
     fh_Erel_vs_thetabc->GetXaxis()->SetTitle("Erel / MeV");
@@ -492,16 +496,15 @@ InitStatus R3BGlobalAnalysisS494::Init()
         checkMC->cd(5);
         fh_dpzC->Draw();
         checkMC->cd(6);
-        fh_dpC->Draw();
-        checkMC->cd(7);
-        gPad->SetLogz();
-        fh_x_dpx->Draw("colz");
-        checkMC->cd(8);
-        gPad->SetLogz();
-        fh_y_dpy->Draw("colz");
-        checkMC->cd(9);
         gPad->SetLogz();
         fh_dpy_dpx->Draw("colz");
+        checkMC->cd(7);
+        fh_dpxHe->Draw();
+        checkMC->cd(8);
+        fh_dpyHe->Draw();
+        checkMC->cd(9);
+
+        fh_dpzHe->Draw();
     }
 
     return kSUCCESS;
@@ -727,6 +730,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             is_tracked = true;
 
             fh_target_xy->Fill(XHe * 100., YHe * 100.);
+            fh_target_xy->Fill(XC * 100., YC * 100.);
 
             fh_px_He->Fill(alpha.Px());
             fh_py_He->Fill(alpha.Py());
@@ -748,10 +752,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             // Calculate angle between alpha and C
             if (alpha.Pz() == 0 || carbon.Pz() == 0)
                 return;
-            if (alpha.Pz() < 3700 || alpha.Pz() > 5000)
-                return;
-            if (carbon.Pz() < 12700 || carbon.Pz() > 13300)
-                return;
+            /*  if (alpha.Pz() < 3700 || alpha.Pz() > 5000)
+                  return;
+              if (carbon.Pz() < 12700 || carbon.Pz() > 13300)
+                  return;*/
 
             fh_p_vs_p->Fill(pa.Mag() + pc.Mag());
             theta_26 = alpha.Angle(carbon.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
@@ -766,11 +770,14 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_ErelR->Fill(Erel);
             if (alpha.Px() > 0. && carbon.Px() > 0.)
                 fh_ErelL->Fill(Erel);
+
+            fh_Erel_vs_pC->Fill(theta_26, Erel);
+
             if ((alpha.Px() > 0. && carbon.Px() < 0.) || (alpha.Px() < 0. && carbon.Px() > 0.))
             {
-                fh_Erel_vs_pC->Fill(theta_26, Erel);
-                if (theta_26 > 0.7)
-                    fh_ErelB->Fill(Erel);
+
+                // if (theta_26 > 0.7)
+                fh_ErelB->Fill(Erel);
             }
             fh_dErel_vs_x->Fill(carbon.Px(), Erel);
             fh_dErel_vs_y->Fill(carbon.Py(), Erel);
@@ -875,6 +882,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         /** Calculate invariant mass and relative energy **/
         m_invaMC = (alphaMC + carbonMC).M(); // invariant mass
         ErelMC = m_invaMC - mHe - mC;        // relative Energy
+        fh_Erel_vs_thetaMC->Fill(theta_26MC, ErelMC);
 
         /** transfer to cm system and rotate **/
 
@@ -1411,6 +1419,7 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_py_py_cm->Write();
     fh_pz_pz_cm->Write();
     fh_Erel_vs_pC->Write();
+    fh_Erel_vs_thetaMC->Write();
     fh_dErel->Write();
     fh_dtheta->Write();
     fh_p_vs_p->Write();

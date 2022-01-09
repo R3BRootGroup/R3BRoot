@@ -287,6 +287,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_ErelB;
 	TH2F* fh_phi_bc_cm_polar;
 	TH2F* fh_Erel_vs_pC;
+	TH2F* fh_Erel_vs_thetaMC;
 	TH1F* fh_p_vs_p;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;

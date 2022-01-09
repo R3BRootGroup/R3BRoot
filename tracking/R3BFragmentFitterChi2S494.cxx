@@ -226,22 +226,22 @@ double Chi2MomentumBackward(const double* xx)
     TVector3 pos3;
     // LOG(DEBUG3) << "Test: " << gCandidate->GetHitIndexByName("fi12") << "  " << gCandidate->GetHitIndexByName("fi10")
     // << endl;
-/*
-    if (gCandidate->GetHitIndexByName("fi30") > -1)
-    {
-        auto fi30 = gSetup->GetByName("fi30");
-        fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
-    }
-    else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
-    {
-        auto fi33 = gSetup->GetByName("fi33");
-        fi33->LocalToGlobal(pos3, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
-    }
-    else
-    {
-        return 10;
-    }
-*/
+    /*
+        if (gCandidate->GetHitIndexByName("fi30") > -1)
+        {
+            auto fi30 = gSetup->GetByName("fi30");
+            fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
+        }
+        else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
+        {
+            auto fi33 = gSetup->GetByName("fi33");
+            fi33->LocalToGlobal(pos3, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
+        }
+        else
+        {
+            return 10;
+        }
+    */
     Double_t px0 = xx[0];
     Double_t py0 = xx[1];
     Double_t pz0 = xx[2];
@@ -255,7 +255,6 @@ double Chi2MomentumBackward(const double* xx)
 
     TVector3 startPosition(x0, y0, z0);
     TVector3 startMomentum(px0, py0, pz0);
-
 
     gCandidate->SetPosition(startPosition);
     gCandidate->SetMomentum(startMomentum);
@@ -630,7 +629,7 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
 
     fMinimum->SetFunction(*f);
     minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
-    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    // minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 
     // set tolerance , etc...
     minimum_m->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
@@ -706,31 +705,41 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     Double_t x0 = gCandidate->GetStartPosition().X();
     Double_t y0 = gCandidate->GetStartPosition().Y();
     Double_t z0 = gCandidate->GetStartPosition().Z();
-	
+
+    //    cout<<"In FitTrackMomentumForward"<<endl;
+    //   cout<<setprecision(10)<<"Start Momenta: "<<px0<<", "<<py0<<", "<<pz0<<endl;
+    //   cout<<setprecision(10)<<"Start Position: "<<x0<<"; "<<y0<<", "<<z0<<endl;
+
     TVector3 pos0;
     TVector3 pos3;
-    
+
     if (gCandidate->GetHitIndexByName("fi23a") > -1 && gCandidate->GetHitIndexByName("fi23b") > -1)
     {
         auto fi23a = gSetup->GetByName("fi23a");
         auto fi23b = gSetup->GetByName("fi23b");
-        fi23a->LocalToGlobal(pos3, gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(), gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
+        fi23a->LocalToGlobal(pos3,
+                             gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(),
+                             gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
     }
-	pos0.SetX(x0);
-	pos0.SetY(y0);
-	pos0.SetZ(z0);
-	
-    TVector3 direction0 = pos3-pos0;
-	direction0.SetMag(pz0);
-	
-	px0 = direction0.X();
-	py0 = direction0.Y();
-	pz0 = direction0.Z();
-	
-    if (x0 < -1.) x0 = -1.;
-    if (y0 < -1.) y0 = -1.;
-    if (x0 > 1.)  x0 = 1.;
-    if (y0 > 1.)  y0 = 1.;
+    pos0.SetX(x0);
+    pos0.SetY(y0);
+    pos0.SetZ(z0);
+
+    TVector3 direction0 = pos3 - pos0;
+    direction0.SetMag(pz0);
+
+    px0 = direction0.X();
+    py0 = direction0.Y();
+    pz0 = direction0.Z();
+
+    if (x0 < -1.)
+        x0 = -1.;
+    if (y0 < -1.)
+        y0 = -1.;
+    if (x0 > 1.)
+        x0 = 1.;
+    if (y0 > 1.)
+        y0 = 1.;
 
     LOG(DEBUG3) << "Start values momentum: " << px0 << "  " << py0 << "  " << pz0 << endl;
     LOG(DEBUG3) << "Start values position: " << x0 << "  " << y0 << "  " << z0 << endl;
@@ -748,13 +757,16 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
     minimum_m->SetLimitedVariable(0, "px", variable[0], step[0], -1., 1.);
     minimum_m->SetLimitedVariable(1, "py", variable[1], step[1], -1., 1.);
-    minimum_m->SetLimitedVariable(2, "pz", variable[2], step[2],
+    minimum_m->SetLimitedVariable(2,
+                                  "pz",
+                                  variable[2],
+                                  step[2],
                                   gCandidate->GetStartMomentum().Z() - 2.,
                                   gCandidate->GetStartMomentum().Z() + 2.);
 
     minimum_m->SetLimitedVariable(3, "x0", variable[3], step[3], -1., 1.);
     minimum_m->SetLimitedVariable(4, "y0", variable[4], step[4], -1., 1.);
-    minimum_m->SetLimitedVariable(5, "z0", variable[5], step[5], z0 - 1., z0 + 1.);
+    minimum_m->SetLimitedVariable(5, "z0", variable[5], step[5], z0 - 0.001, z0 + 0.001); // z0 - 1., z0 + 1.);
 
     TVector3 startMomentum(
         gCandidate->GetStartMomentum().X(), gCandidate->GetStartMomentum().Y(), gCandidate->GetStartMomentum().Z());
@@ -791,6 +803,15 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
                 << "  " << gCandidate->GetMomentum().Z();
     LOG(DEBUG3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
                 << "  " << gCandidate->GetPosition().Z();
+    /*
+       cout<<setprecision(10) << "current momentum: " << gCandidate->GetMomentum().X() << "  " <<
+       gCandidate->GetMomentum().Y()
+                    << "  " << gCandidate->GetMomentum().Z()<<endl;
+        cout<<setprecision(10) << "current position: " << gCandidate->GetPosition().X() << "  " <<
+       gCandidate->GetPosition().Y()
+                    << "  " << gCandidate->GetPosition().Z()<<endl;
+
+    */
 
     // delete minimum_m;
 
@@ -812,7 +833,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     TVector3 pos0;
     TVector3 pos2;
     TVector3 pos3;
-    
+
     if (gCandidate->GetHitIndexByName("fi32") > -1 && gCandidate->GetHitIndexByName("fi30") > -1)
     {
         auto fi32 = gSetup->GetByName("fi32");
@@ -832,28 +853,30 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
         return 10;
     }
 
-    if (gCandidate->GetHitIndexByName("tofd") > -1 )
+    if (gCandidate->GetHitIndexByName("tofd") > -1)
     {
         auto tofd = gSetup->GetByName("tofd");
-        tofd->LocalToGlobal(pos0, gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(), gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
+        tofd->LocalToGlobal(pos0,
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(),
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
     }
 
-    //TVector3 direction0 = (pos2 - pos3).Unit();
+    // TVector3 direction0 = (pos2 - pos3).Unit();
     TVector3 direction0 = (pos2 - pos0).Unit();
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
     direction0.SetMag(mom);
     TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
 
     cout << "mom: " << mom << endl;
-    
+
     px0 = direction0.X();
     py0 = direction0.Y();
     pz0 = direction0.Z();
 
-	x0 = pos0.X();
-	y0 = pos0.Y();
-	z0 = pos0.Z();
-	
+    x0 = pos0.X();
+    y0 = pos0.Y();
+    z0 = pos0.Z();
+
     gCandidate->Reset();
     gCandidate->SetPosition(pos0);
     gCandidate->SetMomentum(startMomentum);
@@ -864,7 +887,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     double variable[6] = { px0, py0, pz0, x0, y0, z0 };
     double step[6] = { 0.01, 0.01, 0.01, 0.1, 0.1, 0.1 };
 
-//    ROOT::Math::Minimizer* minimum_a = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    //    ROOT::Math::Minimizer* minimum_a = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     ROOT::Math::Minimizer* minimum_a = ROOT::Math::Factory::CreateMinimizer("Minuit2", "SIMPLEX");
 
     // set tolerance , etc...
@@ -879,11 +902,10 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     minimum_a->SetFunction(fa);
 
     // Set the free variables to be minimized!
-    minimum_a->SetLimitedVariable(0, "px", variable[0], step[0], px0 - 10., px0 + 01.);
+    minimum_a->SetLimitedVariable(0, "px", variable[0], step[0], px0 - 10., px0 + 10.);
     minimum_a->SetLimitedVariable(1, "py", variable[1], step[1], -10., 10.);
-    minimum_a->SetLimitedVariable(2, "pz", variable[2], step[2],
-                                  gCandidate->GetMomentum().Z() - 20.,
-                                  gCandidate->GetMomentum().Z() + 20.);
+    minimum_a->SetLimitedVariable(
+        2, "pz", variable[2], step[2], gCandidate->GetMomentum().Z() - 20., gCandidate->GetMomentum().Z() + 20.);
 
     minimum_a->SetLimitedVariable(3, "x0", variable[3], step[3], x0 - 5., x0 + 5.);
     minimum_a->SetLimitedVariable(4, "y0", variable[4], step[4], y0 - 5., y0 + 5.);
@@ -908,7 +930,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 
     TVector3 startMomentumOptimized(minimum_a->X()[0], minimum_a->X()[1], minimum_a->X()[2]);
     TVector3 startPosOptimized(minimum_a->X()[3], minimum_a->X()[4], minimum_a->X()[5]);
-    
+
     gCandidate->Reset();
     gCandidate->SetPosition(startPosOptimized);
     gCandidate->SetMomentum(startMomentumOptimized);

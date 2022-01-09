@@ -78,7 +78,7 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fFitter(nullptr)
     , fEnergyLoss(kTRUE)
     , fSimu(kTRUE)
-    , fForward(kTRUE)    
+    , fForward(kTRUE)
     , fOptimizeGeometry(kFALSE)
     , fTrackItems(new TClonesArray("R3BTrack"))
     , fNofTrackItems()
@@ -138,7 +138,11 @@ InitStatus R3BFragmentTrackerS494::Init()
 {
     FairRootManager* man = FairRootManager::Instance();
 
+    // Get objects for detectors on all levels
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
+    if (fArrayMCTracks)
+        man->Register("MCTrack", "Monte Carlo Tracks", fArrayMCTracks, kTRUE);
+
     if (NULL == fArrayMCTracks)
     {
         LOG(INFO) << "No MC Track array found in input file.";
@@ -178,18 +182,18 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_mult_fi32 = new TH1F("h_mult_fi32", "Multiplicity fi32", 20, -0.5, 19.5);
     fh_mult_fi33 = new TH1F("h_mult_fi33", "Multiplicity fi33", 20, -0.5, 19.5);
     fh_mult_tofd = new TH1F("h_mult_tofd", "Multiplicity TOFd", 20, -0.5, 19.5);
-    fh_eloss_fi23a_mc = new TH1F("h_eloss_fi23a_mc", "Energy loss fi23a (MC truth)", 2000, 0., 200.);
-    fh_eloss_fi23a = new TH1F("h_eloss_fi23a", "Energy loss fi23a", 2000, 0., 200.);
-    fh_eloss_fi23b_mc = new TH1F("h_eloss_fi23b_mc", "Energy loss fi23b (MC truth)", 2000, 0., 500.);
-    fh_eloss_fi23b = new TH1F("h_eloss_fi23b", "Energy loss fi23b", 2000, 0., 500.);
-    fh_eloss_fi30_mc = new TH1F("h_eloss_fi30_mc", "Energy loss fi30 (MC truth)", 2000, 0., 500.);
-    fh_eloss_fi30 = new TH1F("h_eloss_fi30", "Energy loss fi30", 2000, 0., 500.);
-    fh_eloss_fi31_mc = new TH1F("h_eloss_fi31_mc", "Energy loss fi31 (MC truth)", 2000, 0., 500.);
-    fh_eloss_fi31 = new TH1F("h_eloss_fi31", "Energy loss fi31", 2000, 0., 500.);
-    fh_eloss_fi32_mc = new TH1F("h_eloss_fi32_mc", "Energy loss fi32 (MC truth)", 2000, 0., 1000.);
-    fh_eloss_fi32 = new TH1F("h_eloss_fi32", "Energy loss fi32", 2000, 0., 1000.);
-    fh_eloss_fi33_mc = new TH1F("h_eloss_fi33_mc", "Energy loss fi33 (MC truth)", 2000, 0., 500.);
-    fh_eloss_fi33 = new TH1F("h_eloss_fi33", "Energy loss fi33", 2000, 0., 500.);
+    fh_eloss_fi23a_mc = new TH1F("h_eloss_fi23a_mc", "Energy loss fi23a (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi23a = new TH1F("h_eloss_fi23a", "Energy loss fi23a", 2000, 0., 50.);
+    fh_eloss_fi23b_mc = new TH1F("h_eloss_fi23b_mc", "Energy loss fi23b (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi23b = new TH1F("h_eloss_fi23b", "Energy loss fi23b", 2000, 0., 50.);
+    fh_eloss_fi30_mc = new TH1F("h_eloss_fi30_mc", "Energy loss fi30 (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi30 = new TH1F("h_eloss_fi30", "Energy loss fi30", 2000, 0., 50.);
+    fh_eloss_fi31_mc = new TH1F("h_eloss_fi31_mc", "Energy loss fi31 (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi31 = new TH1F("h_eloss_fi31", "Energy loss fi31", 2000, 0., 50.);
+    fh_eloss_fi32_mc = new TH1F("h_eloss_fi32_mc", "Energy loss fi32 (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi32 = new TH1F("h_eloss_fi32", "Energy loss fi32", 2000, 0., 50.);
+    fh_eloss_fi33_mc = new TH1F("h_eloss_fi33_mc", "Energy loss fi33 (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi33 = new TH1F("h_eloss_fi33", "Energy loss fi33", 2000, 0., 50.);
     fh_ncand = new TH1F("h_ncand", "Number of candidates", 100, -0.5, 99.5);
     fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 2000., 0., 20.);
     fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 2000., 0., 20.);
@@ -343,6 +347,22 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         return;
     if (fi33->hits.size() < 1)
         return;
+    /*
+        if (tof->hits.size() != 4)
+            return;
+        if (fi23a->hits.size() != 2)
+            return;
+        if (fi23b->hits.size() != 2)
+            return;
+        if (fi30->hits.size() != 1)
+            return;
+        if (fi31->hits.size() != 1)
+            return;
+        if (fi32->hits.size() != 1)
+            return;
+        if (fi33->hits.size() != 1)
+            return;
+    */
 
     if (tof->hits.size() > 0 && debug)
     {
@@ -534,6 +554,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Bool_t carbon = kFALSE;
     // The idea is to loop twice over the ToF wall hits.
     // First we want to look for 12C particle and then for 4He
+
+    Int_t Icountleft = 0;
+    Int_t Icountright = 0;
+
     for (Int_t l = 1; l < 3; l++)
     {
         // l = 0: 16O
@@ -567,7 +591,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 // For tracking of simulations:
                 charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76 + 0.5;
                 Charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76;
-
             }
             else
             {
@@ -625,17 +648,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 if (fNEventsLeft == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
-
-                Double_t fieldScale = -1710.0/3583.81 * 1.0; // standard
+                Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-                if(debug) cout << "Field left:" << field << " scale: " << scale << endl;
+                if (debug)
+                    cout << "Field left:" << field << " scale: " << scale << endl;
 
-                fieldScale = -1710.0/3583.81 / scale * 1.;
-                cout << "Setting field to " << fieldScale << endl;
+                fieldScale = -1710.0 / 3583.81 / scale * 1.;
+                if (debug)
+                    cout << "Setting field to " << fieldScale << endl;
                 ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-               if(debug) cout << "Field left after:" << field << endl;
+                if (debug)
+                    cout << "Field left after:" << field << endl;
 
                 do // fi30
                 {
@@ -693,7 +718,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
                                          << " y: " << tof->hits.at(i)->GetY() << endl;
                                 if (ifi23a > -1 && debug)
-                                    cout << " Fi23a # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
+                                    cout << " Fi23a left # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
+                                         << endl;
                                 if (ifi23b > -1 && debug)
                                     cout << " Fi23b # " << ifi23b << " x: " << fi23b->hits.at(ifi23b)->GetX() << endl;
                                 if (ifi30 > -1 && debug)
@@ -721,7 +747,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 }
                                 else
                                 {
-                                    //status = fFitter->FitTrackBackward2D(candidate, fDetectors);
+                                    // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
@@ -733,8 +759,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (debug)
                                     cout << "--------------------------------" << endl;
                                 nCand += 1;
+                                Icountleft += 1;
 
-                                // cout << "Momentum: " << candidate->GetMomentum().Z() << endl;
+                                //      cout << fNEvents<< ", LEFT SIDE: Charge: "<< charge<<", Momentum: " <<
+                                //      candidate->GetMomentum().Mag()<<
+                                //     ", Momentum Z: "<<candidate->GetMomentum().Z() << endl;
+
                                 if (TMath::IsNaN(candidate->GetMomentum().Z()))
                                 {
                                     delete candidate;
@@ -812,17 +842,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 if (fNEventsRight == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
-                Double_t fieldScale = -1710.0/3583.81 * 1.0; // standard
+                Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-                cout << "Field right:" << field << " scale: " << scale << endl;
+                if (debug)
+                    cout << "Field right:" << field << " scale: " << scale << endl;
 
-                fieldScale = -1710.0/3583.81 / scale * 1.;
-                cout << "Setting field to " << fieldScale << endl;
+                fieldScale = -1710.0 / 3583.81 / scale * 1.;
+                if (debug)
+                    cout << "Setting field to " << fieldScale << endl;
                 ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-                cout << "Field right after:" << field << endl;
-
+                if (debug)
+                    cout << "Field right after:" << field << endl;
 
                 do // fi33
                 {
@@ -879,7 +911,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
                                          << " y: " << tof->hits.at(i)->GetY() << endl;
                                 if (ifi23a > -1 && debug)
-                                    cout << " Fi23a # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
+                                    cout << " Fi23a right # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
+                                         << endl;
                                 if (ifi33 > -1 && debug)
                                     cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
                                 if (ifi31 > -1 && debug)
@@ -904,7 +937,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 }
                                 else
                                 {
-                                    //status = fFitter->FitTrackBackward2D(candidate, fDetectors);
+                                    // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
@@ -916,8 +949,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (debug)
                                     cout << "--------------------------------" << endl;
                                 nCand += 1;
+                                Icountright += 1;
 
-                                // cout << "Momentum: " << candidate->GetMomentum().Z() << endl;
+                                //        cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
+                                //        candidate->GetMomentum().Mag()<<", Momentum Z: "<<candidate->GetMomentum().Z()
+                                //        << endl;
+
                                 if (TMath::IsNaN(candidate->GetMomentum().Z()))
                                 {
                                     delete candidate;
@@ -1181,6 +1218,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                                             minChi2,
                                                             minChi2,
                                                             0);
+
             Double_t x_l = 0.;
             Double_t y_l = 0.;
             Int_t iDet = 0;
@@ -1346,6 +1384,10 @@ void R3BFragmentTrackerS494::Finish()
     fh_eloss_fi30->Write();
     fh_eloss_fi32_mc->Write();
     fh_eloss_fi32->Write();
+    fh_eloss_fi31_mc->Write();
+    fh_eloss_fi31->Write();
+    fh_eloss_fi33_mc->Write();
+    fh_eloss_fi33->Write();
     fh_ncand->Write();
     fh_A_reco1->Write();
     fh_A_reco2->Write();

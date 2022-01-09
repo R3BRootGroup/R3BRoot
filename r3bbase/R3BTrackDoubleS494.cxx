@@ -17,7 +17,7 @@
 // -----          Changed in Jan 2022 by A.Kelic-Heil to  -----
 // -----         preselected hit-level data (pre-track).  -----
 // -----         If you want to use full hit-level data, ------
-//------         use R3BTrackS494.cxx                    ------  
+//------         use R3BTrackS494.cxx                    ------
 // ------------------------------------------------------------
 
 /*
@@ -527,7 +527,7 @@ InitStatus R3BTrackDoubleS494::Init()
             fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
             fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
-           // hit fiber vs. fiber position:
+            // hit fiber vs. fiber position:
 
         } // end if(Mapped)
 
@@ -604,7 +604,6 @@ InitStatus R3BTrackDoubleS494::Init()
         fh_tofd_q2_vs_q1 = new TH2F("tofd_q2_vs_q1", "tofd q2 vs. q1", 500, 0., 50., 500, 0., 50.);
         fh_tofd_q2_vs_q1->GetXaxis()->SetTitle("q1");
         fh_tofd_q2_vs_q1->GetYaxis()->SetTitle("q2");
-
     }
 
     if (fMappedItems.at(DET_CALIFA))
@@ -735,7 +734,6 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-
 
     Bool_t CalifaHit = false;
     if (fMappedItems.at(DET_CALIFA))
@@ -1297,7 +1295,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
 
         if (debug_in)
             cout << "start fiber analysis" << endl;
-        
+
         // loop over fiber 33
         auto detHit33 = fHitItems.at(DET_FI33);
         Int_t nHits33 = detHit33->GetEntriesFast();
@@ -1307,7 +1305,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
         {
             det = fi33;
-            R3BBunchedFiberHitData* hit33 = (R3BBunchedFiberHitData*)detHit33->At(ihit33);
+            R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
             x1[det] = hit33->GetX() / 100.;
             y1[det] = hit33->GetY() / 100.;
             z1[det] = 0.;
@@ -1328,15 +1326,16 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
 
             hits33++;
 
-            if (debug3) cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << t1[det] << endl;
 
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;           
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
         }
 
         // loop over fiber 31
@@ -1347,7 +1346,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
         {
             det = fi31;
-            R3BBunchedFiberHitData* hit31 = (R3BBunchedFiberHitData*)detHit31->At(ihit31);
+            R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
             x1[det] = hit31->GetX() / 100.;
             y1[det] = hit31->GetY() / 100.;
             z1[det] = 0.;
@@ -1368,15 +1367,16 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
 
             hits31++;
 
-            if (debug3) cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << t1[det] << endl;
 
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
         }
 
         // loop over fiber 32
@@ -1387,7 +1387,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
         {
             det = fi32;
-            R3BBunchedFiberHitData* hit32 = (R3BBunchedFiberHitData*)detHit32->At(ihit32);
+            R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
             x1[det] = hit32->GetX() / 100.;
             y1[det] = hit32->GetY() / 100.;
             z1[det] = 0.;
@@ -1408,17 +1408,17 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
 
             hits32++;
 
-           if (debug3) cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi32: " << ihit32 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << t1[det] << endl;
-                     
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;
-        }
 
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
+        }
 
         // loop over fiber 30
         auto detHit30 = fHitItems.at(DET_FI30);
@@ -1428,7 +1428,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
         {
             det = fi30;
-            R3BBunchedFiberHitData* hit30 = (R3BBunchedFiberHitData*)detHit30->At(ihit30);
+            R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
             x1[det] = hit30->GetX() / 100.;
             y1[det] = hit30->GetY() / 100.;
             z1[det] = 0.;
@@ -1449,15 +1449,16 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
 
             hits30++;
 
-            if (debug3) cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi30: " << ihit30 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << t1[det] << endl;
 
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
         }
 
         // loop over fiber 23a
@@ -1469,7 +1470,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
         {
             det = fi23a;
-            R3BBunchedFiberHitData* hit23a = (R3BBunchedFiberHitData*)detHit23a->At(ihit23a);
+            R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
             x1[det] = hit23a->GetX() / 100.;
             y1[det] = hit23a->GetY() / 100.;
             z1[det] = 0.;
@@ -1488,17 +1489,17 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
 
-            if (debug3) cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << tof << endl;
 
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
         }
-
 
         // loop over fiber 23b
         auto detHit23b = fHitItems.at(DET_FI23B);
@@ -1509,7 +1510,7 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
         {
             det = fi23b;
-            R3BBunchedFiberHitData* hit23b = (R3BBunchedFiberHitData*)detHit23b->At(ihit23b);
+            R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
             x1[det] = hit23b->GetX() / 100.;
             y1[det] = hit23b->GetY() / 100.;
             z1[det] = 0.;
@@ -1528,15 +1529,16 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(y1[det] * 100., t1[det]);
 
-            if (debug3) cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+            if (debug3)
+                cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                      << " t1: " << tof << endl;
 
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = q1[det];
-                countdet++;          
+            detector[countdet] = det;
+            xdet[countdet] = x1[det];
+            ydet[countdet] = y1[det];
+            zdet[countdet] = z1[det];
+            qdet[countdet] = q1[det];
+            countdet++;
         }
 
         Bool_t cond1 = kFALSE;
@@ -1715,7 +1717,6 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
                     }
                     fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
 
-
                     if (res1_det_x[i] != 0)
                     {
                         fh_res_xA[i]->Fill(res1_det_x[i] * 100.);
@@ -1732,7 +1733,6 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
                     {
                         fh_res_yC[i]->Fill(res2_det_y[i] * 100.);
                     }
-
 
                     if (qdet[i] == 2)
                     {
@@ -1970,7 +1970,6 @@ void R3BTrackDoubleS494::Exec(Option_t* option)
         }
 
     } // end ToFD loop
-
 }
 void R3BTrackDoubleS494::Output1(Double_t track[12], Double_t chi[6])
 {
@@ -2153,7 +2152,6 @@ void R3BTrackDoubleS494::FinishTask()
     cout << "Eff. Fi31 min: " << hits31 << "  " << hits31 / hits1 << endl;
     cout << "Eff. Fi32 min: " << hits32 << "  " << hits32 / hits1 << endl;
     cout << "Eff. Fi33 min: " << hits33 << "  " << hits33 / hits1 << endl;
-
 
     fh_Tpat->Write();
     fh_Trigger->Write();
