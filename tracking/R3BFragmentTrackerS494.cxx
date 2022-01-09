@@ -430,9 +430,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     pHe = ion->GetP();
                     massHe = ion->GetMass();
                     LOG(DEBUG) << "MC ************ 4He **************";
-                    LOG(DEBUG) << "MC position x: " << x0 << " y: " << y0 << " z: " << z0;
-                    LOG(DEBUG) << "MC momentum p: " << p << " px " << px0 << " py " << py0 << " pz " << pz0;
-                    LOG(DEBUG) << "MC mass: " << mass << " beta: " << beta;
+                    LOG(DEBUG) << "MC position x: " << x0He << " y: " << y0He << " z: " << z0He;
+                    LOG(DEBUG) << "MC momentum p: " << pHe << " px " << px0He << " py " << py0He << " pz " << pz0He;
+                    LOG(DEBUG) << "MC mass: " << massHe << " beta: " << betaHe;
                 }
                 if (PID == 1000060120)
                 {
@@ -447,9 +447,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     pC = ion->GetP();
                     massC = ion->GetMass();
                     LOG(DEBUG) << "MC ************ 12C **************";
-                    LOG(DEBUG) << "MC position x: " << x0 << " y: " << y0 << " z: " << z0;
-                    LOG(DEBUG) << "MC momentum p: " << p << " px " << px0 << " py " << py0 << " pz " << pz0;
-                    LOG(DEBUG) << "MC mass: " << mass << " beta: " << beta;
+                    LOG(DEBUG) << "MC position x: " << x0C << " y: " << y0C << " z: " << z0C;
+                    LOG(DEBUG) << "MC momentum p: " << pC << " px " << px0C << " py " << py0C << " pz " << pz0C;
+                    LOG(DEBUG) << "MC mass: " << massC << " beta: " << betaC;
                 }
                 if (PID == 1000080160)
                 {
@@ -617,15 +617,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (charge == 6)
             {
                 m0 = 11.1749;
+                //m0 = 11.178;
                 p0 = 13.043625;
-                pC = p0;
+                //pC = p0;
                 massC = m0;
             }
             if (charge == 2)
             {
                 m0 = 3.7284;
                 p0 = 4.347875;
-                pHe = p0;
+                //pHe = p0;
                 massHe = m0;
             }
 
@@ -713,10 +714,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
 
                                 if (debug)
+                                {
                                     cout << "left side of setup" << endl;
-                                if (debug)
+                                    cout << "Charge requested: " << charge_requested << endl;
                                     cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
                                          << " y: " << tof->hits.at(i)->GetY() << endl;
+                                }
                                 if (ifi23a > -1 && debug)
                                     cout << " Fi23a left # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
                                          << endl;
@@ -725,8 +728,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (ifi30 > -1 && debug)
                                     cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX() << endl;
                                 if (ifi32 > -1 && debug)
-                                    if (debug)
-                                        cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX() << endl;
+                                    cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX() << endl;
                                 if (debug)
                                     cout << "Hit target # "
                                          << " x: " << target->hits.at(0)->GetX() << endl;
@@ -751,7 +753,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
-                                    cout << "Chi2: " << candidate->GetChi2() << "  "
+                                    cout << " Chi: " << candidate->GetChi2() << "  "
                                          << candidate->GetStartMomentum().Mag() << "  "
                                          << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
                                                 (candidate->GetStartMomentum().Mag() - p0)
@@ -779,11 +781,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     }
                                     else
                                     {
-                                        candidate->SetStartPosition(candidate->GetPosition()); // @target
-                                        candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+                                        //candidate->SetStartPosition(candidate->GetPosition()); // @target
+                                        //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
                                         // candidate->SetStartBeta(0.8328);
-                                        candidate->SetStartBeta(beta0);
-                                        candidate->UpdateMomentum();
+                                        //candidate->SetStartBeta(beta0);
+                                        //candidate->UpdateMomentum();
                                         candidate->Reset();
 
                                         // candidate->GetStartPosition().Print();
@@ -906,13 +908,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
 
                                 if (debug)
+                                {
                                     cout << "right side of setup" << endl;
-                                if (debug)
+                                    cout << "Charge requested: " << charge_requested << endl;
                                     cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
                                          << " y: " << tof->hits.at(i)->GetY() << endl;
+                                }
                                 if (ifi23a > -1 && debug)
-                                    cout << " Fi23a right # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
-                                         << endl;
+                                    cout << " Fi23a # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
+                                if (ifi23b > -1 && debug)
+                                    cout << " Fi23b # " << ifi23b << " x: " << fi23b->hits.at(ifi23b)->GetX() << endl;
                                 if (ifi33 > -1 && debug)
                                     cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
                                 if (ifi31 > -1 && debug)
@@ -941,7 +946,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
-                                    cout << "Chi2: " << candidate->GetChi2() << "  "
+                                    cout << "Chi: " << candidate->GetChi2() << "  "
                                          << candidate->GetStartMomentum().Mag() << "  "
                                          << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
                                                 (candidate->GetStartMomentum().Mag() - p0)
@@ -969,11 +974,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     }
                                     else
                                     {
-                                        candidate->SetStartPosition(candidate->GetPosition());
-                                        candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+                                        //candidate->SetStartPosition(candidate->GetPosition());
+                                        //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
                                         // candidate->SetStartBeta(0.8328);
-                                        candidate->SetStartBeta(beta0);
-                                        candidate->UpdateMomentum();
+                                        //candidate->SetStartBeta(beta0);
+                                        //candidate->UpdateMomentum();
                                         candidate->Reset();
 
                                         // candidate->GetStartPosition().Print();
@@ -1124,7 +1129,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             LOG(DEBUG) << "Mass   : " << candidate->GetMass();
             LOG(DEBUG) << "Beta   : " << candidate->GetStartBeta();
             // LOG(DEBUG) << "chi2: " << candidate->GetChi2() << endl;
-            LOG(DEBUG) << "chi2: " << minChi2 << endl;
+            LOG(DEBUG) << "chi: " << minChi2 << endl;
 
             fh_A_reco1->Fill(candidate->GetMass() / amu);
             if (minChi2 < 1.e4)
