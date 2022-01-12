@@ -1042,47 +1042,6 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_t
     uint32_t NN_P25tft_T2BME[50 EXT_STRUCT_CTRL(NN_P25tft_T2BM)] /* [1,10000] */;
     uint32_t NN_P25tft_T2B /* [0,10000] */;
     uint32_t NN_P25tft_T2Bv[10000 EXT_STRUCT_CTRL(NN_P25tft_T2B)] /* [0,65535] */;
-    // uint32_t NN_P26tcl_T1BM /* [1,50] */;
-    // uint32_t NN_P26tcl_T1BMI[50 EXT_STRUCT_CTRL(NN_P26tcl_T1BM)] /* [1,50] */;
-    // uint32_t NN_P26tcl_T1BME[50 EXT_STRUCT_CTRL(NN_P26tcl_T1BM)] /* [1,10000] */;
-    // uint32_t NN_P26tcl_T1B /* [0,10000] */;
-    // uint32_t NN_P26tcl_T1Bv[10000 EXT_STRUCT_CTRL(NN_P26tcl_T1B)] /* [0,65535] */;
-    // uint32_t NN_P26tcl_T2BM /* [1,50] */;
-    // uint32_t NN_P26tcl_T2BMI[50 EXT_STRUCT_CTRL(NN_P26tcl_T2BM)] /* [1,50] */;
-    // uint32_t NN_P26tcl_T2BME[50 EXT_STRUCT_CTRL(NN_P26tcl_T2BM)] /* [1,10000] */;
-    // uint32_t NN_P26tcl_T2B /* [0,10000] */;
-    // uint32_t NN_P26tcl_T2Bv[10000 EXT_STRUCT_CTRL(NN_P26tcl_T2B)] /* [0,65535] */;
-    // uint32_t NN_P26tfl_T1BM /* [1,50] */;
-    // uint32_t NN_P26tfl_T1BMI[50 EXT_STRUCT_CTRL(NN_P26tfl_T1BM)] /* [1,50] */;
-    // uint32_t NN_P26tfl_T1BME[50 EXT_STRUCT_CTRL(NN_P26tfl_T1BM)] /* [1,10000] */;
-    // uint32_t NN_P26tfl_T1B /* [0,10000] */;
-    // uint32_t NN_P26tfl_T1Bv[10000 EXT_STRUCT_CTRL(NN_P26tfl_T1B)] /* [0,65535] */;
-    // uint32_t NN_P26tfl_T2BM /* [1,50] */;
-    // uint32_t NN_P26tfl_T2BMI[50 EXT_STRUCT_CTRL(NN_P26tfl_T2BM)] /* [1,50] */;
-    // uint32_t NN_P26tfl_T2BME[50 EXT_STRUCT_CTRL(NN_P26tfl_T2BM)] /* [1,10000] */;
-    // uint32_t NN_P26tfl_T2B /* [0,10000] */;
-    // uint32_t NN_P26tfl_T2Bv[10000 EXT_STRUCT_CTRL(NN_P26tfl_T2B)] /* [0,65535] */;
-    // uint32_t NN_P26tct_T1BM /* [1,50] */;
-    // uint32_t NN_P26tct_T1BMI[50 EXT_STRUCT_CTRL(NN_P26tct_T1BM)] /* [1,50] */;
-    // uint32_t NN_P26tct_T1BME[50 EXT_STRUCT_CTRL(NN_P26tct_T1BM)] /* [1,10000] */;
-    // uint32_t NN_P26tct_T1B /* [0,10000] */;
-    // uint32_t NN_P26tct_T1Bv[10000 EXT_STRUCT_CTRL(NN_P26tct_T1B)] /* [0,65535] */;
-    // uint32_t NN_P26tct_T2BM /* [1,50] */;
-    // uint32_t NN_P26tct_T2BMI[50 EXT_STRUCT_CTRL(NN_P26tct_T2BM)] /* [1,50] */;
-    // uint32_t NN_P26tct_T2BME[50 EXT_STRUCT_CTRL(NN_P26tct_T2BM)] /* [1,10000] */;
-    // uint32_t NN_P26tct_T2B /* [0,10000] */;
-    // uint32_t NN_P26tct_T2Bv[10000 EXT_STRUCT_CTRL(NN_P26tct_T2B)] /* [0,65535] */;
-    // uint32_t NN_P26tft_T1BM /* [1,50] */;
-    // uint32_t NN_P26tft_T1BMI[50 EXT_STRUCT_CTRL(NN_P26tft_T1BM)] /* [1,50] */;
-    // uint32_t NN_P26tft_T1BME[50 EXT_STRUCT_CTRL(NN_P26tft_T1BM)] /* [1,10000] */;
-    // uint32_t NN_P26tft_T1B /* [0,10000] */;
-    // uint32_t NN_P26tft_T1Bv[10000 EXT_STRUCT_CTRL(NN_P26tft_T1B)] /* [0,65535] */;
-    // uint32_t NN_P26tft_T2BM /* [1,50] */;
-    // uint32_t NN_P26tft_T2BMI[50 EXT_STRUCT_CTRL(NN_P26tft_T2BM)] /* [1,50] */;
-    // uint32_t NN_P26tft_T2BME[50 EXT_STRUCT_CTRL(NN_P26tft_T2BM)] /* [1,10000] */;
-    // uint32_t NN_P26tft_T2B /* [0,10000] */;
-    // uint32_t NN_P26tft_T2Bv[10000 EXT_STRUCT_CTRL(NN_P26tft_T2B)] /* [0,65535] */;
-
 } EXT_STR_h101_raw_nnp_tamex;
 
 /********************************************************
@@ -2740,72 +2699,6 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
         EXT_STR_ITEM_INFO_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, NN_P25tft_T2Bv, UINT32, "NN_P25tft_T2Bv", "NN_P25tft_T2B");       \
     } while(0);
-/*  EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tcl_T1BM, UINT32, "NN_P26tcl_T1BM", 50); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T1BMI, UINT32, "NN_P26tcl_T1BMI", "NN_P26tcl_T1BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T1BME, UINT32, "NN_P26tcl_T1BME", "NN_P26tcl_T1BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tcl_T1B, UINT32, "NN_P26tcl_T1B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T1Bv, UINT32, "NN_P26tcl_T1Bv", "NN_P26tcl_T1B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tcl_T2BM, UINT32, "NN_P26tcl_T2BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T2BMI, UINT32, "NN_P26tcl_T2BMI", "NN_P26tcl_T2BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T2BME, UINT32, "NN_P26tcl_T2BME", "NN_P26tcl_T2BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tcl_T2B, UINT32, "NN_P26tcl_T2B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tcl_T2Bv, UINT32, "NN_P26tcl_T2Bv", "NN_P26tcl_T2B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tfl_T1BM, UINT32, "NN_P26tfl_T1BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T1BMI, UINT32, "NN_P26tfl_T1BMI", "NN_P26tfl_T1BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T1BME, UINT32, "NN_P26tfl_T1BME", "NN_P26tfl_T1BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tfl_T1B, UINT32, "NN_P26tfl_T1B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T1Bv, UINT32, "NN_P26tfl_T1Bv", "NN_P26tfl_T1B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tfl_T2BM, UINT32, "NN_P26tfl_T2BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T2BMI, UINT32, "NN_P26tfl_T2BMI", "NN_P26tfl_T2BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T2BME, UINT32, "NN_P26tfl_T2BME", "NN_P26tfl_T2BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tfl_T2B, UINT32, "NN_P26tfl_T2B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tfl_T2Bv, UINT32, "NN_P26tfl_T2Bv", "NN_P26tfl_T2B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tct_T1BM, UINT32, "NN_P26tct_T1BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T1BMI, UINT32, "NN_P26tct_T1BMI", "NN_P26tct_T1BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T1BME, UINT32, "NN_P26tct_T1BME", "NN_P26tct_T1BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tct_T1B, UINT32, "NN_P26tct_T1B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T1Bv, UINT32, "NN_P26tct_T1Bv", "NN_P26tct_T1B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tct_T2BM, UINT32, "NN_P26tct_T2BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T2BMI, UINT32, "NN_P26tct_T2BMI", "NN_P26tct_T2BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T2BME, UINT32, "NN_P26tct_T2BME", "NN_P26tct_T2BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tct_T2B, UINT32, "NN_P26tct_T2B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tct_T2Bv, UINT32, "NN_P26tct_T2Bv", "NN_P26tct_T2B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tft_T1BM, UINT32, "NN_P26tft_T1BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T1BMI, UINT32, "NN_P26tft_T1BMI", "NN_P26tft_T1BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T1BME, UINT32, "NN_P26tft_T1BME", "NN_P26tft_T1BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tft_T1B, UINT32, "NN_P26tft_T1B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T1Bv, UINT32, "NN_P26tft_T1Bv", "NN_P26tft_T1B");       \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tft_T2BM, UINT32, "NN_P26tft_T2BM", 50);  \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T2BMI, UINT32, "NN_P26tft_T2BMI", "NN_P26tft_T2BM");    \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T2BME, UINT32, "NN_P26tft_T2BME", "NN_P26tft_T2BM");    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, NN_P26tft_T2B, UINT32, "NN_P26tft_T2B", 10000); \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                    \
-            ok, si, offset, struct_t, printerr, NN_P26tft_T2Bv, UINT32, "NN_P26tft_T2Bv", "NN_P26tft_T2B");       \
-    } while (0);
-*/
 
 #endif /*__GUARD_H101_RAW_NNP_TAMEX_EXT_H101_RAW_NNP_TAMEX_H__*/
 

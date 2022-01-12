@@ -11,10 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandTamexReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
+#include "R3BNeulandTamexReader.h"
 #include "R3BPaddleTamexMappedData.h"
+
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
 
@@ -24,17 +26,22 @@ extern "C"
 #include "ext_h101_raw_nnp_tamex.h"
 }
 
-R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex* data, UInt_t offset)
+R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex_onion* data, size_t offset)
     : R3BReader("R3BNeulandTamexReader")
     , fData(data)
     , fOffset(offset)
+    , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BPaddleTamexMappedData"))
-    , fNofPlanes(sizeof(((EXT_STR_h101_raw_nnp_tamex_onion_t*)(data))->NN_P) /
-                 sizeof(*(((EXT_STR_h101_raw_nnp_tamex_onion_t*)(data))->NN_P)))
+    , fNofPlanes(sizeof(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P) /
+                 sizeof(*(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P)))
 {
 }
 
-R3BNeulandTamexReader::~R3BNeulandTamexReader() {}
+R3BNeulandTamexReader::~R3BNeulandTamexReader()
+{
+    if (fArray)
+        delete fArray;
+}
 
 Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 {
@@ -50,14 +57,14 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("NeulandMappedData", "Neuland", fArray, kTRUE);
+    FairRootManager::Instance()->Register("NeulandMappedData", "Neuland", fArray, !fOnline);
 
     return kTRUE;
 }
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-    const auto data = (EXT_STR_h101_raw_nnp_tamex_onion_t*)fData;
+    EXT_STR_h101_raw_nnp_tamex_onion* data = (EXT_STR_h101_raw_nnp_tamex_onion*)fData;
 
     for (int plane = 0; plane < fNofPlanes; ++plane)
     {
@@ -129,4 +136,4 @@ Bool_t R3BNeulandTamexReader::Read()
 
 void R3BNeulandTamexReader::Reset() { fArray->Clear(); }
 
-ClassImp(R3BNeulandTamexReader)
+ClassImp(R3BNeulandTamexReader);
