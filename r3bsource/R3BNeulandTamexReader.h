@@ -45,12 +45,15 @@ class R3BNeulandTamexReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Set the maximum number of planes
+    void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
+
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
-    size_t fOffset;                    // Data offset
-    TClonesArray* fArray;              // Output array
-    const UInt_t fNofPlanes;
-    Bool_t fOnline; // Don't store data for online
+    size_t fOffset;                          // Data offset
+    TClonesArray* fArray;                    // Output array
+    UInt_t fNofPlanes;                       // Number of planes
+    Bool_t fOnline;                          // Don't store data for online
 
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);

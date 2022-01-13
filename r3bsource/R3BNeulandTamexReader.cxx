@@ -20,6 +20,11 @@
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
 
+/**
+ ** ext_h101_raw_nnp_tamex.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:NN_P,id=h101_raw_nnp_tamex,NOTRIGEVENTNO,ext_h101_raw_nnp_tamex.h
+ **/
+
 extern "C"
 {
 #include "ext_data_client.h"
@@ -45,8 +50,8 @@ R3BNeulandTamexReader::~R3BNeulandTamexReader()
 
 Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BNeulandTamexReader::Init()";
     EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_raw_nnp_tamex, 0);
 
     if (!ok)
@@ -56,6 +61,8 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
+    LOG(INFO) << "R3BNeulandTamexReader::Init(): Number of planes " << fNofPlanes;
+
     // Register output array in tree
     FairRootManager::Instance()->Register("NeulandMappedData", "Neuland", fArray, !fOnline);
 
@@ -64,7 +71,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-    EXT_STR_h101_raw_nnp_tamex_onion* data = (EXT_STR_h101_raw_nnp_tamex_onion*)fData;
+    const auto data = (EXT_STR_h101_raw_nnp_tamex_onion*)fData;
 
     for (int plane = 0; plane < fNofPlanes; ++plane)
     {
