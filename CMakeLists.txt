@@ -242,6 +242,7 @@ endif(${IS_XCODE})
 find_package(ucesb)
 if(ucesb_FOUND)
     set(WITH_UCESB true)
+    SET(UCESBPATH $ENV{UCESB_DIR})
     set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
 else()
   message(WARNING "${BMagenta}No UCESB configured. You will not be able to unpack lmd files. Set UCESB_DIR"

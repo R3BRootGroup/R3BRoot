@@ -7,6 +7,8 @@ if ( "$same_system" == "1" ) then
 	setenv SIMPATH "@SIMPATH@"
 	setenv ROOTSYS "@ROOTSYS@"
 	setenv FAIRROOTPATH "@FAIRROOTPATH@"
+	setenv UCESB_DIR="@UCESBPATH@"
+	setenv UCESB_BASE="@UCESBPATH@"
 	setenv R3BROOTPATH "@R3BROOTPATH@"
 	if ( @FULL_CONFIG_FILE@ == true ) then
 		setenv Geant4_INCLUDE_DIRS "@Geant4_INCLUDE_DIRS@"
