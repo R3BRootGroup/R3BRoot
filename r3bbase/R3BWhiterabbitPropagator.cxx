@@ -16,11 +16,10 @@
 // -----   Created May 28th 2021 by J.L. Rodriguez-Sanchez  -----
 // --------------------------------------------------------------
 
-#include "R3BWhiterabbitPropagator.h"
-#include "R3BWRData.h"
-
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
+#include "R3BWhiterabbitPropagator.h"
 
 #include "TClonesArray.h"
 
@@ -40,7 +39,10 @@ R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 {
     LOG(DEBUG) << "R3BWhiterabbitPropagator::Delete instance";
     if (fInputItem)
+    {
         delete fInputItem;
+        fInputItem = NULL;
+    }
 }
 
 InitStatus R3BWhiterabbitPropagator::Init()

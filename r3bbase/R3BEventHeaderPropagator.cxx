@@ -11,15 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BEventHeaderPropagator.h"
 #include "FairLogger.h"
+
+#include "R3BEventHeaderPropagator.h"
 #include "R3BFileSource.h"
 
 R3BEventHeaderPropagator::R3BEventHeaderPropagator()
-    : FairTask("R3BEventHeaderPropagator", 1)
-    , fNameHeader("EventHeader.")
-    , fHeader(nullptr)
-    , fSource(nullptr)
+    : R3BEventHeaderPropagator("R3BEventHeaderPropagator", 1, "EventHeader.")
 {
 }
 
@@ -35,8 +33,6 @@ R3BEventHeaderPropagator::~R3BEventHeaderPropagator()
 {
     if (fHeader)
         delete fHeader;
-    if (fSource)
-        delete fSource;
 }
 
 InitStatus R3BEventHeaderPropagator::Init()
@@ -57,7 +53,7 @@ InitStatus R3BEventHeaderPropagator::Init()
     fSource = R3BFileSource::Instance();
     if (!fSource)
     {
-        LOG(WARNING) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
+        LOG(ERROR) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
     }
     return kSUCCESS;
 }
