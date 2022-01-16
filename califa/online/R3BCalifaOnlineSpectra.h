@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAONLINESPECTRA
-#define R3BCALIFAONLINESPECTRA
+#ifndef R3BCALIFAONLINESPECTRA_H
+#define R3BCALIFAONLINESPECTRA_H
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -252,4 +252,4 @@ class R3BCalifaOnlineSpectra : public FairTask
     ClassDef(R3BCalifaOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BCALIFAONLINESPECTRA_H */

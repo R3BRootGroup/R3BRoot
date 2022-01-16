@@ -14,30 +14,25 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TRandom.h"
+#include <iomanip>
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include <iomanip>
-
-#include "R3BCalifa.h"
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaMapped2CrystalCal.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaTotCalPar.h"
+#include "R3BLogger.h"
 
-#ifndef PLOG
-#define PLOG(LVL) LOG(LVL) << __PRETTY_FUNCTION__ << ": "
-#endif
-
-// R3BCalifaMapped2CrystalCal: Constructor
+// R3BCalifaMapped2CrystalCal::Constructor
 R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
-    : FairTask("R3B CALIFA Calibrator")
-    , NumCrystals(0)
-    , NumParams(0)
+    : FairTask("R3BCalifaMapped2CrystalCal")
+    , fNumCrystals(0)
+    , fNumParams(0)
+    , fNumTotParams(0)
     , fCalParams(NULL)
     , fCal_Par(NULL)
     , fOnline(kFALSE)
@@ -48,15 +43,7 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
 
 R3BCalifaMapped2CrystalCal::~R3BCalifaMapped2CrystalCal()
 {
-    LOG(INFO) << "R3BCalifaMapped2CrystalCal: Delete instance";
-
-    /*
-     * Note to whomever felt in neccessary to add: "delete fCalifaMappedDataCA;"
-     * This will cause a double free because  R3BCalifaFebexReader (reasonably)
-     * considers itself the owner of that object.
-     * Short version: if your class did not allocate the object with new,
-     * it also (typically) may not delete it. -- pklenze
-     */
+    R3BLOG(DEBUG1, "");
     if (fCalifaCryCalDataCA)
         delete fCalifaCryCalDataCA;
 }
@@ -66,29 +53,26 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     // Parameter Container
     // Reading califaCrystalCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened";
-    }
+    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCal::Init() Couldn't get handle on califaCrystalCalPar container";
+        R3BLOG(ERROR, "Couldn't get handle on califaCrystalCalPar container");
     }
     else
     {
-        LOG(INFO) << "R3BCalifaMapped2CrystalCal:: califaCrystalCalPar container open";
+        R3BLOG(INFO, "califaCrystalCalPar container opened");
     }
 
     fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
     if (!fTotCal_Par)
     {
-        LOG(WARNING) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
+        R3BLOG(WARNING, "Couldn't get handle on CalifaTotCalPar container");
     }
-    if (fTotCal_Par)
+    else
     {
-        LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar:: CalifaTotCalPar container open";
+        R3BLOG(INFO, "CalifaTotCalPar container opened");
     }
 }
 
@@ -110,20 +94,20 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     // Just my 2 cents. -- pklenze
 
     //--- Parameter Container ---
-    NumCrystals = fCal_Par->GetNumCrystals();    // Number of Crystals
-    NumParams = fCal_Par->GetNumParametersFit(); // Number of Parameters
+    fNumCrystals = fCal_Par->GetNumCrystals();    // Number of Crystals
+    fNumParams = fCal_Par->GetNumParametersFit(); // Number of Parameters
 
     fCalParams = fCal_Par->GetCryCalParams(); // Array with the Cal parameters
-    assert(fCalParams->GetSize() >= NumCrystals * NumParams);
+    assert(fCalParams->GetSize() >= fNumCrystals * fNumParams);
 
-    LOG(INFO) << "R3BCalifaMapped2CrystalCal:: Max Crystal ID " << NumCrystals;
-    LOG(INFO) << "R3BCalifaMapped2CrystalCal:: Nb of parameters used in the fits " << NumParams;
+    R3BLOG(INFO, "Max Crystal ID " << fNumCrystals);
+    R3BLOG(INFO, "Nb of parameters used in the fits " << fNumParams);
 
     //--- Parameter Container --- Tot
-    NumTotParams = fTotCal_Par->GetNumParametersFit(); // Number of Parameters
+    fNumTotParams = fTotCal_Par->GetNumParametersFit(); // Number of Parameters
 
     fCalTotParams = fTotCal_Par->GetCryCalParams(); // Array with the Tot Cal parameters
-    assert(fCalTotParams->GetSize() >= NumCrystals * NumTotParams);
+    assert(fCalTotParams->GetSize() >= fNumCrystals * fNumTotParams);
 
     // handle old calibrations which mapped to barrel protons to crId+2432:
     // If you cal[id] is zero or nan (you wish),
@@ -134,9 +118,9 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     constexpr int offset = 2432;
     auto& cal = *fCalParams; // because (*ptr)[i] is ugly and error-prone
     auto& tot = *fCalTotParams;
-    if (NumParams != 2 || NumCrystals < 2 * offset)
+    if (fNumParams != 2 || fNumCrystals < 2 * offset)
     {
-        PLOG(WARNING) << "Not checking calibration in former proton range.";
+        R3BLOG(WARNING, "Not checking calibration in former proton range.");
         return;
     }
     auto invalid = [&cal](int id) {
@@ -151,39 +135,40 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
         {
             ++replaced;
             // Note:  (*a)[n]=...
-            for (int p = 0; p < NumParams; p++)
-                cal[NumParams * (id - 1) + p] = cal[NumParams * (id - 1 + offset) + p];
-            for (int p = 0; p < NumTotParams; p++)
-                tot[NumTotParams * (id - 1) + p] = tot[NumTotParams * (id - 1 + offset) + p];
+            for (int p = 0; p < fNumParams; p++)
+                cal[fNumParams * (id - 1) + p] = cal[fNumParams * (id - 1 + offset) + p];
+            for (int p = 0; p < fNumTotParams; p++)
+                tot[fNumTotParams * (id - 1) + p] = tot[fNumTotParams * (id - 1 + offset) + p];
         }
-    if (replaced)
-        PLOG(WARNING) << replaced
-                      << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
-                         "barrel range.";
+
+    R3BLOG_IF(WARNING,
+              replaced,
+              replaced << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
+                          "barrel range.");
 }
 
 InitStatus R3BCalifaMapped2CrystalCal::Init()
 {
-    LOG(INFO) << "R3BCalifaMapped2CrystalCal::Init()";
+    R3BLOG(INFO, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(FATAL) << "R3BCalifaMapped2CrystalCal::FairRootManager not found";
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
-        LOG(FATAL) << "R3BCalifaMapped2CrystalCal::CalifaMappedData not found";
+        R3BLOG(FATAL, "CalifaMappedData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
     // Calibrated data
-    fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData", 50);
+    fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData");
 
     rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, !fOnline);
 
@@ -203,24 +188,18 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     // Reset entries in output arrays, local arrays
     Reset();
 
-    if (!fCal_Par)
-    {
-        LOG(WARNING) << "R3BCalifaMapped2CrystalCal::Parameter container not found";
-    }
-
     // Reading the Input -- Mapped Data --
     Int_t nHits = fCalifaMappedDataCA->GetEntries();
     if (!nHits)
         return;
 
-    R3BCalifaMappedData** mappedData;
-    mappedData = new R3BCalifaMappedData*[nHits];
+    R3BCalifaMappedData** mappedData = new R3BCalifaMappedData*[nHits];
 
     // Overflow (R3BROOT-speech "Errors") handling:
     // If an error bit indicates that the data is invalid,
     // the correct approach is to set the invalid fields to NaN, imho
 
-    //  source: mbs f_user dir, struct_event_115a.h
+    // source: mbs f_user dir, struct_event_115a.h
     // bit      name        invalidates
 
     //   0      CFD         nothing, trigger branch overflow
@@ -239,6 +218,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     //   b      QPID Nf     Nf
 
     //   c      QPID Ns     Ns
+
     const uint32_t ANY_ERRORS = 0x061e;
     const uint32_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
     const uint32_t EN_ERRORS = 0x0020 | ANY_ERRORS;
@@ -265,12 +245,12 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
         raw[Ns] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNs());
         double cal[3] = { 0, 0, 0 };
 
-        if (0 < crystalId && crystalId <= NumCrystals)
+        if (0 < crystalId && crystalId <= fNumCrystals)
             for (int idx = 0; idx < 3; idx++)
-                for (int p = 0; p < NumParams; p++)
+                for (int p = 0; p < fNumParams; p++)
                 {
                     cal[idx] +=
-                        pow(raw[idx], (NumParams == 1) ? 1 : p) * fCalParams->GetAt(NumParams * (crystalId - 1) + p);
+                        pow(raw[idx], (fNumParams == 1) ? 1 : p) * fCalParams->GetAt(fNumParams * (crystalId - 1) + p);
                 }
         else
             for (int idx; idx < 3; idx++)
@@ -279,23 +259,21 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
         double TotCal = Tot;
         if (fCalTotParams)
         {
-            double a0 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1));
-            double a1 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1) + 1);
+            double a0 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1));
+            double a1 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1) + 1);
             TotCal = a0 * TMath::Exp(Tot / a1);
         }
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);
     }
 
     if (mappedData)
-        delete[] mappedData; // FTFY
+        delete[] mappedData;
     return;
 }
 
-void R3BCalifaMapped2CrystalCal::Finish() {}
-
 void R3BCalifaMapped2CrystalCal::Reset()
 {
-    LOG(DEBUG) << "Clearing CrystalCalData Structure";
+    R3BLOG(DEBUG, "Clearing CrystalCalData Structure");
     if (fCalifaCryCalDataCA)
         fCalifaCryCalDataCA->Clear();
 }
@@ -305,7 +283,7 @@ R3BCalifaCrystalCalData* R3BCalifaMapped2CrystalCal::AddCalData(Int_t id,
                                                                 Double_t Nf,
                                                                 Double_t Ns,
                                                                 uint64_t wrts,
-                                                                Double_t tot_energy = 0)
+                                                                Double_t tot_energy = 0.)
 {
     // It fills the R3BCalifaCrystalCalData
     TClonesArray& clref = *fCalifaCryCalDataCA;
@@ -313,4 +291,4 @@ R3BCalifaCrystalCalData* R3BCalifaMapped2CrystalCal::AddCalData(Int_t id,
     return new (clref[size]) R3BCalifaCrystalCalData(id, energy, Nf, Ns, wrts, tot_energy);
 }
 
-ClassImp(R3BCalifaMapped2CrystalCal)
+ClassImp(R3BCalifaMapped2CrystalCal);
