@@ -24,18 +24,17 @@ ${Boost_INCLUDE_DIR}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
-${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/tracking
+${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/califa/online
 ${R3BROOT_SOURCE_DIR}/califa/calibration
 ${R3BROOT_SOURCE_DIR}/califa/ana
 ${R3BROOT_SOURCE_DIR}/califa/pars
 ${R3BROOT_SOURCE_DIR}/califa/sim
-${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
+${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -78,7 +77,6 @@ set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 
 set(DEPENDENCIES
-  Spectrum R3Bbase R3BData R3BPassive R3BTracking Boost::regex)
-#  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
+  Spectrum R3Bbase R3BData R3BTracking Boost::regex)
 
 GENERATE_LIBRARY()

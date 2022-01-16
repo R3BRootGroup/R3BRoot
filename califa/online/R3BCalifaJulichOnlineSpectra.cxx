@@ -131,7 +131,6 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     TFolder* mapfolCalifa = new TFolder("Mapped", "Califa Mapped");
     TFolder* mapfolSi = new TFolder("Mapped", "Si Mapped");
 
-
     // Mapped data
     fh2_EnergyVsStrip.resize(fNbDet);
     for (Int_t i = 0; i < fNbDet; i++)
@@ -170,7 +169,8 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     run->AddObject(mainfolCalifa);
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_CalifaJulich", Form("/Objects/%s/->Reset_CalifaJulich_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_CalifaJulich",
+                                          Form("/Objects/%s/->Reset_CalifaJulich_Histo()", GetName()));
 
     return kSUCCESS;
 }
@@ -197,7 +197,7 @@ void R3BCalifaJulichOnlineSpectra::Exec(Option_t* option)
             R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsSi->At(ihit);
             if (!hit)
                 continue;
-            fh2_EnergyVsStrip[hit->GetDetectorId()-1]->Fill(hit->GetStripId(), hit->GetEnergy());
+            fh2_EnergyVsStrip[hit->GetDetectorId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
         }
     }
 

@@ -32,27 +32,27 @@ class R3BLogger : public FairLogger
   public:
     R3BLogger();
 
-#define R3BLOG(severity, x)                                                                                          \
-    if (true)                                                                                                        \
-    {                                                                                                                \
-        std::string fileName(__FILE__);                                                                              \
-        std::stringstream ss;                                                                                        \
-        ss << fileName.substr(fileName.find_last_of("/") + 1) << "::" << __FUNCTION__ << "()[" << __LINE__ << "]: "; \
-        LOG(severity) << ss.str() << x;                                                                              \
-    }                                                                                                                \
-    else                                                                                                             \
+#define R3BLOG(severity, x)                                                                                        \
+    if (true)                                                                                                      \
+    {                                                                                                              \
+        std::string fileName(__FILE__);                                                                            \
+        std::stringstream ss;                                                                                      \
+        ss << fileName.substr(fileName.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ << "(): "; \
+        LOG(severity) << ss.str() << x;                                                                            \
+    }                                                                                                              \
+    else                                                                                                           \
         (void)0
 
-#define R3BLOG_IF(severity, condition, x)                                                                        \
-    if (true)                                                                                                    \
-    {                                                                                                            \
-        std::string fileNameif(__FILE__);                                                                        \
-        std::stringstream ssif;                                                                                  \
-        ssif << fileNameif.substr(fileNameif.find_last_of("/") + 1) << "::" << __FUNCTION__ << "()[" << __LINE__ \
-             << "]: ";                                                                                           \
-        LOG_IF(severity, condition) << ssif.str() << x;                                                          \
-    }                                                                                                            \
-    else                                                                                                         \
+#define R3BLOG_IF(severity, condition, x)                                                                     \
+    if (true)                                                                                                 \
+    {                                                                                                         \
+        std::string fileNameif(__FILE__);                                                                     \
+        std::stringstream ssif;                                                                               \
+        ssif << fileNameif.substr(fileNameif.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ \
+             << "(): ";                                                                                       \
+        LOG_IF(severity, condition) << ssif.str() << x;                                                       \
+    }                                                                                                         \
+    else                                                                                                      \
         (void)0
 
   private:

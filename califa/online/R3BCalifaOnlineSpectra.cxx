@@ -17,19 +17,21 @@
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BWRData.h"
-#include "THttpServer.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+
 #include "TCanvas.h"
 #include "TFolder.h"
 #include "TH1F.h"
 #include "TH1I.h"
 #include "TH2F.h"
+#include "THttpServer.h"
 #include "TVector3.h"
 
 #include "TClonesArray.h"
@@ -45,54 +47,8 @@
 using namespace std;
 
 R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
-    : FairTask("CALIFAOnlineSpectra", 1)
-    , fMappedItemsCalifa(NULL)
-    , fCalItemsCalifa(NULL)
-    , fHitItemsCalifa(NULL)
-    , fWRItemsCalifa(NULL)
-    , fWRItemsMaster(NULL)
-    , fMap_Par(NULL)
-    , fNEvents(0)
-    , fNbCalifaCrystals(4864)
-    , fNumSides(Nb_Sides)
-    , fNumRings(Nb_Rings)
-    , fNumPreamps(Nb_Preamps)
-    , fNumCrystalPreamp(Nb_PreampCh)
-    , fMapHistos_bins(500)
-    , fMapHistos_max(4000)
-    , fBinsChannelFebex(5000)
-    , fMaxBinChannelFebex(65535)
-    , fMaxEnergyBarrel(10)
-    , fMaxEnergyIphos(30)
-    , fMinProtonE(50000.)
-    , fRaw2Cal(kFALSE)
-    , fLogScale(kTRUE)
-    , fTotHist(kFALSE)
-    , fFebex2Preamp(kTRUE)
+    : R3BCalifaOnlineSpectra("CALIFAOnlineSpectra", 1)
 {
-    // Define Preamp vs Febex sequence for histograms
-    fOrderFebexPreamp[0] = 6;
-    fOrderFebexPreamp[1] = 5;
-    fOrderFebexPreamp[2] = 4;
-    fOrderFebexPreamp[3] = 3;
-    fOrderFebexPreamp[4] = 2;
-    fOrderFebexPreamp[5] = 1;
-    fOrderFebexPreamp[6] = 0;
-    fOrderFebexPreamp[7] = 7;
-    fOrderFebexPreamp[8] = 8;
-    fOrderFebexPreamp[9] = 15;
-    fOrderFebexPreamp[10] = 14;
-    fOrderFebexPreamp[11] = 13;
-    fOrderFebexPreamp[12] = 12;
-    fOrderFebexPreamp[13] = 11;
-    fOrderFebexPreamp[14] = 10;
-    fOrderFebexPreamp[15] = 9;
-
-    for (Int_t s = 0; s < fNumSides; s++)
-        for (Int_t r = 0; r < fNumRings; r++)
-            for (Int_t p = 0; p < fNumPreamps; p++)
-                for (Int_t i = 0; i < 4; i++)
-                    fFebexInfo[s][r][p][i] = -1;
 }
 
 R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbose)
@@ -148,7 +104,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
 
 R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra()
 {
-    LOG(INFO) << "R3BCalifaOnlineSpectra: Delete instance";
+    R3BLOG(DEBUG1, "");
     if (fMappedItemsCalifa)
         delete fMappedItemsCalifa;
     if (fCalItemsCalifa)
@@ -166,31 +122,26 @@ void R3BCalifaOnlineSpectra::SetParContainers()
     // Parameter Container
     // Reading amsStripCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
+    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaOnlineSpectra::Couldn't get handle on califaMappingPar container";
+        R3BLOG(ERROR, "Couldn't get handle on califaMappingPar container");
     }
     else
     {
-        LOG(INFO) << "R3BCalifaOnlineSpectra::CalifaMappingPar container open";
+        R3BLOG(INFO, "CalifaMappingPar container open");
     }
 }
 
 void R3BCalifaOnlineSpectra::SetParameter()
 {
-    if (!fMap_Par)
-    {
-        LOG(ERROR) << "R3BCalifaOnlineSpectra::CalifaMappingPar container not found";
-    }
+    R3BLOG_IF(ERROR, !fMap_Par, "CalifaMappingPar container not found");
+
     //--- Parameter Container ---
     fNbCalifaCrystals = fMap_Par->GetNumCrystals(); // Number of crystals
-    LOG(INFO) << "R3BCalifaOnlineSpectra::NumCry " << fNbCalifaCrystals;
+    R3BLOG(INFO, "NumCry " << fNbCalifaCrystals);
     // fMap_Par->printParams();
 
     for (Int_t c = 1; c <= fNbCalifaCrystals; c++)
@@ -215,16 +166,14 @@ void R3BCalifaOnlineSpectra::SetParameter()
 
 InitStatus R3BCalifaOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BCalifaOnlineSpectra::Init()";
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
+    R3BLOG(INFO, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(FATAL) << "R3BCalifaOnlineSpectra::Init FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
@@ -232,37 +181,25 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        LOG(ERROR) << "R3BCalifaOnlineSpectra::CalifaCrystalMappedData not found";
+        R3BLOG(ERROR, "R3BCalifaOnlineSpectra::CalifaCrystalMappedData not found");
         return kFATAL;
     }
 
     // get access to Cal data
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
-    if (!fCalItemsCalifa)
-    {
-        LOG(WARNING) << "R3BCalifaOnlineSpectra::CalifaCrystalCalData not found";
-    }
+    R3BLOG_IF(WARNING, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    if (!fHitItemsCalifa)
-    {
-        LOG(WARNING) << "R3BCalifaOnlineSpectra::CalifaHitData not found";
-    }
+    R3BLOG_IF(WARNING, !fHitItemsCalifa, "CalifaHitData not found");
 
     // get access to WR-Califa data
     fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
-    if (!fWRItemsCalifa)
-    {
-        LOG(WARNING) << "R3BCalifaOnlineSpectra::WRCalifaData not found";
-    }
+    R3BLOG_IF(WARNING, !fWRItemsCalifa, "WRCalifaData not found");
 
     // get access to WR-Master data
     fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    if (!fWRItemsMaster)
-    {
-        LOG(WARNING) << "R3BCalifaOnlineSpectra::WRMasterData not found";
-    }
+    R3BLOG_IF(WARNING, !fWRItemsMaster, "WRMasterData not found");
 
     SetParameter();
 
@@ -271,7 +208,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     ifstream* FileHistos = new ifstream(fCalifaFile);
     if (!FileHistos->is_open())
     {
-        LOG(WARNING) << "R3BCalifaOnlineSpectra:  No Histogram definition file";
+        R3BLOG(WARNING, "No Histogram definition file");
         noFile = kTRUE;
     }
 
@@ -857,7 +794,6 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     if (fWRItemsCalifa)
     {
         folder_wrs->Add(cCalifa_wr);
-        folder_wrs->Add(cCalifa_sync);
     }
     if (fWRItemsCalifa)
         mainfolCalifa->Add(folder_wrs);
@@ -1304,12 +1240,6 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 
 void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 {
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(FATAL) << "R3BCalifaOnlineSpectra::Exec FairRootManager not found";
-
-    // int64_t wrdif[fNumSides];
-    // Int_t wrdifinUse = 0;
     int64_t wr[2];
     int64_t wrm = 0.0;
     for (int i = 0; i < 2; i++)
@@ -1340,11 +1270,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                     continue;
                 wrm = hit->GetTimeStamp();
             }
-            // fh1_wrs[0]->Fill(wrm - wr[0]); // messel
-            // fh1_wrs[1]->Fill(wrm - wr[1]); // wixhausen
-            // wrdif[0] = wrm - wr[0];
-            // wrdif[1] = wrm - wr[1];
-            // wrdifinUse = 1;
         }
     }
 
@@ -1483,13 +1408,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         // Comparison of hits to get energy, theta and phi correlations between them
         for (Int_t i1 = 0; i1 < nHits; i1++)
         {
-            /*if (wrdifinUse == 1)
-            {
-                if (TMath::Abs(califa_phi[i1]) > 90.)
-                    fh2_Cal_wr_energy_r->Fill(wrdif[1], califa_e[i1]); // wixhausen
-                else
-                    fh2_Cal_wr_energy_l->Fill(wrdif[0], califa_e[i1]); // messel
-            }*/
             for (Int_t i2 = i1 + 1; i2 < nHits; i2++)
             {
                 if (gRandom->Uniform(0., 1.) < 0.5)
@@ -1555,7 +1473,6 @@ void R3BCalifaOnlineSpectra::FinishTask()
     if (fMappedItemsCalifa)
     {
         cCalifaMult->Write();
-        cCalifa_sync->Write();
         cCalifa_cry_energy->Write();
         for (Int_t i = 0; i < fNumRings; i++)
         {
@@ -1602,4 +1519,4 @@ void R3BCalifaOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BCalifaOnlineSpectra)
+ClassImp(R3BCalifaOnlineSpectra);
