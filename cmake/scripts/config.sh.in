@@ -7,6 +7,8 @@ if [ $same_system -eq 1 ]; then
 	export SIMPATH="@SIMPATH@"
 	export ROOTSYS="@ROOTSYS@"
 	export FAIRROOTPATH="@FAIRROOTPATH@"
+	export UCESB_DIR="@UCESBPATH@"
+	export UCESB_BASE="@UCESBPATH@"
 	export R3BROOTPATH="@R3BROOTPATH@"
   if (@FULL_CONFIG_FILE@); then
     export Geant4_INCLUDE_DIRS="@Geant4_INCLUDE_DIRS@"
