@@ -89,6 +89,7 @@ class R3BSci2Tcal2Hit : public FairTask
 
     // Method to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
+
     virtual void SetParContainers();
 
   private:

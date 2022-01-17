@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BSci2Mapped2Cal                -----
-// -----          Created December 6th 2019 by M. Heil -----
+// -----                  R3BSci2Mapped2Cal               -----
+// -----          Created December 6th 2019 by M. Heil    -----
 // ------------------------------------------------------------
 
 /*
@@ -43,16 +43,7 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BSci2Mapped2Cal::R3BSci2Mapped2Cal()
-    : FairTask("Sci2Tcal", 1)
-    , fMappedItems(NULL)
-    , fCalItems(new TClonesArray("R3BSci2CalData"))
-    , fNofCalItems(0)
-    , fNofTcalPars(0)
-    , fNofModules(0)
-    , fTcalPar(NULL)
-    , fTrigger(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvent(0)
+    : R3BSci2Mapped2Cal("R3BSci2Mapped2Cal", 1)
 {
 }
 
@@ -67,11 +58,13 @@ R3BSci2Mapped2Cal::R3BSci2Mapped2Cal(const char* name, Int_t iVerbose)
     , fTrigger(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvent(0)
+    , fOnline(kFALSE)
 {
 }
 
 R3BSci2Mapped2Cal::~R3BSci2Mapped2Cal()
 {
+    LOG(DEBUG) << "R3BSci2Mapped2Cal::Destructor";
     if (fCalItems)
     {
         delete fCalItems;
@@ -82,30 +75,32 @@ R3BSci2Mapped2Cal::~R3BSci2Mapped2Cal()
 
 InitStatus R3BSci2Mapped2Cal::Init()
 {
-    fNofTcalPars = fTcalPar->GetNumModulePar();
-    if (fNofTcalPars == 0)
-    {
-        LOG(ERROR) << "There are no TCal parameters in container Sci2TCalPar";
-        return kFATAL;
-    }
-
     LOG(INFO) << "R3BSci2Mapped2Cal::Init : read " << fNofModules << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
+    {
         LOG(fatal) << "FairRootManager not found";
+        return kFATAL;
+    }
+
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("Sci2Mapped");
 
     if (NULL == fMappedItems)
+    {
         LOG(fatal) << "Branch Sci2Mapped not found";
+        return kFATAL;
+    }
 
     // request storage of Cal data in output tree
-    mgr->Register("Sci2Cal", "Land", fCalItems, kTRUE);
+    mgr->Register("Sci2Cal", "Sci2Cal", fCalItems, kTRUE);
     fCalItems->Clear();
 
     return kSUCCESS;
@@ -117,7 +112,7 @@ void R3BSci2Mapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to Sci2TCalPar-Container.";
+        LOG(FATAL) << "Could not get access to Sci2TCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -136,6 +131,9 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
         return;
 
     Int_t nHits = fMappedItems->GetEntriesFast();
+
+    if (nHits == 0)
+        return;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_Sci2 * NTypes = 2 * 3
     {

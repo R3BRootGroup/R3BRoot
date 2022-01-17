@@ -128,7 +128,7 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
     if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
         iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
 
-    if (iD >= 1 && iD <= 2432)
+    if (iD >= 1 && iD <= fNumCrystals / 2)
     {
         nameVolume = GetCrystalVolumePath(iD);
 
@@ -174,7 +174,7 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
 
     static char nameVolume[400];
 
-    if (iD >= 1 && iD <= 2432)
+    if (iD >= 1 && iD <= fNumCrystals / 2)
     {
         if (iD < 33)
         {                          // First ring in BARREL (single crystal per alveolus)

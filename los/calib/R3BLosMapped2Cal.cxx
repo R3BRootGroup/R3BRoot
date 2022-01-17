@@ -71,29 +71,19 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BLosMapped2Cal::~R3BLosMapped2Cal()
 {
-    if (fMappedItems)
-        delete fMappedItems;
+    LOG(DEBUG) << "R3BLosMapped2Cal::Destructor";
     if (fCalItems)
         delete fCalItems;
 }
 
 InitStatus R3BLosMapped2Cal::Init()
 {
-    fNofTcalPars = fTcalPar->GetNumModulePar();
-    if (fNofTcalPars == 0)
-    {
-        LOG(ERROR) << "There are no TCal parameters in container LosTCalPar";
-        return kFATAL;
-    }
-
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-
     {
-        //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(FATAL) << "FairRootManager not found";
         return kFATAL;
     }
 
@@ -106,8 +96,7 @@ InitStatus R3BLosMapped2Cal::Init()
 
     if (NULL == fMappedItems)
     {
-        //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosMapped not found");
-        LOG(ERROR) << "Branch LosMapped not found";
+        LOG(FATAL) << "Branch LosMapped not found";
         return kFATAL;
     }
 
@@ -125,7 +114,7 @@ void R3BLosMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to LosTCalPar-Container.";
+        LOG(FATAL) << "Could not get access to LosTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -145,6 +134,9 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         return;
 
     Int_t nHits = fMappedItems->GetEntriesFast();
+
+    if (nHits == 0)
+        return;
 
     // if(nHits >0) cout<<"Mapped hits: "<<nHits<<", No det.: "<<fNofDetectors<<endl;
 
@@ -390,8 +382,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         if (!calItem)
         {
             // there is no detector hit with matching time. Hence, create a new one.
-            calItem = new ((*fCalItems)[fNofCalItems++]) R3BLosCalData(iDet);
-            // fNofCalItems += 1;
+            calItem = new ((*fCalItems)[fCalItems->GetEntriesFast()]) R3BLosCalData(iDet);
+            fNofCalItems += 1;
         }
         // set the time to the correct cal item
 

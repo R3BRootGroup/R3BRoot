@@ -230,6 +230,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
         auto wrts = mappedData[i]->GetWrts();
         auto ov = mappedData[i]->GetOverFlow();
         auto Tot = mappedData[i]->GetTot();
+
         auto validate_smear = [](uint16_t err_cond, double raw) {
             return err_cond ? NAN : raw + gRandom->Rndm() - 0.5;
         };

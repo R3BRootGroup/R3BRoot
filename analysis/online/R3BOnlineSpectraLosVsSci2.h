@@ -21,7 +21,7 @@
 #include <sstream>
 #include <vector>
 
-#include "R3BFrsData.h"
+//#include "R3BFrsData.h"
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH1.h"
@@ -231,7 +231,7 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     TClonesArray* fHitItemsMus;
-    TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
+    // TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
 
     Double_t fPos2min, fPos2max;
 
@@ -408,14 +408,14 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
 
     /** Private method FrsData **/
     //** Adds a FrsData to the analysis
-    R3BFrsData* AddData(Int_t StaId,
+    /*R3BFrsData* AddData(Int_t StaId,
                         Int_t StoId,
                         Double_t z,
                         Double_t aq,
                         Double_t betaval,
                         Double_t brhoval,
                         Double_t xs2,
-                        Double_t xc);
+                        Double_t xc);*/
 
   public:
     ClassDef(R3BOnlineSpectraLosVsSci2, 2)

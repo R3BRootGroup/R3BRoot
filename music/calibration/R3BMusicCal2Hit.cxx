@@ -40,7 +40,7 @@
 
 // R3BMusicCal2Hit: Default Constructor --------------------------
 R3BMusicCal2Hit::R3BMusicCal2Hit()
-    : R3BMusicCal2Hit("R3BMusic Hit Calibrator", 1)
+    : R3BMusicCal2Hit("R3BMusicCal2Hit", 1)
 {
 }
 
@@ -64,11 +64,9 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMusicCal2Hit: Destructor
 R3BMusicCal2Hit::~R3BMusicCal2Hit()
 {
-    LOG(INFO) << "R3BMusicCal2Hit: Delete instance";
+    LOG(DEBUG) << "R3BMusicCal2Hit::Destructor";
     if (fMusicHitDataCA)
         delete fMusicHitDataCA;
-    if (fMusicCalDataCA)
-        delete fMusicCalDataCA;
 }
 
 void R3BMusicCal2Hit::SetParContainers()
@@ -78,7 +76,7 @@ void R3BMusicCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(ERROR) << "FairRuntimeDb not found";
     }
 
     fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");

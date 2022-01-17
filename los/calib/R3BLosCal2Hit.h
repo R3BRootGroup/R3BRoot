@@ -130,9 +130,9 @@ class R3BLosCal2Hit : public FairTask
     /**
      * Methods for setting input files
      */
-    inline void SetLosInput(Int_t iOptHisto, std::string const& walk_param_file, std::string const& tot_param_file)
+    inline void SetLosInput(Bool_t OptHisto, std::string const& walk_param_file, std::string const& tot_param_file)
     {
-        OptHisto = iOptHisto;
+        fOptHisto = OptHisto;
         fwalk_param_file = walk_param_file;
         ftot_param_file = tot_param_file;
     }
@@ -159,7 +159,11 @@ class R3BLosCal2Hit : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
+
     virtual void SetParContainers();
+
+    /** Method to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     void SetParameter();
@@ -167,6 +171,7 @@ class R3BLosCal2Hit : public FairTask
     TClonesArray* fCalItems;   /**< Array with Cal items - input data. */
     TClonesArray* fHitItems;   /**< Array with Hit items - output data. */
     Float_t fp0, fp1;
+    Bool_t fOnline; // Don't store data for online
 
     // check for trigger
     R3BEventHeader* header; /**< Event header. */
@@ -189,7 +194,7 @@ class R3BLosCal2Hit : public FairTask
     Double_t flosOffsetYT;
     Double_t walk_par[16][11]{}; // Array containing walk parameters: x=PM, y=min,max,p0...p9; MCFD and TAMEX considered
     Double_t tot_par[8][4]{};    // Array containing walk parameters: x=PM, y=p0...p3;
-    Int_t OptHisto;
+    Bool_t fOptHisto;
     std::string fwalk_param_file;
     std::string ftot_param_file;
 

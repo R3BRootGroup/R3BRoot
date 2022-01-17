@@ -123,6 +123,9 @@ class R3BSci2Mapped2Cal : public FairTask
         fNofModules = nChs * nDets * 3;
     }
 
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
@@ -130,6 +133,9 @@ class R3BSci2Mapped2Cal : public FairTask
     Int_t fNofCalItems;         /**< Number of produced time items per event. */
     Int_t Icounts_good = 0;
     Int_t Icounts_tot = 0;
+
+    // Don't store data for online
+    Bool_t fOnline;
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
     UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
