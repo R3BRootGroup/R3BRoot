@@ -13,7 +13,6 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
@@ -30,12 +29,7 @@
 #include "R3BSci2TcalData.h"
 
 R3BOnlineSpectraSci2::R3BOnlineSpectraSci2()
-    : FairTask("OnlineSpectraSci2", 1)
-    , fMapped(NULL)
-    , fTcal(NULL)
-    , fNEvents(0)
-    , fNbDetectors(1)
-    , fNbChannels(3)
+    : R3BOnlineSpectraSci2("R3BOnlineSpectraSci2", 1)
 {
 }
 
@@ -51,7 +45,7 @@ R3BOnlineSpectraSci2::R3BOnlineSpectraSci2(const char* name, Int_t iVerbose)
 
 R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Delete instance";
+    LOG(DEBUG) << "R3BOnlineSpectraSci2::Destructor";
     if (fMapped)
         delete fMapped;
     if (fTcal)
@@ -60,7 +54,7 @@ R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 
 InitStatus R3BOnlineSpectraSci2::Init()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Init ";
+    LOG(INFO) << "R3BOnlineSpectraSci2::Init()";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -69,9 +63,9 @@ InitStatus R3BOnlineSpectraSci2::Init()
     if (NULL == mgr)
         LOG(FATAL) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
 
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -82,12 +76,8 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
     if (!fMapped)
     {
-        LOG(ERROR) << "Sci2Mapped not found: is OK";
+        LOG(FATAL) << "Sci2Mapped not found";
         return (kFATAL);
-    }
-    else
-    {
-        LOG(INFO) << "Sci2Mapped found";
     }
 
     // --- ------------------------ --- //
@@ -96,7 +86,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fTcal = (TClonesArray*)mgr->GetObject("Sci2Tcal");
     if (!fTcal)
     {
-        LOG(INFO) << "Sci2Tcal not found: is OK";
+        LOG(WARNING) << "Sci2Tcal not found: is OK";
     }
 
     // --- ------------------------------ --- //
@@ -568,4 +558,4 @@ void R3BOnlineSpectraSci2::FinishTask()
         }
     } // end of loop over fNbDetectors
 }
-ClassImp(R3BOnlineSpectraSci2)
+ClassImp(R3BOnlineSpectraSci2);

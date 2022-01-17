@@ -55,11 +55,7 @@ R3BSci2Mapped2Tcal::R3BSci2Mapped2Tcal(const char* name, Int_t iVerbose)
 
 R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
 {
-    LOG(DEBUG) << "R3BSci2Mapped2Tcal: Delete instance";
-    if (fMapped)
-    {
-        delete fMapped;
-    }
+    LOG(DEBUG) << "R3BSci2Mapped2Tcal::Destructor";
     if (fTcal)
     {
         delete fTcal;
@@ -72,7 +68,7 @@ void R3BSci2Mapped2Tcal::SetParameter()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container Sci2TCalPar";
+        LOG(FATAL) << "There are no TCal parameters in container Sci2TCalPar";
     }
     LOG(INFO) << "R3BSci2Mapped2Tcal::SetParameter() : read " << fNofModules << " modules";
 
@@ -86,23 +82,20 @@ InitStatus R3BSci2Mapped2Tcal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
+        LOG(FATAL) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
         return kFATAL;
     }
 
     // try to get a handle on the EventHeader.
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
-    {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        LOG(WARNING) << "R3BSci2Mapped2Tcal::Init() EventHeader. not found";
-    }
 
     // --- get access to Mapped data --- //
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
     if (!fMapped)
     {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped Data not found.";
+        LOG(FATAL) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped Data not found.";
         return kFATAL;
     }
 
@@ -142,6 +135,8 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
         return;
 
     Int_t nHits = fMapped->GetEntriesFast();
+    if (nHits == 0)
+        return;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_Sci2 * NTypes = 2 * 3
     {

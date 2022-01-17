@@ -63,34 +63,7 @@ using namespace std;
 #define SPEED_OF_LIGHT_MNS 0.299792458
 
 R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2()
-    : FairTask("OnlineSpectraLosVsSci2", 1)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fClockFreq(5.)
-    , fNEvents(0)
-    , fTcalSci2(NULL)
-    , fHitItemsMus(NULL)
-    , fFrsDataCA(NULL)
-    , fToFoffset(0)
-    , fToFmin(-5000)
-    , fToFmax(5000)
-    , fTof2InvV_p0(-7.8)
-    , fTof2InvV_p1(0.0073)
-    , fL2(137)
-    , fPos_p0(-11)
-    , fPos_p1(54.7)
-    , fDispersionS2(7000)
-    , fBrho0_S2toCC(9.458)
-    , fP0(-2.12371e7)
-    , fP1(4.9473e7)
-    , fP2(-2.87635e7)
-    , fZprimary(50.)
-    , fZoffset(-1.3)
-    , fPos2min(-200.)
-    , fPos2max(200.)
-    , ZMUSIC_cut(50)
-    , ZMUSIC_wcut(0.5)
-    , fOnline(kFALSE)
+    : R3BOnlineSpectraLosVsSci2("R3BOnlineSpectraLosVsSci2", 1)
 {
 }
 
@@ -102,7 +75,7 @@ R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2(const char* name, Int_t iVe
     , fNEvents(0)
     , fTcalSci2(NULL)
     , fHitItemsMus(NULL)
-    , fFrsDataCA(NULL)
+    //, fFrsDataCA(NULL)
     , fToFoffset(0)
     , fToFmin(-5000)
     , fToFmax(5000)
@@ -130,10 +103,10 @@ R3BOnlineSpectraLosVsSci2::~R3BOnlineSpectraLosVsSci2()
         delete fTcalSci2;
     if (fHitItemsMus)
         delete fHitItemsMus;
-    if (fFrsDataCA)
-    {
-        delete fFrsDataCA;
-    }
+    /* if (fFrsDataCA)
+     {
+         delete fFrsDataCA;
+     }*/
 }
 
 InitStatus R3BOnlineSpectraLosVsSci2::Init()
@@ -142,7 +115,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraLosVsSci2::Init ";
+    LOG(INFO) << "R3BOnlineSpectraLosVsSci2::Init()";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -151,9 +124,9 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
 
@@ -185,7 +158,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
         LOG(WARNING) << "R3BOnlineSpectraLosVsSci2: MusicHitData not found";
 
     // OUTPUT DATA
-    fFrsDataCA = new TClonesArray("R3BFrsData", 5);
+    /*fFrsDataCA = new TClonesArray("R3BFrsData", 5);
     if (!fOnline)
     {
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kTRUE);
@@ -193,7 +166,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     else
     {
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kFALSE);
-    }
+    }*/
 
     // MAIN FOLDER-ID
     TFolder* mainfolId = new TFolder("FRS_ID", "FRS ID info");
@@ -656,16 +629,6 @@ void R3BOnlineSpectraLosVsSci2::Reset_LosVsSci2_Histo()
 
 void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
 {
-    //  cout << "fNEvents " << fNEvents << endl;
-
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-    {
-        // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
-        return;
-    }
-
     double Zmusic = 0., Music_ang = 0.;
     if (fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
     {
@@ -1330,7 +1293,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
                         fh2_AoQ_cut->Fill(AoQ_m1);
                     fh2_Pos2vsAoQ_m1->Fill(PosCal_m1, AoQ_m1);
 
-                    AddData(1, 2, zcorang, AoQ_m1, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                    // AddData(1, 2, zcorang, AoQ_m1, Beta_m1, Brho_m1, PosCal_m1, 0.);
                 }
             }
         } // for iDet
@@ -1397,14 +1360,14 @@ void R3BOnlineSpectraLosVsSci2::FinishTask()
     fh2_MusZcorvsAng->Write();
     fh2_ZvsAoQ_m1->Write();
     fh2_ZvsAoQ_m1_cor->Write();
-    fh2_ZvsAoQ_m1_cor_tpat->Write();
+    fh2_ZvsAoQ_m1_cor_tpat_los->Write();
     fh2_ZvsBeta_m1->Write();
     fh2_ZcorvsBeta_m1->Write();
     fh2_Pos2vsAoQ_m1->Write();
 
     cout << "FinishTask: All events: " << fNEvents << ", LOS events: " << nLosEvents << endl;
 }
-
+/*
 // -----   Private method AddData  --------------------------------------------
 R3BFrsData* R3BOnlineSpectraLosVsSci2::AddData(Int_t StaId,
                                                Int_t StoId,
@@ -1420,5 +1383,5 @@ R3BFrsData* R3BOnlineSpectraLosVsSci2::AddData(Int_t StaId,
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc);
 }
-
-ClassImp(R3BOnlineSpectraLosVsSci2)
+*/
+ClassImp(R3BOnlineSpectraLosVsSci2);

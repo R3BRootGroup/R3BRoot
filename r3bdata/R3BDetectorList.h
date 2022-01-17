@@ -122,7 +122,8 @@ enum fDetectorType
     kFI32Point,
     kFI33Point,
     kSFIPoint,
-    kMUSICPoint
+    kMUSICPoint,
+    kLOSPoint
 #ifdef SOFIA
     ,
     kSOFSCIPoint,

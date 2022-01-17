@@ -49,6 +49,7 @@ R3BSci2Tcal2Hit::R3BSci2Tcal2Hit(const char* name, Int_t iVerbose)
 
 R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
 {
+    LOG(DEBUG) << "R3BSci2Tcal2Hit::Destructor";
     if (fHitItems)
     {
         delete fHitItems;
@@ -153,7 +154,6 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
 
 void R3BSci2Tcal2Hit::FinishEvent()
 {
-
     if (fHitItems)
     {
         fHitItems->Clear();

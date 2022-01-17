@@ -23,6 +23,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BLogger.h"
 #include "R3BTGeoPar.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
@@ -40,7 +41,7 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalCalData(NULL)
     , fCalifaHitData(NULL)
-    , fGeometryVersion(2020) // BARREL+iPhos
+    , fGeometryVersion(2021) // BARREL+iPhos
     , fThreshold(0.)         // no threshold
     , fDRThreshold(15000)    // in keV, for real data (15000 = 15MeV)
     , fDeltaPolar(0.25)
@@ -58,10 +59,9 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit: Delete instance";
+    R3BLOG(DEBUG1, "");
     if (fCalifaHitData)
         delete fCalifaHitData;
-    // do not delete fCalifaGeo. It's a pointer to a static instance
 }
 
 void R3BCalifaCrystalCal2Hit::SetParContainers()
@@ -73,17 +73,12 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
     fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
     if (!fCalifaGeoPar || !fTargetGeoPar)
     {
-        if (!fCalifaGeoPar)
-            LOG(WARNING)
-                << "R3BCalifaCrystalCal2Hit::SetParContainers() : Could not get access to CalifaGeoPar container.";
-
-        if (!fTargetGeoPar)
-            LOG(WARNING)
-                << "R3BCalifaCrystalCal2Hit::SetParContainers() : Could not get access to TargetGeoPar container.";
+        R3BLOG_IF(WARNING, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container.");
+        R3BLOG_IF(WARNING, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
         return;
     }
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() : Container CalifaGeoPar found.";
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() : Container TargetGeoPar found.";
+    R3BLOG(INFO, "Container CalifaGeoPar found.");
+    R3BLOG(INFO, "Container TargetGeoPar found.");
 
     fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
     fCalifaPos.SetXYZ(fCalifaGeoPar->GetPosX(), fCalifaGeoPar->GetPosY(), fCalifaGeoPar->GetPosZ());
@@ -92,11 +87,11 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init()";
+    R3BLOG(INFO, "");
     assert(!fCalifaHitData); // in case someone calls Init() twice.
+
     FairRootManager* ioManager = FairRootManager::Instance();
-    if (!ioManager)
-        LOG(fatal) << "R3BCalifaCrystalCal2Hit::Init() FairRootManager not found";
+    R3BLOG_IF(fatal, !ioManager, "FairRootManager not found");
 
     fCrystalCalData = (TClonesArray*)ioManager->GetObject("CalifaCrystalCalData");
 
@@ -105,18 +100,17 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
     ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitData, !fOnline);
 
     fCalifaGeo = R3BCalifaGeometry::Instance();
-    if (!fCalifaGeo->Init(fGeometryVersion))
-        LOG(ERROR) << "R3BCalifaCrystalCal2Hit::Init() Califa geometry not found";
+    R3BLOG_IF(ERROR, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
 
     // Determine CALIFA position with respect to target
     if (fCalifaGeo->IsSimulation())
     {
-        LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() simulation configuration.";
+        R3BLOG(INFO, "Simulation configuration.");
         fCalifatoTargetPos = 2.0 * fTargetPos - fCalifaPos;
     }
     else
     {
-        LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() analysis configuration.";
+        R3BLOG(INFO, "Analysis configuration.");
         fCalifatoTargetPos = fTargetPos - fCalifaPos;
     }
 
@@ -213,8 +207,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
     // ALGORITHMS FOR HIT FINDING
     // Nb of CrystalHits in current event
     const int numCrystalHits = fCrystalCalData->GetEntries();
-    LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): crystal hits at start: " << numCrystalHits
-               << "  ********************************";
+    R3BLOG(DEBUG, "Crystal hits at start:" << numCrystalHits);
 
     if (numCrystalHits)
     {
@@ -239,7 +232,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         for (auto& aCalData : TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalCalData))
             crystalId2Pos[aCalData.GetCrystalId()] = &aCalData;
 
-        LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec():  crystalId2Pos.size()=" << crystalId2Pos.size();
+        R3BLOG(DEBUG, "crystalId2Pos.size()=" << crystalId2Pos.size());
 
         for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
             if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
@@ -255,8 +248,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
                 // not a hit where two ranges were hit
                 addHit(k1.second);
     }
-    LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): after uniquifying, we have " << unusedCrystalHits.size()
-               << " crystal hits.";
+    R3BLOG(DEBUG, "after uniquifying, we have " << unusedCrystalHits.size() << " crystal hits.");
 
     unusedCrystalHits.sort(
         [](R3BCalifaCrystalCalData* lhs, R3BCalifaCrystalCalData* rhs) { return lhs->GetEnergy() > rhs->GetEnergy(); });
@@ -295,7 +287,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 void R3BCalifaCrystalCal2Hit::Reset()
 {
     // Clear the CA structure
-    LOG(DEBUG) << "Clearing CalifaHitData Structure";
+    R3BLOG(DEBUG, "Clearing CalifaHitData Structure");
     if (fCalifaHitData)
         fCalifaHitData->Clear();
 }
@@ -303,20 +295,19 @@ void R3BCalifaCrystalCal2Hit::Reset()
 void R3BCalifaCrystalCal2Hit::SelectGeometryVersion(Int_t version)
 {
     fGeometryVersion = version;
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SelectGeometryVersion to " << fGeometryVersion;
+    R3BLOG(INFO, "to " << fGeometryVersion);
 }
 
 void R3BCalifaCrystalCal2Hit::SetCrystalThreshold(Double_t thresholdEne)
 {
     fThreshold = thresholdEne;
-
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetCrystalThreshold to " << fThreshold << " keV.";
+    R3BLOG(INFO, "to " << fThreshold << " keV.");
 }
 
 void R3BCalifaCrystalCal2Hit::SetDRThreshold(Double_t DRthresholdEne)
 {
     fDRThreshold = DRthresholdEne;
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetDRThreshold to " << fDRThreshold << " keV.";
+    R3BLOG(INFO, "to " << fDRThreshold << " keV.");
 }
 
 TVector3 R3BCalifaCrystalCal2Hit::GetAnglesVector(int id) { return fCalifaGeo->GetAngles(id); }

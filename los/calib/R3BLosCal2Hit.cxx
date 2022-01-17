@@ -66,6 +66,8 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
     , flosVeffYQ(1.)
     , flosOffsetXQ(0.)
     , flosOffsetYQ(0.)
+    , fOptHisto(kFALSE)
+    , fOnline(kFALSE)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
     fhTres_M = NULL;
@@ -135,6 +137,7 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
 
 R3BLosCal2Hit::~R3BLosCal2Hit()
 {
+    LOG(DEBUG) << "R3BLosCal2Hit::Destructor";
     if (fhTres_M)
         delete (fhTres_M);
     if (fhTres_T)
@@ -305,14 +308,21 @@ InitStatus R3BLosCal2Hit::Init()
     if (NULL == mgr)
         LOG(ERROR) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
-        LOG(ERROR) << "Branch LosCal not found";
+    {
+        LOG(FATAL) << "Branch LosCal not found";
+        return kFATAL;
+    }
 
     // request storage of Hit data in output tree
-    mgr->Register("LosHit", "Land", fHitItems, kTRUE);
+    mgr->Register("LosHit", "LosHit", fHitItems, !fOnline);
+
+    fHitItems->Clear();
 
     Icount = 0;
 
@@ -379,6 +389,10 @@ InitStatus R3BLosCal2Hit::Init()
         }
     }
 
+    // if fOptHisto = true histograms are created
+    if (fOptHisto)
+        CreateHisto();
+
     // cout << "R3BLosCal2Hit::Init END" << endl;
     SetParameter();
     return kSUCCESS;
@@ -420,7 +434,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
     Int_t nHits = fCalItems->GetEntries();
 
-    if (nHits < 1)
+    if (nHits == 0)
         return;
 
     // missing times are NAN, hence other times will also
@@ -491,41 +505,35 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
     Int_t nDet = 0;
 
-    // if OptHisto = true histograms are created
-    if (OptHisto)
-        CreateHisto();
-
+    R3BLosCalData** calItem = new R3BLosCalData*[nHits];
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
-        R3BLosCalData* calItem = (R3BLosCalData*)fCalItems->At(ihit);
+        calItem[ihit] = (R3BLosCalData*)(fCalItems->At(ihit));
 
-        nDet = calItem->GetDetector();
+        nDet = calItem[ihit]->GetDetector();
 
         // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7
         for (Int_t iCha = 0; iCha < 8; iCha++)
         {
             time_V[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeV_ns(iCha))))
+            if (!(IS_NAN(calItem[ihit]->GetTimeV_ns(iCha))))
             { // VFTX
-                time_V[ihit][iCha] = calItem->GetTimeV_ns(iCha);
+                time_V[ihit][iCha] = calItem[ihit]->GetTimeV_ns(iCha);
             }
             time_L[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeL_ns(iCha))))
+            if (!(IS_NAN(calItem[ihit]->GetTimeL_ns(iCha))))
             { // TAMEX leading
-                time_L[ihit][iCha] = calItem->GetTimeL_ns(iCha);
+                time_L[ihit][iCha] = calItem[ihit]->GetTimeL_ns(iCha);
             }
             time_T[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem->GetTimeT_ns(iCha))))
+            if (!(IS_NAN(calItem[ihit]->GetTimeT_ns(iCha))))
             { // TAMEX trailing
-                time_T[ihit][iCha] = calItem->GetTimeT_ns(iCha);
+                time_T[ihit][iCha] = calItem[ihit]->GetTimeT_ns(iCha);
             }
         }
-        if (!calItem)
-        {
-            cout << " !calItem" << endl;
-            continue; // can this happen?
-        }
+        if (calItem)
+            delete[] calItem;
     }
 
     // Sorting VFTX data:
@@ -694,10 +702,10 @@ void R3BLosCal2Hit::Exec(Option_t* option)
             x_cm[ihit] = xV_cm[ihit];
             y_cm[ihit] = yV_cm[ihit];
             Z[ihit] = totsum_corr[ihit] * fp1 + fp0;
-            //Z[ihit] = totsum_corr[ihit];
+            // Z[ihit] = totsum_corr[ihit];
             t_hit[ihit] = timeLosM_corr[ihit];
 
-            if (OptHisto && nPMV == 8 && nPMT == 8 && Igood_event)
+            if (fOptHisto && nPMV == 8 && nPMT == 8 && Igood_event)
             {
                 // MCFD times:
                 fhTres_M->Fill(LosTresM[ihit]);
@@ -800,8 +808,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
         } // end of LOSTYPE = true
 
-        new ((*fHitItems)[fNofHitItems]) R3BLosHitData(nDet, t_hit[ihit], x_cm[ihit], y_cm[ihit], Z[ihit]);
-        fNofHitItems += 1;
+        new ((*fHitItems)[fHitItems->GetEntriesFast()])
+            R3BLosHitData(nDet, t_hit[ihit], x_cm[ihit], y_cm[ihit], Z[ihit]);
 
         Icount++;
     }
@@ -1266,8 +1274,8 @@ void R3BLosCal2Hit::CreateHisto()
         char strName[255];
         sprintf(strName, "TreswcT_vs_dt");
         fhTreswcTvsIcount = new TH2F(strName, "", 6000, 0, 3000, fhTbin, fhTmin, fhTmax);
-        fhTreswcMvsIcount->GetXaxis()->SetTitle("time between two hits / ns");
-        fhTreswcMvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
+        fhTreswcTvsIcount->GetXaxis()->SetTitle("time between two hits / ns");
+        fhTreswcTvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
     if (NULL == fh_los_dt_hits_ToT_corr)
@@ -1280,7 +1288,6 @@ void R3BLosCal2Hit::CreateHisto()
 
 void R3BLosCal2Hit::FinishEvent()
 {
-
     if (fHitItems)
     {
         fHitItems->Clear();
@@ -1290,7 +1297,7 @@ void R3BLosCal2Hit::FinishEvent()
 
 void R3BLosCal2Hit::FinishTask()
 {
-    if (OptHisto)
+    if (fOptHisto)
     {
         if (fhTres_M)
             fhTres_M->Write();
@@ -1470,4 +1477,4 @@ Double_t R3BLosCal2Hit::satu(Int_t inum, Double_t tot, Double_t dt)
     return ysc;
 }
 
-ClassImp(R3BLosCal2Hit)
+ClassImp(R3BLosCal2Hit);
