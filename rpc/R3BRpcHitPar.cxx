@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,27 +11,42 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#include "R3BRpcHitPar.h"
+#include "TMath.h"
+#include <iostream>
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+R3BRpcHitPar::R3BRpcHitPar(const char* name, const char* title, const char* context)
+    : FairParGenericSet(name, title, context)
+{
+    clear();
+}
 
-#pragma link C++ class R3BRpc+;
-#pragma link C++ class R3BRpcContFact;
-#pragma link C++ class R3BRpcDigitizer+;
+void R3BRpcHitPar::putParams(FairParamList* list)
+{
+    std::cout << "-I- R3BRpcHitPar::putParams() called" << std::endl;
 
-#pragma link C++ class R3BRpcMapped2Cal+;
-#pragma link C++ class R3BRpcMapped2CalPar+;
-#pragma link C++ class R3BRpcCalPar+;
+    if (!list)
+        return;
+    list->add("fExample", (Double_t)fExample);
+}
 
-#pragma link C++ class R3BRpcCal2Hit+;
-#pragma link C++ class R3BRpcCal2HitPar+;
-#pragma link C++ class R3BRpcHitPar+;
+Bool_t R3BRpcHitPar::getParams(FairParamList* list)
+{
+    std::cout << "-I- R3BRpcHitPar::getParams() called" << std::endl;
+    if (!list)
+        return kFALSE;
+    std::cout << "-I- R3BRpcHitPar::getParams() 1 ";
 
-#pragma link C++ class R3BRpcPars4Sim+;
+    if (!list->fill("fExample", &fExample, 1))
+        return kFALSE;
 
-//#pragma link C++ class R3BRpcOnlineSpectra+;
+    return kTRUE;
+}
 
+void R3BRpcHitPar::Print(Option_t* option) const
+{
+    std::cout << "-I- CALIFA HitFinder Parameters:" << std::endl;
+    std::cout << "fExample " << fExample << std::endl;
+}
 
-#endif
+ClassImp(R3BRpcHitPar);

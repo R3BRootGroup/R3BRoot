@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,27 +11,37 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BRPCHITPAR_H
+#define R3BRPCHITPAR_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include <TObjString.h>
+#include <TVector3.h>
 
-#pragma link C++ class R3BRpc+;
-#pragma link C++ class R3BRpcContFact;
-#pragma link C++ class R3BRpcDigitizer+;
+#include "FairParGenericSet.h"
+#include "FairParamList.h"
 
-#pragma link C++ class R3BRpcMapped2Cal+;
-#pragma link C++ class R3BRpcMapped2CalPar+;
-#pragma link C++ class R3BRpcCalPar+;
+class R3BRpcHitPar : public FairParGenericSet
+{
+  public:
+    R3BRpcHitPar(const char* name = "R3BRpcHitPar",
+                 const char* title = "RPC Hit Finder Parameters",
+                 const char* context = "TestDefaultContext");
+    ~R3BRpcHitPar(void){};
+    void clear(void){};
+    void putParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list);
 
-#pragma link C++ class R3BRpcCal2Hit+;
-#pragma link C++ class R3BRpcCal2HitPar+;
-#pragma link C++ class R3BRpcHitPar+;
+    void Print(Option_t* option = "") const;
+    /** Accessor functions **/
+    const Double_t GetExample() { return fExample; }
 
-#pragma link C++ class R3BRpcPars4Sim+;
+    void SetExample(Double_t value) { fExample = value; }
 
-//#pragma link C++ class R3BRpcOnlineSpectra+;
+  private:
+    // Whatever
+    Double_t fExample;
 
+    ClassDef(R3BRpcHitPar, 1); //
+};
 
-#endif
+#endif /* !R3BRPCHITPAR_H*/

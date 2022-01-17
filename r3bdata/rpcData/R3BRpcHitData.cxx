@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,27 +11,33 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#include "R3BRpcHitData.h"
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+R3BRpcHitData::R3BRpcHitData()
+    : FairMultiLinkedData()
+    , fChannelId(0)
+    // MODIFY ME!!!!!!!!!!!!!!!!!
+    , fEnergy(NAN)
+    , fTime(NAN)
+{
+}
 
-#pragma link C++ class R3BRpc+;
-#pragma link C++ class R3BRpcContFact;
-#pragma link C++ class R3BRpcDigitizer+;
+R3BRpcHitData::R3BRpcHitData(UInt_t ch, Double_t ene, Double_t tim)
+    : FairMultiLinkedData()
+    , fChannelId(ch)
+    // MODIFY ME!!!!!!!!!!!!!!!!!
+    , fEnergy(ene)
+    , fTime(tim)
+{
+}
 
-#pragma link C++ class R3BRpcMapped2Cal+;
-#pragma link C++ class R3BRpcMapped2CalPar+;
-#pragma link C++ class R3BRpcCalPar+;
+R3BRpcHitData::R3BRpcHitData(const R3BRpcHitData& right)
+    : FairMultiLinkedData(right)
+    , fChannelId(right.fChannelId)
+    // MODIFY ME!!!!!!!!!!!!!!!!!
+    , fEnergy(right.fEnergy)
+    , fTime(right.fTime)
+{
+}
 
-#pragma link C++ class R3BRpcCal2Hit+;
-#pragma link C++ class R3BRpcCal2HitPar+;
-#pragma link C++ class R3BRpcHitPar+;
-
-#pragma link C++ class R3BRpcPars4Sim+;
-
-//#pragma link C++ class R3BRpcOnlineSpectra+;
-
-
-#endif
+ClassImp(R3BRpcHitData);

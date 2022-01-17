@@ -13,10 +13,10 @@
 ##############################################################################
 
 # Create a library called "libR3BRpc" which includes the source files given
-# in the array. The extension is already found. Any number of sources could be 
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
@@ -26,6 +26,9 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/rpc
+${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -34,13 +37,23 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-) 
+)
 
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-# R3BRpc.cxx
+R3BRpc.cxx
+R3BRpcContFact.cxx
+R3BRpcDigitizer.cxx
+R3BRpcMapped2Cal.cxx
+R3BRpcMapped2CalPar.cxx
+R3BRpcCalPar.cxx
+R3BRpcCal2Hit.cxx
+R3BRpcCal2HitPar.cxx
+R3BRpcHitPar.cxx
+R3BRpcPars4Sim.cxx
+#R3BRpcOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files
@@ -49,8 +62,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF RpcLinkDef.h)
 set(LIBRARY_NAME R3BRpc)
+
 set(DEPENDENCIES
     R3Bbase R3BData)
 
 GENERATE_LIBRARY()
-

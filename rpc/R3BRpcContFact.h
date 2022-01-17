@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,27 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BRPCCONTFACT_H
+#define R3BRPCCONTFACT_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "FairContFact.h"
 
-#pragma link C++ class R3BRpc+;
-#pragma link C++ class R3BRpcContFact;
-#pragma link C++ class R3BRpcDigitizer+;
+class FairContainer;
 
-#pragma link C++ class R3BRpcMapped2Cal+;
-#pragma link C++ class R3BRpcMapped2CalPar+;
-#pragma link C++ class R3BRpcCalPar+;
+class R3BRpcContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
 
-#pragma link C++ class R3BRpcCal2Hit+;
-#pragma link C++ class R3BRpcCal2HitPar+;
-#pragma link C++ class R3BRpcHitPar+;
+  public:
+    R3BRpcContFact();
+    ~R3BRpcContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    ClassDef(R3BRpcContFact, 0) // Factory for all RPC parameter containers
+};
 
-#pragma link C++ class R3BRpcPars4Sim+;
-
-//#pragma link C++ class R3BRpcOnlineSpectra+;
-
-
-#endif
+#endif /* !R3BRPCCONTFACT_H */
