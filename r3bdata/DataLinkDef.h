@@ -66,9 +66,14 @@
 #pragma link C++ class R3BRpcPmtMappedData+;
 #pragma link C++ class R3BRpcRefMappedData+;
 #pragma link C++ class R3BRpcStripMappedData+;
-#pragma link C++ class R3BRpcCalData+;
-#pragma link C++ class R3BRpcHitData+;
+#pragma link C++ class R3BRpcPmtPreCalData+;
+#pragma link C++ class R3BRpcStripPreCalData+;
+#pragma link C++ class R3BRpcPmtCalData+;
+#pragma link C++ class R3BRpcStripCalData+;
+#pragma link C++ class R3BRpcPmtHitData+;
+#pragma link C++ class R3BRpcStripHitData+;
 #pragma link C++ class R3BRpcPoint+;
+
 #pragma link C++ class R3BWRData+;
 #pragma link C++ class R3BTrloiiData+;
 

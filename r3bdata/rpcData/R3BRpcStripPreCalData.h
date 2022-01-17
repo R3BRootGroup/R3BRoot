@@ -11,47 +11,49 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRpcPmtMappedData_H
-#define R3BRpcPmtMappedData_H
+#ifndef R3BRPCSTRIPPRECALDATA_H
+#define R3BRPCSTRIPPRECALDATA_H
 
+#include "FairMultiLinkedData.h"
 #include "TObject.h"
-#include <stdint.h>
 
-class R3BRpcPmtMappedData : public TObject
+class R3BRpcStripPreCalData : public FairMultiLinkedData
 {
-
   public:
-    // Default Constructor
-    R3BRpcPmtMappedData();
+    /** Default constructor **/
+    R3BRpcStripPreCalData();
+
 
     /** Standard Constructor
      *@param channelId   Channel unique identifier
-     *@param fineTime    Fine Time
-     *@param coarseTime  Coarse Time
-     *@param edge        Leading or Trailing
-     *@param side        Side
+     *@param Time        Time
+     *@param Tot         Coarse Time
+     *@param Side        left or right
      **/
-    R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge, UShort_t Side);
+    R3BRpcStripPreCalData(UShort_t channelId, double Time, double Tot, UShort_t Side);
 
-    // Destructor
-    virtual ~R3BRpcPmtMappedData() {}
+    /** Copy constructor **/
+    R3BRpcStripPreCalData(const R3BRpcStripPreCalData&);
 
-    // Getters
+    R3BRpcStripPreCalData& operator=(const R3BRpcStripPreCalData&) { return *this; }
+
+    /** Destructor **/
+    virtual ~R3BRpcStripPreCalData() {}
+
+    /** Accessors **/
     inline UShort_t GetChannelId() const { return fChannelId; }
-    inline uint64_t GetCoarseTime() const { return fCoarseTime; }
-    inline uint64_t GetFineTime() const { return fFineTime; }
-    inline Int_t GetEdge() const { return fEdge; }
+    inline double GetTime() const { return fTime; }
+    inline double GetTot() const { return fTot; }
     inline UShort_t GetSide() const { return fSide; }
 
   protected:
     UShort_t fChannelId;     // Channel unique identifier
-    uint64_t fFineTime;      // Fine time
-    uint64_t fCoarseTime;    // Coarse time
-    Int_t fEdge;             // Leading or Trailing
+    double fTime;      // Fine time
+    double fTot;    // Coarse time
     Short_t fSide;           // Top Or Bottom
 
   public:
-    ClassDef(R3BRpcPmtMappedData, 1)
+    ClassDef(R3BRpcStripPreCalData, 1)
 };
 
 #endif

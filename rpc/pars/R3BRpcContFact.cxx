@@ -18,7 +18,7 @@
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BRpcCalPar.h"
+#include "R3BRpcTotCalPar.h"
 #include "R3BRpcHitPar.h"
 #include "R3BRpcPars4Sim.h"
 #include "R3BTGeoPar.h"
@@ -41,7 +41,7 @@ void R3BRpcContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them
     // to the list of containers for the RPC library.
 
-    FairContainer* p1 = new FairContainer("RpcCalPar", "RPC Calibration Parameters", "RPCCalParContext");
+    FairContainer* p1 = new FairContainer("RpcTotCalPar", "RPC Calibration Parameters", "RPCCalParContext");
     p1->addContext("RPCCalParContext");
     containers->Add(p1);
 
@@ -68,9 +68,9 @@ FairParSet* R3BRpcContFact::createContainer(FairContainer* c)
     const char* name = c->GetName();
     LOG(INFO) << "R3BRpcContFact: Create container name: " << name;
     FairParSet* p = 0;
-    if (strcmp(name, "RpcCalPar") == 0)
+    if (strcmp(name, "RpcTotCalPar") == 0)
     {
-        p = new R3BRpcCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+        p = new R3BRpcTotCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     else if (strcmp(name, "RpcHitPar") == 0)
     {

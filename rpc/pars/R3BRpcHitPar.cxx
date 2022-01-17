@@ -12,41 +12,108 @@
  ******************************************************************************/
 
 #include "R3BRpcHitPar.h"
+
+#include "FairLogger.h"
+#include "FairParamList.h"
+
 #include "TMath.h"
+#include "TString.h"
+
 #include <iostream>
 
+// ---- Standard Constructor ---------------------------------------------------
 R3BRpcHitPar::R3BRpcHitPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
+    , fNumChannels(N_STRIP_NB)
+    , fHitCalParams1(new TArrayF(N_STRIP_NB))
+    , fHitCalParams2(new TArrayF(N_STRIP_NB))
+{
+}
+
+// ----  Destructor ------------------------------------------------------------
+R3BRpcHitPar::~R3BRpcHitPar()
 {
     clear();
+    delete fHitCalParams1;
+    delete fHitCalParams2;
 }
 
+// ----  Method clear ----------------------------------------------------------
+void R3BRpcHitPar::clear()
+{
+    status = kFALSE;
+    resetInputVersions();
+}
+
+// ----  Method putParams ------------------------------------------------------
 void R3BRpcHitPar::putParams(FairParamList* list)
 {
-    std::cout << "-I- R3BRpcHitPar::putParams() called" << std::endl;
-
+    LOG(INFO) << "RpcHitPar::putParams() called";
     if (!list)
+    {
         return;
-    list->add("fExample", (Double_t)fExample);
+    }
+
+    Int_t array_size = fNumChannels;
+    LOG(INFO) << "Array Size: " << array_size;
+
+    fHitCalParams1->Set(array_size);
+    fHitCalParams2->Set(array_size);
+
+    list->add("RpcHitPar1", *fHitCalParams1);
+    list->add("RpcHitPar2", *fHitCalParams2);
+    list->add("RPCChannelsNumberPar", fNumChannels);
 }
 
+// ----  Method getParams ------------------------------------------------------
 Bool_t R3BRpcHitPar::getParams(FairParamList* list)
 {
-    std::cout << "-I- R3BRpcHitPar::getParams() called" << std::endl;
+    LOG(INFO) << "RpcHitPar::getParams() called";
     if (!list)
+    {
         return kFALSE;
-    std::cout << "-I- R3BRpcHitPar::getParams() 1 ";
+    }
 
-    if (!list->fill("fExample", &fExample, 1))
+    if (!list->fill("RPCChannelsNumberPar", &fNumChannels))
+    {
         return kFALSE;
+    }
+
+    Int_t array_size = fNumChannels;
+    LOG(INFO) << "Nb_channels: " << array_size;
+    fHitCalParams1->Set(array_size);
+    fHitCalParams2->Set(array_size);
+
+    if (!(list->fill("RpcHitPar1", fHitCalParams1)))
+    {
+        LOG(INFO) << "---Could not initialize RpcHitPar1";
+        return kFALSE;
+    }
+
+    if (!(list->fill("RpcHitPar2", fHitCalParams2)))
+    {
+        LOG(INFO) << "---Could not initialize RpcHitPar1";
+        return kFALSE;
+    }
 
     return kTRUE;
 }
 
-void R3BRpcHitPar::Print(Option_t* option) const
+// ----  Method print ----------------------------------------------------------
+void R3BRpcHitPar::print() { printParams(); }
+
+// ----  Method printParams ----------------------------------------------------
+void R3BRpcHitPar::printParams()
 {
-    std::cout << "-I- CALIFA HitFinder Parameters:" << std::endl;
-    std::cout << "fExample " << fExample << std::endl;
+    LOG(INFO) << "RpcHitPar::RPC Calibration Parameters: ";
+    Int_t array_size = fNumChannels;
+
+    for (Int_t i = 0; i < fNumChannels; i++)
+    {
+        LOG(INFO) << "Channel number: " << i + 1;
+        LOG(INFO) << "Param1= " << fHitCalParams1->GetAt(i);
+        LOG(INFO) << "Param2= " << fHitCalParams2->GetAt(i);
+    }
 }
 
-ClassImp(R3BRpcHitPar);
+ClassImp(R3BRpcHitPar)

@@ -23,11 +23,15 @@
 #pragma link C++ class R3BRpcContFact;
 #pragma link C++ class R3BRpcDigitizer+;
 
-#pragma link C++ class R3BRpcMapped2Cal+;
-#pragma link C++ class R3BRpcMapped2CalPar+;
-#pragma link C++ class R3BRpcCalPar+;
+#pragma link C++ class R3BRpcMapped2PreCalPar+;
+#pragma link C++ class R3BRpcMapped2PreCal+;
 
-#pragma link C++ class R3BRpcCal2Hit+;
+#pragma link C++ class R3BRpcPreCal2CalPar+;
+#pragma link C++ class R3BRpcPreCal2Cal+;
+
+#pragma link C++ class R3BRpcTotCalPar+;
+
+//#pragma link C++ class R3BRpcCal2Hit+;
 #pragma link C++ class R3BRpcCal2HitPar+;
 #pragma link C++ class R3BRpcHitPar+;
 

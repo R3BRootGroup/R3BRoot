@@ -45,6 +45,7 @@ void R3BTCalContFact::setAllContainers()
      *  them to the list of containers.*/
     addContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters");
     addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
+    addContainer("RpcTCalPar", "Rpc TCAL Calibration Parameters");
     addContainer("RoluTCalPar", "ROLU TCAL Calibration Parameters");
     addContainer("Sci2TCalPar", "SCI2 TCAL Calibration Parameters");
     addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
@@ -90,6 +91,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
 
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
+    containerNames.push_back("RpcTCalPar");
     containerNames.push_back("RoluTCalPar");
     containerNames.push_back("Sci2TCalPar");
     containerNames.push_back("Sci8TCalPar");

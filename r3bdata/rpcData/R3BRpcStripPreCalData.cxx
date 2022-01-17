@@ -11,33 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcHitData.h"
+#include "R3BRpcStripPreCalData.h"
 
-R3BRpcHitData::R3BRpcHitData()
+R3BRpcStripPreCalData::R3BRpcStripPreCalData()
     : FairMultiLinkedData()
     , fChannelId(0)
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    , fEnergy(NAN)
-    , fTime(NAN)
+    , fTime(0)
+    , fTot(0)
+    , fSide(0)
 {
 }
 
-R3BRpcHitData::R3BRpcHitData(UInt_t ch, Double_t ene, Double_t tim)
+R3BRpcStripPreCalData::R3BRpcStripPreCalData(UShort_t channelId, double Time, double Tot, UShort_t Side)
     : FairMultiLinkedData()
-    , fChannelId(ch)
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    , fEnergy(ene)
-    , fTime(tim)
+    , fChannelId(channelId)
+    , fTime(Time)
+    , fTot(Tot)
+    , fSide(Side)
 {
 }
 
-R3BRpcHitData::R3BRpcHitData(const R3BRpcHitData& right)
-    : FairMultiLinkedData(right)
-    , fChannelId(right.fChannelId)
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    , fEnergy(right.fEnergy)
-    , fTime(right.fTime)
-{
-}
-
-ClassImp(R3BRpcHitData);
+ClassImp(R3BRpcStripPreCalData);

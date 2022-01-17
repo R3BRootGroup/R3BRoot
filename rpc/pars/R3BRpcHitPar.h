@@ -13,33 +13,55 @@
 
 #ifndef R3BRPCHITPAR_H
 #define R3BRPCHITPAR_H
+// 41 Strips +  5 Bars
+#define N_STRIP_NB (41 + 5)
 
 #include <TObjString.h>
 #include <TVector3.h>
 
+#include "TArrayF.h"
 #include "FairParGenericSet.h"
 #include "FairParamList.h"
 
 class R3BRpcHitPar : public FairParGenericSet
 {
   public:
-    R3BRpcHitPar(const char* name = "R3BRpcHitPar",
+    /** Standard constructor **/
+    R3BRpcHitPar(const char* name = "RpcHitPar",
                  const char* title = "RPC Hit Finder Parameters",
                  const char* context = "TestDefaultContext");
-    ~R3BRpcHitPar(void){};
-    void clear(void){};
-    void putParams(FairParamList* list);
+    /** Destructor **/
+    virtual ~R3BRpcHitPar();
+
+    /** Method to reset all parameters **/
+    virtual void clear();
+
+    /** Method to store all parameters using FairRuntimeDB **/
+    virtual void putParams(FairParamList* list);
+
+    /** Method to retrieve all parameters using FairRuntimeDB**/
     Bool_t getParams(FairParamList* list);
 
-    void Print(Option_t* option = "") const;
-    /** Accessor functions **/
-    const Double_t GetExample() { return fExample; }
+    /** Method to print values of parameters to the standard output **/
+    virtual void print();
+    void printParams();
 
-    void SetExample(Double_t value) { fExample = value; }
+    /** Accessor functions **/
+    const Double_t GetNumChannels() { return fNumChannels; }
+    TArrayF* GetCalParams1() { return fHitCalParams1; }
+    TArrayF* GetCalParams2() { return fHitCalParams2; }
+
+    void SetNumChannels(Int_t numberCha) { fNumChannels = numberCha; }
+    void SetCalParams1(Float_t cc, Int_t ii) { fHitCalParams1->AddAt(cc, ii); }
+    void SetCalParams2(Float_t cc, Int_t ii) { fHitCalParams2->AddAt(cc, ii); }
 
   private:
-    // Whatever
-    Double_t fExample;
+    TArrayF* fHitCalParams1; /*< Calibration Parameters of Pos 1>*/
+    TArrayF* fHitCalParams2; /*< Calibration Parameters of Pos 2>*/
+    Int_t fNumChannels;  /*< number of channels>*/
+
+    const R3BRpcHitPar& operator=(const R3BRpcHitPar&);
+    R3BRpcHitPar(const R3BRpcHitPar&);
 
     ClassDef(R3BRpcHitPar, 1); //
 };

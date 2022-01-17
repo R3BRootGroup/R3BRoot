@@ -37,11 +37,11 @@ class R3BRpcStripMappedData : public TObject
     virtual ~R3BRpcStripMappedData() {}
 
     // Getters
-    inline const UShort_t& GetStripId() const { return fStripId; }
-    inline const uint64_t& GetCoarseTime() const { return fCoarseTime; }
-    inline const uint64_t& GetFineTime() const { return fFineTime; }
-    inline const UShort_t& GetEdge() const { return fEdge; }
-    inline const UShort_t& GetSide() const { return fSide; }
+    inline UShort_t GetStripId() const { return fStripId; }
+    inline uint64_t GetCoarseTime() const { return fCoarseTime; }
+    inline uint64_t GetFineTime() const { return fFineTime; }
+    inline UShort_t GetEdge() const { return fEdge; }
+    inline UShort_t GetSide() const { return fSide; }
 
 
   protected:

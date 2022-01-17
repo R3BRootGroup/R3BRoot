@@ -74,6 +74,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 )
 
 set(LINK_DIRECTORIES

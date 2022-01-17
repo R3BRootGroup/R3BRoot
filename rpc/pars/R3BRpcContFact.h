@@ -27,7 +27,7 @@ class R3BRpcContFact : public FairContFact
     R3BRpcContFact();
     ~R3BRpcContFact() {}
     FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BRpcContFact, 0) // Factory for all RPC parameter containers
+    ClassDef(R3BRpcContFact, 1) // Factory for all RPC parameter containers
 };
 
 #endif /* !R3BRPCCONTFACT_H */

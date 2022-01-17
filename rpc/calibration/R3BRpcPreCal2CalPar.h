@@ -11,28 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCMAPPED2CALPAR_H
-#define R3BRPCMAPPED2CALPAR_H
+#ifndef R3BRPCPRECAL2CALPAR_H
+#define R3BRPCPRECAL2CALPAR_H
 
 #include "FairTask.h"
 #include "TH1F.h"
+#include "R3BRpcTotCalPar.h"
 
 class TClonesArray;
-class R3BRpcCalPar;
+class R3BRpcTotCalPar;
 class R3BEventHeader;
 
-class R3BRpcMapped2CalPar : public FairTask
+
+class R3BRpcPreCal2CalPar : public FairTask
 {
 
   public:
     /** Default constructor **/
-    R3BRpcMapped2CalPar();
+    R3BRpcPreCal2CalPar();
 
     /** Standard constructor **/
-    R3BRpcMapped2CalPar(const char* name, Int_t iVerbose = 1);
+    R3BRpcPreCal2CalPar(const char* name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BRpcMapped2CalPar();
+    virtual ~R3BRpcPreCal2CalPar();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -67,11 +69,15 @@ class R3BRpcMapped2CalPar : public FairTask
     Bool_t fDebugMode;
     Int_t fNumChannels;
 
-    R3BRpcCalPar* fCalPar;       /**< Container for Cal parameters. >*/
-    TClonesArray* fMappedDataCA; /**< Array with RPC Mapped-input data. >*/
+    R3BRpcTotCalPar* fTotCalPar;
+
+    TH1F* fhTot[N_NUM]; 
+
+    TClonesArray* fPreCalStripDataCA; /**< Array with RPC PreCal-input data. >*/
+    TClonesArray* fPreCalPmtDataCA; /**< Array with RPC PreCal-input data. >*/
 
   public:
-    ClassDef(R3BRpcMapped2CalPar, 1);
+    ClassDef(R3BRpcPreCal2CalPar, 1);
 };
 
 #endif

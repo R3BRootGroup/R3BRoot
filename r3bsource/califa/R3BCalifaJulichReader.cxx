@@ -100,7 +100,7 @@ Bool_t R3BCalifaJulichReader::Read()
             LOG(FATAL) << "\033[5m\033[31m ERROR TO CHECK!! Channel number=" << channelNumber
                        << " detected in data \033[0m";
 
-        if (channelNumber < 17)
+       if (channelNumber < 17)
             new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])
                 R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
         else if (channelNumber < 81)

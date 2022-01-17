@@ -423,7 +423,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     }
 
 
-    if (fPmtMappedItems && fPmtMappedItems->GetEntriesFast() > 0)
+/*    if (fPmtMappedItems && fPmtMappedItems->GetEntriesFast() > 0)
     {
         auto nHits = fPmtMappedItems->GetEntriesFast();
 
@@ -437,7 +437,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
              pmtCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
 
         }
-    }
+    }*/
 
 
     fNEvents += 1;

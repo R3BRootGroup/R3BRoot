@@ -31,6 +31,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <deque>
 
 #include "TMath.h"
 #include <cstdlib>
