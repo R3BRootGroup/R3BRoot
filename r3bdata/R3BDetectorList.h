@@ -64,6 +64,7 @@ enum DetectorId
     kSFI,
     kMUSIC,
     kLOS,
+    kRPC,
 #ifdef SOFIA
     kSOFSCI,
     kSOFAT,
@@ -123,7 +124,8 @@ enum fDetectorType
     kFI33Point,
     kSFIPoint,
     kMUSICPoint,
-    kLOSPoint
+    kLOSPoint,
+    kRpcPoint
 #ifdef SOFIA
     ,
     kSOFSCIPoint,

@@ -54,6 +54,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -190,6 +191,10 @@ footData/R3BFootCalData.cxx
 footData/R3BFootHitData.cxx
 alpideData/R3BAlpidePoint.cxx
 alpideData/R3BAlpideMappedData.cxx
+rpcData/R3BRpcCalData.cxx
+rpcData/R3BRpcMappedData.cxx
+rpcData/R3BRpcHitData.cxx
+rpcData/R3BRpcPoint.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
