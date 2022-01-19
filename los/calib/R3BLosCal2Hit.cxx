@@ -320,7 +320,7 @@ InitStatus R3BLosCal2Hit::Init()
     }
 
     // request storage of Hit data in output tree
-    mgr->Register("LosHit", "LosHit", fHitItems, !fOnline);
+    mgr->Register("LosHit", "LosHitData", fHitItems, !fOnline);
 
     fHitItems->Clear();
 
@@ -505,35 +505,32 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
     Int_t nDet = 0;
 
-    R3BLosCalData** calItem = new R3BLosCalData*[nHits];
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
-        calItem[ihit] = (R3BLosCalData*)(fCalItems->At(ihit));
+        auto calItem = (R3BLosCalData*)(fCalItems->At(ihit));
 
-        nDet = calItem[ihit]->GetDetector();
+        nDet = calItem->GetDetector();
 
         // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7
         for (Int_t iCha = 0; iCha < 8; iCha++)
         {
             time_V[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem[ihit]->GetTimeV_ns(iCha))))
+            if (!(IS_NAN(calItem->GetTimeV_ns(iCha))))
             { // VFTX
-                time_V[ihit][iCha] = calItem[ihit]->GetTimeV_ns(iCha);
+                time_V[ihit][iCha] = calItem->GetTimeV_ns(iCha);
             }
             time_L[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem[ihit]->GetTimeL_ns(iCha))))
+            if (!(IS_NAN(calItem->GetTimeL_ns(iCha))))
             { // TAMEX leading
-                time_L[ihit][iCha] = calItem[ihit]->GetTimeL_ns(iCha);
+                time_L[ihit][iCha] = calItem->GetTimeL_ns(iCha);
             }
             time_T[ihit][iCha] = 0. / 0.;
-            if (!(IS_NAN(calItem[ihit]->GetTimeT_ns(iCha))))
+            if (!(IS_NAN(calItem->GetTimeT_ns(iCha))))
             { // TAMEX trailing
-                time_T[ihit][iCha] = calItem[ihit]->GetTimeT_ns(iCha);
+                time_T[ihit][iCha] = calItem->GetTimeT_ns(iCha);
             }
         }
-        if (calItem)
-            delete[] calItem;
     }
 
     // Sorting VFTX data:

@@ -86,10 +86,6 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
 
 R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 {
-    if (fHitSci2)
-        delete fHitSci2;
-    if (fHitItemsMus)
-        delete fHitItemsMus;
     if (fFrsDataCA)
         delete fFrsDataCA;
 }
