@@ -14,19 +14,19 @@
 #ifndef R3BAnalysisIncomingID_H
 #define R3BAnalysisIncomingID_H
 
+#include "TMath.h"
+#include <TArrayF.h>
 #include <array>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "TMath.h"
-#include <TArrayF.h>
-#include <cstdlib>
 
 // R3B headers
 #include "R3BEventHeader.h"
-#include "R3BMusicHitData.h"
 #include "R3BFrsData.h"
+#include "R3BMusicHitData.h"
 
 // Fair headers
 #include "FairLogger.h"
@@ -40,7 +40,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads all detector data items for the analysis of incoming 
+ * This taks reads all detector data items for the analysis of incoming
  * projectiles from FRS.
  */
 class R3BAnalysisIncomingID : public FairTask
