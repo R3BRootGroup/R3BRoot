@@ -79,6 +79,7 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fEnergyLoss(kTRUE)
     , fSimu(kTRUE)
     , fForward(kTRUE)
+    , fBfield(-1710.)
     , fOptimizeGeometry(kFALSE)
     , fTrackItems(new TClonesArray("R3BTrack"))
     , fNofTrackItems()
@@ -202,7 +203,7 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_mom_res_y = new TH1F("h_mom_res_y", "Momentum resolution py in %", 1000, -10., 10.);
     fh_mom_res_z = new TH1F("h_mom_res_z", "Momentum resolution pz in %", 1000, -10., 10.);
     fh_mass_res = new TH1F("h_mass_res", "Mass resolution", 10, -5.5, 4.5);
-    fh_chi2 = new TH1F("h_chi2", "Chi2", 1000, 0., 100.);
+    fh_chi2 = new TH1F("h_chi2", "Chi2", 10000, 0., 1000.);
     fh_vz_res = new TH1F("h_vz_res", "vz - vz_mc", 200, -1., 1.);
     fh_beta_res = new TH1F("h_beta_res", "beta - beta_mc", 200, -0.1, 0.1);
     fh_A_overZ = new TH2F("fh_A_overZ", "particle identification", 100, 0., 10., 100, 1., 3.);
@@ -217,12 +218,15 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_r = new TH1F("h_py_r", "momentum py right", 1000, -500., 500.);
     fh_pz_r = new TH1F("h_pz_r", "momentum pz right", 2000, 0., 20.);
 
-    Double_t ranges[] = { 10., 10., 10., 10., 10., 10., 10. };
-    for (Int_t i = 0; i < 7; i++)
+    fh_p_vs_ch2 = new TH2F("h_p_vs_chi2", "p.Mag vs chi2", 2000, 0., 200., 2000, 0., 20.);
+
+    Double_t ranges[] = { 10., 10., 10., 10., 10., 10., 10., 50 };
+    Int_t bins[] = { 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000 };
+    for (Int_t i = 0; i < 8; i++)
     {
-        fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), 200, -ranges[i], ranges[i]);
+        fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), bins[i], -ranges[i], ranges[i]);
         fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 40, -10., 10.);
-        fh_y_res[i] = new TH1F(Form("h_y_res%d", i), Form("y residual %d", i), 200, -ranges[i], ranges[i]);
+        fh_y_res[i] = new TH1F(Form("h_y_res%d", i), Form("y residual %d", i), bins[i], -ranges[i], ranges[i]);
         fh_y_pull[i] = new TH1F(Form("h_y_pull%d", i), Form("ypull %d", i), 40, -10., 10.);
     }
 
@@ -231,39 +235,6 @@ InitStatus R3BFragmentTrackerS494::Init()
     Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
     Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
     cout << "Field:" << field << " scale: " << scale << endl;
-
-    if (fVis)
-    {
-        TCanvas* cdif = new TCanvas("cSum", "Summed", 10, 10, 1100, 550);
-        cdif->Divide(6, 3);
-        cdif->cd(1);
-        fh_chi2->Draw("hist");
-        cdif->cd(2);
-        fh_p->Draw("hist");
-        cdif->cd(3);
-        fh_px->Draw("hist");
-        cdif->cd(4);
-        fh_py->Draw("hist");
-        cdif->cd(5);
-        fh_pz->Draw("hist");
-        cdif->cd(6);
-        fh_px_l->Draw("hist");
-        cdif->cd(7);
-        fh_py_l->Draw("hist");
-        cdif->cd(8);
-        fh_pz_l->Draw("hist");
-        cdif->cd(9);
-        fh_px_r->Draw("hist");
-        cdif->cd(10);
-        fh_py_r->Draw("hist");
-        cdif->cd(11);
-        fh_pz_r->Draw("hist");
-        for (Int_t i = 0; i < 7; i++)
-        {
-            cdif->cd(12 + i);
-            fh_x_res[i]->Draw("hist");
-        }
-    }
 
     return kSUCCESS;
 }
@@ -335,22 +306,29 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
 
-/*
-    if (tof->hits.size() < 1)
-        return;
-    if (fi23a->hits.size() < 1)
-        return;
-    if (fi23b->hits.size() < 1)
-        return;        
-    if (fi30->hits.size() < 1)
-        return;
-    if (fi31->hits.size() < 1)
-        return;
-    if (fi32->hits.size() < 1)
-        return;
-    if (fi33->hits.size() < 1)
-        return;
-*/        
+    if (fBfield == -1710.0)
+    {
+        if (tof->hits.size() < 2)
+            return;
+        if (fi23a->hits.size() < 2)
+            return;
+        if (fi23b->hits.size() < 2)
+            return;
+        if (fi30->hits.size() < 1)
+            return;
+        if (fi31->hits.size() < 1)
+            return;
+        if (fi32->hits.size() < 1)
+            return;
+        if (fi33->hits.size() < 1)
+            return;
+    }
+    else
+    {
+        if (tof->hits.size() < 1)
+            return;
+    }
+
     /*
         if (tof->hits.size() != 4)
             return;
@@ -367,7 +345,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         if (fi33->hits.size() != 1)
             return;
     */
+    fNEvents_nonull += 1;
 
+    if (debug)
+        cout << "*************** NEW EVENT *******************" << endl;
     if (tof->hits.size() > 0 && debug)
     {
         cout << "Hits ToFD: " << tof->hits.size() << endl;
@@ -447,7 +428,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     LOG(DEBUG) << "MC ************ 4He **************";
                     LOG(DEBUG) << "MC position x: " << x0He << " y: " << y0He << " z: " << z0He;
                     LOG(DEBUG) << "MC momentum p: " << pHe << " px " << px0He << " py " << py0He << " pz " << pz0He;
-                    LOG(DEBUG) << "MC mass: " << massHe << " beta: " << betaHe;
+                    LOG(DEBUG) << "MC mass 4He: " << massHe << " beta: " << betaHe;
                 }
                 if (PID == 1000060120)
                 {
@@ -464,7 +445,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     LOG(DEBUG) << "MC ************ 12C **************";
                     LOG(DEBUG) << "MC position x: " << x0C << " y: " << y0C << " z: " << z0C;
                     LOG(DEBUG) << "MC momentum p: " << pC << " px " << px0C << " py " << py0C << " pz " << pz0C;
-                    LOG(DEBUG) << "MC mass: " << massC << " beta: " << betaC;
+                    LOG(DEBUG) << "MC mass 12C: " << massC << " beta: " << betaC;
                 }
                 if (PID == 1000080160)
                 {
@@ -567,14 +548,27 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Int_t charge_mem = 0;
     Bool_t alpha = kFALSE;
     Bool_t carbon = kFALSE;
+    Bool_t oxygen = kFALSE;
     // The idea is to loop twice over the ToF wall hits.
     // First we want to look for 12C particle and then for 4He
 
     Int_t Icountleft = 0;
     Int_t Icountright = 0;
 
-    //for (Int_t l = 1; l < 3; l++)
-    for (Int_t l = 0; l < 1; l++)
+    Int_t lmin;
+    Int_t lmax;
+    if (fBfield != -1710.0)
+    {
+        lmin = 0;
+        lmax = 1;
+    }
+    else
+    {
+        lmin = 1;
+        lmax = 3;
+    }
+
+    for (Int_t l = lmin; l < lmax; l++)
     {
         // l = 0: 16O
         // l = 1: 12C
@@ -635,17 +629,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             }
             if (charge == 6)
             {
-                m0 = 11.1749;
-                //m0 = 11.178;
+                m0 = 11.17486339;
+                // m0 = 11.178;
                 p0 = 13.043625;
-                //pC = p0;
+                if (!fSimu)
+                    pC = p0;
                 massC = m0;
             }
             if (charge == 2)
             {
-                m0 = 3.7284;
+                m0 = 3.728401291;
                 p0 = 4.347875;
-                //pHe = p0;
+                if (!fSimu)
+                    pHe = p0;
                 massHe = m0;
             }
 
@@ -660,6 +656,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 continue;
             }
 
+            if (debug)
+                cout << "AT START: "
+                     << "Mass: " << m0 << ", Momentum: " << p0 << endl;
+
             if (tof->hits.at(i)->GetX() > 0 && fi30->hits.size() > 0 && fi32->hits.size() > 0 &&
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
@@ -667,14 +667,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
                 if (fNEventsLeft == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+
 /*
-                Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
+
+                Double_t fieldScale = fBfield / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 if (debug)
                     cout << "Field left:" << field << " scale: " << scale << endl;
 
-                fieldScale = -1710.0 / 3583.81 / scale * 1.;
+                fieldScale = fBfield / 3583.81 / scale * 1.;
                 if (debug)
                     cout << "Setting field to " << fieldScale << endl;
                 ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
@@ -782,9 +784,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 nCand += 1;
                                 Icountleft += 1;
 
-                                //      cout << fNEvents<< ", LEFT SIDE: Charge: "<< charge<<", Momentum: " <<
-                                //      candidate->GetMomentum().Mag()<<
-                                //     ", Momentum Z: "<<candidate->GetMomentum().Z() << endl;
+                                //     cout << fNEvents<< ", LEFT SIDE: Charge: "<< charge<<", Momentum: " <<
+                                //     candidate->GetMomentum().Mag()<<
+                                //  ", Momentum Z: "<<candidate->GetMomentum().Z() <<
+                                //   ", Momentum X: "<<candidate->GetMomentum().X()<< endl;
 
                                 if (TMath::IsNaN(candidate->GetMomentum().Z()))
                                 {
@@ -862,14 +865,15 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
                 if (fNEventsRight == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+
 /*
-                Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
+                Double_t fieldScale = fBfield / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 if (debug)
                     cout << "Field right:" << field << " scale: " << scale << endl;
 
-                fieldScale = -1710.0 / 3583.81 / scale * 1.;
+                fieldScale = fBfield / 3583.81 / scale * 1.;
                 if (debug)
                     cout << "Setting field to " << fieldScale << endl;
                 ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
@@ -930,6 +934,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 {
                                     cout << "right side of setup" << endl;
                                     cout << "Charge requested: " << charge_requested << endl;
+                                    cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
+                                         << " p0: " << p0 << " beta0: " << beta0 << " m0: " << m0 << endl;
                                     cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
                                          << " y: " << tof->hits.at(i)->GetY() << endl;
                                 }
@@ -940,7 +946,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (ifi33 > -1 && debug)
                                     cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
                                 if (ifi31 > -1 && debug)
-                                    cout << "Fi31 # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX() << endl;
+                                    cout << "Fi31  # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX() << endl;
                                 if (debug)
                                     cout << "Hit target # "
                                          << " x: " << target->hits.at(0)->GetX() << endl;
@@ -965,8 +971,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
-                                    cout << "Chi: " << candidate->GetChi2() << "  "
-                                         << candidate->GetStartMomentum().Mag() << "  "
+                                    cout << "Chi2: " << candidate->GetChi2() << "  pstart.Mag "
+                                         << candidate->GetStartMomentum().Mag() << " dp.Mag "
                                          << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
                                                 (candidate->GetStartMomentum().Mag() - p0)
                                          << endl;
@@ -975,9 +981,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 nCand += 1;
                                 Icountright += 1;
 
-                                //        cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
-                                //        candidate->GetMomentum().Mag()<<", Momentum Z: "<<candidate->GetMomentum().Z()
-                                //        << endl;
+                                //    cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
+                                //    candidate->GetMomentum().Mag()<<", Momentum Z: "<<candidate->GetMomentum().Z()<<
+                                //   ", Momentum X: "<<candidate->GetMomentum().X() << " status: "<<status<<endl;
 
                                 if (TMath::IsNaN(candidate->GetMomentum().Z()))
                                 {
@@ -1108,15 +1114,30 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (l == 0)
             {
                 LOG(DEBUG) << "16O";
-                x0soll = x0O;
-                y0soll = y0O;
-                z0soll = z0O;
-                px0soll = px0O;
-                py0soll = py0O;
-                pz0soll = pz0O;
-                psoll = pO;
-                m0soll = massO;
-                beta0soll = betaO;
+                oxygen = kTRUE;
+                if(fSimu){
+					x0soll = x0O;
+					y0soll = y0O;
+					z0soll = z0O;
+					px0soll = px0O;
+					py0soll = py0O;
+					pz0soll = pz0O;
+					psoll = pO;
+					m0soll = massO;
+					beta0soll = betaO;	
+				}
+				else{
+					x0soll = x0;
+					y0soll = y0;
+					z0soll = z0;
+					px0soll = 0.;
+					py0soll = 0.;
+					pz0soll = 17.3915;
+					psoll = 17.3915;
+					m0soll = m0;
+					beta0soll = 0.7593209;
+				}
+
             }
 
             if (l == 1)
@@ -1165,6 +1186,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             // LOG(DEBUG) << "chi2: " << candidate->GetChi2() << endl;
             LOG(DEBUG) << "chi: " << minChi2 << endl;
 
+            // cout<<"Momentum (ist) : " << candidate->GetStartMomentum().Mag()
+            //          << " px : " << candidate->GetStartMomentum().X() << " py: " << candidate->GetStartMomentum().Y()
+            //        << " pz: " << candidate->GetStartMomentum().Z()<<", Mass   : " << candidate->GetMass()<<", chi2: "
+            //        << minChi2 << endl;
+
             fh_A_reco1->Fill(candidate->GetMass() / amu);
             if (minChi2 < 1.e4)
                 totalChi2Mass += minChi2;
@@ -1212,7 +1238,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // LOG(INFO) << (candidate->GetMass() / amu);
             */
             totalChi2P += minChi2;
-            if (minChi2 < 10)
+
+            fh_p_vs_ch2->Fill(minChi2, candidate->GetStartMomentum().Mag());
+
+            if (minChi2 < 1000)
             {
                 fh_p->Fill(candidate->GetStartMomentum().Mag());
                 fh_px->Fill(candidate->GetStartMomentum().X() * 100.);
@@ -1278,47 +1307,47 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 { // fi23a
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi23a->Fill(eloss);
-                    iDet = 0;
+                    iDet = 1;
                 }
 
                 if (det->GetDetectorName().EqualTo("fi23b"))
                 { // fi23b
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi23b->Fill(eloss);
-                    iDet = 1;
+                    iDet = 2;
                 }
 
                 if (det->GetDetectorName().EqualTo("fi30"))
                 { // fi30
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi30->Fill(eloss);
-                    iDet = 2;
+                    iDet = 3;
                 }
 
                 if (det->GetDetectorName().EqualTo("fi31"))
                 { // fi31
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi31->Fill(eloss);
-                    iDet = 3;
+                    iDet = 4;
                 }
 
                 if (det->GetDetectorName().EqualTo("fi32"))
                 { // fi32
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi32->Fill(eloss);
-                    iDet = 4;
+                    iDet = 5;
                 }
 
                 if (det->GetDetectorName().EqualTo("fi33"))
                 { // fi33
                     Double_t eloss = det->GetEnergyLoss(candidate);
                     fh_eloss_fi33->Fill(eloss);
-                    iDet = 5;
+                    iDet = 6;
                 }
 
                 if (det->GetDetectorName().EqualTo("tofd"))
                 { // tofd
-                    iDet = 6;
+                    iDet = 7;
                 }
 
                 if (fEnergyLoss)
@@ -1383,9 +1412,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
         //} // end for TofD
     } // end for two particle (12C and 4He)
-    if (alpha && carbon)
+    if ((alpha && carbon && fBfield == -1710.0) || (oxygen && fBfield != -1710.0))
     {
         counter1++;
+
+        cout << "Found Tracks: " << counter1 << " from selected NEvents: " << fNEvents_nonull
+             << "num total events: " << fNEvents << endl;
+        ;
     }
 
     // delete particle;
@@ -1436,7 +1469,7 @@ void R3BFragmentTrackerS494::Finish()
     fh_mom_res_z->Write();
     fh_mass_res->Write();
     fh_chi2->Write();
-    for (Int_t i = 0; i < 6; i++)
+    for (Int_t i = 0; i < 8; i++)
     {
         fh_x_res[i]->Write();
         fh_x_pull[i]->Write();
@@ -1456,9 +1489,38 @@ void R3BFragmentTrackerS494::Finish()
     fh_px_r->Write();
     fh_py_r->Write();
     fh_pz_r->Write();
+    fh_p_vs_ch2->Write();
 
     if (fVis)
     {
+        TCanvas* cdif = new TCanvas("cSum", "Summed", 10, 10, 1100, 550);
+        cdif->Divide(4, 3);
+        cdif->cd(1);
+        fh_chi2->Draw("hist");
+        cdif->cd(2);
+        fh_p->Draw("hist");
+        cdif->cd(3);
+        fh_px->Draw("hist");
+        cdif->cd(4);
+        fh_py->Draw("hist");
+        cdif->cd(5);
+        fh_pz->Draw("hist");
+        cdif->cd(6);
+        fh_px_l->Draw("hist");
+        cdif->cd(7);
+        fh_py_l->Draw("hist");
+        cdif->cd(8);
+        fh_pz_l->Draw("hist");
+        cdif->cd(9);
+        fh_px_r->Draw("hist");
+        cdif->cd(10);
+        fh_py_r->Draw("hist");
+        cdif->cd(11);
+        fh_pz_r->Draw("hist");
+        cdif->cd(12);
+        gPad->SetLogz();
+        fh_p_vs_ch2->Draw("colz");
+
         for (auto const& det : fDetectors->GetArray())
         {
             det->Draw();
@@ -1511,30 +1573,30 @@ void R3BFragmentTrackerS494::Finish()
         new TCanvas("c7", "", 500, 600, 500, 500);
         fh_chi2->Draw();
 
-        TCanvas* c8 = new TCanvas("c8", "", 10, 10, 1500, 500);
-        c8->Divide(4, 3);
-        for (Int_t i = 0; i < 7; i++)
+        TCanvas* c8 = new TCanvas("c8", "", 10, 10, 1200, 1200);
+        c8->Divide(4, 4);
+        for (Int_t i = 0; i < 8; i++)
         {
             c8->cd(i + 1);
             fh_x_res[i]->Draw();
         }
-        for (Int_t i = 0; i < 7; i++)
+        for (Int_t i = 0; i < 8; i++)
         {
-            c8->cd(i + 7);
+            c8->cd(i + 9);
             fh_y_res[i]->Draw();
         }
         c8->cd(0);
 
-        TCanvas* c9 = new TCanvas("c9", "", 10, 10, 1500, 500);
-        c9->Divide(4, 3);
-        for (Int_t i = 0; i < 7; i++)
+        TCanvas* c9 = new TCanvas("c9", "", 10, 10, 1200, 1200);
+        c9->Divide(4, 4);
+        for (Int_t i = 0; i < 8; i++)
         {
             c9->cd(i + 1);
             fh_x_pull[i]->Draw();
         }
-        for (Int_t i = 0; i < 7; i++)
+        for (Int_t i = 0; i < 8; i++)
         {
-            c9->cd(i + 7);
+            c9->cd(i + 9);
             fh_y_pull[i]->Draw();
         }
         c9->cd(0);

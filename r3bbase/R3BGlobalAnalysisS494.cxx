@@ -91,7 +91,7 @@ R3BGlobalAnalysisS494::R3BGlobalAnalysisS494(const char* name, Int_t iVerbose)
     , fTpat(-1)
     , fCuts(0)
     , fGhost(0)
-    , fPairs(0)
+    , fPairs(1)
     , fSimu(0)
     , fB(-1710)
     , fcut_chiX(5000)
@@ -107,7 +107,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BGlobalAnalysisS494::Init ";
+    cout << "R3BGlobalAnalysisS494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -124,6 +124,8 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fTrack = (TClonesArray*)mgr->GetObject("Track");
     maxevent = mgr->CheckMaxEventNo();
 
+    cout << "R3BGlobalAnalysisS494::Max num events: " << maxevent << endl;
+
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
@@ -133,32 +135,6 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Cave_position = new TH2F(strNameC, "", 2100, -100., 2000., 1000, -500., 500.);
 
     //-----------------------------------------------------------------------
-    // BeamMonitor
-
-    // get the theoretical calib factors for SEETRAM
-    Double_t fexp = float(fsens_SEE + 9);
-    Double_t fpow = float(pow(10., fexp));
-    calib_SEE = 135641.7786 * fpow;
-    LOG(DEBUG) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
-
-    fh_Tpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
-    fh_Tpat->GetXaxis()->SetTitle("Tpat value");
-
-    fh_Trigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
-    fh_Trigger->GetXaxis()->SetTitle("Trigger value");
-
-    fh_IC = new TH1F("IC", "IC ", 1000, 0, 1000);
-    fh_IC->GetXaxis()->SetTitle("spill number");
-    fh_IC->GetYaxis()->SetTitle("IC counts");
-
-    fh_SEE = new TH1F("SEETRAM", "SEETRAM ", 1000, 0, 1000);
-    fh_SEE->GetXaxis()->SetTitle("spill number");
-    fh_SEE->GetYaxis()->SetTitle("SEETRAM counts");
-
-    fh_TOFDOR = new TH1F("TOFDOR", "TOFDOR ", 1000, 0, 1000);
-    fh_TOFDOR->GetXaxis()->SetTitle("spill number");
-    fh_TOFDOR->GetYaxis()->SetTitle("TOFDOR counts");
-
     //-----------------------------------------------------------------------
     // compare against MC Simulations
 
@@ -210,6 +186,22 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_p_C->GetXaxis()->SetTitle("pz / MeV/c");
     fh_p_C->GetYaxis()->SetTitle("counts");
 
+    fh_px_O = new TH1F("px_O", " px O", 2000, -500., 500);
+    fh_px_O->GetXaxis()->SetTitle("px / MeV/c");
+    fh_px_O->GetYaxis()->SetTitle("counts");
+
+    fh_py_O = new TH1F("py_O", " py O", 2000, -500., 500);
+    fh_py_O->GetXaxis()->SetTitle("py / MeV/c");
+    fh_py_O->GetYaxis()->SetTitle("counts");
+
+    fh_pz_O = new TH1F("pz_O", " pz O", 30000, 0., 30000.);
+    fh_pz_O->GetXaxis()->SetTitle("pz / MeV/c");
+    fh_pz_O->GetYaxis()->SetTitle("counts");
+
+    fh_p_O = new TH1F("p_O", " p O", 10000, 0., 30000.);
+    fh_p_O->GetXaxis()->SetTitle("pz / MeV/c");
+    fh_p_O->GetYaxis()->SetTitle("counts");
+
     fh_target_xy = new TH2F("target_xy", "target xy ", 500, -5, 5, 500, -5, 5);
     fh_target_xy->GetXaxis()->SetTitle("x / cm");
     fh_target_xy->GetYaxis()->SetTitle("y / cm");
@@ -230,6 +222,22 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_dz->GetXaxis()->SetTitle("dz / cm");
     fh_dz->GetYaxis()->SetTitle("counts");
 
+    fh_dpxO = new TH1F("tracker_dpxO", "tracker dpx O", 1000, -50, 50);
+    fh_dpxO->GetXaxis()->SetTitle("dpx / percent");
+    fh_dpxO->GetYaxis()->SetTitle("counts");
+
+    fh_dpyO = new TH1F("tracker_dpyO", "tracker dpy O", 1000, -50, 50);
+    fh_dpyO->GetXaxis()->SetTitle("dpy / percent");
+    fh_dpyO->GetYaxis()->SetTitle("counts");
+
+    fh_dpzO = new TH1F("tracker_dpzO", "tracker dpz O", 1000, -50, 50);
+    fh_dpzO->GetXaxis()->SetTitle("dpz / percent");
+    fh_dpzO->GetYaxis()->SetTitle("counts");
+
+    fh_dpO = new TH1F("tracker_dpO", "tracker dp O", 1000, -50, 50);
+    fh_dpO->GetXaxis()->SetTitle("dp / percent");
+    fh_dpO->GetYaxis()->SetTitle("counts");
+
     fh_dpxC = new TH1F("tracker_dpxC", "tracker dpx C", 1000, -50, 50);
     fh_dpxC->GetXaxis()->SetTitle("dpx / percent");
     fh_dpxC->GetYaxis()->SetTitle("counts");
@@ -242,7 +250,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_dpzC->GetXaxis()->SetTitle("dpz / percent");
     fh_dpzC->GetYaxis()->SetTitle("counts");
 
-    fh_dpC = new TH1F("tracker_dpC", "tracker dp C", 1000, -50, 50);
+    fh_dpC = new TH1F("tracker_dpC", "tracker dp C", 10000, -500, 500);
     fh_dpC->GetXaxis()->SetTitle("dp / percent");
     fh_dpC->GetYaxis()->SetTitle("counts");
 
@@ -258,7 +266,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_dpzHe->GetXaxis()->SetTitle("dpz / percent");
     fh_dpzHe->GetYaxis()->SetTitle("counts");
 
-    fh_dpHe = new TH1F("tracker_dpHe", "tracker dp He", 1000, -50, 50);
+    fh_dpHe = new TH1F("tracker_dpHe", "tracker dp He", 10000, -500, 500);
     fh_dpHe->GetXaxis()->SetTitle("dp / percent");
     fh_dpHe->GetYaxis()->SetTitle("counts");
 
@@ -438,73 +446,115 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Erel_vs_thetabcMC->GetXaxis()->SetTitle("Erel / MeV");
 
     TCanvas* check = new TCanvas("CheckingGlobal", "CheckingGlobal", 10, 10, 900, 900);
-    check->Divide(4, 4);
-    check->cd(1);
-    fh_chiy_vs_chix_He->Draw("colz");
-    check->cd(2);
-    fh_chiy_vs_chix_C->Draw("colz");
-    check->cd(3);
-    gPad->SetLogz();
-    fh_Erel_vs_thetabc->Draw("colz");
-    check->cd(4);
-    gPad->SetLogz();
-    fh_target_xy->Draw("colz");
-    check->cd(5);
-    fh_p_He->Draw();
-    check->cd(6);
-    fh_p_C->Draw();
-    check->cd(7);
-    // fh_ErelB->SetAxisRange(0., 50.,"X");
-    fh_ErelB->Draw();
-    check->cd(8);
-    // fh_Erel->SetAxisRange(0., 50.,"X");
-    fh_Erel->Draw();
-    check->cd(9);
-    fh_theta26->Draw();
-    check->cd(10);
-    fh_theta_bc_cm->Draw();
-    check->cd(11);
-    fh_phi_bc_cm->Draw();
-    check->cd(12);
-    gPad->SetLogz();
-    fh_px_px->Draw("colz");
-    check->cd(13);
-    gPad->SetLogz();
-    fh_py_py->Draw("colz");
-    check->cd(14);
-    gPad->SetLogz();
-    fh_pz_pz->Draw("colz");
-    check->cd(15);
-    gPad->SetLogz();
-    fh_p_vs_p->Draw("colz");
-    check->cd(16);
-    gPad->SetLogz();
-    fh_Erel_vs_pC->Draw("colz");
+    if (fPairs)
+    {
+        check->Divide(4, 4);
+        check->cd(1);
+        fh_chiy_vs_chix_He->Draw("colz");
+        check->cd(2);
+        fh_chiy_vs_chix_C->Draw("colz");
+        check->cd(3);
+        gPad->SetLogz();
+        fh_Erel_vs_thetabc->Draw("colz");
+        check->cd(4);
+        gPad->SetLogz();
+        fh_target_xy->Draw("colz");
+        check->cd(5);
+        fh_p_He->Draw();
+        check->cd(6);
+        fh_p_C->Draw();
+        check->cd(7);
+        // fh_ErelB->SetAxisRange(0., 50.,"X");
+        fh_ErelB->Draw();
+        check->cd(8);
+        // fh_Erel->SetAxisRange(0., 50.,"X");
+        fh_Erel->Draw();
+        check->cd(9);
+        fh_theta26->Draw();
+        check->cd(10);
+        fh_theta_bc_cm->Draw();
+        check->cd(11);
+        fh_phi_bc_cm->Draw();
+        check->cd(12);
+        gPad->SetLogz();
+        fh_px_px->Draw("colz");
+        check->cd(13);
+        gPad->SetLogz();
+        fh_py_py->Draw("colz");
+        check->cd(14);
+        gPad->SetLogz();
+        fh_pz_pz->Draw("colz");
+        check->cd(15);
+        gPad->SetLogz();
+        fh_p_vs_p->Draw("colz");
+        check->cd(16);
+        gPad->SetLogz();
+        fh_Erel_vs_pC->Draw("colz");
+    }
+    else
+    {
+        check->Divide(3, 2);
+        check->cd(1);
+        fh_chi2->Draw();
+        check->cd(2);
+        gPad->SetLogz();
+        fh_target_xy->Draw("colz");
+        check->cd(3);
+        fh_p_O->Draw();
+        check->cd(4);
+        fh_px_O->Draw();
+        check->cd(5);
+        fh_py_O->Draw();
+        check->cd(6);
+        fh_pz_O->Draw();
+    }
 
     if (fSimu)
     {
         TCanvas* checkMC = new TCanvas("CheckingGlobalMC", "CheckingGlobalMC", 10, 10, 900, 900);
-        checkMC->Divide(3, 3);
-        checkMC->cd(1);
-        fh_dx->Draw();
-        checkMC->cd(2);
-        fh_dy->Draw();
-        checkMC->cd(3);
-        fh_dpxC->Draw();
-        checkMC->cd(4);
-        fh_dpyC->Draw();
-        checkMC->cd(5);
-        fh_dpzC->Draw();
-        checkMC->cd(6);
-        gPad->SetLogz();
-        fh_dpy_dpx->Draw("colz");
-        checkMC->cd(7);
-        fh_dpxHe->Draw();
-        checkMC->cd(8);
-        fh_dpyHe->Draw();
-        checkMC->cd(9);
 
-        fh_dpzHe->Draw();
+        if (fPairs)
+        {
+            checkMC->Divide(3, 3);
+            checkMC->cd(1);
+            fh_dx->Draw();
+            checkMC->cd(2);
+            fh_dy->Draw();
+            checkMC->cd(3);
+            fh_dpxC->Draw();
+            checkMC->cd(4);
+            fh_dpyC->Draw();
+            checkMC->cd(5);
+            fh_dpzC->Draw();
+            checkMC->cd(6);
+            gPad->SetLogz();
+            fh_dpy_dpx->Draw("colz");
+            checkMC->cd(7);
+            fh_dpxHe->Draw();
+            checkMC->cd(8);
+            fh_dpyHe->Draw();
+            checkMC->cd(9);
+            fh_dpzHe->Draw();
+        }
+        else
+        {
+            checkMC->Divide(3, 3);
+            checkMC->cd(1);
+            fh_dx->Draw();
+            checkMC->cd(2);
+            fh_dy->Draw();
+            checkMC->cd(3);
+            fh_dpxO->Draw();
+            checkMC->cd(4);
+            fh_dpyO->Draw();
+            checkMC->cd(5);
+            fh_dpzO->Draw();
+            checkMC->cd(6);
+            fh_dpO->Draw();
+            checkMC->cd(7);
+            gPad->SetLogz();
+            fh_dpy_dpx->Draw("colz");
+        }
     }
 
     return kSUCCESS;
@@ -516,7 +566,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
                   << " %) " << std::flush;
 
-    //    cout << "New event " << fNEvents << endl;
+    // cout << "New event " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -549,10 +599,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     Double_t px, py, pz;
     Double_t theta_16, theta_26;
     Double_t costh26;
-    Double_t chiHex, chiHey = 1.e+36, chiCx = 1.e+36, chiCy = 1.e+36;
+    Double_t chiHex = 1.e+36, chiHey = 1.e+36, chiCx = 1.e+36, chiCy = 1.e+36;
+    Double_t chix = 1.e+36, chiy = 1.e+36;
 
     Bool_t is_alpha = false;
     Bool_t is_carbon = false;
+    Bool_t is_oxygen = false;
     Bool_t is_tracked = false;
 
     Int_t nHitsTrack = 0;
@@ -586,12 +638,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 is_alpha = true;
                 alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
-                /*
-                   cout << "******************************************" << endl;
-                   cout << "Track In 4He"
-                             << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                   cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
-                 */
+
+                LOG(DEBUG) << "******************************************" << endl;
+                LOG(DEBUG) << "Track In 4He"
+                           << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
+                LOG(DEBUG) << "px " << pHex << " py " << pHey << " z " << pHez << endl;
             }
             if (aTrack->GetQ() == 6)
             {
@@ -609,12 +660,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 is_carbon = true;
                 carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
-                /*
-                  cout << "******************************************" << endl;
-                  cout << "Track In 12C"
-                            << "x " << XC << " y " << YC << " z " << ZC << endl;
-                  cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
-                 */
+
+                LOG(DEBUG) << "******************************************" << endl;
+                LOG(DEBUG) << "Track In 12C"
+                           << "x " << XC << " y " << YC << " z " << ZC << endl;
+                LOG(DEBUG) << "px " << pCx << " py " << pCy << " z " << pCz << endl;
             }
             if (aTrack->GetQ() == 8)
             {
@@ -626,11 +676,16 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 Pxf = aTrack->GetPx();
                 Pyf = aTrack->GetPy();
                 Pzf = aTrack->GetPz();
+                is_oxygen = true;
+                Pf_tot = sqrt((Pxf * Pxf) + (Pyf * Pyf) + (Pzf * Pzf));
 
-                // cout << "******************************************" << endl;
-                // cout << "Track In 16O"
-                //           << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                // cout << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                chix = aTrack->GetChix();
+                chiy = aTrack->GetChiy();
+
+                LOG(DEBUG) << "******************************************" << endl;
+                LOG(DEBUG) << "Track In 16O"
+                           << "x " << Xf << " y " << Yf << " z " << Zf << endl;
+                LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
             }
         }
     }
@@ -705,6 +760,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     Pxf_mc = aTrack->GetPx() * 1000.;
                     Pyf_mc = aTrack->GetPy() * 1000.;
                     Pzf_mc = aTrack->GetPz() * 1000.;
+
+                    is_oxygen = true;
                     Pf_tot_mc = sqrt((Pxf_mc * Pxf_mc) + (Pyf_mc * Pyf_mc) + (Pzf_mc * Pzf_mc));
 
                     LOG(DEBUG) << "******************************************" << endl;
@@ -717,13 +774,14 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     }
 
     // new version of analysis
-    if (is_carbon && is_alpha)
+    if (is_carbon && is_alpha && fPairs)
     {
         fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
         fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
         fh_chi2->Fill(chiHex + chiHey);
         fh_chi2->Fill(chiCx + chiCy);
 
+        LOG(DEBUG) << "Entering Pair analysis***" << endl;
         if (chiHex < fcut_chiX && chiHey < fcut_chiY && chiCx < fcut_chiX && chiCy < fcut_chiY)
         //			&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
         {
@@ -752,9 +810,9 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             // Calculate angle between alpha and C
             if (alpha.Pz() == 0 || carbon.Pz() == 0)
                 return;
-            /*  if (alpha.Pz() < 3700 || alpha.Pz() > 5000)
+            /*  if (alpha.Pz() < 3900 || alpha.Pz() > 4800)
                   return;
-              if (carbon.Pz() < 12700 || carbon.Pz() > 13300)
+              if (carbon.Pz() < 12600 || carbon.Pz() > 13500)
                   return;*/
 
             fh_p_vs_p->Fill(pa.Mag() + pc.Mag());
@@ -873,69 +931,114 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         } // end if chi2
     }     // end if trackHits>1
 
+    if (is_oxygen && !fPairs)
+    {
+        fh_chi2->Fill(chix + chiy);
+
+        if (chix < fcut_chiX && chiy < fcut_chiY)
+        //			&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
+        {
+            is_tracked = true;
+
+            fh_target_xy->Fill(Xf * 100., Yf * 100.);
+
+            fh_px_O->Fill(Pxf);
+            fh_py_O->Fill(Pyf);
+            fh_pz_O->Fill(Pzf);
+            fh_p_O->Fill(Pf_tot);
+
+        } // end if chi2
+    }     // end if trackHits>1
+
     if (fSimu && nHitsMCTrack > 0)
     {
-
-        paMC = alphaMC.Vect();
-        pcMC = carbonMC.Vect();
-        Double_t theta_26MC = alphaMC.Angle(carbonMC.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
-        /** Calculate invariant mass and relative energy **/
-        m_invaMC = (alphaMC + carbonMC).M(); // invariant mass
-        ErelMC = m_invaMC - mHe - mC;        // relative Energy
-        fh_Erel_vs_thetaMC->Fill(theta_26MC, ErelMC);
-
-        /** transfer to cm system and rotate **/
-
-        oxygenMC = alphaMC + carbonMC; // excited oxygen
-        // cout<<"gamma "<<oxygen.Gamma()<<endl;
-        Double_t thetaMC_16O = oxygenMC.Theta() * TMath::RadToDeg();
-        Double_t phiMC_16O = oxygenMC.Phi() * TMath::RadToDeg();
-        if (phiMC_16O < 0)
-            phiMC_16O += 360.;
-
-        // transfer to cm system and make some rotations
-        // boost them to centre of mass
-        alphaMC_cm = alphaMC;
-        carbonMC_cm = carbonMC;
-        oxygenMC_cm = oxygenMC;
-        alphaMC_cm.Boost(-oxygenMC.BoostVector());
-        carbonMC_cm.Boost(-oxygenMC.BoostVector());
-        oxygenMC_cm.Boost(-oxygenMC.BoostVector());
-
-        Double_t phiMC = (alphaMC_cm.Phi() - carbonMC_cm.Phi()) * TMath::RadToDeg();
-        Double_t thetaMC = alphaMC_cm.Angle(carbonMC_cm.Vect()) * TMath::RadToDeg();
-
-        phiMC_bc_cm = (oxygenMC.Phi() - alphaMC_cm.Phi()) * TMath::RadToDeg();
-        if (phiMC_bc_cm < 0)
-            phiMC_bc_cm += 360.;
-        fh_Erel_vs_thetabcMC->Fill(ErelMC, phiMC_bc_cm);
-        fh_Erel_simu->Fill(ErelMC);
-
-        if (is_tracked)
+        if (fPairs)
         {
-            fh_dErel->Fill(ErelMC - Erel);
-            fh_dtheta->Fill(phiMC_bc_cm - phi_bc_cm);
 
-            fh_dx->Fill((XHe_mc - XHe) * 100.);
-            fh_dx->Fill((XC_mc - XC) * 100.);
-            fh_dy->Fill((YHe_mc - YHe) * 100.);
-            fh_dy->Fill((YC_mc - YC) * 100.);
+            paMC = alphaMC.Vect();
+            pcMC = carbonMC.Vect();
+            Double_t theta_26MC = alphaMC.Angle(carbonMC.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
+            /** Calculate invariant mass and relative energy **/
+            m_invaMC = (alphaMC + carbonMC).M(); // invariant mass
+            ErelMC = m_invaMC - mHe - mC;        // relative Energy
+            fh_Erel_vs_thetaMC->Fill(theta_26MC, ErelMC);
 
-            fh_dpxC->Fill((pCx_mc - pCx) / pCx_mc * 100.);
-            fh_dpxHe->Fill((pHex_mc - pHex) / pHex_mc * 100.);
-            fh_dpyC->Fill((pCy_mc - pCy) / pCy_mc * 100.);
-            fh_dpyHe->Fill((pHey_mc - pHey) / pHey_mc * 100.);
-            fh_dpzC->Fill((pCz_mc - pCz) / pCz_mc * 100.);
-            fh_dpzHe->Fill((pHez_mc - pHez) / pHez_mc * 100.);
-            fh_dpC->Fill((pcMC.Mag() - pc.Mag()) / pcMC.Mag() * 100.);
-            fh_dpHe->Fill((paMC.Mag() - pa.Mag()) / paMC.Mag() * 100.);
+            /** transfer to cm system and rotate **/
 
-            fh_x_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., XC);
-            fh_x_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., XHe);
-            fh_y_dpy->Fill((pCy_mc - pCy) / pCy_mc * 100., YC);
-            fh_y_dpy->Fill((pHey_mc - pHey) / pHey_mc * 100., YHe);
-            fh_dpy_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., (pCy_mc - pCy) / pCy_mc * 100.);
-            fh_dpy_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., (pHey_mc - pHey) / pHey_mc * 100.);
+            oxygenMC = alphaMC + carbonMC; // excited oxygen
+            // cout<<"gamma "<<oxygen.Gamma()<<endl;
+            Double_t thetaMC_16O = oxygenMC.Theta() * TMath::RadToDeg();
+            Double_t phiMC_16O = oxygenMC.Phi() * TMath::RadToDeg();
+            if (phiMC_16O < 0)
+                phiMC_16O += 360.;
+
+            // transfer to cm system and make some rotations
+            // boost them to centre of mass
+            alphaMC_cm = alphaMC;
+            carbonMC_cm = carbonMC;
+            oxygenMC_cm = oxygenMC;
+            alphaMC_cm.Boost(-oxygenMC.BoostVector());
+            carbonMC_cm.Boost(-oxygenMC.BoostVector());
+            oxygenMC_cm.Boost(-oxygenMC.BoostVector());
+
+            Double_t phiMC = (alphaMC_cm.Phi() - carbonMC_cm.Phi()) * TMath::RadToDeg();
+            Double_t thetaMC = alphaMC_cm.Angle(carbonMC_cm.Vect()) * TMath::RadToDeg();
+
+            phiMC_bc_cm = (oxygenMC.Phi() - alphaMC_cm.Phi()) * TMath::RadToDeg();
+            if (phiMC_bc_cm < 0)
+                phiMC_bc_cm += 360.;
+            fh_Erel_vs_thetabcMC->Fill(ErelMC, phiMC_bc_cm);
+            fh_Erel_simu->Fill(ErelMC);
+
+            if (is_tracked)
+            {
+                fh_dErel->Fill(ErelMC - Erel);
+                fh_dtheta->Fill(phiMC_bc_cm - phi_bc_cm);
+
+                fh_dx->Fill((XHe_mc - XHe) * 100.);
+                fh_dx->Fill((XC_mc - XC) * 100.);
+                fh_dy->Fill((YHe_mc - YHe) * 100.);
+                fh_dy->Fill((YC_mc - YC) * 100.);
+
+                fh_dpxC->Fill((pCx_mc - pCx) / pCx_mc * 100.);
+                fh_dpxHe->Fill((pHex_mc - pHex) / pHex_mc * 100.);
+                fh_dpyC->Fill((pCy_mc - pCy) / pCy_mc * 100.);
+                fh_dpyHe->Fill((pHey_mc - pHey) / pHey_mc * 100.);
+                fh_dpzC->Fill((pCz_mc - pCz) / pCz_mc * 100.);
+                fh_dpzHe->Fill((pHez_mc - pHez) / pHez_mc * 100.);
+                fh_dpC->Fill((pcMC.Mag() - pc.Mag()) / pcMC.Mag() * 100.);
+                fh_dpHe->Fill((paMC.Mag() - pa.Mag()) / paMC.Mag() * 100.);
+
+                Double_t diff =
+                    sqrt(pCx_mc * pCx_mc + pCy_mc * pCy_mc + pCz_mc * pCz_mc) - sqrt(pCx * pCx + pCy * pCy + pCz * pCz);
+                //	cout<<"Difference: "<<pcMC.Mag() - pc.Mag()<<", "<<diff<<endl;
+
+                fh_x_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., XC);
+                fh_x_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., XHe);
+                fh_y_dpy->Fill((pCy_mc - pCy) / pCy_mc * 100., YC);
+                fh_y_dpy->Fill((pHey_mc - pHey) / pHey_mc * 100., YHe);
+                fh_dpy_dpx->Fill((pCx_mc - pCx) / pCx_mc * 100., (pCy_mc - pCy) / pCy_mc * 100.);
+                fh_dpy_dpx->Fill((pHex_mc - pHex) / pHex_mc * 100., (pHey_mc - pHey) / pHey_mc * 100.);
+            }
+        }
+        else
+        {
+
+            if (is_tracked)
+            {
+
+                fh_dx->Fill((Xf_mc - Xf) * 100.);
+                fh_dy->Fill((Yf_mc - Yf) * 100.);
+
+                fh_dpxO->Fill((Pxf_mc - Pxf) / Pxf_mc * 100.);
+                fh_dpyO->Fill((Pyf_mc - Pyf) / Pyf_mc * 100.);
+                fh_dpzO->Fill((Pzf_mc - Pzf) / Pzf_mc * 100.);
+                // fh_dpO->Fill((Pf_tot_mc - Pf_tot) / Pf_tot_mc * 100.);
+
+                fh_x_dpx->Fill((Pxf_mc - Pxf) / Pxf_mc * 100., Xf);
+                fh_y_dpy->Fill((Pyf_mc - Pyf) / Pyf_mc * 100., Yf);
+                // fh_dpy_dpx->Fill((Pxf_mc - Pxf) / Pxf_mc * 100., (Pyf_mc - Pyf) / Pyf_mc * 100.);
+            }
         }
     }
 
@@ -1345,18 +1448,11 @@ void R3BGlobalAnalysisS494::FinishEvent()
 void R3BGlobalAnalysisS494::FinishTask()
 {
 
-    fh_Tpat->Write();
-    fh_Trigger->Write();
-    fh_Cave_position->Write();
-    fh_TOFDOR->Write();
-    fh_SEE->Write();
-    fh_IC->Write();
-
     fh_target_xy->Write();
-    fh_target_px->Write();
-    fh_target_py->Write();
-    fh_target_pz->Write();
-    fh_target_p->Write();
+    //    fh_target_px->Write();
+    //    fh_target_py->Write();
+    //    fh_target_pz->Write();
+    //    fh_target_p->Write();
 
     fh_px_He->Write();
     fh_py_He->Write();
@@ -1366,12 +1462,20 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_py_C->Write();
     fh_pz_C->Write();
     fh_p_C->Write();
+    fh_px_O->Write();
+    fh_py_O->Write();
+    fh_pz_O->Write();
+    fh_p_O->Write();
 
     fh_chi2->Write();
 
     fh_dx->Write();
     fh_dy->Write();
     fh_dz->Write();
+    fh_dpxO->Write();
+    fh_dpyO->Write();
+    fh_dpzO->Write();
+    fh_dpO->Write();
     fh_dpxC->Write();
     fh_dpyC->Write();
     fh_dpzC->Write();

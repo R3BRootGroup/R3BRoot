@@ -77,7 +77,7 @@ InitStatus R3BTrackingDetector::Init()
 
     norm = ((pos1 - pos0).Cross(pos2 - pos0)).Unit();
 
-    cout << "Test" << endl;
+    cout << "In Tracking Detector: " << norm.X() << ", " << norm.Y() << ", " << norm.Z() << endl;
     pos0.Print();
     pos1.Print();
     pos2.Print();
@@ -156,9 +156,12 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
     local.RotateY(-fGeo->GetRotY() * TMath::DegToRad());
     x_local = local.X();
     y_local = local.Y();
-    //cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
-    //cout << "Local x: " << x_local << " y: " << y_local << endl;
-    //cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
+    Double_t z_local = local.Z();
+    //  cout<< "GlobalToLocal:"<<endl;
+    //  cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
+    // cout << "GlobalToLocal Local x: " << x_local << " y: " << y_local <<  " z: " << z_local <<endl;
+    //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
+
 }
 
 void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local)
@@ -166,8 +169,10 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
     posGlobal = TVector3(x_local, y_local, 0.);
     posGlobal.RotateY(fGeo->GetRotY() * TMath::DegToRad());
     posGlobal = posGlobal + pos0;
-    //cout << "Local x: " << x_local << " y: " << y_local << endl;
-    //cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
+    //  cout << "LocalToGlobal: "<<endl;
+    //  cout << "Local x: " << x_local << " y: " << y_local << endl;
+    //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
+
 }
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)

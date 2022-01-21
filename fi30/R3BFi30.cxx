@@ -199,6 +199,10 @@ Bool_t R3BFi30::ProcessHits(FairVolume* vol)
             fPosOut.SetX(newpos[0]);
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
+
+            // cout<<setprecision(10)<<"IN R3BFi30 exiting track: "<<fTrackID<<", "<<planeNr<<", "<<fPosIn.X()<<",
+            // "<<fPosOut.X()<<", "<< fPosIn.X()+61.224460462455166 <<", "<<fPosOut.X()+61.224460462455166<<",
+            // "<<fELoss<<endl;
         }
 
         AddHit(fTrackID,

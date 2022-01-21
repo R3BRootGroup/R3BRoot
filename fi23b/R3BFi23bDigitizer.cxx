@@ -186,12 +186,14 @@ void R3BFi23bDigitizer::Exec(Option_t* opt)
             {
                 if (energyl > 0.0001)
                 {
-					Double_t fiber_id = i;					
-                    Float_t xpos =
-                    -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. + 
-					fiber_id * (1 + air_layer) * fiber_thickness;
-                    cout << "Test Det = 23b"
-                         << " x = " << xpos << " fiber = " << i << endl;
+
+
+                    Double_t fiber_id = i;
+                    Double_t xpos = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                    fiber_id * (1 + air_layer) * fiber_thickness;
+
+                    // cout<<setprecision(10) << "Test Det = 23b" << " x = " << xpos << " fiber = " << i << endl;
+
 
                     new ((*Hits)[Hits->GetEntries()])
                         R3BBunchedFiberHitData(2,

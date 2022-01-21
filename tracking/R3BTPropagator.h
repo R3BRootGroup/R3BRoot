@@ -28,7 +28,7 @@ class R3BTrackingDetector;
 class R3BTPropagator : public TObject
 {
   public:
-    R3BTPropagator(R3BGladFieldMap* field, Bool_t vis = kFALSE);
+    R3BTPropagator(R3BGladFieldMap* field, Bool_t vis = kTRUE);
 
     virtual ~R3BTPropagator();
 

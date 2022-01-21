@@ -234,14 +234,22 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_py_C;
     TH1F* fh_pz_C;
     TH1F* fh_p_C;
+    TH1F* fh_px_O;
+    TH1F* fh_py_O;
+    TH1F* fh_pz_O;
+    TH1F* fh_p_O;
 
     TH2F* fh_chiy_vs_chix_He;
     TH2F* fh_chiy_vs_chix_C;
-    
+    TH2F* fh_chiy_vs_chix;
 
     TH1F* fh_dx;
     TH1F* fh_dy;
     TH1F* fh_dz;
+    TH1F* fh_dpxO;
+    TH1F* fh_dpyO;
+    TH1F* fh_dpzO;
+    TH1F* fh_dpO;
     TH1F* fh_dpxC;
     TH1F* fh_dpyC;
     TH1F* fh_dpzC;

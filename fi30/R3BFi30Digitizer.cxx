@@ -45,6 +45,7 @@
 
 using std::cout;
 using std::endl;
+using namespace std;
 
 R3BFi30Digitizer::R3BFi30Digitizer()
     : FairTask("R3B Fi30 Digitization scheme ")
@@ -104,7 +105,17 @@ void R3BFi30Digitizer::Exec(Option_t* opt)
 
         if (!entryNum)
             return;
+        /*
+                for (Int_t l = 0; l < entryNum; l++)
+                {
+                    R3BFibPoint* aTrack = (R3BFibPoint*)fFi30Points->At(l);
 
+                if(aTrack->GetModule()==43 || aTrack->GetModule()==45 || aTrack->GetModule()==52)
+           cout<<setprecision(10)<<"From Fi30Points: "<<l<<", "<<aTrack->GetModule()<<", "<<aTrack->GetXIn()<<";
+           "<<aTrack->GetXOut()<<endl;
+
+              }
+        */
         // creating the storage for energy and time for each PMT
         std::vector<Double_t>* energy = new std::vector<Double_t>[NumOfFibers];
         std::vector<Double_t>* time = new std::vector<Double_t>[NumOfFibers];
@@ -187,11 +198,15 @@ void R3BFi30Digitizer::Exec(Option_t* opt)
             {
                 if (energyl > 0.0000001)
                 {
-					Double_t fiber_id = i;
-                    Float_t xpos =
-                    -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. + 
-						fiber_id * (1 + air_layer) * fiber_thickness;
-                    cout << "Test: Det = 30" << " x = " << xpos << " fiber = " << i << endl;
+
+                    Double_t fiber_id = i;
+                    Double_t xpos = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                    fiber_id * (1 + air_layer) * fiber_thickness;
+
+                    //        if(fiber_id==43 || fiber_id==45 || fiber_id==52) cout<<setprecision(10)<< "Test: Det = 30"
+                    //        << " x = " << xpos << "lab x: "<<xpos-61.224460462455166<<" fiber = " << fiber_id <<" ,
+                    //        "<<energyl<<endl;
+
 
                     new ((*Hits)[Hits->GetEntries()])
                         R3BBunchedFiberHitData(6,

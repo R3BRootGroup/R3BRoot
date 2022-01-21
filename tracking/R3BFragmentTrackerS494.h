@@ -52,6 +52,7 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetSimu(Int_t simu) {fSimu = simu;}
     void SetForward(Bool_t forward) {fForward = forward;}
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
+    void SetBfield(Double_t Bfield) {fBfield = Bfield;}
     
   private:
     Bool_t InitPropagator();
@@ -73,7 +74,10 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t fNEvents;
     Int_t fNEventsLeft;
     Int_t fNEventsRight;
-    Int_t counter1 = 0;
+    Int_t counter1 = 0, fNEvents_nonull=0;
+    Double_t fBfield;
+    
+    Int_t icount100 = 0;
     
     enum DetectorInstances
     {
@@ -129,10 +133,10 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_eloss_fi33_mc;
     TH1F* fh_eloss_fi33;
     TH1F* fh_ncand;
-    TH1F* fh_x_res[7];
-    TH1F* fh_x_pull[7];
-    TH1F* fh_y_res[7];
-    TH1F* fh_y_pull[7];
+    TH1F* fh_x_res[8];
+    TH1F* fh_x_pull[8];
+    TH1F* fh_y_res[8];
+    TH1F* fh_y_pull[8];
     TH1F* fh_A_reco1;
     TH1F* fh_A_reco2;
     TH1F* fh_mom_res;
@@ -153,6 +157,7 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_px_r;
     TH1F* fh_py_r;
     TH1F* fh_pz_r;
+    TH2F* fh_p_vs_ch2;
     
    TH2F* fh_A_overZ;
 

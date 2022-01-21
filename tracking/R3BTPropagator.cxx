@@ -49,13 +49,14 @@ R3BTPropagator::R3BTPropagator(R3BGladFieldMap* field, Bool_t vis)
     fNorm1 = ((fPlane1[1] - fPlane1[0]).Cross(fPlane1[2] - fPlane1[0])).Unit();
     fNorm2 = ((fPlane2[1] - fPlane2[0]).Cross(fPlane2[2] - fPlane2[0])).Unit();
     //----------------------------------------------------------------------
-    fVis = kFALSE;
+    fVis = kTRUE;
+    fc4 = new TCanvas("c4", "", 50, 50, 800, 800);
+    TH2F* h3 = new TH2F("h3", "", 180, -450., 450., 180, -100., 800.);
+    h3->SetStats(kFALSE);
+    h3->Draw();
+
     if (fVis)
     {
-        fc4 = new TCanvas("c4", "", 50, 50, 400, 400);
-        TH2F* h3 = new TH2F("h3", "", 180, -450., 450., 180, -100., 800.);
-        h3->SetStats(kFALSE);
-        h3->Draw();
 
         TLine* l1 = new TLine(-fPlane1[1].X(), fPlane1[1].Z(), -fPlane1[2].X(), fPlane1[2].Z());
         l1->SetLineColor(2);
@@ -76,6 +77,13 @@ R3BTPropagator::~R3BTPropagator() {}
 
 Bool_t R3BTPropagator::PropagateToDetector(R3BTrackingParticle* particle, R3BTrackingDetector* detector)
 {
+    //   std::cout<<"In PropagateToDetector: "<<std::endl;
+    //   detector->pos0.Print();
+    //   detector->pos1.Print();
+    //   detector->pos2.Print();
+
+    detector->Draw();
+
     return PropagateToPlane(particle, detector->pos0, detector->pos1, detector->pos2);
 }
 
@@ -89,18 +97,25 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
                                         const TVector3& v2,
                                         const TVector3& v3)
 {
-    TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit();
-    // Check if particle is already on plane
-    if (TMath::Abs((particle->GetPosition() - v1).Dot(norm)) < 1e-6)
-    {
-        return kTRUE;
-    }
     TVector3 intersect;
     Bool_t crossed;
     Double_t step = 0.;
     Bool_t result;
+
+    TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit(); // normalized vector of vector product of (v2-1) and (v3-v1)
+    // Check if particle is already on plane
+    crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
+    TVector3 dist = (particle->GetPosition() - intersect);
+    Double_t diff = dist.Mag();
+
+    // if (TMath::Abs((particle->GetPosition() - v1).Dot(norm)) < 1e-6)
+    if (diff < 1.e-6)
+    {
+        return kTRUE;
+    }
+
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane1[0], fNorm1, intersect);
-    // LOG(INFO) << "crossed: " << crossed << " at:";
+    LOG(DEBUG2) << "crossed at glad entrance: " << crossed << " at:" << endl;
     // intersect.Print();
     if (crossed)
     {
@@ -110,20 +125,29 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
             LOG(DEBUG2) << "Propagating to end-plane and stop.";
             crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
             step = (intersect - particle->GetPosition()).Mag();
+            //  cout<<"Step 1: "<<step<<", intersect: "<<endl;
+            intersect.Print();
             particle->SetPosition(intersect);
             particle->AddStep(step);
             return kTRUE;
         }
 
         LOG(DEBUG2) << "Propagating to entrance of magnetic field.";
-        fVis = kFALSE;
+        fVis = kTRUE;
         if (fVis)
         {
+            //	cout<<"Line 1 to be plotted: xpart= "<<-particle->GetX()<<"; zpart= "<<particle->GetZ()<<", xinter=
+            //"<<-intersect.X()<<
+            //	", zinter= "<<intersect.Z()<<endl;
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
-            l1->Draw();
+            l1->SetLineColor(1);
+            l1->Draw("same");
         }
 
         step = (intersect - particle->GetPosition()).Mag();
+        //   cout<<"Step 2: "<<step<<", intersect: "<<endl;
+        // intersect.Print();
+
         particle->SetPosition(intersect);
         particle->AddStep(step);
         LOG(DEBUG2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z();
@@ -131,18 +155,23 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         // particle->GetMomentum().Print();
     }
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane2[0], fNorm2, intersect);
-    // LOG(INFO) << "crossed1: " << crossed << " at:";
+    LOG(DEBUG2) << "crossed at the end of Bfeld: " << crossed << " at:";
     // intersect.Print();
 
     if (crossed)
     {
-        LOG(DEBUG2) << "Propagating inside of field using RK4...";
+        LOG(DEBUG2) << "Propagating inside of field using RK4..." << endl;
         TVector3 tpos;
-        // cout << "Test1: " << (v1 - particle->GetPosition()).Mag() << "  " << (fPlane2[0] -
-        // particle->GetPosition()).Mag() << endl;
+        // cout << "Test1: dist to det: " << (v1 - particle->GetPosition()).Mag() << ", dist to exit: " << (fPlane2[0] -
+        // particle->GetPosition()).Mag() << ", xpart: "<<particle->GetX()<<", ypart: "<<particle->GetY()<<", zpart: "<<
+        // particle->GetZ()<<", det v1/v2/v3:  "<<endl;
+        // v1.Print();
+        // v2.Print();
+        // v3.Print();
         if ((v1 - particle->GetPosition()).Mag() < (fPlane2[0] - particle->GetPosition()).Mag())
         {
-            LOG(DEBUG2) << "Propagating to end-plane using RK4 and stop.";
+            // LOG(DEBUG2)
+            //   cout << "Propagating to end-plane using RK4 and stop."<<endl;
             tpos = particle->GetPosition();
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
@@ -150,10 +179,11 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
             result = PropagateToPlaneRK(particle, v1, v2, v3);
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
-            fVis = kFALSE;
+            fVis = kTRUE;
             if (fVis)
             {
                 TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
+                l1->SetLineColor(1);
                 l1->Draw();
             }
             return result;
@@ -162,7 +192,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         LOG(DEBUG2) << "Propagating to exit from magnetic field.";
         tpos = particle->GetPosition();
         result = PropagateToPlaneRK(particle, fPlane2[0], fPlane2[1], fPlane2[2]);
-        fVis = kFALSE;
+        fVis = true; // kTRUE;
         if (fVis)
         {
             TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
@@ -174,17 +204,21 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         }
     }
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
+    // cout << "crossed 3rd: " << crossed << " at:";
+    // intersect.Print();
     if (crossed)
     {
 
-        LOG(DEBUG2) << "Propagating to end plane. Finish.";
-        fVis = kFALSE;
+        LOG(DEBUG2) << "Propagating to end plane. Finish." << endl;
+        fVis = kTRUE;
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
             l1->Draw();
         }
-        step = (intersect - particle->GetPosition()).Mag();
+        step = (intersect - particle->GetPosition()).Mag() * 0.1;
+        // cout<<"Step 3: "<<step<<", interesct: "<<endl;
+        // intersect.Print();
         particle->SetPosition(intersect);
         particle->AddStep(step);
         LOG(DEBUG2);
@@ -219,7 +253,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         {
             LOG(DEBUG2) << "Propagating to end-plane and stop.";
             crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
-            fVis = kFALSE;
+            fVis = kTRUE;
             if (fVis)
             {
                 TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -231,7 +265,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
             return kTRUE;
         }
         LOG(DEBUG2) << "Propagating to exit of magnetic field.";
-        fVis = kFALSE;
+        fVis = kTRUE;
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -253,7 +287,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
             LOG(DEBUG2) << "Propagating to end-plane using RK4 and stop.";
             tpos = particle->GetPosition();
             result = PropagateToPlaneRK(particle, v1, v3, v2);
-            fVis = kFALSE;
+            fVis = kTRUE;
             if (fVis)
             {
                 TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
@@ -265,7 +299,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         LOG(DEBUG2) << "Propagating to entrance of magnetic field.";
         tpos = particle->GetPosition();
         result = PropagateToPlaneRK(particle, fPlane1[0], fPlane1[2], fPlane1[1]);
-        fVis = kFALSE;
+        fVis = kTRUE;
         if (fVis)
         {
             TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
@@ -282,7 +316,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
     if (crossed)
     {
         LOG(DEBUG2) << "Propagating to end plane. Finish.";
-        fVis = kFALSE;
+        fVis = kTRUE;
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -309,20 +343,29 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     Double_t vecRKIn[7];
     Double_t vecTemp[7];
     Double_t vecOut[7];
+    TVector3 dist;
+    Double_t diff;
+    TVector3 intersect;
+    Bool_t crossed;
+    Double_t distance;
 
     particle->GetPosition(vecRKIn);
     particle->GetCosines(&vecRKIn[3]);
 
     TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit();
-    TVector3 dist = particle->GetPosition() - v1;//ersetze mit Abstand zur Ebene
-    
-    Double_t diff = dist.Dot(norm);
+
+    // dist = particle->GetPosition() - v1;
+    // diff = dist.Dot(norm);
+    crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
+    dist = (particle->GetPosition() - intersect);
+    diff = dist.Mag();
     // cout << "diff: " << diff << endl;
+
     // Double_t step = TMath::Abs(diff) / 400.;// / 100.;
     Double_t step = 0.1;
     Double_t length = 0.;
-    Double_t res = 100.;
-    Double_t res_old = 100.;
+    Double_t res = 10000.;
+    Double_t res_old = 10000.;
 
     // cout << "Step: " << step << endl;
 
@@ -343,13 +386,21 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
 
         nStep += 1;
 
-        dist = particle->GetPosition() - v1;
-        Double_t distance = (TVector3(dist.X() * norm.X(), dist.Y() * norm.Y(), dist.Z() * norm.Z())).Mag();
-        res = TMath::Abs(distance / diff);
-        // cout << "Res: " << res << "  " << res_old << "  " << nStep << "  " << distance << endl;
-        if (res < 0.001 || res > res_old)
+        //   dist = particle->GetPosition() - v1;
+        //   distance = (TVector3(dist.X() * norm.X(), dist.Y() * norm.Y(), dist.Z() * norm.Z())).Mag();
+
+        crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
+        dist = (particle->GetPosition() - intersect);
+        distance = dist.Mag();
+
+        res = TMath::Abs(distance); // / diff);
+
+        if (res < 0.1 || res > res_old)
         {
+
             // cout << "break############" << endl;
+            // cout << "Res: " << res << "  " << res_old << "  " << nStep << "  " << distance << endl;
+            // cout<<"Intersection point: "<<intersect.X()<<", "<<intersect.Y()<<", "<<intersect.Z()<<endl;
             break;
         }
         else
@@ -359,7 +410,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
             step = 0.1;
         }
 
-        if (nStep > 1000)
+        if (nStep > 100000)
         {
             return kFALSE;
         }
