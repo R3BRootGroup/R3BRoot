@@ -144,6 +144,9 @@ InitStatus R3BOnlineSpectraPdc::Init()
         TCanvas* cPdc_planes = new TCanvas("PDC_planes", "PDC planes", 50, 50, 500, 500);
         cPdc_planes->Divide(5, 4);
 
+        TCanvas* cPdc = new TCanvas("PDC", "PDC", 50, 50, 500, 500);
+        cPdc->Divide(1, 4);
+
         for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
         {
             char strName1[255];
@@ -202,6 +205,15 @@ InitStatus R3BOnlineSpectraPdc::Init()
             fh_Pdc_xy[j]->GetXaxis()->SetTitle("x in cm");
             fh_Pdc_xy[j]->GetYaxis()->SetTitle("y in cm");
 
+            char strName15[255];
+            sprintf(strName15, "pdc_wire_vs_Event_plane_%d", j + 1);
+            char strName16[255];
+            sprintf(strName16, "PDC wire vs. events plane %d", j + 1);
+            fh_Pdc_Wire_vs_Events[j] = new TH2F(strName15, strName16, 1000, 0, 10000000, 150, 0, 150);
+            fh_Pdc_Wire_vs_Events[j]->GetXaxis()->SetTitle("Event number");
+            fh_Pdc_Wire_vs_Events[j]->GetYaxis()->SetTitle("Wire number");
+
+
             /*
                         char strName9[255];
                         sprintf(strName9, "tofd_multihit_plane_%d", j + 1);
@@ -235,12 +247,20 @@ InitStatus R3BOnlineSpectraPdc::Init()
             cPdc_planes->cd(j * 5 + 5);
             // gPad->SetLogz();
             fh_Pdc_xy[j]->Draw("colz");
+            
+            cPdc->cd(j + 1);
+            fh_Pdc_Wire_vs_Events[j]->Draw("colz");
+            
         }
 
         cPdc_planes->cd(0);
         run->AddObject(cPdc_planes);
+        cPdc->cd(0);
+        run->AddObject(cPdc);
 
         run->GetHttpServer()->RegisterCommand("Reset_PDC", Form("/Tasks/%s/->Reset_PDC_Histo()", GetName()));
+
+
     }
 
     return kSUCCESS;
@@ -257,11 +277,13 @@ void R3BOnlineSpectraPdc::Reset_PDC_Histo()
         fh_Pdc_xy[i]->Reset();
         fh_Pdc_x[i]->Reset();
         fh_Pdc_y[i]->Reset();
+        fh_Pdc_Wire_vs_Events[i]->Reset();
     }
 }
 
 void R3BOnlineSpectraPdc::Exec(Option_t* option)
 {
+	fNEvents++;
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
@@ -321,9 +343,21 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Int_t const iWire = mapped->GetWireId();   // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
             //cout << "Plane: " << iPlane << " Wire: " << iWire << endl;
+            Int_t wire = iWire;
+/*
+			if(wire%8 == 1) wire=wire;
+			else if(wire%8 == 2) wire=wire+1;
+			else if(wire%8 == 3) wire=wire+2;
+			else if(wire%8 == 4) wire=wire+3;
+			else if(wire%8 == 5) wire=wire-3;
+			else if(wire%8 == 6) wire=wire-2;
+			else if(wire%8 == 7) wire=wire-1;
+			else if(wire%8 == 0) wire=wire;
+*/
             if (iPlane <= N_PLANE_MAX_PDC)
             {
-                fh_Pdc_Wire[iPlane - 1]->Fill(iWire);
+                fh_Pdc_Wire[iPlane - 1]->Fill(wire);
+                fh_Pdc_Wire_vs_Events[iPlane - 1]->Fill(fNEvents,wire);
             }
         }
     }
@@ -388,14 +422,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 			y[plane - 1] = hit->GetY();
 			eloss[plane - 1] = hit->GetEloss();
 			t[plane - 1] = hit->GetTime();
-			if (plane & 1)
-			{
-				fh_Pdc_Tot[plane - 1]->Fill(x[plane - 1], eloss[plane - 1]);
-			}
-			else
-			{
-				fh_Pdc_Tot[plane - 1]->Fill(y[plane - 1], eloss[plane - 1]);
-			}
+			fh_Pdc_Tot[plane - 1]->Fill(wire, eloss[plane - 1]);
 			fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
 
 			if (hit->GetX() > 0 )
@@ -438,7 +465,7 @@ void R3BOnlineSpectraPdc::FinishTask()
             fh_Pdc_Wire[i]->Write();
             fh_Pdc_Tot[i]->Write();
             fh_Pdc_Time[i]->Write();
-            // fh_Pdc_Wire_vs_Events[i]->Write();
+            fh_Pdc_Wire_vs_Events[i]->Write();
         }
     }
 }

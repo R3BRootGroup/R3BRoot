@@ -92,7 +92,7 @@ R3BPdcHitModulePar* R3BPdcHitPar::GetModuleParAt(Int_t wire)
                 continue;
             }
             tWire = par->GetWire();
-            if (tWire < 1 || tWire > N_WIRE_MAX)
+            if (tWire < 1 || tWire > N_WIRE_MAX*N_PLANE_MAX_PDC)
             {
                 LOG(ERROR) << "R3BPdcHitPar::GetModuleParAt : error in Wire indexing. " << tWire;
                 continue;
@@ -108,7 +108,7 @@ R3BPdcHitModulePar* R3BPdcHitPar::GetModuleParAt(Int_t wire)
         fMapInit = kTRUE;
     }
 
-    if (wire < 1 || wire > N_WIRE_MAX)
+    if (wire < 1 || wire > N_WIRE_MAX*N_PLANE_MAX_PDC)
     {
         LOG(ERROR) << "R3BPdcHitPar::GetModuleParAt : error in wire indexing. " << wire;
         return NULL;

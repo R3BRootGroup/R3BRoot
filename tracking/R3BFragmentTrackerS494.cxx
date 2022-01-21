@@ -298,6 +298,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     fNEvents += 1;
 
+
     fArrayFragments->Clear();
     if (fFragments.size() > 0)
     {
@@ -308,7 +309,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug = false;
+    Bool_t debug = true;
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -333,12 +334,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
-    if (tof->hits.size() < 2)
+
+/*
+    if (tof->hits.size() < 1)
         return;
-    if (fi23a->hits.size() < 2)
+    if (fi23a->hits.size() < 1)
         return;
-    if (fi23b->hits.size() < 2)
-        return;
+    if (fi23b->hits.size() < 1)
+        return;        
     if (fi30->hits.size() < 1)
         return;
     if (fi31->hits.size() < 1)
@@ -347,6 +350,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         return;
     if (fi33->hits.size() < 1)
         return;
+*/        
     /*
         if (tof->hits.size() != 4)
             return;
@@ -376,9 +380,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     // Start values
     Double_t beta = 0.;
+    Double_t beta0 = 0.;
     Double_t x0 = 0.;
     Double_t y0 = 0.;
-    Double_t z0 = -16.2;
+    Double_t z0 = 0.;
     Double_t px0 = 0;
     Double_t py0 = 0.;
     Double_t pz0 = 0.;
@@ -404,6 +409,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t pz0C = 0.;
     Double_t pC = 0.;
     Double_t massC = 0.;
+
+    Double_t betaO = 0.;
+    Double_t x0O = 0.;
+    Double_t y0O = 0.;
+    Double_t z0O = 0.;
+    Double_t px0O = 0;
+    Double_t py0O = 0.;
+    Double_t pz0O = 0.;
+    Double_t pO = 0.;
+    Double_t massO = 0.;
 
     if (fArrayMCTracks)
     {
@@ -454,19 +469,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 if (PID == 1000080160)
                 {
                     // 16O
-                    beta = 1. / TMath::Sqrt(1 + TMath::Power(ion->GetMass() / ion->GetP(), 2));
-                    x0 = ion->GetStartX();
-                    y0 = ion->GetStartY();
-                    z0 = ion->GetStartZ();
-                    px0 = ion->GetPx();
-                    py0 = ion->GetPy();
-                    pz0 = ion->GetPz();
-                    p = ion->GetP();
-                    mass = ion->GetMass();
+                    betaO = 1. / TMath::Sqrt(1 + TMath::Power(ion->GetMass() / ion->GetP(), 2));
+                    x0O = ion->GetStartX();
+                    y0O = ion->GetStartY();
+                    z0O = ion->GetStartZ();
+                    px0O = ion->GetPx();
+                    py0O = ion->GetPy();
+                    pz0O = ion->GetPz();
+                    pO = ion->GetP();
+                    massO = ion->GetMass();
                     LOG(DEBUG) << "MC ************ 16O **************";
-                    LOG(DEBUG) << "MC position x: " << x0 << " y: " << y0 << " z: " << z0;
-                    LOG(DEBUG) << "MC momentum p: " << p << " px " << px0 << " py " << py0 << " pz " << pz0;
-                    LOG(DEBUG) << "MC mass: " << mass << " beta: " << beta;
+                    LOG(DEBUG) << "MC position x: " << x0O << " y: " << y0O << " z: " << z0O;
+                    LOG(DEBUG) << "MC momentum p: " << pO << " px " << px0O << " py " << py0O << " pz " << pz0O;
+                    LOG(DEBUG) << "MC mass: " << massO << " beta: " << betaO;
                 }
             }
         }
@@ -502,7 +517,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     // try to fit all possible combination of hits.
 
-    fPropagator->SetVis(kFALSE);
+    fPropagator->SetVis(kTRUE);
 
     Int_t nCand = 0;
 
@@ -558,7 +573,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Int_t Icountleft = 0;
     Int_t Icountright = 0;
 
-    for (Int_t l = 1; l < 3; l++)
+    //for (Int_t l = 1; l < 3; l++)
+    for (Int_t l = 0; l < 1; l++)
     {
         // l = 0: 16O
         // l = 1: 12C
@@ -580,7 +596,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
         else if (l == 2)
         {
-            charge_requested = 2;
+            charge_requested = 2; 
         }
 
         // Loop over all combinations of hits
@@ -598,13 +614,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 charge = tof->hits.at(i)->GetEloss();
                 Charge = tof->hits.at(i)->GetEloss();
             }
+            if (debug)
+                cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
+
 
             if (charge != charge_requested)
                 continue;
             if (debug)
                 cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
 
-            Double_t beta0 = 0.7593; // velocity could eventually be calculated from ToF
+            beta0 = 0.7593; // velocity could eventually be calculated from ToF
             tof->res_t = 0.03;
             // Double_t m0 = charge * 2. * 0.931494028; // First guess of mass
 
@@ -648,7 +667,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
                 if (fNEventsLeft == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-
+/*
                 Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
@@ -662,7 +681,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 if (debug)
                     cout << "Field left after:" << field << endl;
-
+*/
                 do // fi30
                 {
                     if (ifi30 >= 0)
@@ -843,7 +862,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
                 if (fNEventsRight == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-
+/*
                 Double_t fieldScale = -1710.0 / 3583.81 * 1.0; // standard
                 Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
                 Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
@@ -857,7 +876,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
                 if (debug)
                     cout << "Field right after:" << field << endl;
-
+*/
                 do // fi33
                 {
                     if (ifi33 >= 0)
@@ -1085,6 +1104,21 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             tof->free_hit[candidate->GetHitIndexByName("tofd")] = false;
 
             Double_t x0soll, y0soll, z0soll, psoll, px0soll, py0soll, pz0soll, beta0soll, m0soll;
+
+            if (l == 0)
+            {
+                LOG(DEBUG) << "16O";
+                x0soll = x0O;
+                y0soll = y0O;
+                z0soll = z0O;
+                px0soll = px0O;
+                py0soll = py0O;
+                pz0soll = pz0O;
+                psoll = pO;
+                m0soll = massO;
+                beta0soll = betaO;
+            }
+
             if (l == 1)
             {
                 LOG(DEBUG) << "12C";

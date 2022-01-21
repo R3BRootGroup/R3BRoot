@@ -314,11 +314,12 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     particle->GetCosines(&vecRKIn[3]);
 
     TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit();
-    TVector3 dist = particle->GetPosition() - v1;
+    TVector3 dist = particle->GetPosition() - v1;//ersetze mit Abstand zur Ebene
+    
     Double_t diff = dist.Dot(norm);
     // cout << "diff: " << diff << endl;
     // Double_t step = TMath::Abs(diff) / 400.;// / 100.;
-    Double_t step = 0.01;
+    Double_t step = 0.1;
     Double_t length = 0.;
     Double_t res = 100.;
     Double_t res_old = 100.;
@@ -355,7 +356,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
         {
             res_old = res;
             // step = distance / 400.;// / 100.;
-            step = 1.;
+            step = 0.1;
         }
 
         if (nStep > 1000)

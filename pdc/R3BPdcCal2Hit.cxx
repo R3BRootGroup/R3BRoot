@@ -325,13 +325,18 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 auto const& pdc_tot = *it_pdc_tot;
                 auto plane = pdc_tot.lead->GetPlaneId();
                 auto wire = pdc_tot.lead->GetWireId();
+/*                
                 cout << "wire before: " << wire << endl;
-                if(wire%8 == 5) wire=wire+3;
-                else if(wire%8 == 6) wire=wire+1;
+                if(wire%8 == 1) wire=wire;
+                else if(wire%8 == 2) wire=wire+1;
+                else if(wire%8 == 3) wire=wire+2;
+                else if(wire%8 == 4) wire=wire+3;
+                else if(wire%8 == 5) wire=wire-3;
+                else if(wire%8 == 6) wire=wire-2;
                 else if(wire%8 == 7) wire=wire-1;
-                else if(wire%8 == 0) wire=wire-3;
+                else if(wire%8 == 0) wire=wire;
                 cout << "wire after: " << wire << endl;
-                
+*/                
                 auto tot_pdc = pdc_tot.tot_ns;
                 Double_t t_pdc = pdc_tot.lead_ns;
 
@@ -351,13 +356,17 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 						auto const& pdc_tot1 = *it_pdc_tot1;
 						auto plane1 = pdc_tot1.lead->GetPlaneId();
 						auto wire1 = pdc_tot1.lead->GetWireId();
+/*						
 						cout << "wire1 before: " << wire1 << endl;
-						if(wire1%8 == 5) wire1=wire1+3;
-						else if(wire1%8 == 6) wire1=wire1+1;
+						if(wire1%8 == 1) wire=wire;
+						else if(wire1%8 == 2) wire1=wire1+1;
+						else if(wire1%8 == 3) wire1=wire1+2;
+						else if(wire1%8 == 4) wire1=wire1+3;
+						else if(wire1%8 == 5) wire1=wire1-3;
+						else if(wire1%8 == 6) wire1=wire1-2;
 						else if(wire1%8 == 7) wire1=wire1-1;
-						else if(wire1%8 == 0) wire1=wire1-3;
-						cout << "wire1 after: " << wire1 << endl;
-
+						else if(wire1%8 == 0) wire1=wire1;
+*/						
 						auto tot_pdc1 = pdc_tot1.tot_ns;
 						Double_t t_pdc1 = pdc_tot1.lead_ns;
 
@@ -391,7 +400,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 				
 				if (!fIsCalibrator && fHitPar)
 				{
-					R3BPdcHitModulePar* par = fHitPar->GetModuleParAt(wire);
+					R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((plane-1)*N_WIRE_MAX+wire);
 					if (par)
 					{
 						tmin = par->GetTmin();
@@ -514,111 +523,114 @@ void R3BPdcCal2Hit::FinishTask()
 		cfit->Divide(1,2);
 
         R3BPdcHitModulePar* mpar;
-
-        UInt_t max = N_WIRE_MAX;
-        if (fh_time_raw[0]->GetNbinsX() < N_WIRE_MAX)
-        {
-            max = fh_time_raw[0]->GetNbinsX();
-		}
-		
-        for (UInt_t i = 1; i <= max; i++)
-        {
-            mpar = new R3BPdcHitModulePar();
-            mpar->SetWire(i);
-            fHitPar->AddModulePar(mpar);
-        }
-        for (UInt_t i = 1; i <= max; i++)
-        {
-            // find maximum value of drift times
-            TH1D* proj = fh_time_raw[0]->ProjectionY("", i + 1, i + 1, 0);
-
-			// make running sum of drift times
-			if(i >= 0)
+		cout << "MAX: " << N_PLANE_MAX_PDC << endl;
+	    for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
+		{
+			for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
 			{
-				Double_t sum = 0;
-
-				Double_t y[4000], x[4000];
-				Double_t y1[4000], x1[4000];
-				Int_t n = 0;
-				Int_t n1 = 0;
-				Double_t center = 0;
-				//Double_t wire_distance = 7.8; // in mm
-				TGraph* gr1 = new TGraph();
-				TGraph* gr2 = new TGraph();
-				Double_t tmin = -10000.;
-				Double_t tmax = -10000.;
-				sum = 0.;
-				for (UInt_t j = 1; j < proj->GetNbinsX()-2; j++)
-				{
-					sum = sum + proj->GetBinContent(j)/proj->GetSum() * wire_distance;
-					//cout << "sum: " << sum << "  " << proj->GetBinContent(j)/proj->GetSum() * 8. << endl;
-					//cout << "Bin: " << proj->GetBinCenter(j) <<  "  " << proj->GetBinContent(j) << endl;
-					fh_running_sum->Fill(proj->GetBinCenter(j), sum);
-					if(sum > 0.1 && tmin < -9999) 
-					{
-						tmin = proj->GetBinCenter(j);
-					}
-					if(sum > wire_distance-0.1 && tmax < -9999) 
-					{
-						tmax = proj->GetBinCenter(j);
-					}
-					if(sum > 0.1 && sum < wire_distance-0.1)
-					{
-						x[n] = proj->GetBinCenter(j);
-						y[n] = sum ;
-						n++;
-					}		
-				}
-
-				
-				// Fitting pol
-				cfit->cd(1);
-				gr1 = new TGraph(n, x, y);
-				gr1->SetTitle("Points found for fitting; drift times in ns; radius in mm");
-				gr1->Draw("A*");
-				TF1* f2 = new TF1("f2", "pol4", -400, 400);
-				f2->SetLineColor(3);
-				gr1->Fit("f2", "Q", "", -400, 400);
-				Double_t p[5];
-				std::cout << "Parameter pol: \n";
-				for (Int_t j = 0; j < 5; j++)
-				{
-					p[j] = f2->GetParameter(j);
-					std::cout << "Parameter: " << p[j] << "\n";
-				}
-				
-				cfit->cd(2);
-
-				n1 = n;
-				for (Int_t j = 0; j < n; j++)
-				{
-					x1[j] = x[j];
-					y1[j] = y[j] - (p[0] + p[1]*x[j] + p[2]*x[j]*x[j] + p[3]*x[j]*x[j]*x[j] + p[4]*x[j]*x[j]*x[j]*x[j]);
-				}
-				gr2 = new TGraph(n1, x1, y1);
-				gr2->SetTitle("Residuals");
-				gr2->Draw("A*");
-				
-				
-				cfit->Update();
-				gPad->WaitPrimitive();
-				//gSystem->Sleep(3000);
-				// time offset 
-				R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(i);
-				par2->SetTmin(tmin);
-				par2->SetTmax(tmax);
-				par2->SetPar1(p[0]);
-				par2->SetPar2(p[1]);
-				par2->SetPar3(p[2]);
-				par2->SetPar4(p[3]);
-				par2->SetPar5(p[4]);
-
-				cout << "Set parameter of wire: " << i << " tmin: " << tmin << " tmax: " << tmax << endl;
-				cout << "Parameter: " << p[0] << "  " << p[1] << "  "<< p[2] << "  " 
-				<< p[3] << "  "<< p[4] << endl;
+				mpar = new R3BPdcHitModulePar();
+				mpar->SetWire(plane*N_WIRE_MAX + i);
+				cout << "New module: " << plane*N_WIRE_MAX + i << endl;
+				fHitPar->AddModulePar(mpar);
 			}
+		}
+	    for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
+		{			
+			for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
+			{
+				// find maximum value of drift times
+				TH1D* proj = fh_time_raw[plane]->ProjectionY("", i + 1, i + 1, 0);
 
+				// make running sum of drift times
+				if(i >= 0)
+				{
+					Double_t sum = 0;
 
+					Double_t y[4000], x[4000];
+					Double_t y1[4000], x1[4000];
+					Int_t n = 0;
+					Int_t n1 = 0;
+					Double_t center = 0;
+					//Double_t wire_distance = 7.8; // in mm
+					TGraph* gr1 = new TGraph();
+					TGraph* gr2 = new TGraph();
+					Double_t tmin = -10000.;
+					Double_t tmax = -10000.;
+					sum = 0.;
+					for (UInt_t j = 1; j < proj->GetNbinsX()-2; j++)
+					{
+						sum = sum + proj->GetBinContent(j)/proj->GetSum() * wire_distance;
+						//cout << "sum: " << sum << "  " << proj->GetBinContent(j)/proj->GetSum() * 8. << endl;
+						//cout << "Bin: " << proj->GetBinCenter(j) <<  "  " << proj->GetBinContent(j) << endl;
+						fh_running_sum->Fill(proj->GetBinCenter(j), sum);
+						if(sum > 0.1 && tmin < -9999) 
+						{
+							tmin = proj->GetBinCenter(j);
+						}
+						if(sum > wire_distance-0.1 && tmax < -9999) 
+						{
+							tmax = proj->GetBinCenter(j);
+						}
+						if(sum > 0.1 && sum < wire_distance-0.1)
+						{
+							x[n] = proj->GetBinCenter(j);
+							y[n] = sum ;
+							n++;
+						}		
+					}
+
+					
+					// Fitting pol
+					cfit->cd(1);
+					gr1 = new TGraph(n, x, y);
+					gr1->SetTitle("Points found for fitting; drift times in ns; radius in mm");
+					gr1->Draw("A*");
+					TF1* f2 = new TF1("f2", "pol4", -400, 400);
+					f2->SetLineColor(3);
+					gr1->Fit("f2", "Q", "", -400, 400);
+					Double_t p[5];
+					std::cout << "Parameter pol: \n";
+					for (Int_t j = 0; j < 5; j++)
+					{
+						p[j] = f2->GetParameter(j);
+						std::cout << "Parameter: " << p[j] << "\n";
+					}
+					
+					cfit->cd(2);
+
+					n1 = n;
+					for (Int_t j = 0; j < n; j++)
+					{
+						x1[j] = x[j];
+						y1[j] = y[j] - (p[0] + p[1]*x[j] + p[2]*x[j]*x[j] + p[3]*x[j]*x[j]*x[j] + p[4]*x[j]*x[j]*x[j]*x[j]);
+					}
+					gr2 = new TGraph(n1, x1, y1);
+					gr2->SetTitle("Residuals");
+					gr2->Draw("A*");
+					
+					
+					cfit->Update();
+					//gPad->WaitPrimitive();
+					//gSystem->Sleep(3000);
+					// time offset 
+
+					cout << "Plane: " << plane << "  " << plane*N_WIRE_MAX + i << endl;
+					cout << "Set parameter of wire: " << i << " tmin: " << tmin << " tmax: " << tmax << endl;
+					cout << "Parameter: " << p[0] << "  " << p[1] << "  "<< p[2] << "  " 
+					<< p[3] << "  "<< p[4] << endl;
+
+					R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(plane*N_WIRE_MAX + i);
+					par2->SetTmin(tmin);
+					par2->SetTmax(tmax);
+					par2->SetPar1(p[0]);
+					par2->SetPar2(p[1]);
+					par2->SetPar3(p[2]);
+					par2->SetPar4(p[3]);
+					par2->SetPar5(p[4]);
+
+				}
+
+			}
 
         }
 

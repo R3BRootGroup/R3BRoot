@@ -107,6 +107,19 @@ double Chi2(const double* xx)
 
 double Chi2MomentumForward(const double* xx)
 {
+
+/*
+	auto fi31 = gSetup->GetByName("fi31");
+	TVector3 fib31(-111.1, 0., 537.8);
+	Double_t xxx, yyy;
+	fi31->GlobalToLocal(fib31, xxx, yyy);
+	cout << "***************** " << xxx << "  " << yyy << endl;
+	
+	TVector3 out;
+	fi31->LocalToGlobal(out, -21.40, 0.);
+    cout<<"++++++++++++++++++ " << out.X() << "  " << out.Y() << "  " << out.Z() << endl;
+*/        
+
     LOG(DEBUG3) << "In chi2 forward" << endl;
     LOG(DEBUG3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
                 << "  " << gCandidate->GetMomentum().Z() << endl;
@@ -628,13 +641,16 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
     ROOT::Math::Functor* f = new ROOT::Math::Functor(&Chi2Backward2D, 1);
 
     fMinimum->SetFunction(*f);
-    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
-    minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
+    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Minimize");
+    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Scan");
+    //minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Seek");
 
     // set tolerance , etc...
-    minimum_m->SetMaxFunctionCalls(100000); // for Minuit/Minuit2
-    minimum_m->SetMaxIterations(10000);     // for GSL
-    minimum_m->SetTolerance(1.0);
+    minimum_m->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
+    minimum_m->SetMaxIterations(1000);     // for GSL
+    minimum_m->SetTolerance(10.0);
     minimum_m->SetPrintLevel(0);
 
     // create funciton wrapper for minmizer
@@ -694,7 +710,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrack(R3BTrackingParticle* particle, R3BTrac
 
 Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
-    // fPropagator->SetVis(kTRUE);
+    fPropagator->SetVis(kFALSE);
     LOG(DEBUG3) << "In track momentum forward" << endl;
     gCandidate = particle;
     gSetup = setup;
@@ -755,14 +771,14 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
     // Set the free variables to be minimized!
 
-    minimum_m->SetLimitedVariable(0, "px", variable[0], step[0], -1., 1.);
-    minimum_m->SetLimitedVariable(1, "py", variable[1], step[1], -1., 1.);
+    minimum_m->SetLimitedVariable(0, "px", variable[0], step[0], -10.05, 10.05);
+    minimum_m->SetLimitedVariable(1, "py", variable[1], step[1], -10.05, 10.05);
     minimum_m->SetLimitedVariable(2,
                                   "pz",
                                   variable[2],
                                   step[2],
-                                  gCandidate->GetStartMomentum().Z() - 2.,
-                                  gCandidate->GetStartMomentum().Z() + 2.);
+                                  gCandidate->GetStartMomentum().Z() - 20.5,
+                                  gCandidate->GetStartMomentum().Z() + 20.5);
 
     minimum_m->SetLimitedVariable(3, "x0", variable[3], step[3], -1., 1.);
     minimum_m->SetLimitedVariable(4, "y0", variable[4], step[4], -1., 1.);

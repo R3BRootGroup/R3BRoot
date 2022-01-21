@@ -30,7 +30,7 @@
 #pragma link C++ class R3BTrackingDetector+;
 #pragma link C++ class R3BTrackingParticle+;
 #pragma link C++ class R3BTrackingSetup+;
-//#pragma link C++ class R3BOptimizeGeometryS454+;
+#pragma link C++ class R3BOptimizeGeometryS494+;
 
 #endif
 

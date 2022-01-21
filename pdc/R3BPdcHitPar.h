@@ -14,9 +14,11 @@
 #ifndef R3BPDCHITPAR_H
 #define R3BPDCHITPAR_H
 
-#define NMODULEMAX 6000
 
 #define N_WIRE_MAX 144
+#define N_PLANE_MAX_PDC 4
+
+#define NMODULEMAX 6000
 
 #include "FairParGenericSet.h" // for FairParGenericSet
 #include "R3BPdcHitModulePar.h"

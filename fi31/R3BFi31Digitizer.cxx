@@ -187,8 +187,10 @@ void R3BFi31Digitizer::Exec(Option_t* opt)
             {
                 if (energyl > 0.0000001)
                 {
+					Double_t fiber_id = i;
                     Float_t xpos =
-                        -detector_width / 2. + fiber_thickness / 2. + (i + (i * air_layer)) * fiber_thickness;
+                    -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. + 
+						fiber_id * (1 + air_layer) * fiber_thickness;
                     cout << "Test: Det = 31"
                          << " x = " << xpos << " fiber = " << i << endl;
 
