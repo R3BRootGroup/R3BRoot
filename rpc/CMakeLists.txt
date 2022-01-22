@@ -25,7 +25,12 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/rpc
+${R3BROOT_SOURCE_DIR}/rpc/sim
+${R3BROOT_SOURCE_DIR}/rpc/pars
+${R3BROOT_SOURCE_DIR}/rpc/calibration
+${R3BROOT_SOURCE_DIR}/rpc/online
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -40,7 +45,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-# R3BRpc.cxx
+# ./online/R3BRpcOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

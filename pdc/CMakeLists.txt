@@ -22,16 +22,14 @@ ${BASE_INCLUDE_DIRECTORIES}
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
-${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/pdc
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/tracking
-${R3BROOT_SOURCE_DIR}/r3bsource
-${R3BROOT_SOURCE_DIR}/r3bsource/ext
+${R3BROOT_SOURCE_DIR}/r3bsource/pdc
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
