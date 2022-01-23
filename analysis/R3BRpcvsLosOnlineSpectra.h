@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------
-// -----             R3BRpcOnlineSpectra                 -----
+// -----          R3BRpcvsLosOnlineSpectra               -----
 // -----   Created 23/01/22 by J.L. Rodriguez-Sanchez    -----
 // -----         Fill RPC online histograms              -----
 // -----------------------------------------------------------
 
-#ifndef R3BRpcOnlineSpectra_H
-#define R3BRpcOnlineSpectra_H
+#ifndef R3BRpcvsLosOnlineSpectra_H
+#define R3BRpcvsLosOnlineSpectra_H
 
 #include "FairTask.h"
 
@@ -38,9 +38,9 @@ class TH1F;
 class TH2F;
 
 /**
- * This taks reads RPC data and plots online histograms
+ * This taks reads RPC vs Los data and plots online histograms
  */
-class R3BRpcOnlineSpectra : public FairTask
+class R3BRpcvsLosOnlineSpectra : public FairTask
 {
 
   public:
@@ -48,7 +48,7 @@ class R3BRpcOnlineSpectra : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BRpcOnlineSpectra();
+    R3BRpcvsLosOnlineSpectra();
 
     /**
      * Standard constructor.
@@ -56,13 +56,13 @@ class R3BRpcOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose = 1);
+    R3BRpcvsLosOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BRpcOnlineSpectra();
+    virtual ~R3BRpcvsLosOnlineSpectra();
 
     /**
      * Method for task initialization.
@@ -95,12 +95,12 @@ class R3BRpcOnlineSpectra : public FairTask
     /**
      * Method to reset histograms
      */
-    void Reset_RPC_Histo();
+    void Reset_RpcvsLos_Histo();
 
     /**
-     * Method to set the number of detectors
+     * Method to set the number of rpc strips
      */
-    void SetNbDet(Int_t ndet) { fNbDet = ndet; }
+    void SetNbStrips(Int_t n) { fNbStrips = n; }
 
     /**
      * Method to set the trigger
@@ -108,25 +108,22 @@ class R3BRpcOnlineSpectra : public FairTask
     void SetTrigger(Int_t trigg) { fTrigger = trigg; }
 
   private:
-    R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
-    TClonesArray* fMappedItems;   // Array with mapped items.
-    TClonesArray* fCalItems;      // Array with cal items.
-    TClonesArray* fHitItems;      // Array with hit items.
+    R3BEventHeader* fEventHeader;  // // Pointer to the R3BEventHeader structure
+    TClonesArray* fRpcMappedItems; // Array with mapped items.
+    TClonesArray* fRpcCalItems;    // Array with cal items.
+    TClonesArray* fRpcHitItems;    // Array with hit items.
+    TClonesArray* fLosHitItems;    // Array with hit items.
 
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
     Int_t fNEvents;         // Event counter.
-    Int_t fNbDet;           // Number of RPC detectors.
+    Int_t fNbStrips;        // Number of RPC strips.
 
-    // Histograms for map data
-    std::vector<TH2F*> fh2_EnergyVsStrip;
-    // Histograms for cal data
-    std::vector<TH2F*> fh2_EnergyVsStrip_cal;
     // Histograms for hit data
-    std::vector<TH1F*> fh1_pos;
+    std::vector<TH1F*> fh1_tof;
 
   public:
-    ClassDefOverride(R3BRpcOnlineSpectra, 1)
+    ClassDefOverride(R3BRpcvsLosOnlineSpectra, 1)
 };
 
-#endif /* R3BRpcOnlineSpectra_H */
+#endif /* R3BRpcvsLosOnlineSpectra_H */
