@@ -41,5 +41,6 @@
 #pragma link C++ class R3BOnlineSpectraFiber23+;
 #pragma link C++ class R3BOnlineSpectraToFD_S494+;
 #pragma link C++ class R3BOnlineSpectraToFI_S494+;
+//#pragma link C++ class R3BRpcvsLosOnlineSpectra+;
 
 #endif

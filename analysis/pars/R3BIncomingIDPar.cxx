@@ -12,9 +12,11 @@
  ******************************************************************************/
 
 #include "R3BIncomingIDPar.h"
+#include "R3BLogger.h"
 
 #include "FairLogger.h"
 #include "FairParamList.h"
+
 #include "TArrayF.h"
 #include "TMath.h"
 #include "TString.h"
@@ -33,11 +35,13 @@ R3BIncomingIDPar::R3BIncomingIDPar(const TString& name, const TString& title, co
     fDispersionS2 = new TArrayF(fNumDet);
     fTof2InvV_p0 = new TArrayF(fNumDet);
     fTof2InvV_p1 = new TArrayF(fNumDet);
+    fTcutparS2 = new R3BTcutPar("CutS2");
 }
 
 // ----  Destructor ------------------------------------------------------------
 R3BIncomingIDPar::~R3BIncomingIDPar()
 {
+    R3BLOG(DEBUG, "");
     clear();
     if (fToFoffset)
         delete fToFoffset;
@@ -65,10 +69,10 @@ void R3BIncomingIDPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BIncomingIDPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BIncomingIDPar::putParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
-        LOG(FATAL) << "Could not find FairParamList";
+        R3BLOG(FATAL, "Could not find FairParamList");
         return;
     }
     fToFoffset->Set(fNumDet);
@@ -93,15 +97,17 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
     list->add("ang_Aq", fang_Aq);
     list->add("Beta_min", fBeta_min);
     list->add("Beta_max", fBeta_max);
+
+    fTcutparS2->putParams(list);
 }
 
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BIncomingIDPar::getParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
-        LOG(FATAL) << "Could not initialize FairParamList";
+        R3BLOG(FATAL, "Could not initialize FairParamList");
         return kFALSE;
     }
 
@@ -195,6 +201,8 @@ Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
+    fTcutparS2->getParams(list);
+
     return kTRUE;
 }
 
@@ -204,13 +212,15 @@ void R3BIncomingIDPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BIncomingIDPar::printParams()
 {
-    LOG(INFO) << "R3BIncomingIDPar::Incoming ID parameters";
+    R3BLOG(INFO, "Incoming ID parameters");
 
     LOG(INFO) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
 
     for (Int_t d = 0; d < fNumDet; d++)
         LOG(INFO) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d) << " PosS2Left" << fPosS2Left->GetAt(d)
                   << ", PosS2Right: " << fPosS2Right->GetAt(d);
+
+    fTcutparS2->print();
 }
 
 ClassImp(R3BIncomingIDPar);
