@@ -28,5 +28,6 @@
 #pragma link C++ class R3BFileSource+;
 #pragma link C++ class R3BLogger+;
 #pragma link C++ class R3BTcutPar+;
+#pragma link C++ class R3BTsplinePar+;
 
 #endif
