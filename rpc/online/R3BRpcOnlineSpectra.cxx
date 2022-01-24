@@ -235,7 +235,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 {
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
         return;
-
+/*
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -245,7 +245,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
             R3BRpcMappedData* hit = (R3BRpcMappedData*)fMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_EnergyVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
+            fh2_EnergyVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetTime());
         }
     }
 
@@ -273,7 +273,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
         }
-    }
+    }*/
 
     fNEvents += 1;
     return;

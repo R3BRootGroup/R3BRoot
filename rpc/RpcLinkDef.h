@@ -33,7 +33,6 @@
 
 #pragma link C++ class R3BRpcPars4Sim+;
 
-//#pragma link C++ class R3BRpcOnlineSpectra+;
-
+#pragma link C++ class R3BRpcOnlineSpectra+;
 
 #endif
