@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include "R3BLosContFact.h"
 
 #include "FairLogger.h"
@@ -6,6 +19,8 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BLosHitPar.h"
+#include "R3BTGeoPar.h"
+
 #include "TClass.h"
 
 static R3BLosContFact gR3BLosContFact;
@@ -27,6 +42,10 @@ void R3BLosContFact::setAllContainers()
     FairContainer* p1 = new FairContainer("LosHitPar", "Los Hit parameters", "LosHitParContext");
     p1->addContext("LosHitParContext");
     containers->Add(p1);
+
+    FairContainer* p2 = new FairContainer("LosGeoPar", "Los geometry parameters", "GeometryParameterContext");
+    p2->addContext("GeometryParameterContext");
+    containers->Add(p2);
 }
 
 FairParSet* R3BLosContFact::createContainer(FairContainer* c)
@@ -41,6 +60,10 @@ FairParSet* R3BLosContFact::createContainer(FairContainer* c)
     if (strcmp(name, "LosHitPar") == 0)
     {
         p = new R3BLosHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "LosGeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }

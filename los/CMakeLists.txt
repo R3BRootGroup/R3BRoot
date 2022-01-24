@@ -23,7 +23,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
-${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/los/calib
 ${R3BROOT_SOURCE_DIR}/los/params
@@ -66,6 +66,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF LosLinkDef.h)
 Set(LIBRARY_NAME R3BLos)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BTCal)
+    R3Bbase R3BData R3BTracking R3BTCal)
 
 GENERATE_LIBRARY()
