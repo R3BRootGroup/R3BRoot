@@ -187,24 +187,24 @@ void R3BRpcvsLosOnlineSpectra::Exec(Option_t* option)
         auto nHits = fLosHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto loshit = (R3BLosHitData*)fHitLos->At(ihit);
+            auto loshit = (R3BLosHitData*)fLosHitItems->At(ihit);
             if (!loshit)
                 continue;
 
             if (lostime == 0)
-                lostime = fHitLos->GetTime();
+                lostime = loshit->GetTime();
         }
 
         // Fill rpc hit data
         if (fRpcHitItems && fRpcHitItems->GetEntriesFast() > 0 && lostime > 0.)
         {
-            auto nHits = fRpcHitItems->GetEntriesFast();
+            nHits = fRpcHitItems->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
                 auto rpchit = (R3BRpcHitData*)fRpcHitItems->At(ihit);
                 if (!rpchit)
                     continue;
-                fh1_tof[rpchit->GetStripId() - 1]->Fill(hit->GetTime() - lostime);
+                // fh1_tof[rpchit->GetStripId() - 1]->Fill(hit->GetTime() - lostime);
             }
         }
     }
