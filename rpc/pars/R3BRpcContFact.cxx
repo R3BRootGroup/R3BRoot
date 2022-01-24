@@ -21,6 +21,8 @@
 #include "R3BRpcCalPar.h"
 #include "R3BRpcHitPar.h"
 #include "R3BRpcPars4Sim.h"
+#include "R3BTGeoPar.h"
+
 #include "TClass.h"
 
 static R3BRpcContFact gR3BRpcContFact;
@@ -39,17 +41,21 @@ void R3BRpcContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them
     // to the list of containers for the RPC library.
 
-    FairContainer* p1 = new FairContainer("RPCCalPar", "RPC Calibration Parameters", "RPCCalParContext");
+    FairContainer* p1 = new FairContainer("RpcCalPar", "RPC Calibration Parameters", "RPCCalParContext");
     p1->addContext("RPCCalParContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("RPCHitPar", "RPC Hit Parameters", "RPCHitParContext");
+    FairContainer* p2 = new FairContainer("RpcHitPar", "RPC Hit Parameters", "RPCHitParContext");
     p2->addContext("RPCHitParContext");
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("RPCPars4Sim", "RPC Parameters for Sim", "RPCSimParContext");
+    FairContainer* p3 = new FairContainer("RpcPars4Sim", "RPC Parameters for Sim", "RPCSimParContext");
     p3->addContext("RPCSimParContext");
     containers->Add(p3);
+
+    FairContainer* p4 = new FairContainer("RpcGeoPar", "RPC geometry parameters", "GeometryParameterContext");
+    p4->addContext("GeometryParameterContext");
+    containers->Add(p4);
 }
 
 FairParSet* R3BRpcContFact::createContainer(FairContainer* c)
@@ -62,17 +68,21 @@ FairParSet* R3BRpcContFact::createContainer(FairContainer* c)
     const char* name = c->GetName();
     LOG(INFO) << "R3BRpcContFact: Create container name: " << name;
     FairParSet* p = 0;
-    if (strcmp(name, "RPCCalPar") == 0)
+    if (strcmp(name, "RpcCalPar") == 0)
     {
         p = new R3BRpcCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "RPCHitPar") == 0)
+    else if (strcmp(name, "RpcHitPar") == 0)
     {
         p = new R3BRpcHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "RPCPars4Sim") == 0)
+    else if (strcmp(name, "RpcPars4Sim") == 0)
     {
         p = new R3BRpcPars4Sim(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "RpcGeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }

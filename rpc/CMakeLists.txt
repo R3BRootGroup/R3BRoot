@@ -24,6 +24,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
@@ -74,6 +75,6 @@ set(LINKDEF RpcLinkDef.h)
 set(LIBRARY_NAME R3BRpc)
 
 set(DEPENDENCIES
-    R3Bbase R3BData)
+    R3Bbase R3BTracking R3BData)
 
 GENERATE_LIBRARY()
