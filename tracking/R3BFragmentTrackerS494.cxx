@@ -280,7 +280,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug = true;
+    Bool_t debug = false;
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -304,7 +304,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     R3BTrackingDetector* tof = fDetectorsLeft->GetByName("tofd");
 
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-
 
     if (fBfield == -1710.0)
     {
@@ -659,6 +658,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (debug)
                 cout << "AT START: "
                      << "Mass: " << m0 << ", Momentum: " << p0 << endl;
+
 
             if (tof->hits.at(i)->GetX() > 0 && fi30->hits.size() > 0 && fi32->hits.size() > 0 &&
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)

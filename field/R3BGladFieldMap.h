@@ -84,6 +84,8 @@ class R3BGladFieldMap : public FairField
     virtual void SetScale(Double_t factor) { fScale = factor; }
 
     void SetTrackerCorrection(const Double_t& corr) { fTrackerCorr = corr; }
+    void SetTrackerCorrectionZ(const Double_t& corr) { fPosZ = corr; }
+    void SetTrackerCorrectionAngle(const Double_t& corr) { fYAngle = corr; }
 
     /** Accessors to field parameters in local coordinate system **/
     Double_t GetXmin() const { return fXmin; }

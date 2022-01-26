@@ -125,14 +125,20 @@ R3BGladFieldMap::~R3BGladFieldMap()
 void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
-    fPosY = 0.0;
+    fPosY = 1.0;
 
+// Distance in z: turning point big flansch:   415 mm 
+//				  big flanch to small flansch: 100 mm ???
+//				  small GLAD flansch target:  1210 mm
+//											  1725 mm
+// 					
+    //fPosZ = 163.4+16.2-0.5; 
     fPosZ = 163.4+16.2;
-    //fPosZ = 163.4+16.2+0.6 + 2.;
     //fPosZ = 163.4+16.2+0.6 + 6.;
-    //fPosZ = 163.4 + 19.;
+    //fPosZ = 171.8496;
     fYAngle = -14.;
-
+ // for left side: -13.44 , 171.8496 
+ // for right side: -13.8875 , 178.6103
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
@@ -154,6 +160,8 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
     // transform to local coordinates
     // local to global
     TVector3 localPoint(x, y, z);
+
+    gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 
     localPoint = localPoint + (*gTrans);
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
@@ -195,6 +203,8 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
     // local to global
     TVector3 localPoint(x, y, z);
 
+    gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
+
     localPoint = localPoint + (*gTrans);
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
 
@@ -234,6 +244,8 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
     // transform to local coordinates
     // local to global
     TVector3 localPoint(x, y, z);
+
+    gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 
     localPoint = localPoint + (*gTrans);
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
