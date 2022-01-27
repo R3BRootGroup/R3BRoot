@@ -11,8 +11,8 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3Bsource" which includes the source files given 
-# in the array. The extension is already found. Any number of sources could be 
+# Create a library called "libR3Bsource" which includes the source files given
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
 set(SYSTEM_INCLUDE_DIRECTORIES
@@ -44,6 +44,8 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/music
 ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofi
+${R3BROOT_SOURCE_DIR}/r3bsource/rpc
+
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
@@ -64,6 +66,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
@@ -143,6 +146,7 @@ set(SRCS
 ./ams/R3BAmsReader.cxx
 ./foot/R3BFootSiReader.cxx
 ./music/R3BMusicReader.cxx
+./rpc/R3BRpcReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -204,6 +208,8 @@ Set(STRUCT_HEADERS
 ./music/ext_h101_music.h
 ./trloii/ext_h101_samp.h
 ./pdc/ext_h101_pdc.h
+./rpc/ext_h101_Rpc.h
+
 )
 
 # fill list of header files from list of source files

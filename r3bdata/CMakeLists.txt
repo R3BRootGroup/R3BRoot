@@ -192,7 +192,9 @@ footData/R3BFootHitData.cxx
 alpideData/R3BAlpidePoint.cxx
 alpideData/R3BAlpideMappedData.cxx
 rpcData/R3BRpcCalData.cxx
-rpcData/R3BRpcMappedData.cxx
+rpcData/R3BRpcPmtMappedData.cxx
+rpcData/R3BRpcRefMappedData.cxx
+rpcData/R3BRpcStripMappedData.cxx
 rpcData/R3BRpcHitData.cxx
 rpcData/R3BRpcPoint.cxx
 )

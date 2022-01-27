@@ -11,22 +11,22 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcMappedData.h"
+#include "R3BRpcRefMappedData.h"
 
-R3BRpcMappedData::R3BRpcMappedData()
-    : fChannelId(0)
-    , fTime(0)
-    , fWrts(0)
-    , fSide(0)
+R3BRpcRefMappedData::R3BRpcRefMappedData()
+   : fChannelId(0)
+   , fFineTime(0)
+   , fCoarseTime(0)
+
 {
 }
 
-R3BRpcMappedData::R3BRpcMappedData(UShort_t channelId, uint64_t time, uint64_t wrts, Int_t side)
-    : fChannelId(channelId)
-    , fTime(time)
-    , fWrts(wrts)
-    , fSide(side)
+R3BRpcRefMappedData::R3BRpcRefMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime)
+  : fChannelId(0)
+  , fFineTime(0)
+  , fCoarseTime(0)
+
 {
 }
 
-ClassImp(R3BRpcMappedData);
+ClassImp(R3BRpcRefMappedData);

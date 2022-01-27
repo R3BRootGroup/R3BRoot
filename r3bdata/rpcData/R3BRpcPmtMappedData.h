@@ -11,44 +11,44 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCMAPPEDDATA_H
-#define R3BRPCMAPPEDDATA_H
+#ifndef R3BRpcPmtMappedData_H
+#define R3BRpcPmtMappedData_H
 
 #include "TObject.h"
 #include <stdint.h>
 
-class R3BRpcMappedData : public TObject
+class R3BRpcPmtMappedData : public TObject
 {
 
   public:
     // Default Constructor
-    R3BRpcMappedData();
+    R3BRpcPmtMappedData();
 
     /** Standard Constructor
      *@param channelId   Channel unique identifier
-     *@param time        Internal time per crystal [ns]
-     *@param wrts        Timestamp or time since event start in simulation [ns]
-     *@param side        Left (0) or right (1)
+     *@param fineTime    Fine Time
+     *@param coarseTime  Coarse Time
+     *@param edge        Leading or Trailing
      **/
-    R3BRpcMappedData(UShort_t channelId, uint64_t time, uint64_t wrts, Int_t side);
+    R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge);
 
     // Destructor
-    virtual ~R3BRpcMappedData() {}
+    virtual ~R3BRpcPmtMappedData() {}
 
     // Getters
     inline const UShort_t& GetChannelId() const { return fChannelId; }
-    inline const uint64_t& GetTime() const { return fTime; }
-    inline const uint64_t& GetWrts() const { return fWrts; }
-    inline const Int_t& GetSide() const { return fSide; }
+    inline const uint64_t& GetCoarseTime() const { return fCoarseTime; }
+    inline const uint64_t& GetFineTime() const { return fFineTime; }
+    inline const Int_t& GetEdge() const { return fEdge; }
 
   protected:
-    UShort_t fChannelId; // Channel unique identifier
-    uint64_t fTime;      // Internal time
-    uint64_t fWrts;      // Timestamp per channel
-    Int_t fSide;         // Left (0) or right (1) or ...
+    UShort_t fChannelId;     // Channel unique identifier
+    uint64_t fFineTime;      // Fine time
+    uint64_t fCoarseTime;    // Coarse time
+    Int_t fEdge;             // Leading or Trailing
 
   public:
-    ClassDef(R3BRpcMappedData, 1)
+    ClassDef(R3BRpcPmtMappedData, 1)
 };
 
 #endif

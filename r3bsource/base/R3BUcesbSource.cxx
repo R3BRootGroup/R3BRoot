@@ -201,7 +201,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 {
     const void* raw;
     ssize_t raw_words;
-
     int ret;
     (void)i; /* Why is i not used? Outer loop seems not to use it. */
 
@@ -241,6 +240,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     /* Fetch data */
     ret = fClient.fetch_event(fEvent, fEventSize);
+
     if (0 == ret)
     {
         LOG(info) << "End of input";

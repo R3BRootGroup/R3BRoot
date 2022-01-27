@@ -24,9 +24,9 @@
 #include "R3BRpcOnlineSpectra.h"
 #include "R3BLogger.h"
 #include "R3BEventHeader.h"
-#include "R3BRpcCalData.h"
-#include "R3BRpcHitData.h"
-#include "R3BRpcMappedData.h"
+#include "R3BRpcRefMappedData.h"
+#include "R3BRpcPmtMappedData.h"
+#include "R3BRpcStripMappedData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -54,9 +54,9 @@ R3BRpcOnlineSpectra::R3BRpcOnlineSpectra()
 R3BRpcOnlineSpectra::R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fEventHeader(nullptr)
-    , fMappedItems(NULL)
-    , fCalItems(NULL)
-    , fHitItems(NULL)
+    , fRefMappedItems(NULL)
+    , fPmtMappedItems(NULL)
+    , fStripMappedItems(NULL)
     , fTrigger(-1)
     , fNEvents(0)
     , fNbDet(1)
@@ -68,12 +68,16 @@ R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
     R3BLOG(DEBUG1, "");
     if (fEventHeader)
         delete fEventHeader;
-    if (fMappedItems)
-        delete fMappedItems;
-    if (fCalItems)
-        delete fCalItems;
-    if (fHitItems)
-        delete fHitItems;
+
+    if (fRefMappedItems)
+       delete fRefMappedItems;
+
+    if (fStripMappedItems)
+       delete fStripMappedItems;
+
+    if (fPmtMappedItems)
+       delete fPmtMappedItems;
+
 }
 
 InitStatus R3BRpcOnlineSpectra::Init()
@@ -95,103 +99,147 @@ InitStatus R3BRpcOnlineSpectra::Init()
         R3BLOG(INFO,"EventHeader. found");
 
     // Get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("RpcMappedData");
-    if (!fMappedItems)
+    fRefMappedItems = (TClonesArray*)mgr->GetObject("RpcRefMappedData");
+    if (!fRefMappedItems)
     {
         R3BLOG(FATAL, "RpcMappedData not found");
         return kFATAL;
     }
 
-    // Get access to Cal data
-    fCalItems = (TClonesArray*)mgr->GetObject("RpcCalData");
-    R3BLOG_IF(WARNING, !fCalItems,"RpcCalData not found");
+    fPmtMappedItems = (TClonesArray*)mgr->GetObject("RpcPmtMappedData");
+    if (!fPmtMappedItems)
+    {
+        R3BLOG(FATAL, "RpcMappedData not found");
+        return kFATAL;
+    }
 
-    // Get access to Hit data
-    fHitItems = (TClonesArray*)mgr->GetObject("RpcHitData");
-    R3BLOG_IF(WARNING, !fHitItems, "RpcHitData not found");
 
-    // Create histograms for all the detectors
+    fStripMappedItems = (TClonesArray*)mgr->GetObject("RpcStripMappedData");
+    if (!fStripMappedItems)
+    {
+        R3BLOG(FATAL, "RpcMappedData not found");
+        return kFATAL;
+    }
 
-    // Energy range for strips
-    Double_t binsE = 5000;
-    Double_t minE = 0;
-    Double_t maxE = 20000;
+    char name[100];
+    /*
+      4 Pmt's
+      41 Strips per side
+      2 Sides
+      4 Ref's
+    */
 
-    char Name1[255];
-    char Name2[255];
+     stripCoarseRightHisto = new TH1F*[41];
+     stripFineRightHisto = new TH1F*[41];
+
+     stripCoarseLeftHisto = new TH1F*[41];
+     stripFineLeftHisto = new TH1F*[41];
+
+     pmtCoarseHisto = new TH1F*[4];
+     pmtFineHisto = new TH1F*[4];
+
+     refCoarseHisto = new TH1F*[4];
+     refFineHisto = new TH1F*[4];
+
+
+    for ( Int_t i = 0 ; i < 41; i++){
+
+      sprintf(name, "Left : Coarse Time Strip_%i",i+1);
+      stripCoarseLeftHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Left : Fine Time Strip_%i",i+1);
+      stripFineLeftHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Right : Coarse Time Strip_%i",i+1);
+      stripCoarseRightHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Right : Fine Time Strip_%i",i+1);
+      stripFineRightHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+    }
+
+
+    for ( Int_t i = 0 ; i < 4; i++){
+
+      sprintf(name, "Coarse Time Pmt_%i",i+1);
+      pmtCoarseHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Fine Time Pmt_%i",i+1);
+      pmtFineHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Coarse Time Ref_%i",i+1);
+      refCoarseHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+      sprintf(name, "Fine Time Ref_%i",i+1);
+      refFineHisto[i] = new TH1F(name,name,1000,0,2E12);
+
+    }
+
+
+
+
+
 
     // MAIN FOLDER-RPC
     TFolder* mainfol = new TFolder("Rpc", "RPC info");
     // Folder for mapped data
     TFolder* mapfol = new TFolder("Map", "Map RPC info");
     mainfol->Add(mapfol);
-    // Folder for cal data
-    TFolder* calfol = new TFolder("Cal", "Cal RPC info");
-    // Folder for hit data
-    TFolder* hitfol = new TFolder("Hit", "Hit RPC info");
 
-    // Mapped data
-    fh2_EnergyVsStrip.resize(fNbDet);
-    for (Int_t i = 0; i < fNbDet; i++)
-    { // one histo per detector
-        sprintf(Name1, "fh2_energy_vs_strip_rpc_%d", i + 1);
-        sprintf(Name2, "Mapped energy vs strip number for RPC Det: %d", i + 1);
-        fh2_EnergyVsStrip[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
-        fh2_EnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
-        fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
-        fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
-        fh2_EnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
-        fh2_EnergyVsStrip[i]->GetYaxis()->CenterTitle(true);
-        fh2_EnergyVsStrip[i]->Draw("col");
-        mapfol->Add(fh2_EnergyVsStrip[i]);
-    }
+    // // Mapped data
+    // fh2_EnergyVsStrip.resize(fNbDet);
+    // for (Int_t i = 0; i < fNbDet; i++)
+    // { // one histo per detector
+    //     sprintf(Name1, "fh2_energy_vs_strip_rpc_%d", i + 1);
+    //     sprintf(Name2, "Mapped energy vs strip number for RPC Det: %d", i + 1);
+    //     fh2_EnergyVsStrip[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+    //     fh2_EnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
+    //     fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
+    //     fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
+    //     fh2_EnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
+    //     fh2_EnergyVsStrip[i]->GetYaxis()->CenterTitle(true);
+    //     fh2_EnergyVsStrip[i]->Draw("col");
+    //     mapfol->Add(fh2_EnergyVsStrip[i]);
+    // }
+    //
+    // // Cal data
+    // if (fCalItems)
+    // {
+    //     fh2_EnergyVsStrip_cal.resize(fNbDet);
+    //     for (Int_t i = 0; i < fNbDet; i++)
+    //     { // one histo per detector
+    //         sprintf(Name1, "fh2_energy_vs_strip_cal_rpc_%d", i + 1);
+    //         sprintf(Name2, "Cal-energy vs strip number for RPC Det: %d", i + 1);
+    //         fh2_EnergyVsStrip_cal[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+    //         fh2_EnergyVsStrip_cal[i]->GetXaxis()->SetTitle("Strip number");
+    //         fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitle("Energy [channels]");
+    //         fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitleOffset(1.4);
+    //         fh2_EnergyVsStrip_cal[i]->GetXaxis()->CenterTitle(true);
+    //         fh2_EnergyVsStrip_cal[i]->GetYaxis()->CenterTitle(true);
+    //         fh2_EnergyVsStrip_cal[i]->Draw("col");
+    //         calfol->Add(fh2_EnergyVsStrip_cal[i]);
+    //     }
+    // }
+    //
+    // // Hit data
+    // if (fHitItems)
+    // {
+    //     fh1_pos.resize(fNbDet);
+    //     for (Int_t i = 0; i < fNbDet; i++)
+    //     { // one histo per detector
+    //         sprintf(Name1, "fh1_pos_rpc_%d", i + 1);
+    //         sprintf(Name2, "Cluster position for RPC Det: %d", i + 1);
+    //         fh1_pos[i] = new TH1F(Name1, Name2, 600, -50., 50.);
+    //         fh1_pos[i]->GetXaxis()->SetTitle("Position [mm]");
+    //         fh1_pos[i]->GetYaxis()->SetTitle("Counts");
+    //         fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
+    //         fh1_pos[i]->GetXaxis()->CenterTitle(true);
+    //         fh1_pos[i]->GetYaxis()->CenterTitle(true);
+    //         fh1_pos[i]->Draw("");
+    //         hitfol->Add(fh1_pos[i]);
+    //     }
+    // }
 
-    // Cal data
-    if (fCalItems)
-    {
-        fh2_EnergyVsStrip_cal.resize(fNbDet);
-        for (Int_t i = 0; i < fNbDet; i++)
-        { // one histo per detector
-            sprintf(Name1, "fh2_energy_vs_strip_cal_rpc_%d", i + 1);
-            sprintf(Name2, "Cal-energy vs strip number for RPC Det: %d", i + 1);
-            fh2_EnergyVsStrip_cal[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
-            fh2_EnergyVsStrip_cal[i]->GetXaxis()->SetTitle("Strip number");
-            fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitle("Energy [channels]");
-            fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitleOffset(1.4);
-            fh2_EnergyVsStrip_cal[i]->GetXaxis()->CenterTitle(true);
-            fh2_EnergyVsStrip_cal[i]->GetYaxis()->CenterTitle(true);
-            fh2_EnergyVsStrip_cal[i]->Draw("col");
-            calfol->Add(fh2_EnergyVsStrip_cal[i]);
-        }
-    }
-
-    // Hit data
-    if (fHitItems)
-    {
-        fh1_pos.resize(fNbDet);
-        for (Int_t i = 0; i < fNbDet; i++)
-        { // one histo per detector
-            sprintf(Name1, "fh1_pos_rpc_%d", i + 1);
-            sprintf(Name2, "Cluster position for RPC Det: %d", i + 1);
-            fh1_pos[i] = new TH1F(Name1, Name2, 600, -50., 50.);
-            fh1_pos[i]->GetXaxis()->SetTitle("Position [mm]");
-            fh1_pos[i]->GetYaxis()->SetTitle("Counts");
-            fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
-            fh1_pos[i]->GetXaxis()->CenterTitle(true);
-            fh1_pos[i]->GetYaxis()->CenterTitle(true);
-            fh1_pos[i]->Draw("");
-            hitfol->Add(fh1_pos[i]);
-        }
-    }
-
-    if (fCalItems)
-    {
-        mainfol->Add(calfol);
-    }
-    if (fHitItems)
-    {
-        mainfol->Add(hitfol);
-    }
 
     // Looking for FairRunOnline
     FairRunOnline* run = FairRunOnline::Instance();
@@ -200,7 +248,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_RPC", Form("/Objects/%s/->Reset_RPC_Histo()", GetName()));
-
     return kSUCCESS;
 }
 
@@ -209,24 +256,21 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     R3BLOG(INFO, "");
 
     // Mapped data
-    for (Int_t i = 0; i < fNbDet; i++)
+    for (Int_t i = 0; i < 44; i++)
     {
-        fh2_EnergyVsStrip[i]->Reset();
+        stripCoarseLeftHisto[i]->Reset();
+        stripFineLeftHisto[i]->Reset();
+        stripCoarseRightHisto[i]->Reset();
+        stripFineRightHisto[i]->Reset();
     }
 
-    // Cal data
-    if (fCalItems)
-        for (Int_t i = 0; i < fNbDet; i++)
-        {
-            fh2_EnergyVsStrip_cal[i]->Reset();
-        }
-
-    // Hit data
-    if (fHitItems)
-        for (Int_t i = 0; i < fNbDet; i++)
-        {
-            fh1_pos[i]->Reset();
-        }
+    for (Int_t i = 0; i < 4; i++)
+    {
+        refFineHisto[i]->Reset();
+        refCoarseHisto[i]->Reset();
+        pmtFineHisto[i]->Reset();
+        pmtCoarseHisto[i]->Reset();
+    }
 
     return;
 }
@@ -235,45 +279,71 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 {
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
         return;
-/*
+        
     // Fill mapped data
-    if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
+
+    if (fStripMappedItems && fStripMappedItems->GetEntriesFast() > 0)
     {
-        auto nHits = fMappedItems->GetEntriesFast();
+        auto nHits = fStripMappedItems->GetEntriesFast();
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRpcMappedData* hit = (R3BRpcMappedData*)fMappedItems->At(ihit);
+            R3BRpcStripMappedData* hit = (R3BRpcStripMappedData*)fStripMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_EnergyVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetTime());
+            Int_t side = hit->GetSide();
+
+            if(side == 0){
+
+             stripFineLeftHisto[hit->GetStripId() - 1]->Fill(hit->GetFineTime());
+             stripCoarseLeftHisto[hit->GetStripId() - 1]->Fill(hit->GetCoarseTime());
+
+           }
+
+           if(side == 1){
+
+            stripFineRightHisto[hit->GetStripId() - 1]->Fill(hit->GetFineTime());
+            stripCoarseRightHisto[hit->GetStripId() - 1]->Fill(hit->GetCoarseTime());
+
+          }
         }
     }
 
-    // Fill cal data
-    if (fCalItems && fCalItems->GetEntriesFast() > 0)
+
+
+    if (fRefMappedItems && fRefMappedItems->GetEntriesFast() > 0)
     {
-        auto nHits = fCalItems->GetEntriesFast();
+        auto nHits = fRefMappedItems->GetEntriesFast();
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRpcCalData* hit = (R3BRpcCalData*)fCalItems->At(ihit);
+            R3BRpcRefMappedData* hit = (R3BRpcRefMappedData*)fRefMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_EnergyVsStrip_cal[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
+
+             refFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+             refCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+
         }
     }
 
-    // Fill hit data
-    if (fHitItems && fHitItems->GetEntriesFast() > 0)
+
+    if (fPmtMappedItems && fPmtMappedItems->GetEntriesFast() > 0)
     {
-        auto nHits = fHitItems->GetEntriesFast();
+        auto nHits = fPmtMappedItems->GetEntriesFast();
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRpcHitData* hit = (R3BRpcHitData*)fHitItems->At(ihit);
+            R3BRpcPmtMappedData* hit = (R3BRpcPmtMappedData*)fPmtMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
+
+             pmtFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+             pmtCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+
         }
-    }*/
+    }
+
 
     fNEvents += 1;
     return;
@@ -281,39 +351,58 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
 void R3BRpcOnlineSpectra::FinishEvent()
 {
-    if (fMappedItems)
+    if (fRefMappedItems)
     {
-        fMappedItems->Clear();
+        fRefMappedItems->Clear();
     }
-    if (fCalItems)
+
+
+    if (fPmtMappedItems)
     {
-        fCalItems->Clear();
+        fPmtMappedItems->Clear();
     }
-    if (fHitItems)
+
+
+    if (fStripMappedItems)
     {
-        fHitItems->Clear();
+        fStripMappedItems->Clear();
     }
+
+
     return;
 }
 
 void R3BRpcOnlineSpectra::FinishTask()
 {
-    if (fMappedItems)
+    if (fRefMappedItems)
     {
-        for (Int_t i = 0; i < fNbDet; i++)
-            fh2_EnergyVsStrip[i]->Write();
-    }
-    if (fCalItems)
-        for (Int_t i = 0; i < fNbDet; i++)
-        {
-            fh2_EnergyVsStrip_cal[i]->Write();
-        }
+        for (Int_t i = 0; i < 4; i++){
+            refFineHisto[i]->Write();
+            refCoarseHisto[i]->Write();
+     }
+   }
 
-    if (fHitItems)
-        for (Int_t i = 0; i < fNbDet; i++)
-        {
-            fh1_pos[i]->Write();
-        }
+   if (fPmtMappedItems)
+   {
+       for (Int_t i = 0; i < 4; i++){
+           pmtFineHisto[i]->Write();
+           pmtCoarseHisto[i]->Write();
+    }
+  }
+
+
+  if (fStripMappedItems)
+  {
+      for (Int_t i = 0; i < 4; i++){
+
+          stripFineLeftHisto[i]->Write();
+          stripFineRightHisto[i]->Write();
+
+          stripCoarseLeftHisto[i]->Write();
+          stripCoarseRightHisto[i]->Write();
+   }
+ }
+
     return;
 }
 
