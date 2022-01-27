@@ -109,7 +109,11 @@ class R3BRpcOnlineSpectra : public FairTask
 
   private:
     R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
-    TClonesArray* fMappedItems;   // Array with mapped items.
+    TClonesArray* fRefMappedItems;   // Array with mapped items.
+    TClonesArray* fPmtMappedItems;   // Array with mapped items.
+    TClonesArray* fStripMappedItems;   // Array with mapped items.
+
+
     TClonesArray* fCalItems;      // Array with cal items.
     TClonesArray* fHitItems;      // Array with hit items.
 
@@ -118,12 +122,24 @@ class R3BRpcOnlineSpectra : public FairTask
     Int_t fNEvents;         // Event counter.
     Int_t fNbDet;           // Number of RPC detectors.
 
-    // Histograms for map data
-    std::vector<TH2F*> fh2_EnergyVsStrip;
-    // Histograms for cal data
-    std::vector<TH2F*> fh2_EnergyVsStrip_cal;
-    // Histograms for hit data
-    std::vector<TH1F*> fh1_pos;
+    // // Histograms for map data
+    // std::vector<TH2F*> fh2_EnergyVsStrip;
+    // // Histograms for cal data
+    // std::vector<TH2F*> fh2_EnergyVsStrip_cal;
+    // // Histograms for hit data
+    // std::vector<TH1F*> fh1_pos;
+
+    TH1F **stripCoarseRightHisto;
+    TH1F **stripFineRightHisto;
+
+    TH1F **stripCoarseLeftHisto;
+    TH1F **stripFineLeftHisto;
+
+    TH1F **pmtCoarseHisto;
+    TH1F **pmtFineHisto;
+
+    TH1F **refCoarseHisto;
+    TH1F **refFineHisto;
 
   public:
     ClassDefOverride(R3BRpcOnlineSpectra, 1)

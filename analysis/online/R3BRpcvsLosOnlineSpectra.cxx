@@ -27,7 +27,7 @@
 #include "R3BLosHitData.h"
 #include "R3BRpcCalData.h"
 #include "R3BRpcHitData.h"
-#include "R3BRpcMappedData.h"
+//#include "R3BRpcMappedData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"

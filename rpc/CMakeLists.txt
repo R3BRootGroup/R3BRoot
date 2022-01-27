@@ -45,7 +45,7 @@ ${FAIRROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-#set(SRCS
+set(SRCS
 #Put here your sourcefiles
 #R3BRpc.cxx
 #R3BRpcContFact.cxx
@@ -57,15 +57,15 @@ link_directories( ${LINK_DIRECTORIES})
 #R3BRpcCal2HitPar.cxx
 #R3BRpcHitPar.cxx
 #R3BRpcPars4Sim.cxx
-#R3BRpcOnlineSpectra.cxx
-#)
-
-file(GLOB SRCS 
-./sim/*.cxx 
-./pars/*.cxx
-./calibration/*.cxx
-./online/*.cxx
+./online/R3BRpcOnlineSpectra.cxx
 )
+
+#file(GLOB SRCS
+#./sim/*.cxx
+#./pars/*.cxx
+#./calibration/*.cxx
+#./online/*.cxx
+#)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

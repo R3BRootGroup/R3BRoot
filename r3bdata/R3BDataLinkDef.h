@@ -61,11 +61,12 @@
 #pragma link C++ class R3BFootHitData+;
 #pragma link C++ class R3BAlpidePoint+;
 #pragma link C++ class R3BAlpideMappedData+;
-#pragma link C++ class R3BRpcMappedData+;
+#pragma link C++ class R3BRpcPmtMappedData+;
+#pragma link C++ class R3BRpcRefMappedData+;
+#pragma link C++ class R3BRpcStripMappedData+;
 #pragma link C++ class R3BRpcCalData+;
 #pragma link C++ class R3BRpcHitData+;
 #pragma link C++ class R3BRpcPoint+;
-
 #pragma link C++ class R3BWRData+;
 #pragma link C++ class R3BTrloiiData+;
 
