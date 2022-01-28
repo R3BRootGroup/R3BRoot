@@ -134,7 +134,6 @@ void R3BGladFieldMap::Init()
 // 					
     //fPosZ = 163.4+16.2-0.5; 
     fPosZ = 163.4+16.2;
-    //fPosZ = 163.4+16.2+0.6 + 6.;
     //fPosZ = 171.8496;
 
     fYAngle = -14.;

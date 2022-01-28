@@ -83,11 +83,10 @@ Bool_t R3BTPropagator::PropagateToDetector(R3BTrackingParticle* particle, R3BTra
     //  detector->pos0.Print();
     //  detector->pos1.Print();
     //   detector->pos2.Print();
-    //   particle->GetPosition().Print();
-    //   particle->GetMomentum().Print();
-
-    if (fVis)
-        detector->Draw();
+	if (fVis)
+    {
+		detector->Draw();
+	}
 
     return PropagateToPlane(particle, detector->pos0, detector->pos1, detector->pos2);
 }
@@ -512,8 +511,8 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
 
     TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit();
 
-    // dist = particle->GetPosition() - v1;
-    // diff = dist.Dot(norm);
+    //dist = particle->GetPosition() - v1;
+    //diff = dist.Dot(norm);
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
     dist = (particle->GetPosition() - intersect);
     diff = dist.Mag();
@@ -544,8 +543,8 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
 
         nStep += 1;
 
-        //   dist = particle->GetPosition() - v1;
-        //   distance = (TVector3(dist.X() * norm.X(), dist.Y() * norm.Y(), dist.Z() * norm.Z())).Mag();
+        //dist = particle->GetPosition() - v1;
+        //distance = (TVector3(dist.X() * norm.X(), dist.Y() * norm.Y(), dist.Z() * norm.Z())).Mag();
 
         crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
         // cout<<"In propagatRK intersect/v1/particle: "<<endl;

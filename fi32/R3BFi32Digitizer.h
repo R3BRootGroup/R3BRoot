@@ -64,12 +64,12 @@ class R3BFi32Digitizer : public FairTask
     Double_t tsigma;
     Double_t ysigma;
 
-  Double_t detector_height = 50.000000 ;
-  Double_t fiber_thickness = 0.1024 ; 
-  Int_t fiber_nbr = 512;
-  Double_t dead_layer = 0.9;
-  Double_t air_layer = 0.01; // relative to fiber_thickness
-  Double_t  detector_width = fiber_nbr*fiber_thickness*(1+air_layer);  
+	Double_t detector_height = 50.000000 ;
+	Int_t fiber_nbr = 512;
+	Double_t dead_layer = 0.9;
+	Double_t air_layer = 0.01; // relative to fiber_thickness
+	Double_t fiber_thickness = 0.1024 / (1 + air_layer); //Assume air gap and reduce fiber thickness	
+	Double_t  detector_width = fiber_nbr*fiber_thickness*(1+air_layer);  
 
     ClassDef(R3BFi32Digitizer, 1);
 };

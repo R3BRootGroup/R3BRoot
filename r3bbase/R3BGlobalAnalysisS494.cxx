@@ -1010,6 +1010,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_dpxC->Fill((pCx_mc - pCx) / pCx_mc * 100.);
                 fh_dpxHe->Fill((pHex_mc - pHex) / pHex_mc * 100.);
                 fh_dpyC->Fill((pCy_mc - pCy) / pCy_mc * 100.);
+                cout << "Test: " << pCy_mc << "  " << pCy << endl;
                 fh_dpyHe->Fill((pHey_mc - pHey) / pHey_mc * 100.);
                 fh_dpzC->Fill((pCz_mc - pCz) / pCz_mc * 100.);
                 fh_dpzHe->Fill((pHez_mc - pHez) / pHez_mc * 100.);

@@ -83,7 +83,8 @@ class R3BGladFieldMap : public FairField
     /** Set a global field scaling factor **/
     virtual void SetScale(Double_t factor) { fScale = factor; }
 
-    void SetTrackerCorrection(const Double_t& corr) { fTrackerCorr = corr; }
+    void SetTrackerCorrectionScale(const Double_t& corr) { fTrackerCorr = corr; }
+    void SetTrackerCorrectionY(const Double_t& corr) { fPosY = corr; }
     void SetTrackerCorrectionZ(const Double_t& corr) { fPosZ = corr; }
     void SetTrackerCorrectionAngle(const Double_t& corr) { fYAngle = corr; }
 

@@ -223,20 +223,15 @@ double Chi2MomentumForward(const double* xx)
         // Take into chi2 only if there is a hit and user specified SigmaX > 0.
         Double_t chi2temp;
         if (hit && det->res_x > 1e-6)
-
-        {
-            if (TMath::Abs(x_l - hit->GetX()) < det->res_x)
+        {           
+			chi2temp = TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
+            if(TMath::Abs(x_l - hit->GetX()) < det->res_x)
             {
-                chi2temp = 0.;
-            }
-            else
-            {
-                chi2temp = TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            }
-            chi2 += chi2temp;
-
-            // chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-
+				chi2temp = 0.;
+			}
+			chi2 += chi2temp;
+			
+            //chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(DEBUG3) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
                         << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2;
@@ -245,13 +240,10 @@ double Chi2MomentumForward(const double* xx)
         }
         if (hit && det->res_y > 1e-6)
         {
+			chi2temp = TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
             if(TMath::Abs(y_l - hit->GetY()) < det->res_y)
             {
 				chi2temp = 0.;
-			}
-			else
-			{
-				chi2temp = TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
 			}
 			chi2 += chi2temp;
 			

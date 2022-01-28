@@ -1028,7 +1028,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
                                 if (debug)
-                                    cout << "Chi2: " << candidate->GetChi2() << "  pstart.Mag "
+                                    cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
                                          << candidate->GetStartMomentum().Mag() << " dp.Mag "
                                          << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
                                                 (candidate->GetStartMomentum().Mag() - p0)
