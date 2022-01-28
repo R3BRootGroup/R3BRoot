@@ -11,28 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// -----------------------------------------------------------------------
-// -----            R3BAlpideMappedData source file                  -----
-// -----------------------------------------------------------------------
+// -------------------------------------------------------------------
+// -----            R3BAlpideCalData source file                 -----
+// -------------------------------------------------------------------
 
-#include "R3BAlpideMappedData.h"
+#include "R3BAlpideCalData.h"
 
-R3BAlpideMappedData::R3BAlpideMappedData()
+R3BAlpideCalData::R3BAlpideCalData()
     : fDetId(0)
-    , fChip(0)
-    , fReg(0)
-    , fCol(0)
-    , fAds(0)
+    , fPosl(-4.0)
+    , fPost(-4.0)
 {
 }
 
-R3BAlpideMappedData::R3BAlpideMappedData(UShort_t detId, UShort_t chip, UShort_t reg, UShort_t col, UShort_t ads)
+R3BAlpideCalData::R3BAlpideCalData(UShort_t detId, Float_t posl, Float_t post)
     : fDetId(detId)
-    , fChip(chip)
-    , fReg(reg)
-    , fCol(col)
-    , fAds(ads)
+    , fPosl(posl)
+    , fPost(post)
 {
 }
 
-ClassImp(R3BAlpideMappedData);
+ClassImp(R3BAlpideCalData);

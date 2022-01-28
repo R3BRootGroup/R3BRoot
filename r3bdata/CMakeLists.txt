@@ -191,6 +191,7 @@ footData/R3BFootCalData.cxx
 footData/R3BFootHitData.cxx
 alpideData/R3BAlpidePoint.cxx
 alpideData/R3BAlpideMappedData.cxx
+alpideData/R3BAlpideCalData.cxx
 rpcData/R3BRpcCalData.cxx
 rpcData/R3BRpcPmtMappedData.cxx
 rpcData/R3BRpcRefMappedData.cxx
