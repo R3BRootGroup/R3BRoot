@@ -12,50 +12,44 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------------
-// -----                   R3BAlpideMappedData                 -----
-// -----          Created 11/10/2021 by J.L. Rodriguez         -----
+// -----                   R3BAlpideCalData                    -----
+// -----          Created 28/01/2022 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideMappedData_H
-#define R3BAlpideMappedData_H
+#ifndef R3BAlpideCalData_H
+#define R3BAlpideCalData_H
 
 #include "TObject.h"
 #include <stdint.h>
 
-class R3BAlpideMappedData : public TObject
+class R3BAlpideCalData : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideMappedData();
+    R3BAlpideCalData();
 
     /** Standard Constructor
      *@param detId    Detector unique identifier
-     *@param chip     Chip identifier
-     *@param reg      Region identifier
-     *@param col      Column identifier
-     *@param ads      Address identifier
+     *@param postl    Longitudinal position
+     *@param postt    Transverse position
      **/
-    R3BAlpideMappedData(UShort_t detId, UShort_t chip, UShort_t reg, UShort_t col, UShort_t ads);
+    R3BAlpideCalData(UShort_t detId, Float_t posl, Float_t post);
 
     // Destructor
-    virtual ~R3BAlpideMappedData() {}
+    virtual ~R3BAlpideCalData() {}
 
     // Getters
     inline const UShort_t& GetDetId() const { return fDetId; }
-    inline const UShort_t& GetChip() const { return fChip; }
-    inline const UShort_t& GetReg() const { return fReg; }
-    inline const UShort_t& GetCol() const { return fCol; }
-    inline const UShort_t& GetAds() const { return fAds; }
+    inline const Float_t& GetPosl() const { return fPosl; }
+    inline const Float_t& GetPost() const { return fPost; }
 
   protected:
-    UShort_t fDetId; // Detector unique identifier
-    UShort_t fChip;  // Chip identifier
-    UShort_t fReg;   // Region identifier from 1 to 32
-    UShort_t fCol;   // Column identifier from 1 to 16
-    UShort_t fAds;   // Address identifier from 1 to 1024
+    UShort_t fDetId;
+    Float_t fPosl;
+    Float_t fPost;
 
   public:
-    ClassDef(R3BAlpideMappedData, 1)
+    ClassDef(R3BAlpideCalData, 1)
 };
 
-#endif /* R3BAlpideMappedData */
+#endif /* R3BAlpideCalData */

@@ -21,6 +21,7 @@
 
 #include "TObject.h"
 #include "TVector3.h"
+#include <stdint.h>
 
 #include "FairMCPoint.h"
 
