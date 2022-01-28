@@ -194,7 +194,6 @@ void R3BFi33Digitizer::Exec(Option_t* opt)
 
                     // cout<<setprecision(10) << "Test: Det = 33" << " x = " << xpos << " fiber = " << i << endl;
 
-
                     new ((*Hits)[Hits->GetEntries()])
                         R3BBunchedFiberHitData(33,
                                                xpos,

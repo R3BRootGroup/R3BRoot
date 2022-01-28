@@ -161,7 +161,6 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
     //  cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
     // cout << "GlobalToLocal Local x: " << x_local << " y: " << y_local <<  " z: " << z_local <<endl;
     //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
-
 }
 
 void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local)
@@ -172,7 +171,6 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
     //  cout << "LocalToGlobal: "<<endl;
     //  cout << "Local x: " << x_local << " y: " << y_local << endl;
     //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
-
 }
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)

@@ -142,6 +142,10 @@ class R3BPreTrackS494 : public FairTask
     {
         ftrackerType = trackerType;   // 0 == Rene, 1 == Dima
     }
+    inline void SetAverage(Bool_t averageValues)
+    {
+		fAverage = averageValues;
+	}
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
@@ -201,6 +205,7 @@ class R3BPreTrackS494 : public FairTask
 	Bool_t tracker = true;
 	Double_t delta;
 	Bool_t ftrackerType;
+	Bool_t fAverage;
 
 	TCutG *cut_fi31_fi23a;
 	TCutG *cut_fi30_fi23b;
@@ -219,6 +224,14 @@ class R3BPreTrackS494 : public FairTask
     Double_t counts_SEE = 0;
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
+    
+    Double_t qdet_sum[10] ={ 0};
+    Double_t xdet_sum[10] ={ 0};
+    Double_t ydet_sum[10] ={ 0};
+    Double_t tdet_sum[10] ={ 0};
+    Double_t zdet_sum[10] ={ 0};
+   
+    Int_t nsum[10] = { 0 };
 
 	Double_t XHes, YHes, ZHes, XCs, YCs, ZCs, THes, TCs;
 	Double_t pHexs, pHeys, pHezs, pCxs, pCys, pCzs, pHes, pCs;

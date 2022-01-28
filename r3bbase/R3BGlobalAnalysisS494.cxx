@@ -725,7 +725,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                                        sqrt(pow(pHex_mc, 2) + pow(pHey_mc, 2) + pow(pHez_mc, 2) + pow(mHe, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 4He"
+                    LOG(DEBUG) << "MC Track In 4He"
                                << "x " << XHe_mc << " y " << YHe_mc << " z " << ZHe_mc << endl;
                     LOG(DEBUG) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
                 }
@@ -746,7 +746,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                         pCx_mc, pCy_mc, pCz_mc, sqrt(pow(pCx_mc, 2) + pow(pCy_mc, 2) + pow(pCz_mc, 2) + pow(mC, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 12C"
+                    LOG(DEBUG) << "MC Track In 12C"
                                << "x " << XC_mc << " y " << YC_mc << " z " << ZC_mc << endl;
                     LOG(DEBUG) << "px " << pCx_mc << " py " << pCy_mc << " pz " << pCz_mc << endl;
                 }
@@ -765,7 +765,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     Pf_tot_mc = sqrt((Pxf_mc * Pxf_mc) + (Pyf_mc * Pyf_mc) + (Pzf_mc * Pzf_mc));
 
                     LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 16O"
+                    LOG(DEBUG) << "MC Track In 16O"
                                << "x " << Xf_mc << " y " << Yf_mc << " z " << Zf_mc << endl;
                     LOG(DEBUG) << "px " << Pxf_mc << " py " << Pyf_mc << " z " << Pzf_mc << endl;
                 }
@@ -999,6 +999,13 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_dx->Fill((XC_mc - XC) * 100.);
                 fh_dy->Fill((YHe_mc - YHe) * 100.);
                 fh_dy->Fill((YC_mc - YC) * 100.);
+
+                cout << "X-momenta: MC_He: " << pHex_mc << ", tracked He: " << pHex << endl;
+                cout << "X-momenta: MC_C: " << pCx_mc << ", tracked C: " << pCx << endl;
+                cout << "Y-momenta: MC_He: " << pHey_mc << ", tracked He: " << pHey << endl;
+                cout << "Y-momenta: MC_C: " << pCy_mc << ", tracked C: " << pCy << endl;
+                cout << "Momenta: MC_He: " << paMC.Mag() << ", tracked He: " << pa.Mag() << endl;
+                cout << "Momenta: MC_C: " << pcMC.Mag() << ", tracked C: " << pc.Mag() << endl;
 
                 fh_dpxC->Fill((pCx_mc - pCx) / pCx_mc * 100.);
                 fh_dpxHe->Fill((pHex_mc - pHex) / pHex_mc * 100.);

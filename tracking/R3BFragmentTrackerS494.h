@@ -25,6 +25,7 @@ class R3BTPropagator;
 class R3BTrackingDetector;
 class R3BTrackingParticle;
 class R3BTrackingSetup;
+class R3BTGeoPar ;
 class R3BFragmentFitterGeneric;
 
 class TH1F;
@@ -56,13 +57,13 @@ class R3BFragmentTrackerS494 : public FairTask
     
   private:
     Bool_t InitPropagator();
-
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
     TClonesArray* fArrayMCTracks; // simulation output??? To compare?
     R3BTrackingSetup* fDetectors; // array of R3BTrackingDetector
     R3BTrackingSetup* fDetectorsLeft; // array of R3BTrackingDetector
     R3BTrackingSetup* fDetectorsRight; // array of R3BTrackingDetector
+    R3BTGeoPar* fGeo;
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;
     TClonesArray* fTrackItems;
@@ -74,7 +75,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t fNEvents;
     Int_t fNEventsLeft;
     Int_t fNEventsRight;
-    Int_t counter1 = 0, fNEvents_nonull=0;
+    Int_t counter1 = 0, fNEvents_nonull=0, counterHe=0, counterC=0;
     Double_t fBfield;
     
     Int_t icount100 = 0;
@@ -112,6 +113,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fOptimizeGeometry;
     Double_t fAfterGladResolution;
     Int_t eventCounter = 0;
+    Double_t minChi2;
 
     TH1F* fh_mult_fi23a;
     TH1F* fh_mult_fi23b;
@@ -158,8 +160,20 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_py_r;
     TH1F* fh_pz_r;
     TH2F* fh_p_vs_ch2;
-    
-   TH2F* fh_A_overZ;
+    TH2F* fh_xfi30_fi23a_track;
+    TH2F* fh_xfi30_fi32_track;
+    TH2F* fh_xfi30_tofd_track;
+    TH2F* fh_xfi31_fi23a_track;
+    TH2F* fh_xfi31_fi33_track;
+    TH2F* fh_xfi31_tofd_track;
+            
+    TH2F* fh_xfi30_fi23a_exp;
+    TH2F* fh_xfi30_fi32_exp;
+    TH2F* fh_xfi30_tofd_exp;
+    TH2F* fh_xfi31_fi23a_exp;
+    TH2F* fh_xfi31_fi33_exp;
+    TH2F* fh_xfi31_tofd_exp;    
+    TH2F* fh_A_overZ;
 
     ClassDef(R3BFragmentTrackerS494, 1)
 };

@@ -207,7 +207,6 @@ void R3BFi30Digitizer::Exec(Option_t* opt)
                     //        << " x = " << xpos << "lab x: "<<xpos-61.224460462455166<<" fiber = " << fiber_id <<" ,
                     //        "<<energyl<<endl;
 
-
                     new ((*Hits)[Hits->GetEntries()])
                         R3BBunchedFiberHitData(6,
                                                xpos,
