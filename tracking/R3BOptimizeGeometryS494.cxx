@@ -177,7 +177,7 @@ InitStatus R3BOptimizeGeometryS494::Init()
 
     // For the moment we have to change manually between the setup
     gSetup = fDetectorsLeft;
-    // gSetup = fDetectorsRight;
+    //gSetup = fDetectorsRight;
 
     gThisTask = this;
 
@@ -283,9 +283,10 @@ void R3BOptimizeGeometryS494::Exec(const Option_t*)
 
         cout << "Saved events: " << gThisTask->GetNEvents() << endl;
     }
-    /*
-    // For the moment we have to change manually between the setup
 
+    
+    // For the moment we have to change manually between the setup
+/*
         R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
         R3BTrackingDetector* tof = fDetectorsRight->GetByName("tofd");
         R3BTrackingDetector* fi23a = fDetectorsRight->GetByName("fi23a");
@@ -318,7 +319,7 @@ void R3BOptimizeGeometryS494::Exec(const Option_t*)
 
             fNEvents += 1;
         }
-    */
+*/   
 }
 
 double Chi2AllEvents(const double* xx)
@@ -332,12 +333,13 @@ double Chi2AllEvents(const double* xx)
 	cout.precision(7);
 	cout << "new correction: " << xx[0] << "  " << xx[1] << "  " << xx[2] 
 	<< "  " << xx[3] << "  " << xx[4] << "  " << xx[5] << "  " << xx[6] 
-	<< "  " << xx[7] << "  " << xx[8]<< endl;
+	<< "  " << xx[7] << "  " << xx[8] << "  " << xx[9] << "  " << xx[10] << endl;
 
 
-	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngle(xx[7]);						
+	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(xx[7]);						
 	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(xx[8]);						
 	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(xx[6]);						
+	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(xx[10]);						
 
 	if(fLeft)
 	{
@@ -476,7 +478,7 @@ double Chi2AllEvents(const double* xx)
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;			
-				fieldScale	= -1560.0 / 3583.81 / scale; // * xx[6];	//run395
+				fieldScale	= -1560.0 / 3583.81 / scale * xx[9];	//run395
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);						
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
@@ -489,7 +491,7 @@ double Chi2AllEvents(const double* xx)
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale<< endl;
-				fieldScale	= -1410.0 / 3583.81 / scale; // * xx[6];	//run391
+				fieldScale	= -1410.0 / 3583.81 / scale * xx[9];	//run391
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);						
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
@@ -501,7 +503,7 @@ double Chi2AllEvents(const double* xx)
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;
-				fieldScale	= -1260.0 / 3583.81 / scale; // * xx[6];	//run389
+				fieldScale	= -1260.0 / 3583.81 / scale * xx[9];	//run389
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);									
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
@@ -513,7 +515,7 @@ double Chi2AllEvents(const double* xx)
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;
-				fieldScale	= -1110.0 / 3583.81 / scale; // * xx[6];	//run389
+				fieldScale	= -1110.0 / 3583.81 / scale * xx[9];	//run389
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);									
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
@@ -527,41 +529,41 @@ double Chi2AllEvents(const double* xx)
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;			
-				fieldScale	= -2310.0/ 3583.81 / scale; //* xx[6] 	//run399
+				fieldScale	= -2310.0/ 3583.81 / scale * xx[9]; 	//run399
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);						
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field after:" << 	field << endl;
 		
 			}
-			if(iev == 1) 
+			if(iev == 1000) 
 			{				
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale<< endl;
-				fieldScale	= -2160.0/ 3583.81 / scale;	// * xx[6]//run401
+				fieldScale	= -2160.0/ 3583.81 / scale * xx[9];//run401
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);						
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field after:" << 	field << endl;
 			}
-			if(iev == 2) 
+			if(iev == 2000) 
 			{				
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;
-				fieldScale	= -2010.0/ 3583.81 / scale;	// * xx[6]//run405
+				fieldScale	= -2010.0/ 3583.81 / scale * xx[9];//run405
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);									
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field after:" << 	field << endl;
 			}
-			if(iev == 3) 
+			if(iev == 3000) 
 			{				
 				Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
 				Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
 				cout << "Field:" << field << " scale: " << scale << endl;
-				fieldScale	= -1860.0/ 3583.81 / scale;	// * xx[6]//run405
+				fieldScale	= -1860.0/ 3583.81 / scale * xx[9];//run405
 				cout << "Setting field to " << 	fieldScale << endl;
 				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(fieldScale);									
 				field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
@@ -623,12 +625,12 @@ double R3BOptimizeGeometryS494::Chi2()
     R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
 
 
-    /*
-        R3BTrackingDetector* fi32 = fDetectorsLeft->GetByName("fi32");
-        R3BTrackingDetector* fi30 = fDetectorsLeft->GetByName("fi30");
-        R3BTrackingDetector* fi31 = gSetup->GetByName("fi31");
-        R3BTrackingDetector* fi33 = gSetup->GetByName("fi33");
-    */
+/*    
+	R3BTrackingDetector* fi32 = fDetectorsLeft->GetByName("fi32");
+	R3BTrackingDetector* fi30 = fDetectorsLeft->GetByName("fi30");
+	R3BTrackingDetector* fi31 = gSetup->GetByName("fi31");
+	R3BTrackingDetector* fi33 = gSetup->GetByName("fi33");
+*/  
 
     if (target->hits.size() < 1)
         target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
@@ -993,7 +995,16 @@ double R3BOptimizeGeometryS494::Chi2()
         pChi2 = 1. * (candidate->GetStartMomentum().Mag() - p0) * (candidate->GetStartMomentum().Mag() - p0) /
                 (p0 * p0 * 0.001 * 0.001);
         mChi2 = candidate->GetChi2();
-        mChi2 = mChi2 + pChi2;
+        zChi2 = (candidate->GetStartMomentum().Z() - p0) * (candidate->GetStartMomentum().Z() - p0) /
+                (p0 * p0 * 0.001 * 0.001);
+        yChi2 = (candidate->GetStartMomentum().Y() - 0.) * (candidate->GetStartMomentum().Y() - 0.) /
+                (0.01 * 0.01);
+        xChi2 = (candidate->GetStartMomentum().X() - 0.) * (candidate->GetStartMomentum().X() - 0.) /
+                (0.01 * 0.01);
+        
+        //mChi2 = mChi2 + pChi2;
+        mChi2 = mChi2 + xChi2 + yChi2 + zChi2;
+        
         // mChi2 = sqrt(candidate->GetChi2() * candidate->GetChi2() + pChi2 * pChi2);
         // mChi2 = pChi2;
         // cout << "pchi: " << pChi2 << " mchi " << candidate->GetChi2() << " total " << mChi2 << endl;
@@ -1052,33 +1063,24 @@ void R3BOptimizeGeometryS494::Finish()
 
     // create funciton wrapper for minmizer
     // a IMultiGenFunction type
-    ROOT::Math::Functor fm1(&Chi2AllEvents, 9);
+    ROOT::Math::Functor fm1(&Chi2AllEvents, 11);
 
 	if(fLeft)
 	{
 		// 12C und 4He from simulation
-		Double_t variable[9] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.0,  -14. , 179.6}; //chi=329.8
+		//Double_t variable[9] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.0,  -14. , 177.6}; //chi=329.8
+		//Double_t variable[9] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.4,  -13.6 , 173.6025}; //chi=329.8
+		//Double_t variable[10] = {-62.6664, 570.9671, -82.8087,  632.4669,  -14., -14.,  1.5,  -13.6 , 173.6025, 1.}; //chi=329.8
+		//Double_t variable[11] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.5,  -14. , 172.5, 1., 0.}; //chi=329.8
+		//Double_t variable[11] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.625196,  -13.9750 , 172.8753, 0.997496, 0.025}; //chi=329.8
+		Double_t variable[11] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.625196,  -13.9750 , 172.8753, 0.997496, 0.025}; //chi=329.8
 		//Double_t variable[9] = {-62.77785, 570.9837, -82.85499,  632.4431,  -13.78335, -13.90721,  1.0,  -13.44 , 171.7496}; //chi=329.8
 		//Double_t variable[9] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.0,  -13.8875 , 178.6103}; //chi=329.8
 		//Double_t variable[9] = {-62.6622, 571.2881, -82.8171,  632.4879,  -13.8879, -13.9790,  1.0,  -13.8875 , 178.6103}; //chi=329.8
-		
-		//Double_t variable[9] = {-62.8664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.0,  13.5885 , 161.2898}; //chi=329.8
-		//Double_t variable[9] = {-62.9, 570.8, -82.8,  632.5,  -14.0, -14.,  1.0,  0.0 , 91.2}; //chi=329.8
-		//Double_t variable[9] = {-62.49415, 570.6712, -83.09245,  632.3618,  -14.06262, -14.01402,  1.0246,  0.0 , 91.2}; //chi=4.0377
-		
-		//Double_t variable[9] = {-62.09, 571.4, -82.42,  633.2,  -14.14, -13.91, 1.016, 0.0, 91.2}; //chi=69.8 scan
-		//Double_t variable[9] = {-61.97496, 571.9778, -82.27509,  633.5024,  -14.07784, -13.76490, 1.008, 0.0, 91.2}; //chi=23.35 mit p
-		//Double_t variable[9] = {-61.55449, 572.4289, -81.88424,  634.2852,  -13.71719, -13.60719, 1.006815, 0.0, 91.2}; //chi=23.35 mit p
-		//Double_t variable[9] = {-61.55449, 572.4289, -81.88424,  634.2852,  -13.71719, -13.60719, 1.006815, 0.0, 91.2}; //chi=23.35 mit p
-		
-		
-		
-		//Double_t variable[9] = {-61.60449, 572.4400, -81.87311,  634.4963, -13.70606, -13.59606, 1.0011, -14.85722,  177.5361}; //chi=23.35 mit p
-		
 
-		Double_t step[9] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.0}; 
-		//ouble_t step[9] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.01, 0.1, 0.2}; 
-		//Double_t step[9] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.1}; 
+		//Double_t step[11] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.5, 0.01, 0.1}; 
+		//Double_t step[11] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 1., 0.01, 0.1}; 
+		Double_t step[11] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01}; 
 		//Double_t step[9] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.005, 0.005, 0.005}; 
 		//Double_t step[9] = {0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001}; 
 
@@ -1091,45 +1093,40 @@ void R3BOptimizeGeometryS494::Finish()
 		mini->SetLimitedVariable(3, "z32", variable[3], step[3], variable[3] - 0.5, variable[3] + 0.5);
 		mini->SetLimitedVariable(4, "dangle30", variable[4], step[4], variable[4] - 0.5, variable[4] + 0.5);
 		mini->SetLimitedVariable(5, "dangle32", variable[5], step[5], variable[5] - 0.5, variable[5] + 0.5);
-		mini->SetLimitedVariable(6, "ypos", variable[6], step[6], variable[6] - 2., variable[6] + 2.);
-		mini->SetLimitedVariable(7, "angle", variable[7], step[7], variable[7] - 2., variable[7] + 2.);
+		mini->SetLimitedVariable(6, "ypos", variable[6], step[6], variable[6] - 5., variable[6] + 5.);
+		mini->SetLimitedVariable(7, "angleY", variable[7], step[7], variable[7] - 5., variable[7] + 5.);
 		mini->SetLimitedVariable(8, "zpos", variable[8], step[8], variable[8] - 20., variable[8] + 20.);
-		mini->FixVariable(0);
-		mini->FixVariable(1);
-		mini->FixVariable(2);
-		mini->FixVariable(3);
-		mini->FixVariable(4);
-		mini->FixVariable(5);
+		mini->SetLimitedVariable(9, "field", variable[9], step[9], variable[9] - 0.1, variable[9] + 0.1);
+		mini->SetLimitedVariable(10, "angleZ", variable[10], step[10], variable[10] - 5., variable[10] + 5.);
+		//mini->FixVariable(0);
+		//mini->FixVariable(1);
+		//mini->FixVariable(2);
+		//mini->FixVariable(3);
+		//mini->FixVariable(4);
+		//mini->FixVariable(5);
 		//mini->FixVariable(6);
 		//mini->FixVariable(7);
 		//mini->FixVariable(8);
+		//mini->FixVariable(9);
+		//mini->FixVariable(10);
 
 	}
 	else
 	{
-		Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.,   -14. , 167.5}; // chi=7.534
-		//Double_t variable[9] = { -111.1140,  537.8391,  -131.0608,  599.5911,  -193.9792,  -193.9792,  1.,   -13.8875 , 178.6103}; // chi=7.534
+		//Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.994056,   -13.62947 , 175.2631}; // chi=7.534
+		//Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.994056,   -13.62947 , 176.7631}; // chi=7.534
+		//Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 1.927387, -13.56280, 177.8298}; // chi=7.534
+		//Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 1.4,  -13.6 , 173.6025}; // chi=7.534
+		//Double_t variable[10] = { -111.2816,  537.8088,  -130.9717,  599.6506,  -193.9370,  -193.9600, 0.8032,  -14.19709 , 176.9028, 1.}; // chi=7.534
+		//Double_t variable[10] = { -111.2476,  537.8921,  -131.0065,  599.5336,  -193.8243,  -193.8473, 0.9147, -14.13736, 177.1437, 0.9962}; // chi=7.534
+		//Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 1.000, -14., 172.5, 1.0, 0.}; // chi=7.534
+		//Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 2.041127, -13.88482, 178.7732, 1.002188, -0.3535}; // chi=7.534
+		Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 2.041127, -13.88482, 178.7732, 1.002188, -0.3535}; // chi=7.534
 		
-		//Double_t variable[9] = { -111.1875,  537.7842,  -130.9560,  599.6793,  -193.6810,  -193.9983,  1.,   -13.44 , 171.7496}; // chi=7.534
-		//Double_t variable[9] = { -111.3490,  537.8201,  -130.9466,  599.6887,  -194.1314,  -193.8816,  1.,   -13.44 , 171.8496}; // chi=7.534
-		//Double_t variable[9] = { -111.1,  537.8,  -131.1,  599.6,  -194.,  -194.,  1.,  0.,  91.2}; // chi=7.534
-		//Double_t variable[9] = { -111.0782,  537.8185,  -131.0829,  599.5830,  -193.9118,  -193.9118,  1.00111,  0.,  91.2}; // chi=7.534
-		//Double_t variable[9] = { -111.0782,  537.8185,  -131.0829,  599.5830,  -193.7118,  -193.9118,  1.00111,  0.,  91.2}; // chi=7.534
-		//Double_t variable[9] = { -111.0670,  537.8421,  -131.0593,  599.6066,  -193.4882,  -193.8882,  1.00110,  0.,  91.2}; // chi=7.534
-		//Double_t variable[9] = { -111.0559,  537.8532,  -131.0482,  599.6177,  -193.4771,  -193.8771,  1.00110,  0.,  91.2}; // chi=7.534
-		//Double_t variable[9] = { -111.0809,  537.8615,  -131.0399,  599.6250,  -193.4588,  -193.8688,  1.00110,  -14.85722,  177.5361}; // chi=7.534
-		
-		//Double_t variable[9] = { -110.8,  537.9,  -131.1,  599.5,  -193.9,  -193.8,  1.007,  0.,  91.2}; // chi=110.7 scan  
-		
-		//best Double_t variable[9] = { -110.7436,  538.7448,  -130.7746,  599.6543,  -192.9494,  -193.3667,  1.007038,  0.0,  91.2}; // chi=56.64 mit p  
-		//Double_t variable[9] = { -110.7436,  536.7448,  -130.7746,  597.6543,  -192.9494,  -193.3667,  1.007038,  0.0,  91.2}; // chi=56.64 mit p  
 
-		//Double_t variable[9] = { -110.8116,  540.6786,  -130.7119,  601.8127,  -192.8380,  -193.2083,  0.9978,  0.0,  91.2}; // chi=56.64 mit p  
-
-		Double_t step[9] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.02, 0.1, 1.0}; 
-		//Double_t step[9] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.02, 0.1, 1.}; 
-		//Double_t step[9] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.1, 0.1}; 
-		//Double_t step[9] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.005, 0.005, 0.005}; 
+		//Double_t step[11] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.5, 0.01, 0.1}; 
+		//Double_t step[11] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 1., 0.01, 0.1}; 
+		Double_t step[11] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01}; 
 		//Double_t step[9] = {0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001}; 
 		//Double_t step[9] = {0.001, 0.001, 0.001, 0.001, 0.001, 0.001, 0.0001, 0.0001, 0.0001}; 
 
@@ -1142,18 +1139,22 @@ void R3BOptimizeGeometryS494::Finish()
 		mini->SetLimitedVariable(3, "z33", variable[3], step[3], variable[3] - 1.5, variable[3] + 1.5);
 		mini->SetLimitedVariable(4, "dangle31", variable[4], step[4], variable[4] - 1.5, variable[4] + 1.5);
 		mini->SetLimitedVariable(5, "dangle33", variable[5], step[5], variable[5] - 1.5, variable[5] + 1.5);
-		mini->SetLimitedVariable(6, "dmag", variable[6], step[6], variable[6] - 0.0001, variable[6] + 0.0001);
-		mini->SetLimitedVariable(7, "angle", variable[7], step[7], variable[7] - 2., variable[7] + 2.);
+		mini->SetLimitedVariable(6, "ypos", variable[6], step[6], variable[6] - 5., variable[6] + 5.);
+		mini->SetLimitedVariable(7, "angleY", variable[7], step[7], variable[7] - 5., variable[7] + 5.);
 		mini->SetLimitedVariable(8, "zpos", variable[8], step[8], variable[8] - 20., variable[8] + 20.);
+		mini->SetLimitedVariable(9, "field", variable[9], step[9], variable[9] - 0.1, variable[9] + 0.1);
+		mini->SetLimitedVariable(10, "angleZ", variable[10], step[10], variable[10] - 5., variable[10] + 5.);
 		mini->FixVariable(0);
 		mini->FixVariable(1);
 		mini->FixVariable(2);
 		mini->FixVariable(3);
 		mini->FixVariable(4);
 		mini->FixVariable(5);
-		mini->FixVariable(6);
+		//mini->FixVariable(6);
 		//mini->FixVariable(7);
 		//mini->FixVariable(8);
+		//mini->FixVariable(9);
+		//mini->FixVariable(10);
 	}
 
     Int_t status = 0;
@@ -1170,18 +1171,18 @@ void R3BOptimizeGeometryS494::Finish()
 		cout << "dx30: " << mini->X()[0] << " dz30 " << mini->X()[1] << endl;
 		cout << "dx32: " << mini->X()[2] << " dz32 " << mini->X()[3] << endl;
 		cout << "dangle30: " << mini->X()[4] << " dangle32: " << mini->X()[5] << endl; 
-		cout << "PosY: " << mini->X()[6] << endl;
-		cout << "PosZ " << mini->X()[8] << endl;
-		cout << "Glad angle: " << mini->X()[7]  << endl;
 	}	
 	else
 	{
 		cout << "dx31: " << mini->X()[0] << " dz31 " << mini->X()[1] << endl;
 		cout << "dx33: " << mini->X()[2] << " dz33 " << mini->X()[3] << endl;
 		cout << "dangle31: " << mini->X()[4] << " dangle33: " << mini->X()[5] << endl; 
-		cout << "mag field: " << mini->X()[6] << endl;
-		cout << "dx23a: " << mini->X()[7] << " dz23a " << mini->X()[8] << endl;
 	}
+	cout << "PosY: " << mini->X()[6] << endl;
+	cout << "PosZ " << mini->X()[8] << endl;
+	cout << "Glad angle Y: " << mini->X()[7]  << endl;
+	cout << "Glad angle Z: " << mini->X()[10]  << endl;
+	cout << "field: " << mini->X()[9]  << endl;
     mini->Clear();
 
     if (fVis)

@@ -720,25 +720,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
                 // left branch in beam direction, don't consider hits in the detectors of the other side
+
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.9750);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.8753);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.625196);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.025);						
+                ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.9974960);
+
                 R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
                 if (fNEventsLeft == 0)
+                {
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+				}
 
-                /*
-
-                                Double_t fieldScale = fBfield / 3583.81 * 1.0; // standard
-                                Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
-                                Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0.,
-                   240.); if (debug) cout << "Field left:" << field << " scale: " << scale << endl;
-
-                                fieldScale = fBfield / 3583.81 / scale * 1.;
-                                if (debug)
-                                    cout << "Setting field to " << fieldScale << endl;
-                                ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
-                                field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-                                if (debug)
-                                    cout << "Field left after:" << field << endl;
-                */
                 do // fi30
                 {
                     if (ifi30 >= 0)
@@ -921,24 +915,15 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
                 // right branch in beam direction, don't consider hits in the detectors of the other side
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.88482);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(178.7732);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(2.041127);						
+				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(-0.3535);						
+                ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002188);
                 R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
                 if (fNEventsRight == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
-                /*
-                                Double_t fieldScale = fBfield / 3583.81 * 1.0; // standard
-                                Double_t scale = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetScale();
-                                Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0.,
-                   240.); if (debug) cout << "Field right:" << field << " scale: " << scale << endl;
-
-                                fieldScale = fBfield / 3583.81 / scale * 1.;
-                                if (debug)
-                                    cout << "Setting field to " << fieldScale << endl;
-                                ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrection(fieldScale);
-                                field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(0., 0., 240.);
-                                if (debug)
-                                    cout << "Field right after:" << field << endl;
-                */
                 do // fi33
                 {
                     if (ifi33 >= 0)
