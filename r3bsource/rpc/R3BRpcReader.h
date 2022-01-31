@@ -11,11 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BPRPCREADER_H
-#define R3BPRPCREADER_H
+#ifndef R3BRPCREADER_H
+#define R3BRPCREADER_H
 
 /* Include the parent reader class definition */
 #include "R3BReader.h"
+#include <Rtypes.h>
+
+class TClonesArray;
 
 /* The structure containing the data layout of PTOF detector */
 struct EXT_STR_h101_RPC_t;
@@ -34,8 +37,8 @@ class R3BRpcReader : public R3BReader
 {
   public:
     /* Default constructor / destructor */
-    R3BRpcReader(EXT_STR_h101_RPC*);
-    ~R3BRpcReader();
+    R3BRpcReader(EXT_STR_h101_RPC*,size_t);
+    virtual ~R3BRpcReader();
 
     /*
      * Functions needing implementation:
@@ -47,18 +50,22 @@ class R3BRpcReader : public R3BReader
      * in the ext_data_struct_info list of items.
      * This is called by the R3BUcesbSource.
      */
-    Bool_t Init(ext_data_struct_info*);
+    virtual Bool_t Init(ext_data_struct_info*) override;
 
     /*
      * Copy data from the ucesb data stream to
      * native data containers, called by R3BUcesbSource.
      */
-    Bool_t Read();
+    virtual Bool_t Read() override;
 
     /*
      * Reset the internal output array.
      */
-    void Reset();
+    virtual void Reset() override;
+
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
 
   private:
     /* Reader specific data structure from ucesb */
@@ -70,7 +77,8 @@ class R3BRpcReader : public R3BReader
      * PTOF instance begins. Use e.g.:
      *   offsetof(EXT_STR_h101, PTOF);
      */
-    UInt_t fOffset;
+    size_t fOffset;
+    Bool_t fOnline;
 
     /* FairLogger */
     FairLogger* fLogger;
@@ -93,7 +101,7 @@ class R3BRpcReader : public R3BReader
      */
 
   public:
-    ClassDef(R3BRpcReader, 0);
+    ClassDefOverride(R3BRpcReader, 0);
 };
 
 #endif

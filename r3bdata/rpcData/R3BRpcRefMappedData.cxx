@@ -22,9 +22,9 @@ R3BRpcRefMappedData::R3BRpcRefMappedData()
 }
 
 R3BRpcRefMappedData::R3BRpcRefMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime)
-  : fChannelId(0)
-  , fFineTime(0)
-  , fCoarseTime(0)
+  : fChannelId(channelId)
+  , fFineTime(fineTime)
+  , fCoarseTime(coarseTime)
 
 {
 }

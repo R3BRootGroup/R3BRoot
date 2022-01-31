@@ -240,7 +240,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     /* Fetch data */
     ret = fClient.fetch_event(fEvent, fEventSize);
-
     if (0 == ret)
     {
         LOG(info) << "End of input";

@@ -208,7 +208,7 @@ Set(STRUCT_HEADERS
 ./music/ext_h101_music.h
 ./trloii/ext_h101_samp.h
 ./pdc/ext_h101_pdc.h
-./rpc/ext_h101_Rpc.h
+./rpc/ext_h101_rpc.h
 
 )
 
