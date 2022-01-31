@@ -98,11 +98,6 @@ class R3BRpcOnlineSpectra : public FairTask
     void Reset_RPC_Histo();
 
     /**
-     * Method to set the number of detectors
-     */
-    void SetNbDet(Int_t ndet) { fNbDet = ndet; }
-
-    /**
      * Method to set the trigger
      */
     void SetTrigger(Int_t trigg) { fTrigger = trigg; }
@@ -120,14 +115,6 @@ class R3BRpcOnlineSpectra : public FairTask
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
     Int_t fNEvents;         // Event counter.
-    Int_t fNbDet;           // Number of RPC detectors.
-
-    // // Histograms for map data
-    // std::vector<TH2F*> fh2_EnergyVsStrip;
-    // // Histograms for cal data
-    // std::vector<TH2F*> fh2_EnergyVsStrip_cal;
-    // // Histograms for hit data
-    // std::vector<TH1F*> fh1_pos;
 
     TH1F **stripCoarseRightHisto;
     TH1F **stripFineRightHisto;
@@ -140,6 +127,24 @@ class R3BRpcOnlineSpectra : public FairTask
 
     TH1F **refCoarseHisto;
     TH1F **refFineHisto;
+
+    TH2F *stripCoarseLeftCorr;
+    TH2F *stripCoarseRightCorr;
+
+    TH2F *stripFineLeftCorr;
+    TH2F *stripFineRightCorr;
+
+    TCanvas *leftStripCanvasCoarse;
+    TCanvas *rightStripCanvasCoarse;
+
+    TCanvas *leftStripCanvasFine;
+    TCanvas *rightStripCanvasFine;
+
+    TCanvas *stripCoarseLeftCorrCanvas;
+    TCanvas *stripCoarseRightCorrCanvas;
+
+    TCanvas *stripFineLeftCorrCanvas;
+    TCanvas *stripFineRightCorrCanvas;
 
   public:
     ClassDefOverride(R3BRpcOnlineSpectra, 1)

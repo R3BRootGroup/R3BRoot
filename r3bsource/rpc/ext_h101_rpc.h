@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_EXT_H101_RPC_H__
-#define __GUARD_H101_EXT_H101_RPC_H__
+#ifndef __GUARD_H101_RPC_EXT_H101_RPC_H__
+#define __GUARD_H101_RPC_EXT_H101_RPC_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -29,6 +29,8 @@ typedef          int  int32_t;
 typedef struct EXT_STR_h101_RPC_t
 {
   /* RAW */
+  uint32_t RPC_WR_L /* [-1,-1] */;
+  uint32_t RPC_WR_H /* [-1,-1] */;
   uint32_t RPC_EPOCH /* [-1,-1] */;
   uint32_t RPC_REF_FTM /* [1,4] */;
   uint32_t RPC_REF_FTMI[4 EXT_STRUCT_CTRL(RPC_REF_FTM)] /* [1,4] */;
@@ -112,6 +114,8 @@ typedef struct EXT_STR_h101_RPC_t
 typedef struct EXT_STR_h101_RPC_onion_t
 {
   /* RAW */
+  uint32_t RPC_WR_L;
+  uint32_t RPC_WR_H;
   uint32_t RPC_EPOCH;
   uint32_t RPC_REF_FTM;
   uint32_t RPC_REF_FTMI[4 /* RPC_REF_FTM */];
@@ -191,6 +195,12 @@ typedef struct EXT_STR_h101_RPC_onion_t
 #define EXT_STR_h101_RPC_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* RAW */ \
+  EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
+                     RPC_WR_L,                        UINT32,\
+                    "RPC_WR_L"); \
+  EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
+                     RPC_WR_H,                        UINT32,\
+                    "RPC_WR_H"); \
   EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
                      RPC_EPOCH,                       UINT32,\
                     "RPC_EPOCH"); \
@@ -413,7 +423,7 @@ typedef struct EXT_STR_h101_RPC_onion_t
  * (version checks, etc)
  */
 
-typedef struct EXT_STR_h101_layout_t
+typedef struct EXT_STR_h101_RPC_layout_t
 {
   uint32_t _magic;
   uint32_t _size_info;
@@ -429,20 +439,20 @@ typedef struct EXT_STR_h101_layout_t
     const char *_name;
   } _items[1];
   uint32_t _pack_list[80086];
-} EXT_STR_h101_layout;
+} EXT_STR_h101_RPC_layout;
 
-#define EXT_STR_h101_LAYOUT_INIT { \
-  0x57e65c97, \
-  sizeof(EXT_STR_h101_layout), \
-  sizeof(EXT_STR_h101), \
-  sizeof(EXT_STR_h101_onion), \
+#define EXT_STR_h101_RPC_LAYOUT_INIT { \
+  0x57e65c96, \
+  sizeof(EXT_STR_h101_RPC_layout), \
+  sizeof(EXT_STR_h101_RPC), \
+  sizeof(EXT_STR_h101_RPC_onion), \
   80086, \
   1, \
   { \
-    { 0, sizeof(EXT_STR_h101), 0xdf24afb5, "h101" }, \
+    { 0, sizeof(EXT_STR_h101_RPC), 0xd5601e19, "h101_RPC" }, \
   }, \
   { \
-   /*    0 */ 0x40a52000, 0x00000000, 0x40a52000, 0x00000004, \
+   /*    0 */ 0x40a50000, 0x00000000, 0x40a50000, 0x00000004, \
    /*    4 */ 0x40a50000, 0x00000008, 0xd0a50000, 0x0000000c, \
    /*    8 */ 0x00000004, 0x00000002, 0x48a50000, 0x00000010, \
    /*   12 */ 0x44a50000, 0x00000020, 0x48a50000, 0x00000014, \
@@ -20467,6 +20477,6 @@ typedef struct EXT_STR_h101_layout_t
   } \
 };
 
-#endif/*__GUARD_H101_EXT_H101_RPC_H__*/
+#endif/*__GUARD_H101_RPC_EXT_H101_RPC_H__*/
 
 /*******************************************************/

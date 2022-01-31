@@ -22,10 +22,10 @@ R3BRpcPmtMappedData::R3BRpcPmtMappedData()
 }
 
 R3BRpcPmtMappedData::R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge)
-: fChannelId(0)
-, fFineTime(0)
-, fCoarseTime(0)
-, fEdge(0)
+: fChannelId(channelId)
+, fFineTime(fineTime)
+, fCoarseTime(coarseTime)
+, fEdge(edge)
 {
 }
 

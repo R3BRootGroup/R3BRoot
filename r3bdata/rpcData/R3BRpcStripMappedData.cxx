@@ -23,11 +23,11 @@ R3BRpcStripMappedData::R3BRpcStripMappedData()
 }
 
 R3BRpcStripMappedData::R3BRpcStripMappedData(UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t Side)
-   : fStripId(0)
-   , fFineTime(0)
-   , fCoarseTime(0)
-   , fEdge(0)
-   , fSide(0)
+   : fStripId(StripId)
+   , fFineTime(FineTime)
+   , fCoarseTime(CoarseTime)
+   , fEdge(Edge)
+   , fSide(Side)
 {
 }
 
