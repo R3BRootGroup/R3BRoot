@@ -62,6 +62,7 @@
 #pragma link C++ class R3BAlpidePoint+;
 #pragma link C++ class R3BAlpideMappedData+;
 #pragma link C++ class R3BAlpideCalData+;
+#pragma link C++ class R3BAlpideHitData+;
 #pragma link C++ class R3BRpcPmtMappedData+;
 #pragma link C++ class R3BRpcRefMappedData+;
 #pragma link C++ class R3BRpcStripMappedData+;
