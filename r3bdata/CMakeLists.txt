@@ -192,6 +192,7 @@ footData/R3BFootHitData.cxx
 alpideData/R3BAlpidePoint.cxx
 alpideData/R3BAlpideMappedData.cxx
 alpideData/R3BAlpideCalData.cxx
+alpideData/R3BAlpideHitData.cxx
 rpcData/R3BRpcCalData.cxx
 rpcData/R3BRpcPmtMappedData.cxx
 rpcData/R3BRpcRefMappedData.cxx
@@ -204,7 +205,7 @@ rpcData/R3BRpcPoint.cxx
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 set(HEADERS ${HEADERS} R3BDetectorList.h)
 
-set(LINKDEF R3BDataLinkDef.h)
+set(LINKDEF DataLinkDef.h)
 set(LIBRARY_NAME R3BData)
 set(DEPENDENCIES Base FairTools)
 
