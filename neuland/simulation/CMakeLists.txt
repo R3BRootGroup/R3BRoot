@@ -14,7 +14,7 @@
 set(LIBRARY_NAME R3BNeulandSimulation)
 set(LINKDEF NeulandSimulationLinkDef.h)
 
-set(DEPENDENCIES R3BNeulandShared R3BData R3Bbase)
+set(DEPENDENCIES R3BNeulandShared R3BData R3BBase)
 
 set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/simulation)
 include_directories(${INCLUDE_DIRECTORIES})

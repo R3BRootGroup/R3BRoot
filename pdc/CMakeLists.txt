@@ -59,6 +59,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF PdcLinkDef.h)
 set(LIBRARY_NAME R3BPdc)
 set(DEPENDENCIES
-    Spectrum R3Bbase R3BPassive R3BTracking R3BData R3BTCal)
+    Spectrum R3BBase R3BTracking R3BData R3BTCal)
     
 GENERATE_LIBRARY()

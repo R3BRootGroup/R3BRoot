@@ -20,7 +20,6 @@ ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${ucesb_INCLUDE_DIR}
 )
-# Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
@@ -45,7 +44,6 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofi
 ${R3BROOT_SOURCE_DIR}/r3bsource/rpc
-
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
@@ -220,7 +218,7 @@ Set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
 set(LINKDEF_FILE SourceLinkDef.h)
 set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools
-    R3Bbase R3BData Core Geom GenVector
+    R3BBase R3BData Core Geom GenVector
     Physics Matrix MathCore R3BPsp
     ${ucesb_LIBRARY_SHARED})
 set(LIBRARY_NAME R3Bsource)

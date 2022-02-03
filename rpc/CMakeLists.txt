@@ -75,6 +75,6 @@ set(LINKDEF RpcLinkDef.h)
 set(LIBRARY_NAME R3BRpc)
 
 set(DEPENDENCIES
-    R3Bbase R3BTracking R3BData)
+    R3BBase R3BTracking R3BData)
 
 GENERATE_LIBRARY()

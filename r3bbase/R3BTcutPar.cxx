@@ -39,7 +39,6 @@ void R3BTcutPar::putParams(FairParamList* list)
     R3BLOG(INFO, "called for " << fCut->GetN() << " points");
 
     TArrayF* p = new TArrayF(2);
-
     for (int n = 0; n < fCut->GetN(); n++)
     {
         Double_t a[2];
@@ -75,8 +74,6 @@ void R3BTcutPar::print()
     if (fCut)
     {
         R3BLOG(INFO, "for " << fCut->GetName());
-
-        TArrayF* p = new TArrayF(2);
         for (int n = 0; n < fCut->GetN(); n++)
         {
             Double_t a[2];

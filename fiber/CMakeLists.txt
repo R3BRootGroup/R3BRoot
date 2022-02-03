@@ -21,11 +21,11 @@ ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
+${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/tcal
-${R3BROOT_SOURCE_DIR}/r3bdata
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -59,8 +59,11 @@ R3BFiberMAPMTHitModulePar.cxx
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 Set(LINKDEF BunchedFiberLinkDef.h)
+
 Set(LIBRARY_NAME R3BBunchedFiber)
+
 set(DEPENDENCIES
-     R3BPassive R3BData R3BTCal)
+R3BData R3BTCal
+)
 
 GENERATE_LIBRARY()

@@ -17,7 +17,7 @@ set(LINKDEF NeulandUnpackLinkDef.h)
 set(SRCS R3BNeulandTcalFill.cxx R3BNeulandTcal.cxx R3BNeulandPmt.cxx)
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
-set(DEPENDENCIES R3Bbase R3BTCal R3BData)
+set(DEPENDENCIES R3BBase R3BTCal R3BData)
 
 set(INCLUDE_DIRECTORIES
     ${R3BROOT_SOURCE_DIR}/neuland/unpack

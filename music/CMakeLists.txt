@@ -84,6 +84,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF MusicLinkDef.h)
 set(LIBRARY_NAME R3BMusic)
 set(DEPENDENCIES
-          R3Bbase R3BData R3BTracking)
+          R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()

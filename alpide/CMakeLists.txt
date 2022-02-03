@@ -53,7 +53,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF AlpideLinkDef.h)
 set(LIBRARY_NAME R3BAlpide)
 set(DEPENDENCIES
-    R3Bbase R3BData)
+    R3BBase R3BData)
 
 GENERATE_LIBRARY()
 
