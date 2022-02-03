@@ -11,27 +11,22 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BCal" which includes the source files given in the array . The
-# extension is already found.  Any number of sources could be listed here.
+# Create a library called "libR3BLand" which includes the source files given in 
+# the array. The extension is already found. Any number of sources could be
+# listed here.
 
 set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
     # put here all directories where header files are located
     ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/passive
     ${R3BROOT_SOURCE_DIR}/land
     ${R3BROOT_SOURCE_DIR}/los
     ${R3BROOT_SOURCE_DIR}/r3bdata/
-    ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
-    ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
-    ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-    ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
     ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
     ${R3BROOT_SOURCE_DIR}/r3bdata/landData
     ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
     ${R3BROOT_SOURCE_DIR}/r3bdata/losData
-    ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
     ${R3BROOT_SOURCE_DIR}/tcal
     ${R3BROOT_SOURCE_DIR}/neuland/unpack)
 
@@ -62,7 +57,10 @@ set(SRCS
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF LandLinkDef.h)
+
 set(LIBRARY_NAME R3BLand)
-set(DEPENDENCIES R3Bbase R3BData R3BPassive R3BTCal)
+
+set(DEPENDENCIES 
+R3BBase R3BData R3BTCal)
 
 generate_library()

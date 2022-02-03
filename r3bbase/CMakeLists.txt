@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3Bbase" which includes the source files given in
+# Create a library called "libR3BBase" which includes the source files given in
 # the array. The extension is already found. Any number of sources could be 
 # listed here.
 
@@ -60,7 +60,7 @@ Set(LINKDEF BaseLinkDef.h)
 Set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
 
-Set(LIBRARY_NAME R3Bbase)
+Set(LIBRARY_NAME R3BBase)
 
 GENERATE_LIBRARY()
 

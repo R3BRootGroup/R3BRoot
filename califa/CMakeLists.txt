@@ -77,6 +77,6 @@ set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 
 set(DEPENDENCIES
-  Spectrum R3Bbase R3BData R3BTracking Boost::regex)
+  Spectrum R3BBase R3BData R3BTracking Boost::regex)
 
 GENERATE_LIBRARY()

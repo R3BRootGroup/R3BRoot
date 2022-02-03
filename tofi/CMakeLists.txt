@@ -71,7 +71,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TofiLinkDef.h)
 set(LIBRARY_NAME R3BTofi)
 set(DEPENDENCIES
-    R3Bbase R3BData R3BTCal R3BTracking)
+    R3BBase R3BData R3BTCal R3BTracking)
 
 GENERATE_LIBRARY()
 

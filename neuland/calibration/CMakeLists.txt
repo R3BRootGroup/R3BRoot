@@ -16,7 +16,7 @@ set(LINKDEF NeulandCalibrationLinkDef.h)
 
 #set(CMAKE_CXX_STANDARD 14)
 
-set(DEPENDENCIES R3Bbase R3BData R3BTCal R3BNeulandShared)
+set(DEPENDENCIES R3BBase R3BData R3BTCal R3BNeulandShared)
 
 set(INCLUDE_DIRECTORIES
     ${INCLUDE_DIRECTORIES}

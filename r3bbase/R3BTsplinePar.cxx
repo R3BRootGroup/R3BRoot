@@ -39,7 +39,6 @@ void R3BTsplinePar::putParams(FairParamList* list)
     R3BLOG(INFO, "called for " << fSpline->GetNp() << " points");
 
     TArrayF* p = new TArrayF(2);
-
     for (int n = 0; n < fSpline->GetNp(); n++)
     {
         Double_t a[2];
@@ -76,7 +75,6 @@ void R3BTsplinePar::print()
     {
         R3BLOG(INFO, "for " << fSpline->GetName());
 
-        TArrayF* p = new TArrayF(2);
         for (int n = 0; n < fSpline->GetNp(); n++)
         {
             Double_t a[2];
