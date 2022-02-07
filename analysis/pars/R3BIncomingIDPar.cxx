@@ -35,7 +35,10 @@ R3BIncomingIDPar::R3BIncomingIDPar(const TString& name, const TString& title, co
     fDispersionS2 = new TArrayF(fNumDet);
     fTof2InvV_p0 = new TArrayF(fNumDet);
     fTof2InvV_p1 = new TArrayF(fNumDet);
+    // TCut to skip charge states at S2
     fTcutparS2 = new R3BTcutPar("CutS2");
+    // TCut to select incoming projectile at the entrance of Cave-C
+    fTcutparCave = new R3BTcutPar("CutCave");
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -99,6 +102,7 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
     list->add("Beta_max", fBeta_max);
 
     fTcutparS2->putParams(list);
+    fTcutparCave->putParams(list);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -201,7 +205,9 @@ Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
+    // TCuts
     fTcutparS2->getParams(list);
+    fTcutparCave->getParams(list);
 
     return kTRUE;
 }
@@ -221,6 +227,7 @@ void R3BIncomingIDPar::printParams()
                   << ", PosS2Right: " << fPosS2Right->GetAt(d);
 
     fTcutparS2->print();
+    fTcutparCave->print();
 }
 
 ClassImp(R3BIncomingIDPar);
