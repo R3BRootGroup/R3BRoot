@@ -52,6 +52,8 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
     , fCalifaGeo(NULL)
     , fNbCrystalsGammaRange(2432) // during 2019 it was 5000
     , fOnline(kFALSE)
+    , fRand(0)
+    , fRandFile("")
 {
     SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
     fCalifatoTargetPos.SetXYZ(0., 0., 0.);
@@ -114,6 +116,22 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
         fCalifatoTargetPos = fTargetPos - fCalifaPos;
     }
 
+
+    if(fRand){
+
+    fAngularDistributions = new TH2F*[4864];
+
+    char name[100];
+    for(Int_t i = 0 ; i < 4864 ; i++ ){
+
+        sprintf(name, "distributionCrystalID_%i",i+1);
+        fHistoFile->GetObject(name,fAngularDistributions[i]);
+
+
+    }
+
+
+ }
     return kSUCCESS;
 }
 
@@ -263,8 +281,25 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         uint64_t time = highest->GetTime();
         auto vhighest = GetAnglesVector(highest->GetCrystalId()) - fCalifatoTargetPos;
 
-        auto clusterHit =
+        Double_t fRandPhi,fRandTheta;
+        R3BCalifaHitData* clusterHit;
+
+        if(fRand){
+
+         fAngularDistributions[highest->GetCrystalId()-1]->GetRandom2(fRandPhi,fRandTheta);
+
+           clusterHit =
+            TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time ,TMath::DegToRad()*fRandTheta,TMath::DegToRad()*fRandPhi,clusterId);
+
+        }
+
+        else{
+
+          clusterHit =
             TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
+
+        }
+
 
         // loop through remaining crystals, remove matches from list.
         auto i = unusedCrystalHits.begin();
