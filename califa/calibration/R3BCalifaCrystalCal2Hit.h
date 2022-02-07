@@ -20,6 +20,7 @@
 #include "Rtypes.h"
 
 #include <TVector3.h>
+#include "TH2F.h"
 
 class TClonesArray;
 class R3BTGeoPar;
@@ -158,6 +159,15 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
+    void SetRandomization(Bool_t rand){fRand=rand;}
+
+    void SetRandomizationFile(TString file) {
+
+      fRandFile = file;
+      fHistoFile = new TFile(fRandFile);
+
+    }
+
   protected:
     /** Method GetAnglesVector (calls R3BCalifaGeometry::GetAngles(id)) **/
     TVector3 GetAnglesVector(int id);
@@ -199,7 +209,10 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     // R3BCalifaHitPar* fCalifaHitPar;
 
     R3BCalifaGeometry* fCalifaGeo;
-
+    Bool_t fRand;                // Flag to set randomization procedure
+    TString fRandFile;           // File with angular coverages for each crystal
+    TFile *fHistoFile;
+    TH2F **fAngularDistributions;
     /** Private method AddHit
      **
      ** Adds a CalifaHit to the HitCollection
