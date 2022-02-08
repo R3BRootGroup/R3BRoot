@@ -58,6 +58,10 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
     , fZ1(0.)
     , fZ2(0.)
     , fOnline(kFALSE)
+    , fx0_point(0.0)
+    , fy0_point(0.0)
+    , frot_ang(0.0)
+
 {
 }
 
@@ -107,6 +111,12 @@ void R3BMusicCal2Hit::SetParameter()
     CalZParams->Set(fNumParams);
     CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
 
+    CalAngCorParams = new TArrayF();
+    CalAngCorParams->Set(3);
+    CalAngCorParams = fCal_Par->GetAngCorPar(); // Array with the Cal parameters
+    fx0_point = CalAngCorParams->GetAt(0);
+    fy0_point = CalAngCorParams->GetAt(1);
+    frot_ang = CalAngCorParams->GetAt(2);
     // Parameters detector
     if (fNumParams == 2)
     {
@@ -233,9 +243,12 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         theta = c_svd_r[1];
 
         Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba) + fZ2 * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
+        std::cout<<fx0_point<<" "<<fy0_point<<" "<<frot_ang<<std::endl;
+        double zcorang =
+            fy0_point + (theta*1000 - fx0_point) * sin(frot_ang) + (zhit - fy0_point) * cos(frot_ang);
         if (zhit > 0)
             // AddHitData(theta, zhit);
-            AddHitData(theta, zhit, Esum / nba);
+            AddHitData(theta, zcorang, Esum / nba);
     }
     if (CalDat)
         delete CalDat;

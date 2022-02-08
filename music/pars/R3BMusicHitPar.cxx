@@ -36,6 +36,7 @@ R3BMusicHitPar::R3BMusicHitPar(const char* name, const char* title, const char* 
     fDetZHitParams = new TArrayF(fNumParamsZFit); // 2 Parameters for Z (Linear fits)
     fIn_use = new TArrayI(fNumAnodes);
     fAnode_pos = new TArrayF(fNumAnodes);
+    fAngCorParams = new TArrayF(3);
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -48,6 +49,8 @@ R3BMusicHitPar::~R3BMusicHitPar()
         delete fAnode_pos;
     if (fDetZHitParams)
         delete fDetZHitParams;
+    if (fAngCorParams)
+        delete fAngCorParams;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -68,8 +71,13 @@ void R3BMusicHitPar::putParams(FairParamList* list)
 
     LOG(INFO) << "Nb Anodes: " << fNumAnodes;
     list->add("musicAnodeNumberPar", fNumAnodes);
+
+    fAngCorParams->Set(3);
+    list->add("musicAngCorHitPar", *fAngCorParams);
+
     fIn_use->Set(fNumAnodes);
     list->add("musicInUsePar", *fIn_use);
+
     fAnode_pos->Set(fNumAnodes);
     list->add("musicAnodePosPar", *fAnode_pos);
 
@@ -77,6 +85,7 @@ void R3BMusicHitPar::putParams(FairParamList* list)
     list->add("musicZHitParamsFitPar", fNumParamsZFit);
     fDetZHitParams->Set(fNumParamsZFit);
     list->add("musicZHitPar", *fDetZHitParams);
+
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -94,8 +103,15 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
         LOG(ERROR) << "Could not initialize musicAnodeNumberPar";
         return kFALSE;
     }
-
     LOG(INFO) << "Nb Anodes: " << fNumAnodes;
+
+    fAngCorParams->Set(3);
+    if (!(list->fill("musicAngCorHitPar", fAngCorParams)))
+    {
+        LOG(ERROR) << "Could not initialize musicAngCorHitPar";
+        return kFALSE;
+    }
+
     fIn_use->Set(fNumAnodes);
     if (!(list->fill("musicInUsePar", fIn_use)))
     {
@@ -142,6 +158,7 @@ void R3BMusicHitPar::printParams()
     {
         LOG(INFO) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
     }
+
 }
 
 ClassImp(R3BMusicHitPar);

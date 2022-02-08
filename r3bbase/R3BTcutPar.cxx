@@ -28,7 +28,7 @@
 // -----   Default constructor   -----------------------------------------------
 R3BTcutPar::R3BTcutPar(const TString& cutname)
     : fCutName(cutname)
-    , fMaxPoints(100)
+    , fMaxPoints(20)
 {
     fCut = new TCutG(fCutName, 1);
 }
