@@ -15,6 +15,7 @@
 #define R3BAnalysisIncomingID_H
 
 #include "TMath.h"
+#include "TCutG.h"
 #include <TArrayF.h>
 #include <array>
 #include <cstdlib>
@@ -38,6 +39,7 @@
 class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
+class R3BTcutPar;
 
 /**
  * This taks reads all detector data items for the analysis of incoming
@@ -134,6 +136,7 @@ class R3BAnalysisIncomingID : public FairTask
     Float_t fx0_point, fy0_point, frot_ang;
     Float_t fx0_Aq, fy0_Aq, fang_Aq;
     Float_t fBeta_max, fBeta_min;
+    TCutG* fCutS2;
 
     // Parameter containers for R3BMusicPar
     UChar_t fNumMusicParams;

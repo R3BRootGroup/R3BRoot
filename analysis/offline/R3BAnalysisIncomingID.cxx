@@ -162,6 +162,7 @@ void R3BAnalysisIncomingID::SetParameter()
     fang_Aq = fIncomingID_Par->Getang_Aq();
     fBeta_min = fIncomingID_Par->GetBeta_min();
     fBeta_max = fIncomingID_Par->GetBeta_max();
+    fCutS2 = fIncomingID_Par->GetCutS2();
 
     for (Int_t i = 1; i < fNumDet + 1; i++)
     {
@@ -328,19 +329,37 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                 AoQ_m1 = Brho_m1 / (3.10716 * Beta_m1 * Gamma_m1);
                 AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
 
-                if (Zmusic > 0. && !fUseLOS)
-                {
-                    double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                    double zcor = sqrt(Emus * Beta_m1) * 0.277;
-                    double zcorang =
-                        fy0_point + (Music_ang - fx0_point) * sin(frot_ang) + (zcor - fy0_point) * cos(frot_ang) + 0.2;
 
-                    AddData(1, 2, zcorang, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                if (fCutS2 && fCutS2->IsInside(PosSci2_m1[i],AoQ_m1_corr))
+                {
+                  if (Zmusic > 0. && !fUseLOS)
+                  {
+                      double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                      double zcor = sqrt(Emus * Beta_m1) * 0.277;
+
+                      AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                  }
+
+                  if (Zlos[i] > 0. && fUseLOS)
+                  {
+                      AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                  }
                 }
 
-                if (Zlos[i] > 0. && fUseLOS)
+                else if (!fCutS2 )
                 {
-                    AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                  if (Zmusic > 0. && !fUseLOS)
+                  {
+                      double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                      double zcor = sqrt(Emus * Beta_m1) * 0.277;
+
+                      AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                  }
+
+                  if (Zlos[i] > 0. && fUseLOS)
+                  {
+                      AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                  }
                 }
             }
         }
