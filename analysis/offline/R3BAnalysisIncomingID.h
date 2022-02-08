@@ -136,7 +136,7 @@ class R3BAnalysisIncomingID : public FairTask
     Float_t fx0_point, fy0_point, frot_ang;
     Float_t fx0_Aq, fy0_Aq, fang_Aq;
     Float_t fBeta_max, fBeta_min;
-    TCutG* fCutS2;
+    TCutG* fCutS2, *fCutCave;
 
     // Parameter containers for R3BMusicPar
     UChar_t fNumMusicParams;

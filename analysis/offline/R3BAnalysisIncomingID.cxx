@@ -74,6 +74,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
     , fUseLOS(kTRUE)
+    , fCutS2(NULL)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);
@@ -147,13 +148,13 @@ void R3BAnalysisIncomingID::SetParContainers()
             << "R3BAnalysisIncomingIDPar:: R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of "
                "parameters: "
             << fNumMusicParams;
-
     return;
 }
 
 void R3BAnalysisIncomingID::SetParameter()
 {
     //--- Parameter Container ---
+    //std::cout<<"BBBBBBBBBBBBBBBBBBBBBBBBBBBBB"<<std::endl;
     fx0_point = fIncomingID_Par->Getx0_point();
     fy0_point = fIncomingID_Par->Gety0_point();
     frot_ang = fIncomingID_Par->Getrot_ang();
@@ -162,7 +163,9 @@ void R3BAnalysisIncomingID::SetParameter()
     fang_Aq = fIncomingID_Par->Getang_Aq();
     fBeta_min = fIncomingID_Par->GetBeta_min();
     fBeta_max = fIncomingID_Par->GetBeta_max();
+
     fCutS2 = fIncomingID_Par->GetCutS2();
+    fCutCave = fIncomingID_Par->GetCutCave();
 
     for (Int_t i = 1; i < fNumDet + 1; i++)
     {
@@ -185,7 +188,6 @@ InitStatus R3BAnalysisIncomingID::Init()
     LOG_IF(FATAL, NULL == mgr) << "FairRootManager not found";
 
     // fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
-
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
     LOG_IF(WARNING, !fHitSci2) << "R3BAnalysisIncomingID::Init()  Could not find Sci2Hit";

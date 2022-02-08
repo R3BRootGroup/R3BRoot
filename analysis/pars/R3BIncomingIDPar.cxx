@@ -92,9 +92,9 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
     list->add("Tof2InvV_p0", *fTof2InvV_p0);
     fTof2InvV_p1->Set(fNumDet);
     list->add("DTof2InvV_p1", *fTof2InvV_p1);
-    list->add("x0_point", fx0_point);
-    list->add("y0_point", fy0_point);
-    list->add("rot_ang", frot_ang);
+    // list->add("x0_point", fx0_point);
+    // list->add("y0_point", fy0_point);
+    // list->add("rot_ang", frot_ang);
     list->add("x0_Aq", fx0_Aq);
     list->add("y0_Aq", fy0_Aq);
     list->add("ang_Aq", fang_Aq);
@@ -157,23 +157,23 @@ Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
-    if (!(list->fill("x0_point", &fx0_point)))
-    {
-        LOG(ERROR) << "Could not initialize incomingIDx0_pointPar";
-        return kFALSE;
-    }
-
-    if (!(list->fill("y0_point", &fy0_point)))
-    {
-        LOG(ERROR) << "Could not initialize incomingIDy0_pointPar";
-        return kFALSE;
-    }
-
-    if (!(list->fill("rot_ang", &frot_ang)))
-    {
-        LOG(ERROR) << "Could not initialize incomingIDrot_angPar";
-        return kFALSE;
-    }
+    // if (!(list->fill("x0_point", &fx0_point)))
+    // {
+    //     LOG(ERROR) << "Could not initialize incomingIDx0_pointPar";
+    //     return kFALSE;
+    // }
+    //
+    // if (!(list->fill("y0_point", &fy0_point)))
+    // {
+    //     LOG(ERROR) << "Could not initialize incomingIDy0_pointPar";
+    //     return kFALSE;
+    // }
+    //
+    // if (!(list->fill("rot_ang", &frot_ang)))
+    // {
+    //     LOG(ERROR) << "Could not initialize incomingIDrot_angPar";
+    //     return kFALSE;
+    // }
 
     if (!(list->fill("x0_Aq", &fx0_Aq)))
     {
