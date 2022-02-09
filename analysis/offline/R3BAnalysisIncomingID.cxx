@@ -154,7 +154,6 @@ void R3BAnalysisIncomingID::SetParContainers()
 void R3BAnalysisIncomingID::SetParameter()
 {
     //--- Parameter Container ---
-    //std::cout<<"BBBBBBBBBBBBBBBBBBBBBBBBBBBBB"<<std::endl;
     fx0_point = fIncomingID_Par->Getx0_point();
     fy0_point = fIncomingID_Par->Gety0_point();
     frot_ang = fIncomingID_Par->Getrot_ang();
@@ -344,7 +343,10 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 
                   if (Zlos[i] > 0. && fUseLOS)
                   {
-                      AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                    if (fCutCave && fCutCave->IsInside(AoQ_m1_corr,Zlos[i]))
+                      {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
+                    else if (!fCutCave)
+                    {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
                   }
                 }
 
@@ -360,7 +362,10 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 
                   if (Zlos[i] > 0. && fUseLOS)
                   {
-                      AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                    if (fCutCave && fCutCave->IsInside(AoQ_m1_corr,Zlos[i]))
+                      {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
+                    else if (!fCutCave)
+                    {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
                   }
                 }
             }

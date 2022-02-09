@@ -108,8 +108,7 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
     fAngCorParams->Set(3);
     if (!(list->fill("musicAngCorHitPar", fAngCorParams)))
     {
-        LOG(ERROR) << "Could not initialize musicAngCorHitPar";
-        return kFALSE;
+        LOG(WARNING) << "Could not initialize musicAngCorHitPar";
     }
 
     fIn_use->Set(fNumAnodes);
