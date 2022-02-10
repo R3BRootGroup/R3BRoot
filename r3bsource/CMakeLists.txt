@@ -39,6 +39,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/califa
 ${R3BROOT_SOURCE_DIR}/r3bsource/neuland
 ${R3BROOT_SOURCE_DIR}/r3bsource/ams
 ${R3BROOT_SOURCE_DIR}/r3bsource/foot
+${R3BROOT_SOURCE_DIR}/r3bsource/alpide
 ${R3BROOT_SOURCE_DIR}/r3bsource/music
 ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
@@ -63,6 +64,7 @@ ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
+${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
@@ -143,6 +145,7 @@ set(SRCS
 ./strack/R3BStartrackReader.cxx
 ./ams/R3BAmsReader.cxx
 ./foot/R3BFootSiReader.cxx
+./alpide/R3BAlpideReader.cxx
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
 )
@@ -203,6 +206,7 @@ Set(STRUCT_HEADERS
 ./strack/ext_h101_star.h
 ./ams/ext_h101_ams.h
 ./foot/ext_h101_foot.h
+./alpide/ext_h101_alpide.h
 ./music/ext_h101_music.h
 ./trloii/ext_h101_samp.h
 ./pdc/ext_h101_pdc.h

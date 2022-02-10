@@ -80,6 +80,7 @@
 #pragma link C++ class R3BAmsReader+;
 #pragma link C++ class R3BMusicReader+;
 #pragma link C++ class R3BFootSiReader+;
+#pragma link C++ class R3BAlpideReader+;
 #pragma link C++ class R3BCalifaJulichReader+;
 #pragma link C++ class R3BRpcReader+;
 
@@ -124,6 +125,7 @@
 #pragma link C++ class EXT_STR_h101_STAR_onion_t;
 #pragma link C++ class EXT_STR_h101_AMS_onion_t;
 #pragma link C++ class EXT_STR_h101_FOOT_onion_t;
+#pragma link C++ class EXT_STR_h101_ALPIDE_onion_t;
 #pragma link C++ class EXT_STR_h101_WRMASTER_onion_t;
 #pragma link C++ class EXT_STR_h101_WRCALIFA_onion_t;
 #pragma link C++ class EXT_STR_h101_WRAMS_onion_t;

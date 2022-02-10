@@ -29,22 +29,22 @@ class R3BAlpideCalData : public TObject
     R3BAlpideCalData();
 
     /** Standard Constructor
-     *@param detId    Detector unique identifier
+     *@param senId    Sensor unique identifier
      *@param postl    Longitudinal position
      *@param postt    Transverse position
      **/
-    R3BAlpideCalData(UShort_t detId, Float_t posl, Float_t post);
+    R3BAlpideCalData(UShort_t senId, Float_t posl, Float_t post);
 
     // Destructor
     virtual ~R3BAlpideCalData() {}
 
     // Getters
-    inline const UShort_t& GetDetId() const { return fDetId; }
-    inline const Float_t& GetPosl() const { return fPosl; }
-    inline const Float_t& GetPost() const { return fPost; }
+    inline const UShort_t GetSensorId() const { return fSenId; }
+    inline const Float_t GetPosl() const { return fPosl; }
+    inline const Float_t GetPost() const { return fPost; }
 
   protected:
-    UShort_t fDetId;
+    UShort_t fSenId;
     Float_t fPosl;
     Float_t fPost;
 
