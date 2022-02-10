@@ -28,6 +28,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
 ${R3BROOT_SOURCE_DIR}/alpide
 ${R3BROOT_SOURCE_DIR}/alpide/sim
+${R3BROOT_SOURCE_DIR}/alpide/calibration
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -43,7 +44,7 @@ link_directories( ${LINK_DIRECTORIES})
 file(GLOB SRCS 
 ./sim/*.cxx 
 #./pars/*.cxx 
-#./calibration/*.cxx
+./calibration/*.cxx
 )
 
 # fill list of header files from list of source files

@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BAlpide+;
+#pragma link C++ class R3BAlpideMapped2Cal+;
 
 #endif
 
