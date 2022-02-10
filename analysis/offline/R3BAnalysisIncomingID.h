@@ -14,8 +14,8 @@
 #ifndef R3BAnalysisIncomingID_H
 #define R3BAnalysisIncomingID_H
 
-#include "TMath.h"
 #include "TCutG.h"
+#include "TMath.h"
 #include <TArrayF.h>
 #include <array>
 #include <cstdlib>

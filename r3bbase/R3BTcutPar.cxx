@@ -29,8 +29,9 @@
 R3BTcutPar::R3BTcutPar(const TString& cutname)
     : fCutName(cutname)
     , fMaxPoints(20)
+    , fCut(NULL)
 {
-    fCut = new TCutG(fCutName, 1);
+    // fCut = new TCutG(fCutName, 1);
 }
 
 // ----  Method putParams ------------------------------------------------------
@@ -62,7 +63,13 @@ TCutG* R3BTcutPar::getParams(FairParamList* list)
         TString name = fCutName + "Point" + n;
         if (list->fill(name, p))
         {
+            if (fCut == NULL)
+                fCut = new TCutG(fCutName, 1);
             fCut->SetPoint(n, p->GetAt(0), p->GetAt(1));
+        }
+        else
+        {
+            break;
         }
     }
     return fCut;
