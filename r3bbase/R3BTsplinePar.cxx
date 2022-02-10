@@ -28,9 +28,10 @@
 // -----   Default constructor   -----------------------------------------------
 R3BTsplinePar::R3BTsplinePar(const TString& name)
     : fSplineName(name)
+    , fSpline(NULL)
     , fMaxPoints(100)
 {
-    fSpline = new TSpline3();
+    // fSpline = new TSpline3();
 }
 
 // ----  Method putParams ------------------------------------------------------
@@ -62,7 +63,13 @@ TSpline3* R3BTsplinePar::getParams(FairParamList* list)
         TString name = fSplineName + "Point" + n;
         if (list->fill(name, p))
         {
+            if (fSpline == NULL)
+                fSpline = new TSpline3();
             fSpline->SetPoint(n, p->GetAt(0), p->GetAt(1));
+        }
+        else
+        {
+            break;
         }
     }
     return fSpline;

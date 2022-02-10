@@ -30,6 +30,7 @@
 #include "R3BAnalysisIncomingID.h"
 #include "R3BEventHeader.h"
 #include "R3BIncomingIDPar.h"
+#include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
 #include "R3BLosMappedData.h"
@@ -38,7 +39,6 @@
 #include "R3BSamplerMappedData.h"
 #include "R3BSci2HitData.h"
 #include "R3BSci2TcalData.h"
-#include "R3BTCalEngine.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -47,10 +47,6 @@
 #include <algorithm>
 #include <array>
 #include <vector>
-#define IS_NAN(x) TMath::IsNaN(x)
-using namespace std;
-
-#define SPEED_OF_LIGHT_MNS 0.299792458
 
 R3BAnalysisIncomingID::R3BAnalysisIncomingID()
     : R3BAnalysisIncomingID("AnalysisIncomingID", 1)
@@ -87,6 +83,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
 
 R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 {
+    R3BLOG(DEBUG1, "");
     if (fFrsDataCA)
         delete fFrsDataCA;
 }
@@ -97,10 +94,7 @@ void R3BAnalysisIncomingID::SetParContainers()
     // Parameter Container
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
+    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
 
@@ -126,7 +120,7 @@ void R3BAnalysisIncomingID::SetParContainers()
 
     //--- Parameter Container ---
     fNumMusicParams = fCal_Par->GetNumParZFit(); // Number of Parameters
-    LOG(INFO) << "R3BAnalysisIncomingIDPar:: R3BMusicCal2Hit: Nb parameters for charge-Z: " << (Int_t)fNumMusicParams;
+    LOG(INFO) << "R3BAnalysisIncomingIDPar::R3BMusicCal2Hit: Nb parameters for charge-Z: " << (Int_t)fNumMusicParams;
     CalZParams = new TArrayF();
     CalZParams->Set(fNumMusicParams);
     CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
@@ -181,26 +175,26 @@ void R3BAnalysisIncomingID::SetParameter()
 
 InitStatus R3BAnalysisIncomingID::Init()
 {
-    LOG(INFO) << "R3BAnalysisIncomingID::Init()";
+    R3BLOG(INFO, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
-    LOG_IF(FATAL, NULL == mgr) << "FairRootManager not found";
+    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
     // fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
-    LOG_IF(WARNING, !fHitSci2) << "R3BAnalysisIncomingID::Init()  Could not find Sci2Hit";
+    R3BLOG_IF(WARNING, !fHitSci2, "Could not find Sci2Hit");
 
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
-    LOG_IF(WARNING, !fHitItemsMus) << "R3BAnalysisIncomingID: MusicHitData not found";
+    R3BLOG_IF(WARNING, !fHitItemsMus, "MusicHitData not found");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    LOG_IF(WARNING, !fHitLos) << "R3BAnalysisIncomingID: LosHit not found";
+    R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
 
     // Output data
-    fFrsDataCA = new TClonesArray("R3BFrsData", 1);
+    fFrsDataCA = new TClonesArray("R3BFrsData");
     mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
 
     SetParameter();
@@ -330,43 +324,50 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                 AoQ_m1 = Brho_m1 / (3.10716 * Beta_m1 * Gamma_m1);
                 AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
 
-
-                if (fCutS2 && fCutS2->IsInside(PosSci2_m1[i],AoQ_m1_corr))
+                if (fCutS2 && fCutS2->IsInside(PosSci2_m1[i], AoQ_m1_corr))
                 {
-                  if (Zmusic > 0. && !fUseLOS)
-                  {
-                      double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                      double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                    if (Zmusic > 0. && !fUseLOS)
+                    {
+                        double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                        double zcor = sqrt(Emus * Beta_m1) * 0.277;
 
-                      AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
-                  }
+                        AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                    }
 
-                  if (Zlos[i] > 0. && fUseLOS)
-                  {
-                    if (fCutCave && fCutCave->IsInside(AoQ_m1_corr,Zlos[i]))
-                      {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
-                    else if (!fCutCave)
-                    {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
-                  }
+                    if (Zlos[i] > 0. && fUseLOS)
+                    {
+                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
+                        {
+                            AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                        else if (!fCutCave)
+                        {
+                            AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                    }
                 }
 
-                else if (!fCutS2 )
+                else if (!fCutS2)
                 {
-                  if (Zmusic > 0. && !fUseLOS)
-                  {
-                      double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                      double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                    if (Zmusic > 0. && !fUseLOS)
+                    {
+                        double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                        double zcor = sqrt(Emus * Beta_m1) * 0.277;
 
-                      AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
-                  }
+                        AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                    }
 
-                  if (Zlos[i] > 0. && fUseLOS)
-                  {
-                    if (fCutCave && fCutCave->IsInside(AoQ_m1_corr,Zlos[i]))
-                      {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
-                    else if (!fCutCave)
-                    {AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);}
-                  }
+                    if (Zlos[i] > 0. && fUseLOS)
+                    {
+                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
+                        {
+                            AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                        else if (!fCutCave)
+                        {
+                            AddData(1, 2, Zlos[i], AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                    }
                 }
             }
         }
@@ -377,13 +378,15 @@ void R3BAnalysisIncomingID::FinishEvent()
 {
     if (fHitSci2)
         fHitSci2->Clear();
+    if (fHitLos)
+        fHitLos->Clear();
     if (fHitItemsMus)
         fHitItemsMus->Clear();
 }
 
 void R3BAnalysisIncomingID::Reset()
 {
-    LOG(DEBUG) << "Clearing FrsData Structure";
+    R3BLOG(DEBUG1, "Clearing FrsData Structure");
     if (fFrsDataCA)
         fFrsDataCA->Clear();
 }

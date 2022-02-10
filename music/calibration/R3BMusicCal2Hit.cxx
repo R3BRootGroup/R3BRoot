@@ -243,9 +243,8 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         theta = c_svd_r[1];
 
         Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba) + fZ2 * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
-        //std::cout<<fx0_point<<" "<<fy0_point<<" "<<frot_ang<<std::endl;
-        zhit =
-            fy0_point + (theta*1000 - fx0_point) * sin(frot_ang) + (zhit - fy0_point) * cos(frot_ang);
+
+        zhit = fy0_point + (theta * 1000 - fx0_point) * sin(frot_ang) + (zhit - fy0_point) * cos(frot_ang);
         if (zhit > 0)
             // AddHitData(theta, zhit);
             AddHitData(theta, zhit, Esum / nba);
