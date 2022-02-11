@@ -129,7 +129,7 @@ class R3BFileSource : public FairSource
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
     /**Read one event from source to find out which RunId to use*/
-    Bool_t SpecifyRunId();
+    virtual Bool_t SpecifyRunId();
 
   private:
     // static pointer to this class

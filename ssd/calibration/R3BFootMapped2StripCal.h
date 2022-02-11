@@ -12,27 +12,24 @@
  ******************************************************************************/
 
 // --------------------------------------------------------------
-// -----                                                    -----
 // -----             R3BFootMapped2StripCal                 -----
-// -----     Created 08/09/21  by J.L. Rodriguez-Sanchez    -----
+// -----     Created 08/09/21 by J.L. Rodriguez-Sanchez     -----
 // --------------------------------------------------------------
 
 #ifndef R3BFootMapped2StripCal_H
-#define R3BFootMapped2StripCal_H
+#define R3BFootMapped2StripCal_H 1
 
 #include "FairTask.h"
 
 #include "R3BFootCalData.h"
 
 #include <Rtypes.h>
-#include <TRandom.h>
 
 class TClonesArray;
 class R3BFootCalPar;
 
 class R3BFootMapped2StripCal : public FairTask
 {
-
   public:
     /** Default constructor **/
     R3BFootMapped2StripCal();
@@ -83,7 +80,6 @@ class R3BFootMapped2StripCal : public FairTask
     TClonesArray* fFootCalData;    // Array with FOOT Cal output data
 
     // Private method AddCalData
-    // Adds a FootCalData to the CalCollection
     R3BFootCalData* AddCalData(Int_t detid, Int_t stripid, Double_t energy);
 
   public:

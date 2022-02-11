@@ -16,6 +16,7 @@
 
 #include "R3BFootMappedData.h"
 #include "R3BFootSiReader.h"
+#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
@@ -37,7 +38,7 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fNbDet(1)
+    , fNbDet(10)
     , fArray(new TClonesArray("R3BFootMappedData"))
 {
 }
@@ -51,12 +52,12 @@ R3BFootSiReader::~R3BFootSiReader()
 Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BFootSiReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_FOOT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FOOT, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BFootSiReader::Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -69,7 +70,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BFootSiReader::Read()
 {
-    LOG(DEBUG) << "R3BFootSiReader::Read() Event data.";
+    R3BLOG(DEBUG1, "Event data");
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
     {

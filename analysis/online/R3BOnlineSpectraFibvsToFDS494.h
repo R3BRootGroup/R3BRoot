@@ -30,6 +30,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <deque>
 
 #include "TClonesArray.h"
 #include "TMath.h"

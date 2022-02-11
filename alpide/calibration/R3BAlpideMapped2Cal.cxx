@@ -19,7 +19,6 @@
 // ROOT headers
 #include "TClonesArray.h"
 #include "TMath.h"
-#include "TRandom.h"
 
 // FAIR headers
 #include "FairLogger.h"
@@ -32,8 +31,6 @@
 #include "R3BAlpideMapped2Cal.h"
 #include "R3BAlpideMappedData.h"
 #include "R3BLogger.h"
-
-#include <iomanip>
 
 // R3BAlpideMapped2Cal: Default Constructor --------------------------
 R3BAlpideMapped2Cal::R3BAlpideMapped2Cal()
@@ -75,7 +72,6 @@ InitStatus R3BAlpideMapped2Cal::Init()
 {
     R3BLOG(INFO, "");
 
-    // INPUT DATA
     FairRootManager* rmg = FairRootManager::Instance();
     if (!rmg)
     {
@@ -83,6 +79,7 @@ InitStatus R3BAlpideMapped2Cal::Init()
         return kFATAL;
     }
 
+    // INPUT DATA
     fAlpideMappedData = (TClonesArray*)rmg->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
@@ -91,7 +88,6 @@ InitStatus R3BAlpideMapped2Cal::Init()
     }
 
     // OUTPUT DATA
-    // Calibrated data
     fAlpideCalData = new TClonesArray("R3BAlpideCalData");
     rmg->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
 

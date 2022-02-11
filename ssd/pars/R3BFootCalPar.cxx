@@ -20,20 +20,20 @@
 #include "FairParamList.h"
 
 #include "R3BFootCalPar.h"
+#include "R3BLogger.h"
 
 #include "TArrayF.h"
 #include "TMath.h"
 #include "TString.h"
-#include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
+    , fNumDets(10)
+    , fNumStrips(640)
+    , fNumParsFit(2)
 {
     detName = "FootCal";
-    fNumDets = 10;
-    fNumStrips = 640;
-    fNumParsFit = 2;
     fStripCalParams = new TArrayF(fNumDets * fNumStrips * fNumParsFit);
 }
 
@@ -54,9 +54,10 @@ void R3BFootCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BFootCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFootCalPar::putParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(ERROR, "Could not initialize FairParamList");
         return;
     }
 
@@ -74,9 +75,10 @@ void R3BFootCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BFootCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFootCalPar::getParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(ERROR, "Could not initialize FairParamList");
         return kFALSE;
     }
 
@@ -114,15 +116,15 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
 // ----  Method print ----------------------------------------------------------
 void R3BFootCalPar::print()
 {
-    LOG(INFO) << "R3BFootCalPar:Foot strip Parameters: ";
+    R3BLOG(INFO, "Foot strip Parameters");
     Int_t array_size = fNumDets * fNumStrips;
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
-        LOG(INFO) << "Foot detector number: " << d;
+        LOG(INFO) << "Foot detector number: " << d + 1;
         for (Int_t i = 0; i < fNumStrips; i++)
         {
-            LOG(INFO) << "Foot strip number: " << i;
+            LOG(INFO) << "Foot strip number: " << i + 1;
             for (Int_t j = 0; j < fNumParsFit; j++)
             {
                 LOG(INFO) << "FitParam(" << j

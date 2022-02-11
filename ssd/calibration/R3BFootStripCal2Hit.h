@@ -11,14 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// -------------------------------------------------------------------
-// -----                                                         -----
-// -----                 R3BFootStripCal2Hit                     -----
-// -----       Created 05/11/21  by J.L. Rodriguez-Sanchez       -----
-// -------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -----            R3BFootStripCal2Hit source file                   -----
+// -----       Created 05/11/21 by J.L. Rodriguez-Sanchez             -----
+// ------------------------------------------------------------------------
 
 #ifndef R3BFootStripCal2Hit_H
-#define R3BFootStripCal2Hit_H
+#define R3BFootStripCal2Hit_H 1
 
 #include "FairTask.h"
 
@@ -44,23 +43,20 @@ class R3BFootStripCal2Hit : public FairTask
     virtual ~R3BFootStripCal2Hit();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t* option) override;
 
     /** Virtual method Reset **/
     virtual void Reset();
 
     // Fair specific
     /** Virtual method Init **/
-    virtual InitStatus Init();
+    virtual InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
+    virtual InitStatus ReInit() override;
 
     /** Virtual method SetParContainers **/
-    virtual void SetParContainers();
+    virtual void SetParContainers() override;
 
     /** Accessor for selecting online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -73,7 +69,7 @@ class R3BFootStripCal2Hit : public FairTask
 
   private:
     void SetParameter();
-    virtual void DefineClusters(Int_t* nfound, Double_t fPitch, Double_t* fChannels, TH1F* hsst, Double_t cluster[][2]);
+    void DefineClusters(Int_t* nfound, Double_t fPitch, Double_t* fChannels, TH1F* hsst, Double_t cluster[][2]);
 
     Double_t fPitch;
     Double_t fMiddle;
@@ -93,7 +89,7 @@ class R3BFootStripCal2Hit : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BFootStripCal2Hit, 1)
+    ClassDefOverride(R3BFootStripCal2Hit, 1)
 };
 
 #endif /* R3BFootStripCal2Hit_H */

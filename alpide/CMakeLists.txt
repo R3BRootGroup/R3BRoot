@@ -24,10 +24,12 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
 ${R3BROOT_SOURCE_DIR}/alpide
 ${R3BROOT_SOURCE_DIR}/alpide/sim
+${R3BROOT_SOURCE_DIR}/alpide/pars
 ${R3BROOT_SOURCE_DIR}/alpide/calibration
 )
 
@@ -43,7 +45,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 file(GLOB SRCS 
 ./sim/*.cxx 
-#./pars/*.cxx 
+./pars/*.cxx 
 ./calibration/*.cxx
 )
 
@@ -54,7 +56,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF AlpideLinkDef.h)
 set(LIBRARY_NAME R3BAlpide)
 set(DEPENDENCIES
-    R3BBase R3BData)
+    R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
 
