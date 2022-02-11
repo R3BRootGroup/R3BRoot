@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,18 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BAlpideContFact_H
+#define R3BAlpideContFact_H 1
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "FairContFact.h"
 
-#pragma link C++ class R3BAlpide+;
+class FairContainer;
 
-#pragma link C++ class R3BAlpideContFact+;
-#pragma link C++ class R3BAlpideMappingPar+;
+class R3BAlpideContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
 
-#pragma link C++ class R3BAlpideMapped2Cal+;
+  public:
+    R3BAlpideContFact();
+    virtual ~R3BAlpideContFact() {}
 
-#endif
+    FairParSet* createContainer(FairContainer*);
+    ClassDef(R3BAlpideContFact, 0)
+};
 
+#endif /* R3BAlpideContFact_H */

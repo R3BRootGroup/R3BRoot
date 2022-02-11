@@ -19,21 +19,19 @@
 // ROOT headers
 #include "TClonesArray.h"
 #include "TMath.h"
-#include "TRandom.h"
 
-// Fair headers
+// FAIR headers
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include <iomanip>
-
-// AMS headers
+// FOOT headers
 #include "R3BFootCalData.h"
 #include "R3BFootCalPar.h"
 #include "R3BFootMapped2StripCal.h"
 #include "R3BFootMappedData.h"
+#include "R3BLogger.h"
 
 // R3BFootMapped2StripCal: Default Constructor --------------------------
 R3BFootMapped2StripCal::R3BFootMapped2StripCal()
@@ -45,7 +43,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal()
 R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , NumDets(1)
-    , NumStrips(634)
+    , NumStrips(640)
     , NumParams(2)
     , MaxSigma(5)
     , fTimesSigma(3.)
@@ -60,9 +58,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
 // Virtual R3BFootMapped2StripCal: Destructor
 R3BFootMapped2StripCal::~R3BFootMapped2StripCal()
 {
-    LOG(DEBUG) << "R3BFootMapped2StripCal::Delete instance";
-    if (fFootMappedData)
-        delete fFootMappedData;
+    R3BLOG(DEBUG1, "");
     if (fFootCalData)
         delete fFootCalData;
 }
@@ -72,19 +68,16 @@ void R3BFootMapped2StripCal::SetParContainers()
     // Parameter Container
     // Reading footCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
+    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BFootCalPar*)rtdb->getContainer("footCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BFootMapped2StripCalPar::SetParContainers() footCalPar container not found";
+        R3BLOG(ERROR, "footCalPar container not found");
     }
     else
     {
-        LOG(INFO) << "R3BFootMapped2StripCalPar::SetParContainers() footCalPar container open";
+        R3BLOG(INFO, "footCalPar found");
     }
 }
 
@@ -95,9 +88,9 @@ void R3BFootMapped2StripCal::SetParameter()
     NumStrips = fCal_Par->GetNumStrips();  // Number of Strips
     NumParams = fCal_Par->GetNumParsFit(); // Number of Parameters
 
-    LOG(INFO) << "R3BFootMapped2StripCal: Nb detectors: " << NumDets;
-    LOG(INFO) << "R3BFootMapped2StripCal: Nb strips: " << NumStrips;
-    LOG(INFO) << "R3BFootMapped2StripCal: Nb parameters from pedestal fit: " << NumParams;
+    LOG(INFO) << "R3BFootMapped2StripCal::Nb detectors: " << NumDets;
+    LOG(INFO) << "R3BFootMapped2StripCal::Nb strips: " << NumStrips;
+    LOG(INFO) << "R3BFootMapped2StripCal::Nb parameters from pedestal fit: " << NumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = NumDets * NumStrips * NumParams;
@@ -113,34 +106,34 @@ void R3BFootMapped2StripCal::SetParameter()
             if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
                 numdeadstrips++;
         }
-        LOG(INFO) << "R3BFootMapped2StripCal: Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
+        LOG(INFO) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
     }
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BFootMapped2StripCal::Init()
 {
-    LOG(INFO) << "R3BFootMapped2StripCal::Init()";
+    R3BLOG(INFO, "");
 
-    // INPUT DATA
-    FairRootManager* rootManager = FairRootManager::Instance();
-    if (!rootManager)
+    FairRootManager* rmg = FairRootManager::Instance();
+    if (!rmg)
     {
-        LOG(FATAL) << "R3BFootMapped2StripCal::FairRootManager not found";
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
-    fFootMappedData = (TClonesArray*)rootManager->GetObject("FootMappedData");
+    // INPUT DATA
+    fFootMappedData = (TClonesArray*)rmg->GetObject("FootMappedData");
     if (!fFootMappedData)
     {
-        LOG(FATAL) << "R3BFootMapped2StripCal::FootMappedData not found";
+        R3BLOG(FATAL, "FootMappedData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
-    // Calibrated data
-    fFootCalData = new TClonesArray("R3BFootCalData", 10);
-    rootManager->Register("FootCalData", "FOOT strip Cal", fFootCalData, !fOnline);
+    fFootCalData = new TClonesArray("R3BFootCalData");
+    rmg->Register("FootCalData", "FOOT strip Cal", fFootCalData, !fOnline);
+    fFootCalData->Clear();
 
     SetParameter();
     return kSUCCESS;
@@ -175,8 +168,8 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BFootMappedData*)(fFootMappedData->At(i));
-        detId = mappedData[i]->GetDetId();
-        stripId = mappedData[i]->GetStripId();
+        detId = mappedData[i]->GetDetId() - 1;
+        stripId = mappedData[i]->GetStripId() - 1;
 
         if (CalParams)
         {
@@ -190,7 +183,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
         // and the strip is not dead
         if (energy > 0. && pedestal != -1)
         {
-            AddCalData(detId, stripId, energy);
+            AddCalData(detId + 1, stripId + 1, energy);
         }
     }
     if (mappedData)
@@ -201,7 +194,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BFootMapped2StripCal::Reset()
 {
-    LOG(DEBUG) << "Clearing StripCalData Structure";
+    R3BLOG(DEBUG1, "Clearing StripCalData Structure");
     if (fFootCalData)
         fFootCalData->Clear();
 }

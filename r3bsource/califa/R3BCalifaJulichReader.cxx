@@ -14,10 +14,13 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BAmsMappedData.h"
 #include "R3BCalifaJulichReader.h"
 #include "R3BCalifaMappedData.h"
-#include "R3BAmsMappedData.h"
+#include "R3BLogger.h"
+
 #include "TClonesArray.h"
+#include "ext_data_struct_info.hh"
 
 /**
  ** ext_h101_califa.h was created by running
@@ -52,27 +55,27 @@ R3BCalifaJulichReader::~R3BCalifaJulichReader()
 Bool_t R3BCalifaJulichReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BCalifaJulichReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BCalifaJulichReader::Failed to setup structure information.";
-        //LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArrayCalifa, !fOnline);
-    FairRootManager::Instance()->Register("AmsMappedData", "Ams", fArrayAms, !fOnline);
+    fArrayCalifa->Clear();
+    FairRootManager::Instance()->Register("AmsMappedData", "Si detector", fArrayAms, !fOnline);
+    fArrayAms->Clear();
 
     return kTRUE;
 }
 
 Bool_t R3BCalifaJulichReader::Read()
 {
-    LOG(DEBUG) << "R3BCalifaJulichReader::Read() Event data."; 
-
+    R3BLOG(DEBUG1, "Event data");
     // SELECT THE FOR LOOP BASED ON THE MAPPING...
     for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal)
     {
@@ -92,17 +95,16 @@ Bool_t R3BCalifaJulichReader::Read()
         int16_t dc = fData->CALIFA_DISCARDv[crystal];
 
         int16_t tot = fData->CALIFA_TOTv[crystal];
-	  
-	if(channelNumber<1 || channelNumber>80) 
-	  std::cout << "ERROR TO CHECK!! Channel number="<<channelNumber << " detected in data."<< std::endl;
-	
+
+        if (channelNumber < 1 || channelNumber > 80)
+            LOG(FATAL) << "\033[5m\033[31m ERROR TO CHECK!! Channel number=" << channelNumber
+                       << " detected in data \033[0m";
+
         if (channelNumber < 17)
-	  new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])
-            R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
+            new ((*fArrayCalifa)[fArrayCalifa->GetEntriesFast()])
+                R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
         else if (channelNumber < 81)
-	  new ((*fArrayAms)[fArrayAms->GetEntriesFast()])
-            R3BAmsMappedData(1,channelNumber-16, energy);
-	
+            new ((*fArrayAms)[fArrayAms->GetEntriesFast()]) R3BAmsMappedData(1, channelNumber - 16, energy);
     }
     fNEvent += 1;
     return kTRUE;

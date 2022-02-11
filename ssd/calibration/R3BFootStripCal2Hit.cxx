@@ -11,10 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// -------------------------------------------------------------------------
-// -----           R3BFootStripCal2Hit source file                     -----
-// -----       Created 05/11/21  by J.L. Rodriguez-Sanchez             -----
-// -------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+// -----            R3BFootStripCal2Hit source file                   -----
+// -----       Created 05/11/21 by J.L. Rodriguez-Sanchez             -----
+// ------------------------------------------------------------------------
 
 // ROOT headers
 #include "TClonesArray.h"
@@ -24,32 +24,33 @@
 #include "TSpectrum.h"
 #include <iomanip>
 
-// Fair headers
+// FAIR headers
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// AMS headers
+// FOOT headers
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
 #include "R3BFootMappingPar.h"
 #include "R3BFootStripCal2Hit.h"
+#include "R3BLogger.h"
 
-// R3BFootStripCal2Hit: Default Constructor --------------------------
+// R3BFootStripCal2Hit::Default Constructor -------------------------------------
 R3BFootStripCal2Hit::R3BFootStripCal2Hit()
     : R3BFootStripCal2Hit("R3BFootStripCal2Hit", 1)
 {
 }
 
-// R3BFootStripCal2HitPar: Standard Constructor --------------------------
+// R3BFootStripCal2HitPar::Standard Constructor ---------------------------------
 R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPitch(157.7)
     , fMiddle(50.)
     , fThSum(20.)
     , fMaxNumDet(10)
-    , fMaxNumClusters(3) // Max number of clusters per ams detector set to 3
+    , fMaxNumClusters(3) // Max number of clusters per foot detector set to 3
     , fFootCalData(NULL)
     , fFootHitData(NULL)
     , fMap_Par(NULL)
@@ -57,12 +58,10 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
 {
 }
 
-// Virtual R3BFootStripCal2Hit: Destructor
+// Virtual R3BFootStripCal2Hit::Destructor --------------------------------------
 R3BFootStripCal2Hit::~R3BFootStripCal2Hit()
 {
-    LOG(DEBUG) << "R3BFootStripCal2Hit::Delete instance";
-    if (fFootCalData)
-        delete fFootCalData;
+    R3BLOG(DEBUG1, "");
     if (fFootHitData)
         delete fFootHitData;
 }
@@ -70,21 +69,18 @@ R3BFootStripCal2Hit::~R3BFootStripCal2Hit()
 void R3BFootStripCal2Hit::SetParContainers()
 {
     // Parameter Container
-    // Reading amsMappingPar from FairRuntimeDb
+    // Reading footMappingPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "R3BFootStripCal2Hit::FairRuntimeDb not found";
-    }
+    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BFootMappingPar*)rtdb->getContainer("footMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BFootStripCal2Hit::Init() Couldn't get handle on footMappingPar container";
+        R3BLOG(ERROR, "Couldn't get handle on footMappingPar container");
     }
     else
     {
-        LOG(INFO) << "R3BFootStripCal2Hit::footMappingPar found";
+        R3BLOG(INFO, "footMappingPar found");
     }
 }
 
@@ -92,7 +88,8 @@ void R3BFootStripCal2Hit::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(WARNING) << "R3BFootStripCal2Hit::Container footMappingPar not found";
+        R3BLOG(WARNING, "Container footMappingPar not found");
+        return;
     }
     //--- Parameter Container ---
     fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
@@ -100,23 +97,23 @@ void R3BFootStripCal2Hit::SetParameter()
     fMap_Par->printParams();
 }
 
-// -----   Public method Init   --------------------------------------------
+// -----   Public method Init   -------------------------------------------------
 InitStatus R3BFootStripCal2Hit::Init()
 {
-    LOG(INFO) << "R3BFootStripCal2Hit::Init()";
+    R3BLOG(INFO, "");
 
-    // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(FATAL) << "R3BFootStripCal2Hit::FairRootManager not found";
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
+    // INPUT DATA
     fFootCalData = (TClonesArray*)rootManager->GetObject("FootCalData");
     if (!fFootCalData)
     {
-        LOG(FATAL) << "R3BFootStripCal2Hit::FootCalData not found";
+        R3BLOG(FATAL, "FootCalData not found");
         return kFATAL;
     }
 
@@ -124,8 +121,9 @@ InitStatus R3BFootStripCal2Hit::Init()
     SetParameter();
 
     // Output data
-    fFootHitData = new TClonesArray("R3BFootHitData", fMaxNumDet * fMaxNumClusters);
+    fFootHitData = new TClonesArray("R3BFootHitData");
     rootManager->Register("FootHitData", "FOOT Hit", fFootHitData, !fOnline);
+    fFootHitData->Clear();
 
     char Name[255];
     for (Int_t i = 0; i < fMaxNumDet; i++)
@@ -137,7 +135,7 @@ InitStatus R3BFootStripCal2Hit::Init()
     return kSUCCESS;
 }
 
-// -----   Public method ReInit   ----------------------------------------------
+// -----   Public method ReInit   -----------------------------------------------
 InitStatus R3BFootStripCal2Hit::ReInit()
 {
     SetParContainers();
@@ -177,7 +175,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     TSpectrum* ss = new TSpectrum(10000);
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
-        // Looking for hits in side S
+        // Looking for hits
         nfound = ss->Search(hssd[i], 1., "goff", 0.0001);
         fChannelPeaks = (Double_t*)ss->GetPositionX();
         Double_t clusterS[nfound][2];
@@ -215,9 +213,6 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     delete ss;
     return;
 }
-
-// -----   Protected method Finish   --------------------------------------------
-void R3BFootStripCal2Hit::Finish() {}
 
 // -----   Protected method to define clusters   --------------------------------
 void R3BFootStripCal2Hit::DefineClusters(Int_t* nfoundhits,
@@ -285,12 +280,12 @@ void R3BFootStripCal2Hit::DefineClusters(Int_t* nfoundhits,
 // -----   Public method Reset   ------------------------------------------------
 void R3BFootStripCal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing HitData Structure";
+    R3BLOG(DEBUG, "Clearing HitData Structure");
     if (fFootHitData)
         fFootHitData->Clear();
 }
 
-// -----   Private method AddHitData  --------------------------------------------
+// -----   Private method AddHitData  -------------------------------------------
 R3BFootHitData* R3BFootStripCal2Hit::AddHitData(Int_t detid,
                                                 Int_t numhit,
                                                 Double_t s,
@@ -298,7 +293,7 @@ R3BFootHitData* R3BFootStripCal2Hit::AddHitData(Int_t detid,
                                                 Double_t energy_s,
                                                 Int_t mulS)
 {
-    // It fills the R3BAmsHitData
+    // It fills the R3BFootHitData
     TClonesArray& clref = *fFootHitData;
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BFootHitData(detid, numhit, s, master, energy_s, mulS);
