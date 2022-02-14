@@ -26,6 +26,7 @@
 #pragma link C++ class R3BMusicContFact+;
 #pragma link C++ class R3BMusicMapped2Cal+;
 #pragma link C++ class R3BMusicMapped2CalPar+;
+#pragma link C++ class R3BMusicMapped2CalPar_S515+;
 #pragma link C++ class R3BMusicCal2Hit+;
 #pragma link C++ class R3BMusicOnlineSpectra+;
 

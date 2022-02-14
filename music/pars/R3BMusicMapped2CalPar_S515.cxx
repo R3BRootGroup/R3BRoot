@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // ---------------------------------------------------------------------
-// -----           R3BMusicMapped2CalPar source file               -----
-// -----      Created 29/01/20 by J.L. Rodriguez-Sanchez           -----
+// -----         R3BMusicMapped2CalPar_S515 source file                 -----
+// -----      Created 23/03/22  by M. Feijoo Fontán          -----
 // ---------------------------------------------------------------------
 
 // ROOT headers
@@ -30,21 +30,43 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// R3B headers
+// Music headers
 #include "R3BMusicCalPar.h"
-#include "R3BMusicMapped2CalPar.h"
+#include "R3BMusicMapped2CalPar_S515.h"
 #include "R3BMusicMappedData.h"
 #include "R3BMwpcHitData.h"
-#include "R3BTimeStitch.h"
+#include "R3BLosHitData.h"
 
-// R3BMusicMapped2CalPar: Default Constructor --------------------------
-R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
-    : R3BMusicMapped2CalPar("R3BMusicMapped2CalPar", 1)
+#include <iomanip>
+
+// R3BMusicMapped2CalPar_S515: Default Constructor --------------------------
+R3BMusicMapped2CalPar_S515::R3BMusicMapped2CalPar_S515()
+    : FairTask("R3B Music Angle Calibrator", 1)
+    , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
+    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
+    , fMaxMult(MAX_MULT_MUSIC_CAL)
+    , fMinStadistics(1000)
+    , fLimit_left(10000)
+    , fLimit_right(24000)
+    , fNumParams(3)
+    , fNumPosParams(2)
+    , fMaxSigma(200)
+    , CalParams(NULL)
+    , PosParams(NULL)
+    , fCal_Par(NULL)
+    , fNameDetA("Mwpc0")
+    , fPosMwpcA(0.)
+    , fNameDetB("Los")
+    , fPosLos(0.)
+    , fPosMusic(0.)
+    , fMusicMappedDataCA(NULL)
+    , fHitItemsMwpcA(NULL)
+    , fHitItemsLos(NULL)
 {
 }
 
-// R3BMusicMapped2CalParPar: Standard Constructor --------------------------
-R3BMusicMapped2CalPar::R3BMusicMapped2CalPar(const TString& name,
+// R3BMusicMapped2CalPar_S515: Standard Constructor --------------------------
+R3BMusicMapped2CalPar_S515::R3BMusicMapped2CalPar_S515(const TString& name,
                                              Int_t iVerbose,
                                              const TString& namedeta,
                                              const TString& namedetb)
@@ -62,23 +84,32 @@ R3BMusicMapped2CalPar::R3BMusicMapped2CalPar(const TString& name,
     , PosParams(NULL)
     , fCal_Par(NULL)
     , fNameDetA(namedeta)
-    , fPosDetA(0.)
+    , fPosMwpcA(0.)
     , fNameDetB(namedetb)
-    , fPosDetB(0.)
+    , fPosLos(0.)
     , fPosMusic(0.)
     , fMusicMappedDataCA(NULL)
-    , fHitItemsDetA(NULL)
-    , fHitItemsDetB(NULL)
+    , fHitItemsMwpcA(NULL)
+    , fHitItemsLos(NULL)
 {
 }
 
-// Virtual R3BMusicMapped2CalPar: Destructor
-R3BMusicMapped2CalPar::~R3BMusicMapped2CalPar() { LOG(INFO) << "R3BMusicMapped2CalPar: Delete instance"; }
+// Virtual R3BMusicMapped2CalPar_S515: Destructor
+R3BMusicMapped2CalPar_S515::~R3BMusicMapped2CalPar_S515()
+{
+    LOG(INFO) << "R3BMusicMapped2CalPar_S515: Delete instance";
+    if (fMusicMappedDataCA)
+        delete fMusicMappedDataCA;
+    if (fHitItemsMwpcA)
+        delete fHitItemsMwpcA;
+    if (fHitItemsLos)
+        delete fHitItemsLos;
+}
 
 // -----   Public method Init   --------------------------------------------
-InitStatus R3BMusicMapped2CalPar::Init()
+InitStatus R3BMusicMapped2CalPar_S515::Init()
 {
-    LOG(INFO) << "R3BMusicMapped2CalPar: Init";
+    LOG(INFO) << "R3BMusicMapped2CalPar_S515: Init";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -90,36 +121,22 @@ InitStatus R3BMusicMapped2CalPar::Init()
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar: MusicMappedData not found";
+        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: MusicMappedData not found";
         return kFATAL;
     }
 
-    // get access to hit data of detA and detB
-
-    if (fNameDetA == "Los")
+    // get access to hit data of mwpcs
+    fHitItemsMwpcA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
+    if (!fHitItemsMwpcA)
     {
-      fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "Hit");
-      if (!fHitItemsDetA)
-      {
-          LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
-          return kFATAL;
-      }
-    }
-    else
-    {
-      fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
-      if (!fHitItemsDetA)
-      {
-          LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
-          return kFATAL;
-      }
+        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: " + fNameDetA + "HitData not found";
+        return kFATAL;
     }
 
-
-    fHitItemsDetB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
-    if (!fHitItemsDetB)
+    fHitItemsLos = (TClonesArray*)rootManager->GetObject(fNameDetB + "Hit");
+    if (!fHitItemsLos)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetB + "HitData not found";
+        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: " + fNameDetB + "Hit not found";
         return kFATAL;
     }
 
@@ -132,12 +149,9 @@ InitStatus R3BMusicMapped2CalPar::Init()
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar:: Couldn't get handle on musicCalPar container";
+        LOG(ERROR) << "R3BMusicMapped2CalPar_S515:: Couldn't get handle on musicCalPar container";
         return kFATAL;
     }
-
-    // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BTimeStitch();
 
     // Define TGraph for fits
     char Name1[255];
@@ -159,32 +173,32 @@ InitStatus R3BMusicMapped2CalPar::Init()
 }
 
 // -----   Public method ReInit   ----------------------------------------------
-InitStatus R3BMusicMapped2CalPar::ReInit() { return kSUCCESS; }
+InitStatus R3BMusicMapped2CalPar_S515::ReInit() { return kSUCCESS; }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMusicMapped2CalPar::Exec(Option_t* option)
+void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
-    Int_t nHitsA = fHitItemsDetA->GetEntries();
-    Int_t nHitsB = fHitItemsDetB->GetEntries();
+    Int_t nHits = fMusicMappedDataCA->GetEntries();
+    Int_t nHitsA = fHitItemsMwpcA->GetEntries();
+    Int_t nHitsB = fHitItemsLos->GetEntries();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 
-    TVector3 PosDetA(0., 0., fPosDetA);
-    TVector3 PosDetB(0., 0., fPosDetB);
+    TVector3 PosMwpcA(0., 0., fPosMwpcA);
+    TVector3 PosLos(0., 0., fPosLos);
     R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
     for (Int_t i = 0; i < nHitsA; i++)
     {
-        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsDetA->At(i));
-        PosDetA.SetX(hitMwAData[i]->GetX());
+        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
+        PosMwpcA.SetX(hitMwAData[i]->GetX());
         // LOG(INFO) <<hitMwAData[i]->GetX();
     }
-    R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
+    R3BLosHitData** hitLosData = new R3BLosHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
-        hitMwBData[i] = (R3BMwpcHitData*)(fHitItemsDetB->At(i));
-        PosDetB.SetX(hitMwBData[i]->GetX());
+        hitLosData[i] = (R3BLosHitData*)(fHitItemsLos->At(i));
+        PosLos.SetX(hitLosData[i]->GetX_cm());
         // LOG(INFO) <<hitMwBData[i]->GetX();
     }
 
@@ -222,9 +236,9 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
     // Fill data only if there are trigger and TREF signals
     if (mulanode[fNumAnodes] == 1 && mulanode[fNumAnodes + 1] == 1)
     {
-        TF1* fa = new TF1("fa", "pol1", fPosDetA, fPosDetB);
-        fa->SetParameter(0, PosDetA.X());
-        fa->SetParameter(1, (PosDetB - PosDetA).X() / (fPosDetB - fPosDetA));
+        TF1* fa = new TF1("fa", "pol1", fPosMwpcA, fPosLos);
+        fa->SetParameter(0, PosMwpcA.X());
+        fa->SetParameter(1, (PosLos - PosMwpcA).X() / (fPosLos - fPosMwpcA));
         for (Int_t i = 0; i < fNumAnodes; i++)
         {
             for (Int_t j = 0; j < mulanode[fNumAnodes]; j++)
@@ -233,22 +247,28 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
                     if (energy[k][i] > 0.)
                     { // Anode is 50mm, first anode is at 175mm with respect to the center of music detector
                         fg_anode[i]->SetPoint(fg_anode[i]->GetN() + 1,
-                                              fTimeStitch->GetTime(dtime[k][i] - dtime[j][fNumAnodes], "vftx", "vftx"),
+                                              dtime[k][i] - dtime[j][fNumAnodes],
                                               fa->Eval(fPosMusic - 175.0 + i * 50.0));
                     }
                 }
         }
     }
     if (mappedData)
-        delete[] mappedData;
+        delete mappedData;
     if (hitMwAData)
-        delete[] hitMwAData;
-    if (hitMwBData)
-        delete[] hitMwBData;
+        delete hitMwAData;
+    if (hitLosData)
+        delete hitLosData;
     return;
 }
 
-void R3BMusicMapped2CalPar::FinishTask()
+// -----   Protected method Finish   --------------------------------------------
+void R3BMusicMapped2CalPar_S515::FinishEvent() {}
+
+// -----   Public method Reset   ------------------------------------------------
+void R3BMusicMapped2CalPar_S515::Reset() {}
+
+void R3BMusicMapped2CalPar_S515::FinishTask()
 {
     fCal_Par->SetNumAnodes(fNumAnodes);
     fCal_Par->SetNumParamsEFit(fNumParams);
@@ -278,4 +298,4 @@ void R3BMusicMapped2CalPar::FinishTask()
     fCal_Par->setChanged();
 }
 
-ClassImp(R3BMusicMapped2CalPar);
+ClassImp(R3BMusicMapped2CalPar_S515)

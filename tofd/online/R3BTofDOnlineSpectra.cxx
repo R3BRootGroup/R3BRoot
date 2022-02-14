@@ -45,6 +45,7 @@
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
 #include "R3BTofdMappedData.h"
+#include "R3BLosCalData.h"
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
@@ -559,6 +560,39 @@ InitStatus R3BTofDOnlineSpectra::Init()
         maintofd->Add(cToFd_los_h2);
     }
 
+
+    TCanvas* cToFd_los[N_PLANE_MAX];
+    TCanvas* cToFd_los_h2 = new TCanvas("ToFD time - Los time","ToFD time - Los time", 20,20,1120,1020);
+    cToFd_los_h2->Divide(2,2);
+    for (Int_t i=0;i<4;i++)
+    {
+      char strNameLos_c[255];
+      sprintf(strNameLos_c,"tofd-los_timediff_plane_%d",i+1);
+      fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c,strNameLos_c,45,0,45,5000,-50000,10000);
+      fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
+      fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF");
+      cToFd_los_h2->cd(i+1);
+      fh_tofd_time_los_h2[i]->Draw("colz");
+
+      cToFd_los[i] = new TCanvas(strNameLos_c, strNameLos_c, 20, 20, 1120, 1020);
+      cToFd_los[i]->Divide(5,9);
+      for (Int_t j = 0; j < 44; j++)
+      {
+        char strNameLos[255];
+        sprintf(strNameLos,"tofd-los_timediff_bar_%d_plane_%d",j+1,i+1);
+        char strNameLos2[255];
+        sprintf(strNameLos2,"Tofd_time - Los_time bar %d plane %d",j+1,i+1);
+        fh_tofd_time_los[i][j] = new TH1F(strNameLos, strNameLos2,50,0,1000);
+        fh_tofd_time_los[i][j]->GetXaxis()->SetTitle("Time");
+        fh_tofd_time_los[i][j]->GetYaxis()->SetTitle("counts");
+        cToFd_los[i]->cd(j+1);
+        fh_tofd_time_los[i][j]->Draw("");
+      }
+      // Adding this canvases to the main folder
+      maintofd->Add(cToFd_los[i]);
+    }
+    maintofd->Add(cToFd_los_h2);
+
     run->AddObject(maintofd);
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_TofD_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
@@ -579,6 +613,7 @@ void R3BTofDOnlineSpectra::Reset_Histo()
         fh_tofd_TotPm[i]->Reset();
         fh_tofd_multihit_coinc[i]->Reset();
         fh_tofd_TotPm_coinc[i]->Reset();
+        fh_tofd_time_los_h2[i]->Reset();
     }
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
@@ -686,6 +721,24 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             fh_num_side[i]->Fill(nsum_bot[i], nsum_top[i]);
         }
     }
+
+    // Reading LOS cal data
+
+    /*    Float_t losTime=0.0;
+        Float_t losTriggerTime=0.0;
+
+        if(fLosCalDataItems && fLosCalDataItems->GetEntriesFast()>0){R3BLosCalData* losHit =
+       (R3BLosCalData*)fLosCalDataItems->At(0); Int_t losChannel = losHit->GetDetector();
+       // std::cout<<"LOS Time : "<<losHit->GetTimeT_ns(losChannel)<<std::endl;
+        losTime = losHit->GetTimeV_ns(losChannel);}
+
+        if(fLosTriggerCalDataItems && fLosTriggerCalDataItems->GetEntriesFast()>0){R3BLosCalData* losTriggerHit =
+       (R3BLosCalData*)fLosTriggerCalDataItems->At(0); Int_t losChannelTrigger = losTriggerHit->GetDetector();
+        //std::cout<<"LOS Time (Trigger) :
+       "<<losTriggerHit->Ge(losHit->GetTime()-losCalTriggerHits->GetTimeL_ns(channelLos)tTimeL_ns(0)<<"
+       "<<losChannelTrigger<<std::endl; losTriggerTime = losTriggerHit->GetTimeL_ns(0);}
+    */
+
 
     if (fCalItems)
     {

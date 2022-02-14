@@ -129,10 +129,10 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
-
+    //std::cout<<"ProcessHits"<<std::endl;
     // Set additional parameters at exit of active volume. Create R3BTofdPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
-    {
+    { //std::cout<<"ProcessHits, track"<<std::endl;
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         static auto restr = "Plane_([0-9]+).*Paddle_([0-9]+)";
         static auto re = boost::regex(restr, boost::regex::extended);

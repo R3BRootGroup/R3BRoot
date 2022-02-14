@@ -120,7 +120,10 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
 
-    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+    TClonesArray* fLosCalDataItems; /**< Array with trigger Cal items - input data. */
+    TClonesArray* fLosTriggerCalDataItems;
+    TClonesArray* fCalTriggerItems;
+
 
     enum DetectorInstances
     {
@@ -169,6 +172,7 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
     TH2F* fh_tofd_time_hit[N_PLANE_MAX_TOFD_S494];
     TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD_S494];
     TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD_S494 - 1];
+    TH1F* fh_tofd_time_los[N_PLANE_MAX_TOFD_S494][N_PADDLE_MAX_TOFD_S494];
 
   public:
     ClassDef(R3BOnlineSpectraToFD_S494, 2)

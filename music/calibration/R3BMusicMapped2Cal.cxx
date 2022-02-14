@@ -21,18 +21,19 @@
 #include "TMath.h"
 #include "TRandom.h"
 
-// FAIR headers
+// Fair headers
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// R3B headers
+// Music headers
 #include "R3BMusicCalData.h"
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2Cal.h"
 #include "R3BMusicMappedData.h"
-#include "R3BTimeStitch.h"
+
+#include <iomanip>
 
 // R3BMusicMapped2Cal: Default Constructor --------------------------
 R3BMusicMapped2Cal::R3BMusicMapped2Cal()
@@ -143,9 +144,6 @@ InitStatus R3BMusicMapped2Cal::Init()
     fMusicCalDataCA = new TClonesArray("R3BMusicCalData", MAX_MULT_MUSIC_CAL * (fNumAnodes + fNumAnodesRef));
     rootManager->Register("MusicCalData", "MUSIC Cal", fMusicCalDataCA, !fOnline);
 
-    // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BTimeStitch();
-
     SetParameters();
     return kSUCCESS;
 }
@@ -165,10 +163,10 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
+    Int_t nHits = fMusicMappedDataCA->GetEntries();
     // if (nHits != fNumAnodes && nHits > 0)
     //  LOG(WARNING) << "R3BMusicMapped2Cal: nHits!=" << nHits << " NumAnodes:NumDets" << fNumAnodes << ":" << fNumDets;
-    if (nHits == 0)
+    if (!nHits)
         return;
 
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];
@@ -221,14 +219,12 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
                 for (Int_t k = 0; k < mulanode[i]; k++)
                 {
                     if (energy[k][i] > 0.)
-                        AddCalData(i,
-                                   a0 + a1 * fTimeStitch->GetTime(dtime[k][i] - dtime[j][fNumAnodes], "vftx", "vftx"),
-                                   energy[k][i]);
+                        AddCalData(i, a0 + a1 * (dtime[k][i] - dtime[j][fNumAnodes]), energy[k][i]);
                 }
         }
     }
     if (mappedData)
-        delete[] mappedData;
+        delete mappedData;
     return;
 }
 
