@@ -63,6 +63,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fNumDet(1)
     , fUseLOS(kTRUE)
     , fCutS2(NULL)
+    , fCutCave(NULL)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);

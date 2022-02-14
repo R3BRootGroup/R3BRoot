@@ -20,13 +20,16 @@
 #define R3BFiberDigitizer_H 1
 
 #include "FairTask.h"
+#include "TRotation.h"
 #include "R3BBunchedFiberHitData.h"
 #include <TRandom3.h>
+#include "TVector3.h"
 #include <string>
 
 class TClonesArray;
 class TH1F;
 class TH2F;
+class R3BTGeoPar;
 
 class R3BFiberDigitizer : public FairTask
 {
@@ -42,30 +45,46 @@ class R3BFiberDigitizer : public FairTask
 
     /** Virtual method Init **/
     virtual InitStatus Init();
+    /** Virtual method ReInit **/
+    virtual InitStatus ReInit();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
     virtual void Reset();
+    virtual void SetParContainers();
 
     void SetEnergyResolution(Double_t e);
     void SetTimeResolution(Double_t t);
     void SetYPositionResolution(Double_t y);
 
   private:
+    void SetParameter();
     TString fName;
-    TRandom3* prnd;
+    TRandom3* rand;
     Double_t esigma;
     Double_t tsigma;
     Double_t ysigma;
+    Double_t xsigma;
+    R3BTGeoPar* fFiGeoPar;
+    TRotation fRot;
+    TVector3 fTrans;
 
     TClonesArray* fFiPoints;
     TClonesArray* fFiHits;
+    TClonesArray* fMCTrack;
 
     Float_t fiber_thickness;
     Int_t fiber_nbr;
     Float_t air_layer;
     Float_t detector_width;
+
+    /** Private method AddHitData **/
+    // Adds a R3BFiberHitData
+    R3BBunchedFiberHitData* AddHitData(Int_t DetId, Double_t x, Double_t y,
+               Double_t Eloss, Double_t time, Int_t fiber, Double_t a_bottom_time_ns, Double_t a_top_time_ns,
+               Double_t a_bottom_tot_ns, Double_t a_top_tot_ns);
+
 
     ClassDef(R3BFiberDigitizer, 1);
 };

@@ -11,12 +11,12 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BMusic" which includes the source files given 
-# in the array. The extension is already found. Any number of sources could be 
+# Create a library called "libR3BMusic" which includes the source files given
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
-${SYSTEM_INCLUDE_DIRECTORIES} 
+Set(SYSTEM_INCLUDE_DIRECTORIES
+${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
 
@@ -32,6 +32,7 @@ ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -41,8 +42,18 @@ set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR} )
 
 link_directories( ${LINK_DIRECTORIES})
 
-#set(SRCS
+set(SRCS
 #Put here your sourcefiles
+#./sim/R3BMusic.cxx
+#./sim/R3BMusicDigitizer.cxx
+#./pars/R3BMusicCalPar.cxx
+#./pars/R3BMusicHitPar.cxx
+#./pars/R3BMusicContFact.cxx
+#./pars/R3BMusicMapped2CalPar.cxx
+#./pars/R3BMusicMapped2CalPar_S515.cxx
+#./calibration/R3BMusicMapped2Cal.cxx
+#./calibration/R3BMusicCal2Hit.cxx
+#./online/R3BMusicOnlineSpectra.cxx
 #./sim/R3BMusic.cxx
 #./sim/R3BMusicDigitizer.cxx
 #./pars/R3BMusicCalPar.cxx
@@ -52,12 +63,12 @@ link_directories( ${LINK_DIRECTORIES})
 #./calibration/R3BMusicMapped2Cal.cxx
 #./calibration/R3BMusicCal2Hit.cxx
 #./online/R3BMusicOnlineSpectra.cxx
-#)
+)
 
-file(GLOB SRCS 
-./sim/*.cxx 
-./pars/*.cxx 
-./calibration/*.cxx 
+file(GLOB SRCS
+./sim/*.cxx
+./pars/*.cxx
+./calibration/*.cxx
 ./online/*.cxx
 )
 

@@ -107,6 +107,7 @@ Double_t R3BFibPoint::GetY(Double_t z) const
     //  if ( TMath::Abs(dz) < 1.e-3 ) return (fY_out+fY)/2.;
     return (fY + (z - fZ) / dz * (fY_out - fY));
 }
+
 // -------------------------------------------------------------------------
 
 // -----   Public method IsUsable   ----------------------------------------

@@ -523,6 +523,10 @@ void R3BBunchedFiberCal2Hit::Standard()
         mapmt_trig_table.at(idx) = cal;
     }
 
+
+
+
+
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.
     size_t spmt_trig_num = fSPMTCalTriggerItems->GetEntriesFast();

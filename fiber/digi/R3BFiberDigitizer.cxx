@@ -21,12 +21,14 @@
 #include "FairRuntimeDb.h"
 #include "R3BLogger.h"
 #include "TClonesArray.h"
-
+#include "R3BTGeoPar.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
 #include "TRandom.h"
-
+#include "TVector3.h"
+#include <iostream>
+#include <string>
 #include "R3BFibPoint.h"
 #include "R3BMCTrack.h"
 
@@ -63,7 +65,7 @@ R3BFiberDigitizer::R3BFiberDigitizer(const TString& name, Double_t e, Double_t t
 R3BFiberDigitizer::~R3BFiberDigitizer()
 {
     if (fFiPoints)
-        delete fFiPoints;
+        delete[] fFiPoints;
 }
 
 void R3BFiberDigitizer::SetEnergyResolution(Double_t e) { esigma = e; }
@@ -71,6 +73,32 @@ void R3BFiberDigitizer::SetEnergyResolution(Double_t e) { esigma = e; }
 void R3BFiberDigitizer::SetTimeResolution(Double_t t) { tsigma = t; }
 
 void R3BFiberDigitizer::SetYPositionResolution(Double_t y) { ysigma = y; }
+
+void R3BFiberDigitizer::SetParContainers()
+{
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName+"GeoPar");
+    if (!fFiGeoPar)
+    {
+        LOG(ERROR) << "R3BFiberDigitizer::SetParContainers() : Could not get access to "+fName+"GeoPar container.";
+        return;
+    }
+    else
+        LOG(INFO) << "R3BFiberDigitizer::SetParContainers() : Container "+fName+"GeoPar found.";
+}
+
+void R3BFiberDigitizer::SetParameter()
+{
+    if (fFiGeoPar){
+      ysigma = fFiGeoPar->GetSigmaY();
+      xsigma = fFiGeoPar->GetSigmaX();
+      fRot.RotateX(-fFiGeoPar->GetRotX() * TMath::DegToRad());
+      fRot.RotateY(-fFiGeoPar->GetRotY() * TMath::DegToRad());
+      fRot.RotateZ(-fFiGeoPar->GetRotZ() * TMath::DegToRad());
+
+      fTrans.SetXYZ(fFiGeoPar->GetPosX(), fFiGeoPar->GetPosY(), fFiGeoPar->GetPosZ());
+    }
+}
 
 InitStatus R3BFiberDigitizer::Init()
 {
@@ -82,19 +110,22 @@ InitStatus R3BFiberDigitizer::Init()
     fFiPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
     R3BLOG_IF(FATAL, !fFiPoints, fName + "Point not found");
 
+    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+
     // Register output array DchDigi
     fFiHits = new TClonesArray("R3BBunchedFiberHitData");
     ioman->Register(fName + "Hit", "Digital response in" + fName, fFiHits, kTRUE);
 
     // for sigmas
-    prnd = new TRandom3();
+    rand = new TRandom3();
 
+    SetParameter();
     return kSUCCESS;
 }
 
 void R3BFiberDigitizer::Exec(Option_t* opt)
 {
-    Reset();
+    /*Reset();
 
     auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, Int_t NumOfFibers) {
         Int_t entryNum = Points->GetEntries();
@@ -214,9 +245,59 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
     {
         Digitize(fFiPoints, fFiHits, fiber_nbr);
     }
-}
-// -------------------------------------------------------------------------
+    */
 
+    Reset();
+    // Reading the Input -- Point Data --
+    Int_t nHits = fFiPoints->GetEntriesFast();
+    if (!nHits)
+        return;
+    // Data from Point level
+    R3BFibPoint** pointData;
+    pointData = new R3BFibPoint*[nHits];
+    Int_t fiber = 0;
+    Int_t TrackId = 0, PID = 0, mother = -1;
+    Double_t x = 0., y = 0., z = 0., time = 0.;
+    TVector3 vpos;
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        pointData[i] = (R3BFibPoint*)(fFiPoints->At(i));
+        TrackId = pointData[i]->GetTrackID();
+
+        R3BMCTrack* Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        PID = Track->GetPdgCode();
+        // mother = Track->GetMotherId();
+
+        if (PID > 1000401000) // Z=40 and A=100
+        {
+            x = (pointData[i]->GetXIn() + pointData[i]->GetXOut())/2.;
+            y = (pointData[i]->GetYIn() + pointData[i]->GetYOut())/2.;
+            z = (pointData[i]->GetZIn() + pointData[i]->GetZOut())/2.;
+            vpos.SetXYZ(x, y, z);
+
+            vpos = fRot * (vpos - fTrans);
+            //vpos = fRot * (vpos);
+            //time = pointData[i]->GetTime() + rand->Gaus(0., fsigma_t);
+
+            fiber = (int) std::round(vpos.X() / fiber_thickness);
+            // Add hit data
+            AddHitData(1, vpos.X()*10.+rand->Gaus(0., 0.1), vpos.Y()*10.+rand->Gaus(0., 0.1),
+                       1, 1, fiber, 1,1,1,1);
+        }
+    }
+    if (pointData)
+        delete[] pointData;
+    return;
+
+}
+
+// -----   Public method ReInit   ----------------------------------------------
+InitStatus R3BFiberDigitizer::ReInit()
+{
+    SetParContainers();
+    SetParameter();
+    return kSUCCESS;
+}
 void R3BFiberDigitizer::Reset()
 {
     if (fFiHits)

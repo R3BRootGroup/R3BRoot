@@ -13,12 +13,12 @@
 
 // -----------------------------------------------------------------
 // -----                                                       -----
-// -----                R3BMusicMapped2CalPar                  -----
-// -----        Created 29/01/20 by J.L. Rodriguez-Sanchez     -----
+// -----                R3BMusicMapped2CalPar_S515                  -----
+// -----        Created 23/03/2022 M. Feijoo Fontán    -----
 // -----------------------------------------------------------------
 
-#ifndef R3BMusicMapped2CalPar_H
-#define R3BMusicMapped2CalPar_H 1
+#ifndef R3BMusicMapped2CalPar_S515_H
+#define R3BMusicMapped2CalPar_S515_H
 
 #include "FairTask.h"
 #include "R3BMusicMapped2Cal.h"
@@ -27,29 +27,35 @@
 #include "TH1F.h"
 
 class TClonesArray;
-class R3BTimeStitch;
 class R3BMusicCalPar;
 
-class R3BMusicMapped2CalPar : public FairTask
+class R3BMusicMapped2CalPar_S515 : public FairTask
 {
+
   public:
     /** Default constructor **/
-    R3BMusicMapped2CalPar();
+    R3BMusicMapped2CalPar_S515();
 
     /** Standard constructor **/
-    R3BMusicMapped2CalPar(const TString& name,
+    R3BMusicMapped2CalPar_S515(const TString& name,
                           Int_t iVerbose = 1,
                           const TString& namedeta = "Mwpc0",
-                          const TString& namedetb = "Mwpc2");
+                          const TString& namedetb = "Los");
 
     /** Destructor **/
-    virtual ~R3BMusicMapped2CalPar();
+    virtual ~R3BMusicMapped2CalPar_S515();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
 
+    /** Virtual method FinishEvent **/
+    virtual void FinishEvent();
+
     /** Virtual method FinishTask **/
     virtual void FinishTask();
+
+    /** Virtual method Reset **/
+    virtual void Reset();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -57,11 +63,11 @@ class R3BMusicMapped2CalPar : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Method to set up the position of DetA **/
-    void SetPosDetA(Float_t pos) { fPosDetA = pos; }
+    /** Method to set up the position of MwpcA **/
+    void SetPosMwpcA(Float_t pos) { fPosMwpcA = pos; }
 
-    /** Method to set up the position of DetB **/
-    void SetPosDetB(Float_t pos) { fPosDetB = pos; }
+    /** Method to set up the position of Los **/
+    void SetPosLos(Float_t pos) { fPosLos = pos; }
 
     /** Method to set up the position of Music **/
     void SetPosMusic(Float_t pos) { fPosMusic = pos; }
@@ -87,26 +93,25 @@ class R3BMusicMapped2CalPar : public FairTask
     TArrayF* PosParams;
 
     TString fNameDetA;
-    Float_t fPosDetA; // Position in the beam direction in mm
+    Float_t fPosMwpcA; // Position in the beam direction in mm
     TString fNameDetB;
-    Float_t fPosDetB; // Position in the beam direction in mm
+    Float_t fPosLos; // Position in the beam direction in mm
     Float_t fPosMusic; // Position in the beam direction in mm
 
     Int_t mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
     Double_t energy[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
     Double_t dtime[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
 
-    R3BTimeStitch* fTimeStitch;
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
-    TClonesArray* fHitItemsDetA;     /**< Array with hit items. */
-    TClonesArray* fHitItemsDetB;     /**< Array with hit items. */
+    TClonesArray* fHitItemsMwpcA;     /**< Array with hit items. */
+    TClonesArray* fHitItemsLos;     /**< Array with hit items. */
 
     TGraph** fg_anode;
 
   public:
     // Class definition
-    ClassDef(R3BMusicMapped2CalPar, 1)
+    ClassDef(R3BMusicMapped2CalPar_S515, 1)
 };
 
 #endif

@@ -132,7 +132,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 
     // Set additional parameters at exit of active volume. Create R3BTofdPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
-    {
+    { 
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         static auto restr = "Plane_([0-9]+).*Paddle_([0-9]+)";
         static auto re = boost::regex(restr, boost::regex::extended);
