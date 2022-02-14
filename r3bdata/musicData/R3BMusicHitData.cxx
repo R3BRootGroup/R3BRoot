@@ -41,5 +41,11 @@ R3BMusicHitData::R3BMusicHitData(Double_t theta, Double_t z, Double_t ene)
 {
 }
 // -------------------------------------------------------------------------
-
+R3BMusicHitData::R3BMusicHitData(Double_t theta, Double_t z, Double_t ene, Double_t good_dt)
+    : fTheta(theta)
+    , fZ(z)
+    , fE(ene)
+    , fDt(good_dt)
+{
+}
 ClassImp(R3BMusicHitData)

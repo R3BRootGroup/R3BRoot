@@ -33,6 +33,7 @@ class R3BMusicHitData : public TObject
      **/
     R3BMusicHitData(Double_t theta, Double_t z);
     R3BMusicHitData(Double_t theta, Double_t z, Double_t ene);
+    R3BMusicHitData(Double_t theta, Double_t z, Double_t ene, Double_t good_dt);
 
     /** Destructor **/
     virtual ~R3BMusicHitData() {}
@@ -41,14 +42,16 @@ class R3BMusicHitData : public TObject
     inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetZcharge() const { return fZ; }
     inline const Double_t& GetEave() const { return fE; }
+    inline const Double_t& GetGoodDt() const { return fDt; }
 
     /** Modifiers **/
     void SetTheta(Double_t theta) { fTheta = theta; };
     void SetZcharge(Double_t z) { fZ = z; };
     void SetEave(Double_t ene) { fE = ene; };
+    void SetDt(Double_t dt) { fDt = dt; };
 
   protected:
-    Double_t fTheta, fZ, fE;
+    Double_t fTheta, fZ, fE, fDt;
 
     ClassDef(R3BMusicHitData, 1)
 };

@@ -577,13 +577,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
-                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx") -
-                           par->GetTofSync();
+                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx") ;
+                auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope()*tof;
 
                 // if (parz[1] > 0)
                 // {
                 event.push_back(
-                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
+                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
                 // }
 
                 /* if (parz[0] > 0 && parz[2] > 0)
