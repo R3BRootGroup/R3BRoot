@@ -12,10 +12,12 @@
  ******************************************************************************/
 
 #ifndef R3BCAVE_H
-#define R3BCAVE_H
+#define R3BCAVE_H 1
 
 #include "FairDetector.h"
 #include "FairModule.h"
+
+#include "Rtypes.h"
 
 class R3BCave : public FairModule
 {
@@ -25,9 +27,15 @@ class R3BCave : public FairModule
     virtual ~R3BCave();
     virtual void ConstructGeometry();
 
+    virtual FairModule* CloneModule() const;
+
   private:
-    Double_t world[3];   //!
-    ClassDef(R3BCave, 1) // R3BCaveSD
+    Double_t world[3];
+
+    R3BCave(const R3BCave&);
+    R3BCave& operator=(const R3BCave&);
+
+    ClassDef(R3BCave, 1);
 };
 
 #endif // R3BCave_H

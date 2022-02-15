@@ -11,8 +11,8 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libPassive" which includes the source files given in
-# the array. The extension is already found. Any number of sources could be
+# Create a library called "libR3BPassive" which includes the source files given 
+# in the array. The extension is already found. Any number of sources could be
 # listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES
@@ -39,11 +39,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BCave.cxx
 R3BGeoCave.cxx
-R3BGeoGDML.cxx
-R3BGeoMagnet.cxx
 R3BGeoPassivePar.cxx
-R3BGeoPipe.cxx
-R3BGeoVacVesselCool.cxx
 R3BGeoTarget.cxx
 R3BAladinMagnet.cxx
 R3BGladMagnet.cxx

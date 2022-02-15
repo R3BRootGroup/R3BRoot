@@ -27,7 +27,6 @@
 #include "TObjArray.h"
 
 #include "R3BGeoPassivePar.h"
-#include "R3BGeoPipe.h"
 #include "R3BPipe.h"
 
 R3BPipe::~R3BPipe() {}
