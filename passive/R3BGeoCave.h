@@ -12,14 +12,16 @@
  ******************************************************************************/
 
 #ifndef R3BGEOCAVE_H
-#define R3BGEOCAVE_H
+#define R3BGEOCAVE_H 1
 
-#include "FairGeoMedia.h"
 #include "FairGeoSet.h"
-#include "TString.h"
-#include <fstream>
 
-using namespace std;
+#include <Rtypes.h>
+#include <TString.h>
+#include <fstream>
+#include <iosfwd>
+
+class FairGeoMedia;
 
 class R3BGeoCave : public FairGeoSet
 {
@@ -30,11 +32,11 @@ class R3BGeoCave : public FairGeoSet
     R3BGeoCave();
     ~R3BGeoCave() {}
     const char* getModuleName(Int_t) { return name.Data(); }
-    Bool_t read(fstream&, FairGeoMedia*);
+    Bool_t read(std::fstream&, FairGeoMedia*);
     void addRefNodes();
-    void write(fstream&);
+    void write(std::fstream&);
     void print();
     ClassDef(R3BGeoCave, 0) // Class for the geometry of CAVE
 };
 
-#endif /* !PNDGEOCAVE_H */
+#endif /* !R3BGEOCAVE_H */

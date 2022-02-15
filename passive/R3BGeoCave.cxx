@@ -11,30 +11,27 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//*-- AUTHOR : Ilse Koenig
-//*-- Created : 10/11/2003
-
-/////////////////////////////////////////////////////////////
-// FairGeoCave
-//
-// Class for the geometry of the detector part CAVE
-//
-/////////////////////////////////////////////////////////////
-
 #include "R3BGeoCave.h"
+
 #include "FairGeoBasicShape.h"
+#include "FairGeoMedia.h"
 #include "FairGeoMedium.h"
 #include "FairGeoNode.h"
 #include "FairGeoShapes.h"
+#include "FairLogger.h"
+
+#include <TList.h>
+#include <iostream>
+#include <string.h>
 
 using namespace std;
-ClassImp(R3BGeoCave)
 
-    R3BGeoCave::R3BGeoCave()
+R3BGeoCave::R3BGeoCave()
+    : FairGeoSet()
+    , name("cave")
 {
     // Constructor
     fName = "cave";
-    name = "cave";
     maxModules = 1;
 }
 
@@ -42,7 +39,9 @@ Bool_t R3BGeoCave::read(fstream& fin, FairGeoMedia* media)
 {
     // Reads the geometry from file
     if (!media)
+    {
         return kFALSE;
+    }
     const Int_t maxbuf = 256;
     char buf[maxbuf];
     FairGeoNode* volu = 0;
@@ -63,9 +62,13 @@ Bool_t R3BGeoCave::read(fstream& fin, FairGeoMedia* media)
                 TString shape(buf);
                 FairGeoBasicShape* sh = pShapes->selectShape(shape);
                 if (sh)
+                {
                     volu->setShape(sh);
+                }
                 else
+                {
                     rc = kFALSE;
+                }
                 fin.getline(buf, maxbuf);
                 medium = media->getMedium(buf);
                 if (!medium)
@@ -76,12 +79,18 @@ Bool_t R3BGeoCave::read(fstream& fin, FairGeoMedia* media)
                 volu->setMedium(medium);
                 Int_t n = 0;
                 if (sh)
+                {
                     n = sh->readPoints(&fin, volu);
+                }
                 if (n <= 0)
+                {
                     rc = kFALSE;
+                }
             }
             else
+            {
                 rc = kFALSE;
+            }
         }
     } while (rc && !volu && !fin.eof());
     if (volu && rc)
@@ -103,7 +112,9 @@ void R3BGeoCave::addRefNodes()
     // Adds the reference node
     FairGeoNode* volu = getVolume(name);
     if (volu)
+    {
         masterNodes->Add(new FairGeoNode(*volu));
+    }
 }
 
 void R3BGeoCave::write(fstream& fout)
@@ -133,8 +144,10 @@ void R3BGeoCave::print()
         FairGeoMedium* med = volu->getMedium();
         if (sh && med)
         {
-            cout << volu->GetName() << '\n' << sh->GetName() << '\n' << med->GetName() << '\n';
+            LOG(INFO) << volu->GetName() << '\n' << sh->GetName() << '\n' << med->GetName() << '\n';
             sh->printPoints(volu);
         }
     }
 }
+
+ClassImp(R3BGeoCave);

@@ -13,7 +13,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// clang-format off
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -29,12 +28,8 @@
 #pragma link C++ class R3BCave+;
 #pragma link C++ class R3BNeutronWindowAndSomeAir+;
 #pragma link C++ class R3BGeoCave;
-#pragma link C++ class R3BGeoGDML+;
-#pragma link C++ class R3BGeoPipe;
-#pragma link C++ class R3BGeoVacVesselCool;
 #pragma link C++ class R3BGeoTarget;
-#pragma link C++ class R3BGeoMagnet;
 #pragma link C++ class R3BGeoPassivePar;
-#pragma link C++ class R3BPassiveContFact;
+#pragma link C++ class R3BPassiveContFact+;
 
 #endif
