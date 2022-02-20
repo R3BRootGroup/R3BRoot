@@ -20,10 +20,6 @@ ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
 
-if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-set(WITH_SOFIA true)
-endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
@@ -35,14 +31,8 @@ ${R3BROOT_SOURCE_DIR}/music/sim
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 )
-
-if(WITH_SOFIA)
-set(INCLUDE_DIRECTORIES
-${INCLUDE_DIRECTORIES}
-${R3BROOT_SOURCE_DIR}/sofia/sofdata/mwpcData
-)
-endif(WITH_SOFIA)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -51,31 +41,25 @@ set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR} )
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SRCS
+#set(SRCS
 #Put here your sourcefiles
-./sim/R3BMusic.cxx
-./sim/R3BMusicDigitizer.cxx
-./pars/R3BMusicCalPar.cxx
-./pars/R3BMusicHitPar.cxx
-./pars/R3BMusicContFact.cxx
-./calibration/R3BMusicMapped2Cal.cxx
-./calibration/R3BMusicCal2Hit.cxx
-./online/R3BMusicOnlineSpectra.cxx
-)
-
-#file(GLOB SRCS 
-#./sim/*.cxx 
-#./pars/*.cxx 
-#./calibration/*.cxx 
-#./online/*.cxx
+#./sim/R3BMusic.cxx
+#./sim/R3BMusicDigitizer.cxx
+#./pars/R3BMusicCalPar.cxx
+#./pars/R3BMusicHitPar.cxx
+#./pars/R3BMusicContFact.cxx
+#./pars/R3BMusicMapped2CalPar.cxx
+#./calibration/R3BMusicMapped2Cal.cxx
+#./calibration/R3BMusicCal2Hit.cxx
+#./online/R3BMusicOnlineSpectra.cxx
 #)
 
-if(WITH_SOFIA)
-set(SRCS
-${SRCS}
-./pars/R3BMusicMapped2CalPar.cxx
+file(GLOB SRCS 
+./sim/*.cxx 
+./pars/*.cxx 
+./calibration/*.cxx 
+./online/*.cxx
 )
-endif(WITH_SOFIA)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

@@ -55,6 +55,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/twimData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -199,6 +201,14 @@ rpcData/R3BRpcRefMappedData.cxx
 rpcData/R3BRpcStripMappedData.cxx
 rpcData/R3BRpcHitData.cxx
 rpcData/R3BRpcPoint.cxx
+mwpcData/R3BMwpcPoint.cxx
+mwpcData/R3BMwpcMappedData.cxx
+mwpcData/R3BMwpcCalData.cxx
+mwpcData/R3BMwpcHitData.cxx
+twimData/R3BTwimPoint.cxx
+twimData/R3BTwimMappedData.cxx
+twimData/R3BTwimCalData.cxx
+twimData/R3BTwimHitData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

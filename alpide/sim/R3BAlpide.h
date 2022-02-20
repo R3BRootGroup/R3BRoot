@@ -17,7 +17,7 @@
 // ---------------------------------------------------------------
 
 #ifndef R3BAlpide_H
-#define R3BAlpide_H
+#define R3BAlpide_H 1
 
 #include "R3BDetector.h"
 #include "Rtypes.h"

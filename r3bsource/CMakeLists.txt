@@ -41,6 +41,8 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/ams
 ${R3BROOT_SOURCE_DIR}/r3bsource/foot
 ${R3BROOT_SOURCE_DIR}/r3bsource/alpide
 ${R3BROOT_SOURCE_DIR}/r3bsource/music
+${R3BROOT_SOURCE_DIR}/r3bsource/mwpc
+${R3BROOT_SOURCE_DIR}/r3bsource/twim
 ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofi
@@ -69,6 +71,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/twimData
+${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 )
 
@@ -148,6 +152,8 @@ set(SRCS
 ./alpide/R3BAlpideReader.cxx
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
+./twim/R3BTwimReader.cxx
+./mwpc/R3BMwpcReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -208,10 +214,11 @@ Set(STRUCT_HEADERS
 ./foot/ext_h101_foot.h
 ./alpide/ext_h101_alpide.h
 ./music/ext_h101_music.h
+./twim/ext_h101_twim.h
+./mwpc/ext_h101_mwpc.h
 ./trloii/ext_h101_samp.h
 ./pdc/ext_h101_pdc.h
 ./rpc/ext_h101_rpc.h
-
 )
 
 # fill list of header files from list of source files

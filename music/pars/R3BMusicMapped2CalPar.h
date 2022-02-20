@@ -14,15 +14,15 @@
 // -----------------------------------------------------------------
 // -----                                                       -----
 // -----                R3BMusicMapped2CalPar                  -----
-// -----        Created 29/01/20  by J.L. Rodriguez-Sanchez    -----
+// -----        Created 29/01/20 by J.L. Rodriguez-Sanchez     -----
 // -----------------------------------------------------------------
 
 #ifndef R3BMusicMapped2CalPar_H
-#define R3BMusicMapped2CalPar_H
+#define R3BMusicMapped2CalPar_H 1
 
 #include "FairTask.h"
-#include "R3BMusicMapped2Cal.h"
 #include "R3BMusicMappedData.h"
+#include "R3BMusicMapped2Cal.h"
 #include "TGraph.h"
 #include "TH1F.h"
 
@@ -31,7 +31,6 @@ class R3BMusicCalPar;
 
 class R3BMusicMapped2CalPar : public FairTask
 {
-
   public:
     /** Default constructor **/
     R3BMusicMapped2CalPar();
@@ -48,14 +47,8 @@ class R3BMusicMapped2CalPar : public FairTask
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
 
-    /** Virtual method FinishEvent **/
-    virtual void FinishEvent();
-
     /** Virtual method FinishTask **/
     virtual void FinishTask();
-
-    /** Virtual method Reset **/
-    virtual void Reset();
 
     /** Virtual method Init **/
     virtual InitStatus Init();

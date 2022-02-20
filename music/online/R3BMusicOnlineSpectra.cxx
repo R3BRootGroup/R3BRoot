@@ -54,14 +54,7 @@
 using namespace std;
 
 R3BMusicOnlineSpectra::R3BMusicOnlineSpectra()
-    : FairTask("R3BMusicOnlineSpectra", 1)
-    , fMappedItemsMus(NULL)
-    , fCalItemsMus(NULL)
-    , fHitItemsMus(NULL)
-    , fExpId(467)
-    , fERange(8192)
-    , fZRange(40)
-    , fNEvents(0)
+    : R3BMusicOnlineSpectra("MusicOnlineSpectra", 1)
 {
 }
 
