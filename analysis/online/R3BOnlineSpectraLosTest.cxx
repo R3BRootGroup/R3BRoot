@@ -32,9 +32,9 @@
 #include "R3BPspxMappedData.h"
 #include "R3BPspxPrecalData.h"
 
-#include "../sofia/sofdata/twimData/R3BSofTwimCalData.h"
-#include "../sofia/sofdata/twimData/R3BSofTwimHitData.h"
-#include "../sofia/sofdata/twimData/R3BSofTwimMappedData.h"
+#include "R3BTwimCalData.h"
+#include "R3BTwimHitData.h"
+#include "R3BTwimMappedData.h"
 
 #include "R3BEventHeader.h"
 #include "R3BSamplerMappedData.h"
@@ -116,15 +116,6 @@ R3BOnlineSpectraLosTest::~R3BOnlineSpectraLosTest()
         delete fh_ToT_single_Fib[i];
         delete fh_channels_single_Fib[i];
     }
-    /*
-      LOG(INFO) << "R3BSofTwimOnlineSpectra::Delete instance";
-       if (fMappedItemsTwim)
-           delete fMappedItemsTwim;
-       if (fCalItemsTwim)
-           delete fCalItemsTwim;
-       if (fHitItemsTwim)
-           delete fHitItemsTwim;
-    */
 }
 
 InitStatus R3BOnlineSpectraLosTest::Init()
@@ -1766,7 +1757,7 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
         Int_t nHits = fMappedItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSofTwimMappedData* hit = (R3BSofTwimMappedData*)fMappedItemsTwim->At(ihit);
+            R3BTwimMappedData* hit = (R3BTwimMappedData*)fMappedItemsTwim->At(ihit);
             if (!hit)
                 continue;
             fh1_Twimmap_mult->Fill(hit->GetAnodeID());

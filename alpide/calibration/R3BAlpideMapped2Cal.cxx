@@ -32,13 +32,13 @@
 #include "R3BAlpideMappedData.h"
 #include "R3BLogger.h"
 
-// R3BAlpideMapped2Cal: Default Constructor --------------------------
+// R3BAlpideMapped2Cal::Default Constructor --------------------------
 R3BAlpideMapped2Cal::R3BAlpideMapped2Cal()
     : R3BAlpideMapped2Cal("R3BAlpideMapped2Cal", 1)
 {
 }
 
-// R3BAlpideMapped2CalPar: Standard Constructor --------------------------
+// R3BAlpideMapped2Cal::Standard Constructor --------------------------
 R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fAlpideMappedData(NULL)

@@ -77,6 +77,16 @@
 #pragma link C++ class R3BMusicCalData+;
 #pragma link C++ class R3BMusicHitData+;
 
+#pragma link C++ class R3BMwpcMappedData+;
+#pragma link C++ class R3BMwpcCalData+;
+#pragma link C++ class R3BMwpcHitData+;
+#pragma link C++ class R3BMwpcPoint+;
+
+#pragma link C++ class R3BTwimMappedData+;
+#pragma link C++ class R3BTwimCalData+;
+#pragma link C++ class R3BTwimHitData+;
+#pragma link C++ class R3BTwimPoint+;
+
 #pragma link C++ class R3BStartrackerDigitHit+;
 #pragma link C++ class R3BStartrackMappedData+;
 #pragma link C++ class R3BStartrackCalData+;

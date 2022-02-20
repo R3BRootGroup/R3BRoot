@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // ---------------------------------------------------------------------
-// -----         R3BMusicMapped2CalPar source file                 -----
-// -----      Created 29/01/20  by J.L. Rodriguez-Sanchez          -----
+// -----           R3BMusicMapped2CalPar source file               -----
+// -----      Created 29/01/20 by J.L. Rodriguez-Sanchez           -----
 // ---------------------------------------------------------------------
 
 // ROOT headers
@@ -34,33 +34,11 @@
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2CalPar.h"
 #include "R3BMusicMappedData.h"
-#include "R3BSofMwpcHitData.h"
-
-#include <iomanip>
+#include "R3BMwpcHitData.h"
 
 // R3BMusicMapped2CalPar: Default Constructor --------------------------
 R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
-    : FairTask("R3B Music Angle Calibrator", 1)
-    , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
-    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
-    , fMaxMult(MAX_MULT_MUSIC_CAL)
-    , fMinStadistics(1000)
-    , fLimit_left(10000)
-    , fLimit_right(24000)
-    , fNumParams(3)
-    , fNumPosParams(2)
-    , fMaxSigma(200)
-    , CalParams(NULL)
-    , PosParams(NULL)
-    , fCal_Par(NULL)
-    , fNameDetA("Mwpc0")
-    , fPosMwpcA(0.)
-    , fNameDetB("Mwpc2")
-    , fPosMwpcB(0.)
-    , fPosMusic(0.)
-    , fMusicMappedDataCA(NULL)
-    , fHitItemsMwpcA(NULL)
-    , fHitItemsMwpcB(NULL)
+    : R3BMusicMapped2CalPar("R3BMusicMapped2CalPar", 1)
 {
 }
 
@@ -97,12 +75,6 @@ R3BMusicMapped2CalPar::R3BMusicMapped2CalPar(const TString& name,
 R3BMusicMapped2CalPar::~R3BMusicMapped2CalPar()
 {
     LOG(INFO) << "R3BMusicMapped2CalPar: Delete instance";
-    if (fMusicMappedDataCA)
-        delete fMusicMappedDataCA;
-    if (fHitItemsMwpcA)
-        delete fHitItemsMwpcA;
-    if (fHitItemsMwpcB)
-        delete fHitItemsMwpcB;
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -186,17 +158,17 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
 
     TVector3 PosMwpcA(0., 0., fPosMwpcA);
     TVector3 PosMwpcB(0., 0., fPosMwpcB);
-    R3BSofMwpcHitData** hitMwAData = new R3BSofMwpcHitData*[nHitsA];
+    R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
     for (Int_t i = 0; i < nHitsA; i++)
     {
-        hitMwAData[i] = (R3BSofMwpcHitData*)(fHitItemsMwpcA->At(i));
+        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
         PosMwpcA.SetX(hitMwAData[i]->GetX());
         // LOG(INFO) <<hitMwAData[i]->GetX();
     }
-    R3BSofMwpcHitData** hitMwBData = new R3BSofMwpcHitData*[nHitsB];
+    R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
-        hitMwBData[i] = (R3BSofMwpcHitData*)(fHitItemsMwpcB->At(i));
+        hitMwBData[i] = (R3BMwpcHitData*)(fHitItemsMwpcB->At(i));
         PosMwpcB.SetX(hitMwBData[i]->GetX());
         // LOG(INFO) <<hitMwBData[i]->GetX();
     }
@@ -261,12 +233,6 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
     return;
 }
 
-// -----   Protected method Finish   --------------------------------------------
-void R3BMusicMapped2CalPar::FinishEvent() {}
-
-// -----   Public method Reset   ------------------------------------------------
-void R3BMusicMapped2CalPar::Reset() {}
-
 void R3BMusicMapped2CalPar::FinishTask()
 {
     fCal_Par->SetNumAnodes(fNumAnodes);
@@ -297,4 +263,4 @@ void R3BMusicMapped2CalPar::FinishTask()
     fCal_Par->setChanged();
 }
 
-ClassImp(R3BMusicMapped2CalPar)
+ClassImp(R3BMusicMapped2CalPar);

@@ -52,7 +52,9 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/twimData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
 ${R3BROOT_SOURCE_DIR}/analysis

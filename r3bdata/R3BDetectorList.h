@@ -65,15 +65,15 @@ enum DetectorId
     kMUSIC,
     kLOS,
     kRPC,
-#ifdef SOFIA
-    kSOFSCI,
-    kSOFAT,
-    kSOFTRIM,
     kSOFMWPC0,
     kSOFMWPC1,
     kSOFTWIM,
     kSOFMWPC2,
     kSOFMWPC3,
+#ifdef SOFIA
+    kSOFSCI,
+    kSOFAT,
+    kSOFTRIM,
     kSOFTofWall,
 #endif
 #ifdef GTPC
@@ -124,17 +124,17 @@ enum fDetectorType
     kFI33Point,
     kSFIPoint,
     kMUSICPoint,
-    kRpcPoint
+    kRpcPoint,
+    kSOFMWPC0Point,
+    kSOFMWPC1Point,
+    kSOFTWIMPoint,
+    kSOFMWPC2Point,
+    kSOFMWPC3Point
 #ifdef SOFIA
     ,
     kSOFSCIPoint,
     kSOFATPoint,
     kSOFTRIMPoint,
-    kSOFMWPC0Point,
-    kSOFMWPC1Point,
-    kSOFTWIMPoint,
-    kSOFMWPC2Point,
-    kSOFMWPC3Point,
     kSOFTofWallPoint
 #endif
 #ifdef GTPC
