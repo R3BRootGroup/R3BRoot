@@ -28,6 +28,7 @@
 
 #pragma link C++ class R3BTwimMapped2Cal+;
 #pragma link C++ class R3BTwimCal2Hit+;
+#pragma link C++ class R3BTwimGainMatching+;
 #pragma link C++ class R3BTwimMapped2CalPar+;
 
 #pragma link C++ class R3BTwimOnlineSpectra+;

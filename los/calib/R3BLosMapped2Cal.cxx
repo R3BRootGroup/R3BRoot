@@ -51,14 +51,16 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosMapped2Cal::R3BLosMapped2Cal()
-    : R3BLosMapped2Cal("LosTcal", 1)
+    : R3BLosMapped2Cal("R3BLosMapped2Cal", 1)
 {
 }
 
 R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
+    , fMappedTriggerItems(NULL)
     , fCalItems(new TClonesArray("R3BLosCalData"))
+    , fCalTriggerItems(new TClonesArray("R3BLosCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fTcalPar(NULL)
@@ -74,6 +76,8 @@ R3BLosMapped2Cal::~R3BLosMapped2Cal()
     LOG(DEBUG) << "R3BLosMapped2Cal::Destructor";
     if (fCalItems)
         delete fCalItems;
+    if (fCalTriggerItems)
+        delete fCalTriggerItems;
 }
 
 InitStatus R3BLosMapped2Cal::Init()
@@ -93,17 +97,26 @@ InitStatus R3BLosMapped2Cal::Init()
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
-
     if (NULL == fMappedItems)
     {
         LOG(FATAL) << "Branch LosMapped not found";
         return kFATAL;
     }
 
-    // Request storage of Cal data in output tree
-    mgr->Register("LosCal", "Land", fCalItems, !fOnline);
+    // get access to Trigger Mapped data
+    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerMapped");
+    if (!fMappedTriggerItems)
+        LOG(WARNING) << "LosTriggerMapped not found";
 
+    // Request storage of Cal data in output tree
+    mgr->Register("LosCal", "LosCal data", fCalItems, !fOnline);
     fCalItems->Clear();
+
+    if (fMappedTriggerItems)
+    {
+        mgr->Register("LosTriggerCal", "LosTriggerCal data", fCalTriggerItems, !fOnline);
+        fCalTriggerItems->Clear();
+    }
 
     return kSUCCESS;
 }
@@ -440,6 +453,10 @@ void R3BLosMapped2Cal::FinishEvent()
     {
         fCalItems->Clear();
         fNofCalItems = 0;
+    }
+    if (fCalTriggerItems)
+    {
+        fCalTriggerItems->Clear();
     }
 }
 

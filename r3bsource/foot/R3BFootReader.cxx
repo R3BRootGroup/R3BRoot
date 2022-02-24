@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 
 #include "R3BFootMappedData.h"
-#include "R3BFootSiReader.h"
+#include "R3BFootReader.h"
 #include "R3BLogger.h"
 
 #include "TClonesArray.h"
@@ -32,8 +32,8 @@ extern "C"
 #include "ext_h101_foot.h"
 }
 
-R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
-    : R3BReader("R3BFootSiReader")
+R3BFootReader::R3BFootReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
+    : R3BReader("R3BFootReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
@@ -43,13 +43,13 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
 {
 }
 
-R3BFootSiReader::~R3BFootSiReader()
+R3BFootReader::~R3BFootReader()
 {
     if (fArray)
         delete fArray;
 }
 
-Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
+Bool_t R3BFootReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
     R3BLOG(INFO, "");
@@ -68,7 +68,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BFootSiReader::Read()
+Bool_t R3BFootReader::Read()
 {
     R3BLOG(DEBUG1, "Event data");
     // Read FOOT detectors
@@ -86,7 +86,7 @@ Bool_t R3BFootSiReader::Read()
         else
         {
             if (fNEvent > 0)
-                LOG(FATAL) << "\033[5m\033[31m R3BFootSiReader::Failed number of strips per detector. \033[0m";
+                LOG(FATAL) << "\033[5m\033[31m R3BFootReader::Failed number of strips per detector. \033[0m";
         }
     }
     if (fNEvent == 0)
@@ -95,10 +95,10 @@ Bool_t R3BFootSiReader::Read()
     return kTRUE;
 }
 
-void R3BFootSiReader::Reset()
+void R3BFootReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
 }
 
-ClassImp(R3BFootSiReader);
+ClassImp(R3BFootReader);

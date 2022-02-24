@@ -124,7 +124,9 @@ class R3BLosMapped2Cal : public FairTask
     size_t GetCalLookupIndex(R3BLosMappedData const&) const;
 
     TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
+    TClonesArray* fMappedTriggerItems;
+    TClonesArray* fCalItems; /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems;
 
     Int_t fNofCalItems; /**< Number of produced time items per event. */
 

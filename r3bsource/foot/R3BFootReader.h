@@ -11,26 +11,32 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BLOSREADER_H
-#define R3BLOSREADER_H 1
+// ----------------------------------------------------------------------
+// -----                         R3BFootReader                      -----
+// -----             Created 19/07/21 by J.L. Rodriguez-Sanchez     -----
+// ----------------------------------------------------------------------
+
+#ifndef R3BFootReader_H
+#define R3BFootReader_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
 
 class TClonesArray;
 
-struct EXT_STR_h101_LOS_t;
-typedef struct EXT_STR_h101_LOS_t EXT_STR_h101_LOS;
+struct EXT_STR_h101_FOOT_t;
+typedef struct EXT_STR_h101_FOOT_t EXT_STR_h101_FOOT;
+typedef struct EXT_STR_h101_FOOT_onion_t EXT_STR_h101_FOOT_onion;
 class ext_data_struct_info;
 
-class R3BLosReader : public R3BReader
+class R3BFootReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BLosReader(EXT_STR_h101_LOS*, size_t);
+    R3BFootReader(EXT_STR_h101_FOOT_onion*, size_t);
 
     // Destructor
-    virtual ~R3BLosReader();
+    virtual ~R3BFootReader();
 
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
@@ -46,21 +52,20 @@ class R3BLosReader : public R3BReader
 
   private:
     // An event counter
-    unsigned int fNEvents;
-    //  Reader specific data structure from ucesb
-    EXT_STR_h101_LOS* fData;
+    unsigned int fNEvent;
+    // Reader specific data structure from ucesb
+    EXT_STR_h101_FOOT_onion* fData;
     // Data offset
     size_t fOffset;
-    // Output array of R3BLosxMappedItem
-    TClonesArray* fArray;
-    TClonesArray* fArrayTrigger;
     // Don't store data for online
     Bool_t fOnline;
-    // EventHeader
-    R3BEventHeader* header;
+    // Number of silicon detectors
+    Int_t fNbDet;
+    // Output array
+    TClonesArray* fArray;
 
   public:
-    ClassDefOverride(R3BLosReader, 0);
+    ClassDefOverride(R3BFootReader, 0);
 };
 
-#endif /* R3BLOSREADER_H */
+#endif /* R3BFootReader_H */

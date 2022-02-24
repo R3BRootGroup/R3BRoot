@@ -15,9 +15,13 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BRoluMappedData.h"
 #include "R3BRoluReader.h"
+
 #include "TClonesArray.h"
+#include "TMath.h"
+#include <iostream>
 
 /**
  ** ext_h101_rolu.h was created by running
@@ -30,11 +34,9 @@ extern "C"
 #include "ext_h101_rolu.h"
 }
 
-#include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 #define NUM_ROLU_DETECTORS (sizeof data->ROLU / sizeof data->ROLU[0])
 #define NUM_ROLU_CHANNELS 4
-#include <iostream>
 
 using namespace std;
 
@@ -62,19 +64,19 @@ R3BRoluReader::~R3BRoluReader()
 
 Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
 {
-
-    int ok;
+    Int_t ok;
+    R3BLOG(INFO, "");
     EXT_STR_h101_ROLU_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_ROLU, 0);
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup ROLU structure information.";
+        R3BLOG(ERROR, "Failed to setup ROLU structure information.");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("RoluMapped", "Rolu Mapped", fArray, !fOnline);
-    FairRootManager::Instance()->Register("RoluTriggerMapped", "Rolu Trigger Mappe", fArrayTrigger, !fOnline);
+    FairRootManager::Instance()->Register("RoluTriggerMapped", "Rolu Trigger Mapped", fArrayTrigger, !fOnline);
 
     Reset();
 
@@ -82,7 +84,7 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     // for channels that are unknown to the current ucesb config.
     EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
 
-    LOG(INFO) << "ROLU num Dets: " << NUM_ROLU_DETECTORS;
+    R3BLOG(INFO, "ROLU num Dets: " << NUM_ROLU_DETECTORS);
     for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
     {
         data->ROLU[d].TTFLM = 0;

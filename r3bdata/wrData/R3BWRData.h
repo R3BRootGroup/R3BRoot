@@ -12,36 +12,37 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------------------
-// -----                                                              -----
 // -----                      R3BWRData                               -----
 // -----          Created 28/02/2019 by J.L. Rodriguez                -----
-// -----                                                              -----
 // ------------------------------------------------------------------------
 
 #ifndef R3BWRData_H
-#define R3BWRData_H
+#define R3BWRData_H 1
 
 #include "TObject.h"
+#include <Rtypes.h>
 
 class R3BWRData : public TObject
 {
-
   public:
     // Default Constructor
     R3BWRData();
 
     /** Standard Constructor
      *@param timestamp
+     *@param id
      **/
-    R3BWRData(uint64_t timestamp);
+    R3BWRData(uint64_t timestamp, UInt_t id = 1);
 
     // Destructor
     virtual ~R3BWRData() {}
 
     // Getters
     inline const uint64_t& GetTimeStamp() const { return fTimeStamp; }
+    inline const UInt_t& GetId() const { return fId; }
 
   protected:
+    UInt_t fId;
     uint64_t fTimeStamp; // timestamp for master
 
   public:

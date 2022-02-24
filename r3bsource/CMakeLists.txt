@@ -94,6 +94,7 @@ set(SRCS
 ./califa/R3BWhiterabbitCalifaReader.cxx
 ./neuland/R3BWhiterabbitNeulandReader.cxx
 ./ams/R3BWhiterabbitAmsReader.cxx
+./foot/R3BWhiterabbitFootReader.cxx
 ./wr/R3BWhiterabbitS2Reader.cxx
 ./wr/R3BWhiterabbitS8Reader.cxx
 ./los/R3BWhiterabbitLosReader.cxx
@@ -148,7 +149,7 @@ set(SRCS
 ./stubes/R3BStrawtubesReader.cxx
 ./strack/R3BStartrackReader.cxx
 ./ams/R3BAmsReader.cxx
-./foot/R3BFootSiReader.cxx
+./foot/R3BFootReader.cxx
 ./alpide/R3BAlpideReader.cxx
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
@@ -163,6 +164,7 @@ Set(STRUCT_HEADERS
 ./califa/ext_h101_wrcalifa.h
 ./neuland/ext_h101_wrneuland.h
 ./ams/ext_h101_wrams.h
+./foot/ext_h101_wrfoot.h
 ./music/ext_h101_wrmusic.h
 ./wr/ext_h101_timestamp_pspx.h
 ./wr/ext_h101_wrs2.h

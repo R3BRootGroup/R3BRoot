@@ -77,7 +77,7 @@ void R3BTwimMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
     if (!fCal_Par)

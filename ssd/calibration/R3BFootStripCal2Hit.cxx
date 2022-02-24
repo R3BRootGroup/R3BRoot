@@ -46,7 +46,7 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit()
 // R3BFootStripCal2HitPar::Standard Constructor ---------------------------------
 R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fPitch(157.7)
+    , fPitch(156.25)
     , fMiddle(50.)
     , fThSum(20.)
     , fMaxNumDet(10)
@@ -93,7 +93,7 @@ void R3BFootStripCal2Hit::SetParameter()
     }
     //--- Parameter Container ---
     fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
-    LOG(INFO) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
+    R3BLOG(INFO, "NumDet from mapping: " << fMaxNumDet);
     fMap_Par->printParams();
 }
 
@@ -129,7 +129,7 @@ InitStatus R3BFootStripCal2Hit::Init()
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
         sprintf(Name, "hssd_%d", i + 1);
-        hssd[i] = new TH1F(Name, "", 640, -0.5, 640.5);
+        hssd[i] = new TH1F(Name, "", 640, -0.5, 639.5);
     }
 
     return kSUCCESS;

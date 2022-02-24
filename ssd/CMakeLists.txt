@@ -32,6 +32,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/ssd
 ${R3BROOT_SOURCE_DIR}/ssd/sim
 ${R3BROOT_SOURCE_DIR}/ssd/digi
