@@ -115,12 +115,12 @@ InitStatus R3BRoluMapped2Cal::Init()
         LOG(WARNING) << "R3BRoluMapped2Cal::Branch RoluTriggerMapped not found";
 
     // request storage of Cal data in output tree
-    mgr->Register("RoluCal", "RoluCal", fCalItems, !fOnline);
+    mgr->Register("RoluCal", "RoluCal data", fCalItems, !fOnline);
     fCalItems->Clear();
 
     if (fMappedTriggerItems)
     {
-        mgr->Register("RoluTriggerCal", "RoluTriggerCal", fCalTriggerItems, !fOnline);
+        mgr->Register("RoluTriggerCal", "RoluTriggerCal data", fCalTriggerItems, !fOnline);
         fCalTriggerItems->Clear();
     }
 

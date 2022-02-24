@@ -13,6 +13,7 @@
 
 #include "R3BLosReader.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosMappedData.h"
 
 #include "FairLogger.h"
@@ -42,6 +43,7 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BLosMappedData"))
+    , fArrayTrigger(new TClonesArray("R3BLosMappedData"))
 {
 }
 
@@ -51,37 +53,40 @@ R3BLosReader::~R3BLosReader()
     {
         delete fArray;
     }
+    if (fArrayTrigger)
+    {
+        delete fArrayTrigger;
+    }
 }
 
 Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BLosReader::Init()";
+    R3BLOG(INFO, "");
+    EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
+    if (!ok)
+    {
+        perror("ext_data_struct_info_item");
+        R3BLOG(ERROR, "Failed to setup structure information.");
+        return kFALSE;
+    }
+
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        LOG(WARNING) << "R3BLosReader::Init() R3BEventHeader not found";
-    }
-
-    EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
-    if (!ok)
-    {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
-        return kFALSE;
+        R3BLOG(WARNING, "EventHeader. not found");
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("LosMapped", "Los detector", fArray, !fOnline);
-
-    fArray->Clear();
+    mgr->Register("LosMapped", "Los detector", fArray, !fOnline);
+    mgr->Register("LosTriggerMapped", "Los Trigger Mapped", fArrayTrigger, !fOnline);
+    Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
@@ -374,6 +379,7 @@ void R3BLosReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
+    fArrayTrigger->Clear();
 }
 
 ClassImp(R3BLosReader);

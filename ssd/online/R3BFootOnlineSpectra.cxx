@@ -13,7 +13,7 @@
 
 // ------------------------------------------------------------
 // -----             R3BFootOnlineSpectra                 -----
-// -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
+// -----    Created 16/07/21 by J.L. Rodriguez-Sanchez    -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
 
@@ -25,26 +25,21 @@
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
 #include "R3BFootMappedData.h"
+#include "R3BWRData.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "THttpServer.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
+#include "TClonesArray.h"
 #include "TFolder.h"
 #include "TH1F.h"
 #include "TH2F.h"
-
-#include "TClonesArray.h"
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 R3BFootOnlineSpectra::R3BFootOnlineSpectra()
     : R3BFootOnlineSpectra("FootOnlineSpectra", 1)
@@ -57,6 +52,8 @@ R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
     , fMappedItems(NULL)
     , fCalItems(NULL)
     , fHitItems(NULL)
+    , fWRItems(NULL)
+    , fWRItemsMaster(NULL)
     , fTrigger(-1)
     , fNEvents(0)
     , fNbDet(10)
@@ -65,7 +62,7 @@ R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
 
 R3BFootOnlineSpectra::~R3BFootOnlineSpectra()
 {
-    LOG(DEBUG) << "R3BFootOnlineSpectra::Delete instance";
+    R3BLOG(DEBUG1, "Destructor");
     if (fEventHeader)
         delete fEventHeader;
     if (fMappedItems)
@@ -74,44 +71,52 @@ R3BFootOnlineSpectra::~R3BFootOnlineSpectra()
         delete fCalItems;
     if (fHitItems)
         delete fHitItems;
+    if (fWRItems)
+        delete fWRItems;
+    if (fWRItemsMaster)
+        delete fWRItemsMaster;
 }
 
 InitStatus R3BFootOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BFootOnlineSpectra::Init()";
-
+    R3BLOG(INFO, "");
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(FATAL) << "R3BFootOnlineSpectra::FairRootManager not found";
+    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
     // Look for the R3BEventHeader
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
+        R3BLOG(WARNING, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BFootOnlineSpectra::Init() EventHeader. found";
+        R3BLOG(INFO, "EventHeader. found");
 
     // Get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("FootMappedData");
     if (!fMappedItems)
     {
-        LOG(FATAL) << "R3BFootOnlineSpectra::FootMappedData not found";
+        R3BLOG(FATAL, "FootMappedData not found");
         return kFATAL;
     }
 
     // Get access to Cal data
     fCalItems = (TClonesArray*)mgr->GetObject("FootCalData");
-    if (!fCalItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootCalData not found";
+    R3BLOG_IF(WARNING, !fCalItems, "FootCalData not found");
 
     // Get access to Hit data
     fHitItems = (TClonesArray*)mgr->GetObject("FootHitData");
-    if (!fHitItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootHitData not found";
+    R3BLOG_IF(WARNING, !fHitItems, "FootHitData not found");
+
+    // Get access to WR data
+    fWRItems = (TClonesArray*)mgr->GetObject("WRFootData");
+    R3BLOG_IF(WARNING, !fWRItems, "WRFootData not found");
+
+    // get access to WR-Master data
+    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+    R3BLOG_IF(WARNING, !fWRItemsMaster, "WRMasterData not found");
 
     // Create histograms for all the detectors
 
@@ -132,6 +137,8 @@ InitStatus R3BFootOnlineSpectra::Init()
     TFolder* calfol = new TFolder("Cal", "Cal FOOT info");
     // Folder for hit data
     TFolder* hitfol = new TFolder("Hit", "Hit FOOT info");
+    // Folder for WR data
+    TFolder* wrfol = new TFolder("WRs", "WR FOOT info");
 
     // Mapped data
     fh2_EnergyVsStrip.resize(fNbDet);
@@ -176,7 +183,7 @@ InitStatus R3BFootOnlineSpectra::Init()
         { // one histo per detector
             sprintf(Name1, "fh1_pos_det_%d", i + 1);
             sprintf(Name2, "Cluster position for FOOT Det: %d", i + 1);
-            fh1_pos[i] = new TH1F(Name1, Name2, 600, -50., 50.);
+            fh1_pos[i] = new TH1F(Name1, Name2, 640, -50., 50.);
             fh1_pos[i]->GetXaxis()->SetTitle("Position [mm]");
             fh1_pos[i]->GetYaxis()->SetTitle("Counts");
             fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -187,6 +194,21 @@ InitStatus R3BFootOnlineSpectra::Init()
         }
     }
 
+    // WR data
+    if (fWRItems && fWRItemsMaster)
+    {
+        auto cwr = new TCanvas("Foot_wr", "", 10, 10, 500, 500);
+        fh2_wr = new TH2F("fh2_wr", "WRFoot - WRMaster", 4000, -4000, 4000, 10, 0.5, 10.5);
+        fh2_wr->GetXaxis()->SetTitle("WR difference [ns]");
+        fh2_wr->GetYaxis()->SetTitle("FOOT Det");
+        fh2_wr->GetYaxis()->SetTitleOffset(1.4);
+        fh2_wr->GetXaxis()->CenterTitle(true);
+        fh2_wr->GetYaxis()->CenterTitle(true);
+        cwr->cd();
+        fh2_wr->Draw("colz");
+        wrfol->Add(cwr);
+    }
+
     if (fCalItems)
     {
         mainfol->Add(calfol);
@@ -194,6 +216,10 @@ InitStatus R3BFootOnlineSpectra::Init()
     if (fHitItems)
     {
         mainfol->Add(hitfol);
+    }
+    if (fWRItems && fWRItemsMaster)
+    {
+        mainfol->Add(wrfol);
     }
 
     // Looking for FairRunOnline
@@ -209,7 +235,7 @@ InitStatus R3BFootOnlineSpectra::Init()
 
 void R3BFootOnlineSpectra::Reset_FOOT_Histo()
 {
-    LOG(INFO) << "R3BFootOnlineSpectra::Reset_FOOT_Histo";
+    R3BLOG(INFO, "Reset_Histo");
 
     // Mapped data
     for (Int_t i = 0; i < fNbDet; i++)
@@ -231,12 +257,15 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
             fh1_pos[i]->Reset();
         }
 
+    // WR data
+    if (fWRItems && fWRItemsMaster)
+        fh2_wr->Reset();
+
     return;
 }
 
 void R3BFootOnlineSpectra::Exec(Option_t* option)
 {
-
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
         return;
 
@@ -279,6 +308,29 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         }
     }
 
+    // Fill wr data
+    if (fWRItems && fWRItems->GetEntriesFast() > 0 && fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
+    {
+        int64_t wrm = 0.0;
+        auto nHits = fWRItemsMaster->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            auto hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+            if (!hit)
+                continue;
+            wrm = hit->GetTimeStamp();
+        }
+
+        nHits = fWRItems->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            auto hit = (R3BWRData*)fWRItems->At(ihit);
+            if (!hit)
+                continue;
+            fh2_wr->Fill(hit->GetTimeStamp() - wrm, hit->GetId());
+        }
+    }
+
     fNEvents += 1;
     return;
 }
@@ -296,6 +348,14 @@ void R3BFootOnlineSpectra::FinishEvent()
     if (fHitItems)
     {
         fHitItems->Clear();
+    }
+    if (fWRItems)
+    {
+        fWRItems->Clear();
+    }
+    if (fWRItemsMaster)
+    {
+        fWRItemsMaster->Clear();
     }
     return;
 }
@@ -318,6 +378,10 @@ void R3BFootOnlineSpectra::FinishTask()
         {
             fh1_pos[i]->Write();
         }
+
+    if (fWRItems && fWRItemsMaster)
+        fh2_wr->Write();
+
     return;
 }
 

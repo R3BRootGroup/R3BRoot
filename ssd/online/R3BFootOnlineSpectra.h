@@ -13,12 +13,12 @@
 
 // ------------------------------------------------------------
 // -----             R3BFootOnlineSpectra                 -----
-// -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
+// -----    Created 16/07/21 by J.L. Rodriguez-Sanchez    -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
 
 #ifndef R3BFootOnlineSpectra_H
-#define R3BFootOnlineSpectra_H
+#define R3BFootOnlineSpectra_H 1
 
 #include "FairTask.h"
 
@@ -112,6 +112,8 @@ class R3BFootOnlineSpectra : public FairTask
     TClonesArray* fMappedItems;   // Array with mapped items.
     TClonesArray* fCalItems;      // Array with cal items.
     TClonesArray* fHitItems;      // Array with hit items.
+    TClonesArray* fWRItems;       // Array with wr items.
+    TClonesArray* fWRItemsMaster; // Array with wr items.
 
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
@@ -124,6 +126,8 @@ class R3BFootOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_EnergyVsStrip_cal;
     // Histograms for hit data
     std::vector<TH1F*> fh1_pos;
+    // Histograms for wr data
+    TH2F* fh2_wr;
 
   public:
     ClassDefOverride(R3BFootOnlineSpectra, 1)

@@ -11,32 +11,36 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ----------------------------------------------------------------------
-// -----                         R3BFootSiReader                    -----
-// -----             Created 19/07/21  by J.L. Rodriguez-Sanchez    -----
-// ----------------------------------------------------------------------
-
-#ifndef R3BFootSiReader_H
-#define R3BFootSiReader_H
+#ifndef R3BWhiterabbitFootReader_H
+#define R3BWhiterabbitFootReader_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
+#include <vector>
+
+struct EXT_STR_h101_WRFOOT_t;
+typedef struct EXT_STR_h101_WRFOOT_t EXT_STR_h101_WRFOOT;
+typedef struct EXT_STR_h101_WRFOOT_onion_t EXT_STR_h101_WRFOOT_onion;
 
 class TClonesArray;
-
-struct EXT_STR_h101_FOOT_t;
-typedef struct EXT_STR_h101_FOOT_t EXT_STR_h101_FOOT;
-typedef struct EXT_STR_h101_FOOT_onion_t EXT_STR_h101_FOOT_onion;
+class R3BEventHeader;
 class ext_data_struct_info;
 
-class R3BFootSiReader : public R3BReader
+/**
+ * A reader of FOOT white rabbit data with UCESB.
+ * Receives mapped raw data and converts it to R3BRoot objects.
+ * @author J.L. Rodriguez
+ * @since Feb 24, 2022
+ */
+
+class R3BWhiterabbitFootReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BFootSiReader(EXT_STR_h101_FOOT_onion*, size_t);
+    R3BWhiterabbitFootReader(EXT_STR_h101_WRFOOT_onion*, size_t, std::vector<UInt_t>);
 
     // Destructor
-    virtual ~R3BFootSiReader();
+    virtual ~R3BWhiterabbitFootReader();
 
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
@@ -52,20 +56,21 @@ class R3BFootSiReader : public R3BReader
 
   private:
     // An event counter
-    unsigned int fNEvent;
+    UInt_t fNEvent;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_FOOT_onion* fData;
-    // Data offset
+    EXT_STR_h101_WRFOOT_onion* fData;
+    // Offset of detector specific data in full data structure
     size_t fOffset;
+    // The whiterabbit subsystem ID
+    std::vector<UInt_t> fWhiterabbitId;
+    // A pointer to the R3BEventHeader structure
+    R3BEventHeader* fEventHeader;
     // Don't store data for online
     Bool_t fOnline;
-    // Number of silicon detectors
-    Int_t fNbDet;
     // Output array
     TClonesArray* fArray;
 
   public:
-    ClassDefOverride(R3BFootSiReader, 0);
+    ClassDefOverride(R3BWhiterabbitFootReader, 0);
 };
-
-#endif /* R3BFootSiReader_H */
+#endif // R3BWhiterabbitFootReader_H

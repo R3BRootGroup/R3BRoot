@@ -357,7 +357,7 @@ void R3BTwimCal2Hit::S455()
                 Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean;
                 // if (zhit > 0 && theta > -5000.)
                 if (zhit > 0)
-                    AddHitData(i, theta, zhit, Esum_mean);
+                    AddHitData(i, theta, zhit, good_dt[7], Esum_mean);
             }
             else
             {
@@ -365,7 +365,7 @@ void R3BTwimCal2Hit::S455()
                 Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean;
                 // if (zhit > 0 && theta > -5000.)
                 if (zhit > 0)
-                    AddHitData(i + 1, theta, zhit, Esum_mean);
+                    AddHitData(i + 1, theta, zhit, good_dt[7], Esum_mean);
             }
         }
         // i = i + 2;
@@ -449,7 +449,7 @@ void R3BTwimCal2Hit::S467()
             Double_t zhit =
                 fZ0[i] + fZ1[i] * TMath::Sqrt(Esum / nba) + fZ2[i] * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
             if (zhit > 0 && theta > -5000.)
-                AddHitData(i + 1, theta, zhit, Esum / nba);
+                AddHitData(i + 1, theta, zhit, good_dt[7], Esum / nba);
         }
     }
 
@@ -467,21 +467,25 @@ void R3BTwimCal2Hit::Reset()
 }
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BTwimHitData* R3BTwimCal2Hit::AddHitData(UShort_t secid, Double_t theta, Double_t charge_z)
+R3BTwimHitData* R3BTwimCal2Hit::AddHitData(UShort_t secid, Double_t theta, Double_t charge_z, Double_t xpos)
 {
     // It fills the R3BTwimHitData
     TClonesArray& clref = *fTwimHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BTwimHitData(secid, theta, charge_z);
+    return new (clref[size]) R3BTwimHitData(secid, theta, charge_z, xpos);
 }
 
 // -----   For later analysis with reconstructed beta -----
-R3BTwimHitData* R3BTwimCal2Hit::AddHitData(UShort_t secid, Double_t theta, Double_t charge_z, Double_t ene_ave)
+R3BTwimHitData* R3BTwimCal2Hit::AddHitData(UShort_t secid,
+                                           Double_t theta,
+                                           Double_t charge_z,
+                                           Double_t xpos,
+                                           Double_t ene_ave)
 {
     // It fills the R3BTwimHitData
     TClonesArray& clref = *fTwimHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BTwimHitData(secid, theta, charge_z, ene_ave);
+    return new (clref[size]) R3BTwimHitData(secid, theta, charge_z, xpos, ene_ave);
 }
 
 ClassImp(R3BTwimCal2Hit);
