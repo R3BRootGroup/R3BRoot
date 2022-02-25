@@ -17,12 +17,13 @@
 #include "R3BFiberMAPMTMappedData.h"
 #include "TClonesArray.h"
 
-R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name, UInt_t a_offset, UInt_t fiber_num)
+R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name, UInt_t a_offset, size_t fiber_num)
     : R3BReader(TString("R3B") + a_name + "Reader")
     , fOffset(a_offset)
     , fShortName(a_name)
     , fFiberNum(fiber_num)
     , fMappedArray(new TClonesArray("R3BFiberMAPMTMappedData"))
+    , fOnline(kFALSE)
 {
 }
 
@@ -37,20 +38,20 @@ Bool_t R3BFiberMAPMTReader::Init()
                 auto const& ch = fMHL[side_i][edge_i][prec_i];
                 if (fFiberNum != ch._MI_len)
                 {
-                    LOG(FATAL) << "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum
-                               << " != MI-len=" << ch._MI_len << ").";
+                    R3BLOG(FATAL, "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum
+                               << " != MI-len=" << ch._MI_len << ").");
                     return kFALSE;
                 }
             }
         }
     }
-    FairRootManager::Instance()->Register(fShortName + "Mapped", "Land", fMappedArray, kTRUE);
+    FairRootManager::Instance()->Register(fShortName + "Mapped", fShortName + " mapped data", fMappedArray, !fOnline);
     return kTRUE;
 }
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
-    //  LOG(WARNING) << "R3BFiberMAPMTReader::Read BEGIN for fib "<<fShortName;
+    R3BLOG(DEBUG, "Read BEGIN for fib "<<fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
@@ -153,4 +154,4 @@ Bool_t R3BFiberMAPMTReader::Read()
 
 void R3BFiberMAPMTReader::Reset() { fMappedArray->Clear(); }
 
-ClassImp(R3BFiberMAPMTReader)
+ClassImp(R3BFiberMAPMTReader);

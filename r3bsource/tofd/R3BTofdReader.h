@@ -12,9 +12,12 @@
  ******************************************************************************/
 
 #ifndef R3BTOFDREADER_H
-#define R3BTOFDREADER_H
+#define R3BTOFDREADER_H 1
 
 #include "R3BReader.h"
+#include <Rtypes.h>
+
+class TClonesArray;
 
 struct EXT_STR_h101_TOFD_t;
 typedef struct EXT_STR_h101_TOFD_t EXT_STR_h101_TOFD;
@@ -24,29 +27,37 @@ class ext_data_struct_info;
 class R3BTofdReader : public R3BReader
 {
   public:
-    R3BTofdReader(EXT_STR_h101_TOFD*, UInt_t);
-    ~R3BTofdReader();
+    // Standard constructor
+    R3BTofdReader(EXT_STR_h101_TOFD*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BTofdReader();
 
-    /** Accessor to select online mode **/
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
+
+    // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    /* Reader specific data structure from ucesb */
+    // Reader specific data structure from ucesb
     EXT_STR_h101_TOFD* fData;
-    /* Data offset */
-    UInt_t fOffset;
+    // Data offset
+    size_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
-    /* the structs of type R3BTofdxMappedItem */
+    // Output array
     TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */
 
   public:
-    ClassDef(R3BTofdReader, 0);
+    ClassDefOverride(R3BTofdReader, 0);
 };
 
-#endif
+#endif /* R3BTOFDREADER_H */

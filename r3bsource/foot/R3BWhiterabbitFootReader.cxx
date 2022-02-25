@@ -82,12 +82,7 @@ Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRFootData", "WRFoot", fArray, !fOnline);
-    fArray->Clear();
-
-    for (uint32_t d = 0; d < NB_FOOT_DETS; d++)
-    {
-        fData->TIMESTAMP_FOOT[d].ID = 0;
-    }
+    Reset();
 
     return kTRUE;
 }

@@ -20,7 +20,7 @@ extern "C"
 #include "ext_h101_fib30.h"
 }
 
-R3BFi30Reader::R3BFi30Reader(EXT_STR_h101_FIBEO* a_data, UInt_t a_offset)
+R3BFi30Reader::R3BFi30Reader(EXT_STR_h101_FIBEO* a_data, size_t a_offset)
     : R3BFiberMAPMTReader("Fi30", a_offset, 512)
     , fData((EXT_STR_h101_FIBEO_onion*)a_data)
 {

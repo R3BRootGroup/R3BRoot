@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BTofdMapped2Cal                -----
+// -----                  R3BTofdMapped2Cal               -----
 // -----          Created Feb 4th 2016 by R.Plag          -----
 // ------------------------------------------------------------
 
@@ -25,21 +25,19 @@
  * detector status during the experiment.
  */
 
-#include <assert.h>
-
-#include "R3BTofdMapped2Cal.h"
-
-#include "TClonesArray.h"
-#include "TMath.h"
-
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTofdCalData.h"
+#include "R3BTofdMapped2Cal.h"
 #include "R3BTofdMappedData.h"
 
-#include "R3BEventHeader.h"
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <assert.h>
 
 #define IS_NAN(x) TMath::IsNaN(x)
 
@@ -49,18 +47,7 @@ namespace
 };
 
 R3BTofdMapped2Cal::R3BTofdMapped2Cal()
-    : FairTask("R3BTofdMapped2Cal", 1)
-    , fMappedItems(nullptr)
-    , fMappedTriggerItems(nullptr)
-    , fCalItems(new TClonesArray("R3BTofdCalData"))
-    , fCalTriggerItems(new TClonesArray("R3BTofdCalData"))
-    , fTcalPar(0)
-    , fNofTcalPars(0)
-    , fNofPlanes(0)
-    , fPaddlesPerPlane(0)
-    , fTrigger(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fCalLookup()
+    : R3BTofdMapped2Cal("R3BTofdMapped2Cal", 1)
 {
 }
 
@@ -77,13 +64,16 @@ R3BTofdMapped2Cal::R3BTofdMapped2Cal(const char* name, Int_t iVerbose)
     , fTrigger(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fCalLookup()
+    , fOnline(kFALSE)
 {
 }
 
 R3BTofdMapped2Cal::~R3BTofdMapped2Cal()
 {
-    delete fCalItems;
-    delete fCalTriggerItems;
+    if (fCalItems)
+        delete fCalItems;
+    if (fCalTriggerItems)
+        delete fCalTriggerItems;
 }
 
 size_t R3BTofdMapped2Cal::GetCalLookupIndex(R3BTofdMappedData const& a_mapped) const
@@ -91,58 +81,74 @@ size_t R3BTofdMapped2Cal::GetCalLookupIndex(R3BTofdMappedData const& a_mapped) c
     size_t i = ((a_mapped.GetDetectorId() - 1) * fPaddlesPerPlane + (a_mapped.GetBarId() - 1)) * 2 +
                (a_mapped.GetSideId() - 1);
 
-    //  cout<<i<<";"<<fCalLookup.size()<<"; "<<a_mapped.GetDetectorId()<<"; "<<a_mapped.GetBarId()<<endl   ;
-
     assert(i < fCalLookup.size());
     return i;
 }
 
+void R3BTofdMapped2Cal::SetParContainers()
+{
+    // Parameter Container
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+
+    fTcalPar = (R3BTCalPar*)rtdb->getContainer("TofdTCalPar");
+    if (!fTcalPar)
+    {
+        R3BLOG(ERROR, "Could not get access to TofdTCalPar-Container.");
+        fNofTcalPars = 0;
+    }
+    return;
+}
+
+void R3BTofdMapped2Cal::SetParameter()
+{
+    //--- Parameter Container ---
+    fNofTcalPars = fTcalPar->GetNumModulePar();
+    R3BLOG_IF(FATAL, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
+    return;
+}
+
 InitStatus R3BTofdMapped2Cal::Init()
 {
-    fNofTcalPars = fTcalPar->GetNumModulePar();
-    if (fNofTcalPars == 0)
+    R3BLOG(INFO, "");
+
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (!mgr)
     {
-        LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar";
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BTofdMapped2Cal::Init : read " << fNofTcalPars << " modules";
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
-
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
-    if (NULL == fMappedItems)
-        LOG(fatal) << "Branch TofdMapped not found";
+    if (!fMappedItems)
+    {
+        R3BLOG(FATAL, "TofdMapped not found");
+        return kFATAL;
+    }
+
     fMappedTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerMapped");
-    if (NULL == fMappedTriggerItems)
-        LOG(fatal) << "Branch TofdTriggerMapped not found";
+    if (!fMappedTriggerItems)
+    {
+        R3BLOG(WARNING, "TofdTriggerMapped not found");
+    }
 
     // request storage of Cal data in output tree
-    mgr->Register("TofdCal", "Land", fCalItems, kTRUE);
-    mgr->Register("TofdTriggerCal", "Land", fCalTriggerItems, kTRUE);
-
-    return kSUCCESS;
-}
-
-// Note that the container may still be empty at this point.
-void R3BTofdMapped2Cal::SetParContainers()
-{
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
-    if (!fTcalPar)
+    mgr->Register("TofdCal", "TofdCal data", fCalItems, !fOnline);
+    if (fMappedTriggerItems)
     {
-        LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
-        fNofTcalPars = 0;
+        mgr->Register("TofdTriggerCal", "TofdTriggerCal data", fCalTriggerItems, !fOnline);
     }
+
+    SetParameter();
+    R3BLOG(INFO, "Read " << fNofTcalPars << " modules");
+    return kSUCCESS;
 }
 
 InitStatus R3BTofdMapped2Cal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -327,8 +333,6 @@ void R3BTofdMapped2Cal::FinishEvent()
     }
 }
 
-void R3BTofdMapped2Cal::FinishTask() {}
-
 void R3BTofdMapped2Cal::SetNofModules(Int_t planes, Int_t ppp)
 {
     fNofPlanes = planes;
@@ -338,4 +342,4 @@ void R3BTofdMapped2Cal::SetNofModules(Int_t planes, Int_t ppp)
     fCalLookup.resize(planes * ppp * 2);
 }
 
-ClassImp(R3BTofdMapped2Cal)
+ClassImp(R3BTofdMapped2Cal);

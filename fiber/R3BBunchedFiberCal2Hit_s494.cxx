@@ -88,8 +88,10 @@ R3BBunchedFiberCal2Hit_s494::R3BBunchedFiberCal2Hit_s494(const char* a_name,
 
 R3BBunchedFiberCal2Hit_s494::~R3BBunchedFiberCal2Hit_s494()
 {
-    delete fHitItems;
-    delete fCalPar;
+    if (fHitItems)
+        delete fHitItems;
+    if (fCalPar)
+        delete fCalPar;
 }
 
 InitStatus R3BBunchedFiberCal2Hit_s494::Init()
@@ -119,7 +121,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
 
     maxevent = mgr->CheckMaxEventNo();
 
-    mgr->Register(fName + "Hit", "Land", fHitItems, kTRUE);
+    mgr->Register(fName + "Hit", fName + " hit data", fHitItems, kTRUE);
     // Resize per-channel info arrays.
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
@@ -594,9 +596,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     //  cout << "save fiber " << fName<< "  "  << fiber_id << " pos " << x << endl;
                     if (!fIsCalibrator)
                     {
-                        new ((*fHitItems)[fNofHitItems++])
-                            // s                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt,
-                            // t_spmt, tot_mapmt, tot_spmt);
+                        new ((*fHitItems)[fHitItems->GetEntriesFast()])
                             R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
 
                         // cout << fName << " x: " << x << " y: " << y << endl;

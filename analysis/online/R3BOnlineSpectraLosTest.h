@@ -9,7 +9,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 4
+#define NB_PSPX 4
 #define N_STRIPS_PSPX 32
 #define N_FIBER_PLOT 1050 // range to plot
 #define NbSections 1
@@ -416,17 +416,17 @@ class R3BOnlineSpectraLosTest : public FairTask
     TH1F* fh_ptof_TotPm1[N_PADDLE_MAX_PTOF];
     TH1F* fh_ptof_TotPm2[N_PADDLE_MAX_PTOF];
 
-    TH1F* fh_pspx_channel_x[N_PSPX];      /**< PSPX x channel profile on mapped level */
-    TH1F* fh_pspx_channel_y[N_PSPX];      /**< PSPX y channel profile on mapped level */
-    TH1F* fh_pspx_multiplicity_x[N_PSPX]; /**< PSPX x multiplicity on mapped level */
-    TH1F* fh_pspx_multiplicity_y[N_PSPX]; /**< PSPX y multiplicity on mapped level */
+    TH1F* fh_pspx_channel_x[NB_PSPX];      /**< PSPX x channel profile on mapped level */
+    TH1F* fh_pspx_channel_y[NB_PSPX];      /**< PSPX y channel profile on mapped level */
+    TH1F* fh_pspx_multiplicity_x[NB_PSPX]; /**< PSPX x multiplicity on mapped level */
+    TH1F* fh_pspx_multiplicity_y[NB_PSPX]; /**< PSPX y multiplicity on mapped level */
 
-    TH2F* fh_pspx_strips_position[N_PSPX];        /**< PSPX 2D position on mapped level */
-    TH2F* fh_pspx_hit_position[(N_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
+    TH2F* fh_pspx_strips_position[NB_PSPX];        /**< PSPX 2D position on mapped level */
+    TH2F* fh_pspx_hit_position[(NB_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
 
-    TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2]; /**< PSPX energy on hit level */
-    TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
-    TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
+    TH1F* fh_pspx_hit_energy[(NB_PSPX + 1) / 2]; /**< PSPX energy on hit level */
+    TH2F* fh_pspx_cal_energy_frontback[NB_PSPX]; /**< PSPX energy front vs back on cal level */
+    TH2F* fh_pspx_hit_multi[(NB_PSPX + 1) / 2];
 
   public:
     ClassDef(R3BOnlineSpectraLosTest, 2)

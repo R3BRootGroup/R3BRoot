@@ -1,14 +1,21 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // ------------------------------------------------------------
 // -----                  R3BOnlineSpectra                -----
 // -----          Created April 13th 2016 by M.Heil       -----
 // -----          Modified 2021 by A.Kelic-Heil           -----
 // ------------------------------------------------------------
-
-/*
- * This task should fill histograms with detector variables which allow
- * to test the detectors online
- *
- */
 
 #include "R3BOnlineSpectraFibvsToFDS494.h"
 
@@ -82,27 +89,9 @@ namespace
 {
     double c_period = 2048 * 5;
 } // namespace
-R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494()
-    : FairTask("OnlineSpectraFibvsToFDS494", 1)
-    , fTrigger(-1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fCuts(0)
-    , fVeto(false)
-    , fwindow_mv(10000)
-    , fxmin(-1000)
-    , fxmax(1000)
-    , ftofminFib2x(T_TOF_MIN)
-    , ftofmaxFib2x(T_TOF_MAX)
-    , ftofminFib3x(T_TOF_MIN)
-    , ftofmaxFib3x(T_TOF_MAX)
-    , ftofminTofi(T_TOF_MIN)
-    , ftofmaxTofi(T_TOF_MAX)
-    , fqtofdmin(0)
-    , fqtofdmax(200)
-    , fNEvents(0)
-    , fMappedItemsCalifa(NULL)
 
+R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494()
+    : R3BOnlineSpectraFibvsToFDS494("OnlineSpectraFibvsToFDS494", 1)
 {
 }
 
@@ -125,7 +114,11 @@ R3BOnlineSpectraFibvsToFDS494::R3BOnlineSpectraFibvsToFDS494(const char* name, I
     , fqtofdmin(0)
     , fqtofdmax(200)
     , fNEvents(0)
+    , header(NULL)
     , fMappedItemsCalifa(NULL)
+    , fMappedItems()
+    , fCalItems()
+    , fHitItems()
 {
 }
 
@@ -168,7 +161,6 @@ R3BOnlineSpectraFibvsToFDS494::~R3BOnlineSpectraFibvsToFDS494()
 
 InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
 {
-
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
@@ -180,17 +172,25 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
+    
+    // Look for the R3BEventHeader
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+    {
+        LOG(WARNING) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. not found";
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(INFO) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. found";
+    
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 
     // Get objects for detectors on all levels
-
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
-    cout << " I HAVE FOUND " << DET_MAX + 1 << " DETECTORS" << endl;
+    LOG(INFO) << " I HAVE FOUND " << DET_MAX + 1 << " DETECTORS";
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
+    
     for (int det = 0; det < DET_MAX; det++)
     {
 
@@ -1933,7 +1933,6 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
 void R3BOnlineSpectraFibvsToFDS494::FinishEvent()
 {
-
     for (Int_t det = 0; det < DET_MAX; det++)
     {
         if (fHitItems.at(det))
@@ -1944,7 +1943,13 @@ void R3BOnlineSpectraFibvsToFDS494::FinishEvent()
         {
             fCalItems.at(det)->Clear();
         }
+        if (fMappedItems.at(det))
+        {
+            fMappedItems.at(det)->Clear();
+        }
     }
+    if (fMappedItemsCalifa)
+        fMappedItemsCalifa->Clear();
 }
 
 void R3BOnlineSpectraFibvsToFDS494::FinishTask()
@@ -2038,4 +2043,4 @@ void R3BOnlineSpectraFibvsToFDS494::FinishTask()
     }
 }
 
-ClassImp(R3BOnlineSpectraFibvsToFDS494)
+ClassImp(R3BOnlineSpectraFibvsToFDS494);

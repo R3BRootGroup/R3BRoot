@@ -133,7 +133,6 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (UInt_t i = 0; i < nHits; i++)
     {
-
         R3BRoluMappedData* hit = (R3BRoluMappedData*)fMapped->At(i);
         if (!hit)
         {

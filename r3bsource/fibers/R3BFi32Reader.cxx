@@ -20,7 +20,7 @@ extern "C"
 #include "ext_h101_fib32.h"
 }
 
-R3BFi32Reader::R3BFi32Reader(EXT_STR_h101_FIBEZ* a_data, UInt_t a_offset)
+R3BFi32Reader::R3BFi32Reader(EXT_STR_h101_FIBEZ* a_data, size_t a_offset)
     : R3BFiberMAPMTReader("Fi32", a_offset, 512)
     , fData((EXT_STR_h101_FIBEZ_onion*)a_data)
 {

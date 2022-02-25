@@ -148,7 +148,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     maxevent = mgr->CheckMaxEventNo();
 
     // TClones branch with Hit items
-    mgr->Register(fName + "Hit", "Land", fHitItems, kTRUE);
+    mgr->Register(fName + "Hit", fName + " hit data", fHitItems, kTRUE);
 
     // Resize per-channel info arrays.
     for (auto side_i = 0; side_i < 2; ++side_i)
@@ -259,7 +259,11 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     return kSUCCESS;
 }
 
-InitStatus R3BFiberMAPMTCal2Hit::ReInit() { return kSUCCESS; }
+InitStatus R3BFiberMAPMTCal2Hit::ReInit()
+{
+    SetParContainers();
+    return kSUCCESS;
+}
 
 void R3BFiberMAPMTCal2Hit::SetParContainers()
 {
@@ -657,4 +661,4 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
     }
 }
 
-ClassImp(R3BFiberMAPMTCal2Hit)
+ClassImp(R3BFiberMAPMTCal2Hit);

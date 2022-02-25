@@ -1063,7 +1063,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
     if (fMappedItems.at(DET_PSPX) || fCalItems.at(DET_PSPX) || fHitItems.at(DET_PSPX))
     {
         TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
-        cPspx_comp->Divide(N_PSPX, 3);
+        cPspx_comp->Divide(NB_PSPX, 3);
 
         Int_t Emax = 1000000;
 
@@ -1071,7 +1071,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
         {
             // LOG(INFO) << "Init MappedPspx";
 
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
                 if (i % 2 == 0)
                 { // even numbers = read out with energy filter
@@ -1150,35 +1150,35 @@ InitStatus R3BOnlineSpectraLosTest::Init()
             }
 
             TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
-            cPspx_strips->Divide(N_PSPX, 2);
+            cPspx_strips->Divide(NB_PSPX, 2);
 
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
                 cPspx_strips->cd(i + 1);
                 fh_pspx_channel_x[i]->Draw();
 
-                cPspx_strips->cd(i + 1 + N_PSPX);
+                cPspx_strips->cd(i + 1 + NB_PSPX);
                 fh_pspx_channel_y[i]->Draw();
             }
 
             run->AddObject(cPspx_strips);
 
             TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
-            cPspx_multiplicity->Divide(N_PSPX, 2);
+            cPspx_multiplicity->Divide(NB_PSPX, 2);
 
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
                 cPspx_multiplicity->cd(i + 1);
                 fh_pspx_multiplicity_x[i]->Draw();
 
-                cPspx_multiplicity->cd(i + 1 + N_PSPX);
+                cPspx_multiplicity->cd(i + 1 + NB_PSPX);
                 fh_pspx_multiplicity_y[i]->Draw();
             }
 
             run->AddObject(cPspx_multiplicity);
 
             // Fill cPspx_comp with Mapped level data
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
                 cPspx_comp->cd(i + 1);
                 fh_pspx_strips_position[i]->Draw("colz");
@@ -1208,7 +1208,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
         {
             UInt_t nbins = 200;
 
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
 
                 if (i % 2 == 0)
@@ -1238,10 +1238,10 @@ InitStatus R3BOnlineSpectraLosTest::Init()
             }
 
             // Fill cPspx_comp with Cal level data
-            for (UInt_t i = 0; i < N_PSPX; i++)
+            for (UInt_t i = 0; i < NB_PSPX; i++)
             {
 
-                cPspx_comp->cd(i + 1 + N_PSPX); // i*2
+                cPspx_comp->cd(i + 1 + NB_PSPX); // i*2
                 fh_pspx_cal_energy_frontback[i]->Draw("colz");
             }
         }
@@ -1251,7 +1251,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
             UInt_t nbins = 100;
             Double_t length = 10; // detector length, range of histogram
 
-            for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
+            for (UInt_t i = 0; i < (NB_PSPX + 1) / 2; i++)
             {
                 fh_pspx_hit_position[i] = new TH2F(Form("pspx_%d_position_cm", i),
                                                    Form("Pspx %d Position;x Position / cm; y Position / cm", i + 1),
@@ -1273,19 +1273,19 @@ InitStatus R3BOnlineSpectraLosTest::Init()
             }
 
             TCanvas* cPspx_hit = new TCanvas("Pspx_hit", "Pspx Hit", 10, 10, 1100, 1000);
-            cPspx_hit->Divide((N_PSPX + 1) / 2, 3);
+            cPspx_hit->Divide((NB_PSPX + 1) / 2, 3);
 
-            for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
+            for (UInt_t i = 0; i < (NB_PSPX + 1) / 2; i++)
             {
                 cPspx_hit->cd(i + 1);
                 gPad->SetLogz();
                 fh_pspx_hit_position[i]->Draw("colz");
 
-                cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2);
+                cPspx_hit->cd(i + 1 + (NB_PSPX + 1) / 2);
                 gPad->SetLogy();
                 fh_pspx_hit_energy[i]->Draw();
 
-                cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2 + 3);
+                cPspx_hit->cd(i + 1 + (NB_PSPX + 1) / 2 + 3);
                 gPad->SetLogz();
                 fh_pspx_hit_multi[i]->Draw("colz");
             }
@@ -1293,9 +1293,9 @@ InitStatus R3BOnlineSpectraLosTest::Init()
             run->AddObject(cPspx_hit);
 
             // Fill cPspx_comp with Hit level data-((channel_y[i][0] + 1) / 2) + 3 * N_STRIPS_PSPX + 1)
-            for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
+            for (UInt_t i = 0; i < (NB_PSPX + 1) / 2; i++)
             {
-                cPspx_comp->cd(i * 2 + 2 * N_PSPX + 1); // supposed to be +2 if
+                cPspx_comp->cd(i * 2 + 2 * NB_PSPX + 1); // supposed to be +2 if
                                                         // energy and position
                                                         // readout is used
                 fh_pspx_hit_position[i]->Draw("colz");
@@ -1408,7 +1408,7 @@ void R3BOnlineSpectraLosTest::Reset_FIBERS_Histo()
 {
     if (fMappedItems.at(DET_PSPX))
     {
-        for (UInt_t i = 0; i < N_PSPX; i++)
+        for (UInt_t i = 0; i < NB_PSPX; i++)
         {
             fh_pspx_channel_x[i]->Reset();
             fh_pspx_channel_y[i]->Reset();
@@ -1419,14 +1419,14 @@ void R3BOnlineSpectraLosTest::Reset_FIBERS_Histo()
     }
     if (fCalItems.at(DET_PSPX))
     {
-        for (UInt_t i = 0; i < N_PSPX; i++)
+        for (UInt_t i = 0; i < NB_PSPX; i++)
         {
             fh_pspx_cal_energy_frontback[i]->Reset();
         }
     }
     if (fHitItems.at(DET_PSPX))
     {
-        for (UInt_t i = 0; i < N_PSPX / 2; i++)
+        for (UInt_t i = 0; i < NB_PSPX / 2; i++)
         {
             fh_pspx_hit_position[i]->Reset();
             fh_pspx_hit_energy[i]->Reset();
@@ -3544,7 +3544,7 @@ void R3BOnlineSpectraLosTest::FinishTask()
     {
         // LOG(INFO) << "Finish MappedPspx";
 
-        for (UInt_t i = 0; i < N_PSPX; i++)
+        for (UInt_t i = 0; i < NB_PSPX; i++)
         {
             fh_pspx_channel_x[i]->Write();
             fh_pspx_channel_y[i]->Write();
@@ -3555,14 +3555,14 @@ void R3BOnlineSpectraLosTest::FinishTask()
     }
     if (fCalItems.at(DET_PSPX))
     {
-        for (UInt_t i = 0; i < N_PSPX; i++)
+        for (UInt_t i = 0; i < NB_PSPX; i++)
         {
             fh_pspx_cal_energy_frontback[i]->Write();
         }
     }
     if (fHitItems.at(DET_PSPX))
     {
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
+        for (UInt_t i = 0; i < (NB_PSPX + 1) / 2; i++)
         {
             fh_pspx_hit_energy[i]->Write();
             fh_pspx_hit_position[i]->Write();

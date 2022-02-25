@@ -10,6 +10,7 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+ 
 // This is generic class for the fibers 30, 31, 32 33 used in s494 experiment
 // modified from  R3BBunchedFiber code
 // Boiler-plate code for bunched fiber detectors with multi-hit electronics on
@@ -37,9 +38,11 @@
 //
 
 #ifndef R3BFIBERMAPMTREADER_H
-#define R3BFIBERMAPMTREADER_H
+#define R3BFIBERMAPMTREADER_H 1
 
 #include "R3BReader.h"
+#include "R3BLogger.h"
+
 #include "TString.h"
 
 class TClonesArray;
@@ -63,7 +66,7 @@ class TClonesArray;
         EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
         if (!ok)                                                                               \
         {                                                                                      \
-            LOG(ERROR) << "Failed to setup UCESB structure information.";                      \
+            R3BLOG(ERROR, "Failed to setup UCESB structure information.");                     \
             return kFALSE;                                                                     \
         }                                                                                      \
         memset(data, 0, sizeof *data);                                                         \
@@ -112,13 +115,19 @@ class R3BFiberMAPMTReader : public R3BReader
         size_t _v_len;
     };
 
-    R3BFiberMAPMTReader(char const*, UInt_t, UInt_t);
+    R3BFiberMAPMTReader(char const*, UInt_t, size_t);
     Bool_t Init();
     Bool_t Read();
     void Reset();
+    
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
 
   protected:
-    UInt_t fOffset;
+    // Data offset
+    size_t fOffset;
+    // Don't store data for online
+    Bool_t fOnline;
     // [0=bottom,1=top,2=MAPMT-trig][0=leading,1=trailing][0=coarse,1=fine].
     UCESBMultiHitLink fMHL[3][2][2];
 

@@ -63,7 +63,9 @@ Bool_t R3BFootReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("FootMappedData", "Foot mapped data", fArray, !fOnline);
-    fArray->Clear();
+
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
@@ -80,17 +82,20 @@ Bool_t R3BFootReader::Read()
             {
                 new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->FOOT[d].E[strip]);
             }
-            if (fNEvent == 0)
-                fNbDet++;
+        }
+        else if (fData->FOOT[d]._ == 0)
+        {
         }
         else
         {
             if (fNEvent > 0)
-                LOG(FATAL) << "\033[5m\033[31m R3BFootReader::Failed number of strips per detector. \033[0m";
+            {
+                R3BLOG(FATAL,
+                       "\033[5m\033[31m Failed number of strips per detector " << fData->FOOT[d]._ << " \033[0m");
+            }
         }
     }
-    if (fNEvent == 0)
-        fNbDet--;
+
     fNEvent += 1;
     return kTRUE;
 }

@@ -118,6 +118,13 @@ InitStatus R3BTwimOnlineSpectra::Init()
         fNbTref = 2;
         fNbTrig = 2;
     }
+    else if (fExpId == 509 || fExpId == 522)
+    {
+        fNbSections = 1;
+        fNbAnodes = 16;
+        fNbTref = 1;
+        fNbTrig = 1;
+    }
     else if (fExpId == 455)
     {
         fNbSections = 4;
@@ -797,7 +804,7 @@ InitStatus R3BTwimOnlineSpectra::Init()
         mapfolTwim->Add(cTwimMap_DeltaTrefTrig[i]);
     for (Int_t i = 0; i < fNbSections; i++)
         mapfolTwim->Add(cTwim_Mult[i]);
-    if (fExpId == 444 || fExpId == 467)
+    if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
     {
         mapfolTwim->Add(cTwimMap_ESum);
         mapfolTwim->Add(cTwimMap_ESum1);
@@ -826,7 +833,7 @@ InitStatus R3BTwimOnlineSpectra::Init()
     TFolder* hitfolTwim = new TFolder("Hit", "Hit TWIM info");
 
     // Hit data --------------------------------------------------
-    if (fHitItemsTwim && (fExpId == 444 || fExpId == 467))
+    if (fHitItemsTwim && (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522))
     {
         hitfolTwim->Add(cTwim_Z);
         hitfolTwim->Add(cTwim_theta);
@@ -864,7 +871,7 @@ InitStatus R3BTwimOnlineSpectra::Init()
 
 void R3BTwimOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO,"Reset_Histo");
+    R3BLOG(INFO, "Reset_Histo");
     // Map data
     for (Int_t i = 0; i < fNbSections; i++)
     {
@@ -901,7 +908,7 @@ void R3BTwimOnlineSpectra::Reset_Histo()
     }
 
     // Hit data
-    if (fHitItemsTwim && (fExpId == 444 || fExpId == 467))
+    if (fHitItemsTwim && (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522))
     {
         fh1_Twimhit_z->Reset();
         fh1_Twimhit_theta->Reset();
@@ -936,17 +943,18 @@ void R3BTwimOnlineSpectra::Reset_Histo()
 
 void R3BTwimOnlineSpectra::Exec(Option_t* option)
 {
-    if (fExpId == 444 || fExpId == 467)
+    if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
+    {
         s444_s467();
+    }
     else if (fExpId == 455)
+    {
         s455();
+    }
 }
 
 void R3BTwimOnlineSpectra::s455()
 {
-    FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
-
     // Fill mapped data
     if (fMappedItemsTwim && fMappedItemsTwim->GetEntriesFast() > 0)
     {
@@ -1152,9 +1160,6 @@ void R3BTwimOnlineSpectra::s455()
 
 void R3BTwimOnlineSpectra::s444_s467()
 {
-    FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
-
     // Fill mapped data
     if (fMappedItemsTwim && fMappedItemsTwim->GetEntriesFast() > 0)
     {
@@ -1259,7 +1264,7 @@ void R3BTwimOnlineSpectra::s444_s467()
         }
     }
 
-    Double_t mwpc3x = -500;
+    Double_t mwpc3x = -1500;
     // Fill MWPC3 Hit data
     if (fHitItemsMwpc3 && fHitItemsMwpc3->GetEntriesFast() > 0)
     {
@@ -1274,7 +1279,7 @@ void R3BTwimOnlineSpectra::s444_s467()
     }
 
     // Fill hit data
-    if (fHitItemsTwim && fHitItemsTwim->GetEntriesFast() > 0)
+    if (fHitItemsTwim && fHitItemsTwim->GetEntriesFast() > 0 && mwpc3x > -1500)
     {
         Int_t nHits = fHitItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
@@ -1349,7 +1354,7 @@ void R3BTwimOnlineSpectra::FinishTask()
     }
     if (fHitItemsTwim)
     {
-        if (fExpId == 444 || fExpId == 467)
+        if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
         {
             fh1_Twimhit_z->Write();
             fh1_Twimhit_theta->Write();

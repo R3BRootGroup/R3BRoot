@@ -79,10 +79,8 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
     FairRootManager::Instance()->Register("Mwpc2MappedData", "MWPC2", fArrayMwpc2, !fOnline);
     FairRootManager::Instance()->Register("Mwpc3MappedData", "MWPC3", fArrayMwpc3, !fOnline);
 
-    fArrayMwpc0->Clear();
-    fArrayMwpc1->Clear();
-    fArrayMwpc2->Clear();
-    fArrayMwpc3->Clear();
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.

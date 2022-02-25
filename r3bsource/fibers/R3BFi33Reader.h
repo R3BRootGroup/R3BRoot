@@ -22,7 +22,7 @@ typedef struct EXT_STR_h101_FIBEE_onion_t EXT_STR_h101_FIBEE_onion;
 class R3BFi33Reader : public R3BFiberMAPMTReader
 {
   public:
-    R3BFi33Reader(EXT_STR_h101_FIBEE*, UInt_t);
+    R3BFi33Reader(EXT_STR_h101_FIBEE*, size_t);
     Bool_t Init(ext_data_struct_info*);
 
   private:

@@ -121,9 +121,6 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
 
-    /** Virtual method Finish **/
-    // virtual void Finish();
-
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
 

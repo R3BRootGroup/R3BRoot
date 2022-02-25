@@ -12,11 +12,13 @@
  ******************************************************************************/
 
 #ifndef R3BTCALCONTFACT_H
-#define R3BTCALCONTFACT_H
+#define R3BTCALCONTFACT_H 1
 
 #include "FairContFact.h"
 
 #include "Rtypes.h"
+#include "TString.h"
+#include <vector>
 
 class FairParSet;
 
@@ -50,10 +52,34 @@ class R3BTCalContFact : public FairContFact
     FairParSet* createContainer(FairContainer* c);
 
   private:
+    std::vector<const char*> containerNames;
     /**
      * Method to add a standard container
      */
     void addContainer(TString, TString);
+
+    /**
+     * Method to add a Fiber detector to the container
+     */
+#define ADD_FIBER(Name, NAME)                                                                       \
+    do                                                                                              \
+    {                                                                                               \
+        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");             \
+        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");               \
+        addContainer(#Name "MAPMTTrigTCalPar", #NAME " MAPMT Trigger TCAL Calibration Parameters"); \
+    } while (0)
+
+    /**
+     * Method to push a Fiber detector to the container
+     */
+#define PUSH_FIBER(Name)                                    \
+    do                                                      \
+    {                                                       \
+        containerNames.push_back(#Name "MAPMTTCalPar");     \
+        containerNames.push_back(#Name "SPMTTCalPar");      \
+        containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
+    } while (0)
+
     /**
      * Method to specify a list of parameter containers managed by this factory.
      * Support for additional detrectors has to be implemented in this function.
