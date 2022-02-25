@@ -131,7 +131,14 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+    {
+        LOG(WARNING) << "R3BOnlineSpectraFiber_s494::Init() EventHeader. not found";
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(INFO) << "R3BOnlineSpectraFiber_s494::Init() EventHeader. found";
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
@@ -942,4 +949,4 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
     }
 }
 
-ClassImp(R3BOnlineSpectraFiber_s494)
+ClassImp(R3BOnlineSpectraFiber_s494);

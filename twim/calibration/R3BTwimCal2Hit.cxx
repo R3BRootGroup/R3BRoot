@@ -201,8 +201,10 @@ void R3BTwimCal2Hit::Exec(Option_t* option)
 {
     // At the moment we will use the expid to select the reconstruction
     // this should be changed in the future because expid is not necessary
-    if (fExpId == 467 || fExpId == 444)
+    if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
+    {
         S467();
+    }
     else if (fExpId == 455)
     {
         S455();

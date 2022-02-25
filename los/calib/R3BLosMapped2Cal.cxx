@@ -28,6 +28,7 @@
 
 #include "R3BLosMapped2Cal.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
@@ -73,7 +74,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BLosMapped2Cal::~R3BLosMapped2Cal()
 {
-    LOG(DEBUG) << "R3BLosMapped2Cal::Destructor";
+    R3BLOG(DEBUG1, "Destructor");
     if (fCalItems)
         delete fCalItems;
     if (fCalTriggerItems)
@@ -82,12 +83,13 @@ R3BLosMapped2Cal::~R3BLosMapped2Cal()
 
 InitStatus R3BLosMapped2Cal::Init()
 {
+    R3BLOG(INFO, "");
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(FATAL) << "FairRootManager not found";
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -99,14 +101,13 @@ InitStatus R3BLosMapped2Cal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
     if (NULL == fMappedItems)
     {
-        LOG(FATAL) << "Branch LosMapped not found";
+        R3BLOG(FATAL, "LosMapped not found");
         return kFATAL;
     }
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerMapped");
-    if (!fMappedTriggerItems)
-        LOG(WARNING) << "LosTriggerMapped not found";
+    R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     // Request storage of Cal data in output tree
     mgr->Register("LosCal", "LosCal data", fCalItems, !fOnline);
@@ -127,7 +128,7 @@ void R3BLosMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-        LOG(FATAL) << "Could not get access to LosTCalPar-Container.";
+        R3BLOG(FATAL, "Could not get access to LosTCalPar-Container.");
         fNofTcalPars = 0;
         return;
     }
@@ -179,13 +180,13 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(INFO) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << iDet;
+            R3BLOG(WARNING, "Detector number out of range: " << iDet);
             continue;
         }
 
         if (hit->GetTimeCoarse() > 8192)
         {
-            LOG(WARNING) << "R3BLosMapped2Cal::Exec : coarse counter > 8192: " << iDet;
+            R3BLOG(WARNING, "Coarse counter > 8192: " << iDet);
             continue;
         }
 
@@ -198,8 +199,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
             if (!par)
             {
-                LOG(INFO) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
-                          << ", Type: " << iType;
+                R3BLOG(WARNING,
+                       "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
                 continue;
             }
 
@@ -210,9 +211,10 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
             {
 
-                LOG(INFO) << "R3BLosMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
-                          << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
-                          << ", time in ns = " << times_raw_ns;
+                R3BLOG(WARNING,
+                       "Bad time in ns: det= " << iDet << ", ch= " << iCha << ", type= " << iType
+                                               << ", time in channels = " << hit->GetTimeFine()
+                                               << ", time in ns = " << times_raw_ns);
                 continue;
             }
 
@@ -442,6 +444,32 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         // skip_event_pileup:
         //   LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
         //              << " iCal: " << iCal << " Skip event because of pileup.";
+    }
+
+    // Calibrate trigger channels -----------------------------------------------
+    if (fMappedTriggerItems)
+    {
+        auto mapped_num = fMappedTriggerItems->GetEntriesFast();
+        for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+        {
+            auto mapped = (R3BLosMappedData const*)fMappedTriggerItems->At(mapped_i);
+
+            // Tcal parameters.
+            auto* par = fTcalPar->GetModuleParAt(3, 1, 1);
+            if (!par)
+            {
+                R3BLOG(WARNING, "Trigger Tcal par not found.");
+                continue;
+            }
+
+            // Convert TDC to [ns] ...
+            Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
+            // ... and subtract it from the next clock cycle.
+            time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
+
+            auto cal = new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()]) R3BLosCalData(3);
+            cal->fTimeL_ns[0] = time_ns;
+        }
     }
 
     ++fNEvent;

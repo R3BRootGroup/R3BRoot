@@ -61,7 +61,9 @@ Bool_t R3BTwimReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("TwimMappedData", "MappedTwim", fArray, !fOnline);
-    fArray->Clear();
+
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.

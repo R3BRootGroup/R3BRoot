@@ -11,28 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-/////////////////////////////////////////////////////////////
-//
-//  R3BTCalContFact
-//
-//  Factory for the parameter containers
-//
-/////////////////////////////////////////////////////////////
+#include "FairParSet.h"
+#include "FairRuntimeDb.h"
+
+#include "R3BLogger.h"
 #include "R3BTCalContFact.h"
+#include "R3BTCalPar.h"
 
-#include "FairLogger.h"
-#include "FairParSet.h"    // for FairParSet
-#include "FairRuntimeDb.h" // for FairRuntimeDb
-#include "R3BTCalPar.h"    // for R3BLandGeometryPar
-
-#include "TList.h"   // for TList
-#include "TString.h" // for TString
-
-#include <string.h> // for strcmp, NULL
-
-using namespace std;
-
-ClassImp(R3BTCalContFact);
+#include "TList.h"
+#include <string.h>
 
 static R3BTCalContFact gR3BTCalContFact;
 
@@ -66,13 +53,9 @@ void R3BTCalContFact::setAllContainers()
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
     addContainer("BunchedFiberSPMTTrigTCalPar", "Bunched Fiber SPMT Trigger TCAL Calibration Parameters");
     addContainer("SfibTCalPar", "Sfib TCAL Calibration Parameters");
-#define ADD_FIBER(Name, NAME)                                                                       \
-    do                                                                                              \
-    {                                                                                               \
-        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");             \
-        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");               \
-        addContainer(#Name "MAPMTTrigTCalPar", #NAME " MAPMT Trigger TCAL Calibration Parameters"); \
-    } while (0)
+    addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
+    addContainer("Sci2TCalPar", "S2 TCAL Calibration Parameters");
+    addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
     ADD_FIBER(Fi0, FI0);
     ADD_FIBER(Fi1a, FI1a);
     ADD_FIBER(Fi1b, FI1b);
@@ -90,9 +73,10 @@ void R3BTCalContFact::setAllContainers()
     ADD_FIBER(Fi11, FI11);
     ADD_FIBER(Fi12, FI12);
     ADD_FIBER(Fi13, FI13);
-    addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
-    addContainer("Sci2TCalPar", "S2 TCAL Calibration Parameters");
-    addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
+    ADD_FIBER(Fi30, FI30);
+    ADD_FIBER(Fi31, FI31);
+    ADD_FIBER(Fi32, FI32);
+    ADD_FIBER(Fi33, FI33);
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
@@ -102,9 +86,8 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BTCalContFact::createContainer : " << name;
+    R3BLOG(INFO, name);
 
-    vector<const char*> containerNames;
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
     containerNames.push_back("RoluTCalPar");
@@ -115,13 +98,9 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("StrawtubesTCalPar");
     containerNames.push_back("BunchedFiberSPMTTrigTCalPar");
     containerNames.push_back("SfibTCalPar");
-#define PUSH_FIBER(Name)                                    \
-    do                                                      \
-    {                                                       \
-        containerNames.push_back(#Name "MAPMTTCalPar");     \
-        containerNames.push_back(#Name "SPMTTCalPar");      \
-        containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
-    } while (0)
+    containerNames.push_back("PtofTCalPar");
+    containerNames.push_back("Sci2TCalPar");
+    containerNames.push_back("Sci8TCalPar");
     PUSH_FIBER(Fi0);
     PUSH_FIBER(Fi1a);
     PUSH_FIBER(Fi1b);
@@ -139,26 +118,30 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     PUSH_FIBER(Fi11);
     PUSH_FIBER(Fi12);
     PUSH_FIBER(Fi13);
-    containerNames.push_back("PtofTCalPar");
-    containerNames.push_back("Sci2TCalPar");
-    containerNames.push_back("Sci8TCalPar");
+    PUSH_FIBER(Fi30);
+    PUSH_FIBER(Fi31);
+    PUSH_FIBER(Fi32);
+    PUSH_FIBER(Fi33);
 
-    bool found = false;
+    // bool found = false;
     for (auto containerName : containerNames)
     {
         if (strncmp(name, containerName, strlen(containerName)) == 0)
         {
-            found = true;
-            break;
+            // found = true;
+            // break;
+            return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
         }
     }
 
-    if (found == true)
-    {
-        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else
-    {
-        return nullptr;
-    }
+    /* if (found == true)
+     {
+         return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+     }
+     else
+     {*/
+    return nullptr;
+    // }
 }
+
+ClassImp(R3BTCalContFact);

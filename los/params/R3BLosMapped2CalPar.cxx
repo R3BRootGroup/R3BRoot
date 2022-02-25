@@ -36,6 +36,7 @@
 
 #include "R3BLosMapped2CalPar.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
@@ -57,7 +58,12 @@
 using namespace std;
 
 R3BLosMapped2CalPar::R3BLosMapped2CalPar()
-    : FairTask("R3BLosMapped2CalPar", 1)
+    : R3BLosMapped2CalPar("R3BLosMapped2CalPar", 1)
+{
+}
+
+R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
+    : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -69,21 +75,9 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar()
 {
 }
 
-R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
-    , fUpdateRate(1000000)
-    , fMinStats(100000)
-    , fTrigger(1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
-    , fNofTypes(0)
-    , fNEvents(0)
-    , fCal_Par(NULL)
-{
-}
-
 R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 {
+    R3BLOG(DEBUG1, "Destructor");
     if (fCal_Par)
     {
         delete fCal_Par;
@@ -96,7 +90,7 @@ R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 
 InitStatus R3BLosMapped2CalPar::Init()
 {
-
+    R3BLOG(INFO, "");
     for (UInt_t i = 0; i < 16; i++)
     {
         for (UInt_t k = 0; k < 3; k++)
@@ -107,22 +101,30 @@ InitStatus R3BLosMapped2CalPar::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
     // may be = NULL!
+    if (!header)
+    {
+        R3BLOG(WARNING, "EventHeader. not found");
+        header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    }
+    else
+        R3BLOG(INFO, "EventHeader. found");
 
     fMapped = (TClonesArray*)rm->GetObject("LosMapped");
     if (!fMapped)
     {
+        R3BLOG(FATAL, "LosMapped not found");
         return kFATAL;
     }
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     fCal_Par->setChanged();
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
-    //    fEngine = new R3BTCalEngine(fCal_Par, fNofModules, fMinStats);
 
     return kSUCCESS;
 }
@@ -135,8 +137,6 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
 
     UInt_t nHits = fMapped->GetEntries();
 
-    // cout<<"Mapped2CalPar: "<<nHits<<endl;
-
     // Loop over mapped hits
     for (UInt_t i = 0; i < nHits; i++)
     {
@@ -144,7 +144,6 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         R3BLosMappedData* hit = (R3BLosMappedData*)fMapped->At(i);
         if (!hit)
         {
-            // cout<<"Mapped2CalPar no hit"<<endl;
             continue; // should not happen
         }
 
@@ -158,36 +157,26 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         {
             if (iDetector > (fNofDetectors - 1))
             {
-                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
-                           << " allowed are 1.." << fNofDetectors;
+                R3BLOG(ERROR,
+                       "More detectors than expected! Det: " << (iDetector + 1) << " allowed are 1.." << fNofDetectors);
                 continue;
             }
             if (iChannel > (fNofChannels - 1))
             {
-                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
-                           << " allowed are 1.." << fNofChannels;
+                R3BLOG(
+                    ERROR,
+                    "More channels than expected! Channel: " << (iChannel + 1) << " allowed are 1.." << fNofChannels);
                 continue;
             }
 
             if (iType > 3)
             {
-                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
-                           << " allowed are 0..3";
+                R3BLOG(ERROR, "More time-types than expected! Type: " << iType << " allowed are 0..3");
                 continue;
             }
 
-            // Fill TAC histogram for VFTX and TAMEX
-            // fEngine->Fill(iModule, hit->GetTimeFine());
-            // void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc); see R3BRoot/tcal/R3BTcalEngine.h
-            // *** new ***
-
-            //     if(isnan(hit->GetTimeFine())) cout << "Fine Time = nan" <<endl;
-
-            //  if(hit->GetTimeFine() <= 0) cout<<"time<=0 for"<< iChannel<<", "<<iType<<endl;
-
             Icount[iChannel][iType]++;
 
-            // cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;
             fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
         }
     }
@@ -195,8 +184,6 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
     // Increment events
     fNEvents += 1;
 }
-
-void R3BLosMapped2CalPar::FinishEvent() {}
 
 void R3BLosMapped2CalPar::FinishTask()
 {
@@ -211,11 +198,12 @@ void R3BLosMapped2CalPar::FinishTask()
         for (Int_t k = 0; k < 3; k++)
         {
             if (Icount[i][k] > 0)
-                cout << "R3BLosMapped2CalPar::FinishTask  Channel: " << i << ", Type: " << k
-                     << ", Count: " << Icount[i][k] << endl;
+            {
+                R3BLOG(INFO, "Channel: " << i << ", Type: " << k << ", Count: " << Icount[i][k]);
+            }
         }
     }
     //    }
 }
 
-ClassImp(R3BLosMapped2CalPar)
+ClassImp(R3BLosMapped2CalPar);

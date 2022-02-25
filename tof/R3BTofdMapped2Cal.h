@@ -95,12 +95,6 @@ class R3BTofdMapped2Cal : public FairTask
     void FinishEvent();
 
     /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    void FinishTask();
-
-    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
@@ -113,7 +107,11 @@ class R3BTofdMapped2Cal : public FairTask
      */
     void SetNofModules(Int_t, Int_t);
 
+    // Method to setup online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
+    void SetParameter();
     size_t GetCalLookupIndex(R3BTofdMappedData const&) const;
 
     TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
@@ -131,6 +129,7 @@ class R3BTofdMapped2Cal : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
+    Bool_t fOnline;         // Don't store data for online
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BTofdCalData*>> fCalLookup;

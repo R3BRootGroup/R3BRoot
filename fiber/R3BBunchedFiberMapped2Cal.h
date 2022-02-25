@@ -12,17 +12,20 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                R3BBunchedFiberMapped2Cal                -----
+// -----              R3BBunchedFiberMapped2Cal           -----
 // -----            Created Jan 13th 2018 by M.Heil       -----
 // ----- Convert mapped data to time calibrated data      -----
 // ------------------------------------------------------------
 
 #ifndef R3BBUNCHEDFIBERMAPPED2CAL
-#define R3BBUNCHEDFIBERMAPPED2CAL
+#define R3BBUNCHEDFIBERMAPPED2CAL 1
 
 #include "FairTask.h"
+#include "Rtypes.h"
 #include <R3BTCalEngine.h>
+#include <string.h>
 
+class TClonesArray;
 class R3BTCalPar;
 
 /**
@@ -100,7 +103,12 @@ class R3BBunchedFiberMapped2Cal : public FairTask
      */
     virtual void FinishEvent();
 
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
+    // Selector for online data storage
+    Bool_t fOnline;
     enum Electronics fSPMTElectronics;
     enum R3BTCalEngine::CTDCVariant fCTDCVariant;
     TString fName;

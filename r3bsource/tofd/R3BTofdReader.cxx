@@ -11,10 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTofdReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
+#include "R3BLogger.h"
 #include "R3BTofdMappedData.h"
+#include "R3BTofdReader.h"
+
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
 
@@ -27,7 +30,7 @@ extern "C"
 //#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
 #define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
-R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
+R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, size_t offset)
     : R3BReader("R3BTofdReader")
     , fData(data)
     , fOffset(offset)
@@ -52,27 +55,17 @@ R3BTofdReader::~R3BTofdReader()
 Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTofdReader::Init";
+    R3BLOG(INFO, "");
     EXT_STR_h101_TOFD_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TOFD, 0);
-
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Register output array in tree
-    if (!fOnline)
-    {
-        FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, kTRUE);
-        FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, kTRUE);
-    }
-    else
-    {
-        FairRootManager::Instance()->Register("TofdMapped", "Tofd", fArray, kFALSE);
-        FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd", fArrayTrigger, kFALSE);
-    }
+    FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, !fOnline);
+    FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, !fOnline);
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
@@ -186,4 +179,4 @@ void R3BTofdReader::Reset()
     fArrayTrigger->Clear();
 }
 
-ClassImp(R3BTofdReader)
+ClassImp(R3BTofdReader);

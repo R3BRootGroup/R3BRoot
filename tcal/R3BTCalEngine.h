@@ -42,18 +42,19 @@ class R3BTCalEngine : public TObject
 {
   public:
     // CTDC variants.
-    enum CTDCVariant {
-	  // To make sure the user doesn't just put a 0...
-	  CTDC_INVALID = 0,
-	  // 8..12 bins for fine time.
-	  // Fine time forwards from last cycle.
-	  // 250 Mhz.
-	  CTDC_8_12_FWD_250,
-	  // 16 bins for fine time.
-	  // Fine time backwards from last cycle.
-	  // 150 Mhz.
-	  CTDC_16_BWD_150
-	};
+    enum CTDCVariant
+    {
+        // To make sure the user doesn't just put a 0...
+        CTDC_INVALID = 0,
+        // 8..12 bins for fine time.
+        // Fine time forwards from last cycle.
+        // 250 Mhz.
+        CTDC_8_12_FWD_250,
+        // 16 bins for fine time.
+        // Fine time backwards from last cycle.
+        // 150 Mhz.
+        CTDC_16_BWD_150
+    };
 
     /**
      * Standard constructor.

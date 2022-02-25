@@ -98,7 +98,15 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+    {
+        LOG(WARNING) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. not found";
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(INFO) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. found";
+    
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 

@@ -72,15 +72,15 @@ InitStatus R3BAlpideMapped2Cal::Init()
 {
     R3BLOG(INFO, "");
 
-    FairRootManager* rmg = FairRootManager::Instance();
-    if (!rmg)
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (!mgr)
     {
         R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
     // INPUT DATA
-    fAlpideMappedData = (TClonesArray*)rmg->GetObject("AlpideMappedData");
+    fAlpideMappedData = (TClonesArray*)mgr->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
         R3BLOG(FATAL, "AlpideMappedData not found");
@@ -89,7 +89,7 @@ InitStatus R3BAlpideMapped2Cal::Init()
 
     // OUTPUT DATA
     fAlpideCalData = new TClonesArray("R3BAlpideCalData");
-    rmg->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
+    mgr->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
 
     SetParameter();
     return kSUCCESS;

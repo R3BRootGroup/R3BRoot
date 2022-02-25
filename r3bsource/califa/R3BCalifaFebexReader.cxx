@@ -16,6 +16,8 @@
 
 #include "R3BCalifaFebexReader.h"
 #include "R3BCalifaMappedData.h"
+#include "R3BLogger.h"
+
 #include "TClonesArray.h"
 
 /**
@@ -48,25 +50,26 @@ R3BCalifaFebexReader::~R3BCalifaFebexReader()
 Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BCalifaFebexReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 1);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BCalifaFebexReader::Failed to setup structure information.";
-        // LOG(ERROR) << "sizeof=" << sizeof(EXT_STR_h101_CALIFA);
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, !fOnline);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
 
 Bool_t R3BCalifaFebexReader::Read()
 {
-    LOG(DEBUG) << "R3BCalifaFebexReader::Read() Event data.";
+    R3BLOG(DEBUG1, "Event data.");
 
     // SELECT THE FOR LOOP BASED ON THE MAPPING...
     for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal)
