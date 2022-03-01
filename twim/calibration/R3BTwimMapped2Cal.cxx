@@ -244,15 +244,21 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                             // anode 17 and 18 : reference time --> will be changed to 17 only when the full Twin-MUSIC
                             // will be cabled anode 19 and 20 : trigger time   --> will be changed to 18 only when the
                             // full Twin-MUSIC will be cabled
-                            if (i < 8)
+                            if (i < 8) // Check if fNumAnodes+1 and +2 values
                             {
                                 if (fE[s][k][i] > 0.)
-                                    AddCalData(s, i, a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]), fE[s][k][i]);
+                                    AddCalData(s + 1,
+                                               i + 1,
+                                               a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes + 1]),
+                                               fE[s][k][i]);
                             }
                             else
                             {
                                 if (fE[s][k][i] > 0.)
-                                    AddCalData(s, i, a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes + 1]), fE[s][k][i]);
+                                    AddCalData(s + 1,
+                                               i + 1,
+                                               a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes + 2]),
+                                               fE[s][k][i]);
                             }
                         }
                         else if (fExpId == 455)
