@@ -416,10 +416,11 @@ void R3BTwimCal2Hit::S467()
         dt[secId][anodeId] = CalDat[i]->GetDTime();
     }
 
-    Double_t nba = 0, theta = -5000., Esum = 0.;
     // calculate truncated dE from 16 anodes, Twim-MUSIC
     for (Int_t i = 0; i < fNumSec; i++)
     {
+        Double_t nba = 0, theta = -5000., Esum = 0.;
+        Double_t zhit = 0;
         fNumAnodesAngleFit = 0;
         for (Int_t j = 0; j < fNumAnodes; j++)
         {
@@ -448,7 +449,7 @@ void R3BTwimCal2Hit::S467()
                 TVectorD c_svd_r = svd.Solve(dt_r, ok);
                 theta = c_svd_r[1];
             }
-            Double_t zhit =
+            zhit =
                 fZ0[i] + fZ1[i] * TMath::Sqrt(Esum / nba) + fZ2[i] * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
             if (zhit > 0 && theta > -5000.)
                 AddHitData(i + 1, theta, zhit, good_dt[7], Esum / nba);
