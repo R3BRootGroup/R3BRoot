@@ -14,6 +14,7 @@
 #include "R3BLosProvideTStart.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
@@ -35,7 +36,8 @@ InitStatus R3BLosProvideTStart::Init()
     fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
     if (fEventHeader == nullptr)
     {
-        throw std::runtime_error("R3BLosProvideTStart: No R3BEventHeader");
+        fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
 
     return kSUCCESS;
@@ -55,4 +57,4 @@ Double_t R3BLosProvideTStart::GetTStart() const
 
 bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart()); }
 
-ClassImp(R3BLosProvideTStart)
+ClassImp(R3BLosProvideTStart);
