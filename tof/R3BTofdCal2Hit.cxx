@@ -18,6 +18,7 @@
 
 #include "R3BTofdCal2Hit.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
 #include "R3BTCalEngine.h"
@@ -51,79 +52,8 @@ namespace
 } // namespace
 
 R3BTofdCal2Hit::R3BTofdCal2Hit()
-    : FairTask("TofdCal2Hit", 1)
-    , fCalItems(NULL)
-    , fCalItemsLos(NULL)
-    , fHitItemsLos(NULL)
-    , fHitItems(new TClonesArray("R3BTofdHitData"))
-    , fNofHitItems(0)
-    , fNofHitPars(0)
-    , fHitPar(NULL)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fNofPlanes(5)
-    , fPaddlesPerPlane(6)
-    , fTofdQ(1)
-    , fTofdHisto(true)
-    , fTofdTotPos(true)
-    , fnEvents(0)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , maxevent(0)
-    , countloshit(0)
-    , wrongtrigger(0)
-    , wrongtpat(0)
-    , headertpat(0)
-    , events_in_cal_level(0)
-    , inbarcoincidence(0)
-    , countreset(0)
-    , hitsbeforereset(0)
-    , eventstore(0)
-    , incoincidence(0)
-    , inaverage12(0)
-    , inaverage34(0)
-    , singlehit(0)
-    , multihit(0)
-    , bars_with_multihit(0)
-    , events_wo_tofd_hits(0)
+    : R3BTofdCal2Hit("R3BTofdCal2Hit", 1)
 {
-    fhLosXYP = NULL;
-    fhChargeLosTofD = NULL;
-    fh_los_pos = NULL;
-    if (fTofdHisto)
-    {
-        fhxy12 = NULL;
-        fhxy12tot = NULL;
-        fhxy34 = NULL;
-        fhxy34tot = NULL;
-        fhCharge = NULL;
-        fhAverageCharge = NULL;
-        //    fhChargevsTof = NULL;
-        //    fhChargevsPos = NULL;
-        //    fhQp12 = NULL;
-        //    fhQp34 = NULL;
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
-        {
-            fhQ[i] = NULL;
-            fhxy[i] = NULL;
-            fhQvsEvent[i] = NULL;
-            fhQM[i] = NULL;
-            fhMvsQ[i] = NULL;
-            fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                fhTdiffvsQ[i][2 * j] = NULL;
-                fhTdiffvsQ[i][2 * j + 1] = NULL;
-                fhQvsQ[i][2 * j] = NULL;
-                fhQvsQ[i][2 * j + 1] = NULL;
-                fhQvsTof[i][j] = NULL;
-                fhTvsTof[i][j] = NULL;
-                fhToTvsTofw[i][j] = NULL;
-            }
-        }
-    }
 }
 
 R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
@@ -173,10 +103,6 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
         fhxy34tot = NULL;
         fhCharge = NULL;
         fhAverageCharge = NULL;
-        //    fhChargevsTof = NULL;
-        //    fhChargevsPos = NULL;
-        //    fhQp12 = NULL;
-        //    fhQp34 = NULL;
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
@@ -185,8 +111,6 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
             fhQM[i] = NULL;
             fhMvsQ[i] = NULL;
             fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
@@ -222,10 +146,6 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
             delete fhxy34tot;
         if (fhAverageCharge)
             delete fhAverageCharge;
-        //    if (fhChargevsTof) delete  fhChargevsTof;
-        //    if (fhChargevsPos) delete  fhChargevsPos;
-        //    if (fhQp12) delete fhQp12;
-        //    if (fhQp34) delete fhQp34;
         if (fhCharge)
             delete fhCharge;
         for (Int_t i = 0; i < fNofPlanes; i++)
@@ -242,8 +162,6 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
                 delete fhMvsQ[i];
             if (fhTdiff[i])
                 delete fhTdiff[i];
-            // if (fhTsync[i]) delete fhTsync[i];
-            // if (fhTof[i]) delete fhTof[i];
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
@@ -289,9 +207,15 @@ InitStatus R3BTofdCal2Hit::Init()
     }
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (header == nullptr)
+    {
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+    }
+
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
@@ -302,8 +226,10 @@ InitStatus R3BTofdCal2Hit::Init()
     fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
     if (NULL == fHitItemsLos)
         LOG(WARNING) << "Branch LosHit not found";
+
     // request storage of Hit data in output tree
-    mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
+    mgr->Register("TofdHit", "Tofd hit data", fHitItems, kTRUE);
+
     return kSUCCESS;
 }
 

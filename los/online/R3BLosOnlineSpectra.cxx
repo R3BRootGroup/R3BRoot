@@ -12,22 +12,16 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BOnlineSpectra                -----
+// -----                R3BLosOnlineSpectra               -----
 // -----          Created April 13th 2016 by M.Heil       -----
 // ------------------------------------------------------------
 
-/*
- * This task should fill histograms with detector variables which allow
- * to test the detectors online
- *
- */
-
-#include "R3BOnlineSpectraLosStandalone.h"
+#include "R3BLosOnlineSpectra.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
+#include "R3BLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BSamplerMappedData.h"
 #include "R3BTCalEngine.h"
 
 #include "FairLogger.h"
@@ -47,25 +41,16 @@
 #include <TRandomGen.h>
 #include <algorithm>
 #include <array>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <vector>
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
-R3BOnlineSpectraLosStandalone::R3BOnlineSpectraLosStandalone()
-    : FairTask("OnlineSpectraLosStandalone", 1)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvents(0)
+R3BLosOnlineSpectra::R3BLosOnlineSpectra()
+    : R3BLosOnlineSpectra("LosOnlineSpectra", 1)
 {
 }
 
-R3BOnlineSpectraLosStandalone::R3BOnlineSpectraLosStandalone(const char* name, Int_t iVerbose)
+R3BLosOnlineSpectra::R3BLosOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
     , fTpat(-1)
@@ -74,7 +59,7 @@ R3BOnlineSpectraLosStandalone::R3BOnlineSpectraLosStandalone(const char* name, I
 {
 }
 
-R3BOnlineSpectraLosStandalone::~R3BOnlineSpectraLosStandalone()
+R3BLosOnlineSpectra::~R3BLosOnlineSpectra()
 {
     for (Int_t i = 0; i < fMappedItems.size(); i++)
         delete fMappedItems[i];
@@ -83,20 +68,19 @@ R3BOnlineSpectraLosStandalone::~R3BOnlineSpectraLosStandalone()
         delete fCalItems[i];
 }
 
-InitStatus R3BOnlineSpectraLosStandalone::Init()
+InitStatus R3BLosOnlineSpectra::Init()
 {
 
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraLosStandalone::Init ";
+    LOG(INFO) << "R3BLosOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     if (!header)
@@ -111,11 +95,9 @@ InitStatus R3BOnlineSpectraLosStandalone::Init()
     for (int det = 0; det < DET_MAX; det++)
     {
         fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
-        if (NULL == fMappedItems.at(det))
-        {
-            printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
-        }
+        R3BLOG_IF(FATAL, NULL == fMappedItems.at(det), "LosMapped not found");
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        R3BLOG_IF(WARNING, NULL == fCalItems.at(det), "LosCal not found");
     }
 
     //------------------------------------------------------------------------
@@ -293,7 +275,7 @@ InitStatus R3BOnlineSpectraLosStandalone::Init()
     return kSUCCESS;
 }
 
-void R3BOnlineSpectraLosStandalone::Reset_LOS_Histo()
+void R3BLosOnlineSpectra::Reset_LOS_Histo()
 {
 
     if (fMappedItems.at(DET_LOS))
@@ -318,7 +300,7 @@ void R3BOnlineSpectraLosStandalone::Reset_LOS_Histo()
     }
 }
 
-void R3BOnlineSpectraLosStandalone::Exec(Option_t* option)
+void R3BLosOnlineSpectra::Exec(Option_t* option)
 {
     //  cout << "fNEvents " << fNEvents << endl;
 
@@ -379,39 +361,7 @@ void R3BOnlineSpectraLosStandalone::Exec(Option_t* option)
             return;
     }
 
-    if (fMappedItems.at(DET_SAMPLER))
-    {
 
-        auto det = fMappedItems.at(DET_SAMPLER);
-        Int_t nHitsSamp = det->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHitsSamp; ihit++)
-        {
-            auto hit = (R3BSamplerMappedData*)det->At(ihit);
-            // time is in steps of 10 ns
-            // is is a 34 bit number, so max 1073741823
-            samplerCurr = hit->GetTime();
-            //		cout<<"Sampler vs Tstemp: " << samplerCurr<<", "<<time<<", "<<fNEvents<<endl;
-
-            /*
-                        if(spill_on_sampler && ihit == 0) {
-                            samplerSpill = samplerCurr;
-                            spill_on_sampler=false;
-                        }
-
-
-                        long samp = (samplerCurr - samplerSpill); //time in 10 ns
-                        if(samp<0) samp += 1073741823;
-                        if((double)samp/1e8 > fSpillLength && spillCounter>0) {
-                            cout <<"Missed spill end!" << endl;
-                            std::cout << samplerCurr << "  " << samplerPrev << "  " << samplerSpill<< "  " <<
-               (double)samp/1e8 << '\n';
-                        }
-            */
-            Double_t dt = ((double)(samplerCurr - samplerPrev)) / 100.;
-
-            samplerPrev = samplerCurr;
-        }
-    }
 
     //----------------------------------------------------------------------
     // LOS detector
@@ -866,7 +816,7 @@ void R3BOnlineSpectraLosStandalone::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BOnlineSpectraLosStandalone::FinishEvent()
+void R3BLosOnlineSpectra::FinishEvent()
 {
 
     for (Int_t det = 0; det < DET_MAX; det++)
@@ -882,7 +832,7 @@ void R3BOnlineSpectraLosStandalone::FinishEvent()
     }
 }
 
-void R3BOnlineSpectraLosStandalone::FinishTask()
+void R3BLosOnlineSpectra::FinishTask()
 {
 
     if (fMappedItems.at(DET_LOS))
@@ -907,4 +857,4 @@ void R3BOnlineSpectraLosStandalone::FinishTask()
     cout << "FinishTask: All events: " << fNEvents << ", LOS events: " << nLosEvents << endl;
 }
 
-ClassImp(R3BOnlineSpectraLosStandalone)
+ClassImp(R3BLosOnlineSpectra)

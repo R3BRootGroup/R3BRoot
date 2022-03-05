@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BOnlineSpectra                -----
+// -----                  R3BLosOnlineSpectra             -----
 // -----            Created 13-04-2016 by M.Heil          -----
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BONLINESPECTRALOSSTANDALONE
-#define R3BONLINESPECTRALOSSTANDALONE
+#ifndef R3BLosOnlineSpectra_H
+#define R3BLosOnlineSpectra_H 1
 
 #include "FairTask.h"
 #include <array>
@@ -38,18 +38,17 @@ class TH2F;
 class R3BEventHeader;
 
 /**
- * This taks reads all detector data items and plots histograms
+ * This taks reads LOS data items and plots histograms
  * for online checks.
  */
-class R3BOnlineSpectraLosStandalone : public FairTask
+class R3BLosOnlineSpectra : public FairTask
 {
-
   public:
     /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BOnlineSpectraLosStandalone();
+    R3BLosOnlineSpectra();
 
     /**
      * Standard constructor.
@@ -57,13 +56,13 @@ class R3BOnlineSpectraLosStandalone : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BOnlineSpectraLosStandalone(const char* name, Int_t iVerbose = 1);
+    R3BLosOnlineSpectra(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BOnlineSpectraLosStandalone();
+    virtual ~R3BLosOnlineSpectra();
 
     /**
      * Method for task initialization.
@@ -201,11 +200,10 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     enum DetectorInstances
     {
         DET_LOS,
-        DET_SAMPLER,
         DET_MAX
     };
 
-    const char* fDetectorNames[DET_MAX + 1] = { "Los", "Sampler", NULL };
+    const char* fDetectorNames[DET_MAX + 1] = { "Los", NULL };
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -237,7 +235,6 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long long time_spill_start = 0, time_spill_end = 0;
-    long samplerPrev = 0, samplerCurr = 0, samplerSpill = 0;
     unsigned long long time_previous_event = 0;
 
     Double_t time_clear = -1.;
@@ -271,7 +268,7 @@ class R3BOnlineSpectraLosStandalone : public FairTask
     std::vector<TH1F*> fh_los_vftx_tamex;
 
   public:
-    ClassDef(R3BOnlineSpectraLosStandalone, 2)
+    ClassDef(R3BLosOnlineSpectra, 2)
 };
 
 #endif

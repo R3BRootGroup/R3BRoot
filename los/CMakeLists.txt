@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/los/calib
 ${R3BROOT_SOURCE_DIR}/los/params
+${R3BROOT_SOURCE_DIR}/los/online
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
@@ -52,6 +53,7 @@ calib/R3BLosCal2Hit.cxx
 R3BLosProvideTStart.cxx
 params/R3BLosHitPar.cxx
 params/R3BLosContFact.cxx
+online/R3BLosOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

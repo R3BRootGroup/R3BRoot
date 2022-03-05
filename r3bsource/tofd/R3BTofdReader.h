@@ -28,7 +28,7 @@ class R3BTofdReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BTofdReader(EXT_STR_h101_TOFD*, size_t);
+    R3BTofdReader(EXT_STR_h101_TOFD_onion*, size_t);
 
     // Destructor
     virtual ~R3BTofdReader();
@@ -47,7 +47,7 @@ class R3BTofdReader : public R3BReader
 
   private:
     // Reader specific data structure from ucesb
-    EXT_STR_h101_TOFD* fData;
+    EXT_STR_h101_TOFD_onion* fData;
     // Data offset
     size_t fOffset;
     // Don't store data for online

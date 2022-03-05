@@ -18,6 +18,7 @@
 
 #include "R3BTofdCal2HitS494.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
@@ -60,57 +61,8 @@ namespace
 } // namespace
 
 R3BTofdCal2HitS494::R3BTofdCal2HitS494()
-    : FairTask("TofdCal2Hit", 1)
-    , fCalItems(NULL)
-    , fCalTriggerItems(NULL)
-    , fHitItems(new TClonesArray("R3BTofdHitData"))
-    , fNofHitItems(0)
-    , fNofHitPars(0)
-    , fHitPar(NULL)
-    , fTrigger(-1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fNofPlanes(5)
-    , fPaddlesPerPlane(6)
-    , fTofdQ(1)
-    , fTofdHisto(true)
-    , fTofdTotPos(true)
-    , fnEvents(0)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , maxevent(0)
-    , wrongtrigger(0)
-    , wrongtpat(0)
-    , notpat(0)
-    , headertpat(0)
-    , events_in_cal_level(0)
-    , inbarcoincidence(0)
-    , eventstore(0)
-    , singlehit(0)
-    , multihit(0)
-    , bars_with_multihit(0)
-    , events_wo_tofd_hits(0)
+    : R3BTofdCal2HitS494("R3BTofdCal2HitS494", 1)
 {
-    if (fTofdHisto)
-    {
-        // fhTpat = NULL;
-        fhNoTpat = NULL;
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
-        {
-            fhQ[i] = NULL;
-            fhxy[i] = NULL;
-            fhQvsEvent[i] = NULL;
-            fhTdiff[i] = NULL;
-            fhTsync[i] = NULL;
-            fhQ0Qt[i] = NULL;
-            fhTvsQ[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                // fhQvsTHit[i][j] = NULL;
-                // fhTvsTHit[i][j] = NULL;
-            }
-        }
-    }
 }
 
 R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
@@ -143,6 +95,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494(const char* name, Int_t iVerbose)
     , multihit(0)
     , bars_with_multihit(0)
     , events_wo_tofd_hits(0)
+    , fOnline(kFALSE)
 {
     if (fTofdHisto)
     {
@@ -231,19 +184,26 @@ InitStatus R3BTofdCal2HitS494::Init()
 
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (header == nullptr)
+    {
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+    }
+
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
-    if (NULL == fCalItems)
-        LOG(fatal) << "Branch TofdCal not found";
+    R3BLOG_IF(FATAL, NULL == fCalItems, "TofdCal not found");
+
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
-    if (NULL == fCalTriggerItems)
-        LOG(fatal) << "Branch TofdTriggerCal not found";
+    R3BLOG_IF(WARNING, NULL == fCalTriggerItems, "TofdTriggerCal not found");
+
+    // CheckMaxEventNo
     maxevent = mgr->CheckMaxEventNo();
 
     // request storage of Hit data in output tree
-    mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
+    mgr->Register("TofdHit", "Tofd hit data", fHitItems, !fOnline);
 
     tofd_trig_map_setup();
 
@@ -532,19 +492,24 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
+                {
                     LOG(INFO) << "Walk correction not found!";
-                auto bot_ns_walk = bot_ns - walk(bot_tot,
-                                                 par->GetPar1Walk(),
-                                                 par->GetPar2Walk(),
-                                                 par->GetPar3Walk(),
-                                                 par->GetPar4Walk(),
-                                                 par->GetPar5Walk());
-                auto top_ns_walk = top_ns - walk(top_tot,
-                                                 par->GetPar1Walk(),
-                                                 par->GetPar2Walk(),
-                                                 par->GetPar3Walk(),
-                                                 par->GetPar4Walk(),
-                                                 par->GetPar5Walk());
+                }
+                else
+                {
+                    auto bot_ns_walk = bot_ns - walk(bot_tot,
+                                                     par->GetPar1Walk(),
+                                                     par->GetPar2Walk(),
+                                                     par->GetPar3Walk(),
+                                                     par->GetPar4Walk(),
+                                                     par->GetPar5Walk());
+                    auto top_ns_walk = top_ns - walk(top_tot,
+                                                     par->GetPar1Walk(),
+                                                     par->GetPar2Walk(),
+                                                     par->GetPar3Walk(),
+                                                     par->GetPar4Walk(),
+                                                     par->GetPar5Walk());
+                }
 
                 // calculate tdiff
                 auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
@@ -904,15 +869,15 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             tArrU[hit] = true;
             // store single hits
             singlehit++;
-            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,
-                                                              event[hit].xpos,
-                                                              event[hit].ypos,
-                                                              event[hit].charge,
-                                                              -1.,
-                                                              event[hit].charge,
-                                                              event[hit].plane,
-                                                              event[hit].bar,
-                                                              event[hit].time_raw);
+            new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BTofdHitData(event[hit].time,
+                                                                           event[hit].xpos,
+                                                                           event[hit].ypos,
+                                                                           event[hit].charge,
+                                                                           -1.,
+                                                                           event[hit].charge,
+                                                                           event[hit].plane,
+                                                                           event[hit].bar,
+                                                                           event[hit].time_raw);
         }
     }
 
@@ -1253,4 +1218,4 @@ Double_t R3BTofdCal2HitS494::saturation(Double_t x)
     return kor;
 }
 
-ClassImp(R3BTofdCal2HitS494)
+ClassImp(R3BTofdCal2HitS494);
