@@ -29,7 +29,6 @@ class R3BMwpc1CalPar;
 
 class R3BMwpc1Mapped2Cal : public FairTask
 {
-
   public:
     /** Default constructor **/
     R3BMwpc1Mapped2Cal();
@@ -54,9 +53,6 @@ class R3BMwpc1Mapped2Cal : public FairTask
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
 
     void SetOnline(Bool_t option) { fOnline = option; }
 

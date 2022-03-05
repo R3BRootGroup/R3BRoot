@@ -192,6 +192,19 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_pos[i]->Draw("");
             hitfol->Add(fh1_pos[i]);
         }
+
+        auto cecor = new TCanvas("Energy_cor", "", 10, 10, 500, 500);
+        sprintf(Name1, "fh1_ecor_det_%d_vs_%d", 5, 6);
+        sprintf(Name2, "Cluster energy for FOOT Dets (in-beam): %d vs %d", 5, 6);
+        fh2_ecor = new TH2F(Name1, Name2, binsE, minE, maxE, binsE, minE, maxE);
+        fh2_ecor->GetXaxis()->SetTitle("Energy [channels]");
+        fh2_ecor->GetYaxis()->SetTitle("Energy [channels]");
+        fh2_ecor->GetYaxis()->SetTitleOffset(1.4);
+        fh2_ecor->GetXaxis()->CenterTitle(true);
+        fh2_ecor->GetYaxis()->CenterTitle(true);
+        cecor->cd();
+        fh2_ecor->Draw("colz");
+        hitfol->Add(cecor);
     }
 
     // WR data
@@ -252,10 +265,13 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
 
     // Hit data
     if (fHitItems)
+    {
         for (Int_t i = 0; i < fNbDet; i++)
         {
             fh1_pos[i]->Reset();
         }
+        fh2_ecor->Reset();
+    }
 
     // WR data
     if (fWRItems && fWRItemsMaster)
@@ -299,13 +315,20 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
     {
         auto nHits = fHitItems->GetEntriesFast();
+        double e1 = 0., e2 = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BFootHitData* hit = (R3BFootHitData*)fHitItems->At(ihit);
             if (!hit)
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
+            if (hit->GetDetId() == 5)
+                e1 = hit->GetEnergy();
+            if (hit->GetDetId() == 6)
+                e2 = hit->GetEnergy();
         }
+        if (e1 > 0 && e2 > 0)
+            fh2_ecor->Fill(e1, e2);
     }
 
     // Fill wr data
@@ -374,10 +397,13 @@ void R3BFootOnlineSpectra::FinishTask()
         }
 
     if (fHitItems)
+    {
         for (Int_t i = 0; i < fNbDet; i++)
         {
             fh1_pos[i]->Write();
         }
+        fh2_ecor->Write();
+    }
 
     if (fWRItems && fWRItemsMaster)
         fh2_wr->Write();

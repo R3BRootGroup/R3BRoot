@@ -28,6 +28,7 @@
 #include "FairRuntimeDb.h"
 
 // MWPC headers
+#include "R3BLogger.h"
 #include "R3BMwpc1Cal2Hit.h"
 #include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
@@ -53,7 +54,7 @@ R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc1Cal2Hit: Destructor
 R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
 {
-    LOG(INFO) << "R3BMwpc1Cal2Hit: Delete instance";
+    R3BLOG(DEBUG1, "Destructor");
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
 }
@@ -61,25 +62,28 @@ R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc1Cal2Hit::Init()
 {
-    LOG(INFO) << "R3BMwpc1Cal2Hit::Init()";
+    R3BLOG(INFO, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc1CalData");
     if (!fMwpcCalDataCA)
     {
+        R3BLOG(FATAL, "Mwpc1CalData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
     // Hit data
-    fMwpcHitDataCA = new TClonesArray("R3BMwpcHitData", 10);
+    fMwpcHitDataCA = new TClonesArray("R3BMwpcHitData");
     rootManager->Register("Mwpc1HitData", "MWPC1 Hit", fMwpcHitDataCA, !fOnline);
+    fMwpcHitDataCA->Clear();
 
     return kSUCCESS;
 }
@@ -185,7 +189,7 @@ Double_t R3BMwpc1Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc1Cal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc1HitData Structure";
+    R3BLOG(DEBUG1, "Clearing Mwpc1HitData Structure");
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }

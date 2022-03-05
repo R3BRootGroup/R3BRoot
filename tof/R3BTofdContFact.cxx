@@ -39,9 +39,7 @@
 using std::cout;
 using std::endl;
 
-ClassImp(R3BTofdContFact)
-
-    static R3BTofdContFact gR3BTofdContFact;
+static R3BTofdContFact gR3BTofdContFact;
 
 R3BTofdContFact::R3BTofdContFact()
 {
@@ -100,18 +98,4 @@ FairParSet* R3BTofdContFact::createContainer(FairContainer* c)
     return p;
 }
 
-void R3BTofdContFact::activateParIo(FairParIo* io)
-{
-    // activates the input/output class for the parameters
-    // needed by the Sts
-    /*
-    if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BTofdParRootFileIo* p=new R3BTofdParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
-      io->setDetParIo(p);
-    }
-    if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BTofdParAsciiFileIo* p=new R3BTofdParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
-      io->setDetParIo(p);
-      }
-    */
-}
+ClassImp(R3BTofdContFact);

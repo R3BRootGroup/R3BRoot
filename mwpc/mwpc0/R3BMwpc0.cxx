@@ -158,10 +158,7 @@ void R3BMwpc0::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BMwpc0::Register()
-{
-    FairRootManager::Instance()->Register("Mwpc0Point", GetName(), fSofMWPCCollection, kTRUE);
-}
+void R3BMwpc0::Register() { FairRootManager::Instance()->Register("Mwpc0Point", GetName(), fSofMWPCCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------

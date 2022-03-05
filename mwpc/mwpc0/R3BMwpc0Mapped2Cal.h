@@ -21,8 +21,6 @@
 
 #include "FairTask.h"
 #include "R3BMwpcCalData.h"
-#include "R3BMwpcMappedData.h"
-#include "TH1F.h"
 #include <TRandom.h>
 
 class TClonesArray;
@@ -56,9 +54,6 @@ class R3BMwpc0Mapped2Cal : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method Finish **/
-    virtual void Finish();
-
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
@@ -76,7 +71,6 @@ class R3BMwpc0Mapped2Cal : public FairTask
     TClonesArray* fMwpcCalDataCA;    /**< Array with Cal output data. >*/
 
     /** Private method AddCalData **/
-    // Adds a SofMwpcCalData to the MwpcCalCollection
     R3BMwpcCalData* AddCalData(Int_t plane, Int_t pad, Float_t charge);
 
   public:

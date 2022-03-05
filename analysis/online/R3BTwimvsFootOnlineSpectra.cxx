@@ -85,11 +85,11 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
+        R3BLOG(WARNING, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BFootOnlineSpectra::Init() EventHeader. found";
+        R3BLOG(INFO, "EventHeader. found");
 
     // get access to hit data of the FOOT detector
     fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
