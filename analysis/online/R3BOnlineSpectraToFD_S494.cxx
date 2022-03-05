@@ -106,7 +106,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     }
     else
         LOG(INFO) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. found";
-    
+
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 

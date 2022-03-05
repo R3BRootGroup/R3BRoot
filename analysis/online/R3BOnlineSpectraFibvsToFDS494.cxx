@@ -172,7 +172,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    
+
     // Look for the R3BEventHeader
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
@@ -182,7 +182,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     }
     else
         LOG(INFO) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. found";
-    
+
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 
@@ -190,7 +190,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     LOG(INFO) << " I HAVE FOUND " << DET_MAX + 1 << " DETECTORS";
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
-    
+
     for (int det = 0; det < DET_MAX; det++)
     {
 

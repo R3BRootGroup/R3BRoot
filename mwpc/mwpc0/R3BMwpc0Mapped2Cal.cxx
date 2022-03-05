@@ -28,6 +28,7 @@
 #include "FairRuntimeDb.h"
 
 // R3B headers
+#include "R3BLogger.h"
 #include "R3BMwpc0CalPar.h"
 #include "R3BMwpc0Mapped2Cal.h"
 #include "R3BMwpcCalData.h"
@@ -56,7 +57,7 @@ R3BMwpc0Mapped2Cal::R3BMwpc0Mapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc0Mapped2Cal: Destructor
 R3BMwpc0Mapped2Cal::~R3BMwpc0Mapped2Cal()
 {
-    LOG(INFO) << "R3BMwpc0Mapped2Cal: Delete instance";
+    R3BLOG(DEBUG1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
 }
@@ -67,19 +68,16 @@ void R3BMwpc0Mapped2Cal::SetParContainers()
     // Parameter Container
     // Reading padCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
+    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BMwpc0CalPar*)rtdb->getContainer("mwpc0CalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMwpc0Mapped2Cal::Init() Couldn't get handle on mwpc0CalPar container";
+        R3BLOG(ERROR, "Couldn't get handle on mwpc0CalPar container.");
     }
     else
     {
-        LOG(INFO) << "R3BMwpc0Mapped2Cal:: mwpc0CalPar container open";
+        R3BLOG(INFO, "mwpc0CalPar container found.");
     }
     return;
 }
@@ -91,9 +89,9 @@ void R3BMwpc0Mapped2Cal::SetParameter()
     NumPadY = fCal_Par->GetNumPadsY();           // Number of Pads in Y
     NumParams = fCal_Par->GetNumParametersFit(); // Number of parameters in the Fit
 
-    LOG(INFO) << "R3BMwpc0Mapped2Cal: NumPadX: " << NumPadX;
-    LOG(INFO) << "R3BMwpc0Mapped2Cal: NumPadY: " << NumPadY;
-    LOG(INFO) << "R3BMwpc0Mapped2Cal: Number of fit parameters: " << NumParams;
+    R3BLOG(INFO, "NumPadX: " << NumPadX);
+    R3BLOG(INFO, "NumPadY: " << NumPadY);
+    R3BLOG(INFO, "Number of fit parameters: " << NumParams);
 
     CalParams = new TArrayF();
     Int_t array_size = (NumPadX + NumPadY) * NumParams;
@@ -105,25 +103,28 @@ void R3BMwpc0Mapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc0Mapped2Cal::Init()
 {
-    LOG(INFO) << "R3BMwpc0Mapped2Cal::Init()";
+    R3BLOG(INFO, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
     }
 
     fMwpcMappedDataCA = (TClonesArray*)rootManager->GetObject("Mwpc0MappedData");
     if (!fMwpcMappedDataCA)
     {
+        R3BLOG(FATAL, "Mwpc0MappedData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
     // Calibrated data
-    fMwpcCalDataCA = new TClonesArray("R3BMwpcCalData", 10);
+    fMwpcCalDataCA = new TClonesArray("R3BMwpcCalData");
     rootManager->Register("Mwpc0CalData", "MWPC0 Cal", fMwpcCalDataCA, !fOnline);
+    fMwpcCalDataCA->Clear();
 
     SetParameter();
     return kSUCCESS;
@@ -143,15 +144,12 @@ void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
     // Reset entries in output arrays, local arrays
     Reset();
 
-    if (!fCal_Par)
-    {
-        LOG(WARNING) << "NO Container Parameter!, pedestals will be set to zero";
-    }
-
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMwpcMappedDataCA->GetEntries();
     if (nHits > (NumPadX + NumPadY) && nHits > 0)
-        LOG(WARNING) << "R3BMwpc0Mapped2Cal: nHits>(NumPadX+NumPadY)";
+    {
+        R3BLOG(WARNING, "nHits>(NumPadX+NumPadY)");
+    }
     if (!nHits)
         return;
 
@@ -173,7 +171,7 @@ void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
         else if (planeId == 3)
             nbpad = (padId + NumPadX) * NumParams;
         else
-            LOG(ERROR) << "Plane " << planeId << " does not exist in MWPC0";
+            R3BLOG(ERROR, "Plane " << planeId << " does not exist in MWPC0");
 
         pedestal = CalParams->GetAt(nbpad);
         charge = mappedData[i]->GetQ() - pedestal;
@@ -189,13 +187,10 @@ void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
     return;
 }
 
-// -----   Protected method Finish   --------------------------------------------
-void R3BMwpc0Mapped2Cal::Finish() {}
-
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc0Mapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc0CalData Structure";
+    R3BLOG(DEBUG1, "Clearing Mwpc0CalData Structure");
     if (fMwpcCalDataCA)
         fMwpcCalDataCA->Clear();
 }

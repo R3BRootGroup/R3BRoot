@@ -18,7 +18,6 @@
 
 #include "R3BOnlineSpillAnalysis.h"
 
-
 #include "R3BEventHeader.h"
 
 #include "R3BSamplerMappedData.h"
@@ -92,7 +91,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    
+
     // Look for the R3BEventHeader
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
@@ -102,7 +101,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     }
     else
         LOG(INFO) << "R3BOnlineSpillAnalysis::Init() EventHeader. found";
-    
+
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
@@ -770,7 +769,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
         fh_spill_times_Fine->Reset();
         fh_spill_times_Coarse->Reset();
 
-        //cout << "updating" << endl;
+        // cout << "updating" << endl;
         for (int i = 0; i < 6; i++)
         {
             TVirtualPad* pad = cSpill->cd(i + 1);
@@ -791,9 +790,10 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BOnlineSpillAnalysis::FinishEvent() { 
-if(fSamplerMappedItems)
-fSamplerMappedItems->Clear(); 
+void R3BOnlineSpillAnalysis::FinishEvent()
+{
+    if (fSamplerMappedItems)
+        fSamplerMappedItems->Clear();
 }
 
 void R3BOnlineSpillAnalysis::FinishTask()

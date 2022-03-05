@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTOFDCONTFACT_H
-#define R3BTOFDCONTFACT_H
+#define R3BTOFDCONTFACT_H 1
 
 #include "FairContFact.h"
 
@@ -27,7 +27,6 @@ class R3BTofdContFact : public FairContFact
     R3BTofdContFact();
     ~R3BTofdContFact() {}
     FairParSet* createContainer(FairContainer*);
-    void activateParIo(FairParIo* io);
     ClassDef(R3BTofdContFact, 0) // Factory for all Tofd parameter containers
 };
 
