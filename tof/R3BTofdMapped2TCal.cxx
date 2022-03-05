@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BTofdMapped2TCal                -----
+// -----                  R3BTofdMapped2TCal              -----
 // -----          Created Feb 4th 2016 by R.Plag          -----
 // ------------------------------------------------------------
 
@@ -28,6 +28,7 @@
 #include "R3BTofdMapped2TCal.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "R3BTofdCalData.h"
@@ -44,18 +45,7 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BTofdMapped2TCal::R3BTofdMapped2TCal()
-    : FairTask("TofdTcal", 1)
-    , fMappedItems(nullptr)
-    , fCalItems(new TClonesArray("R3BTofdCalData"))
-    , fNofCalItems(0)
-    , fTcalPar(0)
-    , fNofTcalPars(0)
-    , header(nullptr)
-    , fTrigger(-1)
-    , fNofPlanes(0)
-    , fPaddlesPerPlane(0)
-    , fNofEdges(0)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
+    : R3BTofdMapped2TCal("R3BTofdMapped2TCal", 1)
 {
 }
 
@@ -91,17 +81,21 @@ InitStatus R3BTofdMapped2TCal::Init()
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (header == nullptr)
+    {
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+    }
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
-    if (NULL == fMappedItems)
-        LOG(fatal) << "Branch TofdMapped not found";
+    R3BLOG_IF(fatal, NULL == fMappedItems, "TofdMapped not found");
 
     // request storage of Cal data in output tree
-    mgr->Register("TofdCal", "Land", fCalItems, kTRUE);
+    mgr->Register("TofdCal", "Tofd cal data", fCalItems, kTRUE);
 
     return kSUCCESS;
 }
@@ -173,7 +167,7 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
             }
         }
 
-        R3BTofdCalData* calData = new ((*fCalItems)[fNofCalItems++]) R3BTofdCalData(iDetector, iBar);
+        R3BTofdCalData* calData = new ((*fCalItems)[fCalItems->GetEntriesFast()]) R3BTofdCalData(iDetector, iBar);
 
         R3BTCalModulePar const* par = fTcalPar->GetModuleParAt(iDetector, iBar, 2 * iSide + iEdge - 2);
 
@@ -204,4 +198,4 @@ void R3BTofdMapped2TCal::FinishEvent()
 
 void R3BTofdMapped2TCal::FinishTask() {}
 
-ClassImp(R3BTofdMapped2TCal)
+ClassImp(R3BTofdMapped2TCal);

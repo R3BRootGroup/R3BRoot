@@ -17,6 +17,7 @@
 
 #include "R3BPdcCal2Hit.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BPdcCalData.h"
 #include "R3BPdcHitData.h"
 #include "R3BTCalEngine.h"
@@ -128,9 +129,15 @@ InitStatus R3BPdcCal2Hit::Init()
 
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (header == nullptr)
+    {
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+    }
+
     fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch PdcCal not found";
@@ -333,4 +340,4 @@ void R3BPdcCal2Hit::FinishEvent()
 
 void R3BPdcCal2Hit::FinishTask() {}
 
-ClassImp(R3BPdcCal2Hit)
+ClassImp(R3BPdcCal2Hit);

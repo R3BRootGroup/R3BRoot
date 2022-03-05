@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BUNPACKREADER_H
-#define R3BUNPACKREADER_H
+#define R3BUNPACKREADER_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>

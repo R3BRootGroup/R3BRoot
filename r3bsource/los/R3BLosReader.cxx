@@ -21,12 +21,15 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
-#include <iostream>
+
+/**
+ ** ext_h101_los.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:LOS,id=h101_LOS,NOTRIGEVENTNO,ext_h101_los.h
+ **/
 
 extern "C"
 {
 #include "ext_data_client.h"
-//#include "ext_h101_los_dez19.h"
 #include "ext_h101_los.h"
 }
 
@@ -49,6 +52,7 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
 
 R3BLosReader::~R3BLosReader()
 {
+    R3BLOG(DEBUG1, "");
     if (fArray)
     {
         delete fArray;
@@ -66,8 +70,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(FATAL, "Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -84,7 +87,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    mgr->Register("LosMapped", "Los detector", fArray, !fOnline);
+    mgr->Register("LosMapped", "Los Mapped", fArray, !fOnline);
     mgr->Register("LosTriggerMapped", "Los Trigger Mapped", fArrayTrigger, !fOnline);
     Reset();
 
@@ -99,7 +102,8 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTFTM = 0;
         data->LOS[d].TTCLM = 0;
         data->LOS[d].TTCTM = 0;
-        // data->LOS[d].MTM = 0;
+        data->LOS[d].VTRIGC = 0;
+        data->LOS[d].VTRIGF = 0;
     }
 
     return kTRUE;
@@ -368,8 +372,23 @@ Bool_t R3BLosReader::Read()
             // cout<<"nsumt & data->LOS[d].TTFL "<<d+1<<"; "<<nsuml<<"; "<< data->LOS[d].TTFL<<endl;
             // cout<<"nsumt & data->LOS[d].TTFT "<<d+1<<"; "<<nsumt<<"; "<< data->LOS[d].TTFT<<endl;
         }
-    }
 
+        // Trigger VFTX2 Mapping.
+        uint32_t trigChannels = data->LOS[d].VTRIGF;
+        for (uint32_t i = 0; i < trigChannels; i++)
+        {
+            uint32_t channelf = data->LOS[d].VTRIGFI[i]; // = 1..8
+            uint32_t channelc = data->LOS[d].VTRIGCI[i]; // = 1..8
+            if (channelf == channelc)
+                new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                    R3BLosMappedData(d + 1,                   // detector number
+                                     channelf,                // channel number: 1-8
+                                     0,                       // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
+                                     data->LOS[d].VTRIGFv[i], // VFTX fine time
+                                     data->LOS[d].VTRIGCv[i]  // VFTX coarse time
+                    );
+        }
+    }
     fNEvents += 1;
 
     return kTRUE;

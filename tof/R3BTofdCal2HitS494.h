@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // ------------------------------------------------------------
-// -----                 R3BTofdCal2HitS494                   -----
+// -----                 R3BTofdCal2HitS494               -----
 // -----         Created May 30th 2016 by M.Heil          -----
 // -----           Modified Mar 2020 by L.Bott            -----
 // ------------------------------------------------------------
@@ -150,6 +150,9 @@ class R3BTofdCal2HitS494 : public FairTask
         fPaddlesPerPlane = ppp;
     }
 
+    // Method to setup online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     TClonesArray* fCalItems;        /**< Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
@@ -158,6 +161,7 @@ class R3BTofdCal2HitS494 : public FairTask
     R3BTofdHitPar* fHitPar;         /**< Hit parameter container. */
     UInt_t fNofHitPars;             /**< Number of modules in parameter file. */
     R3BEventHeader* header;         /**< Event header - input data. */
+    Bool_t fOnline;                 // Don't store data for online
     Double_t fClockFreq;            /**< Clock cycle in [ns]. */
     Int_t fTrigger;                 /**< Trigger value. */
     Int_t fTpat1;

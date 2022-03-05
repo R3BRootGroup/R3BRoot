@@ -33,6 +33,12 @@ ${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/tofi
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/fiber
+${R3BROOT_SOURCE_DIR}/ssd/online
+${R3BROOT_SOURCE_DIR}/los/online
+${R3BROOT_SOURCE_DIR}/califa/online
+${R3BROOT_SOURCE_DIR}/music/online
+${R3BROOT_SOURCE_DIR}/twim/online
+${R3BROOT_SOURCE_DIR}/mwpc/online
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
@@ -57,6 +63,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
 ${R3BROOT_SOURCE_DIR}/analysis
 ${R3BROOT_SOURCE_DIR}/analysis/pars
@@ -68,26 +75,6 @@ include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
-
-#set(SRCS
-#R3BAnalysisIncomingFrs.cxx
-#R3BAnalysisIncomingID.cxx
-#R3BAnalysisIncomingIDContFact.cxx
-#R3BIncomingIDPar.cxx
-#R3BGlobalAnalysis.cxx
-#R3BGlobalAnalysisS454.cxx
-#R3BTrackS454.cxx
-#R3BTrackerTestS454.cxx
-#R3BOnlineSpectra.cxx
-#R3BOnlineSpectraDec2019.cxx
-#R3BOnlineSpectraPdc.cxx
-#R3BOnlineSpectraSfib.cxx
-#R3BOnlineSpillAnalysis.cxx
-#R3BOnlineSpectraFiberTofds515.cxx
-#R3BOnlineSpectraLosStandalone.cxx
-#R3BOnlineSpectraSci2.cxx
-#R3BOnlineSpectraLosVsSci2.cxx
-#)
 
 file(GLOB SRCS ./online/*.cxx ./offline/*.cxx ./pars/*.cxx)
 

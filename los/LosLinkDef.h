@@ -25,6 +25,7 @@
 #pragma link C++ class R3BLosHitPar+;
 #pragma link C++ class R3BLosProvideTStart+;
 #pragma link C++ class R3BLosContFact+;
+#pragma link C++ class R3BLosOnlineSpectra+;
 
 #endif
 

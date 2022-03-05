@@ -30,7 +30,7 @@ extern "C"
 //#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
 #define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
-R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, size_t offset)
+R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD_onion* data, size_t offset)
     : R3BReader("R3BTofdReader")
     , fData(data)
     , fOffset(offset)
@@ -64,8 +64,8 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, !fOnline);
-    FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, !fOnline);
+    FairRootManager::Instance()->Register("TofdMapped", "Tofd mapped data", fArray, !fOnline);
+    FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd trigger mapped data", fArrayTrigger, !fOnline);
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
