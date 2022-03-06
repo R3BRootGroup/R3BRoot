@@ -63,6 +63,7 @@ class TClonesArray;
     do                                                                                         \
     {                                                                                          \
         int ok;                                                                                \
+        R3BLOG(INFO, "");                                                                      \
         EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
         if (!ok)                                                                               \
         {                                                                                      \
@@ -82,6 +83,7 @@ class TClonesArray;
         R3B_FIBER_MAPMT_UCESB_LINK_MULTIHIT(fMHL[2][0][1], data->NAME##_TRIGF);                \
         return R3BFiberMAPMTReader::Init();                                                    \
     } while (0)
+
 #define R3B_FIBER_MAPMT_UCESB_LINK_MULTIHIT(dst, src)     \
     do                                                    \
     {                                                     \

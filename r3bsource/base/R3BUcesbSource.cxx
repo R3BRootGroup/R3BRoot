@@ -156,8 +156,8 @@ Bool_t R3BUcesbSource::InitUnpackers()
     uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
     if (struct_map_success & ~(map_ok))
     {
-        perror("ext_data_clnt::setup()");
-        R3BLOG(ERROR, "ext_data_clnt::setup() failed");
+        //perror("ext_data_clnt::setup()");
+        R3BLOG(WARNING, "ext_data_clnt::setup() failed");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
         return kFALSE;
     }
