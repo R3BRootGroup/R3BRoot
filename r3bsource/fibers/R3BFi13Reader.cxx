@@ -20,7 +20,7 @@ extern "C"
 #include "ext_h101_fibthirteen.h"
 }
 
-R3BFi13Reader::R3BFi13Reader(EXT_STR_h101_FIBTHIRTEEN* a_data, UInt_t a_offset)
+R3BFi13Reader::R3BFi13Reader(EXT_STR_h101_FIBTHIRTEEN* a_data, size_t a_offset)
     : R3BBunchedFiberReader("Fi13", a_offset, 2, 256, 2)
     , fData((EXT_STR_h101_FIBTHIRTEEN_onion*)a_data)
 {

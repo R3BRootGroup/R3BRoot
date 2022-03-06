@@ -38,9 +38,10 @@
 //
 
 #ifndef R3BBUNCHEDFIBERREADER_H
-#define R3BBUNCHEDFIBERREADER_H
+#define R3BBUNCHEDFIBERREADER_H 1
 
 #include "R3BReader.h"
+#include "R3BLogger.h"
 #include "TString.h"
 
 class TClonesArray;
@@ -59,13 +60,15 @@ class TClonesArray;
 #define LENGTH(x) (sizeof x / sizeof *x)
 #define R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME)                                                \
     int ok;                                                                                \
+    R3BLOG(INFO, "");                                                                      \
     EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
     if (!ok)                                                                               \
     {                                                                                      \
-        LOG(ERROR) << "Failed to setup UCESB structure information.";                      \
+        R3BLOG(ERROR, "Failed to setup UCESB structure information.");                      \
         return kFALSE;                                                                     \
     }
 #define R3B_BUNCHED_FIBER_INIT_END_ return R3BBunchedFiberReader::Init()
+
 #define R3B_BUNCHED_FIBER_INIT(NAME, data)                                       \
     do                                                                           \
     {                                                                            \
@@ -81,6 +84,7 @@ class TClonesArray;
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][1][1], data->NAME##_TSTF); \
         R3B_BUNCHED_FIBER_INIT_END_;                                             \
     } while (0)
+
 #define R3B_BUNCHED_FIBER_INIT_MAPMT_ONLY(NAME, data)                            \
     do                                                                           \
     {                                                                            \
@@ -92,6 +96,7 @@ class TClonesArray;
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][1], data->NAME##_TMTF); \
         R3B_BUNCHED_FIBER_INIT_END_;                                             \
     } while (0)
+
 #define R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(NAME, data)                               \
     do                                                                              \
     {                                                                               \
@@ -109,6 +114,7 @@ class TClonesArray;
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[2][0][1], data->NAME##_TRIGMLF); \
         R3B_BUNCHED_FIBER_INIT_END_;                                                \
     } while (0)
+
 #define R3B_BUNCHED_FIBER_UCESB_LINK(dst, src)             \
     do                                                     \
     {                                                      \
@@ -123,6 +129,7 @@ class TClonesArray;
             exit(EXIT_FAILURE);                            \
         }                                                  \
     } while (0)
+
 #define R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(dst, src)   \
     do                                                    \
     {                                                     \
@@ -156,13 +163,13 @@ class R3BBunchedFiberReader : public R3BReader
         size_t _v_len;
     };
 
-    R3BBunchedFiberReader(char const*, UInt_t, UInt_t, UInt_t, UInt_t);
+    R3BBunchedFiberReader(char const*, size_t, UInt_t, UInt_t, UInt_t);
     Bool_t Init();
     Bool_t Read();
     void Reset();
 
   protected:
-    UInt_t fOffset;
+    size_t fOffset;
     // [0=MAPMT,1=SPMT,2=MAPMT-trig][0=leading,1=trailing][0=coarse,1=fine].
     UCESBMultiHitLink fMHL[3][2][2];
 

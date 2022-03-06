@@ -20,7 +20,7 @@
 std::map<TString, int> counter;
 
 R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
-                                             UInt_t a_offset,
+                                             size_t a_offset,
                                              UInt_t a_sub_num,
                                              UInt_t a_mapmt_channel_num,
                                              UInt_t a_spmt_channel_num)

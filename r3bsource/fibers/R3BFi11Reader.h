@@ -22,7 +22,7 @@ typedef struct EXT_STR_h101_FIBELEVEN_onion_t EXT_STR_h101_FIBELEVEN_onion;
 class R3BFi11Reader : public R3BBunchedFiberReader
 {
   public:
-    R3BFi11Reader(EXT_STR_h101_FIBELEVEN*, UInt_t);
+    R3BFi11Reader(EXT_STR_h101_FIBELEVEN*, size_t);
     Bool_t Init(ext_data_struct_info*);
 
   private:

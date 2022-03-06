@@ -12,14 +12,16 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
-
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+
+#include "R3BLogger.h"
 #include "R3BPspxMappedData.h"
 #include "R3BPspxMappedPar.h"
 #include "R3BPspxReader.h"
+
 #include "TClonesArray.h"
+#include "ext_data_struct_info.hh"
 
 extern "C"
 {
@@ -29,12 +31,11 @@ extern "C"
 
 #define LENGTH(x) (sizeof x / sizeof *x)
 
-R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
+R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, size_t offset)
     : R3BReader("R3BPspxReader")
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fMappedItems(2 * LENGTH(((EXT_STR_h101_PSP_onion*)data)->PSPX)) // number of faces of detectors
 {
     EXT_STR_h101_PSP_onion* data_o = (EXT_STR_h101_PSP_onion*)fData;
@@ -43,11 +44,12 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
     printf("Length: %lu\n", LENGTH(data_o->PSPX));
-    LOG(INFO) << "R3BPspxReader: Created " << 2 * LENGTH(data_o->PSPX) << " detectors.";
+    R3BLOG(INFO, "Created " << 2 * LENGTH(data_o->PSPX) << " detectors.");
 }
 
 R3BPspxReader::~R3BPspxReader()
 {
+    R3BLOG(DEBUG1, "");
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
     for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
     {
@@ -55,19 +57,14 @@ R3BPspxReader::~R3BPspxReader()
     }
 }
 
-/**
- * Initialize output data. Read input data.
- */
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BPspxReader::Init";
+    R3BLOG(INFO, "");
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
-
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
@@ -78,23 +75,16 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
         for (Int_t f = 0; f < 2; f++)
         {
             // Register output array in tree
-            if (!fOnline)
-            {
-                FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped", d + 1, xy[f]),
-                                                      Form("Pspx%d_%c", d + 1, xy[f]),
-                                                      fMappedItems[2 * d + f],
-                                                      kTRUE);
-            }
-            else
-            {
-                FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped", d + 1, xy[f]),
-                                                      Form("Pspx%d_%c", d + 1, xy[f]),
-                                                      fMappedItems[2 * d + f],
-                                                      kFALSE);
-            }
-            LOG(INFO) << "Registered Pspx" << d + 1 << "_" << xy[f];
+            FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped", d + 1, xy[f]),
+                                                  Form("Pspx%d_%c", d + 1, xy[f]),
+                                                  fMappedItems[2 * d + f],
+                                                  !fOnline);
+            fMappedItems[2 * d + f]->Clear();
+            R3BLOG(INFO, "Registered Pspx" << d + 1 << "_" << xy[f]);
         }
     }
+    memset(fData, 0, sizeof *fData);
+
     return kTRUE;
 }
 
@@ -167,4 +157,4 @@ void R3BPspxReader::Reset()
     }
 }
 
-ClassImp(R3BPspxReader)
+ClassImp(R3BPspxReader);

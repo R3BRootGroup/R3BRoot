@@ -14,6 +14,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BLogger.h"
 #include "R3BNeulandTamexReader.h"
 #include "R3BPaddleTamexMappedData.h"
 
@@ -44,27 +45,31 @@ R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex_onion* d
 
 R3BNeulandTamexReader::~R3BNeulandTamexReader()
 {
+    R3BLOG(DEBUG1, "");
     if (fArray)
+    {
         delete fArray;
+    }
 }
 
 Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BNeulandTamexReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_raw_nnp_tamex, 0);
 
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
 
-    LOG(INFO) << "R3BNeulandTamexReader::Init(): Number of planes " << fNofPlanes;
+    R3BLOG(INFO, "Number of planes " << fNofPlanes);
 
     // Register output array in tree
     FairRootManager::Instance()->Register("NeulandMappedData", "Neuland", fArray, !fOnline);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }

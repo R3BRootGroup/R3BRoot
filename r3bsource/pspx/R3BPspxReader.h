@@ -15,10 +15,11 @@
 #define R3BPSPXREADER_H
 
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 struct EXT_STR_h101_PSP_t;
 typedef struct EXT_STR_h101_PSP_t EXT_STR_h101_PSP;
-class FairLogger;
+typedef struct EXT_STR_h101_PSP_onion_t EXT_STR_h101_PSP_onion;
 class TClonesArray;
 
 /**
@@ -31,27 +32,33 @@ class TClonesArray;
 class R3BPspxReader : public R3BReader
 {
   public:
-    /** Standard Constructor **/
-    R3BPspxReader(EXT_STR_h101_PSP*, UInt_t);
-    /** Destructor **/
-    ~R3BPspxReader();
+    // Standard Constructor
+    R3BPspxReader(EXT_STR_h101_PSP*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
+    // Destructor
+    virtual ~R3BPspxReader();
+
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
+
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-    void Reset(); /**< Reset the output array **/
 
   private:
     EXT_STR_h101_PSP* fData; /**< Reader specific data structure from ucesb */
-    UInt_t fOffset;          /**< Data Offset */
-    FairLogger* fLogger;     /**< FairLogger */
+    size_t fOffset;          /**< Data Offset */
     // Don't store data for online
     Bool_t fOnline;
     std::vector<TClonesArray*> fMappedItems; /**< Array holding output (Mapped) data */
 
   public:
-    ClassDef(R3BPspxReader, 4);
+    ClassDefOverride(R3BPspxReader, 4);
 };
 
 #endif

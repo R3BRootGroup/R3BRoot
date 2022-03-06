@@ -12,6 +12,13 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
+#include "FairRootManager.h"
+
+#include "R3BLogger.h"
+#include "R3BPspReader.h"
+#include "R3BPspxMappedData.h"
+
+#include "TClonesArray.h"
 
 extern "C"
 {
@@ -19,12 +26,7 @@ extern "C"
 #include "ext_h101_psp.h"
 }
 
-#include "FairRootManager.h"
-#include "R3BPspReader.h"
-#include "R3BPspxMappedData.h"
-#include "TClonesArray.h"
-
-R3BPspReader::R3BPspReader(EXT_STR_h101_PSP* data, UInt_t offset)
+R3BPspReader::R3BPspReader(EXT_STR_h101_PSP* data, size_t offset)
     : R3BReader("R3BPspReader")
     , fData(data)
     , fOffset(offset)
@@ -33,23 +35,29 @@ R3BPspReader::R3BPspReader(EXT_STR_h101_PSP* data, UInt_t offset)
 {
 }
 
-R3BPspReader::~R3BPspReader() {}
+R3BPspReader::~R3BPspReader()
+{
+    if (fArray)
+    {
+        delete fArray;
+    }
+}
 
 Bool_t R3BPspReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    R3BLOG(INFO, "");
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
-
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("PspxMapped", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("PspxMapped", "Pspx Mapped data", fArray, kTRUE);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
@@ -57,7 +65,7 @@ Bool_t R3BPspReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BPspReader::Read()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
 
     // Display data
     // LOG(info) << "  Event data:";
@@ -133,4 +141,4 @@ void R3BPspReader::Reset()
     fArray->Clear();
 }
 
-ClassImp(R3BPspReader)
+ClassImp(R3BPspReader);

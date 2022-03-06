@@ -16,6 +16,7 @@
 
 #include "R3BAmsMappedData.h"
 #include "R3BAmsReader.h"
+#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
@@ -50,17 +51,19 @@ R3BAmsReader::~R3BAmsReader()
 Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BAmsReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_AMS, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BAmsReader::Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, !fOnline);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }

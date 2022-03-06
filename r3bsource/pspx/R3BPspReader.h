@@ -12,22 +12,33 @@
  ******************************************************************************/
 
 #ifndef R3BPSPREADER_H
-#define R3BPSPREADER_H
+#define R3BPSPREADER_H 1
 
 #include "R3BReader.h"
+#include <Rtypes.h>
 
-struct EXT_STR_h101_PSP;
-class FairLogger;
+struct EXT_STR_h101_PSP_t;
+typedef struct EXT_STR_h101_PSP_t EXT_STR_h101_PSP;
+typedef struct EXT_STR_h101_PSP_onion_t EXT_STR_h101_PSP_onion;
+class ext_data_struct_info;
 
 class R3BPspReader : public R3BReader
 {
   public:
-    R3BPspReader(EXT_STR_h101_PSP*, UInt_t);
-    ~R3BPspReader();
+    // Standard constructor
+    R3BPspReader(EXT_STR_h101_PSP*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BPspReader();
+
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
 
   private:
     /* An event counter */
@@ -35,14 +46,12 @@ class R3BPspReader : public R3BReader
     /* Reader specific data structure from ucesb */
     EXT_STR_h101_PSP* fData;
     /* Offset */
-    UInt_t fOffset;
-    /* FairLogger */
-    FairLogger* fLogger;
+    size_t fOffset;
     /* the structs of type R3BPspxMappedItem */
     TClonesArray* fArray; /**< Output array. */
 
   public:
-    ClassDef(R3BPspReader, 0);
+    ClassDefOverride(R3BPspReader, 0);
 };
 
-#endif
+#endif /* R3BPSPREADER_H */
