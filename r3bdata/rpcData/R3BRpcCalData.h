@@ -11,17 +11,17 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCCALDATA_H
-#define R3BRPCCALDATA_H
+#ifndef R3BRPCSTRIPCALDATA_H
+#define R3BRPCSTRIPCALDATA_H
 
 #include "FairMultiLinkedData.h"
 #include "TObject.h"
 
-class R3BRpcCalData : public FairMultiLinkedData
+class R3BRpcStripCalData : public FairMultiLinkedData
 {
   public:
     /** Default constructor **/
-    R3BRpcCalData();
+    R3BRpcStripCalData();
 
     /** Constructor with arguments
      *@param fChannelId   Channel unique identifier
@@ -30,19 +30,19 @@ class R3BRpcCalData : public FairMultiLinkedData
      *@param fTime        Time since event start [ns]
      *@param fToT_Energy  Total energy deposited from ToT ([GeV] in sim)
      **/
-    R3BRpcCalData(Int_t ident,
+    R3BRpcStripCalData(Int_t ident,
                   // MODIFY ME!!!!!!!!!!!!!!!!!
                   Double_t energy,
                   uint64_t time,
                   Double_t tot_energy = 0);
 
     /** Copy constructor **/
-    R3BRpcCalData(const R3BRpcCalData&);
+    R3BRpcStripCalData(const R3BRpcStripCalData&);
 
-    R3BRpcCalData& operator=(const R3BRpcCalData&) { return *this; }
+    R3BRpcStripCalData& operator=(const R3BRpcStripCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BRpcCalData() {}
+    virtual ~R3BRpcStripCalData() {}
 
     /** Accessors **/
     inline const Int_t& GetChannelId() const { return fChannelId; }
@@ -70,7 +70,7 @@ class R3BRpcCalData : public FairMultiLinkedData
     uint64_t fTime;         // time of the interaction
 
   public:
-    ClassDef(R3BRpcCalData, 1)
+    ClassDef(R3BRpcStripCalData, 1)
 };
 
 #endif

@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcCalPar.h"
+#include "R3BRpcTotCalPar.h"
 
 #include "FairLogger.h"
 #include "FairParamList.h"
@@ -22,31 +22,31 @@
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
-R3BRpcCalPar::R3BRpcCalPar(const char* name, const char* title, const char* context)
+R3BRpcTotCalPar::R3BRpcTotCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumChannels(64)
+    , fNumChannels(N_NUM)
+    , fCalParams(new TArrayF(N_NUM))
 {
 }
 
 // ----  Destructor ------------------------------------------------------------
-R3BRpcCalPar::~R3BRpcCalPar()
+R3BRpcTotCalPar::~R3BRpcTotCalPar()
 {
     clear();
-    if (fCalParams)
-        delete fCalParams;
+    delete fCalParams;
 }
 
 // ----  Method clear ----------------------------------------------------------
-void R3BRpcCalPar::clear()
+void R3BRpcTotCalPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
 
 // ----  Method putParams ------------------------------------------------------
-void R3BRpcCalPar::putParams(FairParamList* list)
+void R3BRpcTotCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BRpcCalPar::putParams() called";
+    LOG(INFO) << "RpcTotCalPar::putParams() called";
     if (!list)
     {
         return;
@@ -57,14 +57,14 @@ void R3BRpcCalPar::putParams(FairParamList* list)
 
     fCalParams->Set(array_size);
 
-    list->add("RPCCalPar", *fCalParams);
+    list->add("RpcTotCalPar", *fCalParams);
     list->add("RPCChannelsNumberPar", fNumChannels);
 }
 
 // ----  Method getParams ------------------------------------------------------
-Bool_t R3BRpcCalPar::getParams(FairParamList* list)
+Bool_t R3BRpcTotCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BRpcCalPar::getParams() called";
+    LOG(INFO) << "RpcTotCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -79,9 +79,9 @@ Bool_t R3BRpcCalPar::getParams(FairParamList* list)
     LOG(INFO) << "Nb_channels: " << array_size;
     fCalParams->Set(array_size);
 
-    if (!(list->fill("RPCCalPar", fCalParams)))
+    if (!(list->fill("RpcTotCalPar", fCalParams)))
     {
-        LOG(INFO) << "---Could not initialize RPCCalPar";
+        LOG(INFO) << "---Could not initialize RpcTotCalPar";
         return kFALSE;
     }
 
@@ -89,12 +89,12 @@ Bool_t R3BRpcCalPar::getParams(FairParamList* list)
 }
 
 // ----  Method print ----------------------------------------------------------
-void R3BRpcCalPar::print() { printParams(); }
+void R3BRpcTotCalPar::print() { printParams(); }
 
 // ----  Method printParams ----------------------------------------------------
-void R3BRpcCalPar::printParams()
+void R3BRpcTotCalPar::printParams()
 {
-    LOG(INFO) << "R3BRpcCalPar::RPC Calibration Parameters: ";
+    LOG(INFO) << "RpcTotCalPar::RPC Calibration Parameters: ";
     Int_t array_size = fNumChannels;
 
     for (Int_t i = 0; i < fNumChannels; i++)
@@ -104,4 +104,4 @@ void R3BRpcCalPar::printParams()
     }
 }
 
-ClassImp(R3BRpcCalPar)
+ClassImp(R3BRpcTotCalPar)

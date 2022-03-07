@@ -26,14 +26,20 @@
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 
-#include "R3BRpcCalData.h"
+#include "R3BRpcStripCalData.h"
+#include "R3BRpcPmtCalData.h"
 #include <list>
 #include <vector>
 
 R3BRpcCal2Hit::R3BRpcCal2Hit()
     : FairTask("R3B RPC Cal to Hit")
     , fCalDataCA(NULL)
-    , fHitDataCA(NULL)
+    , fParCont1(NULL)
+    , fParCont2(NULL)
+    , fRpcHitStripDataCA(NULL)
+    , fRpcHitPmtDataCA(NULL)
+    , fRpcCalStripDataCA(NULL)
+    , fRpcCalPmtDataCA(NULL)
     , fOnline(kFALSE)
 {
 }
@@ -41,12 +47,21 @@ R3BRpcCal2Hit::R3BRpcCal2Hit()
 R3BRpcCal2Hit::~R3BRpcCal2Hit()
 {
     LOG(INFO) << "R3BRpcCal2Hit: Delete instance";
-    if (fHitDataCA)
-        delete fHitDataCA;
+    if (fRpcHitStripDataCA)
+        delete fRpcHitStripDataCA;
+    if (fRpcHitPmtDataCA)
+        delete fRpcHitPmtDataCA;
+
 }
 
 void R3BRpcCal2Hit::SetParContainers()
 {
+
+}
+
+InitStatus R3BRpcCal2Hit::Init()
+{
+
     // Parameter Container
     // Reading RPCHitPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
@@ -54,6 +69,14 @@ void R3BRpcCal2Hit::SetParContainers()
     {
         LOG(ERROR) << "R3BRpcCal2Hit:: FairRuntimeDb not opened";
     }
+
+    FairRootManager* rootManager = FairRootManager::Instance();
+    if (!rootManager)
+    {
+        LOG(FATAL) << "R3BRpcCal2Hit::FairRootManager not found";
+        return kFATAL;
+    }
+
 
     fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RPCHitPar");
     if (!fHitPar)
@@ -64,21 +87,31 @@ void R3BRpcCal2Hit::SetParContainers()
     {
         LOG(INFO) << "R3BRpcCal2Hit:: RPCHitPar container open";
     }
-}
 
-InitStatus R3BRpcCal2Hit::Init()
-{
-    LOG(INFO) << "R3BRpcCal2Hit::Init()";
-    assert(!fHitDataCA); // in case someone calls Init() twice.
-    FairRootManager* ioManager = FairRootManager::Instance();
-    if (!ioManager)
-        LOG(fatal) << "R3BRpcCal2Hit::Init() FairRootManager not found";
+    fRpcCalStripDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcStripCalData");
+    if (!fRpcCalStripDataCA)
+    {
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcStripCalData not found";
+        return kFATAL;
+    }
 
-    fCalDataCA = (TClonesArray*)ioManager->GetObject("RPCCalData");
+    fRpcCalPmtDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPmtCalData");
+    if (!fRpcCalPmtDataCA)
+    {
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcPmtCalData not found";
+        return kFATAL;
+    }
 
     // Register output array
-    fHitDataCA = new TClonesArray("R3BRPCHitData");
-    ioManager->Register("RPCHitData", "RPC Hit", fHitDataCA, !fOnline);
+    fRpcHitStripDataCA = new TClonesArray("R3BRpcStripHitData");
+    fRpcHitPmtDataCA = new TClonesArray("R3BRpcPmtHitData");
+    rootManager->Register("RpcStripHitData", "RPC Strip Hit", fRpcHitStripDataCA, !fOnline);
+    rootManager->Register("RpcPmtHitData", "RPC Pmt Hit", fRpcHitPmtDataCA, !fOnline);
+
+
+    //fill the TArray with Tot parameters!!!
+    fParCont1 = fHitPar->GetCalParams1();
+    fParCont2 = fHitPar->GetCalParams2();
 
     return kSUCCESS;
 }
@@ -93,46 +126,54 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 {
     Reset(); // Reset entries in output arrays, local arrays
 
-    if (!fHitPar)
-    {
-        LOG(WARNING) << "R3BRpcCal2Hit::Parameter container not found";
-    }
-
-    // Reading the Input -- Cal Data --
-    Int_t nHits = fCalDataCA->GetEntries();
-    if (!nHits)
-        return;
-
-    R3BRpcCalData** calData;
-    calData = new R3BRpcCalData*[nHits];
-
+    //loop over strip data
+    Int_t nHits = fRpcCalStripDataCA->GetEntries();
+    UInt_t iDetector = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BRpcCalData*)(fCalDataCA->At(i));
-        Int_t channelId = 0; // DUMMY FILLING---> CALL HERE YOUR CALIB
-        Double_t energy = 0;
-        uint64_t time = 0;
-        AddHit(channelId, energy, time);
+        auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
+
+        UInt_t inum = iDetector * 41 + map1->GetChannelId() -1;
+
     }
 
-    if (calData)
-        delete[] calData; // FTFY
+    //loop over Pmt data
+    nHits = fRpcCalStripDataCA->GetEntries();
+    iDetector = 1;
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        auto map2 = (R3BRpcPmtCalData*)(fRpcCalPmtDataCA->At(i));
+
+        UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
+
+    }
     return;
 }
 
 void R3BRpcCal2Hit::Reset()
 {
-    // Clear the CA structure
-    LOG(DEBUG) << "Clearing RPCHitData Structure";
-    if (fHitDataCA)
-        fHitDataCA->Clear();
+    LOG(DEBUG) << "Clearing RPCHItStructure Structure";
+    if (fRpcHitStripDataCA){
+        fRpcHitStripDataCA->Clear();
+    }
+    if (fRpcHitPmtDataCA){
+        fRpcHitPmtDataCA->Clear();
+    }
 }
 
-R3BRpcHitData* R3BRpcCal2Hit::AddHit(UInt_t channel, Double_t ene, ULong64_t time)
+R3BRpcStripHitData* R3BRpcCal2Hit::AddHitStrip(UInt_t channel, double time, double pos, double charge)
 {
-    TClonesArray& clref = *fHitDataCA;
+    TClonesArray& clref = *fRpcHitStripDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BRpcHitData(channel, ene, time);
+    return new (clref[size]) R3BRpcStripHitData(channel, time, pos, charge);
+}
+
+
+R3BRpcPmtHitData* R3BRpcCal2Hit::AddHitPmt(UInt_t channel, double time, double pos, double charge)
+{
+    TClonesArray& clref = *fRpcHitPmtDataCA;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BRpcPmtHitData(channel, time, pos, charge);
 }
 
 ClassImp(R3BRpcCal2Hit);

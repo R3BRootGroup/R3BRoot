@@ -22,31 +22,40 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BRpcCal2HitPar.h"
-#include "R3BRpcCalData.h"
+#include "R3BRpcStripCalData.h"
+#include "R3BRpcPmtCalData.h"
+
 #include "R3BRpcHitPar.h"
 
 #include <iostream>
 #include <stdlib.h>
 
 R3BRpcCal2HitPar::R3BRpcCal2HitPar()
-    : R3BRpcCal2HitPar("R3B CALIFA Tot Calibration Parameters Finder ", 1)
+    : R3BRpcCal2HitPar("R3B Rpc Tot Calibration Parameters Finder ", 1)
 {
 }
 
 R3BRpcCal2HitPar::R3BRpcCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fHitPar(NULL)
-    , fCalDataCA(NULL)
+    , fCalStripDataCA(NULL)
+    , fCalPmtDataCA(NULL)
     , fNumChannels(64)
     , fDebugMode(false)
 {
+    for (Int_t i = 0; i < N_STRIP_NB; i++)
+    {
+        fhPos[i] = NULL;
+    }
 }
 
 R3BRpcCal2HitPar::~R3BRpcCal2HitPar()
 {
     LOG(INFO) << "R3BRpcCal2HitPar: Delete instance";
-    if (fCalDataCA)
-        delete fCalDataCA;
+    if (fCalStripDataCA)
+        delete fCalStripDataCA;
+    if (fCalPmtDataCA)
+        delete fCalPmtDataCA;
 }
 
 void R3BRpcCal2HitPar::SetParContainers()
@@ -73,10 +82,17 @@ InitStatus R3BRpcCal2HitPar::Init()
         return kFATAL;
     }
 
-    fCalDataCA = (TClonesArray*)rootManager->GetObject("RPCCalData");
-    if (!fCalDataCA)
+    fCalStripDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcStripCalData");
+    if (!fCalStripDataCA)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() RPCCalData not found";
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcStripCalData not found";
+        return kFATAL;
+    }
+
+    fCalPmtDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPmtCalData");
+    if (!fCalPmtDataCA)
+    {
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcPmtCalData not found";
         return kFATAL;
     }
 
@@ -87,7 +103,7 @@ InitStatus R3BRpcCal2HitPar::Init()
         return kFATAL;
     }
 
-    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RPCHitPar");
+    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
     if (!fHitPar)
 
     {
@@ -108,30 +124,78 @@ InitStatus R3BRpcCal2HitPar::ReInit()
     return kSUCCESS;
 }
 
+void R3BRpcCal2HitPar::Exec(Option_t* opt)
+{
+    //loop over strip data
+    Int_t nHits = fCalStripDataCA->GetEntries();
+    UInt_t iDetector = 0;
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        auto map1 = (R3BRpcStripCalData*)(fCalStripDataCA->At(i));
+
+        UInt_t inum = iDetector * 41 + map1->GetChannelId() -1;
+
+        if (NULL == fhPos[inum])
+        {
+            char strName[255];
+            sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
+            fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+        }
+        fhPos[inum]->Fill( map1->GetTimeLeft() - map1->GetTimeRight() );
+    }
+
+    //loop over Pmt data
+    nHits = fCalPmtDataCA->GetEntries();
+    iDetector = 1;
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        auto map2 = (R3BRpcPmtCalData*)(fCalPmtDataCA->At(i));
+
+        UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
+
+        if (NULL == fhPos[inum])
+        {
+            char strName[255];
+            sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
+            fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+        }
+        fhPos[inum]->Fill( map2->GetTimeTop() - map2->GetTimeBottom() );
+    }
+    return;
+}
+
 void R3BRpcCal2HitPar::Reset() {}
 
 void R3BRpcCal2HitPar::FinishEvent() {}
 
-void R3BRpcCal2HitPar::FinishTask() {}
+void R3BRpcCal2HitPar::FinishTask() {
 
-void R3BRpcCal2HitPar::Exec(Option_t* opt)
-{
-    Int_t nHits = fCalDataCA->GetEntries();
-    if (!nHits)
-        return;
+    for (int t = 0; t < N_STRIP_NB; t++){
 
-    R3BRpcCalData** CalHit = new R3BRpcCalData*[nHits];
-    Int_t crystalId = 0;
+        if (NULL == fhPos[t]){continue;}
 
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        CalHit[i] = (R3BRpcCalData*)(fCalDataCA->At(i));
-        // DO THE WORK
+        int bin_max = fhPos[t]->GetMaximumBin();
+
+        float threshold = 
+        (fhPos[t]->GetBinContent(bin_max - 1) + fhPos[t]->GetBinContent(bin_max) + 
+        fhPos[t]->GetBinContent(bin_max + 1) )/30.;
+
+        for(int i = 1; i <= bin_max; i++){
+            if (fhPos[t]->GetBinContent(i) >= threshold){
+                fHitPar->SetCalParams1(i,t);
+                break;
+            }                
+        }
+        for(int i = 800; i > bin_max; i--){
+            if (fhPos[t]->GetBinContent(i) >= threshold){
+                fHitPar->SetCalParams2(i,t);
+                break;
+            }
+        }
     }
-
-    if (CalHit)
-        delete[] CalHit;
-    return;
+    fHitPar->setChanged();
+    fHitPar->printParams();
+    fHitPar->Write();
 }
 
 ClassImp(R3BRpcCal2HitPar)

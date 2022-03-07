@@ -11,47 +11,50 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRpcPmtMappedData_H
-#define R3BRpcPmtMappedData_H
+#ifndef R3BRPCSTRIPCALDATA_H
+#define R3BRPCSTRIPCALDATA_H
 
+#include "FairMultiLinkedData.h"
 #include "TObject.h"
-#include <stdint.h>
 
-class R3BRpcPmtMappedData : public TObject
+class R3BRpcStripCalData : public FairMultiLinkedData
 {
-
   public:
-    // Default Constructor
-    R3BRpcPmtMappedData();
+    /** Default constructor **/
+    R3BRpcStripCalData();
+
 
     /** Standard Constructor
      *@param channelId   Channel unique identifier
-     *@param fineTime    Fine Time
-     *@param coarseTime  Coarse Time
-     *@param edge        Leading or Trailing
-     *@param side        Side
+     *@param Time        Time (R/L) 
+     *@param Tot         Time over threshold (R/L)
      **/
-    R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge, UShort_t Side);
+    R3BRpcStripCalData(UShort_t channelId, double TimeRight, double TimeLeft, double TotRight, double TotLeft);
 
-    // Destructor
-    virtual ~R3BRpcPmtMappedData() {}
+    /** Copy constructor **/
+    R3BRpcStripCalData(const R3BRpcStripCalData&);
 
-    // Getters
+    R3BRpcStripCalData& operator=(const R3BRpcStripCalData&) { return *this; }
+
+    /** Destructor **/
+    virtual ~R3BRpcStripCalData() {}
+
+    /** Accessors **/
     inline UShort_t GetChannelId() const { return fChannelId; }
-    inline uint64_t GetCoarseTime() const { return fCoarseTime; }
-    inline uint64_t GetFineTime() const { return fFineTime; }
-    inline Int_t GetEdge() const { return fEdge; }
-    inline UShort_t GetSide() const { return fSide; }
+    inline double GetTimeLeft() const { return fTimeLeft; }
+    inline double GetTimeRight() const { return fTimeRight; }
+    inline double GetTotLeft() const { return fTotLeft; }
+    inline double GetTotRight() const { return fTotRight; }
 
   protected:
     UShort_t fChannelId;     // Channel unique identifier
-    uint64_t fFineTime;      // Fine time
-    uint64_t fCoarseTime;    // Coarse time
-    Int_t fEdge;             // Leading or Trailing
-    Short_t fSide;           // Top Or Bottom
+    double fTimeRight;         // Time from Right channel
+    double fTimeLeft;      // Time from Left channel
+    double fTotRight;          // Tot from the Right channel
+    double fTotLeft;       // Tot from the Left channel
 
   public:
-    ClassDef(R3BRpcPmtMappedData, 1)
+    ClassDef(R3BRpcStripCalData, 1)
 };
 
 #endif

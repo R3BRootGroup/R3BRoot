@@ -11,8 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCCALPAR_H
-#define R3BRPCCALPAR_H
+#ifndef R3BRPCTOTCALPAR_H
+#define R3BRPCTOTCALPAR_H
+// 41 Strips +  5 Bars
+#define N_NUM (41*2 + 5*2)
 
 #include "FairParGenericSet.h"
 #include "TObject.h"
@@ -23,17 +25,17 @@
 
 class FairParamList;
 
-class R3BRpcCalPar : public FairParGenericSet
+class R3BRpcTotCalPar : public FairParGenericSet
 {
 
   public:
     /** Standard constructor **/
-    R3BRpcCalPar(const char* name = "RPCCalPar",
+    R3BRpcTotCalPar(const char* name = "RpcTotCalPar",
                  const char* title = "RPC Cal Parameters",
-                 const char* context = "RPCCalParContext");
+                 const char* context = "R3BRpcTotCalParContext");
 
     /** Destructor **/
-    virtual ~R3BRpcCalPar();
+    virtual ~R3BRpcTotCalPar();
 
     /** Method to reset all parameters **/
     virtual void clear();
@@ -61,10 +63,10 @@ class R3BRpcCalPar : public FairParGenericSet
     TArrayF* fCalParams; /*< Calibration Parameters of Channels>*/
     Int_t fNumChannels;  /*< number of channels>*/
 
-    const R3BRpcCalPar& operator=(const R3BRpcCalPar&);
-    R3BRpcCalPar(const R3BRpcCalPar&);
+    const R3BRpcTotCalPar& operator=(const R3BRpcTotCalPar&);
+    R3BRpcTotCalPar(const R3BRpcTotCalPar&);
 
-    ClassDef(R3BRpcCalPar, 1);
+    ClassDef(R3BRpcTotCalPar, 1);
 };
 
-#endif /* R3BRPCCALPAR_H */
+#endif /* R3BRPCTotCALPAR_H */
