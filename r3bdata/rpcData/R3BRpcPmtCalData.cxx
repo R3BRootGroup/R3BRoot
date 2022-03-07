@@ -11,24 +11,26 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcPmtMappedData.h"
+#include "R3BRpcPmtCalData.h"
 
-R3BRpcPmtMappedData::R3BRpcPmtMappedData()
-    : fChannelId(0)
-    , fFineTime(0)
-    , fCoarseTime(0)
-    , fEdge(0)
-    , fSide(0)
+R3BRpcPmtCalData::R3BRpcPmtCalData()
+    : FairMultiLinkedData()
+    , fChannelId(0)
+    , fTimeTop(0)
+    , fTimeBottom(0)
+    , fTotTop(0)
+    , fTotBottom(0)
 {
 }
 
-R3BRpcPmtMappedData::R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge, UShort_t Side)
-: fChannelId(channelId)
-, fFineTime(fineTime)
-, fCoarseTime(coarseTime)
-, fEdge(edge)
-, fSide(Side)
+R3BRpcPmtCalData::R3BRpcPmtCalData(UShort_t channelId, double TimeTop, double TimeBottom, double TotTop, double TotBottom)
+    : FairMultiLinkedData()
+    , fChannelId(channelId)
+    , fTimeTop(TimeTop)
+    , fTimeBottom(TimeBottom)
+    , fTotTop(TotTop)
+    , fTotBottom(TotBottom)
 {
 }
 
-ClassImp(R3BRpcPmtMappedData);
+ClassImp(R3BRpcPmtCalData);

@@ -36,9 +36,9 @@ class R3BRpcRefMappedData : public TObject
     virtual ~R3BRpcRefMappedData() {}
 
     // Getters
-    inline const UShort_t& GetChannelId() const { return fChannelId; }
-    inline const uint64_t& GetCoarseTime() const { return fCoarseTime; }
-    inline const uint64_t& GetFineTime() const { return fFineTime; }
+    inline UShort_t GetChannelId() const { return fChannelId; }
+    inline uint64_t GetCoarseTime() const { return fCoarseTime; }
+    inline uint64_t GetFineTime() const { return fFineTime; }
 
   protected:
     UShort_t fChannelId;     // Channel unique identifier

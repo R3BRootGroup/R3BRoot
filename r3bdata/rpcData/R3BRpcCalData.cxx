@@ -11,9 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcCalData.h"
+#include "R3BRpcStripCalData.h"
 
-R3BRpcCalData::R3BRpcCalData()
+R3BRpcStripCalData::R3BRpcStripCalData()
     : FairMultiLinkedData()
     , fChannelId(-1)
     // MODIFY ME!!!!!!!!!!!!!!!!!
@@ -23,7 +23,7 @@ R3BRpcCalData::R3BRpcCalData()
 {
 }
 
-R3BRpcCalData::R3BRpcCalData(Int_t ident,
+R3BRpcStripCalData::R3BRpcStripCalData(Int_t ident,
                              // MODIFY ME!!!!!!!!!!!!!!!!!
 
                              Double_t energy,
@@ -38,7 +38,7 @@ R3BRpcCalData::R3BRpcCalData(Int_t ident,
 {
 }
 
-R3BRpcCalData::R3BRpcCalData(const R3BRpcCalData& right)
+R3BRpcStripCalData::R3BRpcStripCalData(const R3BRpcStripCalData& right)
     : FairMultiLinkedData(right)
     , fChannelId(right.fChannelId)
     // MODIFY ME!!!!!!!!!!!!!!!!!
@@ -48,4 +48,4 @@ R3BRpcCalData::R3BRpcCalData(const R3BRpcCalData& right)
 {
 }
 
-ClassImp(R3BRpcCalData);
+ClassImp(R3BRpcStripCalData);

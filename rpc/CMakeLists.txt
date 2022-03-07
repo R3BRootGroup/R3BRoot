@@ -33,6 +33,7 @@ ${R3BROOT_SOURCE_DIR}/rpc/sim
 ${R3BROOT_SOURCE_DIR}/rpc/pars
 ${R3BROOT_SOURCE_DIR}/rpc/calibration
 ${R3BROOT_SOURCE_DIR}/rpc/online
+${R3BROOT_SOURCE_DIR}/tcal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -47,25 +48,20 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-#R3BRpc.cxx
-#R3BRpcContFact.cxx
+sim/R3BRpc.cxx
+pars/R3BRpcContFact.cxx
 #R3BRpcDigitizer.cxx
-#R3BRpcMapped2Cal.cxx
-#R3BRpcMapped2CalPar.cxx
-#R3BRpcCalPar.cxx
-#R3BRpcCal2Hit.cxx
-#R3BRpcCal2HitPar.cxx
-#R3BRpcHitPar.cxx
+calibration/R3BRpcMapped2PreCalPar.cxx
+calibration/R3BRpcMapped2PreCal.cxx
+calibration/R3BRpcPreCal2CalPar.cxx
+calibration/R3BRpcPreCal2Cal.cxx
+pars/R3BRpcTotCalPar.cxx
+calibration/R3BRpcCal2Hit.cxx
+calibration/R3BRpcCal2HitPar.cxx
+pars/R3BRpcHitPar.cxx
 #R3BRpcPars4Sim.cxx
-./online/R3BRpcOnlineSpectra.cxx
+#./online/R3BRpcOnlineSpectra.cxx
 )
-
-#file(GLOB SRCS
-#./sim/*.cxx
-#./pars/*.cxx
-#./calibration/*.cxx
-#./online/*.cxx
-#)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -75,6 +71,6 @@ set(LINKDEF RpcLinkDef.h)
 set(LIBRARY_NAME R3BRpc)
 
 set(DEPENDENCIES
-    R3BBase R3BTracking R3BData)
+    R3BBase R3BTracking R3BData R3BTCal)
 
 GENERATE_LIBRARY()

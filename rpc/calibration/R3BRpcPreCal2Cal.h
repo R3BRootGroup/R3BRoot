@@ -13,32 +13,38 @@
 
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                     R3BRpcMapped2Cal                              -----
+// -----                     R3BRpcPreCal2Cal                              -----
 // -----                Created 17/01/2021 by H. Alvarez-Pol               -----
 // -----------------------------------------------------------------------------
 
-#ifndef R3BRPCMAPPED2CAL_H
-#define R3BRPCMAPPED2CAL_H
+#ifndef R3BRPCPRECAL2CAL_H
+#define R3BRPCPRECAL2CAL_H
 
 #include "FairTask.h"
-#include "R3BRpc.h"
-#include "R3BRpcCalData.h"
-#include "R3BRpcMapped2CalPar.h"
-#include "R3BRpcMappedData.h"
+
+
+#include "R3BRpcPreCal2CalPar.h"
+
+#include "R3BRpcStripPreCalData.h"
+#include "R3BRpcPmtPreCalData.h"
+
+#include "R3BRpcStripCalData.h"
+#include "R3BRpcPmtCalData.h"
+
 #include <TRandom.h>
 
 class TClonesArray;
-class R3BRpcCalPar;
+class R3BRpcTotCalPar;
 
-class R3BRpcMapped2Cal : public FairTask
+class R3BRpcPreCal2Cal : public FairTask
 {
 
   public:
     /** Default constructor **/
-    R3BRpcMapped2Cal();
+    R3BRpcPreCal2Cal();
 
     /** Destructor **/
-    virtual ~R3BRpcMapped2Cal();
+    virtual ~R3BRpcPreCal2Cal();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
@@ -59,27 +65,27 @@ class R3BRpcMapped2Cal : public FairTask
     virtual void Finish();
 
     /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
-
+     void SetOnline(Bool_t option) { fOnline = option; }
+    
   private:
     void SetParameter();
-
+    
     Int_t fNumChannels;
-    TArrayF* fCalParams;
+    R3BRpcTotCalPar* fTotCalPar;
+    TArrayF* fParCont;
+    UInt_t fNEvent;
     // Don't store data for online
     Bool_t fOnline;
+    
+    TClonesArray* fStripPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
+    TClonesArray* fPmtPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 
-    R3BRpcCalPar* fCal_Par;         /**< Parameter container. >*/
-    TClonesArray* fRpcMappedDataCA; /**< Array with RPC Mapped- input data. >*/
-    TClonesArray* fRpcCalDataCA;    /**< Array with RPC Cal- output data. >*/
-
-    /** Private method AddCalData **/
-    //** Adds a RpcCalData to the RpcCalCollection
-    R3BRpcCalData* AddCalData(Int_t id, Double_t energy, uint64_t wrts, Double_t tot_energy);
-
-  public:
+    TClonesArray* fRpcStripCalDataCA;    /**< Array with Strip Cal- output data. >*/
+    TClonesArray* fRpcPmtCalDataCA;    /**< Array with Pmt Cal- output data. >*/
+    Int_t event =0;
+  public: 
     // Class definition
-    ClassDef(R3BRpcMapped2Cal, 1)
-};
+    ClassDef(R3BRpcPreCal2Cal, 1)
+};  
 
 #endif

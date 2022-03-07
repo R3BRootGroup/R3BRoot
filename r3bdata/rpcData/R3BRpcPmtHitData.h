@@ -11,65 +11,56 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCHITDATA_H
-#define R3BRPCHITDATA_H
+#ifndef R3BRPCPMTHITDATA_H
+#define R3BRPCPMTHITDATA_H
 
 #include "TObject.h"
 
 #include "FairMultiLinkedData.h"
-#include "R3BRpcCalData.h"
+#include "R3BRpcStripCalData.h"
 
-class R3BRpcHitData : public FairMultiLinkedData
+class R3BRpcPmtHitData : public FairMultiLinkedData
 {
 
   public:
     /** Default constructor **/
-    R3BRpcHitData();
+    R3BRpcPmtHitData();
 
     /** Constructor with arguments
      *@param fChannelId		Channel unique identifier
-     //MODIFY ME!!!!!!!!!!!!!!!!!
-     *@param fEnergy				Total energy deposited
-     *@param fTime				  Time
+     *@param fPos				  Position
+     *@param fTime			  Time
+     *@param fCharge      Charge
      **/
-    R3BRpcHitData(UInt_t channel, Double_t ene, Double_t time);
+    R3BRpcPmtHitData(UInt_t channel, double time, double pos, double charge);
 
     /** Copy constructor **/
-    R3BRpcHitData(const R3BRpcHitData&);
-
-    /** += operator **/
-    R3BRpcHitData& operator+=(R3BRpcCalData& cH)
-    {
-        // MODIFY ME!!!!!!!!!!!!!!!!!
-        this->fEnergy += cH.GetEnergy();
-        return *this;
-    }
-
-    R3BRpcHitData& operator=(const R3BRpcHitData&) { return *this; }
+    R3BRpcPmtHitData(const R3BRpcPmtHitData&);
+    R3BRpcPmtHitData& operator=(const R3BRpcPmtHitData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BRpcHitData() {}
+    virtual ~R3BRpcPmtHitData() {}
 
     /** Accessors **/
     UInt_t GetChannelId() const { return fChannelId; }
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    Double_t GetEnergy() const { return fEnergy; }
-    Double_t GetTime() const { return fTime; }
+    double GetTime() const { return fTime; }
+    double GetPos() const { return fPos; }
+    double GetCharge() const { return fCharge; }
 
     /** Modifiers **/
     void SetChannelId(UInt_t ch) { fChannelId = ch; }
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    void SetEnergy(Double_t ene) { fEnergy = ene; }
-    void SetTime(Double_t tim) { fTime = tim; }
+    void SetPos(double pos) { fPos = pos; }
+    void SetTime(double tim) { fTime = tim; }
+    void SetCharge(double Q) { fCharge = Q; }
 
   protected:
     // Basic Hit information
-    UInt_t fChannelId; //
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    Double_t fEnergy; //
-    Double_t fTime;   //
+    UInt_t fChannelId;
+    double fPos;
+    double fTime;
+    double fCharge;
 
-    ClassDef(R3BRpcHitData, 1)
+    ClassDef(R3BRpcPmtHitData, 1)
 };
 
 #endif
