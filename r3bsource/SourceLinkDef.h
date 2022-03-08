@@ -85,6 +85,7 @@
 #pragma link C++ class R3BCalifaJulichReader+;
 #pragma link C++ class R3BRpcReader+;
 #pragma link C++ class R3BTwimReader+;
+#pragma link C++ class R3BMusliReader+;
 #pragma link C++ class R3BMwpcReader+;
 
 
@@ -142,6 +143,7 @@
 #pragma link C++ class EXT_STR_h101_MUSIC_onion_t;
 #pragma link C++ class EXT_STR_h101_SOFTWIM_onion_t;
 #pragma link C++ class EXT_STR_h101_SOFMWPC_onion_t;
+#pragma link C++ class EXT_STR_h101_MUSLI_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
 #pragma link C++ class EXT_STR_h101_PDC_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_t;

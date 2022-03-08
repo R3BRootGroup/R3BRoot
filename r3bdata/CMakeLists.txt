@@ -57,6 +57,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
+${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -213,6 +214,7 @@ twimData/R3BTwimPoint.cxx
 twimData/R3BTwimMappedData.cxx
 twimData/R3BTwimCalData.cxx
 twimData/R3BTwimHitData.cxx
+musliData/R3BMusliMappedData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
