@@ -388,6 +388,7 @@ if(NOT MODULE)
     endif(WITH_FRS)
     add_subdirectory(mwpc)
     add_subdirectory(twim)
+    add_subdirectory(musli)
 endif(NOT MODULE)
 
 execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
