@@ -78,7 +78,7 @@ InitStatus R3BRpcCal2Hit::Init()
     }
 
 
-    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RPCHitPar");
+    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
     if (!fHitPar)
     {
         LOG(ERROR) << "R3BRpcCal2Hit::Init() Couldn't get handle on RPCHitPar container";
@@ -124,23 +124,54 @@ InitStatus R3BRpcCal2Hit::ReInit()
 
 void R3BRpcCal2Hit::Exec(Option_t* opt)
 {
+
     //loop over strip data
     Int_t nHits = fRpcCalStripDataCA->GetEntries();
     UInt_t iDetector = 0;
-    double max_charge = 0;
+    double charge_left = -1000;
+    double charge_right = -1000;
+    double time_left=0;
+    double time_right = 0;
+    double ichn_right= 0;
+    double ichn_left= 0;
+
     for (Int_t i = 0; i < nHits; i++)
     {
+    
         auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
 
-        if(max_charge <= (map1->GetTotLeft() + map1->GetTotRight())/2.){continue;}
+        if(map1->GetTotRight() >=  charge_right){
+            charge_right=map1->GetTotRight();
+            time_right=map1->GetTimeRight();
+            ichn_right = map1->GetChannelId();
+        }
 
-        UInt_t inum = iDetector * 41 + map1->GetChannelId() -1;
+        if(map1->GetTotLeft() >= charge_left){
+            charge_left=map1->GetTotLeft();
+            time_left= map1->GetTimeLeft();
+            ichn_left = map1->GetChannelId();
+        }
 
     }
 
-    max_charge = 0;
+    return;
 
-    //loop over Pmt data
+    if(ichn_left == ichn_right){
+
+        double position = (time_left - time_right)/2.;
+
+        double charge =  (charge_left + charge_right)/2.;
+
+        double time = (time_left + time_right)/2.;
+
+        TClonesArray& clref = *fRpcHitStripDataCA;
+        Int_t size = clref.GetEntriesFast();
+        //R3BRpcStripHitData(UInt_t channel, double time, double pos, double charge);
+        new (clref[size]) R3BRpcStripHitData(ichn_right, time, position,charge);
+
+    }
+
+    /*//loop over Pmt data
     nHits = fRpcCalPmtDataCA->GetEntries();
     iDetector = 1;
     for (Int_t i = 0; i < nHits; i++)
@@ -151,7 +182,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
         UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
 
-    }
+    }*/
 }
 
 void R3BRpcCal2Hit::Reset()
@@ -165,19 +196,5 @@ void R3BRpcCal2Hit::Reset()
     }
 }
 
-R3BRpcStripHitData* R3BRpcCal2Hit::AddHitStrip(UInt_t channel, double time, double pos, double charge)
-{
-    TClonesArray& clref = *fRpcHitStripDataCA;
-    Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BRpcStripHitData(channel, time, pos, charge);
-}
-
-
-R3BRpcPmtHitData* R3BRpcCal2Hit::AddHitPmt(UInt_t channel, double time, double pos, double charge)
-{
-    TClonesArray& clref = *fRpcHitPmtDataCA;
-    Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BRpcPmtHitData(channel, time, pos, charge);
-}
 
 ClassImp(R3BRpcCal2Hit);

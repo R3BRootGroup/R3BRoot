@@ -144,7 +144,7 @@ void R3BRpcPreCal2Cal::Exec(Option_t* option)
             {
                 UInt_t nxt_inum = (iDetector * 41 + nxt_chn->GetChannelId())*2 + nxt_chn->GetSide() -2 ;
        
-                if (map1->GetSide() == 0)
+                if (map1->GetSide() == 1)
                 {       
                    tot_right = map1->GetTot() - fParCont->GetAt(inum);
                    tot_left = nxt_chn->GetTot() - fParCont->GetAt(nxt_inum);
