@@ -53,15 +53,6 @@ R3BRpcPreCal2Cal::~R3BRpcPreCal2Cal()
     delete fTotCalPar;
 }
 
-void R3BRpcPreCal2Cal::SetParContainers()
-{
-
-}
-
-void R3BRpcPreCal2Cal::SetParameter()
-{
-
-}
 
 InitStatus R3BRpcPreCal2Cal::Init()
 {
@@ -118,17 +109,15 @@ InitStatus R3BRpcPreCal2Cal::Init()
     rootManager->Register("R3BRpcStripCalData", "RPC Strip Cal", fRpcStripCalDataCA, !fOnline);
     rootManager->Register("R3BRpcPmtCalData", "RPC Pmt Cal", fRpcPmtCalDataCA, !fOnline);
 
-
-    SetParameter();
     return kSUCCESS;
 }
 
 InitStatus R3BRpcPreCal2Cal::ReInit()
 {
-    SetParContainers();
-    SetParameter();
+
     return kSUCCESS;
 }
+
 void R3BRpcPreCal2Cal::Exec(Option_t* option)
 {
     // Reset entries in output arrays, local arrays

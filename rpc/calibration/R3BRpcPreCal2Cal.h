@@ -52,8 +52,6 @@ class R3BRpcPreCal2Cal : public FairTask
     /** Virtual method Reset **/
     virtual void Reset();
 
-    virtual void SetParContainers();
-
     // Fair specific
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -68,7 +66,6 @@ class R3BRpcPreCal2Cal : public FairTask
      void SetOnline(Bool_t option) { fOnline = option; }
     
   private:
-    void SetParameter();
     
     Int_t fNumChannels;
     R3BRpcTotCalPar* fTotCalPar;
