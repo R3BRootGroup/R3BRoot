@@ -74,8 +74,6 @@ class R3BRpcCal2Hit : public FairTask
     /** Private method AddHit
      ** Adds a RpcHit to the HitCollection
      **/
-    R3BRpcStripHitData* AddHitStrip(UInt_t channel, double time, double pos, double charge);
-    R3BRpcPmtHitData* AddHitPmt(UInt_t channel, double time, double pos, double charge);
 
     ClassDef(R3BRpcCal2Hit, 1);
 };
