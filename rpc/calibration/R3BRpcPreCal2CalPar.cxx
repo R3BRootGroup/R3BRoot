@@ -56,18 +56,6 @@ R3BRpcPreCal2CalPar::~R3BRpcPreCal2CalPar()
 
 }
 
-void R3BRpcPreCal2CalPar::SetParContainers()
-{
-    // Parameter Container
-    FairRuntimeDb* rtdbPar = FairRuntimeDb::instance();
-    if (!rtdbPar)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
-}
-
-void R3BRpcPreCal2CalPar::SetParameter() {}
-
 InitStatus R3BRpcPreCal2CalPar::Init()
 {
     LOG(INFO) << "R3BRpcPreCal2CalPar::Init()";
@@ -107,15 +95,13 @@ InitStatus R3BRpcPreCal2CalPar::Init()
         return kFATAL;
     }
 
-    // Set container with mapping parameters
-    SetParameter();
+    // Set container with mapping parameter
     return kSUCCESS;
 }
 
 InitStatus R3BRpcPreCal2CalPar::ReInit()
 {
-    SetParContainers();
-    SetParameter();
+
     return kSUCCESS;
 }
 

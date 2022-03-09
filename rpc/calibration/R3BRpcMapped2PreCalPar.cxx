@@ -56,18 +56,6 @@ R3BRpcMapped2PreCalPar::~R3BRpcMapped2PreCalPar()
     delete fEngine;
 }
 
-void R3BRpcMapped2PreCalPar::SetParContainers()
-{
-    // Parameter Container
-    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
-    }
-}
-
-void R3BRpcMapped2PreCalPar::SetParameter() {}
-
 InitStatus R3BRpcMapped2PreCalPar::Init()
 {
     LOG(INFO) << "R3BRpcMapped2PreCalPar::Init()";
@@ -115,9 +103,6 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
         return kFATAL;
     }
 
-    // Set container with mapping parameters
-    SetParameter();
-
     int fMinStats = 10;
 
     fEngine = new R3BTCalEngine(fTCalPar, fMinStats);
@@ -127,8 +112,6 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
 
 InitStatus R3BRpcMapped2PreCalPar::ReInit()
 {
-    SetParContainers();
-    SetParameter();
     return kSUCCESS;
 }
 

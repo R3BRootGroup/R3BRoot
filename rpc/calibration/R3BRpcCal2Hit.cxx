@@ -124,30 +124,34 @@ InitStatus R3BRpcCal2Hit::ReInit()
 
 void R3BRpcCal2Hit::Exec(Option_t* opt)
 {
-    Reset(); // Reset entries in output arrays, local arrays
-
     //loop over strip data
     Int_t nHits = fRpcCalStripDataCA->GetEntries();
     UInt_t iDetector = 0;
+    double max_charge = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
         auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
+
+        if(max_charge <= (map1->GetTotLeft() + map1->GetTotRight())/2.){continue;}
 
         UInt_t inum = iDetector * 41 + map1->GetChannelId() -1;
 
     }
 
+    max_charge = 0;
+
     //loop over Pmt data
-    nHits = fRpcCalStripDataCA->GetEntries();
+    nHits = fRpcCalPmtDataCA->GetEntries();
     iDetector = 1;
     for (Int_t i = 0; i < nHits; i++)
     {
         auto map2 = (R3BRpcPmtCalData*)(fRpcCalPmtDataCA->At(i));
 
+        if(max_charge <= (map2->GetTotBottom() + map2->GetTotTop())/2.){continue;}
+
         UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
 
     }
-    return;
 }
 
 void R3BRpcCal2Hit::Reset()

@@ -54,8 +54,6 @@ class R3BRpcMapped2PreCal : public FairTask
     /** Virtual method Reset **/
     virtual void Reset();
 
-    virtual void SetParContainers();
-
     // Fair specific
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -66,11 +64,16 @@ class R3BRpcMapped2PreCal : public FairTask
     /** Virtual method Finish **/
     virtual void Finish();
 
+    void SetFpgaCorrelationFile(TString file){
+
+      fFpgaCorrelationFile = file;
+
+    };
+
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    void SetParameter();
 
     UInt_t fNofTCalPars;  /**< Number of modules in parameter file. */
 
@@ -80,7 +83,7 @@ class R3BRpcMapped2PreCal : public FairTask
     UInt_t fNEvent;
     // Don't store data for online
     Bool_t fOnline;
-
+    TString fFpgaCorrelationFile;
     R3BTCalPar* fTCalPar;         /**< Parameter container. >*/
     std::vector<int> lut[46][2];  /**<look up table.>*/
     TClonesArray* fMappedStripDataCA; /**< Array with RPC Mapped-input data. >*/
@@ -88,6 +91,21 @@ class R3BRpcMapped2PreCal : public FairTask
     TClonesArray* fMappedRefDataCA; /**< Array with RPC Mapped-input data. >*/
     TClonesArray* fRpcStripPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
     TClonesArray* fRpcPmtPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
+
+    struct Entry_Ref {
+        double time;
+        R3BRpcRefMappedData const *RefMapped;
+    };
+
+    struct Entry_Strip {
+        double time;
+        R3BRpcStripMappedData const *StripMapped;
+    };
+
+    struct Entry_Pmt {
+        double time;
+        R3BRpcPmtMappedData const *PmtMapped;
+    };
     
 
   public:

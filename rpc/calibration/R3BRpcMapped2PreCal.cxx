@@ -36,6 +36,7 @@ R3BRpcMapped2PreCal::R3BRpcMapped2PreCal()
     : FairTask("R3B RPC Calibrator")
     , fTCalPar(NULL)
     , fOnline(kFALSE)
+    , fFpgaCorrelationFile("")
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fMappedStripDataCA(NULL)
     , fMappedPmtDataCA(NULL)
@@ -50,38 +51,6 @@ R3BRpcMapped2PreCal::~R3BRpcMapped2PreCal()
     LOG(INFO) << "R3BRpcMapped2PreCal: Delete instance";
     delete fRpcStripPreCalDataCA;
     delete fRpcPmtPreCalDataCA;
-}
-
-void R3BRpcMapped2PreCal::SetParContainers()
-{
-    // Parameter Container
-    // Reading RPCTCalPar from FairRuntimeDb
-    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    if (!rtdb)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
-    }
-
-    fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
-    if (!fTCalPar)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
-    }
-    else
-    {
-        LOG(INFO) << "R3BRpcMapped2PreCal:: RPCTCalPar container open";
-    }
-}
-
-void R3BRpcMapped2PreCal::SetParameter()
-{
-    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RpcTCalPar");
-    if (!fTCalPar)
-    {
-        LOG(FATAL) << "Could not get access to RpcTCalPar-Container.";
-        fNofTCalPars = 0;
-        return;
-    }
 }
 
 InitStatus R3BRpcMapped2PreCal::Init()
@@ -118,15 +87,24 @@ InitStatus R3BRpcMapped2PreCal::Init()
         return kFATAL;
     }
 
-    // OUTPUT DATA
-    // Calibrated data
-    fRpcStripPreCalDataCA = new TClonesArray("R3BRpcStripPreCalData", 50);
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
+    }
 
-    fRpcPmtPreCalDataCA = new TClonesArray("R3BRpcPmtPreCalData", 50);
+    fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
+    if (!fTCalPar)
+    {
+        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BRpcMapped2PreCal:: RPCTCalPar container open";
+    }
 
-    rootManager->Register("R3BRpcStripPreCalData", "RPC Strip Pre Cal", fRpcStripPreCalDataCA, !fOnline);
-    rootManager->Register("R3BRpcPmtPreCalData", "RPC Pmt Pre Cal", fRpcPmtPreCalDataCA, !fOnline);
 
+    //FPGA mapping
     int lines=0;
 
     ifstream in;
@@ -134,7 +112,12 @@ InitStatus R3BRpcMapped2PreCal::Init()
     string chn_id; 
     int side_lut ;
 
-    in.open("/home/manuel/R3Broot_dev/R3Broot_test/R3BRoot/rpc/calibration/LUT.txt", ios::in);
+    in.open(fFpgaCorrelationFile, ios::in);
+    
+    if (fFpgaCorrelationFile=="")
+    {
+        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";
+    }
 
     while(in >> chn_id >> side_lut ){
 
@@ -146,15 +129,21 @@ InitStatus R3BRpcMapped2PreCal::Init()
     }
     in.close();
 
+    // OUTPUT DATA
+    // Calibrated data
+    fRpcStripPreCalDataCA = new TClonesArray("R3BRpcStripPreCalData", 50);
 
-    SetParameter();
+    fRpcPmtPreCalDataCA = new TClonesArray("R3BRpcPmtPreCalData", 50);
+
+    rootManager->Register("R3BRpcStripPreCalData", "RPC Strip Pre Cal", fRpcStripPreCalDataCA, !fOnline);
+    rootManager->Register("R3BRpcPmtPreCalData", "RPC Pmt Pre Cal", fRpcPmtPreCalDataCA, !fOnline);
+
+
     return kSUCCESS;
 }
 
 InitStatus R3BRpcMapped2PreCal::ReInit()
 {
-    SetParContainers();
-    SetParameter();
     return kSUCCESS;
 }
 
@@ -167,11 +156,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
     {
         LOG(WARNING) << "R3BRpcMapped2PreCal::Parameter container not found";
     }
-
-    struct Entry_Ref {
-        double time;
-        R3BRpcRefMappedData const *RefMapped;
-    };
 
     Entry_Ref Ref_vec[4];
 
@@ -212,10 +196,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
         entry.RefMapped = map3;
     }
 
-    struct Entry_Strip {
-        double time;
-        R3BRpcStripMappedData const *StripMapped;
-    };
+
     std::vector<Entry_Strip> strip_vec[41][2][2];
 
     //loop over strip data
@@ -250,10 +231,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
         strip_vec[map1->GetStripId() -1][map1->GetSide()][map1->GetEdge()].push_back(entry);
     }
 
-    struct Entry_Pmt {
-        double time;
-        R3BRpcPmtMappedData const *PmtMapped;
-    };
     std::vector<Entry_Pmt> bar_vec[5][2][2];
 
     //loop over strip data

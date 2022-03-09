@@ -54,9 +54,6 @@ class R3BRpcMapped2PreCalPar : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method SetParContainers **/
-    virtual void SetParContainers();
-
     /** Accessor functions **/
     const Int_t GetNumChannels() { return fNumChannels; }
 
@@ -65,7 +62,6 @@ class R3BRpcMapped2PreCalPar : public FairTask
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
   private:
-    void SetParameter();
     Bool_t fDebugMode;
     Int_t fNumChannels;
 

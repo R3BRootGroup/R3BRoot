@@ -69,6 +69,7 @@ class R3BRpcCal2HitPar : public FairTask
     Int_t fNumChannels;
 
     TH1F* fhPos[N_STRIP_NB]; 
+    TH1F* fhTime[N_STRIP_NB]; 
 
     R3BRpcHitPar* fHitPar;    /**< Container for Hit parameters. >*/
     TClonesArray* fCalStripDataCA; /**< Array with Cal RPC Strip - input data. >*/
