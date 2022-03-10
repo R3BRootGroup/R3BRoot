@@ -107,6 +107,8 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fRefMappedItems;   // Array with mapped items.
     TClonesArray* fPmtMappedItems;   // Array with mapped items.
     TClonesArray* fStripMappedItems;   // Array with mapped items.
+    TClonesArray* fStripPreCalDataItems;
+    TClonesArray* fStripCalDataItems;
 
 
     TClonesArray* fCalItems;      // Array with cal items.
@@ -116,6 +118,7 @@ class R3BRpcOnlineSpectra : public FairTask
     Int_t fTrigger;         // Trigger value.
     Int_t fNEvents;         // Event counter.
 
+    /* ----- Map Histograms -----*/
     TH1F **stripCoarseRightHisto;
     TH1F **stripFineRightHisto;
 
@@ -134,6 +137,7 @@ class R3BRpcOnlineSpectra : public FairTask
     TH2F *stripFineLeftCorr;
     TH2F *stripFineRightCorr;
 
+    /* ----- Map Canvases*/
     TCanvas *leftStripCanvasCoarse;
     TCanvas *rightStripCanvasCoarse;
 
@@ -145,6 +149,38 @@ class R3BRpcOnlineSpectra : public FairTask
 
     TCanvas *stripFineLeftCorrCanvas;
     TCanvas *stripFineRightCorrCanvas;
+
+    TCanvas *pmtCoarseCanvas;
+    TCanvas *pmtFineCanvas;
+    TCanvas *refFineCanvas;
+    TCanvas *refCoarseCanvas;
+
+    /* ----- Pre Cal Histograms ----- */
+    TH2F *stripLeftTotCorr;
+    TH2F *stripRightTotCorr;
+    TH2F *stripLeftTimeCorr;
+    TH2F *stripRightTimeCorr;
+
+
+    /* ----- Pre Cal Canvases ----- */
+    TCanvas *stripLeftTotCorrCanvas;
+    TCanvas *stripRightTotCorrCanvas;
+    TCanvas *stripLeftTimeCorrCanvas;
+    TCanvas *stripRightTimeCorrCanvas;
+
+    /* ----- Cal Histograms ----- */
+    TH2F *stripCalTimeCorr;
+    TH2F *stripCalToTCorr;
+
+
+
+
+    /* ----- Cal Canvases ----- */
+    TCanvas *stripCalTimeCorrCanvas;
+    TCanvas *stripCalToTCorrCanvas;
+
+
+
 
   public:
     ClassDefOverride(R3BRpcOnlineSpectra, 1)

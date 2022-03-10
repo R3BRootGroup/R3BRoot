@@ -28,6 +28,11 @@
 #include "R3BRpcRefMappedData.h"
 #include "R3BRpcPmtMappedData.h"
 #include "R3BRpcStripMappedData.h"
+#include "R3BRpcStripPreCalData.h"
+#include "R3BRpcStripCalData.h"
+
+
+
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -78,6 +83,9 @@ R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
     if (fPmtMappedItems)
        delete fPmtMappedItems;
 
+    if (fStripPreCalDataItems)
+       delete fStripPreCalDataItems;
+
 }
 
 InitStatus R3BRpcOnlineSpectra::Init()
@@ -121,6 +129,22 @@ InitStatus R3BRpcOnlineSpectra::Init()
         return kFATAL;
     }
 
+    fStripPreCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcStripPreCalData");
+    if (!fStripPreCalDataItems)
+    {
+        R3BLOG(FATAL, "R3BRpcStripPreCalData not found");
+        return kFATAL;
+    }
+
+    fStripCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcStripCalData");
+    if (!fStripCalDataItems)
+    {
+        R3BLOG(FATAL, "R3BRpcStripCalData not found");
+        return kFATAL;
+    }
+
+
+
     char name[100];
     /*
       4 Pmt's
@@ -129,14 +153,16 @@ InitStatus R3BRpcOnlineSpectra::Init()
       4 Ref's
     */
 
+    /* ----- Map Histograms -----*/
+
      stripCoarseRightHisto = new TH1F*[41];
      stripFineRightHisto = new TH1F*[41];
 
      stripCoarseLeftHisto = new TH1F*[41];
      stripFineLeftHisto = new TH1F*[41];
 
-     pmtCoarseHisto = new TH1F*[4];
-     pmtFineHisto = new TH1F*[4];
+     pmtCoarseHisto = new TH1F*[6];
+     pmtFineHisto = new TH1F*[6];
 
      refCoarseHisto = new TH1F*[4];
      refFineHisto = new TH1F*[4];
@@ -145,6 +171,16 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripCoarseRightCorr = new TH2F("stripCoarseRight"," Strip Vs Coarse Time: Right",42,-0.5,41.5,400,0,2500);
      stripFineLeftCorr = new TH2F("stripFineLeft"," Strip Vs Fine Time: Left",42,-0.5,41.5,400,0,600);
      stripFineRightCorr = new TH2F("stripFineRight"," Strip Vs Fine Time: Right",42,-0.5,41.5,400,0,600);
+
+     /* ----- Pre Cal Histograms ----- */
+     stripLeftTotCorr = new TH2F("stripLeftTotCorr","Strip Vs Tot : Left",42,-0.5,41.5,400,0,500);
+     stripRightTotCorr = new TH2F("stripRightTotCorr","Strip Vs Tot : Right",42,-0.5,41.5,400,0,500);
+     stripLeftTimeCorr = new TH2F("stripLeftTimeCorr","Strip Vs Time : Left",42,-0.5,41.5,1000,-550,400);
+     stripRightTimeCorr = new TH2F("stripRightTimeCorr","Strip Vs Time : Right",42,-0.5,41.5,1000,-550,400);
+
+     /* ----- Cal Histograms ----- */
+     stripCalTimeCorr = new TH2F("stripCalTimeCorr","Time Left Vs Time Right",800,-550,400,800,-550,400);
+     stripCalToTCorr = new TH2F("stripCalToTCorr","ToT Left Vs ToT Right",400,-100,350,400,-100,350);
 
 
     for ( Int_t i = 0 ; i < 41; i++){
@@ -164,13 +200,17 @@ InitStatus R3BRpcOnlineSpectra::Init()
     }
 
 
-    for ( Int_t i = 0 ; i < 4; i++){
+    for ( Int_t i = 0 ; i < 6; i++){
 
       sprintf(name, "Coarse Time Pmt_%i",i+1);
       pmtCoarseHisto[i] = new TH1F(name,name,1000,0,3000);
 
       sprintf(name, "Fine Time Pmt_%i",i+1);
       pmtFineHisto[i] = new TH1F(name,name,1000,0,3000);
+
+    }
+
+    for ( Int_t i = 0 ; i < 4; i++){
 
       sprintf(name, "Coarse Time Ref_%i",i+1);
       refCoarseHisto[i] = new TH1F(name,name,1000,0,3000);
@@ -181,6 +221,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
     }
 
 
+    /* ----- Map Canvases*/
 
     rightStripCanvasCoarse = new TCanvas("Right Coarse Canvas","rightStripCanvasCoarse");
     leftStripCanvasCoarse = new TCanvas("Left Coarse Canvas","leftStripCanvasCoarse");
@@ -194,6 +235,19 @@ InitStatus R3BRpcOnlineSpectra::Init()
     rightStripCanvasCoarse->Divide(9,5);
     leftStripCanvasCoarse->Divide(9,5);
 
+    pmtCoarseCanvas = new TCanvas("Pmt Coarse Canvas","pmtCoarseCanvas");
+    pmtCoarseCanvas->Divide(3,2);
+
+    pmtFineCanvas = new TCanvas("Pmt Fine Canvas","pmtFineCanvas");
+    pmtFineCanvas->Divide(3,2);
+
+    refFineCanvas = new TCanvas("Ref Fine Canvas","refFineCanvas");
+    refFineCanvas->Divide(2,2);
+
+    refCoarseCanvas = new TCanvas("Ref Coarse Canvas","refCoarseCanvas");
+    refCoarseCanvas->Divide(2,2);
+
+
 
     stripCoarseLeftCorrCanvas  =  new TCanvas("Left : Strip Vs Coarse","stripCoarseLeftCorrCanvas");
     stripCoarseRightCorrCanvas =  new TCanvas("Right : Strip Vs Coarse","stripCoarseRightCorrCanvas");
@@ -202,6 +256,15 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripFineRightCorrCanvas   =  new TCanvas("Right : Strip Vs Fine","stripFineRightCorrCanvas");
 
 
+    /* ----- Pre Cal Canvases ----- */
+    stripLeftTotCorrCanvas     = new TCanvas("Left : Strip Vs Tot","stripVsTot");
+    stripRightTotCorrCanvas    = new TCanvas("Right : Strip Vs Tot","stripVsTot");
+    stripLeftTimeCorrCanvas    = new TCanvas("Left : Strip Vs Time","stripVsTime");
+    stripRightTimeCorrCanvas    = new TCanvas("Right : Strip Vs Time","stripVsTime");
+
+    /* ----- Cal Canvases ----- */
+    stripCalTimeCorrCanvas = new TCanvas("Left Time Vs Right Time","leftTimeVsRightTime");
+    stripCalToTCorrCanvas  = new TCanvas("Left ToT Vs Right ToT","leftToTVsRightToT");
 
     // MAIN FOLDER-RPC
 
@@ -210,6 +273,15 @@ InitStatus R3BRpcOnlineSpectra::Init()
     // Folder for mapped data
     TFolder* mapfol = new TFolder("Map", "Map RPC info");
     mainfol->Add(mapfol);
+
+    // Folder for PreCal Data
+    TFolder* preCalFolder = new TFolder("Pre Cal", "Pre Cal RPC info");
+    mainfol->Add(preCalFolder);
+
+    // Folder for Cal Data
+    TFolder* calFolder = new TFolder("Cal", "Cal RPC info");
+    mainfol->Add(calFolder);
+
 
     TFolder* stripLeftFolder = new TFolder("Strip Map : Left", "Strip Map : Left");
     mapfol->Add(stripLeftFolder);
@@ -222,6 +294,18 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
     TFolder* refFolder = new TFolder("Ref Map", "Ref Map");
     mapfol->Add(refFolder);
+
+
+    TFolder* stripLeftPreCalFolder = new TFolder("Strip Pre Cal : Left", "Strip Pre Cal : Left");
+    preCalFolder->Add(stripLeftPreCalFolder);
+
+    TFolder* stripRightPreCalFolder = new TFolder("Strip Pre Cal : Right", "Strip Pre Cal : Right");
+    preCalFolder->Add(stripRightPreCalFolder);
+
+    TFolder* stripCalFolder = new TFolder("Strip Cal", "Strip Cal");
+    calFolder->Add(stripCalFolder);
+
+
 
      for (Int_t i = 0; i < 41; i++) {
 
@@ -278,30 +362,79 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripRightFolder->Add(rightStripCanvasFine);
 
 
-    for (Int_t i = 0; i < 4; i++) {
+    stripLeftTotCorr->GetXaxis()->SetTitle("Strip Number");
+    stripLeftTotCorr->GetYaxis()->SetTitle("ToT");
+    stripLeftTotCorrCanvas->cd();
+    stripLeftTotCorr->Draw("COLZ");
+    stripLeftPreCalFolder->Add(stripLeftTotCorrCanvas);
+
+    stripRightTotCorr->GetXaxis()->SetTitle("Strip Number");
+    stripRightTotCorr->GetYaxis()->SetTitle("ToT");
+    stripRightTotCorrCanvas->cd();
+    stripRightTotCorr->Draw("COLZ");
+    stripRightPreCalFolder->Add(stripRightTotCorrCanvas);
+
+
+    stripLeftTimeCorr->GetXaxis()->SetTitle("Strip Number");
+    stripLeftTimeCorr->GetYaxis()->SetTitle("Time");
+    stripLeftTimeCorrCanvas->cd();
+    stripLeftTimeCorr->Draw("COLZ");
+    stripLeftPreCalFolder->Add(stripLeftTimeCorrCanvas);
+
+    stripRightTimeCorr->GetXaxis()->SetTitle("Strip Number");
+    stripRightTimeCorr->GetYaxis()->SetTitle("Time");
+    stripRightTimeCorrCanvas->cd();
+    stripRightTimeCorr->Draw("COLZ");
+    stripRightPreCalFolder->Add(stripRightTimeCorrCanvas);
+
+    stripCalTimeCorr->GetXaxis()->SetTitle("Left Time");
+    stripCalTimeCorr->GetYaxis()->SetTitle("Right Time");
+    stripCalTimeCorrCanvas->cd();
+    stripCalTimeCorr->Draw("COLZ");
+    stripCalFolder->Add(stripCalTimeCorrCanvas);
+
+    stripCalToTCorr->GetXaxis()->SetTitle("Left ToT");
+    stripCalToTCorr->GetYaxis()->SetTitle("Right ToT");
+    stripCalToTCorrCanvas->cd();
+    stripCalToTCorr->Draw("COLZ");
+    stripCalFolder->Add(stripCalToTCorrCanvas);
+
+
+
+
+    for (Int_t i = 0; i < 6; i++) {
 
        pmtCoarseHisto[i]->GetXaxis()->SetTitle("Coarse Time");
        pmtCoarseHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtCoarseCanvas->cd(i+1);
        pmtCoarseHisto[i]->Draw();
-       pmtFolder->Add(pmtCoarseHisto[i]);
 
        pmtFineHisto[i]->GetXaxis()->SetTitle("Fine Time");
        pmtFineHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtFineCanvas->cd(i+1);
        pmtFineHisto[i]->Draw();
-       pmtFolder->Add(pmtFineHisto[i]);
+    }
+
+
+    for (Int_t i = 0; i < 4; i++) {
 
        refFineHisto[i]->GetXaxis()->SetTitle("Fine Time");
        refFineHisto[i]->GetYaxis()->SetTitle("Counts");
+       refFineCanvas->cd(i+1);
        refFineHisto[i]->Draw();
-       refFolder->Add(refFineHisto[i]);
 
 
        refCoarseHisto[i]->GetXaxis()->SetTitle("Coarse Time");
        refCoarseHisto[i]->GetYaxis()->SetTitle("Counts");
+       refCoarseCanvas->cd(i+1);
        refCoarseHisto[i]->Draw();
-       refFolder->Add(refCoarseHisto[i]);
-
    }
+
+    refFolder->Add(refFineCanvas);
+    refFolder->Add(refCoarseCanvas);
+    pmtFolder->Add(pmtCoarseCanvas);
+    pmtFolder->Add(pmtFineCanvas);
+
 
     stripCoarseRightCorr->GetXaxis()->SetTitle("Strip Number");
     stripCoarseRightCorr->GetYaxis()->SetTitle("Coarse Time");
@@ -354,6 +487,12 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     {
         refFineHisto[i]->Reset();
         refCoarseHisto[i]->Reset();
+
+    }
+
+
+    for (Int_t i = 0; i < 6; i++) {
+
         pmtFineHisto[i]->Reset();
         pmtCoarseHisto[i]->Reset();
     }
@@ -371,12 +510,13 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 {
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
         return;
-
     // // Fill mapped data
 
     if (fStripMappedItems && fStripMappedItems->GetEntriesFast() > 0)
     {
         auto nHits = fStripMappedItems->GetEntriesFast();
+
+
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
@@ -437,6 +577,38 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
              pmtCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
 
         }
+    }
+
+
+    auto nStripPreCalHits = fStripPreCalDataItems->GetEntriesFast();
+
+    for( Int_t ihit = 0; ihit < nStripPreCalHits; ihit++) {
+
+      R3BRpcStripPreCalData* hit = (R3BRpcStripPreCalData*)fStripPreCalDataItems->At(ihit);
+
+         Int_t side = hit->GetSide();
+
+         if(side == 0){
+           stripLeftTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
+           stripLeftTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+         }
+
+         if(side == 1){
+           stripRightTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
+           stripRightTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+
+         }
+
+    }
+
+    auto nStripCalHits = fStripCalDataItems->GetEntriesFast();
+
+    for( Int_t ihit = 0; ihit < nStripCalHits; ihit++) {
+
+     R3BRpcStripCalData* hit = (R3BRpcStripCalData*)fStripCalDataItems->At(ihit);
+     stripCalTimeCorr->Fill(hit->GetTimeLeft(),hit->GetTimeRight());
+     stripCalToTCorr->Fill(hit->GetTotLeft(),hit->GetTotRight());
+
     }
 
 

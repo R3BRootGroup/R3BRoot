@@ -60,7 +60,7 @@ calibration/R3BRpcCal2Hit.cxx
 calibration/R3BRpcCal2HitPar.cxx
 pars/R3BRpcHitPar.cxx
 #R3BRpcPars4Sim.cxx
-#./online/R3BRpcOnlineSpectra.cxx
+./online/R3BRpcOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

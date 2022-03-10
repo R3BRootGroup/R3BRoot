@@ -103,8 +103,8 @@ InitStatus R3BRpcCal2Hit::Init()
     }
 
     // Register output array
-    fRpcHitStripDataCA = new TClonesArray("R3BRpcStripHitData");
-    fRpcHitPmtDataCA = new TClonesArray("R3BRpcPmtHitData");
+    fRpcHitStripDataCA = new TClonesArray("R3BRpcStripHitData",50);
+    fRpcHitPmtDataCA = new TClonesArray("R3BRpcPmtHitData",50);
     rootManager->Register("RpcStripHitData", "RPC Strip Hit", fRpcHitStripDataCA, !fOnline);
     rootManager->Register("RpcPmtHitData", "RPC Pmt Hit", fRpcHitPmtDataCA, !fOnline);
 
@@ -124,7 +124,7 @@ InitStatus R3BRpcCal2Hit::ReInit()
 
 void R3BRpcCal2Hit::Exec(Option_t* opt)
 {
-
+    Reset();
     //loop over strip data
     Int_t nHits = fRpcCalStripDataCA->GetEntries();
     UInt_t iDetector = 0;
@@ -137,7 +137,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-    
+
         auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
 
         if(map1->GetTotRight() >=  charge_right){
@@ -154,7 +154,6 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
     }
 
-    return;
 
     if(ichn_left == ichn_right){
 
@@ -164,10 +163,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
         double time = (time_left + time_right)/2.;
 
-        TClonesArray& clref = *fRpcHitStripDataCA;
-        Int_t size = clref.GetEntriesFast();
-        //R3BRpcStripHitData(UInt_t channel, double time, double pos, double charge);
-        new (clref[size]) R3BRpcStripHitData(ichn_right, time, position,charge);
+        AddHit(ichn_right,time,position,charge);
 
     }
 
@@ -184,6 +180,19 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
     }*/
 }
+
+R3BRpcStripHitData* R3BRpcCal2Hit::AddHit(UInt_t channel, double time, double pos, double charge)
+{
+
+    TClonesArray& clref = *fRpcHitStripDataCA;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BRpcStripHitData(channel, time, pos,charge);
+
+
+}
+
+void R3BRpcCal2Hit::Finish() {}
+
 
 void R3BRpcCal2Hit::Reset()
 {
