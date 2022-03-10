@@ -121,6 +121,10 @@ InitStatus R3BLosMapped2CalPar::Init()
         R3BLOG(FATAL, "LosMapped not found");
         return kFATAL;
     }
+    
+    // get access to Trigger Mapped data
+    fMappedTriggerItems = (TClonesArray*)rm->GetObject("LosTriggerMapped");
+    R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     fCal_Par->setChanged();
@@ -178,6 +182,22 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
             Icount[iChannel][iType]++;
 
             fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
+        }
+    }
+    
+    // Calibrate trigger channels -----------------------------------------------
+    if (fMappedTriggerItems && fMappedTriggerItems->GetEntriesFast()>0)
+    {
+        auto mapped_num = fMappedTriggerItems->GetEntriesFast();
+        for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+        {
+            auto mapped = (R3BLosMappedData const*)fMappedTriggerItems->At(mapped_i);
+            
+            UInt_t iDetector = mapped->GetDetector() - 1; // now 0..n-1
+            UInt_t iChannel = mapped->GetChannel() - 1;   // now 0..n-1
+            UInt_t iType = mapped->GetType();             // 0,1,2,3
+            //R3BLOG(INFO, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
+            fEngine->Fill(3, iChannel + 1, iType + 1, mapped->GetTimeFine());
         }
     }
 

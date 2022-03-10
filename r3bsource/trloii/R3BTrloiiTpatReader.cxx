@@ -55,10 +55,10 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BTrloiiTpatReader::Init() R3BEventHeader not found";
+        LOG(WARNING) << "R3BTrloiiTpatReader::Init() EventHeader. not found";
     }
     else
-        LOG(INFO) << "R3BTrloiiTpatReader::Init() R3BEventHeader found";
+        LOG(INFO) << "R3BTrloiiTpatReader::Init() EventHeader. found";
 
     return kTRUE;
 }

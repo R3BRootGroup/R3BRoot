@@ -130,6 +130,7 @@ class R3BLosMapped2CalPar : public FairTask
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */
     TClonesArray* fMapped;  /**< Array with mapped data - input data. */
+    TClonesArray* fMappedTriggerItems;
     R3BEventHeader* header; /**< Event header - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
