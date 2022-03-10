@@ -109,11 +109,11 @@ InitStatus R3BRpcMapped2PreCal::Init()
 
     ifstream in;
 
-    string chn_id; 
+    string chn_id;
     int side_lut ;
 
     in.open(fFpgaCorrelationFile, ios::in);
-    
+
     if (fFpgaCorrelationFile=="")
     {
         LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";

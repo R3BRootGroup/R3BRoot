@@ -46,7 +46,7 @@ class R3BRpcCal2Hit : public FairTask
     virtual void SetParContainers();
 
     /** Virtual method Finish **/
-    // virtual void Finish();
+     virtual void Finish();
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -70,6 +70,10 @@ class R3BRpcCal2Hit : public FairTask
     Bool_t fOnline; // Selector for online data storage
     // Parameter class
     R3BRpcHitPar* fHitPar;
+
+
+    R3BRpcStripHitData* AddHit(UInt_t channel, double time, double pos, double charge);
+
 
     /** Private method AddHit
      ** Adds a RpcHit to the HitCollection
