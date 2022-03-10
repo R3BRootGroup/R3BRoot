@@ -129,6 +129,8 @@ class R3BMusliOnlineSpectra : public FairTask
 
     TCanvas* cMusliMap_Emean;
 
+    TCanvas* cMusliMap_DeltaDT;
+
     // Histograms for Mapped data
     TH1I* fh1_Muslimap_mult;
     TH2I* fh2_Muslimap_mult;
@@ -149,7 +151,7 @@ class R3BMusliOnlineSpectra : public FairTask
     TH2F* fh2_Muslimap_Emean4vsE16;
     TH2F* fh2_Muslimap_Emean8vsE16;
 
-    // TH1F* fh1_Muslimap_treftrigger;
+    TH1I* fh1_Muslimap_DeltaDT;
 
   public:
     ClassDef(R3BMusliOnlineSpectra, 1)
