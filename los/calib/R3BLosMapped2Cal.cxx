@@ -447,15 +447,17 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
     }
 
     // Calibrate trigger channels -----------------------------------------------
-    if (fMappedTriggerItems)
+    if (fMappedTriggerItems && fMappedTriggerItems->GetEntriesFast() > 0)
     {
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
             auto mapped = (R3BLosMappedData const*)fMappedTriggerItems->At(mapped_i);
-
+            UInt_t iDetector = mapped->GetDetector();
+            UInt_t iChannel = mapped->GetChannel();
+            UInt_t iType = mapped->GetType() + 1;
             // Tcal parameters.
-            auto* par = fTcalPar->GetModuleParAt(3, 1, 1);
+            auto* par = fTcalPar->GetModuleParAt(2 + iDetector, iChannel, iType);
             if (!par)
             {
                 R3BLOG(WARNING, "Trigger Tcal par not found.");
@@ -467,7 +469,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             // ... and subtract it from the next clock cycle.
             time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
 
-            auto cal = new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()]) R3BLosCalData(3);
+            auto cal = new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()]) R3BLosCalData(iDetector);
             cal->fTimeL_ns[0] = time_ns;
         }
     }

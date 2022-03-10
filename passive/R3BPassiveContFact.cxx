@@ -71,4 +71,4 @@ FairParSet* R3BPassiveContFact::createContainer(FairContainer* c)
     return p;
 }
 
-ClassImp(R3BPassiveContFact)
+ClassImp(R3BPassiveContFact);
