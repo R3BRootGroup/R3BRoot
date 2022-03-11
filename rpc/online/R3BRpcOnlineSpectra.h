@@ -109,10 +109,7 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fStripMappedItems;   // Array with mapped items.
     TClonesArray* fStripPreCalDataItems;
     TClonesArray* fStripCalDataItems;
-
-
-    TClonesArray* fCalItems;      // Array with cal items.
-    TClonesArray* fHitItems;      // Array with hit items.
+    TClonesArray* fPmtPreCalItems;
 
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
@@ -160,13 +157,17 @@ class R3BRpcOnlineSpectra : public FairTask
     TH2F *stripRightTotCorr;
     TH2F *stripLeftTimeCorr;
     TH2F *stripRightTimeCorr;
-
+    TH1F **pmtPreCalTimeHisto;
+    TH1F **pmtPreCalTotHisto;
 
     /* ----- Pre Cal Canvases ----- */
     TCanvas *stripLeftTotCorrCanvas;
     TCanvas *stripRightTotCorrCanvas;
     TCanvas *stripLeftTimeCorrCanvas;
     TCanvas *stripRightTimeCorrCanvas;
+    TCanvas *pmtPreCalTimeCanvas;
+    TCanvas *pmtPreCalTotCanvas;
+
 
     /* ----- Cal Histograms ----- */
     TH2F *stripCalTimeCorr;
@@ -175,9 +176,12 @@ class R3BRpcOnlineSpectra : public FairTask
 
 
 
+
     /* ----- Cal Canvases ----- */
     TCanvas *stripCalTimeCorrCanvas;
-    TCanvas *stripCalToTCorrCanvas;
+    TCanvas *stripCalTotCorrCanvas;
+
+
 
 
 
