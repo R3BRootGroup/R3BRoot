@@ -31,6 +31,8 @@
 #include "R3BRpcStripPreCalData.h"
 #include "R3BRpcStripCalData.h"
 #include "R3BRpcPmtPreCalData.h"
+#include "R3BRpcStripHitData.h"
+
 
 
 
@@ -153,6 +155,12 @@ InitStatus R3BRpcOnlineSpectra::Init()
     }
 
 
+    fStripHitDataItems = (TClonesArray*)mgr->GetObject("RpcStripHitData");
+    if (!fStripHitDataItems)
+    {
+        R3BLOG(FATAL, "RpcStripHitData not found");
+        return kFATAL;
+    }
 
 
 
@@ -179,6 +187,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
     // Folder for Cal Data
     TFolder* calFolder = new TFolder("Cal", "Cal RPC info");
     mainfol->Add(calFolder);
+
+    // Folder for Hit Data
+    TFolder* hitFolder = new TFolder("Hit", "Hit RPC info");
+    mainfol->Add(hitFolder);
+
 
 
     TFolder* stripLeftFolder = new TFolder("Strip Map : Left", "Strip Map : Left");
@@ -264,6 +277,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripCalTimeCorrCanvas = new TCanvas("Left Time Vs Right Time","leftTimeVsRightTime");
     stripCalTotCorrCanvas  = new TCanvas("Left ToT Vs Right ToT","leftToTVsRightToT");
 
+    /* ------ Hit Canvases ------*/
+    hitMapCanvas = new TCanvas("Hit Map","hitMapCanvas");
+    hitMapCanvas->Divide(2,1);
+
+
     /* ----- Map Histograms -----*/
 
      stripCoarseRightHisto = new TH1F*[41];
@@ -295,6 +313,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
      /* ----- Cal Histograms ----- */
      stripCalTimeCorr = new TH2F("stripCalTimeCorr","Strip: Time Left Vs Time Right",800,-550,400,800,-550,400);
      stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,350,400,-100,350);
+
+     /* ------------- HIT Histograms ------------ */
+     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",500,-200,300,42,-0.5,41.5);
+     totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
+
 
     for ( Int_t i = 0 ; i < 41; i++){
 
@@ -434,6 +457,15 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripCalToTCorr->Draw("COLZ");
     stripCalFolder->Add(stripCalTotCorrCanvas);
 
+    stripPosHitCorr->GetXaxis()->SetTitle("Position");
+    stripPosHitCorr->GetYaxis()->SetTitle("Strip");
+    hitMapCanvas->cd(1);
+    stripPosHitCorr->Draw("COLZ");
+    hitFolder->Add(hitMapCanvas);
+
+    totalChargeHist->GetXaxis()->SetTitle("Charge");
+    totalChargeHist->GetYaxis()->SetTitle("Counts");
+    hitFolder->Add(totalChargeHist);
 
 
     for (Int_t i = 0; i < 6; i++) {
@@ -555,6 +587,8 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     stripFineRightCorr->Reset();
     stripCalTimeCorr->Reset();
     stripCalToTCorr->Reset();
+    totalChargeHist->Reset();
+    stripPosHitCorr->Reset();
 
 
 
@@ -683,6 +717,18 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
     }
 
+    /*---------------- HIT EventLoop ---------------*/
+    auto nStripHits = fStripHitDataItems->GetEntriesFast();
+
+    for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
+
+     R3BRpcStripHitData* hit = (R3BRpcStripHitData*)fStripHitDataItems->At(ihit);
+
+     stripPosHitCorr->Fill(hit->GetChannelId(),hit->GetPos());
+     totalChargeHist->Fill(hit->GetCharge());
+
+    }
+
 
     fNEvents += 1;
     return;
@@ -722,6 +768,12 @@ void R3BRpcOnlineSpectra::FinishEvent()
     {
         fPmtPreCalItems->Clear();
     }
+
+    if(fStripHitDataItems)
+    {
+        fStripHitDataItems->Clear();
+    }
+
 
 
 }
