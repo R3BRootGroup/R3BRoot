@@ -19,6 +19,8 @@
 #include "TGraph.h"
 #include "TH1F.h"
 
+#define CSCINT (140.)
+
 class TClonesArray;
 class R3BEventHeader;
 
@@ -63,9 +65,16 @@ class R3BRpcCal2HitPar : public FairTask
 
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
+    void SetNBCalib(){fRpcCalib = false;}
+
+
+
   private:
+    void CalculateParsStrip();
+    void CalculateParsPmt();
     void SetParameter();
     Bool_t fDebugMode;
+    Bool_t  fRpcCalib;
     Int_t fNumChannels;
 
     TH1F* fhPos[N_STRIP_NB]; 
