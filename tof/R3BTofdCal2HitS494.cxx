@@ -148,14 +148,6 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
             {
                 if (fhQvsPos[i][j])
                     delete fhQvsPos[i][j];
-                /*
-                if (fhQvsTHit[i][j])
-                    delete fhQvsTHit[i][j];
-                */
-                /*
-                if (fhTvsTHit[i][j])
-                    delete fhTvsTHit[i][j];
-                */
             }
         }
     }
@@ -168,6 +160,7 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
 
 InitStatus R3BTofdCal2HitS494::Init()
 {
+    R3BLOG(INFO, "");
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
@@ -696,15 +689,18 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    LOG(DEBUG) << "Charge Time xpos ypos plane bar";
-    for (Int_t hit = 0; hit < event.size(); hit++)
+    if (fTofdHisto)
     {
-        LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
-                   << " " << event[hit].plane << " " << event[hit].bar;
-        // if (event[hit].plane == 2 && (event[hit].bar < 21 || event[hit].bar > 24)) fhTvsQ[event[hit].plane -
-        // 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
-        if (event[hit].plane == 2 && (event[hit].bar == 18))
-            fhTvsQ[event[hit].plane - 1]->Fill(event[hit].time - event[0].time, event[hit].charge);
+        LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+        for (Int_t hit = 0; hit < event.size(); hit++)
+        {
+            LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " "
+                       << event[hit].ypos << " " << event[hit].plane << " " << event[hit].bar;
+            // if (event[hit].plane == 2 && (event[hit].bar < 21 || event[hit].bar > 24)) fhTvsQ[event[hit].plane -
+            // 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
+            if (event[hit].plane == 2 && (event[hit].bar == 18))
+                fhTvsQ[event[hit].plane - 1]->Fill(event[hit].time - event[0].time, event[hit].charge);
+        }
     }
 
     // Now we can analyze the hits in this event

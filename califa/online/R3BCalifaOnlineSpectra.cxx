@@ -657,7 +657,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     sprintf(Name1, "WR_Master_Califa");
     cWrs = new TCanvas(Name1, Name1, 10, 10, 500, 500);
     sprintf(Name2, "fh1_WR_Master_Califa");
-    sprintf(Name3, "WR-Master - WR-Califa: Messel (blue), Wixhausen (red) - WR-Master");
+    sprintf(Name3, "WR-Califa - WR-Master: Messel (blue), Wixhausen (red) - WR-Master");
     fh1_wrs[0] = new TH1I(Name2, Name3, 4000, -4000, 4000);
     fh1_wrs[0]->SetStats(1);
     fh1_wrs[0]->GetXaxis()->SetTitle("WRTs difference");
