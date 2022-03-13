@@ -20,6 +20,8 @@
 #include "R3BRpcHitPar.h"
 #include "Rtypes.h"
 
+#define CSCINT (140.)
+
 #include <TVector3.h>
 
 class TClonesArray;
@@ -66,18 +68,15 @@ class R3BRpcCal2Hit : public FairTask
 
     TArrayF* fParCont1;
     TArrayF* fParCont2;
+    TArrayF* fParCont3;
 
     Bool_t fOnline; // Selector for online data storage
     // Parameter class
     R3BRpcHitPar* fHitPar;
 
 
-    R3BRpcStripHitData* AddHit(UInt_t channel, double time, double pos, double charge);
-
-
-    /** Private method AddHit
-     ** Adds a RpcHit to the HitCollection
-     **/
+    R3BRpcStripHitData* AddHitStrip(UInt_t channel, double time, double pos, double charge);
+    R3BRpcPmtHitData* AddHitPmt(UInt_t channel, double time, double pos, double charge);
 
     ClassDef(R3BRpcCal2Hit, 1);
 };

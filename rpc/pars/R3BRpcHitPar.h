@@ -50,14 +50,20 @@ class R3BRpcHitPar : public FairParGenericSet
     const Double_t GetNumChannels() { return fNumChannels; }
     TArrayF* GetCalParams1() { return fHitCalParams1; }
     TArrayF* GetCalParams2() { return fHitCalParams2; }
+    TArrayF* GetCalParams3() { return fHitCalParams3; }
+    TArrayF* GetCalParams4() { return fHitCalParams4; }
 
     void SetNumChannels(Int_t numberCha) { fNumChannels = numberCha; }
     void SetCalParams1(Float_t cc, Int_t ii) { fHitCalParams1->AddAt(cc, ii); }
     void SetCalParams2(Float_t cc, Int_t ii) { fHitCalParams2->AddAt(cc, ii); }
+    void SetCalParams3(Float_t cc, Int_t ii) { fHitCalParams3->AddAt(cc, ii); }
+    void SetCalParams4(Float_t cc, Int_t ii) { fHitCalParams4->AddAt(cc, ii); }
 
   private:
     TArrayF* fHitCalParams1; /*< Calibration Parameters of Pos 1>*/
     TArrayF* fHitCalParams2; /*< Calibration Parameters of Pos 2>*/
+    TArrayF* fHitCalParams3; /*< Calibration Parameters of Pos 3>*/
+    TArrayF* fHitCalParams4; /*< Calibration Parameters of Pos 4>*/
     Int_t fNumChannels;  /*< number of channels>*/
 
     const R3BRpcHitPar& operator=(const R3BRpcHitPar&);

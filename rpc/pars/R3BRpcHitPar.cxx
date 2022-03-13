@@ -27,6 +27,8 @@ R3BRpcHitPar::R3BRpcHitPar(const char* name, const char* title, const char* cont
     , fNumChannels(N_STRIP_NB)
     , fHitCalParams1(new TArrayF(N_STRIP_NB))
     , fHitCalParams2(new TArrayF(N_STRIP_NB))
+    , fHitCalParams3(new TArrayF(N_STRIP_NB))
+    , fHitCalParams4(new TArrayF(N_STRIP_NB))
 {
 }
 
@@ -36,6 +38,8 @@ R3BRpcHitPar::~R3BRpcHitPar()
     clear();
     delete fHitCalParams1;
     delete fHitCalParams2;
+    delete fHitCalParams3;
+    delete fHitCalParams4;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -62,6 +66,8 @@ void R3BRpcHitPar::putParams(FairParamList* list)
 
     list->add("RpcHitPar1", *fHitCalParams1);
     list->add("RpcHitPar2", *fHitCalParams2);
+    list->add("RpcHitPar3", *fHitCalParams3);
+    list->add("RpcHitPar4", *fHitCalParams4);
     list->add("RPCChannelsNumberPar", fNumChannels);
 }
 
@@ -83,6 +89,8 @@ Bool_t R3BRpcHitPar::getParams(FairParamList* list)
     LOG(INFO) << "Nb_channels: " << array_size;
     fHitCalParams1->Set(array_size);
     fHitCalParams2->Set(array_size);
+    fHitCalParams3->Set(array_size);
+    fHitCalParams4->Set(array_size);
 
     if (!(list->fill("RpcHitPar1", fHitCalParams1)))
     {
@@ -92,7 +100,19 @@ Bool_t R3BRpcHitPar::getParams(FairParamList* list)
 
     if (!(list->fill("RpcHitPar2", fHitCalParams2)))
     {
-        LOG(INFO) << "---Could not initialize RpcHitPar1";
+        LOG(INFO) << "---Could not initialize RpcHitPar2";
+        return kFALSE;
+    }
+
+    if (!(list->fill("RpcHitPar3", fHitCalParams3)))
+    {
+        LOG(INFO) << "---Could not initialize RpcHitPar3";
+        return kFALSE;
+    }
+
+    if (!(list->fill("RpcHitPar4", fHitCalParams4)))
+    {
+        LOG(INFO) << "---Could not initialize RpcHitPar4";
         return kFALSE;
     }
 
@@ -113,6 +133,8 @@ void R3BRpcHitPar::printParams()
         LOG(INFO) << "Channel number: " << i + 1;
         LOG(INFO) << "Param1= " << fHitCalParams1->GetAt(i);
         LOG(INFO) << "Param2= " << fHitCalParams2->GetAt(i);
+        LOG(INFO) << "Param3= " << fHitCalParams3->GetAt(i);
+        LOG(INFO) << "Param3= " << fHitCalParams4->GetAt(i);
     }
 }
 
