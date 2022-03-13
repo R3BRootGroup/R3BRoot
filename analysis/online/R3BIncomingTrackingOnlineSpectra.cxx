@@ -305,15 +305,21 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
                     continue;
                 mwpc1x = hit->GetX() + fMw1GeoPar->GetPosX() * 10.;
                 mwpc1y = hit->GetY() + fMw1GeoPar->GetPosY() * 10.;
-                Float_t angX = (mwpc1x - mwpc0x) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
-                Float_t angY = (mwpc1y - mwpc0y) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
+                // Float_t angX = (mwpc1x - mwpc0x) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
+                // Float_t angY = (mwpc1y - mwpc0y) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
+                Float_t angX = (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
+                Float_t angY = (mwpc0y - mwpc1y) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
                 if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc1x > -150.)
                 {
                     zrand = gRandom->Uniform(0., fDist_acelerator_glad);
-                    fh2_tracking_planeYZ->Fill(zrand, mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * zrand); // mm
-                    ytarget = mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * fPosTarget;
-                    fh2_tracking_planeXZ->Fill(zrand, mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * zrand); // mm
-                    xtarget = mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * fPosTarget;
+                    // fh2_tracking_planeYZ->Fill(zrand, mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * zrand); // mm
+                    // ytarget = mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * fPosTarget;
+                    // fh2_tracking_planeXZ->Fill(zrand, mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * zrand); // mm
+                    // xtarget = mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * fPosTarget;
+                    fh2_tracking_planeYZ->Fill(zrand, mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * zrand); // mm
+                    ytarget = mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * fPosTarget;
+                    fh2_tracking_planeXZ->Fill(zrand, mwpc1x - angX * fMw1GeoPar->GetPosZ() * 10. + angX * zrand); // mm
+                    xtarget = mwpc1x - angX * fMw1GeoPar->GetPosZ() * 10. + angX * fPosTarget;
                 }
             }
             if (xtarget > -500. && ytarget > -500.)

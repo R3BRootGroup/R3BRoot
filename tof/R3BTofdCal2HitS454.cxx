@@ -59,51 +59,8 @@ namespace
 } // namespace
 
 R3BTofdCal2HitS454::R3BTofdCal2HitS454()
-    : FairTask("TofdCal2Hit", 1)
-    , fCalItems(NULL)
-    , fCalTriggerItems(NULL)
-    , fHitItems(new TClonesArray("R3BTofdHitData"))
-    , fNofHitItems(0)
-    , fNofHitPars(0)
-    , fHitPar(NULL)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fNofPlanes(5)
-    , fPaddlesPerPlane(6)
-    , fTofdQ(1)
-    , fTofdHisto(true)
-    , fTofdTotPos(true)
-    , fnEvents(0)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , maxevent(0)
-    , wrongtrigger(0)
-    , wrongtpat(0)
-    , headertpat(0)
-    , events_in_cal_level(0)
-    , inbarcoincidence(0)
-    , eventstore(0)
-    , singlehit(0)
-    , multihit(0)
-    , bars_with_multihit(0)
-    , events_wo_tofd_hits(0)
+    : R3BTofdCal2HitS454("TofdCal2Hit", 1)
 {
-    if (fTofdHisto)
-    {
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
-        {
-            fhQ[i] = NULL;
-            fhxy[i] = NULL;
-            fhQvsEvent[i] = NULL;
-            fhTdiff[i] = NULL;
-            fhTsync[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                // fhQvsTHit[i][j] = NULL;
-                // fhTvsTHit[i][j] = NULL;
-            }
-        }
-    }
 }
 
 R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
@@ -174,14 +131,6 @@ R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
             {
                 if (fhQvsPos[i][j])
                     delete fhQvsPos[i][j];
-                /*
-                if (fhQvsTHit[i][j])
-                    delete fhQvsTHit[i][j];
-                */
-                /*
-                if (fhTvsTHit[i][j])
-                    delete fhTvsTHit[i][j];
-                */
             }
         }
     }
