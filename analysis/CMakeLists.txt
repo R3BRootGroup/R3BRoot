@@ -33,6 +33,13 @@ ${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/tofi
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/fiber
+${R3BROOT_SOURCE_DIR}/fibers
+${R3BROOT_SOURCE_DIR}/fibers/fi30
+${R3BROOT_SOURCE_DIR}/fibers/fi31
+${R3BROOT_SOURCE_DIR}/fibers/fi32
+${R3BROOT_SOURCE_DIR}/fibers/fi33
+${R3BROOT_SOURCE_DIR}/fibers/fi23a
+${R3BROOT_SOURCE_DIR}/fibers/fi23b
 ${R3BROOT_SOURCE_DIR}/ssd/online
 ${R3BROOT_SOURCE_DIR}/los/online
 ${R3BROOT_SOURCE_DIR}/califa/online
@@ -85,7 +92,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF AnaLinkDef.h)
 
 Set(DEPENDENCIES
-GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene)
+GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene
+)
 
 Set(LIBRARY_NAME R3BAnalysis)
 
