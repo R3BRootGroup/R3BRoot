@@ -54,6 +54,7 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetForward(Bool_t forward) {fForward = forward;}
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
     void SetBfield(Double_t Bfield) {fBfield = Bfield;}
+    void SetOutput(Bool_t WriteOut){fWriteOut = WriteOut;}
     
   private:
     Bool_t InitPropagator();
@@ -71,7 +72,21 @@ class R3BFragmentTrackerS494 : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fArrayHits;
-    Int_t fNofTrackItems;    
+    Int_t fNofTrackItems;
+    TClonesArray* fTofdHitItems;       
+    Int_t fNofTofdHitItems;
+    TClonesArray* fFi23aHitItems;       
+    Int_t fNofFi23aHitItems;
+    TClonesArray* fFi23bHitItems;       
+    Int_t fNofFi23bHitItems;
+    TClonesArray* fFi30HitItems;       
+    Int_t fNofFi30HitItems;
+    TClonesArray* fFi31HitItems;       
+    Int_t fNofFi31HitItems;
+    TClonesArray* fFi32HitItems;       
+    Int_t fNofFi32HitItems;
+    TClonesArray* fFi33HitItems;       
+    Int_t fNofFi33HitItems;    
     Int_t fNEvents;
     Int_t fNEventsLeft;
     Int_t fNEventsRight;
@@ -112,6 +127,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fForward;
     Bool_t fOptimizeGeometry;
     Double_t fAfterGladResolution;
+    Bool_t fWriteOut;
     Int_t eventCounter = 0;
     Double_t minChi2;
 
@@ -172,7 +188,14 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_xfi30_tofd_exp;
     TH2F* fh_xfi31_fi23a_exp;
     TH2F* fh_xfi31_fi33_exp;
-    TH2F* fh_xfi31_tofd_exp;    
+    TH2F* fh_xfi31_tofd_exp;   
+    TH2F* fh_yC_vs_yHe_Tofd;
+    TH2F* fh_yC_vs_yHe_Tofd_exp;
+    TH2F* fh_tofd_track_exp;
+    TH2F* fh_fi23b_track_exp;
+    TH2F* fh_yFi23b_tofd_track;
+    TH2F* fh_yFi23b_tofd_exp;
+    TH2F* fh_pyC_vs_pyHe; 
     TH2F* fh_A_overZ;
 
     ClassDef(R3BFragmentTrackerS494, 1)

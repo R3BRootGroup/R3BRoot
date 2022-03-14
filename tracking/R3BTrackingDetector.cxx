@@ -202,6 +202,7 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
                      (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta);
 
     // cout << "Eloss: " << eloss << endl;
+    //  if(fGeoParName.EqualTo("TargetGeoPar")) cout<<"Eloss in target: "<<eloss<<", for Z= "<<Z1<<", "<<beta<<endl;
 
     //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
     //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);

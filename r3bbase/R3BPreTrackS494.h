@@ -217,6 +217,7 @@ class R3BPreTrackS494 : public FairTask
     unsigned long fNEvents = 0, fNEvents_start = 0, fNeventstrack=0, fNeventselect=0; /**< Event counter. */
 
     Int_t maxevent;
+    Int_t ncorell = 0, nanticorell = 0;
 
     Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
     Double_t calib_SEE = 1.;   // SEETRAM calibration factor
@@ -304,26 +305,63 @@ class R3BPreTrackS494 : public FairTask
 
 	TH2F* fh_Fib30_vs_Fib23a;
 	TH2F* fh_Fib30_vs_Fib23a_dx;
+	TH2F* fh_Fib30_vs_Fib23a_dt;
 	TH2F* fh_Fib31_vs_Fib23b;
 	TH2F* fh_Fib31_vs_Fib23b_dx;
+	TH2F* fh_Fib31_vs_Fib23b_dt;
 
 	TH2F* fh_Fib33_vs_Fib31;
 	TH2F* fh_Fib33_vs_Fib31_dx;
+	TH2F* fh_Fib33_vs_Fib31_dt;
 	TH2F* fh_Fib31_vs_Fib23a;
 	TH2F* fh_Fib31_vs_Fib23a_dx;
+	TH2F* fh_Fib31_vs_Fib23a_dt;
 	TH2F* fh_Fib32_vs_Fib30;
 	TH2F* fh_Fib32_vs_Fib30_dx;
+	TH2F* fh_Fib32_vs_Fib30_dt;
 	TH2F* fh_Fib30_vs_Fib23b;
 	TH2F* fh_Fib30_vs_Fib23b_dx;
+	TH2F* fh_Fib30_vs_Fib23b_dt;
+	
+	TH2F* fh_tofd_vs_Fib31;
+    TH2F* fh_ytofd_vs_yFib31;
+    TH2F* fh_tofd_vs_Fib31_ac;
+    TH2F* fh_tofd_vs_Fib30;
+    TH2F* fh_ytofd_vs_yFib30;
+    TH2F* fh_tofd_vs_Fib30_ac;
 
-	TH2F* fh_Fib33_vs_Fib31_back;
-	TH2F* fh_Fib23a_vs_Fib23b_back;
-	TH2F* fh_Fib31_vs_Fib23a_back;
-	TH2F* fh_Fib31_vs_Fib23a_dx_back;
-	TH2F* fh_Fib32_vs_Fib30_back;
-	TH2F* fh_Fib32_vs_Fib30_dx_back;
-	TH2F* fh_Fib30_vs_Fib23b_back;
-	TH2F* fh_Fib30_vs_Fib23b_dx_back;
+	TH2F* fh_Fib33_vs_Fib31_ac;
+	TH2F* fh_Fib33_vs_Fib31_dx_ac;
+	TH2F* fh_Fib31_vs_Fib23a_ac;
+	TH2F* fh_Fib31_vs_Fib23a_dx_ac;
+	TH2F* fh_Fib31_vs_Fib23b_ac;
+	TH2F* fh_Fib31_vs_Fib23b_dx_ac;
+	TH2F* fh_Fib32_vs_Fib30_ac;
+	TH2F* fh_Fib32_vs_Fib30_dx_ac;
+	TH2F* fh_Fib30_vs_Fib23b_ac;
+	TH2F* fh_Fib30_vs_Fib23b_dx_ac;
+	TH2F* fh_Fib30_vs_Fib23a_ac;
+	TH2F* fh_Fib30_vs_Fib23a_dx_ac;
+	TH2F* fh_Fi23aX_TofdX_He;
+	TH2F* fh_Fi23aX_TofdX_C;
+	TH2F* fh_Fi23bY_TofdY_He;
+	TH2F* fh_Fi23bY_TofdY_C;
+	TH2F* fh_Fi301X_TofdX_He;
+	TH2F* fh_Fi301X_TofdX_C;
+	TH2F* fh_Fi301Y_TofdY_He;
+	TH2F* fh_Fi301Y_TofdY_C;
+	TH2F* fh_Fi323X_TofdX_He;
+	TH2F* fh_Fi323X_TofdX_C;
+	TH2F* fh_Fi323Y_TofdY_He;
+	TH2F* fh_Fi323Y_TofdY_C;
+	TH2F* fh_Fi23aX_TofdX_bw1;
+	TH2F* fh_Fi23aX_TofdX_bw2;
+	TH2F* fh_yTofd_vs_yTofd;
+	TH2F* fh_yTofdHe_vs_yTofdC   ;
+	TH2F* fh_xTofdHe_vs_xTofdC;
+	TH2F* fh_xy_target;
+	TH2F* fh_TimePreviousEventFi23a;
+    TH2F* fh_TimePreviousEventFi23b;
 
     TH2F* fh_Cave_position;
 

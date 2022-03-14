@@ -83,6 +83,21 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fOptimizeGeometry(kFALSE)
     , fTrackItems(new TClonesArray("R3BTrack"))
     , fNofTrackItems()
+    , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
+    , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi23bHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi30HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi31HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi32HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi33HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fNofTofdHitItems(0)
+    , fNofFi23aHitItems(0)
+    , fNofFi23bHitItems(0)
+    , fNofFi30HitItems(0)
+    , fNofFi31HitItems(0)
+    , fNofFi32HitItems(0)
+    , fNofFi33HitItems(0)
+    , fWriteOut(kFALSE)
 {
     // this is the list of detectors (active areas) we use for tracking
     fDetectorsLeft->AddDetector("target", kTarget, "TargetGeoPar");
@@ -168,6 +183,14 @@ InitStatus R3BFragmentTrackerS494::Init()
     man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
     man->Register("Track", "Land", fTrackItems, kTRUE);
 
+    man->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
+    man->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
+    man->Register("Fi23bHit", "Land", fFi23bHitItems, kTRUE);
+    man->Register("Fi30Hit", "Land", fFi30HitItems, kTRUE);
+    man->Register("Fi31Hit", "Land", fFi31HitItems, kTRUE);
+    man->Register("Fi32Hit", "Land", fFi32HitItems, kTRUE);
+    man->Register("Fi33Hit", "Land", fFi33HitItems, kTRUE);
+
     if (!InitPropagator())
     {
         return kERROR;
@@ -239,7 +262,7 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_xfi30_fi32_track->GetXaxis()->SetTitle("xFi30 / cm");
     fh_xfi30_fi32_track->GetYaxis()->SetTitle("xFi32 / cm");
 
-    fh_xfi30_tofd_track = new TH2F("h_xFi30vsToFD_track", "xToFD vs xFi30 track", 120, -60, 60, 600, -30, 30);
+    fh_xfi30_tofd_track = new TH2F("h_xFi30vsToFD_track", "xToFD track vs xFi30", 120, -60, 60, 600, -30, 30);
     fh_xfi30_tofd_track->GetXaxis()->SetTitle("xToFD / cm");
     fh_xfi30_tofd_track->GetYaxis()->SetTitle("xFi30 / cm");
 
@@ -265,22 +288,47 @@ InitStatus R3BFragmentTrackerS494::Init()
 
     fh_xfi30_tofd_exp = new TH2F("h_xFi30vsToFD_exp", "xToFD vs xFi30 exp", 120, -60, 60, 600, -30, 30);
     fh_xfi30_tofd_exp->GetXaxis()->SetTitle("xToFD / cm");
-    fh_xfi30_tofd_exp->GetYaxis()->SetTitle("xFi30 / cm");
+    fh_xfi30_tofd_exp->GetYaxis()->SetTitle("xFi39 / cm");
+
+    fh_fi23b_track_exp = new TH2F("h_yFi23b_track_vs_exp", "yFi23b track vs yFi23b exp", 480, -6, 6, 480, -6, 6);
+    fh_fi23b_track_exp->GetXaxis()->SetTitle("yFib23b track / cm");
+    fh_fi23b_track_exp->GetYaxis()->SetTitle("yFi23b exp / cm");
+
+    fh_tofd_track_exp = new TH2F("h_yToFD_track_vs_exp", "yToFD track vs yTofd exp", 120, -60, 60, 120, -60, 60);
+    fh_tofd_track_exp->GetXaxis()->SetTitle("yToFD track / cm");
+    fh_tofd_track_exp->GetYaxis()->SetTitle("yTofd exp / cm");
+
+    fh_yFi23b_tofd_track = new TH2F("h_yTofdvsFi23b_track", "yFi23b vs yTofd track", 120, -60, 60, 480, -6, 6);
+    fh_yFi23b_tofd_track->GetYaxis()->SetTitle("yFi23b / cm");
+    fh_yFi23b_tofd_track->GetXaxis()->SetTitle("yTofd / cm");
+
+    fh_yFi23b_tofd_exp = new TH2F("h_yTofdvsFi23b_exp", "yFi23b vs yTofd exp", 120, -60, 60, 480, -6, 6);
+    fh_yFi23b_tofd_track->GetYaxis()->SetTitle("yFi23b / cm");
+    fh_yFi23b_tofd_track->GetXaxis()->SetTitle("yTofd / cm");
 
     fh_xfi31_fi23a_exp = new TH2F("h_xFi31vsFi23a_exp", "xFi23a vs xFi31 exp", 480, -6, 6, 600, -30, 30);
     fh_xfi31_fi23a_exp->GetXaxis()->SetTitle("xFi23a / cm");
     fh_xfi31_fi23a_exp->GetYaxis()->SetTitle("xFi31 / cm");
-    ;
 
     fh_xfi31_fi33_exp = new TH2F("h_xFi31vsFi33_exp", "xFi33 vs xFi31 exp", 600, -30, 30, 600, -30, 30);
     fh_xfi31_fi33_exp->GetXaxis()->SetTitle("xFi31 / cm");
     fh_xfi31_fi33_exp->GetYaxis()->SetTitle("xFi33 / cm");
-    ;
 
     fh_xfi31_tofd_exp = new TH2F("h_xFi31vsToFD_exp", "xToFD vs xFi31 exp", 120, -60, 60, 600, -30, 30);
     fh_xfi31_tofd_exp->GetXaxis()->SetTitle("xToFD / cm");
-    fh_xfi31_tofd_exp->GetYaxis()->SetTitle("xFi31 / cm");
-    ;
+    fh_xfi31_tofd_exp->GetYaxis()->SetTitle("xFi31/ cm");
+
+    fh_yC_vs_yHe_Tofd = new TH2F("h_yC_vs_yHe_Tofd", "yC_vs_yHe_Tofd track", 120, -60, 60, 120, -60, 60);
+    fh_yC_vs_yHe_Tofd->GetXaxis()->SetTitle("yC / cm");
+    fh_yC_vs_yHe_Tofd->GetYaxis()->SetTitle("yHe / cm");
+
+    fh_yC_vs_yHe_Tofd_exp = new TH2F("h_yC_vs_yHe_Tofd_exp", "yC_vs_yHe_Tofd exp", 120, -60, 60, 120, -60, 60);
+    fh_yC_vs_yHe_Tofd_exp->GetXaxis()->SetTitle("yC / cm");
+    fh_yC_vs_yHe_Tofd_exp->GetYaxis()->SetTitle("yHe / cm");
+
+    fh_pyC_vs_pyHe = new TH2F("h_pyC_vs_pyHe", "pyC_vs_pyHe", 1000, -500, 500, 1000, -500, 500);
+    fh_pyC_vs_pyHe->GetXaxis()->SetTitle("pyC / MeV/c");
+    fh_pyC_vs_pyHe->GetYaxis()->SetTitle("pyHe / MeV/c");
 
     fFitter->Init(fPropagator, fEnergyLoss);
 
@@ -397,9 +445,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     */
     fNEvents_nonull += 1;
 
-    if (debug)
-        cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
-    if (tof->hits.size() > 0 && debug)
+    // if (debug)
+    cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+    if (tof->hits.size() > 0) //&& debug)
     {
         cout << "Hits ToFD: " << tof->hits.size() << endl;
         cout << "Hits right: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi31->hits.size() << "  "
@@ -450,6 +498,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t pz0O = 0.;
     Double_t pO = 0.;
     Double_t massO = 0.;
+
+    Double_t pBeamz = 17.3915;
+    Double_t pzmem = 0.;
+    Double_t pymem = 0.;
+    Double_t xmem = 0.;
+    Double_t ymem = 0.;
+    Double_t yC = -1000;
+    Double_t yCexp = -1000;
 
     if (fArrayMCTracks)
     {
@@ -665,8 +721,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             if (charge != charge_requested)
                 continue;
-            if (debug)
-                cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
+            //  if (debug)
+            cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
 
             beta0 = 0.7593; // velocity could eventually be calculated from ToF
             tof->res_t = 0.03;
@@ -715,44 +771,111 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 cout << "AT START: "
                      << "Mass: " << m0 << ", Momentum: " << p0 << endl;
 
-
             if (tof->hits.at(i)->GetX() > 0 && fi30->hits.size() > 0 && fi32->hits.size() > 0 &&
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
                 // left branch in beam direction, don't consider hits in the detectors of the other side
 
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.9750);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.8753);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.625196);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.025);						
-                ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.9974960);
+                if (!fSimu)
+                {
+                    // first optimization, right and left same:
+                    /* ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
+                      ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(179.1);
+                      ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.);
+                      ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                      ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0011);
+                      ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // second optimization
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.9750);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(172.8753);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(1.625196);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(0.025);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.9974960);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0);
+                    // second optimization angleZ=0
+                    /*( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.875);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.8753);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.630196);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.0);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.997496);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);	*/
+                    // third optimization
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.8);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(174.9635);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.205);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(1.009);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // fourth optimization
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleY(-13.73465); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionZ(175.0103); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionY(1.24908); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleZ(0.); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionScale(1.00596); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleX(0.0);*/
+                    // fifth optimization
+                    /*( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.83939);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(173.005);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.16036);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.027573);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.99871);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.02068);	*/
+                    // seventh optimization
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(173.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.99);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.03);*/
+                    // seventh optimization test
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(173.7);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.3);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.991);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.03);*/
+                }
+                // simu from 01/02/22:
+                if (fSimu)
+                {
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-14.);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(174.95);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(1.08);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(0.);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.00);
+                }
 
                 R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
                 if (fNEventsLeft == 0)
                 {
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-				}
+                }
 
-                do // fi30
+                do // fi32
                 {
-                    if (ifi30 >= 0)
-                        fh_eloss_fi30_mc->Fill(1000. * fi30->hits.at(ifi30)->GetEloss()); // MeV
-                    if (ifi30 >= 0 && !fi30->free_hit[ifi30]) // if the hit was used already, continue
+                    if (ifi32 >= 0)
+                        fh_eloss_fi32_mc->Fill(1000. * fi32->hits.at(ifi32)->GetEloss()); // MeV
+                    if (ifi32 >= 0 && !fi32->free_hit[ifi32] &&
+                        (charge_requested != fi32->hits.at(ifi32)->GetEloss() &&
+                         !fSimu)) // if the hit was used already, continue
                     {
                         if (debug)
-                            cout << "Fi30 hit already used" << endl;
-                        ifi30 += 1;
+                            cout << "Fi32 hit already used" << endl;
+                        ifi32 += 1;
                         continue;
                     }
-                    do // fi32
+                    do // fi30
                     {
-                        if (ifi32 >= 0)
-                            fh_eloss_fi32_mc->Fill(1000. * fi32->hits.at(ifi32)->GetEloss()); // MeV
-                        if (ifi32 >= 0 && !fi32->free_hit[ifi32]) // if the hit was used already, continue
+                        if (ifi30 >= 0)
+                            fh_eloss_fi30_mc->Fill(1000. * fi30->hits.at(ifi30)->GetEloss()); // MeV
+                        if (ifi30 >= 0 && !fi30->free_hit[ifi30] &&
+                            (charge_requested != fi30->hits.at(ifi30)->GetEloss() &&
+                             !fSimu)) // if the hit was used already, continue
                         {
                             if (debug)
-                                cout << "Fi32 hit already used" << endl;
-                            ifi32 += 1;
+                                cout << "Fi30 hit already used" << endl;
+                            ifi30 += 1;
                             continue;
                         }
                         do // fi23b
@@ -762,7 +885,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             if (ifi23b >= 0 && !fi23b->free_hit[ifi23b]) // if the hit was used already, continue
                             {
                                 if (debug)
-                                    cout << "Fi23b hit already used" << endl;
+                                    cout << "left - Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
+                                         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -780,7 +904,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 }
 
                                 // Create object for particle which will be fitted
-                                candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
+                                if (l < 3)
+                                {
+                                    candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
+                                }
+                                else
+                                {
+                                    Double_t pHestart = pBeamz - pzmem;
+                                    candidate =
+                                        new R3BTrackingParticle(charge, xmem, ymem, z0, 0., 0., pHestart, beta0, m0);
+                                }
 
                                 if (debug)
                                 {
@@ -793,7 +926,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     cout << " Fi23a left # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
                                          << endl;
                                 if (ifi23b > -1 && debug)
-                                    cout << " Fi23b # " << ifi23b << " x: " << fi23b->hits.at(ifi23b)->GetX() << endl;
+                                    cout << " left Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
+                                         << endl;
                                 if (ifi30 > -1 && debug)
                                     cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX() << endl;
                                 if (ifi32 > -1 && debug)
@@ -814,7 +948,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Int_t status = 10;
                                 if (fForward)
                                 {
-                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+                                    Double_t pin = 0;
+                                    //	if(l > 1) pin = pzmem;
+                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors, pin);
                                 }
                                 else
                                 {
@@ -898,28 +1034,97 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (0 == fi23b->hits.size())
                             ifi23b = -1;
 
-                        ifi32 += 1;
-                    } while (ifi32 < fi32->hits.size());
-                    ifi32 = 0;
-                    if (0 == fi32->hits.size())
-                        ifi32 = -1;
+                        ifi30 += 1;
+                    } while (ifi30 < fi30->hits.size());
+                    ifi30 = 0;
+                    if (0 == fi30->hits.size())
+                        ifi30 = -1;
 
-                    ifi30 += 1;
-                } while (ifi30 < fi30->hits.size());
-                ifi30 = 0;
-                if (0 == fi30->hits.size())
-                    ifi30 = -1;
+                    ifi32 += 1;
+                } while (ifi32 < fi32->hits.size());
+                ifi32 = 0;
+                if (0 == fi32->hits.size())
+                    ifi32 = -1;
             } // end if left branch
 
             if (tof->hits.at(i)->GetX() < 0 && fi31->hits.size() > 0 && fi33->hits.size() > 0 &&
                 fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
                 // right branch in beam direction, don't consider hits in the detectors of the other side
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.88482);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(178.7732);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(2.041127);						
-				( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(-0.3535);						
-                ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002188);
+
+                if (!fSimu)
+                {
+                    // first optimization, right and left same:
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(179.1);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0011);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // second optimization
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.88482);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(178.7732);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(2.041127);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(-0.3535);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002188);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0);
+                    // second optimization angleZ=0
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleY(-13.86857); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionZ(179.0529); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionY(2.122505); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleZ(-0.3535); ( (R3BGladFieldMap*)
+                       FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.001629); ( (R3BGladFieldMap*)
+                       FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // third optimization
+                    /*( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.00583);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(175.4381);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.72047);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.9895);
+                    ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // fourth optimization
+                    /*  ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                      )->SetTrackerCorrectionAngleY(-13.97821); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                      )->SetTrackerCorrectionZ(175.4601); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                      )->SetTrackerCorrectionY(1.74234); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                      )->SetTrackerCorrectionAngleZ(0.); ( (R3BGladFieldMap*)
+                      FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.98795); ( (R3BGladFieldMap*)
+                      FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
+                    // fifth optimization
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleY(-13.38015); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionZ(173.6426); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionY(0.87293); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
+                       )->SetTrackerCorrectionAngleZ(0.03423889); ( (R3BGladFieldMap*)
+                       FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.98219); ( (R3BGladFieldMap*)
+                       FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.01777889);	*/
+                    // seventh optimization
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(173.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.99);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.03);*/
+                    // seventh optimization test
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.5);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(173.7);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.3);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionScale(0.991);
+                        ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.03);
+                     */
+                }
+                // simu from 01/02/22:
+                if (fSimu)
+                {
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-14.);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(174.95);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(1.08);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(0.);
+                    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.00);
+                }
+
                 R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
                 if (fNEventsRight == 0)
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
@@ -928,7 +1133,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 {
                     if (ifi33 >= 0)
                         fh_eloss_fi33_mc->Fill(1000. * fi33->hits.at(ifi33)->GetEloss()); // MeV
-                    if (ifi33 >= 0 && !fi33->free_hit[ifi33]) // if the hit was used already, continue
+                    if (ifi33 >= 0 && !fi33->free_hit[ifi33] &&
+                        (charge_requested != fi33->hits.at(ifi33)->GetEloss() &&
+                         !fSimu)) // if the hit was used already, continue
                     {
                         if (debug)
                             cout << "Fi33 hit already used" << endl;
@@ -939,10 +1146,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     {
                         if (ifi31 >= 0)
                             fh_eloss_fi31_mc->Fill(1000. * fi31->hits.at(ifi31)->GetEloss()); // MeV
-                        if (ifi31 >= 0 && !fi31->free_hit[ifi31]) // if the hit was used already, continue
+                        if (ifi31 >= 0 && !fi31->free_hit[ifi31] &&
+                            (charge_requested != fi31->hits.at(ifi31)->GetEloss() &&
+                             !fSimu)) // if the hit was used already, continue
                         {
                             if (debug)
-                                cout << "Fi11 hit already used" << endl;
+                                cout << "Fi31 hit already used" << endl;
                             ifi31 += 1;
                             continue;
                         }
@@ -953,7 +1162,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             if (ifi23b >= 0 && !fi23b->free_hit[ifi23b]) // if the hit was used already, continue
                             {
                                 if (debug)
-                                    cout << "Fi23b hit already used" << endl;
+                                    cout << "right Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
+                                         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -964,13 +1174,22 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit was used already, continue
                                 {
                                     if (debug)
-                                        cout << "Fi3a hit already used" << endl;
+                                        cout << "Fi23a hit already used" << endl;
                                     ifi23a += 1;
                                     continue;
                                 }
 
                                 // Create object for particle which will be fitted
-                                candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
+                                if (l < 3)
+                                {
+                                    candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
+                                }
+                                else
+                                {
+                                    Double_t pHestart = pBeamz - pzmem;
+                                    candidate =
+                                        new R3BTrackingParticle(charge, xmem, ymem, z0, 0., 0., pHestart, beta0, m0);
+                                }
 
                                 if (debug)
                                 {
@@ -984,7 +1203,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (ifi23a > -1 && debug)
                                     cout << " Fi23a # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
                                 if (ifi23b > -1 && debug)
-                                    cout << " Fi23b # " << ifi23b << " x: " << fi23b->hits.at(ifi23b)->GetX() << endl;
+                                    cout << "right Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
+                                         << endl;
                                 if (ifi33 > -1 && debug)
                                     cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
                                 if (ifi31 > -1 && debug)
@@ -1005,7 +1225,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Int_t status = 10;
                                 if (fForward)
                                 {
-                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+                                    Double_t pin = 0;
+                                    //	if(l > 1) pin = pzmem;
+                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors, pin);
                                 }
                                 else
                                 {
@@ -1139,6 +1361,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     bestcandidate = x;
                     // minChi2 = x->GetChi2();
                     minChi2 = parChi2;
+                    pzmem = x->GetStartMomentum().Z();
+                    xmem = x->GetStartPosition().X();
+                    ymem = x->GetStartPosition().Y();
 
                     // cout << "New min chi2: " << minChi2 << endl;
                     // cout << "Corresponding Mass   : " << x->GetMass() << endl;
@@ -1346,6 +1571,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             // bestcandidate->GetStartPosition().Print();
             // LOG(INFO) << (bestcandidate->GetMass() / amu);
 
+            if (charge_requested == 6)
+                pymem = bestcandidate->GetStartMomentum().Y() * 1000.;
+
             // store hits in track level
             new ((*fTrackItems)[fNofTrackItems++]) R3BTrack(bestcandidate->GetStartPosition().X() / 100.,
                                                             bestcandidate->GetStartPosition().Y() / 100.,
@@ -1453,13 +1681,30 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 Int_t hitIndex = bestcandidate->GetHitIndexByName(det->GetDetectorName().Data());
                 if (hitIndex >= 0)
                     hit = fDetectors->GetHit(det->GetDetectorName().Data(), hitIndex);
+                if (hit)
+                    det_hit_x[iDet] = hit->GetX();
+                if (hit)
+                    det_hit_y[iDet] = hit->GetY();
+                if (hit && iDet == 7 && l == 1)
+                {
+                    yC = y_l[iDet];
+                    yCexp = det_hit_y[iDet];
+                }
+
+                if (hit && iDet == 7 && l == 2)
+                {
+                    fh_yC_vs_yHe_Tofd->Fill(yC, y_l[iDet]);
+                    fh_pyC_vs_pyHe->Fill(pymem, bestcandidate->GetStartMomentum().Y() * 1000.);
+                    fh_yC_vs_yHe_Tofd_exp->Fill(yCexp, det_hit_y[iDet]);
+                }
+
                 if (hit && det->res_x > 1e-6)
                 {
                     if (debug)
                         cout << "For charge: " << charge_requested
                              << ", current x position: " << bestcandidate->GetPosition().X() << "  "
                              << bestcandidate->GetPosition().Y() << "  " << bestcandidate->GetPosition().Z() << endl;
-                    det_hit_x[iDet] = hit->GetX();
+
                     if (debug)
                         cout << "Residuals x - iDet: " << iDet << "; Det: " << det->GetDetectorName().Data()
                              << ", tracked x: " << x_l[iDet] << ", hit_x: " << det_hit_x[iDet] << endl;
@@ -1476,7 +1721,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         cout << "For charge: " << charge_requested
                              << ", current y position: " << bestcandidate->GetPosition().X() << "  "
                              << bestcandidate->GetPosition().Y() << "  " << bestcandidate->GetPosition().Z() << endl;
-                    det_hit_y[iDet] = hit->GetY();
+
                     if (debug)
                         cout << "Residuals y - iDet: " << iDet << ", Det: " << det->GetDetectorName().Data()
                              << ", tracked y:  " << y_l[iDet] << ", hit_y: " << det_hit_y[iDet] << endl;
@@ -1487,19 +1732,92 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             }
             bestcandidate->Reset();
 
-            fh_xfi30_fi23a_track->Fill(x_l[1], x_l[3]);
-            fh_xfi30_fi32_track->Fill(x_l[3], x_l[5]);
-            fh_xfi30_tofd_track->Fill(x_l[7], x_l[3]);
-            fh_xfi31_fi23a_track->Fill(x_l[1], x_l[4]);
-            fh_xfi31_fi33_track->Fill(x_l[4], x_l[6]);
-            fh_xfi31_tofd_track->Fill(x_l[7], x_l[4]);
+            if (l < 3)
+            {
+                fh_xfi30_fi23a_track->Fill(x_l[1], x_l[3]);
+                fh_xfi30_fi32_track->Fill(x_l[3], x_l[5]);
+                fh_xfi30_tofd_track->Fill(x_l[7], x_l[5]);
+                fh_xfi31_fi23a_track->Fill(x_l[1], x_l[4]);
+                fh_xfi31_fi33_track->Fill(x_l[4], x_l[6]);
+                fh_xfi31_tofd_track->Fill(x_l[7], x_l[4]);
+                fh_yFi23b_tofd_track->Fill(y_l[7], y_l[2]);
 
-            fh_xfi30_fi23a_exp->Fill(det_hit_x[1], det_hit_x[3]);
-            fh_xfi30_fi32_exp->Fill(det_hit_x[3], det_hit_x[5]);
-            fh_xfi30_tofd_exp->Fill(det_hit_x[7], det_hit_x[3]);
-            fh_xfi31_fi23a_exp->Fill(det_hit_x[1], det_hit_x[4]);
-            fh_xfi31_fi33_exp->Fill(det_hit_x[4], det_hit_x[6]);
-            fh_xfi31_tofd_exp->Fill(det_hit_x[7], det_hit_x[4]);
+                fh_xfi30_fi23a_exp->Fill(det_hit_x[1], det_hit_x[3]);
+                fh_xfi30_fi32_exp->Fill(det_hit_x[3], det_hit_x[5]);
+                fh_xfi30_tofd_exp->Fill(det_hit_x[7], det_hit_x[5]);
+                fh_xfi31_fi23a_exp->Fill(det_hit_x[1], det_hit_x[4]);
+                fh_xfi31_fi33_exp->Fill(det_hit_x[4], det_hit_x[6]);
+                fh_xfi31_tofd_exp->Fill(det_hit_x[7], det_hit_x[4]);
+                fh_yFi23b_tofd_exp->Fill(det_hit_y[7], det_hit_y[2]);
+
+                fh_tofd_track_exp->Fill(y_l[7], det_hit_y[7]);
+                fh_fi23b_track_exp->Fill(y_l[2], det_hit_y[2]);
+            }
+
+            if (fWriteOut)
+            {
+                // if(l == 1 && bestcandidate->GetStartMomentum().Mag() * 1000. > 13000. &&
+                //       	 bestcandidate->GetStartMomentum().Mag() * 1000. < 13080.)
+                if (l == 1)
+                {
+                    new ((*fFi23aHitItems)[fNofFi23aHitItems++])
+                        R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 6, 0, 0, 0, 0., 0, 0.);
+
+                    new ((*fFi23bHitItems)[fNofFi23bHitItems++])
+                        R3BFiberMAPMTHitData(0, det_hit_x[2], det_hit_y[2], 6, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[3] > -1000)
+                        new ((*fFi30HitItems)[fNofFi30HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[3], det_hit_y[3], 6, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[4] > -1000)
+                        new ((*fFi31HitItems)[fNofFi31HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[4], det_hit_y[4], 6, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[5] > -1000)
+                        new ((*fFi32HitItems)[fNofFi32HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[5], det_hit_y[5], 6, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[6] > -1000)
+                        new ((*fFi33HitItems)[fNofFi33HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[6], det_hit_y[6], 6, 0, 0, 0, 0., 0, 0.);
+
+                    new ((*fTofdHitItems)[fNofTofdHitItems++])
+                        R3BTofdHitData(0, det_hit_x[7], det_hit_y[7], 6, 0, 6, 1, 1, 0);
+                }
+                //	if(l == 2 && bestcandidate->GetStartMomentum().Mag() * 1000. > 4250. &&
+                //   			bestcandidate->GetStartMomentum().Mag() * 1000. < 4440.)
+                // if(l == 2 && bestcandidate->GetStartMomentum().Z() * 1000. > 4250. &&
+                //			bestcandidate->GetStartMomentum().Z() * 1000. < 4440.)
+                if (l == 2)
+                {
+
+                    new ((*fFi23aHitItems)[fNofFi23aHitItems++])
+                        R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 2, 0, 0, 0, 0., 0, 0.);
+
+                    new ((*fFi23bHitItems)[fNofFi23bHitItems++])
+                        R3BFiberMAPMTHitData(0, det_hit_x[2], det_hit_y[2], 2, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[3] > -1000)
+                        new ((*fFi30HitItems)[fNofFi30HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[3], det_hit_y[3], 2, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[4] > -1000)
+                        new ((*fFi31HitItems)[fNofFi31HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[4], det_hit_y[4], 2, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[5] > -1000)
+                        new ((*fFi32HitItems)[fNofFi32HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[5], det_hit_y[5], 2, 0, 0, 0, 0., 0, 0.);
+
+                    if (det_hit_x[6] > -1000)
+                        new ((*fFi33HitItems)[fNofFi33HitItems++])
+                            R3BFiberMAPMTHitData(0, det_hit_x[6], det_hit_y[6], 2, 0, 0, 0, 0., 0, 0.);
+
+                    new ((*fTofdHitItems)[fNofTofdHitItems++])
+                        R3BTofdHitData(0, det_hit_x[7], det_hit_y[7], 2, 0, 2, 1, 1, 0);
+                }
+            }
         }
         // delete all stored fragments
         fArrayFragments->Clear();
@@ -1515,6 +1833,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
         //} // end for TofD
     } // end for two particle (12C and 4He)
+
     if ((alpha && carbon && fBfield == -1710.0) || (oxygen && fBfield != -1710.0))
     {
         counter1++;
@@ -1538,6 +1857,21 @@ void R3BFragmentTrackerS494::FinishEvent()
             fArrayHits.at(det)->Clear();
         }
     }
+
+    fNofTofdHitItems = 0;
+    fTofdHitItems->Clear();
+    fNofFi23aHitItems = 0;
+    fFi23aHitItems->Clear();
+    fNofFi23bHitItems = 0;
+    fFi23bHitItems->Clear();
+    fNofFi30HitItems = 0;
+    fFi30HitItems->Clear();
+    fNofFi31HitItems = 0;
+    fFi31HitItems->Clear();
+    fNofFi32HitItems = 0;
+    fFi32HitItems->Clear();
+    fNofFi33HitItems = 0;
+    fFi33HitItems->Clear();
 }
 
 void R3BFragmentTrackerS494::Finish()
@@ -1600,6 +1934,7 @@ void R3BFragmentTrackerS494::Finish()
     fh_xfi30_fi23a_track->Write();
     fh_xfi30_fi32_track->Write();
     fh_xfi30_tofd_track->Write();
+    fh_tofd_track_exp->Write();
     fh_xfi31_fi23a_track->Write();
     fh_xfi31_fi33_track->Write();
     fh_xfi31_tofd_track->Write();
@@ -1610,6 +1945,12 @@ void R3BFragmentTrackerS494::Finish()
     fh_xfi31_fi23a_exp->Write();
     fh_xfi31_fi33_exp->Write();
     fh_xfi31_tofd_exp->Write();
+    fh_yC_vs_yHe_Tofd->Write();
+    fh_yC_vs_yHe_Tofd_exp->Write();
+    fh_yFi23b_tofd_track->Write();
+    fh_yFi23b_tofd_exp->Write();
+    fh_fi23b_track_exp->Write();
+    fh_pyC_vs_pyHe->Write();
 
     if (fVis)
     {

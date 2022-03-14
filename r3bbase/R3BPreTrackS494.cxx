@@ -157,6 +157,8 @@ InitStatus R3BPreTrackS494::Init()
 
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
+
+    // CALIFA
     fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMappedData", fDetectorNames[0])));
     if (NULL == fMappedItems.at(0))
     {
@@ -172,6 +174,7 @@ InitStatus R3BPreTrackS494::Init()
     {
         printf("Could not find hit data for '%s'.\n", fDetectorNames[0]);
     }
+    // The rest
     for (int det = 1; det < DET_MAX; det++)
     {
         fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
@@ -291,18 +294,12 @@ InitStatus R3BPreTrackS494::Init()
 
             // ToT MAPMT:
             fh_ToT_Fib[ifibcount] =
-                new TH2F(Form("%s_tot_m", detName), Form("%s ToT of MAPMT", detName), 600, -30., 30, 400, 0., 400.);
+                new TH2F(Form("%s_tot_m", detName), Form("%s ToT ", detName), 600, -30., 30, 400, 0., 40.);
             fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber x / cm");
             fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
-            fh_ToT_Fib_ac[ifibcount] = new TH2F(Form("%s_tot_m_ac", detName),
-                                                Form("%s ToT of MAPMT after cuts", detName),
-                                                1000,
-                                                -50.,
-                                                50,
-                                                400,
-                                                0.,
-                                                400.);
+            fh_ToT_Fib_ac[ifibcount] =
+                new TH2F(Form("%s_tot_ac", detName), Form("%s ToT after cuts", detName), 600, -30., 30, 400, 0., 40);
             fh_ToT_Fib_ac[ifibcount]->GetXaxis()->SetTitle("Fiber x / cm");
             fh_ToT_Fib_ac[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -412,7 +409,7 @@ InitStatus R3BPreTrackS494::Init()
     fh_Fib33_vs_Fib31->GetYaxis()->SetTitle("Fiber33");
     fh_Fib33_vs_Fib31->GetXaxis()->SetTitle("Fiber31");
 
-    fh_Fib31_vs_Fib23a = new TH2F("fib31_vs_fib23a", "Fiber 31 vs. Fiber 23a", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib31_vs_Fib23a = new TH2F("fib31_vs_fib23a", "Fiber 31 vs. Fiber 23a", 500, -10, 10, 1000, -50., 50.);
     fh_Fib31_vs_Fib23a->GetYaxis()->SetTitle("Fiber31");
     fh_Fib31_vs_Fib23a->GetXaxis()->SetTitle("Fiber23a");
 
@@ -420,15 +417,15 @@ InitStatus R3BPreTrackS494::Init()
     fh_Fib32_vs_Fib30->GetYaxis()->SetTitle("Fiber32");
     fh_Fib32_vs_Fib30->GetXaxis()->SetTitle("Fiber30");
 
-    fh_Fib30_vs_Fib23b = new TH2F("fib30_vs_fib23b", "Fiber 30 vs. Fiber 23b", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib30_vs_Fib23b = new TH2F("fib30_vs_fib23b", "Fiber 30 vs. Fiber 23b", 500, -10, 10, 1000, -50., 50.);
     fh_Fib30_vs_Fib23b->GetYaxis()->SetTitle("Fiber30");
     fh_Fib30_vs_Fib23b->GetXaxis()->SetTitle("Fiber23b");
 
-    fh_Fib30_vs_Fib23a = new TH2F("fib30_vs_fib23a", "Fiber 30 vs. Fiber 23a", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib30_vs_Fib23a = new TH2F("fib30_vs_fib23a", "Fiber 30 vs. Fiber 23a", 500, -10, 10, 1000, -50., 50.);
     fh_Fib30_vs_Fib23a->GetYaxis()->SetTitle("Fiber30");
     fh_Fib30_vs_Fib23a->GetXaxis()->SetTitle("Fiber23a");
 
-    fh_Fib31_vs_Fib23b = new TH2F("fib31_vs_fib23b", "Fiber 31 vs. Fiber 23b", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib31_vs_Fib23b = new TH2F("fib31_vs_fib23b", "Fiber 31 vs. Fiber 23b", 500, -10, 10, 1000, -50., 50.);
     fh_Fib31_vs_Fib23b->GetYaxis()->SetTitle("Fiber31");
     fh_Fib31_vs_Fib23b->GetXaxis()->SetTitle("Fiber23b");
 
@@ -437,25 +434,214 @@ InitStatus R3BPreTrackS494::Init()
     fh_Fib33_vs_Fib31_dx->GetYaxis()->SetTitle("xFi33 - xFi31 / cm");
     fh_Fib33_vs_Fib31_dx->GetXaxis()->SetTitle("x Fi31 / cm");
 
+    fh_Fib33_vs_Fib31_dt = new TH2F("fib33_fib31_dt", "dt of Fiber 33 and Fiber 31", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib33_vs_Fib31_dt->GetYaxis()->SetTitle("tFi33 - tFi31 / ns");
+    fh_Fib33_vs_Fib31_dt->GetXaxis()->SetTitle("x Fi31 / cm");
+
     fh_Fib31_vs_Fib23a_dx = new TH2F("fib31_fib23a_dx", "dx of Fiber 31 and Fiber 23a", 1000, -50, 50, 1000, -50., 50.);
     fh_Fib31_vs_Fib23a_dx->GetYaxis()->SetTitle("xFi31 - xFi23a / cm");
     fh_Fib31_vs_Fib23a_dx->GetXaxis()->SetTitle("x Fi23a / cm");
+
+    fh_Fib31_vs_Fib23a_dt =
+        new TH2F("fib31_fib23a_dt", "dt of Fiber 31 and Fiber 23a", 1000, -50, 50, 5500, -500., 5000.);
+    fh_Fib31_vs_Fib23a_dt->GetYaxis()->SetTitle("tFi31 - tFi23a / ns");
+    fh_Fib31_vs_Fib23a_dt->GetXaxis()->SetTitle("x Fi23a / cm");
 
     fh_Fib32_vs_Fib30_dx = new TH2F("fib32_fib30_dx", "dx of Fiber 32 and Fiber 30", 1000, -50, 50, 1000, -50., 50.);
     fh_Fib32_vs_Fib30_dx->GetYaxis()->SetTitle("xFi32 - xFi30 / cm");
     fh_Fib32_vs_Fib30_dx->GetXaxis()->SetTitle("x Fi30 / cm");
 
-    fh_Fib30_vs_Fib23b_dx = new TH2F("fib32_fib23b_dx", "dx of Fiber 32 and Fiber 23b", 1000, -50, 50, 1000, -50., 50.);
-    fh_Fib30_vs_Fib23b_dx->GetYaxis()->SetTitle("xFi32 - xFi23b / cm");
+    fh_Fib32_vs_Fib30_dt = new TH2F("fib32_fib30_dt", "dt of Fiber 32 and Fiber 30", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib32_vs_Fib30_dt->GetYaxis()->SetTitle("tFi32 - tFi30 / ns");
+    fh_Fib32_vs_Fib30_dt->GetXaxis()->SetTitle("x Fi30 / cm");
+
+    fh_Fib30_vs_Fib23b_dx = new TH2F("fib30_fib23b_dx", "dx of Fiber 30 and Fiber 23b", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib30_vs_Fib23b_dx->GetYaxis()->SetTitle("xFi30 - xFi23b / cm");
     fh_Fib30_vs_Fib23b_dx->GetXaxis()->SetTitle("x Fi23b / cm");
+
+    fh_Fib30_vs_Fib23b_dt =
+        new TH2F("fib30_fib23b_dt", "dt of Fiber 30 and Fiber 23b", 1000, -10, 10, 5500, -500., 5000.);
+    fh_Fib30_vs_Fib23b_dt->GetYaxis()->SetTitle("tFi30 - tFi23b / ns");
+    fh_Fib30_vs_Fib23b_dt->GetXaxis()->SetTitle("x Fi23b / cm");
 
     fh_Fib31_vs_Fib23b_dx = new TH2F("fib31_fib23b_dx", "dx of Fiber 31 and Fiber 23b", 1000, -50, 50, 1000, -50., 50.);
     fh_Fib31_vs_Fib23b_dx->GetYaxis()->SetTitle("xFi31 - xFi23b / cm");
     fh_Fib31_vs_Fib23b_dx->GetXaxis()->SetTitle("x Fi23b / cm");
 
+    fh_Fib31_vs_Fib23b_dt =
+        new TH2F("fib31_fib23b_dt", "dt of Fiber 31 and Fiber 23b", 1000, -10, 10, 5500, -500., 5000.);
+    fh_Fib31_vs_Fib23b_dt->GetYaxis()->SetTitle("tFi31 - tFi23b / ns");
+    fh_Fib31_vs_Fib23b_dt->GetXaxis()->SetTitle("x Fi23b / cm");
+
     fh_Fib30_vs_Fib23a_dx = new TH2F("fib30_fib23a_dx", "dx of Fiber 30 and Fiber 23a", 1000, -50, 50, 1000, -50., 50.);
     fh_Fib30_vs_Fib23a_dx->GetYaxis()->SetTitle("xFi30 - xFi23a / cm");
     fh_Fib30_vs_Fib23a_dx->GetXaxis()->SetTitle("x Fi23a / cm");
+
+    fh_Fib30_vs_Fib23a_dt =
+        new TH2F("fib30_fib23a_dt", "dt of Fiber 30 and Fiber 23a", 1000, -50, 50, 5500, -500., 5000.);
+    fh_Fib30_vs_Fib23a_dt->GetYaxis()->SetTitle("tFi30 - tFi23a / ns");
+    fh_Fib30_vs_Fib23a_dt->GetXaxis()->SetTitle("x Fi23a / cm");
+
+    fh_tofd_vs_Fib31_ac = new TH2F("tofd_vs_fib31_ac", "tofd vs. Fiber 31_ac", 1000, -50, 50, 50, -50., 50.);
+    fh_tofd_vs_Fib31_ac->GetYaxis()->SetTitle("tofd");
+    fh_tofd_vs_Fib31_ac->GetXaxis()->SetTitle("Fiber31");
+
+    fh_tofd_vs_Fib31 = new TH2F("tofd_vs_fib31", "tofd vs. Fiber 31", 150, -30, 30, 50, -50., 50.);
+    fh_tofd_vs_Fib31->GetYaxis()->SetTitle("tofd");
+    fh_tofd_vs_Fib31->GetXaxis()->SetTitle("Fiber31");
+
+    fh_ytofd_vs_yFib31 = new TH2F("ytofd_vs_yfib31", "ytofd vs. yFiber 31", 150, -30, 30, 50, -50., 50.);
+    fh_ytofd_vs_yFib31->GetYaxis()->SetTitle("tofd");
+    fh_ytofd_vs_yFib31->GetXaxis()->SetTitle("Fiber31");
+
+    fh_tofd_vs_Fib30_ac = new TH2F("tofd_vs_fib30_ac", "tofd vs. Fiber 30_ac", 150, -30, 30, 50, -50., 50.);
+    fh_tofd_vs_Fib30_ac->GetYaxis()->SetTitle("tofd");
+    fh_tofd_vs_Fib30_ac->GetXaxis()->SetTitle("Fiber30");
+
+    fh_tofd_vs_Fib30 = new TH2F("tofd_vs_fib30", "tofd vs. Fiber 30", 150, -30, 30, 50, -50., 50.);
+    fh_tofd_vs_Fib30->GetYaxis()->SetTitle("tofd");
+    fh_tofd_vs_Fib30->GetXaxis()->SetTitle("Fiber30");
+
+    fh_ytofd_vs_yFib30 = new TH2F("ytofd_vs_yfib30", "ytofd vs. yFiber 30", 150, -30, 30, 50, -50., 50.);
+    fh_ytofd_vs_yFib30->GetYaxis()->SetTitle("tofd");
+    fh_ytofd_vs_yFib30->GetXaxis()->SetTitle("Fiber30");
+
+    fh_Fib33_vs_Fib31_ac = new TH2F("fib33_vs_fib31_ac", "Fiber 33 vs. Fiber 31_ac", 150, -30, 30, 150, -30, 30);
+    fh_Fib33_vs_Fib31_ac->GetYaxis()->SetTitle("Fiber33");
+    fh_Fib33_vs_Fib31_ac->GetXaxis()->SetTitle("Fiber31");
+
+    fh_Fib31_vs_Fib23a_ac = new TH2F("fib31_vs_fib23a_ac", "Fiber 31 vs. Fiber 23a_ac", 500, -10, 10, 150, -30, 30);
+    fh_Fib31_vs_Fib23a_ac->GetYaxis()->SetTitle("Fiber31");
+    fh_Fib31_vs_Fib23a_ac->GetXaxis()->SetTitle("Fiber23a");
+
+    fh_Fib32_vs_Fib30_ac = new TH2F("fib32_vs_fib30_ac", "Fiber 32 vs. Fiber 30_ac", 150, -30, 30, 150, -30, 30);
+    fh_Fib32_vs_Fib30_ac->GetYaxis()->SetTitle("Fiber32");
+    fh_Fib32_vs_Fib30_ac->GetXaxis()->SetTitle("Fiber30");
+
+    fh_Fib30_vs_Fib23b_ac = new TH2F("fib30_vs_fib23b_ac", "Fiber 30 vs. Fiber 23b_ac", 500, -10, 10, 150, -30, 30);
+    fh_Fib30_vs_Fib23b_ac->GetYaxis()->SetTitle("Fiber30");
+    fh_Fib30_vs_Fib23b_ac->GetXaxis()->SetTitle("Fiber23b");
+
+    fh_Fib30_vs_Fib23a_ac = new TH2F("fib30_vs_fib23a_ac", "Fiber 30 vs. Fiber 23a_ac", 500, -10, 10, 150, -30, 30);
+    fh_Fib30_vs_Fib23a_ac->GetYaxis()->SetTitle("Fiber30");
+    fh_Fib30_vs_Fib23a_ac->GetXaxis()->SetTitle("Fiber23a");
+
+    fh_Fib31_vs_Fib23b_ac = new TH2F("fib31_vs_fib23b_ac", "Fiber 31 vs. Fiber 23b_ac", 500, -10, 10, 150, -30, 30);
+    fh_Fib31_vs_Fib23b_ac->GetYaxis()->SetTitle("Fiber31");
+    fh_Fib31_vs_Fib23b_ac->GetXaxis()->SetTitle("Fiber23b");
+
+    // dx between fibers vs x
+    fh_Fib33_vs_Fib31_dx_ac =
+        new TH2F("fib33_fib31_dx_ac", "dx of Fiber 33 and Fiber 31_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib33_vs_Fib31_dx_ac->GetYaxis()->SetTitle("xFi33 - xFi31 / cm");
+    fh_Fib33_vs_Fib31_dx_ac->GetXaxis()->SetTitle("x Fi31 / cm");
+
+    fh_Fib31_vs_Fib23a_dx_ac =
+        new TH2F("fib31_fib23a_dx_ac", "dx of Fiber 31 and Fiber 23a_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib31_vs_Fib23a_dx_ac->GetYaxis()->SetTitle("xFi31 - xFi23a / cm");
+    fh_Fib31_vs_Fib23a_dx_ac->GetXaxis()->SetTitle("x Fi23a / cm");
+
+    fh_Fib32_vs_Fib30_dx_ac =
+        new TH2F("fib32_fib30_dx_ac", "dx of Fiber 32 and Fiber 30_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib32_vs_Fib30_dx_ac->GetYaxis()->SetTitle("xFi32 - xFi30 / cm");
+    fh_Fib32_vs_Fib30_dx_ac->GetXaxis()->SetTitle("x Fi30 / cm");
+
+    fh_Fib30_vs_Fib23b_dx_ac =
+        new TH2F("fib32_fib23b_dx_ac", "dx of Fiber 32 and Fiber 23b_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib30_vs_Fib23b_dx_ac->GetYaxis()->SetTitle("xFi32 - xFi23b / cm");
+    fh_Fib30_vs_Fib23b_dx_ac->GetXaxis()->SetTitle("x Fi23b / cm");
+
+    fh_Fib31_vs_Fib23b_dx_ac =
+        new TH2F("fib31_fib23b_dx_ac", "dx of Fiber 31 and Fiber 23b_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib31_vs_Fib23b_dx_ac->GetYaxis()->SetTitle("xFi31 - xFi23b / cm");
+    fh_Fib31_vs_Fib23b_dx_ac->GetXaxis()->SetTitle("x Fi23b / cm");
+
+    fh_Fib30_vs_Fib23a_dx_ac =
+        new TH2F("fib30_fib23a_dx_ac", "dx of Fiber 30 and Fiber 23a_ac", 1000, -50, 50, 1000, -50., 50.);
+    fh_Fib30_vs_Fib23a_dx_ac->GetYaxis()->SetTitle("xFi30 - xFi23a / cm");
+    fh_Fib30_vs_Fib23a_dx_ac->GetXaxis()->SetTitle("x Fi23a / cm");
+
+    fh_yTofd_vs_yTofd = new TH2F("yTofd_vs_yTofd", "yTofd_vs_yTofd", 80, -60., 60., 80, -60., 60.);
+    fh_yTofd_vs_yTofd->GetYaxis()->SetTitle("Tofd 2 y / cm");
+    fh_yTofd_vs_yTofd->GetXaxis()->SetTitle("Tofd 1 y / cm");
+
+    fh_xy_target = new TH2F("fh_xy_target", "fh_xy_target", 420, -6, 6, 420, -6, 6);
+    fh_xy_target->GetYaxis()->SetTitle(" y / cm");
+    fh_xy_target->GetXaxis()->SetTitle("x / cm");
+
+    fh_Fi23bY_TofdY_He = new TH2F("Fi23bY_TofdY_He", "Fi23bY_TofdY_He", 80, -60., 60., 420, -6, 6);
+    fh_Fi23bY_TofdY_He->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi23bY_TofdY_He->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi23bY_TofdY_C = new TH2F("Fi23bY_TofdY_C", "fh_Fi23bY_TofdY_C", 80, -60., 60., 420, -6, 6);
+    fh_Fi23bY_TofdY_C->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi23bY_TofdY_C->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi23aX_TofdX_bw1 = new TH2F("Fi23aX_TofdX_bw1", "fh_Fi23aX_TofdX_Ebene1", 80, -60., 60., 420, -6, 6);
+    fh_Fi23aX_TofdX_bw1->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi23aX_TofdX_bw1->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi23aX_TofdX_bw2 = new TH2F("Fi23aX_TofdX_bw2", "fh_Fi23aX_TofdX_Ebene2", 80, -60., 60., 420, -6, 6);
+    fh_Fi23aX_TofdX_bw2->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi23aX_TofdX_bw2->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi23aX_TofdX_He = new TH2F("Fi23aX_TofdX_He", "fh_Fi23aX_TofdX_He", 80, -60., 60., 420, -6, 6);
+    fh_Fi23aX_TofdX_He->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi23aX_TofdX_He->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi23aX_TofdX_C = new TH2F("Fi23aX_TofdX_C", "fh_Fi23aX_TofdX_C", 80, -60., 60., 420, -6, 6);
+    fh_Fi23aX_TofdX_C->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi23aX_TofdX_C->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_yTofdHe_vs_yTofdC = new TH2F("fh_yTofdHe_vs_yTofdC", "fh_yTofdHe_vs_yTofdC", 80, -60., 60., 1200, -60, 60);
+    fh_yTofdHe_vs_yTofdC->GetXaxis()->SetTitle("He y / cm");
+    fh_yTofdHe_vs_yTofdC->GetYaxis()->SetTitle("C y / cm");
+
+    fh_xTofdHe_vs_xTofdC = new TH2F("fh_xTofdHe_vs_xTofdC", "fh_xTofdHe_vs_xTofdC", 80, -60., 60., 1200, -60, 60);
+    fh_xTofdHe_vs_xTofdC->GetXaxis()->SetTitle("He x / cm");
+    fh_xTofdHe_vs_xTofdC->GetYaxis()->SetTitle("C x / cm");
+
+    fh_Fi301Y_TofdY_He = new TH2F("Fi301Y_TofdY_He", "Fi301Y_TofdY_He", 80, -60., 60., 1200, -60, 60);
+    fh_Fi301Y_TofdY_He->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi301Y_TofdY_He->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi301Y_TofdY_C = new TH2F("Fi301Y_TofdY_C", "fh_Fi301Y_TofdY_C", 80, -60., 60., 1200, -60, 60);
+    fh_Fi301Y_TofdY_C->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi301Y_TofdY_C->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi301X_TofdX_He = new TH2F("Fi301X_TofdX_He", "fh_Fi301X_TofdX_He", 80, -60., 60., 1200, -60, 60);
+    fh_Fi301X_TofdX_He->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi301X_TofdX_He->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi301X_TofdX_C = new TH2F("Fi301X_TofdX_C", "fh_Fi301X_TofdX_C", 80, -60., 60., 1200, -60, 60);
+    fh_Fi301X_TofdX_C->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi301X_TofdX_C->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi323Y_TofdY_He = new TH2F("Fi323Y_TofdY_He", "Fi323Y_TofdY_He", 80, -60., 60., 1200, -60, 60);
+    fh_Fi323Y_TofdY_He->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi323Y_TofdY_He->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi323Y_TofdY_C = new TH2F("Fi323Y_TofdY_C", "fh_Fi323Y_TofdY_C", 80, -60., 60., 1200, -60, 60);
+    fh_Fi323Y_TofdY_C->GetYaxis()->SetTitle("Fiber y / cm");
+    fh_Fi323Y_TofdY_C->GetXaxis()->SetTitle("Tofd y / cm");
+
+    fh_Fi323X_TofdX_He = new TH2F("Fi323X_TofdX_He", "fh_Fi323X_TofdX_He", 80, -60., 60., 1200, -60, 60);
+    fh_Fi323X_TofdX_He->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi323X_TofdX_He->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_Fi323X_TofdX_C = new TH2F("Fi323X_TofdX_C", "fh_Fi323X_TofdX_C", 80, -60., 60., 1200, -60, 60);
+    fh_Fi323X_TofdX_C->GetYaxis()->SetTitle("Fiber x / cm");
+    fh_Fi323X_TofdX_C->GetXaxis()->SetTitle("Tofd x / cm");
+
+    fh_TimePreviousEventFi23a =
+        new TH2F("TimePreviousEvent23a ", "Time between 2 particles 23a", 3000, -1500, 1500, 3000, -1500, 1500);
+    fh_TimePreviousEventFi23a->GetYaxis()->SetTitle("dtime fi23a/ ns");
+    fh_TimePreviousEventFi23a->GetXaxis()->SetTitle("dtime tofd / ns");
+
+    fh_TimePreviousEventFi23b =
+        new TH2F("TimePreviousEvent23b", "Time between 2 particles 23b", 3000, -1500, 1500, 3000, -1500, 1500);
+    fh_TimePreviousEventFi23b->GetYaxis()->SetTitle("dtime fi23b/ ns");
+    fh_TimePreviousEventFi23b->GetXaxis()->SetTitle("dtime tofd / ns");
 
     //---------------------------------------------------------------------------------------------------
     // TofD detector
@@ -488,7 +674,7 @@ InitStatus R3BPreTrackS494::Init()
         fh_tofd_mult_ac->GetXaxis()->SetTitle("multiplicity");
         fh_tofd_mult_ac->GetYaxis()->SetTitle("counts");
 
-        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 3000, 0, 3000);
+        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 3000, -1500, 1500);
         fh_TimePreviousEvent->GetXaxis()->SetTitle("time / ns");
         fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
 
@@ -816,12 +1002,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Double_t zdet[max];
     Double_t zdet_s[max];
     Double_t tdet[max];
+    Int_t fibdet[max];
+    Int_t fibdet_s[max];
     Int_t qdet[max];
-    Double_t qdet_s[max] = { 0 };
-    Double_t xdet_s[max] = { 0 };
-    Double_t ydet_s[max] = { 0 };
-    Double_t tdet_s[max] = { 0 };
-    Int_t detector_s[max] = { 0 };
+    Double_t qdet_s[max];
+    Double_t xdet_s[max];
+    Double_t ydet_s[max];
+    Double_t tdet_s[max];
+    Int_t detector_s[max];
     Double_t xFi33[max];
     Double_t yFi33[max];
     Double_t qFi33[max];
@@ -858,6 +1046,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Double_t tFi23b[max];
     Double_t timeFi23b[max];
     Bool_t fFi23b[max];
+    Bool_t cTofd1l = false;
+    Bool_t cTofd1r = false;
+    Bool_t cTofd2l = false;
+    Bool_t cTofd2r = false;
     for (int i = 0; i < max; i++)
     {
         fFi33[i] = false;
@@ -866,11 +1058,57 @@ void R3BPreTrackS494::Exec(Option_t* option)
         fFi30[i] = false;
         fFi23a[i] = false;
         fFi23b[i] = false;
+        xFi23b[i] = -1000;
+        yFi23b[i] = -1000;
+        qFi23b[i] = -1;
+        tFi23b[i] = -1000;
+        timeFi23b[i] = -1000;
+        xFi23a[i] = -1000;
+        yFi23a[i] = -1000;
+        qFi23a[i] = -1;
+        tFi23a[i] = -1000;
+        timeFi23a[i] = -1000;
+        xFi30[i] = -1000;
+        yFi30[i] = -1000;
+        qFi30[i] = -1;
+        tFi30[i] = -1000;
+        timeFi30[i] = -1000;
+        xFi31[i] = -1000;
+        yFi31[i] = -1000;
+        qFi31[i] = -1;
+        tFi31[i] = -1000;
+        timeFi31[i] = -1000;
+        xFi32[i] = -1000;
+        yFi32[i] = -1000;
+        qFi32[i] = -1;
+        tFi32[i] = -1000;
+        timeFi32[i] = -1000;
+        xFi33[i] = -1000;
+        yFi33[i] = -1000;
+        qFi33[i] = -1;
+        tFi33[i] = -1000;
+        timeFi33[i] = -1000;
+        detector[i] = -1;
+        ;
+        xdet[i] = -1000;
+        ydet[i] = -1000;
+        zdet[i] = -1000;
+        zdet_s[i] = -1000;
+        tdet[i] = -1000;
+        qdet[i] = -1;
+        qdet_s[i] = -1;
+        xdet_s[i] = -1000;
+        ydet_s[i] = -1000;
+        tdet_s[i] = -1000;
+        detector_s[i] = -1;
+        ;
+        fibdet[i] = 0;
+        fibdet_s[i] = 0;
     }
 
     countdet = 0;
 
-    Int_t n_det = 10;
+    Int_t n_det = 16;
 
     Double_t x[n_det];
     Double_t y[n_det];
@@ -911,30 +1149,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
     // if (!fPairs && fB != -1710 && !fSimu)
     //   maxWerte = true;
     // if fibCuts true, dx1 (Fib3xvs3x), dx2(Fib3xvs2x), dx3(Fib3xvsTofd) used for cuts in xfib correlations
-    Double_t dx1 = 2;   // cm
-    Double_t dx2 = 5.;  // cm
-    Double_t dx3 = 4.;  // cm
-    Double_t dtft = 8.; // ns
-                        // END CHOOSING OPTIONS **********
+
+    Double_t dx1 = 2;      // cm
+    Double_t dx2 = 5.;     // cm
+    Double_t dx3 = 5.;     // cm
+    Double_t dtft = 1000.; // ns
+                           // END CHOOSING OPTIONS **********
 
     for (int i = 0; i < n_det; i++)
     {
         x[i] = -1000.;
         y[i] = -1000.;
-        z[i] = 0.;
-        q[i] = 0.;
+        z[i] = -1000.;
+        q[i] = -1.;
         t[i] = -1000.;
 
         x1[i] = -1000.;
         y1[i] = -1000.;
-        z1[i] = 0.;
-        q1[i] = 0.;
+        z1[i] = -1000.;
+        q1[i] = -1.;
         t1[i] = -1000.;
 
         x2[i] = -1000.;
         y2[i] = -1000.;
-        z2[i] = 0.;
-        q2[i] = 0.;
+        z2[i] = -1000.;
+        q2[i] = -1.;
         t2[i] = -1000.;
 
         xMax[i] = -1000.;
@@ -951,15 +1190,21 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Int_t fi31 = 3;
     Int_t fi32 = 4;
     Int_t fi33 = 5;
-    Int_t tofd1r = 6;
-    Int_t tofd1l = 7;
-    Int_t tofd2r = 8;
-    Int_t tofd2l = 9;
+    Int_t tofd1rc = 6;
+    Int_t tofd1lc = 7;
+    Int_t tofd2rc = 8;
+    Int_t tofd2lc = 9;
+    Int_t tofd1r = 10;
+    Int_t tofd1l = 11;
+    Int_t tofd2r = 12;
+    Int_t tofd2l = 13;
+    Int_t fi23ar = 14;
+    Int_t fi23al = 15;
 
     Double_t tof = 0.;
     Bool_t pair = false;
     Bool_t single = false;
-    Double_t tStart = 0.;
+    Double_t tStart = -1000, xStart = -1000, yStart = -1000, qStart = 0;
     Bool_t first = true;
     Bool_t alpha = false;
     Bool_t carbon = false;
@@ -1009,6 +1254,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Int_t multTofd = 0;
 
     // loop over ToFD
+
+    // cout<<"*** NEW EVENT ***"<<endl;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
@@ -1039,14 +1286,20 @@ void R3BPreTrackS494::Exec(Option_t* option)
         //}
 
         if (fSimu)
-            qqq = qqq * 26.76 * 3.2706460;
+        {
+            // qqq = qqq * 3.2706460;
+            if (qqq > 0.01)
+                qqq = qqq * 26.76 * 4.4085231;
+            if (qqq < 0.01)
+                qqq = qqq * 26.76 * 4.4085231 * 3.0599755;
+        }
 
         fh_tofd_charge->Fill(qqq);
 
         Double_t xxx = hitTofd->GetX();
         Double_t yyy = hitTofd->GetY();
 
-        if (!fSimu && !fPairs)
+        if (!fSimu)
         {
             yyy = yyy * (-1.); // -1 until we solve problem with y direction
             if (qqq > 1.4 && qqq < 2.6)
@@ -1104,10 +1357,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
             if (id2 == 1)
             {
                 det2 = tofd1r;
+                cTofd1r = false;
             }
             else if (id2 == 2)
             {
                 det2 = tofd2r;
+                cTofd2r = false;
             }
         }
         else
@@ -1116,12 +1371,17 @@ void R3BPreTrackS494::Exec(Option_t* option)
             if (id2 == 1)
             {
                 det2 = tofd1l;
+                cTofd1l = false;
             }
             else if (id2 == 2)
             {
                 det2 = tofd2l;
+                cTofd2l = false;
             }
         }
+
+        //  cout<<"NEW HIT: "<<nHits<<", "<<ihit<<"; "<<id2<<", "<<qqq<<", "<<xxx<<endl;
+
         x2[det2] = xxx / 100.; // for tracker everything in meters
         y2[det2] = yyy / 100. + y_corr;
         if (y2[det2] < -0.8 || y2[det2] > 0.8) // in meters!
@@ -1140,11 +1400,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
         fh_tofd_time_ac->Fill(t2[det2]);
 
         // register hits for tracker as long a time is in the coincidence window
-        if ((abs(t2[det2] - t1[det1]) < 50.) || first) // change back to 5.
+        Double_t tDiffTofd = t2[det2] - t1[det1];
+        fh_TimePreviousEvent->Fill(t2[det2] - t1[det1]);
+        if ((abs(t2[det2] - t1[det1]) < 20.) || first) // change back to 5.
         {
             if (debug_in)
                 cout << "2 particle within 5 ns   " << first << endl;
             // register point for tracker
+
             detector[countdet] = det2;
             xdet[countdet] = x2[det2];
             ydet[countdet] = y2[det2];
@@ -1173,9 +1436,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 z_12C = zdet[countdet];
             }
             countdet++;
+
             single = true;
             first = false;
             tStart = t2[det2];
+            xStart = x2[det2];
+            yStart = y2[det2];
+            qStart = q2[det2];
 
             det1 = det2;
             x1[det1] = x2[det2];
@@ -1207,7 +1474,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         carbon = false;
         //        cout << "Found pair!!!!!! " << endl;
 
-        delta = sqrt((x_12C - x_4He) * (x_12C - x_4He) + (y_12C - y_4He) * (y_12C - y_4He));
+        // delta = sqrt((x_12C - x_4He) * (x_12C - x_4He) + (y_12C - y_4He) * (y_12C - y_4He));
         //		cout << "Delta: " << delta << endl;
 
         if (debug2)
@@ -1260,15 +1527,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit33->GetEloss();
 
-            /*     if (fSimu)
-                 {
-                     if (q1[det] > 7.) // these cuts are for simulations
-                         q1[det] = 8.;
-                     else if (q1[det] > 5.)
-                         q1[det] = 6.;
-                     else if (q1[det] > 0.)
-                         q1[det] = 2.;
-                 }*/
+            if (fSimu)
+            {
+                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009336;
+                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001009;
+                q1[det] = q1[det] * 480.36508 - 1.5153116;
+            }
 
             t1[det] = hit33->GetTime();
             tof = tStart - t1[det];
@@ -1298,8 +1562,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3))
                 continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
-                continue;
             if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
                 continue;
             if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
@@ -1309,18 +1571,20 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             hits33++;
 
-            xFi33[mult33] = x1[det];
-            yFi33[mult33] = y1[det];
-            if (q1[det] > 7. && (q1[tofd1r] > 5.5 || q1[tofd2r] > 5.5))
-                qFi33[mult33] = 6;
-            else
-                qFi33[mult33] = 0;
-            tFi33[mult33] = tof;
-            timeFi33[mult33] = t1[det];
-
-            mult33++;
-            if (mult33 > 100)
-                continue;
+            if (fibCuts && !maxWerte)
+            {
+                xFi33[mult33] = x1[det];
+                yFi33[mult33] = y1[det];
+                if (q1[det] > 7.2 && (q1[tofd1r] > 5.5 || q1[tofd2r] > 5.5))
+                    qFi33[mult33] = 6.;
+                else
+                    qFi33[mult33] = 0;
+                tFi33[mult33] = tof;
+                timeFi33[mult33] = t1[det];
+                mult33++;
+                if (mult33 > 100)
+                    continue;
+            }
 
             if (q1[det] > qMax[det])
             {
@@ -1392,15 +1656,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit31->GetEloss();
 
-            /*  if (fSimu)
-              {
-                  if (q1[det] > 7.)
-                      q1[det] = 8.;
-                  else if (q1[det] > 5.)
-                      q1[det] = 6.;
-                  else if (q1[det] > 0.)
-                      q1[det] = 2.;
-              }*/
+            if (fSimu)
+            {
+                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009401;
+                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001083;
+                q1[det] = q1[det] * 480.88483 - 1.4792017;
+            }
 
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
@@ -1432,8 +1693,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3))
                 continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
-                continue;
             if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
                 continue;
             if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
@@ -1443,17 +1702,30 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             hits31++;
 
-            xFi31[mult31] = x1[det];
-            yFi31[mult31] = y1[det];
-            if (q1[det] > 6.7 && (q1[tofd1r] > 5.5 || q1[tofd2r] > 5.5))
-                qFi31[mult31] = 6.;
-            else
-                qFi31[mult31] = 0;
-            tFi31[mult31] = tof;
-            timeFi31[mult31] = t1[det];
-            mult31++;
-            if (mult31 > 100)
-                continue;
+            if (fibCuts && !maxWerte)
+            {
+                xFi31[mult31] = x1[det];
+                yFi31[mult31] = y1[det];
+                if (q1[det] > 7.2 && (q1[tofd1r] > 5.5 || q1[tofd2r] > 5.5))
+                {
+                    qFi31[mult31] = 6.;
+                }
+                else
+                {
+                    qFi31[mult31] = 0;
+                }
+                tFi31[mult31] = tof;
+                timeFi31[mult31] = t1[det];
+
+                //  cout << "Fi31 ac: " << mult31 << " x1: " << xFi31[mult31] << " y1: " << yFi31[mult31]  << " q1: " <<
+                //  qFi31[mult31]
+                //     << " t1: " << timeFi31[mult31] <<", "<<q1[tofd1r]<<", "<<q1[tofd2r]<< endl;
+
+                mult31++;
+
+                if (mult31 > 100)
+                    continue;
+            }
 
             if (q1[det] > qMax[det])
             {
@@ -1525,15 +1797,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit32->GetEloss();
 
-            /*  if (fSimu)
-              {
-                  if (q1[det] > 7.)
-                      q1[det] = 8.;
-                  else if (q1[det] > 5.)
-                      q1[det] = 6.;
-                  else if (q1[det] > 0.)
-                      q1[det] = 2.;
-              }*/
+            if (fSimu)
+            {
+                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009298;
+                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.0009719;
+                q1[det] = q1[det] * 480.417 - 1.5330827;
+            }
 
             t1[det] = hit32->GetTime();
             tof = tStart - t1[det];
@@ -1556,8 +1825,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
-                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
             if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
                 continue;
@@ -1649,15 +1916,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit30->GetEloss();
 
-            /*   if (fSimu)
-               {
-                   if (q1[det] > 7.)
-                       q1[det] = 8.;
-                   else if (q1[det] > 5.)
-                       q1[det] = 6.;
-                   else if (q1[det] > 0.)
-                       q1[det] = 2.;
-               }*/
+            if (fSimu)
+            {
+                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.00938;
+                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001;
+                q1[det] = q1[det] * 477.32697 - 1.5226730;
+            }
 
             t1[det] = hit30->GetTime();
             tof = tStart - t1[det];
@@ -1680,8 +1944,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
-                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
             if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
                 continue;
@@ -1764,7 +2026,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Int_t mult23a = 0;
         auto detHit23a = fHitItems.at(DET_FI23A);
         Int_t nHits23a = detHit23a->GetEntriesFast();
-        LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+        // LOG(DEBUG)
+        // cout<< "Fi23a hits: " << nHits23a << endl;
         // fh_mult_Fib[fi23a]->Fill(nHits23a);
         for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
         {
@@ -1790,37 +2053,53 @@ void R3BPreTrackS494::Exec(Option_t* option)
             t1[det] = hit23a->GetTime();
             tof = tStart - t1[det];
 
+            //     cout << "Fi23 bc: " << ihit23a << " x1: " << x1[det]*100 << " y1: " << y1[det]*100 << " q1: " <<
+            //     q1[det]
+            //            << " t1: " << t1[det] << endl;
+
             // Fill histograms before cuts
             fh_Fib_ToF[det]->Fill(x1[det] * 100., tof);
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits23a);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(xStart * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
 
+            Double_t tmem = 0;
+            if (ihit23a > 0)
+            {
+                fh_TimePreviousEventFi23a->Fill(tDiffTofd, tmem - t1[det1]);
+            }
+            tmem = t1[det1];
+
             // Cuts on Fi23a
-            if (fCuts && (t1[det] < -30 || t1[det] > 30) && !fSimu && fB == -1710)
+            if (fCuts && (y1[det] * 100. < -7.5 || y1[det] * 100. > 7.5) && !fSimu)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            if (fCuts && (tof < -25 || tof > 45) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (x1[det] < -0.06 || x1[det] > 0.06))
-                continue;
-            if (fCuts && (y1[det] < -0.06 || y1[det] > 0.06))
-                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
-                continue;
-            if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
-                continue;
-            if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
-                continue;
+            //   if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB == -1710)
+            //       continue;
+            /*  if (fCuts && (x1[det] < -0.06 || x1[det] > 0.06))
+                  continue;
+              if (fCuts && (y1[det] < -0.06 || y1[det] > 0.06))
+                  continue;
+              if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
+                  continue;
+              if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
+                  continue;*/
+
+            if (debug3)
+                cout << "Fi23 ac: " << ihit23a << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
+                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
 
             xFi23a[mult23a] = x1[det];
             yFi23a[mult23a] = y1[det];
-            qFi23a[mult23a] = 0.; // q1[det];
+            qFi23a[mult23a] = q1[det];
             tFi23a[mult23a] = tof;
-            timeFi23a[mult33] = t1[det];
+            timeFi23a[mult23a] = t1[det];
+
             mult23a++;
             if (mult23a > 100)
                 continue;
@@ -1854,10 +2133,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 tdet[countdet] = t1[det];
                 countdet++;
             }
-
-            if (debug3)
-                cout << "Fi23a " << ihit23a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << tof << endl;
         }
 
         if (mult23a > 0 && maxWerte)
@@ -1885,7 +2160,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Int_t mult23b = 0;
         auto detHit23b = fHitItems.at(DET_FI23B);
         Int_t nHits23b = detHit23b->GetEntriesFast();
-        LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+        // LOG(DEBUG)
+        // cout<< "Fi23b hits: " << nHits23b << endl;
         //   fh_mult_Fib[fi23b]->Fill(nHits23b);
         for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
         {
@@ -1916,32 +2192,37 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits23b);
             fh_ToT_Fib[det]->Fill(y1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(y1[tofd1l] * 100., y1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(yStart * 100., y1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, y1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(y1[det] * 100., t1[det]);
-
+            Double_t tmem = 0;
+            if (ihit23b > 0)
+            {
+                fh_TimePreviousEventFi23b->Fill(tDiffTofd, tmem - t1[det1]);
+            }
+            tmem = t1[det1];
             // Cuts on Fi23b
-            if (fCuts && (t1[det] < -30 || t1[det] > 30) && !fSimu && fB == -1710)
+            if (fCuts && (x1[det] * 100. < -7.5 || x1[det] * 100. > 7.5) && !fSimu)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            if (fCuts && (tof < -25 || tof > 45) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (y1[det] < -0.06 || y1[det] > 0.06))
-                continue;
-            if (fCuts && (x1[det] < -0.06 || x1[det] > 0.06))
-                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
-                continue;
-            if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
-                continue;
-            if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
-                continue;
+            //   if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB == -1710)
+            //      continue;
+            /*    if (fCuts && (y1[det] < -0.06 || y1[det] > 0.06))
+                   continue;
+               if (fCuts && (x1[det] < -0.06 || x1[det] > 0.06))
+                   continue;
+               if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
+                   continue;
+               if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
+                   continue;*/
 
             xFi23b[mult23b] = x1[det];
             yFi23b[mult23b] = y1[det];
-            qFi23b[mult23b] = 0.; // q1[det];
+            qFi23b[mult23b] = q1[det];
             tFi23b[mult23b] = tof;
-            timeFi23b[mult33] = t1[det];
+            timeFi23b[mult23b] = t1[det];
             mult23b++;
 
             if (mult23b > 100)
@@ -1978,8 +2259,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
             }
 
             if (debug3)
-                cout << "Fi23b " << ihit23b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << tof << endl;
+                cout << "Fi23b ac: " << ihit23b << " x1: " << x1[det] * 100. << " y1: " << y1[det] * 100.
+                     << " q1: " << q1[det] << " t1: " << tof << endl;
         }
 
         if (mult23b > 0 && maxWerte)
@@ -2044,28 +2325,57 @@ void R3BPreTrackS494::Exec(Option_t* option)
         // FIBCORREL
         if (fibCuts)
         {
+
+            /*	cout<<"NEW START charges: "<<ihit<<", "<<id1<<", "<<id2<<"; "<<q1[tofd1r]<<", "<<q1[tofd2r]<<", "<<
+                q1[tofd1l]<<", "<<q1[tofd2l]<<endl;
+                cout<<"NEW START positions: "<<ihit<<", "<<id1<<", "<<id2<<"; "<<x1[tofd1r]* 100.<<", "<<x1[tofd2r]*
+               100.<<", "<< x1[tofd1l]* 100.<<", "<<x1[tofd2l]* 100.<<endl; for(Int_t k = 0; k < countdet; k++){
+                    cout<<"CHARGES AND POSIT:   "<<qdet[k]<<", "<<xdet[k]* 100.<<endl;
+                }*/
+
+            Double_t offset_corr = 0.;
+            if (abs(fB) == 2310. || abs(fB) == 2160. || abs(fB) == 1110)
+                offset_corr = 3.;
             // Plots of correlations of Fiber detectors and register events for tracker
             for (Int_t i = 0; i < mult31; i++)
             {
                 if (debug3)
-                    cout << "Fib31: " << i << " x: " << xFi31[i] << " q: " << qFi31[i] << endl;
+                    cout << "Fib31 out: " << i << " x: " << xFi31[i] << " q: " << qFi31[i] << endl;
 
-                Double_t xtemp31 = -0.732 * x1[tofd1r] * 100. - 29.364;
-                if (std::abs(xtemp31 - xFi31[i] * 100.) > dx3)
+                fh_tofd_vs_Fib31->Fill(xFi31[i] * 100., x1[tofd1r] * 100.);
+                fh_ytofd_vs_yFib31->Fill(yFi31[i] * 100., y1[tofd1r] * 100.);
+                fh_tofd_vs_Fib31->Fill(xFi31[i] * 100., x1[tofd2r] * 100.);
+                fh_ytofd_vs_yFib31->Fill(yFi31[i] * 100., y1[tofd2r] * 100.);
+
+                Double_t xtemp31;
+                xtemp31 = -0.732 * x1[tofd1r] * 100. - 29.364;
+                if (fPairs && std::abs(xtemp31 - xFi31[i] * 100.) > dx3)
                     continue;
+                xtemp31 = -0.732 * x1[tofd2r] * 100. - 29.364;
+                if (fPairs && std::abs(xtemp31 - xFi31[i] * 100.) > dx3)
+                    continue;
+
+                fh_tofd_vs_Fib31_ac->Fill(xFi31[i] * 100., x1[tofd1r] * 100.);
+                fh_tofd_vs_Fib31_ac->Fill(xFi31[i] * 100., x1[tofd2r] * 100.);
 
                 fh_Fib_ToF_ac[fi31]->Fill(xFi31[i] * 100., tFi31[i]);
                 fh_xy_Fib_ac[fi31]->Fill(xFi31[i] * 100., yFi31[i] * 100.);
                 fh_ToT_Fib_ac[fi31]->Fill(xFi31[i] * 100., qFi31[i]);
                 fh_Fibs_vs_Tofd_ac[fi31]->Fill(x1[tofd1r] * 100. + randx, xFi31[i] * 100.);
-                fh_Fib_Time_ac[fi31]->Fill(xFi31[i] * 100., tStart - tFi31[i]);
+                fh_Fibs_vs_Tofd_ac[fi31]->Fill(x1[tofd2r] * 100. + randx, xFi31[i] * 100.);
+                fh_Fib_Time_ac[fi31]->Fill(xFi31[i] * 100., t1[tofd1r] - tFi31[i]);
+                fh_Fib_Time_ac[fi31]->Fill(xFi31[i] * 100., t1[tofd2r] - tFi31[i]);
 
                 for (Int_t j = 0; j < mult33; j++)
                 {
                     if (debug3)
-                        cout << "Fib33: " << j << " x: " << xFi33[j] << " q: " << qFi33[j] << endl;
-                    Double_t x31 = 0.866 * xFi33[j] * 100. - 4.637; // 1.1165 * xFi31[i] * 100. + 2.53856;
-                    // if(xFi33[j] > -100 && xFi31[i] > -100)
+                        cout << "Fib33 out: " << j << " x: " << xFi33[j] << " q: " << qFi33[j] << endl;
+                    Double_t x31 = 0.866 * xFi33[j] * 100. - 4.637 - offset_corr; // 1.1165 * xFi31[i] * 100. + 2.53856;
+
+                    fh_Fib33_vs_Fib31->Fill(xFi31[i] * 100., xFi33[j] * 100.);
+                    fh_Fib33_vs_Fib31_dx->Fill(xFi31[i] * 100., xFi33[j] * 100. - xFi31[i] * 100.);
+                    fh_Fib33_vs_Fib31_dt->Fill(xFi33[j] * 100., timeFi31[i] - timeFi33[j]);
+
                     tempFi33 = false;
                     if (fSimu)
                         tempFi33 = true;
@@ -2081,7 +2391,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         fh_xy_Fib_ac[fi33]->Fill(xFi33[j] * 100., yFi33[j] * 100.);
                         fh_ToT_Fib_ac[fi33]->Fill(xFi33[j] * 100., qFi33[j]);
                         fh_Fibs_vs_Tofd_ac[fi33]->Fill(x1[tofd1r] * 100. + randx, xFi33[j] * 100.);
-                        fh_Fib_Time_ac[fi33]->Fill(xFi33[j] * 100., tStart - tFi33[j]);
+                        fh_Fibs_vs_Tofd_ac[fi33]->Fill(x1[tofd2r] * 100. + randx, xFi33[j] * 100.);
+                        fh_Fib_Time_ac[fi33]->Fill(xFi33[j] * 100., t1[tofd1r] - tFi33[j]);
+                        fh_Fib_Time_ac[fi33]->Fill(xFi33[j] * 100., t1[tofd2r] - tFi33[j]);
 
                         cond1 = kTRUE;
                         if (debug3)
@@ -2120,13 +2432,19 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         cout << "Fib23a: " << j << " x: " << xFi23a[j] << " q: " << qFi23a[j] << endl;
                     Double_t x31 = -6.625 * xFi23a[j] * 100. - 29.29; //-6.8672 * xFi23a[j] * 100. - 27.3507;
                     // if (abs(xFi31[i] * 100. - x31) < dx2 && xFi31[i] > -100 && xFi23a[j] > -100)
+
+                    fh_Fib31_vs_Fib23a->Fill(xFi23a[j] * 100., xFi31[i] * 100.);
+                    fh_Fib31_vs_Fib23a_dx->Fill(xFi23a[j] * 100., xFi31[i] * 100. - xFi23a[j] * 100.);
+                    fh_Fib31_vs_Fib23a_dt->Fill(xFi31[i] * 100. - xFi23a[j] * 100., timeFi31[i] - timeFi23a[j]);
+
                     tempFi23ar = false;
                     if (fSimu)
                         tempFi23ar = true;
-                    if (!fSimu && abs(timeFi31[i] - timeFi23a[j]) < dtft)
+                    if (!fSimu && abs(timeFi31[i] - timeFi23a[j]) < 30.)
                         tempFi23ar = true;
                     // if (abs(xFi31[i] * 100. - x31) < dx2 && xFi31[i]*100. > -30 && xFi23a[j]*100. > -6 &&
-                    if (xFi23a[j] * 100. < -0.05 && tempFi23ar)
+                    if ((!fPairs) ||
+                        (fPairs && abs(xFi23a[j] * 100.) > 0.26 && tempFi23ar)) // && abs(xFi31[i] * 100. - x31) < dx2))
                     {
                         // if (fGraphCuts && !cut_fi31_fi23a->IsInside(xFi23a[j] * 100., xFi31[i] * 100.))
                         //	continue;
@@ -2137,7 +2455,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         fh_xy_Fib_ac[fi23a]->Fill(xFi23a[j] * 100., yFi23a[j] * 100.);
                         fh_ToT_Fib_ac[fi23a]->Fill(xFi23a[j] * 100., qFi23a[j]);
                         fh_Fibs_vs_Tofd_ac[fi23a]->Fill(x1[tofd1r] * 100. + randx, xFi23a[j] * 100.);
-                        fh_Fib_Time_ac[fi23a]->Fill(xFi23a[j] * 100., tStart - tFi23a[j]);
+                        fh_Fibs_vs_Tofd_ac[fi23a]->Fill(x1[tofd2r] * 100. + randx, xFi23a[j] * 100.);
+                        fh_Fib_Time_ac[fi23a]->Fill(x1[tofd2r] * 100. + randx - xFi23a[j] * 100.,
+                                                    t1[tofd1r] - tFi23a[j]);
+                        fh_Fib_Time_ac[fi23a]->Fill(x1[tofd2r] * 100. + randx - xFi23a[j] * 100.,
+                                                    t1[tofd2r] - tFi23a[j]);
 
                         cond2 = kTRUE;
                         if (debug3)
@@ -2154,6 +2476,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 qdet[countdet] = qFi23a[j];
                                 tdet[countdet] = tFi23a[j];
                                 countdet++;
+
+                                detector[countdet] = fi23ar;
+                                xdet[countdet] = xFi23a[j];
+                                ydet[countdet] = yFi23a[j];
+                                zdet[countdet] = 0.;
+                                qdet[countdet] = qFi23a[j];
+                                tdet[countdet] = tFi23a[j];
+                                countdet++;
+
                                 fFi23a[j] = true;
                             }
                         }
@@ -2165,23 +2496,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         cout << "Fib23b: " << j << " y: " << yFi23b[j] << " q: " << qFi23b[j] << endl;
                     // Double_t x31 = -6.8672 * xFi23b[j] * 100. - 27.3507;
                     // if (abs(xFi31[i] * 100. - x31) < dx2 && xFi31[i] > -100 && xFi23b[j] > -100)
+
+                    fh_Fib31_vs_Fib23b->Fill(yFi23b[j] * 100., yFi31[i] * 100.);
+                    fh_Fib31_vs_Fib23b_dx->Fill(yFi23b[j] * 100., yFi31[i] * 100. - yFi23b[j] * 100.);
+                    fh_Fib31_vs_Fib23b_dt->Fill(yFi23b[j] * 100., timeFi31[i] - timeFi23b[j]);
+
                     tempFi23br = false;
                     if (fSimu)
                         tempFi23br = true;
-                    if (!fSimu && abs(timeFi31[i] - timeFi23b[j]) < dtft)
+                    if (!fSimu && abs(timeFi31[i] - timeFi23b[j]) < 30.)
                         tempFi23br = true;
-                    if (xFi23b[j] * 100. > -6. && tempFi23br)
+
+                    if ((!fPairs) || (fPairs && abs(yFi23b[j] * 100.) > 0.26 && tempFi23br))
                     {
                         // if (fGraphCuts && !cut_fi30_fi23b->IsInside(yFi23b[j] * 100., xFi30[i] * 100.))
                         //	continue;
-                        fh_Fib31_vs_Fib23b->Fill(xFi23b[j] * 100., xFi31[i] * 100.);
-                        fh_Fib31_vs_Fib23b_dx->Fill(xFi23b[j] * 100., xFi31[i] * 100. - xFi23b[j] * 100.);
+                        fh_Fib31_vs_Fib23b_ac->Fill(yFi23b[j] * 100., yFi31[i] * 100.);
+                        fh_Fib31_vs_Fib23b_dx_ac->Fill(yFi23b[j] * 100., yFi31[i] * 100. - yFi23b[j] * 100.);
 
-                        fh_Fib_ToF_ac[fi23b]->Fill(xFi23b[j] * 100., tFi23b[j]);
+                        fh_Fib_ToF_ac[fi23b]->Fill(yFi23b[j] * 100., tFi23b[j]);
                         fh_xy_Fib_ac[fi23b]->Fill(xFi23b[j] * 100., yFi23b[j] * 100.);
-                        fh_ToT_Fib_ac[fi23b]->Fill(xFi23b[j] * 100., qFi23b[j]);
-                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(x1[tofd1r] * 100. + randx, xFi23b[j] * 100.);
-                        fh_Fib_Time_ac[fi23b]->Fill(xFi23b[j] * 100., tStart - tFi23b[j]);
+                        fh_ToT_Fib_ac[fi23b]->Fill(yFi23b[j] * 100., qFi23b[j]);
+                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(y1[tofd1r] * 100., yFi23b[j] * 100.);
+                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(y1[tofd2r] * 100., yFi23b[j] * 100.);
+                        fh_Fib_Time_ac[fi23b]->Fill(y1[tofd1r] * 100. - yFi23b[j] * 100., t1[tofd1r] - tFi23b[j]);
+                        fh_Fib_Time_ac[fi23b]->Fill(y1[tofd2r] * 100. - yFi23b[j] * 100., t1[tofd2r] - tFi23b[j]);
 
                         cond3 = kTRUE;
                         if (debug3)
@@ -2201,6 +2540,30 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 fFi23b[j] = true;
                             }
                         }
+                        if (q1[tofd1r] > 0 && !cTofd1r)
+                        {
+                            detector[countdet] = tofd1rc;
+                            xdet[countdet] = x1[tofd1r];
+                            ydet[countdet] = y1[tofd1r];
+                            zdet[countdet] = z1[tofd1r];
+                            tdet[countdet] = t1[tofd1r];
+                            qdet[countdet] = (int)(q1[tofd1r] + 0.5); // q for tracker must be integer
+
+                            countdet++;
+                            cTofd1r = true;
+                        }
+                        if (q1[tofd2r] > 0 && !cTofd2r)
+                        {
+                            detector[countdet] = tofd2rc;
+                            xdet[countdet] = x1[tofd2r];
+                            ydet[countdet] = y1[tofd2r];
+                            zdet[countdet] = z1[tofd2r];
+                            tdet[countdet] = t1[tofd2r];
+                            qdet[countdet] = (int)(q1[tofd2r] + 0.5); // q for tracker must be integer
+
+                            countdet++;
+                            cTofd2r = true;
+                        }
                     }
                 }
             }
@@ -2209,21 +2572,39 @@ void R3BPreTrackS494::Exec(Option_t* option)
             {
                 if (debug3)
                     cout << "Fib30: " << i << " x: " << xFi30[i] << " q: " << qFi30[i] << endl;
-                Double_t xtemp30 = 0.7796 * x1[tofd1l] * 100. - 28.669;
-                if (std::abs(xtemp30 - xFi30[i] * 100.) > dx3)
+
+                fh_tofd_vs_Fib30->Fill(xFi30[i] * 100., x1[tofd1l] * 100.);
+                fh_ytofd_vs_yFib30->Fill(yFi30[i] * 100., y1[tofd1l] * 100.);
+                fh_tofd_vs_Fib30->Fill(xFi30[i] * 100., x1[tofd2l] * 100.);
+                fh_ytofd_vs_yFib30->Fill(yFi30[i] * 100., y1[tofd2l] * 100.);
+
+                Double_t xtemp30;
+                xtemp30 = 0.7796 * x1[tofd1l] * 100. - 28.669;
+                if (fPairs && std::abs(xtemp30 - xFi30[i] * 100.) > dx3)
+                    continue;
+                xtemp30 = 0.7796 * x1[tofd2l] * 100. - 28.669;
+                if (fPairs && std::abs(xtemp30 - xFi30[i] * 100.) > dx3)
                     continue;
 
-                fh_Fib_ToF_ac[fi30]->Fill(xFi30[i] * 100., tStart - tFi30[i]);
+                fh_tofd_vs_Fib30_ac->Fill(xFi30[i] * 100., x1[tofd1l] * 100.);
+                fh_tofd_vs_Fib30_ac->Fill(xFi30[i] * 100., x1[tofd2l] * 100.);
+                fh_Fib_ToF_ac[fi30]->Fill(xFi30[i] * 100., t1[tofd1l] - tFi30[i]);
+                fh_Fib_ToF_ac[fi30]->Fill(xFi30[i] * 100., t1[tofd2l] - tFi30[i]);
                 fh_xy_Fib_ac[fi30]->Fill(xFi30[i] * 100., yFi30[i] * 100.);
                 fh_ToT_Fib_ac[fi30]->Fill(xFi30[i] * 100., qFi30[i]);
                 fh_Fibs_vs_Tofd_ac[fi30]->Fill(x1[tofd1l] * 100. + randx, xFi30[i] * 100.);
+                fh_Fibs_vs_Tofd_ac[fi30]->Fill(x1[tofd2l] * 100. + randx, xFi30[i] * 100.);
                 fh_Fib_Time_ac[fi30]->Fill(xFi30[i] * 100., tFi30[i]);
 
                 for (Int_t j = 0; j < mult32; j++)
                 {
                     if (debug3)
                         cout << "Fib32: " << j << " x: " << xFi32[j] << " q: " << qFi32[j] << endl;
-                    Double_t x30 = 0.873 * xFi32[j] * 100. - 3.302; // 1.10926 * xFi30[i] * 100. + 2.8943;
+                    fh_Fib32_vs_Fib30->Fill(xFi30[i] * 100., xFi32[j] * 100.);
+                    fh_Fib32_vs_Fib30_dx->Fill(xFi30[i] * 100., xFi32[j] * 100. - xFi30[i] * 100.);
+                    fh_Fib32_vs_Fib30_dt->Fill(xFi32[j] * 100., timeFi30[i] - timeFi32[j]);
+
+                    Double_t x30 = 0.873 * xFi32[j] * 100. - 3.302 - offset_corr; // 1.10926 * xFi30[i] * 100. + 2.8943;
                     tempFi32 = false;
                     if (fSimu)
                         tempFi32 = true;
@@ -2241,7 +2622,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         fh_xy_Fib_ac[fi32]->Fill(xFi32[j] * 100., yFi32[j] * 100.);
                         fh_ToT_Fib_ac[fi32]->Fill(xFi32[j] * 100., qFi32[j]);
                         fh_Fibs_vs_Tofd_ac[fi32]->Fill(x1[tofd1l] * 100. + randx, xFi32[j] * 100.);
-                        fh_Fib_Time_ac[fi32]->Fill(xFi32[j] * 100., tStart - tFi32[j]);
+                        fh_Fibs_vs_Tofd_ac[fi32]->Fill(x1[tofd2l] * 100. + randx, xFi32[j] * 100.);
+                        fh_Fib_Time_ac[fi32]->Fill(xFi32[j] * 100., t1[tofd1l] - tFi32[j]);
+                        fh_Fib_Time_ac[fi32]->Fill(xFi32[j] * 100., t1[tofd2l] - tFi32[j]);
 
                         cond4 = kTRUE;
                         if (debug3)
@@ -2278,15 +2661,22 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 {
                     if (debug3)
                         cout << "Fib23a: " << j << " x: " << xFi23a[j] << " q: " << qFi23a[j] << endl;
+
+                    fh_Fib30_vs_Fib23a->Fill(xFi23a[j] * 100., xFi30[i] * 100.);
+                    fh_Fib30_vs_Fib23a_dx->Fill(xFi23a[j] * 100., xFi30[i] * 100. - xFi23a[j] * 100.);
+                    fh_Fib30_vs_Fib23a_dt->Fill(xFi30[i] * 100. - xFi23a[j] * 100., timeFi30[i] - timeFi23a[j]);
+
                     Double_t x30 = 6.498 * xFi23a[j] * 100. - 28.93;
                     // if (abs(xFi30[i] * 100. - x30) < dx2 && xFi30[i] > -100 && xFi23a[j] > -100)
                     tempFi23al = false;
                     if (fSimu)
                         tempFi23al = true;
-                    if (!fSimu && abs(timeFi30[i] - timeFi23a[j]) < dtft)
+                    if (!fSimu && abs(timeFi30[i] - timeFi23a[j]) < 30)
                         tempFi23al = true;
                     // if (abs(xFi30[i] * 100. - x30) < dx2 && xFi30[i]*100. > -30 && xFi23a[j]*100. > -6 &&
-                    if (xFi23a[j] * 100. > 0.05 && tempFi23al)
+
+                    if ((!fPairs) ||
+                        (fPairs && abs(xFi23a[j] * 100.) > 0.26 && tempFi23al)) // && abs(xFi30[i] * 100. - x30) < dx2))
                     {
                         // if (fGraphCuts && !cut_fi30_fi23b->IsInside(yFi23b[j] * 100., xFi30[i] * 100.))
                         //	continue;
@@ -2297,7 +2687,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         fh_xy_Fib_ac[fi23a]->Fill(xFi23a[j] * 100., yFi23a[j] * 100.);
                         fh_ToT_Fib_ac[fi23a]->Fill(xFi23a[j] * 100., qFi23a[j]);
                         fh_Fibs_vs_Tofd_ac[fi23a]->Fill(x1[tofd1l] * 100. + randx, xFi23a[j] * 100.);
-                        fh_Fib_Time_ac[fi23a]->Fill(xFi23a[j] * 100., tStart - tFi23a[j]);
+                        fh_Fibs_vs_Tofd_ac[fi23a]->Fill(x1[tofd2l] * 100. + randx, xFi23a[j] * 100.);
+                        fh_Fib_Time_ac[fi23a]->Fill(x1[tofd1l] * 100. + randx - xFi23a[j] * 100.,
+                                                    t1[tofd1l] - tFi23a[j]);
+                        fh_Fib_Time_ac[fi23a]->Fill(x1[tofd2l] * 100. + randx - xFi23a[j] * 100.,
+                                                    t1[tofd2l] - tFi23a[j]);
 
                         cond5 = kTRUE;
                         if (debug3)
@@ -2308,6 +2702,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
                             if (!fFi23a[j])
                             {
                                 detector[countdet] = fi23a;
+                                xdet[countdet] = xFi23a[j];
+                                ydet[countdet] = yFi23a[j];
+                                zdet[countdet] = 0.;
+                                qdet[countdet] = qFi23a[j];
+                                tdet[countdet] = tFi23a[j];
+                                countdet++;
+
+                                detector[countdet] = fi23al;
                                 xdet[countdet] = xFi23a[j];
                                 ydet[countdet] = yFi23a[j];
                                 zdet[countdet] = 0.;
@@ -2325,23 +2727,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         cout << "Fib23b: " << j << " y: " << yFi23b[j] << " q: " << qFi23b[j] << endl;
                     // Double_t x30 = 6.98386 * xFi23b[j] * 100. - 27.39897;
                     // if (abs(xFi30[i] * 100. - x30) < dx2 && xFi30[i] > -100 && xFi23b[j] > -100)
+
+                    fh_Fib30_vs_Fib23b->Fill(yFi23b[j] * 100., yFi30[i] * 100.);
+                    fh_Fib30_vs_Fib23b_dx->Fill(yFi23b[j] * 100., yFi30[i] * 100. - yFi23b[j] * 100.);
+                    fh_Fib30_vs_Fib23b_dt->Fill(yFi23b[j] * 100., timeFi30[i] - timeFi23b[j]);
+
                     tempFi23bl = false;
                     if (fSimu)
                         tempFi23bl = true;
-                    if (!fSimu && abs(timeFi30[i] - timeFi23b[j]) < dtft)
+                    if (!fSimu && abs(timeFi30[i] - timeFi23b[j]) < 30)
                         tempFi23bl = true;
-                    if ((yFi23b[j] * 100. > -6. && tempFi23bl))
+
+                    if ((!fPairs) || (fPairs && abs(yFi23b[j] * 100.) > 0.26 && tempFi23bl))
                     {
                         // if (fGraphCuts && !cut_fi30_fi23b->IsInside(yFi23b[j] * 100., xFi30[i] * 100.))
                         //	continue;
-                        fh_Fib30_vs_Fib23b->Fill(xFi23b[j] * 100., xFi30[i] * 100.);
-                        fh_Fib30_vs_Fib23b_dx->Fill(xFi23b[j] * 100., xFi30[i] * 100. - xFi23b[j] * 100.);
+                        fh_Fib30_vs_Fib23b_ac->Fill(yFi23b[j] * 100., yFi30[i] * 100.);
+                        fh_Fib30_vs_Fib23b_dx_ac->Fill(yFi23b[j] * 100., yFi30[i] * 100. - yFi23b[j] * 100.);
 
-                        fh_Fib_ToF_ac[fi23b]->Fill(xFi23b[j] * 100., tFi23b[j]);
+                        fh_Fib_ToF_ac[fi23b]->Fill(yFi23b[j] * 100., tFi23b[j]);
                         fh_xy_Fib_ac[fi23b]->Fill(xFi23b[j] * 100., yFi23b[j] * 100.);
-                        fh_ToT_Fib_ac[fi23b]->Fill(xFi23b[j] * 100., qFi23b[j]);
-                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(x1[tofd1l] * 100. + randx, xFi23b[j] * 100.);
-                        fh_Fib_Time_ac[fi23b]->Fill(xFi23b[j] * 100., tStart - tFi23b[j]);
+                        fh_ToT_Fib_ac[fi23b]->Fill(yFi23b[j] * 100., qFi23b[j]);
+                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(y1[tofd1l] * 100., yFi23b[j] * 100.);
+                        fh_Fibs_vs_Tofd_ac[fi23b]->Fill(y1[tofd2l] * 100., yFi23b[j] * 100.);
+                        fh_Fib_Time_ac[fi23b]->Fill(y1[tofd1l] * 100. - yFi23b[j] * 100., t1[tofd1l] - tFi23b[j]);
+                        fh_Fib_Time_ac[fi23b]->Fill(y1[tofd2l] * 100. - yFi23b[j] * 100., t1[tofd2l] - tFi23b[j]);
 
                         cond6 = kTRUE;
                         if (debug3)
@@ -2360,6 +2770,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 countdet++;
                                 fFi23b[j] = true;
                             }
+                        }
+                        if (q1[tofd1l] > 0 && !cTofd1l)
+                        {
+                            detector[countdet] = tofd1lc;
+                            xdet[countdet] = x1[tofd1l];
+                            ydet[countdet] = y1[tofd1l];
+                            zdet[countdet] = z1[tofd1l];
+                            tdet[countdet] = t1[tofd1l];
+                            qdet[countdet] = (int)(q1[tofd1l] + 0.5); // q for tracker must be integer
+
+                            countdet++;
+                            cTofd1l = true;
+                        }
+                        if (q1[tofd2l] > 0 && !cTofd2l)
+                        {
+
+                            detector[countdet] = tofd2lc;
+                            xdet[countdet] = x1[tofd2l];
+                            ydet[countdet] = y1[tofd2l];
+                            zdet[countdet] = z1[tofd2l];
+                            tdet[countdet] = t1[tofd2l];
+                            qdet[countdet] = (int)(q1[tofd2l] + 0.5); // q for tracker must be integer
+
+                            countdet++;
+                            cTofd2l = true;
                         }
                     }
                 }
@@ -2405,7 +2840,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 for (Int_t i = 0; i < countdet; i++)
                 {
                     Bool_t iffib33 = true;
-                    if (detector[i] > 5 && goodQ)
+                    if (detector[i] > 5 && detector[i] < 10 && goodQ)
                     {
                         xdet_s[countdet_s] = xdet[i];
                         ydet_s[countdet_s] = ydet[i];
@@ -2461,7 +2896,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         xdet_s[countdet_s] = xdet[i];
                         ydet_s[countdet_s] = ydet[i];
                         zdet_s[countdet_s] = zdet[i];
-                        qdet_s[countdet_s] = 0.; // qdet[i];
+                        qdet_s[countdet_s] = qdet[i];
                         tdet_s[countdet_s] = tdet[i];
                         detector_s[countdet_s] = detector[i];
 
@@ -2469,7 +2904,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         xdet_sum[detector_s[countdet_s]] += xdet[i];
                         ydet_sum[detector_s[countdet_s]] += ydet[i];
                         zdet_sum[detector_s[countdet_s]] += zdet[i];
-                        qdet_sum[detector_s[countdet_s]] += 0.; // qdet[i];
+                        qdet_sum[detector_s[countdet_s]] += qdet[i];
                         tdet_sum[detector_s[countdet_s]] += tdet[i];
 
                         countdet_s++;
@@ -2489,14 +2924,17 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 Double_t ct = 0.;
 
                 counter1++;
-                // cout<<"************* counter1: "<<counter1<<endl;
-                if (counter1 < 1001 && !fAverage)
+
+                //  cout<<"************* counter1: "<<counter1<<endl;
+                // if (counter1 < 1001 && !fAverage)
+                if (!fAverage)
                 {
                     for (Int_t i = 0; i < countdet_s; i++)
                     {
-                        // if (debug)
-                        cout << "counter1 :" << counter1 << " #" << i << " Det: " << detector_s[i]
-                             << " x: " << xdet_s[i] * 100. << " y: " << ydet_s[i] * 100. << " q: " << qdet_s[i] << endl;
+                        if (debug)
+                            cout << "counter1 :" << counter1 << " #" << i << " Det: " << detector_s[i]
+                                 << " x: " << xdet_s[i] * 100. << " y: " << ydet_s[i] * 100. << " q: " << qdet_s[i]
+                                 << endl;
 
                         if (detector_s[i] == 0)
                         {
@@ -2618,14 +3056,41 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         if (fPairs && temp_cond)
         {
-            Int_t ncount[10] = { 0 };
-            // cout<<"Before: "<<endl;
+            Int_t ncount[n_det] = { 0 }, ncounttemp1 = 0, ncounttemp2 = 0;
+            Double_t x23ltemp[40], x23rtemp[40], xtofdtemp1[40], xtofdtemp2[40], ytofdtemp1[40], ytofdtemp2[40],
+                qtofdtemp1[40], qtofdtemp2[40];
+            // cout<<"******************* "<<endl;
+
             for (Int_t i = 0; i < countdet; i++)
             {
+
+                if (detector[i] == 14)
+                    x23rtemp[ncount[detector[i]]] = xdet[i];
+                if (detector[i] == 15)
+                    x23ltemp[ncount[detector[i]]] = xdet[i];
+
+                if (detector[i] == 6 || detector[i] == 7)
+                {
+                    xtofdtemp1[ncounttemp1] = xdet[i];
+                    ytofdtemp1[ncounttemp1] = ydet[i];
+                    qtofdtemp1[ncounttemp1] = qdet[i];
+                    ncounttemp1 += 1;
+                }
+                if (detector[i] == 8 || detector[i] == 9)
+                {
+                    xtofdtemp2[ncounttemp2] = xdet[i];
+                    ytofdtemp2[ncounttemp2] = ydet[i];
+                    qtofdtemp2[ncounttemp2] = qdet[i];
+                    ncounttemp2 += 1;
+                }
+
                 ncount[detector[i]] += 1;
-                // cout<<"Count: "<< i<<", det: "<<detector_s[i]<<", qdet: "<<qdet_s[i]<<endl;
             }
 
+            /*	for (Int_t i = 0; i < countdet; i++)
+                {
+                   cout<<"Count: "<< i<<", det: "<<detector[i]<<", ncount: "<<ncount[detector[i]]<<endl;
+                }*/
             countdet_s = 0;
 
             Double_t qdet_s7 = 0., qdet_s6 = 0., qdet_s8 = 0., qdet_s9 = 0.;
@@ -2634,6 +3099,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 ncount[2] == ncount[4] && ncount[3] == ncount[5] && ncount[0] > ncount[2] && ncount[0] > ncount[3] &&
                 ncount[1] > ncount[2] && ncount[1] > ncount[3])
             {
+
                 Bool_t goodQ = false;
                 for (Int_t i = 0; i < countdet; i++)
                 {
@@ -2646,12 +3112,52 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     if (detector[i] == 9)
                         qdet_s9 += qdet[i];
                 }
+
                 if (qdet_s6 == qdet_s8 && qdet_s7 == qdet_s9)
                     goodQ = true;
 
+                if (goodQ)
+                {
+                    for (Int_t i = 0; i < ncounttemp1; i++)
+                    {
+                        for (Int_t j = 0; j < ncounttemp2; j++)
+                        {
+                            if (qtofdtemp1[i] == qtofdtemp2[j])
+                                fh_yTofd_vs_yTofd->Fill(ytofdtemp1[i] * 100., ytofdtemp2[j] * 100);
+                        }
+                    }
+
+                    for (Int_t j = 0; j < ncount[14]; j++)
+                    {
+                        for (Int_t i = 0; i < ncounttemp1; i++)
+                        {
+                            if (xtofdtemp1[i] < 0)
+                                fh_Fi23aX_TofdX_bw1->Fill(xtofdtemp1[i] * 100., x23rtemp[j] * 100.);
+                        }
+                        for (Int_t i = 0; i < ncounttemp2; i++)
+                        {
+                            if (xtofdtemp2[i] < 0)
+                                fh_Fi23aX_TofdX_bw2->Fill(xtofdtemp2[i] * 100., x23rtemp[j] * 100.);
+                        }
+                    }
+                    for (Int_t j = 0; j < ncount[15]; j++)
+                    {
+                        for (Int_t i = 0; i < ncounttemp1; i++)
+                        {
+                            if (xtofdtemp1[i] > 0)
+                                fh_Fi23aX_TofdX_bw1->Fill(xtofdtemp1[i] * 100., x23ltemp[j] * 100.);
+                        }
+                        for (Int_t i = 0; i < ncounttemp2; i++)
+                        {
+                            if (xtofdtemp2[i] > 0)
+                                fh_Fi23aX_TofdX_bw2->Fill(xtofdtemp2[i] * 100., x23ltemp[j] * 100.);
+                        }
+                    }
+                }
+
                 for (Int_t i = 0; i < countdet; i++)
                 {
-                    if (detector[i] > 5 && goodQ)
+                    if (detector[i] > 5 && detector[i] < 10 && goodQ)
                     {
                         xdet_s[countdet_s] = xdet[i];
                         ydet_s[countdet_s] = ydet[i];
@@ -2665,7 +3171,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
                             cout << "tofd det:   " << detector[i] << ", count " << i << ", x: " << xdet[i]
                                  << ", q: " << qdet[i] << endl;
                             cout << "tofd det_s: " << detector_s[countdet_s] << ", count " << countdet_s
-                                 << ", x: " << xdet_s[countdet_s] << ", q: " << qdet_s[countdet_s] << endl;
+                                 << ", x: " << xdet_s[countdet_s] * 100. << ", y: " << ydet_s[countdet_s] * 100.
+                                 << ", q: " << qdet_s[countdet_s] << endl;
                         }
                         countdet_s++;
                     }
@@ -2673,6 +3180,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     {
                         if (((detector[i] == 2 || detector[i] == 4) && abs(qdet_s7 - qdet[i] < 2.1)) ||
                             ((detector[i] == 3 || detector[i] == 5) && abs(qdet_s6 - qdet[i] < 2.1)))
+                        //     if(1 == 1)
                         {
                             xdet_s[countdet_s] = xdet[i];
                             ydet_s[countdet_s] = ydet[i];
@@ -2687,10 +3195,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                             if (debug)
                             {
-                                cout << "fib  det:   " << detector[i] << ", count " << i << ", x: " << xdet[i]
+                                cout << "fib3x  det:   " << detector[i] << ", count " << i << ", x: " << xdet[i]
                                      << ", q: " << qdet[i] << endl;
-                                cout << "fib  det_s: " << detector_s[countdet_s] << ", count " << countdet_s
-                                     << ", x: " << xdet_s[countdet_s] << ", q: " << qdet_s[countdet_s] << endl;
+                                cout << "fib3x  det_s: " << detector_s[countdet_s] << ", count " << countdet_s
+                                     << ", x: " << xdet_s[countdet_s] * 100. << ", y: " << ydet_s[countdet_s] * 100.
+                                     << ", q: " << qdet_s[countdet_s] << endl;
                             }
                             countdet_s++;
                         }
@@ -2703,6 +3212,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         qdet_s[countdet_s] = qdet[i];
                         tdet_s[countdet_s] = tdet[i];
                         detector_s[countdet_s] = detector[i];
+
+                        if (debug)
+                        {
+                            cout << "fib2x  det:   " << detector[i] << ", count " << i << ", x: " << xdet[i] * 100.
+                                 << ", y: " << ydet[i] * 100. << ", q: " << qdet[i] << endl;
+                            cout << "fib2x  det_s: " << detector_s[countdet_s] << ", count " << countdet_s
+                                 << ", x: " << xdet_s[countdet_s] * 100. << ", y: " << ydet_s[countdet_s] * 100.
+                                 << ", q: " << qdet_s[countdet_s] << endl;
+                        }
                         countdet_s++;
                     }
 
@@ -2720,6 +3238,24 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 Double_t ct = 0.;
 
                 counter1++;
+                cout << "* counter1: " << counter1 << ", from Nevents: " << fNEvents << ", " << fNeventselect << endl;
+                Int_t nfin[7] = { 0 }, nC = 0, nHe = 0;
+                Double_t yfi23[10], xfi23[10], xfi30[5], yfi30[5], xfi31[5], yfi31[5], xfi32[5], yfi32[5], xfi33[5],
+                    yfi33[5], ytofdC[10], xtofdC[10], qtofdC[10], ytofdHe[10], xtofdHe[10], qtofdHe[10], qfi30[5],
+                    qfi31[5], qfi32[5], qfi33[5];
+
+                for (Int_t l = 0; l < mult23a; l++)
+                {
+                    cout << "Fi23a ac: " << l << " x1: " << xFi23a[l] * 100 << " y1: " << yFi23a[l] * 100
+                         << " q1: " << qFi23a[l] << " t1: " << timeFi23a[l] << ", tof: " << tFi23a[l]
+                         << ", tStart: " << tStart << endl;
+                }
+                for (Int_t l = 0; l < mult23b; l++)
+                {
+                    cout << "Fi23b ac: " << l << " x1: " << xFi23b[l] * 100 << " y1: " << yFi23b[l] * 100
+                         << " q1: " << qFi23b[l] << " t1: " << timeFi23b[l] << ", tof: " << tFi23b[l]
+                         << ", tStart: " << tStart << endl;
+                }
 
                 for (Int_t i = 0; i < countdet_s; i++)
                 {
@@ -2729,45 +3265,73 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                     if (detector_s[i] == 0)
                     {
+                        xfi23[nfin[0]] = xdet_s[i] * 100.;
+                        nfin[0] += 1;
                         // write fiber detector hits
                         new ((*fFi23aHitItems)[fNofFi23aHitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        cout << "Fib23a write out: " << xdet_s[i] * 100 << "; " << ydet_s[i] * 100. << "; " << qdet_s[i]
+                             << ", " << tdet_s[i] << endl;
+
                         fh_check_QvsX[detector_s[i]]->Fill(xdet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(xdet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
                     }
                     if (detector_s[i] == 1)
                     {
+                        yfi23[nfin[1]] = ydet_s[i] * 100.;
+                        nfin[1] += 1;
                         // write fiber detector hits
                         new ((*fFi23bHitItems)[fNofFi23bHitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        cout << "Fib23b write out: " << xdet_s[i] * 100 << "; " << ydet_s[i] * 100. << "; " << qdet_s[i]
+                             << ", " << tdet_s[i] << endl;
+
                         fh_check_QvsX[detector_s[i]]->Fill(ydet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(ydet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
                     }
                     if (detector_s[i] == 2)
                     {
+                        xfi30[nfin[2]] = xdet_s[i] * 100.;
+                        yfi30[nfin[2]] = ydet_s[i] * 100.;
+                        qfi30[nfin[2]] = qdet_s[i];
+                        nfin[2] += 1;
                         // write fiber detector hits
                         new ((*fFi30HitItems)[fNofFi30HitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        //  cout<<"Fib30 write out: "<< xdet_s[i] * 100<<"; "<< ydet_s[i] * 100.<<"; "<<
+                        //  qdet_s[i]<<endl;
                         fh_check_QvsX[detector_s[i]]->Fill(xdet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(xdet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
                     }
                     if (detector_s[i] == 3)
                     {
+                        xfi31[nfin[3]] = xdet_s[i] * 100.;
+                        yfi31[nfin[3]] = ydet_s[i] * 100.;
+                        qfi31[nfin[2]] = qdet_s[i];
+                        nfin[3] += 1;
                         // write fiber detector hits
                         new ((*fFi31HitItems)[fNofFi31HitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        //  cout<<"Fib31 write out: "<< xdet_s[i] * 100<<"; "<< ydet_s[i] * 100.<<"; "<<
+                        //  qdet_s[i]<<endl;
                         fh_check_QvsX[detector_s[i]]->Fill(xdet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(xdet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
                     }
                     if (detector_s[i] == 4)
                     {
+                        xfi32[nfin[4]] = xdet_s[i] * 100.;
+                        yfi32[nfin[4]] = ydet_s[i] * 100.;
+                        qfi32[nfin[2]] = qdet_s[i];
+                        nfin[4] += 1;
                         // write fiber detector hits
                         new ((*fFi32HitItems)[fNofFi32HitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        //   cout<<"Fib32 write out: "<< xdet_s[i] * 100<<"; "<< ydet_s[i] * 100.<<"; "<<
+                        //   qdet_s[i]<<endl;
                         fh_check_QvsX[detector_s[i]]->Fill(xdet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(xdet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
@@ -2775,21 +3339,30 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     if (detector_s[i] == 5)
                     {
                         // write fiber detector hits
+                        xfi33[nfin[5]] = xdet_s[i] * 100.;
+                        yfi33[nfin[5]] = ydet_s[i] * 100.;
+                        qfi33[nfin[2]] = qdet_s[i];
+                        nfin[5] += 1;
                         new ((*fFi33HitItems)[fNofFi33HitItems++]) R3BFiberMAPMTHitData(
                             0, xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], tdet_s[i], 0, 0, 0., 0, 0.);
+                        //   cout<<"Fib33 write out: "<< xdet_s[i] * 100<<"; "<< ydet_s[i] * 100.<<"; "<<
+                        //   qdet_s[i]<<endl;
                         fh_check_QvsX[detector_s[i]]->Fill(xdet_s[i] * 100, qdet_s[i]);
                         fh_check_TvsX[detector_s[i]]->Fill(xdet_s[i] * 100, tdet_s[i]);
                         fh_check_XvsY[detector_s[i]]->Fill(xdet_s[i] * 100, ydet_s[i] * 100);
                     }
-                    if ((detector_s[i] == 6 || detector_s[i] == 8 || detector_s[i] == 7 || detector_s[i] == 9))
+                    //  if ((detector_s[i] == 6 || detector_s[i] == 8 || detector_s[i] == 7 || detector_s[i] == 9))
+                    if (detector_s[i] == 6 || detector_s[i] == 7)
                     {
                         if (ftrackerType == 0) // TofD data written out for each plane separately
                         {
+
                             Int_t ipl;
                             if (detector_s[i] == 6 || detector_s[i] == 7)
                                 ipl = 1;
                             else
                                 ipl = 2;
+
                             new ((*fTofdHitItems)[fNofTofdHitItems++]) R3BTofdHitData(
                                 tdet_s[i], xdet_s[i] * 100., ydet_s[i] * 100., qdet_s[i], -5, qdet_s[i], ipl, 1, 0);
 
@@ -2799,12 +3372,21 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         }
                         else // first and second plane will be written as one detector; this makes Dima's tracker faster
                         {
-                            if (qdet_s[i] == 8)
+                            if (qdet_s[i] == 2)
                             {
                                 ax += xdet_s[i];
                                 ay += ydet_s[i];
                                 at += tdet_s[i];
                                 aq += qdet_s[i];
+                                nHe++;
+                            }
+                            else if (qdet_s[i] == 6)
+                            {
+                                cx += xdet_s[i];
+                                cy += ydet_s[i];
+                                ct += tdet_s[i];
+                                cq += qdet_s[i];
+                                nC++;
                             }
                         }
                     }
@@ -2812,18 +3394,42 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                 if (ftrackerType == 1)
                 {
-                    ax = ax / 2.;
-                    ay = ay / 2.;
-                    at = at / 2.;
-                    aq = aq / 2.;
+                    ax = ax / nHe;
+                    ay = ay / nHe;
+                    at = at / nHe;
+                    aq = aq / nHe;
+                    cx = cx / nC;
+                    cy = cy / nC;
+                    ct = ct / nC;
+                    cq = cq / nC;
 
-                    //    cout<<"TOFD C: " << " x: " << cx * 100.
-                    //           << " y: " << cy * 100. << " q: " << cq << " t: " <<  endl;
-                    //   cout<<"TOFD He: " << " x: " << ax * 100.
-                    //         << " y: " << ay * 100. << " q: " << aq << " t: " <<  endl;
+                    if ((cy > 0 && ay > 0) || (cy < 0 && ay < 0))
+                        ncorell += 1;
+                    if ((cy > 0 && ay < 0) || (cy < 0 && ay > 0))
+                        nanticorell += 1;
+
+                    xtofdHe[nfin[6]] = ax * 100.;
+                    ytofdHe[nfin[6]] = ay * 100.;
+                    qtofdHe[nfin[6]] = 2;
+
+                    xtofdC[nfin[6]] = cx * 100.;
+                    ytofdC[nfin[6]] = cy * 100.;
+                    qtofdC[nfin[6]] = 6;
+
+                    nfin[6] += 1;
+
+                    cout << "NFIN[6]: " << nfin[6] << endl;
+                    //   cout<<"TOFD C: " << " x: " << cx * 100.
+                    //        << " y: " << cy * 100. << " q: " << cq << " t: " <<  endl;
+                    // cout<<"TOFD He: " << " x: " << ax * 100.
+                    //       << " y: " << ay * 100. << " q: " << aq << " t: " <<  endl;
 
                     new ((*fTofdHitItems)[fNofTofdHitItems++])
-                        R3BTofdHitData(at, ax * 100., ay * 100., aq, -5., aq, 10, 1, 0);
+                        R3BTofdHitData(at, ax * 100., ay * 100., 2, -5., 2, 10, 1, 0);
+                    cout << "Tofd alpha write out: " << ax * 100 << "; " << ay * 100. << "; " << aq << endl;
+                    new ((*fTofdHitItems)[fNofTofdHitItems++])
+                        R3BTofdHitData(ct, cx * 100., cy * 100., 6, -5., 6, 10, 1, 0);
+                    cout << "Tofd carbon write out: " << cx * 100 << "; " << cy * 100. << "; " << cq << endl;
 
                     // Fill check spectra:
                     fh_check_QvsX[6]->Fill(cx * 100, cq);
@@ -2832,6 +3438,78 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     fh_check_QvsX[6]->Fill(ax * 100, aq);
                     fh_check_TvsX[6]->Fill(ax * 100, at);
                     fh_check_XvsY[6]->Fill(ax * 100, ay * 100);
+                }
+
+                for (int i = 0; i < nfin[0]; i++)
+                {
+                    for (int j = 0; j < nfin[1]; j++)
+                    {
+                        fh_xy_target->Fill(xfi23[i], yfi23[j]);
+                    }
+                }
+                for (int j = 0; j < nfin[6]; j++)
+                {
+                    fh_xTofdHe_vs_xTofdC->Fill(xtofdHe[j], xtofdC[j]);
+                    fh_yTofdHe_vs_yTofdC->Fill(ytofdHe[j], ytofdC[j]);
+
+                    for (int i = 0; i < nfin[0]; i++)
+                    {
+                        fh_Fi23aX_TofdX_He->Fill(xtofdHe[j], xfi23[i]);
+                        fh_Fi23aX_TofdX_C->Fill(xtofdC[j], xfi23[i]);
+                    }
+                    for (int i = 0; i < nfin[1]; i++)
+                    {
+                        fh_Fi23bY_TofdY_He->Fill(ytofdHe[j], yfi23[i]);
+                        fh_Fi23bY_TofdY_C->Fill(ytofdC[j], yfi23[i]);
+                    }
+                    for (int i = 0; i < nfin[2]; i++)
+                    {
+                        if (qfi30[i] == 2)
+                            fh_Fi301X_TofdX_He->Fill(xtofdHe[j], xfi30[i]);
+                        if (qfi30[i] == 6)
+                            fh_Fi301X_TofdX_C->Fill(xtofdC[j], xfi30[i]);
+
+                        if (qfi30[i] == 2)
+                            fh_Fi301Y_TofdY_He->Fill(ytofdHe[j], yfi30[i]);
+                        if (qfi30[i] == 6)
+                            fh_Fi301Y_TofdY_C->Fill(ytofdC[j], yfi30[i]);
+                    }
+                    for (int i = 0; i < nfin[3]; i++)
+                    {
+                        if (qfi31[i] == 2)
+                            fh_Fi301X_TofdX_He->Fill(xtofdHe[j], xfi31[i]);
+                        if (qfi31[i] == 6)
+                            fh_Fi301X_TofdX_C->Fill(xtofdC[j], xfi31[i]);
+
+                        if (qfi31[i] == 2)
+                            fh_Fi301Y_TofdY_He->Fill(ytofdHe[j], yfi31[i]);
+                        if (qfi31[i] == 6)
+                            fh_Fi301Y_TofdY_C->Fill(ytofdC[j], yfi31[i]);
+                    }
+                    for (int i = 0; i < nfin[4]; i++)
+                    {
+                        if (qfi32[i] == 2)
+                            fh_Fi323X_TofdX_He->Fill(xtofdHe[j], xfi32[i]);
+                        if (qfi32[i] == 6)
+                            fh_Fi323X_TofdX_C->Fill(xtofdC[j], xfi32[i]);
+
+                        if (qfi32[i] == 2)
+                            fh_Fi323Y_TofdY_He->Fill(ytofdHe[j], yfi32[i]);
+                        if (qfi32[i] == 6)
+                            fh_Fi323Y_TofdY_C->Fill(ytofdC[j], yfi32[i]);
+                    }
+                    for (int i = 0; i < nfin[5]; i++)
+                    {
+                        if (qfi33[i] == 2)
+                            fh_Fi323X_TofdX_He->Fill(xtofdHe[j], xfi33[i]);
+                        if (qfi33[i] == 6)
+                            fh_Fi323X_TofdX_C->Fill(xtofdC[j], xfi33[i]);
+
+                        if (qfi33[i] == 2)
+                            fh_Fi323Y_TofdY_He->Fill(ytofdHe[j], yfi33[i]);
+                        if (qfi33[i] == 6)
+                            fh_Fi323Y_TofdY_C->Fill(ytofdC[j], yfi33[i]);
+                    }
                 }
             }
         }
@@ -3042,13 +3720,15 @@ void R3BPreTrackS494::FinishTask()
     cout << "Statistics:" << endl;
     cout << "Events: " << fNEvents << endl;
     cout << "Events after selection: " << fNeventselect << endl;
-    cout << "Wrong Trigger: " << counterWrongTrigger << endl;
-    cout << "Wrong Tpat: " << counterWrongTpat << endl;
-    cout << "ROLU veto: " << counterRolu << endl;
-    cout << "Califa veto: " << counterCalifa << endl;
-    cout << "TofD: " << counterTofd << endl;
-    cout << "TofD multi: " << counterTofdMulti << endl;
-    cout << "Selected events: " << counter1 << endl;
+    cout << "Wrong Trigger:     " << counterWrongTrigger << endl;
+    cout << "Wrong Tpat:        " << counterWrongTpat << endl;
+    cout << "ROLU veto:         " << counterRolu << endl;
+    //   cout << "Califa veto: " << counterCalifa << endl;
+    cout << "TofD:              " << counterTofd << endl;
+    cout << "TofD multi:        " << counterTofdMulti << endl;
+    cout << "Selected events:       " << counter1 << endl;
+    cout << "Correlated events:     " << ncorell << endl;
+    cout << "Anticorrelated events: " << nanticorell << endl;
     cout << "Hits with countddet>50: " << countdet50 << endl;
 
     cout << "Hits TofD " << hits1 << endl;
@@ -3115,18 +3795,62 @@ void R3BPreTrackS494::FinishTask()
         }
     }
 
+    fh_TimePreviousEventFi23a->Write();
+    fh_TimePreviousEventFi23b->Write();
+    fh_tofd_vs_Fib31->Write();
+    fh_ytofd_vs_yFib31->Write();
+    fh_tofd_vs_Fib31_ac->Write();
+    fh_tofd_vs_Fib30->Write();
+    fh_ytofd_vs_yFib30->Write();
+    fh_tofd_vs_Fib30_ac->Write();
     fh_Fib33_vs_Fib31->Write();
     fh_Fib33_vs_Fib31_dx->Write();
+    fh_Fib33_vs_Fib31_dt->Write();
     fh_Fib31_vs_Fib23a->Write();
     fh_Fib31_vs_Fib23a_dx->Write();
+    fh_Fib31_vs_Fib23a_dt->Write();
     fh_Fib32_vs_Fib30->Write();
     fh_Fib32_vs_Fib30_dx->Write();
+    fh_Fib32_vs_Fib30_dt->Write();
     fh_Fib30_vs_Fib23b->Write();
     fh_Fib30_vs_Fib23b_dx->Write();
+    fh_Fib30_vs_Fib23b_dt->Write();
     fh_Fib30_vs_Fib23a->Write();
     fh_Fib30_vs_Fib23a_dx->Write();
+    fh_Fib30_vs_Fib23a_dt->Write();
     fh_Fib31_vs_Fib23b->Write();
     fh_Fib31_vs_Fib23b_dx->Write();
+    fh_Fib31_vs_Fib23b_dt->Write();
+    fh_Fib33_vs_Fib31_ac->Write();
+    fh_Fib33_vs_Fib31_dx_ac->Write();
+    fh_Fib31_vs_Fib23a_ac->Write();
+    fh_Fib31_vs_Fib23a_dx_ac->Write();
+    fh_Fib32_vs_Fib30_ac->Write();
+    fh_Fib32_vs_Fib30_dx_ac->Write();
+    fh_Fib30_vs_Fib23b_ac->Write();
+    fh_Fib30_vs_Fib23b_dx_ac->Write();
+    fh_Fib30_vs_Fib23a_ac->Write();
+    fh_Fib30_vs_Fib23a_dx_ac->Write();
+    fh_Fib31_vs_Fib23b_ac->Write();
+    fh_Fib31_vs_Fib23b_dx_ac->Write();
+    fh_Fi23bY_TofdY_He->Write();
+    fh_Fi23bY_TofdY_C->Write();
+    fh_Fi23aX_TofdX_He->Write();
+    fh_Fi23aX_TofdX_C->Write();
+    fh_Fi301Y_TofdY_He->Write();
+    fh_Fi301Y_TofdY_C->Write();
+    fh_Fi301X_TofdX_He->Write();
+    fh_Fi301X_TofdX_C->Write();
+    fh_Fi323Y_TofdY_He->Write();
+    fh_Fi323Y_TofdY_C->Write();
+    fh_Fi323X_TofdX_He->Write();
+    fh_Fi323X_TofdX_C->Write();
+    fh_Fi23aX_TofdX_bw1->Write();
+    fh_Fi23aX_TofdX_bw2->Write();
+    fh_yTofd_vs_yTofd->Write();
+    fh_yTofdHe_vs_yTofdC->Write();
+    fh_xTofdHe_vs_xTofdC->Write();
+    fh_xy_target->Write();
 
     for (int i = 0; i < 7; i++)
     {

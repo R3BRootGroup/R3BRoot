@@ -84,8 +84,10 @@ class R3BGladFieldMap : public FairField
     virtual void SetScale(Double_t factor) { fScale = factor; }
 
     void SetTrackerCorrectionScale(const Double_t& corr) { fTrackerCorr = corr; }
+    void SetTrackerCorrectionX(const Double_t& corr) { fPosX = corr; }
     void SetTrackerCorrectionY(const Double_t& corr) { fPosY = corr; }
     void SetTrackerCorrectionZ(const Double_t& corr) { fPosZ = corr; }
+    void SetTrackerCorrectionAngleX(const Double_t& corr) { fXAngle = corr; }
     void SetTrackerCorrectionAngleY(const Double_t& corr) { fYAngle = corr; }
     void SetTrackerCorrectionAngleZ(const Double_t& corr) { fZAngle = corr; }
 
@@ -109,6 +111,7 @@ class R3BGladFieldMap : public FairField
     Double_t GetPositionZ() const { return fPosZ; }
 
     /** Accessor to field rotation **/
+    Double_t GetXAngle() const { return fXAngle; }
     Double_t GetYAngle() const { return fYAngle; }
     Double_t GetZAngle() const { return fZAngle; }
 
@@ -156,6 +159,7 @@ class R3BGladFieldMap : public FairField
     Double_t fPosX, fPosY, fPosZ;
 
     /** Field rotation around Y axis **/
+    Double_t fXAngle;
     Double_t fYAngle;
     Double_t fZAngle;
 

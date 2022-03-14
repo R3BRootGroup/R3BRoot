@@ -125,21 +125,21 @@ R3BGladFieldMap::~R3BGladFieldMap()
 void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
-    fPosY = 0.0;
+    // fPosY = 0.0;
+    fPosY = 1.5;
 
-// Distance in z: turning point big flansch:   415 mm 
-//				  big flanch to small flansch: 100 mm ???
-//				  small GLAD flansch target:  1210 mm
-//											  1725 mm
-// 					
-    //fPosZ = 163.4+16.2-0.5; 
-    fPosZ = 163.4+16.2;
-    //fPosZ = 171.8496;
+    // Distance in z: turning point to flansch:   539.5 mm
+    //				       GLAD flansch target:  1210 mm
+    //											  1749.5 mm
+    //
+    // fPosZ = 163.4+16.2-0.5;
+    // fPosZ = 172.5; // Measured with ruler
+    // fPosZ = 174.95; // from the drawings
+    fPosZ = 173.5;
+    fXAngle = 0.03;
+    fYAngle = -13.5;
+    fZAngle = 0.02;
 
-    fYAngle = -14.;
-    fZAngle = 0.;
- // for left side: -13.44 , 171.8496 
- // for right side: -13.8875 , 178.6103
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
@@ -162,15 +162,16 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
     // local to global
     TVector3 localPoint(x, y, z);
 
-    //gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
-    //localPoint = localPoint + (*gTrans);
+    // gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
+    // localPoint = localPoint + (*gTrans);
 
     TVector3 gTrans1;
     gTrans1.SetX(-fPosX);
     gTrans1.SetY(-fPosY);
-    gTrans1.SetZ(-fPosZ); 
+    gTrans1.SetZ(-fPosZ);
     localPoint = localPoint + gTrans1;
 
+    localPoint.RotateX(-fXAngle * TMath::DegToRad());
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
     localPoint.RotateZ(-fZAngle * TMath::DegToRad());
 
@@ -211,16 +212,16 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
     // local to global
     TVector3 localPoint(x, y, z);
 
-    //gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
-    //localPoint = localPoint + (*gTrans);
-    
+    // gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
+    // localPoint = localPoint + (*gTrans);
+
     TVector3 gTrans1;
     gTrans1.SetX(-fPosX);
     gTrans1.SetY(-fPosY);
-    gTrans1.SetZ(-fPosZ); 
+    gTrans1.SetZ(-fPosZ);
     localPoint = localPoint + gTrans1;
-    
-    
+
+    localPoint.RotateX(-fXAngle * TMath::DegToRad());
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
     localPoint.RotateZ(-fZAngle * TMath::DegToRad());
 
@@ -261,15 +262,16 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
     // local to global
     TVector3 localPoint(x, y, z);
 
-    //gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
-    //localPoint = localPoint + (*gTrans);
+    // gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
+    // localPoint = localPoint + (*gTrans);
 
     TVector3 gTrans1;
     gTrans1.SetX(-fPosX);
     gTrans1.SetY(-fPosY);
-    gTrans1.SetZ(-fPosZ); 
+    gTrans1.SetZ(-fPosZ);
     localPoint = localPoint + gTrans1;
 
+    localPoint.RotateX(-fXAngle * TMath::DegToRad());
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
     localPoint.RotateZ(-fZAngle * TMath::DegToRad());
 
@@ -451,6 +453,7 @@ void R3BGladFieldMap::Print(Option_t* option) const
     cout << endl;
     cout << "----  Field centre position: ( " << setw(6) << fPosX << ", " << setw(6) << fPosY << ", " << setw(6)
          << fPosZ << ") cm" << endl;
+    cout << "----  Field rotation X: " << setw(6) << fXAngle << " deg" << endl;
     cout << "----  Field rotation Y: " << setw(6) << fYAngle << " deg" << endl;
     cout << "----  Field rotation Z: " << setw(6) << fZAngle << " deg" << endl;
     cout << "----  Field scaling factor: " << fScale << endl;
@@ -574,6 +577,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
                                Int_t((z - fZmin) / fZstep);
 
                 TVector3 B(bx, by, bz);
+                B.RotateX(fXAngle * TMath::DegToRad());
                 B.RotateY(fYAngle * TMath::DegToRad());
                 B.RotateZ(fZAngle * TMath::DegToRad());
 
@@ -669,6 +673,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
         fTreeMap->GetEntry(ev);
 
         fBvec.SetXYZ(tBx * factor, tBy * factor, tBz * factor);
+        fBvec.RotateX(fXAngle * TMath::DegToRad());
         fBvec.RotateY(fYAngle * TMath::DegToRad());
         fBvec.RotateZ(fZAngle * TMath::DegToRad());
 

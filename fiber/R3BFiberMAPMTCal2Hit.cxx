@@ -362,6 +362,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             trail_raw = cur_cal_trail->GetTime_ns();
             trail_trig_ns = cur_cal_trig_ns;
 
+            if (fName == "Fi23a" && fnEvents == 60929)
+                cout << "Cal2Hit Fi23a 0th: " << fnEvents << ", " << chlead_i << "; " << lead->GetChannel() << "; "
+                     << lead_raw << ", " << lead_ns << ", " << trail_raw << endl;
+
             if (tot_ns < fGate_ns && tot_ns > 0.)
             {
                 //	if(chlead_i == 0 && fName=="Fi31") cout<<"Side: "<<side_i<<", "<<lead_raw<<", "<<lead_trig_ns<<",
@@ -409,6 +413,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     if ((fName == "Fi23a" || fName == "Fi23b") && (fiber_up_ch > 187 && fiber_up_ch < 197))
                         continue;
 
+                    if (fName == "Fi23a" && fnEvents == 60929)
+                        cout << "Cal2Hit, 1st: " << fnEvents << ", " << fiber_up_ch << ", " << fiber_down_ch << endl;
+
                     Int_t fiber_id = -1000;
                     if (fiber_down_ch == fiber_up_ch)
                         fiber_id = fiber_down_ch;
@@ -424,6 +431,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Double_t t_up = up_tot.lead_ns;
                     Double_t dtime = t_up - t_down;
                     Double_t tof = (t_up + t_down) / 2.;
+
+                    if (fName == "Fi23a" && fnEvents == 60929)
+                        cout << "Cal2Hit, 2nd: " << fnEvents << ", " << fiber_up_ch << ", " << fiber_down_ch << ", "
+                             << fiber_id << "; " << t_up << ", " << t_down << endl;
 
                     // Fill histograms for gain match, offset and sync.
                     fh_ToT_bottom_Fib_raw->Fill(fiber_id, tot_down);
@@ -555,6 +566,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     {
                         if (tof >= ftofmin && tof <= ftofmax)
                         {
+                            if (fName == "Fi23a" && fnEvents == 60929)
+                                cout << "Cal2Hit Fi23a 3rd: " << fnEvents << ", " << x << "; " << y << "; " << fiber_id
+                                     << ", " << t << ", " << eloss << ", " << t_down << ", " << t_up << endl;
+
                             new ((*fHitItems)[fNofHitItems++])
                                 R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
                         }

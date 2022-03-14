@@ -220,8 +220,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    //Int_t fTpat_bit = fTpat - 1;
-    //if (fTpat_bit >= 0)
+    // Int_t fTpat_bit = fTpat - 1;
+    // if (fTpat_bit >= 0)
     //{
     //    Int_t itpat = header->GetTpat();
     //    Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
@@ -231,26 +231,25 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
     Int_t fTpat_bit1 = fTpat1 - 1;
     Int_t fTpat_bit2 = fTpat2 - 1;
     Int_t tpatbin;
-    Int_t tpatsum=0;
+    Int_t tpatsum = 0;
     for (int i = 0; i < 16; i++)
     {
         tpatbin = (header->GetTpat() & (1 << i));
-        LOG(DEBUG)<<"tpatbin "<<tpatbin;
+        LOG(DEBUG) << "tpatbin " << tpatbin;
         if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
         {
             return;
         }
         if (tpatbin != 0)
         {
-            LOG(DEBUG)<<"Accepted Tpat: "<<i+1;
+            LOG(DEBUG) << "Accepted Tpat: " << i + 1;
         }
-        tpatsum+=tpatbin;
+        tpatsum += tpatbin;
     }
-    if(tpatsum < 1)
+    if (tpatsum < 1)
     {
-        LOG(DEBUG)<<"No Tpat info";
+        LOG(DEBUG) << "No Tpat info";
         return;
-
     }
 
     // ToFD detector
@@ -273,21 +272,21 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
     }
-//new
+    // new
     // Build trigger map.
-    std::vector<R3BTofdCalData const *> trig_map;
+    std::vector<R3BTofdCalData const*> trig_map;
     for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
     {
-        auto trig = (R3BTofdCalData const *)fCalTriggerItems->At(i);
+        auto trig = (R3BTofdCalData const*)fCalTriggerItems->At(i);
         if (trig_map.size() < trig->GetBarId())
         {
             trig_map.resize(trig->GetBarId());
         }
         trig_map.at(trig->GetBarId() - 1) = trig;
     }
-//end new
+    // end new
     static bool s_was_trig_missing = false;
-    //auto trig_num = fCalTriggerItems->GetEntries(); //old
+    // auto trig_num = fCalTriggerItems->GetEntries(); //old
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -349,7 +348,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 */
                 ++n1;
             }
-            //end new
+            // end new
             else
             {
                 if (!s_was_trig_missing)
@@ -431,12 +430,12 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     auto posToT = 0.;
                     if (fTofdY == 0.)
                     {
-                        LOG(INFO)<<"Will prepare for offset and sync calculation";
+                        LOG(INFO) << "Will prepare for offset and sync calculation";
                         posToT = TMath::Log(top_tot / bot_tot);
                     }
                     else
                     {
-                        LOG(INFO)<<"Will prepare for veff and lambda calculation";
+                        LOG(INFO) << "Will prepare for veff and lambda calculation";
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
@@ -456,7 +455,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
                 else
                 {
-                    LOG(INFO)<<"Will prepare for position dependent charge calculation";
+                    LOG(INFO) << "Will prepare for position dependent charge calculation";
                     // get parameter
                     R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
@@ -520,10 +519,10 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 
                     // calculate y position
                     auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-                    //cout<<"pos "<<pos<<" bot_tot "<<bot_tot<<" top_tot "<<top_tot<<"\n";
+                    // cout<<"pos "<<pos<<" bot_tot "<<bot_tot<<" top_tot "<<top_tot<<"\n";
                     // fill fitting histograms and smiley histogram
-                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    //  fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
+                    //  fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
 
                 // prepare charge fit / quench correction
@@ -542,7 +541,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     // calculate y position
                     auto posToT =
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
-                    if (!fTofdSmiley) posToT = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                    if (!fTofdSmiley)
+                        posToT = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
 
                     Double_t parq[4];
 
@@ -579,6 +579,9 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                              fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
                         q2 = q2 * fTofdQ;
                         qb = (q1 + q2) / 2.;
+
+                        fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, q2);
+                        fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, q1);
                     }
 
                     // fill control histograms and Q vs Pos without multihits

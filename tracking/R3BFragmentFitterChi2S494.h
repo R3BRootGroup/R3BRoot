@@ -33,7 +33,7 @@ class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
     
     Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*);
 
-    Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*);
+    Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*, Double_t);
     
     Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*);
 
