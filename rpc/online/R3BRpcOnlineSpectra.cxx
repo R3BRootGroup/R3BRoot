@@ -296,28 +296,28 @@ InitStatus R3BRpcOnlineSpectra::Init()
      refCoarseHisto = new TH1F*[4];
      refFineHisto = new TH1F*[4];
 
-     stripCoarseLeftCorr = new TH2F("stripCoarseLeft"," Strip Vs Coarse Time: Left",42,-0.5,41.5,400,0,2500);
-     stripCoarseRightCorr = new TH2F("stripCoarseRight"," Strip Vs Coarse Time: Right",42,-0.5,41.5,400,0,2500);
-     stripFineLeftCorr = new TH2F("stripFineLeft"," Strip Vs Fine Time: Left",42,-0.5,41.5,400,0,600);
-     stripFineRightCorr = new TH2F("stripFineRight"," Strip Vs Fine Time: Right",42,-0.5,41.5,400,0,600);
+     stripCoarseLeftCorr = new TH2F("stripCoarseLeft"," Strip Vs Coarse Time: Left",41,0.5,41.5,400,0,2500);
+     stripCoarseRightCorr = new TH2F("stripCoarseRight"," Strip Vs Coarse Time: Right",41,0.5,41.5,400,0,2500);
+     stripFineLeftCorr = new TH2F("stripFineLeft"," Strip Vs Fine Time: Left",41,0.5,41.5,400,0,600);
+     stripFineRightCorr = new TH2F("stripFineRight"," Strip Vs Fine Time: Right",41,0.5,41.5,400,0,600);
 
      /* ----- Pre Cal Histograms ----- */
      pmtPreCalTimeHisto = new TH1F*[6];
      pmtPreCalTotHisto  = new TH1F*[6];
 
-     stripLeftTotCorr = new TH2F("stripLeftTotCorr","Strip Vs Tot : Left",42,-0.5,41.5,400,0,500);
-     stripRightTotCorr = new TH2F("stripRightTotCorr","Strip Vs Tot : Right",42,-0.5,41.5,400,0,500);
-     stripLeftTimeCorr = new TH2F("stripLeftTimeCorr","Strip Vs Time : Left",42,-0.5,41.5,1000,-550,400);
-     stripRightTimeCorr = new TH2F("stripRightTimeCorr","Strip Vs Time : Right",42,-0.5,41.5,1000,-550,400);
+     stripLeftTotCorr = new TH2F("stripLeftTotCorr","Strip Vs Tot : Left",41,0.5,41.5,400,0,500);
+     stripRightTotCorr = new TH2F("stripRightTotCorr","Strip Vs Tot : Right",41,0.5,41.5,400,0,500);
+     stripLeftTimeCorr = new TH2F("stripLeftTimeCorr","Strip Vs Time : Left",41,0.5,41.5,1000,-550,400);
+     stripRightTimeCorr = new TH2F("stripRightTimeCorr","Strip Vs Time : Right",41,0.5,41.5,1000,-550,400);
 
      /* ----- Cal Histograms ----- */
      stripCalTimeCorr = new TH2F("stripCalTimeCorr","Strip: Time Left Vs Time Right",800,-550,400,800,-550,400);
      stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,350,400,-100,350);
 
      /* ------------- HIT Histograms ------------ */
-     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",500,-200,300,42,-0.5,41.5);
+     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",300,0,150,41,0.5,41.5);
      totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
-
+     meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",5,0,150,41,0.5,41.5);
 
     for ( Int_t i = 0 ; i < 41; i++){
 
@@ -467,6 +467,13 @@ InitStatus R3BRpcOnlineSpectra::Init()
     totalChargeHist->GetYaxis()->SetTitle("Counts");
     hitFolder->Add(totalChargeHist);
 
+    meanChargeCorr->GetXaxis()->SetTitle("Position");
+    meanChargeCorr->GetYaxis()->SetTitle("Strip");
+    hitMapCanvas->cd(2);
+    meanChargeCorr->Draw("COLZ");
+
+
+
 
     for (Int_t i = 0; i < 6; i++) {
 
@@ -589,8 +596,7 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     stripCalToTCorr->Reset();
     totalChargeHist->Reset();
     stripPosHitCorr->Reset();
-
-
+    meanChargeCorr->Reset();
 
 
     return;
@@ -720,15 +726,53 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     /*---------------- HIT EventLoop ---------------*/
     auto nStripHits = fStripHitDataItems->GetEntriesFast();
 
+
+    Int_t channelId;
+    Float_t pos,charge;
+
     for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
 
      R3BRpcStripHitData* hit = (R3BRpcStripHitData*)fStripHitDataItems->At(ihit);
+     channelId =  hit->GetChannelId();
+     pos       =  hit->GetPos();
+     charge    =  hit->GetCharge();
 
-     stripPosHitCorr->Fill(hit->GetChannelId(),hit->GetPos());
+     stripPosHitCorr->Fill(pos,channelId);
      totalChargeHist->Fill(hit->GetCharge());
 
-    }
+     counts++;
 
+
+   if(charge >= 0.0){
+
+     if(pos < 30){
+      meanCharges[channelId][0] = meanCharges[channelId][0] + (1.0/counts)*(charge-meanCharges[channelId][0]);
+      meanChargeCorr->SetBinContent(1,channelId,meanCharges[channelId][0]);
+   }
+
+     if(pos >= 30 && pos < 60){
+      meanCharges[channelId][1] = meanCharges[channelId][1] + (1.0/counts)*(charge-meanCharges[channelId][1]);
+      meanChargeCorr->SetBinContent(2,channelId,meanCharges[channelId][1]);
+   }
+
+     if(pos >= 60 && pos < 90){
+      meanCharges[channelId][2] = meanCharges[channelId][2] + (1.0/counts)*(charge-meanCharges[channelId][2]);
+      meanChargeCorr->SetBinContent(3,channelId,meanCharges[channelId][2]);
+   }
+
+     if(pos >= 90 && pos <= 120){
+      meanCharges[channelId][3] = meanCharges[channelId][3] + (1.0/counts)*(charge-meanCharges[channelId][3]);
+      meanChargeCorr->SetBinContent(4,channelId,meanCharges[channelId][3]);
+   }
+
+   if(pos > 120 && pos <= 150){
+    meanCharges[channelId][4] = meanCharges[channelId][4] + (1.0/counts)*(charge-meanCharges[channelId][4]);
+    meanChargeCorr->SetBinContent(5,channelId,meanCharges[channelId][4]);
+ }
+
+
+    }
+ }
 
     fNEvents += 1;
     return;

@@ -112,6 +112,11 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fPmtPreCalItems;
     TClonesArray* fStripHitDataItems;
 
+    Float_t meanCharges[41][5]={{0.0}};
+    Int_t counts=0;
+
+
+
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
     Int_t fNEvents;         // Event counter.
@@ -180,6 +185,7 @@ class R3BRpcOnlineSpectra : public FairTask
 
     /* ----- Hit Histograms ----- */
     TH2F *stripPosHitCorr;
+    TH2F *meanChargeCorr;
     TH1F *totalChargeHist;
 
     /* ----- Hit Canvases ----- */
