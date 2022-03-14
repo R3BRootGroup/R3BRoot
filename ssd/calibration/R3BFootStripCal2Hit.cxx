@@ -46,7 +46,7 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit()
 // R3BFootStripCal2HitPar::Standard Constructor ---------------------------------
 R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fPitch(156.25)
+    , fPitch(157.7)
     , fMiddle(50.)
     , fThSum(20.)
     , fMaxNumDet(10)
@@ -93,7 +93,7 @@ void R3BFootStripCal2Hit::SetParameter()
     }
     //--- Parameter Container ---
     fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
-    R3BLOG(INFO, "NumDet from mapping: " << fMaxNumDet);
+    LOG(INFO) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
     fMap_Par->printParams();
 }
 
@@ -129,7 +129,7 @@ InitStatus R3BFootStripCal2Hit::Init()
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
         sprintf(Name, "hssd_%d", i + 1);
-        hssd[i] = new TH1F(Name, "", 640, -0.5, 639.5);
+        hssd[i] = new TH1F(Name, "", 640, -0.5, 640.5);
     }
 
     return kSUCCESS;
@@ -173,6 +173,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     Int_t nfound = 0;
     Double_t x = 0., y = 0., z = 0.;
     TSpectrum* ss = new TSpectrum(10000);
+if (0) {
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
         // Looking for hits
@@ -194,18 +195,89 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
                     // Julich test with 6 detectors
                     if (i >= 0)
                     {
-                        x = 1.0 * clusterS[mul][1] - fMiddle;
-                        y = 0.;
-                        z = fMap_Par->GetDist2target(i + 1);
+                      x = 1.0 * clusterS[mul][1] - fMiddle;
+                      y = 0.;
+                      z = fMap_Par->GetDist2target(i + 1);
                     }
                 }
 
-                TVector3 master(x, y, z);
-                AddHitData(i + 1, mul, clusterS[mul][1], master, clusterS[mul][0], nfound);
+                // TVector3 master(x, y, z);
+                // AddHitData(i + 1, mul, clusterS[mul][1]-fMiddle, master, clusterS[mul][0], nfound);
             }
         }
     }
+}
 
+    //Simple Cluster Algorythm
+    Double_t EMax[fMaxNumDet];
+    Double_t ESum[fMaxNumDet];
+    Int_t MultStrip[fMaxNumDet];
+    Int_t IMax[fMaxNumDet];
+    Int_t Counter = 0;
+    for (Int_t i = 0; i < fMaxNumDet; i++){
+      EMax[i] = 0.;
+      ESum[i] = 0.;
+      IMax[i] = -1;
+      MultStrip[i] = 0;
+    }
+
+    //Get Emax
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
+        detId = calData[i]->GetDetId() - 1;
+        stripId = calData[i]->GetStripId() - 1;
+        energy = calData[i]->GetEnergy();
+
+        if(EMax[detId]<energy){
+          EMax[detId] = energy;
+          ESum[detId] = energy;
+          IMax[detId] = stripId;
+          MultStrip[detId]++;
+        }
+    }
+
+    //Get ESum                                                                                                                                                                                                                              
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        detId = calData[i]->GetDetId() - 1;
+        stripId = calData[i]->GetStripId() - 1;
+        energy = calData[i]->GetEnergy();
+
+        if(EMax[detId]>0 && TMath::Abs(stripId-IMax[detId])<=2 && stripId!=IMax[detId]){
+          if(energy>0.){
+            MultStrip[detId]++;
+            ESum[detId] += energy;
+          }
+        }
+    }   
+
+    Int_t Found = 0;
+    
+    for (Int_t i = 0; i < fMaxNumDet; i++){
+      if(EMax[i]>0.){ 
+        Found++;
+      }
+    }
+    
+    for (Int_t i = 0; i < fMaxNumDet; i++){
+
+      if(EMax[i]>0.){ 
+
+        x = 100.*(Double_t)IMax[i]/640. - 50.;
+        y = 0.;
+        z = 0.;
+        TVector3 master(x, y, z);                                                                                                                                                                                                 
+        //AddHitData(i + 1, Counter, x, master, EMax[i], Found);
+        //AddHitData(i + 1, Counter, x, master, ESum[i], MultStrip[i]);
+        AddHitData(i + 1, MultStrip[i], x, master, ESum[i], Found);
+        Counter++;
+        //AddHitData(i + 1, mul, clusterS[mul][1]-fMiddle, master, clusterS[mul][0], nfound);              
+      }
+
+    }
+
+    
     for (Int_t i = 0; i < fMaxNumDet; i++)
         hssd[i]->Reset();
     if (calData)

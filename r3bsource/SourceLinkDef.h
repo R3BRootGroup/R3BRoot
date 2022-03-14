@@ -81,6 +81,7 @@
 #pragma link C++ class R3BAmsReader+;
 #pragma link C++ class R3BMusicReader+;
 #pragma link C++ class R3BFootReader+;
+#pragma link C++ class R3BFootSiReader+;
 #pragma link C++ class R3BAlpideReader+;
 #pragma link C++ class R3BCalifaJulichReader+;
 #pragma link C++ class R3BRpcReader+;
