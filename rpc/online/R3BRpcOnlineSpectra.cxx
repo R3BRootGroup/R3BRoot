@@ -155,7 +155,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
     }
 
 
-    fStripHitDataItems = (TClonesArray*)mgr->GetObject("RpcStripHitData");
+    fStripHitDataItems = (TClonesArray*)mgr->GetObject("R3BRpcStripHitData");
     if (!fStripHitDataItems)
     {
         R3BLOG(FATAL, "RpcStripHitData not found");
@@ -241,10 +241,10 @@ InitStatus R3BRpcOnlineSpectra::Init()
     leftStripCanvasCoarse->Divide(9,5);
 
     pmtCoarseCanvas = new TCanvas("Pmt Coarse Canvas","pmtCoarseCanvas");
-    pmtCoarseCanvas->Divide(3,2);
+    pmtCoarseCanvas->Divide(4,2);
 
     pmtFineCanvas = new TCanvas("Pmt Fine Canvas","pmtFineCanvas");
-    pmtFineCanvas->Divide(3,2);
+    pmtFineCanvas->Divide(4,2);
 
     refFineCanvas = new TCanvas("Ref Fine Canvas","refFineCanvas");
     refFineCanvas->Divide(2,2);
@@ -268,10 +268,10 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripRightTimeCorrCanvas   = new TCanvas("Right : Strip Vs Time","stripVsTime");
 
     pmtPreCalTimeCanvas        = new TCanvas("Pmt PreCal Time","pmtPreCalTime");
-    pmtPreCalTimeCanvas->Divide(3,2);
+    pmtPreCalTimeCanvas->Divide(4,2);
 
     pmtPreCalTotCanvas         = new TCanvas("Pmt PreCal ToT Time","pmtPreCalToT");
-    pmtPreCalTotCanvas->Divide(3,2);
+    pmtPreCalTotCanvas->Divide(4,2);
 
     /* ----- Cal Canvases ----- */
     stripCalTimeCorrCanvas = new TCanvas("Left Time Vs Right Time","leftTimeVsRightTime");
@@ -290,8 +290,13 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripCoarseLeftHisto = new TH1F*[41];
      stripFineLeftHisto = new TH1F*[41];
 
-     pmtCoarseHisto = new TH1F*[6];
-     pmtFineHisto = new TH1F*[6];
+     pmtCoarseHistoTop = new TH1F*[4];
+     pmtFineHistoTop = new TH1F*[4];
+
+     pmtCoarseHistoBottom = new TH1F*[4];
+     pmtFineHistoBottom = new TH1F*[4];
+
+
 
      refCoarseHisto = new TH1F*[4];
      refFineHisto = new TH1F*[4];
@@ -302,8 +307,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripFineRightCorr = new TH2F("stripFineRight"," Strip Vs Fine Time: Right",41,0.5,41.5,400,0,600);
 
      /* ----- Pre Cal Histograms ----- */
-     pmtPreCalTimeHisto = new TH1F*[6];
-     pmtPreCalTotHisto  = new TH1F*[6];
+     pmtPreCalTimeHistoTop = new TH1F*[4];
+     pmtPreCalTotHistoTop  = new TH1F*[4];
+
+     pmtPreCalTimeHistoBottom = new TH1F*[4];
+     pmtPreCalTotHistoBottom  = new TH1F*[4];
 
      stripLeftTotCorr = new TH2F("stripLeftTotCorr","Strip Vs Tot : Left",41,0.5,41.5,400,0,500);
      stripRightTotCorr = new TH2F("stripRightTotCorr","Strip Vs Tot : Right",41,0.5,41.5,400,0,500);
@@ -315,9 +323,9 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,350,400,-100,350);
 
      /* ------------- HIT Histograms ------------ */
-     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",300,0,150,41,0.5,41.5);
+     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",300,0,1500,41,0.5,41.5);
      totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
-     meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",5,0,150,41,0.5,41.5);
+     meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
 
     for ( Int_t i = 0 ; i < 41; i++){
 
@@ -336,19 +344,35 @@ InitStatus R3BRpcOnlineSpectra::Init()
     }
 
 
-    for ( Int_t i = 0 ; i < 6; i++){
+    for ( Int_t i = 0 ; i < 4; i++){
 
-      sprintf(name, "Coarse Time Pmt_%i",i+1);
-      pmtCoarseHisto[i] = new TH1F(name,name,1000,0,3000);
+      sprintf(name, "Coarse Time Pmt_%i TOP",i+1);
+      pmtCoarseHistoTop[i] = new TH1F(name,name,1000,0,3000);
 
-      sprintf(name, "Fine Time Pmt_%i",i+1);
-      pmtFineHisto[i] = new TH1F(name,name,1000,0,3000);
+      sprintf(name, "Fine Time Pmt_%i TOP",i+1);
+      pmtFineHistoTop[i] = new TH1F(name,name,1000,0,3000);
 
-      sprintf(name, "Time Pmt_%i",i+1);
-      pmtPreCalTimeHisto[i] = new TH1F(name,name,1000,-550,400);
+      sprintf(name, "Time Pmt_%i TOP",i+1);
+      pmtPreCalTimeHistoTop[i] = new TH1F(name,name,1000,-550,400);
 
-      sprintf(name, "ToT Pmt_%i",i+1);
-      pmtPreCalTotHisto[i] = new TH1F(name,name,1000,-550,400);
+      sprintf(name, "ToT Pmt_%i TOP",i+1);
+      pmtPreCalTotHistoTop[i] = new TH1F(name,name,1000,-550,400);
+
+    }
+
+    for ( Int_t i = 0 ; i < 4; i++){
+
+      sprintf(name, "Coarse Time Pmt_%i BOTTOM",i+1);
+      pmtCoarseHistoBottom[i] = new TH1F(name,name,1000,0,3000);
+
+      sprintf(name, "Fine Time Pmt_%i BOTTOM",i+1);
+      pmtFineHistoBottom[i] = new TH1F(name,name,1000,0,3000);
+
+      sprintf(name, "Time Pmt_%i BOTTOM",i+1);
+      pmtPreCalTimeHistoBottom[i] = new TH1F(name,name,1000,-550,400);
+
+      sprintf(name, "ToT Pmt_%i BOTTOM",i+1);
+      pmtPreCalTotHistoBottom[i] = new TH1F(name,name,1000,-550,400);
 
     }
 
@@ -475,27 +499,47 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
 
 
-    for (Int_t i = 0; i < 6; i++) {
+    for (Int_t i = 0; i < 4; i++) {
 
-       pmtCoarseHisto[i]->GetXaxis()->SetTitle("Coarse Time");
-       pmtCoarseHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtCoarseHistoTop[i]->GetXaxis()->SetTitle("Coarse Time");
+       pmtCoarseHistoTop[i]->GetYaxis()->SetTitle("Counts");
        pmtCoarseCanvas->cd(i+1);
-       pmtCoarseHisto[i]->Draw();
+       pmtCoarseHistoTop[i]->Draw();
 
-       pmtFineHisto[i]->GetXaxis()->SetTitle("Fine Time");
-       pmtFineHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtFineHistoTop[i]->GetXaxis()->SetTitle("Fine Time");
+       pmtFineHistoTop[i]->GetYaxis()->SetTitle("Counts");
        pmtFineCanvas->cd(i+1);
-       pmtFineHisto[i]->Draw();
+       pmtFineHistoTop[i]->Draw();
 
-       pmtPreCalTimeHisto[i]->GetXaxis()->SetTitle("Time");
-       pmtPreCalTimeHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtPreCalTimeHistoTop[i]->GetXaxis()->SetTitle("Time");
+       pmtPreCalTimeHistoTop[i]->GetYaxis()->SetTitle("Counts");
        pmtPreCalTimeCanvas->cd(i+1);
-       pmtPreCalTimeHisto[i]->Draw();
+       pmtPreCalTimeHistoTop[i]->Draw();
 
-       pmtPreCalTotHisto[i]->GetXaxis()->SetTitle("ToT");
-       pmtPreCalTotHisto[i]->GetYaxis()->SetTitle("Counts");
+       pmtPreCalTotHistoTop[i]->GetXaxis()->SetTitle("ToT");
+       pmtPreCalTotHistoTop[i]->GetYaxis()->SetTitle("Counts");
        pmtPreCalTotCanvas->cd(i+1);
-       pmtPreCalTotHisto[i]->Draw();
+       pmtPreCalTotHistoTop[i]->Draw();
+
+       pmtCoarseHistoBottom[i]->GetXaxis()->SetTitle("Coarse Time");
+       pmtCoarseHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+       pmtCoarseCanvas->cd(i+1+4);
+       pmtCoarseHistoBottom[i]->Draw();
+
+       pmtFineHistoBottom[i]->GetXaxis()->SetTitle("Fine Time");
+       pmtFineHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+       pmtFineCanvas->cd(i+1+4);
+       pmtFineHistoBottom[i]->Draw();
+
+       pmtPreCalTimeHistoBottom[i]->GetXaxis()->SetTitle("Time");
+       pmtPreCalTimeHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+       pmtPreCalTimeCanvas->cd(i+1+4);
+       pmtPreCalTimeHistoBottom[i]->Draw();
+
+       pmtPreCalTotHistoBottom[i]->GetXaxis()->SetTitle("ToT");
+       pmtPreCalTotHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+       pmtPreCalTotCanvas->cd(i+1+4);
+       pmtPreCalTotHistoBottom[i]->Draw();
 
     }
 
@@ -577,10 +621,14 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     }
 
 
-    for (Int_t i = 0; i < 6; i++) {
+    for (Int_t i = 0; i < 4; i++) {
 
-        pmtFineHisto[i]->Reset();
-        pmtCoarseHisto[i]->Reset();
+        pmtFineHistoTop[i]->Reset();
+        pmtCoarseHistoTop[i]->Reset();
+        pmtFineHistoBottom[i]->Reset();
+        pmtCoarseHistoBottom[i]->Reset();
+
+
     }
 
 
@@ -659,16 +707,26 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
 
         auto nPmtMappedHits = fPmtMappedItems->GetEntriesFast();
-
+        Int_t pmtSide;
         for (Int_t ihit = 0; ihit < nPmtMappedHits; ihit++) {
 
             R3BRpcPmtMappedData* hit = (R3BRpcPmtMappedData*)fPmtMappedItems->At(ihit);
             if (!hit)
                 continue;
 
-             pmtFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-             pmtCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+            pmtSide=hit->GetSide();
 
+             if(pmtSide==0){
+
+             pmtFineHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+             pmtCoarseHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+          }
+
+          if(pmtSide==1){
+
+          pmtFineHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+          pmtCoarseHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+       }
 
     }
 
@@ -695,13 +753,23 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     }
 
     auto nPmtPreCalHits = fPmtPreCalItems->GetEntriesFast();
-
     for( Int_t ihit = 0; ihit < nPmtPreCalHits; ihit++) {
 
       R3BRpcPmtPreCalData* hit = (R3BRpcPmtPreCalData*)fPmtPreCalItems->At(ihit);
+      pmtSide = hit->GetSide();
 
-        pmtPreCalTimeHisto[hit->GetChannelId()-1]->Fill(hit->GetTime());
-        pmtPreCalTotHisto[hit->GetChannelId()-1]->Fill(hit->GetTot());
+      if(pmtSide==0){
+        pmtPreCalTimeHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTime());
+        pmtPreCalTotHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTot());
+      }
+
+      if(pmtSide==1){
+        pmtPreCalTimeHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTime());
+        pmtPreCalTotHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTot());
+      }
+
+
+
 
     }
 
@@ -729,6 +797,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
     Int_t channelId;
     Float_t pos,charge;
+    Int_t bin;
 
     for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
 
@@ -743,35 +812,48 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
      counts++;
 
 
-   if(charge >= 0.0){
+     bin =Int_t(50 - (1500-pos)/30.0 + 1);
 
-     if(pos < 30){
-      meanCharges[channelId][0] = meanCharges[channelId][0] + (1.0/counts)*(charge-meanCharges[channelId][0]);
-      meanChargeCorr->SetBinContent(1,channelId,meanCharges[channelId][0]);
-   }
+     if(charge>=0.0 && bin <= 50 && bin > 0){
 
-     if(pos >= 30 && pos < 60){
-      meanCharges[channelId][1] = meanCharges[channelId][1] + (1.0/counts)*(charge-meanCharges[channelId][1]);
-      meanChargeCorr->SetBinContent(2,channelId,meanCharges[channelId][1]);
-   }
+      //std::cout<<bin<<" "<<meanCharges[channelId][bin-1]<<" "<<channelId<<std::endl;
 
-     if(pos >= 60 && pos < 90){
-      meanCharges[channelId][2] = meanCharges[channelId][2] + (1.0/counts)*(charge-meanCharges[channelId][2]);
-      meanChargeCorr->SetBinContent(3,channelId,meanCharges[channelId][2]);
-   }
+      meanCharges[channelId-1][bin-1] = meanCharges[channelId-1][bin-1] + (1.0/counts)*(charge-meanCharges[channelId-1][bin-1]);
 
-     if(pos >= 90 && pos <= 120){
-      meanCharges[channelId][3] = meanCharges[channelId][3] + (1.0/counts)*(charge-meanCharges[channelId][3]);
-      meanChargeCorr->SetBinContent(4,channelId,meanCharges[channelId][3]);
-   }
+      meanChargeCorr->SetBinContent(bin,channelId,meanCharges[channelId-1][bin-1]);
 
-   if(pos > 120 && pos <= 150){
-    meanCharges[channelId][4] = meanCharges[channelId][4] + (1.0/counts)*(charge-meanCharges[channelId][4]);
-    meanChargeCorr->SetBinContent(5,channelId,meanCharges[channelId][4]);
- }
+     }
 
 
-    }
+ //   if(charge >= 0.0){
+ //
+ //     if(pos < 300){
+ //      meanCharges[channelId][0] = meanCharges[channelId][0] + (1.0/counts)*(charge-meanCharges[channelId][0]);
+ //      meanChargeCorr->SetBinContent(1,channelId,meanCharges[channelId][0]);
+ //   }
+ //
+ //     if(pos >= 300 && pos < 600){
+ //      meanCharges[channelId][1] = meanCharges[channelId][1] + (1.0/counts)*(charge-meanCharges[channelId][1]);
+ //      meanChargeCorr->SetBinContent(2,channelId,meanCharges[channelId][1]);
+ //   }
+ //
+ //     if(pos >= 600 && pos < 900){
+ //      meanCharges[channelId][2] = meanCharges[channelId][2] + (1.0/counts)*(charge-meanCharges[channelId][2]);
+ //      meanChargeCorr->SetBinContent(3,channelId,meanCharges[channelId][2]);
+ //   }
+ //
+ //     if(pos >= 900 && pos <= 1200){
+ //      meanCharges[channelId][3] = meanCharges[channelId][3] + (1.0/counts)*(charge-meanCharges[channelId][3]);
+ //      meanChargeCorr->SetBinContent(4,channelId,meanCharges[channelId][3]);
+ //   }
+ //
+ //   if(pos > 1200 && pos <= 1500){
+ //    meanCharges[channelId][4] = meanCharges[channelId][4] + (1.0/counts)*(charge-meanCharges[channelId][4]);
+ //    meanChargeCorr->SetBinContent(5,channelId,meanCharges[channelId][4]);
+ // }
+ //
+ //
+ //    }
  }
 
     fNEvents += 1;
@@ -835,8 +917,10 @@ void R3BRpcOnlineSpectra::FinishTask()
    if (fPmtMappedItems)
    {
        for (Int_t i = 0; i < 4; i++){
-           pmtFineHisto[i]->Write();
-           pmtCoarseHisto[i]->Write();
+           pmtFineHistoTop[i]->Write();
+           pmtCoarseHistoTop[i]->Write();
+           pmtFineHistoBottom[i]->Write();
+           pmtCoarseHistoBottom[i]->Write();
     }
   }
 

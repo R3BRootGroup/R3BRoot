@@ -144,7 +144,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
         auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
 
-        valid =true; 
+        valid =true;
 
         if(map1->GetTotRight() >=  charge_right){
             charge_right=map1->GetTotRight();
@@ -154,7 +154,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
         if(map1->GetTotLeft() >= charge_left){
 
             charge_left=map1->GetTotLeft();
-            time_left= map1->GetTimeLeft();      
+            time_left= map1->GetTimeLeft();
             ichn_left = map1->GetChannelId();
         }
 
