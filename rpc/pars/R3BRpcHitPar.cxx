@@ -134,7 +134,7 @@ void R3BRpcHitPar::printParams()
         LOG(INFO) << "Param1= " << fHitCalParams1->GetAt(i);
         LOG(INFO) << "Param2= " << fHitCalParams2->GetAt(i);
         LOG(INFO) << "Param3= " << fHitCalParams3->GetAt(i);
-        LOG(INFO) << "Param3= " << fHitCalParams4->GetAt(i);
+        LOG(INFO) << "Param4= " << fHitCalParams4->GetAt(i);
     }
 }
 
