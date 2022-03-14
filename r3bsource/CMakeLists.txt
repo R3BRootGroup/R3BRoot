@@ -152,6 +152,7 @@ set(SRCS
 ./strack/R3BStartrackReader.cxx
 ./ams/R3BAmsReader.cxx
 ./foot/R3BFootReader.cxx
+./foot/R3BFootSiReader.cxx
 ./alpide/R3BAlpideReader.cxx
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
