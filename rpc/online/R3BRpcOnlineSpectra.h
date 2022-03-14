@@ -112,7 +112,7 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fPmtPreCalItems;
     TClonesArray* fStripHitDataItems;
 
-    Float_t meanCharges[41][5]={{0.0}};
+    Float_t meanCharges[41][50]={{0.0}};
     Int_t counts=0;
 
 
@@ -128,8 +128,11 @@ class R3BRpcOnlineSpectra : public FairTask
     TH1F **stripCoarseLeftHisto;
     TH1F **stripFineLeftHisto;
 
-    TH1F **pmtCoarseHisto;
-    TH1F **pmtFineHisto;
+    TH1F **pmtCoarseHistoTop;
+    TH1F **pmtFineHistoTop;
+    TH1F **pmtCoarseHistoBottom;
+    TH1F **pmtFineHistoBottom;
+
 
     TH1F **refCoarseHisto;
     TH1F **refFineHisto;
@@ -163,8 +166,11 @@ class R3BRpcOnlineSpectra : public FairTask
     TH2F *stripRightTotCorr;
     TH2F *stripLeftTimeCorr;
     TH2F *stripRightTimeCorr;
-    TH1F **pmtPreCalTimeHisto;
-    TH1F **pmtPreCalTotHisto;
+    TH1F **pmtPreCalTimeHistoTop;
+    TH1F **pmtPreCalTotHistoTop;
+    TH1F **pmtPreCalTimeHistoBottom;
+    TH1F **pmtPreCalTotHistoBottom;
+
 
     /* ----- Pre Cal Canvases ----- */
     TCanvas *stripLeftTotCorrCanvas;
