@@ -41,7 +41,6 @@ class R3BFiberMAPMTCalData;
 
 class R3BOnlineSpectraFiber_s522 : public FairTask
 {
-
   public:
     struct Channel
     {
@@ -120,7 +119,7 @@ class R3BOnlineSpectraFiber_s522 : public FairTask
         DET_FI31,
         DET_FI32,
         DET_FI33,
-        DET_FI_LAST = DET_FI23B,
+        DET_FI_LAST = DET_FI33,
         DET_MAX
     };
 
@@ -158,7 +157,6 @@ class R3BOnlineSpectraFiber_s522 : public FairTask
     TH2F* fh_raw_tot_down[NOF_FIB_DET];
     TH2F* fh_chan_dt_cal[NOF_FIB_DET];
     TH2F* fh_xy_global;
-    TH2F* fh_dtime_Fib23;
     TH2F* fh_test2;
 
   public:
