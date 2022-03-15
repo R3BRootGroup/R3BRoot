@@ -167,7 +167,14 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
         {
             char strName[255];
             sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
-            fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+            
+            if(!fRpcCalib){
+                fhPos[inum] = new TH1F(strName, "", 750,0.,1500.);
+            }
+            else{
+                fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+            }
+
         }
         if (NULL == fhTime[inum])
         {
@@ -181,7 +188,14 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
     if(ichn_left == ichn_right && valid ){
         UInt_t inum = iDetector * 41 + ichn_right -1;
 
-        fhPos[inum]->Fill((time_left - time_right)/2.);
+        
+        if(!fRpcCalib){
+            fhPos[inum]->Fill(((((time_left-time_right)/2. - (fHitPar->GetCalParams1()->GetAt(inum)-400)*40./800.)*800./40.)
+                  /(fHitPar->GetCalParams2()->GetAt(inum) - fHitPar->GetCalParams1()->GetAt(inum)))*1500);
+        }
+        else{
+            fhPos[inum]->Fill((time_left - time_right)/2.);
+        }
         fhTime[inum]->Fill((time_left + time_right)/2.); 
     }
 
@@ -212,7 +226,10 @@ void R3BRpcCal2HitPar::FinishEvent() {}
 void R3BRpcCal2HitPar::FinishTask() {
 
     if(fRpcCalib){CalculateParsStrip();}
-    else{CalculateParsPmt();}
+    else{
+
+        CalculateParsPmt();
+    }
 
     fHitPar->setChanged();
     fHitPar->printParams();
@@ -220,6 +237,10 @@ void R3BRpcCal2HitPar::FinishTask() {
 }
 
 void R3BRpcCal2HitPar::CalculateParsPmt(){
+
+    double counter=0;
+    double average=0;
+    std::vector<double> v;
 
     for (int t = 0; t < N_STRIP_NB; t++){
 
@@ -239,6 +260,7 @@ void R3BRpcCal2HitPar::CalculateParsPmt(){
             }
         }
         else{
+
             if (NULL == fhPos[t]){continue;}
 
             fhPos[t]->GetXaxis()->SetRange(bin_max-50,bin_max+50);
@@ -246,9 +268,18 @@ void R3BRpcCal2HitPar::CalculateParsPmt(){
             fhPos[t]->Fit("gaus");
 
             TF1 *g = (TF1*)fhPos[t]->GetListOfFunctions()->FindObject("gaus");
-            fHitPar->SetCalParams4(g->GetParameter(1),t);
+            
+            v.push_back(g->GetParameter(1));
+            average+=g->GetParameter(1);
+            counter++;
+  
         }
+    }
 
+    for (int i = 0; i < v.size(); i++)
+    {
+        std::cout << v[i] << " " << v[i]-average/counter << " " << average/counter<<  std::endl;
+        fHitPar->SetCalParams4(v[i]-average/counter,i);
     }
 }
 
