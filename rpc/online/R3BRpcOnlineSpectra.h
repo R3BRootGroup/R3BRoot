@@ -111,11 +111,15 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fStripCalDataItems;
     TClonesArray* fPmtPreCalItems;
     TClonesArray* fStripHitDataItems;
-    TClonesArray* fLosHitDataItems;
+    TClonesArray* fLosCalDataItems;
+    TClonesArray* fLosTriggerCalDataItems;
+
+
+    TClonesArray* fLosWRData;
 
     Float_t meanCharges[41][50]={{0.0}};
     Int_t counts=0;
-
+    Int_t tpatbin,fTPat;
 
 
     R3BEventHeader* header; // Event header.
