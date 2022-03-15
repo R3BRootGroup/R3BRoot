@@ -32,12 +32,8 @@
 #include "R3BRpcStripCalData.h"
 #include "R3BRpcPmtPreCalData.h"
 #include "R3BRpcStripHitData.h"
-
-/* LOS */
+#include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
-
-
-
 
 
 #include "FairLogger.h"
@@ -69,6 +65,8 @@ R3BRpcOnlineSpectra::R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose)
     , fRefMappedItems(NULL)
     , fPmtMappedItems(NULL)
     , fStripMappedItems(NULL)
+    , fLosTriggerCalDataItems(NULL)
+    , fLosCalDataItems(NULL)
     , fTrigger(-1)
     , fNEvents(0)
 {
@@ -91,6 +89,13 @@ R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
 
     if (fStripPreCalDataItems)
        delete fStripPreCalDataItems;
+
+    if(fLosTriggerCalDataItems)
+     delete fLosTriggerCalDataItems;
+
+    if(fLosCalDataItems)
+     delete fLosCalDataItems;
+
 
 }
 
@@ -165,12 +170,22 @@ InitStatus R3BRpcOnlineSpectra::Init()
         return kFATAL;
     }
 
-    fLosHitDataItems = (TClonesArray*)mgr->GetObject("LosHit");
-    if (!fLosHitDataItems)
+    fLosCalDataItems = (TClonesArray*)mgr->GetObject("LosCal");
+    if (!fLosCalDataItems)
     {
         R3BLOG(FATAL, "LOS Hit Data not found");
         return kFATAL;
     }
+
+    fLosTriggerCalDataItems = (TClonesArray*)mgr->GetObject("LosTriggerCal");
+    if (!fLosTriggerCalDataItems)
+    {
+        R3BLOG(FATAL, "LOS Data not found");
+        return kFATAL;
+    }
+
+
+
 
 
 
@@ -347,7 +362,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
      meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
 
 
-     losTimeDiffCorr = new TH2F("losTimeDiffCorr","Time Differences with LOS",1000,0,1E5,41,0.5,41.5);
+     losTimeDiffCorr = new TH2F("losTimeDiffCorr","Time Differences with LOS",4000,2000,4000,41,0.5,41.5);
      stripDiffLosHisto = new TH1F*[41];
 
     for ( Int_t i = 0 ; i < 41; i++){
@@ -365,7 +380,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
       stripFineRightHisto[i] = new TH1F(name,name,200,0,600);
 
       sprintf(name, "Time LOS - Time RPC Strip : Strip_%i",i+1);
-      stripDiffLosHisto[i] = new TH1F(name,name,100,0,1E5);
+      stripDiffLosHisto[i] = new TH1F(name,name,10000,0,4000);
 
 
     }
@@ -698,9 +713,39 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1){
         return;
     }
+
+
+    if (fEventHeader->GetTpat() > 0)
+    {
+        for (Int_t i = 0; i < 16; i++)
+        {
+            tpatbin = (fEventHeader->GetTpat() & (1 << i));
+            if (tpatbin != 0){
+                fTPat=i+1;
+               }
+            }
+
+
+      }
+
+
+
         auto nStripMappedHits = fStripMappedItems->GetEntriesFast();
 
 
+        /*
+          TRIG_LMU_OUT( 1) = BEAM_GATE_AUX and in_los_nrolu;
+        	TRIG_LMU_OUT( 2) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa;
+        	TRIG_LMU_OUT( 3) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa and in_rpc;
+        	TRIG_LMU_OUT( 4) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_neuland;
+        	TRIG_LMU_OUT( 5) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa and not in_califa_veto;
+
+        	TRIG_LMU_OUT( 9) = not BEAM_GATE_AUX and in_califa;
+        	TRIG_LMU_OUT(10) = not BEAM_GATE_AUX and in_neuland;
+        	TRIG_LMU_OUT(11) = not BEAM_GATE_AUX and in_tofd;
+        	TRIG_LMU_OUT(12) = not BEAM_GATE_AUX and in_rpc;
+        */
+         if(fTPat >=1 && fTPat <= 5){
         /* ------------------- Map EventLoop ------------------*/
         for (Int_t ihit = 0; ihit < nStripMappedHits; ihit++) {
 
@@ -836,11 +881,33 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
     /*---------------- HIT EventLoop ---------------*/
     auto nStripHits = fStripHitDataItems->GetEntriesFast();
-    auto losNHits = fLosHitDataItems->GetEntriesFast();
+    auto losNHits = fLosCalDataItems->GetEntriesFast();
+    auto losNTriggerHits = fLosTriggerCalDataItems->GetEntriesFast();
+
 
     Int_t channelId;
     Float_t pos,charge;
     Int_t bin;
+
+    Float_t losTime,losTriggerTime;
+
+    for( Int_t ihit = 0; ihit < losNHits; ihit++) {
+
+      R3BLosCalData* losHit = (R3BLosCalData*)fLosCalDataItems->At(ihit);
+      Int_t losChannel = losHit->GetDetector();
+      losTime = losHit->GetTimeT_ns(losChannel);
+  }
+
+  for( Int_t ihit = 0; ihit < losNTriggerHits; ihit++) {
+
+    R3BLosCalData* losTriggerHit = (R3BLosCalData*)fLosTriggerCalDataItems->At(ihit);
+    Int_t losChannelTrigger = losTriggerHit->GetDetector();
+    losTriggerTime = losTriggerHit->GetTimeL_ns(0);
+}
+
+
+
+
 
     for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
 
@@ -850,10 +917,17 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
      charge    =  hit->GetCharge();
 
 
-     if(losNHits){
-      R3BLosHitData* losHit = (R3BLosHitData*)fLosHitDataItems->At(0);
-      losTimeDiffCorr->Fill(losHit->GetTime()-hit->GetTime(),channelId);
-      stripDiffLosHisto[channelId-1]->Fill(losHit->GetTime()-hit->GetTime());
+     if(losNHits && losNTriggerHits){
+
+
+         int c = 2048*5;
+
+         double time = fmod((losTime-losTriggerTime-hit->GetTime() +10*c +c/2.),c)-c/2.;
+         stripDiffLosHisto[channelId-1]->Fill(time);
+         losTimeDiffCorr->Fill(time,channelId);
+
+
+
     }
 
      stripPosHitCorr->Fill(pos,channelId);
@@ -870,6 +944,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
      }
 
+   }
 
  }
 
@@ -918,9 +993,9 @@ void R3BRpcOnlineSpectra::FinishEvent()
     }
 
 
-    if(fLosHitDataItems){
+    if(fLosCalDataItems){
 
-      fLosHitDataItems->Clear();
+      fLosCalDataItems->Clear();
 
     }
 
