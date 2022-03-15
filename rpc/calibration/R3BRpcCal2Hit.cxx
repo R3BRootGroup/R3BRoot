@@ -37,6 +37,7 @@ R3BRpcCal2Hit::R3BRpcCal2Hit()
     , fParCont1(NULL)
     , fParCont2(NULL)
     , fParCont3(NULL)
+    , fParCont4(NULL)
     , fRpcHitStripDataCA(NULL)
     , fRpcHitPmtDataCA(NULL)
     , fRpcCalStripDataCA(NULL)
@@ -113,6 +114,7 @@ InitStatus R3BRpcCal2Hit::Init()
     fParCont1 = fHitPar->GetCalParams1();
     fParCont2 = fHitPar->GetCalParams2();
     fParCont3 = fHitPar->GetCalParams3();
+    fParCont4 = fHitPar->GetCalParams4();
 
     return kSUCCESS;
 }
@@ -165,14 +167,12 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
         UInt_t inum = iDetector * 41 + ichn_right -1;
 
-        //std::cout << (fParCont1->GetAt(inum)-400)*40./800. << " " << (time_left-time_right)/2. << std::endl;
-
         //double position = (time_left-time_right)/2.;
 
 
         double position = ((((time_left-time_right)/2. - (fParCont1->GetAt(inum)-400)*40./800.)*800./40.)
-                  /(fParCont2->GetAt(inum) - fParCont1->GetAt(inum)))*1500;
-
+                  /(fParCont2->GetAt(inum) - fParCont1->GetAt(inum)))*1500 - fParCont4->GetAt(inum);
+    
         double charge =  (charge_left + charge_right)/2.;
 
         double time = (time_left + time_right)/2. - fParCont3->GetAt(inum);
@@ -190,7 +190,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
         UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
 
-        double position = (map2->GetTimeBottom()-map2->GetTimeTop())*CSCINT/2.;
+        double position = (map2->GetTimeBottom()-map2->GetTimeTop())*CSCINT/2. -(fParCont1->GetAt(inum) - 2500);
 
         double charge =  (map2->GetTotBottom() + map2->GetTotTop())/2.;
 
