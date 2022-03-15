@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/rpc
 ${R3BROOT_SOURCE_DIR}/rpc/sim

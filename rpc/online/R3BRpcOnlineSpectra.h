@@ -111,6 +111,7 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fStripCalDataItems;
     TClonesArray* fPmtPreCalItems;
     TClonesArray* fStripHitDataItems;
+    TClonesArray* fLosHitDataItems;
 
     Float_t meanCharges[41][50]={{0.0}};
     Int_t counts=0;
@@ -196,6 +197,14 @@ class R3BRpcOnlineSpectra : public FairTask
 
     /* ----- Hit Canvases ----- */
     TCanvas *hitMapCanvas;
+
+    /* ------ LOS Correlations Histograms ------*/
+    TH2F *losTimeDiffCorr;
+    TH1F **stripDiffLosHisto;
+
+    /* ------ LOS Correlations Canvases ------*/
+    TCanvas *losCorrCanvas;
+    TCanvas *stripLosCanvas;
 
 
   public:

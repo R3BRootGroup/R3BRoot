@@ -33,6 +33,9 @@
 #include "R3BRpcPmtPreCalData.h"
 #include "R3BRpcStripHitData.h"
 
+/* LOS */
+#include "R3BLosHitData.h"
+
 
 
 
@@ -162,6 +165,13 @@ InitStatus R3BRpcOnlineSpectra::Init()
         return kFATAL;
     }
 
+    fLosHitDataItems = (TClonesArray*)mgr->GetObject("LosHit");
+    if (!fLosHitDataItems)
+    {
+        R3BLOG(FATAL, "LOS Hit Data not found");
+        return kFATAL;
+    }
+
 
 
     char name[100];
@@ -191,6 +201,10 @@ InitStatus R3BRpcOnlineSpectra::Init()
     // Folder for Hit Data
     TFolder* hitFolder = new TFolder("Hit", "Hit RPC info");
     mainfol->Add(hitFolder);
+
+    TFolder* losCorrFolder = new TFolder("LOS Correlations", "LOS Correlations");
+    mainfol->Add(losCorrFolder);
+
 
 
 
@@ -281,6 +295,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
     hitMapCanvas = new TCanvas("Hit Map","hitMapCanvas");
     hitMapCanvas->Divide(2,1);
 
+    /* ------ LOS Correlations -------*/
+    losCorrCanvas = new TCanvas("losCorrCanvas","LOS Correlations");
+    stripLosCanvas = new TCanvas("stripLosCanvas","Strip Los Correlations");
+    stripLosCanvas->Divide(5,9);
+
 
     /* ----- Map Histograms -----*/
 
@@ -327,6 +346,10 @@ InitStatus R3BRpcOnlineSpectra::Init()
      totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
      meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
 
+
+     losTimeDiffCorr = new TH2F("losTimeDiffCorr","Time Differences with LOS",1000,0,1E5,41,0.5,41.5);
+     stripDiffLosHisto = new TH1F*[41];
+
     for ( Int_t i = 0 ; i < 41; i++){
 
       sprintf(name, "Left : Coarse Time Strip_%i",i+1);
@@ -340,6 +363,10 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
       sprintf(name, "Right : Fine Time Strip_%i",i+1);
       stripFineRightHisto[i] = new TH1F(name,name,200,0,600);
+
+      sprintf(name, "Time LOS - Time RPC Strip : Strip_%i",i+1);
+      stripDiffLosHisto[i] = new TH1F(name,name,100,0,1E5);
+
 
     }
 
@@ -388,7 +415,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
 
 
-
      for (Int_t i = 0; i < 41; i++) {
 
         stripCoarseLeftHisto[i]->GetXaxis()->SetTitle("Coarse Time");
@@ -432,6 +458,13 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
         rightStripCanvasCoarse->cd(i+1);
         stripCoarseRightHisto[i]->Draw();
+
+        stripDiffLosHisto[i]->GetXaxis()->SetTitle("Time Difference (ns)");
+        stripDiffLosHisto[i]->GetYaxis()->SetTitle("Counts");
+        stripLosCanvas->cd(i+1);
+        stripDiffLosHisto[i]->Draw();
+
+
 
 
     }
@@ -495,6 +528,13 @@ InitStatus R3BRpcOnlineSpectra::Init()
     meanChargeCorr->GetYaxis()->SetTitle("Strip");
     hitMapCanvas->cd(2);
     meanChargeCorr->Draw("COLZ");
+
+    losTimeDiffCorr->GetXaxis()->SetTitle("Time Difference (ns)");
+    losTimeDiffCorr->GetYaxis()->SetTitle("Strip Number");
+    losCorrCanvas->cd();
+    losTimeDiffCorr->Draw("COLZ");
+    losCorrFolder->Add(losCorrCanvas);
+    losCorrFolder->Add(stripLosCanvas);
 
 
 
@@ -611,6 +651,7 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
         stripFineLeftHisto[i]->Reset();
         stripCoarseRightHisto[i]->Reset();
         stripFineRightHisto[i]->Reset();
+        stripDiffLosHisto[i]->Reset();
     }
 
     for (Int_t i = 0; i < 4; i++)
@@ -645,6 +686,8 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     totalChargeHist->Reset();
     stripPosHitCorr->Reset();
     meanChargeCorr->Reset();
+    losTimeDiffCorr->Reset();
+
 
 
     return;
@@ -793,7 +836,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
     /*---------------- HIT EventLoop ---------------*/
     auto nStripHits = fStripHitDataItems->GetEntriesFast();
-
+    auto losNHits = fLosHitDataItems->GetEntriesFast();
 
     Int_t channelId;
     Float_t pos,charge;
@@ -806,17 +849,20 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
      pos       =  hit->GetPos();
      charge    =  hit->GetCharge();
 
+
+     if(losNHits){
+      R3BLosHitData* losHit = (R3BLosHitData*)fLosHitDataItems->At(0);
+      losTimeDiffCorr->Fill(losHit->GetTime()-hit->GetTime(),channelId);
+      stripDiffLosHisto[channelId-1]->Fill(losHit->GetTime()-hit->GetTime());
+    }
+
      stripPosHitCorr->Fill(pos,channelId);
      totalChargeHist->Fill(hit->GetCharge());
-
      counts++;
-
 
      bin =Int_t(50 - (1500-pos)/30.0 + 1);
 
      if(charge>=0.0 && bin <= 50 && bin > 0){
-
-      //std::cout<<bin<<" "<<meanCharges[channelId][bin-1]<<" "<<channelId<<std::endl;
 
       meanCharges[channelId-1][bin-1] = meanCharges[channelId-1][bin-1] + (1.0/counts)*(charge-meanCharges[channelId-1][bin-1]);
 
@@ -825,35 +871,6 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
      }
 
 
- //   if(charge >= 0.0){
- //
- //     if(pos < 300){
- //      meanCharges[channelId][0] = meanCharges[channelId][0] + (1.0/counts)*(charge-meanCharges[channelId][0]);
- //      meanChargeCorr->SetBinContent(1,channelId,meanCharges[channelId][0]);
- //   }
- //
- //     if(pos >= 300 && pos < 600){
- //      meanCharges[channelId][1] = meanCharges[channelId][1] + (1.0/counts)*(charge-meanCharges[channelId][1]);
- //      meanChargeCorr->SetBinContent(2,channelId,meanCharges[channelId][1]);
- //   }
- //
- //     if(pos >= 600 && pos < 900){
- //      meanCharges[channelId][2] = meanCharges[channelId][2] + (1.0/counts)*(charge-meanCharges[channelId][2]);
- //      meanChargeCorr->SetBinContent(3,channelId,meanCharges[channelId][2]);
- //   }
- //
- //     if(pos >= 900 && pos <= 1200){
- //      meanCharges[channelId][3] = meanCharges[channelId][3] + (1.0/counts)*(charge-meanCharges[channelId][3]);
- //      meanChargeCorr->SetBinContent(4,channelId,meanCharges[channelId][3]);
- //   }
- //
- //   if(pos > 1200 && pos <= 1500){
- //    meanCharges[channelId][4] = meanCharges[channelId][4] + (1.0/counts)*(charge-meanCharges[channelId][4]);
- //    meanChargeCorr->SetBinContent(5,channelId,meanCharges[channelId][4]);
- // }
- //
- //
- //    }
  }
 
     fNEvents += 1;
@@ -901,6 +918,13 @@ void R3BRpcOnlineSpectra::FinishEvent()
     }
 
 
+    if(fLosHitDataItems){
+
+      fLosHitDataItems->Clear();
+
+    }
+
+
 
 }
 
@@ -934,6 +958,7 @@ void R3BRpcOnlineSpectra::FinishTask()
 
           stripCoarseLeftHisto[i]->Write();
           stripCoarseRightHisto[i]->Write();
+          stripDiffLosHisto[i]->Write();
    }
 
    leftStripCanvasCoarse->Write();
