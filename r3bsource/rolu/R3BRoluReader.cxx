@@ -14,7 +14,6 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
-#include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BRoluMappedData.h"
 #include "R3BRoluReader.h"
@@ -35,14 +34,14 @@ extern "C"
 }
 
 #define IS_NAN(x) TMath::IsNaN(x)
-#define NUM_ROLU_DETECTORS (sizeof data->ROLU / sizeof data->ROLU[0])
-#define NUM_ROLU_CHANNELS 4
+#define NUM_ROLU_DETECTORS (sizeof fData->ROLU / sizeof fData->ROLU[0])
 
 using namespace std;
 
-R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU* data, size_t offset)
+R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU_onion* data, size_t offset)
     : R3BReader("R3BRoluReader")
     , fData(data)
+    , fNbDet(NUM_ROLU_DETECTORS)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BRoluMappedData"))
@@ -69,7 +68,6 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     EXT_STR_h101_ROLU_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_ROLU, 0);
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
         R3BLOG(ERROR, "Failed to setup ROLU structure information.");
         return kFALSE;
     }
@@ -77,27 +75,23 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     FairRootManager::Instance()->Register("RoluMapped", "Rolu Mapped", fArray, !fOnline);
     FairRootManager::Instance()->Register("RoluTriggerMapped", "Rolu Trigger Mapped", fArrayTrigger, !fOnline);
-
     Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
-
-    R3BLOG(INFO, "ROLU num Dets: " << NUM_ROLU_DETECTORS);
-    for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
+    R3BLOG(INFO, "ROLU num Dets: " << fNbDet);
+    for (uint32_t d = 0; d < fNbDet; d++)
     {
-        data->ROLU[d].TTFLM = 0;
-        data->ROLU[d].TTFTM = 0;
-        data->ROLU[d].TTCLM = 0;
-        data->ROLU[d].TTCTM = 0;
+        fData->ROLU[d].TTFLM = 0;
+        fData->ROLU[d].TTFTM = 0;
+        fData->ROLU[d].TTCLM = 0;
+        fData->ROLU[d].TTCTM = 0;
     }
     return kTRUE;
 }
 
 Bool_t R3BRoluReader::Read()
 {
-
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
 
@@ -121,9 +115,8 @@ Bool_t R3BRoluReader::Read()
 
     // loop over all detectors
 
-    for (uint32_t d = 0; d < NUM_ROLU_DETECTORS; d++)
+    for (uint32_t d = 0; d < fNbDet; d++)
     {
-
         // Coarse counter reset recovery:
         // Divide the course counter range 0..8191 into four pieces.
         // If we have _any_ hit in the uppermost quarter, then all hits in the
@@ -134,10 +127,6 @@ Bool_t R3BRoluReader::Read()
 
         if (data->ROLU[d].TTCL < 1)
             return kFALSE;
-
-        //   cout<<" **** NEW EVENT **** "<<endl;
-
-        //  cout<<"NUM DATA: "<<data->ROLU[d].TTCL<<"; NUM CHANNELS: "<<data->ROLU[d].TTCLM<<endl;
 
         uint32_t numData = data->ROLU[d].TTCL;
         uint32_t numChannels = data->ROLU[d].TTCLM;
@@ -168,7 +157,6 @@ Bool_t R3BRoluReader::Read()
         // Leading mapping.
         numChannels = data->ROLU[d].TTCLM;
         uint32_t curChannelStart = 0;
-        // cout<<"numChannels: "<<numChannels<<", "<<curChannelStart<<endl;
         for (uint32_t i = 0; i < numChannels; i++)
         {
             uint32_t channel = data->ROLU[d].TTCLMI[i];
@@ -182,8 +170,6 @@ Bool_t R3BRoluReader::Read()
                 }
                 new ((*fArray)[fArray->GetEntriesFast()])
                     R3BRoluMappedData(d + 1, channel, 0, data->ROLU[d].TTFLv[j], coarse_leading);
-
-                //    cout<<"TAMEX leading: "<< channel<<", "<<data->ROLU[d].TTFLv[j]<<", "<<  coarse_leading<<endl;
             }
             curChannelStart = nextChannelStart;
         }
@@ -192,7 +178,6 @@ Bool_t R3BRoluReader::Read()
         // Trailing.
         // Matched against leading edges.
         //
-
         numChannels = data->ROLU[d].TTCTM;
         curChannelStart = 0;
         for (uint32_t i = 0; i < numChannels; i++)

@@ -82,6 +82,7 @@ namespace
 {
     double c_period = 2048 * 5;
 } // namespace
+
 R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494()
     : R3BOnlineSpectraBMON_S494("OnlineSpectra", 1)
 {
@@ -122,7 +123,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     FairRunOnline* run = FairRunOnline::Instance();
 
-    run->GetHttpServer()->Register("/Tasks", this);
+    run->GetHttpServer()->Register("", this);
 
     // Get objects for detectors on all levels
 
@@ -166,8 +167,6 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
     if (fMappedItems.at(DET_ROLU))
     {
-        // TCanvas* cRolu = new TCanvas("Rolu", "Rolu", 10, 10, 800, 400);
-
         fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT", 10, 0, 10, 600, 0, 300);
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
@@ -180,7 +179,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
         fh_rolu_channels->GetYaxis()->SetTitle("Counts");
 
-        run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Tasks/%s/->Reset_ROLU_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
     }
 
     if (fMappedItems.at(DET_BMON))
@@ -285,7 +284,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
         run->AddObject(cbmon);
 
-        run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Objects/%s/->Reset_BMON_Histo()", GetName()));
     }
 
     return kSUCCESS;
@@ -333,12 +332,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     Bool_t debug = false;
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-    {
-        LOG(ERROR) << "FairRootManager not found";
-        return;
-    }
 
     if (header)
     {

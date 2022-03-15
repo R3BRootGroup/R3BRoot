@@ -12,11 +12,11 @@
  ******************************************************************************/
 
 #include "R3BBeamMonitorReader.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BBeamMonitorMappedData.h"
-#include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "TClonesArray.h"
+
 extern "C"
 {
 #include "ext_data_client.h"
@@ -24,47 +24,39 @@ extern "C"
 }
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
-#define NUM_BMON 3
-#include <iostream>
 
 using namespace std;
 
-R3BBeamMonitorReader::R3BBeamMonitorReader(EXT_STR_h101_BMON* data, UInt_t offset)
+R3BBeamMonitorReader::R3BBeamMonitorReader(EXT_STR_h101_BMON* data, size_t offset)
     : R3BReader("R3BBeamMonitorReader")
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
+    , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BBeamMonitorMappedData"))
 {
 }
 
-R3BBeamMonitorReader::~R3BBeamMonitorReader() {}
+R3BBeamMonitorReader::~R3BBeamMonitorReader()
+{
+    if (fArray)
+        delete fArray;
+}
 
 Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
 {
-
-    int ok;
-
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
-
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
+    Int_t ok;
+    R3BLOG(INFO, "");
     EXT_STR_h101_BMON_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_BMON, 0);
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup structure information.";
-
+        R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("BeamMonitorMapped", "Land", fArray, kTRUE);
-    fArray->Clear();
+    FairRootManager::Instance()->Register("BeamMonitorMapped", "BeamMonitorMapped data", fArray, !fOnline);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
@@ -78,7 +70,6 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BBeamMonitorReader::Read()
 {
-
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;
 
@@ -88,8 +79,6 @@ Bool_t R3BBeamMonitorReader::Read()
 
     return kTRUE;
 }
-
-void R3BBeamMonitorReader::FinishTask() {}
 
 void R3BBeamMonitorReader::Reset()
 {
