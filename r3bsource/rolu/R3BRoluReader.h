@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BROLUREADER_H
-#define R3BROLUREADER_H
+#define R3BROLUREADER_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -21,13 +21,14 @@ class TClonesArray;
 
 struct EXT_STR_h101_ROLU_t;
 typedef struct EXT_STR_h101_ROLU_t EXT_STR_h101_ROLU;
+typedef struct EXT_STR_h101_ROLU_onion_t EXT_STR_h101_ROLU_onion;
 class ext_data_struct_info;
 
 class R3BRoluReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BRoluReader(EXT_STR_h101_ROLU*, size_t);
+    R3BRoluReader(EXT_STR_h101_ROLU_onion*, size_t);
 
     // Destructor
     virtual ~R3BRoluReader();
@@ -44,9 +45,14 @@ class R3BRoluReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Accessor to select the number of detectors
+    void SetNbDet(UInt_t nb) { fNbDet = nb; }
+
   private:
     // Reader specific data structure from ucesb
-    EXT_STR_h101_ROLU* fData;
+    EXT_STR_h101_ROLU_onion* fData;
+    // Number of detectors
+    UInt_t fNbDet;
     // Data offset
     size_t fOffset;
     // Output array
@@ -56,7 +62,6 @@ class R3BRoluReader : public R3BReader
     Bool_t fOnline;
 
     Int_t fNEvents = 0;
-    R3BEventHeader* header;
 
   public:
     ClassDefOverride(R3BRoluReader, 0);

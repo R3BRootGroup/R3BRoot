@@ -67,7 +67,8 @@ R3BRoluCal2Hit::R3BRoluCal2Hit(const char* name, Int_t iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BRoluHitData"))
-    , fNofDetectors(2)
+    , fNofDetectors(1)
+    , fNofChannels(1)
     , fnEvents(0)
     , fOnline(kFALSE)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -118,7 +119,7 @@ InitStatus R3BRoluCal2Hit::Init()
         LOG(WARNING) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
 
     // request storage of Hit data in output tree
-    mgr->Register("RoluHit", "RoluHit", fHitItems, !fOnline);
+    mgr->Register("RoluHit", "RoluHitData", fHitItems, !fOnline);
     maxevent = mgr->CheckMaxEventNo();
 
     return kSUCCESS;
@@ -258,4 +259,5 @@ void R3BRoluCal2Hit::FinishTask()
     }
 }
 
+ClassImp(R3BRoluCal2Hit);
 ClassImp(R3BRoluCal2Hit);
