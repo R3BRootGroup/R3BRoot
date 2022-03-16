@@ -156,6 +156,11 @@ class R3BCalifaOnlineSpectra : public FairTask
      * Method for setting histogram sequence (Febex or Preamp. channels)
      */
     void Febex2Preamp_CALIFA_Histo();
+    
+    /**
+     * Method for setting the trigger
+     */
+     void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
   private:
     void SetParameter();
@@ -173,6 +178,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     // Check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
     Int_t fNEvents;         /**< Event counter. */
+    Int_t fTrigger;
 
     Int_t fNbCalifaCrystals;              /**< Number of Crystals in Califa. */
     Int_t fNumSides;                      /**< Number of Sides, left and right.   */
