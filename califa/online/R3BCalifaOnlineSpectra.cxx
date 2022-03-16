@@ -876,8 +876,8 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     if (fMappedItemsCalifa)
     {
         fh1_Califa_Mult->Reset();
-        for (Int_t s = 0; s < 3; s++)
-            fh1_Califa_sync[s]->Reset();
+       // for (Int_t s = 0; s < 3; s++)
+         //   fh1_Califa_sync[s]->Reset();
         fh2_Califa_cryId_energy->Reset();
         for (Int_t i = 0; i < fNumRings; i++)
         {
