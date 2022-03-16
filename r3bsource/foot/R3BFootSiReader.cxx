@@ -39,15 +39,13 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fNbDet(20)
-    //, fNbDet(sizeof(EXT_STR_h101_FOOT_onion) / sizeof(EXT_STR_h101_FOOT_onion.FOOT[0])) // Auto-gets # FEET from struct!
+    //, fNbDet(sizeof(EXT_STR_h101_FOOT_onion) / sizeof(EXT_STR_h101_FOOT_onion.FOOT[0])) // Auto-gets # FEET from
+    //struct!
     , fArray(new TClonesArray("R3BFootMappedData"))
 {
 }
 
-R3BFootSiReader::~R3BFootSiReader()
-{
-	delete fArray;
-}
+R3BFootSiReader::~R3BFootSiReader() { delete fArray; }
 
 Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 {
@@ -83,9 +81,9 @@ Bool_t R3BFootSiReader::Read()
                 new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->FOOT[d].E[strip]);
             }
         }
-	else if (fData->FOOT[d]._ == 0)
-	{
-	}
+        else if (fData->FOOT[d]._ == 0)
+        {
+        }
         else
         {
             if (fNEvent > 0)
