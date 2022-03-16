@@ -60,6 +60,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fWRItemsMaster(NULL)
     , fMap_Par(NULL)
     , fNEvents(0)
+    , fTrigger(-1)
     , fNbCalifaCrystals(4864)
     , fNumSides(Nb_Sides)
     , fNumRings(Nb_Rings)
@@ -532,8 +533,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // CANVAS Multiplicity
     cCalifaMult = new TCanvas("Califa_Multiplicity", "Califa_Multiplicity", 10, 10, 500, 500);
-    fh1_Califa_Mult = new TH1F("fh1_Califa_Mult", "Califa multiplicity (crystal:blue, cluster:red)", 141, -0.5, 140.5);
-    fh1_Califa_MultHit = new TH1F("fh1_Califa_MultHit", "Califa multiplicity", 141, -0.5, 140.5);
+    fh1_Califa_Mult = new TH1F("fh1_Califa_Mult", "Califa multiplicity (crystal:blue, cluster:red)", 341, -0.5, 340.5);
+    fh1_Califa_MultHit = new TH1F("fh1_Califa_MultHit", "Califa multiplicity", 341, -0.5, 340.5);
     fh1_Califa_Mult->GetXaxis()->SetTitle("Multiplicity");
     fh1_Califa_Mult->GetXaxis()->CenterTitle(true);
     fh1_Califa_Mult->GetYaxis()->CenterTitle(true);
@@ -1240,6 +1241,9 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 
 void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 {
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
+
     int64_t wr[2];
     int64_t wrm = 0.0;
     for (int i = 0; i < 2; i++)
