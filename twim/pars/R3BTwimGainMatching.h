@@ -25,7 +25,7 @@
 class TClonesArray;
 class R3BTwimCalPar;
 class TCanvas;
-class TH2F;
+class TGraph;
 
 class R3BTwimGainMatching : public FairTask
 {
@@ -51,12 +51,16 @@ class R3BTwimGainMatching : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Method to set up the limits for fit **/
+    // Method to set up the limits for fit
     void SetFitLimits(Int_t left, Int_t right)
     {
         fLimit_left = left;
         fLimit_right = right;
     }
+
+    // Method to set up the reference anode
+    // a is given in 1-base
+    void SetRefAnode(Int_t a) { fRefAnode = a - 1; }
 
   private:
     Int_t fNumSec;
@@ -64,10 +68,11 @@ class R3BTwimGainMatching : public FairTask
     Int_t fMinStadistics;
     Int_t fNumParams;
     Int_t fNumAnodesRef;
+    Int_t fRefAnode;
     Int_t fLimit_left;
     Int_t fLimit_right;
     TArrayF* CalParams;
-    TH2F** Anode8_vs_anodes;
+    TGraph** Anode8_vs_anodes;
     TCanvas** canvas;
 
     R3BTwimCalPar* fCal_Par;         /**< Parameter container. >*/

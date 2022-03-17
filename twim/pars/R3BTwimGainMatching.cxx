@@ -20,7 +20,7 @@
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TF1.h"
-#include "TH2F.h"
+#include "TGraph.h"
 #include "TMath.h"
 
 // FAIR headers
@@ -47,8 +47,9 @@ R3BTwimGainMatching::R3BTwimGainMatching(const TString& name, Int_t iVerbose)
     , fNumAnodes(16)
     , fNumAnodesRef(1)
     , fMinStadistics(1000)
+    , fRefAnode(7)
     , fLimit_left(5000)
-    , fLimit_right(30000)
+    , fLimit_right(90000)
     , fNumParams(2)
     , fTwimMappedDataCA(NULL)
     , fCal_Par(NULL)
@@ -90,17 +91,18 @@ InitStatus R3BTwimGainMatching::Init()
         return kFATAL;
     }
 
-    Anode8_vs_anodes = new TH2F*[fNumSec * fNumAnodes];
+    Anode8_vs_anodes = new TGraph*[fNumSec * fNumAnodes];
     char Name1[255];
-    char Name2[255];
     for (Int_t s = 0; s < fNumSec; s++)
         for (Int_t i = 0; i < fNumAnodes; i++)
         {
-            sprintf(Name1, "Section_%i_anode_8_vs_anode_%i", s + 1, i + 1);
-            sprintf(Name2, "Anode_%i", i + 1);
-            Anode8_vs_anodes[s * fNumAnodes + i] = new TH2F(Name1, Name1, 1500, 0, 90000, 1500, 0, 90000);
-            Anode8_vs_anodes[s * fNumAnodes + i]->GetXaxis()->SetTitle(Name2);
-            Anode8_vs_anodes[s * fNumAnodes + i]->GetYaxis()->SetTitle("Anode_8");
+            sprintf(Name1, "Section_%i_anode_%i_vs_anode_%i", s + 1, fRefAnode + 1, i + 1);
+            Anode8_vs_anodes[s * fNumAnodes + i] = new TGraph(1);
+            Anode8_vs_anodes[s * fNumAnodes + i]->SetName(Name1);
+            Anode8_vs_anodes[s * fNumAnodes + i]->SetMarkerColor(4);
+            Anode8_vs_anodes[s * fNumAnodes + i]->SetMarkerStyle(20);
+            Anode8_vs_anodes[s * fNumAnodes + i]->SetMarkerSize(1.2);
+            Anode8_vs_anodes[s * fNumAnodes + i]->SetLineWidth(0.);
         }
 
     return kSUCCESS;
@@ -118,6 +120,7 @@ void R3BTwimGainMatching::Exec(Option_t* option)
     Int_t secId = 0;
     Int_t anodeId = 0;
     Double_t energyperanode[fNumSec][fNumAnodes];
+    Int_t multanode[fNumSec][fNumAnodes];
 
     if (nHits > 0)
     {
@@ -127,6 +130,7 @@ void R3BTwimGainMatching::Exec(Option_t* option)
             for (Int_t i = 0; i < fNumAnodes; i++)
             {
                 energyperanode[s][i] = 0.;
+                multanode[s][i] = 0;
             }
         }
         // std::cout << "nHits = " << nHits << "\n";
@@ -135,17 +139,24 @@ void R3BTwimGainMatching::Exec(Option_t* option)
             mappedData[i] = (R3BTwimMappedData*)(fTwimMappedDataCA->At(i));
             secId = mappedData[i]->GetSecID() - 1;
             anodeId = mappedData[i]->GetAnodeID() - 1;
-            if (energyperanode[secId][anodeId] == 0) // multi=1
+            if (multanode[secId][anodeId] == 0 && mappedData[i]->GetPileupStatus() == 0 &&
+                anodeId < fNumAnodes) // multi=1
             {
                 energyperanode[secId][anodeId] = mappedData[i]->GetEnergy();
+                multanode[secId][anodeId]++;
             }
         }
 
         for (Int_t s = 0; s < fNumSec; s++)
             for (Int_t i = 0; i < fNumAnodes; i++)
-            {
-                Anode8_vs_anodes[s * fNumAnodes + i]->Fill(energyperanode[s][i], energyperanode[s][7]);
-            }
+                if (energyperanode[s][i] > 0. && energyperanode[s][fRefAnode] > 0. &&
+                    abs(energyperanode[s][i] - energyperanode[s][fRefAnode]) < 6000. &&
+                    energyperanode[s][i] < fLimit_right && energyperanode[s][fRefAnode] < fLimit_right)
+                {
+                    Anode8_vs_anodes[s * fNumAnodes + i]->SetPoint(Anode8_vs_anodes[s * fNumAnodes + i]->GetN(),
+                                                                   energyperanode[s][i],
+                                                                   energyperanode[s][fRefAnode]);
+                }
     }
 
     if (mappedData)
@@ -168,19 +179,20 @@ void R3BTwimGainMatching::FinishTask()
     for (Int_t s = 0; s < fNumSec; s++)
     {
         for (Int_t i = 0; i < fNumAnodes; i++)
-        {
-            sprintf(Name3, "FIT_Section_%i_anode_8_vs_anode_%i", s + 1, i + 1);
-            anodes_fit[s][i] = new TF1(Name3, "pol1", fLimit_left, fLimit_right);
-            sprintf(Name4, "Anode8_vs_anodes_%i_%i", s + 1, i + 1);
-            canvas[s * fNumAnodes + i] = new TCanvas(Name4, Name4, 0, 400, 0, 400);
-            canvas[s * fNumAnodes + i]->cd();
-            Anode8_vs_anodes[s * fNumAnodes + i]->Fit(anodes_fit[s][i], "R");
-            Double_t par1 = anodes_fit[s][i]->GetParameter(0);
-            Double_t par2 = anodes_fit[s][i]->GetParameter(1);
-            fCal_Par->SetAnodeCalParams(par1, s + 1, i + 1, 1);
-            fCal_Par->SetAnodeCalParams(par2, s + 1, i + 1, 2);
-            Anode8_vs_anodes[s * fNumAnodes + i]->Write();
-        }
+            if (Anode8_vs_anodes[s * fNumAnodes + i]->GetN() > fMinStadistics)
+            {
+                sprintf(Name3, "FIT_Section_%i_anode_8_vs_anode_%i", s + 1, i + 1);
+                anodes_fit[s][i] = new TF1(Name3, "pol1", fLimit_left, fLimit_right);
+                sprintf(Name4, "Anode8_vs_anodes_%i_%i", s + 1, i + 1);
+                canvas[s * fNumAnodes + i] = new TCanvas(Name4, Name4, 0, 400, 0, 400);
+                canvas[s * fNumAnodes + i]->cd();
+                Anode8_vs_anodes[s * fNumAnodes + i]->Fit(anodes_fit[s][i], "R");
+                Double_t par1 = anodes_fit[s][i]->GetParameter(0);
+                Double_t par2 = anodes_fit[s][i]->GetParameter(1);
+                fCal_Par->SetAnodeCalParams(par1, s + 1, i + 1, 1);
+                fCal_Par->SetAnodeCalParams(par2, s + 1, i + 1, 2);
+                Anode8_vs_anodes[s * fNumAnodes + i]->Write();
+            }
     }
     fCal_Par->setChanged();
 }
