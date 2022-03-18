@@ -12,13 +12,14 @@
  ******************************************************************************/
 
 #ifndef R3BWhiterabbitMasterReader_H
-#define R3BWhiterabbitMasterReader_H
+#define R3BWhiterabbitMasterReader_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
 
 struct EXT_STR_h101_WRMASTER_t;
 typedef struct EXT_STR_h101_WRMASTER_t EXT_STR_h101_WRMASTER;
+class ext_data_struct_info;
 
 class TClonesArray;
 class R3BEventHeader;

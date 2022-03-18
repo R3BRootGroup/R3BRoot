@@ -152,17 +152,12 @@ class R3BCalifavsFootOnlineSpectra : public FairTask
     Int_t fMaxBinChannelFebex; /**< Maximum bin for Febex histograms. */
     Float_t fMinProtonE;       /**< Min proton energy (in keV) to calculate the opening angle */
 
-    TString fCalifaFile;    /**< Config file name. */
     Int_t fMaxEnergyBarrel; /**< Max. energy for Barrel histograms at CAL level. */
     Int_t fMaxEnergyIphos;  /**< Max. energy for Iphos histograms at CAL level. */
-    Bool_t fLogScale;       /**< Selecting scale. */
     Bool_t fRaw2Cal;        /**< Mapped or Cal selector. */
-    Bool_t fFebex2Preamp;   /**< Febex or Preamp selector. */
-    Bool_t fTotHist;        /**< Tot histograms selector. */
-    Int_t fFebexInfo[Nb_Sides][Nb_Rings][Nb_Preamps]
-                    [4]; /**< Febex slot and module info: 0 slot and 1 module, (PR) 2 slot and 3 module. */
 
-    TH2F* fh2_Califa_theta_phi;
+    TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with foot
+    TCanvas* cCalifa_angles;
 
   public:
     ClassDef(R3BCalifavsFootOnlineSpectra, 1)

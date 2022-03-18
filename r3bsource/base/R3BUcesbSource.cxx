@@ -102,6 +102,7 @@ Bool_t R3BUcesbSource::Init()
     R3BLOG(INFO, "Register of R3BEventHeader");
     fEventHeader = new R3BEventHeader();
     frm->Register("EventHeader.", "R3BEvtHeader", fEventHeader, kTRUE);
+    R3BLOG(INFO, "EventHeader. has been created");
 
     // Open configuration file with runid values if needed in this step
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
@@ -126,7 +127,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     {
         if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
         {
-            R3BLOG(fatal, "ucesb error: " << fClient.last_error());
+            R3BLOG(fatal, "UCESB error: " << fClient.last_error());
             return kFALSE;
         }
     }
@@ -141,9 +142,9 @@ Bool_t R3BUcesbSource::InitUnpackers()
 #endif
     if (status != 0)
     {
-        perror("ext_data_clnt::setup()");
+        // perror("ext_data_clnt::setup()");
         R3BLOG(ERROR, "ext_data_clnt::setup() failed");
-        R3BLOG(fatal, "ucesb error: " << fClient.last_error());
+        R3BLOG(fatal, "UCESB error: " << fClient.last_error());
         return kFALSE;
     }
 #ifdef EXT_DATA_ITEM_MAP_MATCH
@@ -156,7 +157,6 @@ Bool_t R3BUcesbSource::InitUnpackers()
     uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
     if (struct_map_success & ~(map_ok))
     {
-        //perror("ext_data_clnt::setup()");
         R3BLOG(WARNING, "ext_data_clnt::setup() failed");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
         return kFALSE;
@@ -249,7 +249,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     {
         perror("ext_data_clnt::fetch_event()");
         R3BLOG(error, "ext_data_clnt::fetch_event() failed");
-        R3BLOG(fatal, "ucesb error: " << fClient.last_error());
+        R3BLOG(fatal, "UCESB error: " << fClient.last_error());
         return 0;
     }
 
@@ -310,7 +310,7 @@ void R3BUcesbSource::Close()
     ret = fClient.close();
     if (0 != ret)
     {
-        perror("ext_data_clnt::close()");
+        // perror("ext_data_clnt::close()");
         R3BLOG(fatal, "ext_data_clnt::close() failed");
     }
 
@@ -321,7 +321,7 @@ void R3BUcesbSource::Close()
         status = pclose(fFd);
         if (-1 == status)
         {
-            perror("pclose()");
+            // perror("pclose()");
             R3BLOG(fatal, "pclose() failed");
             abort();
         }
