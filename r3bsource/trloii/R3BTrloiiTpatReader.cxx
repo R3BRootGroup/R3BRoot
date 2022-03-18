@@ -16,6 +16,7 @@
 
 #include "R3BEventHeader.h"
 #include "R3BTrloiiTpatReader.h"
+#include "R3BLogger.h"
 
 extern "C"
 {
@@ -34,20 +35,19 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
 
 R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
 {
-    if (fEventHeader)
+    if (fEventHeader){
         delete fEventHeader;
+        }
 }
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTrloiiTpatReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_TPAT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TPAT, 0);
-
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(FATAL, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -55,19 +55,17 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BTrloiiTpatReader::Init() EventHeader. not found";
+        R3BLOG(FATAL, "EventHeader. not found");
+        return kFALSE;
     }
     else
-        LOG(INFO) << "R3BTrloiiTpatReader::Init() EventHeader. found";
+        R3BLOG(INFO, "EventHeader. found");
 
     return kTRUE;
 }
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
-
-    // LOG(info) << "TrloiiTpatReader::Read BEGIN";
-
     if (fEventHeader)
     {
         fEventHeader->SetTpat(0);
@@ -82,7 +80,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     if (0 == (fNEvent % 1000000))
     {
-        LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent;
+        R3BLOG(DEBUG1, "Event : " << fNEvent);
     }
 
     /* Display data */
