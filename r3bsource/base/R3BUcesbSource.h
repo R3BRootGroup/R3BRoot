@@ -27,7 +27,6 @@
 #include "TString.h"
 #include <Rtypes.h>
 
-#include "FairRunOnline.h"
 #include <fstream>
 #include <list>
 

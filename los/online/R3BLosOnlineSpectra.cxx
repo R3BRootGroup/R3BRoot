@@ -17,9 +17,9 @@
 // ------------------------------------------------------------
 
 #include "R3BLosOnlineSpectra.h"
+#include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-#include "R3BLogger.h"
 
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
@@ -70,11 +70,10 @@ R3BLosOnlineSpectra::~R3BLosOnlineSpectra()
 
 InitStatus R3BLosOnlineSpectra::Init()
 {
-
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BLosOnlineSpectra::Init ";
+    R3BLOG(INFO, "");
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -126,15 +125,11 @@ InitStatus R3BLosOnlineSpectra::Init()
 
     //------------------------------------------------------------------------
     // Los detector
-
     TCanvas* cLos[fNofLosDetectors];
-
     if (fMappedItems.at(DET_LOS))
     {
-
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
         {
-
             char detName[255];
             sprintf(detName, "LOS%d", iloscount + 1);
 
@@ -267,17 +262,15 @@ InitStatus R3BLosOnlineSpectra::Init()
         }
 
         run->AddObject(mainfol);
-        run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Reset/%s/->Reset_LOS_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_LOS_HIST", Form("/Reset/%s/->Reset_LOS_Histo()", GetName()));
     }
-
-    // -------------------------------------------------------------------------
 
     return kSUCCESS;
 }
 
 void R3BLosOnlineSpectra::Reset_LOS_Histo()
 {
-
+    R3BLOG(INFO, "");
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
@@ -302,20 +295,7 @@ void R3BLosOnlineSpectra::Reset_LOS_Histo()
 
 void R3BLosOnlineSpectra::Exec(Option_t* option)
 {
-    //  cout << "fNEvents " << fNEvents << endl;
-
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-    {
-        // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
-        return;
-    }
-
-    time = header->GetTimeStamp(); // / 1.6; // divided by 1.6 for stand alone daq with Vulom generating time stamps
-
-    // time = 0;
-
+    time = header->GetTimeStamp();
     if (time_start == 0 && time > 0)
     {
         time_start = time;
@@ -343,8 +323,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         tpatbin = (header->GetTpat() & (1 << i));
         if (tpatbin != 0)
         {
-            // if (i != 11)
-            //    cout << "Tpat = " << i + 1 << endl;
             fhTpat->Fill(i + 1);
         }
     }
@@ -360,8 +338,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         if ((tpatvalue == 0))
             return;
     }
-
-
 
     //----------------------------------------------------------------------
     // LOS detector
@@ -636,9 +612,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                 if (iLOSTypeTAMEX && iLOSTypeMCFD)
                     iLOSType[iDet - 1][iPart] = true;
 
-                // if(iDet < fNofLosDetectors+1)
-                // {
-
                 if (iLOSType[iDet - 1][iPart])
                 {
                     int nPMT = 0;
@@ -675,11 +648,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                             timeLosV[iDet - 1][iPart] += time_V[iDet - 1][iPart][ipm];
                             nPMV = nPMV + 1;
                         }
-
-                        /*  if (fNEvents < 5000000)
-                              myFile << setprecision(10) << iDet << " " << iPart << " " << ipm << " "
-                                     << time_V[iDet - 1][iPart][ipm] << " " << time_L[iDet - 1][iPart][ipm] << " "
-                                     << tot[iDet - 1][iPart][ipm] << endl;*/
                     }
 
                     totsum[iDet - 1][iPart] = totsum[iDet - 1][iPart] / nPMT;
@@ -689,8 +657,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                     timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] / nPMT;
 
                     timeLos[iDet - 1][iPart] = timeLosV[iDet - 1][iPart];
-
-                    // cout<<"LOS: "<<iDet<<", "<<iPart<<"; "<<timeLos[iDet-1][iPart]<<endl;
 
                     LosTresV[iDet - 1][iPart] = ((time_V[iDet - 1][iPart][0] + time_V[iDet - 1][iPart][2] +
                                                   time_V[iDet - 1][iPart][4] + time_V[iDet - 1][iPart][6]) -
@@ -751,21 +717,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                     yToT_cm[iDet - 1][iPart] =
                         (yToT_cm[iDet - 1][iPart] - flosOffsetYQ[iDet - 1]) * flosVeffYQ[iDet - 1];
 
-                    // time difference between two hits
-                    /*
-                      if (time0[iDet - 1] < 0)
-                          time0[iDet - 1] = timeLosV[iDet - 1][iPart];
-                      time1[iDet - 1] = timeLosV[iDet - 1][iPart];
-                      time_abs[iDet - 1] = time1[iDet - 1] - time0[iDet - 1]; // + (double)(time - time_prev[iDet - 1]);
-                      if (time_abs[iDet - 1] > 0 && time_abs[iDet - 1] < 5.E8)
-                      {
-                          fh_los_dt_hits_ToT[iDet - 1]->Fill(time_abs[iDet - 1] / 1000., totsum[iDet - 1][iPart]);
-                      }
-
-                      time_prev[iDet - 1] = time;
-                      time0[iDet - 1] = time1[iDet - 1];
-                    */
-
                     if (timeLosV[iDet - 1][iPart] > 0. && timeLosV[iDet - 1][iPart] < 8192. * 5. &&
                         !(IS_NAN(timeLosV[iDet - 1][iPart])))
                     {
@@ -802,14 +753,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                         fh_los_multihit[iDet - 1]->Fill(iPart + 1);
                     }
                 } // if iLosType
-
-                // }
-                // else
-                // {
-                // cout<<"Wrong detector ID for LOS!"<<endl;
-                // }
-            } // for iPart
-        }     // for iDet
+            }     // for iPart
+        }         // for iDet
 
     } // if fCallItems
 
@@ -834,7 +779,6 @@ void R3BLosOnlineSpectra::FinishEvent()
 
 void R3BLosOnlineSpectra::FinishTask()
 {
-
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
@@ -854,7 +798,7 @@ void R3BLosOnlineSpectra::FinishTask()
     fhTpat->Write();
     fhTrigger->Write();
 
-    cout << "FinishTask: All events: " << fNEvents << ", LOS events: " << nLosEvents << endl;
+    R3BLOG(INFO, "All events: " << fNEvents << ", LOS events: " << nLosEvents);
 }
 
-ClassImp(R3BLosOnlineSpectra)
+ClassImp(R3BLosOnlineSpectra);

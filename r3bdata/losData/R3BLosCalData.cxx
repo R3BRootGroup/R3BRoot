@@ -59,7 +59,6 @@ namespace
 
 R3BLosCalData::R3BLosCalData()
     : fDetector(-1)
-
 {
     Reset();
 }

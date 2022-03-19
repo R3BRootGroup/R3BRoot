@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTRLOIITPATREADER_H
-#define R3BTRLOIITPATREADER_H
+#define R3BTRLOIITPATREADER_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -41,9 +41,19 @@ class R3BTrloiiTpatReader : public R3BReader
     // Reset
     virtual void Reset() override;
 
+    // Set trigger selector
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+
+    // Set tpat selector
+    void SetTpat(Int_t tpat) { fTpat = tpat; }
+
   private:
     // An event counter
     UInt_t fNEvent;
+    // Trigger selector
+    Int_t fTrigger;
+    // TPat selector
+    Int_t fTpat;
     // Reader specific data structure from ucesb
     EXT_STR_h101_TPAT* fData;
     // Offset of detector specific data in full data structure

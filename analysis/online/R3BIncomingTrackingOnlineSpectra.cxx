@@ -312,10 +312,10 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
                 if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc1x > -150.)
                 {
                     zrand = gRandom->Uniform(0., fDist_acelerator_glad);
-                    // fh2_tracking_planeYZ->Fill(zrand, mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * zrand); // mm
-                    // ytarget = mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * fPosTarget;
-                    // fh2_tracking_planeXZ->Fill(zrand, mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * zrand); // mm
-                    // xtarget = mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * fPosTarget;
+                    // fh2_tracking_planeYZ->Fill(zrand, mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * zrand); //
+                    // mm ytarget = mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * fPosTarget;
+                    // fh2_tracking_planeXZ->Fill(zrand, mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * zrand); //
+                    // mm xtarget = mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * fPosTarget;
                     fh2_tracking_planeYZ->Fill(zrand, mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * zrand); // mm
                     ytarget = mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * fPosTarget;
                     fh2_tracking_planeXZ->Fill(zrand, mwpc1x - angX * fMw1GeoPar->GetPosZ() * 10. + angX * zrand); // mm
