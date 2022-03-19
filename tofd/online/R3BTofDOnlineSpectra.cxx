@@ -1191,8 +1191,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
 void R3BTofDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "Reset_Histo");
-
+    R3BLOG(INFO, "");
     for (int i = 0; i < N_PLANE_MAX_TOFD_S494; i++)
     {
         fh_tofd_channels[i]->Reset();

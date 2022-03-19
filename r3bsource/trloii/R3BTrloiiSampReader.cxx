@@ -43,7 +43,7 @@ Bool_t R3BTrloiiSampReader::Init(ext_data_struct_info* a_struct_info)
         LOG(ERROR) << "Failed to setup structure information.";
         return kFALSE;
     }
-    
+
     FairRootManager* frm = FairRootManager::Instance();
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)

@@ -332,7 +332,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     Bool_t debug = false;
 
-
     if (header)
     {
         time = header->GetTimeStamp();

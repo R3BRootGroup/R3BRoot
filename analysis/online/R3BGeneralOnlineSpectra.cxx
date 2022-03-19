@@ -28,6 +28,7 @@
 #include "R3BMusicOnlineSpectra.h"
 #include "R3BMwpcCorrelationOnlineSpectra.h"
 #include "R3BMwpcOnlineSpectra.h"
+#include "R3BTofDOnlineSpectra.h"
 #include "R3BTwimOnlineSpectra.h"
 #include "R3BTwimvsFootOnlineSpectra.h"
 #include "R3BWRData.h"
@@ -51,7 +52,7 @@
 #include "TVector3.h"
 
 R3BGeneralOnlineSpectra::R3BGeneralOnlineSpectra()
-    : R3BGeneralOnlineSpectra("R3BGeneralOnlineSpectra", 1)
+    : R3BGeneralOnlineSpectra("GeneralOnlineSpectra", 1)
 {
 }
 
@@ -70,6 +71,7 @@ R3BGeneralOnlineSpectra::R3BGeneralOnlineSpectra(const TString& name, Int_t iVer
     , fLosOnline(NULL)
     , fFootOnline(NULL)
     , fCalifaOnline(NULL)
+    , fTofdOnlineSpectra(NULL)
     , fIncomingTrackingOnline(NULL)
     , fTwimvsFootOnlineSpectra(NULL)
     , fWRItemsMaster(NULL)
@@ -106,6 +108,7 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    R3BLOG_IF(WARNING, NULL == fEventHeader, "EventHeader. not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     R3BLOG_IF(FATAL, NULL == run, "FairRunOnline not found");
@@ -187,6 +190,10 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     fCalifaOnline = (R3BCalifaOnlineSpectra*)FairRunOnline::Instance()->GetTask("CALIFAOnlineSpectra");
     R3BLOG_IF(WARNING, !fCalifaOnline, "CALIFAOnlineSpectra not found");
 
+    // Looking for TOFD online
+    fTofdOnlineSpectra = (R3BTofDOnlineSpectra*)FairRunOnline::Instance()->GetTask("TofdOnlineSpectra");
+    R3BLOG_IF(WARNING, !fTofdOnlineSpectra, "TofdOnlineSpectra not found");
+
     // Looking for Incoming Tracking online
     fIncomingTrackingOnline =
         (R3BIncomingTrackingOnlineSpectra*)FairRunOnline::Instance()->GetTask("IncomingTrackingOnlineSpectra");
@@ -203,9 +210,23 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     char Name3[255];
 
     // Triggers
-    cTrigger = new TCanvas("Triggers", "Trigger information", 10, 10, 800, 700);
-    fh1_trigger = new TH1F("fh1_trigger", "Trigger information: Tpat", 17, -0.5, 16.5);
-    fh1_trigger->GetXaxis()->SetTitle("Trigger number (tpat)");
+    // cTrigger = new TCanvas("Triggers", "Trigger information", 10, 10, 800, 700);
+    fh1_tpat = new TH1F("fh1_tpat", "TPat information", 17, -0.5, 16.5);
+    fh1_tpat->GetXaxis()->SetTitle("Trigger number (TPat)");
+    fh1_tpat->GetYaxis()->SetTitle("Counts");
+    fh1_tpat->GetXaxis()->CenterTitle(true);
+    fh1_tpat->GetYaxis()->CenterTitle(true);
+    fh1_tpat->GetXaxis()->SetLabelSize(0.04);
+    fh1_tpat->GetXaxis()->SetTitleSize(0.04);
+    fh1_tpat->GetYaxis()->SetTitleOffset(1.1);
+    fh1_tpat->GetXaxis()->SetTitleOffset(1.1);
+    fh1_tpat->GetYaxis()->SetLabelSize(0.04);
+    fh1_tpat->GetYaxis()->SetTitleSize(0.04);
+    fh1_tpat->SetFillColor(kBlue + 2);
+    fh1_tpat->Draw("");
+
+    fh1_trigger = new TH1F("fh1_trigger", "Trigger information", 17, -0.5, 16.5);
+    fh1_trigger->GetXaxis()->SetTitle("Trigger number");
     fh1_trigger->GetYaxis()->SetTitle("Counts");
     fh1_trigger->GetXaxis()->CenterTitle(true);
     fh1_trigger->GetYaxis()->CenterTitle(true);
@@ -319,7 +340,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 
     // MAIN FOLDER-R3B
     TFolder* mainfol = new TFolder("R3B_General", "R3B WhiteRabbit and trigger info");
-    mainfol->Add(cTrigger);
+    mainfol->Add(fh1_trigger);
+    mainfol->Add(fh1_tpat);
     if (fWRItemsMaster && fWRItemsSofia)
         mainfol->Add(cWr);
     if (fWRItemsSofia && fWRItemsCalifa)
@@ -334,7 +356,7 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 
 void R3BGeneralOnlineSpectra::Reset_GENERAL_Histo()
 {
-    R3BLOG(INFO, "Reset_General_Histo");
+    R3BLOG(INFO, "");
     fh1_trigger->Reset();
     if (fWRItemsMaster && fWRItemsSofia)
     {
@@ -394,6 +416,9 @@ void R3BGeneralOnlineSpectra::Reset_GENERAL_Histo()
     // Reset Twim vs Foot histograms if they exist somewhere
     if (fTwimvsFootOnlineSpectra)
         fTwimvsFootOnlineSpectra->Reset_Histo();
+    // Reset TofD histograms if they exist somewhere
+    if (fTofdOnlineSpectra)
+        fTofdOnlineSpectra->Reset_Histo();
 }
 
 void R3BGeneralOnlineSpectra::Exec(Option_t* option)
@@ -406,18 +431,19 @@ void R3BGeneralOnlineSpectra::Exec(Option_t* option)
         {
             tpatbin = (fEventHeader->GetTpat() & (1 << i));
             if (tpatbin != 0)
-                fh1_trigger->Fill(i + 1);
+                fh1_tpat->Fill(i + 1);
         }
     }
     else if (fEventHeader->GetTpat() == 0)
     {
-        fh1_trigger->Fill(0);
+        fh1_tpat->Fill(0);
     }
     else
     {
         LOG(INFO) << fNEvents << " " << fEventHeader->GetTpat();
     }
-    // fh1_trigger->Fill(fEventHeader->GetTpat());
+    if (fEventHeader)
+        fh1_trigger->Fill(fEventHeader->GetTrigger());
 
     // WR data
     if (fWRItemsSofia && fWRItemsSofia->GetEntriesFast() > 0)
@@ -537,7 +563,8 @@ void R3BGeneralOnlineSpectra::FinishEvent()
 void R3BGeneralOnlineSpectra::FinishTask()
 {
     // Write trigger canvas in the root file
-    cTrigger->Write();
+    fh1_trigger->Write();
+    fh1_tpat->Write();
     if (fWRItemsMaster && fWRItemsSofia)
     {
         cWr->Write();

@@ -49,6 +49,7 @@ class R3BFootOnlineSpectra;
 class R3BCalifaOnlineSpectra;
 class R3BIncomingTrackingOnlineSpectra;
 class R3BTwimvsFootOnlineSpectra;
+class R3BTofDOnlineSpectra;
 
 class R3BGeneralOnlineSpectra : public FairTask
 {
@@ -133,12 +134,13 @@ class R3BGeneralOnlineSpectra : public FairTask
     R3BLosOnlineSpectra* fLosOnline;
     R3BIncomingTrackingOnlineSpectra* fIncomingTrackingOnline;
     R3BTwimvsFootOnlineSpectra* fTwimvsFootOnlineSpectra;
+    R3BTofDOnlineSpectra* fTofdOnlineSpectra;
 
     // Canvas
     TCanvas *cTrigger, *cWr, *cWrs;
 
     // Unpack
-    TH1F *fh1_trigger, *fh1_wr[2];
+    TH1F *fh1_trigger, *fh1_tpat, *fh1_wr[2];
     TH1F* fh1_wrs[5];
 
   public:

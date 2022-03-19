@@ -92,8 +92,6 @@ Bool_t R3BUnpackReader::Read()
     fHeader->SetTrigger(fData->TRIGGER);
     fHeader->SetEventno(fNEvent);
 
-    //    if(fData->TRIGGER != 1) cout<<"R3BUnpack: "<<fData->TRIGGER<<endl;
-
     return kTRUE;
 }
 

@@ -17,6 +17,8 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "FairRunOnline.h"
+
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BUcesbSource.h"

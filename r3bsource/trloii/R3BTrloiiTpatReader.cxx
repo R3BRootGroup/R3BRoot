@@ -13,10 +13,11 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "FairRunOnline.h"
 
 #include "R3BEventHeader.h"
-#include "R3BTrloiiTpatReader.h"
 #include "R3BLogger.h"
+#include "R3BTrloiiTpatReader.h"
 
 extern "C"
 {
@@ -29,15 +30,18 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
+    , fTrigger(-1)
+    , fTpat(-1)
     , fEventHeader(nullptr)
 {
 }
 
 R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
 {
-    if (fEventHeader){
+    if (fEventHeader)
+    {
         delete fEventHeader;
-        }
+    }
 }
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
@@ -83,12 +87,41 @@ Bool_t R3BTrloiiTpatReader::Read()
         R3BLOG(DEBUG1, "Event : " << fNEvent);
     }
 
-    /* Display data */
-    // char str[256];
-    // sprintf(str, "  Trlo II Tpat = 0x%04x.", fData->TPATv[0]);
-    // LOG(info) << str;
+    if (fTrigger > 0 && fEventHeader && fTpat < 0)
+    {
+        if (fEventHeader->GetTrigger() == fTrigger)
+        {
+            FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+        else
+        {
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
 
-    // LOG(info) << "TrloiiTpatReader::Read END";
+    if (fTpat >= 0 && fEventHeader && fTrigger <= 0)
+    {
+        if ((fEventHeader->GetTpat() & fTpat) == fTpat)
+        {
+            FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+        else
+        {
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
+
+    if (fTpat >= 0 && fEventHeader && fTrigger > 0)
+    {
+        if ((fEventHeader->GetTpat() & fTpat) == fTpat && fEventHeader->GetTrigger() == fTrigger)
+        {
+            FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+        else
+        {
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
 
     return kTRUE;
 }
