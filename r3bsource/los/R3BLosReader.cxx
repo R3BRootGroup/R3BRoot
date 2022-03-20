@@ -45,6 +45,7 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
+    , fSkiptriggertimes(kFALSE)
     , fArray(new TClonesArray("R3BLosMappedData"))
     , fArrayTrigger(new TClonesArray("R3BLosMappedData"))
 {
@@ -88,7 +89,11 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     mgr->Register("LosMapped", "Los Mapped", fArray, !fOnline);
-    mgr->Register("LosTriggerMapped", "Los Trigger Mapped", fArrayTrigger, !fOnline);
+    if (!fSkiptriggertimes)
+    {
+        mgr->Register("LosTriggerMapped", "Los Trigger Mapped", fArrayTrigger, !fOnline);
+        fArrayTrigger = NULL;
+    }
     Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
@@ -373,20 +378,23 @@ Bool_t R3BLosReader::Read()
             // cout<<"nsumt & data->LOS[d].TTFT "<<d+1<<"; "<<nsumt<<"; "<< data->LOS[d].TTFT<<endl;
         }
 
-        // Trigger VFTX2 Mapping.
-        uint32_t trigChannels = data->LOS[d].VTRIGF;
-        for (uint32_t i = 0; i < trigChannels; i++)
+        if (fArrayTrigger)
         {
-            uint32_t channelf = data->LOS[d].VTRIGFI[i]; // = 1..8
-            uint32_t channelc = data->LOS[d].VTRIGCI[i]; // = 1..8
-            if (channelf == channelc)
-                new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
-                    R3BLosMappedData(d + 1,                   // detector number
-                                     channelf,                // channel number: 1-8
-                                     0,                       // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
-                                     data->LOS[d].VTRIGFv[i], // VFTX fine time
-                                     data->LOS[d].VTRIGCv[i]  // VFTX coarse time
-                    );
+            // Trigger VFTX2 Mapping.
+            uint32_t trigChannels = data->LOS[d].VTRIGF;
+            for (uint32_t i = 0; i < trigChannels; i++)
+            {
+                uint32_t channelf = data->LOS[d].VTRIGFI[i]; // = 1..8
+                uint32_t channelc = data->LOS[d].VTRIGCI[i]; // = 1..8
+                if (channelf == channelc)
+                    new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                        R3BLosMappedData(d + 1,                   // detector number
+                                         channelf,                // channel number: 1-8
+                                         0,                       // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
+                                         data->LOS[d].VTRIGFv[i], // VFTX fine time
+                                         data->LOS[d].VTRIGCv[i]  // VFTX coarse time
+                        );
+            }
         }
     }
     fNEvents += 1;
@@ -398,7 +406,8 @@ void R3BLosReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    fArrayTrigger->Clear();
+    if (fArrayTrigger)
+        fArrayTrigger->Clear();
 }
 
 ClassImp(R3BLosReader);

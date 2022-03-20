@@ -44,6 +44,9 @@ class R3BLosReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Accessor to skip trigger times
+    void SetSkipTriggerTimes(Bool_t skip) { fSkiptriggertimes = skip; }
+
   private:
     // An event counter
     unsigned int fNEvents;
@@ -56,6 +59,8 @@ class R3BLosReader : public R3BReader
     TClonesArray* fArrayTrigger;
     // Don't store data for online
     Bool_t fOnline;
+    // Skip trigger times
+    Bool_t fSkiptriggertimes;
     // EventHeader
     R3BEventHeader* header;
 
