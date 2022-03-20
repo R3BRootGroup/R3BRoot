@@ -19,10 +19,10 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
+#pragma link C++ class R3BTofDContFact+;
 #pragma link C++ class R3BTofD+;
 #pragma link C++ class R3BTofDDigitizer+;
 #pragma link C++ class R3BTofDDigitizerCal+;
-#pragma link C++ class R3BTofDContFact+;
 #pragma link C++ class R3BTofDHitPar+;
 #pragma link C++ class R3BTofDHitModulePar+;
 #pragma link C++ class R3BTofDMappingPar+;

@@ -142,8 +142,6 @@ class R3BTofDCal2Hit : public FairTask
   private:
     void SetParameter();
 
-    // unsigned g_tofd_trig_map[4][2][48];
-
     Bool_t fOnline;
     TClonesArray* fCalItems;        /**< Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */

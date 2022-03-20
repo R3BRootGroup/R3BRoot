@@ -23,6 +23,7 @@
 #include "R3BTofDContFact.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
+#include "TClass.h"
 
 #include <string.h>
 
@@ -43,15 +44,15 @@ void R3BTofDContFact::setAllContainers()
      *  the list of containers for the STS library.*/
 
     FairContainer* p1 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "TestDefaultContext");
-    p1->addContext("TestNonDefaultContext");
+    p1->addContext("TestDefaultContext");
     containers->Add(p1);
-    
-    FairContainer* p2 = new FairContainer("tofdMappingPar", "Tofd Mapping parameters", "TestDefaultContext");
-    p2->addContext("TestNonDefaultContext");
+
+    FairContainer* p2 = new FairContainer("tofdMappingPar", "Tofd Mapping parameters", "tofdMappingContext");
+    p2->addContext("tofdMappingContext");
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("TofdHitPar", "Tofd Hit parameters", "TestDefaultContext");
-    p3->addContext("TestNonDefaultContext");
+    FairContainer* p3 = new FairContainer("TofdHitPar", "Tofd Hit parameters", "tofdHitDefaultContext");
+    p3->addContext("tofdHitDefaultContext");
     containers->Add(p3);
 }
 
