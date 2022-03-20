@@ -59,7 +59,7 @@ class R3BTofDMappingPar : public FairParGenericSet
     // GetTrigMap in 1-base for plane(1-4), paddle(1-44) and pmt(1-2)
     const Int_t GetTrigMap(UInt_t plane, UInt_t paddle, UInt_t pmt)
     {
-        return fTrigmap[plane - 1][pmt - 1]->GetAt(paddle - 1);
+        return fTrigmap[pmt - 1][plane - 1]->GetAt(paddle - 1);
     }
 
     void SetNbPlanes(Int_t p) { fNumPlanes = p; }
@@ -67,7 +67,7 @@ class R3BTofDMappingPar : public FairParGenericSet
     // SetTrigMap in 1-base for plane(1-4), paddle(1-44) and pmt(1-2)
     void SetTrigMap(Int_t value, UInt_t plane, UInt_t paddle, UInt_t pmt)
     {
-        fTrigmap[plane - 1][pmt - 1]->AddAt(value, paddle - 1);
+        fTrigmap[pmt - 1][plane - 1]->AddAt(value, paddle - 1);
     }
 
   private:

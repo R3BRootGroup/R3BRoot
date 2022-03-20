@@ -16,8 +16,6 @@
 
 #include "FairContFact.h"
 
-#include "Rtypes.h"
-
 class FairContainer;
 
 class R3BTofDContFact : public FairContFact
@@ -37,7 +35,7 @@ class R3BTofDContFact : public FairContFact
     ~R3BTofDContFact() {}
 
     FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BTofDContFact, 1) // Factory for all TofD parameter containers
+    ClassDef(R3BTofDContFact, 0) // Factory for all TofD parameter containers
 };
 
 #endif /* !R3BTOFDCONTFACT_H */

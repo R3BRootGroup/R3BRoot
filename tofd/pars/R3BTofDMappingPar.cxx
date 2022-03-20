@@ -38,9 +38,9 @@ R3BTofDMappingPar::R3BTofDMappingPar(const TString& name, const TString& title, 
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
-            fTrigmap[plane][p] = new TArrayI(fNumPaddles);
+            fTrigmap[p][plane] = new TArrayI(fNumPaddles);
             for (Int_t paddle = 0; paddle < fNumPaddles; paddle++)
-                fTrigmap[plane][p]->AddAt(0, paddle);
+                fTrigmap[p][plane]->AddAt(0, paddle);
         }
 }
 
@@ -51,8 +51,8 @@ R3BTofDMappingPar::~R3BTofDMappingPar()
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
-            if (fTrigmap[plane][p])
-                delete fTrigmap[plane][p];
+            if (fTrigmap[p][plane])
+                delete fTrigmap[p][plane];
         }
 }
 
@@ -86,9 +86,9 @@ void R3BTofDMappingPar::putParams(FairParamList* list)
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
-            fTrigmap[plane][p]->Set(fNumPaddles);
+            fTrigmap[p][plane]->Set(fNumPaddles);
             sprintf(name, "tofdplane%dPmt%dPar", plane + 1, p + 1);
-            list->add(name, *fTrigmap[plane][p]);
+            list->add(name, *fTrigmap[p][plane]);
         }
 }
 
@@ -120,10 +120,10 @@ Bool_t R3BTofDMappingPar::getParams(FairParamList* list)
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
-            fTrigmap[plane][p]->Set(fNumPaddles);
+            fTrigmap[p][plane]->Set(fNumPaddles);
             sprintf(name, "tofdplane%dPmt%dPar", plane + 1, p + 1);
 
-            if (!(list->fill(name, fTrigmap[plane][p])))
+            if (!(list->fill(name, fTrigmap[p][plane])))
             {
                 R3BLOG(ERROR, "Could not initialize " << name);
                 return kFALSE;
@@ -147,7 +147,7 @@ void R3BTofDMappingPar::printParams()
             {
                 R3BLOG(INFO,
                        "Plane: " << plane + 1 << ", pmt: " << p + 1 << ", paddle: " << paddle + 1
-                                 << ", value: " << fTrigmap[plane][p]->GetAt(paddle));
+                                 << ", value: " << fTrigmap[p][plane]->GetAt(paddle));
             }
 }
 
