@@ -12,51 +12,46 @@
  ******************************************************************************/
 
 // -----------------------------------------------------------------
-// -----                   R3BAlpideHitData                    -----
+// -----                   R3BAlpideCluster                    -----
 // -----          Created 28/01/2022 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideHitData_H
-#define R3BAlpideHitData_H 1
+#ifndef R3BAlpideCluster_H
+#define R3BAlpideCluster_H 1
 
 #include "TObject.h"
-#include "TVector3.h"
 #include <stdint.h>
 
-class R3BAlpideHitData : public TObject
+class R3BAlpideCluster : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideHitData();
+    R3BAlpideCluster();
 
-    /** Standard Constructor
-     *@param track    Reconstructed trajectory
-     **/
-    R3BAlpideHitData(UInt_t sensorId, Double_t posl, Double_t post, UInt_t clustersize);
+    // Standard Constructors
+    R3BAlpideCluster(UShort_t sensorid, Int_t col, Int_t row, Bool_t active = true);
+
+    R3BAlpideCluster(UShort_t sensorid, Int_t clusterid, Int_t col, Int_t row);
 
     // Destructor
-    virtual ~R3BAlpideHitData() {}
+    virtual ~R3BAlpideCluster() {}
 
     // Getters
-    inline const UInt_t& GetSensorId() const { return fSensorId; }
-    inline const UInt_t& GetClusterSize() const { return fClustersize; }
-    inline const Double_t& GetPosl() const { return fPosl; }
-    inline const Double_t& GetPost() const { return fPost; }
-    inline const Double_t& GetTheta() const { return fTheta; }
-    inline const Double_t& GetPhi() const { return fPhi; }
-    inline const TVector3 GetTrack() const { return fTrack; }
+    const UShort_t& GetSensorId() const { return fSensorId; }
+    const Int_t& GetClusterId() const { return fClusterId; }
+    const Int_t& GetCol() const { return fCol; }
+    const Int_t& GetRow() const { return fRow; }
+    const Bool_t& GetAct() const { return fActive; }
 
   protected:
-    TVector3 fTrack;
-    UInt_t fSensorId;
-    UInt_t fClustersize;
-    Double_t fPosl;
-    Double_t fPost;
-    Double_t fTheta; // Reconstructed Theta
-    Double_t fPhi;   // Reconstructed Phi
+    UShort_t fSensorId;
+    Int_t fClusterId;
+    Int_t fCol;
+    Int_t fRow;
+    Bool_t fActive;
 
   public:
-    ClassDef(R3BAlpideHitData, 1)
+    ClassDef(R3BAlpideCluster, 1)
 };
 
-#endif /* R3BAlpideHitData */
+#endif /* R3BAlpideCluster */

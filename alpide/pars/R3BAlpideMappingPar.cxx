@@ -22,18 +22,20 @@
 #include "R3BAlpideMappingPar.h"
 #include "R3BLogger.h"
 
-#include "TString.h"
-
 // ---- Standard Constructor ---------------------------------------------------
 R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNbSensors(1)
+    , fNbSensors(100)
 {
-    fIn_use[AlpideCols][AlpideRows].resize(fNbSensors);
     for (Int_t c = 0; c < AlpideCols; c++)
         for (Int_t r = 0; r < AlpideRows; r++)
+        {
+            fIn_use[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
+            {
                 fIn_use[c][r][s] = 1;
+            }
+        }
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -43,11 +45,13 @@ R3BAlpideMappingPar::~R3BAlpideMappingPar() { clear(); }
 void R3BAlpideMappingPar::SetNbSensors(UInt_t n)
 {
     fNbSensors = n;
-    fIn_use[AlpideCols][AlpideRows].resize(fNbSensors);
     for (Int_t c = 0; c < AlpideCols; c++)
         for (Int_t r = 0; r < AlpideRows; r++)
+        {
+            fIn_use[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
                 fIn_use[c][r][s] = 1;
+        }
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -63,22 +67,21 @@ void R3BAlpideMappingPar::putParams(FairParamList* list)
     R3BLOG(INFO, "called");
     if (!list)
     {
-        R3BLOG(ERROR, "Could not initialize FairParamList");
+        R3BLOG(FATAL, "Could not initialize FairParamList");
         return;
     }
 
     list->add("alpideNbSensorsPar", fNbSensors);
+    R3BLOG(INFO, "Nb of ALPIDE sensors: " << fNbSensors);
 
     Int_t defzero = 0;
+    char name[300];
     for (int s = 1; s <= fNbSensors; s++)
         for (int c = 1; c <= AlpideCols; c++)
             for (int r = 1; r <= AlpideRows; r++)
                 if (fIn_use[c - 1][r - 1][s - 1] == 0)
                 {
-                    TString ns = "Sensor" + s;
-                    TString nc = "_Col" + c;
-                    TString nr = "_Row" + r;
-                    TString name = ns + nc + nr;
+                    sprintf(name, "Sensor%dCol%dRow%dPar", s, c, r);
                     list->add(name, defzero);
                 }
 }
@@ -89,7 +92,7 @@ Bool_t R3BAlpideMappingPar::getParams(FairParamList* list)
     R3BLOG(INFO, "called");
     if (!list)
     {
-        R3BLOG(ERROR, "Could not initialize FairParamList");
+        R3BLOG(FATAL, "Could not initialize FairParamList");
         return kFALSE;
     }
 
@@ -99,20 +102,22 @@ Bool_t R3BAlpideMappingPar::getParams(FairParamList* list)
         return kFALSE;
     }
     else
-        R3BLOG(INFO, "Nb Sensors: " << fNbSensors);
+    {
+        R3BLOG(INFO, "Nb of ALPIDE sensors: " << fNbSensors);
+    }
 
+    char name[300];
     for (int s = 1; s <= fNbSensors; s++)
         for (Int_t c = 1; c <= AlpideCols; c++)
             for (Int_t r = 1; r <= AlpideRows; r++)
             {
-                TString ns = "Sensor" + s;
-                TString nc = "_Col" + c;
-                TString nr = "_Row" + r;
-                TString name = ns + nc + nr;
+                sprintf(name, "Sensor%dCol%dRow%dPar", s, c, r);
                 Int_t value = 1;
                 auto check = fillParams(name, &value, list);
                 if (check)
-                    fIn_use[c - 1][r - 1][s - 1] = value;
+                {
+                    fIn_use[c - 1][r - 1][s - 1] = 0;
+                }
             }
     return kTRUE;
 }
@@ -126,11 +131,12 @@ Bool_t R3BAlpideMappingPar::fillParams(const Text_t* name, Int_t* values, FairPa
     {
         return kFALSE;
     }
-    FairParamObj* o = static_cast<FairParamObj*>(paramList->FindObject(name));
-    if (o != 0 && strcmp(o->getParamType(), "Int_t") == 0)
+    auto o = paramList->find(name);
+    if (o && strcmp(o->getParamType(), "Int_t") == 0)
     {
         Int_t l = o->getLength();
         Int_t n = o->getNumParams();
+
         if (n == nValues)
         {
             memcpy(values, o->getParamValue(), l);
@@ -151,7 +157,7 @@ void R3BAlpideMappingPar::printParams()
     R3BLOG(INFO, "Nb Sensors: " << fNbSensors);
     for (Int_t s = 0; s < fNbSensors; s++)
     {
-        LOG(INFO) << "Alpide Sensor: " << s + 1;
+        R3BLOG(INFO, "ALPIDE sensor: " << s + 1);
         for (Int_t c = 0; c < AlpideCols; c++)
             for (Int_t r = 0; r < AlpideRows; r++)
             {

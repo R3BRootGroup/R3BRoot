@@ -19,15 +19,15 @@
 
 R3BAlpideCalData::R3BAlpideCalData()
     : fSenId(0)
-    , fPosl(-4.0)
-    , fPost(-4.0)
+    , fCol(0)
+    , fRow(0)
 {
 }
 
-R3BAlpideCalData::R3BAlpideCalData(UShort_t senId, Float_t posl, Float_t post)
+R3BAlpideCalData::R3BAlpideCalData(UShort_t senId, Int_t col, Int_t row)
     : fSenId(senId)
-    , fPosl(posl)
-    , fPost(post)
+    , fCol(col)
+    , fRow(row)
 {
 }
 

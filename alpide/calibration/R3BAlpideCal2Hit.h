@@ -12,33 +12,33 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------
-// -----               R3BAlpideMapped2Cal                 -----
-// -----     Created 09/02/22 by J.L. Rodriguez-Sanchez    -----
+// -----               R3BAlpideCal2Hit                    -----
+// -----     Created 22/03/22 by J.L. Rodriguez-Sanchez    -----
 // -------------------------------------------------------------
 
-#ifndef R3BAlpideMapped2Cal_H
-#define R3BAlpideMapped2Cal_H 1
+#ifndef R3BAlpideCal2Hit_H
+#define R3BAlpideCal2Hit_H 1
 
 #include "FairTask.h"
 
-#include "R3BAlpideCalData.h"
+#include "R3BAlpideHitData.h"
 
 #include <Rtypes.h>
 
 class TClonesArray;
 class R3BAlpideMappingPar;
 
-class R3BAlpideMapped2Cal : public FairTask
+class R3BAlpideCal2Hit : public FairTask
 {
   public:
     /** Default constructor **/
-    R3BAlpideMapped2Cal();
+    R3BAlpideCal2Hit();
 
     /** Standard constructor **/
-    R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose = 1);
+    R3BAlpideCal2Hit(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BAlpideMapped2Cal();
+    virtual ~R3BAlpideCal2Hit();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option) override;
@@ -60,21 +60,24 @@ class R3BAlpideMapped2Cal : public FairTask
 
   private:
     void SetParameter();
-    int GetCol(int reg, int dcol, int ads);
-    int GetRow(int ads);
+    void FindClusters();
+    Double_t fPixelSize;
+    Int_t fNbSensors;
 
     Bool_t fOnline; // Don't store data for online
 
-    R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
-    TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
-    TClonesArray* fAlpideCalData;    // Array with Alpide Cal output data
+    R3BAlpideMappingPar* fMap_Par; /**< Parameter container. >*/
+    TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
+    TClonesArray* fAlpideHitData;  // Array with Alpide Hit output data
+    TClonesArray* fAlpideCluster;  // Array with clusters
+    TClonesArray* fAlpidePixel;
 
-    // Private method AddCalData
-    R3BAlpideCalData* AddCalData(UShort_t senId, Int_t col, Int_t row);
+    // Private method AddHitData
+    R3BAlpideHitData* AddHitData(UShort_t senId, Double_t posl, Double_t post, UInt_t clustersize);
 
   public:
     // Class definition
-    ClassDefOverride(R3BAlpideMapped2Cal, 1)
+    ClassDefOverride(R3BAlpideCal2Hit, 1)
 };
 
-#endif /*  R3BAlpideMapped2Cal_H */
+#endif /*  R3BAlpideCal2Hit_H */
