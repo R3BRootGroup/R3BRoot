@@ -60,7 +60,7 @@ class R3BAlpideMappingPar : public FairParGenericSet
     void SetInUse(UInt_t sensor, UInt_t col, UInt_t row, Int_t val) { fIn_use[col - 1][row - 1][sensor - 1] = val; }
 
   private:
-    UInt_t fNbSensors;
+    Int_t fNbSensors;
     std::vector<Int_t> fIn_use[AlpideCols][AlpideRows];
 
     /** Method to fill all parameters using FairRuntimeDB **/

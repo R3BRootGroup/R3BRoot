@@ -20,7 +20,9 @@
 #define R3BALPIDEREADER_H
 
 #include "R3BReader.h"
+#include "TLeaf.h"
 #include "TString.h"
+#include "TTree.h"
 #include <fstream>
 #include <stdint.h>
 
@@ -57,12 +59,18 @@ class R3BAlpideReader : public R3BReader
     // Set input file
     void SetFile(TString name) { fFileName = name; }
 
+    // Set input root file
+    void SetRootFile(TString name) { fRootName = name; }
+
   private:
     // Input file
     ifstream* fInput;
+    TTree* fTree;
     TString fFileName;
+    TString fRootName;
     int ae;
     int b, c, d, e, f, g;
+    TLeaf *fRow, *fCol, *fDet, *trgNum;
     // An event counter
     unsigned int fNEvent;
     // Reader specific data structure from ucesb

@@ -19,15 +19,23 @@
 
 R3BAlpideHitData::R3BAlpideHitData()
     : fTrack(0., 0., 0.)
+    , fSensorId(0)
+    , fClustersize(0)
     , fTheta(NAN)
     , fPhi(NAN)
+    , fPosl(NAN)
+    , fPost(NAN)
 {
 }
 
-R3BAlpideHitData::R3BAlpideHitData(TVector3 track)
-    : fTrack(track)
-    , fTheta(track.Theta())
-    , fPhi(track.Phi())
+R3BAlpideHitData::R3BAlpideHitData(UInt_t sensorId, Double_t posl, Double_t post, UInt_t clustersize)
+    : fSensorId(sensorId)
+    , fClustersize(clustersize)
+    //, fTrack(track)
+    //, fTheta(track.Theta())
+    //, fPhi(track.Phi())
+    , fPosl(posl)
+    , fPost(post)
 {
 }
 

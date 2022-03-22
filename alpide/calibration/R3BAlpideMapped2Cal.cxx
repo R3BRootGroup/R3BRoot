@@ -30,6 +30,7 @@
 #include "R3BAlpideCalData.h"
 #include "R3BAlpideMapped2Cal.h"
 #include "R3BAlpideMappedData.h"
+#include "R3BAlpideMappingPar.h"
 #include "R3BLogger.h"
 
 // R3BAlpideMapped2Cal::Default Constructor --------------------------
@@ -43,6 +44,7 @@ R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fAlpideMappedData(NULL)
     , fAlpideCalData(NULL)
+    , fMap_Par(NULL)
     , fOnline(kFALSE)
 {
 }
@@ -59,19 +61,23 @@ void R3BAlpideMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+
+    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
 }
 
 void R3BAlpideMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
+    // R3BLOG(INFO, "Nb of sensors: " << fMap_Par->GetNbSensors());
+    fMap_Par->printParams();
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideMapped2Cal::Init()
 {
     R3BLOG(INFO, "");
-
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -114,18 +120,20 @@ void R3BAlpideMapped2Cal::Exec(Option_t* option)
     if (!nHits)
         return;
 
-    R3BAlpideMappedData** mappedData = new R3BAlpideMappedData*[nHits];
+    auto mappedData = new R3BAlpideMappedData*[nHits];
 
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BAlpideMappedData*)(fAlpideMappedData->At(i));
-        auto reg = mappedData[i]->GetReg() - 1;
-        auto dcol = mappedData[i]->GetCol() - 1;
-        auto ads = mappedData[i]->GetAds() - 1;
-        AddCalData(mappedData[i]->GetSensorId(), GetCol(reg, dcol, ads), GetRow(ads));
+        auto det = mappedData[i]->GetSensorId();
+        auto col = mappedData[i]->GetCol();
+        auto row = mappedData[i]->GetAds();
+        // AddCalData(mappedData[i]->GetSensorId(), GetCol(reg, dcol, ads), GetRow(ads));
+        if (fMap_Par->GetInUse(det, col, row) == 1)
+            AddCalData(det, col, row);
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 
@@ -154,12 +162,12 @@ void R3BAlpideMapped2Cal::Reset()
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BAlpideCalData* R3BAlpideMapped2Cal::AddCalData(UShort_t senId, Float_t posl, Float_t post)
+R3BAlpideCalData* R3BAlpideMapped2Cal::AddCalData(UShort_t senId, Int_t col, Int_t row)
 {
-    // It fills the R3BFootCalData
+    // It fills the R3BAlpideCalData
     TClonesArray& clref = *fAlpideCalData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideCalData(senId, posl, post);
+    return new (clref[size]) R3BAlpideCalData(senId, col, row);
 }
 
 ClassImp(R3BAlpideMapped2Cal);

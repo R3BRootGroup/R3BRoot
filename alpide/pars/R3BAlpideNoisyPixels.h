@@ -12,69 +12,59 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------
-// -----               R3BAlpideMapped2Cal                 -----
-// -----     Created 09/02/22 by J.L. Rodriguez-Sanchez    -----
+// -----               R3BAlpideNoisyPixels                -----
+// -----     Created 22/03/22 by J.L. Rodriguez-Sanchez    -----
 // -------------------------------------------------------------
 
-#ifndef R3BAlpideMapped2Cal_H
-#define R3BAlpideMapped2Cal_H 1
+#ifndef R3BAlpideNoisyPixels_H
+#define R3BAlpideNoisyPixels_H 1
 
 #include "FairTask.h"
 
-#include "R3BAlpideCalData.h"
+#include "R3BAlpideMappingPar.h"
 
 #include <Rtypes.h>
+#include <stdint.h>
+#include <vector>
 
 class TClonesArray;
-class R3BAlpideMappingPar;
 
-class R3BAlpideMapped2Cal : public FairTask
+class R3BAlpideNoisyPixels : public FairTask
 {
   public:
     /** Default constructor **/
-    R3BAlpideMapped2Cal();
+    R3BAlpideNoisyPixels();
 
     /** Standard constructor **/
-    R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose = 1);
+    R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BAlpideMapped2Cal();
+    virtual ~R3BAlpideNoisyPixels();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option) override;
-
-    /** Virtual method Reset **/
-    virtual void Reset();
-
-    virtual void SetParContainers() override;
 
     // Fair specific
     /** Virtual method Init **/
     virtual InitStatus Init() override;
 
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit() override;
+    /** Virtual method FinishTask **/
+    virtual void FinishTask() override;
 
-    // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetNbSensors(UInt_t n);
+
+    void SetThreshold(UInt_t th) { fThr = th; }
 
   private:
-    void SetParameter();
-    int GetCol(int reg, int dcol, int ads);
-    int GetRow(int ads);
-
-    Bool_t fOnline; // Don't store data for online
-
-    R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
+    Int_t fNbSensors;
+    Int_t fThr;
+    std::vector<Int_t> fMap[AlpideCols][AlpideRows];
     TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
-    TClonesArray* fAlpideCalData;    // Array with Alpide Cal output data
-
-    // Private method AddCalData
-    R3BAlpideCalData* AddCalData(UShort_t senId, Int_t col, Int_t row);
+    R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
 
   public:
     // Class definition
-    ClassDefOverride(R3BAlpideMapped2Cal, 1)
+    ClassDefOverride(R3BAlpideNoisyPixels, 1)
 };
 
-#endif /*  R3BAlpideMapped2Cal_H */
+#endif /*  R3BAlpideNoisyPixels_H */

@@ -19,6 +19,7 @@
 #include "R3BLogger.h"
 
 #include "TClonesArray.h"
+#include "TFile.h"
 #include "ext_data_struct_info.hh"
 #include <iostream>
 
@@ -32,6 +33,8 @@ extern "C"
 #include "ext_data_client.h"
 #include "ext_h101_alpide.h"
 }
+
+int prevevent = 0;
 
 R3BAlpideReader::R3BAlpideReader(EXT_STR_h101_ALPIDE_onion* data, size_t offset)
     : R3BReader("R3BAlpideReader")
@@ -74,13 +77,30 @@ Bool_t R3BAlpideReader::Init(ext_data_struct_info* a_struct_info)
     fInput = new ifstream(fFileName);
     if (!fInput->is_open())
     {
-        R3BLOG(fatal, "Cannot open input file: " << fFileName);
+        R3BLOG(warning, "Cannot open input file: " << fFileName);
+        fInput = NULL;
     }
     else
     {
-
         R3BLOG(info, "Open input file: " << fFileName);
     }
+
+    TFile* fi = new TFile(fRootName);
+    fTree = (TTree*)fi->Get("pixTree");
+    if (fTree)
+    {
+        R3BLOG(info, "Open input file: " << fRootName);
+
+        R3BLOG(INFO, "Root file entries " << fTree->GetEntries());
+
+        fRow = fTree->FindLeaf("row");
+        fCol = fTree->FindLeaf("col");
+        trgNum = fTree->FindLeaf("trgNum");
+        fDet = fTree->FindLeaf("chipid");
+        fNEvent = 0;
+    }
+    else
+        fTree = NULL;
 
     return kTRUE;
 }
@@ -107,19 +127,36 @@ Bool_t R3BAlpideReader::Read()
             *fInput >> ae >> b >> c >> d >> e >> f >> g;
         }
     }
+
 next:
 
-    // Read ALPIDE detectors
-    /*   for (int d = 0; d < 6; d++)
-           if (fData->SST[d]._ == 1024)
-               for (int strip = 0; strip < fData->SST[d]._; ++strip)
-               {
-                   new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(d, strip, fData->SST[d].E[strip]);
-               }
+    if (fTree)
+    {
 
-              */
+        if (fNEvent == 0)
+        {
+            fTree->GetEntry(fNEvent);
+            prevevent = 0;
+        }
 
-    fNEvent += 1;
+    newevent:
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(1, 1, fCol->GetValue() + 1, fRow->GetValue() + 1);
+
+        fTree->GetEntry(fNEvent++);
+
+        if (trgNum->GetValue() == prevevent)
+        {
+            goto newevent;
+        }
+        else
+            prevevent++;
+    }
+
+    if (fNEvent > fTree->GetEntries())
+    {
+        R3BLOG(INFO, "Run finished");
+        return kFALSE;
+    }
     return kTRUE;
 }
 

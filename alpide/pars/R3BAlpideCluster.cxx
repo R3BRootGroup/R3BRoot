@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,23 +11,35 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+// -----------------------------------------------------------------
+// -----            R3BAlpideCluster source file               -----
+// -----------------------------------------------------------------
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "R3BAlpideCluster.h"
 
-#pragma link C++ class R3BAlpide+;
+R3BAlpideCluster::R3BAlpideCluster()
+    : fSensorId(0)
+    , fClusterId(0)
+    , fCol(0)
+    , fRow(0)
+    , fActive(false)
+{
+}
 
-#pragma link C++ class R3BAlpideContFact+;
-#pragma link C++ class R3BAlpideMappingPar+;
-#pragma link C++ class R3BAlpideNoisyPixels+;
-#pragma link C++ class R3BAlpideCluster;
+R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t col, Int_t row, Bool_t active)
+    : fSensorId(sensorid)
+    , fCol(col)
+    , fRow(row)
+    , fActive(active)
+{
+}
 
-#pragma link C++ class R3BAlpideMapped2Cal+;
-#pragma link C++ class R3BAlpideCal2Hit+;
+R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t clusterid, Int_t col, Int_t row)
+    : fSensorId(sensorid)
+    , fClusterId(clusterid)
+    , fCol(col)
+    , fRow(row)
+{
+}
 
-#pragma link C++ class R3BAlpideOnlineSpectra+;
-
-#endif
-
+ClassImp(R3BAlpideCluster);

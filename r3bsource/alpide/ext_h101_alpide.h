@@ -68,7 +68,7 @@ typedef struct EXT_STR_h101_ALPIDE_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_ALPIDE_ITEMS_INFO(ok, si, offset, struct_t, printerr)                            \
+#define EXT_STR_h101_ALPIDE_ITEMS_INFO(ok, si, offset, struct_t, printerr)                         \
     do                                                                                             \
     {                                                                                              \
         ok = 1;                                                                                    \
@@ -78,7 +78,6 @@ typedef struct EXT_STR_h101_ALPIDE_onion_t
         EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, SST1E, UINT32, "SST1E", "SST1"); \
                                                                                                    \
     } while (0);
-
 
 #endif /*__GUARD_H101_ALPIDE_EXT_H101_ALPIDE_H__*/
 
