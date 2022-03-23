@@ -110,6 +110,8 @@ class R3BTofDOnlineSpectra : public FairTask
 
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
 
+    TClonesArray* fLosTriggerCalDataItems;
+    TClonesArray* fLosCalDataItems;
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
@@ -149,6 +151,9 @@ class R3BTofDOnlineSpectra : public FairTask
     TH2F* fh_tofd_time_hit[N_PLANE_MAX_TOFD_S494];
     TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD_S494];
     TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD_S494 - 1];
+
+    TH2F* fh_tofd_time_los_h2[N_PLANE_MAX_TOFD_S494];
+    TH1F* fh_tofd_time_los[N_PLANE_MAX_TOFD_S494][N_PADDLE_MAX_TOFD_S494];
 
   public:
     ClassDef(R3BTofDOnlineSpectra, 1)
