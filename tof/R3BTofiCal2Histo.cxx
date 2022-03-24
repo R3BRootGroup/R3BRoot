@@ -498,15 +498,15 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
                     Double_t parq[4];
-                    parq[0] = par->GetPar1a();
-                    parq[1] = par->GetPar1b();
-                    parq[2] = par->GetPar1c();
-                    parq[3] = par->GetPar1d();
 
                     // calculate charge
                     Double_t qb = 0.;
                     if (fTofiSmiley)
                     {
+                        parq[0] = par->GetPola();
+                        parq[1] = par->GetPolb();
+                        parq[2] = par->GetPolc();
+                        parq[3] = par->GetPold();
                         qb = TMath::Sqrt(top_tot * bot_tot) /
                              (parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) + parq[3] * pow(posToT, 3));
                         qb = qb *
@@ -516,6 +516,10 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     {
                         // double exponential
                         auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                        parq[0] = par->GetPar1a();
+                        parq[1] = par->GetPar1b();
+                        parq[2] = par->GetPar1c();
+                        parq[3] = par->GetPar1d();
                         auto q1 = bot_tot /
                                   (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
                         parq[0] = par->GetPar2a();

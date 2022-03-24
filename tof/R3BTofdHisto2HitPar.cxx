@@ -201,12 +201,12 @@ void R3BTofdHisto2HitPar::FinishTask()
         {
             LOG(WARNING) << "Calling function smiley";
             Double_t para2[4];
-            Double_t min2 = -40.; // -40 effective bar length
-            Double_t max2 = 40.;  // 40 effective bar length = 80 cm
+            Double_t min2 = -50.; // -40 effective bar length
+            Double_t max2 = 50.;  // 40 effective bar length = 80 cm
                                   // we will use 50 here for some fit safety margin
             for (Int_t i = 0; i < fNofPlanes; i++)
             {
-                for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+                for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
                 {
                     if (histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
                     {
@@ -288,7 +288,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         Int_t min = 0.1, max = 14; // select range for peak search
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
-            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
             {
                 if (histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
@@ -788,6 +788,10 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     {
         printf("Found peak @ %f\n",xpeaks[i]);
         peaks[i] = par[2 * i + 1];
+        TLine* l = new TLine(par[2 * i + 1], 0, par[2 * i + 1], par[2 * i]);
+        l->SetLineColor(kRed);
+        l->SetLineWidth(2.);
+        l->Draw();
     }
     czcorr->Update();
 
@@ -802,7 +806,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         for (Int_t i = 0; i < nPeaks; i++)
         {
             std::cout << "Peak @ " << peaks[i];
-            Int_t z = 0;
+            Double_t z = 0;
             while ((std::cout << " corresponds to Z=") && !(std::cin >> z))
             {
                 std::cout << "That's not a number;";
@@ -813,6 +817,14 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
                 continue;
             x[nfp] = (Double_t)z;
             zpeaks[nfp] = peaks[i];
+            Float_t xl = peaks[i];
+            Int_t bin = h1->GetXaxis()->FindBin(xl);
+            Float_t yl = h1->GetBinContent(bin);
+            TLine* l = new TLine(xl, 0, xl, yl);
+            l->SetLineColor(kBlue);
+            l->SetLineWidth(2.);
+            l->Draw();
+            czcorr->Update();
             // std::cout<<"z real " << x[nfp] << " z found " << zpeaks[nfp] <<"\n";
             nfp++;
         }
@@ -823,6 +835,12 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     {
         delete s;
         //delete czcorr;
+        std::cout << "Not enough Peaks to fit! Next Bar...\n";
+        for (Int_t j = 0; j < 3; j++)
+        {
+            pars[j] = 0.;
+            // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
+        }
         return;
     }
     // fit charge axis
@@ -834,6 +852,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     gr1 = new TGraph(nfp, zpeaks, x);
     gr1->Draw("A*");
     gr1->Fit("fitz", "Q", "", min, max);
+    czcorr->Update();
     // write parameters
     std::cout << "Optimise the fit, double click to finish\n";
     // gPad->WaitPrimitive();
@@ -847,7 +866,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     //TImage *img = TImage::Create();
     //img->FromPad(czcorr);
     //img->WriteImage(Form("./calib/zcorrpol3/zcorr_pol3_%i_%i.png",pl,b));
-    // gPad->WaitPrimitive();
+    gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete s;
     delete gr1;

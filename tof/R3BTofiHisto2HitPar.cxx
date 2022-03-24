@@ -313,7 +313,6 @@ void R3BTofiHisto2HitPar::FinishTask()
 
 void R3BTofiHisto2HitPar::calcOffset()
 {
-	std::cout << "Hallo 1" << endl;
     TCanvas* cOffset = new TCanvas("cOffset", "cOffset", 10, 10, 1000, 900);
     cOffset->Divide(2, 2);
     R3BTofiHitModulePar* mpar;
@@ -355,7 +354,6 @@ void R3BTofiHisto2HitPar::calcOffset()
 }
 void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
 {
-	std::cout << "Hallo 2" << endl;
     TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
     cToTOffset->Divide(1, 2);
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -377,7 +375,7 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 TF1* fgaus = new TF1(
-                    "fgaus", "gaus(0)", Max - 0.3, Max + 0.3); // 0.2 //new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                    "fgaus", "gaus(0)", Max - 0.4, Max + 0.4); // 0.2 //new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1);
                 fgaus->Draw("SAME");
@@ -400,7 +398,6 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
 
 void R3BTofiHisto2HitPar::calcSync()
 {
-		std::cout << "Hallo 3" << endl;
     TCanvas* cSync = new TCanvas("cSync", "cSync", 10, 10, 1000, 900);
     cSync->Divide(2, 2);
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -744,19 +741,23 @@ void R3BTofiHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
 chthres:
     TSpectrum* s = new TSpectrum(nPeaks);
     Int_t nfound = s->Search(h1, 1, "", threshold); // lower threshold than default 0.05
+    Double_t *xpeaks = new Double_t[nfound];
     std::cout << "Found " << nfound << " Peaks\nEliminate background Peaks...\n";
     c1->Update();
     // Eliminate background peaks
     nPeaks = 0;
-    Double_t* xpeaks = s->GetPositionX();
+    xpeaks = s->GetPositionX();
     for (Int_t p = 0; p <= nfound; p++)
     {
         Float_t xp = xpeaks[p];
         Int_t bin = h1->GetXaxis()->FindBin(xp);
         Float_t yp = h1->GetBinContent(bin);
         if (yp - TMath::Sqrt(yp) < 1.)
+        {
+            //std::cout<<"peak @ "<<xp<<" to small, continue\n";
             continue;
-        cout << xp << " " << yp << "\n";
+        }
+        std::cout << xp << " " << yp << "\n";
         par[2 * nPeaks] = yp;
         par[2 * nPeaks + 1] = xp;
         nPeaks++;
@@ -767,7 +768,7 @@ chthres:
         countskip++;
         return;
     }
-    Double_t peaks[nPeaks];
+    Double_t peaks[nPeaks] = {0};
     for (Int_t i = 0; i < nPeaks; i++)
     {
         // printf("Found peak @ %f\n",xpeaks[i]);
