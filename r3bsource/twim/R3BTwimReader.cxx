@@ -31,6 +31,7 @@ R3BTwimReader::R3BTwimReader(EXT_STR_h101_SOFTWIM* data, size_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
+    , fPileup(kFALSE)
     , fSections(4)
     , fAnodes(16)
     , fTref(1)
@@ -101,8 +102,8 @@ void R3BTwimReader::Reset()
 Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t section)
 {
 
-    Bool_t pileupFLAG;
-    Bool_t overflowFLAG;
+    Bool_t pileupFLAG = kFALSE;
+    Bool_t overflowFLAG = kFALSE;
     UInt_t multPerAnode[fAnodes + fTref + fTtrig];
     for (int ch = 0; ch < fAnodes + fTref + fTtrig; ch++)
         multPerAnode[ch] = 0;
@@ -148,8 +149,9 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
         {
             pileupFLAG = (data->SOFTWIM_S[section].TREFv[hit] & 0x00040000) >> 18;
             overflowFLAG = (data->SOFTWIM_S[section].TREFv[hit] & 0x00080000) >> 19;
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(
-                section + 1, idAnodeTref + 1, data->SOFTWIM_S[section].TREFv[hit], 0, pileupFLAG, overflowFLAG);
+            if (pileupFLAG == kFALSE || !fPileup)
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(
+                    section + 1, idAnodeTref + 1, data->SOFTWIM_S[section].TREFv[hit], 0, pileupFLAG, overflowFLAG);
             // std::cout << "valTimeTref = " << data->SOFTWIM_S[section].TREFv[hit] << std::endl;
         }
         curTref = nextTref;

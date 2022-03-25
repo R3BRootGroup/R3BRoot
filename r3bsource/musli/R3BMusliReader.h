@@ -21,6 +21,7 @@
 struct EXT_STR_h101_MUSLI_t;
 typedef struct EXT_STR_h101_MUSLI_t EXT_STR_h101_MUSLI;
 typedef struct EXT_STR_h101_MUSLI_onion_t EXT_STR_h101_MUSLI_onion;
+class ext_data_struct_info;
 
 class R3BMusliReader : public R3BReader
 {

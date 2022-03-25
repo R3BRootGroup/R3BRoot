@@ -97,6 +97,7 @@ Bool_t R3BAlpideReader::Init(ext_data_struct_info* a_struct_info)
         fCol = fTree->FindLeaf("col");
         trgNum = fTree->FindLeaf("trgNum");
         fDet = fTree->FindLeaf("chipid");
+        trgTime = fTree->FindLeaf("trgTime");
         fNEvent = 0;
     }
     else
@@ -131,6 +132,7 @@ Bool_t R3BAlpideReader::Read()
 next:
 
     if (fTree)
+     if (fNEvent < fTree->GetEntries())
     {
 
         if (fNEvent == 0)
@@ -146,6 +148,7 @@ next:
 
         if (trgNum->GetValue() == prevevent)
         {
+            //std::cout << "trgtime: " << trgTime->GetValue() << std::endl;
             goto newevent;
         }
         else
