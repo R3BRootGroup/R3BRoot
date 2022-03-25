@@ -70,7 +70,7 @@ class R3BAlpideReader : public R3BReader
     TString fRootName;
     int ae;
     int b, c, d, e, f, g;
-    TLeaf *fRow, *fCol, *fDet, *trgNum;
+    TLeaf *fRow, *fCol, *fDet, *trgNum, *trgTime;
     // An event counter
     unsigned int fNEvent;
     // Reader specific data structure from ucesb

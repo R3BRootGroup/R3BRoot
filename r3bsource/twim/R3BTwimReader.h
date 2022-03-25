@@ -21,6 +21,7 @@
 struct EXT_STR_h101_SOFTWIM_t;
 typedef struct EXT_STR_h101_SOFTWIM_t EXT_STR_h101_SOFTWIM;
 typedef struct EXT_STR_h101_SOFTWIM_onion_t EXT_STR_h101_SOFTWIM_onion;
+class ext_data_struct_info;
 
 class R3BTwimReader : public R3BReader
 {
@@ -43,6 +44,9 @@ class R3BTwimReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Accessor to select events without pileup
+    void SetSkipPileup() { fPileup = kTRUE; }
+
   private:
     Bool_t ReadData(EXT_STR_h101_SOFTWIM_onion*, UShort_t);
     void SetNumSections(Int_t num) { fSections = num; }
@@ -63,6 +67,7 @@ class R3BTwimReader : public R3BReader
     Int_t fAnodes;
     Int_t fTref;
     Int_t fTtrig;
+    Bool_t fPileup;
 
   public:
     ClassDefOverride(R3BTwimReader, 0);
