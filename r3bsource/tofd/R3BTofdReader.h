@@ -45,6 +45,9 @@ class R3BTofdReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    // Accessor to skip trigger times
+    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+
   private:
     // Reader specific data structure from ucesb
     EXT_STR_h101_TOFD_onion* fData;
@@ -52,6 +55,8 @@ class R3BTofdReader : public R3BReader
     size_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
+    // Skip trigger times
+    Bool_t fSkiptriggertimes;
     // Output array
     TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */

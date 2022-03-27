@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 /********************************************************
  *
  * Structure for ext_data_fetch_event() filling.
@@ -31,54 +44,54 @@ typedef struct EXT_STR_h101_FIBTEN_t
     /* RAW */
     uint32_t FIBTEN_TMLCM /* [1,512] */;
     uint32_t FIBTEN_TMLCMI[512 EXT_STRUCT_CTRL(FIBTEN_TMLCM)] /* [1,512] */;
-    uint32_t FIBTEN_TMLCME[512 EXT_STRUCT_CTRL(FIBTEN_TMLCM)] /* [1,32768] */;
+    uint32_t FIBTEN_TMLCME[512 EXT_STRUCT_CTRL(FIBTEN_TMLCM)] /* [1,512] */;
     uint32_t FIBTEN_TMLC /* [0,32768] */;
-    uint32_t FIBTEN_TMLCv[32768 EXT_STRUCT_CTRL(FIBTEN_TMLC)] /* [0,65535] */;
+    uint32_t FIBTEN_TMLCv[32768 EXT_STRUCT_CTRL(FIBTEN_TMLC)] /* [0,32768] */;
     uint32_t FIBTEN_TMTCM /* [1,512] */;
     uint32_t FIBTEN_TMTCMI[512 EXT_STRUCT_CTRL(FIBTEN_TMTCM)] /* [1,512] */;
-    uint32_t FIBTEN_TMTCME[512 EXT_STRUCT_CTRL(FIBTEN_TMTCM)] /* [1,32768] */;
+    uint32_t FIBTEN_TMTCME[512 EXT_STRUCT_CTRL(FIBTEN_TMTCM)] /* [1,512] */;
     uint32_t FIBTEN_TMTC /* [0,32768] */;
-    uint32_t FIBTEN_TMTCv[32768 EXT_STRUCT_CTRL(FIBTEN_TMTC)] /* [0,65535] */;
+    uint32_t FIBTEN_TMTCv[32768 EXT_STRUCT_CTRL(FIBTEN_TMTC)] /* [0,32768] */;
     uint32_t FIBTEN_TMLFM /* [1,512] */;
     uint32_t FIBTEN_TMLFMI[512 EXT_STRUCT_CTRL(FIBTEN_TMLFM)] /* [1,512] */;
-    uint32_t FIBTEN_TMLFME[512 EXT_STRUCT_CTRL(FIBTEN_TMLFM)] /* [1,32768] */;
+    uint32_t FIBTEN_TMLFME[512 EXT_STRUCT_CTRL(FIBTEN_TMLFM)] /* [1,512] */;
     uint32_t FIBTEN_TMLF /* [0,32768] */;
-    uint32_t FIBTEN_TMLFv[32768 EXT_STRUCT_CTRL(FIBTEN_TMLF)] /* [0,65535] */;
+    uint32_t FIBTEN_TMLFv[32768 EXT_STRUCT_CTRL(FIBTEN_TMLF)] /* [0,32768] */;
     uint32_t FIBTEN_TMTFM /* [1,512] */;
     uint32_t FIBTEN_TMTFMI[512 EXT_STRUCT_CTRL(FIBTEN_TMTFM)] /* [1,512] */;
-    uint32_t FIBTEN_TMTFME[512 EXT_STRUCT_CTRL(FIBTEN_TMTFM)] /* [1,32768] */;
+    uint32_t FIBTEN_TMTFME[512 EXT_STRUCT_CTRL(FIBTEN_TMTFM)] /* [1,512] */;
     uint32_t FIBTEN_TMTF /* [0,32768] */;
-    uint32_t FIBTEN_TMTFv[32768 EXT_STRUCT_CTRL(FIBTEN_TMTF)] /* [0,65535] */;
+    uint32_t FIBTEN_TMTFv[32768 EXT_STRUCT_CTRL(FIBTEN_TMTF)] /* [0,32768] */;
     uint32_t FIBTEN_TRIGMLCM /* [1,4] */;
     uint32_t FIBTEN_TRIGMLCMI[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLCM)] /* [1,4] */;
-    uint32_t FIBTEN_TRIGMLCME[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLCM)] /* [1,256] */;
-    uint32_t FIBTEN_TRIGMLC /* [0,256] */;
-    uint32_t FIBTEN_TRIGMLCv[256 EXT_STRUCT_CTRL(FIBTEN_TRIGMLC)] /* [0,65535] */;
+    uint32_t FIBTEN_TRIGMLCME[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLCM)] /* [1,4] */;
+    uint32_t FIBTEN_TRIGMLC /* [0,32768] */;
+    uint32_t FIBTEN_TRIGMLCv[32768 EXT_STRUCT_CTRL(FIBTEN_TRIGMLC)] /* [0,32767] */;
     uint32_t FIBTEN_TRIGMLFM /* [1,4] */;
     uint32_t FIBTEN_TRIGMLFMI[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLFM)] /* [1,4] */;
-    uint32_t FIBTEN_TRIGMLFME[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLFM)] /* [1,256] */;
-    uint32_t FIBTEN_TRIGMLF /* [0,256] */;
-    uint32_t FIBTEN_TRIGMLFv[256 EXT_STRUCT_CTRL(FIBTEN_TRIGMLF)] /* [0,65535] */;
+    uint32_t FIBTEN_TRIGMLFME[4 EXT_STRUCT_CTRL(FIBTEN_TRIGMLFM)] /* [1,4] */;
+    uint32_t FIBTEN_TRIGMLF /* [0,32768] */;
+    uint32_t FIBTEN_TRIGMLFv[32768 EXT_STRUCT_CTRL(FIBTEN_TRIGMLF)] /* [0,32767] */;
     uint32_t FIBTEN_TSLCM /* [1,4] */;
     uint32_t FIBTEN_TSLCMI[4 EXT_STRUCT_CTRL(FIBTEN_TSLCM)] /* [1,4] */;
-    uint32_t FIBTEN_TSLCME[4 EXT_STRUCT_CTRL(FIBTEN_TSLCM)] /* [1,256] */;
-    uint32_t FIBTEN_TSLC /* [0,256] */;
-    uint32_t FIBTEN_TSLCv[256 EXT_STRUCT_CTRL(FIBTEN_TSLC)] /* [0,65535] */;
+    uint32_t FIBTEN_TSLCME[4 EXT_STRUCT_CTRL(FIBTEN_TSLCM)] /* [1,4] */;
+    uint32_t FIBTEN_TSLC /* [0,32768] */;
+    uint32_t FIBTEN_TSLCv[32768 EXT_STRUCT_CTRL(FIBTEN_TSLC)] /* [0,32768] */;
     uint32_t FIBTEN_TSTCM /* [1,4] */;
     uint32_t FIBTEN_TSTCMI[4 EXT_STRUCT_CTRL(FIBTEN_TSTCM)] /* [1,4] */;
-    uint32_t FIBTEN_TSTCME[4 EXT_STRUCT_CTRL(FIBTEN_TSTCM)] /* [1,256] */;
-    uint32_t FIBTEN_TSTC /* [0,256] */;
-    uint32_t FIBTEN_TSTCv[256 EXT_STRUCT_CTRL(FIBTEN_TSTC)] /* [0,65535] */;
+    uint32_t FIBTEN_TSTCME[4 EXT_STRUCT_CTRL(FIBTEN_TSTCM)] /* [1,4] */;
+    uint32_t FIBTEN_TSTC /* [0,32768] */;
+    uint32_t FIBTEN_TSTCv[32768 EXT_STRUCT_CTRL(FIBTEN_TSTC)] /* [0,32768] */;
     uint32_t FIBTEN_TSLFM /* [1,4] */;
     uint32_t FIBTEN_TSLFMI[4 EXT_STRUCT_CTRL(FIBTEN_TSLFM)] /* [1,4] */;
-    uint32_t FIBTEN_TSLFME[4 EXT_STRUCT_CTRL(FIBTEN_TSLFM)] /* [1,256] */;
-    uint32_t FIBTEN_TSLF /* [0,256] */;
-    uint32_t FIBTEN_TSLFv[256 EXT_STRUCT_CTRL(FIBTEN_TSLF)] /* [0,65535] */;
+    uint32_t FIBTEN_TSLFME[4 EXT_STRUCT_CTRL(FIBTEN_TSLFM)] /* [1,4] */;
+    uint32_t FIBTEN_TSLF /* [0,32768] */;
+    uint32_t FIBTEN_TSLFv[32768 EXT_STRUCT_CTRL(FIBTEN_TSLF)] /* [0,32768] */;
     uint32_t FIBTEN_TSTFM /* [1,4] */;
     uint32_t FIBTEN_TSTFMI[4 EXT_STRUCT_CTRL(FIBTEN_TSTFM)] /* [1,4] */;
-    uint32_t FIBTEN_TSTFME[4 EXT_STRUCT_CTRL(FIBTEN_TSTFM)] /* [1,256] */;
-    uint32_t FIBTEN_TSTF /* [0,256] */;
-    uint32_t FIBTEN_TSTFv[256 EXT_STRUCT_CTRL(FIBTEN_TSTF)] /* [0,65535] */;
+    uint32_t FIBTEN_TSTFME[4 EXT_STRUCT_CTRL(FIBTEN_TSTFM)] /* [1,4] */;
+    uint32_t FIBTEN_TSTF /* [0,32768] */;
+    uint32_t FIBTEN_TSTFv[32768 EXT_STRUCT_CTRL(FIBTEN_TSTF)] /* [0,32768] */;
 
 } EXT_STR_h101_FIBTEN;
 
@@ -115,32 +128,32 @@ typedef struct EXT_STR_h101_FIBTEN_onion_t
     uint32_t FIBTEN_TRIGMLCMI[4 /* FIBTEN_TRIGMLCM */];
     uint32_t FIBTEN_TRIGMLCME[4 /* FIBTEN_TRIGMLCM */];
     uint32_t FIBTEN_TRIGMLC;
-    uint32_t FIBTEN_TRIGMLCv[256 /* FIBTEN_TRIGMLC */];
+    uint32_t FIBTEN_TRIGMLCv[32768 /* FIBTEN_TRIGMLC */];
     uint32_t FIBTEN_TRIGMLFM;
     uint32_t FIBTEN_TRIGMLFMI[4 /* FIBTEN_TRIGMLFM */];
     uint32_t FIBTEN_TRIGMLFME[4 /* FIBTEN_TRIGMLFM */];
     uint32_t FIBTEN_TRIGMLF;
-    uint32_t FIBTEN_TRIGMLFv[256 /* FIBTEN_TRIGMLF */];
+    uint32_t FIBTEN_TRIGMLFv[32768 /* FIBTEN_TRIGMLF */];
     uint32_t FIBTEN_TSLCM;
     uint32_t FIBTEN_TSLCMI[4 /* FIBTEN_TSLCM */];
     uint32_t FIBTEN_TSLCME[4 /* FIBTEN_TSLCM */];
     uint32_t FIBTEN_TSLC;
-    uint32_t FIBTEN_TSLCv[256 /* FIBTEN_TSLC */];
+    uint32_t FIBTEN_TSLCv[32768 /* FIBTEN_TSLC */];
     uint32_t FIBTEN_TSTCM;
     uint32_t FIBTEN_TSTCMI[4 /* FIBTEN_TSTCM */];
     uint32_t FIBTEN_TSTCME[4 /* FIBTEN_TSTCM */];
     uint32_t FIBTEN_TSTC;
-    uint32_t FIBTEN_TSTCv[256 /* FIBTEN_TSTC */];
+    uint32_t FIBTEN_TSTCv[32768 /* FIBTEN_TSTC */];
     uint32_t FIBTEN_TSLFM;
     uint32_t FIBTEN_TSLFMI[4 /* FIBTEN_TSLFM */];
     uint32_t FIBTEN_TSLFME[4 /* FIBTEN_TSLFM */];
     uint32_t FIBTEN_TSLF;
-    uint32_t FIBTEN_TSLFv[256 /* FIBTEN_TSLF */];
+    uint32_t FIBTEN_TSLFv[32768 /* FIBTEN_TSLF */];
     uint32_t FIBTEN_TSTFM;
     uint32_t FIBTEN_TSTFMI[4 /* FIBTEN_TSTFM */];
     uint32_t FIBTEN_TSTFME[4 /* FIBTEN_TSTFM */];
     uint32_t FIBTEN_TSTF;
-    uint32_t FIBTEN_TSTFv[256 /* FIBTEN_TSTF */];
+    uint32_t FIBTEN_TSTFv[32768 /* FIBTEN_TSTF */];
 
 } EXT_STR_h101_FIBTEN_onion;
 
