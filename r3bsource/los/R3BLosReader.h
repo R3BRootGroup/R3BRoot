@@ -45,7 +45,7 @@ class R3BLosReader : public R3BReader
     void SetOnline(Bool_t option) { fOnline = option; }
 
     // Accessor to skip trigger times
-    void SetSkipTriggerTimes(Bool_t skip) { fSkiptriggertimes = skip; }
+    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
 
   private:
     // An event counter

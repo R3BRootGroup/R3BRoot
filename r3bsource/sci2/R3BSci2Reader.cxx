@@ -14,6 +14,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BLogger.h"
 #include "R3BSci2MappedData.h"
 #include "R3BSci2Reader.h"
 
@@ -28,7 +29,6 @@ extern "C"
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 #define NUM_SCI2_DETECTORS 1
-//#define NUM_SCI2_CHANNELS 3 // 1=RIGHT, 2=LEFT, 3=Tref
 #include <iostream>
 
 R3BSci2Reader::R3BSci2Reader(EXT_STR_h101_SCI2* data, size_t offset)
@@ -50,19 +50,18 @@ R3BSci2Reader::~R3BSci2Reader()
 Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BSci2Reader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_SCI2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SCI2, 0);
 
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("Sci2Mapped", "Sci at S2", fArray, !fOnline);
-    fArray->Clear();
+    Reset();
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
@@ -84,6 +83,7 @@ Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BSci2Reader::Read()
 {
+    R3BLOG(DEBUG1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_SCI2_onion* data = (EXT_STR_h101_SCI2_onion*)fData;
 

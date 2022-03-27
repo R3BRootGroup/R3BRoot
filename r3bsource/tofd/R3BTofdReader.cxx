@@ -35,6 +35,7 @@ R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD_onion* data, size_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
+    , fSkiptriggertimes(kFALSE)
     , fArray(new TClonesArray("R3BTofdMappedData"))
     , fArrayTrigger(new TClonesArray("R3BTofdMappedData"))
 {
@@ -65,7 +66,16 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("TofdMapped", "Tofd mapped data", fArray, !fOnline);
-    FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd trigger mapped data", fArrayTrigger, !fOnline);
+
+    if (!fSkiptriggertimes)
+    {
+        FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd trigger mapped data", fArrayTrigger, !fOnline);
+    }
+    else
+    {
+        fArrayTrigger = NULL;
+    }
+    Reset();
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
@@ -83,7 +93,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTofdReader::Read()
 {
-    LOG(DEBUG) << "R3BTofdReader::Read() Event data.";
+    R3BLOG(DEBUG1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 
@@ -159,6 +169,7 @@ Bool_t R3BTofdReader::Read()
     }     // for planes
 
     // Leading TAMEX trigger times.
+    if (fArrayTrigger)
     {
         auto numChannels = data->TOFD_TRIGFL;
         for (uint32_t i = 0; i < numChannels; i++)
@@ -176,7 +187,8 @@ void R3BTofdReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    fArrayTrigger->Clear();
+    if (fArrayTrigger)
+        fArrayTrigger->Clear();
 }
 
 ClassImp(R3BTofdReader);

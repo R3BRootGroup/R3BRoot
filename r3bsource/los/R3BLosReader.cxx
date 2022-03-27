@@ -92,6 +92,9 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     if (!fSkiptriggertimes)
     {
         mgr->Register("LosTriggerMapped", "Los Trigger Mapped", fArrayTrigger, !fOnline);
+    }
+    else
+    {
         fArrayTrigger = NULL;
     }
     Reset();
@@ -116,7 +119,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BLosReader::Read()
 {
-
+    R3BLOG(DEBUG1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 
