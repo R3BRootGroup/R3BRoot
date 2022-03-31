@@ -19,6 +19,8 @@
  * */
 
 #include "R3BFileSource.h"
+#include "R3BLogger.h"
+
 #include "FairEventHeader.h"
 #include "FairFileHeader.h"
 #include "FairLogger.h"
@@ -90,16 +92,16 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
 {
     if (fSourceInstance)
     {
-        Fatal("R3BFileSource", "Singleton instance already exists.");
+        R3BLOG(FATAL, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
 
     if (fRootFile->IsZombie())
     {
-        LOG(fatal) << "Error opening the Input file";
+        R3BLOG(fatal, "Error opening the Input file");
     }
-    LOG(debug) << "R3BFileSource created------------";
+    R3BLOG(debug, "R3BFileSource created------------");
 }
 
 R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UInt_t)
@@ -144,7 +146,7 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
 {
     if (fSourceInstance)
     {
-        Fatal("R3BFileSource", "Singleton instance already exists.");
+        R3BLOG(FATAL, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
@@ -152,9 +154,9 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     fRootFile = TFile::Open(RootFileName->Data());
     if (fRootFile->IsZombie())
     {
-        LOG(fatal) << "Error opening the Input file";
+        R3BLOG(fatal, "Error opening the Input file");
     }
-    LOG(debug) << "R3BFileSource created------------";
+    R3BLOG(debug, "R3BFileSource created------------");
 }
 
 R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt_t)
@@ -199,7 +201,7 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
 {
     if (fSourceInstance)
     {
-        Fatal("R3BFileSource", "Singleton instance already exists.");
+        R3BLOG(FATAL, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
@@ -207,9 +209,9 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     fRootFile = TFile::Open(RootFileName.Data());
     if (fRootFile->IsZombie())
     {
-        LOG(fatal) << "Error opening the Input file";
+        R3BLOG(fatal, "Error opening the Input file");
     }
-    LOG(debug) << "R3BFileSource created------------";
+    R3BLOG(debug, "R3BFileSource created------------");
 }
 
 R3BFileSource* R3BFileSource::Instance() { return fSourceInstance; }
@@ -217,23 +219,24 @@ R3BFileSource* R3BFileSource::Instance() { return fSourceInstance; }
 R3BFileSource::~R3BFileSource()
 {
     LOG(debug) << "Enter Destructor of R3BFileSource";
-    delete fEvtHeader;
+    if (fEvtHeader)
+        delete fEvtHeader;
     LOG(debug) << "Leave Destructor of R3BFileSource";
 }
 
 Bool_t R3BFileSource::Init()
 {
-    LOG(INFO) << "R3BFileSource::Init()";
+    R3BLOG(INFO, "");
 
     if (IsInitialized)
     {
-        LOG(INFO) << "R3BFileSource already initialized";
+        R3BLOG(INFO, "R3BFileSource already initialized");
         return kTRUE;
     }
     if (!fInChain)
     {
         fInChain = new TChain(FairRootManager::GetTreeName(), Form("/%s", FairRootManager::GetFolderName()));
-        LOG(debug) << "R3BFileSource::Init() chain created";
+        R3BLOG(debug, "Chain created");
         FairRootManager::Instance()->SetInChain(fInChain);
     }
     fInChain->Add(fRootFile->GetName());
@@ -272,7 +275,7 @@ Bool_t R3BFileSource::Init()
     TList* list = dynamic_cast<TList*>(fRootFile->Get("BranchList"));
     if (list == 0)
     {
-        LOG(fatal) << "No Branch list in input file";
+        R3BLOG(fatal, "No Branch list in input file");
     }
     TString chainName = fInputTitle;
     TString ObjName;
@@ -281,14 +284,14 @@ Bool_t R3BFileSource::Init()
     if (list)
     {
         TObjString* Obj = 0;
-        LOG(debug) << "Enteries in the list " << list->GetEntries();
+        R3BLOG(debug, "Enteries in the list " << list->GetEntries());
         for (Int_t i = 0; i < list->GetEntries(); i++)
         {
             Obj = dynamic_cast<TObjString*>(list->At(i));
             if (Obj != 0)
             {
                 ObjName = Obj->GetString();
-                LOG(debug) << "Branch name " << ObjName.Data();
+                R3BLOG(debug, "Branch name " << ObjName.Data());
                 fCheckInputBranches[chainName]->push_back(ObjName.Data());
 
                 FairRootManager::Instance()->AddBranchToList(ObjName.Data());
@@ -346,7 +349,7 @@ Bool_t R3BFileSource::Init()
     }
     fNoOfEntries = fInChain->GetEntries();
 
-    LOG(debug) << "Entries in this Source " << fNoOfEntries;
+    R3BLOG(debug, "Entries in this Source " << fNoOfEntries);
 
     for (Int_t i = 0; i < fListFolder->GetEntriesFast(); i++)
     {
@@ -381,18 +384,18 @@ Bool_t R3BFileSource::Init()
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
     {
-        LOG(WARNING) << "R3BFileSource::Init() Input file for RunIds was not found, it is Ok!";
+        R3BLOG(WARNING, "Input file for RunIds was not found, it is Ok!");
     }
     else
     {
-        LOG(INFO) << "R3BFileSource::Init() Input file for RunIds " << fInputFileName.Data() << " is open!";
+        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " is open");
         fInputFile.clear();
         fInputFile.seekg(0, std::ios::beg);
     }
 
     if (fInputFile.is_open())
     {
-        LOG(INFO) << "R3BFileSource::Init() Reading RunId file";
+        R3BLOG(INFO, "Reading RunId file");
 
         Int_t rid;
         Int_t expRun;
@@ -408,7 +411,7 @@ Bool_t R3BFileSource::Init()
             fTimestamp.push_back(ts);
         }
 
-        LOG(INFO) << "R3BFileSource::Init() End of reading RunId file";
+        R3BLOG(INFO, "End of reading RunId file");
         fInputFile.close();
     }
     else
@@ -435,7 +438,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     UInt_t fArraysize = fTimestamp.size();
     if (fArraysize != fRunid.size())
     {
-        LOG(ERROR) << "\033[5m\033[31m R3BFileSource::GetRunid() Different number of RunIds and timestamps \033[0m";
+        R3BLOG(ERROR, "\033[5m\033[31m Different number of RunIds and timestamps \033[0m");
         prevts = 0;
         nextts = 0;
         return 1;
@@ -459,7 +462,9 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     }
 
     if (nextts > 0)
-        LOG(WARNING) << "\033[5m\033[33m R3BFileSource::GetRunid() RunId was not found, it will be 1 \033[0m";
+    {
+        R3BLOG(WARNING, "\033[5m\033[33m RunId was not found, it will be 1 \033[0m");
+    }
     prevts = 0;
     nextts = 0;
 

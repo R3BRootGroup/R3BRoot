@@ -19,13 +19,16 @@
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
     , fLosCalData("LosCal")
+    , fLosTriggerCalData("LosTriggerCal")
     , fEventHeader(nullptr)
 {
 }
 
 InitStatus R3BLosProvideTStart::Init()
 {
+    R3BLOG(INFO, "");
     fLosCalData.Init();
+    fLosTriggerCalData.Init();
 
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
@@ -48,11 +51,22 @@ void R3BLosProvideTStart::Exec(Option_t*) { fEventHeader->SetTStart(GetTStart())
 Double_t R3BLosProvideTStart::GetTStart() const
 {
     const auto losCalData = fLosCalData.Retrieve();
+    const auto losTriggerCalData = fLosTriggerCalData.Retrieve();
+
     if (losCalData.empty())
     {
         return std::numeric_limits<Double_t>::quiet_NaN();
     }
-    return losCalData.back()->GetMeanTimeVFTX();
+    else if (losTriggerCalData.empty())
+    {
+        R3BLOG(DEBUG1, "CalData info for LOS");
+        return losCalData.back()->GetMeanTimeVFTX();
+    }
+    else
+    {
+        R3BLOG(DEBUG1, "CalData with trigger info for LOS");
+        return losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0);
+    }
 }
 
 bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart()); }

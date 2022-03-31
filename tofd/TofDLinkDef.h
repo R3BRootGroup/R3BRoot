@@ -26,13 +26,13 @@
 #pragma link C++ class R3BTofDHitPar+;
 #pragma link C++ class R3BTofDHitModulePar+;
 #pragma link C++ class R3BTofDMappingPar+;
+#pragma link C++ class R3BTofDMapped2CalPar+;
  
 #pragma link C++ class R3BTofDMapped2Cal+;
 #pragma link C++ class R3BTofDCal2Hit+;
 
 #pragma link C++ class R3BTofDOnlineSpectra+;
 
-//#pragma link C++ class R3BTofDMapped2CalPar+;
 //#pragma link C++ class R3BTofDCal2HitPar+;
 //#pragma link C++ class R3BTofDCal2Histo+;
 //#pragma link C++ class R3BTofDCal2HistoPar+;

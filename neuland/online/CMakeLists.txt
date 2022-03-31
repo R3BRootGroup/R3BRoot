@@ -16,7 +16,8 @@ set(LINKDEF NeulandOnlineLinkDef.h)
 
 set(DEPENDENCIES R3BData)
 
-set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/online)
+set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} 
+${R3BROOT_SOURCE_DIR}/neuland/online)
 include_directories(${INCLUDE_DIRECTORIES})
 
 set(SRCS R3BNeulandOnlineReconstruction.cxx R3BNeulandOnlineSpectra.cxx)
