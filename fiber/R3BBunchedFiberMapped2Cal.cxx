@@ -34,6 +34,8 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
                                                      Bool_t a_skip_spmt)
     : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
     , fName(a_name)
+    , fSPMTElectronics(Electronics::CTDC)
+    , fCTDCVariant(a_variant)
     , fSkipSPMT(a_skip_spmt)
     , fMAPMTTCalPar(nullptr)
     , fMAPMTTrigTCalPar(nullptr)

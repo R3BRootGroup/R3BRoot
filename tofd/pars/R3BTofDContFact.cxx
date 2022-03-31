@@ -43,16 +43,16 @@ void R3BTofDContFact::setAllContainers()
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers for the STS library.*/
 
-    FairContainer* p1 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "TestDefaultContext");
-    p1->addContext("TestDefaultContext");
+    FairContainer* p1 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "tofdGeoContext");
+    p1->addContext("tofdGeoContext");
     containers->Add(p1);
 
     FairContainer* p2 = new FairContainer("tofdMappingPar", "Tofd Mapping parameters", "tofdMappingContext");
     p2->addContext("tofdMappingContext");
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("TofdHitPar", "Tofd Hit parameters", "tofdHitDefaultContext");
-    p3->addContext("tofdHitDefaultContext");
+    FairContainer* p3 = new FairContainer("tofdHitPar", "Tofd Hit parameters", "tofdHitContext");
+    p3->addContext("tofdHitContext");
     containers->Add(p3);
 }
 
@@ -73,7 +73,7 @@ FairParSet* R3BTofDContFact::createContainer(FairContainer* c)
     {
         p = new R3BTofDMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "TofdHitPar") == 0)
+    else if (strcmp(name, "tofdHitPar") == 0)
     {
         p = new R3BTofDHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

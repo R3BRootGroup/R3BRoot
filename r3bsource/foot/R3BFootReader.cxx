@@ -45,6 +45,7 @@ R3BFootReader::R3BFootReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
 
 R3BFootReader::~R3BFootReader()
 {
+    R3BLOG(DEBUG1, "");
     if (fArray)
         delete fArray;
 }

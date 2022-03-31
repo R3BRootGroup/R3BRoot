@@ -55,10 +55,10 @@ set(SRCS
 ./pars/R3BTofDHitPar.cxx
 ./pars/R3BTofDHitModulePar.cxx
 ./pars/R3BTofDMappingPar.cxx
+./pars/R3BTofDMapped2CalPar.cxx
 ./calibration/R3BTofDMapped2Cal.cxx
 ./calibration/R3BTofDCal2Hit.cxx
 ./online/R3BTofDOnlineSpectra.cxx
-#R3BTofDMapped2CalPar.cxx
 #R3BTofDCal2HitPar.cxx
 #R3BTofDCal2Histo.cxx
 #R3BTofDCal2HistoPar.cxx

@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BROOT_R3BLOSPROVIDETSTART_H
-#define R3BROOT_R3BLOSPROVIDETSTART_H
+#define R3BROOT_R3BLOSPROVIDETSTART_H 1
 
 #include "FairTask.h"
 #include "R3BLosCalData.h"
@@ -30,6 +30,7 @@ class R3BLosProvideTStart : public FairTask
 
   private:
     TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
+    TCAOptionalInputConnector<R3BLosCalData> fLosTriggerCalData;
     R3BEventHeader* fEventHeader;
 
     bool IsBeam() const;

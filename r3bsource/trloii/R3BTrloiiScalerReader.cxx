@@ -14,6 +14,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BLogger.h"
 #include "R3BTrloiiData.h"
 #include "R3BTrloiiScalerReader.h"
 
@@ -43,6 +44,7 @@ R3BTrloiiScalerReader::R3BTrloiiScalerReader(EXT_STR_h101_TRLO_onion* data, size
 
 R3BTrloiiScalerReader::~R3BTrloiiScalerReader()
 {
+    R3BLOG(DEBUG1, "");
     if (fArray)
         delete fArray;
 }
@@ -50,25 +52,26 @@ R3BTrloiiScalerReader::~R3BTrloiiScalerReader()
 Bool_t R3BTrloiiScalerReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTrloiiScalerReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_TRLO_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TRLO, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BTrloiiScalerReader::Failed to setup structure information.";
+        R3BLOG(ERROR, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Register output array in tree
     FairRootManager::Instance()->Register("TrloiiData", "TRLOII info", fArray, !fOnline);
-    fArray->Clear();
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
 
 Bool_t R3BTrloiiScalerReader::Read()
 {
-    LOG(DEBUG) << "R3BTrloiiScalerReader::Read() Event data.";
+    R3BLOG(DEBUG1, "Event data");
 
     for (int ch = 0; ch < 16; ++ch)
     {

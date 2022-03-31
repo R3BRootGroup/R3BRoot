@@ -112,6 +112,8 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTCTM = 0;
         data->LOS[d].VTRIGC = 0;
         data->LOS[d].VTRIGF = 0;
+        data->LOS[d].TTRIGCL = 0;
+        data->LOS[d].TTRIGFL = 0;
     }
 
     return kTRUE;
@@ -383,19 +385,35 @@ Bool_t R3BLosReader::Read()
 
         if (fArrayTrigger)
         {
-            // Trigger VFTX2 Mapping.
+            // Trigger VFTX2 data
             uint32_t trigChannels = data->LOS[d].VTRIGF;
             for (uint32_t i = 0; i < trigChannels; i++)
             {
-                uint32_t channelf = data->LOS[d].VTRIGFI[i]; // = 1..8
-                uint32_t channelc = data->LOS[d].VTRIGCI[i]; // = 1..8
+                uint32_t channelf = data->LOS[d].VTRIGFI[i]; // = 1..2
+                uint32_t channelc = data->LOS[d].VTRIGCI[i]; // = 1..2
                 if (channelf == channelc)
                     new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
                         R3BLosMappedData(d + 1,                   // detector number
-                                         channelf,                // channel number: 1-8
+                                         channelf,                // channel number: 1
                                          0,                       // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
                                          data->LOS[d].VTRIGFv[i], // VFTX fine time
                                          data->LOS[d].VTRIGCv[i]  // VFTX coarse time
+                        );
+            }
+
+            // Trigger TAMEX3 data.
+            trigChannels = data->LOS[d].TTRIGFL;
+            for (uint32_t i = 0; i < trigChannels; i++)
+            {
+                uint32_t channelf = data->LOS[d].TTRIGFLI[i]; // = 1..2
+                uint32_t channelc = data->LOS[d].TTRIGCLI[i]; // = 1..2
+                if (channelf == channelc)
+                    new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                        R3BLosMappedData(d + 1,                    // detector number
+                                         channelf,                 // channel number: 1
+                                         1,                        // VFTX (0),TAMEX leading (1), TAMEX trailing (2)
+                                         data->LOS[d].TTRIGFLv[i], // VFTX fine time
+                                         data->LOS[d].TTRIGCLv[i]  // VFTX coarse time
                         );
             }
         }
