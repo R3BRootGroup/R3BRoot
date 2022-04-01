@@ -72,10 +72,7 @@ R3BMusicMapped2CalPar::R3BMusicMapped2CalPar(const TString& name,
 }
 
 // Virtual R3BMusicMapped2CalPar: Destructor
-R3BMusicMapped2CalPar::~R3BMusicMapped2CalPar()
-{
-    LOG(INFO) << "R3BMusicMapped2CalPar: Delete instance";
-}
+R3BMusicMapped2CalPar::~R3BMusicMapped2CalPar() { LOG(INFO) << "R3BMusicMapped2CalPar: Delete instance"; }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicMapped2CalPar::Init()

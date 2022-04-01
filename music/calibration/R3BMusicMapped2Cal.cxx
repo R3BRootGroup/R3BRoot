@@ -172,6 +172,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];
     UShort_t anodeId = 0;
     Double_t pedestal = 0.;
+    Double_t slope = 1.;
     Double_t sigma = 0.;
 
     for (Int_t i = 0; i < (fNumAnodes + fNumAnodesRef); i++)
@@ -191,10 +192,11 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
 
         if (anodeId < fNumAnodes && fCal_Par->GetInUse(anodeId + 1) == 1)
         {
-            pedestal = CalParams->GetAt(fNumParams * anodeId + 1);
+            pedestal = CalParams->GetAt(fNumParams * anodeId);
+            slope = CalParams->GetAt(fNumParams * anodeId + 1);
             // sigma=CalParams->GetAt(fNumParams*anodeId+2);
             // LOG(INFO) << detId << " " << anodeId<<" "<< mappedData[i]->GetEnergy()<< " " << pedestal;
-            energy[mulanode[anodeId]][anodeId] = mappedData[i]->GetEnergy() - pedestal;
+            energy[mulanode[anodeId]][anodeId] = pedestal + slope * mappedData[i]->GetEnergy();
             dtime[mulanode[anodeId]][anodeId] = mappedData[i]->GetTime();
             mulanode[anodeId]++;
         }

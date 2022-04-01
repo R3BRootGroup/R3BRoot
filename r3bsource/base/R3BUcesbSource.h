@@ -77,6 +77,7 @@ class R3BUcesbSource : public FairSource
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
     void SetSkipEvents(Bool_t skip) { fSkip = skip; }
+    Bool_t GetSkipEvents() { return fSkip; }
 
   private:
     /* File descriptor returned from popen() */
