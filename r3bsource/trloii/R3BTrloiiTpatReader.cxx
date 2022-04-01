@@ -18,6 +18,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTrloiiTpatReader.h"
+#include "R3BUcesbSource.h"
 
 extern "C"
 {
@@ -64,6 +65,15 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     }
     else
         R3BLOG(INFO, "EventHeader. found");
+    R3BUcesbSource* source = (R3BUcesbSource*)frm->GetSource();
+    if (fTpat >= 0 && source->GetSkipEvents())
+    {
+        R3BLOG(WARNING,
+               "Both SetSkipEvents() in R3BUcesbSource and SetTpat() in R3BTrloiiTpatReader are defined to select "
+               "events based on tpat values.");
+        R3BLOG(INFO, "Thus SetSkipEvents() in R3BUcesbSource will be disabled.");
+        source->SetSkipEvents(false);
+    }
 
     return kTRUE;
 }

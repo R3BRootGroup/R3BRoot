@@ -74,9 +74,9 @@ class R3BMwpc0Cal2Hit : public FairTask
     R3BMwpcHitData* AddHitData(Double_t x, Double_t y);
 
     /** Private method to obtain the position X **/
-    Double_t GetPostionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
+    Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
     /** Private method to obtain the position Y **/
-    Double_t GetPostionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup);
+    Double_t GetPositionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup);
 
   public:
     // Class definition
