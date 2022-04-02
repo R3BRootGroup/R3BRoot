@@ -20,6 +20,11 @@
 #include "R3BTrloiiTpatReader.h"
 #include "R3BUcesbSource.h"
 
+/**
+ ** ext_h101_tpat.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:TPAT,RAW:TPATFAIL,id=h101_TPAT,NOTRIGEVENTNO,ext_h101_tpat.h
+ **/
+
 extern "C"
 {
 #include "ext_data_client.h"
@@ -39,6 +44,7 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
 
 R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
 {
+    R3BLOG(INFO, "");
     if (fEventHeader)
     {
         delete fEventHeader;
@@ -64,7 +70,10 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
     else
+    {
         R3BLOG(INFO, "EventHeader. found");
+    }
+    
     R3BUcesbSource* source = (R3BUcesbSource*)frm->GetSource();
     if (fTpat >= 0 && source->GetSkipEvents())
     {
@@ -75,11 +84,15 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
         source->SetSkipEvents(false);
     }
 
+    Reset();
+    memset(fData, 0, sizeof *fData);
+
     return kTRUE;
 }
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
+    R3BLOG(DEBUG1, "Event data.");
     if (fEventHeader)
     {
         fEventHeader->SetTpat(0);

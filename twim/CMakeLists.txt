@@ -32,7 +32,6 @@ ${R3BROOT_SOURCE_DIR}/twim/online
 )
 
 if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-add_definitions(-DSOFIADEFINED)
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/sofia/sofdata

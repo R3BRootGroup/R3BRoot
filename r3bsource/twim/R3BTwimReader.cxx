@@ -176,8 +176,9 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
         {
             pileupFLAG = (data->SOFTWIM_S[section].TTRIGv[hit] & 0x00040000) >> 18;
             overflowFLAG = (data->SOFTWIM_S[section].TTRIGv[hit] & 0x00080000) >> 19;
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(
-                section + 1, idAnodeTtrig + 1, data->SOFTWIM_S[section].TTRIGv[hit], 0, pileupFLAG, overflowFLAG);
+            if (pileupFLAG == kFALSE || !fPileup)
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(
+                    section + 1, idAnodeTtrig + 1, data->SOFTWIM_S[section].TTRIGv[hit], 0, pileupFLAG, overflowFLAG);
             // std::cout << "valTimeTtrig = " << data->SOFTWIM_S[section].TTRIGv[hit] << std::endl;
         }
         curTtrig = nextTtrig;
@@ -218,12 +219,13 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
             // Attention, here the numbering is 0-based for section and anodes
             pileupFLAG = (data->SOFTWIM_S[section].Ev[hit] & 0x00040000) >> 18;
             overflowFLAG = (data->SOFTWIM_S[section].Ev[hit] & 0x00080000) >> 19;
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(section + 1,
-                                                                        idAnodeEnergy + 1,
-                                                                        data->SOFTWIM_S[section].Tv[hit],
-                                                                        data->SOFTWIM_S[section].Ev[hit],
-                                                                        pileupFLAG,
-                                                                        overflowFLAG);
+            if (pileupFLAG == kFALSE || !fPileup)
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BTwimMappedData(section + 1,
+                                                                            idAnodeEnergy + 1,
+                                                                            data->SOFTWIM_S[section].Tv[hit],
+                                                                            data->SOFTWIM_S[section].Ev[hit],
+                                                                            pileupFLAG,
+                                                                            overflowFLAG);
             // std::cout << "valTimeAnode = " << data->SOFTWIM_S[section].Tv[hit] << std::endl;
         }
         curAnodeEnergyStart = nextAnodeEnergyStart;

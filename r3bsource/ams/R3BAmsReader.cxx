@@ -44,6 +44,7 @@ R3BAmsReader::R3BAmsReader(EXT_STR_h101_AMS_onion* data, size_t offset)
 
 R3BAmsReader::~R3BAmsReader()
 {
+    R3BLOG(INFO, "");
     if (fArray)
         delete fArray;
 }
@@ -70,7 +71,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BAmsReader::Read()
 {
-    LOG(DEBUG) << "R3BAmsReader::Read() Event data.";
+    R3BLOG(DEBUG1, "Event data.");
     // Read AMS detectors
     for (int d = 0; d < 6; d++)
         if (fData->SST[d]._ == 1024)
