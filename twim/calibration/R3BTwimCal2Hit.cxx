@@ -36,7 +36,7 @@
 #include "R3BTwimCalData.h"
 #include "R3BTwimHitData.h"
 #include "R3BTwimHitPar.h"
-#ifdef DSOFIADEFINED
+#ifdef SOFIA
 #include "R3BSofTofWHitData.h"
 #endif
 
@@ -53,6 +53,7 @@ R3BTwimCal2Hit::R3BTwimCal2Hit(const char* name, Int_t iVerbose)
     , fNumAnodes(16)
     , fNumAnodesAngleFit(0)
     , fNumParams(2)
+    , fMaxEnergyperanode(65535)
     , CalZParams(NULL)
     , CalZTofParams(NULL)
     , fCal_Par(NULL)
@@ -95,7 +96,6 @@ void R3BTwimCal2Hit::SetParContainers()
 
 void R3BTwimCal2Hit::SetParameter()
 {
-
     //--- Parameter Container ---
     fNumSec = fCal_Par->GetNumSec();        // Number of Sections
     fNumAnodes = fCal_Par->GetNumAnodes();  // Number of anodes
@@ -255,7 +255,7 @@ void R3BTwimCal2Hit::S455()
         }
     }
 
-#ifdef DSOFIADEFINED
+#ifdef SOFIA
     // Fill TofW Hit data
     Double_t tof[2] = { 0., 0. };
     Int_t padid[2] = { 0, 0 };
@@ -302,7 +302,7 @@ void R3BTwimCal2Hit::S455()
             // energyperanode[i+1][j] > 0)) && energyperanode[i][j] < 65535 && StatusAnodes[i][j] == 1 &&
             // energyperanode[i+1][j] < 65535 && StatusAnodes[i+1][j] == 1)
 
-            if (energyperanode[i][j] > 0 && energyperanode[i][j] < 65535 && StatusAnodes[i][j] == 1)
+            if (energyperanode[i][j] > 0 && energyperanode[i][j] < fMaxEnergyperanode && StatusAnodes[i][j] == 1)
             {
                 Esum += energyperanode[i][j];
                 if (dt[i][j] > 0.)
@@ -312,6 +312,7 @@ void R3BTwimCal2Hit::S455()
                 fPosAnodes[fNumAnodesAngleFit] = fCal_Par->GetAnodePos(j + 1);
                 fNumAnodesAngleFit++;
                 nba++;
+                // std::cout<< i <<" "<< j <<" "<< energyperanode[i][j] <<std::endl;
             }
             /*}else
             if ( energyperanode[i][j] > 0 && energyperanode[i][j] < 65535 && StatusAnodes[i][j] == 1 &&
@@ -359,7 +360,7 @@ void R3BTwimCal2Hit::S455()
                 Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean;
                 // if (zhit > 0 && theta > -5000.)
                 if (zhit > 0)
-                    AddHitData(i, theta, zhit, good_dt[7], Esum_mean);
+                    AddHitData(i + 1, theta, zhit, good_dt[7], Esum_mean);
             }
             else
             {
@@ -374,7 +375,7 @@ void R3BTwimCal2Hit::S455()
     }
 #endif
     if (CalDat)
-        delete CalDat;
+        delete[] CalDat;
     return;
 }
 
@@ -388,7 +389,6 @@ void R3BTwimCal2Hit::S467()
     if (!nHits)
         return;
 
-    // R3BTwimCalData* CalDat;
     R3BTwimCalData** CalDat = new R3BTwimCalData*[nHits];
 
     Int_t secId, anodeId;
@@ -457,7 +457,7 @@ void R3BTwimCal2Hit::S467()
     }
 
     if (CalDat)
-        delete CalDat;
+        delete[] CalDat;
     return;
 }
 

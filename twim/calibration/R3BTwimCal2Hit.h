@@ -74,6 +74,7 @@ class R3BTwimCal2Hit : public FairTask
     Int_t fNumAnodes;
     Int_t fNumAnodesAngleFit;
     Int_t fNumParams;
+    Int_t fMaxEnergyperanode;
     Float_t fZ0[4], fZ1[4], fZ2[4];
     Int_t StatusAnodes[4][16]; // Sections and anodes
     Double_t fPosAnodes[16];   // Position-Z of each anode
