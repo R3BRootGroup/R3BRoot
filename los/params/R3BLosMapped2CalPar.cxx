@@ -121,13 +121,12 @@ InitStatus R3BLosMapped2CalPar::Init()
         R3BLOG(FATAL, "LosMapped not found");
         return kFATAL;
     }
-    
+
     // get access to Trigger Mapped data
     fMappedTriggerItems = (TClonesArray*)rm->GetObject("LosTriggerMapped");
     R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
-    fCal_Par->setChanged();
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
@@ -184,20 +183,20 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
             fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
         }
     }
-    
+
     // Calibrate trigger channels -----------------------------------------------
-    if (fMappedTriggerItems && fMappedTriggerItems->GetEntriesFast()>0)
+    if (fMappedTriggerItems && fMappedTriggerItems->GetEntriesFast() > 0)
     {
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
             auto mapped = (R3BLosMappedData const*)fMappedTriggerItems->At(mapped_i);
-            
+
             UInt_t iDetector = mapped->GetDetector() - 1; // now 0..n-1
-            UInt_t iChannel = mapped->GetChannel() - 1;   // now 0..n-1
-            UInt_t iType = mapped->GetType();             // 0,1,2,3
-            //R3BLOG(INFO, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
-            fEngine->Fill(3, iChannel + 1, iType + 1, mapped->GetTimeFine());
+            UInt_t iChannel = mapped->GetChannel();
+            UInt_t iType = mapped->GetType() + 1; // 1,2,3...
+            R3BLOG(DEBUG1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
+            fEngine->Fill(3 + iDetector, iChannel, iType, mapped->GetTimeFine());
         }
     }
 
@@ -208,11 +207,9 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
 void R3BLosMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
-
     fCal_Par->printParams();
+    fCal_Par->setChanged();
 
-    //    for (Int_t id = 0; id < 2; id++)
-    //    {
     for (Int_t i = 0; i < 16; i++)
     {
         for (Int_t k = 0; k < 3; k++)
@@ -223,7 +220,6 @@ void R3BLosMapped2CalPar::FinishTask()
             }
         }
     }
-    //    }
 }
 
 ClassImp(R3BLosMapped2CalPar);

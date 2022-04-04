@@ -127,9 +127,9 @@ class R3BLosMapped2CalPar : public FairTask
     UInt_t fNofTypes = 3; /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
     UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
 
-    Int_t fNEvents;         /**< Event counter. */
-    R3BTCalPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fMapped;  /**< Array with mapped data - input data. */
+    Int_t fNEvents;        /**< Event counter. */
+    R3BTCalPar* fCal_Par;  /**< Parameter container. */
+    TClonesArray* fMapped; /**< Array with mapped data - input data. */
     TClonesArray* fMappedTriggerItems;
     R3BEventHeader* header; /**< Event header - input data. */
 
