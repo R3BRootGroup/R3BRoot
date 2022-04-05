@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BBunchedFiberMappedData.h"
+#include "R3BLogger.h"
 #include "TClonesArray.h"
 
 extern "C"
@@ -25,7 +26,7 @@ extern "C"
 
 R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a_data, size_t a_offset)
     : R3BReader("R3BBunchedFiberSPMTTrigReader")
-    , fData(a_data)
+    , fData((EXT_STR_h101_FIB_onion*)a_data)
     , fOffset(a_offset)
     , fOnline(kFALSE)
     , fMappedArray(new TClonesArray("R3BBunchedFiberMappedData"))
@@ -41,16 +42,16 @@ R3BBunchedFiberSPMTTrigReader::~R3BBunchedFiberSPMTTrigReader()
 Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
+    R3BLOG(INFO, "");
     EXT_STR_h101_FIB_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FIB, 0);
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(FATAL) << "Failed to setup structure information.";
+        R3BLOG(FATAL, "Failed to setup structure information.");
         return kFALSE;
     }
 
     FairRootManager::Instance()->Register(
-        "BunchedFiberSPMTTrigMapped", "BunchedFiberSPMTTrigMapped", fMappedArray, !fOnline);
+        "BunchedFiberSPMTTrigMapped", "BunchedFiberSPMTTrigMapped data", fMappedArray, !fOnline);
     memset(fData, 0, sizeof *fData);
 
     return kTRUE;

@@ -95,6 +95,7 @@
 #pragma link C++ class EXT_STR_h101_TPAT_t;
 #pragma link C++ class EXT_STR_h101_timestamp_master_t;
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
+#pragma link C++ class EXT_STR_h101_FIB_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBZERO_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBONEA_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBONEB_onion_t;
