@@ -128,7 +128,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     auto name_spmt_trig = "BunchedFiberSPMTTrigCal";
     fSPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_spmt_trig);
     if (NULL == fSPMTCalTriggerItems)
-        LOG(fatal) << "Branch " << name_spmt_trig << " not found";
+        LOG(warning) << "Branch " << name_spmt_trig << " not found";
 
     maxevent = mgr->CheckMaxEventNo();
 
@@ -139,8 +139,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         fChannelArray[side_i].resize(fSubNum * fChPerSub[side_i]);
     }
 
-    //    if (!fIsCalibrator )//|| (fIsCalibrator && (!fIsGain || !fIsTsync)) )
-    //    {
+    if (!fIsCalibrator )//|| (fIsCalibrator && (!fIsGain || !fIsTsync)) )
+    {
     // Get calibration parameters if we're not a calibrator.
     auto container = fName + "HitPar";
     fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
@@ -185,8 +185,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
             }
         }
     }
-
-    //    }
+    }
+    
     // create histograms
     TString chistName;
     TString chistTitle;
@@ -276,6 +276,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
+
     // cout<<"in exec"<<endl;
     //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
     multi = 0;
@@ -310,11 +311,14 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
     }
+    
+
 
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.
-    size_t spmt_trig_num = fSPMTCalTriggerItems->GetEntries();
+    /*size_t spmt_trig_num = fSPMTCalTriggerItems->GetEntries();
     std::vector<R3BBunchedFiberCalData const*> spmt_trig_table;
+    if (fSPMTCalTriggerItems){
     for (size_t j = 0; j < spmt_trig_num; ++j)
     {
         auto cal = (R3BBunchedFiberCalData const*)fSPMTCalTriggerItems->At(j);
@@ -323,6 +327,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             spmt_trig_table.resize(idx + 1);
         spmt_trig_table.at(idx) = cal;
     }
+    }*/
+
 
     // Find multi-hit ToT for every channel.
     // The easiest safe way to survive ugly cases is to record all
@@ -395,20 +401,20 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     lead_trig_ns = lead_trig->GetTime_ns();
                 }
             }
-            else if (cur_cal->IsSPMT() && fSPMTTriggerMap)
+            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && fSPMTCalTriggerItems)
             {
                 auto cur_cal_trig_i = fSPMTTriggerMap[ch_i];
                 auto lead_trig_i = fSPMTTriggerMap[lead->GetChannel() - 1];
                 // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
                 // lead->GetChannel() - 1, lead_trig_i, spmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
                 // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
-                if (cur_cal_trig_i < spmt_trig_table.size() && lead_trig_i < spmt_trig_table.size())
+                /*if (cur_cal_trig_i < spmt_trig_table.size() && lead_trig_i < spmt_trig_table.size())
                 {
                     auto cur_cal_trig = spmt_trig_table.at(cur_cal_trig_i);
                     auto lead_trig = spmt_trig_table.at(lead_trig_i);
                     cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
                     lead_trig_ns = lead_trig->GetTime_ns();
-                }
+                }*/
             }
 
             auto cur_cal_ns =
@@ -832,4 +838,15 @@ void R3BBunchedFiberCal2Hit::SPMTTriggerMapSet(unsigned const* a_map, size_t a_m
     fSPMTTriggerMap = a_map;
 }
 
-ClassImp(R3BBunchedFiberCal2Hit)
+UInt_t R3BBunchedFiberCal2Hit::FixMistake(UInt_t a_fiber_id)
+{
+    //  if (201 == a_fiber_id) {
+    //    a_fiber_id = 200;
+    //  }
+    //  if (200 == a_fiber_id) {
+    //    a_fiber_id = 201;
+    //  }
+    return a_fiber_id;
+}
+
+ClassImp(R3BBunchedFiberCal2Hit);

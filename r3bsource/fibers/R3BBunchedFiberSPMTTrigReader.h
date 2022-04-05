@@ -26,6 +26,7 @@ class TClonesArray;
 
 struct EXT_STR_h101_FIB_t;
 typedef struct EXT_STR_h101_FIB_t EXT_STR_h101_FIB;
+typedef struct EXT_STR_h101_FIB_onion_t EXT_STR_h101_FIB_onion;
 class ext_data_struct_info;
 
 class R3BBunchedFiberSPMTTrigReader : public R3BReader
@@ -51,7 +52,7 @@ class R3BBunchedFiberSPMTTrigReader : public R3BReader
 
   private:
     // Reader specific data structure from ucesb
-    EXT_STR_h101_FIB* fData;
+    EXT_STR_h101_FIB_onion* fData;
     // Data offset
     size_t fOffset;
     // Don't store data for online

@@ -130,7 +130,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * Getting all fibers correct is difficult, this function lets us fix that
      * per detector.
      */
-    virtual UInt_t FixMistake(UInt_t) = 0;
+    virtual UInt_t FixMistake(UInt_t);
 
     /**
      * Can provide an array that lists for every channel (i.e. fiber bunch, not
