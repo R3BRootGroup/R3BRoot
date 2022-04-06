@@ -133,11 +133,11 @@ class R3BTofdHisto2HitPar : public FairTask
     /**
      * Method for setting the lower range of ToT for offset calibration
      */
-    inline void SetTofdTotLow(Double_t TotLow) { fTofdTotLow = TotLow; }
+    inline void SetTofdCutLow(Double_t CutLow) { fTofdCutLow = CutLow; }
     /**
      * Method for setting the upper range of ToT for offset calibration
      */
-    inline void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
+    inline void SetTofdCutHigh(Double_t CutHigh) { fTofdCutHigh = CutHigh; }
     /**
      * Method for using smiley or double exponential charge correction
      */
@@ -159,7 +159,7 @@ class R3BTofdHisto2HitPar : public FairTask
     /**
      * Method for calculation of ToT offset.
      */
-    virtual void calcToTOffset(Double_t TotLow, Double_t TotHigh);
+    virtual void calcToTOffset(Double_t CutLow, Double_t CutHigh);
 
     /**
      * Method for calculation of sync offset between paddles.
@@ -174,7 +174,7 @@ class R3BTofdHisto2HitPar : public FairTask
     /**
      * Method for calculation of light attenuation factor.
      */
-    virtual void calcLambda(Double_t TotLow, Double_t TotHigh);
+    virtual void calcLambda(Double_t CutLow, Double_t CutHigh);
 
     /**
      * Method for calculation of position dependence charge of scintillator.
@@ -209,8 +209,8 @@ class R3BTofdHisto2HitPar : public FairTask
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
-    Double_t fTofdTotLow;
-    Double_t fTofdTotHigh;
+    Double_t fTofdCutLow;
+    Double_t fTofdCutHigh;
     Bool_t fTofdSmiley;
     TString fParaFile;
     TString fHistoFile;

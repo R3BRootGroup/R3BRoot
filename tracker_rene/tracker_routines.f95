@@ -3794,7 +3794,7 @@ subroutine single_track
  t = 0.
  x = x_start
 !
- print*,'single track',reference_track
+! print*,'single track',reference_track
  call get_velocity(x(4:6))
  dt_fine   = spatial_resolution / dsqrt(dot_product(v,v))
  if (reference_track .and. grafical_output) open (unit=unit_standard_track, file=trim(output_file(2)))

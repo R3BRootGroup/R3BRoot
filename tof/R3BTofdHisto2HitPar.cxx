@@ -79,8 +79,8 @@ R3BTofdHisto2HitPar::R3BTofdHisto2HitPar()
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fTofdTotLow(0.)
-    , fTofdTotHigh(0.)
+    , fTofdCutLow(0.)
+    , fTofdCutHigh(0.)
     , fTofdSmiley(true)
     , fParaFile("")
     , fHistoFile("")
@@ -101,8 +101,8 @@ R3BTofdHisto2HitPar::R3BTofdHisto2HitPar(const char* name, Int_t iVerbose)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fTofdTotLow(0.)
-    , fTofdTotHigh(0.)
+    , fTofdCutLow(0.)
+    , fTofdCutHigh(0.)
     , fTofdSmiley(true)
     , fParaFile("")
     , fHistoFile("")
@@ -177,7 +177,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         calcOffset();
         // Determine ToT offset between top and bottom PMT
         LOG(WARNING) << "Calling function calcToTOffset";
-        calcToTOffset(fTofdTotLow, fTofdTotHigh);
+        calcToTOffset(fTofdCutLow, fTofdCutHigh);
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
@@ -191,7 +191,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         calcVeff();
         // Determine light attenuation lambda for each paddle
         LOG(WARNING) << "Calling function calcLambda";
-        calcLambda(fTofdTotLow, fTofdTotHigh);
+        calcLambda(fTofdCutLow, fTofdCutHigh);
     }
 
     if (fParameter == 3)
@@ -237,8 +237,6 @@ void R3BTofdHisto2HitPar::FinishTask()
             Double_t para[4];
             Double_t min = -50.; // effective bar length
             Double_t max = 50.;  // effective bar length = 80 cm
-            Double_t cutmin = 20.;  // cut on ToT/charge
-            Double_t cutmax = 70.;  //
 
             for (Int_t i = 0; i < fNofPlanes; i++)
             {
@@ -285,10 +283,12 @@ void R3BTofdHisto2HitPar::FinishTask()
         TCanvas* czcorr = new TCanvas("czcorr", "czcorr", 100, 100, 800, 800);
         Double_t para[8];
         Double_t pars[3];
-        Int_t min = 0.1, max = 14; // select range for peak search
-        for (Int_t i = 0; i < fNofPlanes; i++)
+        Int_t min = fTofdCutLow, max = fTofdCutHigh; // select range for peak search
+        //for (Int_t i = 0; i < fNofPlanes; i++)
+        for (Int_t i = 1; i < 2; i++)
         {
-            for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
+            //for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
+            for (Int_t j = 37; j < 41; j++) //
             {
                 if (histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
@@ -537,13 +537,13 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     TH2F* histo2 = (TH2F*)histo->Clone();
     histo1->Draw("colz");
     histo1->RebinY(2);
-    histo1->SetAxisRange(fTofdTotLow, fTofdTotHigh, "Y");
+    histo1->SetAxisRange(fTofdCutLow, fTofdCutHigh, "Y");
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
     {
         TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
-        histo_py->SetAxisRange(fTofdTotLow, fTofdTotHigh, "X");
+        histo_py->SetAxisRange(fTofdCutLow, fTofdCutHigh, "X");
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -632,18 +632,18 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
     histo1->Draw("colz");
     TH2F* histo2 = (TH2F*)histo->Clone();
     histo2->RebinX(50);
-    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
-    // histo2->SetAxisRange(fTofdTotLow,fTofdTotHigh,"Y");
+    histo2->GetYaxis()->SetRangeUser(fTofdCutLow, fTofdCutHigh);
+    // histo2->SetAxisRange(fTofdCutLow,fTofdCutHigh,"Y");
     cfit_smiley->cd(2);
     histo2->Draw("colz");
     std::cout << "Searching for points to fit...\n";
     for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
     {
-        // std::cout<<"Bin "<<i<<" of "<<histo2->GetNbinsX()<<" with cut: "<<fTofdTotLow<<" < sqrt(q1*q2) <
-        // "<<fTofdTotHigh<<"\n";
+        // std::cout<<"Bin "<<i<<" of "<<histo2->GetNbinsX()<<" with cut: "<<fTofdCutLow<<" < sqrt(q1*q2) <
+        // "<<fTofdCutHigh<<"\n";
         cfit_smiley->cd(2);
         TLine* l = new TLine(
-            histo2->GetXaxis()->GetBinCenter(i), fTofdTotLow, histo2->GetXaxis()->GetBinCenter(i), fTofdTotHigh);
+            histo2->GetXaxis()->GetBinCenter(i), fTofdCutLow, histo2->GetXaxis()->GetBinCenter(i), fTofdCutHigh);
         l->SetLineColor(kRed);
         l->SetLineWidth(2.);
         l->Draw();
@@ -655,7 +655,7 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
 
-        if ((x[n] < min || x[n] > max) || (y[n] < fTofdTotLow || y[n] > fTofdTotHigh))
+        if ((x[n] < min || x[n] > max) || (y[n] < fTofdCutLow || y[n] > fTofdCutHigh))
         {
             delete histo_py;
             continue;
@@ -713,7 +713,7 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         para[j] = f2->GetParameter(j);
         std::cout << "Parameter: " << para[j] << "\n";
     }
-    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
+    histo2->GetYaxis()->SetRangeUser(fTofdCutLow, fTofdCutHigh);
     auto legend = new TLegend(.9, 0.7, .99, 0.9);
     legend->AddEntry("f1", "First Fit", "l");
     legend->AddEntry("f2", "Second Fit", "l");
@@ -780,9 +780,39 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         nPeaks++;
     }
     if (nPeaks < 2)
+    {
+        string doagain = "y";
+        Double_t xus = par[2 * nPeaks + 1];
+        do
+        {
+            for (Int_t i = 0; i < nPeaks; i++)
+            {
+                std::cout<<"Not enough peaks\nGive charge of main peak:\n";
+                std::cout << "Peak @ " << par[2 * nPeaks + 1];
+                Double_t z = 0;
+                while ((std::cout << " corresponds to Z=") && !(std::cin >> z))
+                {
+                    std::cout << "That's not a number;";
+                    std::cin.clear();
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                }
+                if (z != 0) xus = (Double_t)z;
+            }
+            std::cout << "Do again? (y/n) ";
+            std::cin >> doagain;
+        } while (doagain != "n");
+        pars[0] = xus/par[2 * nPeaks + 1];
+        pars[1] = 0.;
+        pars[2] = 1;
         return;
+    }
 
-    Double_t peaks[nPeaks] = {0};
+    Double_t peaks[nPeaks];
+    for (Int_t i = 0; i < nPeaks; i++)
+    {
+        peaks[i] = 0;
+    }
+    //Double_t peaks[nPeaks] = {0};
 
     for (Int_t i = 0; i < nPeaks; i++)
     {
@@ -814,7 +844,17 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
             if (z == 0)
+            {
+                Float_t xl = peaks[i];
+                Int_t bin = h1->GetXaxis()->FindBin(xl);
+                Float_t yl = h1->GetBinContent(bin);
+                TLine* l = new TLine(xl, 0, xl, yl);
+                l->SetLineColor(kWhite);
+                l->SetLineWidth(2.);
+                l->Draw();
+                czcorr->Update();
                 continue;
+            }
             x[nfp] = (Double_t)z;
             zpeaks[nfp] = peaks[i];
             Float_t xl = peaks[i];
@@ -835,12 +875,12 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     {
         delete s;
         //delete czcorr;
-        std::cout << "Not enough Peaks to fit! Next Bar...\n";
-        for (Int_t j = 0; j < 3; j++)
-        {
-            pars[j] = 0.;
-            // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
-        }
+        std::cout << "Not enough Peaks to fit! Will set charge to main peak.\n";
+        if (zpeaks[0] != 0) pars[0] = x[0]/zpeaks[0];
+        else pars[0] = 1;
+        pars[1] = 0.;
+        pars[2] = 1.;
+        // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
         return;
     }
     // fit charge axis
