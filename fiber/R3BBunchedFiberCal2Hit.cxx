@@ -518,7 +518,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             // TODO: Use it_sub->direction to find real life coordinates.
 
             // Fix fiber installation mistakes.
-            fiber_id = FixMistake(fiber_id);
+           // fiber_id = FixMistake(fiber_id);
 
             // Calibrate hit fiber.
             auto tot_mapmt = mapmt_tot.tot_ns;

@@ -12,17 +12,16 @@
  ******************************************************************************/
 
 #include "R3BTCalModulePar.h"
+#include "R3BLogger.h"
 
 #include "FairLogger.h"
-#include "FairParamList.h" // for FairParamList
+#include "FairParamList.h"
 
 #include "TF1.h"
 #include "TH1F.h"
 #include "TPad.h"
 
 using namespace std;
-
-ClassImp(R3BTCalModulePar);
 
 R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
@@ -35,13 +34,17 @@ R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const ch
     clear();
 }
 
-R3BTCalModulePar::~R3BTCalModulePar() {}
+R3BTCalModulePar::~R3BTCalModulePar() {
+    // Reset all parameters
+    clear();
+}
 
 void R3BTCalModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTCalModulePar::putParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(FATAL, "Could not find FairParamList");
         return;
     }
     list->add("plane", fPlane);
@@ -56,8 +59,10 @@ void R3BTCalModulePar::putParams(FairParamList* list)
 
 Bool_t R3BTCalModulePar::getParams(FairParamList* list)
 {
+    // R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(FATAL, "Could not find FairParamList");
         return kFALSE;
     }
     if (!list->fill("plane", &fPlane))
@@ -110,7 +115,7 @@ void R3BTCalModulePar::clear()
 
 void R3BTCalModulePar::printParams()
 {
-    LOG(INFO) << "   R3BTCalModulePar: Time Calibration Parameters: ";
+    R3BLOG(INFO, "Time Calibration Parameters:");
     LOG(INFO) << "   fPlane: " << fPlane;
     LOG(INFO) << "   fPaddle: " << fPaddle;
     LOG(INFO) << "   fSide: " << fSide;
@@ -205,3 +210,5 @@ void R3BTCalModulePar::DrawParams()
     }
     gPad->Update();
 }
+
+ClassImp(R3BTCalModulePar);

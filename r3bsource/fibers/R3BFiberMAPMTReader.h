@@ -10,7 +10,7 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
- 
+
 // This is generic class for the fibers 30, 31, 32 33 used in s494 experiment
 // modified from  R3BBunchedFiber code
 // Boiler-plate code for bunched fiber detectors with multi-hit electronics on
@@ -40,8 +40,8 @@
 #ifndef R3BFIBERMAPMTREADER_H
 #define R3BFIBERMAPMTREADER_H 1
 
-#include "R3BReader.h"
 #include "R3BLogger.h"
+#include "R3BReader.h"
 
 #include "TString.h"
 
@@ -121,7 +121,7 @@ class R3BFiberMAPMTReader : public R3BReader
     Bool_t Init();
     Bool_t Read();
     void Reset();
-    
+
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 

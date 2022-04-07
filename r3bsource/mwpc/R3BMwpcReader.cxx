@@ -31,6 +31,7 @@ using namespace std;
 
 R3BMwpcReader::R3BMwpcReader(EXT_STR_h101_SOFMWPC* data, size_t offset)
     : R3BReader("R3BMwpcReader")
+    , fMaxDet(4)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
@@ -75,10 +76,13 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("Mwpc0MappedData", "MWPC0", fArrayMwpc0, !fOnline);
-    FairRootManager::Instance()->Register("Mwpc1MappedData", "MWPC1", fArrayMwpc1, !fOnline);
-    FairRootManager::Instance()->Register("Mwpc2MappedData", "MWPC2", fArrayMwpc2, !fOnline);
-    FairRootManager::Instance()->Register("Mwpc3MappedData", "MWPC3", fArrayMwpc3, !fOnline);
-
+    if (fMaxDet > 1)
+        FairRootManager::Instance()->Register("Mwpc1MappedData", "MWPC1", fArrayMwpc1, !fOnline);
+    if (fMaxDet > 2)
+        FairRootManager::Instance()->Register("Mwpc2MappedData", "MWPC2", fArrayMwpc2, !fOnline);
+    if (fMaxDet > 3)
+        FairRootManager::Instance()->Register("Mwpc3MappedData", "MWPC3", fArrayMwpc3, !fOnline);
+    R3BLOG(INFO, "Max. number of MWPCs: " << fMaxDet);
     Reset();
     memset(fData, 0, sizeof *fData);
 

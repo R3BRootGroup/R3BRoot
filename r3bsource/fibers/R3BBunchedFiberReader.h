@@ -40,8 +40,8 @@
 #ifndef R3BBUNCHEDFIBERREADER_H
 #define R3BBUNCHEDFIBERREADER_H 1
 
-#include "R3BReader.h"
 #include "R3BLogger.h"
+#include "R3BReader.h"
 #include "TString.h"
 
 class TClonesArray;
@@ -64,7 +64,7 @@ class TClonesArray;
     EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
     if (!ok)                                                                               \
     {                                                                                      \
-        R3BLOG(ERROR, "Failed to setup UCESB structure information.");                      \
+        R3BLOG(ERROR, "Failed to setup UCESB structure information.");                     \
         return kFALSE;                                                                     \
     }
 #define R3B_BUNCHED_FIBER_INIT_END_ return R3BBunchedFiberReader::Init()
