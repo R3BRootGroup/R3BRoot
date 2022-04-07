@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef _R3BTCAL_ENGINE_
-#define _R3BTCAL_ENGINE_
+#ifndef R3BTCALENGINE_H
+#define R3BTCALENGINE_H 1
 
 #define MAX_TACQUILA_SAM 7     // 0 .. 7
 #define MAX_TACQUILA_GTB 1     // 0 and 1

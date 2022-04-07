@@ -11,12 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BWRData.h"
 #include "R3BWhiterabbitNeulandReader.h"
+
 #include "TClonesArray.h"
 
 extern "C"
@@ -52,12 +53,11 @@ R3BWhiterabbitNeulandReader::~R3BWhiterabbitNeulandReader()
 Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitNeulandReader::Init()";
+    R3BLOG(INFO, "");
     EXT_STR_h101_WRNEULAND_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRNEULAND, 0);
-
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitNeulandReader::Failed to setup structure information.";
+        R3BLOG(ERROR, "R3BWhiterabbitNeulandReader::Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -66,11 +66,11 @@ Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitNeulandReader::Init() EventHeader. not found";
+        R3BLOG(WARNING, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BWhiterabbitNeulandReader::Init() R3BEventHeader found";
+        R3BLOG(INFO, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRNeulandData", "WRNeuland", fArray, !fOnline);
@@ -96,7 +96,7 @@ Bool_t R3BWhiterabbitNeulandReader::Read()
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->NN_WR_ID);
-        LOG(error) << strMessage;
+        R3BLOG(error, strMessage);
     }
 
     if (fEventHeader != nullptr)

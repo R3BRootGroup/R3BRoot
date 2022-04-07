@@ -12,12 +12,12 @@
  ******************************************************************************/
 
 #include "R3BTCalPar.h"
+#include "R3BLogger.h"
 
 #include "FairLogger.h"
-#include "FairParamList.h" // for FairParamList
+#include "FairParamList.h"
 #include "FairRtdbRun.h"
 
-ClassImp(R3BTCalPar);
 
 R3BTCalPar::R3BTCalPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
@@ -28,6 +28,7 @@ R3BTCalPar::R3BTCalPar(const char* name, const char* title, const char* context,
 
 R3BTCalPar::~R3BTCalPar()
 {
+    clear();
     if (fTCalParams)
     {
         delete fTCalParams;
@@ -37,9 +38,10 @@ R3BTCalPar::~R3BTCalPar()
 
 void R3BTCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTCalPar::putParams() called";
+    R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(FATAL, "Could not find FairParamList");
         return;
     }
     list->addObject(GetName(), fTCalParams);
@@ -47,8 +49,10 @@ void R3BTCalPar::putParams(FairParamList* list)
 
 Bool_t R3BTCalPar::getParams(FairParamList* list)
 {
+    // R3BLOG(INFO, "called");
     if (!list)
     {
+        R3BLOG(FATAL, "Could not find FairParamList");
         return kFALSE;
     }
     if (!list->fillObject(GetName(), fTCalParams))
@@ -58,14 +62,17 @@ Bool_t R3BTCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BTCalPar::clear() {}
+void R3BTCalPar::clear() 
+{
+    status = kFALSE;
+    resetInputVersions();
+}
 
 void R3BTCalPar::printParams()
 {
+    R3BLOG(INFO, GetName() << " Time Calib. Parameters");
 
-    LOG(INFO) << " -----------  " << GetName() << " Time Calib. Parameters -------------  ";
-
-    LOG(INFO) << " Number of TCal Parameters " << fTCalParams->GetEntries();
+    R3BLOG(INFO,"Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
         R3BTCalModulePar* t_par = (R3BTCalModulePar*)fTCalParams->At(i);
@@ -100,15 +107,15 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
             if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
                 tside > N_SIDE_MAX)
             {
-                LOG(ERROR) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << tplane << " / "
-                           << tpaddle << " / " << tside;
+                R3BLOG(ERROR, "error in plane/paddle/side indexing. " << tplane << " / "
+                           << tpaddle << " / " << tside);
                 continue;
             }
             index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BTCalPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
-                           << tpaddle << " / " << tside;
+                R3BLOG(ERROR, "parameter found more than once. " << tplane << " / "
+                           << tpaddle << " / " << tside);
                 continue;
             }
             fIndexMap[index] = i;
@@ -118,16 +125,14 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
 
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)
     {
-        LOG(ERROR) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << plane << " / " << paddle
-                   << " / " << side;
+        R3BLOG(ERROR, "error in plane/paddle/side indexing. " << plane << " / " << paddle << " / " << side);
         return NULL;
     }
     Int_t index = (plane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (paddle - 1) * N_SIDE_MAX + side - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        LOG(WARNING) << "R3BTCalPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle << " / "
-                     << side;
+        R3BLOG(WARNING, "parameter not found for: " << plane << " / " << paddle << " / " << side);
         return NULL;
     }
     Int_t arind = fIndexMap[index];
@@ -165,7 +170,7 @@ Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_
     {
         if (par->GetSlopeAt(0) > 0)
         {
-            LOG(ERROR) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila.";
+            R3BLOG(ERROR, "this function does not support Tacquila.");
             return kFALSE;
         }
         Int_t i = 0;
@@ -188,16 +193,18 @@ void R3BTCalPar::SavePar(TString runNumber)
     FairRtdbRun* r1 = (FairRtdbRun*)gDirectory->Get(runNumber);
     if (NULL == r1)
     {
-        LOG(ERROR) << "Run " << runNumber << " does not exist in parameter file! Aborting.";
+        R3BLOG(ERROR, "Run " << runNumber << " does not exist in parameter file! Aborting.");
         return;
     }
     FairParVersion* ver = r1->getParVersion(GetName());
     if (NULL == ver)
     {
-        LOG(ERROR) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting.";
+        R3BLOG(ERROR, "Parameter container " << GetName() << " does not exist in parameter file! Aborting.");
         return;
     }
     ver->setRootVersion(ver->getRootVersion() + 1);
     r1->Write();
-    LOG(INFO) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion();
+    R3BLOG(INFO, "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion());
 }
+
+ClassImp(R3BTCalPar);

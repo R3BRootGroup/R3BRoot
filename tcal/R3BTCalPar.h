@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTCALPAR_H
-#define R3BTCALPAR_H
+#define R3BTCALPAR_H 1
 
 #define NMODULEMAX 6000
 

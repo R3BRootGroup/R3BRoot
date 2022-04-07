@@ -39,12 +39,17 @@ class R3BMwpcReader : public R3BReader
     // Reset
     virtual void Reset() override;
 
+    // Accessor to select the max. number of mwpcs
+    void SetMaxNbDet(UInt_t d) { fMaxDet = d; }
+
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     // Reader specific data structure from ucesb
     EXT_STR_h101_SOFMWPC* fData;
+    // Max. number of mwpcs
+    UInt_t fMaxDet;
     // Data offset
     size_t fOffset;
     // Don't store data for online

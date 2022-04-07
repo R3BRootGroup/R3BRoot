@@ -38,8 +38,9 @@ Bool_t R3BFiberMAPMTReader::Init()
                 auto const& ch = fMHL[side_i][edge_i][prec_i];
                 if (fFiberNum != ch._MI_len)
                 {
-                    R3BLOG(FATAL, "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum
-                               << " != MI-len=" << ch._MI_len << ").");
+                    R3BLOG(FATAL,
+                           "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum << " != MI-len=" << ch._MI_len
+                                                                        << ").");
                     return kFALSE;
                 }
             }
@@ -51,7 +52,7 @@ Bool_t R3BFiberMAPMTReader::Init()
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
-    R3BLOG(DEBUG, "Read BEGIN for fib "<<fShortName);
+    R3BLOG(DEBUG, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)

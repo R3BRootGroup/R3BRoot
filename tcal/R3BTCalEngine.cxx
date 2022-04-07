@@ -18,6 +18,7 @@
 
 #include "FairLogger.h"
 
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 
 R3BTCalEngine::R3BTCalEngine(R3BTCalPar* param, Int_t minStats)
@@ -63,8 +64,8 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
 {
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)
     {
-        LOG(ERROR) << "R3BTCalEngine::Fill : index out of max range " << plane << " / " << paddle << " / " << side;
-        LOG(ERROR) << "R3BTCalEngine::Fill : ranges: " << N_PLANE_MAX << " / " << N_PADDLE_MAX << " / " << N_SIDE_MAX;
+        R3BLOG(ERROR, "index out of max range " << plane << " / " << paddle << " / " << side);
+        R3BLOG(ERROR, "ranges: " << N_PLANE_MAX << " / " << N_PADDLE_MAX << " / " << N_SIDE_MAX);
         return;
     }
     if (NULL == fhData[plane - 1][paddle - 1][side - 1])
@@ -117,7 +118,7 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
                 {
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Range of channels: " << iMin << " - " << iMax;
+                R3BLOG(INFO, "Range of channels: " << iMin << " - " << iMax);
 
                 Int_t nparam = 0;
                 auto pTCal = new R3BTCalModulePar;
@@ -140,15 +141,12 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
                 }
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Number of parameters: " << nparam;
+                R3BLOG(INFO, "Number of parameters: " << nparam);
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Module: " << (i + 1) << " / " << (j + 1)
-                          << " / " << (k + 1) << " is calibrated."
-
-                    ;
+                R3BLOG(INFO, "Module: " << (i + 1) << " / " << (j + 1) << " / " << (k + 1) << " is calibrated.");
             }
         }
     }
@@ -182,7 +180,7 @@ void R3BTCalEngine::CalculateParamTacquila()
                 {
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Range of channels: " << iMin << " - " << iMax;
+                R3BLOG(INFO, "Range of channels: " << iMin << " - " << iMax);
 
                 Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
                 for (Int_t ii = iMin; ii <= iMax; ii++)
@@ -281,19 +279,15 @@ void R3BTCalEngine::CalculateParamTacquila()
 
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Number of parameters: " << nparam;
+                R3BLOG(INFO, "Number of parameters: " << nparam);
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Module: " << (i + 1) << " / " << (j + 1)
-                          << " / " << (k + 1) << " is calibrated."
-
-                    ;
+                R3BLOG(INFO, "Module: " << (i + 1) << " / " << (j + 1) << " / " << (k + 1) << " is calibrated.");
             }
         }
     }
-
     fCal_Par->setChanged();
 }
 
@@ -331,9 +325,10 @@ void R3BTCalEngine::CalculateParamVFTX()
                 FindRange(fhData[i][j][k], ic, iMin, iMax);
                 if (iMin < 0 || iMax > 4097)
                 {
+                    R3BLOG(WARNING, "Out of range, Min: " << iMin << " , Max: " << iMax);
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Range of channels: " << iMin << " - " << iMax;
+                R3BLOG(INFO, "Range of channels: " << iMin << " - " << iMax);
 
                 Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
                 for (Int_t ii = iMin; ii <= iMax; ii++)
@@ -366,19 +361,15 @@ void R3BTCalEngine::CalculateParamVFTX()
 
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Number of parameters: " << nparam;
+                R3BLOG(INFO, "Number of parameters: " << nparam);
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Module: " << (i + 1) << " / " << (j + 1) << " / "
-                          << (k + 1) << " is calibrated."
-
-                    ;
+                R3BLOG(INFO, "Module: " << (i + 1) << " / " << (j + 1) << " / " << (k + 1) << " is calibrated.");
             }
         }
     }
-
     fCal_Par->setChanged();
 }
 
@@ -416,7 +407,7 @@ void R3BTCalEngine::LinearUp(TH1F* h1, Int_t iMin, Int_t iMax, Int_t& il, Int_t&
     Double_t t2 = h1->Integral(iMin, ih) / tot; // * fClockFreq;
     if (t1 > 1. || t2 > 1.)
     {
-        LOG(fatal) << "LinearUp: Integration error";
+        R3BLOG(FATAL, "Integration error");
     }
     t1 *= fClockFreq;
     t2 *= fClockFreq;
@@ -498,4 +489,4 @@ void R3BTCalEngine::LinearDown(TH1F* h1,
     }
 }
 
-ClassImp(R3BTCalEngine)
+ClassImp(R3BTCalEngine);
