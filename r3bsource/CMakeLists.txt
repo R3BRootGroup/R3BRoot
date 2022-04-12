@@ -132,7 +132,7 @@ set(SRCS
 ./fibers/R3BFi31Reader.cxx
 ./fibers/R3BFi32Reader.cxx
 ./fibers/R3BFi33Reader.cxx
-./fibers/R3BFiber3XReader.cxx
+./fibers/R3BFiberReader.cxx
 ./los/R3BLosReader.cxx
 ./rolu/R3BRoluReader.cxx
 ./sci2/R3BSci2Reader.cxx
@@ -181,8 +181,6 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fibzero.h
 ./fibers/ext_h101_fibonea.h
 ./fibers/ext_h101_fiboneb.h
-#ext_h101_fibtwoa.h
-#ext_h101_fibtwob.h
 ./fibers/ext_h101_fibthreea.h
 ./fibers/ext_h101_fibthreeb.h
 ./fibers/ext_h101_fibfour.h
@@ -190,7 +188,6 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fibsix.h
 ./fibers/ext_h101_fibseven.h
 ./fibers/ext_h101_fibeight.h
-#ext_h101_fibnine.h
 ./fibers/ext_h101_fibten.h
 ./fibers/ext_h101_fibeleven.h
 ./fibers/ext_h101_fibtwelve.h
@@ -201,7 +198,6 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fib31.h
 ./fibers/ext_h101_fib32.h
 ./fibers/ext_h101_fib33.h
-./fibers/ext_h101_fib3X.h
 ./los/ext_h101_los_dez19.h
 ./rolu/ext_h101_rolu.h
 ./sci2/ext_h101_sci2.h
