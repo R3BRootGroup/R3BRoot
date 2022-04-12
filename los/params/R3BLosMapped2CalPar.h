@@ -121,6 +121,7 @@ class R3BLosMapped2CalPar : public FairTask
     Int_t Icounts2 = 0;
     Int_t Icounts3 = 0;
     Int_t Icount[16][3];
+    Int_t Icounttrig[16][3];
 
     UInt_t fNofDetectors; /**< Number of LOS detectors. */
     UInt_t fNofChannels;  /**< Number of channels per detector. */

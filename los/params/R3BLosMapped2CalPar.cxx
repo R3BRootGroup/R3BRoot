@@ -96,6 +96,7 @@ InitStatus R3BLosMapped2CalPar::Init()
         for (UInt_t k = 0; k < 3; k++)
         {
             Icount[i][k] = 0;
+            Icounttrig[i][k] = 0;
         }
     }
     FairRootManager* rm = FairRootManager::Instance();
@@ -139,7 +140,6 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         return;
 
     UInt_t nHits = fMapped->GetEntries();
-
     // Loop over mapped hits
     for (UInt_t i = 0; i < nHits; i++)
     {
@@ -197,6 +197,7 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
             UInt_t iType = mapped->GetType() + 1; // 1,2,3...
             R3BLOG(DEBUG1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
             fEngine->Fill(3 + iDetector, iChannel, iType, mapped->GetTimeFine());
+            Icounttrig[iChannel-1][iType-1]++;
         }
     }
 
@@ -210,13 +211,26 @@ void R3BLosMapped2CalPar::FinishTask()
     fCal_Par->printParams();
     fCal_Par->setChanged();
 
+    R3BLOG(INFO, "Calibration of LOS detector");
     for (Int_t i = 0; i < 16; i++)
     {
         for (Int_t k = 0; k < 3; k++)
         {
             if (Icount[i][k] > 0)
             {
-                R3BLOG(INFO, "Channel: " << i << ", Type: " << k << ", Count: " << Icount[i][k]);
+                R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
+            }
+        }
+    }
+    
+    R3BLOG(INFO, "Calibration of trigger signals from LOS detector");
+    for (Int_t i = 0; i < 16; i++)
+    {
+        for (Int_t k = 0; k < 3; k++)
+        {
+            if (Icounttrig[i][k] > 0)
+            {
+                R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
             }
         }
     }
