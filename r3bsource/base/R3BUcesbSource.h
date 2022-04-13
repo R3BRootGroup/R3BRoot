@@ -72,12 +72,9 @@ class R3BUcesbSource : public FairSource
     /* Get readers */
     const TObjArray* GetReaders() const { return fReaders; }
 
-    virtual void FillEventHeader(FairEventHeader* feh);
+    virtual void FillEventHeader(R3BEventHeader* feh);
 
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
-
-    void SetSkipEvents(Bool_t skip) { fSkip = skip; }
-    Bool_t GetSkipEvents() { return fSkip; }
 
   private:
     /* File descriptor returned from popen() */
@@ -107,7 +104,6 @@ class R3BUcesbSource : public FairSource
     TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
-    Bool_t fSkip;
 
   public:
     // Create dictionary

@@ -45,7 +45,6 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fInputFile()
     , fEntryMax(0)
     , fReaders(new TObjArray())
-    , fSkip(0)
 {
 }
 
@@ -75,14 +74,12 @@ Bool_t R3BUcesbSource::Init()
     {
         command << " --max-events=" << fLastEventNo;
     }
-
     LOG(INFO) << "Calling ucesb with command: " << command.str();
 
     /* Fork off ucesb (calls fork() and pipe()) */
     fFd = popen(command.str().c_str(), "r");
     if (nullptr == fFd)
     {
-        perror("popen()");
         R3BLOG(fatal, "popen() failed");
         return kFALSE;
     }
@@ -91,20 +88,10 @@ Bool_t R3BUcesbSource::Init()
     status = fClient.connect(fileno(fFd));
     if (kFALSE == status)
     {
-        perror("ext_data_clnt::connect()");
         R3BLOG(error, "ext_data_clnt::connect() failed");
         R3BLOG(fatal, "ucesb error: " << fClient.last_error());
         return kFALSE;
     }
-
-    // Register of R3BEventHeader in the output root file
-    FairRootManager* frm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !frm, "FairRootManager no found");
-
-    R3BLOG(INFO, "Register of R3BEventHeader");
-    fEventHeader = new R3BEventHeader();
-    frm->Register("EventHeader.", "R3BEvtHeader", fEventHeader, kTRUE);
-    R3BLOG(INFO, "EventHeader. has been created");
 
     // Open configuration file with runid values if needed in this step
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
@@ -124,6 +111,23 @@ Bool_t R3BUcesbSource::Init()
 
 Bool_t R3BUcesbSource::InitUnpackers()
 {
+    // Register of R3BEventHeader in the output root file
+    FairRootManager* frm = FairRootManager::Instance();
+    R3BLOG_IF(FATAL, !frm, "FairRootManager no found");
+
+    R3BLOG(INFO, "Register of R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    if (fEventHeader)
+    {
+        R3BLOG(INFO, "EventHeader. was defined properly");
+    }
+    else
+    {
+        fEventHeader = new R3BEventHeader();
+        R3BLOG(WARNING, "EventHeader. has been created from R3BEventHeader");
+        frm->Register("EventHeader.", "Event", fEventHeader, kTRUE);
+    }
+
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
@@ -289,18 +293,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
         }
     }
 
-    if (fSkip)
-    {
-        if (fEventHeader->GetTpat() > 0)
-        {
-            FairRunOnline::Instance()->MarkFill(kTRUE);
-        }
-        else
-        {
-            FairRunOnline::Instance()->MarkFill(kFALSE);
-        }
-    }
-
     return 0;
 }
 
@@ -349,6 +341,6 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 }
 
 //_____________________________________________________________________________
-void R3BUcesbSource::FillEventHeader(FairEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
+void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
 
 ClassImp(R3BUcesbSource);

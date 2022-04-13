@@ -28,6 +28,7 @@
 #include "R3BReader.h"
 
 #include "TString.h"
+#include <Rtypes.h>
 
 class TClonesArray;
 
@@ -86,6 +87,10 @@ typedef struct EXT_STR_h101_FIBEZ_onion_t EXT_STR_h101_FIBEZ_onion;
 struct EXT_STR_h101_FIBEE_t;
 typedef struct EXT_STR_h101_FIBEE_t EXT_STR_h101_FIBEE;
 typedef struct EXT_STR_h101_FIBEE_onion_t EXT_STR_h101_FIBEE_onion;
+
+struct EXT_STR_h101_FIB_t;
+typedef struct EXT_STR_h101_FIB_t EXT_STR_h101_FIB;
+typedef struct EXT_STR_h101_FIB_onion_t EXT_STR_h101_FIB_onion;
 
 class ext_data_struct_info;
 
@@ -223,6 +228,9 @@ class R3BFiberReader : public R3BReader
     R3BFiberReader(char const*, UInt_t, EXT_STR_h101_FIBEZ_onion*, size_t);
     R3BFiberReader(char const*, UInt_t, EXT_STR_h101_FIBEE_onion*, size_t);
 
+    // Function to set up the ucesb data structure of SPMT trigger info
+    void SetUcesbSPMTTrigStructure(EXT_STR_h101_FIB_onion*, size_t);
+
     // Destructor
     virtual ~R3BFiberReader();
 
@@ -239,7 +247,7 @@ class R3BFiberReader : public R3BReader
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    TString fShortName; // e.g. "Fi30", "Fi31", ...
+    TString fShortName; // e.g. "Fi10", "Fi30", "Fi31", ...
     UInt_t fFiberNum;
     // [0=MAPMT,1=SPMT].
     UInt_t fChannelNum[2];
@@ -260,8 +268,13 @@ class R3BFiberReader : public R3BReader
     EXT_STR_h101_FIBEI_onion* fData31;
     EXT_STR_h101_FIBEZ_onion* fData32;
     EXT_STR_h101_FIBEE_onion* fData33;
-    // Data offset
+    // Reader specific data structure for SPMT trigger info
+    // Only for fibers 10, 11, 12 and 13
+    EXT_STR_h101_FIB_onion* fDataSPMTTrig;
+
+    // Data offsets
     size_t fOffset;
+    size_t fOffsetspmttrig;
     // Don't store data for online
     Bool_t fOnline;
     // [0=bottom,1=top,2=MAPMT-trig][0=leading,1=trailing][0=coarse,1=fine].

@@ -20,9 +20,8 @@
 struct EXT_STR_h101_unpack_t;
 typedef struct EXT_STR_h101_unpack_t EXT_STR_h101_unpack;
 
+class ext_data_struct_info;
 class R3BEventHeader;
-class FairEventHeader;
-class FairRunOnline;
 
 class R3BUnpackReader : public R3BReader
 {
@@ -48,12 +47,8 @@ class R3BUnpackReader : public R3BReader
     EXT_STR_h101_unpack* fData;
     // Offset of detector specific data in full data structure
     size_t fOffset;
-
+    // A pointer to the R3BEventHeader structure
     R3BEventHeader* fHeader;
-
-    FairEventHeader* evt;
-
-    FairRunOnline* fair;
 
   public:
     ClassDefOverride(R3BUnpackReader, 0);

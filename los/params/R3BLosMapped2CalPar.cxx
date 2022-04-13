@@ -197,7 +197,7 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
             UInt_t iType = mapped->GetType() + 1; // 1,2,3...
             R3BLOG(DEBUG1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
             fEngine->Fill(3 + iDetector, iChannel, iType, mapped->GetTimeFine());
-            Icounttrig[iChannel-1][iType-1]++;
+            Icounttrig[iChannel - 1][iType - 1]++;
         }
     }
 
@@ -216,19 +216,19 @@ void R3BLosMapped2CalPar::FinishTask()
     {
         for (Int_t k = 0; k < 3; k++)
         {
-            if (Icount[i][k] > 0)
+            if (Icount[i][k] > fMinStats)
             {
                 R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
             }
         }
     }
-    
+
     R3BLOG(INFO, "Calibration of trigger signals from LOS detector");
     for (Int_t i = 0; i < 16; i++)
     {
         for (Int_t k = 0; k < 3; k++)
         {
-            if (Icounttrig[i][k] > 0)
+            if (Icounttrig[i][k] > fMinStats)
             {
                 R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
             }

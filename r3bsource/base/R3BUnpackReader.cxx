@@ -11,9 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairEventHeader.h"
 #include "FairRootManager.h"
-#include "FairRunOnline.h"
 #include "R3BLogger.h"
 
 #include "R3BEventHeader.h"
@@ -28,7 +26,7 @@ extern "C"
 
 R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, size_t offset)
     : R3BReader("R3BUnpackReader")
-    , fNEvent(0)
+    , fNEvent(1)
     , fData(data)
     , fOffset(offset)
     , fHeader(NULL)
@@ -51,7 +49,6 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
     EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_unpack, 0);
     if (!ok)
     {
-        // perror("ext_data_struct_info_item");
         R3BLOG(ERROR, "Failed to setup structure information.");
         return kFALSE;
     }
@@ -61,8 +58,6 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
     fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fHeader)
     {
-        fHeader = new R3BEventHeader();
-        frm->Register("EventHeader.", "R3BEvtHeader", fHeader, kTRUE);
         R3BLOG(WARNING, "EventHeader. not found");
     }
     else
@@ -89,12 +84,15 @@ Bool_t R3BUnpackReader::Read()
         R3BLOG(DEBUG1, "event : " << fNEvent << ", trigger : " << fData->TRIGGER);
     }
 
-    fHeader->SetTrigger(fData->TRIGGER);
-    fHeader->SetEventno(fNEvent);
+    if (fHeader)
+    {
+        fHeader->SetTrigger(fData->TRIGGER);
+        fHeader->SetEventno(fNEvent);
+    }
 
     return kTRUE;
 }
 
-void R3BUnpackReader::Reset() { fNEvent = 0; }
+void R3BUnpackReader::Reset() {}
 
 ClassImp(R3BUnpackReader);
