@@ -157,6 +157,7 @@
 #pragma link C++ class R3BBunchedFiberCalData+;
 #pragma link C++ class R3BBunchedFiberHitData+;
 #pragma link C++ class R3BBunchedFiberMappedData+;
+#pragma link C++ class R3BFiberMappedData+;
 #pragma link C++ class R3BFiberMAPMTCalData+;
 #pragma link C++ class R3BFiberMAPMTHitData+;
 #pragma link C++ class R3BFiberMAPMTMappedData+;

@@ -93,6 +93,7 @@ class R3BTofDMapped2CalPar : public FairTask
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
+    Int_t Icount[5][48][4];
 
     UInt_t fNofPlanes;       /**< Number of planes. */
     UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */

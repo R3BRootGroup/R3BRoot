@@ -93,6 +93,13 @@ InitStatus R3BTofDMapped2CalPar::Init()
 
     fEngine = new R3BTCalEngine(fCalPar, fMinStats);
 
+    for (UInt_t d = 0; d < 5; d++)
+        for (UInt_t i = 0; i < 48; i++)
+            for (UInt_t k = 0; k < 4; k++)
+            {
+                Icount[d][i][k] = 0;
+            }
+
     return kSUCCESS;
 }
 
@@ -121,12 +128,13 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
         Int_t edge = mapped->GetSideId() * 2 + mapped->GetEdgeId() - 2; // 1..4
         // std::cout << mapped->GetDetectorId() <<" "<< mapped->GetBarId() << " "<< mapped->GetTimeFine() <<std::endl;
         fEngine->Fill(mapped->GetDetectorId(), mapped->GetBarId(), edge, mapped->GetTimeFine());
+
+        Icount[mapped->GetDetectorId() - 1][mapped->GetBarId() - 1][edge - 1]++;
     }
 
     if (fMappedTrigger)
     {
         nHits = fMappedTrigger->GetEntries();
-
         // Loop over mapped triggers
         for (Int_t i = 0; i < nHits; i++)
         {
@@ -140,6 +148,7 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
             }
 
             fEngine->Fill(mapped->GetDetectorId(), mapped->GetBarId(), 1, mapped->GetTimeFine());
+            Icount[mapped->GetDetectorId() - 1][mapped->GetBarId() - 1][0]++;
         }
     }
 }
@@ -149,6 +158,22 @@ void R3BTofDMapped2CalPar::FinishTask()
     fEngine->CalculateParamVFTX();
     fCalPar->setChanged();
     fCalPar->printParams();
+
+    R3BLOG(INFO, "Calibration of TofD detector");
+    for (Int_t p = 0; p < 5; p++)
+        for (Int_t i = 0; i < 48; i++)
+            for (Int_t k = 0; k < 4; k++)
+                if (Icount[p][i][k] > fMinStats)
+                {
+                    if (p < 4)
+                        R3BLOG(INFO,
+                               "Plane: " << p + 1 << ", paddle: " << i + 1 << ", side: " << k + 1
+                                         << ", Count: " << Icount[p][i][k]);
+                    else
+                        R3BLOG(INFO,
+                               "Trigger plane: " << p + 1 << ", paddle: " << i + 1 << ", side: " << k + 1
+                                                 << ", Count: " << Icount[p][i][k]);
+                }
 }
 
 void R3BTofDMapped2CalPar::SetUpdateRate(Int_t rate) { fUpdateRate = rate; }

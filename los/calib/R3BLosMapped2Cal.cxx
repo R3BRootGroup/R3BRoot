@@ -186,7 +186,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         if (hit->GetTimeCoarse() > 8192)
         {
-            R3BLOG(WARNING, "Coarse counter > 8192: " << iDet);
+            R3BLOG(WARNING, "Coarse counter > 8192: Det " << iDet << " , Ch: " << iCha << " , type: " << iType);
             continue;
         }
 

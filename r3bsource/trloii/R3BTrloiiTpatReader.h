@@ -19,8 +19,8 @@
 
 struct EXT_STR_h101_TPAT_t;
 typedef struct EXT_STR_h101_TPAT_t EXT_STR_h101_TPAT;
-class ext_data_struct_info;
 
+class ext_data_struct_info;
 class R3BEventHeader;
 
 class R3BTrloiiTpatReader : public R3BReader
@@ -45,15 +45,27 @@ class R3BTrloiiTpatReader : public R3BReader
     void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     // Set tpat selector
-    void SetTpat(Int_t tpat) { fTpat = tpat; }
+    // tpatmin is the minimum tpat value
+    // tpatmax is the maximum tpat value
+    void SetTpatRange(Int_t tpatmin, Int_t tpatmax)
+    {
+        fTpatmin = tpatmin;
+        fTpatmax = tpatmax;
+    }
+
+    // Skip events with Tpat=0
+    void SetSkipEventsTpatZero() { fSkipTpatZero = kTRUE; }
 
   private:
     // An event counter
     UInt_t fNEvent;
     // Trigger selector
     Int_t fTrigger;
-    // TPat selector
-    Int_t fTpat;
+    // TPat selectors
+    Int_t fTpatmin;
+    Int_t fTpatmax;
+    // Skip events with Tpat=0
+    Bool_t fSkipTpatZero;
     // Reader specific data structure from ucesb
     EXT_STR_h101_TPAT* fData;
     // Offset of detector specific data in full data structure

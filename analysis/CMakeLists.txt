@@ -23,6 +23,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/rolu
@@ -93,7 +94,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF AnaLinkDef.h)
 
 Set(DEPENDENCIES
-GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene
+GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene R3BPassive
 )
 
 Set(LIBRARY_NAME R3BAnalysis)

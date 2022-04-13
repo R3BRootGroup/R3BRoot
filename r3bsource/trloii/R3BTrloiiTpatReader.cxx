@@ -18,7 +18,6 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTrloiiTpatReader.h"
-#include "R3BUcesbSource.h"
 
 /**
  ** ext_h101_tpat.h was created by running
@@ -33,11 +32,13 @@ extern "C"
 
 R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
     : R3BReader("R3BTrloiiTpatReader")
-    , fNEvent(0)
+    , fNEvent(1)
     , fData(data)
     , fOffset(offset)
     , fTrigger(-1)
-    , fTpat(-1)
+    , fTpatmin(-1)
+    , fTpatmax(-1)
+    , fSkipTpatZero(kFALSE)
     , fEventHeader(nullptr)
 {
 }
@@ -73,17 +74,6 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     {
         R3BLOG(INFO, "EventHeader. found");
     }
-    
-    R3BUcesbSource* source = (R3BUcesbSource*)frm->GetSource();
-    if (fTpat >= 0 && source->GetSkipEvents())
-    {
-        R3BLOG(WARNING,
-               "Both SetSkipEvents() in R3BUcesbSource and SetTpat() in R3BTrloiiTpatReader are defined to select "
-               "events based on tpat values.");
-        R3BLOG(INFO, "Thus SetSkipEvents() in R3BUcesbSource will be disabled.");
-        source->SetSkipEvents(false);
-    }
-
     Reset();
     memset(fData, 0, sizeof *fData);
 
@@ -92,6 +82,8 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
+    // R3BLOG(INFO, "Event : " << fNEvent);
+
     R3BLOG(DEBUG1, "Event data.");
     if (fEventHeader)
     {
@@ -102,7 +94,7 @@ Bool_t R3BTrloiiTpatReader::Read()
             fNEvent = fEventHeader->GetEventno();
         }
     }
-    if (!fEventHeader || fData->TPAT <= 0)
+    else if (fData->TPAT <= 0)
         fNEvent++;
 
     if (0 == (fNEvent % 1000000))
@@ -110,7 +102,7 @@ Bool_t R3BTrloiiTpatReader::Read()
         R3BLOG(DEBUG1, "Event : " << fNEvent);
     }
 
-    if (fTrigger > 0 && fEventHeader && fTpat < 0)
+    if (fTrigger > 0 && fEventHeader && fTpatmin < 0 && fTpatmax < 0)
     {
         if (fEventHeader->GetTrigger() == fTrigger)
         {
@@ -122,9 +114,9 @@ Bool_t R3BTrloiiTpatReader::Read()
         }
     }
 
-    if (fTpat >= 0 && fEventHeader && fTrigger <= 0)
+    if (fSkipTpatZero && fTrigger < 0 && fTpatmin < 0 && fTpatmax < 0)
     {
-        if ((fEventHeader->GetTpat() & fTpat) == fTpat)
+        if (fEventHeader->GetTpat() > 0)
         {
             FairRunOnline::Instance()->MarkFill(kTRUE);
         }
@@ -134,11 +126,76 @@ Bool_t R3BTrloiiTpatReader::Read()
         }
     }
 
-    if (fTpat >= 0 && fEventHeader && fTrigger > 0)
+    if (fTpatmin >= 0 && fTpatmax >= 0 && fEventHeader && fTrigger < 0)
     {
-        if ((fEventHeader->GetTpat() & fTpat) == fTpat && fEventHeader->GetTrigger() == fTrigger)
+        Bool_t valid = false;
+        Int_t tpatbin = 0;
+        for (Int_t i = 0; i < 16; i++)
+        {
+            tpatbin = false;
+            tpatbin = (fEventHeader->GetTpat() & (1 << i));
+            if (tpatbin != 0 && (i + 1 < fTpatmin))
+            {
+                valid = false;
+            }
+            else
+            {
+                if (tpatbin != 0 && (i + 1 > fTpatmax))
+                {
+                    valid = false;
+                }
+                else if (tpatbin != 0)
+                {
+                    R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                    valid = true;
+                }
+            }
+        }
+        if (valid)
         {
             FairRunOnline::Instance()->MarkFill(kTRUE);
+        }
+        else
+        {
+            FairRunOnline::Instance()->MarkFill(kFALSE);
+        }
+    }
+
+    if (fTpatmin >= 0 && fTpatmax >= 0 && fEventHeader && fTrigger > 0)
+    {
+        if (fEventHeader->GetTrigger() == fTrigger)
+        {
+            Bool_t valid = false;
+            Int_t tpatbin = 0;
+            for (Int_t i = 0; i < 16; i++)
+            {
+                tpatbin = false;
+                tpatbin = (fEventHeader->GetTpat() & (1 << i));
+                if (tpatbin != 0 && (i + 1 < fTpatmin))
+                {
+                    valid = false;
+                }
+                else
+                {
+                    if (tpatbin != 0 && (i + 1 > fTpatmax))
+                    {
+                        valid = false;
+                    }
+                    else if (tpatbin != 0)
+                    {
+                        R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                        valid = true;
+                    }
+                }
+            }
+            if (valid)
+            {
+                FairRunOnline::Instance()->MarkFill(kTRUE);
+            }
+            else
+            {
+                FairRunOnline::Instance()->MarkFill(kFALSE);
+            }
         }
         else
         {
@@ -149,6 +206,6 @@ Bool_t R3BTrloiiTpatReader::Read()
     return kTRUE;
 }
 
-void R3BTrloiiTpatReader::Reset() { fNEvent = 0; }
+void R3BTrloiiTpatReader::Reset() {}
 
 ClassImp(R3BTrloiiTpatReader);

@@ -170,6 +170,7 @@ fibData/R3BBunchedFiberMappedData.cxx
 fibData/R3BFi4Point.cxx
 fibData/R3BFi4CalItem.cxx
 fibData/R3BFi4HitItem.cxx
+fibData/R3BFiberMappedData.cxx
 fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
 fibData/R3BFibPoint.cxx

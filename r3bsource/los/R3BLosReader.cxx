@@ -205,7 +205,9 @@ Bool_t R3BLosReader::Read()
             coarse_vftx = data->LOS[d].VTCv[i];
             if (coarse_vftx > 3 * c_vftx2_range / 4)
             {
-                do_increment = true;
+                // FIXME:
+                // This algo gives problems with vftx calibration and data processing.
+                do_increment = false; // true;
                 break;
             }
         }
