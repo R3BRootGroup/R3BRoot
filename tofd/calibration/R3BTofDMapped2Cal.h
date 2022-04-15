@@ -19,18 +19,12 @@
 #include "FairTask.h"
 
 class TClonesArray;
+class R3BTofDMappingPar;
 class R3BTCalPar;
 class R3BTofdMappedData;
 class R3BTofdCalData;
 class R3BEventHeader;
 
-/**
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BTofDMapped2CalPar task.
- */
 class R3BTofDMapped2Cal : public FairTask
 {
   public:
@@ -105,6 +99,8 @@ class R3BTofDMapped2Cal : public FairTask
   private:
     void SetParameter();
     size_t GetCalLookupIndex(R3BTofdMappedData const&) const;
+
+    R3BTofDMappingPar* fMapPar;
 
     TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
     TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */

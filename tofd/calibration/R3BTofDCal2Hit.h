@@ -25,6 +25,7 @@ class R3BTofDHitPar;
 class R3BEventHeader;
 class R3BTofDMappingPar;
 class R3BTofDHitPar;
+class R3BTimeStitch;
 class TH1F;
 class TH2F;
 
@@ -141,18 +142,19 @@ class R3BTofDCal2Hit : public FairTask
 
   private:
     void SetParameter();
+    R3BTimeStitch* fTimeStitch;
+    R3BEventHeader* header; /**< Event header - input data. */
+    R3BTofDHitPar* fHitPar; /**< Hit parameter container. */
+    R3BTofDMappingPar* fMapPar;
 
     Bool_t fOnline;
     TClonesArray* fCalItems;        /**< Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
     TClonesArray* fHitItems;        /**< Array with Hit items - output data. */
     UInt_t fNofHitItems;            /**< Number of hit items for cur event. */
-    R3BTofDHitPar* fHitPar;         /**< Hit parameter container. */
-    R3BTofDMappingPar* fMapPar;
-    UInt_t fNofHitPars;     /**< Number of modules in parameter file. */
-    R3BEventHeader* header; /**< Event header - input data. */
-    Double_t fClockFreq;    /**< Clock cycle in [ns]. */
-    Int_t fTrigger;         /**< Trigger value. */
+    UInt_t fNofHitPars;             /**< Number of modules in parameter file. */
+    Double_t fClockFreq;            /**< Clock cycle in [ns]. */
+    Int_t fTrigger;                 /**< Trigger value. */
     Int_t fTpat1;
     Int_t fTpat2;
     Double_t fTofdQ;
