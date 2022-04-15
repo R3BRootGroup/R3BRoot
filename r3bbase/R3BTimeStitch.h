@@ -11,45 +11,31 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTOFDHITDATA_H
-#define R3BTOFDHITDATA_H 1
+#ifndef R3BTimeStitch_H
+#define R3BTimeStitch_H 1
 
-#include "R3BHit.h"
+#include "TObject.h"
+#include <Rtypes.h>
 
-// for the data analysis of the Tofd detectors.
-// Introduced by M.Heil, May 2016
-
-class R3BTofdHitData : public R3BHit
+class R3BTimeStitch : public TObject
 {
   public:
     // Default Constructor
-    R3BTofdHitData();
-
-    // Standard Constructor
-    R3BTofdHitData(Double_t t,
-                   Double_t x,
-                   Double_t y,
-                   Double_t Z,
-                   Double_t tdiff,
-                   Double_t ELoss = 0,
-                   Double_t ID = 0,
-                   UInt_t iBar = 0,
-                   Double_t traw = -1000,
-                   Double_t tof = 0.);
-
+    R3BTimeStitch();
+    
     // Destructor
-    virtual ~R3BTofdHitData() {}
+    virtual ~R3BTimeStitch() {}
 
-    UInt_t GetBarId() const;
-    Double_t GetTimeRaw() const; // Get paddle time without trigger
-    Double_t GetTof() const;     // Time-of-flight with respect to LOS detector
+    Float_t GetRange() const { return fRange;} 
+    Double_t GetTime(Double_t ) const;
+
+    void SetRange(Float_t range) { fRange = range;}
 
   private:
-    UInt_t fBarId;
-    Double_t fTimeRaw;
-    Double_t fTof;
+    Float_t fRange;
 
-    ClassDef(R3BTofdHitData, 3)
+  public:
+    ClassDef(R3BTimeStitch, 1)
 };
 
 #endif

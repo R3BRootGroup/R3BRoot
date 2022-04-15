@@ -19,6 +19,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "R3BTofDMapped2Cal.h"
+#include "R3BTofDMappingPar.h"
 #include "R3BTofdCalData.h"
 #include "R3BTofdMappedData.h"
 
@@ -78,6 +79,9 @@ void R3BTofDMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
+    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+
     fTcalPar = (R3BTCalPar*)rtdb->getContainer("TofdTCalPar");
     if (!fTcalPar)
     {
@@ -90,6 +94,13 @@ void R3BTofDMapped2Cal::SetParContainers()
 void R3BTofDMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
+    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    if (fMapPar)
+    {
+        fNofPlanes = fMapPar->GetNbPlanes();
+        fPaddlesPerPlane = fMapPar->GetNbPaddles();
+    }
+
     fNofTcalPars = fTcalPar->GetNumModulePar();
     R3BLOG_IF(FATAL, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
     return;
@@ -160,6 +171,7 @@ void R3BTofDMapped2Cal::Exec(Option_t* option)
         R3BTofdMappedData const* mapped;
         double time_ns;
     };
+
     std::vector<std::vector<Cal>> cal_vec(fNofPlanes * fPaddlesPerPlane * 2);
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {

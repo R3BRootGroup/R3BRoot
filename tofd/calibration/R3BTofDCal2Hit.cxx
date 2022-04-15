@@ -20,6 +20,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
+#include "R3BTimeStitch.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
@@ -70,7 +71,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fNofPlanes(5)
     , fPaddlesPerPlane(44)
     , fTofdQ(1)
-    , fTofdHisto(true)
+    , fTofdHisto(false)
     , fTofdTotPos(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -97,25 +98,19 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , goodpair7(0)
     , fOnline(kFALSE)
 {
-    if (fTofdHisto)
+    fhNoTpat = NULL;
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        //  fhTpat = NULL;
-        fhNoTpat = NULL;
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+        fhQ[i] = NULL;
+        fhxy[i] = NULL;
+        fhQvsEvent[i] = NULL;
+        fhTdiff[i] = NULL;
+        fhTsync[i] = NULL;
+        fhQ0Qt[i] = NULL;
+        fhTvsQ[i] = NULL;
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhQ[i] = NULL;
-            fhxy[i] = NULL;
-            fhQvsEvent[i] = NULL;
-            fhTdiff[i] = NULL;
-            fhTsync[i] = NULL;
-            fhQ0Qt[i] = NULL;
-            fhTvsQ[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                // fhQvsTHit[i][j] = NULL;
-                // fhTvsTHit[i][j] = NULL;
-            }
+            fhQvsPos[i][j] = NULL;
         }
     }
 }
@@ -124,8 +119,6 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
 {
     if (fTofdHisto)
     {
-        // if (fhTpat)
-        //   delete fhTpat;
         if (fhNoTpat)
             delete fhNoTpat;
         for (Int_t i = 0; i < fNofPlanes; i++)
@@ -166,7 +159,7 @@ void R3BTofDCal2Hit::SetParContainers()
     fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        R3BLOG(FATAL, "Could not get access to TofdHitPar container");
+        R3BLOG(ERROR, "Could not get access to TofdHitPar container");
         fNofHitPars = 0;
         return;
     }
@@ -174,9 +167,14 @@ void R3BTofDCal2Hit::SetParContainers()
 
 void R3BTofDCal2Hit::SetParameter()
 {
-    R3BLOG(INFO, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
 
-    fNofHitPars = fHitPar->GetNumModulePar();
+    if (fHitPar)
+        fNofHitPars = fHitPar->GetNumModulePar();
+    else
+        fNofHitPars = 0;
+
+    R3BLOG(INFO, "Parameters in the TofdHitPar container: " << fNofHitPars);
 
     return;
 }
@@ -214,6 +212,9 @@ InitStatus R3BTofDCal2Hit::Init()
                 CreateHistograms(i, j);
     }
 
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
+
     return kSUCCESS;
 }
 
@@ -240,6 +241,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     Int_t fTpat_bit2 = fTpat2 - 1;
     Int_t tpatbin;
     Int_t tpatsum = 0;
+
     if (header && fTpat1 >= 0 && fTpat2 >= 0)
     {
         for (int i = 0; i < 16; i++)
@@ -260,12 +262,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         }
         if (tpatsum < 1)
         {
-            if (NULL == fhNoTpat)
-            {
-                fhNoTpat = new TH1F("NoTpat", "NoTpat", 200, 0, 200);
-                fhNoTpat->GetXaxis()->SetTitle("No Tpat event dist");
-            }
-            fhNoTpat->Fill(counter - lasttpatevent);
+            if (fhNoTpat)
+                fhNoTpat->Fill(counter - lasttpatevent);
+
             lasttpatevent = counter;
             notpat++;
             // LOG(fatal)<<"No Tpat info";
@@ -294,6 +293,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         Int_t plane;
         Int_t bar;
         Double_t time_raw;
+        Double_t tof;
     };
 
     //    std::cout<<"new event!*************************************\n";
@@ -379,24 +379,16 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 auto bot_trig = trig_map.at(bot_trig_i);
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
-                /*
-                                std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' <<
-                   top->GetBarId() << ' '
-                                << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl;
-                                std::cout << "Bot: " <<
-                                bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' <<
-                   bot_trig_i << ' '
-                                << bot_trig->GetTimeLeading_ns() << std::endl;
-                */
+
                 ++n1;
             }
             else
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS494Par::Exec() : Missing trigger information!";
-                    LOG(ERROR) << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId();
-                    LOG(ERROR) << "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId();
+                    R3BLOG(ERROR, "Missing trigger information!");
+                    R3BLOG(ERROR, "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId());
+                    R3BLOG(ERROR, "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId());
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -404,17 +396,12 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
             // Shift the cyclic difference window by half a window-length and move it back,
             // this way the trigger time will be at 0.
+            // FIXME: These equations could be no right!
             auto top_ns =
                 fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             auto bot_ns =
                 fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
 
-            /*
-                        if(top_ns>2000 || bot_ns>2000){
-                            std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
-                            std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
-                        }
-            */
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
             auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
@@ -594,18 +581,19 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                                << " plane " << iPlane << " ibar " << iBar;
                 LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
+                // Tof with respect LOS detector
+                auto tof = fTimeStitch->GetTime(THit - header->GetTStart());
                 if (parz[0] > 0 && parz[2] > 0)
                 {
                     event.push_back(
-                        { parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar, THit_raw });
+                        { parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar, THit_raw, tof });
                 }
                 else
                 {
                     parz[0] = 1.;
                     parz[1] = 0.;
                     parz[2] = 1.;
-
-                    event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw });
+                    event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
                 }
 
                 if (fTofdHisto)
@@ -643,7 +631,6 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     // Now all hits in this event are analyzed
 
     LOG(DEBUG) << "Hits in this event: " << event.size();
-
     Bool_t tArrU[event.size() + 1];
     for (int i = 0; i < (event.size() + 1); i++)
         tArrU[i] = kFALSE;
@@ -848,7 +835,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                                                                            event[hit].charge,
                                                                            event[hit].plane,
                                                                            event[hit].bar,
-                                                                           event[hit].time_raw);
+                                                                           event[hit].time_raw,
+                                                                           event[hit].tof);
         }
     }
 
@@ -1040,7 +1028,6 @@ void R3BTofDCal2Hit::FinishTask()
     }
 
     std::stringstream sprint;
-
     sprint << "\n\nSome statistics:\n";
     sprint << "Total number of events in tree    " << maxevent << "\n";
     sprint << "Max Event analyzed                " << fnEvents + wrongtrigger + wrongtpat + notpat << "\n";

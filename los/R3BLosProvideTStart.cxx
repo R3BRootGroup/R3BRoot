@@ -14,6 +14,7 @@
 #include "R3BLosProvideTStart.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BTimeStitch.h"
 #include "R3BLogger.h"
 
 R3BLosProvideTStart::R3BLosProvideTStart()
@@ -42,6 +43,8 @@ InitStatus R3BLosProvideTStart::Init()
         fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
         R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
 
     return kSUCCESS;
 }
@@ -64,8 +67,8 @@ Double_t R3BLosProvideTStart::GetTStart() const
     }
     else
     {
-        R3BLOG(DEBUG1, "CalData with trigger info for LOS");
-        return losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0);
+        R3BLOG(DEBUG1, "CalData with trigger info for LOS");               
+        return fTimeStitch->GetTime(losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0));
     }
 }
 

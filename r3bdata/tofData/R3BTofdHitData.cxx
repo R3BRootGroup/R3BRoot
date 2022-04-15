@@ -17,7 +17,8 @@
 // Introduced by M.Heil, May 2016
 
 R3BTofdHitData::R3BTofdHitData()
-    : fBarId(-1)
+    : fBarId(0)
+    , fTof(0.)
 {
 }
 
@@ -28,15 +29,20 @@ R3BTofdHitData::R3BTofdHitData(Double_t t,
                                Double_t tdiff,
                                Double_t ELoss,
                                Double_t ID,
-                               Int_t iBar,
-                               Double_t traw)
+                               UInt_t iBar,
+                               Double_t traw,
+                               Double_t tof)
     : R3BHit(ID, x, y, ELoss, t)
     , fBarId(iBar)
     , fTimeRaw(traw)
+    , fTof(tof)
 {
 }
 
-Int_t R3BTofdHitData::GetBarId() const { return fBarId; }
+UInt_t R3BTofdHitData::GetBarId() const { return fBarId; }
+
 Double_t R3BTofdHitData::GetTimeRaw() const { return fTimeRaw; } // returm bar time without trigger, needed for Rolu Tof
+
+Double_t R3BTofdHitData::GetTof() const { return fTof; }
 
 ClassImp(R3BTofdHitData)
