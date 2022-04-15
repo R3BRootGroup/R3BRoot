@@ -94,8 +94,8 @@ void R3BIncomingTrackingOnlineSpectra::SetParContainers()
     fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
     R3BLOG_IF(ERROR, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
 
-    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
-    R3BLOG_IF(ERROR, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
+    // fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    // R3BLOG_IF(ERROR, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
 
     fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
     R3BLOG_IF(ERROR, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
