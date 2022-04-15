@@ -28,9 +28,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
-
-#define N_PLANE_MAX_TOFD_S494 4
-#define N_PADDLE_MAX_TOFD_S494 44
+class R3BTofDMappingPar;
 
 class R3BTofDOnlineSpectra : public FairTask
 {
@@ -77,6 +75,8 @@ class R3BTofDOnlineSpectra : public FairTask
      */
     virtual void FinishEvent();
 
+    virtual void SetParContainers();
+
     /**
      * Methods to clean histograms.
      */
@@ -96,64 +96,43 @@ class R3BTofDOnlineSpectra : public FairTask
     /**
      * Methods for setting number of planes and paddles
      */
-    inline void SetNofModules(Int_t planes, Int_t ppp)
+    inline void SetNofModules(Int_t planes, Int_t p)
     {
         fNofPlanes = planes;
-        fPaddlesPerPlane = ppp;
+        fPaddlesPerPlane = p;
     }
 
   private:
-    unsigned g_tofd_trig_map[4][2][48];
+    void SetParameter();
     TClonesArray* fMappedItems;
     TClonesArray* fCalItems;
     TClonesArray* fHitItems;
-
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
 
-    TClonesArray* fLosTriggerCalDataItems;
-    TClonesArray* fLosCalDataItems;
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
+    R3BTofDMappingPar* fMapPar;
+    Int_t fTrigger; /**< Trigger value. */
     Int_t fTpat1, fTpat2;
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
+    unsigned long fNEvents;  /**< Event counter. */
 
-    unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
-    unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
-    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
-    unsigned long long time_spill_start = 0, time_spill_end = 0;
-    unsigned long long time_previous_event = 0;
-    Double_t time_clear = -1.;
-    Double_t tdiff = 0.;
-    Double_t fNorm = 1.;
-    Int_t iclear_count = 1;
-    UInt_t reset_time;         // time after which bmon spectra are reseted
-    Double_t read_time;        // step in which scalers are read, in sec
-    Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
-    Double_t calib_SEE = 1.;   // SEETRAM calibration factor
-    Double_t see_offset = 7.1; // SEETRAM offset in kHz
+    std::vector<TH1F*> fh_tofd_channels;
+    std::vector<TH2F*> fh_tofd_multihit;
+    std::vector<TH2F*> fh_tofd_TotPm;
+    std::vector<TH2F*> fh_tofd_dt;
+    std::vector<TH2F*> fh_tofd_multihit_coinc;
+    std::vector<TH2F*> fh_tofd_TotPm_coinc;
+    std::vector<TH2F*> fh_num_side;
+    std::vector<TH1F*> fh_tofd_bars;
+    std::vector<TH2F*> fh_tofd_Tot_hit;
+    std::vector<TH2F*> fh_tofd_time_hit;
+    std::vector<TH1F*> fh_tofd_multihit_hit;
+    std::vector<TH2F*> fh_tofd_dt_hit;
 
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
-
-    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_dt[N_PLANE_MAX_TOFD_S494 - 1];
-    TH1F* fh_TimePreviousEvent;
-    TH2F* fh_tofd_multihit_coinc[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_TotPm_coinc[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_num_side[N_PLANE_MAX_TOFD_S494];
-    TH1F* fh_tofd_bars[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_Tot_hit[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_time_hit[N_PLANE_MAX_TOFD_S494];
-    TH1F* fh_tofd_multihit_hit[N_PLANE_MAX_TOFD_S494];
-    TH2F* fh_tofd_dt_hit[N_PLANE_MAX_TOFD_S494 - 1];
-
-    TH2F* fh_tofd_time_los_h2[N_PLANE_MAX_TOFD_S494];
-    TH1F* fh_tofd_time_los[N_PLANE_MAX_TOFD_S494][N_PADDLE_MAX_TOFD_S494];
+    std::vector<TH2F*> fh_tofd_time_los_h2;
+    std::vector<TH1F*> fh_tofd_time_los[44];
 
   public:
     ClassDef(R3BTofDOnlineSpectra, 1)

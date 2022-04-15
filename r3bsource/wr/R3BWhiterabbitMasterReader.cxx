@@ -31,10 +31,10 @@ R3BWhiterabbitMasterReader::R3BWhiterabbitMasterReader(EXT_STR_h101_WRMASTER* da
                                                        size_t offset,
                                                        UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitMasterReader")
-    , fNEvent(0)
+    , fNEvent(1)
     , fData(data)
     , fOffset(offset)
-    , fOnline(kFALSE)
+    , fOnline(kTRUE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
     , fArray(new TClonesArray("R3BWRData"))
@@ -57,7 +57,6 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
     Int_t ok;
     R3BLOG(INFO, "");
     EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMASTER, 0);
-
     if (!ok)
     {
         R3BLOG(FATAL, "Failed to setup structure information");
@@ -78,8 +77,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
     Reset();
-
-    fData->TIMESTAMP_MASTER_ID = 0;
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
@@ -129,7 +127,6 @@ void R3BWhiterabbitMasterReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    fNEvent = 0;
 }
 
 ClassImp(R3BWhiterabbitMasterReader);
