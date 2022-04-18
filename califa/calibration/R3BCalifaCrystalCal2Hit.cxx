@@ -286,7 +286,14 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 
         if(fRand){
 
-         fAngularDistributions[highest->GetCrystalId()-1]->GetRandom2(fRandPhi,fRandTheta);
+
+         if(highest->GetCrystalId() <= 2432)
+          fAngularDistributions[highest->GetCrystalId() - 1]->GetRandom2(fRandPhi,fRandTheta);
+
+         else
+          fAngularDistributions[highest->GetCrystalId()- 1 - 2432]->GetRandom2(fRandPhi,fRandTheta);
+
+
 
            clusterHit =
             TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time ,TMath::DegToRad()*fRandTheta,TMath::DegToRad()*fRandPhi,clusterId);
