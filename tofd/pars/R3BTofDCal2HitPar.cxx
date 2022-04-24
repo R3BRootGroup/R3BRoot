@@ -13,11 +13,11 @@
 
 #include "R3BTofDCal2HitPar.h"
 #include "R3BEventHeader.h"
-#include "R3BTofdCalData.h"
+#include "R3BLogger.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
-#include "R3BLogger.h"
+#include "R3BTofdCalData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -31,6 +31,8 @@
 #include "TGraph.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TLegend.h"
+#include "TLine.h"
 #include "TMath.h"
 #include "TProfile.h"
 #include "TSpectrum.h"
@@ -56,23 +58,25 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar()
 R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalTriggerItems(NULL)
-    , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
     , fTpat(-1)
     , fNofPlanes(4)
     , fPaddlesPerPlane(44)
-    , fNofModules(fNofPlanes*fPaddlesPerPlane)
+    , fNofModules(fNofPlanes * fPaddlesPerPlane)
     , fNEvents(0)
+    , fParameter(1)
     , fHitPar(NULL)
     , fTofdY(0.)
     , fTofdQ(0.)
+    , fMaxQ(1500)
+    , fNbZPeaks(1)
+    , fZfitType("pol1")
     , fTofdTotLow(0.)
-    , fTofdTotHigh(0.)
+    , fTofdTotHigh(200.)
     , fMapPar(NULL)
     , fTofdSmiley(true)
     , fTofdZ(false)
-    , fParaFile("")
     , maxevent(0)
 {
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -85,8 +89,8 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
             fhLogTot1vsLogTot2[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
-                fhTot1vsPos[i][j] = NULL;
-                fhTot2vsPos[i][j] = NULL;
+            fhTot1vsPos[i][j] = NULL;
+            fhTot2vsPos[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
         }
     }
@@ -141,10 +145,10 @@ InitStatus R3BTofDCal2HitPar::Init()
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
     R3BLOG_IF(fatal, NULL == fCalData, "TofdCal not found");
-    
+
     fCalTriggerItems = (TClonesArray*)rm->GetObject("TofdTriggerCal");
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
-    
+
     fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
     if (!fHitPar)
     {
@@ -153,10 +157,10 @@ InitStatus R3BTofDCal2HitPar::Init()
     }
 
     maxevent = rm->CheckMaxEventNo();
-    
+
     for (Int_t i = 1; i <= fNofPlanes; i++)
-          for (Int_t j = 1; j <= fPaddlesPerPlane; j++)
-                CreateHistograms(i, j);
+        for (Int_t j = 1; j <= fPaddlesPerPlane; j++)
+            CreateHistograms(i, j);
 
     return kSUCCESS;
 }
@@ -193,7 +197,11 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     }
 
     // ToFD detector
-    std::vector<std::vector<UInt_t>> multihits(N_TOFD_HIT_PLANE_MAX, std::vector<UInt_t>(N_TOFD_HIT_PADDLE_MAX));
+    std::vector<std::vector<UInt_t>> multihits(fNofPlanes, std::vector<UInt_t>(fPaddlesPerPlane));
+    for (Int_t i = 0; i < fNofPlanes; ++i)
+        for (Int_t j = 0; j < fPaddlesPerPlane; ++j)
+            multihits[i][j] = 0;
+
     UInt_t nHits = fCalData->GetEntries();
     // Organize cals into bars.
     struct Entry
@@ -206,8 +214,6 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     {
         auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
-        // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
-        //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
@@ -216,17 +222,8 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     static bool s_was_trig_missing = false;
     auto trig_num = fCalTriggerItems->GetEntries();
     // Find coincident PMT hits.
-    // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
-        // for (auto it2 = it->second.top.begin(); it->second.top.end() != it2; ++it2) {
-        // std::cout << "Top: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
-        // (*it2)->GetTimeLeading_ns() << '\n';
-        //}
-        // for (auto it2 = it->second.bot.begin(); it->second.bot.end() != it2; ++it2) {
-        // std::cout << "Bot: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
-        // (*it2)->GetTimeLeading_ns() << '\n';
-        //}
         auto const& top_vec = it->second.top;
         auto const& bot_vec = it->second.bot;
         size_t top_i = 0;
@@ -235,7 +232,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
         {
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
-            
+
             Int_t top_trig_i = 0;
             Int_t bot_trig_i = 0;
             if (fMapPar)
@@ -243,7 +240,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 top_trig_i = fMapPar->GetTrigMap(top->GetDetectorId(), top->GetBarId(), top->GetSideId());
                 bot_trig_i = fMapPar->GetTrigMap(bot->GetDetectorId(), bot->GetBarId(), bot->GetSideId());
             }
-            
+
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {
@@ -257,7 +254,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofDCal2HitPar::Exec() : Missing trigger information!";
+                    R3BLOG(ERROR, "Missing trigger information!");
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -269,7 +266,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             auto bot_ns =
                 fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
- 
+
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
             auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
@@ -281,24 +278,19 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 // glue zero and the largest values together.
                 dt_mod -= c_range_ns;
             }
-            // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
-            // std::abs(dt_mod) << '\n';
             if (std::abs(dt_mod) < c_bar_coincidence_ns)
             {
-                // Hit!
-                // std::cout << "Hit!\n";
+                // Hit
                 Int_t iPlane = top->GetDetectorId(); // 1..n
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
-                               << " allowed are 1.." << fNofPlanes;
+                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
-                               << " allowed are 1.." << fPaddlesPerPlane;
+                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
@@ -325,17 +317,21 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     // offset histo via ToT
                     auto posToT = 0.;
                     if (fTofdY == 0.)
+                    {
+                        R3BLOG(DEBUG, "Will prepare for offset and sync calculation");
                         posToT = TMath::Log(top_tot / bot_tot);
+                    }
                     else
                     {
-                        /*auto par = fHitPar->GetModuleParAt(iPlane, iBar);
+                        auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
-                            LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                       << ", Bar: " << top->GetBarId();
+                            R3BLOG(
+                                ERROR,
+                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                             continue;
-                        }*/
-                        posToT = log((top_tot /*+ par->GetToTOffset2()*/) / (bot_tot/* + par->GetToTOffset1()*/));
+                        }
+                        posToT = log((top_tot + par->GetToTOffset2()) / (bot_tot + par->GetToTOffset1()));
                     }
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
                     // fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
@@ -348,37 +344,39 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 else
                 {
                     // get parameter
-                   /* auto para = fHitPar->GetModuleParAt(iPlane, iBar);
+                    auto para = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                   << ", Bar: " << top->GetBarId();
+                        R3BLOG(ERROR,
+                               "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
-                    }*/
+                    }
 
                     // calculate tdiff with offest
-                    auto tdiff = (bot_ns /*+ para->GetOffset1()*/) - (top_ns /*+ para->GetOffset2()*/);
+                    auto tdiff = (bot_ns + para->GetOffset1()) - (top_ns + para->GetOffset2());
+                    /*
+                                        // walk corrections
+                                        if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. ||
+                       para->GetPar3Walk() == 0. || para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.){
+                                            R3BLOG(WARNING, "Walk correction not found!");
+                                        }else{
 
-                    // walk corrections
-                    /*if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. || para->GetPar3Walk() == 0. ||
-                        para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.)
-                        LOG(INFO) << "Walk correction not found!";
-                    bot_ns = bot_ns - walk(bot_tot,
-                                           para->GetPar1Walk(),
-                                           para->GetPar2Walk(),
-                                           para->GetPar3Walk(),
-                                           para->GetPar4Walk(),
-                                           para->GetPar5Walk());
-                    top_ns = top_ns - walk(top_tot,
-                                           para->GetPar1Walk(),
-                                           para->GetPar2Walk(),
-                                           para->GetPar3Walk(),
-                                           para->GetPar4Walk(),
-                                           para->GetPar5Walk());*/
+                                        bot_ns = bot_ns - walk(bot_tot,
+                                                               para->GetPar1Walk(),
+                                                               para->GetPar2Walk(),
+                                                               para->GetPar3Walk(),
+                                                               para->GetPar4Walk(),
+                                                               para->GetPar5Walk());
+                                        top_ns = top_ns - walk(top_tot,
+                                                               para->GetPar1Walk(),
+                                                               para->GetPar2Walk(),
+                                                               para->GetPar3Walk(),
+                                                               para->GetPar4Walk(),
+                                                               para->GetPar5Walk());
+                                        }*/
 
                     auto posToT =
-                        /*para->GetLambda() */ log((top_tot /*+ para->GetToTOffset2()*/) / (bot_tot /*+ para->GetToTOffset1()*/));
-
+                        para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
 
                     // fill control histograms
                     // fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
@@ -388,87 +386,91 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
                     // Time of hit
-                    auto THit = (bot_ns + top_ns) / 2. /*- para->GetSync()*/;
+                    auto THit = (bot_ns + top_ns) / 2. - para->GetSync();
 
                     // Sync of one plane
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
                 }
 
                 // prepare double exponential fit
-                if (!fTofdSmiley)
+                if (!fTofdSmiley && fTofdQ > 0.1)
                 {
-
                     LOG(DEBUG) << "Prepare histo for double exponential fit";
-                    /*auto par = fHitPar->GetModuleParAt(iPlane, iBar);
+                    auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                  << ", Bar: " << top->GetBarId();
+                        R3BLOG(ERROR,
+                               "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
-                    }*/
+                    }
 
                     // calculate y position
-                    auto pos = ((bot_ns /*+ par->GetOffset1()*/) - (top_ns /*+ par->GetOffset2()*/));// * par->GetVeff();
+                    auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
 
                     // fill fitting histograms and smiley histogram
-                    //if(!IS_NAN(pos) && !IS_NAN(bot_tot))
                     fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                   // if(!IS_NAN(pos) && !IS_NAN(top_tot))
                     fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
+
+                // std::cout<< " hola 10" << fTofdZ << std::endl;
 
                 // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
+                    // std::cout<< " hola 20" << std::endl;
                     LOG(DEBUG) << "Prepare histo for quenching correction";
                     // get parameter
-                    /*R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
+                    auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                  << ", Bar: " << top->GetBarId();
+                        R3BLOG(ERROR,
+                               "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
-                    }*/
+                    }
 
-                    // calculate y position
+                    // Calculate y position
                     auto posToT =
-                        /*par->GetLambda() */ log((top_tot /* par->GetToTOffset2()*/) / (bot_tot /* par->GetToTOffset1()*/));
+                        par->GetLambda() * log((top_tot + par->GetToTOffset2()) / (bot_tot + par->GetToTOffset1()));
 
-                 /*   Double_t parq[4];
+                    Double_t parq[4];
                     parq[0] = par->GetPar1a();
                     parq[1] = par->GetPar1b();
                     parq[2] = par->GetPar1c();
                     parq[3] = par->GetPar1d();
-*/
-                    // calculate charge
+
+                    // Calculate charge
                     Double_t qb = 0.;
                     if (fTofdSmiley)
                     {
-                        qb = TMath::Sqrt(top_tot * bot_tot);
-                            // (parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) + parq[3] * pow(posToT, 3));
-                        qb = qb * fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
+                        qb = TMath::Sqrt(top_tot * bot_tot); //
+                                                             //(parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) +
+                                                             //parq[3] * pow(posToT, 3));
+                        qb = qb *
+                             fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
+                        // std::cout<< " hola30 " << qb << " , " << fTofdQ << std::endl;
                     }
                     else
                     {
                         // double exponential
-                        auto pos = ((bot_ns /*+ par->GetOffset1()*/) - (top_ns /*+ par->GetOffset2()*/));// * par->GetVeff();
-                        auto q1 = bot_tot;
-                                //  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
-                       // parq[0] = par->GetPar2a();
-                       // parq[1] = par->GetPar2b();
-                       // parq[2] = par->GetPar2c();
-                       // parq[3] = par->GetPar2d();
-                        auto q2 = top_tot;
-                                //  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
+                        auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                        auto q1 = bot_tot /
+                                  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
+                        parq[0] = par->GetPar2a();
+                        parq[1] = par->GetPar2b();
+                        parq[2] = par->GetPar2c();
+                        parq[3] = par->GetPar2d();
+                        auto q2 = top_tot /
+                                  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
                         q1 = q1 *
                              fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
                         q2 = q2 * fTofdQ;
                         qb = (q1 + q2) / 2.;
                     }
 
-                    // fill control histograms and Q vs Pos without multihits
+                    // Fill control histograms and Q vs Pos without multihits
                     if (multihits[iPlane - 1][iBar - 1] < 2 && (qb > 0.))
                     {
+                        // std::cout<< " h: " << posToT << " , " << qb << std::endl;
                         fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT, qb);
                     }
                 }
@@ -493,7 +495,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
 
 void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 60.;
+    Double_t max_charge = fMaxQ;
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];
@@ -501,7 +503,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
         sprintf(strName2, "Time Diff Plane %d", iPlane);
         fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
-        fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
     }
     if (NULL == fhTsync[iPlane - 1])
@@ -511,7 +513,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
         sprintf(strName2, "Time Sync Plane %d", iPlane);
         fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -2000, 2000.);
-        fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
         fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }
     if (NULL == fh_tofd_TotPm[iPlane - 1])
@@ -521,7 +523,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName2, "Tofd ToT plane %d", iPlane);
         fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 300, 0., 300.);
-        fh_tofd_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fh_tofd_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
         fh_tofd_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
     }
     if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
@@ -537,7 +539,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName[255];
         sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
+            new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
     }
@@ -545,37 +547,27 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 20000, -100, 100, max_charge * 10, 0., max_charge);
+        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 2000, -100, 100, max_charge / 2, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
-    /*
-    if (NULL == fhTot1vsTot2[iPlane - 1][iBar - 1])
+
+    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1] && !fTofdSmiley)
     {
         char strName[255];
-        sprintf(strName, "Plane_%d_Bar_%d_ToT1vsToT2", iPlane, iBar);
-        fhTot1vsTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 300, 0., 300., 300, 0., 300.);
-        fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
-        fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
-    */
-    
-    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1] && !fTofdSmiley)
-                    {
-                        char strName[255];
-                        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-                        fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
-                    }
     if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1] && !fTofdSmiley)
-                    {
-                        char strName[255];
-                        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-                        fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
-                    }
+    {
+        char strName[255];
+        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
+    }
 }
 
 void R3BTofDCal2HitPar::FinishEvent() {}
@@ -590,7 +582,7 @@ void R3BTofDCal2HitPar::calcOffset()
         if (fhTdiff[i])
         {
             LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
-            //auto* h = (TH2F*)fhTdiff[i]->Clone();
+            // auto* h = (TH2F*)fhTdiff[i]->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 mpar = new R3BTofDHitModulePar();
@@ -627,8 +619,8 @@ void R3BTofDCal2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(i + 1, j + 1);
             if (fhSqrtQvsPosToT[i][j])
             {
-                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                //auto* h = fhSqrtQvsPosToT[i][j]->Clone();
+                LOG(INFO) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                // auto* h = fhSqrtQvsPosToT[i][j]->Clone();
                 cToTOffset->cd(1);
                 fhSqrtQvsPosToT[i][j]->Draw("colz");
                 auto histo_py = (TH2F*)fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
@@ -647,7 +639,6 @@ void R3BTofDCal2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 fhSqrtQvsPosToT[i][j]->SetAxisRange(totLow, totHigh, "Y");
                 cToTOffset->Update();
                 delete fgaus;
-         
             }
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
             par->SetToTOffset1(sqrt(exp(offset)));
@@ -665,8 +656,8 @@ void R3BTofDCal2HitPar::calcSync()
     {
         if (fhTsync[i])
         {
-            LOG(WARNING) << "Found histo Time_Sync_Plane_" << i + 1;
-            //auto h = fhTsync[i]->Clone();
+            LOG(INFO) << "Found histo Time_Sync_Plane_" << i + 1;
+            // auto h = fhTsync[i]->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 cSync->cd(i + 1);
@@ -681,7 +672,7 @@ void R3BTofDCal2HitPar::calcSync()
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
     }
@@ -690,8 +681,14 @@ void R3BTofDCal2HitPar::calcSync()
 
 void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars, Int_t index)
 {
+    if (histo->GetEntries() < 100)
+    {
+        R3BLOG(INFO, "Nb of events below 100 for histo with index" << index);
+        return;
+    }
+
     Double_t par[3000] = { 0 };
-    Int_t nPeaks = 180;
+    Int_t nPeaks = fNbZPeaks;
     Double_t x[3000] = { 0 };
     char strName[255];
     sprintf(strName, "canvas_%d", index);
@@ -699,16 +696,26 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
     c1->Divide(1, 3);
     c1->cd(1);
     auto* h = (TH2F*)histo->Clone();
-    //h->Draw("colz");
+    h->Draw("colz");
     h->SetAxisRange(min, max, "Y");
     // Projection of charge axis
     auto* h1 = h->ProjectionY("p_y");
     c1->cd(2);
-   // h1->Draw();
+    h1->Draw();
     // Use TSpectrum to find the peak candidates
     TSpectrum* s = new TSpectrum(nPeaks);
-    Int_t nfound = s->Search(h1, 1, "", 0.005); // lower threshold than default 0.05
+    Int_t nfound = s->Search(h1, 10, "", 0.001);
     std::cout << "Found " << nfound << " candidate peaks to fit\n";
+
+    if (nfound == 0)
+    {
+        delete s;
+        delete c1;
+        delete h;
+        delete h1;
+        return;
+    }
+
     c1->Update();
     // Eliminate background peaks
     nPeaks = 0;
@@ -728,7 +735,6 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
         return;
 
     Double_t peaks[nPeaks];
-
     for (Int_t i = 0; i < nPeaks; i++)
     {
         // printf("Found peak @ %f\n",xpeaks[i]);
@@ -741,6 +747,7 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
     Double_t zpeaks[3000] = { 0 };
     string doagain = "y";
     Int_t nfp;
+doagainfit:
     do
     {
         nfp = 0;
@@ -768,38 +775,346 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
     {
         delete s;
         delete c1;
+        delete h;
+        delete h1;
         return;
     }
     // fit charge axis
     std::cout << "Selected " << nfp << " useful peaks to fit\nStart fitting...\n";
-    auto* gr1 = new TGraph();
-    TF1* fitz = new TF1("fitz", "[0]*TMath::Power(x,[2])+[1]", min, max);
-    fitz->SetParameters(1.5, 2., .1);
+    c1->cd(3)->Clear();
+    c1->Update();
     c1->cd(3);
-    gr1 = new TGraph(nfp, zpeaks, x);
-    //gr1->Draw("A*");
-    gr1->Fit("fitz", "Q", "", min, max);
-    // write parameters
-    std::cout << "Optimise the fit, double click to finish\n";
-    // gPad->WaitPrimitive();
-    auto* fitzr = gr1->GetFunction("fitz");
-    for (Int_t j = 0; j < 3; j++)
+    auto gr1 = new TGraph(nfp, zpeaks, x);
+    gr1->SetMarkerColor(4);
+    gr1->SetMarkerSize(1.5);
+    gr1->SetMarkerStyle(20);
+    gr1->Draw("AP");
+    // TF1* fitz = new TF1("fitz", "[0]*TMath::Power(x,[2])+[1]", min, max);
+    if (fZfitType != "pol1" && fZfitType != "pol2")
     {
-        pars[j] = fitzr->GetParameter(j);
+        R3BLOG(ERROR, "Fit " << fZfitType << " is not allowed, use pol1 or pol2 ");
+        return;
+    }
+    auto fitz = new TF1("fitz", fZfitType, min, max);
+    fitz->SetLineColor(2);
+    fitz->SetLineWidth(2);
+    fitz->SetLineStyle(1);
+    // fitz->SetParameters(1.5, 2., .1);
+    gr1->Fit("fitz", "Q");
+    fitz->Draw("lsame");
+    c1->Update();
+    // write parameters
+    std::cout << "Is OK? (y/n) ";
+    std::cin >> doagain;
+    if (doagain == "n")
+        goto doagainfit;
+
+    for (Int_t j = 0; j < 2; j++)
+    {
+        pars[j] = fitz->GetParameter(j);
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
     }
-    // gPad->WaitPrimitive();
-   // gSystem->Sleep(3000);
     delete s;
+    delete h;
+    delete h1;
     delete gr1;
     delete c1;
     delete fitz;
 }
 
+void R3BTofDCal2HitPar::calcVeff()
+{
+    TCanvas* cVeff = new TCanvas("cVeff", "cVeff", 10, 10, 1000, 900);
+    cVeff->Divide(2, 2);
+    for (Int_t i = 0; i < fNofPlanes; i++)
+    {
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+        {
+            Double_t max = 0.;
+            Double_t veff = 7.;
+            if (fhTdiff[i])
+            {
+                LOG(INFO) << "Found histo Time_Diff_Plane_" << i + 1;
+                auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                if (!par)
+                {
+                    LOG(WARNING) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                    continue;
+                }
+                // auto* h = (TH2F*)histofilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
+                cVeff->cd(i + 1);
+                // h->Draw("colz");
+                TH1F* histo_py = (TH1F*)fhTdiff[i]->ProjectionY("histo_py", j + 2, j + 2, "");
+                Int_t binmax = histo_py->GetMaximumBin();
+                max = histo_py->GetXaxis()->GetBinCenter(binmax);
+                Double_t maxEntry = histo_py->GetBinContent(binmax);
+                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 0.3, max + 0.3); /// TODO: find best range
+                fgaus->SetParameters(maxEntry, max, 20);
+                histo_py->Fit("fgaus", "QR0");
+                Double_t offset1 = par->GetOffset1();
+                Double_t offset2 = par->GetOffset2();
+                Double_t sync = par->GetSync();
+                max = fgaus->GetParameter(1) + offset1 - offset2; /// TODO: needs to be tested
+                // max = max+offset1-offset2;
+                veff = fTofdY / max; // effective speed of light in [cm/s]
+                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
+                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
+                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
+                par->SetVeff(veff);
+            }
+        }
+    }
+    fHitPar->setChanged();
+}
+
+void R3BTofDCal2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
+{
+    TCanvas* cToTOffset = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
+    cToTOffset->Divide(1, 2);
+    for (Int_t i = 0; i < fNofPlanes; i++)
+    {
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+        {
+            Double_t offset = 0.;
+            auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+            if (fhSqrtQvsPosToT[i][j])
+            {
+                LOG(INFO) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                // auto* h = (TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
+                cToTOffset->cd(1);
+                fhSqrtQvsPosToT[i][j]->Draw("colz");
+                auto* histo_py = (TH2F*)fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
+                cToTOffset->cd(2);
+                histo_py->Draw();
+                Int_t binmax = histo_py->GetMaximumBin();
+                Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                histo_py->Fit("fgaus", "QR0");
+                offset = fgaus->GetParameter(1);
+                fgaus->Draw("SAME");
+                histo_py->SetAxisRange(Max - .5, Max + .5, "X");
+                fhSqrtQvsPosToT[i][j]->SetAxisRange(Max - .5, Max + .5, "X");
+                fhSqrtQvsPosToT[i][j]->SetAxisRange(totLow, totHigh, "Y");
+                cToTOffset->Update();
+                delete fgaus;
+                delete histo_py;
+            }
+            else
+                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+            Double_t lambda = fTofdY / offset;
+            LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
+                      << "\n";
+            par->SetLambda(lambda);
+        }
+    }
+    fHitPar->setChanged();
+}
+
+void R3BTofDCal2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para)
+{
+    // This fits the smiley: Sqrt(q1*q2) returns position dependent charge, we fit that via pol3 and try to correct
+    Double_t y[1000], x[1000];
+    Int_t n = 0;
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = 0;
+    }
+    TGraph* gr1 = new TGraph();
+    TGraph* gr2 = new TGraph();
+    TCanvas* cfit_smiley = new TCanvas("cfit_smiley", "fit smiley", 100, 100, 800, 800);
+    cfit_smiley->Clear();
+    cfit_smiley->Divide(1, 4);
+    cfit_smiley->cd(1);
+    TH2F* histo1 = (TH2F*)histo->Clone();
+    histo1->Draw("colz");
+    TH2F* histo2 = (TH2F*)histo->Clone();
+    histo2->RebinX(50);
+    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
+    // histo2->SetAxisRange(fTofdTotLow,fTofdTotHigh,"Y");
+    cfit_smiley->cd(2);
+    histo2->Draw("colz");
+    std::cout << "Searching for points to fit...\n";
+    for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
+    {
+        // std::cout<<"Bin "<<i<<" of "<<histo2->GetNbinsX()<<" with cut: "<<fTofdTotLow<<" < sqrt(q1*q2) <
+        // "<<fTofdTotHigh<<"\n";
+        cfit_smiley->cd(2);
+        TLine* l = new TLine(
+            histo2->GetXaxis()->GetBinCenter(i), fTofdTotLow, histo2->GetXaxis()->GetBinCenter(i), fTofdTotHigh);
+        l->SetLineColor(kRed);
+        l->SetLineWidth(2.);
+        l->Draw();
+        cfit_smiley->cd(3);
+        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        // cfit_smiley->Update();
+        x[n] = histo2->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
+
+        if ((x[n] < min || x[n] > max) || (y[n] < fTofdTotLow || y[n] > fTofdTotHigh))
+        {
+            delete histo_py;
+            continue;
+        }
+        if (histo_py->GetMaximum() > 5)
+        {
+            n++;
+            delete l;
+        }
+        delete histo_py;
+    }
+    gr1 = new TGraph(n, x, y);
+    gr1->SetTitle("Points found for fitting; x position in cm; sqrt(tot1*tot2)");
+    gr1->Draw("A*");
+    std::cout << "Start fitting\n";
+    TF1* f1 = new TF1("f1", "pol3", min, max);
+    f1->SetLineColor(2);
+    gr1->Fit("f1", "Q", "", min, max);
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f1->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    // fit again but with more information and better cuts
+    std::cout << "Fit again with more information\n";
+    n = 0;
+    cfit_smiley->cd(4);
+    for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
+    {
+        Double_t pos = histo2->GetXaxis()->GetBinCenter(i);
+        Double_t ymean = f1->Eval(pos);
+        histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
+        histo2->Draw("colz");
+        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        x[n] = histo2->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
+        if (histo_py->GetMaximum() > 2)
+            n++;
+        delete histo_py;
+    }
+    gr2 = new TGraph(n, x, y);
+    gr2->SetTitle("More information;x position in cm;sqrt(q1*q2)");
+    gr2->Draw("A*");
+    f1->DrawCopy("SAME");
+    TF1* f2 = new TF1("f2", "pol3", min, max);
+    f2->SetParameters(para[0], para[1], para[2], para[3]);
+    f2->SetLineColor(3);
+    gr2->Fit("f2", "0Q", "", min, max);
+    f2->Draw("SAME");
+    std::cout << "Will write:\n";
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f2->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
+    auto legend = new TLegend(.9, 0.7, .99, 0.9);
+    legend->AddEntry("f1", "First Fit", "l");
+    legend->AddEntry("f2", "Second Fit", "l");
+    legend->Draw();
+    cfit_smiley->Update();
+    // gPad->WaitPrimitive();
+    // gSystem->Sleep(3000);
+    delete histo1;
+    delete histo2;
+    delete gr1;
+    delete gr2;
+    delete f1;
+    delete f2;
+    delete cfit_smiley;
+}
+
+void R3BTofDCal2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para)
+{
+    // This fits the exponential decay of the light in a paddle. The 2 PMTs are fit with the same function but one
+    // side will deliver negative attenuation parameters and the other positive.
+    Double_t y[1000], x[1000];
+    Int_t n = 0;
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = 0;
+    }
+    TGraph* gr1 = new TGraph();
+    TGraph* gr2 = new TGraph();
+    TCanvas* cfit_exp = new TCanvas("cfit_exp", "fit exponential", 100, 100, 800, 800);
+    cfit_exp->Clear();
+    cfit_exp->Divide(1, 3);
+    cfit_exp->cd(1);
+    TH2F* histo1 = (TH2F*)histo->Clone();
+    TH2F* histo2 = (TH2F*)histo->Clone();
+    histo1->Draw("colz");
+    cfit_exp->cd(2);
+    for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
+    {
+        TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        x[n] = histo1->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
+        if ((x[n] < -40. || x[n] > 40.) || y[n] < 50.)
+        {
+            delete histo_py;
+            continue;
+        }
+        if (histo_py->GetMaximum() > 5)
+            n++;
+        delete histo_py;
+    }
+    gr1 = new TGraph(n, x, y);
+    gr1->Draw("A*");
+    TF1* f1 = new TF1("f1", "[0]*(exp(-[1]*(x+100.))+exp(-[2]*(x+100.)))+[3]", min, max);
+    f1->SetParameters(520., 0.001, 17234, -485.);
+    f1->SetLineColor(2);
+    gr1->Fit("f1", "", "", min, max);
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f1->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    // fit again but with more information and better cuts
+    n = 0;
+    cfit_exp->cd(3);
+    for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
+    {
+        Double_t pos = histo2->GetXaxis()->GetBinCenter(i);
+        Double_t ymean = para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3];
+        histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
+        histo2->Draw("colz");
+        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        x[n] = histo2->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
+        if (histo_py->GetMaximum() > 2)
+            n++;
+        delete histo_py;
+    }
+    gr2 = new TGraph(n, x, y);
+    gr2->Draw("A*");
+    TF1* f2 = new TF1("f2", "[0]*(exp(-[1]*(x+100.))+exp(-[2]*(x+100.)))+[3]", min, max);
+    f2->SetParameters(para[0], para[1], para[2], para[3]);
+    f2->SetLineColor(2);
+    gr2->Fit("f2", "", "", min, max);
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f2->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    cfit_exp->Update();
+    // gPad->WaitPrimitive();
+    // gSystem->Sleep(3000);
+    delete gr1;
+    delete gr2;
+    delete f1;
+    delete f2;
+}
 
 void R3BTofDCal2HitPar::FinishTask()
 {
-    if (1)
+    if (fParameter == 1)
     {
         // Determine time offset of the 2 PMTs of one paddle. This procedure
         // assumes a sweep run in the middle of the ToF wall horizontally.
@@ -815,9 +1130,91 @@ void R3BTofDCal2HitPar::FinishTask()
         calcSync();
         LOG(ERROR) << "Call walk correction before next step!";
     }
-    
-    
-    if (0)
+    else if (fParameter == 2)
+    {
+        // Determine effective speed of light in [cm/s] for each paddle
+        LOG(INFO) << "Calling function";
+        calcVeff();
+        // Determine light attenuation lambda for each paddle
+        LOG(INFO) << "Calling function calcLambda";
+        calcLambda(fTofdTotLow, fTofdTotHigh);
+    }
+    else if (fParameter == 3)
+    {
+        // calculation of position dependend charge
+        if (fTofdSmiley)
+        {
+            LOG(INFO) << "Calling function smiley";
+            Double_t para2[4];
+            for (Int_t i = 0; i < 4; i++)
+                para2[i] = 0.;
+            Double_t min2 = -40.; // -40 effective bar length
+            Double_t max2 = 40.;  // 40 effective bar length = 80 cm
+                                  // we will use 50 here for some fit safety margin
+            for (Int_t i = 0; i < fNofPlanes; i++)
+            {
+                for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+                {
+                    if (fhSqrtQvsPosToT[i][j])
+                    {
+                        LOG(INFO) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                        auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                        smiley(fhSqrtQvsPosToT[i][j], min2, max2, para2);
+                        par->SetPola(para2[0]);
+                        par->SetPolb(para2[1]);
+                        par->SetPolc(para2[2]);
+                        par->SetPold(para2[3]);
+                    }
+                }
+            }
+            fHitPar->setChanged();
+        }
+        else
+        {
+            LOG(INFO) << "Calling function doubleExp";
+            Double_t para[4];
+            for (Int_t i = 0; i < 4; i++)
+                para[i] = 0.;
+            Double_t min = -40.; // effective bar length
+            Double_t max = 40.;  // effective bar length = 80 cm
+
+            for (Int_t i = 0; i < fNofPlanes; i++)
+            {
+                for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+                {
+                    if (fhTot1vsPos[i][j])
+                    {
+                        auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                        doubleExp(fhTot1vsPos[i][j], min, max, para);
+                        Double_t offset1 = par->GetOffset1();
+                        Double_t offset2 = par->GetOffset2();
+                        Double_t veff = par->GetVeff();
+                        Double_t sync = par->GetSync();
+                        par->SetPar1a(para[0]);
+                        par->SetPar1b(para[1]);
+                        par->SetPar1c(para[2]);
+                        par->SetPar1d(para[3]);
+                    }
+                    if (fhTot2vsPos[i][j])
+                    {
+                        auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                        doubleExp(fhTot2vsPos[i][j], min, max, para);
+                        Double_t offset1 = par->GetOffset1();
+                        Double_t offset2 = par->GetOffset2();
+                        Double_t veff = par->GetVeff();
+                        Double_t sync = par->GetSync();
+                        par->SetPar2a(para[0]);
+                        par->SetPar2b(para[1]);
+                        par->SetPar2c(para[2]);
+                        par->SetPar2d(para[3]);
+                    }
+                }
+            }
+            fHitPar->setChanged();
+        }
+    }
+
+    if (fParameter == 4)
     {
         // Z correction for each plane
         LOG(WARNING) << "Calling function zcorr";
@@ -826,29 +1223,17 @@ void R3BTofDCal2HitPar::FinishTask()
         pars[0] = 0.;
         pars[1] = 0.;
         pars[2] = 0.;
-        Int_t min = 0, max = 20; // select range for peak search
+        Int_t min = 0, max = fMaxQ; // select range for peak search
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 if (fhQvsPos[i][j])
                 {
-                    R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                    auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    Int_t index = i*fPaddlesPerPlane + j;
-                    zcorr(fhQvsPos[i][j], min, max, pars,index);
-                    Double_t offset1 = par->GetOffset1();
-                    Double_t offset2 = par->GetOffset2();
-                    Double_t veff = par->GetVeff();
-                    Double_t sync = par->GetSync();
-                    para[0] = par->GetPar1a();
-                    para[1] = par->GetPar1b();
-                    para[2] = par->GetPar1c();
-                    para[3] = par->GetPar1d();
-                    para[4] = par->GetPar2a();
-                    para[5] = par->GetPar2b();
-                    para[6] = par->GetPar2c();
-                    para[7] = par->GetPar2d();
+                    Int_t index = i * fPaddlesPerPlane + j;
+                    zcorr(fhQvsPos[i][j], min, max, pars, index);
                     std::cout << "Write parameter: " << pars[0] << " " << pars[1] << " " << pars[2] << "\n";
                     par->SetPar1za(pars[0]);
                     par->SetPar1zb(pars[1]);
