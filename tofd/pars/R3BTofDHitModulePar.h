@@ -79,6 +79,7 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Int_t GetPlane() const { return fPlane; }
     Int_t GetPaddle() const { return fPaddle; }
     Double_t GetSync() const { return fSync; }
+    Double_t GetTofSync() const { return fTofSync; }
     Double_t GetOffset1() const { return fOffset1; }
     Double_t GetOffset2() const { return fOffset2; }
     Double_t GetToTOffset1() const { return fToTOffset1; }
@@ -108,6 +109,7 @@ class R3BTofDHitModulePar : public FairParGenericSet
     void SetPlane(Int_t i) { fPlane = i; }
     void SetPaddle(Int_t i) { fPaddle = i; }
     void SetSync(Double_t t) { fSync = t; }
+    void SetTofSync(Double_t t) { fTofSync = t; }
     void SetOffset1(Double_t t) { fOffset1 = t; }
     void SetOffset2(Double_t t) { fOffset2 = t; }
     void SetToTOffset1(Double_t t) { fToTOffset1 = t; }
@@ -145,6 +147,7 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t fVeff;                          /**< effective velocity of light in paddle for position determination */
     Double_t fLambda;                        /**< light attenuation in paddle for position determination */
     Double_t fSync;                          /**< time offset between paddles */
+    Double_t fTofSync;                       /**< tof alignment with respect to the start detector */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d; /**< double exponential parameters for position dependent charge */
     Double_t fPar2a, fPar2b, fPar2c, fPar2d; /**< double exponential parameters for position dependent charge */
     Double_t fPola, fPolb, fPolc, fPold;     /**< polynomial parameters for position dependent charge */

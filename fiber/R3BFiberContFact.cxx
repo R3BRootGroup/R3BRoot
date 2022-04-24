@@ -26,6 +26,7 @@
 
 #include "R3BBunchedFiberHitPar.h"
 #include "R3BFiberMAPMTHitPar.h"
+#include "R3BFiberMappingPar.h"
 
 #include "TClass.h"
 
@@ -114,6 +115,22 @@ void R3BFiberContFact::setAllContainers()
     FairContainer* p16 = new FairContainer("Fi23bHitPar", "Fi23b Hit Parameters", "TestDefaultContext");
     p16->addContext("TestNonDefaultContext");
     containers->Add(p16);
+
+    auto p17 = new FairContainer("Fi30MappingPar", "Fi30 Mapping Parameters", "TestDefaultContext");
+    p17->addContext("TestNonDefaultContext");
+    containers->Add(p17);
+
+    auto p18 = new FairContainer("Fi31MappingPar", "Fi31 Mapping Parameters", "TestDefaultContext");
+    p18->addContext("TestNonDefaultContext");
+    containers->Add(p18);
+
+    auto p19 = new FairContainer("Fi32MappingPar", "Fi32 Mapping Parameters", "TestDefaultContext");
+    p19->addContext("TestNonDefaultContext");
+    containers->Add(p19);
+
+    auto p20 = new FairContainer("Fi33MappingPar", "Fi33 Mapping Parameters", "TestDefaultContext");
+    p20->addContext("TestNonDefaultContext");
+    containers->Add(p20);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
@@ -126,8 +143,13 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
     LOG(INFO) << "R3BFiberContFact: Create container name " << name;
     FairParSet* p = 0;
 
-    if (strcmp(name, "Fi30HitPar") == 0 || strcmp(name, "Fi31HitPar") == 0 || strcmp(name, "Fi32HitPar") == 0 ||
-        strcmp(name, "Fi33HitPar") == 0 || strcmp(name, "Fi23aHitPar") == 0 || strcmp(name, "Fi23bHitPar") == 0)
+    if (strcmp(name, "Fi30MappingPar") == 0 || strcmp(name, "Fi31MappingPar") == 0 ||
+        strcmp(name, "Fi32MappingPar") == 0 || strcmp(name, "Fi33MappingPar") == 0)
+    {
+        p = new R3BFiberMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "Fi30HitPar") == 0 || strcmp(name, "Fi31HitPar") == 0 || strcmp(name, "Fi32HitPar") == 0 ||
+             strcmp(name, "Fi33HitPar") == 0 || strcmp(name, "Fi23aHitPar") == 0 || strcmp(name, "Fi23bHitPar") == 0)
     {
         p = new R3BFiberMAPMTHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

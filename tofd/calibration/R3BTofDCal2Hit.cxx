@@ -70,7 +70,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fTpat2(-1)
     , fNofPlanes(5)
     , fPaddlesPerPlane(44)
-    , fTofdQ(1)
+    , fTofdQ(0)
     , fTofdHisto(false)
     , fTofdTotPos(true)
     , fnEvents(0)
@@ -156,10 +156,10 @@ void R3BTofDCal2Hit::SetParContainers()
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
     R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
 
-    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
     if (!fHitPar)
     {
-        R3BLOG(ERROR, "Could not get access to TofdHitPar container");
+        R3BLOG(ERROR, "Could not get access to tofdHitPar container");
         fNofHitPars = 0;
         return;
     }
@@ -174,7 +174,7 @@ void R3BTofDCal2Hit::SetParameter()
     else
         fNofHitPars = 0;
 
-    R3BLOG(INFO, "Parameters in the TofdHitPar container: " << fNofHitPars);
+    R3BLOG(INFO, "Parameters in the tofdHitPar container: " << fNofHitPars);
 
     return;
 }
@@ -316,7 +316,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
         auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
-        size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
+        size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << ' '
@@ -442,7 +442,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
 
-                R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
+                auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
                     R3BLOG(ERROR, "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
@@ -582,19 +582,26 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
-                auto tof = fTimeStitch->GetTime(THit - header->GetTStart());
-                if (parz[0] > 0 && parz[2] > 0)
-                {
-                    event.push_back(
-                        { parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar, THit_raw, tof });
-                }
-                else
-                {
-                    parz[0] = 1.;
-                    parz[1] = 0.;
-                    parz[2] = 1.;
-                    event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
-                }
+                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart()) - par->GetTofSync();
+
+                // if (parz[1] > 0)
+                // {
+                event.push_back(
+                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
+                // }
+
+                /* if (parz[0] > 0 && parz[2] > 0)
+                 {
+                     event.push_back(
+                         { parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar, THit_raw, tof });
+                 }
+                 else
+                 {
+                     parz[0] = 1.;
+                     parz[1] = 0.;
+                     parz[2] = 1.;
+                     event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
+                 }*/
 
                 if (fTofdHisto)
                 {

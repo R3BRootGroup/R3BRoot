@@ -33,9 +33,9 @@ class R3BFiberMappingPar : public FairParGenericSet
 {
   public:
     /** Standard constructor **/
-    R3BFiberMappingPar(const TString& name = "tofdMappingPar",
-                      const TString& title = "TofD Mapping parameters",
-                      const TString& context = "tofdMappingContext");
+    R3BFiberMappingPar(const TString& name = "fiberMappingPar",
+                       const TString& title = "Fiber Mapping parameters",
+                       const TString& context = "fiberMappingContext");
 
     /** Destructor **/
     virtual ~R3BFiberMappingPar();
@@ -54,27 +54,20 @@ class R3BFiberMappingPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Int_t GetNbPlanes() { return fNumPlanes; }
-    const Int_t GetNbPaddles() { return fNumPaddles; }
-    // GetTrigMap in 1-base for plane(1-4), paddle(1-44) and pmt(1-2)
-    const Int_t GetTrigMap(UInt_t plane, UInt_t paddle, UInt_t pmt)
-    {
-        return fTrigmap[pmt - 1][plane - 1]->GetAt(paddle - 1);
-    }
+    const Int_t GetNbChannels() { return fNbChannels; }
+    const Int_t GetNbSides() { return fNbSides; }
+    // GetTrigMap in 1-base for side(1-2) and channel(1-X)
+    const Int_t GetTrigMap(UInt_t side, UInt_t ch) { return fTrigmap[side - 1]->GetAt(ch - 1); }
 
-    void SetNbPlanes(Int_t p) { fNumPlanes = p; }
-    void SetNbPaddles(Int_t p) { fNumPaddles = p; }
-    // SetTrigMap in 1-base for plane(1-4), paddle(1-44) and pmt(1-2)
-    void SetTrigMap(Int_t value, UInt_t plane, UInt_t paddle, UInt_t pmt)
-    {
-        fTrigmap[pmt - 1][plane - 1]->AddAt(value, paddle - 1);
-    }
+    void SetNbChannels(Int_t p) { fNbChannels = p; }
+    void SetNbSides(Int_t p) { fNbSides = p; }
+    // SetTrigMap in 1-base for side(1-2) and channel(1-X)
+    void SetTrigMap(Int_t value, UInt_t side, UInt_t ch) { fTrigmap[side - 1]->AddAt(value, ch - 1); }
 
   private:
-    Int_t fNumPlanes;
-    Int_t fNumPaddles;
-    Int_t fNumPmts;
-    std::vector<TArrayI*> fTrigmap[2]; // Two PMTs per paddle
+    Int_t fNbChannels;
+    Int_t fNbSides;
+    TArrayI* fTrigmap[2]; // Two sides per fiber
 
     const R3BFiberMappingPar& operator=(const R3BFiberMappingPar&);
     R3BFiberMappingPar(const R3BFiberMappingPar&);

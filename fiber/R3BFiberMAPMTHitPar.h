@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 #ifndef R3BFiberMAPMTHITPAR_H
-#define R3BFiberMAPMTHITPAR_H
+#define R3BFiberMAPMTHITPAR_H 1
 
 #define NMODULEMAX 6000
 
 #define N_FIBER_MAX 2048
 
-#include "FairParGenericSet.h" // for FairParGenericSet
+#include "FairParGenericSet.h"
 #include "R3BFiberMAPMTHitModulePar.h"
 #include "TObjArray.h"
 #include <map>

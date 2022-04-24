@@ -26,6 +26,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/fiber
+${R3BROOT_SOURCE_DIR}/fiber/online
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
@@ -55,6 +56,8 @@ R3BFiberMAPMTMapped2CalPar.cxx
 R3BFiberMAPMTCal2Hit.cxx
 R3BFiberMAPMTHitPar.cxx
 R3BFiberMAPMTHitModulePar.cxx
+R3BFiberMappingPar.cxx
+./online/R3BFiberMAPMTOnlineSpectra.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")

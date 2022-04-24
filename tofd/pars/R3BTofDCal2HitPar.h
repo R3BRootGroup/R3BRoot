@@ -11,6 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// ------------------------------------------------------------
+// -----               R3BTofDCal2HitPar                  -----
+// -----    Created 20/04/22 by J.L. Rodriguez-Sanchez    -----
+// ------------------------------------------------------------
+
 #ifndef R3BTofDCal2HitPar_H
 #define R3BTofDCal2HitPar_H 1
 
@@ -27,6 +32,7 @@ class R3BTofDHitPar;
 class TClonesArray;
 class R3BEventHeader;
 class R3BTofDMappingPar;
+class R3BTimeStitch;
 class TH1F;
 class TH2F;
 
@@ -68,13 +74,6 @@ class R3BTofDCal2HitPar : public FairTask
      * @param option an execution option.
      */
     virtual void Exec(Option_t* option);
-
-    /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
 
     /**
      * Method for finish of the task execution.
@@ -159,6 +158,7 @@ class R3BTofDCal2HitPar : public FairTask
     void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
 
   private:
+    R3BTimeStitch* fTimeStitch;
     /**
      * Method for creating histograms.
      */
@@ -223,6 +223,7 @@ class R3BTofDCal2HitPar : public FairTask
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
+    TH1F* fh1_tofsync[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];

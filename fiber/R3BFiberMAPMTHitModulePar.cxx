@@ -14,15 +14,11 @@
 #include "R3BFiberMAPMTHitModulePar.h"
 
 #include "FairLogger.h"
-#include "FairParamList.h" // for FairParamList
+#include "FairParamList.h"
 
-#include "TF1.h"
-#include "TH1F.h"
-#include "TPad.h"
-
-using namespace std;
-
-ClassImp(R3BFiberMAPMTHitModulePar);
+//#include "TF1.h"
+//#include "TH1F.h"
+//#include "TPad.h"
 
 R3BFiberMAPMTHitModulePar::R3BFiberMAPMTHitModulePar(const char* name,
                                                      const char* title,
@@ -37,11 +33,13 @@ R3BFiberMAPMTHitModulePar::R3BFiberMAPMTHitModulePar(const char* name,
     , fGainUp(0)
     , fGainDown(0)
 {
+}
+
+R3BFiberMAPMTHitModulePar::~R3BFiberMAPMTHitModulePar()
+{
     // Reset all parameters
     clear();
 }
-
-R3BFiberMAPMTHitModulePar::~R3BFiberMAPMTHitModulePar() {}
 
 void R3BFiberMAPMTHitModulePar::putParams(FairParamList* list)
 {
@@ -127,3 +125,5 @@ void R3BFiberMAPMTHitModulePar::DrawParams()
         }
         gPad->Update();*/
 }
+
+ClassImp(R3BFiberMAPMTHitModulePar);

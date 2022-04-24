@@ -1,14 +1,25 @@
-// ------------------------------------------------------------
-// -----                  R3BOnlineSpectra                -----
-// -----            Created 13-04-2016 by M.Heil          -----
-// -----               Fill online histograms             -----
-// ------------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 
-#ifndef R3BONLINESPECTRAFIBER_S494
-#define R3BONLINESPECTRAFIBER_S494
-#define N_FIBER_PLOT_S494 520 // range to plot
-#define NbSections 1
-#define NbAnodes 16
+// -------------------------------------------------------------
+// -----      R3BFiberMAPMTOnlineSpectra source file       -----
+// -----    Created 25/04/22 by J.L. Rodriguez-Sanchez     -----
+// -------------------------------------------------------------
+
+#ifndef R3BFiberMAPMTOnlineSpectra_H
+#define R3BFiberMAPMTOnlineSpectra_H 1
+
+#define N_FIBER_PLOT_S494 520
 
 #include "FairTask.h"
 #include <array>
@@ -17,22 +28,19 @@
 #include <sstream>
 #include <vector>
 
-#include "TClonesArray.h"
 #include "TMath.h"
 #include <cstdlib>
 #include <list>
+
 class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
+class R3BFiberMappingPar;
 class R3BFiberMAPMTCalData;
-/**
- * This taks reads all detector data items and plots histograms
- * for online checks.
- */
-class R3BOnlineSpectraFiber_s494 : public FairTask
-{
 
+class R3BFiberMAPMTOnlineSpectra : public FairTask
+{
   public:
     struct Channel
     {
@@ -42,7 +50,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BOnlineSpectraFiber_s494();
+    R3BFiberMAPMTOnlineSpectra();
 
     /**
      * Standard constructor.
@@ -50,13 +58,13 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BOnlineSpectraFiber_s494(const char* name, Int_t iVerbose = 1);
+    R3BFiberMAPMTOnlineSpectra(const TString, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BOnlineSpectraFiber_s494();
+    virtual ~R3BFiberMAPMTOnlineSpectra();
 
     /**
      * Method for task initialization.
@@ -65,6 +73,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
     virtual InitStatus Init();
+    virtual InitStatus ReInit();
 
     /**
      * Method for event loop implementation.
@@ -86,6 +95,8 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
      */
     virtual void FinishTask();
 
+    virtual void SetParContainers();
+
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
@@ -99,6 +110,8 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     void Reset_Fiber_Histo();
 
   private:
+    TString fName;
+    R3BFiberMappingPar* fMapPar;
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
@@ -155,7 +168,7 @@ class R3BOnlineSpectraFiber_s494 : public FairTask
     TH2F* fh_test2;
 
   public:
-    ClassDef(R3BOnlineSpectraFiber_s494, 2)
+    ClassDef(R3BFiberMAPMTOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BFiberMAPMTOnlineSpectra_H */

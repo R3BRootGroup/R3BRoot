@@ -14,6 +14,7 @@
 #include "R3BTofDCal2HitPar.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "R3BTimeStitch.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
@@ -91,6 +92,7 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
             fhQvsPos[i][j] = NULL;
             fhTot1vsPos[i][j] = NULL;
             fhTot2vsPos[i][j] = NULL;
+            fh1_tofsync[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
         }
     }
@@ -118,6 +120,8 @@ R3BTofDCal2HitPar::~R3BTofDCal2HitPar()
                 delete fhTot1vsPos[i][j];
             if (fhTot2vsPos[i][j])
                 delete fhTot2vsPos[i][j];
+            if (fh1_tofsync[i][j])
+                delete fh1_tofsync[i][j];
             /*
             if (fhTot1vsTot2[i][j])
                 delete fhTot1vsTot2[i][j];
@@ -156,11 +160,12 @@ InitStatus R3BTofDCal2HitPar::Init()
         return kFATAL;
     }
 
-    maxevent = rm->CheckMaxEventNo();
-
     for (Int_t i = 1; i <= fNofPlanes; i++)
         for (Int_t j = 1; j <= fPaddlesPerPlane; j++)
             CreateHistograms(i, j);
+
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
 
     return kSUCCESS;
 }
@@ -178,10 +183,6 @@ namespace
 
 void R3BTofDCal2HitPar::Exec(Option_t* option)
 {
-    if (fNEvents / 10000. == fNEvents / 10000)
-        std::cout << "Events: " << fNEvents << " / " << maxevent << " (" << (Int_t)(fNEvents * 100. / maxevent)
-                  << " %)             \r" << std::flush;
-
     // test for requested trigger (if possible)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
@@ -213,7 +214,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
         auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
-        size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
+        size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
@@ -298,12 +299,44 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 // register multi hits
                 multihits[iPlane - 1][iBar - 1] += 1;
 
+                if (fParameter == 1)
+                {
+                    // calculate tdiff
+                    auto tdiff = (bot_ns) - (top_ns);
+
+                    // fill control histograms
+                    fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->Fill(TMath::Log(top_tot), TMath::Log(bot_tot));
+                    fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
+                    fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
+
+                    // Time differences of one paddle; offset  histo
+                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
+
+                    auto posToT = TMath::Log(top_tot / bot_tot);
+                    fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
+
+                    // Time of hit
+                    auto THit = (top_ns + bot_ns) / 2.;
+                    fhTsync[iPlane - 1]->Fill(iBar, THit);
+
+                    // Tof with respect LOS detector
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart());
+                    fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof);
+                }
+
                 // prepare offset and sync calculation
-                if (fTofdQ < 0.1)
+                if (fTofdQ == 0.0 && fParameter > 1)
                 {
                     LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    auto par = fHitPar->GetModuleParAt(iPlane, iBar);
+                    if (!par)
+                    {
+                        R3BLOG(ERROR,
+                               "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
+                        continue;
+                    }
                     // calculate tdiff
-                    auto tdiff = bot_ns - top_ns;
+                    auto tdiff = (bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2());
 
                     // fill control histograms
                     // fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
@@ -315,33 +348,28 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
                     // offset histo via ToT
-                    auto posToT = 0.;
-                    if (fTofdY == 0.)
+                    /*if (fTofdY == 0.)
                     {
                         R3BLOG(DEBUG, "Will prepare for offset and sync calculation");
                         posToT = TMath::Log(top_tot / bot_tot);
                     }
                     else
-                    {
-                        auto par = fHitPar->GetModuleParAt(iPlane, iBar);
-                        if (!par)
-                        {
-                            R3BLOG(
-                                ERROR,
-                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
-                            continue;
-                        }
-                        posToT = log((top_tot + par->GetToTOffset2()) / (bot_tot + par->GetToTOffset1()));
-                    }
+                    {*/
+                    auto posToT = TMath::Log((top_tot + par->GetToTOffset2()) / (bot_tot + par->GetToTOffset1()));
+                    //}
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
                     // fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
                     // fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, top_tot);
 
                     // Time of hit
-                    auto THit = (top_ns + bot_ns) / 2.;
+                    auto THit = (top_ns + bot_ns) / 2. - par->GetSync();
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
+
+                    // Tof with respect LOS detector
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart());
+                    fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof - par->GetTofSync());
                 }
-                else
+                else if (fTofdQ > 0 && fParameter > 1)
                 {
                     // get parameter
                     auto para = fHitPar->GetModuleParAt(iPlane, iBar);
@@ -393,7 +421,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 }
 
                 // prepare double exponential fit
-                if (!fTofdSmiley && fTofdQ > 0.1)
+                if (!fTofdSmiley && fTofdQ > 0.1 && fParameter > 1)
                 {
                     LOG(DEBUG) << "Prepare histo for double exponential fit";
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
@@ -415,7 +443,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 // std::cout<< " hola 10" << fTofdZ << std::endl;
 
                 // prepare charge fit / quench correction
-                if (fTofdZ == true)
+                if (fTofdZ == true && fParameter > 1)
                 {
                     // std::cout<< " hola 20" << std::endl;
                     LOG(DEBUG) << "Prepare histo for quenching correction";
@@ -444,7 +472,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     {
                         qb = TMath::Sqrt(top_tot * bot_tot); //
                                                              //(parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) +
-                                                             //parq[3] * pow(posToT, 3));
+                                                             // parq[3] * pow(posToT, 3));
                         qb = qb *
                              fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
                         // std::cout<< " hola30 " << qb << " , " << fTofdQ << std::endl;
@@ -509,10 +537,8 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
-        char strName2[255];
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
-        sprintf(strName2, "Time Sync Plane %d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -2000, 2000.);
+        fhTsync[iPlane - 1] = new TH2F(strName, strName, 45, 0, 45, 10000, -3500, 1000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
         fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }
@@ -568,9 +594,14 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
     }
+    if (fh1_tofsync[iPlane - 1][iBar - 1] == NULL)
+    {
+        char strName[255];
+        sprintf(strName, "tofdiff_plane_%d_bar_%d", iPlane, iBar);
+        fh1_tofsync[iPlane - 1][iBar - 1] = new TH1F(strName, strName, 20000, -3000, 0);
+        fh1_tofsync[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToF [ns]");
+    }
 }
-
-void R3BTofDCal2HitPar::FinishEvent() {}
 
 void R3BTofDCal2HitPar::calcOffset()
 {
@@ -683,7 +714,7 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
 {
     if (histo->GetEntries() < 100)
     {
-        R3BLOG(INFO, "Nb of events below 100 for histo with index" << index);
+        R3BLOG(WARNING, "Nb of events below 100 for histo with index" << index);
         return;
     }
 
@@ -731,8 +762,6 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
         par[2 * nPeaks + 1] = xp;
         nPeaks++;
     }
-    if (nPeaks < 2)
-        return;
 
     Double_t peaks[nPeaks];
     for (Int_t i = 0; i < nPeaks; i++)
@@ -741,6 +770,19 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
         peaks[i] = par[2 * i + 1];
     }
     c1->Update();
+
+    if (nPeaks < 2)
+    {
+        pars[0] = 0.;
+        pars[1] = fTofdQ / peaks[0];
+        pars[2] = 0.;
+
+        delete s;
+        delete c1;
+        delete h;
+        delete h1;
+        return;
+    }
 
     // select useful peaks
     sort(peaks, peaks + nPeaks);
@@ -771,14 +813,7 @@ doagainfit:
         std::cout << "Do again? (y/n) ";
         std::cin >> doagain;
     } while (doagain != "n");
-    if (nfp < 2)
-    {
-        delete s;
-        delete c1;
-        delete h;
-        delete h1;
-        return;
-    }
+
     // fit charge axis
     std::cout << "Selected " << nfp << " useful peaks to fit\nStart fitting...\n";
     c1->cd(3)->Clear();
@@ -809,7 +844,11 @@ doagainfit:
     if (doagain == "n")
         goto doagainfit;
 
-    for (Int_t j = 0; j < 2; j++)
+    int nbpars = 2;
+    if (fZfitType == "pol2")
+        nbpars = 3;
+
+    for (Int_t j = 0; j < nbpars; j++)
     {
         pars[j] = fitz->GetParameter(j);
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
@@ -853,7 +892,6 @@ void R3BTofDCal2HitPar::calcVeff()
                 histo_py->Fit("fgaus", "QR0");
                 Double_t offset1 = par->GetOffset1();
                 Double_t offset2 = par->GetOffset2();
-                Double_t sync = par->GetSync();
                 max = fgaus->GetParameter(1) + offset1 - offset2; /// TODO: needs to be tested
                 // max = max+offset1-offset2;
                 veff = fTofdY / max; // effective speed of light in [cm/s]
@@ -1129,6 +1167,18 @@ void R3BTofDCal2HitPar::FinishTask()
         LOG(INFO) << "Calling function calcSync";
         calcSync();
         LOG(ERROR) << "Call walk correction before next step!";
+
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            {
+                auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
+                Int_t binmax = fh1_tofsync[i][j]->GetMaximumBin();
+                auto tofsync = fh1_tofsync[i][j]->GetXaxis()->GetBinCenter(binmax);
+                par->SetTofSync(tofsync);
+                LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " Tof-Sync  " << tofsync;
+            }
+        }
     }
     else if (fParameter == 2)
     {
@@ -1254,6 +1304,8 @@ void R3BTofDCal2HitPar::FinishTask()
             fhTdiff[i]->Write(); // histogram for offset and veff calculation
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
+            if (fh1_tofsync[i][j])
+                fh1_tofsync[i][j]->Write(); // histogram for ToF sync calculation
             if (fhLogTot1vsLogTot2[i][j])
                 fhLogTot1vsLogTot2[i][j]->Write(); // control histogram Log(ToT) Pm1 vs Log(ToT) Pm2
             if (fhSqrtQvsPosToT[i][j])

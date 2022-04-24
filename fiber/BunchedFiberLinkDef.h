@@ -34,5 +34,7 @@
 #pragma link C++ class R3BFiberMAPMTCal2Hit+;
 #pragma link C++ class R3BFiberMAPMTHitPar+;
 #pragma link C++ class R3BFiberMAPMTHitModulePar+;
+#pragma link C++ class R3BFiberMappingPar+;
+#pragma link C++ class R3BFiberMAPMTOnlineSpectra+;
 
 #endif

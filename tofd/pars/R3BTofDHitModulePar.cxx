@@ -30,6 +30,7 @@ R3BTofDHitModulePar::R3BTofDHitModulePar(const char* name, const char* title, co
     , fVeff(0)
     , fLambda(0)
     , fSync(0)
+    , fTofSync(0)
     , fPar1a(0)
     , fPar1b(0)
     , fPar1c(0)
@@ -38,7 +39,7 @@ R3BTofDHitModulePar::R3BTofDHitModulePar(const char* name, const char* title, co
     , fPar2b(0)
     , fPar2c(0)
     , fPar2d(0)
-    , fPola(0)
+    , fPola(1.)
     , fPolb(0)
     , fPolc(0)
     , fPold(0)
@@ -51,8 +52,6 @@ R3BTofDHitModulePar::R3BTofDHitModulePar(const char* name, const char* title, co
     , fPar4walk(0)
     , fPar5walk(0)
 {
-    // Reset all parameters
-    clear();
 }
 
 R3BTofDHitModulePar::~R3BTofDHitModulePar() { clear(); }
@@ -89,7 +88,7 @@ void R3BTofDHitModulePar::clear() { fPlane = fPaddle = 0; }
 
 void R3BTofDHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BTofDHitModulePar: TOFd HIT Calibration Parameters: ";
+    LOG(INFO) << "   TOFd HIT Calibration Parameters: ";
     LOG(INFO) << "   fPlane: " << fPlane;
     LOG(INFO) << "   fPaddle: " << fPaddle;
     LOG(INFO) << "   fOffset1: " << fOffset1;
@@ -97,6 +96,7 @@ void R3BTofDHitModulePar::printParams()
     LOG(INFO) << "   fToTOffset1: " << fToTOffset1;
     LOG(INFO) << "   fToTOffset2: " << fToTOffset2;
     LOG(INFO) << "   fSync: " << fSync;
+    LOG(INFO) << "   fTofSync: " << fTofSync;
     LOG(INFO) << "   fVeff: " << fVeff;
     LOG(INFO) << "   fLambda: " << fLambda;
     LOG(INFO) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
