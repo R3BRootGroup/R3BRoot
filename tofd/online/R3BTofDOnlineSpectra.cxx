@@ -51,7 +51,7 @@ using namespace std;
 namespace
 {
     double c_range_ns = 2048 * 5;
-    double c_bar_coincidence_ns = 15; // nanoseconds.
+    double c_bar_coincidence_ns = 20; // nanoseconds.
     uint64_t n1, n2;
 } // namespace
 
@@ -373,7 +373,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
             sprintf(strName3, "tofd_hit_Q_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "Tofd hit Charge plane %d", j + 1);
-            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 1000, 0., 40.);
+            fh_tofd_Tot_hit[j] = new TH2F(strName3, strName4, 45, 0, 45, 1000, 0., 12.);
             fh_tofd_Tot_hit[j]->GetXaxis()->SetTitle("BarId");
             fh_tofd_Tot_hit[j]->GetYaxis()->SetTitle("Charge");
             fh_tofd_Tot_hit[j]->GetYaxis()->SetTitleOffset(1.);
@@ -527,7 +527,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
         {
             char strNameLos_c[255];
             sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
-            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, -5000, 5000);
+            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, -200, 200);
             fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
             fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF [ns]");
             fh_tofd_time_los_h2[i]->GetXaxis()->CenterTitle(true);
@@ -543,7 +543,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
                 sprintf(strNameLos, "tofd-los_timediff_bar_%d_plane_%d", j + 1, i + 1);
                 char strNameLos2[255];
                 sprintf(strNameLos2, "Tofd_time - Los_time bar %d plane %d", j + 1, i + 1);
-                fh_tofd_time_los[j][i] = new TH1F(strNameLos, strNameLos2, 20000, -5000, 5000);
+                fh_tofd_time_los[j][i] = new TH1F(strNameLos, strNameLos2, 20000, -200, 200);
                 fh_tofd_time_los[j][i]->GetXaxis()->SetTitle("ToF [ns]");
                 fh_tofd_time_los[j][i]->GetYaxis()->SetTitle("counts");
                 fh_tofd_time_los[j][i]->SetFillColor(31);
@@ -711,7 +711,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
-            size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
+            size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + hit->GetBarId() - 1;
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
 
@@ -744,8 +744,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             for (; top_i < top_vec.size();)
             {
                 auto top = top_vec.at(top_i);
-                Int_t top_trig_i =
-                    0; // g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
+                Int_t top_trig_i = 0;
 
                 if (fMapPar)
                     top_trig_i = fMapPar->GetTrigMap(top->GetDetectorId(), top->GetBarId(), top->GetSideId());
@@ -760,7 +759,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
+                        R3BLOG(ERROR, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -769,14 +768,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more detectors than expected! Det: " << iPlane
-                               << " allowed are 1.." << fNofPlanes;
+                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more bars then expected! Det: " << iBar
-                               << " allowed are 1.." << fPaddlesPerPlane;
+                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -790,8 +787,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             for (; bot_i < bot_vec.size();)
             {
                 auto bot = bot_vec.at(bot_i);
-                Int_t bot_trig_i =
-                    0; // g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+                Int_t bot_trig_i = 0;
 
                 if (fMapPar)
                     bot_trig_i = fMapPar->GetTrigMap(bot->GetDetectorId(), bot->GetBarId(), bot->GetSideId());
@@ -806,7 +802,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
+                        R3BLOG(ERROR, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -820,14 +816,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = bot->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more detectors than expected! Det: " << iPlane
-                               << " allowed are 1.." << fNofPlanes;
+                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTOnlineSpectraToFD::Exec() : more bars then expected! Det: " << iBar
-                               << " allowed are 1.." << fPaddlesPerPlane;
+                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -863,10 +857,6 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             {
                 auto topc = topc_vec.at(topc_i);
                 auto botc = botc_vec.at(botc_i);
-                // auto topc_trig_i =
-                //   g_tofd_trig_map[topc->GetDetectorId() - 1][topc->GetSideId() - 1][topc->GetBarId() - 1];
-                // auto botc_trig_i =
-                //     g_tofd_trig_map[botc->GetDetectorId() - 1][botc->GetSideId() - 1][botc->GetBarId() - 1];
 
                 Int_t topc_trig_i = 0;
                 Int_t botc_trig_i = 0;
@@ -890,7 +880,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missingc)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFD::Exec() : Missing trigger information!";
+                        R3BLOG(ERROR, "Missing trigger information!");
                         s_was_trig_missingc = true;
                     }
                     ++n2;
@@ -1053,8 +1043,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     for (Int_t im2 = 0; im2 < iCounts[i - 1]; im2++)
                     {
-                        Double_t tdif = fmod(t[i][im1] - t[i - 1][im2] + /*c_range_ns*/ +c_range_ns / 2, c_range_ns) -
-                                        c_range_ns / 2;
+                        Double_t tdif =
+                            fmod(t[i][im1] - t[i - 1][im2] + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
                         fh_tofd_dt_hit[i - 1]->Fill(bar[i][im1], tdif);
                     }
                 }

@@ -23,6 +23,7 @@ class TH1F;
 class TH2F;
 class R3BFiberMAPMTCalData;
 class R3BFiberMAPMTHitPar;
+class R3BFiberMappingPar;
 class R3BFiberMAPMTHitModulePar;
 
 class R3BFiberMAPMTCal2Hit : public FairTask
@@ -104,11 +105,10 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     TClonesArray* fCalItems;
     TClonesArray* fCalTriggerItems;
     TClonesArray* fHitItems;
-    unsigned const* fTriggerMap[2];
+    R3BFiberMappingPar* fMapPar;
     R3BFiberMAPMTHitPar* fCalPar; /**< Parameter container. */
     R3BFiberMAPMTHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;            /**< Number of modules in parameter file. */
-    Int_t fNofHitItems;
     // [0=bottom,1=top][Channel].
     std::vector<Channel> fChannelArray[2];
 

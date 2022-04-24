@@ -12,13 +12,13 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                R3BFiberMAPMTMapped2Cal                -----
-// -----            Created May 13th 2021 by V. Panin      -----
+// -----               R3BFiberMAPMTMapped2Cal            -----
+// -----           Created May 13th 2021 by V. Panin      -----
 // ----- Convert mapped data to time calibrated data      -----
 // ------------------------------------------------------------
 
-#ifndef R3BFIBERMAPMTMAPPED2CAL
-#define R3BFIBERMAPMTMAPPED2CAL
+#ifndef R3BFIBERMAPMTMAPPED2CAL_H
+#define R3BFIBERMAPMTMAPPED2CAL_H 1
 
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
@@ -85,12 +85,6 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
      */
     virtual void FinishEvent();
 
-    /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
-
   private:
     TString fName;
     R3BTCalPar* fMAPMTTCalPar;
@@ -98,12 +92,12 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
     TClonesArray* fMappedItems;
     TClonesArray* fCalItems;
     TClonesArray* fCalTriggerItems;
-    Int_t fNoCalItems;
-    Int_t fNoCalTrigItems;
+    // Int_t fNoCalItems;
+    // Int_t fNoCalTrigItems;
     Double_t fClockFreq;
     Int_t fnEvents;
-    Double_t tmaxfib23a[256] = { -4096 };
-    Double_t tminfib23a[256] = { 4096 };
+    // Double_t tmaxfib23a[256] = { -4096 };
+    // Double_t tminfib23a[256] = { 4096 };
 
   public:
     ClassDef(R3BFiberMAPMTMapped2Cal, 1)

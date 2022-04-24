@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "R3BFiberMAPMTMappedData.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
@@ -33,23 +34,26 @@ R3BFiberMAPMTMapped2CalPar::R3BFiberMAPMTMapped2CalPar(const char* a_name,
 
 R3BFiberMAPMTMapped2CalPar::~R3BFiberMAPMTMapped2CalPar()
 {
-    delete fMAPMTTCalPar;
-    delete fMAPMTEngine;
-    delete fMAPMTTrigTCalPar;
-    delete fMAPMTTrigEngine;
+    if (fMAPMTTCalPar)
+        delete fMAPMTTCalPar;
+    if (fMAPMTEngine)
+        delete fMAPMTEngine;
+    if (fMAPMTTrigTCalPar)
+        delete fMAPMTTrigTCalPar;
+    if (fMAPMTTrigEngine)
+        delete fMAPMTTrigEngine;
 }
 
 InitStatus R3BFiberMAPMTMapped2CalPar::Init()
 {
+    R3BLOG(INFO, "");
     auto rm = FairRootManager::Instance();
-    if (!rm)
-    {
-        return kFATAL;
-    }
+    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
     if (!fMapped)
     {
+        R3BLOG(FATAL, fName + " not found");
         return kFATAL;
     }
 
@@ -62,8 +66,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            LOG(ERROR) << "Could not get " << name << '.';                             \
-            abort();                                                                   \
+            R3BLOG(ERROR, "Could not find " << name);                                  \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \
@@ -94,8 +97,6 @@ void R3BFiberMAPMTMapped2CalPar::Exec(Option_t* option)
     }
 }
 
-void R3BFiberMAPMTMapped2CalPar::FinishEvent() {}
-
 void R3BFiberMAPMTMapped2CalPar::FinishTask()
 {
     fMAPMTEngine->CalculateParamClockTDC(R3BTCalEngine::CTDC_16_BWD_150);
@@ -108,4 +109,4 @@ void R3BFiberMAPMTMapped2CalPar::SetUpdateRate(Int_t a_rate) { fUpdateRate = a_r
 
 void R3BFiberMAPMTMapped2CalPar::SetMinStats(Int_t a_min_stats) { fMinStats = a_min_stats; }
 
-ClassImp(R3BFiberMAPMTMapped2CalPar)
+ClassImp(R3BFiberMAPMTMapped2CalPar);

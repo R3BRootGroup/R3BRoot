@@ -45,8 +45,8 @@ class R3BTofDHitPar : public FairParGenericSet
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BTofDHitPar(const char* name = "TofdHitPar",
-                  const char* title = "TOFd HIT calibration",
+    R3BTofDHitPar(const char* name = "tofdHitPar",
+                  const char* title = "Tofd Hit parameters",
                   const char* context = "TestDefaultContext",
                   Bool_t own = kTRUE);
     /**

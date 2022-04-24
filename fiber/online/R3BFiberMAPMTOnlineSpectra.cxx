@@ -1,22 +1,29 @@
-// ------------------------------------------------------------
-// -----                  R3BOnlineSpectra                -----
-// -----          Created April 13th 2016 by M.Heil       -----
-// ------------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 
-/*
- * This task should fill histograms with detector variables which allow
- * to test the detectors online
- *
- */
-#include "R3BOnlineSpectraFiber_s494.h"
+// -------------------------------------------------------------
+// -----      R3BFiberMAPMTOnlineSpectra source file       -----
+// -----    Created 25/04/22 by J.L. Rodriguez-Sanchez     -----
+// -------------------------------------------------------------
 
+#include "R3BFiberMAPMTOnlineSpectra.h"
 #include "R3BEventHeader.h"
-#include "R3BSamplerMappedData.h"
-#include "R3BTCalEngine.h"
-
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTHitData.h"
-#include "R3BFiberMAPMTMappedData.h"
+#include "R3BFiberMappedData.h"
+#include "R3BFiberMappingPar.h"
+#include "R3BLogger.h"
+#include "R3BTCalEngine.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -31,12 +38,6 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
-#include "mapping_fib23a_trig_hit.hh"
-#include "mapping_fib23b_trig_hit.hh"
-#include "mapping_fib30_trig.hh"
-#include "mapping_fib31_trig.hh"
-#include "mapping_fib32_trig.hh"
-#include "mapping_fib33_trig.hh"
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <algorithm>
@@ -58,31 +59,27 @@ namespace
     double c_fiber_coincidence_ns = 20; // nanoseconds.
     double c_tot_coincidence_ns = 100;  // nanoseconds
 } // namespace
-R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494()
-    : FairTask("OnlineSpectraFiber_s494", 1)
-    , fTrigger(1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvents(0)
-    , fChannelArray()
+
+R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra()
+    : R3BFiberMAPMTOnlineSpectra("FiberOnlineSpectra", 1)
 {
 }
 
-R3BOnlineSpectraFiber_s494::R3BOnlineSpectraFiber_s494(const char* name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
+R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra(const TString name, Int_t iVerbose)
+    : FairTask(name + "OnlineSpectra", iVerbose)
+    , fName(name)
     , fTrigger(-1)
     , fTpat1(-1)
     , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
     , fChannelArray()
+    , fMapPar(NULL)
 {
 }
 
-R3BOnlineSpectraFiber_s494::~R3BOnlineSpectraFiber_s494()
+R3BFiberMAPMTOnlineSpectra::~R3BFiberMAPMTOnlineSpectra()
 {
-
     for (int i = 0; i < NOF_FIB_DET; i++)
     {
         if (fh_channels_Fib[i])
@@ -116,14 +113,24 @@ R3BOnlineSpectraFiber_s494::~R3BOnlineSpectraFiber_s494()
     }
 }
 
-InitStatus R3BOnlineSpectraFiber_s494::Init()
+void R3BFiberMAPMTOnlineSpectra::SetParContainers()
 {
+    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
+}
 
+InitStatus R3BFiberMAPMTOnlineSpectra::ReInit()
+{
+    SetParContainers();
+    return kSUCCESS;
+}
+
+InitStatus R3BFiberMAPMTOnlineSpectra::Init()
+{
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraFiber_s494::Init ";
-
+    R3BLOG(INFO, "");
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
@@ -134,15 +141,15 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        LOG(WARNING) << "R3BOnlineSpectraFiber_s494::Init() EventHeader. not found";
+        LOG(WARNING) << "R3BFiberMAPMTOnlineSpectra::Init() EventHeader. not found";
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BOnlineSpectraFiber_s494::Init() EventHeader. found";
+        LOG(INFO) << "R3BFiberMAPMTOnlineSpectra::Init() EventHeader. found";
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
-    run->GetHttpServer()->Register("/Tasks", this);
+    run->GetHttpServer()->Register("", this);
 
     // Get objects for detectors on all levels
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
@@ -170,54 +177,6 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
     }
-
-    // Trigger mappin from included mapping files for each det.
-    const char* name;
-    for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
-    {
-        if (fCalItems.at(DET_FI_FIRST + ifibcount))
-        {
-            name = fDetectorNames[DET_FI_FIRST + ifibcount];
-            if ((strcmp(name, "Fi30") == 0))
-            {
-                fib30_trig_map_setup();
-                fTriggerMap[0] = g_fib30_trig_map[0];
-                fTriggerMap[1] = g_fib30_trig_map[1];
-            }
-            if ((strcmp(name, "Fi31") == 0))
-            {
-                fib31_trig_map_setup();
-                fTriggerMap[0] = g_fib31_trig_map[0];
-                fTriggerMap[1] = g_fib31_trig_map[1];
-            }
-
-            if ((strcmp(name, "Fi32") == 0))
-            {
-                fib32_trig_map_setup();
-                fTriggerMap[0] = g_fib32_trig_map[0];
-                fTriggerMap[1] = g_fib32_trig_map[1];
-            }
-            if ((strcmp(name, "Fi33") == 0))
-            {
-                fib33_trig_map_setup();
-                fTriggerMap[0] = g_fib33_trig_map[0];
-                fTriggerMap[1] = g_fib33_trig_map[1];
-            }
-            if ((strcmp(name, "Fi23a") == 0))
-            {
-                fib23a_trig_map_hit_setup();
-                fTriggerMap[0] = g_fib23a_trig_map_hit[0];
-                fTriggerMap[1] = g_fib23a_trig_map_hit[1];
-            }
-            if ((strcmp(name, "Fi23b") == 0))
-            {
-                fib23b_trig_map_hit_setup();
-                fTriggerMap[0] = g_fib23b_trig_map_hit[0];
-                fTriggerMap[1] = g_fib23b_trig_map_hit[1];
-            }
-        }
-    }
-
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
@@ -474,7 +433,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
 
     return kSUCCESS;
 }
-void R3BOnlineSpectraFiber_s494::Reset_Fiber_Histo()
+void R3BFiberMAPMTOnlineSpectra::Reset_Fiber_Histo()
 {
     if (fHitItems.at(DET_FI23A) && fHitItems.at(DET_FI23B))
     {
@@ -508,11 +467,11 @@ void R3BOnlineSpectraFiber_s494::Reset_Fiber_Histo()
         }
     }
 }
-void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
+void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 {
     fNEvents += 1;
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        cout << "Events: " << fNEvents << flush << '\r';
+    // if (fNEvents / 10000. == (int)fNEvents / 10000)
+    //   cout << "Events: " << fNEvents << flush << '\r';
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -587,11 +546,11 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
             for (Int_t i = 0; i < nMapp; i++)
             {
 
-                auto map_lead = (R3BFiberMAPMTMappedData const*)detMap->At(i);
+                auto map_lead = (R3BFiberMappedData const*)detMap->At(i);
 
                 if (map_lead->IsLeading())
                 {
-                    auto side_i = map_lead->GetSide();
+                    auto side_i = map_lead->GetSide() - 1;
                     auto ch_i = map_lead->GetChannel() - 1;
 
                     if (side_i == 1)
@@ -653,7 +612,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
 
                 if (cur_cal_lead->IsLeading())
                 {
-                    auto side_i = cur_cal_lead->GetSide();
+                    auto side_i = cur_cal_lead->GetSide() - 1;
                     auto ch_i = cur_cal_lead->GetChannel() - 1;
 
                     if (side_i == 1)
@@ -668,7 +627,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
                         vmultihits_bot[ch_i] += 1; // multihit of a given down killom channel
                     }
 
-                    auto time_trig = trig_time[fTriggerMap[side_i][ch_i]];
+                    auto time_trig = fMapPar->GetTrigMap(side_i + 1, ch_i + 1);
                     auto time_ns =
                         fmod(cur_cal_lead->GetTime_ns() - time_trig + c_period + c_period / 2, c_period) - c_period / 2;
 
@@ -898,7 +857,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
     }
 }
 
-void R3BOnlineSpectraFiber_s494::FinishEvent()
+void R3BFiberMAPMTOnlineSpectra::FinishEvent()
 {
 
     for (Int_t det = 0; det < DET_MAX; det++)
@@ -915,7 +874,7 @@ void R3BOnlineSpectraFiber_s494::FinishEvent()
     }
 }
 
-void R3BOnlineSpectraFiber_s494::FinishTask()
+void R3BFiberMAPMTOnlineSpectra::FinishTask()
 {
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
@@ -949,4 +908,4 @@ void R3BOnlineSpectraFiber_s494::FinishTask()
     }
 }
 
-ClassImp(R3BOnlineSpectraFiber_s494);
+ClassImp(R3BFiberMAPMTOnlineSpectra);

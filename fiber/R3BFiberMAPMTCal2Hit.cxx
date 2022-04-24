@@ -11,17 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "mapping_fib23a_trig_hit.hh"
-#include "mapping_fib23b_trig_hit.hh"
-#include "mapping_fib30_trig.hh"
-#include "mapping_fib31_trig.hh"
-#include "mapping_fib32_trig.hh"
-#include "mapping_fib33_trig.hh"
-
 #include "R3BFiberMAPMTCal2Hit.h"
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTHitData.h"
 #include "R3BFiberMAPMTHitPar.h"
+#include "R3BFiberMappingPar.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 
 #include "TH1F.h"
@@ -67,9 +62,9 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fCalItems()
     , fCalTriggerItems()
     , fHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
-    , fCalPar()
+    , fMapPar(NULL)
+    , fCalPar(NULL)
     , fNofHitPars()
-    , fNofHitItems()
     , fChannelArray()
     , fnEvents(0)
     , ftofmin(TOF_MIN)
@@ -77,59 +72,23 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fWrite(true)
     , fGate_ns(100.) // make it constructor parameter
 {
-    // Trigger mappin from included mapping files for each det.
-    if (fName == "Fi30")
-    {
-        fib30_trig_map_setup();
-        fTriggerMap[0] = g_fib30_trig_map[0];
-        fTriggerMap[1] = g_fib30_trig_map[1];
-    }
-    if (fName == "Fi31")
-    {
-        fib31_trig_map_setup();
-        fTriggerMap[0] = g_fib31_trig_map[0];
-        fTriggerMap[1] = g_fib31_trig_map[1];
-    }
-
-    if (fName == "Fi32")
-    {
-        fib32_trig_map_setup();
-        fTriggerMap[0] = g_fib32_trig_map[0];
-        fTriggerMap[1] = g_fib32_trig_map[1];
-    }
-    if (fName == "Fi33")
-    {
-        fib33_trig_map_setup();
-        fTriggerMap[0] = g_fib33_trig_map[0];
-        fTriggerMap[1] = g_fib33_trig_map[1];
-    }
-    if (fName == "Fi23a")
-    {
-        fib23a_trig_map_hit_setup();
-        fTriggerMap[0] = g_fib23a_trig_map_hit[0];
-        fTriggerMap[1] = g_fib23a_trig_map_hit[1];
-    }
-    if (fName == "Fi23b")
-    {
-        fib23b_trig_map_hit_setup();
-        fTriggerMap[0] = g_fib23b_trig_map_hit[0];
-        fTriggerMap[1] = g_fib23b_trig_map_hit[1];
-    }
 }
 
 R3BFiberMAPMTCal2Hit::~R3BFiberMAPMTCal2Hit()
 {
-    delete fHitItems;
-    delete fCalPar;
+    if (fHitItems)
+        delete fHitItems;
+    if (fCalPar)
+        delete fCalPar;
 }
 
 InitStatus R3BFiberMAPMTCal2Hit::Init()
 {
-    std::cout << "Init:R3BFiberMAPMTCal2Hit" << std::endl;
+    R3BLOG(INFO, "");
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        R3BLOG(ERROR, "FairRootManager not found.");
         return kERROR;
     }
 
@@ -137,18 +96,18 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     fCalItems = (TClonesArray*)mgr->GetObject(name);
     if (!fCalItems)
     {
-        LOG(fatal) << "Branch " << name << " not found.";
+        R3BLOG(fatal, "Branch " << name << " not found.");
         return kERROR;
     }
     auto name_mapmt_trig = fName + "TriggerCal";
     fCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
-    if (NULL == fCalTriggerItems)
-        LOG(fatal) << "Branch " << name_mapmt_trig << " not found";
+    R3BLOG_IF(fatal, NULL == fCalTriggerItems, "Branch " << name_mapmt_trig << " not found");
 
     maxevent = mgr->CheckMaxEventNo();
 
     // TClones branch with Hit items
     mgr->Register(fName + "Hit", fName + " hit data", fHitItems, kTRUE);
+    fHitItems->Clear();
 
     // Resize per-channel info arrays.
     for (auto side_i = 0; side_i < 2; ++side_i)
@@ -267,22 +226,17 @@ InitStatus R3BFiberMAPMTCal2Hit::ReInit()
 
 void R3BFiberMAPMTCal2Hit::SetParContainers()
 {
+    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
     fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
-    if (fCalPar)
-        cout << "R3BFiberCal2Hit::Init() container " << fName << "HitPar initialized. " << endl;
-    if (!fCalPar)
-    {
-        LOG(ERROR) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
-    }
+    R3BLOG_IF(INFO, fCalPar, "Container " << fName << "HitPar initialized");
+    R3BLOG_IF(ERROR, !fCalPar, "Couldn't get " << fName << "HitPar");
 }
 
 void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 {
-
-    // cout<<"R3BFiberMAPMTCal2Hit::Exec entering"<<endl;
-
     if (fnEvents / 100000. == (int)fnEvents / 100000)
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
                   << " %) " << std::flush;
@@ -320,7 +274,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
         if (cur_cal_lead->IsLeading())
         {
-            auto side_i = cur_cal_lead->GetSide();
+            auto side_i = cur_cal_lead->GetSide() - 1;
             auto ch_i = cur_cal_lead->GetChannel() - 1;
             auto& channel = fChannelArray[side_i].at(ch_i);
             channel.lead_list.push_back(cur_cal_lead);
@@ -335,7 +289,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
         if (cur_cal_trail->IsTrailing())
         {
-            auto side_i = cur_cal_trail->GetSide();
+            auto side_i = cur_cal_trail->GetSide() - 1;
 
             auto ch_i = cur_cal_trail->GetChannel() - 1;
 
@@ -354,8 +308,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             Double_t lead_ns = 0. / 0., tot_ns = 0. / 0.;
 
             auto chlead_i = lead->GetChannel() - 1;
-            cur_cal_trig_ns = trig_time[fTriggerMap[side_i][ch_i]];
-            lead_trig_ns = trig_time[fTriggerMap[side_i][chlead_i]];
+
+            cur_cal_trig_ns = fMapPar->GetTrigMap(side_i + 1, ch_i + 1);
+            lead_trig_ns = fMapPar->GetTrigMap(side_i + 1, chlead_i + 1);
 
             auto cur_cal_ns =
                 fmod(cur_cal_trail->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
@@ -368,9 +323,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
             if (tot_ns < fGate_ns && tot_ns > 0.)
             {
-                //	if(chlead_i == 0 && fName=="Fi31") cout<<"Side: "<<side_i<<", "<<lead_raw<<", "<<lead_trig_ns<<",
-                //"<< 	lead_ns<<"; "<<fTriggerMap[side_i][chlead_i]<<endl;
-
                 channel.tot_list.push_back(ToT(lead, cur_cal_trail, lead_ns, cur_cal_ns, tot_ns));
                 channel.lead_list.pop_front();
             }
@@ -553,7 +505,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     {
                         if (tof >= ftofmin && tof <= ftofmax)
                         {
-                            new ((*fHitItems)[fNofHitItems++])
+                            new ((*fHitItems)[fHitItems->GetEntriesFast()])
                                 R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
                         }
                     }
@@ -567,8 +519,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
 void R3BFiberMAPMTCal2Hit::FinishEvent()
 {
-    fHitItems->Clear();
-    fNofHitItems = 0;
+    if (fHitItems)
+        fHitItems->Clear();
 }
 
 void R3BFiberMAPMTCal2Hit::FinishTask()

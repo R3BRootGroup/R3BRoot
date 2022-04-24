@@ -11,12 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//
-// Creates time calib parameters for bunched fiber detector.
-//
-
 #ifndef R3BFIBERMAPMTMAPPED2CALPAR_H
-#define R3BFIBERMAPMTMAPPED2CALPAR_H
+#define R3BFIBERMAPMTMAPPED2CALPAR_H 1
 
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
@@ -58,13 +54,6 @@ class R3BFiberMAPMTMapped2CalPar : public FairTask
      * @param option an execution option.
      */
     virtual void Exec(Option_t*);
-
-    /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
 
     /**
      * Method for finish of the task execution.
