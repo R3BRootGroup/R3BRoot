@@ -11,9 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3BTofDCal2HitPar_H
-#define R3BTofDCal2HitPar_H
+#define R3BTofDCal2HitPar_H 1
 
 #define N_TOFD_HIT_PLANE_MAX 4
 #define N_TOFD_HIT_PADDLE_MAX 44
@@ -22,6 +21,7 @@
 
 #include "FairTask.h"
 #include "TObject.h"
+#include <string.h>
 
 class R3BTofDHitPar;
 class TClonesArray;
@@ -35,7 +35,6 @@ class R3BTofDCal2HitPar : public FairTask
   public:
     /**
      * Default constructor.
-     * Creates an instance of the task with default parameters.
      */
     R3BTofDCal2HitPar();
 
@@ -83,11 +82,7 @@ class R3BTofDCal2HitPar : public FairTask
      */
     virtual void FinishTask();
 
-    /**
-     * Method for setting the update rate for control histograms
-     * @param rate an update rate value (events).
-     */
-    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
+    void SetParameterOption(Int_t opt) { fParameter = opt; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -96,21 +91,21 @@ class R3BTofDCal2HitPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
+    void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     /**
      * Method for setting number of LOS detectors and channels.
      * @param nDets number of detectors.
      * @param nCh number of channels per detector (4+master trigger?)
      */
-    inline void SetNofModules(Int_t nDets, Int_t nCh)
+    void SetNofModules(Int_t nDets, Int_t nCh)
     {
         fNofPlanes = nDets;
         fPaddlesPerPlane = nCh;
@@ -119,94 +114,112 @@ class R3BTofDCal2HitPar : public FairTask
     /**
      * Method for setting the y-position of a horizonzal sweep run for calibration of effective velocity of light
      */
-    inline void SetTofdPos(Double_t Y) { fTofdY = Y; }
+    void SetTofdPos(Double_t Y) { fTofdY = Y; }
+
     /**
      * Method for setting the nuclear charge of main beam
      */
-    inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
+    void SetTofdQ(Double_t Q) { fTofdQ = Q; }
+
+    /**
+     * Method for setting the max. charge for histograms
+     */
+    void SetMaxQ(Double_t Q) { fMaxQ = Q; }
+
+    /**
+     * Method for setting the nb of Z peaks to be calibrated
+     */
+    void SetNbZPeaks(Int_t nb) { fNbZPeaks = nb; }
+
     /**
      * Method for setting charge correction
      */
-    inline void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
+    void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
+
+    /**
+     * Method for setting the fit for the charge
+     * pol1
+     + pol2
+     */
+    void SetChargeFit(TString type) { fZfitType = type; }
+
     /**
      * Method for using smiley or double exponential charge correction
      */
-    inline void SetTofdSmiley(Bool_t Smiley) { fTofdSmiley = Smiley; }
-    /**
-     *
-     */
-    inline void ReadParaFile(TString file) { fParaFile = file; }
-    /**
-     * old Method for walk calculation.
-     */
-    /// virtual Double_t walk(Double_t Q);
-    /**
-     * new Method for walk calculation.
-     */
-    virtual Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
-    /**
-     * Method for creating histograms.
-     */
-    virtual void CreateHistograms(Int_t iPlane, Int_t iBar);
+    void SetTofdSmiley(Bool_t Smiley) { fTofdSmiley = Smiley; }
 
-    /**
-     * Method for calculation of saturation.
-     */
-    virtual Double_t saturation(Double_t x);
-    
     /**
      * Method for setting the lower range of ToT for offset calibration
      */
-    inline void SetTofdTotLow(Double_t TotLow) { fTofdTotLow = TotLow; }
+    void SetTofdTotLow(Double_t TotLow) { fTofdTotLow = TotLow; }
+
     /**
      * Method for setting the upper range of ToT for offset calibration
      */
-    inline void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
+    void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
 
   private:
-  
-      /**
-     * Method for calculation of offset.
+    /**
+     * Method for creating histograms.
      */
-    virtual void calcOffset();
-    virtual void calcSync();
-    
+    void CreateHistograms(Int_t, Int_t);
+
+    void calcOffset();
+    void calcSync();
+    void calcVeff();
+    void calcLambda(Double_t, Double_t);
+
+    void smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para);
+
+    void doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para);
+
     /**
      * Method for calculation of z correction.
      */
-    virtual void zcorr(TH2F* histo, Int_t min, Int_t max, Double_t*, Int_t index);
+    void zcorr(TH2F* histo, Int_t min, Int_t max, Double_t*, Int_t index);
 
     /**
      * Method for calculation of ToT offset.
      */
-    virtual void calcToTOffset(Double_t TotLow, Double_t TotHigh);
-  
-    Int_t fUpdateRate; /**< An update rate. */
-    Int_t fMinStats;   /**< Minimum statistics required per module. */
-    Int_t fTrigger;    /**< Trigger value. */
+    void calcToTOffset(Double_t, Double_t);
+
+    /**
+     * new Method for walk calculation.
+     */
+    Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
+
+    /**
+     * Method for calculation of saturation.
+     */
+    Double_t saturation(Double_t x);
+
+    Int_t fParameter;
+    Int_t fUpdateRate; /* An update rate. */
+    Int_t fMinStats;   /* Minimum statistics required per module. */
+    Int_t fTrigger;    /* Trigger value. */
     Int_t fTpat;
+    TString fZfitType;
+    UInt_t fNofPlanes;       /* Number of planes. */
+    UInt_t fPaddlesPerPlane; /* Number of bars per plane. */
+    UInt_t fNofModules;      /* Total number of modules (=edges) to calibrate */
 
-    UInt_t fNofPlanes;       /**< Number of planes. */
-    UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
-    UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
-
-    UInt_t fNEvents;                /**< Event counter. */
+    UInt_t fNEvents; /* Event counter. */
     R3BTofDMappingPar* fMapPar;
-    R3BTofDHitPar* fHitPar;        /**< Parameter container. */
-    TClonesArray* fCalData;         /**< Array with mapped data - input data. */
-    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
-    R3BEventHeader* header;         /**< Event header - input data. */
-    Double_t fClockFreq;            /**< Clock cycle in [ns]. */
+    R3BTofDHitPar* fHitPar;         /* Parameter container. */
+    TClonesArray* fCalData;         /* Array with mapped data - input data. */
+    TClonesArray* fCalTriggerItems; /* Array with trigger Cal items - input data. */
+    R3BEventHeader* header;         /* Event header  */
     Double_t fTofdY;
     Double_t fTofdQ;
+    Double_t fMaxQ;
+    Int_t fNbZPeaks;
     Bool_t fTofdSmiley;
     Bool_t fTofdZ;
-    TString fParaFile;
     UInt_t maxevent;
     Double_t fTofdTotLow;
     Double_t fTofdTotHigh;
 
-    // arrays of control histograms
+    // Arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
@@ -221,4 +234,4 @@ class R3BTofDCal2HitPar : public FairTask
     ClassDef(R3BTofDCal2HitPar, 1)
 };
 
-#endif
+#endif /* R3BTofDCal2HitPar_H */
