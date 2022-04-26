@@ -55,6 +55,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
                                            Bool_t a_is_calibrator)
     : FairTask(TString("R3B") + a_name + "Cal2Hit", a_verbose)
     , fName(a_name)
+    , fDetId(1)
     , fClockFreq(150.)
     , fDirection(a_direction)
     , fNumFibers(a_num_fibers)
@@ -64,7 +65,8 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fMapPar(NULL)
     , fCalPar(NULL)
-    , fNofHitPars()
+    , fHitPar(NULL)
+    , fNofHitPars(0)
     , fChannelArray()
     , fnEvents(0)
     , ftofmin(TOF_MIN)
@@ -72,38 +74,51 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fWrite(true)
     , fGate_ns(100.) // make it constructor parameter
 {
+    if (fName == "Fi23a")
+        fDetId = 230;
+    else if (fName == "Fi23b")
+        fDetId = 231;
+    else if (fName == "Fi30")
+        fDetId = 30;
+    else if (fName == "Fi31")
+        fDetId = 31;
+    else if (fName == "Fi32")
+        fDetId = 32;
+    else if (fName == "Fi33")
+        fDetId = 33;
+    else
+    {
+        R3BLOG(WARNING, "Fiber " << fName << " not found");
+    }
 }
 
 R3BFiberMAPMTCal2Hit::~R3BFiberMAPMTCal2Hit()
 {
     if (fHitItems)
         delete fHitItems;
+    if (fMapPar)
+        delete fMapPar;
     if (fCalPar)
         delete fCalPar;
+    if (fHitPar)
+        delete fHitPar;
 }
 
 InitStatus R3BFiberMAPMTCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(INFO, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
-    if (!mgr)
-    {
-        R3BLOG(ERROR, "FairRootManager not found.");
-        return kERROR;
-    }
+    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
-    if (!fCalItems)
-    {
-        R3BLOG(fatal, "Branch " << name << " not found.");
-        return kERROR;
-    }
+    R3BLOG_IF(FATAL, !fCalItems, "Branch " << name << " not found.");
+
     auto name_mapmt_trig = fName + "TriggerCal";
     fCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "Branch " << name_mapmt_trig << " not found");
 
-    maxevent = mgr->CheckMaxEventNo();
+    // maxevent = mgr->CheckMaxEventNo();
 
     // TClones branch with Hit items
     mgr->Register(fName + "Hit", fName + " hit data", fHitItems, kTRUE);
@@ -113,27 +128,6 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         fChannelArray[side_i].resize(fNumFibers);
-    }
-
-    if (!fIsCalibrator)
-    {
-        // Get calibration parameters if we're not a calibrator.
-        auto container = fName + "HitPar";
-        fHitPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(container);
-        if (!fHitPar)
-        {
-            LOG(ERROR) << "Could not get " << container << " container.";
-            fNofHitPars = 0;
-        }
-        else
-        {
-            fNofHitPars = fHitPar->GetNumModulePar();
-            if (0 == fNofHitPars)
-            {
-                LOG(ERROR) << "No Hit parameters in " << container << " container.";
-                fHitPar = nullptr;
-            }
-        }
     }
 
     // create histograms
@@ -233,13 +227,21 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
     R3BLOG_IF(INFO, fCalPar, "Container " << fName << "HitPar initialized");
     R3BLOG_IF(ERROR, !fCalPar, "Couldn't get " << fName << "HitPar");
+
+    if (!fIsCalibrator)
+    {
+        // Get calibration parameters if we're not a calibrator.
+        auto container = fName + "HitPar";
+        fHitPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        R3BLOG_IF(ERROR, !fHitPar, "Could not get " << container << " container.");
+    }
 }
 
 void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 {
-    if (fnEvents / 100000. == (int)fnEvents / 100000)
-        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
-                  << " %) " << std::flush;
+    // if (fnEvents / 100000. == (int)fnEvents / 100000)
+    //     std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
+    //               << " %) " << std::flush;
 
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
@@ -437,7 +439,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
                         if (fDirection == VERTICAL)
                         {
-
                             x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
                             y = (t_down - t_up) * veff;
@@ -497,16 +498,14 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     // -156.00382+70.021718*eloss-10.350304*eloss*eloss+0.51455325*eloss*eloss*eloss; if (fName ==
                     // "Fi33") eloss = -298.60978+130.07812*eloss-18.699849*eloss*eloss+0.89852388*eloss*eloss*eloss;
 
-                    Double_t t = tof;
-
                     multi++;
 
                     if (!fIsCalibrator)
                     {
                         if (tof >= ftofmin && tof <= ftofmax)
                         {
-                            new ((*fHitItems)[fHitItems->GetEntriesFast()])
-                                R3BFiberMAPMTHitData(0, x, y, eloss, t, fiber_id, t_down, t_up, tot_down, tot_up);
+                            new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BFiberMAPMTHitData(
+                                fDetId, x, y, eloss, tof, fiber_id, t_down, t_up, tot_down, tot_up);
                         }
                     }
                 }
@@ -542,9 +541,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
     if (fIsCalibrator)
     {
-
         R3BFiberMAPMTHitModulePar* mpar;
-
         UInt_t max = N_FIBER_MAX;
         if (fh_ToT_bottom_Fib->GetNbinsX() < N_FIBER_MAX)
             max = fh_ToT_bottom_Fib->GetNbinsX();

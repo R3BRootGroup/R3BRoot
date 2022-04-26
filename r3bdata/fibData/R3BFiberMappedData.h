@@ -26,21 +26,21 @@ class R3BFiberMappedData : public TObject
   public:
     R3BFiberMappedData();
     R3BFiberMappedData(UInt_t, UInt_t, Bool_t, Int_t, Int_t);
-    virtual ~R3BFiberMappedData() {};
+    virtual ~R3BFiberMappedData(){};
 
-    inline UInt_t GetSide() const;
-    inline UInt_t GetChannel() const;
-    inline Int_t GetCoarse() const;
-    inline Int_t GetFine() const;
-    inline Bool_t IsTop() const;
-    inline Bool_t IsBottom() const;
-    inline Bool_t IsTrigger() const;
-    inline Bool_t IsLeading() const;
-    inline Bool_t IsTrailing() const;
-    inline Bool_t IsMAPMT() const;
-    inline Bool_t IsSPMT() const;
-    inline Bool_t IsMAPMTTrigger() const;
-    inline Bool_t IsSPMTTrigger() const;
+    inline UInt_t GetSide() const { return fSide; }
+    inline UInt_t GetChannel() const { return fChannel; }
+    inline Int_t GetCoarse() const { return fCoarse; }
+    inline Int_t GetFine() const { return fFine; }
+    inline Bool_t IsTop() const { return 2 == fSide; }
+    inline Bool_t IsBottom() const { return 1 == fSide; }
+    inline Bool_t IsTrigger() const { return 3 == fSide; }
+    inline Bool_t IsLeading() const { return fIsLeading; }
+    inline Bool_t IsTrailing() const { return !fIsLeading; }
+    inline Bool_t IsMAPMT() const { return 1 == fSide; }
+    inline Bool_t IsSPMT() const { return 2 == fSide; }
+    inline Bool_t IsMAPMTTrigger() const { return 3 == fSide; }
+    inline Bool_t IsSPMTTrigger() const { return 4 == fSide; }
 
   protected:
     // fSide is defined as follows:

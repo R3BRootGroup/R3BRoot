@@ -14,7 +14,7 @@
 #include "R3BFiberMAPMTMapped2CalPar.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
-#include "R3BFiberMAPMTMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
@@ -83,12 +83,12 @@ void R3BFiberMAPMTMapped2CalPar::Exec(Option_t* option)
     auto mapped_num = fMapped->GetEntriesFast();
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMAPMTMappedData*)fMapped->At(i);
+        auto mapped = (R3BFiberMappedData*)fMapped->At(i);
         assert(mapped);
         if (!mapped->IsTrigger())
         {
             fMAPMTEngine->Fill(
-                1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), mapped->GetSide() + 1, mapped->GetFine());
+                1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), mapped->GetSide(), mapped->GetFine());
         }
         else
         {

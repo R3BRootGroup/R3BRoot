@@ -14,7 +14,7 @@
 #include "R3BFiberMAPMTHitData.h"
 
 R3BFiberMAPMTHitData::R3BFiberMAPMTHitData()
-    : fFiberId(-1)
+    : fFiberId(0)
     , fBottomTime_ns(-1)
     , fTopTime_ns(-1)
     , fTime_ns(-1)
@@ -57,4 +57,4 @@ Double_t R3BFiberMAPMTHitData::GetBottomToT_ns() const { return fBottomToT_ns; }
 
 Double_t R3BFiberMAPMTHitData::GetTopToT_ns() const { return fTopToT_ns; }
 
-ClassImp(R3BFiberMAPMTHitData)
+ClassImp(R3BFiberMAPMTHitData);

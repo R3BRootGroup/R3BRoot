@@ -56,10 +56,10 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     };
 
     R3BFiberMAPMTCal2Hit(const char*,
-                         Int_t, // verbosity
-                         Direction,
-                         UInt_t, // fiber number
-                         Bool_t  // is calib
+                         Int_t v = 1, // verbosity
+                         Direction dir = HORIZONTAL,
+                         UInt_t fnb = 512,    // fiber number
+                         Bool_t iscal = false // is calib
     );
 
     virtual ~R3BFiberMAPMTCal2Hit();
@@ -85,6 +85,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 
   private:
     TString fName;
+    Int_t fDetId;
     Int_t fnEvents;
     Int_t fNumFibers;
     Int_t maxevent;

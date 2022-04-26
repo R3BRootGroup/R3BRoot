@@ -18,7 +18,6 @@
 #include "FairParamList.h"
 #include "FairRtdbRun.h"
 
-
 R3BTCalPar::R3BTCalPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fTCalParams(new TObjArray(NMODULEMAX))
@@ -62,7 +61,7 @@ Bool_t R3BTCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BTCalPar::clear() 
+void R3BTCalPar::clear()
 {
     status = kFALSE;
     resetInputVersions();
@@ -72,7 +71,7 @@ void R3BTCalPar::printParams()
 {
     R3BLOG(INFO, GetName() << " Time Calib. Parameters");
 
-    R3BLOG(INFO,"Number of TCal Parameters " << fTCalParams->GetEntries());
+    R3BLOG(INFO, "Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
         R3BTCalModulePar* t_par = (R3BTCalModulePar*)fTCalParams->At(i);
@@ -107,15 +106,13 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
             if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
                 tside > N_SIDE_MAX)
             {
-                R3BLOG(ERROR, "error in plane/paddle/side indexing. " << tplane << " / "
-                           << tpaddle << " / " << tside);
+                R3BLOG(ERROR, "error in plane/paddle/side indexing. " << tplane << " / " << tpaddle << " / " << tside);
                 continue;
             }
             index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                R3BLOG(ERROR, "parameter found more than once. " << tplane << " / "
-                           << tpaddle << " / " << tside);
+                R3BLOG(ERROR, "parameter found more than once. " << tplane << " / " << tpaddle << " / " << tside);
                 continue;
             }
             fIndexMap[index] = i;

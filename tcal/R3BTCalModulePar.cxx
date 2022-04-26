@@ -34,7 +34,8 @@ R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const ch
     clear();
 }
 
-R3BTCalModulePar::~R3BTCalModulePar() {
+R3BTCalModulePar::~R3BTCalModulePar()
+{
     // Reset all parameters
     clear();
 }

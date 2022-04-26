@@ -20,7 +20,7 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "R3BFiberMAPMTCalData.h"
-#include "R3BFiberMAPMTMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
@@ -49,7 +49,7 @@ R3BFiberMAPMTMapped2Cal::~R3BFiberMAPMTMapped2Cal()
 
 InitStatus R3BFiberMAPMTMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(INFO, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -63,8 +63,8 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
         R3BLOG(FATAL, "Branch " << name << " not found.");
         return kFATAL;
     }
-    mgr->Register(fName + "Cal", "Land", fCalItems, kTRUE);
-    mgr->Register(fName + "TriggerCal", "Land", fCalTriggerItems, kTRUE);
+    mgr->Register(fName + "Cal", "Fiber Cal Data", fCalItems, kTRUE);
+    mgr->Register(fName + "TriggerCal", "Fiber TriggerCal Data", fCalTriggerItems, kTRUE);
 
     return kSUCCESS;
 }
@@ -102,7 +102,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMAPMTMappedData*)fMappedItems->At(i);
+        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto channel = mapped->GetChannel();
