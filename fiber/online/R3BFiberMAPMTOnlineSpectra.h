@@ -19,8 +19,6 @@
 #ifndef R3BFiberMAPMTOnlineSpectra_H
 #define R3BFiberMAPMTOnlineSpectra_H 1
 
-#define N_FIBER_PLOT_S494 520
-
 #include "FairTask.h"
 #include <array>
 #include <fstream>
@@ -107,64 +105,43 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
         fTpat1 = tpat1;
         fTpat2 = tpat2;
     }
-    void Reset_Fiber_Histo();
+
+    void Reset_Histo();
 
   private:
     TString fName;
+    UInt_t fNbfibersplot;
+    UInt_t fNbfibers;
     R3BFiberMappingPar* fMapPar;
-    std::vector<TClonesArray*> fMappedItems;
-    std::vector<TClonesArray*> fCalItems;
-    std::vector<TClonesArray*> fHitItems;
-    std::vector<TClonesArray*> fCalTriggerItems;
+    TClonesArray* fMappedItems;
+    TClonesArray* fCalItems;
+    TClonesArray* fHitItems;
+    TClonesArray* fCalTriggerItems;
 
-    enum DetectorInstances
-    {
-        DET_FI_FIRST,
-        DET_FI30 = DET_FI_FIRST,
-        DET_FI31,
-        DET_FI32,
-        DET_FI33,
-        DET_FI23A,
-        DET_FI23B,
-        DET_FI_LAST = DET_FI23B,
-        DET_MAX
-    };
-
-#define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
-
-    const char* fDetectorNames[DET_MAX + 1] = { "Fi30", "Fi31", "Fi32", "Fi33", "Fi23a", "Fi23b", NULL };
-
-    // If FiberI is present or not:
-    Int_t ifibdet;
-    // Number of fibers per detector
-    Double_t n_fiber[NOF_FIB_DET] = { 512., 512., 512., 512., 384., 384. };
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat1, fTpat2;
-    Int_t fSamp;
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     std::vector<Channel> fChannelArray[2];
     unsigned const* fTriggerMap[2];
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+    unsigned long fNEvents; /**< Event counter. */
 
-    TH1F* fh_channels_Fib[NOF_FIB_DET];
-    TH1F* fh_channels_single_Fib[NOF_FIB_DET];
-    TH1F* fh_fibers_Fib[NOF_FIB_DET];
-    TH1F* fh_mult_Fib[NOF_FIB_DET];
-    TH2F* fh_Fib_pos[NOF_FIB_DET];
-    TH2F* fh_time_Fib[NOF_FIB_DET];
-    TH2F* fh_multihit_m_Fib[NOF_FIB_DET];
-    TH2F* fh_multihit_s_Fib[NOF_FIB_DET];
-    TH2F* fh_ToT_Fib[NOF_FIB_DET];
-    TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
-    TH2F* fh_ToTup_vs_ToTdown[NOF_FIB_DET];
-    TH2F* fh_chan_corell[NOF_FIB_DET];
-    TH2F* fh_raw_tot_up[NOF_FIB_DET];
-    TH2F* fh_raw_tot_down[NOF_FIB_DET];
-    TH2F* fh_chan_dt_cal[NOF_FIB_DET];
-    TH2F* fh_xy_global;
-    TH2F* fh_dtime_Fib23;
+    TH1F* fh_channels_Fib;
+    TH1F* fh_channels_single_Fib;
+    TH1F* fh_fibers_Fib;
+    TH1F* fh_mult_Fib;
+    TH2F* fh_Fib_pos;
+    TH2F* fh_time_Fib;
+    TH2F* fh_multihit_m_Fib;
+    TH2F* fh_multihit_s_Fib;
+    TH2F* fh_ToT_Fib;
+    TH2F* fh_Fib_vs_Events;
+    TH2F* fh_ToTup_vs_ToTdown;
+    TH2F* fh_chan_corell;
+    TH2F* fh_raw_tot_up;
+    TH2F* fh_raw_tot_down;
+    TH2F* fh_chan_dt_cal;
     TH2F* fh_test2;
 
   public:

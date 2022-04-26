@@ -43,7 +43,7 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
      * @param a_variant CTDC firmware variant, see R3BTCalEngine.
      * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
-    R3BFiberMAPMTMapped2Cal(const char*, Int_t);
+    R3BFiberMAPMTMapped2Cal(const char*, Int_t iVerbose = 1);
 
     /**
      * Destructor.

@@ -138,10 +138,12 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_channels[iloscount] =
                 new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 10, 0., 10.);
             fh_los_channels[iloscount]->GetXaxis()->SetTitle("Channel number");
+            fh_los_channels[iloscount]->SetFillColor(31);
 
             fh_los_multihit[iloscount] =
                 new TH1F(Form("%s_multihit", detName), Form("%s multihit && all 8 PMs", detName), 30, 0., 30.);
             fh_los_multihit[iloscount]->GetXaxis()->SetTitle("Multihit");
+            fh_los_multihit[iloscount]->SetFillColor(31);
 
             fh_los_pos_MCFD[iloscount] =
                 new TH2F(Form("%s_pos_MCFD", detName), Form("%s MCFD Position ", detName), 500, -5., 5., 500, -5., 5.);
@@ -169,6 +171,7 @@ InitStatus R3BLosOnlineSpectra::Init()
                                                    -4.,
                                                    4.);
             fh_los_tres_MCFD[iloscount]->GetXaxis()->SetTitle("Time MCFD / ns");
+            fh_los_tres_MCFD[iloscount]->SetFillColor(31);
 
             fh_los_tres_TAMEX[iloscount] = new TH1F(Form("%s_dt_4vs4_TAMEX", detName),
                                                     Form("%s TAMEX Time resolution - 4pmts vs 4pmts ", detName),
@@ -186,6 +189,7 @@ InitStatus R3BLosOnlineSpectra::Init()
                 new TH1F(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 300.);
             fh_los_tot_mean[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_tot_mean[iloscount]->GetXaxis()->SetTitle("ToT / ns");
+            fh_los_tot_mean[iloscount]->SetFillColor(31);
 
             fh_los_ihit_ToT[iloscount] =
                 new TH2F(Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 300.);
@@ -262,7 +266,7 @@ InitStatus R3BLosOnlineSpectra::Init()
         }
 
         run->AddObject(mainfol);
-        run->GetHttpServer()->RegisterCommand("Reset_LOS_HIST", Form("/Reset/%s/->Reset_LOS_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_LOS_HIST", Form("/Objects/%s/->Reset_LOS_Histo()", GetName()));
     }
 
     return kSUCCESS;
