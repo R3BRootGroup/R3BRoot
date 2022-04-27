@@ -434,7 +434,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     {
                         Float_t fiber_thickness = 0.028000;
                         Int_t fiber_nbr = 384;
-                        Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
                         if (fDirection == VERTICAL)
@@ -463,7 +462,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         if (fName == "Fi33")
                             fiber_thickness = 0.1025;
                         Int_t fiber_nbr = 512;
-                        Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 
