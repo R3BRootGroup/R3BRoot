@@ -58,6 +58,7 @@ R3BFiberMAPMTHitPar.cxx
 R3BFiberMAPMTHitModulePar.cxx
 R3BFiberMappingPar.cxx
 ./online/R3BFiberMAPMTOnlineSpectra.cxx
+./online/R3BFiberMAPMTCorrelationOnlineSpectra.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")

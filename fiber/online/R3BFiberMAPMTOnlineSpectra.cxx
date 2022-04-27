@@ -74,6 +74,10 @@ R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra(const TString name, Int_t
     , fNEvents(0)
     , fChannelArray()
     , fMapPar(NULL)
+    , fHitItems(NULL)
+    , fCalItems(NULL)
+    , fCalTriggerItems(NULL)
+    , fMappedItems(NULL)
     , fNbfibersplot(520)
     , fNbfibers(512)
 {
@@ -115,8 +119,11 @@ void R3BFiberMAPMTOnlineSpectra::SetParContainers()
 {
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
     R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
-    R3BLOG_IF(INFO, fMapPar, fName << "MappingPar found");
-    fNbfibers = fMapPar->GetNbChannels();
+    if (fMapPar)
+    {
+        fNbfibers = fMapPar->GetNbChannels();
+        R3BLOG(INFO, fName << "MappingPar found with " << fNbfibers << " fibers");
+    }
 }
 
 InitStatus R3BFiberMAPMTOnlineSpectra::ReInit()
@@ -175,14 +182,6 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 
     if (fCalItems)
     {
-        const char* chistName;
-        const char* chistTitle;
-        std::string tempTitle;
-        std::string tempName;
-        std::stringstream tempFibName;
-        std::string tempFibNames;
-        std::stringstream tempCanvName;
-
         FibCanvas = new TCanvas(fName, fName, 10, 10, 910, 910);
         // Cal level
         // Channels:
@@ -270,10 +269,13 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
         fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_time_Fib->GetYaxis()->SetTitle("(tUp+tDown)/2 / ns");
 
-        // Not-calibrated position:
-        fh_Fib_pos = new TH2F(fName + "Hit_pos", fName + "Hit Not-calibrated position", 300, -30, 30, 500, -500, 500);
+        // calibrated position
+        auto cxy = new TCanvas(fName + "_xy", fName + "_xy", 10, 10, 910, 910);
+        fh_Fib_pos = new TH2F(fName + "Hit_pos", fName + "Hit calibrated position", 300, -30, 30, 500, -500, 500);
         fh_Fib_pos->GetXaxis()->SetTitle("x position");
         fh_Fib_pos->GetYaxis()->SetTitle("y position");
+        cxy->cd();
+        fh_Fib_pos->Draw("colz");
 
         // hit fiber number vs. event number:
         fh_Fib_vs_Events = new TH2F(fName + "Hit_fib_vs_event",
@@ -338,9 +340,9 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
             gPad->SetLogz();
             fh_time_Fib->Draw("colz");
         }
-        FibCanvas->cd(0);
 
         mainfolder->Add(FibCanvas);
+        mainfolder->Add(cxy);
     } // end if(Mapped)
 
     run->AddObject(mainfolder);
@@ -612,10 +614,6 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
         Double_t xposMax = 0. / 0.;
         Double_t yposMax = 0. / 0.;
         Double_t tfib = 0. / 0.;
-        Double_t totMax_MA = 0.;
-        Double_t spmtMax;
-        Double_t mapmtMax;
-        Double_t totMax_S = 0.;
         iFibMax = -1000;
         totMax = 0.;
         dtimeMax = 0. / 0.;
@@ -687,6 +685,10 @@ void R3BFiberMAPMTOnlineSpectra::FinishEvent()
     if (fCalItems)
     {
         fCalItems->Clear();
+    }
+    if (fCalTriggerItems)
+    {
+        fCalTriggerItems->Clear();
     }
     if (fHitItems)
     {
