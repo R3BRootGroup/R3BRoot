@@ -36,6 +36,7 @@ R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_ver
     , fCalTriggerItems(new TClonesArray("R3BFiberMAPMTCalData"))
     , fClockFreq(1000. / 150)
     , fnEvents(0)
+    , fOnline(kFALSE)
 {
 }
 
@@ -63,8 +64,8 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
         R3BLOG(FATAL, "Branch " << name << " not found.");
         return kFATAL;
     }
-    mgr->Register(fName + "Cal", "Fiber Cal Data", fCalItems, kTRUE);
-    mgr->Register(fName + "TriggerCal", "Fiber TriggerCal Data", fCalTriggerItems, kTRUE);
+    mgr->Register(fName + "Cal", "Fiber Cal Data", fCalItems, !fOnline);
+    mgr->Register(fName + "TriggerCal", "Fiber TriggerCal Data", fCalTriggerItems, !fOnline);
 
     return kSUCCESS;
 }
@@ -210,8 +211,14 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
 void R3BFiberMAPMTMapped2Cal::FinishEvent()
 {
-    fCalItems->Clear();
-    fCalTriggerItems->Clear();
+    if (fCalItems)
+    {
+        fCalItems->Clear();
+    }
+    if (fCalTriggerItems)
+    {
+        fCalTriggerItems->Clear();
+    }
 }
 
 ClassImp(R3BFiberMAPMTMapped2Cal);

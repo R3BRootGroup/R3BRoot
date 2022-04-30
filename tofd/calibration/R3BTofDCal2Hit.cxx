@@ -61,7 +61,6 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
-    , fNofHitItems(0)
     , fNofHitPars(0)
     , fHitPar(NULL)
     , fMapPar(NULL)
@@ -72,7 +71,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fPaddlesPerPlane(44)
     , fTofdQ(0)
     , fTofdHisto(false)
-    , fTofdTotPos(true)
+    , fTofdTotPos(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
@@ -396,11 +395,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
             // Shift the cyclic difference window by half a window-length and move it back,
             // this way the trigger time will be at 0.
-            // FIXME: These equations could be no right!
-            auto top_ns =
-                fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
-            auto bot_ns =
-                fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+            auto top_ns = fTimeStitch->GetTime(top->GetTimeLeading_ns() - top_trig_ns);
+            auto bot_ns = fTimeStitch->GetTime(bot->GetTimeLeading_ns() - bot_trig_ns);
 
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
@@ -496,26 +492,21 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
 
                 Float_t paddle_width = 2.70000;
-                Float_t paddle_thickness = 0.50000;
                 Float_t air_gap_paddles = 0.04;
                 Float_t air_gap_layer = 5.;
-                // define number of layers and paddles with sizes of the detector
-                Int_t number_layers = 2;   // number of layers
-                Int_t number_paddles = 44; // number of paddles per layer
                 Float_t detector_width =
-                    number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + paddle_width;
-                Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
+                    fPaddlesPerPlane * paddle_width + (fPaddlesPerPlane - 1) * air_gap_paddles + paddle_width;
                 Double_t xp = -1000.;
                 // calculate x-position
                 if (iPlane == 1 || iPlane == 3)
                 {
                     xp = -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
-                         (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04;
+                         (iBar - 1) * (paddle_width + air_gap_paddles);
                 }
                 if (iPlane == 2 || iPlane == 4)
                 {
                     xp = -detector_width / 2 + (paddle_width + air_gap_paddles) +
-                         (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04;
+                         (iBar - 1) * (paddle_width + air_gap_paddles);
                 }
 
                 Double_t para[4];
@@ -582,7 +573,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
-                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart()) - par->GetTofSync();
+                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx") -
+                           par->GetTofSync();
 
                 // if (parz[1] > 0)
                 // {
@@ -988,7 +980,6 @@ void R3BTofDCal2Hit::FinishEvent()
     if (fHitItems)
     {
         fHitItems->Clear();
-        fNofHitItems = 0;
     }
 }
 

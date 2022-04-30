@@ -139,54 +139,54 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         fChannelArray[side_i].resize(fSubNum * fChPerSub[side_i]);
     }
 
-    if (!fIsCalibrator )//|| (fIsCalibrator && (!fIsGain || !fIsTsync)) )
+    if (!fIsCalibrator) //|| (fIsCalibrator && (!fIsGain || !fIsTsync)) )
     {
-    // Get calibration parameters if we're not a calibrator.
-    auto container = fName + "HitPar";
-    fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        // Get calibration parameters if we're not a calibrator.
+        auto container = fName + "HitPar";
+        fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
 
-    if (!fHitPar)
-    {
-        LOG(ERROR) << "Could not get " << container << " container.";
-        fNofHitPars = 0;
-    }
-    else
-    {
-        // if(!fIsCalibrator)
-        fNofHitPars = fHitPar->GetNumModulePar();
-        if (0 == fNofHitPars)
+        if (!fHitPar)
         {
-            LOG(ERROR) << "No Hit parameters in " << container << " container.";
-            fHitPar = nullptr;
+            LOG(ERROR) << "Could not get " << container << " container.";
+            fNofHitPars = 0;
         }
-    }
+        else
+        {
+            // if(!fIsCalibrator)
+            fNofHitPars = fHitPar->GetNumModulePar();
+            if (0 == fNofHitPars)
+            {
+                LOG(ERROR) << "No Hit parameters in " << container << " container.";
+                fHitPar = nullptr;
+            }
+        }
 
-    for (int i = 1; i <= N_FIBER_MAX; i++)
-    {
-        gain_temp[i - 1] = 10.;
-        tsync_temp[i - 1] = 0.;
-    }
-
-    if (fHitPar)
-    {
         for (int i = 1; i <= N_FIBER_MAX; i++)
         {
-            if (!fIsGain && fIsTsync) // gain already made, tsync will be done now
+            gain_temp[i - 1] = 10.;
+            tsync_temp[i - 1] = 0.;
+        }
+
+        if (fHitPar)
+        {
+            for (int i = 1; i <= N_FIBER_MAX; i++)
             {
-                R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
-                if (par && par->GetGainMA() > 0.)
-                    gain_temp[i - 1] = par->GetGainMA();
-            }
-            if (fIsGain && !fIsTsync) // tsync already made, gain will be done now
-            {
-                R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
-                if (par)
-                    tsync_temp[i - 1] = par->GetSync();
+                if (!fIsGain && fIsTsync) // gain already made, tsync will be done now
+                {
+                    R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
+                    if (par && par->GetGainMA() > 0.)
+                        gain_temp[i - 1] = par->GetGainMA();
+                }
+                if (fIsGain && !fIsTsync) // tsync already made, gain will be done now
+                {
+                    R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
+                    if (par)
+                        tsync_temp[i - 1] = par->GetSync();
+                }
             }
         }
     }
-    }
-    
+
     // create histograms
     TString chistName;
     TString chistTitle;
@@ -311,8 +311,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
     }
-    
-
 
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.
@@ -328,7 +326,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         spmt_trig_table.at(idx) = cal;
     }
     }*/
-
 
     // Find multi-hit ToT for every channel.
     // The easiest safe way to survive ugly cases is to record all
@@ -518,7 +515,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             // TODO: Use it_sub->direction to find real life coordinates.
 
             // Fix fiber installation mistakes.
-           // fiber_id = FixMistake(fiber_id);
+            // fiber_id = FixMistake(fiber_id);
 
             // Calibrate hit fiber.
             auto tot_mapmt = mapmt_tot.tot_ns;

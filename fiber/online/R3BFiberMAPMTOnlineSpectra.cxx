@@ -30,21 +30,18 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+
 #include "TCanvas.h"
+#include "TClonesArray.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
-
-#include "TClonesArray.h"
 #include "TMath.h"
 #include <TRandom3.h>
-#include <TRandomGen.h>
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstdlib>
-#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -71,6 +68,7 @@ R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra(const TString name, Int_t
     , fTpat1(-1)
     , fTpat2(-1)
     , fClockFreq(150.)
+    , fClockPeriods(4096.)
     , fNEvents(0)
     , fChannelArray()
     , fMapPar(NULL)
@@ -186,39 +184,45 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
         // Cal level
         // Channels:
         fh_channels_Fib =
-            new TH1F(fName + "Mapped_channels_up", fName + "Mapped channels up", fNbfibersplot, 0., fNbfibersplot);
+            new TH1F(fName + "Mapped_channels_up", fName + "Mapped channels up", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_channels_Fib->GetXaxis()->SetTitle("PMT channel number");
         fh_channels_Fib->GetYaxis()->SetTitle("Counts");
         fh_channels_Fib->SetFillColor(31);
 
         // Channels:
-        fh_channels_single_Fib =
-            new TH1F(fName + "Mapped_channels_down", fName + "Mapped channels down", fNbfibersplot, 0., fNbfibersplot);
+        fh_channels_single_Fib = new TH1F(
+            fName + "Mapped_channels_down", fName + "Mapped channels down", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_channels_single_Fib->GetXaxis()->SetTitle("PMT channel number");
         fh_channels_single_Fib->GetYaxis()->SetTitle("Counts");
         fh_channels_single_Fib->SetFillColor(31);
 
         // Multihit MAPMT:
         fh_multihit_m_Fib = new TH2F(
-            fName + "Cal_multihit_up", fName + "Cal multihits up", fNbfibersplot, 0., fNbfibersplot, 20, 0., 20.);
+            fName + "Cal_multihit_up", fName + "Cal multihits up", fNbfibersplot, 1., fNbfibersplot + 1., 20, 0., 20.);
         fh_multihit_m_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_multihit_m_Fib->GetYaxis()->SetTitle("Multihit");
 
         // Multihit SAPMT:
-        fh_multihit_s_Fib = new TH2F(
-            fName + "Cal_multihit_down", fName + "Cal multihits down", fNbfibersplot, 0., fNbfibersplot, 20, 0., 20.);
+        fh_multihit_s_Fib = new TH2F(fName + "Cal_multihit_down",
+                                     fName + "Cal multihits down",
+                                     fNbfibersplot,
+                                     1.,
+                                     fNbfibersplot + 1.,
+                                     20,
+                                     0.,
+                                     20.);
         fh_multihit_s_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_multihit_s_Fib->GetYaxis()->SetTitle("Multihit");
 
         // ToT raw up:
         fh_raw_tot_up = new TH2F(
-            fName + "Cal_totraw_up", fName + "Cal ToT raw up", fNbfibersplot, 0., fNbfibersplot, 200, 0., 100.);
+            fName + "Cal_totraw_up", fName + "Cal ToT raw up", fNbfibersplot, 1., fNbfibersplot + 1., 200, 0., 100.);
         fh_raw_tot_up->GetXaxis()->SetTitle("Fiber number");
         fh_raw_tot_up->GetYaxis()->SetTitle("ToT / ns");
 
         // ToT SAPMT:
         fh_raw_tot_down = new TH2F(
-            fName + "Cal_totraw_down", fName + "Cal ToT raw down", fNbfibersplot, 0., fNbfibersplot, 200, 0., 100.);
+            fName + "Cal_totraw_down", fName + "Cal ToT raw down", fNbfibersplot, 1., fNbfibersplot + 1, 200, 0., 100.);
         fh_raw_tot_down->GetXaxis()->SetTitle("Fiber number");
         fh_raw_tot_down->GetYaxis()->SetTitle("ToT / ns");
 
@@ -240,7 +244,7 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 
         // Hit level
         // Fibers:
-        fh_fibers_Fib = new TH1F(fName + "Hit_fibers", fName + "Hit fibers", fNbfibersplot, 0., fNbfibersplot);
+        fh_fibers_Fib = new TH1F(fName + "Hit_fibers", fName + "Hit fibers", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_fibers_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_fibers_Fib->GetYaxis()->SetTitle("Counts");
         fh_fibers_Fib->SetFillColor(31);
@@ -252,8 +256,8 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
         fh_mult_Fib->SetFillColor(31);
 
         // ToT :
-        fh_ToT_Fib =
-            new TH2F(fName + "Hit_ToT_iFib", fName + "Hit ToT vs Fib", fNbfibersplot, 0., fNbfibersplot, 200, 0., 100.);
+        fh_ToT_Fib = new TH2F(
+            fName + "Hit_ToT_iFib", fName + "Hit ToT vs Fib", fNbfibersplot, 1., fNbfibersplot + 1, 200, 0., 100.);
         fh_ToT_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_ToT_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -261,11 +265,11 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
         fh_time_Fib = new TH2F(fName + "Hit_TimevsFiber",
                                fName + "Hit Time vs Fiber",
                                fNbfibersplot,
-                               0.,
-                               fNbfibersplot,
-                               4096,
-                               -2048.,
-                               2048.);
+                               1.,
+                               fNbfibersplot + 1.,
+                               fClockPeriods,
+                               -fClockPeriods / 2.,
+                               fClockPeriods / 2.);
         fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_time_Fib->GetYaxis()->SetTitle("(tUp+tDown)/2 / ns");
 
@@ -284,8 +288,8 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
                                     0,
                                     5e6,
                                     fNbfibersplot,
-                                    0.,
-                                    fNbfibersplot);
+                                    1.,
+                                    fNbfibersplot + 1.);
         fh_Fib_vs_Events->GetYaxis()->SetTitle("Fiber number");
         fh_Fib_vs_Events->GetXaxis()->SetTitle("Event number");
 
@@ -352,6 +356,7 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 }
 void R3BFiberMAPMTOnlineSpectra::Reset_Histo()
 {
+    R3BLOG(INFO, "For firber " << fName);
     if (fCalItems)
     {
         fh_channels_Fib->Reset();
@@ -411,7 +416,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
     Int_t iCha_up = 0, iCha_down = 0;
     Double_t tFib = 0. / 0.;
     Int_t iSide = 0;
-    Double_t c_period = 4096. * (1000. / fClockFreq);
+    Double_t c_period = fClockPeriods * (1000. / fClockFreq);
 
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {

@@ -85,6 +85,9 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
      */
     virtual void FinishEvent();
 
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     TString fName;
     R3BTCalPar* fMAPMTTCalPar;
@@ -95,6 +98,8 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
     // Int_t fNoCalItems;
     // Int_t fNoCalTrigItems;
     Double_t fClockFreq;
+    // Don't store data for online
+    Bool_t fOnline;
     Int_t fnEvents;
     // Double_t tmaxfib23a[256] = { -4096 };
     // Double_t tminfib23a[256] = { 4096 };

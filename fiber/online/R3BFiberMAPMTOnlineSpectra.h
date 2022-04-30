@@ -71,6 +71,7 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
     virtual InitStatus Init();
+
     virtual InitStatus ReInit();
 
     /**
@@ -99,11 +100,16 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat1, Int_t tpat2)
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    void SetTpat(Int_t tpat1, Int_t tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
+    }
+    void SetClock(Double_t CF, Double_t CP)
+    {
+        fClockFreq = CF;
+        fClockPeriods = CP;
     }
 
     void Reset_Histo();
@@ -123,6 +129,7 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat1, fTpat2;
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    Double_t fClockPeriods;
     std::vector<Channel> fChannelArray[2];
     unsigned const* fTriggerMap[2];
     unsigned long fNEvents; /**< Event counter. */
@@ -142,7 +149,6 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
     TH2F* fh_raw_tot_up;
     TH2F* fh_raw_tot_down;
     TH2F* fh_chan_dt_cal;
-    TH2F* fh_test2;
 
   public:
     ClassDef(R3BFiberMAPMTOnlineSpectra, 1)

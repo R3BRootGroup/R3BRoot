@@ -10,11 +10,9 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-#ifndef R3BFIBERMAPMTCAL2HIT
-#define R3BFIBERMAPMTCAL2HIT
 
-#define TOF_MIN -1000
-#define TOF_MAX 1000
+#ifndef R3BFIBERMAPMTCAL2HIT_H
+#define R3BFIBERMAPMTCAL2HIT_H 1
 
 #include "FairTask.h"
 #include <list>
@@ -64,24 +62,34 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 
     virtual ~R3BFiberMAPMTCal2Hit();
 
-    // @return Initialization status. kSUCCESS, kERROR or kFATAL.
     virtual InitStatus Init();
 
-    // Method for re-initialization of parameter containers
-    // in case the Run ID has changed.
     virtual InitStatus ReInit();
+
     virtual void SetParContainers();
+
     virtual void Exec(Option_t*);
+
     virtual void FinishEvent();
+
     virtual void FinishTask();
+
     inline void SetTimeWindow(Double_t tmin, Double_t tmax)
     {
         ftofmin = tmin;
         ftofmax = tmax;
     }
-    inline void SetWriteHisto(Bool_t write) { fWrite = write; }
 
-    R3BFiberMAPMTHitModulePar* GetModuleParAt(Int_t fiber);
+    void SetWriteHisto(Bool_t write) { fWrite = write; }
+
+    void SetTofMin(Double_t min) { ftofmin = min; }
+
+    void SetTofMax(Double_t max) { ftofmax = max; }
+
+    void SetGate(Double_t g) { fGate_ns = g; }
+
+    // Accessor to select online mode
+    void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     TString fName;
@@ -90,8 +98,8 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Int_t fNumFibers;
     Int_t maxevent;
     Int_t multi;
-    double fClockFreq;
-    double fGate_ns;
+    Double_t fClockFreq;
+    Double_t fGate_ns;
 
     Double_t tsync;
     Double_t gainUp;
@@ -101,6 +109,8 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Bool_t fIsCalibrator;
     Double_t ftofmin, ftofmax;
     Bool_t fWrite;
+    // Don't store data for online
+    Bool_t fOnline;
 
     Direction fDirection;
     TClonesArray* fCalItems;
@@ -131,4 +141,4 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     ClassDef(R3BFiberMAPMTCal2Hit, 3)
 };
 
-#endif
+#endif /* R3BFIBERMAPMTCAL2HIT_H */

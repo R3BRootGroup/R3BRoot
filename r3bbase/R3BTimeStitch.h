@@ -15,24 +15,33 @@
 #define R3BTimeStitch_H 1
 
 #include "TObject.h"
+#include "TString.h"
 #include <Rtypes.h>
 
 class R3BTimeStitch : public TObject
 {
   public:
-    // Default Constructor
+    // Default Constructor for sync two tamex channels
     R3BTimeStitch();
-    
+
     // Destructor
     virtual ~R3BTimeStitch() {}
 
-    Float_t GetRange() const { return fRange;} 
-    Double_t GetTime(Double_t ) const;
+    Float_t GetRange1() const { return fRange1; }
+    Float_t GetRange2() const { return fRange2; }
+    Double_t GetTime(Double_t) const;
+    Double_t GetTime(Double_t, TString, TString);
 
-    void SetRange(Float_t range) { fRange = range;}
+    void SetRange1(Float_t range) { fRange1 = range; }
+    void SetRange2(Float_t range) { fRange2 = range; }
 
   private:
-    Float_t fRange;
+    Double_t fRange1;
+    Double_t fRange2;
+    Double_t fRangeTamex;
+    Double_t fRangeVftx;
+    Double_t fRangeTrb;
+    Double_t fRangeClockTDC;
 
   public:
     ClassDef(R3BTimeStitch, 1)

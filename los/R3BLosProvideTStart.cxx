@@ -14,8 +14,8 @@
 #include "R3BLosProvideTStart.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
-#include "R3BTimeStitch.h"
 #include "R3BLogger.h"
+#include "R3BTimeStitch.h"
 
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
@@ -67,8 +67,18 @@ Double_t R3BLosProvideTStart::GetTStart() const
     }
     else
     {
-        R3BLOG(DEBUG1, "CalData with trigger info for LOS");               
-        return fTimeStitch->GetTime(losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0));
+        if (losTriggerCalData.back()->GetTimeV_ns(0) > 0.)
+        {
+            R3BLOG(DEBUG1, "CalData with VFTX trigger info for LOS");
+            return fTimeStitch->GetTime(
+                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(0), "vftx", "vftx");
+        }
+        else
+        {
+            R3BLOG(DEBUG1, "CalData with Tamex trigger info for LOS");
+            return fTimeStitch->GetTime(
+                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0), "vftx", "tamex");
+        }
     }
 }
 
