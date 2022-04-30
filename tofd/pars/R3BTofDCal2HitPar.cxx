@@ -78,6 +78,7 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
     , fMapPar(NULL)
     , fTofdSmiley(true)
     , fTofdZ(false)
+    , fMeanTof(20.)
     , maxevent(0)
 {
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -320,7 +321,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
 
                     // Tof with respect LOS detector
-                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart());
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart(), "tamex", "vftx");
                     fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof);
                 }
 
@@ -366,7 +367,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
 
                     // Tof with respect LOS detector
-                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart());
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart(), "tamex", "vftx");
                     fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof - par->GetTofSync());
                 }
                 else if (fTofdQ > 0 && fParameter > 1)
@@ -598,7 +599,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "tofdiff_plane_%d_bar_%d", iPlane, iBar);
-        fh1_tofsync[iPlane - 1][iBar - 1] = new TH1F(strName, strName, 20000, -3000, 0);
+        fh1_tofsync[iPlane - 1][iBar - 1] = new TH1F(strName, strName, 25000, -1000, 200);
         fh1_tofsync[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToF [ns]");
     }
 }
@@ -1175,7 +1176,7 @@ void R3BTofDCal2HitPar::FinishTask()
                 auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
                 Int_t binmax = fh1_tofsync[i][j]->GetMaximumBin();
                 auto tofsync = fh1_tofsync[i][j]->GetXaxis()->GetBinCenter(binmax);
-                par->SetTofSync(tofsync);
+                par->SetTofSync(tofsync - fMeanTof);
                 LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " Tof-Sync  " << tofsync;
             }
         }

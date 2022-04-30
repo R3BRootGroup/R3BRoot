@@ -136,6 +136,11 @@ class R3BTofDCal2HitPar : public FairTask
     void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
 
     /**
+     * Method for setting the mean ToF
+     */
+    void SetMeanTof(Double_t tof) { fMeanTof = tof; }
+
+    /**
      * Method for setting the fit for the charge
      * pol1
      + pol2
@@ -218,6 +223,7 @@ class R3BTofDCal2HitPar : public FairTask
     UInt_t maxevent;
     Double_t fTofdTotLow;
     Double_t fTofdTotHigh;
+    Double_t fMeanTof;
 
     // Arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];

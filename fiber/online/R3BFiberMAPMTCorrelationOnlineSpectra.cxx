@@ -184,12 +184,13 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     }
 
     run->AddObject(mainfolder);
-    run->GetHttpServer()->RegisterCommand("Reset_" + fName1 + "_", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_" + fName1 + "_Cor_"+ fName2, Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     return kSUCCESS;
 }
 void R3BFiberMAPMTCorrelationOnlineSpectra::Reset_Histo()
 {
+    R3BLOG(INFO, "For firbers " << fName1 << " and " << fName2);
     if (fHitItems1 && fHitItems2)
     {
         fh_Fib_posX->Reset();

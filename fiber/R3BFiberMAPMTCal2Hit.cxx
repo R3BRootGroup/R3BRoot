@@ -22,7 +22,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include <TClonesArray.h>
-#include <cassert>
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -69,10 +68,11 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fNofHitPars(0)
     , fChannelArray()
     , fnEvents(0)
-    , ftofmin(TOF_MIN)
-    , ftofmax(TOF_MAX)
-    , fWrite(true)
-    , fGate_ns(100.) // make it constructor parameter
+    , ftofmin(-1000)
+    , ftofmax(1000)
+    , fWrite(false)
+    , fGate_ns(100.)
+    , fOnline(kFALSE)
 {
     if (fName == "Fi23a")
         fDetId = 230;
@@ -88,7 +88,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
         fDetId = 33;
     else
     {
-        R3BLOG(WARNING, "Fiber " << fName << " not found");
+        R3BLOG(ERROR, "Fiber " << fName << " not found");
     }
 }
 
@@ -121,7 +121,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // maxevent = mgr->CheckMaxEventNo();
 
     // TClones branch with Hit items
-    mgr->Register(fName + "Hit", fName + " hit data", fHitItems, kTRUE);
+    mgr->Register(fName + "Hit", fName + " hit data", fHitItems, !fOnline);
     fHitItems->Clear();
 
     // Resize per-channel info arrays.
@@ -136,69 +136,70 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     // ToT bottom PMT raw:
     chistName = fName + "_ToT_bottom_raw";
     chistTitle = fName + " ToTbottom raw of fibers";
-    fh_ToT_bottom_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
+    fh_ToT_bottom_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 200, 0., 100.);
     fh_ToT_bottom_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_bottom_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
     // ToT bottom gainmatched:
     chistName = fName + "_ToT_bottom";
     chistTitle = fName + " ToTbottom of fibers";
-    fh_ToT_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
+    fh_ToT_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 200, 0., 100.);
     fh_ToT_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_bottom_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     // ToF Tofd -> Fiber:
     chistName = fName + "_time";
     chistTitle = fName + " Time";
-    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2200, -1100., 1100.);
+    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 2200, -1100., 1100.);
     fh_Fib_ToF->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF->GetXaxis()->SetTitle("Fiber ID");
 
     // ToF Fiber for sync:
     chistName = fName + "_time_raw";
     chistTitle = fName + " Time raw";
-    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
+    fh_Fib_ToF_raw = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 2400, -1000., 200.);
     fh_Fib_ToF_raw->GetYaxis()->SetTitle("Time/ ns");
     fh_Fib_ToF_raw->GetXaxis()->SetTitle("Fiber ID");
 
     // ToT top MAPMT raw:
     chistName = fName + "_ToT_top_raw";
     chistTitle = fName + " ToTtop raw of fibers";
-    fh_ToT_top_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
+    fh_ToT_top_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 200, 0., 100.);
     fh_ToT_top_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_top_Fib_raw->GetYaxis()->SetTitle("ToT / ns");
 
     // ToT top MAPMT gainmatched:
     chistName = fName + "_ToT_top";
     chistTitle = fName + " ToTtop of fibers";
-    fh_ToT_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 200, 0., 100.);
+    fh_ToT_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 200, 0., 100.);
     fh_ToT_top_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_top_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     chistName = fName + "_time_top";
     chistTitle = fName + " time of top MAPMTs ";
-    fh_time_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
+    fh_time_top_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 2400, -1000., 200.);
     fh_time_top_Fib->GetXaxis()->SetTitle("single number");
     fh_time_top_Fib->GetYaxis()->SetTitle("time / ns");
 
     // time difference top-bottom:
     chistName = fName + "_dt";
     chistTitle = fName + " dt of fibers";
-    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4400, -1100., 1100.);
+    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 4400, -1100., 1100.);
     fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
 
     // time difference top-bottom for offsets:
     chistName = fName + "_dt_raw";
     chistTitle = fName + " dt_raw of fibers";
-    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 4400, -1100., 1100.);
+    fh_dt_Fib_raw = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 4400, -1100., 1100.);
     fh_dt_Fib_raw->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib_raw->GetYaxis()->SetTitle("dt / ns");
 
     // time of MAPMT:
     chistName = fName + "_time_bottom";
     chistTitle = fName + " time of bottom MAPMTs";
-    fh_time_bottom_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 512, 0, 512, 2400, -1000., 200.);
+    fh_time_bottom_Fib =
+        new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 2400, -1000., 200.);
     fh_time_bottom_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_time_bottom_Fib->GetYaxis()->SetTitle("time / ns");
 
@@ -221,7 +222,15 @@ InitStatus R3BFiberMAPMTCal2Hit::ReInit()
 void R3BFiberMAPMTCal2Hit::SetParContainers()
 {
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
-    R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
+    if (!fMapPar)
+    {
+        R3BLOG(ERROR, "Couldn't get " << fName << "MappingPar");
+    }
+    else
+    {
+        fNumFibers = fMapPar->GetNbChannels();
+        R3BLOG(INFO, "Nb of fibers: " << fNumFibers);
+    }
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
     fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
@@ -239,9 +248,6 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
 
 void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 {
-    // if (fnEvents / 100000. == (int)fnEvents / 100000)
-    //     std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
-    //               << " %) " << std::flush;
 
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
@@ -267,8 +273,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
     }
 
     size_t cal_num = fCalItems->GetEntriesFast();
-
-    //   if(cal_num>0 ) cout<<"calNum: "<<fName<<", "<<cal_num<<", "<<endl;
 
     for (size_t j = 0; j < cal_num; ++j)
     {
@@ -353,7 +357,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto const& up_tot = *it_up_tot;
 
                     // Check that the combo is inside one sub-det.
-
                     auto up_sub_id = (up_tot.lead->GetChannel() - 1) / fNumFibers;
                     if (down_sub_id != up_sub_id)
                     {
@@ -379,10 +382,13 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Double_t tof = (t_up + t_down) / 2.;
 
                     // Fill histograms for gain match, offset and sync.
-                    fh_ToT_bottom_Fib_raw->Fill(fiber_id, tot_down);
-                    fh_ToT_top_Fib_raw->Fill(fiber_id, tot_up);
-                    fh_dt_Fib_raw->Fill(fiber_id, dtime);
-                    fh_Fib_ToF_raw->Fill(fiber_id, tof);
+                    if (fWrite)
+                    {
+                        fh_ToT_bottom_Fib_raw->Fill(fiber_id, tot_down);
+                        fh_ToT_top_Fib_raw->Fill(fiber_id, tot_up);
+                        fh_dt_Fib_raw->Fill(fiber_id, dtime);
+                        fh_Fib_ToF_raw->Fill(fiber_id, tof);
+                    }
 
                     gainUp = 10.;
                     gainDown = 10.;
@@ -415,27 +421,29 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     tof = (t_up + t_down) / 2.;
 
                     // histogram after gain match, sync....
-                    fh_dt_Fib->Fill(fiber_id, dtime);
-                    fh_Fib_ToF->Fill(fiber_id, tof);
-                    fh_ToT_bottom_Fib->Fill(fiber_id, tot_down);
-                    fh_ToT_top_Fib->Fill(fiber_id, tot_up);
-                    fh_time_bottom_Fib->Fill(fiber_id, t_down);
-                    fh_time_top_Fib->Fill(fiber_id, t_up);
+                    if (fWrite)
+                    {
+                        fh_dt_Fib->Fill(fiber_id, dtime);
+                        fh_Fib_ToF->Fill(fiber_id, tof);
+                        fh_ToT_bottom_Fib->Fill(fiber_id, tot_down);
+                        fh_ToT_top_Fib->Fill(fiber_id, tot_up);
+                        fh_time_bottom_Fib->Fill(fiber_id, t_down);
+                        fh_time_top_Fib->Fill(fiber_id, t_up);
+                    }
 
                     if (fiber_id == 10)
                         fh_time_check_tsync->Fill(fnEvents, tof);
 
-                    Int_t numFibs = fNumFibers;
                     Double_t x = -10000.;
                     Double_t y = -10000.;
+                    // FIXME: veff should be taken from the hit-parameter container
                     Double_t veff = 12. / 2.; // cm/ns
                     Double_t randx = (std::rand() / (float)RAND_MAX);
                     if (fName == "Fi23a" || fName == "Fi23b")
                     {
-                        Float_t fiber_thickness = 0.028000;
-                        Int_t fiber_nbr = 384;
+                        Float_t fiber_thickness = 0.028;
                         Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+                        Float_t detector_width = fNumFibers * fiber_thickness * (1 + air_layer);
                         if (fDirection == VERTICAL)
                         {
                             x = -detector_width / 2. +
@@ -445,7 +453,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         else
                         {
                             x = (t_down - t_up) * veff;
-
                             y = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
@@ -461,26 +468,25 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                             fiber_thickness = 0.1024;
                         if (fName == "Fi33")
                             fiber_thickness = 0.1025;
-                        Int_t fiber_nbr = 512;
-                        Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 
+                        Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
+                        Float_t detector_width = fNumFibers * fiber_thickness * (1 + air_layer);
+
+                        // FIXME: This needs improvements because it depends on the fiber orientation
                         if (fDirection == VERTICAL)
                         {
                             x = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                             y = (t_down - t_up) * veff;
-                            // y = 0.;
                         }
                         else
                         {
                             x = (t_down - t_up) * veff;
-                            // x = 0.;
                             y = -detector_width / 2. +
                                 (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
                     }
-                    // cout<<"Fiber y " << y << endl;
+
                     if (y < -60 || y > 60)
                     {
                         // continue;
@@ -517,7 +523,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 void R3BFiberMAPMTCal2Hit::FinishEvent()
 {
     if (fHitItems)
+    {
         fHitItems->Clear();
+    }
 }
 
 void R3BFiberMAPMTCal2Hit::FinishTask()
@@ -539,56 +547,92 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
     if (fIsCalibrator)
     {
-        R3BFiberMAPMTHitModulePar* mpar;
-        UInt_t max = N_FIBER_MAX;
-        if (fh_ToT_bottom_Fib->GetNbinsX() < N_FIBER_MAX)
-            max = fh_ToT_bottom_Fib->GetNbinsX();
+        Bool_t Redo = false; // Add a redo flag, to redo a calibration, if Maximum falls on noise.
+        Double_t PercentOfMax = 0.5;
 
-        for (UInt_t i = 1; i <= max; i++)
+        R3BFiberMAPMTHitModulePar* mpar;
+
+        for (UInt_t i = 1; i <= fNumFibers; i++)
         {
             mpar = new R3BFiberMAPMTHitModulePar();
             mpar->SetFiber(i);
             fCalPar->AddModulePar(mpar);
         }
 
-        for (UInt_t i = 1; i <= max; i++)
+        Int_t loopctr = 0;
+        for (UInt_t i = 1; i <= fNumFibers; i++)
         {
             // gain bottom MAPMTs
             TH1D* proj = fh_ToT_bottom_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
+            Double_t PartMax = proj->GetMaximum() * PercentOfMax;
+            Int_t LowerBound = proj->FindFirstBinAbove(PartMax, 1);
+            loopctr = 0;
+
             for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
             {
                 if (j == 2)
                 {
                     // could not find maximum
                 }
-                if (proj->GetBinContent(j) > proj->GetMaximum() * 10. / 100.)
+                if (proj->GetBinContent(j) > PartMax)
                 {
-                    R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
-                    par->SetGainDown(proj->GetBinCenter(j));
+                    if (j - LowerBound <= 90. /*Bins = 0.1 ns*/ && loopctr < 4)
+                    {
+                        // Redo, start from beginning, with lower threshold for "peak" acceptance.
+                        j = proj->GetNbinsX() - 2;
+                        PartMax = PartMax * 0.6; // lower threshold, do as many times until noise peak is no longer
+                                                 // considered "Data-peak"
+                        Redo = true;
+                        loopctr++;
+                    }
+                    else
+                    {
+                        R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
+                        par->SetGainDown(proj->GetBinCenter(j));
 
-                    cout << fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j) << endl;
-
-                    break;
+                        R3BLOG(INFO, fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j));
+                        if (Redo == true)
+                        {
+                            PartMax = proj->GetMaximum() * PercentOfMax;
+                            Redo = false;
+                        }
+                        break;
+                    }
                 }
             }
             // gain top MAPMT
             TH1D* proj1 = fh_ToT_top_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
+            Double_t PartMax1 = proj1->GetMaximum() * PercentOfMax;
+            Int_t LowerBound1 = proj1->FindFirstBinAbove(PartMax1, 1);
+            Redo = false;
+            loopctr = 0;
             for (UInt_t j = proj1->GetNbinsX() - 2; j > 2; j--)
             {
                 if (j == 2)
                 {
                     // could not find maximum
                 }
-                if (proj1->GetBinContent(j) > proj1->GetMaximum() * 10. / 100.)
+                if (proj1->GetBinContent(j) > PartMax1)
                 {
-                    R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
-                    par1->SetGainUp(proj->GetBinCenter(j));
-
-                    cout << fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j) << endl;
-
-                    break;
+                    if (j - LowerBound1 <= 90. /*ns*/ && loopctr < 4)
+                    {
+                        // Redo, start from beginning, with lower threshold for "peak" acceptance.
+                        j = proj1->GetNbinsX() - 2;
+                        PartMax1 = PartMax1 * 0.6; // lower threshold, do as many times until noise peak is no longer
+                                                   // considered "Data-peak"
+                        Redo = true;
+                        loopctr++;
+                    }
+                    else
+                    {
+                        R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
+                        par1->SetGainUp(proj1->GetBinCenter(j));
+                        R3BLOG(INFO, fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j));
+                        break;
+                    }
                 }
             }
+
             // time offset
             R3BFiberMAPMTHitModulePar* par2 = fCalPar->GetModuleParAt(i);
             TH1D* proj2 = fh_dt_Fib_raw->ProjectionY("", i + 1, i + 1, 0);
@@ -600,8 +644,9 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
             TH1D* proj3 = fh_Fib_ToF_raw->ProjectionY("", i + 1, i + 1, 0);
             par3->SetSync(proj3->GetBinCenter(proj3->GetMaximumBin()));
 
-            cout << fName << " fiberId: " << i << ", offset: " << 0.5 * proj2->GetBinCenter(proj2->GetMaximumBin())
-                 << ", sync: " << proj3->GetBinCenter(proj3->GetMaximumBin()) << endl;
+            R3BLOG(INFO,
+                   fName << " fiberId: " << i << ", offset: " << 0.5 * proj2->GetBinCenter(proj2->GetMaximumBin())
+                         << ", sync: " << proj3->GetBinCenter(proj3->GetMaximumBin()));
         }
 
         fCalPar->setChanged();

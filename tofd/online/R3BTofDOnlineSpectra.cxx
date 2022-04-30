@@ -527,7 +527,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
         {
             char strNameLos_c[255];
             sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
-            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, -200, 200);
+            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, 0, 60);
             fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
             fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF [ns]");
             fh_tofd_time_los_h2[i]->GetXaxis()->CenterTitle(true);
@@ -543,7 +543,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
                 sprintf(strNameLos, "tofd-los_timediff_bar_%d_plane_%d", j + 1, i + 1);
                 char strNameLos2[255];
                 sprintf(strNameLos2, "Tofd_time - Los_time bar %d plane %d", j + 1, i + 1);
-                fh_tofd_time_los[j][i] = new TH1F(strNameLos, strNameLos2, 20000, -200, 200);
+                fh_tofd_time_los[j][i] = new TH1F(strNameLos, strNameLos2, 20000, 0, 60);
                 fh_tofd_time_los[j][i]->GetXaxis()->SetTitle("ToF [ns]");
                 fh_tofd_time_los[j][i]->GetYaxis()->SetTitle("counts");
                 fh_tofd_time_los[j][i]->SetFillColor(31);

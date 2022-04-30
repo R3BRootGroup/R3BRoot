@@ -13,19 +13,67 @@
 
 #include "R3BTimeStitch.h"
 #include "R3BLogger.h"
+
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 
+// Standard constructur
 R3BTimeStitch::R3BTimeStitch()
-    : fRange(2048 * 5) // ns
+    : fRange1(2048 * 5.)        // ns
+    , fRange2(2048 * 5.)        // ns
+    , fRangeTamex(2048 * 5.)    // ns
+    , fRangeTrb(2048 * 5.)      // ns
+    , fRangeVftx(8192 * 5.)     // ns
+    , fRangeClockTDC(4096 * 5.) // ns
 {
 }
 
 Double_t R3BTimeStitch::GetTime(Double_t time) const
 {
- // R3BLOG_IF(ERROR, IS_NAN(time), "Providing NaN time!");
- R3BLOG(DEBUG, "Time: " << time << " , range: " << fRange);
- return fmod(time + fRange + fRange / 2., fRange) - fRange / 2.;
+    // R3BLOG_IF(ERROR, IS_NAN(time), "Providing NaN time!");
+    R3BLOG(DEBUG, "Time: " << time << " , range1: " << fRange1 << " , range2: " << fRange2);
+    return fmod(time + fRange2 + fRange1 / 2., fRange1) - fRange1 / 2.;
+}
+
+Double_t R3BTimeStitch::GetTime(Double_t time, TString name1, TString name2)
+{
+    if (name1 == "tamex")
+    {
+        fRange1 = fRangeTamex;
+    }
+    else if (name1 == "trb")
+    {
+        fRange1 = fRangeTrb;
+    }
+    else if (name1 == "vftx")
+    {
+        fRange1 = fRangeVftx;
+    }
+    else if (name1 == "clocktdc")
+    {
+        fRange1 = fRangeClockTDC;
+    }
+
+    if (name2 == "tamex")
+    {
+        fRange2 = fRangeTamex;
+    }
+    else if (name1 == "trb")
+    {
+        fRange2 = fRangeTrb;
+    }
+    else if (name2 == "vftx")
+    {
+        fRange2 = fRangeVftx;
+    }
+    else if (name2 == "clocktdc")
+    {
+        fRange2 = fRangeClockTDC;
+    }
+
+    R3BLOG(DEBUG,
+           "Time: " << time << " , range1(" << name1 << "): " << fRange1 << " , range2(" << name1 << "): " << fRange2);
+    return fmod(time + fRange2 + fRange1 / 2., fRange1) - fRange1 / 2.;
 }
 
 ClassImp(R3BTimeStitch);
