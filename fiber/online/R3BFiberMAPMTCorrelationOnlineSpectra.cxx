@@ -55,6 +55,7 @@ R3BFiberMAPMTCorrelationOnlineSpectra::R3BFiberMAPMTCorrelationOnlineSpectra(con
     , fHitItems1(NULL)
     , fHitItems2(NULL)
     , fNbfibers1(512)
+    , fNbfibers2(512)
 {
 }
 
@@ -82,8 +83,8 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::SetParContainers()
     R3BLOG_IF(ERROR, !fMapPar2, "Couldn't get " << fName2 << "MappingPar");
     if (fMapPar2)
     {
-        fNbfibers1 = fMapPar2->GetNbChannels();
-        R3BLOG(INFO, fName2 << "MappingPar found with " << fNbfibers1 << " fibers");
+        fNbfibers2 = fMapPar2->GetNbChannels();
+        R3BLOG(INFO, fName2 << "MappingPar found with " << fNbfibers2 << " fibers");
     }
 }
 
@@ -135,14 +136,14 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
         // Position X
         fh_Fib_posX = new TH2F(fName1 + "_" + fName2 + "Hit_posX",
                                fName1 + "_" + fName2 + " Hit X position",
-                               600,
-                               -300,
-                               300,
-                               800,
-                               -400,
-                               400);
-        fh_Fib_posX->GetXaxis()->SetTitle(fName1 + " X position");
-        fh_Fib_posX->GetYaxis()->SetTitle(fName2 + " X position");
+                               fNbfibers1,
+                               -25.6,
+                               25.6,
+                               fNbfibers2,
+                               -25.6,
+                               25.6);
+        fh_Fib_posX->GetXaxis()->SetTitle(fName1 + " X position [cm]");
+        fh_Fib_posX->GetYaxis()->SetTitle(fName2 + " X position [cm]");
         fh_Fib_posX->GetYaxis()->SetTitleOffset(1.02);
         fh_Fib_posX->GetXaxis()->CenterTitle(true);
         fh_Fib_posX->GetYaxis()->CenterTitle(true);
@@ -150,14 +151,14 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
         // Position Y
         fh_Fib_posY = new TH2F(fName1 + "_" + fName2 + "Hit_posY",
                                fName1 + "_" + fName2 + " Hit Y position",
-                               600,
-                               -300,
-                               300,
-                               800,
-                               -400,
-                               400);
-        fh_Fib_posY->GetXaxis()->SetTitle(fName1 + " Y position");
-        fh_Fib_posY->GetYaxis()->SetTitle(fName2 + " Y position");
+                               fNbfibers1,
+                               -25.6,
+                               25.6,
+                               fNbfibers2,
+                               -25.6,
+                               25.6);
+        fh_Fib_posY->GetXaxis()->SetTitle(fName1 + " Y position [cm]");
+        fh_Fib_posY->GetYaxis()->SetTitle(fName2 + " Y position [cm]");
         fh_Fib_posY->GetYaxis()->SetTitleOffset(1.02);
         fh_Fib_posY->GetXaxis()->CenterTitle(true);
         fh_Fib_posY->GetYaxis()->CenterTitle(true);

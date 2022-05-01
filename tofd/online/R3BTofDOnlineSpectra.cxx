@@ -628,8 +628,14 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
     {
         Int_t nMapped = fMappedItems->GetEntriesFast();
         Int_t iPlaneMem = 1, iBarMem = 0;
-        Int_t nsum_top[fNofPlanes] = { 0 };
-        Int_t nsum_bot[fNofPlanes] = { 0 };
+
+        Int_t nsum_top[fNofPlanes];
+        Int_t nsum_bot[fNofPlanes];
+        for (Int_t p = 0; p < fNofPlanes; p++)
+        {
+            nsum_top[p] = 0;
+            nsum_bot[p] = 0;
+        }
 
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
