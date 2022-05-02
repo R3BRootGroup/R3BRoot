@@ -39,6 +39,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
+#include "R3BTimeStitch.h"
 #include "R3BTofDMappingPar.h"
 #include "R3BTofDOnlineSpectra.h"
 #include "R3BTofdCalData.h"
@@ -74,7 +75,9 @@ R3BTofDOnlineSpectra::R3BTofDOnlineSpectra(const TString& name, Int_t iVerbose)
     , fMappedItems(NULL)
     , fCalItems(NULL)
     , fHitItems(NULL)
+    , fTimeStitch(nullptr)
     , fMapPar(NULL)
+    , fMaxmul(100)
 {
 }
 
@@ -388,7 +391,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
             sprintf(strName7, "tofd_hit_multihit_plane_%d", j + 1);
             char strName8[255];
             sprintf(strName8, "Tofd hit multihit plane %d", j + 1);
-            fh_tofd_multihit_hit[j] = new TH1F(strName7, strName8, 100, 0, 100);
+            fh_tofd_multihit_hit[j] = new TH1F(strName7, strName8, fMaxmul, 0, fMaxmul);
             fh_tofd_multihit_hit[j]->GetYaxis()->SetTitle("Counts");
             fh_tofd_multihit_hit[j]->GetXaxis()->SetTitle("Multihit");
             fh_tofd_multihit_hit[j]->GetYaxis()->SetTitleOffset(1.);
@@ -560,6 +563,9 @@ InitStatus R3BTofDOnlineSpectra::Init()
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_TofD_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
+
     return kSUCCESS;
 }
 
@@ -686,7 +692,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
         UInt_t vmultihits[fNofPlanes + 1][fPaddlesPerPlane];
         UInt_t vmultihits_top[fNofPlanes + 1][fPaddlesPerPlane];
         UInt_t vmultihits_bot[fNofPlanes + 1][fPaddlesPerPlane];
-        Double_t time_bar[fNofPlanes + 1][fPaddlesPerPlane][100];
+        Double_t time_bar[fNofPlanes + 1][fPaddlesPerPlane][fMaxmul];
         for (Int_t i = 0; i < fNofPlanes + 1; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
@@ -694,7 +700,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 vmultihits[i][j] = 0;
                 vmultihits_top[i][j] = 0;
                 vmultihits_bot[i][j] = 0;
-                for (Int_t l = 0; l < 100; l++)
+                for (Int_t l = 0; l < fMaxmul; l++)
                 {
                     time_bar[i][j][l] = 0. / 0.;
                 }
@@ -786,7 +792,6 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                 vmultihits_top[iPlane - 1][iBar - 1] += 1;
-
                 ++top_i;
             }
 
@@ -894,12 +899,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
                 // Shift the cyclic difference window by half a window-length and move it back,
                 // this way the trigger time will be at 0.
-                auto topc_ns =
-                    fmod(topc->GetTimeLeading_ns() - topc_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
-                    c_range_ns / 2;
-                auto botc_ns =
-                    fmod(botc->GetTimeLeading_ns() - botc_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
-                    c_range_ns / 2;
+                auto topc_ns = fTimeStitch->GetTime(topc->GetTimeLeading_ns() - topc_trig_ns);
+                auto botc_ns = fTimeStitch->GetTime(botc->GetTimeLeading_ns() - botc_trig_ns);
 
                 auto dt = topc_ns - botc_ns;
                 // Handle wrap-around.
@@ -932,14 +933,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                         continue;
                     }
 
-                    auto topc_tot =
-                        fmod(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns() + c_range_ns + c_range_ns / 2,
-                             c_range_ns) -
-                        c_range_ns / 2;
-                    auto botc_tot =
-                        fmod(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns() + c_range_ns + c_range_ns / 2,
-                             c_range_ns) -
-                        c_range_ns / 2;
+                    auto topc_tot = fTimeStitch->GetTime(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns());
+                    auto botc_tot = fTimeStitch->GetTime(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns());
 
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, botc_tot);
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, topc_tot);
@@ -977,10 +972,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                         for (Int_t imult2 = 0; imult2 < vmultihits[ipl - 1][ibr - 1]; imult2++)
                         {
                             Double_t tof_plane = 0. / 0.;
-                            tof_plane = fmod(time_bar[ipl][ibr - 1][imult1] - time_bar[ipl - 1][ibr - 1][imult2] +
-                                                 c_range_ns + c_range_ns / 2,
-                                             c_range_ns) -
-                                        c_range_ns / 2;
+                            tof_plane = fTimeStitch->GetTime(time_bar[ipl][ibr - 1][imult1] -
+                                                             time_bar[ipl - 1][ibr - 1][imult2]);
                             fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
                         }
                     }
@@ -992,16 +985,15 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
     if (fHitItems)
     {
-        Int_t maxmul = 100;
         Int_t nHits = fHitItems->GetEntriesFast();
-        if (nHits > maxmul)
+        if (nHits > fMaxmul)
             return;
 
-        Double_t x[fNofPlanes][maxmul], y[fNofPlanes][maxmul], t[fNofPlanes][maxmul], q[fNofPlanes][maxmul],
-            bar[fNofPlanes][maxmul];
+        Double_t x[fNofPlanes][fMaxmul], y[fNofPlanes][fMaxmul], t[fNofPlanes][fMaxmul], q[fNofPlanes][fMaxmul],
+            bar[fNofPlanes][fMaxmul];
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
-            for (Int_t k = 0; k < maxmul; k++)
+            for (Int_t k = 0; k < fMaxmul; k++)
             {
                 x[i][k] = -1000.;
                 y[i][k] = -1000.;
@@ -1049,8 +1041,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     for (Int_t im2 = 0; im2 < iCounts[i - 1]; im2++)
                     {
-                        Double_t tdif =
-                            fmod(t[i][im1] - t[i - 1][im2] + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+                        Double_t tdif = fTimeStitch->GetTime(t[i][im1] - t[i - 1][im2]);
                         fh_tofd_dt_hit[i - 1]->Fill(bar[i][im1], tdif);
                     }
                 }

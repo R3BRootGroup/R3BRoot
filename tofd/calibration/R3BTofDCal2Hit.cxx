@@ -60,6 +60,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
+    , fTimeStitch(nullptr)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitPars(0)
     , fHitPar(NULL)
@@ -491,7 +492,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     pos = posToT;
                 }
 
-                Float_t paddle_width = 2.70000;
+                Float_t paddle_width = 2.700;
                 Float_t air_gap_paddles = 0.04;
                 Float_t air_gap_layer = 5.;
                 Float_t detector_width =

@@ -27,6 +27,7 @@
 class TClonesArray;
 class TH1F;
 class TH2F;
+class R3BTimeStitch;
 class R3BEventHeader;
 class R3BTofDMappingPar;
 
@@ -86,8 +87,8 @@ class R3BTofDOnlineSpectra : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat1, Int_t tpat2)
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    void SetTpat(Int_t tpat1, Int_t tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
@@ -96,14 +97,17 @@ class R3BTofDOnlineSpectra : public FairTask
     /**
      * Methods for setting number of planes and paddles
      */
-    inline void SetNofModules(Int_t planes, Int_t p)
+    void SetNofModules(Int_t planes, Int_t p)
     {
         fNofPlanes = planes;
         fPaddlesPerPlane = p;
     }
 
+    void SetMaxMult(Int_t m) { fMaxmul = m; }
+
   private:
     void SetParameter();
+    R3BTimeStitch* fTimeStitch;
     TClonesArray* fMappedItems;
     TClonesArray* fCalItems;
     TClonesArray* fHitItems;
@@ -115,6 +119,7 @@ class R3BTofDOnlineSpectra : public FairTask
     Int_t fTrigger; /**< Trigger value. */
     Int_t fTpat1, fTpat2;
     UInt_t fNofPlanes;
+    Int_t fMaxmul;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
     unsigned long fNEvents;  /**< Event counter. */
 
@@ -138,4 +143,4 @@ class R3BTofDOnlineSpectra : public FairTask
     ClassDef(R3BTofDOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BTofDOnlineSpectra_H */
