@@ -216,6 +216,8 @@ twimData/R3BTwimMappedData.cxx
 twimData/R3BTwimCalData.cxx
 twimData/R3BTwimHitData.cxx
 musliData/R3BMusliMappedData.cxx
+musliData/R3BMusliCalData.cxx
+musliData/R3BMusliHitData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
