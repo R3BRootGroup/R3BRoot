@@ -82,7 +82,7 @@ class R3BTwimCalPar : public FairParGenericSet
     void SetPosParams(Float_t val, Int_t sec, Int_t anode, Int_t indexpar)
     {
         // 1-base
-        int index = (anode - 1) * fNumParamsEFit + indexpar - 1;
+        int index = (anode - 1) * fNumParamsPosFit + indexpar - 1;
         fAnodePosCalParams[sec - 1]->AddAt(val, index);
     }
 

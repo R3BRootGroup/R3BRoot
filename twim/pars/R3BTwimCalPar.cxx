@@ -190,9 +190,10 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         }
     }
 
+    Int_t array_e = fNumAnodes * fNumParamsEFit;
     for (Int_t s = 0; s < fNumSections; s++)
     {
-        fAnodeECalParams[s]->Set(fNumAnodes);
+        fAnodeECalParams[s]->Set(array_e);
         sprintf(name, "twimSec%dCalEPar", s + 1);
         if (!(list->fill(name, fAnodeECalParams[s])))
         {
@@ -201,9 +202,10 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         }
     }
 
+    Int_t array_pos = fNumAnodes * fNumParamsPosFit;
     for (Int_t s = 0; s < fNumSections; s++)
     {
-        fAnodePosCalParams[s]->Set(fNumAnodes);
+        fAnodePosCalParams[s]->Set(array_pos);
         sprintf(name, "twimSec%dPosPar", s + 1);
         if (!(list->fill(name, fAnodePosCalParams[s])))
         {
