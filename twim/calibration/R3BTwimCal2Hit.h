@@ -62,6 +62,8 @@ class R3BTwimCal2Hit : public FairTask
 
   private:
     void SetParameter();
+    /** Private method Experiment s4551 => s455+fission **/
+    virtual void S4551();
     /** Private method Experiment s455 **/
     virtual void S455();
     /** Private method Experiment s467 **/
@@ -73,13 +75,16 @@ class R3BTwimCal2Hit : public FairTask
     Int_t fNumSec; // Number of sections
     Int_t fNumAnodes;
     Int_t fNumAnodesAngleFit;
+    Int_t fNumParamsTof;
     Int_t fNumParams;
     Int_t fMaxEnergyperanode;
-    Float_t fZ0[4], fZ1[4], fZ2[4];
+    Float_t fZ0[4], fZ1[4], fZ2[4], fZ3[4];
     Int_t StatusAnodes[4][16]; // Sections and anodes
     Double_t fPosAnodes[16];   // Position-Z of each anode
     TArrayF* CalZTofParams;
     TArrayF* CalZParams;
+    Float_t fEmean_tof[4];
+    Float_t fEmean_dt[4];
     TVectorD fPosZ;
 
     R3BTwimHitPar* fCal_Par;      /**< Parameter container. >*/

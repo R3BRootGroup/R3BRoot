@@ -50,6 +50,8 @@ class R3BTsplinePar : public TObject
     UInt_t fMaxPoints;
     TSpline3* fSpline;
     TString fSplineName;
+    Double_t fxmin;
+    Double_t fxmax;
 
   public:
     ClassDef(R3BTsplinePar, 0);

@@ -1,3 +1,4 @@
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -23,13 +24,16 @@
 #include "FairParamList.h"
 
 #include "TArrayF.h"
+#include "TF1.h"
 #include "TMath.h"
 
 // -----   Default constructor   -----------------------------------------------
 R3BTsplinePar::R3BTsplinePar(const TString& name)
     : fSplineName(name)
     , fSpline(NULL)
-    , fMaxPoints(100)
+    , fMaxPoints(4000) // 100
+    , fxmin(-100.50)
+    , fxmax(1030)
 {
     // fSpline = new TSpline3();
 }
@@ -39,16 +43,26 @@ void R3BTsplinePar::putParams(FairParamList* list)
 {
     R3BLOG(INFO, "called for " << fSpline->GetNp() << " points");
 
-    TArrayF* p = new TArrayF(2);
+    TArrayF* p = new TArrayF(5);
+    // TArrayF* q = new TArrayF(3);
     for (int n = 0; n < fSpline->GetNp(); n++)
     {
         Double_t a[2];
+        Double_t b[6];
         fSpline->GetKnot(n, a[0], a[1]);
-
+        fSpline->GetCoeff(n, b[0], b[1], b[2], b[3], b[4]);
         TString name = fSplineName + "Point" + n;
         p->AddAt(a[0], 0);
         p->AddAt(a[1], 1);
+        p->AddAt(b[2], 2);
+        p->AddAt(b[3], 3);
+        p->AddAt(b[4], 4);
         list->add(name, *p);
+        /*TString namecoeff = fSplineName + "PointCoeff" + n;
+        q->AddAt(b[0], 0);
+        q->AddAt(b[1], 1);
+        q->AddAt(b[2], 2);
+        list->add(namecoeff, *q);*/
     }
 }
 
@@ -56,22 +70,25 @@ void R3BTsplinePar::putParams(FairParamList* list)
 TSpline3* R3BTsplinePar::getParams(FairParamList* list)
 {
     R3BLOG(INFO, "called");
-
-    TArrayF* p = new TArrayF(2);
+    // if (fSpline == NULL)
+    fSpline = new TSpline3("spline_func", fxmin, fxmax, (TF1*)0, fMaxPoints);
+    TArrayF* p = new TArrayF(5);
+    // TArrayF* q = new TArrayF(3);
     for (int n = 0; n < fMaxPoints; n++)
     {
         TString name = fSplineName + "Point" + n;
+        // TString namecoeff = fSplineName + "PointCoeff" + n;
         if (list->fill(name, p))
         {
-            if (fSpline == NULL)
-                fSpline = new TSpline3();
             fSpline->SetPoint(n, p->GetAt(0), p->GetAt(1));
+            fSpline->SetPointCoeff(n, p->GetAt(2), p->GetAt(3), p->GetAt(4));
         }
         else
         {
             break;
         }
     }
+    // std::cout << "Np spline = " << fSpline->GetNp() << std::endl;
     return fSpline;
 }
 
@@ -85,8 +102,11 @@ void R3BTsplinePar::print()
         for (int n = 0; n < fSpline->GetNp(); n++)
         {
             Double_t a[2];
+            Double_t b[6];
             fSpline->GetKnot(n, a[0], a[1]);
+            fSpline->GetCoeff(n, b[0], b[1], b[2], b[3], b[4]);
             LOG(INFO) << "CutPoint" << n << ": " << a[0] << " ; " << a[1];
+            LOG(INFO) << "CutPoint" << n << ": " << b[0] << " ; " << b[1] << " ; " << b[2];
         }
     }
     else
