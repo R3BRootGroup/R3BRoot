@@ -25,6 +25,8 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/musli
 ${R3BROOT_SOURCE_DIR}/musli/online
+${R3BROOT_SOURCE_DIR}/musli/pars
+${R3BROOT_SOURCE_DIR}/musli/calibration
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 )
@@ -37,6 +39,8 @@ set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR} )
 link_directories( ${LINK_DIRECTORIES})
 
 file(GLOB SRCS 
+./pars/*.cxx
+./calibration/*.cxx
 ./online/*.cxx
 )
 
