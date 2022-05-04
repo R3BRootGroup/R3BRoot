@@ -237,6 +237,8 @@ void R3BTwimCal2Hit::S4551()
     // Reset entries in output arrays, local arrays
     Reset();
 
+#ifdef SOFIA
+
     Int_t nHitTwim = fTwimCalDataCA->GetEntries();
     Int_t nHitTofW = fHitItemsTofW->GetEntries();
 
@@ -432,7 +434,7 @@ void R3BTwimCal2Hit::S4551()
         if (HitTofW)
             delete[] HitTofW;
     } // if nHitTofW == 2
-
+#endif
     return;
 }
 
