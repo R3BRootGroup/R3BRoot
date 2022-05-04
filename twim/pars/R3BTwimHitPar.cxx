@@ -31,7 +31,7 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BTwimHitPar::R3BTwimHitPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumParamsZFit(3)
+    , fNumParamsZFit(4)
     , fNumAnodes(16)
     , fNumSec(4)
 {
@@ -40,6 +40,18 @@ R3BTwimHitPar::R3BTwimHitPar(const char* name, const char* title, const char* co
     fAnode_pos = new TArrayF(fNumAnodes * fNumSec);
     // left and right + up and down --> 4
     fTofHitParams = new TArrayF(fNumSec * 3);
+    fEmean_tof.resize(fNumSec);
+    fEmean_dt.resize(fNumSec);
+    fSpline.resize(fNumSec);
+    char spline_name[200];
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        sprintf(spline_name, "spline%d", s + 1);
+        fSpline[s] = new R3BTsplinePar(spline_name);
+        fEmean_tof[s] = 0.;
+        fEmean_dt[s] = 0.;
+    }
+    // fSpline = new R3BTsplinePar("TwimSpline");
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -54,6 +66,12 @@ R3BTwimHitPar::~R3BTwimHitPar()
         delete fDetZHitParams;
     if (fTofHitParams)
         delete fTofHitParams;
+
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        if (fSpline[s])
+            delete fSpline[s];
+    }
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -90,6 +108,23 @@ void R3BTwimHitPar::putParams(FairParamList* list)
     // fTofHitParams->Set(2 * 28 * 3);
     fTofHitParams->Set(fNumSec * 3);
     list->add("twimvstofHitPar", *fTofHitParams);
+
+    fSpline.resize(fNumSec);
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        fSpline[s]->putParams(list);
+    }
+    fEmean_tof.resize(fNumSec);
+    fEmean_dt.resize(fNumSec);
+    char nametof[300];
+    char namedt[300];
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        sprintf(nametof, "Emean_tof%d", s + 1);
+        sprintf(namedt, "Emean_dt%d", s + 1);
+        list->add(nametof, fEmean_tof[s]);
+        list->add(namedt, fEmean_dt[s]);
+    }
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -151,6 +186,32 @@ Bool_t R3BTwimHitPar::getParams(FairParamList* list)
         LOG(WARNING) << "Could not initialize twimvstofHitPar";
         // return kFALSE;
     }
+    fSpline.resize(fNumSec);
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        fSpline[s]->getParams(list);
+        ////std::cout << "Eval tspliine = " << fSpline[s]->Eval(-35);
+    }
+
+    fEmean_tof.resize(fNumSec);
+    fEmean_dt.resize(fNumSec);
+    char nametof[300];
+    char namedt[300];
+    for (Int_t s = 0; s < fNumSec; s++)
+    {
+        sprintf(nametof, "Emean_tof%d", s + 1);
+        sprintf(namedt, "Emean_dt%d", s + 1);
+        if (!(list->fill(nametof, &fEmean_tof[s])))
+        {
+            LOG(ERROR) << "Could not initialize " << nametof;
+            return kFALSE;
+        }
+        if (!(list->fill(namedt, &fEmean_dt[s])))
+        {
+            LOG(ERROR) << "Could not initialize " << namedt;
+            return kFALSE;
+        }
+    }
 
     return kTRUE;
 }
@@ -184,6 +245,7 @@ void R3BTwimHitPar::printParams()
     }
 
     if (fTofHitParams)
+    {
         for (Int_t s = 0; s < fNumSec; s++)
         {
             LOG(INFO) << "Section = " << s + 1;
@@ -195,6 +257,7 @@ void R3BTwimHitPar::printParams()
                 LOG(INFO) << "FitParam(" << j << ") = " << fTofHitParams->GetAt(j + s * 3);
             }
         }
+    }
 }
 
 ClassImp(R3BTwimHitPar);

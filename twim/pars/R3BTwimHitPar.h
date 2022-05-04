@@ -20,12 +20,23 @@
 #define R3BTwimHitPar_H 1
 
 #include "FairParGenericSet.h"
-#include "TObject.h"
-
+#include "R3BTsplinePar.h"
 #include "TArrayF.h"
 #include "TArrayI.h"
 #include "TObjArray.h"
+#include "TObject.h"
+#include "TSpline.h"
 #include <TObjString.h>
+#include <vector>
+
+#include "FairDetParIo.h"
+#include "FairLogger.h"
+#include "FairParamList.h"
+#include "TArrayF.h"
+#include "TMath.h"
+#include "TString.h"
+
+#include <iostream>
 
 class FairParamList;
 
@@ -59,8 +70,11 @@ class R3BTwimHitPar : public FairParGenericSet
     const Int_t GetNumAnodes() { return fNumAnodes; }
     const Int_t GetInUse(Int_t sec, Int_t anode) { return fIn_use->GetAt((sec - 1) * 16 + anode - 1); }
     const Float_t GetAnodePos(Int_t anode) { return fAnode_pos->GetAt(anode - 1); }
+    Float_t GetEmean_tof(Int_t sec) { return fEmean_tof[sec - 1]; }
+    Float_t GetEmean_dt(Int_t sec) { return fEmean_dt[sec - 1]; }
     TArrayF* GetZHitPar() { return fDetZHitParams; }
     TArrayF* GetZTofHitPar() { return fTofHitParams; }
+    TSpline3* GetSpline(Int_t sec) { return fSpline[sec - 1]->GetSpline(); }
 
     TArrayF* GetTofCorrectionPar(Int_t sectwim)
     {
@@ -79,6 +93,9 @@ class R3BTwimHitPar : public FairParGenericSet
     void SetZHitPar(Double_t cc, Int_t ii) { fDetZHitParams->AddAt(cc, ii); }
     void SetZTofHitPar(Double_t cc, Int_t ii) { fTofHitParams->AddAt(cc, ii); }
     void SetAnodePos(Float_t value, Int_t anode) { fAnode_pos->AddAt(value, anode - 1); }
+    void SetEmean_tofParam(Float_t val, Int_t sec) { fEmean_tof[sec - 1] = val; }
+    void SetEmean_dtParam(Float_t val, Int_t sec) { fEmean_dt[sec - 1] = val; }
+    void SetSpline(TSpline3* spline, Int_t nbsec) { fSpline[nbsec - 1]->SetSpline(spline); }
 
     void SetTofCorrectionPar(Float_t value[3], Int_t sectwim)
     {
@@ -98,6 +115,11 @@ class R3BTwimHitPar : public FairParGenericSet
     Int_t fNumSec;
     Int_t fNumAnodes;     // Number of anodes
     Int_t fNumParamsZFit; // number of hit parameters in the fit for charge Z
+
+    std::vector<Float_t> fEmean_tof;
+    std::vector<Float_t> fEmean_dt;
+
+    std::vector<R3BTsplinePar*> fSpline;
 
     const R3BTwimHitPar& operator=(const R3BTwimHitPar&); /*< an assignment operator>*/
     R3BTwimHitPar(const R3BTwimHitPar&);                  /*< a copy constructor >*/
