@@ -76,6 +76,12 @@ class R3BTofDOnlineSpectra : public FairTask
      */
     virtual void FinishEvent();
 
+    /**
+     * Method for finish of the task execution.
+     * Is called by the framework after processing the event loop.
+     */
+    virtual void FinishTask();
+
     virtual void SetParContainers();
 
     /**
@@ -105,6 +111,10 @@ class R3BTofDOnlineSpectra : public FairTask
 
     void SetMaxMult(Int_t m) { fMaxmul = m; }
 
+    void SetClockRange(Double_t r) { fC_range_ns = r; }
+
+    void SetClockCoincidenceRange(Double_t r) { fC_bar_coincidence_ns = r; }
+
   private:
     void SetParameter();
     R3BTimeStitch* fTimeStitch;
@@ -121,7 +131,9 @@ class R3BTofDOnlineSpectra : public FairTask
     UInt_t fNofPlanes;
     Int_t fMaxmul;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
-    unsigned long fNEvents;  /**< Event counter. */
+    Double_t fC_range_ns;
+    Double_t fC_bar_coincidence_ns;
+    unsigned long fNEvents; /**< Event counter. */
 
     std::vector<TH1F*> fh_tofd_channels;
     std::vector<TH2F*> fh_tofd_multihit;

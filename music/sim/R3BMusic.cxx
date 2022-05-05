@@ -15,35 +15,22 @@
 // -----                        R3BMusic source file                   -----
 // -----                  Created 08/10/19  by JL Rodriguez            -----
 // -------------------------------------------------------------------------
-#include "R3BMusic.h"
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
-#include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
+
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
-#include "FairRuntimeDb.h"
 #include "FairVolume.h"
+
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
+#include "R3BMusic.h"
 #include "R3BMusicPoint.h"
+
 #include "TClonesArray.h"
-#include "TGeoCompositeShape.h"
-#include "TGeoMCGeometry.h"
 #include "TGeoManager.h"
-#include "TGeoMaterial.h"
-#include "TGeoMatrix.h"
-#include "TGeoMedium.h"
-#include "TMCProcess.h"
-#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TVirtualMCStack.h"
-#include <iostream>
-#include <stdlib.h>
-
-using std::cerr;
-using std::cout;
-using std::endl;
 
 #define U_MEV 931.4940954
 
@@ -63,19 +50,12 @@ R3BMusic::R3BMusic(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BMusic", kMUSIC, geoFile, combi)
     , fMusicCollection(new TClonesArray("R3BMusicPoint"))
     , fPosIndex(0)
-    , kGeoSaved(kFALSE)
-    , flGeoPar(new TList())
 {
-    flGeoPar->SetName(GetName());
     ResetParameters();
 }
 
 R3BMusic::~R3BMusic()
 {
-    if (flGeoPar)
-    {
-        delete flGeoPar;
-    }
     if (fMusicCollection)
     {
         fMusicCollection->Delete();
@@ -87,8 +67,8 @@ void R3BMusic::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BMusic: initialisation";
-    LOG(DEBUG) << "-I- R3BMusic: Vol (McId) def" << gMC->VolId("Anode");
+    R3BLOG(INFO, "");
+    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Anode"));
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -169,9 +149,6 @@ Bool_t R3BMusic::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BMusic::BeginEvent() {}
-
-// -----   Public method EndOfEvent   -----------------------------------------
 void R3BMusic::EndOfEvent()
 {
     if (fVerboseLevel)
@@ -182,7 +159,11 @@ void R3BMusic::EndOfEvent()
 }
 
 // -----   Public method Register   -------------------------------------------
-void R3BMusic::Register() { FairRootManager::Instance()->Register("MusicPoint", GetName(), fMusicCollection, kTRUE); }
+void R3BMusic::Register()
+{
+    R3BLOG(DEBUG, "");
+    FairRootManager::Instance()->Register("MusicPoint", GetName(), fMusicCollection, kTRUE);
+}
 
 // -----   Public method GetCollection   --------------------------------------
 TClonesArray* R3BMusic::GetCollection(Int_t iColl) const
@@ -211,7 +192,7 @@ void R3BMusic::Reset()
 void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BMusic: " << nEntries << " entries to add";
+    R3BLOG(INFO, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BMusicPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -222,7 +203,7 @@ void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BMusicPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BMusic: " << cl2->GetEntriesFast() << " merged entries";
+    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -242,8 +223,11 @@ R3BMusicPoint* R3BMusic::AddPoint(Int_t trackID,
     TClonesArray& clref = *fMusicCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BMusic: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+    {
+        R3BLOG(INFO,
+               "at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
+                      << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
+    }
     return new (clref[size])
         R3BMusicPoint(trackID, detID, volid, Z, A, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -253,10 +237,10 @@ Bool_t R3BMusic::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Anode"))
     {
-        LOG(INFO) << "Found MUSIC geometry from ROOT file: " << name;
+        LOG(DEBUG) << "Found MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;
 }
 
-ClassImp(R3BMusic)
+ClassImp(R3BMusic);

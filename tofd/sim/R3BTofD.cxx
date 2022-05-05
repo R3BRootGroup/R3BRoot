@@ -11,19 +11,27 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// ---------------------------------------------------------------
+// -----                        R3BTofD                      -----
+// -----          Created 18/03/2022 by J.L. Rodriguez       -----
+// -----          Updated 05/05/2022 by M. Feijoo            -----
+// ---------------------------------------------------------------
+
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
 #include "FairVolume.h"
 
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
 #include "R3BTofD.h"
 #include "R3BTofdPoint.h"
+
 #include "TClonesArray.h"
 #include "TGeoManager.h"
-#include "TGeoMedium.h"
-#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include "TVirtualMCStack.h"
 
 R3BTofD::R3BTofD()
     : R3BTofD("")
@@ -55,49 +63,47 @@ R3BTofD::~R3BTofD()
 void R3BTofD::Initialize()
 {
     FairDetector::Initialize();
-
-    LOG(INFO) << "R3BTofD: initialisation";
-    LOG(DEBUG) << "R3BTofD: Sci. Vol. (McId0) " << gMC->VolId("TOFdLog101");
+    R3BLOG(INFO, "");
+    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Paddle"));
 }
 
 void R3BTofD::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "R3BTofD: Adding customized Physics cut ... ";
-
+    R3BLOG(INFO, "");
     if (gGeoManager)
     {
-        TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
-        if (pSi && 1 == 0)
+        TGeoMedium* plastic = gGeoManager->GetMedium("plasticFormTOF");
+        if (plastic && 1 == 0)
         {
-            // Setting processes for Si only
-            gMC->Gstpar(pSi->GetId(), "LOSS", 3);
-            gMC->Gstpar(pSi->GetId(), "STRA", 1.0);
-            gMC->Gstpar(pSi->GetId(), "PAIR", 1.0);
-            gMC->Gstpar(pSi->GetId(), "COMP", 1.0);
-            gMC->Gstpar(pSi->GetId(), "PHOT", 1.0);
-            gMC->Gstpar(pSi->GetId(), "ANNI", 1.0);
-            gMC->Gstpar(pSi->GetId(), "BREM", 1.0);
-            gMC->Gstpar(pSi->GetId(), "HADR", 1.0);
-            gMC->Gstpar(pSi->GetId(), "DRAY", 1.0);
-            gMC->Gstpar(pSi->GetId(), "DCAY", 1.0);
-            gMC->Gstpar(pSi->GetId(), "MULS", 1.0);
-            gMC->Gstpar(pSi->GetId(), "RAYL", 1.0);
+            // Setting processes for plasticFormTOF only
+            gMC->Gstpar(plastic->GetId(), "LOSS", 3);
+            gMC->Gstpar(plastic->GetId(), "STRA", 1.0);
+            gMC->Gstpar(plastic->GetId(), "PAIR", 1.0);
+            gMC->Gstpar(plastic->GetId(), "COMP", 1.0);
+            gMC->Gstpar(plastic->GetId(), "PHOT", 1.0);
+            gMC->Gstpar(plastic->GetId(), "ANNI", 1.0);
+            gMC->Gstpar(plastic->GetId(), "BREM", 1.0);
+            gMC->Gstpar(plastic->GetId(), "HADR", 1.0);
+            gMC->Gstpar(plastic->GetId(), "DRAY", 1.0);
+            gMC->Gstpar(plastic->GetId(), "DCAY", 1.0);
+            gMC->Gstpar(plastic->GetId(), "MULS", 1.0);
+            gMC->Gstpar(plastic->GetId(), "RAYL", 1.0);
 
-            // Setting Energy-CutOff for Si Only
-            Double_t cutE = fCutE; // GeV-> 1 keV
+            // Setting Energy-CutOff for plasticFormTOF Only
+            Double_t cutE = fCutE; // GeV
 
-            LOG(INFO) << "R3BTofD: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
-            // Si
-            gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE);
-            gMC->Gstpar(pSi->GetId(), "CUTELE", cutE);
-            gMC->Gstpar(pSi->GetId(), "CUTNEU", cutE);
-            gMC->Gstpar(pSi->GetId(), "CUTHAD", cutE);
-            gMC->Gstpar(pSi->GetId(), "CUTMUO", cutE);
-            gMC->Gstpar(pSi->GetId(), "BCUTE", cutE);
-            gMC->Gstpar(pSi->GetId(), "BCUTM", cutE);
-            gMC->Gstpar(pSi->GetId(), "DCUTE", cutE);
-            gMC->Gstpar(pSi->GetId(), "DCUTM", cutE);
-            gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);
+            R3BLOG(INFO, "plasticFormTOF Medium Id " << plastic->GetId() << " Energy Cut-Off : " << cutE << " GeV");
+            // plastic
+            gMC->Gstpar(plastic->GetId(), "CUTGAM", cutE);
+            gMC->Gstpar(plastic->GetId(), "CUTELE", cutE);
+            gMC->Gstpar(plastic->GetId(), "CUTNEU", cutE);
+            gMC->Gstpar(plastic->GetId(), "CUTHAD", cutE);
+            gMC->Gstpar(plastic->GetId(), "CUTMUO", cutE);
+            gMC->Gstpar(plastic->GetId(), "BCUTE", cutE);
+            gMC->Gstpar(plastic->GetId(), "BCUTM", cutE);
+            gMC->Gstpar(plastic->GetId(), "DCUTE", cutE);
+            gMC->Gstpar(plastic->GetId(), "DCUTM", cutE);
+            gMC->Gstpar(plastic->GetId(), "PPCUTM", -1.);
         }
     } //! gGeoManager
 }
@@ -110,8 +116,6 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackEntering())
     {
         fELoss = 0.;
-        // fTime   = gMC->TrackTime() * 1.0e09;
-        // fLength = gMC->TrackLength();
         fTime_in = gMC->TrackTime() * 1.0e09;
         fLength_in = gMC->TrackLength();
         gMC->TrackPosition(fPosIn);
@@ -200,7 +204,11 @@ void R3BTofD::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BTofD::Register() { FairRootManager::Instance()->Register("TOFdPoint", GetName(), fTofdCollection, kTRUE); }
+void R3BTofD::Register()
+{
+    R3BLOG(DEBUG, "");
+    FairRootManager::Instance()->Register("TofDPoint", GetName(), fTofdCollection, kTRUE);
+}
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -233,7 +241,7 @@ void R3BTofD::Reset()
 void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTofD: " << nEntries << " entries to add";
+    R3BLOG(INFO, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BTofdPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -244,7 +252,7 @@ void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTofD: " << cl2->GetEntriesFast() << " merged entries";
+    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -262,16 +270,18 @@ R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BTofD: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+        R3BLOG(INFO,
+               "at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
+                      << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }
     return new (clref[size]) R3BTofdPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
 Bool_t R3BTofD::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("TOFdLog"))
+    if (TString(name).Contains("Paddle"))
     {
+        LOG(DEBUG) << "Found TofD geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

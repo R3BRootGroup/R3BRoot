@@ -33,6 +33,7 @@
 
 #include "TCanvas.h"
 #include "TClonesArray.h"
+#include "TFolder.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -40,12 +41,7 @@
 #include "TMath.h"
 #include <TRandom3.h>
 #include <algorithm>
-#include <array>
-#include <cassert>
-#include <fstream>
-#include <iostream>
 #include <map>
-#include <sstream>
 #include <vector>
 
 #define IS_NAN(x) TMath::IsNaN(x)

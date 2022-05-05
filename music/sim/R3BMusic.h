@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BMusic_H
-#define R3BMusic_H
+#define R3BMusic_H 1
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
@@ -53,12 +53,6 @@ class R3BMusic : public R3BDetector
      *@param vol  Pointer to the active volume
      **/
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
-
-    /** Virtual method BeginEvent
-     **
-     ** Actions at the begin of the event
-     **/
-    virtual void BeginEvent();
 
     /** Virtual method EndOfEvent
      **
@@ -121,8 +115,6 @@ class R3BMusic : public R3BDetector
     Int_t fPosIndex;                //!
     Int_t fNSteps;                  //!  Number of steps in the active volume
     Double32_t fEinc;               //!  Total incident energy
-    Bool_t kGeoSaved;               //!
-    TList* flGeoPar;                //!
 
     TClonesArray* fMusicCollection; //!  The point collection
 

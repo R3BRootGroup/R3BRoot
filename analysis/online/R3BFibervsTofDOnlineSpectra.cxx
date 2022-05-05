@@ -30,6 +30,7 @@
 
 #include "TCanvas.h"
 #include "TClonesArray.h"
+#include "TFolder.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
