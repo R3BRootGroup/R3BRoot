@@ -15,12 +15,15 @@
 // MUSLI stands for MUSIC LIGHT ION
 // ----------------------------------------------------------------------------
 //   The Hit Data has the following structure
-//     UInt_t fNbAnodes;
-//            fNbAnodes=n, with n = 2, 4, 8, 16 mean signal on x anodes
+//     UInt_t fType;
+//            for fType = 1, 8 mean signals averaged on 2  anodes
+//            for fType = 2, 4 mean signals averaged on 4  anodes
+//            for fType = 3, 2 mean signals averaged on 8  anodes
+//            for fType = 4, 1 mean signal  averaged on 16 anodes
 //
 //     Double_t fE     = calculated with the sets of the data of fNbAnodes
 //     Double_t fZ;    = atomic charge from the average sum of the energy fEave
-//     Double_t fTheta = theta angle (not available for the case of fNbAnodes=16)
+//     Double_t fTheta = theta angle (available only for fType == 1)
 // ----------------------------------------------------------------------------
 
 #ifndef R3BMusliHitData_H
@@ -40,19 +43,19 @@ class R3BMusliHitData : public TObject
     virtual ~R3BMusliHitData() {}
 
     /** Accessors **/
-    inline const UInt_t& GetNbAnodes() const { return fNbAnodes; }
+    inline const UInt_t& GetType() const { return fType; }
     inline const Double_t& GetEave() const { return fE; }
     inline const Double_t& GetZcharge() const { return fZ; }
     inline const Double_t& GetTheta() const { return fTheta; }
 
     /** Modifiers **/
-    void SetNbAnodes(UInt_t n) { fNbAnodes = n; };
+    void SetType(UInt_t n) { fType = n; };
     void SetEave(Double_t energy) { fE = energy; };
     void SetZcharge(Double_t z) { fZ = z; };
     void SetTheta(Double_t theta) { fTheta = theta; };
 
   protected:
-    UInt_t fNbAnodes;
+    UInt_t fType;
     Double_t fE;
     Double_t fZ;
     Double_t fTheta;

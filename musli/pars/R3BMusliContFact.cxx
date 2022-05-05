@@ -25,7 +25,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BMusliCalPar.h"
-//#include "R3BMusliHitPar.h"
+#include "R3BMusliHitPar.h"
 //#include "R3BTGeoPar.h"
 
 #include "TClass.h"
@@ -51,10 +51,10 @@ void R3BMusliContFact::setAllContainers()
 
     containers->Add(p1);
 
-    // FairContainer* p2 = new FairContainer("musliHitPar", "MUSLI Hit Parameters", "MusliHitParContext");
-    // p2->addContext("MusliHitParContext");
+    FairContainer* p2 = new FairContainer("musliHitPar", "MUSLI Hit Parameters", "MusliHitParContext");
+    p2->addContext("MusliHitParContext");
 
-    // containers->Add(p2);
+    containers->Add(p2);
 
     // FairContainer* p3 = new FairContainer("MusliGeoPar", "Musli geometry parameters", "GeometryParameterContext");
     // p3->addContext("GeometryParameterContext");
@@ -75,10 +75,10 @@ FairParSet* R3BMusliContFact::createContainer(FairContainer* c)
     {
         p = new R3BMusliCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    // else if (strcmp(name, "musliHitPar") == 0)
-    //{
-    //    p = new R3BMusliHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    //}
+    else if (strcmp(name, "musliHitPar") == 0)
+    {
+        p = new R3BMusliHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
     // else if (strcmp(name, "MusliGeoPar") == 0)
     //{
     //    p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());

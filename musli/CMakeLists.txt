@@ -29,6 +29,8 @@ ${R3BROOT_SOURCE_DIR}/musli/pars
 ${R3BROOT_SOURCE_DIR}/musli/calibration
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
+${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/tracking
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
