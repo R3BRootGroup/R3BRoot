@@ -1,0 +1,230 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+// ------------------------------------------------------------
+// -----           R3BIncomingIDOnlineSpectra             -----
+// -----    Created 05/05/22 by J.L. Rodriguez-Sanchez    -----
+// -----           Fill PID online histograms             -----
+// ------------------------------------------------------------
+
+#include "R3BIncomingIDOnlineSpectra.h"
+#include "R3BEventHeader.h"
+#include "R3BFrsData.h"
+#include "R3BLogger.h"
+
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRunOnline.h"
+#include "FairRuntimeDb.h"
+#include "TCanvas.h"
+#include "TClonesArray.h"
+#include "TFolder.h"
+#include "TH1F.h"
+#include "TH2F.h"
+#include "THttpServer.h"
+#include "TMath.h"
+#include "TRandom.h"
+
+R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra()
+    : R3BIncomingIDOnlineSpectra("IncomingIDOnlineSpectra", 1)
+{
+}
+
+R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_t iVerbose)
+    : FairTask(name, iVerbose)
+    , fHitFrs(NULL)
+    , fNEvents(0)
+{
+}
+
+R3BIncomingIDOnlineSpectra::~R3BIncomingIDOnlineSpectra()
+{
+    R3BLOG(INFO, "");
+    if (fHitFrs)
+        delete fHitFrs;
+}
+
+InitStatus R3BIncomingIDOnlineSpectra::Init()
+{
+    R3BLOG(INFO, "");
+    FairRootManager* mgr = FairRootManager::Instance();
+    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+
+    FairRunOnline* run = FairRunOnline::Instance();
+    run->GetHttpServer()->Register("", this);
+
+    // get access to mapped data of FRS
+    fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
+    R3BLOG_IF(FATAL, !fHitFrs, "Branch FrsData not found");
+
+    // Create histograms for detectors
+    TString Name1;
+    TString Name2;
+
+    cBeta = new TCanvas("Beta_frs", "Beta info", 10, 10, 800, 700);
+
+    // Hit data, beta
+    Name1 = "fh1_beta_frs";
+    Name2 = "FRS: Beta";
+    fh1_beta = new TH1F(Name1, Name2, 1000, 0.45, 0.99);
+    fh1_beta->GetXaxis()->SetTitle("Beta");
+    fh1_beta->GetYaxis()->SetTitle("Counts");
+    fh1_beta->GetYaxis()->SetTitleOffset(1.15);
+    fh1_beta->GetXaxis()->CenterTitle(true);
+    fh1_beta->GetYaxis()->CenterTitle(true);
+    fh1_beta->GetXaxis()->SetLabelSize(0.045);
+    fh1_beta->GetXaxis()->SetTitleSize(0.045);
+    fh1_beta->GetYaxis()->SetLabelSize(0.045);
+    fh1_beta->GetYaxis()->SetTitleSize(0.045);
+    fh1_beta->SetFillColor(2);
+    fh1_beta->SetLineColor(1);
+    fh1_beta->Draw("");
+
+    // Hit data, brho
+    cBrho = new TCanvas("Brho_frs", "Brho info", 10, 10, 800, 700);
+
+    Name1 = "fh1_brho_frs";
+    Name2 = "FRS: Brho S2-Cave";
+    fh1_brho = new TH1F(Name1, Name2, 1500, 8., 19.);
+    fh1_brho->GetXaxis()->SetTitle("Brho [Tm]");
+    fh1_brho->GetYaxis()->SetTitle("Counts");
+    fh1_brho->GetYaxis()->SetTitleOffset(1.15);
+    fh1_brho->GetXaxis()->CenterTitle(true);
+    fh1_brho->GetYaxis()->CenterTitle(true);
+    fh1_brho->GetXaxis()->SetLabelSize(0.045);
+    fh1_brho->GetXaxis()->SetTitleSize(0.045);
+    fh1_brho->GetYaxis()->SetLabelSize(0.045);
+    fh1_brho->GetYaxis()->SetTitleSize(0.045);
+    fh1_brho->SetFillColor(2);
+    fh1_brho->SetLineColor(1);
+    fh1_brho->Draw("");
+
+    // Hit data, Xs2_vs_Tof
+    cXs2vsBeta = new TCanvas("Xs2_vs_beta_frs", "Xs2_vs_Beta 2D info", 10, 10, 800, 700);
+
+    Name1 = "fh2_Xs2_vs_beta_frs";
+    Name2 = "FRS: Xs2 vs #beta";
+    fh2_Xs2vsbeta = new TH2F(Name1, Name2, 800, -100., 100., 1000, 0.45, 0.99);
+    fh2_Xs2vsbeta->GetXaxis()->SetTitle("X at S2 [mm]");
+    fh2_Xs2vsbeta->GetYaxis()->SetTitle("FRS-#beta");
+    fh2_Xs2vsbeta->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Xs2vsbeta->GetXaxis()->CenterTitle(true);
+    fh2_Xs2vsbeta->GetYaxis()->CenterTitle(true);
+    fh2_Xs2vsbeta->GetXaxis()->SetLabelSize(0.045);
+    fh2_Xs2vsbeta->GetXaxis()->SetTitleSize(0.045);
+    fh2_Xs2vsbeta->GetYaxis()->SetLabelSize(0.045);
+    fh2_Xs2vsbeta->GetYaxis()->SetTitleSize(0.045);
+    fh2_Xs2vsbeta->Draw("col");
+
+    cAoQvsPosS2 = new TCanvas("AoQvsPosS2", "Pos-S2 vs AoQ", 10, 10, 800, 700);
+
+    Name1 = "fh2_PosS2vsAoQ_frs";
+    Name2 = "FRS: Pos-S2 vs AoQ with mult==1";
+    fh2_Pos2vsAoQ_m1 = new TH2F(Name1, Name2, 2000, -100, 100, 1000, 1.6, 2.75);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetTitle("Pos-S2 [mm]");
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitle("AoQ");
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->CenterTitle(true);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->CenterTitle(true);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetLabelSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetTitleSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetLabelSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitleSize(0.045);
+    fh2_Pos2vsAoQ_m1->Draw("colz");
+
+    // Hit data, Aq_vs_q
+    cAqvsq = new TCanvas("Aq_vs_q_frs", "A/q_vs_q 2D info", 10, 10, 800, 700);
+
+    Name1 = "fh2_Aq_vs_q_frs";
+    Name2 = "FRS: A/q vs q";
+    fh2_Aqvsq = new TH2F(Name1, Name2, 1000, 1.6, 2.75, 1900, 1, 20.);
+    fh2_Aqvsq->GetXaxis()->SetTitle("A/q");
+    fh2_Aqvsq->GetYaxis()->SetTitle("Z [Charge units]");
+    fh2_Aqvsq->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Aqvsq->GetXaxis()->CenterTitle(true);
+    fh2_Aqvsq->GetYaxis()->CenterTitle(true);
+    fh2_Aqvsq->GetXaxis()->SetLabelSize(0.045);
+    fh2_Aqvsq->GetXaxis()->SetTitleSize(0.045);
+    fh2_Aqvsq->GetYaxis()->SetLabelSize(0.045);
+    fh2_Aqvsq->GetYaxis()->SetTitleSize(0.045);
+    fh2_Aqvsq->Draw("colz");
+
+    // MAIN FOLDER-FRS
+    TFolder* mainfol = new TFolder("FRS-IncomingID", "FRS incomingID info");
+    mainfol->Add(cAoQvsPosS2);
+    mainfol->Add(cBeta);
+    mainfol->Add(cBrho);
+    mainfol->Add(cXs2vsBeta);
+    mainfol->Add(cAqvsq);
+    run->AddObject(mainfol);
+
+    // Register command to reset histograms
+    run->GetHttpServer()->RegisterCommand("Reset_IncomingID_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+
+    return kSUCCESS;
+}
+
+void R3BIncomingIDOnlineSpectra::Reset_Histo()
+{
+    R3BLOG(INFO, "");
+    fh2_Pos2vsAoQ_m1->Reset();
+    fh1_beta->Reset();
+    fh1_brho->Reset();
+    fh2_Aqvsq->Reset();
+    fh2_Xs2vsbeta->Reset();
+}
+
+void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
+{
+    // Fill Hit data
+    if (fHitFrs && fHitFrs->GetEntriesFast() > 0)
+    {
+        Int_t nHits = fHitFrs->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BFrsData* hit = (R3BFrsData*)fHitFrs->At(ihit);
+            if (!hit)
+                continue;
+            fh2_Pos2vsAoQ_m1->Fill(hit->GetXS2(), hit->GetAq());
+            fh1_beta->Fill(hit->GetBeta());
+            fh1_brho->Fill(hit->GetBrho());
+            fh2_Aqvsq->Fill(hit->GetAq(), hit->GetZ());
+            fh2_Xs2vsbeta->Fill(hit->GetXS2(), hit->GetBeta());
+        }
+    }
+
+    fNEvents += 1;
+}
+
+void R3BIncomingIDOnlineSpectra::FinishEvent()
+{
+    if (fHitFrs)
+    {
+        fHitFrs->Clear();
+    }
+}
+
+void R3BIncomingIDOnlineSpectra::FinishTask()
+{
+    if (fHitFrs)
+    {
+        cAoQvsPosS2->Write();
+        cBeta->Write();
+        cBrho->Write();
+        cXs2vsBeta->Write();
+        cAqvsq->Write();
+    }
+}
+
+ClassImp(R3BIncomingIDOnlineSpectra);
