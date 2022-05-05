@@ -16,18 +16,21 @@
 // -----          Created 06/10/19 by JL Rodriguez          -----
 // --------------------------------------------------------------
 
-#include "R3BMwpc0.h"
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
 #include "FairVolume.h"
+
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
+#include "R3BMwpc0.h"
 #include "R3BMwpcPoint.h"
+
 #include "TClonesArray.h"
 #include "TGeoManager.h"
-#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-#include <stdlib.h>
+#include "TVirtualMCStack.h"
 
 R3BMwpc0::R3BMwpc0()
     : R3BMwpc0("")
@@ -60,11 +63,11 @@ void R3BMwpc0::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BMwpc0: initialisation";
-    LOG(DEBUG) << "R3BMwpc0: Sens. Vol. (McId) " << gMC->VolId("MWPC0");
+    R3BLOG(INFO, "");
+    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("MWPC0"));
 }
 
-void R3BMwpc0::SetSpecialPhysicsCuts() { LOG(INFO) << "R3BMwpc0: Adding customized Physics cut ... "; }
+void R3BMwpc0::SetSpecialPhysicsCuts() { R3BLOG(INFO, ""); }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BMwpc0::ProcessHits(FairVolume* vol)
@@ -151,14 +154,18 @@ void R3BMwpc0::EndOfEvent()
 {
     if (fVerboseLevel)
         Print();
-    fSofMWPCCollection->Clear();
 
+    fSofMWPCCollection->Clear();
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BMwpc0::Register() { FairRootManager::Instance()->Register("Mwpc0Point", GetName(), fSofMWPCCollection, kTRUE); }
+void R3BMwpc0::Register()
+{
+    R3BLOG(DEBUG, "");
+    FairRootManager::Instance()->Register("Mwpc0Point", GetName(), fSofMWPCCollection, kTRUE);
+}
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -191,7 +198,7 @@ void R3BMwpc0::Reset()
 void R3BMwpc0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BMwpc0: " << nEntries << " entries to add";
+    R3BLOG(INFO, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BMwpcPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -202,7 +209,7 @@ void R3BMwpc0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BMwpcPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BMwpc0: " << cl2->GetEntriesFast() << " merged entries";
+    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -220,8 +227,11 @@ R3BMwpcPoint* R3BMwpc0::AddPoint(Int_t trackID,
     TClonesArray& clref = *fSofMWPCCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BMwpc0: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+    {
+        R3BLOG(INFO,
+               "at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
+                      << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
+    }
     return new (clref[size]) R3BMwpcPoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 

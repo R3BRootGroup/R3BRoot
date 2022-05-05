@@ -29,6 +29,7 @@
 
 #include "TCanvas.h"
 #include "TClonesArray.h"
+#include "TFolder.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -185,7 +186,8 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     }
 
     run->AddObject(mainfolder);
-    run->GetHttpServer()->RegisterCommand("Reset_" + fName1 + "_Cor_"+ fName2, Form("/Objects/%s/->Reset_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_" + fName1 + "_Cor_" + fName2,
+                                          Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     return kSUCCESS;
 }

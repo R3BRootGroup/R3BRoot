@@ -51,14 +51,12 @@ using namespace std;
 
 namespace
 {
-    double c_range_ns = 2048 * 5;
-    double c_bar_coincidence_ns = 20; // nanoseconds.
     uint64_t n1, n2;
 } // namespace
 
 // R3BTofDOnlineSpectra::Default Constructor --------------------------
 R3BTofDOnlineSpectra::R3BTofDOnlineSpectra()
-    : R3BTofDOnlineSpectra("TofdOnlineSpectra", 1)
+    : R3BTofDOnlineSpectra("TofDOnlineSpectra", 1)
 {
 }
 
@@ -78,6 +76,8 @@ R3BTofDOnlineSpectra::R3BTofDOnlineSpectra(const TString& name, Int_t iVerbose)
     , fTimeStitch(nullptr)
     , fMapPar(NULL)
     , fMaxmul(100)
+    , fC_range_ns(2048 * 5)     // nanoseconds
+    , fC_bar_coincidence_ns(20) // nanoseconds
 {
 }
 
@@ -145,7 +145,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     SetParameter();
 
     // MAIN FOLDER-Twim-Foot
-    TFolder* maintofd = new TFolder("TofD", "TofD info");
+    auto maintofd = new TFolder("TofD", "TofD info");
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -789,7 +789,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     continue;
                 }
 
-                auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + fC_range_ns, fC_range_ns);
                 fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                 vmultihits_top[iPlane - 1][iBar - 1] += 1;
                 ++top_i;
@@ -820,8 +820,9 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
                 // Shift the cyclic difference window by half a window-length and move it back,
                 // this way the trigger time will be at 0.
-                auto bot_ns = fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) -
-                              c_range_ns / 2;
+                auto bot_ns =
+                    fmod(bot->GetTimeLeading_ns() - bot_trig_ns + fC_range_ns + fC_range_ns / 2, fC_range_ns) -
+                    fC_range_ns / 2;
 
                 Int_t iPlane = bot->GetDetectorId(); // 1..n
                 Int_t iBar = bot->GetBarId();        // 1..n
@@ -836,7 +837,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     continue;
                 }
 
-                auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
+                auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + fC_range_ns, fC_range_ns);
 
                 fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
@@ -904,17 +905,17 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
                 auto dt = topc_ns - botc_ns;
                 // Handle wrap-around.
-                auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
+                auto dt_mod = fmod(dt + fC_range_ns, fC_range_ns);
                 if (dt < 0)
                 {
                     // We're only interested in the short time-differences, so we
                     // want to move the upper part of the coarse counter range close
                     // to the lower range, i.e. we cut the middle of the range and
                     // glue zero and the largest values together.
-                    dt_mod -= c_range_ns;
+                    dt_mod -= fC_range_ns;
                 }
 
-                if (std::abs(dt_mod) < c_bar_coincidence_ns)
+                if (std::abs(dt_mod) < fC_bar_coincidence_ns)
                 {
                     // Hit!
                     // std::cout << "Hit!\n";
@@ -949,7 +950,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     ++topc_i;
                     ++botc_i;
                 }
-                else if (dt < 0 && dt > -c_range_ns / 2)
+                else if (dt < 0 && dt > -fC_range_ns / 2)
                 {
                     ++topc_i;
                 }
@@ -1066,6 +1067,41 @@ void R3BTofDOnlineSpectra::FinishEvent()
     if (fHitItems)
     {
         fHitItems->Clear();
+    }
+}
+
+void R3BTofDOnlineSpectra::FinishTask()
+{
+    if (fCalItems)
+    {
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            fh_tofd_TotPm[i]->Write();
+            fh_tofd_TotPm_coinc[i]->Write();
+            fh_tofd_channels[i]->Write();
+            fh_num_side[i]->Write();
+            fh_tofd_multihit[i]->Write();
+            fh_tofd_multihit_coinc[i]->Write();
+        }
+        for (Int_t i = 0; i < fNofPlanes - 1; i++)
+        {
+            fh_tofd_dt[i]->Write();
+        }
+    }
+    if (fHitItems)
+    {
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            fh_tofd_Tot_hit[i]->Write();
+            fh_tofd_time_hit[i]->Write();
+            fh_tofd_multihit_hit[i]->Write();
+            fh_tofd_bars[i]->Write();
+            fh_tofd_time_hit[i]->Write();
+        }
+        for (Int_t i = 0; i < fNofPlanes - 1; i++)
+        {
+            fh_tofd_dt_hit[i]->Write();
+        }
     }
 }
 

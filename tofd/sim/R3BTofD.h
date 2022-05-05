@@ -11,6 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// ---------------------------------------------------------------
+// -----                        R3BTofD                      -----
+// -----          Created 18/03/2022 by J.L. Rodriguez       -----
+// ---------------------------------------------------------------
+
 #ifndef R3BTofD_H
 #define R3BTofD_H 1
 
@@ -41,7 +46,7 @@ class R3BTofD : public R3BDetector
     R3BTofD(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    ~R3BTofD();
+    virtual ~R3BTofD();
 
     /** Virtual method ProcessHits
      **
@@ -93,8 +98,6 @@ class R3BTofD : public R3BDetector
     virtual Bool_t CheckIfSensitive(std::string name);
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
-
-    //  void SaveGeoParams();
 
   private:
     /** Track information to be stored until the track leaves the
