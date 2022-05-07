@@ -31,11 +31,18 @@ R3BTofDDigitizer::R3BTofDDigitizer()
     , fTofdPoints(NULL)
     , fTofdHits(NULL)
 {
-
     // set default values for smearing
     fsigma_y = 0.001;
-    fsigma_t = 0.001;
+    fsigma_t = 0.007;
     fsigma_ELoss = 0.001;
+    number_layers = 4;
+    number_paddles = 44; // per layer
+    paddle_width = 2.70000;
+    paddle_thickness = 0.50000;
+    air_gap_paddles = 0.04;
+    air_gap_layer = 5.;
+    detector_width = number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + paddle_width;
+    detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
 }
 
 R3BTofDDigitizer::~R3BTofDDigitizer()
@@ -52,8 +59,8 @@ InitStatus R3BTofDDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTofdPoints = (TClonesArray*)ioman->GetObject("TofDPoint");
+    // fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array fTofdHits
     fTofdHits = new TClonesArray("R3BTofdHitData");
@@ -73,31 +80,44 @@ void R3BTofDDigitizer::Exec(Option_t* opt)
 {
     Reset();
 
-    std::vector<R3BTofdPoint*> vPoints[1000];
     Int_t n_entries = fTofdPoints->GetEntries();
-    Bool_t ChannelFired[1000] = { kFALSE };
+    if (n_entries == 0)
+        return;
 
-    Float_t X_Pos[10000] = { 0 };
-    Float_t Y_Pos[10000] = { 0 };
-    Float_t Time[10000] = { 0 };
-    Float_t Energy_Loss[10000] = { 0 };
-    Int_t number_paddles_hit = 0;
+    std::vector<R3BTofdPoint*> vPoints[1000];
+    Bool_t ChannelFired[1000];
+    Float_t X_Pos[10000];
+    Float_t Y_Pos[10000];
+    Float_t Time[10000];
+    Float_t Energy_Loss[10000];
+
+    for (Int_t i = 0; i < 1000; i++)
+        ChannelFired[i] = kFALSE;
+
+    for (Int_t i = 0; i < 10000; i++)
+    {
+        X_Pos[i] = 0;
+        Y_Pos[i] = 0;
+        Time[i] = 0;
+        Energy_Loss[i] = 0;
+    }
 
     for (Int_t entry = 0; entry < n_entries; entry++)
     {
         auto data_element = (R3BTofdPoint*)fTofdPoints->At(entry);
-
-        Int_t DetectorID = data_element->GetDetectorID();
+        Int_t planeID = data_element->GetPlane() - 1;
+        Int_t paddleID = data_element->GetPaddle() - 1;
         Double_t energy_loss = data_element->GetEnergyLoss();
 
         // discard all hits with an energy loss < cut
         if (energy_loss < 0.0000001)
             continue;
 
+        Int_t channel = planeID * number_paddles + paddleID;
         // add hits to vector
-        vPoints[DetectorID].push_back(data_element);
+        vPoints[channel].push_back(data_element);
 
-        ChannelFired[DetectorID] = kTRUE;
+        ChannelFired[channel] = kTRUE;
     }
 
     R3BTofdHitData* hit = nullptr;
@@ -120,41 +140,36 @@ void R3BTofDDigitizer::Exec(Option_t* opt)
 
                 if (0 == point || (vPoints[channel].at(point)->GetTime() - MapOfHits[channel]->GetTime()) > 30)
                 { // add new hits
-                    int layer_label = 0;
-                    int paddle_number = 0;
-                    if (channel < 200)
-                    {
-                        layer_label = 0;
-                        paddle_number = channel;
-                    }
-                    else if (channel < 300)
-                    {
-                        layer_label = 1;
-                        paddle_number = channel - 100;
-                    }
+                    int layer_label = vPoints[channel].at(point)->GetPlane() - 1;
+                    int paddle_number = vPoints[channel].at(point)->GetPaddle() - 1;
 
-                    X_Pos[channel] = -detector_width / 2. + paddle_width / 2. * (1 + layer_label) +
-                                     paddle_number * paddle_width + paddle_number * air_gap_paddles;
+                    auto shift = (layer_label % 2 == 0) ? -paddle_width / 4. : paddle_width / 4.;
+
+                    X_Pos[channel] = -detector_width / 2. + paddle_width / 2. + shift + paddle_number * paddle_width +
+                                     paddle_number * air_gap_paddles;
 
                     Y_Pos[channel] = vPoints[channel].at(point)->GetYIn(); // get y-position //local
                     Time[channel] = vPoints[channel].at(point)->GetTime();
                     Energy_Loss[channel] = vPoints[channel].at(point)->GetEnergyLoss();
 
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    LOG(INFO) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
-                              << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
-                              << " eloss = " << Energy_Loss[channel];
+                    LOG(DEBUG) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                               << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
+                               << " eloss = " << Energy_Loss[channel];
 
-                    MapOfHits.insert(std::pair<Int_t, R3BTofdHitData*>(channel,
-                                                                       new R3BTofdHitData(0.,
-                                                                                          X_Pos[channel],
-                                                                                          Y_Pos[channel],
-                                                                                          0.,
-                                                                                          Time[channel],
-                                                                                          Energy_Loss[channel],
-                                                                                          layer_label + 1)));
+                    MapOfHits.insert(std::pair<Int_t, R3BTofdHitData*>(
+                        channel,
+                        new R3BTofdHitData(0.,
+                                           X_Pos[channel] + fRnd->Uniform(-paddle_width / 2., paddle_width / 2.),
+                                           Y_Pos[channel] + fRnd->Gaus(0., fsigma_y),
+                                           0.,
+                                           Time[channel] + fRnd->Gaus(0., fsigma_t),
+                                           Energy_Loss[channel],
+                                           layer_label + 1,
+                                           paddle_number + 1,
+                                           0.,
+                                           Time[channel] + fRnd->Gaus(0., fsigma_t))));
                 }
-
                 else
                 { // update hit
                     MapOfHits[channel]->SetTime(vPoints[channel].at(point)->GetTime());

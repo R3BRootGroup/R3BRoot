@@ -230,7 +230,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
             R3BLOG(DEBUG, "Channel=" << channel << ": Time=" << time_ns << "ns.");
         }
-        if (2 == mapped->GetSide())
+        if (3 == mapped->GetSide())
         {
             new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
                 R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
@@ -246,7 +246,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
 void R3BBunchedFiberMapped2Cal::FinishEvent()
 {
+    if (fCalItems)
     fCalItems->Clear();
+    if (fCalTriggerItems)
     fCalTriggerItems->Clear();
 }
 

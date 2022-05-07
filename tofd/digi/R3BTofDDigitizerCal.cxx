@@ -30,6 +30,10 @@ R3BTofDDigitizerCal::R3BTofDDigitizerCal()
     , fCalTriggerItems(NULL)
     , fMCTrack(NULL)
 {
+    // detector parameter
+    number_layers = 4;
+    number_paddles = 44; // per layer
+    number_channels = number_layers * number_paddles;
 }
 
 R3BTofDDigitizerCal::~R3BTofDDigitizerCal()
@@ -50,8 +54,8 @@ InitStatus R3BTofDDigitizerCal::Init()
 
     fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
+    // fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    // ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
 
     // Register output array fTofdCals
     fTofdCals = new TClonesArray("R3BTofdCalData");
@@ -69,11 +73,6 @@ InitStatus R3BTofDDigitizerCal::Init()
 
 void R3BTofDDigitizerCal::Exec(Option_t* opt)
 {
-    //	cout<<"R3BTofDDigitizerCal Exec Entry"<<endl;
-    if (counter / 10000. == (int)counter / 10000)
-        LOG(INFO) << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) ";
-    counter += 1;
-
     Reset();
 
     auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels) {
@@ -111,14 +110,13 @@ void R3BTofDDigitizerCal::Exec(Option_t* opt)
         };
 
         // ordering the hits in time
-
         std::vector<TempHit> TempHits;
-
         for (Int_t i = 0; i < entryNum; ++i)
         {
             R3BTofdPoint* data_element = (R3BTofdPoint*)Points->At(i);
-
-            TempHits.push_back(TempHit(data_element->GetDetectorID(), // channel nummer
+            // Plane and paddle data members in 1-base
+            auto channel = (data_element->GetPlane() - 1) * number_paddles + data_element->GetPaddle() - 1;
+            TempHits.push_back(TempHit(channel, // channel nummer
                                        data_element->GetEnergyLoss(),
                                        data_element->GetTime(),
                                        data_element->GetYIn()));
@@ -131,8 +129,8 @@ void R3BTofDDigitizerCal::Exec(Option_t* opt)
         Int_t number_paddles_hit = 0;
         for (TempHit& Hit : TempHits) // loop over full range of TempHits; Hit is reference to each TempHit
         {
-            // discard all hits with an energy loss < cut
-            if (Hit.Energy < 0.000001 || Hit.Time > 1.e9)
+            // discard all hits with an energy loss < cut -> 1 keV
+            if (Hit.Energy < 0.000001)
                 continue;
 
             Int_t ChannelID = Hit.ChannelID;
@@ -165,25 +163,25 @@ void R3BTofDDigitizerCal::Exec(Option_t* opt)
             {
                 if (energyl > 0.0001)
                 {
-                    if (i < 200) // ch: 101-144, layer: 0, paddle_number: 0-43
+                    if (i < number_paddles) // plane 1, paddle_number: 0-43
                     {
                         layer_label = 0;
-                        paddle_number = i - 101;
+                        paddle_number = i;
                     }
-                    else if (i < 300 && i > 200) // ch: 201-244, layer: 1, paddle_number: 0-43
+                    else if (i < number_paddles * 2) // plane 2, paddle_number: 0-43
                     {
                         layer_label = 1;
-                        paddle_number = i - 201;
+                        paddle_number = i - number_paddles;
                     }
-                    else if (i < 400 && i > 300) // ch: 301-344, layer: 2, paddle_number: 0-43
+                    else if (i < number_paddles * 3) // plane 3, paddle_number: 0-43
                     {
                         layer_label = 2;
-                        paddle_number = i - 301;
+                        paddle_number = i - number_paddles * 2;
                     }
-                    else if (i < 500 && i > 400) // ch: 401-444, layer: 3, paddle_number: 0-43
+                    else if (i < number_paddles * 4) // plane 4, paddle_number: 0-43
                     {
                         layer_label = 3;
-                        paddle_number = i - 401;
+                        paddle_number = i - number_paddles * 3;
                     }
 
                     /* From y-position get ToT_up and ToT_down only considering absorption;
@@ -214,7 +212,6 @@ void R3BTofDDigitizerCal::Exec(Option_t* opt)
                     new ((*Hits)[Hits->GetEntries()])
                         R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
 
-                    // Int_t card = (int)paddle_number/8.+layer_label*6;
                     for (Int_t j = 0; j < 12; j++)
                     {
                         new ((*Trigger)[Trigger->GetEntries()]) R3BTofdCalData(5, j + 1, 1, 0., 0.);

@@ -23,7 +23,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BFiberContFact.h"
-
+#include "R3BLogger.h"
 #include "R3BBunchedFiberHitPar.h"
 #include "R3BFiberMAPMTHitPar.h"
 #include "R3BFiberMappingPar.h"
@@ -140,10 +140,14 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BFiberContFact: Create container name " << name;
+    R3BLOG(INFO, "Create container name " << name);
+    
     FairParSet* p = 0;
-
-    if (strcmp(name, "Fi30MappingPar") == 0 || strcmp(name, "Fi31MappingPar") == 0 ||
+    if (
+        strcmp(name, "Fi10MappingPar") == 0 || strcmp(name, "Fi11MappingPar") == 0 ||
+        strcmp(name, "Fi12MappingPar") == 0 || strcmp(name, "Fi13MappingPar") == 0 ||
+        strcmp(name, "Fi23aMappingPar") == 0 || strcmp(name, "Fi23bMappingPar") == 0 ||
+        strcmp(name, "Fi30MappingPar") == 0 || strcmp(name, "Fi31MappingPar") == 0 ||
         strcmp(name, "Fi32MappingPar") == 0 || strcmp(name, "Fi33MappingPar") == 0)
     {
         p = new R3BFiberMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());

@@ -27,6 +27,11 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/fiber/online
+${R3BROOT_SOURCE_DIR}/fiber/sim
+${R3BROOT_SOURCE_DIR}/fiber/digi
+${R3BROOT_SOURCE_DIR}/fiber/pars
+${R3BROOT_SOURCE_DIR}/fiber/mapmt
+${R3BROOT_SOURCE_DIR}/fiber/bunched
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
@@ -41,29 +46,30 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories(${LINK_DIRECTORIES})
 
 set(SRCS
-R3BBunchedFiberMapped2CalPar.cxx
-R3BBunchedFiberMapped2Cal.cxx
-R3BBunchedFiberCal2Hit.cxx
-R3BBunchedFiberCal2Hit_s494.cxx
-R3BBunchedFiberHitModulePar.cxx
-R3BBunchedFiberHitPar.cxx
-R3BFiberContFact.cxx
-R3BBunchedFiberSPMTTrigMapped2CalPar.cxx
-R3BBunchedFiberSPMTTrigMapped2Cal.cxx
-R3BBunchedFiberSPMTTrigDigitizerCal.cxx
-R3BFiberMAPMTMapped2Cal.cxx
-R3BFiberMAPMTMapped2CalPar.cxx
-R3BFiberMAPMTCal2Hit.cxx
-R3BFiberMAPMTHitPar.cxx
-R3BFiberMAPMTHitModulePar.cxx
-R3BFiberMappingPar.cxx
+./sim/R3BFiber.cxx
+./digi/R3BFiberDigitizer.cxx
+./bunched/R3BBunchedFiberMapped2CalPar.cxx
+./bunched/R3BBunchedFiberMapped2Cal.cxx
+./bunched/R3BBunchedFiberCal2Hit.cxx
+./bunched/R3BBunchedFiberCal2Hit_s494.cxx
+./bunched/R3BBunchedFiberSPMTTrigMapped2CalPar.cxx
+./bunched/R3BBunchedFiberSPMTTrigMapped2Cal.cxx
+./mapmt/R3BFiberMAPMTMapped2Cal.cxx
+./mapmt/R3BFiberMAPMTCal2Hit.cxx
+./mapmt/R3BFiberMAPMTMapped2CalPar.cxx
+./pars/R3BFiberContFact.cxx
+./pars/R3BBunchedFiberHitModulePar.cxx
+./pars/R3BBunchedFiberHitPar.cxx
+./pars/R3BFiberMAPMTHitPar.cxx
+./pars/R3BFiberMAPMTHitModulePar.cxx
+./pars/R3BFiberMappingPar.cxx
 ./online/R3BFiberMAPMTOnlineSpectra.cxx
 ./online/R3BFiberMAPMTCorrelationOnlineSpectra.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF BunchedFiberLinkDef.h)
+Set(LINKDEF FiberLinkDef.h)
 
 Set(LIBRARY_NAME R3BBunchedFiber)
 

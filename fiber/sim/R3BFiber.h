@@ -12,46 +12,53 @@
  ******************************************************************************/
 
 // ---------------------------------------------------------------
-// -----                        R3BTofD                      -----
-// -----          Created 18/03/2022 by J.L. Rodriguez       -----
+// -----                       R3BFiber                      -----
+// -----          Created 10/05/2022 by J.L. Rodriguez       -----
 // ---------------------------------------------------------------
 
-#ifndef R3BTofD_H
-#define R3BTofD_H 1
+#ifndef R3BFiber_H
+#define R3BFiber_H 1
 
 #include "R3BDetector.h"
+#include "R3BDetectorList.h"
 #include "TLorentzVector.h"
+#include "TString.h"
 
 class TClonesArray;
-class R3BTofdPoint;
+class R3BFibPoint;
 class FairVolume;
+class R3BTGeoPar;
 
-class R3BTofD : public R3BDetector
+class R3BFiber : public R3BDetector
 {
   public:
     /** Default constructor **/
-    R3BTofD();
+    R3BFiber();
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param trans   position
      *@param rot     rotation
      */
-    R3BTofD(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+    R3BFiber(const TString& name,
+             const TString& geoFile,
+             DetectorId,
+             const TGeoTranslation& trans,
+             const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param combi   position + rotation
      */
-    R3BTofD(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    R3BFiber(const TString& name, const TString& geoFile, DetectorId, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BTofD();
+    virtual ~R3BFiber();
 
     /** Virtual method ProcessHits
      **
      ** Defines the action to be taken when a step is inside the
-     ** active volume. Creates a R3BTofdPoint and adds it to the
+     ** active volume. Creates a R3BFiberPoint and adds it to the
      ** collection.
      *@param vol  Pointer to the active volume
      **/
@@ -99,40 +106,45 @@ class R3BTofD : public R3BDetector
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
 
+    //  void SaveGeoParams();
+
   private:
     /** Track information to be stored until the track leaves the
     active volume. **/
+    TString fName;
+    DetectorId fDetId;
     Int_t fTrackID;                 //!  track index
-    Int_t fPlaneID;                 //!  Plane id
-    Int_t fPaddleID;                //!  Paddle id
+    Int_t fVolumeID;                //!  volume id
     TLorentzVector fPosIn, fPosOut; //!  position
     TLorentzVector fMomIn, fMomOut; //!  momentum
     Double32_t fTime_in;            //!  time when entering active volume
     Double32_t fTime_out;           //!  time when exiting active volume
-    Double32_t fTime;               //!  time average in detector
+    Double32_t fTime;               //!  time
     Double32_t fLength_in;          //!  length when entering active volume
     Double32_t fLength_out;         //!  length when exiting active volume
-    Double32_t fLength;             //!  length average in detector
+    Double32_t fLength;             //!  length
     Double32_t fELoss;              //!  energy loss
+    Int_t fPosIndex;                //!
+    TClonesArray* fFiCollection;    //!  The hit collection
+    Bool_t kGeoSaved;               //!
+    TList* flGeoPar;                //!
 
-    Int_t fPosIndex;               //!
-    TClonesArray* fTofdCollection; //!  The hit collection
+    R3BTGeoPar* fTGeoPar; //!
 
     /** Private method AddHit
      **
-     ** Adds a TofdPoint to the HitCollection
+     ** Adds a FibPoint to the HitCollection
      **/
-    R3BTofdPoint* AddHit(Int_t trackID,
-                         Int_t detID,
-                         Int_t planeID,
-                         Int_t paddleID,
-                         TVector3 posIn,
-                         TVector3 pos_out,
-                         TVector3 momIn,
-                         TVector3 momOut,
-                         Double_t time,
-                         Double_t length,
-                         Double_t eLoss);
+    R3BFibPoint* AddHit(Int_t trackID,
+                        Int_t detID,
+                        Int_t plane,
+                        TVector3 posIn,
+                        TVector3 pos_out,
+                        TVector3 momIn,
+                        TVector3 momOut,
+                        Double_t time,
+                        Double_t length,
+                        Double_t eLoss);
 
     /** Private method ResetParameters
      **
@@ -140,12 +152,12 @@ class R3BTofD : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BTofD, 1);
+    ClassDef(R3BFiber, 1);
 };
 
-inline void R3BTofD::ResetParameters()
+inline void R3BFiber::ResetParameters()
 {
-    fTrackID = fPlaneID = fPaddleID = 0;
+    fTrackID = fVolumeID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
@@ -154,4 +166,4 @@ inline void R3BTofD::ResetParameters()
     fPosIndex = 0;
 };
 
-#endif /* R3BTofD_H */
+#endif /* R3BFiber_H */
