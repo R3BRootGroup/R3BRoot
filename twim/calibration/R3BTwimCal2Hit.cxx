@@ -136,17 +136,21 @@ void R3BTwimCal2Hit::SetParameter()
         fEmean_dt[s] = fCal_Par->GetEmean_dt(s + 1);
         if (fNumParams == 2)
         {
-            LOG(INFO) << "R3BTwimCal2Hit parameters for charge-Z:" << CalZParams->GetAt(s * fNumParams) << " : "
-                      << CalZParams->GetAt(s * fNumParams + 1);
+            R3BLOG(INFO,
+                   "R3BTwimCal2Hit parameters for charge-Z:" << CalZParams->GetAt(s * fNumParams) << " : "
+                                                             << CalZParams->GetAt(s * fNumParams + 1));
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
         }
         else if (fNumParams == 3)
         {
             if (fHitItemsTofW)
-                LOG(INFO) << "R3BTwimCal2Hit parameters for charge-Z vs tof:" << CalZParams->GetAt(s * fNumParams)
-                          << " : " << CalZParams->GetAt(s * fNumParams + 1) << " : "
-                          << CalZParams->GetAt(s * fNumParams + 2);
+            {
+                R3BLOG(INFO,
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2));
+            }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
             fZ2[s] = CalZParams->GetAt(s * fNumParams + 2);
@@ -154,16 +158,20 @@ void R3BTwimCal2Hit::SetParameter()
         else if (fNumParams == 4)
         {
             if (fHitItemsTofW)
-                LOG(INFO) << "R3BTwimCal2Hit parameters for charge-Z vs tof:" << CalZParams->GetAt(s * fNumParams)
-                          << " : " << CalZParams->GetAt(s * fNumParams + 1) << " : "
-                          << CalZParams->GetAt(s * fNumParams + 2) << " : " << CalZParams->GetAt(s * fNumParams + 3);
+            {
+                R3BLOG(INFO,
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
+                           << CalZParams->GetAt(s * fNumParams + 3));
+            }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
             fZ2[s] = CalZParams->GetAt(s * fNumParams + 2);
             fZ3[s] = CalZParams->GetAt(s * fNumParams + 3);
         }
         else
-            R3BLOG(warning, "Parameters for charge-Z cannot be used here, number of parameters: " << fNumParams);
+            R3BLOG(WARNING, "aa Parameters for charge-Z cannot be used here, number of parameters: " << fNumParams);
     }
     return;
 }
