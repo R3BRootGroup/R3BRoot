@@ -11,32 +11,34 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// R3BBunchedFiberSPMTTrigDigitizerCal.h
+// ---------------------------------------------------------------
+// -----                    R3BFiberDigitizer                -----
+// -----          Created 10/05/2022 by J.L. Rodriguez       -----
+// ---------------------------------------------------------------
 
-#ifndef R3BBunchedFiberSPMTTrigDigitizerCal_H
-#define R3BBunchedFiberSPMTTrigDigitizerCal_H 1
+#ifndef R3BFiberDigitizer_H
+#define R3BFiberDigitizer_H 1
 
 #include "FairTask.h"
-#include "R3BBunchedFiberCalData.h"
+#include "R3BBunchedFiberHitData.h"
 #include <TRandom3.h>
-#include <map>
 #include <string>
 
 class TClonesArray;
 class TH1F;
 class TH2F;
 
-class R3BBunchedFiberSPMTTrigDigitizerCal : public FairTask
+class R3BFiberDigitizer : public FairTask
 {
 
   public:
     /** Default constructor **/
-    R3BBunchedFiberSPMTTrigDigitizerCal();
+    R3BFiberDigitizer(const TString& name = "Fi");
 
-    R3BBunchedFiberSPMTTrigDigitizerCal(const char* name, Int_t iVerbose = 1);
+    R3BFiberDigitizer(const TString& name, Double_t esigma, Double_t tsigma, Double_t ysigma);
 
     /** Destructor **/
-    virtual ~R3BBunchedFiberSPMTTrigDigitizerCal();
+    virtual ~R3BFiberDigitizer();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -44,16 +46,28 @@ class R3BBunchedFiberSPMTTrigDigitizerCal : public FairTask
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
-    virtual void Finish();
-
     virtual void Reset();
 
-  protected:
-    TClonesArray* fFiberTriggerSingleCals;
-    TClonesArray* fMCTrack;
+    void SetEnergyResolution(Double_t e);
+    void SetTimeResolution(Double_t t);
+    void SetYPositionResolution(Double_t y);
 
   private:
-    ClassDef(R3BBunchedFiberSPMTTrigDigitizerCal, 1);
+    TString fName;
+    TRandom3* prnd;
+    Double_t esigma;
+    Double_t tsigma;
+    Double_t ysigma;
+
+    TClonesArray* fFiPoints;
+    TClonesArray* fFiHits;
+
+    Float_t fiber_thickness;
+    Int_t fiber_nbr;
+    Float_t air_layer;
+    Float_t detector_width;
+
+    ClassDef(R3BFiberDigitizer, 1);
 };
 
-#endif
+#endif /* R3BFiberDigitizer_H */

@@ -16,17 +16,14 @@
 // -------------------------------------------------------------------------
 
 #include "R3BTofdPoint.h"
-
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
+#include "R3BLogger.h"
 
 // -----   Default constructor   -------------------------------------------
 R3BTofdPoint::R3BTofdPoint()
     : FairMCPoint()
 {
+    fPlane = 0;
+    fPaddle = 0;
     fX_out = fY_out = fZ_out = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
 }
@@ -42,8 +39,26 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
                            Double_t tof,
                            Double_t length,
                            Double_t eLoss)
+    : R3BTofdPoint(trackID, detID, 0, 0, posIn, posOut, momIn, momOut, tof, length, eLoss)
+{
+}
+
+// -----   Standard constructor   ------------------------------------------
+R3BTofdPoint::R3BTofdPoint(Int_t trackID,
+                           Int_t detID,
+                           Int_t planeID,
+                           Int_t paddleID,
+                           TVector3 posIn,
+                           TVector3 posOut,
+                           TVector3 momIn,
+                           TVector3 momOut,
+                           Double_t tof,
+                           Double_t length,
+                           Double_t eLoss)
     : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss)
 {
+    fPlane = planeID;
+    fPaddle = paddleID;
     fX_out = posOut.X();
     fY_out = posOut.Y();
     fZ_out = posOut.Z();
@@ -60,11 +75,12 @@ R3BTofdPoint::~R3BTofdPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BTofdPoint::Print(const Option_t* opt) const
 {
-    cout << "-I- R3BTofdPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
-    cout << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm" << endl;
-    cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV" << endl;
-    cout << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
-         << endl;
+    R3BLOG(INFO,
+           "Point for track " << fTrackID << " in plane " << fPlane << " and paddle " << fPaddle << "    Position ("
+                              << fX << ", " << fY << ", " << fZ << ") cm"
+                              << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV"
+                              << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss "
+                              << fELoss * 1.0e06 << " keV");
 }
 // -------------------------------------------------------------------------
 
@@ -100,4 +116,4 @@ Bool_t R3BTofdPoint::IsUsable() const
 }
 // -------------------------------------------------------------------------
 
-ClassImp(R3BTofdPoint)
+ClassImp(R3BTofdPoint);

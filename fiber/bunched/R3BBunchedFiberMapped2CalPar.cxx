@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "R3BBunchedFiberMappedData.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
@@ -32,6 +33,7 @@ R3BBunchedFiberMapped2CalPar::R3BBunchedFiberMapped2CalPar(const char* a_name,
     , fCTDCVariant(a_ctdc_variant)
     , fUpdateRate(a_update_rate)
     , fMinStats(a_min_stats)
+    , fMapped(NULL)
 {
 }
 
@@ -47,18 +49,6 @@ R3BBunchedFiberMapped2CalPar::~R3BBunchedFiberMapped2CalPar()
 
 InitStatus R3BBunchedFiberMapped2CalPar::Init()
 {
-    auto rm = FairRootManager::Instance();
-    if (!rm)
-    {
-        return kFATAL;
-    }
-
-    fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
-    if (!fMapped)
-    {
-        return kFATAL;
-    }
-
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
 #define GET_TCALPAR(NAME)                                                              \
@@ -68,13 +58,20 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            LOG(ERROR) << "Could not get " << name << '.';                             \
+            R3BLOG(ERROR, "Could not get " << name);                                   \
             abort();                                                                   \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \
         f##NAME##Engine = new R3BTCalEngine(f##NAME##TCalPar, fMinStats);              \
     } while (0)
+
+    auto rm = FairRootManager::Instance();
+    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+
+    fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
+    R3BLOG_IF(FATAL, !fMapped, fName + "Mapped not found");
+
     GET_TCALPAR(MAPMT);
     GET_TCALPAR(MAPMTTrig);
     GET_TCALPAR(SPMT);
@@ -89,17 +86,18 @@ void R3BBunchedFiberMapped2CalPar::Exec(Option_t* option)
     {
         auto mapped = (R3BBunchedFiberMappedData*)fMapped->At(i);
         assert(mapped);
+        auto channel = mapped->GetChannel();
         if (mapped->IsMAPMT())
         {
-            fMAPMTEngine->Fill(1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
+            fMAPMTEngine->Fill(1, channel * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
         }
         else if (mapped->IsSPMT())
         {
-            fSPMTEngine->Fill(1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
+            fSPMTEngine->Fill(1, channel * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
         }
         else if (mapped->IsMAPMTTrigger())
         {
-            fMAPMTTrigEngine->Fill(1, mapped->GetChannel(), 1, mapped->GetFine());
+            fMAPMTTrigEngine->Fill(1, channel, 1, mapped->GetFine());
         }
     }
 }
@@ -130,4 +128,4 @@ void R3BBunchedFiberMapped2CalPar::SetUpdateRate(Int_t a_rate) { fUpdateRate = a
 
 void R3BBunchedFiberMapped2CalPar::SetMinStats(Int_t a_min_stats) { fMinStats = a_min_stats; }
 
-ClassImp(R3BBunchedFiberMapped2CalPar)
+ClassImp(R3BBunchedFiberMapped2CalPar);

@@ -12,113 +12,90 @@
  ******************************************************************************/
 
 // ---------------------------------------------------------------
-// -----                        R3BTofD                      -----
-// -----          Created 18/03/2022 by J.L. Rodriguez       -----
-// -----          Updated 05/05/2022 by M. Feijoo            -----
+// -----                       R3BFiber                      -----
+// -----          Created 10/05/2022 by J.L. Rodriguez       -----
 // ---------------------------------------------------------------
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRun.h"
-#include "FairVolume.h"
-
+#include "R3BFiber.h"
+#include "R3BFibPoint.h"
 #include "R3BLogger.h"
 #include "R3BMCStack.h"
-#include "R3BTofD.h"
-#include "R3BTofdPoint.h"
+
+#include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "FairVolume.h"
 
 #include "TClonesArray.h"
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-#include "TVirtualMCStack.h"
 
-#include <TString.h>
-#include <boost/regex.hpp>
-
-R3BTofD::R3BTofD()
-    : R3BTofD("")
+R3BFiber::R3BFiber()
+    : R3BFiber("", "", kREF)
 {
 }
 
-R3BTofD::R3BTofD(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
-    : R3BTofD(geoFile, { trans, rot })
+R3BFiber::R3BFiber(const TString& name,
+                   const TString& geoFile,
+                   DetectorId detid,
+                   const TGeoTranslation& trans,
+                   const TGeoRotation& rot)
+    : R3BFiber(name, geoFile, detid, { trans, rot })
 {
 }
 
-R3BTofD::R3BTofD(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BTofD", kTOFD, geoFile, combi)
-    , fTofdCollection(new TClonesArray("R3BTofdPoint"))
+R3BFiber::R3BFiber(const TString& name, const TString& geoFile, DetectorId detid, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BFi" + name, detid, geoFile, combi)
+    , fName(name)
+    , fDetId(detid)
+    , fFiCollection(new TClonesArray("R3BFibPoint"))
     , fPosIndex(0)
+    , kGeoSaved(kFALSE)
+    , flGeoPar(new TList())
 {
+    flGeoPar->SetName(GetName());
     ResetParameters();
 }
 
-R3BTofD::~R3BTofD()
+R3BFiber::~R3BFiber()
 {
-    if (fTofdCollection)
+    if (flGeoPar)
     {
-        fTofdCollection->Delete();
-        delete fTofdCollection;
+        delete flGeoPar;
+    }
+    if (fFiCollection)
+    {
+        fFiCollection->Delete();
+        delete fFiCollection;
     }
 }
 
-void R3BTofD::Initialize()
+void R3BFiber::Initialize()
 {
     FairDetector::Initialize();
-    R3BLOG(INFO, "");
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Paddle"));
+
+    R3BLOG(INFO, "for fiber Fi" << fName);
+    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("FI" + fName + "Log"));
 }
 
-void R3BTofD::SetSpecialPhysicsCuts()
-{
-    R3BLOG(INFO, "");
-    if (gGeoManager)
-    {
-        TGeoMedium* plastic = gGeoManager->GetMedium("plasticFormTOF");
-        if (plastic && 1 == 0)
-        {
-            // Setting processes for plasticFormTOF only
-            gMC->Gstpar(plastic->GetId(), "LOSS", 3);
-            gMC->Gstpar(plastic->GetId(), "STRA", 1.0);
-            gMC->Gstpar(plastic->GetId(), "PAIR", 1.0);
-            gMC->Gstpar(plastic->GetId(), "COMP", 1.0);
-            gMC->Gstpar(plastic->GetId(), "PHOT", 1.0);
-            gMC->Gstpar(plastic->GetId(), "ANNI", 1.0);
-            gMC->Gstpar(plastic->GetId(), "BREM", 1.0);
-            gMC->Gstpar(plastic->GetId(), "HADR", 1.0);
-            gMC->Gstpar(plastic->GetId(), "DRAY", 1.0);
-            gMC->Gstpar(plastic->GetId(), "DCAY", 1.0);
-            gMC->Gstpar(plastic->GetId(), "MULS", 1.0);
-            gMC->Gstpar(plastic->GetId(), "RAYL", 1.0);
-
-            // Setting Energy-CutOff for plasticFormTOF Only
-            Double_t cutE = fCutE; // GeV
-
-            R3BLOG(INFO, "plasticFormTOF Medium Id " << plastic->GetId() << " Energy Cut-Off : " << cutE << " GeV");
-            // plastic
-            gMC->Gstpar(plastic->GetId(), "CUTGAM", cutE);
-            gMC->Gstpar(plastic->GetId(), "CUTELE", cutE);
-            gMC->Gstpar(plastic->GetId(), "CUTNEU", cutE);
-            gMC->Gstpar(plastic->GetId(), "CUTHAD", cutE);
-            gMC->Gstpar(plastic->GetId(), "CUTMUO", cutE);
-            gMC->Gstpar(plastic->GetId(), "BCUTE", cutE);
-            gMC->Gstpar(plastic->GetId(), "BCUTM", cutE);
-            gMC->Gstpar(plastic->GetId(), "DCUTE", cutE);
-            gMC->Gstpar(plastic->GetId(), "DCUTM", cutE);
-            gMC->Gstpar(plastic->GetId(), "PPCUTM", -1.);
-        }
-    } //! gGeoManager
-}
+void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(INFO, ""); }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BTofD::ProcessHits(FairVolume* vol)
+Bool_t R3BFiber::ProcessHits(FairVolume* vol)
 {
-    // Simple Det plane
+    // 2 Simple Det PLane
+    // get Info from DCH planes
+    Int_t copyNo = -1;
+    Int_t planeNr = -1;
+    // Get the Geo info from MC Point
+    gMC->CurrentVolID(copyNo);
+    gMC->CurrentVolOffID(1, planeNr);
 
     if (gMC->IsTrackEntering())
     {
         fELoss = 0.;
+        // fTime   = gMC->TrackTime() * 1.0e09;
+        // fLength = gMC->TrackLength();
         fTime_in = gMC->TrackTime() * 1.0e09;
         fLength_in = gMC->TrackLength();
         gMC->TrackPosition(fPosIn);
@@ -128,20 +105,11 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
 
-    // Set additional parameters at exit of active volume. Create R3BTofdPoint.
+    // Set additional parameters at exit of active volume. Create R3BFiberPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        static auto restr = "Plane_([0-9]+).*Paddle_([0-9]+)";
-        static auto re = boost::regex(restr, boost::regex::extended);
-        boost::cmatch m;
-        if (!boost::regex_search(gMC->CurrentVolPath(), m, re))
-        {
-            R3BLOG(ERROR, gMC->CurrentVolPath() << " does not match RE " << restr);
-        }
-        fPlaneID = std::stoi(m[1].str());
-        fPaddleID = vol->getCopyNo();
-
+        fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -170,6 +138,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
             }
 
             gGeoManager->SetCurrentDirection(newdirection);
+            // TGeoNode *bla = gGeoManager->FindNextBoundary(2);
             safety = gGeoManager->GetSafeDistance();
 
             gGeoManager->SetCurrentDirection(-newdirection[0], -newdirection[1], -newdirection[2]);
@@ -185,9 +154,8 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
         }
 
         AddHit(fTrackID,
-               1,
-               fPlaneID,
-               fPaddleID,
+               /*fVolumeID*/ /*copyNo*/ planeNr,
+               planeNr,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
                TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
@@ -196,9 +164,9 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
                fLength,
                fELoss);
 
-        // Increment number of TofdPoints for this track
-        auto stack = (R3BStack*)gMC->GetStack();
-        stack->AddPoint(kTOFD);
+        // Increment number of Fi30Points for this track
+        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        stack->AddPoint(fDetId);
 
         ResetParameters();
     }
@@ -207,73 +175,72 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BTofD::EndOfEvent()
+void R3BFiber::EndOfEvent()
 {
     if (fVerboseLevel)
         Print();
-    fTofdCollection->Clear();
+    fFiCollection->Clear();
 
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BTofD::Register()
+void R3BFiber::Register()
 {
     R3BLOG(DEBUG, "");
-    FairRootManager::Instance()->Register("TofDPoint", GetName(), fTofdCollection, kTRUE);
+    FairRootManager::Instance()->Register("Fi" + fName + "Point", GetName(), fFiCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BTofD::GetCollection(Int_t iColl) const
+TClonesArray* R3BFiber::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
-        return fTofdCollection;
+        return fFiCollection;
     else
         return NULL;
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Print   ----------------------------------------------
-void R3BTofD::Print(Option_t* option) const
+void R3BFiber::Print(Option_t* option) const
 {
-    Int_t nHits = fTofdCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTofD: " << nHits << " points registered in this event";
+    Int_t nHits = fFiCollection->GetEntriesFast();
+    LOG(INFO) << "R3BFi" << fName << ": " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BTofD::Reset()
+void R3BFiber::Reset()
 {
-    fTofdCollection->Clear();
+    fFiCollection->Clear();
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+void R3BFiber::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
     R3BLOG(INFO, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
-    R3BTofdPoint* oldpoint = NULL;
+    R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BTofdPoint*)cl1->At(i);
+        oldpoint = (R3BFibPoint*)cl1->At(i);
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
-        new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);
+        new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
     R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
+R3BFibPoint* R3BFiber::AddHit(Int_t trackID,
                               Int_t detID,
-                              Int_t planeID,
-                              Int_t paddleID,
+                              Int_t plane,
                               TVector3 posIn,
                               TVector3 posOut,
                               TVector3 momIn,
@@ -282,26 +249,25 @@ R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
                               Double_t length,
                               Double_t eLoss)
 {
-    TClonesArray& clref = *fTofdCollection;
+    TClonesArray& clref = *fFiCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
         R3BLOG(INFO,
-               "at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
-                      << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
+               "Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
+                                   << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }
-    return new (clref[size])
-        R3BTofdPoint(trackID, detID, planeID, paddleID, posIn, posOut, momIn, momOut, time, length, eLoss);
+    return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
-Bool_t R3BTofD::CheckIfSensitive(std::string name)
+Bool_t R3BFiber::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("Paddle"))
+    if (TString(name).Contains("FI" + fName + "LogActive"))
     {
-        LOG(DEBUG) << "Found TofD geometry from ROOT file: " << name;
+        LOG(DEBUG) << "Found FI" << fName << " geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;
 }
 
-ClassImp(R3BTofD);
+ClassImp(R3BFiber);

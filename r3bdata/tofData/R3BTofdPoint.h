@@ -20,7 +20,7 @@
  **/
 
 #ifndef R3BTOFDPOINT_H
-#define R3BTOFDPOINT_H
+#define R3BTOFDPOINT_H 1
 
 #include "TObject.h"
 #include "TVector3.h"
@@ -29,22 +29,35 @@
 
 class R3BTofdPoint : public FairMCPoint
 {
-
   public:
     /** Default constructor **/
     R3BTofdPoint();
 
     /** Constructor with arguments
-     *@param trackID  Index of MCTrack
-     *@param detID    Detector ID
-     *@param posIn    Ccoordinates at entrance to active volume [cm]
-     *@param posOut   Coordinates at exit of active volume [cm]
-     *@param momIn    Momentum of track at entrance [GeV]
-     *@param momOut   Momentum of track at exit [GeV]
-     *@param tof      Time since event start [ns]
-     *@param length   Track length since creation [cm]
-     *@param eLoss    Energy deposit [GeV]
+     *@param trackID   Index of MCTrack
+     *@param detID     Detector ID
+     *@param planeID   Plane ID
+     *@param paddleID  Paddle ID
+     *@param posIn     Coordinates at entrance to active volume [cm]
+     *@param posOut    Coordinates at exit of active volume [cm]
+     *@param momIn     Momentum of track at entrance [GeV]
+     *@param momOut    Momentum of track at exit [GeV]
+     *@param tof       Time since event start [ns]
+     *@param length    Track length since creation [cm]
+     *@param eLoss     Energy deposit [GeV]
      **/
+    R3BTofdPoint(Int_t trackID,
+                 Int_t detID,
+                 Int_t planeID,
+                 Int_t paddleID,
+                 TVector3 posIn,
+                 TVector3 posOut,
+                 TVector3 momIn,
+                 TVector3 momOut,
+                 Double_t tof,
+                 Double_t length,
+                 Double_t eLoss);
+
     R3BTofdPoint(Int_t trackID,
                  Int_t detID,
                  TVector3 posIn,
@@ -62,6 +75,8 @@ class R3BTofdPoint : public FairMCPoint
     virtual ~R3BTofdPoint();
 
     /** Accessors **/
+    Int_t GetPlane() const { return fPlane; }
+    Int_t GetPaddle() const { return fPaddle; }
     Double_t GetXIn() const { return fX; }
     Double_t GetYIn() const { return fY; }
     Double_t GetZIn() const { return fZ; }
@@ -90,6 +105,7 @@ class R3BTofdPoint : public FairMCPoint
     virtual void Print(const Option_t* opt) const;
 
   protected:
+    Int_t fPlane, fPaddle;
     Double32_t fX_out, fY_out, fZ_out;
     Double32_t fPx_out, fPy_out, fPz_out;
 
