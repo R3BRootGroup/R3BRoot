@@ -15,13 +15,13 @@
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberHitData.h"
 #include "R3BBunchedFiberHitPar.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include <TClonesArray.h>
 #include <cassert>
 
-#include "R3BTofdHitData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -97,20 +97,12 @@ R3BBunchedFiberCal2Hit::~R3BBunchedFiberCal2Hit()
 
 InitStatus R3BBunchedFiberCal2Hit::Init()
 {
-    cout << "Init:R3BBunchedFiberCal2Hit" << endl;
+    R3BLOG(INFO, "");
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
         LOG(ERROR) << "FairRootManager not found.";
         return kERROR;
-    }
-
-    tofdin = true;
-    fTofdHitItems = (TClonesArray*)mgr->GetObject("TofdHit");
-    if (!fTofdHitItems)
-    {
-        LOG(INFO) << "Branch TofdHit not found.";
-        tofdin = false;
     }
 
     auto name = fName + "Cal";

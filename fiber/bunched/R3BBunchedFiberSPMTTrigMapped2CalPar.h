@@ -60,13 +60,6 @@ class R3BBunchedFiberSPMTTrigMapped2CalPar : public FairTask
     virtual void Exec(Option_t*);
 
     /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
-
-    /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */

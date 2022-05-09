@@ -16,7 +16,7 @@
 //
 
 #ifndef R3BBUNCHEDFIBERMAPPED2CALPAR_H
-#define R3BBUNCHEDFIBERMAPPED2CALPAR_H
+#define R3BBUNCHEDFIBERMAPPED2CALPAR_H 1
 
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
@@ -69,13 +69,6 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
      * @param option an execution option.
      */
     virtual void Exec(Option_t*);
-
-    /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
-    virtual void FinishEvent();
 
     /**
      * Method for finish of the task execution.

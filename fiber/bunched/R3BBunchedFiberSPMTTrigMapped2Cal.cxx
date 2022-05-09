@@ -20,7 +20,7 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "R3BBunchedFiberCalData.h"
-#include "R3BBunchedFiberMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
 #include <cassert>
@@ -87,7 +87,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
     LOG(DEBUG) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BBunchedFiberMappedData*)fMappedItems->At(i);
+        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
         auto channel = mapped->GetChannel();
         auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
         if (!par)
@@ -128,6 +128,4 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 
 void R3BBunchedFiberSPMTTrigMapped2Cal::FinishEvent() { fCalItems->Clear(); }
 
-void R3BBunchedFiberSPMTTrigMapped2Cal::FinishTask() {}
-
-ClassImp(R3BBunchedFiberSPMTTrigMapped2Cal)
+ClassImp(R3BBunchedFiberSPMTTrigMapped2Cal);

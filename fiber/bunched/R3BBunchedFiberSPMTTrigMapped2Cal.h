@@ -85,12 +85,6 @@ class R3BBunchedFiberSPMTTrigMapped2Cal : public FairTask
      */
     virtual void FinishEvent();
 
-    /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
-    virtual void FinishTask();
-
   private:
     R3BTCalPar* fTCalPar;
     TClonesArray* fMappedItems;
