@@ -68,6 +68,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData

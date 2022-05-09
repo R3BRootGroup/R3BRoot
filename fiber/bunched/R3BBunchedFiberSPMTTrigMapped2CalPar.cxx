@@ -14,11 +14,10 @@
 #include "R3BBunchedFiberSPMTTrigMapped2CalPar.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
-#include "R3BBunchedFiberMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
-#include <cassert>
 
 R3BBunchedFiberSPMTTrigMapped2CalPar::R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t a_verbose,
                                                                            Int_t a_update_rate,
@@ -70,12 +69,10 @@ void R3BBunchedFiberSPMTTrigMapped2CalPar::Exec(Option_t* option)
     auto mapped_num = fMapped->GetEntriesFast();
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BBunchedFiberMappedData*)fMapped->At(i);
+        auto mapped = (R3BFiberMappedData*)fMapped->At(i);
         fEngine->Fill(1, mapped->GetChannel(), 1, mapped->GetFine());
     }
 }
-
-void R3BBunchedFiberSPMTTrigMapped2CalPar::FinishEvent() {}
 
 void R3BBunchedFiberSPMTTrigMapped2CalPar::FinishTask()
 {
@@ -87,4 +84,4 @@ void R3BBunchedFiberSPMTTrigMapped2CalPar::SetUpdateRate(Int_t a_rate) { fUpdate
 
 void R3BBunchedFiberSPMTTrigMapped2CalPar::SetMinStats(Int_t a_min_stats) { fMinStats = a_min_stats; }
 
-ClassImp(R3BBunchedFiberSPMTTrigMapped2CalPar)
+ClassImp(R3BBunchedFiberSPMTTrigMapped2CalPar);

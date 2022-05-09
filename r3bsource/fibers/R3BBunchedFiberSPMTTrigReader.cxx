@@ -14,7 +14,7 @@
 #include "R3BBunchedFiberSPMTTrigReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "R3BBunchedFiberMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
 #include "TClonesArray.h"
 
@@ -29,7 +29,7 @@ R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a
     , fData((EXT_STR_h101_FIB_onion*)a_data)
     , fOffset(a_offset)
     , fOnline(kFALSE)
-    , fMappedArray(new TClonesArray("R3BBunchedFiberMappedData"))
+    , fMappedArray(new TClonesArray("R3BFiberMappedData"))
 {
 }
 
@@ -67,7 +67,7 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Read()
     {
         uint32_t channel = data->FIB_TRIGSLFI[i];
         new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-            R3BBunchedFiberMappedData(3, channel, true, data->FIB_TRIGSLCv[i], data->FIB_TRIGSLFv[i]);
+            R3BFiberMappedData(4, channel, true, data->FIB_TRIGSLCv[i], data->FIB_TRIGSLFv[i]);
     }
 
     return kTRUE;

@@ -36,9 +36,11 @@
 #include "R3BLosMappedData.h"
 #include "R3BMusicHitData.h"
 #include "R3BMusicHitPar.h"
+#include "R3BMusliHitData.h"
 #include "R3BSamplerMappedData.h"
 #include "R3BSci2HitData.h"
 #include "R3BSci2TcalData.h"
+#include "R3BTimeStitch.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -58,6 +60,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fHeader(NULL)
     , fHitSci2(NULL)
     , fHitItemsMus(NULL)
+    , fHitItemsMusli(NULL)
     , fFrsDataCA(NULL)
     , fPos_p0(-11)
     , fPos_p1(54.7)
@@ -67,6 +70,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fZprimary(50.)
     , fZoffset(-1.3)
     , fOnline(kFALSE)
+    , fTimeStitch(nullptr)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
     , fUseLOS(kTRUE)
@@ -90,37 +94,24 @@ R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 
 void R3BAnalysisIncomingID::SetParContainers()
 {
-    LOG(INFO) << "R3BAnalysisIncomingID::SetParContainers()";
+    R3BLOG(INFO, "");
     // Parameter Container
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
+    R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
 
-    if (!fIncomingID_Par)
-    {
-        LOG(ERROR) << "R3BAnalysisIncomingIDPar:: Couldn't get handle on R3BincomingIDPar container";
-    }
-    else
-    {
-        LOG(INFO) << "R3BAnalysisIncomingIDPar:: R3BincomingIDParcontainer open";
-    }
-
-    R3BMusicHitPar* fCal_Par; /// **< Parameter container. >* //
-    fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
-    if (!fCal_Par)
-    {
-        LOG(ERROR) << "R3BAnalysisIncomingIDPar::Init() Couldn't get handle on musicHitPar container";
-    }
-    else
-    {
-        LOG(INFO) << "R3BAnalysisIncomingIDPar:: musicHitPar container open";
-    }
+    /*auto fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
+    R3BLOG_IF(WARNING, !fCal_Par, "Couldn't get handle on musicHitPar container");
+    R3BLOG_IF(INFO, fCal_Par, "musicHitPar container was found");
 
     //--- Parameter Container ---
     fNumMusicParams = fCal_Par->GetNumParZFit(); // Number of Parameters
-    LOG(INFO) << "R3BAnalysisIncomingIDPar::R3BMusicCal2Hit: Nb parameters for charge-Z: " << (Int_t)fNumMusicParams;
+    if (fNumMusicParams>0){
+    R3BLOG(INFO, "Nb parameters for charge-Z: " << (Int_t)fNumMusicParams);
     CalZParams = new TArrayF();
     CalZParams->Set(fNumMusicParams);
     CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
@@ -138,10 +129,9 @@ void R3BAnalysisIncomingID::SetParContainers()
         fZ2 = CalZParams->GetAt(2);
     }
     else
-        LOG(INFO)
-            << "R3BAnalysisIncomingIDPar:: R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of "
-               "parameters: "
-            << fNumMusicParams;
+        R3BLOG(ERROR, "Parameters for charge-Z cannot be used here, number of parameters: "<< fNumMusicParams);
+    }*/
+
     return;
 }
 
@@ -180,7 +170,8 @@ InitStatus R3BAnalysisIncomingID::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    // fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
     R3BLOG_IF(WARNING, !fHitSci2, "Could not find Sci2Hit");
@@ -188,6 +179,9 @@ InitStatus R3BAnalysisIncomingID::Init()
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
     R3BLOG_IF(WARNING, !fHitItemsMus, "MusicHitData not found");
+
+    fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
+    R3BLOG_IF(WARNING, !fHitItemsMusli, "MusliHitData not found");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
@@ -198,6 +192,9 @@ InitStatus R3BAnalysisIncomingID::Init()
     mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
 
     SetParameter();
+
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
 
     return kSUCCESS;
 }
@@ -220,7 +217,20 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         Int_t nHits = fHitItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            auto hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            if (!hit)
+                continue;
+            Zmusic = hit->GetZcharge();
+            Music_ang = hit->GetTheta() * 1000.; // mrad
+        }
+    }
+
+    if (fHitItemsMusli && fHitItemsMusli->GetEntriesFast() > 0)
+    {
+        Int_t nHits = fHitItemsMusli->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            auto hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
             if (!hit)
                 continue;
             Zmusic = hit->GetZcharge();
@@ -309,9 +319,8 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 
         if (multLos[i] >= 1 && multSci2[i] >= 1)
         {
-            ToFraw_m1 = timeLosV[i] - TimeSci2_m1[i];
-            if (ToFraw_m1 > 0)
-                ToFraw_m1 = ToFraw_m1 - 40960.;
+            ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i] - TimeSci2_m1[i], "vftx", "vftx");
+
             Velo_m1 =
                 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
             Beta_m1 = Velo_m1 / 0.299792458;
@@ -328,10 +337,16 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                 {
                     if (Zmusic > 0. && !fUseLOS)
                     {
-                        double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                        double zcor = sqrt(Emus * Beta_m1) * 0.277;
-
-                        AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                        // double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
+                        {
+                            AddData(1, 2, Zmusic, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                        else if (!fCutCave)
+                        {
+                            AddData(1, 2, Zmusic, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
                     }
 
                     if (Zlos[i] > 0. && fUseLOS)
@@ -346,15 +361,20 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         }
                     }
                 }
-
                 else if (!fCutS2)
                 {
                     if (Zmusic > 0. && !fUseLOS)
                     {
-                        double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                        double zcor = sqrt(Emus * Beta_m1) * 0.277;
-
-                        AddData(1, 2, zcor, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                        // double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
+                        {
+                            AddData(1, 2, Zmusic, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
+                        else if (!fCutCave)
+                        {
+                            AddData(1, 2, Zmusic, AoQ_m1_corr, Beta_m1, Brho_m1, PosCal_m1, 0.);
+                        }
                     }
 
                     if (Zlos[i] > 0. && fUseLOS)

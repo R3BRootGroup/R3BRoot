@@ -21,7 +21,7 @@
 
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberMapped2Cal.h"
-#include "R3BBunchedFiberMappedData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 
@@ -158,7 +158,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
     R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BBunchedFiberMappedData*)fMappedItems->At(i);
+        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto channel = mapped->GetChannel();

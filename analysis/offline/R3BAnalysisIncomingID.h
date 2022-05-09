@@ -39,6 +39,7 @@
 class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
+class R3BTimeStitch;
 class R3BTcutPar;
 
 /**
@@ -112,8 +113,10 @@ class R3BAnalysisIncomingID : public FairTask
 
   private:
     void SetParameter();
+    R3BTimeStitch* fTimeStitch;
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
     TClonesArray* fHitItemsMus;
+    TClonesArray* fHitItemsMusli;
     TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
 
     TClonesArray* fHitSci2; /**< Array with Tcal items. */
