@@ -45,7 +45,7 @@ R3BFiber::R3BFiber(const TString& name,
 }
 
 R3BFiber::R3BFiber(const TString& name, const TString& geoFile, DetectorId detid, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BFi" + name, detid, geoFile, combi)
+    : R3BDetector("R3B" + name, detid, geoFile, combi)
     , fName(name)
     , fDetId(detid)
     , fFiCollection(new TClonesArray("R3BFibPoint"))
@@ -74,8 +74,8 @@ void R3BFiber::Initialize()
 {
     FairDetector::Initialize();
 
-    R3BLOG(INFO, "for fiber Fi" << fName);
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("FI" + fName + "Log"));
+    R3BLOG(INFO, "for fiber " << fName);
+    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Fiber"));
 }
 
 void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(INFO, ""); }
@@ -189,7 +189,7 @@ void R3BFiber::EndOfEvent()
 void R3BFiber::Register()
 {
     R3BLOG(DEBUG, "");
-    FairRootManager::Instance()->Register("Fi" + fName + "Point", GetName(), fFiCollection, kTRUE);
+    FairRootManager::Instance()->Register(fName + "Point", GetName(), fFiCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -207,7 +207,7 @@ TClonesArray* R3BFiber::GetCollection(Int_t iColl) const
 void R3BFiber::Print(Option_t* option) const
 {
     Int_t nHits = fFiCollection->GetEntriesFast();
-    LOG(INFO) << "R3BFi" << fName << ": " << nHits << " points registered in this event";
+    LOG(INFO) << "R3B" << fName << ": " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -262,9 +262,9 @@ R3BFibPoint* R3BFiber::AddHit(Int_t trackID,
 
 Bool_t R3BFiber::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI" + fName + "LogActive"))
+    if (TString(name).Contains(fName))
     {
-        LOG(DEBUG) << "Found FI" << fName << " geometry from ROOT file: " << name;
+        LOG(DEBUG) << "Found" << fName << " geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

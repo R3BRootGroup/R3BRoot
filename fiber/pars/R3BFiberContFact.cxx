@@ -22,11 +22,12 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BFiberContFact.h"
-#include "R3BLogger.h"
 #include "R3BBunchedFiberHitPar.h"
+#include "R3BFiberContFact.h"
 #include "R3BFiberMAPMTHitPar.h"
 #include "R3BFiberMappingPar.h"
+#include "R3BLogger.h"
+#include "R3BTGeoPar.h"
 
 #include "TClass.h"
 
@@ -131,6 +132,46 @@ void R3BFiberContFact::setAllContainers()
     auto p20 = new FairContainer("Fi33MappingPar", "Fi33 Mapping Parameters", "TestDefaultContext");
     p20->addContext("TestNonDefaultContext");
     containers->Add(p20);
+
+    FairContainer* p21 = new FairContainer("Fi10GeoPar", "Fi10 geometry parameters", "fi10GeoContext");
+    p21->addContext("fi10GeoContext");
+    containers->Add(p21);
+
+    FairContainer* p22 = new FairContainer("Fi11GeoPar", "Fi11 geometry parameters", "fi11GeoContext");
+    p22->addContext("fi11GeoContext");
+    containers->Add(p22);
+
+    FairContainer* p23 = new FairContainer("Fi12GeoPar", "Fi12 geometry parameters", "fi12GeoContext");
+    p23->addContext("fi12GeoContext");
+    containers->Add(p23);
+
+    FairContainer* p24 = new FairContainer("Fi13GeoPar", "Fi13 geometry parameters", "fi13GeoContext");
+    p24->addContext("fi13GeoContext");
+    containers->Add(p24);
+
+    FairContainer* p25 = new FairContainer("Fi30GeoPar", "Fi30 geometry parameters", "fi30GeoContext");
+    p25->addContext("fi30GeoContext");
+    containers->Add(p25);
+
+    FairContainer* p26 = new FairContainer("Fi31GeoPar", "Fi31 geometry parameters", "fi31GeoContext");
+    p26->addContext("fi31GeoContext");
+    containers->Add(p26);
+
+    FairContainer* p27 = new FairContainer("Fi32GeoPar", "Fi32 geometry parameters", "fi32GeoContext");
+    p27->addContext("fi32GeoContext");
+    containers->Add(p27);
+
+    FairContainer* p28 = new FairContainer("Fi33GeoPar", "Fi33 geometry parameters", "fi33GeoContext");
+    p28->addContext("fi33GeoContext");
+    containers->Add(p28);
+
+    FairContainer* p29 = new FairContainer("Fi23aGeoPar", "Fi23a geometry parameters", "fi23aGeoContext");
+    p29->addContext("fi23aGeoContext");
+    containers->Add(p29);
+
+    FairContainer* p30 = new FairContainer("Fi23bGeoPar", "Fi23b geometry parameters", "fi23bGeoContext");
+    p30->addContext("fi23bGeoContext");
+    containers->Add(p30);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
@@ -140,15 +181,21 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    R3BLOG(INFO, "Create container name " << name);
-    
+    R3BLOG(INFO, name);
+
     FairParSet* p = 0;
-    if (
-        strcmp(name, "Fi10MappingPar") == 0 || strcmp(name, "Fi11MappingPar") == 0 ||
-        strcmp(name, "Fi12MappingPar") == 0 || strcmp(name, "Fi13MappingPar") == 0 ||
-        strcmp(name, "Fi23aMappingPar") == 0 || strcmp(name, "Fi23bMappingPar") == 0 ||
-        strcmp(name, "Fi30MappingPar") == 0 || strcmp(name, "Fi31MappingPar") == 0 ||
-        strcmp(name, "Fi32MappingPar") == 0 || strcmp(name, "Fi33MappingPar") == 0)
+    if (strcmp(name, "Fi10GeoPar") == 0 || strcmp(name, "Fi11GeoPar") == 0 || strcmp(name, "Fi12GeoPar") == 0 ||
+        strcmp(name, "Fi13GeoPar") == 0 || strcmp(name, "Fi23aGeoPar") == 0 || strcmp(name, "Fi23bGeoPar") == 0 ||
+        strcmp(name, "Fi30GeoPar") == 0 || strcmp(name, "Fi31GeoPar") == 0 || strcmp(name, "Fi32GeoPar") == 0 ||
+        strcmp(name, "Fi33GeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "Fi10MappingPar") == 0 || strcmp(name, "Fi11MappingPar") == 0 ||
+             strcmp(name, "Fi12MappingPar") == 0 || strcmp(name, "Fi13MappingPar") == 0 ||
+             strcmp(name, "Fi23aMappingPar") == 0 || strcmp(name, "Fi23bMappingPar") == 0 ||
+             strcmp(name, "Fi30MappingPar") == 0 || strcmp(name, "Fi31MappingPar") == 0 ||
+             strcmp(name, "Fi32MappingPar") == 0 || strcmp(name, "Fi33MappingPar") == 0)
     {
         p = new R3BFiberMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

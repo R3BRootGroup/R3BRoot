@@ -33,6 +33,7 @@ ${R3BROOT_SOURCE_DIR}/fiber/pars
 ${R3BROOT_SOURCE_DIR}/fiber/mapmt
 ${R3BROOT_SOURCE_DIR}/fiber/bunched
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/tracking
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -74,7 +75,7 @@ Set(LINKDEF FiberLinkDef.h)
 Set(LIBRARY_NAME R3BBunchedFiber)
 
 set(DEPENDENCIES
-R3BData R3BTCal
+R3BData R3BTCal R3BTracking R3BBase
 )
 
 GENERATE_LIBRARY()

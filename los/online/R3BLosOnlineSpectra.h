@@ -33,6 +33,7 @@
 #include <cstdlib>
 
 class TClonesArray;
+class R3BTimeStitch;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
@@ -194,6 +195,7 @@ class R3BLosOnlineSpectra : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
 
+    R3BTimeStitch* fTimeStitch;
     TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
     TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
 
