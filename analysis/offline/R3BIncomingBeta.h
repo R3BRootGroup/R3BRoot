@@ -11,13 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BAnalysisIncomingID_H
-#define R3BAnalysisIncomingID_H 1
+#ifndef R3BIncomingBeta_H
+#define R3BIncomingBeta_H 1
 
 // ROOT headers
-#include "TCutG.h"
 #include "TMath.h"
 #include <TArrayF.h>
+#include <array>
+#include <vector>
 
 // R3B headers
 #include "R3BEventHeader.h"
@@ -34,20 +35,16 @@
 class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
-class R3BTcutPar;
+class R3BTimeStitch;
 
-/**
- * This taks reads all detector data items for the analysis of incoming
- * projectiles from FRS.
- */
-class R3BAnalysisIncomingID : public FairTask
+class R3BIncomingBeta : public FairTask
 {
   public:
     /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BAnalysisIncomingID();
+    R3BIncomingBeta();
 
     /**
      * Standard constructor.
@@ -55,13 +52,13 @@ class R3BAnalysisIncomingID : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BAnalysisIncomingID(const char* name, Int_t iVerbose = 1);
+    R3BIncomingBeta(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BAnalysisIncomingID();
+    virtual ~R3BIncomingBeta();
 
     /**
      * Method for task initialization.
@@ -88,6 +85,8 @@ class R3BAnalysisIncomingID : public FairTask
 
     virtual void SetParContainers();
 
+    virtual void Reset();
+
     void SetBetaCorrectionForZ(Double_t p0, Double_t p1, Double_t p2, Double_t Zprimary, Double_t Zoffset)
     {
         fP0 = p0;
@@ -100,20 +99,17 @@ class R3BAnalysisIncomingID : public FairTask
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
-    // Accessor to select the MUSIC for the incoming ID
-    void SetMusicForPID() { fUseLOS = kFALSE; }
-
   private:
     void SetParameter();
+    R3BTimeStitch* fTimeStitch;
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
-    TClonesArray* fHitItemsMus;
-    TClonesArray* fHitItemsMusli;
-    TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
+    TClonesArray* fFrsDataCA;          /**< Array with FRS-output data. >*/
+
+    TClonesArray* fHitSci2; /**< Array with Tcal items. */
     TClonesArray* fHitLos;
 
     R3BEventHeader* fHeader; // Event header
     Bool_t fOnline;          // Don't store data for online
-    Bool_t fUseLOS;          // Use LOS charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;
@@ -123,15 +119,21 @@ class R3BAnalysisIncomingID : public FairTask
     TArrayF* fToFoffset;
     TArrayF *fPosS2Left, *fPosS2Right;
     TArrayF *fTof2InvV_p0, *fTof2InvV_p1;
-    TArrayF* fBrho0_S2toCC;
-    TArrayF* fDispersionS2;
-    Float_t fx0_point, fy0_point, frot_ang;
-    Float_t fx0_Aq, fy0_Aq, fang_Aq;
     Float_t fBeta_max, fBeta_min;
-    TCutG *fCutS2, *fCutCave;
+
+    /** Private method FrsData **/
+    //** Adds a FrsData to the analysis
+    R3BFrsData* AddData(Int_t StaId,
+                        Int_t StoId,
+                        Double_t z,
+                        Double_t aq,
+                        Double_t betaval,
+                        Double_t brhoval,
+                        Double_t xs2,
+                        Double_t xc);
 
   public:
-    ClassDef(R3BAnalysisIncomingID, 1)
+    ClassDef(R3BIncomingBeta, 1)
 };
 
-#endif /* R3BAnalysisIncomingID_H */
+#endif /* R3BIncomingBeta_H */
