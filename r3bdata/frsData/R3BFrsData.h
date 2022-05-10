@@ -59,6 +59,15 @@ class R3BFrsData : public TObject
     inline const Double_t GetXS2() const { return fxs2; }
     inline const Double_t GetXCave() const { return fxc; }
 
+    void SetStaId(Int_t v) { fStaId = v; }
+    void SetStoId(Int_t v) { fStoId = v; }
+    void SetZ(Double_t v) { fZ = v; }
+    void SetAq(Double_t v) { fAq = v; }
+    void SetBeta(Double_t v) { fBeta = v; }
+    void SetBrho(Double_t v) { fBrho = v; }
+    void SetXS2(Double_t v) { fxs2 = v; }
+    void SetXCave(Double_t v) { fxc = v; }
+
   protected:
     Int_t fStaId, fStoId;
     Double_t fZ, fAq;
