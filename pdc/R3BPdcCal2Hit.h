@@ -131,8 +131,10 @@ class R3BPdcCal2Hit : public FairTask
     // histograms for gain matching
     TH2F* fh_time_raw[N_PLANE_MAX_PDC];
     TH2F* fh_time_drift[N_PLANE_MAX_PDC];
-    TH1F* fh_running_sum;
-    TH1F* fh_radius;
+    TH2F* fh_running_sum;
+    TH2F* fh_radius[N_PLANE_MAX_PDC];
+    TH2F* fh_radius_dt[N_PLANE_MAX_PDC];
+    TH2F* fh_mult[N_PLANE_MAX_PDC];
     
 	TH2F* fh_wire_cor;
 	

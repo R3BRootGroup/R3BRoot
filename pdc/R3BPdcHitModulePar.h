@@ -77,6 +77,8 @@ class R3BPdcHitModulePar : public FairParGenericSet
 
     /** Accessor functions **/
     Int_t GetWire() const { return fWire; }
+    Double_t GetdTmin() const { return fdTmin; }
+    Double_t GetdTmax() const { return fdTmax; }
     Double_t GetTmin() const { return fTmin; }
     Double_t GetTmax() const { return fTmax; }
     Double_t GetPar1() const { return fPar1; }
@@ -86,6 +88,8 @@ class R3BPdcHitModulePar : public FairParGenericSet
     Double_t GetPar5() const { return fPar5; }
 
     void SetWire(Int_t i) { fWire = i; }
+    void SetdTmin(Double_t dtmin) { fdTmin = dtmin; }
+    void SetdTmax(Double_t dtmax) { fdTmax = dtmax; }
     void SetTmin(Double_t tmin) { fTmin = tmin; }
     void SetTmax(Double_t tmax) { fTmax = tmax; }
     void SetPar1(Double_t p1) { fPar1 = p1; }
@@ -96,6 +100,8 @@ class R3BPdcHitModulePar : public FairParGenericSet
 
   private:
     Int_t fWire;      /**< Index of a fiber. */
+    Double_t fdTmin;    /**< minimum drift time */
+    Double_t fdTmax;    /**< maximum drift time */
     Double_t fTmin;    /**< minimum drift time */
     Double_t fTmax;    /**< maximum drift time */
     Double_t fPar1;    /**< Parameter 1 */

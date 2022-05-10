@@ -125,21 +125,20 @@ R3BGladFieldMap::~R3BGladFieldMap()
 void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
-    // fPosY = 0.0;
-    fPosY = 1.5;
+    //fPosY = 0.0;
+    fPosY = 1.08;
 
-    // Distance in z: turning point to flansch:   539.5 mm
-    //				       GLAD flansch target:  1210 mm
-    //											  1749.5 mm
-    //
-    // fPosZ = 163.4+16.2-0.5;
-    // fPosZ = 172.5; // Measured with ruler
-    // fPosZ = 174.95; // from the drawings
-    fPosZ = 173.5;
-    fXAngle = 0.03;
-    fYAngle = -13.5;
-    fZAngle = 0.02;
+// Distance in z: turning point to flansch:   539.5 mm 
+//				       GLAD flansch target:  1210 mm
+//											  1749.5 mm
+// 					
+    //fPosZ = 163.4+16.2-0.5; 
+    //fPosZ = 172.5; // Measured with ruler
+    fPosZ = 174.95; // from the drawings
 
+    fXAngle = 0.;
+    fYAngle = -14.;
+    fZAngle = 0.;
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
@@ -220,7 +219,6 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
     gTrans1.SetY(-fPosY);
     gTrans1.SetZ(-fPosZ);
     localPoint = localPoint + gTrans1;
-
     localPoint.RotateX(-fXAngle * TMath::DegToRad());
     localPoint.RotateY(-fYAngle * TMath::DegToRad());
     localPoint.RotateZ(-fZAngle * TMath::DegToRad());

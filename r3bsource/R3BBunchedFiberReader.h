@@ -109,6 +109,19 @@ class TClonesArray;
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[2][0][1], data->NAME##_TRIGMLF);       \
         R3B_BUNCHED_FIBER_INIT_END_;                                             \
     } while (0)
+#define R3B_BUNCHED_FIBER_INIT_MAPMT_ONLY_TRIG(NAME, data)                            \
+    do                                                                           \
+    {                                                                            \
+        R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][1], data->NAME##_TMTF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[2][0][0], data->NAME##_TRIGMLC);       \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[2][0][1], data->NAME##_TRIGMLF);       \
+        R3B_BUNCHED_FIBER_INIT_END_;                                             \
+    } while (0)
 #define R3B_BUNCHED_FIBER_UCESB_LINK(dst, src)             \
     do                                                     \
     {                                                      \

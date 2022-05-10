@@ -57,7 +57,6 @@ R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
-
     switch (fSPMTElectronics)
     {
         case CTDC:

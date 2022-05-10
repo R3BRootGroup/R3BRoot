@@ -30,6 +30,8 @@ R3BPdcHitModulePar::R3BPdcHitModulePar(const char* name,
                                                      Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fWire(0)
+    , fdTmin(0)
+    , fdTmax(0)
     , fTmin(0)
     , fTmax(0)
     , fPar1(0)
@@ -78,6 +80,8 @@ void R3BPdcHitModulePar::printParams()
 {
     LOG(INFO) << "   R3BPdcHitModulePar: FIBER HIT Calibration Parameters: ";
     LOG(INFO) << "   fWire: " << fWire;
+    LOG(INFO) << "   fdTmin: " << fdTmin;
+    LOG(INFO) << "   fdTmax: " << fdTmax;
     LOG(INFO) << "   fTmin: " << fTmin;
     LOG(INFO) << "   fTmax: " << fTmax;
     LOG(INFO) << "   fPar1: " << fPar1;

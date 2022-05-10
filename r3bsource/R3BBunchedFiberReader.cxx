@@ -66,14 +66,14 @@ Bool_t R3BBunchedFiberReader::Read()
 {
     auto it = counter.find(fShortName);
 
-    // LOG(INFO) << "R3BBunchedFiberReader::Read BEGIN";
+    LOG(DEBUG) << "R3BBunchedFiberReader::Read BEGIN";
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
-        // LOG(INFO) << "R3BBunchedFiberReader::Read fiber/side "<<fShortName<<", "<<side_i;
+        LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side "<<fShortName<<", "<<side_i;
 
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
         {
-            //    LOG(INFO) << "R3BBunchedFiberReader::Read fiber/side/edge "<<fShortName<<", "<<side_i<<", "<<edge_i;
+            LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side/edge "<<fShortName<<", "<<side_i<<", "<<edge_i;
 
             auto const& e = fMHL[side_i][edge_i];
 
@@ -83,7 +83,7 @@ Bool_t R3BBunchedFiberReader::Read()
             uint32_t c_ = *e[0]._;
             uint32_t f_ = *e[1]._;
 
-            //  LOG(INFO) << "R3BBunchedFiberReader::Read fiber/c_M/f_M "<<fShortName<<", "<<c_M<<", "<<f_M;
+            LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/c_M/f_M "<<fShortName<<", "<<c_M<<", "<<f_M;
 
             if (c_M != f_M || c_ != f_)
             {
@@ -123,8 +123,8 @@ Bool_t R3BBunchedFiberReader::Read()
                 for (; cur_entry < c_ME; cur_entry++)
                 {
 
-                    //   LOG(INFO) << "Data SAPMT FIBERS!!!!!!"
-                    //    << c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry];
+                    LOG(DEBUG) << "Data SAPMT FIBERS!!!!!!"
+                        << c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry];
 
                     new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                         R3BBunchedFiberMappedData(side_i, c_MI, 0 == edge_i, e[0]._v[cur_entry], e[1]._v[cur_entry]);
@@ -146,6 +146,8 @@ Bool_t R3BBunchedFiberReader::Read()
         uint32_t f_M = *e[1]._M;
         uint32_t c_ = *e[0]._;
         uint32_t f_ = *e[1]._;
+
+        LOG(DEBUG) << "Trigger times coarse = "<< c_ << " fine = " << f_ ;
 
         if (c_ != f_)
         {
@@ -171,8 +173,8 @@ Bool_t R3BBunchedFiberReader::Read()
             if (cur_entry < c_ME)
             {
 
-                // LOG(INFO) << "Data MAPMT FIBERS!!!!!!"
-                //        << c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry];
+                LOG(DEBUG) << "Data MAPMT FIBERS!!!!!!"
+                        << c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry];
 
                 new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                     R3BBunchedFiberMappedData(2, c_MI, true, e[0]._v[cur_entry], e[1]._v[cur_entry]);
@@ -239,7 +241,7 @@ Bool_t R3BBunchedFiberReader::Read()
     }
     ++it->second;
 
-    // LOG(ERROR) << "R3BBunchedFiberReader::Read END";
+    LOG(DEBUG) << "R3BBunchedFiberReader::Read END";
     return kTRUE;
 }
 

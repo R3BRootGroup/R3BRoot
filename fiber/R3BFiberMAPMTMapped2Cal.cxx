@@ -171,7 +171,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         //       cout<<"Input M2C: "<<fName<<", "<<  i<<", "<<fCalItems->GetEntriesFast()<<", "<<channel<<",
         //       "<<mapped->IsTrigger()<<", "<<mapped->GetSide()<<", "<<mapped->IsLeading()<<endl;
 
-        if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+        if (fName == "Fi0" || fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
         {
             if (2 == mapped->GetSide())
             {

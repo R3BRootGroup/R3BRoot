@@ -84,11 +84,25 @@ class R3BOnlineSpectraPdc : public FairTask
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     void Reset_PDC_Histo();
+    void Reset_Fi0_Histo();
+    void Reset_Fi1_Histo();
 
   private:
     TClonesArray* fMappedItems; /**< Array with Cal items - input data. */
     TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems;    /**< Array with Cal items - input data. */
+
+    TClonesArray* fMappedItems_fi0; /**< Array with Cal items - input data. */
+    TClonesArray* fCalItems_fi0;    /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems_fi0;    /**< Array with Cal items - input data. */
+
+    TClonesArray* fMappedItems_fi1a; /**< Array with Cal items - input data. */
+    TClonesArray* fCalItems_fi1a;    /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems_fi1a;    /**< Array with Cal items - input data. */
+
+    TClonesArray* fMappedItems_fi1b; /**< Array with Cal items - input data. */
+    TClonesArray* fCalItems_fi1b;    /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems_fi1b;    /**< Array with Cal items - input data. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -103,12 +117,55 @@ class R3BOnlineSpectraPdc : public FairTask
 
     TH1F* fh_Pdc_Wire[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Tot[N_PLANE_MAX_PDC];
+    TH2F* fh_Pdc_mult[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_ToF[N_PLANE_MAX_PDC];
     TH1F* fh_Pdc_x[N_PLANE_MAX_PDC];
     TH1F* fh_Pdc_y[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_xy[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Time[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Wire_vs_Events[N_PLANE_MAX_PDC];
+    TH2F* fh_Pdc_ToT_vs_Time[144];
+    TH2F* fh_Pdc_ToT_vs_Hit[144];
+
+    TH1F* fh_fi0_0_fiber;
+    TH1F* fh_fi0_1_fiber;
+    TH1F* fh_fi0_0_mult;
+    TH1F* fh_fi0_1_mult;
+    TH2F* fh_fi0_0_Tot;
+    TH2F* fh_fi0_1_Tot;
+    TH2F* fh_fi0_0_Time;
+    TH2F* fh_fi0_1_Time;
+    TH1F* fh_fi0_0_fiber_mc;
+    TH1F* fh_fi0_1_fiber_mc;
+    TH1F* fh_fi0_0_mult_mc;
+    TH1F* fh_fi0_1_mult_mc;
+    TH2F* fh_fi0_0_Tot_mc;
+    TH2F* fh_fi0_1_Tot_mc;
+    TH2F* fh_fi0_0_Time_mc;
+    TH2F* fh_fi0_1_Time_mc;
+    
+    TH2F* fh_fi0_0_pdc;
+    TH2F* fh_fi0_1_pdc;
+    
+    TH1F* fh_fi1a_fiber;
+    TH1F* fh_fi1b_fiber;
+    TH1F* fh_fi1a_mult;
+    TH1F* fh_fi1b_mult;
+    TH2F* fh_fi1a_Tot;
+    TH2F* fh_fi1b_Tot;
+    TH2F* fh_fi1a_Time;
+    TH2F* fh_fi1b_Time;
+    TH1F* fh_fi1a_fiber_mc;
+    TH1F* fh_fi1b_fiber_mc;
+    TH1F* fh_fi1a_mult_mc;
+    TH1F* fh_fi1b_mult_mc;
+    TH2F* fh_fi1a_Tot_mc;
+    TH2F* fh_fi1b_Tot_mc;
+    TH2F* fh_fi1a_Time_mc;
+    TH2F* fh_fi1b_Time_mc;
+    
+    TH2F* fh_fi1a_pdc;
+    TH2F* fh_fi1b_pdc;
 
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)
