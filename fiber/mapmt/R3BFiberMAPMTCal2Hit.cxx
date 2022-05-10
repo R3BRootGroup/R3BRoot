@@ -409,8 +409,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         }
                     }
 
-                    tot_down *= 10. / gainDown;
-                    tot_up *= 10. / gainUp;
+                    tot_down *= 20. / gainDown;
+                    tot_up *= 20. / gainUp;
 
                     //  tof -= tsync;
                     t_down -= offsetDown;

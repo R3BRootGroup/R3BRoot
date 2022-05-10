@@ -154,7 +154,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
 
     fh_FFT = new TH1F("FFT", "FFT", 1000000, 0., 10.);
     fh_FFT_adj = new TH1F("adj_FFT", "FFT", 1000000, 0., 10.);
-    fh_FFT_add = new TH1F("added_FFT", "added FFT", 1000000, 0., 10.);
+    fh_FFT_add = new TH1F("added_FFT", "FFT summed", 1000000, 0., 10.);
 
     fh_hans_sum = new TH1F("Spillquality_sum", "Spill quality HT", 600, -300., 300.);
     fh_hans_sum_byMax = new TH1F("Spillquality_sum_byMax", "Spill quality HT", 600, -300., 300.);
@@ -271,16 +271,16 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     fh_FFT_adj->Draw();
 
     cFFT->cd(4);
-    // gPad->SetLogy();
-    fh_FFT_adj->GetXaxis()->SetTitle("Frequency [10kHz]");
-    fh_FFT_adj->GetYaxis()->SetTitle("Magnitude arb. units");
-    fh_FFT_adj->Draw();
+    gPad->SetLogy();
+    fh_FFT_add->GetXaxis()->SetTitle("Frequency [10kHz]");
+    fh_FFT_add->GetYaxis()->SetTitle("Magnitude arb. units");
+    fh_FFT_add->Draw();
 
     run->AddObject(cFFT);
 
-    run->GetHttpServer()->RegisterCommand("Reset", Form("/Tasks/%s/->Reset_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
-    run->GetHttpServer()->RegisterCommand("Update", Form("/Tasks/%s/->Update_Histo()", GetName()));
+    // run->GetHttpServer()->RegisterCommand("Update", Form("/Tasks/%s/->Update_Histo()", GetName()));
 
     return kSUCCESS;
 }

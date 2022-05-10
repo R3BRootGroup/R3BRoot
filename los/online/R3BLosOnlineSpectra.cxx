@@ -14,34 +14,30 @@
 // ------------------------------------------------------------
 // -----                R3BLosOnlineSpectra               -----
 // -----          Created April 13th 2016 by M.Heil       -----
+// -----       Updated May 11th 2022 by J.L. Rodriguez    -----
 // ------------------------------------------------------------
 
 #include "R3BLosOnlineSpectra.h"
+#include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-
-#include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
+#include "R3BTimeStitch.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+
 #include "TCanvas.h"
-#include "TGaxis.h"
+#include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
-
-#include "TClonesArray.h"
 #include "TMath.h"
-#include <TRandom3.h>
-#include <TRandomGen.h>
-#include <algorithm>
-#include <array>
 #include <vector>
+
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
@@ -56,6 +52,7 @@ R3BLosOnlineSpectra::R3BLosOnlineSpectra(const char* name, Int_t iVerbose)
     , fTpat(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
+    , fTimeStitch(nullptr)
 {
 }
 
@@ -126,6 +123,7 @@ InitStatus R3BLosOnlineSpectra::Init()
     //------------------------------------------------------------------------
     // Los detector
     TCanvas* cLos[fNofLosDetectors];
+    TCanvas* cLos_diagnosis[fNofLosDetectors];
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
@@ -135,8 +133,12 @@ InitStatus R3BLosOnlineSpectra::Init()
 
             cLos[iloscount] = new TCanvas(detName, detName, 10, 10, 1010, 810);
 
+            char detName2[255];
+            sprintf(detName2, "LOS%d_diagnosis", iloscount + 1);
+            cLos_diagnosis[iloscount] = new TCanvas(detName2, detName2, 10, 10, 1010, 810);
+
             fh_los_channels[iloscount] =
-                new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 10, 0., 10.);
+                new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 20, 0., 20.);
             fh_los_channels[iloscount]->GetXaxis()->SetTitle("Channel number");
             fh_los_channels[iloscount]->SetFillColor(31);
 
@@ -179,6 +181,7 @@ InitStatus R3BLosOnlineSpectra::Init()
                                                     -4.,
                                                     4.);
             fh_los_tres_TAMEX[iloscount]->GetXaxis()->SetTitle("Time TAMEX / ns");
+            fh_los_tres_TAMEX[iloscount]->SetFillColor(31);
 
             fh_los_tot[iloscount] =
                 new TH2F(Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 10, 0, 10, 1500, 0., 300.);
@@ -235,6 +238,7 @@ InitStatus R3BLosOnlineSpectra::Init()
                 new TH1F(Form("%s_vftx_tamex", detName), Form("%s vftx_tamex", detName), 100000, -5000, 5000.);
             fh_los_vftx_tamex[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_vftx_tamex[iloscount]->GetXaxis()->SetTitle("Ttamex-Tvftx / ns");
+            fh_los_vftx_tamex[iloscount]->SetFillColor(31);
 
             cLos[iloscount]->Divide(3, 3);
             cLos[iloscount]->cd(1);
@@ -263,11 +267,35 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_ihit_ToT[iloscount]->Draw("colz");
             cLos[iloscount]->cd(0);
             mainfol->Add(cLos[iloscount]);
+
+            cLos_diagnosis[iloscount]->Divide(2, 3);
+            cLos_diagnosis[iloscount]->cd(1);
+            gPad->SetLogz();
+            fh_los_pos_TAMEX[iloscount]->Draw("colz");
+            cLos_diagnosis[iloscount]->cd(2);
+            gPad->SetLogy();
+            fh_los_tres_TAMEX[iloscount]->Draw();
+            cLos_diagnosis[iloscount]->cd(3);
+            gPad->SetLogz();
+            fh_losToT_vs_Events[iloscount]->Draw("colz");
+            cLos_diagnosis[iloscount]->cd(4);
+            gPad->SetLogz();
+            fh_losTAMEX_vs_Events[iloscount]->Draw("colz");
+            cLos_diagnosis[iloscount]->cd(5);
+            gPad->SetLogz();
+            fh_losMCFD_vs_Events[iloscount]->Draw("colz");
+            cLos_diagnosis[iloscount]->cd(6);
+            gPad->SetLogy();
+            fh_los_vftx_tamex[iloscount]->Draw();
+            mainfol->Add(cLos_diagnosis[iloscount]);
         }
 
         run->AddObject(mainfol);
         run->GetHttpServer()->RegisterCommand("Reset_LOS_HIST", Form("/Objects/%s/->Reset_LOS_Histo()", GetName()));
     }
+
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
 
     return kSUCCESS;
 }
@@ -440,8 +468,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
             Int_t iDet = hit->GetDetector(); // 1..
             Int_t iCha = hit->GetChannel();  // 1..
             Int_t iTyp = hit->GetType();     // 0,1,2,3
-
-            fh_los_channels[iDet - 1]->Fill(iCha); // exclude MTDC data
+            if (iTyp == 0 || iTyp == 1)
+                fh_los_channels[iDet - 1]->Fill(8 * iTyp + iCha); // exclude MTDC data
         }
     }
 
@@ -674,13 +702,6 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                                                   time_L[iDet - 1][iPart][5] + time_L[iDet - 1][iPart][7])) /
                                                 4.;
 
-                    LosTresT[iDet - 1][iPart] = ((time_V[iDet - 1][iPart][0] * 0. + time_V[iDet - 1][iPart][2] +
-                                                  time_V[iDet - 1][iPart][4] + time_V[iDet - 1][iPart][6]) /
-                                                     3. -
-                                                 (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][3] +
-                                                  time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][7]) /
-                                                     4.);
-
                     // right koord.-system, Z-axis beam direction:
                     // Position from tamex:
                     xT_cm[iDet - 1][iPart] = (time_L[iDet - 1][iPart][1] + time_L[iDet - 1][iPart][2]) / 2. -
@@ -733,7 +754,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                             timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] - 2048. * 5.;
                         }
 
-                        fh_los_vftx_tamex[iDet - 1]->Fill(timeLosT[iDet - 1][iPart] - timeLosV[iDet - 1][iPart]);
+                        fh_los_vftx_tamex[iDet - 1]->Fill(fTimeStitch->GetTime(
+                            timeLosT[iDet - 1][iPart] - timeLosV[iDet - 1][iPart], "tamex", "vftx"));
                     }
 
                     fh_losMCFD_vs_Events[iDet - 1]->Fill(fNEvents, LosTresV[iDet - 1][iPart]);
