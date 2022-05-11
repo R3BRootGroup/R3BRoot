@@ -63,6 +63,7 @@ class R3BMusliMapped2Cal : public FairTask
     Int_t mult_signalmap[MAX_NB_SIGNALS_MAP];
     UInt_t type[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
     UInt_t index[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    UInt_t signal[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
     Double_t energy[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
     Double_t time[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
 
@@ -82,7 +83,7 @@ class R3BMusliMapped2Cal : public FairTask
 
     /** Private method AddCalData **/
     //** Adds a MusliCalData to the anodeCalCollection
-    R3BMusliCalData* AddCalData(UInt_t nb_anodes, UInt_t index, Double_t dt, Double_t e);
+    R3BMusliCalData* AddCalData(UInt_t nb_anodes, UInt_t index, UInt_t signal, Double_t dt, Double_t e);
 
   public:
     // Class definition

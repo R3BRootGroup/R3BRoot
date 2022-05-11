@@ -17,6 +17,7 @@
 R3BMusliCalData::R3BMusliCalData()
     : fNbAnodes(0)
     , fIndex(0)
+    , fSignal(0)
     , fDT(-1.)
     , fE(-1.)
 {
@@ -24,9 +25,10 @@ R3BMusliCalData::R3BMusliCalData()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-R3BMusliCalData::R3BMusliCalData(UInt_t n, UInt_t index, Double_t drifttime, Double_t energy)
+R3BMusliCalData::R3BMusliCalData(UInt_t n, UInt_t index, UInt_t signal, Double_t drifttime, Double_t energy)
     : fNbAnodes(n)
     , fIndex(index)
+    , fSignal(index)
     , fDT(drifttime)
     , fE(energy)
 {
