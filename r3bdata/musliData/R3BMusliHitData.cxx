@@ -15,7 +15,7 @@
 
 // -----   Default constructor   -------------------------------------------
 R3BMusliHitData::R3BMusliHitData()
-    : fNbAnodes(0)
+    : fType(0)
     , fE(-1.)
     , fZ(-1.)
     , fTheta(-1.)
@@ -25,7 +25,7 @@ R3BMusliHitData::R3BMusliHitData()
 
 // -----   Standard constructor   ------------------------------------------
 R3BMusliHitData::R3BMusliHitData(UInt_t n, Double_t e, Double_t z, Double_t theta)
-    : fNbAnodes(n)
+    : fType(n)
     , fE(e)
     , fZ(z)
     , fTheta(theta)
