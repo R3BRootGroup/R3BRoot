@@ -27,10 +27,23 @@ class R3BFiberMAPMTHitModulePar;
 class R3BFiberMAPMTCal2Hit : public FairTask
 {
   public:
+    // This defines the fiber direction
     enum Direction
     {
         HORIZONTAL,
         VERTICAL
+    };
+    // This tells us where the first fiber is located:
+    // VERTICAL direction ---------------------------------
+    // STANDARD: fiber 1 wixhausen -> fiber 512 messel
+    // INVERTED: fiber 1 messel -> fiber 512 wixhausen
+    // HORIZONTAL direction -------------------------------
+    // STANDARD: fiber 1 down -> fiber 512 up
+    // INVERTED: fiber 1 up -> fiber 512 down
+    enum Orientation
+    {
+        STANDARD,
+        INVERTED
     };
 
     struct ToT
@@ -88,6 +101,8 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 
     void SetGate(Double_t g) { fGate_ns = g; }
 
+    void SetOrientation(Orientation opt) { fOrientation = opt; }
+
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
@@ -113,6 +128,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Bool_t fOnline;
 
     Direction fDirection;
+    Orientation fOrientation;
     TClonesArray* fCalItems;
     TClonesArray* fCalTriggerItems;
     TClonesArray* fHitItems;
