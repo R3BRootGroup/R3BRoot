@@ -20,9 +20,11 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BMusliCalPar+;
+#pragma link C++ class R3BMusliHitPar+;
 #pragma link C++ class R3BMusliContFact+;
 
 #pragma link C++ class R3BMusliMapped2Cal+;
+#pragma link C++ class R3BMusliCal2Hit+;
 
 #pragma link C++ class R3BMusliOnlineSpectra+;
 

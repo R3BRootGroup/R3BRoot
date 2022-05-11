@@ -164,6 +164,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
         {
             type[j][i] = 0; // type = nb_anodes for data with energy and time
             index[j][i] = 0;
+            signal[j][i] = 0;
             energy[j][i] = 0.;
             time[j][i] = 0.;
         }
@@ -178,6 +179,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
         {
             type[mult_signalmap[signalId]][signalId] = mappedData[i]->GetType();
             index[mult_signalmap[signalId]][signalId] = mappedData[i]->GetIndex();
+            signal[mult_signalmap[signalId]][signalId] = mappedData[i]->GetSignal();
             energy[mult_signalmap[signalId]][signalId] = mappedData[i]->GetEnergy();
             time[mult_signalmap[signalId]][signalId] = mappedData[i]->GetTime();
             mult_signalmap[signalId]++;
@@ -201,7 +203,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
                 }
                 e = pedestal + slope * energy[j][i];
                 if (e > 0.)
-                    AddCalData(type[j][i], index[j][i], dt, e);
+                    AddCalData(type[j][i], index[j][i], signal[j][i], dt, e);
             }
         }
     }
@@ -219,12 +221,12 @@ void R3BMusliMapped2Cal::Reset()
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BMusliCalData* R3BMusliMapped2Cal::AddCalData(UInt_t nb_anodes, UInt_t ind, Double_t dt, Double_t e)
+R3BMusliCalData* R3BMusliMapped2Cal::AddCalData(UInt_t nb_anodes, UInt_t ind, UInt_t sig, Double_t dt, Double_t e)
 {
     // It fills the R3BMusliCalData
     TClonesArray& clref = *fMusliCalDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BMusliCalData(nb_anodes, ind, dt, e);
+    return new (clref[size]) R3BMusliCalData(nb_anodes, ind, sig, dt, e);
 }
 
 ClassImp(R3BMusliMapped2Cal);
