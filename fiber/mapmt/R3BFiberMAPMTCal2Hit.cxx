@@ -73,6 +73,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fWrite(false)
     , fGate_ns(100.)
     , fOnline(kFALSE)
+    , fOrientation(STANDARD)
 {
     if (fName == "Fi23a")
         fDetId = 230;
@@ -469,21 +470,21 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         if (fName == "Fi33")
                             fiber_thickness = 0.1025;
 
-                        Float_t air_layer = 0.01 * 0.; // relative to fiber_thickness
-                        Float_t detector_width = fNumFibers * fiber_thickness * (1 + air_layer);
+                        Float_t air_layer = 0.0; // 1 * 0.; // relative to fiber_thickness
+                        Float_t detector_width = fNumFibers * fiber_thickness * (1.0 + air_layer);
 
-                        // FIXME: This needs improvements because it depends on the fiber orientation
+                        // FIXME: This needs improvements because it depends on the fiber direction and orientation
                         if (fDirection == VERTICAL)
                         {
-                            x = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            x = (fOrientation == STANDARD ? 1.0 : -1.0) *
+                                (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
                             y = (t_down - t_up) * veff;
                         }
                         else
                         {
                             x = (t_down - t_up) * veff;
-                            y = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            y = (fOrientation == STANDARD ? 1.0 : -1.0) *
+                                (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
                         }
                     }
 
