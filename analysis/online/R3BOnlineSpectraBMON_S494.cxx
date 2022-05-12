@@ -34,31 +34,20 @@
 #include "R3BTofdMappedData.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
-#include "TGaxis.h"
+#include "TClonesArray.h"
+#include "TFolder.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
-
-#include "TClonesArray.h"
-#include "TDatime.h"
 #include "TMath.h"
-#include <TRandom3.h>
-#include <TRandomGen.h>
-#include <algorithm>
-#include <array>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include <vector>
 #define IS_NAN(x) TMath::IsNaN(x)
 
@@ -167,18 +156,34 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
     if (fMappedItems.at(DET_ROLU))
     {
+        TCanvas* cROLU = new TCanvas("ROLU", "ROLU", 10, 10, 650, 350);
         fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT", 10, 0, 10, 600, 0, 300);
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
+        fh_rolu_tot->GetXaxis()->CenterTitle(true);
+        fh_rolu_tot->GetYaxis()->CenterTitle(true);
 
         fh_rolu_tof = new TH2F("Rolu_tof", "ROLU-TOFD ToF", 9, 0, 9, 4000, -2000, 2000);
         fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tof->GetYaxis()->SetTitle("Rolu time / ns");
 
-        fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels", 10, 0, 10);
+        fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels", 6, 0, 6);
         fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
         fh_rolu_channels->GetYaxis()->SetTitle("Counts");
+        fh_rolu_channels->SetFillColor(31);
+        fh_rolu_channels->GetXaxis()->CenterTitle(true);
+        fh_rolu_channels->GetYaxis()->CenterTitle(true);
 
+        cROLU->Divide(1, 2);
+        cROLU->cd(1);
+        fh_rolu_channels->Draw();
+        cROLU->cd(2);
+        fh_rolu_tot->Draw("colz");
+
+        auto mainfolRolu = new TFolder("ROLU", "ROLU info");
+        mainfolRolu->Add(cROLU);
+
+        run->AddObject(mainfolRolu);
         run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
     }
 
@@ -325,11 +330,11 @@ void R3BOnlineSpectraBMON_S494::Reset_BMON_Histo()
 void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 {
     fNEvents += 1;
-
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::flush;
-
+    /*
+        if (fNEvents / 10000. == (int)fNEvents / 10000)
+            std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+                      << " %) " << std::flush;
+    */
     Bool_t debug = false;
 
     if (header)
@@ -345,7 +350,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         {
             time_start = time;
             fNEvents_start = fNEvents;
-            cout << "Start event number " << fNEvents_start << endl;
+            // cout << "Start event number " << fNEvents_start << endl;
         }
 
         if (header->GetTrigger() == 12)
@@ -354,10 +359,10 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             // cout << "spill start" << endl;
             num_spills++;
             newSpill = true;
-            cout << "Spill num: " << num_spills << endl;
+            // cout << "Spill num: " << num_spills << endl;
 
             time_spill_start = time; // header->GetTimeStamp();    // spill start in nsec
-            cout << "Spill start: " << double(time_spill_start - time_begin) / 1.e9 << " sec " << endl;
+            // cout << "Spill start: " << double(time_spill_start - time_begin) / 1.e9 << " sec " << endl;
             // reset counters:
             see_spill = 0;
             ic_spill = 0;
@@ -371,7 +376,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             // spill end  in nsec
             // cout << "spill stop" << endl;
             time_spill_end = time; // header->GetTimeStamp();    // spill end  in nsec
-            cout << "Spill stop: " << double(time_spill_end - time_begin) / 1.e9 << " sec " << endl;
+            // cout << "Spill stop: " << double(time_spill_end - time_begin) / 1.e9 << " sec " << endl;
             spill_on = false;
         }
 
@@ -404,6 +409,100 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             }
         }
     }
+
+    // **************   ROLU *************************************
+    if (fMappedItems.at(DET_ROLU))
+    {
+        auto det = fMappedItems.at(DET_ROLU);
+        Int_t nHits = det->GetEntriesFast();
+
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BRoluMappedData* hit = (R3BRoluMappedData*)det->At(ihit);
+            if (!hit)
+                continue;
+
+            // channel numbers are stored 1-based (1..n)
+            Int_t iDet = hit->GetDetector(); // 1..
+            Int_t iCha = hit->GetChannel();  // 1..
+
+            if (iDet < 2)
+                fh_rolu_channels->Fill(iCha); // ROLU 1
+            if (iDet > 1)
+                fh_rolu_channels->Fill(iCha + 4); // ROLU 2
+        }
+    }
+
+    if (fCalItems.at(DET_ROLU))
+    {
+        Int_t nParts = 0;
+        auto det = fCalItems.at(DET_ROLU);
+        nParts = det->GetEntriesFast();
+
+        if (nParts > 0)
+        {
+            fNEventsRolu += 1;
+            Int_t iDet = 0;
+            /*
+             * Note: double x[nParts][2][4]={NAN};
+             * will initialize everything other than x[0][0][0] to 0.0.
+             * (and also not compile with our ancient gcc 4.8.5.)
+             */
+            using A = boost::multi_array<double, 3>;
+            auto dims = boost::extents[nParts][2][4];
+            A timeRolu_L(dims);
+            init_array(timeRolu_L, NAN);
+            A timeRolu_T(dims);
+            init_array(timeRolu_T, NAN);
+            A totRolu(dims);
+            init_array(totRolu, NAN);
+
+            for (Int_t iPart = 0; iPart < nParts; iPart++)
+            {
+                /*
+                 * nParts is the number of particle passing through detector in one event
+                 */
+                R3BRoluCalData* calData = (R3BRoluCalData*)det->At(iPart);
+                iDet = calData->GetDetector();
+
+                for (Int_t iCha = 0; iCha < 4; iCha++)
+                {
+
+                    if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                    { // TAMEX leading
+                        timeRolu_L[iPart][iDet - 1][iCha] = calData->GetTimeL_ns(iCha);
+                    }
+                    if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                    { // TAMEX trailing
+                        timeRolu_T[iPart][iDet - 1][iCha] = calData->GetTimeT_ns(iCha);
+                    }
+
+                    if (timeRolu_T[iPart][iDet - 1][iCha] > 0. && timeRolu_L[iPart][iDet - 1][iCha] > 0. &&
+                        !(IS_NAN(timeRolu_T[iPart][iDet - 1][iCha])) && !(IS_NAN(timeRolu_L[iPart][iDet - 1][iCha])))
+                    {
+                        while (timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha] <= 0.)
+                        {
+                            timeRolu_T[iPart][iDet - 1][iCha] = timeRolu_T[iPart][iDet - 1][iCha] + 2048. * fClockFreq;
+                        }
+
+                        totRolu[iPart][iDet - 1][iCha] =
+                            timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
+                    }
+
+                    if (iDet < 2)
+                        fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
+                    if (iDet > 1)
+                        fh_rolu_tot->Fill(iCha + 5, totRolu[iPart][iDet - 1][iCha]);
+                }
+
+                if (!calData)
+                {
+                    cout << "Rolu !calData" << endl;
+                    continue; // can this happen?
+                }
+            }
+        }
+    } // end if fCalItems(ROLU)
 
     if (fMappedItems.at(DET_BMON))
     {
@@ -540,15 +639,14 @@ void R3BOnlineSpectraBMON_S494::FinishEvent()
 
 void R3BOnlineSpectraBMON_S494::FinishTask()
 {
-
-    cout << " " << endl;
-    cout << "nEvents total " << fNEvents << endl;
-    cout << "nEvents Rolu " << fNEventsRolu << endl;
-    cout << "Time_start      : " << time_begin << endl;
-    cout << "Time end        : " << time_end << endl;
-    cout << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec" << endl;
-    cout << "nSpill          : " << fNSpills << endl;
-    cout << "Total num of 18O: " << nBeamParticle << endl;
+    R3BLOG(INFO,
+           "\n"
+               << "nEvents total " << fNEvents << "\n"
+               << "nEvents Rolu " << fNEventsRolu << "\n"
+               << "Time_start      : " << time_begin << "\n"
+               << "Time end        : " << time_end << "\n"
+               << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec \n"
+               << "nSpill          : " << fNSpills);
 
     if (fMappedItems.at(DET_ROLU))
     {
