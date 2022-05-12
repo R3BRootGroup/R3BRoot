@@ -11,12 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BBunchedFiberSPMTTrigMapped2CalPar.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+
+#include "R3BBunchedFiberSPMTTrigMapped2CalPar.h"
 #include "R3BFiberMappedData.h"
+#include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+
 #include "TClonesArray.h"
 
 R3BBunchedFiberSPMTTrigMapped2CalPar::R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t a_verbose,
@@ -30,23 +33,19 @@ R3BBunchedFiberSPMTTrigMapped2CalPar::R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t
 
 R3BBunchedFiberSPMTTrigMapped2CalPar::~R3BBunchedFiberSPMTTrigMapped2CalPar()
 {
-    delete fTCalPar;
-    delete fEngine;
+    if (fTCalPar)
+        delete fTCalPar;
+    if (fEngine)
+        delete fEngine;
 }
 
 InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
 {
     auto rm = FairRootManager::Instance();
-    if (!rm)
-    {
-        return kFATAL;
-    }
+    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject("BunchedFiberSPMTTrigMapped");
-    if (!fMapped)
-    {
-        return kFATAL;
-    }
+    R3BLOG_IF(FATAL, !fMapped, "BunchedFiberSPMTTrigMapped not found");
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
@@ -54,11 +53,9 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get " << name << '.';
-        abort();
+        R3BLOG(ERROR, "Could not get " << name);
         return kFATAL;
     }
-    fTCalPar->setChanged();
     fEngine = new R3BTCalEngine(fTCalPar, fMinStats);
 
     return kSUCCESS;
@@ -76,6 +73,7 @@ void R3BBunchedFiberSPMTTrigMapped2CalPar::Exec(Option_t* option)
 
 void R3BBunchedFiberSPMTTrigMapped2CalPar::FinishTask()
 {
+    R3BLOG(INFO, "");
     fEngine->CalculateParamVFTX();
     fTCalPar->printParams();
 }
