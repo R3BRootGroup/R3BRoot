@@ -22,8 +22,9 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// Musli headers
 #include "R3BLogger.h"
+
+// Musli headers
 #include "R3BMusliCalData.h"
 #include "R3BMusliCalPar.h"
 #include "R3BMusliMapped2Cal.h"

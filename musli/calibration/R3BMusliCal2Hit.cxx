@@ -73,9 +73,9 @@ R3BMusliCal2Hit::~R3BMusliCal2Hit()
 void R3BMusliCal2Hit::SetParContainers()
 {
     // Parameter Container
-    // Reading musicCalPar from FairRuntimeDb
+    // Reading musicHitPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(FATAL, !rtdb, "R3BMusliCal2Hit::SetParContainers(), FairRuntimeDb not found");
 
     fHit_Par = (R3BMusliHitPar*)rtdb->getContainer("musliHitPar");
     if (!fHit_Par)
@@ -87,6 +87,7 @@ void R3BMusliCal2Hit::SetParContainers()
         R3BLOG(INFO, "R3BMusliCal2Hit::SetParContainers() musliHitPar container open");
     }
 
+		// Reading the TGeoPar from the FairRun
     fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
     R3BLOG_IF(ERROR, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
 }

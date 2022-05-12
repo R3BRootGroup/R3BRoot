@@ -161,8 +161,9 @@ void R3BMusliCalPar::printParams()
     R3BLOG(INFO, "Nb of musli signals: " << fNumSignals);
     R3BLOG(INFO, "Nb of musli groups anodes signals: " << fNumGroupsAnodes);
     R3BLOG(INFO, "Nb of musli Max. multiplicity per anode: " << fMaxMult);
-    R3BLOG(INFO, "Musli anode parameters for energy calibration");
 
+    R3BLOG(INFO, "Musli anode parameters for energy calibration");
+    R3BLOG(INFO, "Nb of energy parameter per signal: " << fNumParamsEneFit);
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)
     {
         LOG(INFO) << "Group of Anodes number: " << i + 1;
@@ -173,6 +174,7 @@ void R3BMusliCalPar::printParams()
     }
 
     R3BLOG(INFO, "Musli anode parameters for position calibration");
+    R3BLOG(INFO, "Nb of position parameter per signal: " << fNumParamsPosFit);
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)
     {
         LOG(INFO) << "Group of Anodea number: " << i + 1;
