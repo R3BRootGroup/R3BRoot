@@ -111,7 +111,6 @@ set(SRCS
 ./fibers/R3BBunchedFiberReader.cxx
 ./fibers/R3BBunchedFiberSPMTTrigReader.cxx
 ./beammonitor/R3BBeamMonitorReader.cxx
-./fibers/R3BFiberMAPMTReader.cxx
 ./fibers/R3BFi0Reader.cxx
 ./fibers/R3BFi1aReader.cxx
 ./fibers/R3BFi1bReader.cxx
@@ -122,16 +121,6 @@ set(SRCS
 ./fibers/R3BFi6Reader.cxx
 ./fibers/R3BFi7Reader.cxx
 ./fibers/R3BFi8Reader.cxx
-./fibers/R3BFi10Reader.cxx
-./fibers/R3BFi11Reader.cxx
-./fibers/R3BFi12Reader.cxx
-./fibers/R3BFi13Reader.cxx
-./fibers/R3BFi23aReader.cxx
-./fibers/R3BFi23bReader.cxx
-./fibers/R3BFi30Reader.cxx
-./fibers/R3BFi31Reader.cxx
-./fibers/R3BFi32Reader.cxx
-./fibers/R3BFi33Reader.cxx
 ./fibers/R3BFiberReader.cxx
 ./los/R3BLosReader.cxx
 ./rolu/R3BRoluReader.cxx

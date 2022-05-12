@@ -37,7 +37,7 @@ class R3BMusliHitData : public TObject
     /** Default constructor **/
     R3BMusliHitData();
 
-    R3BMusliHitData(UInt_t n, Double_t e, Double_t z, Double_t t);
+    R3BMusliHitData(UInt_t n, Double_t e, Double_t z, Double_t t, Double_t x = 0.);
 
     /** Destructor **/
     virtual ~R3BMusliHitData() {}
@@ -47,6 +47,7 @@ class R3BMusliHitData : public TObject
     inline const Double_t& GetEave() const { return fE; }
     inline const Double_t& GetZcharge() const { return fZ; }
     inline const Double_t& GetTheta() const { return fTheta; }
+    inline const Double_t& GetX() const { return fX; }
 
     /** Modifiers **/
     void SetType(UInt_t n) { fType = n; };
@@ -58,6 +59,7 @@ class R3BMusliHitData : public TObject
     UInt_t fType;
     Double_t fE;
     Double_t fZ;
+    Double_t fX;
     Double_t fTheta;
 
   public:

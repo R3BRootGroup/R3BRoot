@@ -34,7 +34,6 @@
 #pragma link C++ class R3BOnlineSpectraPdc+;
 #pragma link C++ class R3BOnlineSpectraSfib+;
 #pragma link C++ class R3BOnlineSpillAnalysis+;
-#pragma link C++ class R3BOnlineSpectraFiberTofds515+;
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
 #pragma link C++ class R3BOnlineSpectraFibvsToFDS494+;
 #pragma link C++ class R3BOnlineSpectraBMON_S494+;

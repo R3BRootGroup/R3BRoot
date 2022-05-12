@@ -86,6 +86,7 @@ class R3BTwimvsFootOnlineSpectra : public FairTask
 
   private:
     Int_t fNbFootDet;
+    Bool_t fMusli;
     TClonesArray* fHitItemsTwim; /**< Array with hit-Twim items. */
     TClonesArray* fHitItemsFoot; /**< Array with hit-Foot items. */
 
