@@ -14,11 +14,11 @@
 // ------------------------------------------------------------
 // -----           R3BTwimvsFootOnlineSpectra             -----
 // -----    Created 24/02/22 by J.L. Rodriguez-Sanchez    -----
-// -----         Fill Twim-Foot online histograms         -----
+// -----  Fill Twim-Foot or Musli-Foot online histograms  -----
 // ------------------------------------------------------------
 
 /*
- * This task should fill histograms for Twim-Foot correlations
+ * This task should fill histograms for Twim-Foot or Musli-Foot correlations
  */
 
 // ROOT headers
@@ -41,6 +41,7 @@
 #include "R3BEventHeader.h"
 #include "R3BFootHitData.h"
 #include "R3BLogger.h"
+#include "R3BMusliHitData.h"
 #include "R3BTwimHitData.h"
 #include "R3BTwimvsFootOnlineSpectra.h"
 
@@ -58,6 +59,7 @@ R3BTwimvsFootOnlineSpectra::R3BTwimvsFootOnlineSpectra(const TString& name, Int_
     , fEventHeader(NULL)
     , fNbFootDet(2)
     , fNEvents(0)
+    , fMusli(kFALSE)
 {
 }
 
@@ -99,12 +101,30 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
         return kFATAL;
     }
 
-    // get access to hit data of the TWIM
-    fHitItemsTwim = (TClonesArray*)mgr->GetObject("TwimHitData");
-    R3BLOG_IF(WARNING, !fHitItemsTwim, "TwimHitData not found");
+    // get access to hit data of the Musli
+    fHitItemsTwim = (TClonesArray*)mgr->GetObject("MusliHitData");
+    if (fHitItemsTwim)
+    {
+        fMusli = kTRUE;
+        R3BLOG(INFO, "MusliHitData found");
+    }
+    else
+    {
+        // get access to hit data of the TWIM
+        fHitItemsTwim = (TClonesArray*)mgr->GetObject("TwimHitData");
+        R3BLOG_IF(WARNING, !fHitItemsTwim, "TwimHitData not found");
+    }
 
     // MAIN FOLDER-Twim-Foot
-    TFolder* mainfolTwim = new TFolder("TWIM_vs_FOOT", "TWIM vs FOOT info");
+    TFolder* mainfolTwim;
+    if (fMusli)
+    {
+        mainfolTwim = new TFolder("MUSLI_vs_FOOT", "Musli vs FOOT info");
+    }
+    else
+    {
+        mainfolTwim = new TFolder("TWIM_vs_FOOT", "TWIM vs FOOT info");
+    }
 
     // Create histograms for detectors
     char Name1[255];
@@ -118,11 +138,26 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     fh2_hit_e.resize(fNbFootDet);
     for (Int_t i = 0; i < fNbFootDet; i++)
     { // one histo per detector
-        sprintf(Name1, "fh2_energy_twim_vs_foot_%d", i + 1);
-        sprintf(Name2, "Energy Twim vs energy Foot Det: %d", i + 1);
+        if (fMusli)
+        {
+            sprintf(Name1, "fh2_energy_musli_vs_foot_%d", i + 1);
+            sprintf(Name2, "Energy Musli vs energy Foot Det: %d", i + 1);
+        }
+        else
+        {
+            sprintf(Name1, "fh2_energy_twim_vs_foot_%d", i + 1);
+            sprintf(Name2, "Energy Twim vs energy Foot Det: %d", i + 1);
+        }
         fh2_hit_e[i] = new TH2F(Name1, Name2, binsE, 0, maxE, binsE, 0, 10);
         fh2_hit_e[i]->GetXaxis()->SetTitle("Energy Foot [channels]");
-        fh2_hit_e[i]->GetYaxis()->SetTitle("Energy twim [charge-Z]");
+        if (fMusli)
+        {
+            fh2_hit_e[i]->GetYaxis()->SetTitle("Energy musli [charge-Z]");
+        }
+        else
+        {
+            fh2_hit_e[i]->GetYaxis()->SetTitle("Energy twim [charge-Z]");
+        }
         fh2_hit_e[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_hit_e[i]->GetXaxis()->CenterTitle(true);
         fh2_hit_e[i]->GetYaxis()->CenterTitle(true);
@@ -135,11 +170,26 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     fh2_hit_x.resize(fNbFootDet);
     for (Int_t i = 0; i < fNbFootDet; i++)
     { // one histo per detector
-        sprintf(Name1, "fh2_Xpos_twim_vs_foot_%d", i + 1);
-        sprintf(Name2, "X-pos Twim vs X-pos Foot Det: %d", i + 1);
+        if (fMusli)
+        {
+            sprintf(Name1, "fh2_Xpos_musli_vs_foot_%d", i + 1);
+            sprintf(Name2, "X-pos Musli vs X-pos Foot Det: %d", i + 1);
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Xpos_twim_vs_foot_%d", i + 1);
+            sprintf(Name2, "X-pos Twim vs X-pos Foot Det: %d", i + 1);
+        }
         fh2_hit_x[i] = new TH2F(Name1, Name2, binsE, -60, 60, binsE, -60, 60);
-        fh2_hit_x[i]->GetXaxis()->SetTitle("X-pos Foot [channels]");
-        fh2_hit_x[i]->GetYaxis()->SetTitle("X-pos twim [channels]");
+        fh2_hit_x[i]->GetXaxis()->SetTitle("X-pos Foot [mm]");
+        if (fMusli)
+        {
+            fh2_hit_x[i]->GetYaxis()->SetTitle("X-pos musli [mm]");
+        }
+        else
+        {
+            fh2_hit_x[i]->GetYaxis()->SetTitle("X-pos twim [mm]");
+        }
         fh2_hit_x[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_hit_x[i]->GetXaxis()->CenterTitle(true);
         fh2_hit_x[i]->GetYaxis()->CenterTitle(true);
@@ -151,7 +201,14 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     run->AddObject(mainfolTwim);
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_TWIMvsFOOT_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    if (fMusli)
+    {
+        run->GetHttpServer()->RegisterCommand("Reset_MUSLIvsFOOT_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    }
+    else
+    {
+        run->GetHttpServer()->RegisterCommand("Reset_TWIMvsFOOT_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    }
 
     return kSUCCESS;
 }
@@ -177,11 +234,22 @@ void R3BTwimvsFootOnlineSpectra::Exec(Option_t* option)
         Int_t nHits2 = fHitItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits2; ihit++)
         {
-            auto hit = (R3BTwimHitData*)fHitItemsTwim->At(ihit);
-            if (!hit)
-                continue;
-            etwim = hit->GetZcharge();
-            xtwim = hit->GetX();
+            if (fMusli)
+            {
+                auto hit = (R3BMusliHitData*)fHitItemsTwim->At(ihit);
+                if (!hit)
+                    continue;
+                etwim = hit->GetZcharge();
+                xtwim = hit->GetX();
+            }
+            else
+            {
+                auto hit = (R3BTwimHitData*)fHitItemsTwim->At(ihit);
+                if (!hit)
+                    continue;
+                etwim = hit->GetZcharge();
+                xtwim = hit->GetX();
+            }
         }
 
         Float_t efoot[fNbFootDet], xfoot[fNbFootDet];

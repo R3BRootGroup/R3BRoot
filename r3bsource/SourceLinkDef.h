@@ -43,7 +43,6 @@
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigReader+;
 #pragma link C++ class R3BSfibReader+;
-#pragma link C++ class R3BFiberMAPMTReader+;
 #pragma link C++ class R3BFi0Reader+;
 #pragma link C++ class R3BFi1aReader+;
 #pragma link C++ class R3BFi1bReader+;
@@ -54,16 +53,6 @@
 #pragma link C++ class R3BFi6Reader+;
 #pragma link C++ class R3BFi7Reader+;
 #pragma link C++ class R3BFi8Reader+;
-#pragma link C++ class R3BFi10Reader+;
-#pragma link C++ class R3BFi11Reader+;
-#pragma link C++ class R3BFi12Reader+;
-#pragma link C++ class R3BFi13Reader+;
-#pragma link C++ class R3BFi23aReader+;
-#pragma link C++ class R3BFi23bReader+;
-#pragma link C++ class R3BFi30Reader+;
-#pragma link C++ class R3BFi31Reader+;
-#pragma link C++ class R3BFi32Reader+;
-#pragma link C++ class R3BFi33Reader+;
 #pragma link C++ class R3BFiberReader+;
 #pragma link C++ class R3BLosReader+;
 #pragma link C++ class R3BRoluReader+;
