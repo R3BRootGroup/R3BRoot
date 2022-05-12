@@ -39,12 +39,18 @@ R3BBunchedFiberMapped2CalPar::R3BBunchedFiberMapped2CalPar(const char* a_name,
 
 R3BBunchedFiberMapped2CalPar::~R3BBunchedFiberMapped2CalPar()
 {
-    delete fMAPMTTCalPar;
-    delete fMAPMTEngine;
-    delete fMAPMTTrigTCalPar;
-    delete fMAPMTTrigEngine;
-    delete fSPMTTCalPar;
-    delete fSPMTEngine;
+    if (fMAPMTTCalPar)
+        delete fMAPMTTCalPar;
+    if (fMAPMTEngine)
+        delete fMAPMTEngine;
+    if (fMAPMTTrigTCalPar)
+        delete fMAPMTTrigTCalPar;
+    if (fMAPMTTrigEngine)
+        delete fMAPMTTrigEngine;
+    if (fSPMTTCalPar)
+        delete fSPMTTCalPar;
+    if (fSPMTEngine)
+        delete fSPMTEngine;
 }
 
 InitStatus R3BBunchedFiberMapped2CalPar::Init()
@@ -59,7 +65,6 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
             R3BLOG(ERROR, "Could not get " << name);                                   \
-            abort();                                                                   \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \
@@ -104,6 +109,7 @@ void R3BBunchedFiberMapped2CalPar::Exec(Option_t* option)
 
 void R3BBunchedFiberMapped2CalPar::FinishTask()
 {
+    R3BLOG(INFO, "");
     fMAPMTEngine->CalculateParamClockTDC(fCTDCVariant);
     fMAPMTTrigEngine->CalculateParamClockTDC(fCTDCVariant);
     switch (fSPMTElectronics)

@@ -247,9 +247,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 void R3BBunchedFiberMapped2Cal::FinishEvent()
 {
     if (fCalItems)
-    fCalItems->Clear();
+        fCalItems->Clear();
     if (fCalTriggerItems)
-    fCalTriggerItems->Clear();
+        fCalTriggerItems->Clear();
 }
 
 ClassImp(R3BBunchedFiberMapped2Cal);

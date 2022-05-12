@@ -133,45 +133,61 @@ void R3BFiberContFact::setAllContainers()
     p20->addContext("TestNonDefaultContext");
     containers->Add(p20);
 
-    FairContainer* p21 = new FairContainer("Fi10GeoPar", "Fi10 geometry parameters", "fi10GeoContext");
+    auto p21 = new FairContainer("Fi10GeoPar", "Fi10 geometry parameters", "fi10GeoContext");
     p21->addContext("fi10GeoContext");
     containers->Add(p21);
 
-    FairContainer* p22 = new FairContainer("Fi11GeoPar", "Fi11 geometry parameters", "fi11GeoContext");
+    auto p22 = new FairContainer("Fi11GeoPar", "Fi11 geometry parameters", "fi11GeoContext");
     p22->addContext("fi11GeoContext");
     containers->Add(p22);
 
-    FairContainer* p23 = new FairContainer("Fi12GeoPar", "Fi12 geometry parameters", "fi12GeoContext");
+    auto p23 = new FairContainer("Fi12GeoPar", "Fi12 geometry parameters", "fi12GeoContext");
     p23->addContext("fi12GeoContext");
     containers->Add(p23);
 
-    FairContainer* p24 = new FairContainer("Fi13GeoPar", "Fi13 geometry parameters", "fi13GeoContext");
+    auto p24 = new FairContainer("Fi13GeoPar", "Fi13 geometry parameters", "fi13GeoContext");
     p24->addContext("fi13GeoContext");
     containers->Add(p24);
 
-    FairContainer* p25 = new FairContainer("Fi30GeoPar", "Fi30 geometry parameters", "fi30GeoContext");
+    auto p25 = new FairContainer("Fi30GeoPar", "Fi30 geometry parameters", "fi30GeoContext");
     p25->addContext("fi30GeoContext");
     containers->Add(p25);
 
-    FairContainer* p26 = new FairContainer("Fi31GeoPar", "Fi31 geometry parameters", "fi31GeoContext");
+    auto p26 = new FairContainer("Fi31GeoPar", "Fi31 geometry parameters", "fi31GeoContext");
     p26->addContext("fi31GeoContext");
     containers->Add(p26);
 
-    FairContainer* p27 = new FairContainer("Fi32GeoPar", "Fi32 geometry parameters", "fi32GeoContext");
+    auto p27 = new FairContainer("Fi32GeoPar", "Fi32 geometry parameters", "fi32GeoContext");
     p27->addContext("fi32GeoContext");
     containers->Add(p27);
 
-    FairContainer* p28 = new FairContainer("Fi33GeoPar", "Fi33 geometry parameters", "fi33GeoContext");
+    auto p28 = new FairContainer("Fi33GeoPar", "Fi33 geometry parameters", "fi33GeoContext");
     p28->addContext("fi33GeoContext");
     containers->Add(p28);
 
-    FairContainer* p29 = new FairContainer("Fi23aGeoPar", "Fi23a geometry parameters", "fi23aGeoContext");
+    auto p29 = new FairContainer("Fi23aGeoPar", "Fi23a geometry parameters", "fi23aGeoContext");
     p29->addContext("fi23aGeoContext");
     containers->Add(p29);
 
-    FairContainer* p30 = new FairContainer("Fi23bGeoPar", "Fi23b geometry parameters", "fi23bGeoContext");
+    auto p30 = new FairContainer("Fi23bGeoPar", "Fi23b geometry parameters", "fi23bGeoContext");
     p30->addContext("fi23bGeoContext");
     containers->Add(p30);
+
+    auto p31 = new FairContainer("Fi10MappingPar", "Fi10 Mapping Parameters", "TestDefaultContext");
+    p31->addContext("TestNonDefaultContext");
+    containers->Add(p31);
+
+    auto p32 = new FairContainer("Fi11MappingPar", "Fi11 Mapping Parameters", "TestDefaultContext");
+    p32->addContext("TestNonDefaultContext");
+    containers->Add(p32);
+
+    auto p33 = new FairContainer("Fi12MappingPar", "Fi12 Mapping Parameters", "TestDefaultContext");
+    p33->addContext("TestNonDefaultContext");
+    containers->Add(p33);
+
+    auto p34 = new FairContainer("Fi13MappingPar", "Fi13 Mapping Parameters", "TestDefaultContext");
+    p34->addContext("TestNonDefaultContext");
+    containers->Add(p34);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)

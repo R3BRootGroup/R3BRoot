@@ -22,7 +22,6 @@
 #include <TClonesArray.h>
 #include <cassert>
 
-
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRtdbRun.h"
