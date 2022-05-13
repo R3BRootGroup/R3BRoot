@@ -70,4 +70,4 @@ class R3BAsciiGenerator : public FairGenerator
     ClassDefOverride(R3BAsciiGenerator, 0);
 };
 
-#endif
+#endif /* R3BASCIIGENERATOR_H */

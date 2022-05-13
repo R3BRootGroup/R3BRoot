@@ -85,6 +85,9 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     double vx = 0.;
     double vy = 0.;
     double vz = 0.;
+    double ivx = 0.;
+    double ivy = 0.;
+    double ivz = 0.;
 
     OpenOrRewindFile();
 
@@ -103,10 +106,26 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
+    if (fPointVtxIsSet)
+    {
+        if (fBoxVtxIsSet)
+        {
+            vx = gRandom->Gaus(fX, fDX);
+            vy = gRandom->Gaus(fY, fDY);
+            vz = gRandom->Uniform(fZ - fDZ / 2.0, fZ + fDZ / 2.0);
+        }
+        else
+        {
+            vx = fX;
+            vy = fY;
+            vz = fZ;
+        }
+    }
+
     // Loop over tracks in the current event
     for (int itrack = 0; itrack < nTracks; itrack++)
     {
-        if (!(fInput >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz))
+        if (!(fInput >> iPid >> iZ >> iA >> px >> py >> pz >> ivx >> ivy >> ivz))
         {
             LOG(FATAL) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
         }
@@ -114,22 +133,13 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         // Ions: -1, Particles +1
-        int pdg = iPid < 0 ? GetIonPdg(iZ, iA) : iA;
+        int pdg = iPid == -1 ? GetIonPdg(iZ, iA) : iPid;
 
-        if (fPointVtxIsSet)
+        if (!fPointVtxIsSet)
         {
-            if (fBoxVtxIsSet)
-            {
-                vx = gRandom->Gaus(fX, fDX);
-                vy = gRandom->Gaus(fY, fDY);
-                vz = gRandom->Gaus(fZ, fDZ);
-            }
-            else
-            {
-                vx = fX;
-                vy = fY;
-                vz = fZ;
-            }
+            vx = ivx;
+            vy = ivy;
+            vz = ivz;
         }
 
         LOG(DEBUG) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
@@ -182,7 +192,7 @@ void R3BAsciiGenerator::RegisterIons()
             // Ignore the other stuff that might still be on that line
             fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-            if (iPid < 0)
+            if (iPid == -1)
             {
                 const int pdg = GetIonPdg(iZ, iA);
                 if (ions.find(pdg) == ions.end())
@@ -255,4 +265,4 @@ void R3BAsciiGenerator::OpenOrRewindFile()
     }
 }
 
-ClassImp(R3BAsciiGenerator)
+ClassImp(R3BAsciiGenerator);

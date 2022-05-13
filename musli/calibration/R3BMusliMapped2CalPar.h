@@ -66,7 +66,7 @@ class R3BMusliMapped2CalPar : public FairTask
     void SetNumParamsEneFit(Int_t n) { fNumParamsEneFit = n; }
     void SetNumParamsPosFit(Int_t n) { fNumParamsPosFit = n; }
     virtual void CalculatePosCalPar();
-    virtual void CalculateEneCalPar();
+    // virtual void CalculateEneCalPar();
 
   private:
     Int_t fNumSignals;
