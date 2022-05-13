@@ -561,7 +561,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifaCoinTheta = new TCanvas("Califa_theta_correlation_hits", "Theta correlations, hit level", 10, 10, 500, 500);
 
     fh2_Califa_coinTheta =
-        new TH2F("fh2_Califa_theta_correlations", "Califa theta correlations", 50, 0, 100, 50, 0, 100);
+        new TH2F("fh2_Califa_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
     fh2_Califa_coinTheta->GetXaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta->GetYaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta->GetYaxis()->SetTitleOffset(1.2);
@@ -573,7 +573,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifaCoinPhi = new TCanvas("Califa_phi_correlation_hits", "Phi correlations, hit level", 10, 10, 500, 500);
 
     fh2_Califa_coinPhi =
-        new TH2F("fh2_Califa_phi_correlations", "Califa phi correlations", 90, -180, 180, 90, -180, 180);
+        new TH2F("fh2_Califa_phi_correlations", "Califa phi correlations", 600, -190, 190, 600, -190, 190);
     fh2_Califa_coinPhi->GetXaxis()->SetTitle("Phi [degrees]");
     fh2_Califa_coinPhi->GetYaxis()->SetTitle("Phi [degrees]");
     fh2_Califa_coinPhi->GetYaxis()->SetTitleOffset(1.2);
@@ -583,7 +583,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // CANVAS Theta vs Phi
     cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi", "Theta vs Phi", 10, 10, 500, 500);
-    fh2_Califa_theta_phi = new TH2F("fh2_Califa_theta_vs_phi", "Califa theta vs phi", 50, 0, 90, 180, -180, 180);
+    fh2_Califa_theta_phi = new TH2F("fh2_Califa_theta_vs_phi", "Califa theta vs phi", 500, 0, 90, 600, -190, 190);
     fh2_Califa_theta_phi->GetXaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_theta_phi->GetYaxis()->SetTitle("Phi [degrees]");
     fh2_Califa_theta_phi->GetYaxis()->SetTitleOffset(1.2);
@@ -596,7 +596,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     sprintf(Name2, "fh_Califa_theta_vs_total_energy");
     sprintf(Name3, "Califa theta vs energy for full calorimeter");
     cCalifa_theta_energy = new TCanvas(Name1, Name1, 10, 10, 500, 500);
-    fh2_Califa_theta_energy = new TH2F(Name2, Name3, 360, 0, 90, bins, minE, maxE);
+    fh2_Califa_theta_energy = new TH2F(Name2, Name3, 500, 0, 90, bins, minE, maxE);
     fh2_Califa_theta_energy->GetXaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_theta_energy->GetYaxis()->SetTitle("Energy [keV]");
     fh2_Califa_theta_energy->GetYaxis()->SetTitleOffset(1.4);
