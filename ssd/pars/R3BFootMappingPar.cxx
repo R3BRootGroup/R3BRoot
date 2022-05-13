@@ -31,11 +31,15 @@
 R3BFootMappingPar::R3BFootMappingPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
     , fNumDet(10)
+    , fPolPar(5)
     , fGeo(202111)
 {
     fDistance2target = new TArrayF(fNumDet);
     fAngleTheta = new TArrayF(fNumDet);
+    fAnglePhi = new TArrayF(fNumDet);
+    fOffsetX = new TArrayF(fNumDet);
     fOffsetY = new TArrayF(fNumDet);
+    fEnevsPosCorr = new TArrayF(fPolPar*fNumDet);
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -46,8 +50,14 @@ R3BFootMappingPar::~R3BFootMappingPar()
         delete fDistance2target;
     if (fAngleTheta)
         delete fAngleTheta;
+    if (fAnglePhi)
+      delete fAnglePhi;
+    if (fOffsetX)
+      delete fOffsetX;
     if (fOffsetY)
         delete fOffsetY;
+    if (fEnevsPosCorr)
+      delete fEnevsPosCorr;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -71,8 +81,15 @@ void R3BFootMappingPar::putParams(FairParamList* list)
     list->add("footDistance2targetPar", *fDistance2target);
     fAngleTheta->Set(fNumDet);
     list->add("footAngleThetaPar", *fAngleTheta);
+    fAnglePhi->Set(fNumDet);
+    list->add("footAnglePhiPar", *fAnglePhi);
+    fOffsetX->Set(fNumDet);
+    list->add("footOffsetXPar", *fOffsetX);
     fOffsetY->Set(fNumDet);
     list->add("footOffsetYPar", *fOffsetY);
+    list->add("footPolPar", fPolPar);
+    fEnevsPosCorr->Set(fNumDet*fPolPar);
+    list->add("footEnevsPosCorrPar", *fEnevsPosCorr);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -105,12 +122,35 @@ Bool_t R3BFootMappingPar::getParams(FairParamList* list)
         LOG(INFO) << "Could not initialize footAngleThetaPar";
         return kFALSE;
     }
+    fAnglePhi->Set(fNumDet);
+    if (!(list->fill("footAnglePhiPar", fAnglePhi)))
+      {
+        LOG(INFO) << "Could not initialize footAnglePhiPar";
+        return kFALSE;
+      }
+    fOffsetX->Set(fNumDet);
+    if (!(list->fill("footOffsetXPar", fOffsetX)))
+      {
+        LOG(INFO) << "Could not initialize footOffsetXPar";
+        return kFALSE;
+      }    
     fOffsetY->Set(fNumDet);
     if (!(list->fill("footOffsetYPar", fOffsetY)))
-    {
+      {
         LOG(INFO) << "Could not initialize footOffsetYPar";
         return kFALSE;
-    }
+      }
+    if (!list->fill("footPolPar", &fPolPar))
+      {
+        LOG(INFO) << "Could not initialize footPolPar";
+        return kFALSE;
+      }
+    fEnevsPosCorr->Set(fNumDet*fPolPar);
+    if (!(list->fill("footEnevsPosCorrPar", fEnevsPosCorr)))
+      {
+        LOG(INFO) << "Could not initialize footEnevsPosCorrPar";
+        return kFALSE;
+      }  
 
     return kTRUE;
 }
@@ -129,14 +169,32 @@ void R3BFootMappingPar::printParams()
               << " "
               << "Angle_theta"
               << " "
+              << "Angle_Phi"
+              << " "
+              << "Offset_X"
+              << " "
               << "Offset_Y";
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
         LOG(INFO) << i + 1 << "\t"
                   << "\t" << fDistance2target->GetAt(i) << "\t\t" << fAngleTheta->GetAt(i) << "\t"
-                  << fOffsetY->GetAt(i);
+                  << fAnglePhi->GetAt(i) << "\t"
+                  << fOffsetX->GetAt(i) << "\t" << fOffsetY->GetAt(i);
     }
+
+    LOG(INFO) << "Energy vs Position Correction Parameters : ";
+    
+    for (Int_t i = 0; i < fNumDet; i++)
+      {
+        LOG(INFO) << "FOOT " << i+1 << " : ";
+        
+        for (Int_t j = 0; j < fPolPar; j++)
+          {
+            LOG(INFO) << "Pol" << j << "\t"
+                      << "\t" << fEnevsPosCorr->GetAt(i*fPolPar+j);
+          }
+      }
 }
 
 ClassImp(R3BFootMappingPar);

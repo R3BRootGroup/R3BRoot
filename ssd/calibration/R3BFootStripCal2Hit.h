@@ -74,9 +74,15 @@ class R3BFootStripCal2Hit : public FairTask
     Double_t fPitch;
     Double_t fMiddle;
     Float_t fThSum;
-    Int_t fMaxNumDet, fMaxNumClusters;
-    TH1F* hssd[10];
-
+  Int_t fMaxNumDet, fMaxNumClusters, fPolPar;
+  Double_t fEnevsPosCorrPar[20][10];
+  Double_t fDistTarget[20];
+  Double_t fAngleTheta[20];
+  Double_t fAnglePhi[20];
+  Double_t fOffsetX[20];
+  Double_t fOffsetY[20];
+  TH1F* hssd[10];
+  
     R3BFootMappingPar* fMap_Par; // Parameter container with mapping
     TClonesArray* fFootCalData;  // Array with FOOT Cal-input data
     TClonesArray* fFootHitData;  // Array with FOOT Hit-output data
