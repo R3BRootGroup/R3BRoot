@@ -24,6 +24,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/xballData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -175,6 +176,7 @@ amsData/R3BAmsMappedData.cxx
 amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx
 beammonitorData/R3BBeamMonitorMappedData.cxx
+trloiiData/R3BTrloiiData.cxx
 musicData/R3BMusicPoint.cxx
 musicData/R3BMusicMappedData.cxx
 musicData/R3BMusicCalData.cxx

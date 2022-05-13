@@ -521,8 +521,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
                     // cout<<"pos "<<pos<<" bot_tot "<<bot_tot<<" top_tot "<<top_tot<<"\n";
                     // fill fitting histograms and smiley histogram
-                    //  fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    //  fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
+                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
 
                 // prepare charge fit / quench correction
@@ -579,9 +579,6 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                              fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
                         q2 = q2 * fTofdQ;
                         qb = (q1 + q2) / 2.;
-
-                        fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, q2);
-                        fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, q1);
                     }
 
                     // fill control histograms and Q vs Pos without multihits

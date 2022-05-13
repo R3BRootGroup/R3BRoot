@@ -245,6 +245,34 @@ InitStatus R3BTofdCal2HitS494::Init()
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
 
+    // For testing purpose *****
+    //    std::string foff_param_file =
+    //    "/u/kelic/R3BRoot/macros/r3b/tracking/s494/offset_ytofd_run0872_0060lmd_allCharges.dat";
+    std::string foff_param_file =
+        "/u/kelic/R3BRoot/macros/r3b/tracking/s494/offset_ytofd_run0906_0073lmds_allCharges.dat";
+    ifstream infile(foff_param_file.c_str());
+    Int_t iplane, ibar;
+    if (!(infile.is_open()))
+        cout << "** WARNING ** OFFSET FILE NOT FOUND! " << foff_param_file.c_str() << endl;
+    if (infile.is_open())
+    {
+        cout << "TOFD OFFSET PARAMS WILL BE READ" << endl;
+        for (Int_t ivec = 0; ivec < 88; ivec++)
+        {
+            infile >> iplane >> ibar;
+            infile >> ytofd_offsetZ2[iplane - 1][ibar - 1] >> ytofd_offsetZ3[iplane - 1][ibar - 1] >>
+                ytofd_offsetZ4[iplane - 1][ibar - 1] >> ytofd_offsetZ5[iplane - 1][ibar - 1] >>
+                ytofd_offsetZ6[iplane - 1][ibar - 1] >> ytofd_offsetZ7[iplane - 1][ibar - 1] >>
+                ytofd_offsetZ8[iplane - 1][ibar - 1];
+
+            /* cout<<iplane <<", "<< ibar <<", "<<
+                   ytofd_offsetZ2[iplane-1][ibar-1] <<", "<<
+                   ytofd_offsetZ6[iplane-1][ibar-1] <<", "<<
+                   ytofd_offsetZ8[iplane-1][ibar-1]<<endl;*/
+        }
+    }
+    // *******
+
     tofd_trig_map_setup();
 
     return kSUCCESS;
@@ -903,6 +931,47 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             tArrU[hit] = true;
             // store single hits
             singlehit++;
+            if (fTofdTotPos)
+            {
+                Int_t iplane = event[hit].plane;
+                Int_t ibar = event[hit].bar;
+                if (event[hit].charge > 1.4 && event[hit].charge < 2.6)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ2[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge >= 2.6 && event[hit].charge < 3.5)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ3[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge >= 3.5 && event[hit].charge < 4.5)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ4[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=4: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ4[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge >= 4.5 && event[hit].charge < 5.5)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ5[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=5: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ5[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge >= 5.5 && event[hit].charge < 6.6)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ6[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge >= 6.6 && event[hit].charge <= 7.2)
+                {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ7[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=7: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ7[iplane-1][ibar-1]<<endl;
+                }
+                if (event[hit].charge > 7.2)
+                { //&& event[hit].charge < 8.8) {
+                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ8[iplane - 1][ibar - 1];
+                    // cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
+                }
+                event[hit].ypos = event[hit].ypos * sqrt(event[hit].charge) / sqrt(8.);
+            }
             new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,
                                                               event[hit].xpos,
                                                               event[hit].ypos,

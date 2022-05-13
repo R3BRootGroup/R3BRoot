@@ -20,16 +20,16 @@ R3BFi1aCal2Hit::R3BFi1aCal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                                Bool_t a_is_gain,
                                Bool_t a_is_tsync,
                                Int_t a_verbose)
-    : R3BBunchedFiberCal2HitEngRun2019("Fi1a",
-                                       a_verbose,
-                                       a_variant,
-                                       a_direction,
-                                       1,
-                                       256,
-                                       1,
-                                       a_is_calibrator,
-                                       a_is_gain,
-                                       a_is_tsync)
+    : R3BBunchedFiberCal2Hit("Fi1a",
+                             a_verbose,
+                             a_variant,
+                             a_direction,
+                             1,
+                             256,
+                             1,
+                             a_is_calibrator,
+                             a_is_gain,
+                             a_is_tsync)
 {
     fib1a_trig_map_setup();
     BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib1am_trig_map, g_fib1as_trig_map);

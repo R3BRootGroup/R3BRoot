@@ -365,7 +365,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     if (fNEvents / 10000. == (int)fNEvents / 10000)
         std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::flush;
+                  << " %) " << std::endl;
 
     fNEvents += 1;
 
@@ -380,6 +380,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     }
 
     Bool_t debug = false;
+    Int_t fNevOut = 0;
+    if (fNEvents == 147041 || fNEvents == 184888)
+        fNevOut = fNEvents;
+    if (fNEvents == fNevOut)
+        debug = true;
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -403,6 +408,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     R3BTrackingDetector* tof = fDetectorsLeft->GetByName("tofd");
 
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+
+    if (debug)
+        cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+    if (tof->hits.size() > 0 && debug)
+    {
+        cout << "Hits ToFD: " << tof->hits.size() << endl;
+        cout << "Hits right: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi31->hits.size() << "  "
+             << fi33->hits.size() << endl;
+
+        cout << "Hits left: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi32->hits.size() << "  "
+             << fi30->hits.size() << endl;
+    }
 
     if (fBfield == -1710.0)
     {
@@ -444,18 +461,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     */
     fNEvents_nonull += 1;
-
-    // if (debug)
-    cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
-    if (tof->hits.size() > 0) //&& debug)
-    {
-        cout << "Hits ToFD: " << tof->hits.size() << endl;
-        cout << "Hits right: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi31->hits.size() << "  "
-             << fi33->hits.size() << endl;
-
-        cout << "Hits left: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi32->hits.size() << "  "
-             << fi30->hits.size() << endl;
-    }
 
     // Start values
     Double_t beta = 0.;
@@ -506,6 +511,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t ymem = 0.;
     Double_t yC = -1000;
     Double_t yCexp = -1000;
+    Double_t yCfib = -1000;
+    Double_t yCfibexp = -1000;
 
     if (fArrayMCTracks)
     {
@@ -655,6 +662,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Bool_t alpha = kFALSE;
     Bool_t carbon = kFALSE;
     Bool_t oxygen = kFALSE;
+    Bool_t writeOutC = kFALSE;
 
     R3BTrackingParticle* candidate;
     // The idea is to loop twice over the ToF wall hits.
@@ -674,6 +682,21 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     {
         lmin = 1;
         lmax = 3;
+    }
+    if (debug)
+    {
+        for (Int_t i = 0; i < fi23a->hits.size(); i++)
+        {
+            cout << "Fib23a hits: " << i << ", " << fi23a->hits.at(i)->GetX() << endl;
+        }
+        for (Int_t i = 0; i < fi23b->hits.size(); i++)
+        {
+            cout << "Fib23b hits: " << i << ", " << fi23b->hits.at(i)->GetY() << endl;
+        }
+        for (Int_t i = 0; i < tof->hits.size(); i++)
+        {
+            cout << "Tofd hits  : " << i << ", " << tof->hits.at(i)->GetX() << ", " << tof->hits.at(i)->GetY() << endl;
+        }
     }
 
     for (Int_t l = lmin; l < lmax; l++)
@@ -707,8 +730,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (fSimu)
             {
                 // For tracking of simulations:
-                charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76 + 0.5;
-                Charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76;
+                //   charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76 + 0.5;
+                //   Charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76;
+
+                charge = tof->hits.at(i)->GetEloss();
+                Charge = tof->hits.at(i)->GetEloss();
             }
             else
             {
@@ -721,8 +747,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             if (charge != charge_requested)
                 continue;
-            //  if (debug)
-            cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
+            if (debug)
+                cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
 
             beta0 = 0.7593; // velocity could eventually be calculated from ToF
             tof->res_t = 0.03;
@@ -778,6 +804,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 if (!fSimu)
                 {
+                    // start values:
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.5);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.5);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0000);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
                     // first optimization, right and left same:
                     /* ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
                       ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(179.1);
@@ -1054,6 +1087,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 if (!fSimu)
                 {
+                    // start values:
+                    /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.5);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionY(1.5);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0000);
+                          ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
                     // first optimization, right and left same:
                     /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(179.1);
@@ -1690,12 +1730,27 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     yC = y_l[iDet];
                     yCexp = det_hit_y[iDet];
                 }
-
+                if (hit && iDet == 2 && l == 1)
+                {
+                    yCfibexp = det_hit_y[iDet];
+                    yCfib = y_l[iDet];
+                }
+                if (hit && iDet == 2 && l == 2)
+                {
+                    if (fNEvents == fNevOut)
+                        cout << "yPosit He/C on fi23 exp   :" << det_hit_y[iDet] << ", " << yCfibexp << endl;
+                    if (fNEvents == fNevOut)
+                        cout << "yPosit He/C on fi23 track :" << y_l[iDet] << ", " << yCfib << endl;
+                }
                 if (hit && iDet == 7 && l == 2)
                 {
                     fh_yC_vs_yHe_Tofd->Fill(yC, y_l[iDet]);
                     fh_pyC_vs_pyHe->Fill(pymem, bestcandidate->GetStartMomentum().Y() * 1000.);
                     fh_yC_vs_yHe_Tofd_exp->Fill(yCexp, det_hit_y[iDet]);
+                    if (fNEvents == fNevOut)
+                        cout << "yPosit He/C on ToFD exp   :" << det_hit_y[iDet] << ", " << yCexp << endl;
+                    if (fNEvents == fNevOut)
+                        cout << "yPosit He/C on ToFD track :" << y_l[iDet] << ", " << yC << endl;
                 }
 
                 if (hit && det->res_x > 1e-6)
@@ -1756,10 +1811,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             if (fWriteOut)
             {
-                // if(l == 1 && bestcandidate->GetStartMomentum().Mag() * 1000. > 13000. &&
-                //       	 bestcandidate->GetStartMomentum().Mag() * 1000. < 13080.)
-                if (l == 1)
+                if (l == 1 && bestcandidate->GetStartMomentum().Mag() * 1000. > 12700. &&
+                    bestcandidate->GetStartMomentum().Mag() * 1000. < 13200.)
+                // if (l == 1)
                 {
+                    writeOutC = kTRUE;
+
                     new ((*fFi23aHitItems)[fNofFi23aHitItems++])
                         R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 6, 0, 0, 0, 0., 0, 0.);
 
@@ -1785,11 +1842,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     new ((*fTofdHitItems)[fNofTofdHitItems++])
                         R3BTofdHitData(0, det_hit_x[7], det_hit_y[7], 6, 0, 6, 1, 1, 0);
                 }
-                //	if(l == 2 && bestcandidate->GetStartMomentum().Mag() * 1000. > 4250. &&
-                //   			bestcandidate->GetStartMomentum().Mag() * 1000. < 4440.)
-                // if(l == 2 && bestcandidate->GetStartMomentum().Z() * 1000. > 4250. &&
+                if (l == 2 && bestcandidate->GetStartMomentum().Mag() * 1000. > 4200. &&
+                    bestcandidate->GetStartMomentum().Mag() * 1000. < 4600. && writeOutC)
+                //  if(l == 2 && bestcandidate->GetStartMomentum().Z() * 1000. > 4250. &&
                 //			bestcandidate->GetStartMomentum().Z() * 1000. < 4440.)
-                if (l == 2)
+                // if (l == 2)
                 {
 
                     new ((*fFi23aHitItems)[fNofFi23aHitItems++])

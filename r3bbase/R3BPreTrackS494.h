@@ -206,6 +206,8 @@ class R3BPreTrackS494 : public FairTask
 	Double_t delta;
 	Bool_t ftrackerType;
 	Bool_t fAverage;
+	unsigned long IcountwriteOut1[19]={0}, IcountwriteOut2[19]={0};
+	
 
 	TCutG *cut_fi31_fi23a;
 	TCutG *cut_fi30_fi23b;
@@ -225,6 +227,8 @@ class R3BPreTrackS494 : public FairTask
     Double_t counts_SEE = 0;
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
+    
+    Double_t ytofd_offsetZ2[2][44]={0},ytofd_offsetZ6[2][44]={0},ytofd_offsetZ8[2][44]={0};
     
     Double_t qdet_sum[10] ={ 0};
     Double_t xdet_sum[10] ={ 0};
@@ -379,6 +383,7 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_check_QvsX[7];
 	TH2F* fh_check_TvsX[7];
 	TH2F* fh_check_XvsY[7];
+	TH2F* fh_tofd_x_vs_y_z[6];
 
 	
   public:

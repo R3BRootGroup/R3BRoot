@@ -29,6 +29,7 @@
 #include "R3BRoluMappedData.h"
 
 #include "R3BBeamMonitorMappedData.h"
+#include "R3BTrloiiData.h"
 
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
@@ -89,6 +90,7 @@ R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494()
 
 R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fTrloiiItems(NULL)
     , fTrigger(-1)
     , fTpat1(-1)
     , fTpat2(-1)
@@ -138,6 +140,14 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
     }
+
+    // get access to Trloii data
+    fTrloiiItems = (TClonesArray*)mgr->GetObject("TrloiiData");
+    if (!fTrloiiItems)
+    {
+        LOG(WARNING) << "R3BOnlineSpectra: fTrloiiItems not found"; // return kFATAL;
+    }
+
     maxevent = mgr->CheckMaxEventNo();
 
     //------------------------------------------------------------------------
@@ -195,6 +205,20 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
                 run->AddObject(cRolu);
         */
         run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Tasks/%s/->Reset_ROLU_Histo()", GetName()));
+    }
+
+    if (fTrloiiItems)
+    {
+        for (Int_t i = 0; i < 16; i++)
+        {
+            fh_BDT[i] = new TH1F(Form("BDT_Tpat%d", i + 1), Form("BDT Tpat%d", i + 1), 5000, 0, 5000);
+            fh_BDT[i]->GetYaxis()->SetTitle("BDT counter");
+            fh_BDT[i]->GetXaxis()->SetTitle("Spill Num");
+
+            fh_ARD[i] = new TH1F(Form("ARD_Tpat%d", i + 1), Form("ARD Tpat%d", i + 1), 5000, 0, 5000);
+            fh_ARD[i]->GetYaxis()->SetTitle("ARD counter");
+            fh_ARD[i]->GetXaxis()->SetTitle("Spill Num");
+        }
     }
 
     if (fMappedItems.at(DET_BMON))
@@ -464,6 +488,109 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 counterWrongTpat++;
                 return;
             }
+        }
+    }
+
+    if (fTrloiiItems)
+    {
+        Int_t nHitstrlo = fTrloiiItems->GetEntriesFast();
+        Int_t trlo_type = 0, trlo_ch = 0;
+        unsigned long long countBDT[16] = { 0 }, countADT[16] = { 0 }, countARD[16] = { 0 }, diff1[16] = { 0 },
+                           diff2[16] = { 0 }, diff3[16] = { 0 };
+        for (Int_t ihit = 0; ihit < nHitstrlo; ihit++)
+        {
+            R3BTrloiiData* hit = (R3BTrloiiData*)fTrloiiItems->At(ihit);
+            /*
+             * GetType() = 1-4 =>  1 = Raw (ECL input), 2 = BDT (before dead time),
+             *                     3 = ADT (after dead time), 4 = ARD (after reduction)
+             *
+             * Below, see: /u/land/landexp/202105_s494/r4l-46/vulom.trlo
+             * ECL:
+             * GetCh() = 1-16 =>  1=Fi23a,     2=Fi23b,   2=Fi30,...,    6=Fi33,
+             *                    7=Tofd1or,   8=Tofd1mt, 9=Tofd2or,    10=Tofd2mt,
+             *                   11=Tofd34or, 12=Tofd34mt,
+             *                   13=Tofior,   14=Tofimt,  15=scaler_dt, 16=bus_dt
+             * BDT, ADT, ARD:
+             * 	* On-spill tpats. *
+                TRIG_LMU_OUT( 1) = BEAM_GATE_AUX and in_fi30 and in_fi32 and TOFD12_OR_AUX;
+                TRIG_LMU_OUT( 2) = BEAM_GATE_AUX and in_fi31 and in_fi33 and TOFD12_OR_AUX;
+
+                TRIG_LMU_OUT( 3) = BEAM_GATE_AUX and ALL_OR_AUX;
+                TRIG_LMU_OUT( 4) = BEAM_GATE_AUX and in_tofd34or;
+
+                TRIG_LMU_OUT( 5) = BEAM_GATE_AUX and in_fi30 and in_fi32 and in_tofd1mt and not ROLU_OR_MUX;
+                TRIG_LMU_OUT( 6) = BEAM_GATE_AUX and in_fi30 and in_fi32 and in_tofd2mt and not ROLU_OR_MUX;
+                TRIG_LMU_OUT( 7) = BEAM_GATE_AUX and in_fi31 and in_fi33 and in_tofd1mt and not ROLU_OR_MUX;
+                TRIG_LMU_OUT( 8) = BEAM_GATE_AUX and in_fi31 and in_fi33 and in_tofd2mt and not ROLU_OR_MUX;
+
+                * Off-spill tpats. *
+                TRIG_LMU_OUT( 9) = not BEAM_GATE_AUX and in_tofd1mt;
+                TRIG_LMU_OUT(10) = not BEAM_GATE_AUX and in_tofd2mt;
+                TRIG_LMU_OUT(11) = not BEAM_GATE_AUX and in_tofd34mt;
+                TRIG_LMU_OUT(12) = not BEAM_GATE_AUX and in_tofior;
+
+                TRIG_LMU_OUT(13) = BEAM_GATE_AUX and in_tofd1or;
+                TRIG_LMU_OUT(14) = BEAM_GATE_AUX and in_tofd2or;
+             */
+
+            trlo_type = hit->GetType();
+            trlo_ch = hit->GetCh() - 1;
+
+            if (trlo_type == 2)
+            {
+                countBDT[trlo_ch] = hit->GetCounts();
+                if (countBDTMem[trlo_ch] == 0)
+                    countBDTMem[trlo_ch] = countBDT[trlo_ch];
+                diff1[trlo_ch] = countBDT[trlo_ch] - countBDTMem[trlo_ch];
+                if (diff1[trlo_ch] > 0 && countBDT[trlo_ch] > 0)
+                    SumBDT[trlo_ch] += countBDT[trlo_ch] - countBDTMem[trlo_ch];
+                if (diff1[trlo_ch] > 0 && countBDT[trlo_ch] > 0 && 1 == 0)
+                    cout << "BDT: " << fNEvents << ", " << trlo_ch + 1 << ", " << countBDT[trlo_ch] << ", "
+                         << countBDTMem[trlo_ch] << ", " << countBDT[trlo_ch] - countBDTMem[trlo_ch] << ", "
+                         << SumBDT[trlo_ch] << endl;
+                if (countBDT[trlo_ch] > 0)
+                    countBDTMem[trlo_ch] = countBDT[trlo_ch];
+                if (diff1[trlo_ch] > 0 && countBDT[trlo_ch] > 0)
+                    fh_BDT[trlo_ch]->SetBinContent(num_spills, diff1[trlo_ch]);
+            }
+            if (trlo_type == 3)
+            {
+                countADT[trlo_ch] = hit->GetCounts();
+                if (countADTMem[trlo_ch] == 0)
+                    countADTMem[trlo_ch] = countADT[trlo_ch];
+                diff2[trlo_ch] = countADT[trlo_ch] - countADTMem[trlo_ch];
+                if (diff2[trlo_ch] > 0 && countADT[trlo_ch] > 0)
+                    SumADT[trlo_ch] += countADT[trlo_ch] - countADTMem[trlo_ch];
+                if (diff2[trlo_ch] > 0 && countADT[trlo_ch] > 0 && 1 == 0)
+                    cout << "ADT: " << fNEvents << ", " << trlo_ch + 1 << ", " << countADT[trlo_ch] << ", "
+                         << countADTMem[trlo_ch] << ", " << countADT[trlo_ch] - countADTMem[trlo_ch] << ", "
+                         << SumADT[trlo_ch] << endl;
+                if (countADT[trlo_ch] > 0)
+                    countADTMem[trlo_ch] = countADT[trlo_ch];
+            }
+            if (trlo_type == 4)
+            {
+                countARD[trlo_ch] = hit->GetCounts();
+                if (countARDMem[trlo_ch] == 0)
+                    countARDMem[trlo_ch] = countARD[trlo_ch];
+                diff3[trlo_ch] = countARD[trlo_ch] - countARDMem[trlo_ch];
+                if (diff3[trlo_ch] > 0 && countARD[trlo_ch] > 0)
+                    SumARD[trlo_ch] += countARD[trlo_ch] - countARDMem[trlo_ch];
+                if (diff3[trlo_ch] > 0 && countARD[trlo_ch] > 0 && 1 == 0)
+                    cout << "ARD: " << fNEvents << ", " << trlo_ch + 1 << ", " << countARD[trlo_ch] << ", "
+                         << countARDMem[trlo_ch] << ", " << countARD[trlo_ch] - countARDMem[trlo_ch] << ", "
+                         << SumARD[trlo_ch] << endl;
+                if (countARD[trlo_ch] > 0)
+                    countARDMem[trlo_ch] = countARD[trlo_ch];
+                if (diff3[trlo_ch] > 0 && countARD[trlo_ch] > 0)
+                    fh_ARD[trlo_ch]->SetBinContent(num_spills, diff3[trlo_ch]);
+            }
+
+            /*  if(count>0 && trlo_type==1) cout<<"RAW online: "<<fNEvents-1<<ihit<<"; "<<trlo_type<<", "<<trlo_ch<<",
+              "<<count<<endl; if(count>0 && trlo_type==2) cout<<"BDT online: "<<fNEvents-1<<ihit<<"; "<<trlo_type<<",
+              "<<trlo_ch<<", "<<count<<endl; if(count>0 && trlo_type==3) cout<<"ADT online: "<<fNEvents-1<<ihit<<";
+              "<<trlo_type<<", "<<trlo_ch<<", "<<count<<endl; if(count>0 && trlo_type==4) cout<<"ARD online:
+              "<<fNEvents-1<<ihit<<"; "<<trlo_type<<", "<<trlo_ch<<", "<<count<<endl;	*/
         }
     }
 
@@ -948,6 +1075,15 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     cout << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec" << endl;
     cout << "nSpill          : " << fNSpills << endl;
     cout << "Total num of 18O: " << nBeamParticle << endl;
+    for (Int_t i = 4; i < 8; i++)
+    {
+        cout << "Counters for Tpat  " << i + 1 << " => BDT= " << SumBDT[i] << ", ADT= " << SumADT[i]
+             << ", ARD: " << SumARD[i] << ", Dead time = " << (1. - double(SumARD[i]) / double(SumBDT[i])) * 100.
+             << " %" << endl;
+    }
+    cout << "Counters for Tpat " << 12 << " => BDT= " << SumBDT[11] << ", ADT= " << SumADT[11]
+         << ", ARD: " << SumARD[11] << ", Dead time = " << (1. - double(SumARD[11]) / double(SumBDT[11])) * 100. << " %"
+         << endl;
 
     if (fMappedItems.at(DET_ROLU))
     {
@@ -956,7 +1092,14 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         if (fHitItems.at(DET_TOFD))
             fh_rolu_tof->Write();
     }
-
+    if (fTrloiiItems)
+    {
+        for (Int_t i = 0; i < 16; i++)
+        {
+            fh_BDT[i]->Write();
+            fh_ARD[i]->Write();
+        }
+    }
     if (fMappedItems.at(DET_BMON))
     {
         fh_Tpat->Write();

@@ -1309,16 +1309,18 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                       std::abs(qtemp[tofd2l][il2] - qtemp[tofd1l][il1]) < 1.5)*/
 
                 // select either Z=2 in both planes, or Z=6 in both planes
-                if (((std::abs(qtemp[tofd2l][il2] - 2.088)) < 4. * 0.148 &&
-                     (std::abs(qtemp[tofd1l][il1] - 2.038)) < 4. * 0.106) ||
-                    ((std::abs(qtemp[tofd2l][il2] - 6.094)) < 4. * 0.219 &&
-                     (std::abs(qtemp[tofd1l][il1] - 6.051)) < 4. * 0.1799))
+                //  if (((std::abs(qtemp[tofd2l][il2] - 2.088)) < 4. * 0.148 &&
+                //       (std::abs(qtemp[tofd1l][il1] - 2.038)) < 4. * 0.106) ||
+                //     ((std::abs(qtemp[tofd2l][il2] - 6.094)) < 4. * 0.219 &&
+                //      (std::abs(qtemp[tofd1l][il1] - 6.051)) < 4. * 0.1799))
+                if (1 == 1)
                 {
 
                     xl[tofdgoodl][nSuml] = (xtemp[tofd2l][il2] + xtemp[tofd1l][il1]) / 2.;
                     tl[tofdgoodl][nSuml] = (ttemp[tofd2l][il2] + ttemp[tofd1l][il1]) / 2.;
                     yl[tofdgoodl][nSuml] = (ytemp[tofd2l][il2] + ytemp[tofd1l][il1]) / 2.;
-                    ql[tofdgoodl][nSuml] = (qtemp[tofd2l][il2] + qtemp[tofd1l][il1]) / 2.;
+                    //  ql[tofdgoodl][nSuml] = (qtemp[tofd2l][il2] + qtemp[tofd1l][il1]) / 2.;
+                    ql[tofdgoodl][nSuml] = qtemp[tofd1l][il1];
                     nSuml += 1;
                 }
             }
@@ -1338,16 +1340,18 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                     std::abs(qtemp[tofd2r][ir2] - qtemp[tofd1r][ir1]) < 1.5)*/
 
                 // select either Z=2 in both planes, or Z=6 in both planes
-                if (((std::abs(qtemp[tofd2r][ir2] - 2.094)) < 4. * 0.1187 &&
-                     (std::abs(qtemp[tofd1r][ir1] - 2.091)) < 4. * 0.115) ||
-                    ((std::abs(qtemp[tofd2r][ir2] - 6.068)) < 3.7 * 0.214 &&
-                     (std::abs(qtemp[tofd1r][ir1] - 6.054)) < 3.7 * 0.213))
+                //  if (((std::abs(qtemp[tofd2r][ir2] - 2.094)) < 4. * 0.1187 &&
+                //      (std::abs(qtemp[tofd1r][ir1] - 2.091)) < 4. * 0.115) ||
+                //    ((std::abs(qtemp[tofd2r][ir2] - 6.068)) < 3.7 * 0.214 &&
+                // //    (std::abs(qtemp[tofd1r][ir1] - 6.054)) < 3.7 * 0.213))
+                if (1 == 1)
                 {
 
                     xr[tofdgoodr][nSumr] = (xtemp[tofd2r][ir2] + xtemp[tofd1r][ir1]) / 2.;
                     tr[tofdgoodr][nSumr] = (ttemp[tofd2r][ir2] + ttemp[tofd1r][ir1]) / 2.;
                     yr[tofdgoodr][nSumr] = (ytemp[tofd2r][ir2] + ytemp[tofd1r][ir1]) / 2.;
-                    qr[tofdgoodr][nSumr] = (qtemp[tofd2r][ir2] + qtemp[tofd1r][ir1]) / 2.;
+                    //  qr[tofdgoodr][nSumr] = (qtemp[tofd2r][ir2] + qtemp[tofd1r][ir1]) / 2.;
+                    qr[tofdgoodr][nSumr] = qtemp[tofd1r][ir1];
 
                     nSumr += 1;
                 }
@@ -1436,8 +1440,8 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 
                 fh_dqvsdt_Tofd->Fill(tr[tofdgoodr][ihitr] - tl[tofdgoodl][ihitl],
                                      qr[tofdgoodr][ihitr] - ql[tofdgoodl][ihitl]);
-                if ((tr[tofdgoodr][ihitr] - tl[tofdgoodl][ihitl]) > -30. &&
-                    (tr[tofdgoodr][ihitr] - tl[tofdgoodl][ihitl]) < 30)
+                if ((tr[tofdgoodr][ihitr] - tl[tofdgoodl][ihitl]) > -10. &&
+                    (tr[tofdgoodr][ihitr] - tl[tofdgoodl][ihitl]) < 30.)
                 {
                     fh_ql_vs_qr_Tofd->Fill(qr[tofdgoodr][ihitr], ql[tofdgoodl][ihitl]);
                     fh_xl_vs_xr_Tofd->Fill(xr[tofdgoodr][ihitr], xl[tofdgoodl][ihitl]);

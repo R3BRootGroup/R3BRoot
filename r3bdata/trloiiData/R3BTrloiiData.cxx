@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -11,19 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BFI1ACAL2HIT
-#define R3BFI1ACAL2HIT
+// --------------------------------------------------------------
+// -----            R3BTrloiiData source file               -----
+// --------------------------------------------------------------
 
-#include "R3BBunchedFiberCal2Hit.h"
+#include "R3BTrloiiData.h"
 
-class R3BFi1aCal2Hit : public R3BBunchedFiberCal2Hit
+R3BTrloiiData::R3BTrloiiData()
+    : fType(0)
+    , fCh(0)
+    , fCounts(0)
 {
-  public:
-    R3BFi1aCal2Hit(enum R3BTCalEngine::CTDCVariant, Direction, Bool_t, Bool_t, Bool_t, Int_t = 1);
-    virtual ~R3BFi1aCal2Hit();
-    UInt_t FixMistake(UInt_t);
+}
 
-    ClassDef(R3BFi1aCal2Hit, 1)
-};
+R3BTrloiiData::R3BTrloiiData(UInt_t type, Int_t ch, uint32_t counts)
+    : fType(type)
+    , fCh(ch)
+    , fCounts(counts)
+{
+}
 
-#endif
+ClassImp(R3BTrloiiData);

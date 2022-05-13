@@ -28,6 +28,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bsource/ext
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
+${R3BROOT_SOURCE_DIR}/r3bsource/trloii
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
@@ -39,6 +40,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
+${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
@@ -77,6 +79,7 @@ R3BWhiterabbitS8Reader.cxx
 R3BWhiterabbitLosReader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
+R3BTrloiiScalerReader.cxx
 R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
@@ -131,6 +134,7 @@ ext/ext_h101_wrmaster.h
 ext/ext_h101_wrcalifa.h
 ext/ext_h101_wrneuland.h
 ext/ext_h101_wrams.h
+ext/ext_h101_trlo.h
 ext/ext_h101_wrs2.h
 ext/ext_h101_wrs8.h
 ext/ext_h101_tpat.h

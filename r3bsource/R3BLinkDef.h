@@ -32,6 +32,7 @@
 #pragma link C++ class R3BWhiterabbitS8Reader+;
 #pragma link C++ class R3BTrloiiTpatReader+;
 #pragma link C++ class R3BTrloiiSampReader+;
+#pragma link C++ class R3BTrloiiScalerReader+;
 #pragma link C++ class R3BTimestampMasterReader+;
 #pragma link C++ class R3BBeamMonitorReader+;
 #pragma link C++ class R3BPspxReader+;
@@ -78,6 +79,7 @@
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;
 #pragma link C++ class EXT_STR_h101_TPAT_t;
+#pragma link C++ class EXT_STR_h101_TRLO_onion_t;
 #pragma link C++ class EXT_STR_h101_timestamp_master_onion_t;
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
 //#pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;

@@ -185,7 +185,10 @@ class R3BTofdCal2HitS494 : public FairTask
     UInt_t goodpair5=0;
     UInt_t goodpair6=0;
     UInt_t goodpair7=0;
-
+ 
+    Double_t ytofd_offsetZ2[2][44]={0},ytofd_offsetZ6[2][44]={0},ytofd_offsetZ8[2][44]={0};
+	Double_t ytofd_offsetZ3[2][44]={0},ytofd_offsetZ4[2][44]={0},ytofd_offsetZ5[2][44]={0},ytofd_offsetZ7[2][44]={0};
+	
     // arrays of control histograms
     TH1F* fhTpat;
     TH1F* fhNoTpat;

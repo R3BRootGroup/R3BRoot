@@ -134,6 +134,10 @@ void R3BFiberContFact::setAllContainers()
     FairContainer* p16 = new FairContainer("Fi23bHitPar", "Fi23b Hit Parameters", "TestDefaultContext");
     p16->addContext("TestNonDefaultContext");
     containers->Add(p16);
+
+    FairContainer* p17 = new FairContainer("Fi0HitPar", "Fi0 Hit Parameters", "TestDefaultContext");
+    p17->addContext("TestNonDefaultContext");
+    containers->Add(p17);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)

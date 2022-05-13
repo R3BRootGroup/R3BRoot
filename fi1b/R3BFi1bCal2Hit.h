@@ -14,9 +14,9 @@
 #ifndef R3BFI1BCAL2HIT
 #define R3BFI1BCAL2HIT
 
-#include "R3BBunchedFiberCal2HitEngRun2019.h"
+#include "R3BBunchedFiberCal2Hit.h"
 
-class R3BFi1bCal2Hit : public R3BBunchedFiberCal2HitEngRun2019
+class R3BFi1bCal2Hit : public R3BBunchedFiberCal2Hit
 {
   public:
     R3BFi1bCal2Hit(enum R3BTCalEngine::CTDCVariant, Direction, Bool_t, Bool_t, Bool_t, Int_t = 1);
