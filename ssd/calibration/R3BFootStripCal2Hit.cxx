@@ -22,7 +22,9 @@
 #include "TH1F.h"
 #include "TMath.h"
 #include "TSpectrum.h"
+#include "TRandom3.h"
 #include <iomanip>
+#include <vector>
 
 // FAIR headers
 #include "FairLogger.h"
@@ -49,12 +51,19 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
     , fPitch(157.7)
     , fMiddle(50.)
     , fThSum(20.)
-    , fMaxNumDet(10)
+    , fMaxNumDet(16)
     , fMaxNumClusters(3) // Max number of clusters per foot detector set to 3
     , fFootCalData(NULL)
     , fFootHitData(NULL)
     , fMap_Par(NULL)
     , fOnline(kFALSE)
+    , fPolPar(5)
+    , fEnevsPosCorrPar{{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.},{0.,0.,0.,0.,0.,0.,0.,0.,0.,0.}}
+    , fDistTarget{0.,0.,0.,0.,0.,0.,0.,0.,0.,0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0}
+    , fAngleTheta{0.,0.,0.,0.,0.,0.,0.,0.,0.,0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0}
+    , fAnglePhi{0.,0.,0.,0.,0.,0.,0.,0.,0.,0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0}
+    , fOffsetX{0.,0.,0.,0.,0.,0.,0.,0.,0.,0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0}
+    , fOffsetY{0.,0.,0.,0.,0.,0.,0.,0.,0.,0,0.,0.,0.,0.,0.,0.,0.,0.,0.,0}
 {
 }
 
@@ -92,8 +101,20 @@ void R3BFootStripCal2Hit::SetParameter()
         return;
     }
     //--- Parameter Container ---
-    fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
+    fMaxNumDet = fMap_Par->GetNumDets(); // Number of foot detectors
+    fPolPar = fMap_Par->GetPolPar(); // Number of parameters for Energy correction of foot detectors
     LOG(INFO) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
+    LOG(INFO) << "R3BFootStripCal2Hit::PolPar from mapping " << fPolPar;
+    for(Int_t i=0 ; i<fMaxNumDet ; i++){
+      fDistTarget[i] = fMap_Par->GetDist2target(i+1);
+      fAngleTheta[i] = fMap_Par->GetAngleTheta(i+1);
+      fAnglePhi[i] = fMap_Par->GetAnglePhi(i+1);
+      fOffsetX[i] = fMap_Par->GetOffsetX(i+1);
+      fOffsetY[i] = fMap_Par->GetOffsetY(i+1);
+      for(Int_t j=0 ; j<fPolPar ; j++){
+        fEnevsPosCorrPar[i][j] = fMap_Par->GetEnevsPosCorr(i*fPolPar+j+1);
+      }
+    }
     fMap_Par->printParams();
 }
 
@@ -151,138 +172,224 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 
     // Reading the Input Cal Data
     Int_t nHits = fFootCalData->GetEntries();
-    if (!nHits)
+    if (!nHits || nHits<0)
         return;
 
     // Data from cal level
-    R3BFootCalData** calData;
-    calData = new R3BFootCalData*[nHits];
+    R3BFootCalData** calData = new R3BFootCalData*[nHits];
     Int_t detId;
     Int_t stripId;
     Double_t energy;
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
-        detId = calData[i]->GetDetId() - 1;
-        stripId = calData[i]->GetStripId() - 1;
-        energy = calData[i]->GetEnergy();
-        hssd[detId]->SetBinContent(stripId, energy);
-        // std::cout << stripId <<" "<< energy << std::endl;
-    }
-
-    Int_t nfound = 0;
     Double_t x = 0., y = 0., z = 0.;
-    TSpectrum* ss = new TSpectrum(10000);
-if (0) {
-    for (Int_t i = 0; i < fMaxNumDet; i++)
-    {
-        // Looking for hits
-        nfound = ss->Search(hssd[i], 1., "goff", 0.0001);
-        fChannelPeaks = (Double_t*)ss->GetPositionX();
-        Double_t clusterS[nfound][2];
-        DefineClusters(&nfound, fPitch, fChannelPeaks, hssd[i], clusterS);
+    std::vector<Int_t> StripI[fMaxNumDet];
+    std::vector<Double_t> StripE[fMaxNumDet];
 
-        // std::cout << nfound  << std::endl;
+    //Clustering algorithm - A. Revel
 
-        // Add hits per detector from the maximum energy to the lower one, but limiting the number
-        // of clusters per detector to fMaxNumClusters
-        if (nfound > 0)
-        {
-            for (Int_t mul = 0; mul < std::min(nfound, fMaxNumClusters); mul++)
-            {
-                if (fMap_Par->GetGeometry() == 202111)
-                {
-                    // Julich test with 6 detectors
-                    if (i >= 0)
-                    {
-                      x = 1.0 * clusterS[mul][1] - fMiddle;
-                      y = 0.;
-                      z = fMap_Par->GetDist2target(i + 1);
-                    }
-                }
+    Int_t ClusterMult[fMaxNumDet]; //Cluster multiplicity
+    Double_t ClusterPos[fMaxNumDet][100]; //Position of Cluster from Weighted Average
+    Double_t ClusterESum[fMaxNumDet][100]; //Sum of Energies in the Cluster
+    Double_t Nu[fMaxNumDet][100]; //Nu for Energy/Position correction
+    Int_t ClusterNStrip[fMaxNumDet][100]; //Number of Strips in Cluster
+    Double_t ClusterI[fMaxNumDet][100][200]; //Id Strip in Cluster
+    Double_t ClusterE[fMaxNumDet][100][200]; //Energy of Strip in Cluster
 
-                // TVector3 master(x, y, z);
-                // AddHitData(i + 1, mul, clusterS[mul][1]-fMiddle, master, clusterS[mul][0], nfound);
-            }
-        }
-    }
-}
-
-    //Simple Cluster Algorythm
-    Double_t EMax[fMaxNumDet];
-    Double_t ESum[fMaxNumDet];
-    Int_t MultStrip[fMaxNumDet];
-    Int_t IMax[fMaxNumDet];
-    Int_t Counter = 0;
+    //Init
     for (Int_t i = 0; i < fMaxNumDet; i++){
-      EMax[i] = 0.;
-      ESum[i] = 0.;
-      IMax[i] = -1;
-      MultStrip[i] = 0;
-    }
-
-    //Get Emax
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
-        detId = calData[i]->GetDetId() - 1;
-        stripId = calData[i]->GetStripId() - 1;
-        energy = calData[i]->GetEnergy();
-
-        if(EMax[detId]<energy){
-          EMax[detId] = energy;
-          ESum[detId] = energy;
-          IMax[detId] = stripId;
-          MultStrip[detId]++;
+      StripI[i].clear();
+      StripE[i].clear();
+      ClusterMult[i] = 0;
+      for (Int_t j = 0; j < 100; j++){
+        ClusterPos[i][j] = 0.;
+        ClusterESum[i][j] = 0.;
+        ClusterNStrip[i][j] = 0;
+        Nu[i][j] = 0.;
+        for (Int_t k = 0; k < 200; k++){
+          ClusterI[i][j][k] = 0.;
+          ClusterE[i][j][k] = 0.;
         }
+      }
     }
 
-    //Get ESum                                                                                                                                                                                                                              
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        detId = calData[i]->GetDetId() - 1;
-        stripId = calData[i]->GetStripId() - 1;
-        energy = calData[i]->GetEnergy();
+    //Filling vectors
+    for (Int_t i = 0; i < nHits; i++){
 
-        if(EMax[detId]>0 && TMath::Abs(stripId-IMax[detId])<=2 && stripId!=IMax[detId]){
-          if(energy>0.){
-            MultStrip[detId]++;
-            ESum[detId] += energy;
+      calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
+      detId = calData[i]->GetDetId() - 1;
+      stripId = calData[i]->GetStripId() - 1;
+      energy = calData[i]->GetEnergy();       
+
+      StripI[detId].push_back(stripId);
+      StripE[detId].push_back(energy);
+
+    } 
+
+    //Sort (should be good by default but just in case)
+    for (Int_t i = 0; i < fMaxNumDet; i++){
+      if(StripI[i].size()>1){
+        for (Int_t j = 0; j < StripI[i].size()-1 ; j++){
+          for (Int_t k = j+1; k < StripI[i].size() ; k++){
+            if(StripI[i].at(j)>StripI[i].at(k)){
+              Int_t tempI = StripI[i].at(j);
+              StripI[i].at(j) = StripI[i].at(k);
+              StripI[i].at(k) = tempI;
+              Int_t tempD = StripE[i].at(j);
+              StripE[i].at(j) = StripE[i].at(k);
+              StripE[i].at(k) = tempD;
+            }
           }
         }
-    }   
-
-    Int_t Found = 0;
-    
-    for (Int_t i = 0; i < fMaxNumDet; i++){
-      if(EMax[i]>0.){ 
-        Found++;
       }
     }
-    
+
+    // std::cout << "Event" << std::endl;
+    // for (Int_t i = 0; i < fMaxNumDet; i++){
+    //   for (Int_t j = 0; j < StripI[i].size() ; j++){   
+    //     std::cout << i+1 << "   " << j << "   " << StripI[i].at(j) << "   " << StripE[i].at(j) << std::endl;
+    //   }
+    // }
+
+    //Clustering
     for (Int_t i = 0; i < fMaxNumDet; i++){
 
-      if(EMax[i]>0.){ 
+      Int_t ClusterCount = 0;
+      Int_t StripCount = 0;  
+      Int_t TempI = 0;
 
-        x = 100.*(Double_t)IMax[i]/640. - 50.;
-        y = 0.;
-        z = 0.;
-        TVector3 master(x, y, z);                                                                                                                                                                                                 
-        //AddHitData(i + 1, Counter, x, master, EMax[i], Found);
-        //AddHitData(i + 1, Counter, x, master, ESum[i], MultStrip[i]);
-        AddHitData(i + 1, MultStrip[i], x, master, ESum[i], Found);
-        Counter++;
-        //AddHitData(i + 1, mul, clusterS[mul][1]-fMiddle, master, clusterS[mul][0], nfound);              
+      Int_t j = 0;
+      
+      while(j<StripI[i].size()){
+
+        if(j==0){
+          TempI = StripI[i].at(j);
+        }
+
+        ClusterNStrip[i][ClusterCount]++;
+        ClusterI[i][ClusterCount][StripCount] = StripI[i].at(j);
+        ClusterE[i][ClusterCount][StripCount] = StripE[i].at(j); 
+
+        Int_t k = j+1;
+        
+        while(k<StripI[i].size() && (StripI[i].at(k)-TempI)==1){
+          StripCount++;
+          ClusterNStrip[i][ClusterCount]++;
+          ClusterI[i][ClusterCount][StripCount] = StripI[i].at(k);
+          ClusterE[i][ClusterCount][StripCount] = StripE[i].at(k);
+          TempI = StripI[i].at(k);
+          StripI[i].erase(StripI[i].begin()+k);
+          StripE[i].erase(StripE[i].begin()+k);
+        }
+          
+        StripI[i].erase(StripI[i].begin()+j);
+        StripE[i].erase(StripE[i].begin()+j);
+          
+        ClusterCount++;
+        StripCount=0;
       }
+      ClusterMult[i] = ClusterCount;
+    }
+       
+    // std::cout << "Clustering Result : " << std::endl;
+    // for(Int_t i = 0; i < fMaxNumDet; i++){
+    //   if(ClusterMult[i]>0){
+    //     std::cout << "FOOT " << i << std::endl;
+    //     std::cout << ClusterMult[i] << std::endl;
+    //     for(Int_t j = 0; j < ClusterMult[i] ; j++){
+    //       for(Int_t k = 0; k < ClusterNStrip[i][j] ; k++){
+    //         std::cout << j << "   " << ClusterNStrip[i][j] << "   " << ClusterI[i][j][k]<< "   " << ClusterE[i][j][k] << std::endl;
+    //       }
+    //     }
+    //   }
+    // }
 
+    //Compute Sum Energy, Position and Eta
+    for(Int_t i = 0; i < fMaxNumDet; i++){
+      for(Int_t j = 0; j < ClusterMult[i] ; j++){
+        for(Int_t k = 0; k < ClusterNStrip[i][j] ; k++){
+          ClusterESum[i][j]+=ClusterE[i][j][k];
+          ClusterPos[i][j]+=ClusterE[i][j][k]*ClusterI[i][j][k];
+        }
+        ClusterPos[i][j] = ClusterPos[i][j]/ClusterESum[i][j];
+        if(ClusterNStrip[i][j]==1){ //Clusters with only one strip fired
+          ClusterPos[i][j] = gRandom->Gaus(ClusterPos[i][j],0.001);
+        }
+        Nu[i][j] = ClusterPos[i][j]-(Int_t)ClusterPos[i][j];
+      }
+    }        
+    
+    //Sort Cluster from Higher to Lower Energy
+    for(Int_t i = 0; i < fMaxNumDet; i++){
+      for(Int_t j = 0; j < ClusterMult[i]-1 ; j++){    
+        for(Int_t k = j+1; k < ClusterMult[i] ; k++){    
+          if(ClusterESum[i][j]<ClusterESum[i][k]){
+
+            Int_t tempI = ClusterNStrip[i][j];
+            ClusterNStrip[i][j] = ClusterNStrip[i][k];
+            ClusterNStrip[i][k] = tempI;
+
+            Double_t tempD = ClusterESum[i][j];
+            ClusterESum[i][j] = ClusterESum[i][k];
+            ClusterESum[i][k] = tempD;
+
+            tempD = ClusterPos[i][j];
+            ClusterPos[i][j] = ClusterPos[i][k];
+            ClusterPos[i][k] = tempD;
+
+            tempD = Nu[i][j];
+            Nu[i][j] = Nu[i][k];
+            Nu[i][k] = tempD;
+          }
+        }
+      }
     }
 
-    
+    //Filling HitData
+    for(Int_t i = 0; i < fMaxNumDet; i++){
+      for(Int_t j = 0; j < ClusterMult[i]; j++){    
+
+        Double_t pos = 100.*ClusterPos[i][j]/640. - 50.; 
+        
+        if(fAnglePhi[i]==0.){ //X-Foot (StripId numbered from left to right)
+          x = pos * TMath::Cos(fAngleTheta[i] * TMath::DegToRad()) + fOffsetX[i];
+          y = fOffsetY[i];
+          z = pos * TMath::Sin(fAngleTheta[i] * TMath::DegToRad()) + fDistTarget[i];
+        }else if(fAnglePhi[i]==90.){ //Y-Foot (StripId numbered from bottom to top)
+          x = fOffsetX[i];
+          y = pos + fOffsetY[i];
+          z = fDistTarget[i]; 
+        }else if(fAnglePhi[i]==180.){ //X-Foot (StripId numbered from right to left)
+          x = -pos * TMath::Cos(fAngleTheta[i] * TMath::DegToRad()) + fOffsetX[i];
+          y = fOffsetY[i];
+          z = -pos * TMath::Sin(fAngleTheta[i] * TMath::DegToRad()) + fDistTarget[i];
+        }else if(fAnglePhi[i]==270.){ //Y-Foot (StripId numbered from top to bottom)
+          x = fOffsetX[i];
+          y = -pos + fOffsetY[i];
+          z = fDistTarget[i]; 
+        }else{
+          LOG(INFO) << "R3BFootStripCal2Hit::AnglePhi is Wrong !";
+        }
+
+        TVector3 master(x, y, z);
+
+        Double_t energy_corr = 0.;
+
+        for(Int_t k=1 ; k<fPolPar ; k++){
+          energy_corr += fEnevsPosCorrPar[i][k]*TMath::Power(Nu[i][j],k);
+        }
+ 
+        energy = ClusterESum[i][j] - energy_corr;
+
+        if(ClusterESum[i][j]>fThSum && j<fMaxNumClusters){
+          AddHitData(i + 1, ClusterNStrip[i][j], x, master, energy, ClusterMult[i]); 
+        }
+      }
+    }
+
     for (Int_t i = 0; i < fMaxNumDet; i++)
-        hssd[i]->Reset();
+      hssd[i]->Reset();
     if (calData)
-        delete calData;
-    delete ss;
+      delete calData;
+    //delete ss;
     return;
 }
 
