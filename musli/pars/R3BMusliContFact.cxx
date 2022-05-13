@@ -19,11 +19,11 @@
 
 #include "R3BMusliContFact.h"
 
-#include "FairLogger.h"
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BLogger.h"
 #include "R3BMusliCalPar.h"
 #include "R3BMusliHitPar.h"
 #include "R3BTGeoPar.h"
@@ -69,7 +69,7 @@ FairParSet* R3BMusliContFact::createContainer(FairContainer* c)
     // of this container, the name is concatinated with the context.
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BMusliContFact: Create container name: " << name;
+    R3BLOG(INFO, name);
     FairParSet* p = 0;
     if (strcmp(name, "musliCalPar") == 0)
     {

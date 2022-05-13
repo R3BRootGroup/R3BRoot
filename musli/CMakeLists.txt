@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BMusic" which includes the source files given 
+# Create a library called "libR3BMusli" which includes the source files given 
 # in the array. The extension is already found. Any number of sources could be 
 # listed here.
 
@@ -54,6 +54,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF MusliLinkDef.h)
 set(LIBRARY_NAME R3BMusli)
 set(DEPENDENCIES
-          R3BBase R3BData)
+          R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
