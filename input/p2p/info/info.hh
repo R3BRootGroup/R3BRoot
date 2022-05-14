@@ -3,7 +3,7 @@
 
 #include <math.h>
 
-const int    MAX_STORY = 10240; 	 // Total number of generated events
+const int    MAX_STORY = 1000; 	 // Total number of generated events
 const double ENERGY    = 800.;           // Beam energy (MeV/u)
 const double Exe       = 0.0;        // Residual excitation energy (MeV) (change it for deeply bound states)
 const bool   ISOTROPIC = true;           // Internal momentum spread (Gauss)

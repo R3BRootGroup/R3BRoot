@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTSPLINEPAR_H
-#define R3BTSPLINEPAR_H
+#define R3BTSPLINEPAR_H 1
 
 #include "TObject.h"
 #include "TSpline.h"

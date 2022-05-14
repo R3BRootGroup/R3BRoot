@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BMusliCal2Hit_H
-#define R3BMusliCal2Hit_H
+#define R3BMusliCal2Hit_H 1
 
 #include "TArrayD.h"
 
@@ -108,4 +108,4 @@ class R3BMusliCal2Hit : public FairTask
     ClassDef(R3BMusliCal2Hit, 1)
 };
 
-#endif
+#endif /* R3BMusliCal2Hit_H */

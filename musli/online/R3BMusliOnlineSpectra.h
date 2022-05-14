@@ -18,7 +18,7 @@
 // ------------------------------------------------------------
 
 #ifndef R3BMusliOnlineSpectra_H
-#define R3BMusliOnlineSpectra_H
+#define R3BMusliOnlineSpectra_H 1
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -157,4 +157,4 @@ class R3BMusliOnlineSpectra : public FairTask
     ClassDef(R3BMusliOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BMusliOnlineSpectra_H */

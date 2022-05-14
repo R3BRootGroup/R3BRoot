@@ -11,15 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-/* R3BFileSource.h
- * R3BROOT
- *
- * Author: J.L. Rodriguez-Sanchez
- * Date: 12/05/21
- * */
+// -----------------------------------------------------------
+// -----                 R3BFileSource                   -----
+// -----    Created 12/05/21 by J.L. Rodriguez-Sanchez   -----
+// -----------------------------------------------------------
 
 #ifndef R3BFileSource_H
-#define R3BFileSource_H
+#define R3BFileSource_H 1
 
 #include "FairSource.h"
 #include "TChain.h"
@@ -225,4 +223,4 @@ class R3BFileSource : public FairSource
     ClassDefOverride(R3BFileSource, 0)
 };
 
-#endif // R3BFileSource_H
+#endif /* R3BFileSource_H */

@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BMusliMapped2Cal_H
-#define R3BMusliMapped2Cal_H
+#define R3BMusliMapped2Cal_H 1
 
 #include "TArrayF.h"
 
@@ -90,4 +90,4 @@ class R3BMusliMapped2Cal : public FairTask
     ClassDef(R3BMusliMapped2Cal, 1)
 };
 
-#endif
+#endif /* R3BMusliMapped2Cal_H */
