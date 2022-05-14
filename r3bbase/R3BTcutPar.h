@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTCUTPAR_H
-#define R3BTCUTPAR_H
+#define R3BTCUTPAR_H 1
 
 #include "TCutG.h"
 #include "TObject.h"

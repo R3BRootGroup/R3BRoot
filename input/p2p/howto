@@ -1,13 +1,23 @@
-In info/info.hh change the energy, beta, events, etc, as you please.
-mkdir build
-cd build
-cmake ../
-make
-./qfs
-
-The output is quasi.root and quasi.out (a text file). 
-
 Uses Valerii Panin's code, in turn based on the QFS fortran code by Leonid Chulkov.
+
+In info/info.hh change the energy, beta, number of events, etc, as you wish.
+
+Execute the QFS generator:
+1) root -l
+2) .L qfs.C
+3) main()
+
+The outputs are quasi.root, quasi.out and quasi_ascii.txt (a text file for R3BAsciiGenerator). 
+
+R3BAsciiGenerator
+1) Copy the file into R3BParams_SXXX/input folder, where XXX is the ID of your experiment
+2) Define the name of your input file in the simulation macro runsim.C
+   (the macro should be in the folder R3BParams_SXXX/macros/sim) like this:
+   if (fGenerator.CompareTo("ascii") == 0)
+    fEventFile = "p2p_Ca48_800MeV.txt";
+3) Run the macro: root -l 'runsim.C(1000)'
+   (More details can be found in the simulation macro)
+
 
 You can use the quasi.out as an input for the R3Bp2pGenerator.
 

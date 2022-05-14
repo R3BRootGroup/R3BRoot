@@ -11,12 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-/* R3BFileSource.h
- * R3BROOT
- *
- * Author: J.L. Rodriguez-Sanchez
- * Date: 12/05/21
- * */
+// -----------------------------------------------------------
+// -----                 R3BFileSource                   -----
+// -----    Created 12/05/21 by J.L. Rodriguez-Sanchez   -----
+// -----------------------------------------------------------
 
 #include "R3BFileSource.h"
 #include "R3BLogger.h"
@@ -388,7 +386,7 @@ Bool_t R3BFileSource::Init()
     }
     else
     {
-        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " is open");
+        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " was found");
         fInputFile.clear();
         fInputFile.seekg(0, std::ios::beg);
     }
@@ -396,19 +394,15 @@ Bool_t R3BFileSource::Init()
     if (fInputFile.is_open())
     {
         R3BLOG(INFO, "Reading RunId file");
-
         Int_t rid;
         Int_t expRun;
         int64_t ts;
-        Int_t dummy;
-
-        while (fInputFile >> hex >> rid >> expRun >> ts >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-               dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >>
-               dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy >> dummy)
+        while (fInputFile >> hex >> rid >> expRun >> ts)
         {
-
             fRunid.push_back(rid);
             fTimestamp.push_back(ts);
+            // Ignore the other stuff that might still be on that line
+            fInputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
         R3BLOG(INFO, "End of reading RunId file");
@@ -449,7 +443,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
         {
             prevts = fTimestamp[j];
             nextts = fTimestamp[j + 1];
-            LOG(DEBUG) << "New timestamp " << nextts << " for RunId " << fRunid[j];
+            R3BLOG(DEBUG, "New timestamp " << nextts << " for RunId " << fRunid[j]);
             return fRunid[j];
         }
 
@@ -457,7 +451,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     {
         prevts = fTimestamp[fArraysize - 1];
         nextts = fTimestamp[fArraysize - 1];
-        LOG(DEBUG) << "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1];
+        R3BLOG(DEBUG, "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1]);
         return fRunid[fArraysize - 1];
     }
 
@@ -474,27 +468,30 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
 // ----  Method ReadEvent ----------------------------------------------------
 Int_t R3BFileSource::ReadEvent(UInt_t i)
 {
+    fCurrentEntryNo = i;
+    fEventTime = GetEventTime();
+
     /** TODO
      ** We should use here the timestamp from the header to look for the right runId
      ** and set up the parameters for the analysis of the root files.
      ** std::cout << fEvtHeader->GetTimeStamp() << std::endl;
      **/
-
-    printf("Processed: \033[32m %d \033[0m of \033[34m %d \033[0m (\033[33m %.2f \033[0m of 100), current RunId "
-           "\033[31m %d \033[0m \r",
-           i + 1,
-           fNoOfEntries,
-           100. * i / (double)(fNoOfEntries),
-           fRunId);
-    fflush(stdout);
+    if (i > 0)
+    {
+        printf("Processed: \033[32m %d \033[0m of \033[34m %d \033[0m (\033[33m %.2f \033[0m of 100), current RunId "
+               "\033[31m %d \033[0m \r",
+               i + 1,
+               fNoOfEntries,
+               100. * i / (double)(fNoOfEntries),
+               fRunId);
+        fflush(stdout);
+    }
 
     if (nextts > 0 && prevts > 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
     {
         fRunId = GetRunid(fEvtHeader->GetTimeStamp());
     }
 
-    fCurrentEntryNo = i;
-    fEventTime = GetEventTime();
     if (fInChain->GetEntry(i))
         return 0;
 
