@@ -23,6 +23,7 @@
 //
 //     Double_t fE     = calculated with the sets of the data of fNbAnodes
 //     Double_t fZ;    = atomic charge from the average sum of the energy fEave
+//     Double_t fX;    = rough calibrated position in the center of the detector
 //     Double_t fTheta = theta angle (available only for fType == 1)
 // ----------------------------------------------------------------------------
 
@@ -37,7 +38,7 @@ class R3BMusliHitData : public TObject
     /** Default constructor **/
     R3BMusliHitData();
 
-    R3BMusliHitData(UInt_t n, Double_t e, Double_t z, Double_t t, Double_t x = 0.);
+    R3BMusliHitData(UInt_t n, Double_t e, Double_t z, Double_t t, Double_t x);
 
     /** Destructor **/
     virtual ~R3BMusliHitData() {}
@@ -46,13 +47,14 @@ class R3BMusliHitData : public TObject
     inline const UInt_t& GetType() const { return fType; }
     inline const Double_t& GetEave() const { return fE; }
     inline const Double_t& GetZcharge() const { return fZ; }
-    inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetX() const { return fX; }
+    inline const Double_t& GetTheta() const { return fTheta; }
 
     /** Modifiers **/
     void SetType(UInt_t n) { fType = n; };
     void SetEave(Double_t energy) { fE = energy; };
     void SetZcharge(Double_t z) { fZ = z; };
+    void SetX(Double_t x) { fX = x; };
     void SetTheta(Double_t theta) { fTheta = theta; };
 
   protected:

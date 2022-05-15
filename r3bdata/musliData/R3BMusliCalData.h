@@ -16,7 +16,7 @@
 // ----------------------------------------------------------------------------
 //   The Cal Data has the following structure
 //     UInt_t fNbAnodes;
-//            fNbAnodes=n, with n = 2, 4, 8, 16 mean signal on x anodes
+//            fNbAnodes=n, with n = 2, 4, 8, 16 : mean signal on n anodes
 //
 //     UInt_t fIndex;
 //            fIndex = i, with i = 1, 2, 3, 4, 5, 6, 7, 8 for fNbAnodes = 2
