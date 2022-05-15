@@ -104,6 +104,7 @@ R3BBunchedFiberCal2HitEngRun2019::~R3BBunchedFiberCal2HitEngRun2019()
 
 InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
 {
+	cout << "Test1 **************************" << endl;
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -120,19 +121,25 @@ InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
     if (!fCalItems)
     {
         LOG(ERROR) << "Branch " << name << " not found.";
-        return kERROR;
+        //return kERROR;
     }
-   auto name_mapmt_trig = fName + "TriggerCal";
+
+	cout << "Test2 **************************" << endl;
+
+    auto name_mapmt_trig = fName + "TriggerCal";
     fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
     if (NULL == fMAPMTCalTriggerItems)
-        LOG(fatal) << "Branch " << name_mapmt_trig << " not found";
+        LOG(ERROR) << "Branch " << name_mapmt_trig << " not found";
 
     auto name_spmt_trig = "BunchedFiberSPMTTrigCal";
     fSPMTCalTriggerItems =
       (TClonesArray*)mgr->GetObject(name_spmt_trig);
     if (NULL == fSPMTCalTriggerItems)
-        LOG(fatal) << "Branch " << name_spmt_trig << " not found";
+        LOG(ERROR) << "Branch " << name_spmt_trig << " not found";
         
+	cout << "Test3 **************************" << endl;
+
+
     maxevent = mgr->CheckMaxEventNo();
 
     mgr->Register(fName + "Hit", "Land", fHitItems, kTRUE);

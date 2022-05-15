@@ -119,33 +119,33 @@ InitStatus R3BOnlineSpectraPdc::Init()
     // Get objects for detectors on all levels
     fMappedItems = (TClonesArray*)mgr->GetObject("PdcMapped");
     if (NULL == fMappedItems)
-        LOG(fatal) << "Branch PdcMapped not found";
+        LOG(ERROR) << "Branch PdcMapped not found";
 
     fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
     if (NULL == fCalItems)
-        LOG(fatal) << "Branch PdcCal not found";
+        LOG(ERROR) << "Branch PdcCal not found";
 
     fHitItems = (TClonesArray*)mgr->GetObject("PdcHit");
     if (NULL == fHitItems)
-        LOG(fatal) << "Branch PdcHit not found";
+        LOG(ERROR) << "Branch PdcHit not found";
 
     // Get objects for detectors on all levels
     fMappedItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Mapped");
     if (NULL == fMappedItems_fi0)
-        LOG(fatal) << "Branch Fi0Mapped not found";
+        LOG(ERROR) << "Branch Fi0Mapped not found";
 
     fCalItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Cal");
     if (NULL == fCalItems_fi0)
-        LOG(fatal) << "Branch Fi0Cal not found";
+        LOG(ERROR) << "Branch Fi0Cal not found";
 
-    fHitItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Hit");
-    if (NULL == fHitItems_fi0)
-        LOG(fatal) << "Branch Fi0Hit not found";
+    //fHitItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Hit");
+    //if (NULL == fHitItems_fi0)
+    //    LOG(ERROR) << "Branch Fi0Hit not found";
 
     // Get objects for detectors on all levels
     fMappedItems_fi1a = (TClonesArray*)mgr->GetObject("Fi1aMapped");
     if (NULL == fMappedItems_fi1a)
-        LOG(fatal) << "Branch Fi1aMapped not found";
+        LOG(ERROR) << "Branch Fi1aMapped not found";
 
     fCalItems_fi1a = (TClonesArray*)mgr->GetObject("Fi1aCal");
     if (NULL == fCalItems_fi1a)
@@ -158,7 +158,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
     // Get objects for detectors on all levels
     fMappedItems_fi1b = (TClonesArray*)mgr->GetObject("Fi1bMapped");
     if (NULL == fMappedItems_fi1b)
-        LOG(fatal) << "Branch Fi1bMapped not found";
+        LOG(ERROR) << "Branch Fi1bMapped not found";
 
     fCalItems_fi1b = (TClonesArray*)mgr->GetObject("Fi1bCal");
     if (NULL == fCalItems_fi1b)
@@ -829,6 +829,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         }
     }
 
+
     //----------------------------------------------------------------------
     // Fiber0 detectors
     //----------------------------------------------------------------------
@@ -1180,6 +1181,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     }
 
     fNEvents += 1;
+
 }
 
 void R3BOnlineSpectraPdc::FinishEvent()
