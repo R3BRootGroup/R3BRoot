@@ -11,18 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----                  R3BMusliOnlineSpectra           -----
-// -----    Created 29/09/19  by J.L. Rodriguez-Sanchez   -----
-// -----           Fill MUSIC online histograms           -----
-// ------------------------------------------------------------
-
 /*
  * This task should fill histograms with MUSIC online data
  */
 
 #include "R3BMusliOnlineSpectra.h"
 #include "R3BEventHeader.h"
+#include "R3BMusliCalData.h"
+#include "R3BMusliHitData.h"
 #include "R3BMusliMappedData.h"
 #include "THttpServer.h"
 
@@ -59,6 +55,8 @@ R3BMusliOnlineSpectra::R3BMusliOnlineSpectra()
 R3BMusliOnlineSpectra::R3BMusliOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapItemsMusli(NULL)
+    , fCalItemsMusli(NULL)
+    , fHitItemsMusli(NULL)
     , fNEvents(0)
 {
 }
@@ -88,9 +86,23 @@ InitStatus R3BMusliOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    // get access to mapped data of the MUSIC
+    // get access to the MAPPED data of the MUSIC
     fMapItemsMusli = (TClonesArray*)mgr->GetObject("MusliMappedData");
     if (!fMapItemsMusli)
+    {
+        return kFATAL;
+    }
+
+    // get access to the CAL data of the MUSIC
+    fCalItemsMusli = (TClonesArray*)mgr->GetObject("MusliCalData");
+    if (!fCalItemsMusli)
+    {
+        return kFATAL;
+    }
+
+    // get access to the HIT data of the MUSIC
+    fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
+    if (!fHitItemsMusli)
     {
         return kFATAL;
     }
@@ -668,6 +680,311 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_DeltaDT->cd();
     fh1_Muslimap_DeltaDT->Draw("");
 
+    // === ======== === //
+    // === CAL DATA === //
+    // === ======== === //
+
+    // --- Energies --- //
+    cMusliCal_E2 = new TCanvas("Musli_Ecal2", "", 10, 10, 800, 700);
+    cMusliCal_E2->Divide(4, 2);
+    for (Int_t j = 0; j < 8; j++)
+    {
+        sprintf(Name1, "fh1_Musli_Ecal_a%d_a%d", 2 * j + 1, 2 * j + 2);
+        sprintf(Name2, " E A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
+        fh1_Muslical_E[j] = new TH1D(Name1, Name2, 64000, 0, 64000);
+        fh1_Muslical_E[j]->GetXaxis()->SetTitle("Energy [channels]");
+        fh1_Muslical_E[j]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_E[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_E[j]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_E[j]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_E[j]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j]->SetFillColor(31);
+        cMusliCal_E2->cd(j + 1);
+        fh1_Muslical_E[j]->Draw("");
+    }
+
+    cMusliCal_E4 = new TCanvas("Musli_Ecal4", "", 10, 10, 800, 700);
+    cMusliCal_E4->Divide(2, 2);
+    for (Int_t j = 0; j < 4; j++)
+    {
+        sprintf(Name1, "fh1_Musli_Ecal_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
+        sprintf(Name2, "E A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
+        fh1_Muslical_E[j + 8] = new TH1D(Name1, Name2, 64000, 0, 64000);
+        fh1_Muslical_E[j + 8]->GetXaxis()->SetTitle("Energy [channels]");
+        fh1_Muslical_E[j + 8]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_E[j + 8]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_E[j + 8]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_E[j + 8]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_E[j + 8]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j + 8]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j + 8]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j + 8]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j + 8]->SetFillColor(31);
+        cMusliCal_E4->cd(j + 1);
+        fh1_Muslical_E[j + 8]->Draw("");
+    }
+
+    cMusliCal_E8 = new TCanvas("Musli_Ecal8", "", 10, 10, 800, 700);
+    cMusliCal_E8->Divide(2, 1);
+    for (Int_t j = 0; j < 2; j++)
+    {
+        sprintf(Name1, "fh1_Musli_Ecal_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
+        sprintf(Name2, "E A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
+        fh1_Muslical_E[j + 12] = new TH1D(Name1, Name2, 64000, 0, 64000);
+        fh1_Muslical_E[j + 12]->GetXaxis()->SetTitle("Energy [channels]");
+        fh1_Muslical_E[j + 12]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_E[j + 12]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_E[j + 12]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_E[j + 12]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_E[j + 12]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j + 12]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j + 12]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_E[j + 12]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_E[j + 12]->SetFillColor(31);
+        cMusliCal_E8->cd(j + 1);
+        fh1_Muslical_E[j + 12]->Draw("");
+    }
+
+    cMusliCal_E16 = new TCanvas("Musli_Ecal16", "", 10, 10, 800, 700);
+    sprintf(Name1, "fh1_Musli_Ecal_mean_a1_to_a16");
+    sprintf(Name2, "E A01 to A16 if mult==1");
+    fh1_Muslical_E[14] = new TH1D(Name1, Name2, 64000, 0, 64000);
+    fh1_Muslical_E[14]->GetXaxis()->SetTitle("Energy [channels]");
+    fh1_Muslical_E[14]->GetYaxis()->SetTitle("Counts");
+    fh1_Muslical_E[14]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslical_E[14]->GetXaxis()->CenterTitle(true);
+    fh1_Muslical_E[14]->GetYaxis()->CenterTitle(true);
+    fh1_Muslical_E[14]->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslical_E[14]->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslical_E[14]->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslical_E[14]->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslical_E[14]->SetFillColor(31);
+    cMusliCal_E16->cd();
+    fh1_Muslical_E[14]->Draw("");
+
+    // --- Drift times --- //
+
+    cMusliCal_DT2 = new TCanvas("Musli_DTcal2", "", 10, 10, 800, 700);
+    cMusliCal_DT2->Divide(4, 2);
+    for (Int_t j = 0; j < 8; j++)
+    {
+        sprintf(Name1, "fh1_Musli_DTcal_mean_a%d_a%d", 2 * j + 1, 2 * j + 2);
+        sprintf(Name2, "DT A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
+        fh1_Muslical_DT[j] = new TH1D(Name1, Name2, 2000, -100, 100);
+        fh1_Muslical_DT[j]->GetXaxis()->SetTitle("Calibrated Drift Time in [mm]");
+        fh1_Muslical_DT[j]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_DT[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_DT[j]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j]->SetFillColor(31);
+        cMusliCal_DT2->cd(j + 1);
+        fh1_Muslical_DT[j]->Draw("");
+    }
+
+    cMusliCal_DT4 = new TCanvas("Musli_DTcal4", "", 10, 10, 800, 700);
+    cMusliCal_DT4->Divide(2, 2);
+    for (Int_t j = 0; j < 4; j++)
+    {
+        sprintf(Name1, "fh1_Musli_DTcal_mean_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
+        sprintf(Name2, "DT A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
+        fh1_Muslical_DT[j + 8] = new TH1D(Name1, Name2, 2000, -100, 100);
+        fh1_Muslical_DT[j + 8]->GetXaxis()->SetTitle("Calibrated Drift Time in [mm]");
+        fh1_Muslical_DT[j + 8]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_DT[j + 8]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_DT[j + 8]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j + 8]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j + 8]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j + 8]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j + 8]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j + 8]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j + 8]->SetFillColor(31);
+        cMusliCal_DT4->cd(j + 1);
+        fh1_Muslical_DT[j + 8]->Draw("");
+    }
+
+    cMusliCal_DT8 = new TCanvas("Musli_DTcal8", "", 10, 10, 800, 700);
+    cMusliCal_DT8->Divide(2, 1);
+    for (Int_t j = 0; j < 2; j++)
+    {
+        sprintf(Name1, "fh1_Musli_DTcal_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
+        sprintf(Name2, "DT A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
+        fh1_Muslical_DT[j + 12] = new TH1D(Name1, Name2, 2000, -100, 100);
+        fh1_Muslical_DT[j + 12]->GetXaxis()->SetTitle("Calibrated Drift Time in [mm]");
+        fh1_Muslical_DT[j + 12]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslical_DT[j + 12]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslical_DT[j + 12]->GetXaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j + 12]->GetYaxis()->CenterTitle(true);
+        fh1_Muslical_DT[j + 12]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j + 12]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j + 12]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslical_DT[j + 12]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslical_DT[j + 12]->SetFillColor(31);
+        cMusliCal_DT8->cd(j + 1);
+        fh1_Muslical_DT[j + 12]->Draw("");
+    }
+
+    cMusliCal_DT16 = new TCanvas("Musli_DTcal16", "", 10, 10, 800, 700);
+    sprintf(Name1, "fh1_Musli_DTcal_mean_a1_to_a16");
+    sprintf(Name2, "DT A01 to A16 if mult==1");
+    fh1_Muslical_DT[14] = new TH1D(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslical_DT[14]->GetXaxis()->SetTitle("Calibrated Drift Time in [mm]");
+    fh1_Muslical_DT[14]->GetYaxis()->SetTitle("Counts");
+    fh1_Muslical_DT[14]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslical_DT[14]->GetXaxis()->CenterTitle(true);
+    fh1_Muslical_DT[14]->GetYaxis()->CenterTitle(true);
+    fh1_Muslical_DT[14]->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslical_DT[14]->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslical_DT[14]->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslical_DT[14]->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslical_DT[14]->SetFillColor(31);
+    cMusliCal_DT16->cd();
+    fh1_Muslical_DT[14]->Draw("");
+
+    // === ======== === //
+    // === HIT DATA === //
+    // === ======== === //
+    Int_t nb_anodes[4] = { 2, 4, 8, 16 };
+
+    cMusliHit_E = new TCanvas("Musli_Ehit", "", 10, 10, 800, 700);
+    cMusliHit_E->Divide(2, 2);
+
+    cMusliHit_Z = new TCanvas("Musli_Zcharge", "", 10, 10, 800, 700);
+    cMusliHit_Z->Divide(2, 2);
+
+    cMusliHit_EvsX = new TCanvas("Musli_EhitVsX", "", 10, 10, 800, 700);
+    cMusliHit_EvsX->Divide(2, 2);
+
+    cMusliHit_ZvsX = new TCanvas("Musli_ZchargeVsX", "", 10, 10, 800, 700);
+    cMusliHit_ZvsX->Divide(2, 2);
+
+    cMusliHit_EvsTheta = new TCanvas("Musli_EhitVsTheta", "", 10, 10, 800, 700);
+    cMusliHit_EvsTheta->Divide(2, 2);
+
+    cMusliHit_ZvsTheta = new TCanvas("Musli_ZchargeVsTheta", "", 10, 10, 800, 700);
+    cMusliHit_ZvsTheta->Divide(2, 2);
+
+    for (Int_t j = 0; j < 4; j++)
+    {
+        sprintf(Name1, "fh1_Musli_Ehit_%i", nb_anodes[j]);
+        sprintf(Name2, " Eaverage for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh1_Muslihit_E[j] = new TH1D(Name1, Name2, 64000, 0, 64000);
+        fh1_Muslihit_E[j]->GetXaxis()->SetTitle("Energy [channels]");
+        fh1_Muslihit_E[j]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslihit_E[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslihit_E[j]->GetXaxis()->CenterTitle(true);
+        fh1_Muslihit_E[j]->GetYaxis()->CenterTitle(true);
+        fh1_Muslihit_E[j]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslihit_E[j]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslihit_E[j]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslihit_E[j]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslihit_E[j]->SetFillColor(31);
+        cMusliHit_E->cd(j + 1);
+        fh1_Muslihit_E[j]->Draw("");
+
+        sprintf(Name1, "fh1_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh1_Muslihit_Z[j] = new TH1D(Name1, Name2, 3000, 0, 15);
+        fh1_Muslihit_Z[j]->GetXaxis()->SetTitle("Charge  [atomic number]");
+        fh1_Muslihit_Z[j]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslihit_Z[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslihit_Z[j]->GetXaxis()->CenterTitle(true);
+        fh1_Muslihit_Z[j]->GetYaxis()->CenterTitle(true);
+        fh1_Muslihit_Z[j]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslihit_Z[j]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslihit_Z[j]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslihit_Z[j]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslihit_Z[j]->SetFillColor(31);
+        cMusliHit_Z->cd(j + 1);
+        fh1_Muslihit_Z[j]->Draw("");
+
+        sprintf(Name1, "fh2_Musli_EhitVsX%i", nb_anodes[j]);
+        sprintf(Name2, " Eaverage for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh2_Muslihit_EvsX[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1600, 0, 64000);
+        fh2_Muslihit_EvsX[j]->GetXaxis()->SetTitle("X [mm]");
+        fh2_Muslihit_EvsX[j]->GetYaxis()->SetTitle("Energy [channels]");
+        fh2_Muslihit_EvsX[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_Muslihit_EvsX[j]->GetXaxis()->CenterTitle(true);
+        fh2_Muslihit_EvsX[j]->GetYaxis()->CenterTitle(true);
+        fh2_Muslihit_EvsX[j]->GetXaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_EvsX[j]->GetXaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_EvsX[j]->GetYaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_EvsX[j]->GetYaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_EvsX[j]->SetFillColor(31);
+        cMusliHit_EvsX->cd(j + 1);
+        fh2_Muslihit_EvsX[j]->Draw("");
+
+        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh2_Muslihit_ZvsX[j] = new TH2D(Name1, Name2, 1000, -50, 50, 750, 0, 15);
+        fh2_Muslihit_ZvsX[j]->GetXaxis()->SetTitle("X [mm]");
+        fh2_Muslihit_ZvsX[j]->GetYaxis()->SetTitle("Charge  [atomic number]");
+        fh2_Muslihit_ZvsX[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_Muslihit_ZvsX[j]->GetXaxis()->CenterTitle(true);
+        fh2_Muslihit_ZvsX[j]->GetYaxis()->CenterTitle(true);
+        fh2_Muslihit_ZvsX[j]->GetXaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_ZvsX[j]->GetXaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_ZvsX[j]->GetYaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_ZvsX[j]->GetYaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_ZvsX[j]->SetFillColor(31);
+        cMusliHit_ZvsX->cd(j + 1);
+        fh2_Muslihit_ZvsX[j]->Draw("");
+
+        sprintf(Name1, "fh2_Musli_EhitVsTheta%i", nb_anodes[j]);
+        sprintf(Name2, " Eaverage for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh2_Muslihit_EvsTheta[j] = new TH2D(Name1, Name2, 1000, -0.05, 0.05, 1600, 0, 64000);
+        fh2_Muslihit_EvsTheta[j]->GetXaxis()->SetTitle("Theta [mm]");
+        fh2_Muslihit_EvsTheta[j]->GetYaxis()->SetTitle("Energy [channels]");
+        fh2_Muslihit_EvsTheta[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_Muslihit_EvsTheta[j]->GetXaxis()->CenterTitle(true);
+        fh2_Muslihit_EvsTheta[j]->GetYaxis()->CenterTitle(true);
+        fh2_Muslihit_EvsTheta[j]->GetXaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_EvsTheta[j]->GetXaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_EvsTheta[j]->GetYaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_EvsTheta[j]->GetYaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_EvsTheta[j]->SetFillColor(31);
+        cMusliHit_EvsTheta->cd(j + 1);
+        fh2_Muslihit_EvsTheta[j]->Draw("");
+
+        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
+        fh2_Muslihit_ZvsTheta[j] = new TH2D(Name1, Name2, 1000, -0.05, 0.05, 750, 0, 15);
+        fh2_Muslihit_ZvsTheta[j]->GetXaxis()->SetTitle("Theta [mrad]");
+        fh2_Muslihit_ZvsTheta[j]->GetYaxis()->SetTitle("Charge  [atomic number]");
+        fh2_Muslihit_ZvsTheta[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_Muslihit_ZvsTheta[j]->GetXaxis()->CenterTitle(true);
+        fh2_Muslihit_ZvsTheta[j]->GetYaxis()->CenterTitle(true);
+        fh2_Muslihit_ZvsTheta[j]->GetXaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_ZvsTheta[j]->GetXaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_ZvsTheta[j]->GetYaxis()->SetLabelSize(0.045);
+        fh2_Muslihit_ZvsTheta[j]->GetYaxis()->SetTitleSize(0.045);
+        fh2_Muslihit_ZvsTheta[j]->SetFillColor(31);
+        cMusliHit_ZvsTheta->cd(j + 1);
+        fh2_Muslihit_ZvsTheta[j]->Draw("");
+    }
+
+    cMusliHit_Theta = new TCanvas("Musli_Theta", "", 10, 10, 800, 700);
+    fh1_Muslihit_Theta = new TH1D("fh1_Musli_Theta", "Theta for data with nb_anodes = 2 if mult==1", 1000, -0.05, 0.05);
+    fh1_Muslihit_Theta = new TH1D(Name1, Name2, 64000, 0, 64000);
+    fh1_Muslihit_Theta->GetXaxis()->SetTitle("Theta [mrad]");
+    fh1_Muslihit_Theta->GetYaxis()->SetTitle("Counts");
+    fh1_Muslihit_Theta->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslihit_Theta->GetXaxis()->CenterTitle(true);
+    fh1_Muslihit_Theta->GetYaxis()->CenterTitle(true);
+    fh1_Muslihit_Theta->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslihit_Theta->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslihit_Theta->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslihit_Theta->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslihit_Theta->SetFillColor(31);
+    cMusliHit_Theta->cd();
+    fh1_Muslihit_Theta->Draw("");
+
     // === ================= === //
     // === MAIN FOLDER-Musli === //
     // === ================= === //
@@ -703,6 +1020,24 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     mainfolMusli->Add(cMusliMap_DeltaDT);
 
+    mainfolMusli->Add(cMusliCal_E2);
+    mainfolMusli->Add(cMusliCal_E4);
+    mainfolMusli->Add(cMusliCal_E8);
+    mainfolMusli->Add(cMusliCal_E16);
+
+    mainfolMusli->Add(cMusliCal_DT2);
+    mainfolMusli->Add(cMusliCal_DT4);
+    mainfolMusli->Add(cMusliCal_DT8);
+    mainfolMusli->Add(cMusliCal_DT16);
+
+    mainfolMusli->Add(cMusliHit_E);
+    mainfolMusli->Add(cMusliHit_Z);
+    mainfolMusli->Add(cMusliHit_Theta);
+    mainfolMusli->Add(cMusliHit_EvsX);
+    mainfolMusli->Add(cMusliHit_ZvsX);
+    mainfolMusli->Add(cMusliHit_EvsTheta);
+    mainfolMusli->Add(cMusliHit_ZvsTheta);
+
     run->AddObject(mainfolMusli);
 
     // Register command to reset histograms
@@ -715,7 +1050,7 @@ void R3BMusliOnlineSpectra::Reset_Histo()
 {
     LOG(INFO) << "R3BMusliOnlineSpectra::Reset_Histo";
 
-    // --- Reset Histo from mapped level --- //
+    // --- Reset Histo of mapped level --- //
     fh1_Muslimap_mult->Reset();
     fh2_Muslimap_mult->Reset();
     for (Int_t j = 0; j < 15; j++)
@@ -723,6 +1058,8 @@ void R3BMusliOnlineSpectra::Reset_Histo()
         fh1_Muslimap_E[j]->Reset();
         fh1_Muslimap_DT[j]->Reset();
         fh2_Muslimap_EvsDT[j]->Reset();
+        fh1_Muslical_E[j]->Reset();
+        fh1_Muslical_DT[j]->Reset();
     }
     for (Int_t j = 0; j < 13; j++)
     {
@@ -741,6 +1078,25 @@ void R3BMusliOnlineSpectra::Reset_Histo()
     fh2_Muslimap_Emean4vsE16->Reset();
     fh2_Muslimap_Emean8vsE16->Reset();
     fh1_Muslimap_DeltaDT->Reset();
+
+    // --- Reset Histo of hit level --- //
+    for (Int_t j = 0; j < 15; j++)
+    {
+        fh1_Muslical_E[j]->Reset();
+        fh1_Muslical_DT[j]->Reset();
+    }
+
+    // --- Reset Histo of hit level --- //
+    for (Int_t j = 0; j < 4; j++)
+    {
+        fh1_Muslihit_E[j]->Reset();
+        fh1_Muslihit_Z[j]->Reset();
+        fh2_Muslihit_EvsX[j]->Reset();
+        fh2_Muslihit_ZvsX[j]->Reset();
+        fh2_Muslihit_EvsTheta[j]->Reset();
+        fh2_Muslihit_ZvsTheta[j]->Reset();
+    }
+    fh1_Muslihit_Theta->Reset();
 }
 
 void R3BMusliOnlineSpectra::Exec(Option_t* option)
@@ -749,35 +1105,40 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(FATAL) << "R3BMusliOnlineSpectra::Exec FairRootManager not found";
 
-    // Local variables for mapped data
-    UInt_t mult[18], e[15], t[18];
+    Int_t nHits;
     UInt_t rank;
-    UInt_t tref = 0;
-    Int_t dt[15];
-    Float_t emean2 = 0;
-    Float_t emean4 = 0;
-    Float_t emean8 = 0;
-    UShort_t cptemean2 = 0;
-    UShort_t cptemean4 = 0;
-    UShort_t cptemean8 = 0;
-    for (UShort_t i = 0; i < 15; i++)
-    {
-        mult[i] = 0;
-        e[i] = 0;
-        t[i] = 0;
-        dt[i] = 0;
-    }
-    for (UShort_t i = 15; i < 18; i++)
-    {
-        mult[i] = 0;
-        t[i] = 0;
-    }
 
-    // mapped data
+    // --- ----------- --- //
+    // --- MAPPED DATA --- //
+    // --- ----------- --- //
+
     if (fMapItemsMusli && fMapItemsMusli->GetEntriesFast() > 0)
     {
+        // Local variables for mapped data
+        UInt_t mult[18], e[15], t[18];
+        UInt_t tref = 0;
+        Int_t dt[15];
+        Float_t emean2 = 0;
+        Float_t emean4 = 0;
+        Float_t emean8 = 0;
+        UShort_t cptemean2 = 0;
+        UShort_t cptemean4 = 0;
+        UShort_t cptemean8 = 0;
+        for (UShort_t i = 0; i < 15; i++)
+        {
+            mult[i] = 0;
+            e[i] = 0;
+            t[i] = 0;
+            dt[i] = 0;
+        }
+        for (UShort_t i = 15; i < 18; i++)
+        {
+            mult[i] = 0;
+            t[i] = 0;
+        }
+
         // read mapped data
-        Int_t nHits = fMapItemsMusli->GetEntriesFast();
+        nHits = fMapItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BMusliMappedData* hit = (R3BMusliMappedData*)fMapItemsMusli->At(ihit);
@@ -898,6 +1259,92 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
 
     } // end of if(fMapItemsMusli && fMapItemsMusli->GetEntriesFast()>0)
 
+    // --- -------- --- //
+    // --- CAL DATA --- //
+    // --- -------- --- //
+
+    if (fCalItemsMusli && fCalItemsMusli->GetEntriesFast() > 0)
+    {
+        // Local variables for cal data
+        Double_t multcal[15], ecal[15], dtcal[18];
+        for (UShort_t i = 0; i < 15; i++)
+        {
+            multcal[i] = 0;
+            ecal[i] = 0;
+            dtcal[i] = 0;
+        }
+
+        // read cal data
+        nHits = fCalItemsMusli->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BMusliCalData* hit = (R3BMusliCalData*)fCalItemsMusli->At(ihit);
+            if (!hit)
+                continue;
+            rank = hit->GetSignal() - 1;
+            multcal[rank]++;
+            ecal[rank] = hit->GetEnergy();
+            dtcal[rank] = hit->GetDT();
+        }
+        // implement the spectra only if mult[signal] == 1
+        for (Int_t i = 0; i < 15; i++)
+        {
+            if (multcal[i] == 1)
+            {
+                fh1_Muslical_E[i]->Fill(ecal[i]);
+                fh1_Muslical_DT[i]->Fill(dtcal[i]);
+            }
+        }
+
+    } // end of if (fCalItemsMusli)
+
+    // --- -------- --- //
+    // --- HIT DATA --- //
+    // --- -------- --- //
+
+    if (fHitItemsMusli && fHitItemsMusli->GetEntriesFast() > 0)
+    {
+        // Local variables for hit data
+        Double_t multhit[4], ehit[4], zhit[4], xhit[4], theta[4];
+        for (UShort_t i = 0; i < 4; i++)
+        {
+            multhit[i] = 0;
+            ehit[i] = 0;
+            zhit[i] = 0;
+            xhit[i] = -1000.;
+            theta[i] = -1000.;
+        }
+
+        // read  data
+        nHits = fHitItemsMusli->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BMusliHitData* hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
+            if (!hit)
+                continue;
+            rank = hit->GetType() - 1;
+            multhit[rank]++;
+            ehit[rank] = hit->GetEave();
+            zhit[rank] = hit->GetZcharge();
+            xhit[rank] = hit->GetX();
+            theta[rank] = hit->GetTheta();
+        }
+        // implement the spectra only if mult[signal] == 1
+        for (Int_t i = 0; i < 4; i++)
+        {
+            if (multhit[i] == 1)
+            {
+                fh1_Muslihit_E[i]->Fill(ehit[i]);
+                fh1_Muslihit_Z[i]->Fill(zhit[i]);
+                fh2_Muslihit_EvsX[i]->Fill(xhit[i], ehit[i]);
+                fh2_Muslihit_ZvsX[i]->Fill(xhit[i], zhit[i]);
+                fh2_Muslihit_EvsTheta[i]->Fill(theta[0], ehit[i]);
+                fh2_Muslihit_ZvsTheta[i]->Fill(theta[0], zhit[i]);
+                if (i == 0)
+                    fh1_Muslihit_Theta->Fill(theta[i]);
+            }
+        }
+    }
     fNEvents += 1;
 }
 
@@ -906,6 +1353,14 @@ void R3BMusliOnlineSpectra::FinishEvent()
     if (fMapItemsMusli)
     {
         fMapItemsMusli->Clear();
+    }
+    if (fCalItemsMusli)
+    {
+        fCalItemsMusli->Clear();
+    }
+    if (fHitItemsMusli)
+    {
+        fHitItemsMusli->Clear();
     }
 }
 
@@ -942,6 +1397,26 @@ void R3BMusliOnlineSpectra::FinishTask()
         cMusliMap_Emean->Write();
 
         cMusliMap_DeltaDT->Write();
+    }
+
+    if (fCalItemsMusli)
+    {
+        cMusliCal_E2->Write();
+        cMusliCal_E4->Write();
+        cMusliCal_E8->Write();
+        cMusliCal_E16->Write();
+
+        cMusliCal_DT2->Write();
+        cMusliCal_DT4->Write();
+        cMusliCal_DT8->Write();
+        cMusliCal_DT16->Write();
+    }
+
+    if (fHitItemsMusli)
+    {
+        cMusliHit_E->Write();
+        cMusliHit_Z->Write();
+        cMusliHit_Theta->Write();
     }
 }
 
