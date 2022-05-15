@@ -19,6 +19,8 @@
 
 class TH1F;
 class TH2F;
+class R3BEventHeader;
+class R3BTimeStitch;
 class R3BFiberMAPMTCalData;
 class R3BFiberMAPMTHitPar;
 class R3BFiberMappingPar;
@@ -93,7 +95,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
         ftofmax = tmax;
     }
 
-    void SetWriteHisto(Bool_t write) { fWrite = write; }
+    void SetWriteHisto() { fWrite = kTRUE; }
 
     void SetTofMin(Double_t min) { ftofmin = min; }
 
@@ -119,14 +121,16 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Double_t tsync;
     Double_t gainUp;
     Double_t gainDown;
-    Double_t offsetUp;
-    Double_t offsetDown;
+    // Double_t offsetUp;
+    Double_t offsetDT;
     Bool_t fIsCalibrator;
     Double_t ftofmin, ftofmax;
     Bool_t fWrite;
     // Don't store data for online
     Bool_t fOnline;
 
+    R3BEventHeader* fHeader; /* Event header  */
+    R3BTimeStitch* fTimeStitch;
     Direction fDirection;
     Orientation fOrientation;
     TClonesArray* fCalItems;

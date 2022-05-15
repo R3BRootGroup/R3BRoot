@@ -79,6 +79,7 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
     , fTofdSmiley(true)
     , fTofdZ(false)
     , fMeanTof(20.)
+    , fHeader(nullptr)
     , maxevent(0)
 {
     for (Int_t i = 0; i < fNofPlanes; i++)
@@ -145,8 +146,8 @@ InitStatus R3BTofDCal2HitPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
-    R3BLOG_IF(fatal, NULL == header, "EventHeader. not found");
+    fHeader = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
     R3BLOG_IF(fatal, NULL == fCalData, "TofdCal not found");
@@ -185,16 +186,16 @@ namespace
 void R3BTofDCal2HitPar::Exec(Option_t* option)
 {
     // test for requested trigger (if possible)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    if ((fTrigger >= 0) && (fHeader) && (fHeader->GetTrigger() != fTrigger))
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
     Int_t fTpat_bit = fTpat - 1;
     if (fTpat_bit >= 0)
     {
-        Int_t itpat = header->GetTpat();
+        Int_t itpat = fHeader->GetTpat();
         Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
-        if ((header) && (tpatvalue == 0))
+        if ((fHeader) && (tpatvalue == 0))
             return;
     }
 
@@ -321,7 +322,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
 
                     // Tof with respect LOS detector
-                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart(), "tamex", "vftx");
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - fHeader->GetTStart(), "tamex", "vftx");
                     fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof);
                 }
 
@@ -367,7 +368,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
 
                     // Tof with respect LOS detector
-                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - header->GetTStart(), "tamex", "vftx");
+                    auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - fHeader->GetTStart(), "tamex", "vftx");
                     fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof - par->GetTofSync());
                 }
                 else if (fTofdQ > 0 && fParameter > 1)
