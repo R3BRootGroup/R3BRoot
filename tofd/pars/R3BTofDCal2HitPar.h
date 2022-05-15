@@ -213,7 +213,7 @@ class R3BTofDCal2HitPar : public FairTask
     R3BTofDHitPar* fHitPar;         /* Parameter container. */
     TClonesArray* fCalData;         /* Array with mapped data - input data. */
     TClonesArray* fCalTriggerItems; /* Array with trigger Cal items - input data. */
-    R3BEventHeader* header;         /* Event header  */
+    R3BEventHeader* fHeader;        /* Event header  */
     Double_t fTofdY;
     Double_t fTofdQ;
     Double_t fMaxQ;

@@ -102,7 +102,7 @@ class R3BTofDCal2Hit : public FairTask
     /**
      * Method for setting histograms
      */
-    inline void SetTofdHisto(Bool_t Histo) { fTofdHisto = Histo; }
+    inline void SetTofdHisto() { fTofdHisto = kTRUE; }
     /**
      * Method for setting y calculation via ToT instead of tdiff
      */
