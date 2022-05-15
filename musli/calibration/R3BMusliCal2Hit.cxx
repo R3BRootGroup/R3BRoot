@@ -87,7 +87,7 @@ void R3BMusliCal2Hit::SetParContainers()
         R3BLOG(INFO, "R3BMusliCal2Hit::SetParContainers() musliHitPar container open");
     }
 
-		// Reading the TGeoPar from the FairRun
+    // Reading the TGeoPar from the FairRun
     fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
     R3BLOG_IF(ERROR, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
 }
@@ -208,6 +208,7 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
         eave[i] = 0;
         e_hit[i] = 0;
         z_hit[i] = 0;
+        x_hit[i] = -1000;
         theta_hit[i] = -1000;
     }
 
@@ -219,6 +220,8 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
             Esum[0] += e_cal[0][i];
             nba[0]++;
         }
+        if (mult_cal[3] == 1 && mult_cal[4] == 1)
+            x_hit[0] = 0.5 * (dt_cal[0][3] + dt_cal[0][4]);
     }
 
     // Calculate the energy sum for fNbAnodes = 4: fSignal = [9..12]
@@ -229,6 +232,8 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
             Esum[1] += e_cal[0][i];
             nba[1]++;
         }
+        if (mult_cal[9] == 1 && mult_cal[10] == 1)
+            x_hit[1] = 0.5 * (dt_cal[0][9] + dt_cal[0][10]);
     }
 
     // Calculate the energy sum for fNbAnodes = 8: fSignal = [13,14]
@@ -239,6 +244,8 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
             Esum[2] += e_cal[0][i];
             nba[2]++;
         }
+        if (mult_cal[12] == 1 && mult_cal[13] == 1)
+            x_hit[2] = 0.5 * (dt_cal[0][12] + dt_cal[0][13]);
     }
 
     // Calculate the energy sum for fNbAnodes = 16: fSignal = [15]
@@ -246,7 +253,9 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
     {
         Esum[3] = e_cal[0][14];
         nba[3] = 1;
+        x_hit[3] = dt_cal[0][14];
     }
+
     for (Int_t type = 1; type <= fNumTypes; type++)
     {
         // Calculate theta value only if type = 1, exclude first and last pairs of anodes
@@ -301,7 +310,7 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
                                       fZHitParams->GetAt((type - 1) * fNumZ),
                                       fZHitParams->GetAt((type - 1) * fNumZ + 1),
                                       fZHitParams->GetAt((type - 1) * fNumZ + 2));
-            AddHitData(type, e_hit[type - 1], z_hit[type - 1], theta_hit[type - 1]);
+            AddHitData(type, e_hit[type - 1], z_hit[type - 1], x_hit[type - 1], theta_hit[type - 1]);
         }
     }
 
@@ -320,12 +329,12 @@ void R3BMusliCal2Hit::Reset()
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BMusliHitData* R3BMusliCal2Hit::AddHitData(UInt_t nb_anodes, Double_t e, Double_t z, Double_t theta)
+R3BMusliHitData* R3BMusliCal2Hit::AddHitData(UInt_t nb_anodes, Double_t e, Double_t z, Double_t x, Double_t theta)
 {
     // It fills the R3BMusliCalData
     TClonesArray& clref = *fMusliHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BMusliHitData(nb_anodes, e, z, theta);
+    return new (clref[size]) R3BMusliHitData(nb_anodes, e, z, x, theta);
 }
 
 ClassImp(R3BMusliCal2Hit);

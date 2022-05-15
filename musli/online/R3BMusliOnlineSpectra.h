@@ -11,12 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----                R3BMusliOnlineSpectra             -----
-// -----    Created 06/10/19  by J.L. Rodriguez-Sanchez   -----
-// -----           Fill MusIC online histograms           -----
-// ------------------------------------------------------------
-
 #ifndef R3BMusliOnlineSpectra_H
 #define R3BMusliOnlineSpectra_H
 
@@ -96,12 +90,14 @@ class R3BMusliOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fMapItemsMusli; /**< Array with mapped items. */
+    TClonesArray* fCalItemsMusli; /**< Array with cal items. */
+    TClonesArray* fHitItemsMusli; /**< Array with hit items. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
 
-    // Canvas
+    // Canvas at MAPPED level
     TCanvas* cMusliMap_Mult;
 
     TCanvas* cMusliMap_E2;
@@ -131,6 +127,27 @@ class R3BMusliOnlineSpectra : public FairTask
 
     TCanvas* cMusliMap_DeltaDT;
 
+    // Canvas at CAL level
+
+    TCanvas* cMusliCal_E2;
+    TCanvas* cMusliCal_E4;
+    TCanvas* cMusliCal_E8;
+    TCanvas* cMusliCal_E16;
+
+    TCanvas* cMusliCal_DT2;
+    TCanvas* cMusliCal_DT4;
+    TCanvas* cMusliCal_DT8;
+    TCanvas* cMusliCal_DT16;
+
+    // Canvas at HIT level
+    TCanvas* cMusliHit_E;
+    TCanvas* cMusliHit_Z;
+    TCanvas* cMusliHit_Theta;
+    TCanvas* cMusliHit_EvsX;
+    TCanvas* cMusliHit_ZvsX;
+    TCanvas* cMusliHit_EvsTheta;
+    TCanvas* cMusliHit_ZvsTheta;
+
     // Histograms for Mapped data
     TH1I* fh1_Muslimap_mult;
     TH2I* fh2_Muslimap_mult;
@@ -152,6 +169,19 @@ class R3BMusliOnlineSpectra : public FairTask
     TH2F* fh2_Muslimap_Emean8vsE16;
 
     TH1I* fh1_Muslimap_DeltaDT;
+
+    // Histograms for Cal data
+    TH1D* fh1_Muslical_E[15];
+    TH1D* fh1_Muslical_DT[15];
+
+    // Histrograms for Hit data
+    TH1D* fh1_Muslihit_E[4];
+    TH1D* fh1_Muslihit_Z[4];
+    TH1D* fh1_Muslihit_Theta;
+    TH2D* fh2_Muslihit_EvsX[4];
+    TH2D* fh2_Muslihit_ZvsX[4];
+    TH2D* fh2_Muslihit_EvsTheta[4];
+    TH2D* fh2_Muslihit_ZvsTheta[4];
 
   public:
     ClassDef(R3BMusliOnlineSpectra, 1)

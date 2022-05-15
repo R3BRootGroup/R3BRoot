@@ -89,6 +89,7 @@ class R3BMusliCal2Hit : public FairTask
 
     // variables to calculate theta
     Double_t dt_cal[MAX_MULT_MUSLI][MAX_NUM_GROUPS_CAL];
+    Double_t x_hit[MAX_NUM_TYPES_HIT];
     Double_t theta_hit[MAX_NUM_TYPES_HIT];
 
     R3BMusliHitPar* fHit_Par;      /**< Parameter container. > */
@@ -101,7 +102,7 @@ class R3BMusliCal2Hit : public FairTask
 
     /** Private method AddHitData **/
     //** Adds a MusliHitData to the HitCollection
-    R3BMusliHitData* AddHitData(UInt_t t, Double_t e, Double_t z, Double_t theta);
+    R3BMusliHitData* AddHitData(UInt_t t, Double_t e, Double_t z, Double_t x, Double_t theta);
 
   public:
     // Class definition
