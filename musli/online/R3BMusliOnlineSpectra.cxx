@@ -116,10 +116,10 @@ InitStatus R3BMusliOnlineSpectra::Init()
     // === =========== === //
 
     // --- Multiplicities --- //
-    cMusliMap_Mult = new TCanvas("Musli_Mult", "", 10, 10, 800, 700);
+    cMusliMap_Mult = new TCanvas("MusliMap_Mult", "", 10, 10, 800, 700);
     cMusliMap_Mult->Divide(2, 1);
 
-    fh1_Muslimap_mult = new TH1I("MultTot", "Total Multiplicity", 20, -0.5, 19.5);
+    fh1_Muslimap_mult = new TH1I("MultMapTot", "Total Multiplicity at MAPPED level", 20, -0.5, 19.5);
     fh1_Muslimap_mult->GetXaxis()->SetTitle("fSignal");
     fh1_Muslimap_mult->GetYaxis()->SetTitle("Total Counts");
     fh1_Muslimap_mult->GetYaxis()->SetTitleOffset(1.1);
@@ -133,7 +133,8 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Mult->cd(1);
     fh1_Muslimap_mult->Draw("");
 
-    fh2_Muslimap_mult = new TH2I("MultDist", "Multiplicity Distribution per fSignal", 20, -0.5, 19.5, 50, -0.5, 49.5);
+    fh2_Muslimap_mult = new TH2I(
+        "MultMapDist", "Multiplicity Distribution per fSignal at MAPPED level", 20, -0.5, 19.5, 50, -0.5, 49.5);
     fh2_Muslimap_mult->GetXaxis()->SetTitle("fSignal");
     fh2_Muslimap_mult->GetYaxis()->SetTitle("Counts per Event");
     fh2_Muslimap_mult->GetYaxis()->SetTitleOffset(1.1);
@@ -684,6 +685,39 @@ InitStatus R3BMusliOnlineSpectra::Init()
     // === CAL DATA === //
     // === ======== === //
 
+    // --- Multiplicities --- //
+    cMusliCal_Mult = new TCanvas("MusliCal_Mult", "", 10, 10, 800, 700);
+    cMusliCal_Mult->Divide(2, 1);
+
+    fh1_Muslical_mult = new TH1I("MultCalTot", "Total Multiplicity at CAL level", 17, -0.5, 16.5);
+    fh1_Muslical_mult->GetXaxis()->SetTitle("fSignal");
+    fh1_Muslical_mult->GetYaxis()->SetTitle("Total Counts");
+    fh1_Muslical_mult->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslical_mult->GetXaxis()->CenterTitle(true);
+    fh1_Muslical_mult->GetYaxis()->CenterTitle(true);
+    fh1_Muslical_mult->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslical_mult->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslical_mult->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslical_mult->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslical_mult->SetFillColor(31);
+    cMusliCal_Mult->cd(1);
+    fh1_Muslical_mult->Draw("");
+
+    fh2_Muslical_mult =
+        new TH2I("MultCalDist", "Multiplicity Distribution per fSignal at CAL level", 17, -0.5, 16.5, 50, -0.5, 49.5);
+    fh2_Muslical_mult->GetXaxis()->SetTitle("fSignal");
+    fh2_Muslical_mult->GetYaxis()->SetTitle("Counts per Event");
+    fh2_Muslical_mult->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Muslical_mult->GetXaxis()->CenterTitle(true);
+    fh2_Muslical_mult->GetYaxis()->CenterTitle(true);
+    fh2_Muslical_mult->GetXaxis()->SetLabelSize(0.045);
+    fh2_Muslical_mult->GetXaxis()->SetTitleSize(0.045);
+    fh2_Muslical_mult->GetYaxis()->SetLabelSize(0.045);
+    fh2_Muslical_mult->GetYaxis()->SetTitleSize(0.045);
+    fh2_Muslical_mult->SetFillColor(31);
+    cMusliCal_Mult->cd(2);
+    fh2_Muslical_mult->Draw("COL");
+
     // --- Energies --- //
     cMusliCal_E2 = new TCanvas("Musli_Ecal2", "", 10, 10, 800, 700);
     cMusliCal_E2->Divide(4, 2);
@@ -918,9 +952,9 @@ InitStatus R3BMusliOnlineSpectra::Init()
         fh2_Muslihit_EvsX[j]->GetYaxis()->SetTitleSize(0.045);
         fh2_Muslihit_EvsX[j]->SetFillColor(31);
         cMusliHit_EvsX->cd(j + 1);
-        fh2_Muslihit_EvsX[j]->Draw("");
+        fh2_Muslihit_EvsX[j]->Draw("COL");
 
-        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name1, "fh2_Musli_Zcharge_%i_vs_X", nb_anodes[j]);
         sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
         fh2_Muslihit_ZvsX[j] = new TH2D(Name1, Name2, 1000, -50, 50, 750, 0, 15);
         fh2_Muslihit_ZvsX[j]->GetXaxis()->SetTitle("X [mm]");
@@ -934,7 +968,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
         fh2_Muslihit_ZvsX[j]->GetYaxis()->SetTitleSize(0.045);
         fh2_Muslihit_ZvsX[j]->SetFillColor(31);
         cMusliHit_ZvsX->cd(j + 1);
-        fh2_Muslihit_ZvsX[j]->Draw("");
+        fh2_Muslihit_ZvsX[j]->Draw("COL");
 
         sprintf(Name1, "fh2_Musli_EhitVsTheta%i", nb_anodes[j]);
         sprintf(Name2, " Eaverage for data with nb anodes %02d  if mult==1", nb_anodes[j]);
@@ -950,9 +984,9 @@ InitStatus R3BMusliOnlineSpectra::Init()
         fh2_Muslihit_EvsTheta[j]->GetYaxis()->SetTitleSize(0.045);
         fh2_Muslihit_EvsTheta[j]->SetFillColor(31);
         cMusliHit_EvsTheta->cd(j + 1);
-        fh2_Muslihit_EvsTheta[j]->Draw("");
+        fh2_Muslihit_EvsTheta[j]->Draw("COL");
 
-        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name1, "fh2_Musli_Zcharge_%i_vs_Theta", nb_anodes[j]);
         sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
         fh2_Muslihit_ZvsTheta[j] = new TH2D(Name1, Name2, 1000, -0.05, 0.05, 750, 0, 15);
         fh2_Muslihit_ZvsTheta[j]->GetXaxis()->SetTitle("Theta [mrad]");
@@ -966,12 +1000,11 @@ InitStatus R3BMusliOnlineSpectra::Init()
         fh2_Muslihit_ZvsTheta[j]->GetYaxis()->SetTitleSize(0.045);
         fh2_Muslihit_ZvsTheta[j]->SetFillColor(31);
         cMusliHit_ZvsTheta->cd(j + 1);
-        fh2_Muslihit_ZvsTheta[j]->Draw("");
+        fh2_Muslihit_ZvsTheta[j]->Draw("COL");
     }
 
     cMusliHit_Theta = new TCanvas("Musli_Theta", "", 10, 10, 800, 700);
     fh1_Muslihit_Theta = new TH1D("fh1_Musli_Theta", "Theta for data with nb_anodes = 2 if mult==1", 1000, -0.05, 0.05);
-    fh1_Muslihit_Theta = new TH1D(Name1, Name2, 64000, 0, 64000);
     fh1_Muslihit_Theta->GetXaxis()->SetTitle("Theta [mrad]");
     fh1_Muslihit_Theta->GetYaxis()->SetTitle("Counts");
     fh1_Muslihit_Theta->GetYaxis()->SetTitleOffset(1.1);
@@ -983,7 +1016,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     fh1_Muslihit_Theta->GetYaxis()->SetTitleSize(0.045);
     fh1_Muslihit_Theta->SetFillColor(31);
     cMusliHit_Theta->cd();
-    fh1_Muslihit_Theta->Draw("");
+    fh1_Muslihit_Theta->Draw("COL");
 
     // === ================= === //
     // === MAIN FOLDER-Musli === //
@@ -1019,6 +1052,8 @@ InitStatus R3BMusliOnlineSpectra::Init()
     mainfolMusli->Add(cMusliMap_Emean);
 
     mainfolMusli->Add(cMusliMap_DeltaDT);
+
+    mainfolMusli->Add(cMusliCal_Mult);
 
     mainfolMusli->Add(cMusliCal_E2);
     mainfolMusli->Add(cMusliCal_E4);
@@ -1079,7 +1114,9 @@ void R3BMusliOnlineSpectra::Reset_Histo()
     fh2_Muslimap_Emean8vsE16->Reset();
     fh1_Muslimap_DeltaDT->Reset();
 
-    // --- Reset Histo of hit level --- //
+    // --- Reset Histo of cal level --- //
+    fh1_Muslical_mult->Reset();
+    fh2_Muslical_mult->Reset();
     for (Int_t j = 0; j < 15; j++)
     {
         fh1_Muslical_E[j]->Reset();
@@ -1145,6 +1182,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
+            fh1_Muslimap_mult->Fill(rank + 1);
             mult[rank]++;
             e[rank] = hit->GetEnergy();
             t[rank] = hit->GetTime();
@@ -1158,7 +1196,6 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         {
             if (mult[i] == 1)
             {
-                fh1_Muslimap_mult->Fill(i + 1);
                 fh1_Muslimap_E[i]->Fill(e[i]);
                 if (tref > 0)
                 {
@@ -1283,6 +1320,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
                 continue;
             rank = hit->GetSignal() - 1;
             multcal[rank]++;
+            fh1_Muslical_mult->Fill(rank + 1);
             ecal[rank] = hit->GetEnergy();
             dtcal[rank] = hit->GetDT();
         }
@@ -1294,6 +1332,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
                 fh1_Muslical_E[i]->Fill(ecal[i]);
                 fh1_Muslical_DT[i]->Fill(dtcal[i]);
             }
+            fh2_Muslical_mult->Fill(i + 1, multcal[i]);
         }
 
     } // end of if (fCalItemsMusli)
@@ -1401,6 +1440,8 @@ void R3BMusliOnlineSpectra::FinishTask()
 
     if (fCalItemsMusli)
     {
+        cMusliCal_Mult->Write();
+
         cMusliCal_E2->Write();
         cMusliCal_E4->Write();
         cMusliCal_E8->Write();
