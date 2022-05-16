@@ -129,6 +129,8 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
     TH2F* fh2_tracking_planeYZ;
     TH2F* fh2_target_PosXY;
     TH2F* fh2_ZvsBeta;
+    TH2F* fh2_angvsposx;
+    TH2F* fh2_angvsposy;
 
   public:
     ClassDef(R3BIncomingTrackingOnlineSpectra, 1)

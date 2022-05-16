@@ -60,7 +60,7 @@ R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString
     , fMwpc1HitDataCA(NULL)
     , fTwimHitDataCA(NULL)
     , fDist_acelerator_glad(3718.0)
-    , fPosTarget(1970.)
+    , fPosTarget(2656.)
     , fWidthTarget(40.)
     , fZ_max(40.)
     , fZ_min(0.)
@@ -232,7 +232,40 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     fh2_target_PosXY->GetYaxis()->SetTitleSize(0.045);
     fh2_target_PosXY->Draw("colz");
 
+    // AngleX and positionX on the target position
+    auto cAPX = new TCanvas("AngleX_vs_positionX_target", "Angle_XZ vs position X on target", 10, 10, 800, 700);
+    fh2_angvsposx =
+        new TH2F("AngXvsPosX", "Angle vs position on target", 500, -fWidthTarget, fWidthTarget, 500, -10., 10.);
+    fh2_angvsposx->GetXaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
+    fh2_angvsposx->GetYaxis()->SetTitle("Angle plane_XZ [mrad]");
+    fh2_angvsposx->GetYaxis()->SetTitleOffset(1.1);
+    fh2_angvsposx->GetXaxis()->CenterTitle(true);
+    fh2_angvsposx->GetYaxis()->CenterTitle(true);
+    fh2_angvsposx->GetXaxis()->SetLabelSize(0.045);
+    fh2_angvsposx->GetXaxis()->SetTitleSize(0.045);
+    fh2_angvsposx->GetYaxis()->SetLabelSize(0.045);
+    fh2_angvsposx->GetYaxis()->SetTitleSize(0.045);
+    cAPX->cd();
+    fh2_angvsposx->Draw("colz");
+
+    // AngleY and positionY on the target position
+    auto cAPY = new TCanvas("AngleY_vs_positionY_target", "Angle_YZ vs position Y on target", 10, 10, 800, 700);
+    fh2_angvsposy =
+        new TH2F("AngYvsPosY", "Angle vs position on target", 500, -fWidthTarget, fWidthTarget, 500, -10., 10.);
+    fh2_angvsposy->GetXaxis()->SetTitle("Y [mm]");
+    fh2_angvsposy->GetYaxis()->SetTitle("Angle plane_YZ [mrad]");
+    fh2_angvsposy->GetYaxis()->SetTitleOffset(1.1);
+    fh2_angvsposy->GetXaxis()->CenterTitle(true);
+    fh2_angvsposy->GetYaxis()->CenterTitle(true);
+    fh2_angvsposy->GetXaxis()->SetLabelSize(0.045);
+    fh2_angvsposy->GetXaxis()->SetTitleSize(0.045);
+    fh2_angvsposy->GetYaxis()->SetLabelSize(0.045);
+    fh2_angvsposy->GetYaxis()->SetTitleSize(0.045);
+    cAPY->cd();
+    fh2_angvsposy->Draw("colz");
+
     // Hit data, Z versus beta
+    /*
     cZvsBeta = new TCanvas("TwimZ_vs_Beta", "Z versus Beta", 10, 10, 800, 700);
     fh2_ZvsBeta =
         new TH2F("VvsBeta", "Z from Twim vs Beta from TofW", 1200, 0.5, 0.9, (fZ_max - fZ_min) * 20., fZ_min, fZ_max);
@@ -247,12 +280,15 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     fh2_ZvsBeta->GetYaxis()->SetTitleSize(0.045);
     cZvsBeta->cd();
     fh2_ZvsBeta->Draw("colz");
+    */
 
     // MAIN FOLDER
     TFolder* mainfol = new TFolder("Tracking_Cave", "Tracking info");
     mainfol->Add(cTrackingXZ);
     mainfol->Add(cTrackingYZ);
     mainfol->Add(cBeamProfileTarget);
+    mainfol->Add(cAPX);
+    mainfol->Add(cAPY);
     // mainfol->Add(cZvsBeta);
 
     FairRunOnline* run = FairRunOnline::Instance();
@@ -261,18 +297,20 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     run->AddObject(mainfol);
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_Tracking_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_Cave_Tracking_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     return kSUCCESS;
 }
 
 void R3BIncomingTrackingOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "Reset_Histo");
+    R3BLOG(INFO, "");
     fh2_tracking_planeXZ->Reset();
     fh2_tracking_planeYZ->Reset();
     fh2_target_PosXY->Reset();
-    fh2_ZvsBeta->Reset();
+    fh2_angvsposx->Reset();
+    fh2_angvsposy->Reset();
+    // fh2_ZvsBeta->Reset();
 }
 
 void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
@@ -297,7 +335,10 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
         if (fMwpc1HitDataCA && fMwpc1HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100.)
         {
             nHits = fMwpc1HitDataCA->GetEntriesFast();
-            Float_t mwpc1x = -150., mwpc1y = -150.;
+            Float_t mwpc1x = -150.;
+            Float_t mwpc1y = -150.;
+            Float_t angX = -500.;
+            Float_t angY = -500.;
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
                 auto hit = (R3BMwpcHitData*)fMwpc1HitDataCA->At(ihit);
@@ -307,8 +348,8 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
                 mwpc1y = hit->GetY() + fMw1GeoPar->GetPosY() * 10.;
                 // Float_t angX = (mwpc1x - mwpc0x) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
                 // Float_t angY = (mwpc1y - mwpc0y) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
-                Float_t angX = (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
-                Float_t angY = (mwpc0y - mwpc1y) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
+                angX = (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
+                angY = (mwpc0y - mwpc1y) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
                 if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc1x > -150.)
                 {
                     zrand = gRandom->Uniform(0., fDist_acelerator_glad);
@@ -323,7 +364,11 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
                 }
             }
             if (xtarget > -500. && ytarget > -500.)
+            {
                 fh2_target_PosXY->Fill(xtarget, ytarget);
+                fh2_angvsposx->Fill(xtarget, angX * 1000.);
+                fh2_angvsposy->Fill(ytarget, angY * 1000.);
+            }
         }
     }
 
@@ -355,6 +400,8 @@ void R3BIncomingTrackingOnlineSpectra::FinishTask()
         cTrackingXZ->Write();
         cTrackingYZ->Write();
         cBeamProfileTarget->Write();
+        fh2_angvsposx->Write();
+        fh2_angvsposy->Write();
     }
 }
 
