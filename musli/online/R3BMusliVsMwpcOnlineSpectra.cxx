@@ -51,7 +51,7 @@
 using namespace std;
 
 R3BMusliVsMwpcOnlineSpectra::R3BMusliVsMwpcOnlineSpectra()
-    : R3BMusliVsMwpcOnlineSpectra("MusicVsMwpcOnlineSpectra", 1, "Mwpc1", "Mwpc2")
+    : R3BMusliVsMwpcOnlineSpectra("MusicVsMwpcOnlineSpectra", 1, "Mwpc1", "Mwpc0")
 {
 }
 
@@ -154,6 +154,10 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     // Create histograms for detectors
     char Name1[255];
     char Name2[255];
+    char* cstrNameDet1 = new char[fNameDet1.Length() + 1];
+    char* cstrNameDet2 = new char[fNameDet2.Length() + 1];
+    strcpy(cstrNameDet1, fNameDet1);
+    strcpy(cstrNameDet2, fNameDet2);
 
     // === ======================== === //
     // === MAPPED-MUSLI vs HIT-MWPC === //
@@ -166,9 +170,10 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     for (Int_t j = 0; j < 8; j++)
     {
         sprintf(Name1, "fh2_MusMapDT_vs_X1_a%d_a%d", 2 * j + 1, 2 * j + 2);
-        sprintf(Name2, "DT A%02d and A%02d vs X1", 2 * j + 1, 2 * j + 2);
-        fh2_mapDTvsX1[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_mapDTvsX1[j]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        sprintf(Name2, "DTmap A%02d and A%02d vs X1", 2 * j + 1, 2 * j + 2);
+        fh2_mapDTvsX1[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_mapDTvsX1[j]->GetXaxis()->SetTitle(Name1);
         fh2_mapDTvsX1[j]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX1[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX1[j]->GetXaxis()->CenterTitle(true);
@@ -182,9 +187,10 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
         fh2_mapDTvsX1[j]->Draw("COL");
 
         sprintf(Name1, "fh2_MusMapDT_vs_X2_a%d_a%d", 2 * j + 1, 2 * j + 2);
-        sprintf(Name2, "DT A%02d and A%02d vs X2", 2 * j + 1, 2 * j + 2);
-        fh2_mapDTvsX2[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_mapDTvsX2[j]->GetXaxis()->SetTitle("X position of the second Mwpc [mm]");
+        sprintf(Name2, "DTmap A%02d and A%02d vs X2", 2 * j + 1, 2 * j + 2);
+        fh2_mapDTvsX2[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_mapDTvsX2[j]->GetXaxis()->SetTitle(Name2);
         fh2_mapDTvsX2[j]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX2[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX2[j]->GetXaxis()->CenterTitle(true);
@@ -201,8 +207,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_MusMapDT_vs_X1_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DTmap A%02d to A%02d vs X1", j * 4 + 1, j * 4 + 5);
-        fh2_mapDTvsX1[j + 8] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
-        fh2_mapDTvsX1[j + 8]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_mapDTvsX1[j + 8] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_mapDTvsX1[j + 8]->GetXaxis()->SetTitle(Name1);
         fh2_mapDTvsX1[j + 8]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX1[j + 8]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX1[j + 8]->GetXaxis()->CenterTitle(true);
@@ -217,8 +224,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusMapDT_vs_X2_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DTmap A%02d to A%02d vs X2", j * 4 + 1, j * 4 + 5);
-        fh2_mapDTvsX2[j + 8] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_mapDTvsX2[j + 8]->GetXaxis()->SetTitle("X position of the second Mwpc [mm]");
+        fh2_mapDTvsX2[j + 8] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_mapDTvsX2[j + 8]->GetXaxis()->SetTitle(Name2);
         fh2_mapDTvsX2[j + 8]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX2[j + 8]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX2[j + 8]->GetXaxis()->CenterTitle(true);
@@ -235,8 +243,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_MusMapDT_vs_X1_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DTmap A%02d to A%02d vs X1", j * 8 + 1, j * 8 + 8);
-        fh2_mapDTvsX1[j + 12] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_mapDTvsX1[j + 12]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_mapDTvsX1[j + 12] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_mapDTvsX1[j + 12]->GetXaxis()->SetTitle(Name1);
         fh2_mapDTvsX1[j + 12]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX1[j + 12]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX1[j + 12]->GetXaxis()->CenterTitle(true);
@@ -251,8 +260,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusMapDT_vs_X2_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DTmap A%02d to A%02d vs X2", j * 8 + 1, j * 8 + 8);
-        fh2_mapDTvsX2[j + 12] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_mapDTvsX2[j + 12]->GetXaxis()->SetTitle("X position of the second Mwpc [mm]");
+        fh2_mapDTvsX2[j + 12] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_mapDTvsX2[j + 12]->GetXaxis()->SetTitle(Name2);
         fh2_mapDTvsX2[j + 12]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_mapDTvsX2[j + 12]->GetYaxis()->SetTitleOffset(1.1);
         fh2_mapDTvsX2[j + 12]->GetXaxis()->CenterTitle(true);
@@ -267,8 +277,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     }
     sprintf(Name1, "fh2_MusMapDT_vs_X1_a1_to_a16");
     sprintf(Name2, "DTmap A01 to A16 vs X1");
-    fh2_mapDTvsX1[14] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-    fh2_mapDTvsX1[14]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+    fh2_mapDTvsX1[14] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+    sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+    fh2_mapDTvsX1[14]->GetXaxis()->SetTitle(Name1);
     fh2_mapDTvsX1[14]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
     fh2_mapDTvsX1[14]->GetYaxis()->SetTitleOffset(1.1);
     fh2_mapDTvsX1[14]->GetXaxis()->CenterTitle(true);
@@ -283,8 +294,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
     sprintf(Name1, "fh2_MusMapDT_vs_X2_a1_to_a16");
     sprintf(Name2, "DTmap A01 to A16 vs X2");
-    fh2_mapDTvsX2[14] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-    fh2_mapDTvsX2[14]->GetXaxis()->SetTitle("X position of the second Mwpc [mm]");
+    fh2_mapDTvsX2[14] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, 10000, 30000);
+    sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+    fh2_mapDTvsX2[14]->GetXaxis()->SetTitle(Name2);
     fh2_mapDTvsX2[14]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
     fh2_mapDTvsX2[14]->GetYaxis()->SetTitleOffset(1.1);
     fh2_mapDTvsX2[14]->GetXaxis()->CenterTitle(true);
@@ -309,9 +321,10 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_MusCalDT_vs_X1_a%d_a%d", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "DT A%02d and A%02d vs X1", 2 * j + 1, 2 * j + 2);
-        fh2_calDTvsX1[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_calDTvsX1[j]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
-        fh2_calDTvsX1[j]->GetYaxis()->SetTitle("Drift Time [100ps]");
+        fh2_calDTvsX1[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_calDTvsX1[j]->GetXaxis()->SetTitle(Name1);
+        fh2_calDTvsX1[j]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
         fh2_calDTvsX1[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX1[j]->GetXaxis()->CenterTitle(true);
         fh2_calDTvsX1[j]->GetYaxis()->CenterTitle(true);
@@ -325,8 +338,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusCalDT_vs_X2_a%d_a%d", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "DT A%02d and A%02d vs X2", 2 * j + 1, 2 * j + 2);
-        fh2_calDTvsX2[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_calDTvsX2[j]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_calDTvsX2[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_calDTvsX2[j]->GetXaxis()->SetTitle(Name2);
         fh2_calDTvsX2[j]->GetYaxis()->SetTitle("Drift Time [100ps]");
         fh2_calDTvsX2[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX2[j]->GetXaxis()->CenterTitle(true);
@@ -343,8 +357,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_MusCalDT_vs_X1_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DTcal A%02d to A%02d vs X1", j * 4 + 1, j * 4 + 5);
-        fh2_calDTvsX1[j + 8] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
-        fh2_calDTvsX1[j + 8]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_calDTvsX1[j + 8] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_calDTvsX1[j + 8]->GetXaxis()->SetTitle(Name1);
         fh2_calDTvsX1[j + 8]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
         fh2_calDTvsX1[j + 8]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX1[j + 8]->GetXaxis()->CenterTitle(true);
@@ -359,8 +374,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusCalDT_vs_X2_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DTcal A%02d to A%02d vs X2", j * 4 + 1, j * 4 + 5);
-        fh2_calDTvsX2[j + 8] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_calDTvsX2[j + 8]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_calDTvsX2[j + 8] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_calDTvsX2[j + 8]->GetXaxis()->SetTitle(Name2);
         fh2_calDTvsX2[j + 8]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
         fh2_calDTvsX2[j + 8]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX2[j + 8]->GetXaxis()->CenterTitle(true);
@@ -377,8 +393,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_MusCalDT_vs_X1_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DTcal A%02d to A%02d vs X1", j * 8 + 1, j * 8 + 8);
-        fh2_calDTvsX1[j + 12] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_calDTvsX1[j + 12]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_calDTvsX1[j + 12] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_calDTvsX1[j + 12]->GetXaxis()->SetTitle(Name1);
         fh2_calDTvsX1[j + 12]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
         fh2_calDTvsX1[j + 12]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX1[j + 12]->GetXaxis()->CenterTitle(true);
@@ -393,8 +410,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusCalDT_vs_X2_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DTcal A%02d to A%02d vs X2", j * 8 + 1, j * 8 + 8);
-        fh2_calDTvsX2[j + 12] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-        fh2_calDTvsX2[j + 12]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+        fh2_calDTvsX2[j + 12] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+        fh2_calDTvsX2[j + 12]->GetXaxis()->SetTitle(Name2);
         fh2_calDTvsX2[j + 12]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
         fh2_calDTvsX2[j + 12]->GetYaxis()->SetTitleOffset(1.1);
         fh2_calDTvsX2[j + 12]->GetXaxis()->CenterTitle(true);
@@ -409,8 +427,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     }
     sprintf(Name1, "fh2_MusCalDT_vs_X1_a1_to_a16");
     sprintf(Name2, "DTcal A01 to A16 vs X1");
-    fh2_calDTvsX1[14] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-    fh2_calDTvsX1[14]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+    fh2_calDTvsX1[14] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+    sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+    fh2_calDTvsX1[14]->GetXaxis()->SetTitle(Name1);
     fh2_calDTvsX1[14]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
     fh2_calDTvsX1[14]->GetYaxis()->SetTitleOffset(1.1);
     fh2_calDTvsX1[14]->GetXaxis()->CenterTitle(true);
@@ -425,8 +444,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
     sprintf(Name1, "fh2_MusCalDT_vs_X2_a1_to_a16");
     sprintf(Name2, "DTcal A01 to A16 vs X2");
-    fh2_calDTvsX2[14] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, 10000, 35000);
-    fh2_calDTvsX2[14]->GetXaxis()->SetTitle("X position of the first Mwpc [mm]");
+    fh2_calDTvsX2[14] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+    sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+    fh2_calDTvsX2[14]->GetXaxis()->SetTitle(Name2);
     fh2_calDTvsX2[14]->GetYaxis()->SetTitle("Calibrated Drift Time [mm]");
     fh2_calDTvsX2[14]->GetYaxis()->SetTitleOffset(1.1);
     fh2_calDTvsX2[14]->GetXaxis()->CenterTitle(true);
@@ -472,8 +492,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitE%i_vs_X1", nb_anodes[j]);
         sprintf(Name2, " Average E for data with nb anodes %02d  vs X1", nb_anodes[j]);
-        fh2_hitEvsX1[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1600, 0, 64000);
-        fh2_hitEvsX1[j]->GetXaxis()->SetTitle("Position of the first Mwpc [mm]");
+        fh2_hitEvsX1[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1600, 0, 64000);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_hitEvsX1[j]->GetXaxis()->SetTitle(Name1);
         fh2_hitEvsX1[j]->GetYaxis()->SetTitle("Average Energy [channels]");
         fh2_hitEvsX1[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_hitEvsX1[j]->GetXaxis()->CenterTitle(true);
@@ -488,7 +509,8 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitE%i_vs_X2", nb_anodes[j]);
         sprintf(Name2, " Average E for data with nb anodes %02d  vs X2", nb_anodes[j]);
-        fh2_hitEvsX2[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1600, 0, 64000);
+        fh2_hitEvsX2[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1600, 0, 64000);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
         fh2_hitEvsX2[j]->GetXaxis()->SetTitle("Position of the second Mwpc [mm]");
         fh2_hitEvsX2[j]->GetYaxis()->SetTitle("Average Energy [channels]");
         fh2_hitEvsX2[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -504,8 +526,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitZ%i_vs_X1", nb_anodes[j]);
         sprintf(Name2, " Z charge for data with nb anodes %02d  vs X1", nb_anodes[j]);
-        fh2_hitZvsX1[j] = new TH2D(Name1, Name2, 1000, -50, 50, 800, 2, 10);
-        fh2_hitZvsX1[j]->GetXaxis()->SetTitle("Position of the first Mwpc [mm]");
+        fh2_hitZvsX1[j] = new TH2D(Name1, Name2, 1000, -100, 100, 800, 2, 10);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_hitZvsX1[j]->GetXaxis()->SetTitle(Name1);
         fh2_hitZvsX1[j]->GetYaxis()->SetTitle("Atomic charge (Z)");
         fh2_hitZvsX1[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_hitZvsX1[j]->GetXaxis()->CenterTitle(true);
@@ -520,7 +543,8 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitZ%i_vs_X2", nb_anodes[j]);
         sprintf(Name2, " Z charge for data with nb anodes %02d  vs X2", nb_anodes[j]);
-        fh2_hitZvsX2[j] = new TH2D(Name1, Name2, 1000, -50, 50, 800, 2, 10);
+        fh2_hitZvsX2[j] = new TH2D(Name1, Name2, 1000, -100, 100, 800, 2, 10);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
         fh2_hitZvsX2[j]->GetXaxis()->SetTitle("Position of the second Mwpc [mm]");
         fh2_hitZvsX2[j]->GetYaxis()->SetTitle("Atomic charge (Z)");
         fh2_hitZvsX2[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -536,8 +560,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitX%i_vs_X1", nb_anodes[j]);
         sprintf(Name2, " X middle of MusLI with nb anodes %02d  vs X1", nb_anodes[j]);
-        fh2_hitXvsX1[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
-        fh2_hitXvsX1[j]->GetXaxis()->SetTitle("Position of the first Mwpc [mm]");
+        fh2_hitXvsX1[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+        fh2_hitXvsX1[j]->GetXaxis()->SetTitle(Name1);
         fh2_hitXvsX1[j]->GetYaxis()->SetTitle("Rough position in the middle of MusLI [mm]");
         fh2_hitXvsX1[j]->GetYaxis()->SetTitleOffset(1.1);
         fh2_hitXvsX1[j]->GetXaxis()->CenterTitle(true);
@@ -552,7 +577,8 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
         sprintf(Name1, "fh2_MusHitX%i_vs_X2", nb_anodes[j]);
         sprintf(Name2, " X middle of MusLI for data with nb anodes %02d  vs X2", nb_anodes[j]);
-        fh2_hitXvsX2[j] = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
+        fh2_hitXvsX2[j] = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+        sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
         fh2_hitXvsX2[j]->GetXaxis()->SetTitle("Position of the second Mwpc [mm]");
         fh2_hitXvsX2[j]->GetYaxis()->SetTitle("Rough position in the middle of MusLI [mm]");
         fh2_hitXvsX2[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -569,8 +595,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
     sprintf(Name1, "fh2_MusHitTheta_vs_X1");
     sprintf(Name2, " Theta from MusLI  vs X1");
-    fh2_hitTvsX1 = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
-    fh2_hitTvsX1->GetXaxis()->SetTitle("Position of the first Mwpc [mm]");
+    fh2_hitTvsX1 = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -0.1, 0.1);
+    sprintf(Name1, "X position in the first Mwpc [mm] (%s)", cstrNameDet1);
+    fh2_hitTvsX1->GetXaxis()->SetTitle(Name1);
     fh2_hitTvsX1->GetYaxis()->SetTitle("Theta from MusLI [mrad]");
     fh2_hitTvsX1->GetYaxis()->SetTitleOffset(1.1);
     fh2_hitTvsX1->GetXaxis()->CenterTitle(true);
@@ -585,8 +612,9 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
     sprintf(Name1, "fh2_MusHitTheta_vs_X2");
     sprintf(Name2, " Theta from MusLI  vs X2");
-    fh2_hitTvsX2 = new TH2D(Name1, Name2, 1000, -50, 50, 1000, -50, 50);
-    fh2_hitTvsX2->GetXaxis()->SetTitle("Position of the second Mwpc [mm]");
+    fh2_hitTvsX2 = new TH2D(Name1, Name2, 1000, -100, 100, 1000, -0.1, 0.1);
+    sprintf(Name2, "X position in the second Mwpc [mm] (%s)", cstrNameDet2);
+    fh2_hitTvsX2->GetXaxis()->SetTitle(Name2);
     fh2_hitTvsX2->GetYaxis()->SetTitle("Theta from MusLI [mrad]");
     fh2_hitTvsX2->GetYaxis()->SetTitleOffset(1.1);
     fh2_hitTvsX2->GetXaxis()->CenterTitle(true);
@@ -622,6 +650,8 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 
     mainfolMusliVsMw->Add(cMusliHit_TvsX1);
     mainfolMusliVsMw->Add(cMusliHit_TvsX2);
+
+    run->AddObject(mainfolMusliVsMw);
 
     // === ==================================== === //
     // === Register command to reset histograms === //
@@ -674,8 +704,6 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
         R3BMwpcHitData* hitDataMw1 = (R3BMwpcHitData*)fHitMwpcDet1->At(0);
         fX1 = hitDataMw1->GetX() + fMw1Geo_Par->GetPosX();
     }
-    else
-        return;
 
     // --- --------------- --- //
     // --- HIT MWPC 2 DATA --- //
@@ -686,8 +714,6 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
         R3BMwpcHitData* hitDataMw2 = (R3BMwpcHitData*)fHitMwpcDet2->At(0);
         fX2 = hitDataMw2->GetX() + fMw2Geo_Par->GetPosX();
     }
-    else
-        return;
 
     // --- ----------------- --- //
     // --- MAPPED MUSLI DATA --- //
@@ -732,9 +758,9 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
 
     } // end of mapped data
 
-    // --- ----------------- --- //
+    // --- -------------- --- //
     // --- CAL MUSLI DATA --- //
-    // --- ----------------- --- //
+    // --- -------------- --- //
     if (fCalMusli && fCalMusli->GetEntriesFast() > 0)
     {
         // Local variables for cal data

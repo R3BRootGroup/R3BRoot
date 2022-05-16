@@ -60,6 +60,7 @@ class R3BMusliCal2Hit : public FairTask
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
     void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetDirectBeta(Double_t beta) { fDirectBeta = beta; }
 
   private:
     void SetParameters();
@@ -73,6 +74,7 @@ class R3BMusliCal2Hit : public FairTask
     Int_t fExpId;
     Int_t fNumEcorrBeta;
     Int_t fNumZ;
+    Double_t fDirectBeta; // if direct beam from SIS
     TArrayD* fEaveVsBetaHitParams;
     TArrayD* fEcorrBetaHitParams;
     TArrayD* fZHitParams;

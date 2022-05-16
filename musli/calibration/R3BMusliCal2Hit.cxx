@@ -55,6 +55,7 @@ R3BMusliCal2Hit::R3BMusliCal2Hit(const char* name, Int_t iVerbose)
     , fFrsDataCA(NULL)
     , fOnline(kFALSE)
     , fExpId(522) // s522 at 1.2 A.GeV, s509 at 400 A.MeV
+    , fDirectBeta(0.876)
 {
 }
 
@@ -130,15 +131,13 @@ InitStatus R3BMusliCal2Hit::Init()
     fMusliCalDataCA = (TClonesArray*)rootManager->GetObject("MusliCalData");
     if (!fMusliCalDataCA)
     {
-        R3BLOG(FATAL, "R3BMusliCal2Hit::Init() MusliCalData not found.");
-        return kFATAL;
+        R3BLOG(INFO, "R3BMusliCal2Hit::Init() MusliCalData not found.");
     }
 
     fFrsDataCA = (TClonesArray*)rootManager->GetObject("FrsData");
     if (!fFrsDataCA)
     {
-        R3BLOG(FATAL, "R3BMusliCal2Hit::Init() FrsData not found.");
-        return kFATAL;
+        R3BLOG(INFO, "R3BMusliCal2Hit::Init() FrsData not found.");
     }
 
     // OUTPUT DATA
@@ -165,13 +164,17 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
     Reset();
 
     // Get the Beta of the incoming beam
-    Double_t beta = 0;
+    Double_t beta = fDirectBeta;
     if (fFrsDataCA && fFrsDataCA->GetEntriesFast() == 1)
     {
         R3BFrsData* hit = (R3BFrsData*)fFrsDataCA->At(0);
         if (hit)
         {
             beta = hit->GetBeta();
+        }
+        else
+        {
+            beta = 0.;
         }
     }
 
@@ -319,12 +322,12 @@ void R3BMusliCal2Hit::Reset()
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BMusliHitData* R3BMusliCal2Hit::AddHitData(UInt_t nb_anodes, Double_t e, Double_t z, Double_t x, Double_t theta)
+R3BMusliHitData* R3BMusliCal2Hit::AddHitData(UInt_t type, Double_t e, Double_t z, Double_t x, Double_t theta)
 {
     // It fills the R3BMusliCalData
     TClonesArray& clref = *fMusliHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BMusliHitData(nb_anodes, e, z, x, theta);
+    return new (clref[size]) R3BMusliHitData(type, e, z, x, theta);
 }
 
 ClassImp(R3BMusliCal2Hit);
