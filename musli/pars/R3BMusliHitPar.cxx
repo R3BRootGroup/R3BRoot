@@ -18,8 +18,7 @@
 #include "FairLogger.h"
 #include "FairParamList.h"
 
-#include "TArrayF.h"
-#include "TArrayI.h"
+#include "TArrayD.h"
 #include "TMath.h"
 #include "TString.h"
 
@@ -32,6 +31,9 @@ R3BMusliHitPar::R3BMusliHitPar(const char* name, const char* title, const char* 
     , fNumParamsEcorrBetaFit(2)
     , fNumParamsZFit(3)
 {
+    fEaveVsBetaHitParams = new TArrayD(fNumTypes);
+    fEcorrBetaHitParams = new TArrayD(fNumTypes * fNumParamsEcorrBetaFit);
+    fZHitParams = new TArrayD(fNumTypes * fNumParamsZFit);
 }
 
 // ----  Destructor ------------------------------------------------------------
