@@ -97,14 +97,14 @@ InitStatus R3BMusliOnlineSpectra::Init()
     fCalItemsMusli = (TClonesArray*)mgr->GetObject("MusliCalData");
     if (!fCalItemsMusli)
     {
-        return kFATAL;
+        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
     }
 
     // get access to the HIT data of the MUSIC
     fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
     if (!fHitItemsMusli)
     {
-        return kFATAL;
+        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
     }
 
     // Create histograms for detectors
@@ -435,7 +435,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_EvsDT2->Divide(4, 2);
     for (Int_t j = 0; j < 8; j++)
     {
-        sprintf(Name1, "fh1_Musli_EvsDTmap_mean_a%d_a%d", 2 * j + 1, 2 * j + 2);
+        sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_a%d", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "EvsDT A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
         fh2_Muslimap_EvsDT[j] = new TH2I(Name1, Name2, 1000, 10000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j]->GetXaxis()->SetTitle("Drift Time [100ps]");
@@ -456,7 +456,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_EvsDT4->Divide(2, 2);
     for (Int_t j = 0; j < 4; j++)
     {
-        sprintf(Name1, "fh1_Musli_EvsDTmap_mean_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
+        sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "EvsDT A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
         fh2_Muslimap_EvsDT[j + 8] = new TH2I(Name1, Name2, 1000, 10000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j + 8]->GetXaxis()->SetTitle("Drift Time [100ps]");
@@ -477,7 +477,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_EvsDT8->Divide(2, 1);
     for (Int_t j = 0; j < 2; j++)
     {
-        sprintf(Name1, "fh1_Musli_EvsDTmap_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
+        sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "EvsDT A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
         fh2_Muslimap_EvsDT[j + 12] = new TH2I(Name1, Name2, 1000, 10000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j + 12]->GetXaxis()->SetTitle("Drift Time [100ps]");
@@ -495,7 +495,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     }
 
     cMusliMap_EvsDT16 = new TCanvas("Musli_EvsDTmap16", "", 10, 10, 800, 700);
-    sprintf(Name1, "fh1_Musli_EvsDTmap_mean_a1_to_a16");
+    sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a1_to_a16");
     sprintf(Name2, "EvsDT A01 to A16 if mult==1");
     fh2_Muslimap_EvsDT[14] = new TH2I(Name1, Name2, 1000, 10000, 35000, 1280, 0, 64000);
     fh2_Muslimap_EvsDT[14]->GetXaxis()->SetTitle("Drift Time [100ps]");

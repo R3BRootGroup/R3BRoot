@@ -28,5 +28,6 @@
 #pragma link C++ class R3BMusliCal2Hit+;
 
 #pragma link C++ class R3BMusliOnlineSpectra+;
+#pragma link C++ class R3BMusliVsMwpcOnlineSpectra+;
 
 #endif
