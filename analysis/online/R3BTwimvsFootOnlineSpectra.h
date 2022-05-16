@@ -21,6 +21,7 @@
 #define R3BTwimvsFootOnlineSpectra_H 1
 
 #include "FairTask.h"
+#include "R3BLogger.h"
 #include "TCanvas.h"
 #include "TH2F.h"
 #include <vector>
@@ -84,14 +85,30 @@ class R3BTwimvsFootOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
+    void SetFootDetIDs(UInt_t id1, UInt_t id2)
+    {
+        if (id1 < 1)
+        {
+            R3BLOG(FATAL, "id1 < 1, it should be at least 1");
+        }
+        if (id2 < 1)
+        {
+            R3BLOG(FATAL, "id2 < 1, it should be at least 1");
+        }
+        fFootDetId1 = id1;
+        fFootDetId2 = id2;
+    }
+
   private:
     Int_t fNbFootDet;
+    UInt_t fFootDetId1;
+    UInt_t fFootDetId2;
     Bool_t fMusli;
-    TClonesArray* fHitItemsTwim; /**< Array with hit-Twim items. */
-    TClonesArray* fHitItemsFoot; /**< Array with hit-Foot items. */
+    TClonesArray* fHitItemsTwim; /* Array with hit-Twim items. */
+    TClonesArray* fHitItemsFoot; /* Array with hit-Foot items. */
 
-    R3BEventHeader* fEventHeader; /**< Event header.      */
-    Int_t fNEvents;               /**< Event counter.     */
+    R3BEventHeader* fEventHeader; /* Event header.      */
+    Int_t fNEvents;               /* Event counter.     */
 
     // Histograms for Hit data
     std::vector<TH2F*> fh2_hit_e;
@@ -101,4 +118,4 @@ class R3BTwimvsFootOnlineSpectra : public FairTask
     ClassDef(R3BTwimvsFootOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BTwimvsFootOnlineSpectra_H */
