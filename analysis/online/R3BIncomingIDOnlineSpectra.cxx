@@ -21,6 +21,8 @@
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BLogger.h"
+#include "R3BMwpcHitData.h"
+#include "R3BTGeoPar.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -44,7 +46,18 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra()
 R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fHitFrs(NULL)
+    , fMwpc0HitDataCA(NULL)
+    , fMwpc1HitDataCA(NULL)
     , fNEvents(0)
+    , fStaId(1)
+    , fMin_Z(0.)
+    , fMax_Z(20.)
+    , fMin_Aq(1.6)
+    , fMax_Aq(2.9)
+    , fMin_Z_gate(0.)
+    , fMax_Z_gate(20.)
+    , fMin_Aq_gate(1.6)
+    , fMax_Aq_gate(2.9)
 {
 }
 
@@ -53,6 +66,25 @@ R3BIncomingIDOnlineSpectra::~R3BIncomingIDOnlineSpectra()
     R3BLOG(INFO, "");
     if (fHitFrs)
         delete fHitFrs;
+    if (fMwpc0HitDataCA)
+        delete fMwpc0HitDataCA;
+    if (fMwpc1HitDataCA)
+        delete fMwpc1HitDataCA;
+}
+
+// -----   Public method SetParContainers   --------------------------------
+void R3BIncomingIDOnlineSpectra::SetParContainers()
+{
+    // Parameter Container
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(FATAL, NULL == rtdb, "FairRuntimeDb not found");
+
+    fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
+    R3BLOG_IF(ERROR, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
+
+    fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
+    R3BLOG_IF(ERROR, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
+    return;
 }
 
 InitStatus R3BIncomingIDOnlineSpectra::Init()
@@ -67,6 +99,10 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     // get access to mapped data of FRS
     fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
     R3BLOG_IF(FATAL, !fHitFrs, "Branch FrsData not found");
+    fMwpc0HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc0HitData");
+    R3BLOG_IF(FATAL, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
+    fMwpc1HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc1HitData");
+    R3BLOG_IF(FATAL, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
 
     // Create histograms for detectors
     TString Name1;
@@ -131,7 +167,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
     Name1 = "fh2_PosS2vsAoQ_frs";
     Name2 = "FRS: Pos-S2 vs AoQ with mult==1";
-    fh2_Pos2vsAoQ_m1 = new TH2F(Name1, Name2, 2000, -100, 100, 1000, 1.6, 2.75);
+    fh2_Pos2vsAoQ_m1 = new TH2F(Name1, Name2, 2000, -100, 100, 1000, fMin_Aq, fMax_Aq);
     fh2_Pos2vsAoQ_m1->GetXaxis()->SetTitle("Pos-S2 [mm]");
     fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitle("AoQ");
     fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitleOffset(1.1);
@@ -148,7 +184,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
     Name1 = "fh2_Aq_vs_q_frs";
     Name2 = "FRS: A/q vs q";
-    fh2_Aqvsq = new TH2F(Name1, Name2, 1000, 1.6, 2.75, 1900, 1, 20.);
+    fh2_Aqvsq = new TH2F(Name1, Name2, 1000, fMin_Aq, fMax_Aq, 1900, fMin_Z, fMax_Z);
     fh2_Aqvsq->GetXaxis()->SetTitle("A/q");
     fh2_Aqvsq->GetYaxis()->SetTitle("Z [Charge units]");
     fh2_Aqvsq->GetYaxis()->SetTitleOffset(1.1);
@@ -160,6 +196,72 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh2_Aqvsq->GetYaxis()->SetTitleSize(0.045);
     fh2_Aqvsq->Draw("colz");
 
+    // Isotope gated ion images
+    TString RangeGates =
+        Form("IsoGated_Z_%1.1f_%1.1f_Aq_%1.2f_%1.2f", fMin_Z_gate, fMax_Z_gate, fMin_Aq_gate, fMax_Aq_gate);
+    cIsoGated = new TCanvas("Isotope_gated_images", "Isotope gated ion images", 10, 10, 800, 700);
+    cIsoGated->Divide(2, 2);
+
+    cIsoGated->cd(1);
+    Name1 = "Z_xcave";
+    Name2 = "Z vs Xcave";
+    fh2_Z_xc = new TH2F(Name1, Name2, 1000, -100, 100, 1000, fMin_Z, fMax_Z);
+    fh2_Z_xc->GetXaxis()->SetTitle("XCave [mm]");
+    fh2_Z_xc->GetYaxis()->SetTitle("Z [charge units]");
+    fh2_Z_xc->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Z_xc->GetXaxis()->CenterTitle(true);
+    fh2_Z_xc->GetYaxis()->CenterTitle(true);
+    fh2_Z_xc->GetXaxis()->SetLabelSize(0.045);
+    fh2_Z_xc->GetXaxis()->SetTitleSize(0.045);
+    fh2_Z_xc->GetYaxis()->SetLabelSize(0.045);
+    fh2_Z_xc->GetYaxis()->SetTitleSize(0.045);
+    fh2_Z_xc->Draw("colz");
+
+    cIsoGated->cd(2);
+    Name1 = RangeGates + "_Z_xcave";
+    Name2 = RangeGates + " Z vs Xcave";
+    fh2_IsoGated_Z_xc = new TH2F(Name1, Name2, 1000, -100, 100, 1000, fMin_Z, fMax_Z);
+    fh2_IsoGated_Z_xc->GetXaxis()->SetTitle("XCave [mm]");
+    fh2_IsoGated_Z_xc->GetYaxis()->SetTitle("Z [charge units]");
+    fh2_IsoGated_Z_xc->GetYaxis()->SetTitleOffset(1.1);
+    fh2_IsoGated_Z_xc->GetXaxis()->CenterTitle(true);
+    fh2_IsoGated_Z_xc->GetYaxis()->CenterTitle(true);
+    fh2_IsoGated_Z_xc->GetXaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_Z_xc->GetXaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_Z_xc->GetYaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_Z_xc->GetYaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_Z_xc->Draw("colz");
+
+    cIsoGated->cd(3);
+    Name1 = RangeGates + "_xs2_xcave";
+    Name2 = RangeGates + " Xs2 vs Xcave";
+    fh2_IsoGated_xs2_xc = new TH2F(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+    fh2_IsoGated_xs2_xc->GetXaxis()->SetTitle("Xs2 [mm]");
+    fh2_IsoGated_xs2_xc->GetYaxis()->SetTitle("Xcave [mm]");
+    fh2_IsoGated_xs2_xc->GetYaxis()->SetTitleOffset(1.1);
+    fh2_IsoGated_xs2_xc->GetXaxis()->CenterTitle(true);
+    fh2_IsoGated_xs2_xc->GetYaxis()->CenterTitle(true);
+    fh2_IsoGated_xs2_xc->GetXaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_xs2_xc->GetXaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_xs2_xc->GetYaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_xs2_xc->GetYaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_xs2_xc->Draw("colz");
+
+    cIsoGated->cd(4);
+    Name1 = RangeGates + "_xcave_acave";
+    Name2 = RangeGates + " Xcave vs Anglecave";
+    fh2_IsoGated_xc_anglec = new TH2F(Name1, Name2, 1000, -100, 100, 1000, -100, 100);
+    fh2_IsoGated_xc_anglec->GetXaxis()->SetTitle("Xcave [mm]");
+    fh2_IsoGated_xc_anglec->GetYaxis()->SetTitle("Angle Cave [mrad]");
+    fh2_IsoGated_xc_anglec->GetYaxis()->SetTitleOffset(1.1);
+    fh2_IsoGated_xc_anglec->GetXaxis()->CenterTitle(true);
+    fh2_IsoGated_xc_anglec->GetYaxis()->CenterTitle(true);
+    fh2_IsoGated_xc_anglec->GetXaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_xc_anglec->GetXaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_xc_anglec->GetYaxis()->SetLabelSize(0.045);
+    fh2_IsoGated_xc_anglec->GetYaxis()->SetTitleSize(0.045);
+    fh2_IsoGated_xc_anglec->Draw("colz");
+
     // MAIN FOLDER-FRS
     TFolder* mainfol = new TFolder("FRS-IncomingID", "FRS incomingID info");
     mainfol->Add(cAoQvsPosS2);
@@ -167,6 +269,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     mainfol->Add(cBrho);
     mainfol->Add(cXs2vsBeta);
     mainfol->Add(cAqvsq);
+    mainfol->Add(cIsoGated);
     run->AddObject(mainfol);
 
     // Register command to reset histograms
@@ -183,6 +286,10 @@ void R3BIncomingIDOnlineSpectra::Reset_Histo()
     fh1_brho->Reset();
     fh2_Aqvsq->Reset();
     fh2_Xs2vsbeta->Reset();
+    fh2_Z_xc->Reset();
+    fh2_IsoGated_Z_xc->Reset();
+    fh2_IsoGated_xs2_xc->Reset();
+    fh2_IsoGated_xc_anglec->Reset();
 }
 
 void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
@@ -196,11 +303,44 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             R3BFrsData* hit = (R3BFrsData*)fHitFrs->At(ihit);
             if (!hit)
                 continue;
+            if (hit->GetStaId() != fStaId)
+                continue;
             fh2_Pos2vsAoQ_m1->Fill(hit->GetXS2(), hit->GetAq());
             fh1_beta->Fill(hit->GetBeta());
             fh1_brho->Fill(hit->GetBrho());
             fh2_Aqvsq->Fill(hit->GetAq(), hit->GetZ());
             fh2_Xs2vsbeta->Fill(hit->GetXS2(), hit->GetBeta());
+
+            auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
+            auto nHits_Mw1 = fMwpc1HitDataCA->GetEntriesFast();
+            for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
+            {
+                auto hit_mw0 = (R3BMwpcHitData*)fMwpc0HitDataCA->At(iMw0);
+                if (!hit_mw0)
+                    continue;
+                auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
+                auto mwpc0y = hit_mw0->GetY() + fMw0GeoPar->GetPosY() * 10.; // mm
+                for (Int_t iMw1 = 0; iMw1 < nHits_Mw1; iMw1++)
+                {
+                    auto hit_mw1 = (R3BMwpcHitData*)fMwpc1HitDataCA->At(iMw1);
+                    if (!hit_mw1)
+                        continue;
+                    auto mwpc1x = hit_mw1->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
+                    auto mwpc1y = hit_mw1->GetY() + fMw1GeoPar->GetPosY() * 10.; // mm
+                    auto XCave = mwpc0x;
+                    auto AngleCave =
+                        (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10. * 1000.; // mrad
+
+                    fh2_Z_xc->Fill(XCave, hit->GetZ());
+                    // Plot PID gated histograms below
+                    if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
+                        hit->GetZ() > fMax_Z_gate)
+                        continue;
+                    fh2_IsoGated_Z_xc->Fill(XCave, hit->GetZ());
+                    fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), XCave);
+                    fh2_IsoGated_xc_anglec->Fill(XCave, AngleCave);
+                }
+            }
         }
     }
 
@@ -213,17 +353,28 @@ void R3BIncomingIDOnlineSpectra::FinishEvent()
     {
         fHitFrs->Clear();
     }
+
+    if (fMwpc0HitDataCA)
+    {
+        fMwpc0HitDataCA->Clear();
+    }
+
+    if (fMwpc1HitDataCA)
+    {
+        fMwpc1HitDataCA->Clear();
+    }
 }
 
 void R3BIncomingIDOnlineSpectra::FinishTask()
 {
-    if (fHitFrs)
+    if (fHitFrs && fMwpc0HitDataCA && fMwpc1HitDataCA)
     {
         cAoQvsPosS2->Write();
         cBeta->Write();
         cBrho->Write();
         cXs2vsBeta->Write();
         cAqvsq->Write();
+        cIsoGated->Write();
     }
 }
 
