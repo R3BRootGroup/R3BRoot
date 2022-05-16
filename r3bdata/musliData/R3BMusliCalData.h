@@ -15,15 +15,6 @@
 // MUSLI stands for MUSIC LIGHT ION
 // ----------------------------------------------------------------------------
 //   The Cal Data has the following structure
-//     UInt_t fNbAnodes;
-//            fNbAnodes=n, with n = 2, 4, 8, 16 : mean signal on n anodes
-//
-//     UInt_t fIndex;
-//            fIndex = i, with i = 1, 2, 3, 4, 5, 6, 7, 8 for fNbAnodes = 2
-//                        with i = 1, 2, 3, 4             for fNbAnodes = 4
-//                        with i = 1, 2                   for fNbAnodes = 8
-//                        with i = 1                      for fNbAnodes = 16
-//
 //     UInt_t fSignal = [1..8], [9..12], [13..14], [15]
 //     Double_t fDT; is the Drift Time Tstop - Tstart(=Tref)
 //     Double_t fE;  is the energy
@@ -40,28 +31,22 @@ class R3BMusliCalData : public TObject
     /** Default constructor **/
     R3BMusliCalData();
 
-    R3BMusliCalData(UInt_t n, UInt_t i, UInt_t s, Double_t dt, Double_t e);
+    R3BMusliCalData(UInt_t s, Double_t dt, Double_t e);
 
     /** Destructor **/
     virtual ~R3BMusliCalData() {}
 
     /** Accessors **/
-    inline const UInt_t& GetNbAnodes() const { return fNbAnodes; }
-    inline const UInt_t& GetIndex() const { return fIndex; }
     inline const UInt_t& GetSignal() const { return fSignal; }
     inline const Double_t& GetDT() const { return fDT; }
     inline const Double_t& GetEnergy() const { return fE; }
 
     /** Modifiers **/
-    void SetNbAnodes(UInt_t n) { fNbAnodes = n; };
-    void SetIndex(UInt_t index) { fIndex = index; };
     void SetSignal(UInt_t signal) { fSignal = signal; };
     void SetDT(Double_t dt) { fDT = dt; };
     void SetEnergy(Double_t energy) { fE = energy; };
 
   protected:
-    UInt_t fNbAnodes;
-    UInt_t fIndex;
     UInt_t fSignal;
     Double_t fDT;
     Double_t fE;
