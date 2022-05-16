@@ -38,6 +38,7 @@ R3BCalifaFebexReader::R3BCalifaFebexReader(EXT_STR_h101_CALIFA* data, size_t off
     , fOffset(offset)
     , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BCalifaMappedData"))
+    , fArraytrig(new TClonesArray("R3BCalifaMappedData"))
 {
 }
 
@@ -45,6 +46,8 @@ R3BCalifaFebexReader::~R3BCalifaFebexReader()
 {
     if (fArray)
         delete fArray;
+    if (fArraytrig)
+        delete fArraytrig;
 }
 
 Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
@@ -60,7 +63,8 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, !fOnline);
+    FairRootManager::Instance()->Register("CalifaMappedData", "Califa mapped data", fArray, !fOnline);
+    FairRootManager::Instance()->Register("CalifaMappedtrigData", "Califa mapped trigger data", fArraytrig, !fOnline);
     Reset();
     memset(fData, 0, sizeof *fData);
 
@@ -94,6 +98,16 @@ Bool_t R3BCalifaFebexReader::Read()
         new ((*fArray)[fArray->GetEntriesFast()])
             R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
     }
+
+    // Trigger signals for correlations
+    for (int i = 0; i < fData->CALIFA_TRGENE; ++i)
+    {
+        UShort_t channelNumber = fData->CALIFA_TRGENEI[i];
+        int16_t energy = fData->CALIFA_TRGENEv[i];
+        new ((*fArraytrig)[fArraytrig->GetEntriesFast()])
+            R3BCalifaMappedData(channelNumber, energy, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
     fNEvent += 1;
     return kTRUE;
 }
@@ -102,6 +116,7 @@ void R3BCalifaFebexReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
+    fArraytrig->Clear();
 }
 
 ClassImp(R3BCalifaFebexReader);

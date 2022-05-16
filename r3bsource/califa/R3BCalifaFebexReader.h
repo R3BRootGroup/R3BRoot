@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFAFEBEXREADER_H
-#define R3BCALIFAFEBEXREADER_H
+#define R3BCALIFAFEBEXREADER_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -66,6 +66,7 @@ class R3BCalifaFebexReader : public R3BReader
     Bool_t fOnline;
     // Output array
     TClonesArray* fArray;
+    TClonesArray* fArraytrig;
 
   public:
     ClassDefOverride(R3BCalifaFebexReader, 0);
