@@ -11,47 +11,51 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRpcPmtMappedData_H
-#define R3BRpcPmtMappedData_H
+#ifndef R3BRpcMappedData_H
+#define R3BRpcMappedData_H
 
 #include "TObject.h"
 #include <stdint.h>
 
-class R3BRpcPmtMappedData : public TObject
+class R3BRpcMappedData : public TObject
 {
 
   public:
     // Default Constructor
-    R3BRpcPmtMappedData();
+    R3BRpcMappedData();
 
     /** Standard Constructor
-     *@param channelId   Channel unique identifier
+     *@param detId       Detector Id
+     *@param ChannelId   Channel Id
      *@param fineTime    Fine Time
      *@param coarseTime  Coarse Time
-     *@param edge        Leading or Trailing
      *@param side        Side
+     *@param edge        Leading or Trailing
      **/
-    R3BRpcPmtMappedData(UShort_t channelId, uint64_t fineTime, uint64_t coarseTime, Int_t edge, UShort_t Side);
+    R3BRpcMappedData(UShort_t DetId, UShort_t ChannelId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t Side);
 
     // Destructor
-    virtual ~R3BRpcPmtMappedData() {}
+    virtual ~R3BRpcMappedData() {}
 
     // Getters
+    inline UShort_t GetDetId() const { return fDetId; }
     inline UShort_t GetChannelId() const { return fChannelId; }
     inline uint64_t GetCoarseTime() const { return fCoarseTime; }
     inline uint64_t GetFineTime() const { return fFineTime; }
-    inline Int_t GetEdge() const { return fEdge; }
+    inline UShort_t GetEdge() const { return fEdge; }
     inline UShort_t GetSide() const { return fSide; }
 
+
   protected:
-    UShort_t fChannelId;     // Channel unique identifier
-    uint64_t fFineTime;      // Fine time
-    uint64_t fCoarseTime;    // Coarse time
-    Int_t fEdge;             // Leading or Trailing
-    Short_t fSide;           // Top Or Bottom
+    UShort_t fDetId;            // Detector unique identifier
+    UShort_t fChannelId;        // Channel unique identifier
+    uint64_t fFineTime;         // Fine time
+    uint64_t fCoarseTime;       // Coarse time
+    UShort_t fEdge;             // Leading or Trailing
+    UShort_t fSide;             // Left Or Right
 
   public:
-    ClassDef(R3BRpcPmtMappedData, 1)
+    ClassDef(R3BRpcMappedData, 1)
 };
 
 #endif

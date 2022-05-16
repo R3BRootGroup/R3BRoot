@@ -22,9 +22,7 @@
 
 #include "R3BRpcMapped2PreCalPar.h"
 
-#include "R3BRpcStripMappedData.h"
-#include "R3BRpcPmtMappedData.h"
-#include "R3BRpcRefMappedData.h"
+#include "R3BRpcMappedData.h"
 
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
@@ -41,9 +39,7 @@ R3BRpcMapped2PreCalPar::R3BRpcMapped2PreCalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTCalPar(NULL)
     , fEngine()
-    , fMappedStripDataCA(NULL)
-    , fMappedPmtDataCA(NULL)
-    , fMappedRefDataCA(NULL)
+    , fMappedDataCA(NULL)
     , fNumChannels(64)
     , fDebugMode(0)
 {
@@ -67,25 +63,10 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
         return kFATAL;
     }
 
-    fMappedStripDataCA = (TClonesArray*)rootManager->GetObject("RpcStripMappedData");
-    if (!fMappedStripDataCA)
+    fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
+    if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedStripDataCA not found";
-        return kFATAL;
-    }
-
-    fMappedPmtDataCA = (TClonesArray*)rootManager->GetObject("RpcPmtMappedData");
-    if (!fMappedPmtDataCA)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedPmtDataCA not found";
-        return kFATAL;
-    }
-
-
-    fMappedRefDataCA = (TClonesArray*)rootManager->GetObject("RpcRefMappedData");
-    if (!fMappedRefDataCA)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedRefDataCA not found";
+        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
@@ -121,42 +102,15 @@ void R3BRpcMapped2PreCalPar::Exec(Option_t* opt)
     //loop over the 3 mapped structures
 
     //loop over strip data
-    Int_t nHits = fMappedStripDataCA->GetEntries();
-    UInt_t iDetector = 0;
+    Int_t nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcStripMappedData*)(fMappedStripDataCA->At(i));
+        auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
 
-        UInt_t iStrip = map1->GetStripId();   // now 1..41
+        UInt_t iDetector = map1->GetDetId();
+        UInt_t iStrip = map1->GetChannelId();   // now 1..41
         UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
-
         fEngine->Fill(iDetector+1, iStrip, iEdge_Side+1, map1->GetFineTime());
-    }
-
-    //loop over pmt data
-    nHits = fMappedPmtDataCA->GetEntries();
-    iDetector = 1;
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        auto map2 = (R3BRpcPmtMappedData*)(fMappedPmtDataCA->At(i));
-
-        UInt_t iPmt = map2->GetChannelId();   // now 1..3
-        UInt_t iEdge_Side = map2->GetEdge()*2 + map2->GetSide();           // 0,3
-
-        fEngine->Fill(iDetector +1 ,iPmt, iEdge_Side+1, map2->GetFineTime());
-    }
-
-    //loop over ref data
-    iDetector = 2;
-    nHits = fMappedRefDataCA->GetEntries();
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        auto map3 = (R3BRpcRefMappedData*)(fMappedRefDataCA->At(i));
-
-        UInt_t iFpga = map3->GetChannelId();   // now 1..41
-        UInt_t iEdge_Side = 0;           // 0
-
-        fEngine->Fill(iDetector+1,iFpga, iEdge_Side+1, map3->GetFineTime());
     }
 }
 

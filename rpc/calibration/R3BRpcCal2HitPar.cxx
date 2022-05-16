@@ -23,8 +23,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BRpcCal2HitPar.h"
-#include "R3BRpcStripCalData.h"
-#include "R3BRpcPmtCalData.h"
+#include "R3BRpcCalData.h"
 
 #include "R3BRpcHitPar.h"
 
@@ -39,8 +38,7 @@ R3BRpcCal2HitPar::R3BRpcCal2HitPar()
 R3BRpcCal2HitPar::R3BRpcCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fHitPar(NULL)
-    , fCalStripDataCA(NULL)
-    , fCalPmtDataCA(NULL)
+    , fCalDataCA(NULL)
     , fNumChannels(64)
     , fDebugMode(false)
     , fRpcCalib(true)
@@ -57,10 +55,8 @@ R3BRpcCal2HitPar::R3BRpcCal2HitPar(const char* name, Int_t iVerbose)
 R3BRpcCal2HitPar::~R3BRpcCal2HitPar()
 {
     LOG(INFO) << "R3BRpcCal2HitPar: Delete instance";
-    if (fCalStripDataCA)
-        delete fCalStripDataCA;
-    if (fCalPmtDataCA)
-        delete fCalPmtDataCA;
+    if (fCalDataCA)
+        delete fCalDataCA;
 }
 
 void R3BRpcCal2HitPar::SetParContainers()
@@ -87,17 +83,10 @@ InitStatus R3BRpcCal2HitPar::Init()
         return kFATAL;
     }
 
-    fCalStripDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcStripCalData");
-    if (!fCalStripDataCA)
+    fCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
+    if (!fCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcStripCalData not found";
-        return kFATAL;
-    }
-
-    fCalPmtDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPmtCalData");
-    if (!fCalPmtDataCA)
-    {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcPmtCalData not found";
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
         return kFATAL;
     }
 
@@ -133,7 +122,7 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
 {
 
     //loop over strip data
-    Int_t nHits = fCalStripDataCA->GetEntries();
+    Int_t nHits = fCalDataCA->GetEntries();
     UInt_t iDetector = 0;
     double charge_left = -1000;
     double charge_right = -1000;
@@ -142,80 +131,71 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
     double ichn_right= 0;
     double ichn_left= 0;
 
-    bool valid = false;
-
+    UInt_t inum=0 ;
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcStripCalData*)(fCalStripDataCA->At(i));
-        valid =true; 
+     auto map1 = (R3BRpcCalData*)(fCalDataCA->At(i));
+     iDetector=map1->GetDetId();
+     inum = iDetector * 41 + map1->GetChannelId() -1;
 
-        if(map1->GetTotRight() >=  charge_right){
-            charge_right=map1->GetTotRight();
-            time_right=map1->GetTimeRight();
-            ichn_right = map1->GetChannelId();
-        }
-        if(map1->GetTotLeft() >= charge_left){
+     if(iDetector==0){
+      if(map1->GetTotR_B() >=  charge_right){
+          charge_right=map1->GetTotR_B();
+          time_right=map1->GetTimeR_B();
+          ichn_right = map1->GetChannelId();
+      }
+      if(map1->GetTotL_T() >= charge_left){
 
-            charge_left=map1->GetTotLeft();
-            time_left= map1->GetTimeLeft();      
-            ichn_left = map1->GetChannelId();
-        }
-        
-        UInt_t inum = iDetector * 41 + ichn_right -1;
-        if (NULL == fhPos[inum])
-        {
-            char strName[255];
-            sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
-            
-            if(!fRpcCalib){
-                fhPos[inum] = new TH1F(strName, "", 750,0.,1500.);
-            }
-            else{
-                fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
-            }
+          charge_left=map1->GetTotL_T();
+          time_left= map1->GetTimeL_T();      
+          ichn_left = map1->GetChannelId();
+      }
+      
+      if (NULL == fhPos[inum])
+      {
+          char strName[255];
+          sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
+          
+          if(!fRpcCalib){
+              fhPos[inum] = new TH1F(strName, "", 750,0.,1500.);
+          }
+          else{
+              fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+          }
 
-        }
-        if (NULL == fhTime[inum])
-        {
-            char strName[255];
-            sprintf(strName, "%s_timecaldata_%d", fHitPar->GetName(),inum);
-            fhTime[inum] = new TH1F(strName, "", 800,-200,-150);
-        }
-
-    }
-
-    if(ichn_left == ichn_right && valid ){
-        UInt_t inum = iDetector * 41 + ichn_right -1;
-
+      }
+      if (NULL == fhTime[inum])
+      {
+          char strName[255];
+          sprintf(strName, "%s_timecaldata_%d", fHitPar->GetName(),inum);
+          fhTime[inum] = new TH1F(strName, "", 800,-200,-150);
+      } 
+   
+      if(ichn_left == ichn_right){
         
         if(!fRpcCalib){
-            fhPos[inum]->Fill(((((time_left-time_right)/2. - (fHitPar->GetCalParams1()->GetAt(inum)-400)*40./800.)*800./40.)
-                  /(fHitPar->GetCalParams2()->GetAt(inum) - fHitPar->GetCalParams1()->GetAt(inum)))*1500);
+            fhPos[inum]->Fill(((((time_left-time_right)/2. -\
+			 (fHitPar->GetCalParams1()->GetAt(inum)-400)*40./800.)*800./40.)\
+		        /(fHitPar->GetCalParams2()->GetAt(inum) -\
+			 fHitPar->GetCalParams1()->GetAt(inum)))*1500);
         }
         else{
             fhPos[inum]->Fill((time_left - time_right)/2.);
         }
         fhTime[inum]->Fill((time_left + time_right)/2.); 
+      }
+     }
+     if(iDetector==1){
+      if (NULL == fhPos[inum])
+      {
+          char strName[255];
+          sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
+          fhPos[inum] = new TH1F(strName, "", 5000,-2500.,2500.);
+      }
+      fhPos[inum]->Fill((map1->GetTimeR_B() - map1->GetTimeL_T())*CSCINT/2.);
+     }
     }
-
-    //loop over Pmt data
-    nHits = fCalPmtDataCA->GetEntries();
-    iDetector = 1;
-
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        auto map2 = (R3BRpcPmtCalData*)(fCalPmtDataCA->At(i));
-        UInt_t inum = iDetector * 41 + map2->GetChannelId()-1;
-        if (NULL == fhPos[inum])
-        {
-            char strName[255];
-            sprintf(strName, "%s_poscaldata_%d", fHitPar->GetName(),inum);
-            fhPos[inum] = new TH1F(strName, "", 5000,-2500.,2500.);
-        }
-        fhPos[inum]->Fill((map2->GetTimeBottom() - map2->GetTimeTop())*CSCINT/2.);
-    }
-
     return;
 }
 
@@ -234,6 +214,52 @@ void R3BRpcCal2HitPar::FinishTask() {
     fHitPar->setChanged();
     fHitPar->printParams();
     fHitPar->Write();
+}
+
+
+
+void R3BRpcCal2HitPar::CalculateParsStrip(){
+
+    for (int t = 0; t < N_STRIP_NB; t++){
+
+        if (NULL == fhPos[t]){continue;}
+
+        fHitPar->SetCalParams4(0,t);
+
+        int bin_max = fhPos[t]->GetMaximumBin();
+        
+        float threshold = 
+        (fhPos[t]->GetBinContent(bin_max - 1) + fhPos[t]->GetBinContent(bin_max) + 
+        fhPos[t]->GetBinContent(bin_max + 1) )/120.;
+
+        for(int i = 1; i <= bin_max; i++){
+            if (fhPos[t]->GetBinContent(i) >= threshold){
+                fHitPar->SetCalParams1(i,t);
+                break;
+            }                
+        }
+        for(int i = 800; i > bin_max; i--){
+            if (fhPos[t]->GetBinContent(i) >= threshold){
+                fHitPar->SetCalParams2(i,t);
+                break;
+            }
+        }
+    }
+
+    for (int t = 0; t < N_STRIP_NB; t++){
+
+        if (NULL == fhTime[t]){continue;}
+
+        int bin_max = fhTime[t]->GetMaximumBin();
+
+        fhTime[t]->GetXaxis()->SetRange(bin_max-50,bin_max+50);
+
+        fhTime[t]->Fit("gaus");
+
+        TF1 *g = (TF1*)fhTime[t]->GetListOfFunctions()->FindObject("gaus");
+        fHitPar->SetCalParams3(g->GetParameter(1),t);
+
+    }
 }
 
 void R3BRpcCal2HitPar::CalculateParsPmt(){
@@ -278,52 +304,7 @@ void R3BRpcCal2HitPar::CalculateParsPmt(){
 
     for (int i = 0; i < v.size(); i++)
     {
-        std::cout << v[i] << " " << v[i]-average/counter << " " << average/counter<<  std::endl;
         fHitPar->SetCalParams4(v[i]-average/counter,i);
-    }
-}
-
-void R3BRpcCal2HitPar::CalculateParsStrip(){
-
-    for (int t = 0; t < N_STRIP_NB; t++){
-
-        if (NULL == fhPos[t]){continue;}
-
-        fHitPar->SetCalParams4(0,t);
-
-        int bin_max = fhPos[t]->GetMaximumBin();
-        
-        float threshold = 
-        (fhPos[t]->GetBinContent(bin_max - 1) + fhPos[t]->GetBinContent(bin_max) + 
-        fhPos[t]->GetBinContent(bin_max + 1) )/90.;
-
-        for(int i = 1; i <= bin_max; i++){
-            if (fhPos[t]->GetBinContent(i) >= threshold){
-                fHitPar->SetCalParams1(i,t);
-                break;
-            }                
-        }
-        for(int i = 800; i > bin_max; i--){
-            if (fhPos[t]->GetBinContent(i) >= threshold){
-                fHitPar->SetCalParams2(i,t);
-                break;
-            }
-        }
-    }
-
-    for (int t = 0; t < N_STRIP_NB; t++){
-
-        if (NULL == fhTime[t]){continue;}
-
-        int bin_max = fhTime[t]->GetMaximumBin();
-
-        fhTime[t]->GetXaxis()->SetRange(bin_max-50,bin_max+50);
-
-        fhTime[t]->Fit("gaus");
-
-        TF1 *g = (TF1*)fhTime[t]->GetListOfFunctions()->FindObject("gaus");
-        fHitPar->SetCalParams3(g->GetParameter(1),t);
-
     }
 }
 

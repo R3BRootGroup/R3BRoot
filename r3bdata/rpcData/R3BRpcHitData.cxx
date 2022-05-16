@@ -11,26 +11,29 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BRpcStripCalData.h"
+#include "R3BRpcHitData.h"
 
-R3BRpcStripCalData::R3BRpcStripCalData()
+R3BRpcHitData::R3BRpcHitData()
     : FairMultiLinkedData()
+    , fDetId(0)
     , fChannelId(0)
-    , fTimeRight(0)
-    , fTimeLeft(0)
-    , fTotRight(0)
-    , fTotLeft(0)
+    , fTime(0)
+    , fPos(0)
+    , fCharge(0)
+    , fTof(0)	
 {
 }
 
-R3BRpcStripCalData::R3BRpcStripCalData(UShort_t channelId, double TimeRight, double TimeLeft, double TotRight, double TotLeft)
+R3BRpcHitData::R3BRpcHitData(UInt_t detId, UInt_t channel, double time, double pos, double charge, double tof)
     : FairMultiLinkedData()
-    , fChannelId(channelId)
-    , fTimeRight(TimeRight)
-    , fTimeLeft(TimeLeft)
-    , fTotRight(TotRight)
-    , fTotLeft(TotLeft)
+    , fDetId(detId)
+    , fChannelId(channel)
+    , fTime(time)
+    , fPos(pos)
+    , fCharge(charge)
+    , fTof(tof)
 {
 }
 
-ClassImp(R3BRpcStripCalData);
+
+ClassImp(R3BRpcHitData);

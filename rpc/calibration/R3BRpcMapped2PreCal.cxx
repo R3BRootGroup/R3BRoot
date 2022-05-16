@@ -24,12 +24,11 @@
 
 #include "R3BRpcMapped2PreCal.h"
 
-#include "R3BRpcStripMappedData.h"
-#include "R3BRpcPmtMappedData.h"
-#include "R3BRpcRefMappedData.h"
+#include "R3BRpcMappedData.h"
 
-#include "R3BRpcStripPreCalData.h"
-#include "R3BRpcPmtPreCalData.h"
+#include "R3BRpcPreCalData.h"
+double counter_bad =0;
+double counter_good = 0;
 
 // R3BRpcMapped2PreCal: Constructor
 R3BRpcMapped2PreCal::R3BRpcMapped2PreCal()
@@ -38,19 +37,15 @@ R3BRpcMapped2PreCal::R3BRpcMapped2PreCal()
     , fOnline(kFALSE)
     , fFpgaCorrelationFile("")
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fMappedStripDataCA(NULL)
-    , fMappedPmtDataCA(NULL)
-    , fMappedRefDataCA(NULL)
-    , fRpcStripPreCalDataCA(NULL)
-    , fRpcPmtPreCalDataCA(NULL)
+    , fMappedDataCA(NULL)
+    , fRpcPreCalDataCA(NULL)
 {
 }
 
 R3BRpcMapped2PreCal::~R3BRpcMapped2PreCal()
 {
     LOG(INFO) << "R3BRpcMapped2PreCal: Delete instance";
-    delete fRpcStripPreCalDataCA;
-    delete fRpcPmtPreCalDataCA;
+    delete fRpcPreCalDataCA;
 }
 
 InitStatus R3BRpcMapped2PreCal::Init()
@@ -65,25 +60,10 @@ InitStatus R3BRpcMapped2PreCal::Init()
         return kFATAL;
     }
 
-    fMappedStripDataCA = (TClonesArray*)rootManager->GetObject("RpcStripMappedData");
-    if (!fMappedStripDataCA)
+    fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
+    if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedStripDataCA not found";
-        return kFATAL;
-    }
-
-    fMappedPmtDataCA = (TClonesArray*)rootManager->GetObject("RpcPmtMappedData");
-    if (!fMappedPmtDataCA)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedPmtDataCA not found";
-        return kFATAL;
-    }
-
-
-    fMappedRefDataCA = (TClonesArray*)rootManager->GetObject("RpcRefMappedData");
-    if (!fMappedRefDataCA)
-    {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedRefDataCA not found";
+        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
@@ -102,7 +82,6 @@ InitStatus R3BRpcMapped2PreCal::Init()
     {
         LOG(INFO) << "R3BRpcMapped2PreCal:: RPCTCalPar container open";
     }
-
 
     //FPGA mapping
     int lines=0;
@@ -131,15 +110,12 @@ InitStatus R3BRpcMapped2PreCal::Init()
 
     // OUTPUT DATA
     // Calibrated data
-    fRpcStripPreCalDataCA = new TClonesArray("R3BRpcStripPreCalData", 50);
+    fRpcPreCalDataCA = new TClonesArray("R3BRpcPreCalData", 50);
 
-    fRpcPmtPreCalDataCA = new TClonesArray("R3BRpcPmtPreCalData", 50);
-
-    rootManager->Register("R3BRpcStripPreCalData", "RPC Strip Pre Cal", fRpcStripPreCalDataCA, !fOnline);
-    rootManager->Register("R3BRpcPmtPreCalData", "RPC Pmt Pre Cal", fRpcPmtPreCalDataCA, !fOnline);
-
+    rootManager->Register("R3BRpcPreCalData", "RPC Pre Cal", fRpcPreCalDataCA, !fOnline);
 
     return kSUCCESS;
+
 }
 
 InitStatus R3BRpcMapped2PreCal::ReInit()
@@ -157,7 +133,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
         LOG(WARNING) << "R3BRpcMapped2PreCal::Parameter container not found";
     }
 
-    Entry_Ref Ref_vec[4];
+    Entry Ref_vec[10];
 
     Double_t times_Ref = 0. / 0.;
     Double_t times_Pmt = 0. / 0.;
@@ -166,13 +142,22 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
     //loop over the 3 mapped structures
 
     //loop over ref data
-    UInt_t iDetector = 2;
-    Int_t nHits = fMappedRefDataCA->GetEntries();
+    Int_t nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map3 = (R3BRpcRefMappedData*)(fMappedRefDataCA->At(i));
+        auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
+	
+        UInt_t iDetector = map1->GetDetId();
+	if(iDetector != 2){continue;}
 
-        UInt_t iFpga = map3->GetChannelId();   // now 1..4
+        UInt_t iFpga;
+        if(map1->GetChannelId() == 7 ){//|| map1->GetChannelId() == 5) {
+            iFpga = 5;
+        }
+        else {
+            iFpga = map1->GetChannelId();   // now 1..4
+        }
+
         UInt_t iEdge_Side = 0;           // 0
         R3BTCalModulePar* par_Refs = fTCalPar->GetModuleParAt(iDetector+1,iFpga, iEdge_Side+1);
 
@@ -180,94 +165,103 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
 
         // Convert TDC to [ns] ...
 
-        times_Ref = par_Refs->GetTimeVFTX(map3->GetFineTime());
+        times_Ref = par_Refs->GetTimeVFTX(map1->GetFineTime());
 
         if (times_Ref < 0. || times_Ref > fClockFreq )//|| IS_NAN(times_Ref))
         {
 
             LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", FPGA= " << iFpga
-                      << ", time in channels = " << map3->GetFineTime()
+                      << ", time in channels = " << map1->GetFineTime()
                       << ", time in ns = " << times_Ref;
             continue;
         }
-
-        auto &entry = Ref_vec[iFpga-1];
-        entry.time = 5. * map3->GetCoarseTime() - times_Ref;
-        entry.RefMapped = map3;
+	
+        auto &entry = Ref_vec[map1->GetChannelId()-1];
+        entry.time = 5. * map1->GetCoarseTime() - times_Ref;
+        entry.Mapped = map1;
     }
 
 
-    std::vector<Entry_Strip> strip_vec[41][2][2];
+    std::vector<Entry> strip_vec[41][2][2];
 
-    //loop over strip data
-    nHits = fMappedStripDataCA->GetEntries();
-    iDetector = 0;
+    std::vector<Entry> bar_vec[5][2][2];
+   double leading_strip=0;
+   double leading_pmt=0;
+
+    double c=2048.*5.;
+    nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcStripMappedData*)(fMappedStripDataCA->At(i));
 
-        UInt_t iStrip = map1->GetStripId();   // now 1..41
-        UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
-        R3BTCalModulePar* par_Strips = fTCalPar->GetModuleParAt(iDetector+1, iStrip, iEdge_Side+1);
+        auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
+        UInt_t iDetector = map1->GetDetId();
 
-        if(NULL == par_Strips ) {continue;}
+	if(iDetector == 2){
+          TClonesArray& clref = *fRpcPreCalDataCA;
+	  Int_t size = clref.GetEntriesFast();
+	  	new (clref[size]) R3BRpcPreCalData(2,map1->GetChannelId(),Ref_vec[map1->GetChannelId()-1].time , 0, 0);
+	}
 
-        // Convert TDC to [ns] ...
+        //loop over strip data
 
-        times_Strip = par_Strips->GetTimeVFTX(map1->GetFineTime());
+	if(iDetector == 0){
+         UInt_t iStrip = map1->GetChannelId();   // now 1..41
+         UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
+         R3BTCalModulePar* par_Strips = fTCalPar->GetModuleParAt(iDetector+1, iStrip, iEdge_Side+1);
 
-        if (times_Strip < 0. || times_Strip > fClockFreq )//|| IS_NAN(times_Strip))
-        {
+         if(NULL == par_Strips ) {continue;}
 
-            LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", strip= " << iStrip
-                      << ", side= " << map1->GetSide() << ", edge= " << map1->GetEdge() << ", time in channels = " << map1->GetFineTime()
-                      << ", time in ns = " << times_Strip;
-            continue;
-        }
-        double c=2048.*5.;
-        Entry_Strip entry;
-        entry.time = fmod((5. * map1->GetCoarseTime() - times_Strip - Ref_vec[lut[iStrip -1][map1->GetSide()][0]].time + c + c/2),c) - c/2 ;
-        entry.StripMapped = map1;
-        strip_vec[map1->GetStripId() -1][map1->GetSide()][map1->GetEdge()].push_back(entry);
+         // Convert TDC to [ns] ...
+
+         times_Strip = par_Strips->GetTimeVFTX(map1->GetFineTime());
+
+         if (times_Strip < 0. || times_Strip > fClockFreq )//|| IS_NAN(times_Strip))
+         {
+
+             LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", strip= " << iStrip
+                       << ", side= " << map1->GetSide() << ", edge= " << map1->GetEdge() << ", time in channels = " << map1->GetFineTime()
+                       << ", time in ns = " << times_Strip;
+             continue;
+         }
+         Entry entry;
+         entry.time = fmod((5. * map1->GetCoarseTime() - times_Strip - Ref_vec[lut[iStrip -1][map1->GetSide()][0]].time  - (Ref_vec[8].time - Ref_vec[6].time)+ 4*c + c/2),c) - c/2 ;
+         entry.Mapped = map1;
+         strip_vec[map1->GetChannelId() -1][map1->GetSide()][map1->GetEdge()].push_back(entry);
+
+	}
+
+        //loop over pmt data
+	
+	if(iDetector == 1){
+
+         UInt_t iPmt = map1->GetChannelId();   // now 1..41
+         UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
+         R3BTCalModulePar* par_Pmts = fTCalPar->GetModuleParAt(iDetector +1 ,iPmt, iEdge_Side+1);
+
+         if(NULL == par_Pmts ) {continue;}
+
+         // Convert TDC to [ns] ...
+
+         times_Pmt = par_Pmts->GetTimeVFTX(map1->GetFineTime());
+
+         if (times_Pmt < 0. || times_Pmt > fClockFreq )//|| IS_NAN(times_Pmt))
+         {
+
+             LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", pmt= " << iPmt
+                       << ", side= " << map1->GetSide() << ", edge= " << map1->GetEdge() << ", time in channels = " << map1->GetFineTime()
+                       << ", time in ns = " << times_Pmt << " " << fClockFreq;
+             continue;
+         }
+
+         Entry entry;
+         entry.time = fmod((5. * map1->GetCoarseTime() - times_Pmt - Ref_vec[1].time - (Ref_vec[8].time - Ref_vec[6].time)+ 4*c + c/2),c) - c/2 ;
+         entry.Mapped = map1;
+         bar_vec[map1->GetChannelId() -1][map1->GetSide()][map1->GetEdge()].push_back(entry);
+
+	}
+
     }
 
-    std::vector<Entry_Pmt> bar_vec[5][2][2];
-
-    //loop over strip data
-
-    //loop over pmt data
-    nHits = fMappedPmtDataCA->GetEntries();
-    iDetector = 1;
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        auto map2 = (R3BRpcPmtMappedData*)(fMappedPmtDataCA->At(i));
-
-        UInt_t iPmt = map2->GetChannelId();   // now 1..3
-        UInt_t iEdge_Side = map2->GetEdge()*2 + map2->GetSide();           // 0,3
-        R3BTCalModulePar* par_Pmts = fTCalPar->GetModuleParAt(iDetector +1 ,iPmt, iEdge_Side+1);
-
-        if(NULL == par_Pmts ) {continue;}
-
-        // Convert TDC to [ns] ...
-
-        times_Pmt = par_Pmts->GetTimeVFTX(map2->GetFineTime());
-
-        if (times_Pmt < 0. || times_Pmt > fClockFreq )//|| IS_NAN(times_Pmt))
-        {
-
-            LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", pmt= " << iPmt
-                      << ", side= " << map2->GetSide() << ", edge= " << map2->GetEdge() << ", time in channels = " << map2->GetFineTime()
-                      << ", time in ns = " << times_Pmt << " " << fClockFreq;
-            continue;
-        }
-
-        double c=2048.*5.;
-        Entry_Pmt entry;
-        entry.time = fmod((5. * map2->GetCoarseTime() - times_Pmt - Ref_vec[1].time + c + c/2),c) - c/2 ;
-        entry.PmtMapped = map2;
-        bar_vec[map2->GetChannelId() -1][map2->GetSide()][map2->GetEdge()].push_back(entry);
-
-    }
 
     for (Int_t strip = 0; strip < 41; strip++)
     {
@@ -284,19 +278,20 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
                 auto const &entry_lead = strip_vec[strip][side][1].at(lead_i);
                 auto const &entry_trail = strip_vec[strip][side][0].at(trail_i);
 
-                double c=2048.*5.;
-
                 double tot = fmod((entry_trail.time - entry_lead.time + c + c/2),c) - c/2 ;
                 if (tot < 0) {
                     ++trail_i;
                     continue;
                 }
                 // It fills the R3BRpcStripCalData
-                TClonesArray& clref = *fRpcStripPreCalDataCA;
+                TClonesArray& clref = *fRpcPreCalDataCA;
                 Int_t size = clref.GetEntriesFast();
-                new (clref[size]) R3BRpcStripPreCalData(strip + 1, entry_lead.time, tot, side);
+		//cout << "strip  " << entry_lead.time << " " << strip << " " << side <<endl;
+                new (clref[size]) R3BRpcPreCalData(0,strip + 1, entry_lead.time, tot, side);
                 ++lead_i;
                 ++trail_i;
+                
+                leading_strip = entry_lead.time;
             }
         }
     }
@@ -316,35 +311,35 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
                 auto const &entry_lead = bar_vec[bar][side][1].at(lead_i);
                 auto const &entry_trail = bar_vec[bar][side][0].at(trail_i);
 
-                double c=2048.*5.;
-
-                double tot = fmod((entry_trail.time - entry_lead.time + c + c/2),c) - c/2 ;
+                double tot = fmod((entry_trail.time - entry_lead.time + c + c/2),c) - c/2;
                 if (tot < 0) {
                     ++trail_i;
                     continue;
                 }
                 // It fills the R3BRpcPmtCalData
-                TClonesArray& clref = *fRpcPmtPreCalDataCA;
+                TClonesArray& clref = *fRpcPreCalDataCA;
                 Int_t size = clref.GetEntriesFast();
-                new (clref[size]) R3BRpcStripPreCalData(bar+1, entry_lead.time, tot, side);
+		//cout << "pmt " << entry_lead.time << " " << bar << " " << side<<endl;
+                new (clref[size]) R3BRpcPreCalData(1,bar+1, entry_lead.time, tot, side);
                 ++lead_i;
                 ++trail_i;
+
+                leading_pmt = entry_lead.time;
             }
         }
     }
-    return;
+//      if(leading_pmt !=0 && leading_strip != 0){	 std::cout<<leading_pmt << " " <<  leading_strip << " " << leading_strip - leading_pmt  <<  " " << fmod(leading_strip - leading_pmt + 1.5*c,c)-c/2 <<  std::endl;}
+   return;
 }
 
-void R3BRpcMapped2PreCal::Finish() {}
+void R3BRpcMapped2PreCal::Finish() {
+}
 
 void R3BRpcMapped2PreCal::Reset()
 {
     LOG(DEBUG) << "Clearing RPCCalData Structure";
-    if (fRpcStripPreCalDataCA){
-        fRpcStripPreCalDataCA->Clear();
-    }
-    if (fRpcPmtPreCalDataCA){
-        fRpcPmtPreCalDataCA->Clear();
+    if (fRpcPreCalDataCA){
+        fRpcPreCalDataCA->Clear();
     }
 }
 

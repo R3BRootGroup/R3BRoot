@@ -31,6 +31,8 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "TLatex.h"
+
 
 class TClonesArray;
 class R3BEventHeader;
@@ -96,30 +98,82 @@ class R3BRpcOnlineSpectra : public FairTask
      * Method to reset histograms
      */
     void Reset_RPC_Histo();
+    void Reset_Efficiencies();
+
+
+    void SetTofAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
+
+        fLeftTofLim  = leftLimit;
+        fRightTofLim = rightLimit;
+        fTofBins = bins;
+    };
+
+
+    void SetRpcTimeAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
+
+        fLeftRpcTimeLim  = leftLimit;
+        fRightRpcTimeLim = rightLimit;
+        fRpcTimeBins = bins;
+    };
+
+
+    void SetRpcToTAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
+
+        fLeftRpcToTLim  = leftLimit;
+        fRightRpcToTLim = rightLimit;
+        fRpcToTBins = bins;
+    };
+
+
 
     /**
      * Method to set the trigger
      */
     void SetTrigger(Int_t trigg) { fTrigger = trigg; }
 
+    double fmod_calc(double a, double b) {
+         Int_t c = 2048*5;
+	 return fmod(a - b +c +c/2.,c) -c/2.;
+    }
+
   private:
     R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
-    TClonesArray* fRefMappedItems;   // Array with mapped items.
-    TClonesArray* fPmtMappedItems;   // Array with mapped items.
-    TClonesArray* fStripMappedItems;   // Array with mapped items.
-    TClonesArray* fStripPreCalDataItems;
-    TClonesArray* fStripCalDataItems;
-    TClonesArray* fPmtPreCalItems;
-    TClonesArray* fStripHitDataItems;
-    TClonesArray* fLosCalDataItems;
-    TClonesArray* fLosTriggerCalDataItems;
+    int fcounter;
+    TClonesArray* fMappedDataItems;   // Array with mapped items.
+    TClonesArray* fPreCalDataItems;
+    TClonesArray* fCalDataItems;
+    TClonesArray* fHitDataItems;
+    TClonesArray* fPmtHitDataItems;
+
+    Float_t bar_1_hits[90]={0.0};
+    Float_t bar_2_hits[90]={0.0};
+    Float_t bar_3_hits[90]={0.0};
 
 
-    TClonesArray* fLosWRData;
+    Float_t rpcHitMatrix[41][50] = {{0.0}};
+    Float_t meanCharges[41][50]  = {{0.0}};
 
-    Float_t meanCharges[41][50]={{0.0}};
+
     Int_t counts=0;
     Int_t tpatbin,fTPat;
+    int64_t fTimeStart,fTimeEnd;
+
+
+    Float_t fLeftTofLim;
+    Float_t fRightTofLim;
+
+    Float_t fLeftRpcTimeLim;
+    Float_t fRightRpcTimeLim;
+
+    Float_t fLeftRpcToTLim;
+    Float_t fRightRpcToTLim;
+
+    Int_t fTofBins;
+    Int_t fRpcTimeBins;
+    Int_t fRpcToTBins;
+    Float_t fBarHits;
+    Float_t fStrip21Hits;
+
 
 
     R3BEventHeader* header; // Event header.
@@ -171,6 +225,8 @@ class R3BRpcOnlineSpectra : public FairTask
     TH2F *stripRightTotCorr;
     TH2F *stripLeftTimeCorr;
     TH2F *stripRightTimeCorr;
+    TH2F **stripLeftBanana;
+    TH2F **stripRightBanana;
     TH1F **pmtPreCalTimeHistoTop;
     TH1F **pmtPreCalTotHistoTop;
     TH1F **pmtPreCalTimeHistoBottom;
@@ -182,6 +238,8 @@ class R3BRpcOnlineSpectra : public FairTask
     TCanvas *stripRightTotCorrCanvas;
     TCanvas *stripLeftTimeCorrCanvas;
     TCanvas *stripRightTimeCorrCanvas;
+    TCanvas *stripLeftBananaCanvas;
+    TCanvas *stripRightBananaCanvas;
     TCanvas *pmtPreCalTimeCanvas;
     TCanvas *pmtPreCalTotCanvas;
 
@@ -202,14 +260,43 @@ class R3BRpcOnlineSpectra : public FairTask
     /* ----- Hit Canvases ----- */
     TCanvas *hitMapCanvas;
 
-    /* ------ LOS Correlations Histograms ------*/
-    TH2F *losTimeDiffCorr;
-    TH1F **stripDiffLosHisto;
+    /* ------ ToF Correlations Histograms ------*/
+    TH2F *tofCorr;
+    TH1F **stripTofHisto;
+    TH2F *tofVsPosCorr;
 
-    /* ------ LOS Correlations Canvases ------*/
-    TCanvas *losCorrCanvas;
-    TCanvas *stripLosCanvas;
+    /* ------ ToF Correlations Canvases ------*/
+    TCanvas *tofCorrCanvas;
+    TCanvas *stripTofCanvas;
+    TCanvas *tofPosCanvas;
 
+    /* ------ Strip - Bar Correlation -----*/
+    TCanvas *timeDiffStripPmtCanvas;
+    TCanvas *timeDiffStripPmtCorrCanvas;
+    TCanvas *posRpcCorrCanvas;
+    TCanvas *timeDiffLosPmtCanvas;
+    TCanvas *stripIdVsHitsCanvas;
+
+    /* ------ Strip - Bar Correlation Histograms -----*/
+    TH1F **timeDiffStripPmtHisto;
+    TH2F *timeDiffStripPmtCorr;
+
+    TH2F *deltaTVsPosCorr;
+    TH2F *posRpcVsPosBar;
+
+    TH2F *stripIdVsNHitsCorr;
+
+    /*------------ Efficiency Canvases --------*/
+    TCanvas *stripMultCanvas;
+    TCanvas *efficiencyCanvas;
+
+    /*--------- Efficiency Histograms ----------*/
+    TH1F *stripMultHisto;
+    TH2F *bar_1_efficiency_pos_corr;
+    TH2F *bar_2_efficiency_pos_corr;
+    TH2F *bar_3_efficiency_pos_corr;
+
+    TLatex *tex1,*tex2;
 
   public:
     ClassDefOverride(R3BRpcOnlineSpectra, 1)
