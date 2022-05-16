@@ -66,9 +66,7 @@ class R3BRpcReader : public R3BReader
      * An array where the read R3BPaddleTamexMappedData
      * items are stored.
      */
-    TClonesArray* fArrayRef;   /**< Output array. */
-    TClonesArray* fArrayPmt;   /**< Output array. */
-    TClonesArray* fArrayStrip; /**< Output array. */
+    TClonesArray* fArrayRpc; /**< Output array. */
 
     Int_t fCoarseReference; // earliest coarse counter to detect coarse counter wrap
 

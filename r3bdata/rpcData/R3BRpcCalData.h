@@ -11,66 +11,59 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCSTRIPCALDATA_H
-#define R3BRPCSTRIPCALDATA_H
+#ifndef R3BRPCCALDATA_H
+#define R3BRPCCALDATA_H
 
 #include "FairMultiLinkedData.h"
 #include "TObject.h"
 
-class R3BRpcStripCalData : public FairMultiLinkedData
+class R3BRpcCalData : public FairMultiLinkedData
 {
   public:
     /** Default constructor **/
-    R3BRpcStripCalData();
+    R3BRpcCalData();
 
-    /** Constructor with arguments
-     *@param fChannelId   Channel unique identifier
-     //MODIFY ME!!!!!!!!!!!!!!!!!
-     *@param fEnergy      Total energy deposited ([GeV] in sim)
-     *@param fTime        Time since event start [ns]
-     *@param fToT_Energy  Total energy deposited from ToT ([GeV] in sim)
+
+    /** Standard Constructor
+     *@param DetId       Detector identifier
+     *@param channelId   Channel unique identifier
+     *@param Time        Time (R/L,B/T) 
+     *@param Tot         Time over threshold (R/L,B/T)
      **/
-    R3BRpcStripCalData(Int_t ident,
-                  // MODIFY ME!!!!!!!!!!!!!!!!!
-                  Double_t energy,
-                  uint64_t time,
-                  Double_t tot_energy = 0);
+    R3BRpcCalData(
+		       UShort_t DetId,
+		       UShort_t channelId,
+		       double TimeR_B,
+		       double TimeL_T,
+		       double TotR_B,
+                       double TotL_T);
 
     /** Copy constructor **/
-    R3BRpcStripCalData(const R3BRpcStripCalData&);
+    R3BRpcCalData(const R3BRpcCalData&);
 
-    R3BRpcStripCalData& operator=(const R3BRpcStripCalData&) { return *this; }
+    R3BRpcCalData& operator=(const R3BRpcCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BRpcStripCalData() {}
+    virtual ~R3BRpcCalData() {}
 
     /** Accessors **/
-    inline const Int_t& GetChannelId() const { return fChannelId; }
-
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    inline const Double_t& GetEnergy() const { return fEnergy; }
-    inline const Double_t& GetToT_Energy() const { return fToT_Energy; }
-    inline const uint64_t& GetTime() const { return fTime; }
-
-    /** Modifiers **/
-    void SetChannelId(Int_t ident) { fChannelId = ident; }
-
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    void SetEnergy(Double32_t energy) { fEnergy = energy; }
-    void SetToT_Energy(Double32_t energy) { fToT_Energy = energy; }
-    void SetTime(uint64_t time) { fTime = time; }
-    void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
+    inline UShort_t GetDetId() const { return fDetId; }
+    inline UShort_t GetChannelId() const { return fChannelId; }
+    inline double GetTimeL_T() const { return fTimeL_T; }
+    inline double GetTimeR_B() const { return fTimeR_B; }
+    inline double GetTotL_T() const { return fTotL_T; }
+    inline double GetTotR_B() const { return fTotR_B; }
 
   protected:
-    Int_t fChannelId; // channel unique identifier
-
-    // MODIFY ME!!!!!!!!!!!!!!!!!
-    Double32_t fEnergy;     // total energy
-    Double32_t fToT_Energy; // total energy from ToT
-    uint64_t fTime;         // time of the interaction
+    UShort_t fDetId;      // Detector identifier
+    UShort_t fChannelId;  // Channel unique identifier
+    double fTimeR_B;      // Time from Right strip or Bottom Pmt channel
+    double fTimeL_T;      // Time from Left or Top Pmt channel
+    double fTotR_B;       // Tot from the Right or Bottom Pmt channel
+    double fTotL_T;       // Tot from the Left or Top Pmt channel
 
   public:
-    ClassDef(R3BRpcStripCalData, 1)
+    ClassDef(R3BRpcCalData, 1)
 };
 
 #endif

@@ -15,8 +15,7 @@
 #define R3BRPCCAL2HIT_H
 
 #include "FairTask.h"
-#include "R3BRpcStripHitData.h"
-#include "R3BRpcPmtHitData.h"
+#include "R3BRpcHitData.h"
 #include "R3BRpcHitPar.h"
 #include "Rtypes.h"
 
@@ -26,6 +25,8 @@
 
 class TClonesArray;
 class R3BTGeoPar;
+class R3BEventHeader;
+class R3BTimeStitch;
 
 class R3BRpcCal2Hit : public FairTask
 {
@@ -60,11 +61,13 @@ class R3BRpcCal2Hit : public FairTask
     virtual InitStatus ReInit();
 
   private:
-    TClonesArray* fCalDataCA;
-    TClonesArray* fRpcHitStripDataCA;
-    TClonesArray* fRpcHitPmtDataCA;
-    TClonesArray* fRpcCalStripDataCA;
-    TClonesArray* fRpcCalPmtDataCA;
+  
+
+    R3BTimeStitch* fTimeStitch;
+    R3BEventHeader* fR3BEventHeader; /**< Event header - input data. */
+  
+    TClonesArray* fRpcCalDataCA;
+    TClonesArray* fRpcHitDataCA;
 
     TArrayF* fParCont1;
     TArrayF* fParCont2;
@@ -76,8 +79,7 @@ class R3BRpcCal2Hit : public FairTask
     R3BRpcHitPar* fHitPar;
 
 
-    R3BRpcStripHitData* AddHitStrip(UInt_t channel, double time, double pos, double charge);
-    R3BRpcPmtHitData* AddHitPmt(UInt_t channel, double time, double pos, double charge);
+    R3BRpcHitData* AddHitStrip(UInt_t iDet,UInt_t channel, double time, double pos, double charge,double tof);
 
     ClassDef(R3BRpcCal2Hit, 1);
 };

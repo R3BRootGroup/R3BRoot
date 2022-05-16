@@ -23,25 +23,24 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BTimeStitch.h"
+#include "R3BEventHeader.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 
-#include "R3BRpcStripCalData.h"
-#include "R3BRpcPmtCalData.h"
+#include "R3BRpcCalData.h"
 #include <list>
 #include <vector>
 
 R3BRpcCal2Hit::R3BRpcCal2Hit()
     : FairTask("R3B RPC Cal to Hit")
-    , fCalDataCA(NULL)
     , fParCont1(NULL)
     , fParCont2(NULL)
     , fParCont3(NULL)
     , fParCont4(NULL)
-    , fRpcHitStripDataCA(NULL)
-    , fRpcHitPmtDataCA(NULL)
-    , fRpcCalStripDataCA(NULL)
-    , fRpcCalPmtDataCA(NULL)
+    , fRpcHitDataCA(NULL)
+    , fRpcCalDataCA(NULL)
+    , fR3BEventHeader(NULL)
     , fOnline(kFALSE)
 {
 }
@@ -49,10 +48,8 @@ R3BRpcCal2Hit::R3BRpcCal2Hit()
 R3BRpcCal2Hit::~R3BRpcCal2Hit()
 {
     LOG(INFO) << "R3BRpcCal2Hit: Delete instance";
-    if (fRpcHitStripDataCA)
-        delete fRpcHitStripDataCA;
-    if (fRpcHitPmtDataCA)
-        delete fRpcHitPmtDataCA;
+    if (fRpcHitDataCA)
+        delete fRpcHitDataCA;
 
 }
 
@@ -79,6 +76,12 @@ InitStatus R3BRpcCal2Hit::Init()
         return kFATAL;
     }
 
+    fR3BEventHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    if (!fR3BEventHeader)
+    {
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() EventHeader. not found";
+        return kFATAL;
+    }
 
     fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
     if (!fHitPar)
@@ -90,31 +93,25 @@ InitStatus R3BRpcCal2Hit::Init()
         LOG(INFO) << "R3BRpcCal2Hit:: RPCHitPar container open";
     }
 
-    fRpcCalStripDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcStripCalData");
-    if (!fRpcCalStripDataCA)
+    fRpcCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
+    if (!fRpcCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcStripCalData not found";
+        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
         return kFATAL;
     }
-
-    fRpcCalPmtDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPmtCalData");
-    if (!fRpcCalPmtDataCA)
-    {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcPmtCalData not found";
-        return kFATAL;
-    }
-
+    
     // Register output array
-    fRpcHitStripDataCA = new TClonesArray("R3BRpcStripHitData");
-    fRpcHitPmtDataCA = new TClonesArray("R3BRpcPmtHitData");
-    rootManager->Register("R3BRpcStripHitData", "RPC Strip Hit", fRpcHitStripDataCA, !fOnline);
-    rootManager->Register("R3BRpcPmtHitData", "RPC Pmt Hit", fRpcHitPmtDataCA, !fOnline);
+    fRpcHitDataCA = new TClonesArray("R3BRpcHitData");
+    rootManager->Register("R3BRpcHitData", "RPC Strip Hit", fRpcHitDataCA, !fOnline);
 
     //fill the TArray with Tot parameters!!!
     fParCont1 = fHitPar->GetCalParams1();
     fParCont2 = fHitPar->GetCalParams2();
     fParCont3 = fHitPar->GetCalParams3();
     fParCont4 = fHitPar->GetCalParams4();
+ 
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
 
     return kSUCCESS;
 }
@@ -128,9 +125,8 @@ InitStatus R3BRpcCal2Hit::ReInit()
 void R3BRpcCal2Hit::Exec(Option_t* opt)
 {
     Reset();
-
     //loop over strip data
-    Int_t nHits = fRpcCalStripDataCA->GetEntries();
+    Int_t nHits = fRpcCalDataCA->GetEntries();
     UInt_t iDetector = 0;
     double charge_left = -1000;
     double charge_right = -1000;
@@ -138,89 +134,63 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
     double time_right = 0;
     double ichn_right= 0;
     double ichn_left= 0;
-
-    bool valid = false;
+    UInt_t inum;
 
     for (Int_t i = 0; i < nHits; i++)
     {
+        auto map1 = (R3BRpcCalData*)(fRpcCalDataCA->At(i));
+	iDetector = map1->GetDetId() ;
+        inum = iDetector * 41 + map1->GetChannelId() -1;
 
-        auto map1 = (R3BRpcStripCalData*)(fRpcCalStripDataCA->At(i));
+	if( iDetector==0){
+         if(map1->GetTotR_B() >=  charge_right){
+             charge_right=map1->GetTotR_B();
+             time_right=map1->GetTimeR_B();
+             ichn_right = map1->GetChannelId();
+         }
+         if(map1->GetTotL_T() >= charge_left){
 
-        valid =true;
+             charge_left=map1->GetTotL_T();
+             time_left= map1->GetTimeL_T();
+             ichn_left = map1->GetChannelId();
+         } 
+      	 if(ichn_left == ichn_right){
 
-        if(map1->GetTotRight() >=  charge_right){
-            charge_right=map1->GetTotRight();
-            time_right=map1->GetTimeRight();
-            ichn_right = map1->GetChannelId();
-        }
-        if(map1->GetTotLeft() >= charge_left){
-
-            charge_left=map1->GetTotLeft();
-            time_left= map1->GetTimeLeft();
-            ichn_left = map1->GetChannelId();
-        }
-
-
-    }
-
-    if(ichn_left == ichn_right && valid ){
-
-        UInt_t inum = iDetector * 41 + ichn_right -1;
-
-        //double position = (time_left-time_right)/2.;
-
-
-        double position = ((((time_left-time_right)/2. - (fParCont1->GetAt(inum)-400)*40./800.)*800./40.)
-                  /(fParCont2->GetAt(inum) - fParCont1->GetAt(inum)))*1500 - fParCont4->GetAt(inum);
+          double position = ((((time_left-time_right)/2. - (fParCont1->GetAt(inum)-400)*40./800.)*800./40.)
+                  /(fParCont2->GetAt(inum) - fParCont1->GetAt(inum)))*1500;// - fParCont4->GetAt(inum);
     
-        double charge =  (charge_left + charge_right)/2.;
+          double charge =  (charge_left + charge_right)/2.;
 
-        double time = (time_left + time_right)/2. - fParCont3->GetAt(inum);
+          double time = (time_left + time_right)/2. - fParCont3->GetAt(inum);
+	
+	  auto tof = fTimeStitch->GetTime(time - fR3BEventHeader->GetTStart());
+          AddHitStrip(iDetector,ichn_right,time,position,charge,tof);
+        }
 
-        AddHitStrip(ichn_right,time,position,charge);
+	}
+        //loop over Pmt data
+	if( iDetector==1){
+         double position = (map1->GetTimeR_B()-map1->GetTimeL_T())*CSCINT/2. -(fParCont1->GetAt(inum) - 2500);
 
+         double charge =  (map1->GetTotR_B() + map1->GetTotL_T())/2.;
+
+         double time = (map1->GetTimeR_B() + map1->GetTimeL_T())/2.;
+
+         auto tof = fTimeStitch->GetTime(time - fR3BEventHeader->GetTStart());
+
+         AddHitStrip(iDetector,map1->GetChannelId(),time,position,charge,tof);
+
+	}
     }
-
-    //loop over Pmt data
-    nHits = fRpcCalPmtDataCA->GetEntries();
-    iDetector = 1;
-    for (Int_t i = 0; i < nHits; i++)
-    {
-        auto map2 = (R3BRpcPmtCalData*)(fRpcCalPmtDataCA->At(i));
-
-        UInt_t inum = iDetector * 41 + map2->GetChannelId() -1;
-
-        double position = (map2->GetTimeBottom()-map2->GetTimeTop())*CSCINT/2. -(fParCont1->GetAt(inum) - 2500);
-
-        double charge =  (map2->GetTotBottom() + map2->GetTotTop())/2.;
-
-        double time = (map2->GetTimeBottom() + map2->GetTimeTop())/2.;
-
-        AddHitPmt(map2->GetChannelId(),time,position,charge);
-
-    }
-
-
 
 }
 
-R3BRpcStripHitData* R3BRpcCal2Hit::AddHitStrip(UInt_t channel, double time, double pos, double charge)
+R3BRpcHitData* R3BRpcCal2Hit::AddHitStrip(UInt_t detId,UInt_t channel, double time, double pos, double charge, double tof)
 {
 
-    TClonesArray& clref = *fRpcHitStripDataCA;
+    TClonesArray& clref = *fRpcHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BRpcStripHitData(channel, time, pos,charge);
-
-
-}
-
-R3BRpcPmtHitData* R3BRpcCal2Hit::AddHitPmt(UInt_t channel, double time, double pos, double charge)
-{
-
-    TClonesArray& clref = *fRpcHitPmtDataCA;
-    Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BRpcPmtHitData(channel, time, pos,charge);
-
+    return new (clref[size]) R3BRpcHitData(detId,channel, time, pos,charge,tof);
 
 }
 
@@ -230,11 +200,8 @@ void R3BRpcCal2Hit::Finish() {}
 void R3BRpcCal2Hit::Reset()
 {
     LOG(DEBUG) << "Clearing RPCHItStructure Structure";
-    if (fRpcHitStripDataCA){
-        fRpcHitStripDataCA->Clear();
-    }
-    if (fRpcHitPmtDataCA){
-        fRpcHitPmtDataCA->Clear();
+    if (fRpcHitDataCA){
+        fRpcHitDataCA->Clear();
     }
 }
 

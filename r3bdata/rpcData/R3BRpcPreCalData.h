@@ -11,49 +11,52 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCPMTPRECALDATA_H
-#define R3BRPCPMTPRECALDATA_H
+#ifndef R3BRPCPRECALDATA_H
+#define R3BRPCPRECALDATA_H
 
 #include "FairMultiLinkedData.h"
 #include "TObject.h"
 
-class R3BRpcPmtPreCalData : public FairMultiLinkedData
+class R3BRpcPreCalData : public FairMultiLinkedData
 {
   public:
     /** Default constructor **/
-    R3BRpcPmtPreCalData();
+    R3BRpcPreCalData();
 
 
     /** Standard Constructor
+     *@param DetId       Detector unique identifier
      *@param channelId   Channel unique identifier
      *@param Time        Time
      *@param Tot         Coarse Time
      *@param Side        left or right
      **/
-    R3BRpcPmtPreCalData(UShort_t channelId, double Time, double Tot, UShort_t Side);
+    R3BRpcPreCalData(UShort_t DetId, UShort_t channelId, double Time, double Tot, UShort_t Side);
 
     /** Copy constructor **/
-    R3BRpcPmtPreCalData(const R3BRpcPmtPreCalData&);
+    R3BRpcPreCalData(const R3BRpcPreCalData&);
 
-    R3BRpcPmtPreCalData& operator=(const R3BRpcPmtPreCalData&) { return *this; }
+    R3BRpcPreCalData& operator=(const R3BRpcPreCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BRpcPmtPreCalData() {}
+    virtual ~R3BRpcPreCalData() {}
 
     /** Accessors **/
+    inline UShort_t GetDetId() const { return fDetId; }
     inline UShort_t GetChannelId() const { return fChannelId; }
     inline double GetTime() const { return fTime; }
     inline double GetTot() const { return fTot; }
     inline UShort_t GetSide() const { return fSide; }
 
   protected:
+    UShort_t fDetId;     // Channel unique identifier
     UShort_t fChannelId;     // Channel unique identifier
     double fTime;      // Fine time
     double fTot;    // Coarse time
     Short_t fSide;           // Top Or Bottom
 
   public:
-    ClassDef(R3BRpcPmtPreCalData, 1)
+    ClassDef(R3BRpcPreCalData, 1)
 };
 
 #endif

@@ -69,8 +69,7 @@ class R3BRpcPreCal2CalPar : public FairTask
 
     TH1F* fhTot[N_NUM]; 
 
-    TClonesArray* fPreCalStripDataCA; /**< Array with RPC PreCal-input data. >*/
-    TClonesArray* fPreCalPmtDataCA; /**< Array with RPC PreCal-input data. >*/
+    TClonesArray* fPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 
   public:
     ClassDef(R3BRpcPreCal2CalPar, 1);

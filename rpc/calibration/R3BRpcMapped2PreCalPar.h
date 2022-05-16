@@ -67,9 +67,7 @@ class R3BRpcMapped2PreCalPar : public FairTask
 
     R3BTCalPar* fTCalPar;   /**< Parameter container. */
     R3BTCalEngine* fEngine;      /**< Instance of the TCAL engine. */
-    TClonesArray* fMappedStripDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fMappedPmtDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fMappedRefDataCA; /**< Array with RPC Mapped-input data. >*/
+    TClonesArray* fMappedDataCA; /**< Array with RPC Mapped-input data. >*/
 
   public:
     ClassDef(R3BRpcMapped2PreCalPar, 1);

@@ -24,14 +24,11 @@
 
 #include "R3BRpcMapped2PreCalPar.h"
 
-#include "R3BRpcStripMappedData.h"
-#include "R3BRpcPmtMappedData.h"
-#include "R3BRpcRefMappedData.h"
+#include "R3BRpcMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
-#include "R3BRpcStripPreCalData.h"
-#include "R3BRpcPmtPreCalData.h"
+#include "R3BRpcPreCalData.h"
 
 #include <TRandom.h>
 
@@ -86,27 +83,13 @@ class R3BRpcMapped2PreCal : public FairTask
     TString fFpgaCorrelationFile;
     R3BTCalPar* fTCalPar;         /**< Parameter container. >*/
     std::vector<int> lut[46][2];  /**<look up table.>*/
-    TClonesArray* fMappedStripDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fMappedPmtDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fMappedRefDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fRpcStripPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
-    TClonesArray* fRpcPmtPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
+    TClonesArray* fMappedDataCA; /**< Array with RPC Mapped-input data. >*/
+    TClonesArray* fRpcPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
 
-    struct Entry_Ref {
+    struct Entry {
         double time;
-        R3BRpcRefMappedData const *RefMapped;
+        R3BRpcMappedData const *Mapped;
     };
-
-    struct Entry_Strip {
-        double time;
-        R3BRpcStripMappedData const *StripMapped;
-    };
-
-    struct Entry_Pmt {
-        double time;
-        R3BRpcPmtMappedData const *PmtMapped;
-    };
-    
 
   public:
     // Class definition

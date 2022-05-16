@@ -25,11 +25,9 @@
 
 #include "R3BRpcPreCal2CalPar.h"
 
-#include "R3BRpcStripPreCalData.h"
-#include "R3BRpcPmtPreCalData.h"
+#include "R3BRpcPreCalData.h"
 
-#include "R3BRpcStripCalData.h"
-#include "R3BRpcPmtCalData.h"
+#include "R3BRpcCalData.h"
 
 #include <TRandom.h>
 
@@ -74,11 +72,9 @@ class R3BRpcPreCal2Cal : public FairTask
     // Don't store data for online
     Bool_t fOnline;
     
-    TClonesArray* fStripPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
-    TClonesArray* fPmtPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
+    TClonesArray* fPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 
-    TClonesArray* fRpcStripCalDataCA;    /**< Array with Strip Cal- output data. >*/
-    TClonesArray* fRpcPmtCalDataCA;    /**< Array with Pmt Cal- output data. >*/
+    TClonesArray* fRpcCalDataCA;    /**< Array with Strip Cal- output data. >*/
     Int_t event =0;
   public: 
     // Class definition
