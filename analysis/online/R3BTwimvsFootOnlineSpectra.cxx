@@ -40,7 +40,6 @@
 // R3B headers
 #include "R3BEventHeader.h"
 #include "R3BFootHitData.h"
-#include "R3BLogger.h"
 #include "R3BMusliHitData.h"
 #include "R3BTwimHitData.h"
 #include "R3BTwimvsFootOnlineSpectra.h"
@@ -60,6 +59,8 @@ R3BTwimvsFootOnlineSpectra::R3BTwimvsFootOnlineSpectra(const TString& name, Int_
     , fNbFootDet(2)
     , fNEvents(0)
     , fMusli(kFALSE)
+    , fFootDetId1(1)
+    , fFootDetId2(2)
 {
 }
 
@@ -173,15 +174,15 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
         if (fMusli)
         {
             sprintf(Name1, "fh2_Xpos_musli_vs_foot_%d", i + 1);
-            sprintf(Name2, "X-pos Musli vs X-pos Foot Det: %d", i + 1);
+            sprintf(Name2, "X-pos Musli vs Position Foot Det: %d", i + 1);
         }
         else
         {
             sprintf(Name1, "fh2_Xpos_twim_vs_foot_%d", i + 1);
-            sprintf(Name2, "X-pos Twim vs X-pos Foot Det: %d", i + 1);
+            sprintf(Name2, "X-pos Twim vs Position Foot Det: %d", i + 1);
         }
         fh2_hit_x[i] = new TH2F(Name1, Name2, binsE, -60, 60, binsE, -60, 60);
-        fh2_hit_x[i]->GetXaxis()->SetTitle("X-pos Foot [mm]");
+        fh2_hit_x[i]->GetXaxis()->SetTitle("Position Foot [mm]");
         if (fMusli)
         {
             fh2_hit_x[i]->GetYaxis()->SetTitle("X-pos musli [mm]");
@@ -267,11 +268,19 @@ void R3BTwimvsFootOnlineSpectra::Exec(Option_t* option)
             auto hit = (R3BFootHitData*)fHitItemsFoot->At(ihit);
             if (!hit)
                 continue;
-            if ((hit->GetDetId() == 5 || hit->GetDetId() == 6) && mulfootdet[hit->GetDetId() - 5] == 0)
+
+            if ((hit->GetDetId() == fFootDetId1) && mulfootdet[hit->GetDetId() - 1] == 0)
             {
-                efoot[hit->GetDetId() - 5] = hit->GetEnergy();
-                xfoot[hit->GetDetId() - 5] = hit->GetPos();
-                mulfootdet[hit->GetDetId() - 5]++;
+                efoot[hit->GetDetId() - 1] = hit->GetEnergy();
+                xfoot[hit->GetDetId() - 1] = hit->GetPos();
+                mulfootdet[hit->GetDetId() - 1]++;
+            }
+
+            if ((hit->GetDetId() == fFootDetId2) && mulfootdet[hit->GetDetId() - 1] == 0)
+            {
+                efoot[hit->GetDetId() - 1] = hit->GetEnergy();
+                xfoot[hit->GetDetId() - 1] = hit->GetPos();
+                mulfootdet[hit->GetDetId() - 1]++;
             }
         }
         // Fill histograms
