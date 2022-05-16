@@ -59,9 +59,9 @@ R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString
     , fMwpc0HitDataCA(NULL)
     , fMwpc1HitDataCA(NULL)
     , fTwimHitDataCA(NULL)
-    , fDist_acelerator_glad(3718.0)
-    , fPosTarget(2656.)
-    , fWidthTarget(40.)
+    , fDist_acelerator_glad(3855.0)
+    , fPosTarget(2773.0)
+    , fWidthTarget(40.0)
     , fZ_max(40.)
     , fZ_min(0.)
 {
