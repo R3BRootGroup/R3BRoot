@@ -156,11 +156,11 @@ class R3BCalifaOnlineSpectra : public FairTask
      * Method for setting histogram sequence (Febex or Preamp. channels)
      */
     void Febex2Preamp_CALIFA_Histo();
-    
+
     /**
      * Method for setting the trigger
      */
-     void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
   private:
     void SetParameter();
@@ -170,10 +170,11 @@ class R3BCalifaOnlineSpectra : public FairTask
 
     R3BCalifaMappingPar* fMap_Par;    /**< Container with mapping parameters. >*/
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
-    TClonesArray* fCalItemsCalifa;    /**< Array with cal items.       */
-    TClonesArray* fHitItemsCalifa;    /**< Array with hit items.       */
-    TClonesArray* fWRItemsCalifa;     /**< Array with WR-Califa items. */
-    TClonesArray* fWRItemsMaster;     /**< Array with WR-Master items. */
+    TClonesArray* fTrigMappedItemsCalifa;
+    TClonesArray* fCalItemsCalifa; /**< Array with cal items.       */
+    TClonesArray* fHitItemsCalifa; /**< Array with hit items.       */
+    TClonesArray* fWRItemsCalifa;  /**< Array with WR-Califa items. */
+    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
@@ -253,6 +254,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
     TH2F* fh2_Califa_NsNf;
+    TH2F* fh2_Califa_EtrigCor[4];
+    TH1F* fh1_Califa_Etrig[2];
 
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)
