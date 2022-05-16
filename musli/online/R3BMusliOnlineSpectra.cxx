@@ -920,7 +920,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
         cMusliHit_EvsX->cd(j + 1);
         fh2_Muslihit_EvsX[j]->Draw("");
 
-        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name1, "fh2_Musli_Zcharge_%i_vs_X", nb_anodes[j]);
         sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
         fh2_Muslihit_ZvsX[j] = new TH2D(Name1, Name2, 1000, -50, 50, 750, 0, 15);
         fh2_Muslihit_ZvsX[j]->GetXaxis()->SetTitle("X [mm]");
@@ -952,7 +952,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
         cMusliHit_EvsTheta->cd(j + 1);
         fh2_Muslihit_EvsTheta[j]->Draw("");
 
-        sprintf(Name1, "fh2_Musli_Zcharge_%i", nb_anodes[j]);
+        sprintf(Name1, "fh2_Musli_Zcharge_%i_vs_Theta", nb_anodes[j]);
         sprintf(Name2, " Z for data with nb anodes %02d  if mult==1", nb_anodes[j]);
         fh2_Muslihit_ZvsTheta[j] = new TH2D(Name1, Name2, 1000, -0.05, 0.05, 750, 0, 15);
         fh2_Muslihit_ZvsTheta[j]->GetXaxis()->SetTitle("Theta [mrad]");
