@@ -84,7 +84,7 @@ void R3BMusliMapped2CalPar::SetParContainers()
 
     fMwAGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetA + "GeoPar");
     R3BLOG_IF(ERROR,
-              !fMwBGeo_Par,
+              !fMwAGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetA + "GeoPar container.");
 
     fMwBGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetB + "GeoPar");
@@ -147,6 +147,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fh2_XvsDT = new TH2D*[fNumGroupsAnodes];
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)
     {
+        sprintf(Name, "Musli_XvsDT_GroupAnode%02d", i);
         fh2_XvsDT[i] = new TH2D(Name, Name, 1200, 0, 24000, 1300, -20, 110);
     }
 
@@ -187,9 +188,12 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
     {
         mappedData[i] = (R3BMusliMappedData*)(fMusliMappedDataCA->At(i));
         UInt_t signal_id = mappedData[i]->GetSignal() - 1; // signal_id is 0-based [0..17]
-        fEneMap[multMap[signal_id]][signal_id] = mappedData[i]->GetEnergy();
-        fTimeMap[multMap[signal_id]][signal_id] = mappedData[i]->GetEnergy();
-        multMap[signal_id]++;
+        if (multMap[signal_id] < fMaxMult)
+        {
+            fEneMap[multMap[signal_id]][signal_id] = mappedData[i]->GetEnergy();
+            fTimeMap[multMap[signal_id]][signal_id] = mappedData[i]->GetTime();
+            multMap[signal_id]++;
+        }
     }
 
     // Continue only if there is only one TREF signal, otherwise return (->exit Exec())
@@ -222,7 +226,6 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
     // for fSignal = [9..12] 4 groups of 4 anodes (width of 4A = 100 mm)
     // for fSignal = [13,14] 2 groups of 8 anodes (width of 8A = 200 mm)
     // for fSignal = [15]    1 group of 16 anodes (width of 16A = 400 mm = active volume)
-
     Double_t slope = (fXB - fXA) / (fMwBGeo_Par->GetPosZ() - fMwAGeo_Par->GetPosZ());
     Double_t musliZpos[fNumGroupsAnodes]; // position in Z of each group of anodes
     Double_t musliXpos[fNumGroupsAnodes]; // position in X extrapolated from MwA & MwB
@@ -248,12 +251,9 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         }
     }
 
-    if (fMusliMappedDataCA)
-        delete fMusliMappedDataCA;
-    if (fMwAHitDataCA)
-        delete fMwAHitDataCA;
-    if (fMwBHitDataCA)
-        delete fMwBHitDataCA;
+    if (mappedData)
+        delete mappedData;
+
     return;
 }
 

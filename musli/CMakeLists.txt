@@ -23,6 +23,9 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/mwpc
+${R3BROOT_SOURCE_DIR}/mwpc/mwpc0
+${R3BROOT_SOURCE_DIR}/mwpc/mwpc1
 ${R3BROOT_SOURCE_DIR}/musli
 ${R3BROOT_SOURCE_DIR}/musli/online
 ${R3BROOT_SOURCE_DIR}/musli/pars
