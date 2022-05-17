@@ -127,6 +127,8 @@ class R3BMusliOnlineSpectra : public FairTask
 
     TCanvas* cMusliMap_DeltaDT;
 
+    TCanvas* cMusliMap_TchTtrig;
+
     // Canvas at CAL level
     TCanvas* cMusliCal_Mult;
 
@@ -170,6 +172,8 @@ class R3BMusliOnlineSpectra : public FairTask
     TH2F* fh2_Muslimap_Emean8vsE16;
 
     TH1I* fh1_Muslimap_DeltaDT;
+
+    TH1I* fh1_Muslimap_TchTtrig[16];
 
     // Histograms for Cal data
     TH1I* fh1_Muslical_mult;

@@ -514,10 +514,10 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     // --- Mean Energy --- //
 
-    cMusliMap_Emean = new TCanvas("Musli_Emean", "", 10, 10, 800, 700);
+    cMusliMap_Emean = new TCanvas("MusliMap_Emean", "", 10, 10, 800, 700);
     cMusliMap_Emean->Divide(3, 3);
 
-    sprintf(Name1, "fh1_Musli_Emean_from_Emap2");
+    sprintf(Name1, "fh1_MusliMap_Emean_from_Emap2");
     sprintf(Name2, "Mean Energy from Emap2");
     fh1_Muslimap_Emean2 = new TH1F(Name1, Name2, 64000, 0, 64000);
     fh1_Muslimap_Emean2->GetXaxis()->SetTitle("Energy [channels]");
@@ -533,7 +533,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(1);
     fh1_Muslimap_Emean2->Draw("");
 
-    sprintf(Name1, "fh1_Musli_Emean_from_Emap4");
+    sprintf(Name1, "fh1_MusliMap_Emean_from_Emap4");
     sprintf(Name2, "Mean Energy from Emap4");
     fh1_Muslimap_Emean4 = new TH1F(Name1, Name2, 64000, 0, 64000);
     fh1_Muslimap_Emean4->GetXaxis()->SetTitle("Energy [channels]");
@@ -549,7 +549,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(2);
     fh1_Muslimap_Emean4->Draw("");
 
-    sprintf(Name1, "fh1_Musli_Emean_from_Emap8");
+    sprintf(Name1, "fh1_MusliMap_Emean_from_Emap8");
     sprintf(Name2, "Mean Energy from Emap8");
     fh1_Muslimap_Emean8 = new TH1F(Name1, Name2, 64000, 0, 64000);
     fh1_Muslimap_Emean8->GetXaxis()->SetTitle("Energy [channels]");
@@ -565,7 +565,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(3);
     fh1_Muslimap_Emean8->Draw("");
 
-    sprintf(Name1, "fh2_Musli_Emean2_vs_Emean4");
+    sprintf(Name1, "fh2_MusliMap_Emean2_vs_Emean4");
     sprintf(Name2, "Emean2 vs Emean4");
     fh2_Muslimap_Emean2vsEmean4 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean2vsEmean4->GetXaxis()->SetTitle("Energy [channels]");
@@ -581,7 +581,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(4);
     fh2_Muslimap_Emean2vsEmean4->Draw("COL");
 
-    sprintf(Name1, "fh2_Musli_Emean2_vs_Emean8");
+    sprintf(Name1, "fh2_MusliMap_Emean2_vs_Emean8");
     sprintf(Name2, "Emean2 vs Emean8");
     fh2_Muslimap_Emean2vsEmean8 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean2vsEmean8->GetXaxis()->SetTitle("Energy [channels]");
@@ -597,7 +597,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(5);
     fh2_Muslimap_Emean2vsEmean8->Draw("COL");
 
-    sprintf(Name1, "fh2_Musli_Emean2_vs_E16");
+    sprintf(Name1, "fh2_MusliMap_Emean2_vs_E16");
     sprintf(Name2, "Emean2 vs E16");
     fh2_Muslimap_Emean2vsE16 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean2vsE16->GetXaxis()->SetTitle("Energy [channels]");
@@ -613,7 +613,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(6);
     fh2_Muslimap_Emean2vsE16->Draw("COL");
 
-    sprintf(Name1, "fh2_Musli_Emean4_vs_Emean8");
+    sprintf(Name1, "fh2_MusliMap_Emean4_vs_Emean8");
     sprintf(Name2, "Emean4 vs Emean8");
     fh2_Muslimap_Emean4vsEmean8 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean4vsEmean8->GetXaxis()->SetTitle("Energy [channels]");
@@ -629,7 +629,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(7);
     fh2_Muslimap_Emean4vsEmean8->Draw("COL");
 
-    sprintf(Name1, "fh2_Musli_Emean4_vs_E16");
+    sprintf(Name1, "fh2_MusliMap_Emean4_vs_E16");
     sprintf(Name2, "Emean4 vs E16");
     fh2_Muslimap_Emean4vsE16 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean4vsE16->GetXaxis()->SetTitle("Energy [channels]");
@@ -645,7 +645,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_Emean->cd(8);
     fh2_Muslimap_Emean4vsE16->Draw("COL");
 
-    sprintf(Name1, "fh2_Musli_Emean8_vs_E16");
+    sprintf(Name1, "fh2_MusliMap_Emean8_vs_E16");
     sprintf(Name2, "Emean8 vs E16");
     fh2_Muslimap_Emean8vsE16 = new TH2F(Name1, Name2, 1280, 0, 64000, 1280, 0, 64000);
     fh2_Muslimap_Emean8vsE16->GetXaxis()->SetTitle("Energy [channels]");
@@ -663,9 +663,9 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     // --- DeltaDT --- //
 
-    cMusliMap_DeltaDT = new TCanvas("Musli_DeltaDT", "", 10, 10, 800, 700);
+    cMusliMap_DeltaDT = new TCanvas("MusliMap_DeltaDT", "", 10, 10, 800, 700);
 
-    sprintf(Name1, "fh1_Musli_DeltaDT");
+    sprintf(Name1, "fh1_MusliMap_DeltaDT");
     sprintf(Name2, "Delta DTmap2 between first and last pair ");
     fh1_Muslimap_DeltaDT = new TH1I(Name1, Name2, 3000, -1500, 1500);
     fh1_Muslimap_DeltaDT->GetXaxis()->SetTitle("Delta Drift Time [100ps]");
@@ -680,6 +680,95 @@ InitStatus R3BMusliOnlineSpectra::Init()
     fh1_Muslimap_DeltaDT->SetFillColor(31);
     cMusliMap_DeltaDT->cd();
     fh1_Muslimap_DeltaDT->Draw("");
+
+    // --- T[ch] - T[17]=Ttrig --- //
+    cMusliMap_TchTtrig = new TCanvas("MusliMap_TchTtrig", "", 10, 10, 800, 700);
+    cMusliMap_TchTtrig->Divide(4, 24);
+    for (Int_t j = 0; j < 8; j++)
+    {
+        sprintf(Name1, "fh1_MusliMap_Traw_a%d_a%d_Ttrig", 2 * j + 1, 2 * j + 2);
+        sprintf(Name2, "DeltaT with respect to Ttrig, A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
+        fh1_Muslimap_TchTtrig[j] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j]->GetXaxis()->SetTitle("Delta T [100ps]");
+        fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslimap_TchTtrig[j]->GetXaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j]->GetYaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j]->SetFillColor(31);
+        cMusliMap_TchTtrig->cd(j + 1);
+        fh1_Muslimap_TchTtrig[j]->Draw("");
+    }
+    for (Int_t j = 0; j < 4; j++)
+    {
+        sprintf(Name1, "fh1_MusliMap_Traw_a%d_to_a%d_Ttrig", j * 4 + 1, j * 4 + 4);
+        sprintf(Name2, "DeltaT with respect to Ttrig, A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
+        fh1_Muslimap_TchTtrig[j + 8] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j + 8]->GetXaxis()->SetTitle("Delta T [100ps]");
+        fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslimap_TchTtrig[j + 8]->GetXaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j + 8]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 8]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 8]->SetFillColor(31);
+        cMusliMap_TchTtrig->cd(j + 9);
+        fh1_Muslimap_TchTtrig[j + 8]->Draw("");
+    }
+    for (Int_t j = 0; j < 2; j++)
+    {
+        sprintf(Name1, "fh1_MusliMap_Traw_a%d_to_a%d_Ttrig", j * 8 + 1, j * 8 + 8);
+        sprintf(Name2, "DeltaT with respect to Ttrig, A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
+        fh1_Muslimap_TchTtrig[j + 12] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j + 12]->GetXaxis()->SetTitle("Delta T [100ps]");
+        fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetTitle("Counts");
+        fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Muslimap_TchTtrig[j + 12]->GetXaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->CenterTitle(true);
+        fh1_Muslimap_TchTtrig[j + 12]->GetXaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 12]->GetXaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetLabelSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetTitleSize(0.045);
+        fh1_Muslimap_TchTtrig[j + 12]->SetFillColor(31);
+        cMusliMap_TchTtrig->cd(j + 13);
+        fh1_Muslimap_TchTtrig[j + 12]->Draw("");
+    }
+    sprintf(Name1, "fh1_MusliMap_Traw_a1_to_a16_Ttrig");
+    sprintf(Name2, "DeltaT with respect to Ttrig, A01 to A16 if mult==1");
+    fh1_Muslimap_TchTtrig[14] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitle("Delta T [100ps]");
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitle("Counts");
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->SetFillColor(31);
+    cMusliMap_TchTtrig->cd(15);
+    fh1_Muslimap_DT[14]->Draw("");
+
+    sprintf(Name1, "fh1_MusliMap_Tref_Ttrig");
+    sprintf(Name2, "DeltaT = Tref - Ttrig if mult==1");
+    fh1_Muslimap_TchTtrig[14] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitle("Delta T [100ps]");
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitle("Counts");
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[14]->SetFillColor(31);
+    cMusliMap_TchTtrig->cd(15);
+    fh1_Muslimap_DT[14]->Draw("");
 
     // === ======== === //
     // === CAL DATA === //
@@ -1053,6 +1142,8 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     mainfolMusli->Add(cMusliMap_DeltaDT);
 
+    mainfolMusli->Add(cMusliMap_TchTtrig);
+
     mainfolMusli->Add(cMusliCal_Mult);
 
     mainfolMusli->Add(cMusliCal_E2);
@@ -1093,9 +1184,9 @@ void R3BMusliOnlineSpectra::Reset_Histo()
         fh1_Muslimap_E[j]->Reset();
         fh1_Muslimap_DT[j]->Reset();
         fh2_Muslimap_EvsDT[j]->Reset();
-        fh1_Muslical_E[j]->Reset();
-        fh1_Muslical_DT[j]->Reset();
+        fh1_Muslimap_TchTtrig[j]->Reset();
     }
+    fh1_Muslimap_TchTtrig[15]->Reset();
     for (Int_t j = 0; j < 13; j++)
     {
         if (j == 7 || j == 11)
@@ -1154,6 +1245,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         // Local variables for mapped data
         UInt_t mult[18], e[15], t[18];
         UInt_t tref = 0;
+        UInt_t ttrig = 0;
         Int_t dt[15];
         Float_t emean2 = 0;
         Float_t emean4 = 0;
@@ -1191,17 +1283,25 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         if (mult[16] == 1)
             tref = t[16];
 
-        // calculate drift time and fill mapped data histo
+        if (mult[17] == 1)
+            ttrig = t[17];
+
+        // calculate drift time (and DeltaT to check searching window) and fill mapped data histo
         for (UShort_t i = 0; i < 15; i++)
         {
             if (mult[i] == 1)
             {
                 fh1_Muslimap_E[i]->Fill(e[i]);
+                if (ttrig > 0)
+                {
+                    fh1_Muslimap_TchTtrig[i]->Fill(t[i] - ttrig);
+                }
                 if (tref > 0)
                 {
                     dt[i] = t[i] - tref;
                     fh1_Muslimap_DT[i]->Fill(dt[i]);
                     fh2_Muslimap_EvsDT[i]->Fill(dt[i], e[i]);
+                    fh1_Muslimap_TchTtrig[15]->Fill(tref - ttrig);
                 }
             }
             fh2_Muslimap_mult->Fill(i + 1, mult[i]);
@@ -1436,6 +1536,8 @@ void R3BMusliOnlineSpectra::FinishTask()
         cMusliMap_Emean->Write();
 
         cMusliMap_DeltaDT->Write();
+
+        cMusliMap_TchTtrig->Write();
     }
 
     if (fCalItemsMusli)
