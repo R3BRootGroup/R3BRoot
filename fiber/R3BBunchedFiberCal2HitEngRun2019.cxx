@@ -104,7 +104,6 @@ R3BBunchedFiberCal2HitEngRun2019::~R3BBunchedFiberCal2HitEngRun2019()
 
 InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
 {
-	cout << "Test1 **************************" << endl;
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -115,7 +114,6 @@ InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
     // present though and hence may be null. Take care when using.
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     
-    
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
     if (!fCalItems)
@@ -123,8 +121,6 @@ InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
         LOG(ERROR) << "Branch " << name << " not found.";
         //return kERROR;
     }
-
-	cout << "Test2 **************************" << endl;
 
     auto name_mapmt_trig = fName + "TriggerCal";
     fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
@@ -136,9 +132,6 @@ InitStatus R3BBunchedFiberCal2HitEngRun2019::Init()
       (TClonesArray*)mgr->GetObject(name_spmt_trig);
     if (NULL == fSPMTCalTriggerItems)
         LOG(ERROR) << "Branch " << name_spmt_trig << " not found";
-        
-	cout << "Test3 **************************" << endl;
-
 
     maxevent = mgr->CheckMaxEventNo();
 
@@ -476,7 +469,6 @@ void R3BBunchedFiberCal2HitEngRun2019::Exec(Option_t* option)
 
     
     /*size_t*/ cal_num = fCalItems->GetEntriesFast();
-    
    // if(cal_num < 1) return;
    // if(cal_num%2 == 1) return;
 
@@ -586,6 +578,7 @@ void R3BBunchedFiberCal2HitEngRun2019::Exec(Option_t* option)
                     auto lead_trig = mapmt_trig_table.at(lead_trig_i);
                     cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
                     lead_trig_ns = lead_trig->GetTime_ns();
+                    
                 }
             }
             else if (cur_cal->IsSPMT() && fSPMTTriggerMap)

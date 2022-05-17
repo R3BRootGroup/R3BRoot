@@ -167,9 +167,6 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_fi1a_pdc;
     TH2F* fh_fi1b_pdc;
 
-    TH2F* fh_Fi1a_Fiber_vs_Events;
-    TH2F* fh_Fi1b_Fiber_vs_Events;
-
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)
 };

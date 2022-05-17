@@ -526,9 +526,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
         tl = cal->GetTime_ns();
         trig_time[j] = tl;
+        cout << "mapmt trig time " << fName << " j: " << j << " time: " << tl << endl;
     }
 
-    // cout << "mapmt trig read " << fName << " " << mapmt_trig_num << endl;
+    //cout << "mapmt trig read " << fName << " " << mapmt_trig_num << endl;
 
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.
@@ -659,8 +660,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             // auto lead_ns = cur_cal->GetTime_ns();
             // auto tot_ns = lead->GetTime_ns();//cur_cal_ns;
             // if(tot_ns < 0.) tot_ns = 0./0.;
-            // cout << fName << " side: " << side_i << " lead_raw " << lead_raw << " trig time: "
-            //	 << lead_trig_ns << " time " << lead_ns << endl;
+            cout << fName << " side: " << side_i << " trigger time " << cur_cal_trig_ns  << " trig time: "
+            	 << lead_trig_ns << " time " << lead_ns << endl;
 
             if (side_i == 0)
                 summmpt += 1;
