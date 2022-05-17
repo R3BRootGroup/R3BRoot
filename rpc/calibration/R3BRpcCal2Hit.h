@@ -20,6 +20,7 @@
 #include "Rtypes.h"
 
 #define CSCINT (140.)
+#define CSTRIP (165.7)
 
 #include <TVector3.h>
 

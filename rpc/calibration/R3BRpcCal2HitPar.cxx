@@ -161,7 +161,7 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
               fhPos[inum] = new TH1F(strName, "", 750,0.,1500.);
           }
           else{
-              fhPos[inum] = new TH1F(strName, "", 800,-20.,20.);
+              fhPos[inum] = new TH1F(strName, "", 400,-2000.,2000.);
           }
 
       }
@@ -175,10 +175,7 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
       if(ichn_left == ichn_right){
         
         if(!fRpcCalib){
-            fhPos[inum]->Fill(((((time_left-time_right)/2. -\
-			 (fHitPar->GetCalParams1()->GetAt(inum)-400)*40./800.)*800./40.)\
-		        /(fHitPar->GetCalParams2()->GetAt(inum) -\
-			 fHitPar->GetCalParams1()->GetAt(inum)))*1500);
+            fhPos[inum]->Fill((time_left-time_right)/2. - 10*(fHitPar->GetCalParams1()->GetAt(inum)-200));
         }
         else{
             fhPos[inum]->Fill((time_left - time_right)/2.);
@@ -222,7 +219,7 @@ void R3BRpcCal2HitPar::CalculateParsStrip(){
 
     for (int t = 0; t < N_STRIP_NB; t++){
 
-        if (NULL == fhPos[t]){continue;}
+        if (NULL == fhPos[t] && t>=41){continue;}
 
         fHitPar->SetCalParams4(0,t);
 
@@ -233,7 +230,8 @@ void R3BRpcCal2HitPar::CalculateParsStrip(){
         fhPos[t]->GetBinContent(bin_max + 1) )/120.;
 
         for(int i = 1; i <= bin_max; i++){
-            if (fhPos[t]->GetBinContent(i) >= threshold){
+            float mean = (fhPos[t]->GetBinContent(i-1) + fhPos[t]->GetBinContent(i) + fhPos[t]->GetBinContent(i+1))/3.;
+            if (fhPos[t]->GetBinContent(i) >= threshold && mean >= threshold){
                 fHitPar->SetCalParams1(i,t);
                 break;
             }                
