@@ -117,6 +117,10 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
     UInt_t nHits = 0, iDet = 0, iCh = 0;
     Int_t multTcal[2][3];
     Double_t iRawTimeNs[2][3][64];
+    Double_t PosCal = -1000.;
+    Double_t Tmean = -1;        // 0.5*(TrawLEFT + TrawRIGHT)
+    Double_t Tmean_w_Tref = -1; // 0.5*(TrawLEFT + TrawRIGHT) - Tref
+
     for (UShort_t d = 0; d < 2; d++)
         for (UShort_t pmt = 0; pmt < 3; pmt++)
         {
@@ -143,12 +147,21 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
         } // --- end of loop over Tcal data --- //
 
         for (UShort_t d = 0; d < 2; d++)
-            if (multTcal[d][0] > 0 && multTcal[d][1] > 0) // just for mult=1
-                AddHitData(d + 1,
-                           fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0]),
-                           0.5 * (iRawTimeNs[d][0][0] + iRawTimeNs[d][1][0]));
-    }
-
+        {
+            // Actually we just consider data with mult == 1,
+            // otherwise, we should select the proper hit on each
+            // side looking at the ToF from S2 to cave C.
+            // This would require to read the LOS data
+            if (multTcal[d][0] == 1 && multTcal[d][1] == 1)
+            {
+                PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0]);
+                Tmean = 0.5 * (iRawTimeNs[d][0][0] + iRawTimeNs[d][1][0]);
+                if (multTcal[d][2] == 1)
+                    Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
+                AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+            } // end of mult == 1 for left and right
+        }     // end of loop over the number of detectors
+    }         // end of if Tcal data
     return;
 }
 
@@ -161,12 +174,12 @@ void R3BSci2Tcal2Hit::FinishEvent()
 }
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BSci2HitData* R3BSci2Tcal2Hit::AddHitData(Int_t sci, Double_t x, Double_t tof)
+R3BSci2HitData* R3BSci2Tcal2Hit::AddHitData(Int_t sci, Double_t x, Double_t tmean, Double_t tmean_w_tref)
 {
     // It fills the R3BSofSciHitData
     TClonesArray& clref = *fHitItems;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BSci2HitData(sci, x, tof);
+    return new (clref[size]) R3BSci2HitData(sci, x, tmean, tmean_w_tref);
 }
 
 ClassImp(R3BSci2Tcal2Hit);

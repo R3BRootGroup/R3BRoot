@@ -25,7 +25,7 @@ class R3BSci2HitData : public TObject
     R3BSci2HitData();
 
     // Standard Constructor
-    R3BSci2HitData(Int_t detid, Double_t xpos, Double_t time);
+    R3BSci2HitData(Int_t detid, Double_t xpos, Double_t time, Double_t time_w_tref);
 
     // Destructor
     virtual ~R3BSci2HitData() {}
@@ -34,10 +34,11 @@ class R3BSci2HitData : public TObject
     inline const Int_t& GetSciId() const { return fSciId; }
     inline const Double_t& GetX() const { return fX; }
     inline const Double_t& GetTime() const { return fTime; }
+    inline const Double_t& GetTimeWithTref() const { return fTimeWithTref; }
 
   protected:
     Int_t fSciId;
-    Double_t fX, fTime;
+    Double_t fX, fTime, fTimeWithTref;
 
   public:
     ClassDef(R3BSci2HitData, 1)
