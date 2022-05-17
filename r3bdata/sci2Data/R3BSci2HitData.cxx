@@ -19,13 +19,15 @@ R3BSci2HitData::R3BSci2HitData()
     : fSciId(0)
     , fX(0.)
     , fTime(0.)
+    , fTimeWithTref(0.)
 {
 }
 
-R3BSci2HitData::R3BSci2HitData(Int_t sci, Double_t x, Double_t time)
+R3BSci2HitData::R3BSci2HitData(Int_t sci, Double_t x, Double_t time, Double_t time_w_tref)
     : fSciId(sci)
     , fX(x)
     , fTime(time)
+    , fTimeWithTref(time_w_tref)
 
 {
 }
