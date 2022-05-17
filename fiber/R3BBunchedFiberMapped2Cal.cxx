@@ -136,8 +136,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
-        //      cout<<"Mapped2Cal:  iHit: "<< i<<"; Side: "<<mapped->GetSide()<<", iChan: "<<mapped->GetChannel()<<",
-        //      isLead: "<<mapped->IsLeading()<<", time:"<<mapped->GetFine()<<"; "<<mapped->GetCoarse()<<endl;
+        //  cout<<"Mapped2Cal:  iHit: "<<fName<<", "<< i<<"; Side: "<<mapped->GetSide()<<", iChan:
+        //  "<<mapped->GetChannel()<<
+        //      ",isLead: "<<mapped->IsLeading()<<", time:"<<mapped->GetFine()<<"; "<<mapped->GetCoarse()<<endl;
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;

@@ -261,6 +261,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH1F* fh_multi;
     TH2F* fh_lowMtot;
     TH2F* fh_Mtot_vs_NEvents;
+    TH2F* fh_fibId_vs_NEvents;
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

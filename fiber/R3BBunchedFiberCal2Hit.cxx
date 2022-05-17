@@ -104,6 +104,7 @@ R3BBunchedFiberCal2Hit::~R3BBunchedFiberCal2Hit()
 
 InitStatus R3BBunchedFiberCal2Hit::Init()
 {
+
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -438,17 +439,23 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fh_dttrig_all->GetXaxis()->SetTitle("Fiber number");
     fh_dttrig_all->GetYaxis()->SetTitle("dt trigger/ ns");
 
-    chistName = fName + "_lowMtot";
-    chistTitle = fName + " lowMtot";
-    fh_lowMtot = new TH2F(chistName.Data(), chistTitle.Data(), 20, 0, 20, NChaMax, 0, NChaMax);
-    fh_lowMtot->GetXaxis()->SetTitle("Nhit MA");
-    fh_lowMtot->GetYaxis()->SetTitle("MAPMT channel");
+    chistName = fName + "_Eloss_vs_tof";
+    chistTitle = fName + " Eloss vs ToF";
+    fh_lowMtot = new TH2F(chistName.Data(), chistTitle.Data(), 500, 0., 100., 2000, -1000., 1000.);
+    fh_lowMtot->GetXaxis()->SetTitle("Eloss /ns");
+    fh_lowMtot->GetYaxis()->SetTitle("ToF / ns");
 
     chistName = fName + "_Mtot_vs_NEvents";
     chistTitle = fName + " Mtot vs NEvents";
     fh_Mtot_vs_NEvents = new TH2F(chistName.Data(), chistTitle.Data(), 100000, 0, Nmax, 500, 0., 100.);
     fh_Mtot_vs_NEvents->GetXaxis()->SetTitle("Event number");
-    fh_Mtot_vs_NEvents->GetYaxis()->SetTitle("tot MA row / ns");
+    fh_Mtot_vs_NEvents->GetYaxis()->SetTitle("Eloss / ns");
+
+    chistName = fName + "_fibId_vs_NEvents";
+    chistTitle = fName + " fibId vs NEvents";
+    fh_fibId_vs_NEvents = new TH2F(chistName.Data(), chistTitle.Data(), 100000, 0, Nmax, 1024, 0., 1024.);
+    fh_fibId_vs_NEvents->GetXaxis()->SetTitle("Event number");
+    fh_fibId_vs_NEvents->GetYaxis()->SetTitle("fiber ID");
 
     return kSUCCESS;
 }
@@ -459,6 +466,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
+
     fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
     if (!fCalPar)
     {
@@ -469,12 +477,16 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
 
-    //  cout<<"in exec "<<fName<<endl;
+    //   cout<<"in exec "<<fName<<endl;
     //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
 
     if (fnEvents / 100000. == (int)fnEvents / 100000)
+    {
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
                   << " %) " << std::flush;
+        cout << " " << endl;
+    }
+
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         // Clear local helper containers.
@@ -493,19 +505,24 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     //  cout<<"multihit"<<endl;
 
     /*size_t*/ cal_num = fCalItems->GetEntriesFast();
-    // cout << "calnum: " << cal_num << endl;
+    //  cout << "calnum: " << cal_num << endl;
 
     // if(cal_num < 1) return;
     // if(cal_num%2 == 1) return;
 
     size_t mapmt_trig_num = fMAPMTCalTriggerItems->GetEntries();
+    // cout<<"mapmt_trig_num = "<<mapmt_trig_num<<endl;
+
     double trig_time[8];
     Double_t tl, tt; // lead and trile times of the trigger
 
     std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0] / 128);
+    // cout<<"mapmt_trig_table size: "<<fName<<", "<<fSubNum * fChPerSub[0] / 128<<endl;
+
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
         auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
+        // cout<<"Trigger Map: "<<fName<<", "<<j<<"; "<<cal->GetChannel()<<endl;
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
         tl = cal->GetTime_ns();
         trig_time[j] = tl;
@@ -561,7 +578,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         }
     }
 
-    //   cout<<"channel side read "<<fName<<endl;
+    // cout<<"channel side read "<<fName<<endl;
 
     if (n_lead != n_trail)
     {
@@ -577,9 +594,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     {
         auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
 
-        // cout<<"Cal2Hit *** "<<fName<<", Nev="<<fnEvents<<", iHit="<<j<<
+        //   cout<<"Cal2Hit *** "<<fName<<", Nev="<<fnEvents<<", iHit="<<j<<
         // ", iCha="<<cur_cal->GetChannel() <<", isLead="<<cur_cal->IsLeading()<<
-        // ", time="<<cur_cal->GetTime_ns()<<endl;
+        //", time="<<cur_cal->GetTime_ns()<<endl;
 
         if (cur_cal->IsTrailing())
         {
@@ -612,6 +629,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     auto lead_trig = mapmt_trig_table.at(lead_trig_i);
                     cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
                     lead_trig_ns = lead_trig->GetTime_ns();
+
+                    //  cout<<"Detector: "<<fName<<", trig times: "<<lead_trig_ns<<", "<<cur_cal_trig_ns<<", times: "<<
+                    //       lead->GetTime_ns()<<", "<<cur_cal->GetTime_ns()<<endl;
                 }
             }
             else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 0) // Don't use this for s454
@@ -756,11 +776,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             etemp[isumNhitMA][mch] = mapmt_tot.tot_ns;
 
             isumNhitMA += 1;
-
-            if (mapmt_tot.tot_ns < 2.)
-                fh_lowMtot->Fill(isumNhitMA, mch + 1);
-
-            fh_Mtot_vs_NEvents->Fill(fnEvents, mapmt_tot.tot_ns);
 
             // if(isumNhitMA > 1) continue;    // only first hit in each event
 
@@ -1061,6 +1076,13 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         // tot_spmt_max = tot_spmt;
                         // tot_spmt_max_fiber_id = fiber_id;
                     }
+
+                    //  if(fName=="Fi1a" || (fName=="Fi1b" && fiber_id > 115 && fiber_id < 135))
+                    {
+                        fh_Mtot_vs_NEvents->Fill(fnEvents, eloss);
+                        fh_fibId_vs_NEvents->Fill(fnEvents, fiber_id);
+                        fh_lowMtot->Fill(eloss, tof);
+                    }
                     fh_x_vs_y->Fill(x, y);
                     // fh_ecorell->Fill(sqrt(tot_spmt), sqrt(tot_mapmt));
                     fh_ToT_ifib->Fill(fiber_id, eloss);
@@ -1189,7 +1211,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
     fh_multi->Write();
     fh_lowMtot->Write();
     fh_Mtot_vs_NEvents->Write();
-
+    fh_fibId_vs_NEvents->Write();
     for (Int_t i = 0; i < 4; i++)
     {
         fh_ToT_s_Fib[i]->Write();
@@ -1322,6 +1344,9 @@ void R3BBunchedFiberCal2Hit::MAPMTTriggerMapSet(unsigned const* a_map, size_t a_
         LOG(fatal) << "MAPMT trigger map length=" << c_length << " not compatible with sub#=" << fSubNum
                    << " mapmt_per_sub=" << fChPerSub[0] << "!";
     }
+    cout << "Set trigger map: "
+         << "MAPMT trigger map length=" << c_length << ", sub#=" << fSubNum << " mapmt_per_sub=" << fChPerSub[0]
+         << endl;
     fMAPMTTriggerMap = a_map;
 }
 
