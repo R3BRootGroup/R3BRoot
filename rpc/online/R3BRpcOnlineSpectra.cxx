@@ -329,7 +329,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,-350,400,-100,350);
 
      /* ------------- HIT Histograms ------------ */
-     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",300,0,1500,41,0.5,41.5);
+     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",340,0,1700,41,0.5,41.5);
      totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-5,70);
      meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
 
