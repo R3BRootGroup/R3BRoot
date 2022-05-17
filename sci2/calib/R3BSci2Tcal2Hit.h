@@ -108,7 +108,7 @@ class R3BSci2Tcal2Hit : public FairTask
     Int_t Icount = 0;
 
     /** Private method AddHitData **/
-    R3BSci2HitData* AddHitData(Int_t sci, Double_t x, Double_t tof);
+    R3BSci2HitData* AddHitData(Int_t sci, Double_t x, Double_t Tmean, Double_t Tmean_w_Tref);
 
   public:
     ClassDef(R3BSci2Tcal2Hit, 1)

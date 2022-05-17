@@ -54,6 +54,7 @@ R3BIncomingBeta::R3BIncomingBeta(const char* name, Int_t iVerbose)
     , fTimeStitch(nullptr)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
+    , fUseTref(kFALSE)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);
@@ -149,10 +150,12 @@ void R3BIncomingBeta::Exec(Option_t* option)
     Double_t timeLosV[fNumDet];
     Double_t posLosX_cm[fNumDet];
     Double_t TimeSci2_m1[fNumDet];
+    Double_t TimeSci2wTref_m1[fNumDet];
     Double_t PosSci2_m1[fNumDet];
     UInt_t nHits = 0;
     Double_t ToFraw_m1 = 0.;
-    Double_t Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0.;
+    Double_t ToFrawwTref_m1 = 0.;
+    Double_t Velo_m1 = 0., VelowTref_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0.;
 
     Int_t multSci2[fNumDet];
     Int_t multLos[fNumDet];
@@ -163,6 +166,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
         multLos[i] = 0;
         PosSci2_m1[i] = 0.;
         TimeSci2_m1[i] = 0.;
+        TimeSci2wTref_m1[i] = 0.;
         posLosX_cm[i] = 0.;
         timeLosV[i] = 0.;
     }
@@ -181,6 +185,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
             {
                 PosSci2_m1[numDet - 1] = hittcal->GetX();
                 TimeSci2_m1[numDet - 1] = hittcal->GetTime();
+                TimeSci2wTref_m1[numDet - 1] = hittcal->GetTimeWithTref();
                 multSci2[numDet - 1]++;
             }
         } // --- end of loop over hit data --- //
@@ -212,10 +217,17 @@ void R3BIncomingBeta::Exec(Option_t* option)
         if (multLos[i] >= 1 && multSci2[i] >= 1)
         {
             ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i] - TimeSci2_m1[i], "vftx", "vftx");
+            ToFrawwTref_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i], "vftx", "vftx");
 
             Velo_m1 =
                 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
-            Beta_m1 = Velo_m1 / 0.299792458;
+            VelowTref_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
+                                 fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFrawwTref_m1)); // [m/ns]
+
+            if (fUseTref)
+                Beta_m1 = VelowTref_m1 / 0.299792458;
+            else
+                Beta_m1 = Velo_m1 / 0.299792458;
 
             if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
             {

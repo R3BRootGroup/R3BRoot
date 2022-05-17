@@ -27,7 +27,7 @@ R3BSci2HitData::R3BSci2HitData(Int_t sci, Double_t x, Double_t time, Double_t ti
     : fSciId(sci)
     , fX(x)
     , fTime(time)
-    , fTimeWithTref(time)
+    , fTimeWithTref(time_w_tref)
 
 {
 }

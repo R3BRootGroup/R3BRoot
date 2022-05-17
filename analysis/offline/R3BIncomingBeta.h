@@ -98,6 +98,7 @@ class R3BIncomingBeta : public FairTask
 
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
+    void SetUseTref() { fUseTref = kTRUE; }
 
   private:
     void SetParameter();
@@ -120,6 +121,7 @@ class R3BIncomingBeta : public FairTask
     TArrayF *fPosS2Left, *fPosS2Right;
     TArrayF *fTof2InvV_p0, *fTof2InvV_p1;
     Float_t fBeta_max, fBeta_min;
+    Bool_t fUseTref;
 
     /** Private method FrsData **/
     //** Adds a FrsData to the analysis
