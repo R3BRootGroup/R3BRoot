@@ -229,9 +229,12 @@ void R3BIncomingBeta::Exec(Option_t* option)
             else
                 Beta_m1 = Velo_m1 / 0.299792458;
 
+            if (fUseTref)
+                ToFraw_m1 = ToFrawwTref_m1;
+
             if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
             {
-                AddData(1, 2, 0., 0., Beta_m1, 0., PosSci2_m1[i], posLosX_cm[i]);
+                AddData(1, 2, 0., 0., Beta_m1, 0., PosSci2_m1[i], posLosX_cm[i], ToFraw_m1);
             }
         }
     }
@@ -260,12 +263,13 @@ R3BFrsData* R3BIncomingBeta::AddData(Int_t StaId,
                                      Double_t beta,
                                      Double_t brho,
                                      Double_t xs2,
-                                     Double_t xc)
+                                     Double_t xc,
+                                     Double_t tof)
 {
     // It fills the R3BFrsData
     TClonesArray& clref = *fFrsDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc);
+    return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc, tof);
 }
 
 ClassImp(R3BIncomingBeta);

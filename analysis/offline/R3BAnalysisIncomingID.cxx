@@ -187,8 +187,10 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             auto hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
             if (!hit)
                 continue;
-            Zmusic = hit->GetZcharge();
-            Music_ang = hit->GetTheta() * 1000.; // mrad
+            if (hit->GetType() == 2)
+                Zmusic = hit->GetZcharge(); // for data with mean signals from 4 anodes
+            if (hit->GetType() == 1)
+                Music_ang = hit->GetTheta() * 1000.; // mrad, for data with mean signals from 2 anodes
         }
     }
 
@@ -208,7 +210,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
     }
 
     // --- read hit from LOS data --- //
-    if (fHitLos && fHitLos->GetEntriesFast())
+    if (fHitLos && fHitLos->GetEntriesFast() > 0)
     {
         Int_t numDet = 1;
         nHits = fHitLos->GetEntriesFast();

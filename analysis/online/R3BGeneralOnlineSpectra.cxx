@@ -209,8 +209,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     char Name2[255];
     char Name3[255];
 
-    // Triggers
-    // cTrigger = new TCanvas("Triggers", "Trigger information", 10, 10, 800, 700);
+    // Tpats
+    cTpat = new TCanvas("TPats", "Tpat information", 10, 10, 800, 700);
     fh1_tpat = new TH1F("fh1_tpat", "TPat information", 17, -0.5, 16.5);
     fh1_tpat->GetXaxis()->SetTitle("Trigger number (TPat)");
     fh1_tpat->GetYaxis()->SetTitle("Counts");
@@ -225,6 +225,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     fh1_tpat->SetFillColor(kBlue + 2);
     fh1_tpat->Draw("");
 
+    // Triggers
+    cTrigger = new TCanvas("Triggers", "Trigger information", 10, 10, 800, 700);
     fh1_trigger = new TH1F("fh1_trigger", "Trigger information", 17, -0.5, 16.5);
     fh1_trigger->GetXaxis()->SetTitle("Trigger number");
     fh1_trigger->GetYaxis()->SetTitle("Counts");
@@ -340,8 +342,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 
     // MAIN FOLDER-R3B
     TFolder* mainfol = new TFolder("R3B_General", "R3B WhiteRabbit and trigger info");
-    mainfol->Add(fh1_trigger);
-    mainfol->Add(fh1_tpat);
+    mainfol->Add(cTrigger);
+    mainfol->Add(cTpat);
     if (fWRItemsMaster && fWRItemsSofia)
         mainfol->Add(cWr);
     if (fWRItemsSofia && fWRItemsCalifa)
@@ -562,9 +564,9 @@ void R3BGeneralOnlineSpectra::FinishEvent()
 
 void R3BGeneralOnlineSpectra::FinishTask()
 {
-    // Write trigger canvas in the root file
-    fh1_trigger->Write();
-    fh1_tpat->Write();
+    // Write canvas in the root file
+    cTrigger->Write();
+    cTpat->Write();
     if (fWRItemsMaster && fWRItemsSofia)
     {
         cWr->Write();

@@ -20,7 +20,7 @@ R3BRpcHitData::R3BRpcHitData()
     , fTime(0)
     , fPos(0)
     , fCharge(0)
-    , fTof(0)	
+    , fTof(0)
 {
 }
 
@@ -34,6 +34,5 @@ R3BRpcHitData::R3BRpcHitData(UInt_t detId, UInt_t channel, double time, double p
     , fTof(tof)
 {
 }
-
 
 ClassImp(R3BRpcHitData);

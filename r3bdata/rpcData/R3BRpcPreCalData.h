@@ -23,7 +23,6 @@ class R3BRpcPreCalData : public FairMultiLinkedData
     /** Default constructor **/
     R3BRpcPreCalData();
 
-
     /** Standard Constructor
      *@param DetId       Detector unique identifier
      *@param channelId   Channel unique identifier
@@ -50,10 +49,10 @@ class R3BRpcPreCalData : public FairMultiLinkedData
 
   protected:
     UShort_t fDetId;     // Channel unique identifier
-    UShort_t fChannelId;     // Channel unique identifier
-    double fTime;      // Fine time
-    double fTot;    // Coarse time
-    Short_t fSide;           // Top Or Bottom
+    UShort_t fChannelId; // Channel unique identifier
+    double fTime;        // Fine time
+    double fTot;         // Coarse time
+    Short_t fSide;       // Top Or Bottom
 
   public:
     ClassDef(R3BRpcPreCalData, 1)

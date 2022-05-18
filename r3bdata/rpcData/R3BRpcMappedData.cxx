@@ -14,7 +14,7 @@
 #include "R3BRpcMappedData.h"
 
 R3BRpcMappedData::R3BRpcMappedData()
-    : fDetId(0) 
+    : fDetId(0)
     , fChannelId(0)
     , fFineTime(0)
     , fCoarseTime(0)
@@ -23,13 +23,18 @@ R3BRpcMappedData::R3BRpcMappedData()
 {
 }
 
-R3BRpcMappedData::R3BRpcMappedData(UShort_t DetId, UShort_t ChannelId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t Side)
-   : fDetId(DetId)
-   , fChannelId(ChannelId)
-   , fFineTime(FineTime)
-   , fCoarseTime(CoarseTime)
-   , fEdge(Edge)
-   , fSide(Side)
+R3BRpcMappedData::R3BRpcMappedData(UShort_t DetId,
+                                   UShort_t ChannelId,
+                                   uint64_t FineTime,
+                                   uint64_t CoarseTime,
+                                   UShort_t Edge,
+                                   UShort_t Side)
+    : fDetId(DetId)
+    , fChannelId(ChannelId)
+    , fFineTime(FineTime)
+    , fCoarseTime(CoarseTime)
+    , fEdge(Edge)
+    , fSide(Side)
 {
 }
 

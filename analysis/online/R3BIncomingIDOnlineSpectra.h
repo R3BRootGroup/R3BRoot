@@ -88,21 +88,33 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     virtual void Reset_Histo();
 
     // Setting parameters
-    void SetStartPlaId(Int_t id){fStaId = id;};
-    void SetRangeZ(Double_t min, Double_t max){fMin_Z = min; fMax_Z = max;};
-    void SetRangeAq(Double_t min, Double_t max){fMin_Aq = min; fMax_Aq = max;};
-    void SetIsoGate(Double_t minz, Double_t maxz, Double_t minaq, Double_t maxaq){
-      fMin_Z_gate = minz; fMax_Z_gate = maxz; fMin_Aq_gate = minaq; fMax_Aq_gate = maxaq;
+    void SetStartPlaId(Int_t id) { fStaId = id; };
+    void SetRangeZ(Double_t min, Double_t max)
+    {
+        fMin_Z = min;
+        fMax_Z = max;
+    };
+    void SetRangeAq(Double_t min, Double_t max)
+    {
+        fMin_Aq = min;
+        fMax_Aq = max;
+    };
+    void SetIsoGate(Double_t minz, Double_t maxz, Double_t minaq, Double_t maxaq)
+    {
+        fMin_Z_gate = minz;
+        fMax_Z_gate = maxz;
+        fMin_Aq_gate = minaq;
+        fMax_Aq_gate = maxaq;
     }
 
- private:
+  private:
     TClonesArray* fHitFrs; /**< Array with hit items. */
     TClonesArray* fMwpc0HitDataCA;
     TClonesArray* fMwpc1HitDataCA;
 
     // Start Plastic ID
     Int_t fStaId;
-    
+
     // Ranges for the histograms;
     Double_t fMin_Z, fMax_Z, fMin_Aq, fMax_Aq;
     Double_t fMin_Z_gate, fMax_Z_gate, fMin_Aq_gate, fMax_Aq_gate;
@@ -117,6 +129,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
 
     // Canvas
     TCanvas* cBeta;
+    TCanvas* cTof;
     TCanvas* cBrho;
     TCanvas* cAqvsq;
     TCanvas* cXs2vsBeta;
@@ -125,6 +138,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
 
     // Histograms for Hit data
     TH1F* fh1_beta;
+    TH1F* fh1_tof;
     TH1F* fh1_brho;
     TH2F* fh2_Aqvsq;
     TH2F* fh2_Xs2vsbeta;
@@ -133,6 +147,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     TH2F* fh2_IsoGated_Z_xc;
     TH2F* fh2_IsoGated_xs2_xc;
     TH2F* fh2_IsoGated_xc_anglec;
+
   public:
     ClassDef(R3BIncomingIDOnlineSpectra, 1)
 };

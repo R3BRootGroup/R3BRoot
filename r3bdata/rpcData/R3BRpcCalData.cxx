@@ -24,7 +24,12 @@ R3BRpcCalData::R3BRpcCalData()
 {
 }
 
-R3BRpcCalData::R3BRpcCalData(UShort_t detId,UShort_t channelId, double TimeR_B, double TimeL_T, double TotR_B, double TotL_T)
+R3BRpcCalData::R3BRpcCalData(UShort_t detId,
+                             UShort_t channelId,
+                             double TimeR_B,
+                             double TimeL_T,
+                             double TotR_B,
+                             double TotL_T)
     : FairMultiLinkedData()
     , fDetId(detId)
     , fChannelId(channelId)

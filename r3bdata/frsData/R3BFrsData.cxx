@@ -24,6 +24,7 @@ R3BFrsData::R3BFrsData()
     , fZ(0.)
     , fAq(0.)
     , fBeta(0.)
+    , fTof(0.)
     , fBrho(0.)
     , fxs2(0.)
     , fxc(0.)
@@ -37,12 +38,14 @@ R3BFrsData::R3BFrsData(Int_t StaId,
                        Double_t beta,
                        Double_t brho,
                        Double_t xs2,
-                       Double_t xc)
+                       Double_t xc,
+                       Double_t tof)
     : fStaId(StaId)
     , fStoId(StoId)
     , fZ(z)
     , fAq(aq)
     , fBeta(beta)
+    , fTof(tof)
     , fBrho(brho)
     , fxs2(xs2)
     , fxc(xc)
