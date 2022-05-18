@@ -23,20 +23,13 @@ class R3BRpcCalData : public FairMultiLinkedData
     /** Default constructor **/
     R3BRpcCalData();
 
-
     /** Standard Constructor
      *@param DetId       Detector identifier
      *@param channelId   Channel unique identifier
-     *@param Time        Time (R/L,B/T) 
+     *@param Time        Time (R/L,B/T)
      *@param Tot         Time over threshold (R/L,B/T)
      **/
-    R3BRpcCalData(
-		       UShort_t DetId,
-		       UShort_t channelId,
-		       double TimeR_B,
-		       double TimeL_T,
-		       double TotR_B,
-                       double TotL_T);
+    R3BRpcCalData(UShort_t DetId, UShort_t channelId, double TimeR_B, double TimeL_T, double TotR_B, double TotL_T);
 
     /** Copy constructor **/
     R3BRpcCalData(const R3BRpcCalData&);
@@ -55,12 +48,12 @@ class R3BRpcCalData : public FairMultiLinkedData
     inline double GetTotR_B() const { return fTotR_B; }
 
   protected:
-    UShort_t fDetId;      // Detector identifier
-    UShort_t fChannelId;  // Channel unique identifier
-    double fTimeR_B;      // Time from Right strip or Bottom Pmt channel
-    double fTimeL_T;      // Time from Left or Top Pmt channel
-    double fTotR_B;       // Tot from the Right or Bottom Pmt channel
-    double fTotL_T;       // Tot from the Left or Top Pmt channel
+    UShort_t fDetId;     // Detector identifier
+    UShort_t fChannelId; // Channel unique identifier
+    double fTimeR_B;     // Time from Right strip or Bottom Pmt channel
+    double fTimeL_T;     // Time from Left or Top Pmt channel
+    double fTotR_B;      // Tot from the Right or Bottom Pmt channel
+    double fTotL_T;      // Tot from the Left or Top Pmt channel
 
   public:
     ClassDef(R3BRpcCalData, 1)

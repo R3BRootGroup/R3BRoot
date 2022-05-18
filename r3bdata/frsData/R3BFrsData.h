@@ -44,7 +44,8 @@ class R3BFrsData : public TObject
                Double_t beta,
                Double_t brho,
                Double_t xs2 = 0.,
-               Double_t xc = 0.);
+               Double_t xc = 0.,
+               Double_t tof = 0.);
 
     // Destructor
     virtual ~R3BFrsData() {}
@@ -55,6 +56,7 @@ class R3BFrsData : public TObject
     inline const Double_t GetZ() const { return fZ; }
     inline const Double_t GetAq() const { return fAq; }
     inline const Double_t GetBeta() const { return fBeta; }
+    inline const Double_t GetTof() const { return fTof; }
     inline const Double_t GetBrho() const { return fBrho; }
     inline const Double_t GetXS2() const { return fxs2; }
     inline const Double_t GetXCave() const { return fxc; }
@@ -71,7 +73,7 @@ class R3BFrsData : public TObject
   protected:
     Int_t fStaId, fStoId;
     Double_t fZ, fAq;
-    Double_t fBeta, fBrho, fxs2, fxc;
+    Double_t fBeta, fTof, fBrho, fxs2, fxc;
 
   public:
     ClassDef(R3BFrsData, 1)

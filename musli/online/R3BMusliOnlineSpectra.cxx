@@ -683,7 +683,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     // --- T[ch] - T[17]=Ttrig --- //
     cMusliMap_TchTtrig = new TCanvas("MusliMap_TchTtrig", "", 10, 10, 800, 700);
-    cMusliMap_TchTtrig->Divide(4, 24);
+    cMusliMap_TchTtrig->Divide(4, 4);
     for (Int_t j = 0; j < 8; j++)
     {
         sprintf(Name1, "fh1_MusliMap_Traw_a%d_a%d_Ttrig", 2 * j + 1, 2 * j + 2);
@@ -756,19 +756,19 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
     sprintf(Name1, "fh1_MusliMap_Tref_Ttrig");
     sprintf(Name2, "DeltaT = Tref - Ttrig if mult==1");
-    fh1_Muslimap_TchTtrig[14] = new TH1I(Name1, Name2, 5000, 10000, 35000);
-    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitle("Delta T [100ps]");
-    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitle("Counts");
-    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleOffset(1.1);
-    fh1_Muslimap_TchTtrig[14]->GetXaxis()->CenterTitle(true);
-    fh1_Muslimap_TchTtrig[14]->GetYaxis()->CenterTitle(true);
-    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetLabelSize(0.045);
-    fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitleSize(0.045);
-    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetLabelSize(0.045);
-    fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleSize(0.045);
-    fh1_Muslimap_TchTtrig[14]->SetFillColor(31);
-    cMusliMap_TchTtrig->cd(15);
-    fh1_Muslimap_DT[14]->Draw("");
+    fh1_Muslimap_TchTtrig[15] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslimap_TchTtrig[15]->GetXaxis()->SetTitle("Delta T [100ps]");
+    fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetTitle("Counts");
+    fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Muslimap_TchTtrig[15]->GetXaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[15]->GetYaxis()->CenterTitle(true);
+    fh1_Muslimap_TchTtrig[15]->GetXaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[15]->GetXaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetLabelSize(0.045);
+    fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetTitleSize(0.045);
+    fh1_Muslimap_TchTtrig[15]->SetFillColor(31);
+    cMusliMap_TchTtrig->cd(16);
+    fh1_Muslimap_TchTtrig[15]->Draw("");
 
     // === ======== === //
     // === CAL DATA === //

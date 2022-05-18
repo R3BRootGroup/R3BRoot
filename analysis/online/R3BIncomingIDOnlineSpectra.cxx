@@ -127,6 +127,24 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh1_beta->SetLineColor(1);
     fh1_beta->Draw("");
 
+    cTof = new TCanvas("TofRaw_frs", "TofRaw info", 10, 10, 800, 700);
+
+    Name1 = "fh1_tofraw_frs";
+    Name2 = "FRS: Raw Tof";
+    fh1_tof = new TH1F(Name1, Name2, 100000, 0, 2000);
+    fh1_tof->GetXaxis()->SetTitle("ToF [ns]");
+    fh1_tof->GetYaxis()->SetTitle("Counts");
+    fh1_tof->GetYaxis()->SetTitleOffset(1.15);
+    fh1_tof->GetXaxis()->CenterTitle(true);
+    fh1_tof->GetYaxis()->CenterTitle(true);
+    fh1_tof->GetXaxis()->SetLabelSize(0.045);
+    fh1_tof->GetXaxis()->SetTitleSize(0.045);
+    fh1_tof->GetYaxis()->SetLabelSize(0.045);
+    fh1_tof->GetYaxis()->SetTitleSize(0.045);
+    fh1_tof->SetFillColor(2);
+    fh1_tof->SetLineColor(1);
+    fh1_tof->Draw("");
+
     // Hit data, brho
     cBrho = new TCanvas("Brho_frs", "Brho info", 10, 10, 800, 700);
 
@@ -146,7 +164,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh1_brho->SetLineColor(1);
     fh1_brho->Draw("");
 
-    // Hit data, Xs2_vs_Tof
+    // Hit data, Xs2_vs_Beta
     cXs2vsBeta = new TCanvas("Xs2_vs_beta_frs", "Xs2_vs_Beta 2D info", 10, 10, 800, 700);
 
     Name1 = "fh2_Xs2_vs_beta_frs";
@@ -262,10 +280,11 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh2_IsoGated_xc_anglec->GetYaxis()->SetTitleSize(0.045);
     fh2_IsoGated_xc_anglec->Draw("colz");
 
-    // MAIN FOLDER-FRS
+    // MAIN FOLDER-INCOMINGID
     TFolder* mainfol = new TFolder("FRS-IncomingID", "FRS incomingID info");
     mainfol->Add(cAoQvsPosS2);
     mainfol->Add(cBeta);
+    mainfol->Add(cTof);
     mainfol->Add(cBrho);
     mainfol->Add(cXs2vsBeta);
     mainfol->Add(cAqvsq);
@@ -283,6 +302,7 @@ void R3BIncomingIDOnlineSpectra::Reset_Histo()
     R3BLOG(INFO, "");
     fh2_Pos2vsAoQ_m1->Reset();
     fh1_beta->Reset();
+    fh1_tof->Reset();
     fh1_brho->Reset();
     fh2_Aqvsq->Reset();
     fh2_Xs2vsbeta->Reset();
@@ -306,6 +326,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             if (hit->GetStaId() != fStaId)
                 continue;
             fh2_Pos2vsAoQ_m1->Fill(hit->GetXS2(), hit->GetAq());
+            fh1_tof->Fill(hit->GetTof());
             fh1_beta->Fill(hit->GetBeta());
             fh1_brho->Fill(hit->GetBrho());
             fh2_Aqvsq->Fill(hit->GetAq(), hit->GetZ());
@@ -371,6 +392,7 @@ void R3BIncomingIDOnlineSpectra::FinishTask()
     {
         cAoQvsPosS2->Write();
         cBeta->Write();
+        cTof->Write();
         cBrho->Write();
         cXs2vsBeta->Write();
         cAqvsq->Write();

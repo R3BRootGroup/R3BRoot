@@ -132,7 +132,8 @@ class R3BIncomingBeta : public FairTask
                         Double_t betaval,
                         Double_t brhoval,
                         Double_t xs2,
-                        Double_t xc);
+                        Double_t xc,
+                        Double_t tof);
 
   public:
     ClassDef(R3BIncomingBeta, 1)

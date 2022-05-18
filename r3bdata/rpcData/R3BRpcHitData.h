@@ -33,12 +33,7 @@ class R3BRpcHitData : public FairMultiLinkedData
      *@param fCharge      Charge
      *@param Tof          Time of flight with respct to LOS detector
      **/
-    R3BRpcHitData(UInt_t detId,
-                       UInt_t channel,
-		       double time,
-		       double pos,
-		       double charge,
-		       double Tof);
+    R3BRpcHitData(UInt_t detId, UInt_t channel, double time, double pos, double charge, double Tof);
 
     /** Copy constructor **/
     R3BRpcHitData(const R3BRpcHitData&);
@@ -69,7 +64,7 @@ class R3BRpcHitData : public FairMultiLinkedData
     double fPos;
     double fTime;
     double fCharge;
-    double fTof;       // Time-of-flight with respect to LOS detector
+    double fTof; // Time-of-flight with respect to LOS detector
 
     ClassDef(R3BRpcHitData, 1)
 };

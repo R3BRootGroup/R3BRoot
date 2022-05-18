@@ -32,7 +32,12 @@ class R3BRpcMappedData : public TObject
      *@param side        Side
      *@param edge        Leading or Trailing
      **/
-    R3BRpcMappedData(UShort_t DetId, UShort_t ChannelId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t Side);
+    R3BRpcMappedData(UShort_t DetId,
+                     UShort_t ChannelId,
+                     uint64_t FineTime,
+                     uint64_t CoarseTime,
+                     UShort_t Edge,
+                     UShort_t Side);
 
     // Destructor
     virtual ~R3BRpcMappedData() {}
@@ -45,14 +50,13 @@ class R3BRpcMappedData : public TObject
     inline UShort_t GetEdge() const { return fEdge; }
     inline UShort_t GetSide() const { return fSide; }
 
-
   protected:
-    UShort_t fDetId;            // Detector unique identifier
-    UShort_t fChannelId;        // Channel unique identifier
-    uint64_t fFineTime;         // Fine time
-    uint64_t fCoarseTime;       // Coarse time
-    UShort_t fEdge;             // Leading or Trailing
-    UShort_t fSide;             // Left Or Right
+    UShort_t fDetId;      // Detector unique identifier
+    UShort_t fChannelId;  // Channel unique identifier
+    uint64_t fFineTime;   // Fine time
+    uint64_t fCoarseTime; // Coarse time
+    UShort_t fEdge;       // Leading or Trailing
+    UShort_t fSide;       // Left Or Right
 
   public:
     ClassDef(R3BRpcMappedData, 1)
