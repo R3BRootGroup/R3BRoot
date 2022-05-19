@@ -18,9 +18,6 @@
 // -----         Fill RPC online histograms              -----
 // -----------------------------------------------------------
 
-/*
- * This task should fill histograms with RPC online data
- */
 
 #include "R3BRpcOnlineSpectra.h"
 #include "R3BLogger.h"
@@ -76,6 +73,9 @@ R3BRpcOnlineSpectra::R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose)
     , fTimeEnd(0)
     , fBarHits(0)
     , fStrip21Hits(0)
+    , fSpill(1)
+    , fFirstTPat(1)
+    , fLastTPat(12)
 {
 }
 
@@ -140,7 +140,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
     fHitDataItems = (TClonesArray*)mgr->GetObject("R3BRpcHitData");
     if (!fHitDataItems)
     {
-        R3BLOG(FATAL, "RpcStripHitData not found");
+        R3BLOG(FATAL, "RpcHitData not found");
         return kFATAL;
     }
 
@@ -329,8 +329,8 @@ InitStatus R3BRpcOnlineSpectra::Init()
      stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,-350,400,-100,350);
 
      /* ------------- HIT Histograms ------------ */
-     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",340,0,1700,41,0.5,41.5);
-     totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-5,70);
+     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",150,0,1500,41,0.5,41.5);
+     totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
      meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
 
      tofVsPosCorr = new TH2F("tofVsPosCorr", "ToF Vs Position",600,0,1500,fTofBins,fLeftTofLim,fRightTofLim);
@@ -344,13 +344,23 @@ InitStatus R3BRpcOnlineSpectra::Init()
      deltaTVsPosCorr   = new TH2F("deltaTVsPosCorr","Time Difference Vs Position",300,0,1500,1000,-1000,1000);
      posRpcVsPosBar    = new TH2F("posRpcVsPosBar","Rpc Position Vs Bar Position",300,0,1500,500,-1000,3000);
 
-     stripIdVsNHitsCorr = new TH2F("stripIdVsNHitsCorr","Hits Vs Strip ID (H Bar && Good Beam)",21,-0.5,20.5,41,0.5,41.5);
+     stripIdVsNHitsCorr = new TH2F("stripIdVsNHitsCorr","Hits Vs Strip ID (Good Beam)",21,-0.5,20.5,41,0.5,41.5);
 
      stripMultHisto = new TH1F("stripMultHisto","Strips : H Bar AND Start",41,0.5,41.5);
 
-     bar_1_efficiency_pos_corr = new TH2F("bar_1_efficiency_pos_corr","Efficiency : Bar 1",50,0,1500,41,0.5,41.5);
-     bar_2_efficiency_pos_corr = new TH2F("bar_2_efficiency_pos_corr","Efficiency : Bar 2",400,0,400,400,0,400);
-     bar_3_efficiency_pos_corr = new TH2F("bar_3_efficiency_pos_corr","Efficiency : Bar 3",400,0,400,400,0,400);
+     hStripEffHisto_H = new TH1F("hStripEffHisto_H","Strip Efficiency (H Bar)",350,-1000,2500);
+     hBarEffHisto_H = new TH1F("hBarEffHisto_H","Bar Efficiency",350,-1000,2500);
+     hEfficiencyHisto_H= new TH1F("hEfficiencyHisto_H","Strip Efficiency (H Bar)",350,-1000,2500);
+
+     hStripEffHisto_V1 = new TH1F("hStripEffHisto_V1","Strip Efficiency (VR Bar)",350,-1000,2500);
+     hBarEffHisto_V1 = new TH1F("hBarEffHisto_V1","Bar Efficiency",350,-1000,2500);
+     hEfficiencyHisto_V1= new TH1F("hEfficiencyHisto_V1","Strip Efficiency (VR Bar)",350,-1000,2500);
+
+     hStripEffHisto_V2 = new TH1F("hStripEffHisto_V2","Strip Efficiency (VL Bar)",350,0,3500);
+     hBarEffHisto_V2 = new TH1F("hBarEffHisto_V2","Bar Efficiency",350,0,3500);
+     hEfficiencyHisto_V2= new TH1F("hEfficiencyHisto_V2","Strip Efficiency (VL Bar)",350,0,3500);
+
+
 
     for ( Int_t i = 0 ; i < 41; i++){
 
@@ -370,7 +380,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
       stripTofHisto[i] = new TH1F(name,name,fTofBins,fLeftTofLim,fRightTofLim);
 
       sprintf(name, "Time Strip- Time Bar 2 : Strip_%i",i+1);
-      timeDiffStripPmtHisto[i] = new TH1F(name,name,200,135,170);
+      timeDiffStripPmtHisto[i] = new TH1F(name,name,200,-70,-20);
 
 
 
@@ -579,22 +589,22 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripIdVsNHitsCorr->Draw("COLZ");
     stripBarCorrFolder->Add(stripIdVsHitsCanvas);
 
-
-    bar_1_efficiency_pos_corr->GetXaxis()->SetTitle("Position");
-    bar_1_efficiency_pos_corr->GetYaxis()->SetTitle("Strip Number");
+    hEfficiencyHisto_H->GetXaxis()->SetTitle("Position (mm)");
+    hEfficiencyHisto_H->GetYaxis()->SetTitle("Efficiency");
     efficiencyCanvas->cd(1);
-    bar_1_efficiency_pos_corr->Draw("COLZ");
+    hEfficiencyHisto_H->Draw("");
 
-    bar_2_efficiency_pos_corr->GetXaxis()->SetTitle("Position");
-    bar_2_efficiency_pos_corr->GetYaxis()->SetTitle("Strip Number");
+    hEfficiencyHisto_V1->GetXaxis()->SetTitle("Position (mm)");
+    hEfficiencyHisto_V1->GetYaxis()->SetTitle("Efficiency");
     efficiencyCanvas->cd(2);
-    bar_2_efficiency_pos_corr->Draw("COLZ");
+    hEfficiencyHisto_V1->Draw("");
 
-
-    bar_3_efficiency_pos_corr->GetXaxis()->SetTitle("Position");
-    bar_3_efficiency_pos_corr->GetYaxis()->SetTitle("Strip Number");
+    hEfficiencyHisto_V2->GetXaxis()->SetTitle("Position (mm)");
+    hEfficiencyHisto_V2->GetYaxis()->SetTitle("Efficiency");
     efficiencyCanvas->cd(3);
-    bar_3_efficiency_pos_corr->Draw("COLZ");
+    hEfficiencyHisto_V2->Draw("");
+
+
 
     efficiencyFolder->Add(efficiencyCanvas);
 
@@ -616,7 +626,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
     tex1->SetTextSize(0.04);
     tex1->SetLineWidth(1);
 
-    tex2 = new TLatex(2,80000, "Efficiency (Strip 21) : ");
+    tex2 = new TLatex(2,80000, "Hits in Horizontal Bar : ");
     tex2->SetTextFont(42);
     tex2->SetTextSize(0.04);
     tex2->SetLineWidth(1);
@@ -730,6 +740,8 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
     run->GetHttpServer()->RegisterCommand("Reset_RPC", Form("/Objects/%s/->Reset_RPC_Histo()", GetName()));
     run->GetHttpServer()->RegisterCommand("Reset_Efficiencies", Form("/Objects/%s/->Reset_Efficiencies()", GetName()));
+    run->GetHttpServer()->RegisterCommand("GO_ONSPILL", Form("/Objects/%s/->GO_ONSPILL()", GetName()));
+    run->GetHttpServer()->RegisterCommand("GO_OFFSPILL", Form("/Objects/%s/->GO_OFFSPILL()", GetName()));
 
 
   return kSUCCESS;
@@ -792,10 +804,8 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
 
     for(Int_t i = 0 ; i < 41 ; i++){
      for(Int_t j = 0 ; j < 50 ; j++){
-
        meanCharges[i][j]=0.0;
-
-    }}
+   }}
 
      return;
 }
@@ -805,23 +815,36 @@ void R3BRpcOnlineSpectra::Reset_Efficiencies()
 {
 
   stripMultHisto->Reset();
-  bar_1_efficiency_pos_corr->Reset();
-  bar_2_efficiency_pos_corr->Reset();
-  bar_3_efficiency_pos_corr->Reset();
   fBarHits=0.0;
-  fStrip21Hits=0.0;
   fTimeStart=0;
 
-  for(Int_t i = 0 ; i < 41 ; i++){
-   for(Int_t j = 0 ; j < 50 ; j++){
+  hEfficiencyHisto_H->Reset();
+  hStripEffHisto_H->Reset();
+  hBarEffHisto_H->Reset();
 
-     rpcHitMatrix[i][j]=0.0;
+  hEfficiencyHisto_V1->Reset();
+  hStripEffHisto_V1->Reset();
+  hBarEffHisto_V1->Reset();
 
+  hEfficiencyHisto_V2->Reset();
+  hStripEffHisto_V2->Reset();
+  hBarEffHisto_V2->Reset();
 
-  }}
+   return;
+}
 
+void R3BRpcOnlineSpectra::GO_ONSPILL()
+{
+   R3BLOG(INFO, "");
+   fSpill=1;
+   return;
+}
 
-  return;
+void R3BRpcOnlineSpectra::GO_OFFSPILL()
+{
+   R3BLOG(INFO, "");
+   fSpill=0;
+   return;
 }
 
 
@@ -855,63 +878,74 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
         auto nMappedHits = fMappedDataItems->GetEntriesFast();
 
+         if(fSpill==1)
+         execBool = (fTPat >=fFirstTPat && fTPat <= fFirstTPat);
 
-        /*
-          TRIG_LMU_OUT( 1) = BEAM_GATE_AUX and in_los_nrolu;
-        	TRIG_LMU_OUT( 2) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa;
-        	TRIG_LMU_OUT( 3) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa and in_rpc;
-        	TRIG_LMU_OUT( 4) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_neuland;
-        	TRIG_LMU_OUT( 5) = BEAM_GATE_AUX and in_los_nrolu and in_tofd and in_califa and not in_califa_veto;
+         if(fSpill==0)
+         execBool = !(fTPat >=fFirstTPat && fTPat <= fFirstTPat);
 
-        	TRIG_LMU_OUT( 9) = not BEAM_GATE_AUX and in_califa;
-        	TRIG_LMU_OUT(10) = not BEAM_GATE_AUX and in_neuland;
-        	TRIG_LMU_OUT(11) = not BEAM_GATE_AUX and in_tofd;
-        	TRIG_LMU_OUT(12) = not BEAM_GATE_AUX and in_rpc;
-        */
-         if(fTPat >=1 && fTPat <= 5){
-        /* ------------------- Map EventLoop ------------------*/
-        for (Int_t ihit = 0; ihit < nMappedHits; ihit++) {
+        if(execBool){
+
+
+     /* ------------------- Map EventLoop ------------------*/
+     for (Int_t ihit = 0; ihit < nMappedHits; ihit++) {
 
             R3BRpcMappedData* hit = (R3BRpcMappedData*)fMappedDataItems->At(ihit);
 
             if (!hit)
                 continue;
-	    UInt_t idetector = hit->GetDetId();
+
+      UInt_t idetector = hit->GetDetId();
 
 	    if(idetector == 0){
+
              Int_t side = hit->GetSide();
+
              if(side == 0){
+
               stripFineLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
               stripCoarseLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
               stripCoarseLeftCorr->Fill(hit->GetChannelId(),hit->GetCoarseTime());
               stripFineLeftCorr->Fill(hit->GetChannelId(),hit->GetFineTime());
-             }
-             if(side == 1){
+
+           }
+
+            if(side == 1){
+
              stripFineRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
              stripCoarseRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
              stripCoarseRightCorr->Fill(hit->GetChannelId(),hit->GetCoarseTime());
              stripFineRightCorr->Fill(hit->GetChannelId(),hit->GetFineTime());
-            }
-	   }
+
+           }
+	      }
 
 	   if(idetector == 2){
-             refFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+
+       refFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
 	     refCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
-	   }
+
+     }
 
 	   if(idetector == 1){
-	    Int_t pmtSide=hit->GetSide();
-	    if(pmtSide==0){
-	     pmtFineHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-	     pmtCoarseHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
-	    }
-            if(pmtSide==1){
+
+      Int_t pmtSide=hit->GetSide();
+
+      if(pmtSide==0){
+
+       pmtFineHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+       pmtCoarseHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+
+      }
+
+      if(pmtSide==1){
+
 	     pmtFineHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
 	     pmtCoarseHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
-	    }
-	   }
 
-        }
+  	     }
+	     }
+     }
 
 
     /* ----------------- PreCal EventLoop ------------------*/
@@ -922,27 +956,39 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
       R3BRpcPreCalData* hit = (R3BRpcPreCalData*)fPreCalDataItems->At(ihit);
 
       Int_t side = hit->GetSide();
+
       if(hit->GetDetId() == 0){
+
        if(side == 0){
+
         stripLeftTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
         stripLeftTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+
        }
        if(side == 1){
+
         stripRightTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
         stripRightTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+
        }
-      }
+    }
+
       if(hit->GetDetId() == 1){
+
        if(side==0){
-        pmtPreCalTimeHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTime());
-        pmtPreCalTotHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTot());
+
+         pmtPreCalTimeHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTime());
+         pmtPreCalTotHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTot());
+
        }
 
        if(side==1){
+
          pmtPreCalTimeHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTime());
          pmtPreCalTotHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTot());
+
        }
-      }
+     }
    }
 
 
@@ -952,9 +998,12 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     for( Int_t ihit = 0; ihit < nStripCalHits; ihit++) {
 
      R3BRpcCalData* hit = (R3BRpcCalData*)fCalDataItems->At(ihit);
+
      if(hit->GetDetId()==0){
+
       stripCalTimeCorr->Fill(hit->GetTimeL_T(),hit->GetTimeR_B());
       stripCalToTCorr->Fill(hit->GetTotL_T(),hit->GetTotR_B());
+
      }
     }
 
@@ -965,19 +1014,18 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     Int_t detId;
     Float_t pos,charge;
     Int_t bin;
-    bool valid=false;
-    Float_t barTime=0.0,barID=0;
-    Float_t sciPos=0;
 
-
-    /* Time differences come here */
-
+    Float_t barTime    = 0.0;
+    Float_t barID      = 0.0;
+    Float_t sciPos     = 0.0;
+    Int_t StripCounter = 0;
 
     Bool_t goodBar = kFALSE;
 
     for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
 
      R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+
       detId =  hit->GetDetId();
       channelId =  hit->GetChannelId();
       pos       =  hit->GetPos();
@@ -990,14 +1038,23 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
       barTime = hit->GetTime();
       sciPos  = hit->GetPos();
       fBarHits++;
+      hBarEffHisto_H->Fill(pos);
 
+     }
+
+     if(detId ==1 && channelId == 1){
+      hBarEffHisto_V1->Fill(pos);
+     }
+
+     if(detId ==1 && channelId == 3){
+      hBarEffHisto_V2->Fill(pos);
      }
 
    }
 
     Int_t stripMultiplicityArray[41] = {0};
 
-   for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
+    for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
 
      R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
       detId =  hit->GetDetId();
@@ -1008,20 +1065,20 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
      if(detId ==1)
       continue;
 
-     if(goodBar)
+     StripCounter++;
+
      stripMultiplicityArray[channelId-1] += 1;
 
-     double rpc_tof = hit->GetTof();
+     Double_t rpc_tof = hit->GetTof();
+
      stripTofHisto[channelId-1]->Fill(rpc_tof);
+
      tofCorr->Fill(rpc_tof,channelId);
 
-       //if(channelId ==21)
-	  	 //losVsRpc->Fill(rpc_time,los_time);
-
-    tofVsPosCorr->Fill(pos,rpc_tof);
+     tofVsPosCorr->Fill(pos,rpc_tof);
 
 
-     if(goodBar){// && (channelId>=18 && channelId <=22 )){
+     if(goodBar){
 
         timeDiffStripPmtHisto[channelId-1]->Fill(hit->GetTime()-barTime);
         timeDiffStripPmtCorr->Fill(hit->GetTime()-barTime,channelId);
@@ -1046,33 +1103,62 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
 
 
      }
-
-     if(channelId==21)
-      fStrip21Hits++;
-
-
-
-
-
    }
+
+
+   for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
+
+    R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+     detId =  hit->GetDetId();
+     channelId =  hit->GetChannelId();
+     pos       =  hit->GetPos();
+     charge    =  hit->GetCharge();
+
+
+    if(detId ==1 && channelId == 2 && StripCounter!=0)
+      hStripEffHisto_H->Fill(pos);
+
+    if(detId ==1 && channelId == 1 && StripCounter!=0)
+      hStripEffHisto_V1->Fill(pos);
+
+    if(detId ==1 && channelId == 3 && StripCounter!=0)
+      hStripEffHisto_V2->Fill(pos);
+
+  }
+
 
     for(int i = 0 ; i < 41 ; i++)
       stripIdVsNHitsCorr->Fill(stripMultiplicityArray[i],i+1);
 
 
-
-}
     if(fNEvents%1000==0){
+
+      efficiencyCanvas->cd(1);
+      hEfficiencyHisto_H->Divide(hStripEffHisto_H,hBarEffHisto_H,1,1,"");
+      efficiencyCanvas->Modified();
+
+      efficiencyCanvas->cd(2);
+      hEfficiencyHisto_V1->Divide(hStripEffHisto_V1,hBarEffHisto_V1,1,1,"");
+      efficiencyCanvas->Modified();
+
+
+      efficiencyCanvas->cd(3);
+      hEfficiencyHisto_V2->Divide(hStripEffHisto_V2,hBarEffHisto_V2,1,1,"");
+      efficiencyCanvas->Modified();
+
+
       fTimeEnd=fEventHeader->GetTimeStamp();
       elapsedTime = (fTimeEnd - fTimeStart)/1E9;
-      Int_t y;
-      Float_t eff = 100*fStrip21Hits/fBarHits;
-      y = (int)stripMultHisto->GetMaximum();
+
+      Int_t y = (int)stripMultHisto->GetMaximum();
+
       char name1[255];
+
       sprintf(name1,"Elapsed time (since last restart) : %d  s",(int)elapsedTime);
 
       char name2[255];
-      sprintf(name2,"Efficiency (Strip 21) : %0.2f %% ",eff);
+
+      sprintf(name2,"Hits in Horizontal Bar  : %d  ",(int)fBarHits);
 
       stripMultCanvas->Clear();
       stripMultHisto->Draw();
@@ -1084,11 +1170,12 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
       stripMultCanvas->Modified();
       stripMultCanvas->cd();
 
+       }
     }
 
     fNEvents += 1;
     return;
-}
+  }
 
 void R3BRpcOnlineSpectra::FinishEvent()
 {
