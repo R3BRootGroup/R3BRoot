@@ -39,66 +39,46 @@ class R3BEventHeader;
 class TH1F;
 class TH2F;
 
-/**
- * This taks reads RPC data and plots online histograms
- */
+
 class R3BRpcOnlineSpectra : public FairTask
 {
 
   public:
-    /**
-     * Default constructor.
-     * Creates an instance of the task with default parameters.
-     */
+
+
+    /* --------- Default Constructor ---------- */
     R3BRpcOnlineSpectra();
 
-    /**
-     * Standard constructor.
-     * Creates an instance of the task.
-     * @param name a name of the task.
-     * @param iVerbose a verbosity level.
-     */
+    /* --------- Standard Constructor ---------- */
     R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
-    /**
-     * Destructor.
-     * Frees the memory used by the object.
-     */
+
+    /* ------------ Standard  Destructor ----------- */
     virtual ~R3BRpcOnlineSpectra();
 
-    /**
-     * Method for task initialization.
-     * This function is called by the framework before
-     * the event loop.
-     * @return Initialization status. kSUCCESS, kERROR or kFATAL.
-     */
+    /* ------------ Init Method ----------- */
     virtual InitStatus Init() override;
 
-    /**
-     * Method for event loop implementation.
-     * Is called by the framework every time a new event is read.
-     * @param option an execution option.
-     */
+    /* ------------ Exec Method ----------- */
     virtual void Exec(Option_t* option) override;
 
-    /**
-     * A method for finish of processing of an event.
-     * Is called by the framework for each event after executing
-     * the tasks.
-     */
+    /* ------------ Finish Event ----------- */
     virtual void FinishEvent() override;
 
-    /**
-     * Method for finish of the task execution.
-     * Is called by the framework after processing the event loop.
-     */
+    /*-------- Finish Task : After the eventloop -------*/
     virtual void FinishTask() override;
 
-    /**
-     * Method to reset histograms
-     */
+
+
+    /* ------- Reset Methods : Clear histograms and time counters -------*/
     void Reset_RPC_Histo();
     void Reset_Efficiencies();
+
+
+    /* ------ Choose to fill online histograms only if onspill or offspill ------ */
+    void GO_ONSPILL();
+    void GO_OFFSPILL();
+
 
 
     void SetTofAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
@@ -125,38 +105,36 @@ class R3BRpcOnlineSpectra : public FairTask
     };
 
 
+    void SetOnspillTPatRange(Int_t tpat1,Int_t tpat2){
 
-    /**
-     * Method to set the trigger
-     */
+         fFirstTPat = tpat1;
+         fLastTPat  = tpat2;
+
+    };
+
+
     void SetTrigger(Int_t trigg) { fTrigger = trigg; }
 
-    double fmod_calc(double a, double b) {
-         Int_t c = 2048*5;
-	 return fmod(a - b +c +c/2.,c) -c/2.;
-    }
-
   private:
-    R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
+
+    R3BEventHeader* fEventHeader;
     int fcounter;
-    TClonesArray* fMappedDataItems;   // Array with mapped items.
+    TClonesArray* fMappedDataItems;
     TClonesArray* fPreCalDataItems;
     TClonesArray* fCalDataItems;
     TClonesArray* fHitDataItems;
     TClonesArray* fPmtHitDataItems;
 
-    Float_t bar_1_hits[90]={0.0};
-    Float_t bar_2_hits[90]={0.0};
-    Float_t bar_3_hits[90]={0.0};
 
-
-    Float_t rpcHitMatrix[41][50] = {{0.0}};
     Float_t meanCharges[41][50]  = {{0.0}};
+    Float_t stripHitsVec[41] =     {0.0};
 
 
     Int_t counts=0;
     Int_t tpatbin,fTPat;
     int64_t fTimeStart,fTimeEnd;
+    Bool_t fSpill;
+    Bool_t execBool;
 
 
     Float_t fLeftTofLim;
@@ -292,9 +270,20 @@ class R3BRpcOnlineSpectra : public FairTask
 
     /*--------- Efficiency Histograms ----------*/
     TH1F *stripMultHisto;
-    TH2F *bar_1_efficiency_pos_corr;
-    TH2F *bar_2_efficiency_pos_corr;
-    TH2F *bar_3_efficiency_pos_corr;
+    TH1F *hEfficiencyHisto_H;
+    TH1F *hStripEffHisto_H;
+    TH1F *hBarEffHisto_H;
+
+    TH1F *hEfficiencyHisto_V1;
+    TH1F *hStripEffHisto_V1;
+    TH1F *hBarEffHisto_V1;
+
+    TH1F *hEfficiencyHisto_V2;
+    TH1F *hStripEffHisto_V2;
+    TH1F *hBarEffHisto_V2;
+
+    Int_t fFirstTPat;
+    Int_t fLastTPat;
 
     TLatex *tex1,*tex2;
 
