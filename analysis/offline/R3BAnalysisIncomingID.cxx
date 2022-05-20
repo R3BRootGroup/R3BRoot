@@ -120,6 +120,7 @@ void R3BAnalysisIncomingID::SetParameter()
         fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
         fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
     }
+    R3BLOG(INFO, "Brho:" << fBrho0_S2toCC->GetAt(1));
     return;
 }
 

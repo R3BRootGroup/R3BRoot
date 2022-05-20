@@ -131,7 +131,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
     Name1 = "fh1_tofraw_frs";
     Name2 = "FRS: Raw Tof";
-    fh1_tof = new TH1F(Name1, Name2, 100000, 0, 2000);
+    fh1_tof = new TH1F(Name1, Name2, 200000, 0, 3000);
     fh1_tof->GetXaxis()->SetTitle("ToF [ns]");
     fh1_tof->GetYaxis()->SetTitle("Counts");
     fh1_tof->GetYaxis()->SetTitleOffset(1.15);

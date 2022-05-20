@@ -173,7 +173,7 @@ class R3BMusliOnlineSpectra : public FairTask
 
     TH1I* fh1_Muslimap_DeltaDT;
 
-    TH1I* fh1_Muslimap_TchTtrig[16];
+    TH1D* fh1_Muslimap_TchTtrig[16];
 
     // Histograms for Cal data
     TH1I* fh1_Muslical_mult;

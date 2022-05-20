@@ -688,7 +688,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_MusliMap_Traw_a%d_a%d_Ttrig", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "DeltaT with respect to Ttrig, A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
-        fh1_Muslimap_TchTtrig[j] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j] = new TH1D(Name1, Name2, 20000, -1000000, 1000000);
         fh1_Muslimap_TchTtrig[j]->GetXaxis()->SetTitle("Delta T [100ps]");
         fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_TchTtrig[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -706,7 +706,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_MusliMap_Traw_a%d_to_a%d_Ttrig", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DeltaT with respect to Ttrig, A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
-        fh1_Muslimap_TchTtrig[j + 8] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j + 8] = new TH1D(Name1, Name2, 20000, -1000000, 1000000);
         fh1_Muslimap_TchTtrig[j + 8]->GetXaxis()->SetTitle("Delta T [100ps]");
         fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_TchTtrig[j + 8]->GetYaxis()->SetTitleOffset(1.1);
@@ -724,7 +724,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_MusliMap_Traw_a%d_to_a%d_Ttrig", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DeltaT with respect to Ttrig, A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
-        fh1_Muslimap_TchTtrig[j + 12] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+        fh1_Muslimap_TchTtrig[j + 12] = new TH1D(Name1, Name2, 20000, -1000000, 1000000);
         fh1_Muslimap_TchTtrig[j + 12]->GetXaxis()->SetTitle("Delta T [100ps]");
         fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_TchTtrig[j + 12]->GetYaxis()->SetTitleOffset(1.1);
@@ -740,7 +740,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     }
     sprintf(Name1, "fh1_MusliMap_Traw_a1_to_a16_Ttrig");
     sprintf(Name2, "DeltaT with respect to Ttrig, A01 to A16 if mult==1");
-    fh1_Muslimap_TchTtrig[14] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslimap_TchTtrig[14] = new TH1D(Name1, Name2, 20000, -1000000, 1000000);
     fh1_Muslimap_TchTtrig[14]->GetXaxis()->SetTitle("Delta T [100ps]");
     fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitle("Counts");
     fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleOffset(1.1);
@@ -752,11 +752,11 @@ InitStatus R3BMusliOnlineSpectra::Init()
     fh1_Muslimap_TchTtrig[14]->GetYaxis()->SetTitleSize(0.045);
     fh1_Muslimap_TchTtrig[14]->SetFillColor(31);
     cMusliMap_TchTtrig->cd(15);
-    fh1_Muslimap_DT[14]->Draw("");
+    fh1_Muslimap_TchTtrig[14]->Draw("");
 
     sprintf(Name1, "fh1_MusliMap_Tref_Ttrig");
     sprintf(Name2, "DeltaT = Tref - Ttrig if mult==1");
-    fh1_Muslimap_TchTtrig[15] = new TH1I(Name1, Name2, 5000, 10000, 35000);
+    fh1_Muslimap_TchTtrig[15] = new TH1D(Name1, Name2, 20000, -1000000, 1000000);
     fh1_Muslimap_TchTtrig[15]->GetXaxis()->SetTitle("Delta T [100ps]");
     fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetTitle("Counts");
     fh1_Muslimap_TchTtrig[15]->GetYaxis()->SetTitleOffset(1.1);
@@ -1294,14 +1294,15 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
                 fh1_Muslimap_E[i]->Fill(e[i]);
                 if (ttrig > 0)
                 {
-                    fh1_Muslimap_TchTtrig[i]->Fill(t[i] - ttrig);
+                    fh1_Muslimap_TchTtrig[i]->Fill((double)(t[i] - ttrig));
                 }
                 if (tref > 0)
                 {
                     dt[i] = t[i] - tref;
                     fh1_Muslimap_DT[i]->Fill(dt[i]);
                     fh2_Muslimap_EvsDT[i]->Fill(dt[i], e[i]);
-                    fh1_Muslimap_TchTtrig[15]->Fill(tref - ttrig);
+                    if (ttrig > 0)
+                        fh1_Muslimap_TchTtrig[15]->Fill(tref - ttrig);
                 }
             }
             fh2_Muslimap_mult->Fill(i + 1, mult[i]);
@@ -1563,4 +1564,4 @@ void R3BMusliOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BMusliOnlineSpectra)
+ClassImp(R3BMusliOnlineSpectra);

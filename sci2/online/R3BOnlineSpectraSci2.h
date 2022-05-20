@@ -28,7 +28,6 @@ class R3BEventHeader;
  */
 class R3BOnlineSpectraSci2 : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -88,8 +87,14 @@ class R3BOnlineSpectraSci2 : public FairTask
 
     void SetNbDetectors(Int_t ndets) { fNbDetectors = ndets; }
     void SetNbChannels(Int_t nchs) { fNbChannels = nchs; }
-    Int_t GetNbDetectors() { return fNbDetectors; }
-    Int_t GetNbChannels() { return fNbChannels; }
+    // Int_t GetNbDetectors() { return fNbDetectors; }
+    // Int_t GetNbChannels() { return fNbChannels; }
+
+    void SetTpat(Int_t tpat1, Int_t tpat2)
+    {
+        fTpat1 = tpat1;
+        fTpat2 = tpat2;
+    }
 
   private:
     TClonesArray* fMapped; /**< Array with R3BSofSciMappedData */
@@ -97,6 +102,7 @@ class R3BOnlineSpectraSci2 : public FairTask
 
     Int_t fNbDetectors; // fNbDetectors is also equal to fIdCaveC
     Int_t fNbChannels;
+    Int_t fTpat1, fTpat2;
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* fEventHeader; /**< Event header.      */

@@ -29,7 +29,7 @@
 #include "R3BSci2TcalData.h"
 
 R3BOnlineSpectraSci2::R3BOnlineSpectraSci2()
-    : R3BOnlineSpectraSci2("R3BOnlineSpectraSci2", 1)
+    : R3BOnlineSpectraSci2("Sci2OnlineSpectra", 1)
 {
 }
 
@@ -40,6 +40,8 @@ R3BOnlineSpectraSci2::R3BOnlineSpectraSci2(const char* name, Int_t iVerbose)
     , fNEvents(0)
     , fNbDetectors(1)
     , fNbChannels(3)
+    , fTpat1(-1)
+    , fTpat2(-1)
 {
 }
 
@@ -396,12 +398,28 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
     // --- -------------- --- //
     // --- TPAT CONDITION --- //
     // --- -------------- --- //
-    Bool_t BeamOrFission = kFALSE;
-    if (fEventHeader->GetTpat() > 0)
+    Bool_t BeamOrFission = kTRUE;
+    /*if (fEventHeader->GetTpat() > 0)
     {
         if ((fEventHeader->GetTpat() & 0x1) == 1 || // beam
             (fEventHeader->GetTpat() & 0x2) == 2)   // fission
-            BeamOrFission = kTRUE;
+
+    }*/
+
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    if (fTpat1 >= 0 && fTpat2 >= 0)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            tpatbin = (fEventHeader->GetTpat() & (1 << i));
+            if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+            {
+                BeamOrFission = kFALSE;
+            }
+        }
     }
 
     // --- --------------- --- //
@@ -429,7 +447,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
         RawPos[i] = -100000.;
     }
 
-    if (fMapped && fMapped->GetEntriesFast())
+    if (fMapped && fMapped->GetEntriesFast() > 0)
     {
         // --- ---------------- --- //
         // --- read mapped data --- //
@@ -524,7 +542,6 @@ void R3BOnlineSpectraSci2::FinishEvent()
 
 void R3BOnlineSpectraSci2::FinishTask()
 {
-
     for (Int_t i = 0; i < fNbDetectors; i++)
     {
         if (fMapped)
