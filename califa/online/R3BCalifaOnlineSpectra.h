@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFAONLINESPECTRA_H
-#define R3BCALIFAONLINESPECTRA_H
+#define R3BCALIFAONLINESPECTRA_H 1
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -40,7 +40,6 @@ class R3BEventHeader;
  */
 class R3BCalifaOnlineSpectra : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -162,11 +161,22 @@ class R3BCalifaOnlineSpectra : public FairTask
      */
     void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
+    /**
+     * Method for selecting tpat values.
+     */
+    void SetTpat(Int_t tpat1, Int_t tpat2)
+    {
+        fTpat1 = tpat1;
+        fTpat2 = tpat2;
+    }
+
   private:
     void SetParameter();
 
     Int_t fMapHistos_max;
     Int_t fMapHistos_bins;
+    Int_t fTpat1;
+    Int_t fTpat2;
 
     R3BCalifaMappingPar* fMap_Par;    /**< Container with mapping parameters. >*/
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */

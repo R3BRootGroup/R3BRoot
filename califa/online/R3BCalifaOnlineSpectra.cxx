@@ -62,6 +62,8 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fMap_Par(NULL)
     , fNEvents(0)
     , fTrigger(-1)
+    , fTpat1(-1)
+    , fTpat2(-1)
     , fNbCalifaCrystals(4864)
     , fNumSides(Nb_Sides)
     , fNumRings(Nb_Rings)
@@ -1309,6 +1311,21 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 {
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
+    // fTpat = 1-16; fTpat_bit = 0-15
+    Int_t fTpat_bit1 = fTpat1 - 1;
+    Int_t fTpat_bit2 = fTpat2 - 1;
+    Int_t tpatbin;
+    if (header && fTpat1 >= 0 && fTpat2 >= 0)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            tpatbin = (header->GetTpat() & (1 << i));
+            if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
+            {
+                return;
+            }
+        }
+    }
 
     int64_t wr[2];
     int64_t wrm = 0.0;
