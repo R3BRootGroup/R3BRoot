@@ -10,6 +10,10 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+#ifndef ROOT_template_hacks_h
+#define ROOT_template_hacks_h
+
+#include <TClonesArray.h>
 
 #include <TIterator.h> //
 namespace roothacks
@@ -58,8 +62,12 @@ namespace roothacks
     class wrappedCollection
     {
       public:
-        wrappedCollection(ColType* pseudoCollection)
-            : pseudoCol(pseudoCollection)
+      wrappedCollection()
+        : wrappedCollection(static_cast<TObject*>(nullptr)) {}
+      
+        template<class Ptr>
+        wrappedCollection(Ptr pseudoCollection)
+          : pseudoCol(dynamic_cast<ColType*>(pseudoCollection))
         {
         }
 
@@ -80,4 +88,8 @@ namespace roothacks
         }
     };
 
+  template<class T>
+  using wrappedTCA=wrappedCollection<T, TClonesArray>;
+  
 }; // namespace roothacks
+#endif

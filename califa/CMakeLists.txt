@@ -67,6 +67,7 @@ set(SRCS
 ./online/R3BCalifaOnlineSpectra.cxx
 ./online/R3BCalifaJulichOnlineSpectra.cxx
 ./online/R3BCalifaDemoOnlineSpectra.cxx
+./online/R3BCalifaProtonHists.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 )
 
