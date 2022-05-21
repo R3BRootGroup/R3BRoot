@@ -12,44 +12,45 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                R3BBunchedFiberSPMTTrigMapped2Cal                -----
-// -----            Created Jan 13th 2018 by M.Heil       -----
-// ----- Convert mapped data to time calibrated data      -----
+// -----            R3BCalifavsTofDOnlineSpectra          -----
+// -----    Created 21/05/22 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------
 
-#ifndef R3BBUNCHEDFIBERSPMTTRIGMAPPED2CAL_H
-#define R3BBUNCHEDFIBERSPMTTRIGMAPPED2CAL_H 1
+#ifndef R3BCalifavsTofDOnlineSpectra_H
+#define R3BCalifavsTofDOnlineSpectra_H 1
 
 #include "FairTask.h"
-#include <R3BTCalEngine.h>
+#include "TCanvas.h"
 
-class R3BTCalPar;
+class TClonesArray;
+class TH2F;
+class R3BEventHeader;
 
-/**
- * An analysis task to apply TCAL calibration.
- * This class reads mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BBunchedFiberSPMTTrigMapped2CalPar task.
- */
-class R3BBunchedFiberSPMTTrigMapped2Cal : public FairTask
+class R3BCalifavsTofDOnlineSpectra : public FairTask
 {
   public:
+    /**
+     * Default constructor.
+     * Creates an instance of the task with default parameters.
+     */
+    R3BCalifavsTofDOnlineSpectra();
+
     /**
      * Standard constructor.
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
-     * @param a_variant CTDC firmware variant, see R3BTCalEngine.
-     * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
-    R3BBunchedFiberSPMTTrigMapped2Cal(Int_t iVerbose = 1);
+    R3BCalifavsTofDOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BBunchedFiberSPMTTrigMapped2Cal();
+    virtual ~R3BCalifavsTofDOnlineSpectra();
+
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
     /**
      * Method for task initialization.
@@ -59,16 +60,7 @@ class R3BBunchedFiberSPMTTrigMapped2Cal : public FairTask
      */
     virtual InitStatus Init();
 
-    /**
-     * Method for initialization of the parameter containers.
-     * Called by the framework prior to Init() method.
-     */
-    virtual void SetParContainers();
-
-    /**
-     * Method for re-initialization of parameter containers
-     * in case the Run ID has changed.
-     */
+    /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
     /**
@@ -85,13 +77,47 @@ class R3BBunchedFiberSPMTTrigMapped2Cal : public FairTask
      */
     virtual void FinishEvent();
 
+    /**
+     * Method for finish of the task execution.
+     * Is called by the framework after processing the event loop.
+     */
+    virtual void FinishTask();
+
+    /**
+     * Method for setting min proton energy (in keV) for opening angle histogram
+     */
+    inline void SetMinProtonEnergyForOpening(Float_t min) { fMinProtonE = min; }
+
+    /**
+     * Method to reset histograms
+     */
+    void Reset_Histo();
+
+    /**
+     * Method for setting the fTpat
+     */
+    void SetTpat(Int_t tpat) { fTpat = tpat; }
+
+    /**
+     * Method for setting the charge of the nuclear residue
+     */
+    void SetZCharge(Float_t z) { fZselection = z; }
+
   private:
-    R3BTCalPar* fTCalPar;
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
+    TClonesArray* fHitItemsCalifa;
+    TClonesArray* fHitItemsTofd;
+
+    R3BEventHeader* header;
+    Int_t fNEvents;
+    Int_t fTpat;
+    Float_t fZselection;
+    Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
+
+    TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with TofD
+    TCanvas* cCalifa_angles;
 
   public:
-    ClassDef(R3BBunchedFiberSPMTTrigMapped2Cal, 0)
+    ClassDef(R3BCalifavsTofDOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BCalifavsTofDOnlineSpectra_H */

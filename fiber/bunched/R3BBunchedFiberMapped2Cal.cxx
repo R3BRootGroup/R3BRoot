@@ -226,7 +226,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             //		time_ns = mapped->GetCoarse() * fTamexFreq +
             //		(mapped->IsLeading() ? -fine_ns : fine_ns);
             // new clock TDC firmware need here a minus
-            time_ns = mapped->GetCoarse() * fTamexFreq - fine_ns;
+            // time_ns = mapped->GetCoarse() * fTamexFreq - fine_ns;
+            time_ns = par->GetTimeVFTX(fine_raw);
+            time_ns = mapped->GetCoarse() * fTamexFreq - time_ns;
 
             R3BLOG(DEBUG, "Channel=" << channel << ": Time=" << time_ns << "ns.");
         }

@@ -33,14 +33,17 @@ R3BBunchedFiberSPMTTrigMapped2Cal::R3BBunchedFiberSPMTTrigMapped2Cal(Int_t a_ver
 {
 }
 
-R3BBunchedFiberSPMTTrigMapped2Cal::~R3BBunchedFiberSPMTTrigMapped2Cal() { delete fCalItems; }
+R3BBunchedFiberSPMTTrigMapped2Cal::~R3BBunchedFiberSPMTTrigMapped2Cal()
+{
+    if (fCalItems)
+        delete fCalItems;
+}
 
 InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
-                      "did you forget SetParContainers?";
+        LOG(ERROR) << "TCal parameter containers missing, did you forget SetParContainers?";
         return kERROR;
     }
     if (0 == fTCalPar->GetNumModulePar())
@@ -104,10 +107,10 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
             // TODO: Is this really ok?
             continue;
         }
-        auto fine_ns = par->GetTimeClockTDC(fine_raw);
+        auto fine_ns = par->GetTimeVFTX(fine_raw);
         LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
-        if (fine_ns < 0. || fine_ns > 5)
+        if (fine_ns < 0. || fine_ns > 5.)
         {
             LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
@@ -126,6 +129,10 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
     }
 }
 
-void R3BBunchedFiberSPMTTrigMapped2Cal::FinishEvent() { fCalItems->Clear(); }
+void R3BBunchedFiberSPMTTrigMapped2Cal::FinishEvent()
+{
+    if (fCalItems)
+        fCalItems->Clear();
+}
 
 ClassImp(R3BBunchedFiberSPMTTrigMapped2Cal);

@@ -267,14 +267,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
-
-    // cout<<"in exec"<<endl;
-    //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
     multi = 0;
-    if (fnEvents / 100000. == (int)fnEvents / 100000)
-        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
-                  << " %) " << std::flush;
-
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         // Clear local helper containers.
@@ -290,7 +283,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         energy[i] = 0.;
         counts[i] = 0;
     }
-    //  cout<<"multihit"<<endl;
 
     size_t cal_num = fCalItems->GetEntriesFast();
 
