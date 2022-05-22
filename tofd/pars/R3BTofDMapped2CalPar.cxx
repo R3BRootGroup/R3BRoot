@@ -106,7 +106,6 @@ InitStatus R3BTofDMapped2CalPar::Init()
 void R3BTofDMapped2CalPar::Exec(Option_t* option)
 {
     Int_t nHits = fMapped->GetEntries();
-
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
@@ -146,7 +145,6 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
                        "Trigger plane incorrect! Plane: " << mapped->GetDetectorId() << " not " << fNofPlanes + 1);
                 continue;
             }
-
             fEngine->Fill(mapped->GetDetectorId(), mapped->GetBarId(), 1, mapped->GetTimeFine());
             Icount[mapped->GetDetectorId() - 1][mapped->GetBarId() - 1][0]++;
         }

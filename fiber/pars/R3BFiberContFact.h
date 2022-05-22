@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BFIBERCONTFACT_H
-#define R3BFIBERCONTFACT_H
+#define R3BFIBERCONTFACT_H 1
 
 #include "FairContFact.h"
 

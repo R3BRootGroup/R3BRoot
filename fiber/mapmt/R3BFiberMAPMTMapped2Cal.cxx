@@ -140,7 +140,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
         // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
         Double_t time_ns = -1;
-        if (fine_ns < 0. || fine_ns >= fClockFreq)
+        if (fine_ns < 0. || fine_ns > fClockFreq)
         {
             R3BLOG(ERROR,
                    "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw

@@ -46,13 +46,7 @@ void R3BFiberContFact::setAllContainers()
 {
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers for the STS library.*/
-    /*
-     FairContainer* p1= new FairContainer("R3BFiberDigiPar",
-                                           "Sts Digitisation Parameters",
-                                           "TestDefaultContext");
-     p1->addContext("TestNonDefaultContext");
-     containers->Add(p1);
-     */
+
     FairContainer* p1 = new FairContainer("Fi3aHitPar", "Fi3a Hit Parameters", "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
@@ -188,6 +182,14 @@ void R3BFiberContFact::setAllContainers()
     auto p34 = new FairContainer("Fi13MappingPar", "Fi13 Mapping Parameters", "TestDefaultContext");
     p34->addContext("TestNonDefaultContext");
     containers->Add(p34);
+
+    auto p35 = new FairContainer("Fi7GeoPar", "Fi7 geometry parameters", "fi7GeoContext");
+    p35->addContext("fi7GeoContext");
+    containers->Add(p35);
+
+    auto p36 = new FairContainer("Fi8GeoPar", "Fi8 geometry parameters", "fi8GeoContext");
+    p36->addContext("fi8GeoContext");
+    containers->Add(p36);
 }
 
 FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
@@ -200,10 +202,10 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
     R3BLOG(INFO, name);
 
     FairParSet* p = 0;
-    if (strcmp(name, "Fi10GeoPar") == 0 || strcmp(name, "Fi11GeoPar") == 0 || strcmp(name, "Fi12GeoPar") == 0 ||
-        strcmp(name, "Fi13GeoPar") == 0 || strcmp(name, "Fi23aGeoPar") == 0 || strcmp(name, "Fi23bGeoPar") == 0 ||
-        strcmp(name, "Fi30GeoPar") == 0 || strcmp(name, "Fi31GeoPar") == 0 || strcmp(name, "Fi32GeoPar") == 0 ||
-        strcmp(name, "Fi33GeoPar") == 0)
+    if (strcmp(name, "Fi7GeoPar") == 0 || strcmp(name, "Fi8GeoPar") == 0 || strcmp(name, "Fi10GeoPar") == 0 ||
+        strcmp(name, "Fi11GeoPar") == 0 || strcmp(name, "Fi12GeoPar") == 0 || strcmp(name, "Fi13GeoPar") == 0 ||
+        strcmp(name, "Fi23aGeoPar") == 0 || strcmp(name, "Fi23bGeoPar") == 0 || strcmp(name, "Fi30GeoPar") == 0 ||
+        strcmp(name, "Fi31GeoPar") == 0 || strcmp(name, "Fi32GeoPar") == 0 || strcmp(name, "Fi33GeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

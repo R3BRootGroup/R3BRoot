@@ -114,6 +114,8 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
 
     TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with TofD
+    TH2F* fh2_Califa_coinPhi;
+    TH2F* fh2_Califa_coinTheta;
     TCanvas* cCalifa_angles;
 
   public:
