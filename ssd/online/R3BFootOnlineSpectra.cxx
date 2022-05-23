@@ -60,7 +60,7 @@ R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
     , fHitItems(NULL)
     , fTrigger(-1)
     , fNEvents(0)
-      , fNbDet(16)
+    , fNbDet(16)
 {
 }
 
@@ -136,17 +136,15 @@ InitStatus R3BFootOnlineSpectra::Init()
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_EnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
-        int foot_num = i+1;
-        if(foot_num==1 || foot_num==2 || foot_num==13 
-                || foot_num==4 || foot_num==11 || foot_num==6
-                || foot_num==7 || foot_num==12 || foot_num==9
-                || foot_num==10 || foot_num==15 || foot_num==16)
+        int foot_num = i + 1;
+        if (foot_num == 1 || foot_num == 2 || foot_num == 13 || foot_num == 4 || foot_num == 11 || foot_num == 6 ||
+            foot_num == 7 || foot_num == 12 || foot_num == 9 || foot_num == 10 || foot_num == 15 || foot_num == 16)
         {
             cMap->cd(i_pad);
             fh2_EnergyVsStrip[i]->Draw("col");
-            for(int i_asic=1; i_asic<10; i_asic++)
+            for (int i_asic = 1; i_asic < 10; i_asic++)
             {
-                TLine* l = new TLine(64.5*i_asic,minE,64.5*i_asic,maxE);
+                TLine* l = new TLine(64.5 * i_asic, minE, 64.5 * i_asic, maxE);
                 l->Draw("same");
                 l->SetLineStyle(7);
                 l->SetLineWidth(1);
@@ -164,7 +162,7 @@ InitStatus R3BFootOnlineSpectra::Init()
 
     if (fCalItems)
     {
-        i_pad=1;//pad iterator
+        i_pad = 1; // pad iterator
         fh2_EnergyVsStrip_cal.resize(fNbDet);
         for (Int_t i = 0; i < fNbDet; i++)
         {
@@ -176,17 +174,15 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitleOffset(1.4);
             fh2_EnergyVsStrip_cal[i]->GetXaxis()->CenterTitle(true);
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->CenterTitle(true);
-            int foot_num = i+1;
-            if(foot_num==1 || foot_num==2 || foot_num==13 
-                    || foot_num==4 || foot_num==11 || foot_num==6
-                    || foot_num==7 || foot_num==12 || foot_num==9
-                    || foot_num==10 || foot_num==15 || foot_num==16)
+            int foot_num = i + 1;
+            if (foot_num == 1 || foot_num == 2 || foot_num == 13 || foot_num == 4 || foot_num == 11 || foot_num == 6 ||
+                foot_num == 7 || foot_num == 12 || foot_num == 9 || foot_num == 10 || foot_num == 15 || foot_num == 16)
             {
                 cCal->cd(i_pad);
                 fh2_EnergyVsStrip_cal[i]->Draw("col");
-                for(int i_asic=1; i_asic<10; i_asic++)
+                for (int i_asic = 1; i_asic < 10; i_asic++)
                 {
-                    TLine* l = new TLine(64.5*i_asic,minE,64.5*i_asic,maxE);
+                    TLine* l = new TLine(64.5 * i_asic, minE, 64.5 * i_asic, maxE);
                     l->Draw("same");
                     l->SetLineStyle(7);
                     l->SetLineWidth(1);
@@ -204,7 +200,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     hitfol->Add(cHit);
     if (fHitItems)
     {
-        i_pad=1;//pad iterator
+        i_pad = 1; // pad iterator
         fh1_pos.resize(fNbDet);
         fh1_ene.resize(fNbDet);
         for (Int_t i = 0; i < fNbDet; i++)
@@ -226,8 +222,8 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_ene[i]->GetXaxis()->CenterTitle(true);
             fh1_ene[i]->GetYaxis()->CenterTitle(true);
 
-            int foot_num = i+1;
-            if(foot_num==2 || foot_num==4 || foot_num==11)
+            int foot_num = i + 1;
+            if (foot_num == 2 || foot_num == 4 || foot_num == 11)
             {
                 cHit->cd(i_pad);
                 fh1_pos[i]->Draw();
@@ -248,7 +244,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     if (fHitItems)
     {
         fh1_mult.resize(fNbDet);
-        fh2_BeamSpot = new TH2F("BeamSpot", "BeamSpot", 600, -50., 50.,600, -50., 50.);
+        fh2_BeamSpot = new TH2F("BeamSpot", "BeamSpot", 600, -50., 50., 600, -50., 50.);
         fh2_BeamSpot->GetYaxis()->SetTitle("Position [mm]");
         fh2_BeamSpot->GetYaxis()->SetTitleOffset(1.4);
         fh2_BeamSpot->GetXaxis()->CenterTitle(true);
@@ -377,9 +373,9 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             fh1_ene[hit->GetDetId() - 1]->Fill(hit->GetEnergy());
             fh1_mult[hit->GetDetId() - 1]->Fill(hit->GetNbHit());
         }
-        for (Int_t ihit = 0; ihit < nHits-1; ihit++)
+        for (Int_t ihit = 0; ihit < nHits - 1; ihit++)
         {
-            for (Int_t jhit = ihit+1; jhit < nHits; jhit++)
+            for (Int_t jhit = ihit + 1; jhit < nHits; jhit++)
             {
                 R3BFootHitData* hitI = (R3BFootHitData*)fHitItems->At(ihit);
                 R3BFootHitData* hitJ = (R3BFootHitData*)fHitItems->At(jhit);
@@ -388,7 +384,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
                 if (!hitJ)
                     continue;
                 if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
-                        (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
+                    (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
                 {
                     if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
                     {
@@ -399,17 +395,18 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
                     {
                         fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
                         fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
-                        if((hitI->GetDetId()==4 && hitJ->GetDetId()==2)||(hitJ->GetDetId()==4 && hitI->GetDetId()==2))
+                        if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
+                            (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
                         {
-                            if((hitI->GetDetId()==4 && hitJ->GetDetId()==2))
+                            if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
                             {
-                                fh2_BeamSpot->Fill(hitI->GetPos(),hitJ->GetPos());
-                                fh2_BeamSpotE->Fill(hitI->GetEnergy(),hitJ->GetEnergy());
+                                fh2_BeamSpot->Fill(hitI->GetPos(), hitJ->GetPos());
+                                fh2_BeamSpotE->Fill(hitI->GetEnergy(), hitJ->GetEnergy());
                             }
                             else
                             {
-                                fh2_BeamSpot->Fill(hitJ->GetPos(),hitI->GetPos());
-                                fh2_BeamSpotE->Fill(hitJ->GetEnergy(),hitI->GetEnergy());
+                                fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
+                                fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
                             }
                         }
                     }

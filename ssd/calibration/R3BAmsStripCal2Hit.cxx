@@ -165,7 +165,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Cal Data --
-    Int_t nHits = fAmsStripCalDataCA->GetEntries();
+    Int_t nHits = fAmsStripCalDataCA->GetEntriesFast();
     if (!nHits)
         return;
 
@@ -341,7 +341,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
     for (Int_t i = 0; i < fMaxNumDet * 2; i++)
         hams[i]->Reset();
     if (calData)
-        delete calData;
+        delete[] calData;
     delete ss;
     return;
 }

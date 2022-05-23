@@ -186,7 +186,7 @@ InitStatus R3BAmsMapped2StripCalPar::ReInit()
 void R3BAmsMapped2StripCalPar::Exec(Option_t* opt)
 {
 
-    Int_t nHits = fAmsMappedDataCA->GetEntries();
+    Int_t nHits = fAmsMappedDataCA->GetEntriesFast();
     if (!nHits)
         return;
 

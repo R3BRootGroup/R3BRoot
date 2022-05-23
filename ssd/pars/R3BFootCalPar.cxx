@@ -29,7 +29,7 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumDets(10)
+    , fNumDets(20)
     , fNumStrips(640)
     , fNumParsFit(2)
 {
