@@ -195,7 +195,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
     }
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fAmsMappedDataCA->GetEntries();
+    Int_t nHits = fAmsMappedDataCA->GetEntriesFast();
     if (nHits != NumStrips * NumDets && nHits > 0)
         LOG(WARNING) << "R3BAmsMapped2StripCal: nHits!=NumStrips*NumDets";
     if (!nHits)
@@ -284,7 +284,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
     }
 
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

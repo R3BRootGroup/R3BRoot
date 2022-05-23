@@ -189,7 +189,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     }
 
     // Hit data
-    if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
+    if(fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
 
         Double_t theta = 0., phi = 0.;
@@ -213,22 +213,26 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
         for (Int_t i1 = 0; i1 < nHits; i1++)
         {
 
-            if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 150.) // wixhausen
+            if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 90.) // wixhausen
             {
                 master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
                 maxER = califa_e[i1];
             }
-            if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 30.)
+            if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 90.)
             { // messel
                 master[1].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
                 maxEL = califa_e[i1];
             }
         }
-        if (maxEL > fMinProtonE && maxER > fMinProtonE)
-        {
-            fh2_Califa_coinTheta->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
-            fh2_Califa_coinPhi->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
-        }
+		if (maxEL > fMinProtonE && maxER > fMinProtonE && TMath::Abs(master[0].Phi()* TMath::RadToDeg() - master[1].Phi()* TMath::RadToDeg()) > 150.0)
+        {   if(gRandom->Uniform(0.,1.0)<0.5){
+              fh2_Califa_coinTheta->Fill(master[0].Theta()* TMath::RadToDeg(), master[1].Theta()* TMath::RadToDeg());
+              fh2_Califa_coinPhi->Fill(master[0].Phi()* TMath::RadToDeg(), master[1].Phi()* TMath::RadToDeg());
+					    } else{
+	      fh2_Califa_coinTheta->Fill(master[1].Theta()* TMath::RadToDeg(), master[0].Theta()* TMath::RadToDeg());
+	      fh2_Califa_coinPhi->Fill(master[1].Phi()* TMath::RadToDeg(), master[0].Phi()* TMath::RadToDeg());
+	    }
+	}
     }
 
     fNEvents += 1;
