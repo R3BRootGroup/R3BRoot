@@ -15,6 +15,7 @@
 #define R3BEVENTHEADER_h
 
 #include "FairEventHeader.h"
+#include <stdexcept>
 
 class R3BEventHeader : public FairEventHeader
 {
@@ -32,6 +33,16 @@ class R3BEventHeader : public FairEventHeader
     Int_t GetTrigger() const { return fTrigger; }
     uint64_t GetTimeStamp() const { return fTimeStamp; }
     Int_t GetTpat() const { return fTpat; }
+
+    static constexpr uint32_t MakeTpatBit(uint8_t trigNo)
+    {
+      return (1<=trigNo && trigNo<=16)
+        ?(1<<(trigNo-1))
+        :throw std::runtime_error("Bad trigNo.");
+    }
+  
+    bool HasTpatTrig(int trigNo) const { return fTpat & MakeTpatBit(trigNo);}
+    
     Double_t GetTStart() const { return fTStart; }
 
     virtual void Register(Bool_t Persistance = kTRUE);
@@ -43,7 +54,7 @@ class R3BEventHeader : public FairEventHeader
     Int_t fTpat;
     Double_t fTStart;
 
-    ClassDef(R3BEventHeader, 6)
+    ClassDef(R3BEventHeader, 7)
 };
 
 #endif
