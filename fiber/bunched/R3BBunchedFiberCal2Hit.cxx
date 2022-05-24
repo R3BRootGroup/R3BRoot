@@ -287,7 +287,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     size_t cal_num = fCalItems->GetEntriesFast();
 
     // Make direct mapping tables for trigger items.
-    size_t mapmt_trig_num = fMAPMTCalTriggerItems->GetEntries();
+    size_t mapmt_trig_num = fMAPMTCalTriggerItems->GetEntriesFast();
     std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0] / 128);
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
@@ -657,7 +657,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
             // if(fiber_id>256) cout << "save fiber_id " << fiber_id << " pos " << x << endl;
             if (!fIsCalibrator)
-                new ((*fHitItems)[fNofHitItems++])
+                new ((*fHitItems)[fHitItems->GetEntriesFast()])
                     // s                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt,
                     // tot_mapmt, tot_spmt);
                     R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt1, 0., tot_mapmt, 0.);
@@ -667,8 +667,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     }
     fh_ToT_ToT->Fill(s1, s2);
     fnEvents++;
-
-    // cout<<"end exec"<<endl;
 }
 
 void R3BBunchedFiberCal2Hit::FinishEvent()
