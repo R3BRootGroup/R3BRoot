@@ -28,6 +28,7 @@
 #include <vector>
 
 class TClonesArray;
+class R3BTimeStitch;
 class R3BTwimCalPar;
 
 class R3BTwimMapped2Cal : public FairTask
@@ -82,6 +83,7 @@ class R3BTwimMapped2Cal : public FairTask
 
     Bool_t fOnline; // Don't store data for online
 
+    R3BTimeStitch* fTimeStitch;
     R3BTwimCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fTwimMappedDataCA; /**< Array with Mapped-input data. >*/
     TClonesArray* fTwimCalDataCA;    /**< Array with Cal-output data. >*/

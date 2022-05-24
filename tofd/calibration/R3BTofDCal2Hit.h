@@ -109,15 +109,6 @@ class R3BTofDCal2Hit : public FairTask
     inline void SetTofdTotPos(Bool_t ToTy) { fTofdTotPos = ToTy; }
 
     /**
-     * Old Method for walk calculation.
-     */
-    /// virtual Double_t walk(Double_t Q);
-    /**
-     * new Method for walk calculation.
-     */
-    virtual Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
-
-    /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
@@ -142,6 +133,12 @@ class R3BTofDCal2Hit : public FairTask
 
   private:
     void SetParameter();
+
+    /**
+     * Method for walk calculation.
+     */
+    Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
+
     R3BTimeStitch* fTimeStitch;
     R3BEventHeader* header; /**< Event header - input data. */
     R3BTofDHitPar* fHitPar; /**< Hit parameter container. */

@@ -166,11 +166,8 @@ InitStatus R3BMusliMapped2CalPar::ReInit()
 void R3BMusliMapped2CalPar::Exec(Option_t* option)
 {
 
-    Int_t nHits;
-
-    // Reading the Input -- MusLI Mapped Data --
-    nHits = fMusliMappedDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMusliMappedDataCA->GetEntriesFast();
+    if (nHits == 0)
         return;
     R3BMusliMappedData** mappedData = new R3BMusliMappedData*[nHits];
 
@@ -201,7 +198,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         return;
 
     // Reading the Input -- MwpcA Hit Data -- only if one (X,Y) hit only
-    nHits = fMwAHitDataCA->GetEntries();
+    nHits = fMwAHitDataCA->GetEntriesFast();
     if (nHits != 1)
         return;
     else
@@ -211,7 +208,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
     }
 
     // Reading the Input -- MwpcB Hit Data --
-    nHits = fMwBHitDataCA->GetEntries();
+    nHits = fMwBHitDataCA->GetEntriesFast();
     if (nHits != 1)
         return;
     else
@@ -252,7 +249,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
     }
 
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
 
     return;
 }

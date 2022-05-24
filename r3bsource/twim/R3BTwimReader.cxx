@@ -101,7 +101,6 @@ void R3BTwimReader::Reset()
 
 Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t section)
 {
-
     Bool_t pileupFLAG = kFALSE;
     Bool_t overflowFLAG = kFALSE;
     UInt_t multPerAnode[fAnodes + fTref + fTtrig];

@@ -30,11 +30,12 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-// Music headers
+// R3B headers
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2CalPar.h"
 #include "R3BMusicMappedData.h"
 #include "R3BMwpcHitData.h"
+#include "R3BTimeStitch.h"
 
 // R3BMusicMapped2CalPar: Default Constructor --------------------------
 R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
@@ -121,6 +122,9 @@ InitStatus R3BMusicMapped2CalPar::Init()
         return kFATAL;
     }
 
+    // Definition of a time stich object to correlate VFTX times
+    fTimeStitch = new R3BTimeStitch();
+
     // Define TGraph for fits
     char Name1[255];
     fg_anode = new TGraph*[fNumAnodes];
@@ -147,9 +151,9 @@ InitStatus R3BMusicMapped2CalPar::ReInit() { return kSUCCESS; }
 void R3BMusicMapped2CalPar::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntries();
-    Int_t nHitsA = fHitItemsMwpcA->GetEntries();
-    Int_t nHitsB = fHitItemsMwpcB->GetEntries();
+    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
+    Int_t nHitsA = fHitItemsMwpcA->GetEntriesFast();
+    Int_t nHitsB = fHitItemsMwpcB->GetEntriesFast();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 
@@ -215,18 +219,18 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
                     if (energy[k][i] > 0.)
                     { // Anode is 50mm, first anode is at 175mm with respect to the center of music detector
                         fg_anode[i]->SetPoint(fg_anode[i]->GetN() + 1,
-                                              dtime[k][i] - dtime[j][fNumAnodes],
+                                              fTimeStitch->GetTime(dtime[k][i] - dtime[j][fNumAnodes], "vftx", "vftx"),
                                               fa->Eval(fPosMusic - 175.0 + i * 50.0));
                     }
                 }
         }
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     if (hitMwAData)
-        delete hitMwAData;
+        delete[] hitMwAData;
     if (hitMwBData)
-        delete hitMwBData;
+        delete[] hitMwBData;
     return;
 }
 

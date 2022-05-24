@@ -115,7 +115,7 @@ InitStatus R3BTwimGainMatching::ReInit() { return kSUCCESS; }
 void R3BTwimGainMatching::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fTwimMappedDataCA->GetEntries();
+    Int_t nHits = fTwimMappedDataCA->GetEntriesFast();
     R3BTwimMappedData** mappedData = new R3BTwimMappedData*[nHits];
     Int_t secId = 0;
     Int_t anodeId = 0;
@@ -160,7 +160,7 @@ void R3BTwimGainMatching::Exec(Option_t* option)
     }
 
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

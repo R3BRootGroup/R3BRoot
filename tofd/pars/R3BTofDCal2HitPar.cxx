@@ -205,7 +205,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
         for (Int_t j = 0; j < fPaddlesPerPlane; ++j)
             multihits[i][j] = 0;
 
-    UInt_t nHits = fCalData->GetEntries();
+    UInt_t nHits = fCalData->GetEntriesFast();
     // Organize cals into bars.
     struct Entry
     {
@@ -223,7 +223,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     }
 
     static bool s_was_trig_missing = false;
-    auto trig_num = fCalTriggerItems->GetEntries();
+    auto trig_num = fCalTriggerItems->GetEntriesFast();
     // Find coincident PMT hits.
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {

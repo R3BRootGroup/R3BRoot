@@ -61,7 +61,6 @@ class R3BMusicHitPar : public FairParGenericSet
     TArrayF* GetZHitPar() { return fDetZHitParams; }
     TArrayF* GetAngCorPar() { return fAngCorParams; }
 
-
     void SetNumParZFit(Int_t nbParams) { fNumParamsZFit = nbParams; }
     void SetNumAnodes(Int_t nbAnodes) { fNumAnodes = nbAnodes; }
     void SetInUse(Int_t value, Int_t anode) { fIn_use->AddAt(value, anode - 1); }

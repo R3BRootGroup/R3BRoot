@@ -145,12 +145,12 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMwpcMappedDataCA->GetEntries();
+    Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY) && nHits > 0)
     {
         R3BLOG(WARNING, "nHits>(NumPadX+NumPadY)");
     }
-    if (!nHits)
+    if (nHits==0)
         return;
 
     R3BMwpcMappedData** mappedData;
@@ -185,7 +185,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
         }
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

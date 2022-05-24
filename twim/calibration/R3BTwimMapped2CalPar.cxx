@@ -165,9 +165,9 @@ InitStatus R3BTwimMapped2CalPar::ReInit() { return kSUCCESS; }
 void R3BTwimMapped2CalPar::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fTwimMappedDataCA->GetEntries();
-    Int_t nHitsA = fHitItemsMwpcA->GetEntries();
-    Int_t nHitsB = fHitItemsMwpcB->GetEntries();
+    Int_t nHits = fTwimMappedDataCA->GetEntriesFast();
+    Int_t nHitsA = fHitItemsMwpcA->GetEntriesFast();
+    Int_t nHitsB = fHitItemsMwpcB->GetEntriesFast();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 
@@ -261,11 +261,11 @@ void R3BTwimMapped2CalPar::Exec(Option_t* option)
                 }
             }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     if (hitMwAData)
-        delete hitMwAData;
+        delete[] hitMwAData;
     if (hitMwBData)
-        delete hitMwBData;
+        delete[] hitMwBData;
     return;
 }
 

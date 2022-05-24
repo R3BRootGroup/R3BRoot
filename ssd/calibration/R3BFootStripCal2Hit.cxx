@@ -228,7 +228,6 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     // Filling vectors
     for (Int_t i = 0; i < nHits; i++)
     {
-
         calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
         detId = calData[i]->GetDetId() - 1;
         stripId = calData[i]->GetStripId() - 1;

@@ -93,8 +93,8 @@ void R3BMwpc2Cal2Hit::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Cal Data --
-    Int_t nHits = fMwpcCalDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
+    if (nHits==0)
         return;
 
     // Data from cal level
@@ -155,7 +155,7 @@ void R3BMwpc2Cal2Hit::Exec(Option_t* option)
     }
 
     if (calData)
-        delete calData;
+        delete[] calData;
     return;
 }
 

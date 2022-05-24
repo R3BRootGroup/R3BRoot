@@ -190,8 +190,8 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
     }
 
     Int_t signal_cal; // 0-based [0..14]
-    Int_t nHits = fMusliCalDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMusliCalDataCA->GetEntriesFast();
+    if (nHits == 0)
         return;
     R3BMusliCalData** calData = new R3BMusliCalData*[nHits];
     for (Int_t i = 0; i < nHits; i++)

@@ -84,12 +84,12 @@ Bool_t R3BMusliReader::Read()
 void R3BMusliReader::Reset()
 {
     // Reset the output array
+    if (fArray)
     fArray->Clear();
 }
 
 Bool_t R3BMusliReader::ReadData(EXT_STR_h101_MUSLI_onion* data)
 {
-
     Bool_t pileupFLAG;
     Bool_t overflowFLAG;
 

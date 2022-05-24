@@ -175,7 +175,6 @@ void R3BIncomingBeta::Exec(Option_t* option)
     if (fHitSci2 && fHitSci2->GetEntriesFast())
     {
         Int_t numDet = 1;
-
         nHits = fHitSci2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {

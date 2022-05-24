@@ -118,8 +118,8 @@ void R3BMwpc3Cal2Hit::Exec(Option_t* option)
     else
     {
         // Reading the Input -- Cal Data --
-        Int_t nHits = fMwpcCalDataCA->GetEntries();
-        if (!nHits)
+        Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
+        if (nHits==0)
             return;
 
         // Data from cal level
@@ -253,7 +253,7 @@ Double_t R3BMwpc3Cal2Hit::FittedHyperbolicSecant(string XorY,
 void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 {
     // Getting Position information from tof wall
-    Int_t twHits = fTofWallHitDataCA->GetEntries();
+    Int_t twHits = fTofWallHitDataCA->GetEntriesFast();
     if (!twHits)
         return;
     R3BSofTofWHitData** twHitData;
@@ -272,8 +272,8 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
         delete twHitData;
 
     // Getting Position information from mwpc3
-    Int_t nHits = fMwpcCalDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
+    if (nHits==0)
         return;
     // Data from cal level
     R3BMwpcCalData** calData;
@@ -315,7 +315,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     if (fPairX.size() == 0 || fPairY.size() == 0)
     {
         if (calData)
-            delete calData;
+            delete[] calData;
         return;
     }
 
@@ -338,7 +338,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     if (fClusterX.size() == 0 || fClusterY.size() == 0)
     {
         if (calData)
-            delete calData;
+            delete[] calData;
         return;
     }
 
@@ -379,7 +379,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     if (Xpos.size() == 0 || Ypos.size() == 0)
     {
         if (calData)
-            delete calData;
+            delete[] calData;
         return;
     }
 
@@ -388,7 +388,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
         TofWallMatching(twX, twY, Xpos, Ypos);
     }
     if (calData)
-        delete calData;
+        delete[] calData;
     return;
 }
 

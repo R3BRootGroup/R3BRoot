@@ -92,7 +92,7 @@ void R3BMusicDigitizer::Exec(Option_t* opt)
 
     Reset();
     // Reading the Input -- Point Data --
-    Int_t nHits = fMusicPoints->GetEntries();
+    Int_t nHits = fMusicPoints->GetEntriesFast();
     if (!nHits)
         return;
     // Data from Point level

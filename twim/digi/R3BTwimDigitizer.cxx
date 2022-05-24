@@ -94,7 +94,7 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
 
     Reset();
     // Reading the Input -- Point Data --
-    Int_t nHits = fTwimPoints->GetEntries();
+    Int_t nHits = fTwimPoints->GetEntriesFast();
     if (!nHits)
         return;
     // Data from Point level

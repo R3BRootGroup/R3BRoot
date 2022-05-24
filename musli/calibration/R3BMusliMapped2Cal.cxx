@@ -147,8 +147,8 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusliMappedDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMusliMappedDataCA->GetEntriesFast();
+    if (nHits == 0)
         return;
 
     R3BMusliMappedData** mappedData = new R3BMusliMappedData*[nHits];

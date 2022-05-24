@@ -74,7 +74,6 @@ Bool_t R3BRpcReader::Read()
 
     for (int i = 0; i < fData->RPC_FT_RM; i++)
     {
-
         int begin = 0;
 
         if (i != 0)
@@ -101,7 +100,6 @@ Bool_t R3BRpcReader::Read()
 
     for (int i = 0; i < fData->RPC_FT_LM; i++)
     {
-
         int begin = 0;
 
         if (i != 0)

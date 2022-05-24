@@ -181,8 +181,8 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
     // Reset entries in output arrays, local arrays
     Reset();
 
-    Int_t nHits = fMusicCalDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMusicCalDataCA->GetEntriesFast();
+    if (nHits == 0)
         return;
 
     // R3BMusicCalData* CalDat;

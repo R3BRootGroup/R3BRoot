@@ -21,12 +21,13 @@
 #define R3BMusicMapped2CalPar_H 1
 
 #include "FairTask.h"
-#include "R3BMusicMappedData.h"
 #include "R3BMusicMapped2Cal.h"
+#include "R3BMusicMappedData.h"
 #include "TGraph.h"
 #include "TH1F.h"
 
 class TClonesArray;
+class R3BTimeStitch;
 class R3BMusicCalPar;
 
 class R3BMusicMapped2CalPar : public FairTask
@@ -95,6 +96,7 @@ class R3BMusicMapped2CalPar : public FairTask
     Double_t energy[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
     Double_t dtime[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
 
+    R3BTimeStitch* fTimeStitch;
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
     TClonesArray* fHitItemsMwpcA;     /**< Array with hit items. */

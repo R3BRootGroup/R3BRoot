@@ -85,7 +85,6 @@ void R3BMusicHitPar::putParams(FairParamList* list)
     list->add("musicZHitParamsFitPar", fNumParamsZFit);
     fDetZHitParams->Set(fNumParamsZFit);
     list->add("musicZHitPar", *fDetZHitParams);
-
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -157,7 +156,6 @@ void R3BMusicHitPar::printParams()
     {
         LOG(INFO) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
     }
-
 }
 
 ClassImp(R3BMusicHitPar);

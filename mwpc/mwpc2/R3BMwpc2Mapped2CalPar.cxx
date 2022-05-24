@@ -118,8 +118,8 @@ InitStatus R3BMwpc2Mapped2CalPar::ReInit() { return kSUCCESS; }
 void R3BMwpc2Mapped2CalPar::Exec(Option_t* opt)
 {
 
-    Int_t nHits = fMwpcMappedDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
+    if (nHits==0)
         return;
 
     R3BMwpcMappedData* MapHit;

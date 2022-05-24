@@ -247,8 +247,8 @@ void R3BTwimCal2Hit::S4551()
 
 #ifdef SOFIA
 
-    Int_t nHitTwim = fTwimCalDataCA->GetEntries();
-    Int_t nHitTofW = fHitItemsTofW->GetEntries();
+    Int_t nHitTwim = fTwimCalDataCA->GetEntriesFast();
+    Int_t nHitTofW = fHitItemsTofW->GetEntriesFast();
 
     if (nHitTofW == 2 && nHitTwim > 16 && nHitTwim < 33)
     {
@@ -452,7 +452,7 @@ void R3BTwimCal2Hit::S455()
     // Reset entries in output arrays, local arrays
     Reset();
 
-    Int_t nHits = fTwimCalDataCA->GetEntries();
+    Int_t nHits = fTwimCalDataCA->GetEntriesFast();
     if (!nHits)
         return;
 
@@ -618,8 +618,8 @@ void R3BTwimCal2Hit::S467()
     // Reset entries in output arrays, local arrays
     Reset();
 
-    Int_t nHits = fTwimCalDataCA->GetEntries();
-    if (!nHits)
+    Int_t nHits = fTwimCalDataCA->GetEntriesFast();
+    if (nHits == 0)
         return;
 
     R3BTwimCalData** CalDat = new R3BTwimCalData*[nHits];

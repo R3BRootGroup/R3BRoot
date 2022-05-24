@@ -112,8 +112,8 @@ void R3BMwpcDigitizer::Exec(Option_t* opt)
 {
     Reset();
     // Reading the Input -- Point Data --
-    Int_t nHits = fMwpcPoints->GetEntries();
-    if (!nHits)
+    Int_t nHits = fMwpcPoints->GetEntriesFast();
+    if (nHits==0)
         return;
     // Data from Point level
     R3BMwpcPoint** pointData;
