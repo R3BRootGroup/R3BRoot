@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BBUNCHEDFIBERCAL2HIT
-#define R3BBUNCHEDFIBERCAL2HIT
+#ifndef R3BBUNCHEDFIBERCAL2HIT_H
+#define R3BBUNCHEDFIBERCAL2HIT_H 1
 
 #include "FairTask.h"
 
@@ -23,34 +23,31 @@
 class TH1F;
 class TH2F;
 
+class R3BFiberMappingPar;
 class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
 
-#define BUNCHED_FIBER_TRIGGER_MAP_SET(mapmt_arr, spmt_arr) \
-    MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);       \
-    SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
-
-/**
- * Transforms bunched fiber Cal level data to Hit level.
- *
- * A note about the UCESB unpacker:
- * All channels in a full plane of fibers should be mapped in sequence. For
- * example, Fib4 is built out of two "sub-detectors" (left and right side),
- * where each subdet has 256 CTDC/MAPMT 2 TAMEX2/SPMT channels, which should be
- * mapped as:
- *  FIB4_MAPMT1 .. FIB4_MAPMT512
- *  FIB4_SPMT1 .. FIB4_SPMT4
- * This class will then figure out how to map the actual fibers (except for
- * non-ambiguous sorting errors).
- */
 class R3BBunchedFiberCal2Hit : public FairTask
 {
   public:
+    // This defines the fiber direction
     enum Direction
     {
         HORIZONTAL,
         VERTICAL
+    };
+    // This tells us where the first fiber is located:
+    // VERTICAL direction ---------------------------------
+    // STANDARD: fiber 1 wixhausen -> fiber 512 messel
+    // INVERTED: fiber 1 messel -> fiber 512 wixhausen
+    // HORIZONTAL direction -------------------------------
+    // STANDARD: fiber 1 down -> fiber 512 up
+    // INVERTED: fiber 1 up -> fiber 512 down
+    enum Orientation
+    {
+        STANDARD,
+        INVERTED
     };
     struct ToT
     {
@@ -124,27 +121,14 @@ class R3BBunchedFiberCal2Hit : public FairTask
      */
     virtual void FinishTask();
 
-    R3BBunchedFiberHitModulePar* GetModuleParAt(Int_t fiber);
-
-    /**
-     * Getting all fibers correct is difficult, this function lets us fix that
-     * per detector.
-     */
-    virtual UInt_t FixMistake(UInt_t);
-
-    /**
-     * Can provide an array that lists for every channel (i.e. fiber bunch, not
-     * fiber!) the entry in the <name>TriggerCal TClonesArray for trigger
-     * times.
-     */
-    void MAPMTTriggerMapSet(unsigned const*, size_t);
-    void SPMTTriggerMapSet(unsigned const*, size_t);
+    void SetOrientation(Orientation opt) { fOrientation = opt; }
 
   private:
     TString fName;
     Int_t fnEvents;
     Int_t maxevent;
     Int_t fnEventsfill = 0;
+    Int_t fNumFibers;
 
     Int_t multi = 0;
     Double_t energy[2048];
@@ -155,6 +139,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
     double fClockFreq;
     Direction fDirection;
+    Orientation fOrientation;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;
@@ -167,6 +152,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TClonesArray* fTofdHitItems;
     unsigned const* fMAPMTTriggerMap;
     unsigned const* fSPMTTriggerMap;
+    R3BFiberMappingPar* fMapPar;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */

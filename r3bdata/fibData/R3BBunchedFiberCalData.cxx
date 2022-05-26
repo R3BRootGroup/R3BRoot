@@ -14,8 +14,8 @@
 #include "R3BBunchedFiberCalData.h"
 
 R3BBunchedFiberCalData::R3BBunchedFiberCalData()
-    : fSide(-1)
-    , fChannel(-1)
+    : fSide(0)
+    , fChannel(0)
     , fIsLeading()
     , fTime_ns(-1)
 {
@@ -35,13 +35,13 @@ Int_t R3BBunchedFiberCalData::GetChannel() const { return fChannel; }
 
 Double_t R3BBunchedFiberCalData::GetTime_ns() const { return fTime_ns; }
 
-Bool_t R3BBunchedFiberCalData::IsMAPMT() const { return 0 == fSide; }
+Bool_t R3BBunchedFiberCalData::IsMAPMT() const { return 1 == fSide; }
 
-Bool_t R3BBunchedFiberCalData::IsSPMT() const { return 1 == fSide; }
+Bool_t R3BBunchedFiberCalData::IsSPMT() const { return 2 == fSide; }
 
-Bool_t R3BBunchedFiberCalData::IsMAPMTTrigger() const { return 2 == fSide; }
+Bool_t R3BBunchedFiberCalData::IsMAPMTTrigger() const { return 3 == fSide; }
 
-Bool_t R3BBunchedFiberCalData::IsSPMTTrigger() const { return 3 == fSide; }
+Bool_t R3BBunchedFiberCalData::IsSPMTTrigger() const { return 4 == fSide; }
 
 Bool_t R3BBunchedFiberCalData::IsLeading() const { return fIsLeading; }
 
@@ -49,4 +49,4 @@ Bool_t R3BBunchedFiberCalData::IsSortable() const { return kTRUE; }
 
 Bool_t R3BBunchedFiberCalData::IsTrailing() const { return !fIsLeading; }
 
-ClassImp(R3BBunchedFiberCalData)
+ClassImp(R3BBunchedFiberCalData);

@@ -158,11 +158,14 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
     R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
+    if (mapped_num == 0)
+    {
+        return;
+    }
+
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
-        assert(mapped);
-
         auto channel = mapped->GetChannel();
         R3BLOG(DEBUG, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 
