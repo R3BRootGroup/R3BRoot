@@ -56,7 +56,9 @@ class R3BTofdPoint : public FairMCPoint
                  TVector3 momOut,
                  Double_t tof,
                  Double_t length,
-                 Double_t eLoss);
+                 Double_t eLoss,
+                 Double_t Z,
+                 Double_t A);
 
     R3BTofdPoint(Int_t trackID,
                  Int_t detID,
@@ -89,6 +91,8 @@ class R3BTofdPoint : public FairMCPoint
     void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
     void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out, fY_out, fZ_out); }
     void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out, fPy_out, fPz_out); }
+    Double_t GetFragZ() const { return fZfrag; }
+    Double_t GetFragA() const { return fAfrag; }
 
     /** Point coordinates at given z from linear extrapolation **/
     Double_t GetX(Double_t z) const;
@@ -106,6 +110,7 @@ class R3BTofdPoint : public FairMCPoint
 
   protected:
     Int_t fPlane, fPaddle;
+    Double_t fZfrag, fAfrag;
     Double32_t fX_out, fY_out, fZ_out;
     Double32_t fPx_out, fPy_out, fPz_out;
 

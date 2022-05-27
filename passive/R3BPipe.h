@@ -12,24 +12,25 @@
  ******************************************************************************/
 
 #ifndef R3BPIPE_H
-#define R3BPIPE_H
+#define R3BPIPE_H 1
 
-#include "FairDetector.h"
 #include "R3BModule.h"
-#include "TArrayI.h"
-#include "TClonesArray.h"
-#include "TNamed.h"
+#include "TString.h"
 
 class R3BPipe : public R3BModule
 {
   public:
-    R3BPipe(const char* name, const char* Title = "R3B Pipe");
     R3BPipe();
 
-    virtual ~R3BPipe();
+    R3BPipe(const TString& name);
+
+    R3BPipe(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    R3BPipe(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+
     virtual void ConstructGeometry();
 
-    ClassDef(R3BPipe, 1) // R3BPIPE
+    ClassDef(R3BPipe, 1);
 };
 
 #endif // R3BPIPE_H

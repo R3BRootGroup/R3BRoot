@@ -24,6 +24,8 @@ R3BTofdPoint::R3BTofdPoint()
 {
     fPlane = 0;
     fPaddle = 0;
+    fZfrag=0.;
+    fAfrag=0.;
     fX_out = fY_out = fZ_out = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
 }
@@ -39,7 +41,7 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
                            Double_t tof,
                            Double_t length,
                            Double_t eLoss)
-    : R3BTofdPoint(trackID, detID, 0, 0, posIn, posOut, momIn, momOut, tof, length, eLoss)
+    : R3BTofdPoint(trackID, detID, 0, 0, posIn, posOut, momIn, momOut, tof, length, eLoss, 0, 0)
 {
 }
 
@@ -54,7 +56,9 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
                            TVector3 momOut,
                            Double_t tof,
                            Double_t length,
-                           Double_t eLoss)
+                           Double_t eLoss,
+                           Double_t Z,
+                           Double_t A)
     : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss)
 {
     fPlane = planeID;
@@ -65,6 +69,8 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
     fPx_out = momOut.Px();
     fPy_out = momOut.Py();
     fPz_out = momOut.Pz();
+    fZfrag=Z;
+    fAfrag=A;
 }
 // -------------------------------------------------------------------------
 

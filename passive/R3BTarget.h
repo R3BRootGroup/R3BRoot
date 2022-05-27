@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BTARGET_H
-#define R3BTARGET_H
+#define R3BTARGET_H 1
 
 #include "R3BModule.h"
 

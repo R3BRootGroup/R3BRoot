@@ -148,7 +148,8 @@ newevt:
     {
         LOG(ERROR) << "\033[5m\033[31m R3BINCLRootGenerator: Number of simulated events larger than the ones contained "
                       "in the Root file \033[0m ";
-        LOG(INFO) << "\033[5m\033[33m R3BINCLRootGenerator: Please, provide a new Root file with more events \033[0m ";
+        LOG(WARNING)
+            << "\033[5m\033[33m R3BINCLRootGenerator: Please, provide a new Root file with more events \033[0m ";
         return kTRUE;
     }
 
@@ -157,7 +158,7 @@ newevt:
     for (Int_t j = 0; j < fParticles; j++)
     {
         Int_t pdg = 0;
-        if (fMass[j] > 1)
+        if (fMass[j] > 1 && fCharge[j] > 0)
         {
             iA = fMass[j];
             iZ = fCharge[j];
@@ -216,7 +217,7 @@ void R3BINCLRootGenerator::RegisterIons()
         Tree->GetEntry(ie);
 
         for (Int_t j = 0; j < fParticles; j++)
-            if (fMass[j] > 1 && fCharge[j] > 1)
+            if (fMass[j] > 1 && fCharge[j] > 0)
             {
                 iA = fMass[j];
                 iZ = fCharge[j];

@@ -114,8 +114,6 @@ void R3BTofD::SetSpecialPhysicsCuts()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 {
-    // Simple Det plane
-
     if (gMC->IsTrackEntering())
     {
         fELoss = 0.;
@@ -124,6 +122,10 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
         gMC->TrackPosition(fPosIn);
         gMC->TrackMomentum(fMomIn);
     }
+
+    // Charge and mass are now obtained from PDG Code
+    Double_t fZ_in = int(gMC->TrackPid() / 10000) - 100000.;
+    Double_t fA_in = 0.1 * (gMC->TrackPid() - (100000 + fZ_in) * 10000.);
 
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
@@ -194,7 +196,9 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
                TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
                fTime,
                fLength,
-               fELoss);
+               fELoss,
+               fZ_in,
+               fA_in);
 
         // Increment number of TofdPoints for this track
         auto stack = (R3BStack*)gMC->GetStack();
@@ -280,7 +284,9 @@ R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
                               TVector3 momOut,
                               Double_t time,
                               Double_t length,
-                              Double_t eLoss)
+                              Double_t eLoss,
+                              Double_t Z,
+                              Double_t A)
 {
     TClonesArray& clref = *fTofdCollection;
     Int_t size = clref.GetEntriesFast();
@@ -291,7 +297,7 @@ R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
                       << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }
     return new (clref[size])
-        R3BTofdPoint(trackID, detID, planeID, paddleID, posIn, posOut, momIn, momOut, time, length, eLoss);
+        R3BTofdPoint(trackID, detID, planeID, paddleID, posIn, posOut, momIn, momOut, time, length, eLoss, Z, A);
 }
 
 Bool_t R3BTofD::CheckIfSensitive(std::string name)

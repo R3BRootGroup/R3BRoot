@@ -60,8 +60,12 @@ class R3BMusicCal2Hit : public FairTask
     /** Method to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    /** Method for simulation reconstruction **/
+    void SetSimulation() { fSim = true; }
+
   private:
     void SetParameter();
+    void ExecSim(int);
 
     Int_t fNumAnodes;
     Int_t fNumAnodesAngleFit;
@@ -73,6 +77,7 @@ class R3BMusicCal2Hit : public FairTask
     Int_t fStatusAnodes[8]; // Status anodes
     Double_t fPosAnodes[8]; // Position-Z of each anode
     TVectorD fPosZ;
+    bool fSim;
     Bool_t fOnline; // Don't store data for online
 
     R3BMusicHitPar* fCal_Par;      /**< Parameter container. >*/

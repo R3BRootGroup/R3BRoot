@@ -132,7 +132,9 @@ class R3BTofD : public R3BDetector
                          TVector3 momOut,
                          Double_t time,
                          Double_t length,
-                         Double_t eLoss);
+                         Double_t eLoss,
+                         Double_t Z,
+                         Double_t A);
 
     /** Private method ResetParameters
      **

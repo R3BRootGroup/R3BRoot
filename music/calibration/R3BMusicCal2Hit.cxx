@@ -61,7 +61,7 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
     , fx0_point(0.0)
     , fy0_point(0.0)
     , frot_ang(0.0)
-
+    , fSim(false)
 {
 }
 
@@ -160,7 +160,7 @@ InitStatus R3BMusicCal2Hit::Init()
     }
 
     // OUTPUT DATA
-    fMusicHitDataCA = new TClonesArray("R3BMusicHitData", 10);
+    fMusicHitDataCA = new TClonesArray("R3BMusicHitData");
     rootManager->Register("MusicHitData", "Music Hit", fMusicHitDataCA, !fOnline);
 
     SetParameter();
@@ -183,7 +183,16 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
 
     Int_t nHits = fMusicCalDataCA->GetEntriesFast();
     if (nHits == 0)
+    {
         return;
+    }
+
+    // This option is only for simulations
+    if (fSim)
+    {
+        ExecSim(nHits);
+        return;
+    }
 
     // R3BMusicCalData* CalDat;
     R3BMusicCalData** CalDat = new R3BMusicCalData*[nHits];
@@ -250,7 +259,74 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
             AddHitData(theta, zhit, Esum / nba);
     }
     if (CalDat)
-        delete CalDat;
+        delete[] CalDat;
+    return;
+}
+
+void R3BMusicCal2Hit::ExecSim(int nHits)
+{
+
+    R3BMusicCalData** CalDat = new R3BMusicCalData*[nHits];
+
+    Int_t secId, anodeId;
+    Double_t energyperanode[fNumAnodes], dt[fNumAnodes], good_dt[fNumAnodes];
+    Int_t nbdet = 0;
+
+    for (Int_t j = 0; j < fNumAnodes; j++)
+    {
+        energyperanode[j] = 0.;
+        dt[j] = 0.;
+    }
+
+    for (Int_t j = 0; j < fNumAnodes; j++)
+    {
+        good_dt[j] = 0.;
+    }
+
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
+        anodeId = CalDat[i]->GetAnodeID();
+        energyperanode[anodeId] = CalDat[i]->GetEnergy();
+        dt[anodeId] = CalDat[i]->GetDTime();
+    }
+
+    Double_t nba = 0., theta = 0., Esum = 0.;
+    // calculate truncated dE from 8 anodes, MUSIC
+    fNumAnodesAngleFit = 0;
+    for (Int_t j = 0; j < fNumAnodes; j++)
+    {
+        if (energyperanode[j] > 0. && fStatusAnodes[j] == 1)
+        {
+            Esum = Esum + energyperanode[j];
+            good_dt[fNumAnodesAngleFit] = dt[j];
+            fPosAnodes[fNumAnodesAngleFit] = fCal_Par->GetAnodePos(j + 1);
+            fNumAnodesAngleFit++;
+            nba++;
+        }
+    }
+
+    if (Esum / nba > 0.)
+    {
+        fPosZ.Use(fNumAnodesAngleFit, fPosAnodes);
+        TMatrixD A(fNumAnodesAngleFit, 2);
+        TMatrixDColumn(A, 0) = 1.0;
+        TMatrixDColumn(A, 1) = fPosZ;
+        TDecompSVD svd(A);
+        Bool_t ok;
+        TVectorD dt_r;
+        dt_r.Use(fNumAnodesAngleFit, good_dt);
+        TVectorD c_svd_r = svd.Solve(dt_r, ok);
+        theta = c_svd_r[1];
+
+        Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba);
+
+        if (zhit > 0)
+            AddHitData(theta, zhit, Esum / nba);
+    }
+    if (CalDat)
+        delete[] CalDat;
+
     return;
 }
 
