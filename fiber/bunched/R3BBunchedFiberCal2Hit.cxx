@@ -18,6 +18,8 @@
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
+#include "R3BTimeStitch.h"
+
 #include "TH1F.h"
 #include "TH2F.h"
 #include <TClonesArray.h>
@@ -86,6 +88,7 @@ R3BBunchedFiberCal2Hit::R3BBunchedFiberCal2Hit(const char* a_name,
     , fnEvents(0)
     , fNumFibers(a_sub_num * a_mapmt_per_sub)
     , fOrientation(STANDARD)
+    , fTimeStitch(nullptr)
 
 {
     fChPerSub[0] = a_mapmt_per_sub;
@@ -121,8 +124,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     R3BLOG_IF(warning, !fSPMTCalTriggerItems, "Branch " << name_spmt_trig << " not found.");
 
     // maxevent = mgr->CheckMaxEventNo();
-    if (!fIsCalibrator)
-        mgr->Register(fName + "Hit", "Fiber Hit Data", fHitItems, kTRUE);
+    // if (!fIsCalibrator)
+    mgr->Register(fName + "Hit", "Fiber Hit Data", fHitItems, kTRUE);
 
     // Resize per-channel info arrays.
     for (auto side_i = 0; side_i < 2; ++side_i)
@@ -247,6 +250,9 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_time_Fib->GetYaxis()->SetTitle("time / ns");
 
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BTimeStitch();
+
     return kSUCCESS;
 }
 
@@ -367,7 +373,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
-            Double_t c_period = 0 == side_i ? 4096. * (1000. / fClockFreq) : 2048. * (1000. / 200.);
+            // Double_t c_period = 0 == side_i ? 4096. * (1000. / fClockFreq) : 2048. * (1000. / 200.);
 
             auto ch_i = cur_cal->GetChannel() - 1;
             auto& channel = fChannelArray[side_i].at(ch_i);
@@ -397,12 +403,14 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             }
             else if (cur_cal->IsSPMT() && fSPMTCalTriggerItems)
             {
+                // std::cout<< side_i+1<<" "<<ch_i + 1<<"  "<<fMapPar->GetTrigMap(side_i + 1, ch_i + 1)<<std::endl;
                 auto cur_cal_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1); // fSPMTTriggerMap[ch_i];
-                auto lead_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1);    // fSPMTTriggerMap[lead->GetChannel() -
-                                                                                 // 1];
+                auto lead_trig_i =
+                    fMapPar->GetTrigMap(side_i + 1, lead->GetChannel()); // fSPMTTriggerMap[lead->GetChannel()
                 // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
                 // lead->GetChannel() - 1, lead_trig_i, spmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
                 // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
+                // std::cout<<" "<<lead_trig_i<<"  "<<spmt_trig_table.size()<<std::endl;
                 if (cur_cal_trig_i < spmt_trig_table.size() && lead_trig_i < spmt_trig_table.size())
                 {
                     auto cur_cal_trig = spmt_trig_table.at(cur_cal_trig_i);
@@ -412,10 +420,35 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                 }
             }
 
-            auto cur_cal_ns =
-                fmod(cur_cal->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
-            auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
-            auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
+            Double_t cur_cal_ns = 0.;
+            Double_t lead_ns = 0.;
+            Double_t tot_ns = 0.;
+
+            // auto cur_cal_ns =
+            //   fmod(cur_cal->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
+
+            // auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period /
+            // 2;
+
+            // auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
+
+            // auto tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
+
+            if (side_i == 0)
+            {
+                cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "clocktdc", "clocktdc");
+                lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "clocktdc", "clocktdc");
+                tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
+                // tot_ns = fmod(cur_cal->GetTime_ns() - lead->GetTime_ns() + c_period + c_period / 2, c_period) -
+                // c_period / 2; tot_ns = fmod(cur_cal->GetTime_ns() - lead->GetTime_ns() + c_period, c_period);
+                // std::cout<<cur_cal->GetTime_ns()<<" "<< cur_cal->GetTime_ns() - lead->GetTime_ns() <<std::endl;
+            }
+            else
+            {
+                cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "tamex", "tamex");
+                lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "tamex", "tamex");
+                tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "tamex", "tamex");
+            }
 
             // if (fName=="Fi3a" && side_i==0) {
             // printf("3a curr %8.2f %8.2f\n", cur_cal->GetTime_ns(), cur_cal_trig_ns);
@@ -668,9 +701,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     counts[fiber_id - 1] = counts[fiber_id - 1] + 1;
                     multi++;
 
-                    if (!fIsCalibrator)
-                        new ((*fHitItems)[fHitItems->GetEntriesFast()])
-                            R3BBunchedFiberHitData(0, x, y, eloss, tof, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
+                    // if (!fIsCalibrator)
+                    new ((*fHitItems)[fHitItems->GetEntriesFast()])
+                        R3BBunchedFiberHitData(0, x, y, eloss, tof, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
                 }
             }
         }

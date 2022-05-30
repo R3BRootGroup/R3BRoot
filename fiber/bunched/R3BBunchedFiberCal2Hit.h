@@ -24,6 +24,7 @@ class TH1F;
 class TH2F;
 
 class R3BFiberMappingPar;
+class R3BTimeStitch;
 class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
@@ -133,13 +134,14 @@ class R3BBunchedFiberCal2Hit : public FairTask
     Int_t multi = 0;
     Double_t energy[2048];
     Int_t counts[2048];
-    Double_t tsync_temp[2048] = { 0 };
-    Double_t gain_temp[2048] = { 10 };
+    Double_t tsync_temp[2048];
+    Double_t gain_temp[2048];
     Bool_t tofdin;
 
     double fClockFreq;
     Direction fDirection;
     Orientation fOrientation;
+    R3BTimeStitch* fTimeStitch;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;
