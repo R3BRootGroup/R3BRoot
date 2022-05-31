@@ -18,7 +18,6 @@
 
 /*
  * This task should make the analysis of the incoming projectiles from FRS
- *
  */
 
 #include "FairLogger.h"

@@ -373,8 +373,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
-            // Double_t c_period = 0 == side_i ? 4096. * (1000. / fClockFreq) : 2048. * (1000. / 200.);
-
             auto ch_i = cur_cal->GetChannel() - 1;
             auto& channel = fChannelArray[side_i].at(ch_i);
             if (channel.lead_list.empty())
@@ -388,8 +386,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             if (cur_cal->IsMAPMT() && fMAPMTTriggerMap)
             {
                 auto cur_cal_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1); // fMAPMTTriggerMap[ch_i];
-                auto lead_trig_i =
-                    fMapPar->GetTrigMap(side_i + 1, lead->GetChannel()); // fMAPMTTriggerMap[lead->GetChannel() - 1];
+                auto lead_trig_i = fMapPar->GetTrigMap(side_i + 1, lead->GetChannel());
                 // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
                 // lead->GetChannel() - 1, lead_trig_i, mapmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
                 // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
@@ -403,14 +400,11 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             }
             else if (cur_cal->IsSPMT() && fSPMTCalTriggerItems)
             {
-                // std::cout<< side_i+1<<" "<<ch_i + 1<<"  "<<fMapPar->GetTrigMap(side_i + 1, ch_i + 1)<<std::endl;
                 auto cur_cal_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1); // fSPMTTriggerMap[ch_i];
-                auto lead_trig_i =
-                    fMapPar->GetTrigMap(side_i + 1, lead->GetChannel()); // fSPMTTriggerMap[lead->GetChannel()
+                auto lead_trig_i = fMapPar->GetTrigMap(side_i + 1, lead->GetChannel());
                 // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
                 // lead->GetChannel() - 1, lead_trig_i, spmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
                 // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
-                // std::cout<<" "<<lead_trig_i<<"  "<<spmt_trig_table.size()<<std::endl;
                 if (cur_cal_trig_i < spmt_trig_table.size() && lead_trig_i < spmt_trig_table.size())
                 {
                     auto cur_cal_trig = spmt_trig_table.at(cur_cal_trig_i);
@@ -423,25 +417,11 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             Double_t cur_cal_ns = 0.;
             Double_t lead_ns = 0.;
             Double_t tot_ns = 0.;
-
-            // auto cur_cal_ns =
-            //   fmod(cur_cal->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
-
-            // auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period /
-            // 2;
-
-            // auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
-
-            // auto tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
-
             if (side_i == 0)
             {
                 cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "clocktdc", "clocktdc");
                 lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "clocktdc", "clocktdc");
                 tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
-                // tot_ns = fmod(cur_cal->GetTime_ns() - lead->GetTime_ns() + c_period + c_period / 2, c_period) -
-                // c_period / 2; tot_ns = fmod(cur_cal->GetTime_ns() - lead->GetTime_ns() + c_period, c_period);
-                // std::cout<<cur_cal->GetTime_ns()<<" "<< cur_cal->GetTime_ns() - lead->GetTime_ns() <<std::endl;
             }
             else
             {
@@ -450,37 +430,15 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                 tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "tamex", "tamex");
             }
 
-            // if (fName=="Fi3a" && side_i==0) {
-            // printf("3a curr %8.2f %8.2f\n", cur_cal->GetTime_ns(), cur_cal_trig_ns);
-            // printf("3a lead %8.2f %8.2f\n", lead->GetTime_ns(), lead_trig_ns);
-            //}
-            //
-            // if (fName=="Fi3b" && side_i==0) {
-            // printf("3b curr %8.2f %8.2f\n", cur_cal->GetTime_ns(), cur_cal_trig_ns);
-            // printf("3b lead %8.2f %8.2f\n", lead->GetTime_ns(), lead_trig_ns);
-            //}
-            // if (cur_cal->IsMAPMT() && tot_ns < 0) {
-            //  printf("%8.2f %8.2f %8.2f\n", lead->GetTime_ns(), cur_cal->GetTime_ns(), tot_ns);
-            //  do_print = true;
-            //}
-
-            //  if (tot_ns > 0 && tot_ns < 1000)
-            //  {
-            // if (side_i==0) tot_ns -= 9.;//taken out for the moment MH
             if (side_i == 1)
                 channel.tot_list.push_back(ToT(lead, cur_cal, lead_ns, cur_cal_ns, tot_ns));
             if (side_i == 0)
                 channel.tot_list.push_front(ToT(lead, cur_cal, lead_ns, cur_cal_ns, tot_ns));
 
             channel.lead_list.pop_front();
-            // }
         }
     }
-    // if (do_print) for (size_t j = 0; j < cal_num; ++j) {
-    // auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
-    // if (cur_cal->IsMAPMT())
-    // printf("%3u: %3u %u %f\n", j, cur_cal->GetChannel(), cur_cal->IsLeading(), cur_cal->GetTime_ns());
-    //}
+
     double s1 = 99.;
     double s2 = 99.;
     double s3 = 99.;
@@ -530,18 +488,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     // auto fiber_id = mapmt_tot.lead->GetChannel();
                     auto fiber_id = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] +
                                     ((spmt_tot.lead->GetChannel() - 1) % fChPerSub[1]) + 1;
-
-                    // auto fiber_id_ch = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] + 1;
                     single = spmt_tot.lead->GetChannel();
-
-                    // TODO: Use it_sub->direction to find real life coordinates.
-
-                    // Fix fiber installation mistakes.
-                    // fiber_id = FixMistake(fiber_id);
 
                     // Calibrate hit fiber.
                     auto tot_mapmt = mapmt_tot.tot_ns;
-                    // std::cout << mapmt_tot.tot_ns << " "<< tot_mapmt << std::endl;
                     auto tot_spmt = spmt_tot.tot_ns;
                     Double_t t_mapmt = mapmt_tot.lead_ns;
 

@@ -189,7 +189,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     }
 
     // Hit data
-    if(fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
+    if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
 
         Double_t theta = 0., phi = 0.;
@@ -224,15 +224,22 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
                 maxEL = califa_e[i1];
             }
         }
-		if (maxEL > fMinProtonE && maxER > fMinProtonE && TMath::Abs(master[0].Phi()* TMath::RadToDeg() - master[1].Phi()* TMath::RadToDeg()) > 150.0)
-        {   if(gRandom->Uniform(0.,1.0)<0.5){
-              fh2_Califa_coinTheta->Fill(master[0].Theta()* TMath::RadToDeg(), master[1].Theta()* TMath::RadToDeg());
-              fh2_Califa_coinPhi->Fill(master[0].Phi()* TMath::RadToDeg(), master[1].Phi()* TMath::RadToDeg());
-					    } else{
-	      fh2_Califa_coinTheta->Fill(master[1].Theta()* TMath::RadToDeg(), master[0].Theta()* TMath::RadToDeg());
-	      fh2_Califa_coinPhi->Fill(master[1].Phi()* TMath::RadToDeg(), master[0].Phi()* TMath::RadToDeg());
-	    }
-	}
+        if (maxEL > fMinProtonE && maxER > fMinProtonE &&
+            TMath::Abs(master[0].Phi() * TMath::RadToDeg() - master[1].Phi() * TMath::RadToDeg()) > 150.0)
+        {
+            if (gRandom->Uniform(0., 1.0) < 0.5)
+            {
+                fh2_Califa_coinTheta->Fill(master[0].Theta() * TMath::RadToDeg(),
+                                           master[1].Theta() * TMath::RadToDeg());
+                fh2_Califa_coinPhi->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
+            }
+            else
+            {
+                fh2_Califa_coinTheta->Fill(master[1].Theta() * TMath::RadToDeg(),
+                                           master[0].Theta() * TMath::RadToDeg());
+                fh2_Califa_coinPhi->Fill(master[1].Phi() * TMath::RadToDeg(), master[0].Phi() * TMath::RadToDeg());
+            }
+        }
     }
 
     fNEvents += 1;

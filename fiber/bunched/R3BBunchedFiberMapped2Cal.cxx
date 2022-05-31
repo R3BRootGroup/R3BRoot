@@ -232,7 +232,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
                            << ",ns=" << fine_ns << ").");
                 continue;
             }
-            time_ns = (mapped->GetCoarse() + 1) * fTamexFreq - time_ns;
+            time_ns = (mapped->GetCoarse() + 1) * fTamexFreq - fine_ns;
 
             R3BLOG(DEBUG, "Channel=" << channel << ": Time=" << time_ns << "ns.");
         }

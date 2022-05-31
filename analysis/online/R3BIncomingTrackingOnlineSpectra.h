@@ -22,9 +22,9 @@
 
 #include "FairTask.h"
 #include "TCanvas.h"
+#include "TCutG.h"
 #include "TH1.h"
 #include "TH2F.h"
-#include "TMath.h"
 
 class TClonesArray;
 class R3BEventHeader;
@@ -38,6 +38,8 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
      * Creates an instance of the task with default parameters.
      */
     R3BIncomingTrackingOnlineSpectra();
+
+    R3BIncomingTrackingOnlineSpectra(const TString& name, float, float, float, float);
 
     /**
      * Standard constructor.
@@ -91,32 +93,22 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
-    /**
-     * Method to set up charge range in the histograms.
-     */
-    inline void Set_Charge_range(Float_t minz, Float_t maxz)
-    {
-        fZ_min = minz;
-        fZ_max = maxz;
-    }
-
   private:
     TClonesArray* fMwpc0HitDataCA; /**< Array with Mwpc0 Hit-input data. >*/
     TClonesArray* fMwpc1HitDataCA; /**< Array with Mwpc1 Hit-input data. >*/
-    TClonesArray* fTwimHitDataCA;  /**< Array with Twim Hit-input data. >*/
+    TClonesArray* fFrsHitDataCA;   /**< Array with FRS Hit-input data. >*/
 
     // Parameters
     R3BTGeoPar* fMw0GeoPar;
     R3BTGeoPar* fTargetGeoPar;
     R3BTGeoPar* fMw1GeoPar;
 
-    // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header.      */
-    Int_t fNEvents;         /**< Event counter.     */
+    R3BEventHeader* header;
+    Int_t fNEvents;
     Float_t fPosTarget;
     Float_t fWidthTarget;
     Float_t fDist_acelerator_glad;
-    Float_t fZ_max, fZ_min;
+    TString fNameCut;
 
     // Canvas
     TCanvas* cTrackingXZ;
@@ -131,6 +123,7 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
     TH2F* fh2_ZvsBeta;
     TH2F* fh2_angvsposx;
     TH2F* fh2_angvsposy;
+    TCutG* fCutIncoming;
 
   public:
     ClassDef(R3BIncomingTrackingOnlineSpectra, 1)
