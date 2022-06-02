@@ -87,18 +87,25 @@ class R3BIncomingIDOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
+    /**
+     * Method for setting the fTpat
+     */
+    void SetTpat(Int_t tpat) { fTpat = tpat; }
+
     // Setting parameters
     void SetStartPlaId(Int_t id) { fStaId = id; };
     void SetRangeZ(Double_t min, Double_t max)
     {
         fMin_Z = min;
         fMax_Z = max;
-    };
+    }
+
     void SetRangeAq(Double_t min, Double_t max)
     {
         fMin_Aq = min;
         fMax_Aq = max;
-    };
+    }
+
     void SetIsoGate(Double_t minz, Double_t maxz, Double_t minaq, Double_t maxaq)
     {
         fMin_Z_gate = minz;
@@ -126,6 +133,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
+    Int_t fTpat;
 
     // Canvas
     TCanvas* cBeta;
