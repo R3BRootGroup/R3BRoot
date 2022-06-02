@@ -165,10 +165,11 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     TString Name2;
 
     // Hit data, tracking plane X-Z
-    cTrackingXZ = new TCanvas("Tracking_before_GLAD_XZ" + fNameCut, "Tracking (Lab.) plane XZ info", 10, 10, 800, 700);
+    cTrackingXZ = new TCanvas(
+        "Tracking_before_GLAD_XZ" + fNameCut, "Tracking (Lab.) plane XZ info " + fNameCut, 10, 10, 800, 700);
 
     Name1 = "fh2_tracking_planeXZ" + fNameCut;
-    Name2 = "Tracking (Lab.) plane XZ info";
+    Name2 = "Tracking (Lab.) plane XZ info " + fNameCut;
     Int_t histoYlim = 150;
     fh2_tracking_planeXZ = new TH2F(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
     fh2_tracking_planeXZ->GetXaxis()->SetTitle("Beam direction-Z [mm]");
@@ -211,9 +212,10 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     latex.DrawLatex(fDist_acelerator_glad - 600., -1. * histoYlim + 20., "GLAD wind.");
 
     // Hit data, tracking plane Y-Z
-    cTrackingYZ = new TCanvas("Tracking_before_GLAD_YZ" + fNameCut, "Tracking (Lab.) plane YZ info", 10, 10, 800, 700);
+    cTrackingYZ = new TCanvas(
+        "Tracking_before_GLAD_YZ" + fNameCut, "Tracking (Lab.) plane YZ info " + fNameCut, 10, 10, 800, 700);
     Name1 = "fh2_tracking_planeYZ" + fNameCut;
-    Name2 = "Tracking (Lab.) plane YZ info";
+    Name2 = "Tracking (Lab.) plane YZ info " + fNameCut;
     fh2_tracking_planeYZ = new TH2F(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
     fh2_tracking_planeYZ->GetXaxis()->SetTitle("Beam direction-Z [mm]");
     fh2_tracking_planeYZ->GetYaxis()->SetTitle("Y [mm]");
@@ -241,9 +243,10 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     arrow->Draw();
 
     // Hit data, Beam profile X-Y at target position
-    cBeamProfileTarget = new TCanvas("Beam_profile_XY_at_target" + fNameCut, "Beam profile XY info", 10, 10, 800, 700);
+    cBeamProfileTarget =
+        new TCanvas("Beam_profile_XY_at_target" + fNameCut, "Beam profile XY info " + fNameCut, 10, 10, 800, 700);
     Name1 = "fh2_beam_profile_XY" + fNameCut;
-    Name2 = "Beam profile-XY (Lab.) at target position";
+    Name2 = "Beam profile-XY (Lab.) at target position " + fNameCut;
     fh2_target_PosXY = new TH2F(Name1, Name2, 200, -100., 100., 200, -100., 100.);
     fh2_target_PosXY->GetXaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
     fh2_target_PosXY->GetYaxis()->SetTitle("Y [mm]");
@@ -257,10 +260,16 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     fh2_target_PosXY->Draw("colz");
 
     // AngleX and positionX on the target position
-    auto cAPX =
-        new TCanvas("AngleX_vs_positionX_target" + fNameCut, "Angle_XZ vs position X on target", 10, 10, 800, 700);
-    fh2_angvsposx = new TH2F(
-        "AngXvsPosX" + fNameCut, "Angle vs position on target", 500, -fWidthTarget, fWidthTarget, 500, -10., 10.);
+    auto cAPX = new TCanvas(
+        "AngleX_vs_positionX_target" + fNameCut, "Angle_XZ vs position X on target " + fNameCut, 10, 10, 800, 700);
+    fh2_angvsposx = new TH2F("AngXvsPosX" + fNameCut,
+                             "Angle vs position on target " + fNameCut,
+                             500,
+                             -fWidthTarget,
+                             fWidthTarget,
+                             500,
+                             -10.,
+                             10.);
     fh2_angvsposx->GetXaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
     fh2_angvsposx->GetYaxis()->SetTitle("Angle plane_XZ [mrad]");
     fh2_angvsposx->GetYaxis()->SetTitleOffset(1.1);
@@ -274,10 +283,16 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     fh2_angvsposx->Draw("colz");
 
     // AngleY and positionY on the target position
-    auto cAPY =
-        new TCanvas("AngleY_vs_positionY_target" + fNameCut, "Angle_YZ vs position Y on target", 10, 10, 800, 700);
-    fh2_angvsposy = new TH2F(
-        "AngYvsPosY" + fNameCut, "Angle vs position on target", 500, -fWidthTarget, fWidthTarget, 500, -10., 10.);
+    auto cAPY = new TCanvas(
+        "AngleY_vs_positionY_target" + fNameCut, "Angle_YZ vs position Y on target " + fNameCut, 10, 10, 800, 700);
+    fh2_angvsposy = new TH2F("AngYvsPosY" + fNameCut,
+                             "Angle vs position on target " + fNameCut,
+                             500,
+                             -fWidthTarget,
+                             fWidthTarget,
+                             500,
+                             -10.,
+                             10.);
     fh2_angvsposy->GetXaxis()->SetTitle("Y [mm]");
     fh2_angvsposy->GetYaxis()->SetTitle("Angle plane_YZ [mrad]");
     fh2_angvsposy->GetYaxis()->SetTitleOffset(1.1);
@@ -291,7 +306,7 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     fh2_angvsposy->Draw("colz");
 
     // MAIN FOLDER
-    TFolder* mainfol = new TFolder("Tracking_Cave" + fNameCut, "Tracking info");
+    TFolder* mainfol = new TFolder("Tracking_Cave" + fNameCut, "Tracking info " + fNameCut);
     mainfol->Add(cTrackingXZ);
     mainfol->Add(cTrackingYZ);
     mainfol->Add(cBeamProfileTarget);
