@@ -359,17 +359,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         }
     }
 
-    // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat;
-    Int_t tpatvalue;
-    if (fTpat_bit >= 0)
-    {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 < fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue == 0))
-            return;
-    }
+    if ((fTpat > 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+        return;
 
     //----------------------------------------------------------------------
     // LOS detector
