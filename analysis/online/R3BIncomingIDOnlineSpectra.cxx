@@ -49,6 +49,7 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
     , fMwpc0HitDataCA(NULL)
     , fMwpc1HitDataCA(NULL)
     , fNEvents(0)
+    , fTpat(-1)
     , fStaId(1)
     , fMin_Z(0.)
     , fMax_Z(20.)
@@ -58,6 +59,7 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
     , fMax_Z_gate(20.)
     , fMin_Aq_gate(1.6)
     , fMax_Aq_gate(2.9)
+    , header(nullptr)
 {
 }
 
@@ -95,6 +97,9 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    R3BLOG_IF(ERROR, !header, "Branch EventHeader. not found");
 
     // get access to mapped data of FRS
     fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
@@ -314,6 +319,9 @@ void R3BIncomingIDOnlineSpectra::Reset_Histo()
 
 void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
 {
+    if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+        return;
+
     // Fill Hit data
     if (fHitFrs && fHitFrs->GetEntriesFast() > 0)
     {
@@ -340,14 +348,12 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
                 if (!hit_mw0)
                     continue;
                 auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
-                auto mwpc0y = hit_mw0->GetY() + fMw0GeoPar->GetPosY() * 10.; // mm
                 for (Int_t iMw1 = 0; iMw1 < nHits_Mw1; iMw1++)
                 {
                     auto hit_mw1 = (R3BMwpcHitData*)fMwpc1HitDataCA->At(iMw1);
                     if (!hit_mw1)
                         continue;
                     auto mwpc1x = hit_mw1->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
-                    auto mwpc1y = hit_mw1->GetY() + fMw1GeoPar->GetPosY() * 10.; // mm
                     auto XCave = mwpc0x;
                     auto AngleCave =
                         (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10. * 1000.; // mrad
