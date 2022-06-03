@@ -21,6 +21,7 @@
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BLogger.h"
+#include "R3BLosHitData.h"
 #include "R3BMwpcHitData.h"
 #include "R3BTGeoPar.h"
 
@@ -46,6 +47,7 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra()
 R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fHitFrs(NULL)
+    , fHitLos(NULL)
     , fMwpc0HitDataCA(NULL)
     , fMwpc1HitDataCA(NULL)
     , fNEvents(0)
@@ -54,11 +56,11 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
     , fMin_Z(0.)
     , fMax_Z(20.)
     , fMin_Aq(1.6)
-    , fMax_Aq(2.9)
+    , fMax_Aq(3.9)
     , fMin_Z_gate(0.)
     , fMax_Z_gate(20.)
     , fMin_Aq_gate(1.6)
-    , fMax_Aq_gate(2.9)
+    , fMax_Aq_gate(3.9)
     , header(nullptr)
 {
 }
@@ -68,6 +70,8 @@ R3BIncomingIDOnlineSpectra::~R3BIncomingIDOnlineSpectra()
     R3BLOG(INFO, "");
     if (fHitFrs)
         delete fHitFrs;
+    if (fHitLos)
+        delete fHitLos;
     if (fMwpc0HitDataCA)
         delete fMwpc0HitDataCA;
     if (fMwpc1HitDataCA)
@@ -104,6 +108,8 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     // get access to mapped data of FRS
     fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
     R3BLOG_IF(FATAL, !fHitFrs, "Branch FrsData not found");
+    fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
+    R3BLOG_IF(FATAL, !fHitLos, "Branch LosHitData not found");
     fMwpc0HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc0HitData");
     R3BLOG_IF(FATAL, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
     fMwpc1HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc1HitData");
@@ -285,6 +291,20 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh2_IsoGated_xc_anglec->GetYaxis()->SetTitleSize(0.045);
     fh2_IsoGated_xc_anglec->Draw("colz");
 
+    cLosE_Tof = new TCanvas("LosE_Tof", "DeltaE in LOS and Tof", 10, 10, 800, 700);
+
+    Name1 = "LOS-E_vs_ToF";
+    Name2 = "LOS Energy vs Raw ToF (S2-LOS);Raw ToF (S2-LOS) / ns;LOS Z";
+    fh2_LosE_Tof = new TH2F(Name1, Name2, 3000, 0, 3000, 900, 0, 30);
+    fh2_LosE_Tof->GetYaxis()->SetTitleOffset(1.1);
+    fh2_LosE_Tof->GetXaxis()->CenterTitle(true);
+    fh2_LosE_Tof->GetYaxis()->CenterTitle(true);
+    fh2_LosE_Tof->GetXaxis()->SetLabelSize(0.045);
+    fh2_LosE_Tof->GetXaxis()->SetTitleSize(0.045);
+    fh2_LosE_Tof->GetYaxis()->SetLabelSize(0.045);
+    fh2_LosE_Tof->GetYaxis()->SetTitleSize(0.045);
+    fh2_LosE_Tof->Draw("colz");
+
     // MAIN FOLDER-INCOMINGID
     TFolder* mainfol = new TFolder("FRS-IncomingID", "FRS incomingID info");
     mainfol->Add(cAoQvsPosS2);
@@ -294,6 +314,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     mainfol->Add(cXs2vsBeta);
     mainfol->Add(cAqvsq);
     mainfol->Add(cIsoGated);
+    mainfol->Add(cLosE_Tof);
     run->AddObject(mainfol);
 
     // Register command to reset histograms
@@ -315,6 +336,7 @@ void R3BIncomingIDOnlineSpectra::Reset_Histo()
     fh2_IsoGated_Z_xc->Reset();
     fh2_IsoGated_xs2_xc->Reset();
     fh2_IsoGated_xc_anglec->Reset();
+    fh2_LosE_Tof->Reset();
 }
 
 void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
@@ -368,7 +390,19 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
                     fh2_IsoGated_xc_anglec->Fill(XCave, AngleCave);
                 }
             }
-        }
+            // making los pid
+            if (fHitLos && fHitLos->GetEntriesFast() > 0)
+            {
+                Int_t nHitsLos = fHitLos->GetEntriesFast();
+                for (Int_t ihitLos = 0; ihitLos < nHitsLos; ihitLos++)
+                {
+                    R3BLosHitData* hitLos = (R3BLosHitData*)fHitLos->At(ihitLos);
+                    if (!hitLos)
+                        continue;
+                    fh2_LosE_Tof->Fill(hit->GetTof(), hitLos->GetZ());
+                }
+            }
+        } // for hit frs
     }
 
     fNEvents += 1;

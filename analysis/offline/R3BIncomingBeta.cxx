@@ -223,10 +223,8 @@ void R3BIncomingBeta::Exec(Option_t* option)
             {
                 if (num_tof_candidates > 0)
                     break;
-                ToFraw_m1 =
-                    fTimeStitch->GetTime(timeLosV[i][multLos[i_L]] - TimeSci2_m1[i][multSci2[i_2]], "vftx", "vftx");
-                ToFrawwTref_m1 =
-                    fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][multSci2[i_2]], "vftx", "vftx");
+                ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
+                ToFrawwTref_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
 
                 Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
                                 fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
@@ -246,15 +244,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
                 // is restricted to be one. The beta conditions should be optimised.
                 if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
                 {
-                    AddData(1,
-                            2,
-                            0.,
-                            0.,
-                            Beta_m1,
-                            0.,
-                            PosSci2_m1[i][multSci2[i_2]],
-                            posLosX_cm[i][multLos[i_L]],
-                            ToFraw_m1);
+                    AddData(1, 2, 0., 0., Beta_m1, 0., PosSci2_m1[i][i_2], posLosX_cm[i][i_L], ToFraw_m1);
                     num_tof_candidates++;
                 }
             }

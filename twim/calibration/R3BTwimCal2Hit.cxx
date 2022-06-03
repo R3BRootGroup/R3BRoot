@@ -178,8 +178,7 @@ void R3BTwimCal2Hit::SetParameter()
                        "R3BTwimCal2Hit parameters for charge-Z vs tof:"
                            << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
                            << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
-                           << CalZParams->GetAt(s * fNumParams + 3) << " : "
-                           << CalZParams->GetAt(s * fNumParams + 4));
+                           << CalZParams->GetAt(s * fNumParams + 3) << " : " << CalZParams->GetAt(s * fNumParams + 4));
             }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);

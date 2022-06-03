@@ -116,6 +116,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fHitFrs; /**< Array with hit items. */
+    TClonesArray* fHitLos; /**< Array with hit items. */
     TClonesArray* fMwpc0HitDataCA;
     TClonesArray* fMwpc1HitDataCA;
 
@@ -143,6 +144,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     TCanvas* cXs2vsBeta;
     TCanvas* cAoQvsPosS2;
     TCanvas* cIsoGated;
+    TCanvas* cLosE_Tof;
 
     // Histograms for Hit data
     TH1F* fh1_beta;
@@ -155,6 +157,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     TH2F* fh2_IsoGated_Z_xc;
     TH2F* fh2_IsoGated_xs2_xc;
     TH2F* fh2_IsoGated_xc_anglec;
+    TH2F* fh2_LosE_Tof;
 
   public:
     ClassDef(R3BIncomingIDOnlineSpectra, 1)
