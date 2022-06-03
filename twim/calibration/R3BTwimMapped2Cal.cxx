@@ -273,8 +273,12 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                             // anodes 1 to 16 : energy and time
                             // anode 17 : reference time
                             // anode 18 : trigger time
-                            auto dtime = fTimeStitch->GetTime(fDT[s][k][i] - fDT[s][j][fNumAnodes], "vftx", "vftx");
-                            AddCalData(s + 1, i + 1, a0 + a1 * dtime, fE[s][k][i]);
+
+                            //auto dtime = fTimeStitch->GetTime(fDT[s][k][i] - fDT[s][j][fNumAnodes], "vftx", "vftx");
+                            //AddCalData(s + 1, i + 1, a0 + a1 * dtime, fE[s][k][i]);
+                                
+                            AddCalData(s + 1, i + 1, a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]), fE[s][k][i]);
+
                         }
                     }
             }
