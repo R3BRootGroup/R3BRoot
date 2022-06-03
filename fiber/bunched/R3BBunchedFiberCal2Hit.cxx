@@ -518,7 +518,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         }
                     }
 
-                    if (fIsCalibrator)
+                    //if (fIsCalibrator)
                     {
                         fh_time_Fib->Fill(fiber_id, t_mapmt);
                         fh_time_s_Fib->Fill(single, t_spmt);
@@ -559,7 +559,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     }
                     tof -= tsync;
 
-                    if (fIsCalibrator)
+                    //if (fIsCalibrator)
                     {
                         // histogram for offset determination
                         fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
@@ -642,7 +642,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     {
                         eloss = tot_mapmt;
                     }
-                    if (fIsCalibrator)
+                    //if (fIsCalibrator)
                     {
                         fh_ToT_ToT->Fill(tot_mapmt, tot_spmt);
                     }
