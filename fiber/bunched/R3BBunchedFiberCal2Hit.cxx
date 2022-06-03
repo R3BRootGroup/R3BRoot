@@ -672,25 +672,24 @@ void R3BBunchedFiberCal2Hit::FinishEvent()
 void R3BBunchedFiberCal2Hit::FinishTask()
 {
 
-        fh_ToT_MA_Fib->Write();
-        fh_ToT_Single_Fib->Write();
-        fh_dt_Fib->Write();
-        fh_time_Fib->Write();
-        fh_Fib_ToF->Write();
-        fh_Test->Write();
-        fh_time_s_Fib->Write();
+    fh_ToT_MA_Fib->Write();
+    fh_ToT_Single_Fib->Write();
+    fh_dt_Fib->Write();
+    fh_time_Fib->Write();
+    fh_Fib_ToF->Write();
+    fh_Test->Write();
+    fh_time_s_Fib->Write();
 
-        /*
+    /*
 
-            fh_multi->Write();
-        */
+        fh_multi->Write();
+    */
 
-        for (Int_t i = 0; i < 4; i++)
-        {
-            fh_ToT_s_Fib[i]->Write();
-        }
-        fh_ToT_ToT->Write();
-
+    for (Int_t i = 0; i < 4; i++)
+    {
+        fh_ToT_s_Fib[i]->Write();
+    }
+    fh_ToT_ToT->Write();
 
     if (fIsCalibrator)
     {
@@ -764,28 +763,28 @@ void R3BBunchedFiberCal2Hit::FinishTask()
             }
         }
         // MH
-                for (UInt_t i = 1; i <= max; i++)
+        for (UInt_t i = 1; i <= max; i++)
+        {
+            TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i + 1, i + 1, 0);
+            for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
+            {
+                if (j == 2)
                 {
-                    TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i + 1, i + 1, 0);
-                    for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
-                    {
-                        if (j == 2)
-                        {
-                            // could not find maximum
-                        }
-
-                        if (proj->GetBinContent(j) > proj->GetMaximum() / 10.)
-                        {
-                            R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
-                            par->SetGainS(proj->GetBinCenter(j));
-                            // cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
-                            // par->SetGainS(j - 1);
-                            cout << "S fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
-                            break;
-                        }
-                    }
+                    // could not find maximum
                 }
-        
+
+                if (proj->GetBinContent(j) > proj->GetMaximum() / 10.)
+                {
+                    R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
+                    par->SetGainS(proj->GetBinCenter(j));
+                    // cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
+                    // par->SetGainS(j - 1);
+                    cout << "S fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
+                    break;
+                }
+            }
+        }
+
         fCalPar->setChanged();
     }
 }

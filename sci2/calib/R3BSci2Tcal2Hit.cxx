@@ -148,18 +148,25 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
 
         for (UShort_t d = 0; d < 2; d++)
         {
-            // Actually we just consider data with mult == 1,
-            // otherwise, we should select the proper hit on each
-            // side looking at the ToF from S2 to cave C.
-            // This would require to read the LOS data
-            if (multTcal[d][0] == 1 && multTcal[d][1] == 1)
+            // This hit selection requiring both multiplicity
+            // being the same should not be used for the
+            // actual offline analysis, but still sufficient
+            // assumption  for the online analysis.
+            // For the offline analysis, it is important to
+            // check time difference between two detectors
+            // to get a pair of hits with reasonable position.
+            // At the Sci2Hit level, we don't care about higher
+            // multiplicity. The good hit will be selected by
+            // later analysis, such as R3BIncomingBeta to find
+            // a good hit to give a proper tof value.
+            if (multTcal[d][0] == multTcal[d][1])
             {
-                PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][0] - iRawTimeNs[d][1][0]);
-                Tmean = 0.5 * (iRawTimeNs[d][0][0] + iRawTimeNs[d][1][0]);
+                PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][multTcal[d][0]] - iRawTimeNs[d][1][multTcal[d][1]]);
+                Tmean = 0.5 * (iRawTimeNs[d][0][multTcal[d][0]] + iRawTimeNs[d][1][multTcal[d][1]]);
                 if (multTcal[d][2] == 1)
                     Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
                 AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
-            } // end of mult == 1 for left and right
+            } // end of mult left == mult right
         }     // end of loop over the number of detectors
     }         // end of if Tcal data
     return;
