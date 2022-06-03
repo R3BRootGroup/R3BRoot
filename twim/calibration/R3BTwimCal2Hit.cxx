@@ -54,7 +54,7 @@ R3BTwimCal2Hit::R3BTwimCal2Hit(const char* name, Int_t iVerbose)
     , fNumAnodes(16)
     , fNumAnodesAngleFit(0)
     , fNumParamsTof(3)
-    , fNumParams(4)
+    , fNumParams(5)
     , fMaxEnergyperanode(65535)
     , CalZParams(NULL)
     , CalZTofParams(NULL)
@@ -169,6 +169,23 @@ void R3BTwimCal2Hit::SetParameter()
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
             fZ2[s] = CalZParams->GetAt(s * fNumParams + 2);
             fZ3[s] = CalZParams->GetAt(s * fNumParams + 3);
+        }
+        else if (fNumParams == 5)
+        {
+            if (fHitItemsTofW)
+            {
+                R3BLOG(INFO,
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
+                           << CalZParams->GetAt(s * fNumParams + 3) << " : "
+                           << CalZParams->GetAt(s * fNumParams + 4));
+            }
+            fZ0[s] = CalZParams->GetAt(s * fNumParams);
+            fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
+            fZ2[s] = CalZParams->GetAt(s * fNumParams + 2);
+            fZ3[s] = CalZParams->GetAt(s * fNumParams + 3);
+            fZ4[s] = CalZParams->GetAt(s * fNumParams + 4);
         }
         else
             R3BLOG(WARNING, "aa Parameters for charge-Z cannot be used here, number of parameters: " << fNumParams);
@@ -421,7 +438,7 @@ void R3BTwimCal2Hit::S4551()
                     // std::cout << "Z_dt = " << fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean <<
                     // std::endl;
                     Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean +
-                                    fZ3[i] * TMath::Power(Esum_mean, 3. / 2.);
+                                    fZ3[i] * TMath::Power(Esum_mean, 3. / 2.) + fZ4[i] * TMath::Power(Esum_mean, 2.);
                     // std::cout << "i = " << i << ", fZ0[i] = " << fZ0[i] << ", fZ1[i] = " << fZ1[i] << ", fZ2[i] = "
                     // << fZ2[i] << ", fZ3[i] = " << fZ3[i] << std::endl;
                     if (zhit > 0)
@@ -431,7 +448,7 @@ void R3BTwimCal2Hit::S4551()
                 {
                     Double_t Esum_mean = Esum / nba;
                     Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean +
-                                    fZ3[i] * TMath::Power(Esum_mean, 3. / 2.);
+                                    fZ3[i] * TMath::Power(Esum_mean, 3. / 2.) + fZ4[i] * TMath::Power(Esum_mean, 2.);
                     if (zhit > 0)
                         AddHitData(i + 1, theta, zhit, dt_ref);
                 }
