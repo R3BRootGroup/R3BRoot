@@ -671,8 +671,7 @@ void R3BBunchedFiberCal2Hit::FinishEvent()
 
 void R3BBunchedFiberCal2Hit::FinishTask()
 {
-    if (fIsCalibrator)
-    {
+
         fh_ToT_MA_Fib->Write();
         fh_ToT_Single_Fib->Write();
         fh_dt_Fib->Write();
@@ -691,6 +690,10 @@ void R3BBunchedFiberCal2Hit::FinishTask()
             fh_ToT_s_Fib[i]->Write();
         }
         fh_ToT_ToT->Write();
+
+
+    if (fIsCalibrator)
+    {
 
         R3BBunchedFiberHitModulePar* mpar;
 
@@ -760,7 +763,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                 }
             }
         }
-        /* MH
+        // MH
                 for (UInt_t i = 1; i <= max; i++)
                 {
                     TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i + 1, i + 1, 0);
@@ -782,7 +785,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                         }
                     }
                 }
-        */
+        
         fCalPar->setChanged();
     }
 }
