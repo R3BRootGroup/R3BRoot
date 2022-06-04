@@ -124,12 +124,18 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
     void SetOrientation(Orientation opt) { fOrientation = opt; }
 
+    void SetExpId(UInt_t opt) { fExpId = opt; }
+
   private:
+    void Standard();
+    void S515();
     TString fName;
     Int_t fnEvents;
     Int_t maxevent;
     Int_t fnEventsfill = 0;
     Int_t fNumFibers;
+    UInt_t fExpId;
+    int fDetId;
 
     Int_t multi = 0;
     Double_t energy[2048];
