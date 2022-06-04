@@ -35,6 +35,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TRandom3.h"
 
 #include <iostream>
 #include <numeric>
@@ -502,12 +503,14 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (iPlane == 1 || iPlane == 3)
                 {
                     xp = -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
-                         (iBar - 1) * (paddle_width + air_gap_paddles);
+                         (iBar - 1) * (paddle_width + air_gap_paddles) +
+                         gRandom->Uniform(-paddle_width / 2., paddle_width / 2.);
                 }
                 if (iPlane == 2 || iPlane == 4)
                 {
                     xp = -detector_width / 2 + (paddle_width + air_gap_paddles) +
-                         (iBar - 1) * (paddle_width + air_gap_paddles);
+                         (iBar - 1) * (paddle_width + air_gap_paddles) +
+                         gRandom->Uniform(-paddle_width / 2., paddle_width / 2.);
                 }
 
                 Double_t para[4];
