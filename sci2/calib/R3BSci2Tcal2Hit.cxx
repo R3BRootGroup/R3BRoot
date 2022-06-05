@@ -159,13 +159,16 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             // multiplicity. The good hit will be selected by
             // later analysis, such as R3BIncomingBeta to find
             // a good hit to give a proper tof value.
-            if (multTcal[d][0] == multTcal[d][1])
+            if (multTcal[d][0] < 64 && multTcal[d][0] == multTcal[d][1])
             {
-                PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][multTcal[d][0]] - iRawTimeNs[d][1][multTcal[d][1]]);
-                Tmean = 0.5 * (iRawTimeNs[d][0][multTcal[d][0]] + iRawTimeNs[d][1][multTcal[d][1]]);
-                if (multTcal[d][2] == 1)
-                    Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
-                AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+                for (int m = 0; m < multTcal[d][0]; m++)
+                {
+                    PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][m] - iRawTimeNs[d][1][m]);
+                    Tmean = 0.5 * (iRawTimeNs[d][0][m] + iRawTimeNs[d][1][m]);
+                    if (multTcal[d][2] == 1)
+                        Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
+                    AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+                }
             } // end of mult left == mult right
         }     // end of loop over the number of detectors
     }         // end of if Tcal data

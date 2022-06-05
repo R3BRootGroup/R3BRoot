@@ -176,7 +176,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
     }
 
     // --- read hit from Sci2 data --- //
-    if (fHitSci2 && fHitSci2->GetEntriesFast())
+    if (fHitSci2 && fHitSci2->GetEntriesFast() > 0)
     {
         Int_t numDet = 1;
         nHits = fHitSci2->GetEntriesFast();
@@ -184,8 +184,13 @@ void R3BIncomingBeta::Exec(Option_t* option)
         {
             R3BSci2HitData* hittcal = (R3BSci2HitData*)fHitSci2->At(ihit);
             numDet = hittcal->GetSciId();
+            if (numDet > fNumDet)
+            {
+                R3BLOG(WARNING, "Sci2 detector id:" << numDet << " is out of range!");
+                continue;
+            }
             if (multSci2[numDet - 1] >= MAXMULT)
-                break;
+                continue;
             PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetX();
             TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTime();
             TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTimeWithTref();
@@ -194,7 +199,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
     }
 
     // --- read hit from LOS data --- //
-    if (fHitLos && fHitLos->GetEntriesFast())
+    if (fHitLos && fHitLos->GetEntriesFast() > 0)
     {
         Int_t numDet = 1;
 
@@ -238,7 +243,6 @@ void R3BIncomingBeta::Exec(Option_t* option)
 
                 if (fUseTref)
                     ToFraw_m1 = ToFrawwTref_m1;
-
                 // Select good ToF hit with gating beta
                 // At this moment, the multiplicity of FrsData (num_tof_candidates)
                 // is restricted to be one. The beta conditions should be optimised.
