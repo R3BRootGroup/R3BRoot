@@ -135,6 +135,7 @@
 #pragma link C++ class EXT_STR_h101_SOFMWPC_onion_t;
 #pragma link C++ class EXT_STR_h101_MUSLI_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
+#pragma link C++ class EXT_STR_h101_SAMPLOS_onion_t;
 #pragma link C++ class EXT_STR_h101_PDC_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_t;
 #pragma link C++ class EXT_STR_h101_RPC_t;

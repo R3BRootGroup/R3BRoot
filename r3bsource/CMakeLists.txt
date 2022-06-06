@@ -209,6 +209,9 @@ Set(STRUCT_HEADERS
 ./musli/ext_h101_musli.h
 ./mwpc/ext_h101_mwpc.h
 ./trloii/ext_h101_samp.h
+./trloii/ext_h101_samplos.h
+./trloii/ext_h101_sampms.h
+./trloii/ext_h101_samplosms.h
 ./pdc/ext_h101_pdc.h
 ./rpc/ext_h101_rpc.h
 )
