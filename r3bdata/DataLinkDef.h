@@ -169,6 +169,7 @@
 #pragma link C++ class R3BSci8HitData+;
 #pragma link C++ class R3BBeamMonitorMappedData+;
 #pragma link C++ class R3BSamplerMappedData+;
+#pragma link C++ class R3BSampLosMappedData+;
 #pragma link C++ class R3BSfibMappedData+;
 #pragma link C++ class R3BSfibCalData+;
 #pragma link C++ class R3BSfibHitData+;

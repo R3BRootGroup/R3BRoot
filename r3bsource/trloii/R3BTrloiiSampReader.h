@@ -1,35 +1,88 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+// ----------------------------------------------------------------------
+// -----                       R3BTrloiiSampReader                  -----
+// ----------------------------------------------------------------------
+// sampler reader modified to read the sampler storing master start timestamps
+// along with sampler hits and both the high and low bits
+
 #ifndef R3BTRLOIISAMPREADER_H
-#define R3BTRLOIISAMPREADER_H
+#define R3BTRLOIISAMPREADER_H 1
 #include "R3BReader.h"
 
 struct EXT_STR_h101_SAMP_t;
 typedef struct EXT_STR_h101_SAMP_t EXT_STR_h101_SAMP;
+typedef struct EXT_STR_h101_SAMP_onion_t EXT_STR_h101_SAMP_onion;
 
-class R3BEventHeader;
+struct EXT_STR_h101_SAMPLOS_t;
+typedef struct EXT_STR_h101_SAMPLOS_t EXT_STR_h101_SAMPLOS;
+typedef struct EXT_STR_h101_SAMPLOS_onion_t EXT_STR_h101_SAMPLOS_onion;
+
+struct EXT_STR_h101_SAMPMS_t;
+typedef struct EXT_STR_h101_SAMPMS_t EXT_STR_h101_SAMPMS;
+typedef struct EXT_STR_h101_SAMPMS_onion_t EXT_STR_h101_SAMPMS_onion;
+
+struct EXT_STR_h101_SAMPLOSMS_t;
+typedef struct EXT_STR_h101_SAMPLOSMS_t EXT_STR_h101_SAMPLOSMS;
+typedef struct EXT_STR_h101_SAMPLOSMS_onion_t EXT_STR_h101_SAMPLOSMS_onion;
 
 class R3BTrloiiSampReader : public R3BReader
 {
   public:
+    // Parametrized constructors
     R3BTrloiiSampReader(EXT_STR_h101_SAMP*, size_t);
-    ~R3BTrloiiSampReader();
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOS*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPMS*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOSMS*, size_t);
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    // Destructor
+    virtual ~R3BTrloiiSampReader();
+
+    // Setup structure information
+    virtual Bool_t Init(ext_data_struct_info*) override;
+
+    // Read data from full event structure
+    virtual Bool_t Read() override;
+
+    // Reset
+    virtual void Reset() override;
 
   private:
-    /* An event counter */
-    UInt_t fNEvent;
     /* Reader specific data structure from ucesb */
-    EXT_STR_h101_SAMP* fData;
+    EXT_STR_h101_SAMP* fSampData;
+    EXT_STR_h101_SAMPLOS* fSampLosData;
+    EXT_STR_h101_SAMPMS* fSampMSData;
+    EXT_STR_h101_SAMPLOSMS* fSampLosMSData;
+
     /* Offset of detector specific data in full data structure */
     size_t fOffset;
-    /* A pointer to the R3BEventHeader structure */
-    R3BEventHeader* fEventHeader;
-    TClonesArray* fArray; /**< Output array. */
+
+    /* number of samplers */
+    UInt_t fSNum;
+
+    /* number of sampler components */
+    UInt_t fSCNum;
+
+    /* Output arrays */
+    TClonesArray* fArray;
+    TClonesArray* fArrayLH;
+
+    /* Should data for online be stored */
+    Bool_t fOnline;
 
   public:
-    ClassDef(R3BTrloiiSampReader, 0);
+    ClassDefOverride(R3BTrloiiSampReader, 0);
 };
 
 #endif

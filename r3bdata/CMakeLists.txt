@@ -187,6 +187,7 @@ musicData/R3BMusicMappedData.cxx
 musicData/R3BMusicCalData.cxx
 musicData/R3BMusicHitData.cxx
 sampData/R3BSamplerMappedData.cxx
+sampData/R3BSampLosMappedData.cxx
 sfibData/R3BSfibMappedData.cxx
 sfibData/R3BSfibCalData.cxx
 sfibData/R3BSfibHitData.cxx
