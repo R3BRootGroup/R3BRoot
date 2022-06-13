@@ -57,7 +57,6 @@ R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
-	cout << "Test1 -------------------------" << endl;
     switch (fSPMTElectronics)
     {
         case CTDC:
@@ -98,7 +97,6 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
     }
     mgr->Register(fName + "Cal", "Land", fCalItems, kTRUE);
     mgr->Register(fName + "TriggerCal", "Land", fCalTriggerItems, kTRUE);
-	cout << "Test2 -------------------------" << endl;
 
     return kSUCCESS;
 }

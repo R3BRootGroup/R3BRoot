@@ -184,6 +184,17 @@ InitStatus R3BPdcCal2Hit::Init()
 	fh_wire_cor->GetXaxis()->SetTitle("wire");
 	fh_wire_cor->GetYaxis()->SetTitle("wire");
 
+	sprintf(chistName, "pdc_fish");
+	sprintf(chistTitle, "PDC fish");
+	fh_fish = new TH2F(chistName, chistTitle, 500, -1000, 1000., 500, -1000., 1000.);
+	fh_fish->GetXaxis()->SetTitle("t1+t2");
+	fh_fish->GetYaxis()->SetTitle("t1-t2");
+
+	sprintf(chistName, "pdc_check1");
+	sprintf(chistTitle, "PDC check1");
+	fh_check1 = new TH2F(chistName, chistTitle, 400, -20, 20., 500, -1000., 1000.);
+	fh_check1->GetXaxis()->SetTitle("r1+r2");
+	fh_check1->GetYaxis()->SetTitle("t1-t2");
 
 
     return kSUCCESS;
@@ -283,7 +294,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
             //cout << "trailing wire:" << wire_i <<  " time: " << cur_cal->GetTime_ns() << endl;
             if (channel.lead_list.empty())
             {
-                cout << "lead list empty for plane, wire " << plane_i + 1 << "  " << wire_i + 1 << endl;
+                //cout << "lead list empty for plane, wire " << plane_i + 1 << "  " << wire_i + 1 << endl;
                 continue;
             }
             auto lead = channel.lead_list.front();
@@ -321,7 +332,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
             }
         }
     }
-    LOG(DEBUG) << "***************** new event ****************" << endl;
+    //cout << "***************** new event ****************" << endl;
 	Int_t ID_old = 0;
 	Int_t ID_new = 0;
 	Double_t t_old = 0.;
@@ -408,13 +419,13 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 				{
 					//continue;
 				}
-				if(t_pdc < -300. || t_pdc > -100.)
+				if(t_pdc < -480. || t_pdc > -250.)
 				{
 					//continue;
 				}
 				
 				
-                LOG(DEBUG)  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc << endl;
+                //cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc << endl;
 				
 				Double_t r = 0.;
 				Int_t ID = 0;
@@ -439,7 +450,6 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 				Double_t x = 0.;
 				Double_t y = 0.;
 				
-				//write all hits:
 				if(ID == 1 || ID == 3)
 				{
 					x = wire * wire_distance;
@@ -451,7 +461,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 					x = 0;
 				}
 				
-				new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(t_pdc, x, y, tot_pdc, ID, wire);
+				//new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(t_pdc, x, y, tot_pdc, ID, wire);
 				
                 //cout << "plane: " << ID << " wire: " << wire << " ToT: " << tot_pdc << " t: " << t_pdc << endl;
                 //cout << firstLeading << "  " << lastTrailing << endl;
@@ -466,7 +476,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 				
             if(ID_new == ID_old && wire_new - 1 == wire_old)
             {
-				LOG(DEBUG)  << "found Pair!" << endl;
+				//cout  << "found Pair: " << ID_new << "  " << wire_new << "  " << wire_old << endl;
 				Double_t pos = 0.;
 				Double_t x = 0.;
 				Double_t y = 0.;
@@ -488,35 +498,25 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
 				if (!fIsCalibrator && fHitPar)
 				{
-					R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID_new-1)*N_WIRE_MAX+wire_new);
+					R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID_new-1) * N_WIRE_MAX + wire_new);
 					if (par)
 					{
 						dtmin = par->GetdTmin();
 						dtmax = par->GetdTmax();
-						LOG(DEBUG)  << "Parameter: " << tmin << "  " << tmax << endl;
-
+						//cout  << "Parameter: " << dtmin << "  " << dtmax << endl;
 					}
 					// calculate radius 
 					//Double_t wire_distance = 7.8;
-					
-					if ((t_new-t_old) < dtmin)
-					{
-						r = -wire_distance / 2.;
-					}
-					else if ((t_new-t_old) > dtmax)
-					{
-						r = wire_distance / 2.;
-					}
-					else
-					{
-						Double_t m = wire_distance / (dtmax - dtmin);
-						Double_t b = wire_distance / 2. - m * dtmax;
-						r = m * (t_new - t_old) + b;
-						LOG(DEBUG)  << "Radius: " << r << endl;
-					}
+
+					Double_t m = (wire_distance - 0.) / (dtmax - dtmin) * 0.9;
+					Double_t b = (wire_distance - 0.) / 2. - m * dtmax;
+					r = m * (t_new - t_old) + b;
+					r = r * 1.1;
+					//cout  << "dt: " << (t_new - t_old) << " Radius: " << r << endl;
+
 					fh_radius_dt[ID_new-1]->Fill(wire_new, r);
 					
-					Bool_t method2 = true;
+					Bool_t method2 = false;
 					if(method2)
 					{
 						R3BPdcHitModulePar* par1 = fHitPar->GetModuleParAt((ID_old-1)*N_WIRE_MAX+wire_old);
@@ -579,14 +579,14 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
 				if (!fIsCalibrator && fHitPar)
 				{					
-					pos = (wire_new * wire_distance + wire_distance/2. - r);
+					pos = (wire_old * wire_distance + wire_distance/2. - r);
 				}
 				else
 				{
 					pos = ((wire_new * wire_distance) + (wire_old * wire_distance)) / 2.;
 				}
 
-				if (ID_new & 1)
+				if (ID_new == 1 || ID_new == 3)
 				{
 					x = pos ;
 					y = 0;
@@ -596,15 +596,23 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 					x = 0;
 					y = pos;
 				}
+				
+				
+				if (ID_new == 1 && wire_new > 50 && wire_new < 55)
+				{
+					fh_fish->Fill((t_new + t_old), t_new - t_old);
+					fh_check1->Fill(x, t_new - t_old);
+					
+				}
 
 
-//                new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData((t_new + t_old) / 2., x, 
-//                y, sqrt(tot_new*tot_old), ID_new, wire_new);
+                new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData((t_new + t_old) / 2., x, 
+                y, sqrt(tot_new*tot_old), ID_new, wire_new);
 				
-                // cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " << 
-                // sqrt(tot_new*tot_old) << " t: " << (t_new + t_old) / 2. << " wire: " << wire_new << endl;
+                //cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " << 
+                //sqrt(tot_new * tot_old) << " t: " << (t_new + t_old) / 2. << " wire: " << wire_new << endl;
 				
-				fh_time_drift[ID_new-1]->Fill(wire_new, t_new-t_old);
+				fh_time_drift[ID_new - 1]->Fill(wire_new, t_new - t_old);
 				
 			}
 			ID_old = ID_new;
@@ -641,6 +649,9 @@ void R3BPdcCal2Hit::FinishTask()
 
 	}
 	fh_wire_cor->Write();
+	fh_fish->Write();
+	fh_check1->Write();
+	
 	
     if (fIsCalibrator)
     {
@@ -672,8 +683,8 @@ void R3BPdcCal2Hit::FinishTask()
 				Double_t tmin = -10000.;
 				Double_t tmax = -10000.;
 				Int_t numBins = proj->GetNbinsX()-2;
-				//if(proj->GetMaximum() < 10)
-					//continue;
+				if(proj->GetSum()<100)
+					continue;
 				for (UInt_t j = 1; j < numBins; j++)
 				{
 					//cout << "sum: " << sum << "  " << proj->GetBinContent(j)/proj->GetSum() * 8. << endl;
@@ -681,25 +692,27 @@ void R3BPdcCal2Hit::FinishTask()
 					//cout << "Maximum: " << proj->GetMaximum() << endl;
 					//cout << "Test1: " << proj->GetBinContent(j)/proj->GetMaximum() << endl;
 					//cout << "Test2: " << proj->GetBinContent(numBins-j)/proj->GetMaximum() << endl;
-					if( proj->GetBinContent(j)/proj->GetMaximum() > 0.1 && tmin < -9999) 
+					if( proj->GetBinContent(j)/(proj->GetSum() / 300.) > 0.5 && tmin < -9999) 
 					{
 						tmin = proj->GetBinCenter(j);
 					}
-					if(proj->GetBinContent(numBins-j)/proj->GetMaximum() > 0.1  && tmax < -9999) 
+					if(proj->GetBinContent(numBins-j)/(proj->GetSum() / 300.) > 0.5  && tmax < -9999) 
 					{
 						tmax = proj->GetBinCenter(numBins-j);
 					}
 				}
 
-
-				cout << "Plane: " << plane << "  " << plane*N_WIRE_MAX + i << endl;
+				//tmin -= 70.;
+				//tmax += 70.;
+				
+				cout << "Plane: " << plane << "  " << plane * N_WIRE_MAX + i << endl;
 				cout << "Set parameter of wire: " << i << " tmin: " << tmin << " tmax: " << tmax << endl;
 
-				R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(plane*N_WIRE_MAX + i);
+				R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
 				par2->SetdTmin(tmin);
 				par2->SetdTmax(tmax);
-				cfit->cd(3);
-				proj->Draw();
+				//cfit->cd(3);
+				//proj->Draw();
 				//gPad->WaitPrimitive();
 				//gSystem->Sleep(3000);
 			}

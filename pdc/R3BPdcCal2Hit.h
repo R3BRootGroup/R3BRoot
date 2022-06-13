@@ -25,7 +25,7 @@
 #include "THnSparse.h"
 
 #define N_PLANE_MAX_PDC 4
-#define wire_distance 7.8
+#define wire_distance 6.92820323
 
 class TClonesArray;
 class R3BPdcHitModulePar;
@@ -135,6 +135,9 @@ class R3BPdcCal2Hit : public FairTask
     TH2F* fh_radius[N_PLANE_MAX_PDC];
     TH2F* fh_radius_dt[N_PLANE_MAX_PDC];
     TH2F* fh_mult[N_PLANE_MAX_PDC];
+    
+    TH2F* fh_fish;
+    TH2F* fh_check1;
     
 	TH2F* fh_wire_cor;
 	
