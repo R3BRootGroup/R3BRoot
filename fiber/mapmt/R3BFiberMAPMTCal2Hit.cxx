@@ -326,8 +326,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
             auto chlead_i = lead->GetChannel() - 1;
 
-            cur_cal_trig_ns = fMapPar->GetTrigMap(side_i + 1, ch_i + 1);
-            lead_trig_ns = fMapPar->GetTrigMap(side_i + 1, chlead_i + 1);
+            cur_cal_trig_ns = trig_time[fMapPar->GetTrigMap(side_i + 1, ch_i + 1)];
+            lead_trig_ns = trig_time[fMapPar->GetTrigMap(side_i + 1, chlead_i + 1)];
 
             auto cur_cal_ns =
                 fTimeStitch->GetTime(cur_cal_trail->GetTime_ns() - cur_cal_trig_ns, "clocktdc", "clocktdc");
