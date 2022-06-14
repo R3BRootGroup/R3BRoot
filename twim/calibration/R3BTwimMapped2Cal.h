@@ -73,6 +73,8 @@ class R3BTwimMapped2Cal : public FairTask
     Int_t fNumAnodesRef;
     Int_t fNumAnodesTrig;
     Int_t fMaxMult;
+    Int_t fMinDT;
+    Int_t fMaxDT;
     Int_t fExpId;
     std::vector<TArrayF*> CalEParams;
     std::vector<TArrayF*> PosParams;
