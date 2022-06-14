@@ -38,6 +38,8 @@ R3BTwimCalPar::R3BTwimCalPar(const char* name, const char* title, const char* co
     , fNumAnodesTRef(2)
     , fNumAnodesTrig(2)
     , fMaxMult(20)
+    , fMinDT(-1000)
+    , fMaxDT(1000)
 {
     fIn_use.resize(fNumSections);
     fAnodeECalParams.resize(fNumSections);
@@ -87,6 +89,8 @@ void R3BTwimCalPar::putParams(FairParamList* list)
     list->add("twimAnodeTRefPar", fNumAnodesTRef);
     list->add("twimAnodeTrigPar", fNumAnodesTrig);
     list->add("twimMaxMultPar", fMaxMult);
+    list->add("twimMinDTPar", fMinDT);
+    list->add("twimMaxDTPar", fMaxDT);
     list->add("twimAnodeEFitPar", fNumParamsEFit);
     list->add("twimAnodePosFitPar", fNumParamsPosFit);
 
@@ -162,6 +166,16 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
+    if (!list->fill("twimMinDTPar", &fMinDT))
+    {
+        LOG(WARNING) << "Could not initialize twimMinDTPar";
+    }
+
+    if (!list->fill("twimMaxDTPar", &fMaxDT))
+    {
+        LOG(WARNING) << "Could not initialize twimMaxDTPar";
+    }
+
     if (!list->fill("twimAnodeEFitPar", &fNumParamsEFit))
     {
         LOG(ERROR) << "Could not initialize twimAnodeEFitPar";
@@ -227,6 +241,8 @@ void R3BTwimCalPar::printParams()
     R3BLOG(INFO, "Nb of twim Ref anodes: " << fNumAnodesTRef);
     R3BLOG(INFO, "Nb of twim Trigger anodes: " << fNumAnodesTrig);
     R3BLOG(INFO, "Nb of twim Max. multiplicity per anode: " << fMaxMult);
+    R3BLOG(INFO, "Min Drift Time accepted: " << fMinDT);
+    R3BLOG(INFO, "Max Drift Time accepted: " << fMaxDT);
     R3BLOG(INFO, "Twim anode parameters for energy calibration");
 
     for (Int_t s = 0; s < fNumSections; s++)

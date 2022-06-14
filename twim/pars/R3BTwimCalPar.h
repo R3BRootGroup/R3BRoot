@@ -61,6 +61,8 @@ class R3BTwimCalPar : public FairParGenericSet
     const Int_t GetNumAnodesTRef() { return fNumAnodesTRef; }
     const Int_t GetNumAnodesTrig() { return fNumAnodesTrig; }
     const Int_t GetMaxMult() { return fMaxMult; }
+    const Int_t GetMinDT() { return fMinDT; }
+    const Int_t GetMaxDT() { return fMaxDT; }
     const Int_t GetInUse(Int_t sec, Int_t anode) { return fIn_use[sec - 1]->GetAt(anode - 1); }
     TArrayF* GetAnodeCalEParams(Int_t sec) { return fAnodeECalParams[sec - 1]; }
     TArrayF* GetAnodeCalPosParams(Int_t sec) { return fAnodePosCalParams[sec - 1]; }
@@ -72,6 +74,8 @@ class R3BTwimCalPar : public FairParGenericSet
     void SetNumAnodesTRef(Int_t nb) { fNumAnodesTRef = nb; }
     void SetNumAnodesTrig(Int_t nb) { fNumAnodesTrig = nb; }
     void SetMaxMult(Int_t max) { fMaxMult = max; }
+    void SetMinDT(Int_t minDT) { fMinDT = minDT; }
+    void SetMaxDT(Int_t maxDT) { fMaxDT = maxDT; }
     void SetInUse(Int_t value, Int_t sec, Int_t anode) { fIn_use[sec - 1]->AddAt(value, anode - 1); }
     void SetAnodeCalParams(Float_t val, Int_t sec, Int_t anode, Int_t indexpar)
     {
@@ -97,6 +101,8 @@ class R3BTwimCalPar : public FairParGenericSet
     Int_t fNumAnodesTRef;                     // number of anodes for TREF
     Int_t fNumAnodesTrig;                     // number of anodes for Trigger
     Int_t fMaxMult;                           // Max. multiplicity per anode
+    Int_t fMinDT;                             // Min. drift time accepted
+    Int_t fMaxDT;                             // Max. drift time accepted
 
     const R3BTwimCalPar& operator=(const R3BTwimCalPar&);
     R3BTwimCalPar(const R3BTwimCalPar&);

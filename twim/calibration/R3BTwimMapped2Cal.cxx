@@ -49,6 +49,8 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal(const char* name, Int_t iVerbose)
     , fNumAnodesRef(2)  // 2 anode for TREF
     , fNumAnodesTrig(2) // 2 anode for TRIG
     , fMaxMult(20)
+    , fMinDT(-1000)
+    , fMaxDT(1000)
     , fNumEParams(2)
     , fNumPosParams(2)
     , fCal_Par(NULL)
@@ -99,6 +101,8 @@ void R3BTwimMapped2Cal::SetParameter()
     fNumAnodesRef = fCal_Par->GetNumAnodesTRef();  // Anodes for TREF
     fNumAnodesTrig = fCal_Par->GetNumAnodesTrig(); // Anodes for Trig
     fMaxMult = fCal_Par->GetMaxMult();
+    fMinDT = fCal_Par->GetMinDT();
+    fMaxDT = fCal_Par->GetMaxDT();
     fNumAnodes = fCal_Par->GetNumAnodes();          // Number of anodes per section
     fNumEParams = fCal_Par->GetNumParamsEFit();     // Number of parameters for energy calibration
     fNumPosParams = fCal_Par->GetNumParamsPosFit(); // Number of parameters for position calibration
@@ -108,6 +112,8 @@ void R3BTwimMapped2Cal::SetParameter()
     R3BLOG(INFO, "Nb of twim Ref anodes: " << fNumAnodesRef);
     R3BLOG(INFO, "Nb of twim Trigger anodes: " << fNumAnodesTrig);
     R3BLOG(INFO, "Nb of twim Max. multiplicity per anode: " << fMaxMult);
+    R3BLOG(INFO, "Twim Min Drift Time accepted: " << fMinDT);
+    R3BLOG(INFO, "Twim Max Drift Time accepted: " << fMaxDT);
     R3BLOG(INFO, "Nb parameters from energy cal fit: " << fNumEParams);
     R3BLOG(INFO, "Nb parameters from position cal fit: " << fNumPosParams);
 
@@ -276,9 +282,12 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
 
                             //auto dtime = fTimeStitch->GetTime(fDT[s][k][i] - fDT[s][j][fNumAnodes], "vftx", "vftx");
                             //AddCalData(s + 1, i + 1, a0 + a1 * dtime, fE[s][k][i]);
-                                
-                            AddCalData(s + 1, i + 1, a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]), fE[s][k][i]);
 
+                            auto dtime = a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]);
+                            if ( dtime > fMinDT && dtime < fMaxDT ){
+                               //std::cout << "fMinDT = " << fMinDT << ", fMaxDT = " << fMaxDT << ", dt = " << fDT[s][k][i] - fDT[s][j][fNumAnodes] << ", dt2 = " << a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]) << std::endl;
+                              AddCalData(s + 1, i + 1, dtime, fE[s][k][i]);
+                            }
                         }
                     }
             }
