@@ -54,7 +54,9 @@ R3BGladFieldMap::R3BGladFieldMap()
 R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
     : FairField(mapName)
 {
-    fPosX = fPosY = fPosZ = 0.;
+    fPosZ = 163.4;//default offset (rotation point to target), override in macro by SetPosition(...) before Init()
+    fYAngle = -14.;//default value, override in macro by SetYAngle(...) before Init()
+    fPosX = fPosY = 0.;
     fXmin = fYmin = fZmin = 0.;
     fXmax = fYmax = fZmax = 0.;
     fXstep = fYstep = fZstep = 0.;
@@ -121,10 +123,6 @@ R3BGladFieldMap::~R3BGladFieldMap()
 // -----------   Intialisation   ------------------------------------------
 void R3BGladFieldMap::Init()
 {
-    fPosX = 0.0;
-    fPosY = 0.0;
-    fPosZ = 163.4;
-    fYAngle = -14.;
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);

@@ -83,6 +83,9 @@ class R3BGladFieldMap : public FairField
     /** Set a global field scaling factor **/
     virtual void SetScale(Double_t factor) { fScale = factor; }
 
+    /** Set the rotation angle of the field (in degrees, default: -14 deg) **/
+    virtual void SetYAngle(Double_t a) { fYAngle = a; };
+
     /** Accessors to field parameters in local coordinate system **/
     Double_t GetXmin() const { return fXmin; }
     Double_t GetYmin() const { return fYmin; }
