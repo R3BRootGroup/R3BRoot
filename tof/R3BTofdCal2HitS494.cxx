@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum fï¿½r Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -935,41 +935,45 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             {
                 Int_t iplane = event[hit].plane;
                 Int_t ibar = event[hit].bar;
-                if (event[hit].charge > 1.4 && event[hit].charge < 2.6)
+                if (fYOffset)
                 {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ2[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
+                    if (event[hit].charge > 1.4 && event[hit].charge < 2.6)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ2[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge >= 2.6 && event[hit].charge < 3.5)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ3[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge >= 3.5 && event[hit].charge < 4.5)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ4[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=4: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ4[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge >= 4.5 && event[hit].charge < 5.5)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ5[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=5: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ5[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge >= 5.5 && event[hit].charge < 6.6)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ6[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge >= 6.6 && event[hit].charge <= 7.2)
+                    {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ7[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=7: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ7[iplane-1][ibar-1]<<endl;
+                    }
+                    if (event[hit].charge > 7.2)
+                    { //&& event[hit].charge < 8.8) {
+                        event[hit].ypos = event[hit].ypos - ytofd_offsetZ8[iplane - 1][ibar - 1];
+                        // cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
+                    }
                 }
-                if (event[hit].charge >= 2.6 && event[hit].charge < 3.5)
-                {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ3[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
-                }
-                if (event[hit].charge >= 3.5 && event[hit].charge < 4.5)
-                {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ4[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=4: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ4[iplane-1][ibar-1]<<endl;
-                }
-                if (event[hit].charge >= 4.5 && event[hit].charge < 5.5)
-                {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ5[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=5: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ5[iplane-1][ibar-1]<<endl;
-                }
-                if (event[hit].charge >= 5.5 && event[hit].charge < 6.6)
-                {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ6[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
-                }
-                if (event[hit].charge >= 6.6 && event[hit].charge <= 7.2)
-                {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ7[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=7: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ7[iplane-1][ibar-1]<<endl;
-                }
-                if (event[hit].charge > 7.2)
-                { //&& event[hit].charge < 8.8) {
-                    event[hit].ypos = event[hit].ypos - ytofd_offsetZ8[iplane - 1][ibar - 1];
-                    // cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
-                }
+
                 event[hit].ypos = event[hit].ypos * sqrt(event[hit].charge) / sqrt(8.);
             }
             new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,

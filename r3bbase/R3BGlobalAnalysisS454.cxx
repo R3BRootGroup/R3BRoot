@@ -360,7 +360,7 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_theta26_simu = new TH1F("theta26_simu", "theta 26 simulation", 500, 0., 5);
     fh_theta26_simu->GetXaxis()->SetTitle("angle / degree");
     fh_theta26_simu->GetYaxis()->SetTitle("counts");
-    
+
     fh_sum_pz = new TH1F("fh_sum_pz", "Sum pz He and C ", 5000, -10., 10);
     fh_sum_pz->GetXaxis()->SetTitle("total Pz / MeV/c");
     fh_sum_pz->GetYaxis()->SetTitle("counts");
@@ -1103,9 +1103,9 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_px_px_cm->Fill(pHex_cm, pCx_cm);
             fh_py_py_cm->Fill(pHey_cm, pCy_cm);
             fh_pz_pz_cm->Fill(pHez_cm, pCz_cm);
-			
+
 			fh_sum_pz->Fill(pHez_cm + pCz_cm);
-			
+
         } // end if chi2
     }     // end if trackHits>1
 

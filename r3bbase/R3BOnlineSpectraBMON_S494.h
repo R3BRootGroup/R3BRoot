@@ -104,7 +104,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 
 
   private:
-    TClonesArray* fTrloiiItems;       
+    TClonesArray* fTrloiiItems;
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
@@ -129,7 +129,8 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
     //   TClonesArray *fbmonMappedItems;
-
+    unsigned long long SEETRAM_raw = 0;
+    unsigned long TOFDOR = 0, IC = 0;
     unsigned long long  time_start = -1, time_begin = -1, time = 0, time_mem = 0, time_end = 0, time_mem_long = 0;
     unsigned long long time_prev_read = 0, time_to_read = 0;
     unsigned long int ic_mem = 0, see_mem = 0, see_first = 0, tofdor_mem = 0, srolu1_mem = 0, srolu2_mem = 0, nBeamParticle=0;
@@ -140,11 +141,11 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
 	unsigned long long countARDMem[16] = {0}, SumARD[16] = {0} ;
     Double_t see_spill = 0, ic_spill = 0, tofdor_spill = 0;
     unsigned long long time_previous_event = 0;
-    unsigned long ySEE = 0, ySEE_mem = 0;
+    unsigned long ySEE = 0, ySEE_prev = 0, ySEE_mem = 0;
     int yIC_mem_mem=0, ySEE_mem_mem=0,yTOFDOR_mem_mem=0,ySROLU1_mem_mem=0,ySROLU2_mem_mem=0;
-    
+
     Int_t maxevent;
-    
+
     Bool_t newSpill = false;
     Bool_t spill_on = false;
     Double_t time_clear = -1.;
@@ -197,7 +198,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH2F* fh_rolu_tot;
     TH2F* fh_rolu_tof;
     TH1F* fh_rolu_channels;
-    
+
     TH1F* fh_BDT[16];
     TH1F* fh_ARD[16];
 

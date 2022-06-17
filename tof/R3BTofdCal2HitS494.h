@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum fï¿½r Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -137,6 +137,7 @@ class R3BTofdCal2HitS494 : public FairTask
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
+    inline void SetYOffset(Bool_t yoffset) { fYOffset = yoffset;}
     /**
      * Methods for setting number of planes and paddles
      */
@@ -161,6 +162,7 @@ class R3BTofdCal2HitS494 : public FairTask
     Double_t fTofdQ;
     Bool_t fTofdHisto;
     Bool_t fTofdTotPos;
+    Bool_t fYOffset=true;
     UInt_t fnEvents;
     UInt_t lasttpatevent=0;
     UInt_t fNofPlanes;
@@ -185,10 +187,10 @@ class R3BTofdCal2HitS494 : public FairTask
     UInt_t goodpair5=0;
     UInt_t goodpair6=0;
     UInt_t goodpair7=0;
- 
+
     Double_t ytofd_offsetZ2[2][44]={0},ytofd_offsetZ6[2][44]={0},ytofd_offsetZ8[2][44]={0};
 	Double_t ytofd_offsetZ3[2][44]={0},ytofd_offsetZ4[2][44]={0},ytofd_offsetZ5[2][44]={0},ytofd_offsetZ7[2][44]={0};
-	
+
     // arrays of control histograms
     TH1F* fhTpat;
     TH1F* fhNoTpat;

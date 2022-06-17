@@ -48,6 +48,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
+#include "TDatime.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -596,11 +597,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     if (fMappedItems.at(DET_BMON))
     {
-        unsigned long IC;
-        unsigned long SEETRAM_raw;
         Double_t SEETRAM;
-        unsigned long TOFDOR;
-
         auto detBmon = fMappedItems.at(DET_BMON);
         Int_t nHitsbm = detBmon->GetEntriesFast();
         // cout<<"Bmon hits: "<<nHitsbm<<endl;
@@ -615,7 +612,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             IC = hit->GetIC(); // negative values if offset not high enough
             counts_IC += (double)IC;
 
-            SEETRAM_raw = hit->GetSEETRAM();           // raw counts
+            if(hit->GetSEETRAM() != 0) SEETRAM_raw = hit->GetSEETRAM();           // raw counts
             SEETRAM = (double)SEETRAM_raw * calib_SEE; // calibrated SEETRAM counts
             // cout<<SEETRAM_raw<<" "<<calib_SEE<<" "<<SEETRAM<<"\n";
             counts_SEE += SEETRAM;
@@ -623,7 +620,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             TOFDOR = hit->GetTOFDOR(); // only positive values possible
             counts_TofD += TOFDOR;
 
-            if (fNEvents == fNEvents_start)
+            if (fNEvents == fNEvents_start) // this counts the number of incoming particles until we receive the first spill start signal
             {
                 see_start = SEETRAM;
                 ic_start = IC;
@@ -636,13 +633,21 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             unsigned long yIC = IC - ic_start;
 
             // SEETRAM:
+            ySEE_prev = ySEE;
             ySEE = SEETRAM - see_start;
 
             if (num_spills == 0)
             {
                 nBeamParticle += ySEE - ySEE_mem;
                 ySEE_mem = ySEE;
-                seeLastSpill = 0;
+                seeLastSpill = nBeamParticle;
+                if (debug)
+                {
+                    cout << "Spill: " << num_spills << endl;
+                    cout << "SEE  " << SEETRAM_raw << "  " << SEETRAM << "  " << counts_SEE << "  " << ySEE << endl;
+                    cout << "incr SEE " << ySEE - seeLastSpill << "\n";
+                    cout << "nBeamPart: " << nBeamParticle << endl;
+                }
             }
 
             if (newSpill == true)
@@ -660,10 +665,11 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                          << " " << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
                     cout << "last spill length " << (time / 1e9) - time_lastSpill << " s; SEE last spill "
                          << seeLastSpill << "\n";
-                    cout << "Spill: " << num_spills << endl;
+                    cout << "last spill incr SEE " << ySEE - seeLastSpill << "\n";
+                    cout << "current Spill: " << num_spills << endl;
                     cout << "SEE  " << SEETRAM_raw << "  " << SEETRAM << "  " << counts_SEE << "  " << ySEE << endl;
-                    cout << "incr SEE " << ySEE - seeLastSpill << "\n";
-                    cout << "nBeamPart: " << nBeamParticle << endl;
+                    cout << "nBeamPart start of spill: " << nBeamParticle << endl;
+                    cout << maxevent << endl;
                 }
 
                 seeLastSpill = ySEE;
@@ -1066,15 +1072,19 @@ void R3BOnlineSpectraBMON_S494::FinishEvent()
 
 void R3BOnlineSpectraBMON_S494::FinishTask()
 {
-
+    TDatime t;
+    t.Set(time_begin / 1e9);
     cout << " " << endl;
     cout << "nEvents total " << fNEvents << endl;
     cout << "nEvents Rolu " << fNEventsRolu << endl;
-    cout << "Time_start      : " << time_begin << endl;
-    cout << "Time end        : " << time_end << endl;
+    cout << "Time_start      : " << time_begin << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear()
+                     << " " << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
+    t.Set(time_end / 1e9);
+    cout << "Time end        : " << time_end << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear()
+                     << " " << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
     cout << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec" << endl;
     cout << "nSpill          : " << fNSpills << endl;
-    cout << "Total num of 18O: " << nBeamParticle << endl;
+    cout << "Total num of 16O in last complete spill: " << nBeamParticle << " include events of last incomplete spill: " << ySEE << endl;
     for (Int_t i = 4; i < 8; i++)
     {
         cout << "Counters for Tpat  " << i + 1 << " => BDT= " << SumBDT[i] << ", ADT= " << SumADT[i]
