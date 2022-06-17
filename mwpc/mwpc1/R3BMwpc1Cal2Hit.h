@@ -11,26 +11,33 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ----------------------------------------------------------------------
-// -----		    R3BMwpc1Cal2Hit              	    -----
-// -----          Created 16/10/19  by G. García Jiménez            -----
-// -----  by modifying J.L. Rodriguez-Sanchez  classes for Mwpc2    -----
-// ----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+// -----                       R3BMwpc1 header file                  -----
+// -----                 Created 06/10/19 by JL Rodriguez            -----
+// -----                  s455 method 17/06/22 by Antia GG           ----- 
+// -----------------------------------------------------------------------
 
 #ifndef R3BMwpc1Cal2Hit_H
 #define R3BMwpc1Cal2Hit_H 1
 
 #include "FairTask.h"
+#include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
+#include "TH1F.h"
 #include <TRandom.h>
 
 #define Mw1PadsX 64
 #define Mw1PadsY 40
 
+//Mw1PadsX 64
+
+using namespace std;
+
 class TClonesArray;
 
 class R3BMwpc1Cal2Hit : public FairTask
 {
+
   public:
     /** Default constructor **/
     R3BMwpc1Cal2Hit();
@@ -55,20 +62,27 @@ class R3BMwpc1Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
+    void SetExpId(Int_t exp) { fExpId = exp; }
 
   private:
+    /** Private method Experiment s455 **/
+    virtual void S455();
+    /** Private method Experiment s467 **/
+    virtual void S467();
     Double_t fSize; // Detector size in X and Y
     Double_t fwx;   // Pad width in X
     Double_t fwy;   // Pad width in Y
-    Int_t fx[Mw1PadsX], fy[Mw1PadsY];
+    Int_t fx[Mw1PadsX], fx_p1[Mw1PadsX], fx_p2[Mw1PadsX], fy[Mw1PadsY];
 
     Bool_t fOnline; // Don't store data for online
+    Int_t fExpId;
 
     TClonesArray* fMwpcCalDataCA; /**< Array with Cal input data. >*/
     TClonesArray* fMwpcHitDataCA; /**< Array with Hit output data. >*/
 
     /** Private method AddHitData **/
-    R3BMwpcHitData* AddHitData(Double_t x, Double_t y);
+    // Adds a MwpcHitData to the MwpcHitCollection
+    R3BMwpcHitData* AddHitData(Double_t x, Double_t y, Int_t plane=1);
 
     /** Private method to obtain the position X **/
     Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
