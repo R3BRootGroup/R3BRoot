@@ -1,26 +1,28 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
+ **   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ **   Copyright (C) 2019 Members of R3B Collaboration                          *
+ **                                                                            *
+ **             This software is distributed under the terms of the            *
+ **                 GNU General Public Licence (GPL) version 3,                *
+ **                    copied verbatim in the file "LICENSE".                  *
+ **                                                                            *
+ ** In applying this license GSI does not waive the privileges and immunities  *
+ ** granted to it by virtue of its status as an Intergovernmental Organization *
+ ** or submit itself to any jurisdiction.                                      *
+ *******************************************************************************/
 
-// ---------------------------------------------------------------------
-// -----                      R3BMwpc3Cal2Hit                      -----
-// -----            Created 14/10/19 by G. García Jiménez          -----
-// -----            by modifying J.L classes for MWPC0             -----
-// ---------------------------------------------------------------------
+//----------------------------------------------------------------------
+//-----                        R3BMwpc3Cal2Hit                     -----
+//-----             Created 14/10/19 by G. García Jiménez          -----
+//-----             by modifying J.L classes for MWPC0             -----
+//-----               s455 method 17/06/22 by Antia GG             ----- 
+//----------------------------------------------------------------------
 
-#ifndef R3BMwpc3CAL2HIT_H
-#define R3BMwpc3CAL2HIT_H 1
+#ifndef R3BMWPC3CAL2HIT_H
+#define R3BMWPC3CAL2HIT_H 1
 
 #include "FairTask.h"
+#include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
 #include "R3BSofTofWHitData.h"
 #include "TH1F.h"
@@ -60,13 +62,19 @@ class R3BMwpc3Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
+    void SetExpId(Int_t exp) { fExpId = exp; }
 
   private:
+
+    /** Private method Experiment s455 **/
+    virtual void S455();
+    /** Private method Experiment s467 **/
+    virtual void S467();
     Double_t fSizeX; // Detector size in X and Y
     Double_t fSizeY; // Detector size in X and Y
     Double_t fwx;    // Pad width in X
     Double_t fwy;    // Pad width in Y
-    Int_t fx[Mw3PadsX], fy[Mw3PadsY];
+    Double_t fx[Mw3PadsX], fy[Mw3PadsY]; 
     vector<Int_t> fQX;
     vector<Int_t> fQY;
     vector<Int_t> fPadX;
@@ -80,6 +88,7 @@ class R3BMwpc3Cal2Hit : public FairTask
     double fThresholdY;
     Bool_t fOnline;          // Don't store data for online
     Bool_t fTofWallMatching; // boolean to know if position matching with the tofwall is required
+    Int_t fExpId;
 
     TClonesArray* fMwpcCalDataCA;    /**< Array with Cal input data. >*/
     TClonesArray* fMwpcHitDataCA;    /**< Array with Hit output data. >*/
@@ -87,9 +96,8 @@ class R3BMwpc3Cal2Hit : public FairTask
 
     /** Private method AddHitData **/
 
-    // Adds a SofMwpcHitData to the MwpcHitCollection
+    // Adds a MwpcHitData to the MwpcHitCollection
     R3BMwpcHitData* AddHitData(Double_t x, Double_t y);
-
     /** **/
     void TofWallMatching(vector<double>, vector<double>, vector<double>, vector<double>);
     /** **/
