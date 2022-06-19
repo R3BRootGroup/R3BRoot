@@ -217,28 +217,28 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     // ToT MAPMT:
     chistName = fName + "_ToT_MAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 1000, 0., 400.);
+    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
     fh_ToT_MA_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_MA_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     // ToF Tofd -> Fiber:
     chistName = fName + "_tof";
     chistTitle = fName + " ToF";
-    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 44000, -1100., 1100.);
+    fh_Fib_ToF = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 44000, -1100., 1100.);
     fh_Fib_ToF->GetYaxis()->SetTitle("ToF / ns");
     fh_Fib_ToF->GetXaxis()->SetTitle("Fiber ID");
 
     // Test:
     chistName = fName + "_test";
     chistTitle = fName + " Tsync test";
-    fh_Test = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 50, -1024., 1024.);
+    fh_Test = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 50, -1024., 1024.);
     fh_Test->GetYaxis()->SetTitle("Tsync / ns");
     fh_Test->GetXaxis()->SetTitle("Fiber ID");
 
     // ToT single PMT:
     chistName = fName + "_ToT_SAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 100, 0., 100.);
+    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
     fh_ToT_Single_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_Single_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -249,7 +249,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         snprintf(number, sizeof(number), "%d", i);
         chistName = fName + "_ToT_SAPMT" + number;
         chistTitle = fName + " ToT of single PMTs " + number;
-        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 100, 0., 100.);
+        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
         fh_ToT_s_Fib[i]->GetXaxis()->SetTitle("Fiber number");
         fh_ToT_s_Fib[i]->GetYaxis()->SetTitle("ToT / ns");
     }
@@ -270,14 +270,14 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     // time difference SPMT - MAPMT:
     chistName = fName + "_dt";
     chistTitle = fName + " dt of fibers";
-    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 1000, -5000., 5000.);
+    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 1000, -5000., 5000.);
     fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
 
     // time of MAPMT:
     chistName = fName + "_time";
     chistTitle = fName + " time of fibers";
-    fh_time_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 0, fNumFibers, 4000, -2000., 2000.);
+    fh_time_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 4000, -2000., 2000.);
     fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_time_Fib->GetYaxis()->SetTitle("time / ns");
 
@@ -305,7 +305,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
         fNumFibers = fMapPar->GetNbChannels();
         if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
         {
-            fNumFibers *= 2;
+            fNumFibers *= fSubNum;
         }
         R3BLOG(INFO, "Nb of fibers for " << fName << ": " << fNumFibers);
     }
@@ -455,7 +455,8 @@ void R3BBunchedFiberCal2Hit::S515()
 
             // Fill histograms for gain match, and for debugging.
             fh_Fib_ToF->Fill(fiber_id, tof);
-            fh_ToT_MA_Fib->Fill(fiber_id, caltot_ns);
+            if (caltot_ns > 0.)
+                fh_ToT_MA_Fib->Fill(fiber_id, caltot_ns);
         }
 
         Double_t x = -10000.;
@@ -512,7 +513,7 @@ void R3BBunchedFiberCal2Hit::Standard()
 
     // Make direct mapping tables for trigger items.
     size_t mapmt_trig_num = fMAPMTCalTriggerItems->GetEntriesFast();
-    std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0] / 128);
+    std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0]);
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
         auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
@@ -927,7 +928,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                     par->SetGainMA(gain_temp[i - 1]);
                 }
                 R3BBunchedFiberHitModulePar* par1 = fCalPar->GetModuleParAt(i);
-                TH1D* proj = fh_Fib_ToF->ProjectionY("", i + 1, i + 1, 0);
+                TH1D* proj = fh_Fib_ToF->ProjectionY("", i, i, 0);
                 par1->SetSync(proj->GetBinCenter(proj->GetMaximumBin()));
 
                 cout << "MA fiber: " << fName << ", " << i << " tsync: " << proj->GetBinCenter(proj->GetMaximumBin())
@@ -938,7 +939,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
 
         for (UInt_t i = 1; i <= max; i++)
         {
-            TH1D* proj = fh_dt_Fib->ProjectionY("", i + 1, i + 1, 0);
+            TH1D* proj = fh_dt_Fib->ProjectionY("", i, i, 0);
             R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
             par->SetOffset1(0.5 * proj->GetBinCenter(proj->GetMaximumBin()));
             par->SetOffset2(-0.5 * proj->GetBinCenter(proj->GetMaximumBin()));
@@ -948,46 +949,56 @@ void R3BBunchedFiberCal2Hit::FinishTask()
 
         if (fIsGain)
         {
+            // MAPMT
             for (UInt_t i = 1; i <= max; i++)
             {
-                TH1D* proj = fh_ToT_MA_Fib->ProjectionY("", i + 1, i + 1, 0);
-                for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
+                TH1D* proj = fh_ToT_MA_Fib->ProjectionY("", i, i, 0);
+
+                Int_t binmax = proj->GetMaximumBin();
+                auto totsync = proj->GetXaxis()->GetBinCenter(binmax);
+
+                R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
+                par->SetGainMA(totsync);
+                cout << "MAPMT fiber: " << i << " par: " << totsync << endl;
+
+                /* for (UInt_t j = proj->GetNbinsX() ; j > 0; j--)
+                 {
+                     if (j == 2)
+                     {
+                         // could not find maximum
+                     }
+                     if (proj->GetBinContent(j) > proj->GetMaximum() / 100.)
+                     {
+                         R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
+                         par->SetGainMA(proj->GetBinCenter(j));
+                         cout << "MAPMT fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
+                         // par->SetGainMA(j - 1);
+                         //	cout << "MA fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
+                         break;
+                     }
+                 }*/
+            }
+
+            // SPMT
+            for (UInt_t i = 1; i <= max; i++)
+            {
+                TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i, i, 0);
+                for (UInt_t j = proj->GetNbinsX(); j > 0; j--)
                 {
                     if (j == 2)
                     {
                         // could not find maximum
                     }
-                    if (proj->GetBinContent(j) > proj->GetMaximum() / 100.)
+
+                    if (proj->GetBinContent(j) > proj->GetMaximum() / 10.)
                     {
                         R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
-                        par->SetGainMA(proj->GetBinCenter(j));
-                        cout << "MA fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
-                        // par->SetGainMA(j - 1);
-                        //	cout << "MA fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
+                        par->SetGainS(proj->GetBinCenter(j));
+                        // cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
+                        // par->SetGainS(j - 1);
+                        cout << "SPMT fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
                         break;
                     }
-                }
-            }
-        }
-        // MH
-        for (UInt_t i = 1; i <= max; i++)
-        {
-            TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i + 1, i + 1, 0);
-            for (UInt_t j = proj->GetNbinsX() - 2; j > 2; j--)
-            {
-                if (j == 2)
-                {
-                    // could not find maximum
-                }
-
-                if (proj->GetBinContent(j) > proj->GetMaximum() / 10.)
-                {
-                    R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
-                    par->SetGainS(proj->GetBinCenter(j));
-                    // cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
-                    // par->SetGainS(j - 1);
-                    cout << "S fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
-                    break;
                 }
             }
         }
