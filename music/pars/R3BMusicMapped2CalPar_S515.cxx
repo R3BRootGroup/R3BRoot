@@ -179,9 +179,9 @@ InitStatus R3BMusicMapped2CalPar_S515::ReInit() { return kSUCCESS; }
 void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntries();
-    Int_t nHitsA = fHitItemsMwpcA->GetEntries();
-    Int_t nHitsB = fHitItemsLos->GetEntries();
+    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
+    Int_t nHitsA = fHitItemsMwpcA->GetEntriesFast();
+    Int_t nHitsB = fHitItemsLos->GetEntriesFast();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 

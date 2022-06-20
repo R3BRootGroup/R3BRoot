@@ -247,7 +247,7 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
 
     Reset();
     // Reading the Input -- Point Data --
-    Int_t nHits = fFiPoints->GetEntries();
+    Int_t nHits = fFiPoints->GetEntriesFast();
     if (!nHits)
         return;
     // Data from Point level

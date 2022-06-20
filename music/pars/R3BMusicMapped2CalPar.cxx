@@ -166,8 +166,8 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
-    Int_t nHitsA = fHitItemsDetA->GetEntries();
-    Int_t nHitsB = fHitItemsDetB->GetEntries();
+    Int_t nHitsA = fHitItemsDetA->GetEntriesFast();
+    Int_t nHitsB = fHitItemsDetB->GetEntriesFast();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 
