@@ -65,7 +65,7 @@ R3BFiberDigitizer::R3BFiberDigitizer(const TString& name, Double_t e, Double_t t
 R3BFiberDigitizer::~R3BFiberDigitizer()
 {
     if (fFiPoints)
-        delete fFiPoints;
+        delete[] fFiPoints;
 }
 
 void R3BFiberDigitizer::SetEnergyResolution(Double_t e) { esigma = e; }
@@ -77,25 +77,27 @@ void R3BFiberDigitizer::SetYPositionResolution(Double_t y) { ysigma = y; }
 void R3BFiberDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer("Fi"+fName+"GeoPar");
+    fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName+"GeoPar");
     if (!fFiGeoPar)
     {
-        LOG(ERROR) << "R3BFiberDigitizer::SetParContainers() : Could not get access to Fi"+fName+"GeoPar container.";
+        LOG(ERROR) << "R3BFiberDigitizer::SetParContainers() : Could not get access to "+fName+"GeoPar container.";
         return;
     }
     else
-        LOG(INFO) << "R3BFiberDigitizer::SetParContainers() : Container Fi"+fName+"GeoPar found.";
+        LOG(INFO) << "R3BFiberDigitizer::SetParContainers() : Container "+fName+"GeoPar found.";
 }
 
 void R3BFiberDigitizer::SetParameter()
 {
-    ysigma = fFiGeoPar->GetSigmaY();
-    xsigma = fFiGeoPar->GetSigmaX();
-    fRot.RotateX(-fFiGeoPar->GetRotX() * TMath::DegToRad());
-    fRot.RotateY(-fFiGeoPar->GetRotY() * TMath::DegToRad());
-    fRot.RotateZ(-fFiGeoPar->GetRotZ() * TMath::DegToRad());
+    if (fFiGeoPar){
+      ysigma = fFiGeoPar->GetSigmaY();
+      xsigma = fFiGeoPar->GetSigmaX();
+      fRot.RotateX(-fFiGeoPar->GetRotX() * TMath::DegToRad());
+      fRot.RotateY(-fFiGeoPar->GetRotY() * TMath::DegToRad());
+      fRot.RotateZ(-fFiGeoPar->GetRotZ() * TMath::DegToRad());
 
-    fTrans.SetXYZ(fFiGeoPar->GetPosX(), fFiGeoPar->GetPosY(), fFiGeoPar->GetPosZ());
+      fTrans.SetXYZ(fFiGeoPar->GetPosX(), fFiGeoPar->GetPosY(), fFiGeoPar->GetPosZ());
+    }
 }
 
 InitStatus R3BFiberDigitizer::Init()
@@ -274,6 +276,7 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
             vpos.SetXYZ(x, y, z);
 
             vpos = fRot * (vpos - fTrans);
+            //vpos = fRot * (vpos);
             //time = pointData[i]->GetTime() + rand->Gaus(0., fsigma_t);
 
             fiber = (int) std::round(vpos.X() / fiber_thickness);
@@ -283,7 +286,7 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
         }
     }
     if (pointData)
-        delete pointData;
+        delete[] pointData;
     return;
 
 }
