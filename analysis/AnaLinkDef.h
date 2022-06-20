@@ -21,7 +21,6 @@
 
 #pragma link C++ class R3BAnalysisIncomingFrs+;
 #pragma link C++ class R3BAnalysisIncomingID+;
-#pragma link C++ class R3BAnalysisIncomingIDtrigger+;
 #pragma link C++ class R3BIncomingBeta+;
 #pragma link C++ class R3BIncomingIDPar+;
 #pragma link C++ class R3BAnalysisContFact+;

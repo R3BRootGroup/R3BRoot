@@ -163,10 +163,10 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntries();
+    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
     // if (nHits != fNumAnodes && nHits > 0)
     //  LOG(WARNING) << "R3BMusicMapped2Cal: nHits!=" << nHits << " NumAnodes:NumDets" << fNumAnodes << ":" << fNumDets;
-    if (!nHits)
+    if (nHits==0)
         return;
 
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];
@@ -224,7 +224,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
         }
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

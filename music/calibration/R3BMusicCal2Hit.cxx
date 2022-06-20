@@ -215,7 +215,7 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
         CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
-        anodeId = CalDat[i]->GetAnodeID() -1 ;
+        anodeId = CalDat[i]->GetAnodeID();
         energyperanode[anodeId] = CalDat[i]->GetEnergy();
         dt[anodeId] = CalDat[i]->GetDTime();
     }
@@ -291,7 +291,7 @@ void R3BMusicCal2Hit::ExecSim(int nHits)
     for (Int_t i = 0; i < nHits; i++)
     {
         CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
-        anodeId = CalDat[i]->GetAnodeID() -1;
+        anodeId = CalDat[i]->GetAnodeID();
         energyperanode[anodeId] = CalDat[i]->GetEnergy();
         dt[anodeId] = CalDat[i]->GetDTime();
     }
