@@ -206,7 +206,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
     chistName = fName + "_hit_mult";
     chistTitle = fName + " hit mult";
-    fh_multi = new TH1F(chistName.Data(), chistTitle.Data(), 200, 0, 200);
+    fh_multi = new TH1F(chistName.Data(), chistTitle.Data(), 300, 0, 300);
     fh_multi->GetXaxis()->SetTitle("mutltiplicity");
     fh_multi->GetYaxis()->SetTitle("Counts");
 
@@ -457,6 +457,24 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fh_fibId_vs_NEvents->GetXaxis()->SetTitle("Event number");
     fh_fibId_vs_NEvents->GetYaxis()->SetTitle("fiber ID");
 
+    chistName = fName + "_dtot_vs_dt";
+    chistTitle = fName + " dToT vs dt";
+    fh_dt_dtot = new TH2F(chistName.Data(), chistTitle.Data(), 1000, 0., 1000., 500, -250., 250.);
+    fh_dt_dtot->GetXaxis()->SetTitle("dtime two hits /ns");
+    fh_dt_dtot->GetYaxis()->SetTitle("dtot two hits / ns");
+
+    chistName = fName + "_time_vs_hit";
+    chistTitle = fName + " time vs hit num";
+    fh_t_ihit = new TH2F(chistName.Data(), chistTitle.Data(), 1000, 0., 1000., 2000, -1000, 1000);
+    fh_t_ihit->GetXaxis()->SetTitle("hit number");
+    fh_t_ihit->GetYaxis()->SetTitle("time / ns");
+
+    chistName = fName + "_tot_vs_hit";
+    chistTitle = fName + " tot vs hit num";
+    fh_tot_ihit = new TH2F(chistName.Data(), chistTitle.Data(), 1000, 0., 1000., 500, 0, 250);
+    fh_tot_ihit->GetXaxis()->SetTitle("hit number");
+    fh_tot_ihit->GetYaxis()->SetTitle("tot / ns");
+
     return kSUCCESS;
 }
 
@@ -477,7 +495,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
 
-    //   cout<<"in exec "<<fName<<endl;
+    // cout<<"in exec "<<fName<<endl;
     //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
 
     if (fnEvents / 100000. == (int)fnEvents / 100000)
@@ -549,7 +567,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         spmt_trig_table.at(idx) = cal;
     }
 
-    // cout << "sapmt trig read " << fName << "  " << spmt_trig_num << endl;
+    //  cout << "sapmt trig read " << fName << "  " << spmt_trig_num << endl;
 
     // Find multi-hit ToT for every channel.
     // The easiest safe way to survive ugly cases is to record all
@@ -635,7 +653,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     //       lead->GetTime_ns()<<", "<<cur_cal->GetTime_ns()<<endl;
                 }
             }
-            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 0) // Don't use this for s454
+            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 1) // Don't use this for s454
             {
                 auto cur_cal_trig_i = fSPMTTriggerMap[ch_i];
                 auto lead_trig_i = fSPMTTriggerMap[lead->GetChannel() - 1];
@@ -652,6 +670,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                 fmod(cur_cal->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
             auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
             auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
+
+            //	if(side_i==0) cout<<"Trigger "<<fName<<", "<<lead->GetTime_ns()<<", "<<lead_trig_ns<<",
+            //"<<lead->GetChannel()<<
+            //	", "<<fMAPMTTriggerMap[lead->GetChannel() - 1]<<", "<<cur_cal->GetChannel()<<endl;
 
             lead_raw = lead->GetTime_ns();
             trail_raw = cur_cal->GetTime_ns();
@@ -680,6 +702,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             {
                 // channel.tot_list.push_back(ToT(lead, cur_cal, tot_ns)); -> this lead to: t1>t2>t3....; we need
                 // t1<t2<t3....
+
+                //    if(fName=="Fi1b" && side_i==1) cout<<"First: "<<fName<<", "<<side_i<<"; "<<lead->GetChannel()<<",
+                //    "<<lead_ns<<"; "<<tot_ns<<endl;
+
                 if (side_i == 0)
                     channel.tot_list.push_front(ToT(
                         lead, cur_cal, lead_raw, trail_raw, lead_ns, cur_cal_ns, tot_ns, lead_trig_ns, trail_trig_ns));
@@ -799,6 +825,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             triglmem = mapmt_tot.lead_trig_ns;
             trigtmem = mapmt_tot.trail_trig_ns;
 
+            //   if(fName=="Fi1b") cout<<"Second: "<<fName<<", "<<"0; "<<mapmt_tot.lead->GetChannel()<<",
+            //   "<<mapmt_tot.lead_ns<<"; "<<mapmt_tot.tot_ns<<endl;
+
             int single = 0;
             Int_t isumNSA = 0;
             // if there is a single PMT:
@@ -871,6 +900,12 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
                     // Fix fiber installation mistakes.
                     fiber_id = FixMistake(fiber_id);
+
+                    //   if(fiber_id==173 || fiber_id==181 || fiber_id==185) continue;
+
+                    fh_dt_dtot->Fill(tdiff0, mapmt_tot.tot_ns - emem0);
+                    fh_t_ihit->Fill(isumNhitMA, mapmt_tot.lead_ns);
+                    fh_tot_ihit->Fill(isumNhitMA, mapmt_tot.tot_ns);
 
                     // Calibrate hit fiber.
                     /*
@@ -946,13 +981,14 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         }
                     }
 
-                    t_mapmt += offset1;
+                    // t_mapmt += offset1;
                     // t_spmt += offset2;
                     tot_mapmt *= 20. / gainMA;
                     // tot_spmt *= 20. / gainSA;
                     // tof  -= tsync;
                     // tof = (t_spmt + t_mapmt) / 2. - tsync;
-                    tof = t_mapmt - tsync;
+                    t_mapmt -= tsync;
+                    tof = t_mapmt;
 
                     // fh_tot_SA_ch->Fill(single, tot_spmt);
 
@@ -1048,7 +1084,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     Double_t eloss = tot_mapmt;
                     // Double_t t = (t_spmt_raw + t_mapmt_raw) / 2.; // tof;
                     //  Double_t t = t_spmt;
-                    Double_t t = t_mapmt;
+                    Double_t t = tof;
 
                     /*
                     if ((tof > -30. && tof < 30.) && (dtime > -20. && dtime < 20.))
@@ -1120,9 +1156,12 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     Double_t tot_spmt = 0.;
                     if (!fIsCalibrator)
                     {
-                        new ((*fHitItems)[fNofHitItems++]) R3BBunchedFiberHitData(
-                            0, x, y, eloss, t, fiber_id, t_mapmt_raw, t_spmt_raw, tot_mapmt, tot_spmt);
+                        new ((*fHitItems)[fNofHitItems++])
+                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
                         // cout << "saved hit: " << fiber_id << "  " << t << endl;
+
+                        //   if(fName=="Fi1b")  cout<<"Third: "<<fName<<", "<<"0; "<<fiber_id<<", "<<t<<";
+                        //   "<<eloss<<endl;
                     }
                 } // over it_mapmt_tot
             }     // it_mapmt
@@ -1148,18 +1187,19 @@ void R3BBunchedFiberCal2Hit::FinishEvent()
     fHitItems->Clear();
     fNofHitItems = 0;
     Double_t t1, t2, t3, t4;
-    if (cal_num > 0 && (summsm1_ac + summsm2_ac + summsm3_ac + summsm4_ac) > 0)
+    // if (cal_num > 0 && (summsm1_ac + summsm2_ac + summsm3_ac + summsm4_ac) > 0)
     {
         Int_t norm = summmpt_ac;
         if (norm < 1)
             norm = 1;
-        fh_hit1_ac->Fill(summmpt_ac, (summsm1_ac + summsm2_ac + summsm3_ac + summsm4_ac));
-        fh_hit2_ac->Fill(summsm1_ac + summsm3_ac, summsm2_ac + summsm4_ac);
+        // fh_hit1_ac->Fill(summmpt_ac, (summsm1_ac + summsm2_ac + summsm3_ac + summsm4_ac));
+        // fh_hit2_ac->Fill(summsm1_ac + summsm3_ac, summsm2_ac + summsm4_ac);
 
         //  cout<<"max values: "<<fName<<", "<<tot_mapmt_max_fiber_id<<", "<< tot_mapmt_max<<endl;
         fh_ToT_MA_Fib_max->Fill(tot_mapmt_max_fiber_id, tot_mapmt_max);
 
-        fh_multi->Fill(multi);
+        if (multi > 0)
+            fh_multi->Fill(multi);
     }
 
     multi = 0;
@@ -1213,6 +1253,9 @@ void R3BBunchedFiberCal2Hit::FinishTask()
     fh_lowMtot->Write();
     fh_Mtot_vs_NEvents->Write();
     fh_fibId_vs_NEvents->Write();
+    fh_dt_dtot->Write();
+    fh_t_ihit->Write();
+    fh_tot_ihit->Write();
     for (Int_t i = 0; i < 4; i++)
     {
         fh_ToT_s_Fib[i]->Write();
@@ -1359,6 +1402,8 @@ void R3BBunchedFiberCal2Hit::SPMTTriggerMapSet(unsigned const* a_map, size_t a_m
         LOG(fatal) << "SPMT trigger map length=" << c_length << " not compatible with sub#=" << fSubNum
                    << " spmt_per_sub=" << fChPerSub[1] << "!";
     }
+    cout << "Set trigger map: "
+         << "SPMT trigger map length=" << c_length << ", sub#=" << fSubNum << " spmt_per_sub=" << fChPerSub[1] << endl;
     fSPMTTriggerMap = a_map;
 }
 

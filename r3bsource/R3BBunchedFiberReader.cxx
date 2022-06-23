@@ -59,6 +59,7 @@ Bool_t R3BBunchedFiberReader::Init()
         }
     }
     FairRootManager::Instance()->Register(fShortName + "Mapped", "Land", fMappedArray, kTRUE);
+
     return kTRUE;
 }
 
@@ -73,8 +74,8 @@ Bool_t R3BBunchedFiberReader::Read()
 
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
         {
-            LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side/edge " << fShortName << ", " << side_i << ", "
-                       << edge_i;
+            //  LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side/edge " << fShortName << ", " << side_i << ", "
+            // << edge_i;
 
             auto const& e = fMHL[side_i][edge_i];
 
@@ -102,10 +103,31 @@ Bool_t R3BBunchedFiberReader::Read()
                 return kFALSE;
             }
 
+            if (c_M > 0)
+            {
+                if (fShortName == "Fi1a")
+                {
+                    if (side_i == 0)
+                        sum0a++;
+                    if (side_i == 1)
+                        sum1a++;
+                }
+                if (fShortName == "Fi1b")
+                {
+                    if (side_i == 0)
+                        sum0b++;
+                    if (side_i == 1)
+                        sum1b++;
+                }
+            }
+
             // Simply dump edges, can only be sorted perfectly after calibration,
             // and hits should be somewhat sorted already, that helps many sorting
             // algos.
             uint32_t cur_entry = 0;
+            //   if(fShortName=="Fi1b" && c_M > 0) std::cout<<"Num channels side/edge/num: "<<fShortName<<"; "<<side_i<<
+            // ", "<<edge_i<<", "<<c_M<<std::endl;
+
             for (uint32_t i = 0; i < c_M; i++)
             {
                 uint32_t c_MI = e[0]._MI[i];
@@ -121,11 +143,13 @@ Bool_t R3BBunchedFiberReader::Read()
                                  << "}).";
                     return kFALSE;
                 }
+
                 for (; cur_entry < c_ME; cur_entry++)
                 {
 
-                    LOG(DEBUG) << "Data SAPMT FIBERS!!!!!!" << c_MI << "," << e[0]._v[cur_entry] << ", "
-                               << e[1]._v[cur_entry];
+                    // LOG(DEBUG)  << "Data FIBERS det/side/channel/edge/times " << fShortName<<", "<<side_i<<", "<<c_MI
+                    // << ", " << edge_i<<
+                    //   ", "<<e[0]._v[cur_entry] << ", "<< e[1]._v[cur_entry];
 
                     new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                         R3BBunchedFiberMappedData(side_i, c_MI, 0 == edge_i, e[0]._v[cur_entry], e[1]._v[cur_entry]);
@@ -158,6 +182,18 @@ Bool_t R3BBunchedFiberReader::Read()
             return kFALSE;
         }
 
+        //   if( c_M > 0)
+        {
+            if (fShortName == "Fi1a")
+            {
+                sum2a++;
+            }
+            if (fShortName == "Fi1b")
+            {
+                sum2b++;
+            }
+        }
+
         // Simply dump edges, can only be sorted perfectly after calibration,
         // and hits should be somewhat sorted already, that helps many sorting
         // algos.
@@ -175,8 +211,8 @@ Bool_t R3BBunchedFiberReader::Read()
             {
 
                 //  LOG(DEBUG)
-                //   std::cout<< "Data MAPMT FIBERS!!!!!! "<<fShortName
-                //         <<"; "<<c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry]<<std::endl;
+                //   std::cout<< "Data MAPMT Trigger FIBERS!!!!!! "<<fShortName
+                //       <<"; "<<c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry]<<std::endl;
 
                 new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
                     R3BBunchedFiberMappedData(2, c_MI, true, e[0]._v[cur_entry], e[1]._v[cur_entry]);
@@ -184,6 +220,8 @@ Bool_t R3BBunchedFiberReader::Read()
             cur_entry = c_ME;
         }
     }
+    //  if(fShortName=="Fi1a") std::cout<<"Sums 1a multi/single/trigg: "<<sum0a<<"; "<<sum1a<<"; "<<sum2a<<std::endl;
+    //  if(fShortName=="Fi1b") std::cout<<"Sums 1b multi/single/trigg: "<<sum0b<<"; "<<sum1b<<"; "<<sum2b<<std::endl;
 
     // HTT HAXX!!!
     if (0)

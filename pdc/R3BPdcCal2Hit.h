@@ -23,7 +23,7 @@
 
 #include "FairTask.h"
 #include "THnSparse.h"
-
+#define N_WIRE_MAX 144
 #define N_PLANE_MAX_PDC 4
 #define wire_distance 6.92820323
 
@@ -67,7 +67,7 @@ class R3BPdcCal2Hit : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BPdcCal2Hit(const char* name, Bool_t, Int_t iVerbose = 1);
+    R3BPdcCal2Hit(const char* name, Bool_t, Bool_t, Int_t iVerbose = 1);
 
     /**
      * Destructor.
@@ -124,6 +124,18 @@ class R3BPdcCal2Hit : public FairTask
     UInt_t maxevent;
     UInt_t fnEvents;
 	Bool_t fIsCalibrator;
+	Bool_t fIsSync;
+	const Double_t * xtc_x;
+	const Double_t * xtc_t;
+	Double_t xt_xarray[200];
+    Double_t xt_tarray[200];
+    Double_t t_ns[4000];
+    Double_t x_mm[4000];
+    Double_t rebinned_x_mm[200];
+    Double_t rebinned_t_ns[200];
+    Int_t ipar_channels = N_PLANE_MAX_PDC*N_WIRE_MAX ;
+    Double_t tsync_mem[N_PLANE_MAX_PDC*N_WIRE_MAX];
+    Bool_t method2 = false;
 
     typedef std::vector<Channel> ChannelArray;
     std::vector<ChannelArray> fPlaneArray;
@@ -131,13 +143,17 @@ class R3BPdcCal2Hit : public FairTask
     // histograms for gain matching
     TH2F* fh_time_raw[N_PLANE_MAX_PDC];
     TH2F* fh_time_drift[N_PLANE_MAX_PDC];
-    TH2F* fh_running_sum;
+    TH1F* fh_running_sum;
+    TH1F* fh_xtc;
+    TH1F* fh_error[N_PLANE_MAX_PDC];
     TH2F* fh_radius[N_PLANE_MAX_PDC];
     TH2F* fh_radius_dt[N_PLANE_MAX_PDC];
-    TH2F* fh_mult[N_PLANE_MAX_PDC];
-    
-    TH2F* fh_fish;
-    TH2F* fh_check1;
+    TH2F* fh_mult[N_PLANE_MAX_PDC];    
+    TH2F* fh_fish[N_PLANE_MAX_PDC];
+    TH2F* fh_check[N_PLANE_MAX_PDC];
+    TH2F* fh_rvspos[N_PLANE_MAX_PDC];
+    TH2F* fh_tsync[N_PLANE_MAX_PDC];
+    TH1F* fh_angle[N_PLANE_MAX_PDC];
     
 	TH2F* fh_wire_cor;
 	

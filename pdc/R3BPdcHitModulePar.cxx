@@ -24,21 +24,16 @@ using namespace std;
 
 ClassImp(R3BPdcHitModulePar);
 
-R3BPdcHitModulePar::R3BPdcHitModulePar(const char* name,
-                                                     const char* title,
-                                                     const char* context,
-                                                     Bool_t own)
+R3BPdcHitModulePar::R3BPdcHitModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fWire(0)
     , fdTmin(0)
     , fdTmax(0)
     , fTmin(0)
     , fTmax(0)
-    , fPar1(0)
-    , fPar2(0)
-    , fPar3(0)
-    , fPar4(0)
-    , fPar5(0)
+    , fnpoints(0)
+    , fXT_xArray()
+    , fXT_tArray()
 {
     // Reset all parameters
     clear();
@@ -76,6 +71,22 @@ Bool_t R3BPdcHitModulePar::getParams(FairParamList* list)
 
 void R3BPdcHitModulePar::clear() { fWire = 0; }
 
+void R3BPdcHitModulePar::SetXT_xArray(Double_t* XT_xArray, Int_t isize)
+{
+    for (Int_t i = 0; i < isize; i++)
+    {
+        fXT_xArray[i] = XT_xArray[i];
+    }
+}
+void R3BPdcHitModulePar::SetXT_tArray(Double_t* XT_tArray, Int_t isize)
+{
+    for (Int_t i = 0; i < isize; i++)
+    {
+        fXT_tArray[i] = XT_tArray[i];
+    }
+}
+const Double_t* R3BPdcHitModulePar::GetXT_xArray() const { return fXT_xArray; }
+const Double_t* R3BPdcHitModulePar::GetXT_tArray() const { return fXT_tArray; }
 void R3BPdcHitModulePar::printParams()
 {
     LOG(INFO) << "   R3BPdcHitModulePar: FIBER HIT Calibration Parameters: ";
@@ -84,11 +95,12 @@ void R3BPdcHitModulePar::printParams()
     LOG(INFO) << "   fdTmax: " << fdTmax;
     LOG(INFO) << "   fTmin: " << fTmin;
     LOG(INFO) << "   fTmax: " << fTmax;
-    LOG(INFO) << "   fPar1: " << fPar1;
-    LOG(INFO) << "   fPar2: " << fPar2;
-    LOG(INFO) << "   fPar3: " << fPar3;
-    LOG(INFO) << "   fPar4: " << fPar4;
-    LOG(INFO) << "   fPar5: " << fPar5;
+    LOG(INFO) << "   fSync: " << fSync;
+    LOG(INFO) << " fnpoints: " << fnpoints;
+    for (Int_t i = 0; i < fnpoints; i++)
+    {
+        LOG(INFO) << " t_ns & x_mm: " << i << ", " << fXT_tArray[i] << ", " << fXT_xArray[i];
+    }
 }
 
 void R3BPdcHitModulePar::DrawParams()

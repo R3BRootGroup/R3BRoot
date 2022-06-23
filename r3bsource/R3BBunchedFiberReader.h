@@ -185,6 +185,7 @@ class R3BBunchedFiberReader : public R3BReader
     // [0=MAPMT,1=SPMT].
     UInt_t fChannelNum[2];
     TClonesArray* fMappedArray;
+     Int_t sum0a = 0, sum0b = 0, sum1a = 0, sum1b = 0, sum2a = 0, sum2b = 0;
 
   public:
     ClassDef(R3BBunchedFiberReader, 1);

@@ -216,6 +216,9 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         {
             new ((*fCalItems)[fCalItems->GetEntriesFast()])
                 R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+
+            //    if(fName=="Fi1b" && mapped->IsLeading()) cout<<"Mapped2cal: "<<fName<<", "<<mapped->GetSide()<<",
+            //    "<<channel<<", "<<time_ns<<endl;
         }
     }
     fnEvents++;

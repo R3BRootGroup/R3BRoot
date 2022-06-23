@@ -15,8 +15,13 @@
 #define R3BPDCHITMODULEPAR_H
 
 #include "FairParGenericSet.h"
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
 
 #define NCHMAX 5000
+#define XTC_MAXPOINTS 200
 
 class FairParamList;
 
@@ -81,36 +86,44 @@ class R3BPdcHitModulePar : public FairParGenericSet
     Double_t GetdTmax() const { return fdTmax; }
     Double_t GetTmin() const { return fTmin; }
     Double_t GetTmax() const { return fTmax; }
-    Double_t GetPar1() const { return fPar1; }
-    Double_t GetPar2() const { return fPar2; }
-    Double_t GetPar3() const { return fPar3; }
-    Double_t GetPar4() const { return fPar4; }
-    Double_t GetPar5() const { return fPar5; }
+    Double_t GetSync() const { return fSync; }
+    Double_t GetNPoints() const {return fnpoints;}
+    
+    const Double_t* GetXT_xArray() const ;//{return fXT_xArray;}
+    const Double_t* GetXT_tArray() const ;//{return fXT_tArray;}
+    
 
     void SetWire(Int_t i) { fWire = i; }
     void SetdTmin(Double_t dtmin) { fdTmin = dtmin; }
     void SetdTmax(Double_t dtmax) { fdTmax = dtmax; }
     void SetTmin(Double_t tmin) { fTmin = tmin; }
     void SetTmax(Double_t tmax) { fTmax = tmax; }
-    void SetPar1(Double_t p1) { fPar1 = p1; }
-    void SetPar2(Double_t p2) { fPar2 = p2; }
-    void SetPar3(Double_t p3) { fPar3 = p3; }
-    void SetPar4(Double_t p4) { fPar4 = p4; }
-    void SetPar5(Double_t p5) { fPar5 = p5; }
-
+    void SetSync(Double_t tsync) { fSync = tsync; }
+    void SetNPoints(UInt_t npoints) {fnpoints = npoints;}
+    void SetXT_xArray(Double_t* fXT_xArray, Int_t isize);
+  /*  {
+		for(Int_t i=0;i<isize;i++){
+			fXT_xArray[i]=xt_xarray[i];
+		}
+	}*/
+	void SetXT_tArray(Double_t* fXT_tArray, Int_t isize);
+  /*  {
+		for(Int_t i=0;i<isize;i++){
+			fXT_tArray[i]=xt_tarray[i];
+		}
+	}*/
   private:
     Int_t fWire;      /**< Index of a fiber. */
     Double_t fdTmin;    /**< minimum drift time */
     Double_t fdTmax;    /**< maximum drift time */
     Double_t fTmin;    /**< minimum drift time */
     Double_t fTmax;    /**< maximum drift time */
-    Double_t fPar1;    /**< Parameter 1 */
-    Double_t fPar2;    /**< Parameter 2 */
-    Double_t fPar3;    /**< Parameter 3 */
-    Double_t fPar4;    /**< Parameter 4 */
-    Double_t fPar5;    /**< Parameter 5 */
+	Double_t fSync;   /** TSync */
+	UInt_t fnpoints;
+    Double_t fXT_tArray[XTC_MAXPOINTS]={0};
+    Double_t fXT_xArray[XTC_MAXPOINTS]={0};
 
-    ClassDef(R3BPdcHitModulePar, 1);
+    ClassDef(R3BPdcHitModulePar, 2);
 };
 
 #endif
