@@ -150,14 +150,14 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t fLambda;                        /**< light attenuation in paddle for position determination */
     Double_t fSync;                          /**< time offset between paddles */
     Double_t fTofSyncOffset;                 /**< tof alignment with respect to the start detector */
-    Double_t fTofSyncSlope;                 /**< tof alignment with respect to the start detector */
+    Double_t fTofSyncSlope;                  /**< tof alignment with respect to the start detector */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d; /**< double exponential parameters for position dependent charge */
     Double_t fPar2a, fPar2b, fPar2c, fPar2d; /**< double exponential parameters for position dependent charge */
     Double_t fPola, fPolb, fPolc, fPold;     /**< polynomial parameters for position dependent charge */
     Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;                    /**< quench correction parameters */
     Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk; /**< walk correction parameters */
 
-    ClassDef(R3BTofDHitModulePar, 1);
+    ClassDef(R3BTofDHitModulePar, 2);
 };
 
 #endif /* R3BTofDHitModulePar_H */

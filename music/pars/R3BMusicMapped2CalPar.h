@@ -89,7 +89,7 @@ class R3BMusicMapped2CalPar : public FairTask
     TString fNameDetA;
     Float_t fPosDetA; // Position in the beam direction in mm
     TString fNameDetB;
-    Float_t fPosDetB; // Position in the beam direction in mm
+    Float_t fPosDetB;  // Position in the beam direction in mm
     Float_t fPosMusic; // Position in the beam direction in mm
 
     Int_t mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
@@ -99,8 +99,8 @@ class R3BMusicMapped2CalPar : public FairTask
     R3BTimeStitch* fTimeStitch;
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
-    TClonesArray* fHitItemsDetA;     /**< Array with hit items. */
-    TClonesArray* fHitItemsDetB;     /**< Array with hit items. */
+    TClonesArray* fHitItemsDetA;      /**< Array with hit items. */
+    TClonesArray* fHitItemsDetB;      /**< Array with hit items. */
 
     TGraph** fg_anode;
 

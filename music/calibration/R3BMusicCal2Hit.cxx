@@ -245,9 +245,9 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         TMatrixDColumn(A, 0) = 1.0;
         TMatrixDColumn(A, 1) = fPosZ;
 
-        //singular value decomposition of matrix A
+        // singular value decomposition of matrix A
         //(generalizes the eigendecomposition of a square normal matrix with an orthonormal eigenbasis
-        //to any m × n matrix)
+        // to any m × n matrix)
         TDecompSVD svd(A);
         Bool_t ok;
         TVectorD dt_r;
@@ -255,7 +255,8 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         TVectorD c_svd_r = svd.Solve(dt_r, ok);
         theta = c_svd_r[1];
 
-        Double_t Esum_nba_rot = fy0_point + (theta * 1000 - fx0_point) * sin(frot_ang) + (TMath::Sqrt(Esum / nba) - fy0_point) * cos(frot_ang);
+        Double_t Esum_nba_rot = fy0_point + (theta * 1000 - fx0_point) * sin(frot_ang) +
+                                (TMath::Sqrt(Esum / nba) - fy0_point) * cos(frot_ang);
         Double_t zhit = fZ0 + fZ1 * Esum_nba_rot + fZ2 * Esum_nba_rot * Esum_nba_rot;
 
         if (zhit > 0)
@@ -327,8 +328,8 @@ void R3BMusicCal2Hit::ExecSim(int nHits)
         Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba);
 
         if (zhit > 0)
-            //AddHitData(theta, zhit, Esum / nba);
-            AddHitData(theta, zhit, Esum / nba, good_dt[3]); //for tracking
+            // AddHitData(theta, zhit, Esum / nba);
+            AddHitData(theta, zhit, Esum / nba, good_dt[3]); // for tracking
     }
     if (CalDat)
         delete[] CalDat;

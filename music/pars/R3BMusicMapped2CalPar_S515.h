@@ -38,9 +38,9 @@ class R3BMusicMapped2CalPar_S515 : public FairTask
 
     /** Standard constructor **/
     R3BMusicMapped2CalPar_S515(const TString& name,
-                          Int_t iVerbose = 1,
-                          const TString& namedeta = "Mwpc0",
-                          const TString& namedetb = "Los");
+                               Int_t iVerbose = 1,
+                               const TString& namedeta = "Mwpc0",
+                               const TString& namedetb = "Los");
 
     /** Destructor **/
     virtual ~R3BMusicMapped2CalPar_S515();
@@ -95,7 +95,7 @@ class R3BMusicMapped2CalPar_S515 : public FairTask
     TString fNameDetA;
     Float_t fPosMwpcA; // Position in the beam direction in mm
     TString fNameDetB;
-    Float_t fPosLos; // Position in the beam direction in mm
+    Float_t fPosLos;   // Position in the beam direction in mm
     Float_t fPosMusic; // Position in the beam direction in mm
 
     Int_t mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
@@ -105,7 +105,7 @@ class R3BMusicMapped2CalPar_S515 : public FairTask
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
     TClonesArray* fHitItemsMwpcA;     /**< Array with hit items. */
-    TClonesArray* fHitItemsLos;     /**< Array with hit items. */
+    TClonesArray* fHitItemsLos;       /**< Array with hit items. */
 
     TGraph** fg_anode;
 

@@ -166,7 +166,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
     Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
     // if (nHits != fNumAnodes && nHits > 0)
     //  LOG(WARNING) << "R3BMusicMapped2Cal: nHits!=" << nHits << " NumAnodes:NumDets" << fNumAnodes << ":" << fNumDets;
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];

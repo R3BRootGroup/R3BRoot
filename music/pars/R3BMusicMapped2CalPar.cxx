@@ -98,23 +98,22 @@ InitStatus R3BMusicMapped2CalPar::Init()
 
     if (fNameDetA == "Los")
     {
-      fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "Hit");
-      if (!fHitItemsDetA)
-      {
-          LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
-          return kFATAL;
-      }
+        fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "Hit");
+        if (!fHitItemsDetA)
+        {
+            LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
+            return kFATAL;
+        }
     }
     else
     {
-      fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
-      if (!fHitItemsDetA)
-      {
-          LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
-          return kFATAL;
-      }
+        fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
+        if (!fHitItemsDetA)
+        {
+            LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
+            return kFATAL;
+        }
     }
-
 
     fHitItemsDetB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
     if (!fHitItemsDetB)

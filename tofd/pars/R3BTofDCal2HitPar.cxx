@@ -321,7 +321,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     // Tof with respect LOS detector
                     auto tof = fTimeStitch->GetTime((top_ns + bot_ns) / 2. - fHeader->GetTStart(), "tamex", "vftx");
                     fh1_tofsync[iPlane - 1][iBar - 1]->Fill(tof);
-                    //std::cout << "top" << top_ns << " bot"<<bot_ns << " start" << header->GetTStart() << std::endl;
+                    // std::cout << "top" << top_ns << " bot"<<bot_ns << " start" << header->GetTStart() << std::endl;
                 }
 
                 // prepare offset and sync calculation
@@ -1176,7 +1176,7 @@ void R3BTofDCal2HitPar::FinishTask()
                 Int_t binmax = fh1_tofsync[i][j]->GetMaximumBin();
                 auto tofsync = fh1_tofsync[i][j]->GetXaxis()->GetBinCenter(binmax);
 
-                TF1* fgauss = new TF1("fgaus", "gaus(0)", tofsync-0.25, tofsync+0.25);
+                TF1* fgauss = new TF1("fgaus", "gaus(0)", tofsync - 0.25, tofsync + 0.25);
                 fh1_tofsync[i][j]->Fit("fgaus", "QR");
                 auto tof_offset = fgauss->GetParameter(1);
 

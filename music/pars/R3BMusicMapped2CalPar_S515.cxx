@@ -31,11 +31,11 @@
 #include "FairRuntimeDb.h"
 
 // Music headers
+#include "R3BLosHitData.h"
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2CalPar_S515.h"
 #include "R3BMusicMappedData.h"
 #include "R3BMwpcHitData.h"
-#include "R3BLosHitData.h"
 
 #include <iomanip>
 
@@ -67,9 +67,9 @@ R3BMusicMapped2CalPar_S515::R3BMusicMapped2CalPar_S515()
 
 // R3BMusicMapped2CalPar_S515: Standard Constructor --------------------------
 R3BMusicMapped2CalPar_S515::R3BMusicMapped2CalPar_S515(const TString& name,
-                                             Int_t iVerbose,
-                                             const TString& namedeta,
-                                             const TString& namedetb)
+                                                       Int_t iVerbose,
+                                                       const TString& namedeta,
+                                                       const TString& namedetb)
     : FairTask(name, iVerbose)
     , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
     , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
