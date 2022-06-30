@@ -642,35 +642,35 @@ InitStatus R3BOnlineSpectraPdc::Init()
             fh_Pdc_Wire_vs_Events[j]->GetYaxis()->SetTitle("Wire number");
         }
 
-		fh_Pdc_xvsx = new TH2F("PDC_x_vs_x", "PDC x vs x", 1500, 0, 1500, 1500, 0, 1500);
+        fh_Pdc_xvsx = new TH2F("PDC_x_vs_x", "PDC x vs x", 1500, 0, 1500, 1500, 0, 1500);
         fh_Pdc_xvsx->GetXaxis()->SetTitle("x1 in mm");
-        fh_Pdc_xvsx->GetYaxis()->SetTitle("x3 in mm");        
+        fh_Pdc_xvsx->GetYaxis()->SetTitle("x3 in mm");
 
-		fh_Pdc_yvsy = new TH2F("PDC_y_vs_y", "PDC y vs y", 1000, 0, 1000, 1000, 0, 1000);
+        fh_Pdc_yvsy = new TH2F("PDC_y_vs_y", "PDC y vs y", 1000, 0, 1000, 1000, 0, 1000);
         fh_Pdc_yvsy->GetXaxis()->SetTitle("y2 in mm");
-        fh_Pdc_yvsy->GetYaxis()->SetTitle("y4 in mm");        
-        
-/*
-        for (Int_t j = 0; j < 144; j++)
-        {
+        fh_Pdc_yvsy->GetYaxis()->SetTitle("y4 in mm");
 
-            char strName17[255];
-            sprintf(strName17, "pdc_Tot_vs_Time_wire_%d", j + 1);
-            char strName18[255];
-            sprintf(strName18, "PDC ToT vs. Time wire %d", j + 1);
-            fh_Pdc_ToT_vs_Time[j] = new TH2F(strName17, strName18, 2000, -1000, 1000, 300, 0, 300);
-            fh_Pdc_ToT_vs_Time[j]->GetXaxis()->SetTitle("Time in ns");
-            fh_Pdc_ToT_vs_Time[j]->GetYaxis()->SetTitle("ToT in ns");
+        /*
+                for (Int_t j = 0; j < 144; j++)
+                {
 
-            char strName19[255];
-            sprintf(strName19, "pdc_Tot_vs_Hit_wire_%d", j + 1);
-            char strName20[255];
-            sprintf(strName20, "PDC ToT vs. Hit number for wire %d", j + 1);
-            fh_Pdc_ToT_vs_Hit[j] = new TH2F(strName19, strName20, 20, 0, 20, 300, 0, 300);
-            fh_Pdc_ToT_vs_Hit[j]->GetXaxis()->SetTitle("Time in ns");
-            fh_Pdc_ToT_vs_Hit[j]->GetYaxis()->SetTitle("ToT in ns");
-        }
-*/
+                    char strName17[255];
+                    sprintf(strName17, "pdc_Tot_vs_Time_wire_%d", j + 1);
+                    char strName18[255];
+                    sprintf(strName18, "PDC ToT vs. Time wire %d", j + 1);
+                    fh_Pdc_ToT_vs_Time[j] = new TH2F(strName17, strName18, 2000, -1000, 1000, 300, 0, 300);
+                    fh_Pdc_ToT_vs_Time[j]->GetXaxis()->SetTitle("Time in ns");
+                    fh_Pdc_ToT_vs_Time[j]->GetYaxis()->SetTitle("ToT in ns");
+
+                    char strName19[255];
+                    sprintf(strName19, "pdc_Tot_vs_Hit_wire_%d", j + 1);
+                    char strName20[255];
+                    sprintf(strName20, "PDC ToT vs. Hit number for wire %d", j + 1);
+                    fh_Pdc_ToT_vs_Hit[j] = new TH2F(strName19, strName20, 20, 0, 20, 300, 0, 300);
+                    fh_Pdc_ToT_vs_Hit[j]->GetXaxis()->SetTitle("Time in ns");
+                    fh_Pdc_ToT_vs_Hit[j]->GetYaxis()->SetTitle("ToT in ns");
+                }
+        */
         for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
         {
             cPdc_planes->cd(j * 6 + 1);
@@ -693,17 +693,17 @@ InitStatus R3BOnlineSpectraPdc::Init()
                 cPdc_planes->cd(j * 6 + 6);
                 fh_Pdc_xy[j]->Draw("colz");
             }
-			if(j == 0) {
-				cPdc_planes->cd(j * 6 + 6);
-				fh_Pdc_xvsx->Draw("colz");
-			}
-			if(j == 2) {
-				cPdc_planes->cd(j * 6 + 6);
-				fh_Pdc_yvsy->Draw("colz");
-			}
-			
-			
-			
+            if (j == 0)
+            {
+                cPdc_planes->cd(j * 6 + 6);
+                fh_Pdc_xvsx->Draw("colz");
+            }
+            if (j == 2)
+            {
+                cPdc_planes->cd(j * 6 + 6);
+                fh_Pdc_yvsy->Draw("colz");
+            }
+
             cPdc->cd(j + 1);
             fh_Pdc_Wire_vs_Events[j]->Draw("colz");
         }
@@ -873,7 +873,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Double_t edge = cal->GetEdgeId();
             Double_t t = cal->GetTime_ns();
 
-            //cout << "Plane: " << plane << " Wire: " << wire << " edge: " << edge << endl;
+            // cout << "Plane: " << plane << " Wire: " << wire << " edge: " << edge << endl;
             // fh_Pdc_Time[plane-1]->Fill(wire,t);
         }
     }
@@ -920,7 +920,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         Double_t y_prev = -10.;
         Double_t xPair[4];
         Double_t yPair[4];
-		Double_t TotMax[4];
+        Double_t TotMax[4];
         for (Int_t i = 0; i < 4; i++)
         {
             xPair[i] = -10.;
@@ -947,15 +947,14 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
 
             mult[plane - 1][wire]++;
-/*
-            if (plane == 2)
-            {
-                fh_Pdc_ToT_vs_Time[wire]->Fill(t[plane - 1], eloss[plane - 1]);
-                fh_Pdc_ToT_vs_Hit[wire]->Fill(mult[plane - 1][wire], eloss[plane - 1]);
-            }
-*/            
+            /*
+                        if (plane == 2)
+                        {
+                            fh_Pdc_ToT_vs_Time[wire]->Fill(t[plane - 1], eloss[plane - 1]);
+                            fh_Pdc_ToT_vs_Hit[wire]->Fill(mult[plane - 1][wire], eloss[plane - 1]);
+                        }
+            */
 
-				
             if (x[plane - 1] > 0 && eloss[plane - 1] > TotMax[plane - 1])
             {
                 fh_Pdc_x[plane - 1]->Fill(x[plane - 1]);
@@ -1034,13 +1033,13 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             fh_Pdc_xy[1]->Fill(xPdc1, yPdc2);
             fh_Pdc_xy[3]->Fill(xPdc3, yPdc4);
         }
-        if(xPdc1 > 0. && xPdc3 > 0. && yPdc2 > 0. && yPdc4 > 0.)
+        if (xPdc1 > 0. && xPdc3 > 0. && yPdc2 > 0. && yPdc4 > 0.)
         {
-			
-			//cout << "Test: " << xPdc1 << "  " << yPdc2 << "  " << xPdc3 << "  " << yPdc4 << endl;
-			fh_Pdc_xvsx->Fill(xPdc1, xPdc3);
-			fh_Pdc_yvsy->Fill(yPdc2, yPdc4);
-		}
+
+            // cout << "Test: " << xPdc1 << "  " << yPdc2 << "  " << xPdc3 << "  " << yPdc4 << endl;
+            fh_Pdc_xvsx->Fill(xPdc1, xPdc3);
+            fh_Pdc_yvsy->Fill(yPdc2, yPdc4);
+        }
     }
     if (ipl[0] > 1 || ipl[1] > 1 || ipl[2] > 1 || ipl[3] > 1)
         cout << "Multipl: " << ipl[0] << ", " << ipl[1] << "; " << ipl[2] << ", " << ipl[3] << endl;
@@ -1221,8 +1220,8 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Double_t ypos = 0. / 0.;
             Double_t tfib = 0. / 0., tof_fib = 0. / 0.;
             Double_t randx;
-            
-            //if(nHits>0) cout<<"new event Fi1a: "<< nHits<<endl;
+
+            // if(nHits>0) cout<<"new event Fi1a: "<< nHits<<endl;
 
             Double_t tMAPMT = 0. / 0.;
             Double_t tSPMT1 = 0. / 0.;
@@ -1260,9 +1259,9 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 tMAPMT = hit->GetTime();
                 tot = hit->GetEloss(); // hit->GetMAPMTToT_ns();
 
-				//cout << "Hit: " << ihit << " Fib: " << iFib << " t: " << tMAPMT 
-				//	 << " ToT: " << tot << endl;
-					 
+                // cout << "Hit: " << ihit << " Fib: " << iFib << " t: " << tMAPMT
+                //	 << " ToT: " << tot << endl;
+
                 fh_fi1a_Tot->Fill(iFib, tot);
                 fh_fi1a_Time->Fill(iFib, tMAPMT);
 
@@ -1354,8 +1353,8 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Double_t ypos = 0. / 0.;
             Double_t tfib = 0. / 0., tof_fib = 0. / 0.;
             Double_t randx;
-            
-            //if(nHits>0) cout<<"new event Fi1b: "<< nHits<<endl;
+
+            // if(nHits>0) cout<<"new event Fi1b: "<< nHits<<endl;
 
             Double_t tMAPMT = 0. / 0.;
             Double_t tSPMT1 = 0. / 0.;
@@ -1396,8 +1395,8 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 ypos = hit->GetY();
                 Double_t ttt = hit->GetTime();
 
-				//cout << "Hit: " << ihit << " Fib: " << iFib << " t: " << tMAPMT 
-				//	 << " ToT: " << tot << endl;
+                // cout << "Hit: " << ihit << " Fib: " << iFib << " t: " << tMAPMT
+                //	 << " ToT: " << tot << endl;
 
                 fh_fi1b_Tot->Fill(iFib, tot);
                 fh_fi1b_Time->Fill(iFib, tMAPMT);

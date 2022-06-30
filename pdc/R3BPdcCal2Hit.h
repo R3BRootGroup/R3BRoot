@@ -26,6 +26,7 @@
 #define N_WIRE_MAX 144
 #define N_PLANE_MAX_PDC 4
 #define wire_distance 6.92820323
+#define xtc_points 300
 
 class TClonesArray;
 class R3BPdcHitModulePar;
@@ -127,12 +128,12 @@ class R3BPdcCal2Hit : public FairTask
 	Bool_t fIsSync;
 	const Double_t * xtc_x;
 	const Double_t * xtc_t;
-	Double_t xt_xarray[200];
-    Double_t xt_tarray[200];
+	Double_t xt_xarray[xtc_points];
+    Double_t xt_tarray[xtc_points];
     Double_t t_ns[4000];
     Double_t x_mm[4000];
-    Double_t rebinned_x_mm[200];
-    Double_t rebinned_t_ns[200];
+    Double_t rebinned_x_mm[xtc_points];
+    Double_t rebinned_t_ns[xtc_points];
     Int_t ipar_channels = N_PLANE_MAX_PDC*N_WIRE_MAX ;
     Double_t tsync_mem[N_PLANE_MAX_PDC*N_WIRE_MAX];
     Bool_t method2 = false;

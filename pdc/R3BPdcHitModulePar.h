@@ -21,7 +21,7 @@
 using namespace std;
 
 #define NCHMAX 5000
-#define XTC_MAXPOINTS 200
+#define XTC_MAXPOINTS 300
 
 class FairParamList;
 

@@ -544,10 +544,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
         tl = cal->GetTime_ns();
         trig_time[j] = tl;
-        //cout << "mapmt trig time " << fName << " j: " << j << " time: " << tl << endl;
+        // cout << "mapmt trig time " << fName << " j: " << j << " time: " << tl << endl;
     }
 
-    //cout << "mapmt trig read " << fName << " " << mapmt_trig_num << endl;
+    // cout << "mapmt trig read " << fName << " " << mapmt_trig_num << endl;
 
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.
@@ -682,7 +682,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             // auto lead_ns = cur_cal->GetTime_ns();
             // auto tot_ns = lead->GetTime_ns();//cur_cal_ns;
             // if(tot_ns < 0.) tot_ns = 0./0.;
-            //cout << fName << " side: " << side_i << " trigger time " << cur_cal_trig_ns  << " trig time: "
+            // cout << fName << " side: " << side_i << " trigger time " << cur_cal_trig_ns  << " trig time: "
             //	 << lead_trig_ns << " time " << lead_ns << endl;
 
             if (side_i == 0)
@@ -1057,7 +1057,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     if (fName == "Fi0")
                     {
                         Float_t fiber_thickness = 0.2; // MH remove *2 when taking SPMT into analysis
-                        Int_t fiber_nbr = 128;          // MH remove /2 when taking SPMT into analysis
+                        Int_t fiber_nbr = 128;         // MH remove /2 when taking SPMT into analysis
                         Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01; // relative to fiber_thickness
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1. + air_layer);

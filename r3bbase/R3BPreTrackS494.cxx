@@ -1198,11 +1198,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
         debug_in = true;
     }
     Bool_t twice = false; // true: one part after another tracked; false: both part traacked simult.
-    Bool_t fibCuts = true;
+    Bool_t fibCuts = false;
     // only consider fiber with maximum energy deposit, only for sweep runs with beam
     Bool_t maxWerte = false;
     // if (!fPairs && fB != -1710 && !fSimu)
-    //   maxWerte = true;
+    maxWerte = true;
     // if fibCuts true, dx1 (Fib3xvs3x), dx2(Fib3xvs2x), dx3(Fib3xvsTofd) used for cuts in xfib correlations
 
     Double_t dx1 = 2;      // cm
@@ -1274,11 +1274,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
     {
         auto detHit23a = fHitItems.at(DET_FI23A);
         Int_t nHits23a = detHit23a->GetEntriesFast();
-        if (nHits23a > 0)
+        if (!(nHits23a > 0))
             return;
         auto detHit23b = fHitItems.at(DET_FI23B);
         Int_t nHits23b = detHit23b->GetEntriesFast();
-        if (nHits23b > 0)
+        if (!(nHits23b > 0))
             return;
     }
 
@@ -1445,13 +1445,27 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // tof rechts
             if (id2 == 1)
             {
-                det2 = tofd1r;
-                cTofd1r = false;
+                if (maxWerte)
+                {
+                    det2 = tofd1rc;
+                }
+                else
+                {
+                    det2 = tofd1r;
+                    cTofd1r = false;
+                }
             }
             else if (id2 == 2)
             {
-                det2 = tofd2r;
-                cTofd2r = false;
+                if (maxWerte)
+                {
+                    det2 = tofd2rc;
+                }
+                else
+                {
+                    det2 = tofd2r;
+                    cTofd2r = false;
+                }
             }
         }
         else
@@ -1459,13 +1473,27 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // tof links
             if (id2 == 1)
             {
-                det2 = tofd1l;
-                cTofd1l = false;
+                if (maxWerte)
+                {
+                    det2 = tofd1lc;
+                }
+                else
+                {
+                    det2 = tofd1l;
+                    cTofd1l = false;
+                }
             }
             else if (id2 == 2)
             {
-                det2 = tofd2l;
-                cTofd2l = false;
+                if (maxWerte)
+                {
+                    det2 = tofd2lc;
+                }
+                else
+                {
+                    det2 = tofd2l;
+                    cTofd2l = false;
+                }
             }
         }
 
@@ -1647,19 +1675,22 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // Cuts on Fi33
             if (fCuts && (t1[det] < -150 || t1[det] > 50) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //  if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //    continue;
+            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fB == -1710)
                 continue;
-            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
-                continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3))
+            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fB == -1710)
                 continue;
             if (fCuts && (tof < -300 || tof > 300) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
-                continue;
+            //     if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
+            //       continue;
             //            if (fGraphCuts && !cut_Fi33vsTofd->IsInside(x1[tofd1r] * 100., x1[det] * 100.))
             //                continue;
 
+            if (debug3)
+                cout << "Fi33 ac: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                     << " t1: " << t1[det] << endl;
             hits33++;
 
             if (fibCuts && !maxWerte)
@@ -1706,15 +1737,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
+
+                if (debug3)
+                    cout << "Fi33: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
+
                 countdet++;
             }
-
-            if (debug3)
-                cout << "Fi33: " << ihit33 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
         }
 
-        if (mult33 > 0 && maxWerte)
+        if (hits33 > 0 && maxWerte)
         {
             detector[countdet] = fi33;
             xdet[countdet] = xMax[fi33];
@@ -1731,6 +1763,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug3)
+                cout << "Fi33: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
         }
@@ -1780,11 +1816,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // continue;
             if (fCuts && (t1[det] < -150 || t1[det] > 50) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //    if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //      continue;
+            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fB == -1710)
                 continue;
-            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
-                continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3))
+            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fB == -1710)
                 continue;
             if (fCuts && (tof < -300 || tof > 300) && !fSimu && fB == -1710)
                 continue;
@@ -1792,6 +1828,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             //            if (fGraphCuts && !cut_Fi33vsTofd->IsInside(x1[tofd1r] * 100., x1[det] * 100.))
             //                continue;
+
+            if (debug3)
+                cout << "Fi31 ac: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
+                     << " t1: " << t1[det] << endl;
 
             hits31++;
 
@@ -1849,15 +1889,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
+
+                if (debug3)
+                    cout << "Fi33: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
+
                 countdet++;
             }
-
-            if (debug3)
-                cout << "Fi31: " << ihit31 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
-                     << " t1: " << t1[det] << endl;
         }
 
-        if (mult31 > 0 && maxWerte)
+        if (hits31 > 0 && maxWerte)
         {
             detector[countdet] = fi31;
             xdet[countdet] = xMax[fi31];
@@ -1874,6 +1915,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug3)
+                cout << "Fi33: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
         }
@@ -1917,14 +1962,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // Cuts on Fi32
             if (fCuts && (t1[det] < -150 || t1[det] > 50) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
-                continue;
-            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
+            //     if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //       continue;
+            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fB == -1710)
                 continue;
             if (fCuts && (tof < -300 || tof > 300) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
-                continue;
+            //       if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
+            //         continue;
 
             hits32++;
 
@@ -1978,7 +2023,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                      << " t1: " << t1[det] << endl;
         }
 
-        if (mult32 > 0 && maxWerte)
+        if (hits32 > 0 && maxWerte)
         {
             detector[countdet] = fi32;
             xdet[countdet] = xMax[fi32];
@@ -2038,14 +2083,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // Cuts on Fi30
             if (fCuts && (t1[det] < -150 || t1[det] > 50) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
-                continue;
-            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3))
+            //    if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB != -1710)
+            //      continue;
+            if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fB == -1710)
                 continue;
             if (fCuts && (tof < -300 || tof > 300) && !fSimu && fB == -1710)
                 continue;
-            if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
-                continue;
+            //     if (fCuts && (tof < 20 || tof > 90) && !fSimu && fB != -1710)
+            //       continue;
 
             hits30++;
 
@@ -2098,7 +2143,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                      << " t1: " << t1[det] << endl;
         }
 
-        if (mult30 > 0 && maxWerte)
+        if (hits30 > 0 && maxWerte)
         {
             detector[countdet] = fi30;
             xdet[countdet] = xMax[fi30];
@@ -2239,7 +2284,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
             xdet[countdet] = xMax[fi23a];
             ydet[countdet] = yMax[fi23a];
             zdet[countdet] = zMax[fi23a];
-            qdet[countdet] = 0;
+            qdet[countdet] = 8;
             tdet[countdet] = tMax[fi23a];
 
             fh_Fib_ToF_ac[det]->Fill(xdet[countdet] * 100., tStart - tdet[countdet]);
@@ -2367,7 +2412,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
             xdet[countdet] = xMax[fi23b];
             ydet[countdet] = yMax[fi23b];
             zdet[countdet] = zMax[fi23b];
-            qdet[countdet] = 0;
+            qdet[countdet] = 8;
             tdet[countdet] = tMax[fi23b];
 
             fh_Fib_ToF_ac[det]->Fill(xdet[countdet] * 100., tStart - tdet[countdet]);
@@ -2383,7 +2428,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         }
 
         // if we have magnetic field runs we do not have hits in Fib23
-        if (mult23a == 0 && mult23b == 0 && !fPairs && fB != -1710)
+        if (mult23a == 0 && mult23b == 0 && !fPairs && fB != -1710 && !maxWerte)
         {
             det = fi23a;
             detector[countdet] = det;
@@ -2909,8 +2954,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         // cout << "Test: " << multTofd << endl;
         Bool_t temp_cond = false;
-        if ((!fibCuts && ((mult30 > 0 && mult32 > 0 && mult23a > 0 && mult23b > 0) ||
-                          (mult31 > 0 && mult33 > 0 && mult23a > 0 && mult23b > 0))) ||
+        if ((!fibCuts && !maxWerte &&
+             ((mult30 > 0 && mult32 > 0 && mult23a > 0 && mult23b > 0) ||
+              (mult31 > 0 && mult33 > 0 && mult23a > 0 && mult23b > 0))) ||
             (fibCuts && ((cond1 && cond2 && cond3) || (cond4 && cond5 && cond6))))
             temp_cond = true;
 
@@ -2923,13 +2969,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
             {
                 ncount[detector[i]] += 1;
 
-                // cout<<"Count: "<< i<<", det: "<<detector[i]<<", qdet: "<<qdet[i]<<endl;
+                //  cout<<"Count: "<< i<<", det: "<<detector[i]<<", qdet: "<<qdet[i]<<endl;
             }
 
             countdet_s = 0;
 
             Double_t qdet_s7 = 0., qdet_s6 = 0., qdet_s8 = 0., qdet_s9 = 0.;
-            if ((ncount[9] > 0 && ncount[7] > 0 && ncount[2] > 1 && ncount[4] > 1 && ncount[0] > 0 && ncount[1] > 0) ||
+            if ((ncount[9] > 0 && ncount[7] > 0 && ncount[2] > 0 && ncount[4] > 0 && ncount[0] > 0 && ncount[1] > 0) ||
                 (ncount[6] > 0 && ncount[8] > 0 && ncount[3] > 0 && ncount[5] > 0 && ncount[0] > 0 && ncount[1] > 0))
             // if(1 == 1)
             {
@@ -2969,7 +3015,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         xdet_s[countdet_s] = xdet[i];
                         ydet_s[countdet_s] = ydet[i];
                         zdet_s[countdet_s] = zdet[i];
-                        qdet_s[countdet_s] = 0.; // qdet[i];
+                        qdet_s[countdet_s] = 8.; // qdet[i];
                         tdet_s[countdet_s] = tdet[i];
                         detector_s[countdet_s] = detector[i];
 
@@ -2977,7 +3023,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         xdet_sum[detector_s[countdet_s]] += xdet[i];
                         ydet_sum[detector_s[countdet_s]] += ydet[i];
                         zdet_sum[detector_s[countdet_s]] += zdet[i];
-                        qdet_sum[detector_s[countdet_s]] += 0.; // qdet[i];
+                        qdet_sum[detector_s[countdet_s]] += 8.; // qdet[i];
                         tdet_sum[detector_s[countdet_s]] += tdet[i];
 
                         if (debug)
@@ -3004,6 +3050,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         zdet_sum[detector_s[countdet_s]] += zdet[i];
                         qdet_sum[detector_s[countdet_s]] += qdet[i];
                         tdet_sum[detector_s[countdet_s]] += tdet[i];
+
+                        if (debug)
+                        {
+                            cout << "fib  det:   " << detector[i] << ", count " << i << ", x: " << xdet[i]
+                                 << ", q: " << qdet[i] << endl;
+                            cout << "fib  det_s: " << detector_s[countdet_s] << ", count " << countdet_s
+                                 << ", x: " << xdet_s[countdet_s] << ", q: " << qdet_s[countdet_s] << endl;
+                        }
 
                         countdet_s++;
                     }

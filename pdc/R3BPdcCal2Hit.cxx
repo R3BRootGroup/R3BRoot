@@ -520,7 +520,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 {
                     // continue;
                 }
-                if (tsync_pdc < -70. || tsync_pdc > 250.)
+                if (!fIsSync && (tsync_pdc < -70. || tsync_pdc > 250.))
                 {
                     continue;
                 }
@@ -599,8 +599,8 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 if (!fIsCalibrator && fHitPar)
                 {
                     Int_t xtc_npoints = 0;
-                    Double_t x_xtc[200] = { 0 };
-                    Double_t t_xtc[200] = { 0 };
+                    Double_t x_xtc[300] = { 0 };
+                    Double_t t_xtc[300] = { 0 };
                     Double_t apar, bpar;
 
                     if (!method2)
@@ -900,7 +900,6 @@ void R3BPdcCal2Hit::FinishTask()
 
         R3BPdcHitModulePar* mpar;
 
-
         for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
         {
             for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
@@ -1016,7 +1015,7 @@ void R3BPdcCal2Hit::FinishTask()
                         tmax = 0;
                         rebind_sum = 0;
                         index_start = 0;
-                        for (Int_t icount = 0; icount < 100; icount++)
+                        for (Int_t icount = 0; icount < xtc_points; icount++)
                         {
                             rebinned_x_mm[icount] = -1;
                             rebinned_t_ns[icount] = -10000;
@@ -1048,7 +1047,7 @@ void R3BPdcCal2Hit::FinishTask()
                             sum = 0.;
 
                             Double_t yloghigh, yloglow, xhigh, xlow, slope, curveStart_ns = -1000;
-                            Double_t tlow, thigh;
+                            Double_t tlow = 1000, thigh = -1000;
 
                             for (int j = 1; j < proj->GetNbinsX() - distance; j++)
                             {
@@ -1087,7 +1086,7 @@ void R3BPdcCal2Hit::FinishTask()
                                 }
                             }
 
-                            for (UInt_t j = index_start; j < proj->GetNbinsX(); j++)
+                            for (UInt_t j = index_start; j < index_high + 1; j++) // proj->GetNbinsX(); j++)
                             {
                                 total += proj->GetBinContent(j);
                             }
@@ -1095,7 +1094,8 @@ void R3BPdcCal2Hit::FinishTask()
                             Double_t float_index = 0;
                             Int_t npoints = 0;
                             Double_t time_ns = -1000;
-                            for (UInt_t j = 1; j < proj->GetNbinsX(); j++)
+                            // for (UInt_t j = 1; j < proj->GetNbinsX(); j++)
+                            for (UInt_t j = index_start; j < index_high + 1; j++)
                             {
                                 time_ns = proj->GetBinCenter(j);
                                 if (time_ns > curveStart_ns)
@@ -1131,10 +1131,28 @@ void R3BPdcCal2Hit::FinishTask()
 
                             Double_t max_abs_err;
                             rebinned_points = 0;
-                            rebinned_x_mm[rebinned_points] = x_mm[0];
-                            rebinned_t_ns[rebinned_points] = t_ns[0];
+                            // rebinned_x_mm[rebinned_points] = x_mm[0];
+                            // rebinned_t_ns[rebinned_points] = t_ns[0];
                             UInt_t rebinned_counter = 0;
 
+                            Double_t time_interval = thigh - tlow;
+                            Int_t idelta = int(time_interval / double(xtc_points) + 1.);
+
+                            cout << "*** " << plane << ", " << i << "; " << tlow << ", " << thigh << "; "
+                                 << time_interval << ", " << idelta << ", " << endl;
+
+                            for (Int_t index = index_start; index < index_high + 1; index++)
+                            {
+                                //	cout<<"Index: "<<index_start<<", "<<index_high<<"; "<<index<<"; "<<index %
+                                //idelta<<endl;
+                                if (0 == index % idelta)
+                                {
+                                    rebinned_x_mm[rebinned_points] = x_mm[index];
+                                    rebinned_t_ns[rebinned_points] = t_ns[index];
+                                    rebinned_points++;
+                                }
+                            }
+                            /*
                             for (Int_t index = 1; index < npoints; index++)
                             {
                                 if (rebinned_counter > npoints)
@@ -1183,6 +1201,7 @@ void R3BPdcCal2Hit::FinishTask()
                                 }
                             }
 
+
                             if (rebinned_t_ns[rebinned_points] < t_ns[npoints - 1])
                             {
                                 rebinned_points += 1;
@@ -1190,7 +1209,10 @@ void R3BPdcCal2Hit::FinishTask()
                                 rebinned_t_ns[rebinned_points] = t_ns[npoints - 1];
                             }
 
+
                             rebind_sum = rebinned_points + 1;
+                            */
+                            rebind_sum = rebinned_points;
                             for (Int_t irp = 0; irp < rebind_sum; irp++)
                             {
                                 //  cout<<"Rebined: "<<rebind_sum<<", "<<irp<<", t_ns: "<<rebinned_t_ns[irp]<<"; x_mm:
@@ -1198,13 +1220,14 @@ void R3BPdcCal2Hit::FinishTask()
                                 fh_xtc->Fill(rebinned_t_ns[irp], rebinned_x_mm[irp]);
                             }
                             tmin = rebinned_t_ns[0];
-                            tmax = rebinned_t_ns[rebind_sum - 1];
+                            //    tmax = rebinned_t_ns[rebind_sum - 1];
+                            tmax = thigh;
 
                             Double_t err = 0;
                             Double_t err_check = 0;
                             Int_t isum = 0;
 
-                            for (UInt_t j = 0; j < npoints; j++)
+                            for (UInt_t j = index_start; j < index_high + 1; j++)
                             {
                                 Double_t temp_x = x_mm[j];
                                 Double_t temp_t = t_ns[j];
@@ -1252,25 +1275,25 @@ void R3BPdcCal2Hit::FinishTask()
                         par3->SetSync(tsync_mem[plane * N_WIRE_MAX + iwire - 1]);
                         par3->SetNPoints(rebind_sum);
 
-                        for (Int_t icount = 0; icount < 100; icount++)
+                        for (Int_t icount = 0; icount < xtc_points; icount++)
                         {
                             xt_tarray[icount] = -10000;
                             xt_xarray[icount] = -1;
                         }
 
-                        for (Int_t icount = 0; icount < rebinned_points; icount++)
+                        for (Int_t icount = 0; icount < rebind_sum; icount++)
                         {
                             xt_tarray[icount] = rebinned_t_ns[icount];
                             xt_xarray[icount] = rebinned_x_mm[icount];
                         }
 
-                        par3->SetXT_xArray(xt_xarray, rebinned_points);
-                        par3->SetXT_tArray(xt_tarray, rebinned_points);
+                        par3->SetXT_xArray(xt_xarray, rebind_sum);
+                        par3->SetXT_tArray(xt_tarray, rebind_sum);
 
                         cout << "Plane: " << plane + 1 << ", wire: " << i << ", channel: " << plane * N_WIRE_MAX + iwire
                              << ", tmin: " << tmin << ", tmax: " << tmax
                              << ", tsync: " << tsync_mem[plane * N_WIRE_MAX + iwire - 1]
-                             << ", xtc points: " << rebinned_points << endl;
+                             << ", xtc points: " << rebind_sum << endl;
                     }
                     cfit->cd(plane + 1);
                     fh_error[plane]->SetMarkerStyle(22);
@@ -1309,7 +1332,7 @@ void R3BPdcCal2Hit::FinishTask()
                         rebinned_points = 0;
                         tmin = 0;
                         tmax = 0;
-                        for (Int_t icount = 0; icount < 100; icount++)
+                        for (Int_t icount = 0; icount < xtc_points; icount++)
                         {
                             rebinned_x_mm[icount] = -1;
                             rebinned_t_ns[icount] = -10000;
@@ -1534,7 +1557,7 @@ void R3BPdcCal2Hit::FinishTask()
                         par3->SetSync(tsync_mem[plane * N_WIRE_MAX + iwire - 1]);
                         par3->SetNPoints(rebinned_points);
 
-                        for (Int_t icount = 0; icount < 100; icount++)
+                        for (Int_t icount = 0; icount < xtc_points; icount++)
                         {
                             xt_tarray[icount] = -10000;
                             xt_xarray[icount] = -1;
