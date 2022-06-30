@@ -513,7 +513,10 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                     }
                 }
                 tsync_pdc = t_pdc - tsync;
-                // cout<<"Tsync: "<<ID<<", "<<wire<<", "<<tsync<<", "<<t_pdc<<", "<<tsync_pdc<<endl;
+                
+                //cout<<"Tsync: "<<ID<<", "<<wire<<", "<<tsync<<", "<<t_pdc<<", "<<tsync_pdc<<endl;
+
+                //cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc << endl;
 
                 // cuts
                 if (tot_pdc < 35.)
@@ -522,11 +525,9 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 }
                 if (!fIsSync && (tsync_pdc < -70. || tsync_pdc > 250.))
                 {
-                    continue;
+                    //continue;
                 }
 
-                // cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc <<
-                // endl;
 
                 // store first hit in wire
                 first = true;
@@ -575,7 +576,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
             if (ID_new == ID_old && wire_new - 1 == wire_old)
             {
-                // cout  << "found Pair: " << ID_new << "  " << wire_new << "  " << wire_old << endl;
+                //cout  << "found Pair: " << ID_new << "  " << wire_new << "  " << wire_old << endl;
                 Double_t pos = 0.;
                 Double_t x = 0.;
                 Double_t y = 0.;
@@ -842,15 +843,17 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
                 if (!fIsCalibrator)
                 {
-                    if (tsync_new > -100 && tsync_new < 300 && tsync_old > -100 && tsync_old < 300)
+                    //if (tsync_new > -100 && tsync_new < 300 && tsync_old > -100 && tsync_old < 300)
                     {
 
                         new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(
                             (tsync_new + tsync_old) / 2., x, y, sqrt(tot_new * tot_old), ID_new, wire_new);
+
+						//cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " <<
+						//	sqrt(tot_new * tot_old) << " t: " << (tsync_new + tsync_old) / 2. << " wire: " << wire_new << endl;
+
                     }
                 }
-                // cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " <<
-                // sqrt(tot_new * tot_old) << " t: " << (tsync_new + tsync_old) / 2. << " wire: " << wire_new << endl;
             }
             ID_old = ID_new;
             t_old = t_new;

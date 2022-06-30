@@ -127,6 +127,7 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_Pdc_ToT_vs_Time[144];
     TH2F* fh_Pdc_ToT_vs_Hit[144];
     TH2F* fh_Pdc_xvsx;
+    TH2F* fh_Pdc_wvsw;
     TH2F* fh_Pdc_yvsy;
     TH2F* fh_pdc_ebene4;
     TH2F* fh_Pdc_tvst[2];

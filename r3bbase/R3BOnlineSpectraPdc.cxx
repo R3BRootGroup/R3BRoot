@@ -648,7 +648,12 @@ InitStatus R3BOnlineSpectraPdc::Init()
 
         fh_Pdc_yvsy = new TH2F("PDC_y_vs_y", "PDC y vs y", 1000, 0, 1000, 1000, 0, 1000);
         fh_Pdc_yvsy->GetXaxis()->SetTitle("y2 in mm");
-        fh_Pdc_yvsy->GetYaxis()->SetTitle("y4 in mm");
+        fh_Pdc_yvsy->GetYaxis()->SetTitle("y4 in mm");        
+
+		fh_Pdc_wvsw = new TH2F("PDC_w_vs_w", "PDC w vs w", 130, 0, 130, 130, 0, 130);
+        fh_Pdc_wvsw->GetXaxis()->SetTitle("wire p2 ");
+        fh_Pdc_wvsw->GetYaxis()->SetTitle("wire p4");        
+        
 
         /*
                 for (Int_t j = 0; j < 144; j++)
@@ -806,10 +811,11 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     // PDC
     //----------------------------------------------------------------------
 
+	//cout << "new Event" << endl;
     if (fMappedItems)
     {
         Int_t mult[5][145] = { 0 };
-
+		
         auto det = fMappedItems;
         Int_t nMapped = det->GetEntriesFast();
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
@@ -821,26 +827,40 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             Int_t iPlane = mapped->GetPlaneId(); // 1..n
             Int_t iWire = mapped->GetWireId();   // 1..n
             Int_t iEdge = mapped->GetEdgeId();
-            // cout << "Plane: " << iPlane << " Wire: " << iWire << "Edge: " << iEdge << endl;
+            //cout << "Plane: " << iPlane << " Wire: " << iWire << " Edge: " << iEdge << endl;
             Int_t wire = iWire;
-            // cout << "Plane: " << iPlane-1 << " wire: " << iWire-1 << endl;
+            
+            //cout << "Plane: " << iPlane << " wire: " << iWire << endl;
             mult[iPlane - 1][iWire - 1]++;
-            /*
-                        if(wire%8 == 1) wire=wire;
-                        else if(wire%8 == 2) wire=wire+1;
-                        else if(wire%8 == 3) wire=wire+2;
-                        else if(wire%8 == 4) wire=wire+3;
-                        else if(wire%8 == 5) wire=wire-3;
-                        else if(wire%8 == 6) wire=wire-2;
-                        else if(wire%8 == 7) wire=wire-1;
-                        else if(wire%8 == 0) wire=wire;
-            */
             if (iPlane <= N_PLANE_MAX_PDC)
             {
                 fh_Pdc_Wire[iPlane - 1]->Fill(wire);
                 fh_Pdc_Wire_vs_Events[iPlane - 1]->Fill(fNEvents, wire);
             }
+
+
+			auto det1 = fMappedItems;
+			Int_t nMapped1 = det1->GetEntriesFast();
+			for (Int_t imapped1 = 0; imapped1 < nMapped1; imapped1++)
+			{
+				auto mapped1 = (R3BPdcMappedData const*)det1->At(imapped1);
+				if (!mapped1)
+					continue; // should not happen
+
+				Int_t iPlane1 = mapped1->GetPlaneId(); // 1..n
+				Int_t iWire1 = mapped1->GetWireId();   // 1..n
+				Int_t iEdge1 = mapped1->GetEdgeId();
+				//cout << "Plane1: " << iPlane1 << " Wire1: " << iWire1 << " Edge1: " << iEdge1 << endl;
+
+				if(iPlane == 2 && iPlane1 == 4)
+				{
+					fh_Pdc_wvsw->Fill(iWire, iWire1);
+				}
+
+			}
+
         }
+
 
         for (Int_t p = 0; p < N_PLANE_MAX_PDC; p++)
         {
@@ -880,6 +900,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
     Double_t yPdc2 = -1000;
     Double_t xPdc1 = -1000;
+    Double_t yPdc4test = -1000;
     Double_t yPdc4 = -1000;
     Double_t xPdc3 = -1000;
     Double_t t0 = -10000.;
@@ -955,15 +976,23 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                         }
             */
 
-            if (x[plane - 1] > 0 && eloss[plane - 1] > TotMax[plane - 1])
+            //if (x[plane - 1] > 0 && eloss[plane - 1] > TotMax[plane - 1])
+            if (x[plane - 1] > 0 )
             {
+
+				//cout << "Plane: " << plane << " wire: " << wire << " x: " << x[plane - 1] << endl;
+
                 fh_Pdc_x[plane - 1]->Fill(x[plane - 1]);
                 xPair[plane - 1] = x[plane - 1];
                 TotMax[plane - 1] = eloss[plane - 1];
             }
 
-            if (y[plane - 1] > 0 && eloss[plane - 1] > TotMax[plane - 1])
+            //if (y[plane - 1] > 0 && eloss[plane - 1] > TotMax[plane - 1])
+            if (y[plane - 1] > 0 )
             {
+
+				//cout << "Plane: " << plane << " wire: " << wire << " y: " << y[plane - 1] << endl;
+
                 fh_Pdc_y[plane - 1]->Fill(y[plane - 1]);
                 yPair[plane - 1] = y[plane - 1];
                 TotMax[plane - 1] = eloss[plane - 1];
@@ -972,6 +1001,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             if (plane == 4)
             {
                 fh_pdc_ebene4->Fill(wire, y[plane - 1]);
+                yPdc4test = y[plane - 1] ;
             }
         }
         Bool_t true1 = false, true2 = false, true3 = false;
@@ -1017,10 +1047,10 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
         if (true1 && true2)
         {
-            yPdc2 = ppl[1][ipl[1]];
-            yPdc4 = ppl[3][ipl[3]];
             xPdc1 = ppl[0][ipl[0]];
+            yPdc2 = ppl[1][ipl[1]];
             xPdc3 = ppl[2][ipl[2]];
+            yPdc4 = ppl[3][ipl[3]];
             for (Int_t ia = 0; ia < 4; ia++)
             {
                 tPair[ia] = tpl[ia][ipl[ia]];
@@ -1146,12 +1176,15 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 fh_fi0_0_Time_mc->Fill(iFib, tMAPMT);
                 fh_fi0_0_fiber_mc->Fill(iFib);
 
-                if (yPdc4 > 0. && eloss[3] > 35 && nHits == 1)
+                //if (yPdc4 > 0. && eloss[3] > 35 && nHits == 1)
+                if (yPdc4test > 0. && nHits == 1)
                 {
-                    fh_fi0_0_pdc->Fill(iFib, yPdc4);
+                    //fh_fi0_0_pdc->Fill(iFib, yPdc4);
+                    fh_fi0_0_pdc->Fill(iFib, yPdc4test);
                     fh_fi0_pdc_time->Fill(tMAPMT, tPair[3]);
                     fh_fi0_pdc_eloss->Fill(tot, eloss[3]);
                 }
+                
 
             } // end for(ihit)
             Int_t multi_fi0 = 0;
@@ -1551,6 +1584,7 @@ void R3BOnlineSpectraPdc::FinishTask()
     {
         fh_Pdc_xvsx->Write();
         fh_Pdc_yvsy->Write();
+        fh_Pdc_wvsw->Write();
         fh_pdc_ebene4->Write();
         fh_Pdc_tvst[0]->Write();
         fh_Pdc_tvst[1]->Write();
