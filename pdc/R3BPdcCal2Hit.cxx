@@ -1098,7 +1098,7 @@ void R3BPdcCal2Hit::FinishTask()
                             for (UInt_t j = index_start; j < index_high + 1; j++)
                             {
                                 time_ns = proj->GetBinCenter(j);
-                                if (time_ns > curveStart_ns)
+                                if (time_ns >= curveStart_ns)
                                 {
                                     if (npoints == 0)
                                     {
@@ -1135,16 +1135,16 @@ void R3BPdcCal2Hit::FinishTask()
                             // rebinned_t_ns[rebinned_points] = t_ns[0];
                             UInt_t rebinned_counter = 0;
 
-                            Double_t time_interval = thigh - tlow;
+                            Double_t time_interval = thigh - tlow + 1.;
                             Int_t idelta = int(time_interval / double(xtc_points) + 1.);
 
                             cout << "*** " << plane << ", " << i << "; " << tlow << ", " << thigh << "; "
                                  << time_interval << ", " << idelta << ", " << endl;
 
-                            for (Int_t index = index_start; index < index_high + 1; index++)
+                            for (Int_t index = 1; index < npoints; index++)
                             {
                                 //	cout<<"Index: "<<index_start<<", "<<index_high<<"; "<<index<<"; "<<index %
-                                //idelta<<endl;
+                                // idelta<<endl;
                                 if (0 == index % idelta)
                                 {
                                     rebinned_x_mm[rebinned_points] = x_mm[index];
@@ -1227,7 +1227,7 @@ void R3BPdcCal2Hit::FinishTask()
                             Double_t err_check = 0;
                             Int_t isum = 0;
 
-                            for (UInt_t j = index_start; j < index_high + 1; j++)
+                            for (Int_t j = 1; j < npoints; j++)
                             {
                                 Double_t temp_x = x_mm[j];
                                 Double_t temp_t = t_ns[j];
