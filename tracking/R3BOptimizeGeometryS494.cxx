@@ -176,7 +176,7 @@ InitStatus R3BOptimizeGeometryS494::Init()
     fDetectors->Init();
 
     // For the moment we have to change manually between the setup
-    // gSetup = fDetectorsLeft;
+    //gSetup = fDetectorsLeft;
     gSetup = fDetectorsRight;
 
     gThisTask = this;
@@ -317,14 +317,15 @@ void R3BOptimizeGeometryS494::Exec(const Option_t*)
 
         fNEvents += 1;
     }
+
 }
 
 double Chi2AllEvents(const double* xx)
 {
 
     // For the moment ...
-    // Bool_t fLeft = kFALSE;
-    Bool_t fLeft = kTRUE;
+    Bool_t fLeft = kFALSE;
+    //Bool_t fLeft = kTRUE;
     Double_t chi2_all = 0;
     Int_t nof = 0;
     cout.precision(7);
@@ -332,18 +333,20 @@ double Chi2AllEvents(const double* xx)
          << xx[5] << "  " << xx[6] << "  " << xx[7] << "  " << xx[8] << "  " << xx[9] << "  " << xx[10] << "  "
          << xx[11] << endl;
 
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(xx[6]);
     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(xx[7]);
     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(xx[8]);
-    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(xx[6]);
-    //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionX(xx[10]);
-    //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(xx[10]);
-    //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(xx[11]);
+    ((R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionX(xx[9]);
+    ((R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(xx[10]);
+    ((R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(xx[11]);
 
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.02);
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.01);
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.03);
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
 
+
+/*
     R3BTrackingDetector* fi23a = gSetup->GetByName("fi23a");
 
     fi23a->pos0 = TVector3(0., 0., 0.);
@@ -360,6 +363,7 @@ double Chi2AllEvents(const double* xx)
     fi23a->pos1 += trans3b;
     fi23a->pos2 += trans3b;
     fi23a->norm = ((fi23a->pos1 - fi23a->pos0).Cross(fi23a->pos2 - fi23a->pos0)).Unit();
+*/
 
     if (fLeft)
     {
@@ -458,9 +462,13 @@ double Chi2AllEvents(const double* xx)
         gSetup->TakeHitsFromBuffer(iev);
         Double_t fieldScale;
 
-        ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(xx[9]);
+// für break-up events wieder rein
+        //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(xx[9]);
 
-        /*
+
+
+// Braucht man nur für Magnetfeld runs
+        
                 if(fLeft)
                 {
                     if(iev == 0)
@@ -469,44 +477,44 @@ double Chi2AllEvents(const double* xx)
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -1560.0 / 3583.81 / scale * xx[9];	//run395
+                        fieldScale	= -1560.0 / 3583.81 / scale ;//* xx[9];	//run395
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
 
                     }
-                    if(iev == 1000)
+                    if(iev == 100)
                     //if(iev == -1)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale<< endl;
-                        fieldScale	= -1410.0 / 3583.81 / scale * xx[9];	//run391
+                        fieldScale	= -1410.0 / 3583.81 / scale ;//* xx[9];	//run391
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
                     }
-                    if(iev == 2000)
+                    if(iev == 223)
                     //if(iev == -1)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -1260.0 / 3583.81 / scale * xx[9];	//run389
+                        fieldScale	= -1260.0 / 3583.81 / scale ;//* xx[9];	//run389
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
                     }
-                    if(iev == 3000)
+                    if(iev == 412)
                     //if(iev == 0)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -1110.0 / 3583.81 / scale * xx[9];	//run389
+                        fieldScale	= -1110.0 / 3583.81 / scale ;//* xx[9];	//run389
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
@@ -521,51 +529,51 @@ double Chi2AllEvents(const double* xx)
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -2310.0/ 3583.81 / scale * xx[9]; 	//run399
+                        fieldScale	= -2310.0/ 3583.81 / scale ;//* xx[9]; 	//run399
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
 
                     }
-                    if(iev == 1000)
+                    if(iev == 113)
                     //if(iev == -1)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale<< endl;
-                        fieldScale	= -2160.0/ 3583.81 / scale * xx[9];//run401
+                        fieldScale	= -2160.0/ 3583.81 / scale ;//* xx[9];//run401
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
                     }
-                    if(iev == 2000)
+                    if(iev == 302)
                     //if(iev == -1)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -2010.0/ 3583.81 / scale * xx[9];//run405
+                        fieldScale	= -2010.0/ 3583.81 / scale ;//* xx[9];//run405
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
                     }
-                    if(iev == 3000)
+                    if(iev == 545)
                     //if(iev == -1)
                     {
                         Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
                         Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
                         cout << "Field:" << field << " scale: " << scale << endl;
-                        fieldScale	= -1860.0/ 3583.81 / scale * xx[9];//run405
+                        fieldScale	= -1860.0/ 3583.81 / scale ;//* xx[9];//run405
                         cout << "Setting field to " << 	fieldScale << endl;
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
            )->SetTrackerCorrectionScale(fieldScale); field = ((R3BGladFieldMap *)
            FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.); cout << "Field after:" << 	field << endl;
                     }
                 }
-        */
+// Braucht man nur für Magnetfeld runs - Ende        
 
         // cout << "Test: " << gSetup->GetArray().size() << endl;
 
@@ -611,18 +619,19 @@ double R3BOptimizeGeometryS494::Chi2()
     R3BTrackingDetector* tof = gSetup->GetByName("tofd");
 
     // For the moment we have to change manually between the setup
-    R3BTrackingDetector* fi32 = gSetup->GetByName("fi32");
-    R3BTrackingDetector* fi30 = gSetup->GetByName("fi30");
-    R3BTrackingDetector* fi31 = fDetectorsRight->GetByName("fi31");
-    R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
-
-    /*
-        R3BTrackingDetector* fi32 = fDetectorsLeft->GetByName("fi32");
-        R3BTrackingDetector* fi30 = fDetectorsLeft->GetByName("fi30");
-        R3BTrackingDetector* fi31 = gSetup->GetByName("fi31");
-        R3BTrackingDetector* fi33 = gSetup->GetByName("fi33");
-    */
-
+	/*
+	R3BTrackingDetector* fi32 = gSetup->GetByName("fi32");
+	R3BTrackingDetector* fi30 = gSetup->GetByName("fi30");
+	R3BTrackingDetector* fi31 = fDetectorsRight->GetByName("fi31");
+	R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
+	*/
+	
+	R3BTrackingDetector* fi32 = fDetectorsLeft->GetByName("fi32");
+	R3BTrackingDetector* fi30 = fDetectorsLeft->GetByName("fi30");
+	R3BTrackingDetector* fi31 = gSetup->GetByName("fi31");
+	R3BTrackingDetector* fi33 = gSetup->GetByName("fi33");
+	
+	
     if (target->hits.size() < 1)
         target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
@@ -675,8 +684,8 @@ double R3BOptimizeGeometryS494::Chi2()
 
     Int_t charge = 0;
     Double_t Charge = 0;
-    // Int_t charge_requested = 8;
-    Int_t charge_requested = 6;
+    Int_t charge_requested = 8;
+    //Int_t charge_requested = 6;
     // Int_t charge_requested = 2;
     Double_t m0 = 0.;
     Double_t p0 = 0.;
@@ -701,9 +710,9 @@ double R3BOptimizeGeometryS494::Chi2()
             Charge = tof->hits.at(i)->GetEloss();
         }
 
-        // if (charge != charge_requested)
+        if (charge != charge_requested)
         // if (charge != 2 && charge != 6)
-        if (charge != 6)
+        //if (charge != 6)
             continue;
 
         // cout << "Charge: " << charge << " requested charge: " << charge_requested << endl;
@@ -994,7 +1003,7 @@ double R3BOptimizeGeometryS494::Chi2()
 
         // if(minChi2 > 1.e5) continue;
         pChi2 = 1. * (candidate->GetStartMomentum().Mag() - p0) * (candidate->GetStartMomentum().Mag() - p0) /
-                (p0 * p0 * 0.0001 * 0.0001);
+                (p0 * p0 * 0.001 * 0.001);
         mChi2 = candidate->GetChi2();
         zChi2 = (candidate->GetStartMomentum().Z() - p0) * (candidate->GetStartMomentum().Z() - p0) /
                 (p0 * p0 * 0.001 * 0.001);
@@ -1052,9 +1061,9 @@ void R3BOptimizeGeometryS494::Finish()
     // Place here Minuit part for
     // minimization of Chi2AllEvents()
 
-    ROOT::Math::Minimizer* mini = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    //ROOT::Math::Minimizer* mini = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     // ROOT::Math::Minimizer* mini = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Scan");
-    // ROOT::Math::Minimizer* mini = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
+    ROOT::Math::Minimizer* mini = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
     // Minimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     // Migrad, Simplex, Scan,
     // set tolerance , etc...
@@ -1069,106 +1078,11 @@ void R3BOptimizeGeometryS494::Finish()
 
     if (fLeft)
     {
-        // 12C und 4He from simulation
-        // Double_t variable[9] = {-62.8664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.0,  -14. , 177.6};
-        // //chi=329.8 Double_t variable[9] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.4,  -13.6 ,
-        // 173.6025}; //chi=329.8 Double_t variable[10] = {-62.6664, 570.9671, -82.8087,  632.4669,  -14., -14.,  1.5,
-        // -13.6 , 173.6025, 1.}; //chi=329.8 Double_t variable[11] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14.,
-        // -14.,  1.5,  -14. , 172.5, 1., 0.}; //chi=329.8 Double_t variable[11] = {-62.6664, 570.7671, -82.8087,
-        // 632.4669,  -14., -14.,  1.625196,  -13.9750 , 172.8753, 0.997496, 0.025}; //chi=329.8 *Double_t variable[11]
-        // =
-        //{-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.625196,  -13.9750 , 172.8753, 0.997496, 0.025};
-        ////chi=329.8 Double_t variable[11] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.630196, -13.8750
-        // , 172.8753, 0.997496, 0.025}; //chi=3.0188
 
-        // Ohne Rotation des Magnetfeldes, fixed variable 10
-        // Double_t variable[12] = {-62.6664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.630196,  -13.8750 ,
-        // 172.8753, 0.997496, 0., 91.2}; //chi=3.0188
+        Double_t variable[12] = {-62.58520, 570.8430,  -82.70848, 632.5428, -14.000,   -14.000,
+            1.690075,  -13.94990, 175.9708,  0.0000, 0.0000, 0.0000 }; // chi=73.0314937255
 
-        // mit breakup data
-        // Double_t variable[12] = {-62.6664, 570.7671, -82.7987,  632.4669,  -13.9900, -13.9500,  1.630196,  -13.8750 ,
-        // 172.8753, 0.997496, 0.0, 0.}; //chi=3.0188
-
-        // Mit x, y, z Drehung von Glad
-        // Double_t variable[12] = {-62.82355, 570.8905, -82.87761,  632.5903,  -13.87659, -13.87659,  1.159864,
-        // -13.8398 , 175.1890, 1.002706, 0.0201793, 0.027073}; // Double_t variable[12] = {-62.80855, 571.3955,
-        // -82.86261,  632.5953,  -13.87159, -13.87159,  1.160364,  -13.83930 , 173.0050, 0.9987061, 0.02067930,
-        // 0.027573}; // mit echten Daten Double_t variable[12] = {-62.82293, 571.4378, -82.78851,  632.6376, -13.82937,
-        // -13.84923,  1.200,  -13.79943 , 173.1065, 0.9966701, 0.024889, 0.03178}; // Double_t variable[12] =
-        // {-62.81546, 571.4552, -82.78104,  632.6950,  -13.82190, -13.84176,  1.200747,  -13.79196 , 173.1072,
-        // 0.9981290, 0.0053298, 91.05174}; //chi=2.80829
-        // jetzt gleiche Paramter fÃ¼r Magnetfeld links und rechts
-        // Double_t variable[12] = {-62.72401, 571.4876, -82.64887,  633.0008,  -13.63535, -13.61740,  1.223193,
-        // -13.40954 , 171.0334, 0.99, 0.0054, 91.052}; //chi=2.520121 Double_t variable[12] = {-62.72401, 571.4876,
-        // -82.64887,  633.0008,  -13.63535, -13.61740,  1.223193,  -13.40954 , 171.0334, 0.99, 0.0054, 91.052};
-        // //chi=2.520121 Double_t variable[12] = {-62.15724, 572.2269, -82.12618,  633.9725,  -13.00364,
-        // -11.43203,  1.5,  -13.5 , 173.5, 0.99, 0.0054, 91.052}; //chi=2.277084679
-        //**Double_t variable[12] = {-62.15502, 572.2391, -82.12785,  633.9731,  -13.00142, -11.42981,  1.3,  -13.5 ,
-        // 173.7, 0.991, 0.0054, 91.052}; //chi=2.277084679 Double_t variable[12] = {-62.15502, 572.2391, -82.12785,
-        // 633.9731,  -13.00142, -11.42981,  1.3,  -13.5 , 173.7, 0.991, 0.0054, 91.052}; //chi=2.277084679
-
-        // Double_t variable[12] = {-62.8664, 570.7671, -82.8087,  632.4669,  -14., -14., 1.87, -13.46 , 177.36, 1.013,
-        // 0.0052, 91.06}; //chi=329.8
-
-        // Double_t variable[12] = {-62.8664, 570.7671, -82.8087,  632.4669,  -14., -14., 1.5,   -14. , 175.2631, 1.0,
-        // 0, 91.06}; //chi=195.72315 Double_t variable[12] = {-62.68456, 571.0268, -82.78089,  632.6474,  -14.20422,
-        // -14.02416, 1.9,   -14.02416 , 175.2631, 1.0, 0, 91.06}; //chi=
-
-        // Double_t variable[12] = {-62.61640, 570.7671, -82.6087,  632.4669,  -14.0000, -14.0000, 1.6252,   -13.975 ,
-        // 172.87530, 0.9975, 0, 91.06}; //chi=5.78805 Double_t variable[12] = {-62.6039, 570.7796, -82.70868, 632.4794,
-        // -13.98750, -13.9875, 1.62645,   -13.96250 , 174.8766, 1.0012, 0.00125, 91.06125}; //chi=4.691445300 Double_t
-        // variable[12] = {-62.58520, 570.8430, -82.70848,  632.5428,  -13.92333, -13.92333, 1.690075,   -13.94990 ,
-        // 173.9708, 1.001513, 0.000037787, 91.19050}; //chi=76.58731558 Double_t variable[12] = {-62.58520, 570.8430,
-        // -82.70848,  632.5428,  -13.92333, -13.92333, 1.690075,   -13.94990 , 173.9708, 1.001513,
-        // 0.000037787, 91.29050}; //chi=73.0314937255
-        Double_t variable[12] = {
-            -62.58520, 570.8430,  -82.70848, 632.5428, -13.92333,   -13.92333,
-            1.690075,  -13.94990, 175.9708,  1.001513, 0.000037787, 91.29050
-        }; // chi=73.0314937255
-
-        // richtiger Abstand von Magnet
-        // Double_t variable[11] = {-62.64088, 570.9361, -82.77324,  632.6359,  -13.83102, -13.83102,  1.05,  -14.0 ,
-        // 174.950, 1.0, 0.}; //chi=5.55378 Double_t variable[11] = {-62.15025, 571.2975, -82.28261,  632.7194,
-        // -13.62326, -13.43957,  1.05,  -14.0 , 174.950, 1.0, 0.}; //chi=5.55378 Double_t variable[11] = {-62.16052,
-        // 571.3229, -82.26855,  632.7448,  -13.59789, -13.41420,  1.074675,  -13.98766 , 175.0117, 0.999948, 0.};
-        // //chi=5.55378
-
-        // einzelne runs fitten:
-        // Double_t variable[11] = {-62.8664, 570.7671, -82.8087,  632.4669,  -14., -14.,  1.07,  -14. , 174.950, 1.0,
-        // 0.}; //chi= Double_t variable[11] = {-62.7, 570.7671, -83.0,  632.4669,  -14., -14.,  1.07,  -14. ,
-        // 174.950, 1.0, 0.}; //chi= Double_t variable[11] = {-62.7, 570.7671, -83.0,  632.4669,  -14., -14.,  1.07,
-        // -14. , 174.950, 1.01, 0.}; //chi=
-
-        // both sides individually
-        // Double_t variable[11] = {-62.69650, 570.7806, -83.00851,  632.4804,  -13.98649, -13.98649,  1.083501,
-        // -13.98650 , 174.9635, 1.009699, 0.}; //chi= Double_t variable[11] = {-62.69650, 570.7806, -83.00851,
-        // 632.4804, -13.98649, -13.98649,  1.083501,  -13.98650 , 174.9635, 1.009699, 0.}; //chi= Double_t variable[11]
-        // =
-        // {-62.69650, 570.7806, -83.00851,  632.4804,  -13.98649, -13.93649,  1.083501,  -13.98650 ,
-        // 174.9635, 1.009699, 0.}; //chi=16.387 Double_t variable[11] = {-62.69650, 570.7806, -83.00851,  632.4804,
-        // -13.98649, -13.93649,  1.083501,  -13.98650 , 174.9635, 1.009699, 0.}; //chi= anschliesend linke und rechte
-        // Seite zusammen Double_t variable[11] = {-62.70, 570.80, -83.00,  632.50,  -13.95, -13.90,  1.1,  -13.90 ,
-        // 174.9635, 1.009, 0.}; //chi= Double_t variable[11] = {-62.70, 570.80, -83.00,  632.50,  -13.95, -13.90,  1.1,
-        // -13.80 , 174.9635, 1.009, 0.}; //chi=5.477 Double_t variable[11] = {-62.70, 570.80, -83.00,  632.50,  -13.94,
-        // -13.90,  1.205,  -13.80 , 174.9635, 1.009, 0.}; //chi=5.395
-
-        // together with oter side
-        // Double_t variable[11] = {-62.70, 570.80, -83.00,  632.50,  -13.94, -13.90,  1.205,  -13.80 , 174.9635, 1.009,
-        // 0.}; //chi=5.395
-
-        // chi2 nur auf den Gesamtimpuls p0 = 17.3915*1.01
-        // Double_t variable[11] = {-62.6910, 570.8190, -82.97099,  632.5190,  -13.92099, -13.88099,  1.217251,
-        // -13.78100 , 174.9758, 1.016998, 0.}; //chi=2.9125524
-
-        // chi2 nur auf den Gesamtimpuls p0 = 17.3915*1.0
-        // Double_t variable[11] = {-62.64873, 570.8673, -82.93272,  632.5673, -13.82272, -13.63265,  1.249078,
-        // -13.73465, 175.0103, 1.005960, 0.}; //chi=2.76379
-
-        // chi2 nur auf den Gesamtimpuls p0 = 17.3915*0.99
-        // Double_t variable[11] = {-62.60059, 570.9154, -82.97283,  632.8154, -13.82458, -13.58451,  1.297090,
-        // -13.71065, 175.1315, 0.9963587, 0.}; //chi=3.51779127
-
-        Double_t step[12] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.5, 0.01, 0.1, 0.1 };
+        Double_t step[12] = { 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.5, 0.1, 0.1, 0.1 };
         // Double_t step[12] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.1, 0.5, 0.01, 0.1, 0.1};
         // Double_t step[12] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01};
         // Double_t step[12] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.005, 0.05, 0.005, 0.005, 0.005, 0.005};
@@ -1191,12 +1105,12 @@ void R3BOptimizeGeometryS494::Finish()
         mini->SetLimitedVariable(9, "field", variable[9], step[9], variable[9] - 0.1, variable[9] + 0.1);
         mini->SetLimitedVariable(10, "angleX", variable[10], step[10], variable[10] - 0.5, variable[10] + 0.5);
         mini->SetLimitedVariable(11, "angleZ", variable[11], step[11], variable[11] - 0.5, variable[11] + 0.5);
-        // mini->FixVariable(0);
-        // mini->FixVariable(1);
-        // mini->FixVariable(2);
-        // mini->FixVariable(3);
-        // mini->FixVariable(4);
-        // mini->FixVariable(5);
+        mini->FixVariable(0);
+        mini->FixVariable(1);
+        mini->FixVariable(2);
+        mini->FixVariable(3);
+        mini->FixVariable(4);
+        mini->FixVariable(5);
         // mini->FixVariable(6);
         // mini->FixVariable(7);
         // mini->FixVariable(8);
@@ -1206,103 +1120,8 @@ void R3BOptimizeGeometryS494::Finish()
     }
     else
     {
-        // Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.994056,   -13.62947
-        // , 175.2631}; // chi=7.534 Double_t variable[9] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,
-        // -194., 1.994056,   -13.62947 , 176.7631}; // chi=7.534 Double_t variable[9] = { -111.1057,  537.8183,
-        // -131.0650, 599.5703,  -194.,  -194., 1.927387, -13.56280, 177.8298}; // chi=7.534 Double_t variable[9] = {
-        // -111.1057, 537.8183,  -131.0650,  599.5703,  -194.,  -194., 1.4,  -13.6 , 173.6025}; // chi=7.534 Double_t
-        // variable[10] = { -111.2816,  537.8088,  -130.9717,  599.6506,  -193.9370,  -193.9600, 0.8032,  -14.19709 ,
-        // 176.9028, 1.}; // chi=7.534 Double_t variable[10] = { -111.2476,  537.8921,  -131.0065,  599.5336, -193.8243,
-        // -193.8473, 0.9147, -14.13736, 177.1437, 0.9962}; // chi=7.534 Double_t variable[11] = { -111.1057,  537.8183,
-        // -131.0650, 599.5703,  -194.,  -194., 1.000, -14., 172.5, 1.0, 0.}; // chi=7.534 Double_t variable[11] = {
-        // -111.1057, 537.8183,  -131.0650,  599.5703,  -194.,  -194., 2.041127, -13.88482, 178.7732, 1.002188,
-        // -0.3535}; // chi=7.534 *Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,
-        // -194., 2.041127,
-        //-13.88482, 178.7732, 1.002188, -0.3535}; // chi=7.534 Double_t variable[11] = { -111.1257,  537.8731,
-        // -131.0910,  599.6022,  -193.8672,  -193.9172, 2.122505, -13.86857, 179.0529, 1.001629, -0.3535}; //
-        // chi=2.547957
-
-        // Ohne Rotation des Magnetfeldes, fixed variable 10
-        // Double_t variable[11] = { -111.1257,  537.8731,  -131.0910,  599.6022,  -193.8672,  -193.9172, 2.122505,
-        // -13.86857, 179.0529, 1.001629, 0.}; // chi=2.547957
-
-        // Jetzt mit breakup Daten und Fokus auf 4He
-        // Double_t variable[12] = { -111.2143,  537.8894,  -131.0247,  599.6185,  -193.8517,  -193.9009, 2.124099,
-        // -13.85344, 179.0557, 1.003588, 0.00009375, 91.18513}; // chi=5.77
-
-        // Mit x, y, z Drehung von Glad
-        // Double_t variable[12] = { -111.0853,  537.8589,  -130.9761,  599.7052,  -193.8651,  -193.8651,  0.9016831,
-        // -13.77554 , 177.2066, 0.9955284, 0.00538, 0.01569}; // chi=7.534 Double_t variable[12] = { -111.2014,
-        // 537.8158,  -130.7929,  599.9453,  -193.7693,  -194.3303,  0.8279273,  -13.38015 , 173.6426, 0.9821933,
-        // 0.01777889, 0.03423889}; // chi=2.16326
-        // Jetzt mit echten Daten
-        // Double_t variable[12] = { -111.1967,  537.8205,  -130.7382,  599.9500,  -193.7546,  -194.3256,  0.8284064,
-        // -13.27686 , 173.6445, 0.9844438, 0.005479167, 91.05247}; // chi=2.4988
-        // Jetzt gleiche Parameter fÃ¼r Magnetfeld fÃ¼r links und rechts
-        // Double_t variable[12] = { -111.3371,  537.7993,  -130.9237,  599.8100,  -193.9877,  -193.9409,  0.8808368,
-        // -12.89503 , 174.7896, 0.99, 0.0054, 91.052}; // chi=2.43289 Double_t variable[12] = { -111.3371,  537.7993,
-        // -130.9237,  599.8100,  -193.9877,  -193.9409,  0.8808368,  -12.89503 , 174.7896, 0.994, 0.0054, 91.052}; //
-        // chi=2.43289 Double_t variable[12] = { -111.5882,  537.3350,  -131.3205,  599.7711,  -193.7239,
-        // -192.6849,  1.5,  -13.50 , 173.5, 0.99, 0.0054, 91.052}; // chi=2.23704168
-        //**Double_t variable[12] = { -111.5849,  537.3483,  -131.3305,  599.7744,  -193.7206,  -192.6716,  1.3,  -13.50
-        //, 173.7, 0.991, 0.0054, 91.052}; // chi=2.23704168 Double_t variable[12] = { -111.5849,  537.3483,  -131.3305,
-        // 599.7744,  -193.2206,  -192.6716,  1.3,  -13.50 , 173.7, 0.991, 0.0054, 91.052}; // chi=2.23704168
-
-        // Double_t variable[12] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.87, -13.46 ,
-        // 177.36, 1.013, 0.0052, 91.06}; // chi=7.534
-
-        // Double_t variable[12] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.5,   -14. ,
-        // 175.2631, 1.0, 0, 91.06}; // chi=123.16 Double_t variable[12] = { -110.2538,  537.4911,  -130.2718, 599.9729,
-        // -194.3020,  -193.6182,  1.5,   -14. , 175.2631, 1.0, 0, 91.06}; // chi=121.0383 Double_t variable[12] = {
-        // -110.2538,  537.4911,  -130.2318,  599.9729,  -194.2820,  -193.5782,  1.975152,   -14.35 , 175.2631, 1.0,
-        // 0, 91.11}; // chi=121.0383
-        Double_t variable[12] = { -111.1056, 537.81830, -131.065, 599.57030, -194.0000,  -194.000,
-                                  2.04113,   -13.88482, 178.7732, 1.00219,   0.01460567, 91.12461 }; // chi=
-
-        // Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194., 1.0, -14., 172.5, 1.,
-        // 0.}; // chi=7.534 Double_t variable[11] = { -111.4118,  537.9929,  -130.8408,  599.8507,  -193.4780,
-        // -193.8677, 1.0, -14., 172.5, 0.9797757, 0.}; // chi=7.534 Double_t variable[11] = { -111.4118,  537.9929,
-        // -130.8408,  599.8507,  -193.4780,  -193.8677, 1.0, -14., 172.5, 0.9797757, 0.}; // chi=7.534 Double_t
-        // variable[11] = { -111.4118,  537.9929,  -130.8408,  599.8507,  -193.4780,  -193.8677, 1.05, -14., 172.5,
-        // 0.9797757, 0.}; // chi=7.534 Double_t variable[11] = { -111.4118,  537.9929,  -130.8408,  599.8507,
-        // -193.4280, -193.8677, 1.05, -14., 172.5, 0.9797757, 0.}; // chi=7.534
-
-        // richtiger Abstand Magnet
-        // Double_t variable[11] = { -111.4118,  537.9929,  -130.8408,  599.8507,  -194.,  -194., 1.0, -14., 174.95, 1.,
-        // 0.}; // chi=5.1532138 Double_t variable[11] = { -112.1990,  538.2636,  -132.3246,  600.9256,  -193.9895,
-        // -193.4368, 1.0, -14., 174.95, 1., 0.}; // chi=5.1532138 Double_t variable[11] = { -112.2356,  538.2684,
-        // -132.3929,  600.9053,  -194.0040,  -193.3735, 1.074349, -13.95020, 175.2253, 0.9971670, 0.}; // chi=5.1532138
-
-        // einzelne runs fitten
-        // Double_t variable[11] = { -111.1057,  537.8183,  -131.0650,  599.5703,  -194.,  -194.,  1.07,   -14. ,
-        // 174.95, 1., 0.}; // chi=7.534 Double_t variable[11] = { -111.2,  537.8183,  -130.85,  599.5703,  -194.,
-        // -194., 1.07,   -14. , 174.95, 1., 0.}; // chi=7.534 Double_t variable[11] = { -111.2133,  537.8370,
-        // -130.8812, 599.5432,  -193.9240,  -193.9240,  1.079929,   -14.04407 , 175.0259, 0.9883258, 0.}; // chi=7.534
-        // Double_t variable[11] = { -111.2133,  537.8370,  -130.7812,  599.5432,  -193.9240,  -193.9240,  1.079929,
-        // -14.04407 , 175.0259, 0.9883258, 0.}; // chi=7.534 anschliesend linke und rechte Seite zusammen Double_t
-        // variable[11] = { -111.2133,  537.8370,  -130.7812,  599.5432,  -193.9240,  -193.9240,  1.579929, -14.04407 ,
-        // 175.0259, 0.9883258, 0.}; // chi=12.4501 Double_t variable[11] = { -111.1806,  537.8837, -130.7788, 599.5708,
-        // -193.7783,  -193.7783,  1.72047,   -14.00583 , 175.4381, 0.9894962, 0.}; // chi=5.100 Double_t variable[11] =
-        // { -111.1806,  537.8837,  -130.7788,  599.5708,  -193.6783,  -193.7783,  1.72047, -14.00583 , 175.4381,
-        // 0.9894962, 0.}; // chi=4,902 Double_t variable[11] = { -111.1806,  537.8837,  -130.7788, 599.5708, -193.6783,
-        // -193.7783,  1.72047,   -14.00583 , 175.4381, 0.9894962, 0.}; // chi=4,902
-
-        // chi2 nur auf den Gesamtimpuls p0 = 17.3915*1.01
-        // Double_t variable[11] = { -111.1728,  537.8965,  -130.7660,  599.6336,  -193.5655,  -193.7655,  1.721745,
-        // -13.99308 , 175.4394, 0.9972455, 0.}; // chi=2.238658
-
-        // chi2 nur auf den Gesamtimpuls p0 = 17.3915*1.0
-        // Double_t variable[11] = { -111.1519,  537.9124,  -130.7511,  599.6495,  -193.4496,  -193.7496,  1.742336,
-        // -13.97821 , 175.4601, 0.9879454, 0.}; // chi=2.0697
-
-        // together with oter side
-        // Double_t variable[11] = { -111.1806,  537.8837,  -130.7788,  599.5708,  -193.6783,  -193.7783,  1.205, -13.80
-        // , 174.9635, 1.009, 0.}; // chi=58.6125 Double_t variable[11] = { -111.0986,  538.0398,  -130.8728,  599.4673,
-        // -193.5222,  -193.6222,  1.205,  -13.80 , 174.9635, 1.009, 0.}; // chi=4,902
-
-        // Double_t variable[11] = { -111.0809,  537.8615,  -131.0399,  599.626,  -193.4688,  -193.8688, 1., -14.,
-        // 179.1, 1.0011, 0.}; // chi= Double_t variable[11] = { -111.0701,  537.8723,  -131.0391,  599.6368, -193.4580,
-        // -193.8580, 1.010751, -13.98925, 179.1108, 1.001350, 0.}; // chi=5.88859
+        Double_t variable[12] = { -111.1057, 537.81830, -131.065, 599.57030, -194.0000,  -194.000,
+                                  1.690075,  -14.000, 175.9708,  0.0000, 0.0000, 0.0000 }; // chi=
 
         // Double_t step[11] = {0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.1, 1.5, 0.01, 0.1};
         // Double_t step[11] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.5, 0.01, 0.1};
@@ -1311,7 +1130,7 @@ void R3BOptimizeGeometryS494::Finish()
         // Double_t step[12] = {0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.01, 0.001, 0.001, 0.001};
         // Double_t step[12] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.1, 0.01, 0.01, 0.01};
         // Double_t step[12] = {0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.5, 0.02, 0.02, 0.02};
-        Double_t step[12] = { 0.2, 0.5, 0.2, 0.5, 0.2, 0.2, 0.5, 0.5, 0.5, 0.01, 0.05, 0.05 };
+        Double_t step[12] = { 0.2, 0.5, 0.2, 0.5, 0.2, 0.2, 0.2, 0.2, 0.5, 0.1, 0.1, 0.1 };
 
         mini->SetFunction(fm1);
 
@@ -1328,12 +1147,12 @@ void R3BOptimizeGeometryS494::Finish()
         mini->SetLimitedVariable(9, "field", variable[9], step[9], variable[9] - 0.1, variable[9] + 0.1);
         mini->SetLimitedVariable(10, "x23", variable[10], step[10], variable[10] - 0.5, variable[10] + 0.5);
         mini->SetLimitedVariable(11, "z23", variable[11], step[11], variable[11] - 0.5, variable[11] + 0.5);
-        // mini->FixVariable(0);
-        // mini->FixVariable(1);
-        // mini->FixVariable(2);
-        // mini->FixVariable(3);
-        // mini->FixVariable(4);
-        // mini->FixVariable(5);
+        mini->FixVariable(0);
+        mini->FixVariable(1);
+        mini->FixVariable(2);
+        mini->FixVariable(3);
+        mini->FixVariable(4);
+        mini->FixVariable(5);
         // mini->FixVariable(6);
         // mini->FixVariable(7);
         // mini->FixVariable(8);
