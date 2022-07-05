@@ -174,7 +174,7 @@ void R3BCalifavsFootOnlineSpectra::Reset_CALIFAFOOT_Histo()
 
 void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
 {
-    if ((fTpat >= 0) && (header) && ((header->GetTpat() & 2) != fTpat))
+    if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
         return;
 
     bool ffoot = false;

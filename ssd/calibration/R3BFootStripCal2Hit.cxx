@@ -196,15 +196,6 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     std::vector<Double_t> StripE[fMaxNumDet];
 
     // Clustering algorithm - A. Revel
-
-    Int_t ClusterMult[fMaxNumDet];           // Cluster multiplicity
-    Double_t ClusterPos[fMaxNumDet][100];    // Position of Cluster from Weighted Average
-    Double_t ClusterESum[fMaxNumDet][100];   // Sum of Energies in the Cluster
-    Double_t Nu[fMaxNumDet][100];            // Nu for Energy/Position correction
-    Int_t ClusterNStrip[fMaxNumDet][100];    // Number of Strips in Cluster
-    Double_t ClusterI[fMaxNumDet][100][200]; // Id Strip in Cluster
-    Double_t ClusterE[fMaxNumDet][100][200]; // Energy of Strip in Cluster
-
     // Init
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {

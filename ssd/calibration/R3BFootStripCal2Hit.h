@@ -82,6 +82,14 @@ class R3BFootStripCal2Hit : public FairTask
     Double_t fOffsetY[20];
     TH1F* hssd[20];
 
+    Int_t ClusterMult[20];           // Cluster multiplicity
+    Double_t ClusterPos[20][100];    // Position of Cluster from Weighted Average
+    Double_t ClusterESum[20][100];   // Sum of Energies in the Cluster
+    Double_t Nu[20][100];            // Nu for Energy/Position correction
+    Int_t ClusterNStrip[20][100];    // Number of Strips in Cluster
+    Double_t ClusterI[20][100][200]; // Id Strip in Cluster
+    Double_t ClusterE[20][100][200]; // Energy of Strip in Cluster
+
     R3BFootMappingPar* fMap_Par; // Parameter container with mapping
     TClonesArray* fFootCalData;  // Array with FOOT Cal-input data
     TClonesArray* fFootHitData;  // Array with FOOT Hit-output data
