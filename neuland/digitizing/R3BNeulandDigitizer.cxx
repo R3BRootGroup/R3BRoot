@@ -125,17 +125,6 @@ void R3BNeulandDigitizer::Exec(Option_t*)
                                      return kv.second->HasFired();
                                  }));
 
-    for (const auto& kv : paddles)
-    {
-        const Int_t paddleID = kv.first;
-        const auto& paddle = kv.second;
-        if (paddle->HasFired())
-        {
-            hRLTimeToTrig->Fill(paddle->GetLeftChannel()->GetTDC() - triggerTime);
-            hRLTimeToTrig->Fill(paddle->GetRightChannel()->GetTDC() - triggerTime);
-            hElossVSQDC->Fill(paddleEnergyDeposit[paddleID], paddle->GetEnergy());
-        }
-    }
 
     // Create Hits
     for (const auto& kv : paddles)
@@ -148,24 +137,28 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             continue;
         }
 
-        const TVector3 hitPositionLocal = TVector3(paddle->GetPosition(), 0., 0.);
-        const TVector3 hitPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(hitPositionLocal, paddleID);
-        const TVector3 hitPixel = fNeulandGeoPar->ConvertGlobalToPixel(hitPositionGlobal);
-
-        R3BNeulandHit hit(paddleID,
-                          paddle->GetLeftChannel()->GetTDC(),
-                          paddle->GetRightChannel()->GetTDC(),
-                          paddle->GetTime(),
-                          paddle->GetLeftChannel()->GetEnergy(),
-                          paddle->GetRightChannel()->GetEnergy(),
-                          paddle->GetEnergy(),
-                          hitPositionGlobal,
-                          hitPixel);
-
-        if (fHitFilters.IsValid(hit))
+        for (UInt_t i = 0; i < paddle->GetNHits(); i++)
         {
-            fHits.Insert(std::move(hit));
-        }
+            const TVector3 hitPositionLocal = TVector3(paddle->GetPosition(i), 0., 0.);
+            const TVector3 hitPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(hitPositionLocal, paddleID);
+            const TVector3 hitPixel = fNeulandGeoPar->ConvertGlobalToPixel(hitPositionGlobal);
+
+            R3BNeulandHit hit(paddleID,
+                    paddle->GetLeftChannel()->GetTDC(i),
+                    paddle->GetRightChannel()->GetTDC(i),
+                    paddle->GetTime(i),
+                    paddle->GetLeftChannel()->GetEnergy(i),
+                    paddle->GetRightChannel()->GetEnergy(i),
+                    paddle->GetEnergy(i),
+                    hitPositionGlobal,
+                    hitPixel);
+
+            if (fHitFilters.IsValid(hit))
+            {
+                fHits.Insert(std::move(hit));
+            }
+        } // loop over all hits for each paddle
+
     } // loop over paddles
 
     LOG(DEBUG) << "R3BNeulandDigitizer: produced " << fHits.Size() << " hits";

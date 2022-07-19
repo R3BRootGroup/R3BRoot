@@ -84,6 +84,16 @@ void R3BNeulandHitMon::Exec(Option_t*)
 {
     const auto hits = fHits.Retrieve();
 
+    // checking paddle multihits
+    std::map<Int_t, Int_t> paddlenum;
+    for(const auto &hit : hits){
+        auto result = paddlenum.insert(std::pair<Int_t, Int_t>(hit->GetPaddle(), 1));
+        if(result.second == false)
+            result.first->second++;
+    }
+    auto max = std::max_element(paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs){return (lhs.second < rhs.second);});
+    LOG(DEBUG) << "max dupli: " << max->second;
+
     if (fIs3DTrackEnabled)
     {
         fh3->Reset("ICES");
