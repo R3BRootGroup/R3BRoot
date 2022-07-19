@@ -14,6 +14,7 @@
 #include "DigitizingEngine.h"
 #include <algorithm>
 #include <cmath>
+#include "FairLogger.h"
 
 namespace Neuland
 {
@@ -47,16 +48,28 @@ namespace Neuland
                    (!fLeftChannel->HasFired() && fRightChannel->HasFired());
         }
 
-        Double_t Paddle::GetEnergy() const { return std::sqrt(fLeftChannel->GetEnergy() * fRightChannel->GetEnergy()); }
-
-        Double_t Paddle::GetTime() const
-        {
-            return (fLeftChannel->GetTDC() + fRightChannel->GetTDC()) / 2. - gHalfLength / gCMedium;
+        Double_t Paddle::GetEnergy(UShort_t index ) const { 
+            return std::sqrt(fLeftChannel->GetEnergy(index) * fRightChannel->GetEnergy(index));
         }
 
-        Double_t Paddle::GetPosition() const
+        Double_t Paddle::GetTime(UShort_t index) const
         {
-            return (fRightChannel->GetTDC() - fLeftChannel->GetTDC()) / 2. * gCMedium;
+            return (fLeftChannel->GetTDC(index) + fRightChannel->GetTDC(index)) / 2. - gHalfLength / gCMedium;
+        }
+
+        Double_t Paddle::GetPosition(UShort_t index) const
+        {
+            return (fRightChannel->GetTDC(index) - fLeftChannel->GetTDC(index)) / 2. * gCMedium;
+        }
+
+        const UShort_t Paddle::GetNHits() const {
+            if (fRightChannel->GetNHits() != fLeftChannel->GetNHits()){
+                LOG(ERROR) << "DigitizingEngine: nhits from both side of PMTs don't match!";
+                return 0;
+            }
+            else{
+                return fRightChannel->GetNHits();
+            }
         }
     } // namespace Digitizing
 

@@ -37,6 +37,9 @@
 #emacs and gedit
 *~
 
+#clangd file
+compile_commands.json
+
 # Generated folders and files 
 geometry/neuland_v*.root
 geometry/*.geo.root
@@ -45,6 +48,7 @@ input/
 
 macros/
 
+.cache
 .idea/
 .vscode/
 build-r3broot.sh

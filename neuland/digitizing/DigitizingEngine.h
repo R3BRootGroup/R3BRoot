@@ -18,6 +18,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include "FairLogger.h"
 
 namespace Neuland
 {
@@ -40,9 +41,15 @@ namespace Neuland
             virtual ~Channel() = default; // FIXME: Root doesn't like pure virtual destructors (= 0;)
             virtual void AddHit(Double_t mcTime, Double_t mcLight, Double_t dist) = 0;
             virtual bool HasFired() const = 0;
-            virtual Double_t GetQDC() const = 0;
-            virtual Double_t GetTDC() const = 0;
-            virtual Double_t GetEnergy() const = 0;
+            virtual Double_t GetQDC(UShort_t index) const {return GetQDC();}
+            virtual Double_t GetTDC(UShort_t index) const {return GetTDC();}
+            virtual Double_t GetEnergy(UShort_t index) const {return GetEnergy();}
+            virtual Int_t GetNHits() const {return 1;};
+
+            // for backward compatibility
+            virtual Double_t GetQDC() const {return GetQDC(0);}
+            virtual Double_t GetTDC() const {return GetTDC(0);}
+            virtual Double_t GetEnergy() const {return GetEnergy(0);}
 
           protected:
             std::vector<PMTHit> fPMTHits;
@@ -56,9 +63,10 @@ namespace Neuland
 
             bool HasFired() const;
             bool HasHalfFired() const;
-            Double_t GetEnergy() const;
-            Double_t GetTime() const;
-            Double_t GetPosition() const;
+            Double_t GetEnergy(UShort_t index = 0) const;
+            Double_t GetTime(UShort_t index = 0) const;
+            Double_t GetPosition(UShort_t index = 0) const;
+            const UShort_t GetNHits() const;
 
             const Channel* GetLeftChannel() const { return fLeftChannel.get(); }
             const Channel* GetRightChannel() const { return fRightChannel.get(); }
