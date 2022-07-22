@@ -255,13 +255,11 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         TVectorD c_svd_r = svd.Solve(dt_r, ok);
         theta = c_svd_r[1];
 
-        Double_t Esum_nba_rot = fy0_point + (theta * 1000 - fx0_point) * sin(frot_ang) +
-                                (TMath::Sqrt(Esum / nba) - fy0_point) * cos(frot_ang);
-        Double_t zhit = fZ0 + fZ1 * Esum_nba_rot + fZ2 * Esum_nba_rot * Esum_nba_rot;
-
+        Double_t sqrtEsum_nba_rot = fy0_point + (theta * 1000 - fx0_point) * sin(frot_ang) +
+                                    (TMath::Sqrt(Esum / nba) - fy0_point) * cos(frot_ang);
+        Double_t Esum_nba_rot = sqrtEsum_nba_rot * sqrtEsum_nba_rot;
+        Double_t zhit = fZ0 + fZ1 * sqrtEsum_nba_rot + fZ2 * Esum_nba_rot;
         if (zhit > 0)
-            // AddHitData(theta, zhit);
-            // AddHitData(theta, zhit, Esum / nba);
             AddHitData(theta, zhit, Esum_nba_rot);
     }
     if (CalDat)
@@ -344,24 +342,7 @@ void R3BMusicCal2Hit::Reset()
     if (fMusicHitDataCA)
         fMusicHitDataCA->Clear();
 }
-
 // -----   Private method AddHitData  --------------------------------------------
-R3BMusicHitData* R3BMusicCal2Hit::AddHitData(Double_t theta, Double_t charge_z)
-{
-    // It fills the R3BMusicHitData
-    TClonesArray& clref = *fMusicHitDataCA;
-    Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BMusicHitData(theta, charge_z);
-}
-// -----   For later analysis with reconstructed beta -----
-R3BMusicHitData* R3BMusicCal2Hit::AddHitData(Double_t theta, Double_t charge_z, Double_t ene_ave)
-{
-    // It fills the R3BMusicHitData
-    TClonesArray& clref = *fMusicHitDataCA;
-    Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BMusicHitData(theta, charge_z, ene_ave);
-}
-// -----   To include position for tracking (s515) -----
 R3BMusicHitData* R3BMusicCal2Hit::AddHitData(Double_t theta, Double_t charge_z, Double_t ene_ave, Double_t good_dt)
 {
     // It fills the R3BMusicHitData
