@@ -86,9 +86,7 @@ class R3BMusicCal2Hit : public FairTask
 
     /** Private method MusicHitData **/
     //** Adds a MusicHitData to the detector
-    R3BMusicHitData* AddHitData(Double_t theta, Double_t charge_z);
-    R3BMusicHitData* AddHitData(Double_t theta, Double_t charge_z, Double_t ene_ave);
-    R3BMusicHitData* AddHitData(Double_t theta, Double_t charge_z, Double_t ene_ave, Double_t good_dt);
+    R3BMusicHitData* AddHitData(Double_t theta, Double_t charge_z, Double_t ene_ave = 0., Double_t good_dt = 0.);
 
   public:
     // Class definition
