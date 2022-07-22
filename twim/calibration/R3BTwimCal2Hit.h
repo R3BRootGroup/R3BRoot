@@ -21,12 +21,15 @@
 
 #include "FairTask.h"
 #include "R3BTwimHitData.h"
+#include "TCanvas.h"
 #include "TH1F.h"
+#include "TH2F.h"
 #include "TVectorD.h"
 #include <TRandom.h>
 
 class TClonesArray;
 class R3BTwimHitPar;
+class R3BEventHeader;
 
 class R3BTwimCal2Hit : public FairTask
 {
@@ -60,6 +63,13 @@ class R3BTwimCal2Hit : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
     void SetExpId(Int_t exp) { fExpId = exp; }
 
+    /** Virtual method FinishTask **/
+    virtual void FinishTask();
+
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+
+    inline void SetDebug() { fDebug = kTRUE; }
+
   private:
     void SetParameter();
     /** Private method Experiment s4551 => s455+fission **/
@@ -69,12 +79,18 @@ class R3BTwimCal2Hit : public FairTask
     /** Private method Experiment s467 **/
     virtual void S467();
 
+    R3BEventHeader* header; /**< Event header. */
+
     Bool_t fOnline; // Don't store data for online
     Int_t fExpId;
+    Int_t fTpat;
+    Bool_t fDebug;
 
     Int_t fNumSec; // Number of sections
     Int_t fNumAnodes;
     Int_t fNumAnodesAngleFit;
+    // Int_t fNumAnodesAngleFit4551[4];
+    Int_t fIndex[16];
     Int_t fNumParamsTof;
     Int_t fNumParams;
     Int_t fMaxEnergyperanode;
@@ -96,6 +112,14 @@ class R3BTwimCal2Hit : public FairTask
     //** Adds a TwimHitData to the detector
     R3BTwimHitData* AddHitData(UShort_t secID, Double_t theta, Double_t charge_z, Double_t xpos);
     R3BTwimHitData* AddHitData(UShort_t secID, Double_t theta, Double_t charge_z, Double_t xpos, Double_t ene_ave);
+
+    TH1F** dx;
+    TH1F** dx_all;
+    TH2F** dx_vs_pos;
+
+    TCanvas** dx_canvas;
+    TCanvas** dx_all_canvas;
+    TCanvas** dx_vs_pos_canvas;
 
   public:
     // Class definition

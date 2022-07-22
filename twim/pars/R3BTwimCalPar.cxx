@@ -34,7 +34,7 @@ R3BTwimCalPar::R3BTwimCalPar(const char* name, const char* title, const char* co
     , fNumSections(4)
     , fNumAnodes(16)
     , fNumParamsEFit(2)
-    , fNumParamsPosFit(2)
+    , fNumParamsPosFit(3)
     , fNumAnodesTRef(2)
     , fNumAnodesTrig(2)
     , fMaxMult(20)
