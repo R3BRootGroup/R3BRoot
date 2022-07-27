@@ -110,8 +110,12 @@ class R3BTwimCal2Hit : public FairTask
 
     /** Private method TwimHitData **/
     //** Adds a TwimHitData to the detector
-    R3BTwimHitData* AddHitData(UShort_t secID, Double_t theta, Double_t charge_z, Double_t xpos);
-    R3BTwimHitData* AddHitData(UShort_t secID, Double_t theta, Double_t charge_z, Double_t xpos, Double_t ene_ave);
+    R3BTwimHitData* AddHitData(UShort_t secID,
+                               Double_t theta,
+                               Double_t charge_z,
+                               Double_t xpos,
+                               Double_t offset = 0.0,
+                               Double_t ene_ave = 0.0);
 
     TH1F** dx;
     TH1F** dx_all;

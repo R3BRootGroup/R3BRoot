@@ -32,5 +32,6 @@
 #pragma link C++ class R3BTwimMapped2CalPar+;
 
 #pragma link C++ class R3BTwimOnlineSpectra+;
+#pragma link C++ class R3BTwimVertexReconstruction+;
 
 #endif

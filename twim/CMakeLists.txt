@@ -29,6 +29,7 @@ ${R3BROOT_SOURCE_DIR}/twim/sim
 ${R3BROOT_SOURCE_DIR}/twim/pars
 ${R3BROOT_SOURCE_DIR}/twim/calibration
 ${R3BROOT_SOURCE_DIR}/twim/online
+${R3BROOT_SOURCE_DIR}/twim/ana
 )
 
 if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
@@ -57,6 +58,7 @@ link_directories( ${LINK_DIRECTORIES})
 #./calibration/R3BSofTwimMapped2Cal.cxx
 #./calibration/R3BSofTwimCal2Hit.cxx
 #./calibration/R3BSofTwimMapped2CalPar.cxx
+#./ana/R3BTwimVertexReconstruction.cxx
 #)
 
 file(GLOB SRCS 
@@ -65,6 +67,7 @@ file(GLOB SRCS
 ./pars/*.cxx 
 ./online/*.cxx
 ./calibration/*.cxx
+./ana/*.cxx
 )
 
 

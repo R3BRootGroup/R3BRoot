@@ -33,8 +33,10 @@ class R3BTwimHitData : public TObject
      *@param theta    Angle theta in [mrad]
      *@param z        Atomic number Z in charge units
      *@param x        Position of a reference anode
+     *@param offset   Offset of the fission fragment trajectory fit[mm]
+     *@param vertex   vertex of the fission fragments trajectory (fission position)
      **/
-    R3BTwimHitData(UInt_t secID, Double_t theta, Double_t z, Double_t x = 0., Double_t ene = 0.);
+    R3BTwimHitData(UInt_t secID, Double_t theta, Double_t z, Double_t x = 0., Double_t Offset = 0., Double_t ene = 0., Double_t Vertex = 0.);
 
     /** Destructor **/
     virtual ~R3BTwimHitData() {}
@@ -45,6 +47,8 @@ class R3BTwimHitData : public TObject
     inline const Double_t& GetZcharge() const { return fZ; }
     inline const Double_t& GetEave() const { return fE; }
     inline const Double_t& GetX() const { return fX; }
+    inline const Double_t& GetOffset() const { return fOffset; }
+    inline const Double_t& GetVertex() const { return fVertex; }
 
     /** Modifiers **/
     void SetSecID(UInt_t id) { fSecID = id; };
@@ -52,10 +56,12 @@ class R3BTwimHitData : public TObject
     void SetZcharge(Double_t z) { fZ = z; };
     void SetEave(Double_t ene) { fE = ene; };
     void SetX(Double_t x) { fX = x; };
+    void SetOffset(Double_t offset) { fOffset = offset; };
+    void SetVertex(Double_t vertex) { fVertex = vertex; };
 
   protected:
     UInt_t fSecID;
-    Double_t fTheta, fZ, fE, fX;
+    Double_t fTheta, fZ, fE, fX, fVertex, fOffset;
 
   public:
     ClassDef(R3BTwimHitData, 1)
