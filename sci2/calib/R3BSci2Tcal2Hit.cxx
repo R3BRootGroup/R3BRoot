@@ -44,6 +44,7 @@ R3BSci2Tcal2Hit::R3BSci2Tcal2Hit(const char* name, Int_t iVerbose)
     , fsci2OffsetXT(0.)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fOnline(kFALSE)
+    , fCoincWindow(4.)
 {
 }
 
@@ -114,27 +115,37 @@ InitStatus R3BSci2Tcal2Hit::ReInit()
 
 void R3BSci2Tcal2Hit::Exec(Option_t* option)
 {
+
     UInt_t nHits = 0, iDet = 0, iCh = 0;
     Int_t multTcal[2][3];
     Double_t iRawTimeNs[2][3][64];
+    Double_t tRawTimeNs[2][3][64];
     Double_t PosCal = -1000.;
     Double_t Tmean = -1;        // 0.5*(TrawLEFT + TrawRIGHT)
     Double_t Tmean_w_Tref = -1; // 0.5*(TrawLEFT + TrawRIGHT) - Tref
-
+    UInt_t tHits[2];
+    Bool_t tCh[2][3][64];
     for (UShort_t d = 0; d < 2; d++)
+    {
+	    tHits[d] = 0;
         for (UShort_t pmt = 0; pmt < 3; pmt++)
         {
             multTcal[d][pmt] = 0;
             for (UShort_t m = 0; m < 64; m++)
+	        {
                 iRawTimeNs[d][pmt][m] = 0.;
+                tRawTimeNs[d][pmt][m] = 0.;
+		        tCh[d][pmt][m] = false;
+	        }
         }
+    }
 
     // --- -------------- --- //
     // --- read tcal data --- //
     // --- -------------- --- //
     if (fCalItems && fCalItems->GetEntriesFast())
     {
-        nHits = fCalItems->GetEntriesFast();
+        nHits = fCalItems->GetEntriesFast(); 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fCalItems->At(ihit);
@@ -143,33 +154,65 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             iDet = hittcal->GetDetector() - 1;
             iCh = hittcal->GetChannel() - 1;
             iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]] = hittcal->GetRawTimeNs();
-            multTcal[iDet][iCh]++;
-        } // --- end of loop over Tcal data --- //
+	        Bool_t inHit = false;
+	    
+	        //Check if a coincident hit exists
+	        for(UShort_t d = 0; d < 2; d++)
+	        {
+		        if(iDet != d)	//skip for different detectors
+			        continue;
+		        for(Int_t j = 0; j < tHits[d]; j++)
+		        {
+			        if(iCh == 2)	//skip reference channel
+				        break;
+			        for(Int_t ch = 0; ch < 2; ch++)
+			        {
+				        if(!tCh[d][ch][j])
+					        continue;
+				        Double_t COINC_WINDOW = fCoincWindow;	//time window
+				        Double_t tdiff = 0.;
+				        tdiff = fabs(tRawTimeNs[d][ch][j] - iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]]);
+					    if(tdiff < COINC_WINDOW)
+				        {
+					        if(tCh[d][iCh][j])	//skip event if already set. Pileup
+					        {
+						        LOG(WARNING) << "Pileup Event. Skipping Event.";
+						        return;
+					        }
+			    
+					        tRawTimeNs[d][iCh][j] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
+					        tCh[d][iCh][j] = true;
+					        inHit = true;
+					        break;
+	 			        }
+			        }		    
+		        }
+	        }
+	        //If no coincident hits make a new hit
+	        if(!inHit && (iCh == 0 || iCh == 1)) 
+	        {
+   		        tRawTimeNs[iDet][iCh][tHits[iDet]] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
+		        tCh[iDet][iCh][tHits[iDet]] = true;
+		        tHits[iDet]++;
+	        }
+	        multTcal[iDet][iCh]++;
 
+        } // --- end of loop over Tcal data --- //
         for (UShort_t d = 0; d < 2; d++)
         {
-            // This hit selection requiring both multiplicity
-            // being the same should not be used for the
-            // actual offline analysis, but still sufficient
-            // assumption  for the online analysis.
-            // For the offline analysis, it is important to
-            // check time difference between two detectors
-            // to get a pair of hits with reasonable position.
-            // At the Sci2Hit level, we don't care about higher
-            // multiplicity. The good hit will be selected by
-            // later analysis, such as R3BIncomingBeta to find
-            // a good hit to give a proper tof value.
-            if (multTcal[d][0] < 64 && multTcal[d][0] == multTcal[d][1])
+		    for (int m = 0; m < tHits[d]; m++)
             {
-                for (int m = 0; m < multTcal[d][0]; m++)
-                {
-                    PosCal = fPos_p0 + fPos_p1 * (iRawTimeNs[d][0][m] - iRawTimeNs[d][1][m]);
-                    Tmean = 0.5 * (iRawTimeNs[d][0][m] + iRawTimeNs[d][1][m]);
-                    if (multTcal[d][2] == 1)
-                        Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
-                    AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
-                }
-            } // end of mult left == mult right
+		       	if(tCh[d][0][m] && tCh[d][1][m])	//only take hits for which both sides have signal
+		       	{
+			    	PosCal = fPos_p0 + fPos_p1 * (tRawTimeNs[d][0][m] - tRawTimeNs[d][1][m]);
+			    	Tmean = 0.5 * (tRawTimeNs[d][0][m] + tRawTimeNs[d][1][m]);
+			    	if (multTcal[d][2] == 1)
+					Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
+			    	AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+			    }
+				
+              }	
+              // end of hit loop
         }     // end of loop over the number of detectors
     }         // end of if Tcal data
     return;

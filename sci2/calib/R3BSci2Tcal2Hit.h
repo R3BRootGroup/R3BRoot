@@ -16,7 +16,6 @@
 
 #include "FairTask.h"
 #include "R3BSci2HitData.h"
-
 class TClonesArray;
 class R3BSci2HitPar;
 
@@ -89,6 +88,9 @@ class R3BSci2Tcal2Hit : public FairTask
 
     // Method to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
+    
+    //Method to set Coincidence window
+    void SetCoincWindow(Double_t t_Diff) { fCoincWindow = t_Diff; }
 
     virtual void SetParContainers();
 
@@ -103,6 +105,7 @@ class R3BSci2Tcal2Hit : public FairTask
     Double_t fsci2OffsetX;
     Double_t fsci2OffsetXT;
     Double_t fsci2VeffXT;
+    Double_t fCoincWindow;
     Float_t fPos_p0, fPos_p1;
 
     Int_t Icount = 0;
