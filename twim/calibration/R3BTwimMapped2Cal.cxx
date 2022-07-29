@@ -245,8 +245,8 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                 Float_t a0 = PosParams[s]->GetAt(ii);
                 Float_t a1 = PosParams[s]->GetAt(ii + 1);
                 Float_t a2 = 0.0;
-                if(fNumPosParams > 2)
-                   a2 = PosParams[s]->GetAt(ii + 2);
+                if (fNumPosParams > 2)
+                    a2 = PosParams[s]->GetAt(ii + 2);
                 for (Int_t j = 0; j < mulanode[s][fNumAnodes]; j++)
                     for (Int_t k = 0; k < mulanode[s][i]; k++)
                     {
@@ -278,9 +278,11 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                         }
                         else if (fExpId == 455 && fE[s][k][i] > 0.)
                         {
-                            auto dtime = a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]) + a2 * pow((fDT[s][k][i] - fDT[s][j][fNumAnodes]),2);
-                            if ( dtime > fMinDT && dtime < fMaxDT ){
-                              AddCalData(s + 1, i + 1, dtime, fE[s][k][i]);
+                            auto dtime = a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]) +
+                                         a2 * pow((fDT[s][k][i] - fDT[s][j][fNumAnodes]), 2);
+                            if (dtime > fMinDT && dtime < fMaxDT)
+                            {
+                                AddCalData(s + 1, i + 1, dtime, fE[s][k][i]);
                             }
                         }
                     }
