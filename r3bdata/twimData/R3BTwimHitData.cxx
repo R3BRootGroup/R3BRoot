@@ -25,20 +25,29 @@ R3BTwimHitData::R3BTwimHitData()
     , fX(0.)
     , fOffset(0.)
     , fE(0.)
-    , fVertex(0.)
+    , fVertexX(0.)
+    , fVertexZ(0.)
 {
 }
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-R3BTwimHitData::R3BTwimHitData(UInt_t secID, Double_t theta, Double_t z, Double_t x, Double_t offset, Double_t ene, Double_t vertex)
+R3BTwimHitData::R3BTwimHitData(UInt_t secID,
+                               Double_t theta,
+                               Double_t z,
+                               Double_t x,
+                               Double_t offset,
+                               Double_t ene,
+                               Double_t vertexX,
+                               Double_t vertexZ)
     : fSecID(secID)
     , fTheta(theta)
     , fZ(z)
     , fX(x)
     , fOffset(offset)
     , fE(ene)
-    , fVertex(vertex)
+    , fVertexX(vertexX)
+    , fVertexZ(vertexZ)
 {
 }
 // -------------------------------------------------------------------------

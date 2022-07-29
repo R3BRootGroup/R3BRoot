@@ -115,13 +115,15 @@ void R3BTwimVertexReconstruction::Exec(Option_t* option)
         f2->SetParameter(0, trajparams[1].Y());
         f2->SetParameter(1, trajparams[1].Z());
         Double_t min = 2000;
-        for (Int_t i = -4000; i < 4000; i++)
+        for (Int_t i = -4000; i < -20; i++)
         {
             if (min > TMath::Abs(f1->Eval(i) - f2->Eval(i)))
             {
                 min = TMath::Abs(f1->Eval(i) - f2->Eval(i));
-                HitDat[0]->SetVertex(i);
-                HitDat[1]->SetVertex(i);
+                HitDat[0]->SetVertexZ(i);
+                HitDat[1]->SetVertexZ(i);
+                HitDat[0]->SetVertexX(f1->Eval(i));
+                HitDat[1]->SetVertexX(f2->Eval(i));
             }
         }
 
