@@ -34,6 +34,7 @@
 using namespace std;
 
 class TClonesArray;
+class R3BEventHeader;
 
 class R3BMwpc1Cal2Hit : public FairTask
 {
@@ -62,13 +63,16 @@ class R3BMwpc1Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
     /** Private method Experiment s455 **/
     virtual void S455();
     /** Private method Experiment s467 **/
     virtual void S467();
+
+    R3BEventHeader* header; /**< Event header. */
+
     Double_t fSize; // Detector size in X and Y
     Double_t fwx;   // Pad width in X
     Double_t fwy;   // Pad width in Y

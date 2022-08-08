@@ -20,6 +20,7 @@
 #define R3BTwimMapped2Cal_H 1
 
 #include "FairTask.h"
+#include "R3BLogger.h"
 #include "R3BTwimCalData.h"
 #include "R3BTwimMappedData.h"
 #include "TH1F.h"
@@ -28,6 +29,7 @@
 #include <vector>
 
 class TClonesArray;
+class R3BEventHeader;
 class R3BTimeStitch;
 class R3BTwimCalPar;
 
@@ -59,12 +61,18 @@ class R3BTwimMapped2Cal : public FairTask
     virtual InitStatus ReInit();
 
     /** Method to set up the experiment ID **/
-    void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetExpId(Int_t exp) {
+      R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId <<", New value:" << exp);
+      R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
+      fExpId = exp;
+    }
 
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     void SetParameter();
+
+    R3BEventHeader* header; /**< Event header. */
 
     Int_t fNumSec;
     Int_t fNumAnodes;

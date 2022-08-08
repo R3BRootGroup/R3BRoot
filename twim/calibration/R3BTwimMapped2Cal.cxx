@@ -28,6 +28,7 @@
 #include "FairRuntimeDb.h"
 
 // TWIM headers
+#include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTimeStitch.h"
 #include "R3BTwimCalData.h"
@@ -56,7 +57,7 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal(const char* name, Int_t iVerbose)
     , fCal_Par(NULL)
     , fTwimMappedDataCA(NULL)
     , fTwimCalDataCA(NULL)
-    , fExpId(467)
+    , fExpId(0)
     , fOnline(kFALSE)
 {
     CalEParams.resize(fNumSec);
@@ -155,6 +156,15 @@ InitStatus R3BTwimMapped2Cal::Init()
     {
         R3BLOG(FATAL, "FairRootManager not found");
         return kFATAL;
+    }
+
+    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+    if (fExpId == 0) // Obtain global ExpId if it's not set locally.
+    {
+        fExpId = header->GetExpId();
+        R3BLOG(INFO, "fExpId :" << fExpId);
     }
 
     // INPUT DATA
@@ -262,8 +272,10 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                                 if (fE[s][k][i] > 0.)
                                     AddCalData(s + 1,
                                                i + 1,
-                                               a0 + a1 * fTimeStitch->GetTime(
-                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 1], "vftx", "vftx"),
+                                               a0 +
+                                                   a1 *
+                                                       fTimeStitch->GetTime(
+                                                           fDT[s][k][i] - fDT[s][j][fNumAnodes + 1], "vftx", "vftx"),
                                                fE[s][k][i]);
                             }
                             else
@@ -271,8 +283,10 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                                 if (fE[s][k][i] > 0.)
                                     AddCalData(s + 1,
                                                i + 1,
-                                               a0 + a1 * fTimeStitch->GetTime(
-                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 2], "vftx", "vftx"),
+                                               a0 +
+                                                   a1 *
+                                                       fTimeStitch->GetTime(
+                                                           fDT[s][k][i] - fDT[s][j][fNumAnodes + 2], "vftx", "vftx"),
                                                fE[s][k][i]);
                             }
                         }

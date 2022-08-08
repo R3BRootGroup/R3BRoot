@@ -17,6 +17,7 @@
 
 R3BEventHeader::R3BEventHeader()
     : FairEventHeader()
+    , fExpId(0)
     , fEventno(0)
     , fTrigger(0)
     , fTimeStamp(0)
