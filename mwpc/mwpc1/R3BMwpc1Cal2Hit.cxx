@@ -14,7 +14,7 @@
 // ------------------------------------------------------------------------
 // -----                        R3BMwpc1 source file                  -----
 // -----                  Created 06/10/19 by JL Rodriguez            -----
-// -----                  s455 method 17/06/22 by Antia GG            -----   
+// -----                  s455 method 17/06/22 by Antia GG            -----
 // ------------------------------------------------------------------------
 
 // ROOT headers
@@ -28,6 +28,7 @@
 #include "FairRuntimeDb.h"
 
 // MWPC headers
+#include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BMwpc1Cal2Hit.h"
 #include "R3BMwpcCalData.h"
@@ -48,13 +49,13 @@ R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose)
     , fwy(5.000)   // in mm
     , fSize(200.0) // in mm
     , fOnline(kFALSE)
-    , fExpId(455)
+    , fExpId(0)
 {
 }
 
 // Virtual R3BMwpc1Cal2Hit: Destructor
 R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
-{   
+{
     R3BLOG(DEBUG1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
@@ -74,9 +75,13 @@ InitStatus R3BMwpc1Cal2Hit::Init()
         return kFATAL;
     }
 
+    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc1CalData");
     if (!fMwpcCalDataCA)
-    { 
+    {
         R3BLOG(FATAL, "Mwpc1CalData not found");
         return kFATAL;
     }
@@ -92,10 +97,7 @@ InitStatus R3BMwpc1Cal2Hit::Init()
 // -----   Public method ReInit   ----------------------------------------------
 InitStatus R3BMwpc1Cal2Hit::ReInit() { return kSUCCESS; }
 
-bool sortPairsmwpc1(const pair<Double_t, Int_t> &x, const pair<Double_t, Int_t> &y)
-{
-  return x.first > y.first;
-}
+bool sortPairsmwpc1(const pair<Double_t, Int_t>& x, const pair<Double_t, Int_t>& y) { return x.first > y.first; }
 
 Double_t R3BMwpc1Cal2Hit::GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright)
 {
@@ -111,11 +113,12 @@ Double_t R3BMwpc1Cal2Hit::GetPositionX(Double_t qmax, Int_t padmax, Double_t qle
 Double_t R3BMwpc1Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup)
 {
     Double_t a2 = 0;
-    if (qdown!=0 && qup!=0) {
-    Double_t a3 = TMath::Pi() * fwy / (TMath::ACosH(0.5 * (TMath::Sqrt(qmax / qdown) + TMath::Sqrt(qmax / qup))));
-    // Double_t a2 = gRandom->Uniform(-fwy / 2, fwy / 2);
-    a2 = (a3 / TMath::Pi()) * TMath::ATanH((TMath::Sqrt(qmax / qdown) - TMath::Sqrt(qmax / qup)) /
-                                                    (2 * TMath::SinH(TMath::Pi() * fwy / a3)));
+    if (qdown != 0 && qup != 0)
+    {
+        Double_t a3 = TMath::Pi() * fwy / (TMath::ACosH(0.5 * (TMath::Sqrt(qmax / qdown) + TMath::Sqrt(qmax / qup))));
+        // Double_t a2 = gRandom->Uniform(-fwy / 2, fwy / 2);
+        a2 = (a3 / TMath::Pi()) * TMath::ATanH((TMath::Sqrt(qmax / qdown) - TMath::Sqrt(qmax / qup)) /
+                                               (2 * TMath::SinH(TMath::Pi() * fwy / a3)));
     }
     return (padmax * fwy - (fSize / 2) + (fwy / 2) + a2);
 }
@@ -125,13 +128,14 @@ void R3BMwpc1Cal2Hit::Exec(Option_t* option)
 {
     // At the moment we will use the expid to select the reconstruction
     // this should be changed in the future because expid is not necessary
-    if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
-    {
-        S467();
-    }
-    else if (fExpId == 455)
+    int expid = fExpId != 0 ? fExpId : header->GetExpId();
+    if (expid == 455)
     {
         S455();
+    }
+    else
+    {
+        S467();
     }
 
     return;
@@ -145,7 +149,7 @@ void R3BMwpc1Cal2Hit::S467()
 
     // Reading the Input -- Cal Data --
     Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     // Data from cal level
@@ -239,211 +243,246 @@ void R3BMwpc1Cal2Hit::S455()
     Bool_t xexists_p1 = false;
     Bool_t xexists_p2 = false;
     Bool_t yexists = false;
-    //Double_t fx[Mw1PadsX], fy[Mw1PadsY];
-    //cout << "NUEVO EVENTO" << endl;
+    // Double_t fx[Mw1PadsX], fy[Mw1PadsY];
+    // cout << "NUEVO EVENTO" << endl;
     for (Int_t i = 0; i < Mw1PadsX; i++)
-      fx_p1[i] = 0;
+        fx_p1[i] = 0;
     for (Int_t i = 0; i < Mw1PadsX; i++)
-      fx_p2[i] = 0;
+        fx_p2[i] = 0;
     for (Int_t i = 0; i < Mw1PadsY; i++)
-      fy[i] = 0;
-    for (Int_t i = 0; i < nHits; i++){
-      calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
-      planeId = calData[i]->GetPlane();
-      padId = calData[i]->GetPad() - 1;
-      q = calData[i]->GetQ();
-      //cout << "i = " << i << ", q = " << q << ", padId = " << padId << ", planeId = " << planeId << endl;
-      pair<Double_t, Int_t> hit_pair = make_pair(q,padId);
-      if (planeId == 1)
-      {
-        fx_p1[padId] = q;
-        QpadX_p1.push_back(hit_pair);
-        //xexists_p1 = true;
-        nx_p1 = nx_p1 + 1;
-      }
-      if (planeId == 2)
-      {
-        fx_p2[padId] = q;
-        QpadX_p2.push_back(hit_pair);
-        //xexists_p2 = true;
-        nx_p2 = nx_p2 + 1;
-      }
-      if (planeId == 3)
-      {
-        fy[padId] = q;
-        QpadY.push_back(hit_pair);
-        //yexists = true;
-        ny = ny + 1 ;
-      }
+        fy[i] = 0;
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        planeId = calData[i]->GetPlane();
+        padId = calData[i]->GetPad() - 1;
+        q = calData[i]->GetQ();
+        // cout << "i = " << i << ", q = " << q << ", padId = " << padId << ", planeId = " << planeId << endl;
+        pair<Double_t, Int_t> hit_pair = make_pair(q, padId);
+        if (planeId == 1)
+        {
+            fx_p1[padId] = q;
+            QpadX_p1.push_back(hit_pair);
+            // xexists_p1 = true;
+            nx_p1 = nx_p1 + 1;
+        }
+        if (planeId == 2)
+        {
+            fx_p2[padId] = q;
+            QpadX_p2.push_back(hit_pair);
+            // xexists_p2 = true;
+            nx_p2 = nx_p2 + 1;
+        }
+        if (planeId == 3)
+        {
+            fy[padId] = q;
+            QpadY.push_back(hit_pair);
+            // yexists = true;
+            ny = ny + 1;
+        }
     }
 
-    if ( (nx_p1>0 || nx_p2>0) && ny>0){
+    if ((nx_p1 > 0 || nx_p2 > 0) && ny > 0)
+    {
 
-      if (nx_p1>0){
-      sort(QpadX_p1.begin(),QpadX_p1.end(),sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
-      qmx_p1 = QpadX_p1[0].first;
-      padmx_p1 = QpadX_p1[0].second;
-      //cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-      /*for (Int_t i=0; i<nx_p1; i++){
-        cout << "Loop i = " << i << " q = " << QpadX_p1[i].first << endl;
-      }*/
-      }
-      if (nx_p2>0){
-      sort(QpadX_p2.begin(),QpadX_p2.end(),sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
-      qmx_p2 = QpadX_p2[0].first;
-      padmx_p2 = QpadX_p2[0].second;
-      //cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-      }
-      if (qmx_p1>qmx_p2 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX){
-        qmx1 = qmx_p1;
-        padmx1 = padmx_p1;
-        qleft1 = fx_p1[padmx1 - 1];
-        qright1 = fx_p1[padmx1 + 1];
-        planex1 = 1;
-        /*cout << "1>2" << endl;
-        cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-        cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
-        if (qmx1 > 10 && qleft1 > 0 && qright1 > 0){
-          x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
+        if (nx_p1 > 0)
+        {
+            sort(QpadX_p1.begin(),
+                 QpadX_p1.end(),
+                 sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
+            qmx_p1 = QpadX_p1[0].first;
+            padmx_p1 = QpadX_p1[0].second;
+            // cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
+            /*for (Int_t i=0; i<nx_p1; i++){
+              cout << "Loop i = " << i << " q = " << QpadX_p1[i].first << endl;
+            }*/
         }
-        else
-          x1 = -1000.;
-
-        for (Int_t i =0; i<nx_p1; i++){
-          if (QpadX_p1[i].second == padmx_p1-3 || QpadX_p1[i].second == padmx_p1-2 || QpadX_p1[i].second == padmx_p1-1 || QpadX_p1[i].second == padmx_p1 ||
-            QpadX_p1[i].second == padmx_p1+1 || QpadX_p1[i].second == padmx_p1+2 || QpadX_p1[i].second == padmx_p1+3){
-            QpadX_p1[i].first = 0.;
-          }
+        if (nx_p2 > 0)
+        {
+            sort(QpadX_p2.begin(),
+                 QpadX_p2.end(),
+                 sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
+            qmx_p2 = QpadX_p2[0].first;
+            padmx_p2 = QpadX_p2[0].second;
+            // cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
         }
-        sort(QpadX_p1.begin(),QpadX_p1.end(),sortPairsmwpc1);
-        qmx_p1 = QpadX_p1[0].first;
-        padmx_p1 = QpadX_p1[0].second;
+        if (qmx_p1 > qmx_p2 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX)
+        {
+            qmx1 = qmx_p1;
+            padmx1 = padmx_p1;
+            qleft1 = fx_p1[padmx1 - 1];
+            qright1 = fx_p1[padmx1 + 1];
+            planex1 = 1;
+            /*cout << "1>2" << endl;
+            cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
+            cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
+            if (qmx1 > 10 && qleft1 > 0 && qright1 > 0)
+            {
+                x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
+            }
+            else
+                x1 = -1000.;
 
-        if (qmx_p1>qmx_p2 && padmx_p1 + 1 < Mw1PadsX){
-          qmx2 = qmx_p1;
-          padmx2 = padmx_p1;
-          qleft2 = fx_p1[padmx2 - 1];
-          qright2 = fx_p1[padmx2 + 1];
-          planex2 = 1;
-          if (qmx2 > 10 && qleft2 > 0 && qright2 > 0){
-            x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
-          }
-          else
-            x2 = -1000.;
-        }
-        else if (qmx_p2>qmx_p1 && padmx_p2 + 1 < Mw1PadsX){
-          qmx2 = qmx_p2;
-          padmx2 = padmx_p2;
-          qleft2 = fx_p2[padmx2 - 1];
-          qright2 = fx_p2[padmx2 + 1];
-          planex2 = 2;
-          if (qmx2 > 10 && qleft2 > 0 && qright2 > 0){
-            x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
-          }
-          else
-            x2 = -1000.;
-        }
-      }
+            for (Int_t i = 0; i < nx_p1; i++)
+            {
+                if (QpadX_p1[i].second == padmx_p1 - 3 || QpadX_p1[i].second == padmx_p1 - 2 ||
+                    QpadX_p1[i].second == padmx_p1 - 1 || QpadX_p1[i].second == padmx_p1 ||
+                    QpadX_p1[i].second == padmx_p1 + 1 || QpadX_p1[i].second == padmx_p1 + 2 ||
+                    QpadX_p1[i].second == padmx_p1 + 3)
+                {
+                    QpadX_p1[i].first = 0.;
+                }
+            }
+            sort(QpadX_p1.begin(), QpadX_p1.end(), sortPairsmwpc1);
+            qmx_p1 = QpadX_p1[0].first;
+            padmx_p1 = QpadX_p1[0].second;
 
-      else if (qmx_p2>qmx_p1 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX){
-
-        qmx1 = qmx_p2;
-        padmx1 = padmx_p2;
-        qleft1 = fx_p2[padmx1 - 1];
-        qright1 = fx_p2[padmx1 + 1];
-        planex1 = 2;
-        /*cout << "2>1" << endl;
-        cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-        cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
-        if (qmx1 > 10 && qleft1 > 0 && qright1 > 0){
-          x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
-        }
-        else
-          x1 = -1000.;
-
-        for (Int_t i =0; i<nx_p2; i++){
-          if (QpadX_p2[i].second == padmx_p2-3 || QpadX_p2[i].second == padmx_p2-2 || QpadX_p2[i].second == padmx_p2-1 || QpadX_p2[i].second == padmx_p2 ||
-            QpadX_p2[i].second == padmx_p2+1 || QpadX_p2[i].second == padmx_p2+2 || QpadX_p2[i].second == padmx_p2+3){
-            QpadX_p2[i].first = 0.;
-          }
-        }
-        sort(QpadX_p2.begin(),QpadX_p2.end(),sortPairsmwpc1);
-        qmx_p2 = QpadX_p2[0].first;
-        padmx_p2 = QpadX_p2[0].second;
-
-        if (qmx_p2>qmx_p1 && padmx_p2 + 1 < Mw1PadsX){
-          qmx2 = qmx_p2;
-          padmx2 = padmx_p2;
-          qleft2 = fx_p2[padmx2 - 1];
-          qright2 = fx_p2[padmx2 + 1];
-          planex2 = 2;
-          if (qmx2 > 10 && qleft2 > 0 && qright2 > 0){
-            x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
-          }
-          else
-            x2 = -1000.;
+            if (qmx_p1 > qmx_p2 && padmx_p1 + 1 < Mw1PadsX)
+            {
+                qmx2 = qmx_p1;
+                padmx2 = padmx_p1;
+                qleft2 = fx_p1[padmx2 - 1];
+                qright2 = fx_p1[padmx2 + 1];
+                planex2 = 1;
+                if (qmx2 > 10 && qleft2 > 0 && qright2 > 0)
+                {
+                    x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
+                }
+                else
+                    x2 = -1000.;
+            }
+            else if (qmx_p2 > qmx_p1 && padmx_p2 + 1 < Mw1PadsX)
+            {
+                qmx2 = qmx_p2;
+                padmx2 = padmx_p2;
+                qleft2 = fx_p2[padmx2 - 1];
+                qright2 = fx_p2[padmx2 + 1];
+                planex2 = 2;
+                if (qmx2 > 10 && qleft2 > 0 && qright2 > 0)
+                {
+                    x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
+                }
+                else
+                    x2 = -1000.;
+            }
         }
 
-        else if (qmx_p1>qmx_p2 && padmx_p1 + 1 < Mw1PadsX){
-          qmx2 = qmx_p1;
-          padmx2 = padmx_p1;
-          qleft2 = fx_p1[padmx2 - 1];
-          qright2 = fx_p1[padmx2 + 1];
-          planex2 = 1;
-          if (qmx2 > 10 && qleft2 > 0 && qright2 > 0){
-            x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
-          }
-          else
-            x2 = -1000.;
+        else if (qmx_p2 > qmx_p1 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX)
+        {
+
+            qmx1 = qmx_p2;
+            padmx1 = padmx_p2;
+            qleft1 = fx_p2[padmx1 - 1];
+            qright1 = fx_p2[padmx1 + 1];
+            planex1 = 2;
+            /*cout << "2>1" << endl;
+            cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
+            cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
+            if (qmx1 > 10 && qleft1 > 0 && qright1 > 0)
+            {
+                x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
+            }
+            else
+                x1 = -1000.;
+
+            for (Int_t i = 0; i < nx_p2; i++)
+            {
+                if (QpadX_p2[i].second == padmx_p2 - 3 || QpadX_p2[i].second == padmx_p2 - 2 ||
+                    QpadX_p2[i].second == padmx_p2 - 1 || QpadX_p2[i].second == padmx_p2 ||
+                    QpadX_p2[i].second == padmx_p2 + 1 || QpadX_p2[i].second == padmx_p2 + 2 ||
+                    QpadX_p2[i].second == padmx_p2 + 3)
+                {
+                    QpadX_p2[i].first = 0.;
+                }
+            }
+            sort(QpadX_p2.begin(), QpadX_p2.end(), sortPairsmwpc1);
+            qmx_p2 = QpadX_p2[0].first;
+            padmx_p2 = QpadX_p2[0].second;
+
+            if (qmx_p2 > qmx_p1 && padmx_p2 + 1 < Mw1PadsX)
+            {
+                qmx2 = qmx_p2;
+                padmx2 = padmx_p2;
+                qleft2 = fx_p2[padmx2 - 1];
+                qright2 = fx_p2[padmx2 + 1];
+                planex2 = 2;
+                if (qmx2 > 10 && qleft2 > 0 && qright2 > 0)
+                {
+                    x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
+                }
+                else
+                    x2 = -1000.;
+            }
+
+            else if (qmx_p1 > qmx_p2 && padmx_p1 + 1 < Mw1PadsX)
+            {
+                qmx2 = qmx_p1;
+                padmx2 = padmx_p1;
+                qleft2 = fx_p1[padmx2 - 1];
+                qright2 = fx_p1[padmx2 + 1];
+                planex2 = 1;
+                if (qmx2 > 10 && qleft2 > 0 && qright2 > 0)
+                {
+                    x2 = GetPositionX(qmx2, padmx2, qleft2, qright2);
+                }
+                else
+                    x2 = -1000.;
+            }
         }
-      }
-    if (ny>0){
+        if (ny > 0)
+        {
 
-      sort(QpadY.begin(),QpadY.end(),sortPairsmwpc1);
-      qmy1 = QpadY[0].first;
-      padmy1 = QpadY[0].second;
-      //cout << "qmy1 = " << qmy1 << ", padmy1 = " << padmy1 << endl;
+            sort(QpadY.begin(), QpadY.end(), sortPairsmwpc1);
+            qmy1 = QpadY[0].first;
+            padmy1 = QpadY[0].second;
+            // cout << "qmy1 = " << qmy1 << ", padmy1 = " << padmy1 << endl;
 
-      if (padmy1 + 1 < Mw1PadsY)
-      {
-        // Obtain position Y for 1st charge ----
-        qdown1 = fy[padmy1 - 1];
-        qup1 = fy[padmy1 + 1];
-        if (qmy1 > 10){ // && qdown1 > 0 && qup1 > 0){
-          y1 = GetPositionY(qmy1, padmy1, qdown1, qup1);
-        }
-        else
-          y1 = -1000.;
-      }
+            if (padmy1 + 1 < Mw1PadsY)
+            {
+                // Obtain position Y for 1st charge ----
+                qdown1 = fy[padmy1 - 1];
+                qup1 = fy[padmy1 + 1];
+                if (qmy1 > 10)
+                { // && qdown1 > 0 && qup1 > 0){
+                    y1 = GetPositionY(qmy1, padmy1, qdown1, qup1);
+                }
+                else
+                    y1 = -1000.;
+            }
 
-      for (Int_t i =0; i<ny; i++){
-        if (QpadY[i].second == padmy1-3 || QpadY[i].second == padmy1-2 || QpadY[i].second == padmy1-1 || QpadY[i].second == padmy1 ||
-          QpadY[i].second == padmy1+1 || QpadY[i].second == padmy1+2 || QpadY[i].second == padmy1+3 ){
-          QpadY[i].first = 0.;
-        }
-      }
+            for (Int_t i = 0; i < ny; i++)
+            {
+                if (QpadY[i].second == padmy1 - 3 || QpadY[i].second == padmy1 - 2 || QpadY[i].second == padmy1 - 1 ||
+                    QpadY[i].second == padmy1 || QpadY[i].second == padmy1 + 1 || QpadY[i].second == padmy1 + 2 ||
+                    QpadY[i].second == padmy1 + 3)
+                {
+                    QpadY[i].first = 0.;
+                }
+            }
 
-      sort(QpadY.begin(),QpadY.end(),sortPairsmwpc1);
-      qmy2 = QpadY[0].first;
-      padmy2 = QpadY[0].second;
-      //cout << "qmy2 = " << qmy2 << ", padmy2 = " << padmy2 << endl;
+            sort(QpadY.begin(), QpadY.end(), sortPairsmwpc1);
+            qmy2 = QpadY[0].first;
+            padmy2 = QpadY[0].second;
+            // cout << "qmy2 = " << qmy2 << ", padmy2 = " << padmy2 << endl;
 
-      if (padmy2 + 1 < Mw1PadsY)
-      {
-        // Obtain position Y for 2nd charge ----
-        qdown2 = fy[padmy2 - 1];
-        qup2 = fy[padmy2 + 1];
-        if (qmy2 > 10){ // && qdown2 > 0 && qup2 > 0){
-          y2 = GetPositionY(qmy2, padmy2, qdown2, qup2);
-        }
-        else
-          y2 = -1000.;
-      }
-    } //if y
-    //cout << "x1 = " << x1 << ", y1 = " << y1 << " ,planex1 = " << planex1 << ", x2 = " << x2 << ", y2 = " << y2 << " ,planex2 = " << planex2 << endl;
-    AddHitData(x1, y1, planex1);
-    AddHitData(x2, y2, planex2);
-  } // if all
+            if (padmy2 + 1 < Mw1PadsY)
+            {
+                // Obtain position Y for 2nd charge ----
+                qdown2 = fy[padmy2 - 1];
+                qup2 = fy[padmy2 + 1];
+                if (qmy2 > 10)
+                { // && qdown2 > 0 && qup2 > 0){
+                    y2 = GetPositionY(qmy2, padmy2, qdown2, qup2);
+                }
+                else
+                    y2 = -1000.;
+            }
+        } // if y
+        // cout << "x1 = " << x1 << ", y1 = " << y1 << " ,planex1 = " << planex1 << ", x2 = " << x2 << ", y2 = " << y2
+        // << " ,planex2 = " << planex2 << endl;
+        AddHitData(x1, y1, planex1);
+        AddHitData(x2, y2, planex2);
+    } // if all
 
     if (calData)
         delete[] calData;

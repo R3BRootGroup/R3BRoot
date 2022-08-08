@@ -20,6 +20,7 @@
 #define R3BTwimCal2Hit_H 1
 
 #include "FairTask.h"
+#include "R3BLogger.h"
 #include "R3BTwimHitData.h"
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -61,7 +62,11 @@ class R3BTwimCal2Hit : public FairTask
 
     /** Method to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetExpId(Int_t exp) {
+      R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId <<", New value:" << exp);
+      R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
+      fExpId = exp;
+    }
 
     /** Virtual method FinishTask **/
     virtual void FinishTask();

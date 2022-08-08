@@ -63,7 +63,7 @@ R3BTwimOnlineSpectra::R3BTwimOnlineSpectra(const TString& name, Int_t iVerbose)
     , fHitItemsMwpc3(NULL)
     , fHitItemsTofW(NULL)
     , fNEvents(0)
-    , fExpId(455)
+    , fExpId(0)
     , fNbSections(1)
     , fNbAnodes(1)
     , fNbTref(1)
@@ -80,15 +80,23 @@ InitStatus R3BTwimOnlineSpectra::Init()
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
-    // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    FairRootManager* rootManager = FairRootManager::Instance();
+    R3BLOG_IF(FATAL, NULL == rootManager, "FairRootManager not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
+    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+    if (fExpId == 0) // Obtain global ExpId if it's not set locally.
+    {
+        fExpId = header->GetExpId();
+        R3BLOG(INFO, "fExpId: " << fExpId);
+    }
+
     // get access to mapped data of the TWIM
-    fMappedItemsTwim = (TClonesArray*)mgr->GetObject("TwimMappedData");
+    fMappedItemsTwim = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fMappedItemsTwim)
     {
         R3BLOG(FATAL, "TwimMappedData not found");
@@ -96,19 +104,19 @@ InitStatus R3BTwimOnlineSpectra::Init()
     }
 
     // get access to cal data of the TWIM
-    fCalItemsTwim = (TClonesArray*)mgr->GetObject("TwimCalData");
+    fCalItemsTwim = (TClonesArray*)rootManager->GetObject("TwimCalData");
     R3BLOG_IF(WARNING, !fCalItemsTwim, "TwimCalData not found");
 
     // get access to hit data of the TWIM
-    fHitItemsTwim = (TClonesArray*)mgr->GetObject("TwimHitData");
+    fHitItemsTwim = (TClonesArray*)rootManager->GetObject("TwimHitData");
     R3BLOG_IF(WARNING, !fHitItemsTwim, "TwimHitData not found");
 
     // get access to hit data of the MWPC3
-    fHitItemsMwpc3 = (TClonesArray*)mgr->GetObject("Mwpc3HitData");
+    fHitItemsMwpc3 = (TClonesArray*)rootManager->GetObject("Mwpc3HitData");
     R3BLOG_IF(WARNING, !fHitItemsMwpc3, "Mwpc3HitData not found");
 
     // get access to hit data of the Tof-Wall
-    fHitItemsTofW = (TClonesArray*)mgr->GetObject("TofWHitData");
+    fHitItemsTofW = (TClonesArray*)rootManager->GetObject("TofWHitData");
     R3BLOG_IF(WARNING, !fHitItemsTofW, "TofWHitData not found");
 
     if (fExpId == 444 || fExpId == 467)

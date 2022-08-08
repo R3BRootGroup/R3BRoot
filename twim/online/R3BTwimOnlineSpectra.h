@@ -21,6 +21,7 @@
 #define R3BTwimOnlineSpectra_H 1
 
 #include "FairTask.h"
+#include "R3BLogger.h"
 #include "TCanvas.h"
 #include "TH1.h"
 #include "TH2F.h"
@@ -94,7 +95,11 @@ class R3BTwimOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
-    void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetExpId(Int_t exp) {
+      R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId <<", New value:" << exp);
+      R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
+      fExpId = exp;
+    }
 
   private:
     void s444_s467();

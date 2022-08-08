@@ -28,6 +28,7 @@ class R3BTimeStitch;
 class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
+class R3BEventHeader;
 
 class R3BBunchedFiberCal2Hit : public FairTask
 {
@@ -124,17 +125,20 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
     void SetOrientation(Orientation opt) { fOrientation = opt; }
 
-    void SetExpId(UInt_t opt) { fExpId = opt; }
+    void SetExpId(Int_t opt) { fExpId = opt; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
     void Standard();
     void S515();
+
+    R3BEventHeader* header; /**< Event header. */
+    
     TString fName;
     Int_t fnEvents;
     Int_t maxevent;
     Int_t fnEventsfill = 0;
     Int_t fNumFibers;
-    UInt_t fExpId;
+    Int_t fExpId;
     int fDetId;
 
     Int_t multi = 0;

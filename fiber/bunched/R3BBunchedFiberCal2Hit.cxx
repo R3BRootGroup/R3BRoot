@@ -15,6 +15,7 @@
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberHitData.h"
 #include "R3BBunchedFiberHitPar.h"
+#include "R3BEventHeader.h"
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
@@ -141,6 +142,10 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     R3BLOG(INFO, "");
     auto mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
+
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
@@ -316,7 +321,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
-    if (fExpId == 515)
+    if (fExpId == 515 || (fExpId == 0 && header->GetExpId() == 515)) // If fExpId is not set, global ExpId will be used
     {
         S515();
     }
@@ -522,10 +527,6 @@ void R3BBunchedFiberCal2Hit::Standard()
             mapmt_trig_table.resize(idx + 1);
         mapmt_trig_table.at(idx) = cal;
     }
-
-
-
-
 
     // TODO: This will create a map for every fiber detector... Urg.
     // Also since it's shared between many detectors it must be dynamic, for now.

@@ -63,7 +63,7 @@ R3BMusicOnlineSpectra::R3BMusicOnlineSpectra(const TString& name, Int_t iVerbose
     , fMappedItemsMus(NULL)
     , fCalItemsMus(NULL)
     , fHitItemsMus(NULL)
-    , fExpId(467)
+    , fExpId(0)
     , fERange(8192)
     , fZRange(40)
     , fNEvents(0)
@@ -94,7 +94,9 @@ InitStatus R3BMusicOnlineSpectra::Init()
         LOG(FATAL) << "R3BMusicOnlineSpectra::Init FairRootManager not found";
         return kFATAL;
     }
-    // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader.");
+    if (!header)
+        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -117,7 +119,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
         LOG(WARNING) << "R3BMusicOnlineSpectra: MusicHitData not found";
 
     // This changes the energy range for some experiments
-    if (fExpId == 515)
+    if (fExpId == 515 || (fExpId == 0 && header->GetExpId() == 515)) // If fExpId is not set, global ExpId will be used
     {
         fERange = 64000;
         fZRange = 60;

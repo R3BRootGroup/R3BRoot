@@ -23,12 +23,14 @@ class R3BEventHeader : public FairEventHeader
     R3BEventHeader();
     virtual ~R3BEventHeader();
 
+    void SetExpId(const Int_t expid) { fExpId = expid; }
     void SetEventno(const Int_t eventno) { fEventno = eventno; }
     void SetTrigger(const Int_t trigger) { fTrigger = trigger; }
     void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
     void SetTpat(const Int_t tpat) { fTpat = tpat; }
     void SetTStart(const Double_t tStart) { fTStart = tStart; }
 
+    Int_t GetExpId() const { return fExpId; }
     Int_t GetEventno() const { return fEventno; }
     Int_t GetTrigger() const { return fTrigger; }
     uint64_t GetTimeStamp() const { return fTimeStamp; }
@@ -48,6 +50,7 @@ class R3BEventHeader : public FairEventHeader
     virtual void Register(Bool_t Persistance = kTRUE);
 
   private:
+    Int_t fExpId;
     Int_t fEventno;
     Int_t fTrigger;
     uint64_t fTimeStamp;

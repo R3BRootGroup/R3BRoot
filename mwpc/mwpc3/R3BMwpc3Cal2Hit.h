@@ -34,6 +34,7 @@ using namespace std;
 #define Mw3PadsY 120
 
 class TClonesArray;
+class R3BEventHeader;
 
 class R3BMwpc3Cal2Hit : public FairTask
 {
@@ -62,7 +63,7 @@ class R3BMwpc3Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; }
+    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
 
@@ -70,6 +71,9 @@ class R3BMwpc3Cal2Hit : public FairTask
     virtual void S455();
     /** Private method Experiment s467 **/
     virtual void S467();
+
+    R3BEventHeader* header; /**< Event header. */
+    
     Double_t fSizeX; // Detector size in X and Y
     Double_t fSizeY; // Detector size in X and Y
     Double_t fwx;    // Pad width in X
