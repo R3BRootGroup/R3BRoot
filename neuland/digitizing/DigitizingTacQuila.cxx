@@ -59,7 +59,7 @@ namespace Neuland
             return cachedFirstHitOverThresh.get() != fPMTHits.end();
         }
 
-        Double_t Channel::GetQDC() const
+        Double_t Channel::GetQDC(UShort_t index) const
         {
             if (!cachedQDC.valid())
             {
@@ -68,7 +68,7 @@ namespace Neuland
             return cachedQDC;
         }
 
-        Double_t Channel::GetTDC() const
+        Double_t Channel::GetTDC(UShort_t index) const
         {
             if (!cachedTDC.valid())
             {
@@ -77,7 +77,7 @@ namespace Neuland
             return cachedTDC;
         }
 
-        Double_t Channel::GetEnergy() const
+        Double_t Channel::GetEnergy(UShort_t index) const
         {
             if (!cachedEnergy.valid())
             {
@@ -124,7 +124,7 @@ namespace Neuland
 
         Double_t Channel::BuildEnergy() const
         {
-            Double_t e = GetQDC();
+            Double_t e = GetQDC(0);
             // Apply reverse attenuation (TODO: Should be last?)
             e = e * exp((2. * (Digitizing::Paddle::gHalfLength)) * Digitizing::Paddle::gAttenuation / 2.);
             // Apply saturation

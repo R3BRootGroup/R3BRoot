@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 #include "DigitizingEngine.h"
+#include "FairLogger.h"
 #include <algorithm>
 #include <cmath>
-#include "FairLogger.h"
 
 namespace Neuland
 {
@@ -48,7 +48,8 @@ namespace Neuland
                    (!fLeftChannel->HasFired() && fRightChannel->HasFired());
         }
 
-        Double_t Paddle::GetEnergy(UShort_t index ) const { 
+        Double_t Paddle::GetEnergy(UShort_t index) const
+        {
             return std::sqrt(fLeftChannel->GetEnergy(index) * fRightChannel->GetEnergy(index));
         }
 
@@ -62,12 +63,15 @@ namespace Neuland
             return (fRightChannel->GetTDC(index) - fLeftChannel->GetTDC(index)) / 2. * gCMedium;
         }
 
-        const UShort_t Paddle::GetNHits() const {
-            if (fRightChannel->GetNHits() != fLeftChannel->GetNHits()){
+        const UShort_t Paddle::GetNHits() const
+        {
+            if (fRightChannel->GetNHits() != fLeftChannel->GetNHits())
+            {
                 LOG(ERROR) << "DigitizingEngine: nhits from both side of PMTs don't match!";
                 return 0;
             }
-            else{
+            else
+            {
                 return fRightChannel->GetNHits();
             }
         }
@@ -94,13 +98,13 @@ namespace Neuland
             const auto& paddle = kv.second;
 
             // TODO: Should be easier with std::min?
-            if (paddle->GetLeftChannel()->HasFired() && paddle->GetLeftChannel()->GetTDC() < triggerTime)
+            if (paddle->GetLeftChannel()->HasFired() && paddle->GetLeftChannel()->GetTDC(0) < triggerTime)
             {
-                triggerTime = paddle->GetLeftChannel()->GetTDC();
+                triggerTime = paddle->GetLeftChannel()->GetTDC(0);
             }
-            if (paddle->GetRightChannel()->HasFired() && paddle->GetRightChannel()->GetTDC() < triggerTime)
+            if (paddle->GetRightChannel()->HasFired() && paddle->GetRightChannel()->GetTDC(0) < triggerTime)
             {
-                triggerTime = paddle->GetRightChannel()->GetTDC();
+                triggerTime = paddle->GetRightChannel()->GetTDC(0);
             }
         }
         return triggerTime;

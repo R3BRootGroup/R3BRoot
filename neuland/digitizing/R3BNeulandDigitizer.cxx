@@ -17,13 +17,13 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include <TFile.h>
 #include "TGeoManager.h"
 #include "TGeoNode.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
 #include "TString.h"
+#include <TFile.h>
 #include <iostream>
 #include <stdexcept>
 
@@ -125,7 +125,6 @@ void R3BNeulandDigitizer::Exec(Option_t*)
                                      return kv.second->HasFired();
                                  }));
 
-
     // Create Hits
     for (const auto& kv : paddles)
     {
@@ -144,14 +143,14 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             const TVector3 hitPixel = fNeulandGeoPar->ConvertGlobalToPixel(hitPositionGlobal);
 
             R3BNeulandHit hit(paddleID,
-                    paddle->GetLeftChannel()->GetTDC(i),
-                    paddle->GetRightChannel()->GetTDC(i),
-                    paddle->GetTime(i),
-                    paddle->GetLeftChannel()->GetEnergy(i),
-                    paddle->GetRightChannel()->GetEnergy(i),
-                    paddle->GetEnergy(i),
-                    hitPositionGlobal,
-                    hitPixel);
+                              paddle->GetLeftChannel()->GetTDC(i),
+                              paddle->GetRightChannel()->GetTDC(i),
+                              paddle->GetTime(i),
+                              paddle->GetLeftChannel()->GetEnergy(i),
+                              paddle->GetRightChannel()->GetEnergy(i),
+                              paddle->GetEnergy(i),
+                              hitPositionGlobal,
+                              hitPixel);
 
             if (fHitFilters.IsValid(hit))
             {
