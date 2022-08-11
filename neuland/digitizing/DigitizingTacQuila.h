@@ -42,9 +42,9 @@ namespace Neuland
             ~Channel() override = default;
             void AddHit(Double_t mcTime, Double_t mcLight, Double_t dist) override;
             bool HasFired() const override;
-            Double_t GetQDC() const override;
-            Double_t GetTDC() const override;
-            Double_t GetEnergy() const override;
+            Double_t GetQDC(UShort_t index) const override;
+            Double_t GetTDC(UShort_t index) const override;
+            Double_t GetEnergy(UShort_t index) const override;
 
           private:
             // NOTE: Some expensive calculations and random distributions are cached
