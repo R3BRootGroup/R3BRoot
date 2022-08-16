@@ -71,6 +71,9 @@ class R3BFieldPar : public FairParGenericSet
     Double_t GetPositionX() const { return fPosX; }
     Double_t GetPositionY() const { return fPosY; }
     Double_t GetPositionZ() const { return fPosZ; }
+    Double_t GetXAngle() const { return fXAngle; }
+    Double_t GetYAngle() const { return fYAngle; }
+    Double_t GetZAngle() const { return fZAngle; }
     Double_t GetScale() const { return fScale; }
     Double_t GetCurrent() const { return fCurrent; }
 
@@ -78,6 +81,7 @@ class R3BFieldPar : public FairParGenericSet
     /** Field type
      ** 0 = constant field
      ** 1 = field map
+     ** 2 = Glad field map
      **/
     Int_t fType;
 
@@ -95,6 +99,9 @@ class R3BFieldPar : public FairParGenericSet
 
     /** Field centre position for field map **/
     Double_t fPosX, fPosY, fPosZ;
+
+    /** Euler rotations of the field map **/
+    Double_t fXAngle, fYAngle, fZAngle;
 
     /** Scaling factor for field map **/
     Double_t fScale;
