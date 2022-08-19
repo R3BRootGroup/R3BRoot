@@ -124,7 +124,6 @@ class R3BOnlineSpectraToFD_S494 : public FairTask
     TClonesArray* fLosTriggerCalDataItems;
     TClonesArray* fCalTriggerItems;
 
-
     enum DetectorInstances
     {
         DET_TOFD,
