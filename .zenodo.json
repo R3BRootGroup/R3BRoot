@@ -25,6 +25,9 @@
             "name": "Wagner, Vadim"
         },
         {
+            "name": "Rodriguez Sanchez, Jose Luis"
+        },
+        {
             "name": "Cabanelas, Pablo"
         },
         {
@@ -95,14 +98,15 @@
         },
         {
             "name": "Zanetti, Lorenzo"
+        },
+        {
+            "name": "Feijoo, Martina"
+        },
+        {
+            "name": "Panin, Valerii"
         }
     ],
     "description": "Software for simulations and data analysis of Reactions with Relativistic Radioactive Beams experiment at FAIR",
-    "grants": [
-        {
-            "id": "10.13039/501100000780::824064"
-        }
-    ],
     "keywords": [
         "MC simulation",
         "structure of nuclei",
@@ -111,9 +115,23 @@
     ],
     "language": "eng",
     "license": "GPL-3.0",
+    "notes": "Release Notes: ",
     "publication_date": "2009-08-01",
+    "related_identifiers": [
+        {
+            "identifier": "git+https://github.com/R3BRootGroup/R3BRoot.git",
+            "relation": "isDerivedFrom",
+            "resource_type": "software",
+            "scheme": "url"
+        },
+        {
+            "identifier": "https://github.com/R3BRootGroup/R3BRoot/blob/master/README.md",
+            "relation": "isDocumentedBy",
+            "resource_type": "publication-softwaredocumentation",
+            "scheme": "url"
+        }
+    ],
     "title": "R3BRoot",
     "upload_type": "software",
-    "version": "oct21"
+    "version": "sep22"
 }
-

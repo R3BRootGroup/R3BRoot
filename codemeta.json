@@ -10,8 +10,10 @@
   "downloadUrl": "https://github.com/R3BRootGroup/R3BRoot/archive/refs/tags/may21.tar.gz",
   "issueTracker": "https://github.com/R3BRootGroup/R3BRoot/issues",
   "name": "R3BRoot",
-  "version": "oct21",
+  "softwareVersion": "sep22",
   "description": "Software for simulations and data analysis of Reactions with Relativistic Radioactive Beams experiment at FAIR",
+  "readme": "https://github.com/R3BRootGroup/R3BRoot/blob/master/README.md",
+  "releaseNotes": "",
   "applicationCategory": "Nuclear physics",
   "developmentStatus": "active",
   "referencePublication": "https://doi.org/10.1088/1742-6596/523/1/012034",
@@ -35,6 +37,11 @@
   "softwareRequirements": [
     "FairRoot, FairSoft"
   ],
+  "maintainer": {
+    "@type": "Person",
+    "givenName": "Jose Luis",
+    "familyName": "Rodriguez Sanchez"
+  },
   "author": [
     {
       "@type": "Person",
