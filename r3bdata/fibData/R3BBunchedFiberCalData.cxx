@@ -35,6 +35,8 @@ Int_t R3BBunchedFiberCalData::GetChannel() const { return fChannel; }
 
 Double_t R3BBunchedFiberCalData::GetTime_ns() const { return fTime_ns; }
 
+Int_t R3BBunchedFiberCalData::GetSide() const { return fSide; }
+
 Bool_t R3BBunchedFiberCalData::IsMAPMT() const { return 1 == fSide; }
 
 Bool_t R3BBunchedFiberCalData::IsSPMT() const { return 2 == fSide; }

@@ -75,10 +75,6 @@ endif()
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
-# Check if the compiler support specific C++11 features Up to now this is only a check since the
-# code does not use any of the features of the new standard
-include(CheckCXX11Features)
-
 # Load some basic macros which are needed later on
 include(FairMacros)
 include(R3BMacros)
@@ -87,21 +83,17 @@ include(Dart)
 include(CheckCompiler)
 include(WriteEnvCache)
 
-# R3BRoot uses from 10.08.15 C++11, so we need an compiler which supports C++11 Check if the used
-# compiler support C++11. If not stop with an error message Check also if FairSoft and FairRoot have
-# been compiled with C++11 support
-if(NOT _HAS_CXX11_FLAG)
-    message(
-        FATAL_ERROR
-            "The used C++ compiler (${CMAKE_CXX_COMPILER}) does not support C++11. R3BRoot can only be compiled with compilers supporting C++11. Please install such an compiler."
-        )
-endif()
-
 if(SIMPATH)
   set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
 endif()
 
 find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
+if(ROOT_vmc_FOUND)
+  set(VMCLIB ROOT::VMC)
+else()
+  find_package2(PUBLIC VMC REQUIRED)
+  set(VMCLIB VMCLibrary)
+endif()
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
   if(NOT dep STREQUAL "Boost")

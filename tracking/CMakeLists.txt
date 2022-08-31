@@ -59,7 +59,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF TrackingLinkDef.h)
 Set(LIBRARY_NAME R3BTracking)
 Set(DEPENDENCIES
-    Base ParBase Minuit)
+  Base ParBase TrkBase R3BBase Minuit)
 
 GENERATE_LIBRARY()
 

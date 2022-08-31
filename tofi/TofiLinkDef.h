@@ -25,6 +25,7 @@
 #pragma link C++ class R3BTofiChangePar+;
 #pragma link C++ class R3BTofiCal2HitS494+;
 #pragma link C++ class R3BTofiHitModulePar+;
+#pragma link C++ class R3BTofiDigiPar+;
 #pragma link C++ class R3BTofi+;
 #pragma link C++ class R3BTofiDigitizerCal+;
 #pragma link C++ class R3BGeoTofiPar+;

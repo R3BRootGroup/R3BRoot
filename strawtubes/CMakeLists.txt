@@ -48,8 +48,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 Set(LINKDEF StrawtubesLinkDef.h)
 Set(LIBRARY_NAME R3BStrawtubes)
-#Set(DEPENDENCIES
-#    R3Bbase R3BData R3BPassive R3BTCal)
+Set(DEPENDENCIES
+    R3BBase R3BData R3BPassive R3BTCal)
 
 GENERATE_LIBRARY()
 
