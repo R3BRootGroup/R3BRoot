@@ -14,7 +14,7 @@
 set(LIBRARY_NAME R3BNeulandOnline)
 set(LINKDEF NeulandOnlineLinkDef.h)
 
-set(DEPENDENCIES R3BData)
+set(DEPENDENCIES R3BData R3BBase)
 
 set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} 
 ${R3BROOT_SOURCE_DIR}/neuland/online)

@@ -48,7 +48,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 # set(LINKDEF CaloLinkDef.h)
 set(LIBRARY_NAME timestitcher)
 set(DEPENDENCIES
-    R3BData R3BCalifa)
+  R3BData R3BBase R3BCalifa)
 
 GENERATE_LIBRARY()
 

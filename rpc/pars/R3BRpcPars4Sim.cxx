@@ -79,3 +79,6 @@ void R3BRpcPars4Sim::printParams()
         LOG(INFO) << i + 1 << " " << fChannelIDArray->GetAt(i);
     }
 }
+
+ClassImp(R3BRpcPars4Sim)
+

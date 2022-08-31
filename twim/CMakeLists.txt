@@ -78,6 +78,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TwimLinkDef.h)
 set(LIBRARY_NAME R3BTwim)
 set(DEPENDENCIES
-    R3BBase R3BData)
+  R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()

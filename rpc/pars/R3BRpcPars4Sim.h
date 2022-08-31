@@ -61,6 +61,7 @@ class R3BRpcPars4Sim : public FairParGenericSet
 
     R3BRpcPars4Sim(const R3BRpcPars4Sim&); /*  a copy constructor  */
 
+  public:
     ClassDef(R3BRpcPars4Sim, 1);
 };
 

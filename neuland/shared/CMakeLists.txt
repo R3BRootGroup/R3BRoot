@@ -14,7 +14,7 @@
 set(LIBRARY_NAME R3BNeulandShared)
 set(LINKDEF NeulandSharedLinkDef.h)
 
-set(DEPENDENCIES R3BData)
+set(DEPENDENCIES R3BData R3BBase ParBase)
 
 include_directories(${INCLUDE_DIRECTORIES})
 

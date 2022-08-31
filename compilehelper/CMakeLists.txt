@@ -61,8 +61,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF LinkDef.h)
 set(LIBRARY_NAME R3BMacroCompiler)
-#set(DEPENDENCIES
-#    R3Bbase R3BData R3BPassive R3BXBall)
+set(DEPENDENCIES
+    R3BBase R3BData R3BPassive R3BXBall)
 
 GENERATE_LIBRARY()
 
