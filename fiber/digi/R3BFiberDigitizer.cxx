@@ -33,18 +33,8 @@
 #include <string>
 
 R3BFiberDigitizer::R3BFiberDigitizer(const TString& name)
-    : FairTask("R3B" + name + "Digitizer")
-    , fName(name)
-    , fFiPoints(NULL)
-    , fFiHits(NULL)
+    : R3BFiberDigitizer(name, 0.001, 0.01, 1.0)
 {
-    esigma = 0.001;
-    tsigma = 0.01;
-    ysigma = 1;
-    fiber_thickness = 0.10000;
-    fiber_nbr = 512;
-    air_layer = 0.01; // relative to fiber_thickness
-    detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 }
 
 R3BFiberDigitizer::R3BFiberDigitizer(const TString& name, Double_t e, Double_t t, Double_t y)
@@ -53,6 +43,7 @@ R3BFiberDigitizer::R3BFiberDigitizer(const TString& name, Double_t e, Double_t t
     , fFiPoints(NULL)
     , fFiHits(NULL)
 {
+    fMinPID = 1000020030; // Z=2 and A=3
     esigma = e;
     tsigma = t;
     ysigma = y;
@@ -65,7 +56,7 @@ R3BFiberDigitizer::R3BFiberDigitizer(const TString& name, Double_t e, Double_t t
 R3BFiberDigitizer::~R3BFiberDigitizer()
 {
     if (fFiPoints)
-        delete[] fFiPoints;
+        delete fFiPoints;
 }
 
 void R3BFiberDigitizer::SetEnergyResolution(Double_t e) { esigma = e; }
@@ -80,11 +71,13 @@ void R3BFiberDigitizer::SetParContainers()
     fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName + "GeoPar");
     if (!fFiGeoPar)
     {
-        LOG(ERROR) << "R3BFiberDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.";
+        R3BLOG(ERROR, "R3BFiberDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.");
         return;
     }
     else
-        LOG(INFO) << "R3BFiberDigitizer::SetParContainers() : Container " + fName + "GeoPar found.";
+    {
+        R3BLOG(INFO, "R3BFiberDigitizer::SetParContainers() : Container " + fName + "GeoPar found.");
+    }
 }
 
 void R3BFiberDigitizer::SetParameter()
@@ -129,11 +122,12 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
     Reset();
     // Reading the Input -- Point Data --
     Int_t nHits = fFiPoints->GetEntriesFast();
-    if (!nHits)
+    if (nHits == 0)
+    {
         return;
+    }
     // Data from Point level
-    R3BFibPoint** pointData;
-    pointData = new R3BFibPoint*[nHits];
+    R3BFibPoint** pointData = new R3BFibPoint*[nHits];
     Int_t fiber = 0;
     Int_t TrackId = 0, PID = 0, mother = -1;
     Double_t x = 0., y = 0., z = 0., time = 0.;
@@ -141,7 +135,6 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-
         pointData[i] = (R3BFibPoint*)(fFiPoints->At(i));
         TrackId = pointData[i]->GetTrackID();
 
@@ -149,21 +142,30 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
         PID = Track->GetPdgCode();
         // mother = Track->GetMotherId();
 
-        if (PID > 1000401000) // Z=40 and A=100
+        if (PID >= fMinPID)
         {
             x = (pointData[i]->GetXIn() + pointData[i]->GetXOut()) / 2.;
             y = (pointData[i]->GetYIn() + pointData[i]->GetYOut()) / 2.;
             z = (pointData[i]->GetZIn() + pointData[i]->GetZOut()) / 2.;
             vpos.SetXYZ(x, y, z);
 
-            vpos = fRot * (vpos - fTrans);
+            // vpos = fRot * (vpos - fTrans);
+            vpos = (vpos - fTrans);
             // vpos = fRot * (vpos);
-            // time = pointData[i]->GetTime() + rand->Gaus(0., fsigma_t);
+            time = pointData[i]->GetTime() + rand->Gaus(0., tsigma);
 
             fiber = (int)std::round(vpos.X() / fiber_thickness);
             // Add hit data
-            AddHitData(
-                1, vpos.X() * 10. + rand->Gaus(0., 0.1), vpos.Y() * 10. + rand->Gaus(0., 0.1), 1, 1, fiber, 1, 1, 1, 1);
+            AddHitData(1,
+                       vpos.X() * 10. + rand->Gaus(0., 0.1),
+                       vpos.Y() * 10. + rand->Gaus(0., 0.1),
+                       1,
+                       time,
+                       fiber,
+                       1,
+                       1,
+                       1,
+                       1);
         }
     }
     if (pointData)
