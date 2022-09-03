@@ -20,10 +20,10 @@
 #define R3BFiberDigitizer_H 1
 
 #include "FairTask.h"
-#include "TRotation.h"
 #include "R3BBunchedFiberHitData.h"
-#include <TRandom3.h>
+#include "TRotation.h"
 #include "TVector3.h"
+#include <TRandom3.h>
 #include <string>
 
 class TClonesArray;
@@ -57,11 +57,13 @@ class R3BFiberDigitizer : public FairTask
     void SetEnergyResolution(Double_t e);
     void SetTimeResolution(Double_t t);
     void SetYPositionResolution(Double_t y);
+    void SetMinPID(Int_t min) { fMinPID = min; }
 
   private:
     void SetParameter();
     TString fName;
     TRandom3* rand;
+    Int_t fMinPID;
     Double_t esigma;
     Double_t tsigma;
     Double_t ysigma;
@@ -81,10 +83,16 @@ class R3BFiberDigitizer : public FairTask
 
     /** Private method AddHitData **/
     // Adds a R3BFiberHitData
-    R3BBunchedFiberHitData* AddHitData(Int_t DetId, Double_t x, Double_t y,
-               Double_t Eloss, Double_t time, Int_t fiber, Double_t a_bottom_time_ns, Double_t a_top_time_ns,
-               Double_t a_bottom_tot_ns, Double_t a_top_tot_ns);
-
+    R3BBunchedFiberHitData* AddHitData(Int_t DetId,
+                                       Double_t x,
+                                       Double_t y,
+                                       Double_t Eloss,
+                                       Double_t time,
+                                       Int_t fiber,
+                                       Double_t a_bottom_time_ns,
+                                       Double_t a_top_time_ns,
+                                       Double_t a_bottom_tot_ns,
+                                       Double_t a_top_tot_ns);
 
     ClassDef(R3BFiberDigitizer, 1);
 };
