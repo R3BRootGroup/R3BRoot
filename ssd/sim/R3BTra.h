@@ -125,6 +125,9 @@ class R3BTra : public R3BDetector
     TClonesArray* fTraCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
+    Int_t fNbDet;
+    Int_t fdetid[20];
+    Int_t GetDetId(Int_t);
 
     /** Private method AddHit
      **
@@ -148,7 +151,7 @@ class R3BTra : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BTra, 3);
+    ClassDef(R3BTra, 4);
 };
 
 inline void R3BTra::ResetParameters()

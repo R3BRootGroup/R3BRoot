@@ -39,7 +39,7 @@ class R3BAmsStripCalData : public FairMultiLinkedData
      *@param fStripId  Strip unique identifier
      *@param fEnergy   Total energy deposited on the strip ([GeV] in sim)
      **/
-    R3BAmsStripCalData(Int_t detid, Int_t sideid, Int_t stripid, Double_t energy);
+    R3BAmsStripCalData(Int_t detid, Int_t sideid, Int_t stripid, Double32_t energy);
 
     /** Copy constructor **/
     R3BAmsStripCalData(const R3BAmsStripCalData&);
@@ -53,7 +53,7 @@ class R3BAmsStripCalData : public FairMultiLinkedData
     inline const Int_t& GetDetId() const { return fDetId; }
     inline const Int_t& GetSideId() const { return fSideId; }
     inline const Int_t& GetStripId() const { return fStripId; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
+    inline const Double32_t& GetEnergy() const { return fEnergy; }
 
     /** Modifiers **/
     void SetDetId(Int_t detid) { fDetId = detid; }
@@ -61,11 +61,13 @@ class R3BAmsStripCalData : public FairMultiLinkedData
     void SetStripId(Int_t stripid) { fStripId = stripid; }
     void SetEnergy(Double32_t energy) { fEnergy = energy; }
 
+    void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
+
   protected:
-    Int_t fDetId;     // detector unique identifier
-    Int_t fSideId;    // side unique identifier
-    Int_t fStripId;   // strip unique identifier
-    Double_t fEnergy; // total energy in the strip
+    Int_t fDetId;       // detector unique identifier
+    Int_t fSideId;      // side unique identifier
+    Int_t fStripId;     // strip unique identifier
+    Double32_t fEnergy; // total energy in the strip
 
     ClassDef(R3BAmsStripCalData, 1)
 };

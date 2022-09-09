@@ -14,11 +14,11 @@
 // ----------------------------------------------------------------------
 // -----                                                            -----
 // -----                     R3BAmsStripCal2Hit                     -----
-// -----             Created 01/06/18  by J.L. Rodriguez-Sanchez    -----
+// -----             Created 01/06/18 by J.L. Rodriguez-Sanchez    -----
 // ----------------------------------------------------------------------
 
 #ifndef R3BAmsStripCal2Hit_H
-#define R3BAmsStripCal2Hit_H
+#define R3BAmsStripCal2Hit_H 1
 
 #include "FairTask.h"
 

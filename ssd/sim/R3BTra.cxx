@@ -20,8 +20,7 @@
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
-#include "R3BGeoTra.h"
-#include "R3BGeoTraPar.h"
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
 #include "R3BTraPoint.h"
 #include "TClonesArray.h"
@@ -30,7 +29,6 @@
 #include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-#include <stdlib.h>
 
 R3BTra::R3BTra()
     : R3BTra("")
@@ -48,6 +46,7 @@ R3BTra::R3BTra(const TString& geoFile, const TGeoCombiTrans& combi)
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
     , flGeoPar(new TList())
+    , fNbDet(20)
 {
     flGeoPar->SetName(GetName());
     ResetParameters();
@@ -73,8 +72,15 @@ void R3BTra::Initialize()
     LOG(INFO) << "R3BTra: initialisation";
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
-    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Alpide");
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot_");
+
+    Char_t buffer[126];
+    for (Int_t i = 0; i < fNbDet; i++)
+    {
+        sprintf(buffer, "Det%i", i + 1);
+        LOG(DEBUG) << "Det " << i << " connected to (McId) ---> " << buffer << "  " << gMC->VolId(buffer);
+        fdetid[i] = gMC->VolId(buffer);
+    }
 }
 
 void R3BTra::SetSpecialPhysicsCuts()
@@ -375,6 +381,21 @@ void R3BTra::SetSpecialPhysicsCuts()
     } //! gGeoManager
 }
 
+Int_t R3BTra::GetDetId(Int_t volID)
+{
+    Int_t detid = -1;
+
+    for (Int_t i = 0; i < fNbDet; i++)
+    {
+        if (volID == fdetid[i] + 1 || volID == fdetid[i] + 2)
+        {
+            detid = i;
+            return (detid);
+        }
+    }
+    return detid;
+}
+
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol)
 {
@@ -395,7 +416,8 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         fVolumeID = vol->getMCid();
-        fDetCopyID = vol->getCopyNo(); // added by Marc
+        fVolumeID = GetDetId(fVolumeID);
+        fDetCopyID = vol->getCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -436,7 +458,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
 
         AddHit(fTrackID,
                fVolumeID,
-               fDetCopyID, // added by Marc
+               fDetCopyID,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
                TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),

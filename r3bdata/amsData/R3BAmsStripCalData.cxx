@@ -23,12 +23,12 @@ R3BAmsStripCalData::R3BAmsStripCalData()
     , fDetId(-1)
     , fSideId(-1.)
     , fStripId(-1)
-    , fEnergy(-1.)
+    , fEnergy(0.)
 {
 }
 
 // -----   Standard constructor   ------------------------------------------
-R3BAmsStripCalData::R3BAmsStripCalData(Int_t detid, Int_t sideid, Int_t stripid, Double_t energy)
+R3BAmsStripCalData::R3BAmsStripCalData(Int_t detid, Int_t sideid, Int_t stripid, Double32_t energy)
     : FairMultiLinkedData()
     , fDetId(detid)
     , fSideId(sideid)

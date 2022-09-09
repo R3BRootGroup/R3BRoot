@@ -23,6 +23,7 @@
 #pragma link C++ class R3BGeoTraPar+;
 #pragma link C++ class R3BTra+;
 #pragma link C++ class R3BTraDigitizer+;
+#pragma link C++ class R3BAmsDigitizer+;
 #pragma link C++ class R3BTraDigiPar+;
 #pragma link C++ class R3BSsdContFact+;
 #pragma link C++ class R3BTargetDigitizer+;

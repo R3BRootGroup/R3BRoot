@@ -20,7 +20,7 @@
  **/
 
 #ifndef R3BTRAPOINT_H
-#define R3BTRAPOINT_H
+#define R3BTRAPOINT_H 1
 
 #include "TObject.h"
 #include "TVector3.h"

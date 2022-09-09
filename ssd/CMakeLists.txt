@@ -64,6 +64,7 @@ set(SRCS
 ./digi/R3BTraDigitizer.cxx
 ./digi/R3BTargetDigiPar.cxx
 ./digi/R3BTargetDigitizer.cxx
+./digi/R3BAmsDigitizer.cxx
 ./digi/R3BTra2pDigiPar.cxx
 ./digi/R3BTra2pDigitizer.cxx
 ./digi/R3BTraFraDigiPar.cxx

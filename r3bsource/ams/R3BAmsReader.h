@@ -13,11 +13,11 @@
 
 // ----------------------------------------------------------------------
 // -----                         R3BAmsReader                       -----
-// -----             Created 12/05/18  by J.L. Rodriguez-Sanchez    -----
+// -----             Created 12/05/18 by J.L. Rodriguez-Sanchez     -----
 // ----------------------------------------------------------------------
 
 #ifndef R3BAMSREADER_H
-#define R3BAMSREADER_H
+#define R3BAMSREADER_H 1
 
 #include "R3BReader.h"
 #include <Rtypes.h>
