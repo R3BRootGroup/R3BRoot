@@ -133,8 +133,8 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             multTcal[d][pmt] = 0;
             for (UShort_t m = 0; m < 64; m++)
 	        {
-                iRawTimeNs[d][pmt][m] = 0.;
-                tRawTimeNs[d][pmt][m] = 0.;
+			iRawTimeNs[d][pmt][m] = 0.;
+			tRawTimeNs[d][pmt][m] = 0.;
 		        tCh[d][pmt][m] = false;
 	        }
         }
@@ -201,18 +201,17 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
         for (UShort_t d = 0; d < 2; d++)
         {
 		    for (int m = 0; m < tHits[d]; m++)
-            {
-		       	if(tCh[d][0][m] && tCh[d][1][m])	//only take hits for which both sides have signal
-		       	{
-			    	PosCal = fPos_p0 + fPos_p1 * (tRawTimeNs[d][0][m] - tRawTimeNs[d][1][m]);
-			    	Tmean = 0.5 * (tRawTimeNs[d][0][m] + tRawTimeNs[d][1][m]);
-			    	if (multTcal[d][2] == 1)
-					Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
-			    	AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
-			    }
-				
-              }	
-              // end of hit loop
+		    {
+    			    if(tCh[d][0][m] && tCh[d][1][m])	//only take hits for which both sides have signal
+    			    {
+    				    PosCal = fPos_p0 + fPos_p1 * (tRawTimeNs[d][0][m] - tRawTimeNs[d][1][m]);
+    				    Tmean = 0.5 * (tRawTimeNs[d][0][m] + tRawTimeNs[d][1][m]);
+    				    if (multTcal[d][2] == 1)
+    					    Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
+    				    AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+    			    }
+		    }	
+      	    // end of hit loop
         }     // end of loop over the number of detectors
     }         // end of if Tcal data
     return;
@@ -220,10 +219,10 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
 
 void R3BSci2Tcal2Hit::FinishEvent()
 {
-    if (fHitItems)
-    {
-        fHitItems->Clear();
-    }
+    	if (fHitItems)
+    	{
+	    	fHitItems->Clear();
+    	}
 }
 
 // -----   Private method AddHitData  --------------------------------------------

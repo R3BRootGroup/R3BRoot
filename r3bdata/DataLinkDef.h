@@ -126,6 +126,7 @@
 #pragma link C++ class R3BPspxHitData+;
 #pragma link C++ class R3BLosMappedData+;
 #pragma link C++ class R3BLosCalData+;
+#pragma link C++ class R3BLosTCalData+;
 #pragma link C++ class R3BLosHitData+;
 #pragma link C++ class R3BRoluMappedData+;
 #pragma link C++ class R3BRoluCalData+;
