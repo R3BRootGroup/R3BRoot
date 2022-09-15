@@ -48,6 +48,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 calib/R3BLosMapped2Cal.cxx
+calib/R3BLosMapped2TCal.cxx
 params/R3BLosMapped2CalPar.cxx
 calib/R3BLosCal2Hit.cxx
 R3BLosProvideTStart.cxx

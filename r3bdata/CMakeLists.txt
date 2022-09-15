@@ -134,6 +134,7 @@ pspData/R3BPspxCalData.cxx
 pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
 losData/R3BLosCalData.cxx
+losData/R3BLosTCalData.cxx
 losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx

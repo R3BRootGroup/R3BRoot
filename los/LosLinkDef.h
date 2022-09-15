@@ -20,6 +20,7 @@
 #pragma link off all functions;
  
 #pragma link C++ class R3BLosMapped2Cal+;
+#pragma link C++ class R3BLosMapped2TCal+;
 #pragma link C++ class R3BLosMapped2CalPar+;
 #pragma link C++ class R3BLosCal2Hit+;
 #pragma link C++ class R3BLosHitPar+;
