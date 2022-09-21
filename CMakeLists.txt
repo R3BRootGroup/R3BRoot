@@ -89,7 +89,7 @@ endif()
 
 find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
 if(ROOT_vmc_FOUND)
-  set(VMCLIB ROOT::VMC)
+  set(VMCLIB VMC)
 else()
   find_package2(PUBLIC VMC REQUIRED)
   set(VMCLIB VMCLibrary)
