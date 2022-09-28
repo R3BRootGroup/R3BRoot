@@ -26,7 +26,7 @@ extern "C"
 
 R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, size_t offset)
     : R3BReader("R3BUnpackReader")
-    , fNEvent(1)
+    , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fHeader(NULL)
@@ -77,7 +77,7 @@ Bool_t R3BUnpackReader::Read()
     //		fData->TRIGGER);
     //  LOG(info) << strMessage;
 
-    fNEvent = fData->EVENTNO;
+    // fNEvent = fData->EVENTNO;
 
     if (0 == (fNEvent % 1000))
     {
@@ -87,7 +87,7 @@ Bool_t R3BUnpackReader::Read()
     if (fHeader)
     {
         fHeader->SetTrigger(fData->TRIGGER);
-        fHeader->SetEventno(fNEvent);
+        fHeader->SetEventno(fNEvent++);
     }
 
     return kTRUE;

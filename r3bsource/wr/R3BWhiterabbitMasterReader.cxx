@@ -15,9 +15,9 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BWRData.h"
 #include "R3BWhiterabbitMasterReader.h"
-#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 
@@ -69,7 +69,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO,"EventHeader. found");
+        R3BLOG(INFO, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
@@ -91,7 +91,7 @@ Bool_t R3BWhiterabbitMasterReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->TIMESTAMP_MASTER_ID);

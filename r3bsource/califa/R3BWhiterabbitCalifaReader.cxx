@@ -96,7 +96,7 @@ Bool_t R3BWhiterabbitCalifaReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId1,
                  fData->TIMESTAMP_CALIFA1ID);
@@ -108,7 +108,7 @@ Bool_t R3BWhiterabbitCalifaReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId2,
                  fData->TIMESTAMP_CALIFA2ID);

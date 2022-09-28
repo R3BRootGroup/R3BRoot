@@ -12,8 +12,6 @@
  ******************************************************************************/
 
 #include "R3BEventHeader.h"
-//#include "FairLogger.h"
-//#include "FairRootManager.h"
 
 R3BEventHeader::R3BEventHeader()
     : FairEventHeader()
@@ -28,14 +26,6 @@ R3BEventHeader::R3BEventHeader()
 
 R3BEventHeader::~R3BEventHeader() {}
 
-void R3BEventHeader::Register(Bool_t Persistence)
-{
-    /*   FairRootManager* frm = FairRootManager::Instance();
-       LOG(INFO) << "R3BEventHeader::Register of R3BEventHeader";
-       if (!frm)
-           LOG(FATAL) << "R3BEventHeader::FairRootManager no found";
-       frm->Register("EventHeader.", "R3BEvtHeader", this, Persistence);
-       */
-}
+void R3BEventHeader::Register(Bool_t Persistence) {}
 
-ClassImp(R3BEventHeader)
+ClassImp(R3BEventHeader);

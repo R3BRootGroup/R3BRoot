@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef _R3BREADER_H
-#define _R3BREADER_H
+#define _R3BREADER_H 1
 
 #include "TObject.h"
 #include "TString.h"
@@ -21,9 +21,6 @@ extern "C"
 {
 #include "ext_data_struct_info.hh"
 }
-
-//#define EXP_SPECIFIC_H101_FILE "jun16_ext_h101.h"
-//#define EXP_SPECIFIC_H101_FILE "ext_h101.h"
 
 class TClonesArray;
 class R3BEventHeader;
@@ -52,4 +49,4 @@ class R3BReader : public TObject
     ClassDef(R3BReader, 0);
 };
 
-#endif
+#endif /* _R3BREADER_H */

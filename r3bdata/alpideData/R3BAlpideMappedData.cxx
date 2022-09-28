@@ -20,16 +20,18 @@
 R3BAlpideMappedData::R3BAlpideMappedData()
     : fSenId(0)
     , fReg(0)
-    , fCol(0)
     , fAds(0)
+    , fRow(0)
+    , fCol(0)
 {
 }
 
-R3BAlpideMappedData::R3BAlpideMappedData(UShort_t senId, UShort_t reg, UShort_t col, UShort_t ads)
+R3BAlpideMappedData::R3BAlpideMappedData(UShort_t senId, UShort_t reg, UShort_t ads, UShort_t row, UShort_t col)
     : fSenId(senId)
     , fReg(reg)
-    , fCol(col)
     , fAds(ads)
+    , fRow(row)
+    , fCol(col)
 {
 }
 

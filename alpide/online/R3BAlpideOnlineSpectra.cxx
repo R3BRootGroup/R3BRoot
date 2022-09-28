@@ -324,10 +324,10 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
             auto hit = (R3BAlpideMappedData*)fMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_ColVsRow[hit->GetSensorId() - 1]->Fill(hit->GetCol(), hit->GetAds());
+            fh2_ColVsRow[hit->GetSensorId() - 1]->Fill(hit->GetCol(), hit->GetRow());
         }
     }
-
+/*
     // Fill cal data
     if (fCalItems && fCalItems->GetEntriesFast() > 0)
     {
@@ -374,7 +374,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
         for (Int_t s = 0; s < fNbSensors; s++)
             fh1_Clustermult[s]->Fill(mult[s]);
     }
-
+*/
     fNEvents++;
 }
 

@@ -17,7 +17,7 @@
 // ---------------------------------------------------------------------
 
 #ifndef R3BALPIDEREADER_H
-#define R3BALPIDEREADER_H
+#define R3BALPIDEREADER_H 1
 
 #include "R3BReader.h"
 #include "TLeaf.h"
@@ -26,7 +26,7 @@
 #include <fstream>
 #include <stdint.h>
 
-using std::ifstream;
+// using std::ifstream;
 
 class TClonesArray;
 
@@ -57,22 +57,27 @@ class R3BAlpideReader : public R3BReader
     void SetOnline(Bool_t option) { fOnline = option; }
 
     // Set input file
-    void SetFile(TString name) { fFileName = name; }
+    // void SetFile(TString name) { fFileName = name; }
 
     // Set input root file
-    void SetRootFile(TString name) { fRootName = name; }
+    // void SetRootFile(TString name) { fRootName = name; }
+
+    // Set number of sensors
+    void SetDet(uint n) { fNbDet = n; }
 
   private:
     // Input file
-    ifstream* fInput;
-    TTree* fTree;
-    TString fFileName;
-    TString fRootName;
-    int ae;
-    int b, c, d, e, f, g;
-    TLeaf *fRow, *fCol, *fDet, *trgNum, *trgTime;
+    //  ifstream* fInput;
+    //  TTree* fTree;
+    //  TString fFileName;
+    //   TString fRootName;
+    //    int ae;
+    //    int b, c, d, e, f, g;
+    // TLeaf *fRow, *fCol, *fDet, *trgNum, *trgTime;
     // An event counter
     unsigned int fNEvent;
+    // Number of ALPIDE sensors
+    uint fNbDet;
     // Reader specific data structure from ucesb
     EXT_STR_h101_ALPIDE_onion* fData;
     // Data offset

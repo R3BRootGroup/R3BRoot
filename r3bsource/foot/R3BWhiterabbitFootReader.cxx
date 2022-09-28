@@ -92,7 +92,7 @@ Bool_t R3BWhiterabbitFootReader::Read()
             char strMessage[1000];
             snprintf(strMessage,
                      sizeof strMessage,
-                     "Event %u: Whiterabbit ID mismatch for det=%u: expected 0x%x, got 0x%x.\n",
+                     "Event %lu: Whiterabbit ID mismatch for det=%u: expected 0x%x, got 0x%x.\n",
                      fEventHeader->GetEventno(),
                      d,
                      fWhiterabbitId[d],

@@ -42,7 +42,7 @@ class R3BUnpackReader : public R3BReader
 
   private:
     // An event counter
-    UInt_t fNEvent;
+    uint64_t fNEvent;
     // Reader specific data structure from ucesb
     EXT_STR_h101_unpack* fData;
     // Offset of detector specific data in full data structure
