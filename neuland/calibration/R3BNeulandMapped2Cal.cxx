@@ -17,7 +17,9 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BNeulandCalData.h"
+#include "R3BNeulandMappingPar.h"
 #include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
@@ -31,7 +33,9 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal()
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
     , fMapped(NULL)
-    , fPmt(new TClonesArray("R3BNeulandCalData"))
+    , fMappedTrigger(NULL)
+    , fMapPar(NULL)
+    , fCal(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
@@ -45,7 +49,9 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
     , fMapped(NULL)
-    , fPmt(new TClonesArray("R3BNeulandCalData"))
+    , fMappedTrigger(NULL)
+    , fMapPar(NULL)
+    , fCal(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
@@ -55,10 +61,10 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BNeulandMapped2Cal::~R3BNeulandMapped2Cal()
 {
-    if (fPmt)
+    if (fCal)
     {
-        delete fPmt;
-        fPmt = NULL;
+        delete fCal;
+        fCal = NULL;
         fNPmt = 0;
     }
 }
@@ -92,32 +98,63 @@ InitStatus R3BNeulandMapped2Cal::Init()
     {
         LOG(FATAL) << "Branch NeulandMapped not found";
     }
+    fMappedTrigger = (TClonesArray*)mgr->GetObject("NeulandTrigMappedData");
+    if (NULL == fMappedTrigger)
+    {
+        LOG(INFO) << "Branch NeulandTrigMapped not found";
+    }
 
-    mgr->Register("NeulandCalData", "Neuland", fPmt, kTRUE);
+    mgr->Register("NeulandCalData", "Neuland", fCal, kTRUE);
+    fCal->Clear();
 
     htcal1 = new TH2F("htcal1", "htcal1", 800, 0.5, 800.5, 500, -1., 6.);
     htcal2 = new TH2F("htcal2", "htcal2", 800, 0.5, 800.5, 500, -1., 6.);
     htcal3 = new TH2F("htcal3", "htcal3", 800, 0.5, 800.5, 500, -1., 6.);
     htcal4 = new TH2F("htcal4", "htcal4", 800, 0.5, 800.5, 500, -1., 6.);
 
+    SetParameter();
+    R3BLOG(INFO, "Read " << fNofTcalPars << " modules");
     return kSUCCESS;
 }
 
 void R3BNeulandMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
+    // Parameter Container
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+
+    fMapPar = (R3BNeulandMappingPar*)rtdb->getContainer("neulandMappingPar");
+    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to neulandMappingPar container");
+
+    fTcalPar = (R3BTCalPar*)rtdb->getContainer("LandTCalPar");
 
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to LandTCalPar-Container.";
         fNofTcalPars = 0;
-        return;
     }
+    return;
+}
+
+void R3BNeulandMapped2Cal::SetParameter()
+{
+    //--- Parameter Container ---
+    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    if (fMapPar)
+    {
+        fNofPlanes = fMapPar->GetNbPlanes();
+        fNofBarsPerPlane = fMapPar->GetNbPaddles();
+    }
+
+    fNofTcalPars = fTcalPar->GetNumModulePar();
+    R3BLOG_IF(FATAL, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
+    return;
 }
 
 InitStatus R3BNeulandMapped2Cal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -155,7 +192,26 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
 
 void R3BNeulandMapped2Cal::MakeCal()
 {
-    Int_t nHits = fMapped->GetEntriesFast();
+    Int_t nHits = 0;
+    // Map and calibrate triggers.
+    std::vector<double> trig_map(13 * fNofPlanes);
+    if (fMappedTrigger)
+    {
+        nHits = fMappedTrigger->GetEntriesFast();
+        for (int i = 0; i < nHits; ++i)
+        {
+            auto* mapped = (R3BPaddleTamexMappedData*)fMappedTrigger->At(i);
+            auto iBar = mapped->GetBarId();
+            auto par = fTcalPar->GetModuleParAt(100, iBar, 10);
+            if (!par)
+            {
+                continue;
+            }
+            auto time = par->GetTimeVFTX(mapped->fFineTime1LE);
+            trig_map.at(iBar - 1) = fClockFreq - time + mapped->fCoarseTime1LE * fClockFreq;
+        }
+    }
+    nHits = fMapped->GetEntriesFast();
 
     R3BTCalModulePar* par;
 
@@ -176,6 +232,11 @@ void R3BNeulandMapped2Cal::MakeCal()
         Int_t iPlane = hit->GetPlaneId();
         Int_t iBar = hit->GetBarId();
         Int_t iSide = -1 == hit->fCoarseTime1LE ? 2 : 1;
+
+        auto trig_i = fMapPar->GetTrigMap(iPlane, iBar, iSide);
+        double trig_ns = NAN;
+        if (fMappedTrigger)
+            trig_ns = trig_map.at(trig_i);
 
         if (hit->Is17())
         {
@@ -251,21 +312,20 @@ void R3BNeulandMapped2Cal::MakeCal()
         if (fWalkEnabled)
             timeLE = timeLE + WalkCorrection(qdc);
 
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iBar, iSide, timeLE, qdc);
+        new ((*fCal)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iBar, iSide, timeLE, trig_ns, qdc);
         fNPmt += 1;
 
-        /* if (timeTE-timeLE < 0)
-          {
-            new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50+iBar, iSide, timeLE,
-                               2048*fClockFreq + timeTE-timeLE);
-            fNPmt += 1;
-          }
-        else
-          {
-            new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50+iBar, iSide, timeLE,
-                               timeTE-timeLE);
-            fNPmt += 1;
-            } */
+        // Subtract trigger time.
+        // timeLE -= trig_ns;
+        // timeTE -= trig_ns;
+
+        // qdc = timeTE - timeLE;
+
+        // Put all times in reasonable range.
+        // double const c_range = 2048 * 5.;
+        // timeLE = fmod(timeLE + c_range + c_range/2, c_range) - c_range/2;
+        // timeTE = fmod(timeTE + c_range + c_range/2, c_range) - c_range/2;
+        // qdc = fmod(qdc + c_range + c_range/2, c_range) - c_range/2;
     }
 }
 
@@ -276,9 +336,9 @@ void R3BNeulandMapped2Cal::FinishEvent()
         LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
-    if (fPmt)
+    if (fCal)
     {
-        fPmt->Clear();
+        fCal->Clear();
         fNPmt = 0;
     }
 

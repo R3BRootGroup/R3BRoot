@@ -47,7 +47,8 @@ set(SRCS
     R3BNeulandHitModulePar.cxx
     R3BNeulandQCalPar.cxx
     R3BNeulandQCalFiller.cxx
-    R3BNeulandProvideTStart.cxx)
-change_file_extension(*.cxx *.h HEADERS "${SRCS}")
-
+    R3BNeulandProvideTStart.cxx
+    R3BNeulandMappingPar.cxx)
+  change_file_extension(*.cxx *.h HEADERS "${SRCS}")
+  
 generate_library()

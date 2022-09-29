@@ -43,7 +43,7 @@ class R3BNeulandOnlineSpectra : public FairTask
     void SetCosmicTpat(UInt_t CosmicTpat = 0) { fCosmicTpat = CosmicTpat; }
 
   private:
-    static const unsigned int fNPlanes = 24;
+    static const unsigned int fNPlanes = 26;
     static const unsigned int fNBars = fNPlanes * 50;
 
     R3BEventHeader* fEventHeader;
@@ -84,13 +84,15 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hTofcvsZ;
 
     TH2D* hTdiffvsBarCosmics;
-    TH2D* hDT575;
+    TH2D* hDT675;
     TH2D* hDT625;
+    TH2D* hDT675c;
+    TH2D* hDT625c;
 
     std::array<TH2D*, fNPlanes> ahXYperPlane;
 
     TH1D* hSofiaTime;
-    TH2D* hNeuLANDvsSOFIA;
+    TH2D* hNeuLANDvsStart;
     TH1D* hTOF;
     TH1D* hTOFc;
 

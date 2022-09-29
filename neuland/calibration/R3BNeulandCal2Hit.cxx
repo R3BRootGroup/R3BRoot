@@ -171,8 +171,17 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         if (energy < fEnergyCutoff)
             continue;
 
-        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
-                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+        std::array<Double_t, 2> tdc;
+
+        if (std::isnan(cal[0]->GetTriggerTime()) || std::isnan(cal[0]->GetTriggerTime()))
+        {
+            tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1), cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+        }
+        else
+        {
+            tdc = { cal[0]->GetTime() - cal[0]->GetTriggerTime() + parameter.GetTimeOffset(1),
+                    cal[1]->GetTime() - cal[1]->GetTriggerTime() + parameter.GetTimeOffset(2) };
+        }
 
         // FIXME this should be done in Mapped2Cal
         // In Cal2Hit the difference between all bars should be checked

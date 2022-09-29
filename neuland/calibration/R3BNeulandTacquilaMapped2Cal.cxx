@@ -288,7 +288,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         {
             time += wlk(qdc);
         }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iPaddle, iSide, time, qdc);
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iPaddle, iSide, time, NAN, qdc);
         fNPmt += 1;
     }
 }
