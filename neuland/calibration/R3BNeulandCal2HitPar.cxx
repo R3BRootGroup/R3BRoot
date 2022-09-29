@@ -128,7 +128,14 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
         const auto plane = GetPlaneNumber(id);
         const auto side = pmt->GetSide() - 1;
 
-        fHitCalEngine->Set(id, side, pmt->GetTime(), pmt->GetQdc());
+        if (std::isnan(pmt->GetTriggerTime()))
+        {
+            fHitCalEngine->Set(id, side, pmt->GetTime(), pmt->GetQdc());
+        }
+        else
+        {
+            fHitCalEngine->Set(id, side, pmt->GetTime() - pmt->GetTriggerTime(), pmt->GetQdc());
+        }
 
         if (fHitCalEngine->IsValid(id))
         {

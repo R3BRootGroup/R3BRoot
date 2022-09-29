@@ -36,6 +36,7 @@
 #pragma link C++ class R3BNeulandQCalPar+;
 #pragma link C++ class R3BNeulandQCalFiller+;
 #pragma link C++ class R3BNeulandProvideTStart+;
+#pragma link C++ class R3BNeulandMappingPar+;
 #pragma link C++ class Neuland::Calibration::TSyncer+;
 #pragma link C++ class Neuland::Calibration::HitCalibrationBar+;
 #pragma link C++ class Neuland::Calibration::CosmicTracker+;
