@@ -14,7 +14,7 @@
 set(LIBRARY_NAME R3BNeulandPreexp)
 set(LINKDEF NeulandPreexpLinkDef.h)
 
-set(DEPENDENCIES R3BData R3Bbase R3BChannelAccess)
+set(DEPENDENCIES R3BData R3BBase R3BChannelAccess)
 
 set(INCLUDE_DIRECTORIES
     ${INCLUDE_DIRECTORIES}

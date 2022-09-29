@@ -705,12 +705,13 @@ void lsqr(lsqr_input* input,
 
         /*    05 Jul 2007: Bug reported by Joel Erickson <Joel.Erickson@twosigma.com>.
          */
-        resid_tol = input->rel_rhs_err + input->rel_mat_err *
-                                             output->frob_mat_norm * /* (not output->mat_resid_norm *) */
-                                             output->sol_norm / bnorm;
+        resid_tol = input->rel_rhs_err +
+                    input->rel_mat_err * output->frob_mat_norm * /* (not output->mat_resid_norm *) */
+                        output->sol_norm / bnorm;
 
-        resid_tol_mach = DBL_EPSILON + DBL_EPSILON * output->frob_mat_norm * /* (not output->mat_resid_norm *) */
-                                           output->sol_norm / bnorm;
+        resid_tol_mach = DBL_EPSILON +
+                         DBL_EPSILON * output->frob_mat_norm * /* (not output->mat_resid_norm *) */
+                             output->sol_norm / bnorm;
         /*
          *     Check to see if any of the stopping criteria are satisfied.
          *     First compare the computed criteria to the machine precision.

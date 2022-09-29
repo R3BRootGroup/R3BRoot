@@ -48,12 +48,17 @@ class R3BNeulandTamexReader : public R3BReader
     // Set the maximum number of planes
     void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
 
+    // Accessor to skip trigger times
+    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
     size_t fOffset;                          // Data offset
     TClonesArray* fArray;                    // Output array
+    TClonesArray* fArrayTrigger;             // Output array, cards' trigger
     UInt_t fNofPlanes;                       // Number of planes
     Bool_t fOnline;                          // Don't store data for online
+    Bool_t fSkiptriggertimes;                // Skip trigger times
 
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);

@@ -110,17 +110,18 @@ class R3BNeulandMapped2CalPar : public FairTask
     Int_t fMinStats; /**< Minimum statistics required per module. */
     Int_t fTrigger;  /**< Trigger value. */
 
-    Int_t fNofPlanes;       /**< Number of photomultipliers. */
+    Int_t fNofPlanes;       /**< Number of planes. */
     Int_t fNofBarsPerPlane; /**< Number of photomultipliers. */
     Int_t fNofPMTs;         /**< Number of NeuLAND modules. */
 
     Int_t checkcounts;
     Int_t counts[60][50][4];
 
-    Int_t fNEvents;         /**< Event counter. */
-    R3BTCalPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fHits;    /**< Array with NeuLAND hits - input data. */
-    R3BEventHeader* header; /**< Event header - input data. */
+    Int_t fNEvents;             /**< Event counter. */
+    R3BTCalPar* fCal_Par;       /**< Parameter container. */
+    TClonesArray* fHits;        /**< Array with NeuLAND hits - input data. */
+    TClonesArray* fHitsTrigger; /**< Array with NeuLAND hits - triggers. */
+    R3BEventHeader* header;     /**< Event header - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
