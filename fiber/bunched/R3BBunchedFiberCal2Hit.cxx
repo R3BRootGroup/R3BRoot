@@ -382,6 +382,7 @@ void R3BBunchedFiberCal2Hit::S515()
     {
         auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
 
+        if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT()) continue;
         auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
         auto ch_i = cur_cal->GetChannel() - 1;
         auto& channel = fChannelArray[side_i].at(ch_i);
