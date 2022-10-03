@@ -45,8 +45,6 @@ R3BWhiterabbitPspReader::~R3BWhiterabbitPspReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)

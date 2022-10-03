@@ -47,8 +47,6 @@ R3BWhiterabbitCalifaReader::~R3BWhiterabbitCalifaReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)

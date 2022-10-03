@@ -34,8 +34,6 @@ R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, size_
 
 R3BWhiterabbitReader::~R3BWhiterabbitReader()
 {
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)

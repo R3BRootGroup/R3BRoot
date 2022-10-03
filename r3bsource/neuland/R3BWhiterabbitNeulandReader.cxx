@@ -46,8 +46,6 @@ R3BWhiterabbitNeulandReader::~R3BWhiterabbitNeulandReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)

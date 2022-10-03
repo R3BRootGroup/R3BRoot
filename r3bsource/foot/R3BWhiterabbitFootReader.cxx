@@ -49,10 +49,6 @@ R3BWhiterabbitFootReader::~R3BWhiterabbitFootReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-    {
-        delete fEventHeader;
-    }
 }
 
 Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
