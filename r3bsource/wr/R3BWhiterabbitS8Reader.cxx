@@ -43,8 +43,6 @@ R3BWhiterabbitS8Reader::~R3BWhiterabbitS8Reader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)

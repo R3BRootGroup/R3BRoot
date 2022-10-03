@@ -82,8 +82,6 @@ R3BRpcOnlineSpectra::R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose)
 R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
 {
     R3BLOG(DEBUG1, "");
-    if (fEventHeader)
-        delete fEventHeader;
 
     if (fMappedDataItems)
        delete fMappedDataItems;

@@ -56,8 +56,6 @@ R3BUcesbSource::~R3BUcesbSource()
         fReaders->Delete();
         delete fReaders;
     }
-    if (fEventHeader)
-        delete fEventHeader;
     Close();
 }
 

@@ -67,8 +67,6 @@ R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
 R3BFootOnlineSpectra::~R3BFootOnlineSpectra()
 {
     LOG(DEBUG) << "R3BFootOnlineSpectra::Delete instance";
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 InitStatus R3BFootOnlineSpectra::Init()
