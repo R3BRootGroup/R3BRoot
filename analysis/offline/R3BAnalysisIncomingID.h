@@ -23,6 +23,7 @@
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BMusicHitData.h"
+#include "R3BPspxHitData.h"
 
 // FAIR headers
 #include "FairLogger.h"
@@ -101,7 +102,7 @@ class R3BAnalysisIncomingID : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
 
     // Accessor to select the MUSIC for the incoming ID
-    void SetMusicForPID() { fUseLOS = kFALSE; }
+    void SetMusicForPID() { fUseLOS = kFALSE, fUsePspx1 = kFALSE; }
 
   private:
     void SetParameter();
@@ -110,10 +111,12 @@ class R3BAnalysisIncomingID : public FairTask
     TClonesArray* fHitItemsMusli;
     TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
     TClonesArray* fHitLos;
+    TClonesArray* fHitPspx1_x;
+    TClonesArray* fHitPspx1_y;
 
-    R3BEventHeader* fHeader; // Event header
-    Bool_t fOnline;          // Don't store data for online
-    Bool_t fUseLOS;          // Use LOS charge (otherwise MUSIC charge)
+    R3BEventHeader* fHeader;   // Event header
+    Bool_t fOnline;            // Don't store data for online
+    Bool_t fUseLOS, fUsePspx1; // Use LOS or PSPX1 charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;

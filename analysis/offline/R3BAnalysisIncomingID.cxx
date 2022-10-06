@@ -61,7 +61,8 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fOnline(kFALSE)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
-    , fUseLOS(kTRUE)
+    , fUseLOS(kFALSE)
+    , fUsePspx1(kTRUE)
     , fCutS2(NULL)
     , fCutCave(NULL)
 {
@@ -144,6 +145,12 @@ InitStatus R3BAnalysisIncomingID::Init()
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
     R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
 
+    // Get access to hit data of PSPX1
+    fHitPspx1_x = (TClonesArray*)mgr->GetObject("Pspx1_xHit");
+    R3BLOG_IF(WARNING, !fHitPspx1_x, "Pspx1_xHit not found");
+    fHitPspx1_y = (TClonesArray*)mgr->GetObject("Pspx1_yHit");
+    R3BLOG_IF(WARNING, !fHitPspx1_y, "Pspx1_yHit not found");
+
     // Output data
     fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
     if (fFrsDataCA == NULL)
@@ -202,6 +209,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
     Double_t Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
     Double_t AoQ_m1_corr = 0.;
     Int_t multLos[fNumDet];
+    Double_t en_pspx = 0., en_pspy = 0., ZPsp = 0.;
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
@@ -226,6 +234,27 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                 multLos[numDet - 1]++;
             }
         } // --- end of loop over hit data --- //
+    }
+
+    // --- read hit from PSP data --- //
+
+    if (fHitPspx1_x || fHitPspx1_y)
+    {
+        // For now only multiplicity = 1 events are taken. Proper
+        // treatment of multihit events needs to be implemented.
+        if (fHitPspx1_x && fHitPspx1_x->GetEntriesFast() == 1)
+        {
+            auto pspx1hitx = (R3BPspxHitData*)fHitPspx1_x->At(0);
+            en_pspx = pspx1hitx->GetEnergy();
+        }
+
+        if (fHitPspx1_y && fHitPspx1_y->GetEntriesFast() == 1)
+        {
+            auto pspx1hity = (R3BPspxHitData*)fHitPspx1_y->At(0);
+            en_pspy = pspx1hity->GetEnergy();
+        }
+
+        ZPsp = en_pspx;
     }
 
     for (int i = 0; i < fNumDet; i++)
@@ -265,7 +294,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 
                 if (fCutS2 && fCutS2->IsInside(PosXS2, AoQ_m1_corr))
                 {
-                    if (Zmusic > 0. && !fUseLOS)
+                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                     {
                         // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
                         // double zcor = sqrt(Emus * Beta_m1) * 0.277;
@@ -283,7 +312,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         }
                     }
 
-                    if (Zlos[i] > 0. && fUseLOS)
+                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
                     {
                         if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
                         {
@@ -297,11 +326,18 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
+                    }
+
+                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                    {
+                        hitfrs->SetZ(ZPsp);
+                        hitfrs->SetAq(AoQ_m1_corr);
+                        hitfrs->SetBrho(Brho_m1);
                     }
                 }
                 else if (!fCutS2)
                 {
-                    if (Zmusic > 0. && !fUseLOS)
+                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                     {
                         // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
                         // double zcor = sqrt(Emus * Beta_m1) * 0.277;
@@ -319,7 +355,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         }
                     }
 
-                    if (Zlos[i] > 0. && fUseLOS)
+                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
                     {
                         if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
                         {
@@ -333,6 +369,13 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
+                    }
+
+                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                    {
+                        hitfrs->SetZ(ZPsp);
+                        hitfrs->SetAq(AoQ_m1_corr);
+                        hitfrs->SetBrho(Brho_m1);
                     }
                 }
             }
@@ -350,6 +393,10 @@ void R3BAnalysisIncomingID::FinishEvent()
         fHitItemsMusli->Clear();
     if (fFrsDataCA)
         fFrsDataCA->Clear();
+    if (fHitPspx1_x)
+        fHitPspx1_x->Clear();
+    if (fHitPspx1_y)
+        fHitPspx1_y->Clear();
 }
 
 ClassImp(R3BAnalysisIncomingID);
