@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------
-// -----         R3BAnalysisIncomingID source file            -----
+// -----       R3BAnalysisIncomingID source file              -----
 // -----     Created 01/11/21 by M. Feijoo Fontan             -----
 // ----------------------------------------------------------------
 
@@ -28,6 +28,7 @@
 
 #include "R3BAnalysisIncomingID.h"
 #include "R3BEventHeader.h"
+#include "R3BFrsData.h"
 #include "R3BIncomingIDPar.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
@@ -36,6 +37,7 @@
 #include "R3BMusicHitData.h"
 #include "R3BMusicHitPar.h"
 #include "R3BMusliHitData.h"
+#include "R3BPspxHitData.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -50,6 +52,9 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fHeader(NULL)
     , fHitItemsMus(NULL)
     , fHitItemsMusli(NULL)
+    , fHitLos(NULL)
+    , fHitPspx1_x(NULL)
+    , fHitPspx1_y(NULL)
     , fFrsDataCA(NULL)
     , fPos_p0(-11)
     , fPos_p1(54.7)
@@ -160,7 +165,6 @@ InitStatus R3BAnalysisIncomingID::Init()
     }
 
     SetParameter();
-
     return kSUCCESS;
 }
 
@@ -386,17 +390,29 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 void R3BAnalysisIncomingID::FinishEvent()
 {
     if (fHitLos)
+    {
         fHitLos->Clear();
+    }
     if (fHitItemsMus)
+    {
         fHitItemsMus->Clear();
+    }
     if (fHitItemsMusli)
+    {
         fHitItemsMusli->Clear();
-    if (fFrsDataCA)
-        fFrsDataCA->Clear();
+    }
     if (fHitPspx1_x)
+    {
         fHitPspx1_x->Clear();
+    }
     if (fHitPspx1_y)
+    {
         fHitPspx1_y->Clear();
+    }
+    if (fFrsDataCA)
+    {
+        fFrsDataCA->Clear();
+    }
 }
 
 ClassImp(R3BAnalysisIncomingID);
