@@ -229,8 +229,10 @@ void R3BIncomingBeta::Exec(Option_t* option)
                 if (num_tof_candidates > 0)
                     break;
                 ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
-                if (ToFraw_m1 > 0.)
+
+                if (ToFraw_m1 > 0. && fHeader->GetExpId() == 515)
                     ToFraw_m1 = ToFraw_m1 - 40960.;
+
                 ToFrawwTref_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
 
                 Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
@@ -261,16 +263,22 @@ void R3BIncomingBeta::Exec(Option_t* option)
 void R3BIncomingBeta::FinishEvent()
 {
     if (fHitSci2)
+    {
         fHitSci2->Clear();
+    }
     if (fHitLos)
+    {
         fHitLos->Clear();
+    }
 }
 
 void R3BIncomingBeta::Reset()
 {
     R3BLOG(DEBUG1, "Clearing FrsData Structure");
     if (fFrsDataCA)
+    {
         fFrsDataCA->Clear();
+    }
 }
 
 // -----   Private method AddData  --------------------------------------------

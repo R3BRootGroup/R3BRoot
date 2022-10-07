@@ -19,17 +19,7 @@
 #include "TMath.h"
 #include <TArrayF.h>
 
-// R3B headers
-#include "R3BEventHeader.h"
-#include "R3BFrsData.h"
-#include "R3BMusicHitData.h"
-#include "R3BPspxHitData.h"
-
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
 #include "FairTask.h"
 
 class R3BIncomingIDPar;
@@ -103,6 +93,9 @@ class R3BAnalysisIncomingID : public FairTask
 
     // Accessor to select the MUSIC for the incoming ID
     void SetMusicForPID() { fUseLOS = kFALSE, fUsePspx1 = kFALSE; }
+
+    // Accessor to select the LOS for the incoming ID
+    void SetLosForPID() { fUseLOS = kTRUE, fUsePspx1 = kFALSE; }
 
   private:
     void SetParameter();
