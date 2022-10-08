@@ -35,7 +35,7 @@ class R3BCave : public FairModule
     R3BCave(const R3BCave&);
     R3BCave& operator=(const R3BCave&);
 
-    ClassDef(R3BCave, 1);
+    ClassDef(R3BCave, 2);
 };
 
 #endif // R3BCave_H
