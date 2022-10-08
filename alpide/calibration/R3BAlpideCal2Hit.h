@@ -20,13 +20,14 @@
 #define R3BAlpideCal2Hit_H 1
 
 #include "FairTask.h"
+#include <Rtypes.h>
 
 #include "R3BAlpideHitData.h"
 
-#include <Rtypes.h>
-
 class TClonesArray;
 class R3BAlpideMappingPar;
+class R3BTGeoPar;
+class R3BAlpideGeometry;
 
 class R3BAlpideCal2Hit : public FairTask
 {
@@ -63,14 +64,24 @@ class R3BAlpideCal2Hit : public FairTask
     void FindClusters();
     Double_t fPixelSize;
     Int_t fNbSensors;
-
     Bool_t fOnline; // Don't store data for online
 
+    TVector3 fTargetPos;
+    TVector3 fAlpidePos;
+    TVector3 fAlpidetoTargetPos;
+
+    R3BTGeoPar* fTargetGeoPar;
+    R3BTGeoPar* fAlpideGeoPar;
+    Int_t fGeometryVersion;
+    R3BAlpideGeometry* fAlpideGeo;
     R3BAlpideMappingPar* fMap_Par; /**< Parameter container. >*/
     TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
     TClonesArray* fAlpideHitData;  // Array with Alpide Hit output data
     TClonesArray* fAlpideCluster;  // Array with clusters
     TClonesArray* fAlpidePixel;
+
+    /** Method GetAnglesVector (calls R3BAlpideGeometry::GetAngles(id)) **/
+    TVector3 GetAnglesVector(int id);
 
     // Private method AddHitData
     R3BAlpideHitData* AddHitData(UShort_t senId, Double_t posl, Double_t post, UInt_t clustersize);

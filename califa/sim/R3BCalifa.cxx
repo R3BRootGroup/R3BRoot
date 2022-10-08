@@ -18,6 +18,7 @@
 #include "R3BCalifa.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaPoint.h"
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
 
 #include "TClonesArray.h"
@@ -74,14 +75,15 @@ void R3BCalifa::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BCalifa::Initialize()";
-    LOG(DEBUG) << "R3BCalifa: Vol (McId) def";
+    R3BLOG(INFO, " ");
 
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
 
     if (!R3BCalifaGeometry::Instance()->Init(fGeometryVersion))
-        LOG(ERROR) << "R3BCalifa::Initialize() Califa geometry not found";
+    {
+        R3BLOG(ERROR, "Califa geometry not found");
+    }
     return;
 }
 
@@ -284,8 +286,10 @@ R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
     TClonesArray& clref = *fCalifaCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
+    {
         LOG(INFO) << "R3BCalifa: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+    }
     return new (clref[size]) R3BCalifaPoint(trackID, detID, ident, posIn, momIn, time, length, eLoss, Nf, Ns, EventId);
 }
 

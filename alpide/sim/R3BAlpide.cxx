@@ -16,6 +16,7 @@
 #include "FairVolume.h"
 
 #include "R3BAlpide.h"
+#include "R3BAlpideGeometry.h"
 #include "R3BAlpidePoint.h"
 #include "R3BLogger.h"
 #include "R3BMCStack.h"
@@ -39,6 +40,7 @@ R3BAlpide::R3BAlpide(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BAlpide", kTRA, geoFile, combi)
     , fAlpidePoint(new TClonesArray("R3BAlpidePoint"))
     , fPosIndex(0)
+    , fAlpideGeo(NULL)
 {
     ResetParameters();
 }
@@ -377,8 +379,8 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol->getMCid();
-        fDetCopyID = vol->getCopyNo();
+        fBarrelID = fAlpideGeo->GetBarrelId(gMC->CurrentVolPath());
+        fSensorID = fAlpideGeo->GetSensorId(gMC->CurrentVolPath());
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -417,8 +419,8 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
         }
 
         AddHit(fTrackID,
-               fVolumeID,
-               fDetCopyID,
+               fBarrelID,
+               fSensorID,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
                TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
@@ -444,7 +446,6 @@ void R3BAlpide::EndOfEvent()
     if (fVerboseLevel)
         Print();
     fAlpidePoint->Clear();
-
     ResetParameters();
 }
 // ----------------------------------------------------------------------------

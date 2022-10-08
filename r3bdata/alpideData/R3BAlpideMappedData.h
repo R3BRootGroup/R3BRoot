@@ -32,10 +32,11 @@ class R3BAlpideMappedData : public TObject
      *@param senId    Sensor unique identifier
      *@param reg      Region identifier
      *@param ads      Address identifier
+     *@param chip     Chip identifier
      *@param row      Row identifier
      *@param col      Column identifier
      **/
-    R3BAlpideMappedData(UShort_t senId, UShort_t reg, UShort_t ads, UShort_t row, UShort_t col);
+    R3BAlpideMappedData(UShort_t senId, UShort_t reg, UShort_t ads, UShort_t chip, UShort_t row, UShort_t col);
 
     // Destructor
     virtual ~R3BAlpideMappedData() {}
@@ -44,6 +45,7 @@ class R3BAlpideMappedData : public TObject
     inline const UShort_t GetSensorId() const { return fSenId; }
     inline const UShort_t GetReg() const { return fReg; }
     inline const UShort_t GetAds() const { return fAds; }
+    inline const UShort_t GetChip() const { return fChip; }
     inline const UShort_t GetRow() const { return fRow; }
     inline const UShort_t GetCol() const { return fCol; }
 
@@ -51,11 +53,12 @@ class R3BAlpideMappedData : public TObject
     UShort_t fSenId; // Sensor unique identifier
     UShort_t fReg;   // Region identifier from 1 to 32
     UShort_t fAds;   // Address identifier from 1 to 1024
+    UShort_t fChip;  // Chip identifier
     UShort_t fRow;   // Row identifier from 1 to 512
-    UShort_t fCol;   // Column identifier from 1 to 16
+    UShort_t fCol;   // Column identifier from 1 to 1024
 
   public:
-    ClassDef(R3BAlpideMappedData, 1)
+    ClassDef(R3BAlpideMappedData, 2)
 };
 
 #endif /* R3BAlpideMappedData */

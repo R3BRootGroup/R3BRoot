@@ -17,7 +17,7 @@
 // -----------------------------------------------------------------
 
 #ifndef R3BAlpidePoint_H
-#define R3BAlpidePoint_H
+#define R3BAlpidePoint_H 1
 
 #include "TObject.h"
 #include "TVector3.h"
@@ -33,9 +33,9 @@ class R3BAlpidePoint : public FairMCPoint
 
     /** Constructor with arguments
      *@param trackID  Index of MCTrack
-     *@param detID    Detector ID
-     *@param detVolID Detector Copy ID
-     *@param posIn    Ccoordinates at entrance to active volume [cm]
+     *@param barID    Barrel ID
+     *@param sensorID Sensor ID
+     *@param posIn    Coordinates at entrance to active volume [cm]
      *@param posOut   Coordinates at exit of active volume [cm]
      *@param momIn    Momentum of track at entrance [GeV]
      *@param momOut   Momentum of track at exit [GeV]
@@ -45,8 +45,8 @@ class R3BAlpidePoint : public FairMCPoint
      *@param pid      Particle ID
      **/
     R3BAlpidePoint(Int_t trackID,
-                   Int_t detID,
-                   Int_t detCopyID,
+                   Int_t barID,
+                   Int_t sensorID,
                    TVector3 posIn,
                    TVector3 posOut,
                    TVector3 momIn,
@@ -63,7 +63,8 @@ class R3BAlpidePoint : public FairMCPoint
     virtual ~R3BAlpidePoint();
 
     /** Accessors **/
-    Int_t GetDetCopyID() const { return fDetCopyID; }
+    Int_t GetBarrelID() const { return fDetectorID; }
+    Int_t GetSensorID() const { return fSensorID; }
     Double_t GetXIn() const { return fX; }
     Double_t GetYIn() const { return fY; }
     Int_t GetPid() const { return fPid; }
@@ -101,12 +102,13 @@ class R3BAlpidePoint : public FairMCPoint
     /** Modifiers **/
     void SetPositionOut(TVector3 pos);
     void SetMomentumOut(TVector3 mom);
-    void SetDetCopyID(Int_t id) { fDetCopyID = id; };
+    void SetBarrelID(Int_t id) { fDetectorID = id; };
+    void SetSensorID(Int_t id) { fSensorID = id; };
 
   protected:
     Double32_t fX_out, fY_out, fZ_out, fEloss;
     Double32_t fPx_out, fPy_out, fPz_out;
-    Int_t fDetCopyID, fPid;
+    Int_t fSensorID, fPid;
 
     ClassDef(R3BAlpidePoint, 1)
 };

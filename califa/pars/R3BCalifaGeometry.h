@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFAGEOMETRY_H
-#define R3BCALIFAGEOMETRY_H
+#define R3BCALIFAGEOMETRY_H 1
 
 #include "Rtypes.h"
 #include "TObject.h"

@@ -116,22 +116,19 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
         fCalifatoTargetPos = fTargetPos - fCalifaPos;
     }
 
+    if (fRand)
+    {
 
-    if(fRand){
+        fAngularDistributions = new TH2F*[4864];
 
-    fAngularDistributions = new TH2F*[4864];
+        char name[100];
+        for (Int_t i = 0; i < 4864; i++)
+        {
 
-    char name[100];
-    for(Int_t i = 0 ; i < 4864 ; i++ ){
-
-        sprintf(name, "distributionCrystalID_%i",i+1);
-        fHistoFile->GetObject(name,fAngularDistributions[i]);
-
-
+            sprintf(name, "distributionCrystalID_%i", i + 1);
+            fHistoFile->GetObject(name, fAngularDistributions[i]);
+        }
     }
-
-
- }
     return kSUCCESS;
 }
 
@@ -281,32 +278,28 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         uint64_t time = highest->GetTime();
         auto vhighest = GetAnglesVector(highest->GetCrystalId()) - fCalifatoTargetPos;
 
-        Double_t fRandPhi,fRandTheta;
+        Double_t fRandPhi, fRandTheta;
         R3BCalifaHitData* clusterHit;
 
-        if(fRand){
+        if (fRand)
+        {
 
+            if (highest->GetCrystalId() <= 2432)
+                fAngularDistributions[highest->GetCrystalId() - 1]->GetRandom2(fRandPhi, fRandTheta);
 
-         if(highest->GetCrystalId() <= 2432)
-          fAngularDistributions[highest->GetCrystalId() - 1]->GetRandom2(fRandPhi,fRandTheta);
+            else
+                fAngularDistributions[highest->GetCrystalId() - 1 - 2432]->GetRandom2(fRandPhi, fRandTheta);
 
-         else
-          fAngularDistributions[highest->GetCrystalId()- 1 - 2432]->GetRandom2(fRandPhi,fRandTheta);
-
-
-
-           clusterHit =
-            TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time ,TMath::DegToRad()*fRandTheta,TMath::DegToRad()*fRandPhi,clusterId);
-
+            clusterHit = TCAHelper<R3BCalifaHitData>::AddNew(
+                *fCalifaHitData, time, TMath::DegToRad() * fRandTheta, TMath::DegToRad() * fRandPhi, clusterId);
         }
 
-        else{
+        else
+        {
 
-          clusterHit =
-            TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
-
+            clusterHit =
+                TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
         }
-
 
         // loop through remaining crystals, remove matches from list.
         auto i = unusedCrystalHits.begin();

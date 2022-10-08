@@ -43,7 +43,7 @@ void R3BAlpideContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the Alpide library.
 
-    FairContainer* p1 = new FairContainer("alpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
+    FairContainer* p1 = new FairContainer("AlpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
     p1->addContext("GeometryParContext");
     containers->Add(p1);
 
@@ -59,7 +59,7 @@ FairParSet* R3BAlpideContFact::createContainer(FairContainer* c)
     const char* name = c->GetName();
     R3BLOG(INFO, "Create container name: " << name);
     FairParSet* p = 0;
-    if (strcmp(name, "alpideGeoPar") == 0)
+    if (strcmp(name, "AlpideGeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

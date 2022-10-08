@@ -20,13 +20,7 @@
 #define R3BALPIDEREADER_H 1
 
 #include "R3BReader.h"
-#include "TLeaf.h"
-#include "TString.h"
-#include "TTree.h"
-#include <fstream>
 #include <stdint.h>
-
-// using std::ifstream;
 
 class TClonesArray;
 
@@ -56,24 +50,10 @@ class R3BAlpideReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
-    // Set input file
-    // void SetFile(TString name) { fFileName = name; }
-
-    // Set input root file
-    // void SetRootFile(TString name) { fRootName = name; }
-
     // Set number of sensors
-    void SetDet(uint n) { fNbDet = n; }
+    void SetNbDet(uint n) { fNbDet = n; }
 
   private:
-    // Input file
-    //  ifstream* fInput;
-    //  TTree* fTree;
-    //  TString fFileName;
-    //   TString fRootName;
-    //    int ae;
-    //    int b, c, d, e, f, g;
-    // TLeaf *fRow, *fCol, *fDet, *trgNum, *trgTime;
     // An event counter
     unsigned int fNEvent;
     // Number of ALPIDE sensors
@@ -88,7 +68,7 @@ class R3BAlpideReader : public R3BReader
     TClonesArray* fArray;
 
   public:
-    ClassDefOverride(R3BAlpideReader, 0);
+    ClassDefOverride(R3BAlpideReader, 1);
 };
 
 #endif /* R3BALPIDEREADER_H */

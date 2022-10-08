@@ -12,15 +12,15 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFACRYSTALCAL2HIT_H
-#define R3BCALIFACRYSTALCAL2HIT_H
+#define R3BCALIFACRYSTALCAL2HIT_H 1
 
 #include "FairTask.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaHitData.h"
 #include "Rtypes.h"
 
-#include <TVector3.h>
 #include "TH2F.h"
+#include <TVector3.h>
 
 class TClonesArray;
 class R3BTGeoPar;
@@ -156,13 +156,13 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    void SetRandomization(Bool_t rand){fRand=rand;}
+    void SetRandomization(Bool_t rand) { fRand = rand; }
 
-    void SetRandomizationFile(TString file) {
+    void SetRandomizationFile(TString file)
+    {
 
-      fRandFile = file;
-      fHistoFile = new TFile(fRandFile);
-
+        fRandFile = file;
+        fHistoFile = new TFile(fRandFile);
     }
 
   protected:
@@ -206,10 +206,10 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     // R3BCalifaHitPar* fCalifaHitPar;
 
     R3BCalifaGeometry* fCalifaGeo;
-    Bool_t fRand;                // Flag to set randomization procedure
-    TString fRandFile;           // File with angular coverages for each crystal
-    TFile *fHistoFile;
-    TH2F **fAngularDistributions;
+    Bool_t fRand;      // Flag to set randomization procedure
+    TString fRandFile; // File with angular coverages for each crystal
+    TFile* fHistoFile;
+    TH2F** fAngularDistributions;
     /** Private method AddHit
      **
      ** Adds a CalifaHit to the HitCollection

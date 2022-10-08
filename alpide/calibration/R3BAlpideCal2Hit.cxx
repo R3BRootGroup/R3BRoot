@@ -30,9 +30,11 @@
 #include "R3BAlpideCal2Hit.h"
 #include "R3BAlpideCalData.h"
 #include "R3BAlpideCluster.h"
+#include "R3BAlpideGeometry.h"
 #include "R3BAlpideHitData.h"
 #include "R3BAlpideMappingPar.h"
 #include "R3BLogger.h"
+#include "R3BTGeoPar.h"
 
 // R3BAlpideCal2Hit::Default Constructor --------------------------
 R3BAlpideCal2Hit::R3BAlpideCal2Hit()
@@ -49,21 +51,32 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
     , fMap_Par(NULL)
     , fNbSensors(1)
     , fPixelSize(0.0292968)
+    , fAlpideGeo(NULL)
+    , fGeometryVersion(2022)
     , fAlpideCluster(new TClonesArray("R3BAlpideCluster"))
     , fOnline(kFALSE)
 {
+    fTargetPos.SetXYZ(0., 0., 0.);
+    fAlpidePos.SetXYZ(0., 0., 0.);
+    fAlpidetoTargetPos.SetXYZ(0., 0., 0.);
 }
 
 // Virtual R3BAlpideCal2Hit::Destructor
 R3BAlpideCal2Hit::~R3BAlpideCal2Hit()
 {
-    R3BLOG(DEBUG1, "Destructor");
-    if (fAlpideHitData)
-        delete fAlpideHitData;
+    R3BLOG(DEBUG1, "");
     if (fAlpideCluster)
+    {
         delete fAlpideCluster;
+    }
     if (fAlpidePixel)
+    {
         delete fAlpidePixel;
+    }
+    if (fAlpideHitData)
+    {
+        delete fAlpideHitData;
+    }
 }
 
 void R3BAlpideCal2Hit::SetParContainers()
@@ -74,6 +87,21 @@ void R3BAlpideCal2Hit::SetParContainers()
 
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
     R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
+
+    fAlpideGeoPar = (R3BTGeoPar*)rtdb->getContainer("AlpideGeoPar");
+    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    if (!fAlpideGeoPar || !fTargetGeoPar)
+    {
+        R3BLOG_IF(WARNING, !fAlpideGeoPar, "Could not get access to AlpideGeoPar container.");
+        R3BLOG_IF(WARNING, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
+        return;
+    }
+    R3BLOG(INFO, "Container AlpideGeoPar found.");
+    R3BLOG(INFO, "Container TargetGeoPar found.");
+
+    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
+    fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
+    return;
 }
 
 void R3BAlpideCal2Hit::SetParameter()
@@ -102,10 +130,22 @@ InitStatus R3BAlpideCal2Hit::Init()
         return kFATAL;
     }
 
+    fAlpideGeo = R3BAlpideGeometry::Instance();
+    R3BLOG_IF(ERROR, !fAlpideGeo->Init(fGeometryVersion), "Alpide geometry not found");
+
+    /* for(int s=0;s<363;s++){
+                      TVector3 vref = this->GetAnglesVector(s+1);
+                  std::cout <<"sensorid: "<<s + 1 << " , "<<vref.Mag() <<" , "<<vref.Theta()*TMath::RadToDeg() <<" , "
+                 <<vref.Phi()*TMath::RadToDeg()<<std::endl;
+                 }
+     */
+
     // OUTPUT DATA
     fAlpideHitData = new TClonesArray("R3BAlpideHitData");
     mgr->Register("AlpideHitData", "ALPIDE_Hit", fAlpideHitData, !fOnline);
+    Reset();
 
+    fAlpidetoTargetPos = fTargetPos - fAlpidePos;
     SetParameter();
     return kSUCCESS;
 }
@@ -118,11 +158,13 @@ InitStatus R3BAlpideCal2Hit::ReInit()
     return kSUCCESS;
 }
 
+TVector3 R3BAlpideCal2Hit::GetAnglesVector(int id) { return fAlpideGeo->GetAngles(id); }
+
 // -----   Public method Execution   --------------------------------------------
 void R3BAlpideCal2Hit::Exec(Option_t* option)
 {
     R3BLOG(DEBUG1, "New event");
-    // Reset entries in output arrays, local arrays
+    // Reset entries in the output arrays
     Reset();
 
     UInt_t nbcluster = 0;
@@ -130,7 +172,7 @@ void R3BAlpideCal2Hit::Exec(Option_t* option)
 
     // Reading the Input -- Cal Data --
     fAlpidePixel = (TClonesArray*)fAlpideCalData->Clone();
-    Int_t nHits = fAlpidePixel->GetEntries();
+    Int_t nHits = fAlpidePixel->GetEntriesFast();
     if (!nHits)
         return;
 
@@ -141,7 +183,7 @@ nextcluster:
 nextround:
     shouldround = false;
 
-    for (Int_t i = 0; i < fAlpidePixel->GetEntries(); i++)
+    for (Int_t i = 0; i < fAlpidePixel->GetEntriesFast(); i++)
     {
         auto calData = (R3BAlpideCalData*)(fAlpidePixel->At(i));
         auto sen = calData->GetSensorId();
@@ -204,11 +246,17 @@ void R3BAlpideCal2Hit::Reset()
 {
     R3BLOG(DEBUG1, "Clearing Data Structure");
     if (fAlpideHitData)
+    {
         fAlpideHitData->Clear();
+    }
     if (fAlpideCluster)
+    {
         fAlpideCluster->Clear();
+    }
     if (fAlpidePixel)
+    {
         fAlpidePixel->Clear();
+    }
 }
 
 // -----   Private method FindClusters   -----------------------------------------
@@ -218,11 +266,12 @@ void R3BAlpideCal2Hit::FindClusters()
     UInt_t nbcluster = 0;
 
     auto nHits = fAlpideCluster->GetEntriesFast();
-    if (!nHits)
+    if (nHits == 0)
+    {
         return;
+    }
 
     auto cluster = new R3BAlpideCluster*[nHits];
-
     Int_t mult[fNbSensors][nHits];
     Double_t meancol[fNbSensors][nHits];
     Double_t meanrow[fNbSensors][nHits];

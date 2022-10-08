@@ -26,6 +26,7 @@
 #include <FairLogger.h>
 
 #include "R3BCalifaGeometry.h"
+#include "R3BLogger.h"
 
 #include <boost/regex.hpp>
 
@@ -39,6 +40,7 @@ R3BCalifaGeometry* R3BCalifaGeometry::Instance()
 R3BCalifaGeometry::R3BCalifaGeometry()
     : TObject()
     , IsInitialize(kFALSE)
+    , fNumCrystals(4864)
 {
 }
 
@@ -49,7 +51,7 @@ bool R3BCalifaGeometry::Init(Int_t version)
     else
         return kTRUE;
 
-    LOG(INFO) << "R3BCalifaGeometry::Init()";
+    R3BLOG(INFO, "");
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
     geoPath += "/geometry/";
 
@@ -74,26 +76,26 @@ bool R3BCalifaGeometry::Init(Int_t version)
             break;
 
         default:
-            LOG(ERROR) << "R3BCalifaGeometry::Unsupported geometry version: " << version;
+            R3BLOG(ERROR, "Unsupported geometry version: " << version);
             return kFALSE;
     }
 
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
         // Already set up (MC mode)
-        LOG(INFO) << "R3BCalifaGeometry::Using existing geometry";
+        R3BLOG(INFO, "Using existing geometry");
         // LOG(INFO) << "R3BCalifaGeometry::Opened geometry file " << geoPath;
         fIsSimulation = kTRUE;
         return kTRUE;
     }
 
     // Stand alone mode
-    LOG(INFO) << "R3BCalifaGeometry::Open geometry file " << geoPath << " for analysis.";
+    R3BLOG(INFO, "Open geometry file " << geoPath << " for analysis.");
     f = new TFile(geoPath, "READ");
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
     {
-        LOG(ERROR) << "R3BCalifaGeometry::Could not open CALIFA geometry file: No TOP volume";
+        R3BLOG(ERROR, "Could not open geometry file, No TOP volume");
         return kFALSE;
     }
 
@@ -107,7 +109,7 @@ bool R3BCalifaGeometry::Init(Int_t version)
 
 R3BCalifaGeometry::~R3BCalifaGeometry()
 {
-    LOG(INFO) << "R3BCalifaGeometry::Delete instance";
+    R3BLOG(DEBUG1, "");
     if (gGeoManager)
         delete gGeoManager;
     if (f)
@@ -138,14 +140,14 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
             gGeoManager->cd(nameVolume);
         else
         {
-            LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal path: " << nameVolume;
+            R3BLOG(ERROR, "Invalid crystal path: " << nameVolume);
             return invalid;
         }
         gGeoManager->LocalToMaster(local, master);
     }
     else
     {
-        LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
+        R3BLOG(ERROR, "Invalid crystalId: " << iD);
         return invalid;
     }
 
@@ -159,7 +161,9 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal
     *azimuthal = masterV.Phi();
     *rho = masterV.Mag();
     if (std::isnan(*polar) || std::isnan(*azimuthal) || std::isnan(*rho))
-        LOG(ERROR) << "R3BCalifaGeometry::GetAngles(" << iD << ",...) returns NaN";
+    {
+        R3BLOG(ERROR, " returns NaN");
+    }
 }
 
 const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
@@ -208,7 +212,7 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
     }
     else
     {
-        LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
+        R3BLOG(ERROR, "Invalid crystalId: " << iD);
     }
 
     return nameVolume;
@@ -299,10 +303,11 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
     {
-        LOG(ERROR) << "R3BCalifaGeometry::GetCrystalId: \"" << volumePath
-                   << "\"\n"
-                      "does not match RE \""
-                   << restr << "\".\n";
+        R3BLOG(ERROR,
+               "\"" << volumePath
+                    << "\"\n"
+                       "does not match RE \""
+                    << restr << "\".\n");
         return 0;
     }
 
@@ -313,7 +318,7 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
 
     if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
     { // cryType runs from 1 to 4 while alvType runs from 1 to 23
-        LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (1)";
+        R3BLOG(ERROR, "Wrong crystal numbers (1)");
         LOG(INFO) << "---- cryType: " << cryType << "   alvType: " << alvType;
         LOG(INFO) << "path=" << volumePath;
         return 0;
@@ -328,7 +333,7 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
 
     if (crystalId < 1 || crystalId > 2432)
     { // crystalId runs from 1 to 2432
-        LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (2)";
+        R3BLOG(ERROR, "Wrong crystal numbers (2)");
         LOG(INFO) << "---- crystalId: " << crystalId;
         return 0;
     }

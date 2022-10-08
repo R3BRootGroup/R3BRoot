@@ -25,6 +25,7 @@
 
 class TClonesArray;
 class R3BAlpidePoint;
+class R3BAlpideGeometry;
 class FairVolume;
 
 class R3BAlpide : public R3BDetector
@@ -106,8 +107,8 @@ class R3BAlpide : public R3BDetector
     /** Track information to be stored until the track leaves the
     active volume. **/
     Int_t fTrackID;                 //  track index
-    Int_t fVolumeID;                //  volume id
-    Int_t fDetCopyID;               //  Det volume id
+    Int_t fBarrelID;                //  barrel id
+    Int_t fSensorID;                //  sensor id
     Int_t fsector;                  //  volume id
     TLorentzVector fPosIn, fPosOut; //  position
     TLorentzVector fMomIn, fMomOut; //  momentum
@@ -120,6 +121,7 @@ class R3BAlpide : public R3BDetector
     Double32_t fELoss;              //  energy loss
     Int_t fPosIndex;                //
     TClonesArray* fAlpidePoint;     //  The hit collection
+    R3BAlpideGeometry* fAlpideGeo;
 
     /** Private method AddHit
      **
@@ -149,8 +151,8 @@ class R3BAlpide : public R3BDetector
 
 inline void R3BAlpide::ResetParameters()
 {
-    fTrackID = fVolumeID = 0;
-    fDetCopyID = 0; // fDetCopyID added by Marc
+    fTrackID = fBarrelID = 0;
+    fSensorID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);

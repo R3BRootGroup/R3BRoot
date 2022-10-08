@@ -52,9 +52,11 @@ R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
 // Virtual R3BAlpideMapped2Cal::Destructor
 R3BAlpideMapped2Cal::~R3BAlpideMapped2Cal()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(DEBUG1, "");
     if (fAlpideCalData)
+    {
         delete fAlpideCalData;
+    }
 }
 
 void R3BAlpideMapped2Cal::SetParContainers()
@@ -96,6 +98,7 @@ InitStatus R3BAlpideMapped2Cal::Init()
     // OUTPUT DATA
     fAlpideCalData = new TClonesArray("R3BAlpideCalData");
     mgr->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
+    Reset();
 
     SetParameter();
     return kSUCCESS;
@@ -112,25 +115,27 @@ InitStatus R3BAlpideMapped2Cal::ReInit()
 // -----   Public method Execution   --------------------------------------------
 void R3BAlpideMapped2Cal::Exec(Option_t* option)
 {
-    // Reset entries in output arrays, local arrays
+    // Reset entries in the output arrays
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fAlpideMappedData->GetEntries();
-    if (!nHits)
+    Int_t nHits = fAlpideMappedData->GetEntriesFast();
+    if (nHits == 0)
+    {
         return;
+    }
 
     auto mappedData = new R3BAlpideMappedData*[nHits];
-
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BAlpideMappedData*)(fAlpideMappedData->At(i));
         auto det = mappedData[i]->GetSensorId();
         auto col = mappedData[i]->GetCol();
-        auto row = mappedData[i]->GetAds();
-        // AddCalData(mappedData[i]->GetSensorId(), GetCol(reg, dcol, ads), GetRow(ads));
+        auto row = mappedData[i]->GetRow();
         if (fMap_Par->GetInUse(det, col, row) == 1)
+        {
             AddCalData(det, col, row);
+        }
     }
     if (mappedData)
         delete[] mappedData;
@@ -158,7 +163,9 @@ void R3BAlpideMapped2Cal::Reset()
 {
     R3BLOG(DEBUG1, "Clearing CalData Structure");
     if (fAlpideCalData)
+    {
         fAlpideCalData->Clear();
+    }
 }
 
 // -----   Private method AddCalData  --------------------------------------------
