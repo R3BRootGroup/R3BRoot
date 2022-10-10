@@ -25,6 +25,7 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/tof
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
@@ -50,6 +51,7 @@ R3BFragmentFitterChi2.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
+R3BMDFWrapper.cxx
 )
 
 # fill list of header files from list of source files
