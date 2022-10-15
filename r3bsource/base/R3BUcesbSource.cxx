@@ -61,6 +61,22 @@ R3BUcesbSource::~R3BUcesbSource()
 
 Bool_t R3BUcesbSource::Init()
 {
+    // Register of R3BEventHeader in the output root file
+
+    R3BLOG(DEBUG, "checking whether R3BEventHeader has been defined in FairRun");
+    auto run = FairRun::Instance();
+    auto eventHeader = dynamic_cast<R3BEventHeader*>(run->GetEventHeader());
+    if (eventHeader)
+    {
+        R3BLOG(INFO, "EventHeader. was defined properly");
+    }
+    else
+    {
+        eventHeader = new R3BEventHeader();
+        run -> SetEventHeader(eventHeader); // implicit conversion and trasfer ownership to FairRun
+        R3BLOG(WARNING, "EventHeader. has been created from R3BEventHeader");
+    }
+
     Bool_t status;
     std::ostringstream command;
 
@@ -113,17 +129,15 @@ Bool_t R3BUcesbSource::InitUnpackers()
     FairRootManager* frm = FairRootManager::Instance();
     R3BLOG_IF(FATAL, !frm, "FairRootManager no found");
 
-    R3BLOG(INFO, "Register of R3BEventHeader");
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    R3BLOG(INFO, "Checking the register of R3BEventHeader");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (fEventHeader)
     {
         R3BLOG(INFO, "EventHeader. was defined properly");
     }
     else
     {
-        fEventHeader = new R3BEventHeader();
-        R3BLOG(WARNING, "EventHeader. has been created from R3BEventHeader");
-        frm->Register("EventHeader.", "Event", fEventHeader, kTRUE);
+        R3BLOG(ERROR, "EventHeader. was not defined properly!");
     }
 
     /* Initialize all readers */
