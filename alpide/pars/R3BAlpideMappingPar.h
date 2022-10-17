@@ -54,13 +54,16 @@ class R3BAlpideMappingPar : public FairParGenericSet
 
     /** Accessor functions **/
     const UInt_t GetNbSensors() { return fNbSensors; }
+    const Int_t GetGeoVersion() { return fGeoVersion; }
     const Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) { return fIn_use[col - 1][row - 1][sensor - 1]; }
 
     void SetNbSensors(UInt_t n);
+    void SetGeoVersion(Int_t v) { fGeoVersion = v; }
     void SetInUse(UInt_t sensor, UInt_t col, UInt_t row, Int_t val) { fIn_use[col - 1][row - 1][sensor - 1] = val; }
 
   private:
     Int_t fNbSensors;
+    Int_t fGeoVersion;
     std::vector<Int_t> fIn_use[AlpideCols][AlpideRows];
 
     /** Method to fill all parameters using FairRuntimeDB **/

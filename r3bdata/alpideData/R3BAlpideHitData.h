@@ -32,7 +32,7 @@ class R3BAlpideHitData : public TObject
     /** Standard Constructor
      *@param track    Reconstructed trajectory
      **/
-    R3BAlpideHitData(UInt_t sensorId, Double_t posl, Double_t post, UInt_t clustersize);
+    R3BAlpideHitData(UInt_t sensorId, UInt_t clustersize, Double_t, Double_t, Double_t z = 0.0);
 
     // Destructor
     virtual ~R3BAlpideHitData() {}
@@ -40,18 +40,22 @@ class R3BAlpideHitData : public TObject
     // Getters
     inline const UInt_t& GetSensorId() const { return fSensorId; }
     inline const UInt_t& GetClusterSize() const { return fClustersize; }
-    inline const Double_t& GetPosl() const { return fPosl; }
-    inline const Double_t& GetPost() const { return fPost; }
+    inline const Double_t& GetPosl() const { return fX; }
+    inline const Double_t& GetPost() const { return fY; }
     inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetPhi() const { return fPhi; }
+    inline const Double_t& GetX() const { return fX; }
+    inline const Double_t& GetY() const { return fY; }
+    inline const Double_t& GetZ() const { return fZ; }
     inline const TVector3 GetTrack() const { return fTrack; }
 
   protected:
     TVector3 fTrack;
     UInt_t fSensorId;
     UInt_t fClustersize;
-    Double_t fPosl;
-    Double_t fPost;
+    Double_t fX;
+    Double_t fY;
+    Double_t fZ;
     Double_t fTheta; // Reconstructed Theta
     Double_t fPhi;   // Reconstructed Phi
 

@@ -16,12 +16,11 @@
 #include <TGeoNavigator.h>
 #include <TGeoVolume.h>
 #include <TMath.h>
+#include <TRotation.h>
 #include <TString.h>
 #include <TSystem.h>
 #include <TVector3.h>
 #include <iostream>
-#include <stdlib.h>
-#include <vector>
 
 #include "R3BAlpideGeometry.h"
 #include "R3BLogger.h"
@@ -38,6 +37,7 @@ R3BAlpideGeometry* R3BAlpideGeometry::Instance()
 R3BAlpideGeometry::R3BAlpideGeometry()
     : TObject()
     , IsInitialize(kFALSE)
+    , fGeometryVersion(2022)
     , fNbCyl(2)
     , fNbSensor(363)
 {
@@ -61,17 +61,26 @@ bool R3BAlpideGeometry::Init(Int_t version)
             geoPath += "tracking_alpide_v22.geo.root";
             fNbSensor = 363;
             fNbCyl = 2;
+            fGeometryVersion = 2022;
+            break;
+
+        case 202210:
+            // 6 ALPIDEs
+            geoPath += "tracking_alpide_cern_202210.geo.root";
+            fNbSensor = 6;
+            fNbCyl = 0;
+            fGeometryVersion = 202210;
             break;
 
         default:
-            R3BLOG(ERROR, "Unsupported geometry version: " << version);
+            R3BLOG(error, "Unsupported geometry version: " << version);
             return kFALSE;
     }
 
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
         // Already set up (MC mode)
-        R3BLOG(INFO, "Using existing geometry");
+        R3BLOG(info, "Using existing geometry");
         fIsSimulation = kTRUE;
         return kTRUE;
     }
@@ -82,7 +91,7 @@ bool R3BAlpideGeometry::Init(Int_t version)
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
     {
-        R3BLOG(ERROR, "Could not open geometry file, No TOP volume");
+        R3BLOG(error, "Could not open geometry file, No TOP volume");
         return kFALSE;
     }
 
@@ -96,11 +105,13 @@ bool R3BAlpideGeometry::Init(Int_t version)
 
 R3BAlpideGeometry::~R3BAlpideGeometry()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug, "");
     if (gGeoManager)
         delete gGeoManager;
     if (f)
+    {
         f->Close();
+    }
 }
 
 const TVector3& R3BAlpideGeometry::GetAngles(Int_t iD)
@@ -108,6 +119,111 @@ const TVector3& R3BAlpideGeometry::GetAngles(Int_t iD)
     static std::map<int, TVector3> cache;
     Double_t local[3] = { 0, 0, 0 };
     Double_t master[3];
+
+    const static TVector3 invalid(NAN, NAN, NAN);
+    const char* nameVolume;
+    if (cache.count(iD))
+        return cache[iD];
+
+    if (iD >= 1 && iD <= fNbSensor)
+    {
+        nameVolume = GetSensorVolumePath(iD);
+        gGeoManager->CdTop();
+
+        if (gGeoManager->CheckPath(nameVolume))
+            gGeoManager->cd(nameVolume);
+        else
+        {
+            R3BLOG(error, "Invalid sensor path: " << nameVolume);
+            return invalid;
+        }
+        gGeoManager->LocalToMaster(local, master);
+    }
+    else
+    {
+        R3BLOG(error, "Invalid sensorId: " << iD);
+        return invalid;
+    }
+    return cache[iD] = master;
+}
+
+// Rotation matrix
+const TRotation R3BAlpideGeometry::GetRotation(Int_t iD)
+{
+    static std::map<int, TRotation> cache;
+    Double_t local[3] = { 0, 0, 0 };
+    Double_t master[3];
+
+    TRotation tt;
+
+    static TRotation invalid;
+    invalid.SetToIdentity();
+
+    R3BLOG(debug, "SensorId: " << iD);
+
+    const char* nameVolume;
+    if (cache.count(iD))
+        return cache[iD];
+
+    if (iD >= 1 && iD <= fNbSensor)
+    {
+        nameVolume = GetSensorVolumePath(iD);
+
+        gGeoManager->CdTop();
+
+        if (gGeoManager->CheckPath(nameVolume))
+            gGeoManager->cd(nameVolume);
+        else
+        {
+            R3BLOG(error, "Invalid sensor path: " << nameVolume);
+            return invalid;
+        }
+        gGeoManager->LocalToMaster(local, master);
+
+        Double_t* rMatrix = gGeoManager->GetCurrentMatrix()->GetRotationMatrix();
+        //  std::cout <<"rMatrix "<< rMatrix[0] <<" "<< rMatrix[1] <<" "<< rMatrix[2] << std::endl;
+        //  std::cout <<"rMatrix "<< rMatrix[3] <<" "<< rMatrix[4] <<" "<< rMatrix[5] << std::endl;
+        //  std::cout <<"rMatrix "<< rMatrix[6] <<" "<< rMatrix[7] <<" "<< rMatrix[8] << std::endl;
+
+        TVector3 rx;
+        rx.SetX(rMatrix[0]);
+        rx.SetY(rMatrix[3]);
+        rx.SetZ(rMatrix[6]);
+
+        TVector3 ry;
+        ry.SetX(rMatrix[1]);
+        ry.SetY(rMatrix[4]);
+        ry.SetZ(rMatrix[7]);
+
+        TVector3 rz;
+        rz.SetX(rMatrix[2]);
+        rz.SetY(rMatrix[5]);
+        rz.SetZ(rMatrix[8]);
+
+        tt.RotateAxes(rx, ry, rz);
+
+        R3BLOG(debug, "Rx " << tt.XX() << ", " << tt.XY() << ", " << tt.XZ());
+        R3BLOG(debug, "Ry " << tt.YX() << ", " << tt.YY() << ", " << tt.YZ());
+        R3BLOG(debug, "Rz " << tt.ZX() << ", " << tt.ZY() << ", " << tt.ZZ());
+    }
+    else
+    {
+        R3BLOG(error, "Invalid sensorId: " << iD);
+        return invalid;
+    }
+    return cache[iD] = tt;
+}
+
+// Translation vector
+const TVector3& R3BAlpideGeometry::GetTranslation(Int_t iD)
+{
+    static std::map<int, TVector3> cache;
+    Double_t local[3] = { 0, 0, 0 };
+    Double_t master[3];
+    Double_t* trans;
+
+    R3BLOG(debug, "SensorId: " << iD);
+
     const static TVector3 invalid(NAN, NAN, NAN);
     const char* nameVolume;
     if (cache.count(iD))
@@ -123,18 +239,21 @@ const TVector3& R3BAlpideGeometry::GetAngles(Int_t iD)
             gGeoManager->cd(nameVolume);
         else
         {
-            R3BLOG(ERROR, "Invalid sensor path: " << nameVolume);
+            R3BLOG(error, "Invalid sensor path: " << nameVolume);
             return invalid;
         }
         gGeoManager->LocalToMaster(local, master);
+        trans = gGeoManager->GetCurrentMatrix()->GetTranslation();
+        // std::cout << master[0] <<" "<< master[1] <<" "<< master[2] << std::endl;
+        // std::cout << trans[0] <<" "<< trans[1] <<" "<< trans[2] << std::endl;
     }
     else
     {
-        R3BLOG(ERROR, "Invalid sensorId: " << iD);
+        R3BLOG(error, "Invalid sensorId: " << iD);
         return invalid;
     }
 
-    return cache[iD] = master;
+    return cache[iD] = trans;
 }
 
 void R3BAlpideGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
@@ -145,7 +264,7 @@ void R3BAlpideGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal
     *rho = masterV.Mag();
     if (std::isnan(*polar) || std::isnan(*azimuthal) || std::isnan(*rho))
     {
-        R3BLOG(ERROR, " returns NaN");
+        R3BLOG(error, " returns NaN");
     }
 }
 
@@ -172,7 +291,7 @@ const char* R3BAlpideGeometry::GetSensorVolumePath(Int_t iD)
     }
     else
     {
-        R3BLOG(ERROR, "Invalid sensorId: " << iD);
+        R3BLOG(error, "Invalid sensorId: " << iD);
     }
 
     return nameVolume;
@@ -186,7 +305,7 @@ int R3BAlpideGeometry::GetBarrelId(const char* volumePath)
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
     {
-        R3BLOG(ERROR,
+        R3BLOG(error,
                "\"" << volumePath
                     << "\"\n"
                        "does not match RE \""
@@ -196,7 +315,7 @@ int R3BAlpideGeometry::GetBarrelId(const char* volumePath)
 
     barID = std::stoi(m[1].str()); // converting to int the barrel type
 
-    R3BLOG(DEBUG1, "Barrel ID: " << barID);
+    R3BLOG(debug, "Barrel ID: " << barID);
 
     return barID;
 }
@@ -209,7 +328,7 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
     {
-        R3BLOG(ERROR,
+        R3BLOG(error,
                "\"" << volumePath
                     << "\"\n"
                        "does not match RE \""
@@ -229,8 +348,7 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
     {
         sensorId = sid;
     }
-
-    R3BLOG(DEBUG1, "Barrel: " << bartype << ", sensorID in barrel: " << sid << ", sensorID: " << sensorId);
+    R3BLOG(debug, "Barrel: " << bartype << ", sensorID in barrel: " << sid << ", sensorID: " << sensorId);
 
     return sensorId;
 }

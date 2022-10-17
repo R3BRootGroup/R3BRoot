@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BAlpide+;
+#pragma link C++ class R3BAlpideDigitizer+;
 
 #pragma link C++ class R3BAlpideContFact+;
 #pragma link C++ class R3BAlpideMappingPar+;

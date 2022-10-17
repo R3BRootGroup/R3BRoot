@@ -25,6 +25,7 @@
 
 class TVector3;
 class TGeoNavigator;
+class TRotation;
 
 /**
  * Geometrical queries to ALPIDE device
@@ -46,10 +47,24 @@ class R3BAlpideGeometry : public TObject
 
     /**
      * Gets position in polar coordinates of sensor with given ID.
-     * On error, the x,y and z component of the TVector3 are set to NAN.
+     * On error, the x, y and z components of the TVector3 are set to NAN.
      * @param iD sensor ID (depending on geometry version)
      */
     const TVector3& GetAngles(Int_t iD);
+
+    /**
+     * Gets rotation matrix of sensor with given ID.
+     * In case of error, it returns the identity matrix
+     * @param iD sensor ID (depending on geometry version)
+     */
+    const TRotation GetRotation(Int_t iD);
+
+    /**
+     * Gets position of sensor with given ID.
+     * On error, the x, y and z components of the TVector3 are set to NAN.
+     * @param iD sensor ID (depending on geometry version)
+     */
+    const TVector3& GetTranslation(Int_t iD);
 
     /**
      * Legacy: Gets position in polar coordinates of sensor with given ID.
