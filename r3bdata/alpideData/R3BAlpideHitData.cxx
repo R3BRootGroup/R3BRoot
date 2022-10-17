@@ -23,20 +23,22 @@ R3BAlpideHitData::R3BAlpideHitData()
     , fClustersize(0)
     , fTheta(NAN)
     , fPhi(NAN)
-    , fPosl(NAN)
-    , fPost(NAN)
+    , fX(NAN)
+    , fY(NAN)
+    , fZ(NAN)
 {
 }
 
-R3BAlpideHitData::R3BAlpideHitData(UInt_t sensorId, Double_t posl, Double_t post, UInt_t clustersize)
+R3BAlpideHitData::R3BAlpideHitData(UInt_t sensorId, UInt_t clustersize, Double_t x, Double_t y, Double_t z)
     : fSensorId(sensorId)
     , fClustersize(clustersize)
-    //, fTrack(track)
-    //, fTheta(track.Theta())
-    //, fPhi(track.Phi())
-    , fPosl(posl)
-    , fPost(post)
+    , fX(x)
+    , fY(y)
+    , fZ(z)
 {
+    fTrack.SetXYZ(x, y, z);
+    fTheta = fTrack.Theta();
+    fPhi = fTrack.Phi();
 }
 
 ClassImp(R3BAlpideHitData);

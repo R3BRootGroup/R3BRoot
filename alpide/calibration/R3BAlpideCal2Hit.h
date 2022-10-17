@@ -28,6 +28,7 @@ class TClonesArray;
 class R3BAlpideMappingPar;
 class R3BTGeoPar;
 class R3BAlpideGeometry;
+class TVector3;
 
 class R3BAlpideCal2Hit : public FairTask
 {
@@ -72,7 +73,7 @@ class R3BAlpideCal2Hit : public FairTask
 
     R3BTGeoPar* fTargetGeoPar;
     R3BTGeoPar* fAlpideGeoPar;
-    Int_t fGeometryVersion;
+    Int_t fGeoversion;
     R3BAlpideGeometry* fAlpideGeo;
     R3BAlpideMappingPar* fMap_Par; /**< Parameter container. >*/
     TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
@@ -80,11 +81,8 @@ class R3BAlpideCal2Hit : public FairTask
     TClonesArray* fAlpideCluster;  // Array with clusters
     TClonesArray* fAlpidePixel;
 
-    /** Method GetAnglesVector (calls R3BAlpideGeometry::GetAngles(id)) **/
-    TVector3 GetAnglesVector(int id);
-
     // Private method AddHitData
-    R3BAlpideHitData* AddHitData(UShort_t senId, Double_t posl, Double_t post, UInt_t clustersize);
+    R3BAlpideHitData* AddHitData(UShort_t senId, UInt_t clustersize, Double_t x, Double_t y);
 
   public:
     // Class definition

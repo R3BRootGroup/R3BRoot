@@ -31,6 +31,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/alpide
 ${R3BROOT_SOURCE_DIR}/alpide/sim
+${R3BROOT_SOURCE_DIR}/alpide/digi
 ${R3BROOT_SOURCE_DIR}/alpide/geo
 ${R3BROOT_SOURCE_DIR}/alpide/pars
 ${R3BROOT_SOURCE_DIR}/alpide/calibration
@@ -49,6 +50,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 file(GLOB SRCS 
 ./sim/*.cxx 
+./digi/*.cxx 
 ./geo/*.cxx 
 ./pars/*.cxx 
 ./calibration/*.cxx
