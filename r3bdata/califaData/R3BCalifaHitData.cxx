@@ -15,7 +15,6 @@
 
 R3BCalifaHitData::R3BCalifaHitData()
     : FairMultiLinkedData()
-    , fNbOfCrystalHits(0)
     , fEnergy(NAN)
     , fTheta(NAN)
     , fPhi(NAN)
@@ -23,34 +22,38 @@ R3BCalifaHitData::R3BCalifaHitData()
 {
 }
 
-R3BCalifaHitData::R3BCalifaHitData(UInt_t Nb,
+R3BCalifaHitData::R3BCalifaHitData(std::vector<Int_t> crystalList,
                                    Double_t ene,
                                    Double_t nf,
                                    Double_t ns,
                                    Double_t theta,
                                    Double_t phi,
-                                   ULong64_t time)
+                                   ULong64_t time,
+                                   Int_t clusterType)
     : FairMultiLinkedData()
-    , fNbOfCrystalHits(Nb)
+    , fCrystalList(crystalList)
     , fEnergy(ene)
     , fNf(nf)
     , fNs(ns)
     , fTheta(theta)
     , fPhi(phi)
     , fTime(time)
+    , fClusterType(clusterType)
 {
 }
 
 R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
     : FairMultiLinkedData(right)
-    , fNbOfCrystalHits(right.fNbOfCrystalHits)
+    , fCrystalList(right.fCrystalList)
     , fEnergy(right.fEnergy)
     , fNf(right.fNf)
     , fNs(right.fNs)
     , fTheta(right.fTheta)
     , fPhi(right.fPhi)
     , fTime(right.fTime)
+    , fClusterType(right.fClusterType)
 {
 }
 
 ClassImp(R3BCalifaHitData);
+ 
