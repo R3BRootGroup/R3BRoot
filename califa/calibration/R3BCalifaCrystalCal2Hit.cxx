@@ -30,33 +30,100 @@
 
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaGeometry.h"
+#include "R3BCalifaMappingPar.h"
 #include <list>
 #include <vector>
 
-#include "ROOT_template_hacks.h"
-using roothacks::TCAHelper;
-using roothacks::TypedCollection;
+using namespace std;
+
+struct califa_candidate {
+
+  Int_t motherId;
+  vector<Int_t> crystalList;
+  Double_t energy;
+  Double_t ns;
+  Double_t nf;
+  Double_t theta;
+  Double_t phi;
+  ULong64_t time;
+
+};
+
+bool compareByEnergy(R3BCalifaCrystalCalData *a , R3BCalifaCrystalCalData *b)
+{
+    return a->GetEnergy() < b->GetEnergy();
+}
+
+
+bool isInside(vector<Int_t> &vec, Int_t cryId)
+{
+    bool result = false;
+    if( find(vec.begin(), vec.end(),cryId) != vec.end() )
+    {
+        result = true;
+    }
+    return result;
+}
+
+
+void RemoveUsedCrystals(vector<Int_t> &used , vector<R3BCalifaCrystalCalData*> &all , vector<R3BCalifaCrystalCalData*> &proton, vector<R3BCalifaCrystalCalData*> &gamma, vector<R3BCalifaCrystalCalData*> &saturated){
+
+   for(int p = 0 ; p < used.size() ; p++){
+    for(int s = 0 ; s < all.size() ; s++)
+
+      if(all.at(s)->GetCrystalId() == used.at(p))
+       all.erase(all.begin() + s);
+
+     }
+
+   for(int p = 0 ; p < used.size() ; p++){
+    for(int s = 0 ; s < gamma.size() ; s++)
+
+      if(gamma.at(s)->GetCrystalId() == used.at(p))
+       gamma.erase(gamma.begin() + s);
+
+     }
+
+   for(int p = 0 ; p < used.size() ; p++){
+     for(int s = 0 ; s < proton.size() ; s++)
+
+      if(proton.at(s)->GetCrystalId() == used.at(p))
+       proton.erase(proton.begin() + s);
+
+     }
+
+
+   for(int p = 0 ; p < used.size() ; p++){
+     for(int s = 0 ; s < saturated.size() ; s++)
+
+      if(saturated.at(s)->GetCrystalId() == used.at(p))
+       saturated.erase(saturated.begin() + s);
+
+     }
+
+
+}
+
 
 R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
+
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalCalData(NULL)
     , fCalifaHitData(NULL)
-    , fGeometryVersion(2021) // BARREL+iPhos
-    , fThreshold(0.)         // no threshold
-    , fDRThreshold(15000)    // in keV, for real data (15000 = 15MeV)
-    , fDeltaPolar(0.25)
-    , fDeltaAzimuthal(0.25)
-    , fDeltaAngleClust(0)
-    , fClusterAlgorithmSelector(RECT)
-    , fParCluster1(0)
+    , fGeometryVersion(2021)
+    , fCrystalThreshold(100.) //200 keV
+    , fProtonThreshold(12000) // Crystal saturation @ ~15 MeV
+    , fGammaClusterThreshold(1000) // 1 MeV
+    , fProtonClusterThreshold(50000) // 50000 MeV
+    , fMap_Par(NULL)
+    , fRoundWindow(0.25)             // 14 degrees
+    , fSimulation(kFALSE)
     , fCalifaGeo(NULL)
-    , fNbCrystalsGammaRange(2432) // during 2019 it was 5000
     , fOnline(kFALSE)
     , fRand(0)
     , fRandFile("")
 {
-    SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
-    fCalifatoTargetPos.SetXYZ(0., 0., 0.);
+
 }
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
@@ -73,17 +140,8 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 
     fCalifaGeoPar = (R3BTGeoPar*)rtdb->getContainer("CalifaGeoPar");
     fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
-    if (!fCalifaGeoPar || !fTargetGeoPar)
-    {
-        R3BLOG_IF(WARNING, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container.");
-        R3BLOG_IF(WARNING, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
-        return;
-    }
-    R3BLOG(INFO, "Container CalifaGeoPar found.");
-    R3BLOG(INFO, "Container TargetGeoPar found.");
+    fMap_Par      = (R3BCalifaMappingPar *)rtdb->getContainer("califaMappingPar");
 
-    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
-    fCalifaPos.SetXYZ(fCalifaGeoPar->GetPosX(), fCalifaGeoPar->GetPosY(), fCalifaGeoPar->GetPosZ());
     return;
 }
 
@@ -98,39 +156,35 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
     fCrystalCalData = (TClonesArray*)ioManager->GetObject("CalifaCrystalCalData");
 
     // Register output array
+
     fCalifaHitData = new TClonesArray("R3BCalifaHitData");
     ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitData, !fOnline);
 
     fCalifaGeo = R3BCalifaGeometry::Instance();
+
+    fCalifaGeo->Init(fGeometryVersion);
+
     R3BLOG_IF(ERROR, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
 
-    // Determine CALIFA position with respect to target
-    if (fCalifaGeo->IsSimulation())
-    {
-        R3BLOG(INFO, "Simulation configuration.");
-        fCalifatoTargetPos = 2.0 * fTargetPos - fCalifaPos;
-    }
-    else
-    {
-        R3BLOG(INFO, "Analysis configuration.");
-        fCalifatoTargetPos = fTargetPos - fCalifaPos;
-    }
 
-    if (fRand)
-    {
+    if(fRand){
 
-        fAngularDistributions = new TH2F*[4864];
+    fAngularDistributions = new TH2F*[4864];
 
-        char name[100];
-        for (Int_t i = 0; i < 4864; i++)
-        {
+    char name[100];
 
-            sprintf(name, "distributionCrystalID_%i", i + 1);
-            fHistoFile->GetObject(name, fAngularDistributions[i]);
-        }
-    }
+    for(Int_t i = 0 ; i < 4864 ; i++ ){
+
+        sprintf(name, "distributionCrystalID_%i",i+1);
+        fHistoFile->GetObject(name,fAngularDistributions[i]);
+
+      }
+   }
+
     return kSUCCESS;
-}
+ }
+
+
 
 InitStatus R3BCalifaCrystalCal2Hit::ReInit()
 {
@@ -138,184 +192,517 @@ InitStatus R3BCalifaCrystalCal2Hit::ReInit()
     return kSUCCESS;
 }
 
-bool R3BCalifaCrystalCal2Hit::Match(R3BCalifaCrystalCalData* ref, R3BCalifaCrystalCalData* hit)
-{
-    if (ref == hit)
-        return 1;
 
-    auto circleAbs = [](double dphi) {
-        double d = fmod(fabs(dphi), 2 * M_PI);
-        return d < M_PI ? d : 2 * M_PI - d;
-    };
-    // Clusterization: you want to put a condition on the angle between the highest
-    // energy crystal and the others. This is done by using the TVector3 classes and
-    // not with different DeltaAngle on theta and phi, to get a proper solid angle
-    // and not a "square" one.                    Enrico Fiori
-    TVector3 vref = this->GetAnglesVector(ref->GetCrystalId());
-    TVector3 vhit = this->GetAnglesVector(hit->GetCrystalId());
-    bool takeCrystalInCluster = false;
 
-    // Check if the angle between the two vectors is less than the reference angle.
-    switch (fClusterAlgorithmSelector)
-    {
-        case RECT:
-        { // rectangular window
-            if (TMath::Abs(vref.Theta() - vhit.Theta()) < fDeltaPolar &&
-                circleAbs(vref.Phi() - vhit.Phi()) < fDeltaAzimuthal)
-            {
-                takeCrystalInCluster = true;
-            }
-            break;
-        }
-        case ALL:
-            takeCrystalInCluster = true;
-            break;
-        case NONE:
-            break;
-        case ROUND: // round window
-            // The angle is scaled to a reference distance (e.g. here is
-            // set to 35 cm) to take into account Califa's non-spherical
-            // geometry. The reference angle will then have to be defined
-            // in relation to this reference distance: for example, 10° at
-            // 35 cm corresponds to ~6cm, setting a fDeltaAngleClust=10
-            // means that the gamma rays will be allowed to travel 6 cm in
-            // the CsI, no matter the position of the crystal they hit.
-            if (((vref.Angle(vhit)) * ((vref.Mag() + vhit.Mag()) / (35. * 2.))) < fDeltaAngleClust)
-            {
-                takeCrystalInCluster = true;
-            }
-            break;
-        case ROUND_SCALED: // round window scaled with energy
-            // The same as before but the angular window is scaled
-            // according to the energy of the hit in the higher energy
-            // crystal. It needs a parameter that should be calibrated.
-            {
-                Double_t fDeltaAngleClustScaled = fDeltaAngleClust * (ref->GetEnergy() * energyFactor);
-                if (((vref.Angle(vhit)) * ((vref.Mag() + vhit.Mag()) / (35. * 2.))) < fDeltaAngleClustScaled)
-                {
-                    takeCrystalInCluster = true;
-                }
-            }
-            break;
-        case CONE:
-            takeCrystalInCluster = vref.Angle(vhit) < fDeltaAngleClust;
-            break;
-        case PETAL:
-            takeCrystalInCluster = AngleToPetalId(vref) == AngleToPetalId(vhit);
-        case INVALID:
-        default:
-            throw std::runtime_error("R3BCalifaCrystalCal2Hit: no clustering"
-                                     " algorithm selected.");
-            break;
-    }
-    LOG(DEBUG) << "returning R3BCalifaCrystalCal2Hit::Match(" << ref->GetCrystalId() << ", " << hit->GetCrystalId()
-               << ")=" << takeCrystalInCluster << " with alg " << fClusterAlgorithmSelector;
-
-    return takeCrystalInCluster;
-}
-
-// -----   Public method Exec   --------------------------------------------
 void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 {
     Reset(); // Reset entries in output arrays, local arrays
 
-    // ALGORITHMS FOR HIT FINDING
-    // Nb of CrystalHits in current event
-    const int numCrystalHits = fCrystalCalData->GetEntries();
+    const int  numCrystalHits = fCrystalCalData->GetEntries();
+
     R3BLOG(DEBUG, "Crystal hits at start:" << numCrystalHits);
 
-    if (numCrystalHits)
-    {
-        auto aCalData = dynamic_cast<R3BCalifaCrystalCalData*>((*fCrystalCalData)[0]);
-        // printf("id=%d\n", aCalData->GetCrystalId());
+    vector<R3BCalifaCrystalCalData*> allCrystalVec;
+    vector<R3BCalifaCrystalCalData*> protonCandidatesVec;
+    vector<R3BCalifaCrystalCalData*> gammaCandidatesVec;
+    vector<R3BCalifaCrystalCalData*> saturatedCandidatesVec;
+
+    Double_t cryEnergy;
+    Int_t cryId;
+
+    // ----- Real Data Processing ------
+    if(!fSimulation){
+
+    for(Int_t i = 0 ; i < numCrystalHits ; i++){
+
+        cryId     = ((R3BCalifaCrystalCalData*)fCrystalCalData->At(i))->GetCrystalId();
+        cryEnergy = ((R3BCalifaCrystalCalData*)fCrystalCalData->At(i))->GetEnergy();
+
+        if(cryId <= 2432 && cryEnergy >= fGammaClusterThreshold)
+         gammaCandidatesVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+        if(cryId > 2432 && cryEnergy >= fProtonClusterThreshold)
+         protonCandidatesVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+        if(cryEnergy >= fCrystalThreshold)
+         allCrystalVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+        if(cryId <= 2432 && cryEnergy > fSaturation)
+         saturatedCandidatesVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+     }
+
+    if(gammaCandidatesVec.size()==0 && protonCandidatesVec.size() == 0 && saturatedCandidatesVec.size() == 0)
+     return;
+
+ // Sort all vectors by energy
+ std::sort(gammaCandidatesVec.begin(), gammaCandidatesVec.end(),compareByEnergy);
+ std::sort(protonCandidatesVec.begin(), protonCandidatesVec.end(),compareByEnergy);
+
+ // It does not make sense to sort saturated crystals by "energy"
+ TVector3 mother_angles,angles;
+ Double_t fRandTheta,fRandPhi;
+
+ vector<Int_t> usedCrystals;
+
+ // Proton clusters have priority
+ while(protonCandidatesVec.size()){
+
+  Int_t motherId = protonCandidatesVec.at(0)->GetCrystalId();
+
+  califa_candidate cluster = {motherId,vector<Int_t>(),0.0,0.0,0.0,0.0,0.0};
+
+  mother_angles = fCalifaGeo->GetAngles(motherId);
+
+  if(fRand){
+
+   fAngularDistributions[protonCandidatesVec.at(0)->GetCrystalId()- 1 - 2432]->GetRandom2(fRandPhi,fRandTheta);
+   cluster.theta = TMath::DegToRad()*fRandTheta;
+   cluster.phi = TMath::DegToRad()*fRandPhi;
+
+  }
+
+ else{
+
+   cluster.theta = mother_angles.Theta();
+   cluster.phi = mother_angles.Phi();
+
+  }
+
+
+  cluster.energy += protonCandidatesVec.at(0)->GetEnergy();
+  cluster.nf += protonCandidatesVec.at(0)->GetNf();
+  cluster.ns += protonCandidatesVec.at(0)->GetNs();
+  cluster.crystalList.push_back(motherId);
+  cluster.time = protonCandidatesVec.at(0)->GetTime();
+
+  usedCrystals.push_back(motherId);
+
+
+
+  // First we add all proton hits
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+    if(thisCryId==motherId)
+     continue;
+
+    if(thisCryId > 2432 && !isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId-2432);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+
+      // if it is read in proton, then is not read in gamma
+      if(fMap_Par->GetInUse(thisCryId-2432))
+       usedCrystals.push_back(thisCryId-2432);
+
+      }
     }
-    else
-        return;
+  }
 
-    std::list<R3BCalifaCrystalCalData*> unusedCrystalHits;
-    auto addHit = [&](R3BCalifaCrystalCalData* aCalData) {
-        if (aCalData->GetEnergy() > fThreshold)
-            unusedCrystalHits.push_back(aCalData);
-        else
-            LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): rejected hit in " << aCalData->GetCrystalId()
-                       << " because of low energy (E=" << aCalData->GetEnergy() << "<=" << fThreshold << "=E_threshold";
-    };
 
-    // get rid if redundant (dual range) crystals
-    {
-        std::map<uint32_t, R3BCalifaCrystalCalData*> crystalId2Pos;
-        for (auto& aCalData : TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalCalData))
-            crystalId2Pos[aCalData.GetCrystalId()] = &aCalData;
+  // Then we use the gamma ranges that could have some proton energy inside
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
 
-        R3BLOG(DEBUG, "crystalId2Pos.size()=" << crystalId2Pos.size());
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
 
-        for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
-            if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
-            {
-                auto proton = *crystalId2Pos.find(k1.first + fNbCrystalsGammaRange);
-                // k2: higher id, proton branch
-                if (proton.second->GetEnergy() < fDRThreshold)
-                    addHit(k1.second); // gamma
-                else
-                    addHit(proton.second);
-            }
-            else if (!crystalId2Pos.count(k1.first - fNbCrystalsGammaRange))
-                // not a hit where two ranges were hit
-                addHit(k1.second);
+    if(thisCryId==motherId)
+     continue;
+
+    if(thisCryId <= 2432 && !isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+      }
     }
-    R3BLOG(DEBUG, "after uniquifying, we have " << unusedCrystalHits.size() << " crystal hits.");
+  }
 
-    unusedCrystalHits.sort(
-        [](R3BCalifaCrystalCalData* lhs, R3BCalifaCrystalCalData* rhs) { return lhs->GetEnergy() > rhs->GetEnergy(); });
-    uint32_t clusterId = 0;
-    while (!unusedCrystalHits.empty())
-    {
-        auto highest = unusedCrystalHits.front();
-        LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): starting cluster at "
-                   << "crystal " << highest->GetCrystalId() << ", E=" << highest->GetEnergy();
 
-        // Note: we do not remove highest, but process it like any others
-        uint64_t time = highest->GetTime();
-        auto vhighest = GetAnglesVector(highest->GetCrystalId()) - fCalifatoTargetPos;
 
-        Double_t fRandPhi, fRandTheta;
-        R3BCalifaHitData* clusterHit;
+   AddHit(cluster.crystalList,cluster.energy,cluster.nf,cluster.ns,cluster.theta,cluster.phi,cluster.time,0);
 
-        if (fRand)
-        {
+   RemoveUsedCrystals(usedCrystals,allCrystalVec,protonCandidatesVec,gammaCandidatesVec,saturatedCandidatesVec);
 
-            if (highest->GetCrystalId() <= 2432)
-                fAngularDistributions[highest->GetCrystalId() - 1]->GetRandom2(fRandPhi, fRandTheta);
+}
 
-            else
-                fAngularDistributions[highest->GetCrystalId() - 1 - 2432]->GetRandom2(fRandPhi, fRandTheta);
 
-            clusterHit = TCAHelper<R3BCalifaHitData>::AddNew(
-                *fCalifaHitData, time, TMath::DegToRad() * fRandTheta, TMath::DegToRad() * fRandPhi, clusterId);
+ // Now gamma clusters
+
+ while(gammaCandidatesVec.size()){
+
+  Int_t motherId = gammaCandidatesVec.at(0)->GetCrystalId();
+
+  califa_candidate cluster = {motherId,vector<Int_t>(),0.0,0.0,0.0,0.0,0.0};
+
+  mother_angles = fCalifaGeo->GetAngles(motherId);
+
+  if(fRand){
+
+   fAngularDistributions[gammaCandidatesVec.at(0)->GetCrystalId()- 1]->GetRandom2(fRandPhi,fRandTheta);
+   cluster.theta = TMath::DegToRad()*fRandTheta;
+   cluster.phi = TMath::DegToRad()*fRandPhi;
+
+  }
+
+ else{
+
+   cluster.theta = mother_angles.Theta();
+   cluster.phi = mother_angles.Phi();
+
+  }
+
+  cluster.energy += gammaCandidatesVec.at(0)->GetEnergy();
+  cluster.nf += gammaCandidatesVec.at(0)->GetNf();
+  cluster.ns += gammaCandidatesVec.at(0)->GetNs();
+  cluster.crystalList.push_back(motherId);
+  cluster.time = gammaCandidatesVec.at(0)->GetTime();
+
+  usedCrystals.push_back(motherId);
+
+
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+    if(thisCryId==motherId)
+     continue;
+
+    if(thisCryId <= 2432 && !isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+      // if it is read in gamma,and not used for protons then is not usable
+      if(fMap_Par->GetInUse(thisCryId + 2432))
+       usedCrystals.push_back(thisCryId + 2432);
+
+      }
+    }
+  }
+
+  //Then we use the proton ranges that could have some gamma energy inside (and not used for proton hits)
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+    if(thisCryId==motherId)
+     continue;
+
+    if(thisCryId > 2432 && !isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId - 2432);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+      }
+    }
+  }
+
+
+   AddHit(cluster.crystalList,cluster.energy,cluster.nf,cluster.ns,cluster.theta,cluster.phi,cluster.time,1);
+
+   RemoveUsedCrystals(usedCrystals,allCrystalVec,protonCandidatesVec,gammaCandidatesVec,saturatedCandidatesVec);
+
+    }
+
+  // Saturated Ones
+   while(saturatedCandidatesVec.size()){
+
+    Int_t motherId = saturatedCandidatesVec.at(0)->GetCrystalId();
+
+    califa_candidate cluster = {motherId,vector<Int_t>(),0.0,0.0,0.0,0.0,0.0};
+
+    mother_angles = fCalifaGeo->GetAngles(motherId);
+
+    if(fRand){
+
+     fAngularDistributions[saturatedCandidatesVec.at(0)->GetCrystalId()- 1]->GetRandom2(fRandPhi,fRandTheta);
+     cluster.theta = TMath::DegToRad()*fRandTheta;
+     cluster.phi = TMath::DegToRad()*fRandPhi;
+
+    }
+
+   else{
+
+     cluster.theta = mother_angles.Theta();
+     cluster.phi = mother_angles.Phi();
+
+    }
+
+    cluster.energy += saturatedCandidatesVec.at(0)->GetEnergy();
+    cluster.nf += saturatedCandidatesVec.at(0)->GetNf();
+    cluster.ns += saturatedCandidatesVec.at(0)->GetNs();
+    cluster.crystalList.push_back(motherId);
+    cluster.time = saturatedCandidatesVec.at(0)->GetTime();
+
+    usedCrystals.push_back(motherId);
+
+
+    for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+      Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+      if(thisCryId==motherId)
+       continue;
+
+      if(thisCryId > 2432 && !isInside(usedCrystals,thisCryId)) {
+
+       angles = fCalifaGeo->GetAngles(thisCryId-2432);
+
+       if(mother_angles.Angle(angles) <= fRoundWindow){
+
+        usedCrystals.push_back(thisCryId);
+
+        cluster.energy += allCrystalVec.at(j)->GetEnergy();
+        cluster.nf += allCrystalVec.at(j)->GetNf();
+        cluster.ns += allCrystalVec.at(j)->GetNs();
+        cluster.crystalList.push_back(thisCryId);
+
+        // if it is read in proton, it is not read in gamma
+        if(fMap_Par->GetInUse(thisCryId - 2432))
+         usedCrystals.push_back(thisCryId - 2432);
+
         }
-
-        else
-        {
-
-            clusterHit =
-                TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
-        }
-
-        // loop through remaining crystals, remove matches from list.
-        auto i = unusedCrystalHits.begin();
-        while (i != unusedCrystalHits.end())
-            if (this->Match(highest, *i))
-            {
-                LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): adding  "
-                           << "crystal " << (*i)->GetCrystalId() << ", E=" << (*i)->GetEnergy();
-
-                *clusterHit += **i;
-                i = unusedCrystalHits.erase(i);
-            }
-            else
-                ++i;
-        ++clusterId;
+      }
     }
+
+    //Then we use the gamma ranges that could have some proton energy inside (near a saturation)
+    for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+      Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+      if(thisCryId==motherId)
+       continue;
+
+      if(thisCryId <= 2432 && !isInside(usedCrystals,thisCryId)) {
+
+       angles = fCalifaGeo->GetAngles(thisCryId);
+
+       if(mother_angles.Angle(angles) <= fRoundWindow){
+
+        usedCrystals.push_back(thisCryId);
+
+        cluster.energy += allCrystalVec.at(j)->GetEnergy();
+        cluster.nf += allCrystalVec.at(j)->GetNf();
+        cluster.ns += allCrystalVec.at(j)->GetNs();
+        cluster.crystalList.push_back(thisCryId);
+
+        }
+      }
+    }
+
+
+     AddHit(cluster.crystalList,cluster.energy,cluster.nf,cluster.ns,cluster.theta,cluster.phi,cluster.time,2);
+
+     RemoveUsedCrystals(usedCrystals,allCrystalVec,protonCandidatesVec,gammaCandidatesVec,saturatedCandidatesVec);
+
+
+    }
+
+  }
+
+
+ // -------- Simulation Data --------
+ else {
+
+  for(Int_t i = 0 ; i < numCrystalHits ; i++){
+
+        cryId     = ((R3BCalifaCrystalCalData*)fCrystalCalData->At(i))->GetCrystalId();
+        cryEnergy = ((R3BCalifaCrystalCalData*)fCrystalCalData->At(i))->GetEnergy();
+
+        if(cryEnergy >= fGammaClusterThreshold && cryEnergy < fProtonClusterThreshold)
+         gammaCandidatesVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+        if(cryEnergy >= fProtonClusterThreshold)
+         protonCandidatesVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+        if(cryEnergy >= fCrystalThreshold)
+         allCrystalVec.push_back((R3BCalifaCrystalCalData*)fCrystalCalData->At(i));
+
+     }
+
+    if(gammaCandidatesVec.size()==0 && protonCandidatesVec.size() == 0)
+     return;
+
+ // Sort all vectors by energy
+ std::sort(gammaCandidatesVec.begin(), gammaCandidatesVec.end(),compareByEnergy);
+ std::sort(protonCandidatesVec.begin(), protonCandidatesVec.end(),compareByEnergy);
+
+ TVector3 mother_angles,angles;
+ Double_t fRandTheta,fRandPhi;
+
+ vector<Int_t> usedCrystals;
+
+ // Proton clusters have priority
+ while(protonCandidatesVec.size()){
+
+  Int_t motherId = protonCandidatesVec.at(0)->GetCrystalId();
+
+  califa_candidate cluster = {motherId,vector<Int_t>(),0.0,0.0,0.0,0.0,0.0};
+
+  mother_angles = fCalifaGeo->GetAngles(motherId);
+
+  if(fRand){
+
+   fAngularDistributions[protonCandidatesVec.at(0)->GetCrystalId()- 1]->GetRandom2(fRandPhi,fRandTheta);
+   cluster.theta = TMath::DegToRad()*fRandTheta;
+   cluster.phi = TMath::DegToRad()*fRandPhi;
+
+  }
+
+ else{
+
+   cluster.theta = mother_angles.Theta();
+   cluster.phi = mother_angles.Phi();
+
+  }
+
+
+  cluster.energy += protonCandidatesVec.at(0)->GetEnergy();
+  cluster.nf += protonCandidatesVec.at(0)->GetNf();
+  cluster.ns += protonCandidatesVec.at(0)->GetNs();
+  cluster.crystalList.push_back(motherId);
+  cluster.time = protonCandidatesVec.at(0)->GetTime();
+
+  usedCrystals.push_back(motherId);
+
+
+
+  // First we add all proton hits
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+    if(thisCryId==motherId)
+     continue;
+
+    if(!isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+      }
+    }
+  }
+
+   AddHit(cluster.crystalList,cluster.energy,cluster.nf,cluster.ns,cluster.theta,cluster.phi,cluster.time,0);
+
+   RemoveUsedCrystals(usedCrystals,allCrystalVec,protonCandidatesVec,gammaCandidatesVec,saturatedCandidatesVec);
+
+}
+
+
+ // Now gamma clusters
+
+ while(gammaCandidatesVec.size()){
+
+  Int_t motherId = gammaCandidatesVec.at(0)->GetCrystalId();
+
+  califa_candidate cluster = {motherId,vector<Int_t>(),0.0,0.0,0.0,0.0,0.0};
+
+  mother_angles = fCalifaGeo->GetAngles(motherId);
+
+  if(fRand){
+
+   fAngularDistributions[gammaCandidatesVec.at(0)->GetCrystalId()- 1]->GetRandom2(fRandPhi,fRandTheta);
+   cluster.theta = TMath::DegToRad()*fRandTheta;
+   cluster.phi = TMath::DegToRad()*fRandPhi;
+
+  }
+
+ else{
+
+   cluster.theta = mother_angles.Theta();
+   cluster.phi = mother_angles.Phi();
+
+  }
+
+  cluster.energy += gammaCandidatesVec.at(0)->GetEnergy();
+  cluster.nf += gammaCandidatesVec.at(0)->GetNf();
+  cluster.ns += gammaCandidatesVec.at(0)->GetNs();
+  cluster.crystalList.push_back(motherId);
+  cluster.time = gammaCandidatesVec.at(0)->GetTime();
+
+  usedCrystals.push_back(motherId);
+
+
+  for(Int_t j = 0 ; j < allCrystalVec.size() ; j++ ){
+
+    Int_t thisCryId = allCrystalVec.at(j)->GetCrystalId();
+
+    if(thisCryId==motherId)
+     continue;
+
+    if(!isInside(usedCrystals,thisCryId)) {
+
+     angles = fCalifaGeo->GetAngles(thisCryId);
+
+     if(mother_angles.Angle(angles) <= fRoundWindow){
+
+      usedCrystals.push_back(thisCryId);
+
+      cluster.energy += allCrystalVec.at(j)->GetEnergy();
+      cluster.nf += allCrystalVec.at(j)->GetNf();
+      cluster.ns += allCrystalVec.at(j)->GetNs();
+      cluster.crystalList.push_back(thisCryId);
+
+      }
+    }
+  }
+
+
+
+   AddHit(cluster.crystalList,cluster.energy,cluster.nf,cluster.ns,cluster.theta,cluster.phi,cluster.time,1);
+
+   RemoveUsedCrystals(usedCrystals,allCrystalVec,protonCandidatesVec,gammaCandidatesVec,saturatedCandidatesVec);
+
+   }
+
+
+ }
+
     return;
 }
 
@@ -333,47 +720,21 @@ void R3BCalifaCrystalCal2Hit::SelectGeometryVersion(Int_t version)
     R3BLOG(INFO, "to " << fGeometryVersion);
 }
 
-void R3BCalifaCrystalCal2Hit::SetCrystalThreshold(Double_t thresholdEne)
-{
-    fThreshold = thresholdEne;
-    R3BLOG(INFO, "to " << fThreshold << " keV.");
-}
 
-void R3BCalifaCrystalCal2Hit::SetDRThreshold(Double_t DRthresholdEne)
-{
-    fDRThreshold = DRthresholdEne;
-    R3BLOG(INFO, "to " << fDRThreshold << " keV.");
-}
 
-TVector3 R3BCalifaCrystalCal2Hit::GetAnglesVector(int id) { return fCalifaGeo->GetAngles(id); }
-
-R3BCalifaHitData* R3BCalifaCrystalCal2Hit::AddHit(UInt_t Nbcrystals,
+R3BCalifaHitData* R3BCalifaCrystalCal2Hit::AddHit(vector<Int_t> crystalList,
                                                   Double_t ene,
                                                   Double_t Nf,
                                                   Double_t Ns,
                                                   Double_t pAngle,
                                                   Double_t aAngle,
-                                                  ULong64_t time)
+                                                  ULong64_t time,
+                                                  Int_t clusterType)
 {
     TClonesArray& clref = *fCalifaHitData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BCalifaHitData(Nbcrystals, ene, Nf, Ns, pAngle, aAngle, time);
+    return new (clref[size]) R3BCalifaHitData(crystalList,ene, Nf, Ns, pAngle, aAngle, time, clusterType);
 }
 
-/*
- Double_t GetCMEnergy(Double_t theta, Double_t energy){
- //
- // Calculating the CM energy from the lab energy and the polar angle
- //
- Double_t beta = 0.8197505718204776;  //beta is 0.8197505718204776
- Double_t gamma = 1/sqrt(1-beta*beta);
- //Lorenzt boost correction
- //E' = gamma E + beta gamma P|| = gamma E + beta gamma P cos(theta)
- //In photons E=P
- Double_t energyCorrect = gamma*energy - beta*gamma*energy*cos(theta);
-
- return energyCorrect;
- }
-*/
 
 ClassImp(R3BCalifaCrystalCal2Hit);
