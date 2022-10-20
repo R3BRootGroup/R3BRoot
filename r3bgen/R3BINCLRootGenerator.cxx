@@ -17,6 +17,7 @@
 #include "FairPrimaryGenerator.h"
 #include "FairRunSim.h"
 #include "G4NistManager.hh"
+#include "R3BLogger.h"
 #include "TFile.h"
 #include "TMath.h"
 #include "TRandom.h"
@@ -73,7 +74,6 @@ R3BINCLRootGenerator::~R3BINCLRootGenerator() {}
 bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
     // Track variables to be read from file
-    int iPid = -1;
     int iZ = 0;
     int iA = 0;
     double px = 0.;
@@ -153,7 +153,7 @@ newevt:
         return kTRUE;
     }
 
-    LOG(DEBUG) << "fParticles: " << fParticles;
+    R3BLOG(debug, "fParticles: " << fParticles);
 
     for (Int_t j = 0; j < fParticles; j++)
     {
@@ -162,8 +162,7 @@ newevt:
         {
             iA = fMass[j];
             iZ = fCharge[j];
-            // Ions: -1, Particles +1
-            pdg = iPid < 0 ? GetIonPdgId(iZ, iA) : iA;
+            pdg = GetIonPdgId(iZ, iA);
             pz = fPzPrime[j] / 1000.;
             Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
             px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
@@ -177,7 +176,7 @@ newevt:
             px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
             py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
         }
-        LOG(DEBUG) << "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz;
+        R3BLOG(debug, "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz);
         primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
     }
 
@@ -187,10 +186,9 @@ newevt:
 
 void R3BINCLRootGenerator::RegisterIons()
 {
-    LOG(INFO) << "R3BINCLRootGenerator: Looking for ions ...";
+    R3BLOG(info, "Looking for ions ...");
 
     // Track variables to be read from file
-    Int_t iPid = -1;
     Int_t iZ = 0;
     Int_t iA = 0;
     // Keep a list of ions to register
@@ -200,7 +198,7 @@ void R3BINCLRootGenerator::RegisterIons()
     Tree = (TTree*)f->Get("et");
 
     fEvtRoot = Tree->GetEntries();
-    LOG(INFO) << "R3BINCLRootGenerator: Root file entries " << fEvtRoot;
+    R3BLOG(info, "Root file entries " << fEvtRoot);
 
     // first root file
     Tree->SetBranchAddress("nParticles", &fParticles);
@@ -236,7 +234,7 @@ void R3BINCLRootGenerator::RegisterIons()
         // Note: FairRoot will not register ions known to TDatabasePDG (e.g. alphas)
         FairRunSim::Instance()->AddNewIon(kv.second);
     }
-    LOG(INFO) << "R3BINCLRootGenerator: " << ions.size() << " ions registered.";
+    R3BLOG(info, ions.size() << " ions registered.");
 }
 
 void R3BINCLRootGenerator::SetXYZ(Double32_t x, Double32_t y, Double32_t z)
@@ -255,4 +253,4 @@ void R3BINCLRootGenerator::SetDxDyDz(Double32_t sx, Double32_t sy, Double32_t sz
     fBoxVtxIsSet = kTRUE;
 }
 
-ClassImp(R3BINCLRootGenerator)
+ClassImp(R3BINCLRootGenerator);
