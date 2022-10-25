@@ -14,9 +14,14 @@
 #include "R3BTofdReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "R3BEventHeader.h"
 #include "R3BTofdMappedData.h"
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+using namespace std;
 
 extern "C"
 {
@@ -74,6 +79,11 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
         FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd", fArrayTrigger, kFALSE);
     }
 
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+        LOG(ERROR) << "FairRootManager not found";
+    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
     for (int d = 0; d < MAX_TOFD_PLANES; d++)
@@ -90,7 +100,16 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTofdReader::Read()
 {
+
+    Int_t fNEventUnpack = header->GetEventno();
+    //  cout<<"nEvent from Unpack: "<<fNEventUnpack<<endl;
+
     LOG(DEBUG) << "R3BTofdReader::Read() Event data.";
+    // if (fNEvents / 10000. == (int)fNEvents / 10000)
+    //   std::cout << "ToFD Events: " << fNEvents << std::endl;
+    fNEvents += 1;
+    cout << "ToFD ReaderEvent: " << fNEvents << ", " << fNEventUnpack << endl;
+
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 
@@ -117,6 +136,9 @@ Bool_t R3BTofdReader::Read()
                 for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
                 {
                     // printf("Lead %8u %8u %8u %8u\n", d, t, channel, side.TCLv[j] * 5);
+
+                    //  cout<<"fArray->GetEntriesFast() = "<<fArray->GetEntriesFast()<<endl;
+
                     new ((*fArray)[fArray->GetEntriesFast()])
                         R3BTofdMappedData(d + 1, t + 1, channel, 1, side.TCLv[j], side.TFLv[j]);
                     // if (-1 == first) { first = side.TCLv[j]; }

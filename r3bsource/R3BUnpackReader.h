@@ -41,7 +41,6 @@ class R3BUnpackReader : public R3BReader
     UInt_t fOffset;
     /* FairLogger */
     FairLogger* fLogger;
-
     R3BEventHeader* fHeader;
 
   public:

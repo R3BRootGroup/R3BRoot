@@ -17,6 +17,8 @@
 #include "R3BFiberMAPMTMappedData.h"
 #include "TClonesArray.h"
 
+using namespace std;
+
 R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name, UInt_t a_offset, UInt_t fiber_num)
     : R3BReader(TString("R3B") + a_name + "Reader")
     , fOffset(a_offset)
@@ -45,12 +47,18 @@ Bool_t R3BFiberMAPMTReader::Init()
         }
     }
     FairRootManager::Instance()->Register(fShortName + "Mapped", "Land", fMappedArray, kTRUE);
+
     return kTRUE;
 }
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
     //  LOG(WARNING) << "R3BFiberMAPMTReader::Read BEGIN for fib "<<fShortName;
+
+    // if (fNEvents / 10000. == (int)fNEvents / 10000)
+    // std::cout << "Events: " << fNEvents << std::endl;
+    fNEvents += 1;
+
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)

@@ -146,25 +146,29 @@ class R3BPreTrackS494 : public FairTask
     {
 		fAverage = averageValues;
 	}
+	void SetXlimits(Double_t xmin, Double_t xmax){
+		fXmin=xmin;
+		fXmax=xmax;
+	}
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
     TClonesArray* fTofdHitItems;       
-    Int_t fNofTofdHitItems;
+    Int_t fNofTofdHitItems = 0;
     TClonesArray* fFi23aHitItems;       
-    Int_t fNofFi23aHitItems;
+    Int_t fNofFi23aHitItems = 0;
     TClonesArray* fFi23bHitItems;       
-    Int_t fNofFi23bHitItems;
+    Int_t fNofFi23bHitItems = 0;
     TClonesArray* fFi30HitItems;       
-    Int_t fNofFi30HitItems;
+    Int_t fNofFi30HitItems = 0;
     TClonesArray* fFi31HitItems;       
-    Int_t fNofFi31HitItems;
+    Int_t fNofFi31HitItems = 0;
     TClonesArray* fFi32HitItems;       
-    Int_t fNofFi32HitItems;
+    Int_t fNofFi32HitItems = 0;
     TClonesArray* fFi33HitItems;       
-    Int_t fNofFi33HitItems;
+    Int_t fNofFi33HitItems = 0;
 
     enum DetectorInstances
     {
@@ -203,10 +207,11 @@ class R3BPreTrackS494 : public FairTask
 	Bool_t fSimu;
 	Int_t fB;
 	Bool_t tracker = true;
+	Double_t fXmin, fXmax;
 	Double_t delta;
 	Bool_t ftrackerType;
 	Bool_t fAverage;
-	unsigned long IcountwriteOut1[19]={0}, IcountwriteOut2[19]={0};
+	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0;
 	
 
 	TCutG *cut_fi31_fi23a;
@@ -253,7 +258,8 @@ class R3BPreTrackS494 : public FairTask
 	Double_t tPrev[10];
 	Int_t detPrev[10];
 	
-	Int_t counter1 = 0;
+	Int_t counter1 = 0, counterwo=0;
+	Int_t counter1mem = 0;
 	Int_t counter2 = 0;
 	Int_t counter3 = 0;
 	Int_t counter4 = 0;
@@ -277,6 +283,9 @@ class R3BPreTrackS494 : public FairTask
 	Double_t hits32bc = 0;
 	Double_t hits33 = 0;
 	Double_t hits33bc = 0;
+	Bool_t increment1 = false;
+    Bool_t increment2 = false;
+                    
 
     UInt_t num_spills = 0;
 
@@ -371,11 +380,11 @@ class R3BPreTrackS494 : public FairTask
 
     TH2F* fh_xy_tofd;
     TH2F* fh_xy_tofd_ac;
-    TH1F* fh_tofd_charge;
-    TH1F* fh_tofd_charge_ac;
+    TH2F* fh_tofd_charge;
+    TH2F* fh_tofd_charge_ac;
     TH1F* fh_tofd_time;
     TH1F* fh_tofd_time_ac;
-    TH1F* fh_TimePreviousEvent;
+    TH2F* fh_TimePreviousEvent;
     TH1F* fh_tofd_mult;
     TH1F* fh_tofd_mult_ac;
 	TH2F* fh_tofd_q2_vs_q1;

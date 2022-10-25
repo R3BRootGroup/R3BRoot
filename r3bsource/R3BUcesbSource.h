@@ -82,7 +82,7 @@ class R3BUcesbSource : public FairSource
     /* The location of the unpacker */
     const TString fUcesbPath;
     /* The event counter */
-    unsigned int fNEvent;
+    unsigned int fNEvent=0;
     /* The full event structure */
     EXT_STR_h101* fEvent;
     size_t fEventSize;
@@ -92,6 +92,8 @@ class R3BUcesbSource : public FairSource
     FairLogger* fLogger;
     /* The array of readers */
     TObjArray* fReaders;
+   
+	
 
   public:
     /* Create dictionary */

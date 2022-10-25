@@ -163,7 +163,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNeventstrack = 0; /**< Event counter. */
 
     Int_t maxevent;
 
@@ -214,20 +214,15 @@ class R3BGlobalAnalysisS494 : public FairTask
 	
     UInt_t num_spills = 0;
 
-    TH1F* fh_Tpat;
-    TH1F* fh_Trigger;
-    TH1F* fh_IC;
-    TH1F* fh_SEE;
-    TH1F* fh_TOFDOR;
-    TH2F* fh_Cave_position;
+//    TH1F* fh_Tpat;
+//    TH1F* fh_Trigger;
+//    TH1F* fh_IC;
+//    TH1F* fh_SEE;
+ //   TH1F* fh_TOFDOR;
+//    TH2F* fh_Cave_position;
     TH2F* fh_target_xy;
-    TH2F* fh_target_xy_ac;
     TH1F* fh_target_xx;
     TH1F* fh_target_yy;
-    TH1F* fh_target_px;
-    TH1F* fh_target_py;
-    TH1F* fh_target_pz;
-    TH1F* fh_target_p;
     TH1F* fh_chi2;
     TH1F* fh_px_He;
     TH1F* fh_py_He;
@@ -271,15 +266,49 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_px_px_cm;
     TH2F* fh_py_py_cm;
     TH2F* fh_pz_pz_cm;
-    TH2F* fh_px_px_ac;
-    TH2F* fh_py_py_ac;
-    TH2F* fh_pz_pz_ac;
     TH2F* fh_px_px;
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
     TH2F* fh_Erel_vs_thetabc;
     TH2F* fh_Erel_vs_thetabcMC;
-    TH2F* fh_theta26_vs_chi;    
+    TH2F* fh_psum_vs_event;  
+    
+    TH2F* fh_thetax_px;
+    TH2F* fh_thetay_py;
+    TH2F* fh_thetax_py;
+    TH2F* fh_thetay_px;
+    
+    TH2F* fh_pHe_vs_theta26;
+    TH2F* fh_pC_vs_theta26;
+    
+    TH2F* fh_theta26_vs_chi;  
+    TH2F* fh_Erel_vs_chi; 
+    TH2F* fh_psum_vs_chi; 
+    
+    TH2F* fh_target_xy_nc;
+	TH1F* fh_px_He_nc;
+	TH1F* fh_py_He_nc;
+    TH1F* fh_pz_He_nc;
+    TH1F* fh_p_He_nc;           
+	TH1F* fh_px_C_nc;
+	TH1F* fh_py_C_nc;
+	TH1F* fh_pz_C_nc;
+	TH1F* fh_p_C_nc;
+	TH1F* fh_px_O_nc;
+	TH1F* fh_py_O_nc;
+    TH1F* fh_pz_O_nc;
+    TH1F* fh_p_O_nc;      	
+	TH2F* fh_px_px_nc;
+	TH2F* fh_py_py_nc;
+	TH2F* fh_pz_pz_nc;
+	TH1F* fh_psum_nc;
+	TH2F* fh_psum_vs_event_nc;				
+	TH1F* fh_theta26_nc;
+	TH1F* fh_Erel_nc;                   
+	TH2F* fh_Erel_vs_theta26_nc;
+	TH1F* fh_ErelB_nc;
+	TH1F* fh_theta_bc_cm_nc;
+	TH1F* fh_phi_bc_cm_nc;
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
@@ -300,10 +329,10 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_ErelR;
 	TH1F* fh_ErelB;
 	TH2F* fh_phi_bc_cm_polar;
-	TH2F* fh_Erel_vs_pC;
+	TH2F* fh_Erel_vs_theta26;
 	TH2F* fh_Erel_vs_thetaMC;
-	TH1F* fh_p_vs_p;
-	TH1F* fh_p_vs_p_MC;
+	TH1F* fh_psum;
+	TH1F* fh_psum_MC;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;
 

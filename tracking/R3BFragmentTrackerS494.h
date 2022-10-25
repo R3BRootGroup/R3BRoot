@@ -19,6 +19,11 @@
 #include <string>
 #include <vector>
 
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <TLorentzVector.h>
+#include <cstdlib>
+
 class TClonesArray;
 class R3BFieldPar;
 class R3BTPropagator;
@@ -55,9 +60,14 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
     void SetBfield(Double_t Bfield) {fBfield = Bfield;}
     void SetOutput(Bool_t WriteOut){fWriteOut = WriteOut;}
+    void SetPlimits(Double_t pmin, Double_t pmax){
+		fPmin=pmin;
+		fPmax=pmax;
+	}
     
   private:
     Bool_t InitPropagator();
+    Double_t fPmin, fPmax;
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
     TClonesArray* fArrayMCTracks; // simulation output??? To compare?
@@ -87,9 +97,10 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t fNofFi32HitItems;
     TClonesArray* fFi33HitItems;       
     Int_t fNofFi33HitItems;    
-    Int_t fNEvents;
-    Int_t fNEventsLeft;
-    Int_t fNEventsRight;
+    Int_t fNEvents = 0;
+    Int_t fNEventsLeft = 0;
+    Int_t fNEventsRight=0;
+    Int_t sumwrite = 0;
     Int_t counter1 = 0, fNEvents_nonull=0, counterHe=0, counterC=0;
     Double_t fBfield;
     
@@ -113,7 +124,10 @@ class R3BFragmentTrackerS494 : public FairTask
 
     const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",
                                                 "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
-                                                
+    TLorentzVector Oxygen; 
+    TVector3 pos16O0;
+    TVector3 pos16O3;
+                                           
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
    	Double_t amu = 0.931494028;   // Gev/c**2
@@ -130,6 +144,18 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fWriteOut;
     Int_t eventCounter = 0;
     Double_t minChi2;
+    Double_t minChi2_12C;
+    TLorentzVector alphaP, carbonP;
+    TVector3 p12C;
+    Double_t mHe = 3727.409;
+	Double_t mC = 11174.950;
+	Double_t x_l[8];
+    Double_t y_l[8];
+    Double_t det_hit_x[8];
+    Double_t det_hit_y[8];
+    Double_t det_hit_xC[8];
+    Double_t det_hit_yC[8];
+    Int_t fNwriteout=0;
 
     TH1F* fh_mult_fi23a;
     TH1F* fh_mult_fi23b;
@@ -197,6 +223,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_yFi23b_tofd_exp;
     TH2F* fh_pyC_vs_pyHe; 
     TH2F* fh_A_overZ;
+    TH2F* fh_theta_16O;
+    TH2F* fh_phi_16O;
 
     ClassDef(R3BFragmentTrackerS494, 1)
 };

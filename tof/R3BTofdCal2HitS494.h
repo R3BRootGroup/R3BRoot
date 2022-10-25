@@ -162,7 +162,7 @@ class R3BTofdCal2HitS494 : public FairTask
     Double_t fTofdQ;
     Bool_t fTofdHisto;
     Bool_t fTofdTotPos;
-    Bool_t fYOffset=true;
+    Bool_t fYOffset;
     UInt_t fnEvents;
     UInt_t lasttpatevent=0;
     UInt_t fNofPlanes;

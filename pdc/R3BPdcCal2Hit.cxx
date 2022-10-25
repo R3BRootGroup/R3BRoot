@@ -1139,7 +1139,15 @@ void R3BPdcCal2Hit::FinishTask()
                             Int_t idelta = int(time_interval / double(xtc_points) + 1.);
 
                             cout << "*** " << plane << ", " << i << "; " << tlow << ", " << thigh << "; "
-                                 << time_interval << ", " << idelta << ", " << endl;
+                                 << time_interval << ", " << idelta << ", " << npoints << endl;
+
+                            if (double(npoints) / double(idelta) >= double(xtc_points))
+                            {
+                                cout << "WARNING more than 300 points! " << npoints << ", " << idelta << "; "
+                                     << double(npoints) / double(idelta) << ", " << npoints / xtc_points << endl;
+                                idelta = npoints / xtc_points;
+                                cout << "new idelta = " << idelta << endl;
+                            }
 
                             for (Int_t index = 1; index < npoints; index++)
                             {

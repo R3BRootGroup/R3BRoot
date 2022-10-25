@@ -124,21 +124,63 @@ R3BGladFieldMap::~R3BGladFieldMap()
 // -----------   Intialisation   ------------------------------------------
 void R3BGladFieldMap::Init()
 {
-    fPosX = 0.0;
-    //fPosY = 0.0;
-    fPosY = 1.08;
+    /*
+        fPosX   =  0;
+        fPosY   =  1.5;
+        fPosZ   = 174.95;
+        fXAngle = 0;
+        fYAngle = -14.0;
+        fZAngle = 0.;
+    */
+    // fPosY = 1.08;
 
-// Distance in z: turning point to flansch:   539.5 mm 
-//				       GLAD flansch target:  1210 mm
-//											  1749.5 mm
-// 					
-    //fPosZ = 163.4+16.2-0.5; 
-    //fPosZ = 172.5; // Measured with ruler
-    fPosZ = 174.95; // from the drawings
+    // Distance in z: turning point to flansch:   539.5 mm
+    //				       GLAD flansch target:  1210 mm
+    //											  1749.5 mm
+    //
+    // fPosZ = 163.4+16.2-0.5;
+    // fPosZ = 172.5; // Measured with ruler
+    // fPosZ = 174.95; // from the drawings
 
-    fXAngle = 0.;
-    fYAngle = -14.;
-    fZAngle = 0.;
+    // This is for comparison with measurements (relative to entrance flanch):
+    //   fPosX = 0.0;
+    //   fPosY = 0.0;
+    //   fPosZ = 54.05;
+    //   fXAngle = 0.;
+    //   fYAngle = -14.;
+    //   fZAngle = 0.;
+    // v1 longarm 0deg:
+    //    fPosX   =  0.9225815;
+    //    fPosY   = -0.09727;
+    //    fPosZ   = 174.5535-121.0;  // distane to target subtracted
+    //    fXAngle = 0.19959;
+    //    fYAngle = -14.53223;
+    //    fZAngle = -0.94522;
+    // v2 longarm 0deg only By
+    //   fPosX   =  0.86128;
+    //    fPosY   = -1.543865 + 1.5;
+    //    fPosZ   = 174.5681;//-121.0;  // distane to target subtracted
+    //    fXAngle = -0.1446;
+    //    fYAngle = -14.19588;
+    //    fZAngle = -0.7113;
+    // v3 longarm weighted By
+    //   fPosX   =  0.49236;
+    //    fPosY   = -1.58098;
+    //    fPosZ   = 174.5337-121.0;  // distane to target subtracted
+    //    fXAngle = -0.0868;
+    //    fYAngle = -13.9964;
+    //   fZAngle = -0.5127;
+
+    // end   ****
+    // v2
+
+    fPosX = 0.86128;
+    fPosY = -1.543865 + 1.5;
+    fPosZ = 174.5681;
+    fXAngle = -0.1446;
+    fYAngle = -14.19588;
+    fZAngle = -0.7113;
+
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
     if (fFileName.EndsWith(".dat"))
         ReadAsciiFile(fFileName);
@@ -245,6 +287,26 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (Y) interpolated " << val << endl;
+        /*
+                Double_t fcor = 1.;
+                if(localPoint.Z()>36.67 && localPoint.Z()<294.){
+                    if(localPoint.Y() == 0. ){  // correction for y=0 plane
+                        Double_t
+           par[8]={1.0157655,-5.491E-04,8.7452E-06,-8.849E-08,5.6868E-10,-2.001E-12,2.8387E-15,-3.150E-19}; Double_t zz
+           = localPoint.Z();
+
+                        fcor = par[0] + par[1]* TMath::Power(zz,1)
+                                      + par[2]* TMath::Power(zz,2)
+                                      + par[3]* TMath::Power(zz,3)
+                                      + par[4]* TMath::Power(zz,4)
+                                      + par[5]* TMath::Power(zz,5)
+                                      + par[6]* TMath::Power(zz,6)
+                                      + par[7]* TMath::Power(zz,7);
+                    }
+                }
+                fcor = 1.;
+                val = val*fcor;
+         */
         return (fTrackerCorr * val);
     }
     return 0.;

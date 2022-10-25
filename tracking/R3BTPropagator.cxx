@@ -38,6 +38,7 @@ R3BTPropagator::R3BTPropagator(R3BGladFieldMap* field, Bool_t vis)
     fPlane2[0] = TVector3(0., 0., field->GetZmax());
     fPlane2[1] = TVector3(field->GetXmax(), field->GetYmax(), field->GetZmax());
     fPlane2[2] = TVector3(-field->GetXmax(), field->GetYmax(), field->GetZmax());
+
     for (Int_t i = 0; i < 3; i++)
     {
         fPlane1[i].RotateY(angle);

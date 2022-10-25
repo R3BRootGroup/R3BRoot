@@ -19,6 +19,10 @@
 #include "R3BUcesbSource.h"
 
 #include "ext_data_client.h"
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+using namespace std;
 
 R3BUcesbSource::R3BUcesbSource(const TString& FileName,
                                const TString& NtupleOptions,
@@ -91,6 +95,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
+        cout << "InitUnpacker: " << i << ", " << fReaders->GetEntriesFast() << endl;
         if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
         {
             LOG(fatal) << "ucesb: " << fClient.last_error();
@@ -164,7 +169,9 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     int ret;
     (void)i; /* Why is i not used? Outer loop seems not to use it. */
 
-    LOG(debug1) << "R3BUcesbSource::ReadEvent " << (fNEvent++);
+    fNEvent++;
+
+    LOG(debug1) << "R3BUcesbSource::ReadEvent " << fNEvent;
 
     /* Need to initialize first */
     if (nullptr == fFd)
@@ -174,6 +181,9 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     /* Fetch data */
     ret = fClient.fetch_event(fEvent, fEventSize);
+
+    cout << "R3BUcesbSource::ReadEvent " << fNEvent << ", " << fEventSize << endl;
+    ;
     if (0 == ret)
     {
         LOG(info) << "R3BUcesbSource::End of input";

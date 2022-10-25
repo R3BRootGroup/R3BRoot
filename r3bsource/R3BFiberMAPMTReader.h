@@ -126,6 +126,8 @@ class R3BFiberMAPMTReader : public R3BReader
 		TString fShortName; // e.g. "Fi1a", "Fi2", ...
 		UInt_t fFiberNum;
 		TClonesArray* fMappedArray;
+		Int_t ieventnumer[1000];
+	    Int_t fNEvents = 0;
 
 	public:
 		ClassDef(R3BFiberMAPMTReader, 1);

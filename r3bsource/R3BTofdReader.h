@@ -15,6 +15,7 @@
 #define R3BTOFDREADER_H
 
 #include "R3BReader.h"
+class R3BEventHeader;
 
 struct EXT_STR_h101_TOFD_t;
 typedef struct EXT_STR_h101_TOFD_t EXT_STR_h101_TOFD;
@@ -35,6 +36,7 @@ class R3BTofdReader : public R3BReader
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
+    R3BEventHeader* header; /**< Event header. */
     /* Reader specific data structure from ucesb */
     EXT_STR_h101_TOFD* fData;
     /* Data offset */
@@ -44,6 +46,8 @@ class R3BTofdReader : public R3BReader
     /* the structs of type R3BTofdxMappedItem */
     TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */
+	Int_t fNEvents = 0;
+    Int_t ieventnumer[1000];
 
   public:
     ClassDef(R3BTofdReader, 0);
