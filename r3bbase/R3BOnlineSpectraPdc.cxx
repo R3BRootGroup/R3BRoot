@@ -272,8 +272,8 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_0_pdc->GetXaxis()->SetTitle("Fiber0 position ");
         fh_fi0_0_pdc->GetYaxis()->SetTitle("PDC position ");
 
-        fh_fi0_1_pdc = new TH2F("Fi1_pdc", "Fi1 vs. PDC", 50, 0., 10., 800, 0, 800);
-        fh_fi0_1_pdc->GetXaxis()->SetTitle("Fiber1 position in mm");
+        fh_fi0_1_pdc = new TH2F("Fi1_pdc", "Fi1 vs. PDC", 130, 0., 130., 5000, 200, 1200);
+        fh_fi0_1_pdc->GetXaxis()->SetTitle("Fiber0 position ");
         fh_fi0_1_pdc->GetYaxis()->SetTitle("PDC position in mm");
 
         fh_fi0_pdc_eloss = new TH2F("Fi0_pdc_eloss", "Fi0 vs. PDC eloss", 200, 0, 100, 3000, 0., 300.);
@@ -811,6 +811,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     // PDC
     //----------------------------------------------------------------------
 
+	//cout << endl;
 	//cout << "new Event" << endl;
     if (fMappedItems)
     {
@@ -898,9 +899,14 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         }
     }
 
+
+
+
+
     Double_t yPdc2 = -1000;
     Double_t xPdc1 = -1000;
     Double_t yPdc4test = -1000;
+    Double_t xPdc3test = -1000;
     Double_t yPdc4 = -1000;
     Double_t xPdc3 = -1000;
     Double_t t0 = -10000.;
@@ -919,6 +925,9 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         }
         ipl[ip] = -1;
     }
+
+	Int_t mult_pdc4 = 0;
+	Int_t mult_pdc3 = 0;
 
     if (fHitItems)
     {
@@ -967,6 +976,18 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             fh_Pdc_Tot[plane - 1]->Fill(wire, eloss[plane - 1]);
             fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
 
+			//cout << "Plane: " << plane << " wire: " << wire << " x: " << x[plane - 1]
+			//	<< " y: " << y[plane - 1] << " eloss: " << eloss[plane - 1] << endl;
+
+			if(plane == 3)
+			{
+				mult_pdc3++;
+			}
+			if(plane == 4)
+			{
+				mult_pdc4++;
+			}
+			
             mult[plane - 1][wire]++;
             /*
                         if (plane == 2)
@@ -997,13 +1018,26 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 yPair[plane - 1] = y[plane - 1];
                 TotMax[plane - 1] = eloss[plane - 1];
             }
-
+            /*
             if (plane == 4)
             {
                 fh_pdc_ebene4->Fill(wire, y[plane - 1]);
                 yPdc4test = y[plane - 1] ;
+                cout << "Plane 4: wire = " << wire << " y = " << yPdc4test << " ToT: " << eloss[plane - 1] << endl;
             }
+            */
         }
+        
+        if(yPair[3] > 0)
+        {
+			yPdc4test = yPair[3] ;
+		}
+        if(xPair[2] > 0)
+        {
+			xPdc3test = xPair[2] ;
+		}
+        
+        
         Bool_t true1 = false, true2 = false, true3 = false;
 
         // Choose correlated x1 vs x3 hits
@@ -1105,7 +1139,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         }
         if (mult_fi0_1 > 0)
         {
-            fh_fi0_1_mult->Fill(mult_fi0_1);
+            fh_fi0_1_mult->Fill(mult_fi0_1 / 2.);
         }
 
         // Cal Items
@@ -1177,12 +1211,23 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 fh_fi0_0_fiber_mc->Fill(iFib);
 
                 //if (yPdc4 > 0. && eloss[3] > 35 && nHits == 1)
-                if (yPdc4test > 0. && nHits == 1)
+                if (nHits > 0 && nHits < 3)
                 {
-                    //fh_fi0_0_pdc->Fill(iFib, yPdc4);
+					//cout << "Fib0: fiber = " << iFib << endl;
+				}
+                if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
+                //if (yPdc2 > 0. && nHits > 0 && nHits < 2 )
+                {
+                    //fh_fi0_0_pdc->Fill(iFib, yPdc2);
                     fh_fi0_0_pdc->Fill(iFib, yPdc4test);
                     fh_fi0_pdc_time->Fill(tMAPMT, tPair[3]);
                     fh_fi0_pdc_eloss->Fill(tot, eloss[3]);
+                }
+                if (xPdc3test > 0. && nHits > 0 && nHits < 2 )
+                //if (xPdc1 > 0. && nHits > 0 && nHits < 2 )
+                {
+                    //fh_fi0_1_pdc->Fill(iFib, xPdc1);
+                    fh_fi0_1_pdc->Fill(iFib, xPdc3test);
                 }
                 
 

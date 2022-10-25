@@ -58,6 +58,7 @@ R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
 R3BOptimizeGeometryS494.cxx
+#R3BOptimizeMagfieldS494.cxx
 )
 
 # fill list of header files from list of source files

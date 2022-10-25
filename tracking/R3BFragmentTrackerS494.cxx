@@ -395,7 +395,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug = false;
+    Bool_t debug = true;
     Int_t fNevOut = 0;
     if (fNEvents == 147041 || fNEvents == 184888)
         fNevOut = fNEvents;
@@ -424,6 +424,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     R3BTrackingDetector* tof = fDetectorsLeft->GetByName("tofd");
 
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+
+    if (debug)
+        //cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
 
     if (tof->hits.size() > 0 && debug)
     {
@@ -700,8 +703,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         lmin = 1;
         lmax = 3;
     }
+    //cout << "Test l: " << lmin << "  " << lmax << "  " << fBfield << endl;
     if (debug)
-    {
+    {		
         for (Int_t i = 0; i < fi23a->hits.size(); i++)
         {
             cout << "Fib23a hits: " << i << ", " << fi23a->hits.at(i)->GetX() << endl;
@@ -841,13 +845,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                       ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0011);
                       ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
                     // second optimization
-                    /* ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.9750);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(172.8753);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(1.625196);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(0.025);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.9974960);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0);
-                     */
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.9750);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(172.8753);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(1.625196);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(0.025);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.9974960);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0);
                     // second optimization angleZ=0
                     /*( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-13.875);
                     ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.8753);
@@ -1132,12 +1135,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.0011);
                         ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleX(0.0);*/
                     // second optimization
-                    /* ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.88482);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(178.7732);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(2.041127);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(-0.3535);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002188);
-                     ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0); */
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-13.88482);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(178.7732);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(2.041127);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(-0.3535);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002188);
+                    //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.0);
                     // second optimization angleZ=0
                     /*	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
                        )->SetTrackerCorrectionAngleY(-13.86857); ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField()
@@ -1518,7 +1521,15 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             }
             tof->free_hit[bestcandidate->GetHitIndexByName("tofd")] = false;
 
-            Double_t x0soll, y0soll, z0soll, psoll, px0soll, py0soll, pz0soll, beta0soll, m0soll;
+            Double_t x0soll = 0.;
+            Double_t y0soll = 0.; 
+            Double_t z0soll = 0.;
+            Double_t psoll = 0.;
+            Double_t px0soll = 0.;
+            Double_t py0soll = 0.;
+            Double_t pz0soll = 0.;
+            Double_t beta0soll = 0.;
+            Double_t m0soll = 0.;
 
             if (l == 0)
             {

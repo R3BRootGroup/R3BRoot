@@ -31,6 +31,7 @@
 #pragma link C++ class R3BTrackingParticle+;
 #pragma link C++ class R3BTrackingSetup+;
 #pragma link C++ class R3BOptimizeGeometryS494+;
+//#pragma link C++ class R3BOptimizeMagfieldS494+;
 
 #endif
 

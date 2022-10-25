@@ -845,6 +845,10 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     LOG(DEBUG3) << setprecision(10) << "Start Momenta: " << px0 << ", " << py0 << ", " << pz0 << endl;
     LOG(DEBUG3) << setprecision(10) << "Start Position: " << x0 << "; " << y0 << ", " << z0 << endl;
 
+    //cout << "In FitTrackMomentumForward" << endl;
+    //cout << setprecision(10) << "Start Momenta: " << px0 << ", " << py0 << ", " << pz0 << ", pin: "<<pin<< endl;
+    //cout << setprecision(10) << "Start Position: " << x0 << "; " << y0 << ", " << z0 << endl;
+
     TVector3 pos0;
     TVector3 pos3;
 
@@ -872,6 +876,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
         fi23b->LocalToGlobal(pos3, xfi23b, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
     }
 
+	
     pos0.SetX(x0);
     pos0.SetY(y0);
     pos0.SetZ(z0);

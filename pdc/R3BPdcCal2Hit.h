@@ -136,7 +136,7 @@ class R3BPdcCal2Hit : public FairTask
     Double_t rebinned_t_ns[xtc_points];
     Int_t ipar_channels = N_PLANE_MAX_PDC*N_WIRE_MAX ;
     Double_t tsync_mem[N_PLANE_MAX_PDC*N_WIRE_MAX];
-    Bool_t method2 = false;
+    Bool_t method2 = true;
 
     typedef std::vector<Channel> ChannelArray;
     std::vector<ChannelArray> fPlaneArray;
