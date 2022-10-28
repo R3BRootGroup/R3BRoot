@@ -132,6 +132,7 @@ void R3BAlpideMapped2Cal::Exec(Option_t* option)
         auto det = mappedData[i]->GetSensorId();
         auto col = mappedData[i]->GetCol();
         auto row = mappedData[i]->GetRow();
+        // std::cout << det <<" "<< col <<" "<< row <<std::endl;
         if (fMap_Par->GetInUse(det, col, row) == 1)
         {
             AddCalData(det, col, row);
