@@ -22,6 +22,7 @@
 // D Modified by Jan Mayer
 
 #include <assert.h>
+#include <utility>
 
 //=============================================================================
 template <typename T>
@@ -32,7 +33,8 @@ class Validated
     // invalid constructor
 
     Validated(const T& data);
-    // valid constructor
+    Validated(T&& data);
+    // valid constructors
 
     bool valid() const;
     // is this valid or not?
@@ -42,10 +44,14 @@ class Validated
     // cached value.
 
     void set(const T& data);
+    void set(T&& data);
     // set the data, makes the instance valid.
 
     T get() const;
     // explicit conversion
+
+    const T& getRef();
+    // getter with const ref. Use this if you only want to check the value.
 
     operator T();
     operator T() const;
@@ -84,6 +90,17 @@ Validated<T>::Validated(const T& data)
 
 //=============================================================================
 template <typename T>
+Validated<T>::Validated(T&& data)
+    //
+    // D Valid constructor
+    //
+    : m_valid(true)
+    , m_data(std::move(data))
+{
+}
+
+//=============================================================================
+template <typename T>
 bool Validated<T>::valid() const
 //
 // D is this valid or not?
@@ -116,7 +133,26 @@ void Validated<T>::set(const T& data)
 
 //=============================================================================
 template <typename T>
+void Validated<T>::set(T&& data)
+//
+// D set the data.
+//
+{
+    m_data = std::move(data);
+    m_valid = true;
+}
+
+//=============================================================================
+template <typename T>
 T Validated<T>::get() const
+{
+    assert(valid() && "Cannot return invalid data.");
+    return m_data;
+}
+
+//=============================================================================
+template <typename T>
+const T& Validated<T>::getRef()
 {
     assert(valid() && "Cannot return invalid data.");
     return m_data;
