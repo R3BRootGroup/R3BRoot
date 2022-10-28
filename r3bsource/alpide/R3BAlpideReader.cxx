@@ -105,19 +105,31 @@ Bool_t R3BAlpideReader::Read()
                   "Chip/Col sizes mismatch for detector " << d + 1 << ", Chip: " << fData->ALPIDE[d].CHIP
                                                           << " , Col: " << fData->ALPIDE[d].COL);
 
-        for (int r = 0; r < fData->ALPIDE[d].ROW; r++)
+        for (int r = 0; r < (fData->ALPIDE[d].ROW == fData->ALPIDE[d].COL) ? fData->ALPIDE[d].ROW : 0; r++)
         {
 
             //  R3BLOG(DEBUG1,"det: "<<d+1 <<", region: "<<fData->ALPIDE[d].REGIONv[fData->ALPIDE[d].REGION-1]<< " ,
             //  ads: " << fData->ALPIDE[d].ADDRESSv[fData->ALPIDE[d].ADDRESS-1]<< " , row: "<<
             //  fData->ALPIDE[d].ROWv[r]<<" , col: "<< fData->ALPIDE[d].COLv[r]);
 
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(d + 1,
-                                                                          fData->ALPIDE[d].REGIONv[r],
-                                                                          fData->ALPIDE[d].ADDRESSv[r],
-                                                                          fData->ALPIDE[d].CHIPv[r],
-                                                                          fData->ALPIDE[d].ROWv[r],
-                                                                          fData->ALPIDE[d].COLv[r]);
+            if (fData->ALPIDE[d].ROWv[r] > 0 && fData->ALPIDE[d].COLv[r] > 0 && fData->ALPIDE[d].COLv[r] < 1025 &&
+                fData->ALPIDE[d].ROWv[r] < 513)
+            {
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(d + 1,
+                                                                              fData->ALPIDE[d].REGIONv[r],
+                                                                              fData->ALPIDE[d].ADDRESSv[r],
+                                                                              fData->ALPIDE[d].CHIPv[r],
+                                                                              fData->ALPIDE[d].ROWv[r],
+                                                                              fData->ALPIDE[d].COLv[r]);
+            }
+            else
+            {
+
+                R3BLOG(warning,
+                       "det: " << d + 1 << ", region: " << fData->ALPIDE[d].REGIONv[fData->ALPIDE[d].REGION - 1]
+                               << " , ads: " << fData->ALPIDE[d].ADDRESSv[fData->ALPIDE[d].ADDRESS - 1]
+                               << " , row: " << fData->ALPIDE[d].ROWv[r] << " , col: " << fData->ALPIDE[d].COLv[r]);
+            }
         }
     }
 
