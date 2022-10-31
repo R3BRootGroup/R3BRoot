@@ -32,6 +32,7 @@
 #pragma link C++ class R3BAlpideCal2Hit+;
 
 #pragma link C++ class R3BAlpideOnlineSpectra+;
+#pragma link C++ class R3BSingleAlpideCorrelationOnlineSpectra+;
 
 #endif
 
