@@ -310,8 +310,8 @@ void R3BAlpideCal2Hit::FindClusters()
                 nbcluster++;
                 AddHitData(s + 1,
                            mult[s][i],
-                           meancol[s][i] / double(mult[s][i]) * fPixelSize - fPixelSize / 2.0,
-                           meanrow[s][i] / double(mult[s][i]) * fPixelSize - fPixelSize / 2.0);
+                           meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
+                           meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0);
             }
 
     R3BLOG(debug, "Number of clusters: " << nbcluster);

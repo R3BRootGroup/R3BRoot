@@ -91,7 +91,7 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     // X Hit data
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hitx";
     Name2 = "Position-X: Alpide" + fNameDet1 + " vs Alpide" + fNameDet2;
-    fh2_hitx = new TH2F(Name1, Name2, 200, -1.5, 1.5, 200, -1.5, 1.5);
+    fh2_hitx = new TH2F(Name1, Name2, 200, -15, 15, 200, -15, 15);
     fh2_hitx->GetXaxis()->SetTitle("X" + fNameDet1 + " [mm]");
     fh2_hitx->GetYaxis()->SetTitle("X" + fNameDet2 + " [mm]");
     fh2_hitx->GetYaxis()->SetTitleOffset(1.1);
@@ -107,7 +107,7 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     // Y Hit data
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hity";
     Name2 = "Position-Y: Alpide" + fNameDet1 + " vs Alpide" + fNameDet2;
-    fh2_hity = new TH2F(Name1, Name2, 100, -0.75, 0.75, 100, -0.75, 0.75);
+    fh2_hity = new TH2F(Name1, Name2, 100, -7.5, 7.5, 100, -7.5, 7.5);
     fh2_hity->GetXaxis()->SetTitle("Y" + fNameDet1 + " [mm]");
     fh2_hity->GetYaxis()->SetTitle("Y" + fNameDet2 + " [mm]");
     fh2_hity->GetYaxis()->SetTitleOffset(1.1);
