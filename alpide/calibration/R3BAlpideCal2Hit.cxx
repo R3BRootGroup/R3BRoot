@@ -47,7 +47,7 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fAlpideCalData(NULL)
     , fAlpideHitData(NULL)
-    , fAlpidePixel(NULL)
+    // , fAlpidePixel(NULL)
     , fMap_Par(NULL)
     , fNbSensors(1)
     , fPixelSize(0.0292968) // TODO: put the right ones!
@@ -69,10 +69,10 @@ R3BAlpideCal2Hit::~R3BAlpideCal2Hit()
     {
         delete fAlpideCluster;
     }
-    if (fAlpidePixel)
-    {
-        delete fAlpidePixel;
-    }
+    /* if (fAlpidePixel)
+     {
+         delete fAlpidePixel;
+     }*/
     if (fAlpideHitData)
     {
         delete fAlpideHitData;
@@ -175,10 +175,11 @@ void R3BAlpideCal2Hit::Exec(Option_t* option)
     bool shouldround = false;
 
     // Reading the Input -- Cal Data --
-    fAlpidePixel = (TClonesArray*)fAlpideCalData->Clone();
+    auto fAlpidePixel = (TClonesArray*)fAlpideCalData->Clone();
     Int_t nHits = fAlpidePixel->GetEntriesFast();
     if (nHits == 0)
     {
+        delete fAlpidePixel;
         return;
     }
 
@@ -189,12 +190,13 @@ nextcluster:
 nextround:
     shouldround = false;
 
+    auto calData = new R3BAlpideCalData*[fAlpidePixel->GetEntriesFast()];
     for (Int_t i = 0; i < fAlpidePixel->GetEntriesFast(); i++)
     {
-        auto calData = (R3BAlpideCalData*)(fAlpidePixel->At(i));
-        auto sen = calData->GetSensorId();
-        auto col = calData->GetCol();
-        auto row = calData->GetRow();
+        calData[i] = (R3BAlpideCalData*)(fAlpidePixel->At(i));
+        auto sen = calData[i]->GetSensorId();
+        auto col = calData[i]->GetCol();
+        auto row = calData[i]->GetRow();
 
         if (i == 0 && first)
         {
@@ -233,6 +235,11 @@ nextround:
         }
     }
 
+    if (calData)
+    {
+        delete[] calData;
+    }
+
     if (shouldround)
     {
         R3BLOG(debug, "Should be next round");
@@ -246,6 +253,7 @@ nextround:
 
     FindClusters();
 
+    delete fAlpidePixel;
     return;
 }
 
@@ -261,10 +269,10 @@ void R3BAlpideCal2Hit::Reset()
     {
         fAlpideCluster->Clear();
     }
-    if (fAlpidePixel)
-    {
-        fAlpidePixel->Clear();
-    }
+    /*  if (fAlpidePixel)
+      {
+          fAlpidePixel->Clear();
+      }*/
 }
 
 // -----   Private method FindClusters   -----------------------------------------

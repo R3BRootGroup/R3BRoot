@@ -172,7 +172,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_mulcal_sensor_%d", s + 1);
             sprintf(Name2, "Cal_mult for sensor: %d", s + 1);
-            fh1_Calmult[s] = new TH1F(Name1, Name2, 100, 0, 100);
+            fh1_Calmult[s] = new TH1F(Name1, Name2, 1000, 0, 1000);
             fh1_Calmult[s]->GetXaxis()->SetTitle("Pixel multiplicity");
             fh1_Calmult[s]->GetYaxis()->SetTitle("Counts");
             fh1_Calmult[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -210,7 +210,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_cluster_size_sensor_%d", s + 1);
             sprintf(Name2, "Cluster_size for sensor: %d", s + 1);
-            fh1_Clustersize[s] = new TH1F(Name1, Name2, 60, 0, 60);
+            fh1_Clustersize[s] = new TH1F(Name1, Name2, 160, 0, 160);
             fh1_Clustersize[s]->GetXaxis()->SetTitle("Cluster size [pixels]");
             fh1_Clustersize[s]->GetYaxis()->SetTitle("Counts");
             fh1_Clustersize[s]->GetYaxis()->SetTitleOffset(1.1);
