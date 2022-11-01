@@ -79,7 +79,7 @@ class R3BAlpideCal2Hit : public FairTask
     TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
     TClonesArray* fAlpideHitData;  // Array with Alpide Hit output data
     TClonesArray* fAlpideCluster;  // Array with clusters
-    TClonesArray* fAlpidePixel;
+                                   // TClonesArray* fAlpidePixel;
 
     // Private method AddHitData
     R3BAlpideHitData* AddHitData(UShort_t senId, UInt_t clustersize, Double_t x, Double_t y);
