@@ -199,7 +199,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             cHit->Divide(2, 1);
             sprintf(Name1, "fh2_pos_hit_sensor_%d", s + 1);
             sprintf(Name2, "Hit-position for sensor: %d", s + 1);
-            fh2_PosHit[s] = new TH2F(Name1, Name2, 600, 0.0, 30.0, 300, 0.0, 15.0);
+            fh2_PosHit[s] = new TH2F(Name1, Name2, 600, -15.0, 15.0, 300, -7.5, 7.5);
             fh2_PosHit[s]->GetXaxis()->SetTitle("Posl [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitle("Post [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitleOffset(1.1);
