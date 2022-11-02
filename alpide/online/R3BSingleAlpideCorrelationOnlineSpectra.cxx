@@ -17,23 +17,20 @@
 // ----- Fill Single ALPIDE correlation online histograms -----
 // ------------------------------------------------------------
 
-#include "R3BSingleAlpideCorrelationOnlineSpectra.h"
-#include "R3BAlpideHitData.h"
-#include "R3BEventHeader.h"
-#include "R3BLogger.h"
-
-#include "THttpServer.h"
-
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TCanvas.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
+#include "R3BAlpideHitData.h"
+#include "R3BEventHeader.h"
+#include "R3BLogger.h"
+#include "R3BSingleAlpideCorrelationOnlineSpectra.h"
+
+#include "TCanvas.h"
 #include "TClonesArray.h"
+#include "TFolder.h"
+#include "THttpServer.h"
 #include "TMath.h"
 
 R3BSingleAlpideCorrelationOnlineSpectra::R3BSingleAlpideCorrelationOnlineSpectra()
@@ -86,7 +83,7 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
                          10,
                          800,
                          700);
-    cHit2D->Divide(2, 1);
+    cHit2D->Divide(2, 2);
 
     // X Hit data
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hitx";
@@ -120,6 +117,36 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     cHit2D->cd(2);
     fh2_hity->Draw("col");
 
+    // X Hit diff. data
+    Name1 = "fh1_" + fNameDet1 + "-" + fNameDet2 + "_hitx_dif";
+    Name2 = "Dif. position-X: Alpide" + fNameDet1 + " - Alpide" + fNameDet2;
+    fh1_hitxdif = new TH1F(Name1, Name2, 1000, -5, 5);
+    fh1_hitxdif->GetXaxis()->SetTitle("X" + fNameDet1 + " - X" + fNameDet2 + " [mm]");
+    fh1_hitxdif->GetXaxis()->CenterTitle(true);
+    fh1_hitxdif->GetXaxis()->SetLabelSize(0.045);
+    fh1_hitxdif->GetXaxis()->SetTitleSize(0.045);
+    fh1_hitxdif->GetYaxis()->SetLabelSize(0.045);
+    fh1_hitxdif->GetYaxis()->SetTitleSize(0.045);
+    fh1_hitxdif->GetYaxis()->SetTitle("Counts");
+    fh1_hitxdif->GetYaxis()->SetTitleOffset(1.1);
+    cHit2D->cd(3);
+    fh1_hitxdif->Draw("l");
+
+    // Y Hit diff. data
+    Name1 = "fh1_" + fNameDet1 + "-" + fNameDet2 + "_hity_dif";
+    Name2 = "Dif. position-Y: Alpide" + fNameDet1 + " - Alpide" + fNameDet2;
+    fh1_hitydif = new TH1F(Name1, Name2, 1000, -5, 5);
+    fh1_hitydif->GetXaxis()->SetTitle("Y" + fNameDet1 + " - Y" + fNameDet2 + " [mm]");
+    fh1_hitydif->GetXaxis()->CenterTitle(true);
+    fh1_hitydif->GetXaxis()->SetLabelSize(0.045);
+    fh1_hitydif->GetXaxis()->SetTitleSize(0.045);
+    fh1_hitydif->GetYaxis()->SetLabelSize(0.045);
+    fh1_hitydif->GetYaxis()->SetTitleSize(0.045);
+    fh1_hitydif->GetYaxis()->SetTitle("Counts");
+    fh1_hitydif->GetYaxis()->SetTitleOffset(1.1);
+    cHit2D->cd(4);
+    fh1_hitydif->Draw("l");
+
     // MAIN FOLDER
     TFolder* mainfol = new TFolder("Alpide" + fNameDet1 + "-Alpide" + fNameDet2,
                                    "Alpide" + fNameDet1 + "-Alpide" + fNameDet2 + " info");
@@ -141,6 +168,8 @@ void R3BSingleAlpideCorrelationOnlineSpectra::Reset_Histo()
     R3BLOG(info, "");
     fh2_hitx->Reset();
     fh2_hity->Reset();
+    fh1_hitxdif->Reset();
+    fh1_hitydif->Reset();
 }
 
 void R3BSingleAlpideCorrelationOnlineSpectra::Exec(Option_t* option)
@@ -150,25 +179,33 @@ void R3BSingleAlpideCorrelationOnlineSpectra::Exec(Option_t* option)
     {
         float x1 = NAN, x2 = NAN, y1 = NAN, y2 = NAN;
         auto nHits = fHitItems->GetEntriesFast();
+        int size1 = 0, size2 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BAlpideHitData*)fHitItems->At(ihit);
             if (!hit)
                 continue;
             Int_t senid = hit->GetSensorId();
-            if (senid == fId1)
+            if (senid == fId1 && hit->GetClusterSize() > size1)
             {
-                x1 = hit->GetPosl();
-                y1 = hit->GetPost();
+                size1 = hit->GetClusterSize();
+                x1 = hit->GetX();
+                y1 = hit->GetY();
             }
-            else if (senid == fId2)
+            else if (senid == fId2 && hit->GetClusterSize() > size2)
             {
-                x2 = hit->GetPosl();
-                y2 = hit->GetPost();
+                size2 = hit->GetClusterSize();
+                x2 = hit->GetX();
+                y2 = hit->GetY();
             }
         }
-        fh2_hitx->Fill(x1, x2);
-        fh2_hity->Fill(y1, y2);
+        if (size1 > 0 && size2 > 0)
+        {
+            fh2_hitx->Fill(x1, x2);
+            fh1_hitxdif->Fill(x1 - x2);
+            fh2_hity->Fill(y1, y2);
+            fh1_hitydif->Fill(y1 - y2);
+        }
     }
 
     fNEvents++;
@@ -185,7 +222,6 @@ void R3BSingleAlpideCorrelationOnlineSpectra::FinishEvent()
 
 void R3BSingleAlpideCorrelationOnlineSpectra::FinishTask()
 {
-
     if (fHitItems)
     {
         cHit2D->Write();
