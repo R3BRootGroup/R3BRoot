@@ -22,7 +22,7 @@
 
 #include "FairTask.h"
 #include "TCanvas.h"
-#include "TH1.h"
+#include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
 
@@ -104,6 +104,8 @@ class R3BSingleAlpideCorrelationOnlineSpectra : public FairTask
     TCanvas* cHit2D;
 
     // Histograms for hit data
+    TH1F* fh1_hitxdif;
+    TH1F* fh1_hitydif;
     TH2F* fh2_hitx;
     TH2F* fh2_hity;
 
