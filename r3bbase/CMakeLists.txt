@@ -50,6 +50,7 @@ file(GLOB SRCS
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
+install(FILES "R3BLogger.h" DESTINATION include)
 
 Set(LINKDEF BaseLinkDef.h)
 
