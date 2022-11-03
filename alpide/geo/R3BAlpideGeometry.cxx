@@ -37,9 +37,8 @@ R3BAlpideGeometry* R3BAlpideGeometry::Instance()
 R3BAlpideGeometry::R3BAlpideGeometry()
     : TObject()
     , IsInitialize(kFALSE)
-    , fGeometryVersion(2022)
-    , fNbCyl(2)
-    , fNbSensor(363)
+    , fGeometryVersion(2024)
+    , fNbSensor(108)
 {
 }
 
@@ -56,20 +55,25 @@ bool R3BAlpideGeometry::Init(Int_t version)
 
     switch (version)
     {
-        case 2022:
-            // Two Barrels
-            geoPath += "tracking_alpide_v22.geo.root";
+        case 2026:
+            // Two barrels
+            geoPath += "target_area_alpide_barrel_v26.geo.root";
             fNbSensor = 363;
-            fNbCyl = 2;
-            fGeometryVersion = 2022;
+            fGeometryVersion = version;
+            break;
+
+        case 2024:
+            // Two arms
+            geoPath += "target_area_alpide_twoarms_v24.geo.root";
+            fNbSensor = 108;
+            fGeometryVersion = version;
             break;
 
         case 202210:
-            // 6 ALPIDEs
+            // 6 ALPIDEs in a telescope configuration
             geoPath += "tracking_alpide_cern_202210.geo.root";
-            fNbSensor = 6;
-            fNbCyl = 0;
-            fGeometryVersion = 202210;
+            fNbSensor = 31;
+            fGeometryVersion = version;
             break;
 
         default:
@@ -168,7 +172,6 @@ const TRotation R3BAlpideGeometry::GetRotation(Int_t iD)
     if (iD >= 1 && iD <= fNbSensor)
     {
         nameVolume = GetSensorVolumePath(iD);
-
         gGeoManager->CdTop();
 
         if (gGeoManager->CheckPath(nameVolume))
@@ -232,7 +235,6 @@ const TVector3& R3BAlpideGeometry::GetTranslation(Int_t iD)
     if (iD >= 1 && iD <= fNbSensor)
     {
         nameVolume = GetSensorVolumePath(iD);
-
         gGeoManager->CdTop();
 
         if (gGeoManager->CheckPath(nameVolume))
@@ -270,24 +272,43 @@ void R3BAlpideGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal
 
 const char* R3BAlpideGeometry::GetSensorVolumePath(Int_t iD)
 {
-    static char nameVolume[400];
+    static char nameVolume[300];
     Int_t sid = 0;
     Int_t bartype = 0;
+    Int_t layertype = 0;
+
+    R3BLOG(debug, "SensorId: " << iD);
 
     if (iD >= 1 && iD <= fNbSensor)
     {
-        if (iD <= 153)
+        if (fGeometryVersion == 2026)
         {
-            bartype = 1;
-            sid = iD;
+            if (iD <= 153)
+            {
+                bartype = 1;
+                layertype = (iD - 1) / 9;
+                sid = iD - layertype * 9;
+                layertype++;
+            }
+            else
+            {
+                bartype = 2;
+                sid = iD - 154;
+                layertype = sid / 10;
+                sid = iD - 153 - layertype * 10;
+                layertype++;
+            }
         }
         else
         {
-            bartype = 2;
-            sid = iD - 153;
+
+            bartype = 1;
+            layertype = (iD - 1) / 6;
+            sid = iD - layertype * 6;
+            layertype++;
         }
 
-        sprintf(nameVolume, "/cave_1/VCWorld_0/Cylinder%i_1/Alpide%i_%i", bartype, bartype, sid);
+        sprintf(nameVolume, "/cave_1/VCWorld_0/Multilayer_%i_%i/Alpide_%i", bartype, layertype, sid);
     }
     else
     {
@@ -300,7 +321,7 @@ const char* R3BAlpideGeometry::GetSensorVolumePath(Int_t iD)
 int R3BAlpideGeometry::GetBarrelId(const char* volumePath)
 {
     Int_t barID = 0;
-    static auto restr = "Alpide([0-9]+)_([0-9]+)";
+    static auto restr = "Multilayer_([0-9]+)_([0-9]+)/Alpide_([0-9]+)";
     static auto re = boost::regex(restr, boost::regex::extended);
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
@@ -323,7 +344,10 @@ int R3BAlpideGeometry::GetBarrelId(const char* volumePath)
 int R3BAlpideGeometry::GetSensorId(const char* volumePath)
 {
     Int_t sensorId = 0;
-    static auto restr = "Alpide([0-9]+)_([0-9]+)";
+    Int_t barID = 0;
+    Int_t layerID = 0;
+    Int_t alpideID = 0;
+    static auto restr = "Multilayer_([0-9]+)_([0-9]+)/Alpide_([0-9]+)";
     static auto re = boost::regex(restr, boost::regex::extended);
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
@@ -336,19 +360,30 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
         return sensorId;
     }
 
-    Int_t bartype = std::stoi(m[1].str()); // converting to int the barrel type
-    Int_t sid = std::stoi(m[2].str());     // converting to int the sensor ID
+    barID = std::stoi(m[1].str());    // converting to int the barrel type
+    layerID = std::stoi(m[2].str());  // converting to int the layer type
+    alpideID = std::stoi(m[3].str()); // converting to int the alpide type
 
-    if (bartype == 2)
+    if (fGeometryVersion == 2026)
     {
-        sensorId = sid;
-        sensorId += 153;
+        if (barID == 2)
+        {
+            sensorId = (layerID - 1) * 10 + alpideID;
+            sensorId += 153;
+        }
+        else
+        {
+            sensorId = (layerID - 1) * 9 + alpideID;
+        }
     }
     else
     {
-        sensorId = sid;
+        sensorId = (layerID - 1) * 6 + alpideID;
     }
-    R3BLOG(debug, "Barrel: " << bartype << ", sensorID in barrel: " << sid << ", sensorID: " << sensorId);
+
+    R3BLOG(debug,
+           "Barrel ID: " << barID << ", multiflex ID: " << layerID << ", sensorID in multiflex: " << alpideID
+                         << ", sensorID: " << sensorId);
 
     return sensorId;
 }

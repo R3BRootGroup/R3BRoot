@@ -130,7 +130,8 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     fh1_hitxdif->GetYaxis()->SetTitle("Counts");
     fh1_hitxdif->GetYaxis()->SetTitleOffset(1.1);
     cHit2D->cd(3);
-    fh1_hitxdif->Draw("l");
+    fh1_hitxdif->SetFillColor(31);
+    fh1_hitxdif->Draw("hist");
 
     // Y Hit diff. data
     Name1 = "fh1_" + fNameDet1 + "-" + fNameDet2 + "_hity_dif";
@@ -145,7 +146,8 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     fh1_hitydif->GetYaxis()->SetTitle("Counts");
     fh1_hitydif->GetYaxis()->SetTitleOffset(1.1);
     cHit2D->cd(4);
-    fh1_hitydif->Draw("l");
+    fh1_hitydif->SetFillColor(31);
+    fh1_hitydif->Draw("hist");
 
     // MAIN FOLDER
     TFolder* mainfol = new TFolder("Alpide" + fNameDet1 + "-Alpide" + fNameDet2,

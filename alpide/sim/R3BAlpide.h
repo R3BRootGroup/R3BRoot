@@ -25,6 +25,7 @@
 
 class TClonesArray;
 class R3BAlpidePoint;
+class R3BAlpideMappingPar;
 class R3BAlpideGeometry;
 class FairVolume;
 
@@ -121,7 +122,9 @@ class R3BAlpide : public R3BDetector
     Double32_t fELoss;              //  energy loss
     Int_t fPosIndex;                //
     TClonesArray* fAlpidePoint;     //  The hit collection
+    R3BAlpideMappingPar* fMap_Par;  /**< Parameter container. >*/
     R3BAlpideGeometry* fAlpideGeo;
+    Int_t fGeoversion;
 
     /** Private method AddHit
      **
@@ -145,8 +148,10 @@ class R3BAlpide : public R3BDetector
      **/
     void ResetParameters();
 
+    void SetParameter();
+
   public:
-    ClassDefOverride(R3BAlpide, 0);
+    ClassDefOverride(R3BAlpide, 1);
 };
 
 inline void R3BAlpide::ResetParameters()

@@ -52,7 +52,7 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
     , fNbSensors(1)
     , fPixelSize(0.0292968) // TODO: put the right ones!
     , fAlpideGeo(NULL)
-    , fGeoversion(2022)
+    , fGeoversion(2024)
     , fAlpideCluster(new TClonesArray("R3BAlpideCluster"))
     , fOnline(kFALSE)
 {

@@ -119,7 +119,6 @@ class R3BAlpideGeometry : public TObject
   private:
     Int_t fGeometryVersion;
     Int_t fNbSensor;
-    Int_t fNbCyl;
     Bool_t fIsSimulation;
     Bool_t IsInitialize;
     TFile* f;

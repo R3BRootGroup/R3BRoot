@@ -17,6 +17,7 @@
 
 #include "R3BAlpide.h"
 #include "R3BAlpideGeometry.h"
+#include "R3BAlpideMappingPar.h"
 #include "R3BAlpidePoint.h"
 #include "R3BLogger.h"
 #include "R3BMCStack.h"
@@ -40,7 +41,9 @@ R3BAlpide::R3BAlpide(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BAlpide", kTRA, geoFile, combi)
     , fAlpidePoint(new TClonesArray("R3BAlpidePoint"))
     , fPosIndex(0)
+    , fMap_Par(NULL)
     , fAlpideGeo(NULL)
+    , fGeoversion(2024)
 {
     ResetParameters();
 }
@@ -54,17 +57,36 @@ R3BAlpide::~R3BAlpide()
     }
 }
 
+void R3BAlpide::SetParameter()
+{
+    // Parameter Container
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    R3BLOG_IF(warning, !fMap_Par, "Container alpideMappingPar not found");
+    //--- Parameter Container ---
+    if (fMap_Par)
+    {
+        fGeoversion = fMap_Par->GetGeoVersion();
+    }
+    R3BLOG(info, "Geometry version: " << fGeoversion);
+    return;
+}
+
 void R3BAlpide::Initialize()
 {
     FairDetector::Initialize();
 
     R3BLOG(INFO, " ");
     R3BLOG(DEBUG, "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide"));
+
+    SetParameter();
+    fAlpideGeo = R3BAlpideGeometry::Instance();
+    R3BLOG_IF(error, !fAlpideGeo->Init(fGeoversion), "Alpide geometry " << fGeoversion << " not found");
 }
 
 void R3BAlpide::SetSpecialPhysicsCuts()
 {
-    R3BLOG(INFO, "Adding customized Physics cut.");
+    R3BLOG(info, "Adding customized Physics cut.");
 
     if (gGeoManager)
     {
@@ -88,7 +110,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -133,7 +155,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for LiH Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pLiH->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -168,7 +190,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Vac
             gMC->Gstpar(pVac->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -203,7 +225,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Gold
             gMC->Gstpar(pGold->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -238,7 +260,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Mylar Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Mylar
             gMC->Gstpar(pM->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -273,7 +295,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for aluminium Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Al
             gMC->Gstpar(pAl->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -308,7 +330,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // C
             gMC->Gstpar(pC->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -343,7 +365,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BAlpide: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BAlpide: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Helium
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -379,8 +401,10 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
+        R3BLOG(debug, gMC->CurrentVolPath());
         fBarrelID = fAlpideGeo->GetBarrelId(gMC->CurrentVolPath());
         fSensorID = fAlpideGeo->GetSensorId(gMC->CurrentVolPath());
+
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -468,7 +492,7 @@ TClonesArray* R3BAlpide::GetCollection(Int_t iColl) const
 void R3BAlpide::Print(Option_t* option) const
 {
     Int_t nHits = fAlpidePoint->GetEntriesFast();
-    R3BLOG(INFO, nHits << " points registered in this event");
+    R3BLOG(info, nHits << " points registered in this event");
 }
 // ----------------------------------------------------------------------------
 
@@ -484,7 +508,7 @@ void R3BAlpide::Reset()
 void R3BAlpide::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BAlpide: " << nEntries << " entries to add";
+    LOG(info) << "R3BAlpide: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BAlpidePoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -495,7 +519,7 @@ void R3BAlpide::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BAlpidePoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BAlpide: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BAlpide: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -514,7 +538,7 @@ R3BAlpidePoint* R3BAlpide::AddHit(Int_t trackID,
     TClonesArray& clref = *fAlpidePoint;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BAlpide: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BAlpide: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size])
         R3BAlpidePoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss, pdgcode);
@@ -524,7 +548,7 @@ Bool_t R3BAlpide::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Alpide"))
     {
-        // LOG(INFO) << "Found geometry from ROOT file: " << name;
+        // LOG(info) << "Found geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;
