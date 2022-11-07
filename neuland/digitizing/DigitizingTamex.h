@@ -28,38 +28,85 @@
 
 namespace Neuland
 {
+    class DigitizingTamex;
+
     namespace Tamex
     {
+        class Channel;
         struct Params
         {
             Double_t fPMTThresh;             // [MeV]
-            Double_t fSaturationCoefficient; //
+            Double_t fSaturationCoefficient; // Saturation coefficient of PMTs
             Bool_t fExperimentalDataIsCorrectedForSaturation;
             Double_t fTimeRes; // time + Gaus(0., fTimeRes) [ns]
             Double_t fEResRel; // Gaus(e, fEResRel * e) []
-            std::shared_ptr<TRandom3> fRnd;
+            Double_t fEnergyGain;
+            Double_t fPedestal;
+            Double_t fTimeMax;
+            Double_t fTimeMin;
+            Double_t fQdcMin;
+            TRandom3* fRnd;
 
-            Params();
+            Params(TRandom3*);
+        };
+
+        class TmxPeak
+        {
+          public:
+            TmxPeak();
+            TmxPeak(const Digitizing::PMTHit&, Channel*);
+
+            // Getters:
+            Double_t GetWidth() const { return fWidth; }
+            Double_t GetQDC() const { return fQdc; }
+            Double_t GetTime() const { return fTime; }
+
+            bool operator==(const TmxPeak&) const;
+            void operator+=(TmxPeak&);
+            Double_t QdcToWidth(Double_t) const;
+            explicit operator Digitizing::Channel::Signal() const;
+            bool valid() const { return cachedSignal.valid(); }
+
+          private:
+            Double_t fWidth = 0.0; // the temperal width of the TmxPeak in [ns]
+            Double_t fQdc = 0.0;   // the qdc value in [MeV] (without threshold)
+            Double_t fTime = 0.0;  // leading edge of the TmxPeak in [ns]
+            Channel* fChannel;     // pointer to the channel that generates this peak
+            mutable Validated<Digitizing::Channel::Signal> cachedSignal;
         };
 
         class Channel : public Digitizing::Channel
         {
+            friend class Neuland::DigitizingTamex;
+
           public:
-            explicit Channel(const Tamex::Params&);
             ~Channel() override = default;
             void AddHit(Double_t mcTime, Double_t mcLight, Double_t dist) override;
             bool HasFired() const override;
-            Double_t GetQDC(UShort_t index) const override;
-            Double_t GetTDC(UShort_t index) const override;
-            Double_t GetEnergy(UShort_t index) const override;
-            Int_t GetNHits() const override;
-            // std::vector<Digitizing::PMTHit> GetPMTHits() const;
+
+            // Getters:
+            const Tamex::Params& GetPar() const { return par; }
+            const std::vector<TmxPeak>& GetTmxPeaks() const { return fTmxPeaks; }
+            const Double_t GetTrigTime() const override; 
+
+            void SetPaddle(Digitizing::Paddle* paddle) override;
+            Signal TmxPeakToSignal(const TmxPeak& peak) const;
 
           private:
-            mutable std::vector<Validated<Double_t>> cachedQDC;
-            mutable std::vector<Validated<Double_t>> cachedTDC;
-            mutable std::vector<Validated<Double_t>> cachedEnergy;
-            const Tamex::Params& par;
+            mutable std::vector<TmxPeak> fTmxPeaks;
+            mutable Validated<Double_t> fTrigTime;
+            Tamex::Params par;
+
+            // private ctor. Only constructable via DigitizingEngine.
+            Channel(TRandom3*, const SideOfChannel);
+            Int_t CheckOverlapping(TmxPeak&) const;
+            Int_t RecheckOverlapping(Int_t index);
+            void RemovePeakAt(Int_t index) const;
+            void RemoveZero(std::vector<Signal>&) const;
+            Double_t ToQdc(Double_t) const;
+            Double_t ToTdc(Double_t) const;
+            Double_t ToEnergy(Double_t) const;
+            void ConstructSignals() const override;
         };
 
     } // namespace Tamex
@@ -69,10 +116,11 @@ namespace Neuland
       public:
         DigitizingTamex();
         ~DigitizingTamex() override = default;
-        std::unique_ptr<Digitizing::Channel> BuildChannel() override;
+        std::unique_ptr<Digitizing::Channel> BuildChannel(Digitizing::Channel::SideOfChannel side) override;
 
       private:
-        Tamex::Params fTmP;
+        // single random generator is shared by all paddles.
+        std::unique_ptr<TRandom3> fRnd;
     };
 } // namespace Neuland
 

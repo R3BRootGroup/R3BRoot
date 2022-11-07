@@ -19,6 +19,7 @@
 #include "Filterable.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandHit.h"
+#include "R3BNeulandHitPar.h"
 #include "R3BNeulandPoint.h"
 #include "TCAConnector.h"
 
@@ -62,6 +63,7 @@ class R3BNeulandDigitizer : public FairTask
   public:
     void Exec(Option_t*) override;
     void AddFilter(const Filterable<R3BNeulandHit&>::Filter& f) { fHitFilters.Add(f); }
+    void SetHitParName(const TString& name) { fHitParName = name; };
 
   private:
     TCAInputConnector<R3BNeulandPoint> fPoints;
@@ -73,6 +75,7 @@ class R3BNeulandDigitizer : public FairTask
 
     R3BNeulandGeoPar* fNeulandGeoPar; // non-owning
 
+    TString fHitParName{};
     TH1F* hMultOne;
     TH1F* hMultTwo;
     TH1F* hRLTimeToTrig;

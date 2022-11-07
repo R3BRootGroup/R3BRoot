@@ -38,13 +38,14 @@ namespace Neuland
         class Channel : public Digitizing::Channel
         {
           public:
-            explicit Channel(const TacQuila::Params&);
+            explicit Channel(const TacQuila::Params&, SideOfChannel);
             ~Channel() override = default;
             void AddHit(Double_t mcTime, Double_t mcLight, Double_t dist) override;
             bool HasFired() const override;
-            Double_t GetQDC(UShort_t index) const override;
-            Double_t GetTDC(UShort_t index) const override;
-            Double_t GetEnergy(UShort_t index) const override;
+            Double_t GetQDC() const;
+            Double_t GetTDC() const;
+            Double_t GetEnergy() const;
+            const Double_t GetTrigTime() const override { return GetTDC(); } 
 
           private:
             // NOTE: Some expensive calculations and random distributions are cached
@@ -62,6 +63,11 @@ namespace Neuland
             mutable Validated<Double_t> cachedEnergy;
 
             const TacQuila::Params& par;
+
+            void ConstructSignals() const override
+            {
+                 fSignals.set({Signal{GetQDC(), GetTDC(), GetEnergy(), this->GetSide()}});
+            }
         };
 
     } // namespace TacQuila
@@ -71,7 +77,7 @@ namespace Neuland
       public:
         DigitizingTacQuila();
         ~DigitizingTacQuila() override = default;
-        std::unique_ptr<Digitizing::Channel> BuildChannel() override;
+        std::unique_ptr<Digitizing::Channel> BuildChannel(Digitizing::Channel::SideOfChannel side) override;
 
         void SetPMTThreshold(const Double_t v) { fTQP.fPMTThresh = v; }
         void SetSaturationCoefficient(const Double_t v) { fTQP.fSaturationCoefficient = v; }
