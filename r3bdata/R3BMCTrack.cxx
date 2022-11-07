@@ -65,6 +65,10 @@ void R3BMCTrack::Print(Option_t* option) const
 #ifdef GTPC
     std::cout << ", GTPC " << GetNPoints(kGTPC) << std::endl;
 #endif
+#ifdef ASYEOS
+    std::cout << ", CHIMERA " << GetNPoints(kCHIMERA) << ", KRAB " << GetNPoints(kKRAB) << ", KRATTA "
+              << GetNPoints(kKRATTA) << std::endl;
+#endif
 }
 
 int R3BMCTrack::GetNPoints(DetectorId detId) const

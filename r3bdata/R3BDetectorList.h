@@ -79,6 +79,11 @@ enum DetectorId
 #ifdef GTPC
     kGTPC,
 #endif
+#ifdef ASYEOS
+    kCHIMERA,
+    kKRAB,
+    kKRATTA,
+#endif
     kLAST
 };
 /** Unique identifier for all R3B Point and Hit types **/
@@ -138,11 +143,14 @@ enum fDetectorType
     kSOFTofWallPoint
 #endif
 #ifdef GTPC
-    /* note that the value of kGTPCPoint will depend on
-     * whether SOFIA is defined. --pklenze
-     */
     ,
     kGTPCPoint
+#endif
+#ifdef ASYEOS
+    ,
+    kCHIMERAPoint,
+    kKRABPoint,
+    kKRATTAPoint
 #endif
 };
 
