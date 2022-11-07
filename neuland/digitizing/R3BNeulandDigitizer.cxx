@@ -45,22 +45,33 @@ void R3BNeulandDigitizer::SetParContainers()
     FairRunAna* run = FairRunAna::Instance();
     if (!run)
     {
-        LOG(FATAL) << "R3BNeulandDigitizer::SetParContainers: No analysis run";
+        LOG(fatal) << "R3BNeulandDigitizer::SetParContainers: No analysis run";
         return;
     }
 
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
     if (!rtdb)
     {
-        LOG(FATAL) << "R3BNeulandDigitizer::SetParContainers: No runtime database";
+        LOG(fatal) << "R3BNeulandDigitizer::SetParContainers: No runtime database";
         return;
     }
 
-    fNeulandGeoPar = (R3BNeulandGeoPar*)rtdb->getContainer("R3BNeulandGeoPar");
+    fNeulandGeoPar = dynamic_cast<R3BNeulandGeoPar*>(rtdb->getContainer("R3BNeulandGeoPar"));
     if (!fNeulandGeoPar)
     {
-        LOG(FATAL) << "R3BNeulandDigitizer::SetParContainers: No R3BNeulandGeoPar";
+        LOG(fatal) << "R3BNeulandDigitizer::SetParContainers: No R3BNeulandGeoPar";
         return;
+    }
+
+    auto fNeulandHitPar = dynamic_cast<R3BNeulandHitPar*>(rtdb->findContainer(fHitParName));
+    if (fNeulandHitPar)
+    {
+        LOG(info) << "R3BNeulandDigitizer::SetHitParContainers: HitPar found from " << fHitParName;
+        fDigitizingEngine->SetHitPar(fNeulandHitPar);
+    }
+    else
+    {
+        LOG(info) << "R3BNeulandDigitizer::SetHitParContainers: HitPar rootfile not found. Using default values.";
     }
 }
 
@@ -96,9 +107,9 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             // Convert position of point to paddle-coordinates, including any rotation or translation
             const TVector3 position = point->GetPosition();
             const TVector3 converted_position = fNeulandGeoPar->ConvertToLocalCoordinates(position, paddleID);
-            LOG(DEBUG) << "NeulandDigitizer: Point in paddle " << paddleID
+            LOG(debug) << "NeulandDigitizer: Point in paddle " << paddleID
                        << " with global position XYZ: " << position.X() << " " << position.Y() << " " << position.Z();
-            LOG(DEBUG) << "NeulandDigitizer: Converted to local position XYZ: " << converted_position.X() << " "
+            LOG(debug) << "NeulandDigitizer: Converted to local position XYZ: " << converted_position.X() << " "
                        << converted_position.Y() << " " << converted_position.Z();
 
             // Within the paddle frame, the relevant distance of the light from the pmt is always given by the
@@ -115,15 +126,13 @@ void R3BNeulandDigitizer::Exec(Option_t*)
     // Fill control histograms
     hMultOne->Fill(std::count_if(paddles.begin(),
                                  paddles.end(),
-                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
-                                     return kv.second->HasHalfFired();
-                                 }));
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv)
+                                 { return kv.second->HasHalfFired(); }));
 
     hMultTwo->Fill(std::count_if(paddles.begin(),
                                  paddles.end(),
-                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
-                                     return kv.second->HasFired();
-                                 }));
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv)
+                                 { return kv.second->HasFired(); }));
 
     // Create Hits
     for (const auto& kv : paddles)
@@ -136,31 +145,34 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             continue;
         }
 
-        for (UInt_t i = 0; i < paddle->GetNHits(); i++)
+        auto signals = paddle->GetSignals();
+
+        for (const auto signal : signals)
         {
-            const TVector3 hitPositionLocal = TVector3(paddle->GetPosition(i), 0., 0.);
+            const TVector3 hitPositionLocal = TVector3(signal.position, 0., 0.);
             const TVector3 hitPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(hitPositionLocal, paddleID);
             const TVector3 hitPixel = fNeulandGeoPar->ConvertGlobalToPixel(hitPositionGlobal);
 
             R3BNeulandHit hit(paddleID,
-                              paddle->GetLeftChannel()->GetTDC(i),
-                              paddle->GetRightChannel()->GetTDC(i),
-                              paddle->GetTime(i),
-                              paddle->GetLeftChannel()->GetEnergy(i),
-                              paddle->GetRightChannel()->GetEnergy(i),
-                              paddle->GetEnergy(i),
+                              signal.leftChannel.tdc,
+                              signal.rightChannel.tdc,
+                              signal.time,
+                              signal.leftChannel.energy,
+                              signal.rightChannel.energy,
+                              signal.energy,
                               hitPositionGlobal,
                               hitPixel);
 
             if (fHitFilters.IsValid(hit))
             {
                 fHits.Insert(std::move(hit));
+                LOG(debug) << "Adding neuland hit with id = " << paddleID << ", time = " << signal.time
+                           << ", energy = " << signal.energy;
             }
         } // loop over all hits for each paddle
+    }     // loop over paddles
 
-    } // loop over paddles
-
-    LOG(DEBUG) << "R3BNeulandDigitizer: produced " << fHits.Size() << " hits";
+    LOG(debug) << "R3BNeulandDigitizer: produced " << fHits.Size() << " hits";
 }
 
 void R3BNeulandDigitizer::Finish()
