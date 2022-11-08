@@ -22,6 +22,11 @@ cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT C CXX Fortran)
 
+
+message(FATAL_ERROR
+  "You are trying to compile the master branch, which is not supported. Comment out this error to try anyhow. Recommended action: switch to the more up to date dev branch instead.")
+  
+
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
             "\nmacros repository is missing in the R3BRoot source directory\ncd ../R3BRoot\ngit clone https://github.com/R3BRootGroup/macros.git"

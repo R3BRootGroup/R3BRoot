@@ -1,0 +1,4 @@
+For unfathomable reasons, R3BRoot development does not happen on the default branch (master), but on dev.
+
+Unless you specifcally want the code from a few years ago, which does not even compile with current ucesb,
+I recommend that you run git checkout -b dev origin/dev or switch to a feature branch.
