@@ -24,7 +24,7 @@ project(R3BROOT C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
-            "\nmacros repository is missing in the R3BRoot source directory\ncd ../R3BRoot\ngit clone https://github.com/R3BRootGroup/macros.git"
+            "\nmacros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
            )
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
