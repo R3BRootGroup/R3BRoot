@@ -36,6 +36,7 @@ class R3BMDFWrapper : public TObject
         void PrintPCA();
         void X2P(Double_t *x, Double_t *p);
         void P2X(Double_t *p, Double_t *x, Int_t nTest);
+        int GetNVariables(){ return mdf_NVariables; }
         Double_t MDF(Double_t *x);
 
     private:
