@@ -28,6 +28,7 @@
 #pragma link C++ class R3BTrackingParticle+;
 #pragma link C++ class R3BTrackingSetup+;
 #pragma link C++ class R3BMDFWrapper+;
+#pragma link C++ class R3BTrackingS515+;
 
 #endif
 

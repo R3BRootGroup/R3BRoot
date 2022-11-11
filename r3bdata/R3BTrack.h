@@ -31,8 +31,8 @@ class R3BTrack : public TObject
              Double_t px,
              Double_t py,
              Double_t pz,
-             Int_t q,
-             Int_t AoZ,
+             Double_t q,
+             Double_t AoZ,
              Double_t chix,
              Double_t chiy,
              Int_t quality);
