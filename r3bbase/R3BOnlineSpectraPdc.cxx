@@ -934,8 +934,11 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         Int_t mult[5][145] = { 0 };
         auto det = fHitItems;
         Int_t nHits = det->GetEntriesFast();
-        // cout << "HitItems: " << nHits << endl;
+        //cout << "HitItems: " << nHits << endl;
 
+		if(nHits != 4)
+			return;
+			
         Int_t plane = 0;
         Int_t wire = 0;
         for (Int_t i = 0; i < 4; i++)
@@ -1215,19 +1218,22 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 {
 					//cout << "Fib0: fiber = " << iFib << endl;
 				}
-                if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
-                //if (yPdc2 > 0. && nHits > 0 && nHits < 2 )
+				
+                //if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
+                //if (yPdc4 > 0. && nHits > 0 && nHits < 2 )
+                if (yPdc4 > 0. && nHits > 0 && mult_pdc4 == 1)
                 {
-                    //fh_fi0_0_pdc->Fill(iFib, yPdc2);
-                    fh_fi0_0_pdc->Fill(iFib, yPdc4test);
+                    fh_fi0_0_pdc->Fill(iFib, yPdc4);
+                    //fh_fi0_0_pdc->Fill(iFib, yPdc4test);
                     fh_fi0_pdc_time->Fill(tMAPMT, tPair[3]);
                     fh_fi0_pdc_eloss->Fill(tot, eloss[3]);
                 }
-                if (xPdc3test > 0. && nHits > 0 && nHits < 2 )
+                //if (xPdc3test > 0. && nHits > 0 && nHits < 2 )
                 //if (xPdc1 > 0. && nHits > 0 && nHits < 2 )
+                if (yPdc2 > 0. && nHits > 0 )
                 {
-                    //fh_fi0_1_pdc->Fill(iFib, xPdc1);
-                    fh_fi0_1_pdc->Fill(iFib, xPdc3test);
+                    fh_fi0_1_pdc->Fill(iFib, yPdc2);
+                    //fh_fi0_1_pdc->Fill(iFib, xPdc3test);
                 }
                 
 

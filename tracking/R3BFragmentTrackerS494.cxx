@@ -395,7 +395,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug = true;
+    Bool_t debug = false;
     Int_t fNevOut = 0;
     if (fNEvents == 147041 || fNEvents == 184888)
         fNevOut = fNEvents;
@@ -830,6 +830,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 if (!fSimu)
                 {
+					//( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.002);
+					
                     // start values:
                     //	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
                     //     ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.5);
@@ -909,15 +911,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 if (fNEventsLeft == 0)
                 {
                     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, 0.1, 0., 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, 0.1, 0.1, 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, 0., 0.1, 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, -0.1, 0.1, 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, -0.1, 0., 0., 0., 0));
+                    target->hits.push_back(new R3BHit(0, -0.1, -0.1, 0., 0., 0));
                 }
 
                 do // fi32
                 {
                     if (ifi32 >= 0)
                         fh_eloss_fi32_mc->Fill(1000. * fi32->hits.at(ifi32)->GetEloss()); // MeV
-                    if (ifi32 >= 0 && !fi32->free_hit[ifi32] &&
-                        (charge_requested != fi32->hits.at(ifi32)->GetEloss() &&
-                         !fSimu)) // if the hit was used already, continue
+                    if (ifi32 >= 0 && !fi32->free_hit[ifi32] ) // if the hit was used already, continue
                     {
                         if (debug)
                             cout << "Fi32 hit already used" << endl;
@@ -928,9 +934,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     {
                         if (ifi30 >= 0)
                             fh_eloss_fi30_mc->Fill(1000. * fi30->hits.at(ifi30)->GetEloss()); // MeV
-                        if (ifi30 >= 0 && !fi30->free_hit[ifi30] &&
-                            (charge_requested != fi30->hits.at(ifi30)->GetEloss() &&
-                             !fSimu)) // if the hit was used already, continue
+                        if (ifi30 >= 0 && !fi30->free_hit[ifi30] ) // if the hit was used already, continue
                         {
                             if (debug)
                                 cout << "Fi30 hit already used" << endl;
@@ -944,7 +948,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             if ((l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                 (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                             std::abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                0.028))) // if the hit was used already, continue
+                                                0.03))) // if the hit was used already, continue
                             {
                                 if (debug)
                                     cout << "left - Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
@@ -960,7 +964,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if ((l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                     (l == 2 && ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                                 std::abs(det_hit_xC[1] - fi23a->hits.at(ifi23a)->GetX()) <
-                                                    0.028))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
+                                                    0.03))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
                                                              //was used already, continue
                                 {
                                     if (debug)
@@ -1016,7 +1020,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 {
                                     Double_t pin = 0.;
                                     //	if(l > 1) pin = pzmem;
-                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors, pin);
+                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors, pin);                                
                                 }
                                 else
                                 {
@@ -1120,6 +1124,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 if (!fSimu)
                 {
+					//( (R3BGladFieldMap*) FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.004);
+													
                     // start values:
                     //	( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleY(-14.);
                     //     ( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionZ(172.5);
@@ -1206,9 +1212,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 {
                     if (ifi33 >= 0)
                         fh_eloss_fi33_mc->Fill(1000. * fi33->hits.at(ifi33)->GetEloss()); // MeV
-                    if (ifi33 >= 0 && !fi33->free_hit[ifi33] &&
-                        (charge_requested != fi33->hits.at(ifi33)->GetEloss() &&
-                         !fSimu)) // if the hit was used already, continue
+                    if (ifi33 >= 0 && !fi33->free_hit[ifi33] ) // if the hit was used already, continue
                     {
                         if (debug)
                             cout << "Fi33 hit already used" << endl;
@@ -1219,9 +1223,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     {
                         if (ifi31 >= 0)
                             fh_eloss_fi31_mc->Fill(1000. * fi31->hits.at(ifi31)->GetEloss()); // MeV
-                        if (ifi31 >= 0 && !fi31->free_hit[ifi31] &&
-                            (charge_requested != fi31->hits.at(ifi31)->GetEloss() &&
-                             !fSimu)) // if the hit was used already, continue
+                        if (ifi31 >= 0 && !fi31->free_hit[ifi31] ) // if the hit was used already, continue
                         {
                             if (debug)
                                 cout << "Fi31 hit already used" << endl;
@@ -1235,7 +1237,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             if ((l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                 (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                             std::abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                0.028))) // if the hit was used already, continue
+                                                0.03))) // if the hit was used already, continue
                             {
                                 if (debug)
                                     cout << "right Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
@@ -1250,7 +1252,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if ((l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                     (l == 2 && ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                                 std::abs(det_hit_xC[2] - fi23a->hits.at(ifi23a)->GetX()) <
-                                                    0.028))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
+                                                    0.03))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
                                                              //was used already, continue
                                 {
                                     if (debug)
@@ -1474,7 +1476,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     Double_t Erel_check = 3.87359e-01 - 3.55075e-01 * theta_26 + 6.57182e-01 * theta_26 * theta_26;
 
                     // cout<<"4He selecting: "<<endl;
-                    // cout<<"before if: "<<Erel<<"; "<<Erel_check<<"; "<<parChi2<<", "<<minChi2<<endl;
+                    //cout << "Erel: " << Erel << "; " << Erel_check << "; " << parChi2 << ", " << minChi2 << endl;
                     // cout<<"candidate: "<<x->GetStartMomentum().Z()<<", "<<x->GetStartPosition().X()<<", "<<
                     // x->GetStartPosition().Y()<<endl;
 
@@ -1629,6 +1631,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             fh_A_reco1->Fill(bestcandidate->GetMass() / amu);
             if (minChi2 < 1.e4)
                 totalChi2Mass += minChi2;
+				totalEvents++;
 
             /*
                         // Now we know the mass. We can set here the exact mass if wanted and then track the momentum
@@ -1674,7 +1677,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // LOG(INFO) << (bestcandidate->GetMass() / amu);
             */
             totalChi2P += minChi2;
-
             fh_p_vs_ch2->Fill(minChi2, bestcandidate->GetStartMomentum().Mag());
 
             if (minChi2 < 1000)
@@ -1733,9 +1735,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 pymem = bestcandidate->GetStartMomentum().Y() * 1000.;
 
             // store hits in track level
-            new ((*fTrackItems)[fNofTrackItems++]) R3BTrack(bestcandidate->GetStartPosition().X() / 100.,
-                                                            bestcandidate->GetStartPosition().Y() / 100.,
-                                                            bestcandidate->GetStartPosition().Z() / 100.,
+            new ((*fTrackItems)[fNofTrackItems++]) R3BTrack(bestcandidate->GetStartPosition().X(),
+                                                            bestcandidate->GetStartPosition().Y(),
+                                                            bestcandidate->GetStartPosition().Z(),
                                                             bestcandidate->GetStartMomentum().X() * 1000.,
                                                             bestcandidate->GetStartMomentum().Y() * 1000.,
                                                             bestcandidate->GetStartMomentum().Z() * 1000.,
@@ -2097,8 +2099,8 @@ void R3BFragmentTrackerS494::FinishEvent()
 void R3BFragmentTrackerS494::Finish()
 {
 
-    cout << "Total chi2 for mass: " << totalChi2Mass << endl;
-    cout << "Total chi2 for momentum: " << totalChi2P << endl;
+    cout << "Total chi2 for mass: " << totalChi2Mass / totalEvents << endl;
+    cout << "Total chi2 for momentum: " << totalChi2P / totalEvents << endl;
 
     cout << "found pairs: " << counter1 << endl;
     cout << "found He   : " << counterHe << endl;

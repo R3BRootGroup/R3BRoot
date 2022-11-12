@@ -134,6 +134,7 @@ class R3BFragmentTrackerS494 : public FairTask
    	//0.938272;
    	Double_t totalChi2Mass = 0;
    	Double_t totalChi2P = 0;
+   	Double_t totalEvents = 0;
     Int_t maxevent;
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;

@@ -334,6 +334,8 @@ double Chi2AllEvents(const double* xx)
 		<< "  " << xx[4] << "  " << xx[5] << "  " << xx[6] << "  " 
         << xx[7] << "  " << xx[8] << "  " << xx[9] << endl;
 
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(xx[6]);
+
     //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(xx[6]);
     //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(xx[7]);
     //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(xx[8]);
@@ -346,8 +348,6 @@ double Chi2AllEvents(const double* xx)
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.03);
     //( (R3BGladFieldMap*) FairRunAna::Instance()->GetField() )->SetTrackerCorrectionAngleZ(0.02);
 
-
-
     R3BTrackingDetector* fi23a = gSetup->GetByName("fi23a");
 
     fi23a->pos0 = TVector3(0., 0., 0.);
@@ -359,13 +359,30 @@ double Chi2AllEvents(const double* xx)
     fi23a->pos2.RotateY(xx[8] * TMath::DegToRad());
 
     //TVector3 trans3b(xx[7],  xx[8], xx[9]);
-    TVector3 trans3b(xx[7], 0. , xx[9]);
+    TVector3 trans3a(xx[7], 0. , xx[9] - 0.015);
 
-    fi23a->pos0 += trans3b;
-    fi23a->pos1 += trans3b;
-    fi23a->pos2 += trans3b;
+    fi23a->pos0 += trans3a;
+    fi23a->pos1 += trans3a;
+    fi23a->pos2 += trans3a;
     fi23a->norm = ((fi23a->pos1 - fi23a->pos0).Cross(fi23a->pos2 - fi23a->pos0)).Unit();
 
+    R3BTrackingDetector* fi23b = gSetup->GetByName("fi23b");
+
+    fi23b->pos0 = TVector3(0., 0., 0.);
+    fi23b->pos1 = TVector3(5., 5., 0.);
+    fi23b->pos2 = TVector3(-5., 5., 0.);
+
+    fi23b->pos0.RotateY(xx[8] * TMath::DegToRad());
+    fi23b->pos1.RotateY(xx[8] * TMath::DegToRad());
+    fi23b->pos2.RotateY(xx[8] * TMath::DegToRad());
+
+    //TVector3 trans3b(xx[7],  xx[8], xx[9]);
+    TVector3 trans3b(0., xx[8], xx[9] + 0.015);
+
+    fi23b->pos0 += trans3b;
+    fi23b->pos1 += trans3b;
+    fi23b->pos2 += trans3b;
+    fi23b->norm = ((fi23b->pos1 - fi23b->pos0).Cross(fi23b->pos2 - fi23b->pos0)).Unit();
 
     if (fLeft)
     {
@@ -469,7 +486,7 @@ double Chi2AllEvents(const double* xx)
         
         
         
-        ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(xx[6]);
+        //((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(xx[6]);
 		//Double_t scale = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetScale();
         //Double_t field = ((R3BGladFieldMap *) FairRunAna::Instance()->GetField())->GetBy(0.,0.,240.);
         //cout << "Field:" << field << " scale: " << scale << endl;       
@@ -642,6 +659,7 @@ double R3BOptimizeGeometryS494::Chi2()
         }
         fFragments.clear();
     }
+    Bool_t debug = false;
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -666,12 +684,41 @@ double R3BOptimizeGeometryS494::Chi2()
 	R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
 */
 
-	
+
 	R3BTrackingDetector* fi32 = fDetectorsLeft->GetByName("fi32");
 	R3BTrackingDetector* fi30 = fDetectorsLeft->GetByName("fi30");
 	R3BTrackingDetector* fi31 = gSetup->GetByName("fi31");
 	R3BTrackingDetector* fi33 = gSetup->GetByName("fi33");
+
 	
+	
+    if (tof->hits.size() > 0 && debug)
+    {
+        //cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+        cout << "Hits ToFD: " << tof->hits.size() << endl;
+        cout << "Hits right: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi31->hits.size() << "  "
+             << fi33->hits.size() << endl;
+
+        cout << "Hits left: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi32->hits.size() << "  "
+             << fi30->hits.size() << endl;
+    }
+
+    if (debug)
+    {		
+        for (Int_t i = 0; i < fi23a->hits.size(); i++)
+        {
+            cout << "Fib23a hits: " << i << ", " << fi23a->hits.at(i)->GetX() << endl;
+        }
+        for (Int_t i = 0; i < fi23b->hits.size(); i++)
+        {
+            cout << "Fib23b hits: " << i << ", " << fi23b->hits.at(i)->GetY() << endl;
+        }
+        for (Int_t i = 0; i < tof->hits.size(); i++)
+        {
+            cout << "Tofd hits  : " << i << ", " << tof->hits.at(i)->GetX() << ", " << tof->hits.at(i)->GetY() << endl;
+        }
+    }
+
 	
     if (target->hits.size() < 1)
         target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
@@ -786,6 +833,10 @@ double R3BOptimizeGeometryS494::Chi2()
             // p0 = 4.34669; // in GeV/c2 with C target
         }
 
+		if (debug)
+			cout << "AT START: "
+				 << "Mass: " << m0 << ", Momentum: " << p0 << endl;
+
         //cout << "Mass m0: " << m0 << endl;
         //cout << "Momentum p0: " << p0 << endl;
         //cout << "Charge z0: " << charge << endl;
@@ -814,6 +865,26 @@ double R3BOptimizeGeometryS494::Chi2()
                             // << endl; cout << "Hit target # " << " x: " << target->hits.at(0)->GetX() << endl;
                             //                               cout << "fi23b  # " << " x: " << fi23b->hits.at(0)->GetX()
                             //                               << endl;
+							if (debug)
+							{
+								cout << "left side of setup" << endl;
+								cout << "Charge requested: " << charge_requested << endl;
+								cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
+									 << " y: " << tof->hits.at(i)->GetY() << endl;
+							}
+							if (ifi23a > -1 && debug)
+								cout << " Fi23a left # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
+									 << endl;
+							if (ifi23b > -1 && debug)
+								cout << " left Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
+									 << endl;
+							if (ifi30 > -1 && debug)
+								cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX() << endl;
+							if (ifi32 > -1 && debug)
+								cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX() << endl;
+							if (debug)
+								cout << "Hit target # "
+									 << " x: " << target->hits.at(0)->GetX() << endl;
 
                             candidate->AddHit("target", 0);
                             candidate->AddHit("tofd", i);
@@ -833,6 +904,16 @@ double R3BOptimizeGeometryS494::Chi2()
                             {
                                 status = fFitter->FitTrackBackward2D(candidate, fDetectors);
                             }
+
+							if (debug)
+								cout << " Chi: " << candidate->GetChi2() << "  "
+									 << candidate->GetStartMomentum().Mag() << "  "
+									 << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
+											(candidate->GetStartMomentum().Mag() - p0)
+									 << endl;
+							if (debug)
+								cout << "--------------------------------" << endl;
+
                             nCand += 1;
 
                             if (TMath::IsNaN(candidate->GetMomentum().Z()))
@@ -939,6 +1020,27 @@ double R3BOptimizeGeometryS494::Chi2()
                             //if(ifi23b > -1) cout << "fi23b # " <<  ifi23b << " y: "<< fi23b->hits.at(ifi23b)->GetY() << endl; 
                             
                             //cout << "Hit target # " << " x: " << target->hits.at(0)->GetX() << endl;
+							if (debug)
+							{
+								cout << "right side of setup" << endl;
+								cout << "Charge requested: " << charge_requested << endl;
+								cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
+									 << " p0: " << p0 << " beta0: " << beta0 << " m0: " << m0 << endl;
+								cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
+									 << " y: " << tof->hits.at(i)->GetY() << endl;
+							}
+							if (ifi23a > -1 && debug)
+								cout << " Fi23a # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
+							if (ifi23b > -1 && debug)
+								cout << "right Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
+									 << endl;
+							if (ifi33 > -1 && debug)
+								cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
+							if (ifi31 > -1 && debug)
+								cout << "Fi31  # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX() << endl;
+							if (debug)
+								cout << "Hit target # "
+									 << " x: " << target->hits.at(0)->GetX() << endl;
 
                             candidate->AddHit("target", 0);
                             candidate->AddHit("tofd", i);
@@ -958,6 +1060,16 @@ double R3BOptimizeGeometryS494::Chi2()
                             {
                                 status = fFitter->FitTrackBackward2D(candidate, fDetectors);
                             }
+
+							if (debug)
+								cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
+									 << candidate->GetStartMomentum().Mag() << " dp.Mag "
+									 << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
+											(candidate->GetStartMomentum().Mag() - p0)
+									 << endl;
+							if (debug)
+								cout << "--------------------------------" << endl;
+
                             nCand += 1;
 
                             if (TMath::IsNaN(candidate->GetMomentum().Z()))
@@ -1202,11 +1314,80 @@ void R3BOptimizeGeometryS494::Finish()
         //{-62.72252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0., 0., 91.18721  }; // chi=35.7339 sigmap=0.01
         //{-62.72252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.2  }; // chi=35.7339 sigmap=0.01
         //{-62.71252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.2  }; // chi= 37.8560 sigmap=0.01
-        {-62.71252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.3  }; // chi=36.75182 sigmap=0.01
+        //{-62.71252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.3  }; // chi=36.75182 sigmap=0.01
+        //{-62.71252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.31  }; // chi=36.67675095 sigmap=0.01
+        
+        //now px, py fix and target point same for C and 4He, deltaxy=0.1
+        //{-62.71252, 570.9584, -82.96545, 632.6482, -13.98946, -13.98946, 1.000625, 0.000, 0.005, 91.31  }; // chi=36.67675095 sigmap=0.01
+
+        //{-62.18069, 570.7933, -82.41713, 632.9688, -13.68626, -14.02967, 1., 0.0, 0.0, 91.04  };  // chi=1.6174741 without sigmap and 1000 events
+        //{-62.18069, 570.7933, -82.41713, 632.9688, -13.68626, -14.02967, 1., 0.0, 0.0, 91.04  };  // chi=10.6018455 sigmap=0.01 and 1000 events
+        //{-62.15068, 570.8233, -82.38712, 632.9988, -13.68326, -14.02667, 1.0003, 0.03, 0.03, 90.84025  };  // chi=8.44264287295 sigmap=0.01 and 1000 events
+        //{-62.15211, 570.8251, -82.38671, 633.0006, -13.68308, -14.02649, 1.001, 0.0, 0.0, 91.04184  };  // chi=8.7640679 sigmap=0.01 and 1000 events
+        //{-62.15211, 570.8251, -82.38671, 633.0006, -13.68308, -14.02549, 1.001, 0.0, 0.0, 91.04184  };  // *** chi=8.654978 sigmap=0.01 and 1000 events
+        //{-62.15211, 570.8251, -82.37671, 633.0006, -13.68308, -14.02549, 1.002, 0.0, 0.0, 91.04184  };  // chi=8.7443146 sigmap=0.01 and 1000 events
+        
+        //deltaxy=0.01
+        //{-62.15211, 570.8251, -82.37671, 633.0006, -13.67308, -14.02549, 1.002, 0.0, 0.0, 91.04184  };  // chi=11.20842577 sigmap=0.01 and 1000 events
+        //{-62.15211, 570.8251, -82.37671, 633.0006, -13.67308, -14.02549, 1.002, 0.1, 0.0, 91.04184  };  // chi=10.802843 sigmap=0.01 and 1000 events
+
+        //{-62.16032, 570.8370, -82.39240, 633.0125, -13.67189, -14.02330, 1.003, 0.0, 0.0, 91.04613 };  // chi=11.3757596 sigmap=0.01 and 1000 events
+
+        //{-62.17822, 570.7069, -82.42824, 632.9824, -13.68490, -14.02831, 1., 0.01358, 0.01358, 91.05359  };  // chi=9.2844436 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.17622, 570.7189, -82.43824, 632.9944, -13.68370, -14.02711, 1.00012, 0.02558493, 0.02558493, 91.06559  };  // chi=9.152384725 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.17322, 570.7219, -82.45824, 632.9974, -13.68340, -14.02681, 1.00015, 0.02858494, 0.02858494, 91.06859  };  // chi= 9.059510129 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.17322, 570.7219, -82.45824, 632.9974, -13.68340, -14.02681, 1.00015, 0.03858494, 0.02858494, 91.06859  };  // chi= 8.99686 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.18322, 570.7252, -82.45491, 633.0007, -13.68307, -14.02648, 1.001, 0.014, 0.02, 91.06 };  // chi=9.3093104 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        
+        //best
+        //{-62.17322, 570.7219, -82.45824, 632.9974, -13.68340, -14.01681, 1.0, 0.014, 0.02, 91.06 };  // chi=9.197948 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+
+        // after shifting the fiber detectors by half a fiber and sigma target != 0 (v1)
+        //{-62.16766, 570.7336, -82.45762, 633.0091, -13.68223, -14.01564, 1.0, 0.0257332, 0.03173322, 91.07173 };  // chi=4.23709109286 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.16210, 570.7453, -82.45700, 633.0208, -13.68106, -14.01447, 1.0, 0.03746642, 0.04346644, 91.08346 };  // chi=4.158161482 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.16210, 570.7453, -82.45700, 633.0208, -13.68106, -14.01447, 1.0, 0.04746642, 0.04346644, 91.08346 };  // chi=4.10682275 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{-62.16210, 570.7453, -82.45700, 633.0208, -13.68106, -14.01447, 1.0, 0.05746642, 0.04346644, 91.08346 };  // chi=4.04711486 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        
+        //{-62.15710, 570.7503, -82.47700, 633.0258, -13.68056, -14.01397, 1.0, 0.085, 0.0486, 91.085 };  // chi=3.97238620 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        // 19th opti
+        //{-62.15710, 570.7603, -82.47700, 633.0258, -13.68056, -14.01397, 1.0, 0.085, 0.0486, 91.085 };  // chi=3.967967 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        
+        
+        // after shifting the fiber detectors by half a fiber and sigma target = 0
+        //{-62.16766, 570.7336, -82.45762, 633.0091, -13.68223, -14.01564, 1.0, 0.0257332, 0.0317332, 91.07173 };  // chi=4.30623122 without scale and with momentum contribution and sigmap=0.01
+        //{-62.16210, 570.7453, -82.45700, 633.0208, -13.68106, -14.01447, 1.0, 0.03746642, 0.04346642, 91.08346 };  // chi=4.60040758 without scale and with momentum contribution and sigmap=0.01
+        //{-62.15654, 570.7570, -82.45638, 633.0325, -13.67989, -14.01330, 1.0, 0.04919964, 0.05519964, 91.09519 };  // chi=4.1924227136 without scale and with momentum contribution and sigmap=0.01
+        //{-62.15098, 570.7687, -82.45576, 633.0442, -13.67872, -14.01213, 1.0, 0.06093286, 0.06693286, 91.10692 };  // chi=4.03942520 without scale and with momentum contribution and sigmap=0.01
+        //{-62.14542, 570.7804, -82.45514, 633.0559, -13.67755, -14.01096, 1.0, 0.07266608, 0.07866608, 91.11865 };  // chi=4.003279422 without scale and with momentum contribution and sigmap=0.01
+        //{-62.13986, 570.7921, -82.45452, 633.0676, -13.67638, -14.00979, 1.0, 0.08439930, 0.0903993, 91.13038 };  // chi=3.965502623 without scale and with momentum contribution and sigmap=0.01
+        //{-62.13986, 570.7921, -82.45452, 633.0676, -13.66638, -14.00979, 1.0, 0.08439930, 0.0903993, 91.13038 };  // chi=3.963153075 without scale and with momentum contribution and sigmap=0.01
+        //{-62.13986, 570.7921, -82.45452, 633.0676, -13.66638, -14.00979, 1.0, 0.09439930, 0.0903993, 91.13038 };  // chi=3.954176985 without scale and with momentum contribution and sigmap=0.01
+        //{-62.13986, 570.7921, -82.45452, 633.0676, -13.66638, -14.00979, 1.0, 0.09439930, 0.0903993, 91.14038 };  // chi=3.93942016 without scale and with momentum contribution and sigmap=0.01
+        
+        //{-62.14986, 570.7954, -82.45119, 633.0709, -13.66605, -14.00946, 1.0, 0.073, 0.0805, 91.321 };  // chi=4.033744125 without scale and with momentum contribution and sigmap=0.01
+        // 18th opti
+        //{-62.14986, 570.7954, -82.45119, 633.0709, -13.66605, -14.00946, 1.0, 0.073, 0.0805, 91.321 };  // chi=4.034172779 without scale and with momentum contribution and sigmap=0.01 
+        
+        // new data set 
+        //{-62.14430, 570.8071, -82.45057, 633.0826, -13.66488, -14.00829, 1.0, 0.08473322, 0.09223322, 91.33273 };  // chi= 13.0799417 without scale and with momentum contribution and sigmap=0.01 
+        //{-62.13874, 570.8188, -82.44995, 633.0943, -13.66371, -14.00712, 1.0, 0.09646644, 0.1039664, 91.34446 };  // chi=11.10464082 without scale and with momentum contribution and sigmap=0.01 
+        
+        //sigma target = 0.5
+        //{-62.13318, 570.8305, -82.44933, 633.1060, -13.66254, -14.00595, 1.0, 0.1081997, 0.1156996, 91.35619 };  // chi=12.88408862 without scale and with momentum contribution and sigmap=0.01 
+        //{-62.12762, 570.8422, -82.44871, 633.1177, -13.66137, -14.00478, 1.0, 0.1199329, 0.1274328, 91.36792 };  // chi=12.8292641785 without scale and with momentum contribution and sigmap=0.01 
+        //{-62.12206, 570.8539, -82.44809, 633.1294, -13.66020, -14.00361, 1.0, 0.1316661, 0.1391660, 91.37965 };  // chi=12.7657087843 without scale and with momentum contribution and sigmap=0.01 
+
+		// mit fib23 z fix
+        //{-62.12137, 570.8555, -82.44793, 633.1310, -13.66004, -14.00345, 1.0, 0.1332196, 0.1407195, 91.2 };  // chi=12.768289574 without scale and with momentum contribution and sigmap=0.01 
+        //{-62.11824, 570.8711, -82.46043, 633.1466, -13.65848, -14.00189, 1.0, 0.1488510, 0.1563509, 91.2 };  // chi=12.7025623989 without scale and with momentum contribution and sigmap=0.01 
+
+        //{-62.86640, 570.7671, -82.80870, 632.4669, -14.000, -14.000, 1., 0., 0., 91.2  }; // Startwerte
+        //{-62.76640, 570.7671, -82.80870, 632.4669, -14.000, -14.000, 1., 0., 0., 91.2  }; // chi=17.8061488 without scale and with momentum contribution and sigmap=0.01 
+        {-62.76640, 570.7671, -82.80870, 632.4669, -14.000, -14.000, 1., 0., 0., 91.2  }; // chi= without scale and with momentum contribution and sigmap=0.01 
 
         //Double_t step[7] = { 0.5, 0.5, 0.5, 0.5, 0.1, 0.1, 0.1 };
-        //Double_t step[10] = { 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.001, 0.1, 0.1, 0.1 };
-        Double_t step[10] = { 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.0001, 0.01, 0.01, 0.01 };
+        Double_t step[10] = { 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.001, 0.1, 0.1, 0.1 };
+        //Double_t step[10] = { 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.0001, 0.01, 0.01, 0.01 };
         //Double_t step[10] = { 0.5, 0.5, 0.5, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
 
         mini->SetFunction(fm1);
@@ -1218,9 +1399,9 @@ void R3BOptimizeGeometryS494::Finish()
         mini->SetLimitedVariable(3, "z32", variable[3], step[3], variable[3] - 2.5, variable[3] + 2.5);
         mini->SetLimitedVariable(4, "dangle30", variable[4], step[4], variable[4] - 1.5, variable[4] + 1.5);
         mini->SetLimitedVariable(5, "dangle32", variable[5], step[5], variable[5] - 1.5, variable[5] + 1.5);
-        mini->SetLimitedVariable(6, "scale", variable[6], step[6], variable[6] - 2., variable[6] + 2.);
+        mini->SetLimitedVariable(6, "scale", variable[6], step[6], variable[6] - 0.2, variable[6] + 0.2);
         mini->SetLimitedVariable(7, "xfi23", variable[7], step[7], variable[7] - 2., variable[7] + 2.);
-        mini->SetLimitedVariable(8, "dangle23", variable[8], step[8], variable[8] - 2., variable[8] + 2.);
+        mini->SetLimitedVariable(8, "yfi23", variable[8], step[8], variable[8] - 2., variable[8] + 2.);
         mini->SetLimitedVariable(9, "zfi23", variable[9], step[9], variable[9] - 2., variable[9] + 2.);
         //mini->FixVariable(0);
         //mini->FixVariable(1);
@@ -1228,7 +1409,7 @@ void R3BOptimizeGeometryS494::Finish()
         //mini->FixVariable(3);
         //mini->FixVariable(4);
         //mini->FixVariable(5);
-        //mini->FixVariable(6);
+        mini->FixVariable(6);
         //mini->FixVariable(7);
         //mini->FixVariable(8);
         //mini->FixVariable(9);
@@ -1299,11 +1480,76 @@ void R3BOptimizeGeometryS494::Finish()
         //{ -111.4976, 537.8347, -131.0320, 599.7352, -193.9927, -193.9956, 1.000625, 0., 0., 91.18721 }; // chi=41.05772 sigmap=0.01
         //{ -111.4969, 537.8354, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.2 }; // chi=39.58178 sigmap=0.01
         //{ -111.4969, 537.8454, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.2 }; // chi= 38.90724 sigmap=0.01
-        { -111.4969, 537.9454, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.2 }; // chi=38.656349 sigmap=0.01
+        //{ -111.4969, 537.9454, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.2 }; // chi=38.656349 sigmap=0.01
+        //{ -111.4969, 537.9454, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.21 }; // chi=38.571849 sigmap=0.01
+
+        //now px, py fix and target point same for C and 4He, deltaxy=0.1
+        //{ -111.4969, 537.9454, -131.0313, 599.7359, -193.9926, -193.9955, 1.000625, 0., 0.005, 91.21 }; // chi=38.571849 sigmap=0.01
+
+        //{ -112.6733, 537.9038, -131.8124, 597.7741, -193.8265, -193.8699, 1.001, 0.0, 0.1, 91.04 };  // chi=2.0641595  without sigmap and 1000 events
+        //{ -112.6733, 537.9038, -131.8124, 597.7741, -193.8265, -193.8699, 1.001, 0.0, 0.0, 91.04 };  // chi=11.5507665  sigmap=0.01 and 1000 events
+        //{ -112.6733, 537.9038, -131.8124, 597.8741, -193.8265, -193.8699, 1.001, 0.0, 0.0, 91.04 };  // chi=9.635242  sigmap=0.01 and 1000 events
+        //{ -112.6704, 537.9067, -131.8224, 597.8770, -193.8262, -193.8696, 1.001, 0.0, 0.0, 91.04286 };  // chi=9.6526795  sigmap=0.01 and 1000 events
+        //{ -112.6704, 537.9067, -131.8124, 597.8770, -193.8262, -193.8696, 1.001, 0.0, 0.0, 91.04286 };  // chi=9.59178  sigmap=0.01 and 1000 events
+        //{ -112.6686, 537.9085, -131.8138, 597.8774, -193.8260, -193.8694, 1.002, 0.0, 0.0, 91.04470 };  // chi=9.5285792  sigmap=0.01 and 1000 events        
+        //{ -112.6686, 537.9085, -131.8138, 597.8774, -193.8260, -193.8694, 1.003, 0.0, 0.0, 91.05470 };  // chi= 9.507102  sigmap=0.01 and 1000 events
+        //{ -112.6686, 537.9185, -131.8138, 597.8774, -193.8260, -193.8694, 1.004, 0.0, 0.0, 91.04470 };  // chi=9.4949080  sigmap=0.01 and 1000 events
+				
+        //deltaxy=0.01 
+        //{ -112.6610, 537.9404, -131.8001, 597.8993, -193.8238, -193.8672, 1.004, 0.0, 0.0, 91.01408 };  // chi=11.4077875  sigmap=0.01 and 1000 events
+        //{ -112.6566, 537.9548, -131.8077, 597.9137, -193.8224, -193.8658, 1.004144, 0.01440588, 0.01440588, 91.00208 };  // chi=11.3846919  sigmap=0.01 and 1000 events
+        //{ -112.6466, 537.9548, -131.8077, 597.9137, -193.8224, -193.8658, 1.004144, 0.01440588, 0.01440588, 91.00208 };  // chi=11.361154  sigmap=0.01 and 1000 events
+
+        //{ -112.6502, 537.9412, -131.7951, 597.9001, -193.8237, -193.8651, 1.003, 0.0, 0.0, 91.04613 };  // chi=11.3687475  sigmap=0.01 and 1000 events
+
+        //{ -112.6789, 537.9168, -131.7994, 597.7871, -193.8252, -193.8686, 1.001, 0.00185, 0.012968, 91.05297 };  // chi=10.1793675 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{ -112.6789, 537.9168, -131.7994, 597.7871, -193.8252, -193.8686, 1.0011, 0.00185, 0.012968, 91.05297 };  // chi=10.1642725 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        //{ -112.6787, 537.9180, -131.7982, 597.7883, -193.8251, -193.8251, 1.001112, 0.00085, 0.013088, 91.05417 };  // chi=10.155750 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        
+        //{ -112.6787, 537.9280, -131.7982, 597.7883, -193.8251, -193.8251, 1.001, 0.014, 0.02, 91.06 };  // chi=10.2093026 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+        
+		// best
+        //{ -112.6704, 537.9361, -131.7968, 597.8064, -193.8233, -193.8233, 1.0, 0.014, 0.02, 91.06 };  // chi=10.283307 without scale and with momentum contribution and sigmap=0.0005 and 1000 events
+
+        // after shifting the fiber detectors by half a fiber and sigma target != 0 (v1)
+        //{ -112.6568, 537.9497, -131.8079, 597.8200, -193.8219, -193.8219, 1.0, 0.01647017, 0.03358581, 91.07359 };  // chi=4.573087871 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6512, 537.9614, -131.8073, 597.8317, -193.8207, -193.8207, 1.0, 0.02820339, 0.04531903, 91.08532 };  // chi=4.5542152564 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6512, 537.9614, -131.8073, 597.8317, -193.8207, -193.8207, 1.0, 0.0820339, 0.04531903, 91.08532 };  // chi=4.53375333 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6479, 537.9647, -131.8273, 597.8350, -193.8204, -193.8204, 1.0, 0.08536725, 0.04865238, 91.08865 };  // chi=4.4667076165 without scale and with momentum contribution and sigmap=0.01
+        
+        //{ -112.6429, 537.9697, -131.8473, 597.8400, -193.8199, -193.8199, 1.0, 0.085, 0.0486, 91.085 };  // chi=4.382976767 without scale and with momentum contribution and sigmap=0.01
+        // 19th opti
+        //{ -112.6429, 537.9697, -131.8473, 597.8400, -193.8199, -193.8199, 1.0, 0.085, 0.0486, 91.085 };  // chi=4.382976787 without scale and with momentum contribution and sigmap=0.01
+
+        // after shifting the fiber detectors by half a fiber and sigma target = 0
+        //{ -112.6568, 537.9497, -131.8079, 597.8200, -193.8219, -193.8219, 1.0, 0.01647, 0.0335858, 91.17359 };  // chi=4.35052984 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6512, 537.9614, -131.8073, 597.8317, -193.8207, -193.8207, 1.0, 0.02820322, 0.045319, 91.18532 };  // chi=4.611918177 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6456, 537.9731, -131.8067, 597.8434, -193.8195, -193.8195, 1.0, 0.03993644, 0.05705222, 91.19705 };  // chi=4.49821991 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6400, 537.9848, -131.8061, 597.8551, -193.8183, -193.8183, 1.0, 0.05166966, 0.06878544, 91.20878 };  // chi=4.4651826173 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6344, 537.9965, -131.8055, 597.8668, -193.8171, -193.8171, 1.0, 0.06340288, 0.08051866, 91.22051 };  // chi=4.454226697 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6344, 537.9965, -131.8055, 597.8668, -193.8171, -193.8171, 1.0, 0.06340288, 0.08051866, 91.32051 };  // chi=4.43927885 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6244, 537.9965, -131.8055, 597.8668, -193.8171, -193.8171, 1.0, 0.06340288, 0.08051866, 91.32051 };  // chi=4.420378756 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6244, 537.9965, -131.8055, 597.8668, -193.8171, -193.8171, 1.0, 0.07340288, 0.08051866, 91.32051 };  // chi=4.4041055 without scale and with momentum contribution and sigmap=0.01
+        
+        //{ -112.6211, 537.9998, -131.8155, 597.8701, -193.8168, -193.8168, 1.0, 0.073, 0.0805, 91.321 };  // chi=4.400292866 without scale and with momentum contribution and sigmap=0.01
+        // 18th opti
+        //{ -112.6211, 537.9998, -131.8155, 597.8701, -193.8158, -193.8168, 1.0, 0.073, 0.0805, 91.321 };  // chi=4.3970204 without scale and with momentum contribution and sigmap=0.01
+        
+        // new data set sigma target = 0.5
+        //{ -112.6186, 538.0134, -131.8019, 597.8837, -193.8144, -193.8154, 1.0, 0.06188431, 0.09408581, 91.33459 };  // chi=14.908077996 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6130, 538.0251, -131.7902, 597.8954, -193.8132, -193.8142, 1.0, 0.06250185, 0.1058190, 91.34632 };  // chi=12.692429667 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6105, 538.0387, -131.7766, 597.9090, -193.8118, -193.8128, 1.0, 0.05138816, 0.1194048, 91.35991 };  // chi=14.72121481 without scale and with momentum contribution and sigmap=0.01
+        //{ -112.6080, 538.0523, -131.7630, 597.9226, -193.8104, -193.8114, 1.0, 0.04027247, 0.1329906, 91.37350 };  // chi=14.58486956 without scale and with momentum contribution and sigmap=0.01
+
+		// fib23 z fix
+        //{ -112.6074, 538.0543, -131.7610, 597.9246, -193.8102, -193.8112, 1.0, 0.03888303, 0.1350362, 91.2 };  // chi=14.56910959 without scale and with momentum contribution and sigmap=0.01
+
+        //{ -111.1057, 537.8183, -131.065, 599.57030, -194.0000, -194.0000, 1., 0., 0., 91.2 }; // Startwerte
+        { -111.3552, 537.7937, -130.9549, 599.5581, -193.9950, -193.9980, 1., 0.1100647, -0.00012172, 91.26071 }; // chi=14.67405552 without scale and with momentum contribution and sigmap=0.01
 		
         //Double_t step[7] = { 0.5, 0.5, 0.5, 0.5, 0.1, 0.1, 0.1 };
-        //Double_t step[10] = { 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.001, 0.1, 0.1, 0.1 };
-        Double_t step[10] = { 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.0001, 0.01, 0.001, 0.01 };
+        Double_t step[10] = { 0.1, 0.1, 0.1, 0.1, 0.01, 0.01, 0.001, 0.1, 0.1, 0.1 };
+        //Double_t step[10] = { 0.01, 0.01, 0.01, 0.01, 0.001, 0.001, 0.0001, 0.01, 0.01, 0.01 };
         //Double_t step[10] = { 0.5, 0.5, 0.5, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
         //Double_t step[10] = { 0.2, 0.5, 0.2, 0.5, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };
 
@@ -1316,9 +1562,9 @@ void R3BOptimizeGeometryS494::Finish()
         mini->SetLimitedVariable(3, "z33", variable[3], step[3], variable[3] - 2.5, variable[3] + 2.5);
         mini->SetLimitedVariable(4, "dangle31", variable[4], step[4], variable[4] - 1.5, variable[4] + 1.5);
         mini->SetLimitedVariable(5, "dangle33", variable[5], step[5], variable[5] - 1.5, variable[5] + 1.5);
-        mini->SetLimitedVariable(6, "scale", variable[6], step[6], -2., 2.);
+        mini->SetLimitedVariable(6, "scale", variable[6], step[6], variable[6] - 0.2, variable[6] + 0.2);
         mini->SetLimitedVariable(7, "xfi23", variable[7], step[7], variable[7] - 2., variable[7] + 2.);
-        mini->SetLimitedVariable(8, "dangle23", variable[8], step[8], variable[8] - 2., variable[8] + 2.);
+        mini->SetLimitedVariable(8, "yfi23", variable[8], step[8], variable[8] - 2., variable[8] + 2.);
         mini->SetLimitedVariable(9, "zfi23", variable[9], step[9], variable[9] - 2., variable[9] + 2.);
         // mini->FixVariable(0);
         // mini->FixVariable(1);
@@ -1326,7 +1572,7 @@ void R3BOptimizeGeometryS494::Finish()
         // mini->FixVariable(3);
         // mini->FixVariable(4);
         // mini->FixVariable(5);
-        //mini->FixVariable(6);
+        mini->FixVariable(6);
         //mini->FixVariable(7);
         //mini->FixVariable(8);
         //mini->FixVariable(9);
@@ -1357,7 +1603,7 @@ void R3BOptimizeGeometryS494::Finish()
     }
     cout << "scale: " << mini->X()[6] << endl;
     cout << "dx23: " << mini->X()[7] << endl;
-    cout << "dangle23: " << mini->X()[8] << endl;
+    cout << "dy23: " << mini->X()[8] << endl;
     cout << "dz23: " << mini->X()[9]  << endl;
     //cout << "angleX: " << mini->X()[10] << endl;
     //cout << "angleZ: " << mini->X()[11] << endl;
