@@ -559,6 +559,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t AoverZmem = -1000.;
     Double_t pCx = -1000., pCy = -1000., pCz = -10000.;
     Int_t ixtmax;
+    Double_t Erel = 0;
 
     Double_t AoverZ = 2.;
 
@@ -1574,7 +1575,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     alphaP.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
                     Double_t theta_26 = alphaP.Angle(carbonP.Vect()) * TMath::RadToDeg(); // angle alpha carbon (theta)
                     Double_t m_inva = (alphaP + carbonP).M();                             // invariant mass
-                    Double_t Erel = m_inva - mHe - mC;                                    // relative Energy
+                    Erel = m_inva - mHe - mC;                                             // relative Energy
                     Double_t Erel_check = 3.87359e-01 - 3.55075e-01 * theta_26 + 6.57182e-01 * theta_26 * theta_26;
 
                     // cout<<"4He selecting: "<<endl;
