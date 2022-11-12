@@ -103,20 +103,20 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
-	// Add small component for incoming beam
-	Bool_t incoming_corretions = false;
-	Double_t dpx;
-	Double_t dpy;
-	Double_t dvx;
-	Double_t dvy;
-	if(incoming_corretions)
-	{
-		dpx = gRandom->Gaus(0., 0.00966);
-		dpy = gRandom->Gaus(0., 0.00966);
-				
-		dvx = gRandom->Gaus(0., 0.1);
-		dvy = gRandom->Gaus(0., 0.1);
-	}
+    // Add small component for incoming beam
+    Bool_t incoming_corretions = false;
+    Double_t dpx;
+    Double_t dpy;
+    Double_t dvx;
+    Double_t dvy;
+    if (incoming_corretions)
+    {
+        dpx = gRandom->Gaus(0., 0.00966);
+        dpy = gRandom->Gaus(0., 0.00966);
+
+        dvx = gRandom->Gaus(0., 0.1);
+        dvy = gRandom->Gaus(0., 0.1);
+    }
     // Loop over tracks in the current event
     for (int itrack = 0; itrack < nTracks; itrack++)
     {
@@ -146,28 +146,27 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             }
         }
 
-    	// Add small component for incoming beam
-		if(incoming_corretions)
-		{
-/*			
-			LOG(DEBUG) << "old values: " << px << "  " << py << "  " << pz;
-			Double_t p = sqrt(px * px + py * py + pz * pz);		
-			px = px + dpx * iA / 16.;
-			py = py + dpy * iA / 16.;
-			pz = sqrt(p * p - px * px - py * py);
-			LOG(DEBUG) << "corrections p: " << dpx << "  " << dpy;
-			LOG(DEBUG) << "corrections v: " << dvx << "  " << dvy;
-			LOG(DEBUG) << "new values p: " << px << "  " << py << "  " << pz;
-*/			
-			vx = vx + dvx;
-			vy = vy + dvy;
-			LOG(DEBUG) << "new values v: " << vx << "  " << vy << "  " << vz;
-		}
+        // Add small component for incoming beam
+        if (incoming_corretions)
+        {
+            /*
+                        LOG(DEBUG) << "old values: " << px << "  " << py << "  " << pz;
+                        Double_t p = sqrt(px * px + py * py + pz * pz);
+                        px = px + dpx * iA / 16.;
+                        py = py + dpy * iA / 16.;
+                        pz = sqrt(p * p - px * px - py * py);
+                        LOG(DEBUG) << "corrections p: " << dpx << "  " << dpy;
+                        LOG(DEBUG) << "corrections v: " << dvx << "  " << dvy;
+                        LOG(DEBUG) << "new values p: " << px << "  " << py << "  " << pz;
+            */
+            vx = vx + dvx;
+            vy = vy + dvy;
+            LOG(DEBUG) << "new values v: " << vx << "  " << vy << "  " << vz;
+        }
 
-		// verschiebe Targetpunkt
-		//vx = 0.5;
-		//vy = 0.5;
-
+        // verschiebe Targetpunkt
+        // vx = 0.5;
+        // vy = 0.5;
 
         LOG(DEBUG) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
                    << "\t" << pz << "\t" << vx << "\t" << vy << "\t" << vz;

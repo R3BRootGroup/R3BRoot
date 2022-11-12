@@ -174,7 +174,8 @@ class R3BGlobalAnalysisS494 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;	
+	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;
+	Int_t mtrackHe, mtrackC, mtrackO;	
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
 	Double_t XHe_mc, YHe_mc, ZHe_mc, XC_mc, YC_mc, ZC_mc, THe_mc, TC_mc;	
@@ -237,9 +238,12 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_pz_O;
     TH1F* fh_p_O;
 
-    TH1F* fh_chiy_vs_chix_He;
+    TH2F* fh_chiy_vs_chix_He_nc;
+    TH2F* fh_chiy_vs_chix_He;
     TH1F* fh_chiy_vs_chix_C;
     TH2F* fh_chiy_vs_chix;
+    TH2F* fh_phi26_vs_chi;
+    TH2F* fh_py_vs_chi;
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -256,21 +260,23 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_dpyHe;
     TH1F* fh_dpzHe;
     TH1F* fh_dpHe;
-    TH2F* fh_thetax_dpx;
-    TH2F* fh_thetay_dpy;
+    TH2F* fh_thetax_dpx_C;
+    TH2F* fh_thetay_dpy_C;
+    TH2F* fh_thetax_dpx_He;
+    TH2F* fh_thetay_dpy_He;
     TH2F* fh_x_dpx;
     TH2F* fh_y_dpy;
     TH2F* fh_thetax_dpy;
     TH2F* fh_thetay_dpx;
     TH2F* fh_dpy_dpx;
-    TH2F* fh_px_px_cm;
-    TH2F* fh_py_py_cm;
-    TH2F* fh_pz_pz_cm;
+    TH2F* fh_px_px_mc;
+    TH2F* fh_py_py_mc;
+    TH2F* fh_pz_pz_mc;
     TH2F* fh_px_px;
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
-    TH2F* fh_Erel_vs_thetabc;
-    TH2F* fh_Erel_vs_thetabcMC;
+    TH2F* fh_Erel_vs_phibc;
+    TH2F* fh_Erel_vs_phibcMC;
     TH2F* fh_psum_vs_event;  
     
     TH2F* fh_thetax_px;
@@ -284,6 +290,8 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_theta26_vs_chi;  
     TH2F* fh_Erel_vs_chi; 
     TH2F* fh_psum_vs_chi; 
+    TH2F* fh_Erel_dErel;
+    TH2F* fh_target_xy_MC;
     
     TH2F* fh_target_xy_nc;
 	TH1F* fh_px_He_nc;
@@ -339,6 +347,8 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	TH2F* fh_dErel_vs_z;
+	TH2F* fh_mass_nc;
+	TH2F* fh_mass;
 	
   public:
     ClassDef(R3BGlobalAnalysisS494, 1)

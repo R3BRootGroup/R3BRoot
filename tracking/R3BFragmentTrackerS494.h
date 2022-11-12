@@ -126,7 +126,7 @@ class R3BFragmentTrackerS494 : public FairTask
                                                 "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
     TLorentzVector Oxygen; 
     TVector3 pos16O0;
-    TVector3 pos16O3;
+    TVector3 pos16O3;    
                                            
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
@@ -226,6 +226,13 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_A_overZ;
     TH2F* fh_theta_16O;
     TH2F* fh_phi_16O;
+    TH2F* fh_xfi23a_target_track;
+    TH2F* fh_yfi23b_target_track;
+    TH2F* fh_xy_target_C;
+    TH2F* fh_xy_target_He;
+    TH2F* fh_dxdy;
+    TH2F* fh_mass_corel;
+    TH2F* fh_mass_vs_ch2;
 
     ClassDef(R3BFragmentTrackerS494, 1)
 };

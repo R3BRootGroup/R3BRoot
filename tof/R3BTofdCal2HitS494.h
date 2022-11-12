@@ -114,6 +114,8 @@ class R3BTofdCal2HitS494 : public FairTask
      */
     inline void SetTofdTotPos(Bool_t ToTy) { fTofdTotPos = ToTy; }
 
+    inline void SetSimu(Bool_t Simu) { fSimu = Simu; }
+
     /**
      * Old Method for walk calculation.
      */
@@ -163,6 +165,7 @@ class R3BTofdCal2HitS494 : public FairTask
     Bool_t fTofdHisto;
     Bool_t fTofdTotPos;
     Bool_t fYOffset;
+    Bool_t fSimu;
     UInt_t fnEvents;
     UInt_t lasttpatevent=0;
     UInt_t fNofPlanes;

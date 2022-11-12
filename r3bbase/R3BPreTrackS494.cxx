@@ -865,7 +865,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         }
     }
 
-    if (fMappedItems.at(DET_BMON))
+    if (fMappedItems.at(DET_BMON) && !fSimu)
     {
         unsigned long IC;
         unsigned long SEETRAM_raw;
@@ -1426,7 +1426,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         randy = (std::rand() / (float)RAND_MAX) * 2.8 - 1.4;
         // randx = (std::rand() / (float)RAND_MAX) - 0.5;
 
-        // fh_xy_tofd->Fill(xxx + 0. * randx, yyy);
+        fh_xy_tofd->Fill(xxx + 0. * randx, yyy);
 
         // first looking for the right charge
         if (1 == 1) // fB == -1250 || fB == -1710)
@@ -1525,7 +1525,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         //  cout<<"NEW HIT: "<<nHits<<", "<<ihit<<"; "<<id2<<", "<<qqq<<", "<<xxx<<endl;
 
-        x2[det2] = xxx / 100.; // for tracker everything in meters
+        x2[det2] = xxx / 100.; // for Rene's tracker everything in meters; Dima's tracker in cm
         y2[det2] = yyy / 100. + y_corr;
         if (y2[det2] < -0.8 || y2[det2] > 0.8) // in meters!
         {
@@ -1538,7 +1538,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
         q2[det2] = qqq;
         t2[det2] = hitTofd->GetTime();
 
-        // fh_xy_tofd_ac->Fill(x2[det2] * 100. + 0. * randx, y2[det2] * 100.);
         fh_tofd_time_ac->Fill(t2[det2]);
         fh_tofd_charge_ac->Fill(y2[det2] * 100., q2[det2]);
 
@@ -1554,7 +1553,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 cout << "2 particle within 5 ns   " << first << endl;
             // register point for tracker
 
-            fh_xy_tofd->Fill(x2[det2] * 100., y2[det2] * 100.);
             if (!first)
             {
                 fh_tofd_q2_vs_q1_ac->Fill(q1[det1], q2[det2]);
@@ -3568,9 +3566,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 Double_t ffact;
                 for (Int_t i = 0; i < countdet_s; i++)
                 {
-                    if (detector_s[i] > 5 && detector_s[i] < 10)
-                        fh_xy_tofd_ac->Fill(xdet_s[i] * 100., ydet_s[i] * 100.);
-
                     if (detector_s[i] == 6)
                     {
                         Int_t xbincheck = 17;

@@ -497,17 +497,22 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
                         if (fDirection == VERTICAL)
                         {
+                            x = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                double(fiber_id - 1.) * (1 + air_layer) * fiber_thickness;
 
-                            x = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
+                            // x = -detector_width / 2. +
+                            //   (double(fiber_id - 1) + (double(fiber_id - 1.) * air_layer)) * fiber_thickness;
                             y = (t_down - t_up) * veff;
                         }
                         else
                         {
                             x = (t_down - t_up) * veff;
 
-                            y = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            //   y = -detector_width / 2. +
+                            //      (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+
+                            y = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                double(fiber_id - 1.) * (1 + air_layer) * fiber_thickness;
                         }
                     }
                     if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
@@ -529,8 +534,12 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                         if (fDirection == VERTICAL)
                         {
-                            x = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            //  x = -detector_width / 2. +
+                            //    (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+
+                            x = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                double(fiber_id - 1.) * (1 + air_layer) * fiber_thickness;
+
                             y = (t_down - t_up) * veff;
                             // y = 0.;
                         }
@@ -538,8 +547,11 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         {
                             x = (t_down - t_up) * veff;
                             // x = 0.;
-                            y = -detector_width / 2. +
-                                (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+                            //  y = -detector_width / 2. +
+                            //    (double(fiber_id - 1) + (double(fiber_id - 1) * air_layer)) * fiber_thickness;
+
+                            y = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+                                double(fiber_id - 1.) * (1 + air_layer) * fiber_thickness;
                         }
                     }
                     // cout<<"Fiber y " << y << endl;

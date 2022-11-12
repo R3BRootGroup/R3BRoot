@@ -76,6 +76,7 @@ R3BTofdCal2HitS494::R3BTofdCal2HitS494()
     , fTofdHisto(true)
     , fTofdTotPos(true)
     , fYOffset(true)
+    , fSimu(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
@@ -932,7 +933,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
             tArrU[hit] = true;
             // store single hits
             singlehit++;
-            if (fTofdTotPos)
+            if (fTofdTotPos && !fSimu)
             {
                 Int_t iplane = event[hit].plane;
                 Int_t ibar = event[hit].bar;
