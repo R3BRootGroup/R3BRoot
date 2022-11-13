@@ -17,6 +17,7 @@
 // ------------------------------------------------------------
 
 #include "R3BMwpcDigitizer.h"
+#include "R3BLogger.h"
 #include "R3BMCTrack.h"
 #include "R3BMwpcPoint.h"
 #include "R3BTGeoPar.h"
@@ -24,8 +25,8 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
-#include "TClonesArray.h"
 
+#include "TClonesArray.h"
 #include "TMath.h"
 #include "TRandom.h"
 #include "TVector3.h"
@@ -53,9 +54,11 @@ R3BMwpcDigitizer::R3BMwpcDigitizer(const TString& name, Int_t iVerbose)
 // Virtual R3BMwpcDigitizer: Destructor ----------------------------
 R3BMwpcDigitizer::~R3BMwpcDigitizer()
 {
-    LOG(DEBUG) << "R3B" + fName + "Digitizer: Delete instance";
+    R3BLOG(debug, " for " << fName);
     if (fMwpcHits)
+    {
         delete fMwpcHits;
+    }
 }
 
 void R3BMwpcDigitizer::SetParContainers()
@@ -65,11 +68,13 @@ void R3BMwpcDigitizer::SetParContainers()
     fMwpcGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName + "GeoPar");
     if (!fMwpcGeoPar)
     {
-        LOG(ERROR) << "R3BMwpcDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.";
+        R3BLOG(error, "Could not get access to " + fName + "GeoPar container.");
         return;
     }
     else
-        LOG(INFO) << "R3BMwpcDigitizer::SetParContainers() : Container " + fName + "GeoPar found.";
+    {
+        R3BLOG(info, "Container " + fName + "GeoPar found.");
+    }
 }
 
 void R3BMwpcDigitizer::SetParameter()
@@ -87,17 +92,15 @@ void R3BMwpcDigitizer::SetParameter()
 // ----   Public method Init  -----------------------------------------
 InitStatus R3BMwpcDigitizer::Init()
 {
-    LOG(INFO) << "R3B" + fName + "Digitizer: Init";
+    R3BLOG(info, " for " << fName);
 
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
-        LOG(fatal) << "Init: No FairRootManager";
+    R3BLOG_IF(fatal, !ioman, "FairRootManager not found");
 
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
     fMwpcPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
-    if (!fMwpcPoints)
-        LOG(fatal) << fName + "Point not found";
+    R3BLOG_IF(fatal, !fMwpcPoints, fName + "Point not found");
 
     // Register output array fMwpcHits
     fMwpcHits = new TClonesArray("R3BMwpcHitData");
@@ -113,7 +116,7 @@ void R3BMwpcDigitizer::Exec(Option_t* opt)
     Reset();
     // Reading the Input -- Point Data --
     Int_t nHits = fMwpcPoints->GetEntriesFast();
-    if (nHits==0)
+    if (nHits == 0)
         return;
     // Data from Point level
     R3BMwpcPoint** pointData;
@@ -150,7 +153,11 @@ void R3BMwpcDigitizer::Exec(Option_t* opt)
         }
     }
     if (pointData)
-        delete pointData;
+    {
+        delete[] pointData;
+    }
+
+    LOG(info) << "R3B" << fName << "Digitizer: " << fMwpcHits->GetEntriesFast() << " points registered in this event";
     return;
 }
 
@@ -165,9 +172,11 @@ InitStatus R3BMwpcDigitizer::ReInit()
 // -----   Public method Reset   -----------------------------------------------
 void R3BMwpcDigitizer::Reset()
 {
-    LOG(DEBUG) << "Clearing R3B" + fName + "Digitizer Structure";
+    R3BLOG(debug, " for " << fName);
     if (fMwpcHits)
+    {
         fMwpcHits->Clear();
+    }
 }
 
 // -----   Private method AddHitData  -------------------------------------------
