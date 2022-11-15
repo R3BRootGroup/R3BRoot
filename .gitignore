@@ -51,6 +51,7 @@ macros/
 .cache
 .idea/
 .vscode/
+.DS_Store
 build-r3broot.sh
 cmake-build-debug/
 
