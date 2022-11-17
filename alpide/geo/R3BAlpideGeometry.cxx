@@ -55,6 +55,13 @@ bool R3BAlpideGeometry::Init(Int_t version)
 
     switch (version)
     {
+        case 2028:
+            // Two barrels + one bending barrel
+            geoPath += "target_area_alpide_barrels_bending_v28.geo.root";
+            fNbSensor = 363;
+            fGeometryVersion = version;
+            break;
+
         case 2026:
             // Two barrels
             geoPath += "target_area_alpide_barrel_v26.geo.root";
@@ -281,7 +288,7 @@ const char* R3BAlpideGeometry::GetSensorVolumePath(Int_t iD)
 
     if (iD >= 1 && iD <= fNbSensor)
     {
-        if (fGeometryVersion == 2026)
+        if (fGeometryVersion == 2026 || fGeometryVersion == 2028)
         {
             if (iD <= 153)
             {
@@ -364,7 +371,7 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
     layerID = std::stoi(m[2].str());  // converting to int the layer type
     alpideID = std::stoi(m[3].str()); // converting to int the alpide type
 
-    if (fGeometryVersion == 2026)
+    if (fGeometryVersion == 2026 || fGeometryVersion == 2028)
     {
         if (barID == 2)
         {
