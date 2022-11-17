@@ -38,14 +38,13 @@ ${R3BROOT_SOURCE_DIR}/alpide/calibration
 ${R3BROOT_SOURCE_DIR}/alpide/online
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
-
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
 ) 
 
+include_directories( ${INCLUDE_DIRECTORIES})
+include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 link_directories( ${LINK_DIRECTORIES})
 
 file(GLOB SRCS 
@@ -68,3 +67,4 @@ set(DEPENDENCIES
 
 GENERATE_LIBRARY()
 
+add_subdirectory(test)
