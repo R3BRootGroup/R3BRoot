@@ -25,7 +25,6 @@
 #include "TClonesArray.h"
 #include "TGeoManager.h"
 #include "TVirtualMC.h"
-#include <stdlib.h>
 
 R3BAlpide::R3BAlpide()
     : R3BAlpide("")
@@ -468,8 +467,9 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
 void R3BAlpide::EndOfEvent()
 {
     if (fVerboseLevel)
+    {
         Print();
-    fAlpidePoint->Clear();
+    }
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
@@ -482,9 +482,13 @@ void R3BAlpide::Register() { FairRootManager::Instance()->Register("AlpidePoint"
 TClonesArray* R3BAlpide::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
+    {
         return fAlpidePoint;
+    }
     else
-        return NULL;
+    {
+        return nullptr;
+    }
 }
 // ----------------------------------------------------------------------------
 
