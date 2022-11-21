@@ -52,9 +52,9 @@ void testTwimSimulation(int nbevents=100)
     run->AddModule(new R3BTwim("twinmusic_v22.geo.root", { -2., 0., 60. }));
     
     // Digitizer: Twim
-    auto twimdigitizer = new R3BTwimDigitizer("Twim");
-    twimdigitizer->SetSigCharge(0.16);
-    run->AddTask(twimdigitizer);
+    //auto twimdigitizer = new R3BTwimDigitizer("Twim");
+    //twimdigitizer->SetSigCharge(0.16);
+    //run->AddTask(twimdigitizer);
 
     // Init
     run->Init();

@@ -43,7 +43,7 @@ R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, co
 R3BAlpideMappingPar::~R3BAlpideMappingPar() { clear(); }
 
 // ----  Method SetNbSensors ---------------------------------------------------
-void R3BAlpideMappingPar::SetNbSensors(UInt_t n)
+void R3BAlpideMappingPar::SetNbSensors(Int_t n)
 {
     fNbSensors = n;
     for (Int_t c = 0; c < AlpideCols; c++)

@@ -23,6 +23,7 @@
 #include <Rtypes.h>
 #include <stdint.h>
 #include <vector>
+#include <iostream>
 
 #define AlpideRows 512
 #define AlpideCols 1024
@@ -53,11 +54,11 @@ class R3BAlpideMappingPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const UInt_t GetNbSensors() { return fNbSensors; }
+    const Int_t GetNbSensors() { return fNbSensors; }
     const Int_t GetGeoVersion() { return fGeoVersion; }
     const Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) { return fIn_use[col - 1][row - 1][sensor - 1]; }
 
-    void SetNbSensors(UInt_t n);
+    void SetNbSensors(Int_t n);
     void SetGeoVersion(Int_t v) { fGeoVersion = v; }
     void SetInUse(UInt_t sensor, UInt_t col, UInt_t row, Int_t val) { fIn_use[col - 1][row - 1][sensor - 1] = val; }
 
@@ -70,7 +71,6 @@ class R3BAlpideMappingPar : public FairParGenericSet
     Bool_t fillParams(const Text_t* name, Int_t* values, FairParamList* list, const Int_t nValues = 1);
 
     const R3BAlpideMappingPar& operator=(const R3BAlpideMappingPar&); /*< an assignment operator>*/
-
     R3BAlpideMappingPar(const R3BAlpideMappingPar&); /*< a copy constructor >*/
 
     ClassDef(R3BAlpideMappingPar, 1);
