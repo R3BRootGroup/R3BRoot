@@ -13,13 +13,20 @@
 
 cmake_minimum_required(VERSION 3.0)
 
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
+message(STATUS "Starting to generate the standard root geometry for the Twin-Music")
+execute_process(COMMAND root -l ${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
+message(STATUS "${BYellow}Twin-Music standard root geometry has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
+message(STATUS "${BYellow}Twin-Music standard root geometry already created${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
+
 enable_testing()
-set(PROJECT_TEST_NAME AlpideUnitTests)
+#set(PROJECT_TEST_NAME TwimUnitTests)
 set(GTEST_ROOT ${SIMPATH})
 find_package(GTest)
 
 if(GTEST_FOUND)
-file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/alpide/test/*.cxx)
 
 include_directories(
     ${GTEST_INCLUDE_DIRS}
@@ -27,9 +34,7 @@ include_directories(
     ${BASE_INCLUDE_DIRECTORIES}
     ${R3BROOT_SOURCE_DIR}/r3bbase
     ${R3BROOT_SOURCE_DIR}/r3bdata
-    ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
-    ${R3BROOT_SOURCE_DIR}/alpide/sim
-    ${R3BROOT_SOURCE_DIR}/alpide/pars
+    ${R3BROOT_SOURCE_DIR}/twim/geobase
     )
 
 link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
@@ -40,17 +45,14 @@ set(TEST_DEPENDENCIES
     ${ROOT_LIBRARIES}
     FairTools
     R3BData
-    R3BAlpide
+    R3BTwim
     ParBase
     GeoBase)
 
-add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
-target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
-add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
 endif(GTEST_FOUND)
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/test/testAlpideSimulation.C)
-add_test(AlpideSimulation ${R3BROOT_BINARY_DIR}/alpide/test/testAlpideSimulation.sh)
-set_tests_properties(AlpideSimulation PROPERTIES TIMEOUT "2000")
-set_tests_properties(AlpideSimulation PROPERTIES PASS_REGULAR_EXPRESSION
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
+add_test(TwimRootGeometry ${R3BROOT_BINARY_DIR}/twim/geobase/create_twin_geo.sh)
+set_tests_properties(TwimRootGeometry PROPERTIES TIMEOUT "2000")
+set_tests_properties(TwimRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

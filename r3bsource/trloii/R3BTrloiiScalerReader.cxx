@@ -75,10 +75,14 @@ Bool_t R3BTrloiiScalerReader::Read()
 
     for (int ch = 0; ch < 16; ++ch)
     {
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(1, ch + 1, fData->TRLO[0].TRLORAW_MAIN[ch]);
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(2, ch + 1, fData->TRLO[0].TRLOBDT_MAIN[ch]);
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(3, ch + 1, fData->TRLO[0].TRLOADT_MAIN[ch]);
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(4, ch + 1, fData->TRLO[0].TRLOARD_MAIN[ch]);
+        if (fData->TRLO[0].TRLORAW_MAIN[ch] > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(1, ch + 1, fData->TRLO[0].TRLORAW_MAIN[ch]);
+        if (fData->TRLO[0].TRLOBDT_MAIN[ch] > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(2, ch + 1, fData->TRLO[0].TRLOBDT_MAIN[ch]);
+        if (fData->TRLO[0].TRLOADT_MAIN[ch] > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(3, ch + 1, fData->TRLO[0].TRLOADT_MAIN[ch]);
+        if (fData->TRLO[0].TRLOARD_MAIN[ch] > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BTrloiiData(4, ch + 1, fData->TRLO[0].TRLOARD_MAIN[ch]);
     }
 
     fNEvent += 1;
