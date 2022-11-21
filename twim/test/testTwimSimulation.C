@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-void testAlpideSimulation(int nbevents=100)
+void testTwimSimulation(int nbevents=100)
 {
     // Timer
     TStopwatch timer;
@@ -38,11 +38,7 @@ void testAlpideSimulation(int nbevents=100)
     // run->SetSink(new FairRootFileSink(simufile));
 
     // Primary particle generator
-    auto boxGen = new FairBoxGenerator(2212, 4);
-    boxGen->SetXYZ(0, 0, 0.);
-    boxGen->SetThetaRange(0., 3.);
-    boxGen->SetPhiRange(0., 360.);
-    boxGen->SetEkinRange(0.6, 0.6);
+    auto boxGen = new FairIonGenerator(82, 208, 82, 1, 0., 0., 1.09, 0., 0., 0.);
     auto primGen = new FairPrimaryGenerator();
     primGen->AddGenerator(boxGen);
     run->SetGenerator(primGen);
@@ -52,8 +48,13 @@ void testAlpideSimulation(int nbevents=100)
     cave->SetGeometryFileName("r3b_cave.geo");
     run->AddModule(cave);
 
-    // Geometry: Alpide
-    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v24.geo.root", { 0., 0., 0. }));
+    // Geometry: Twim
+    run->AddModule(new R3BTwim("twinmusic_v22.geo.root", { -2., 0., 60. }));
+    
+    // Digitizer: Twim
+    auto twimdigitizer = new R3BTwimDigitizer("Twim");
+    twimdigitizer->SetSigCharge(0.16);
+    run->AddTask(twimdigitizer);
 
     // Init
     run->Init();
