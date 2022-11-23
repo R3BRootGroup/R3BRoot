@@ -578,7 +578,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-                auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
+                //auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
+                auto tof_corr = tof - par->GetTofSyncOffset();
 
                 // if (parz[1] > 0)
                 // {
