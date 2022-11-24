@@ -20,9 +20,12 @@ namespace
 {
     TEST(testAlpideMappingPar, GetNbSensors)
     {
-      //R3BAlpideMappingPar par;
-      //par.SetNbSensors(2);
-      
-     // EXPECT_EQ(par.GetNbSensors(), 2);
+        auto par = new R3BAlpideMappingPar("alpideMappingPar",
+                       "ALPIDE Mapping Parameters",
+                       "AlpideMappingParContext");
+;
+        par->SetNbSensors(2);
+
+        EXPECT_EQ(par->GetNbSensors(), 2);
     }
 } // namespace

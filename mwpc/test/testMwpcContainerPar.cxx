@@ -11,34 +11,17 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTwimCalPar.h"
-#include "R3BTwimHitPar.h"
+#include "R3BMwpc0CalPar.h"
 #include "gtest/gtest.h"
 #include <map>
 
 namespace
 {
-    TEST(testTwimCalPar, GetNumSec)
+    TEST(testMwpcCalPar, GetNumPadsX)
     {
-        R3BTwimCalPar par;
-        par.SetNumSec(4);
+        R3BMwpc0CalPar par;
+        par.SetNumPadsX(64);
 
-        EXPECT_EQ(par.GetNumSec(), 4);
-    }
-
-    TEST(testTwimCalPar, GetNumAnodes)
-    {
-        R3BTwimCalPar par;
-        par.SetNumAnodes(16);
-
-        EXPECT_EQ(par.GetNumAnodes(), 16);
-    }
-
-    TEST(testTwimHitPar, GetNumSec)
-    {
-        R3BTwimHitPar par;
-        par.SetNumSec(4);
-
-        EXPECT_EQ(par.GetNumSec(), 4);
+        EXPECT_EQ(par.GetNumPadsX(), 64);
     }
 } // namespace
