@@ -11,11 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//   ----- General macro for generating the Twin-Music geometry
+//
+//   ----- General macro for generating the MWPC3 geometry
 //
 //         Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
 //
-//         Last Update: 20/11/2022 (Jose Luis)
+//         Last Update: 07/10/19 (Jose Luis)
 //
 //         Comments:
 //
@@ -25,16 +26,16 @@
 #include <iomanip>
 #include <iostream>
 
-void create_twin_geo(const char* geoTag = "v22")
+void create_mwpc3_geo(const char* geoTag = "3")
 {
     // --------------------------------------------------------------------------
-    // Configurable geometry for the TWIM-MUSIC.
+    // Configurable geometry for the MWPC3 detectors.
     // Use this macro to create root files with the different configurations
-    // and positions/angles of the detector.
+    // and positions of the MWPC3.
     //
     // Execute macro:  root -l
-    //                 .L create_twin_geo.C
-    //                 create_twin_geo()
+    //                 .L create_mwpc3_geo.C
+    //                 create_mwpc3_geo()
     // --------------------------------------------------------------------------
 
     TGeoRotation* fRefRot = NULL;
@@ -51,7 +52,7 @@ void create_twin_geo(const char* geoTag = "v22")
     // --------------------------------------------------------------------------
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = geoPath + "/geometry/twinmusic_";
+    TString geoFileName = geoPath + "/geometry/mwpc_";
     geoFileName = geoFileName + geoTag + ".geo.root";
     // --------------------------------------------------------------------------
 
@@ -74,6 +75,14 @@ void create_twin_geo(const char* geoTag = "v22")
     TGeoMedium* pMedVac = gGeoMan->GetMedium("vacuum");
     if (!pMedVac)
         Fatal("Main", "Medium vacuum not found");
+
+    FairGeoMedium* mSi = geoMedia->getMedium("silicon");
+    if (!mSi)
+        Fatal("Main", "FairMedium silicon not found");
+    geoBuild->createMedium(mSi);
+    TGeoMedium* pMedSi = gGeoMan->GetMedium("silicon");
+    if (!pMedSi)
+        Fatal("Main", "Medium silicon not found");
 
     FairGeoMedium* mCopper = geoMedia->getMedium("copper");
     if (!mCopper)
@@ -111,144 +120,110 @@ void create_twin_geo(const char* geoTag = "v22")
     if (!mMylar)
         Fatal("Main", "FairMedium mylar not found");
     geoBuild->createMedium(mMylar);
-    TGeoMedium* pMed4 = gGeoMan->GetMedium("mylar");
-    if (!pMed4)
-        Fatal("Main", "Medium mylar not found");
+    TGeoMedium* pMedMylar = gGeoMan->GetMedium("mylar");
+    if (!pMedMylar)
+        Fatal("Main", "Medium Mylar not found");
+    // --------------------------------------------------------------------------
 
     // --------------   Create geometry and top volume  -------------------------
     gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
-    gGeoMan->SetName("TWIMgeom");
+    gGeoMan->SetName("MWP3geom");
     TGeoVolume* top = new TGeoVolumeAssembly("TOP");
     gGeoMan->SetTopVolume(top);
     // --------------------------------------------------------------------------
 
     // out-of-file geometry definition
-    Double_t dx = 0., dy = 0., dz = 0.;
-    TGeoRotation* rotg = new TGeoRotation();
-    TGeoCombiTrans* pMatrix0 = new TGeoCombiTrans("", dx, dy, dz, rotg);
+    Double_t dx, dy, dz;
+    Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
+    Double_t thx, phx, thy, phy, thz, phz;
+    Double_t phi1, phi2;
+    Double_t tx, ty, tz;
+
+    TGeoRotation* zeroRot = new TGeoRotation; // zero rotation
+    TGeoCombiTrans* tZero = new TGeoCombiTrans("tZero", 0., 0., 0., zeroRot);
+    tZero->RegisterYourself();
+    //-------------------------------------------------------------------
+
+    // WORLD
+    TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+
+    TGeoRotation* rot_mwpc = new TGeoRotation("MWPCrot");
 
     // Defintion of the Mother Volume
-    TGeoShape* pbox1 = new TGeoBBox("twimbox1", 12. / 2.0, 23. / 2.0, 22.1);
-    TGeoCombiTrans* t_box1 = new TGeoCombiTrans("t_box1", 6., 0., 0., fRefRot);
-    t_box1->RegisterYourself();
+    TGeoShape* pCBWorld = new TGeoBBox("MWPC_box", 120.0 / 2.0, 80.0 / 2.0, 9.0 / 2.0);
 
-    TGeoShape* pbox2 = new TGeoBBox("twimbox2", 12. / 2.0, 23. / 2.0, 22.1);
-    TGeoCombiTrans* t_box2 = new TGeoCombiTrans("t_box2", -6., 0., 0., fRefRot);
-    t_box2->RegisterYourself();
+    TGeoVolume* pWorld = new TGeoVolume("MWPCWorld_3", pCBWorld, pMedAir);
 
-    TGeoCompositeShape* pMWorld = new TGeoCompositeShape("TWIMbox", "twimbox1:t_box1 + twimbox2:t_box2");
+    TGeoCombiTrans* t0 = new TGeoCombiTrans(0., 0., 0., rot_mwpc);
 
-    TGeoVolume* pWorld = new TGeoVolume("TWIMWorld", pMWorld, pMedAr);
+    // add as Mother Volume
+    pAWorld->AddNode(pWorld, 0, t0);
 
-    TGeoCombiTrans* t0 = new TGeoCombiTrans();
+    // TRANSFORMATION MATRICES
+    // Combi transformation:
+    dx = 0.000;
+    dy = 0.000;
+    dz = 0.000;
+    TGeoCombiTrans* pMatrix1 = new TGeoCombiTrans("", dx, dy, dz, 0);
+    //
+    dx = 119.9;
+    dy = 79.9;
+    dz = 5.0;
+    TGeoShape* basea = new TGeoBBox("BaseAl", dx / 2., dy / 2., dz / 2.);
+    dx = 90.;
+    dy = 60.0;
+    dz = 5.5;
+    TGeoShape* baseb = new TGeoBBox("BaseAls", dx / 2., dy / 2., dz / 2.);
+    TGeoSubtraction* basesub = new TGeoSubtraction(basea, baseb, pMatrix1, pMatrix1);
+    TGeoShape* basesub_c = new TGeoCompositeShape("GE", basesub);
+    TGeoVolume* basesub_log = new TGeoVolume("", basesub_c, pMedAl);
+    basesub_log->SetVisLeaves(kTRUE);
+    basesub_log->SetLineColor(29);
 
-    // Adding the Mother Volume
-    top->AddNode(pWorld, 0, t0);
+    // Position
+    pWorld->AddNode(basesub_log, 0, pMatrix1);
 
-    // --------------- Detector --------------------------------------
-
-    TGeoVolumeAssembly* twim = new TGeoVolumeAssembly("TWIMDet");
-
-    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-    // Shape: Anode type: TGeoBBox
-    dx = 11.000;
-    dy = 11.000;
-    dz = 2.5000;
-    Float_t xcathode = 0.05; // mm
-    TGeoShape* AnodeBox = new TGeoBBox("TWIMAnode", dx / 2., dy / 2., dz / 2.);
-    // Volume: TOFLog
-    TGeoVolume* AnodeLog = new TGeoVolume("TwinLog", AnodeBox, pMedAr);
-    AnodeLog->SetVisLeaves(kTRUE);
-    AnodeLog->SetLineColor(2);
-
-    Int_t nbSections = 4;
-    Int_t nbAnodes = 16;
-    TGeoCombiTrans* pMatrixAnode[nbSections * nbAnodes];
-
-    Int_t nbanode = 0;
-    Float_t offsetx = 11. / 2. + xcathode / 2.;
-    Float_t secposx[4] = { offsetx, offsetx, -offsetx, -offsetx };
-    Float_t secposy[4] = { -11. / 2., 11. / 2., 11. / 2., -11. / 2. };
-    for (Int_t i = 0; i < nbSections; i++)
-    { // Sections
-        dx = secposx[i];
-        dy = secposy[i];
-        for (Int_t j = 0; j < nbAnodes; j++)
-        { // Anodes per section
-
-            nbanode = i * nbAnodes + j;
-            dz = 2.5 * (-7.5 + j);
-
-            pMatrixAnode[nbanode] = new TGeoCombiTrans("", dx, dy, dz, rotg);
-            twim->AddNode(AnodeLog, nbanode + 1, pMatrixAnode[nbanode]);
-        }
-    }
-
-    dx = xcathode;
-    dy = 22.0;
-    dz = nbAnodes * 2.5 + 2. * 2.;
-    TGeoShape* twin1 = new TGeoBBox("", dx / 2., dy / 2., dz / 2.);
+    // Shape
+    dx = 90.;
+    dy = 60.;
+    dz = 3.0;
+    TGeoShape* Detector1 = new TGeoBBox("Detector_1", dx / 2., dy / 2., dz / 2.);
     // Volume:
-    TGeoVolume* twin_log = new TGeoVolume("cathode", twin1, pMedCu);
-    twin_log->SetVisLeaves(kTRUE);
-    twin_log->SetLineColor(3);
-
-    // Position Mother Volume
-    TGeoCombiTrans* pMatrix1 = new TGeoCombiTrans("", 0., 0., 0., rotg);
-    twim->AddNode(twin_log, 0, pMatrix1);
-    pWorld->AddNode(twim, 0, pMatrix0);
-
-    // Screening anodes, Shape & volume: TGeoBBox
-    dx = 11.0;
-    dy = 22.0;
-    dz = 2.00;
-    TGeoVolume* SAnode = gGeoManager->MakeBox("TwimScreening", pMedAr, dx / 2., dy / 2., dz / 2.);
-    SAnode->SetVisLeaves(kTRUE);
-    SAnode->SetLineColor(5);
-
-    dx = secposx[0];
-    dy = 0.000;
-    dz = -21.0;
-    TGeoRotation* arot1 = new TGeoRotation();
-    TGeoCombiTrans* pMatrixd1 = new TGeoCombiTrans("", dx, dy, dz, arot1);
-    pWorld->AddNode(SAnode, 0, pMatrixd1);
-
-    dx = secposx[2];
-    dy = 0.000;
-    dz = -21.0;
-    TGeoCombiTrans* pMatrixd1b = new TGeoCombiTrans("", dx, dy, dz, arot1);
-    pWorld->AddNode(SAnode, 1, pMatrixd1b);
-
-    dx = secposx[0];
-    dz = 21.0;
-    TGeoRotation* arot2 = new TGeoRotation();
-    TGeoCombiTrans* pMatrixd2 = new TGeoCombiTrans("", dx, dy, dz, arot2);
-    pWorld->AddNode(SAnode, 2, pMatrixd2);
-
-    dx = secposx[2];
-    dz = 21.0;
-    TGeoCombiTrans* pMatrixd2b = new TGeoCombiTrans("", dx, dy, dz, arot2);
-    pWorld->AddNode(SAnode, 3, pMatrixd2b);
-
-    // Windows, Shape & volume: TGeoBBox
-    dx = 22.0;
-    dy = 22.0;
-    dz = 0.0025;
-    TGeoVolume* Wind = gGeoManager->MakeBox("TwimWindow", pMed4, dx / 2., dy / 2., dz / 2.);
-    Wind->SetVisLeaves(kTRUE);
-    Wind->SetLineColor(13);
+    TGeoVolume* Detector_log1 = new TGeoVolume("MWPC3", Detector1, pMedAr);
+    Detector_log1->SetVisLeaves(kTRUE);
+    Detector_log1->SetLineColor(3);
+    pWorld->AddNode(Detector_log1, 0, pMatrix1);
 
     dx = 0.000;
     dy = 0.000;
-    dz = -22.0 - 0.0025 / 2.;
-    TGeoRotation* arot3 = new TGeoRotation();
-    TGeoCombiTrans* pMatrixd3 = new TGeoCombiTrans("", dx, dy, dz, arot3);
-    pWorld->AddNode(Wind, 0, pMatrixd3);
+    dz = -1.5 - 0.002 / 2.;
+    TGeoCombiTrans* pMatrix20 = new TGeoCombiTrans("", dx, dy, dz, 0);
 
-    dz = 22.0 + 0.0025 / 2.;
-    TGeoRotation* arot4 = new TGeoRotation();
-    TGeoCombiTrans* pMatrixd4 = new TGeoCombiTrans("", dx, dy, dz, arot4);
-    pWorld->AddNode(Wind, 1, pMatrixd4);
+    // Shape
+    dx = 90.;
+    dy = 60.;
+    dz = 0.0020;
+    TGeoShape* basemylar = new TGeoBBox("basemylar", dx / 2., dy / 2., dz / 2.);
+    // Volume:
+    TGeoVolume* basemylar_log1 = new TGeoVolume("basemylar_log1", basemylar, pMedMylar); // first Kapton
+    basemylar_log1->SetVisLeaves(kTRUE);
+    basemylar_log1->SetLineColor(28);
+
+    // Position
+    pWorld->AddNode(basemylar_log1, 0, pMatrix20);
+
+    // Volume:
+    TGeoVolume* basemylar_log2 = new TGeoVolume("basemylar_log2", basemylar, pMedMylar); // Second Kapton
+    basemylar_log2->SetVisLeaves(kTRUE);
+    basemylar_log2->SetLineColor(28);
+
+    dx = 0.000;
+    dy = 0.000;
+    dz = 1.5 + 0.002 / 2.;
+    TGeoCombiTrans* pMatrix21 = new TGeoCombiTrans("", dx, dy, dz, 0);
+
+    // Position
+    pWorld->AddNode(basemylar_log2, 0, pMatrix21);
 
     // ---------------   Finish   -----------------------------------------------
     gGeoMan->CloseGeometry();

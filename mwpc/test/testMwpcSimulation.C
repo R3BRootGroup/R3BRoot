@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-void testAlpideSimulation(int nbevents = 100)
+void testMwpcSimulation(int nbevents = 100)
 {
     // Timer
     TStopwatch timer;
@@ -38,11 +38,7 @@ void testAlpideSimulation(int nbevents = 100)
     // run->SetSink(new FairRootFileSink(simufile));
 
     // Primary particle generator
-    auto boxGen = new FairBoxGenerator(2212, 4);
-    boxGen->SetXYZ(0, 0, 0.);
-    boxGen->SetThetaRange(0., 3.);
-    boxGen->SetPhiRange(0., 360.);
-    boxGen->SetEkinRange(0.6, 0.6);
+    auto boxGen = new FairIonGenerator(82, 208, 82, 1, 0., 0., 1.09, 0., 0., 0.);
     auto primGen = new FairPrimaryGenerator();
     primGen->AddGenerator(boxGen);
     run->SetGenerator(primGen);
@@ -52,8 +48,33 @@ void testAlpideSimulation(int nbevents = 100)
     cave->SetGeometryFileName("r3b_cave.geo");
     run->AddModule(cave);
 
-    // Geometry: Alpide
-    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v24.geo.root", { 0., 0., 0. }));
+    // Geometry: Mwpc0
+    run->AddModule(new R3BMwpc0("mwpc_0.geo.root", { 0., 0., 20. }));
+
+    // Geometry: Mwpc1
+    run->AddModule(new R3BMwpc1("mwpc_1.geo.root", { 0., 0., 40. }));
+
+    // Geometry: Mwpc2
+    // run->AddModule(new R3BMwpc2("mwpc_2.geo.root", { 0., 0., 60. }));
+
+    // Geometry: Mwpc3
+    // run->AddModule(new R3BMwpc3("mwpc_3.geo.root", { 0., 0., 100. }));
+
+    // Digitizer: Mwpc0
+    auto mw0digitizer = new R3BMwpcDigitizer("Mwpc0", 1);
+    run->AddTask(mw0digitizer);
+
+    // Digitizer: Mwpc1
+    auto mw1digitizer = new R3BMwpcDigitizer("Mwpc1", 1);
+    run->AddTask(mw1digitizer);
+
+    // Digitizer: Mwpc2
+    // auto mw2digitizer = new R3BMwpcDigitizer("Mwpc2", 1);
+    // run->AddTask(mw2digitizer);
+
+    // Digitizer: Mwpc3
+    // auto mw3digitizer = new R3BMwpcDigitizer("Mwpc3", 1);
+    // run->AddTask(mw3digitizer);
 
     // Init
     run->Init();

@@ -71,3 +71,6 @@ set(DEPENDENCIES
   R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(geobase)
+add_subdirectory(test)
