@@ -15,6 +15,7 @@
 #define R3BINCLRootGenerator_H 1
 
 #include "FairGenerator.h"
+#include "TFile.h"
 #include "TString.h"
 #include "TTree.h"
 #include <fstream>
@@ -75,7 +76,8 @@ class R3BINCLRootGenerator : public FairGenerator
     void SetOnlyP2pFission(Bool_t Opt) { fOnlyP2pFission = Opt; }
 
   private:
-    TString fFileName;      // Input file name
+    TString fFileName; // Input file name
+    TFile* fInput;
     Bool_t fOnlyFission;    // True if we want to simulate only fission events
     Bool_t fOnlyP2pFission; // True if we want to simulate only p2p-fission events
     Bool_t fOnlySpallation; // True if we want to simulate only spallation events
