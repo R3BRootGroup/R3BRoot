@@ -658,7 +658,6 @@ void R3BFileSource::CheckFriendChains()
             if (runid.size() != map1.size())
             {
                 errorFlag = 1;
-                //        goto error_label;
                 break;
             }
             Int_t counter = 0;
@@ -668,7 +667,6 @@ void R3BFileSource::CheckFriendChains()
                 if ((bla[0] != runid[counter]) || (bla[1] != events[counter]))
                 {
                     errorFlag = 2;
-                    //          goto error_label;
                     break;
                 }
                 counter++;
@@ -680,8 +678,6 @@ void R3BFileSource::CheckFriendChains()
         }
     }
 
-    // Use goto to leave double loop at once in case of error
-    // error_label:
     if (errorFlag > 0)
     {
         LOG(error) << "The input chain and the friend chain " << inputLevel.Data() << " have a different structure:";

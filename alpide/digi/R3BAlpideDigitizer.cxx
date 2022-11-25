@@ -174,6 +174,7 @@ void R3BAlpideDigitizer::Exec(Option_t* opt)
     {
         delete[] pointData;
     }
+    LOG(info) << "R3BAlpideDigitizer: " << fAlpideHits->GetEntriesFast() << " points registered in this event";
     return;
 }
 

@@ -20,10 +20,7 @@ namespace
 {
     TEST(testAlpideMappingPar, GetNbSensors)
     {
-        auto par = new R3BAlpideMappingPar("alpideMappingPar",
-                       "ALPIDE Mapping Parameters",
-                       "AlpideMappingParContext");
-;
+        auto par = new R3BAlpideMappingPar();
         par->SetNbSensors(2);
 
         EXPECT_EQ(par->GetNbSensors(), 2);
