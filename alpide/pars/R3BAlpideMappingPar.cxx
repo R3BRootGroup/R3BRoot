@@ -27,9 +27,11 @@ R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, co
     : FairParGenericSet(name, title, context)
     , fNbSensors(363)
     , fGeoVersion(2022)
+    , fAlpideCols(DAlpideCols)
+    , fAlpideRows(DAlpideRows)
 {
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < fAlpideCols; c++)
+        for (Int_t r = 0; r < fAlpideRows; r++)
         {
             fIn_use[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -40,14 +42,17 @@ R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, co
 }
 
 // ----  Destructor ------------------------------------------------------------
-R3BAlpideMappingPar::~R3BAlpideMappingPar() { clear(); }
+R3BAlpideMappingPar::~R3BAlpideMappingPar() 
+{ 
+    clear();
+}
 
 // ----  Method SetNbSensors ---------------------------------------------------
 void R3BAlpideMappingPar::SetNbSensors(Int_t n)
 {
     fNbSensors = n;
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < fAlpideCols; c++)
+        for (Int_t r = 0; r < fAlpideRows; r++)
         {
             fIn_use[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -81,8 +86,8 @@ void R3BAlpideMappingPar::putParams(FairParamList* list)
     Int_t defzero = 0;
     char name[300];
     for (int s = 1; s <= fNbSensors; s++)
-        for (int c = 1; c <= AlpideCols; c++)
-            for (int r = 1; r <= AlpideRows; r++)
+        for (int c = 1; c <= fAlpideCols; c++)
+            for (int r = 1; r <= fAlpideRows; r++)
                 if (fIn_use[c - 1][r - 1][s - 1] == 0)
                 {
                     sprintf(name, "Sensor%dCol%dRow%dPar", s, c, r);
@@ -122,8 +127,8 @@ Bool_t R3BAlpideMappingPar::getParams(FairParamList* list)
 
     char name[300];
     for (int s = 1; s <= fNbSensors; s++)
-        for (Int_t c = 1; c <= AlpideCols; c++)
-            for (Int_t r = 1; r <= AlpideRows; r++)
+        for (Int_t c = 1; c <= fAlpideCols; c++)
+            for (Int_t r = 1; r <= fAlpideRows; r++)
             {
                 sprintf(name, "Sensor%dCol%dRow%dPar", s, c, r);
                 Int_t value = 1;
@@ -165,6 +170,9 @@ Bool_t R3BAlpideMappingPar::fillParams(const Text_t* name, Int_t* values, FairPa
     return kFALSE;
 }
 
+// ----  Method print ----------------------------------------------------------
+void R3BAlpideMappingPar::print() { printParams(); }
+
 // ----  Method printParams ----------------------------------------------------
 void R3BAlpideMappingPar::printParams()
 {
@@ -172,8 +180,8 @@ void R3BAlpideMappingPar::printParams()
     for (Int_t s = 0; s < fNbSensors; s++)
     {
         R3BLOG(info, "ALPIDE sensor: " << s + 1);
-        for (Int_t c = 0; c < AlpideCols; c++)
-            for (Int_t r = 0; r < AlpideRows; r++)
+        for (Int_t c = 0; c < fAlpideCols; c++)
+            for (Int_t r = 0; r < fAlpideRows; r++)
             {
                 if (fIn_use[c][r][s] == 0)
                     LOG(info) << "Pixel column: " << c + 1 << ", row: " << r + 1 << " is skipped";

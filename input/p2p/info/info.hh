@@ -15,12 +15,12 @@ const double UNIT = 931.4940954;          // Atomic mass unit MeV/c²
 // WARNING (M. Winkel): website above lists ATOMIC masses!
 
 //C-12
-/*
+
 const int    A 	 = 12;                            // Mass number of the nucleus A
 const double MA  = 12.*UNIT;		          // Nuclear mass of initital A nucleus(MeV/c²)
 const double MB  = 11.009305404*UNIT + Exe;       // Nuclear mass of the residual fragment B (MeV/c²)
-const double MOM_SIGMA = 100.00;                  // Internal momentum spread (Gauss)
-*/
+const double MOM_SIGMA = 20.00;                  // Internal momentum spread (Gauss)
+
 /*
 //Pb-208
 const int    A 	 = 208;
@@ -47,11 +47,11 @@ const double MOM_SIGMA = 112.0;  // Per dimension
 
 // Sn-132
 // Binding Energies from http://www.nndc.bnl.gov/chart/chartNuc.jsp
-const int   A   = 132;
+/*const int   A   = 132;
 const double MA = A*UNIT;
 const double MB = (A-1)*UNIT + Exe;
 const double MOM_SIGMA = 30.0;  // Per dimension
-
+*/
 
 const double Ma  = 938.272;  			 // Mass of the knocked-out nucleon (MeV/c²)
 const double Mi  = 938.272;  			 // Mass of the scattered nucleon (MeV/c²)

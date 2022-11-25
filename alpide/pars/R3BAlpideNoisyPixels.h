@@ -58,7 +58,7 @@ class R3BAlpideNoisyPixels : public FairTask
   private:
     Int_t fNbSensors;
     Int_t fThr;
-    std::vector<Int_t> fMap[AlpideCols][AlpideRows];
+    std::vector<Int_t> fMap[DAlpideCols][DAlpideRows];
     TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
     R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
 

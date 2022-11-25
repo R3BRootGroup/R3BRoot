@@ -44,8 +44,8 @@ R3BAlpideNoisyPixels::R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose)
     , fNbSensors(1)
     , fThr(1000)
 {
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
         {
             fMap[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -62,8 +62,8 @@ R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(DEBUG1, "Destructor"); }
 void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
 {
     fNbSensors = n;
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
         {
             fMap[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -128,8 +128,8 @@ void R3BAlpideNoisyPixels::Exec(Option_t* option)
 void R3BAlpideNoisyPixels::FinishTask()
 {
     fMap_Par->SetNbSensors(fNbSensors);
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
             for (Int_t s = 0; s < fNbSensors; s++)
                 if (fMap[c][r][s] > fThr)
                 {

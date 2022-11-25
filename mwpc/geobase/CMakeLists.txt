@@ -83,7 +83,7 @@ set_tests_properties(Mwpc0RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
                                                   
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc1and2_geo.C)
-add_test(Mwpc1RootGeometry ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc1_geo.sh)
+add_test(Mwpc1RootGeometry ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc1and2_geo.sh)
 set_tests_properties(Mwpc1RootGeometry PROPERTIES TIMEOUT "2000")
 set_tests_properties(Mwpc1RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

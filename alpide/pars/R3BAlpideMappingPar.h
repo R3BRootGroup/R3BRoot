@@ -20,13 +20,13 @@
 #define R3BAlpideMappingPar_H 1
 
 #include "FairParGenericSet.h"
+
 #include <Rtypes.h>
 #include <stdint.h>
 #include <vector>
-#include <iostream>
 
-#define AlpideRows 512
-#define AlpideCols 1024
+#define DAlpideRows 512
+#define DAlpideCols 1024
 
 class FairParamList;
 
@@ -51,6 +51,7 @@ class R3BAlpideMappingPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Method to print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
@@ -65,7 +66,9 @@ class R3BAlpideMappingPar : public FairParGenericSet
   private:
     Int_t fNbSensors;
     Int_t fGeoVersion;
-    std::vector<Int_t> fIn_use[AlpideCols][AlpideRows];
+    Int_t fAlpideCols;
+    Int_t fAlpideRows;
+    std::vector<Int_t> fIn_use[DAlpideCols][DAlpideRows];
 
     /** Method to fill all parameters using FairRuntimeDB **/
     Bool_t fillParams(const Text_t* name, Int_t* values, FairParamList* list, const Int_t nValues = 1);
@@ -73,6 +76,7 @@ class R3BAlpideMappingPar : public FairParGenericSet
     const R3BAlpideMappingPar& operator=(const R3BAlpideMappingPar&); /*< an assignment operator>*/
     R3BAlpideMappingPar(const R3BAlpideMappingPar&); /*< a copy constructor >*/
 
+  public:
     ClassDef(R3BAlpideMappingPar, 1);
 };
 
