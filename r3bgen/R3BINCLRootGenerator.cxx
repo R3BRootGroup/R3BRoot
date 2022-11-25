@@ -18,7 +18,6 @@
 #include "FairRunSim.h"
 #include "G4NistManager.hh"
 #include "R3BLogger.h"
-#include "TFile.h"
 #include "TMath.h"
 #include "TRandom.h"
 
@@ -69,7 +68,7 @@ R3BINCLRootGenerator::R3BINCLRootGenerator(const char* fileName)
 {
 }
 
-R3BINCLRootGenerator::~R3BINCLRootGenerator() {}
+R3BINCLRootGenerator::~R3BINCLRootGenerator() { fInput->Close(); }
 
 bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
@@ -99,85 +98,94 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         }
     }
 
-newevt:
+    bool validevent = false;
 
-    Tree->GetEntry(fEvt);
-
-    if (fOnlyFission)
+    while (!validevent)
     {
-        Bool_t check = kFALSE;
-        for (Int_t j = 0; j < fParticles; j++)
-            if (fOrigin[j] == 1 || fOrigin[j] == 101)
-                check = kTRUE;
-        if (!check)
+
+        Tree->GetEntry(fEvt);
+
+        if (fOnlyFission)
         {
-            fEvt++;
-            goto newevt;
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fOrigin[j] == 1 || fOrigin[j] == 101)
+                    validevent = true;
+            if (!validevent)
+            {
+                fEvt++;
+            }
         }
-    }
-    else if (fOnlySpallation && fOrigin[fParticles - 1] != 0)
-    {
-        fEvt++;
-        goto newevt;
-    }
-    else if (fOnlyP2pFission)
-    {
-        Int_t nbp = 0;
-        Bool_t check = kFALSE;
-        for (Int_t j = 0; j < fParticles; j++)
-            if (fOrigin[j] == 1 || fOrigin[j] == 101)
-                check = kTRUE;
-        if (!check)
+        else if (fOnlySpallation)
         {
-            fEvt++;
-            goto newevt;
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fOrigin[j] == 0)
+                    validevent = true;
+            if (!validevent)
+            {
+                fEvt++;
+            }
+        }
+        else if (fOnlyP2pFission)
+        {
+            Int_t nbp = 0;
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fOrigin[j] == 1 || fOrigin[j] == 101)
+                    validevent = true;
+            if (!validevent)
+            {
+                fEvt++;
+            }
+
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fPdgCode[j] == 2212)
+                    nbp++;
+
+            if (nbp != 2 && validevent)
+            {
+                fEvt++;
+                validevent = false;
+            }
         }
 
-        for (Int_t j = 0; j < fParticles; j++)
-            if (fPdgCode[j] == 2212)
-                nbp++;
-
-        if (nbp != 2)
+        if (fEvt > fEvtRoot)
         {
-            fEvt++;
-            goto newevt;
+            LOG(ERROR)
+                << "\033[5m\033[31m R3BINCLRootGenerator: Number of simulated events larger than the ones contained "
+                   "in the Root file \033[0m ";
+            LOG(WARNING)
+                << "\033[5m\033[33m R3BINCLRootGenerator: Please, provide a new Root file with more events \033[0m ";
+            return kTRUE;
         }
-    }
 
-    if (fEvt > fEvtRoot)
-    {
-        LOG(ERROR) << "\033[5m\033[31m R3BINCLRootGenerator: Number of simulated events larger than the ones contained "
-                      "in the Root file \033[0m ";
-        LOG(WARNING)
-            << "\033[5m\033[33m R3BINCLRootGenerator: Please, provide a new Root file with more events \033[0m ";
-        return kTRUE;
-    }
+        R3BLOG(debug, "fParticles: " << fParticles);
 
-    R3BLOG(debug, "fParticles: " << fParticles);
-
-    for (Int_t j = 0; j < fParticles; j++)
-    {
-        Int_t pdg = 0;
-        if (fMass[j] > 1 && fCharge[j] > 0)
+        if (validevent)
         {
-            iA = fMass[j];
-            iZ = fCharge[j];
-            pdg = GetIonPdgId(iZ, iA);
-            pz = fPzPrime[j] / 1000.;
-            Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
-            px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
-            py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
+            for (Int_t j = 0; j < fParticles; j++)
+            {
+                Int_t pdg = 0;
+                if (fMass[j] > 1 && fCharge[j] > 0)
+                {
+                    iA = fMass[j];
+                    iZ = fCharge[j];
+                    pdg = GetIonPdgId(iZ, iA);
+                    pz = fPzPrime[j] / 1000.;
+                    Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
+                    px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
+                    py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
+                }
+                else
+                {
+                    pdg = fPdgCode[j];
+                    pz = fPzPrime[j] / 1000.;
+                    Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
+                    px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
+                    py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
+                }
+                R3BLOG(debug, "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz);
+                primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
+            }
         }
-        else
-        {
-            pdg = fPdgCode[j];
-            pz = fPzPrime[j] / 1000.;
-            Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
-            px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
-            py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
-        }
-        R3BLOG(debug, "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz);
-        primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
     }
 
     fEvt++;
@@ -194,8 +202,8 @@ void R3BINCLRootGenerator::RegisterIons()
     // Keep a list of ions to register
     std::map<Int_t, FairIon*> ions;
 
-    TFile* f = new TFile(fFileName);
-    Tree = (TTree*)f->Get("et");
+    fInput = new TFile(fFileName);
+    Tree = (TTree*)fInput->Get("et");
 
     fEvtRoot = Tree->GetEntries();
     R3BLOG(info, "Root file entries " << fEvtRoot);
