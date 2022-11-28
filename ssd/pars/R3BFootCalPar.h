@@ -29,7 +29,6 @@ class FairParamList;
 
 class R3BFootCalPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BFootCalPar(const char* name = "footStripCalPar",
@@ -73,6 +72,7 @@ class R3BFootCalPar : public FairParGenericSet
     const R3BFootCalPar& operator=(const R3BFootCalPar&);
     R3BFootCalPar(const R3BFootCalPar&);
 
+  public:
     ClassDefOverride(R3BFootCalPar, 1);
 };
 

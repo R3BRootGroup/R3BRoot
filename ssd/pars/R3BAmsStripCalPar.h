@@ -30,7 +30,6 @@ class FairParamList;
 
 class R3BAmsStripCalPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BAmsStripCalPar(const char* name = "amsStripCalPar",
@@ -82,6 +81,7 @@ class R3BAmsStripCalPar : public FairParGenericSet
     const R3BAmsStripCalPar& operator=(const R3BAmsStripCalPar&);
     R3BAmsStripCalPar(const R3BAmsStripCalPar&);
 
+  public:
     ClassDef(R3BAmsStripCalPar, 1);
 };
 

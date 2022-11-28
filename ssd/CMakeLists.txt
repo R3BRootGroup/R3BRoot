@@ -93,3 +93,5 @@ set(DEPENDENCIES
     Spectrum R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(test)

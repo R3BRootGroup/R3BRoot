@@ -88,6 +88,7 @@ class R3BFootMappingPar : public FairParGenericSet
     const R3BFootMappingPar& operator=(const R3BFootMappingPar&);
     R3BFootMappingPar(const R3BFootMappingPar&);
 
+  public:
     ClassDef(R3BFootMappingPar, 1);
 };
 
