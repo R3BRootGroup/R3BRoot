@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-void testTwimSimulation(int nbevents = 100)
+void testCalifaSimulation(const int nbevents = 100)
 {
     // Timer
     TStopwatch timer;
@@ -39,7 +39,11 @@ void testTwimSimulation(int nbevents = 100)
     // run->SetSink(new FairRootFileSink(simufile));
 
     // Primary particle generator
-    auto boxGen = new FairIonGenerator(82, 208, 82, 1, 0., 0., 1.09, 0., 0., 0.);
+    auto boxGen = new FairBoxGenerator(2212, 8);
+    boxGen->SetXYZ(0, 0, 0.);
+    boxGen->SetThetaRange(7., 145.);
+    boxGen->SetPhiRange(0., 360.);
+    boxGen->SetEkinRange(0.6, 0.6);
     auto primGen = new FairPrimaryGenerator();
     primGen->AddGenerator(boxGen);
     run->SetGenerator(primGen);
@@ -49,13 +53,12 @@ void testTwimSimulation(int nbevents = 100)
     cave->SetGeometryFileName("r3b_cave.geo");
     run->AddModule(cave);
 
-    // Geometry: Twim
-    run->AddModule(new R3BTwim("twinmusic_v22.geo.root", { -2., 0., 60. }));
-
-    // Digitizer: Twim
-    auto twimdigitizer = new R3BTwimDigitizer("Twim");
-    twimdigitizer->SetSigCharge(0.16);
-    run->AddTask(twimdigitizer);
+    // Geometry: Califa
+    run->AddModule(new R3BCalifa("califa_2020.geo.root", { 0., 0., 0. }));
+    
+    // Digitizer: Califa
+    auto califaDig = new R3BCalifaDigitizer();
+    run->AddTask(califaDig);
 
     // Init
     run->Init();

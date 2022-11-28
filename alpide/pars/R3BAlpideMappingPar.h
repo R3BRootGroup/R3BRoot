@@ -74,7 +74,7 @@ class R3BAlpideMappingPar : public FairParGenericSet
     Bool_t fillParams(const Text_t* name, Int_t* values, FairParamList* list, const Int_t nValues = 1);
 
     const R3BAlpideMappingPar& operator=(const R3BAlpideMappingPar&); /*< an assignment operator>*/
-    R3BAlpideMappingPar(const R3BAlpideMappingPar&); /*< a copy constructor >*/
+    R3BAlpideMappingPar(const R3BAlpideMappingPar&);                  /*< a copy constructor >*/
 
   public:
     ClassDef(R3BAlpideMappingPar, 1);

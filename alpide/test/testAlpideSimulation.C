@@ -18,8 +18,9 @@ void testAlpideSimulation(int nbevents = 100)
     timer.Start();
 
     // Logging
-    FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogVerbosityLevel("low");
+    FairLogger::GetLogger()->SetLogScreenLevel("warn");
+    FairLogger::GetLogger()->SetColoredLog(true);
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
@@ -38,9 +39,9 @@ void testAlpideSimulation(int nbevents = 100)
     // run->SetSink(new FairRootFileSink(simufile));
 
     // Primary particle generator
-    auto boxGen = new FairBoxGenerator(2212, 4);
+    auto boxGen = new FairBoxGenerator(2212, 8);
     boxGen->SetXYZ(0, 0, 0.);
-    boxGen->SetThetaRange(0., 3.);
+    boxGen->SetThetaRange(7., 90.);
     boxGen->SetPhiRange(0., 360.);
     boxGen->SetEkinRange(0.6, 0.6);
     auto primGen = new FairPrimaryGenerator();
@@ -54,6 +55,11 @@ void testAlpideSimulation(int nbevents = 100)
 
     // Geometry: Alpide
     run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v24.geo.root", { 0., 0., 0. }));
+
+    // Digitizer: Alpide
+    auto digi = new R3BAlpideDigitizer("Alpide");
+    digi->SetLabframe();
+    run->AddTask(digi);
 
     // Init
     run->Init();

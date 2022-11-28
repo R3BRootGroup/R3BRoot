@@ -26,7 +26,7 @@
 R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
     , fNbSensors(363)
-    , fGeoVersion(2022)
+    , fGeoVersion(2024)
     , fAlpideCols(DAlpideCols)
     , fAlpideRows(DAlpideRows)
 {
@@ -42,10 +42,7 @@ R3BAlpideMappingPar::R3BAlpideMappingPar(const char* name, const char* title, co
 }
 
 // ----  Destructor ------------------------------------------------------------
-R3BAlpideMappingPar::~R3BAlpideMappingPar() 
-{ 
-    clear();
-}
+R3BAlpideMappingPar::~R3BAlpideMappingPar() { clear(); }
 
 // ----  Method SetNbSensors ---------------------------------------------------
 void R3BAlpideMappingPar::SetNbSensors(Int_t n)

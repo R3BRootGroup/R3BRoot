@@ -57,7 +57,7 @@ FairParSet* R3BAlpideContFact::createContainer(FairContainer* c)
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
     const char* name = c->GetName();
-    R3BLOG(INFO, "Create container name: " << name);
+    R3BLOG(info, "Create container name: " << name);
     FairParSet* p = 0;
     if (strcmp(name, "AlpideGeoPar") == 0)
     {

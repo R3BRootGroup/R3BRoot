@@ -56,7 +56,7 @@ R3BAlpideNoisyPixels::R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BAlpideNoisyPixels::Destructor
-R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(DEBUG1, "Destructor"); }
+R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(DEBUG1, ""); }
 
 // ----  Method SetNbSensors ---------------------------------------------------
 void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
@@ -78,7 +78,7 @@ InitStatus R3BAlpideNoisyPixels::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -86,16 +86,16 @@ InitStatus R3BAlpideNoisyPixels::Init()
     fAlpideMappedData = (TClonesArray*)mgr->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
-        R3BLOG(FATAL, "AlpideMappedData not found");
+        R3BLOG(fatal, "AlpideMappedData not found");
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
     if (!fMap_Par)
     {
-        R3BLOG(FATAL, "Couldn't get handle on alpideMappingPar container");
+        R3BLOG(fatal, "Couldn't get handle on alpideMappingPar container");
         return kFATAL;
     }
 

@@ -43,7 +43,7 @@ R3BAlpideDigitizer::R3BAlpideDigitizer()
 R3BAlpideDigitizer::R3BAlpideDigitizer(const TString& name, Int_t iVerbose)
     : FairTask(name + "Digitizer", iVerbose)
     , fName(name)
-    , fGeoversion(2022)
+    , fGeoversion(2024)
     , fMCTrack(NULL)
     , fAlpidePoints(NULL)
     , fAlpideHits(NULL)
@@ -68,8 +68,8 @@ void R3BAlpideDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     fMappingPar = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
-    R3BLOG_IF(warning, !fMappingPar, "Could not get access to alpideMappingPar");
-    R3BLOG_IF(warning, fMappingPar, "Container alpideMappingPar found.");
+    R3BLOG_IF(warn, !fMappingPar, "Could not get access to alpideMappingPar");
+    R3BLOG_IF(info, fMappingPar, "Container alpideMappingPar found.");
 }
 
 void R3BAlpideDigitizer::SetParameter()

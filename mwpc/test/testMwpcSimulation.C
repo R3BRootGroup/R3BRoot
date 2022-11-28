@@ -18,8 +18,9 @@ void testMwpcSimulation(int nbevents = 100)
     timer.Start();
 
     // Logging
-    FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogVerbosityLevel("low");
+    FairLogger::GetLogger()->SetLogScreenLevel("warn");
+    FairLogger::GetLogger()->SetColoredLog(true);
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");

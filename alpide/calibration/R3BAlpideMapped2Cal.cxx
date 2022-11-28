@@ -52,7 +52,7 @@ R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
 // Virtual R3BAlpideMapped2Cal::Destructor
 R3BAlpideMapped2Cal::~R3BAlpideMapped2Cal()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fAlpideCalData)
     {
         delete fAlpideCalData;
@@ -63,10 +63,10 @@ void R3BAlpideMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
-    R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
+    R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 }
 
 void R3BAlpideMapped2Cal::SetParameter()
@@ -79,11 +79,11 @@ void R3BAlpideMapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -91,7 +91,7 @@ InitStatus R3BAlpideMapped2Cal::Init()
     fAlpideMappedData = (TClonesArray*)mgr->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
-        R3BLOG(FATAL, "AlpideMappedData not found");
+        R3BLOG(fatal, "AlpideMappedData not found");
         return kFATAL;
     }
 
@@ -162,7 +162,7 @@ int R3BAlpideMapped2Cal::GetRow(int ads)
 // -----   Public method Reset   ------------------------------------------------
 void R3BAlpideMapped2Cal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing CalData Structure");
+    R3BLOG(debug1, "Clearing CalData Structure");
     if (fAlpideCalData)
     {
         fAlpideCalData->Clear();

@@ -75,8 +75,8 @@ void R3BAlpide::Initialize()
 {
     FairDetector::Initialize();
 
-    R3BLOG(INFO, " ");
-    R3BLOG(DEBUG, "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide"));
+    R3BLOG(info, " ");
+    R3BLOG(debug, "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide"));
 
     SetParameter();
     fAlpideGeo = R3BAlpideGeometry::Instance();

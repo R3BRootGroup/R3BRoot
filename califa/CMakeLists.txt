@@ -81,3 +81,5 @@ set(DEPENDENCIES
   Spectrum R3BBase R3BPassive R3BData R3BTracking Boost::regex)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(test)

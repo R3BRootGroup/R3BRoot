@@ -14,12 +14,12 @@
 cmake_minimum_required(VERSION 3.0)
 
 enable_testing()
-set(PROJECT_TEST_NAME AlpideUnitTests)
+set(PROJECT_TEST_NAME CalifaUnitTests)
 set(GTEST_ROOT ${SIMPATH})
 find_package(GTest)
 
 if(GTEST_FOUND)
-file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/alpide/test/*.cxx)
+file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/califa/test/*.cxx)
 
 include_directories(
     ${GTEST_INCLUDE_DIRS}
@@ -28,10 +28,9 @@ include_directories(
     ${R3BROOT_SOURCE_DIR}/r3bbase
     ${R3BROOT_SOURCE_DIR}/r3bdata
     ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
-    ${R3BROOT_SOURCE_DIR}/alpide
-    ${R3BROOT_SOURCE_DIR}/alpide/sim
-    ${R3BROOT_SOURCE_DIR}/alpide/pars
-    ${R3BROOT_SOURCE_DIR}/alpide/geo
+    ${R3BROOT_SOURCE_DIR}/califa
+    ${R3BROOT_SOURCE_DIR}/califa/sim
+    ${R3BROOT_SOURCE_DIR}/califa/pars
     )
 
 link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
@@ -42,7 +41,7 @@ set(TEST_DEPENDENCIES
     ${ROOT_LIBRARIES}
     FairTools
     R3BData
-    R3BAlpide
+    R3BCalifa
     ParBase
     GeoBase)
 
@@ -51,8 +50,8 @@ target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
 add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
 endif(GTEST_FOUND)
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/test/testAlpideSimulation.C)
-add_test(AlpideSimulation ${R3BROOT_BINARY_DIR}/alpide/test/testAlpideSimulation.sh)
-set_tests_properties(AlpideSimulation PROPERTIES TIMEOUT "2000")
-set_tests_properties(AlpideSimulation PROPERTIES PASS_REGULAR_EXPRESSION
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/califa/test/testCalifaSimulation.C)
+add_test(CalifaSimulation ${R3BROOT_BINARY_DIR}/califa/test/testCalifaSimulation.sh)
+set_tests_properties(CalifaSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(CalifaSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
