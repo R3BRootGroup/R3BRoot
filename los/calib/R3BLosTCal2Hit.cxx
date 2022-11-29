@@ -16,6 +16,7 @@
 // -----      Created January 17th 2023 by N.Mozumdar      -----
 // -------------------------------------------------------------
 
+#include <FairRootManager.h>
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
