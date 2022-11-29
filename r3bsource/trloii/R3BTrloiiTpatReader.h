@@ -54,7 +54,7 @@ class R3BTrloiiTpatReader : public R3BReader
     }
 
     // Skip events with Tpat=0
-    void SetSkipEventsTpatZero() { fSkipTpatZero = kTRUE; }
+    void SetSkipEventsTpatZero(Bool_t option) { fSkipTpatZero = option; }
 
   private:
     // An event counter
