@@ -108,6 +108,7 @@ set(SRCS
 ./trloii/R3BTrloiiScalerReader_s467.cxx
 ./wr/R3BTimestampMasterReader.cxx
 ./pspx/R3BPspxReader.cxx
+./pspx/R3BS515PspxReader.cxx
 ./fibers/R3BBunchedFiberReader.cxx
 ./fibers/R3BBunchedFiberSPMTTrigReader.cxx
 ./beammonitor/R3BBeamMonitorReader.cxx

@@ -40,6 +40,7 @@
 #pragma link C++ class R3BTimestampMasterReader+;
 #pragma link C++ class R3BBeamMonitorReader+;
 #pragma link C++ class R3BPspxReader+;
+#pragma link C++ class R3BS515PspxReader+;
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigReader+;
 #pragma link C++ class R3BSfibReader+;
