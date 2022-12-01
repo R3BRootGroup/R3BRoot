@@ -99,10 +99,8 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     }
 
     bool validevent = false;
-
     while (!validevent)
     {
-
         Tree->GetEntry(fEvt);
 
         if (fOnlyFission)
@@ -145,6 +143,10 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 fEvt++;
                 validevent = false;
             }
+        }
+        else
+        {
+            validevent = true;
         }
 
         if (fEvt > fEvtRoot)

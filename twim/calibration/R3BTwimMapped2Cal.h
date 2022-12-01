@@ -61,10 +61,11 @@ class R3BTwimMapped2Cal : public FairTask
     virtual InitStatus ReInit();
 
     /** Method to set up the experiment ID **/
-    void SetExpId(Int_t exp) {
-      R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId <<", New value:" << exp);
-      R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
-      fExpId = exp;
+    void SetExpId(Int_t exp)
+    {
+        R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId << ", New value:" << exp);
+        R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
+        fExpId = exp;
     }
 
     void SetOnline(Bool_t option) { fOnline = option; }

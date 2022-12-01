@@ -97,7 +97,7 @@ bool R3BAlpideGeometry::Init(Int_t version)
     }
 
     // Stand alone mode
-    R3BLOG(INFO, "Open geometry file " << geoPath << " for analysis.");
+    R3BLOG(info, "Open geometry file " << geoPath << " for analysis.");
     f = new TFile(geoPath, "READ");
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)

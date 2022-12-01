@@ -12,8 +12,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaMappingPar.h"
 #include "R3BCalifaCrystalCalPar.h"
+#include "R3BCalifaMappingPar.h"
 #include "gtest/gtest.h"
 #include <map>
 
@@ -26,29 +26,29 @@ namespace
 
         EXPECT_EQ(par.GetNumCrystals(), 2000);
     }
-    
+
     TEST(testCalifaMappingPar, GetInUse)
     {
-     R3BCalifaMappingPar par;
-     par.SetInUse(1,1000);
-    
-    EXPECT_EQ(par.GetInUse(1000), 1);
+        R3BCalifaMappingPar par;
+        par.SetInUse(1, 1000);
+
+        EXPECT_EQ(par.GetInUse(1000), 1);
     }
-    
+
     TEST(testCalifaCrystalCalPar, GetNumCrystals)
     {
-     R3BCalifaCrystalCalPar par;
-     par.SetNumCrystals(100);
-    
-    EXPECT_EQ(par.GetNumCrystals(), 100);
+        R3BCalifaCrystalCalPar par;
+        par.SetNumCrystals(100);
+
+        EXPECT_EQ(par.GetNumCrystals(), 100);
     }
-    
+
     TEST(testCalifaCrystalCalPar, GetNumParametersFit)
     {
-     R3BCalifaCrystalCalPar par;
-     par.SetNumParametersFit(10);
-    
-    EXPECT_EQ(par.GetNumParametersFit(), 10);
+        R3BCalifaCrystalCalPar par;
+        par.SetNumParametersFit(10);
+
+        EXPECT_EQ(par.GetNumParametersFit(), 10);
     }
-    
+
 } // namespace

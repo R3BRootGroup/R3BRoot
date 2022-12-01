@@ -153,10 +153,9 @@ void R3BTwimCal2Hit::SetParameter()
             if (fHitItemsTofW)
             {
                 R3BLOG(INFO,
-                       "R3BTwimCal2Hit parameters for charge-Z vs tof:" << CalZParams->GetAt(s * fNumParams) << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 1)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 2));
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2));
             }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
@@ -167,12 +166,10 @@ void R3BTwimCal2Hit::SetParameter()
             if (fHitItemsTofW)
             {
                 R3BLOG(INFO,
-                       "R3BTwimCal2Hit parameters for charge-Z vs tof:" << CalZParams->GetAt(s * fNumParams) << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 1)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 2)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 3));
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
+                           << CalZParams->GetAt(s * fNumParams + 3));
             }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
@@ -184,14 +181,10 @@ void R3BTwimCal2Hit::SetParameter()
             if (fHitItemsTofW)
             {
                 R3BLOG(INFO,
-                       "R3BTwimCal2Hit parameters for charge-Z vs tof:" << CalZParams->GetAt(s * fNumParams) << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 1)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 2)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 3)
-                                                                        << " : "
-                                                                        << CalZParams->GetAt(s * fNumParams + 4));
+                       "R3BTwimCal2Hit parameters for charge-Z vs tof:"
+                           << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
+                           << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
+                           << CalZParams->GetAt(s * fNumParams + 3) << " : " << CalZParams->GetAt(s * fNumParams + 4));
             }
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
             fZ1[s] = CalZParams->GetAt(s * fNumParams + 1);
@@ -522,10 +515,10 @@ void R3BTwimCal2Hit::S4551()
                 if (CalZTofParams)
                 {
                     Double_t Esum_mean = Esum / nba;
-                    Esum_mean =
-                        fEmean_tof[i] * Esum_mean / (CalZTofParams->GetAt(i * fNumParamsTof) +
-                                                     CalZTofParams->GetAt(i * fNumParamsTof + 1) * tof[i] +
-                                                     CalZTofParams->GetAt(i * fNumParamsTof + 2) * tof[i] * tof[i]);
+                    Esum_mean = fEmean_tof[i] * Esum_mean /
+                                (CalZTofParams->GetAt(i * fNumParamsTof) +
+                                 CalZTofParams->GetAt(i * fNumParamsTof + 1) * tof[i] +
+                                 CalZTofParams->GetAt(i * fNumParamsTof + 2) * tof[i] * tof[i]);
                     TSpline3* spl = fCal_Par->GetSpline(i + 1);
                     Esum_mean = fEmean_dt[i] * Esum_mean / spl->Eval(dt_ref);
                     Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean +

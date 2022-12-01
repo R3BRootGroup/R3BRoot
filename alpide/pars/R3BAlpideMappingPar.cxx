@@ -95,7 +95,7 @@ void R3BAlpideMappingPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BAlpideMappingPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
         R3BLOG(fatal, "Could not initialize FairParamList");

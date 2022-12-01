@@ -55,7 +55,7 @@ void testCalifaSimulation(const int nbevents = 100)
 
     // Geometry: Califa
     run->AddModule(new R3BCalifa("califa_2020.geo.root", { 0., 0., 0. }));
-    
+
     // Digitizer: Califa
     auto califaDig = new R3BCalifaDigitizer();
     run->AddTask(califaDig);

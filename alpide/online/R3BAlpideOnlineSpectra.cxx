@@ -64,7 +64,7 @@ R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra(const TString& name, Int_t iVerbo
 }
 
 // Virtual R3BAlpideOnlineSpectra::Destructor
-R3BAlpideOnlineSpectra::~R3BAlpideOnlineSpectra() { R3BLOG(DEBUG1, ""); }
+R3BAlpideOnlineSpectra::~R3BAlpideOnlineSpectra() { R3BLOG(debug, ""); }
 
 void R3BAlpideOnlineSpectra::SetParContainers()
 {

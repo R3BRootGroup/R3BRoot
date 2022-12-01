@@ -56,7 +56,7 @@ R3BAlpideNoisyPixels::R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BAlpideNoisyPixels::Destructor
-R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(DEBUG1, ""); }
+R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(debug1, ""); }
 
 // ----  Method SetNbSensors ---------------------------------------------------
 void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
@@ -74,7 +74,7 @@ void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideNoisyPixels::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -107,8 +107,10 @@ void R3BAlpideNoisyPixels::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fAlpideMappedData->GetEntries();
-    if (!nHits)
+    if (nHits == 0)
+    {
         return;
+    }
 
     auto mappedData = new R3BAlpideMappedData*[nHits];
 

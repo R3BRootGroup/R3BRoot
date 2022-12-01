@@ -57,7 +57,7 @@ R3BAlpideDigitizer::R3BAlpideDigitizer(const TString& name, Int_t iVerbose)
 // Virtual R3BAlpideDigitizer: Destructor ----------------------------
 R3BAlpideDigitizer::~R3BAlpideDigitizer()
 {
-    R3BLOG(debug, "");
+    R3BLOG(debug1, "");
     if (fAlpideHits)
     {
         delete fAlpideHits;

@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------
-// -----           R3BTwimVertexReconstruction source file              -----
-// -----    Created 30/11/19 by J.L. Rodriguez-Sanchez     -----
+// -----       R3BTwimVertexReconstruction source file     -----
+// -----      Created on 18/07/22 by A. Grana Gonzalez     -----
 // -------------------------------------------------------------
 
 // ROOT headers
@@ -52,34 +52,28 @@ R3BTwimVertexReconstruction::R3BTwimVertexReconstruction(const char* name, Int_t
 }
 
 // Virtual R3BTwimVertexReconstruction: Destructor
-R3BTwimVertexReconstruction::~R3BTwimVertexReconstruction()
-{
-    R3BLOG(DEBUG1, "Destructor");
-    if (fTwimHitDataCA)
-        delete fTwimHitDataCA;
-}
+R3BTwimVertexReconstruction::~R3BTwimVertexReconstruction() { R3BLOG(debug1, ""); }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimVertexReconstruction::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
-    if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+    R3BLOG_IF(error, !header, "EventHeadder. not found");
 
     // INPUT DATA
-    // get access to cal data of the Twim
+    // get access to twim hit data
     fTwimHitDataCA = (TClonesArray*)rootManager->GetObject("TwimHitData");
     if (!fTwimHitDataCA)
     {
-        R3BLOG(FATAL, "TwimHitData not found");
+        R3BLOG(fatal, "TwimdHitData not found");
         return kFATAL;
     }
 
@@ -90,48 +84,60 @@ InitStatus R3BTwimVertexReconstruction::Init()
 void R3BTwimVertexReconstruction::Exec(Option_t* option)
 {
     if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+    {
         return;
+    }
 
     Int_t nHitTwim = fTwimHitDataCA->GetEntriesFast();
+    // The two fission fragments are needed to reconstruct the vertex
+    if (nHitTwim != 2)
+    {
+        return;
+    }
 
     TVector3 trajparams[2];
-    trajparams[0].SetXYZ(-1000., -1000., 0.);
-    trajparams[1].SetXYZ(-1000., -1000., 0.);
+    trajparams[0].SetXYZ(0., 0., 0.);
+    trajparams[1].SetXYZ(0., 0., 0.);
 
-    if (nHitTwim == 2)
+    auto HitDat = new R3BTwimHitData*[nHitTwim];
+
+    for (Int_t i = 0; i < nHitTwim; i++)
     {
-        R3BTwimHitData** HitDat = new R3BTwimHitData*[nHitTwim];
+        HitDat[i] = (R3BTwimHitData*)(fTwimHitDataCA->At(i));
+        trajparams[i].SetXYZ(HitDat[i]->GetSecID(), HitDat[i]->GetOffset(), HitDat[i]->GetTheta());
+    }
 
-        for (Int_t i = 0; i < nHitTwim; i++)
+    f1 = new TF1("f1", "pol1", -2800, 1000);
+    f2 = new TF1("f2", "pol1", -2800, 1000);
+    f1->SetParameter(0, trajparams[0].Y());
+    f1->SetParameter(1, trajparams[0].Z());
+    f2->SetParameter(0, trajparams[1].Y());
+    f2->SetParameter(1, trajparams[1].Z());
+    double min = 2000.; // in mm
+    double xmin = NAN, zmin = NAN;
+    for (int i = -2800; i < 1000; i++) // i is in mm
+    {
+        auto mintemp = TMath::Abs(f1->Eval(i) - f2->Eval(i));
+        if (min > mintemp)
         {
-            HitDat[i] = (R3BTwimHitData*)(fTwimHitDataCA->At(i));
-            trajparams[i].SetXYZ(HitDat[i]->GetSecID(), HitDat[i]->GetOffset(), HitDat[i]->GetTheta());
+            min = mintemp;
+            zmin = i;
+            xmin = (f1->Eval(i) + f2->Eval(i)) / 2.0; // Mean value for X
         }
+    }
 
-        f1 = new TF1("f1", "pol1", -4000, 4000);
-        f2 = new TF1("f2", "pol1", -4000, 4000);
-        f1->SetParameter(0, trajparams[0].Y());
-        f1->SetParameter(1, trajparams[0].Z());
-        f2->SetParameter(0, trajparams[1].Y());
-        f2->SetParameter(1, trajparams[1].Z());
-        Double_t min = 2000;
-        for (Int_t i = -4000; i < -20; i++)
-        {
-            if (min > TMath::Abs(f1->Eval(i) - f2->Eval(i)))
-            {
-                min = TMath::Abs(f1->Eval(i) - f2->Eval(i));
-                HitDat[0]->SetVertexZ(i);
-                HitDat[1]->SetVertexZ(i);
-                HitDat[0]->SetVertexX(f1->Eval(i));
-                HitDat[1]->SetVertexX(f2->Eval(i));
-            }
-        }
+    if (!TMath::IsNaN(xmin) && !TMath::IsNaN(zmin))
+    {
+        HitDat[0]->SetVertexZ(zmin);
+        HitDat[1]->SetVertexZ(zmin);
+        HitDat[0]->SetVertexX(xmin);
+        HitDat[1]->SetVertexX(xmin);
+    }
 
-        if (HitDat)
-            delete[] HitDat;
-
-    } // if nHitTwim == 2
-
+    if (HitDat)
+    {
+        delete[] HitDat;
+    }
     return;
 }
 

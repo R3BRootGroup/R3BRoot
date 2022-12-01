@@ -54,7 +54,7 @@ R3BSingleAlpideCorrelationOnlineSpectra::R3BSingleAlpideCorrelationOnlineSpectra
 {
 }
 
-R3BSingleAlpideCorrelationOnlineSpectra::~R3BSingleAlpideCorrelationOnlineSpectra() { R3BLOG(debug, ""); }
+R3BSingleAlpideCorrelationOnlineSpectra::~R3BSingleAlpideCorrelationOnlineSpectra() { R3BLOG(debug1, ""); }
 
 InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
 {

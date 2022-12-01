@@ -52,9 +52,6 @@ class R3BTwimDigitizer : public FairTask
     /** Setters for sigmas **/
     void SetSigma_x(Float_t sig) { fsigma_x = sig; }
     void SetSigCharge(Float_t sig) { fZsig = sig; }
-    void SetPosX(Float_t x) { fPosX = x; }
-    void SetPosZ(Float_t z) { fPosZ = z; }
-    void SetAngle(Float_t a) { fangle = a; }
 
   private:
     TClonesArray* fMCTrack;
@@ -63,12 +60,10 @@ class R3BTwimDigitizer : public FairTask
     Int_t fDetId;
     Float_t fsigma_x;
     Float_t fZsig;
-    Float_t fangle;
-    Float_t fPosX, fPosZ;
     TString fName;
 
     // Adds a R3BTwimHitData to the HitCollection
-    R3BTwimHitData* AddR3BHitData(Int_t detId, Double_t theta, Double_t z, Double_t x);
+    R3BTwimHitData* AddR3BHitData(Int_t detId, Double_t theta, Double_t z, Double_t x, Double_t offset);
 
   public:
     // Class definition

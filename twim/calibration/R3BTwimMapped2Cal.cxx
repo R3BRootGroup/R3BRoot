@@ -272,10 +272,8 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                                 if (fE[s][k][i] > 0.)
                                     AddCalData(s + 1,
                                                i + 1,
-                                               a0 +
-                                                   a1 *
-                                                       fTimeStitch->GetTime(
-                                                           fDT[s][k][i] - fDT[s][j][fNumAnodes + 1], "vftx", "vftx"),
+                                               a0 + a1 * fTimeStitch->GetTime(
+                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 1], "vftx", "vftx"),
                                                fE[s][k][i]);
                             }
                             else
@@ -283,10 +281,8 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
                                 if (fE[s][k][i] > 0.)
                                     AddCalData(s + 1,
                                                i + 1,
-                                               a0 +
-                                                   a1 *
-                                                       fTimeStitch->GetTime(
-                                                           fDT[s][k][i] - fDT[s][j][fNumAnodes + 2], "vftx", "vftx"),
+                                               a0 + a1 * fTimeStitch->GetTime(
+                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 2], "vftx", "vftx"),
                                                fE[s][k][i]);
                             }
                         }

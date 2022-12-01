@@ -64,7 +64,7 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
 // Virtual R3BAlpideCal2Hit::Destructor
 R3BAlpideCal2Hit::~R3BAlpideCal2Hit()
 {
-    R3BLOG(debug, "");
+    R3BLOG(debug1, "");
     if (fAlpideCluster)
     {
         delete fAlpideCluster;
@@ -117,7 +117,7 @@ void R3BAlpideCal2Hit::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
