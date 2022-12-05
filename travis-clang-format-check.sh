@@ -6,6 +6,10 @@ CLANG_FORMAT=${1:-clang-format}
 echo -n "Running clang-format checks, version: "
 ${CLANG_FORMAT} --version
 
+echo "*** git describe : " ; /usr/bin/git describe --always
+echo "*** git log --oneline --all --decorate --graph : " ; /usr/bin/git log --oneline --all --decorate --graph
+echo "***"
+
 if [ 0 != $? ]; then
     echo -e "\033[1;31mclang-format missing: ${CLANG_FORMAT}\033[0m"
     exit 1
