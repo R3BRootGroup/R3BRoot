@@ -153,17 +153,21 @@ void R3BCalifaOnlineSpectra::SetParameter()
 
         if (c <= fNbCalifaCrystals / 2)
         {
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
-                fMap_Par->GetFebexSlot(c);
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
-                fMap_Par->GetFebexMod(c);
+            if(fMap_Par->GetHalf(c)>0){ //only for installed crystals (see issue 681)
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
+                    fMap_Par->GetFebexSlot(c);
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
+                    fMap_Par->GetFebexMod(c);
+            }
         }
         else
         {
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
-                fMap_Par->GetFebexSlot(c);
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
-                fMap_Par->GetFebexMod(c);
+            if(fMap_Par->GetHalf(c)>0){
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
+                    fMap_Par->GetFebexSlot(c);
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
+                    fMap_Par->GetFebexMod(c);
+            }
         }
     }
 }
