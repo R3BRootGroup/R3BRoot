@@ -73,7 +73,7 @@ Bool_t R3BUcesbSource::Init()
     else
     {
         eventHeader = new R3BEventHeader();
-        run -> SetEventHeader(eventHeader); // implicit conversion and trasfer ownership to FairRun
+        run -> SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
         R3BLOG(WARNING, "EventHeader. has been created from R3BEventHeader");
     }
 
