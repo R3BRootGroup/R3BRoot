@@ -132,7 +132,7 @@ find_package(HEPMC)
 # Check the compiler and set the compile and link flags
 check_compiler()
 
-if(DEFINED $ENV{WERROR} AND $ENV{WERROR})
+if(DEFINED ENV{WERROR} AND "$ENV{WERROR}")
   message(STATUS "Will compile with -Werror. ")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-error=sign-compare -Wno-error=reorder -Wno-error=unused-variable -Wno-error=unused-but-set-variable")
 else()

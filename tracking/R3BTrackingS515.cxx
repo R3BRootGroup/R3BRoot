@@ -192,8 +192,8 @@ void R3BTrackingS515::Exec(Option_t* option)
     auto mwpc_hit = (R3BMwpcHitData*)mwpc_DataItems->At(0);
 
     // Reading fiber detectors (using only highest energy hit)
-    R3BBunchedFiberHitData *f10_hit, *f11_hit, *f12_hit, *this_hit;
-    int f;
+    R3BBunchedFiberHitData *f10_hit{}, *f11_hit{}, *f12_hit{}, *this_hit{};
+    int f{};
     double energy=0;
     for(f=0; f<NOF_FIB_DET; ++f)
     {
@@ -213,7 +213,7 @@ void R3BTrackingS515::Exec(Option_t* option)
         if(energy==0) break;//no good energy in this fiber
     }
     if(f!=3) return;//good hits should be found in all 3 fibers
-
+    assert(f10_hit && f11_hit && f12_hit && "Not all fibers found.");
     //Reading TOFD data
     R3BTofdHitData *tofd_hit;
     bool is_good_tofd = false;

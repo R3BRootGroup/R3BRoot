@@ -362,7 +362,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     if (fTpat_bit >= 0)
     {
         itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+        tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if (tpatvalue == 0)
         {
             // counterWrongTpat++;
