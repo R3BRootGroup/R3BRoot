@@ -113,7 +113,7 @@ echo "SITE: " $SITE
 echo "Model: " ${ctest_model}
 echo "Nr. of processes: " $number_of_processors
 echo "************************"
-
+export WERROR=1
 cd $SOURCEDIR
 
 ctest -S $SOURCEDIR/R3BRoot_test.cmake -V --VV 
