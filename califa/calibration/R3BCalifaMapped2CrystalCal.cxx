@@ -11,6 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#warning "This should fail in CI."
+
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TRandom.h"
