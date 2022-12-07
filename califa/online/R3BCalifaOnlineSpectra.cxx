@@ -153,7 +153,8 @@ void R3BCalifaOnlineSpectra::SetParameter()
 
         if (c <= fNbCalifaCrystals / 2)
         {
-            if(fMap_Par->GetHalf(c)>0){ //only for installed crystals (see issue 681)
+            if (fMap_Par->GetInUse(c) == 1 && fMap_Par->GetHalf(c) > 0)
+            { // only for installed crystals (see issue 681)
                 fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
                     fMap_Par->GetFebexSlot(c);
                 fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
@@ -162,7 +163,8 @@ void R3BCalifaOnlineSpectra::SetParameter()
         }
         else
         {
-            if(fMap_Par->GetHalf(c)>0){
+            if (fMap_Par->GetInUse(c) == 1 && fMap_Par->GetHalf(c) > 0)
+            {
                 fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
                     fMap_Par->GetFebexSlot(c);
                 fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
