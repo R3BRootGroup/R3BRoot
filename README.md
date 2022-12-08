@@ -24,50 +24,17 @@ First, you will need to install FairSoft and FairRoot. For more details: [instru
 ### Configure and compile
 
 ~~~bash
+from %R3BRoot_DIRECTORY%
 cd ..
 mkdir build
 cd build
 export SIMPATH=%PATH_TO_FAIRSOFT%
 export FAIRROOTPATH=%PATH_TO_FAIRROOT%
-cmake ../R3BRoot/
-make
+cmake ../R3BRoot
+. config.sh
+make -j6
 ~~~
 
-# Simulations
+# Simulations and Data Analysis
 
-~~~bash
-cd %BUILD_DIRECTORY%
-. ./config.sh
-cd ../R3BRoot/macros/r3b/
-root -l run_sim.C
-~~~
-
-This will create output file `sim.root` with the simulation results and parameter file `par.root` with geometry and magnetic field parameters.
-
-After the simulation run:
-
-1. To start an event display:
-
-~~~bash
-root -l eventDisplay.C
-~~~
-
-2. To perform a quick analysis with GUI:
-
-~~~bash
-root -l sim.root
-[] evt->StartViewer();
-~~~
-
-3. To convert the MC results into detector-like signals and open the output file:
-
-~~~bash
-root -l run_digi.C
-[] .q
-root -l r3bhits.root
-[] evt->StartViewer();
-~~~
-
-# Data Analysis
-
-> ...Under development...
+This is performed from the GitHub parameter and data analysis repository, which contains all the macros and parameter files needed by the user to carry out the simulations and data analysis of each experiment. There is one repository per experiment, please, visit the R3B Wiki for more details.
