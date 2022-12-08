@@ -50,7 +50,7 @@ R3BTwimDigitizer::R3BTwimDigitizer(const TString& name, Int_t iVerbose)
     , fMCTrack(NULL)
     , fTwimPoints(NULL)
     , fTwimHits(NULL)
-    , fsigma_x(0.030) // 20um
+    , fsigma_x(0.030) // 30um
     , fZsig(0.)
 {
 }
@@ -58,7 +58,7 @@ R3BTwimDigitizer::R3BTwimDigitizer(const TString& name, Int_t iVerbose)
 // Virtual R3BTwimDigitizer: Destructor ----------------------------
 R3BTwimDigitizer::~R3BTwimDigitizer()
 {
-    R3BLOG(debug, "");
+    R3BLOG(debug1, "");
     if (fTwimHits)
     {
         delete fTwimHits;
@@ -100,6 +100,7 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
     {
         return;
     }
+
     // Data from Point level
     R3BTwimPoint** pointData = new R3BTwimPoint*[nHits];
     Int_t TrackId = 0, PID = 0, anodeId = 0;
@@ -126,14 +127,13 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
             double fZ_in = pointData[i]->GetZIn();
             double fZ_out = pointData[i]->GetZOut();
 
-            int secID = anodeId / 16;
+            int secID = anodeId / 17;
             int index = fPos[secID][0].size() + 1;
             fPos[secID][0].resize(index);
             fPos[secID][1].resize(index);
             fPos[secID][0][index - 1] = 10. * (fX_out + fX_in) / 2.; // mm
             fPos[secID][1][index - 1] = 10. * (fZ_out + fZ_in) / 2.; // mm
-
-            if (anodeId % 16 == 7)
+            if (anodeId % 16 == 8)
             {
                 fCharge[secID] = pointData[i]->GetZFF();
                 fPosX[secID] = 10. * (fX_out + fX_in) / 2.; // mm
@@ -166,7 +166,9 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
             // These parameters are calculated in the Lab. frame.
             auto offset = c_svd_r[0];
             auto theta = c_svd_r[1];
-
+            R3BLOG(debug,
+                   "SecId: " << i + 1 << ", charge: " << fCharge[i] << ", offset (mm);" << offset
+                             << ", theta (rad):" << theta);
             AddR3BHitData(i + 1, theta, gRandom->Gaus(fCharge[i], fZsig), gRandom->Gaus(fPosX[i], fsigma_x), offset);
         }
     }

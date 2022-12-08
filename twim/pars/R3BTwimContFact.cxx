@@ -22,11 +22,12 @@
 //
 
 #include "R3BTwimContFact.h"
-#include "R3BTGeoPar.h"
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BLogger.h"
+#include "R3BTGeoPar.h"
 #include "R3BTwimCalPar.h"
 #include "R3BTwimHitPar.h"
 
@@ -68,7 +69,7 @@ FairParSet* R3BTwimContFact::createContainer(FairContainer* c)
     // of this container, the name is concatinated with the context.
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BTwimContFact::createContainer(): " << name;
+    R3BLOG(info, "Create container name: " << name);
     FairParSet* p = 0;
     if (strcmp(name, "twimCalPar") == 0)
     {

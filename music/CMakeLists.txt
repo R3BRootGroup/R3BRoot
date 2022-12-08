@@ -28,6 +28,7 @@ ${R3BROOT_SOURCE_DIR}/music/online
 ${R3BROOT_SOURCE_DIR}/music/pars
 ${R3BROOT_SOURCE_DIR}/music/calibration
 ${R3BROOT_SOURCE_DIR}/music/sim
+${R3BROOT_SOURCE_DIR}/music/digi
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
@@ -42,31 +43,9 @@ set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR} )
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SRCS
-#Put here your sourcefiles
-#./sim/R3BMusic.cxx
-#./sim/R3BMusicDigitizer.cxx
-#./pars/R3BMusicCalPar.cxx
-#./pars/R3BMusicHitPar.cxx
-#./pars/R3BMusicContFact.cxx
-#./pars/R3BMusicMapped2CalPar.cxx
-#./pars/R3BMusicMapped2CalPar_S515.cxx
-#./calibration/R3BMusicMapped2Cal.cxx
-#./calibration/R3BMusicCal2Hit.cxx
-#./online/R3BMusicOnlineSpectra.cxx
-#./sim/R3BMusic.cxx
-#./sim/R3BMusicDigitizer.cxx
-#./pars/R3BMusicCalPar.cxx
-#./pars/R3BMusicHitPar.cxx
-#./pars/R3BMusicContFact.cxx
-#./pars/R3BMusicMapped2CalPar.cxx
-#./calibration/R3BMusicMapped2Cal.cxx
-#./calibration/R3BMusicCal2Hit.cxx
-#./online/R3BMusicOnlineSpectra.cxx
-)
-
 file(GLOB SRCS
 ./sim/*.cxx
+./digi/*.cxx
 ./pars/*.cxx
 ./calibration/*.cxx
 ./online/*.cxx
@@ -82,3 +61,5 @@ set(DEPENDENCIES
           R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(test)

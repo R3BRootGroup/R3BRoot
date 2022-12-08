@@ -17,7 +17,7 @@
 // --------------------------------------------------------------
 
 #ifndef R3BMusicHitPar_H
-#define R3BMusicHitPar_H
+#define R3BMusicHitPar_H 1
 
 #include "FairParGenericSet.h" // for FairParGenericSet
 
@@ -31,7 +31,6 @@ class FairParamList;
 
 class R3BMusicHitPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BMusicHitPar(const char* name = "musicHitPar",
@@ -82,6 +81,7 @@ class R3BMusicHitPar : public FairParGenericSet
 
     R3BMusicHitPar(const R3BMusicHitPar&); /*< a copy constructor >*/
 
+  public:
     ClassDef(R3BMusicHitPar, 1);
 };
 
