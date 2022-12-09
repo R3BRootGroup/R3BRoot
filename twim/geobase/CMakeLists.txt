@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 3.0)
 
 if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
 message(STATUS "Starting to generate the standard root geometry for the Twin-Music")
-execute_process(COMMAND root -l ${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
+execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
 message(STATUS "${BYellow}Twin-Music standard root geometry has been created${CR} ")
 else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
 message(STATUS "${BYellow}Twin-Music standard root geometry already created${CR} ")
