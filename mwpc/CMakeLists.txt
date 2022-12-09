@@ -52,12 +52,17 @@ mwpc1/*.cxx
 mwpc2/*.cxx
 digi/*.cxx
 online/*.cxx
+mwpc3/R3BMwpc3.cxx
+mwpc3/R3BMwpc3ContFact.cxx
+mwpc3/R3BMwpc3CalPar.cxx
+mwpc3/R3BMwpc3Mapped2Cal.cxx
+mwpc3/R3BMwpc3Mapped2CalPar.cxx
 )
 
 if(WITH_SOFIA)
 file(GLOB SRCS 
 ${SRCS}
-mwpc3/*.cxx
+mwpc3/R3BMwpc3Cal2Hit.cxx
 )
 endif(WITH_SOFIA)
 
