@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------
 
 #ifndef R3BLogger_H
-#define R3BLogger_H
+#define R3BLogger_H 1
 
 #include <cstdlib>
 #include <fstream>
@@ -27,11 +27,11 @@
 
 #include "FairLogger.h"
 
+class R3BLogger;
+
 class R3BLogger : public FairLogger
 {
   public:
-    R3BLogger();
-
 #define R3BLOG(severity, x)                                                                                        \
     if (true)                                                                                                      \
     {                                                                                                              \
@@ -56,6 +56,7 @@ class R3BLogger : public FairLogger
         (void)0
 
   private:
+    R3BLogger();
     ~R3BLogger();
 
   public:

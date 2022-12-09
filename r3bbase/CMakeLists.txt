@@ -33,16 +33,6 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
-#set(SRCS
-#R3BModule.cxx
-#R3BDetector.cxx
-#R3BEventHeader.cxx
-#R3BEventHeaderPropagator.cxx
-#R3BWhiterabbitPropagator.cxx
-#R3BDataPropagator.cxx
-#R3BFileSource.cxx
-#)
-
 file(GLOB SRCS 
 *.cxx 
 )
