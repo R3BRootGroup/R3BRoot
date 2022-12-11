@@ -26,7 +26,7 @@
 #include "TClonesArray.h"
 #include "TObjArray.h"
 
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 
 #include "TEveBrowser.h"
 #include "TEveCalo.h"
@@ -147,7 +147,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
         Reset();
 
         // Besides if conditions, both objects must be defined
-        R3BCalifaHitData* caloHit;
+        R3BCalifaClusterData* caloHit;
 
         Int_t caloHits = 0; // Nb of CaloHits in current event
         caloHits = fCaloHitCA->GetEntriesFast();
@@ -164,7 +164,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
         {
 
             Int_t binx = -1, biny = -1;
-            caloHit = (R3BCalifaHitData*)fCaloHitCA->At(i);
+            caloHit = (R3BCalifaClusterData*)fCaloHitCA->At(i);
             theta = caloHit->GetTheta();
             phi = caloHit->GetPhi();
 

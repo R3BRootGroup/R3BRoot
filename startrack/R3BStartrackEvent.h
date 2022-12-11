@@ -14,7 +14,7 @@
 #ifndef R3BStartrackEvent_H
 #define R3BStartrackEvent_H
 
-#include "../califaData/R3BCalifaHitData.h"
+#include "../califaData/R3BCalifaClusterData.h"
 #include "R3BStartrackerHit.h"
 #include <TObjArray.h>
 #include <TObject.h>
@@ -107,7 +107,7 @@ class R3BStartrackEvent : public TObject
     Double_t fVtxPosition[3];    // primary vertex position
     Double_t fVtxError[3];       // primary vertex error
     TObjArray* fSTHits;          // Hits in the Silicon Tracker (R3BSTaRTrackerHit), min 3 (1 track), or 6 (2 protons)
-    TObjArray* fCalifaHits;      // CALIFA hit (R3BCalifaHitData)
+    TObjArray* fCalifaHits;      // CALIFA hit (R3BCalifaClusterData)
     TString fGeometryST;         // geometry Silicon Tracker
 
     ClassDef(R3BStartrackEvent, 1);

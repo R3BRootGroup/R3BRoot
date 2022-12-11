@@ -24,7 +24,7 @@
 
 #include "R3BAmsCalifaCorrelatedOnlineSpectra.h"
 #include "R3BAmsHitData.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "THttpServer.h"
@@ -640,7 +640,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaHitData* hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaClusterData* hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;

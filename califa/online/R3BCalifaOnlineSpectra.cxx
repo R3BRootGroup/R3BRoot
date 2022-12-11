@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifaOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
@@ -1491,7 +1491,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

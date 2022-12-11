@@ -11,12 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFACRYSTALCAL2HIT_H
-#define R3BCALIFACRYSTALCAL2HIT_H 1
+#ifndef R3BCALIFACRYSTALCAL2CLUSTER_H
+#define R3BCALIFACRYSTALCAL2CLUSTER_H 1
 
 #include "FairTask.h"
 #include "R3BCalifaGeometry.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "Rtypes.h"
 
 #include "TH2F.h"
@@ -25,16 +25,16 @@
 class TClonesArray;
 class R3BTGeoPar;
 
-class R3BCalifaCrystalCal2Hit : public FairTask
+class R3BCalifaCrystalCal2Cluster : public FairTask
 {
 
   public:
     /** Default constructor
      **/
-    R3BCalifaCrystalCal2Hit();
+    R3BCalifaCrystalCal2Cluster();
 
     /** Destructor **/
-    virtual ~R3BCalifaCrystalCal2Hit();
+    virtual ~R3BCalifaCrystalCal2Cluster();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -214,7 +214,7 @@ class R3BCalifaCrystalCal2Hit : public FairTask
      **
      ** Adds a CalifaHit to the HitCollection
      **/
-    R3BCalifaHitData* AddHit(UInt_t Nbcrystals,
+    R3BCalifaClusterData* AddHit(UInt_t Nbcrystals,
                              Double_t ene,
                              Double_t Nf,
                              Double_t Ns,
@@ -228,7 +228,8 @@ class R3BCalifaCrystalCal2Hit : public FairTask
      **/
     virtual bool Match(R3BCalifaCrystalCalData* ref, R3BCalifaCrystalCalData* hit);
 
-    ClassDef(R3BCalifaCrystalCal2Hit, 2);
+    ClassDef(R3BCalifaCrystalCal2Cluster, 2);
 };
+using R3BCalifaCrystalCal2Hit [[deprecated("R3BCalifaCrystalCal2Hit was renamed R3BCalifaCrystalCal2Cluster")]] =R3BCalifaCrystalCal2Cluster;
 
 #endif /* R3BCALIFACRYSTALCAL2HIT_H */

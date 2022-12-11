@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifavsFootOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BEventHeader.h"
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
@@ -191,7 +191,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
         if (hit->GetEnergy() < 50e3) // 50MeV
             continue;
 
