@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #include "R3BDetector.h"
-#include "FairLogger.h"
+#include "R3BLogger.h"
 #include "TGeoManager.h"
 
 R3BDetector::R3BDetector()
@@ -50,15 +50,16 @@ void R3BDetector::ConstructGeometry()
 {
     if (!GetGeometryFileName().EndsWith(".root"))
     {
-        LOG(FATAL) << GetName() << " (which is a " << ClassName() << ") geometry file is not specified";
+        R3BLOG(fatal, GetName() << " (which is a " << ClassName() << ") geometry file is not specified");
     }
     ConstructRootGeometry();
 }
 
 void R3BDetector::ConstructRootGeometry()
 {
-    LOG(INFO) << "R3BDetector: Constructing " << GetName() << " (which is a " << ClassName()
-              << ") geometry from ROOT file " << GetGeometryFileName() << " ...";
+    R3BLOG(info,
+           "Constructing " << GetName() << " (which is a " << ClassName() << ") geometry from ROOT file "
+                           << GetGeometryFileName() << " ...");
     FairModule::ConstructRootGeometry();
 
     if (!fCombiTrans.IsIdentity())
@@ -68,4 +69,4 @@ void R3BDetector::ConstructRootGeometry()
     }
 }
 
-ClassImp(R3BDetector)
+ClassImp(R3BDetector);

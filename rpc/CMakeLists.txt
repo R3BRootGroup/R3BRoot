@@ -31,6 +31,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/rpc
 ${R3BROOT_SOURCE_DIR}/rpc/sim
+${R3BROOT_SOURCE_DIR}/rpc/digi
 ${R3BROOT_SOURCE_DIR}/rpc/pars
 ${R3BROOT_SOURCE_DIR}/rpc/calibration
 ${R3BROOT_SOURCE_DIR}/rpc/online
@@ -75,3 +76,5 @@ set(DEPENDENCIES
     R3BBase R3BTracking R3BData R3BTCal)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(test)

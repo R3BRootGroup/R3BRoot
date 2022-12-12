@@ -76,7 +76,7 @@ void R3BAlpide::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, " ");
-    R3BLOG(debug, "R3BAlpide: Sens. Vol. (McId) " << gMC->VolId("Alpide"));
+    R3BLOG(debug, "Sens. Vol. (McId) " << gMC->VolId("Alpide"));
 
     SetParameter();
     fAlpideGeo = R3BAlpideGeometry::Instance();
@@ -542,8 +542,10 @@ R3BAlpidePoint* R3BAlpide::AddHit(Int_t trackID,
     TClonesArray& clref = *fAlpidePoint;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
+    {
         LOG(info) << "R3BAlpide: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+    }
     return new (clref[size])
         R3BAlpidePoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss, pdgcode);
 }

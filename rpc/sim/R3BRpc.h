@@ -12,17 +12,15 @@
  ******************************************************************************/
 
 #ifndef R3BRPC_H
-#define R3BRPC_H
+#define R3BRPC_H 1
 
 #include "R3BDetector.h"
 #include "Rtypes.h"
 #include "TLorentzVector.h"
-#include <map>
 
 class TClonesArray;
 class R3BRpcPoint;
 class FairVolume;
-class TGeoRotation;
 
 class R3BRpc : public R3BDetector
 {
@@ -102,17 +100,13 @@ class R3BRpc : public R3BDetector
     Int_t fTrackID;        //!  track index
     Int_t fTrackPID;       //!  particle identification
     Int_t fVolumeID;       //!  volume id
-    Int_t fParentTrackID;  //!  parent track index
-    Int_t fUniqueID;       //!  particle unique id (e.g. if Delta electron, fUniqueID=9)
+    Int_t fStripID;        //!  strip id
     TLorentzVector fPosIn; //!  position
     TLorentzVector fMomIn; //!  momentum
     Double32_t fTime;      //!  time
     Double32_t fLength;    //!  length
     Double32_t fELoss;     //!  energy loss
     Int_t fPosIndex;       //!
-    Int_t fNSteps;         //!  Number of steps in the active volume
-    Double32_t fEinc;      //!  Total incident energy
-    TList* flGeoPar;       //!
 
     TClonesArray* fRpcCollection; //!  The point collection
 
@@ -142,12 +136,11 @@ class R3BRpc : public R3BDetector
 
 inline void R3BRpc::ResetParameters()
 {
-    fTrackID = fVolumeID = fParentTrackID = fTrackPID = fUniqueID = 0;
+    fTrackID = fVolumeID = fTrackPID = fStripID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
-    fTime = fLength = fELoss = fEinc = 0;
+    fTime = fLength = fELoss = 0;
     fPosIndex = 0;
-    fNSteps = 0;
 };
 
 #endif /* R3BRPC_H */

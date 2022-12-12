@@ -129,6 +129,7 @@ enum fDetectorType
     kFI33Point,
     kSFIPoint,
     kMUSICPoint,
+    kLOSPoint,
     kRpcPoint,
     kSOFMWPC0Point,
     kSOFMWPC1Point,

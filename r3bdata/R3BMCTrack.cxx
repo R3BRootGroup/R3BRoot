@@ -55,8 +55,8 @@ void R3BMCTrack::Print(Option_t* option) const
               << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", TOFd " << GetNPoints(kTOFD)
               << ", TOF " << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA) << ", CALIFA " << GetNPoints(kCALIFA)
               << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP) << ", VETO " << GetNPoints(kVETO)
-              << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON " << GetNPoints(kLUMON) << ", NeuLAND "
-              << GetNPoints(kNEULAND) << std::endl;
+              << ", RPC " << GetNPoints(kRPC) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
+              << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << std::endl;
 #ifdef SOFIA
     std::cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM)
               << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 "
