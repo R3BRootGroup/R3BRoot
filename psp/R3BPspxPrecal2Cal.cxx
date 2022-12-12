@@ -104,7 +104,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
     }
 
     // R3BEventHeader for trigger information, if needed!
-    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    fHeader = dynamic_cast<R3BEventHeader*>(fMan->GetObject("R3BEventHeader"));
 
     // Figure out how many detectors were registered by the reader
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
@@ -163,7 +163,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
         LOG(INFO) << "R3BPspxPrecal2Cal::SetParContainers()";
     }
 
-    fCalPar = (R3BPspxCalPar*)rtdb->getContainer("R3BPspxCalPar");
+    fCalPar = dynamic_cast<R3BPspxCalPar*>(rtdb->getContainer("R3BPspxCalPar"));
     if (!fCalPar)
     {
         LOG(ERROR) << "R3BPspxPrecal2Cal::Could not get access to R3BPspxCalPar-Container.";
@@ -181,7 +181,7 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
 
     LOG(INFO) << "R3BPspxPrecal2Cal::ReInit()";
     /*
-        fCalPar = (R3BPspxCalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxCalPar");
+        fCalPar = dynamic_cast<R3BPspxCalPar*>(FairRuntimeDb::instance()->getContainer("R3BPspxCalPar"));
 
         if (!fCalPar)
         {
@@ -221,7 +221,7 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
         for (Int_t i = 0; i < nPrecal; i++)
         {
 
-            R3BPspxPrecalData* precalData = (R3BPspxPrecalData*)fPrecalItems[d]->At(i);
+            R3BPspxPrecalData* precalData = dynamic_cast<R3BPspxPrecalData*>(fPrecalItems[d]->At(i));
 
             Int_t strip = precalData->GetStrip();
             Float_t energy = (precalData->GetEnergy1() + precalData->GetEnergy2()) * gain[d][strip - 1];

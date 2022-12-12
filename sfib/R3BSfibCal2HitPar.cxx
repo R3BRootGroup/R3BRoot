@@ -60,7 +60,7 @@ void R3BSfibHitPar::printParams()
     LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
-        R3BSfibHitModulePar* t_par = (R3BSfibHitModulePar*)fHitParams->At(i);
+        R3BSfibHitModulePar* t_par = dynamic_cast<R3BSfibHitModulePar*>(fHitParams->At(i));
         LOG(INFO) << "----------------------------------------------------------------------";
         if (t_par)
         {

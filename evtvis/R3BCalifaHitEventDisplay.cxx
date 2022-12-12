@@ -164,7 +164,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
         {
 
             Int_t binx = -1, biny = -1;
-            caloHit = (R3BCalifaHitData*)fCaloHitCA->At(i);
+            caloHit = dynamic_cast<R3BCalifaHitData*>(fCaloHitCA->At(i));
             theta = caloHit->GetTheta();
             phi = caloHit->GetPhi();
 

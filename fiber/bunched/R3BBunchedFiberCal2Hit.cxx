@@ -143,9 +143,9 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
@@ -179,7 +179,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
-        fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        fHitPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(container));
 
         if (!fHitPar)
         {
@@ -300,7 +300,7 @@ InitStatus R3BBunchedFiberCal2Hit::ReInit()
 
 void R3BBunchedFiberCal2Hit::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     if (!fMapPar)
     {
         R3BLOG(ERROR, "Couldn't get " << fName << "MappingPar");
@@ -315,7 +315,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
         R3BLOG(INFO, "Nb of fibers for " << fName << ": " << fNumFibers);
     }
 
-    fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    fCalPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(fName + "HitPar"));
     R3BLOG_IF(ERROR, !fCalPar, "Couldn't get " << fName << "HitPar.");
 }
 

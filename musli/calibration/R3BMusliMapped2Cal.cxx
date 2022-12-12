@@ -72,7 +72,7 @@ void R3BMusliMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
+    fCal_Par = dynamic_cast<R3BMusliCalPar*>(rtdb->getContainer("musliCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(ERROR, "R3BMusliMapped2Cal::SetParContainers() Couldn't get handle on musliCalPar container");
@@ -171,7 +171,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusliMappedData*)(fMusliMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusliMappedData*>((fMusliMappedDataCA->At(i)));
         signalId = mappedData[i]->GetSignal() - 1;
 
         if (0 <= signalId && signalId < fNumSignals)

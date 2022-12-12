@@ -310,7 +310,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
     // First update mother ID in MCTracks
     for (Int_t i = 0; i < fNTracks; i++)
     {
-        R3BMCTrack* track = (R3BMCTrack*)fTracks->At(i);
+        R3BMCTrack* track = dynamic_cast<R3BMCTrack*>(fTracks->At(i));
         Int_t iMotherOld = track->GetMotherId();
         fIndexIter = fIndexMap.find(iMotherOld);
         if (fIndexIter == fIndexMap.end())
@@ -392,7 +392,7 @@ void R3BStack::Print(Int_t iVerbose) const
         {
             char str[100];
             sprintf(str, "%d", iTrack);
-            ((R3BMCTrack*)fTracks->At(iTrack))->Print((Option_t*)str);
+            (dynamic_cast<R3BMCTrack*>(fTracks->At(iTrack))->Print((Option_t*)str));
         }
     }
 }

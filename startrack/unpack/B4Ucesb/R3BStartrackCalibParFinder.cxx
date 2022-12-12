@@ -62,7 +62,7 @@ void R3BStartrackCalibParFinder::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "R3BStartrackCalibParFinder::SetParContainers: No runtime database";
 
-    fStartrackCalibPar = (R3BStartrackCalibPar*)(rtdb->getContainer("R3BStartrackCalibPar"));
+    fStartrackCalibPar = dynamic_cast<R3BStartrackCalibPar*>((rtdb->getContainer("R3BStartrackCalibPar")));
 
     if (fVerbose && fStartrackCalibPar)
     {

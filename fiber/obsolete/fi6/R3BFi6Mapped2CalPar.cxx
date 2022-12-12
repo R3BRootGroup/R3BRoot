@@ -79,7 +79,7 @@ InitStatus R3BFi6Mapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Fi6TCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Fi6TCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BFi6Mapped2CalPar::Init() Couldn't get handle on Fi6TCalPar. ";
@@ -102,7 +102,7 @@ void R3BFi6Mapped2CalPar::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 
-        R3BFibMappedData* hit = (R3BFibMappedData*)fMapped->At(i);
+        R3BFibMappedData* hit = dynamic_cast<R3BFibMappedData*>(fMapped->At(i));
         if (!hit)
             continue; // should not happen
 

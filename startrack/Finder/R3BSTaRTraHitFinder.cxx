@@ -1070,7 +1070,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt)
         for (Int_t i = 0; i < traHitsPerEvent; i++)
         {
             traHit[i] = new R3BSTaRTraPoint;
-            traHit[i] = (R3BSTaRTraPoint*)fSTaRTrackerHitCA->At(i);
+            traHit[i] = dynamic_cast<R3BSTaRTraPoint*>(fSTaRTrackerHitCA->At(i));
             Energy = ExpResSmearing(traHit[i]->GetEnergyLoss());
             // Energy = traHit[i]->GetEnergyLoss();
             Detector = traHit[i]->GetDetCopyID();

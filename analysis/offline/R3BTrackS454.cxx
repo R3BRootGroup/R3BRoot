@@ -130,7 +130,7 @@ InitStatus R3BTrackS454::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     FairRunOnline* run = FairRunOnline::Instance();
 
     // Get objects for detectors on all levels
@@ -781,7 +781,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
         {
-            R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)detBmon->At(ihit);
+            R3BBeamMonitorMappedData* hit = dynamic_cast<R3BBeamMonitorMappedData*>(detBmon->At(ihit));
             if (!hit)
                 continue;
 
@@ -836,7 +836,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHitsRolu; ihit++)
         {
-            R3BRoluMappedData* hitRolu = (R3BRoluMappedData*)detRolu->At(ihit);
+            R3BRoluMappedData* hitRolu = dynamic_cast<R3BRoluMappedData*>(detRolu->At(ihit));
             if (!hitRolu)
                 continue;
 
@@ -863,7 +863,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
         {
-            R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)detCalifa->At(ihit);
+            R3BCalifaMappedData* hitCalifa = dynamic_cast<R3BCalifaMappedData*>(detCalifa->At(ihit));
             if (!hitCalifa)
                 continue;
 
@@ -891,7 +891,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
-            R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
+            R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fMCTrack->At(l));
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
@@ -1155,7 +1155,7 @@ void R3BTrackS454::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
-        R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+        R3BTofdHitData* hitTofd = dynamic_cast<R3BTofdHitData*>(detTofd->At(ihit));
         pair = false;
 
         if (IS_NAN(hitTofd->GetTime()))
@@ -1462,7 +1462,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit13 = 0; ihit13 < nHits13; ihit13++)
         {
             det = fi13;
-            R3BBunchedFiberHitData* hit13 = (R3BBunchedFiberHitData*)detHit13->At(ihit13);
+            R3BBunchedFiberHitData* hit13 = dynamic_cast<R3BBunchedFiberHitData*>(detHit13->At(ihit13));
             x1[det] = hit13->GetX() / 100.;
             y1[det] = hit13->GetY() / 100.;
             z1[det] = 0.;
@@ -1570,7 +1570,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit11 = 0; ihit11 < nHits11; ihit11++)
         {
             det = fi11;
-            R3BBunchedFiberHitData* hit11 = (R3BBunchedFiberHitData*)detHit11->At(ihit11);
+            R3BBunchedFiberHitData* hit11 = dynamic_cast<R3BBunchedFiberHitData*>(detHit11->At(ihit11));
             x1[det] = hit11->GetX() / 100.;
             y1[det] = hit11->GetY() / 100.;
             z1[det] = 0.;
@@ -1677,7 +1677,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit10 = 0; ihit10 < nHits10; ihit10++)
         {
             det = fi10;
-            R3BBunchedFiberHitData* hit10 = (R3BBunchedFiberHitData*)detHit10->At(ihit10);
+            R3BBunchedFiberHitData* hit10 = dynamic_cast<R3BBunchedFiberHitData*>(detHit10->At(ihit10));
             x1[det] = hit10->GetX() / 100.;
             y1[det] = hit10->GetY() / 100.;
             z1[det] = 0.;
@@ -1779,7 +1779,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit12 = 0; ihit12 < nHits12; ihit12++)
         {
             det = fi12;
-            R3BBunchedFiberHitData* hit12 = (R3BBunchedFiberHitData*)detHit12->At(ihit12);
+            R3BBunchedFiberHitData* hit12 = dynamic_cast<R3BBunchedFiberHitData*>(detHit12->At(ihit12));
             x1[det] = hit12->GetX() / 100.;
             y1[det] = hit12->GetY() / 100.;
             z1[det] = 0.;
@@ -1882,7 +1882,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit3a = 0; ihit3a < nHits3a; ihit3a++)
         {
             det = fi3a;
-            R3BBunchedFiberHitData* hit3a = (R3BBunchedFiberHitData*)detHit3a->At(ihit3a);
+            R3BBunchedFiberHitData* hit3a = dynamic_cast<R3BBunchedFiberHitData*>(detHit3a->At(ihit3a));
             x1[det] = hit3a->GetX() / 100.;
             y1[det] = hit3a->GetY() / 100.;
             z1[det] = 0.;
@@ -1983,7 +1983,7 @@ void R3BTrackS454::Exec(Option_t* option)
         for (Int_t ihit3b = 0; ihit3b < nHits3b; ihit3b++)
         {
             det = fi3b;
-            R3BBunchedFiberHitData* hit3b = (R3BBunchedFiberHitData*)detHit3b->At(ihit3b);
+            R3BBunchedFiberHitData* hit3b = dynamic_cast<R3BBunchedFiberHitData*>(detHit3b->At(ihit3b));
             x1[det] = hit3b->GetX() / 100.;
             y1[det] = hit3b->GetY() / 100.;
             z1[det] = 0.;

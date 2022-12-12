@@ -101,11 +101,11 @@ void R3BStartrackContFact::activateParIo(FairParIo* io)
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BStartrackParRootFileIo* p=new R3BStartrackParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new R3BStartrackParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BStartrackParAsciiFileIo* p=new R3BStartrackParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new R3BStartrackParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

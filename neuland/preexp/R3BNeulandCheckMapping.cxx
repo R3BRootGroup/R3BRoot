@@ -52,7 +52,7 @@ InitStatus R3BNeulandCheckMapping::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
 
     fMapped = (TClonesArray*)rm->GetObject("NeulandMappedData");
     if (!fMapped)
@@ -219,7 +219,7 @@ void R3BNeulandCheckMapping::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 
-        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(i);
+        R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fMapped->At(i));
 
         if (!hit)
             continue; // should not happen

@@ -96,7 +96,7 @@ InitStatus R3BSci8Mapped2Cal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("Sci8Mapped");
@@ -114,7 +114,7 @@ InitStatus R3BSci8Mapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BSci8Mapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci8TCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci8TCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to Sci8TCalPar-Container.";

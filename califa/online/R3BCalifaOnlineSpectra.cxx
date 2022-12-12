@@ -128,7 +128,7 @@ void R3BCalifaOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
+    fMap_Par = dynamic_cast<R3BCalifaMappingPar*>(rtdb->getContainer("califaMappingPar"));
     if (!fMap_Par)
     {
         R3BLOG(ERROR, "Couldn't get handle on califaMappingPar container");
@@ -182,7 +182,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -1344,7 +1344,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             wr[ihit] = hit->GetTimeStamp();
@@ -1358,7 +1358,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             nHits = fWRItemsMaster->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+                R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsMaster->At(ihit));
                 if (!hit)
                     continue;
                 wrm = hit->GetTimeStamp();
@@ -1375,7 +1375,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         e[1] = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaMappedData*)fTrigMappedItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaMappedData*>(fTrigMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             Int_t ch = hit->GetCrystalId() - 1;
@@ -1400,7 +1400,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Int_t Crymult = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaMappedData*>(fMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1458,7 +1458,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaCrystalCalData*>(fCalItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1491,7 +1491,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaHitData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

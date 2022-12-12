@@ -85,11 +85,11 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // Look for the R3BEventHeader
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         R3BLOG(WARNING, "EventHeader. not found");
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(INFO, "EventHeader. found");
@@ -237,7 +237,7 @@ void R3BTwimvsFootOnlineSpectra::Exec(Option_t* option)
         {
             if (fMusli)
             {
-                auto hit = (R3BMusliHitData*)fHitItemsTwim->At(ihit);
+                auto hit = dynamic_cast<R3BMusliHitData*>(fHitItemsTwim->At(ihit));
                 if (!hit)
                     continue;
                 etwim = hit->GetZcharge();
@@ -245,7 +245,7 @@ void R3BTwimvsFootOnlineSpectra::Exec(Option_t* option)
             }
             else
             {
-                auto hit = (R3BTwimHitData*)fHitItemsTwim->At(ihit);
+                auto hit = dynamic_cast<R3BTwimHitData*>(fHitItemsTwim->At(ihit));
                 if (!hit)
                     continue;
                 etwim = hit->GetZcharge();
@@ -265,7 +265,7 @@ void R3BTwimvsFootOnlineSpectra::Exec(Option_t* option)
         Int_t nHits1 = fHitItemsFoot->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits1; ihit++)
         {
-            auto hit = (R3BFootHitData*)fHitItemsFoot->At(ihit);
+            auto hit = dynamic_cast<R3BFootHitData*>(fHitItemsFoot->At(ihit));
             if (!hit)
                 continue;
 

@@ -130,12 +130,12 @@ void R3BTof2pDigitizer::Exec(Option_t* opt)
     /*
        for (Int_t l=0;l<nentriesTof;l++){
 
-         R3BTofPoint *tof_obj = (R3BTofPoint*) fTofPoints->At(l);
+         R3BTofPoint *tof_obj = dynamic_cast<R3BTofPoint*>( fTofPoints->At(l));
 
          TOFeloss = tof_obj->GetEnergyLoss()*1000;
 
          TrackIdTof = tof_obj->GetTrackID();
-         R3BMCTrack *aTrack = (R3BMCTrack*) fTofMCTrack->At(TrackIdTof);
+         R3BMCTrack *aTrack = dynamic_cast<R3BMCTrack*>( fTofMCTrack->At(TrackIdTof));
          Int_t PID = aTrack->GetPdgCode();
 
 
@@ -170,10 +170,10 @@ void R3BTof2pDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesTof; l++)
     {
 
-        R3BTofPoint* tof_obj = (R3BTofPoint*)fTofPoints->At(l);
+        R3BTofPoint* tof_obj = dynamic_cast<R3BTofPoint*>(fTofPoints->At(l));
 
         TrackIdTof = tof_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTofMCTrack->At(TrackIdTof);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTofMCTrack->At(TrackIdTof));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

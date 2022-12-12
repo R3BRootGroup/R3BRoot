@@ -74,7 +74,7 @@ void R3BTCalPar::printParams()
     R3BLOG(INFO, "Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
-        R3BTCalModulePar* t_par = (R3BTCalModulePar*)fTCalParams->At(i);
+        R3BTCalModulePar* t_par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
         LOG(INFO) << "----------------------------------------------------------------------";
         if (t_par)
         {
@@ -95,7 +95,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
         Int_t index;
         for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
         {
-            par = (R3BTCalModulePar*)fTCalParams->At(i);
+            par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
             if (NULL == par)
             {
                 continue;
@@ -133,7 +133,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
         return NULL;
     }
     Int_t arind = fIndexMap[index];
-    return (R3BTCalModulePar*)fTCalParams->At(arind);
+    return dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(arind));
 }
 
 void R3BTCalPar::AddModulePar(R3BTCalModulePar* tch)

@@ -101,7 +101,7 @@ InitStatus R3BTofdChangePar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
@@ -123,7 +123,7 @@ void R3BTofdChangePar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fCal_Par = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BTofdChangePar::Init() Couldn't get handle on TofdHitPar. ";

@@ -85,11 +85,11 @@ void R3BAlpideCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 
-    fAlpideGeoPar = (R3BTGeoPar*)rtdb->getContainer("AlpideGeoPar");
-    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    fAlpideGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("AlpideGeoPar"));
+    fTargetGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("TargetGeoPar"));
     if (!fAlpideGeoPar || !fTargetGeoPar)
     {
         R3BLOG_IF(warning, !fAlpideGeoPar, "Could not get access to AlpideGeoPar container.");
@@ -193,7 +193,7 @@ nextround:
     auto calData = new R3BAlpideCalData*[fAlpidePixel->GetEntriesFast()];
     for (Int_t i = 0; i < fAlpidePixel->GetEntriesFast(); i++)
     {
-        calData[i] = (R3BAlpideCalData*)(fAlpidePixel->At(i));
+        calData[i] = dynamic_cast<R3BAlpideCalData*>((fAlpidePixel->At(i)));
         auto sen = calData[i]->GetSensorId();
         auto col = calData[i]->GetCol();
         auto row = calData[i]->GetRow();
@@ -212,7 +212,7 @@ nextround:
             auto cluster = new R3BAlpideCluster*[cHits];
             for (Int_t j = 0; j < cHits; j++)
             {
-                cluster[j] = (R3BAlpideCluster*)fAlpideCluster->At(j);
+                cluster[j] = dynamic_cast<R3BAlpideCluster*>(fAlpideCluster->At(j));
                 if (((std::abs(cluster[j]->GetCol() - col) == 1 && std::abs(cluster[j]->GetRow() - row) == 0) ||
                      (std::abs(cluster[j]->GetRow() - row) == 1 && std::abs(cluster[j]->GetCol() - col) == 0) ||
                      (std::abs(cluster[j]->GetRow() - row) == 1 && std::abs(cluster[j]->GetCol() - col) == 1)) &&
@@ -301,7 +301,7 @@ void R3BAlpideCal2Hit::FindClusters()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        cluster[i] = (R3BAlpideCluster*)fAlpideCluster->At(i);
+        cluster[i] = dynamic_cast<R3BAlpideCluster*>(fAlpideCluster->At(i));
         auto clid = cluster[i]->GetClusterId() - 1;
         auto senid = cluster[i]->GetSensorId() - 1;
         mult[senid][clid]++;

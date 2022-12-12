@@ -587,7 +587,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
         for (Int_t i = 0; i < traHitsPerEvent; i++)
         {
             traHit[i] = new R3BTraPoint;
-            traHit[i] = (R3BTraPoint*)fTrackerHitCA->At(i);
+            traHit[i] = dynamic_cast<R3BTraPoint*>(fTrackerHitCA->At(i));
             Energy = ExpResSmearing(traHit[i]->GetEnergyLoss());
             // Energy = traHit[i]->GetEnergyLoss();
             Detector = traHit[i]->GetDetCopyID();

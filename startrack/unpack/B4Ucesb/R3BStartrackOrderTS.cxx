@@ -89,7 +89,7 @@ InitStatus R3BStartrackOrderTS::Init()
     fRawData = (TClonesArray*)mgr->GetObject(
         "StartrackRawHit"); // StartrackRawHit is the name of the branch object in the tree to get the information from
 
-    // fCal_Par = (R3BTofCalPar*)FairRuntimeDb::instance()->getContainer("StartrackCalPar");
+    // fCal_Par = dynamic_cast<R3BTofCalPar*>(FairRuntimeDb::instance()->getContainer("StartrackCalPar"));
     // fCal_Par->setChanged();
 
     if (!fRawData)
@@ -273,7 +273,7 @@ void R3BStartrackOrderTS::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nItems; i++)
     {
-        item = (R3BStartrackRawHit*)fRawData->At(i);
+        item = dynamic_cast<R3BStartrackRawHit*>(fRawData->At(i));
 
         if (NULL == item)
         {
@@ -680,7 +680,7 @@ void R3BStartrackOrderTS::Exec(Option_t* option)
 
                 // cout << "j= " << j << endl;
 
-                item = (R3BStartrackRawHit*)fRawData->At(index_hit_temp.at(j));
+                item = dynamic_cast<R3BStartrackRawHit*>(fRawData->At(index_hit_temp.at(j)));
 
                 cout << "index_hit_temp.at(j=" << j << ")= " << index_hit_temp.at(j) << endl;
 

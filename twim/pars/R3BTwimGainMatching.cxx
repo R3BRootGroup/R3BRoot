@@ -84,7 +84,7 @@ InitStatus R3BTwimGainMatching::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
+    fCal_Par = dynamic_cast<R3BTwimCalPar*>(rtdb->getContainer("twimCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(FATAL, "Couldn't get handle on twimCalPar container");
@@ -136,7 +136,7 @@ void R3BTwimGainMatching::Exec(Option_t* option)
         // std::cout << "nHits = " << nHits << "\n";
         for (Int_t i = 0; i < nHits; i++)
         {
-            mappedData[i] = (R3BTwimMappedData*)(fTwimMappedDataCA->At(i));
+            mappedData[i] = dynamic_cast<R3BTwimMappedData*>((fTwimMappedDataCA->At(i)));
             secId = mappedData[i]->GetSecID() - 1;
             anodeId = mappedData[i]->GetAnodeID() - 1;
             if (multanode[secId][anodeId] == 0 && mappedData[i]->GetPileupStatus() == 0 &&

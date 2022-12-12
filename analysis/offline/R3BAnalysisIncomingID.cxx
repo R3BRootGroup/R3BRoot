@@ -94,7 +94,7 @@ void R3BAnalysisIncomingID::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
+    fIncomingID_Par = dynamic_cast<R3BIncomingIDPar*>(rtdb->getContainer("IncomingIDPar"));
     R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
     R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
 
@@ -137,7 +137,7 @@ InitStatus R3BAnalysisIncomingID::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
@@ -183,7 +183,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         Int_t nHits = fHitItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            auto hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
             if (!hit)
                 continue;
             Zmusic = hit->GetZcharge();
@@ -196,7 +196,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         Int_t nHits = fHitItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
+            auto hit = dynamic_cast<R3BMusliHitData*>(fHitItemsMusli->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetType() == 2)
@@ -229,7 +229,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         nHits = fHitLos->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosHitData* hittcal = (R3BLosHitData*)fHitLos->At(ihit);
+            R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
             numDet = hittcal->GetDetector();
             if (multLos[numDet - 1] == 0)
             {
@@ -248,13 +248,13 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         // treatment of multihit events needs to be implemented.
         if (fHitPspx1_x && fHitPspx1_x->GetEntriesFast() == 1)
         {
-            auto pspx1hitx = (R3BPspxHitData*)fHitPspx1_x->At(0);
+            auto pspx1hitx = dynamic_cast<R3BPspxHitData*>(fHitPspx1_x->At(0));
             en_pspx = pspx1hitx->GetEnergy();
         }
 
         if (fHitPspx1_y && fHitPspx1_y->GetEntriesFast() == 1)
         {
-            auto pspx1hity = (R3BPspxHitData*)fHitPspx1_y->At(0);
+            auto pspx1hity = dynamic_cast<R3BPspxHitData*>(fHitPspx1_y->At(0));
             en_pspy = pspx1hity->GetEnergy();
         }
 
@@ -281,7 +281,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                 R3BLOG_IF(ERROR, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
                 for (Int_t ihit = 0; ihit < nHits; ihit++)
                 {
-                    hitfrs = (R3BFrsData*)fFrsDataCA->At(ihit);
+                    hitfrs = dynamic_cast<R3BFrsData*>(fFrsDataCA->At(ihit));
                     if (!hitfrs)
                         continue;
                     betaS2 = hitfrs->GetBeta();

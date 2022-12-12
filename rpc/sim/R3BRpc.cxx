@@ -121,7 +121,7 @@ Bool_t R3BRpc::ProcessHits(FairVolume* vol)
                  gMC->CurrentEvent());
 
         // Increment number of RpcPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kRPC);
         ResetParameters();
     }
@@ -168,7 +168,7 @@ void R3BRpc::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BRpcPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BRpcPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BRpcPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BRpcPoint(*oldpoint);

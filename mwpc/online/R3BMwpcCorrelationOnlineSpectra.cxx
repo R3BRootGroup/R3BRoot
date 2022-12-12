@@ -251,7 +251,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t maxpadx1 = -1, maxpady1 = -1, maxqx1 = 0, maxqy1 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcCalData* hit = (R3BMwpcCalData*)fCalItemsMwpc1->At(ihit);
+            R3BMwpcCalData* hit = dynamic_cast<R3BMwpcCalData*>(fCalItemsMwpc1->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetPlane() == 1 || hit->GetPlane() == 2)
@@ -276,7 +276,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t maxpadx2 = -1, maxpady2 = -1, maxqx2 = 0, maxqy2 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcCalData* hit = (R3BMwpcCalData*)fCalItemsMwpc2->At(ihit);
+            R3BMwpcCalData* hit = dynamic_cast<R3BMwpcCalData*>(fCalItemsMwpc2->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetPlane() == 1 || hit->GetPlane() == 2)
@@ -310,7 +310,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t nHits1 = fHitItemsMwpc1->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits1; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc1->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc1->At(ihit));
             if (!hit)
                 continue;
             mw1x = hit->GetX();
@@ -320,7 +320,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t nHits2 = fHitItemsMwpc2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits2; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc2->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc2->At(ihit));
             if (!hit)
                 continue;
             mw2x = hit->GetX();

@@ -64,7 +64,7 @@ bool R3BChannelAccessGroupEPICS::Commit()
     ret &= Search();
     for (Int_t i = 0; i < fChannelArray.GetEntriesFast(); ++i)
     {
-        auto ca = (R3BChannelAccessEPICS*)fChannelArray[i];
+        auto ca = dynamic_cast<R3BChannelAccessEPICS*>(fChannelArray[i]);
         ca_put(ca->GetType(), ca->GetID(), ca->GetPointer());
     }
     ret &= PendIO("get");
@@ -77,7 +77,7 @@ bool R3BChannelAccessGroupEPICS::Fetch()
     ret &= Search();
     for (Int_t i = 0; i < fChannelArray.GetEntriesFast(); ++i)
     {
-        auto ca = (R3BChannelAccessEPICS*)fChannelArray[i];
+        auto ca = dynamic_cast<R3BChannelAccessEPICS*>(fChannelArray[i]);
         ca_get(ca->GetType(), ca->GetID(), ca->GetPointer());
     }
     ret &= PendIO("get");

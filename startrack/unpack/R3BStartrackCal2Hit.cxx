@@ -76,7 +76,7 @@ void R3BStartrackCal2Hit::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fStartrackHitPar = (R3BStartrackHitPar*)(rtdb->getContainer("R3BStartrackHitPar"));
+    fStartrackHitPar = dynamic_cast<R3BStartrackHitPar*>((rtdb->getContainer("R3BStartrackHitPar")));
 
     if (fStartrackHitPar)
     {
@@ -481,7 +481,7 @@ void R3BStartrackCal2Hit::Exec(Option_t* opt)
         for (Int_t i = 0; i < traHitsPerEvent; i++)
         {
             traHit[i] = new R3BStartrackPoint;
-            traHit[i] = (R3BStartrackPoint*)fStartrackerHitCA->At(i);
+            traHit[i] = dynamic_cast<R3BStartrackPoint*>(fStartrackerHitCA->At(i));
             Energy = ExpResSmearing(traHit[i]->GetEnergyLoss());
             // Energy = traHit[i]->GetEnergyLoss();
             Detector = traHit[i]->GetDetCopyID(); // from 1 to 30

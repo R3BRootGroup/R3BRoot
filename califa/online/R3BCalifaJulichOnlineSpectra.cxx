@@ -194,7 +194,7 @@ void R3BCalifaJulichOnlineSpectra::Exec(Option_t* option)
         auto nHits = fMappedItemsSi->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsSi->At(ihit);
+            R3BAmsMappedData* hit = dynamic_cast<R3BAmsMappedData*>(fMappedItemsSi->At(ihit));
             if (!hit)
                 continue;
             fh2_EnergyVsStrip[hit->GetDetectorId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());

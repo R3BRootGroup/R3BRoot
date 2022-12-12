@@ -83,10 +83,10 @@ InitStatus R3BTofdMapped2TCal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
 
@@ -103,7 +103,7 @@ InitStatus R3BTofdMapped2TCal::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdMapped2TCal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
@@ -127,7 +127,7 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
     Int_t nHits = fMappedItems->GetEntriesFast();
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        R3BTofdMappedData* hit = (R3BTofdMappedData*)fMappedItems->At(ihit);
+        R3BTofdMappedData* hit = dynamic_cast<R3BTofdMappedData*>(fMappedItems->At(ihit));
 
         Int_t iDetector = hit->GetDetector(); // 1..n
         Int_t iSide = hit->GetSide();         // 1/2
@@ -151,7 +151,7 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
         Int_t nCals = fCalItems->GetEntriesFast();
         for (Int_t ical = 0; ical < nCals; ical++)
         {
-            cal = (R3BTofdCalData*)fCalItems->At(ical);
+            cal = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ical));
             if (cal->GetBar() != iBar)
             {
                 continue;

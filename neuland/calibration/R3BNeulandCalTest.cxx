@@ -83,7 +83,7 @@ void R3BNeulandCalTest::Exec(Option_t* option)
         Bool_t seen[] = { kFALSE, kFALSE, kFALSE, kFALSE };
         for (Int_t i = 0; i < nLosHit; i++)
         {
-            losHit = (R3BLosHit*)fLosHit->At(i);
+            losHit = dynamic_cast<R3BLosHit*>(fLosHit->At(i));
             ch = losHit->GetChannel();
             if (ch > 3)
             {
@@ -123,7 +123,7 @@ void R3BNeulandCalTest::Exec(Option_t* option)
         Double_t time1, time2;
         for (Int_t i1 = 0; i1 < nLandPmt; i1++)
         {
-            pmt1 = (R3BNeulandCalData*)fLandPmt->At(i1);
+            pmt1 = dynamic_cast<R3BNeulandCalData*>(fLandPmt->At(i1));
             barId = pmt1->GetBarId();
             time1 = pmt1->GetTime();
             time1 += walk(pmt1->GetQdc());
@@ -134,7 +134,7 @@ void R3BNeulandCalTest::Exec(Option_t* option)
                 {
                     continue;
                 }
-                pmt2 = (R3BNeulandCalData*)fLandPmt->At(i2);
+                pmt2 = dynamic_cast<R3BNeulandCalData*>(fLandPmt->At(i2));
                 if (barId != pmt2->GetBarId())
                 {
                     continue;
@@ -167,7 +167,7 @@ void R3BNeulandCalTest::Exec(Option_t* option)
         Double_t time1, time2;
         for (Int_t i1 = 0; i1 < nNeulandPmt; i1++)
         {
-            pmt1 = (R3BNeulandPmt*)fNeulandPmt->At(i1);
+            pmt1 = dynamic_cast<R3BNeulandPmt*>(fNeulandPmt->At(i1));
             planeId = pmt1->GetPlaneId();
             barId = pmt1->GetBarId();
             time1 = pmt1->GetTime();
@@ -179,7 +179,7 @@ void R3BNeulandCalTest::Exec(Option_t* option)
                 {
                     continue;
                 }
-                pmt2 = (R3BNeulandPmt*)fNeulandPmt->At(i2);
+                pmt2 = dynamic_cast<R3BNeulandPmt*>(fNeulandPmt->At(i2));
                 if (barId != pmt2->GetBarId())
                 {
                     continue;

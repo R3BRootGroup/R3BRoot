@@ -93,7 +93,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -376,7 +376,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItemsLos->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(fCalItemsLos->At(iPart));
             iDet = calData->GetDetector();
 
             // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7
@@ -579,7 +579,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
+            R3BAmsHitData* hit = dynamic_cast<R3BAmsHitData*>(fHitItemsAms->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetEnergyS() < 80 || hit->GetEnergyK() < 80 || hit->GetEnergyS() > 8500 ||
@@ -640,7 +640,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaHitData* hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaHitData* hit = dynamic_cast<R3BCalifaHitData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;

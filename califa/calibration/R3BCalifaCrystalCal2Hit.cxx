@@ -71,8 +71,8 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
     // Load CALIFA and target positions from containers
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
 
-    fCalifaGeoPar = (R3BTGeoPar*)rtdb->getContainer("CalifaGeoPar");
-    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    fCalifaGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("CalifaGeoPar"));
+    fTargetGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("TargetGeoPar"));
     if (!fCalifaGeoPar || !fTargetGeoPar)
     {
         R3BLOG_IF(WARNING, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container.");

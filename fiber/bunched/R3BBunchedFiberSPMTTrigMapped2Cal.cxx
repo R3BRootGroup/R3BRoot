@@ -71,7 +71,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 void R3BBunchedFiberSPMTTrigMapped2Cal::SetParContainers()
 {
     auto name = "BunchedFiberSPMTTrigTCalPar";
-    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    fTCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name));
     if (!fTCalPar)
     {
         LOG(ERROR) << "Could not get access to " << name << " container.";
@@ -90,9 +90,9 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
     LOG(DEBUG) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMappedItems->At(i));
         auto channel = mapped->GetChannel();
-        auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
+        auto par = dynamic_cast<R3BTCalModulePar*>(fTCalPar->GetModuleParAt(1, channel, 1));
         if (!par)
         {
             LOG(WARNING) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel

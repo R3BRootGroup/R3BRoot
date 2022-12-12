@@ -48,7 +48,7 @@ void R3BEventManager::AddParticlesToPdgDataBase(Int_t pdgCode)
         bool particleRecognised = true;
         char name[20];
 
-        particleRecognised = ((R3BIonName*)fIonName)->GetIonName(element, name);
+        particleRecognised = (dynamic_cast<R3BIonName*>(fIonName)->GetIonName(element, name));
 
         if (particleRecognised)
         {

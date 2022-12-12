@@ -74,7 +74,7 @@ void R3BNeutronCalibr2D::Exec(Option_t* opt)
     R3BLandDigi* digi;
     for (Int_t id = 0; id < fArrayDigi->GetEntries(); id++)
     {
-        digi = (R3BLandDigi*)fArrayDigi->At(id);
+        digi = dynamic_cast<R3BLandDigi*>(fArrayDigi->At(id));
         eTot += digi->GetQdc();
     }
 

@@ -91,7 +91,7 @@ void R3BFootStripCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BFootMappingPar*)rtdb->getContainer("footMappingPar");
+    fMap_Par = dynamic_cast<R3BFootMappingPar*>(rtdb->getContainer("footMappingPar"));
     if (!fMap_Par)
     {
         R3BLOG(ERROR, "Couldn't get handle on footMappingPar container");
@@ -219,7 +219,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     // Filling vectors
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
+        calData[i] = dynamic_cast<R3BFootCalData*>((fFootCalData->At(i)));
         detId = calData[i]->GetDetId() - 1;
         stripId = calData[i]->GetStripId() - 1;
         energy = calData[i]->GetEnergy();

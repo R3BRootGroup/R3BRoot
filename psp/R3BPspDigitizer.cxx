@@ -62,7 +62,7 @@ void R3BPspDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fPspDigiPar = (R3BPspDigiPar*)(rtdb->getContainer("R3BPspDigiPar"));
+    fPspDigiPar = dynamic_cast<R3BPspDigiPar*>((rtdb->getContainer("R3BPspDigiPar")));
 
     if (fPspDigiPar)
     {
@@ -119,10 +119,10 @@ void R3BPspDigitizer::Exec(Option_t* opt)
     {
         //   cout<<"entries-Psp "<<l<<endl;
 
-        R3BPspPoint* psp_obj = (R3BPspPoint*)fPspPoints->At(l);
+        R3BPspPoint* psp_obj = dynamic_cast<R3BPspPoint*>(fPspPoints->At(l));
 
         TrackIdPsp = psp_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fPspMCTrack->At(TrackIdPsp);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fPspMCTrack->At(TrackIdPsp));
         Int_t PID = aTrack->GetPdgCode();
         //     Int_t mother = aTrack->GetMotherId();
 

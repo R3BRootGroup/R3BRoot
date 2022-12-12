@@ -165,7 +165,7 @@ InitStatus R3BTofiCal2Histo::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
     fCalData = (TClonesArray*)rm->GetObject("TofiCal");
@@ -194,7 +194,7 @@ void R3BTofiCal2Histo::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer("TofiHitPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
@@ -240,7 +240,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofiCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofiCalData*>(fCalData->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';

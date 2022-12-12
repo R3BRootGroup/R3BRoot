@@ -93,7 +93,7 @@ InitStatus R3BCalifavsFootOnlineSpectra::Init()
 
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -180,7 +180,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
     bool ffoot = false;
     for (Int_t ihit = 0; ihit < fMappedItemsFoot->GetEntriesFast(); ihit++)
     {
-        auto hit = (R3BFootMappedData*)fMappedItemsFoot->At(ihit);
+        auto hit = dynamic_cast<R3BFootMappedData*>(fMappedItemsFoot->At(ihit));
         if (!hit)
             continue;
         if (hit->GetDetId() == 11 && hit->GetEnergy() > 500)
@@ -191,7 +191,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+        auto hit = dynamic_cast<R3BCalifaHitData*>(fHitItemsCalifa->At(ihit));
         if (hit->GetEnergy() < 50e3) // 50MeV
             continue;
 

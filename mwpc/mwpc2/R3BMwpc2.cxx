@@ -138,7 +138,7 @@ Bool_t R3BMwpc2::ProcessHits(FairVolume* vol)
                  fELoss);
 
         // Increment number of TraPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kSOFMWPC2);
 
         ResetParameters();
@@ -197,7 +197,7 @@ void R3BMwpc2::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BMwpcPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BMwpcPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BMwpcPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BMwpcPoint(*oldpoint);

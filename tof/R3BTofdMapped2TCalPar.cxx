@@ -101,7 +101,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
     fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
@@ -112,7 +112,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
@@ -143,7 +143,7 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BTofdMappedData* hit = (R3BTofdMappedData*)fMapped->At(i);
+        R3BTofdMappedData* hit = dynamic_cast<R3BTofdMappedData*>(fMapped->At(i));
 
         Int_t iDetector = hit->GetDetector(); // 1..n
         Int_t iSide = hit->GetSide();         // 1/2

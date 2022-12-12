@@ -243,7 +243,7 @@ Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion* data,
 
     for (int k = 0; k < n; k++)
     {
-        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+        R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fArray->At(k));
         //
         // see if other PM has a hit and if leading time is within
         // coincidence window
@@ -345,7 +345,7 @@ Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion* data,
         // PM1
         for (int k = 0; k < n; k++)
         {
-            R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+            R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fArray->At(k));
             if (hit->GetBarId() != bar)
             {
                 continue;
@@ -370,7 +370,7 @@ Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion* data,
         // PM2
         for (int k = 0; k < n; k++)
         {
-            R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+            R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fArray->At(k));
             if (hit->GetBarId() != bar)
             {
                 continue;

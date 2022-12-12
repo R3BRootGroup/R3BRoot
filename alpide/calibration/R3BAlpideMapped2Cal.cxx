@@ -65,7 +65,7 @@ void R3BAlpideMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
 }
 
@@ -128,7 +128,7 @@ void R3BAlpideMapped2Cal::Exec(Option_t* option)
     auto mappedData = new R3BAlpideMappedData*[nHits];
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BAlpideMappedData*)(fAlpideMappedData->At(i));
+        mappedData[i] = dynamic_cast<R3BAlpideMappedData*>((fAlpideMappedData->At(i)));
         auto det = mappedData[i]->GetSensorId();
         auto col = mappedData[i]->GetCol();
         auto row = mappedData[i]->GetRow();

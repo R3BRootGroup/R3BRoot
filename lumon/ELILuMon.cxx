@@ -170,7 +170,7 @@ Bool_t ELILuMon::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of LuMonPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kLUMON);
 
         ResetParameters();

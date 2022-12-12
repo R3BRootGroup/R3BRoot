@@ -65,7 +65,7 @@ void R3BMwpcDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
 
-    fMwpcGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName + "GeoPar");
+    fMwpcGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fName + "GeoPar"));
     if (!fMwpcGeoPar)
     {
         R3BLOG(error, "Could not get access to " + fName + "GeoPar container.");
@@ -126,10 +126,10 @@ void R3BMwpcDigitizer::Exec(Option_t* opt)
     TVector3 vpos;
     for (Int_t i = 0; i < nHits; i++)
     {
-        pointData[i] = (R3BMwpcPoint*)(fMwpcPoints->At(i));
+        pointData[i] = dynamic_cast<R3BMwpcPoint*>((fMwpcPoints->At(i)));
         TrackId = pointData[i]->GetTrackID();
 
-        R3BMCTrack* Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        R3BMCTrack* Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
 
         if (PID > 1000080160) // Z=8 and A=16

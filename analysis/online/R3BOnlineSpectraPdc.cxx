@@ -108,9 +108,9 @@ InitStatus R3BOnlineSpectraPdc::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
 

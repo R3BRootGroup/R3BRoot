@@ -192,7 +192,7 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
 
 InitStatus R3BTofdCal2Hit::Init()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
@@ -209,10 +209,10 @@ InitStatus R3BTofdCal2Hit::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
 
@@ -236,7 +236,7 @@ InitStatus R3BTofdCal2Hit::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdCal2Hit::SetParContainers()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
@@ -314,7 +314,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         {
             countloshit++;
             LOG(WARNING) << "LOS Ihit  " << ihit << " " << nHits;
-            R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
+            R3BLosHitData* hitData = dynamic_cast<R3BLosHitData*>(fHitItemsLos->At(ihit));
             if (ihit == 0)
                 timeLos = hitData->fTime_ns;
             LOG(WARNING) << "LOS Time " << timeLos;
@@ -348,7 +348,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
                 LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
-                R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
+                R3BLosCalData *calData = dynamic_cast<R3BLosCalData*>(fCalItemsLos->At(ihit));
                 timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;
                 LosTresM=(calData->fTimeV_r_ns+calData->fTimeV_l_ns)/2.-(calData->fTimeV_t_ns+calData->fTimeV_b_ns)/2.;
                 LOG(WARNING) << "LOS MCFD  "<< LosTresM<<" "<<timeLos<<FairLogger::endl;
@@ -386,7 +386,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';

@@ -112,7 +112,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
     for (Int_t entry = 0; entry < n_entries; entry++)
     {
 
-        R3BTofdPoint* data_element = (R3BTofdPoint*)fTofdPoints->At(entry);
+        R3BTofdPoint* data_element = dynamic_cast<R3BTofdPoint*>(fTofdPoints->At(entry));
 
         Int_t DetectorID = data_element->GetDetectorID();
         Double_t energy_loss = data_element->GetEnergyLoss();

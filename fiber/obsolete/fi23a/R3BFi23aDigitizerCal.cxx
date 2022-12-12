@@ -131,7 +131,7 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
 
         for (Int_t i = 0; i < entryNum; ++i)
         {
-            R3BFibPoint* data_element = (R3BFibPoint*)Points->At(i);
+            R3BFibPoint* data_element = dynamic_cast<R3BFibPoint*>(Points->At(i));
             // cout << "Hit: " << data_element->GetDetectorID() << endl;
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // fiber nummer
                                        data_element->GetEnergyLoss(),

@@ -95,7 +95,7 @@ void R3BAmsOnlineSpectra::SetParContainers()
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
 
-    fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
+    fMap_Par = dynamic_cast<R3BAmsMappingPar*>(rtdb->getContainer("amsMappingPar"));
     if (!fMap_Par)
     {
         LOG(ERROR) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
@@ -551,7 +551,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << "hit:"<<nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsAms->At(ihit);
+            R3BAmsMappedData* hit = dynamic_cast<R3BAmsMappedData*>(fMappedItemsAms->At(ihit));
             if (!hit)
                 continue;
             fh_Ams_energy_allStrips[hit->GetDetectorId()]->Fill(hit->GetStripId(), hit->GetEnergy());
@@ -565,7 +565,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << "hit:"<<nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsStripCalData* hit = (R3BAmsStripCalData*)fCalItemsAms->At(ihit);
+            R3BAmsStripCalData* hit = dynamic_cast<R3BAmsStripCalData*>(fCalItemsAms->At(ihit));
             if (!hit)
                 continue;
             fh_Ams_energy_allCalStrips[hit->GetDetId() * 2 + hit->GetSideId()]->Fill(hit->GetStripId(),
@@ -596,7 +596,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
+            R3BAmsHitData* hit = dynamic_cast<R3BAmsHitData*>(fHitItemsAms->At(ihit));
             if (!hit)
                 continue;
             DetId = hit->GetDetId();

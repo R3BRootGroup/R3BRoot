@@ -61,7 +61,7 @@ void R3BTraFraDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTraFraDigiPar = (R3BTraFraDigiPar*)(rtdb->getContainer("R3BTraFraDigiPar"));
+    fTraFraDigiPar = dynamic_cast<R3BTraFraDigiPar*>((rtdb->getContainer("R3BTraFraDigiPar")));
 
     if (fTraFraDigiPar)
     {
@@ -136,7 +136,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt)
     {
         //   LOG(INFO)<<"entries "<<l;
 
-        R3BTraPoint* TraFra_obj = (R3BTraPoint*)fTraFraPoints->At(l);
+        R3BTraPoint* TraFra_obj = dynamic_cast<R3BTraPoint*>(fTraFraPoints->At(l));
 
         // Int_t DetID = TraFra_obj->GetDetectorID();
         Double_t fX_In = TraFra_obj->GetXIn();
@@ -146,7 +146,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt)
         Double_t fY_Out = TraFra_obj->GetYOut();
         Double_t fZ_Out = TraFra_obj->GetZOut();
         TrackIdTra = TraFra_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTraFraMCTrack->At(TrackIdTra);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTraFraMCTrack->At(TrackIdTra));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

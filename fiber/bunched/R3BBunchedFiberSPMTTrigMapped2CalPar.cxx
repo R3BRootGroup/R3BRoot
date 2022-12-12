@@ -50,7 +50,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
     auto name = "BunchedFiberSPMTTrigTCalPar";
-    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    fTCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name));
     if (!fTCalPar)
     {
         R3BLOG(ERROR, "Could not get " << name);
@@ -66,7 +66,7 @@ void R3BBunchedFiberSPMTTrigMapped2CalPar::Exec(Option_t* option)
     auto mapped_num = fMapped->GetEntriesFast();
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMapped->At(i));
         fEngine->Fill(1, mapped->GetChannel(), 1, mapped->GetFine());
     }
 }

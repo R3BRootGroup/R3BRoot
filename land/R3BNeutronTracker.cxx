@@ -65,7 +65,7 @@ void R3BNeutronTracker::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    fLandDigiPar = dynamic_cast<R3BLandDigiPar*>((rtdb->getContainer("R3BLandDigiPar")));
 
     if (fLandDigiPar)
     {
@@ -283,7 +283,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
     // Get parameter from original neutrons and fragment
     // Access to Monte Carlo Info
     //  get object from the TclonesArray at index=TrackID
-    R3BMCTrack* aTrack1 = (R3BMCTrack*)fLandMCTrack->At(0);
+    R3BMCTrack* aTrack1 = dynamic_cast<R3BMCTrack*>(fLandMCTrack->At(0));
     Int_t prim = aTrack1->GetMotherId();
 
     while (prim < 0)
@@ -408,7 +408,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
         }
 
         nPrim = nPrim + 1;
-        aTrack1 = (R3BMCTrack*)fLandMCTrack->At(nPrim);
+        aTrack1 = dynamic_cast<R3BMCTrack*>(fLandMCTrack->At(nPrim));
         if (aTrack1 != 0)
             prim = aTrack1->GetMotherId();
         else
@@ -420,7 +420,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
     {
         // cout<<"loop over entries "<<l<<endl;
         // Get the Land Object in array
-        R3BLandDigi* land_obj = (R3BLandDigi*)fLandDigi->At(l);
+        R3BLandDigi* land_obj = dynamic_cast<R3BLandDigi*>(fLandDigi->At(l));
 
         temp[l][0] = int(land_obj->GetPaddleNr()) - 1; // note that paddle starts at 1
         temp[l][1] = land_obj->GetTdcL();
@@ -443,7 +443,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
     //   Int_t nentr = fLandFirstHits->GetEntries();
 
     //   cout<<"entries: "<<nentr<<endl;
-    R3BLandFirstHits* land_obj1 = (R3BLandFirstHits*)fLandFirstHits->At(0);
+    R3BLandFirstHits* land_obj1 = dynamic_cast<R3BLandFirstHits*>(fLandFirstHits->At(0));
 
     firstHitX[0] = land_obj1->GetX0();
     firstHitY[0] = land_obj1->GetY0();

@@ -70,7 +70,7 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
         LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No FairRuntimeDb!";
         return kFATAL;
     }
-    fPar = (R3BNeulandMultiplicityCalorimetricPar*)rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar");
+    fPar = dynamic_cast<R3BNeulandMultiplicityCalorimetricPar*>(rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar"));
     if (fPar == nullptr)
     {
         LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No R3BNeulandMultiplicityCalorimetricPar!";

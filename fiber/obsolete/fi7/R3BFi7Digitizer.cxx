@@ -124,7 +124,7 @@ void R3BFi7Digitizer::Exec(Option_t* opt)
         Double_t fZ_In = Fi7_obj->GetZIn();
         Double_t fZ_Out = Fi7_obj->GetZOut();
         TrackIdFi7 = Fi7_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fFi7MCTrack->At(TrackIdFi7);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fFi7MCTrack->At(TrackIdFi7));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

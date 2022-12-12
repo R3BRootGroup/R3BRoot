@@ -71,7 +71,7 @@ R3BFibervsTofDOnlineSpectra::~R3BFibervsTofDOnlineSpectra()
 
 void R3BFibervsTofDOnlineSpectra::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
     if (fMapPar)
     {
@@ -93,11 +93,11 @@ InitStatus R3BFibervsTofDOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         R3BLOG(WARNING, "EventHeader. not found");
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(INFO, " EventHeader. found");
@@ -216,7 +216,7 @@ void R3BFibervsTofDOnlineSpectra::Exec(Option_t* option)
         Int_t nHits1 = fHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits1; ihit++)
         {
-            auto hit = (R3BFiberMAPMTHitData*)fHitItems->At(ihit);
+            auto hit = dynamic_cast<R3BFiberMAPMTHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
             // Looking for the maximum
@@ -231,7 +231,7 @@ void R3BFibervsTofDOnlineSpectra::Exec(Option_t* option)
         Int_t nHits2 = fHitTofdItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits2; ihit++)
         {
-            auto hit = (R3BTofdHitData*)fHitTofdItems->At(ihit);
+            auto hit = dynamic_cast<R3BTofdHitData*>(fHitTofdItems->At(ihit));
             if (!hit)
                 continue;
             // Looking for the maximum

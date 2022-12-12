@@ -60,7 +60,7 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         R3BLOG(FATAL, "EventHeader. not found");

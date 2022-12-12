@@ -78,7 +78,7 @@ void R3BMusliCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "R3BMusliCal2Hit::SetParContainers(), FairRuntimeDb not found");
 
-    fHit_Par = (R3BMusliHitPar*)rtdb->getContainer("musliHitPar");
+    fHit_Par = dynamic_cast<R3BMusliHitPar*>(rtdb->getContainer("musliHitPar"));
     if (!fHit_Par)
     {
         R3BLOG(ERROR, "R3BMusliCal2Hit::SetParContainers() Couldn't get handle on musliHitPar container");
@@ -89,7 +89,7 @@ void R3BMusliCal2Hit::SetParContainers()
     }
 
     // Reading the TGeoPar from the FairRun
-    fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
+    fMusliGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("MusliGeoPar"));
     R3BLOG_IF(ERROR, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
 }
 
@@ -167,7 +167,7 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
     Double_t beta = fDirectBeta;
     if (fFrsDataCA && fFrsDataCA->GetEntriesFast() == 1)
     {
-        R3BFrsData* hit = (R3BFrsData*)fFrsDataCA->At(0);
+        R3BFrsData* hit = dynamic_cast<R3BFrsData*>(fFrsDataCA->At(0));
         if (hit)
         {
             beta = hit->GetBeta();
@@ -196,7 +196,7 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
     R3BMusliCalData** calData = new R3BMusliCalData*[nHits];
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMusliCalData*)(fMusliCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMusliCalData*>((fMusliCalDataCA->At(i)));
         signal_cal = calData[i]->GetSignal() - 1;
         dt_cal[mult_cal[signal_cal]][signal_cal] = calData[i]->GetDT();
         e_cal[mult_cal[signal_cal]][signal_cal] = calData[i]->GetEnergy();

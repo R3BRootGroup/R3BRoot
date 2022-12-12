@@ -62,7 +62,7 @@ void R3BTofDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTofDigiPar = (R3BTofDigiPar*)(rtdb->getContainer("R3BTofDigiPar"));
+    fTofDigiPar = dynamic_cast<R3BTofDigiPar*>((rtdb->getContainer("R3BTofDigiPar")));
 
     if (fTofDigiPar)
     {
@@ -138,10 +138,10 @@ void R3BTofDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentriesTof; l++)
     {
-        R3BTofPoint* tof_obj = (R3BTofPoint*)fTofPoints->At(l);
+        R3BTofPoint* tof_obj = dynamic_cast<R3BTofPoint*>(fTofPoints->At(l));
         //        if (tof_obj==NULL) continue;
         TrackIdTof = tof_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTofMCTrack->At(TrackIdTof);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTofMCTrack->At(TrackIdTof));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

@@ -196,7 +196,7 @@ Bool_t R3BRoluReader::Read()
                 Int_t n = fArray->GetEntriesFast();
                 for (Int_t k = 0; k < n; k++)
                 {
-                    R3BRoluMappedData const* hit = (R3BRoluMappedData*)fArray->At(k);
+                    R3BRoluMappedData const* hit = dynamic_cast<R3BRoluMappedData*>(fArray->At(k));
 
                     UInt_t const iTypeL = hit->GetType();
                     UInt_t const iCha = hit->GetChannel();

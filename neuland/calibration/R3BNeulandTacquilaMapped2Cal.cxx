@@ -107,7 +107,7 @@ InitStatus R3BNeulandTacquilaMapped2Cal::Init()
         LOG(fatal) << "FairRootManager not found";
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (NULL == header)
     {
         LOG(fatal) << "Branch R3BEventHeader not found";
@@ -133,8 +133,8 @@ void R3BNeulandTacquilaMapped2Cal::SetParContainers()
 {
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
-    fQCalPar = (R3BNeulandQCalPar*)(rtdb->getContainer("NeulandQCalPar"));
+    fTcalPar = dynamic_cast<R3BTCalPar*>((rtdb->getContainer("LandTCalPar")));
+    fQCalPar = dynamic_cast<R3BNeulandQCalPar*>((rtdb->getContainer("NeulandQCalPar")));
 }
 
 void R3BNeulandTacquilaMapped2Cal::SetParameter()
@@ -199,7 +199,7 @@ void R3BNeulandTacquilaMapped2Cal::Exec(Option_t* option)
         Double_t time1 = nan("");
         for (Int_t i = 0; i < fNPmt; i++)
         {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
+            pmt1 = dynamic_cast<R3BNeulandCalData*>(fPmt->At(i));
             if (pmt1->GetBarId() == 2 && pmt1->GetSide() == 1)
             {
                 time1 = pmt1->GetTime();
@@ -208,7 +208,7 @@ void R3BNeulandTacquilaMapped2Cal::Exec(Option_t* option)
         }
         for (Int_t i = 0; i < fNPmt; i++)
         {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
+            pmt1 = dynamic_cast<R3BNeulandCalData*>(fPmt->At(i));
             if (pmt1->GetBarId() == 5 && pmt1->GetSide() == 1)
             {
                 fh_pulser_5_2->Fill(pmt1->GetTime() - time1);
@@ -238,7 +238,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
 
     for (Int_t khit = 0; khit < nHits; khit++)
     {
-        hit2 = (R3BNeulandTacquilaMappedData*)fRawHit->At(khit);
+        hit2 = dynamic_cast<R3BNeulandTacquilaMappedData*>(fRawHit->At(khit));
         if (NULL == hit2)
         {
             continue;

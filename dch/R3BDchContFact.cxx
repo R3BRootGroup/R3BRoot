@@ -101,11 +101,11 @@ void R3BDchContFact::activateParIo(FairParIo* io)
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BDchParRootFileIo* p=new R3BDchParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new R3BDchParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BDchParAsciiFileIo* p=new R3BDchParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new R3BDchParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

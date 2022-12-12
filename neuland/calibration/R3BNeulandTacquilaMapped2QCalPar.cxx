@@ -63,7 +63,7 @@ InitStatus R3BNeulandTacquilaMapped2QCalPar::Init()
         LOG(fatal) << " Branch: NeulandTacquilaMappedData not found in Tree.";
         return kFATAL;
     }
-    header = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(fMan->GetObject("R3BEventHeader"));
     if (!header)
     {
         LOG(fatal) << " Branch: R3BEventHeader not found in Tree.";
@@ -89,7 +89,7 @@ InitStatus R3BNeulandTacquilaMapped2QCalPar::Init()
         }
         fData.push_back(v_plane);
     }
-    fPar = (R3BNeulandQCalPar*)FairRuntimeDb::instance()->getContainer("NeulandQCalPar");
+    fPar = dynamic_cast<R3BNeulandQCalPar*>(FairRuntimeDb::instance()->getContainer("NeulandQCalPar"));
 
     return kSUCCESS;
 }
@@ -107,7 +107,7 @@ void R3BNeulandTacquilaMapped2QCalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BNeulandTacquilaMappedData*)fHits->At(i);
+        hit = dynamic_cast<R3BNeulandTacquilaMappedData*>(fHits->At(i));
         if (!hit)
             continue;
 

@@ -103,11 +103,11 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(WARNING) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(INFO) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. found";
@@ -620,12 +620,12 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
     Float_t losTime = 0.0;
     Float_t losTriggerTime = 0.0;
 
-    R3BLosCalData* losHit = (R3BLosCalData*)fLosCalDataItems->At(0);
+    R3BLosCalData* losHit = dynamic_cast<R3BLosCalData*>(fLosCalDataItems->At(0));
     Int_t losChannel = losHit->GetDetector();
     // std::cout<<"LOS Time : "<<losHit->GetTimeT_ns(losChannel)<<std::endl;
     losTime = losHit->GetTimeT_ns(losChannel);
 
-    R3BLosCalData* losTriggerHit = (R3BLosCalData*)fLosTriggerCalDataItems->At(0);
+    R3BLosCalData* losTriggerHit = dynamic_cast<R3BLosCalData*>(fLosTriggerCalDataItems->At(0));
     Int_t losChannelTrigger = losTriggerHit->GetDetector();
     // std::cout<<"LOS Time (Trigger) :
     // "<<losTriggerHit->Ge(losHit->GetTime()-losCalTriggerHits->GetTimeL_ns(channelLos)tTimeL_ns(0)<<"
@@ -669,7 +669,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         //   puts("Event");
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto* hit = (R3BTofdCalData*)det->At(ihit);
+            auto* hit = dynamic_cast<R3BTofdCalData*>(det->At(ihit));
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
@@ -683,7 +683,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         std::vector<R3BTofdCalData*> trig_map;
         for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
         {
-            auto trig = (R3BTofdCalData*)fCalTriggerItems->At(i);
+            auto trig = dynamic_cast<R3BTofdCalData*>(fCalTriggerItems->At(i));
             if (trig_map.size() < trig->GetBarId())
             {
                 trig_map.resize(trig->GetBarId());
@@ -966,7 +966,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         Int_t nMulti[N_PLANE_MAX_TOFD_S494] = { 0 }, iCounts[N_PLANE_MAX_TOFD_S494] = { 0 };
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+            R3BTofdHitData* hitTofd = dynamic_cast<R3BTofdHitData*>(detTofd->At(ihit));
 
             if (IS_NAN(hitTofd->GetTime()))
                 continue;

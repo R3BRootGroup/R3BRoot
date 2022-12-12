@@ -54,7 +54,7 @@ void R3BStartrackRawAna::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BStartrackRawHit*)fRawData->At(i);
+        hit = dynamic_cast<R3BStartrackRawHit*>(fRawData->At(i));
         thw->Fill(hit->GetWordType());
         thh->Fill(hit->GetHitBit());
         thm->Fill(hit->GetModuleId());

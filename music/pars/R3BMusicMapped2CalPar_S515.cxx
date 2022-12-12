@@ -146,7 +146,7 @@ InitStatus R3BMusicMapped2CalPar_S515::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
+    fCal_Par = dynamic_cast<R3BMusicCalPar*>(rtdb->getContainer("musicCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BMusicMapped2CalPar_S515:: Couldn't get handle on musicCalPar container";
@@ -190,14 +190,14 @@ void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
     R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
     for (Int_t i = 0; i < nHitsA; i++)
     {
-        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
+        hitMwAData[i] = dynamic_cast<R3BMwpcHitData*>((fHitItemsMwpcA->At(i)));
         PosMwpcA.SetX(hitMwAData[i]->GetX());
         // LOG(INFO) <<hitMwAData[i]->GetX();
     }
     R3BLosHitData** hitLosData = new R3BLosHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
-        hitLosData[i] = (R3BLosHitData*)(fHitItemsLos->At(i));
+        hitLosData[i] = dynamic_cast<R3BLosHitData*>((fHitItemsLos->At(i)));
         PosLos.SetX(hitLosData[i]->GetX_cm());
         // LOG(INFO) <<hitMwBData[i]->GetX();
     }
@@ -217,7 +217,7 @@ void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusicMappedData*)(fMusicMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusicMappedData*>((fMusicMappedDataCA->At(i)));
         anodeId = mappedData[i]->GetAnodeID();
 
         if (anodeId < fNumAnodes)

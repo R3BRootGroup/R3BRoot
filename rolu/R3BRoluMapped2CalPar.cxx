@@ -85,12 +85,12 @@ InitStatus R3BRoluMapped2CalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     // may be = NULL!
     if (!header)
     {
         LOG(WARNING) << "R3BRoluMapped2CalPar::Init() EventHeader. not found";
-        header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     }
     else
         LOG(INFO) << "R3BRoluMapped2CalPar::Init() R3BEventHeader found";
@@ -108,7 +108,7 @@ InitStatus R3BRoluMapped2CalPar::Init()
         LOG(WARNING) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
     }
 
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
     fCal_Par->setChanged();
 
     if (!fNofModules)
@@ -133,7 +133,7 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (UInt_t i = 0; i < nHits; i++)
     {
-        R3BRoluMappedData* hit = (R3BRoluMappedData*)fMapped->At(i);
+        R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMapped->At(i));
         if (!hit)
         {
             continue; // should not happen

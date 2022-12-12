@@ -107,10 +107,10 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        pointData[i] = (R3BTwimPoint*)(fTwimPoints->At(i));
+        pointData[i] = dynamic_cast<R3BTwimPoint*>((fTwimPoints->At(i)));
         TrackId = pointData[i]->GetTrackID();
 
-        auto Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        auto Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
 
         if (PID > 1000080160) // Z=8 and A=16

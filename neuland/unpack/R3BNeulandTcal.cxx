@@ -82,7 +82,7 @@ InitStatus R3BNeulandTcal::Init()
         LOG(fatal) << "FairRootManager not found";
     }
     /*
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         if (NULL == header)
         {
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
@@ -103,7 +103,7 @@ void R3BNeulandTcal::SetParContainers()
 {
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
+    fTcalPar = dynamic_cast<R3BTCalPar*>((rtdb->getContainer("LandTCalPar")));
 }
 
 InitStatus R3BNeulandTcal::ReInit()
@@ -141,7 +141,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        hit = (R3BPaddleTamexMappedData*)fMappedHit->At(ihit);
+        hit = dynamic_cast<R3BPaddleTamexMappedData*>(fMappedHit->At(ihit));
         if (NULL == hit)
         {
             continue;

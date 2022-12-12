@@ -80,10 +80,10 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, !mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(WARNING, "EventHeader. not found");
     }
 
@@ -324,7 +324,7 @@ Bool_t R3BLosReader::Read()
                 Int_t n = fArray->GetEntriesFast();
                 for (Int_t k = 0; k < n; k++)
                 {
-                    R3BLosMappedData const* hit = (R3BLosMappedData*)fArray->At(k);
+                    R3BLosMappedData const* hit = dynamic_cast<R3BLosMappedData*>(fArray->At(k));
 
                     UInt_t const iTypeL = hit->GetType();
                     UInt_t const iCha = hit->GetChannel();

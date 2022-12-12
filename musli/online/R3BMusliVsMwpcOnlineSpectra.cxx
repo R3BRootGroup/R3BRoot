@@ -95,12 +95,12 @@ void R3BMusliVsMwpcOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "R3BMusliVsMwpcOnlineSpectra::SetParContainers(), FairRuntimeDb not found");
 
-    fMw1Geo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDet1 + "GeoPar");
+    fMw1Geo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDet1 + "GeoPar"));
     R3BLOG_IF(ERROR,
               !fMw1Geo_Par,
               "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet1 + "GeoPar container.");
 
-    fMw2Geo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDet2 + "GeoPar");
+    fMw2Geo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDet2 + "GeoPar"));
     R3BLOG_IF(ERROR,
               !fMw2Geo_Par,
               "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet2 + "GeoPar container.");
@@ -701,7 +701,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
     Double_t fX1 = -100.;
     if (fHitMwpcDet1 && fHitMwpcDet1->GetEntriesFast() == 1)
     {
-        R3BMwpcHitData* hitDataMw1 = (R3BMwpcHitData*)fHitMwpcDet1->At(0);
+        R3BMwpcHitData* hitDataMw1 = dynamic_cast<R3BMwpcHitData*>(fHitMwpcDet1->At(0));
         fX1 = hitDataMw1->GetX() + fMw1Geo_Par->GetPosX();
     }
 
@@ -711,7 +711,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
     Double_t fX2 = -100.;
     if (fHitMwpcDet2 && fHitMwpcDet2->GetEntriesFast() == 1)
     {
-        R3BMwpcHitData* hitDataMw2 = (R3BMwpcHitData*)fHitMwpcDet2->At(0);
+        R3BMwpcHitData* hitDataMw2 = dynamic_cast<R3BMwpcHitData*>(fHitMwpcDet2->At(0));
         fX2 = hitDataMw2->GetX() + fMw2Geo_Par->GetPosX();
     }
 
@@ -737,7 +737,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
         nHits = fMapMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliMappedData* hit = (R3BMusliMappedData*)fMapMusli->At(ihit);
+            R3BMusliMappedData* hit = dynamic_cast<R3BMusliMappedData*>(fMapMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -774,7 +774,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
         nHits = fCalMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliCalData* hit = (R3BMusliCalData*)fCalMusli->At(ihit);
+            R3BMusliCalData* hit = dynamic_cast<R3BMusliCalData*>(fCalMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -811,7 +811,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
         nHits = fHitMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliHitData* hit = (R3BMusliHitData*)fHitMusli->At(ihit);
+            R3BMusliHitData* hit = dynamic_cast<R3BMusliHitData*>(fHitMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetType() - 1;

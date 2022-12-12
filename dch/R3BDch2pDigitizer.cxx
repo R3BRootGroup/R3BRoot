@@ -174,7 +174,7 @@ void R3BDch2pDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesDch; l++)
     {
 
-        R3BDchPoint* dch2p_obj = (R3BDchPoint*)fDch2pPoints->At(l);
+        R3BDchPoint* dch2p_obj = dynamic_cast<R3BDchPoint*>(fDch2pPoints->At(l));
 
         Int_t DetID = dch2p_obj->GetDetectorID();
 
@@ -196,7 +196,7 @@ void R3BDch2pDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesDch; l++)
     {
 
-        R3BDchPoint* dch2p_obj = (R3BDchPoint*)fDch2pPoints->At(l);
+        R3BDchPoint* dch2p_obj = dynamic_cast<R3BDchPoint*>(fDch2pPoints->At(l));
 
         Int_t DetID = dch2p_obj->GetDetectorID();
         //     Double_t fPx = dch2p_obj->GetPx();
@@ -215,7 +215,7 @@ void R3BDch2pDigitizer::Exec(Option_t* opt)
         //     Double_t fY_Global_Out = dch2p_obj->GetYOut();
         //     Double_t fZ_Global_Out = dch2p_obj->GetZOut();
         TrackId = dch2p_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fDch2pMCTrack->At(TrackId);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fDch2pMCTrack->At(TrackId));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
         //     Double_t fPx_track = aTrack->GetPx();

@@ -78,9 +78,9 @@ InitStatus R3BLosOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -451,7 +451,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -478,7 +478,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;

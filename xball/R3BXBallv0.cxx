@@ -207,7 +207,7 @@ Bool_t R3BXBallv0::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of XBallPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kCAL);
 
         ResetParameters();
@@ -273,7 +273,7 @@ void R3BXBallv0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BXBallPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BXBallPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BXBallPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);

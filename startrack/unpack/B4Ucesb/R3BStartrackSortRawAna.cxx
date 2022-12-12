@@ -72,7 +72,7 @@ void R3BStartrackSortRawAna::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BStartrackRawHit*)fRawData->At(i);
+        hit = dynamic_cast<R3BStartrackRawHit*>(fRawData->At(i));
 
         my_type = hit->GetWordType();
         my_hit = hit->GetHitBit();

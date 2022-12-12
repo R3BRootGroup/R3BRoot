@@ -63,7 +63,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
     do                                                                                 \
     {                                                                                  \
         auto name = fName + #NAME "TCalPar";                                           \
-        f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
+        f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name)); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
             R3BLOG(ERROR, "Could not find " << name);                                  \
@@ -83,7 +83,7 @@ void R3BFiberMAPMTMapped2CalPar::Exec(Option_t* option)
     auto mapped_num = fMapped->GetEntriesFast();
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMapped->At(i));
         assert(mapped);
         if (!mapped->IsTrigger())
         {

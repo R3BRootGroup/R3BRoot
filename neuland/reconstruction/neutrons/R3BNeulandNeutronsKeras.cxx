@@ -94,7 +94,7 @@ void R3BNeulandNeutronsKeras::Exec(Option_t*)
     cwps.reserve(nClusters);
     for (int i = 0; i < nClusters; i++)
     {
-        cwps.emplace_back(ClusterWithProba{ (R3BNeulandCluster*)fClusters->At(i),
+        cwps.emplace_back(ClusterWithProba{  dynamic_cast<R3BNeulandCluster*>(fClusters->At(i)),
                                             (Double_t)TPython::Eval(TString::Format("keras_results[%d]", i)) });
     }
 

@@ -106,12 +106,12 @@ InitStatus R3BLosMapped2CalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     // may be = NULL!
     if (!header)
     {
         R3BLOG(WARNING, "EventHeader. not found");
-        header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(INFO, "EventHeader. found");
@@ -127,7 +127,7 @@ InitStatus R3BLosMapped2CalPar::Init()
     fMappedTriggerItems = (TClonesArray*)rm->GetObject("LosTriggerMapped");
     R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
 
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LosTCalPar"));
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
@@ -144,7 +144,7 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
     for (UInt_t i = 0; i < nHits; i++)
     {
 
-        R3BLosMappedData* hit = (R3BLosMappedData*)fMapped->At(i);
+        R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(fMapped->At(i));
         if (!hit)
         {
             continue; // should not happen

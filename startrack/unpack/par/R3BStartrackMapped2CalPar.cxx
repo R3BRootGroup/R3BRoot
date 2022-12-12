@@ -93,7 +93,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
     /*
       // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
       // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-      fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+      fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
       if (!fCal_Par)
       {
           LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
@@ -128,7 +128,7 @@ void R3BStartrackMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BStartrackMappedData* hit = (R3BStartrackMappedData*)fStartrackMappedDataCA->At(i);
+        R3BStartrackMappedData* hit = dynamic_cast<R3BStartrackMappedData*>(fStartrackMappedDataCA->At(i));
 
         Int_t iLadder = hit->GetLadderId(); // 1..n
         Int_t iAsic = hit->GetAsicId();     // 1..n

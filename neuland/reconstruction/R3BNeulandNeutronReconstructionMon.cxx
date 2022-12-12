@@ -179,7 +179,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
     neutrons.reserve(nReconstructedNeutrons);
     for (Int_t i = 0; i < nReconstructedNeutrons; i++)
     {
-        neutrons.push_back(*((R3BNeulandNeutron*)fReconstructedNeutrons->At(i)));
+        neutrons.push_back(*(dynamic_cast<R3BNeulandNeutron*>(fReconstructedNeutrons->At(i))));
     }
 
     const Int_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
@@ -187,7 +187,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
     npnips.reserve(nReconstructedNeutrons);
     for (Int_t i = 0; i < nNPNIPS; i++)
     {
-        npnips.push_back(*((R3BNeulandPoint*)fPrimaryNeutronInteractionPoints->At(i)));
+        npnips.push_back(*(dynamic_cast<R3BNeulandPoint*>(fPrimaryNeutronInteractionPoints->At(i))));
     }
     fhCountN->Fill(nReconstructedNeutrons);
     fhCountNdiff->Fill((Int_t)nNPNIPS - (Int_t)nReconstructedNeutrons);
@@ -252,7 +252,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
         for (const auto& npnip : npnips)
         {
             // Workaround mom = 0
-            R3BMCTrack* MCTrack = (R3BMCTrack*)fMCTracks->At(npnip.GetTrackID());
+            R3BMCTrack* MCTrack = dynamic_cast<R3BMCTrack*>(fMCTracks->At(npnip.GetTrackID()));
             p4_npnips += TLorentzVector(MCTrack->GetPx() * 1000.,
                                         MCTrack->GetPy() * 1000.,
                                         MCTrack->GetPz() * 1000.,
@@ -264,7 +264,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
         const Int_t nMCTracks = fMCTracks->GetEntries();
         for (Int_t i = 0; i < nMCTracks; i++)
         {
-            MCTrack = (R3BMCTrack*)fMCTracks->At(i);
+            MCTrack = dynamic_cast<R3BMCTrack*>(fMCTracks->At(i));
             // We are only interested in primary particles, these should come first,
             // thus we can stop once the Mother Id != -1
             if (MCTrack->GetMotherId() != -1)

@@ -79,7 +79,7 @@ void R3BMusicMapped2Cal::SetParContainers()
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
 
-    fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
+    fCal_Par = dynamic_cast<R3BMusicCalPar*>(rtdb->getContainer("musicCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BMusicMapped2Cal::SetParContainers() Couldn't get handle on musicCalPar container";
@@ -187,7 +187,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusicMappedData*)(fMusicMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusicMappedData*>((fMusicMappedDataCA->At(i)));
         anodeId = mappedData[i]->GetAnodeID();
 
         if (anodeId < fNumAnodes && fCal_Par->GetInUse(anodeId + 1) == 1)

@@ -76,7 +76,7 @@ void R3BAmsDigitizer::Exec(Option_t* option)
     auto pointData = new R3BTraPoint*[nHits];
     for (Int_t i = 0; i < nHits; i++)
     {
-        pointData[i] = (R3BTraPoint*)(fPointData->At(i));
+        pointData[i] = dynamic_cast<R3BTraPoint*>((fPointData->At(i)));
 
         Int_t detid = pointData[i]->GetDetectorID();
         Int_t stripid = pointData[i]->GetDetCopyID() - 1;
@@ -94,11 +94,11 @@ void R3BAmsDigitizer::Exec(Option_t* option)
         {
             for (Int_t j = 0; j < nStripCals; j++)
             {
-                if (((R3BAmsStripCalData*)(fCalData->At(j)))->GetStripId() == stripid &&
-                    ((R3BAmsStripCalData*)(fCalData->At(j)))->GetSideId() == sideid &&
-                    ((R3BAmsStripCalData*)(fCalData->At(j)))->GetDetId() == detid)
+                if (( dynamic_cast<R3BAmsStripCalData*>((fCalData->At(j)))->GetStripId()) == stripid &&
+                    ( dynamic_cast<R3BAmsStripCalData*>((fCalData->At(j)))->GetSideId()) == sideid &&
+                    ( dynamic_cast<R3BAmsStripCalData*>((fCalData->At(j)))->GetDetId() == detid))
                 {
-                    ((R3BAmsStripCalData*)(fCalData->At(j)))->AddMoreEnergy(energy);
+                    (dynamic_cast<R3BAmsStripCalData*>((fCalData->At(j)))->AddMoreEnergy(energy));
                     existHit = 1; // to avoid the creation of a new StripCal Hit
                     break;
                 }

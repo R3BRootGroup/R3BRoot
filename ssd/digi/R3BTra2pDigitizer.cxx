@@ -160,7 +160,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
     {
         //   LOG(INFO)<<"entries "<<l;
 
-        R3BTraPoint* Tra2p_obj = (R3BTraPoint*)fTra2pPoints->At(l);
+        R3BTraPoint* Tra2p_obj = dynamic_cast<R3BTraPoint*>(fTra2pPoints->At(l));
 
         //     Int_t DetID = Tra2p_obj->GetDetectorID();
         Double_t fX_In = Tra2p_obj->GetXIn();
@@ -170,7 +170,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
         Double_t fY_Out = Tra2p_obj->GetYOut();
         Double_t fZ_Out = Tra2p_obj->GetZOut();
         TrackIdTra = Tra2p_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTra2pMCTrack->At(TrackIdTra);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTra2pMCTrack->At(TrackIdTra));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

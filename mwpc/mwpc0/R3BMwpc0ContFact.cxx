@@ -82,11 +82,11 @@ void R3BMwpc0ContFact::activateParIo(FairParIo* io)
     // needed by the Mwpc0
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BMwpc0ParRootFileIo* p=new R3BMwpc0ParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new R3BMwpc0ParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BMwpc0ParAsciiFileIo* p=new R3BMwpc0ParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new R3BMwpc0ParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

@@ -78,7 +78,7 @@ void R3BIncomingBeta::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
+    fIncomingID_Par = dynamic_cast<R3BIncomingIDPar*>(rtdb->getContainer("IncomingIDPar"));
     R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
     R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
 
@@ -108,7 +108,7 @@ InitStatus R3BIncomingBeta::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
@@ -207,7 +207,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosHitData* hittcal = (R3BLosHitData*)fHitLos->At(ihit);
+            R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
             numDet = hittcal->GetDetector();
 
             if (multLos[numDet - 1] >= MAXMULT)

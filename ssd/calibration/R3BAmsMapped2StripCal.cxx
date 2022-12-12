@@ -92,7 +92,7 @@ void R3BAmsMapped2StripCal::SetParContainers()
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
 
-    fCal_Par = (R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
+    fCal_Par = dynamic_cast<R3BAmsStripCalPar*>(rtdb->getContainer("amsStripCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
@@ -219,7 +219,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
     Double_t h = 0;
     /*
     for(Int_t i = 0; i < nHits; i++) {
-      mappedData[i] = (R3BAmsMappedData*)(fAmsMappedDataCA->At(i));
+      mappedData[i] = dynamic_cast<R3BAmsMappedData*>((fAmsMappedDataCA->At(i)));
 
       detId   = mappedData[i]->GetDetectorId();
       stripId = mappedData[i]->GetStripId();
@@ -252,7 +252,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
     nbadc = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BAmsMappedData*)(fAmsMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BAmsMappedData*>((fAmsMappedDataCA->At(i)));
         detId = mappedData[i]->GetDetectorId();
         stripId = mappedData[i]->GetStripId();
 

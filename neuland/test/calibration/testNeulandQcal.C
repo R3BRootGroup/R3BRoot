@@ -53,7 +53,7 @@ void testNeulandQcal()
     cout << endl << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
 
-    R3BNeulandQCalPar* par = (R3BNeulandQCalPar*)rtdb->getContainer("NeulandQCalPar");
+    R3BNeulandQCalPar* par = dynamic_cast<R3BNeulandQCalPar*>(rtdb->getContainer("NeulandQCalPar"));
     Bool_t failed = false;
 
     for (Int_t i = 0; i < 100; i++)

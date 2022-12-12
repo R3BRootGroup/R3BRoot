@@ -50,7 +50,7 @@ R3BNeulandMappedHist::~R3BNeulandMappedHist() {}
 InitStatus R3BNeulandMappedHist::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
-    fHeader = (R3BEventHeader*)fMan->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(fMan->GetObject("EventHeader."));
     fLandMappedData = (TClonesArray*)fMan->GetObject("NeulandTacquilaMappedData");
     fLosMappedData = (TClonesArray*)fMan->GetObject("LosMapped");
     fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandMappedData");
@@ -73,7 +73,7 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
         R3BNeulandTacquilaMappedData* hitmapped;
         for (Int_t i = 0; i < nLandMapped; i++)
         {
-            hitmapped = (R3BNeulandTacquilaMappedData*)fLandMappedData->At(i);
+            hitmapped = dynamic_cast<R3BNeulandTacquilaMappedData*>(fLandMappedData->At(i));
             fh_land_mapped_barid->Fill((hitmapped->GetPlane() - 1) * 50 + hitmapped->GetPaddle());
             fh_land_mapped_side->Fill(hitmapped->GetSide());
             fh_land_mapped_clock->Fill(hitmapped->GetClock());
@@ -89,7 +89,7 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
         R3BPaddleTamexMappedData* hitmapped;
         for (Int_t i = 0; i < nNeulandTamexHitsMapped; i++)
         {
-            hitmapped = (R3BPaddleTamexMappedData*)fNeulandTamexHitMapped->At(i);
+            hitmapped = dynamic_cast<R3BPaddleTamexMappedData*>(fNeulandTamexHitMapped->At(i));
             fh_neuland_mapped_is17->Fill(hitmapped->Is17());
             if (!hitmapped->Is17())
             {
@@ -117,7 +117,7 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
         R3BLosMappedData* loshit;
         for (Int_t i = 0; i < nLosMapped; i++)
         {
-            loshit = (R3BLosMappedData*)fLosMappedData->At(i);
+            loshit = dynamic_cast<R3BLosMappedData*>(fLosMappedData->At(i));
             fh_los_det->Fill(loshit->GetDetector());
             fh_los_ch->Fill(loshit->GetChannel());
             fh_los_tcoarse->Fill(loshit->GetTimeCoarse());

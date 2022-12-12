@@ -81,7 +81,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
         LOG(FATAL) << "R3BMusliOnlineSpectra::Init FairRootManager not found";
         return kFATAL;
     }
-    // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -1270,7 +1270,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fMapItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliMappedData* hit = (R3BMusliMappedData*)fMapItemsMusli->At(ihit);
+            R3BMusliMappedData* hit = dynamic_cast<R3BMusliMappedData*>(fMapItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -1416,7 +1416,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fCalItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliCalData* hit = (R3BMusliCalData*)fCalItemsMusli->At(ihit);
+            R3BMusliCalData* hit = dynamic_cast<R3BMusliCalData*>(fCalItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -1459,7 +1459,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fHitItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliHitData* hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
+            R3BMusliHitData* hit = dynamic_cast<R3BMusliHitData*>(fHitItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetType() - 1;

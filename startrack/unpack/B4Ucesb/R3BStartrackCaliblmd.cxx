@@ -68,7 +68,7 @@ void R3BStartrackCalib::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "R3BStarTraCalib::SetParContainers: No runtime database";
 
-    fStartrackCalibPar = (R3BStartrackCalibPar*)(rtdb->getContainer("R3BStartrackCalibPar"));
+    fStartrackCalibPar = dynamic_cast<R3BStartrackCalibPar*>((rtdb->getContainer("R3BStartrackCalibPar")));
 
     if (fVerbose && fStartrackCalibPar)
     {
@@ -121,7 +121,7 @@ void R3BStartrackCalib::Exec(Option_t* opt)
         for (Int_t i = 0; i < rawHits; i++)
         {
             rawHit[i] = new R3BStartrackRawHit;
-            rawHit[i] = (R3BStartrackRawHit*)fSiDetHitCA->At(i);
+            rawHit[i] = dynamic_cast<R3BStartrackRawHit*>(fSiDetHitCA->At(i));
 
             module_id = MapModuleID(rawHit[i]);
             side = MapSide(rawHit[i]);

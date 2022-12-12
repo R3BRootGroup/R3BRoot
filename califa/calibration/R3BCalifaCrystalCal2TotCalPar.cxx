@@ -70,7 +70,7 @@ void R3BCalifaCrystalCal2TotCalPar::SetParContainers()
     {
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
-    fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
+    fMap_Par = dynamic_cast<R3BCalifaMappingPar*>(rtdb->getContainer("califaMappingPar"));
     if (!fMap_Par)
     {
         LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on califamappingpar container";
@@ -118,7 +118,7 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
         return kFATAL;
     }
 
-    fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
+    fTotCal_Par = dynamic_cast<R3BCalifaTotCalPar*>(rtdb->getContainer("CalifaTotCalPar"));
     if (!fTotCal_Par)
 
     {
@@ -175,7 +175,7 @@ void R3BCalifaCrystalCal2TotCalPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        CalHit[i] = (R3BCalifaCrystalCalData*)(fCrystalCalDataCA->At(i));
+        CalHit[i] = dynamic_cast<R3BCalifaCrystalCalData*>((fCrystalCalDataCA->At(i)));
         crystalId = CalHit[i]->GetCrystalId();
         // Fill histograms
         if (CalHit[i]->GetEnergy() > fThreshold)

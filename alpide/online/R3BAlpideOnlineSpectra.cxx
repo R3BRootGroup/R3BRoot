@@ -72,7 +72,7 @@ void R3BAlpideOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 }
 
@@ -92,11 +92,11 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         R3BLOG(warning, "EventHeader. not found");
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
     {
@@ -316,7 +316,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
         auto nHits = fMappedItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BAlpideMappedData*)fMappedItems->At(ihit);
+            auto hit = dynamic_cast<R3BAlpideMappedData*>(fMappedItems->At(ihit));
             if (!hit)
                 continue;
             fh2_ColVsRow[hit->GetSensorId() - 1]->Fill(hit->GetCol(), hit->GetRow());
@@ -334,7 +334,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
             auto nHits = fCalItems->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                auto hit = (R3BAlpideCalData*)fCalItems->At(ihit);
+                auto hit = dynamic_cast<R3BAlpideCalData*>(fCalItems->At(ihit));
                 if (!hit)
                     continue;
                 Int_t senid = hit->GetSensorId() - 1;
@@ -361,7 +361,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
         auto nHits = fHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BAlpideHitData*)fHitItems->At(ihit);
+            auto hit = dynamic_cast<R3BAlpideHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
             Int_t senid = hit->GetSensorId() - 1;

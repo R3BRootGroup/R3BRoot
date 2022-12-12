@@ -143,7 +143,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
+        if (!( dynamic_cast<R3BReader*>(fReaders->At(i))->Init(&fStructInfo)))
         {
             R3BLOG(fatal, "UCESB error: " << fClient.last_error());
             return kFALSE;
@@ -182,7 +182,7 @@ void R3BUcesbSource::SetParUnpackers()
 {
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        ((R3BReader*)fReaders->At(i))->SetParContainers();
+        (dynamic_cast<R3BReader*>(fReaders->At(i))->SetParContainers());
     }
 }
 
@@ -191,7 +191,7 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        if (!((R3BReader*)fReaders->At(i))->ReInit())
+        if (!( dynamic_cast<R3BReader*>(fReaders->At(i))->ReInit()))
         {
             R3BLOG(fatal, "ReInit of a reader failed.");
             return kFALSE;
@@ -277,7 +277,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     /* Run detector specific readers */
     for (int r = 0; r < fReaders->GetEntriesFast(); ++r)
     {
-        R3BReader* reader = (R3BReader*)fReaders->At(r);
+        R3BReader* reader = dynamic_cast<R3BReader*>(fReaders->At(r));
 
         LOG(debug1) << "  Reading reader " << r << " (" << reader->GetName() << ")";
         reader->Read();
@@ -335,7 +335,7 @@ void R3BUcesbSource::Reset()
 {
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        ((R3BReader*)fReaders->At(i))->Reset();
+        (dynamic_cast<R3BReader*>(fReaders->At(i))->Reset());
     }
 }
 
@@ -347,6 +347,6 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 }
 
 //_____________________________________________________________________________
-void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
+void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { (dynamic_cast<R3BEventHeader*>(feh)->SetRunId(fRunId)); }
 
 ClassImp(R3BUcesbSource);

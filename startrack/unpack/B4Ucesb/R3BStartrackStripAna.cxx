@@ -48,7 +48,7 @@ void R3BStartrackStripAna::Exec(Option_t* option)
     R3BStartrackerDigitHit* hit;
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BStartrackerDigitHit*)fSiDetData->At(i);
+        hit = dynamic_cast<R3BStartrackerDigitHit*>(fSiDetData->At(i));
 
         // thWordType->Fill(hit->GetWordType());  // 10->type A  ; 11->
         // thHitBit->Fill(hit->GetHitBit());  // 0->timestamp from energy branch (ie over energy threshold) ;

@@ -123,7 +123,7 @@ InitStatus R3BLosCal2HitPar::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
         LOG(ERROR) << "Branch LosCal not found";
@@ -216,7 +216,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItems->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(fCalItems->At(iPart));
 
             iDet = calData->GetDetector();
 

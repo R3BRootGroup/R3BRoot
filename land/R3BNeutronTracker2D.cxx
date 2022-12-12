@@ -79,7 +79,7 @@ void R3BNeutronTracker2D::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    fLandDigiPar = dynamic_cast<R3BLandDigiPar*>((rtdb->getContainer("R3BLandDigiPar")));
 
     if (fLandDigiPar)
     {
@@ -183,7 +183,7 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
     Int_t particleID;
     for (Int_t it = 0; it < fLandMCTrack->GetEntriesFast(); it++)
     {
-        aTrack1 = (R3BMCTrack*)fLandMCTrack->At(it);
+        aTrack1 = dynamic_cast<R3BMCTrack*>(fLandMCTrack->At(it));
 
         prim = aTrack1->GetMotherId();
         if (-1 != prim)
@@ -264,7 +264,7 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
     R3BLandDigi* digi;
     for (Int_t id = 0; id < fLandDigi->GetEntries(); id++)
     {
-        digi = (R3BLandDigi*)fLandDigi->At(id);
+        digi = dynamic_cast<R3BLandDigi*>(fLandDigi->At(id));
         fEtot += digi->GetQdc();
         sumTotalEnergy += digi->GetQdc();
     }
@@ -354,7 +354,7 @@ Int_t R3BNeutronTracker2D::AdvancedMethod()
     for (Int_t ic = 0; ic < fNofClusters; ic++)
     {
         // Get pointer to the cluster
-        cluster = (R3BNeuLandCluster*)fArrayCluster->At(ic);
+        cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(ic));
         // Process starting from this cluster
         NextIteration(ic, cluster);
     } // clusters
@@ -444,7 +444,7 @@ void R3BNeutronTracker2D::SortClustersBeta()
     R3BNeuLandCluster* cluster;
     for (Int_t ic = 1; ic < fNofClusters; ic++)
     {
-        cluster = (R3BNeuLandCluster*)fArrayCluster->At(ic);
+        cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(ic));
         if (cluster->IsMarked())
         {
             continue;
@@ -458,7 +458,7 @@ void R3BNeutronTracker2D::SortClustersBeta()
         std::sort(fVectorCluster.begin(), fVectorCluster.end(), AuxSortClustersBeta);
     }
 
-    cluster = (R3BNeuLandCluster*)fArrayCluster->At(0);
+    cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(0));
     fVectorCluster.insert(fVectorCluster.begin(), cluster);
     fNofClusters1 = fVectorCluster.size();
 }
@@ -476,7 +476,7 @@ void R3BNeutronTracker2D::NextIteration(Int_t curIndex, R3BNeuLandCluster* curCl
     R3BNeuLandCluster* cluster;
     for (Int_t ic = (curIndex + 1); ic < fNofClusters; ic++)
     {
-        cluster = (R3BNeuLandCluster*)fArrayCluster->At(ic);
+        cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(ic));
         // Check if elastic scattering
         if (IsElastic(curClus, cluster))
         {
@@ -840,7 +840,7 @@ Bool_t R3BNeutronTracker2D::IsElastic(R3BNeuLandCluster* c1, R3BNeuLandCluster* 
 // -----------------------------------------------------------------------------
 void R3BNeutronTracker2D::CalculateMassInv()
 {
-    R3BLandFirstHits* fh = (R3BLandFirstHits*)fLandFirstHits->At(0);
+    R3BLandFirstHits* fh = dynamic_cast<R3BLandFirstHits*>(fLandFirstHits->At(0));
     TVector3 fhv[6];
     fhv[0].SetXYZ(fh->GetX0(), fh->GetY0(), fh->GetZ0());
     fhv[1].SetXYZ(fh->GetX1(), fh->GetY1(), fh->GetZ1());
@@ -903,7 +903,7 @@ void R3BNeutronTracker2D::CalculateMassInv()
         // add up momentum of neutrons
         // neutron: beta is calculated with position and time of first hit
 
-        hit = (R3BNeutHit*)fNeutHits->At(i);
+        hit = dynamic_cast<R3BNeutHit*>(fNeutHits->At(i));
 
         Double_t momentumT = hit->GetP();
         Double_t momentumZ =
@@ -926,7 +926,7 @@ void R3BNeutronTracker2D::CalculateMassInv()
         Double_t dmin = 1e6;
         for (Int_t ip = 0; ip < fLandPoints->GetEntriesFast(); ip++)
         {
-            point = (R3BLandPoint*)fLandPoints->At(ip);
+            point = dynamic_cast<R3BLandPoint*>(fLandPoints->At(ip));
             point->PositionIn(posPoint);
             d = TMath::Sqrt(TMath::Power(hit->GetX() - posPoint.X(), 2) + TMath::Power(hit->GetY() - posPoint.Y(), 2) +
                             TMath::Power(hit->GetZ() - posPoint.Z(), 2));
@@ -937,14 +937,14 @@ void R3BNeutronTracker2D::CalculateMassInv()
             }
         }
         assert(index != -1);
-        point = (R3BLandPoint*)fLandPoints->At(index);
+        point = dynamic_cast<R3BLandPoint*>(fLandPoints->At(index));
         Int_t trackID = point->GetTrackID();
-        R3BMCTrack* track = (R3BMCTrack*)fLandMCTrack->At(trackID);
+        R3BMCTrack* track = dynamic_cast<R3BMCTrack*>(fLandMCTrack->At(trackID));
         Int_t mothID = track->GetMotherId();
         Int_t ind;
         while (-1 != mothID)
         {
-            track = (R3BMCTrack*)fLandMCTrack->At(mothID);
+            track = dynamic_cast<R3BMCTrack*>(fLandMCTrack->At(mothID));
             ind = mothID;
             mothID = track->GetMotherId();
         }

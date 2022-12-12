@@ -134,7 +134,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
-        fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        fHitPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(container));
         if (!fHitPar)
         {
             LOG(ERROR) << "Could not get " << container << " container.";
@@ -219,7 +219,7 @@ void R3BBunchedFiberCal2Hit_s494::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    fCalPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(fName + "HitPar"));
     if (!fCalPar)
     {
         LOG(ERROR) << "R3BFiberCal2Hit_s494::Init() Couldn't get " << fName << "HitPar. ";

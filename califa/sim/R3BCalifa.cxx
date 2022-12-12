@@ -212,7 +212,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
                  gMC->CurrentEvent());
 
         // Increment number of CalifaPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kCALIFA);
         ResetParameters();
     }
@@ -262,7 +262,7 @@ void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BCalifaPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BCalifaPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BCalifaPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BCalifaPoint(*oldpoint);

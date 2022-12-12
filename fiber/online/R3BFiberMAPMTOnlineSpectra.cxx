@@ -111,7 +111,7 @@ R3BFiberMAPMTOnlineSpectra::~R3BFiberMAPMTOnlineSpectra()
 
 void R3BFiberMAPMTOnlineSpectra::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
     if (fMapPar)
     {
@@ -138,11 +138,11 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         R3BLOG(WARNING, "EventHeader. not found");
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(INFO, " EventHeader. found");
@@ -627,7 +627,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
             Double_t tDown = 0. / 0.;
             Double_t tUp = 0. / 0.;
 
-            auto hit = (R3BFiberMAPMTHitData*)fHitItems->At(ihit);
+            auto hit = dynamic_cast<R3BFiberMAPMTHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
 

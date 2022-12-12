@@ -167,7 +167,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
     Double_t lead_trig_ns = 0. / 0.;
     for (UInt_t j = 0; j < nTrig; ++j)
     {
-        auto cur_cal = (R3BRoluCalData*)fCalTriggerItems->At(j);
+        auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(j));
         lead_trig_ns = cur_cal->GetTimeL_ns(0);
         // cout<<"Trigger: "<<lead_trig_ns<<endl;
     }
@@ -191,7 +191,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
         /*
          * nParts is the number of particle passing through detector in one event
          */
-        R3BRoluCalData* calItem = (R3BRoluCalData*)fCalItems->At(iPart);
+        R3BRoluCalData* calItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
         iDet = calItem->GetDetector();
 
         for (Int_t iCha = 0; iCha < 4; iCha++)

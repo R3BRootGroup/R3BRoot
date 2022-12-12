@@ -76,7 +76,7 @@ void R3BFiberMAPMTMapped2Cal::SetParContainers()
     do                                                                                 \
     {                                                                                  \
         auto name = fName + #NAME "TCalPar";                                           \
-        f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
+        f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name)); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
             R3BLOG(ERROR, "Could not get access to " << name << " container.");        \
@@ -103,7 +103,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMappedItems->At(i));
         assert(mapped);
 
         auto channel = mapped->GetChannel();

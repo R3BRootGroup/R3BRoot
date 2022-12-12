@@ -146,7 +146,7 @@ InitStatus R3BTofDCal2HitPar::Init()
         return kFATAL;
     }
 
-    fHeader = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
@@ -155,7 +155,7 @@ InitStatus R3BTofDCal2HitPar::Init()
     fCalTriggerItems = (TClonesArray*)rm->GetObject("TofdTriggerCal");
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
-    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
+    fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
         R3BLOG(ERROR, "Could not get access to tofdHitPar container");
@@ -174,7 +174,7 @@ InitStatus R3BTofDCal2HitPar::Init()
 
 void R3BTofDCal2HitPar::SetParContainers()
 {
-    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
     R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
 }
 
@@ -215,7 +215,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalData->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;

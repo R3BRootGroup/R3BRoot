@@ -89,9 +89,9 @@ InitStatus R3BLosMapped2TCal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
@@ -121,7 +121,7 @@ InitStatus R3BLosMapped2TCal::Init()
 // Note that the container may still be empty at this point.
 void R3BLosMapped2TCal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LosTCalPar"));
     if (!fTcalPar)
     {
         R3BLOG(FATAL, "Could not get access to LosTCalPar-Container.");
@@ -154,7 +154,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
         Double_t times_ns = 0. / 0.;
         Double_t times_raw_ns = 0. / 0.;
 
-        R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItems->At(ihit);
+        R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 

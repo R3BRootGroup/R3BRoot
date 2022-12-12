@@ -57,10 +57,10 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
     FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
     {
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         LOG(WARNING) << "R3BWhiterabbitLosReader::Init() EventHeader. not found";
     }
 

@@ -87,9 +87,9 @@ InitStatus R3BSci2Mapped2Tcal::Init()
     }
 
     // try to get a handle on the EventHeader.
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // --- get access to Mapped data --- //
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
@@ -112,7 +112,7 @@ InitStatus R3BSci2Mapped2Tcal::Init()
 // Note that the container may still be empty at this point.
 void R3BSci2Mapped2Tcal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci2TCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to Sci2TCalPar container.";

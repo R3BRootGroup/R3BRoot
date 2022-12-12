@@ -143,7 +143,7 @@ R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
 
 InitStatus R3BTofdCal2HitS454::Init()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
@@ -161,7 +161,7 @@ InitStatus R3BTofdCal2HitS454::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
@@ -182,7 +182,7 @@ InitStatus R3BTofdCal2HitS454::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdCal2HitS454::SetParContainers()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
@@ -272,7 +272,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
         /*std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '

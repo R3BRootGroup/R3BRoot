@@ -52,7 +52,7 @@ class R3BCalifaCrystalCalPar : public FairDbObjTableMap
     void AddDUCalPar(R3BCalifaDUCalPar* tch) { fDUCalParams->Add(tch); }
     TObjArray* GetListOfDUCalPar(Int_t side) { return fDUCalParams; }
     Int_t GetNumDUCalPar() { return fDUCalParams->GetEntries(); }
-    R3BCalifaDUCalPar* GetDUCalParAt(Int_t idx) { return (R3BCalifaDUCalPar*)fDUCalParams->At(idx); }
+    R3BCalifaDUCalPar* GetDUCalParAt(Int_t idx) { return dynamic_cast<R3BCalifaDUCalPar*>(fDUCalParams->At(idx)); }
 
     // Add-ons: SQL descriptors for the parameter class
     virtual std::string GetTableDefinition(const char* Name = 0)

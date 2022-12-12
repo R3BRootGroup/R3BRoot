@@ -142,7 +142,7 @@ void R3BTofiDigitizerCal::Exec(Option_t* opt)
 
         for (Int_t i = 0; i < entryNum; ++i)
         {
-            R3BTofiPoint* data_element = (R3BTofiPoint*)Points->At(i);
+            R3BTofiPoint* data_element = dynamic_cast<R3BTofiPoint*>(Points->At(i));
 
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // channel nummer
                                        data_element->GetEnergyLoss(),

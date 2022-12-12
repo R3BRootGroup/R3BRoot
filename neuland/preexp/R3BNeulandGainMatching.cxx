@@ -64,7 +64,7 @@ InitStatus R3BNeulandGainMatching::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     if (!header)
     {
         return kFATAL;
@@ -169,7 +169,7 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 
-        R3BNeulandCalData* hit = (R3BNeulandCalData*)fPmt->At(i);
+        R3BNeulandCalData* hit = dynamic_cast<R3BNeulandCalData*>(fPmt->At(i));
 
         if (!hit)
             continue; // should not happen

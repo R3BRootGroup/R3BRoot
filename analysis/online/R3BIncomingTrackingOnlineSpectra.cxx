@@ -115,13 +115,13 @@ void R3BIncomingTrackingOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, NULL == rtdb, "FairRuntimeDb not found");
 
-    fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
+    fMw0GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc0GeoPar"));
     R3BLOG_IF(ERROR, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
 
-    // fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    // fTargetGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("TargetGeoPar"));
     // R3BLOG_IF(ERROR, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
 
-    fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
+    fMw1GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc1GeoPar"));
     R3BLOG_IF(ERROR, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
     return;
 }
@@ -346,7 +346,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
         float z = 0., aq = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BFrsData*)fFrsHitDataCA->At(ihit);
+            auto hit = dynamic_cast<R3BFrsData*>(fFrsHitDataCA->At(ihit));
             if (!hit)
                 continue;
             z = hit->GetZ();
@@ -362,7 +362,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fMwpc0HitDataCA->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BMwpcHitData*)fMwpc0HitDataCA->At(ihit);
+            auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(ihit));
             if (!hit)
                 continue;
             mwpc0x = hit->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
@@ -379,7 +379,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
             Float_t angY = -500.;
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                auto hit = (R3BMwpcHitData*)fMwpc1HitDataCA->At(ihit);
+                auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(ihit));
                 if (!hit)
                     continue;
                 mwpc1x = hit->GetX() + fMw1GeoPar->GetPosX() * 10.;

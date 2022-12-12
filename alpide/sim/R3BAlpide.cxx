@@ -60,7 +60,7 @@ void R3BAlpide::SetParameter()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(warning, !fMap_Par, "Container alpideMappingPar not found");
     //--- Parameter Container ---
     if (fMap_Par)
@@ -454,7 +454,7 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
                gMC->TrackPid());
 
         // Increment number of TraPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kTRA);
 
         ResetParameters();
@@ -517,7 +517,7 @@ void R3BAlpide::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BAlpidePoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BAlpidePoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BAlpidePoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BAlpidePoint(*oldpoint);

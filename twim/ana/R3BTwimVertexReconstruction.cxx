@@ -70,9 +70,9 @@ InitStatus R3BTwimVertexReconstruction::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
 
     // INPUT DATA
     // get access to cal data of the Twim
@@ -104,7 +104,7 @@ void R3BTwimVertexReconstruction::Exec(Option_t* option)
 
         for (Int_t i = 0; i < nHitTwim; i++)
         {
-            HitDat[i] = (R3BTwimHitData*)(fTwimHitDataCA->At(i));
+            HitDat[i] = dynamic_cast<R3BTwimHitData*>((fTwimHitDataCA->At(i)));
             trajparams[i].SetXYZ(HitDat[i]->GetSecID(), HitDat[i]->GetOffset(), HitDat[i]->GetTheta());
         }
 

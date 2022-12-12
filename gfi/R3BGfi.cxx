@@ -240,7 +240,7 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of GfiPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kGFI);
 
         ResetParameters();
@@ -310,7 +310,7 @@ void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BGfiPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BGfiPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BGfiPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BGfiPoint(*oldpoint);

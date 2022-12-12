@@ -86,9 +86,9 @@ InitStatus R3BTwimOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
@@ -985,7 +985,7 @@ void R3BTwimOnlineSpectra::s455()
         // std::cout << "Event:\n";
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimMappedData* hit = (R3BTwimMappedData*)fMappedItemsTwim->At(ihit);
+            R3BTwimMappedData* hit = dynamic_cast<R3BTwimMappedData*>(fMappedItemsTwim->At(ihit));
             if (!hit)
                 continue;
             fh1_Twimmap_mult[hit->GetSecID() - 1]->Fill(hit->GetAnodeID());
@@ -1056,7 +1056,7 @@ void R3BTwimOnlineSpectra::s455()
         Int_t nHits = fCalItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimCalData* hit = (R3BTwimCalData*)fCalItemsTwim->At(ihit);
+            R3BTwimCalData* hit = dynamic_cast<R3BTwimCalData*>(fCalItemsTwim->At(ihit));
             if (!hit)
                 continue;
             fh1_Twimcal_Pos[(hit->GetSecID() - 1) * fNbAnodes + (hit->GetAnodeID() - 1)]->Fill(hit->GetDTime());
@@ -1072,7 +1072,7 @@ void R3BTwimOnlineSpectra::s455()
         Int_t nHits = fHitItemsTofW->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSofTofWHitData* hit = (R3BSofTofWHitData*)fHitItemsTofW->At(ihit);
+            R3BSofTofWHitData* hit = dynamic_cast<R3BSofTofWHitData*>(fHitItemsTofW->At(ihit));
             if (!hit)
                 continue;
             if (padid[0] == 0)
@@ -1106,7 +1106,7 @@ void R3BTwimOnlineSpectra::s455()
         Float_t zr[2] = { 0., 0. }, zl[2] = { 0., 0. };
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimHitData* hit = (R3BTwimHitData*)fHitItemsTwim->At(ihit);
+            R3BTwimHitData* hit = dynamic_cast<R3BTwimHitData*>(fHitItemsTwim->At(ihit));
             if (!hit)
                 continue;
             // FIXME: this is defined only for the experiment 4-march-2021
@@ -1189,7 +1189,7 @@ void R3BTwimOnlineSpectra::s444_s467()
         // std::cout << "Event:\n";
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimMappedData* hit = (R3BTwimMappedData*)fMappedItemsTwim->At(ihit);
+            R3BTwimMappedData* hit = dynamic_cast<R3BTwimMappedData*>(fMappedItemsTwim->At(ihit));
             if (!hit)
                 continue;
             fh1_Twimmap_mult[hit->GetSecID() - 1]->Fill(hit->GetAnodeID());
@@ -1265,7 +1265,7 @@ void R3BTwimOnlineSpectra::s444_s467()
         Int_t nHits = fCalItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimCalData* hit = (R3BTwimCalData*)fCalItemsTwim->At(ihit);
+            R3BTwimCalData* hit = dynamic_cast<R3BTwimCalData*>(fCalItemsTwim->At(ihit));
             if (!hit)
                 continue;
             fh1_Twimcal_Pos[(hit->GetSecID() - 1) * fNbAnodes + (hit->GetAnodeID() - 1)]->Fill(hit->GetDTime());
@@ -1279,7 +1279,7 @@ void R3BTwimOnlineSpectra::s444_s467()
         Int_t nHits = fHitItemsMwpc3->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc3->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc3->At(ihit));
             if (!hit)
                 continue;
             mwpc3x = hit->GetX();
@@ -1292,7 +1292,7 @@ void R3BTwimOnlineSpectra::s444_s467()
         Int_t nHits = fHitItemsTwim->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTwimHitData* hit = (R3BTwimHitData*)fHitItemsTwim->At(ihit);
+            R3BTwimHitData* hit = dynamic_cast<R3BTwimHitData*>(fHitItemsTwim->At(ihit));
             if (!hit)
                 continue;
             fh1_Twimhit_z->Fill(hit->GetZcharge());

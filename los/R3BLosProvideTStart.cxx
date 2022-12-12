@@ -37,10 +37,10 @@ InitStatus R3BLosProvideTStart::Init()
         throw std::runtime_error("R3BLosProvideTStart: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("EventHeader."));
     if (fEventHeader == nullptr)
     {
-        fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("R3BEventHeader"));
         R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
     // Definition of a time stich object to correlate times coming from different systems

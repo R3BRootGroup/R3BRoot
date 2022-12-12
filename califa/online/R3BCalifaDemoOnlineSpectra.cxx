@@ -109,7 +109,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     }
     Int_t BinsChannelFebex = 65535;
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("", this);
@@ -1076,7 +1076,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             wrc = hit->GetTimeStamp();
@@ -1088,7 +1088,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsMaster->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsMaster->At(ihit));
             if (!hit)
                 continue;
             wrm = hit->GetTimeStamp();
@@ -1111,7 +1111,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaMappedData* hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
+            R3BCalifaMappedData* hit = dynamic_cast<R3BCalifaMappedData*>(fMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1151,7 +1151,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaCrystalCalData* hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
+            R3BCalifaCrystalCalData* hit = dynamic_cast<R3BCalifaCrystalCalData*>(fCalItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1210,7 +1210,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaHitData* hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaHitData* hit = dynamic_cast<R3BCalifaHitData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;

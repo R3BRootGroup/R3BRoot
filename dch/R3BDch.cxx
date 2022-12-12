@@ -280,7 +280,7 @@ void R3BDch::RecordFullMcHit()
         AddFullHit(trackId, mod, layer, cell, pos, lpos, mom, lmom, time, length, eLoss);
 
         // Increment number of DCH Points for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kDCH);
 
         ResetParameters();
@@ -421,7 +421,7 @@ void R3BDch::RecordPartialMcHit()
                fELoss);
 
         // Increment number of DCH Points for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kDCH);
 
         ResetParameters();
@@ -623,7 +623,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         R3BDchFullPoint* oldpoint = NULL;
         for (Int_t i = 0; i < nEntries; i++)
         {
-            oldpoint = (R3BDchFullPoint*)cl1->At(i);
+            oldpoint = dynamic_cast<R3BDchFullPoint*>(cl1->At(i));
             Int_t index = oldpoint->GetTrackID() + offset;
             oldpoint->SetTrackID(index);
             new (clref[fPosIndex]) R3BDchFullPoint(*oldpoint);
@@ -635,7 +635,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         R3BDchPoint* oldpoint = NULL;
         for (Int_t i = 0; i < nEntries; i++)
         {
-            oldpoint = (R3BDchPoint*)cl1->At(i);
+            oldpoint = dynamic_cast<R3BDchPoint*>(cl1->At(i));
             Int_t index = oldpoint->GetTrackID() + offset;
             oldpoint->SetTrackID(index);
             new (clref[fPosIndex]) R3BDchPoint(*oldpoint);

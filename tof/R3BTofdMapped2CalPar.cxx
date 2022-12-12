@@ -81,7 +81,7 @@ InitStatus R3BTofdMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
     if (!fCalPar)
     {
         LOG(ERROR) << "R3BTofdMapped2CalPar::Init() Couldn't get handle on TofdTCalPar. ";

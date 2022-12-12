@@ -92,11 +92,11 @@ void R3BXBallContFact::activateParIo(FairParIo* io)
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BXBallParRootFileIo* p=new R3BXBallParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new R3BXBallParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BXBallParAsciiFileIo* p=new R3BXBallParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new R3BXBallParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

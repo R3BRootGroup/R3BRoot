@@ -38,7 +38,7 @@ void R3BStrawtubesCal2Hit::Exec(Option_t* option)
     Int_t nDets = fCalItems->GetEntriesFast();
     for (Int_t i = 0; i < nDets; i++)
     {
-        auto calItem = (R3BStrawtubesCalData*)fCalItems->At(i);
+        auto calItem = dynamic_cast<R3BStrawtubesCalData*>(fCalItems->At(i));
         if (!calItem)
         {
             continue;

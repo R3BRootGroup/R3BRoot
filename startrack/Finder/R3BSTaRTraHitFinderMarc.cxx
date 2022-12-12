@@ -80,7 +80,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt)
         for (Int_t i = 0; i < traHitsPerEvent; i++)
         {
             traHit[i] = new R3BSTaRTraPoint;
-            traHit[i] = (R3BSTaRTraPoint*)fTrackerHitCA->At(i);
+            traHit[i] = dynamic_cast<R3BSTaRTraPoint*>(fTrackerHitCA->At(i));
             energy = ExpResSmearing(traHit[i]->GetEnergyLoss());
         }
     }

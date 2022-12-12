@@ -80,10 +80,10 @@ void R3BTofDMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
-    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
     R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
 
-    fTcalPar = (R3BTCalPar*)rtdb->getContainer("TofdTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer("TofdTCalPar"));
     if (!fTcalPar)
     {
         R3BLOG(ERROR, "Could not get access to TofdTCalPar-Container.");

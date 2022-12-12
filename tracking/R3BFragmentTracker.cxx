@@ -174,7 +174,7 @@ InitStatus R3BFragmentTracker::ReInit()
 
 void R3BFragmentTracker::SetParContainers()
 {
-    fFieldPar = (R3BFieldPar*)FairRuntimeDb::instance()->getContainer("R3BFieldPar");
+    fFieldPar = dynamic_cast<R3BFieldPar*>(FairRuntimeDb::instance()->getContainer("R3BFieldPar"));
 
     fDetectors->SetParContainers();
 }
@@ -216,7 +216,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
     // fetch start pos, default momentum and charge from the simulation
     // (just for this test!)
-    R3BMCTrack* ion = (R3BMCTrack*)fArrayMCTracks->At(0);
+    R3BMCTrack* ion = dynamic_cast<R3BMCTrack*>(fArrayMCTracks->At(0));
     // Check if primary
     if (ion->GetMotherId() != -1)
     {
@@ -621,7 +621,7 @@ Bool_t R3BFragmentTracker::InitPropagator()
     fFieldPar->printParams();
     if (2 == fFieldPar->GetType())
     {
-        gladField = (R3BGladFieldMap*)fairField;
+        gladField = dynamic_cast<R3BGladFieldMap*>(fairField);
 
         if (fPropagator)
         {

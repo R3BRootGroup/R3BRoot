@@ -132,7 +132,7 @@ InitStatus R3BTofiMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BTofiMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofiTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofiTCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to TofiTCalPar-Container.";

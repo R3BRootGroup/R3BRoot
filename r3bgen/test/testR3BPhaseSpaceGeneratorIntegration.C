@@ -43,7 +43,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
 
     // Database
     auto rtdb = run.GetRuntimeDb();
-    auto fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
+    auto fieldPar = dynamic_cast<R3BFieldPar*>(rtdb->getContainer("R3BFieldPar"));
     fieldPar->SetParameters(magField);
     fieldPar->setChanged();
     auto parOut = new FairParRootFileIo(true);
@@ -68,7 +68,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
         return;
     }
 
-    auto track = (R3BMCTrack*)mctc->At(1);
+    auto track = dynamic_cast<R3BMCTrack*>(mctc->At(1));
     if (track->GetPdgCode() != 2112 || track->GetMotherId() != -1)
     {
         cout << "Not the correct primary particle" << endl;

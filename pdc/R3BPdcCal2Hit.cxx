@@ -103,7 +103,7 @@ InitStatus R3BPdcCal2Hit::Init()
     pdc_trig_map_setup();
 
     /*
-        fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
+        fHitPar = dynamic_cast<R3BPdcHitPar*>(FairRuntimeDb::instance()->getContainer("PdcHitPar"));
         if (!fHitPar)
         {
             LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
@@ -131,10 +131,10 @@ InitStatus R3BPdcCal2Hit::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
     }
 
@@ -156,7 +156,7 @@ InitStatus R3BPdcCal2Hit::Init()
 void R3BPdcCal2Hit::SetParContainers()
 {
     /*
-        fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
+        fHitPar = dynamic_cast<R3BPdcHitPar*>(FairRuntimeDb::instance()->getContainer("PdcHitPar"));
         if (!fHitPar)
         {
             LOG(ERROR) << "Could not get access to PdcHitPar-Container.";

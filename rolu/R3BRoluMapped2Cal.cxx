@@ -92,11 +92,11 @@ InitStatus R3BRoluMapped2Cal::Init()
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(WARNING) << "R3BRoluMapped2Cal::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(INFO) << "R3BRoluMapped2Cal::Init() R3BEventHeader found";
@@ -130,7 +130,7 @@ InitStatus R3BRoluMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BRoluMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
 
     LOG(INFO) << "R3BRoluMapped2Cal::SetParContainers() ROLU TCAL PARAMETERS SET";
 
@@ -166,7 +166,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         Double_t times_ns = 0. / 0.;
         Double_t times_raw_ns = 0. / 0.;
 
-        R3BRoluMappedData* hit = (R3BRoluMappedData*)fMappedItems->At(ihit);
+        R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
@@ -231,7 +231,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BRoluCalData* aCalItem = (R3BRoluCalData*)fCalItems->At(iCal);
+            R3BRoluCalData* aCalItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iCal));
 
             if (aCalItem->GetDetector() != iDet)
             {

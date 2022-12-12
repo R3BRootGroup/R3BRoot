@@ -109,7 +109,7 @@ void R3BRpcDigitizer::Exec(Option_t* option)
     R3BRpcPoint** pointData = NULL;
     pointData = new R3BRpcPoint*[nHits];
     for (Int_t i = 0; i < nHits; i++)
-        pointData[i] = (R3BRpcPoint*)(fRpcPointDataCA->At(i));
+        pointData[i] = dynamic_cast<R3BRpcPoint*>(fRpcPointDataCA->At(i));
 
     Int_t channelId;
     Double_t time;
@@ -129,12 +129,12 @@ void R3BRpcDigitizer::Exec(Option_t* option)
         {
             for (Int_t j = 0; j < nCals; j++)
             {
-                if (((R3BRpcCalData*)(fRpcCalDataCA->At(j)))->GetChannelId() == channelId)
+              if ( (dynamic_cast<R3BRpcCalData*>((fRpcCalDataCA->At(j))))->GetChannelId() == channelId)
                 {
-                    ((R3BRpcCalData*)(fRpcCalDataCA->At(j)))->AddMoreEnergy(energy);
-                    if (((R3BRpcCalData*)(fRpcCalDataCA->At(j)))->GetTime() > time)
+                    dynamic_cast<R3BRpcCalData*>((fRpcCalDataCA->At(j)))->AddMoreEnergy(energy);
+                    if ( (dynamic_cast<R3BRpcCalData*>((fRpcCalDataCA->At(j))))->GetTime() > time)
                     {
-                        ((R3BRpcCalData*)(fRpcCalDataCA->At(j)))->SetTime(time);
+                        dynamic_cast<R3BRpcCalData*>((fRpcCalDataCA->At(j)))->SetTime(time);
                     }
                     existHit = 1; // to avoid the creation of a new Hit
                     break;

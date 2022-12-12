@@ -88,11 +88,11 @@ void R3BLandContFact::activateParIo(FairParIo* io)
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BLandParRootFileIo* p=new R3BLandParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new R3BLandParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BLandParAsciiFileIo* p=new R3BLandParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new R3BLandParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

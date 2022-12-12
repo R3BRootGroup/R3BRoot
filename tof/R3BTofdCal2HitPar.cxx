@@ -153,7 +153,7 @@ InitStatus R3BTofdCal2HitPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
@@ -178,7 +178,7 @@ void R3BTofdCal2HitPar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fCal_Par = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
@@ -205,7 +205,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(fCalItemsLos->At(ihit));
 
             Int_t iDet = calData->GetDetector();
             // Int_t iCha=calData->GetChannel();
@@ -244,7 +244,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalData->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '

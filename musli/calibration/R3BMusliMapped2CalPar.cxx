@@ -78,16 +78,16 @@ void R3BMusliMapped2CalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "R3BMusliMapped2CalPar::SetParContainers(), FairRuntimeDb not found");
 
-    fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
+    fMusliGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("MusliGeoPar"));
     R3BLOG_IF(
         ERROR, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to MusliGeoPar container.");
 
-    fMwAGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetA + "GeoPar");
+    fMwAGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetA + "GeoPar"));
     R3BLOG_IF(ERROR,
               !fMwAGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetA + "GeoPar container.");
 
-    fMwBGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetB + "GeoPar");
+    fMwBGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetB + "GeoPar"));
     R3BLOG_IF(ERROR,
               !fMwBGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetB + "GeoPar container.");
@@ -135,7 +135,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
+    fCal_Par = dynamic_cast<R3BMusliCalPar*>(rtdb->getContainer("musliCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
@@ -183,7 +183,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusliMappedData*)(fMusliMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusliMappedData*>((fMusliMappedDataCA->At(i)));
         UInt_t signal_id = mappedData[i]->GetSignal() - 1; // signal_id is 0-based [0..17]
         if (multMap[signal_id] < fMaxMult)
         {
@@ -203,7 +203,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         return;
     else
     {
-        R3BMwpcHitData* hitDataMwA = (R3BMwpcHitData*)fMwAHitDataCA->At(0);
+        R3BMwpcHitData* hitDataMwA = dynamic_cast<R3BMwpcHitData*>(fMwAHitDataCA->At(0));
         fXA = hitDataMwA->GetX() + fMwAGeo_Par->GetPosX();
     }
 
@@ -213,7 +213,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         return;
     else
     {
-        R3BMwpcHitData* hitDataMwB = (R3BMwpcHitData*)fMwBHitDataCA->At(0);
+        R3BMwpcHitData* hitDataMwB = dynamic_cast<R3BMwpcHitData*>(fMwBHitDataCA->At(0));
         fXB = hitDataMwB->GetX() + fMwBGeo_Par->GetPosX();
     }
 

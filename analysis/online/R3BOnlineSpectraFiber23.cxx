@@ -96,7 +96,7 @@ InitStatus R3BOnlineSpectraFiber23::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
@@ -254,7 +254,7 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
         if (ihita < 100)
         {
             xpos_global = 0. / 0.;
-            R3BFiberMAPMTHitData* hitFi23a = (R3BFiberMAPMTHitData*)detFib23a->At(ihita);
+            R3BFiberMAPMTHitData* hitFi23a = dynamic_cast<R3BFiberMAPMTHitData*>(detFib23a->At(ihita));
             xpos_global = hitFi23a->GetX();
 
             auto detFib23b = fHitItems.at(DET_FI23B);
@@ -262,7 +262,7 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
             for (Int_t ihitb = 0; ihitb < nHitsb; ihitb++) // just first hit
             {
                 ypos_global = 0. / 0.;
-                R3BFiberMAPMTHitData* hitFi23b = (R3BFiberMAPMTHitData*)detFib23b->At(ihitb);
+                R3BFiberMAPMTHitData* hitFi23b = dynamic_cast<R3BFiberMAPMTHitData*>(detFib23b->At(ihitb));
                 ypos_global = hitFi23b->GetY();
                 auto dtime =
                     fmod(hitFi23a->GetTime() - hitFi23b->GetTime() + c_period + c_period / 2, c_period) - c_period / 2;

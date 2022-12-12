@@ -92,7 +92,7 @@ InitStatus R3BAlpideNoisyPixels::Init()
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
-    fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     if (!fMap_Par)
     {
         R3BLOG(FATAL, "Couldn't get handle on alpideMappingPar container");
@@ -114,7 +114,7 @@ void R3BAlpideNoisyPixels::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BAlpideMappedData*)(fAlpideMappedData->At(i));
+        mappedData[i] = dynamic_cast<R3BAlpideMappedData*>((fAlpideMappedData->At(i)));
         auto det = mappedData[i]->GetSensorId() - 1;
         auto col = mappedData[i]->GetCol() - 1;
         auto row = mappedData[i]->GetAds() - 1;

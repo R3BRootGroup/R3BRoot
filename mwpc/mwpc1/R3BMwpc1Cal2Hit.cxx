@@ -75,9 +75,9 @@ InitStatus R3BMwpc1Cal2Hit::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
 
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc1CalData");
     if (!fMwpcCalDataCA)
@@ -169,7 +169,7 @@ void R3BMwpc1Cal2Hit::S467()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
         planeId = calData[i]->GetPlane();
         padId = calData[i]->GetPad() - 1; // From 0 to 63 for X down and up
         q = calData[i]->GetQ();
@@ -253,7 +253,7 @@ void R3BMwpc1Cal2Hit::S455()
         fy[i] = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
         planeId = calData[i]->GetPlane();
         padId = calData[i]->GetPad() - 1;
         q = calData[i]->GetQ();

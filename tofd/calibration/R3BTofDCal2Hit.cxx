@@ -154,10 +154,10 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
 
 void R3BTofDCal2Hit::SetParContainers()
 {
-    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
     R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
 
-    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
+    fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
         R3BLOG(ERROR, "Could not get access to tofdHitPar container");
@@ -190,7 +190,7 @@ InitStatus R3BTofDCal2Hit::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == header, "EventHeader. not found");
 
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
@@ -316,7 +316,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '

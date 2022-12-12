@@ -55,7 +55,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t* option)
     Int_t mapped_num = fMappedItems->GetEntriesFast();
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {
-        R3BStrawtubesMappedData* mapped = (R3BStrawtubesMappedData*)fMappedItems->At(mapped_i);
+        R3BStrawtubesMappedData* mapped = dynamic_cast<R3BStrawtubesMappedData*>(fMappedItems->At(mapped_i));
         if (!mapped)
         {
             LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: NULL mapped item?";
@@ -87,7 +87,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t* option)
         R3BStrawtubesCalData* cal = NULL;
         for (int cal_i = 0; cal_i < fCalItems->GetEntriesFast(); ++cal_i)
         {
-            R3BStrawtubesCalData* cal_test = (R3BStrawtubesCalData*)fCalItems->At(cal_i);
+            R3BStrawtubesCalData* cal_test = dynamic_cast<R3BStrawtubesCalData*>(fCalItems->At(cal_i));
             // We want the same straw.
             if (cal_test->GetPlane() != mapped->GetPlane() || cal_test->GetStraw() != mapped->GetStraw())
             {
@@ -160,7 +160,7 @@ InitStatus R3BStrawtubesMapped2Cal::ReInit()
 
 void R3BStrawtubesMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("StrawtubesTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("StrawtubesTCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "No StrawtubesTCalPar container.";

@@ -168,7 +168,7 @@ void R3BCalifaEventDisplay::Exec(Option_t* opt)
         // Loop in Crystal Hits
         for (Int_t i = 0; i < crystalHits; i++)
         {
-            crystalHit = (R3BCalifaCrystalCalData*)fCrystalHitCA->At(i);
+            crystalHit = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalHitCA->At(i));
             GetAngles(fGeometryVersion, crystalHit->GetCrystalId(), &theta, &phi, &rho);
         }
 

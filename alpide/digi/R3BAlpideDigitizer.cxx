@@ -67,7 +67,7 @@ R3BAlpideDigitizer::~R3BAlpideDigitizer()
 void R3BAlpideDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    fMappingPar = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMappingPar = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(warning, !fMappingPar, "Could not get access to alpideMappingPar");
     R3BLOG_IF(warning, fMappingPar, "Container alpideMappingPar found.");
 }
@@ -124,11 +124,11 @@ void R3BAlpideDigitizer::Exec(Option_t* opt)
     for (Int_t i = 0; i < nHits; i++)
     {
         fRot.SetToIdentity();
-        pointData[i] = (R3BAlpidePoint*)(fAlpidePoints->At(i));
+        pointData[i] = dynamic_cast<R3BAlpidePoint*>((fAlpidePoints->At(i)));
         TrackId = pointData[i]->GetTrackID();
         auto sid = pointData[i]->GetSensorID();
 
-        auto Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        auto Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
 
         // if (PID > 1000080160) // Z=8 and A=16

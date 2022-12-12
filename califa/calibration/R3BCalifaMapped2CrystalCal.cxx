@@ -55,7 +55,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
+    fCal_Par = dynamic_cast<R3BCalifaCrystalCalPar*>(rtdb->getContainer("califaCrystalCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(ERROR, "Couldn't get handle on califaCrystalCalPar container");
@@ -65,7 +65,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
         R3BLOG(INFO, "califaCrystalCalPar container opened");
     }
 
-    fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
+    fTotCal_Par = dynamic_cast<R3BCalifaTotCalPar*>(rtdb->getContainer("CalifaTotCalPar"));
     if (!fTotCal_Par)
     {
         R3BLOG(WARNING, "Couldn't get handle on CalifaTotCalPar container");
@@ -225,7 +225,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BCalifaMappedData*>((fCalifaMappedDataCA->At(i)));
         auto crystalId = mappedData[i]->GetCrystalId();
         auto wrts = mappedData[i]->GetWrts();
         auto ov = mappedData[i]->GetOverFlow();

@@ -106,7 +106,7 @@ void R3BAmsMapped2StripCalPar::SetParContainers()
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
 
-    fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
+    fMap_Par = dynamic_cast<R3BAmsMappingPar*>(rtdb->getContainer("amsMappingPar"));
     if (!fMap_Par)
     {
         LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
@@ -153,7 +153,7 @@ InitStatus R3BAmsMapped2StripCalPar::Init()
         return kFATAL;
     }
 
-    fStrip_Par = (R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
+    fStrip_Par = dynamic_cast<R3BAmsStripCalPar*>(rtdb->getContainer("amsStripCalPar"));
     if (!fStrip_Par)
     {
         LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
@@ -195,7 +195,7 @@ void R3BAmsMapped2StripCalPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        MapHit = (R3BAmsMappedData*)(fAmsMappedDataCA->At(i));
+        MapHit = dynamic_cast<R3BAmsMappedData*>((fAmsMappedDataCA->At(i)));
         detId = MapHit->GetDetectorId();
         stripId = MapHit->GetStripId();
 

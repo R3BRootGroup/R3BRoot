@@ -190,7 +190,7 @@ void R3BEventManagerEditor::SetModel(TObject* obj) { fObject = obj; }
 void R3BEventManagerEditor::DoScaleE()
 {
     if (fScaleE->IsOn())
-        ((R3BEventManager*)fManager)->SetScaleByEnergy(kTRUE);
+        (dynamic_cast<R3BEventManager*>(fManager)->SetScaleByEnergy(kTRUE));
     else
-        ((R3BEventManager*)fManager)->SetScaleByEnergy(kFALSE);
+        (dynamic_cast<R3BEventManager*>(fManager)->SetScaleByEnergy(kFALSE));
 }

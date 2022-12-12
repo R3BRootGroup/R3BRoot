@@ -103,7 +103,7 @@ void R3BTrackingDetector::CopyHits()
     hits.clear();
     for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
     {
-        R3BHit* hit = (R3BHit*)fArrayHits->At(i);
+        R3BHit* hit = dynamic_cast<R3BHit*>(fArrayHits->At(i));
         hit->SetHitId(i);
         hits.push_back(hit);
     }
@@ -178,7 +178,7 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
 void R3BTrackingDetector::SetParContainers()
 {
     // fetch geometry and position of detector
-    fGeo = (R3BTGeoPar*)FairRuntimeDb::instance()->getContainer(fGeoParName);
+    fGeo = dynamic_cast<R3BTGeoPar*>(FairRuntimeDb::instance()->getContainer(fGeoParName));
 }
 
 void R3BTrackingDetector::Draw(Option_t*)

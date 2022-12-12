@@ -138,7 +138,7 @@ Bool_t R3BMusic::ProcessHits(FairVolume* vol)
                      fELoss);
 
             // Increment number of MusicPoints for this track
-            R3BStack* stack = (R3BStack*)gMC->GetStack();
+            R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
             stack->AddPoint(kMUSIC);
 
             ResetParameters();
@@ -197,7 +197,7 @@ void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BMusicPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BMusicPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BMusicPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BMusicPoint(*oldpoint);

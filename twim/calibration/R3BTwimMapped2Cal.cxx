@@ -83,7 +83,7 @@ void R3BTwimMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
+    fCal_Par = dynamic_cast<R3BTwimCalPar*>(rtdb->getContainer("twimCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(ERROR, "Couldn't get handle on twimCalPar container");
@@ -158,9 +158,9 @@ InitStatus R3BTwimMapped2Cal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
@@ -225,7 +225,7 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BTwimMappedData*)(fTwimMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BTwimMappedData*>((fTwimMappedDataCA->At(i)));
         secId = mappedData[i]->GetSecID() - 1;
         anodeId = mappedData[i]->GetAnodeID() - 1;
 

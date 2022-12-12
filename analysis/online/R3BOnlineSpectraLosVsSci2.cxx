@@ -124,9 +124,9 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
 
@@ -635,7 +635,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
         Int_t nHits = fHitItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            R3BMusicHitData* hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
             if (!hit)
                 continue;
             Zmusic = hit->GetZcharge();
@@ -734,7 +734,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
         Int_t nHitsSamp = det->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHitsSamp; ihit++)
         {
-            auto hit = (R3BSamplerMappedData*)det->At(ihit);
+            auto hit = dynamic_cast<R3BSamplerMappedData*>(det->At(ihit));
             // time is in steps of 10 ns
             // is is a 34 bit number, so max 1073741823
             samplerCurr = hit->GetTime();
@@ -850,7 +850,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -877,7 +877,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;

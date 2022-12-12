@@ -90,7 +90,7 @@ void R3BTwimCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BTwimHitPar*)rtdb->getContainer("twimHitPar");
+    fCal_Par = dynamic_cast<R3BTwimHitPar*>(rtdb->getContainer("twimHitPar"));
     if (!fCal_Par)
     {
         R3BLOG(ERROR, "Couldn't get handle on twimHitPar container");
@@ -216,9 +216,9 @@ InitStatus R3BTwimCal2Hit::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
@@ -371,7 +371,7 @@ void R3BTwimCal2Hit::S4551()
 
         for (Int_t i = 0; i < nHitTofW; i++)
         {
-            HitTofW[i] = (R3BSofTofWHitData*)(fHitItemsTofW->At(i));
+            HitTofW[i] = dynamic_cast<R3BSofTofWHitData*>((fHitItemsTofW->At(i)));
             if (i == 0)
             {
                 postof[0].SetXYZ(HitTofW[i]->GetPaddle(), HitTofW[i]->GetY(), HitTofW[i]->GetTof());
@@ -457,7 +457,7 @@ void R3BTwimCal2Hit::S4551()
 
         for (Int_t i = 0; i < nHitTwim; i++)
         {
-            CalDat[i] = (R3BTwimCalData*)(fTwimCalDataCA->At(i));
+            CalDat[i] = dynamic_cast<R3BTwimCalData*>((fTwimCalDataCA->At(i)));
             secId = CalDat[i]->GetSecID() - 1;
             anodeId = CalDat[i]->GetAnodeID() - 1;
             if (energyperanode[secId][anodeId] == 0)
@@ -584,7 +584,7 @@ void R3BTwimCal2Hit::S455()
     // std::cout<<"Event " <<std::endl;
     for (Int_t i = 0; i < nHits; i++)
     {
-        CalDat[i] = (R3BTwimCalData*)(fTwimCalDataCA->At(i));
+        CalDat[i] = dynamic_cast<R3BTwimCalData*>((fTwimCalDataCA->At(i)));
         secId = CalDat[i]->GetSecID() - 1;
         anodeId = CalDat[i]->GetAnodeID() - 1;
         if (energyperanode[secId][anodeId] == 0)
@@ -604,7 +604,7 @@ void R3BTwimCal2Hit::S455()
         nHits = fHitItemsTofW->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSofTofWHitData* hit = (R3BSofTofWHitData*)fHitItemsTofW->At(ihit);
+            R3BSofTofWHitData* hit = dynamic_cast<R3BSofTofWHitData*>(fHitItemsTofW->At(ihit));
             if (!hit)
                 continue;
             if (padid[0] == 0)
@@ -750,7 +750,7 @@ void R3BTwimCal2Hit::S467()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        CalDat[i] = (R3BTwimCalData*)(fTwimCalDataCA->At(i));
+        CalDat[i] = dynamic_cast<R3BTwimCalData*>((fTwimCalDataCA->At(i)));
         secId = CalDat[i]->GetSecID() - 1;
         anodeId = CalDat[i]->GetAnodeID() - 1;
         energyperanode[secId][anodeId] = CalDat[i]->GetEnergy();

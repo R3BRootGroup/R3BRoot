@@ -113,7 +113,7 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
         planeId = calData[i]->GetPlane();
         padId = calData[i]->GetPad() - 1;
         q = calData[i]->GetQ();

@@ -278,7 +278,7 @@ void R3BLosCal2Hit::SetParContainers()
     {
         LOG(ERROR) << "FairRuntimeDb not opened!";
     }
-    fLosHit_Par = (R3BLosHitPar*)rtdb->getContainer("LosHitPar");
+    fLosHit_Par = dynamic_cast<R3BLosHitPar*>(rtdb->getContainer("LosHitPar"));
     if (!fLosHit_Par)
     {
         LOG(ERROR) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
@@ -308,9 +308,9 @@ InitStatus R3BLosCal2Hit::Init()
     if (NULL == mgr)
         LOG(ERROR) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
@@ -508,7 +508,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 
-        auto calItem = (R3BLosCalData*)(fCalItems->At(ihit));
+        auto calItem = dynamic_cast<R3BLosCalData*>((fCalItems->At(ihit)));
 
         nDet = calItem->GetDetector();
 

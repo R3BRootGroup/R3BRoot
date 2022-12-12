@@ -78,7 +78,7 @@ InitStatus R3BPtofMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("PtofTCalPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BPtofMapped2CalPar::Init() Couldn't get handle on PtofTCalPar. ";
@@ -101,7 +101,7 @@ void R3BPtofMapped2CalPar::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 
-        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(i);
+        R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fMapped->At(i));
         if (!hit)
             continue; // should not happen
 

@@ -78,7 +78,7 @@ InitStatus R3BTofDMapped2CalPar::Init()
         fMappedTrigger = NULL;
     }
 
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
     if (!fCalPar)
     {
         R3BLOG(ERROR, "Couldn't get handle on TofdTCalPar. ");

@@ -58,7 +58,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         throw std::runtime_error("R3BNeulandOnlineSpectra: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("EventHeader."));
     if (fEventHeader == nullptr)
       {
         throw std::runtime_error("R3BNeulandOnlineSpectra: No R3BEventHeader");

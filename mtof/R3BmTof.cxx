@@ -85,7 +85,7 @@ void R3BmTof::Initialize()
     LOG(INFO) << "R3BmTof: initialisation";
     LOG(DEBUG) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog");
 
-    fTGeoPar = (R3BTGeoPar*)FairRuntimeDb::instance()->getContainer("mTofGeoPar");
+    fTGeoPar = dynamic_cast<R3BTGeoPar*>(FairRuntimeDb::instance()->getContainer("mTofGeoPar"));
 
     // Position and rotation
     TGeoNode* main_vol = gGeoManager->GetTopVolume()->FindNode("mTOF_0");
@@ -225,7 +225,7 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of mTofPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kMTOF);
 
         ResetParameters();
@@ -309,7 +309,7 @@ void R3BmTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BmTofPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BmTofPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BmTofPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BmTofPoint(*oldpoint);

@@ -213,7 +213,7 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of Fi4Points for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kFI4);
 
         ResetParameters();

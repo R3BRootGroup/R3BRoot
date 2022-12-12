@@ -101,11 +101,11 @@ void ELILuMonContFact::activateParIo(FairParIo* io)
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      ELILuMonParRootFileIo* p=new ELILuMonParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      auto p=new ELILuMonParRootFileIo(dynamic_cast<FairParRootFileIo*>(io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      ELILuMonParAsciiFileIo* p=new ELILuMonParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      auto p=new ELILuMonParAsciiFileIo(dynamic_cast<FairParAsciiFileIo*>(io)->getFile());
       io->setDetParIo(p);
       }
     */

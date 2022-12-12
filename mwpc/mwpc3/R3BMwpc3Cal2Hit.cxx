@@ -85,9 +85,9 @@ InitStatus R3BMwpc3Cal2Hit::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
 
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc3CalData");
     if (!fMwpcCalDataCA)
@@ -173,7 +173,7 @@ void R3BMwpc3Cal2Hit::S467()
 
         for (Int_t i = 0; i < nHits; i++)
         {
-            calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+            calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
             planeId = calData[i]->GetPlane();
             padId = calData[i]->GetPad() - 1;
             q = calData[i]->GetQ();
@@ -267,7 +267,7 @@ void R3BMwpc3Cal2Hit::S455()
             fy[i] = 0;
         for (Int_t i = 0; i < nHits; i++)
         {
-            calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+            calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
             planeId = calData[i]->GetPlane();
             padId = calData[i]->GetPad() - 1;
             q = calData[i]->GetQ();
@@ -454,7 +454,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     twY.clear();
     for (Int_t i = 0; i < twHits; i++)
     {
-        twHitData[i] = (R3BSofTofWHitData*)(fTofWallHitDataCA->At(i));
+        twHitData[i] = dynamic_cast<R3BSofTofWHitData*>((fTofWallHitDataCA->At(i)));
         twX.push_back(twHitData[i]->GetX());
         twY.push_back(twHitData[i]->GetY());
     }
@@ -485,7 +485,7 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMwpcCalData*>((fMwpcCalDataCA->At(i)));
         planeId = calData[i]->GetPlane();
         padId = calData[i]->GetPad() - 1;
         q = calData[i]->GetQ();

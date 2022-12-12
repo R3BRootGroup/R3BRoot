@@ -66,7 +66,7 @@ void R3BCalifaCrystalCalPar::putParams(FairParamList* list)
         ss << i;
         TString du_id(ss.str());
         TArrayD values(8);
-        R3BCalifaDUCalPar* dupar = (R3BCalifaDUCalPar*)fDUCalParams->At(i);
+        R3BCalifaDUCalPar* dupar = dynamic_cast<R3BCalifaDUCalPar*>(fDUCalParams->At(i));
         values[0] = dupar->GetGammaCal_offset();
         values[1] = dupar->GetGammaCal_gain();
         values[2] = dupar->GetToTCal_par0();
@@ -188,7 +188,7 @@ void R3BCalifaCrystalCalPar::fill(UInt_t rid)
     cout << "-I- R3BCalifaCrystalCalPar numOfRow " << numTCh << endl;
     for (int i = 0; i <= numTCh; ++i)
     {
-        R3BCalifaDUCalPar* tcal_par = (R3BCalifaDUCalPar*)r_tpar->GetRow(i);
+        R3BCalifaDUCalPar* tcal_par = dynamic_cast<R3BCalifaDUCalPar*>(r_tpar->GetRow(i));
         if (!tcal_par)
         {
             continue;
@@ -215,7 +215,7 @@ void R3BCalifaCrystalCalPar::store(UInt_t rid)
         // TCal Objects
         for (Int_t i = 0; i < nParams; i++)
         {
-            R3BCalifaDUCalPar* t_par = (R3BCalifaDUCalPar*)fDUCalParams->At(i);
+            R3BCalifaDUCalPar* t_par = dynamic_cast<R3BCalifaDUCalPar*>(fDUCalParams->At(i));
             if (t_par)
                 *cW << *t_par;
         }
@@ -239,7 +239,7 @@ void R3BCalifaCrystalCalPar::Print()
     std::cout << " Number of DUCal Parameters " << fDUCalParams->GetEntries() << std::endl;
     for (Int_t i = 0; i < fDUCalParams->GetEntries(); i++)
     {
-        R3BCalifaDUCalPar* du_par = (R3BCalifaDUCalPar*)fDUCalParams->At(i);
+        R3BCalifaDUCalPar* du_par = dynamic_cast<R3BCalifaDUCalPar*>(fDUCalParams->At(i));
         cout << "----------------------------------------------------------------------" << endl;
         if (du_par)
             du_par->Print();

@@ -122,7 +122,7 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     R3BCalifaPoint** pointData = NULL;
     pointData = new R3BCalifaPoint*[nHits];
     for (Int_t i = 0; i < nHits; i++)
-        pointData[i] = (R3BCalifaPoint*)(fCalifaPointDataCA->At(i));
+        pointData[i] = dynamic_cast<R3BCalifaPoint*>((fCalifaPointDataCA->At(i)));
 
     Int_t crystalId;
     Double_t Nf;
@@ -146,14 +146,15 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
         {
             for (Int_t j = 0; j < nCrystalCals; j++)
             {
-                if (((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->GetCrystalId() == crystalId)
+              auto cccd=dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j));
+                if (cccd->GetCrystalId() == crystalId)
                 {
-                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->AddMoreEnergy(NUSmearing(energy));
-                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->AddMoreNf(Nf);
-                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->AddMoreNs(Ns);
-                    if (((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->GetTime() > time)
+                    cccd->AddMoreEnergy(NUSmearing(energy));
+                    cccd->AddMoreNf(Nf);
+                    cccd->AddMoreNs(Ns);
+                    if (cccd->GetTime() > time)
                     {
-                        ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(j)))->SetTime(time);
+                        cccd->SetTime(time);
                     }
                     existHit = 1; // to avoid the creation of a new CrystalHit
 
@@ -182,12 +183,12 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     for (Int_t i = 0; i < nCrystalCals; i++)
     {
 
-        tempCryID = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetCrystalId();
+        tempCryID = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetCrystalId();
 
         if (!fRealConfig)
         {
 
-            temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetEnergy();
+            temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetEnergy();
             if (temp < fThreshold)
             {
                 fCalifaCryCalDataCA->RemoveAt(i);
@@ -198,13 +199,13 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
             }
 
             if (fResolution > 0)
-                ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp));
+                (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetEnergy(ExpResSmearing(temp));
             if (fComponentRes > 0)
             {
-                temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNf();
-                ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNf(CompSmearing(temp));
-                temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNs();
-                ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
+                temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetNf();
+                (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetNf(CompSmearing(temp));
+                temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetNs();
+                (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetNs(CompSmearing(temp));
             }
         }
 
@@ -213,7 +214,7 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
         else
         {
 
-            temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetEnergy();
+            temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetEnergy();
 
             inUse = fSim_Par->GetInUse(tempCryID - 1);
             fResolution = fSim_Par->GetResolution(tempCryID - 1);
@@ -222,14 +223,14 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
             if (inUse && parThres < temp * 1000000)
             { // Thresholds are in KeV!!
 
-                ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp));
+                (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetEnergy(ExpResSmearing(temp));
 
                 if (fComponentRes > 0)
                 {
-                    temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNf();
-                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNf(CompSmearing(temp));
-                    temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNs();
-                    ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
+                    temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetNf();
+                    (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetNf(CompSmearing(temp));
+                    temp = (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->GetNs();
+                    (dynamic_cast<R3BCalifaCrystalCalData*>((fCalifaCryCalDataCA->At(i))))->SetNs(CompSmearing(temp));
                 }
             }
 

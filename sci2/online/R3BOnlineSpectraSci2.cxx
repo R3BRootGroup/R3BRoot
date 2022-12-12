@@ -65,9 +65,9 @@ InitStatus R3BOnlineSpectraSci2::Init()
     if (NULL == mgr)
         LOG(FATAL) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
 
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);

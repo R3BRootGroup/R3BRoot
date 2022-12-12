@@ -104,7 +104,7 @@ void R3BTofDDigitizer::Exec(Option_t* opt)
 
     for (Int_t entry = 0; entry < n_entries; entry++)
     {
-        auto data_element = (R3BTofdPoint*)fTofdPoints->At(entry);
+        auto data_element = dynamic_cast<R3BTofdPoint*>(fTofdPoints->At(entry));
         Int_t planeID = data_element->GetPlane() - 1;
         Int_t paddleID = data_element->GetPaddle() - 1;
         Double_t energy_loss = data_element->GetEnergyLoss();

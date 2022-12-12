@@ -97,7 +97,7 @@ InitStatus R3BPdcMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BPdcMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("PdcTCalPar"));
     if (!fTcalPar)
     {
         LOG(ERROR) << "Could not get access to PdcTCalPar-Container.";
@@ -117,7 +117,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
     LOG(DEBUG) << "R3BPdcMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BPdcMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BPdcMappedData*>(fMappedItems->At(i));
         assert(mapped);
 
         auto wire = mapped->GetWireId();

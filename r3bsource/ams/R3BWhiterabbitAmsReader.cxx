@@ -59,11 +59,11 @@ Bool_t R3BWhiterabbitAmsReader::Init(ext_data_struct_info* a_struct_info)
 
     // Look for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         LOG(WARNING) << "R3BWhiterabbitAmsReader::Init() EventHeader. not found";
-        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
     }
     else
         LOG(INFO) << "R3BWhiterabbitAmsReader::Init() R3BEventHeader found";

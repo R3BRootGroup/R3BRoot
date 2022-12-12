@@ -182,7 +182,7 @@ void R3BFieldPar::SetParameters(FairField* field)
 
     if (fType == 0)
     { // constant field
-        R3BFieldConst* fieldConst = (R3BFieldConst*)field;
+        R3BFieldConst* fieldConst = dynamic_cast<R3BFieldConst*>(field);
         fBx = fieldConst->GetBx();
         fBy = fieldConst->GetBy();
         fBz = fieldConst->GetBz();
@@ -200,21 +200,20 @@ void R3BFieldPar::SetParameters(FairField* field)
     else if (fType >= 1 && fType <= kMaxFieldMapType)
     { // field map
         // to be implemented for the  case of R3B
-        R3BFieldMap* fieldMap = (R3BFieldMap*)field;
         fBx = fBy = fBz = 0.;
         fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
 
         fMapName = field->GetName();
-        fScale = fieldMap->GetScale();
-
+        fScale=NAN;
         if (1 == fType)
         {
-            R3BAladinFieldMap* aladinFieldMap = (R3BAladinFieldMap*)field;
+            R3BAladinFieldMap* aladinFieldMap = dynamic_cast<R3BAladinFieldMap*>(field);
             fCurrent = aladinFieldMap->GetCurrent();
+            fScale = aladinFieldMap->GetScale();
         }
         else if (2 == fType)//proper GLAD field
         {
-            R3BGladFieldMap* gladFieldMap = (R3BGladFieldMap*)field;
+            R3BGladFieldMap* gladFieldMap = dynamic_cast<R3BGladFieldMap*>(field);
             fMapFileName = gladFieldMap->GetFileName();
             fPosX   = gladFieldMap->GetPositionX();
             fPosY   = gladFieldMap->GetPositionY();
@@ -228,6 +227,7 @@ void R3BFieldPar::SetParameters(FairField* field)
             fYmax   = gladFieldMap->GetYmax();
             fZmin   = gladFieldMap->GetZmin();
             fZmax   = gladFieldMap->GetZmax();
+            fScale =  gladFieldMap->GetScale();
         }
     }
 

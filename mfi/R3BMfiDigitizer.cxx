@@ -106,7 +106,7 @@ void R3BMfiDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fMfiDigiPar = (R3BMfiDigiPar*)(rtdb->getContainer("R3BMfiDigiPar"));
+    fMfiDigiPar = dynamic_cast<R3BMfiDigiPar*>((rtdb->getContainer("R3BMfiDigiPar")));
 
     if (fMfiDigiPar)
     {
@@ -168,7 +168,7 @@ void R3BMfiDigitizer::Exec(Option_t* opt)
     {
         //   cout<<"entries "<<l<<endl;
 
-        R3BMfiPoint* Mfi_obj = (R3BMfiPoint*)fMfiPoints->At(l);
+        R3BMfiPoint* Mfi_obj = dynamic_cast<R3BMfiPoint*>(fMfiPoints->At(l));
 
         //     Int_t DetID = Mfi_obj->GetDetectorID();
         Double_t fX_In = Mfi_obj->GetXIn();
@@ -176,7 +176,7 @@ void R3BMfiDigitizer::Exec(Option_t* opt)
         Double_t fZ_In = Mfi_obj->GetZIn();
         Double_t fZ_Out = Mfi_obj->GetZOut();
         TrackIdMfi = Mfi_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fMfiMCTrack->At(TrackIdMfi);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fMfiMCTrack->At(TrackIdMfi));
         Int_t PID = aTrack->GetPdgCode();
         //     Int_t mother = aTrack->GetMotherId();
 

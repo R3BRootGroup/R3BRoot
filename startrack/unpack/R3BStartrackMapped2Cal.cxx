@@ -84,7 +84,7 @@ InitStatus R3BStartrackMapped2Cal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
     fMappedItemsCA = (TClonesArray*)mgr->GetObject("StartrackMapped"); // = branch name in TTree
@@ -202,7 +202,7 @@ void R3BStartrackMapped2Cal::Exec(Option_t* option)
         //    for (Int_t ihit = 0; ihit < 2; ihit++)
         for (Int_t ihit = 0; ihit < nRawHits; ihit++)
         {
-            R3BStartrackMappedData* hit = (R3BStartrackMappedData*)fMappedItemsCA->At(ihit);
+            R3BStartrackMappedData* hit = dynamic_cast<R3BStartrackMappedData*>(fMappedItemsCA->At(ihit));
             if (!hit)
                 continue;
 
@@ -252,7 +252,7 @@ void R3BStartrackMapped2Cal::Exec(Option_t* option)
                 for (Int_t j = 0; j < n_loop; j++)
                 { // transport sorted data to output_tree
 
-                    R3BStartrackMappedData* newhit = (R3BStartrackMappedData*)fMappedItemsCA->At(index_hit_temp.at(j));
+                    R3BStartrackMappedData* newhit = dynamic_cast<R3BStartrackMappedData*>(fMappedItemsCA->At(index_hit_temp.at(j)));
 
                     my_new_ts = (ts_temp.at(j));        // in nanosec
                     my_new_ts_ext = newhit->GetTSExt(); // in nanosec

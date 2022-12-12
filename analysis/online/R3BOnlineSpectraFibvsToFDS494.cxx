@@ -174,11 +174,11 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
         LOG(fatal) << "FairRootManager not found";
 
     // Look for the R3BEventHeader
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(WARNING) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(INFO) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. found";
@@ -852,7 +852,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
         // ***********************************************
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+            R3BTofdHitData* hitTofd = dynamic_cast<R3BTofdHitData*>(detTofd->At(ihit));
 
             if (IS_NAN(hitTofd->GetTime()))
                 continue;
@@ -951,7 +951,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
                             for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
                             {
-                                R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                                R3BRoluHitData* hitRolu = dynamic_cast<R3BRoluHitData*>(detHitRolu->At(ihitRolu));
                                 Int_t iDetRolu = hitRolu->GetDetector();
                                 Int_t iCha = hitRolu->GetChannel();
                                 Double_t timeRolu = hitRolu->GetTime();
@@ -987,7 +987,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
                 {
                     det = tofi;
-                    R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
+                    R3BTofiHitData* hitTofi = dynamic_cast<R3BTofiHitData*>(detHitTofi->At(ihitTofi));
                     randx = (std::rand() / (float)RAND_MAX) - 0.5;
                     x1[det] = hitTofi->GetX() + 0.5 * randx; // cm
                     y1[det] = hitTofi->GetY();               // cm
@@ -1031,7 +1031,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
             {
                 det = fi33;
-                R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
+                R3BFiberMAPMTHitData* hit33 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit33->At(ihit33));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit33->GetX() + 0.1 * randx; // cm
                 y1[det] = hit33->GetY();               // cm
@@ -1083,7 +1083,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
             {
                 det = fi31;
-                R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
+                R3BFiberMAPMTHitData* hit31 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit31->At(ihit31));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit31->GetX() + 0.1 * randx; // cm
                 y1[det] = hit31->GetY();
@@ -1133,7 +1133,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
             {
                 det = fi30;
-                R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
+                R3BFiberMAPMTHitData* hit30 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit30->At(ihit30));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit30->GetX() + 0.1 * randx; // cm
                 y1[det] = hit30->GetY();
@@ -1183,7 +1183,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
             {
                 det = fi32;
-                R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
+                R3BFiberMAPMTHitData* hit32 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit32->At(ihit32));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit32->GetX() + 0.1 * randx; // cm
                 y1[det] = hit32->GetY();
@@ -1233,7 +1233,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
             {
                 det = fi23a;
-                R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                R3BFiberMAPMTHitData* hit23a = dynamic_cast<R3BFiberMAPMTHitData*>(detHit23a->At(ihit23a));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit23a->GetX() + 0.028 * randx; // cm
                 y1[det] = hit23a->GetY();
@@ -1283,7 +1283,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
             {
                 det = fi23b;
-                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                R3BFiberMAPMTHitData* hit23b = dynamic_cast<R3BFiberMAPMTHitData*>(detHit23b->At(ihit23b));
                 randx = (std::rand() / (float)RAND_MAX) - 0.5;
                 x1[det] = hit23b->GetX() + 0.028 * randx; // cm
                 y1[det] = hit23b->GetY();
@@ -1334,7 +1334,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 LOG(DEBUG) << "Rolu hits: " << nHitsRolu << endl;
                 for (Int_t ihitRolu = 0; ihitRolu < nHitsRolu; ihitRolu++)
                 {
-                    R3BRoluHitData* hitRolu = (R3BRoluHitData*)detHitRolu->At(ihitRolu);
+                    R3BRoluHitData* hitRolu = dynamic_cast<R3BRoluHitData*>(detHitRolu->At(ihitRolu));
                     Int_t iDetRolu = hitRolu->GetDetector();
                     Int_t iCha = hitRolu->GetChannel();
                     Double_t timeRolu = hitRolu->GetTime();
@@ -1360,7 +1360,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+            R3BTofdHitData* hitTofd = dynamic_cast<R3BTofdHitData*>(detTofd->At(ihit));
 
             if (IS_NAN(hitTofd->GetTime()))
                 continue;
@@ -1418,7 +1418,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
                 for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
                 {
                     det = tofi;
-                    R3BTofiHitData* hitTofi = (R3BTofiHitData*)detHitTofi->At(ihitTofi);
+                    R3BTofiHitData* hitTofi = dynamic_cast<R3BTofiHitData*>(detHitTofi->At(ihitTofi));
                     x1[det] = hitTofi->GetX(); // cm
                     y1[det] = hitTofi->GetY(); // cm
                     z1[det] = 0.;
@@ -1459,7 +1459,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
             {
                 det = fi33;
-                R3BFiberMAPMTHitData* hit33 = (R3BFiberMAPMTHitData*)detHit33->At(ihit33);
+                R3BFiberMAPMTHitData* hit33 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit33->At(ihit33));
                 x1[det] = hit33->GetX(); // cm
                 y1[det] = hit33->GetY(); // cm
                 q1[det] = hit33->GetEloss();
@@ -1500,7 +1500,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
             {
                 det = fi31;
-                R3BFiberMAPMTHitData* hit31 = (R3BFiberMAPMTHitData*)detHit31->At(ihit31);
+                R3BFiberMAPMTHitData* hit31 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit31->At(ihit31));
                 x1[det] = hit31->GetX(); // cm
                 y1[det] = hit31->GetY(); // cm
                 q1[det] = hit31->GetEloss();
@@ -1541,7 +1541,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
             {
                 det = fi30;
-                R3BFiberMAPMTHitData* hit30 = (R3BFiberMAPMTHitData*)detHit30->At(ihit30);
+                R3BFiberMAPMTHitData* hit30 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit30->At(ihit30));
                 x1[det] = hit30->GetX(); // cm
                 y1[det] = hit30->GetY(); // cm
                 q1[det] = hit30->GetEloss();
@@ -1582,7 +1582,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
             {
                 det = fi32;
-                R3BFiberMAPMTHitData* hit32 = (R3BFiberMAPMTHitData*)detHit32->At(ihit32);
+                R3BFiberMAPMTHitData* hit32 = dynamic_cast<R3BFiberMAPMTHitData*>(detHit32->At(ihit32));
                 x1[det] = hit32->GetX(); // cm
                 y1[det] = hit32->GetY(); // cm
                 q1[det] = hit32->GetEloss();
@@ -1623,7 +1623,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
             {
                 det = fi23a;
-                R3BFiberMAPMTHitData* hit23a = (R3BFiberMAPMTHitData*)detHit23a->At(ihit23a);
+                R3BFiberMAPMTHitData* hit23a = dynamic_cast<R3BFiberMAPMTHitData*>(detHit23a->At(ihit23a));
                 x1[det] = hit23a->GetX(); // cm
                 y1[det] = hit23a->GetY(); // cm
                 q1[det] = hit23a->GetEloss();
@@ -1664,7 +1664,7 @@ void R3BOnlineSpectraFibvsToFDS494::Exec(Option_t* option)
             for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
             {
                 det = fi23b;
-                R3BFiberMAPMTHitData* hit23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
+                R3BFiberMAPMTHitData* hit23b = dynamic_cast<R3BFiberMAPMTHitData*>(detHit23b->At(ihit23b));
                 x1[det] = hit23b->GetX(); // cm
                 y1[det] = hit23b->GetY(); // cm
                 q1[det] = hit23b->GetEloss();

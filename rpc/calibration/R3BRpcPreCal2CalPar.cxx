@@ -79,7 +79,7 @@ std::cout << "hre" << std::endl;
         return kFATAL;
     }
 
-    fTotCalPar = (R3BRpcTotCalPar*)rtdbPar->getContainer("RpcTotCalPar");
+    fTotCalPar = dynamic_cast<R3BRpcTotCalPar*>(rtdbPar->getContainer("RpcTotCalPar"));
     if (!fTotCalPar)
     {
         LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
@@ -103,7 +103,7 @@ void R3BRpcPreCal2CalPar::Exec(Option_t* opt)
  UInt_t iDetector = 0;
  for (Int_t i = 0; i < nHits; i++)
  {
-  auto map1 = (R3BRpcPreCalData*)(fPreCalDataCA->At(i));
+  auto map1 = dynamic_cast<R3BRpcPreCalData*>((fPreCalDataCA->At(i)));
   
   UInt_t inum = (iDetector * 41 + map1->GetChannelId())*2 + map1->GetSide() -2 ;
   if(map1->GetDetId() == 0){

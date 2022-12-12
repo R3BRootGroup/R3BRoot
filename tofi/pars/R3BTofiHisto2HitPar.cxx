@@ -121,7 +121,7 @@ InitStatus R3BTofiHisto2HitPar::Init()
     {
         return kFATAL;
     }
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
     fCalData = (TClonesArray*)rm->GetObject("TofiCal");
     if (!fCalData)
@@ -150,7 +150,7 @@ void R3BTofiHisto2HitPar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer("TofiHitPar"));
     if (!fCal_Par)
     {
         LOG(ERROR) << "R3BTofiHisto2HitPar::Init() Couldn't get handle on TofiHitPar. ";

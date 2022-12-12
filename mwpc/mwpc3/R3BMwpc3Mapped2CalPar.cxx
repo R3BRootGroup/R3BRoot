@@ -130,7 +130,7 @@ void R3BMwpc3Mapped2CalPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        MapHit = (R3BMwpcMappedData*)(fMwpcMappedDataCA->At(i));
+        MapHit = dynamic_cast<R3BMwpcMappedData*>((fMwpcMappedDataCA->At(i)));
         planeid = MapHit->GetPlane();
         padid = MapHit->GetPad() - 1;
 
