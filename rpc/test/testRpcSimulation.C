@@ -50,7 +50,7 @@ void testRpcSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: RPC
-    // FIXME: run->AddModule(new R3BTwim("tof_rpc_v22.geo.root", { 0., 0., 60. }));
+    run->AddModule(new R3BTwim("tof_rpc_v22.geo.root", { 0., 0., 60. }));
 
     // Init
     run->Init();

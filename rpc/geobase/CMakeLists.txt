@@ -11,13 +11,13 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
-message(STATUS "Starting to generate the standard root geometry for the Twin-Music")
-execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
-message(STATUS "${BYellow}Twin-Music standard root geometry has been created${CR} ")
-else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
-message(STATUS "${BYellow}Twin-Music standard root geometry already created${CR} ")
-endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/tof_rpc_v22.geo.root")
+message(STATUS "Starting to generate the standard root geometry for the RPC")
+execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/rpc/geobase/create_rpc_geo.C)
+message(STATUS "${BYellow}RPC standard root geometry has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/tof_rpc_v22.geo.root")
+message(STATUS "${BYellow}RPC standard root geometry already created${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/tof_rpc_v22.geo.root")
 
 enable_testing()
 
@@ -31,7 +31,7 @@ include_directories(
     ${SYSTEM_INCLUDE_DIRECTORIES}
     ${BASE_INCLUDE_DIRECTORIES}
     ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/twim/geobase
+    ${R3BROOT_SOURCE_DIR}/rpc/geobase
     )
 
 link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
@@ -41,14 +41,14 @@ set(TEST_DEPENDENCIES
     ${GTEST_BOTH_LIBRARIES}
     ${ROOT_LIBRARIES}
     FairTools
-    R3BTwim
+    R3BRpc
     ParBase
     GeoBase)
 
 endif(GTEST_FOUND)
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
-add_test(TwimRootGeometry ${R3BROOT_BINARY_DIR}/twim/geobase/create_twin_geo.sh)
-set_tests_properties(TwimRootGeometry PROPERTIES TIMEOUT "2000")
-set_tests_properties(TwimRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/rpc/geobase/create_rpc_geo.C)
+add_test(RpcRootGeometry ${R3BROOT_BINARY_DIR}/rpc/geobase/create_rpc_geo.sh)
+set_tests_properties(RpcRootGeometry PROPERTIES TIMEOUT "2000")
+set_tests_properties(RpcRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
