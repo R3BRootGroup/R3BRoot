@@ -6,7 +6,7 @@
   "contIntegration": "https://github.com/R3BRootGroup/R3BRoot/actions",
   "dateCreated": "2009-04-14",
   "datePublished": "2009-08-01",
-  "dateModified": "2021-05-12",
+  "dateModified": "2022-12-14",
   "downloadUrl": "https://github.com/R3BRootGroup/R3BRoot/archive/refs/tags/may21.tar.gz",
   "issueTracker": "https://github.com/R3BRootGroup/R3BRoot/issues",
   "name": "R3BRoot",
@@ -66,7 +66,7 @@
     {
       "@type": "Person",
       "givenName": "Jose Luis",
-      "familyName": "Rodriguez"
+      "familyName": "Rodriguez Sanchez"
     },
     {
       "@type": "Person",
@@ -97,7 +97,12 @@
     },
     {
       "@type": "Person",
-      "givenName": "Eli",
+      "givenName": "Martina",
+      "familyName": "Feijoo"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Elisabet",
       "familyName": "Galiana"
     },
     {
@@ -117,8 +122,18 @@
     },
     {
       "@type": "Person",
+      "givenName": "H\u00e5kan",
+      "familyName": "Johansson"
+    },
+    {
+      "@type": "Person",
       "givenName": "Benjamin",
       "familyName": "Heiss"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Andrea",
+      "familyName": "Horvat"
     },
     {
       "@type": "Person",
@@ -142,13 +157,33 @@
     },
     {
       "@type": "Person",
+      "givenName": "Eleonora",
+      "familyName": "Kudaibergenova"
+    },
+    {
+      "@type": "Person",
       "givenName": "Marc",
       "familyName": "Labiche"
     },
     {
       "@type": "Person",
+      "givenName": "Andrea",
+      "familyName": "Lagni"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Ivana",
+      "familyName": "Lihtar"
+    },
+    {
+      "@type": "Person",
       "givenName": "Bastian",
       "familyName": "Loeher"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Valerii",
+      "familyName": "Panin"
     },
     {
       "@type": "Person",
@@ -187,23 +222,23 @@
     },
     {
       "@type": "Person",
+      "givenName": "Yanzhao",
+      "familyName": "Wang"
+    },
+    {
+      "@type": "Person",
       "givenName": "Alicia",
       "familyName": "Wongel"
     },
     {
       "@type": "Person",
+      "givenName": "Manuel",
+      "familyName": "Xarepe"
+    },
+    {
+      "@type": "Person",
       "givenName": "Lorenzo",
       "familyName": "Zanetti"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Martina",
-      "familyName": "Feijoo"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Valerii",
-      "familyName": "Panin"
     }
   ]
 }
