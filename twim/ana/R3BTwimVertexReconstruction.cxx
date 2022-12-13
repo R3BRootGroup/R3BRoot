@@ -73,7 +73,7 @@ InitStatus R3BTwimVertexReconstruction::Init()
     fTwimHitDataCA = (TClonesArray*)rootManager->GetObject("TwimHitData");
     if (!fTwimHitDataCA)
     {
-        R3BLOG(fatal, "TwimdHitData not found");
+        R3BLOG(fatal, "TwimHitData not found");
         return kFATAL;
     }
 
