@@ -8,7 +8,7 @@ Set(CTEST_PROJECT_NAME "R3BRoot")
 Find_Program(CTEST_GIT_COMMAND NAMES git)
 Set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 
-Set(BUILD_COMMAND "make -k")
+Set(BUILD_COMMAND "make")
 
 Set(CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
