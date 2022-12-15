@@ -27,7 +27,7 @@ jobs:
         - docker load --input fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz
       before_script:
         - cd $HOME && mkdir container && cd container
-        - ${TRAVIS_BUILD_DIR}/travis-generate-dockerfile.sh | tee Dockerfile
+        - ${TRAVIS_BUILD_DIR}/travis-generate-dockerfile-sofia.sh | tee Dockerfile
         - docker build -t r3broot:${TRAVIS_COMMIT} .
         - cd $HOME
       script:
