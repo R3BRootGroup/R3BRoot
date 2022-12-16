@@ -19,8 +19,11 @@
 # Check if cmake has the required version
 cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
+# set cmake policies
+cmake_policy(VERSION 3.11...3.20)
+
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
-project(R3BROOT C CXX Fortran)
+project(R3BROOT LANGUAGES C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
@@ -46,9 +49,6 @@ set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules_old" ${CMAKE
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
 Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
-
-# set cmake policies
-cmake_policy(VERSION 3.11...3.14)
 
 find_package(FairCMakeModules 0.1 QUIET)
 if(FairCMakeModules_FOUND)
@@ -76,16 +76,28 @@ endif()
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
 # Load some basic macros which are needed later on
+#include(FairFormattedOutput)
+#include(FairSummary)
+#include(FairRootTargets)
+#include(FairRootSummary)
 include(FairMacros)
+
 include(R3BMacros)
+#include(R3BRootPackage)
 include(WriteConfigFile_r3b)
+include(WriteEnvCache)
 include(Dart)
 include(CheckCompiler)
-include(WriteEnvCache)
 
 if(SIMPATH)
   set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
 endif()
+
+#find_package(CLHEP)
+find_package(HEPMC)
+
+# Check the compiler and set the compile and link flags
+check_compiler()
 
 find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
 if("${ROOT_vmc_FOUND}" MATCHES "no")
@@ -94,12 +106,7 @@ if("${ROOT_vmc_FOUND}" MATCHES "no")
 else()
   set(VMCLIB VMC)
 endif()
-find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
-foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
-  if(NOT dep STREQUAL "Boost")
-    find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
-  endif()
-endforeach()
+
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 
@@ -126,11 +133,26 @@ if(Geant4VMC_FOUND)
   )
 Endif()
 
-#find_package(CLHEP)
-find_package(HEPMC)
+find_package2(PUBLIC IWYU)
 
-# Check the compiler and set the compile and link flags
-check_compiler()
+find_package2(PUBLIC GSL)
+if(NOT DEFINED GTEST_ROOT)
+  set(GTEST_ROOT ${SIMPATH})
+endif()
+
+#find_package2(PUBLIC FairMQ VERSION 1.4.0)
+find_package2(PUBLIC DDS)
+
+find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
+foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
+  if(NOT dep STREQUAL "Boost")
+    find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
+  endif()
+endforeach()
+
+find_package2(PUBLIC Git)
+set (Git_VERSION ${GIT_VERSION_STRING})
+string(REPLACE "git" " " Git_ROOT ${GIT_EXECUTABLE} )
 
 if(DEFINED ENV{WERROR} AND "$ENV{WERROR}")
   message(STATUS "Will compile with -Werror. ")
@@ -196,9 +218,32 @@ else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
 
-#if(SIMPATH)
-#  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
-#endif()
+set(R3BROOT_LIBRARY_PROPERTIES ${R3BROOT_LIBRARY_PROPERTIES}
+  VERSION "${PROJECT_VERSION}"
+  SOVERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
+)
+set(PROJECT_LIBRARY_PROPERTIES ${R3BROOT_LIBRARY_PROPERTIES})
+
+find_package2(PUBLIC yaml-cpp)
+# Workaround missing exported include directories
+# Upstream has fixed this in https://github.com/jbeder/yaml-cpp/commit/ab5f9259a4e67d3fe0e4832bd407a9e596e2d884 (since 0.6.3)
+if(yaml-cpp_FOUND)
+  get_filename_component(YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}" REALPATH BASE_DIR "/")
+endif()
+if(    yaml-cpp_FOUND
+   AND TARGET yaml-cpp
+   AND EXISTS YAML_CPP_INCLUDE_DIR
+   AND yaml-cpp_VERSION VERSION_LESS 0.6.3
+)
+  set_target_properties(yaml-cpp PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${YAML_CPP_INCLUDE_DIR}"
+  )
+endif()
+
+configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
+
+# Load the macro to generate the needed version info at compile time
+Generate_Version_Info()
 
 SetBasicVariables()
 
@@ -230,6 +275,18 @@ if(${IS_XCODE})
 else(${IS_XCODE})
     set(LD_LIBRARY_PATH ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 endif(${IS_XCODE})
+
+
+find_package2(PRIVATE ClangFormat)
+if(ClangFormat_FOUND)
+  add_custom_target(FormatCheck
+    ${CMAKE_COMMAND} -E env R3BROOT_GIT_CLANG_FORMAT_BIN=${GIT_CLANG_FORMAT_BIN} ${CMAKE_SOURCE_DIR}/check-format.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  )
+else()
+  message(WARNING "${BMagenta}No Clang configured.${CR}")
+endif()
+
 
 find_package(ucesb)
 if(ucesb_FOUND)
@@ -394,6 +451,21 @@ if(NOT MODULE)
     endif(WITH_ASYEOS)
 endif(NOT MODULE)
 
+add_subdirectory(cmake)
+
+
+If(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  Execute_Process(COMMAND ${GIT_EXECUTABLE} describe --tags
+                  OUTPUT_VARIABLE R3BROOT_GIT_VERSION
+                  OUTPUT_STRIP_TRAILING_WHITESPACE
+                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                 )
+Else()
+  Set(R3BROOT_GIT_VERSION v${R3BROOT_MAJOR_VERSION}.${R3BROOT_MINOR_VERSION}.${R3BROOT_PATCH_VERSION})
+EndIf()
+
+
+
 execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
                 OUTPUT_VARIABLE EveIsBuild
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -421,12 +493,10 @@ if(RULE_CHECKER_FOUND)
 
 endif(RULE_CHECKER_FOUND)
 
-if(NOT R3BROOT_MINIMAL)
-    write_config_file(config.sh)
-    write_config_file(config.csh)
-else(NOT R3BROOT_MINIMAL)
-    write_minimal_config_file(config.sh)
-endif(NOT R3BROOT_MINIMAL)
+write_config_file(config.sh)
+write_config_file(config.csh)
+WRITE_CONFIG_FILE(config.sh_install)
+WRITE_CONFIG_FILE(config.csh_install)
 
 write_env_cache(env_cache.sh)
 
@@ -554,8 +624,6 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     unset(version_req_str)
   endforeach()
 endif()
+
 message(STATUS "  ")
-
-   ################################################################################
-
-
+################################################################################

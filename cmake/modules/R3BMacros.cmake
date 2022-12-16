@@ -45,9 +45,9 @@ ENDMACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA)
 
 
 Macro (R3B_Generate_Version_Info)
-  Add_Custom_Target(svnheader ALL)
+  Add_Custom_Target(svnr3bheader ALL)
 
-  Add_Custom_Command(TARGET svnheader
+  Add_Custom_Command(TARGET svnr3bheader
                      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
                      -DBINARY_DIR=${CMAKE_BINARY_DIR}
                      -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}
