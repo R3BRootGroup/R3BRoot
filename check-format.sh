@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_COMMIT=${R3BROOT_FORMAT_BASE:-HEAD}
+BASE_COMMIT=${R3BROOT_FORMAT_BASE:-origin/dev}
 GIT_CLANG_FORMAT_BIN=${R3BROOT_GIT_CLANG_FORMAT_BIN:-git-clang-format}
 
 FILES=$(git diff --name-only $BASE_COMMIT | grep -E '*\.(h|hpp|c|C|cpp|cxx|tpl)$' | grep -viE '*LinkDef.h$')
