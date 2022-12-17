@@ -21,8 +21,7 @@ using std::flush;
 
 R3BCalifaPoint::R3BCalifaPoint()
     : FairMCPoint()
-    ,
-    fCrystalId(-1)
+    , fCrystalId(-1)
     , fNf(0.)
     , fNs(0.)
 {

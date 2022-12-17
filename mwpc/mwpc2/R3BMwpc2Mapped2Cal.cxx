@@ -151,7 +151,7 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
     Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY))
         LOG(WARNING) << "R3BMwpc2Mapped2Cal: nHits>(NumPadX+NumPadY)";
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     R3BMwpcMappedData** mappedData = new R3BMwpcMappedData*[nHits];

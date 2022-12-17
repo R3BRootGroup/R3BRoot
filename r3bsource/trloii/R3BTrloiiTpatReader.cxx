@@ -43,10 +43,7 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
 {
 }
 
-R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
-{
-    R3BLOG(INFO, "");
-}
+R3BTrloiiTpatReader::~R3BTrloiiTpatReader() { R3BLOG(INFO, ""); }
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {

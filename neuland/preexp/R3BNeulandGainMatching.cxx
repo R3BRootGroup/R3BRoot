@@ -124,7 +124,7 @@ InitStatus R3BNeulandGainMatching::Init()
 void R3BNeulandGainMatching::Exec(Option_t* option)
 {
 
-  Double_t maxhv = 1400;
+    Double_t maxhv = 1400;
     // check high voltage
 
     if (finished)
@@ -221,7 +221,8 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
                 }
 
                 maxhv = 1400;
-                if (iPlane < 2) maxhv = 1800;
+                if (iPlane < 2)
+                    maxhv = 1800;
                 if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= maxhv)
                 {
                     hventry.vtarget->Set(hv[iPlane][iBar][iSide]);
@@ -252,7 +253,8 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
                 ealt[iPlane][iBar][iSide] = e;
                 std::cout << "new hv: " << hv[iPlane][iBar][iSide] << std::endl;
                 maxhv = 1400;
-                if (iPlane<2) maxhv = 1800;
+                if (iPlane < 2)
+                    maxhv = 1800;
                 if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= maxhv)
                 {
                     hventry.vtarget->Set(hv[iPlane][iBar][iSide]);

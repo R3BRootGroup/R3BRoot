@@ -29,8 +29,8 @@
 #include "R3BLosMapped2TCal.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BLosTCalData.h"
 #include "R3BLosMappedData.h"
+#include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
@@ -148,7 +148,6 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
     if (nHits == 0)
         return;
 
-
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
     {
         Double_t times_ns = 0. / 0.;
@@ -162,7 +161,6 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
         UInt_t iDet = hit->GetDetector(); // 1..
         UInt_t iCha = hit->GetChannel();  // 1..
         UInt_t iType = hit->GetType();    // 0,1,2,3
-
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
@@ -213,7 +211,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
             times_ns = hit->GetTimeFine() / 7.8 / 1000.; // range MTDC 3->7.8ps
         }
 
-	AddTCalData(iDet, iCha, iType, times_ns);
+        AddTCalData(iDet, iCha, iType, times_ns);
         continue;
     }
 
@@ -242,7 +240,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
             if (time_ns > 0.)
             {
                 time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
-		AddTriggerTCalData(iDetector, iChannel, iType - 1, time_ns);
+                AddTriggerTCalData(iDetector, iChannel, iType - 1, time_ns);
             }
         }
     }
@@ -264,18 +262,17 @@ void R3BLosMapped2TCal::FinishEvent()
 
 R3BLosTCalData* R3BLosMapped2TCal::AddTCalData(Int_t det, Int_t ch, Int_t typ, Double_t tns)
 {
-	    // It fills the R3BLosTcalData
-	    TClonesArray& clref = *fTCalItems;
-   	    Int_t size = clref.GetEntriesFast();
-	    return new (clref[size]) R3BLosTCalData(det, ch, typ, tns);
+    // It fills the R3BLosTcalData
+    TClonesArray& clref = *fTCalItems;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BLosTCalData(det, ch, typ, tns);
 }
-	    
 
 R3BLosTCalData* R3BLosMapped2TCal::AddTriggerTCalData(Int_t det, Int_t ch, Int_t typ, Double_t tns)
 {
-	    // It fills the R3BLosTriggerTcalData
-	    TClonesArray& clref = *fTCalTriggerItems;
-   	    Int_t size = clref.GetEntriesFast();
-	    return new (clref[size]) R3BLosTCalData(det, ch, typ, tns);
+    // It fills the R3BLosTriggerTcalData
+    TClonesArray& clref = *fTCalTriggerItems;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BLosTCalData(det, ch, typ, tns);
 }
 ClassImp(R3BLosMapped2TCal);

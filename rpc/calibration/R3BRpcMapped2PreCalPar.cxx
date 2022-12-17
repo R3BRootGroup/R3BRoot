@@ -48,7 +48,7 @@ R3BRpcMapped2PreCalPar::R3BRpcMapped2PreCalPar(const char* name, Int_t iVerbose)
 R3BRpcMapped2PreCalPar::~R3BRpcMapped2PreCalPar()
 {
     LOG(INFO) << "R3BRpcMapped2PreCalPar: Delete instance";
-    
+
     delete fEngine;
 }
 
@@ -91,26 +91,23 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
     return kSUCCESS;
 }
 
-InitStatus R3BRpcMapped2PreCalPar::ReInit()
-{
-    return kSUCCESS;
-}
+InitStatus R3BRpcMapped2PreCalPar::ReInit() { return kSUCCESS; }
 
 void R3BRpcMapped2PreCalPar::Exec(Option_t* opt)
 {
 
-    //loop over the 3 mapped structures
+    // loop over the 3 mapped structures
 
-    //loop over strip data
+    // loop over strip data
     Int_t nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
         auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
 
         UInt_t iDetector = map1->GetDetId();
-        UInt_t iStrip = map1->GetChannelId();   // now 1..41
-        UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
-        fEngine->Fill(iDetector+1, iStrip, iEdge_Side+1, map1->GetFineTime());
+        UInt_t iStrip = map1->GetChannelId();                      // now 1..41
+        UInt_t iEdge_Side = map1->GetEdge() * 2 + map1->GetSide(); // 0,3
+        fEngine->Fill(iDetector + 1, iStrip, iEdge_Side + 1, map1->GetFineTime());
     }
 }
 
@@ -118,7 +115,8 @@ void R3BRpcMapped2PreCalPar::Reset() {}
 
 void R3BRpcMapped2PreCalPar::FinishEvent() {}
 
-void R3BRpcMapped2PreCalPar::FinishTask() {
+void R3BRpcMapped2PreCalPar::FinishTask()
+{
     fEngine->CalculateParamVFTX();
     fTCalPar->printParams();
 }

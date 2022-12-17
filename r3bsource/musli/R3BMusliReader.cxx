@@ -85,7 +85,7 @@ void R3BMusliReader::Reset()
 {
     // Reset the output array
     if (fArray)
-    fArray->Clear();
+        fArray->Clear();
 }
 
 Bool_t R3BMusliReader::ReadData(EXT_STR_h101_MUSLI_onion* data)

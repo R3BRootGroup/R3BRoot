@@ -162,7 +162,7 @@ InitStatus R3BTofdCal2HitS454::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
-    
+
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
