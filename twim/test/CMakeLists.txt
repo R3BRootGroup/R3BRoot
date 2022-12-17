@@ -11,8 +11,6 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-cmake_minimum_required(VERSION 3.0)
-
 enable_testing()
 set(PROJECT_TEST_NAME TwimUnitTests)
 set(GTEST_ROOT ${SIMPATH})
@@ -28,6 +26,7 @@ include_directories(
     ${R3BROOT_SOURCE_DIR}/r3bbase
     ${R3BROOT_SOURCE_DIR}/r3bdata
     ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
+    ${R3BROOT_SOURCE_DIR}/twim
     ${R3BROOT_SOURCE_DIR}/twim/sim
     ${R3BROOT_SOURCE_DIR}/twim/pars
     ${R3BROOT_SOURCE_DIR}/twim/digi

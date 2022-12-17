@@ -67,5 +67,4 @@ void testTwimSimulation(int nbevents = 100)
     timer.Stop();
     std::cout << "Macro finished successfully." << std::endl;
     std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
-    gApplication->Terminate();
 }
