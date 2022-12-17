@@ -13,16 +13,16 @@
  ******************************************************************************/
 
 #include "R3BAlpideMappingPar.h"
+
 #include "gtest/gtest.h"
 #include <map>
 
-namespace
+namespace {
+TEST(testAlpideMappingPar, GetNbSensors)
 {
-    TEST(testAlpideMappingPar, GetNbSensors)
-    {
-        auto par = new R3BAlpideMappingPar();
-        par->SetNbSensors(2);
+    auto par = new R3BAlpideMappingPar();
+    par->SetNbSensors(2);
 
-        EXPECT_EQ(par->GetNbSensors(), 2);
-    }
-} // namespace
+    EXPECT_EQ(par->GetNbSensors(), 2);
+}
+}   // namespace

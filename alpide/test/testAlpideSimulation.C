@@ -54,7 +54,7 @@ void testAlpideSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Alpide
-    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v24.geo.root", { 0., 0., 0. }));
+    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v24.geo.root", {0., 0., 0.}));
 
     // Digitizer: Alpide
     auto digi = new R3BAlpideDigitizer("Alpide");
@@ -71,5 +71,4 @@ void testAlpideSimulation(int nbevents = 100)
     timer.Stop();
     std::cout << "Macro finished successfully." << std::endl;
     std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
-    gApplication->Terminate();
 }

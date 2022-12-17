@@ -14,41 +14,41 @@
 
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaMappingPar.h"
+
 #include "gtest/gtest.h"
 #include <map>
 
-namespace
+namespace {
+TEST(testCalifaMappingPar, GetNumCrystals)
 {
-    TEST(testCalifaMappingPar, GetNumCrystals)
-    {
-        R3BCalifaMappingPar par;
-        par.SetNumCrystals(2000);
+    R3BCalifaMappingPar par;
+    par.SetNumCrystals(2000);
 
-        EXPECT_EQ(par.GetNumCrystals(), 2000);
-    }
+    EXPECT_EQ(par.GetNumCrystals(), 2000);
+}
 
-    TEST(testCalifaMappingPar, GetInUse)
-    {
-        R3BCalifaMappingPar par;
-        par.SetInUse(1, 1000);
+TEST(testCalifaMappingPar, GetInUse)
+{
+    R3BCalifaMappingPar par;
+    par.SetInUse(1, 1000);
 
-        EXPECT_EQ(par.GetInUse(1000), 1);
-    }
+    EXPECT_EQ(par.GetInUse(1000), 1);
+}
 
-    TEST(testCalifaCrystalCalPar, GetNumCrystals)
-    {
-        R3BCalifaCrystalCalPar par;
-        par.SetNumCrystals(100);
+TEST(testCalifaCrystalCalPar, GetNumCrystals)
+{
+    R3BCalifaCrystalCalPar par;
+    par.SetNumCrystals(100);
 
-        EXPECT_EQ(par.GetNumCrystals(), 100);
-    }
+    EXPECT_EQ(par.GetNumCrystals(), 100);
+}
 
-    TEST(testCalifaCrystalCalPar, GetNumParametersFit)
-    {
-        R3BCalifaCrystalCalPar par;
-        par.SetNumParametersFit(10);
+TEST(testCalifaCrystalCalPar, GetNumParametersFit)
+{
+    R3BCalifaCrystalCalPar par;
+    par.SetNumParametersFit(10);
 
-        EXPECT_EQ(par.GetNumParametersFit(), 10);
-    }
+    EXPECT_EQ(par.GetNumParametersFit(), 10);
+}
 
-} // namespace
+}   // namespace
