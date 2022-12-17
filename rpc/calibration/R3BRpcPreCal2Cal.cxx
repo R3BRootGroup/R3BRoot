@@ -68,20 +68,20 @@ InitStatus R3BRpcPreCal2Cal::Init()
    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcPreCal2Cal:: FairRuntimeDb not opened";
+        LOG(error) << "R3BRpcPreCal2Cal:: FairRuntimeDb not opened";
     }
 
     fPreCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPreCalData");
     if (!fPreCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
         return kFATAL;
     }
 
     fTotCalPar = (R3BRpcTotCalPar*)rtdb->getContainer("RpcTotCalPar");
     if (!fTotCalPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
         return kFATAL;
     }
 

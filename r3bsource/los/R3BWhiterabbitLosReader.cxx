@@ -53,7 +53,7 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitLosReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitLosReader::Failed to setup structure information.";
         return kFALSE;
     }
     FairRootManager* mgr = FairRootManager::Instance();

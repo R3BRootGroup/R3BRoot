@@ -151,7 +151,7 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
         if (fEvt > fEvtRoot)
         {
-            LOG(ERROR)
+            LOG(error)
                 << "\033[5m\033[31m R3BINCLRootGenerator: Number of simulated events larger than the ones contained "
                    "in the Root file \033[0m ";
             LOG(WARNING)

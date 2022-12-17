@@ -114,7 +114,7 @@ InitStatus R3BPspxCal2Hit::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::Init() Root-manager not found.";
+        LOG(error) << "R3BPspxCal2Hit::Init() Root-manager not found.";
         return kFATAL;
     }
 
@@ -168,7 +168,7 @@ void R3BPspxCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::FairRuntimeDb not opened!";
+        LOG(error) << "R3BPspxCal2Hit::FairRuntimeDb not opened!";
         return;
     }
     else
@@ -179,7 +179,7 @@ void R3BPspxCal2Hit::SetParContainers()
     fHitPar = (R3BPspxHitPar*)rtdb->getContainer("R3BPspxHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
+        LOG(error) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
         return;
     }
 
@@ -197,7 +197,7 @@ InitStatus R3BPspxCal2Hit::ReInit()
 
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
+            LOG(error) << "Could not get access to R3BPspxHitPar-Container.";
             return kFATAL;
         }*/
 

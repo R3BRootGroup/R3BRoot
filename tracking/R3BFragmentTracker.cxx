@@ -114,7 +114,7 @@ InitStatus R3BFragmentTracker::Init()
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
     if (NULL == fArrayMCTracks)
     {
-        LOG(ERROR) << "No MC Track array found in input file.";
+        LOG(error) << "No MC Track array found in input file.";
         return kERROR;
     }
 
@@ -631,7 +631,7 @@ Bool_t R3BFragmentTracker::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field.";
+        LOG(error) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

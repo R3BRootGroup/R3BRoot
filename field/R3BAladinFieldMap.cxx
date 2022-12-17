@@ -175,7 +175,7 @@ void R3BAladinFieldMap::Init()
 
         if (!fin)
         {
-            LOG(ERROR) << "Failure opening field map : " << fMapFileName;
+            LOG(error) << "Failure opening field map : " << fMapFileName;
         }
 
         // free(fMapFileName.Data());
@@ -214,14 +214,14 @@ void R3BAladinFieldMap::Init()
                            &bdummy);
 
             if (n != 9)
-                LOG(ERROR) << "Failure parsing field from map: " << filename << " @ line: % " << line;
+                LOG(error) << "Failure parsing field from map: " << filename << " @ line: % " << line;
 
             if (I != measured_I[i])
-                LOG(ERROR) << "Wrong current " << I << " when parsing field from map " << filename
+                LOG(error) << "Wrong current " << I << " when parsing field from map " << filename
                            << " @ line: " << line;
 
             if (rl != 0 && rl != 1)
-                LOG(ERROR) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
+                LOG(error) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
 
             for (int j = 0; j < 3; j++)
             {
@@ -237,7 +237,7 @@ void R3BAladinFieldMap::Init()
                             field->f[rl][0]._np[j],
                             filename,
                             line);
-                    LOG(ERROR) << str;
+                    LOG(error) << str;
                 }
             }
 
@@ -407,7 +407,7 @@ void R3BAladinFieldMap::InitField()
 
     if (iter2 == gMapIFieldOrig.begin())
     {
-        LOG(ERROR) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
+        LOG(error) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
     }
     --iter1;
 

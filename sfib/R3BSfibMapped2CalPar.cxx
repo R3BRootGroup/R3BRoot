@@ -57,7 +57,7 @@ InitStatus R3BSfibMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get SfibTCalPar.";
+        LOG(error) << "Could not get SfibTCalPar.";
         return kFATAL;
     }
     fTCalPar->setChanged();

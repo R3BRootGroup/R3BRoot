@@ -125,7 +125,7 @@ class TClonesArray;
         dst._v_len = LENGTH(src##v);                       \
         if (dst._MI_len != dst._v_len)                     \
         {                                                  \
-            LOG(ERROR) << "UCESB single-hit array error."; \
+            LOG(error) << "UCESB single-hit array error."; \
             exit(EXIT_FAILURE);                            \
         }                                                  \
     } while (0)
@@ -140,7 +140,7 @@ class TClonesArray;
         dst._ME_len = LENGTH(src##ME);                    \
         if (dst._MI_len != dst._ME_len)                   \
         {                                                 \
-            LOG(ERROR) << "UCESB multi-hit array error."; \
+            LOG(error) << "UCESB multi-hit array error."; \
             exit(EXIT_FAILURE);                           \
         }                                                 \
         dst._ = &src;                                     \

@@ -335,7 +335,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 

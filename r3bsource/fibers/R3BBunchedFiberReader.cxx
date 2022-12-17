@@ -63,7 +63,7 @@ Bool_t R3BBunchedFiberReader::Init()
 Bool_t R3BBunchedFiberReader::Read()
 {
     auto it = counter.find(fShortName);
-    // LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN";
+    // LOG(error) << "R3BBunchedFiberReader::Read BEGIN";
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
@@ -221,7 +221,7 @@ Bool_t R3BBunchedFiberReader::Read()
     }
     ++it->second;
 
-    // LOG(ERROR) << "R3BBunchedFiberReader::Read END";
+    // LOG(error) << "R3BBunchedFiberReader::Read END";
     return kTRUE;
 }
 

@@ -68,12 +68,12 @@ void R3BCalifaCrystalCal2TotCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on califamappingpar container";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on califamappingpar container";
     }
     else
     {
@@ -85,7 +85,7 @@ void R3BCalifaCrystalCal2TotCalPar::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
     }
     //--- Parameter Container ---
     fNumCrystals = fMap_Par->GetNumCrystals(); // Number of crystals x 2
@@ -100,21 +100,21 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCrystalCalDataCA = (TClonesArray*)rootManager->GetObject("CalifaCrystalCalData");
     if (!fCrystalCalDataCA)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() CalifaCrystalCalData not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() CalifaCrystalCalData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
@@ -122,7 +122,7 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
     if (!fTotCal_Par)
 
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
         return kFATAL;
     }
 

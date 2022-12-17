@@ -149,7 +149,7 @@ Bool_t R3BFiberMAPMTReader::Read()
             cur_entry = c_ME;
         }
     }
-    // LOG(ERROR) << "R3BFiberMAPMTReader::Read END";
+    // LOG(error) << "R3BFiberMAPMTReader::Read END";
     return kTRUE;
 }
 

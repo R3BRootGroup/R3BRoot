@@ -94,13 +94,13 @@ R3BSfibHitModulePar* R3BSfibHitPar::GetModuleParAt(Int_t fiber)
             tFiber = par->GetFiber();
             if (tFiber < 1 || tFiber > N_FIBER_MAX)
             {
-                LOG(ERROR) << "R3BSfibHitPar::GetModuleParAt : error in fiber indexing. " << tFiber;
+                LOG(error) << "R3BSfibHitPar::GetModuleParAt : error in fiber indexing. " << tFiber;
                 continue;
             }
             index = tFiber - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BSfibHitPar::GetModuleParAt : parameter found more than once. " << tFiber;
+                LOG(error) << "R3BSfibHitPar::GetModuleParAt : parameter found more than once. " << tFiber;
                 continue;
             }
             fIndexMap[index] = i;
@@ -110,7 +110,7 @@ R3BSfibHitModulePar* R3BSfibHitPar::GetModuleParAt(Int_t fiber)
 
     if (fiber < 1 || fiber > N_FIBER_MAX)
     {
-        LOG(ERROR) << "R3BSfibHitPar::GetModuleParAt : error in fiber indexing. " << fiber;
+        LOG(error) << "R3BSfibHitPar::GetModuleParAt : error in fiber indexing. " << fiber;
         return NULL;
     }
     Int_t index = fiber - 1;

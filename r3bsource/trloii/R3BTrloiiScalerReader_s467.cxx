@@ -56,7 +56,7 @@ Bool_t R3BTrloiiScalerReader_s467::Init(ext_data_struct_info* a_struct_info)
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
+        LOG(error) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
         return kFALSE;
     }
 

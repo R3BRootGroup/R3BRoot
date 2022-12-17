@@ -207,14 +207,14 @@ InitStatus R3BTofiCal2HitS494::Init()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofiHitPar";
+        LOG(error) << "There are no Hit parameters in container TofiHitPar";
         return kFATAL;
     }
 
@@ -248,7 +248,7 @@ void R3BTofiCal2HitS494::SetParContainers()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -414,7 +414,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -454,7 +454,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -462,7 +462,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;

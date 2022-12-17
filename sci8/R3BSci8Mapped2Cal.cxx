@@ -85,7 +85,7 @@ InitStatus R3BSci8Mapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container Sci8TCalPar";
+        LOG(error) << "There are no TCal parameters in container Sci8TCalPar";
         return kFATAL;
     }
 
@@ -117,7 +117,7 @@ void R3BSci8Mapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci8TCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to Sci8TCalPar-Container.";
+        LOG(error) << "Could not get access to Sci8TCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }

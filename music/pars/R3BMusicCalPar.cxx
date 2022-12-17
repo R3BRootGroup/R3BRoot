@@ -91,19 +91,19 @@ Bool_t R3BMusicCalPar::getParams(FairParamList* list)
     LOG(INFO) << "R3BMusicCalPar::getParams() called";
     if (!list)
     {
-        LOG(ERROR) << "Could not initialize FairParamList";
+        LOG(error) << "Could not initialize FairParamList";
         return kFALSE;
     }
 
     if (!list->fill("musicAnodeNumberPar", &fNumAnodes))
     {
-        LOG(ERROR) << "Could not initialize musicAnodeNumberPar";
+        LOG(error) << "Could not initialize musicAnodeNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("musicAnodeEFitPar", &fNumParamsEFit))
     {
-        LOG(ERROR) << "Could not initialize musicAnodeEFitPar";
+        LOG(error) << "Could not initialize musicAnodeEFitPar";
         return kFALSE;
     }
 
@@ -111,7 +111,7 @@ Bool_t R3BMusicCalPar::getParams(FairParamList* list)
     fIn_use->Set(fNumAnodes);
     if (!(list->fill("musicInUsePar", fIn_use)))
     {
-        LOG(ERROR) << "Could not initialize musicInUsePar";
+        LOG(error) << "Could not initialize musicInUsePar";
         return kFALSE;
     }
 
@@ -121,13 +121,13 @@ Bool_t R3BMusicCalPar::getParams(FairParamList* list)
 
     if (!(list->fill("musicCalEPar", fAnodeCalParams)))
     {
-        LOG(ERROR) << "Could not initialize musicCalEPar";
+        LOG(error) << "Could not initialize musicCalEPar";
         return kFALSE;
     }
 
     if (!list->fill("musicPosFitPar", &fNumParamsPosFit))
     {
-        LOG(ERROR) << "Could not initialize musicPosFitPar";
+        LOG(error) << "Could not initialize musicPosFitPar";
         return kFALSE;
     }
 
@@ -137,7 +137,7 @@ Bool_t R3BMusicCalPar::getParams(FairParamList* list)
 
     if (!(list->fill("musicPosPar", fPosParams)))
     {
-        LOG(ERROR) << "Could not initialize musicPosPar";
+        LOG(error) << "Could not initialize musicPosPar";
         return kFALSE;
     }
 

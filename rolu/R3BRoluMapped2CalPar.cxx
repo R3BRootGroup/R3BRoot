@@ -146,20 +146,20 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
 
         if (iDetector > (fNofDetectors - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
                        << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
                        << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
                        << " allowed are 0.." << (fNofTypes - 1);
             continue;
         }

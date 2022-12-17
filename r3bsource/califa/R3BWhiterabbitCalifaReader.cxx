@@ -57,7 +57,7 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitCalifaReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitCalifaReader::Failed to setup structure information.";
         return kFALSE;
     }
 

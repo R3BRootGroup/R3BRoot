@@ -62,27 +62,27 @@ std::cout << "hre" << std::endl;
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fPreCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPreCalData");
     if (!fPreCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
         return kFATAL;
     }
     FairRuntimeDb* rtdbPar = FairRuntimeDb::instance();
     if (!rtdbPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fTotCalPar = (R3BRpcTotCalPar*)rtdbPar->getContainer("RpcTotCalPar");
     if (!fTotCalPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
         return kFATAL;
     }
 

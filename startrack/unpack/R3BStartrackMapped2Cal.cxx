@@ -116,7 +116,7 @@ void R3BStartrackMapped2Cal::SetParContainers()
     fStartrackCalPar = (R3BStartrackMapped2CalPar*)FairRuntimeDb::instance()->getContainer("StartrackCalPar");
     if (!fStartrackCalPar)
     {
-        LOG(ERROR) << "Could not get access to StartrackCalPar-Container.";
+        LOG(error) << "Could not get access to StartrackCalPar-Container.";
         fNofCalPars = 0;
         return;
     }

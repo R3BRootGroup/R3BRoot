@@ -267,7 +267,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
             if (m > 1500)
             {
-                LOG(ERROR) << "R3BLandDigitizer: Too many hits in one paddle: " << m << " hits"
+                LOG(error) << "R3BLandDigitizer: Too many hits in one paddle: " << m << " hits"
                            << "entry " << l << " after sorting"
                            << "paddle " << paddle << "padlle mult " << PMmult[paddle] << "Sector " << scint << "eloss "
                            << eloss << "light yield " << light << "time " << time << "X In " << x << "Y In " << y

@@ -194,7 +194,7 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
     // mail from R. Schneider from May 21st 2019 : "the hits from one channel are kept in the chronological order."
     // --> for one anode with multi-hit, the first hit in energy correspond to the first hit in time
     if (nAnodesEnergy != nAnodesTime)
-        LOG(ERROR) << "R3BTwimReader::ReadData ERROR ! NOT THE SAME NUMBER OF ANODES HITTED IN ENERGY () AND TIME ()";
+        LOG(error) << "R3BTwimReader::ReadData ERROR ! NOT THE SAME NUMBER OF ANODES HITTED IN ENERGY () AND TIME ()";
 
     // ENERGY AND TIME ARE SORTED
     uint32_t curAnodeTimeStart = 0;
@@ -206,13 +206,13 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
         UShort_t idAnodeEnergy = data->SOFTWIM_S[section].EMI[a] - 1;
 
         // if (idAnodeEnergy != idAnodeTime)
-        //    LOG(ERROR) << "R3BTwimReader::ReadData ERROR ! MISMATCH FOR ANODE ID IN ENERGY #" << idAnodeEnergy
+        //    LOG(error) << "R3BTwimReader::ReadData ERROR ! MISMATCH FOR ANODE ID IN ENERGY #" << idAnodeEnergy
         //             << " AND TIME #" << idAnodeTime;
         uint32_t nextAnodeTimeStart = data->SOFTWIM_S[section].TME[a];
         uint32_t nextAnodeEnergyStart = data->SOFTWIM_S[section].EME[a];
         multPerAnode[idAnodeTime] = nextAnodeTimeStart - curAnodeTimeStart;
         // if (multPerAnode[idAnodeTime] != (nextAnodeEnergyStart - curAnodeEnergyStart))
-        //    LOG(ERROR) << "R3BTwimReader::ReadData ERROR ! MISMATCH FOR MULTIPLICITY PER ANODE IN ENERGY AND TIME";
+        //    LOG(error) << "R3BTwimReader::ReadData ERROR ! MISMATCH FOR MULTIPLICITY PER ANODE IN ENERGY AND TIME";
         for (int hit = curAnodeTimeStart; hit < nextAnodeTimeStart; hit++)
         {
             // Attention, here the numbering is 0-based for section and anodes

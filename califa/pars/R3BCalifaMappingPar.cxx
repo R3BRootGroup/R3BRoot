@@ -241,12 +241,12 @@ void R3BCalifaMappingPar::printMapCrystalInfo(const UInt_t cryID)
 {
     if (cryID < 1)
     {
-        LOG(ERROR) << "crystal_id must be given in 1-base";
+        LOG(error) << "crystal_id must be given in 1-base";
         return;
     }
     else if (cryID > fNumCrystals)
     {
-        LOG(ERROR) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
+        LOG(error) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
         return;
     }
     auto index = cryID - 1;

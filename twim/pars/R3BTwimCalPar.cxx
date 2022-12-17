@@ -138,31 +138,31 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
 
     if (!list->fill("twimSectionNumberPar", &fNumSections))
     {
-        LOG(ERROR) << "Could not initialize twimSectionNumberPar";
+        LOG(error) << "Could not initialize twimSectionNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("twimAnodeNumberPar", &fNumAnodes))
     {
-        LOG(ERROR) << "Could not initialize twimAnodeNumberPar";
+        LOG(error) << "Could not initialize twimAnodeNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("twimAnodeTRefPar", &fNumAnodesTRef))
     {
-        LOG(ERROR) << "Could not initialize twimAnodeTRefPar";
+        LOG(error) << "Could not initialize twimAnodeTRefPar";
         return kFALSE;
     }
 
     if (!list->fill("twimAnodeTrigPar", &fNumAnodesTrig))
     {
-        LOG(ERROR) << "Could not initialize twimAnodeTrigPar";
+        LOG(error) << "Could not initialize twimAnodeTrigPar";
         return kFALSE;
     }
 
     if (!list->fill("twimMaxMultPar", &fMaxMult))
     {
-        LOG(ERROR) << "Could not initialize twimMaxMultPar";
+        LOG(error) << "Could not initialize twimMaxMultPar";
         return kFALSE;
     }
 
@@ -178,13 +178,13 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
 
     if (!list->fill("twimAnodeEFitPar", &fNumParamsEFit))
     {
-        LOG(ERROR) << "Could not initialize twimAnodeEFitPar";
+        LOG(error) << "Could not initialize twimAnodeEFitPar";
         return kFALSE;
     }
 
     if (!list->fill("twimAnodePosFitPar", &fNumParamsPosFit))
     {
-        LOG(ERROR) << "Could not initialize twimAnodePosFitPar";
+        LOG(error) << "Could not initialize twimAnodePosFitPar";
         return kFALSE;
     }
 
@@ -199,7 +199,7 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         sprintf(name, "twimSec%dInUsePar", s + 1);
         if (!(list->fill(name, fIn_use[s])))
         {
-            LOG(ERROR) << "Could not initialize " << name;
+            LOG(error) << "Could not initialize " << name;
             return kFALSE;
         }
     }
@@ -211,7 +211,7 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         sprintf(name, "twimSec%dCalEPar", s + 1);
         if (!(list->fill(name, fAnodeECalParams[s])))
         {
-            LOG(ERROR) << "Could not initialize " << name;
+            LOG(error) << "Could not initialize " << name;
             return kFALSE;
         }
     }
@@ -223,7 +223,7 @@ Bool_t R3BTwimCalPar::getParams(FairParamList* list)
         sprintf(name, "twimSec%dPosPar", s + 1);
         if (!(list->fill(name, fAnodePosCalParams[s])))
         {
-            LOG(ERROR) << "Could not initialize " << name;
+            LOG(error) << "Could not initialize " << name;
             return kFALSE;
         }
     }

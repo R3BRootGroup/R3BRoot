@@ -59,28 +59,28 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
     if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
     if (!fTCalPar)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
         return kFATAL;
     }
 

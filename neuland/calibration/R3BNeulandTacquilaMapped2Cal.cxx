@@ -259,7 +259,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time = par->GetTimeTacquila(tdc);
         if (time < 0. || time > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time;
             continue;
         }
@@ -275,7 +275,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time2 = par->GetTimeTacquila(tdc);
         if (time2 < 0. || time2 > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time2;
             continue;
         }

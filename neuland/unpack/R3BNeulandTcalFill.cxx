@@ -133,12 +133,12 @@ void R3BNeulandTcalFill::Exec(Option_t*)
 
         if (iPlane > fNofPlanes)
         {
-            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more planes then expected! Plane: " << iPlane;
+            LOG(error) << "R3BNeulandTcalFill::Exec() : more planes then expected! Plane: " << iPlane;
             continue;
         }
         if (iBar > fNofBars)
         {
-            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more bars then expected! Plane: " << iBar;
+            LOG(error) << "R3BNeulandTcalFill::Exec() : more bars then expected! Plane: " << iBar;
             continue;
         }
 

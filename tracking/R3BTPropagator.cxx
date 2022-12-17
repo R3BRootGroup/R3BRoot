@@ -181,7 +181,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         return kTRUE;
     }
 
-    LOG(ERROR) << "!!! Failed !!!";
+    LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 
@@ -279,7 +279,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         return kTRUE;
     }
 
-    LOG(ERROR) << "!!! Failed !!!";
+    LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 

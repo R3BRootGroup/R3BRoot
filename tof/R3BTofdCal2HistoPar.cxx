@@ -132,7 +132,7 @@ InitStatus R3BTofdCal2HistoPar::Init()
     }
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdCal2HistoPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdCal2HistoPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
@@ -142,7 +142,7 @@ InitStatus R3BTofdCal2HistoPar::Init()
     hfilename = TFile::Open(fHistoFile);
     if (hfilename == 0)
     {
-        LOG(ERROR) << "Cannot open Histo file!";
+        LOG(error) << "Cannot open Histo file!";
         return kFATAL;
     }
     return kSUCCESS;
@@ -155,7 +155,7 @@ void R3BTofdCal2HistoPar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdCal2HistoPar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdCal2HistoPar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //  fCal_Par->setChanged();
 }
@@ -180,7 +180,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
-        LOG(ERROR) << "Call walk correction before next step!";
+        LOG(error) << "Call walk correction before next step!";
     }
 
     if (fParameter == 2)
@@ -499,7 +499,7 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                          << "\n";

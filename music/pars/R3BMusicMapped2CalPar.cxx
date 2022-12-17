@@ -90,7 +90,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar: MusicMappedData not found";
+        LOG(error) << "R3BMusicMapped2CalPar: MusicMappedData not found";
         return kFATAL;
     }
 
@@ -101,7 +101,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
         fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "Hit");
         if (!fHitItemsDetA)
         {
-            LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
+            LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
             return kFATAL;
         }
     }
@@ -110,7 +110,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
         fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
         if (!fHitItemsDetA)
         {
-            LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
+            LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
             return kFATAL;
         }
     }
@@ -118,7 +118,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
     fHitItemsDetB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
     if (!fHitItemsDetB)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar: " + fNameDetB + "HitData not found";
+        LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetB + "HitData not found";
         return kFATAL;
     }
 
@@ -131,7 +131,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar:: Couldn't get handle on musicCalPar container";
+        LOG(error) << "R3BMusicMapped2CalPar:: Couldn't get handle on musicCalPar container";
         return kFATAL;
     }
 

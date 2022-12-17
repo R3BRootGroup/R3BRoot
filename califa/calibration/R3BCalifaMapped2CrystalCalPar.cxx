@@ -77,13 +77,13 @@ void R3BCalifaMapped2CrystalCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaMappingPar container";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaMappingPar container";
     }
     else
     {
@@ -116,28 +116,28 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
         return kFATAL;
     }
 

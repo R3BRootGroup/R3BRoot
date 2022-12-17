@@ -183,7 +183,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get " << container << " container.";
+            LOG(error) << "Could not get " << container << " container.";
             fNofHitPars = 0;
         }
         else
@@ -191,7 +191,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
             fNofHitPars = fHitPar->GetNumModulePar();
             if (0 == fNofHitPars)
             {
-                LOG(ERROR) << "No Hit parameters in " << container << " container.";
+                LOG(error) << "No Hit parameters in " << container << " container.";
                 fHitPar = nullptr;
             }
         }

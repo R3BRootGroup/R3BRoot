@@ -103,7 +103,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (E <= 0)
     {
-        LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!";
+        LOG(error) << "R3Bp2pevtGenerator: E < 0!";
         return kFALSE;
     }
     fRandom.SetSeed(0);

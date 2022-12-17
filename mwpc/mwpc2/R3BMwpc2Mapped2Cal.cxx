@@ -68,13 +68,13 @@ void R3BMwpc2Mapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fCal_Par = (R3BMwpc2CalPar*)rtdb->getContainer("mwpc2CalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMwpc2Mapped2Cal::Init() Couldn't get handle on mwpc2CalPar container";
+        LOG(error) << "R3BMwpc2Mapped2Cal::Init() Couldn't get handle on mwpc2CalPar container";
     }
     else
     {
@@ -144,7 +144,7 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
 
     if (!fCal_Par)
     {
-        LOG(ERROR) << "NO Container Parameter!, pedestals will be set to zero";
+        LOG(error) << "NO Container Parameter!, pedestals will be set to zero";
     }
 
     // Reading the Input -- Mapped Data --
@@ -173,7 +173,7 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
         else if (planeId == 3) // Y
             nbpad = (padId + NumPadX) * NumParams;
         else
-            LOG(ERROR) << "Plane " << planeId << " does not exist in MWPC2";
+            LOG(error) << "Plane " << planeId << " does not exist in MWPC2";
 
         pedestal = CalParams->GetAt(nbpad);
         charge = mappedData[i]->GetQ() - pedestal;

@@ -98,38 +98,38 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
 
     if (!list->fill("musliNumSignalsPar", &fNumSignals))
     {
-        LOG(ERROR) << "Could not initialize musliNumSignalsPar";
+        LOG(error) << "Could not initialize musliNumSignalsPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumGroupsAnodesPar", &fNumGroupsAnodes))
     {
-        LOG(ERROR) << "Could not initialize musliNumGroupsAnodesPar";
+        LOG(error) << "Could not initialize musliNumGroupsAnodesPar";
         return kFALSE;
     }
 
     if (!list->fill("musliMaxMultPar", &fMaxMult))
     {
-        LOG(ERROR) << "Could not initialize musliMaxMultPar";
+        LOG(error) << "Could not initialize musliMaxMultPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsEneFitPar", &fNumParamsEneFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsEneFit";
+        LOG(error) << "Could not initialize musliNumParamsEneFit";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsPosFitPar", &fNumParamsPosFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsPosFitPar";
+        LOG(error) << "Could not initialize musliNumParamsPosFitPar";
         return kFALSE;
     }
 
     fIn_use->Set(fNumGroupsAnodes);
     if (!(list->fill("musliInUsePar", fIn_use)))
     {
-        LOG(ERROR) << "Could not initialize musliInUsePar ";
+        LOG(error) << "Could not initialize musliInUsePar ";
         return kFALSE;
     }
 
@@ -137,7 +137,7 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
     fEneCalParams->Set(array_e);
     if (!(list->fill("musliEneCalPar", fEneCalParams)))
     {
-        LOG(ERROR) << "Could not initialize musliEneCalPar";
+        LOG(error) << "Could not initialize musliEneCalPar";
         return kFALSE;
     }
 
@@ -145,7 +145,7 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
     fPosCalParams->Set(array_pos);
     if (!(list->fill("musliPosCalPar", fPosCalParams)))
     {
-        LOG(ERROR) << "Could not initialize musliPosCalPar";
+        LOG(error) << "Could not initialize musliPosCalPar";
         return kFALSE;
     }
 

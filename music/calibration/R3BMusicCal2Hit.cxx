@@ -80,13 +80,13 @@ void R3BMusicCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not found";
+        LOG(error) << "FairRuntimeDb not found";
     }
 
     fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicCal2HitPar::Init() Couldn't get handle on musicHitPar container";
+        LOG(error) << "R3BMusicCal2HitPar::Init() Couldn't get handle on musicHitPar container";
     }
     else
     {
@@ -134,7 +134,7 @@ void R3BMusicCal2Hit::SetParameter()
         fZ2 = CalZParams->GetAt(2);
     }
     else
-        LOG(ERROR) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters must be < 4, "
+        LOG(error) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters must be < 4, "
                       "currently it is "
                    << fNumParams;
 }
@@ -148,14 +148,14 @@ InitStatus R3BMusicCal2Hit::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BMusicCal2Hit::Init() Root-manager not found.";
+        LOG(error) << "R3BMusicCal2Hit::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicCalDataCA = (TClonesArray*)rootManager->GetObject("MusicCalData");
     if (!fMusicCalDataCA)
     {
-        LOG(ERROR) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
+        LOG(error) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
         return kFATAL;
     }
 
@@ -235,7 +235,7 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         }
     }
 
-    // if(nba!=fNumAnodesAngleFit)LOG(ERROR) << "R3BMusicCal2Hit::nba("<< nba<<") and
+    // if(nba!=fNumAnodesAngleFit)LOG(error) << "R3BMusicCal2Hit::nba("<< nba<<") and
     // fNumAnodesAngleFit("<<fNumAnodesAngleFit <<") are different";
 
     if (fNumAnodesAngleFit > 2 && Esum / nba > 0.)

@@ -276,12 +276,12 @@ void R3BLosCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fLosHit_Par = (R3BLosHitPar*)rtdb->getContainer("LosHitPar");
     if (!fLosHit_Par)
     {
-        LOG(ERROR) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
+        LOG(error) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
     }
     else
     {
@@ -306,7 +306,7 @@ InitStatus R3BLosCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)

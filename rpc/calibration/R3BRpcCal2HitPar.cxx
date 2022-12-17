@@ -66,7 +66,7 @@ void R3BRpcCal2HitPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 }
 
@@ -79,21 +79,21 @@ InitStatus R3BRpcCal2HitPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() FairRootManager not found";
+        LOG(error) << "R3BRpcCal2HitPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
     if (!fCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
+        LOG(error) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BRpcCal2HitPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
@@ -101,7 +101,7 @@ InitStatus R3BRpcCal2HitPar::Init()
     if (!fHitPar)
 
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() Couldn't get handle on RPCHitPar container";
+        LOG(error) << "R3BRpcCal2HitPar::Init() Couldn't get handle on RPCHitPar container";
         return kFATAL;
     }
 

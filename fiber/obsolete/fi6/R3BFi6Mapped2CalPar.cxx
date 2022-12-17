@@ -82,7 +82,7 @@ InitStatus R3BFi6Mapped2CalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Fi6TCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BFi6Mapped2CalPar::Init() Couldn't get handle on Fi6TCalPar. ";
+        LOG(error) << "R3BFi6Mapped2CalPar::Init() Couldn't get handle on Fi6TCalPar. ";
         return kFATAL;
     }
 

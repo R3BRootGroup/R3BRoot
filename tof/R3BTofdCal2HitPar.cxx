@@ -164,7 +164,7 @@ InitStatus R3BTofdCal2HitPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdCal2HitPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdCal2HitPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
@@ -181,7 +181,7 @@ void R3BTofdCal2HitPar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //	    fCal_Par->setChanged();
 }
@@ -300,13 +300,13 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }

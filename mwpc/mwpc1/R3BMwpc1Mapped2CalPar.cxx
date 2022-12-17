@@ -107,7 +107,7 @@ InitStatus R3BMwpc1Mapped2CalPar::Init()
     fPad_Par = (R3BMwpc1CalPar*)rtdb->getContainer("mwpc1CalPar");
     if (!fPad_Par)
     {
-        LOG(ERROR) << "R3BMwpc1Mapped2CalPar::Init() Couldn't get handle on mwpc1CalPar container";
+        LOG(error) << "R3BMwpc1Mapped2CalPar::Init() Couldn't get handle on mwpc1CalPar container";
         return kFATAL;
     }
     return kSUCCESS;
@@ -141,7 +141,7 @@ void R3BMwpc1Mapped2CalPar::Exec(Option_t* opt)
         else if (planeid == 3) // plane Y
             fh_Map_q_pad[fNumPadX + padid]->Fill(MapHit->GetQ());
         else
-            LOG(ERROR) << "Plane " << planeid << " does not exist in MWPC1";
+            LOG(error) << "Plane " << planeid << " does not exist in MWPC1";
     }
 }
 

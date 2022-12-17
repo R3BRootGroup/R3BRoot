@@ -938,7 +938,7 @@ void R3BTofDCal2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
             LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                       << "\n";
@@ -1166,7 +1166,7 @@ void R3BTofDCal2HitPar::FinishTask()
         // Determine sync offset between paddles
         LOG(INFO) << "Calling function calcSync";
         calcSync();
-        LOG(ERROR) << "Call walk correction before next step!";
+        LOG(error) << "Call walk correction before next step!";
 
         for (Int_t i = 0; i < fNofPlanes; i++)
         {

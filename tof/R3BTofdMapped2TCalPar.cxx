@@ -115,7 +115,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
+        LOG(error) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
         return kFATAL;
     }
 
@@ -123,7 +123,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -152,13 +152,13 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 
         if (iPlane > fNofPlanes)
         {
-            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more planes than expected! Plane: " << iPlane
+            LOG(error) << "R3BTofdMapped2TCalPar::Exec() : more planes than expected! Plane: " << iPlane
                        << " allowed are 1.." << fNofPlanes;
             continue;
         }
         if (iBar > fPaddlesPerPlane)
         {
-            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.."
+            LOG(error) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.."
                        << fPaddlesPerPlane;
             continue;
         }

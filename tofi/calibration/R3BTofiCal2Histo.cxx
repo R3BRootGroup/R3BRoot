@@ -181,7 +181,7 @@ InitStatus R3BTofiCal2Histo::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -197,7 +197,7 @@ void R3BTofiCal2Histo::SetParContainers()
     fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
     }
     //    fCal_Par->setChanged();
 }
@@ -299,7 +299,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -339,7 +339,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -347,7 +347,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;

@@ -61,7 +61,7 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup structure information.";
+        LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
     // Register output array in tree

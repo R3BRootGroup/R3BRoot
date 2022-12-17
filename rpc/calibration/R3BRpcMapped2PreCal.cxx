@@ -63,20 +63,20 @@ InitStatus R3BRpcMapped2PreCal::Init()
     fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
     if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
+        LOG(error) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
     }
 
     fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
     if (!fTCalPar)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
     }
     else
     {
@@ -95,7 +95,7 @@ InitStatus R3BRpcMapped2PreCal::Init()
 
     if (fFpgaCorrelationFile=="")
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";
     }
 
     while(in >> chn_id >> side_lut ){

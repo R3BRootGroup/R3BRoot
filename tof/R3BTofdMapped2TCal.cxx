@@ -72,7 +72,7 @@ InitStatus R3BTofdMapped2TCal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar";
+        LOG(error) << "There are no TCal parameters in container TofdTCalPar";
         return kFATAL;
     }
 
@@ -106,7 +106,7 @@ void R3BTofdMapped2TCal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
+        LOG(error) << "Could not get access to TofdTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }

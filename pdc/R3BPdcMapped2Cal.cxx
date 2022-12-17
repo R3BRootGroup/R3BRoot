@@ -70,7 +70,7 @@ InitStatus R3BPdcMapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container PdcTCalPar";
+        LOG(error) << "There are no TCal parameters in container PdcTCalPar";
         return kFATAL;
     }
 
@@ -100,7 +100,7 @@ void R3BPdcMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to PdcTCalPar-Container.";
+        LOG(error) << "Could not get access to PdcTCalPar-Container.";
         fNofTcalPars = 0;
     }
 }
@@ -146,7 +146,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
 
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
+            LOG(error) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }

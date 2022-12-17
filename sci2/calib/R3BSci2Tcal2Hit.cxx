@@ -66,12 +66,12 @@ void R3BSci2Tcal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fSci2Hit_Par = (R3BSci2HitPar*)rtdb->getContainer("Sci2HitPar");
     if (!fSci2Hit_Par)
     {
-        LOG(ERROR) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
+        LOG(error) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
     }
     else
     {

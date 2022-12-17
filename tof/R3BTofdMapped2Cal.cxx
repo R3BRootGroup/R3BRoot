@@ -199,7 +199,7 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
             mapped->GetDetectorId(), mapped->GetBarId(), 2 * mapped->GetSideId() + mapped->GetEdgeId() - 2);
         if (!par)
         {
-            LOG(ERROR) << "R3BTofdMapped2Cal::Exec : Tcal par not found, Plane: " << mapped->GetDetectorId()
+            LOG(error) << "R3BTofdMapped2Cal::Exec : Tcal par not found, Plane: " << mapped->GetDetectorId()
                        << ", Bar: " << mapped->GetBarId() << ", Side: " << mapped->GetSideId()
                        << ", Edge: " << mapped->GetEdgeId();
             continue;

@@ -89,13 +89,13 @@ void R3BAmsMapped2StripCal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fCal_Par = (R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
+        LOG(error) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
     }
     else
     {
@@ -191,7 +191,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
 
     if (!fCal_Par)
     {
-        LOG(ERROR) << "NO Container Parameter!!";
+        LOG(error) << "NO Container Parameter!!";
     }
 
     // Reading the Input -- Mapped Data --

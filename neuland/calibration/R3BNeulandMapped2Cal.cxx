@@ -75,7 +75,7 @@ InitStatus R3BNeulandMapped2Cal::Init()
 
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container LandTCalPar";
+        LOG(error) << "There are no TCal parameters in container LandTCalPar";
         return kFATAL;
     }
 
@@ -130,7 +130,7 @@ void R3BNeulandMapped2Cal::SetParContainers()
 
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to LandTCalPar-Container.";
+        LOG(error) << "Could not get access to LandTCalPar-Container.";
         fNofTcalPars = 0;
     }
     return;
@@ -279,7 +279,7 @@ void R3BNeulandMapped2Cal::MakeCal()
 
         if (timeLE < 0. || timeLE > fClockFreq || timeTE < 0. || timeTE > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
+            LOG(error) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
                        << ", tdc= " << tdc << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE;
             continue;
         }

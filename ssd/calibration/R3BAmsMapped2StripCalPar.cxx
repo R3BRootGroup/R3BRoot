@@ -103,13 +103,13 @@ void R3BAmsMapped2StripCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
     }
     else
     {
@@ -156,7 +156,7 @@ InitStatus R3BAmsMapped2StripCalPar::Init()
     fStrip_Par = (R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
     if (!fStrip_Par)
     {
-        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
+        LOG(error) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
         return kFATAL;
     }
 

@@ -136,7 +136,7 @@ void R3BRoluMapped2Cal::SetParContainers()
 
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to RoluTCalPar-Container.";
+        LOG(error) << "Could not get access to RoluTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -177,7 +177,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(ERROR) << "R3BRoluMapped2Cal::Exec : Detector number out of range: " << iDet;
+            LOG(error) << "R3BRoluMapped2Cal::Exec : Detector number out of range: " << iDet;
             continue;
         }
 

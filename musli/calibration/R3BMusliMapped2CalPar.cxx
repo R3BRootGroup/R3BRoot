@@ -108,7 +108,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
     if (!fMusliMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: MusliMappedData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: MusliMappedData not found";
         return kFATAL;
     }
 
@@ -116,7 +116,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMwAHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
     if (!fMwAHitDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: " + fNameDetA + "HitData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetA + "HitData not found";
         return kFATAL;
     }
 
@@ -124,7 +124,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMwBHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
     if (!fMwBHitDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: " + fNameDetB + "HitData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetB + "HitData not found";
         return kFATAL;
     }
 
@@ -138,7 +138,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
+        LOG(error) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
         return kFATAL;
     }
 

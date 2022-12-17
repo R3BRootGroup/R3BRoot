@@ -92,13 +92,13 @@ void R3BAmsOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
     }
     else
     {
@@ -110,7 +110,7 @@ void R3BAmsOnlineSpectra::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsOnlineSpectra::amsMappingPar container not found";
+        LOG(error) << "R3BAmsOnlineSpectra::amsMappingPar container not found";
     }
     //--- Parameter Container ---
     fNbDet = fMap_Par->GetNumDets(); // Number of detectors

@@ -217,10 +217,10 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
 
             if (fPosIn.Z() < 30. && newpos[2] > 30.02)
             {
-                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+                LOG(error) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
                            << " with safety = " << safety;
-                LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
-                LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
+                LOG(error) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
+                LOG(error) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
             }
 
             fPosOut.SetX(newpos[0]);

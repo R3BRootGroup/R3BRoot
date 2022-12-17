@@ -2797,8 +2797,8 @@ void R3BXBallv0::ConstructGeometry2()
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BXBallv0::ConstructGeometry1()
 {
-    LOG(ERROR) << "R3BXBallv0 Dummy function called !!! ";
-    LOG(ERROR) << "no Crystal geometry will be created ... ";
+    LOG(error) << "R3BXBallv0 Dummy function called !!! ";
+    LOG(error) << "no Crystal geometry will be created ... ";
     return;
 }
 

@@ -87,13 +87,13 @@ void R3BAmsStripCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsStripCal2Hit::Init() Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsStripCal2Hit::Init() Couldn't get handle on amsMappingPar container";
     }
     else
     {

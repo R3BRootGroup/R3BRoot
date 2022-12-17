@@ -40,21 +40,21 @@ InitStatus R3BSfibMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
+        LOG(error) << "TCal parameter containers missing, "
                       "did you forget SetParContainers?";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = "SfibMapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register("SfibCal", "Land", fCalItems, kTRUE);
@@ -67,7 +67,7 @@ void R3BSfibMapped2Cal::SetParContainers()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get access to " << name << " container.";
+        LOG(error) << "Could not get access to " << name << " container.";
     }
 }
 
@@ -114,7 +114,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(error) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }

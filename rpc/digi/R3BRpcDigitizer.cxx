@@ -55,7 +55,7 @@ void R3BRpcDigitizer::SetParContainers()
     fSim_Par = (R3BRpcPars4Sim*)rtdb->getContainer("rpcPars4Sim");
     if (!fSim_Par)
     {
-        LOG(ERROR) << "R3BRpcDigitizer::Init() Couldn't get handle on "
+        LOG(error) << "R3BRpcDigitizer::Init() Couldn't get handle on "
                       "rpcPars4Sim container";
     }
     else

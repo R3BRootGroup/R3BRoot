@@ -99,7 +99,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
-        LOG(ERROR) << "R3BPspxPrecal2Cal::Init() Root-manager not found.";
+        LOG(error) << "R3BPspxPrecal2Cal::Init() Root-manager not found.";
         return kFATAL;
     }
 
@@ -120,7 +120,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
         {
             if (d == 0)
             {
-                LOG(ERROR) << "R3BPspxPrecal2Cal::Init() Couldn't get handle on PSPX-precal items.";
+                LOG(error) << "R3BPspxPrecal2Cal::Init() Couldn't get handle on PSPX-precal items.";
                 return kFATAL;
             }
             break;
@@ -155,7 +155,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BPspxPrecal2Cal::FairRuntimeDb not opened!";
+        LOG(error) << "R3BPspxPrecal2Cal::FairRuntimeDb not opened!";
         return;
     }
     else
@@ -166,7 +166,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
     fCalPar = (R3BPspxCalPar*)rtdb->getContainer("R3BPspxCalPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BPspxPrecal2Cal::Could not get access to R3BPspxCalPar-Container.";
+        LOG(error) << "R3BPspxPrecal2Cal::Could not get access to R3BPspxCalPar-Container.";
         return;
     }
 
@@ -185,7 +185,7 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
 
         if (!fCalPar)
         {
-            LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
+            LOG(error) << "Could not get access to R3BPspxCalPar-Container.";
             return kFATAL;
         }*/
 

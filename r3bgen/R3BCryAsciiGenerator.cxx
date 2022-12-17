@@ -42,7 +42,7 @@ R3BCryAsciiGenerator::R3BCryAsciiGenerator(std::string fileName)
 {
     infile.open(fileName);
     if (!infile.is_open())
-        LOG(ERROR) << "R3BCryAsciiGenerator: Cannot open input file.";
+        LOG(error) << "R3BCryAsciiGenerator: Cannot open input file.";
 }
 
 R3BCryAsciiGenerator::R3BCryAsciiGenerator(const TString& fileName)

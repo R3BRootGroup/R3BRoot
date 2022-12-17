@@ -54,7 +54,7 @@ InitStatus R3BSfibCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
 

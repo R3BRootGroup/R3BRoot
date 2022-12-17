@@ -62,7 +62,7 @@ void R3BCalifaDigitizer::SetParContainers()
         fSim_Par = (R3BCalifaCrystalPars4Sim*)rtdb->getContainer("califaCrystalPars4Sim");
         if (!fSim_Par)
         {
-            LOG(ERROR) << "R3BCalifaDigitizer::Init() Couldn't get handle on "
+            LOG(error) << "R3BCalifaDigitizer::Init() Couldn't get handle on "
                           "califaCrystalPars4Sim container";
         }
         else

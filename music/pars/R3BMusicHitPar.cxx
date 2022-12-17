@@ -93,13 +93,13 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
     LOG(INFO) << "R3BMusicHitPar::getParams() called";
     if (!list)
     {
-        LOG(ERROR) << "Could not initialize FairParamList";
+        LOG(error) << "Could not initialize FairParamList";
         return kFALSE;
     }
 
     if (!list->fill("musicAnodeNumberPar", &fNumAnodes))
     {
-        LOG(ERROR) << "Could not initialize musicAnodeNumberPar";
+        LOG(error) << "Could not initialize musicAnodeNumberPar";
         return kFALSE;
     }
     LOG(INFO) << "Nb Anodes: " << fNumAnodes;
@@ -113,20 +113,20 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
     fIn_use->Set(fNumAnodes);
     if (!(list->fill("musicInUsePar", fIn_use)))
     {
-        LOG(ERROR) << "Could not initialize musicInUsePar";
+        LOG(error) << "Could not initialize musicInUsePar";
         return kFALSE;
     }
 
     fAnode_pos->Set(fNumAnodes);
     if (!(list->fill("musicAnodePosPar", fAnode_pos)))
     {
-        LOG(ERROR) << "Could not initialize musicAnodePosPar";
+        LOG(error) << "Could not initialize musicAnodePosPar";
         return kFALSE;
     }
 
     if (!list->fill("musicZHitParamsFitPar", &fNumParamsZFit))
     {
-        LOG(ERROR) << "Could not initialize musicZHitParamsFitPar";
+        LOG(error) << "Could not initialize musicZHitParamsFitPar";
         return kFALSE;
     }
 
@@ -134,7 +134,7 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
     fDetZHitParams->Set(fNumParamsZFit);
     if (!(list->fill("musicZHitPar", fDetZHitParams)))
     {
-        LOG(ERROR) << "Could not initialize musicZHitPar";
+        LOG(error) << "Could not initialize musicZHitPar";
         return kFALSE;
     }
 

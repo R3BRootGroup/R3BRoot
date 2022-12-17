@@ -115,7 +115,7 @@ void R3BSci2Mapped2Tcal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to Sci2TCalPar container.";
+        LOG(error) << "Could not get access to Sci2TCalPar container.";
         fNofTcalPars = 0;
     }
     return;

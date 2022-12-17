@@ -38,7 +38,7 @@ const char* ELIGeoLuMon::getModuleName(Int_t m)
     // Returns the module name of sts number m
     if (m < 0)
     {
-        LOG(ERROR) << "ELIGeoLuMon::getModuleName:: Module number " << m << " not known!";
+        LOG(error) << "ELIGeoLuMon::getModuleName:: Module number " << m << " not known!";
         return "";
     }
     if (m < 9)

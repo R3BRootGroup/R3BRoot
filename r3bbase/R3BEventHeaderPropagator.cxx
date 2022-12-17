@@ -53,7 +53,7 @@ InitStatus R3BEventHeaderPropagator::Init()
     fSource = R3BFileSource::Instance();
     if (!fSource)
     {
-        LOG(ERROR) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
+        LOG(error) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
     }
     return kSUCCESS;
 }

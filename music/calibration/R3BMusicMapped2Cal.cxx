@@ -76,13 +76,13 @@ void R3BMusicMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal::SetParContainers() Couldn't get handle on musicCalPar container";
+        LOG(error) << "R3BMusicMapped2Cal::SetParContainers() Couldn't get handle on musicCalPar container";
     }
     else
     {
@@ -128,14 +128,14 @@ InitStatus R3BMusicMapped2Cal::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal::Init() Root-manager not found.";
+        LOG(error) << "R3BMusicMapped2Cal::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal::Init() MusicMappedData not found.";
+        LOG(error) << "R3BMusicMapped2Cal::Init() MusicMappedData not found.";
         return kFATAL;
     }
 

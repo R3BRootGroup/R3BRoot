@@ -195,14 +195,14 @@ InitStatus R3BTofdCal2Hit::Init()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofdHitPar";
+        LOG(error) << "There are no Hit parameters in container TofdHitPar";
         return kFATAL;
     }
     // get access to Cal data
@@ -239,7 +239,7 @@ void R3BTofdCal2Hit::SetParContainers()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -441,13 +441,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
