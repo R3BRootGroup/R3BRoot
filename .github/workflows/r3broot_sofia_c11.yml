@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI C11
+name: CI C11 SOFIA repository
 
 # Controls when the action will run. 
 on:
@@ -15,16 +15,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test:
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Code formatting
-        run: |
-          cd $GITHUB_WORKSPACE
-          singularity exec /data.local2/kresan/debian10-jun19p2-v18.2.1-ucesb.sif $PWD/travis-clang-format-check.sh clang-format-8
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
@@ -41,5 +31,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone https://github.com/R3BRootGroup/macros.git
           cd macros && git checkout dev && cd ..
+          git clone https://github.com/R3BRootGroup/sofia.git
+          cd sofia && git checkout dev && cd ..
           singularity exec /data.local2/kresan/debian10-jun19p2-v18.2.1-ucesb.sif $PWD/containers/run_build_test.sh
 

@@ -276,12 +276,14 @@ else(${IS_XCODE})
     set(LD_LIBRARY_PATH ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 endif(${IS_XCODE})
 
-
-find_package2(PRIVATE ClangFormat)
-if(ClangFormat_FOUND)
-  add_custom_target(FormatCheck
-    ${CMAKE_COMMAND} -E env R3BROOT_GIT_CLANG_FORMAT_BIN=${GIT_CLANG_FORMAT_BIN} ${CMAKE_SOURCE_DIR}/check-format.sh
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+find_package2(PRIVATE R3BClangFormat)
+if(ClangFormat_FOUND)    
+  add_custom_target(R3BFormatCheck
+    ${CMAKE_COMMAND} -E env
+      R3BROOT_GIT_CLANG_FORMAT_BIN=${GIT_CLANG_FORMAT_BIN}
+      R3BROOT_CLANG_FORMAT_BIN=${CLANG_FORMAT_BIN}
+      ${CMAKE_SOURCE_DIR}/check-format.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} 
   )
 else()
   message(WARNING "${BMagenta}No Clang configured.${CR}")
