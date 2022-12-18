@@ -19,12 +19,16 @@
 
 find_program(CLANG_FORMAT_BIN
   NAMES clang-format
+        clang-format-11
+        clang-format-10
         clang-format-9
         clang-format-8
 )
 
 find_program(GIT_CLANG_FORMAT_BIN
   NAMES git-clang-format
+        git-clang-format-11
+        git-clang-format-10
         git-clang-format-9
         git-clang-format-8
 )
