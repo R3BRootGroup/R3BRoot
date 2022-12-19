@@ -93,7 +93,7 @@ R3BNeulandNeutronReconstructionMon::R3BNeulandNeutronReconstructionMon(const TSt
     , fInput(input)
     , fOutput(output)
 {
-    LOG(INFO) << "Using R3B Neuland Neutron Reconstruction Evaluation";
+    LOG(info) << "Using R3B Neuland Neutron Reconstruction Evaluation";
 }
 
 R3BNeulandNeutronReconstructionMon::~R3BNeulandNeutronReconstructionMon() {}
@@ -103,19 +103,19 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init: No FairRootManager";
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init: No FairRootManager";
         return kFATAL;
     }
 
     // Set Input: TClonesArray of R3BNeulandNeutrons
     if ((TClonesArray*)ioman->GetObject(fInput) == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init No " << fInput << "!";
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No " << fInput << "!";
         return kFATAL;
     }
     if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
                    << " does not contain "
                       "R3BNeulandNeutrons!";
         return kFATAL;
@@ -125,13 +125,13 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     // Set Input: TClonesArray of FairMCPoints
     if ((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints") == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init No NeulandPrimaryPoints!";
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No NeulandPrimaryPoints!";
         return kFATAL;
     }
     if (!TString(((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints"))->GetClass()->GetName())
              .EqualTo("R3BNeulandPoint"))
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryPoints "
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryPoints "
                       "does not contain R3BNeulandPoint!";
         return kFATAL;
     }
@@ -140,12 +140,12 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     // Set Input: TClonesArray of R3BMCTrack
     if ((TClonesArray*)ioman->GetObject("MCTrack") == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init No MCTrack!";
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No MCTrack!";
         return kFATAL;
     }
     if (!TString(((TClonesArray*)ioman->GetObject("MCTrack"))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
+        LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
                       "does not contain FairMCPoints!";
         return kFATAL;
     }

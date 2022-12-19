@@ -74,10 +74,10 @@ InitStatus R3BNeulandCal2HitPar::Init()
     }
 
     fNeulandHitPar = static_cast<R3BNeulandHitPar*>(FairRuntimeDb::instance()->getContainer("NeulandHitPar"));
-    LOG(INFO) << "R3BNeulandCal2HitPar::Init: "
+    LOG(info) << "R3BNeulandCal2HitPar::Init: "
               << "Number of Hit-Paramteres found: " << fNeulandHitPar->GetNumModulePar();
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::Init: "
+    LOG(info) << "R3BNeulandCal2HitPar::Init: "
               << "Initializing NeulandHitCalibrationEngine.";
     fHitCalEngine->Init(fNeulandHitPar);
 
@@ -171,10 +171,10 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
 void R3BNeulandCal2HitPar::FinishTask()
 {
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Saved " << fAcceptedEventNumber << " Events.                       ";
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Starting Neuland Hit Calibration with " << fAcceptedEventNumber << " Events.";
 
     const auto batchMode = gROOT->IsBatch();
@@ -207,12 +207,12 @@ void R3BNeulandCal2HitPar::FinishTask()
     }
 
     fNeulandHitPar->SetEnergyCutoff(maxThreshold);
-    LOG(INFO) << TString::Format("R3BNeulandCal2HitPar::FinishTask: Recommended Minimum Energy Cutoff : >%4.2f MeV\n",
+    LOG(info) << TString::Format("R3BNeulandCal2HitPar::FinishTask: Recommended Minimum Energy Cutoff : >%4.2f MeV\n",
                                  maxThreshold);
 
     fNeulandHitPar->setChanged();
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Number of calibrated Bars: " << fNeulandHitPar->GetNumModulePar();
 }
 

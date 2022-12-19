@@ -89,7 +89,7 @@ void R3BCalifaMappingPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BCalifaMappingPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaMappingPar::putParams() called";
+    LOG(info) << "R3BCalifaMappingPar::putParams() called";
     if (!list)
     {
         return;
@@ -130,7 +130,7 @@ void R3BCalifaMappingPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaMappingPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaMappingPar::getParams() called";
+    LOG(info) << "R3BCalifaMappingPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -142,91 +142,91 @@ Bool_t R3BCalifaMappingPar::getParams(FairParamList* list)
     fHalf->Set(fNumCrystals);
     if (!(list->fill("califaHalfPar", fHalf)))
     {
-        LOG(INFO) << "---Could not initialize califaHalfPar";
+        LOG(info) << "---Could not initialize califaHalfPar";
         return kFALSE;
     }
     fRing->Set(fNumCrystals);
     if (!(list->fill("califaRingPar", fRing)))
     {
-        LOG(INFO) << "---Could not initialize califaRingPar";
+        LOG(info) << "---Could not initialize califaRingPar";
         return kFALSE;
     }
     fPreamp->Set(fNumCrystals);
     if (!(list->fill("califaPreampPar", fPreamp)))
     {
-        LOG(INFO) << "---Could not initialize califaPreampPar";
+        LOG(info) << "---Could not initialize califaPreampPar";
         return kFALSE;
     }
     fChannel->Set(fNumCrystals);
     if (!(list->fill("califaChannelPar", fChannel)))
     {
-        LOG(INFO) << "---Could not initialize califaChannelPar";
+        LOG(info) << "---Could not initialize califaChannelPar";
         return kFALSE;
     }
     fCrystal_type->Set(fNumCrystals);
     if (!(list->fill("califaCrystalTypePar", fCrystal_type)))
     {
-        LOG(INFO) << "---Could not initialize califaCrystalTypePar";
+        LOG(info) << "---Could not initialize califaCrystalTypePar";
         return kFALSE;
     }
     fApd_number->Set(fNumCrystals);
     if (!(list->fill("califaApdNumberPar", fApd_number)))
     {
-        LOG(INFO) << "---Could not initialize califaApdNumberPar";
+        LOG(info) << "---Could not initialize califaApdNumberPar";
         return kFALSE;
     }
     fVoltage->Set(fNumCrystals);
     if (!(list->fill("califaVoltagePar", fVoltage)))
     {
-        LOG(INFO) << "---Could not initialize califaVoltagePar";
+        LOG(info) << "---Could not initialize califaVoltagePar";
         return kFALSE;
     }
     fFebex_slot->Set(fNumCrystals);
     if (!(list->fill("califaFebexSlotPar", fFebex_slot)))
     {
-        LOG(INFO) << "---Could not initialize califaFebexSlotPar";
+        LOG(info) << "---Could not initialize califaFebexSlotPar";
         return kFALSE;
     }
     fFebex_mod->Set(fNumCrystals);
     if (!(list->fill("califaFebexModPar", fFebex_mod)))
     {
-        LOG(INFO) << "---Could not initialize califaFebexModPar";
+        LOG(info) << "---Could not initialize califaFebexModPar";
         return kFALSE;
     }
     fFebex_channel->Set(fNumCrystals);
     if (!(list->fill("califaFebexChannelPar", fFebex_channel)))
     {
-        LOG(INFO) << "---Could not initialize califaFebexChannelPar";
+        LOG(info) << "---Could not initialize califaFebexChannelPar";
         return kFALSE;
     }
     fLab->Set(fNumCrystals);
     if (!(list->fill("califaLabPar", fLab)))
     {
-        LOG(INFO) << "---Could not initialize califaLabPar";
+        LOG(info) << "---Could not initialize califaLabPar";
         return kFALSE;
     }
     fMrcc_module->Set(fNumCrystals);
     if (!(list->fill("califaMrccModulesPar", fMrcc_module)))
     {
-        LOG(INFO) << "---Could not initialize califaMrccModulesPar";
+        LOG(info) << "---Could not initialize califaMrccModulesPar";
         return kFALSE;
     }
     fMrcc_bus->Set(fNumCrystals);
     if (!(list->fill("califaMrccBusPar", fMrcc_bus)))
     {
-        LOG(INFO) << "---Could not initialize califaMrccBusPar";
+        LOG(info) << "---Could not initialize califaMrccBusPar";
         return kFALSE;
     }
     fMrcc_preamp->Set(fNumCrystals);
     if (!(list->fill("califaMrccPreampPar", fMrcc_preamp)))
     {
-        LOG(INFO) << "---Could not initialize califaMrccPreampPar";
+        LOG(info) << "---Could not initialize califaMrccPreampPar";
         return kFALSE;
     }
     fIn_use->Set(fNumCrystals);
     if (!(list->fill("califaInUsePar", fIn_use)))
     {
-        LOG(INFO) << "---Could not initialize califaHacalifaInUseParlfPar";
+        LOG(info) << "---Could not initialize califaHacalifaInUseParlfPar";
         return kFALSE;
     }
 
@@ -241,16 +241,16 @@ void R3BCalifaMappingPar::printMapCrystalInfo(const UInt_t cryID)
 {
     if (cryID < 1)
     {
-        LOG(ERROR) << "crystal_id must be given in 1-base";
+        LOG(error) << "crystal_id must be given in 1-base";
         return;
     }
     else if (cryID > fNumCrystals)
     {
-        LOG(ERROR) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
+        LOG(error) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
         return;
     }
     auto index = cryID - 1;
-    LOG(INFO) << "crystal_id " << cryID << " , "
+    LOG(info) << "crystal_id " << cryID << " , "
               << "half " << fHalf->GetAt(index) << " , "
               << "ring " << fRing->GetAt(index) << " , "
               << "preamp " << fPreamp->GetAt(index) << " , "
@@ -271,9 +271,9 @@ void R3BCalifaMappingPar::printMapCrystalInfo(const UInt_t cryID)
 // ----  Method printParams ----------------------------------------------------
 void R3BCalifaMappingPar::printParams()
 {
-    LOG(INFO) << "R3BCalifaMappingPar: Califa Mapping Parameters:";
+    LOG(info) << "R3BCalifaMappingPar: Califa Mapping Parameters:";
 
-    LOG(INFO) << "crystal_id"
+    LOG(info) << "crystal_id"
               << " "
               << "half"
               << " "
@@ -306,7 +306,7 @@ void R3BCalifaMappingPar::printParams()
               << "in_use";
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
-        LOG(INFO) << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "
+        LOG(info) << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "
                   << fChannel->GetAt(i) << " " << fCrystal_type->GetAt(i) << " " << fApd_number->GetAt(i) << " "
                   << fVoltage->GetAt(i) << " " << fFebex_slot->GetAt(i) << " " << fFebex_mod->GetAt(i) << " "
                   << fFebex_channel->GetAt(i) << " " << fLab->GetAt(i) << " " << fMrcc_module->GetAt(i) << " "

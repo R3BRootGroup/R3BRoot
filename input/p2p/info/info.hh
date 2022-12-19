@@ -1,5 +1,5 @@
-#ifndef _INFO_HH_
-#define _INFO_HH_
+#ifndef _info_HH_
+#define _info_HH_
 
 #include <math.h>
 
@@ -12,7 +12,7 @@ const double UNIT = 931.4940954;          // Atomic mass unit MeV/c²
 
 
 //Nuclear masses from http://wwwndc.jaea.go.jp/NuC/
-// WARNING (M. Winkel): website above lists ATOMIC masses!
+// warn (M. Winkel): website above lists ATOMIC masses!
 
 //C-12
 

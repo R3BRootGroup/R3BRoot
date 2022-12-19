@@ -52,11 +52,11 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMASTER, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information");
+        R3BLOG(fatal, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -65,11 +65,11 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);

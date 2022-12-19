@@ -69,26 +69,26 @@ R3BMusliMapped2CalPar::R3BMusliMapped2CalPar(const TString& name,
 }
 
 // Virtual R3BMusliMapped2CalPar: Destructor
-R3BMusliMapped2CalPar::~R3BMusliMapped2CalPar() { LOG(INFO) << "R3BMusliMapped2CalPar: Delete instance"; }
+R3BMusliMapped2CalPar::~R3BMusliMapped2CalPar() { LOG(info) << "R3BMusliMapped2CalPar: Delete instance"; }
 
 void R3BMusliMapped2CalPar::SetParContainers()
 {
     // Parameter Container
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "R3BMusliMapped2CalPar::SetParContainers(), FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "R3BMusliMapped2CalPar::SetParContainers(), FairRuntimeDb not found");
 
     fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
     R3BLOG_IF(
-        ERROR, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to MusliGeoPar container.");
+        error, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to MusliGeoPar container.");
 
     fMwAGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetA + "GeoPar");
-    R3BLOG_IF(ERROR,
+    R3BLOG_IF(error,
               !fMwAGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetA + "GeoPar container.");
 
     fMwBGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetB + "GeoPar");
-    R3BLOG_IF(ERROR,
+    R3BLOG_IF(error,
               !fMwBGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetB + "GeoPar container.");
 }
@@ -96,7 +96,7 @@ void R3BMusliMapped2CalPar::SetParContainers()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusliMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "R3BMusliMapped2CalPar: Init");
+    R3BLOG(info, "R3BMusliMapped2CalPar: Init");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -108,7 +108,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
     if (!fMusliMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: MusliMappedData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: MusliMappedData not found";
         return kFATAL;
     }
 
@@ -116,7 +116,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMwAHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
     if (!fMwAHitDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: " + fNameDetA + "HitData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetA + "HitData not found";
         return kFATAL;
     }
 
@@ -124,7 +124,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fMwBHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
     if (!fMwBHitDataCA)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar: " + fNameDetB + "HitData not found";
+        LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetB + "HitData not found";
         return kFATAL;
     }
 
@@ -138,7 +138,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
+        LOG(error) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
         return kFATAL;
     }
 
@@ -256,7 +256,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
 
 void R3BMusliMapped2CalPar::CalculatePosCalPar()
 {
-    R3BLOG(INFO, "R3BMusliMapped2CalPar::CalculatePosCalPar()");
+    R3BLOG(info, "R3BMusliMapped2CalPar::CalculatePosCalPar()");
     TH1D* h1_pfx_XvsDT[fNumGroupsAnodes];
     TF1* fit_pol1_XvsDT[fNumGroupsAnodes];
     char Name[255];

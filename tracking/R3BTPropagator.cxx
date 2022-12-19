@@ -102,7 +102,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
     Double_t step = 0.;
     Bool_t result;
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane1[0], fNorm1, intersect);
-    // LOG(INFO) << "crossed: " << crossed;
+    // LOG(info) << "crossed: " << crossed;
     if (crossed)
     {
         LOG(DEBUG2) << "Starting upstream of magnetic field boundaries...";
@@ -140,7 +140,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
             tpos = particle->GetPosition();
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
-            // LOG(INFO) << particle->GetCharge();
+            // LOG(info) << particle->GetCharge();
             result = PropagateToPlaneRK(particle, v1, v2, v3);
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
@@ -181,7 +181,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         return kTRUE;
     }
 
-    LOG(ERROR) << "!!! Failed !!!";
+    LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 
@@ -279,7 +279,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         return kTRUE;
     }
 
-    LOG(ERROR) << "!!! Failed !!!";
+    LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 

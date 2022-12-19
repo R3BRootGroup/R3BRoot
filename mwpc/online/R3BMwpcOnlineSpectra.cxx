@@ -71,7 +71,7 @@ R3BMwpcOnlineSpectra::R3BMwpcOnlineSpectra(const TString& name, Int_t iVerbose, 
 
 R3BMwpcOnlineSpectra::~R3BMwpcOnlineSpectra()
 {
-    LOG(INFO) << "R3B" + fNameDet + "OnlineSpectra::Delete instance";
+    LOG(info) << "R3B" + fNameDet + "OnlineSpectra::Delete instance";
     if (fMapItemsMwpc)
         delete fMapItemsMwpc;
     if (fCalItemsMwpc)
@@ -83,14 +83,14 @@ R3BMwpcOnlineSpectra::~R3BMwpcOnlineSpectra()
 InitStatus R3BMwpcOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3B" + fNameDet + "OnlineSpectra::Init ";
+    LOG(info) << "R3B" + fNameDet + "OnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3B" + fNameDet + "OnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3B" + fNameDet + "OnlineSpectra::Init FairRootManager not found";
     // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
@@ -113,7 +113,7 @@ InitStatus R3BMwpcOnlineSpectra::Init()
     // get access to hit data of mwpcs
     fHitItemsMwpc = (TClonesArray*)mgr->GetObject(fNameDet + "HitData");
     if (!fHitItemsMwpc)
-        LOG(WARNING) << "R3BMwpcOnlineSpectra: " + fNameDet + "HitData not found";
+        LOG(warn) << "R3BMwpcOnlineSpectra: " + fNameDet + "HitData not found";
 
     // Create histograms for detectors
     TString Name1;
@@ -425,7 +425,7 @@ InitStatus R3BMwpcOnlineSpectra::Init()
 
 void R3BMwpcOnlineSpectra::Reset_Histo()
 {
-    LOG(INFO) << "R3B" + fNameDet + "OnlineSpectra::Reset_Histo";
+    LOG(info) << "R3B" + fNameDet + "OnlineSpectra::Reset_Histo";
     // Mapped data
     if (fMapItemsMwpc)
     {
@@ -466,7 +466,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3B" + fNameDet + "OnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3B" + fNameDet + "OnlineSpectra::Exec FairRootManager not found";
 
     if (fMapItemsMwpc && fMapItemsMwpc->GetEntriesFast() > 0)
     {

@@ -63,14 +63,14 @@ R3BMusliOnlineSpectra::R3BMusliOnlineSpectra(const TString& name, Int_t iVerbose
 
 R3BMusliOnlineSpectra::~R3BMusliOnlineSpectra()
 {
-    LOG(INFO) << "R3BMusliOnlineSpectra::Delete instance";
+    LOG(info) << "R3BMusliOnlineSpectra::Delete instance";
     if (fMapItemsMusli)
         delete fMapItemsMusli;
 }
 
 InitStatus R3BMusliOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BMusliOnlineSpectra::Init ";
+    LOG(info) << "R3BMusliOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -78,7 +78,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(FATAL) << "R3BMusliOnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3BMusliOnlineSpectra::Init FairRootManager not found";
         return kFATAL;
     }
     // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
@@ -97,14 +97,14 @@ InitStatus R3BMusliOnlineSpectra::Init()
     fCalItemsMusli = (TClonesArray*)mgr->GetObject("MusliCalData");
     if (!fCalItemsMusli)
     {
-        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
+        LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
     }
 
     // get access to the HIT data of the MUSIC
     fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
     if (!fHitItemsMusli)
     {
-        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
+        LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
     }
 
     // Create histograms for detectors
@@ -1174,7 +1174,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
 
 void R3BMusliOnlineSpectra::Reset_Histo()
 {
-    LOG(INFO) << "R3BMusliOnlineSpectra::Reset_Histo";
+    LOG(info) << "R3BMusliOnlineSpectra::Reset_Histo";
 
     // --- Reset Histo of mapped level --- //
     fh1_Muslimap_mult->Reset();
@@ -1231,7 +1231,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BMusliOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BMusliOnlineSpectra::Exec FairRootManager not found";
 
     Int_t nHits;
     UInt_t rank;

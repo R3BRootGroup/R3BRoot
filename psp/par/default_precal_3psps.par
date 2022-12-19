@@ -8,7 +8,7 @@
 # 3 physical detectors are in this step 12 detetors in R3BRoot
 # because each detector is divided again into front and back side 
 #
-# WARNING: Never ever use TABS! Don't put a Space behind the Backslash!
+# warn: Never ever use TABS! Don't put a Space behind the Backslash!
 #################################################################
 [R3BPspxPrecalPar]
 //-------------------------------------------------------------

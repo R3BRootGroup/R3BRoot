@@ -292,7 +292,7 @@ R3BFiberReader::~R3BFiberReader()
 
 Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
 {
-    R3BLOG(INFO, "For fiber " << fShortName);
+    R3BLOG(info, "For fiber " << fShortName);
     if (fShortName == "Fi23a")
     {
         R3B_MAPMT_INIT_TRIG(FIBZEA, fData23a);
@@ -361,7 +361,7 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
                     auto const& ch = fMHL[side_i][edge_i][prec_i];
                     if (fChannelNum[side_i] != ch._MI_len)
                     {
-                        LOG(FATAL) << "Multi-hit array sizes mismatch (fChannelNum[" << side_i
+                        LOG(fatal) << "Multi-hit array sizes mismatch (fChannelNum[" << side_i
                                    << "]=" << fChannelNum[side_i] << " != MI-len=" << ch._MI_len << ").";
                         return kFALSE;
                     }
@@ -384,7 +384,7 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
                     auto const& ch = fMHL[side_i][edge_i][prec_i];
                     if (fFiberNum != ch._MI_len)
                     {
-                        R3BLOG(FATAL,
+                        R3BLOG(fatal,
                                "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum << " != MI-len=" << ch._MI_len
                                                                             << ").");
                         return kFALSE;
@@ -399,11 +399,11 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
         EXT_STR_h101_FIB_ITEMS_INFO(okt, *a_struct_info, fOffsetspmttrig, EXT_STR_h101_FIB, 0);
         if (!okt)
         {
-            R3BLOG(FATAL, "Failed to setup structure information of EXT_STR_h101_FIB_ITEMS_INFO.");
+            R3BLOG(fatal, "Failed to setup structure information of EXT_STR_h101_FIB_ITEMS_INFO.");
             return kFALSE;
         }
         else
-            R3BLOG(INFO, "SPMT trigger times for " << fShortName);
+            R3BLOG(info, "SPMT trigger times for " << fShortName);
     }
 
     // Register of fiber mapped data
@@ -429,7 +429,7 @@ Bool_t R3BFiberReader::Read()
 
             if (c_M != f_M || c_ != f_)
             {
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Coarse and fine multi-hit list counts mismatch "
                        "(edge="
                            << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).");
@@ -437,7 +437,7 @@ Bool_t R3BFiberReader::Read()
             }
             if (c_M > e[0]._MI_len || c_M > e[0]._ME_len || c_ > e[0]._v_len)
             {
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Multi-hit indexing out of range "
                        "(edge="
                            << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
@@ -458,7 +458,7 @@ Bool_t R3BFiberReader::Read()
 
                 if (c_MI != f_MI || c_ME != f_ME)
                 {
-                    R3BLOG(WARNING,
+                    R3BLOG(warn,
                            "Coarse and fine multi-hit data mismatch "
                            "(edge="
                                << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
@@ -492,7 +492,7 @@ Bool_t R3BFiberReader::Read()
 
         if (c_ != f_)
         {
-            R3BLOG(WARNING, "Coarse and fine single-hit list counts mismatch (_{c=" << c_ << ",f=" << f_ << "}).");
+            R3BLOG(warn, "Coarse and fine single-hit list counts mismatch (_{c=" << c_ << ",f=" << f_ << "}).");
             return kFALSE;
         }
 

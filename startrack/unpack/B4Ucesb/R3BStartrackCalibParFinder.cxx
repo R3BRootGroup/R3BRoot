@@ -66,8 +66,8 @@ void R3BStartrackCalibParFinder::SetParContainers()
 
     if (fVerbose && fStartrackCalibPar)
     {
-        LOG(INFO) << "R3BStartrackCalibParFinder::SetParContainers() ";
-        LOG(INFO) << "Container R3BStartrackCalibPar loaded ";
+        LOG(info) << "R3BStartrackCalibParFinder::SetParContainers() ";
+        LOG(info) << "Container R3BStartrackCalibPar loaded ";
     }
 }
 

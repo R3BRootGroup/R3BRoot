@@ -50,12 +50,12 @@ R3BWhiterabbitPspReader::~R3BWhiterabbitPspReader()
 Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitPspReader::Init()";
+    LOG(info) << "R3BWhiterabbitPspReader::Init()";
     EXT_STR_h101_TIMESTAMP_PSPX_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TIMESTAMP_PSPX, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitPspReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitPspReader::Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -64,11 +64,11 @@ Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitPspReader::Init() EventHeader. not found";
+        LOG(warn) << "R3BWhiterabbitPspReader::Init() EventHeader. not found";
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BWhiterabbitPspReader::Init() R3BEventHeader found";
+        LOG(info) << "R3BWhiterabbitPspReader::Init() R3BEventHeader found";
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRPspData", "WRPsp", fArray, !fOnline);

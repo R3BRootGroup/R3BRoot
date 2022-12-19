@@ -55,12 +55,12 @@ R3BCalifaJulichReader::~R3BCalifaJulichReader()
 Bool_t R3BCalifaJulichReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -97,7 +97,7 @@ Bool_t R3BCalifaJulichReader::Read()
         int16_t tot = fData->CALIFA_TOTv[crystal];
 
         if (channelNumber < 1 || channelNumber > 80)
-            LOG(FATAL) << "\033[5m\033[31m ERROR TO CHECK!! Channel number=" << channelNumber
+            LOG(fatal) << "\033[5m\033[31m error TO CHECK!! Channel number=" << channelNumber
                        << " detected in data \033[0m";
 
         if (channelNumber < 17)

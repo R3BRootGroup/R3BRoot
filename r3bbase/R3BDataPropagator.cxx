@@ -41,17 +41,17 @@ R3BDataPropagator::~R3BDataPropagator()
 
 InitStatus R3BDataPropagator::Init()
 {
-    LOG(INFO) << "R3BDataPropagator::Init()";
+    LOG(info) << "R3BDataPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
 
     fInputData = (TClonesArray*)frm->GetObject(fNameBranch);
     if (!fInputData)
     {
-        R3BLOG(FATAL, "branch " << fNameBranch << "not found");
+        R3BLOG(fatal, "branch " << fNameBranch << "not found");
         return kFATAL;
     }
     else
-        R3BLOG(INFO, "branch " << fNameBranch << " found");
+        R3BLOG(info, "branch " << fNameBranch << " found");
 
     frm->Register(fNameBranch, "Data", fInputData, kTRUE);
 

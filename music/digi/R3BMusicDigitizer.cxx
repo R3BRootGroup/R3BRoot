@@ -57,7 +57,7 @@ R3BMusicDigitizer::R3BMusicDigitizer(const TString& name, Int_t iVerbose)
 // Virtual R3BMusicDigitizer: Destructor ----------------------------
 R3BMusicDigitizer::~R3BMusicDigitizer()
 {
-    LOG(INFO) << "R3B" + fName + "Digitizer: Delete instance";
+    LOG(info) << "R3B" + fName + "Digitizer: Delete instance";
     if (fMusicPoints)
         delete fMusicPoints;
     if (fMusicCal)
@@ -67,7 +67,7 @@ R3BMusicDigitizer::~R3BMusicDigitizer()
 // ----   Public method Init  -----------------------------------------
 InitStatus R3BMusicDigitizer::Init()
 {
-    LOG(INFO) << "R3B" + fName + "Digitizer::Init()";
+    LOG(info) << "R3B" + fName + "Digitizer::Init()";
 
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();

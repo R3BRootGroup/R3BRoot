@@ -59,7 +59,7 @@ R3BCalifaCrystalCal2CrystalCalPID::R3BCalifaCrystalCal2CrystalCalPID()
 
 R3BCalifaCrystalCal2CrystalCalPID::~R3BCalifaCrystalCal2CrystalCalPID()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID: Delete instance";
+    LOG(info) << "R3BCalifaCrystalCal2CrystalCalPID: Delete instance";
     delete fCrystalCalDataCA;
 }
 
@@ -79,8 +79,8 @@ void R3BCalifaCrystalCal2CrystalCalPID::SetParContainers()
     //  if (!rtdb) LOG(fatal) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers: No runtime database";
     //
     //  if ( fVerbose && fCaloCalPar ) {
-    //    LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers() ";
-    //    LOG(INFO) << "Container R3BCalifaCrystalCal2CrystalCalPIDPar loaded ";
+    //    LOG(info) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers() ";
+    //    LOG(info) << "Container R3BCalifaCrystalCal2CrystalCalPIDPar loaded ";
     //  }
 }
 
@@ -111,7 +111,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::Exec(Option_t* option)
     LOG(DEBUG) << "Calibrating CALIFA PID Data";
 
     if (++nEvents % 10000 == 0)
-        LOG(INFO) << nEvents;
+        LOG(info) << nEvents;
 
     R3BCalifaCrystalCalData* hit;
     int ch;

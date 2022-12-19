@@ -56,14 +56,14 @@ R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 
 InitStatus R3BOnlineSpectraSci2::Init()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Init()";
+    LOG(info) << "R3BOnlineSpectraSci2::Init()";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
 
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
@@ -78,7 +78,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
     if (!fMapped)
     {
-        LOG(FATAL) << "Sci2Mapped not found";
+        LOG(fatal) << "Sci2Mapped not found";
         return (kFATAL);
     }
 
@@ -88,7 +88,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fTcal = (TClonesArray*)mgr->GetObject("Sci2Tcal");
     if (!fTcal)
     {
-        LOG(WARNING) << "Sci2Tcal not found: is OK";
+        LOG(warn) << "Sci2Tcal not found: is OK";
     }
 
     // --- ------------------------------ --- //
@@ -362,7 +362,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
 
 void R3BOnlineSpectraSci2::Reset_Histo()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Reset_Histo";
+    LOG(info) << "R3BOnlineSpectraSci2::Reset_Histo";
     for (Int_t i = 0; i < fNbDetectors; i++)
     {
         // === MULTIPLICITY === //
@@ -393,7 +393,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BOnlineSpectraSci2::Exec FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraSci2::Exec FairRootManager not found";
 
     // --- -------------- --- //
     // --- TPAT CONDITION --- //

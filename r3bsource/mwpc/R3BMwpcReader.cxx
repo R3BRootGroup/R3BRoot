@@ -66,7 +66,7 @@ R3BMwpcReader::~R3BMwpcReader()
 Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_SOFMWPC_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SOFMWPC, 0);
     if (!ok)
     {
@@ -82,7 +82,7 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
         FairRootManager::Instance()->Register("Mwpc2MappedData", "MWPC2", fArrayMwpc2, !fOnline);
     if (fMaxDet > 3)
         FairRootManager::Instance()->Register("Mwpc3MappedData", "MWPC3", fArrayMwpc3, !fOnline);
-    R3BLOG(INFO, "Max. number of MWPCs: " << fMaxDet);
+    R3BLOG(info, "Max. number of MWPCs: " << fMaxDet);
     Reset();
     memset(fData, 0, sizeof *fData);
 

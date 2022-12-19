@@ -72,10 +72,10 @@ void R3BIncomingIDPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BIncomingIDPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return;
     }
     fToFoffset->Set(fNumDet);
@@ -105,82 +105,82 @@ void R3BIncomingIDPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BIncomingIDPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not initialize FairParamList");
+        R3BLOG(fatal, "Could not initialize FairParamList");
         return kFALSE;
     }
 
     if (!(list->fill("TofOffset", fToFoffset)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDTofOffsetPar";
+        LOG(error) << "Could not initialize incomingIDTofOffsetPar";
         return kFALSE;
     }
 
     if (!(list->fill("PosS2Left", fPosS2Left)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDPosS2LeftPar";
+        LOG(error) << "Could not initialize incomingIDPosS2LeftPar";
         return kFALSE;
     }
 
     if (!(list->fill("PosS2Right", fPosS2Right)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDPosS2RightPar";
+        LOG(error) << "Could not initialize incomingIDPosS2RightPar";
         return kFALSE;
     }
 
     if (!(list->fill("Brho0_S2toCC", fBrho0_S2toCC)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDBrho0_S2toCCPar";
+        LOG(error) << "Could not initialize incomingIDBrho0_S2toCCPar";
         return kFALSE;
     }
 
     if (!(list->fill("DispersionS2", fDispersionS2)))
     {
-        LOG(ERROR) << "---Could not initialize incomingIDDispersionS2Par";
+        LOG(error) << "---Could not initialize incomingIDDispersionS2Par";
         return kFALSE;
     }
 
     if (!(list->fill("Tof2InvV_p0", fTof2InvV_p0)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDTof2InvV_p0Par";
+        LOG(error) << "Could not initialize incomingIDTof2InvV_p0Par";
         return kFALSE;
     }
 
     if (!(list->fill("Tof2InvV_p1", fTof2InvV_p1)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDTof2InvV_p1Par";
+        LOG(error) << "Could not initialize incomingIDTof2InvV_p1Par";
         return kFALSE;
     }
 
     if (!(list->fill("x0_Aq", &fx0_Aq)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDx0_AqPar";
+        LOG(error) << "Could not initialize incomingIDx0_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("y0_Aq", &fy0_Aq)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDy0_AqPar";
+        LOG(error) << "Could not initialize incomingIDy0_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("ang_Aq", &fang_Aq)))
     {
-        LOG(ERROR) << "Could not initialize incomingIDang_AqPar";
+        LOG(error) << "Could not initialize incomingIDang_AqPar";
         return kFALSE;
     }
 
     if (!(list->fill("Beta_min", &fBeta_min)))
     {
-        LOG(ERROR) << "Could not initialize incomingID Beta_min Par";
+        LOG(error) << "Could not initialize incomingID Beta_min Par";
         return kFALSE;
     }
 
     if (!(list->fill("Beta_max", &fBeta_max)))
     {
-        LOG(ERROR) << "Could not initialize incomingID Beta_max Par";
+        LOG(error) << "Could not initialize incomingID Beta_max Par";
         return kFALSE;
     }
 
@@ -197,12 +197,12 @@ void R3BIncomingIDPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BIncomingIDPar::printParams()
 {
-    R3BLOG(INFO, "Incoming ID parameters");
+    R3BLOG(info, "Incoming ID parameters");
 
-    LOG(INFO) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
+    LOG(info) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
 
     for (Int_t d = 0; d < fNumDet; d++)
-        LOG(INFO) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d) << " PosS2Left" << fPosS2Left->GetAt(d)
+        LOG(info) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d) << " PosS2Left" << fPosS2Left->GetAt(d)
                   << ", PosS2Right: " << fPosS2Right->GetAt(d);
 
     fTcutparS2->print();

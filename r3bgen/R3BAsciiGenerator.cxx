@@ -100,7 +100,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             return ReadEvent(primGen);
         }
         // Throw error if its somewhere in the file
-        LOG(FATAL) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
+        LOG(fatal) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
     }
     // Ignore the other stuff that might still be on that line
     fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -127,7 +127,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     {
         if (!(fInput >> iPid >> iZ >> iA >> px >> py >> pz >> ivx >> ivy >> ivz))
         {
-            LOG(FATAL) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
+            LOG(fatal) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
         }
         // Ignore the other stuff that might still be on that line
         fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -153,7 +153,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
 void R3BAsciiGenerator::RegisterIons()
 {
-    LOG(INFO) << "R3BAsciiGenerator: Looking for ions ...";
+    LOG(info) << "R3BAsciiGenerator: Looking for ions ...";
 
     //  Event variable to be read from file
     int eventId = -1;
@@ -177,7 +177,7 @@ void R3BAsciiGenerator::RegisterIons()
                 break;
             }
             // Throw error if its somewhere in the file
-            LOG(FATAL) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
+            LOG(fatal) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
         }
         // Ignore the other stuff that might still be on that line
         fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -187,7 +187,7 @@ void R3BAsciiGenerator::RegisterIons()
         {
             if (!(fInput >> iPid >> iZ >> iA))
             {
-                LOG(FATAL) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
+                LOG(fatal) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
             }
             // Ignore the other stuff that might still be on that line
             fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -211,7 +211,7 @@ void R3BAsciiGenerator::RegisterIons()
         FairRunSim::Instance()->AddNewIon(kv.second);
     }
 
-    LOG(INFO) << "R3BAsciiGenerator: " << ions.size() << " ions registered.";
+    LOG(info) << "R3BAsciiGenerator: " << ions.size() << " ions registered.";
 }
 
 void R3BAsciiGenerator::SetXYZ(Double32_t x, Double32_t y, Double32_t z)
@@ -242,7 +242,7 @@ void R3BAsciiGenerator::OpenOrRewindFile()
 
     if (!fFile.is_open())
     {
-        LOG(INFO) << "R3BAsciiGenerator: Reading input file " << fFileName;
+        LOG(info) << "R3BAsciiGenerator: Reading input file " << fFileName;
         fFile.open(fFileName);
         const std::string extension = boost::filesystem::extension(fFileName);
         if (extension == ".gz")
@@ -261,7 +261,7 @@ void R3BAsciiGenerator::OpenOrRewindFile()
     // Check for input file
     if (!fFile.is_open())
     {
-        LOG(FATAL) << "R3BAsciiGenerator: Input file not open!";
+        LOG(fatal) << "R3BAsciiGenerator: Input file not open!";
     }
 }
 

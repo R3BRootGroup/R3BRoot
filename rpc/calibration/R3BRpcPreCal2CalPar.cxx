@@ -50,39 +50,39 @@ R3BRpcPreCal2CalPar::R3BRpcPreCal2CalPar(const char* name, Int_t iVerbose)
 
 R3BRpcPreCal2CalPar::~R3BRpcPreCal2CalPar()
 {
-    LOG(INFO) << "R3BRpcPreCal2CalPar: Delete instance";
+    LOG(info) << "R3BRpcPreCal2CalPar: Delete instance";
 
 }
 
 InitStatus R3BRpcPreCal2CalPar::Init()
 {
 std::cout << "hre" << std::endl;
-    LOG(INFO) << "R3BRpcPreCal2CalPar::Init()";
+    LOG(info) << "R3BRpcPreCal2CalPar::Init()";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fPreCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPreCalData");
     if (!fPreCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
         return kFATAL;
     }
     FairRuntimeDb* rtdbPar = FairRuntimeDb::instance();
     if (!rtdbPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fTotCalPar = (R3BRpcTotCalPar*)rtdbPar->getContainer("RpcTotCalPar");
     if (!fTotCalPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
         return kFATAL;
     }
 

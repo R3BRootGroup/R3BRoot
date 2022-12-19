@@ -95,42 +95,42 @@ R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
 
 InitStatus R3BRpcOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     // Look for the R3BEventHeader
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO,"EventHeader. found");
+        R3BLOG(info,"EventHeader. found");
 
     // Get access to Mapped data
 
     fMappedDataItems = (TClonesArray*)mgr->GetObject("R3BRpcMappedData");
     if (!fMappedDataItems)
     {
-        R3BLOG(FATAL, "RpcMappedData not found");
+        R3BLOG(fatal, "RpcMappedData not found");
         return kFATAL;
     }
 
     fPreCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcPreCalData");
     if (!fPreCalDataItems)
     {
-        R3BLOG(FATAL, "R3BRpcPreCalData not found");
+        R3BLOG(fatal, "R3BRpcPreCalData not found");
         return kFATAL;
     }
 
     fCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcCalData");
     if (!fCalDataItems)
     {
-        R3BLOG(FATAL, "R3BRpcCalData not found");
+        R3BLOG(fatal, "R3BRpcCalData not found");
         return kFATAL;
     }
 
@@ -138,7 +138,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
     fHitDataItems = (TClonesArray*)mgr->GetObject("R3BRpcHitData");
     if (!fHitDataItems)
     {
-        R3BLOG(FATAL, "RpcHitData not found");
+        R3BLOG(fatal, "RpcHitData not found");
         return kFATAL;
     }
 
@@ -833,14 +833,14 @@ void R3BRpcOnlineSpectra::Reset_Efficiencies()
 
 void R3BRpcOnlineSpectra::GO_ONSPILL()
 {
-   R3BLOG(INFO, "");
+   R3BLOG(info, "");
    fSpill=1;
    return;
 }
 
 void R3BRpcOnlineSpectra::GO_OFFSPILL()
 {
-   R3BLOG(INFO, "");
+   R3BLOG(info, "");
    fSpill=0;
    return;
 }

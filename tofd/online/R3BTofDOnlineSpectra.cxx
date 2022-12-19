@@ -97,13 +97,13 @@ R3BTofDOnlineSpectra::~R3BTofDOnlineSpectra()
 void R3BTofDOnlineSpectra::SetParContainers()
 {
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
     return;
 }
 
 void R3BTofDOnlineSpectra::SetParameter()
 {
-    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(info, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
     if (fMapPar)
     {
         fNofPlanes = fMapPar->GetNbPlanes();
@@ -115,33 +115,33 @@ void R3BTofDOnlineSpectra::SetParameter()
 
 InitStatus R3BTofDOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
-    R3BLOG_IF(WARNING, NULL == fCalTriggerItems, "TofdTriggerCal not found");
+    R3BLOG_IF(warn, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
-    R3BLOG_IF(FATAL, NULL == fMappedItems, "TofdMapped not found");
+    R3BLOG_IF(fatal, NULL == fMappedItems, "TofdMapped not found");
 
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
-    R3BLOG_IF(WARNING, NULL == fCalItems, "TofdCal not found");
+    R3BLOG_IF(warn, NULL == fCalItems, "TofdCal not found");
 
     fHitItems = (TClonesArray*)mgr->GetObject("TofdHit");
-    R3BLOG_IF(WARNING, NULL == fHitItems, "TofdHit not found");
+    R3BLOG_IF(warn, NULL == fHitItems, "TofdHit not found");
 
     SetParameter();
 
@@ -605,7 +605,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
 void R3BTofDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     for (int i = 0; i < fNofPlanes; i++)
     {
         fh_tofd_channels[i]->Reset();
@@ -824,7 +824,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -833,12 +833,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -866,7 +866,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -881,12 +881,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = bot->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -945,7 +945,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missingc)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missingc = true;
                     }
                     ++n2;
@@ -976,13 +976,13 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     Int_t iBar = topc->GetBarId();        // 1..n
                     if (iPlane > fNofPlanes)              // this also errors for iDetector==0
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                         continue;
                     }
                     if (iBar > fPaddlesPerPlane) // same here
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                         continue;
                     }

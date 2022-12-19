@@ -138,12 +138,12 @@ void R3BNeulandHitHist::Exec(Option_t* option)
         fnEvents += 1;
         if (0 == (fnEvents % 100000))
         {
-            LOG(INFO) << "R3BNeulandHitHist : " << fnEvents << " events collected,  start time=" << startTime;
+            LOG(info) << "R3BNeulandHitHist : " << fnEvents << " events collected,  start time=" << startTime;
             if (count)
             {
-                LOG(INFO) << ",  mean time=" << (tmean / (Double_t)count);
+                LOG(info) << ",  mean time=" << (tmean / (Double_t)count);
             }
-            LOG(INFO);
+            LOG(info);
         }
     }
 }

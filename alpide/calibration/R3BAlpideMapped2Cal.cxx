@@ -72,7 +72,7 @@ void R3BAlpideMapped2Cal::SetParContainers()
 void R3BAlpideMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
-    // R3BLOG(INFO, "Nb of sensors: " << fMap_Par->GetNbSensors());
+    // R3BLOG(info, "Nb of sensors: " << fMap_Par->GetNbSensors());
     fMap_Par->printParams();
 }
 

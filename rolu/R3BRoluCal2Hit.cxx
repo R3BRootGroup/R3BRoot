@@ -108,15 +108,15 @@ InitStatus R3BRoluCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BRoluCal2Hit::Init() FairRootManager not found";
+        LOG(fatal) << "R3BRoluCal2Hit::Init() FairRootManager not found";
 
     fCalItems = (TClonesArray*)mgr->GetObject("RoluCal");
     if (NULL == fCalItems)
-        LOG(FATAL) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
+        LOG(fatal) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
 
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerCal");
     if (NULL == fCalTriggerItems)
-        LOG(WARNING) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
+        LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
 
     // request storage of Hit data in output tree
     mgr->Register("RoluHit", "RoluHitData", fHitItems, !fOnline);

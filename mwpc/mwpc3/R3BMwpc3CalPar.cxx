@@ -50,14 +50,14 @@ void R3BMwpc3CalPar::clear()
 void R3BMwpc3CalPar::putParams(FairParamList* list)
 {
 
-    LOG(INFO) << "R3BMwpc3CalPar::putParams() called";
+    LOG(info) << "R3BMwpc3CalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fPadCalParams->Set(array_size);
 
@@ -70,7 +70,7 @@ void R3BMwpc3CalPar::putParams(FairParamList* list)
 /* ----  Method getParams ---- */
 Bool_t R3BMwpc3CalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BMwpc3CalPar::getParams() called";
+    LOG(info) << "R3BMwpc3CalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -90,12 +90,12 @@ Bool_t R3BMwpc3CalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
     fPadCalParams->Set(array_size);
 
     if (!(list->fill("mwpc3CalPar", fPadCalParams)))
     {
-        LOG(INFO) << "---Could not initialize mwpc3CalPar";
+        LOG(info) << "---Could not initialize mwpc3CalPar";
         return kFALSE;
     }
 
@@ -105,21 +105,21 @@ Bool_t R3BMwpc3CalPar::getParams(FairParamList* list)
 /* ----  Method printParams ---- */
 void R3BMwpc3CalPar::printParams()
 {
-    LOG(INFO) << "R3BMwpc3CalPar: SOFIA MWPC3 Calibration Parameters: ";
+    LOG(info) << "R3BMwpc3CalPar: SOFIA MWPC3 Calibration Parameters: ";
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
     for (Int_t i = 0; i < (fNumPadsX + fNumPadsY); i++)
     {
         if (i < fNumPadsX)
         {
-            LOG(INFO) << "MWPC3 Plane X Pad Number: " << i + 1;
+            LOG(info) << "MWPC3 Plane X Pad Number: " << i + 1;
         }
         else
         {
-            LOG(INFO) << "MWPC3 Plane Y Pad Number: " << i + 1 - fNumPadsX;
+            LOG(info) << "MWPC3 Plane Y Pad Number: " << i + 1 - fNumPadsX;
         }
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j << ") = " << fPadCalParams->GetAt(i * fNumParamsFit + j);
+            LOG(info) << "FitParam(" << j << ") = " << fPadCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

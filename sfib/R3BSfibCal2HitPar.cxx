@@ -29,7 +29,7 @@ R3BSfibHitPar::~R3BSfibHitPar() { delete fHitParams; }
 
 void R3BSfibHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BSfibHitPar::putParams() called";
+    LOG(info) << "R3BSfibHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -55,13 +55,13 @@ void R3BSfibHitPar::clear() {}
 void R3BSfibHitPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " Fiber Hit Parameters -------------  ";
+    LOG(info) << " -----------  " << GetName() << " Fiber Hit Parameters -------------  ";
 
-    LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries();
+    LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
         R3BSfibHitModulePar* t_par = (R3BSfibHitModulePar*)fHitParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();

@@ -38,12 +38,12 @@ R3BAladinMagnet::R3BAladinMagnet(const TString& geoFile)
 
 void R3BAladinMagnet::SetPosition(const TGeoTranslation&)
 {
-    LOG(FATAL) << "Moving " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
+    LOG(fatal) << "Moving " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
 }
 
 void R3BAladinMagnet::SetRotation(const TGeoRotation&)
 {
-    LOG(FATAL) << "Rotating " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
+    LOG(fatal) << "Rotating " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
 }
 
 ClassImp(R3BAladinMagnet)

@@ -63,13 +63,13 @@ void R3BMusicHitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BMusicHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BMusicHitPar::putParams() called";
+    LOG(info) << "R3BMusicHitPar::putParams() called";
     if (!list)
     {
         return;
     }
 
-    LOG(INFO) << "Nb Anodes: " << fNumAnodes;
+    LOG(info) << "Nb Anodes: " << fNumAnodes;
     list->add("musicAnodeNumberPar", fNumAnodes);
 
     fAngCorParams->Set(3);
@@ -81,7 +81,7 @@ void R3BMusicHitPar::putParams(FairParamList* list)
     fAnode_pos->Set(fNumAnodes);
     list->add("musicAnodePosPar", *fAnode_pos);
 
-    LOG(INFO) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
+    LOG(info) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
     list->add("musicZHitParamsFitPar", fNumParamsZFit);
     fDetZHitParams->Set(fNumParamsZFit);
     list->add("musicZHitPar", *fDetZHitParams);
@@ -90,51 +90,51 @@ void R3BMusicHitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BMusicHitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BMusicHitPar::getParams() called";
+    LOG(info) << "R3BMusicHitPar::getParams() called";
     if (!list)
     {
-        LOG(ERROR) << "Could not initialize FairParamList";
+        LOG(error) << "Could not initialize FairParamList";
         return kFALSE;
     }
 
     if (!list->fill("musicAnodeNumberPar", &fNumAnodes))
     {
-        LOG(ERROR) << "Could not initialize musicAnodeNumberPar";
+        LOG(error) << "Could not initialize musicAnodeNumberPar";
         return kFALSE;
     }
-    LOG(INFO) << "Nb Anodes: " << fNumAnodes;
+    LOG(info) << "Nb Anodes: " << fNumAnodes;
 
     fAngCorParams->Set(3);
     if (!(list->fill("musicAngCorHitPar", fAngCorParams)))
     {
-        LOG(WARNING) << "Could not initialize musicAngCorHitPar";
+        LOG(warn) << "Could not initialize musicAngCorHitPar";
     }
 
     fIn_use->Set(fNumAnodes);
     if (!(list->fill("musicInUsePar", fIn_use)))
     {
-        LOG(ERROR) << "Could not initialize musicInUsePar";
+        LOG(error) << "Could not initialize musicInUsePar";
         return kFALSE;
     }
 
     fAnode_pos->Set(fNumAnodes);
     if (!(list->fill("musicAnodePosPar", fAnode_pos)))
     {
-        LOG(ERROR) << "Could not initialize musicAnodePosPar";
+        LOG(error) << "Could not initialize musicAnodePosPar";
         return kFALSE;
     }
 
     if (!list->fill("musicZHitParamsFitPar", &fNumParamsZFit))
     {
-        LOG(ERROR) << "Could not initialize musicZHitParamsFitPar";
+        LOG(error) << "Could not initialize musicZHitParamsFitPar";
         return kFALSE;
     }
 
-    LOG(INFO) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
+    LOG(info) << "Nb of parameters for charge-Z: " << fNumParamsZFit;
     fDetZHitParams->Set(fNumParamsZFit);
     if (!(list->fill("musicZHitPar", fDetZHitParams)))
     {
-        LOG(ERROR) << "Could not initialize musicZHitPar";
+        LOG(error) << "Could not initialize musicZHitPar";
         return kFALSE;
     }
 
@@ -144,17 +144,17 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
 // ----  Method printParams ----------------------------------------------------
 void R3BMusicHitPar::printParams()
 {
-    LOG(INFO) << "R3BMusicHitPar::Music detector Parameters";
-    LOG(INFO) << "R3BMusicHitPar::Music anodes in use: ";
+    LOG(info) << "R3BMusicHitPar::Music detector Parameters";
+    LOG(info) << "R3BMusicHitPar::Music anodes in use: ";
     for (Int_t j = 0; j < fNumAnodes; j++)
     {
-        LOG(INFO) << "Anode " << j + 1 << " in use " << fIn_use->GetAt(j) << ", Position-Z: " << fAnode_pos->GetAt(j);
+        LOG(info) << "Anode " << j + 1 << " in use " << fIn_use->GetAt(j) << ", Position-Z: " << fAnode_pos->GetAt(j);
     }
 
-    LOG(INFO) << "FitParam for charge-Z: " << fNumParamsZFit;
+    LOG(info) << "FitParam for charge-Z: " << fNumParamsZFit;
     for (Int_t j = 0; j < fNumParamsZFit; j++)
     {
-        LOG(INFO) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
+        LOG(info) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
     }
 }
 

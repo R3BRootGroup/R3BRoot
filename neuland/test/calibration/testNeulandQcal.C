@@ -38,7 +38,7 @@ void testNeulandQcal()
     // ---------------------------------------------------------------------------
 
     // Initialize ----------------------------------------------------------------
-    FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+    FairLogger::GetLogger()->SetLogScreenLevel("info");
     run->Init();
     // ---------------------------------------------------------------------------
 

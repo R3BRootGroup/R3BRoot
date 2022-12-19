@@ -83,15 +83,15 @@ void R3BCalifavsFootOnlineSpectra::SetParContainers()
     // Parameter Container
     // Reading amsStripCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 }
 
 InitStatus R3BCalifavsFootOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
 
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
@@ -100,20 +100,20 @@ InitStatus R3BCalifavsFootOnlineSpectra::Init()
 
     // get access to Cal data
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
-    R3BLOG_IF(FATAL, !fCalItemsCalifa, "CalifaCrystalCalData not found");
+    R3BLOG_IF(fatal, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(FATAL, !fHitItemsCalifa, "CalifaHitData not found");
+    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaHitData not found");
 
     fMappedItemsFoot = (TClonesArray*)mgr->GetObject("FootMappedData");
-    R3BLOG_IF(FATAL, !fMappedItemsFoot, "FootMappedData not found");
+    R3BLOG_IF(fatal, !fMappedItemsFoot, "FootMappedData not found");
 
     fCalItemsFoot = (TClonesArray*)mgr->GetObject("FootCalData");
-    R3BLOG_IF(WARNING, !fCalItemsFoot, "FootCalData not found");
+    R3BLOG_IF(warn, !fCalItemsFoot, "FootCalData not found");
 
     fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
-    R3BLOG_IF(WARNING, !fHitItemsFoot, "FootHitData not found");
+    R3BLOG_IF(warn, !fHitItemsFoot, "FootHitData not found");
 
     // Create histograms for detectors
     char Name1[255];
@@ -164,7 +164,7 @@ InitStatus R3BCalifavsFootOnlineSpectra::ReInit()
 void R3BCalifavsFootOnlineSpectra::Reset_CALIFAFOOT_Histo()
 {
 
-    LOG(INFO) << "R3BCalifavsFootOnlineSpectra::Reset_CALIFAFOOT_Histo";
+    LOG(info) << "R3BCalifavsFootOnlineSpectra::Reset_CALIFAFOOT_Histo";
 
     for (int i = 0; i < 2; i++)
     {

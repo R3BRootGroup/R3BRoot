@@ -41,7 +41,7 @@ R3BTsplinePar::R3BTsplinePar(const TString& name)
 // ----  Method putParams ------------------------------------------------------
 void R3BTsplinePar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called for " << fSpline->GetNp() << " points");
+    R3BLOG(info, "called for " << fSpline->GetNp() << " points");
 
     TArrayF* p = new TArrayF(5);
     // TArrayF* q = new TArrayF(3);
@@ -69,7 +69,7 @@ void R3BTsplinePar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 TSpline3* R3BTsplinePar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     // if (fSpline == NULL)
     fSpline = new TSpline3("spline_func", fxmin, fxmax, (TF1*)0, fMaxPoints);
     TArrayF* p = new TArrayF(5);
@@ -97,7 +97,7 @@ void R3BTsplinePar::print()
 {
     if (fSpline)
     {
-        R3BLOG(INFO, "for " << fSpline->GetName());
+        R3BLOG(info, "for " << fSpline->GetName());
 
         for (int n = 0; n < fSpline->GetNp(); n++)
         {
@@ -105,13 +105,13 @@ void R3BTsplinePar::print()
             Double_t b[6];
             fSpline->GetKnot(n, a[0], a[1]);
             fSpline->GetCoeff(n, b[0], b[1], b[2], b[3], b[4]);
-            LOG(INFO) << "CutPoint" << n << ": " << a[0] << " ; " << a[1];
-            LOG(INFO) << "CutPoint" << n << ": " << b[0] << " ; " << b[1] << " ; " << b[2];
+            LOG(info) << "CutPoint" << n << ": " << a[0] << " ; " << a[1];
+            LOG(info) << "CutPoint" << n << ": " << b[0] << " ; " << b[1] << " ; " << b[2];
         }
     }
     else
     {
-        R3BLOG(WARNING, "Spline parameters not found");
+        R3BLOG(warn, "Spline parameters not found");
     }
 }
 

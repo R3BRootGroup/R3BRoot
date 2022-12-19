@@ -50,7 +50,7 @@ R3BS515PspxReader::R3BS515PspxReader(EXT_STR_h101_PSP_onion* data, size_t offset
     {
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
-    R3BLOG(INFO, "Created " << 2 * LENGTH(fDataOnion->PSPX) << " detectors.");
+    R3BLOG(info, "Created " << 2 * LENGTH(fDataOnion->PSPX) << " detectors.");
 }
 
 R3BS515PspxReader::~R3BS515PspxReader()
@@ -65,18 +65,18 @@ R3BS515PspxReader::~R3BS515PspxReader()
 Bool_t R3BS515PspxReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
@@ -95,7 +95,7 @@ Bool_t R3BS515PspxReader::Init(ext_data_struct_info* a_struct_info)
                                                   fMappedItems[2 * d + f],
                                                   !fOnline);
             fMappedItems[2 * d + f]->Clear();
-            R3BLOG(INFO, "Registered Pspx" << d + 1 << "_" << xy[f]);
+            R3BLOG(info, "Registered Pspx" << d + 1 << "_" << xy[f]);
         }
     }
     *fDataOnion = {};

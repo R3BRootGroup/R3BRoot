@@ -46,11 +46,11 @@ R3BPspReader::~R3BPspReader()
 Bool_t R3BPspReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 

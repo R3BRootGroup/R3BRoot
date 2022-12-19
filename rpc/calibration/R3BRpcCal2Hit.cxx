@@ -47,7 +47,7 @@ R3BRpcCal2Hit::R3BRpcCal2Hit()
 
 R3BRpcCal2Hit::~R3BRpcCal2Hit()
 {
-    LOG(INFO) << "R3BRpcCal2Hit: Delete instance";
+    LOG(info) << "R3BRpcCal2Hit: Delete instance";
     if (fRpcHitDataCA)
         delete fRpcHitDataCA;
 
@@ -66,37 +66,37 @@ InitStatus R3BRpcCal2Hit::Init()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcCal2Hit:: FairRuntimeDb not opened";
+        LOG(error) << "R3BRpcCal2Hit:: FairRuntimeDb not opened";
     }
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(FATAL) << "R3BRpcCal2Hit::FairRootManager not found";
+        LOG(fatal) << "R3BRpcCal2Hit::FairRootManager not found";
         return kFATAL;
     }
 
     fR3BEventHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
     if (!fR3BEventHeader)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() EventHeader. not found";
+        LOG(error) << "R3BRpcCal2HitPar::Init() EventHeader. not found";
         return kFATAL;
     }
 
     fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "R3BRpcCal2Hit::Init() Couldn't get handle on RPCHitPar container";
+        LOG(error) << "R3BRpcCal2Hit::Init() Couldn't get handle on RPCHitPar container";
     }
     else
     {
-        LOG(INFO) << "R3BRpcCal2Hit:: RPCHitPar container open";
+        LOG(info) << "R3BRpcCal2Hit:: RPCHitPar container open";
     }
 
     fRpcCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
     if (!fRpcCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
+        LOG(error) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
         return kFATAL;
     }
     

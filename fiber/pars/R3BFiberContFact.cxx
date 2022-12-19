@@ -199,7 +199,7 @@ FairParSet* R3BFiberContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    R3BLOG(INFO, name);
+    R3BLOG(info, name);
 
     FairParSet* p = 0;
     if (strcmp(name, "Fi7GeoPar") == 0 || strcmp(name, "Fi8GeoPar") == 0 || strcmp(name, "Fi10GeoPar") == 0 ||

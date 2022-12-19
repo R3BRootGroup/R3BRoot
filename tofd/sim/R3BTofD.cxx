@@ -66,13 +66,13 @@ R3BTofD::~R3BTofD()
 void R3BTofD::Initialize()
 {
     FairDetector::Initialize();
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Paddle"));
 }
 
 void R3BTofD::SetSpecialPhysicsCuts()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (gGeoManager)
     {
         TGeoMedium* plastic = gGeoManager->GetMedium("plasticFormTOF");
@@ -95,7 +95,7 @@ void R3BTofD::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for plasticFormTOF Only
             Double_t cutE = fCutE; // GeV
 
-            R3BLOG(INFO, "plasticFormTOF Medium Id " << plastic->GetId() << " Energy Cut-Off : " << cutE << " GeV");
+            R3BLOG(info, "plasticFormTOF Medium Id " << plastic->GetId() << " Energy Cut-Off : " << cutE << " GeV");
             // plastic
             gMC->Gstpar(plastic->GetId(), "CUTGAM", cutE);
             gMC->Gstpar(plastic->GetId(), "CUTELE", cutE);
@@ -139,7 +139,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
         boost::cmatch m;
         if (!boost::regex_search(gMC->CurrentVolPath(), m, re))
         {
-            R3BLOG(ERROR, gMC->CurrentVolPath() << " does not match RE " << restr);
+            R3BLOG(error, gMC->CurrentVolPath() << " does not match RE " << restr);
         }
         fPlaneID = std::stoi(m[1].str());
         fPaddleID = vol->getCopyNo();
@@ -243,7 +243,7 @@ TClonesArray* R3BTofD::GetCollection(Int_t iColl) const
 void R3BTofD::Print(Option_t* option) const
 {
     Int_t nHits = fTofdCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTofD: " << nHits << " points registered in this event";
+    LOG(info) << "R3BTofD: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -259,7 +259,7 @@ void R3BTofD::Reset()
 void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    R3BLOG(INFO, nEntries << " entries to add");
+    R3BLOG(info, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BTofdPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -270,7 +270,7 @@ void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);
         fPosIndex++;
     }
-    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
+    R3BLOG(info, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -292,7 +292,7 @@ R3BTofdPoint* R3BTofD::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        R3BLOG(INFO,
+        R3BLOG(info,
                "at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
                       << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }

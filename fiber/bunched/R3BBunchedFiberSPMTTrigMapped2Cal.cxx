@@ -43,25 +43,25 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, did you forget SetParContainers?";
+        LOG(error) << "TCal parameter containers missing, did you forget SetParContainers?";
         return kERROR;
     }
     if (0 == fTCalPar->GetNumModulePar())
     {
-        LOG(ERROR) << "No TCal parameters in containers " << fTCalPar->GetName() << ".";
+        LOG(error) << "No TCal parameters in containers " << fTCalPar->GetName() << ".";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = "BunchedFiberSPMTTrigMapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register("BunchedFiberSPMTTrigCal", "Land", fCalItems, kTRUE);
@@ -74,7 +74,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::SetParContainers()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get access to " << name << " container.";
+        LOG(error) << "Could not get access to " << name << " container.";
     }
 }
 
@@ -95,7 +95,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
         if (!par)
         {
-            LOG(WARNING) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(warn) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                          << ": TCal par not found.";
             continue;
         }
@@ -112,7 +112,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 
         if (fine_ns < 0. || fine_ns > 5.)
         {
-            LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(error) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }

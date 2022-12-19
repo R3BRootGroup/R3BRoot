@@ -66,13 +66,13 @@ R3BMwpc2Cal2Hit::~R3BMwpc2Cal2Hit()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc2Cal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -83,7 +83,7 @@ InitStatus R3BMwpc2Cal2Hit::Init()
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc2CalData");
     if (!fMwpcCalDataCA)
     {
-        R3BLOG(FATAL, "Mwpc2CalData not found");
+        R3BLOG(fatal, "Mwpc2CalData not found");
         return kFATAL;
     }
 

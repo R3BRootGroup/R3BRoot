@@ -76,10 +76,10 @@ R3BTwimvsFootOnlineSpectra::~R3BTwimvsFootOnlineSpectra()
 
 InitStatus R3BTwimvsFootOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -88,17 +88,17 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     // get access to hit data of the FOOT detector
     fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
     if (!fHitItemsFoot)
     {
-        R3BLOG(FATAL, "FootHitData not found");
+        R3BLOG(fatal, "FootHitData not found");
         return kFATAL;
     }
 
@@ -107,13 +107,13 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
     if (fHitItemsTwim)
     {
         fMusli = kTRUE;
-        R3BLOG(INFO, "MusliHitData found");
+        R3BLOG(info, "MusliHitData found");
     }
     else
     {
         // get access to hit data of the TWIM
         fHitItemsTwim = (TClonesArray*)mgr->GetObject("TwimHitData");
-        R3BLOG_IF(WARNING, !fHitItemsTwim, "TwimHitData not found");
+        R3BLOG_IF(warn, !fHitItemsTwim, "TwimHitData not found");
     }
 
     // MAIN FOLDER-Twim-Foot
@@ -216,7 +216,7 @@ InitStatus R3BTwimvsFootOnlineSpectra::Init()
 
 void R3BTwimvsFootOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "Reset_Histo");
+    R3BLOG(info, "Reset_Histo");
     if (fHitItemsTwim && fHitItemsFoot)
         for (Int_t i = 0; i < fNbFootDet; i++)
         {

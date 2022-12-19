@@ -75,33 +75,33 @@ InitStatus R3BNeulandMapped2Cal::Init()
 
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container LandTCalPar";
+        LOG(error) << "There are no TCal parameters in container LandTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fNofTcalPars << " calibrated modules";
+    LOG(info) << "R3BNeulandMapped2Cal::Init : read " << fNofTcalPars << " calibrated modules";
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(FATAL) << "FairRootManager not found";
+        LOG(fatal) << "FairRootManager not found";
     }
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (NULL == header)
     {
-        LOG(FATAL) << "Branch R3BEventHeader not found";
+        LOG(fatal) << "Branch R3BEventHeader not found";
     }
 
     fMapped = (TClonesArray*)mgr->GetObject("NeulandMappedData");
     if (NULL == fMapped)
     {
-        LOG(FATAL) << "Branch NeulandMapped not found";
+        LOG(fatal) << "Branch NeulandMapped not found";
     }
     fMappedTrigger = (TClonesArray*)mgr->GetObject("NeulandTrigMappedData");
     if (NULL == fMappedTrigger)
     {
-        LOG(INFO) << "Branch NeulandTrigMapped not found";
+        LOG(info) << "Branch NeulandTrigMapped not found";
     }
 
     mgr->Register("NeulandCalData", "Neuland", fCal, kTRUE);
@@ -113,7 +113,7 @@ InitStatus R3BNeulandMapped2Cal::Init()
     htcal4 = new TH2F("htcal4", "htcal4", 800, 0.5, 800.5, 500, -1., 6.);
 
     SetParameter();
-    R3BLOG(INFO, "Read " << fNofTcalPars << " modules");
+    R3BLOG(info, "Read " << fNofTcalPars << " modules");
     return kSUCCESS;
 }
 
@@ -121,16 +121,16 @@ void R3BNeulandMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fMapPar = (R3BNeulandMappingPar*)rtdb->getContainer("neulandMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to neulandMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to neulandMappingPar container");
 
     fTcalPar = (R3BTCalPar*)rtdb->getContainer("LandTCalPar");
 
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to LandTCalPar-Container.";
+        LOG(error) << "Could not get access to LandTCalPar-Container.";
         fNofTcalPars = 0;
     }
     return;
@@ -139,7 +139,7 @@ void R3BNeulandMapped2Cal::SetParContainers()
 void R3BNeulandMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
-    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(info, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
     if (fMapPar)
     {
         fNofPlanes = fMapPar->GetNbPlanes();
@@ -147,7 +147,7 @@ void R3BNeulandMapped2Cal::SetParameter()
     }
 
     fNofTcalPars = fTcalPar->GetNumModulePar();
-    R3BLOG_IF(FATAL, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
+    R3BLOG_IF(fatal, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
     return;
 }
 
@@ -246,12 +246,12 @@ void R3BNeulandMapped2Cal::MakeCal()
 
         if ((iPlane < 1) || (iPlane > fNofPlanes))
         {
-            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Plane number out of range: " << iPlane;
+            LOG(info) << "R3BNeulandMapped2TCal::Exec : Plane number out of range: " << iPlane;
             continue;
         }
         if ((iBar < 1) || (iBar > fNofBarsPerPlane))
         {
-            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Bar number out of range: " << iBar;
+            LOG(info) << "R3BNeulandMapped2TCal::Exec : Bar number out of range: " << iBar;
             continue;
         }
 
@@ -279,7 +279,7 @@ void R3BNeulandMapped2Cal::MakeCal()
 
         if (timeLE < 0. || timeLE > fClockFreq || timeTE < 0. || timeTE > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
+            LOG(error) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
                        << ", tdc= " << tdc << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE;
             continue;
         }
@@ -333,7 +333,7 @@ void R3BNeulandMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 100000))
     {
-        LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
+        LOG(info) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fCal)

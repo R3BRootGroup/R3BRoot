@@ -144,7 +144,7 @@ void R3BGeoCave::print()
         FairGeoMedium* med = volu->getMedium();
         if (sh && med)
         {
-            LOG(INFO) << volu->GetName() << '\n' << sh->GetName() << '\n' << med->GetName() << '\n';
+            LOG(info) << volu->GetName() << '\n' << sh->GetName() << '\n' << med->GetName() << '\n';
             sh->printPoints(volu);
         }
     }

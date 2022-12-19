@@ -31,14 +31,14 @@ R3BNeulandHitMon::R3BNeulandHitMon(TString input, TString output, const Option_t
     , fHits(input)
     , fIs3DTrackEnabled(false)
 {
-    LOG(INFO) << "Using R3B NeuLAND NeulandHit Monitor";
+    LOG(info) << "Using R3B NeuLAND NeulandHit Monitor";
 
     TString opt = option;
     opt.ToUpper();
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization";
+        LOG(info) << "... with 3D track visualization";
     }
 }
 

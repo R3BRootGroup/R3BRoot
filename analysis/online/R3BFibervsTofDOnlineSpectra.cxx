@@ -72,11 +72,11 @@ R3BFibervsTofDOnlineSpectra::~R3BFibervsTofDOnlineSpectra()
 void R3BFibervsTofDOnlineSpectra::SetParContainers()
 {
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
-    R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
+    R3BLOG_IF(error, !fMapPar, "Couldn't get " << fName << "MappingPar");
     if (fMapPar)
     {
         fNbfibers = fMapPar->GetNbChannels();
-        R3BLOG(INFO, fName << "MappingPar found with " << fNbfibers << " fibers");
+        R3BLOG(info, fName << "MappingPar found with " << fNbfibers << " fibers");
     }
 }
 
@@ -88,7 +88,7 @@ InitStatus R3BFibervsTofDOnlineSpectra::ReInit()
 
 InitStatus R3BFibervsTofDOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
 
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
@@ -96,21 +96,21 @@ InitStatus R3BFibervsTofDOnlineSpectra::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, " EventHeader. found");
+        R3BLOG(info, " EventHeader. found");
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fHitItems = (TClonesArray*)mgr->GetObject(fName + "Hit");
-    R3BLOG_IF(WARNING, NULL == fHitItems, fName + "Hit not found");
+    R3BLOG_IF(warn, NULL == fHitItems, fName + "Hit not found");
 
     fHitTofdItems = (TClonesArray*)mgr->GetObject("TofdHit");
-    R3BLOG_IF(WARNING, NULL == fHitTofdItems, "TofdHit not found");
+    R3BLOG_IF(warn, NULL == fHitTofdItems, "TofdHit not found");
 
     //------------------------------------------------------------------------
     // create histograms
@@ -167,7 +167,7 @@ InitStatus R3BFibervsTofDOnlineSpectra::Init()
 }
 void R3BFibervsTofDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     if (fHitItems && fHitTofdItems)
     {
         for (Int_t i = 0; i < fNbTofdPlanes; i++)

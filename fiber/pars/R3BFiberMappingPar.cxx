@@ -59,17 +59,17 @@ void R3BFiberMappingPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BFiberMappingPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "FairParamList not found");
+        R3BLOG(fatal, "FairParamList not found");
         return;
     }
     list->add("fiberSidePar", fNbSides);
     list->add("fiberChannelPar", fNbChannels);
 
-    R3BLOG(INFO, "Nb of channels: " << fNbChannels);
-    R3BLOG(INFO, "Nb of sides: " << fNbSides);
+    R3BLOG(info, "Nb of channels: " << fNbChannels);
+    R3BLOG(info, "Nb of sides: " << fNbSides);
 
     char name[300];
     for (Int_t s = 0; s < fNbSides; s++)
@@ -83,20 +83,20 @@ void R3BFiberMappingPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BFiberMappingPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "FairParamList not found");
+        R3BLOG(fatal, "FairParamList not found");
         return kFALSE;
     }
     if (!list->fill("fiberSidePar", &fNbSides))
     {
-        R3BLOG(INFO, "Could not initialize fiberSidePar");
+        R3BLOG(info, "Could not initialize fiberSidePar");
         return kFALSE;
     }
     if (!list->fill("fiberChannelPar", &fNbChannels))
     {
-        R3BLOG(INFO, "Could not initialize fiberChannelPar");
+        R3BLOG(info, "Could not initialize fiberChannelPar");
         return kFALSE;
     }
 
@@ -108,7 +108,7 @@ Bool_t R3BFiberMappingPar::getParams(FairParamList* list)
 
         if (!(list->fill(name, fTrigmap[s])))
         {
-            R3BLOG(ERROR, "Could not initialize " << name);
+            R3BLOG(error, "Could not initialize " << name);
             return kFALSE;
         }
     }
@@ -122,11 +122,11 @@ void R3BFiberMappingPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BFiberMappingPar::printParams()
 {
-    R3BLOG(INFO, "Mapping params for Fiber: Num of sides: " << fNbSides << " and channels: " << fNbChannels);
+    R3BLOG(info, "Mapping params for Fiber: Num of sides: " << fNbSides << " and channels: " << fNbChannels);
     for (Int_t s = 0; s < fNbSides; s++)
         for (Int_t c = 0; c < fNbChannels; c++)
         {
-            R3BLOG(INFO, "Side: " << s + 1 << " , channel:" << c + 1 << ", value: " << fTrigmap[s]->GetAt(c));
+            R3BLOG(info, "Side: " << s + 1 << " , channel:" << c + 1 << ", value: " << fTrigmap[s]->GetAt(c));
         }
 }
 

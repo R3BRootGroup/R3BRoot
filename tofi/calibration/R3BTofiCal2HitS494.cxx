@@ -207,14 +207,14 @@ InitStatus R3BTofiCal2HitS494::Init()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofiHitPar";
+        LOG(error) << "There are no Hit parameters in container TofiHitPar";
         return kFATAL;
     }
 
@@ -235,7 +235,7 @@ InitStatus R3BTofiCal2HitS494::Init()
     mgr->Register("TofiHit", "Land", fHitItems, kTRUE);
 
     if (!fTofiHisto)
-        LOG(INFO) << "No Cal2Hit Histograms will be created!";
+        LOG(info) << "No Cal2Hit Histograms will be created!";
 
     tofi_trig_map_setup();
 
@@ -248,7 +248,7 @@ void R3BTofiCal2HitS494::SetParContainers()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -414,7 +414,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -454,7 +454,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -462,7 +462,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;
@@ -485,7 +485,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 R3BTofiHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(info) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     ++top_i;
                     ++bot_i;
@@ -494,7 +494,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(INFO) << "Walk correction not found!";
+                    LOG(info) << "Walk correction not found!";
                 auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                  par->GetPar1Walk(),
                                                  par->GetPar2Walk(),
@@ -514,7 +514,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
-                    LOG(FATAL) << "ToFi THit not found";
+                    LOG(fatal) << "ToFi THit not found";
                 }
                 if (timeP0 == 0.)
                     timeP0 = THit;
@@ -751,7 +751,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     {
         LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL) << "Not all events analyzed!";
+            LOG(fatal) << "Not all events analyzed!";
     }
 
     LOG(DEBUG) << "------------------------------------------------------\n";

@@ -81,18 +81,18 @@ InitStatus R3BPtofMapped2Cal::Init()
 {
     if (fTcalPar == NULL)
     {
-        LOG(ERROR) << "Have no TCal parameter container";
+        LOG(error) << "Have no TCal parameter container";
         return kFATAL;
     }
 
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "No TCal parameters in container PtofTCalPar";
+        LOG(error) << "No TCal parameters in container PtofTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BPtofMapped2Cal::Init : read " << fNofTcalPars << " modules";
+    LOG(info) << "R3BPtofMapped2Cal::Init : read " << fNofTcalPars << " modules";
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -114,7 +114,7 @@ void R3BPtofMapped2Cal::SetParContainers()
 {
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
     if (!fTcalPar)
-        LOG(ERROR) << "Could not get access to PtofTCalPar-Container.";
+        LOG(error) << "Could not get access to PtofTCalPar-Container.";
 }
 
 InitStatus R3BPtofMapped2Cal::ReInit()
@@ -133,7 +133,7 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 
         Int_t iPlane = mapped->GetPlaneId(); // 1..n; no need to check range
         Int_t iBar = mapped->GetBarId();     // 1..n
-        //		LOG(ERROR) << "R3BPtofMapped2Cal::Exec : Plane: " << 	iPlane << ", Bar: " << iBar ;
+        //		LOG(error) << "R3BPtofMapped2Cal::Exec : Plane: " << 	iPlane << ", Bar: " << iBar ;
 
         R3BPaddleCalData* cal = new ((*fCalItems)[fNofCalItems++]) R3BPaddleCalData(iPlane, iBar);
 
@@ -147,7 +147,7 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
                 R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, tube * 2 + edge + 1); // 1..4
                 if (!par)
                 {
-                    LOG(INFO) << "R3BPtofMapped2Cal::Exec : Tcal par not found, Plane: " << iPlane << ", Bar: " << iBar
+                    LOG(info) << "R3BPtofMapped2Cal::Exec : Tcal par not found, Plane: " << iPlane << ", Bar: " << iBar
                               << ", Tube: " << (tube + 1);
                     continue;
                 }
@@ -160,7 +160,7 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
                 Double_t time_ns = par->GetTimeVFTX(mapped->GetFineTime(tube, edge));
                 if (time_ns < 0. || time_ns > fClockFreq)
                 {
-                    LOG(ERROR) << "R3BPtofMapped2Cal::Exec : bad time in ns: Plane= " << iPlane << ", bar= " << iBar
+                    LOG(error) << "R3BPtofMapped2Cal::Exec : bad time in ns: Plane= " << iPlane << ", bar= " << iBar
                                << ",tube= " << (tube + 1) << ",edge= " << edge
                                << ", time in channels = " << mapped->GetFineTime(tube, edge)
                                << ", time in ns = " << time_ns;
@@ -171,7 +171,7 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
                 time_ns = fClockFreq - time_ns + mapped->GetCoarseTime(tube, edge) * fClockFreq;
                 if (iBar == 40)
                 {
-                    LOG(ERROR) << "Test: Plane: " << iPlane << "  Bar: " << iBar << "  tube= " << tube
+                    LOG(error) << "Test: Plane: " << iPlane << "  Bar: " << iBar << "  tube= " << tube
                                << "  edge= " << edge << "  time in ns = " << time_ns;
                 }
                 cal->SetTime(tube, edge, time_ns);

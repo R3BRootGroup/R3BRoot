@@ -89,16 +89,16 @@ void R3BFootStripCal2Hit::SetParContainers()
     // Parameter Container
     // Reading footMappingPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BFootMappingPar*)rtdb->getContainer("footMappingPar");
     if (!fMap_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on footMappingPar container");
+        R3BLOG(error, "Couldn't get handle on footMappingPar container");
     }
     else
     {
-        R3BLOG(INFO, "footMappingPar found");
+        R3BLOG(info, "footMappingPar found");
     }
 }
 
@@ -106,14 +106,14 @@ void R3BFootStripCal2Hit::SetParameter()
 {
     if (!fMap_Par)
     {
-        R3BLOG(WARNING, "Container footMappingPar not found");
+        R3BLOG(warn, "Container footMappingPar not found");
         return;
     }
     //--- Parameter Container ---
     fMaxNumDet = fMap_Par->GetNumDets(); // Number of foot detectors
     fPolPar = fMap_Par->GetPolPar();     // Number of parameters for Energy correction of foot detectors
-    LOG(INFO) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
-    LOG(INFO) << "R3BFootStripCal2Hit::PolPar from mapping " << fPolPar;
+    LOG(info) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
+    LOG(info) << "R3BFootStripCal2Hit::PolPar from mapping " << fPolPar;
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
         fDistTarget[i] = fMap_Par->GetDist2target(i + 1);
@@ -132,12 +132,12 @@ void R3BFootStripCal2Hit::SetParameter()
 // -----   Public method Init   -------------------------------------------------
 InitStatus R3BFootStripCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -145,7 +145,7 @@ InitStatus R3BFootStripCal2Hit::Init()
     fFootCalData = (TClonesArray*)rootManager->GetObject("FootCalData");
     if (!fFootCalData)
     {
-        R3BLOG(FATAL, "FootCalData not found");
+        R3BLOG(fatal, "FootCalData not found");
         return kFATAL;
     }
 
@@ -399,7 +399,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
             }
             else
             {
-                LOG(INFO) << "R3BFootStripCal2Hit::AnglePhi is Wrong !";
+                LOG(info) << "R3BFootStripCal2Hit::AnglePhi is Wrong !";
             }
 
             TVector3 master(x, y, z);

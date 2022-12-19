@@ -71,12 +71,12 @@ void R3BFiberDigitizer::SetParContainers()
     fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName + "GeoPar");
     if (!fFiGeoPar)
     {
-        R3BLOG(ERROR, "R3BFiberDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.");
+        R3BLOG(error, "R3BFiberDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.");
         return;
     }
     else
     {
-        R3BLOG(INFO, "R3BFiberDigitizer::SetParContainers() : Container " + fName + "GeoPar found.");
+        R3BLOG(info, "R3BFiberDigitizer::SetParContainers() : Container " + fName + "GeoPar found.");
     }
 }
 
@@ -96,13 +96,13 @@ void R3BFiberDigitizer::SetParameter()
 
 InitStatus R3BFiberDigitizer::Init()
 {
-    R3BLOG(INFO, "for fiber " << fName);
+    R3BLOG(info, "for fiber " << fName);
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !ioman, "FairRootManager not found");
+    R3BLOG_IF(fatal, !ioman, "FairRootManager not found");
 
     fFiPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
-    R3BLOG_IF(FATAL, !fFiPoints, fName + "Point not found");
+    R3BLOG_IF(fatal, !fFiPoints, fName + "Point not found");
 
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 

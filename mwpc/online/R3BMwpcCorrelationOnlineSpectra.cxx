@@ -72,7 +72,7 @@ R3BMwpcCorrelationOnlineSpectra::R3BMwpcCorrelationOnlineSpectra(const TString& 
 
 R3BMwpcCorrelationOnlineSpectra::~R3BMwpcCorrelationOnlineSpectra()
 {
-    LOG(INFO) << "R3BMwpc" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Delete instance";
+    LOG(info) << "R3BMwpc" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Delete instance";
     if (fCalItemsMwpc1)
         delete fCalItemsMwpc1;
     if (fHitItemsMwpc1)
@@ -86,14 +86,14 @@ R3BMwpcCorrelationOnlineSpectra::~R3BMwpcCorrelationOnlineSpectra()
 InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init ";
+    LOG(info) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init FairRootManager not found";
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -113,12 +113,12 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     // get access to hit data of mwpcs
     fHitItemsMwpc1 = (TClonesArray*)mgr->GetObject(fNameDet1 + "HitData");
     if (!fHitItemsMwpc1)
-        LOG(WARNING) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
+        LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
                             "HitData not found";
 
     fHitItemsMwpc2 = (TClonesArray*)mgr->GetObject(fNameDet2 + "HitData");
     if (!fHitItemsMwpc2)
-        LOG(WARNING) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
+        LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
                             "HitData not found";
 
     // Create histograms for detectors
@@ -223,7 +223,7 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
 
 void R3BMwpcCorrelationOnlineSpectra::Reset_Histo()
 {
-    LOG(INFO) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Reset_Histo";
+    LOG(info) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Reset_Histo";
     // Cal data
     fh2_mwpc_calx->Reset();
     fh2_mwpc_caly->Reset();
@@ -240,7 +240,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Exec FairRootManager not found";
 
     // Fill Cal data
     if (fCalItemsMwpc1 && fCalItemsMwpc1->GetEntriesFast() > 0 && fCalItemsMwpc2 &&

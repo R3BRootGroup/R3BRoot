@@ -50,12 +50,12 @@ R3BSci2Reader::~R3BSci2Reader()
 Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_SCI2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SCI2, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -173,7 +173,7 @@ Bool_t R3BSci2Reader::Read()
     //                 coarse_vftx = coarse_vftx + 8192;
     //
     //             if (fprint)
-    //                 LOG(INFO) << "SCI2 READER VFTX: " << fNEvent << ", " << Sum << ", " << channel << ", "
+    //                 LOG(info) << "SCI2 READER VFTX: " << fNEvent << ", " << Sum << ", " << channel << ", "
     //                           << data->SCITWO_VTFv[j] << ", " << data->SCITWO_VTCv[j] << ", " << coarse_vftx << ", "
     //                           << mean_coarse_vftx;
     //
@@ -336,7 +336,7 @@ Bool_t R3BSci2Reader::Read()
         uint32_t numberOfPMTsWithHits_TC = data->SCITWO_VTCM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
-            LOG(ERROR) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between TF and TC for SofSci !";
+            LOG(error) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between TF and TC for SofSci !";
         }
         else
         {
@@ -348,7 +348,7 @@ Bool_t R3BSci2Reader::Read()
                 uint32_t pmtid_TC = data->SCITWO_VTCMI[pmmult];
                 if (pmtid_TF != pmtid_TC)
                 {
-                    LOG(ERROR) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between the PMT id for TF "
+                    LOG(error) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between the PMT id for TF "
                                   "and TC for SofSci !";
                 }
                 uint32_t nextChannelStart = data->SCITWO_VTFME[pmmult];

@@ -52,12 +52,12 @@ R3BWhiterabbitCalifaReader::~R3BWhiterabbitCalifaReader()
 Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitCalifaReader::Init()";
+    LOG(info) << "R3BWhiterabbitCalifaReader::Init()";
     EXT_STR_h101_WRCALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRCALIFA, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitCalifaReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitCalifaReader::Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -66,11 +66,11 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitCalifaReader::Init() EventHeader. not found";
+        LOG(warn) << "R3BWhiterabbitCalifaReader::Init() EventHeader. not found";
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader found";
+        LOG(info) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader found";
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, !fOnline);

@@ -13,7 +13,7 @@
 # DetectorNo nStrips
 # Strips Offset Slope
 #
-# WARNING: Never ever use TABS! Don't put a Space behind the Backslash!
+# warn: Never ever use TABS! Don't put a Space behind the Backslash!
 #
 # done 28.04.16, test3 (cal), start counting with 1 for detector and channel,
 # valid also for test4 (cal), check was done for most of the parameter

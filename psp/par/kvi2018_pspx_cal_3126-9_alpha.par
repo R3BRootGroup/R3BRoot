@@ -11,7 +11,7 @@
 # DetectorNo nStrips
 #   Strip# Gain
 #
-# WARNING: Never ever use TABS! Don't put a Space behind the Backslash!
+# warn: Never ever use TABS! Don't put a Space behind the Backslash!
 #
 # Calibration done with window200 & pspx_precal2cal_calib_frontback.C(200,650000,350000,0,5486,true,true)
 #################################################################

@@ -50,7 +50,7 @@ FairParSet* R3BAnalysisContFact::createContainer(FairContainer* c)
     // of this container, the name is concatinated with the context.
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BIncomingIDContFact::Create container name: " << name;
+    LOG(info) << "R3BIncomingIDContFact::Create container name: " << name;
     FairParSet* p = 0;
     if (strcmp(name, "IncomingIDPar") == 0)
     {

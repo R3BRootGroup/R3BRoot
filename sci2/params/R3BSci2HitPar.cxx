@@ -25,7 +25,7 @@ void R3BSci2HitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BSci2HitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BSci2HitPar::putParams() called";
+    LOG(info) << "R3BSci2HitPar::putParams() called";
     if (!list)
     {
         return;
@@ -37,7 +37,7 @@ void R3BSci2HitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BSci2HitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BSci2HitPar::getParams() called";
+    LOG(info) << "R3BSci2HitPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -45,13 +45,13 @@ Bool_t R3BSci2HitPar::getParams(FairParamList* list)
 
     if (!(list->fill("Pos_p0", &fPos_p0)))
     {
-        LOG(INFO) << "---Could not initialize Sci2HitPos_p0Par";
+        LOG(info) << "---Could not initialize Sci2HitPos_p0Par";
         return kFALSE;
     }
 
     if (!(list->fill("Pos_p1", &fPos_p1)))
     {
-        LOG(INFO) << "---Could not initialize Sci2HitPos_p1Par";
+        LOG(info) << "---Could not initialize Sci2HitPos_p1Par";
         return kFALSE;
     }
 
@@ -64,14 +64,14 @@ void R3BSci2HitPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BSci2HitPar::printParams()
 {
-    LOG(INFO) << "R3BSci2HitPar: Incoming ID parameters :";
+    LOG(info) << "R3BSci2HitPar: Incoming ID parameters :";
 
-    LOG(INFO) << "Pos_p0"
+    LOG(info) << "Pos_p0"
               << " "
               << "Pos_p1"
               << " ";
 
-    LOG(INFO) << fPos_p0 << "\t" << fPos_p1;
+    LOG(info) << fPos_p0 << "\t" << fPos_p1;
 }
 
 ClassImp(R3BSci2HitPar)

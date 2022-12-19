@@ -68,16 +68,16 @@ void R3BMwpc1Mapped2Cal::SetParContainers()
     // Parameter Container
     // Reading PadCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BMwpc1CalPar*)rtdb->getContainer("mwpc1CalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on mwpc1CalPar container.");
+        R3BLOG(error, "Couldn't get handle on mwpc1CalPar container.");
     }
     else
     {
-        R3BLOG(INFO, "mwpc1CalPar container found.");
+        R3BLOG(info, "mwpc1CalPar container found.");
     }
     return;
 }
@@ -89,9 +89,9 @@ void R3BMwpc1Mapped2Cal::SetParameter()
     NumPadY = fCal_Par->GetNumPadsY();           // Number of Pads in Y
     NumParams = fCal_Par->GetNumParametersFit(); // Number of parameters in the Fit
 
-    R3BLOG(INFO, "NumPadX: " << NumPadX);
-    R3BLOG(INFO, "NumPadY: " << NumPadY);
-    R3BLOG(INFO, "Number of fit parameters: " << NumParams);
+    R3BLOG(info, "NumPadX: " << NumPadX);
+    R3BLOG(info, "NumPadY: " << NumPadY);
+    R3BLOG(info, "Number of fit parameters: " << NumParams);
 
     CalParams = new TArrayF();
     Int_t array_size = (NumPadX + NumPadY) * NumParams;
@@ -103,20 +103,20 @@ void R3BMwpc1Mapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc1Mapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fMwpcMappedDataCA = (TClonesArray*)rootManager->GetObject("Mwpc1MappedData");
     if (!fMwpcMappedDataCA)
     {
-        R3BLOG(FATAL, "Mwpc1MappedData not found");
+        R3BLOG(fatal, "Mwpc1MappedData not found");
         return kFATAL;
     }
 
@@ -148,7 +148,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
     Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY) && nHits > 0)
     {
-        R3BLOG(WARNING, "nHits>(NumPadX+NumPadY)");
+        R3BLOG(warn, "nHits>(NumPadX+NumPadY)");
     }
     if (nHits==0)
         return;
@@ -173,7 +173,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
         else if (planeId == 3) // Y
             nbpad = (padId + NumPadX) * NumParams;
         else
-            R3BLOG(ERROR, "Plane " << planeId << " does not exist in MWPC1");
+            R3BLOG(error, "Plane " << planeId << " does not exist in MWPC1");
 
         pedestal = CalParams->GetAt(nbpad);
         charge = mappedData[i]->GetQ() - pedestal;

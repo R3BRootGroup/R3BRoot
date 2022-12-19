@@ -66,17 +66,17 @@ void R3BTofDMappingPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BTofDMappingPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "FairParamList not found");
+        R3BLOG(fatal, "FairParamList not found");
         return;
     }
     list->add("tofdPlanesPar", fNumPlanes);
     list->add("tofdPaddlesPar", fNumPaddles);
 
-    R3BLOG(INFO, "Nb of planes: " << fNumPlanes);
-    R3BLOG(INFO, "Nb of paddles: " << fNumPaddles);
+    R3BLOG(info, "Nb of planes: " << fNumPlanes);
+    R3BLOG(info, "Nb of paddles: " << fNumPaddles);
 
     for (Int_t p = 0; p < fNumPmts; p++)
     {
@@ -95,20 +95,20 @@ void R3BTofDMappingPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BTofDMappingPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "FairParamList not found");
+        R3BLOG(fatal, "FairParamList not found");
         return kFALSE;
     }
     if (!list->fill("tofdPlanesPar", &fNumPlanes))
     {
-        R3BLOG(INFO, "Could not initialize tofdPlanesPar");
+        R3BLOG(info, "Could not initialize tofdPlanesPar");
         return kFALSE;
     }
     if (!list->fill("tofdPaddlesPar", &fNumPaddles))
     {
-        R3BLOG(INFO, "Could not initialize tofdPaddlesPar");
+        R3BLOG(info, "Could not initialize tofdPaddlesPar");
         return kFALSE;
     }
 
@@ -125,7 +125,7 @@ Bool_t R3BTofDMappingPar::getParams(FairParamList* list)
 
             if (!(list->fill(name, fTrigmap[p][plane])))
             {
-                R3BLOG(ERROR, "Could not initialize " << name);
+                R3BLOG(error, "Could not initialize " << name);
                 return kFALSE;
             }
         }
@@ -139,13 +139,13 @@ void R3BTofDMappingPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BTofDMappingPar::printParams()
 {
-    R3BLOG(INFO, "Mapping params for TofD: Num of planes: " << fNumPlanes << " and paddles: " << fNumPaddles);
+    R3BLOG(info, "Mapping params for TofD: Num of planes: " << fNumPlanes << " and paddles: " << fNumPaddles);
 
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
             for (Int_t paddle = 0; paddle < fNumPaddles; paddle++)
             {
-                R3BLOG(INFO,
+                R3BLOG(info,
                        "Plane: " << plane + 1 << ", pmt: " << p + 1 << ", paddle: " << paddle + 1
                                  << ", value: " << fTrigmap[p][plane]->GetAt(paddle));
             }

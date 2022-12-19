@@ -48,12 +48,12 @@ R3BWhiterabbitLosReader::~R3BWhiterabbitLosReader()
 Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitLosReader::Init()";
+    LOG(info) << "R3BWhiterabbitLosReader::Init()";
     EXT_STR_h101_WRLOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRLOS, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitLosReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitLosReader::Failed to setup structure information.";
         return kFALSE;
     }
     FairRootManager* mgr = FairRootManager::Instance();
@@ -61,7 +61,7 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
     if (!fEventHeader)
     {
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        LOG(WARNING) << "R3BWhiterabbitLosReader::Init() EventHeader. not found";
+        LOG(warn) << "R3BWhiterabbitLosReader::Init() EventHeader. not found";
     }
 
     // Register output array in tree

@@ -42,7 +42,7 @@ R3BCryAsciiGenerator::R3BCryAsciiGenerator(std::string fileName)
 {
     infile.open(fileName);
     if (!infile.is_open())
-        LOG(ERROR) << "R3BCryAsciiGenerator: Cannot open input file.";
+        LOG(error) << "R3BCryAsciiGenerator: Cannot open input file.";
 }
 
 R3BCryAsciiGenerator::R3BCryAsciiGenerator(const TString& fileName)
@@ -90,7 +90,7 @@ bool R3BCryAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (infile.eof())
     {
-        LOG(INFO) << "R3BCryAsciiGenerator: End of input file reached ";
+        LOG(info) << "R3BCryAsciiGenerator: End of input file reached ";
         CloseInput();
         return kFALSE;
     }
@@ -136,7 +136,7 @@ void R3BCryAsciiGenerator::CloseInput()
     {
         if (infile.is_open())
         {
-            LOG(INFO) << "R3BCryAsciiGenerator: Closing input file ";
+            LOG(info) << "R3BCryAsciiGenerator: Closing input file ";
             infile.close();
         }
     }

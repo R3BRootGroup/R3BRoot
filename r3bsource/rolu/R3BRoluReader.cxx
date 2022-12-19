@@ -64,11 +64,11 @@ R3BRoluReader::~R3BRoluReader()
 Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_ROLU_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_ROLU, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup ROLU structure information.");
+        R3BLOG(error, "Failed to setup ROLU structure information.");
         return kFALSE;
     }
 
@@ -79,7 +79,7 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    R3BLOG(INFO, "ROLU num Dets: " << fNbDet);
+    R3BLOG(info, "ROLU num Dets: " << fNbDet);
     for (uint32_t d = 0; d < fNbDet; d++)
     {
         fData->ROLU[d].TTFLM = 0;

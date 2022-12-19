@@ -73,7 +73,7 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const TString& name, Int_t iVerbose)
 // Virtual R3BAmsStripCal2Hit: Destructor
 R3BAmsStripCal2Hit::~R3BAmsStripCal2Hit()
 {
-    LOG(INFO) << "R3BAmsStripCal2Hit: Delete instance";
+    LOG(info) << "R3BAmsStripCal2Hit: Delete instance";
     if (fAmsStripCalDataCA)
         delete fAmsStripCalDataCA;
     if (fAmsHitDataCA)
@@ -87,17 +87,17 @@ void R3BAmsStripCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsStripCal2Hit::Init() Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsStripCal2Hit::Init() Couldn't get handle on amsMappingPar container";
     }
     else
     {
-        LOG(INFO) << "R3BAmsStripCal2Hit::amsMappingPar found";
+        LOG(info) << "R3BAmsStripCal2Hit::amsMappingPar found";
     }
 }
 
@@ -105,18 +105,18 @@ void R3BAmsStripCal2Hit::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(WARNING) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
+        LOG(warn) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
     }
     //--- Parameter Container ---
     fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
-    LOG(INFO) << "R3BAmsStripCal2Hit::NumDet from mapping " << fMaxNumDet;
+    LOG(info) << "R3BAmsStripCal2Hit::NumDet from mapping " << fMaxNumDet;
     fMap_Par->printParams();
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsStripCal2Hit::Init()
 {
-    LOG(INFO) << "R3BAmsStripCal2Hit::Init()";
+    LOG(info) << "R3BAmsStripCal2Hit::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();

@@ -82,7 +82,7 @@ R3BPspxOnlineSpectra::~R3BPspxOnlineSpectra() {}
 
 InitStatus R3BPspxOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BPspxOnlineSpectra::Init ";
+    LOG(info) << "R3BPspxOnlineSpectra::Init ";
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
@@ -99,7 +99,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
     // PSPX detector
     // get access to data
     const char c_xy[2] = { 'x', 'y' }; // orientation of detector face
-    // LOG(INFO) << "TEST ---- " << PSPX;
+    // LOG(info) << "TEST ---- " << PSPX;
 
     for (Int_t d = 0; d < PSPX; d++)
     {
@@ -120,7 +120,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
     Int_t mappedSize = fMappedItemsPspx.size();
     Int_t precalSize = fPrecalItemsPspx.size();
     Int_t calSize = fCalItemsPspx.size();
-    // LOG(INFO) << "TEST 2 ---- " << fMappedItemsPspx.size();
+    // LOG(info) << "TEST 2 ---- " << fMappedItemsPspx.size();
     Int_t hitSize = fHitItemsPspx.size();
 
     Int_t Emax = 6000;
@@ -267,8 +267,8 @@ InitStatus R3BPspxOnlineSpectra::Init()
     run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Objects/%s/->Reset_PSPX_Histo()", GetName()));
 
     // -------------------------------------------------------------------------
-    // LOG(INFO) << PSPX ;
-    LOG(INFO) << "END of INIT ";
+    // LOG(info) << PSPX ;
+    LOG(info) << "END of INIT ";
     return kSUCCESS;
 }
 
@@ -299,7 +299,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
@@ -361,7 +361,7 @@ void R3BPspxOnlineSpectra::FinishEvent()
 void R3BPspxOnlineSpectra::FinishTask()
 {
 
-    LOG(INFO) << "Finish MappedPspx";
+    LOG(info) << "Finish MappedPspx";
 
     // for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
     for (UInt_t i = 0; i < 2 * PSPX; i++)

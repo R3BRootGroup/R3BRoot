@@ -51,12 +51,12 @@ R3BTrloiiScalerReader_s467::~R3BTrloiiScalerReader_s467()
 Bool_t R3BTrloiiScalerReader_s467::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTrloiiScalerReader_s467::Init()";
+    LOG(info) << "R3BTrloiiScalerReader_s467::Init()";
     EXT_STR_h101_TRLO_s467_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TRLO_s467, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
+        LOG(error) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
         return kFALSE;
     }
 

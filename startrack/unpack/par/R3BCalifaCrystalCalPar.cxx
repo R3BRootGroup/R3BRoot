@@ -85,13 +85,13 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 {
     if (!list)
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
+        LOG(warn) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
         return kFALSE;
     }
     Int_t ndus;
     if (!list->fill("NrOfDUnits", &ndus))
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
+        LOG(warn) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
         return kFALSE;
     }
 

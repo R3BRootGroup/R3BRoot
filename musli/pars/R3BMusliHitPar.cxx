@@ -49,10 +49,10 @@ void R3BMusliHitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BMusliHitPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return;
     }
 
@@ -75,61 +75,61 @@ void R3BMusliHitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BMusliHitPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return kFALSE;
     }
 
     if (!list->fill("musliNumGroupsAnodesPar", &fNumGroups))
     {
-        LOG(ERROR) << "Could not initialize musliNumTypesPar";
+        LOG(error) << "Could not initialize musliNumTypesPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumTypesPar", &fNumTypes))
     {
-        LOG(ERROR) << "Could not initialize musliNumTypesPar";
+        LOG(error) << "Could not initialize musliNumTypesPar";
         return kFALSE;
     }
 
     if (!list->fill("musliMaxMultPar", &fMaxMult))
     {
-        LOG(ERROR) << "Could not initialize musliMaxMultPar";
+        LOG(error) << "Could not initialize musliMaxMultPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsEcorrBetaFitPar", &fNumParamsEcorrBetaFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsEcorrBetaFit";
+        LOG(error) << "Could not initialize musliNumParamsEcorrBetaFit";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsZFitPar", &fNumParamsZFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsZFit";
+        LOG(error) << "Could not initialize musliNumParamsZFit";
         return kFALSE;
     }
 
     fEaveVsBetaHitParams->Set(fNumTypes);
     if (!list->fill("musliEaveVsBetaHitPar", fEaveVsBetaHitParams))
     {
-        LOG(ERROR) << "Could not initialize musliEaveVsBetaHitPar";
+        LOG(error) << "Could not initialize musliEaveVsBetaHitPar";
         return kFALSE;
     }
 
     fEcorrBetaHitParams->Set(fNumTypes * fNumParamsEcorrBetaFit);
     if (!list->fill("musliEcorrBetaHitPar", fEcorrBetaHitParams))
     {
-        LOG(ERROR) << "Could not initialize musliEcorrBetaHitPar";
+        LOG(error) << "Could not initialize musliEcorrBetaHitPar";
         return kFALSE;
     }
 
     fZHitParams->Set(fNumTypes * fNumParamsZFit);
     if (!list->fill("musliZHitPar", fZHitParams))
     {
-        LOG(ERROR) << "Could not initialize musliZHitPar";
+        LOG(error) << "Could not initialize musliZHitPar";
         return kFALSE;
     }
 
@@ -143,32 +143,32 @@ void R3BMusliHitPar::print() { printParams(); }
 void R3BMusliHitPar::printParams()
 {
 
-    R3BLOG(INFO, "Nb of musli groups anodes signals: " << fNumGroups);
-    R3BLOG(INFO, "Nb of musli data types: " << fNumTypes);
-    R3BLOG(INFO, "Nb of musli data types: " << fNumTypes);
-    R3BLOG(INFO, "Nb of parameters in the EcorrBeta Fit: " << fNumParamsEcorrBetaFit);
-    R3BLOG(INFO, "Nb of parameters in the Z vs Sqrt(e) Fit: " << fNumParamsZFit);
+    R3BLOG(info, "Nb of musli groups anodes signals: " << fNumGroups);
+    R3BLOG(info, "Nb of musli data types: " << fNumTypes);
+    R3BLOG(info, "Nb of musli data types: " << fNumTypes);
+    R3BLOG(info, "Nb of parameters in the EcorrBeta Fit: " << fNumParamsEcorrBetaFit);
+    R3BLOG(info, "Nb of parameters in the Z vs Sqrt(e) Fit: " << fNumParamsZFit);
 
     for (Int_t type = 0; type < fNumTypes; type++)
     {
-        LOG(INFO) << "Types of Musli Hit Data : " << type + 1;
-        LOG(INFO) << "fEaveVsBetaHitParams : " << fEaveVsBetaHitParams->GetAt(type);
+        LOG(info) << "Types of Musli Hit Data : " << type + 1;
+        LOG(info) << "fEaveVsBetaHitParams : " << fEaveVsBetaHitParams->GetAt(type);
     }
     for (Int_t type = 0; type < fNumTypes; type++)
     {
-        LOG(INFO) << "Types of Musli Hit Data : " << type + 1;
+        LOG(info) << "Types of Musli Hit Data : " << type + 1;
         for (Int_t i = 0; i < fNumParamsEcorrBetaFit; i++)
         {
-            LOG(INFO) << "fEcorrBetaHitParams : FitParam(" << i
+            LOG(info) << "fEcorrBetaHitParams : FitParam(" << i
                       << ") = " << fEcorrBetaHitParams->GetAt(type * fNumParamsEcorrBetaFit + i);
         }
     }
     for (Int_t type = 0; type < fNumTypes; type++)
     {
-        LOG(INFO) << "Types of Musli Hit Data : " << type + 1;
+        LOG(info) << "Types of Musli Hit Data : " << type + 1;
         for (Int_t i = 0; i < fNumParamsZFit; i++)
         {
-            LOG(INFO) << "fZHitParams : FitParam(" << i << ") = " << fZHitParams->GetAt(type * fNumParamsZFit + i);
+            LOG(info) << "fZHitParams : FitParam(" << i << ") = " << fZHitParams->GetAt(type * fNumParamsZFit + i);
         }
     }
 }

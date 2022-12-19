@@ -54,15 +54,15 @@ void R3BFootCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BFootCalPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(ERROR, "Could not initialize FairParamList");
+        R3BLOG(error, "Could not initialize FairParamList");
         return;
     }
 
     Int_t array_size = fNumDets * fNumStrips;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fStripCalParams->Set(array_size);
 
@@ -75,38 +75,38 @@ void R3BFootCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BFootCalPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(ERROR, "Could not initialize FairParamList");
+        R3BLOG(error, "Could not initialize FairParamList");
         return kFALSE;
     }
 
     if (!list->fill("footDetNumberPar", &fNumDets))
     {
-        LOG(FATAL) << "R3BFootCalPar::Could not initialize footDetNumberPar";
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footDetNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("footStripNumberPar", &fNumStrips))
     {
-        LOG(FATAL) << "R3BFootCalPar::Could not initialize footStripNumberPar";
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footStripNumberPar";
         return kFALSE;
     }
 
     if (!list->fill("footNumberParsFit", &fNumParsFit))
     {
-        LOG(FATAL) << "R3BFootCalPar::Could not initialize footNumberParsFit";
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footNumberParsFit";
         return kFALSE;
     }
 
     Int_t array_size = fNumDets * fNumStrips;
-    LOG(INFO) << "Total number of strips: " << array_size;
+    LOG(info) << "Total number of strips: " << array_size;
     fStripCalParams->Set(array_size * fNumParsFit);
 
     if (!(list->fill("footStripCalPar", fStripCalParams)))
     {
-        LOG(FATAL) << "R3BFootCalPar::Could not initialize footStripCalPar";
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footStripCalPar";
         return kFALSE;
     }
 
@@ -116,18 +116,18 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
 // ----  Method print ----------------------------------------------------------
 void R3BFootCalPar::print()
 {
-    R3BLOG(INFO, "Foot strip Parameters");
+    R3BLOG(info, "Foot strip Parameters");
     Int_t array_size = fNumDets * fNumStrips;
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
-        LOG(INFO) << "Foot detector number: " << d + 1;
+        LOG(info) << "Foot detector number: " << d + 1;
         for (Int_t i = 0; i < fNumStrips; i++)
         {
-            LOG(INFO) << "Foot strip number: " << i + 1;
+            LOG(info) << "Foot strip number: " << i + 1;
             for (Int_t j = 0; j < fNumParsFit; j++)
             {
-                LOG(INFO) << "FitParam(" << j
+                LOG(info) << "FitParam(" << j
                           << ") = " << fStripCalParams->GetAt(d * fNumParsFit * fNumStrips + i * fNumParsFit + j);
             }
         }

@@ -73,7 +73,7 @@ FairParSet* R3BXBallContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
     /*
     const char* name=c->GetName();
-    LOG(INFO) << "container name " << name;
+    LOG(info) << "container name " << name;
     FairParSet* p=0;
     if (strcmp(name,"R3BXBallDigiPar")==0) {
       p=new R3BXBallDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

@@ -36,10 +36,10 @@ R3BTofDHitPar::~R3BTofDHitPar()
 
 void R3BTofDHitPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "putParams() called");
+    R3BLOG(info, "putParams() called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return;
     }
     list->addObject(GetName(), fHitParams);
@@ -49,12 +49,12 @@ Bool_t R3BTofDHitPar::getParams(FairParamList* list)
 {
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return kFALSE;
     }
     if (!list->fillObject(GetName(), fHitParams))
     {
-        R3BLOG(ERROR, "Could not initialize " << GetName());
+        R3BLOG(error, "Could not initialize " << GetName());
         return kFALSE;
     }
     return kTRUE;
@@ -71,13 +71,13 @@ void R3BTofDHitPar::print() { printParams(); }
 
 void R3BTofDHitPar::printParams()
 {
-    R3BLOG(INFO, GetName() << "Time Calib. Parameters");
+    R3BLOG(info, GetName() << "Time Calib. Parameters");
 
-    R3BLOG(INFO, "Number of HIT Parameters " << fHitParams->GetEntries());
+    R3BLOG(info, "Number of HIT Parameters " << fHitParams->GetEntries());
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
         R3BTofDHitModulePar* t_par = (R3BTofDHitModulePar*)fHitParams->At(i);
-        LOG(INFO) << "-------------------------------------------------------";
+        LOG(info) << "-------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();
@@ -105,13 +105,13 @@ R3BTofDHitModulePar* R3BTofDHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
             tpaddle = par->GetPaddle();
             if (tplane < 1 || tplane > N_TOFD_HIT_PLANE_MAX || tpaddle < 1 || tpaddle > N_TOFD_HIT_PADDLE_MAX)
             {
-                R3BLOG(ERROR, "Error in plane/paddle indexing. " << tplane << " / " << tpaddle);
+                R3BLOG(error, "Error in plane/paddle indexing. " << tplane << " / " << tpaddle);
                 continue;
             }
             index = (tplane - 1) * N_TOFD_HIT_PADDLE_MAX + tpaddle - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                R3BLOG(ERROR, "Parameter found more than once. " << tplane << " / " << tpaddle);
+                R3BLOG(error, "Parameter found more than once. " << tplane << " / " << tpaddle);
                 continue;
             }
             fIndexMap[index] = i;
@@ -121,14 +121,14 @@ R3BTofDHitModulePar* R3BTofDHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
 
     if (plane < 1 || plane > N_TOFD_HIT_PLANE_MAX || paddle < 1 || paddle > N_TOFD_HIT_PADDLE_MAX)
     {
-        R3BLOG(ERROR, "Error in plane/paddle indexing. " << plane << " / " << paddle);
+        R3BLOG(error, "Error in plane/paddle indexing. " << plane << " / " << paddle);
         return NULL;
     }
     Int_t index = (plane - 1) * N_TOFD_HIT_PADDLE_MAX + paddle - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        R3BLOG(WARNING, "Parameter not found for: " << plane << " / " << paddle);
+        R3BLOG(warn, "Parameter not found for: " << plane << " / " << paddle);
         return NULL;
     }
     Int_t arind = fIndexMap[index];

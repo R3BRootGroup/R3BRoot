@@ -81,13 +81,13 @@ void R3BFi23b::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BFi23b: initialisation";
+    LOG(info) << "R3BFi23b: initialisation";
     LOG(DEBUG) << "R3BFi23b: Vol. (McId) " << gMC->VolId("FI23BLog");
 }
 
 void R3BFi23b::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BFi23b: Adding customized Physics cut ... ";
+    LOG(info) << "-I- R3BFi23b: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -111,7 +111,7 @@ void R3BFi23b::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi23b: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "-I- R3BFi23b: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -254,7 +254,7 @@ TClonesArray* R3BFi23b::GetCollection(Int_t iColl) const
 void R3BFi23b::Print(Option_t* option) const
 {
     Int_t nHits = fFi23bCollection->GetEntriesFast();
-    LOG(INFO) << "R3BFi23b: " << nHits << " points registered in this event";
+    LOG(info) << "R3BFi23b: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -270,7 +270,7 @@ void R3BFi23b::Reset()
 void R3BFi23b::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BFi23b: " << nEntries << " entries to add";
+    LOG(info) << "R3BFi23b: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -281,7 +281,7 @@ void R3BFi23b::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BFi23b: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BFi23b: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -300,7 +300,7 @@ R3BFibPoint* R3BFi23b::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BFi23b: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BFi23b: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);

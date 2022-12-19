@@ -51,7 +51,7 @@ R3BMwpcPoint::~R3BMwpcPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BMwpcPoint::Print(const Option_t* opt) const
 {
-    LOG(INFO) << "R3BMwpcPoint: Point for track " << fTrackID << " in detector " << fDetectorID << "\n"
+    LOG(info) << "R3BMwpcPoint: Point for track " << fTrackID << " in detector " << fDetectorID << "\n"
               << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm \n"
               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV \n"
               << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06

@@ -36,7 +36,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
     // Logging
     run.SetStoreTraj(false);
     FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+    FairLogger::GetLogger()->SetLogScreenLevel("info");
 
     // Init & Special MC Settings
     run.Init();

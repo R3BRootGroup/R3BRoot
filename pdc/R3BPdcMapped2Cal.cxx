@@ -70,11 +70,11 @@ InitStatus R3BPdcMapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container PdcTCalPar";
+        LOG(error) << "There are no TCal parameters in container PdcTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BPdcMapped2Cal::Init : read " << fNofTcalPars << " modules";
+    LOG(info) << "R3BPdcMapped2Cal::Init : read " << fNofTcalPars << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -100,7 +100,7 @@ void R3BPdcMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to PdcTCalPar-Container.";
+        LOG(error) << "Could not get access to PdcTCalPar-Container.";
         fNofTcalPars = 0;
     }
 }
@@ -129,7 +129,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
         par = fTcalPar->GetModuleParAt(mapped->GetPlaneId(), mapped->GetWireId(), mapped->GetEdgeId());
         if (!par)
         {
-            LOG(WARNING) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire << ": TCal par not found.";
+            LOG(warn) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire << ": TCal par not found.";
             continue;
         }
         Double_t time_ns = -1;
@@ -146,7 +146,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
 
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
+            LOG(error) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }

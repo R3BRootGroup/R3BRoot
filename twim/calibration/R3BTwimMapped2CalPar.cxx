@@ -76,12 +76,12 @@ R3BTwimMapped2CalPar::R3BTwimMapped2CalPar(const TString& name,
 }
 
 // Virtual R3BTwimMapped2CalPar: Destructor
-R3BTwimMapped2CalPar::~R3BTwimMapped2CalPar() { R3BLOG(INFO, "Delete instance"); }
+R3BTwimMapped2CalPar::~R3BTwimMapped2CalPar() { R3BLOG(info, "Delete instance"); }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "Init");
+    R3BLOG(info, "Init");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -96,13 +96,13 @@ InitStatus R3BTwimMapped2CalPar::Init()
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
-        R3BLOG(INFO, "fExpId :" << fExpId);
+        R3BLOG(info, "fExpId :" << fExpId);
     }
 
     fTwimMappedDataCA = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fTwimMappedDataCA)
     {
-        R3BLOG(ERROR, "TwimMappedData not found");
+        R3BLOG(error, "TwimMappedData not found");
         return kFATAL;
     }
 
@@ -110,14 +110,14 @@ InitStatus R3BTwimMapped2CalPar::Init()
     fHitItemsMwpcA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
     if (!fHitItemsMwpcA)
     {
-        R3BLOG(ERROR, fNameDetA << "HitData not found");
+        R3BLOG(error, fNameDetA << "HitData not found");
         return kFATAL;
     }
 
     fHitItemsMwpcB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
     if (!fHitItemsMwpcB)
     {
-        R3BLOG(ERROR, fNameDetB << "HitData not found");
+        R3BLOG(error, fNameDetB << "HitData not found");
         return kFATAL;
     }
 
@@ -130,7 +130,7 @@ InitStatus R3BTwimMapped2CalPar::Init()
     fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on twimCalPar container");
+        R3BLOG(error, "Couldn't get handle on twimCalPar container");
         return kFATAL;
     }
 
@@ -189,14 +189,14 @@ void R3BTwimMapped2CalPar::Exec(Option_t* option)
     {
         hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
         PosMwpcA.SetX(hitMwAData[i]->GetX());
-        // R3BLOG(INFO,hitMwAData[i]->GetX());
+        // R3BLOG(info,hitMwAData[i]->GetX());
     }
     R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
         hitMwBData[i] = (R3BMwpcHitData*)(fHitItemsMwpcB->At(i));
         PosMwpcB.SetX(hitMwBData[i]->GetX());
-        // R3BLOG(INFO,hitMwBData[i]->GetX());
+        // R3BLOG(info,hitMwBData[i]->GetX());
     }
 
     R3BTwimMappedData** mappedData = new R3BTwimMappedData*[nHits];

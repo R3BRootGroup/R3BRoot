@@ -27,7 +27,7 @@ R3BLosProvideTStart::R3BLosProvideTStart()
 
 InitStatus R3BLosProvideTStart::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fLosCalData.Init();
     fLosTriggerCalData.Init();
 
@@ -41,7 +41,7 @@ InitStatus R3BLosProvideTStart::Init()
     if (fEventHeader == nullptr)
     {
         fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
     // Definition of a time stich object to correlate times coming from different systems
     fTimeStitch = new R3BTimeStitch();

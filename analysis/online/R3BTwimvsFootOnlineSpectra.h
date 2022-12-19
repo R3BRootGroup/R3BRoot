@@ -89,11 +89,11 @@ class R3BTwimvsFootOnlineSpectra : public FairTask
     {
         if (id1 < 1)
         {
-            R3BLOG(FATAL, "id1 < 1, it should be at least 1");
+            R3BLOG(fatal, "id1 < 1, it should be at least 1");
         }
         if (id2 < 1)
         {
-            R3BLOG(FATAL, "id2 < 1, it should be at least 1");
+            R3BLOG(fatal, "id2 < 1, it should be at least 1");
         }
         fFootDetId1 = id1;
         fFootDetId2 = id2;

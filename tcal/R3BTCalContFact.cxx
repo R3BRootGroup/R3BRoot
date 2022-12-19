@@ -87,7 +87,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    R3BLOG(INFO, name);
+    R3BLOG(info, name);
 
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");

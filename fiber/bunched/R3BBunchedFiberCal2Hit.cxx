@@ -139,9 +139,9 @@ R3BBunchedFiberCal2Hit::~R3BBunchedFiberCal2Hit()
 
 InitStatus R3BBunchedFiberCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     auto mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found.");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
@@ -149,11 +149,11 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
-    R3BLOG_IF(FATAL, !fCalItems, "Branch " << name << " not found.");
+    R3BLOG_IF(fatal, !fCalItems, "Branch " << name << " not found.");
 
     auto name_mapmt_trig = fName + "TriggerCal";
     fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
-    R3BLOG_IF(FATAL, !fMAPMTCalTriggerItems, "Branch " << name_mapmt_trig << " not found.");
+    R3BLOG_IF(fatal, !fMAPMTCalTriggerItems, "Branch " << name_mapmt_trig << " not found.");
 
     auto name_spmt_trig = "BunchedFiberSPMTTrigCal";
     fSPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_spmt_trig);
@@ -183,7 +183,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get " << container << " container.";
+            LOG(error) << "Could not get " << container << " container.";
             fNofHitPars = 0;
         }
         else
@@ -191,7 +191,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
             fNofHitPars = fHitPar->GetNumModulePar();
             if (0 == fNofHitPars)
             {
-                LOG(ERROR) << "No Hit parameters in " << container << " container.";
+                LOG(error) << "No Hit parameters in " << container << " container.";
                 fHitPar = nullptr;
             }
         }
@@ -303,7 +303,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
     if (!fMapPar)
     {
-        R3BLOG(ERROR, "Couldn't get " << fName << "MappingPar");
+        R3BLOG(error, "Couldn't get " << fName << "MappingPar");
     }
     else
     {
@@ -312,11 +312,11 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
         {
             fNumFibers *= fSubNum;
         }
-        R3BLOG(INFO, "Nb of fibers for " << fName << ": " << fNumFibers);
+        R3BLOG(info, "Nb of fibers for " << fName << ": " << fNumFibers);
     }
 
     fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
-    R3BLOG_IF(ERROR, !fCalPar, "Couldn't get " << fName << "HitPar.");
+    R3BLOG_IF(error, !fCalPar, "Couldn't get " << fName << "HitPar.");
 }
 
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)

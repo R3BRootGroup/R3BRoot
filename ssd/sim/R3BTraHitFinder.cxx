@@ -78,7 +78,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
     Double_t StepZ1 = StripPitch1 / sin(AngTrap1); // step along the z axis of the detector (in xz plan)
     Double_t StepX1 = StripPitch1 / cos(AngTrap1); // step along the x axis of the detector (in xz plan)
     Int_t NbStrip1 = int(WidthMax1 / StepX1);      //
-    // LOG(INFO) << "NbStrip1= " << NbStrip1;
+    // LOG(info) << "NbStrip1= " << NbStrip1;
     // Double_t ShiftalongZ;
     Double_t Proj;      // cm
     Double_t ProjStrip; // cm
@@ -96,7 +96,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
     Double_t StepZ2 = StripPitch2 / sin(AngTrap2); // step along the z axis of the detector (in xz plan)
     Double_t StepX2 = StripPitch2 / cos(AngTrap2); // step along the x axis of the detector (in xz plan)
     Int_t NbStrip2 = int(WidthMax2 / StepX2);      //
-    // LOG(INFO) << "NbStrip2= " << NbStrip2;
+    // LOG(info) << "NbStrip2= " << NbStrip2;
 
     // Outer layer
     Double_t Length3 = 30.06;                      // cm
@@ -107,7 +107,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
     Double_t StepZ3 = StripPitch3 / sin(AngTrap3); // step along the z axis of the detector (in xz plan)
     Double_t StepX3 = StripPitch3 / cos(AngTrap3); // step along the x axis of the detector (in xz plan)
     Int_t NbStrip3 = int(WidthMax3 / StepX3);      //
-    // LOG(INFO) << "NbStrip3= " << NbStrip3;
+    // LOG(info) << "NbStrip3= " << NbStrip3;
 
     Double_t M_Inner[6][4][4] = { {
                                       { 1, 0, 0, 0 },                                // Matrice 1 row 0
@@ -152,10 +152,10 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                                   } };
 
     /*
-     LOG(INFO) << M_Inner[0][0][0] << " " << M_Inner[0][0][1] << " " << M_Inner[0][0][2] << " " << M_Inner[0][0][3] << "
-     "; LOG(INFO) << M_Inner[0][1][0] << " " << M_Inner[0][1][1] << " " << M_Inner[0][1][2] << " " << M_Inner[0][1][3]
-     << " "; LOG(INFO) << M_Inner[0][2][0] << " " << M_Inner[0][2][1] << " " << M_Inner[0][2][2] << " " <<
-     M_Inner[0][2][3] << " "; LOG(INFO) << M_Inner[0][3][0] << " " << M_Inner[0][3][1] << " " << M_Inner[0][3][2] << " "
+     LOG(info) << M_Inner[0][0][0] << " " << M_Inner[0][0][1] << " " << M_Inner[0][0][2] << " " << M_Inner[0][0][3] << "
+     "; LOG(info) << M_Inner[0][1][0] << " " << M_Inner[0][1][1] << " " << M_Inner[0][1][2] << " " << M_Inner[0][1][3]
+     << " "; LOG(info) << M_Inner[0][2][0] << " " << M_Inner[0][2][1] << " " << M_Inner[0][2][2] << " " <<
+     M_Inner[0][2][3] << " "; LOG(info) << M_Inner[0][3][0] << " " << M_Inner[0][3][1] << " " << M_Inner[0][3][2] << " "
      << M_Inner[0][3][3] << " ";
      */
 
@@ -575,11 +575,11 @@ void R3BTraHitFinder::Exec(Option_t* opt)
     Int_t traHitsPerEvent = 0;
     traHitsPerEvent = fTrackerHitCA->GetEntries();
 
-    // LOG(INFO) << " NEW EVENT ";
+    // LOG(info) << " NEW EVENT ";
 
-    // LOG(INFO) << traHitsPerEvent;
+    // LOG(info) << traHitsPerEvent;
 
-    // LOG(INFO) << "";
+    // LOG(info) << "";
 
     if (traHitsPerEvent > 0)
     {
@@ -603,30 +603,30 @@ void R3BTraHitFinder::Exec(Option_t* opt)
             if (Detector <= 6)
             { // = inner layer
 
-                // LOG(INFO) << Detector << " " << j << " " << k;
+                // LOG(info) << Detector << " " << j << " " << k;
 
-                // LOG(INFO) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
+                // LOG(info) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
 
                 // apply transformation M_INV_inner[x][4][4]
                 X_track_det = X_track * M_Inner[Detector - 1][0][0] + Y_track * M_Inner[Detector - 1][0][1] +
                               Z_track * M_Inner[Detector - 1][0][2] + M_Inner[Detector - 1][0][3];
 
-                // LOG(INFO) << M_Inner[Detector-1][0][0] << " " << M_Inner[Detector-1][0][1] << " " <<
+                // LOG(info) << M_Inner[Detector-1][0][0] << " " << M_Inner[Detector-1][0][1] << " " <<
                 // M_Inner[Detector-1][0][2] << " " << M_Inner[Detector-1][0][3] ;
 
                 Y_track_det = X_track * M_Inner[Detector - 1][1][0] + Y_track * M_Inner[Detector - 1][1][1] +
                               Z_track * M_Inner[Detector - 1][1][2] + M_Inner[Detector - 1][1][3];
 
-                // LOG(INFO) << M_Inner[Detector-1][1][0] << " " << M_Inner[Detector-1][1][1] << " " <<
+                // LOG(info) << M_Inner[Detector-1][1][0] << " " << M_Inner[Detector-1][1][1] << " " <<
                 // M_Inner[Detector-1][1][2] << " " << M_Inner[Detector-1][1][3] ;
 
                 Z_track_det = X_track * M_Inner[Detector - 1][2][0] + Y_track * M_Inner[Detector - 1][2][1] +
                               Z_track * M_Inner[Detector - 1][2][2] + M_Inner[Detector - 1][2][3];
 
-                // LOG(INFO) << M_Inner[Detector-1][2][0] << " " << M_Inner[Detector-1][2][1] << " " <<
+                // LOG(info) << M_Inner[Detector-1][2][0] << " " << M_Inner[Detector-1][2][1] << " " <<
                 // M_Inner[Detector-1][2][2] << " " << M_Inner[Detector-1][2][3] ;
 
-                // LOG(INFO) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
+                // LOG(info) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
 
                 // find 1st strip hit:
                 // step 1 : projection parallel to the 1st longitudinal side of the detector (ie: offset at z=0 of this
@@ -647,8 +647,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                              (2 * strip +
                               1)); // 1st strip proj at x=0. -1.1 is a shift along z axis (TODO: find analytic formula).
 
-                // LOG(INFO) << "SlopA= " << SlopA << " Length1= " << Length1 << " WidthMax1= " << WidthMax1 << "
-                // WidthMin1= " << WidthMin1; LOG(INFO) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(INFO)
+                // LOG(info) << "SlopA= " << SlopA << " Length1= " << Length1 << " WidthMax1= " << WidthMax1 << "
+                // WidthMin1= " << WidthMin1; LOG(info) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(info)
                 // << "StepZ1/2 = " << StepZ1/2  << " ProjStrip - Proj= " << ProjStrip-Proj;
 
                 while (strip < NbStrip1)
@@ -657,7 +657,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // first strip hit is:
                         StripA_Id = strip;
-                        // LOG(INFO) << "StripA_Id= " << StripA_Id;
+                        // LOG(info) << "StripA_Id= " << StripA_Id;
                         OffsetA = ProjStrip;
                         strip = NbStrip1; // to end the loop
                     }
@@ -680,8 +680,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 // ProjStrip= (-Length1/2-(StepZ1/2)*(2*strip+1)) - SlopB*(WidthMax1/2);  // 1st strip proj at z=0
                 ProjStrip = (-Length1 / 2 - 1.1) - SlopB * (-WidthMax1 / 2 + (StepX1 / 2) * (2 * strip + 1));
 
-                // LOG(INFO) << "SlopB= " << SlopB << " Length1= " << Length1 << " WidthMax1= " << WidthMax1 << "
-                // WidthMin1= " << WidthMin1; LOG(INFO) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(INFO)
+                // LOG(info) << "SlopB= " << SlopB << " Length1= " << Length1 << " WidthMax1= " << WidthMax1 << "
+                // WidthMin1= " << WidthMin1; LOG(info) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(info)
                 // << "StepZ1/2 = " << StepZ1/2  << " ProjStrip - Proj= " << ProjStrip-Proj;
 
                 while (strip < NbStrip1)
@@ -690,7 +690,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // 2nd strip hit:
                         StripB_Id = strip;
-                        // LOG(INFO) << "StripB_Id= " << StripB_Id;
+                        // LOG(info) << "StripB_Id= " << StripB_Id;
                         OffsetB = ProjStrip;
                         strip = NbStrip1; // to end the loop
                     }
@@ -718,14 +718,14 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 Z_Hit = X_intersect * M_INV_Inner[Detector - 1][2][0] + Y_intersect * M_INV_Inner[Detector - 1][2][1] +
                         Z_intersect * M_INV_Inner[Detector - 1][2][2] + M_INV_Inner[Detector - 1][2][3];
 
-                // LOG(INFO) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
+                // LOG(info) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
 
             } // end of Det=7 ( inner layer)
 
             if (Detector >= 7 && Detector <= 18)
             { // = Middle layer
 
-                // LOG(INFO) << Detector;
+                // LOG(info) << Detector;
 
                 // apply transformation M_INV_Mid[x][4][4]
                 X_track_det = X_track * M_Mid[Detector - 7][0][0] + Y_track * M_Mid[Detector - 7][0][1] +
@@ -735,8 +735,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 Z_track_det = X_track * M_Mid[Detector - 7][2][0] + Y_track * M_Mid[Detector - 7][2][1] +
                               Z_track * M_Mid[Detector - 7][2][2] + M_Mid[Detector - 7][2][3];
 
-                // LOG(INFO) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
-                // LOG(INFO) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
+                // LOG(info) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
+                // LOG(info) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
 
                 // find 1st strip hit:
                 // step 1 : projection parallel to the 1st longitudinal side of the detector (ie: offset at z=0 of this
@@ -754,8 +754,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                                      (StepX2 / 2) * (2 * strip + 1)); // 1st strip proj at x=0, -5.5 ia a shift along Z
                                                                       // axis (TODO: find the analytic formula)
 
-                // LOG(INFO) << "SlopA= " << SlopA << " Length2= " << Length2 << " WidthMax2= " << WidthMax2 << "
-                // WidthMin2= " << WidthMin2; LOG(INFO) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(INFO)
+                // LOG(info) << "SlopA= " << SlopA << " Length2= " << Length2 << " WidthMax2= " << WidthMax2 << "
+                // WidthMin2= " << WidthMin2; LOG(info) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(info)
                 // << "StepZ2/2 = " << StepZ2/2  << " ProjStrip - Proj= " << ProjStrip-Proj;
 
                 while (strip < NbStrip2)
@@ -764,7 +764,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // first strip hit is:
                         StripA_Id = strip;
-                        // LOG(INFO) << "StripA_Id= " << StripA_Id;
+                        // LOG(info) << "StripA_Id= " << StripA_Id;
                         OffsetA = ProjStrip;
                         strip = NbStrip2; // to end the loop
                     }
@@ -793,7 +793,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // 2nd strip hit:
                         StripB_Id = strip;
-                        // LOG(INFO) << "StripB_Id= " << StripB_Id;
+                        // LOG(info) << "StripB_Id= " << StripB_Id;
                         OffsetB = ProjStrip;
                         strip = NbStrip2; // to end the loop
                     }
@@ -821,13 +821,13 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 Z_Hit = X_intersect * M_INV_Mid[Detector - 7][2][0] + Y_intersect * M_INV_Mid[Detector - 7][2][1] +
                         Z_intersect * M_INV_Mid[Detector - 7][2][2] + M_INV_Mid[Detector - 7][2][3];
 
-                // LOG(INFO) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
+                // LOG(info) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
             }
 
             if (Detector >= 19)
             { // = outer layer
 
-                // LOG(INFO) << Detector;
+                // LOG(info) << Detector;
 
                 // apply transformation M_INV_Out[x][4][4]
                 X_track_det = X_track * M_Out[Detector - 19][0][0] + Y_track * M_Out[Detector - 19][0][1] +
@@ -837,8 +837,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 Z_track_det = X_track * M_Out[Detector - 19][2][0] + Y_track * M_Out[Detector - 19][2][1] +
                               Z_track * M_Out[Detector - 19][2][2] + M_Out[Detector - 19][2][3];
 
-                // LOG(INFO) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
-                // LOG(INFO) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
+                // LOG(info) <<  X_track << " " <<   Y_track << " " <<  Z_track << " ";
+                // LOG(info) <<  X_track_det << " " <<   Y_track_det << " " <<  Z_track_det << " ";
 
                 // find 1st strip hit:
                 // step 1 : projection parallel to the 1st longitudinal side of the detector (ie: offset at z=0 of this
@@ -854,8 +854,8 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 ProjStrip = (-Length3 / 2 - 5) -
                             SlopA * (WidthMax3 / 2 - (StepX3 / 2) * (2 * strip + 1)); // 1st strip proj at x=0
 
-                // LOG(INFO) << "SlopA= " << SlopA << " Length3= " << Length3 << " WidthMax3= " << WidthMax3 << "
-                // WidthMin3= " << WidthMin3; LOG(INFO) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(INFO)
+                // LOG(info) << "SlopA= " << SlopA << " Length3= " << Length3 << " WidthMax3= " << WidthMax3 << "
+                // WidthMin3= " << WidthMin3; LOG(info) << "Proj= " << Proj  << " ProjStrip= " << ProjStrip; LOG(info)
                 // << "StepZ3/2 = " << StepZ3/2  << " ProjStrip - Proj= " << ProjStrip-Proj;
 
                 while (strip < NbStrip3)
@@ -864,7 +864,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // first strip hit is:
                         StripA_Id = strip;
-                        // LOG(INFO) << "StripA_Id= " << StripA_Id;
+                        // LOG(info) << "StripA_Id= " << StripA_Id;
                         OffsetA = ProjStrip;
                         strip = NbStrip3; // to end the loop
                     }
@@ -894,7 +894,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                     {
                         // 2nd strip hit:
                         StripB_Id = strip;
-                        // LOG(INFO) << "StripB_Id= " << StripB_Id;
+                        // LOG(info) << "StripB_Id= " << StripB_Id;
                         OffsetB = ProjStrip;
                         strip = NbStrip3; // to end the loop
                     }
@@ -923,7 +923,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
                 Z_Hit = X_intersect * M_INV_Out[Detector - 19][2][0] + Y_intersect * M_INV_Out[Detector - 19][2][1] +
                         Z_intersect * M_INV_Out[Detector - 19][2][2] + M_INV_Out[Detector - 19][2][3];
 
-                // LOG(INFO) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
+                // LOG(info) <<  X_Hit << " " <<   Y_Hit << " " <<  Z_Hit << " ";
             }
 
             Theta = GetThetaScatZero(X_Hit, Y_Hit, Z_Hit);
@@ -931,15 +931,15 @@ void R3BTraHitFinder::Exec(Option_t* opt)
 
             /*if ((X_track/X_Hit)<0 || (Y_track/Y_Hit)<0) {
 
-                LOG(INFO) << "Detector" << " " << "Smeared Energy" << " " << "Raw Energy";
-                LOG(INFO) << Detector << " " << Energy << " " << traHit[i]->GetEnergyLoss();
-                LOG(INFO) << "X_in" << " " << "Y_in" << " " << "Z_in";
-                LOG(INFO) << X_track << " " << Y_track << " " << Z_track;
-                LOG(INFO) << "X_out" << " " << "Y_out" << " " << "Z_out";
-                LOG(INFO) << X_Hit << " " << Y_Hit << " " << Z_Hit;
-                LOG(INFO) << "Theta " << "Phi";
-                LOG(INFO) << Theta << " " << Phi;
-                LOG(INFO) << " ";
+                LOG(info) << "Detector" << " " << "Smeared Energy" << " " << "Raw Energy";
+                LOG(info) << Detector << " " << Energy << " " << traHit[i]->GetEnergyLoss();
+                LOG(info) << "X_in" << " " << "Y_in" << " " << "Z_in";
+                LOG(info) << X_track << " " << Y_track << " " << Z_track;
+                LOG(info) << "X_out" << " " << "Y_out" << " " << "Z_out";
+                LOG(info) << X_Hit << " " << Y_Hit << " " << Z_Hit;
+                LOG(info) << "Theta " << "Phi";
+                LOG(info) << Theta << " " << Phi;
+                LOG(info) << " ";
 
             }*/
 
@@ -949,14 +949,14 @@ void R3BTraHitFinder::Exec(Option_t* opt)
         }
     }
 
-    // LOG(INFO) << " ";
+    // LOG(info) << " ";
 }
 
 // ---- Public method Reset   --------------------------------------------------
 void R3BTraHitFinder::Reset()
 {
     // Clear the CA structure
-    // LOG(INFO) << " -I- R3BTraHitFinder:Reset() called ";
+    // LOG(info) << " -I- R3BTraHitFinder:Reset() called ";
 
     if (fTraHitCA)
         fTraHitCA->Clear();
@@ -966,8 +966,8 @@ void R3BTraHitFinder::Reset()
 void R3BTraHitFinder::Finish()
 {
     // here event. write histos
-    LOG(INFO) << "";
-    LOG(INFO) << " -I- Digit Finish() called ";
+    LOG(info) << "";
+    LOG(info) << " -I- Digit Finish() called ";
     // Write control histograms
 }
 
@@ -975,14 +975,14 @@ void R3BTraHitFinder::Finish()
 void R3BTraHitFinder::SetExperimentalResolution(Double_t trackerRes)
 {
     fTrackerResolution = trackerRes;
-    LOG(INFO) << "-I- R3BTraHitFinder::SetExperimentalResolution to " << fTrackerResolution << " GeV";
+    LOG(info) << "-I- R3BTraHitFinder::SetExperimentalResolution to " << fTrackerResolution << " GeV";
 }
 
 // -----  Public method SetDetectionThreshold  ----------------------------------
 void R3BTraHitFinder::SetDetectionThreshold(Double_t thresholdEne)
 {
     fThreshold = thresholdEne;
-    LOG(INFO) << "-I- R3BTraHitFinder::SetDetectionThreshold to " << fThreshold << " GeV";
+    LOG(info) << "-I- R3BTraHitFinder::SetDetectionThreshold to " << fThreshold << " GeV";
 }
 
 // -----   Private method ExpResSmearing  --------------------------------------------
@@ -994,7 +994,7 @@ Double_t R3BTraHitFinder::ExpResSmearing(Double_t inputEnergy)
     else
     {
         Double_t energy = gRandom->Gaus(inputEnergy, fTrackerResolution);
-        // LOG(INFO) << "energy " << energy << " for and Energy of "<< inputEnergy ;
+        // LOG(info) << "energy " << energy << " for and Energy of "<< inputEnergy ;
         return energy;
     }
 }

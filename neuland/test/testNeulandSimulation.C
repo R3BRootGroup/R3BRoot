@@ -19,7 +19,7 @@ void testNeulandSimulation()
 
     // Logging
     FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogScreenLevel("warn");
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");

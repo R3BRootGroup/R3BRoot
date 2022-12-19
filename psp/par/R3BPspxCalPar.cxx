@@ -45,27 +45,27 @@ void R3BPspxCalPar::clear()
 void R3BPspxCalPar::printParams()
 {
 
-    LOG(INFO) << "R3BPspxCalPar::printParams";
-    LOG(INFO) << "fNumDetectors: " << fNumDetectors;
+    LOG(info) << "R3BPspxCalPar::printParams";
+    LOG(info) << "fNumDetectors: " << fNumDetectors;
     Int_t size = fNumStrips.GetSize();
-    LOG(INFO) << "fNumStrips size: " << size;
-    LOG(INFO) << "Detectorno.: No. of Strips";
+    LOG(info) << "fNumStrips size: " << size;
+    LOG(info) << "Detectorno.: No. of Strips";
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << fNumStrips.GetAt(i);
+        LOG(info) << i << " :" << fNumStrips.GetAt(i);
     }
 
     size = fCalPar.GetSize();
-    LOG(INFO) << "fCalPar size: " << size;
+    LOG(info) << "fCalPar size: " << size;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << fCalPar.GetAt(i);
+        LOG(info) << i << " :" << fCalPar.GetAt(i);
     }
 }
 
 void R3BPspxCalPar::putParams(FairParamList* l)
 {
-    LOG(INFO) << "I am in R3BPspxCalPar::putParams ";
+    LOG(info) << "I am in R3BPspxCalPar::putParams ";
     if (!l)
         return;
     l->add("R3BPspxCalDetectors", fNumDetectors);
@@ -79,14 +79,14 @@ void R3BPspxCalPar::putParams(FairParamList* l)
 
     // count all entries: lines with strip info (2 entries) + lines with detector info (3 entries)
     Int_t array_size = (count_strips * 2 + fNumDetectors * 3);
-    LOG(INFO) << "R3BPspxCalPar Array Size: " << array_size;
+    LOG(info) << "R3BPspxCalPar Array Size: " << array_size;
     fCalPar.Set(array_size);
     l->add("R3BPspxCalPar", fCalPar);
 }
 
 Bool_t R3BPspxCalPar::getParams(FairParamList* l)
 {
-    LOG(INFO) << "I am in R3BPspxCalPar::getParams ";
+    LOG(info) << "I am in R3BPspxCalPar::getParams ";
 
     if (!l)
         return kFALSE;
@@ -103,15 +103,15 @@ Bool_t R3BPspxCalPar::getParams(FairParamList* l)
     {
         count_strips += fNumStrips[i];
     }
-    LOG(INFO) << "Total number of strips: " << count_strips;
+    LOG(info) << "Total number of strips: " << count_strips;
 
     // count all entries: lines with strip info (2 entries) + lines with detector info (3 entries)
     Int_t array_size = (count_strips * 2 + fNumDetectors * 3);
-    LOG(INFO) << "R3BPspxCalPar Array Size: " << array_size;
+    LOG(info) << "R3BPspxCalPar Array Size: " << array_size;
     fCalPar.Set(array_size);
     if (!(l->fill("R3BPspxCalPar", &fCalPar)))
     {
-        LOG(WARNING) << "Could not initialize R3BPspxCalPar";
+        LOG(warn) << "Could not initialize R3BPspxCalPar";
         return kFALSE;
     }
 

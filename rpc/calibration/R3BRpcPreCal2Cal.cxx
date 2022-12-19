@@ -45,7 +45,7 @@ R3BRpcPreCal2Cal::R3BRpcPreCal2Cal()
 
 R3BRpcPreCal2Cal::~R3BRpcPreCal2Cal()
 {
-    LOG(INFO) << "R3BRpcPreCal2Cal: Delete instance";
+    LOG(info) << "R3BRpcPreCal2Cal: Delete instance";
 
     delete fTotCalPar;
 }
@@ -53,13 +53,13 @@ R3BRpcPreCal2Cal::~R3BRpcPreCal2Cal()
 
 InitStatus R3BRpcPreCal2Cal::Init()
 {
-    LOG(INFO) << "R3BRpcPreCal2Cal::Init()";
+    LOG(info) << "R3BRpcPreCal2Cal::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(FATAL) << "R3BRpcPreCal2Cal::FairRootManager not found";
+        LOG(fatal) << "R3BRpcPreCal2Cal::FairRootManager not found";
         return kFATAL;
     }
 
@@ -68,20 +68,20 @@ InitStatus R3BRpcPreCal2Cal::Init()
    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcPreCal2Cal:: FairRuntimeDb not opened";
+        LOG(error) << "R3BRpcPreCal2Cal:: FairRuntimeDb not opened";
     }
 
     fPreCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPreCalData");
     if (!fPreCalDataCA)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
         return kFATAL;
     }
 
     fTotCalPar = (R3BRpcTotCalPar*)rtdb->getContainer("RpcTotCalPar");
     if (!fTotCalPar)
     {
-        LOG(ERROR) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
+        LOG(error) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
         return kFATAL;
     }
 

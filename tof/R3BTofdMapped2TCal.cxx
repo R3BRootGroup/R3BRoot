@@ -72,11 +72,11 @@ InitStatus R3BTofdMapped2TCal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar";
+        LOG(error) << "There are no TCal parameters in container TofdTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BTofdMapped2TCal::Init : read " << fNofTcalPars << " modules";
+    LOG(info) << "R3BTofdMapped2TCal::Init : read " << fNofTcalPars << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -87,7 +87,7 @@ InitStatus R3BTofdMapped2TCal::Init()
     if (header == nullptr)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
     // get access to Mapped data
@@ -106,7 +106,7 @@ void R3BTofdMapped2TCal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
+        LOG(error) << "Could not get access to TofdTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -173,7 +173,7 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 
         if (!par)
         {
-            LOG(INFO) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " << iDetector << ", Bar: " << iBar
+            LOG(info) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " << iDetector << ", Bar: " << iBar
                       << ", Edge: " << iEdge;
             continue;
         }

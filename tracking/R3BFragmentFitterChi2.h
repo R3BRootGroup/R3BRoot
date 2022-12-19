@@ -30,11 +30,11 @@ class R3BFragmentFitterChi2 : public R3BFragmentFitterGeneric
     void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE);
 
     Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*);
-    
+
     Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*);
 
     Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*);
-    
+
     Int_t FitTrackBackward2D(R3BTrackingParticle*, R3BTrackingSetup*);
 
     Double_t TrackFragment(R3BTrackingParticle* particle,
@@ -53,7 +53,7 @@ class R3BFragmentFitterChi2 : public R3BFragmentFitterGeneric
   private:
     ROOT::Math::Minimizer* fMinimum;
     R3BTPropagator* fPropagator;
-   	Double_t amu = 0.938272;
+    Double_t amu = 0.938272;
 
     ClassDef(R3BFragmentFitterChi2, 1)
 };

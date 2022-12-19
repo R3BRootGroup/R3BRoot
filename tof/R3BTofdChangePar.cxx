@@ -112,7 +112,7 @@ InitStatus R3BTofdChangePar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdChangePar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdChangePar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -126,7 +126,7 @@ void R3BTofdChangePar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdChangePar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdChangePar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //	    fCal_Par->setChanged();
 }

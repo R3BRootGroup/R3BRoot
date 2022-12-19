@@ -70,7 +70,7 @@ InitStatus R3BLosOnlineSpectra::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -91,9 +91,9 @@ InitStatus R3BLosOnlineSpectra::Init()
     for (int det = 0; det < DET_MAX; det++)
     {
         fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
-        R3BLOG_IF(FATAL, NULL == fMappedItems.at(det), "LosMapped not found");
+        R3BLOG_IF(fatal, NULL == fMappedItems.at(det), "LosMapped not found");
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        R3BLOG_IF(WARNING, NULL == fCalItems.at(det), "LosCal not found");
+        R3BLOG_IF(warn, NULL == fCalItems.at(det), "LosCal not found");
     }
 
     //------------------------------------------------------------------------
@@ -302,7 +302,7 @@ InitStatus R3BLosOnlineSpectra::Init()
 
 void R3BLosOnlineSpectra::Reset_LOS_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
@@ -815,7 +815,7 @@ void R3BLosOnlineSpectra::FinishTask()
     fhTpat->Write();
     fhTrigger->Write();
 
-    R3BLOG(INFO, "All events: " << fNEvents << ", LOS events: " << nLosEvents);
+    R3BLOG(info, "All events: " << fNEvents << ", LOS events: " << nLosEvents);
 }
 
 ClassImp(R3BLosOnlineSpectra);

@@ -56,7 +56,7 @@ void NewTask::SetParContainers()
 // ---- Init ----------------------------------------------------------
 InitStatus NewTask::Init()
 {
-    LOG(INFO) << "NewTask::Init()";
+    LOG(info) << "NewTask::Init()";
 
     // Get a handle from the IO manager
     FairRootManager* ioman = FairRootManager::Instance();

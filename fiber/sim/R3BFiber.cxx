@@ -74,11 +74,11 @@ void R3BFiber::Initialize()
 {
     FairDetector::Initialize();
 
-    R3BLOG(INFO, "for fiber " << fName);
+    R3BLOG(info, "for fiber " << fName);
     R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Fiber"));
 }
 
-void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(INFO, ""); }
+void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(info, ""); }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BFiber::ProcessHits(FairVolume* vol)
@@ -207,7 +207,7 @@ TClonesArray* R3BFiber::GetCollection(Int_t iColl) const
 void R3BFiber::Print(Option_t* option) const
 {
     Int_t nHits = fFiCollection->GetEntriesFast();
-    LOG(INFO) << "R3B" << fName << ": " << nHits << " points registered in this event";
+    LOG(info) << "R3B" << fName << ": " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -223,7 +223,7 @@ void R3BFiber::Reset()
 void R3BFiber::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    R3BLOG(INFO, nEntries << " entries to add");
+    R3BLOG(info, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -234,7 +234,7 @@ void R3BFiber::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
-    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
+    R3BLOG(info, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -253,7 +253,7 @@ R3BFibPoint* R3BFiber::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        R3BLOG(INFO,
+        R3BLOG(info,
                "Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
                                    << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }

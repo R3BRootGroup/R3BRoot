@@ -730,7 +730,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 // output
                 if (verboseLevel > 0)
                 {
-                    cout << endl << "______________ INFO PRIMARY ____________" << endl;
+                    cout << endl << "______________ info PRIMARY ____________" << endl;
                     cout << " Specific particle: " << particle->GetName() << endl;
                     cout << " momCM (" << momCM.X() << ", " << momCM.Y() << ", " << momCM.Z() << ") with module "
                          << momModuleCM << endl;
@@ -747,7 +747,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 // output
                 if (verboseLevel > 0)
                 {
-                    cout << endl << "______________ INFO PRIMARY ____________" << endl;
+                    cout << endl << "______________ info PRIMARY ____________" << endl;
                     cout << " Specific particle: " << particle->GetName() << endl;
                     cout << " momLAB (" << momLAB.X() << ", " << momLAB.Y() << ", " << momLAB.Z() << ") with module "
                          << momModuleLAB << endl;

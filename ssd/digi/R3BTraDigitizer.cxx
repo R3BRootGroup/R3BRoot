@@ -65,14 +65,14 @@ void R3BTraDigitizer::SetParContainers()
 
     if (fTraDigiPar)
     {
-        LOG(INFO) << "-I- R3BTraDigitizer::SetParContainers() ";
-        LOG(INFO) << "-I- Container R3BTraDigiPar  loaded ";
+        LOG(info) << "-I- R3BTraDigitizer::SetParContainers() ";
+        LOG(info) << "-I- Container R3BTraDigiPar  loaded ";
     }
 }
 
 InitStatus R3BTraDigitizer::Init()
 {
-    //  LOG(INFO)<<"Init ";
+    //  LOG(info)<<"Init ";
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
@@ -97,7 +97,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
 
     Reset();
     eventNoTra += 1;
-    //     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1;
+    //     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(info)<<"Event #: "<<eventNoTra-1;
 
     Int_t nentriesTra = fTraPoints->GetEntries();
     //     Int_t nentries = fMCTrack->GetEntries();
@@ -157,7 +157,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentriesTra; l++)
     {
-        //   LOG(INFO)<<"entries "<<l;
+        //   LOG(info)<<"entries "<<l;
 
         R3BTraPoint* Tra_obj = (R3BTraPoint*)fTraPoints->At(l);
 
@@ -207,7 +207,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
                 ss03_kbw_f = 2; // kpos for 1 SST swop (with 3.9936-) - requirement for tracker
                 ss03_karea_f = 0;
                 ss03_keta_f = 0;
-                //	LOG(INFO)<<"SST1 - fragment "<<PID;
+                //	LOG(info)<<"SST1 - fragment "<<PID;
             }
             // if (DetID==16)
             // if (DetID==22)
@@ -235,7 +235,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
                 ss06_kbw_f = 2;
                 ss06_karea_f = 0;
                 ss06_keta_f = 0;
-                //	LOG(INFO)<<"SST2 - fragment "<<PID;
+                //	LOG(info)<<"SST2 - fragment "<<PID;
             }
         }
 
@@ -269,8 +269,8 @@ void R3BTraDigitizer::Exec(Option_t* opt)
                 ss03_kbw_p1 = 2; // kpos for 1 SST swop (with 3.9936-) - requirement for tracker
                 ss03_karea_p1 = 0;
                 ss03_keta_p1 = 0;
-                //	LOG(INFO)<<"SST1 - proton "<<PID;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"SST1 - proton "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
             // if (DetID==16)
             // if (DetID==22)
@@ -298,8 +298,8 @@ void R3BTraDigitizer::Exec(Option_t* opt)
                 ss06_kbw_p1 = 2;
                 ss06_karea_p1 = 0;
                 ss06_keta_p1 = 0;
-                //	LOG(INFO)<<"SST2 - proton "<<PID;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"SST2 - proton "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
         }
     }
@@ -350,7 +350,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
 void R3BTraDigitizer::Reset()
 {
     // Clear the structure
-    //   LOG(INFO) << " -I- Digit Reset() called ";
+    //   LOG(info) << " -I- Digit Reset() called ";
 
     if (fTraDigi)
         fTraDigi->Clear();
@@ -444,7 +444,7 @@ R3BTraDigi* R3BTraDigitizer::AddHit(Double_t ss03_se_f,
                                         ss06_kbw_p1,
                                         ss06_karea_p1,
                                         ss06_keta_p1);
-    LOG(INFO) << "Point 19";
+    LOG(info) << "Point 19";
 }
 
 // R3BTraDigi* R3BTraDigitizer::AddHit(

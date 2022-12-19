@@ -30,7 +30,7 @@ R3BTimeStitch::R3BTimeStitch()
 
 Double_t R3BTimeStitch::GetTime(Double_t time) const
 {
-    // R3BLOG_IF(ERROR, IS_NAN(time), "Providing NaN time!");
+    // R3BLOG_IF(error, IS_NAN(time), "Providing NaN time!");
     R3BLOG(DEBUG, "Time: " << time << " , range1: " << fRange1 << " , range2: " << fRange2);
     return fmod(time + fRange2 + fRange1 / 2., fRange1) - fRange1 / 2.;
 }

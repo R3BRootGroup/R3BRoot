@@ -62,32 +62,32 @@ R3BTwimGainMatching::~R3BTwimGainMatching() { R3BLOG(DEBUG1, ""); }
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimGainMatching::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fTwimMappedDataCA = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fTwimMappedDataCA)
     {
-        R3BLOG(FATAL, "TwimMappedData not found");
+        R3BLOG(fatal, "TwimMappedData not found");
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        R3BLOG(ERROR, "FairRuntimeDb not found");
+        R3BLOG(error, "FairRuntimeDb not found");
         return kFATAL;
     }
 
     fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(FATAL, "Couldn't get handle on twimCalPar container");
+        R3BLOG(fatal, "Couldn't get handle on twimCalPar container");
         return kFATAL;
     }
 

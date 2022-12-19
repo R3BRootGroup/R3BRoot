@@ -146,14 +146,14 @@ InitStatus R3BTofdCal2HitS454::Init()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofdHitPar";
+        LOG(error) << "There are no Hit parameters in container TofdHitPar";
         return kFATAL;
     }
 
@@ -185,7 +185,7 @@ void R3BTofdCal2HitS454::SetParContainers()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -332,7 +332,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -372,13 +372,13 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitS454Par::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitS454Par::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -395,14 +395,14 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofdCal2HitS454::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(info) << "R3BTofdCal2HitS454::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     continue;
                 }
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(INFO) << "Walk correction not found!";
+                    LOG(info) << "Walk correction not found!";
                 auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                  par->GetPar1Walk(),
                                                  par->GetPar2Walk(),
@@ -422,7 +422,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
-                    LOG(FATAL) << "ToFD THit not found";
+                    LOG(fatal) << "ToFD THit not found";
                 }
                 if (timeP0 == 0.)
                     timeP0 = THit;
@@ -643,7 +643,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                             {
                                 p++; // find insert position
                                 if (p > nHitsEvent + 1)
-                                    LOG(FATAL) << "Insert position oor"; // should not happen
+                                    LOG(fatal) << "Insert position oor"; // should not happen
                             }
 
                             LOG(DEBUG) << "Will insert at " << p;
@@ -661,7 +661,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                             else
                             {
 
-                                LOG(ERROR) << "Insert event with exact same time " << fnEvents;
+                                LOG(error) << "Insert event with exact same time " << fnEvents;
                                 p = p + 1;
                                 LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
@@ -760,7 +760,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     {
         LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL) << "Not all events analyzed!";
+            LOG(fatal) << "Not all events analyzed!";
     }
 
     LOG(DEBUG) << "------------------------------------------------------\n";

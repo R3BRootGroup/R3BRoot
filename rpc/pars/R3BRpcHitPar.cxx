@@ -52,14 +52,14 @@ void R3BRpcHitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BRpcHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "RpcHitPar::putParams() called";
+    LOG(info) << "RpcHitPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = fNumChannels;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fHitCalParams1->Set(array_size);
     fHitCalParams2->Set(array_size);
@@ -74,7 +74,7 @@ void R3BRpcHitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BRpcHitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "RpcHitPar::getParams() called";
+    LOG(info) << "RpcHitPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -86,7 +86,7 @@ Bool_t R3BRpcHitPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumChannels;
-    LOG(INFO) << "Nb_channels: " << array_size;
+    LOG(info) << "Nb_channels: " << array_size;
     fHitCalParams1->Set(array_size);
     fHitCalParams2->Set(array_size);
     fHitCalParams3->Set(array_size);
@@ -94,25 +94,25 @@ Bool_t R3BRpcHitPar::getParams(FairParamList* list)
 
     if (!(list->fill("RpcHitPar1", fHitCalParams1)))
     {
-        LOG(INFO) << "---Could not initialize RpcHitPar1";
+        LOG(info) << "---Could not initialize RpcHitPar1";
         return kFALSE;
     }
 
     if (!(list->fill("RpcHitPar2", fHitCalParams2)))
     {
-        LOG(INFO) << "---Could not initialize RpcHitPar2";
+        LOG(info) << "---Could not initialize RpcHitPar2";
         return kFALSE;
     }
 
     if (!(list->fill("RpcHitPar3", fHitCalParams3)))
     {
-        LOG(INFO) << "---Could not initialize RpcHitPar3";
+        LOG(info) << "---Could not initialize RpcHitPar3";
         return kFALSE;
     }
 
     if (!(list->fill("RpcHitPar4", fHitCalParams4)))
     {
-        LOG(INFO) << "---Could not initialize RpcHitPar4";
+        LOG(info) << "---Could not initialize RpcHitPar4";
         return kFALSE;
     }
 
@@ -125,16 +125,16 @@ void R3BRpcHitPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BRpcHitPar::printParams()
 {
-    LOG(INFO) << "RpcHitPar::RPC Calibration Parameters: ";
+    LOG(info) << "RpcHitPar::RPC Calibration Parameters: ";
     Int_t array_size = fNumChannels;
 
     for (Int_t i = 0; i < fNumChannels; i++)
     {
-        LOG(INFO) << "Channel number: " << i + 1;
-        LOG(INFO) << "Param1= " << fHitCalParams1->GetAt(i);
-        LOG(INFO) << "Param2= " << fHitCalParams2->GetAt(i);
-        LOG(INFO) << "Param3= " << fHitCalParams3->GetAt(i);
-        LOG(INFO) << "Param4= " << fHitCalParams4->GetAt(i);
+        LOG(info) << "Channel number: " << i + 1;
+        LOG(info) << "Param1= " << fHitCalParams1->GetAt(i);
+        LOG(info) << "Param2= " << fHitCalParams2->GetAt(i);
+        LOG(info) << "Param3= " << fHitCalParams3->GetAt(i);
+        LOG(info) << "Param4= " << fHitCalParams4->GetAt(i);
     }
 }
 

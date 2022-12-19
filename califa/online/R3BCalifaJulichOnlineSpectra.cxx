@@ -82,12 +82,12 @@ R3BCalifaJulichOnlineSpectra::~R3BCalifaJulichOnlineSpectra()
 
 InitStatus R3BCalifaJulichOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BCalifaJulichOnlineSpectra::Init()";
+    LOG(info) << "R3BCalifaJulichOnlineSpectra::Init()";
 
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BCalifaJulichOnlineSpectra::FairRootManager not found";
+        LOG(fatal) << "R3BCalifaJulichOnlineSpectra::FairRootManager not found";
 
     // Create histograms for all the detectors
 
@@ -95,7 +95,7 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     fMappedItemsSi = (TClonesArray*)mgr->GetObject("AmsMappedData");
     if (!fMappedItemsSi)
     {
-        LOG(FATAL) << "R3BCalifaJulichOnlineSpectra::AmsMappedData not found";
+        LOG(fatal) << "R3BCalifaJulichOnlineSpectra::AmsMappedData not found";
         return kFATAL;
     }
 
@@ -103,18 +103,18 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        LOG(FATAL) << "R3BCalifaJulichOnlineSpectra::CalifaMappedData not found";
+        LOG(fatal) << "R3BCalifaJulichOnlineSpectra::CalifaMappedData not found";
         return kFATAL;
     }
     // // Get access to Cal data
     // fCalItems = (TClonesArray*)mgr->GetObject("CalifaJulichSiCalData");
     // if (!fCalItems)
-    //     LOG(WARNING) << "R3BCalifaJulichOnlineSpectra::CalifaJulichSiCalData not found";
+    //     LOG(warn) << "R3BCalifaJulichOnlineSpectra::CalifaJulichSiCalData not found";
     //
     // // Get access to Hit data
     // fHitItems = (TClonesArray*)mgr->GetObject("CalifaJulichSiHitData");
     // if (!fHitItems)
-    //     LOG(WARNING) << "R3BCalifaJulichOnlineSpectra::CalifaJulichSiHitData not found";
+    //     LOG(warn) << "R3BCalifaJulichOnlineSpectra::CalifaJulichSiHitData not found";
 
     // Energy range for strips
     Double_t binsE = 200;
@@ -177,7 +177,7 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
 
 void R3BCalifaJulichOnlineSpectra::Reset_CalifaJulich_Histo()
 {
-    LOG(INFO) << "R3BCalifaJulichOnlineSpectra::Reset_CalifaJulich_Histo";
+    LOG(info) << "R3BCalifaJulichOnlineSpectra::Reset_CalifaJulich_Histo";
 
     // Mapped data
     for (Int_t i = 0; i < fNbDet; i++)

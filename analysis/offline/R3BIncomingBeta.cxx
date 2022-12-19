@@ -73,14 +73,14 @@ R3BIncomingBeta::~R3BIncomingBeta()
 
 void R3BIncomingBeta::SetParContainers()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
-    R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
-    R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
+    R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
 
     return;
 }
@@ -104,19 +104,19 @@ void R3BIncomingBeta::SetParameter()
 
 InitStatus R3BIncomingBeta::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
-    R3BLOG_IF(WARNING, !fHitSci2, "Could not find Sci2Hit");
+    R3BLOG_IF(warn, !fHitSci2, "Could not find Sci2Hit");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
+    R3BLOG_IF(warn, !fHitLos, "LosHit not found");
 
     // Output data
     fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
@@ -124,7 +124,7 @@ InitStatus R3BIncomingBeta::Init()
     {
         fFrsDataCA = new TClonesArray("R3BFrsData");
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
-        R3BLOG(INFO, "FrsData register done, it is OK");
+        R3BLOG(info, "FrsData register done, it is OK");
     }
 
     SetParameter();
@@ -186,7 +186,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
             numDet = hittcal->GetSciId();
             if (numDet > fNumDet)
             {
-                R3BLOG(WARNING, "Sci2 detector id:" << numDet << " is out of range!");
+                R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
                 continue;
             }
             if (multSci2[numDet - 1] >= MAXMULT)

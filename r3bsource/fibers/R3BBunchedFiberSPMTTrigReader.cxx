@@ -42,11 +42,11 @@ R3BBunchedFiberSPMTTrigReader::~R3BBunchedFiberSPMTTrigReader()
 Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_FIB_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FIB, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information.");
+        R3BLOG(fatal, "Failed to setup structure information.");
         return kFALSE;
     }
 

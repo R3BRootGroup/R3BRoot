@@ -94,7 +94,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
         fDetId = 33;
     else
     {
-        R3BLOG(ERROR, "Fiber " << fName << " not found");
+        R3BLOG(error, "Fiber " << fName << " not found");
     }
 }
 
@@ -112,16 +112,16 @@ R3BFiberMAPMTCal2Hit::~R3BFiberMAPMTCal2Hit()
 
 InitStatus R3BFiberMAPMTCal2Hit::Init()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found.");
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);
-    R3BLOG_IF(FATAL, !fCalItems, "Branch " << name << " not found.");
+    R3BLOG_IF(fatal, !fCalItems, "Branch " << name << " not found.");
 
     auto name_mapmt_trig = fName + "TriggerCal";
     fCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
@@ -237,25 +237,25 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
     if (!fMapPar)
     {
-        R3BLOG(ERROR, "Couldn't get " << fName << "MappingPar");
+        R3BLOG(error, "Couldn't get " << fName << "MappingPar");
     }
     else
     {
         fNumFibers = fMapPar->GetNbChannels();
-        R3BLOG(INFO, "Nb of fibers: " << fNumFibers);
+        R3BLOG(info, "Nb of fibers: " << fNumFibers);
     }
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
     fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
-    R3BLOG_IF(INFO, fCalPar, "Container " << fName << "HitPar initialized");
-    R3BLOG_IF(ERROR, !fCalPar, "Couldn't get " << fName << "HitPar");
+    R3BLOG_IF(info, fCalPar, "Container " << fName << "HitPar initialized");
+    R3BLOG_IF(error, !fCalPar, "Couldn't get " << fName << "HitPar");
 
     if (!fIsCalibrator)
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
         fHitPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(container);
-        R3BLOG_IF(ERROR, !fHitPar, "Could not get " << container << " container.");
+        R3BLOG_IF(error, !fHitPar, "Could not get " << container << " container.");
     }
 }
 
@@ -603,7 +603,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                         R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
                         par->SetGainDown(proj->GetBinCenter(j));
 
-                        R3BLOG(INFO, fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j));
+                        R3BLOG(info, fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j));
                         if (Redo == true)
                         {
                             PartMax = proj->GetMaximum() * PercentOfMax;
@@ -640,7 +640,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                     {
                         R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
                         par1->SetGainUp(proj1->GetBinCenter(j));
-                        R3BLOG(INFO, fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j));
+                        R3BLOG(info, fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j));
                         break;
                     }
                 }
@@ -664,7 +664,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
             auto sync = proj3->GetXaxis()->GetBinCenter(proj3->GetMaximumBin());
             par2->SetSync(sync);
 
-            R3BLOG(INFO, fName << " fiberId: " << i << ", offset_DT: " << offsetdt << ", sync: " << sync);
+            R3BLOG(info, fName << " fiberId: " << i << ", offset_DT: " << offsetdt << ", sync: " << sync);
         }
 
         fCalPar->setChanged();

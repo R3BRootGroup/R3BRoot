@@ -81,7 +81,7 @@ R3BTofdPoint::~R3BTofdPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BTofdPoint::Print(const Option_t* opt) const
 {
-    R3BLOG(INFO,
+    R3BLOG(info,
            "Point for track " << fTrackID << " in plane " << fPlane << " and paddle " << fPaddle << "    Position ("
                               << fX << ", " << fY << ", " << fZ << ") cm"
                               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV"

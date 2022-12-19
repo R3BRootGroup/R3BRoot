@@ -54,12 +54,12 @@ R3BWhiterabbitFootReader::~R3BWhiterabbitFootReader()
 Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_WRFOOT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRFOOT, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -68,12 +68,12 @@ Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
     {
-        R3BLOG(INFO, "R3BEventHeader found");
+        R3BLOG(info, "R3BEventHeader found");
     }
 
     // Register output array in tree

@@ -50,18 +50,18 @@ R3BFiberMAPMTMapped2Cal::~R3BFiberMAPMTMapped2Cal()
 
 InitStatus R3BFiberMAPMTMapped2Cal::Init()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found.");
+        R3BLOG(fatal, "FairRootManager not found.");
         return kFATAL;
     }
     auto name = fName + "Mapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        R3BLOG(FATAL, "Branch " << name << " not found.");
+        R3BLOG(fatal, "Branch " << name << " not found.");
         return kFATAL;
     }
     mgr->Register(fName + "Cal", "Fiber Cal Data", fCalItems, !fOnline);
@@ -79,7 +79,7 @@ void R3BFiberMAPMTMapped2Cal::SetParContainers()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not get access to " << name << " container.");        \
+            R3BLOG(error, "Could not get access to " << name << " container.");        \
         }                                                                              \
     } while (0)
     GET_TCALPAR(MAPMT);
@@ -124,7 +124,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         }
         if (!par)
         {
-            R3BLOG(WARNING, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
+            R3BLOG(warn, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
             continue;
         }
 
@@ -142,7 +142,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns > fClockFreq)
         {
-            R3BLOG(ERROR,
+            R3BLOG(error,
                    "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
                        << ",ns=" << fine_ns << ").");
             continue;

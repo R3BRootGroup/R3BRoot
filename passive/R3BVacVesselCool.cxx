@@ -42,7 +42,7 @@ void R3BVacVesselCool::ConstructGeometry()
 
     if (TString(GetName()) != TString("LiH"))
     {
-        LOG(FATAL) << "VacVesselCool is only supposed to work with LiH Target";
+        LOG(fatal) << "VacVesselCool is only supposed to work with LiH Target";
         // At least if the previous code was interpreted correctly
     }
     R3BModule::ConstructGeometry();

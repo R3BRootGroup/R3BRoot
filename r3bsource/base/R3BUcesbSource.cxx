@@ -68,13 +68,13 @@ Bool_t R3BUcesbSource::Init()
     auto eventHeader = dynamic_cast<R3BEventHeader*>(run->GetEventHeader());
     if (eventHeader)
     {
-        R3BLOG(INFO, "EventHeader. was defined properly");
+        R3BLOG(info, "EventHeader. was defined properly");
     }
     else
     {
         eventHeader = new R3BEventHeader();
         run->SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
-        R3BLOG(WARNING, "EventHeader. has been created from R3BEventHeader");
+        R3BLOG(warn, "EventHeader. has been created from R3BEventHeader");
     }
 
     Bool_t status;
@@ -88,7 +88,7 @@ Bool_t R3BUcesbSource::Init()
     {
         command << " --max-events=" << fLastEventNo;
     }
-    LOG(INFO) << "Calling ucesb with command: " << command.str();
+    LOG(info) << "Calling ucesb with command: " << command.str();
 
     /* Fork off ucesb (calls fork() and pipe()) */
     fFd = popen(command.str().c_str(), "r");
@@ -111,11 +111,11 @@ Bool_t R3BUcesbSource::Init()
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
     {
-        R3BLOG(WARNING, "Input file for RunIds could not be open, it is Ok!");
+        R3BLOG(warn, "Input file for RunIds could not be open, it is Ok!");
     }
     else
     {
-        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " is open!");
+        R3BLOG(info, "Input file for RunIds " << fInputFileName.Data() << " is open!");
         fInputFile.clear();
         fInputFile.seekg(0, std::ios::beg);
     }
@@ -127,17 +127,17 @@ Bool_t R3BUcesbSource::InitUnpackers()
 {
     // Register of R3BEventHeader in the output root file
     FairRootManager* frm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !frm, "FairRootManager no found");
+    R3BLOG_IF(fatal, !frm, "FairRootManager no found");
 
-    R3BLOG(INFO, "Checking the register of R3BEventHeader");
+    R3BLOG(info, "Checking the register of R3BEventHeader");
     fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (fEventHeader)
     {
-        R3BLOG(INFO, "EventHeader. was defined properly");
+        R3BLOG(info, "EventHeader. was defined properly");
     }
     else
     {
-        R3BLOG(ERROR, "EventHeader. was not defined properly!");
+        R3BLOG(error, "EventHeader. was not defined properly!");
     }
 
     /* Initialize all readers */
@@ -157,7 +157,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     if (status != 0)
     {
         // perror("ext_data_clnt::setup()");
-        R3BLOG(ERROR, "ext_data_clnt::setup() failed");
+        R3BLOG(error, "ext_data_clnt::setup() failed");
         R3BLOG(fatal, "UCESB error: " << fClient.last_error());
         return kFALSE;
     }
@@ -170,7 +170,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
     if (struct_map_success & ~(map_ok))
     {
-        R3BLOG(WARNING, "ext_data_clnt::setup() failed");
+        R3BLOG(warn, "ext_data_clnt::setup() failed");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
         return kFALSE;
     }
@@ -223,13 +223,13 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
     {
 
-        R3BLOG(INFO, "ReadEvent()");
+        R3BLOG(info, "ReadEvent()");
 
         std::string buffer;
         do
         {
             getline(fInputFile, buffer);
-            LOG(INFO) << "read from file: \"" << buffer << "\"";
+            LOG(info) << "read from file: \"" << buffer << "\"";
             if (buffer.find("EVENT BEGIN") == 0)
             {
                 fRunId = ReadIntFromString(buffer, "RUNID");

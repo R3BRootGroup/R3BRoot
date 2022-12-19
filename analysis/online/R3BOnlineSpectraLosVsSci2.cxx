@@ -115,7 +115,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraLosVsSci2::Init()";
+    LOG(info) << "R3BOnlineSpectraLosVsSci2::Init()";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -149,13 +149,13 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     fTcalSci2 = (TClonesArray*)mgr->GetObject("Sci2Tcal");
     if (!fTcalSci2)
     {
-        LOG(INFO) << "R3BOnlineSpectraLosVsSci2::Init()  Could not find ci2Tcal";
+        LOG(info) << "R3BOnlineSpectraLosVsSci2::Init()  Could not find ci2Tcal";
     }
 
     // get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
     if (!fHitItemsMus)
-        LOG(WARNING) << "R3BOnlineSpectraLosVsSci2: MusicHitData not found";
+        LOG(warn) << "R3BOnlineSpectraLosVsSci2: MusicHitData not found";
 
     // OUTPUT DATA
     /*fFrsDataCA = new TClonesArray("R3BFrsData", 5);

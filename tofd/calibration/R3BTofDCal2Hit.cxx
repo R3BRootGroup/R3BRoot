@@ -155,12 +155,12 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
 void R3BTofDCal2Hit::SetParContainers()
 {
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
 
     fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
     if (!fHitPar)
     {
-        R3BLOG(ERROR, "Could not get access to tofdHitPar container");
+        R3BLOG(error, "Could not get access to tofdHitPar container");
         fNofHitPars = 0;
         return;
     }
@@ -168,25 +168,25 @@ void R3BTofDCal2Hit::SetParContainers()
 
 void R3BTofDCal2Hit::SetParameter()
 {
-    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(info, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
 
     if (fHitPar)
         fNofHitPars = fHitPar->GetNumModulePar();
     else
         fNofHitPars = 0;
 
-    R3BLOG(INFO, "Parameters in the tofdHitPar container: " << fNofHitPars);
+    R3BLOG(info, "Parameters in the tofdHitPar container: " << fNofHitPars);
 
     return;
 }
 
 InitStatus R3BTofDCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -387,9 +387,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    R3BLOG(ERROR, "Missing trigger information!");
-                    R3BLOG(ERROR, "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId());
-                    R3BLOG(ERROR, "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId());
+                    R3BLOG(error, "Missing trigger information!");
+                    R3BLOG(error, "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId());
+                    R3BLOG(error, "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId());
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -421,12 +421,12 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -443,7 +443,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    R3BLOG(ERROR, "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
+                    R3BLOG(error, "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                     continue;
                 }
 
@@ -476,7 +476,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
-                    R3BLOG(FATAL, "TofD THit not found");
+                    R3BLOG(fatal, "TofD THit not found");
                 }
                 if (timeP0 == 0.)
                     timeP0 = THit;
@@ -849,7 +849,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     {
         LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL) << "Not all events analyzed!";
+            LOG(fatal) << "Not all events analyzed!";
     }
 
     LOG(DEBUG) << "------------------------------------------------------\n";
@@ -1061,7 +1061,7 @@ void R3BTofDCal2Hit::FinishTask()
 
     sprint << "n1=" << n1 << " n2=" << n2;
 
-    R3BLOG(INFO, sprint.str());
+    R3BLOG(info, sprint.str());
 }
 
 Double_t R3BTofDCal2Hit::walk(Double_t Q,

@@ -103,7 +103,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (E <= 0)
     {
-        LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!";
+        LOG(error) << "R3Bp2pevtGenerator: E < 0!";
         return kFALSE;
     }
     fRandom.SetSeed(0);
@@ -152,7 +152,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
             if (rrtt <= 0)
             {
-                // cout<<"\nERROR off-shell mass!!";//non-zero and real off-shell mass
+                // cout<<"\nerror off-shell mass!!";//non-zero and real off-shell mass
                 // cout<<"\nP:"<< PBx << "\t" << PBy << "\t" << PBz_rf << "\n";//non-zero and real off-shell mass
                 continue;
             }
@@ -249,7 +249,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             double rrtt = MA * MA + MB * MB - 2 * MA * sqrt(MB * MB + Pa.Mag2());
             if (rrtt <= 0)
             {
-                // cout<<"\nERROR off-shell mass!!\n";//non-zero and real off-shell mass
+                // cout<<"\nerror off-shell mass!!\n";//non-zero and real off-shell mass
                 continue;
             }
             double Ma_off = sqrt(rrtt);
@@ -374,10 +374,10 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s, double m2off, double m1, double 
     Z = m1 * m1;
     // And check whether the kinematical function is ok
     // for this specific kinematical case
-    double ERROR_CI = R3Bp2pevtGenerator::CINEMA(X, Y, Z);
-    if (ERROR_CI <= 0.)
+    double error_CI = R3Bp2pevtGenerator::CINEMA(X, Y, Z);
+    if (error_CI <= 0.)
     {
-        // cout << "\nERROR!!! Kinematical function is negative!";
+        // cout << "\nerror!!! Kinematical function is negative!";
         return output;
     }
 
@@ -411,7 +411,7 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s, double m2off, double m1, double 
     double COSINE = (t - 2 * m1 * m1 + 2 * e1_off * e1) / (2 * p1_off * p1);
     if (fabs(COSINE) >= 1)
     { // momentum transfer out of range
-        // cout << "\nERROR! Scattering cosine is larger than 1";
+        // cout << "\nerror! Scattering cosine is larger than 1";
         return output;
     }
 

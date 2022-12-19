@@ -71,7 +71,7 @@ InitStatus R3BPdcMapped2CalPar::Init()
     fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BPdcMapped2CalPar::Init() Couldn't get handle on PdcTCalPar. ";
+        LOG(error) << "R3BPdcMapped2CalPar::Init() Couldn't get handle on PdcTCalPar. ";
         return kFATAL;
     }
 

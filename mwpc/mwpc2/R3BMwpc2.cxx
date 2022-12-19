@@ -61,11 +61,11 @@ void R3BMwpc2::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BMwpc2: initialisation";
+    LOG(info) << "R3BMwpc2: initialisation";
     LOG(DEBUG) << "R3BMwpc2: Sens. Vol. (McId) " << gMC->VolId("MWPC2");
 }
 
-void R3BMwpc2::SetSpecialPhysicsCuts() { LOG(INFO) << "R3BMwpc2: Adding customized Physics cut ... "; }
+void R3BMwpc2::SetSpecialPhysicsCuts() { LOG(info) << "R3BMwpc2: Adding customized Physics cut ... "; }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BMwpc2::ProcessHits(FairVolume* vol)
@@ -176,7 +176,7 @@ TClonesArray* R3BMwpc2::GetCollection(Int_t iColl) const
 void R3BMwpc2::Print(Option_t* option) const
 {
     Int_t nHits = fSofMWPCCollection->GetEntriesFast();
-    LOG(INFO) << "R3BMwpc2: " << nHits << " points registered in this event";
+    LOG(info) << "R3BMwpc2: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -192,7 +192,7 @@ void R3BMwpc2::Reset()
 void R3BMwpc2::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BMwpc2: " << nEntries << " entries to add";
+    LOG(info) << "R3BMwpc2: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BMwpcPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -203,7 +203,7 @@ void R3BMwpc2::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BMwpcPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BMwpc2: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BMwpc2: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -221,7 +221,7 @@ R3BMwpcPoint* R3BMwpc2::AddPoint(Int_t trackID,
     TClonesArray& clref = *fSofMWPCCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BMwpc2: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BMwpc2: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BMwpcPoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

@@ -271,21 +271,21 @@ R3BLosCal2Hit::~R3BLosCal2Hit()
 
 void R3BLosCal2Hit::SetParContainers()
 {
-    LOG(INFO) << "R3BLosTcal2Hit::SetParContainers()";
+    LOG(info) << "R3BLosTcal2Hit::SetParContainers()";
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fLosHit_Par = (R3BLosHitPar*)rtdb->getContainer("LosHitPar");
     if (!fLosHit_Par)
     {
-        LOG(ERROR) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
+        LOG(error) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
     }
     else
     {
-        LOG(INFO) << "R3BLosTcal2Hit:: R3BLosHitPar container open";
+        LOG(info) << "R3BLosTcal2Hit:: R3BLosHitPar container open";
     }
 }
 
@@ -306,7 +306,7 @@ InitStatus R3BLosCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
@@ -315,7 +315,7 @@ InitStatus R3BLosCal2Hit::Init()
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
     {
-        LOG(FATAL) << "Branch LosCal not found";
+        LOG(fatal) << "Branch LosCal not found";
         return kFATAL;
     }
 

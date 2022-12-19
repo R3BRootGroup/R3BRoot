@@ -85,7 +85,7 @@ void R3BTwimHitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BTwimHitPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "R3BTwimHitPar::putParams() called");
+    R3BLOG(info, "R3BTwimHitPar::putParams() called");
     if (!list)
     {
         return;
@@ -94,7 +94,7 @@ void R3BTwimHitPar::putParams(FairParamList* list)
     list->add("twimHitNumSecPar", fNumSec);
     list->add("twimAnodeNumberPar", fNumAnodes);
     Int_t array_anodes = fNumAnodes * fNumSec;
-    R3BLOG(INFO, "Array Size Anodes: " << array_anodes);
+    R3BLOG(info, "Array Size Anodes: " << array_anodes);
     fIn_use->Set(array_anodes);
     list->add("twinInUsePar", *fIn_use);
 
@@ -103,7 +103,7 @@ void R3BTwimHitPar::putParams(FairParamList* list)
 
     list->add("twimZHitParamsFitPar", fNumParamsZFit);
     Int_t array_size = fNumSec * fNumParamsZFit;
-    R3BLOG(INFO, "Number of parameters for charge-Z: " << array_size);
+    R3BLOG(info, "Number of parameters for charge-Z: " << array_size);
     fDetZHitParams->Set(array_size);
     list->add("twimZHitPar", *fDetZHitParams);
     // fTofHitParams->Set(2 * 28 * 3);
@@ -131,60 +131,60 @@ void R3BTwimHitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BTwimHitPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "R3BTwimHitPar::getParams() called");
+    R3BLOG(info, "R3BTwimHitPar::getParams() called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return kFALSE;
     }
 
     if (!list->fill("twimHitNumSecPar", &fNumSec))
     {
-        R3BLOG(ERROR, "Could not initialize twimHitNumSecPar");
+        R3BLOG(error, "Could not initialize twimHitNumSecPar");
         return kFALSE;
     }
 
     if (!list->fill("twimAnodeNumberPar", &fNumAnodes))
     {
-        R3BLOG(ERROR, "Could not initialize twimAnodeNumberPar");
+        R3BLOG(error, "Could not initialize twimAnodeNumberPar");
         return kFALSE;
     }
 
     Int_t array_anode = fNumAnodes * fNumSec;
-    R3BLOG(INFO, "Array Size: " << array_anode);
+    R3BLOG(info, "Array Size: " << array_anode);
     fIn_use->Set(array_anode);
     if (!(list->fill("twimInUsePar", fIn_use)))
     {
-        R3BLOG(ERROR, "Could not initialize twimInUsePar");
+        R3BLOG(error, "Could not initialize twimInUsePar");
         return kFALSE;
     }
 
     fAnode_pos->Set(array_anode);
     if (!(list->fill("twimAnodePosPar", fAnode_pos)))
     {
-        R3BLOG(ERROR, "Could not initialize twimAnodePosPar");
+        R3BLOG(error, "Could not initialize twimAnodePosPar");
         return kFALSE;
     }
 
     if (!list->fill("twimZHitParamsFitPar", &fNumParamsZFit))
     {
-        R3BLOG(ERROR, "Could not initialize twimZHitParamsFitPar");
+        R3BLOG(error, "Could not initialize twimZHitParamsFitPar");
         return kFALSE;
     }
 
     Int_t array_size = fNumParamsZFit * fNumSec;
-    R3BLOG(INFO, "Array Size: " << array_size);
+    R3BLOG(info, "Array Size: " << array_size);
     fDetZHitParams->Set(array_size);
 
     if (!(list->fill("twimZHitPar", fDetZHitParams)))
     {
-        R3BLOG(ERROR, "Could not initialize twimZHitPar");
+        R3BLOG(error, "Could not initialize twimZHitPar");
         return kFALSE;
     }
 
     if (!(list->fill("twimvstofHitPar", fTofHitParams)))
     {
-        R3BLOG(WARNING, "Could not initialize twimvstofHitPar");
+        R3BLOG(warn, "Could not initialize twimvstofHitPar");
         // return kFALSE;
     }
     fSpline.resize(fNumSec);
@@ -204,12 +204,12 @@ Bool_t R3BTwimHitPar::getParams(FairParamList* list)
         sprintf(namedt, "Emean_dt%d", s + 1);
         if (!(list->fill(nametof, &fEmean_tof[s])))
         {
-            R3BLOG(WARNING, "Could not initialize " << nametof);
+            R3BLOG(warn, "Could not initialize " << nametof);
             // return kFALSE;
         }
         if (!(list->fill(namedt, &fEmean_dt[s])))
         {
-            R3BLOG(WARNING, "Could not initialize " << namedt);
+            R3BLOG(warn, "Could not initialize " << namedt);
             // return kFALSE;
         }
     }
@@ -223,15 +223,15 @@ void R3BTwimHitPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BTwimHitPar::printParams()
 {
-    R3BLOG(INFO, "R3BTwimHitPar::printParams() twim detector Parameters");
-    R3BLOG(INFO, "R3BTwimHitPar::printParams() twim anodes in use: ");
+    R3BLOG(info, "R3BTwimHitPar::printParams() twim detector Parameters");
+    R3BLOG(info, "R3BTwimHitPar::printParams() twim anodes in use: ");
 
     for (Int_t s = 0; s < fNumSec; s++)
     {
-        R3BLOG(INFO, "Section = " << s + 1);
+        R3BLOG(info, "Section = " << s + 1);
         for (Int_t j = 0; j < fNumAnodes; j++)
         {
-            R3BLOG(INFO,
+            R3BLOG(info,
                    "Anode " << j + 1 << " in use " << fIn_use->GetAt(s * fNumAnodes + j)
                             << ", Position-Z: " << fAnode_pos->GetAt(j));
         }
@@ -239,10 +239,10 @@ void R3BTwimHitPar::printParams()
 
     for (Int_t s = 0; s < fNumSec; s++)
     {
-        R3BLOG(INFO, "Section = " << s + 1);
+        R3BLOG(info, "Section = " << s + 1);
         for (Int_t j = 0; j < fNumParamsZFit; j++)
         {
-            R3BLOG(INFO, "FitParam(" << j << ") = " << fDetZHitParams->GetAt(j + s * fNumParamsZFit));
+            R3BLOG(info, "FitParam(" << j << ") = " << fDetZHitParams->GetAt(j + s * fNumParamsZFit));
         }
     }
 
@@ -250,13 +250,13 @@ void R3BTwimHitPar::printParams()
     {
         for (Int_t s = 0; s < fNumSec; s++)
         {
-            R3BLOG(INFO, "Section = " << s + 1);
+            R3BLOG(info, "Section = " << s + 1);
             // for (Int_t p = 0; p < 28; p++)
             for (Int_t j = 0; j < 3; j++)
             {
-                // R3BLOG(INFO, "Tof sci nb " << p + 1 << ": FitParam(" << j
+                // R3BLOG(info, "Tof sci nb " << p + 1 << ": FitParam(" << j
                 //       << ") = " << fTofHitParams->GetAt(j + p * 3 + s * 3 * 28));
-                R3BLOG(INFO, "FitParam(" << j << ") = " << fTofHitParams->GetAt(j + s * 3));
+                R3BLOG(info, "FitParam(" << j << ") = " << fTofHitParams->GetAt(j + s * 3));
             }
         }
     }

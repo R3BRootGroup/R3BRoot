@@ -163,7 +163,7 @@ Bool_t R3BStartrackReader::Read()
 
                 hitbit = (starWord1 >> 29) & 0x01;
 
-                // LOG(INFO) << "R3BStartrackUnpack :   hitbit :" <<  hitbit;
+                // LOG(info) << "R3BStartrackUnpack :   hitbit :" <<  hitbit;
 
                 adcData = (starWord1 & 0x00000FFF);
 

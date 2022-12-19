@@ -36,7 +36,7 @@ FairParSet* R3BSci2ContFact::createContainer(FairContainer* c)
     // of this container, the name is concatinated with the context.
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BSci2ContFact: Create container name: " << name;
+    LOG(info) << "R3BSci2ContFact: Create container name: " << name;
     FairParSet* p = 0;
     if (strcmp(name, "Sci2HitPar") == 0)
     {

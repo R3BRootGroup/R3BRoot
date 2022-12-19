@@ -57,37 +57,37 @@ R3BTofDMapped2CalPar::~R3BTofDMapped2CalPar()
 
 InitStatus R3BTofDMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
     if (!fMapped)
     {
-        R3BLOG(FATAL, "TofdMapped not found");
+        R3BLOG(fatal, "TofdMapped not found");
         return kFATAL;
     }
     fMappedTrigger = (TClonesArray*)rm->GetObject("TofdTriggerMapped");
     if (!fMappedTrigger)
     {
-        R3BLOG(WARNING, "TofdTriggerMapped not found");
+        R3BLOG(warn, "TofdTriggerMapped not found");
         fMappedTrigger = NULL;
     }
 
     fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
     if (!fCalPar)
     {
-        R3BLOG(ERROR, "Couldn't get handle on TofdTCalPar. ");
+        R3BLOG(error, "Couldn't get handle on TofdTCalPar. ");
         return kFATAL;
     }
 
     if (!fNofModules)
     {
-        R3BLOG(ERROR, "Number of modules not set.");
+        R3BLOG(error, "Number of modules not set.");
         return kFATAL;
     }
 
@@ -113,13 +113,13 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
 
         if (mapped->GetDetectorId() > fNofPlanes)
         {
-            R3BLOG(ERROR,
+            R3BLOG(error,
                    "More planes than expected! Plane: " << mapped->GetDetectorId() << " allowed are 1.." << fNofPlanes);
             continue;
         }
         if (mapped->GetBarId() > fPaddlesPerPlane)
         {
-            R3BLOG(ERROR,
+            R3BLOG(error,
                    "More bars then expected! Det: " << mapped->GetBarId() << " allowed are 1.." << fPaddlesPerPlane);
             continue;
         }
@@ -141,7 +141,7 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
 
             if (mapped->GetDetectorId() != fNofPlanes + 1)
             {
-                R3BLOG(ERROR,
+                R3BLOG(error,
                        "Trigger plane incorrect! Plane: " << mapped->GetDetectorId() << " not " << fNofPlanes + 1);
                 continue;
             }
@@ -157,18 +157,18 @@ void R3BTofDMapped2CalPar::FinishTask()
     fCalPar->setChanged();
     fCalPar->printParams();
 
-    R3BLOG(INFO, "Calibration of TofD detector");
+    R3BLOG(info, "Calibration of TofD detector");
     for (Int_t p = 0; p < 5; p++)
         for (Int_t i = 0; i < 48; i++)
             for (Int_t k = 0; k < 4; k++)
                 if (Icount[p][i][k] > fMinStats)
                 {
                     if (p < 4)
-                        R3BLOG(INFO,
+                        R3BLOG(info,
                                "Plane: " << p + 1 << ", paddle: " << i + 1 << ", side: " << k + 1
                                          << ", Count: " << Icount[p][i][k]);
                     else
-                        R3BLOG(INFO,
+                        R3BLOG(info,
                                "Trigger plane: " << p + 1 << ", paddle: " << i + 1 << ", side: " << k + 1
                                                  << ", Count: " << Icount[p][i][k]);
                 }

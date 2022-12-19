@@ -16,7 +16,7 @@ void testNeulandDigitizer()
     TStopwatch timer;
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogScreenLevel("warn");
 
     FairRunAna run;
     run.SetSource(new FairFileSource("test.simu.root"));

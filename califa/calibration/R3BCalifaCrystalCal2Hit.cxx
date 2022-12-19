@@ -75,12 +75,12 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
     fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
     if (!fCalifaGeoPar || !fTargetGeoPar)
     {
-        R3BLOG_IF(WARNING, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container.");
-        R3BLOG_IF(WARNING, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
+        R3BLOG_IF(warn, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container.");
+        R3BLOG_IF(warn, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
         return;
     }
-    R3BLOG(INFO, "Container CalifaGeoPar found.");
-    R3BLOG(INFO, "Container TargetGeoPar found.");
+    R3BLOG(info, "Container CalifaGeoPar found.");
+    R3BLOG(info, "Container TargetGeoPar found.");
 
     fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
     fCalifaPos.SetXYZ(fCalifaGeoPar->GetPosX(), fCalifaGeoPar->GetPosY(), fCalifaGeoPar->GetPosZ());
@@ -89,7 +89,7 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     assert(!fCalifaHitData); // in case someone calls Init() twice.
 
     FairRootManager* ioManager = FairRootManager::Instance();
@@ -102,17 +102,17 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
     ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitData, !fOnline);
 
     fCalifaGeo = R3BCalifaGeometry::Instance();
-    R3BLOG_IF(ERROR, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
+    R3BLOG_IF(error, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
 
     // Determine CALIFA position with respect to target
     if (fCalifaGeo->IsSimulation())
     {
-        R3BLOG(INFO, "Simulation configuration.");
+        R3BLOG(info, "Simulation configuration.");
         fCalifatoTargetPos = 2.0 * fTargetPos - fCalifaPos;
     }
     else
     {
-        R3BLOG(INFO, "Analysis configuration.");
+        R3BLOG(info, "Analysis configuration.");
         fCalifatoTargetPos = fTargetPos - fCalifaPos;
     }
 
@@ -330,19 +330,19 @@ void R3BCalifaCrystalCal2Hit::Reset()
 void R3BCalifaCrystalCal2Hit::SelectGeometryVersion(Int_t version)
 {
     fGeometryVersion = version;
-    R3BLOG(INFO, "to " << fGeometryVersion);
+    R3BLOG(info, "to " << fGeometryVersion);
 }
 
 void R3BCalifaCrystalCal2Hit::SetCrystalThreshold(Double_t thresholdEne)
 {
     fThreshold = thresholdEne;
-    R3BLOG(INFO, "to " << fThreshold << " keV.");
+    R3BLOG(info, "to " << fThreshold << " keV.");
 }
 
 void R3BCalifaCrystalCal2Hit::SetDRThreshold(Double_t DRthresholdEne)
 {
     fDRThreshold = DRthresholdEne;
-    R3BLOG(INFO, "to " << fDRThreshold << " keV.");
+    R3BLOG(info, "to " << fDRThreshold << " keV.");
 }
 
 TVector3 R3BCalifaCrystalCal2Hit::GetAnglesVector(int id) { return fCalifaGeo->GetAngles(id); }

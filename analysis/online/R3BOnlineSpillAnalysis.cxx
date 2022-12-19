@@ -83,7 +83,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpillAnalysis::Init() ";
+    LOG(info) << "R3BOnlineSpillAnalysis::Init() ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -96,11 +96,11 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        LOG(WARNING) << "R3BOnlineSpillAnalysis::Init() EventHeader. not found";
+        LOG(warn) << "R3BOnlineSpillAnalysis::Init() EventHeader. not found";
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BOnlineSpillAnalysis::Init() EventHeader. found";
+        LOG(info) << "R3BOnlineSpillAnalysis::Init() EventHeader. found";
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -335,7 +335,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 

@@ -33,7 +33,7 @@ R3BRpcDigitizer::R3BRpcDigitizer()
 
 R3BRpcDigitizer::~R3BRpcDigitizer()
 {
-    LOG(INFO) << "R3BRpcDigitizer: Delete instance";
+    LOG(info) << "R3BRpcDigitizer: Delete instance";
 
     if (fRpcPointDataCA)
     {
@@ -50,17 +50,17 @@ R3BRpcDigitizer::~R3BRpcDigitizer()
 void R3BRpcDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    LOG_IF(ERROR, !rtdb) << "R3BRpcDigitizer::FairRuntimeDb not opened!";
+    LOG_IF(error, !rtdb) << "R3BRpcDigitizer::FairRuntimeDb not opened!";
 
     fSim_Par = (R3BRpcPars4Sim*)rtdb->getContainer("rpcPars4Sim");
     if (!fSim_Par)
     {
-        LOG(ERROR) << "R3BRpcDigitizer::Init() Couldn't get handle on "
+        LOG(error) << "R3BRpcDigitizer::Init() Couldn't get handle on "
                       "rpcPars4Sim container";
     }
     else
     {
-        LOG(INFO) << "R3BRpcDigitizer:: rpcPars4Sim container opened";
+        LOG(info) << "R3BRpcDigitizer:: rpcPars4Sim container opened";
     }
 }
 
@@ -71,12 +71,12 @@ void R3BRpcDigitizer::SetParameter()
 
     fSim_Par->printParams();
 
-    LOG(INFO) << "R3BRpcDigitizer:: max channel ID " << fNumberOfChannels;
+    LOG(info) << "R3BRpcDigitizer:: max channel ID " << fNumberOfChannels;
 }
 
 InitStatus R3BRpcDigitizer::Init()
 {
-    LOG(INFO) << "R3BRpcDigitizer::Init ";
+    LOG(info) << "R3BRpcDigitizer::Init ";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
@@ -169,7 +169,7 @@ R3BRpcCalData* R3BRpcDigitizer::AddCal(Int_t ident, Double_t energy, ULong64_t t
     TClonesArray& clref = *fRpcCalDataCA;
     Int_t size = clref.GetEntriesFast();
     if (fVerbose > 1)
-        LOG(INFO) << "-I- R3BRpcDigitizer: Adding RpcCalData "
+        LOG(info) << "-I- R3BRpcDigitizer: Adding RpcCalData "
                   << " with unique identifier " << ident << " entering with " << energy * 1e06 << " keV  Time=" << time
                   << " tot_energy=" << tot_energy;
 

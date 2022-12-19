@@ -103,7 +103,7 @@ InitStatus R3BTofiChangePar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofiChangePar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofiChangePar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -117,7 +117,7 @@ void R3BTofiChangePar::SetParContainers()
     fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofiChangePar::Init() Couldn't get handle on TofiHitPar. ";
+        LOG(error) << "R3BTofiChangePar::Init() Couldn't get handle on TofiHitPar. ";
     }
     //	    fCal_Par->setChanged();
 }

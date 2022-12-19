@@ -52,7 +52,7 @@ R3BMwpc0Cal2Hit::R3BMwpc0Cal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc0Cal2Hit: Destructor
 R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 {
-    LOG(INFO) << "R3BMwpc0Cal2Hit: Delete instance";
+    LOG(info) << "R3BMwpc0Cal2Hit: Delete instance";
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
 }
@@ -60,7 +60,7 @@ R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc0Cal2Hit::Init()
 {
-    LOG(INFO) << "R3BMwpc0Cal2Hit: Init";
+    LOG(info) << "R3BMwpc0Cal2Hit: Init";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();

@@ -26,7 +26,7 @@ InitStatus R3BNeulandMultiplicityBayes::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayes:Init: No FairRootManager";
+        LOG(fatal) << "R3BNeulandMultiplicityBayes:Init: No FairRootManager";
         return kFATAL;
     }
     ioman->RegisterAny(fOutputName, fMultiplicity, true);
@@ -39,14 +39,14 @@ void R3BNeulandMultiplicityBayes::SetParContainers()
     auto rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayes::SetParContainers: No FairRuntimeDb!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayes::SetParContainers: No FairRuntimeDb!";
         return;
     }
 
     fPar = (R3BNeulandMultiplicityBayesPar*)rtdb->getContainer("R3BNeulandMultiplicityBayesPar");
     if (fPar == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayes::SetParContainers: No NeulandMultiplicityBayesPar!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayes::SetParContainers: No NeulandMultiplicityBayesPar!";
         return;
     }
 

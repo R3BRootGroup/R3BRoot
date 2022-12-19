@@ -45,7 +45,7 @@ R3BStartrackCalib::R3BStartrackCalib()
 // Virtual R3BStartrackCalib: Public method
 R3BStartrackCalib::~R3BStartrackCalib()
 {
-    LOG(INFO) << "R3BStartrackCalib: Delete instance";
+    LOG(info) << "R3BStartrackCalib: Delete instance";
     delete fRawHitCA;
     delete fSiDetHitCA;
 }
@@ -72,8 +72,8 @@ void R3BStartrackCalib::SetParContainers()
 
     if (fVerbose && fStartrackCalibPar)
     {
-        LOG(INFO) << "R3BStarTraCalib::SetParContainers() ";
-        LOG(INFO) << "Container R3BStarTraCalibPar loaded ";
+        LOG(info) << "R3BStarTraCalib::SetParContainers() ";
+        LOG(info) << "Container R3BStarTraCalibPar loaded ";
     }
 }
 

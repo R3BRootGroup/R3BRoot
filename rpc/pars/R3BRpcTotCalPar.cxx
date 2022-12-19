@@ -46,14 +46,14 @@ void R3BRpcTotCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BRpcTotCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "RpcTotCalPar::putParams() called";
+    LOG(info) << "RpcTotCalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = fNumChannels;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fCalParams->Set(array_size);
 
@@ -64,7 +64,7 @@ void R3BRpcTotCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BRpcTotCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "RpcTotCalPar::getParams() called";
+    LOG(info) << "RpcTotCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -76,12 +76,12 @@ Bool_t R3BRpcTotCalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumChannels;
-    LOG(INFO) << "Nb_channels: " << array_size;
+    LOG(info) << "Nb_channels: " << array_size;
     fCalParams->Set(array_size);
 
     if (!(list->fill("RpcTotCalPar", fCalParams)))
     {
-        LOG(INFO) << "---Could not initialize RpcTotCalPar";
+        LOG(info) << "---Could not initialize RpcTotCalPar";
         return kFALSE;
     }
 
@@ -94,13 +94,13 @@ void R3BRpcTotCalPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BRpcTotCalPar::printParams()
 {
-    LOG(INFO) << "RpcTotCalPar::RPC Calibration Parameters: ";
+    LOG(info) << "RpcTotCalPar::RPC Calibration Parameters: ";
     Int_t array_size = fNumChannels;
 
     for (Int_t i = 0; i < fNumChannels; i++)
     {
-        LOG(INFO) << "Channel number: " << i + 1;
-        LOG(INFO) << "Param= " << fCalParams->GetAt(i);
+        LOG(info) << "Channel number: " << i + 1;
+        LOG(info) << "Param= " << fCalParams->GetAt(i);
     }
 }
 

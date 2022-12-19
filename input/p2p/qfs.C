@@ -79,7 +79,7 @@ void run(TString fname)
         double rrtt = MA * MA + MB * MB - 2 * MA * sqrt(MB * MB + Pa.Mag2());
         if (rrtt <= 0)
         {
-            cout << "\nERROR off-shell mass!!\n"; // non-zero and real off-shell mass
+            cout << "\nerror off-shell mass!!\n"; // non-zero and real off-shell mass
             continue;
         }
         double Ma_off = sqrt(rrtt);
@@ -289,10 +289,10 @@ cm_values CENMASS(double s, double m2off, double m1, double m2, bool isotropic)
     Z = m1 * m1;
     // And check whether the kinematical function is ok
     // for this specific kinematical case
-    double ERROR_CI = CINEMA(X, Y, Z);
-    if (ERROR_CI <= 0.)
+    double error_CI = CINEMA(X, Y, Z);
+    if (error_CI <= 0.)
     {
-        // cout << "\nERROR!!! Kinematical function is negative!";
+        // cout << "\nerror!!! Kinematical function is negative!";
         return output;
     }
 
@@ -326,7 +326,7 @@ cm_values CENMASS(double s, double m2off, double m1, double m2, bool isotropic)
     double COSINE = (t - 2 * m1 * m1 + 2 * e1_off * e1) / (2 * p1_off * p1);
     if (fabs(COSINE) >= 1)
     { // momentum transfer out of range
-        // cout << "\nERROR! Scattering cosine is larger than 1";
+        // cout << "\nerror! Scattering cosine is larger than 1";
         return output;
     }
 

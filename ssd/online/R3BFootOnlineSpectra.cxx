@@ -68,36 +68,36 @@ R3BFootOnlineSpectra::~R3BFootOnlineSpectra() { LOG(DEBUG) << "R3BFootOnlineSpec
 
 InitStatus R3BFootOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BFootOnlineSpectra::Init()";
+    LOG(info) << "R3BFootOnlineSpectra::Init()";
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BFootOnlineSpectra::FairRootManager not found";
+        LOG(fatal) << "R3BFootOnlineSpectra::FairRootManager not found";
     // Look for the R3BEventHeader
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
+        LOG(warn) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BFootOnlineSpectra::Init() EventHeader. found";
+        LOG(info) << "R3BFootOnlineSpectra::Init() EventHeader. found";
     // Get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("FootMappedData");
     if (!fMappedItems)
     {
-        LOG(FATAL) << "R3BFootOnlineSpectra::FootMappedData not found";
+        LOG(fatal) << "R3BFootOnlineSpectra::FootMappedData not found";
         return kFATAL;
     }
     // Get access to Cal data
     fCalItems = (TClonesArray*)mgr->GetObject("FootCalData");
     if (!fCalItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootCalData not found";
+        LOG(warn) << "R3BFootOnlineSpectra::FootCalData not found";
 
     // Get access to Hit data
     fHitItems = (TClonesArray*)mgr->GetObject("FootHitData");
     if (!fHitItems)
-        LOG(WARNING) << "R3BFootOnlineSpectra::FootHitData not found";
+        LOG(warn) << "R3BFootOnlineSpectra::FootHitData not found";
 
     // Create histograms for all the detectors
     // Energy range for strips
@@ -293,7 +293,7 @@ InitStatus R3BFootOnlineSpectra::Init()
 
 void R3BFootOnlineSpectra::Reset_FOOT_Histo()
 {
-    LOG(INFO) << "R3BFootOnlineSpectra::Reset_FOOT_Histo";
+    LOG(info) << "R3BFootOnlineSpectra::Reset_FOOT_Histo";
 
     // Mapped data
     for (Int_t i = 0; i < fNbDet; i++)

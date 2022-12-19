@@ -88,16 +88,16 @@ void R3BTwimCal2Hit::SetParContainers()
     // Parameter Container
     // Reading TwimCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BTwimHitPar*)rtdb->getContainer("twimHitPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on twimHitPar container");
+        R3BLOG(error, "Couldn't get handle on twimHitPar container");
     }
     else
     {
-        R3BLOG(INFO, "twimHitPar container open");
+        R3BLOG(info, "twimHitPar container open");
     }
     return;
 }
@@ -109,8 +109,8 @@ void R3BTwimCal2Hit::SetParameter()
     fNumAnodes = fCal_Par->GetNumAnodes();  // Number of anodes
     fNumParams = fCal_Par->GetNumParZFit(); // Number of Parameters
 
-    R3BLOG(INFO, "Nb sections: " << fNumSec);
-    R3BLOG(INFO, "Nb anodes: " << fNumAnodes);
+    R3BLOG(info, "Nb sections: " << fNumSec);
+    R3BLOG(info, "Nb anodes: " << fNumAnodes);
 
     // Anodes that don't work set to zero
     for (Int_t s = 0; s < fNumSec; s++)
@@ -121,14 +121,14 @@ void R3BTwimCal2Hit::SetParameter()
 
     if (fHitItemsTofW)
     {
-        R3BLOG(INFO, "Nb parameters for charge-Z vs Tof correction: " << fNumParamsTof);
+        R3BLOG(info, "Nb parameters for charge-Z vs Tof correction: " << fNumParamsTof);
         CalZTofParams = new TArrayF();
         Int_t size_tof = fNumSec * fNumParamsTof;
         CalZTofParams->Set(size_tof);
         CalZTofParams = fCal_Par->GetZTofHitPar(); // Array with the Cal parameters
     }
 
-    R3BLOG(INFO, "Nb parameters for charge-Z: " << fNumParams);
+    R3BLOG(info, "Nb parameters for charge-Z: " << fNumParams);
     CalZParams = new TArrayF();
     Int_t array_size = fNumSec * fNumParams;
     CalZParams->Set(array_size);
@@ -142,7 +142,7 @@ void R3BTwimCal2Hit::SetParameter()
         fEmean_dt[s] = fCal_Par->GetEmean_dt(s + 1);
         if (fNumParams == 2)
         {
-            R3BLOG(INFO,
+            R3BLOG(info,
                    "R3BTwimCal2Hit parameters for charge-Z:" << CalZParams->GetAt(s * fNumParams) << " : "
                                                              << CalZParams->GetAt(s * fNumParams + 1));
             fZ0[s] = CalZParams->GetAt(s * fNumParams);
@@ -152,7 +152,7 @@ void R3BTwimCal2Hit::SetParameter()
         {
             if (fHitItemsTofW)
             {
-                R3BLOG(INFO,
+                R3BLOG(info,
                        "R3BTwimCal2Hit parameters for charge-Z vs tof:"
                            << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
                            << " : " << CalZParams->GetAt(s * fNumParams + 2));
@@ -165,7 +165,7 @@ void R3BTwimCal2Hit::SetParameter()
         {
             if (fHitItemsTofW)
             {
-                R3BLOG(INFO,
+                R3BLOG(info,
                        "R3BTwimCal2Hit parameters for charge-Z vs tof:"
                            << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
                            << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
@@ -180,7 +180,7 @@ void R3BTwimCal2Hit::SetParameter()
         {
             if (fHitItemsTofW)
             {
-                R3BLOG(INFO,
+                R3BLOG(info,
                        "R3BTwimCal2Hit parameters for charge-Z vs tof:"
                            << CalZParams->GetAt(s * fNumParams) << " : " << CalZParams->GetAt(s * fNumParams + 1)
                            << " : " << CalZParams->GetAt(s * fNumParams + 2) << " : "
@@ -193,7 +193,7 @@ void R3BTwimCal2Hit::SetParameter()
             fZ4[s] = CalZParams->GetAt(s * fNumParams + 4);
         }
         else
-            R3BLOG(WARNING, "aa Parameters for charge-Z cannot be used here, number of parameters: " << fNumParams);
+            R3BLOG(warn, "aa Parameters for charge-Z cannot be used here, number of parameters: " << fNumParams);
     }
     return;
 }
@@ -201,11 +201,11 @@ void R3BTwimCal2Hit::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimCal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -215,7 +215,7 @@ InitStatus R3BTwimCal2Hit::Init()
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
-        R3BLOG(INFO, "fExpId: " << fExpId);
+        R3BLOG(info, "fExpId: " << fExpId);
     }
 
     // INPUT DATA
@@ -223,7 +223,7 @@ InitStatus R3BTwimCal2Hit::Init()
     fTwimCalDataCA = (TClonesArray*)rootManager->GetObject("TwimCalData");
     if (!fTwimCalDataCA)
     {
-        R3BLOG(FATAL, "TwimCalData not found");
+        R3BLOG(fatal, "TwimCalData not found");
         return kFATAL;
     }
 
@@ -231,7 +231,7 @@ InitStatus R3BTwimCal2Hit::Init()
     fHitItemsTofW = (TClonesArray*)rootManager->GetObject("TofWHitData");
     if (!fHitItemsTofW)
     {
-        R3BLOG(WARNING, "TofWHitData not found");
+        R3BLOG(warn, "TofWHitData not found");
     }
 
     // OUTPUT DATA

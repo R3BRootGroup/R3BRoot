@@ -18,7 +18,7 @@ void R3BNeutronWindowAndSomeAir::ConstructRootGeometry(TGeoMatrix*)
 {
     if (gGeoManager == nullptr)
     {
-        LOG(FATAL) << __FUNCTION__ << ": No gGeoManager";
+        LOG(fatal) << __FUNCTION__ << ": No gGeoManager";
     }
 
     auto volSomeAir = gGeoManager->MakeBox("SomeAir", FindMaterial("Air"), 125, 125, (fStop - fStart) / 2.);
@@ -38,14 +38,14 @@ TGeoMedium* R3BNeutronWindowAndSomeAir::FindMaterial(const std::string& mat) con
     auto fairMedium = geoMedia->getMedium(mat.c_str());
     if (!fairMedium)
     {
-        LOG(FATAL) << __FUNCTION__ << ": FairGeoMedium " << mat << " not found";
+        LOG(fatal) << __FUNCTION__ << ": FairGeoMedium " << mat << " not found";
     }
     geoBuild->createMedium(fairMedium);
 
     auto med = gGeoManager->GetMedium(mat.c_str());
     if (!med)
     {
-        LOG(FATAL) << __FUNCTION__ << ": TGeoMedium " << mat << " not found";
+        LOG(fatal) << __FUNCTION__ << ": TGeoMedium " << mat << " not found";
     }
     return med;
 }

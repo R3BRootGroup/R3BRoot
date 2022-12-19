@@ -79,13 +79,13 @@ R3BLosMapped2TCal::~R3BLosMapped2TCal()
 
 InitStatus R3BLosMapped2TCal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -97,13 +97,13 @@ InitStatus R3BLosMapped2TCal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
     if (NULL == fMappedItems)
     {
-        R3BLOG(FATAL, "LosMapped not found");
+        R3BLOG(fatal, "LosMapped not found");
         return kFATAL;
     }
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerMapped");
-    R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
+    R3BLOG_IF(warn, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     // Request storage of TCal data in output tree
     mgr->Register("LosTCal", "LosTCal data", fTCalItems, !fOnline);
@@ -124,7 +124,7 @@ void R3BLosMapped2TCal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-        R3BLOG(FATAL, "Could not get access to LosTCalPar-Container.");
+        R3BLOG(fatal, "Could not get access to LosTCalPar-Container.");
         fNofTcalPars = 0;
         return;
     }
@@ -166,13 +166,13 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            R3BLOG(WARNING, "Detector number out of range: " << iDet);
+            R3BLOG(warn, "Detector number out of range: " << iDet);
             continue;
         }
 
         if (hit->GetTimeCoarse() > 8192)
         {
-            R3BLOG(WARNING, "Coarse counter > 8192: Det " << iDet << " , Ch: " << iCha << " , type: " << iType);
+            R3BLOG(warn, "Coarse counter > 8192: Det " << iDet << " , Ch: " << iCha << " , type: " << iType);
             continue;
         }
 
@@ -185,7 +185,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
 
             if (!par)
             {
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
                 continue;
             }
@@ -197,7 +197,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
             if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
             {
 
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Bad time in ns: det= " << iDet << ", ch= " << iCha << ", type= " << iType
                                                << ", time in channels = " << hit->GetTimeFine()
                                                << ", time in ns = " << times_raw_ns);
@@ -232,7 +232,7 @@ void R3BLosMapped2TCal::Exec(Option_t* option)
             auto par = fTcalPar->GetModuleParAt(2 + iDetector, iChannel, iType);
             if (!par)
             {
-                R3BLOG(WARNING, "Trigger Tcal par not found.");
+                R3BLOG(warn, "Trigger Tcal par not found.");
                 continue;
             }
 

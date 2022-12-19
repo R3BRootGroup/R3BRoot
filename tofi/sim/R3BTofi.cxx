@@ -82,13 +82,13 @@ void R3BTofi::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BTofi: initialisation";
+    LOG(info) << "R3BTofi: initialisation";
     LOG(DEBUG) << "R3BTofi: Sci. Vol. (McId0) " << gMC->VolId("TOFiLog101");
 }
 
 void R3BTofi::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BTofi: Adding customized Physics cut ... ";
+    LOG(info) << "-I- R3BTofi: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -112,7 +112,7 @@ void R3BTofi::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BTofi: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+            LOG(info) << "-I- R3BTofi: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
                       << " GeV";
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE);
@@ -273,7 +273,7 @@ TClonesArray* R3BTofi::GetCollection(Int_t iColl) const
 void R3BTofi::Print(Option_t* option) const
 {
     Int_t nHits = fTofiCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTofi: " << nHits << " points registered in this event";
+    LOG(info) << "R3BTofi: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -289,7 +289,7 @@ void R3BTofi::Reset()
 void R3BTofi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTofi: " << nEntries << " entries to add";
+    LOG(info) << "R3BTofi: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BTofiPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -300,7 +300,7 @@ void R3BTofi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTofiPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTofi: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BTofi: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -317,7 +317,7 @@ R3BTofiPoint* R3BTofi::AddHit(Int_t trackID,
     TClonesArray& clref = *fTofiCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BTofi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BTofi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BTofiPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

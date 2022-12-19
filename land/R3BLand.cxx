@@ -92,7 +92,7 @@ void R3BLand::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BLand initialisation ";
+    LOG(info) << "R3BLand initialisation ";
 
     Int_t id1 = 0, id2 = 0, id3 = 0;
 
@@ -375,9 +375,9 @@ TClonesArray* R3BLand::GetCollection(Int_t iColl) const
 void R3BLand::Print(Option_t* option) const
 {
     Int_t nHits = fLandCollection->GetEntriesFast();
-    LOG(INFO) << "R3BLand: " << nHits << " points registered in this event";
+    LOG(info) << "R3BLand: " << nHits << " points registered in this event";
     nHits = fLandFirstHits->GetEntriesFast();
-    LOG(INFO) << "R3BLandFirstHits: " << nHits << " points registered in this event";
+    LOG(info) << "R3BLandFirstHits: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -395,7 +395,7 @@ void R3BLand::Reset()
 void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BLand: " << nEntries << " entries to add";
+    LOG(info) << "R3BLand: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BLandPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -406,7 +406,7 @@ void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BLandPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BLand: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BLand: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----  Private method AddHit  --------------------------------------------
@@ -428,7 +428,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss << " GeV";
     }
     return new (clref[size])
@@ -525,7 +525,7 @@ void R3BLand::StepHistory()
             break;
     }
 
-    TString flag = "-I- STEPINFO: tracking status: ";
+    TString flag = "-I- STEPinfo: tracking status: ";
     if (gMC->IsTrackAlive())
     {
         if (gMC->IsTrackEntering())
@@ -585,12 +585,12 @@ void R3BLand::StepHistory()
 
     /*
       TArrayI proc;  gMC->StepProcesses(proc);
-      printf("-I- STEPINFO: Processes in this step:\n");
+      printf("-I- STEPinfo: Processes in this step:\n");
       for ( int i = 0 ; i < proc.GetSize(); i++)
       {
         printf("-I- Process involved --->   code: %i : name: %s\n", proc.At(i) , TMCProcessName[proc.At(i)]);
       }
-      printf("-I- STEPINFO: end of process list\n");
+      printf("-I- STEPinfo: end of process list\n");
     */
 
     // Int_t Nprim=gMC->GetStack()->GetNprimary();
@@ -619,7 +619,7 @@ void R3BLand::StepHistory()
 
             if (proc.At(i) != 22 && proc.At(i) != 23 && proc.At(i) != 31 && proc.At(i) != 43 && proc.At(i) != 13)
             {
-                LOG(INFO) << "new primary neutron interaction: " << proc.At(i) << "  " << TMCProcessName[proc.At(i)];
+                LOG(info) << "new primary neutron interaction: " << proc.At(i) << "  " << TMCProcessName[proc.At(i)];
             }
 
             // make histogram with first interaction

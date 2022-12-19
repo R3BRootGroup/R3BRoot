@@ -75,13 +75,13 @@ R3BTwimOnlineSpectra::~R3BTwimOnlineSpectra() { R3BLOG(DEBUG1, ""); }
 
 InitStatus R3BTwimOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* rootManager = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == rootManager, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == rootManager, "FairRootManager not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -92,32 +92,32 @@ InitStatus R3BTwimOnlineSpectra::Init()
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
-        R3BLOG(INFO, "fExpId: " << fExpId);
+        R3BLOG(info, "fExpId: " << fExpId);
     }
 
     // get access to mapped data of the TWIM
     fMappedItemsTwim = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fMappedItemsTwim)
     {
-        R3BLOG(FATAL, "TwimMappedData not found");
+        R3BLOG(fatal, "TwimMappedData not found");
         return kFATAL;
     }
 
     // get access to cal data of the TWIM
     fCalItemsTwim = (TClonesArray*)rootManager->GetObject("TwimCalData");
-    R3BLOG_IF(WARNING, !fCalItemsTwim, "TwimCalData not found");
+    R3BLOG_IF(warn, !fCalItemsTwim, "TwimCalData not found");
 
     // get access to hit data of the TWIM
     fHitItemsTwim = (TClonesArray*)rootManager->GetObject("TwimHitData");
-    R3BLOG_IF(WARNING, !fHitItemsTwim, "TwimHitData not found");
+    R3BLOG_IF(warn, !fHitItemsTwim, "TwimHitData not found");
 
     // get access to hit data of the MWPC3
     fHitItemsMwpc3 = (TClonesArray*)rootManager->GetObject("Mwpc3HitData");
-    R3BLOG_IF(WARNING, !fHitItemsMwpc3, "Mwpc3HitData not found");
+    R3BLOG_IF(warn, !fHitItemsMwpc3, "Mwpc3HitData not found");
 
     // get access to hit data of the Tof-Wall
     fHitItemsTofW = (TClonesArray*)rootManager->GetObject("TofWHitData");
-    R3BLOG_IF(WARNING, !fHitItemsTofW, "TofWHitData not found");
+    R3BLOG_IF(warn, !fHitItemsTofW, "TofWHitData not found");
 
     if (fExpId == 444 || fExpId == 467)
     {
@@ -879,7 +879,7 @@ InitStatus R3BTwimOnlineSpectra::Init()
 
 void R3BTwimOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "Reset_Histo");
+    R3BLOG(info, "Reset_Histo");
     // Map data
     for (Int_t i = 0; i < fNbSections; i++)
     {

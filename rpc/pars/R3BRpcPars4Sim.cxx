@@ -32,7 +32,7 @@ void R3BRpcPars4Sim::clear()
 
 void R3BRpcPars4Sim::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BRpcPars4Sim::putParams() called";
+    LOG(info) << "R3BRpcPars4Sim::putParams() called";
     if (!list)
     {
         return;
@@ -46,7 +46,7 @@ void R3BRpcPars4Sim::putParams(FairParamList* list)
 
 Bool_t R3BRpcPars4Sim::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BRpcPars4Sim::getParams() called";
+    LOG(info) << "R3BRpcPars4Sim::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -60,7 +60,7 @@ Bool_t R3BRpcPars4Sim::getParams(FairParamList* list)
     fChannelIDArray->Set(fNumChannels);
     if (!(list->fill("rpcChannelsIDPar", fChannelIDArray)))
     {
-        LOG(INFO) << "---Could not initialize rpcChannelsIDPar";
+        LOG(info) << "---Could not initialize rpcChannelsIDPar";
         return kFALSE;
     }
 
@@ -69,14 +69,14 @@ Bool_t R3BRpcPars4Sim::getParams(FairParamList* list)
 
 void R3BRpcPars4Sim::printParams()
 {
-    LOG(INFO) << "R3BRpcPars4Sim: RPC Simulation Parameters: ";
+    LOG(info) << "R3BRpcPars4Sim: RPC Simulation Parameters: ";
 
-    LOG(INFO) << "Channel ID"
+    LOG(info) << "Channel ID"
               << " ";
 
     for (Int_t i = 0; i < fNumChannels; i++)
     {
-        LOG(INFO) << i + 1 << " " << fChannelIDArray->GetAt(i);
+        LOG(info) << i + 1 << " " << fChannelIDArray->GetAt(i);
     }
 }
 

@@ -47,7 +47,7 @@ R3BMusliReader::~R3BMusliReader()
 Bool_t R3BMusliReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_MUSLI_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_MUSLI, 0);
     if (!ok)
     {
@@ -143,7 +143,7 @@ Bool_t R3BMusliReader::ReadData(EXT_STR_h101_MUSLI_onion* data)
 
     // --- ENERGY AND TIME SIGNALS --- //
     if (nEnergy != nTime)
-        LOG(ERROR) << "R3BMusliReader::ReadData ERROR ! NOT THE SAME NUMBER OF ANODES HITTED IN ENERGY () AND TIME ()";
+        LOG(error) << "R3BMusliReader::ReadData error ! NOT THE SAME NUMBER OF ANODES HITTED IN ENERGY () AND TIME ()";
 
     // ENERGY AND TIME ARE SORTED
     uint32_t curAnodeTimeStart = 0;
@@ -154,7 +154,7 @@ Bool_t R3BMusliReader::ReadData(EXT_STR_h101_MUSLI_onion* data)
         UShort_t idTime = data->MUSLI_TMI[a];
         UShort_t idEnergy = data->MUSLI_EMI[a];
         if (idTime != idEnergy)
-            LOG(ERROR) << "R3BMusliReader::ReadData ERROR ! Mismatch between numbering of Time and Energy signals";
+            LOG(error) << "R3BMusliReader::ReadData error ! Mismatch between numbering of Time and Energy signals";
 
         uint32_t nextAnodeTimeStart = data->MUSLI_TME[a];
         uint32_t nextAnodeEnergyStart = data->MUSLI_EME[a];

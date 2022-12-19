@@ -46,7 +46,7 @@ R3BParticleGenerator::R3BParticleGenerator(unsigned int seed)
 bool R3BParticleGenerator::Init()
 {
     if (fPDGCode == 0)
-        LOG(FATAL) << "R3BParticleGenerator::Init: No Particle added!";
+        LOG(fatal) << "R3BParticleGenerator::Init: No Particle added!";
 
     return true;
 }
@@ -84,7 +84,7 @@ void R3BParticleGenerator::addParticle(const int pdgCode, const double mass)
     if (fPDGCode != 0)
     {
         // one particle was already added
-        LOG(FATAL) << "R3BParticleGenerator: Trying to add a second Particle. Use a second generator!";
+        LOG(fatal) << "R3BParticleGenerator: Trying to add a second Particle. Use a second generator!";
     }
 
     fPDGCode = pdgCode;

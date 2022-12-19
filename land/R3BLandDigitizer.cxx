@@ -101,8 +101,8 @@ void R3BLandDigitizer::SetParContainers()
 
     if (fVerbose && fLandDigiPar)
     {
-        LOG(INFO) << "R3BLandDigitizer::SetParContainers() ";
-        LOG(INFO) << "Container R3BLandDigiPar loaded ";
+        LOG(info) << "R3BLandDigitizer::SetParContainers() ";
+        LOG(info) << "Container R3BLandDigiPar loaded ";
     }
 }
 // ----------------------------------------------------------------------------
@@ -125,8 +125,8 @@ InitStatus R3BLandDigitizer::Init()
     npaddles = fLandDigiPar->GetMaxPaddle() + 1;
     nplanes = fLandDigiPar->GetMaxPlane();
     paddle_per_plane = (npaddles - 1) / nplanes;
-    LOG(INFO) << "R3BLandDigitizer: # paddles: " << npaddles - 1 << ", # planes: " << nplanes;
-    LOG(INFO) << "R3BLandDigitizer: paddles per plane: " << paddle_per_plane;
+    LOG(info) << "R3BLandDigitizer: # paddles: " << npaddles - 1 << ", # planes: " << nplanes;
+    LOG(info) << "R3BLandDigitizer: paddles per plane: " << paddle_per_plane;
     c = 2.99792458E8;
     cMedia = 14.; // speed of light in material in [cm/ns]
                   //  cMedia = c / 1.58 * 1e9; // speed of light in material in [cm/ns]
@@ -267,7 +267,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
             if (m > 1500)
             {
-                LOG(ERROR) << "R3BLandDigitizer: Too many hits in one paddle: " << m << " hits"
+                LOG(error) << "R3BLandDigitizer: Too many hits in one paddle: " << m << " hits"
                            << "entry " << l << " after sorting"
                            << "paddle " << paddle << "padlle mult " << PMmult[paddle] << "Sector " << scint << "eloss "
                            << eloss << "light yield " << light << "time " << time << "X In " << x << "Y In " << y
@@ -660,7 +660,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
     if (fVerbose)
     {
-        LOG(INFO) << "R3BLandDigitizer: produced " << fLandDigi->GetEntries() << " digis";
+        LOG(info) << "R3BLandDigitizer: produced " << fLandDigi->GetEntries() << " digis";
     }
 }
 // ----------------------------------------------------------------------------

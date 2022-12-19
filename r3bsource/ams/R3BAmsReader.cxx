@@ -44,7 +44,7 @@ R3BAmsReader::R3BAmsReader(EXT_STR_h101_AMS_onion* data, size_t offset)
 
 R3BAmsReader::~R3BAmsReader()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (fArray)
         delete fArray;
 }
@@ -52,12 +52,12 @@ R3BAmsReader::~R3BAmsReader()
 Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_AMS, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 

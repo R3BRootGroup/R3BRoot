@@ -90,7 +90,7 @@ R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 
 InitStatus R3BLosMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     for (UInt_t i = 0; i < 16; i++)
     {
         for (UInt_t k = 0; k < 3; k++)
@@ -102,7 +102,7 @@ InitStatus R3BLosMapped2CalPar::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -110,22 +110,22 @@ InitStatus R3BLosMapped2CalPar::Init()
     // may be = NULL!
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     fMapped = (TClonesArray*)rm->GetObject("LosMapped");
     if (!fMapped)
     {
-        R3BLOG(FATAL, "LosMapped not found");
+        R3BLOG(fatal, "LosMapped not found");
         return kFATAL;
     }
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = (TClonesArray*)rm->GetObject("LosTriggerMapped");
-    R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
+    R3BLOG_IF(warn, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
@@ -160,21 +160,21 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         {
             if (iDetector > (fNofDetectors - 1))
             {
-                R3BLOG(ERROR,
+                R3BLOG(error,
                        "More detectors than expected! Det: " << (iDetector + 1) << " allowed are 1.." << fNofDetectors);
                 continue;
             }
             if (iChannel > (fNofChannels - 1))
             {
                 R3BLOG(
-                    ERROR,
+                    error,
                     "More channels than expected! Channel: " << (iChannel + 1) << " allowed are 1.." << fNofChannels);
                 continue;
             }
 
             if (iType > 3)
             {
-                R3BLOG(ERROR, "More time-types than expected! Type: " << iType << " allowed are 0..3");
+                R3BLOG(error, "More time-types than expected! Type: " << iType << " allowed are 0..3");
                 continue;
             }
 
@@ -211,26 +211,26 @@ void R3BLosMapped2CalPar::FinishTask()
     fCal_Par->printParams();
     fCal_Par->setChanged();
 
-    R3BLOG(INFO, "Calibration of LOS detector");
+    R3BLOG(info, "Calibration of LOS detector");
     for (Int_t i = 0; i < 16; i++)
     {
         for (Int_t k = 0; k < 3; k++)
         {
             if (Icount[i][k] > fMinStats)
             {
-                R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
+                R3BLOG(info, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
             }
         }
     }
 
-    R3BLOG(INFO, "Calibration of trigger signals from LOS detector");
+    R3BLOG(info, "Calibration of trigger signals from LOS detector");
     for (Int_t i = 0; i < 16; i++)
     {
         for (Int_t k = 0; k < 3; k++)
         {
             if (Icounttrig[i][k] > fMinStats)
             {
-                R3BLOG(INFO, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
+                R3BLOG(info, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
             }
         }
     }

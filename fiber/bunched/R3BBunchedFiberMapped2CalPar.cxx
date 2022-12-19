@@ -64,7 +64,7 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not get " << name);                                   \
+            R3BLOG(error, "Could not get " << name);                                   \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \
@@ -72,10 +72,10 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
     } while (0)
 
     auto rm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
-    R3BLOG_IF(FATAL, !fMapped, fName + "Mapped not found");
+    R3BLOG_IF(fatal, !fMapped, fName + "Mapped not found");
 
     GET_TCALPAR(MAPMT);
     GET_TCALPAR(MAPMTTrig);
@@ -109,7 +109,7 @@ void R3BBunchedFiberMapped2CalPar::Exec(Option_t* option)
 
 void R3BBunchedFiberMapped2CalPar::FinishTask()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fMAPMTEngine->CalculateParamClockTDC(fCTDCVariant);
     fMAPMTTrigEngine->CalculateParamClockTDC(fCTDCVariant);
     switch (fSPMTElectronics)

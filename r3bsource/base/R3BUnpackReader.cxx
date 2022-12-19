@@ -45,11 +45,11 @@ R3BUnpackReader::~R3BUnpackReader()
 Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_unpack, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -58,10 +58,10 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
     fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     return kTRUE;
 }

@@ -81,7 +81,7 @@ InitStatus R3BNeulandMapped2CalPar::Init()
     fHitsTrigger = (TClonesArray*)rm->GetObject("NeulandTrigMappedData");
     if (!fHitsTrigger)
     {
-        LOG(INFO) << "Branch NeulandTrigMapped not found";
+        LOG(info) << "Branch NeulandTrigMapped not found";
     }
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs

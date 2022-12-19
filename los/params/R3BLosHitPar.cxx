@@ -38,7 +38,7 @@ void R3BLosHitPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BLosHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BLosHitPar::putParams() called";
+    LOG(info) << "R3BLosHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -54,7 +54,7 @@ void R3BLosHitPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BLosHitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BLosHitPar::getParams() called";
+    LOG(info) << "R3BLosHitPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -62,37 +62,37 @@ Bool_t R3BLosHitPar::getParams(FairParamList* list)
 
     if (!(list->fill("p0", &fp0)))
     {
-        LOG(INFO) << "---Could not initialize LosHit p0 Par";
+        LOG(info) << "---Could not initialize LosHit p0 Par";
         return kFALSE;
     }
 
     if (!(list->fill("p1", &fp1)))
     {
-        LOG(INFO) << "---Could not initialize LosHit p1 Par";
+        LOG(info) << "---Could not initialize LosHit p1 Par";
         return kFALSE;
     }
 
     if (!(list->fill("xoffset_MCFD", &fxoffset_MCFD)))
     {
-        LOG(INFO) << "---Could not initialize LosHit xoffset_MCFD Par";
+        LOG(info) << "---Could not initialize LosHit xoffset_MCFD Par";
         return kFALSE;
     }
 
     if (!(list->fill("yoffset_MCFD", &fyoffset_MCFD)))
     {
-        LOG(INFO) << "---Could not initialize LosHit yoffset_MCFD Par";
+        LOG(info) << "---Could not initialize LosHit yoffset_MCFD Par";
         return kFALSE;
     }
 
     if (!(list->fill("xveff_MCFD", &fxveff_MCFD)))
     {
-        LOG(INFO) << "---Could not initialize LosHit xveff_MCFD Par";
+        LOG(info) << "---Could not initialize LosHit xveff_MCFD Par";
         return kFALSE;
     }
 
     if (!(list->fill("yveff_MCFD", &fyveff_MCFD)))
     {
-        LOG(INFO) << "---Could not initialize LosHit yveff_MCFD Par";
+        LOG(info) << "---Could not initialize LosHit yveff_MCFD Par";
         return kFALSE;
     }
 
@@ -105,14 +105,14 @@ void R3BLosHitPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BLosHitPar::printParams()
 {
-    LOG(INFO) << "R3BLosHitPar: Los calibration parameters (Z-charge):";
+    LOG(info) << "R3BLosHitPar: Los calibration parameters (Z-charge):";
 
-    LOG(INFO) << "p0"
+    LOG(info) << "p0"
               << " "
               << "p1"
               << " ";
 
-    LOG(INFO) << fp0 << "\t" << fp1;
+    LOG(info) << fp0 << "\t" << fp1;
 }
 
 ClassImp(R3BLosHitPar)

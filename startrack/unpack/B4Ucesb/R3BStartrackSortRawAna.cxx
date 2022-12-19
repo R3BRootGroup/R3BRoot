@@ -152,6 +152,6 @@ void R3BStartrackSortRawAna::CreateSortTree()
     */
 }
 
-void R3BStartrackSortRawAna::WriteSortTree() { LOG(INFO) << "R3BStartrackSortRawAna ---  writed to the Root File ..."; }
+void R3BStartrackSortRawAna::WriteSortTree() { LOG(info) << "R3BStartrackSortRawAna ---  writed to the Root File ..."; }
 
 ClassImp(R3BStartrackSortRawAna)

@@ -73,19 +73,19 @@ R3BFiberMAPMTCorrelationOnlineSpectra::~R3BFiberMAPMTCorrelationOnlineSpectra()
 void R3BFiberMAPMTCorrelationOnlineSpectra::SetParContainers()
 {
     fMapPar1 = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName1 + "MappingPar");
-    R3BLOG_IF(ERROR, !fMapPar1, "Couldn't get " << fName1 << "MappingPar");
+    R3BLOG_IF(error, !fMapPar1, "Couldn't get " << fName1 << "MappingPar");
     if (fMapPar1)
     {
         fNbfibers1 = fMapPar1->GetNbChannels();
-        R3BLOG(INFO, fName1 << "MappingPar found with " << fNbfibers1 << " fibers");
+        R3BLOG(info, fName1 << "MappingPar found with " << fNbfibers1 << " fibers");
     }
 
     fMapPar2 = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName2 + "MappingPar");
-    R3BLOG_IF(ERROR, !fMapPar2, "Couldn't get " << fName2 << "MappingPar");
+    R3BLOG_IF(error, !fMapPar2, "Couldn't get " << fName2 << "MappingPar");
     if (fMapPar2)
     {
         fNbfibers2 = fMapPar2->GetNbChannels();
-        R3BLOG(INFO, fName2 << "MappingPar found with " << fNbfibers2 << " fibers");
+        R3BLOG(info, fName2 << "MappingPar found with " << fNbfibers2 << " fibers");
     }
 }
 
@@ -97,7 +97,7 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::ReInit()
 
 InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "For firbers " << fName1 << " and " << fName2);
+    R3BLOG(info, "For firbers " << fName1 << " and " << fName2);
 
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
@@ -105,21 +105,21 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, " EventHeader. found");
+        R3BLOG(info, " EventHeader. found");
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fHitItems1 = (TClonesArray*)mgr->GetObject(fName1 + "Hit");
-    R3BLOG_IF(WARNING, NULL == fHitItems1, fName1 + "Hit not found");
+    R3BLOG_IF(warn, NULL == fHitItems1, fName1 + "Hit not found");
 
     fHitItems2 = (TClonesArray*)mgr->GetObject(fName2 + "Hit");
-    R3BLOG_IF(WARNING, NULL == fHitItems2, fName2 + "Hit not found");
+    R3BLOG_IF(warn, NULL == fHitItems2, fName2 + "Hit not found");
 
     //------------------------------------------------------------------------
     // create histograms
@@ -193,7 +193,7 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
 }
 void R3BFiberMAPMTCorrelationOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "For firbers " << fName1 << " and " << fName2);
+    R3BLOG(info, "For firbers " << fName1 << " and " << fName2);
     if (fHitItems1 && fHitItems2)
     {
         fh_Fib_posX->Reset();

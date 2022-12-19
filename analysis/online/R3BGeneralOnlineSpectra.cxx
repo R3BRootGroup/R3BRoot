@@ -103,106 +103,106 @@ R3BGeneralOnlineSpectra::~R3BGeneralOnlineSpectra()
 
 InitStatus R3BGeneralOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
-    R3BLOG_IF(WARNING, NULL == fEventHeader, "EventHeader. not found");
+    R3BLOG_IF(warn, NULL == fEventHeader, "EventHeader. not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
-    R3BLOG_IF(FATAL, NULL == run, "FairRunOnline not found");
+    R3BLOG_IF(fatal, NULL == run, "FairRunOnline not found");
     run->GetHttpServer()->Register("", this);
 
     // get access to WR-Master data
     fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    R3BLOG_IF(WARNING, !fWRItemsMaster, "WRMasterData not found");
+    R3BLOG_IF(warn, !fWRItemsMaster, "WRMasterData not found");
 
     // get access to WR-Sofia data
     fWRItemsSofia = (TClonesArray*)mgr->GetObject("SofWRData");
-    R3BLOG_IF(WARNING, !fWRItemsSofia, "SofWRData not found");
+    R3BLOG_IF(warn, !fWRItemsSofia, "SofWRData not found");
 
     // get access to WR-Califa data
     fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
-    R3BLOG_IF(WARNING, !fWRItemsCalifa, "WRCalifaData not found");
+    R3BLOG_IF(warn, !fWRItemsCalifa, "WRCalifaData not found");
 
     // get access to WR-Neuland data
     fWRItemsNeuland = (TClonesArray*)mgr->GetObject("WRNeulandData");
-    R3BLOG_IF(WARNING, !fWRItemsNeuland, "WRNeulandData not found");
+    R3BLOG_IF(warn, !fWRItemsNeuland, "WRNeulandData not found");
 
     // get access to WR-S2 data
     fWRItemsS2 = (TClonesArray*)mgr->GetObject("WRS2Data");
-    R3BLOG_IF(WARNING, !fWRItemsS2, "WRS2Data not found");
+    R3BLOG_IF(warn, !fWRItemsS2, "WRS2Data not found");
 
     // get access to WR-S8 data
     fWRItemsS8 = (TClonesArray*)mgr->GetObject("WRS8Data");
-    R3BLOG_IF(WARNING, !fWRItemsS8, "WRS8Data not found");
+    R3BLOG_IF(warn, !fWRItemsS8, "WRS8Data not found");
 
     // Looking for Mwpc0 online
     fMwpc0Online = (R3BMwpcOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc0OnlineSpectra");
-    R3BLOG_IF(WARNING, !fMwpc0Online, "Mwpc0OnlineSpectra not found");
+    R3BLOG_IF(warn, !fMwpc0Online, "Mwpc0OnlineSpectra not found");
 
     // Looking for Mwpc0_1 online
     fMwpc01Online =
         (R3BMwpcCorrelationOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc0_1CorrelationOnlineSpectra");
-    R3BLOG_IF(WARNING, !fMwpc01Online, "Mwpc0_1CorrelationOnlineSpectra not found");
+    R3BLOG_IF(warn, !fMwpc01Online, "Mwpc0_1CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc0_2 online
     fMwpc02Online =
         (R3BMwpcCorrelationOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc0_2CorrelationOnlineSpectra");
-    R3BLOG_IF(WARNING, !fMwpc02Online, "Mwpc0_2CorrelationOnlineSpectra not found");
+    R3BLOG_IF(warn, !fMwpc02Online, "Mwpc0_2CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc1_2 online
     fMwpc12Online =
         (R3BMwpcCorrelationOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc1_2CorrelationOnlineSpectra");
-    R3BLOG_IF(WARNING, !fMwpc12Online, "Mwpc1_2CorrelationOnlineSpectra not found");
+    R3BLOG_IF(warn, !fMwpc12Online, "Mwpc1_2CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc1 online
     fMwpc1Online = (R3BMwpcOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc1OnlineSpectra");
-    R3BLOG_IF(WARNING, !fMwpc1Online, "Mwpc1OnlineSpectra not found");
+    R3BLOG_IF(warn, !fMwpc1Online, "Mwpc1OnlineSpectra not found");
 
     // Looking for Mwpc2 online
     fMwpc2Online = (R3BMwpcOnlineSpectra*)FairRunOnline::Instance()->GetTask("Mwpc2OnlineSpectra");
     if (!fMwpc2Online)
-        LOG(WARNING) << "R3BGeneralOnlineSpectra::Mwpc2OnlineSpectra not found";
+        LOG(warn) << "R3BGeneralOnlineSpectra::Mwpc2OnlineSpectra not found";
 
     // Looking for Twim online
     fTwimOnline = (R3BTwimOnlineSpectra*)FairRunOnline::Instance()->GetTask("TwimOnlineSpectra");
-    R3BLOG_IF(WARNING, !fTwimOnline, "TwimOnlineSpectra not found");
+    R3BLOG_IF(warn, !fTwimOnline, "TwimOnlineSpectra not found");
 
     // Looking for Music online
     fMusicOnline = (R3BMusicOnlineSpectra*)FairRunOnline::Instance()->GetTask("MusicOnlineSpectra");
-    R3BLOG_IF(WARNING, !fMusicOnline, "MusicOnlineSpectra not found");
+    R3BLOG_IF(warn, !fMusicOnline, "MusicOnlineSpectra not found");
 
     // Looking for AMS online
     fAmsOnline = (R3BAmsOnlineSpectra*)FairRunOnline::Instance()->GetTask("AmsOnlineSpectra");
-    R3BLOG_IF(WARNING, !fAmsOnline, "AmsOnlineSpectra not found");
+    R3BLOG_IF(warn, !fAmsOnline, "AmsOnlineSpectra not found");
 
     // Looking for LOS online
     fLosOnline = (R3BLosOnlineSpectra*)FairRunOnline::Instance()->GetTask("LosOnlineSpectra");
-    R3BLOG_IF(WARNING, !fLosOnline, "LosOnlineSpectra not found");
+    R3BLOG_IF(warn, !fLosOnline, "LosOnlineSpectra not found");
 
     // Looking for FOOT online
     fFootOnline = (R3BFootOnlineSpectra*)FairRunOnline::Instance()->GetTask("FootOnlineSpectra");
-    R3BLOG_IF(WARNING, !fFootOnline, "FootOnlineSpectra not found");
+    R3BLOG_IF(warn, !fFootOnline, "FootOnlineSpectra not found");
 
     // Looking for CALIFA online
     fCalifaOnline = (R3BCalifaOnlineSpectra*)FairRunOnline::Instance()->GetTask("CALIFAOnlineSpectra");
-    R3BLOG_IF(WARNING, !fCalifaOnline, "CALIFAOnlineSpectra not found");
+    R3BLOG_IF(warn, !fCalifaOnline, "CALIFAOnlineSpectra not found");
 
     // Looking for TOFD online
     fTofdOnlineSpectra = (R3BTofDOnlineSpectra*)FairRunOnline::Instance()->GetTask("TofdOnlineSpectra");
-    R3BLOG_IF(WARNING, !fTofdOnlineSpectra, "TofdOnlineSpectra not found");
+    R3BLOG_IF(warn, !fTofdOnlineSpectra, "TofdOnlineSpectra not found");
 
     // Looking for Incoming Tracking online
     fIncomingTrackingOnline =
         (R3BIncomingTrackingOnlineSpectra*)FairRunOnline::Instance()->GetTask("IncomingTrackingOnlineSpectra");
-    R3BLOG_IF(WARNING, !fIncomingTrackingOnline, "IncomingTrackingOnlineSpectra not found");
+    R3BLOG_IF(warn, !fIncomingTrackingOnline, "IncomingTrackingOnlineSpectra not found");
 
     // Looking for Incoming Tracking online
     fTwimvsFootOnlineSpectra =
         (R3BTwimvsFootOnlineSpectra*)FairRunOnline::Instance()->GetTask("TwimvsFootOnlineSpectra");
-    R3BLOG_IF(WARNING, !fTwimvsFootOnlineSpectra, "TwimvsFootOnlineSpectra not found");
+    R3BLOG_IF(warn, !fTwimvsFootOnlineSpectra, "TwimvsFootOnlineSpectra not found");
 
     // Create histograms for detectors
     char Name1[255];
@@ -358,7 +358,7 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 
 void R3BGeneralOnlineSpectra::Reset_GENERAL_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fh1_trigger->Reset();
     if (fWRItemsMaster && fWRItemsSofia)
     {
@@ -442,7 +442,7 @@ void R3BGeneralOnlineSpectra::Exec(Option_t* option)
     }
     else
     {
-        LOG(INFO) << fNEvents << " " << fEventHeader->GetTpat();
+        LOG(info) << fNEvents << " " << fEventHeader->GetTpat();
     }
     if (fEventHeader)
         fh1_trigger->Fill(fEventHeader->GetTrigger());

@@ -76,8 +76,8 @@ class R3BTwimMapped2CalPar : public FairTask
     /** Method to set up the experiment ID **/
     void SetExpId(Int_t exp)
     {
-        R3BLOG(INFO, "fExpId is set locally. Original:" << fExpId << ", New value:" << exp);
-        R3BLOG(INFO, "Using R3BEventHeader::SetExpId() is recommended instead.");
+        R3BLOG(info, "fExpId is set locally. Original:" << fExpId << ", New value:" << exp);
+        R3BLOG(info, "Using R3BEventHeader::SetExpId() is recommended instead.");
         fExpId = exp;
     }
 

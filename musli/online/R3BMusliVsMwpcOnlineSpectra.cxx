@@ -75,7 +75,7 @@ R3BMusliVsMwpcOnlineSpectra::R3BMusliVsMwpcOnlineSpectra(const TString& name,
 
 R3BMusliVsMwpcOnlineSpectra::~R3BMusliVsMwpcOnlineSpectra()
 {
-    LOG(INFO) << "R3BMusicVsMwpcOnlineSpectra::Delete instance";
+    LOG(info) << "R3BMusicVsMwpcOnlineSpectra::Delete instance";
     if (fMapMusli)
         delete fMapMusli;
     if (fCalMusli)
@@ -93,15 +93,15 @@ void R3BMusliVsMwpcOnlineSpectra::SetParContainers()
     // Parameter Container
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "R3BMusliVsMwpcOnlineSpectra::SetParContainers(), FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "R3BMusliVsMwpcOnlineSpectra::SetParContainers(), FairRuntimeDb not found");
 
     fMw1Geo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDet1 + "GeoPar");
-    R3BLOG_IF(ERROR,
+    R3BLOG_IF(error,
               !fMw1Geo_Par,
               "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet1 + "GeoPar container.");
 
     fMw2Geo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDet2 + "GeoPar");
-    R3BLOG_IF(ERROR,
+    R3BLOG_IF(error,
               !fMw2Geo_Par,
               "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet2 + "GeoPar container.");
 }
@@ -109,14 +109,14 @@ void R3BMusliVsMwpcOnlineSpectra::SetParContainers()
 InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init ";
+    LOG(info) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BMusliVsMwpcOnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3BMusliVsMwpcOnlineSpectra::Init FairRootManager not found";
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -132,24 +132,24 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
     fCalMusli = (TClonesArray*)mgr->GetObject("MusliCalData");
     if (!fCalMusli)
     {
-        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
+        LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
     }
 
     // get access to hit data of the musli detectors
     fHitMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
     if (!fHitMusli)
     {
-        LOG(INFO) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
+        LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
     }
 
     // get access to hit data of mwpcs
     fHitMwpcDet1 = (TClonesArray*)mgr->GetObject(fNameDet1 + "HitData");
     if (!fHitMwpcDet1)
-        LOG(WARNING) << "R3BMusliVsMwpcOnlineSpectra: " + fNameDet1 + "HitData not found";
+        LOG(warn) << "R3BMusliVsMwpcOnlineSpectra: " + fNameDet1 + "HitData not found";
 
     fHitMwpcDet2 = (TClonesArray*)mgr->GetObject(fNameDet2 + "HitData");
     if (!fHitMwpcDet2)
-        LOG(WARNING) << "R3BMusliVsMwpcOnlineSpectra: " + fNameDet2 + "HitData not found";
+        LOG(warn) << "R3BMusliVsMwpcOnlineSpectra: " + fNameDet2 + "HitData not found";
 
     // Create histograms for detectors
     char Name1[255];
@@ -665,7 +665,7 @@ InitStatus R3BMusliVsMwpcOnlineSpectra::Init()
 void R3BMusliVsMwpcOnlineSpectra::Reset_Histo()
 {
 
-    LOG(INFO) << "R3BMusliVsMwpcOnlineSpectra::Reset_Histo";
+    LOG(info) << "R3BMusliVsMwpcOnlineSpectra::Reset_Histo";
     for (Int_t j = 0; j < 15; j++)
     {
         fh2_mapDTvsX1[j]->Reset();
@@ -690,7 +690,7 @@ void R3BMusliVsMwpcOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BMusliVsMwpcOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BMusliVsMwpcOnlineSpectra::Exec FairRootManager not found";
 
     Int_t nHits;
     UInt_t rank;

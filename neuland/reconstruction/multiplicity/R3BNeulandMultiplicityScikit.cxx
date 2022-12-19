@@ -32,7 +32,7 @@ InitStatus R3BNeulandMultiplicityScikit::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityScikit: No FairRootManager";
+        LOG(fatal) << "R3BNeulandMultiplicityScikit: No FairRootManager";
         return kFATAL;
     }
     ioman->RegisterAny(fOutputName, fMultiplicity, true);

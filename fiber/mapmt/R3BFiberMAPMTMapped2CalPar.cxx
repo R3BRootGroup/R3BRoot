@@ -46,14 +46,14 @@ R3BFiberMAPMTMapped2CalPar::~R3BFiberMAPMTMapped2CalPar()
 
 InitStatus R3BFiberMAPMTMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     auto rm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
     if (!fMapped)
     {
-        R3BLOG(FATAL, fName + " not found");
+        R3BLOG(fatal, fName + " not found");
         return kFATAL;
     }
 
@@ -66,7 +66,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not find " << name);                                  \
+            R3BLOG(error, "Could not find " << name);                                  \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \

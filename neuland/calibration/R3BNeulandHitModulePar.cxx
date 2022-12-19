@@ -30,7 +30,7 @@ R3BNeulandHitModulePar::~R3BNeulandHitModulePar() {}
 
 void R3BNeulandHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandHitModulePar::putParams() called";
+    LOG(info) << "R3BNeulandHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -116,20 +116,20 @@ void R3BNeulandHitModulePar::clear() {}
 
 void R3BNeulandHitModulePar::printParams()
 {
-    LOG(INFO) << "R3BNeulandHitModulePar: Calibration Parameters:";
-    LOG(INFO) << "   Bar ID: " << fModuleId;
-    LOG(INFO) << TString::Format("   TDiff:     %4.2f", fTDiff);
-    LOG(INFO) << TString::Format("   TSync:     %4.2f", fTSync);
-    LOG(INFO) << TString::Format("   Effective Speed: %4.2f", fEffectiveSpeed);
-    LOG(INFO) << TString::Format("   Light Attenuation Length: %4.1f", fLightAttenuationLength);
-    LOG(INFO) << TString::Format("   Energy Gain R/B:    %4.2f", fEnergyGain[0]);
-    LOG(INFO) << TString::Format("   Energy Gain L/T:    %4.2f\n", fEnergyGain[1]);
-    LOG(INFO) << TString::Format("   Pedestal R/B:     %4d\n", fPedestal[0]);
-    LOG(INFO) << TString::Format("   Pedestal L/T:     %4d\n", fPedestal[1]);
-    LOG(INFO) << TString::Format("   PMT Saturation R/B:  %4.2f\n", fPMTSaturation[0]);
-    LOG(INFO) << TString::Format("   PMT Saturation L/T:  %4.2f\n", fPMTSaturation[1]);
-    LOG(INFO) << TString::Format("   PMT Threshold R/B:   %4.2f\n", fPMTThreshold[0]);
-    LOG(INFO) << TString::Format("   PMT Threshold L/T:   %4.2f\n", fPMTThreshold[1]);
+    LOG(info) << "R3BNeulandHitModulePar: Calibration Parameters:";
+    LOG(info) << "   Bar ID: " << fModuleId;
+    LOG(info) << TString::Format("   TDiff:     %4.2f", fTDiff);
+    LOG(info) << TString::Format("   TSync:     %4.2f", fTSync);
+    LOG(info) << TString::Format("   Effective Speed: %4.2f", fEffectiveSpeed);
+    LOG(info) << TString::Format("   Light Attenuation Length: %4.1f", fLightAttenuationLength);
+    LOG(info) << TString::Format("   Energy Gain R/B:    %4.2f", fEnergyGain[0]);
+    LOG(info) << TString::Format("   Energy Gain L/T:    %4.2f\n", fEnergyGain[1]);
+    LOG(info) << TString::Format("   Pedestal R/B:     %4d\n", fPedestal[0]);
+    LOG(info) << TString::Format("   Pedestal L/T:     %4d\n", fPedestal[1]);
+    LOG(info) << TString::Format("   PMT Saturation R/B:  %4.2f\n", fPMTSaturation[0]);
+    LOG(info) << TString::Format("   PMT Saturation L/T:  %4.2f\n", fPMTSaturation[1]);
+    LOG(info) << TString::Format("   PMT Threshold R/B:   %4.2f\n", fPMTThreshold[0]);
+    LOG(info) << TString::Format("   PMT Threshold L/T:   %4.2f\n", fPMTThreshold[1]);
 }
 
 ClassImp(R3BNeulandHitModulePar);

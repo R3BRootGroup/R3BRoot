@@ -11,7 +11,7 @@
 # DetectorNo nStrips
 #   Strip# Gain
 #
-# WARNING: Never ever use TABS! Don't put a Space behind the Backslash!
+# warn: Never ever use TABS! Don't put a Space behind the Backslash!
 #################################################################
 [R3BPspxCalPar]
 //-------------------------------------------------------------

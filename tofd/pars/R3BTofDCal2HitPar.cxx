@@ -138,11 +138,11 @@ R3BTofDCal2HitPar::~R3BTofDCal2HitPar()
 
 InitStatus R3BTofDCal2HitPar::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -158,7 +158,7 @@ InitStatus R3BTofDCal2HitPar::Init()
     fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
     if (!fHitPar)
     {
-        R3BLOG(ERROR, "Could not get access to tofdHitPar container");
+        R3BLOG(error, "Could not get access to tofdHitPar container");
         return kFATAL;
     }
 
@@ -175,7 +175,7 @@ InitStatus R3BTofDCal2HitPar::Init()
 void R3BTofDCal2HitPar::SetParContainers()
 {
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
 }
 
 namespace
@@ -257,7 +257,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    R3BLOG(ERROR, "Missing trigger information!");
+                    R3BLOG(error, "Missing trigger information!");
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -285,12 +285,12 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
@@ -331,7 +331,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
                     }
@@ -375,7 +375,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     auto para = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
                     }
@@ -386,7 +386,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                                         // walk corrections
                                         if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. ||
                        para->GetPar3Walk() == 0. || para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.){
-                                            R3BLOG(WARNING, "Walk correction not found!");
+                                            R3BLOG(warn, "Walk correction not found!");
                                         }else{
 
                                         bot_ns = bot_ns - walk(bot_tot,
@@ -427,7 +427,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
                     }
@@ -451,7 +451,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                         continue;
                     }
@@ -612,7 +612,7 @@ void R3BTofDCal2HitPar::calcOffset()
     {
         if (fhTdiff[i])
         {
-            LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+            LOG(warn) << "Found histo Time_Diff_Plane_" << i + 1;
             // auto* h = (TH2F*)fhTdiff[i]->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -627,7 +627,7 @@ void R3BTofDCal2HitPar::calcOffset()
                 TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
+                LOG(warn) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
                 mpar->SetPlane(i + 1);
                 mpar->SetPaddle(j + 1);
                 mpar->SetOffset1(-offset / 2.);
@@ -650,7 +650,7 @@ void R3BTofDCal2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(i + 1, j + 1);
             if (fhSqrtQvsPosToT[i][j])
             {
-                LOG(INFO) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(info) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 // auto* h = fhSqrtQvsPosToT[i][j]->Clone();
                 cToTOffset->cd(1);
                 fhSqrtQvsPosToT[i][j]->Draw("colz");
@@ -671,7 +671,7 @@ void R3BTofDCal2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 cToTOffset->Update();
                 delete fgaus;
             }
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
+            LOG(warn) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
             par->SetToTOffset1(sqrt(exp(offset)));
             par->SetToTOffset2(1. / sqrt(exp(offset)));
         }
@@ -687,7 +687,7 @@ void R3BTofDCal2HitPar::calcSync()
     {
         if (fhTsync[i])
         {
-            LOG(INFO) << "Found histo Time_Sync_Plane_" << i + 1;
+            LOG(info) << "Found histo Time_Sync_Plane_" << i + 1;
             // auto h = fhTsync[i]->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -703,7 +703,7 @@ void R3BTofDCal2HitPar::calcSync()
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
-                LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                LOG(info) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
     }
@@ -714,7 +714,7 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
 {
     if (histo->GetEntries() < 100)
     {
-        R3BLOG(WARNING, "Nb of events below 100 for histo with index" << index);
+        R3BLOG(warn, "Nb of events below 100 for histo with index" << index);
         return;
     }
 
@@ -827,7 +827,7 @@ doagainfit:
     // TF1* fitz = new TF1("fitz", "[0]*TMath::Power(x,[2])+[1]", min, max);
     if (fZfitType != "pol1" && fZfitType != "pol2")
     {
-        R3BLOG(ERROR, "Fit " << fZfitType << " is not allowed, use pol1 or pol2 ");
+        R3BLOG(error, "Fit " << fZfitType << " is not allowed, use pol1 or pol2 ");
         return;
     }
     auto fitz = new TF1("fitz", fZfitType, min, max);
@@ -873,11 +873,11 @@ void R3BTofDCal2HitPar::calcVeff()
             Double_t veff = 7.;
             if (fhTdiff[i])
             {
-                LOG(INFO) << "Found histo Time_Diff_Plane_" << i + 1;
+                LOG(info) << "Found histo Time_Diff_Plane_" << i + 1;
                 auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
                 if (!par)
                 {
-                    LOG(WARNING) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                    LOG(warn) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
                     continue;
                 }
                 // auto* h = (TH2F*)histofilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
@@ -895,9 +895,9 @@ void R3BTofDCal2HitPar::calcVeff()
                 max = fgaus->GetParameter(1) + offset1 - offset2; /// TODO: needs to be tested
                 // max = max+offset1-offset2;
                 veff = fTofdY / max; // effective speed of light in [cm/s]
-                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
-                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
-                LOG(INFO) << "Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
+                LOG(info) << "Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
+                LOG(info) << "Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
+                LOG(info) << "Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
                 par->SetVeff(veff);
             }
         }
@@ -917,7 +917,7 @@ void R3BTofDCal2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
             auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
             if (fhSqrtQvsPosToT[i][j])
             {
-                LOG(INFO) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(info) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 // auto* h = (TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 fhSqrtQvsPosToT[i][j]->Draw("colz");
@@ -938,9 +938,9 @@ void R3BTofDCal2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
-            LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
+            LOG(info) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                       << "\n";
             par->SetLambda(lambda);
         }
@@ -1158,15 +1158,15 @@ void R3BTofDCal2HitPar::FinishTask()
         // assumes a sweep run in the middle of the ToF wall horizontally.
         // Since all paddles are mounted vertically one can determine the offset.
         // Half of the offset is added to PM1 and half to PM2.
-        LOG(INFO) << "Calling function calcOffset";
+        LOG(info) << "Calling function calcOffset";
         calcOffset();
         // Determine ToT offset between top and bottom PMT
-        LOG(INFO) << "Calling function calcToTOffset";
+        LOG(info) << "Calling function calcToTOffset";
         calcToTOffset(fTofdTotLow, fTofdTotHigh);
         // Determine sync offset between paddles
-        LOG(INFO) << "Calling function calcSync";
+        LOG(info) << "Calling function calcSync";
         calcSync();
-        LOG(ERROR) << "Call walk correction before next step!";
+        LOG(error) << "Call walk correction before next step!";
 
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
@@ -1181,17 +1181,17 @@ void R3BTofDCal2HitPar::FinishTask()
                 auto tof_offset = fgauss->GetParameter(1);
 
                 par->SetTofSyncOffset(tof_offset - fMeanTof);
-                LOG(INFO) << " Plane  " << i + 1 << " Bar " << j + 1 << " Tof-Sync  " << tof_offset;
+                LOG(info) << " Plane  " << i + 1 << " Bar " << j + 1 << " Tof-Sync  " << tof_offset;
             }
         }
     }
     else if (fParameter == 2)
     {
         // Determine effective speed of light in [cm/s] for each paddle
-        LOG(INFO) << "Calling function";
+        LOG(info) << "Calling function";
         calcVeff();
         // Determine light attenuation lambda for each paddle
-        LOG(INFO) << "Calling function calcLambda";
+        LOG(info) << "Calling function calcLambda";
         calcLambda(fTofdTotLow, fTofdTotHigh);
     }
     else if (fParameter == 3)
@@ -1199,7 +1199,7 @@ void R3BTofDCal2HitPar::FinishTask()
         // calculation of position dependend charge
         if (fTofdSmiley)
         {
-            LOG(INFO) << "Calling function smiley";
+            LOG(info) << "Calling function smiley";
             Double_t para2[4];
             for (Int_t i = 0; i < 4; i++)
                 para2[i] = 0.;
@@ -1212,7 +1212,7 @@ void R3BTofDCal2HitPar::FinishTask()
                 {
                     if (fhSqrtQvsPosToT[i][j])
                     {
-                        LOG(INFO) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                        LOG(info) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         auto par = fHitPar->GetModuleParAt(i + 1, j + 1);
                         smiley(fhSqrtQvsPosToT[i][j], min2, max2, para2);
                         par->SetPola(para2[0]);
@@ -1226,7 +1226,7 @@ void R3BTofDCal2HitPar::FinishTask()
         }
         else
         {
-            LOG(INFO) << "Calling function doubleExp";
+            LOG(info) << "Calling function doubleExp";
             Double_t para[4];
             for (Int_t i = 0; i < 4; i++)
                 para[i] = 0.;
@@ -1272,7 +1272,7 @@ void R3BTofDCal2HitPar::FinishTask()
     if (fParameter == 4)
     {
         // Z correction for each plane
-        LOG(WARNING) << "Calling function zcorr";
+        LOG(warn) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
         pars[0] = 0.;

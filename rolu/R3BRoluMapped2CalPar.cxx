@@ -81,7 +81,7 @@ InitStatus R3BRoluMapped2CalPar::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
-        LOG(FATAL) << "R3BRoluMapped2CalPar::Init() FairRootManager not found";
+        LOG(fatal) << "R3BRoluMapped2CalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
@@ -89,23 +89,23 @@ InitStatus R3BRoluMapped2CalPar::Init()
     // may be = NULL!
     if (!header)
     {
-        LOG(WARNING) << "R3BRoluMapped2CalPar::Init() EventHeader. not found";
+        LOG(warn) << "R3BRoluMapped2CalPar::Init() EventHeader. not found";
         header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BRoluMapped2CalPar::Init() R3BEventHeader found";
+        LOG(info) << "R3BRoluMapped2CalPar::Init() R3BEventHeader found";
 
     fMapped = (TClonesArray*)rm->GetObject("RoluMapped");
     if (!fMapped)
     {
-        LOG(FATAL) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
+        LOG(fatal) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
         return kFATAL;
     }
 
     fMappedTrigger = (TClonesArray*)rm->GetObject("RoluTriggerMapped");
     if (!fMappedTrigger)
     {
-        LOG(WARNING) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
+        LOG(warn) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
     }
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
@@ -113,7 +113,7 @@ InitStatus R3BRoluMapped2CalPar::Init()
 
     if (!fNofModules)
     {
-        LOG(FATAL) << "R3BRoluMapped2CalPar::Init() Number of modules not set. ";
+        LOG(fatal) << "R3BRoluMapped2CalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -146,20 +146,20 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
 
         if (iDetector > (fNofDetectors - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
                        << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
                        << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes - 1))
         {
-            LOG(ERROR) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
                        << " allowed are 0.." << (fNofTypes - 1);
             continue;
         }

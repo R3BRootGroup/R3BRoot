@@ -53,7 +53,7 @@ namespace R3BAtima
     {
         if (!read(path))
         {
-            LOG(INFO) << "AtimaCache-File '" << path
+            LOG(info) << "AtimaCache-File '" << path
                       << "' does not exist or does not match the provided Data! Will (re)calculate and (over)write!";
 
             fProjMass = pMass_u;
@@ -72,7 +72,7 @@ namespace R3BAtima
 
         if (energy_MeV_per_u < fEnergies.MinValue || energy_MeV_per_u > fEnergies.MaxValue ||
             distance_mm < fDistances.MinValue || distance_mm > fDistances.MaxValue)
-            LOG(FATAL) << "R3BAtima::Cache: given value outside of calculated range!";
+            LOG(fatal) << "R3BAtima::Cache: given value outside of calculated range!";
 
         TransportResult res;
 

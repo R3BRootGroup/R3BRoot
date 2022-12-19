@@ -112,11 +112,11 @@ R3BFiberMAPMTOnlineSpectra::~R3BFiberMAPMTOnlineSpectra()
 void R3BFiberMAPMTOnlineSpectra::SetParContainers()
 {
     fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
-    R3BLOG_IF(ERROR, !fMapPar, "Couldn't get " << fName << "MappingPar");
+    R3BLOG_IF(error, !fMapPar, "Couldn't get " << fName << "MappingPar");
     if (fMapPar)
     {
         fNbfibers = fMapPar->GetNbChannels();
-        R3BLOG(INFO, fName << "MappingPar found with " << fNbfibers << " fibers");
+        R3BLOG(info, fName << "MappingPar found with " << fNbfibers << " fibers");
     }
 }
 
@@ -131,7 +131,7 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
@@ -141,11 +141,11 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, " EventHeader. found");
+        R3BLOG(info, " EventHeader. found");
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
@@ -153,16 +153,16 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 
     // Get data levels
     fMappedItems = (TClonesArray*)mgr->GetObject(fName + "Mapped");
-    R3BLOG_IF(FATAL, NULL == fMappedItems, fName + "Mapped not found");
+    R3BLOG_IF(fatal, NULL == fMappedItems, fName + "Mapped not found");
 
     fCalItems = (TClonesArray*)mgr->GetObject(fName + "Cal");
-    R3BLOG_IF(FATAL, NULL == fCalItems, fName + "Cal not found");
+    R3BLOG_IF(fatal, NULL == fCalItems, fName + "Cal not found");
 
     fCalTriggerItems = (TClonesArray*)mgr->GetObject(fName + "TriggerCal");
-    R3BLOG_IF(FATAL, NULL == fCalTriggerItems, fName + "TriggerCal not found");
+    R3BLOG_IF(fatal, NULL == fCalTriggerItems, fName + "TriggerCal not found");
 
     fHitItems = (TClonesArray*)mgr->GetObject(fName + "Hit");
-    R3BLOG_IF(WARNING, NULL == fHitItems, fName + "Hit not found");
+    R3BLOG_IF(warn, NULL == fHitItems, fName + "Hit not found");
 
     //------------------------------------------------------------------------
     // create histograms
@@ -352,7 +352,7 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 }
 void R3BFiberMAPMTOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     if (fCalItems)
     {
         fh_channels_Fib->Reset();

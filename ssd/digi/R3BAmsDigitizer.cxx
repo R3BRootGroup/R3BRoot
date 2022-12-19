@@ -44,11 +44,11 @@ R3BAmsDigitizer::~R3BAmsDigitizer()
 
 InitStatus R3BAmsDigitizer::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rootManager = FairRootManager::Instance();
 
-    R3BLOG_IF(FATAL, !rootManager, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rootManager, "FairRootManager not found");
 
     fPointData = (TClonesArray*)rootManager->GetObject("TraPoint");
     if (!fPointData)
@@ -122,7 +122,7 @@ R3BAmsStripCalData* R3BAmsDigitizer::AddCal(Int_t detid, Int_t sideid, Int_t str
     TClonesArray& clref = *fCalData;
     Int_t size = clref.GetEntriesFast();
 
-    R3BLOG_IF(INFO,
+    R3BLOG_IF(info,
               fVerbose,
               "Adding StripCalData "
                   << " with unique identifier " << detid << " strip " << stripid << " side " << sideid

@@ -67,7 +67,7 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
 
 R3BIncomingIDOnlineSpectra::~R3BIncomingIDOnlineSpectra()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (fHitFrs)
         delete fHitFrs;
     if (fHitLos)
@@ -83,37 +83,37 @@ void R3BIncomingIDOnlineSpectra::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, NULL == rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, NULL == rtdb, "FairRuntimeDb not found");
 
     fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
-    R3BLOG_IF(ERROR, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
+    R3BLOG_IF(error, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
 
     fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
-    R3BLOG_IF(ERROR, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
+    R3BLOG_IF(error, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
     return;
 }
 
 InitStatus R3BIncomingIDOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
-    R3BLOG_IF(ERROR, !header, "Branch EventHeader. not found");
+    R3BLOG_IF(error, !header, "Branch EventHeader. not found");
 
     // get access to mapped data of FRS
     fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
-    R3BLOG_IF(FATAL, !fHitFrs, "Branch FrsData not found");
+    R3BLOG_IF(fatal, !fHitFrs, "Branch FrsData not found");
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    R3BLOG_IF(FATAL, !fHitLos, "Branch LosHitData not found");
+    R3BLOG_IF(fatal, !fHitLos, "Branch LosHitData not found");
     fMwpc0HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc0HitData");
-    R3BLOG_IF(FATAL, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
+    R3BLOG_IF(fatal, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
     fMwpc1HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc1HitData");
-    R3BLOG_IF(FATAL, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
+    R3BLOG_IF(fatal, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
 
     // Create histograms for detectors
     TString Name1;
@@ -355,7 +355,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
 void R3BIncomingIDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fh2_Pos2vsAoQ_m1->Reset();
     fh1_beta->Reset();
     fh1_tof->Reset();

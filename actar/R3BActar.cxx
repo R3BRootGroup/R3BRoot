@@ -67,13 +67,13 @@ void R3BActar::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BActar: initialisation";
+    LOG(info) << "R3BActar: initialisation";
     LOG(DEBUG) << "R3BActar: Vol. (McId) " << gMC->VolId("PSP1Log");
 }
 
 void R3BActar::SetSpecialPhysicsCuts()
 {
-    // LOG(INFO) << "R3BActar: Adding customized Physics cut ... ";
+    // LOG(info) << "R3BActar: Adding customized Physics cut ... ";
 
     return;
 
@@ -99,7 +99,7 @@ void R3BActar::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "R3BActar: helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BActar: helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -224,10 +224,10 @@ void R3BActar::EndOfEvent()
     Double_t avalancheSize = garfieldPhysics->GetAvalancheSize();
     Double_t gain = garfieldPhysics->GetGain();
 
-    LOG(INFO) << "Garfield output:";
-    LOG(INFO) << "  energy deposit: " << edep;
-    LOG(INFO) << "  avalanche size: " << avalancheSize;
-    LOG(INFO) << "            gain: " << gain;
+    LOG(info) << "Garfield output:";
+    LOG(info) << "  energy deposit: " << edep;
+    LOG(info) << "  avalanche size: " << avalancheSize;
+    LOG(info) << "            gain: " << gain;
 
     if (fVerboseLevel)
         Print();
@@ -257,7 +257,7 @@ TClonesArray* R3BActar::GetCollection(Int_t iColl) const
 void R3BActar::Print(Option_t* option) const
 {
     Int_t nHits = fPspCollection->GetEntriesFast();
-    LOG(INFO) << "R3BActar: " << nHits << " points registered in this event";
+    LOG(info) << "R3BActar: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -273,7 +273,7 @@ void R3BActar::Reset()
 void R3BActar::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BActar: " << nEntries << " entries to add";
+    LOG(info) << "R3BActar: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BActarPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -284,7 +284,7 @@ void R3BActar::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BActarPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BActar: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BActar: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -303,7 +303,7 @@ R3BActarPoint* R3BActar::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BActar: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BActar: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BActarPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);

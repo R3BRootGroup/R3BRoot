@@ -117,8 +117,8 @@ void R3BDch2pDigitizer::SetParContainers()
 
     if (fDch2pDigiPar)
     {
-        LOG(INFO) << "R3BDch2pDigitizer::SetParContainers() ";
-        LOG(INFO) << "Container R3BDch2pDigiPar  loaded ";
+        LOG(info) << "R3BDch2pDigitizer::SetParContainers() ";
+        LOG(info) << "Container R3BDch2pDigiPar  loaded ";
     }
 }
 

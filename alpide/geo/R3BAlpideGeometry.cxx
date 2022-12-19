@@ -49,7 +49,7 @@ bool R3BAlpideGeometry::Init(Int_t version)
     else
         return kTRUE;
 
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
     geoPath += "/geometry/";
 

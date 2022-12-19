@@ -59,7 +59,7 @@ R3BTofDHitModulePar::~R3BTofDHitModulePar() { clear(); }
 
 void R3BTofDHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTofDHitModulePar::putParams() called";
+    LOG(info) << "R3BTofDHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -89,23 +89,23 @@ void R3BTofDHitModulePar::clear() { fPlane = fPaddle = 0; }
 
 void R3BTofDHitModulePar::printParams()
 {
-    LOG(INFO) << "   TOFd HIT Calibration Parameters: ";
-    LOG(INFO) << "   fPlane: " << fPlane;
-    LOG(INFO) << "   fPaddle: " << fPaddle;
-    LOG(INFO) << "   fOffset1: " << fOffset1;
-    LOG(INFO) << "   fOffset2: " << fOffset2;
-    LOG(INFO) << "   fToTOffset1: " << fToTOffset1;
-    LOG(INFO) << "   fToTOffset2: " << fToTOffset2;
-    LOG(INFO) << "   fSync: " << fSync;
-    LOG(INFO) << "   fTofSyncOffset: " << fTofSyncOffset;
-    LOG(INFO) << "   fTofSyncSlope: " << fTofSyncSlope;
-    LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fLambda: " << fLambda;
-    LOG(INFO) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
-    LOG(INFO) << "   fDoubleExp2: " << fPar2a << "  " << fPar2b << "  " << fPar2c << "  " << fPar2d;
-    LOG(INFO) << "   fPol3: " << fPola << "  " << fPolb << "  " << fPolc << "  " << fPold;
-    LOG(INFO) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
-    LOG(INFO) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
+    LOG(info) << "   TOFd HIT Calibration Parameters: ";
+    LOG(info) << "   fPlane: " << fPlane;
+    LOG(info) << "   fPaddle: " << fPaddle;
+    LOG(info) << "   fOffset1: " << fOffset1;
+    LOG(info) << "   fOffset2: " << fOffset2;
+    LOG(info) << "   fToTOffset1: " << fToTOffset1;
+    LOG(info) << "   fToTOffset2: " << fToTOffset2;
+    LOG(info) << "   fSync: " << fSync;
+    LOG(info) << "   fTofSyncOffset: " << fTofSyncOffset;
+    LOG(info) << "   fTofSyncSlope: " << fTofSyncSlope;
+    LOG(info) << "   fVeff: " << fVeff;
+    LOG(info) << "   fLambda: " << fLambda;
+    LOG(info) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
+    LOG(info) << "   fDoubleExp2: " << fPar2a << "  " << fPar2b << "  " << fPar2c << "  " << fPar2d;
+    LOG(info) << "   fPol3: " << fPola << "  " << fPolb << "  " << fPolc << "  " << fPold;
+    LOG(info) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
+    LOG(info) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
               << fPar5walk;
 }
 

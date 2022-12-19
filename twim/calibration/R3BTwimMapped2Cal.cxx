@@ -81,16 +81,16 @@ void R3BTwimMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on twimCalPar container");
+        R3BLOG(error, "Couldn't get handle on twimCalPar container");
     }
     else
     {
-        R3BLOG(INFO, "twimCalPar container opened");
+        R3BLOG(info, "twimCalPar container opened");
     }
     return;
 }
@@ -108,15 +108,15 @@ void R3BTwimMapped2Cal::SetParameter()
     fNumEParams = fCal_Par->GetNumParamsEFit();     // Number of parameters for energy calibration
     fNumPosParams = fCal_Par->GetNumParamsPosFit(); // Number of parameters for position calibration
 
-    R3BLOG(INFO, "Nb sections: " << fNumSec);
-    R3BLOG(INFO, "Nb anodes: " << fNumAnodes);
-    R3BLOG(INFO, "Nb of twim Ref anodes: " << fNumAnodesRef);
-    R3BLOG(INFO, "Nb of twim Trigger anodes: " << fNumAnodesTrig);
-    R3BLOG(INFO, "Nb of twim Max. multiplicity per anode: " << fMaxMult);
-    R3BLOG(INFO, "Twim Min Drift Time accepted: " << fMinDT);
-    R3BLOG(INFO, "Twim Max Drift Time accepted: " << fMaxDT);
-    R3BLOG(INFO, "Nb parameters from energy cal fit: " << fNumEParams);
-    R3BLOG(INFO, "Nb parameters from position cal fit: " << fNumPosParams);
+    R3BLOG(info, "Nb sections: " << fNumSec);
+    R3BLOG(info, "Nb anodes: " << fNumAnodes);
+    R3BLOG(info, "Nb of twim Ref anodes: " << fNumAnodesRef);
+    R3BLOG(info, "Nb of twim Trigger anodes: " << fNumAnodesTrig);
+    R3BLOG(info, "Nb of twim Max. multiplicity per anode: " << fMaxMult);
+    R3BLOG(info, "Twim Min Drift Time accepted: " << fMinDT);
+    R3BLOG(info, "Twim Max Drift Time accepted: " << fMaxDT);
+    R3BLOG(info, "Nb parameters from energy cal fit: " << fNumEParams);
+    R3BLOG(info, "Nb parameters from position cal fit: " << fNumPosParams);
 
     CalEParams.resize(fNumSec);
     PosParams.resize(fNumSec);
@@ -141,7 +141,7 @@ void R3BTwimMapped2Cal::SetParameter()
         for (Int_t i = 0; i < fNumAnodes; i++)
             if (CalEParams[s]->GetAt(fNumEParams * i + 1) == -1 || fCal_Par->GetInUse(s + 1, i + 1) == 0)
                 numdeadanodes++;
-        R3BLOG(INFO, "Dead (or not used) anodes in section " << s + 1 << ": " << numdeadanodes);
+        R3BLOG(info, "Dead (or not used) anodes in section " << s + 1 << ": " << numdeadanodes);
     }
     return;
 }
@@ -149,12 +149,12 @@ void R3BTwimMapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -164,14 +164,14 @@ InitStatus R3BTwimMapped2Cal::Init()
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
-        R3BLOG(INFO, "fExpId :" << fExpId);
+        R3BLOG(info, "fExpId :" << fExpId);
     }
 
     // INPUT DATA
     fTwimMappedDataCA = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fTwimMappedDataCA)
     {
-        R3BLOG(FATAL, "TwimMappedData not found");
+        R3BLOG(fatal, "TwimMappedData not found");
         return kFATAL;
     }
 

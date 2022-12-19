@@ -142,7 +142,7 @@ void R3BAladinFieldMap::Init()
 
         sprintf(str, "R3BAladinFieldMap ---> %d: cos %7.4f sin %7.4f", i, gCoords[i].fCosa, gCoords[i].fSina);
 
-        LOG(INFO) << str;
+        LOG(info) << str;
     }
 
     // Read the field maps
@@ -169,13 +169,13 @@ void R3BAladinFieldMap::Init()
         TString mapName(filename);
         TString dir = getenv("VMCWORKDIR");
         TString fMapFileName = dir + "/field/magField/Aladin/newmap/" + mapName;
-        LOG(INFO) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName;
+        LOG(info) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName;
 
         fin = fopen(fMapFileName, "r");
 
         if (!fin)
         {
-            LOG(ERROR) << "Failure opening field map : " << fMapFileName;
+            LOG(error) << "Failure opening field map : " << fMapFileName;
         }
 
         // free(fMapFileName.Data());
@@ -214,14 +214,14 @@ void R3BAladinFieldMap::Init()
                            &bdummy);
 
             if (n != 9)
-                LOG(ERROR) << "Failure parsing field from map: " << filename << " @ line: % " << line;
+                LOG(error) << "Failure parsing field from map: " << filename << " @ line: % " << line;
 
             if (I != measured_I[i])
-                LOG(ERROR) << "Wrong current " << I << " when parsing field from map " << filename
+                LOG(error) << "Wrong current " << I << " when parsing field from map " << filename
                            << " @ line: " << line;
 
             if (rl != 0 && rl != 1)
-                LOG(ERROR) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
+                LOG(error) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
 
             for (int j = 0; j < 3; j++)
             {
@@ -237,7 +237,7 @@ void R3BAladinFieldMap::Init()
                             field->f[rl][0]._np[j],
                             filename,
                             line);
-                    LOG(ERROR) << str;
+                    LOG(error) << str;
                 }
             }
 
@@ -262,7 +262,7 @@ void R3BAladinFieldMap::Init()
 
         gMapIFieldOrig.insert(map_fields_ALADiN::value_type(measured_I[i], field));
 
-        LOG(INFO) << "R3BAladinFieldMap: Reading field map: " << filename;
+        LOG(info) << "R3BAladinFieldMap: Reading field map: " << filename;
     }
 
     // Has to ben changed somehow using
@@ -280,7 +280,7 @@ void R3BAladinFieldMap::Init()
     gRot->RotateY(-1. * Glad_angle);
     gTrans = new TVector3(0.0, 0.0, -1. * DistanceFromtargetToAladinCenter);
 
-    LOG(INFO) << "R3BAladinFieldMap::Init() called";
+    LOG(info) << "R3BAladinFieldMap::Init() called";
     InitField();
 
     // Init has been called
@@ -407,7 +407,7 @@ void R3BAladinFieldMap::InitField()
 
     if (iter2 == gMapIFieldOrig.begin())
     {
-        LOG(ERROR) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
+        LOG(error) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
     }
     --iter1;
 

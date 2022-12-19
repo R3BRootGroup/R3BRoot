@@ -63,7 +63,7 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar(const char* name, I
 
 R3BCalifaMapped2CrystalCalPar::~R3BCalifaMapped2CrystalCalPar()
 {
-    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar: Delete instance";
+    LOG(info) << "R3BCalifaMapped2CrystalCalPar: Delete instance";
     if (fCalifaMappedDataCA)
         delete fCalifaMappedDataCA;
     if (fEnergyPeaks)
@@ -77,17 +77,17 @@ void R3BCalifaMapped2CrystalCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaMappingPar container";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaMappingPar container";
     }
     else
     {
-        LOG(INFO) << "R3BCalifaMapped2CrystalCalPar:: califaMappingPar container open";
+        LOG(info) << "R3BCalifaMapped2CrystalCalPar:: califaMappingPar container open";
     }
 }
 
@@ -95,17 +95,17 @@ void R3BCalifaMapped2CrystalCalPar::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(WARNING) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
+        LOG(warn) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
     }
     //--- Parameter Container ---
     fNumCrystals = fMap_Par->GetNumCrystals(); // Number of crystals x 2
-    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar::NumCry " << fNumCrystals;
+    LOG(info) << "R3BCalifaMapped2CrystalCalPar::NumCry " << fNumCrystals;
     // fMap_Par->printParams();
 }
 
 InitStatus R3BCalifaMapped2CrystalCalPar::Init()
 {
-    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar::Init()";
+    LOG(info) << "R3BCalifaMapped2CrystalCalPar::Init()";
 
     if (!fEnergyPeaks)
     {
@@ -116,28 +116,28 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
         return kFATAL;
     }
 
@@ -300,13 +300,13 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                     }
                     if (fNumParam > 5)
                     {
-                        LOG(WARNING)
+                        LOG(warn)
                             << "R3BCalifaMapped2CrystalCalPar:: The number of fit parameters can not be higher than 5";
                     }
                 }
                 else
                 {
-                    LOG(WARNING)
+                    LOG(warn)
                         << "R3BCalifaMapped2CrystalCalPar:: No imput number of fit parameters, therefore, by default "
                            "NumberParameters=2";
                     f1 = new TF1("f1", "[0]+[1]*x", fleft, fright);
@@ -322,7 +322,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
             }
             else
             {
-                LOG(WARNING) << "R3BCalifaMapped2CrystalCalPar::Histogram number " << i + 1 << "not Fitted";
+                LOG(warn) << "R3BCalifaMapped2CrystalCalPar::Histogram number " << i + 1 << "not Fitted";
             }
         }
 

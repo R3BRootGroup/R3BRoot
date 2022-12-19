@@ -54,7 +54,7 @@ R3BPspxCal2Hit::R3BPspxCal2Hit(const char* name, Int_t iVerbose)
 R3BPspxCal2Hit::~R3BPspxCal2Hit()
 {
 
-    LOG(INFO) << "R3BPspxCal2Hit: Delete instance";
+    LOG(info) << "R3BPspxCal2Hit: Delete instance";
     for (Int_t i = 0; i < fCalItems.size(); i++)
     {
         delete fCalItems[i];
@@ -70,14 +70,14 @@ R3BPspxCal2Hit::~R3BPspxCal2Hit()
 void R3BPspxCal2Hit::SetParameters()
 {
 
-    LOG(INFO) << "In R3BPspxCal2Hit::SetParameters()";
+    LOG(info) << "In R3BPspxCal2Hit::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fHitPar->GetNumDetectors(); // Number of Detectors/Faces
     orientation.resize(nDet);
     detSize.resize(nDet);
     posOffset.resize(nDet);
     posSlope.resize(nDet);
-    LOG(INFO) << "Position Parameters";
+    LOG(info) << "Position Parameters";
     Int_t parOffset = 1; // 1 "header" parameter.
     for (Int_t d = 0; d < nDet; d++)
     {
@@ -87,14 +87,14 @@ void R3BPspxCal2Hit::SetParameters()
         posOffset[d] = par.At(parOffset + 4);
         posSlope[d] = par.At(parOffset + 5);
         parOffset += 6; // move to next line in parameter file.
-        LOG(INFO) << "Det: " << d << "\torientation: " << orientation[d] << "\tdetSize: " << detSize[d]
+        LOG(info) << "Det: " << d << "\torientation: " << orientation[d] << "\tdetSize: " << detSize[d]
                   << "\toffset: " << posOffset[d] << "\tslope: " << posSlope[d];
     }
 
     eOffset.resize(nDet);
     eGain.resize(nDet);
     eRange.resize(nDet);
-    LOG(INFO) << "Energy Parameters";
+    LOG(info) << "Energy Parameters";
     parOffset = 1; // 1 "header" parameter.
     for (Int_t d = 0; d < nDet; d++)
     {
@@ -103,7 +103,7 @@ void R3BPspxCal2Hit::SetParameters()
         eGain[d] = par.At(parOffset + 3);
         eRange[d] = par.At(parOffset + 4);
         parOffset += 5; // move to next line in parameter file.
-        LOG(INFO) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d];
+        LOG(info) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d];
     }
 }
 
@@ -114,7 +114,7 @@ InitStatus R3BPspxCal2Hit::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::Init() Root-manager not found.";
+        LOG(error) << "R3BPspxCal2Hit::Init() Root-manager not found.";
         return kFATAL;
     }
 
@@ -168,18 +168,18 @@ void R3BPspxCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::FairRuntimeDb not opened!";
+        LOG(error) << "R3BPspxCal2Hit::FairRuntimeDb not opened!";
         return;
     }
     else
     {
-        LOG(INFO) << "R3BPspxCal2Hit::SetParContainers()";
+        LOG(info) << "R3BPspxCal2Hit::SetParContainers()";
     }
 
     fHitPar = (R3BPspxHitPar*)rtdb->getContainer("R3BPspxHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
+        LOG(error) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
         return;
     }
 
@@ -191,13 +191,13 @@ void R3BPspxCal2Hit::SetParContainers()
 // -- Initialize/Read parameter file for conversion.
 InitStatus R3BPspxCal2Hit::ReInit()
 {
-    LOG(INFO) << " R3BPspxCal2Hit :: ReInit() ";
+    LOG(info) << " R3BPspxCal2Hit :: ReInit() ";
     /*
         fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
+            LOG(error) << "Could not get access to R3BPspxHitPar-Container.";
             return kFATAL;
         }*/
 

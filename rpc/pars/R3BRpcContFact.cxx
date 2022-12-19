@@ -66,7 +66,7 @@ FairParSet* R3BRpcContFact::createContainer(FairContainer* c)
      */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BRpcContFact: Create container name: " << name;
+    LOG(info) << "R3BRpcContFact: Create container name: " << name;
     FairParSet* p = 0;
     if (strcmp(name, "RpcTotCalPar") == 0)
     {

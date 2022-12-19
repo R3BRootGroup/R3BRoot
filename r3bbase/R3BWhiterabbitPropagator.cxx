@@ -47,11 +47,11 @@ R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 
 InitStatus R3BWhiterabbitPropagator::Init()
 {
-    LOG(INFO) << "R3BWhiterabbitPropagator::Init()";
+    LOG(info) << "R3BWhiterabbitPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
     if (NULL == frm)
     {
-        LOG(FATAL) << "R3BWhiterabbitPropagator::Init() FairRootManager not found";
+        LOG(fatal) << "R3BWhiterabbitPropagator::Init() FairRootManager not found";
         return kFATAL;
     }
 
@@ -59,7 +59,7 @@ InitStatus R3BWhiterabbitPropagator::Init()
     fInputItem = (TClonesArray*)frm->GetObject(fNameWR + "Data");
     if (!fInputItem)
     {
-        LOG(FATAL) << "R3BWhiterabbitPropagator::Init() " + fNameWR + "Data not found";
+        LOG(fatal) << "R3BWhiterabbitPropagator::Init() " + fNameWR + "Data not found";
         return kFATAL;
     }
 

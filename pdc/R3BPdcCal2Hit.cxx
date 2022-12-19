@@ -106,7 +106,7 @@ InitStatus R3BPdcCal2Hit::Init()
         fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+            LOG(error) << "Could not get access to PdcHitPar-Container.";
             fNofHitPars = 0;
             return kFATAL;
         }
@@ -114,7 +114,7 @@ InitStatus R3BPdcCal2Hit::Init()
         fNofHitPars = fHitPar->GetNumModulePar();
         if (fNofHitPars == 0)
         {
-            LOG(ERROR) << "There are no Hit parameters in container PdcHitPar";
+            LOG(error) << "There are no Hit parameters in container PdcHitPar";
             return kFATAL;
         }
     */
@@ -135,7 +135,7 @@ InitStatus R3BPdcCal2Hit::Init()
     if (header == nullptr)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
     fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
@@ -159,7 +159,7 @@ void R3BPdcCal2Hit::SetParContainers()
         fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+            LOG(error) << "Could not get access to PdcHitPar-Container.";
             fNofHitPars = 0;
             return;
         }

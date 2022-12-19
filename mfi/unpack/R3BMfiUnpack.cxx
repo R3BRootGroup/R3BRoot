@@ -44,7 +44,7 @@ R3BMfiUnpack::R3BMfiUnpack(Short_t type, Short_t subType, Short_t procId, Short_
 // Virtual R3BMfiUnpack: Public method
 R3BMfiUnpack::~R3BMfiUnpack()
 {
-    LOG(INFO) << "R3BMfiUnpack: Delete instance";
+    LOG(info) << "R3BMfiUnpack: Delete instance";
     delete fRawData;
 }
 
@@ -59,7 +59,7 @@ Bool_t R3BMfiUnpack::Init()
 void R3BMfiUnpack::Register()
 {
     //  LOG(DEBUG) << "Registering";
-    LOG(INFO) << "R3BMfiUnpack : Registering...";
+    LOG(info) << "R3BMfiUnpack : Registering...";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
@@ -129,7 +129,7 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
         }
     }
 
-    LOG(INFO) << "R3BMfiUnpack : Number of hits in MFI: " << fNHits;
+    LOG(info) << "R3BMfiUnpack : Number of hits in MFI: " << fNHits;
     return kTRUE;
 }
 

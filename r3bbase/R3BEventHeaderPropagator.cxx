@@ -37,23 +37,23 @@ R3BEventHeaderPropagator::~R3BEventHeaderPropagator()
 
 InitStatus R3BEventHeaderPropagator::Init()
 {
-    LOG(INFO) << "R3BEventHeaderPropagator::Init()";
+    LOG(info) << "R3BEventHeaderPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fHeader)
     {
         fHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
-        LOG(WARNING) << "R3BEventHeaderPropagator::Init() FairEventHeader not found";
+        LOG(warn) << "R3BEventHeaderPropagator::Init() FairEventHeader not found";
     }
     else
-        LOG(INFO) << "R3BEventHeaderPropagator::Init() EventHeader found";
+        LOG(info) << "R3BEventHeaderPropagator::Init() EventHeader found";
 
     frm->Register(fNameHeader, "EventHeader", fHeader, kTRUE);
 
     fSource = R3BFileSource::Instance();
     if (!fSource)
     {
-        LOG(ERROR) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
+        LOG(error) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
     }
     return kSUCCESS;
 }

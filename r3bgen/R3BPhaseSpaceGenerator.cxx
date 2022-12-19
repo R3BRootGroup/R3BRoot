@@ -36,7 +36,7 @@ R3BPhaseSpaceGenerator::R3BPhaseSpaceGenerator(unsigned int seed)
 bool R3BPhaseSpaceGenerator::Init()
 {
     if (fMasses.size() < 2)
-        LOG(FATAL) << "R3BPhaseSpaceGenerator::Init: Not enough Particles! At least two are required.";
+        LOG(fatal) << "R3BPhaseSpaceGenerator::Init: Not enough Particles! At least two are required.";
 
     fTotMass = std::accumulate(fMasses.begin(), fMasses.end(), 0.);
     return true;

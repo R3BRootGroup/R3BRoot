@@ -97,7 +97,7 @@ R3BMusicMapped2CalPar_S515::R3BMusicMapped2CalPar_S515(const TString& name,
 // Virtual R3BMusicMapped2CalPar_S515: Destructor
 R3BMusicMapped2CalPar_S515::~R3BMusicMapped2CalPar_S515()
 {
-    LOG(INFO) << "R3BMusicMapped2CalPar_S515: Delete instance";
+    LOG(info) << "R3BMusicMapped2CalPar_S515: Delete instance";
     if (fMusicMappedDataCA)
         delete fMusicMappedDataCA;
     if (fHitItemsMwpcA)
@@ -109,7 +109,7 @@ R3BMusicMapped2CalPar_S515::~R3BMusicMapped2CalPar_S515()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicMapped2CalPar_S515::Init()
 {
-    LOG(INFO) << "R3BMusicMapped2CalPar_S515: Init";
+    LOG(info) << "R3BMusicMapped2CalPar_S515: Init";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -121,7 +121,7 @@ InitStatus R3BMusicMapped2CalPar_S515::Init()
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: MusicMappedData not found";
+        LOG(error) << "R3BMusicMapped2CalPar_S515: MusicMappedData not found";
         return kFATAL;
     }
 
@@ -129,14 +129,14 @@ InitStatus R3BMusicMapped2CalPar_S515::Init()
     fHitItemsMwpcA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
     if (!fHitItemsMwpcA)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: " + fNameDetA + "HitData not found";
+        LOG(error) << "R3BMusicMapped2CalPar_S515: " + fNameDetA + "HitData not found";
         return kFATAL;
     }
 
     fHitItemsLos = (TClonesArray*)rootManager->GetObject(fNameDetB + "Hit");
     if (!fHitItemsLos)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar_S515: " + fNameDetB + "Hit not found";
+        LOG(error) << "R3BMusicMapped2CalPar_S515: " + fNameDetB + "Hit not found";
         return kFATAL;
     }
 
@@ -149,7 +149,7 @@ InitStatus R3BMusicMapped2CalPar_S515::Init()
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar_S515:: Couldn't get handle on musicCalPar container";
+        LOG(error) << "R3BMusicMapped2CalPar_S515:: Couldn't get handle on musicCalPar container";
         return kFATAL;
     }
 
@@ -192,14 +192,14 @@ void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
     {
         hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
         PosMwpcA.SetX(hitMwAData[i]->GetX());
-        // LOG(INFO) <<hitMwAData[i]->GetX();
+        // LOG(info) <<hitMwAData[i]->GetX();
     }
     R3BLosHitData** hitLosData = new R3BLosHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
         hitLosData[i] = (R3BLosHitData*)(fHitItemsLos->At(i));
         PosLos.SetX(hitLosData[i]->GetX_cm());
-        // LOG(INFO) <<hitMwBData[i]->GetX();
+        // LOG(info) <<hitMwBData[i]->GetX();
     }
 
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];

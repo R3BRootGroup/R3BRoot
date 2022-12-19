@@ -114,7 +114,7 @@ InitStatus R3BFragmentTracker::Init()
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
     if (NULL == fArrayMCTracks)
     {
-        LOG(ERROR) << "No MC Track array found in input file.";
+        LOG(error) << "No MC Track array found in input file.";
         return kERROR;
     }
 
@@ -236,8 +236,8 @@ void R3BFragmentTracker::Exec(const Option_t*)
                                                             ion->GetPz(),
                                                             beta,
                                                             ion->GetMass());
-    // LOG(INFO) << "MC mass " << ion->GetMass();
-    // LOG(INFO) << "MC beta " << beta;
+    // LOG(info) << "MC mass " << ion->GetMass();
+    // LOG(info) << "MC beta " << beta;
 
     fh_mult_psp->Fill(psp->hits.size());
     fh_mult_fi4->Fill(fi4->hits.size());
@@ -414,7 +414,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
         fh_vz_res->Fill(candidate->GetStartPosition().X() - particle->GetStartPosition().X());
         fh_beta_res->Fill((candidate->GetStartBeta() - particle->GetStartBeta()) / particle->GetStartBeta());
         // candidate->GetStartPosition().Print();
-        // LOG(INFO) << (candidate->GetMass() / amu);
+        // LOG(info) << (candidate->GetMass() / amu);
 
         Double_t x_l = 0.;
         Double_t y_l = 0.;
@@ -495,7 +495,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
     if (0 == (fNEvents % 10))
     {
-        LOG(INFO) << "Event: " << fNEvents;
+        LOG(info) << "Event: " << fNEvents;
     }
 
     fNEvents += 1;
@@ -580,7 +580,7 @@ void R3BFragmentTracker::Finish()
         Int_t bin2 = fh_A_reco2->FindLastBinAbove(fh_A_reco2->GetMaximum() / 2.);
         Double_t fwhm = fh_A_reco2->GetBinCenter(bin2) - fh_A_reco2->GetBinCenter(bin1);
 
-        LOG(INFO) << fwhm / fh_A_reco2->GetMean();
+        LOG(info) << fwhm / fh_A_reco2->GetMean();
 
         new TCanvas("c7", "", 500, 600, 500, 500);
         fh_chi2->Draw();
@@ -631,7 +631,7 @@ Bool_t R3BFragmentTracker::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field.";
+        LOG(error) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

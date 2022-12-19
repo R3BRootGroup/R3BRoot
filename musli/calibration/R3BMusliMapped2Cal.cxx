@@ -70,16 +70,16 @@ void R3BMusliMapped2Cal::SetParContainers()
     // Parameter Container
     // Reading musicCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "R3BMusliMapped2Cal::SetParContainers() Couldn't get handle on musliCalPar container");
+        R3BLOG(error, "R3BMusliMapped2Cal::SetParContainers() Couldn't get handle on musliCalPar container");
     }
     else
     {
-        R3BLOG(INFO, "R3BMusliMapped2Cal::SetParContainers() musliCalPar container open");
+        R3BLOG(info, "R3BMusliMapped2Cal::SetParContainers() musliCalPar container open");
     }
 }
 
@@ -106,20 +106,20 @@ void R3BMusliMapped2Cal::SetParameters()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusliMapped2Cal::Init()
 {
-    R3BLOG(INFO, "R3BMusliMapped2Cal::Init()");
+    R3BLOG(info, "R3BMusliMapped2Cal::Init()");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "R3BMusliMapped2Cal::Init() FairRootManager not found.");
+        R3BLOG(fatal, "R3BMusliMapped2Cal::Init() FairRootManager not found.");
         return kFATAL;
     }
 
     fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
     if (!fMusliMappedDataCA)
     {
-        R3BLOG(FATAL, "R3BMusliMapped2Cal::Init() MusliMappedData not found.");
+        R3BLOG(fatal, "R3BMusliMapped2Cal::Init() MusliMappedData not found.");
         return kFATAL;
     }
 

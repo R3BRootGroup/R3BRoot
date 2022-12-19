@@ -42,10 +42,10 @@ R3BTCalModulePar::~R3BTCalModulePar()
 
 void R3BTCalModulePar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return;
     }
     list->add("plane", fPlane);
@@ -60,10 +60,10 @@ void R3BTCalModulePar::putParams(FairParamList* list)
 
 Bool_t R3BTCalModulePar::getParams(FairParamList* list)
 {
-    // R3BLOG(INFO, "called");
+    // R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return kFALSE;
     }
     if (!list->fill("plane", &fPlane))
@@ -116,15 +116,15 @@ void R3BTCalModulePar::clear()
 
 void R3BTCalModulePar::printParams()
 {
-    R3BLOG(INFO, "Time Calibration Parameters:");
-    LOG(INFO) << "   fPlane: " << fPlane;
-    LOG(INFO) << "   fPaddle: " << fPaddle;
-    LOG(INFO) << "   fSide: " << fSide;
-    LOG(INFO) << "   fNofChannels: " << fNofChannels;
+    R3BLOG(info, "Time Calibration Parameters:");
+    LOG(info) << "   fPlane: " << fPlane;
+    LOG(info) << "   fPaddle: " << fPaddle;
+    LOG(info) << "   fSide: " << fSide;
+    LOG(info) << "   fNofChannels: " << fNofChannels;
     for (Int_t i = 0; i < fNofChannels; i++)
     {
         if ((fBinLow[i] != 0) && (fBinUp[i] != 0) && (fSlope[i] != 0))
-            LOG(INFO) << "   BinLow: " << fBinLow[i] << " BinUp " << fBinUp[i] << " Slope:" << fSlope[i]
+            LOG(info) << "   BinLow: " << fBinLow[i] << " BinUp " << fBinUp[i] << " Slope:" << fSlope[i]
                       << " Offset:" << fOffset[i];
     }
 }

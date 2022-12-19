@@ -94,28 +94,28 @@ Bool_t R3BTrloiiSampReader::Init(ext_data_struct_info* a_struct_info)
     if (1 == fSNum && 1 == fSCNum)
     {
         EXT_STR_h101_SAMP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMP, 0);
-        R3BLOG(INFO, "R3BTrloiiSampReader::Init() SAMP");
+        R3BLOG(info, "R3BTrloiiSampReader::Init() SAMP");
     }
     else if (1 == fSNum && 2 == fSCNum)
     {
         EXT_STR_h101_SAMPLOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOS, 0);
-        R3BLOG(INFO, "R3BTrloiiSampReader::Init() SAMPLOS");
+        R3BLOG(info, "R3BTrloiiSampReader::Init() SAMPLOS");
     }
     else if (2 == fSNum && 1 == fSCNum)
     {
         EXT_STR_h101_SAMPMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPMS, 0);
-        R3BLOG(INFO, "R3BTrloiiSampReader::Init() SAMP master start");
+        R3BLOG(info, "R3BTrloiiSampReader::Init() SAMP master start");
     }
     else if (2 == fSNum && 2 == fSCNum)
     {
         EXT_STR_h101_SAMPLOSMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOSMS, 0);
-        R3BLOG(INFO, "R3BTrloiiSampReader::Init() SAMPLOS master start");
+        R3BLOG(info, "R3BTrloiiSampReader::Init() SAMPLOS master start");
     }
 
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -175,7 +175,7 @@ Bool_t R3BTrloiiSampReader::Read()
     {
         if (fSampLosData->SAMPLOSL != fSampLosData->SAMPLOSH)
         {
-            R3BLOG(WARNING, "SAMPLOSL and SAMPLOSH array size mismatch!");
+            R3BLOG(warn, "SAMPLOSL and SAMPLOSH array size mismatch!");
             return kFALSE;
         }
         else
@@ -202,7 +202,7 @@ Bool_t R3BTrloiiSampReader::Read()
     {
         if (fSampLosMSData->SAMPMSL != fSampLosMSData->SAMPMSH)
         {
-            R3BLOG(WARNING, "SAMPMSL and SAMPMSH array size mismatch!");
+            R3BLOG(warn, "SAMPMSL and SAMPMSH array size mismatch!");
             return kFALSE;
         }
         else

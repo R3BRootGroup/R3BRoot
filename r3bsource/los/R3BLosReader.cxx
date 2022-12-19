@@ -67,24 +67,24 @@ R3BLosReader::~R3BLosReader()
 Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information.");
+        R3BLOG(fatal, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
     }
 
     // Register output array in tree

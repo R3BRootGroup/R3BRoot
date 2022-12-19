@@ -50,12 +50,12 @@ R3BFootSiReader::~R3BFootSiReader() { delete fArray; }
 Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_FOOT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FOOT, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -87,7 +87,7 @@ Bool_t R3BFootSiReader::Read()
         else
         {
             if (fNEvent > 0)
-                LOG(FATAL) << "\033[5m\033[31m R3BFootSiReader::Failed number of strips per detector. \033[0m";
+                LOG(fatal) << "\033[5m\033[31m R3BFootSiReader::Failed number of strips per detector. \033[0m";
         }
     }
     fNEvent += 1;

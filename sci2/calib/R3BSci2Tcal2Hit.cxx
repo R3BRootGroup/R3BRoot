@@ -60,22 +60,22 @@ R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
 
 void R3BSci2Tcal2Hit::SetParContainers()
 {
-    LOG(INFO) << "R3BSci2Tcal2Hit::SetParContainers()";
+    LOG(info) << "R3BSci2Tcal2Hit::SetParContainers()";
     // Parameter Container
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fSci2Hit_Par = (R3BSci2HitPar*)rtdb->getContainer("Sci2HitPar");
     if (!fSci2Hit_Par)
     {
-        LOG(ERROR) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
+        LOG(error) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
     }
     else
     {
-        LOG(INFO) << "R3BSci2Tcal2Hit:: R3BSci2HitPar container open";
+        LOG(info) << "R3BSci2Tcal2Hit:: R3BSci2HitPar container open";
     }
 }
 
@@ -176,7 +176,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
 				        {
 					        if(tCh[d][iCh][j])	//skip event if already set. Pileup
 					        {
-						        LOG(WARNING) << "Pileup Event. Skipping Event.";
+						        LOG(warn) << "Pileup Event. Skipping Event.";
 						        return;
 					        }
 			    

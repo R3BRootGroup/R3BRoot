@@ -76,21 +76,21 @@ void R3BMusliCal2Hit::SetParContainers()
     // Parameter Container
     // Reading musicHitPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "R3BMusliCal2Hit::SetParContainers(), FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "R3BMusliCal2Hit::SetParContainers(), FairRuntimeDb not found");
 
     fHit_Par = (R3BMusliHitPar*)rtdb->getContainer("musliHitPar");
     if (!fHit_Par)
     {
-        R3BLOG(ERROR, "R3BMusliCal2Hit::SetParContainers() Couldn't get handle on musliHitPar container");
+        R3BLOG(error, "R3BMusliCal2Hit::SetParContainers() Couldn't get handle on musliHitPar container");
     }
     else
     {
-        R3BLOG(INFO, "R3BMusliCal2Hit::SetParContainers() musliHitPar container open");
+        R3BLOG(info, "R3BMusliCal2Hit::SetParContainers() musliHitPar container open");
     }
 
     // Reading the TGeoPar from the FairRun
     fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
-    R3BLOG_IF(ERROR, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
+    R3BLOG_IF(error, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
 }
 
 void R3BMusliCal2Hit::SetParameters()
@@ -118,26 +118,26 @@ void R3BMusliCal2Hit::SetParameters()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusliCal2Hit::Init()
 {
-    R3BLOG(INFO, "R3BMusliCal2Hit::Init()");
+    R3BLOG(info, "R3BMusliCal2Hit::Init()");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "R3BMusliCal2Hit::Init() FairRootManager not found.");
+        R3BLOG(fatal, "R3BMusliCal2Hit::Init() FairRootManager not found.");
         return kFATAL;
     }
 
     fMusliCalDataCA = (TClonesArray*)rootManager->GetObject("MusliCalData");
     if (!fMusliCalDataCA)
     {
-        R3BLOG(INFO, "R3BMusliCal2Hit::Init() MusliCalData not found.");
+        R3BLOG(info, "R3BMusliCal2Hit::Init() MusliCalData not found.");
     }
 
     fFrsDataCA = (TClonesArray*)rootManager->GetObject("FrsData");
     if (!fFrsDataCA)
     {
-        R3BLOG(INFO, "R3BMusliCal2Hit::Init() FrsData not found.");
+        R3BLOG(info, "R3BMusliCal2Hit::Init() FrsData not found.");
     }
 
     // OUTPUT DATA

@@ -70,7 +70,7 @@ void R3BStrawtubesMapped2CalPar::Exec(Option_t* option)
         auto mapped = (R3BStrawtubesMappedData*)fMapped->At(i);
         if (!mapped)
         {
-            LOG(ERROR) << "R3BStrawtubesMapped2CalPar::Exec(): What is this crap?";
+            LOG(error) << "R3BStrawtubesMapped2CalPar::Exec(): What is this crap?";
             continue;
         }
 

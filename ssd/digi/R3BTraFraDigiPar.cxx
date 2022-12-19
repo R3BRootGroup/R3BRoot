@@ -23,7 +23,7 @@ R3BTraFraDigiPar::R3BTraFraDigiPar(const char* name, const char* title, const ch
 
 void R3BTraFraDigiPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "-I- R3BTraFraDigiPar::putParams() called";
+    LOG(info) << "-I- R3BTraFraDigiPar::putParams() called";
     if (!list)
         return;
     //  list->add("max_paddle", (Int_t)nMaxPaddle);
@@ -32,10 +32,10 @@ void R3BTraFraDigiPar::putParams(FairParamList* list)
 
 Bool_t R3BTraFraDigiPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "-I- R3BTraFraDigiPar::getParams() called";
+    LOG(info) << "-I- R3BTraFraDigiPar::getParams() called";
     if (!list)
         return kFALSE;
-    LOG(INFO) << "-I- R3BTraFraDigiPar::getParams() 1 ";
+    LOG(info) << "-I- R3BTraFraDigiPar::getParams() 1 ";
 
     //  if (!list->fill("max_paddle", &nMaxPaddle)) return kFALSE;
     //  if (!list->fill("max_plane", &nMaxPlane)) return kFALSE;
@@ -44,9 +44,9 @@ Bool_t R3BTraFraDigiPar::getParams(FairParamList* list)
 
 void R3BTraFraDigiPar::Print(Option_t* option) const
 {
-    LOG(INFO) << "-I- TraFra Digi Parameters:";
-    //    LOG(INFO)<<"   Max Paddle   = "<<nMaxPaddle;
-    //    LOG(INFO)<<"   Max Plane   = "<<nMaxPlane;
+    LOG(info) << "-I- TraFra Digi Parameters:";
+    //    LOG(info)<<"   Max Paddle   = "<<nMaxPaddle;
+    //    LOG(info)<<"   Max Plane   = "<<nMaxPlane;
 }
 
 ClassImp(R3BTraFraDigiPar);

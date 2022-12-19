@@ -85,7 +85,7 @@ R3BNeuland::~R3BNeuland()
 
 void R3BNeuland::Initialize()
 {
-    LOG(INFO) << "R3BNeuland initialization ...";
+    LOG(info) << "R3BNeuland initialization ...";
 
     FairDetector::Initialize();
 
@@ -100,7 +100,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     {
         if (!fLastHitDone)
         {
-            LOG(WARNING) << "R3BNeuland: Incomplete hit discarded";
+            LOG(warn) << "R3BNeuland: Incomplete hit discarded";
             ResetValues();
         }
 
@@ -184,7 +184,7 @@ void R3BNeuland::Register()
 
 void R3BNeuland::Print(Option_t*) const
 {
-    LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
+    LOG(info) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
 }
 
 void R3BNeuland::Reset()
@@ -223,7 +223,7 @@ void R3BNeuland::WriteParameterFile()
 
     if (!geoNodeNeuland)
     {
-        LOG(FATAL) << "volNeuland not found";
+        LOG(fatal) << "volNeuland not found";
     }
 
     fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);

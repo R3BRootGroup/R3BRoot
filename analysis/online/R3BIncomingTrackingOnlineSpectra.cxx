@@ -113,16 +113,16 @@ void R3BIncomingTrackingOnlineSpectra::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, NULL == rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, NULL == rtdb, "FairRuntimeDb not found");
 
     fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
-    R3BLOG_IF(ERROR, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
+    R3BLOG_IF(error, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
 
     // fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
-    // R3BLOG_IF(ERROR, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
+    // R3BLOG_IF(error, !fTargetGeoPar, "Could not get access to TargetGeoPar container.");
 
     fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
-    R3BLOG_IF(ERROR, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
+    R3BLOG_IF(error, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
     return;
 }
 
@@ -135,21 +135,21 @@ InitStatus R3BIncomingTrackingOnlineSpectra::ReInit()
 
 InitStatus R3BIncomingTrackingOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fMwpc0HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc0HitData");
     if (!fMwpc0HitDataCA)
     {
-        R3BLOG(FATAL, "Mwpc0HitData not found");
+        R3BLOG(fatal, "Mwpc0HitData not found");
         return kFATAL;
     }
 
     fMwpc1HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc1HitData");
     if (!fMwpc1HitDataCA)
     {
-        R3BLOG(FATAL, "Mwpc1HitData not found");
+        R3BLOG(fatal, "Mwpc1HitData not found");
         return kFATAL;
     }
 
@@ -314,7 +314,7 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     mainfol->Add(cAPY);
 
     FairRunOnline* run = FairRunOnline::Instance();
-    R3BLOG_IF(FATAL, NULL == run, "FairRunOnline not found");
+    R3BLOG_IF(fatal, NULL == run, "FairRunOnline not found");
     run->GetHttpServer()->Register("", this);
     run->AddObject(mainfol);
 
@@ -327,7 +327,7 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
 
 void R3BIncomingTrackingOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fh2_tracking_planeXZ->Reset();
     fh2_tracking_planeYZ->Reset();
     fh2_target_PosXY->Reset();

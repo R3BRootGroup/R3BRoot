@@ -16,7 +16,7 @@ InitStatus R3BNeulandNeutronsCheat::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "TCAInputConnector: No FairRootManager";
+        LOG(fatal) << "TCAInputConnector: No FairRootManager";
         return kFATAL;
     }
     fMultiplicity = ioman->InitObjectAs<const R3BNeulandMultiplicity*>(fInputMultName);

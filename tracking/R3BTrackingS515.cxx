@@ -94,25 +94,27 @@ R3BTrackingS515::~R3BTrackingS515()
 
 InitStatus R3BTrackingS515::Init()
 {
-    LOG(INFO) << "R3BTrackingS515::Init()";
+    LOG(info) << "R3BTrackingS515::Init()";
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
+    {
         LOG(fatal) << "FairRootManager not found";
+    }
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!fHeader)
     {
-        LOG(WARNING) << "R3BTrackingS515::Init() EventHeader. not found";
+        LOG(warn) << "R3BTrackingS515::Init() EventHeader. not found";
     }
     // Reading all detector branches
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
-    LOG(INFO) << "Reading " << NOF_FIB_DET << " fiber detectors";
+    LOG(info) << "Reading " << NOF_FIB_DET << " fiber detectors";
     for (int det = 0; det < DET_MAX; det++)
     {
         fDataItems.push_back((TClonesArray*)mgr->GetObject(Form("%s", fDetectorNames[det])));
         if (NULL == fDataItems.at(det))
         {
-            R3BLOG(FATAL, Form("\n\n Cannot find tree branch %s \n\n", fDetectorNames[det]));
+            R3BLOG(fatal, Form("\n\n Cannot find tree branch %s \n\n", fDetectorNames[det]));
         }
     }
     // check if all cuts are properly set
@@ -120,25 +122,25 @@ InitStatus R3BTrackingS515::Init()
         FrsCutRadiusAoZ < 0 || FrsBrhoMin < 0 || FrsBrhoMax < 0 || MusicZMin < 0 || MusicZMax < 0 ||
         FiberEnergyMin < 0 || FiberEnergyMax < 0)
     {
-        R3BLOG(FATAL, Form(" Some cuts are not set or negative values are used\n\n"));
+        R3BLOG(fatal, Form(" Some cuts are not set or negative values are used\n\n"));
     }
     // Initializing all MDF functions
-    LOG(INFO) << "Reading MDF function for FlightPath";
+    LOG(info) << "Reading MDF function for FlightPath";
     MDF_FlightPath = new R3BMDFWrapper(MDF_FlightPath_filename.Data());
 
-    LOG(INFO) << "Reading MDF function for PoQ";
+    LOG(info) << "Reading MDF function for PoQ";
     MDF_PoQ = new R3BMDFWrapper(MDF_PoQ_filename.Data());
 
-    LOG(INFO) << "Reading MDF function for TX0";
+    LOG(info) << "Reading MDF function for TX0";
     MDF_TX0 = new R3BMDFWrapper(MDF_TX0_filename.Data());
 
-    LOG(INFO) << "Reading MDF function for TY0";
+    LOG(info) << "Reading MDF function for TY0";
     MDF_TY0 = new R3BMDFWrapper(MDF_TY0_filename.Data());
 
-    LOG(INFO) << "Reading MDF function for TX1";
+    LOG(info) << "Reading MDF function for TX1";
     MDF_TX1 = new R3BMDFWrapper(MDF_TX1_filename.Data());
 
-    LOG(INFO) << "Reading MDF function for TY1";
+    LOG(info) << "Reading MDF function for TY1";
     MDF_TY1 = new R3BMDFWrapper(MDF_TY1_filename.Data());
 
     // linking to global pointer (needed by alignment)
@@ -158,7 +160,9 @@ void R3BTrackingS515::Exec(Option_t* option)
     fNEvents += 1;
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
+    {
         LOG(fatal) << "FairRootManager not found";
+    }
 
     // Accessing TClonesArrays from every detector
     auto tofd_DataItems = fDataItems.at(DET_TOFD);
@@ -333,7 +337,7 @@ void R3BTrackingS515::FinishEvent()
 
 void R3BTrackingS515::FinishTask()
 {
-    LOG(INFO) << "Processed " << fNEvents << " events\n\n";
+    LOG(info) << "Processed " << fNEvents << " events\n\n";
     if (DoAlignment)
         Alignment();
 }
@@ -569,4 +573,4 @@ double R3BTrackingS515::AlignmentErrorS515(const double* par)
     // std::cout << "\nReturning error: " << v;
     return v;
 }
-ClassImp(R3BTrackingS515)
+ClassImp(R3BTrackingS515);

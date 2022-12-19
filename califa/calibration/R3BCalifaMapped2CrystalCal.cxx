@@ -52,26 +52,26 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     // Parameter Container
     // Reading califaCrystalCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on califaCrystalCalPar container");
+        R3BLOG(error, "Couldn't get handle on califaCrystalCalPar container");
     }
     else
     {
-        R3BLOG(INFO, "califaCrystalCalPar container opened");
+        R3BLOG(info, "califaCrystalCalPar container opened");
     }
 
     fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
     if (!fTotCal_Par)
     {
-        R3BLOG(WARNING, "Couldn't get handle on CalifaTotCalPar container");
+        R3BLOG(warn, "Couldn't get handle on CalifaTotCalPar container");
     }
     else
     {
-        R3BLOG(INFO, "CalifaTotCalPar container opened");
+        R3BLOG(info, "CalifaTotCalPar container opened");
     }
 }
 
@@ -99,8 +99,8 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     fCalParams = fCal_Par->GetCryCalParams(); // Array with the Cal parameters
     assert(fCalParams->GetSize() >= fNumCrystals * fNumParams);
 
-    R3BLOG(INFO, "Max Crystal ID " << fNumCrystals);
-    R3BLOG(INFO, "Nb of parameters used in the fits " << fNumParams);
+    R3BLOG(info, "Max Crystal ID " << fNumCrystals);
+    R3BLOG(info, "Nb of parameters used in the fits " << fNumParams);
 
     //--- Parameter Container --- Tot
     fNumTotParams = fTotCal_Par->GetNumParametersFit(); // Number of Parameters
@@ -119,7 +119,7 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     auto& tot = *fCalTotParams;
     if (fNumParams != 2 || fNumCrystals < 2 * offset)
     {
-        R3BLOG(WARNING, "Not checking calibration in former proton range.");
+        R3BLOG(warn, "Not checking calibration in former proton range.");
         return;
     }
     auto invalid = [&cal](int id) {
@@ -140,7 +140,7 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
                 tot[fNumTotParams * (id - 1) + p] = tot[fNumTotParams * (id - 1 + offset) + p];
         }
 
-    R3BLOG_IF(WARNING,
+    R3BLOG_IF(warn,
               replaced,
               replaced << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
                           "barrel range.");
@@ -148,20 +148,20 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
 
 InitStatus R3BCalifaMapped2CrystalCal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
-        R3BLOG(FATAL, "CalifaMappedData not found");
+        R3BLOG(fatal, "CalifaMappedData not found");
         return kFATAL;
     }
 
@@ -218,9 +218,9 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 
     //   c      QPID Ns     Ns
 
-    const uint32_t ANY_ERRORS = 0x061e;
-    const uint32_t QPID_ERRORS = 0x1980 | ANY_ERRORS;
-    const uint32_t EN_ERRORS = 0x0020 | ANY_ERRORS;
+    const uint32_t ANY_errorS = 0x061e;
+    const uint32_t QPID_errorS = 0x1980 | ANY_errorS;
+    const uint32_t EN_errorS = 0x0020 | ANY_errorS;
 
     for (Int_t i = 0; i < nHits; i++)
     {
@@ -240,9 +240,9 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             Ns = 2
         };
         double raw[3];
-        raw[en] = validate_smear(ov & EN_ERRORS, mappedData[i]->GetEnergy());
-        raw[Nf] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNf());
-        raw[Ns] = validate_smear(ov & QPID_ERRORS, mappedData[i]->GetNs());
+        raw[en] = validate_smear(ov & EN_errorS, mappedData[i]->GetEnergy());
+        raw[Nf] = validate_smear(ov & QPID_errorS, mappedData[i]->GetNf());
+        raw[Ns] = validate_smear(ov & QPID_errorS, mappedData[i]->GetNs());
         double cal[3] = { 0, 0, 0 };
 
         if (0 < crystalId && crystalId <= fNumCrystals)

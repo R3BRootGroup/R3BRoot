@@ -164,7 +164,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraFibvsToFDS494::Init ";
+    LOG(info) << "R3BOnlineSpectraFibvsToFDS494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -177,18 +177,18 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        LOG(WARNING) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. not found";
+        LOG(warn) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. not found";
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. found";
+        LOG(info) << "R3BOnlineSpectraFibvsToFDS494::Init() EventHeader. found";
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 
     // Get objects for detectors on all levels
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
-    LOG(INFO) << " I HAVE FOUND " << DET_MAX + 1 << " DETECTORS";
+    LOG(info) << " I HAVE FOUND " << DET_MAX + 1 << " DETECTORS";
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
 
     for (int det = 0; det < DET_MAX; det++)
@@ -218,7 +218,7 @@ InitStatus R3BOnlineSpectraFibvsToFDS494::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found";
+        LOG(warn) << "R3BOnlineSpectra: CalifaMappedData not found";
     }
 
     //-----------------------------------------------------------------------

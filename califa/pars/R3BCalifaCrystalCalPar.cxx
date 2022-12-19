@@ -48,14 +48,14 @@ void R3BCalifaCrystalCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BCalifaCrystalCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaCrystalCalPar::putParams() called";
+    LOG(info) << "R3BCalifaCrystalCalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = fNumCrystals * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fCryCalParams->Set(array_size);
 
@@ -67,7 +67,7 @@ void R3BCalifaCrystalCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaCrystalCalPar::getParams() called";
+    LOG(info) << "R3BCalifaCrystalCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -84,12 +84,12 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumCrystals * fNumParamsFit;
-    LOG(INFO) << "Nb_crystals * Nb_pars: " << array_size;
+    LOG(info) << "Nb_crystals * Nb_pars: " << array_size;
     fCryCalParams->Set(array_size);
 
     if (!(list->fill("califaCrystalCalPar", fCryCalParams)))
     {
-        LOG(INFO) << "---Could not initialize califaCrystalCalPar";
+        LOG(info) << "---Could not initialize califaCrystalCalPar";
         return kFALSE;
     }
 
@@ -104,34 +104,34 @@ void R3BCalifaCrystalCalPar::printCalCrystalInfo(const UInt_t cryID)
 {
     if (cryID < 1)
     {
-        LOG(ERROR) << "crystal_id must be given in 1-base";
+        LOG(error) << "crystal_id must be given in 1-base";
         return;
     }
     else if (cryID > fNumCrystals)
     {
-        LOG(ERROR) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
+        LOG(error) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
         return;
     }
     auto index = cryID - 1;
-    LOG(INFO) << "Califa Crystal number: " << cryID;
+    LOG(info) << "Califa Crystal number: " << cryID;
     for (Int_t j = 0; j < fNumParamsFit; j++)
     {
-        LOG(INFO) << "FitParam(" << j + 1 << ") = " << fCryCalParams->GetAt(index * fNumParamsFit + j);
+        LOG(info) << "FitParam(" << j + 1 << ") = " << fCryCalParams->GetAt(index * fNumParamsFit + j);
     }
 }
 
 // ----  Method printParams ----------------------------------------------------
 void R3BCalifaCrystalCalPar::printParams()
 {
-    LOG(INFO) << "R3BCalifaCrystalCalPar::Califa Crystal Calibration Parameters: ";
+    LOG(info) << "R3BCalifaCrystalCalPar::Califa Crystal Calibration Parameters: ";
     Int_t array_size = fNumCrystals * fNumParamsFit;
 
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
-        LOG(INFO) << "Califa Crystal number: " << i + 1;
+        LOG(info) << "Califa Crystal number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j + 1 << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
+            LOG(info) << "FitParam(" << j + 1 << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

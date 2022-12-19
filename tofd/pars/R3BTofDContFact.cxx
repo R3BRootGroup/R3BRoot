@@ -63,7 +63,7 @@ FairParSet* R3BTofDContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    R3BLOG(INFO, name);
+    R3BLOG(info, name);
     FairParSet* p = 0;
     if (strcmp(name, "tofdGeoPar") == 0)
     {

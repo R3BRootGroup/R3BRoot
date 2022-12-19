@@ -57,7 +57,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (lvlSrc == -1)
     {
-        LOG(ERROR) << "R3BGammaGenerator: Could not pick initial level";
+        LOG(error) << "R3BGammaGenerator: Could not pick initial level";
         return kFALSE;
     }
 
@@ -88,7 +88,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         }
         if (lvlDst == -1)
         {
-            LOG(ERROR) << "R3BGammaGenerator: Could not pick final level from initial level " << lvlSrc;
+            LOG(error) << "R3BGammaGenerator: Could not pick final level from initial level " << lvlSrc;
             break;
         }
 
@@ -110,7 +110,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator* primGen)
 {
     if (E <= 0)
     {
-        LOG(ERROR) << "R3BGammaGenerator: E < 0!";
+        LOG(error) << "R3BGammaGenerator: E < 0!";
         return;
     }
 

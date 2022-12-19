@@ -98,7 +98,7 @@ R3BNeulandTacquilaMapped2Cal::~R3BNeulandTacquilaMapped2Cal()
 
 InitStatus R3BNeulandTacquilaMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
+    LOG(info) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -150,7 +150,7 @@ void R3BNeulandTacquilaMapped2Cal::SetParameter()
                 i++;
             }
 
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i;
+    LOG(info) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i;
 
     fMapQdcOffset = tempMapQdcOffset;
 }
@@ -259,7 +259,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time = par->GetTimeTacquila(tdc);
         if (time < 0. || time > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time;
             continue;
         }
@@ -275,7 +275,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time2 = par->GetTimeTacquila(tdc);
         if (time2 < 0. || time2 > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time2;
             continue;
         }
@@ -297,7 +297,7 @@ void R3BNeulandTacquilaMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1000))
     {
-        LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
+        LOG(info) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

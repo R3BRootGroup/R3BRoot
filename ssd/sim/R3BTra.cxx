@@ -69,7 +69,7 @@ void R3BTra::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BTra: initialisation";
+    LOG(info) << "R3BTra: initialisation";
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot_");
@@ -85,7 +85,7 @@ void R3BTra::Initialize()
 
 void R3BTra::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "R3BTra: Adding customized Physics cut ... ";
+    LOG(info) << "R3BTra: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -109,7 +109,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -154,7 +154,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for LiH Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: LiH Medium Id " << pLiH->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pLiH->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -189,7 +189,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Vac Medium Id " << pVac->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Vac
             gMC->Gstpar(pVac->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -224,7 +224,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Vac Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Gold Medium Id " << pGold->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Gold
             gMC->Gstpar(pGold->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -259,7 +259,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Mylar Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Mylar Medium Id " << pM->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Mylar
             gMC->Gstpar(pM->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -294,7 +294,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for aluminium Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Aluminium Medium Id " << pAl->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Al
             gMC->Gstpar(pAl->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -329,7 +329,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Carbon Medium Id " << pC->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // C
             gMC->Gstpar(pC->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -364,7 +364,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for carbon Only
             Double_t cutE = fCutE;
 
-            LOG(INFO) << "R3BTra: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "R3BTra: Helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Helium
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -510,7 +510,7 @@ TClonesArray* R3BTra::GetCollection(Int_t iColl) const
 void R3BTra::Print(Option_t* option) const
 {
     Int_t nHits = fTraCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTra: " << nHits << " points registered in this event";
+    LOG(info) << "R3BTra: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -526,7 +526,7 @@ void R3BTra::Reset()
 void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTra: " << nEntries << " entries to add";
+    LOG(info) << "R3BTra: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BTraPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -537,7 +537,7 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTraPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -556,7 +556,7 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
     TClonesArray& clref = *fTraCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BTraPoint(trackID,
                                          detID,
@@ -576,7 +576,7 @@ Bool_t R3BTra::CheckIfSensitive(std::string name)
     if (TString(name).Contains("TraLog") || TString(name).Contains("Strip") || TString(name).Contains("Alpide") ||
         TString(name).Contains("Foot_"))
     {
-        // LOG(INFO) << "Found TRA geometry from ROOT file: " << name;
+        // LOG(info) << "Found TRA geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

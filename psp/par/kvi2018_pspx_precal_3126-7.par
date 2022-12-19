@@ -15,7 +15,7 @@
 # DetectorNo nStrips
 #   Channel# EnergyThreshold
 #
-# WARNING: Never ever use TABS! Don't put a Space behind the Backslash!
+# warn: Never ever use TABS! Don't put a Space behind the Backslash!
 #
 # Calibration done with pspx_run067 & pspx_mapped2precal_calib_frontback.C
 #################################################################

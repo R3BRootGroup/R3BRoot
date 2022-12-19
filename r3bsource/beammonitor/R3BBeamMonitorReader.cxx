@@ -45,11 +45,11 @@ R3BBeamMonitorReader::~R3BBeamMonitorReader()
 Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_BMON_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_BMON, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 

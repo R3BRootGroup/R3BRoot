@@ -68,16 +68,16 @@ void R3BFootMapped2StripCal::SetParContainers()
     // Parameter Container
     // Reading footCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BFootCalPar*)rtdb->getContainer("footCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "footCalPar container not found");
+        R3BLOG(error, "footCalPar container not found");
     }
     else
     {
-        R3BLOG(INFO, "footCalPar found");
+        R3BLOG(info, "footCalPar found");
     }
 }
 
@@ -88,9 +88,9 @@ void R3BFootMapped2StripCal::SetParameter()
     NumStrips = fCal_Par->GetNumStrips();  // Number of Strips
     NumParams = fCal_Par->GetNumParsFit(); // Number of Parameters
 
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb detectors: " << NumDets;
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb strips: " << NumStrips;
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb parameters from pedestal fit: " << NumParams;
+    LOG(info) << "R3BFootMapped2StripCal::Nb detectors: " << NumDets;
+    LOG(info) << "R3BFootMapped2StripCal::Nb strips: " << NumStrips;
+    LOG(info) << "R3BFootMapped2StripCal::Nb parameters from pedestal fit: " << NumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = NumDets * NumStrips * NumParams;
@@ -106,19 +106,19 @@ void R3BFootMapped2StripCal::SetParameter()
             if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
                 numdeadstrips++;
         }
-        LOG(INFO) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
+        LOG(info) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
     }
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BFootMapped2StripCal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rmg = FairRootManager::Instance();
     if (!rmg)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -126,7 +126,7 @@ InitStatus R3BFootMapped2StripCal::Init()
     fFootMappedData = (TClonesArray*)rmg->GetObject("FootMappedData");
     if (!fFootMappedData)
     {
-        R3BLOG(FATAL, "FootMappedData not found");
+        R3BLOG(fatal, "FootMappedData not found");
         return kFATAL;
     }
 

@@ -70,7 +70,7 @@ void R3BFootMappingPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BFootMappingPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFootMappingPar::putParams() called";
+    LOG(info) << "R3BFootMappingPar::putParams() called";
     if (!list)
     {
         return;
@@ -95,60 +95,60 @@ void R3BFootMappingPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BFootMappingPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFootMappingPar::getParams() called";
+    LOG(info) << "R3BFootMappingPar::getParams() called";
     if (!list)
     {
         return kFALSE;
     }
     if (!list->fill("footGeoPar", &fGeo))
     {
-        LOG(INFO) << "Could not initialize footGeoPar";
+        LOG(info) << "Could not initialize footGeoPar";
         return kFALSE;
     }
     if (!list->fill("footDetPar", &fNumDet))
     {
-        LOG(INFO) << "Could not initialize footDetPar";
+        LOG(info) << "Could not initialize footDetPar";
         return kFALSE;
     }
     fDistance2target->Set(fNumDet);
     if (!(list->fill("footDistance2targetPar", fDistance2target)))
     {
-        LOG(INFO) << "Could not initialize footDistance2targetPar";
+        LOG(info) << "Could not initialize footDistance2targetPar";
         return kFALSE;
     }
     fAngleTheta->Set(fNumDet);
     if (!(list->fill("footAngleThetaPar", fAngleTheta)))
     {
-        LOG(INFO) << "Could not initialize footAngleThetaPar";
+        LOG(info) << "Could not initialize footAngleThetaPar";
         return kFALSE;
     }
     fAnglePhi->Set(fNumDet);
     if (!(list->fill("footAnglePhiPar", fAnglePhi)))
     {
-        LOG(INFO) << "Could not initialize footAnglePhiPar";
+        LOG(info) << "Could not initialize footAnglePhiPar";
         return kFALSE;
     }
     fOffsetX->Set(fNumDet);
     if (!(list->fill("footOffsetXPar", fOffsetX)))
     {
-        LOG(INFO) << "Could not initialize footOffsetXPar";
+        LOG(info) << "Could not initialize footOffsetXPar";
         return kFALSE;
     }
     fOffsetY->Set(fNumDet);
     if (!(list->fill("footOffsetYPar", fOffsetY)))
     {
-        LOG(INFO) << "Could not initialize footOffsetYPar";
+        LOG(info) << "Could not initialize footOffsetYPar";
         return kFALSE;
     }
     if (!list->fill("footPolPar", &fPolPar))
     {
-        LOG(INFO) << "Could not initialize footPolPar";
+        LOG(info) << "Could not initialize footPolPar";
         return kFALSE;
     }
     fEnevsPosCorr->Set(fNumDet * fPolPar);
     if (!(list->fill("footEnevsPosCorrPar", fEnevsPosCorr)))
     {
-        LOG(INFO) << "Could not initialize footEnevsPosCorrPar";
+        LOG(info) << "Could not initialize footEnevsPosCorrPar";
         return kFALSE;
     }
 
@@ -161,9 +161,9 @@ void R3BFootMappingPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BFootMappingPar::printParams()
 {
-    LOG(INFO) << "R3BFootMappingPar::FOOT mapping parameters for geometry " << fGeo << ": ";
+    LOG(info) << "R3BFootMappingPar::FOOT mapping parameters for geometry " << fGeo << ": ";
 
-    LOG(INFO) << "Detector"
+    LOG(info) << "Detector"
               << " "
               << "Distance_to_target"
               << " "
@@ -177,20 +177,20 @@ void R3BFootMappingPar::printParams()
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
-        LOG(INFO) << i + 1 << "\t"
+        LOG(info) << i + 1 << "\t"
                   << "\t" << fDistance2target->GetAt(i) << "\t\t" << fAngleTheta->GetAt(i) << "\t"
                   << fAnglePhi->GetAt(i) << "\t" << fOffsetX->GetAt(i) << "\t" << fOffsetY->GetAt(i);
     }
 
-    LOG(INFO) << "Energy vs Position Correction Parameters : ";
+    LOG(info) << "Energy vs Position Correction Parameters : ";
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
-        LOG(INFO) << "FOOT " << i + 1 << " : ";
+        LOG(info) << "FOOT " << i + 1 << " : ";
 
         for (Int_t j = 0; j < fPolPar; j++)
         {
-            LOG(INFO) << "Pol" << j << "\t"
+            LOG(info) << "Pol" << j << "\t"
                       << "\t" << fEnevsPosCorr->GetAt(i * fPolPar + j);
         }
     }

@@ -89,14 +89,14 @@ R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 
 void R3BAnalysisIncomingID::SetParContainers()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
-    R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
-    R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
+    R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
 
     return;
 }
@@ -126,35 +126,35 @@ void R3BAnalysisIncomingID::SetParameter()
         fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
         fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
     }
-    R3BLOG(INFO, "Brho:" << fBrho0_S2toCC->GetAt(0));
+    R3BLOG(info, "Brho:" << fBrho0_S2toCC->GetAt(0));
     return;
 }
 
 InitStatus R3BAnalysisIncomingID::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
-    R3BLOG_IF(WARNING, !fHitItemsMus, "MusicHitData not found");
+    R3BLOG_IF(warn, !fHitItemsMus, "MusicHitData not found");
 
     fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
-    R3BLOG_IF(WARNING, !fHitItemsMusli, "MusliHitData not found");
+    R3BLOG_IF(warn, !fHitItemsMusli, "MusliHitData not found");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
+    R3BLOG_IF(warn, !fHitLos, "LosHit not found");
 
     // Get access to hit data of PSPX1
     fHitPspx1_x = (TClonesArray*)mgr->GetObject("Pspx1_xHit");
-    R3BLOG_IF(WARNING, !fHitPspx1_x, "Pspx1_xHit not found");
+    R3BLOG_IF(warn, !fHitPspx1_x, "Pspx1_xHit not found");
     fHitPspx1_y = (TClonesArray*)mgr->GetObject("Pspx1_yHit");
-    R3BLOG_IF(WARNING, !fHitPspx1_y, "Pspx1_yHit not found");
+    R3BLOG_IF(warn, !fHitPspx1_y, "Pspx1_yHit not found");
 
     // Output data
     fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
@@ -278,7 +278,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             if (fFrsDataCA && fFrsDataCA->GetEntriesFast() > 0)
             {
                 nHits = fFrsDataCA->GetEntriesFast();
-                R3BLOG_IF(ERROR, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
+                R3BLOG_IF(error, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
                 for (Int_t ihit = 0; ihit < nHits; ihit++)
                 {
                     hitfrs = (R3BFrsData*)fFrsDataCA->At(ihit);

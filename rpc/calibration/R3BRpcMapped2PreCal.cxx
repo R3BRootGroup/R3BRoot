@@ -44,43 +44,43 @@ R3BRpcMapped2PreCal::R3BRpcMapped2PreCal()
 
 R3BRpcMapped2PreCal::~R3BRpcMapped2PreCal()
 {
-    LOG(INFO) << "R3BRpcMapped2PreCal: Delete instance";
+    LOG(info) << "R3BRpcMapped2PreCal: Delete instance";
     delete fRpcPreCalDataCA;
 }
 
 InitStatus R3BRpcMapped2PreCal::Init()
 {
-    LOG(INFO) << "R3BRpcMapped2PreCal::Init()";
+    LOG(info) << "R3BRpcMapped2PreCal::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(FATAL) << "R3BRpcMapped2PreCal::FairRootManager not found";
+        LOG(fatal) << "R3BRpcMapped2PreCal::FairRootManager not found";
         return kFATAL;
     }
 
     fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
     if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
+        LOG(error) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
     }
 
     fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
     if (!fTCalPar)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
     }
     else
     {
-        LOG(INFO) << "R3BRpcMapped2PreCal:: RPCTCalPar container open";
+        LOG(info) << "R3BRpcMapped2PreCal:: RPCTCalPar container open";
     }
 
     //FPGA mapping
@@ -95,7 +95,7 @@ InitStatus R3BRpcMapped2PreCal::Init()
 
     if (fFpgaCorrelationFile=="")
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on fFpgaCorrelationFile";
     }
 
     while(in >> chn_id >> side_lut ){
@@ -130,7 +130,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
 
     if (!fTCalPar)
     {
-        LOG(WARNING) << "R3BRpcMapped2PreCal::Parameter container not found";
+        LOG(warn) << "R3BRpcMapped2PreCal::Parameter container not found";
     }
 
     Entry Ref_vec[10];
@@ -170,7 +170,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
         if (times_Ref < 0. || times_Ref > fClockFreq )//|| IS_NAN(times_Ref))
         {
 
-            LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", FPGA= " << iFpga
+            LOG(info) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", FPGA= " << iFpga
                       << ", time in channels = " << map1->GetFineTime()
                       << ", time in ns = " << times_Ref;
             continue;
@@ -218,7 +218,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
          if (times_Strip < 0. || times_Strip > fClockFreq )//|| IS_NAN(times_Strip))
          {
 
-             LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", strip= " << iStrip
+             LOG(info) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", strip= " << iStrip
                        << ", side= " << map1->GetSide() << ", edge= " << map1->GetEdge() << ", time in channels = " << map1->GetFineTime()
                        << ", time in ns = " << times_Strip;
              continue;
@@ -247,7 +247,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
          if (times_Pmt < 0. || times_Pmt > fClockFreq )//|| IS_NAN(times_Pmt))
          {
 
-             LOG(INFO) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", pmt= " << iPmt
+             LOG(info) << "R3BRpcMapped2PreCal::Exec : Bad time in ns: det= " << iDetector << ", pmt= " << iPmt
                        << ", side= " << map1->GetSide() << ", edge= " << map1->GetEdge() << ", time in channels = " << map1->GetFineTime()
                        << ", time in ns = " << times_Pmt << " " << fClockFreq;
              continue;

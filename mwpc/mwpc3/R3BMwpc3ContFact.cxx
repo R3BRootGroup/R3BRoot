@@ -56,7 +56,7 @@ FairParSet* R3BMwpc3ContFact::createContainer(FairContainer* c)
     // of this container, the name is concatinated with the context.
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BMwpc3ContFact: Create container name: " << name;
+    LOG(info) << "R3BMwpc3ContFact: Create container name: " << name;
     FairParSet* p = 0;
     if (strcmp(name, "mwpc3CalPar") == 0)
     {

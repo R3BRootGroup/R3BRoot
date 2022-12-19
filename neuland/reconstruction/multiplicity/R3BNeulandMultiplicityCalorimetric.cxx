@@ -26,7 +26,7 @@ InitStatus R3BNeulandMultiplicityCalorimetric::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "TCAInputConnector: No FairRootManager";
+        LOG(fatal) << "TCAInputConnector: No FairRootManager";
         return kFATAL;
     }
     ioman->RegisterAny(fOutputName, fMultiplicity, true);
@@ -35,13 +35,13 @@ InitStatus R3BNeulandMultiplicityCalorimetric::Init()
     auto rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetric::Init: No FairRuntimeDb!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetric::Init: No FairRuntimeDb!";
         return kFATAL;
     }
     fPar = (R3BNeulandMultiplicityCalorimetricPar*)rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar");
     if (fPar == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetric::Init: No R3BNeulandMultiplicityCalorimetricPar!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetric::Init: No R3BNeulandMultiplicityCalorimetricPar!";
         return kFATAL;
     }
     // FIXME: FairRuntimeDB needs to be forced to load the Data from the second file with Run Id 1

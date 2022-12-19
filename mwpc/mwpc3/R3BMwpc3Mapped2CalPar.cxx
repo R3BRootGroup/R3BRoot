@@ -65,13 +65,13 @@ R3BMwpc3Mapped2CalPar::R3BMwpc3Mapped2CalPar(const char* name, Int_t iVerbose)
 }
 
 /* ---- R3BMwpc3Mapped2CalPar : Destructor ---- */
-R3BMwpc3Mapped2CalPar::~R3BMwpc3Mapped2CalPar() { LOG(INFO) << "R3BMwpc3Mapped2CalPar: Delete Instance"; }
+R3BMwpc3Mapped2CalPar::~R3BMwpc3Mapped2CalPar() { LOG(info) << "R3BMwpc3Mapped2CalPar: Delete Instance"; }
 
 /* ---- Public Method Init ---- */
 InitStatus R3BMwpc3Mapped2CalPar::Init()
 {
 
-    LOG(INFO) << "R3BMwpc3Mapped2CalPar: Init";
+    LOG(info) << "R3BMwpc3Mapped2CalPar: Init";
 
     char name[100];
 
@@ -108,7 +108,7 @@ InitStatus R3BMwpc3Mapped2CalPar::Init()
     fPad_Par = (R3BMwpc3CalPar*)rtdb->getContainer("mwpc3CalPar");
     if (!fPad_Par)
     {
-        LOG(ERROR) << "R3BMwpc3Mapped2CalPar::Init() Couldn't get handle on mwpc3CalPar container";
+        LOG(error) << "R3BMwpc3Mapped2CalPar::Init() Couldn't get handle on mwpc3CalPar container";
         return kFATAL;
     }
     return kSUCCESS;
@@ -140,7 +140,7 @@ void R3BMwpc3Mapped2CalPar::Exec(Option_t* opt)
         else if (planeid == 3) // plane Y
             fh_Map_q_pad[fNumPadX + padid]->Fill(MapHit->GetQ());
         else
-            LOG(ERROR) << "Plane " << planeid << " does not exist in MWPC3";
+            LOG(error) << "Plane " << planeid << " does not exist in MWPC3";
     }
 }
 
@@ -157,7 +157,7 @@ void R3BMwpc3Mapped2CalPar::FinishTask()
 void R3BMwpc3Mapped2CalPar::SearchPedestals()
 {
 
-    LOG(INFO) << "R3BMwpc3Mapped2CalPar: Search pedestals";
+    LOG(info) << "R3BMwpc3Mapped2CalPar: Search pedestals";
     Int_t numPars = fNumParams;
 
     fPad_Par->SetNumPadsX(fNumPadX);
@@ -184,9 +184,9 @@ void R3BMwpc3Mapped2CalPar::SearchPedestals()
             fPad_Par->SetPadCalParams(-1, nbpad); // dead pad
             fPad_Par->SetPadCalParams(0, nbpad + 1);
             if (i < fNumPadX) // plane X
-                LOG(WARNING) << "Histogram NO Fitted in mwpc3, plane 1 and pad " << i + 1;
+                LOG(warn) << "Histogram NO Fitted in mwpc3, plane 1 and pad " << i + 1;
             else // plane y
-                LOG(WARNING) << "Histogram NO Fitted in mwpc3, plane 3 and pad " << i + 1 - fNumPadX;
+                LOG(warn) << "Histogram NO Fitted in mwpc3, plane 3 and pad " << i + 1 - fNumPadX;
         }
     }
 

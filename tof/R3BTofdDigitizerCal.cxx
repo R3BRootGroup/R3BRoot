@@ -86,7 +86,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 {
     //	cout<<"R3BTofdDigitizerCal Exec Entry"<<endl;
     if (counter / 10000. == (int)counter / 10000)
-        LOG(INFO) << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) ";
+        LOG(info) << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) ";
     counter += 1;
 
     Reset();

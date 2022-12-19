@@ -53,14 +53,14 @@ void R3BMwpc2CalPar::clear()
 void R3BMwpc2CalPar::putParams(FairParamList* list)
 {
 
-    LOG(INFO) << "R3BMwpc2CalPar::putParams() called";
+    LOG(info) << "R3BMwpc2CalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fPadCalParams->Set(array_size);
 
@@ -73,7 +73,7 @@ void R3BMwpc2CalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BMwpc2CalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BMwpc2CalPar::getParams() called";
+    LOG(info) << "R3BMwpc2CalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -93,12 +93,12 @@ Bool_t R3BMwpc2CalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
     fPadCalParams->Set(array_size);
 
     if (!(list->fill("mwpc2CalPar", fPadCalParams)))
     {
-        LOG(INFO) << "---Could not initialize mwpc2CalPar";
+        LOG(info) << "---Could not initialize mwpc2CalPar";
         return kFALSE;
     }
 
@@ -108,26 +108,26 @@ Bool_t R3BMwpc2CalPar::getParams(FairParamList* list)
 // ----  Method printParams ----------------------------------------------------
 void R3BMwpc2CalPar::printParams()
 {
-    LOG(INFO) << "R3BMwpc2CalPar: SOFIA MWPC2 Calibration Parameters: ";
+    LOG(info) << "R3BMwpc2CalPar: SOFIA MWPC2 Calibration Parameters: ";
     Int_t array_size = (fNumPadsX + fNumPadsY) * fNumParamsFit;
 
     for (Int_t i = 0; i < (fNumPadsX + fNumPadsY); i++)
     {
         if (i < fNumPadsX / 2)
         {
-            LOG(INFO) << "MWPC2 Plane X down, Pad Number: " << i + 1;
+            LOG(info) << "MWPC2 Plane X down, Pad Number: " << i + 1;
         }
         else if (i < fNumPadsX)
         {
-            LOG(INFO) << "MWPC2 Plane X up, Pad Number: " << i + 1 - fNumPadsX / 2;
+            LOG(info) << "MWPC2 Plane X up, Pad Number: " << i + 1 - fNumPadsX / 2;
         }
         else
         {
-            LOG(INFO) << "MWPC2 Plane Y, Pad Number: " << i + 1 - fNumPadsX;
+            LOG(info) << "MWPC2 Plane Y, Pad Number: " << i + 1 - fNumPadsX;
         }
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j << ") = " << fPadCalParams->GetAt(i * fNumParamsFit + j);
+            LOG(info) << "FitParam(" << j << ") = " << fPadCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

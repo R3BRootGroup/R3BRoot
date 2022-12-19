@@ -215,7 +215,7 @@ namespace Neuland
             // seems like we do not have enough statistics in most bars
             if (numberOfEquations < nBars)
             {
-                LOG(INFO) << "Can not synchronize NeuLAND. Not enough equations (" << numberOfEquations << ").";
+                LOG(info) << "Can not synchronize NeuLAND. Not enough equations (" << numberOfEquations << ").";
                 return solution;
             }
 

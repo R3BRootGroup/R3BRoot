@@ -114,7 +114,7 @@ InitStatus R3BLosCal2HitPar::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BLosCal2HitPar::Init ";
+    LOG(info) << "R3BLosCal2HitPar::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -126,7 +126,7 @@ InitStatus R3BLosCal2HitPar::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
-        LOG(ERROR) << "Branch LosCal not found";
+        LOG(error) << "Branch LosCal not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -149,7 +149,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
