@@ -151,7 +151,7 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
     Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY))
         LOG(warn) << "R3BMwpc2Mapped2Cal: nHits>(NumPadX+NumPadY)";
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     R3BMwpcMappedData** mappedData = new R3BMwpcMappedData*[nHits];
@@ -195,7 +195,7 @@ void R3BMwpc2Mapped2Cal::Finish() {}
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc2Mapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc2CalData Structure";
+    LOG(debug) << "Clearing Mwpc2CalData Structure";
     if (fMwpcCalDataCA)
         fMwpcCalDataCA->Clear();
 }

@@ -38,6 +38,7 @@
 // R3B headers
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTimeStitch.h"
 #include "R3BTofDMappingPar.h"
@@ -45,7 +46,6 @@
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
 #include "R3BTofdMappedData.h"
-#include "R3BLosCalData.h"
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
@@ -85,7 +85,7 @@ R3BTofDOnlineSpectra::R3BTofDOnlineSpectra(const TString& name, Int_t iVerbose)
 // Virtual R3BTofDOnlineSpectra::Destructor
 R3BTofDOnlineSpectra::~R3BTofDOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMappedItems)
         delete fMappedItems;
     if (fCalItems)
@@ -560,36 +560,35 @@ InitStatus R3BTofDOnlineSpectra::Init()
         maintofd->Add(cToFd_los_h2);
     }
 
-
     TCanvas* cToFd_los[N_PLANE_MAX];
-    TCanvas* cToFd_los_h2 = new TCanvas("ToFD time - Los time","ToFD time - Los time", 20,20,1120,1020);
-    cToFd_los_h2->Divide(2,2);
-    for (Int_t i=0;i<4;i++)
+    TCanvas* cToFd_los_h2 = new TCanvas("ToFD time - Los time", "ToFD time - Los time", 20, 20, 1120, 1020);
+    cToFd_los_h2->Divide(2, 2);
+    for (Int_t i = 0; i < 4; i++)
     {
-      char strNameLos_c[255];
-      sprintf(strNameLos_c,"tofd-los_timediff_plane_%d",i+1);
-      fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c,strNameLos_c,45,0,45,5000,-50000,10000);
-      fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
-      fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF");
-      cToFd_los_h2->cd(i+1);
-      fh_tofd_time_los_h2[i]->Draw("colz");
+        char strNameLos_c[255];
+        sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
+        fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 45, 0, 45, 5000, -50000, 10000);
+        fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
+        fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF");
+        cToFd_los_h2->cd(i + 1);
+        fh_tofd_time_los_h2[i]->Draw("colz");
 
-      cToFd_los[i] = new TCanvas(strNameLos_c, strNameLos_c, 20, 20, 1120, 1020);
-      cToFd_los[i]->Divide(5,9);
-      for (Int_t j = 0; j < 44; j++)
-      {
-        char strNameLos[255];
-        sprintf(strNameLos,"tofd-los_timediff_bar_%d_plane_%d",j+1,i+1);
-        char strNameLos2[255];
-        sprintf(strNameLos2,"Tofd_time - Los_time bar %d plane %d",j+1,i+1);
-        fh_tofd_time_los[i][j] = new TH1F(strNameLos, strNameLos2,50,0,1000);
-        fh_tofd_time_los[i][j]->GetXaxis()->SetTitle("Time");
-        fh_tofd_time_los[i][j]->GetYaxis()->SetTitle("counts");
-        cToFd_los[i]->cd(j+1);
-        fh_tofd_time_los[i][j]->Draw("");
-      }
-      // Adding this canvases to the main folder
-      maintofd->Add(cToFd_los[i]);
+        cToFd_los[i] = new TCanvas(strNameLos_c, strNameLos_c, 20, 20, 1120, 1020);
+        cToFd_los[i]->Divide(5, 9);
+        for (Int_t j = 0; j < 44; j++)
+        {
+            char strNameLos[255];
+            sprintf(strNameLos, "tofd-los_timediff_bar_%d_plane_%d", j + 1, i + 1);
+            char strNameLos2[255];
+            sprintf(strNameLos2, "Tofd_time - Los_time bar %d plane %d", j + 1, i + 1);
+            fh_tofd_time_los[i][j] = new TH1F(strNameLos, strNameLos2, 50, 0, 1000);
+            fh_tofd_time_los[i][j]->GetXaxis()->SetTitle("Time");
+            fh_tofd_time_los[i][j]->GetYaxis()->SetTitle("counts");
+            cToFd_los[i]->cd(j + 1);
+            fh_tofd_time_los[i][j]->Draw("");
+        }
+        // Adding this canvases to the main folder
+        maintofd->Add(cToFd_los[i]);
     }
     maintofd->Add(cToFd_los_h2);
 
@@ -738,7 +737,6 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
        "<<losTriggerHit->Ge(losHit->GetTime()-losCalTriggerHits->GetTimeL_ns(channelLos)tTimeL_ns(0)<<"
        "<<losChannelTrigger<<std::endl; losTriggerTime = losTriggerHit->GetTimeL_ns(0);}
     */
-
 
     if (fCalItems)
     {
@@ -1108,7 +1106,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
 void R3BTofDOnlineSpectra::FinishEvent()
 {
-    R3BLOG(DEBUG1, "Cleaning data structures");
+    R3BLOG(debug1, "Cleaning data structures");
     if (fMappedItems)
     {
         fMappedItems->Clear();

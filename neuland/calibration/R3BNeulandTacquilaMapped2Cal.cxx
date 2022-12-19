@@ -250,7 +250,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
 
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
         {
-            LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
+            LOG(debug) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
                        << iPaddle << " / " << iSide;
             continue;
         }
@@ -266,7 +266,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
 
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide + 2)))
         {
-            LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
+            LOG(debug) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
                        << iPaddle << " / " << (iSide + 2);
             continue;
         }

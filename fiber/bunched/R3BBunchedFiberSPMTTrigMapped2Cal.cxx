@@ -87,7 +87,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::ReInit()
 void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
@@ -96,7 +96,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         if (!par)
         {
             LOG(warn) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
-                         << ": TCal par not found.";
+                      << ": TCal par not found.";
             continue;
         }
 
@@ -108,7 +108,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeVFTX(fine_raw);
-        LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         if (fine_ns < 0. || fine_ns > 5.)
         {
@@ -123,7 +123,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         auto time_ns = mapped->GetCoarse() * 5. - fine_ns;
 
-        LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
+        LOG(debug) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         new ((*fCalItems)[fCalItems->GetEntriesFast()])
             R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
     }

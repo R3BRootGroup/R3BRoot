@@ -95,7 +95,7 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
-    LOG(DEBUG) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
+    LOG(debug) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
 
     TArrayD* values = new TArrayD(9);
 

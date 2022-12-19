@@ -49,7 +49,7 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, size_t offset)
 
 R3BPspxReader::~R3BPspxReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
     for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
     {

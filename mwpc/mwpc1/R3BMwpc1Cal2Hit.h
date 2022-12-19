@@ -14,7 +14,7 @@
 // -----------------------------------------------------------------------
 // -----                       R3BMwpc1 header file                  -----
 // -----                 Created 06/10/19 by JL Rodriguez            -----
-// -----                  s455 method 17/06/22 by Antia GG           ----- 
+// -----                  s455 method 17/06/22 by Antia GG           -----
 // -----------------------------------------------------------------------
 
 #ifndef R3BMwpc1Cal2Hit_H
@@ -29,7 +29,7 @@
 #define Mw1PadsX 64
 #define Mw1PadsY 40
 
-//Mw1PadsX 64
+// Mw1PadsX 64
 
 using namespace std;
 
@@ -63,7 +63,10 @@ class R3BMwpc1Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
+    void SetExpId(Int_t exp)
+    {
+        fExpId = exp;
+    } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
     /** Private method Experiment s455 **/
@@ -86,7 +89,7 @@ class R3BMwpc1Cal2Hit : public FairTask
 
     /** Private method AddHitData **/
     // Adds a MwpcHitData to the MwpcHitCollection
-    R3BMwpcHitData* AddHitData(Double_t x, Double_t y, Int_t plane=1);
+    R3BMwpcHitData* AddHitData(Double_t x, Double_t y, Int_t plane = 1);
 
     /** Private method to obtain the position X **/
     Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);

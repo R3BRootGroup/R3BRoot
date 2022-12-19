@@ -55,7 +55,7 @@ R3BS515PspxReader::R3BS515PspxReader(EXT_STR_h101_PSP_onion* data, size_t offset
 
 R3BS515PspxReader::~R3BS515PspxReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     for (Int_t d = 0; d < 2 * LENGTH(fDataOnion->PSPX); d++)
     {
         delete fMappedItems[d];

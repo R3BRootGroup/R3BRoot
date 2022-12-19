@@ -40,7 +40,7 @@ R3BFootSiReader::R3BFootSiReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
     , fOnline(kFALSE)
     , fNbDet(16)
     //, fNbDet(sizeof(EXT_STR_h101_FOOT_onion) / sizeof(EXT_STR_h101_FOOT_onion.FOOT[0])) // Auto-gets # FEET from
-    //struct!
+    // struct!
     , fArray(new TClonesArray("R3BFootMappedData"))
 {
 }
@@ -70,7 +70,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BFootSiReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data");
+    R3BLOG(debug1, "Event data");
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
     {

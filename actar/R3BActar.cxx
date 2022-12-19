@@ -68,7 +68,7 @@ void R3BActar::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BActar: initialisation";
-    LOG(DEBUG) << "R3BActar: Vol. (McId) " << gMC->VolId("PSP1Log");
+    LOG(debug) << "R3BActar: Vol. (McId) " << gMC->VolId("PSP1Log");
 }
 
 void R3BActar::SetSpecialPhysicsCuts()

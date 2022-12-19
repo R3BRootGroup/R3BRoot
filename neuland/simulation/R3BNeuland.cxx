@@ -133,7 +133,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
         gMC->TrackMomentum(fMomOut);
 
         // Add Point
-        LOG(DEBUG) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
+        LOG(debug) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
                    << ") cm,  paddle " << fPaddleID << ", track " << fTrackID << ", energy loss " << fELoss << " GeV "
                    << gMC->GetStack()->GetCurrentParentTrackNumber();
 

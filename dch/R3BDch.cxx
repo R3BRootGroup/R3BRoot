@@ -128,7 +128,7 @@ void R3BDch::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BDch: initialisation";
-    LOG(DEBUG) << "R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog");
+    LOG(debug) << "R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog");
 
     // get the transformation matrixes for
     // the sensitive nodes.

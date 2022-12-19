@@ -144,7 +144,7 @@ InitStatus R3BMusicDigitizer::ReInit() { return kSUCCESS; }
 // -----   Public method Reset   -----------------------------------------------
 void R3BMusicDigitizer::Reset()
 {
-    LOG(DEBUG) << "Clearing R3B" + fName + "Digitizer Structure";
+    LOG(debug) << "Clearing R3B" + fName + "Digitizer Structure";
     if (fMusicCal)
         fMusicCal->Clear();
 }

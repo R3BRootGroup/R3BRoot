@@ -394,16 +394,16 @@ void R3BFragmentTracker::Exec(const Option_t*)
         fFitter->FitTrackBeta(candidate, fDetectors);
 
         Double_t momentum0 = candidate->GetStartMomentum().Mag();
-        LOG(DEBUG1);
-        LOG(DEBUG1) << "RESULT : " << momentum0;
-        LOG(DEBUG1) << "TRUTH  : " << particle->GetMomentum().Mag();
-        LOG(DEBUG1) << "Resolution: " << (momentum0 - particle->GetMomentum().Mag()) / particle->GetMomentum().Mag();
-        LOG(DEBUG1) << "Mass   : " << candidate->GetMass() / amu;
-        LOG(DEBUG1) << "Truth  : " << particle->GetMass() / amu;
-        LOG(DEBUG1) << "Mass resolution : " << (candidate->GetMass() - particle->GetMass()) / particle->GetMass();
-        LOG(DEBUG1) << "Beta   : " << candidate->GetStartBeta();
-        LOG(DEBUG1) << "Truth  : " << particle->GetStartBeta();
-        LOG(DEBUG1) << "Beta resolution : "
+        LOG(debug1);
+        LOG(debug1) << "RESULT : " << momentum0;
+        LOG(debug1) << "TRUTH  : " << particle->GetMomentum().Mag();
+        LOG(debug1) << "Resolution: " << (momentum0 - particle->GetMomentum().Mag()) / particle->GetMomentum().Mag();
+        LOG(debug1) << "Mass   : " << candidate->GetMass() / amu;
+        LOG(debug1) << "Truth  : " << particle->GetMass() / amu;
+        LOG(debug1) << "Mass resolution : " << (candidate->GetMass() - particle->GetMass()) / particle->GetMass();
+        LOG(debug1) << "Beta   : " << candidate->GetStartBeta();
+        LOG(debug1) << "Truth  : " << particle->GetStartBeta();
+        LOG(debug1) << "Beta resolution : "
                     << (candidate->GetStartBeta() - particle->GetStartBeta()) / particle->GetStartBeta();
 
         fh_mom_res->Fill((momentum0 - particle->GetStartMomentum().Mag()) / particle->GetStartMomentum().Mag());
@@ -424,7 +424,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
         {
             if (kTarget != det->section)
             {
-                LOG(DEBUG2) << "Propagate to " << det->GetDetectorName();
+                LOG(debug2) << "Propagate to " << det->GetDetectorName();
                 fPropagator->PropagateToDetector(candidate, det);
             }
 

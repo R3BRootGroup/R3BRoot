@@ -108,7 +108,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
 
 R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fMappedItemsCalifa)
         delete fMappedItemsCalifa;
     if (fCalItemsCalifa)

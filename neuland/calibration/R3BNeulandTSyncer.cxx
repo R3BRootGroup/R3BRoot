@@ -318,7 +318,7 @@ namespace Neuland
 
             input->rhs_vec->elements[numberOfEquations] = 0.; // we will use this one the put the mean value to 0
 
-            LOG(DEBUG) << "Syncing Neuland with " << numberOfEquations << " equations...";
+            LOG(debug) << "Syncing Neuland with " << numberOfEquations << " equations...";
 
             lsqr(input, output, work, function, &lhs);
 

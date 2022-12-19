@@ -144,9 +144,8 @@ class R3BLosMapped2TCal : public FairTask
     // Don't store data for online
     Bool_t fOnline;
 
-    
     R3BLosTCalData* AddTCalData(Int_t det, Int_t ch, Int_t typ, Double_t tns);
-    R3BLosTCalData* AddTriggerTCalData(Int_t det, Int_t ch, Int_t typ,  Double_t tns);
+    R3BLosTCalData* AddTriggerTCalData(Int_t det, Int_t ch, Int_t typ, Double_t tns);
 
   public:
     ClassDef(R3BLosMapped2TCal, 2)

@@ -82,7 +82,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
 
 R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFrsDataCA)
         delete fFrsDataCA;
 }

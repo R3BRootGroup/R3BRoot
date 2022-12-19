@@ -80,7 +80,7 @@ R3BStartrackMapped2CalPar::~R3BStartrackMapped2CalPar()
 InitStatus R3BStartrackMapped2CalPar::Init()
 {
 
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {

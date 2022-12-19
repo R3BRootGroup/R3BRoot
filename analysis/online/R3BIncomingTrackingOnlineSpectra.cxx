@@ -93,7 +93,7 @@ R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString
 
 R3BIncomingTrackingOnlineSpectra::~R3BIncomingTrackingOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMwpc0HitDataCA)
     {
         delete fMwpc0HitDataCA;

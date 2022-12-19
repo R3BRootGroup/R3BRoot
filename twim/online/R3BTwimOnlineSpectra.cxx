@@ -71,7 +71,7 @@ R3BTwimOnlineSpectra::R3BTwimOnlineSpectra(const TString& name, Int_t iVerbose)
 {
 }
 
-R3BTwimOnlineSpectra::~R3BTwimOnlineSpectra() { R3BLOG(DEBUG1, ""); }
+R3BTwimOnlineSpectra::~R3BTwimOnlineSpectra() { R3BLOG(debug1, ""); }
 
 InitStatus R3BTwimOnlineSpectra::Init()
 {

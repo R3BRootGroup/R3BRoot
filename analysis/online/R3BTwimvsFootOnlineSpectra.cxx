@@ -67,7 +67,7 @@ R3BTwimvsFootOnlineSpectra::R3BTwimvsFootOnlineSpectra(const TString& name, Int_
 // Virtual R3BTwimvsFootOnlineSpectra::Destructor
 R3BTwimvsFootOnlineSpectra::~R3BTwimvsFootOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fHitItemsFoot)
         delete fHitItemsFoot;
     if (fHitItemsTwim)

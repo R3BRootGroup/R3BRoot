@@ -44,7 +44,7 @@ R3BIncomingIDPar::R3BIncomingIDPar(const TString& name, const TString& title, co
 // ----  Destructor ------------------------------------------------------------
 R3BIncomingIDPar::~R3BIncomingIDPar()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     clear();
     if (fToFoffset)
         delete fToFoffset;

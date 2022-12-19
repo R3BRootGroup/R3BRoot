@@ -69,7 +69,7 @@ Bool_t R3BTrloiiScalerReader_s467::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTrloiiScalerReader_s467::Read()
 {
-    LOG(DEBUG) << "R3BTrloiiScalerReader_s467::Read() Event data.";
+    LOG(debug) << "R3BTrloiiScalerReader_s467::Read() Event data.";
 
     for (int ch = 0; ch < 16; ++ch)
     {

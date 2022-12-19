@@ -241,7 +241,7 @@ void R3BStack::AddParticle(TParticle* oldPart)
 void R3BStack::FillTrackArray()
 {
 
-    LOG(DEBUG) << "R3BStack: Filling MCTrack array...";
+    LOG(debug) << "R3BStack: Filling MCTrack array...";
 
     // --> Reset index map and number of output tracks
     fIndexMap.clear();
@@ -285,7 +285,7 @@ void R3BStack::FillTrackArray()
         }
         else
         {
-            LOG(DEBUG) << "R3BMCStack IndexMap ---> -2 for iPart: " << iPart;
+            LOG(debug) << "R3BMCStack IndexMap ---> -2 for iPart: " << iPart;
             fIndexMap[iPart] = -2;
         }
     }
@@ -304,7 +304,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
 
     if (fMinPoints == 0)
         return;
-    LOG(DEBUG) << "R3BStack: Updating track indizes...";
+    LOG(debug) << "R3BStack: Updating track indizes...";
     Int_t nColl = 0;
 
     // First update mother ID in MCTracks
@@ -341,14 +341,14 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
                 FairMCPoint* point = (FairMCPoint*)hitArray->At(iPoint);
                 Int_t iTrack = point->GetTrackID();
 
-                LOG(DEBUG) << "R3BMCStack TrackID Get : " << iTrack;
+                LOG(debug) << "R3BMCStack TrackID Get : " << iTrack;
 
                 fIndexIter = fIndexMap.find(iTrack);
                 if (fIndexIter == fIndexMap.end())
                 {
                     LOG(fatal) << "R3BStack: Particle index " << iTrack << " not found in index map! ";
                 }
-                LOG(DEBUG) << "R3BMCStack TrackID Set : " << (*fIndexIter).second;
+                LOG(debug) << "R3BMCStack TrackID Set : " << (*fIndexIter).second;
                 //	if ( ((*fIndexIter).second ) < 0 ) {
                 //	   point->SetTrackID(iTrack);
                 //	}else{
@@ -358,7 +358,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
         }
     } // List of active detectors
 
-    LOG(DEBUG) << "...stack and " << nColl << " collections updated";
+    LOG(debug) << "...stack and " << nColl << " collections updated";
 }
 // -------------------------------------------------------------------------
 

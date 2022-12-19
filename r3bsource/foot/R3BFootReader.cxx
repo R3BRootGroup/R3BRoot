@@ -45,7 +45,7 @@ R3BFootReader::R3BFootReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
 
 R3BFootReader::~R3BFootReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
         delete fArray;
 }
@@ -73,7 +73,7 @@ Bool_t R3BFootReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BFootReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data");
+    R3BLOG(debug1, "Event data");
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
     {

@@ -74,7 +74,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BLosMapped2Cal::~R3BLosMapped2Cal()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fCalItems)
         delete fCalItems;
     if (fCalTriggerItems)
@@ -199,8 +199,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
             if (!par)
             {
-                R3BLOG(warn,
-                       "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
+                R3BLOG(warn, "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
                 continue;
             }
 

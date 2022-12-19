@@ -74,7 +74,7 @@ void R3BStartrackCalibParFinder::SetParContainers()
 // Register: Protected method
 void R3BStartrackCalibParFinder::Register()
 {
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {

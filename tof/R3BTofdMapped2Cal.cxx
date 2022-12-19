@@ -184,12 +184,12 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
 
         if ((mapped->GetDetectorId() < 1) || (mapped->GetDetectorId() > fNofPlanes))
         {
-            LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Plane number out of range: " << mapped->GetDetectorId();
+            LOG(debug) << "R3BTofdMapped2Cal::Exec : Plane number out of range: " << mapped->GetDetectorId();
             continue;
         }
         if ((mapped->GetBarId() < 1) || (mapped->GetBarId() > fPaddlesPerPlane))
         {
-            LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Bar number out of range: " << mapped->GetBarId() << ", "
+            LOG(debug) << "R3BTofdMapped2Cal::Exec : Bar number out of range: " << mapped->GetBarId() << ", "
                        << fPaddlesPerPlane;
             continue;
         }
@@ -298,7 +298,7 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {
-            LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Trigger plane number out of range: " << mapped->GetDetectorId();
+            LOG(debug) << "R3BTofdMapped2Cal::Exec : Trigger plane number out of range: " << mapped->GetDetectorId();
             continue;
         }
 

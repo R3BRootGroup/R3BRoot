@@ -58,7 +58,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
 // Virtual R3BFootMapped2StripCal: Destructor
 R3BFootMapped2StripCal::~R3BFootMapped2StripCal()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFootCalData)
         delete fFootCalData;
 }
@@ -294,7 +294,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BFootMapped2StripCal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing StripCalData Structure");
+    R3BLOG(debug1, "Clearing StripCalData Structure");
     if (fFootCalData)
         fFootCalData->Clear();
 }

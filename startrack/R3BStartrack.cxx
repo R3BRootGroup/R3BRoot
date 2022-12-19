@@ -72,8 +72,8 @@ void R3BStartrack::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BStartrack: initialisation";
-    //    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
-    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1");
+    //    LOG(debug) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
+    LOG(debug) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1");
 }
 
 // -----   Public method ProcessHits  --------------------------------------

@@ -249,7 +249,7 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
 void R3BCalifaDigitizer::Reset()
 {
     // Clear the CA structure
-    LOG(DEBUG) << "Clearing CalifaCrystalCalData Structure";
+    LOG(debug) << "Clearing CalifaCrystalCalData Structure";
     if (fCalifaCryCalDataCA)
         fCalifaCryCalDataCA->Clear();
 

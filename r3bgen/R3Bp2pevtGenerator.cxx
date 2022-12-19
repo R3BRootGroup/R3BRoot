@@ -125,11 +125,11 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         const double S_first = (EA + Mi) * (EA + Mi) - PA * PA; // Invariant mass (Mandelstam S-variable)
         const double sigma = MOM_SIGMA; // Internal momentum spread of the cluster "a" inside "A"
 
-        LOG(DEBUG) << "\n****** Beam parameters ********";
-        LOG(DEBUG) << "\nMA:\t" << MA << " MeV";
-        LOG(DEBUG) << "\nTotal momentum:\t" << PA << " MeV";
-        LOG(DEBUG) << "\nTotal energy:\t" << EA << " MeV";
-        LOG(DEBUG) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
+        LOG(debug) << "\n****** Beam parameters ********";
+        LOG(debug) << "\nMA:\t" << MA << " MeV";
+        LOG(debug) << "\nTotal momentum:\t" << PA << " MeV";
+        LOG(debug) << "\nTotal energy:\t" << EA << " MeV";
+        LOG(debug) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
 
         while (!evt) // eventloop
         {
@@ -206,7 +206,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             TVector3 P2L = R3Bp2pevtGenerator::DREHUNG(P2cm, Pa);
 
             evt = true;
-            LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
+            LOG(debug) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
                        << P1L.Pz() << "\n P2 : " << P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
             primGen->AddTrack(2212, P1L.Px() / 1000., P1L.Py() / 1000., P1L.Pz() / 1000., 0, 0, 0);
             primGen->AddTrack(2212, P2L.Px() / 1000., P2L.Py() / 1000., P2L.Pz() / 1000., 0, 0, 0);
@@ -304,7 +304,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             // TVector3 P2L = DREHUNG(P2cm,(LVstart.Vect()));
             evt = true;
 
-            LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
+            LOG(debug) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
                        << P1L.Pz() << "\n P2 : " << P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
             primGen->AddTrack(2212, P1cm.Px() / 1000., P1cm.Py() / 1000., P1cm.Pz() / 1000., 0, 0, 0);
             primGen->AddTrack(2212, P2cm.Px() / 1000., P2cm.Py() / 1000., P2cm.Pz() / 1000., 0, 0, 0);

@@ -58,7 +58,7 @@ R3BMusliMapped2Cal::R3BMusliMapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BMusliMapped2Cal: Destructor
 R3BMusliMapped2Cal::~R3BMusliMapped2Cal()
 {
-    R3BLOG(DEBUG1, "R3BMusliMapped2Cal: Delete instance");
+    R3BLOG(debug1, "R3BMusliMapped2Cal: Delete instance");
     if (fMusliMappedDataCA)
         delete fMusliMappedDataCA;
     if (fMusliCalDataCA)
@@ -212,7 +212,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusliMapped2Cal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing MusliCalData Structure");
+    R3BLOG(debug1, "Clearing MusliCalData Structure");
     if (fMusliCalDataCA)
         fMusliCalDataCA->Clear();
 }

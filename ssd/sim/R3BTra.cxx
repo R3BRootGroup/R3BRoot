@@ -70,15 +70,15 @@ void R3BTra::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BTra: initialisation";
-    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
-    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
-    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot_");
+    LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
+    LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
+    LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot_");
 
     Char_t buffer[126];
     for (Int_t i = 0; i < fNbDet; i++)
     {
         sprintf(buffer, "Det%i", i + 1);
-        LOG(DEBUG) << "Det " << i << " connected to (McId) ---> " << buffer << "  " << gMC->VolId(buffer);
+        LOG(debug) << "Det " << i << " connected to (McId) ---> " << buffer << "  " << gMC->VolId(buffer);
         fdetid[i] = gMC->VolId(buffer);
     }
 }

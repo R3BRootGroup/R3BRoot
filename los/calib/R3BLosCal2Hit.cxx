@@ -137,7 +137,7 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
 
 R3BLosCal2Hit::~R3BLosCal2Hit()
 {
-    LOG(DEBUG) << "R3BLosCal2Hit::Destructor";
+    LOG(debug) << "R3BLosCal2Hit::Destructor";
     if (fhTres_M)
         delete (fhTres_M);
     if (fhTres_T)

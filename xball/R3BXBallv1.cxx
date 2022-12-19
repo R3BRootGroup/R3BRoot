@@ -113,11 +113,11 @@ void R3BXBallv1::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BXBallv1 initialisation";
-    LOG(DEBUG) << "R3BXBallv1: Vol. (McId)";
-    LOG(DEBUG) << "R3BXBallv1: Crystal A : " << gMC->VolId("crystalLogNAJA");
-    LOG(DEBUG) << "R3BXBallv1: Crystal B : " << gMC->VolId("crystalLogNAJB");
-    LOG(DEBUG) << "R3BXBallv1: Crystal C : " << gMC->VolId("crystalLogNAJC");
-    LOG(DEBUG) << "R3BXBallv1: Crystal D : " << gMC->VolId("crystalLogNAJD");
+    LOG(debug) << "R3BXBallv1: Vol. (McId)";
+    LOG(debug) << "R3BXBallv1: Crystal A : " << gMC->VolId("crystalLogNAJA");
+    LOG(debug) << "R3BXBallv1: Crystal B : " << gMC->VolId("crystalLogNAJB");
+    LOG(debug) << "R3BXBallv1: Crystal C : " << gMC->VolId("crystalLogNAJC");
+    LOG(debug) << "R3BXBallv1: Crystal D : " << gMC->VolId("crystalLogNAJD");
 
     // Crystals type ID
     // type  ID

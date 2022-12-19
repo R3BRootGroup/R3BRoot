@@ -18,9 +18,9 @@
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BRpcTotCalPar.h"
 #include "R3BRpcHitPar.h"
 #include "R3BRpcPars4Sim.h"
+#include "R3BRpcTotCalPar.h"
 #include "R3BTGeoPar.h"
 
 #include "TClass.h"

@@ -443,7 +443,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
         {
             prevts = fTimestamp[j];
             nextts = fTimestamp[j + 1];
-            R3BLOG(DEBUG, "New timestamp " << nextts << " for RunId " << fRunid[j]);
+            R3BLOG(debug, "New timestamp " << nextts << " for RunId " << fRunid[j]);
             return fRunid[j];
         }
 
@@ -451,7 +451,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     {
         prevts = fTimestamp[fArraysize - 1];
         nextts = fTimestamp[fArraysize - 1];
-        R3BLOG(DEBUG, "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1]);
+        R3BLOG(debug, "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1]);
         return fRunid[fArraysize - 1];
     }
 

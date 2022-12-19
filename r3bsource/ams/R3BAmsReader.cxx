@@ -71,7 +71,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BAmsReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     // Read AMS detectors
     for (int d = 0; d < 6; d++)
         if (fData->SST[d]._ == 1024)

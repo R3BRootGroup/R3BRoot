@@ -83,7 +83,7 @@ void R3BTofi::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BTofi: initialisation";
-    LOG(DEBUG) << "R3BTofi: Sci. Vol. (McId0) " << gMC->VolId("TOFiLog101");
+    LOG(debug) << "R3BTofi: Sci. Vol. (McId0) " << gMC->VolId("TOFiLog101");
 }
 
 void R3BTofi::SetSpecialPhysicsCuts()

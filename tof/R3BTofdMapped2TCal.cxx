@@ -136,12 +136,12 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 
         if ((iDetector < 1) || (iDetector > fNofPlanes))
         {
-            LOG(DEBUG) << "R3BTofdMapped2TCal::Exec : Plane number out of range: " << iDetector;
+            LOG(debug) << "R3BTofdMapped2TCal::Exec : Plane number out of range: " << iDetector;
             continue;
         }
         if ((iBar < 1) || (iBar > fPaddlesPerPlane))
         {
-            LOG(DEBUG) << "R3BTofdMapped2TCal::Exec : Bar number out of range: " << iBar << ", " << fPaddlesPerPlane;
+            LOG(debug) << "R3BTofdMapped2TCal::Exec : Bar number out of range: " << iBar << ", " << fPaddlesPerPlane;
             continue;
         }
 

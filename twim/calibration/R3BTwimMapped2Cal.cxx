@@ -72,7 +72,7 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BTwimMapped2Cal::Destructor
 R3BTwimMapped2Cal::~R3BTwimMapped2Cal()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fTwimCalDataCA)
         delete fTwimCalDataCA;
 }
@@ -307,7 +307,7 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BTwimMapped2Cal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing TwimCalData Structure");
+    R3BLOG(debug1, "Clearing TwimCalData Structure");
     if (fTwimCalDataCA)
         fTwimCalDataCA->Clear();
 }

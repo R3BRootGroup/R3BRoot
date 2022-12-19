@@ -184,7 +184,7 @@ void R3BMwpc3Mapped2Cal::Exec(Option_t* option)
 /* ---- Public method Reset ----*/
 void R3BMwpc3Mapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing MwpcCalData Structure";
+    LOG(debug) << "Clearing MwpcCalData Structure";
     if (fMwpcCalDataCA)
         fMwpcCalDataCA->Clear();
 }

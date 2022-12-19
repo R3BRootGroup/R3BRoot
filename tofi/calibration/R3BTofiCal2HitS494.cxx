@@ -610,20 +610,20 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
-                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
                 else
-                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
+                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 +
                                           (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
@@ -631,16 +631,16 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width + (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
                 }
-                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
+                LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
@@ -670,19 +670,19 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(DEBUG) << "Not in bar coincidence increase top counter";
+                LOG(debug) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(DEBUG) << "Not in bar coincidence increase bot counter";
+                LOG(debug) << "Not in bar coincidence increase bot counter";
             }
         }
     }
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << event.size();
+    LOG(debug) << "Hits in this event: " << event.size();
     if (event.empty())
         events_wo_tofi_hits++;
 
@@ -706,10 +706,10 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+    LOG(debug) << "Charge Time xpos ypos plane bar";
     for (Int_t hit = 0; hit < event.size(); hit++)
     {
-        LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
+        LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
                    << " " << event[hit].plane << " " << event[hit].bar;
     }
 
@@ -746,15 +746,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         }
     }
 
-    LOG(DEBUG) << "Used up hits in this event:";
+    LOG(debug) << "Used up hits in this event:";
     for (Int_t a = 0; a < event.size(); a++)
     {
-        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
+        LOG(debug) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
             LOG(fatal) << "Not all events analyzed!";
     }
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
     fnEvents++;
 }
 

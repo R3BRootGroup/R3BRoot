@@ -119,7 +119,7 @@ void R3BMwpc2Mapped2CalPar::Exec(Option_t* opt)
 {
 
     Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     R3BMwpcMappedData* MapHit;

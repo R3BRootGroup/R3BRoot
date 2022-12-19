@@ -62,7 +62,7 @@ R3BMusliCal2Hit::R3BMusliCal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMusliCal2Hit: Destructor
 R3BMusliCal2Hit::~R3BMusliCal2Hit()
 {
-    R3BLOG(DEBUG1, "R3BMusliCal2Hit: Delete instance");
+    R3BLOG(debug1, "R3BMusliCal2Hit: Delete instance");
     if (fMusliCalDataCA)
         delete fMusliCalDataCA;
     if (fMusliHitDataCA)
@@ -316,7 +316,7 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusliCal2Hit::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing MusliHitData Structure");
+    R3BLOG(debug1, "Clearing MusliHitData Structure");
     if (fMusliHitDataCA)
         fMusliHitDataCA->Clear();
 }

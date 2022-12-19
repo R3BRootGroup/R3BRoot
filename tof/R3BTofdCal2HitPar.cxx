@@ -604,9 +604,9 @@ void R3BTofdCal2HitPar::calcOffset()
                     TH1F *h = (TH1F*) fhTdiff[i][j]->Clone("h");
                     h->Draw();
                     TSpectrum *s = new TSpectrum(2*npeaks);
-                    LOG(DEBUG) << " Search for peaks ";
+                    LOG(debug) << " Search for peaks ";
                     nfound = s->Search(h,sigma,"", sens);
-                    LOG(DEBUG) << " Found "<< nfound<<" peaks.";
+                    LOG(debug) << " Found "<< nfound<<" peaks.";
 
                     Double_t *xpeaks = s->GetPositionX();
                     for (Int_t p=0;p<nfound;p++) {

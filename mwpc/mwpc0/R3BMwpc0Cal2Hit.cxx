@@ -94,7 +94,7 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
 
     // Reading the Input -- Cal Data --
     Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     // Data from cal level
@@ -180,7 +180,7 @@ Double_t R3BMwpc0Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc0Cal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc0HitData Structure";
+    LOG(debug) << "Clearing Mwpc0HitData Structure";
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }

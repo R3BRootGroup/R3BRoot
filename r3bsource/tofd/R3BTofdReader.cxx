@@ -93,7 +93,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTofdReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 

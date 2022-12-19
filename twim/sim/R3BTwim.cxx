@@ -65,7 +65,7 @@ void R3BTwim::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BTwim: initialisation";
-    LOG(DEBUG) << "R3BTwim: Vol (McId) def" << gMC->VolId("TwinLog");
+    LOG(debug) << "R3BTwim: Vol (McId) def" << gMC->VolId("TwinLog");
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -227,7 +227,7 @@ Bool_t R3BTwim::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("TwinLog"))
     {
-        LOG(DEBUG) << "Found TWIN MUSIC geometry from ROOT file: " << name;
+        LOG(debug) << "Found TWIN MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

@@ -68,7 +68,7 @@ void R3BMusic::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, "");
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Anode"));
+    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("Anode"));
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -161,7 +161,7 @@ void R3BMusic::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BMusic::Register()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     FairRootManager::Instance()->Register("MusicPoint", GetName(), fMusicCollection, kTRUE);
 }
 
@@ -237,7 +237,7 @@ Bool_t R3BMusic::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Anode"))
     {
-        LOG(DEBUG) << "Found MUSIC geometry from ROOT file: " << name;
+        LOG(debug) << "Found MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

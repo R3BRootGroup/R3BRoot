@@ -86,7 +86,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::SetParContainers()
 
 void R3BCalifaCrystalCal2CrystalCalPID::Register()
 {
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
@@ -108,7 +108,7 @@ InitStatus R3BCalifaCrystalCal2CrystalCalPID::ReInit()
 
 void R3BCalifaCrystalCal2CrystalCalPID::Exec(Option_t* option)
 {
-    LOG(DEBUG) << "Calibrating CALIFA PID Data";
+    LOG(debug) << "Calibrating CALIFA PID Data";
 
     if (++nEvents % 10000 == 0)
         LOG(info) << nEvents;
@@ -143,7 +143,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::Finish() {}
 
 void R3BCalifaCrystalCal2CrystalCalPID::Reset()
 {
-    LOG(DEBUG) << "Clearing CalifaCrystalCal Data Structure";
+    LOG(debug) << "Clearing CalifaCrystalCal Data Structure";
     if (fCrystalCalDataCA)
         fCrystalCalDataCA->Clear();
 }

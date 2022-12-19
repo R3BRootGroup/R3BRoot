@@ -52,7 +52,7 @@ Bool_t R3BFiberMAPMTReader::Init()
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
-    R3BLOG(DEBUG, "Read BEGIN for fib " << fShortName);
+    R3BLOG(debug, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
@@ -68,16 +68,16 @@ Bool_t R3BFiberMAPMTReader::Read()
             if (c_M != f_M || c_ != f_)
             {
                 LOG(warn) << "Coarse and fine multi-hit list counts mismatch "
-                                "(edge="
-                             << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).";
+                             "(edge="
+                          << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).";
                 return kFALSE;
             }
             if (c_M > e[0]._MI_len || c_M > e[0]._ME_len || c_ > e[0]._v_len)
             {
                 LOG(warn) << "Multi-hit indexing out of range "
-                                "(edge="
-                             << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
-                             << ");(_=" << c_ << ")>=(v=" << e[0]._v_len << ")).";
+                             "(edge="
+                          << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
+                          << ");(_=" << c_ << ")>=(v=" << e[0]._v_len << ")).";
                 return kFALSE;
             }
 
@@ -97,9 +97,9 @@ Bool_t R3BFiberMAPMTReader::Read()
                 if (c_MI != f_MI || c_ME != f_ME)
                 {
                     LOG(warn) << "Coarse and fine multi-hit data mismatch "
-                                    "(edge="
-                                 << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
-                                 << "}).";
+                                 "(edge="
+                              << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
+                              << "}).";
                     return kFALSE;
                 }
                 for (; cur_entry < c_ME; cur_entry++)
@@ -124,8 +124,8 @@ Bool_t R3BFiberMAPMTReader::Read()
         if (c_ != f_)
         {
             LOG(warn) << "Coarse and fine single-hit list counts mismatch "
-                            "(_{c="
-                         << c_ << ",f=" << f_ << "}).";
+                         "(_{c="
+                      << c_ << ",f=" << f_ << "}).";
             return kFALSE;
         }
 

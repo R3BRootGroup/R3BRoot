@@ -233,7 +233,7 @@ void R3BINCLRootGenerator::RegisterIons()
                 if (ions.find(pdg) == ions.end())
                 {
                     const Double_t mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
-                    LOG(DEBUG) << "R3BINCLRootGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
+                    LOG(debug) << "R3BINCLRootGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
                     ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
                 }
             }

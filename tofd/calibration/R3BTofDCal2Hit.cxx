@@ -248,7 +248,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         for (int i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
-            // LOG(DEBUG)<<"tpatbin "tpatbin;
+            // LOG(debug)<<"tpatbin "tpatbin;
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
                 wrongtpat++;
@@ -257,7 +257,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             if (tpatbin != 0)
             {
                 //  fhTpat->Fill(i+1);
-                LOG(DEBUG) << "Accepted Tpat: " << i + 1;
+                LOG(debug) << "Accepted Tpat: " << i + 1;
             }
             tpatsum += tpatbin;
         }
@@ -302,7 +302,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     std::vector<hit> event;
 
     Int_t nHits = fCalItems->GetEntriesFast();
-    LOG(DEBUG) << "Leading and trailing edges in this event: " << nHits;
+    LOG(debug) << "Leading and trailing edges in this event: " << nHits;
     if (nHits == 0)
         events_wo_tofd_hits++;
 
@@ -451,7 +451,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
                 {
-                    R3BLOG(DEBUG, "TofD walk correction not found");
+                    R3BLOG(debug, "TofD walk correction not found");
                 }
                 else
                 {
@@ -559,26 +559,26 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
-                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
                 else
-                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
+                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
-                    LOG(DEBUG) << "x in this event "
+                    LOG(debug) << "x in this event "
                                << -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
                                       (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
                                << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 2 || iPlane == 4)
-                    LOG(DEBUG) << "x in this event "
+                    LOG(debug) << "x in this event "
                                << -detector_width / 2 + (paddle_width + air_gap_paddles) +
                                       (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
                                << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
+                LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-                //auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
+                // auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
                 auto tof_corr = tof - par->GetTofSyncOffset();
 
                 // if (parz[1] > 0)
@@ -612,7 +612,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 for (Int_t e = 0; e < event.size(); e++)
                 {
-                    LOG(DEBUG) << event[e].charge << " " << event[e].time << " " << event[e].xpos << " "
+                    LOG(debug) << event[e].charge << " " << event[e].time << " " << event[e].xpos << " "
                                << event[e].ypos << " " << event[e].plane << " " << event[e].bar;
                 }
 
@@ -622,19 +622,19 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(DEBUG) << "Not in bar coincidence increase top counter";
+                LOG(debug) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(DEBUG) << "Not in bar coincidence increase bot counter";
+                LOG(debug) << "Not in bar coincidence increase bot counter";
             }
         }
     }
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << event.size();
+    LOG(debug) << "Hits in this event: " << event.size();
     Bool_t tArrU[event.size() + 1];
     for (int i = 0; i < (event.size() + 1); i++)
         tArrU[i] = kFALSE;
@@ -657,10 +657,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
     if (fTofdHisto)
     {
-        LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+        LOG(debug) << "Charge Time xpos ypos plane bar";
         for (Int_t hit = 0; hit < event.size(); hit++)
         {
-            LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " "
+            LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " "
                        << event[hit].ypos << " " << event[hit].plane << " " << event[hit].bar;
             // if (event[hit].plane == 2 && (event[hit].bar < 21 || event[hit].bar > 24)) fhTvsQ[event[hit].plane -
             // 1]->Fill(event[hit].time-event[0].time,event[hit].charge);
@@ -676,7 +676,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     Double_t time0;
     for (Int_t ihit = 0; ihit < event.size();)
     { // loop over all hits in this event
-        LOG(DEBUG) << "Set new coincidence window: " << event[ihit].plane << " " << event[ihit].bar << " "
+        LOG(debug) << "Set new coincidence window: " << event[ihit].plane << " " << event[ihit].bar << " "
                    << event[ihit].time << " " << event[ihit].charge;
         time0 = event[ihit].time;              // time of first hit in coincidence window
         Double_t charge0 = event[ihit].charge; // charge of first hit in coincidence window
@@ -714,7 +714,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 goodbar.push_back(event[ihit].bar);
             }
 
-            LOG(DEBUG) << "Hit in coincidence window: " << event[ihit].plane << " " << event[ihit].bar << " "
+            LOG(debug) << "Hit in coincidence window: " << event[ihit].plane << " " << event[ihit].bar << " "
                        << event[ihit].time << " " << event[ihit].charge;
 
             ihit++;
@@ -730,12 +730,12 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 {
                     if (std::accumulate(goodplane.begin(), goodplane.end(), 0) == 6.)
                     {
-                        LOG(DEBUG) << "Found good pair 2 times in all planes";
+                        LOG(debug) << "Found good pair 2 times in all planes";
                         for (Int_t g = 0; g < goodcharge.size(); g++)
                         {
-                            LOG(DEBUG) << goodcharge.at(g);
-                            LOG(DEBUG) << goodplane.at(g);
-                            LOG(DEBUG) << goodbar.at(g);
+                            LOG(debug) << goodcharge.at(g);
+                            LOG(debug) << goodplane.at(g);
+                            LOG(debug) << goodbar.at(g);
                             goodevents.push_back({ goodcharge.at(g), goodplane.at(g), goodbar.at(g) });
                         }
                         goodpair++;
@@ -758,10 +758,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (std::accumulate(goodplane.begin(), goodplane.end(), 0) == 4 ||
                     std::accumulate(goodplane.begin(), goodplane.end(), 0) == 5)
                 {
-                    LOG(DEBUG) << "Found good pair at least once in all planes";
+                    LOG(debug) << "Found good pair at least once in all planes";
                     for (Int_t g = 0; g < goodcharge.size(); g++)
                     {
-                        LOG(DEBUG) << goodcharge.at(g);
+                        LOG(debug) << goodcharge.at(g);
                     }
                     goodpair++;
                     goodpair5++;
@@ -780,20 +780,20 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (std::accumulate(goodplane.begin(), goodplane.end(), 0) == 2. ||
                     std::accumulate(goodplane.begin(), goodplane.end(), 0) == 4.)
                 {
-                    LOG(DEBUG) << "Found good pair in one plane";
+                    LOG(debug) << "Found good pair in one plane";
                     for (Int_t g = 0; g < goodcharge.size(); g++)
                     {
-                        LOG(DEBUG) << goodcharge.at(g);
+                        LOG(debug) << goodcharge.at(g);
                     }
                     goodpair++;
                     goodpair1++;
                 }
                 if (std::accumulate(goodplane.begin(), goodplane.end(), 0) == 3.)
                 {
-                    LOG(DEBUG) << "Found good pair in different planes";
+                    LOG(debug) << "Found good pair in different planes";
                     for (Int_t g = 0; g < goodcharge.size(); g++)
                     {
-                        LOG(DEBUG) << goodcharge.at(g);
+                        LOG(debug) << goodcharge.at(g);
                     }
                     goodpair++;
                     goodpair2++;
@@ -804,9 +804,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             goodevents.begin(), goodevents.end(), [](goodhit const& a, goodhit const& b) { return a.goodq < b.goodq; });
         for (Int_t g = 0; g < goodevents.size(); g++)
         {
-            LOG(DEBUG) << goodevents[g].goodq;
-            LOG(DEBUG) << goodevents[g].goodp;
-            LOG(DEBUG) << goodevents[g].goodb;
+            LOG(debug) << goodevents[g].goodq;
+            LOG(debug) << goodevents[g].goodp;
+            LOG(debug) << goodevents[g].goodb;
         }
     }
 
@@ -844,15 +844,15 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         }
     }
 
-    LOG(DEBUG) << "Used up hits in this event:";
+    LOG(debug) << "Used up hits in this event:";
     for (Int_t a = 0; a < event.size(); a++)
     {
-        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
+        LOG(debug) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
             LOG(fatal) << "Not all events analyzed!";
     }
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
     fnEvents++;
 }
 

@@ -132,7 +132,7 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
     // Create histograms for crystal calibration
     char name[100];
     energy_vs_tot_crystal = new TGraph*[fNumCrystals];
-    LOG(DEBUG) << "fNumCrystals = " << fNumCrystals;
+    LOG(debug) << "fNumCrystals = " << fNumCrystals;
     for (Int_t i = 0; i < fNumCrystals; i++)
         if (fMap_Par->GetInUse(i + 1) == 1)
         {
@@ -181,8 +181,8 @@ void R3BCalifaCrystalCal2TotCalPar::Exec(Option_t* opt)
         if (CalHit[i]->GetEnergy() > fThreshold)
             energy_vs_tot_crystal[crystalId - 1]->SetPoint(
                 energy_vs_tot_crystal[crystalId - 1]->GetN(), CalHit[i]->GetToT_Energy(), CalHit[i]->GetEnergy());
-        LOG(DEBUG) << "Tot = " << CalHit[i]->GetToT_Energy();
-        LOG(DEBUG) << "Energy = " << CalHit[i]->GetEnergy();
+        LOG(debug) << "Tot = " << CalHit[i]->GetToT_Energy();
+        LOG(debug) << "Energy = " << CalHit[i]->GetEnergy();
     }
 
     if (CalHit)

@@ -81,4 +81,3 @@ void R3BRpcPars4Sim::printParams()
 }
 
 ClassImp(R3BRpcPars4Sim)
-

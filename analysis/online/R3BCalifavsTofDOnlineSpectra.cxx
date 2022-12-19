@@ -52,7 +52,7 @@ R3BCalifavsTofDOnlineSpectra::R3BCalifavsTofDOnlineSpectra(const TString& name, 
 
 R3BCalifavsTofDOnlineSpectra::~R3BCalifavsTofDOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fHitItemsCalifa)
         delete fHitItemsCalifa;
     if (fHitItemsTofd)

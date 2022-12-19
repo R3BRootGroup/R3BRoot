@@ -81,7 +81,7 @@ void R3BMfi::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BMfi: initialisation";
-    LOG(DEBUG) << "R3BMfi: Sci. Vol. (McId) " << gMC->VolId("MFILog");
+    LOG(debug) << "R3BMfi: Sci. Vol. (McId) " << gMC->VolId("MFILog");
 }
 
 // -----   Public method ProcessHits  --------------------------------------

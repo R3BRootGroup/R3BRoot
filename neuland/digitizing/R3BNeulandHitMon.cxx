@@ -92,7 +92,7 @@ void R3BNeulandHitMon::Exec(Option_t*)
             result.first->second++;
     }
     auto max = std::max_element(paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs){return (lhs.second < rhs.second);});
-    LOG(DEBUG) << "max dupli: " << max->second;
+    LOG(debug) << "max dupli: " << max->second;
 
     if (fIs3DTrackEnabled)
     {

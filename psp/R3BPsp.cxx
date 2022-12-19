@@ -95,7 +95,7 @@ void R3BPsp::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BPsp: initialisation";
-    LOG(DEBUG) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log");
+    LOG(debug) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log");
 }
 
 void R3BPsp::SetSpecialPhysicsCuts()

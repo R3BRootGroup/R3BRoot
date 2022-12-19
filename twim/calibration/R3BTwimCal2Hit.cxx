@@ -76,7 +76,7 @@ R3BTwimCal2Hit::R3BTwimCal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BTwimCal2Hit: Destructor
 R3BTwimCal2Hit::~R3BTwimCal2Hit()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fTwimHitDataCA)
         delete fTwimHitDataCA;
     if (fHitItemsTofW)
@@ -799,7 +799,7 @@ void R3BTwimCal2Hit::S467()
 // -----   Public method Reset   ------------------------------------------------
 void R3BTwimCal2Hit::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing TwimHitData Structure");
+    R3BLOG(debug1, "Clearing TwimHitData Structure");
     if (fTwimHitDataCA)
         fTwimHitDataCA->Clear();
 }

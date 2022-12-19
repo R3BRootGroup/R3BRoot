@@ -105,17 +105,17 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
     // LOG(info) << "crossed: " << crossed;
     if (crossed)
     {
-        LOG(DEBUG2) << "Starting upstream of magnetic field boundaries...";
+        LOG(debug2) << "Starting upstream of magnetic field boundaries...";
         if ((v1 - particle->GetPosition()).Mag() < (fPlane1[0] - particle->GetPosition()).Mag())
         {
-            LOG(DEBUG2) << "Propagating to end-plane and stop.";
+            LOG(debug2) << "Propagating to end-plane and stop.";
             crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
             step = (intersect - particle->GetPosition()).Mag();
             particle->SetPosition(intersect);
             particle->AddStep(step);
             return kTRUE;
         }
-        LOG(DEBUG2) << "Propagating to entrance of magnetic field.";
+        LOG(debug2) << "Propagating to entrance of magnetic field.";
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -124,7 +124,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         step = (intersect - particle->GetPosition()).Mag();
         particle->SetPosition(intersect);
         particle->AddStep(step);
-        LOG(DEBUG2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z();
+        LOG(debug2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z();
         // particle->GetPosition().Print();
         // particle->GetMomentum().Print();
     }
@@ -132,11 +132,11 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane2[0], fNorm2, intersect);
     if (crossed)
     {
-        LOG(DEBUG2) << "Propagating inside of field using RK4...";
+        LOG(debug2) << "Propagating inside of field using RK4...";
         TVector3 tpos;
         if ((v1 - particle->GetPosition()).Mag() < (fPlane2[0] - particle->GetPosition()).Mag())
         {
-            LOG(DEBUG2) << "Propagating to end-plane using RK4 and stop.";
+            LOG(debug2) << "Propagating to end-plane using RK4 and stop.";
             tpos = particle->GetPosition();
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
@@ -151,7 +151,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
             }
             return result;
         }
-        LOG(DEBUG2) << "Propagating to exit from magnetic field.";
+        LOG(debug2) << "Propagating to exit from magnetic field.";
         tpos = particle->GetPosition();
         result = PropagateToPlaneRK(particle, fPlane2[0], fPlane2[1], fPlane2[2]);
         if (fVis)
@@ -168,7 +168,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
     if (crossed)
     {
-        LOG(DEBUG2) << "Propagating to end plane. Finish.";
+        LOG(debug2) << "Propagating to end plane. Finish.";
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -177,7 +177,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         step = (intersect - particle->GetPosition()).Mag();
         particle->SetPosition(intersect);
         particle->AddStep(step);
-        LOG(DEBUG2);
+        LOG(debug2);
         return kTRUE;
     }
 
@@ -205,10 +205,10 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane2[0], -fNorm2, intersect);
     if (crossed)
     {
-        LOG(DEBUG2) << "Starting downstream of magnetic field boundaries...";
+        LOG(debug2) << "Starting downstream of magnetic field boundaries...";
         if ((v1 - particle->GetPosition()).Mag() < (fPlane2[0] - particle->GetPosition()).Mag())
         {
-            LOG(DEBUG2) << "Propagating to end-plane and stop.";
+            LOG(debug2) << "Propagating to end-plane and stop.";
             crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
             if (fVis)
             {
@@ -220,7 +220,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
             particle->AddStep(step);
             return kTRUE;
         }
-        LOG(DEBUG2) << "Propagating to exit of magnetic field.";
+        LOG(debug2) << "Propagating to exit of magnetic field.";
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -229,17 +229,17 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         step = (intersect - particle->GetPosition()).Mag();
         particle->SetPosition(intersect);
         particle->AddStep(step);
-        LOG(DEBUG2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z();
+        LOG(debug2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z();
     }
 
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane1[0], -fNorm1, intersect);
     if (crossed)
     {
-        LOG(DEBUG2) << "Propagating inside of field using RK4...";
+        LOG(debug2) << "Propagating inside of field using RK4...";
         TVector3 tpos;
         if ((v1 - particle->GetPosition()).Mag() < (fPlane1[0] - particle->GetPosition()).Mag())
         {
-            LOG(DEBUG2) << "Propagating to end-plane using RK4 and stop.";
+            LOG(debug2) << "Propagating to end-plane using RK4 and stop.";
             tpos = particle->GetPosition();
             result = PropagateToPlaneRK(particle, v1, v3, v2);
             if (fVis)
@@ -249,7 +249,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
             }
             return result;
         }
-        LOG(DEBUG2) << "Propagating to entrance of magnetic field.";
+        LOG(debug2) << "Propagating to entrance of magnetic field.";
         tpos = particle->GetPosition();
         result = PropagateToPlaneRK(particle, fPlane1[0], fPlane1[2], fPlane1[1]);
         if (fVis)
@@ -266,7 +266,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);
     if (crossed)
     {
-        LOG(DEBUG2) << "Propagating to end plane. Finish.";
+        LOG(debug2) << "Propagating to end plane. Finish.";
         if (fVis)
         {
             TLine* l1 = new TLine(-particle->GetX(), particle->GetZ(), -intersect.X(), intersect.Z());
@@ -275,7 +275,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         step = (intersect - particle->GetPosition()).Mag();
         particle->SetPosition(intersect);
         particle->AddStep(step);
-        LOG(DEBUG2);
+        LOG(debug2);
         return kTRUE;
     }
 

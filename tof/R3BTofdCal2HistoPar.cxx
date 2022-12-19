@@ -502,7 +502,7 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
                 LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
             LOG(warn) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
-                         << "\n";
+                      << "\n";
             par->SetLambda(lambda);
         }
     }

@@ -161,7 +161,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             // Convert TDC to [ns]
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 
@@ -170,7 +170,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 

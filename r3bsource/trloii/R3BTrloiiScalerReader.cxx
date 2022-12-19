@@ -44,7 +44,7 @@ R3BTrloiiScalerReader::R3BTrloiiScalerReader(EXT_STR_h101_TRLO_onion* data, size
 
 R3BTrloiiScalerReader::~R3BTrloiiScalerReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
         delete fArray;
 }
@@ -71,7 +71,7 @@ Bool_t R3BTrloiiScalerReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTrloiiScalerReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data");
+    R3BLOG(debug1, "Event data");
 
     for (int ch = 0; ch < 16; ++ch)
     {

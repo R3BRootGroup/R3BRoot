@@ -71,7 +71,7 @@ void R3BTof::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BTof: initialisation";
-    LOG(DEBUG) << "R3BTof: Sci. Vol. (McId) " << gMC->VolId("TOFLog");
+    LOG(debug) << "R3BTof: Sci. Vol. (McId) " << gMC->VolId("TOFLog");
 }
 
 void R3BTof::SetSpecialPhysicsCuts()

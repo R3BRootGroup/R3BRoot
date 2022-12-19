@@ -45,7 +45,7 @@ R3BAlpideReader::R3BAlpideReader(EXT_STR_h101_ALPIDE_onion* data, size_t offset)
 
 R3BAlpideReader::~R3BAlpideReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
     {
         delete fArray;
@@ -70,7 +70,7 @@ Bool_t R3BAlpideReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BAlpideReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data: " << fNEvent);
+    R3BLOG(debug1, "Event data: " << fNEvent);
 
     for (int d = 0; d < fNbDet; d++)
     {
@@ -102,7 +102,7 @@ Bool_t R3BAlpideReader::Read()
         for (int r = 0; r < fData->ALPIDE[d].ROW; r++)
         {
 
-            //  R3BLOG(DEBUG1,"det: "<<d+1 <<", region: "<<fData->ALPIDE[d].REGIONv[fData->ALPIDE[d].REGION-1]<< " ,
+            //  R3BLOG(debug1,"det: "<<d+1 <<", region: "<<fData->ALPIDE[d].REGIONv[fData->ALPIDE[d].REGION-1]<< " ,
             //  ads: " << fData->ALPIDE[d].ADDRESSv[fData->ALPIDE[d].ADDRESS-1]<< " , row: "<<
             //  fData->ALPIDE[d].ROWv[r]<<" , col: "<< fData->ALPIDE[d].COLv[r]);
 

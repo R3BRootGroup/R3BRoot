@@ -157,7 +157,7 @@ InitStatus R3BBunchedFiberMapped2Cal::ReInit()
 void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
+    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName() << '.');
     if (mapped_num == 0)
     {
         return;
@@ -167,7 +167,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
     {
         auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
         auto channel = mapped->GetChannel();
-        R3BLOG(DEBUG, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
+        R3BLOG(debug, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;
@@ -200,7 +200,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         if (mapped->IsMAPMT() || mapped->IsMAPMTTrigger())
         {
             auto fine_ns = par->GetTimeClockTDC(fine_raw);
-            R3BLOG(DEBUG, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
+            R3BLOG(debug, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
             if (fine_ns < 0. || fine_ns > fClockFreq)
             {
                 R3BLOG(error,
@@ -215,7 +215,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             // new clock TDC firmware need here a minus
             time_ns = (mapped->GetCoarse() + 1) * fClockFreq - fine_ns;
 
-            R3BLOG(DEBUG, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
+            R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
         }
         else
         {
@@ -234,7 +234,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             }
             time_ns = (mapped->GetCoarse() + 1) * fTamexFreq - fine_ns;
 
-            R3BLOG(DEBUG, "Channel=" << channel << ": Time=" << time_ns << "ns.");
+            R3BLOG(debug, "Channel=" << channel << ": Time=" << time_ns << "ns.");
         }
         if (3 == mapped->GetSide())
         {

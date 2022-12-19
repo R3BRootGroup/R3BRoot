@@ -114,14 +114,14 @@ InitStatus R3BPdcMapped2Cal::ReInit()
 void R3BPdcMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BPdcMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BPdcMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BPdcMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto wire = mapped->GetWireId();
-        LOG(DEBUG) << " R3BPdcMapped2Cal::Exec:wire=" << wire
+        LOG(debug) << " R3BPdcMapped2Cal::Exec:wire=" << wire
                    << ":Edge=" << (mapped->GetEdgeId() == 1 ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -142,7 +142,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BPdcMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BPdcMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
@@ -153,7 +153,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
 
         time_ns = mapped->GetTimeCoarse() * fClockFreq - fine_ns;
 
-        // LOG(DEBUG) << " R3BPdcMapped2Cal::Exec (" << fName << "): wire=" << wire
+        // LOG(debug) << " R3BPdcMapped2Cal::Exec (" << fName << "): wire=" << wire
         //               << ": Time=" << time_ns << "ns.";
 
         // cout << "mapped2cal plane: " << mapped->GetPlaneId() << " Wire: " << mapped->GetWireId()

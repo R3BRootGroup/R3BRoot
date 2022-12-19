@@ -244,7 +244,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold); // number of peaks
                 else
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "goff", fThreshold);
-                LOG(DEBUG) << "CrystalId=" << i + 1 << " " << nfound << " " << fThreshold;
+                LOG(debug) << "CrystalId=" << i + 1 << " " << nfound << " " << fThreshold;
                 fChannelPeaks = (Double_t*)ss->GetPositionX();
 
                 Int_t idx[nfound];
@@ -258,7 +258,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 {
                     X[j] = fChannelPeaks[idx[nfound - j - 1]];
                     Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
-                    LOG(DEBUG) << "CrystalId=" << i + 1 << " " << j + 1 << " " << X[j + 1];
+                    LOG(debug) << "CrystalId=" << i + 1 << " " << j + 1 << " " << X[j + 1];
                 }
                 X[nfound] = 0.;
                 Y[nfound] = 0.;

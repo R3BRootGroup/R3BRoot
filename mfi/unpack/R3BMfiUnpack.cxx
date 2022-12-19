@@ -58,7 +58,7 @@ Bool_t R3BMfiUnpack::Init()
 // Register: Protected method
 void R3BMfiUnpack::Register()
 {
-    //  LOG(DEBUG) << "Registering";
+    //  LOG(debug) << "Registering";
     LOG(info) << "R3BMfiUnpack : Registering...";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
@@ -71,7 +71,7 @@ void R3BMfiUnpack::Register()
 // DoUnpack: Public method
 Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
 {
-    LOG(DEBUG) << "R3BMfiUnpack : Unpacking... size = " << size;
+    LOG(debug) << "R3BMfiUnpack : Unpacking... size = " << size;
 
     UInt_t l_i = 0;
     while ((data[l_i] & 0xfff00000) == 0xadd00000)
@@ -125,7 +125,7 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
             fNHits++;
             index[id] += 1;
 
-            LOG(DEBUG) << nxtId << "  " << gemexId << "  " << trigger << " tot=" << size << "   " << triggerTs;
+            LOG(debug) << nxtId << "  " << gemexId << "  " << trigger << " tot=" << size << "   " << triggerTs;
         }
     }
 
@@ -136,7 +136,7 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
 // Reset: Public method
 void R3BMfiUnpack::Reset()
 {
-    LOG(DEBUG) << "R3BMfiUnpack : Clearing Data Structure";
+    LOG(debug) << "R3BMfiUnpack : Clearing Data Structure";
     fRawData->Clear();
     fNHits = 0;
 }

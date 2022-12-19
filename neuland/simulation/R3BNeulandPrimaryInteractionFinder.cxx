@@ -163,13 +163,13 @@ void R3BNeulandPrimaryInteractionFinder::Exec(Option_t*)
 
     if (FairLogger::GetLogger()->IsLogNeeded(fair::Severity::debug))
     {
-        LOG(DEBUG) << "R3BNeulandPrimaryInteractionFinder: Points without Hit in: ";
+        LOG(debug) << "R3BNeulandPrimaryInteractionFinder: Points without Hit in: ";
         for (const auto& kv : p2h)
         {
             if (kv.second == nullptr)
             {
                 const auto point = kv.first;
-                LOG(DEBUG) << point->GetDetectorID() << ":" << tracks.at(point->GetTrackID())->GetPdgCode() << ":"
+                LOG(debug) << point->GetDetectorID() << ":" << tracks.at(point->GetTrackID())->GetPdgCode() << ":"
                            << point->GetLightYield() << ":" << point->GetEnergyLoss() << "\t";
             }
         }

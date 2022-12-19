@@ -294,7 +294,7 @@ void R3BAmsMapped2StripCal::Finish() {}
 // -----   Public method Reset   ------------------------------------------------
 void R3BAmsMapped2StripCal::Reset()
 {
-    LOG(DEBUG) << "Clearing StripCalData Structure";
+    LOG(debug) << "Clearing StripCalData Structure";
     if (fAmsStripCalDataCA)
         fAmsStripCalDataCA->Clear();
 }

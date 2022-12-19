@@ -75,7 +75,7 @@ void R3BFiber::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, "for fiber " << fName);
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Fiber"));
+    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("Fiber"));
 }
 
 void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(info, ""); }
@@ -188,7 +188,7 @@ void R3BFiber::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BFiber::Register()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     FairRootManager::Instance()->Register(fName + "Point", GetName(), fFiCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -264,7 +264,7 @@ Bool_t R3BFiber::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains(fName))
     {
-        LOG(DEBUG) << "Found" << fName << " geometry from ROOT file: " << name;
+        LOG(debug) << "Found" << fName << " geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

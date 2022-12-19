@@ -415,7 +415,7 @@ void R3BAmsStripCal2Hit::DefineClusters(Int_t* nfoundhits,
 // -----   Public method Reset   ------------------------------------------------
 void R3BAmsStripCal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing HitData Structure";
+    LOG(debug) << "Clearing HitData Structure";
     if (fAmsHitDataCA)
         fAmsHitDataCA->Clear();
 }

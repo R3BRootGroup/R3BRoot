@@ -544,17 +544,17 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
                 if (timeLos != 0)
                 {
-                    LOG(DEBUG) << "Found LOS detector";
-                    LOG(DEBUG) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
+                    LOG(debug) << "Found LOS detector";
+                    LOG(debug) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
                     while (ToF < -c_range_ns / 2)
                     {
                         ToF += c_range_ns;
-                        LOG(DEBUG) << "Shift up\n";
+                        LOG(debug) << "Shift up\n";
                     }
                     while (ToF > c_range_ns / 2)
                     {
                         ToF -= c_range_ns;
-                        LOG(DEBUG) << "Shift down\n";
+                        LOG(debug) << "Shift down\n";
                     }
                 }
 
@@ -707,7 +707,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t hit_coinc = 5000000.; // coincidence window for hits in one event in ns. physics says max 250 ps
     Double_t maxChargeDiff = 1.;   // maximum charge difference between two planes for averaged hits
 
-    LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
+    LOG(debug) << "Hits in this event: " << nHitsEvent;
     if (nHitsEvent == 0)
         events_wo_tofd_hits++;
 
@@ -756,7 +756,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     Int_t p = 0;
                     if (tArrT[0] == -1.)
                     { // first entry
-                        LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
+                        LOG(debug) << "First entry plane/bar " << i << "/" << j;
                         tArrQ[0] = q[i][j].at(m);
                         tArrT[0] = tof[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
@@ -769,7 +769,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     {
                         if (tof[i][j].at(m) < tArrT[0])
                         { // new first entry with smaller time
-                            LOG(DEBUG) << "Insert new first " << i << " " << j;
+                            LOG(debug) << "Insert new first " << i << " " << j;
                             insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), 1);
@@ -787,10 +787,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                     LOG(fatal) << "Insert position oor"; // should not happen
                             }
 
-                            LOG(DEBUG) << "Will insert at " << p;
+                            LOG(debug) << "Will insert at " << p;
                             if (p > 0 && tof[i][j].at(m) > tArrT[p - 1] && tof[i][j].at(m) != tArrT[p])
                             { // insert at right position
-                                LOG(DEBUG) << "Insert at " << p << " " << i << " " << j;
+                                LOG(debug) << "Insert at " << p << " " << i << " " << j;
                                 insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 1);
@@ -803,7 +803,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             {
                                 if (tof[i][j].at(m) == tArrT[p])
                                 { // handle virtual bars
-                                    LOG(DEBUG) << "Insert virtual bar " << i << " " << j;
+                                    LOG(debug) << "Insert virtual bar " << i << " " << j;
                                     insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 2);
@@ -869,8 +869,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t time0;
     for (Int_t ihit = 0; ihit < 2 * nHitsEvent;)
     { // loop over all hits in this event
-        LOG(warn) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
-                     << " " << tArrQ[ihit];
+        LOG(warn) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit] << " "
+                  << tArrQ[ihit];
         time0 = tArrT[ihit];            // time of first hit in coincidence window
         Double_t charge0 = tArrQ[ihit]; // charge of first hit in coincidence window
         Double_t plane0 = tArrP[ihit];  // plane of first hit in coincidence window
@@ -909,7 +909,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 }
             }
 
-            LOG(DEBUG) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
+            LOG(debug) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
                        << " " << tArrQ[ihit];
 
             // try to average plane 1&2
@@ -1023,8 +1023,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         {
                             inaverage34++;
                             LOG(warn) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
-                                         << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
-                                         << tArrB[ihit - i];
+                                      << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " " << tArrB[ihit - i];
 
                             nAverage34++; // number of averaged hits in this coincidence window
                             sumQ34 += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
@@ -1150,7 +1149,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     { // loop over not averaged hits
         if (tArrU[hit] == false)
         {
-            LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
+            LOG(debug) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = tArrU[hit + 1] = true;
             // store single hits only seen in planes
             singlehit++;
@@ -1187,7 +1186,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     }
     // std::cout << "\n";
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
 
     fnEvents++;
 }

@@ -157,7 +157,7 @@ void R3BRpcDigitizer::Exec(Option_t* option)
 void R3BRpcDigitizer::Reset()
 {
     // Clear the CA structure
-    LOG(DEBUG) << "Clearing RpcCalData Structure";
+    LOG(debug) << "Clearing RpcCalData Structure";
     if (fRpcCalDataCA)
         fRpcCalDataCA->Clear();
 

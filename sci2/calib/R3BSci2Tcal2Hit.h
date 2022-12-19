@@ -88,8 +88,8 @@ class R3BSci2Tcal2Hit : public FairTask
 
     // Method to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
-    
-    //Method to set Coincidence window
+
+    // Method to set Coincidence window
     void SetCoincWindow(Double_t t_Diff) { fCoincWindow = t_Diff; }
 
     virtual void SetParContainers();

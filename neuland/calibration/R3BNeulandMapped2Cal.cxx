@@ -260,7 +260,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         // Convert TDC to [ns] leading
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge)))
         {
-            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+            LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
             continue;
         }
 
@@ -270,7 +270,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         // Convert TDC to [ns] trailing
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge + 1)))
         {
-            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+            LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
             continue;
         }
 

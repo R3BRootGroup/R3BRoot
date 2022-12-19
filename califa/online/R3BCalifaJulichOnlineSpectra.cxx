@@ -69,7 +69,7 @@ R3BCalifaJulichOnlineSpectra::R3BCalifaJulichOnlineSpectra(const TString& name, 
 
 R3BCalifaJulichOnlineSpectra::~R3BCalifaJulichOnlineSpectra()
 {
-    LOG(DEBUG) << "R3BCalifaJulichOnlineSpectra::Delete instance";
+    LOG(debug) << "R3BCalifaJulichOnlineSpectra::Delete instance";
     if (fMappedItemsCalifa)
         delete fMappedItemsCalifa;
     if (fMappedItemsSi)

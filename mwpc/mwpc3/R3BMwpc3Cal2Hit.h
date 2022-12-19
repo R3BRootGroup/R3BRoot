@@ -15,7 +15,7 @@
 //-----                        R3BMwpc3Cal2Hit                     -----
 //-----             Created 14/10/19 by G. García Jiménez          -----
 //-----             by modifying J.L classes for MWPC0             -----
-//-----               s455 method 17/06/22 by Antia GG             ----- 
+//-----               s455 method 17/06/22 by Antia GG             -----
 //----------------------------------------------------------------------
 
 #ifndef R3BMWPC3CAL2HIT_H
@@ -63,22 +63,24 @@ class R3BMwpc3Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
+    void SetExpId(Int_t exp)
+    {
+        fExpId = exp;
+    } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
-
     /** Private method Experiment s455 **/
     virtual void S455();
     /** Private method Experiment s467 **/
     virtual void S467();
 
     R3BEventHeader* header; /**< Event header. */
-    
+
     Double_t fSizeX; // Detector size in X and Y
     Double_t fSizeY; // Detector size in X and Y
     Double_t fwx;    // Pad width in X
     Double_t fwy;    // Pad width in Y
-    Double_t fx[Mw3PadsX], fy[Mw3PadsY]; 
+    Double_t fx[Mw3PadsX], fy[Mw3PadsY];
     vector<Int_t> fQX;
     vector<Int_t> fQY;
     vector<Int_t> fPadX;

@@ -77,7 +77,7 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
 
 R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fCal_Par)
     {
         delete fCal_Par;
@@ -195,7 +195,7 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
             UInt_t iDetector = mapped->GetDetector() - 1; // now 0..n-1
             UInt_t iChannel = mapped->GetChannel();
             UInt_t iType = mapped->GetType() + 1; // 1,2,3...
-            R3BLOG(DEBUG1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
+            R3BLOG(debug1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
             fEngine->Fill(3 + iDetector, iChannel, iType, mapped->GetTimeFine());
             Icounttrig[iChannel - 1][iType - 1]++;
         }

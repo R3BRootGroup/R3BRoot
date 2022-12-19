@@ -79,7 +79,7 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
 // Virtual R3BFootStripCal2Hit::Destructor --------------------------------------
 R3BFootStripCal2Hit::~R3BFootStripCal2Hit()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFootHitData)
         delete fFootHitData;
 }
@@ -431,7 +431,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BFootStripCal2Hit::Reset()
 {
-    R3BLOG(DEBUG, "Clearing HitData Structure");
+    R3BLOG(debug, "Clearing HitData Structure");
     if (fFootHitData)
         fFootHitData->Clear();
 }

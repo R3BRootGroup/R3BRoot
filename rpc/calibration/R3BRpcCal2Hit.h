@@ -50,7 +50,7 @@ class R3BRpcCal2Hit : public FairTask
     virtual void SetParContainers();
 
     /** Virtual method Finish **/
-     virtual void Finish();
+    virtual void Finish();
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -62,11 +62,9 @@ class R3BRpcCal2Hit : public FairTask
     virtual InitStatus ReInit();
 
   private:
-  
-
     R3BTimeStitch* fTimeStitch;
     R3BEventHeader* fR3BEventHeader; /**< Event header - input data. */
-  
+
     TClonesArray* fRpcCalDataCA;
     TClonesArray* fRpcHitDataCA;
 
@@ -79,8 +77,7 @@ class R3BRpcCal2Hit : public FairTask
     // Parameter class
     R3BRpcHitPar* fHitPar;
 
-
-    R3BRpcHitData* AddHitStrip(UInt_t iDet,UInt_t channel, double time, double pos, double charge,double tof);
+    R3BRpcHitData* AddHitStrip(UInt_t iDet, UInt_t channel, double time, double pos, double charge, double tof);
 
     ClassDef(R3BRpcCal2Hit, 1);
 };

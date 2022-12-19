@@ -80,14 +80,14 @@ InitStatus R3BSfibMapped2Cal::ReInit()
 void R3BSfibMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BSfibMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
+        LOG(debug) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -109,7 +109,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns >= fClockFreq)
@@ -125,7 +125,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Channel=" << channel << ": Time=" << time_ns << "ns.";
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Channel=" << channel << ": Time=" << time_ns << "ns.";
         new ((*fCalItems)[fCalItems->GetEntriesFast()])
             R3BSfibCalData(1 + mapped->IsTop(), channel, mapped->IsLeading(), time_ns);
     }

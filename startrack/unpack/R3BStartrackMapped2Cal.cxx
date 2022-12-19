@@ -141,7 +141,7 @@ InitStatus R3BStartrackMapped2Cal::ReInit()
 void R3BStartrackMapped2Cal::Exec(Option_t* option)
 {
 
-    LOG(DEBUG) << "Calibrating StarTrack Mapped Data";
+    LOG(debug) << "Calibrating StarTrack Mapped Data";
 
     if (!fMappedItemsCA)
     {

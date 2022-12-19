@@ -189,7 +189,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t* data, Int_t size) // used for Mbs for
 
         l_s++;
 
-        // LOG(DEBUG) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder
+        // LOG(debug) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder
         // ID IS " << module_id << " , ADC Data IS " << adcData; new ((*fRawData)[fNHits]) R3BStartrackRawHit(module_id,
         // side, asic_id, strip_id, adcData, lclock);
 
@@ -236,7 +236,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
     // cout << "data_word1=" << *pl_data_word1 << endl;
 
     // LOG(info) << "Unpacking Startracker data";
-    LOG(DEBUG) << "Unpacking Startracker data";
+    LOG(debug) << "Unpacking Startracker data";
 
     wordtype = (*data_word0 >> 30) & 0x3; // bit 31:30
 
@@ -255,7 +255,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
             (((*data_word0 & 0xFFFFFFFF) != 0xFFFFFFFF) && ((*data_word1 & 0xFFFFFFFF) != 0xFFFFFFFF)))
         {
             // cout << "Words type A (msb=10)." << std::endl;
-            LOG(DEBUG) << "Words type A (msb=10).";
+            LOG(debug) << "Words type A (msb=10).";
             word_0A = *pl_data_word0;
             word_1A = *pl_data_word1;
 
@@ -302,7 +302,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
             (((*data_word0 & 0xFFFFFFFF) != 0xFFFFFFFF) && ((*data_word1 & 0xFFFFFFFF) != 0xFFFFFFFF)))
         {
             // cout << "Words type B (msb=11)."<< std::endl;
-            LOG(DEBUG) << "Words type B (msb=11)." << std::endl;
+            LOG(debug) << "Words type B (msb=11)." << std::endl;
             word_0B = *pl_data_word0;
             word_1B = *pl_data_word1;
 
@@ -321,7 +321,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
               }
             */
 
-            LOG(DEBUG) << "At GOSIP memory";
+            LOG(debug) << "At GOSIP memory";
 
             // Real R3B Si Tracker data channel
 
@@ -373,7 +373,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
         } // end of B word case
 
         // LOG(info) << " --------- event "
-        LOG(DEBUG) << " --------- event "
+        LOG(debug) << " --------- event "
                    << "        hitbit " << hitbit << "        Channel_id " << channel_id << "        ASIC_id "
                    << asic_id << "        Side " << side << "        Module_id " << module_id << "        energy "
                    << energy << "        timestamp " << timestamp << "=================================";
@@ -385,8 +385,8 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
 
     } // end of while(l_s<size)
 
-    LOG(DEBUG) << "End of memory";
-    LOG(DEBUG) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits;
+    LOG(debug) << "End of memory";
+    LOG(debug) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits;
     // LOG(info) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits;
 
     return kTRUE;
@@ -396,7 +396,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t* data_word0, Int_t* data_word1, Int_t
 // Reset: Public method
 void R3BStartrackUnpack::Reset()
 {
-    LOG(DEBUG) << "Clearing Data Structure";
+    LOG(debug) << "Clearing Data Structure";
     fRawData->Clear();
     fNHits = 0;
 }

@@ -285,7 +285,7 @@ void R3BFiberReader::SetUcesbSPMTTrigStructure(EXT_STR_h101_FIB_onion* data, siz
 
 R3BFiberReader::~R3BFiberReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fMappedArray)
         delete fMappedArray;
 }
@@ -414,7 +414,7 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BFiberReader::Read()
 {
-    R3BLOG(DEBUG1, "Read BEGIN for fib " << fShortName);
+    R3BLOG(debug1, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)

@@ -361,7 +361,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // prepare offset and sync calculation
                 if (fTofiQ < 0.1)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -459,7 +459,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 if (!fTofiSmiley)
                 {
 
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(debug) << "Prepare histo for double exponential fit";
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -480,7 +480,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofiZ == true)
                 {
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)

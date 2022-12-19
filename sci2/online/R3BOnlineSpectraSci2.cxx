@@ -47,7 +47,7 @@ R3BOnlineSpectraSci2::R3BOnlineSpectraSci2(const char* name, Int_t iVerbose)
 
 R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 {
-    LOG(DEBUG) << "R3BOnlineSpectraSci2::Destructor";
+    LOG(debug) << "R3BOnlineSpectraSci2::Destructor";
     if (fMapped)
         delete fMapped;
     if (fTcal)

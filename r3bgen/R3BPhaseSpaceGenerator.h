@@ -16,10 +16,10 @@
 
 // Wrapper for TGenPhaseSpace
 
+#include "R3BBeamProperties.h"
 #include "R3BDistribution.h"
 #include "R3BDistribution1D.h"
 #include "R3BParticleSelector.h"
-#include "R3BBeamProperties.h"
 
 #include "FairGenerator.h"
 #include "FairIon.h"

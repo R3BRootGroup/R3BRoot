@@ -96,12 +96,12 @@ class R3BRoluCal2Hit : public FairTask
 
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
-    
+
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
         fNofChannels = nChs; //=4
-    }    
+    }
 
   private:
     TClonesArray* fCalItems; /* < Array with Cal items - input data. */

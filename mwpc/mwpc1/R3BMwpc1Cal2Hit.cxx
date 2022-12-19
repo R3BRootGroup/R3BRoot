@@ -56,7 +56,7 @@ R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc1Cal2Hit: Destructor
 R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
     if (fMwpcHitDataCA)
@@ -492,7 +492,7 @@ void R3BMwpc1Cal2Hit::S455()
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc1Cal2Hit::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing Mwpc1HitData Structure");
+    R3BLOG(debug1, "Clearing Mwpc1HitData Structure");
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }

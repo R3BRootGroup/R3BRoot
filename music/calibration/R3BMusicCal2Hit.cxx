@@ -68,7 +68,7 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMusicCal2Hit: Destructor
 R3BMusicCal2Hit::~R3BMusicCal2Hit()
 {
-    LOG(DEBUG) << "R3BMusicCal2Hit::Destructor";
+    LOG(debug) << "R3BMusicCal2Hit::Destructor";
     if (fMusicHitDataCA)
         delete fMusicHitDataCA;
 }
@@ -338,7 +338,7 @@ void R3BMusicCal2Hit::ExecSim(int nHits)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicCal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing R3BMusicHitData Structure";
+    LOG(debug) << "Clearing R3BMusicHitData Structure";
     if (fMusicHitDataCA)
         fMusicHitDataCA->Clear();
 }

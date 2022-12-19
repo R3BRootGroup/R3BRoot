@@ -67,7 +67,7 @@ void R3BTofD::Initialize()
 {
     FairDetector::Initialize();
     R3BLOG(info, "");
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Paddle"));
+    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("Paddle"));
 }
 
 void R3BTofD::SetSpecialPhysicsCuts()
@@ -132,7 +132,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 
     // Set additional parameters at exit of active volume. Create R3BTofdPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
-    { 
+    {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         static auto restr = "Plane_([0-9]+).*Paddle_([0-9]+)";
         static auto re = boost::regex(restr, boost::regex::extended);
@@ -224,7 +224,7 @@ void R3BTofD::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BTofD::Register()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     FairRootManager::Instance()->Register("TofDPoint", GetName(), fTofdCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -304,7 +304,7 @@ Bool_t R3BTofD::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Paddle"))
     {
-        LOG(DEBUG) << "Found TofD geometry from ROOT file: " << name;
+        LOG(debug) << "Found TofD geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

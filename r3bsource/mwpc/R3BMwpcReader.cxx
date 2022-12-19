@@ -44,7 +44,7 @@ R3BMwpcReader::R3BMwpcReader(EXT_STR_h101_SOFMWPC* data, size_t offset)
 
 R3BMwpcReader::~R3BMwpcReader()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fArrayMwpc0)
     {
         delete fArrayMwpc0;

@@ -355,7 +355,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare offset and sync calculation
                 if (fTofdQ < 0.1)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -472,7 +472,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                         fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
                     }
 
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(debug) << "Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -492,7 +492,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)

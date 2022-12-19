@@ -64,7 +64,7 @@ void R3BMwpc0::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, "");
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("MWPC0"));
+    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("MWPC0"));
 }
 
 void R3BMwpc0::SetSpecialPhysicsCuts() { R3BLOG(info, ""); }
@@ -163,7 +163,7 @@ void R3BMwpc0::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BMwpc0::Register()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     FairRootManager::Instance()->Register("Mwpc0Point", GetName(), fSofMWPCCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -239,7 +239,7 @@ Bool_t R3BMwpc0::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("MWPC0"))
     {
-        LOG(DEBUG) << "Found MWPC0 geometry from ROOT file: " << name;
+        LOG(debug) << "Found MWPC0 geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

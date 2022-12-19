@@ -34,7 +34,7 @@ R3BAmsDigitizer::R3BAmsDigitizer()
 
 R3BAmsDigitizer::~R3BAmsDigitizer()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fPointData)
     {
         fPointData->Delete();
@@ -112,7 +112,7 @@ void R3BAmsDigitizer::Exec(Option_t* option)
 
 void R3BAmsDigitizer::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing StripCalData Structure");
+    R3BLOG(debug1, "Clearing StripCalData Structure");
     if (fCalData)
         fCalData->Clear();
 }

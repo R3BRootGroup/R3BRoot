@@ -94,7 +94,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
         if (radiative)
         {
-            LOG(DEBUG) << "R3BGammaGenerator: Generating transition from level " << lvlSrc << " ("
+            LOG(debug) << "R3BGammaGenerator: Generating transition from level " << lvlSrc << " ("
                        << (fEnergyLevels[lvlSrc] * 1000.) << " MeV) to level " << lvlDst << " ("
                        << (fEnergyLevels[lvlDst] * 1000.) << " MeV)";
 
@@ -124,7 +124,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator* primGen)
     TLorentzVector vGamma(vMomentum, E);
     vGamma.Boost(fBeta);
 
-    LOG(DEBUG) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000. * E)
+    LOG(debug) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000. * E)
                << " MeV, E_lab = " << (1000. * vGamma.E())
                << " MeV, Theta_lab = " << (vGamma.Theta() * 180. / TMath::Pi()) << " deg";
 

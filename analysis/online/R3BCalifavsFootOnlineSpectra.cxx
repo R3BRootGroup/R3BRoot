@@ -71,7 +71,7 @@ R3BCalifavsFootOnlineSpectra::R3BCalifavsFootOnlineSpectra(const TString& name, 
 
 R3BCalifavsFootOnlineSpectra::~R3BCalifavsFootOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fHitItemsCalifa)
         delete fHitItemsCalifa;
     if (fMappedItemsFoot)

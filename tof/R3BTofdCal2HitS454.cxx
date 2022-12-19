@@ -162,7 +162,7 @@ InitStatus R3BTofdCal2HitS454::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
-    
+
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
@@ -508,22 +508,22 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
-                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
                 else
-                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
+                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
-                    LOG(DEBUG) << "x in this event "
+                    LOG(debug) << "x in this event "
                                << -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
                                       (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
                                << " ibar " << iBar;
                 if (iPlane == 2 || iPlane == 4)
-                    LOG(DEBUG) << "x in this event "
+                    LOG(debug) << "x in this event "
                                << -detector_width / 2 + (paddle_width + air_gap_paddles) +
                                       (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
                                << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
+                LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
@@ -554,19 +554,19 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(DEBUG) << "Not in bar coincidence increase top counter";
+                LOG(debug) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(DEBUG) << "Not in bar coincidence increase bot counter";
+                LOG(debug) << "Not in bar coincidence increase bot counter";
             }
         }
     }
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
+    LOG(debug) << "Hits in this event: " << nHitsEvent;
     //    if (nHitsEvent == 0)
     //        events_wo_tofd_hits++;
 
@@ -615,7 +615,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     Int_t p = 0;
                     if (tArrT[0] == -1.)
                     { // first entry
-                        LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
+                        LOG(debug) << "First entry plane/bar " << i << "/" << j;
                         tArrQ[0] = q[i][j].at(m);
                         tArrT[0] = thit[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
@@ -628,7 +628,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     {
                         if (thit[i][j].at(m) < tArrT[0])
                         { // new first entry with smaller time
-                            LOG(DEBUG) << "Insert new first " << i << "/" << j;
+                            LOG(debug) << "Insert new first " << i << "/" << j;
                             insertX(nHitsEvent, tArrQ, q[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrT, thit[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrX, x[i][j].at(m), 1);
@@ -646,10 +646,10 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                                     LOG(fatal) << "Insert position oor"; // should not happen
                             }
 
-                            LOG(DEBUG) << "Will insert at " << p;
+                            LOG(debug) << "Will insert at " << p;
                             if (p > 0 && thit[i][j].at(m) > tArrT[p - 1] && thit[i][j].at(m) != tArrT[p])
                             { // insert at right position
-                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
+                                LOG(debug) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
@@ -663,7 +663,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
 
                                 LOG(error) << "Insert event with exact same time " << fnEvents;
                                 p = p + 1;
-                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
+                                LOG(debug) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
@@ -709,7 +709,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         for (Int_t a = 0; a < nHitsEvent; a++)
             ss << tArrB[a] << " ";
     }
-    LOG(DEBUG) << ss.str() << "\n";
+    LOG(debug) << ss.str() << "\n";
 
     // Now we can analyze the hits in this event
 
@@ -755,15 +755,15 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         }
     }
 
-    LOG(DEBUG) << "Used up hits in this event:";
+    LOG(debug) << "Used up hits in this event:";
     for (Int_t a = 0; a < nHitsEvent; a++)
     {
-        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
+        LOG(debug) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
             LOG(fatal) << "Not all events analyzed!";
     }
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
     fnEvents++;
 }
 

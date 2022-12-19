@@ -22,7 +22,6 @@
 
 #include "FairTask.h"
 
-
 #include "R3BRpcPreCal2CalPar.h"
 
 #include "R3BRpcPreCalData.h"
@@ -61,24 +60,24 @@ class R3BRpcPreCal2Cal : public FairTask
     virtual void Finish();
 
     /** Accessor to select online mode **/
-     void SetOnline(Bool_t option) { fOnline = option; }
-    
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
-    
     Int_t fNumChannels;
     R3BRpcTotCalPar* fTotCalPar;
     TArrayF* fParCont;
     UInt_t fNEvent;
     // Don't store data for online
     Bool_t fOnline;
-    
+
     TClonesArray* fPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 
-    TClonesArray* fRpcCalDataCA;    /**< Array with Strip Cal- output data. >*/
-    Int_t event =0;
-  public: 
+    TClonesArray* fRpcCalDataCA; /**< Array with Strip Cal- output data. >*/
+    Int_t event = 0;
+
+  public:
     // Class definition
     ClassDef(R3BRpcPreCal2Cal, 1)
-};  
+};
 
 #endif

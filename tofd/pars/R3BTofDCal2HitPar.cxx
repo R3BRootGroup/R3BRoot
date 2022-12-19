@@ -327,7 +327,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 // prepare offset and sync calculation
                 if (fTofdQ == 0.0 && fParameter > 1)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -350,7 +350,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     // offset histo via ToT
                     /*if (fTofdY == 0.)
                     {
-                        R3BLOG(DEBUG, "Will prepare for offset and sync calculation");
+                        R3BLOG(debug, "Will prepare for offset and sync calculation");
                         posToT = TMath::Log(top_tot / bot_tot);
                     }
                     else
@@ -423,7 +423,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 // prepare double exponential fit
                 if (!fTofdSmiley && fTofdQ > 0.1 && fParameter > 1)
                 {
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(debug) << "Prepare histo for double exponential fit";
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -446,7 +446,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                 if (fTofdZ == true && fParameter > 1)
                 {
                     // std::cout<< " hola 20" << std::endl;
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                     if (!par)

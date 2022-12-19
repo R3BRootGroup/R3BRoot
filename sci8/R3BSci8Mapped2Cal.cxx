@@ -341,7 +341,7 @@ void R3BSci8Mapped2Cal::Exec(Option_t* option)
         continue;
     skip_event_pileup:
         LOG(warn) << "R3BSci8Mapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                     << " iCal: " << iCal << " Skip event because of pileup.";
+                  << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     ++fNEvent;

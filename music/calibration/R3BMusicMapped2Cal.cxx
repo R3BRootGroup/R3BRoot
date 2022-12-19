@@ -231,7 +231,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicMapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing MusicCalData Structure";
+    LOG(debug) << "Clearing MusicCalData Structure";
     if (fMusicCalDataCA)
         fMusicCalDataCA->Clear();
 }

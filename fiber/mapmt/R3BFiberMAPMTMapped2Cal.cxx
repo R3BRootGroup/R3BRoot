@@ -96,7 +96,7 @@ InitStatus R3BFiberMAPMTMapped2Cal::ReInit()
 void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
+    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName() << '.');
 
     if (mapped_num == 0)
         return;
@@ -107,7 +107,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        R3BLOG(DEBUG,
+        R3BLOG(debug,
                "Channel=" << channel << ":Side=" << mapped->GetSide()
                           << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 
@@ -136,7 +136,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        R3BLOG(DEBUG, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
+        R3BLOG(debug, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
 
         // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
         Double_t time_ns = -1;
@@ -154,7 +154,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-        R3BLOG(DEBUG, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
+        R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
 
         if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
         {

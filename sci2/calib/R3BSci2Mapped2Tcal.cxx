@@ -55,7 +55,7 @@ R3BSci2Mapped2Tcal::R3BSci2Mapped2Tcal(const char* name, Int_t iVerbose)
 
 R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
 {
-    LOG(DEBUG) << "R3BSci2Mapped2Tcal::Destructor";
+    LOG(debug) << "R3BSci2Mapped2Tcal::Destructor";
     if (fTcal)
     {
         delete fTcal;

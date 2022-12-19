@@ -61,7 +61,10 @@ class R3BMwpc2Cal2Hit : public FairTask
     virtual InitStatus ReInit();
 
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
+    void SetExpId(Int_t exp)
+    {
+        fExpId = exp;
+    } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
     /** Private method Experiment s455 **/
@@ -70,12 +73,12 @@ class R3BMwpc2Cal2Hit : public FairTask
     virtual void S467();
 
     R3BEventHeader* header; /**< Event header. */
-    
+
     Double_t fSize; // Detector size in X and Y
     Double_t fwx;   // Pad width in X
     Double_t fwy;   // Pad width in Y
-    //vector<pair<Int_t, Int_t>> fPairX;
-    //vector<pair<Int_t, Int_t>> fPairY;
+    // vector<pair<Int_t, Int_t>> fPairX;
+    // vector<pair<Int_t, Int_t>> fPairY;
     Int_t fx[Mw2PadsX], fx_p1[Mw2PadsX], fx_p2[Mw2PadsX], fy[Mw2PadsY];
 
     Bool_t fOnline; // Don't store data for online
@@ -86,9 +89,9 @@ class R3BMwpc2Cal2Hit : public FairTask
 
     /** Private method AddHitData **/
     // Adds a MwpcHitData to the MwpcHitCollection
-    R3BMwpcHitData* AddHitData(Double_t x, Double_t y, Int_t plane=1);
+    R3BMwpcHitData* AddHitData(Double_t x, Double_t y, Int_t plane = 1);
 
-    //bool sortPairs(const pair<Double_t, Int_t> &x, const pair<Double_t, Int_t> &y);
+    // bool sortPairs(const pair<Double_t, Int_t> &x, const pair<Double_t, Int_t> &y);
     /** Private method to obtain the position X **/
     Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
     /** Private method to obtain the position Y **/

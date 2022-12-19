@@ -23,6 +23,7 @@
 #include "FairTask.h"
 
 #include "TCanvas.h"
+#include "TLatex.h"
 #include "TMath.h"
 #include <Rtypes.h>
 #include <array>
@@ -31,27 +32,21 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "TLatex.h"
-
 
 class TClonesArray;
 class R3BEventHeader;
 class TH1F;
 class TH2F;
 
-
 class R3BRpcOnlineSpectra : public FairTask
 {
 
   public:
-
-
     /* --------- Default Constructor ---------- */
     R3BRpcOnlineSpectra();
 
     /* --------- Standard Constructor ---------- */
     R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose = 1);
-
 
     /* ------------ Standard  Destructor ----------- */
     virtual ~R3BRpcOnlineSpectra();
@@ -68,55 +63,48 @@ class R3BRpcOnlineSpectra : public FairTask
     /*-------- Finish Task : After the eventloop -------*/
     virtual void FinishTask() override;
 
-
-
     /* ------- Reset Methods : Clear histograms and time counters -------*/
     void Reset_RPC_Histo();
     void Reset_Efficiencies();
-
 
     /* ------ Choose to fill online histograms only if onspill or offspill ------ */
     void GO_ONSPILL();
     void GO_OFFSPILL();
 
+    void SetTofAxisRange(Int_t bins, Float_t leftLimit, Float_t rightLimit)
+    {
 
-
-    void SetTofAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
-
-        fLeftTofLim  = leftLimit;
+        fLeftTofLim = leftLimit;
         fRightTofLim = rightLimit;
         fTofBins = bins;
     };
 
+    void SetRpcTimeAxisRange(Int_t bins, Float_t leftLimit, Float_t rightLimit)
+    {
 
-    void SetRpcTimeAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
-
-        fLeftRpcTimeLim  = leftLimit;
+        fLeftRpcTimeLim = leftLimit;
         fRightRpcTimeLim = rightLimit;
         fRpcTimeBins = bins;
     };
 
+    void SetRpcToTAxisRange(Int_t bins, Float_t leftLimit, Float_t rightLimit)
+    {
 
-    void SetRpcToTAxisRange(Int_t bins, Float_t leftLimit,Float_t rightLimit){
-
-        fLeftRpcToTLim  = leftLimit;
+        fLeftRpcToTLim = leftLimit;
         fRightRpcToTLim = rightLimit;
         fRpcToTBins = bins;
     };
 
+    void SetOnspillTPatRange(Int_t tpat1, Int_t tpat2)
+    {
 
-    void SetOnspillTPatRange(Int_t tpat1,Int_t tpat2){
-
-         fFirstTPat = tpat1;
-         fLastTPat  = tpat2;
-
+        fFirstTPat = tpat1;
+        fLastTPat = tpat2;
     };
-
 
     void SetTrigger(Int_t trigg) { fTrigger = trigg; }
 
   private:
-
     R3BEventHeader* fEventHeader;
     int fcounter;
     TClonesArray* fMappedDataItems;
@@ -125,17 +113,14 @@ class R3BRpcOnlineSpectra : public FairTask
     TClonesArray* fHitDataItems;
     TClonesArray* fPmtHitDataItems;
 
+    Float_t meanCharges[41][50] = { { 0.0 } };
+    Float_t stripHitsVec[41] = { 0.0 };
 
-    Float_t meanCharges[41][50]  = {{0.0}};
-    Float_t stripHitsVec[41] =     {0.0};
-
-
-    Int_t counts=0;
-    Int_t tpatbin,fTPat;
-    int64_t fTimeStart,fTimeEnd;
+    Int_t counts = 0;
+    Int_t tpatbin, fTPat;
+    int64_t fTimeStart, fTimeEnd;
     Bool_t fSpill;
     Bool_t execBool;
-
 
     Float_t fLeftTofLim;
     Float_t fRightTofLim;
@@ -152,140 +137,135 @@ class R3BRpcOnlineSpectra : public FairTask
     Float_t fBarHits;
     Float_t fStrip21Hits;
 
-
-
     R3BEventHeader* header; // Event header.
     Int_t fTrigger;         // Trigger value.
     Int_t fNEvents;         // Event counter.
 
     /* ----- Map Histograms -----*/
-    TH1F **stripCoarseRightHisto;
-    TH1F **stripFineRightHisto;
+    TH1F** stripCoarseRightHisto;
+    TH1F** stripFineRightHisto;
 
-    TH1F **stripCoarseLeftHisto;
-    TH1F **stripFineLeftHisto;
+    TH1F** stripCoarseLeftHisto;
+    TH1F** stripFineLeftHisto;
 
-    TH1F **pmtCoarseHistoTop;
-    TH1F **pmtFineHistoTop;
-    TH1F **pmtCoarseHistoBottom;
-    TH1F **pmtFineHistoBottom;
+    TH1F** pmtCoarseHistoTop;
+    TH1F** pmtFineHistoTop;
+    TH1F** pmtCoarseHistoBottom;
+    TH1F** pmtFineHistoBottom;
 
+    TH1F** refCoarseHisto;
+    TH1F** refFineHisto;
 
-    TH1F **refCoarseHisto;
-    TH1F **refFineHisto;
+    TH2F* stripCoarseLeftCorr;
+    TH2F* stripCoarseRightCorr;
 
-    TH2F *stripCoarseLeftCorr;
-    TH2F *stripCoarseRightCorr;
-
-    TH2F *stripFineLeftCorr;
-    TH2F *stripFineRightCorr;
+    TH2F* stripFineLeftCorr;
+    TH2F* stripFineRightCorr;
 
     /* ----- Map Canvases*/
-    TCanvas *leftStripCanvasCoarse;
-    TCanvas *rightStripCanvasCoarse;
+    TCanvas* leftStripCanvasCoarse;
+    TCanvas* rightStripCanvasCoarse;
 
-    TCanvas *leftStripCanvasFine;
-    TCanvas *rightStripCanvasFine;
+    TCanvas* leftStripCanvasFine;
+    TCanvas* rightStripCanvasFine;
 
-    TCanvas *stripCoarseLeftCorrCanvas;
-    TCanvas *stripCoarseRightCorrCanvas;
+    TCanvas* stripCoarseLeftCorrCanvas;
+    TCanvas* stripCoarseRightCorrCanvas;
 
-    TCanvas *stripFineLeftCorrCanvas;
-    TCanvas *stripFineRightCorrCanvas;
+    TCanvas* stripFineLeftCorrCanvas;
+    TCanvas* stripFineRightCorrCanvas;
 
-    TCanvas *pmtCoarseCanvas;
-    TCanvas *pmtFineCanvas;
-    TCanvas *refFineCanvas;
-    TCanvas *refCoarseCanvas;
+    TCanvas* pmtCoarseCanvas;
+    TCanvas* pmtFineCanvas;
+    TCanvas* refFineCanvas;
+    TCanvas* refCoarseCanvas;
 
     /* ----- Pre Cal Histograms ----- */
-    TH2F *stripLeftTotCorr;
-    TH2F *stripRightTotCorr;
-    TH2F *stripLeftTimeCorr;
-    TH2F *stripRightTimeCorr;
-    TH2F **stripLeftBanana;
-    TH2F **stripRightBanana;
-    TH1F **pmtPreCalTimeHistoTop;
-    TH1F **pmtPreCalTotHistoTop;
-    TH1F **pmtPreCalTimeHistoBottom;
-    TH1F **pmtPreCalTotHistoBottom;
-
+    TH2F* stripLeftTotCorr;
+    TH2F* stripRightTotCorr;
+    TH2F* stripLeftTimeCorr;
+    TH2F* stripRightTimeCorr;
+    TH2F** stripLeftBanana;
+    TH2F** stripRightBanana;
+    TH1F** pmtPreCalTimeHistoTop;
+    TH1F** pmtPreCalTotHistoTop;
+    TH1F** pmtPreCalTimeHistoBottom;
+    TH1F** pmtPreCalTotHistoBottom;
 
     /* ----- Pre Cal Canvases ----- */
-    TCanvas *stripLeftTotCorrCanvas;
-    TCanvas *stripRightTotCorrCanvas;
-    TCanvas *stripLeftTimeCorrCanvas;
-    TCanvas *stripRightTimeCorrCanvas;
-    TCanvas *stripLeftBananaCanvas;
-    TCanvas *stripRightBananaCanvas;
-    TCanvas *pmtPreCalTimeCanvas;
-    TCanvas *pmtPreCalTotCanvas;
-
+    TCanvas* stripLeftTotCorrCanvas;
+    TCanvas* stripRightTotCorrCanvas;
+    TCanvas* stripLeftTimeCorrCanvas;
+    TCanvas* stripRightTimeCorrCanvas;
+    TCanvas* stripLeftBananaCanvas;
+    TCanvas* stripRightBananaCanvas;
+    TCanvas* pmtPreCalTimeCanvas;
+    TCanvas* pmtPreCalTotCanvas;
 
     /* ----- Cal Histograms ----- */
-    TH2F *stripCalTimeCorr;
-    TH2F *stripCalToTCorr;
+    TH2F* stripCalTimeCorr;
+    TH2F* stripCalToTCorr;
 
     /* ----- Cal Canvases ----- */
-    TCanvas *stripCalTimeCorrCanvas;
-    TCanvas *stripCalTotCorrCanvas;
+    TCanvas* stripCalTimeCorrCanvas;
+    TCanvas* stripCalTotCorrCanvas;
 
     /* ----- Hit Histograms ----- */
-    TH2F *stripPosHitCorr;
-    TH2F *meanChargeCorr;
-    TH1F *totalChargeHist;
+    TH2F* stripPosHitCorr;
+    TH2F* meanChargeCorr;
+    TH1F* totalChargeHist;
 
     /* ----- Hit Canvases ----- */
-    TCanvas *hitMapCanvas;
+    TCanvas* hitMapCanvas;
 
     /* ------ ToF Correlations Histograms ------*/
-    TH2F *tofCorr;
-    TH1F **stripTofHisto;
-    TH2F *tofVsPosCorr;
+    TH2F* tofCorr;
+    TH1F** stripTofHisto;
+    TH2F* tofVsPosCorr;
 
     /* ------ ToF Correlations Canvases ------*/
-    TCanvas *tofCorrCanvas;
-    TCanvas *stripTofCanvas;
-    TCanvas *tofPosCanvas;
+    TCanvas* tofCorrCanvas;
+    TCanvas* stripTofCanvas;
+    TCanvas* tofPosCanvas;
 
     /* ------ Strip - Bar Correlation -----*/
-    TCanvas *timeDiffStripPmtCanvas;
-    TCanvas *timeDiffStripPmtCorrCanvas;
-    TCanvas *posRpcCorrCanvas;
-    TCanvas *timeDiffLosPmtCanvas;
-    TCanvas *stripIdVsHitsCanvas;
+    TCanvas* timeDiffStripPmtCanvas;
+    TCanvas* timeDiffStripPmtCorrCanvas;
+    TCanvas* posRpcCorrCanvas;
+    TCanvas* timeDiffLosPmtCanvas;
+    TCanvas* stripIdVsHitsCanvas;
 
     /* ------ Strip - Bar Correlation Histograms -----*/
-    TH1F **timeDiffStripPmtHisto;
-    TH2F *timeDiffStripPmtCorr;
+    TH1F** timeDiffStripPmtHisto;
+    TH2F* timeDiffStripPmtCorr;
 
-    TH2F *deltaTVsPosCorr;
-    TH2F *posRpcVsPosBar;
+    TH2F* deltaTVsPosCorr;
+    TH2F* posRpcVsPosBar;
 
-    TH2F *stripIdVsNHitsCorr;
+    TH2F* stripIdVsNHitsCorr;
 
     /*------------ Efficiency Canvases --------*/
-    TCanvas *stripMultCanvas;
-    TCanvas *efficiencyCanvas;
+    TCanvas* stripMultCanvas;
+    TCanvas* efficiencyCanvas;
 
     /*--------- Efficiency Histograms ----------*/
-    TH1F *stripMultHisto;
-    TH1F *hEfficiencyHisto_H;
-    TH1F *hStripEffHisto_H;
-    TH1F *hBarEffHisto_H;
+    TH1F* stripMultHisto;
+    TH1F* hEfficiencyHisto_H;
+    TH1F* hStripEffHisto_H;
+    TH1F* hBarEffHisto_H;
 
-    TH1F *hEfficiencyHisto_V1;
-    TH1F *hStripEffHisto_V1;
-    TH1F *hBarEffHisto_V1;
+    TH1F* hEfficiencyHisto_V1;
+    TH1F* hStripEffHisto_V1;
+    TH1F* hBarEffHisto_V1;
 
-    TH1F *hEfficiencyHisto_V2;
-    TH1F *hStripEffHisto_V2;
-    TH1F *hBarEffHisto_V2;
+    TH1F* hEfficiencyHisto_V2;
+    TH1F* hStripEffHisto_V2;
+    TH1F* hBarEffHisto_V2;
 
     Int_t fFirstTPat;
     Int_t fLastTPat;
 
-    TLatex *tex1,*tex2;
+    TLatex *tex1, *tex2;
 
   public:
     ClassDefOverride(R3BRpcOnlineSpectra, 1)

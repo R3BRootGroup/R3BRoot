@@ -14,8 +14,8 @@
 #include "FairRootManager.h"
 
 #include "R3BLogger.h"
-#include "R3BRpcReader.h"
 #include "R3BRpcMappedData.h"
+#include "R3BRpcReader.h"
 
 #include "TClonesArray.h"
 
@@ -63,7 +63,7 @@ Bool_t R3BRpcReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BRpcReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
 
     uint64_t Fine_time;
     uint64_t Coarse_time;
@@ -83,7 +83,7 @@ Bool_t R3BRpcReader::Read()
 
         for (int t = begin; t < fData->RPC_FT_RME[i]; t++)
         {
-	    DetId = 0;
+            DetId = 0;
             channelNumber = fData->RPC_FT_RMI[i];
             Fine_time = fData->RPC_FT_Rv[t];
             Coarse_time = fData->RPC_CT_Rv[t];
@@ -91,10 +91,10 @@ Bool_t R3BRpcReader::Read()
             Side = 1;
 
             new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
-                R3BRpcMappedData(DetId , channelNumber, Fine_time, Coarse_time, Edge, Side);
+                R3BRpcMappedData(DetId, channelNumber, Fine_time, Coarse_time, Edge, Side);
 
-            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t
-            // Side)
+            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge,
+            // UShort_t Side)
         }
     }
 
@@ -110,7 +110,7 @@ Bool_t R3BRpcReader::Read()
         for (int t = begin; t < fData->RPC_FT_LME[i]; t++)
         {
 
-	    DetId = 0;
+            DetId = 0;
             channelNumber = fData->RPC_FT_RMI[i];
             channelNumber = fData->RPC_FT_LMI[i];
             Fine_time = fData->RPC_FT_Lv[t];
@@ -119,11 +119,10 @@ Bool_t R3BRpcReader::Read()
             Side = 0;
 
             new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
-                R3BRpcMappedData(DetId,channelNumber, Fine_time, Coarse_time, Edge, Side);
+                R3BRpcMappedData(DetId, channelNumber, Fine_time, Coarse_time, Edge, Side);
 
-            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t
-            // Side)
-
+            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge,
+            // UShort_t Side)
         }
     }
 
@@ -140,17 +139,16 @@ Bool_t R3BRpcReader::Read()
         for (int t = begin; t < fData->RPC_REF_FTME[i]; t++)
         {
 
-	    DetId = 2;
+            DetId = 2;
             channelNumber = fData->RPC_REF_FTMI[i];
             Fine_time = fData->RPC_REF_FTv[t];
             Coarse_time = fData->RPC_REF_CTv[t];
 
+            new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
+                R3BRpcMappedData(DetId, channelNumber, Fine_time, Coarse_time, 0, 0);
 
-	    new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
-                R3BRpcMappedData(DetId,channelNumber, Fine_time, Coarse_time, 0 ,0);
-
-            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t
-            // Side)
+            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge,
+            // UShort_t Side)
         }
     }
 
@@ -167,7 +165,7 @@ Bool_t R3BRpcReader::Read()
         for (int t = begin; t < fData->RPC_FT_B_PMTME[i]; t++)
         {
 
-	    DetId = 1;
+            DetId = 1;
             channelNumber = fData->RPC_FT_B_PMTMI[i];
             Fine_time = fData->RPC_FT_B_PMTv[t];
             Coarse_time = fData->RPC_CT_B_PMTv[t];
@@ -175,11 +173,11 @@ Bool_t R3BRpcReader::Read()
             Edge = fData->RPC_E_B_PMTv[t];
             Side = 1;
 
-	    new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
-                R3BRpcMappedData(DetId,channelNumber, Fine_time, Coarse_time, Edge ,Side);
+            new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
+                R3BRpcMappedData(DetId, channelNumber, Fine_time, Coarse_time, Edge, Side);
 
-            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t
-            // Side)
+            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge,
+            // UShort_t Side)
         }
     }
 
@@ -195,7 +193,7 @@ Bool_t R3BRpcReader::Read()
         for (int t = begin; t < fData->RPC_FT_T_PMTME[i]; t++)
         {
 
-	    DetId = 1;
+            DetId = 1;
             channelNumber = fData->RPC_FT_T_PMTMI[i];
             Fine_time = fData->RPC_FT_T_PMTv[t];
             Coarse_time = fData->RPC_CT_T_PMTv[t];
@@ -204,10 +202,10 @@ Bool_t R3BRpcReader::Read()
             Side = 0;
 
             new ((*fArrayRpc)[fArrayRpc->GetEntriesFast()])
-                R3BRpcMappedData(DetId,channelNumber, Fine_time, Coarse_time, Edge ,Side);
+                R3BRpcMappedData(DetId, channelNumber, Fine_time, Coarse_time, Edge, Side);
 
-            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge, UShort_t
-            // Side)
+            // R3BRpcMappedData(UShort_t DetId, UShort_t StripId, uint64_t FineTime, uint64_t CoarseTime, UShort_t Edge,
+            // UShort_t Side)
         }
     }
 

@@ -64,7 +64,7 @@ R3BMwpc3Cal2Hit::R3BMwpc3Cal2Hit(const char* name, Int_t iVerbose)
 /* ---- Virtual R3BMwpc3Cal2Hit: Destructor ---- */
 R3BMwpc3Cal2Hit::~R3BMwpc3Cal2Hit()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
     if (fMwpcHitDataCA)
@@ -686,7 +686,7 @@ Double_t R3BMwpc3Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 /* ----   Public method Reset  ---- */
 void R3BMwpc3Cal2Hit::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing Mwpc3HitData Structure");
+    R3BLOG(debug1, "Clearing Mwpc3HitData Structure");
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }

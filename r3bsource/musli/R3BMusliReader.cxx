@@ -37,7 +37,7 @@ R3BMusliReader::R3BMusliReader(EXT_STR_h101_MUSLI* data, size_t offset)
 
 R3BMusliReader::~R3BMusliReader()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fArray)
     {
         delete fArray;
@@ -85,7 +85,7 @@ void R3BMusliReader::Reset()
 {
     // Reset the output array
     if (fArray)
-    fArray->Clear();
+        fArray->Clear();
 }
 
 Bool_t R3BMusliReader::ReadData(EXT_STR_h101_MUSLI_onion* data)

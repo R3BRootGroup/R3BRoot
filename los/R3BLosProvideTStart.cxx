@@ -59,8 +59,8 @@ Double_t R3BLosProvideTStart::GetTStart() const
     auto T1 = 10240; // TAMEX, range is 2048*5ns
     auto T2 = 40960; // VFTX, range is 40960*5ns
 
-    const int c1 = std::min(T1,T2);
-    const int c2 = std::max(T1,T2);
+    const int c1 = std::min(T1, T2);
+    const int c2 = std::max(T1, T2);
 
     if (losCalData.empty())
     {
@@ -68,20 +68,20 @@ Double_t R3BLosProvideTStart::GetTStart() const
     }
     else if (losTriggerCalData.empty())
     {
-        R3BLOG(DEBUG1, "CalData info for LOS");
+        R3BLOG(debug1, "CalData info for LOS");
         return losCalData.back()->GetMeanTimeVFTX();
     }
     else
     {
         if (losTriggerCalData.back()->GetTimeV_ns(0) > 0.)
         {
-            R3BLOG(DEBUG1, "CalData with VFTX trigger info for LOS");
+            R3BLOG(debug1, "CalData with VFTX trigger info for LOS");
             return fTimeStitch->GetTime(
                 losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(0), "vftx", "vftx");
         }
         else
         {
-            R3BLOG(DEBUG1, "CalData with Tamex trigger info for LOS");
+            R3BLOG(debug1, "CalData with Tamex trigger info for LOS");
             return fTimeStitch->GetTime(
                 losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0), "vftx", "tamex");
         }

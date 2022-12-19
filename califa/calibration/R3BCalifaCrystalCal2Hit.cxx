@@ -61,7 +61,7 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fCalifaHitData)
         delete fCalifaHitData;
 }
@@ -208,7 +208,7 @@ bool R3BCalifaCrystalCal2Hit::Match(R3BCalifaCrystalCalData* ref, R3BCalifaCryst
                                      " algorithm selected.");
             break;
     }
-    LOG(DEBUG) << "returning R3BCalifaCrystalCal2Hit::Match(" << ref->GetCrystalId() << ", " << hit->GetCrystalId()
+    LOG(debug) << "returning R3BCalifaCrystalCal2Hit::Match(" << ref->GetCrystalId() << ", " << hit->GetCrystalId()
                << ")=" << takeCrystalInCluster << " with alg " << fClusterAlgorithmSelector;
 
     return takeCrystalInCluster;
@@ -222,7 +222,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
     // ALGORITHMS FOR HIT FINDING
     // Nb of CrystalHits in current event
     const int numCrystalHits = fCrystalCalData->GetEntries();
-    R3BLOG(DEBUG, "Crystal hits at start:" << numCrystalHits);
+    R3BLOG(debug, "Crystal hits at start:" << numCrystalHits);
 
     if (numCrystalHits)
     {
@@ -237,7 +237,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         if (aCalData->GetEnergy() > fThreshold)
             unusedCrystalHits.push_back(aCalData);
         else
-            LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): rejected hit in " << aCalData->GetCrystalId()
+            LOG(debug) << "R3BCalifaCrystalCal2Hit::Exec(): rejected hit in " << aCalData->GetCrystalId()
                        << " because of low energy (E=" << aCalData->GetEnergy() << "<=" << fThreshold << "=E_threshold";
     };
 
@@ -247,7 +247,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         for (auto& aCalData : TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalCalData))
             crystalId2Pos[aCalData.GetCrystalId()] = &aCalData;
 
-        R3BLOG(DEBUG, "crystalId2Pos.size()=" << crystalId2Pos.size());
+        R3BLOG(debug, "crystalId2Pos.size()=" << crystalId2Pos.size());
 
         for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
             if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
@@ -263,7 +263,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
                 // not a hit where two ranges were hit
                 addHit(k1.second);
     }
-    R3BLOG(DEBUG, "after uniquifying, we have " << unusedCrystalHits.size() << " crystal hits.");
+    R3BLOG(debug, "after uniquifying, we have " << unusedCrystalHits.size() << " crystal hits.");
 
     unusedCrystalHits.sort(
         [](R3BCalifaCrystalCalData* lhs, R3BCalifaCrystalCalData* rhs) { return lhs->GetEnergy() > rhs->GetEnergy(); });
@@ -271,7 +271,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
     while (!unusedCrystalHits.empty())
     {
         auto highest = unusedCrystalHits.front();
-        LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): starting cluster at "
+        LOG(debug) << "R3BCalifaCrystalCal2Hit::Exec(): starting cluster at "
                    << "crystal " << highest->GetCrystalId() << ", E=" << highest->GetEnergy();
 
         // Note: we do not remove highest, but process it like any others
@@ -306,7 +306,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         while (i != unusedCrystalHits.end())
             if (this->Match(highest, *i))
             {
-                LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): adding  "
+                LOG(debug) << "R3BCalifaCrystalCal2Hit::Exec(): adding  "
                            << "crystal " << (*i)->GetCrystalId() << ", E=" << (*i)->GetEnergy();
 
                 *clusterHit += **i;
@@ -322,7 +322,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 void R3BCalifaCrystalCal2Hit::Reset()
 {
     // Clear the CA structure
-    R3BLOG(DEBUG, "Clearing CalifaHitData Structure");
+    R3BLOG(debug, "Clearing CalifaHitData Structure");
     if (fCalifaHitData)
         fCalifaHitData->Clear();
 }

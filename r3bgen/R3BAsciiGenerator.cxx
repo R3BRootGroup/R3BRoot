@@ -104,7 +104,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     }
     // Ignore the other stuff that might still be on that line
     fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
+    LOG(debug) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
     if (fPointVtxIsSet)
     {
@@ -142,7 +142,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             vz = ivz;
         }
 
-        LOG(DEBUG) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
+        LOG(debug) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
                    << "" << pz << "\t" << vx << "\t" << vy << "" << vz;
         primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
 
@@ -181,7 +181,7 @@ void R3BAsciiGenerator::RegisterIons()
         }
         // Ignore the other stuff that might still be on that line
         fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
+        LOG(debug) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
         for (int iTrack = 0; iTrack < nTracks; iTrack++)
         {
@@ -198,7 +198,7 @@ void R3BAsciiGenerator::RegisterIons()
                 if (ions.find(pdg) == ions.end())
                 {
                     const double mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
-                    LOG(DEBUG) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
+                    LOG(debug) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
                     ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
                 }
             }
@@ -247,12 +247,12 @@ void R3BAsciiGenerator::OpenOrRewindFile()
         const std::string extension = boost::filesystem::extension(fFileName);
         if (extension == ".gz")
         {
-            LOG(DEBUG) << "R3BAsciiGenerator: Using gzip";
+            LOG(debug) << "R3BAsciiGenerator: Using gzip";
             fBuf.push(boost::iostreams::gzip_decompressor());
         }
         // if (extension == ".bz2")
         //{
-        //    LOG(DEBUG) << "R3BAsciiGenerator: Using bzip2";
+        //    LOG(debug) << "R3BAsciiGenerator: Using bzip2";
         //    fBuf.push(boost::iostreams::bzip2_decompressor());
         //}
         fBuf.push(fFile);

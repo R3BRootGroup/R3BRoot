@@ -43,10 +43,7 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
 {
 }
 
-R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
-{
-    R3BLOG(info, "");
-}
+R3BTrloiiTpatReader::~R3BTrloiiTpatReader() { R3BLOG(info, ""); }
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {
@@ -80,7 +77,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 {
     // R3BLOG(info, "Event : " << fNEvent);
 
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     if (fEventHeader)
     {
         fEventHeader->SetTpat(0);
@@ -95,7 +92,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     if (0 == (fNEvent % 1000000))
     {
-        R3BLOG(DEBUG1, "Event : " << fNEvent);
+        R3BLOG(debug1, "Event : " << fNEvent);
     }
 
     if (fTrigger > 0 && fEventHeader && fTpatmin < 0 && fTpatmax < 0)
@@ -142,7 +139,7 @@ Bool_t R3BTrloiiTpatReader::Read()
                 }
                 else if (tpatbin != 0)
                 {
-                    R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                    R3BLOG(debug1, "Accepted Tpat" << i + 1);
                     valid = true;
                 }
             }
@@ -179,7 +176,7 @@ Bool_t R3BTrloiiTpatReader::Read()
                     }
                     else if (tpatbin != 0)
                     {
-                        R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                        R3BLOG(debug1, "Accepted Tpat" << i + 1);
                         valid = true;
                     }
                 }

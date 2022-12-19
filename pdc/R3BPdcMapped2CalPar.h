@@ -104,8 +104,8 @@ class R3BPdcMapped2CalPar : public FairTask
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
 
-    R3BTCalPar* fCalPar;   /**< Parameter container. */
-    TClonesArray* fMapped; /**< Array with mapped data - input data. */
+    R3BTCalPar* fCalPar;          /**< Parameter container. */
+    TClonesArray* fMapped;        /**< Array with mapped data - input data. */
     TClonesArray* fMappedTrigger; /**< Array with mapped trigger data - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */

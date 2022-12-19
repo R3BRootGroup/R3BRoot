@@ -153,7 +153,7 @@ void R3BTofDDigitizer::Exec(Option_t* opt)
                     Energy_Loss[channel] = vPoints[channel].at(point)->GetEnergyLoss();
 
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    LOG(DEBUG) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                    LOG(debug) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
                                << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
                                << " eloss = " << Energy_Loss[channel];
 

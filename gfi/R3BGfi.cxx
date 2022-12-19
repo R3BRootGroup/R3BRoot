@@ -96,7 +96,7 @@ void R3BGfi::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BGfi: initialisation";
-    LOG(DEBUG) << "R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog");
+    LOG(debug) << "R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog");
 }
 
 void R3BGfi::SetSpecialPhysicsCuts()

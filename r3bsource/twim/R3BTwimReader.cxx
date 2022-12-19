@@ -42,7 +42,7 @@ R3BTwimReader::R3BTwimReader(EXT_STR_h101_SOFTWIM* data, size_t offset)
 
 R3BTwimReader::~R3BTwimReader()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fArray)
     {
         delete fArray;

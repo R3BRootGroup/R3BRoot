@@ -61,18 +61,13 @@ class R3BRpcMapped2PreCal : public FairTask
     /** Virtual method Finish **/
     virtual void Finish();
 
-    void SetFpgaCorrelationFile(TString file){
-
-      fFpgaCorrelationFile = file;
-
-    };
+    void SetFpgaCorrelationFile(TString file) { fFpgaCorrelationFile = file; };
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-
-    UInt_t fNofTCalPars;  /**< Number of modules in parameter file. */
+    UInt_t fNofTCalPars; /**< Number of modules in parameter file. */
 
     UInt_t fNofDetectors; /**< Number of detectors. */
     UInt_t fNofChannels;  /**< Number of channels per detector. */
@@ -81,14 +76,15 @@ class R3BRpcMapped2PreCal : public FairTask
     // Don't store data for online
     Bool_t fOnline;
     TString fFpgaCorrelationFile;
-    R3BTCalPar* fTCalPar;         /**< Parameter container. >*/
-    std::vector<int> lut[46][2];  /**<look up table.>*/
-    TClonesArray* fMappedDataCA; /**< Array with RPC Mapped-input data. >*/
-    TClonesArray* fRpcPreCalDataCA;    /**< Array with RPC Cal- output data. >*/
+    R3BTCalPar* fTCalPar;           /**< Parameter container. >*/
+    std::vector<int> lut[46][2];    /**<look up table.>*/
+    TClonesArray* fMappedDataCA;    /**< Array with RPC Mapped-input data. >*/
+    TClonesArray* fRpcPreCalDataCA; /**< Array with RPC Cal- output data. >*/
 
-    struct Entry {
+    struct Entry
+    {
         double time;
-        R3BRpcMappedData const *Mapped;
+        R3BRpcMappedData const* Mapped;
     };
 
   public:

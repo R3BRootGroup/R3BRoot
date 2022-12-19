@@ -17,7 +17,7 @@ void testNeulandTrain()
     TStopwatch timer;
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
+    FairLogger::GetLogger()->SetLogScreenLevel("debug");
 
     FairRunAna run;
     run.SetSource(new FairFileSource("test.digi.root"));

@@ -66,7 +66,7 @@ R3BIncomingBeta::R3BIncomingBeta(const char* name, Int_t iVerbose)
 
 R3BIncomingBeta::~R3BIncomingBeta()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFrsDataCA)
         delete fFrsDataCA;
 }
@@ -274,7 +274,7 @@ void R3BIncomingBeta::FinishEvent()
 
 void R3BIncomingBeta::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing FrsData Structure");
+    R3BLOG(debug1, "Clearing FrsData Structure");
     if (fFrsDataCA)
     {
         fFrsDataCA->Clear();

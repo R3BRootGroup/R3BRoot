@@ -18,15 +18,13 @@
 // -----         Fill RPC online histograms              -----
 // -----------------------------------------------------------
 
-
 #include "R3BRpcOnlineSpectra.h"
-#include "R3BLogger.h"
 #include "R3BEventHeader.h"
-#include "R3BRpcMappedData.h"
-#include "R3BRpcPreCalData.h"
+#include "R3BLogger.h"
 #include "R3BRpcCalData.h"
 #include "R3BRpcHitData.h"
-
+#include "R3BRpcMappedData.h"
+#include "R3BRpcPreCalData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -81,16 +79,16 @@ R3BRpcOnlineSpectra::R3BRpcOnlineSpectra(const TString& name, Int_t iVerbose)
 
 R3BRpcOnlineSpectra::~R3BRpcOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
 
     if (fMappedDataItems)
-       delete fMappedDataItems;
+        delete fMappedDataItems;
 
     if (fPreCalDataItems)
-       delete fPreCalDataItems;
+        delete fPreCalDataItems;
 
     if (fHitDataItems)
-       delete fHitDataItems;
+        delete fHitDataItems;
 }
 
 InitStatus R3BRpcOnlineSpectra::Init()
@@ -109,7 +107,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
         fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(info,"EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     // Get access to Mapped data
 
@@ -134,14 +132,12 @@ InitStatus R3BRpcOnlineSpectra::Init()
         return kFATAL;
     }
 
-
     fHitDataItems = (TClonesArray*)mgr->GetObject("R3BRpcHitData");
     if (!fHitDataItems)
     {
         R3BLOG(fatal, "RpcHitData not found");
         return kFATAL;
     }
-
 
     char name[100];
     /*
@@ -186,13 +182,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
     TFolder* refFolder = new TFolder("Ref Map", "Ref Map");
     mapfol->Add(refFolder);
 
-
     TFolder* stripLeftPreCalFolder = new TFolder("Strip Pre Cal : Left", "Strip Pre Cal : Left");
     preCalFolder->Add(stripLeftPreCalFolder);
 
     TFolder* pmtPreCalFolder = new TFolder("Pmt Pre Cal", "Pmt Pre Cal");
     preCalFolder->Add(pmtPreCalFolder);
-
 
     TFolder* stripRightPreCalFolder = new TFolder("Strip Pre Cal : Right", "Strip Pre Cal : Right");
     preCalFolder->Add(stripRightPreCalFolder);
@@ -209,227 +203,219 @@ InitStatus R3BRpcOnlineSpectra::Init()
     TFolder* efficiencyFolder = new TFolder("Efficiencies", "Efficiencies");
     mainfol->Add(efficiencyFolder);
 
-
     /* ----------- CANVASES ------------- */
 
-    rightStripCanvasCoarse = new TCanvas("Right Coarse Canvas","rightStripCanvasCoarse");
-    leftStripCanvasCoarse = new TCanvas("Left Coarse Canvas","leftStripCanvasCoarse");
+    rightStripCanvasCoarse = new TCanvas("Right Coarse Canvas", "rightStripCanvasCoarse");
+    leftStripCanvasCoarse = new TCanvas("Left Coarse Canvas", "leftStripCanvasCoarse");
 
-    rightStripCanvasFine = new TCanvas("Right Fine Canvas","rightStripCanvasFine");
-    leftStripCanvasFine = new TCanvas("Left Fine Canvas","leftStripCanvasFine");
+    rightStripCanvasFine = new TCanvas("Right Fine Canvas", "rightStripCanvasFine");
+    leftStripCanvasFine = new TCanvas("Left Fine Canvas", "leftStripCanvasFine");
 
-    rightStripCanvasFine->Divide(9,5);
-    leftStripCanvasFine->Divide(9,5);
+    rightStripCanvasFine->Divide(9, 5);
+    leftStripCanvasFine->Divide(9, 5);
 
-    rightStripCanvasCoarse->Divide(9,5);
-    leftStripCanvasCoarse->Divide(9,5);
+    rightStripCanvasCoarse->Divide(9, 5);
+    leftStripCanvasCoarse->Divide(9, 5);
 
-    pmtCoarseCanvas = new TCanvas("Pmt Coarse Canvas","pmtCoarseCanvas");
-    pmtCoarseCanvas->Divide(4,2);
+    pmtCoarseCanvas = new TCanvas("Pmt Coarse Canvas", "pmtCoarseCanvas");
+    pmtCoarseCanvas->Divide(4, 2);
 
-    pmtFineCanvas = new TCanvas("Pmt Fine Canvas","pmtFineCanvas");
-    pmtFineCanvas->Divide(4,2);
+    pmtFineCanvas = new TCanvas("Pmt Fine Canvas", "pmtFineCanvas");
+    pmtFineCanvas->Divide(4, 2);
 
-    refFineCanvas = new TCanvas("Ref Fine Canvas","refFineCanvas");
-    refFineCanvas->Divide(3,4);
+    refFineCanvas = new TCanvas("Ref Fine Canvas", "refFineCanvas");
+    refFineCanvas->Divide(3, 4);
 
-    refCoarseCanvas = new TCanvas("Ref Coarse Canvas","refCoarseCanvas");
-    refCoarseCanvas->Divide(3,4);
+    refCoarseCanvas = new TCanvas("Ref Coarse Canvas", "refCoarseCanvas");
+    refCoarseCanvas->Divide(3, 4);
 
+    stripCoarseLeftCorrCanvas = new TCanvas("Left : Strip Vs Coarse", "stripCoarseLeftCorrCanvas");
+    stripCoarseRightCorrCanvas = new TCanvas("Right : Strip Vs Coarse", "stripCoarseRightCorrCanvas");
 
-
-    stripCoarseLeftCorrCanvas  =  new TCanvas("Left : Strip Vs Coarse","stripCoarseLeftCorrCanvas");
-    stripCoarseRightCorrCanvas =  new TCanvas("Right : Strip Vs Coarse","stripCoarseRightCorrCanvas");
-
-    stripFineLeftCorrCanvas    =  new TCanvas("Left : Strip Vs Fine","stripFineLeftCorrCanvas");
-    stripFineRightCorrCanvas   =  new TCanvas("Right : Strip Vs Fine","stripFineRightCorrCanvas");
-
+    stripFineLeftCorrCanvas = new TCanvas("Left : Strip Vs Fine", "stripFineLeftCorrCanvas");
+    stripFineRightCorrCanvas = new TCanvas("Right : Strip Vs Fine", "stripFineRightCorrCanvas");
 
     /* ----- Pre Cal Canvases ----- */
-    stripLeftTotCorrCanvas     = new TCanvas("Left : Strip Vs Tot","stripVsTot");
-    stripRightTotCorrCanvas    = new TCanvas("Right : Strip Vs Tot","stripVsTot");
-    stripLeftTimeCorrCanvas    = new TCanvas("Left : Strip Vs Time","stripVsTime");
-    stripRightTimeCorrCanvas   = new TCanvas("Right : Strip Vs Time","stripVsTime");
+    stripLeftTotCorrCanvas = new TCanvas("Left : Strip Vs Tot", "stripVsTot");
+    stripRightTotCorrCanvas = new TCanvas("Right : Strip Vs Tot", "stripVsTot");
+    stripLeftTimeCorrCanvas = new TCanvas("Left : Strip Vs Time", "stripVsTime");
+    stripRightTimeCorrCanvas = new TCanvas("Right : Strip Vs Time", "stripVsTime");
 
-    pmtPreCalTimeCanvas        = new TCanvas("Pmt PreCal Time","pmtPreCalTime");
-    pmtPreCalTimeCanvas->Divide(4,2);
+    pmtPreCalTimeCanvas = new TCanvas("Pmt PreCal Time", "pmtPreCalTime");
+    pmtPreCalTimeCanvas->Divide(4, 2);
 
-    pmtPreCalTotCanvas         = new TCanvas("Pmt PreCal ToT Time","pmtPreCalToT");
-    pmtPreCalTotCanvas->Divide(4,2);
+    pmtPreCalTotCanvas = new TCanvas("Pmt PreCal ToT Time", "pmtPreCalToT");
+    pmtPreCalTotCanvas->Divide(4, 2);
 
     /* ----- Cal Canvases ----- */
-    stripCalTimeCorrCanvas = new TCanvas("Left Time Vs Right Time","leftTimeVsRightTime");
-    stripCalTotCorrCanvas  = new TCanvas("Left ToT Vs Right ToT","leftToTVsRightToT");
+    stripCalTimeCorrCanvas = new TCanvas("Left Time Vs Right Time", "leftTimeVsRightTime");
+    stripCalTotCorrCanvas = new TCanvas("Left ToT Vs Right ToT", "leftToTVsRightToT");
 
     /* ------ Hit Canvases ------*/
-    hitMapCanvas = new TCanvas("Hit Map","hitMapCanvas");
-    hitMapCanvas->Divide(2,1);
+    hitMapCanvas = new TCanvas("Hit Map", "hitMapCanvas");
+    hitMapCanvas->Divide(2, 1);
 
     /* ------ ToF Correlations -------*/
-    tofCorrCanvas = new TCanvas("tofCorrCanvas","ToF Correlations");
-    stripTofCanvas = new TCanvas("stripTofCanvas","Strip ToF Correlations");
-    stripTofCanvas->Divide(5,9);
+    tofCorrCanvas = new TCanvas("tofCorrCanvas", "ToF Correlations");
+    stripTofCanvas = new TCanvas("stripTofCanvas", "Strip ToF Correlations");
+    stripTofCanvas->Divide(5, 9);
 
     tofPosCanvas = new TCanvas("tofPosCanvas", "ToF Pos Correlations");
 
+    /* ------ Strip Bar Correlations ------------*/
+    timeDiffStripPmtCanvas = new TCanvas("timeDiffStripPmtCanvas", "Time Differences");
+    timeDiffStripPmtCanvas->Divide(5, 9);
 
-     /* ------ Strip Bar Correlations ------------*/
-     timeDiffStripPmtCanvas     = new TCanvas("timeDiffStripPmtCanvas","Time Differences");
-     timeDiffStripPmtCanvas->Divide(5,9);
+    timeDiffStripPmtCorrCanvas = new TCanvas("timeDiffStripPmtCorrCanvas", "Time Differences");
+    posRpcCorrCanvas = new TCanvas("posRpcCorrCanvas", "Pos Vs Rpc");
+    posRpcCorrCanvas->Divide(2, 1);
 
-     timeDiffStripPmtCorrCanvas = new TCanvas("timeDiffStripPmtCorrCanvas","Time Differences");
-     posRpcCorrCanvas= new TCanvas("posRpcCorrCanvas","Pos Vs Rpc");
-     posRpcCorrCanvas->Divide(2,1);
+    stripIdVsHitsCanvas = new TCanvas("stripIdVsHitsCanvas", "Hits Vs Strip Id (H Bar AND Good Beam )");
 
-     stripIdVsHitsCanvas = new TCanvas("stripIdVsHitsCanvas","Hits Vs Strip Id (H Bar AND Good Beam )");
-
-     efficiencyCanvas = new TCanvas("efficiencyCanvas","Efficiency Canvas");
-     efficiencyCanvas->Divide(3,1);
+    efficiencyCanvas = new TCanvas("efficiencyCanvas", "Efficiency Canvas");
+    efficiencyCanvas->Divide(3, 1);
 
     /* ----- Map Histograms -----*/
 
-     stripCoarseRightHisto = new TH1F*[41];
-     stripFineRightHisto = new TH1F*[41];
+    stripCoarseRightHisto = new TH1F*[41];
+    stripFineRightHisto = new TH1F*[41];
 
-     stripCoarseLeftHisto = new TH1F*[41];
-     stripFineLeftHisto = new TH1F*[41];
+    stripCoarseLeftHisto = new TH1F*[41];
+    stripFineLeftHisto = new TH1F*[41];
 
-     pmtCoarseHistoTop = new TH1F*[4];
-     pmtFineHistoTop = new TH1F*[4];
+    pmtCoarseHistoTop = new TH1F*[4];
+    pmtFineHistoTop = new TH1F*[4];
 
-     pmtCoarseHistoBottom = new TH1F*[4];
-     pmtFineHistoBottom = new TH1F*[4];
+    pmtCoarseHistoBottom = new TH1F*[4];
+    pmtFineHistoBottom = new TH1F*[4];
 
+    refCoarseHisto = new TH1F*[9];
+    refFineHisto = new TH1F*[9];
 
+    stripCoarseLeftCorr = new TH2F("stripCoarseLeft", " Strip Vs Coarse Time: Left", 41, 0.5, 41.5, 400, 0, 2500);
+    stripCoarseRightCorr = new TH2F("stripCoarseRight", " Strip Vs Coarse Time: Right", 41, 0.5, 41.5, 400, 0, 2500);
+    stripFineLeftCorr = new TH2F("stripFineLeft", " Strip Vs Fine Time: Left", 41, 0.5, 41.5, 400, 0, 600);
+    stripFineRightCorr = new TH2F("stripFineRight", " Strip Vs Fine Time: Right", 41, 0.5, 41.5, 400, 0, 600);
 
-     refCoarseHisto = new TH1F*[9];
-     refFineHisto = new TH1F*[9];
+    /* ----- Pre Cal Histograms ----- */
+    pmtPreCalTimeHistoTop = new TH1F*[4];
+    pmtPreCalTotHistoTop = new TH1F*[4];
 
-     stripCoarseLeftCorr = new TH2F("stripCoarseLeft"," Strip Vs Coarse Time: Left",41,0.5,41.5,400,0,2500);
-     stripCoarseRightCorr = new TH2F("stripCoarseRight"," Strip Vs Coarse Time: Right",41,0.5,41.5,400,0,2500);
-     stripFineLeftCorr = new TH2F("stripFineLeft"," Strip Vs Fine Time: Left",41,0.5,41.5,400,0,600);
-     stripFineRightCorr = new TH2F("stripFineRight"," Strip Vs Fine Time: Right",41,0.5,41.5,400,0,600);
+    pmtPreCalTimeHistoBottom = new TH1F*[4];
+    pmtPreCalTotHistoBottom = new TH1F*[4];
 
-     /* ----- Pre Cal Histograms ----- */
-     pmtPreCalTimeHistoTop = new TH1F*[4];
-     pmtPreCalTotHistoTop  = new TH1F*[4];
+    stripLeftTotCorr = new TH2F(
+        "stripLeftTotCorr", "Strip Vs Tot : Left", 41, 0.5, 41.5, fRpcToTBins, fLeftRpcToTLim, fRightRpcToTLim);
+    stripRightTotCorr = new TH2F(
+        "stripRightTotCorr", "Strip Vs Tot : Right", 41, 0.5, 41.5, fRpcToTBins, fLeftRpcToTLim, fRightRpcToTLim);
+    stripLeftTimeCorr = new TH2F(
+        "stripLeftTimeCorr", "Strip Vs Time : Left", 41, 0.5, 41.5, fRpcTimeBins, fLeftRpcTimeLim, fRightRpcTimeLim);
+    stripRightTimeCorr = new TH2F(
+        "stripRightTimeCorr", "Strip Vs Time : Right", 41, 0.5, 41.5, fRpcTimeBins, fLeftRpcTimeLim, fRightRpcTimeLim);
 
-     pmtPreCalTimeHistoBottom = new TH1F*[4];
-     pmtPreCalTotHistoBottom  = new TH1F*[4];
+    /* ----- Cal Histograms ----- */
+    stripCalTimeCorr = new TH2F("stripCalTimeCorr", "Strip: Time Left Vs Time Right", 800, -680, -580, 800, -800, -600);
+    stripCalToTCorr = new TH2F("stripCalToTCorr", "Strip: ToT Left Vs ToT Right", 400, -100, -350, 400, -100, 350);
 
-     stripLeftTotCorr = new TH2F("stripLeftTotCorr","Strip Vs Tot : Left",41,0.5,41.5,fRpcToTBins,fLeftRpcToTLim,fRightRpcToTLim);
-     stripRightTotCorr = new TH2F("stripRightTotCorr","Strip Vs Tot : Right",41,0.5,41.5,fRpcToTBins,fLeftRpcToTLim,fRightRpcToTLim);
-     stripLeftTimeCorr = new TH2F("stripLeftTimeCorr","Strip Vs Time : Left",41,0.5,41.5,fRpcTimeBins,fLeftRpcTimeLim,fRightRpcTimeLim);
-     stripRightTimeCorr = new TH2F("stripRightTimeCorr","Strip Vs Time : Right",41,0.5,41.5,fRpcTimeBins,fLeftRpcTimeLim,fRightRpcTimeLim);
+    /* ------------- HIT Histograms ------------ */
+    stripPosHitCorr = new TH2F("stripPosHitCorr", "Strip Vs Position", 150, 0, 1500, 41, 0.5, 41.5);
+    totalChargeHist = new TH1F("totalChargeHist", "Charge", 1000, -100, 400);
+    meanChargeCorr = new TH2F("meanChargeCorr", "Heat Map : Mean Charge", 50, 0, 1500, 41, 0.5, 41.5);
 
-     /* ----- Cal Histograms ----- */
-     stripCalTimeCorr = new TH2F("stripCalTimeCorr","Strip: Time Left Vs Time Right",800,-680,-580,800,-800,-600);
-     stripCalToTCorr = new TH2F("stripCalToTCorr","Strip: ToT Left Vs ToT Right",400,-100,-350,400,-100,350);
+    tofVsPosCorr = new TH2F("tofVsPosCorr", "ToF Vs Position", 600, 0, 1500, fTofBins, fLeftTofLim, fRightTofLim);
+    tofCorr = new TH2F("tofCorr", "ToF Vs Strip", fTofBins, fLeftTofLim, fRightTofLim, 41, 0.5, 41.5);
 
-     /* ------------- HIT Histograms ------------ */
-     stripPosHitCorr = new TH2F("stripPosHitCorr","Strip Vs Position",150,0,1500,41,0.5,41.5);
-     totalChargeHist = new TH1F("totalChargeHist","Charge",1000,-100,400);
-     meanChargeCorr  = new TH2F("meanChargeCorr","Heat Map : Mean Charge",50,0,1500,41,0.5,41.5);
+    stripTofHisto = new TH1F*[41];
 
-     tofVsPosCorr = new TH2F("tofVsPosCorr", "ToF Vs Position",600,0,1500,fTofBins,fLeftTofLim,fRightTofLim);
-     tofCorr = new TH2F("tofCorr","ToF Vs Strip",fTofBins,fLeftTofLim,fRightTofLim,41,0.5,41.5);
+    timeDiffStripPmtHisto = new TH1F*[41];
 
-     stripTofHisto = new TH1F*[41];
+    timeDiffStripPmtCorr =
+        new TH2F("timeDiffStripPmtCorr", "Time Differences Strip and Bar ", 1000, -1000, -1000, 41, 0.5, 41.5);
+    deltaTVsPosCorr = new TH2F("deltaTVsPosCorr", "Time Difference Vs Position", 300, 0, 1500, 1000, -1000, 1000);
+    posRpcVsPosBar = new TH2F("posRpcVsPosBar", "Rpc Position Vs Bar Position", 300, 0, 1500, 500, -1000, 3000);
 
-     timeDiffStripPmtHisto = new TH1F*[41];
+    stripIdVsNHitsCorr = new TH2F("stripIdVsNHitsCorr", "Hits Vs Strip ID (Good Beam)", 21, -0.5, 20.5, 41, 0.5, 41.5);
 
-     timeDiffStripPmtCorr = new TH2F("timeDiffStripPmtCorr","Time Differences Strip and Bar ",1000,-1000,-1000,41,0.5,41.5);
-     deltaTVsPosCorr   = new TH2F("deltaTVsPosCorr","Time Difference Vs Position",300,0,1500,1000,-1000,1000);
-     posRpcVsPosBar    = new TH2F("posRpcVsPosBar","Rpc Position Vs Bar Position",300,0,1500,500,-1000,3000);
+    stripMultHisto = new TH1F("stripMultHisto", "Strips : H Bar AND Start", 41, 0.5, 41.5);
 
-     stripIdVsNHitsCorr = new TH2F("stripIdVsNHitsCorr","Hits Vs Strip ID (Good Beam)",21,-0.5,20.5,41,0.5,41.5);
+    hStripEffHisto_H = new TH1F("hStripEffHisto_H", "Strip Efficiency (H Bar)", 350, -1000, 2500);
+    hBarEffHisto_H = new TH1F("hBarEffHisto_H", "Bar Efficiency", 350, -1000, 2500);
+    hEfficiencyHisto_H = new TH1F("hEfficiencyHisto_H", "Strip Efficiency (H Bar)", 350, -1000, 2500);
 
-     stripMultHisto = new TH1F("stripMultHisto","Strips : H Bar AND Start",41,0.5,41.5);
+    hStripEffHisto_V1 = new TH1F("hStripEffHisto_V1", "Strip Efficiency (VR Bar)", 350, -1000, 2500);
+    hBarEffHisto_V1 = new TH1F("hBarEffHisto_V1", "Bar Efficiency", 350, -1000, 2500);
+    hEfficiencyHisto_V1 = new TH1F("hEfficiencyHisto_V1", "Strip Efficiency (VR Bar)", 350, -1000, 2500);
 
-     hStripEffHisto_H = new TH1F("hStripEffHisto_H","Strip Efficiency (H Bar)",350,-1000,2500);
-     hBarEffHisto_H = new TH1F("hBarEffHisto_H","Bar Efficiency",350,-1000,2500);
-     hEfficiencyHisto_H= new TH1F("hEfficiencyHisto_H","Strip Efficiency (H Bar)",350,-1000,2500);
+    hStripEffHisto_V2 = new TH1F("hStripEffHisto_V2", "Strip Efficiency (VL Bar)", 350, 0, 3500);
+    hBarEffHisto_V2 = new TH1F("hBarEffHisto_V2", "Bar Efficiency", 350, 0, 3500);
+    hEfficiencyHisto_V2 = new TH1F("hEfficiencyHisto_V2", "Strip Efficiency (VL Bar)", 350, 0, 3500);
 
-     hStripEffHisto_V1 = new TH1F("hStripEffHisto_V1","Strip Efficiency (VR Bar)",350,-1000,2500);
-     hBarEffHisto_V1 = new TH1F("hBarEffHisto_V1","Bar Efficiency",350,-1000,2500);
-     hEfficiencyHisto_V1= new TH1F("hEfficiencyHisto_V1","Strip Efficiency (VR Bar)",350,-1000,2500);
+    for (Int_t i = 0; i < 41; i++)
+    {
 
-     hStripEffHisto_V2 = new TH1F("hStripEffHisto_V2","Strip Efficiency (VL Bar)",350,0,3500);
-     hBarEffHisto_V2 = new TH1F("hBarEffHisto_V2","Bar Efficiency",350,0,3500);
-     hEfficiencyHisto_V2= new TH1F("hEfficiencyHisto_V2","Strip Efficiency (VL Bar)",350,0,3500);
+        sprintf(name, "Left : Coarse Time Strip_%i", i + 1);
+        stripCoarseLeftHisto[i] = new TH1F(name, name, 200, 0, 2200);
 
+        sprintf(name, "Left : Fine Time Strip_%i", i + 1);
+        stripFineLeftHisto[i] = new TH1F(name, name, 200, 0, 600);
 
+        sprintf(name, "Right : Coarse Time Strip_%i", i + 1);
+        stripCoarseRightHisto[i] = new TH1F(name, name, 200, 0, 2200);
 
-    for ( Int_t i = 0 ; i < 41; i++){
+        sprintf(name, "Right : Fine Time Strip_%i", i + 1);
+        stripFineRightHisto[i] = new TH1F(name, name, 200, 0, 600);
 
-      sprintf(name, "Left : Coarse Time Strip_%i",i+1);
-      stripCoarseLeftHisto[i] = new TH1F(name,name,200,0,2200);
+        sprintf(name, "ToF : Strip_%i", i + 1);
+        stripTofHisto[i] = new TH1F(name, name, fTofBins, fLeftTofLim, fRightTofLim);
 
-      sprintf(name, "Left : Fine Time Strip_%i",i+1);
-      stripFineLeftHisto[i] = new TH1F(name,name,200,0,600);
-
-      sprintf(name, "Right : Coarse Time Strip_%i",i+1);
-      stripCoarseRightHisto[i] = new TH1F(name,name,200,0,2200);
-
-      sprintf(name, "Right : Fine Time Strip_%i",i+1);
-      stripFineRightHisto[i] = new TH1F(name,name,200,0,600);
-
-      sprintf(name, "ToF : Strip_%i",i+1);
-      stripTofHisto[i] = new TH1F(name,name,fTofBins,fLeftTofLim,fRightTofLim);
-
-      sprintf(name, "Time Strip- Time Bar 2 : Strip_%i",i+1);
-      timeDiffStripPmtHisto[i] = new TH1F(name,name,200,-70,-20);
-
-
-
+        sprintf(name, "Time Strip- Time Bar 2 : Strip_%i", i + 1);
+        timeDiffStripPmtHisto[i] = new TH1F(name, name, 200, -70, -20);
     }
 
+    for (Int_t i = 0; i < 4; i++)
+    {
 
-    for ( Int_t i = 0 ; i < 4; i++){
+        sprintf(name, "Coarse Time Pmt_%i TOP", i + 1);
+        pmtCoarseHistoTop[i] = new TH1F(name, name, 1000, 0, 3000);
 
-      sprintf(name, "Coarse Time Pmt_%i TOP",i+1);
-      pmtCoarseHistoTop[i] = new TH1F(name,name,1000,0,3000);
+        sprintf(name, "Fine Time Pmt_%i TOP", i + 1);
+        pmtFineHistoTop[i] = new TH1F(name, name, 1000, 0, 3000);
 
-      sprintf(name, "Fine Time Pmt_%i TOP",i+1);
-      pmtFineHistoTop[i] = new TH1F(name,name,1000,0,3000);
+        sprintf(name, "Time Pmt_%i TOP", i + 1);
+        pmtPreCalTimeHistoTop[i] = new TH1F(name, name, 1000, -550, 400);
 
-      sprintf(name, "Time Pmt_%i TOP",i+1);
-      pmtPreCalTimeHistoTop[i] = new TH1F(name,name,1000,-550,400);
-
-      sprintf(name, "ToT Pmt_%i TOP",i+1);
-      pmtPreCalTotHistoTop[i] = new TH1F(name,name,1000,-550,400);
-
+        sprintf(name, "ToT Pmt_%i TOP", i + 1);
+        pmtPreCalTotHistoTop[i] = new TH1F(name, name, 1000, -550, 400);
     }
 
-    for ( Int_t i = 0 ; i < 4; i++){
+    for (Int_t i = 0; i < 4; i++)
+    {
 
-      sprintf(name, "Coarse Time Pmt_%i BOTTOM",i+1);
-      pmtCoarseHistoBottom[i] = new TH1F(name,name,1000,0,3000);
+        sprintf(name, "Coarse Time Pmt_%i BOTTOM", i + 1);
+        pmtCoarseHistoBottom[i] = new TH1F(name, name, 1000, 0, 3000);
 
-      sprintf(name, "Fine Time Pmt_%i BOTTOM",i+1);
-      pmtFineHistoBottom[i] = new TH1F(name,name,1000,0,3000);
+        sprintf(name, "Fine Time Pmt_%i BOTTOM", i + 1);
+        pmtFineHistoBottom[i] = new TH1F(name, name, 1000, 0, 3000);
 
-      sprintf(name, "Time Pmt_%i BOTTOM",i+1);
-      pmtPreCalTimeHistoBottom[i] = new TH1F(name,name,1000,-550,400);
+        sprintf(name, "Time Pmt_%i BOTTOM", i + 1);
+        pmtPreCalTimeHistoBottom[i] = new TH1F(name, name, 1000, -550, 400);
 
-      sprintf(name, "ToT Pmt_%i BOTTOM",i+1);
-      pmtPreCalTotHistoBottom[i] = new TH1F(name,name,1000,-550,400);
-
+        sprintf(name, "ToT Pmt_%i BOTTOM", i + 1);
+        pmtPreCalTotHistoBottom[i] = new TH1F(name, name, 1000, -550, 400);
     }
 
-    for ( Int_t i = 0 ; i < 9; i++){
+    for (Int_t i = 0; i < 9; i++)
+    {
 
-      sprintf(name, "Coarse Time Ref_%i",i+1);
-      refCoarseHisto[i] = new TH1F(name,name,1000,0,3000);
+        sprintf(name, "Coarse Time Ref_%i", i + 1);
+        refCoarseHisto[i] = new TH1F(name, name, 1000, 0, 3000);
 
-      sprintf(name, "Fine Time Ref_%i",i+1);
-      refFineHisto[i] = new TH1F(name,name,1000,0,3000);
-
+        sprintf(name, "Fine Time Ref_%i", i + 1);
+        refFineHisto[i] = new TH1F(name, name, 1000, 0, 3000);
     }
 
-
-
-     for (Int_t i = 0; i < 41; i++) {
+    for (Int_t i = 0; i < 41; i++)
+    {
 
         stripCoarseLeftHisto[i]->GetXaxis()->SetTitle("Coarse Time");
         stripCoarseLeftHisto[i]->GetYaxis()->SetTitle("Counts");
@@ -438,9 +424,8 @@ InitStatus R3BRpcOnlineSpectra::Init()
         stripCoarseLeftHisto[i]->GetXaxis()->CenterTitle(true);
         stripCoarseLeftHisto[i]->GetYaxis()->CenterTitle(true);
 
-        leftStripCanvasCoarse->cd(i+1);
+        leftStripCanvasCoarse->cd(i + 1);
         stripCoarseLeftHisto[i]->Draw();
-
 
         stripFineRightHisto[i]->GetXaxis()->SetTitle("Fine Time");
         stripFineRightHisto[i]->GetYaxis()->SetTitle("Counts");
@@ -449,9 +434,8 @@ InitStatus R3BRpcOnlineSpectra::Init()
         stripFineRightHisto[i]->GetXaxis()->CenterTitle(true);
         stripFineRightHisto[i]->GetYaxis()->CenterTitle(true);
 
-        rightStripCanvasFine->cd(i+1);
+        rightStripCanvasFine->cd(i + 1);
         stripFineRightHisto[i]->Draw();
-
 
         stripFineLeftHisto[i]->GetXaxis()->SetTitle("Fine Time");
         stripFineLeftHisto[i]->GetYaxis()->SetTitle("Counts");
@@ -460,7 +444,7 @@ InitStatus R3BRpcOnlineSpectra::Init()
         stripFineLeftHisto[i]->GetXaxis()->CenterTitle(true);
         stripFineLeftHisto[i]->GetYaxis()->CenterTitle(true);
 
-        leftStripCanvasFine->cd(i+1);
+        leftStripCanvasFine->cd(i + 1);
         stripFineLeftHisto[i]->Draw();
 
         stripCoarseRightHisto[i]->GetXaxis()->SetTitle("Coarse Time");
@@ -470,25 +454,22 @@ InitStatus R3BRpcOnlineSpectra::Init()
         stripCoarseRightHisto[i]->GetXaxis()->CenterTitle(true);
         stripCoarseRightHisto[i]->GetYaxis()->CenterTitle(true);
 
-        rightStripCanvasCoarse->cd(i+1);
+        rightStripCanvasCoarse->cd(i + 1);
         stripCoarseRightHisto[i]->Draw();
-
 
         stripTofHisto[i]->GetXaxis()->SetTitle("ToF (ps)");
         stripTofHisto[i]->GetYaxis()->SetTitle("Counts");
-        stripTofCanvas->cd(i+1);
+        stripTofCanvas->cd(i + 1);
         stripTofHisto[i]->Draw();
 
         timeDiffStripPmtHisto[i]->GetXaxis()->SetTitle("Time Difference (ns)");
         timeDiffStripPmtHisto[i]->GetYaxis()->SetTitle("Counts");
-        timeDiffStripPmtCanvas->cd(i+1);
+        timeDiffStripPmtCanvas->cd(i + 1);
         timeDiffStripPmtHisto[i]->Draw();
-
     }
 
     stripLeftFolder->Add(leftStripCanvasCoarse);
     stripLeftFolder->Add(leftStripCanvasFine);
-
 
     stripRightFolder->Add(rightStripCanvasCoarse);
     stripRightFolder->Add(rightStripCanvasFine);
@@ -506,7 +487,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripRightTotCorrCanvas->cd();
     stripRightTotCorr->Draw("COLZ");
     stripRightPreCalFolder->Add(stripRightTotCorrCanvas);
-
 
     stripLeftTimeCorr->GetXaxis()->SetTitle("Strip Number");
     stripLeftTimeCorr->GetYaxis()->SetTitle("Time");
@@ -553,7 +533,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
     tofCorr->Draw("COLZ");
     stripVsTofFolder->Add(tofCorrCanvas);
 
-
     tofVsPosCorr->GetXaxis()->SetTitle("Pos (mm)");
     tofVsPosCorr->GetYaxis()->SetTitle("ToF (ps)");
     tofPosCanvas->cd();
@@ -561,14 +540,12 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
     stripVsTofFolder->Add(tofPosCanvas);
 
-
     timeDiffStripPmtCorr->GetXaxis()->SetTitle("Time Difference (ns)");
     timeDiffStripPmtCorr->GetYaxis()->SetTitle("Strip Number");
     timeDiffStripPmtCorrCanvas->cd();
     timeDiffStripPmtCorr->Draw("COLZ");
     stripBarCorrFolder->Add(timeDiffStripPmtCorrCanvas);
     stripBarCorrFolder->Add(timeDiffStripPmtCanvas);
-
 
     deltaTVsPosCorr->GetXaxis()->SetTitle("Position (mm)");
     deltaTVsPosCorr->GetYaxis()->SetTitle("Time Difference (ns)");
@@ -579,7 +556,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
     posRpcVsPosBar->GetYaxis()->SetTitle("Sci Position (mm)");
     posRpcCorrCanvas->cd(2);
     posRpcVsPosBar->Draw("COLZ");
-
 
     stripIdVsNHitsCorr->GetXaxis()->SetTitle("Number of Hits");
     stripIdVsNHitsCorr->GetYaxis()->SetTitle("Strip Number");
@@ -602,16 +578,11 @@ InitStatus R3BRpcOnlineSpectra::Init()
     efficiencyCanvas->cd(3);
     hEfficiencyHisto_V2->Draw("");
 
-
-
     efficiencyFolder->Add(efficiencyCanvas);
 
-
-
-
     /* ---------- Efficiency Canvases ---------- */
-    stripMultCanvas = new TCanvas("stripMultCanvas","Strips : Start AND H Bar");
-    //stripMultCanvas->Divide(2,1);
+    stripMultCanvas = new TCanvas("stripMultCanvas", "Strips : Start AND H Bar");
+    // stripMultCanvas->Divide(2,1);
 
     stripMultCanvas->cd();
 
@@ -619,82 +590,79 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripMultHisto->GetYaxis()->SetTitle("Counts");
     stripMultHisto->Draw();
 
-    tex1 = new TLatex(2,80000, "Elapsed time (since last restart): ");
+    tex1 = new TLatex(2, 80000, "Elapsed time (since last restart): ");
     tex1->SetTextFont(42);
     tex1->SetTextSize(0.04);
     tex1->SetLineWidth(1);
 
-    tex2 = new TLatex(2,80000, "Hits in Horizontal Bar : ");
+    tex2 = new TLatex(2, 80000, "Hits in Horizontal Bar : ");
     tex2->SetTextFont(42);
     tex2->SetTextSize(0.04);
     tex2->SetLineWidth(1);
 
-    //tex1->Draw();
+    // tex1->Draw();
 
     efficiencyFolder->Add(stripMultCanvas);
 
-
-
     stripBarCorrFolder->Add(posRpcCorrCanvas);
 
-    for (Int_t i = 0; i < 4; i++) {
+    for (Int_t i = 0; i < 4; i++)
+    {
 
-       pmtCoarseHistoTop[i]->GetXaxis()->SetTitle("Coarse Time");
-       pmtCoarseHistoTop[i]->GetYaxis()->SetTitle("Counts");
-       pmtCoarseCanvas->cd(i+1);
-       pmtCoarseHistoTop[i]->Draw();
+        pmtCoarseHistoTop[i]->GetXaxis()->SetTitle("Coarse Time");
+        pmtCoarseHistoTop[i]->GetYaxis()->SetTitle("Counts");
+        pmtCoarseCanvas->cd(i + 1);
+        pmtCoarseHistoTop[i]->Draw();
 
-       pmtFineHistoTop[i]->GetXaxis()->SetTitle("Fine Time");
-       pmtFineHistoTop[i]->GetYaxis()->SetTitle("Counts");
-       pmtFineCanvas->cd(i+1);
-       pmtFineHistoTop[i]->Draw();
+        pmtFineHistoTop[i]->GetXaxis()->SetTitle("Fine Time");
+        pmtFineHistoTop[i]->GetYaxis()->SetTitle("Counts");
+        pmtFineCanvas->cd(i + 1);
+        pmtFineHistoTop[i]->Draw();
 
-       pmtPreCalTimeHistoTop[i]->GetXaxis()->SetTitle("Time");
-       pmtPreCalTimeHistoTop[i]->GetYaxis()->SetTitle("Counts");
-       pmtPreCalTimeCanvas->cd(i+1);
-       pmtPreCalTimeHistoTop[i]->Draw();
+        pmtPreCalTimeHistoTop[i]->GetXaxis()->SetTitle("Time");
+        pmtPreCalTimeHistoTop[i]->GetYaxis()->SetTitle("Counts");
+        pmtPreCalTimeCanvas->cd(i + 1);
+        pmtPreCalTimeHistoTop[i]->Draw();
 
-       pmtPreCalTotHistoTop[i]->GetXaxis()->SetTitle("ToT");
-       pmtPreCalTotHistoTop[i]->GetYaxis()->SetTitle("Counts");
-       pmtPreCalTotCanvas->cd(i+1);
-       pmtPreCalTotHistoTop[i]->Draw();
+        pmtPreCalTotHistoTop[i]->GetXaxis()->SetTitle("ToT");
+        pmtPreCalTotHistoTop[i]->GetYaxis()->SetTitle("Counts");
+        pmtPreCalTotCanvas->cd(i + 1);
+        pmtPreCalTotHistoTop[i]->Draw();
 
-       pmtCoarseHistoBottom[i]->GetXaxis()->SetTitle("Coarse Time");
-       pmtCoarseHistoBottom[i]->GetYaxis()->SetTitle("Counts");
-       pmtCoarseCanvas->cd(i+1+4);
-       pmtCoarseHistoBottom[i]->Draw();
+        pmtCoarseHistoBottom[i]->GetXaxis()->SetTitle("Coarse Time");
+        pmtCoarseHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+        pmtCoarseCanvas->cd(i + 1 + 4);
+        pmtCoarseHistoBottom[i]->Draw();
 
-       pmtFineHistoBottom[i]->GetXaxis()->SetTitle("Fine Time");
-       pmtFineHistoBottom[i]->GetYaxis()->SetTitle("Counts");
-       pmtFineCanvas->cd(i+1+4);
-       pmtFineHistoBottom[i]->Draw();
+        pmtFineHistoBottom[i]->GetXaxis()->SetTitle("Fine Time");
+        pmtFineHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+        pmtFineCanvas->cd(i + 1 + 4);
+        pmtFineHistoBottom[i]->Draw();
 
-       pmtPreCalTimeHistoBottom[i]->GetXaxis()->SetTitle("Time");
-       pmtPreCalTimeHistoBottom[i]->GetYaxis()->SetTitle("Counts");
-       pmtPreCalTimeCanvas->cd(i+1+4);
-       pmtPreCalTimeHistoBottom[i]->Draw();
+        pmtPreCalTimeHistoBottom[i]->GetXaxis()->SetTitle("Time");
+        pmtPreCalTimeHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+        pmtPreCalTimeCanvas->cd(i + 1 + 4);
+        pmtPreCalTimeHistoBottom[i]->Draw();
 
-       pmtPreCalTotHistoBottom[i]->GetXaxis()->SetTitle("ToT");
-       pmtPreCalTotHistoBottom[i]->GetYaxis()->SetTitle("Counts");
-       pmtPreCalTotCanvas->cd(i+1+4);
-       pmtPreCalTotHistoBottom[i]->Draw();
-
+        pmtPreCalTotHistoBottom[i]->GetXaxis()->SetTitle("ToT");
+        pmtPreCalTotHistoBottom[i]->GetYaxis()->SetTitle("Counts");
+        pmtPreCalTotCanvas->cd(i + 1 + 4);
+        pmtPreCalTotHistoBottom[i]->Draw();
     }
 
+    for (Int_t i = 0; i < 9; i++)
+    {
 
-    for (Int_t i = 0; i < 9; i++) {
+        refFineHisto[i]->GetXaxis()->SetTitle("Fine Time");
+        refFineHisto[i]->GetYaxis()->SetTitle("Counts");
+        refFineCanvas->cd(i + 1);
+        refFineHisto[i]->Draw();
 
-       refFineHisto[i]->GetXaxis()->SetTitle("Fine Time");
-       refFineHisto[i]->GetYaxis()->SetTitle("Counts");
-       refFineCanvas->cd(i+1);
-       refFineHisto[i]->Draw();
-
-
-       refCoarseHisto[i]->GetXaxis()->SetTitle("Coarse Time");
-       refCoarseHisto[i]->GetYaxis()->SetTitle("Counts");
-       refCoarseCanvas->cd(i+1);
-       refCoarseHisto[i]->Draw();
-   }
+        refCoarseHisto[i]->GetXaxis()->SetTitle("Coarse Time");
+        refCoarseHisto[i]->GetYaxis()->SetTitle("Counts");
+        refCoarseCanvas->cd(i + 1);
+        refCoarseHisto[i]->Draw();
+    }
 
     refFolder->Add(refFineCanvas);
     refFolder->Add(refCoarseCanvas);
@@ -703,8 +671,6 @@ InitStatus R3BRpcOnlineSpectra::Init()
 
     pmtPreCalFolder->Add(pmtPreCalTimeCanvas);
     pmtPreCalFolder->Add(pmtPreCalTotCanvas);
-
-
 
     stripCoarseRightCorr->GetXaxis()->SetTitle("Strip Number");
     stripCoarseRightCorr->GetYaxis()->SetTitle("Coarse Time");
@@ -730,19 +696,16 @@ InitStatus R3BRpcOnlineSpectra::Init()
     stripFineLeftCorr->Draw("COLZ");
     stripLeftFolder->Add(stripFineLeftCorrCanvas);
 
-
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
     run->AddObject(mainfol);
-
 
     run->GetHttpServer()->RegisterCommand("Reset_RPC", Form("/Objects/%s/->Reset_RPC_Histo()", GetName()));
     run->GetHttpServer()->RegisterCommand("Reset_Efficiencies", Form("/Objects/%s/->Reset_Efficiencies()", GetName()));
     run->GetHttpServer()->RegisterCommand("GO_ONSPILL", Form("/Objects/%s/->GO_ONSPILL()", GetName()));
     run->GetHttpServer()->RegisterCommand("GO_OFFSPILL", Form("/Objects/%s/->GO_OFFSPILL()", GetName()));
 
-
-  return kSUCCESS;
+    return kSUCCESS;
 }
 
 void R3BRpcOnlineSpectra::Reset_RPC_Histo()
@@ -757,27 +720,22 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
         stripTofHisto[i]->Reset();
         timeDiffStripPmtHisto[i]->Reset();
         stripTofHisto[i]->Reset();
-
     }
 
     for (Int_t i = 0; i < 9; i++)
     {
         refFineHisto[i]->Reset();
         refCoarseHisto[i]->Reset();
-
     }
 
-
-    for (Int_t i = 0; i < 4; i++) {
+    for (Int_t i = 0; i < 4; i++)
+    {
 
         pmtFineHistoTop[i]->Reset();
         pmtCoarseHistoTop[i]->Reset();
         pmtFineHistoBottom[i]->Reset();
         pmtCoarseHistoBottom[i]->Reset();
-
-
     }
-
 
     stripCoarseLeftCorr->Reset();
     stripCoarseRightCorr->Reset();
@@ -800,51 +758,52 @@ void R3BRpcOnlineSpectra::Reset_RPC_Histo()
     tofVsPosCorr->Reset();
     stripIdVsNHitsCorr->Reset();
 
-    for(Int_t i = 0 ; i < 41 ; i++){
-     for(Int_t j = 0 ; j < 50 ; j++){
-       meanCharges[i][j]=0.0;
-   }}
+    for (Int_t i = 0; i < 41; i++)
+    {
+        for (Int_t j = 0; j < 50; j++)
+        {
+            meanCharges[i][j] = 0.0;
+        }
+    }
 
-     return;
+    return;
 }
-
 
 void R3BRpcOnlineSpectra::Reset_Efficiencies()
 {
 
-  stripMultHisto->Reset();
-  fBarHits=0.0;
-  fTimeStart=0;
+    stripMultHisto->Reset();
+    fBarHits = 0.0;
+    fTimeStart = 0;
 
-  hEfficiencyHisto_H->Reset();
-  hStripEffHisto_H->Reset();
-  hBarEffHisto_H->Reset();
+    hEfficiencyHisto_H->Reset();
+    hStripEffHisto_H->Reset();
+    hBarEffHisto_H->Reset();
 
-  hEfficiencyHisto_V1->Reset();
-  hStripEffHisto_V1->Reset();
-  hBarEffHisto_V1->Reset();
+    hEfficiencyHisto_V1->Reset();
+    hStripEffHisto_V1->Reset();
+    hBarEffHisto_V1->Reset();
 
-  hEfficiencyHisto_V2->Reset();
-  hStripEffHisto_V2->Reset();
-  hBarEffHisto_V2->Reset();
+    hEfficiencyHisto_V2->Reset();
+    hStripEffHisto_V2->Reset();
+    hBarEffHisto_V2->Reset();
 
-   return;
+    return;
 }
 
 void R3BRpcOnlineSpectra::GO_ONSPILL()
 {
-   R3BLOG(info, "");
-   fSpill=1;
-   return;
+    R3BLOG(info, "");
+    fSpill = 1;
+    return;
 }
 
 void R3BRpcOnlineSpectra::GO_OFFSPILL()
 {
-   R3BLOG(info, "");
-   fSpill=0;
-   return;
+    R3BLOG(info, "");
+    fSpill = 0;
+    return;
 }
-
 
 void R3BRpcOnlineSpectra::Exec(Option_t* option)
 {
@@ -852,328 +811,326 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
     fcounter++;
     Float_t elapsedTime;
 
-    if(fTimeStart==0)
-     fTimeStart=fEventHeader->GetTimeStamp();
+    if (fTimeStart == 0)
+        fTimeStart = fEventHeader->GetTimeStamp();
 
-    if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1){
+    if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
+    {
         return;
     }
-
 
     if (fEventHeader->GetTpat() > 0)
     {
         for (Int_t i = 0; i < 16; i++)
         {
             tpatbin = (fEventHeader->GetTpat() & (1 << i));
-            if (tpatbin != 0){
-                fTPat=i+1;
-               }
+            if (tpatbin != 0)
+            {
+                fTPat = i + 1;
             }
-
+        }
     }
 
+    auto nMappedHits = fMappedDataItems->GetEntriesFast();
 
+    if (fSpill == 1)
+        execBool = (fTPat >= fFirstTPat && fTPat <= fFirstTPat);
 
-        auto nMappedHits = fMappedDataItems->GetEntriesFast();
+    if (fSpill == 0)
+        execBool = !(fTPat >= fFirstTPat && fTPat <= fFirstTPat);
 
-         if(fSpill==1)
-         execBool = (fTPat >=fFirstTPat && fTPat <= fFirstTPat);
+    if (execBool)
+    {
 
-         if(fSpill==0)
-         execBool = !(fTPat >=fFirstTPat && fTPat <= fFirstTPat);
-
-        if(execBool){
-
-
-     /* ------------------- Map EventLoop ------------------*/
-     for (Int_t ihit = 0; ihit < nMappedHits; ihit++) {
+        /* ------------------- Map EventLoop ------------------*/
+        for (Int_t ihit = 0; ihit < nMappedHits; ihit++)
+        {
 
             R3BRpcMappedData* hit = (R3BRpcMappedData*)fMappedDataItems->At(ihit);
 
             if (!hit)
                 continue;
 
-      UInt_t idetector = hit->GetDetId();
+            UInt_t idetector = hit->GetDetId();
 
-	    if(idetector == 0){
+            if (idetector == 0)
+            {
 
-             Int_t side = hit->GetSide();
+                Int_t side = hit->GetSide();
 
-             if(side == 0){
+                if (side == 0)
+                {
 
-              stripFineLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-              stripCoarseLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
-              stripCoarseLeftCorr->Fill(hit->GetChannelId(),hit->GetCoarseTime());
-              stripFineLeftCorr->Fill(hit->GetChannelId(),hit->GetFineTime());
+                    stripFineLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+                    stripCoarseLeftHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+                    stripCoarseLeftCorr->Fill(hit->GetChannelId(), hit->GetCoarseTime());
+                    stripFineLeftCorr->Fill(hit->GetChannelId(), hit->GetFineTime());
+                }
 
-           }
+                if (side == 1)
+                {
 
-            if(side == 1){
+                    stripFineRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+                    stripCoarseRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+                    stripCoarseRightCorr->Fill(hit->GetChannelId(), hit->GetCoarseTime());
+                    stripFineRightCorr->Fill(hit->GetChannelId(), hit->GetFineTime());
+                }
+            }
 
-             stripFineRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-             stripCoarseRightHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
-             stripCoarseRightCorr->Fill(hit->GetChannelId(),hit->GetCoarseTime());
-             stripFineRightCorr->Fill(hit->GetChannelId(),hit->GetFineTime());
+            if (idetector == 2)
+            {
 
-           }
-	      }
+                refFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+                refCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+            }
 
-	   if(idetector == 2){
+            if (idetector == 1)
+            {
 
-       refFineHisto[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-	     refCoarseHisto[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+                Int_t pmtSide = hit->GetSide();
 
-     }
+                if (pmtSide == 0)
+                {
 
-	   if(idetector == 1){
+                    pmtFineHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+                    pmtCoarseHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+                }
 
-      Int_t pmtSide=hit->GetSide();
+                if (pmtSide == 1)
+                {
 
-      if(pmtSide==0){
+                    pmtFineHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
+                    pmtCoarseHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+                }
+            }
+        }
 
-       pmtFineHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-       pmtCoarseHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+        /* ----------------- PreCal EventLoop ------------------*/
+        auto nPreCalHits = fPreCalDataItems->GetEntriesFast();
 
-      }
+        for (Int_t ihit = 0; ihit < nPreCalHits; ihit++)
+        {
 
-      if(pmtSide==1){
+            R3BRpcPreCalData* hit = (R3BRpcPreCalData*)fPreCalDataItems->At(ihit);
 
-	     pmtFineHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetFineTime());
-	     pmtCoarseHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetCoarseTime());
+            Int_t side = hit->GetSide();
 
-  	     }
-	     }
-     }
+            if (hit->GetDetId() == 0)
+            {
 
+                if (side == 0)
+                {
 
-    /* ----------------- PreCal EventLoop ------------------*/
-    auto nPreCalHits = fPreCalDataItems->GetEntriesFast();
+                    stripLeftTotCorr->Fill(hit->GetChannelId(), hit->GetTot());
+                    stripLeftTimeCorr->Fill(hit->GetChannelId(), hit->GetTime());
+                }
+                if (side == 1)
+                {
 
-    for( Int_t ihit = 0; ihit < nPreCalHits; ihit++) {
+                    stripRightTotCorr->Fill(hit->GetChannelId(), hit->GetTot());
+                    stripRightTimeCorr->Fill(hit->GetChannelId(), hit->GetTime());
+                }
+            }
 
-      R3BRpcPreCalData* hit = (R3BRpcPreCalData*)fPreCalDataItems->At(ihit);
+            if (hit->GetDetId() == 1)
+            {
 
-      Int_t side = hit->GetSide();
+                if (side == 0)
+                {
 
-      if(hit->GetDetId() == 0){
+                    pmtPreCalTimeHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetTime());
+                    pmtPreCalTotHistoTop[hit->GetChannelId() - 1]->Fill(hit->GetTot());
+                }
 
-       if(side == 0){
+                if (side == 1)
+                {
 
-        stripLeftTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
-        stripLeftTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+                    pmtPreCalTimeHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetTime());
+                    pmtPreCalTotHistoBottom[hit->GetChannelId() - 1]->Fill(hit->GetTot());
+                }
+            }
+        }
 
-       }
-       if(side == 1){
+        /* -------------------- Cal EventLoop ---------------------*/
+        auto nStripCalHits = fCalDataItems->GetEntriesFast();
 
-        stripRightTotCorr->Fill(hit->GetChannelId(),hit->GetTot());
-        stripRightTimeCorr->Fill(hit->GetChannelId(),hit->GetTime());
+        for (Int_t ihit = 0; ihit < nStripCalHits; ihit++)
+        {
 
-       }
-    }
+            R3BRpcCalData* hit = (R3BRpcCalData*)fCalDataItems->At(ihit);
 
-      if(hit->GetDetId() == 1){
+            if (hit->GetDetId() == 0)
+            {
 
-       if(side==0){
+                stripCalTimeCorr->Fill(hit->GetTimeL_T(), hit->GetTimeR_B());
+                stripCalToTCorr->Fill(hit->GetTotL_T(), hit->GetTotR_B());
+            }
+        }
 
-         pmtPreCalTimeHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTime());
-         pmtPreCalTotHistoTop[hit->GetChannelId()-1]->Fill(hit->GetTot());
+        /*---------------- HIT EventLoop ---------------*/
+        auto nStripHits = fHitDataItems->GetEntriesFast();
 
-       }
+        Int_t channelId;
+        Int_t detId;
+        Float_t pos, charge;
+        Int_t bin;
 
-       if(side==1){
+        Float_t barTime = 0.0;
+        Float_t barID = 0.0;
+        Float_t sciPos = 0.0;
+        Int_t StripCounter = 0;
 
-         pmtPreCalTimeHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTime());
-         pmtPreCalTotHistoBottom[hit->GetChannelId()-1]->Fill(hit->GetTot());
+        Bool_t goodBar = kFALSE;
 
-       }
-     }
-   }
+        for (Int_t ihit = 0; ihit < nStripHits; ihit++)
+        {
 
+            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
 
-    /* -------------------- Cal EventLoop ---------------------*/
-    auto nStripCalHits = fCalDataItems->GetEntriesFast();
+            detId = hit->GetDetId();
+            channelId = hit->GetChannelId();
+            pos = hit->GetPos();
+            charge = hit->GetCharge();
 
-    for( Int_t ihit = 0; ihit < nStripCalHits; ihit++) {
+            if (detId == 1 && channelId == 2)
+            {
 
-     R3BRpcCalData* hit = (R3BRpcCalData*)fCalDataItems->At(ihit);
+                goodBar = kTRUE;
+                barTime = hit->GetTime();
+                sciPos = hit->GetPos();
+                fBarHits++;
+                hBarEffHisto_H->Fill(pos);
+            }
 
-     if(hit->GetDetId()==0){
+            if (detId == 1 && channelId == 1)
+            {
+                hBarEffHisto_V1->Fill(pos);
+            }
 
-      stripCalTimeCorr->Fill(hit->GetTimeL_T(),hit->GetTimeR_B());
-      stripCalToTCorr->Fill(hit->GetTotL_T(),hit->GetTotR_B());
+            if (detId == 1 && channelId == 3)
+            {
+                hBarEffHisto_V2->Fill(pos);
+            }
+        }
 
-     }
-    }
+        Int_t stripMultiplicityArray[41] = { 0 };
 
-    /*---------------- HIT EventLoop ---------------*/
-    auto nStripHits = fHitDataItems->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nStripHits; ihit++)
+        {
 
-    Int_t channelId;
-    Int_t detId;
-    Float_t pos,charge;
-    Int_t bin;
+            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            detId = hit->GetDetId();
+            channelId = hit->GetChannelId();
+            pos = hit->GetPos();
+            charge = hit->GetCharge();
 
-    Float_t barTime    = 0.0;
-    Float_t barID      = 0.0;
-    Float_t sciPos     = 0.0;
-    Int_t StripCounter = 0;
+            if (detId == 1)
+                continue;
 
-    Bool_t goodBar = kFALSE;
+            StripCounter++;
 
-    for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
+            stripMultiplicityArray[channelId - 1] += 1;
 
-     R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            Double_t rpc_tof = hit->GetTof();
 
-      detId =  hit->GetDetId();
-      channelId =  hit->GetChannelId();
-      pos       =  hit->GetPos();
-      charge    =  hit->GetCharge();
+            stripTofHisto[channelId - 1]->Fill(rpc_tof);
 
+            tofCorr->Fill(rpc_tof, channelId);
 
-     if(detId ==1 && channelId == 2){
+            tofVsPosCorr->Fill(pos, rpc_tof);
 
-      goodBar = kTRUE;
-      barTime = hit->GetTime();
-      sciPos  = hit->GetPos();
-      fBarHits++;
-      hBarEffHisto_H->Fill(pos);
+            if (goodBar)
+            {
 
-     }
+                timeDiffStripPmtHisto[channelId - 1]->Fill(hit->GetTime() - barTime);
+                timeDiffStripPmtCorr->Fill(hit->GetTime() - barTime, channelId);
 
-     if(detId ==1 && channelId == 1){
-      hBarEffHisto_V1->Fill(pos);
-     }
+                posRpcVsPosBar->Fill(pos, sciPos);
+                deltaTVsPosCorr->Fill(pos, hit->GetTime() - barTime);
+                stripMultHisto->Fill(channelId);
+            }
 
-     if(detId ==1 && channelId == 3){
-      hBarEffHisto_V2->Fill(pos);
-     }
+            stripPosHitCorr->Fill(pos, channelId);
+            totalChargeHist->Fill(hit->GetCharge());
+            counts++;
 
-   }
+            bin = Int_t(50 - (1500 - pos) / 30.0 + 1);
 
-    Int_t stripMultiplicityArray[41] = {0};
+            if (charge >= 0.0 && bin <= 50 && bin > 0)
+            {
 
-    for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
+                meanCharges[channelId - 1][bin - 1] = meanCharges[channelId - 1][bin - 1] +
+                                                      (1.0 / counts) * (charge - meanCharges[channelId - 1][bin - 1]);
 
-     R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
-      detId =  hit->GetDetId();
-      channelId =  hit->GetChannelId();
-      pos       =  hit->GetPos();
-      charge    =  hit->GetCharge();
+                meanChargeCorr->SetBinContent(bin, channelId, meanCharges[channelId - 1][bin - 1]);
+            }
+        }
 
-     if(detId ==1)
-      continue;
+        for (Int_t ihit = 0; ihit < nStripHits; ihit++)
+        {
 
-     StripCounter++;
+            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            detId = hit->GetDetId();
+            channelId = hit->GetChannelId();
+            pos = hit->GetPos();
+            charge = hit->GetCharge();
 
-     stripMultiplicityArray[channelId-1] += 1;
+            if (detId == 1 && channelId == 2 && StripCounter != 0)
+                hStripEffHisto_H->Fill(pos);
 
-     Double_t rpc_tof = hit->GetTof();
+            if (detId == 1 && channelId == 1 && StripCounter != 0)
+                hStripEffHisto_V1->Fill(pos);
 
-     stripTofHisto[channelId-1]->Fill(rpc_tof);
+            if (detId == 1 && channelId == 3 && StripCounter != 0)
+                hStripEffHisto_V2->Fill(pos);
+        }
 
-     tofCorr->Fill(rpc_tof,channelId);
+        for (int i = 0; i < 41; i++)
+            stripIdVsNHitsCorr->Fill(stripMultiplicityArray[i], i + 1);
 
-     tofVsPosCorr->Fill(pos,rpc_tof);
+        if (fNEvents % 1000 == 0)
+        {
 
+            efficiencyCanvas->cd(1);
+            hEfficiencyHisto_H->Divide(hStripEffHisto_H, hBarEffHisto_H, 1, 1, "");
+            efficiencyCanvas->Modified();
 
-     if(goodBar){
+            efficiencyCanvas->cd(2);
+            hEfficiencyHisto_V1->Divide(hStripEffHisto_V1, hBarEffHisto_V1, 1, 1, "");
+            efficiencyCanvas->Modified();
 
-        timeDiffStripPmtHisto[channelId-1]->Fill(hit->GetTime()-barTime);
-        timeDiffStripPmtCorr->Fill(hit->GetTime()-barTime,channelId);
+            efficiencyCanvas->cd(3);
+            hEfficiencyHisto_V2->Divide(hStripEffHisto_V2, hBarEffHisto_V2, 1, 1, "");
+            efficiencyCanvas->Modified();
 
-        posRpcVsPosBar->Fill(pos,sciPos);
-        deltaTVsPosCorr->Fill(pos,hit->GetTime()-barTime);
-        stripMultHisto->Fill(channelId);
+            fTimeEnd = fEventHeader->GetTimeStamp();
+            elapsedTime = (fTimeEnd - fTimeStart) / 1E9;
 
-     }
+            Int_t y = (int)stripMultHisto->GetMaximum();
 
-     stripPosHitCorr->Fill(pos,channelId);
-     totalChargeHist->Fill(hit->GetCharge());
-     counts++;
+            char name1[255];
 
-     bin =Int_t(50 - (1500-pos)/30.0 + 1);
+            sprintf(name1, "Elapsed time (since last restart) : %d  s", (int)elapsedTime);
 
-     if(charge>=0.0 && bin <= 50 && bin > 0){
+            char name2[255];
 
-      meanCharges[channelId-1][bin-1] = meanCharges[channelId-1][bin-1] + (1.0/counts)*(charge-meanCharges[channelId-1][bin-1]);
+            sprintf(name2, "Hits in Horizontal Bar  : %d  ", (int)fBarHits);
 
-      meanChargeCorr->SetBinContent(bin,channelId,meanCharges[channelId-1][bin-1]);
+            stripMultCanvas->Clear();
+            stripMultHisto->Draw();
+            tex1->DrawLatex(2, y, name1);
+            tex1->Draw();
+            tex2->DrawLatex(2, 0.95 * y, name2);
+            tex2->Draw();
 
-
-     }
-   }
-
-
-   for( Int_t ihit = 0; ihit < nStripHits; ihit++) {
-
-    R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
-     detId =  hit->GetDetId();
-     channelId =  hit->GetChannelId();
-     pos       =  hit->GetPos();
-     charge    =  hit->GetCharge();
-
-
-    if(detId ==1 && channelId == 2 && StripCounter!=0)
-      hStripEffHisto_H->Fill(pos);
-
-    if(detId ==1 && channelId == 1 && StripCounter!=0)
-      hStripEffHisto_V1->Fill(pos);
-
-    if(detId ==1 && channelId == 3 && StripCounter!=0)
-      hStripEffHisto_V2->Fill(pos);
-
-  }
-
-
-    for(int i = 0 ; i < 41 ; i++)
-      stripIdVsNHitsCorr->Fill(stripMultiplicityArray[i],i+1);
-
-
-    if(fNEvents%1000==0){
-
-      efficiencyCanvas->cd(1);
-      hEfficiencyHisto_H->Divide(hStripEffHisto_H,hBarEffHisto_H,1,1,"");
-      efficiencyCanvas->Modified();
-
-      efficiencyCanvas->cd(2);
-      hEfficiencyHisto_V1->Divide(hStripEffHisto_V1,hBarEffHisto_V1,1,1,"");
-      efficiencyCanvas->Modified();
-
-
-      efficiencyCanvas->cd(3);
-      hEfficiencyHisto_V2->Divide(hStripEffHisto_V2,hBarEffHisto_V2,1,1,"");
-      efficiencyCanvas->Modified();
-
-
-      fTimeEnd=fEventHeader->GetTimeStamp();
-      elapsedTime = (fTimeEnd - fTimeStart)/1E9;
-
-      Int_t y = (int)stripMultHisto->GetMaximum();
-
-      char name1[255];
-
-      sprintf(name1,"Elapsed time (since last restart) : %d  s",(int)elapsedTime);
-
-      char name2[255];
-
-      sprintf(name2,"Hits in Horizontal Bar  : %d  ",(int)fBarHits);
-
-      stripMultCanvas->Clear();
-      stripMultHisto->Draw();
-      tex1->DrawLatex(2,y,name1);
-      tex1->Draw();
-      tex2->DrawLatex(2,0.95*y,name2);
-      tex2->Draw();
-
-      stripMultCanvas->Modified();
-      stripMultCanvas->cd();
-
-       }
+            stripMultCanvas->Modified();
+            stripMultCanvas->cd();
+        }
     }
 
     fNEvents += 1;
     return;
-  }
+}
 
 void R3BRpcOnlineSpectra::FinishEvent()
 {
@@ -1183,75 +1140,73 @@ void R3BRpcOnlineSpectra::FinishEvent()
         fMappedDataItems->Clear();
     }
 
-    if(fPreCalDataItems)
+    if (fPreCalDataItems)
     {
         fPreCalDataItems->Clear();
     }
 
-
-    if(fCalDataItems)
+    if (fCalDataItems)
     {
         fCalDataItems->Clear();
     }
 
-    if(fHitDataItems)
+    if (fHitDataItems)
     {
         fHitDataItems->Clear();
     }
-
-
 }
 
 void R3BRpcOnlineSpectra::FinishTask()
 {
     if (fMappedDataItems)
     {
-     for (Int_t i = 0; i < 7; i++){
-           refFineHisto[i]->Write();
-           refCoarseHisto[i]->Write();
-     }
+        for (Int_t i = 0; i < 7; i++)
+        {
+            refFineHisto[i]->Write();
+            refCoarseHisto[i]->Write();
+        }
 
-     for (Int_t i = 0; i < 4; i++){
-          pmtFineHistoTop[i]->Write();
-          pmtCoarseHistoTop[i]->Write();
-          pmtFineHistoBottom[i]->Write();
-          pmtCoarseHistoBottom[i]->Write();
-     }
+        for (Int_t i = 0; i < 4; i++)
+        {
+            pmtFineHistoTop[i]->Write();
+            pmtCoarseHistoTop[i]->Write();
+            pmtFineHistoBottom[i]->Write();
+            pmtCoarseHistoBottom[i]->Write();
+        }
 
+        for (Int_t i = 0; i < 41; i++)
+        {
 
-     for (Int_t i = 0; i < 41; i++){
+            stripFineLeftHisto[i]->Write();
+            stripFineRightHisto[i]->Write();
 
-         stripFineLeftHisto[i]->Write();
-         stripFineRightHisto[i]->Write();
+            stripCoarseLeftHisto[i]->Write();
+            stripCoarseRightHisto[i]->Write();
+            stripTofHisto[i]->Write();
+        }
 
-         stripCoarseLeftHisto[i]->Write();
-         stripCoarseRightHisto[i]->Write();
-         stripTofHisto[i]->Write();
-     }
+        leftStripCanvasCoarse->Write();
+        rightStripCanvasCoarse->Write();
 
-     leftStripCanvasCoarse->Write();
-     rightStripCanvasCoarse->Write();
+        leftStripCanvasFine->Write();
+        rightStripCanvasFine->Write();
 
-     leftStripCanvasFine->Write();
-     rightStripCanvasFine->Write();
+        stripCoarseLeftCorrCanvas->Write();
+        stripCoarseRightCorrCanvas->Write();
 
-     stripCoarseLeftCorrCanvas->Write();
-     stripCoarseRightCorrCanvas->Write();
+        stripFineLeftCorrCanvas->Write();
+        stripFineRightCorrCanvas->Write();
 
-     stripFineLeftCorrCanvas->Write();
-     stripFineRightCorrCanvas->Write();
+        pmtCoarseCanvas->Write();
+        pmtFineCanvas->Write();
+        refFineCanvas->Write();
+        refCoarseCanvas->Write();
 
-     pmtCoarseCanvas->Write();
-     pmtFineCanvas->Write();
-     refFineCanvas->Write();
-     refCoarseCanvas->Write();
-
-     stripLeftTotCorrCanvas->Write();
-     stripRightTotCorrCanvas->Write();
-     stripLeftTimeCorrCanvas->Write();
-     stripRightTimeCorrCanvas->Write();
-
- }
+        stripLeftTotCorrCanvas->Write();
+        stripRightTotCorrCanvas->Write();
+        stripLeftTimeCorrCanvas->Write();
+        stripRightTimeCorrCanvas->Write();
+    }
 }
 
 ClassImp(R3BRpcOnlineSpectra);

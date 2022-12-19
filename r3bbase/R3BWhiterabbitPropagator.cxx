@@ -37,7 +37,7 @@ R3BWhiterabbitPropagator::R3BWhiterabbitPropagator(const TString& name, Int_t iV
 
 R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 {
-    LOG(DEBUG) << "R3BWhiterabbitPropagator::Delete instance";
+    LOG(debug) << "R3BWhiterabbitPropagator::Delete instance";
     if (fInputItem)
     {
         delete fInputItem;

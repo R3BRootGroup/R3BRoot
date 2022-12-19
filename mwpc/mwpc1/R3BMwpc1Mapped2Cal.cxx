@@ -58,7 +58,7 @@ R3BMwpc1Mapped2Cal::R3BMwpc1Mapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc1Mapped2Cal: Destructor
 R3BMwpc1Mapped2Cal::~R3BMwpc1Mapped2Cal()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
 }
@@ -150,7 +150,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
     {
         R3BLOG(warn, "nHits>(NumPadX+NumPadY)");
     }
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     R3BMwpcMappedData** mappedData;
@@ -192,7 +192,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc1Mapped2Cal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing Mwpc1CalData Structure");
+    R3BLOG(debug1, "Clearing Mwpc1CalData Structure");
     if (fMwpcCalDataCA)
         fMwpcCalDataCA->Clear();
 }

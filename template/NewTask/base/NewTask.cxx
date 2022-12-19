@@ -103,7 +103,7 @@ void NewTask::Finish() { LOG(debug) << "Finish of NewTask"; }
 // ---- Reset ---------------------------------------------------------
 void NewTask::Reset()
 {
-    LOG(DEBUG) << "Reset Data Structures";
+    LOG(debug) << "Reset Data Structures";
     if (fDataOutput)
         fDataOutput->Clear();
 }

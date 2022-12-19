@@ -14,7 +14,7 @@
 #ifndef R3BRPCTOTCALPAR_H
 #define R3BRPCTOTCALPAR_H
 // 41 Strips +  5 Bars
-#define N_NUM (41*2 + 5*2)
+#define N_NUM (41 * 2 + 5 * 2)
 
 #include "FairParGenericSet.h"
 #include "TObject.h"
@@ -31,8 +31,8 @@ class R3BRpcTotCalPar : public FairParGenericSet
   public:
     /** Standard constructor **/
     R3BRpcTotCalPar(const char* name = "RpcTotCalPar",
-                 const char* title = "RPC Cal Parameters",
-                 const char* context = "R3BRpcTotCalParContext");
+                    const char* title = "RPC Cal Parameters",
+                    const char* context = "R3BRpcTotCalParContext");
 
     /** Destructor **/
     virtual ~R3BRpcTotCalPar();

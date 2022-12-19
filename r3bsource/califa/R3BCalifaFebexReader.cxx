@@ -73,7 +73,7 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BCalifaFebexReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
 
     // SELECT THE FOR LOOP BASED ON THE MAPPING...
     for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal)

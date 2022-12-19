@@ -83,7 +83,7 @@ void R3BmTof::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BmTof: initialisation";
-    LOG(DEBUG) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog");
+    LOG(debug) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog");
 
     fTGeoPar = (R3BTGeoPar*)FairRuntimeDb::instance()->getContainer("mTofGeoPar");
 

@@ -132,7 +132,7 @@ InitStatus R3BTrackerTestS454::Init()
     Double_t fexp = float(fsens_SEE + 9);
     Double_t fpow = float(pow(10., fexp));
     calib_SEE = 135641.7786 * fpow;
-    LOG(DEBUG) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
+    LOG(debug) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
 
     fh_Tpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
     fh_Tpat->GetXaxis()->SetTitle("Tpat value");
@@ -300,7 +300,7 @@ InitStatus R3BTrackerTestS454::Init()
         const char* detName2;
         detName = fDetectorNames[DET_FI_FIRST + ifibcount];
 
-        LOG(DEBUG) << "I am creating canvas " << detName << endl;
+        LOG(debug) << "I am creating canvas " << detName << endl;
 
         // xy:
         fh_xy_Fib[ifibcount] =
@@ -788,7 +788,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
-            LOG(DEBUG) << "PID " << PID << endl;
+            LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -804,10 +804,10 @@ void R3BTrackerTestS454::Exec(Option_t* option)
                     pHezs = aTrack->GetPz() * 1000.;
                     pHes = sqrt((pHexs * pHexs) + (pHeys * pHeys) + (pHezs * pHezs));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 4He"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 4He"
                                << "x " << XHes << " y " << YHes << " z " << ZHes << endl;
-                    LOG(DEBUG) << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
+                    LOG(debug) << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -822,10 +822,10 @@ void R3BTrackerTestS454::Exec(Option_t* option)
                     pCzs = aTrack->GetPz() * 1000.;
                     pCs = sqrt((pCxs * pCxs) + (pCys * pCys) + (pCzs * pCzs));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 12C"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 12C"
                                << "x " << XCs << " y " << YCs << " z " << ZCs << endl;
-                    LOG(DEBUG) << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+                    LOG(debug) << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
                 }
                 if (PID == 1000080160)
                 {
@@ -839,10 +839,10 @@ void R3BTrackerTestS454::Exec(Option_t* option)
                     Pzf = aTrack->GetPz() * 1000.;
                     Pf_tot = sqrt((Pxf * Pxf) + (Pyf * Pyf) + (Pzf * Pzf));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 16O"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 16O"
                                << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                    LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                    LOG(debug) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
                 }
             }
         }
@@ -1205,7 +1205,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
         for (Int_t i = 0; i < ndet; i++)
         {
-            LOG(DEBUG2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i] << " max q: " << qMax[i]
+            LOG(debug2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i] << " max q: " << qMax[i]
                         << endl;
         }
     }
@@ -1363,7 +1363,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
                 qTrack[i] = -1000.;
             }
             Int_t charge = 0;
-            LOG(DEBUG2) << "# of points back" << countdet << endl;
+            LOG(debug2) << "# of points back" << countdet << endl;
             for (Int_t i = 0; i < countdet; i++)
             {
 
@@ -1430,7 +1430,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
         Double_t Erelbs = m_invs - mHe - mC;
 
         fh_Erel_simu->Fill(Erelbs);
-        LOG(DEBUG) << "Theta 26 simu: " << theta_26s << " Erel simu: " << Erelas << " " << Erelbs << endl;
+        LOG(debug) << "Theta 26 simu: " << theta_26s << " Erel simu: " << Erelas << " " << Erelbs << endl;
     }
 
     for (Int_t i = 0; i < 12; i++)
@@ -1452,8 +1452,8 @@ void R3BTrackerTestS454::Output1(Double_t track[12], Double_t chi[6])
     pCy = track[10];
     pCz = track[11];
 
-    LOG(DEBUG) << "He: " << pHex << "  " << pHey << "  " << pHez << endl;
-    LOG(DEBUG) << "C: " << pCx << "  " << pCy << "  " << pCz << endl;
+    LOG(debug) << "He: " << pHex << "  " << pHey << "  " << pHez << endl;
+    LOG(debug) << "C: " << pCx << "  " << pCy << "  " << pCz << endl;
 
     fh_target_xy->Fill(track[0] * 100., track[1] * 100.);
     fh_px_He->Fill(pHex);
@@ -1505,11 +1505,11 @@ void R3BTrackerTestS454::Output2(Double_t track_parameter[12], Double_t chi_sing
 {
     // compare
 
-    LOG(DEBUG) << "******************************************" << endl;
-    LOG(DEBUG) << "chi_sqingle_parameter " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
-    LOG(DEBUG) << "xyz: " << track_parameter[0] * 100. << "  " << track_parameter[1] * 100. << "  "
+    LOG(debug) << "******************************************" << endl;
+    LOG(debug) << "chi_sqingle_parameter " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
+    LOG(debug) << "xyz: " << track_parameter[0] * 100. << "  " << track_parameter[1] * 100. << "  "
                << track_parameter[2] * 100. << endl;
-    LOG(DEBUG) << "p: " << track_parameter[3] << "  " << track_parameter[4] << "  " << track_parameter[5] << endl;
+    LOG(debug) << "p: " << track_parameter[3] << "  " << track_parameter[4] << "  " << track_parameter[5] << endl;
     Double_t p_tot = sqrt(track_parameter[3] * track_parameter[3] + track_parameter[4] * track_parameter[4] +
                           track_parameter[5] * track_parameter[5]);
 

@@ -62,7 +62,7 @@ void R3BMwpc2::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BMwpc2: initialisation";
-    LOG(DEBUG) << "R3BMwpc2: Sens. Vol. (McId) " << gMC->VolId("MWPC2");
+    LOG(debug) << "R3BMwpc2: Sens. Vol. (McId) " << gMC->VolId("MWPC2");
 }
 
 void R3BMwpc2::SetSpecialPhysicsCuts() { LOG(info) << "R3BMwpc2: Adding customized Physics cut ... "; }
@@ -230,7 +230,7 @@ Bool_t R3BMwpc2::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("MWPC2"))
     {
-        LOG(DEBUG) << "Found MWPC2 geometry from ROOT file: " << name;
+        LOG(debug) << "Found MWPC2 geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

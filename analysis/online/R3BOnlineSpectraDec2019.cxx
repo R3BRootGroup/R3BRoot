@@ -2842,7 +2842,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         Bool_t bar_quer2 = false;
 
         Int_t nHits = det->GetEntriesFast();
-        LOG(DEBUG) << "nHits: " << nHits;
+        LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
@@ -2861,9 +2861,9 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                 continue;
 
             fh_ptof_channels->Fill(iBar);
-            LOG(DEBUG) << "Bar: " << iBar;
-            LOG(DEBUG) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
-            LOG(DEBUG) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
+            LOG(debug) << "Bar: " << iBar;
+            LOG(debug) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
+            LOG(debug) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
             if (iBar == 7)
                 bar_quer1 = true;
             if (iBar == 8)
@@ -2910,7 +2910,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         // once again
 
         nHits = det->GetEntriesFast();
-        //		LOG(DEBUG) << "nHits: " << nHits;
+        //		LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);

@@ -57,7 +57,7 @@ R3BTwimGainMatching::R3BTwimGainMatching(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BTwimGainMatching::Destructor
-R3BTwimGainMatching::~R3BTwimGainMatching() { R3BLOG(DEBUG1, ""); }
+R3BTwimGainMatching::~R3BTwimGainMatching() { R3BLOG(debug1, ""); }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimGainMatching::Init()

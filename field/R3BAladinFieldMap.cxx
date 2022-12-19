@@ -348,15 +348,15 @@ void R3BAladinFieldMap::CalcFieldDiv(R3BFieldInterp f[3], double d[3])
                 }
                 if (divF == 0)
                 {
-                    LOG(DEBUG) << "  0   ";
+                    LOG(debug) << "  0   ";
                 }
                 else
                 {
                     sprintf(str, "%5.2f ", divF / sqrt(divF_var));
-                    LOG(DEBUG) << str;
+                    LOG(debug) << str;
                 }
             }
-            LOG(DEBUG);
+            LOG(debug);
         }
     }
 }
@@ -417,7 +417,7 @@ void R3BAladinFieldMap::InitField()
     fCurField = new fields_ALADiN;
 
     if (!fCurField)
-        LOG(DEBUG) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure.";
+        LOG(debug) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure.";
 
     double w2 = (current - iter1->first) / (iter2->first - iter1->first);
     double w1 = 1 - w2;

@@ -50,7 +50,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
 
 R3BUcesbSource::~R3BUcesbSource()
 {
-    R3BLOG(DEBUG1, "R3BUcesbSource destructor.");
+    R3BLOG(debug1, "R3BUcesbSource destructor.");
     if (fReaders)
     {
         fReaders->Delete();
@@ -63,7 +63,7 @@ Bool_t R3BUcesbSource::Init()
 {
     // Register of R3BEventHeader in the output root file
 
-    R3BLOG(DEBUG, "checking whether R3BEventHeader has been defined in FairRun");
+    R3BLOG(debug, "checking whether R3BEventHeader has been defined in FairRun");
     auto run = FairRun::Instance();
     auto eventHeader = dynamic_cast<R3BEventHeader*>(run->GetEventHeader());
     if (eventHeader)

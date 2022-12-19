@@ -53,7 +53,7 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
 
 R3BLosReader::~R3BLosReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
     {
         delete fArray;
@@ -121,7 +121,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BLosReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 

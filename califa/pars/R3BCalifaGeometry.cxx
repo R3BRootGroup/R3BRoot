@@ -109,7 +109,7 @@ bool R3BCalifaGeometry::Init(Int_t version)
 
 R3BCalifaGeometry::~R3BCalifaGeometry()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (gGeoManager)
         delete gGeoManager;
     if (f)

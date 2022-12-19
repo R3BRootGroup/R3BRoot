@@ -52,7 +52,7 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
     auto clusteredDigis = fClusteringEngine.Clusterize(digis);
     const auto nClusters = clusteredDigis.size();
 
-    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
+    LOG(debug) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
 
     for (auto& cluster : clusteredDigis)
     {

@@ -131,7 +131,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 
     // Note: TF1s and friends are evil, because they will generally break the
     // stack when they crash (e.g. because of SIGFPE, which GEANT4 helpfully
-    // activates on Tuesdays and Debug builds (->G4FPE_DEBUG).
+    // activates on Tuesdays and Debug builds (->G4FPE_debug).
 
     auto makeCompFun = [](std::array<double, 5> p) {
         return [p](double x) { return (x > 0.0) ? 1. / (p[0] + p[1] * pow(x, p[2]) + p[3] / pow(x, p[4])) : 0.0; };

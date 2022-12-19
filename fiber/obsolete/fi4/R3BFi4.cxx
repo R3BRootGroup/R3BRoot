@@ -82,7 +82,7 @@ void R3BFi4::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BFi4: initialisation";
-    LOG(DEBUG) << "R3BFi4: Vol. (McId) " << gMC->VolId("FI41Log");
+    LOG(debug) << "R3BFi4: Vol. (McId) " << gMC->VolId("FI41Log");
 }
 
 void R3BFi4::SetSpecialPhysicsCuts()

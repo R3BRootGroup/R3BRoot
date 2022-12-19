@@ -99,15 +99,15 @@ void R3BLand::Initialize()
     TString fileName = GetGeometryFileName();
     if (fileName.Contains("neuland"))
     {
-        LOG(DEBUG) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5");
+        LOG(debug) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5");
         id3 = gMC->VolId("padle_h_box5");
         fMapMcId[id3] = 3;
     }
     else
     {
-        LOG(DEBUG) << "R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3");
-        LOG(DEBUG) << "R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4");
-        LOG(DEBUG) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5");
+        LOG(debug) << "R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3");
+        LOG(debug) << "R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4");
+        LOG(debug) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5");
         id1 = gMC->VolId("padle_h_box3");
         id2 = gMC->VolId("padle_h_box4");
         id3 = gMC->VolId("padle_h_box5");

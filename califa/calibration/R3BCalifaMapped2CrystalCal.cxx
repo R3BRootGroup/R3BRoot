@@ -42,7 +42,7 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
 
 R3BCalifaMapped2CrystalCal::~R3BCalifaMapped2CrystalCal()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fCalifaCryCalDataCA)
         delete fCalifaCryCalDataCA;
 }
@@ -273,7 +273,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 
 void R3BCalifaMapped2CrystalCal::Reset()
 {
-    R3BLOG(DEBUG, "Clearing CrystalCalData Structure");
+    R3BLOG(debug, "Clearing CrystalCalData Structure");
     if (fCalifaCryCalDataCA)
         fCalifaCryCalDataCA->Clear();
 }

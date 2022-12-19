@@ -86,7 +86,7 @@ R3BGeneralOnlineSpectra::R3BGeneralOnlineSpectra(const TString& name, Int_t iVer
 
 R3BGeneralOnlineSpectra::~R3BGeneralOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fWRItemsMaster)
         delete fWRItemsMaster;
     if (fWRItemsSofia)

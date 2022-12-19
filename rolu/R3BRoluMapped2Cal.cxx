@@ -186,7 +186,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         if (!par)
         {
             LOG(warn) << "R3BRoluMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
-                         << ", Type: " << iType;
+                      << ", Type: " << iType;
             continue;
         }
 
@@ -197,8 +197,8 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         {
 
             LOG(warn) << "R3BRoluMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
-                         << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
-                         << ", time in ns = " << times_raw_ns;
+                      << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
+                      << ", time in ns = " << times_raw_ns;
             continue;
         }
 
@@ -321,7 +321,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
             calItem->fTimeL_ns[iCha - 1] = times_ns;
             if (calItem->fTimeL_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha - 1]))
                 LOG(warn) << "Problem with fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
-                             << endl;
+                          << endl;
 
             //		cout<<" TEST2: "<<iCha<<", "<<iType<<", "<<calItem->fTimeL_ns[iCha-1]<<endl;
         }
@@ -331,7 +331,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
                 LOG(warn) << "Problem with fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
-                             << endl;
+                          << endl;
 
             //		cout<<" TEST3: "<<iCha<<", "<<iType<<", "<<calItem->fTimeT_ns[iCha-1]<<endl;
         }
@@ -339,7 +339,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         continue;
     skip_event_pileup:
         LOG(warn) << "R3BRoluMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                     << " iCal: " << iCal << " Skip event because of pileup.";
+                  << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     // Calibrate trigger channels.

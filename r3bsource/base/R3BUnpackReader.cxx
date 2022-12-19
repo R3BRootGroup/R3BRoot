@@ -35,7 +35,7 @@ R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, size_t offset)
 
 R3BUnpackReader::~R3BUnpackReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fHeader)
     {
         delete fHeader;
@@ -81,7 +81,7 @@ Bool_t R3BUnpackReader::Read()
 
     if (0 == (fNEvent % 1000))
     {
-        R3BLOG(DEBUG1, "event : " << fNEvent << ", trigger : " << fData->TRIGGER);
+        R3BLOG(debug1, "event : " << fNEvent << ", trigger : " << fData->TRIGGER);
     }
 
     if (fHeader)

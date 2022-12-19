@@ -226,7 +226,7 @@ namespace Neuland
                 SetStatus(Validity, PedestalCalibrationBit);
             }
 
-            LOG(DEBUG) << "Loaded Parameters for Bar " << ID;
+            LOG(debug) << "Loaded Parameters for Bar " << ID;
             return;
         }
 
@@ -258,7 +258,7 @@ namespace Neuland
                         ++FailCounter;
                         if (FailCounter > 10)
                         {
-                            LOG(DEBUG) << "Bar " << ID << ":"
+                            LOG(debug) << "Bar " << ID << ":"
                                        << " Positions were too often too strange. Might be a Time-Jump in one PMT. "
                                           "Removing Position-Calibration.";
                             FailCounter = 0;
@@ -477,15 +477,15 @@ namespace Neuland
                 parameter.SetPedestal(Pedestal[side], side + 1);
             }
 
-            LOG(DEBUG) << ID << " Bar Parameters: ";
-            LOG(DEBUG) << "   Time Offset       : " << parameter.GetTimeOffset(1) << " " << parameter.GetTimeOffset(2);
-            LOG(DEBUG) << "   Effective Speed   : " << parameter.GetEffectiveSpeed();
-            LOG(DEBUG) << "   Energy Gain       : " << parameter.GetEnergyGain(1) << " " << parameter.GetEnergyGain(2);
-            LOG(DEBUG) << "   Attenuationlength : " << parameter.GetLightAttenuationLength();
-            LOG(DEBUG) << "   Threshold         : " << parameter.GetPMTThreshold(1) << " "
+            LOG(debug) << ID << " Bar Parameters: ";
+            LOG(debug) << "   Time Offset       : " << parameter.GetTimeOffset(1) << " " << parameter.GetTimeOffset(2);
+            LOG(debug) << "   Effective Speed   : " << parameter.GetEffectiveSpeed();
+            LOG(debug) << "   Energy Gain       : " << parameter.GetEnergyGain(1) << " " << parameter.GetEnergyGain(2);
+            LOG(debug) << "   Attenuationlength : " << parameter.GetLightAttenuationLength();
+            LOG(debug) << "   Threshold         : " << parameter.GetPMTThreshold(1) << " "
                        << parameter.GetEnergyGain(2);
-            LOG(DEBUG) << "   Pedestal          : " << parameter.GetPedestal(1) << " " << parameter.GetPedestal(2);
-            LOG(DEBUG) << "   Saturation        : " << parameter.GetPMTSaturation(1) << " "
+            LOG(debug) << "   Pedestal          : " << parameter.GetPedestal(1) << " " << parameter.GetPedestal(2);
+            LOG(debug) << "   Saturation        : " << parameter.GetPMTSaturation(1) << " "
                        << parameter.GetPMTSaturation(2);
 
             return parameter;
