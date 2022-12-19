@@ -11,6 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <TStopwatch.h>
+#include <TString.h>
+#include <TSystem.h>
+#include <memory>
+
 void testCalifaSimulation(const int nbevents = 100)
 {
     // Timer
@@ -18,9 +23,10 @@ void testCalifaSimulation(const int nbevents = 100)
     timer.Start();
 
     // Logging
-    FairLogger::GetLogger()->SetLogVerbosityLevel("low");
-    FairLogger::GetLogger()->SetLogScreenLevel("warn");
-    FairLogger::GetLogger()->SetColoredLog(true);
+    auto logger = FairLogger::GetLogger();
+    logger->SetLogVerbosityLevel("low");
+    logger->SetLogScreenLevel("warn");
+    logger->SetColoredLog(true);
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
@@ -28,7 +34,7 @@ void testCalifaSimulation(const int nbevents = 100)
     gSystem->Setenv("CONFIG_DIR", workDirectory + "/gconfig");
 
     // Output files
-    // const TString simufile = "test.simu.root";
+    const TString simufile = "test.simu.root";
     // const TString parafile = "test.para.root";
 
     // Basic simulation setup
@@ -36,7 +42,7 @@ void testCalifaSimulation(const int nbevents = 100)
     run->SetName("TGeant4");
     run->SetStoreTraj(false);
     run->SetMaterials("media_r3b.geo");
-    // run->SetSink(new FairRootFileSink(simufile));
+    run->SetSink(new FairRootFileSink(simufile));
 
     // Primary particle generator
     auto boxGen = new FairBoxGenerator(2212, 8);
@@ -54,7 +60,7 @@ void testCalifaSimulation(const int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Califa
-    run->AddModule(new R3BCalifa("califa_2020.geo.root", { 0., 0., 0. }));
+    run->AddModule(new R3BCalifa("califa_2020.geo.root", {0., 0., 0.}));
 
     // Digitizer: Califa
     auto califaDig = new R3BCalifaDigitizer();
@@ -68,7 +74,6 @@ void testCalifaSimulation(const int nbevents = 100)
 
     // Report
     timer.Stop();
-    std::cout << "Macro finished successfully." << std::endl;
     std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
-    gApplication->Terminate();
+    std::cout << "Macro finished successfully." << std::endl;
 }
