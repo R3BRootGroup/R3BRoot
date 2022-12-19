@@ -106,18 +106,6 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # -- FairTSBufferFunctional.h has to be fixed by Tobias
 	"MbsAPI"
 	"FairTSBufferFunctional.h"
-	
-        # filter warnings from generated files
-        "FairTestDetectorPayloadDigi_generated.h"
-        "FairTestDetectorPayloadHit_generated.h"
-        "FairTestDetectorPayload.pb"
-        "MyPayload.pb"
-        "G__.*Dict"
-
-        # filter warnings from internal gtest headers
-        "gtest/internal"
-        "gtest/gtest-test-part.h"
-        "gtest/gtest.h"
   )
 
 # -----------------------------------------------------------
@@ -125,19 +113,3 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 # -----------------------------------------------------------
 set(CTEST_CUSTOM_WARNING_MATCH	${CTEST_CUSTOM_WARNING_MATCH}
 	)
-
-Set (CTEST_CUSTOM_COVERAGE_EXCLUDE
-     ".*Dict.h"
-     ".*Dict.cxx"
-     "_.*"
-    )
-
-# -----------------------------------------------------------
-# -- Error execptions
-# -- Get rid of boost warnings which are misinterpreted as errors
-# -----------------------------------------------------------
-
-Set(CTEST_CUSTOM_ERROR_EXCEPTION
-	${CTEST_CUSTOM_ERROR_EXCEPTION}
-        "/include/boost/"
-)

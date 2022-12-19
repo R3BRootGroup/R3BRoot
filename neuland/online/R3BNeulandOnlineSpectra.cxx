@@ -60,10 +60,10 @@ InitStatus R3BNeulandOnlineSpectra::Init()
 
     fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
     if (fEventHeader == nullptr)
-      {
+    {
         throw std::runtime_error("R3BNeulandOnlineSpectra: No R3BEventHeader");
-      }
-    
+    }
+
     fNeulandMappedData.Init();
     fNeulandCalData.Init();
     fNeulandHits.Init();
@@ -332,14 +332,14 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
         ahCalTvsBar[side]->Fill(bar, data->GetTime());
         ahCalEvsBar[side]->Fill(bar, data->GetQdc());
         if (std::isnan(data->GetTriggerTime()))
-          {
+        {
             hNeuLANDvsStart->Fill(start, data->GetTime());
-          }
+        }
         else
-          {
-            hNeuLANDvsStart->Fill(start, data->GetTime()-data->GetTriggerTime());
-          }
-        
+        {
+            hNeuLANDvsStart->Fill(start, data->GetTime() - data->GetTriggerTime());
+        }
+
         for (const auto& datax : calData)
         {
             const auto sidex = datax->GetSide() - 1; // [1,2] -> [0,1]

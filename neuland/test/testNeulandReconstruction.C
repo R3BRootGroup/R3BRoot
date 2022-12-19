@@ -31,12 +31,14 @@ void testNeulandReconstruction()
     run.AddTask(new R3BNeulandNeutronsCheat("NeulandMultiplicityCheat", "NeulandPrimaryHits", "NeulandNeutronsCheat"));
 
     // Calorimetric Reco
-     run.AddTask(new R3BNeulandMultiplicityCalorimetric("NeulandClusters", "NeulandMultiplicityCalorimetric"));
-     run.AddTask(new R3BNeulandNeutronsRValue(600, "NeulandMultiplicityCalorimetric", "NeulandClusters", "NeulandNeutronsCalorimetric"));
+    run.AddTask(new R3BNeulandMultiplicityCalorimetric("NeulandClusters", "NeulandMultiplicityCalorimetric"));
+    run.AddTask(new R3BNeulandNeutronsRValue(
+        600, "NeulandMultiplicityCalorimetric", "NeulandClusters", "NeulandNeutronsCalorimetric"));
 
     // Bayes Multiplicity
     run.AddTask(new R3BNeulandMultiplicityBayes("NeulandClusters", "NeulandMultiplicityBayes"));
-    run.AddTask(new R3BNeulandNeutronsRValue(600, "NeulandMultiplicityBayes", "NeulandClusters", "NeulandNeutronsBayes"));
+    run.AddTask(
+        new R3BNeulandNeutronsRValue(600, "NeulandMultiplicityBayes", "NeulandClusters", "NeulandNeutronsBayes"));
 
     run.Init();
     run.Run(0, 0);

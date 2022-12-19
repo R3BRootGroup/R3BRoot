@@ -16,10 +16,11 @@
 #include <numeric>
 #include <string>
 
-void normalize_TArrayD(TArrayD& a){
+void normalize_TArrayD(TArrayD& a)
+{
     const auto s = a.GetSum();
     const auto l = a.GetSize();
-    if(s > 0.)
+    if (s > 0.)
     {
         for (int j = 0; j < l; j++)
         {

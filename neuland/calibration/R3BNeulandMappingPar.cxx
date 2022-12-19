@@ -146,8 +146,8 @@ void R3BNeulandMappingPar::printParams()
             for (Int_t paddle = 0; paddle < fNumPaddles; paddle++)
             {
                 R3BLOG(info,
-                       "Plane: " << plane + 1 << ", pmt: " << p + 1 << ", paddle: " << paddle + 1 << ", value: "
-                                 << fTrigmap[p][plane]->GetAt(paddle));
+                       "Plane: " << plane + 1 << ", pmt: " << p + 1 << ", paddle: " << paddle + 1
+                                 << ", value: " << fTrigmap[p][plane]->GetAt(paddle));
             }
 }
 

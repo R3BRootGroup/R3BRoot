@@ -16,10 +16,10 @@
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
 #include "TDirectory.h"
-#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include <TFile.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -86,12 +86,16 @@ void R3BNeulandHitMon::Exec(Option_t*)
 
     // checking paddle multihits
     std::map<Int_t, Int_t> paddlenum;
-    for(const auto &hit : hits){
+    for (const auto& hit : hits)
+    {
         auto result = paddlenum.insert(std::pair<Int_t, Int_t>(hit->GetPaddle(), 1));
-        if(result.second == false)
+        if (result.second == false)
             result.first->second++;
     }
-    auto max = std::max_element(paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs){return (lhs.second < rhs.second);});
+    auto max = std::max_element(
+        paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs) {
+            return (lhs.second < rhs.second);
+        });
     LOG(debug) << "max dupli: " << max->second;
 
     if (fIs3DTrackEnabled)

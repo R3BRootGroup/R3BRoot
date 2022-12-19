@@ -34,7 +34,6 @@ namespace Neuland
         return val * val;
     }
 
-
     // Initialize variables from Birk' s Law
 
     constexpr double BirkdP = 1.032;

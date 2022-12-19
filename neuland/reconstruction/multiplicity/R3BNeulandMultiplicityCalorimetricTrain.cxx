@@ -26,7 +26,9 @@
  *                   edep
  */
 
-R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(TString clusters, TString tracks, TString phits)
+R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(TString clusters,
+                                                                                 TString tracks,
+                                                                                 TString phits)
     : FairTask("R3BNeulandMultiplicityCalorimetricTrain")
     , fClusters(std::move(clusters))
     , fTracks(std::move(tracks))
@@ -138,8 +140,10 @@ void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 
     min->SetLimitedVariable(0, "edep", fEdepOpt.at(0), fEdepOpt.at(1), fEdepOpt.at(2), fEdepOpt.at(3));
     min->SetLimitedVariable(1, "edepoff", fEdepOffOpt.at(0), fEdepOffOpt.at(1), fEdepOffOpt.at(2), fEdepOffOpt.at(3));
-    min->SetLimitedVariable(2, "ncluster", fNclusterOpt.at(0), fNclusterOpt.at(1), fNclusterOpt.at(2), fNclusterOpt.at(3));
-    min->SetLimitedVariable(3, "nclusteroff", fNclusterOffOpt.at(0), fNclusterOffOpt.at(1), fNclusterOffOpt.at(2), fNclusterOffOpt.at(3));
+    min->SetLimitedVariable(
+        2, "ncluster", fNclusterOpt.at(0), fNclusterOpt.at(1), fNclusterOpt.at(2), fNclusterOpt.at(3));
+    min->SetLimitedVariable(
+        3, "nclusteroff", fNclusterOffOpt.at(0), fNclusterOffOpt.at(1), fNclusterOffOpt.at(2), fNclusterOffOpt.at(3));
 
     min->Minimize();
 
@@ -199,7 +203,8 @@ double R3BNeulandMultiplicityCalorimetricTrain::WastedEfficiency(const double* d
     {
         const unsigned int nNeutrons = nh.first;
         const double efficiency =
-            ((double)GetCut(nNeutrons, edep, edepoff, ncluster, nclusteroff)->IntegralHist(nh.second) / (double)nh.second->GetEntries());
+            ((double)GetCut(nNeutrons, edep, edepoff, ncluster, nclusteroff)->IntegralHist(nh.second) /
+             (double)nh.second->GetEntries());
         wasted_efficiency += (1. - efficiency) * (1. + fWeight * nNeutrons);
     }
     return wasted_efficiency;

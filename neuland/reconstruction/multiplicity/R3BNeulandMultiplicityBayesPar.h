@@ -37,9 +37,9 @@ class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
     bool CheckIfProperlyLoaded() const;
     R3BNeulandMultiplicity::MultiplicityProbabilities GetProbabilities(int nHits, int nClusters, int Edep) const;
 
-    TArrayD GetHitDensity(int n) const {return fHits.at(n);}
-    TArrayD GetClusterDensity(int n) const {return fClusters.at(n);}
-    TArrayD GetEdepDensity(int n) const {return fEdep.at(n);}
+    TArrayD GetHitDensity(int n) const { return fHits.at(n); }
+    TArrayD GetClusterDensity(int n) const { return fClusters.at(n); }
+    TArrayD GetEdepDensity(int n) const { return fEdep.at(n); }
 
     void Finish();
 

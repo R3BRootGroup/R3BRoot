@@ -114,12 +114,12 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     fHitItemsMwpc1 = (TClonesArray*)mgr->GetObject(fNameDet1 + "HitData");
     if (!fHitItemsMwpc1)
         LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
-                            "HitData not found";
+                         "HitData not found";
 
     fHitItemsMwpc2 = (TClonesArray*)mgr->GetObject(fNameDet2 + "HitData");
     if (!fHitItemsMwpc2)
         LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
-                            "HitData not found";
+                         "HitData not found";
 
     // Create histograms for detectors
     TString Name1;

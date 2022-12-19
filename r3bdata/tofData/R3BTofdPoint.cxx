@@ -24,8 +24,8 @@ R3BTofdPoint::R3BTofdPoint()
 {
     fPlane = 0;
     fPaddle = 0;
-    fZfrag=0.;
-    fAfrag=0.;
+    fZfrag = 0.;
+    fAfrag = 0.;
     fX_out = fY_out = fZ_out = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
 }
@@ -69,8 +69,8 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
     fPx_out = momOut.Px();
     fPy_out = momOut.Py();
     fPz_out = momOut.Pz();
-    fZfrag=Z;
-    fAfrag=A;
+    fZfrag = Z;
+    fAfrag = A;
 }
 // -------------------------------------------------------------------------
 

@@ -1,3 +1,16 @@
+##############################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
+
 # Remove trailing slash from a path passed as argument
 Macro(Remove_Trailing_Slash _variable)
   String(FIND ${_variable} "/" _pos_last_slash REVERSE)
@@ -45,9 +58,9 @@ ENDMACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA)
 
 
 Macro (R3B_Generate_Version_Info)
-  Add_Custom_Target(svnheader ALL)
+  Add_Custom_Target(svnr3bheader ALL)
 
-  Add_Custom_Command(TARGET svnheader
+  Add_Custom_Command(TARGET svnr3bheader
                      COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
                      -DBINARY_DIR=${CMAKE_BINARY_DIR}
                      -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}

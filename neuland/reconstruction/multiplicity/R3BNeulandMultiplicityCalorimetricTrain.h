@@ -24,9 +24,12 @@ class R3BNeulandMultiplicityCalorimetricTrain : public FairTask
     void SetEdepOpt(double init, double step, double low, double high) { fEdepOpt = { init, step, low, high }; }
     void SetEdepOffOpt(double init, double step, double low, double high) { fEdepOffOpt = { init, step, low, high }; }
     void SetNclusterOpt(double init, double step, double low, double high) { fNclusterOpt = { init, step, low, high }; }
-    void SetNclusterOffOpt(double init, double step, double low, double high) { fNclusterOffOpt = { init, step, low, high }; }
+    void SetNclusterOffOpt(double init, double step, double low, double high)
+    {
+        fNclusterOffOpt = { init, step, low, high };
+    }
     void SetWeight(double w) { fWeight = w; }
-    void SetUseHits(bool x){ fUseHits = x; }
+    void SetUseHits(bool x) { fUseHits = x; }
 
   protected:
     InitStatus Init() override;
