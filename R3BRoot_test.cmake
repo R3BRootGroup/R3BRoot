@@ -8,7 +8,7 @@ Set(CTEST_PROJECT_NAME "R3BRoot")
 Find_Program(CTEST_GIT_COMMAND NAMES git)
 Set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 
-Set(BUILD_COMMAND "make -k")
+Set(BUILD_COMMAND "make")
 
 Set(CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
@@ -46,6 +46,7 @@ Ctest_Start($ENV{ctest_model})
 If(NOT $ENV{ctest_model} MATCHES Experimental)
   Ctest_Update(SOURCE "${CTEST_SOURCE_DIRECTORY}")
 EndIf()
+Set(ENV{WERROR} TRUE)
 Ctest_Configure(BUILD "${CTEST_BINARY_DIRECTORY}"
                 OPTIONS "${configure_options}"
                )
@@ -53,9 +54,10 @@ Ctest_Build(BUILD "${CTEST_BINARY_DIRECTORY}"
   RETURN_VALUE _ctest_build_ret_val
   )
 if (_ctest_build_ret_val)
-  Message(WARNING "Build failed. Will paste the build log now."
+  Message(WARNING "Build failed. Will paste the error message from the log now."
     "\n---------------------------------------------------\n\n")
-  Execute_process(COMMAND "find" "${CTEST_BINARY_DIRECTORY}" "-iname" "LastBuild_*.log" "-exec" cat "{}" ";")
+  Execute_process(COMMAND "find" "${CTEST_BINARY_DIRECTORY}" "-iname" "LastBuild_*.log" "-exec" ${CTEST_SOURCE_DIRECTORY}/util/print_errors.py "{}" ";")
+
   Message(FATAL_ERROR "\n---------------------------------------------------\n"
     "Ctest Failed: Build failed. (make output is above.)")
 endif()
