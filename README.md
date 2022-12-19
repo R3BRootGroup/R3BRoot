@@ -6,7 +6,7 @@ The R3BRoot software is based on the FairRoot framework and can be used to perfo
 For the software-related user support you can post a new topic on our [forum](https://forum.gsi.de/index.php?t=index&cat=40&).
 
 ## License
-R3BRoot is distributed under the terms of the GNU General Public Licence version 3 (GPLv3).
+R3BRoot is distributed under the terms of the GNU General Public Licence version 3 ([GPLv3](https://github.com/R3BRootGroup/R3BRoot/blob/dev/LICENSE)).
 
 ## Release information
 Please visit [releases](https://github.com/R3BRootGroup/R3BRoot/releases)
