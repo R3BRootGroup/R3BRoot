@@ -103,7 +103,7 @@ foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
 endforeach()
 
 If(${FR_MAJOR_VERSION} EQUAL 18 AND (${FR_MINOR_VERSION} EQUAL 6 AND ${FR_PATCH_VERSION} GREATER 4))
-  find_package2(PUBLIC FairMQ VERSION 1.4.0)
+#  find_package2(PUBLIC FairMQ VERSION 1.4.0)
   
   find_package2(PUBLIC DDS)
 
