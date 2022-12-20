@@ -19,8 +19,11 @@
 # Check if cmake has the required version
 cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
+# set cmake policies
+cmake_policy(VERSION 3.11...3.20)
+
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
-project(R3BROOT C CXX Fortran)
+project(R3BROOT LANGUAGES C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
@@ -29,26 +32,22 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
 # Check for needed environment variables
-IF(NOT DEFINED ENV{FAIRROOTPATH})
-  MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
-ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
-SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
-
 IF(NOT DEFINED ENV{SIMPATH})
   MESSAGE(FATAL_ERROR "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again.")
 ENDIF(NOT DEFINED ENV{SIMPATH})
 SET(SIMPATH $ENV{SIMPATH})
 
+IF(NOT DEFINED ENV{FAIRROOTPATH})
+  MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
+ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
+SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
+
 STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
 set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
-set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules_old" ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
 Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
-
-# set cmake policies
-cmake_policy(VERSION 3.11...3.14)
 
 find_package(FairCMakeModules 0.1 QUIET)
 if(FairCMakeModules_FOUND)
@@ -79,9 +78,9 @@ set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 include(FairMacros)
 include(R3BMacros)
 include(WriteConfigFile_r3b)
+include(WriteEnvCache)
 include(Dart)
 include(CheckCompiler)
-include(WriteEnvCache)
 
 if(SIMPATH)
   set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
@@ -94,12 +93,62 @@ if("${ROOT_vmc_FOUND}" MATCHES "no")
 else()
   set(VMCLIB VMC)
 endif()
+
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
+
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
   if(NOT dep STREQUAL "Boost")
     find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
   endif()
 endforeach()
+
+If(${FR_MAJOR_VERSION} EQUAL 18 AND (${FR_MINOR_VERSION} EQUAL 6 AND ${FR_PATCH_VERSION} GREATER 4))
+  find_package2(PUBLIC FairMQ VERSION 1.4.0)
+  
+  find_package2(PUBLIC DDS)
+
+#If(FAIRSOFT_EXTERN)
+#  set(BOOST_ROOT ${SIMPATH})
+#  set(GSL_DIR ${SIMPATH})
+#Else(FAIRSOFT_EXTERN)
+#  set(BOOST_ROOT ${SIMPATH}/basics/boost)
+#  set(GSL_DIR ${SIMPATH}/basics/gsl)
+#EndIf(FAIRSOFT_EXTERN)
+
+#if(NOT DEFINED Boost_NO_SYSTEM_PATHS)
+#  Set(Boost_NO_SYSTEM_PATHS TRUE)
+#endif()
+#if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
+#  Set(Boost_NO_BOOST_CMAKE TRUE)
+#endif()
+#if(Boost_NO_BOOST_CMAKE)
+  # If an older version of boost is found both of the variables below are
+  # cached and in a second cmake run, a good boost version is found even
+  # if the version is to old.
+  # To overcome this problem both variables are cleared before checking
+  # for boost.
+#  Unset(Boost_INCLUDE_DIR CACHE)
+#  Unset(Boost_LIBRARY_DIRS CACHE)
+#endif()
+
+#list(APPEND boost_dependencies filesystem serialization)
+
+#if(BUILD_UNITTESTS)
+# list(APPEND boost_dependencies unit_test_framework)
+#endif()
+  
+#  find_package2(PUBLIC Boost
+#  VERSION 1.67
+#  COMPONENTS ${boost_dependencies}
+#  )
+#  If (FairMQ_FOUND AND Boost_FOUND)
+#    add_subdirectory(base/MQ)
+#    add_subdirectory(parmq)
+#  Else ()
+#    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
+#  EndIf ()
+Endif()
+
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 
@@ -128,6 +177,17 @@ Endif()
 
 #find_package(CLHEP)
 find_package(HEPMC)
+
+find_package2(PUBLIC IWYU)
+
+find_package2(PUBLIC GSL)
+if(NOT DEFINED GTEST_ROOT)
+  set(GTEST_ROOT ${SIMPATH})
+endif()
+
+find_package2(PUBLIC Git)
+set (Git_VERSION ${GIT_VERSION_STRING})
+string(REPLACE "git" " " Git_ROOT ${GIT_EXECUTABLE} )
 
 # Check the compiler and set the compile and link flags
 check_compiler()
@@ -196,9 +256,21 @@ else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
 
-#if(SIMPATH)
-#  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
-#endif()
+find_package2(PUBLIC yaml-cpp)
+# Workaround missing exported include directories
+# Upstream has fixed this in https://github.com/jbeder/yaml-cpp/commit/ab5f9259a4e67d3fe0e4832bd407a9e596e2d884 (since 0.6.3)
+if(yaml-cpp_FOUND)
+  get_filename_component(YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}" REALPATH BASE_DIR "/")
+endif()
+if(    yaml-cpp_FOUND
+   AND TARGET yaml-cpp
+   AND EXISTS YAML_CPP_INCLUDE_DIR
+   AND yaml-cpp_VERSION VERSION_LESS 0.6.3
+)
+  set_target_properties(yaml-cpp PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${YAML_CPP_INCLUDE_DIR}"
+  )
+endif()
 
 SetBasicVariables()
 
@@ -296,6 +368,8 @@ else(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
       message("${BYellow}ASYEOS framework not found${CR}")
 endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 
+configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
+
 r3b_generate_version_info()
 
 # Recurse into the given subdirectories.  This does not actually cause another cmake executable to
@@ -304,18 +378,6 @@ r3b_generate_version_info()
 # FIXME in FairSoft / FairRoot
 find_package(VMC QUIET)
 set (BASE_INCLUDE_DIRECTORIES ${BASE_INCLUDE_DIRECTORIES} ${VMC_INCLUDE_DIRS})
-
-if(NOT FAIRROOT_FOUND)
-    add_subdirectory(fairtools)
-    add_subdirectory(base)
-    add_subdirectory(dbase)
-    add_subdirectory(geobase)
-    add_subdirectory(parbase)
-    add_subdirectory(generators)
-    add_subdirectory(geane)
-    add_subdirectory(trackbase)
-    add_subdirectory(MbsAPI)
-endif(NOT FAIRROOT_FOUND)
 
 if(MODULE)
     add_subdirectory(${MODULE})
@@ -394,6 +456,18 @@ if(NOT MODULE)
     endif(WITH_ASYEOS)
 endif(NOT MODULE)
 
+add_subdirectory(cmake)
+
+If(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+  Execute_Process(COMMAND ${GIT_EXECUTABLE} describe --tags
+                  OUTPUT_VARIABLE R3BROOT_GIT_VERSION
+                  OUTPUT_STRIP_TRAILING_WHITESPACE
+                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                 )
+Else()
+  Set(R3BROOT_GIT_VERSION v${R3BROOT_MAJOR_VERSION}.${R3BROOT_MINOR_VERSION}.${R3BROOT_PATCH_VERSION})
+EndIf()
+
 execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
                 OUTPUT_VARIABLE EveIsBuild
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -421,12 +495,10 @@ if(RULE_CHECKER_FOUND)
 
 endif(RULE_CHECKER_FOUND)
 
-if(NOT R3BROOT_MINIMAL)
-    write_config_file(config.sh)
-    write_config_file(config.csh)
-else(NOT R3BROOT_MINIMAL)
-    write_minimal_config_file(config.sh)
-endif(NOT R3BROOT_MINIMAL)
+write_config_file(config.sh)
+write_config_file(config.csh)
+WRITE_CONFIG_FILE(config.sh_install)
+WRITE_CONFIG_FILE(config.csh_install)
 
 write_env_cache(env_cache.sh)
 
@@ -554,9 +626,6 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     unset(version_req_str)
   endforeach()
 endif()
+
 message(STATUS "  ")
-
-   ################################################################################
-
-
-
+################################################################################
