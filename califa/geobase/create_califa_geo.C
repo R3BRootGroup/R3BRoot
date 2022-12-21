@@ -33,11 +33,18 @@ const int nbcrystals = 2432;
 
 Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
 
-void create_califa_geo(const char* geoTag = "v2023.1",
-                       const char* expNumber = "nominal",
-                       const char* installedCrystalsFile = "./califa_AllCrystalsInstalled.txt")
-{
+void create_califa_geo(const char* expNumber = "nominal", TString geoTag = "v2023.1");
 
+void create_califa_geo(const int index)
+{
+    if (index == 1)
+        create_califa_geo("s467");
+    else if (index == 2)
+        create_califa_geo("s455");
+}
+
+void create_califa_geo(const char* expNumber, TString geoTag)
+{
     TGeoRotation* fRefRot = NULL;
     TGeoManager* gGeoMan = NULL;
 
@@ -50,28 +57,62 @@ void create_califa_geo(const char* geoTag = "v2023.1",
     geoFace->readMedia();
     gGeoMan = gGeoManager;
 
-    if ((strncmp(expNumber, "s522", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s509", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s455", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s515", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s494", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s444", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_March2021.txt", 40) != 0) ||
-        (strncmp(expNumber, "s467", 4) == 0 &&
-         strncmp(installedCrystalsFile, "./califa_InstalledCrystals_Nov2019.txt", 38) != 0))
+    TString installedCrystalsFile = "califa_AllCrystalsInstalled.txt";
+    if ((strncmp(expNumber, "s522", 4) == 0) || (strncmp(expNumber, "s515", 4) == 0) ||
+        (strncmp(expNumber, "s509", 4) == 0) || (strncmp(expNumber, "s494", 4) == 0) ||
+        (strncmp(expNumber, "s455", 4) == 0) || (strncmp(expNumber, "s444", 4) == 0))
+    {
+        installedCrystalsFile = "califa_InstalledCrystals_March2021.txt";
+        geoTag = "v2021.3";
+    }
+    else if (strncmp(expNumber, "s467", 4) == 0)
+    {
+        installedCrystalsFile = "califa_InstalledCrystals_Nov2019.txt";
+        geoTag = "v2019.11";
+    }
+    else if (strncmp(expNumber, "nominal", 7) == 0)
+    {
+        // Nominal configuration, nothing to say.
+        std::cout << std::endl;
+        std::cout << "\033[35m"
+                  << "Loading the ideal nominal configuration."
+                  << " \033[0m" << std::endl;
+    }
+    else
     {
         std::cout << std::endl
-                  << "WARNING: Using a non-standard combination of experiment number (" << expNumber
-                  << ") and installed crystals file (" << installedCrystalsFile << ")" << std::endl;
+                  << "\033[35m WARNING: Using a non-standard experiment number (" << expNumber
+                  << ") therefore the CALIFA geometry will be generated with all crystals using the file "
+                     "<califa_AllCrystalsInstalled.txt> \033[0m"
+                  << std::endl;
         std::cout << "\033[33m"
                   << "  -> Is this really what you want??"
                   << " \033[0m" << std::endl;
     }
+
+    /*
+        if ((strncmp(expNumber, "s522", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s509", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s455", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s515", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s494", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s444", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_March2021.txt", 38) != 0) ||
+            (strncmp(expNumber, "s467", 4) == 0 &&
+             strncmp(installedCrystalsFile, "califa_InstalledCrystals_Nov2019.txt", 38) != 0))
+        {
+            std::cout << std::endl
+                      << "WARNING: Using a non-standard combination of experiment number (" << expNumber
+                      << ") and installed crystals file (" << installedCrystalsFile << ")" << std::endl;
+            std::cout << "\033[33m"
+                      << "  -> Is this really what you want??"
+                      << " \033[0m" << std::endl;
+        }*/
 
     TString fFilePath = geoPath + "/macros/r3b/geo/" + installedCrystalsFile;
     fFilePath.ReplaceAll("./", "/");
@@ -88,7 +129,9 @@ void create_califa_geo(const char* geoTag = "v2023.1",
 
     if (strncmp(expNumber, "s522", 4) == 0 || strncmp(expNumber, "s509", 4) == 0 ||
         strncmp(expNumber, "s494", 4) == 0 || strncmp(expNumber, "s444", 4) == 0 || strncmp(expNumber, "s467", 4) == 0)
+    {
         std::cout << "\033[31m No alignment data for this experiment yet \033[0m " << std::endl << std::endl;
+    }
 
     ifstream wc1, in1, in2;
     wc1.open(fFilePath.Data());
@@ -764,6 +807,7 @@ void create_califa_geo(const char* geoTag = "v2023.1",
 
     TFile* geoFile = new TFile(geoFileName, "RECREATE");
     top->Write();
+    top->Draw();
     geoFile->Close();
 
     std::cout << "\033[34m Creating geometry:\033[0m "

@@ -11,12 +11,28 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2019.11.geo.root")
+message(STATUS "Starting to generate the standard root geometry v2019.11 for CALIFA")
+execute_process(COMMAND root -l -q -x "${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C(1)")
+message(STATUS "${BYellow}CALIFA standard root geometry v2019.11 has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2019.11.geo.root")
+message(STATUS "${BYellow}CALIFA standard root geometry v2019.11 already created${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2019.11.geo.root")
+
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2021.3.geo.root")
+message(STATUS "Starting to generate the standard root geometry v2021.3 for CALIFA")
+execute_process(COMMAND root -l -q -x "${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C(2)")
+message(STATUS "${BYellow}CALIFA standard root geometry v2021.3 has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2021.3.geo.root")
+message(STATUS "${BYellow}CALIFA standard root geometry v2021.3 already created${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2021.3.geo.root")
+
 if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
-message(STATUS "Starting to generate the standard root geometry for CALIFA")
+message(STATUS "Starting to generate the standard root geometry v2023.1 for CALIFA")
 execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C)
-message(STATUS "${BYellow}CALIFA standard root geometry has been created${CR} ")
+message(STATUS "${BYellow}CALIFA standard root geometry v2023.1 has been created${CR} ")
 else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
-message(STATUS "${BYellow}CALIFA standard root geometry already created${CR} ")
+message(STATUS "${BYellow}CALIFA standard root geometry v2023.1 already created${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
 
 enable_testing()
