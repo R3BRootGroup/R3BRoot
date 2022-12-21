@@ -262,5 +262,4 @@ void create_twin_geo(const char* geoTag = "v22")
     std::cout << "\033[34m Creating geometry:\033[0m "
               << "\033[33m" << geoFileName << " \033[0m" << std::endl;
     std::cout << "Macro finished successfully." << std::endl;
-    gApplication->Terminate();
 }

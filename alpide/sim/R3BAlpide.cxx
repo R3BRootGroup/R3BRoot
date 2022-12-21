@@ -89,7 +89,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
 
     if (gGeoManager)
     {
-        auto pSi = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("silicon"));
+        TGeoMedium* pSi = static_cast<TGeoMedium*>(gGeoManager->GetMedium("silicon"));
         if (pSi)
         {
             // Setting processes for Si only
@@ -125,7 +125,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
         }
         // <DB> trick to remove too much internal
         // tracking in the Aladin magnet yoke
-        auto pFe = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("iron"));
+        TGeoMedium* pFe = static_cast<TGeoMedium*>(gGeoManager->GetMedium("iron"));
 
         if (pFe)
         {
@@ -134,7 +134,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pFe->GetId(), "DRAY", 0.0);
         }
 
-        auto pLiH = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("H2"));
+        TGeoMedium* pLiH = static_cast<TGeoMedium*>(gGeoManager->GetMedium("H2"));
         if (pLiH)
         {
             // Setting processes for LiH only
@@ -169,7 +169,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pLiH->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pVac = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("vacuum"));
+        TGeoMedium* pVac = static_cast<TGeoMedium*>(gGeoManager->GetMedium("vacuum"));
         if (pVac)
         {
             // Setting processes for Vac only
@@ -204,7 +204,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pVac->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pGold = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("gold"));
+        TGeoMedium* pGold = static_cast<TGeoMedium*>(gGeoManager->GetMedium("gold"));
         if (pGold)
         {
             // Setting processes for Vac only
@@ -239,7 +239,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pGold->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pM = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("mylar"));
+        TGeoMedium* pM = static_cast<TGeoMedium*>(gGeoManager->GetMedium("mylar"));
         if (pM)
         {
             // Setting processes for Mylar only
@@ -274,7 +274,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pM->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pAl = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("aluminium"));
+        TGeoMedium* pAl = static_cast<TGeoMedium*>(gGeoManager->GetMedium("aluminium"));
         if (pAl)
         {
             // Setting processes for Mylar only
@@ -309,7 +309,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pAl->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pC = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("carbon"));
+        TGeoMedium* pC = static_cast<TGeoMedium*>(gGeoManager->GetMedium("carbon"));
         if (pC)
         {
             // Setting processes for Carbon only
@@ -344,7 +344,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
             TVirtualMC::GetMC()->Gstpar(pC->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-        auto pHe = dynamic_cast<TGeoMedium*>(gGeoManager->GetMedium("helium"));
+        TGeoMedium* pHe = static_cast<TGeoMedium*>(gGeoManager->GetMedium("helium"));
         if (pHe)
         {
             // Setting processes for Helium only
@@ -425,7 +425,7 @@ Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
                TVirtualMC::GetMC()->TrackPid());
 
         // Increment number of AlpidePoints for this track
-        auto stack = dynamic_cast<R3BStack*>(TVirtualMC::GetMC()->GetStack());
+        R3BStack* stack = static_cast<R3BStack*>(TVirtualMC::GetMC()->GetStack());
         stack->AddPoint(kTRA);
         ResetParameters();
     }

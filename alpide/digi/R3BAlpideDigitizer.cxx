@@ -91,7 +91,7 @@ InitStatus R3BAlpideDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     R3BLOG_IF(fatal, !ioman, "FairRootManager not found.");
 
-    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fMCTrack = static_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
     fAlpidePoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
     R3BLOG_IF(fatal, !fAlpidePoints, fName << "Point not found.");
 

@@ -11,13 +11,13 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v22.geo.root")
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
 message(STATUS "Starting to generate the standard root geometry for CALIFA")
 execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C)
 message(STATUS "${BYellow}CALIFA standard root geometry has been created${CR} ")
-else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v22.geo.root")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
 message(STATUS "${BYellow}CALIFA standard root geometry already created${CR} ")
-endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v22.geo.root")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_v2023.1.geo.root")
 
 enable_testing()
 
