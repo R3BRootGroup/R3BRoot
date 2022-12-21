@@ -42,21 +42,19 @@ class R3BAlpideDigitizer : public FairTask
     R3BAlpideDigitizer(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BAlpideDigitizer();
+    ~R3BAlpideDigitizer() override;
 
     /** Virtual method Init **/
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* opt);
+    void Exec(Option_t* opt) override;
 
     // Fair specific
-    virtual void SetParContainers();
-
-    virtual void Reset();
+    void SetParContainers() override;
 
     /** Setter for sigma **/
     void SetSigma(Float_t sigma) { fsigma = sigma; }
@@ -66,6 +64,8 @@ class R3BAlpideDigitizer : public FairTask
 
   private:
     void SetParameter();
+    void Reset();
+
     Int_t fGeoversion;
     TClonesArray* fMCTrack;
     TClonesArray* fAlpidePoints;
@@ -84,7 +84,7 @@ class R3BAlpideDigitizer : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BAlpideDigitizer, 1);
+    ClassDefOverride(R3BAlpideDigitizer, 1);
 };
 
 #endif /* R3BAlpideDigitizer_H */

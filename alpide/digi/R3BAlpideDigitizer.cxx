@@ -44,13 +44,13 @@ R3BAlpideDigitizer::R3BAlpideDigitizer(const TString& name, Int_t iVerbose)
     : FairTask(name + "Digitizer", iVerbose)
     , fName(name)
     , fGeoversion(2024)
-    , fMCTrack(NULL)
-    , fAlpidePoints(NULL)
-    , fAlpideHits(NULL)
-    , fAlpideGeo(NULL)
-    , fMappingPar(NULL)
+    , fMCTrack(nullptr)
+    , fAlpidePoints(nullptr)
+    , fAlpideHits(nullptr)
+    , fAlpideGeo(nullptr)
+    , fMappingPar(nullptr)
     , fLabframe(false)
-    , fsigma(0.0005) // cm
+    , fsigma(0.0005) // in cm
 {
 }
 
@@ -60,6 +60,7 @@ R3BAlpideDigitizer::~R3BAlpideDigitizer()
     R3BLOG(debug1, "");
     if (fAlpideHits)
     {
+        fAlpideHits->Delete();
         delete fAlpideHits;
     }
 }
@@ -67,7 +68,7 @@ R3BAlpideDigitizer::~R3BAlpideDigitizer()
 void R3BAlpideDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    fMappingPar = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
+    fMappingPar = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(warn, !fMappingPar, "Could not get access to alpideMappingPar");
     R3BLOG_IF(info, fMappingPar, "Container alpideMappingPar found.");
 }
@@ -90,8 +91,8 @@ InitStatus R3BAlpideDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     R3BLOG_IF(fatal, !ioman, "FairRootManager not found.");
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    fAlpidePoints = (TClonesArray*)ioman->GetObject(fName + "Point");
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fAlpidePoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
     R3BLOG_IF(fatal, !fAlpidePoints, fName << "Point not found.");
 
     // Register output array fAlpideHits
@@ -124,7 +125,7 @@ void R3BAlpideDigitizer::Exec(Option_t* opt)
     for (Int_t i = 0; i < nHits; i++)
     {
         fRot.SetToIdentity();
-        pointData[i] = (R3BAlpidePoint*)(fAlpidePoints->At(i));
+        pointData[i] = dynamic_cast<R3BAlpidePoint*>(fAlpidePoints->At(i));
         TrackId = pointData[i]->GetTrackID();
         auto sid = pointData[i]->GetSensorID();
 
@@ -174,7 +175,7 @@ void R3BAlpideDigitizer::Exec(Option_t* opt)
     {
         delete[] pointData;
     }
-    LOG(info) << "R3BAlpideDigitizer: " << fAlpideHits->GetEntriesFast() << " points registered in this event";
+    R3BLOG(info, fAlpideHits->GetEntriesFast() << " points registered in this event");
     return;
 }
 
