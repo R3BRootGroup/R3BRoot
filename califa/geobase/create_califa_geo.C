@@ -33,7 +33,7 @@ const int nbcrystals = 2432;
 
 Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
 
-void create_califa_geo(const char* expNumber = "nominal", TString geoTag = "v2023.1");
+void create_califa_geo(const char* expNumber = "nominal", TString geoTag = "full");
 
 void create_califa_geo(const int index)
 {
@@ -807,7 +807,6 @@ void create_califa_geo(const char* expNumber, TString geoTag)
 
     TFile* geoFile = new TFile(geoFileName, "RECREATE");
     top->Write();
-    top->Draw();
     geoFile->Close();
 
     std::cout << "\033[34m Creating geometry:\033[0m "
