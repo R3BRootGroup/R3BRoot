@@ -315,7 +315,7 @@ const char* R3BAlpideGeometry::GetSensorVolumePath(Int_t iD)
             layertype++;
         }
 
-        sprintf(nameVolume, "/cave_1/VCWorld_0/Multilayer_%i_%i/Alpide_%i", bartype, layertype, sid);
+        sprintf(nameVolume, "/cave_1/TargetChamberWorld_0/Multilayer_%i_%i/Alpide_%i", bartype, layertype, sid);
     }
     else
     {
