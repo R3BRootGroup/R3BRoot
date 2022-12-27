@@ -457,6 +457,7 @@ if(NOT MODULE)
     endif(WITH_ASYEOS)
 endif(NOT MODULE)
 
+add_subdirectory(gconfig)
 add_subdirectory(cmake)
 
 If(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
