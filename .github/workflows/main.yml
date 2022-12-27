@@ -24,9 +24,9 @@ jobs:
       - name: Code formatting
         run: |
           cd $GITHUB_WORKSPACE
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/travis-clang-format-check.sh clang-format-8
-  # Single job called "build_r3broot"
-  build_r3broot:
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/clang-format-check.sh clang-format-8
+  # Single job called "build-r3broot"
+  build-r3broot:
     # The type of runner that the job will run on
     runs-on: self-hosted
     needs: clang-format
@@ -43,11 +43,11 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
-  # Single job called "build_r3broot_sofia"
-  build_r3broot_sofia:
+  # Single job called "build-r3broot-sofia"
+  build-r3broot-sofia:
     # The type of runner that the job will run on
     runs-on: self-hosted
-    needs: clang-format build_r3broot
+    needs: clang-format
     if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -62,11 +62,11 @@ jobs:
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           git clone -b dev https://github.com/R3BRootGroup/sofia.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
-  # Single job called "build_r3broot_asyeos"
-  build_r3broot_asyeos:
+  # Single job called "build-r3broot-asyeos"
+  build-r3broot-asyeos:
     # The type of runner that the job will run on
     runs-on: self-hosted
-    needs: clang-format build_r3broot
+    needs: clang-format
     if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -80,23 +80,4 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           git clone -b dev https://github.com/R3BRootGroup/asyeos.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
-  # Single job called "build_r3broot_gladtpc"
-  build_r3broot_gladtpc:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: clang-format build_r3broot
-    if: always()
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a set of commands using the runners shell
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-      #    git clone -b dev https://github.com/R3BRootGroup/glad-tpc.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh

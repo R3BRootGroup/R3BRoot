@@ -1,13 +1,19 @@
- ################################################################################
- #    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    #
- #                                                                              #
- #              This software is distributed under the terms of the             # 
- #              GNU Lesser General Public Licence (LGPL) version 3,             #  
- #                  copied verbatim in the file "LICENSE"                       #
- ################################################################################
-# Create a library called "libBase" which includes the source files given in
-# the array .
-# The extension is already found.  Any number of sources could be listed here.
+##############################################################################
+#   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2022 Members of R3B Collaboration                          #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
+
+# Create a library called "libR3BGConfig" which includes the source files given in
+# the array. The extension is already found. Any number of sources could be listed
+# here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
@@ -28,7 +34,7 @@ Include_Directories(SYSTEM  ${SYSTEM_INCLUDE_DIRECTORIES})
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 Set(SRCS
-#  FairVMCConfig.cxx
+#  R3BVMCConfig.cxx
 )
 
 # fill list of header files from list of source files
