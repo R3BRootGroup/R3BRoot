@@ -38,11 +38,12 @@ void run(TString fname)
     double target_depth;
 
     cout << "\n****** Beam parameters ********" << endl;
-    cout << "Total momentum:\t" << PA << " MeV" << endl;
-    cout << "Total energy:\t" << EA << " MeV" << endl;
-    cout << "Beta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << endl;
-    ;
-    cout << "Beta (CM):\t" << PA / (EA + Mi) << endl;
+    cout << "Total momentum:\t\t" << PA << " MeV" << endl;
+    cout << "Total energy:\t\t" << EA << " MeV" << endl;
+    cout << "Excitation energy:\t" << Exe << " MeV" << endl;
+    cout << "Beta (beam):\t\t" << (-bA) << "\nGamma (beam):\t" << gA << endl;
+   
+    cout << "Beta (CM):\t\t" << PA / (EA + Mi) << endl;
     cout << "Processing " << MAX_STORY << " events........\n" << endl;
 
     // Random number generators of ROOT

@@ -48,7 +48,7 @@ void Config()
     TString physicsList = gSystem->Getenv("PHYSICSLIST");
     if (physicsList == "")
     {
-        physicsList = "QGSP_BERT_HP";
+        physicsList = "QGSP_BERT_EMV";
     }
 
     auto runConfiguration =
