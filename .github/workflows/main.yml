@@ -1,5 +1,4 @@
 # This is a basic workflow to help you get started with Actions
-
 name: CI C17++
 
 # Controls when the action will run. 
@@ -13,9 +12,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# A workflow run is made up of one or more jobs that can run sequentially
 jobs:
-  test:
+  # This workflow contains a single job called "clang-format"
+  clang-format:
     runs-on: self-hosted
 
     steps:
@@ -25,10 +25,12 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/travis-clang-format-check.sh clang-format-8
-  # This workflow contains a single job called "build"
-  build:
+  # Single job called "build_r3broot"
+  build_r3broot:
     # The type of runner that the job will run on
     runs-on: self-hosted
+    needs: clang-format
+    if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -41,4 +43,60 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+  # Single job called "build_r3broot_sofia"
+  build_r3broot_sofia:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: clang-format build_r3broot
+    if: always()
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          git clone -b dev https://github.com/R3BRootGroup/sofia.git
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+  # Single job called "build_r3broot_asyeos"
+  build_r3broot_asyeos:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: clang-format build_r3broot
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          git clone -b dev https://github.com/R3BRootGroup/asyeos.git
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+  # Single job called "build_r3broot_gladtpc"
+  build_r3broot_gladtpc:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: clang-format build_r3broot
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+      #    git clone -b dev https://github.com/R3BRootGroup/glad-tpc.git
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
