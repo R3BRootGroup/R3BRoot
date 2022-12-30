@@ -28,10 +28,10 @@ R3BSfibMappedData::R3BSfibMappedData()
 }
 
 R3BSfibMappedData::R3BSfibMappedData(Int_t a_is_bottom,
-                                                     Int_t a_channel,
-                                                     Bool_t a_is_leading,
-                                                     Int_t a_coarse,
-                                                     Int_t a_fine)
+                                     Int_t a_channel,
+                                     Bool_t a_is_leading,
+                                     Int_t a_coarse,
+                                     Int_t a_fine)
     : fIsBottom(a_is_bottom)
     , fChannel(a_channel)
     , fIsLeading(a_is_leading)

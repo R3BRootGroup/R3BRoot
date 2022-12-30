@@ -559,16 +559,24 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
         if (rl == 0)
         {
             if (ic[2] > 21)
-                goto no_field_map; // this is outside range
+            {
+                continue; // this is outside range
+            }
             else if (ic[2] > 20)
+            {
                 w = 1 - dc[2];
+            }
         }
         else
         {
             if (ic[2] < -1)
-                goto no_field_map; // this is outside range
+            {
+                continue; // this is outside range
+            }
             else if (ic[2] < 0)
+            {
                 w = dc[2];
+            }
         }
 
         wsum += w;
@@ -605,8 +613,6 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
         Bp[2] = -gCoords[rl].fSina * Bbi[2] + gCoords[rl].fCosa * Bbi[0];
 
         continue;
-
-    no_field_map:;
         // printf (")\n");
     }
 
@@ -630,7 +636,7 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
     // rotate_field(B,Bi[0],Bi[1],Bi[2]);
     TVector3 BLab(Bi[0], Bi[1], Bi[2]);
     //   BLab.Transform(*gRot);
-    // copy value @ end
+    // copy value @ end /old/standard version
     // bField[0] = -1.*BLab.X()*10.; // [kGauss]
     // bField[1] = -1.*BLab.Y()*10.; // [kGauss]
     // bField[2] = -1.*BLab.Z()*10.; // [kGauss]
@@ -639,10 +645,6 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
     bField[2] = -1. * BLab.X() * 10.; // [kGauss]
     bField[1] = -1. * BLab.Y() * 10.; // [kGauss]
     bField[0] = +1. * BLab.Z() * 10.; // [kGauss]
-    ////old/standard version(?):
-    // bField[2] = -1.*BLab.X()*10.; // [kGauss]
-    // bField[1] = -1.*BLab.Y()*10.; // [kGauss]
-    // bField[0] = -1.*BLab.Z()*10.; // [kGauss]
 
     //  cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
     //  cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
@@ -684,4 +686,4 @@ void R3BAladinFieldMap::ReadAsciiFile(const char* fileName) {}
 
 Double_t R3BAladinFieldMap::Interpolate(Double_t dx, Double_t dy, Double_t dz) { return 0.; }
 
-ClassImp(R3BAladinFieldMap)
+ClassImp(R3BAladinFieldMap);

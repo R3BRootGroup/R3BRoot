@@ -25,8 +25,8 @@ R3BNeulandCalData::R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Dou
 std::ostream& operator<<(std::ostream& os, const R3BNeulandCalData& calData)
 {
     os << "R3BNeulandCalData: BarID " << calData.GetBarId() << "    Side " << calData.GetSide() << "    Time "
-       << calData.GetTime() << "   Trigger time " << calData.GetTriggerTime() << "    QDC "
-       << calData.GetQdc() << std::endl;
+       << calData.GetTime() << "   Trigger time " << calData.GetTriggerTime() << "    QDC " << calData.GetQdc()
+       << std::endl;
     return os;
 }
 

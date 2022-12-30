@@ -28,4 +28,4 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
-          singularity exec /data.local2/kresan/debian10-jun19p2-v18.2.1-ucesb.sif $PWD/containers/run_build_test_jun19p2.sh
+          singularity exec /data.local2/kresan/debian10-jun19p2-v18.2.1-ucesb.sif $PWD/.githubfiles/run_build_test_jun19p2.sh
