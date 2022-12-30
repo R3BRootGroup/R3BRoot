@@ -42,7 +42,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
   # Single job called "build-r3broot-sofia"
   build-r3broot-sofia:
     # The type of runner that the job will run on
@@ -61,7 +61,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           git clone -b dev https://github.com/R3BRootGroup/sofia.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
   # Single job called "build-r3broot-asyeos"
   build-r3broot-asyeos:
     # The type of runner that the job will run on
@@ -80,4 +80,4 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           git clone -b dev https://github.com/R3BRootGroup/asyeos.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/containers/run_build_test_apr22.sh
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh

@@ -40,7 +40,7 @@ R3BFieldPar::R3BFieldPar(const char* name, const char* title, const char* contex
     fMapName = "";
     fMapFileName = "";
     fPosX = fPosY = fPosZ = 0.;
-    fXAngle = fYAngle= fZAngle = 0.;
+    fXAngle = fYAngle = fZAngle = 0.;
     fScale = 0.;
 }
 // -------------------------------------------------------------------------
@@ -53,7 +53,7 @@ R3BFieldPar::R3BFieldPar()
     fMapName = "";
     fMapFileName = "";
     fPosX = fPosY = fPosZ = 0.;
-    fXAngle = fYAngle= fZAngle = 0.;
+    fXAngle = fYAngle = fZAngle = 0.;
     fScale = 0.;
 }
 
@@ -212,22 +212,22 @@ void R3BFieldPar::SetParameters(FairField* field)
             R3BAladinFieldMap* aladinFieldMap = (R3BAladinFieldMap*)field;
             fCurrent = aladinFieldMap->GetCurrent();
         }
-        else if (2 == fType)//proper GLAD field
+        else if (2 == fType) // proper GLAD field
         {
             R3BGladFieldMap* gladFieldMap = (R3BGladFieldMap*)field;
             fMapFileName = gladFieldMap->GetFileName();
-            fPosX   = gladFieldMap->GetPositionX();
-            fPosY   = gladFieldMap->GetPositionY();
-            fPosZ   = gladFieldMap->GetPositionZ();
+            fPosX = gladFieldMap->GetPositionX();
+            fPosY = gladFieldMap->GetPositionY();
+            fPosZ = gladFieldMap->GetPositionZ();
             fXAngle = gladFieldMap->GetXAngle();
             fYAngle = gladFieldMap->GetYAngle();
             fZAngle = gladFieldMap->GetZAngle();
-            fXmin   = gladFieldMap->GetXmin();
-            fXmax   = gladFieldMap->GetXmax();
-            fYmin   = gladFieldMap->GetYmin();
-            fYmax   = gladFieldMap->GetYmax();
-            fZmin   = gladFieldMap->GetZmin();
-            fZmax   = gladFieldMap->GetZmax();
+            fXmin = gladFieldMap->GetXmin();
+            fXmax = gladFieldMap->GetXmax();
+            fYmin = gladFieldMap->GetYmin();
+            fYmax = gladFieldMap->GetYmax();
+            fZmin = gladFieldMap->GetZmin();
+            fZmax = gladFieldMap->GetZmax();
         }
     }
 
@@ -239,7 +239,7 @@ void R3BFieldPar::SetParameters(FairField* field)
         fMapName = "";
         fMapFileName = "";
         fPosX = fPosY = fPosZ = fScale = 0.;
-        fXAngle = fYAngle= fZAngle = 0.;
+        fXAngle = fYAngle = fZAngle = 0.;
     }
 
     return;

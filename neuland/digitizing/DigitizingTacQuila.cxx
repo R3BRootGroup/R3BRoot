@@ -33,7 +33,8 @@ namespace Neuland
         }
 
         Channel::Channel(const Params& p, SideOfChannel side)
-            : par(p), Digitizing::Channel(side)
+            : par(p)
+            , Digitizing::Channel(side)
         {
         }
 

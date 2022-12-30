@@ -1,13 +1,12 @@
-#include <iostream>
-#include "FairRunSim.h"
-#include "TStopwatch.h"
-#include "FairRootFileSink.h"
 #include "FairBoxGenerator.h"
+#include "FairParRootFileIo.h"
 #include "FairPrimaryGenerator.h"
+#include "FairRootFileSink.h"
+#include "FairRunSim.h"
 #include "R3BCave.h"
 #include "R3BNeuland.h"
-#include "FairParRootFileIo.h"
-
+#include "TStopwatch.h"
+#include <iostream>
 
 int main()
 {
