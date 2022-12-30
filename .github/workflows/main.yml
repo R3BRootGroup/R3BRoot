@@ -3,7 +3,7 @@ name: CI C17++
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push or pull request events but only for the master and dev branches
   push:
     branches: [ master, dev ]
   pull_request:
@@ -47,7 +47,7 @@ jobs:
   build-r3broot-sofia:
     # The type of runner that the job will run on
     runs-on: self-hosted
-    needs: clang-format
+    needs: build-r3broot
     if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -66,7 +66,7 @@ jobs:
   build-r3broot-asyeos:
     # The type of runner that the job will run on
     runs-on: self-hosted
-    needs: clang-format
+    needs: build-r3broot
     if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -80,4 +80,42 @@ jobs:
           cd $GITHUB_WORKSPACE
           git clone -b dev https://github.com/R3BRootGroup/macros.git
           git clone -b dev https://github.com/R3BRootGroup/asyeos.git
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
+  # Single job called "build-r3broot-glad-tpc"
+  build-r3broot-glad-tpc:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: build-r3broot
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          git clone -b dev https://github.com/R3BRootGroup/glad-tpc.git
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
+  # Single job called "build-r3broot-frs"
+  build-r3broot-frs:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: build-r3broot
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          git clone -b dev https://github.com/R3BRootGroup/frs.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
