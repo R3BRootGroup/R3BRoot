@@ -24,10 +24,10 @@ R3BSfibHitData::R3BSfibHitData()
 }
 
 R3BSfibHitData::R3BSfibHitData(Int_t a_fiber_id,
-		Double_t a_top_time_ns,
-		Double_t a_bot_time_ns,
-		Double_t a_top_tot_ns,
-		Double_t a_bot_tot_ns)
+                               Double_t a_top_time_ns,
+                               Double_t a_bot_time_ns,
+                               Double_t a_top_tot_ns,
+                               Double_t a_bot_tot_ns)
     : R3BHit(0, 0, 0, 0, 0)
     , fFiberId(a_fiber_id)
     , fTopTime_ns(a_top_time_ns)
