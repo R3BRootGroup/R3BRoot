@@ -16,6 +16,7 @@
 #include "R3BStrawtubesCalData.h"
 #include "R3BStrawtubesHitData.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 
 R3BStrawtubesCal2Hit::R3BStrawtubesCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)

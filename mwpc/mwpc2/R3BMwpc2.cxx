@@ -19,6 +19,7 @@
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairVolume.h"
+#include <FairRootManager.h>
 
 #include "R3BMCStack.h"
 #include "R3BMwpc2.h"

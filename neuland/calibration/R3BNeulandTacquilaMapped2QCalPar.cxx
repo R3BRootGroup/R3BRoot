@@ -20,6 +20,7 @@
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
+#include <FairRootManager.h>
 
 #define nPMTs 2 * fPaddles* fPlanes
 

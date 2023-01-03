@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BNeulandCal2HitPar.h"
+#include <FairRootManager.h>
 
 #include "R3BEventHeader.h"
 #include "R3BNeulandCalData.h"

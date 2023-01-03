@@ -22,6 +22,7 @@
 #include "TH3D.h"
 #include "THttpServer.h"
 #include "TStyle.h"
+#include <FairRootManager.h>
 #include <numeric>
 
 /* This function is required to suppress boxes for empty bins - make them transparent.*/

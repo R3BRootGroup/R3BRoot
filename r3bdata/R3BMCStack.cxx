@@ -16,6 +16,7 @@
 // -----             Created 10/08/04  by D. Bertini / V. Friese       -----
 // -------------------------------------------------------------------------
 #include "R3BMCStack.h"
+#include <TClonesArray.h>
 
 #include "FairDetector.h"
 #include "FairLogger.h"

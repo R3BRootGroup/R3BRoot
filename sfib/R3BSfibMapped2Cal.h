@@ -20,6 +20,7 @@
 #ifndef R3BSFIBMAPPED2CAL
 #define R3BSFIBMAPPED2CAL
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
 

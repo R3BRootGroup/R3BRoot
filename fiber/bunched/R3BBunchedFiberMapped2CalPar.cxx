@@ -19,6 +19,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BBunchedFiberMapped2CalPar::R3BBunchedFiberMapped2CalPar(const char* a_name,

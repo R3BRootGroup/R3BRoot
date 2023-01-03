@@ -18,6 +18,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BSfibMapped2CalPar::R3BSfibMapped2CalPar(Int_t a_verbose,

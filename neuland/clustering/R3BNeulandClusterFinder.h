@@ -24,6 +24,7 @@
  *
  */
 
+#include <TClonesArray.h>
 #include "ClusteringEngine.h"
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"

@@ -14,6 +14,7 @@
 #ifndef R3BPSPREADER_H
 #define R3BPSPREADER_H 1
 
+#include <TClonesArray.h>
 #include "R3BReader.h"
 #include <Rtypes.h>
 

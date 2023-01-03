@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
+#include <FairRootManager.h>
 
 #include "R3BDataPropagator.h"
 #include "R3BLogger.h"

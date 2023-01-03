@@ -13,6 +13,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include <FairRootManager.h>
 
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"

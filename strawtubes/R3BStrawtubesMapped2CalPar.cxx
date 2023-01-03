@@ -18,6 +18,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 
 R3BStrawtubesMapped2CalPar::R3BStrawtubesMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)

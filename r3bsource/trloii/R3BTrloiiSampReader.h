@@ -19,6 +19,7 @@
 
 #ifndef R3BTRLOIISAMPREADER_H
 #define R3BTRLOIISAMPREADER_H 1
+#include <TClonesArray.h>
 #include "R3BReader.h"
 
 struct EXT_STR_h101_SAMP_t;

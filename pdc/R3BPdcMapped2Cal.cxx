@@ -11,6 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <FairRootManager.h>
 #include <assert.h>
 
 #include "R3BPdcMapped2Cal.h"

@@ -13,6 +13,7 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include <TClonesArray.h>
 
 #include "R3BLogger.h"
 #include "R3BMusliMappedData.h"

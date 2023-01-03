@@ -22,6 +22,7 @@
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include <FairRootManager.h>
 
 // Initialize variables from Birk' s Law
 static constexpr Double_t BirkdP = 1.032;

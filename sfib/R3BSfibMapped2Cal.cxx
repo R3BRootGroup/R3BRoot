@@ -23,6 +23,7 @@
 #include "R3BSfibMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BSfibMapped2Cal::R3BSfibMapped2Cal(Int_t a_verbose, enum R3BTCalEngine::CTDCVariant a_variant)

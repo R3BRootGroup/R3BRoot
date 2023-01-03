@@ -13,6 +13,7 @@
 
 #include "R3BNeulandNeutronReconstructionStatistics.h"
 #include "FairLogger.h"
+#include <FairRootManager.h>
 #include <TFile.h>
 #include <iostream>
 #include <numeric>

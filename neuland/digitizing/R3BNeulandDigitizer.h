@@ -14,6 +14,7 @@
 #ifndef R3B_NEULAND_DIGITIZER_H
 #define R3B_NEULAND_DIGITIZER_H
 
+#include <TClonesArray.h>
 #include "DigitizingEngine.h"
 #include "FairTask.h"
 #include "Filterable.h"

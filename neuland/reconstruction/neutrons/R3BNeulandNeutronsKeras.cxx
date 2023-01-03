@@ -2,6 +2,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "TPython.h"
+#include <TClonesArray.h>
 #include <iostream>
 #include <utility>
 

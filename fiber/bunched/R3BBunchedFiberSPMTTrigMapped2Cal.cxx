@@ -23,6 +23,7 @@
 #include "R3BFiberMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BBunchedFiberSPMTTrigMapped2Cal::R3BBunchedFiberSPMTTrigMapped2Cal(Int_t a_verbose)

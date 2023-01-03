@@ -24,6 +24,7 @@
 #include "R3BSci8MappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 #include "TH1F.h"

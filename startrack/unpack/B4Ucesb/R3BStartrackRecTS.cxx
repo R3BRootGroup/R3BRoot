@@ -21,6 +21,7 @@
 //
 
 #include "R3BStartrackRecTS.h"
+#include <FairRootManager.h>
 using namespace std;
 
 #include "TCanvas.h"

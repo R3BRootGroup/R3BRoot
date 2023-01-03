@@ -14,6 +14,7 @@
 #ifndef R3BSCI8READER_H
 #define R3BSCI8READER_H
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BReader.h"
 struct EXT_STR_h101_SCI8_t;

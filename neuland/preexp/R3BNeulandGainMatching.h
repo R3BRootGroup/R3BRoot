@@ -14,6 +14,7 @@
 #ifndef R3BNEULANDGAINMATCHING_H
 #define R3BNEULANDGAINMATCHING_H
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BChannelAccessEPICS.h"
 #include "R3BEventHeader.h"

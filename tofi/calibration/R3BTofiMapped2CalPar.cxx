@@ -17,6 +17,7 @@
 // ----------------------------------------------------------------
 
 #include "R3BTofiMapped2CalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 

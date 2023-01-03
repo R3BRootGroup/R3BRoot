@@ -20,6 +20,7 @@
 #ifndef R3BBUNCHEDFIBERSPMTTRIGMAPPED2CAL_H
 #define R3BBUNCHEDFIBERSPMTTRIGMAPPED2CAL_H 1
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
 

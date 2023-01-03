@@ -24,7 +24,7 @@ jobs:
       - name: Code formatting
         run: |
           cd $GITHUB_WORKSPACE
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/clang-format-check.sh clang-format-8
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/util/clang-format-check.sh clang-format-8
   # Single job called "build-r3broot"
   build-r3broot:
     # The type of runner that the job will run on

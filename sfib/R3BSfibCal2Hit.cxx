@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "R3BSfibCalData.h"
 #include "R3BSfibHitData.h"
+#include <FairRootManager.h>
 #include <TClonesArray.h>
 #include <iostream>
 

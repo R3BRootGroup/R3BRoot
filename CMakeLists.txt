@@ -63,12 +63,17 @@ else()
   find_package(FairRoot)
 endif()
 
-execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version OUTPUT_VARIABLE FR_MAJOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version OUTPUT_VARIABLE FR_MINOR_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --patch_version OUTPUT_VARIABLE FR_PATCH_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(${FR_MAJOR_VERSION} LESS 18 OR ${FR_MINOR_VERSION} LESS 2 OR
-        (${FR_MINOR_VERSION} EQUAL 2 AND ${FR_PATCH_VERSION} LESS 1))
-  Message(FATAL_ERROR "Incompatible FairRoot version detected. R3BRoot requires FairRoot v18.2.1")
+# FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
+execute_process(
+  COMMAND ${FAIRROOTPATH}/bin/fairroot-config --version
+  COMMAND sed "s/^v//"
+  OUTPUT_VARIABLE FairRoot_VERSION
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+if( "${FairRoot_VERSION}"  VERSION_LESS 18.2.1 )
+  Message(FATAL_ERROR "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later")
+else()
+  message(info "You seem to be using FairRoot ${FairRoot_VERSION}.")
 endif()
 
 # added a variable to point to r3broot path in the system
@@ -94,6 +99,8 @@ else()
   set(VMCLIB VMC)
 endif()
 
+include(ROOTMacros) # This is from FR, see https://github.com/FairRootGroup/FairRoot/issues/1221
+
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
 
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
@@ -102,7 +109,7 @@ foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
   endif()
 endforeach()
 
-If(${FR_MAJOR_VERSION} EQUAL 18 AND (${FR_MINOR_VERSION} EQUAL 6 AND ${FR_PATCH_VERSION} GREATER 4))
+if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
 #  find_package2(PUBLIC FairMQ VERSION 1.4.0)
   
   find_package2(PUBLIC DDS)
@@ -203,6 +210,8 @@ else()
 endif()
 set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}" )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # used by clang-tidy
+
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
@@ -231,7 +240,9 @@ if(NOT UNIX)
 endif(NOT UNIX)
 
 # Check if the external packages are installed into a separate install directory
-check_external_package_install_dir()
+if (COMMAND check_external_package_install_dir)
+  check_external_package_install_dir()
+endif()
 
 set(Boost_NO_SYSTEM_PATHS TRUE)
 set(Boost_NO_BOOST_CMAKE TRUE)
@@ -279,7 +290,7 @@ SetBasicVariables()
 set(R3BROOT_MAJOR_VERSION 0)
 set(R3BROOT_MINOR_VERSION 0)
 set(R3BROOT_PATCH_VERSION 0)
-set(R3BROOT_VERSION "${FR_MAJOR_VERSION}.${FR_MINOR_VERSION}.${FR_PATCH_VERSION}")
+set(R3BROOT_VERSION "${FairRoot_VERSION}")
 
 if(NOT DEFINED ROOT_FOUND_VERSION)
     set(ROOT_FOUND_VERSION "${found_vers}")
@@ -291,7 +302,7 @@ set(FAIRROOT_LIBRARY_PROPERTIES
     VERSION
     "${R3BROOT_VERSION}"
     SOVERSION
-    "${FR_MAJOR_VERSION}")
+    "${R3BROOT_VERSION}")
 
 string(COMPARE EQUAL
                "${CMAKE_GENERATOR}"

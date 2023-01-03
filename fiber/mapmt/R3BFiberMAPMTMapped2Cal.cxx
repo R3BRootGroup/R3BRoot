@@ -24,6 +24,7 @@
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_verbose)

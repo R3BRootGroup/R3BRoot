@@ -14,6 +14,7 @@
 #ifndef R3BSTRAWTUBESREADER_H
 #define R3BSTRAWTUBESREADER_H
 
+#include <TClonesArray.h>
 #include "R3BReader.h"
 
 typedef struct EXT_STR_h101_STRAWTUBES_t EXT_STR_h101_STRAWTUBES;

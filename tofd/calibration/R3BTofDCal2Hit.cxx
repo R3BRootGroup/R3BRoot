@@ -26,6 +26,7 @@
 #include "R3BTofDMappingPar.h"
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
+#include <FairRootManager.h>
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"

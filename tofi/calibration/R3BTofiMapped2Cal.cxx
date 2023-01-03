@@ -25,6 +25,7 @@
  * detector status during the experiment.
  */
 
+#include <FairRootManager.h>
 #include <assert.h>
 
 #include "R3BTofiMapped2Cal.h"

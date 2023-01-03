@@ -21,6 +21,7 @@
 #include "R3BPdcCalData.h"
 #include "R3BPdcHitData.h"
 #include "R3BTCalEngine.h"
+#include <FairRootManager.h>
 //#include "R3BPdcHitModulePar.h"
 //#include "R3BPdcHitPar.h"
 

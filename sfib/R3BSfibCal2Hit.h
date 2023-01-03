@@ -14,6 +14,7 @@
 #ifndef R3BSFIBCAL2HIT
 #define R3BSFIBCAL2HIT
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 
 #include <R3BTCalEngine.h>

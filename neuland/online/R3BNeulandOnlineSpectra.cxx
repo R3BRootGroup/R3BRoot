@@ -19,6 +19,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "THttpServer.h"
+#include <FairRootManager.h>
 #include <iostream>
 #include <limits>
 

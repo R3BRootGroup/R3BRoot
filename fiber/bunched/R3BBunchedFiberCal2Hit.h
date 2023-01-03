@@ -14,6 +14,7 @@
 #ifndef R3BBUNCHEDFIBERCAL2HIT_H
 #define R3BBUNCHEDFIBERCAL2HIT_H 1
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 
 #include <R3BTCalEngine.h>

@@ -15,6 +15,7 @@
 #include "R3BEventHeader.h"
 #include "R3BNeulandTacquilaMappedData.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 
 R3BNeulandQCalFiller::R3BNeulandQCalFiller()
 {

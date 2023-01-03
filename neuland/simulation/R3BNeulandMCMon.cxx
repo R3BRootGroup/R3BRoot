@@ -506,7 +506,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 // std::vector<int> filteredPdgCodes{ 22, -211, 211, 111 };
                 std::vector<int> filteredPdgCodes{ 22, 111 };
                 const TString reaction = std::accumulate(
-                    tracks.begin(), tracks.end(), TString(), [&](TString& s, const R3BMCTrack* b) -> TString& {
+                    tracks.begin(), tracks.end(), TString(), [&](TString s, const R3BMCTrack* b) -> TString {
                         if (std::find(filteredPdgCodes.begin(), filteredPdgCodes.end(), b->GetPdgCode()) !=
                             filteredPdgCodes.end())
                         {

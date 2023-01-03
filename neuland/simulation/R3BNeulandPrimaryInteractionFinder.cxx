@@ -14,6 +14,7 @@
 #include "R3BNeulandPrimaryInteractionFinder.h"
 #include "FairLogger.h"
 #include "TFile.h"
+#include <FairRootManager.h>
 #include <utility>
 #include <vector>
 

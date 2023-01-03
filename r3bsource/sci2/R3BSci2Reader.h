@@ -14,6 +14,7 @@
 #ifndef R3BSCI2READER_H
 #define R3BSCI2READER_H
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BReader.h"
 #include <Rtypes.h>

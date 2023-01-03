@@ -14,6 +14,7 @@
 #ifndef R3BSTRAWTUBESMAPPED2CAL
 #define R3BSTRAWTUBESMAPPED2CAL
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 
 class R3BTCalPar;

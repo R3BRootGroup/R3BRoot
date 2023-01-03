@@ -15,6 +15,8 @@
 #include "R3BNeulandCalData.h"
 #include "TF1.h"
 #include "TSpectrum.h"
+#include <FairRootManager.h>
+#include <TClonesArray.h>
 
 #include <fstream>
 #include <sstream>

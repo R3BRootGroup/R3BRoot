@@ -20,13 +20,13 @@
 #ifndef R3BPTOFCAL2HIT_H
 #define R3BPTOFCAL2HIT_H
 
+#include <TArrayD.h>
 #include "FairTask.h"
 
 #define PtofPaddlesPerPlane 8
 
 class TClonesArray;
 class R3BPtofHitPar;
-class TArrayD;
 
 class R3BPtofCal2Hit : public FairTask
 {

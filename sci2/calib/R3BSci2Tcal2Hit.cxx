@@ -26,6 +26,7 @@
 #include "R3BSci2TcalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 

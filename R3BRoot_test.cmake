@@ -65,8 +65,18 @@ EndIf()
 
 Set(ENV{WERROR} TRUE)
 Ctest_Configure(BUILD "${CTEST_BINARY_DIRECTORY}"
-                OPTIONS "${configure_options}"
-               )
+  OPTIONS "${configure_options}"
+  RETURN_VALUE _ctest_configure_ret_val
+  )
+if (_ctest_configure_ret_val)
+  Message(WARNING "cmake failed. Will paste the output."
+    "\n---------------------------------------------------\n\n")
+  Execute_process(COMMAND "find" "${CTEST_BINARY_DIRECTORY}" "-iname" "LastConfigure*.log" "-exec" /usr/bin/cat "{}" ";")
+
+  Message(FATAL_ERROR "\n---------------------------------------------------\n"
+    "Ctest Failed: Configure failed. (cmake output is above.)")
+endif()
+
 Ctest_Build(BUILD "${CTEST_BINARY_DIRECTORY}"
   RETURN_VALUE _ctest_build_ret_val
   )

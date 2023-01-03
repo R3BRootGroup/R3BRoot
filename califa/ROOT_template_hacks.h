@@ -11,6 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <TClonesArray.h>
 #include <TIterator.h> //
 namespace roothacks
 {

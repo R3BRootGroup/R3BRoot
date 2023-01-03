@@ -13,6 +13,8 @@
 
 #include "R3BNeulandCheckMapping.h"
 #include "R3BPaddleTamexMappedData.h"
+#include <FairRootManager.h>
+#include <TClonesArray.h>
 
 #include <iostream>
 #include <sstream>

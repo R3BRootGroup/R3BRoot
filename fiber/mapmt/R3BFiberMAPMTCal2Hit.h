@@ -14,6 +14,7 @@
 #ifndef R3BFIBERMAPMTCAL2HIT_H
 #define R3BFIBERMAPMTCAL2HIT_H 1
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 #include <list>
 

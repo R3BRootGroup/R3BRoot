@@ -1,5 +1,6 @@
 #! /bin/bash
 test "$1" == "--autofix" && AUTOFIX=1 && shift
+test "$1" == "--ci" && AUTOFIX=1 && CI=1 && shift
 
 CLANG_FORMAT=${1:-clang-format}
 
@@ -25,6 +26,8 @@ echo "--- Listing all changed files:"
 git diff --name-only ${base_commit}
 echo "---"
 
+FMT_FILE=$(mktemp)
+
 filesToCheck="$(git diff --name-only ${base_commit} | grep -e '.(\.C\|\.cpp\|\.cxx\|\.h)$' || true)"
 for f in $filesToCheck; do
     if test -n "$AUTOFIX"
@@ -33,18 +36,31 @@ for f in $filesToCheck; do
 	$CLANG_FORMAT -i -style=file "$f"
     else
 	echo "  Checking: ${f}"
-	d=$(diff -u "$f" <($CLANG_FORMAT -style=file "$f") || true)
+        d=$(diff -u "$f" <($CLANG_FORMAT -style=file "$f") || true)
 	if ! [ -z "$d" ]; then
-            echo "$d"
+            echo "$d" | tee -a ${FMT_FILE}
             fail=1
 	fi
     fi
 done
 
-if [ "$fail" = 1 ]; then
-    echo -e "\033[1;31mYou must pass the clang-format checks before submitting a pull request.\033[0m"
-    exit 1
-fi
 
-echo -e "\033[1;32m\xE2\x9C\x93 passed clang-format checks\033[0m $1";
-exit 0
+
+if  test -n "$CI"
+then
+    if test -n "$(git status --porcelain)" ; then
+    echo -e "\033[1;31mYou must pass the clang-format checks before submitting a pull request.\033[0m"
+    echo "Changes:"
+    git diff
+    echo "Trying to upload clang-format patch here:"
+    git diff | curl -F 'sprunge=<-' http://sprunge.us
+    exit 1
+    else
+        echo -e "\033[1;32m\xE2\x9C\x93 passed clang-format checks\033[0m $1";
+    fi
+else
+    if test -n "$fail"
+    then
+        echo "Clang-format check failed. Try --autofix to fix it in the code."
+    fi
+fi

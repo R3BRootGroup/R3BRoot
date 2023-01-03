@@ -18,6 +18,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include <FairRootManager.h>
 
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberMapped2Cal.h"

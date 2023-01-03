@@ -31,6 +31,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
+#include <FairRootManager.h>
 #include <fstream>
 #include <iomanip>
 #include <iostream>

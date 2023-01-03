@@ -23,6 +23,7 @@
 #include "R3BTofiHitData.h"
 #include "R3BTofiHitModulePar.h"
 #include "R3BTofiHitPar.h"
+#include <FairRootManager.h>
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
