@@ -85,6 +85,7 @@ Ctest_Test(BUILD "${CTEST_BINARY_DIRECTORY}"
     RETURN_VALUE _ctest_test_ret_val
     )
 
+
 If(GCOV_COMMAND)
   Ctest_Coverage(BUILD "${CTEST_BINARY_DIRECTORY}")
 EndIf()
@@ -92,5 +93,7 @@ EndIf()
 Ctest_Submit()
 
 if (_ctest_test_ret_val)
-  Message(FATAL_ERROR "Some tests failed.")
+  Message(ERROR "Some tests failed, printing output of failed tests:")
+  execute_process(COMMAND ctest  --rerun-failed --output-on-failure )
+  Message(ERROR "End of failed tests output.")
 endif()
