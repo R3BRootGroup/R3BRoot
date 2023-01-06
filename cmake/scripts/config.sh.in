@@ -36,20 +36,20 @@ if [ $same_system -eq 1 ]; then
   export FAIRLIBDIR="@FAIRLIBDIR@"
   export PYTHONPATH="@MY_PYTHONPATH@"
 	case $1 in
-		-a | --append )
-			export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"@MY_DYLD_LIBRARY_PATH@"
-			export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@MY_LD_LIBRARY_PATH@"
-			export PATH=$PATH:"@MY_PATH@"
+		-r | --replace )
+			export DYLD_LIBRARY_PATH="@MY_DYLD_LIBRARY_PATH@"
+			export LD_LIBRARY_PATH="@MY_LD_LIBRARY_PATH@"
+			export PATH="@MY_PATH@"
 			;;
 		-p | --prepend )
 			export DYLD_LIBRARY_PATH="@MY_DYLD_LIBRARY_PATH@":$DYLD_LIBRARY_PATH
 			export LD_LIBRARY_PATH="@MY_LD_LIBRARY_PATH@":$LD_LIBRARY_PATH
 			export PATH="@MY_PATH@":$PATH
 			;;
-		* )
-			export DYLD_LIBRARY_PATH="@MY_DYLD_LIBRARY_PATH@"
-			export LD_LIBRARY_PATH="@MY_LD_LIBRARY_PATH@"
-			export PATH="@MY_PATH@"
+		* ) # default: append
+			export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:"@MY_DYLD_LIBRARY_PATH@"
+			export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"@MY_LD_LIBRARY_PATH@"
+			export PATH=$PATH:"@MY_PATH@"
 			;;
 	esac
 fi
