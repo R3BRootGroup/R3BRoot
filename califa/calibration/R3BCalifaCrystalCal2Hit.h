@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2023 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -127,7 +127,7 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     static int AngleToPetalId(TVector3& vec)
     {
         // internal [double] petal number, not corresponding to anything real
-        // only relevant for 2019 beam times
+        // only relevant for 2023 beam times
         auto a = vec.Phi();
         if (a < 0)
         {

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2023 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,7 +20,7 @@
  * Class containing PSPX detector data on Precal level.
  * @author Ina Syndikus
  * @since March 2017
- * Modified Dec 2019 by M. Holl
+ * Modified Dec 2023 by M. Holl
  */
 
 class R3BPspxPrecalData : public TObject

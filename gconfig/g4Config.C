@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2023 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,7 +58,6 @@ void Config()
 
     // create the Specific stack
     FairStack* stack = new FairStack(1000);
-    stack->SetDebug(kFALSE);
     stack->StoreSecondaries(kTRUE);
     stack->SetMinPoints(0);
     geant4->SetStack(stack);

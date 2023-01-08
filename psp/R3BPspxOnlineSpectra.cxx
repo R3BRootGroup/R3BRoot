@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2023 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,8 +13,8 @@
 
 // ------------------------------------------------------------
 // -----                  R3BPspxOnlineSpectra            -----
-// -----          Created Feb 23th 2019 by J.L. Rodriguez -----
-// -----              Modified Dec 2019 by M. Holl        -----
+// -----          Created Feb 23th 2023 by J.L. Rodriguez -----
+// -----              Modified Dec 2023 by M. Holl        -----
 // ------------------------------------------------------------
 
 /*
