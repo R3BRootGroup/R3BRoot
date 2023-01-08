@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 
 // ----------------------------------------------------------------
 // -----     Create time calib parameters for Rolu via        -----
-// ------         Created July 2023 by A. Kelic-Heil          -----
+// ------         Created July 2019 by A. Kelic-Heil          -----
 // -----            Following R3BLosMapped2CalPar             -----
 // ----------------------------------------------------------------
 

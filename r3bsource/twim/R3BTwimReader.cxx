@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -192,7 +192,7 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
     // mail from R. Schneider from June 16, 2016: "if you have several hits of one channel in the window of interest,
     // you get an energy and a timing for each hit."
     // --> multiplicity per anode (for anode 1 to anode 16) should also be the same in energy and time
-    // mail from R. Schneider from May 21st 2023 : "the hits from one channel are kept in the chronological order."
+    // mail from R. Schneider from May 21st 2019 : "the hits from one channel are kept in the chronological order."
     // --> for one anode with multi-hit, the first hit in energy correspond to the first hit in time
     if (nAnodesEnergy != nAnodesTime)
         LOG(error) << "R3BTwimReader::ReadData error ! NOT THE SAME NUMBER OF ANODES HITTED IN ENERGY () AND TIME ()";

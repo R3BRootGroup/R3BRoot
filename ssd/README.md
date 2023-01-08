@@ -29,7 +29,7 @@ These files generally hold channel-specific data used for calibration and the li
 The main online classes are
 
 - ./online/R3BAmsOnlineSpectra
-- ./online/R3BAmsCalifaCorrelatedOnlineSpectra, only for 2018 and 2023 experiments
+- ./online/R3BAmsCalifaCorrelatedOnlineSpectra, only for 2018 and 2019 experiments
 
 ### other
 

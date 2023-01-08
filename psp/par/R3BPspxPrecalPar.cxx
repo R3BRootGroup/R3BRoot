@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 // ------------------------------------------------------------
 // -----           R3BPspxPrecalPar header file           -----
 // -----           Created 17/03/13  by I.Syndikus        -----
-// -----           Modified Dec 2023 by M. Holl           -----
+// -----           Modified Dec 2019 by M. Holl           -----
 // ------------------------------------------------------------
 
 #include "R3BPspxPrecalPar.h"

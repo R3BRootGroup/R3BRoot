@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,7 +17,6 @@
 #include "R3BFieldPar.h"
 #include "R3BAladinFieldMap.h"
 #include "R3BFieldConst.h"
-#include "R3BFieldMap.h"
 #include "R3BGladFieldMap.h"
 
 #include "FairParamList.h"
@@ -25,12 +24,7 @@
 #include "TDirectory.h"
 #include <iostream>
 
-using std::cerr;
-using std::cout;
-using std::endl;
-
 // ------   Constructor   --------------------------------------------------
-//
 R3BFieldPar::R3BFieldPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
@@ -43,8 +37,7 @@ R3BFieldPar::R3BFieldPar(const char* name, const char* title, const char* contex
     fXAngle = fYAngle = fZAngle = 0.;
     fScale = 0.;
 }
-// -------------------------------------------------------------------------
-//
+
 R3BFieldPar::R3BFieldPar()
 {
     fType = -1;
@@ -58,11 +51,9 @@ R3BFieldPar::R3BFieldPar()
 }
 
 // ------   Destructor   ---------------------------------------------------
-//
 R3BFieldPar::~R3BFieldPar() {}
 
 // ------   Put parameters   -----------------------------------------------
-//
 void R3BFieldPar::putParams(FairParamList* list)
 {
     if (!list)
@@ -99,7 +90,6 @@ void R3BFieldPar::putParams(FairParamList* list)
 }
 
 // --------   Get parameters   ---------------------------------------------
-//
 Bool_t R3BFieldPar::getParams(FairParamList* list)
 {
 
@@ -164,13 +154,12 @@ Bool_t R3BFieldPar::getParams(FairParamList* list)
 }
 
 // ---------   Set parameters from R3BField   ------------------------------
-//
 void R3BFieldPar::SetParameters(FairField* field)
 {
 
     if (!field)
     {
-        cerr << "-W- R3BFieldPar::SetParameters: Empty field pointer!" << endl;
+        LOG(fatal) << "R3BFieldPar::SetParameters: Empty field pointer!";
         return;
     }
 
@@ -182,7 +171,7 @@ void R3BFieldPar::SetParameters(FairField* field)
 
     if (fType == 0)
     { // constant field
-        R3BFieldConst* fieldConst = (R3BFieldConst*)field;
+        R3BFieldConst* fieldConst = dynamic_cast<R3BFieldConst*>(field);
         fBx = fieldConst->GetBx();
         fBy = fieldConst->GetBy();
         fBz = fieldConst->GetBz();
@@ -196,25 +185,23 @@ void R3BFieldPar::SetParameters(FairField* field)
         fMapFileName = "";
         fPosX = fPosY = fPosZ = fScale = 0.;
     }
-
     else if (fType >= 1 && fType <= kMaxFieldMapType)
-    { // field map
-        // to be implemented for the  case of R3B
-        R3BFieldMap* fieldMap = (R3BFieldMap*)field;
+    { // field map to be implemented for the case of R3B
         fBx = fBy = fBz = 0.;
         fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
 
-        fMapName = field->GetName();
-        fScale = fieldMap->GetScale();
-
         if (1 == fType)
         {
-            R3BAladinFieldMap* aladinFieldMap = (R3BAladinFieldMap*)field;
+            R3BAladinFieldMap* aladinFieldMap = dynamic_cast<R3BAladinFieldMap*>(field);
+            fMapName = aladinFieldMap->GetName();
+            fScale = aladinFieldMap->GetScale();
             fCurrent = aladinFieldMap->GetCurrent();
         }
         else if (2 == fType) // proper GLAD field
         {
-            R3BGladFieldMap* gladFieldMap = (R3BGladFieldMap*)field;
+            R3BGladFieldMap* gladFieldMap = dynamic_cast<R3BGladFieldMap*>(field);
+            fMapName = gladFieldMap->GetName();
+            fScale = gladFieldMap->GetScale();
             fMapFileName = gladFieldMap->GetFileName();
             fPosX = gladFieldMap->GetPositionX();
             fPosY = gladFieldMap->GetPositionY();
@@ -230,10 +217,9 @@ void R3BFieldPar::SetParameters(FairField* field)
             fZmax = gladFieldMap->GetZmax();
         }
     }
-
     else
     {
-        cerr << "-W- R3BFieldPar::SetParameters: Unknown field type " << fType << "!" << endl;
+        LOG(error) << "R3BFieldPar::SetParameters: Unknown field type " << fType << "!";
         fBx = fBy = fBz = 0.;
         fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
         fMapName = "";
@@ -245,4 +231,4 @@ void R3BFieldPar::SetParameters(FairField* field)
     return;
 }
 
-ClassImp(R3BFieldPar)
+ClassImp(R3BFieldPar);

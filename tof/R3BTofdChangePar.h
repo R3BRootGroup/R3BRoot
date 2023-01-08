@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 // ------------------------------------------------------
 // -----       Change hit parameters for TOFD       -----
-// -----         Created Sep 2023 by L.Bott         -----
+// -----         Created Sep 2019 by L.Bott         -----
 // ------------------------------------------------------
 
 #ifndef R3BTOFDCHANGEPAR_H

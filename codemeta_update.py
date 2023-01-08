@@ -1,14 +1,12 @@
 #! /usr/bin/env python3
-# Copyright (C) 2021 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH
+# Copyright (C) 2019 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
-
 
 import argparse
 import json
 import re
 from collections import OrderedDict
-
 
 class CodeMetaManipulator(object):
     def load(self, filename='codemeta.json'):

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 
 // ---------------------------------------------------------------
 // -----                  R3BSci2Mapped2Cal                  -----
-// -----            Created August 6th 2023 by M. Heil       -----
+// -----            Created August 6th 2019 by M. Heil       -----
 // ----- Convert mapped data to time calibrated data         -----
 // ----- Following R3BLosMapped2Cal                          -----
 // ---------------------------------------------------------------

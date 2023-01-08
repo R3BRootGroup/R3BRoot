@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -73,7 +73,7 @@ class R3BAmsMappingPar : public FairParGenericSet
     void SetOffsetY(Float_t value, Int_t det) { fOffsetY->AddAt(value, det - 1); }
 
   private:
-    Int_t fGeo;                // geometry of the ams detectors per year: 2023 or 2020
+    Int_t fGeo;                // geometry of the ams detectors per year: 2019 or 2020
     Int_t fNumDet;             // number of ams detectors (from 1 to 6 for 2020 experiments)
     TArrayI* fSam;             // sam number (4 or 5)
     TArrayI* fGtb;             // gtb number (0 or 1)

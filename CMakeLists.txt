@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2023 Members of R3B Collaboration                          #
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -468,7 +468,7 @@ if(NOT MODULE)
     endif(WITH_ASYEOS)
 endif(NOT MODULE)
 
-add_subdirectory(gconfig)
+# add_subdirectory(gconfig)
 add_subdirectory(cmake)
 
 If(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")

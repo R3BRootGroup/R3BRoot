@@ -72,6 +72,11 @@
       "@type": "Person",
       "givenName": "Vadim",
       "familyName": "Wagner"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Mohammad",
+      "familyName": "Al-Turany"
     }
   ],
   "contributor": [
