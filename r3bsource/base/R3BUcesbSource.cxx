@@ -170,8 +170,15 @@ Bool_t R3BUcesbSource::InitUnpackers()
     uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
     if (struct_map_success & ~(map_ok))
     {
-        R3BLOG(warn, "ext_data_clnt::setup() failed");
+        R3BLOG(warn, "ext_data_clnt::setup() failed to map all items:");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
+        /* FairRunOnline::Init() ignores the return value from
+         * GetSource()->InitUnpackers(); so do a (FATAL) error.
+         */
+        R3BLOG(error,
+               "ext_data_clnt::setup() mapping failure may "
+               "cause unexpected analysis results due to missing "
+               "data members. Unpacker needs fixing.");
         return kFALSE;
     }
 
