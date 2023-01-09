@@ -26,6 +26,7 @@
 class TClonesArray;
 class TH1F;
 class TH2F;
+class R3BLandDigi;
 
 class R3BNeuLandClusterFinder : public FairTask
 {

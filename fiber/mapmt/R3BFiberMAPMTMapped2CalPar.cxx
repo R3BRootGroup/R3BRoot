@@ -51,7 +51,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
     auto rm = FairRootManager::Instance();
     R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
-    fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject(fName + "Mapped"));
     if (!fMapped)
     {
         R3BLOG(fatal, fName + " not found");
@@ -84,7 +84,7 @@ void R3BFiberMAPMTMapped2CalPar::Exec(Option_t* option)
     auto mapped_num = fMapped->GetEntriesFast();
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMapped->At(i));
         assert(mapped);
         if (!mapped->IsTrigger())
         {

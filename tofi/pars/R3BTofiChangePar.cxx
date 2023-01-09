@@ -114,7 +114,7 @@ void R3BTofiChangePar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer("TofiHitPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BTofiChangePar::Init() Couldn't get handle on TofiHitPar. ";
@@ -188,7 +188,7 @@ void R3BTofiChangePar::FinishTask()
 void R3BTofiChangePar::changeAll0(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
     auto container = "TofiHitPar";
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer(container);
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer(container));
     if (!fCal_Par)
     {
         R3BTofiHitModulePar* mpar;

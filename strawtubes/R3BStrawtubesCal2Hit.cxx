@@ -39,7 +39,7 @@ void R3BStrawtubesCal2Hit::Exec(Option_t* option)
     Int_t nDets = fCalItems->GetEntriesFast();
     for (Int_t i = 0; i < nDets; i++)
     {
-        auto calItem = (R3BStrawtubesCalData*)fCalItems->At(i);
+        auto calItem = dynamic_cast<R3BStrawtubesCalData*>(fCalItems->At(i));
         if (!calItem)
         {
             continue;
@@ -67,7 +67,7 @@ InitStatus R3BStrawtubesCal2Hit::Init()
     {
         LOG(fatal) << "FairRootManager not found";
     }
-    fCalItems = (TClonesArray*)mgr->GetObject("StrawtubesCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("StrawtubesCal"));
     if (!fCalItems)
     {
         LOG(fatal) << "Branch StrawtubesCal not found";

@@ -73,7 +73,7 @@ Bool_t R3BCalifaJulichReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BCalifaJulichReader::Read()
+Bool_t R3BCalifaJulichReader::R3BRead()
 {
     R3BLOG(debug1, "Event data");
     // SELECT THE FOR LOOP BASED ON THE MAPPING...

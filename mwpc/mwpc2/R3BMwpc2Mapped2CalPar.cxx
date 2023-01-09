@@ -90,7 +90,7 @@ InitStatus R3BMwpc2Mapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMwpcMappedDataCA = (TClonesArray*)rootManager->GetObject("Mwpc2MappedData");
+    fMwpcMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc2MappedData"));
     if (!fMwpcMappedDataCA)
     {
         return kFATAL;
@@ -102,7 +102,7 @@ InitStatus R3BMwpc2Mapped2CalPar::Init()
         return kFATAL;
     }
 
-    fPad_Par = (R3BMwpc2CalPar*)rtdb->getContainer("mwpc2CalPar");
+    fPad_Par = dynamic_cast<R3BMwpc2CalPar*>(rtdb->getContainer("mwpc2CalPar"));
     if (!fPad_Par)
     {
         LOG(error) << "R3BMwpc2Mapped2CalPar::Init() Couldn't get handle on mwpc2CalPar container";
@@ -127,7 +127,7 @@ void R3BMwpc2Mapped2CalPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        MapHit = (R3BMwpcMappedData*)(fMwpcMappedDataCA->At(i));
+        MapHit = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
         planeid = MapHit->GetPlane();
         padid = MapHit->GetPad() - 1;
 

@@ -56,8 +56,8 @@ InitStatus R3BNeulandHitHist::Init()
     {
         LOG(fatal) << "FairRootManager not found";
     }
-    fLandDigi = (TClonesArray*)fMan->GetObject("NeulandHits");
-    fLosHit = (TClonesArray*)fMan->GetObject("LosHit");
+    fLandDigi = dynamic_cast<TClonesArray*>(fMan->GetObject("NeulandHits"));
+    fLosHit = dynamic_cast<TClonesArray*>(fMan->GetObject("LosHit"));
     CreateHistos();
 
     return kSUCCESS;
@@ -68,7 +68,7 @@ void R3BNeulandHitHist::Exec(Option_t* option)
     if (!fLosHit || fLosHit->GetEntriesFast() == 0)
         return;
 
-    R3BLosHitData* losHit = (R3BLosHitData*)fLosHit->At(0);
+    R3BLosHitData* losHit = dynamic_cast<R3BLosHitData*>(fLosHit->At(0));
     // Double_t startTime = losHit->GetTime(); TODO
     Double_t startTime = 0;
     Int_t count = 0;
@@ -87,7 +87,7 @@ void R3BNeulandHitHist::Exec(Option_t* option)
 
         for (Int_t i = 0; i < nLandDigi; i++)
         {
-            digi = (R3BNeulandHit*)fLandDigi->At(i);
+            digi = dynamic_cast<R3BNeulandHit*>(fLandDigi->At(i));
 
             barId = digi->GetPaddle();
             time = digi->GetT();

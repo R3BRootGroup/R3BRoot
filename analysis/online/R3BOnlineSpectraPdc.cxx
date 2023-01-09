@@ -108,24 +108,24 @@ InitStatus R3BOnlineSpectraPdc::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("/Tasks", this);
 
     // Get objects for detectors on all levels
-    fMappedItems = (TClonesArray*)mgr->GetObject("PdcMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PdcMapped"));
     if (NULL == fMappedItems)
         LOG(fatal) << "Branch PdcCal not found";
 
-    fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PdcCal"));
     if (NULL == fCalItems)
         LOG(fatal) << "Branch PdcCal not found";
 
-    fHitItems = (TClonesArray*)mgr->GetObject("PdcHit");
+    fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PdcHit"));
     if (NULL == fHitItems)
         LOG(fatal) << "Branch PdcCal not found";
 
@@ -300,7 +300,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         Int_t nMapped = det->GetEntriesFast();
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
-            auto mapped = (R3BPdcMappedData const*)det->At(imapped);
+            auto mapped = dynamic_cast<R3BPdcMappedData const*>(det->At(imapped));
             if (!mapped)
                 continue; // should not happen
 
@@ -323,7 +323,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
         for (Int_t ical = 0; ical < nCals; ical++)
         {
-            auto cal = (R3BPdcCalData const*)det->At(ical);
+            auto cal = dynamic_cast<R3BPdcCalData const*>(det->At(ical));
             if (!cal)
                 continue; // should not happen
 
@@ -356,7 +356,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BPdcHitData const*)det->At(ihit);
+            auto hit = dynamic_cast<R3BPdcHitData const*>(det->At(ihit));
             if (!hit)
                 continue; // should not happen
             if (t0 == -10000.)

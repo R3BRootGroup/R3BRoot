@@ -99,24 +99,24 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to mapped data of the mwpc detectors
-    fCalItemsMwpc1 = (TClonesArray*)mgr->GetObject(fNameDet1 + "CalData");
+    fCalItemsMwpc1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet1 + "CalData"));
     if (!fCalItemsMwpc1)
     {
         return kFATAL;
     }
-    fCalItemsMwpc2 = (TClonesArray*)mgr->GetObject(fNameDet2 + "CalData");
+    fCalItemsMwpc2 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet2 + "CalData"));
     if (!fCalItemsMwpc2)
     {
         return kFATAL;
     }
 
     // get access to hit data of mwpcs
-    fHitItemsMwpc1 = (TClonesArray*)mgr->GetObject(fNameDet1 + "HitData");
+    fHitItemsMwpc1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet1 + "HitData"));
     if (!fHitItemsMwpc1)
         LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
                          "HitData not found";
 
-    fHitItemsMwpc2 = (TClonesArray*)mgr->GetObject(fNameDet2 + "HitData");
+    fHitItemsMwpc2 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet2 + "HitData"));
     if (!fHitItemsMwpc2)
         LOG(warn) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra: " + fNameDet1 +
                          "HitData not found";
@@ -251,7 +251,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t maxpadx1 = -1, maxpady1 = -1, maxqx1 = 0, maxqy1 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcCalData* hit = (R3BMwpcCalData*)fCalItemsMwpc1->At(ihit);
+            R3BMwpcCalData* hit = dynamic_cast<R3BMwpcCalData*>(fCalItemsMwpc1->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetPlane() == 1 || hit->GetPlane() == 2)
@@ -276,7 +276,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t maxpadx2 = -1, maxpady2 = -1, maxqx2 = 0, maxqy2 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcCalData* hit = (R3BMwpcCalData*)fCalItemsMwpc2->At(ihit);
+            R3BMwpcCalData* hit = dynamic_cast<R3BMwpcCalData*>(fCalItemsMwpc2->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetPlane() == 1 || hit->GetPlane() == 2)
@@ -310,7 +310,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t nHits1 = fHitItemsMwpc1->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits1; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc1->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc1->At(ihit));
             if (!hit)
                 continue;
             mw1x = hit->GetX();
@@ -320,7 +320,7 @@ void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t nHits2 = fHitItemsMwpc2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits2; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc2->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc2->At(ihit));
             if (!hit)
                 continue;
             mw2x = hit->GetX();

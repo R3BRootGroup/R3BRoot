@@ -71,7 +71,7 @@ void R3BFootMapped2StripCal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BFootCalPar*)rtdb->getContainer("footCalPar");
+    fCal_Par = dynamic_cast<R3BFootCalPar*>(rtdb->getContainer("footCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(error, "footCalPar container not found");
@@ -124,7 +124,7 @@ InitStatus R3BFootMapped2StripCal::Init()
     }
 
     // INPUT DATA
-    fFootMappedData = (TClonesArray*)rmg->GetObject("FootMappedData");
+    fFootMappedData = dynamic_cast<TClonesArray*>(rmg->GetObject("FootMappedData"));
     if (!fFootMappedData)
     {
         R3BLOG(fatal, "FootMappedData not found");
@@ -187,7 +187,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
     // Pedestal substraction
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BFootMappedData*)(fFootMappedData->At(i));
+        mappedData[i] = dynamic_cast<R3BFootMappedData*>(fFootMappedData->At(i));
         detId = mappedData[i]->GetDetId() - 1;
         stripId = mappedData[i]->GetStripId() - 1;
 

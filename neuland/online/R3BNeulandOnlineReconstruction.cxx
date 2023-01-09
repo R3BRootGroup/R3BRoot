@@ -58,7 +58,7 @@ InitStatus R3BNeulandOnlineReconstruction::Init()
         throw std::runtime_error("R3BNeulandOnlineReconstruction: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("EventHeader."));
     if (fEventHeader == nullptr)
     {
         throw std::runtime_error("R3BNeulandOnlineReconstruction: No R3BEventHeader");

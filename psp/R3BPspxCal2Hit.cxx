@@ -119,7 +119,7 @@ InitStatus R3BPspxCal2Hit::Init()
     }
 
     // R3BEventHeader for trigger information, if needed!
-    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    fHeader = dynamic_cast<R3BEventHeader*>(fMan->GetObject("R3BEventHeader"));
 
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Figure out how many detectors were registered by the reader
@@ -129,7 +129,7 @@ InitStatus R3BPspxCal2Hit::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cCal", d + 1, xy[f])); // = branch name in TTree
+            tmp[f] = dynamic_cast<TClonesArray*>(fMan->GetObject(Form("Pspx%d_%cCal", d + 1, xy[f]))); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
@@ -176,7 +176,7 @@ void R3BPspxCal2Hit::SetParContainers()
         LOG(info) << "R3BPspxCal2Hit::SetParContainers()";
     }
 
-    fHitPar = (R3BPspxHitPar*)rtdb->getContainer("R3BPspxHitPar");
+    fHitPar = dynamic_cast<R3BPspxHitPar*>(rtdb->getContainer("R3BPspxHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
@@ -224,7 +224,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
         for (Int_t i = 0; i < nCal; i++)
         {
 
-            R3BPspxCalData* calData = (R3BPspxCalData*)fCalItems[d]->At(i); // get cal level event
+            R3BPspxCalData* calData = dynamic_cast<R3BPspxCalData*>(fCalItems[d]->At(i)); // get cal level event
 
             Float_t energy = calData->GetEnergy() * eGain[d] + eOffset[d]; // convert energy to MeV
             Float_t pos =

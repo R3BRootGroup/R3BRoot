@@ -43,7 +43,7 @@ class R3BRpcReader : public R3BReader
      * Copy data from the ucesb data stream to
      * native data containers, called by R3BUcesbSource.
      */
-    virtual Bool_t Read() override;
+    virtual Bool_t R3BRead() override;
 
     /*
      * Reset the internal output array.

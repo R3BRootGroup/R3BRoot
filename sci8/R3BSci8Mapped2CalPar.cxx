@@ -99,16 +99,16 @@ InitStatus R3BSci8Mapped2CalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
-    fMapped = (TClonesArray*)rm->GetObject("Sci8Mapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("Sci8Mapped"));
     if (!fMapped)
     {
         return kFATAL;
     }
 
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci8TCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci8TCalPar"));
     fCal_Par->setChanged();
 
     if (!fNofModules)
@@ -134,7 +134,7 @@ void R3BSci8Mapped2CalPar::Exec(Option_t* option)
     for (UInt_t i = 0; i < nHits; i++)
     {
 
-        R3BSci8MappedData* hit = (R3BSci8MappedData*)fMapped->At(i);
+        R3BSci8MappedData* hit = dynamic_cast<R3BSci8MappedData*>(fMapped->At(i));
         if (!hit)
         {
             continue; // should not happen

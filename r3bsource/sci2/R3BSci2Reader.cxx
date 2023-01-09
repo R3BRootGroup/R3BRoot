@@ -81,7 +81,7 @@ Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BSci2Reader::Read()
+Bool_t R3BSci2Reader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
     // Convert plain raw data to multi-dimensional array
@@ -336,7 +336,7 @@ Bool_t R3BSci2Reader::Read()
         uint32_t numberOfPMTsWithHits_TC = data->SCITWO_VTCM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
-            LOG(error) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between TF and TC for SofSci !";
+            LOG(error) << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between TF and TC for SofSci !";
         }
         else
         {
@@ -348,7 +348,7 @@ Bool_t R3BSci2Reader::Read()
                 uint32_t pmtid_TC = data->SCITWO_VTCMI[pmmult];
                 if (pmtid_TF != pmtid_TC)
                 {
-                    LOG(error) << "R3BSofSciReader::Read() Error in unpacking, unconsistency between the PMT id for TF "
+                    LOG(error) << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
                                   "and TC for SofSci !";
                 }
                 uint32_t nextChannelStart = data->SCITWO_VTFME[pmmult];

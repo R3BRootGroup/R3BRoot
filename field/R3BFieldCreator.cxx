@@ -36,7 +36,7 @@ void R3BFieldCreator::SetParm()
 {
     FairRunAna* Run = FairRunAna::Instance();
     FairRuntimeDb* RunDB = Run->GetRuntimeDb();
-    fFieldPar = (R3BFieldPar*)RunDB->getContainer("R3BFieldPar");
+    fFieldPar = dynamic_cast<R3BFieldPar*>(RunDB->getContainer("R3BFieldPar"));
 }
 
 FairField* R3BFieldCreator::createFairField()

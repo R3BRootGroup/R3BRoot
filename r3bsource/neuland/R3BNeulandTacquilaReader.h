@@ -59,7 +59,7 @@ class R3BNeulandTacquilaReader : public R3BReader
      * Called by the R3BUcesbSource once per sub-event.
      * Makes data conversion.
      */
-    Bool_t Read();
+    Bool_t R3BRead();
 
     /**
      * Method for clearing the output array.

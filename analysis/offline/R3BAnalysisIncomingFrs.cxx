@@ -134,29 +134,29 @@ InitStatus R3BAnalysisIncomingFrs::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // Get objects for detectors on all levels
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
     }
 
     // --- Get access to Sci2 data at Tcal level --- //
-    fTcalSci2 = (TClonesArray*)mgr->GetObject("Sci2Tcal");
+    fTcalSci2 = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Tcal"));
     if (!fTcalSci2)
     {
         LOG(info) << "R3BAnalysisIncomingFrs::Init()  Could not find ci2Tcal";
     }
 
     // get access to hit data of the MUSIC
-    fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
+    fHitItemsMus = dynamic_cast<TClonesArray*>(mgr->GetObject("MusicHitData"));
     if (!fHitItemsMus)
         LOG(warn) << "R3BAnalysisIncomingFrs: MusicHitData not found";
 
@@ -192,7 +192,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
         Int_t nHits = fHitItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            R3BMusicHitData* hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
             if (!hit)
                 continue;
             Zmusic = hit->GetZcharge();
@@ -225,7 +225,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
         nHits = fTcalSci2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fTcalSci2->At(ihit);
+            R3BSci2TcalData* hittcal = dynamic_cast<R3BSci2TcalData*>(fTcalSci2->At(ihit));
             if (!hittcal)
                 continue;
             iCh = hittcal->GetChannel() - 1;
@@ -259,7 +259,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
         Int_t nHitsSamp = det->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHitsSamp; ihit++)
         {
-            auto hit = (R3BSamplerMappedData*)det->At(ihit);
+            auto hit = dynamic_cast<R3BSamplerMappedData*>(det->At(ihit));
             // time is in steps of 10 ns
             // is is a 34 bit number, so max 1073741823
             samplerCurr = hit->GetTime();
@@ -298,7 +298,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
     Double_t tot[fNofLosDetectors][32][8];
-    Double_t time_MTDC[32][8] = { 0. };
+    Double_t time_MTDC[32][8] = { {0.} };
     Double_t LosTresMTDC[32];
 
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
@@ -358,7 +358,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -375,15 +375,15 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
         nPartLOS = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { 0. };
-        Double_t time_V_LOS2[32][8] = { 0. };
+        Double_t time_V_LOS1[32][8] = { {0.} };
+        Double_t time_V_LOS2[32][8] = { {0.} };
 
         for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
         {
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;

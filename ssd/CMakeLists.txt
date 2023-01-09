@@ -90,7 +90,9 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF SsdLinkDef.h)
 set(LIBRARY_NAME R3BSsd)
 set(DEPENDENCIES
-    Spectrum R3BBase R3BData R3BTracking)
+  Spectrum R3BBase R3BData R3BTracking
+  #Online
+  )
 
 GENERATE_LIBRARY()
 

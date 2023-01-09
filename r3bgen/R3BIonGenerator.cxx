@@ -43,7 +43,7 @@ R3BIonGenerator::R3BIonGenerator(const Char_t* ionName, Int_t mult, Double_t mom
     , fIon(nullptr)
     , fRNG(seed)
 {
-    fIon = (FairIon*)FairRunSim::Instance()->GetUserDefIons()->FindObject(ionName);
+    fIon = dynamic_cast<FairIon*>(FairRunSim::Instance()->GetUserDefIons()->FindObject(ionName));
 
     if (!fIon)
         LOG(fatal) << "R3BIonGenerator: Ion is not defined!";

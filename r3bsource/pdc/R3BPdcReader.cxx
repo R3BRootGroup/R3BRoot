@@ -55,7 +55,7 @@ Bool_t R3BPdcReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BPdcReader::Read()
+Bool_t R3BPdcReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     auto data = (EXT_STR_h101_PDC_onion*)fData;

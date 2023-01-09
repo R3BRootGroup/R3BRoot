@@ -93,12 +93,12 @@ InitStatus R3BLosMapped2Cal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosMapped"));
     if (NULL == fMappedItems)
     {
         R3BLOG(fatal, "LosMapped not found");
@@ -106,7 +106,7 @@ InitStatus R3BLosMapped2Cal::Init()
     }
 
     // get access to Trigger Mapped data
-    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerMapped");
+    fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerMapped"));
     R3BLOG_IF(warn, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     // Request storage of Cal data in output tree
@@ -125,7 +125,7 @@ InitStatus R3BLosMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BLosMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LosTCalPar"));
     if (!fTcalPar)
     {
         R3BLOG(fatal, "Could not get access to LosTCalPar-Container.");
@@ -159,7 +159,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         Double_t times_ns = 0. / 0.;
         Double_t times_raw_ns = 0. / 0.;
 
-        R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItems->At(ihit);
+        R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
@@ -252,7 +252,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BLosCalData* aCalItem = (R3BLosCalData*)fCalItems->At(iCal);
+            R3BLosCalData* aCalItem = dynamic_cast<R3BLosCalData*>(fCalItems->At(iCal));
 
             //       cout<<"aCalItem->GetDetector() "<<aCalItem->GetDetector()<<"; "<<iDet<<endl;
 
@@ -453,7 +453,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         R3BLosCalData* caltrigger = NULL;
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
-            auto mapped = (R3BLosMappedData const*)fMappedTriggerItems->At(mapped_i);
+            auto mapped = dynamic_cast<R3BLosMappedData const*>(fMappedTriggerItems->At(mapped_i));
             UInt_t iDetector = mapped->GetDetector();
             UInt_t iChannel = mapped->GetChannel();
             UInt_t iType = mapped->GetType() + 1; // 1, 2, ... 4

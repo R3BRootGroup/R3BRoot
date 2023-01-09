@@ -68,7 +68,7 @@ Bool_t R3BFootSiReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BFootSiReader::Read()
+Bool_t R3BFootSiReader::R3BRead()
 {
     R3BLOG(debug1, "Event data");
     // Read FOOT detectors

@@ -167,7 +167,7 @@ Bool_t R3BS515PspxReader::WriteMappedData(EXT_STR_h101_PSP_onion* source)
  * Converts plain raw data to multi-dimensional array.
  * Ignores energies with an error message.
  */
-Bool_t R3BS515PspxReader::Read()
+Bool_t R3BS515PspxReader::R3BRead()
 {
     if (fShift > 0)
     {

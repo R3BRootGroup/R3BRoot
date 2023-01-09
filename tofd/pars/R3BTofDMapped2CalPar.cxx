@@ -66,20 +66,20 @@ InitStatus R3BTofDMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("TofdMapped"));
     if (!fMapped)
     {
         R3BLOG(fatal, "TofdMapped not found");
         return kFATAL;
     }
-    fMappedTrigger = (TClonesArray*)rm->GetObject("TofdTriggerMapped");
+    fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("TofdTriggerMapped"));
     if (!fMappedTrigger)
     {
         R3BLOG(warn, "TofdTriggerMapped not found");
         fMappedTrigger = NULL;
     }
 
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofdTCalPar"));
     if (!fCalPar)
     {
         R3BLOG(error, "Couldn't get handle on TofdTCalPar. ");
@@ -110,7 +110,7 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto mapped = (R3BTofdMappedData const*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BTofdMappedData const*>(fMapped->At(i));
 
         if (mapped->GetDetectorId() > fNofPlanes)
         {
@@ -138,7 +138,7 @@ void R3BTofDMapped2CalPar::Exec(Option_t* option)
         // Loop over mapped triggers
         for (Int_t i = 0; i < nHits; i++)
         {
-            auto mapped = (R3BTofdMappedData const*)fMappedTrigger->At(i);
+            auto mapped = dynamic_cast<R3BTofdMappedData const*>(fMappedTrigger->At(i));
 
             if (mapped->GetDetectorId() != fNofPlanes + 1)
             {

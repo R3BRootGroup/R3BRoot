@@ -113,7 +113,7 @@ InitStatus R3BPspxMapped2Precal::Init()
     }
 
     // R3BEventHeader for trigger information, if needed!
-    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    fHeader = dynamic_cast<R3BEventHeader*>(fMan->GetObject("R3BEventHeader"));
 
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Figure out how many detectors were registered by the reader
@@ -123,7 +123,7 @@ InitStatus R3BPspxMapped2Precal::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cMapped", d + 1, xy[f])); // = branch name in TTree
+            tmp[f] = dynamic_cast<TClonesArray*>(fMan->GetObject(Form("Pspx%d_%cMapped", d + 1, xy[f]))); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
@@ -174,7 +174,7 @@ void R3BPspxMapped2Precal::SetParContainers()
         LOG(info) << "R3BPspxMapped2Precal::SetParContainers()";
     }
 
-    fPrecalPar = (R3BPspxPrecalPar*)rtdb->getContainer("R3BPspxPrecalPar");
+    fPrecalPar = dynamic_cast<R3BPspxPrecalPar*>(rtdb->getContainer("R3BPspxPrecalPar"));
     if (!fPrecalPar)
     {
         LOG(error) << "R3BPspxMapped2Precal::Could not get access to R3BPspxPrecalPar-Container.";
@@ -228,7 +228,7 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         for (Int_t i = 0; i < nMapped; i++)
         {
 
-            R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItems[d]->At(i);
+            R3BPspxMappedData* mappedData = dynamic_cast<R3BPspxMappedData*>(fMappedItems[d]->At(i));
 
             // get rid of error message from Febex (GSI firmware)
             if (mappedData->GetEnergy1() == 3075811 || mappedData->GetEnergy1() == 3075810)

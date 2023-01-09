@@ -67,7 +67,7 @@ class TClonesArray;
         R3BLOG(error, "Failed to setup UCESB structure information.");                     \
         return kFALSE;                                                                     \
     }
-#define R3B_BUNCHED_FIBER_INIT_END_ return R3BBunchedFiberReader::Init()
+#define R3B_BUNCHED_FIBER_INIT_END_ return R3BBunchedFiberReader::Init(nullptr)
 
 #define R3B_BUNCHED_FIBER_INIT(NAME, data)                                       \
     do                                                                           \
@@ -164,8 +164,8 @@ class R3BBunchedFiberReader : public R3BReader
     };
 
     R3BBunchedFiberReader(char const*, size_t, UInt_t, UInt_t, UInt_t);
-    Bool_t Init();
-    Bool_t Read();
+    Bool_t Init(ext_data_struct_info*);
+    Bool_t R3BRead();
     void Reset();
 
   protected:

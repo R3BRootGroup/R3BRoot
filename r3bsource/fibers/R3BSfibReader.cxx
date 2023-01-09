@@ -56,7 +56,7 @@ Bool_t R3BSfibReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BSfibReader::Read()
+Bool_t R3BSfibReader::R3BRead()
 {
 #define PERM(side, side_i, edge, edge_i)                                   \
     do                                                                     \

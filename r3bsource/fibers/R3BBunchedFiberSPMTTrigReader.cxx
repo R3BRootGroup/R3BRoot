@@ -57,7 +57,7 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BBunchedFiberSPMTTrigReader::Read()
+Bool_t R3BBunchedFiberSPMTTrigReader::R3BRead()
 {
     EXT_STR_h101_FIB_onion* data = (EXT_STR_h101_FIB_onion*)fData;
 

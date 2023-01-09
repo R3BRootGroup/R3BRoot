@@ -68,14 +68,14 @@ InitStatus R3BPtofCal2HitPar::Init()
         return kFATAL;
     }
 
-    fCalData = (TClonesArray*)fMan->GetObject("PtofCal");
+    fCalData = dynamic_cast<TClonesArray*>(fMan->GetObject("PtofCal"));
     if (NULL == fCalData)
     {
         LOG(fatal) << "Branch PtofCal not found!";
         return kFATAL;
     }
 
-    fPar = (R3BPtofHitPar*)FairRuntimeDb::instance()->getContainer("PtofHitPar");
+    fPar = dynamic_cast<R3BPtofHitPar*>(FairRuntimeDb::instance()->getContainer("PtofHitPar"));
     if (NULL == fPar)
     {
         LOG(fatal) << "PtofHitPar not found!";
@@ -101,7 +101,7 @@ void R3BPtofCal2HitPar::Exec(Option_t* option)
     Int_t nData = fCalData->GetEntriesFast();
     for (Int_t i = 0; i < nData; i++)
     {
-        R3BPaddleCalData* cdata = (R3BPaddleCalData*)fCalData->At(i);
+        R3BPaddleCalData* cdata = dynamic_cast<R3BPaddleCalData*>(fCalData->At(i));
 
         Int_t id = (cdata->GetPlane() - 1) * PtofPaddlesPerPlane + cdata->GetBar() - 1;
 

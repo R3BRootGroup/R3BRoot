@@ -55,7 +55,7 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 
     // Look for the R3BEventHeader
     auto frm = FairRootManager::Instance();
-    fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fHeader)
     {
         R3BLOG(warn, "EventHeader. not found");
@@ -66,7 +66,7 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BUnpackReader::Read()
+Bool_t R3BUnpackReader::R3BRead()
 {
     /* Display data */
     //	LOG(info) << "  Event data:";

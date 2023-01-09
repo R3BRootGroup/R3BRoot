@@ -165,15 +165,15 @@ InitStatus R3BTofiCal2Histo::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
-    fCalData = (TClonesArray*)rm->GetObject("TofiCal");
+    fCalData = dynamic_cast<TClonesArray*>(rm->GetObject("TofiCal"));
     if (NULL == fCalData)
     {
         LOG(fatal) << "Branch TofiCal not found";
     }
-    fCalTriggerItems = (TClonesArray*)rm->GetObject("TofiTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(rm->GetObject("TofiTriggerCal"));
     if (NULL == fCalTriggerItems)
         LOG(fatal) << "Branch TofiTriggerCal not found";
 
@@ -194,7 +194,7 @@ void R3BTofiCal2Histo::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer("TofiHitPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
@@ -240,7 +240,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofiCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofiCalData*>(fCalData->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';
@@ -280,8 +280,8 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {
-                auto top_trig = (R3BTofiCalData const*)fCalTriggerItems->At(top_trig_i);
-                auto bot_trig = (R3BTofiCalData const*)fCalTriggerItems->At(bot_trig_i);
+                auto top_trig = dynamic_cast<R3BTofiCalData const*>(fCalTriggerItems->At(top_trig_i));
+                auto bot_trig = dynamic_cast<R3BTofiCalData const*>(fCalTriggerItems->At(bot_trig_i));
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
                 /*

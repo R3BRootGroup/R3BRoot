@@ -113,12 +113,12 @@ InitStatus R3BGlobalAnalysisS454::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     FairRunOnline* run = FairRunOnline::Instance();
 
     // Get objects for detectors on all levels
-    fMCTrack = (TClonesArray*)mgr->GetObject("MCTrack");
-    fTrack = (TClonesArray*)mgr->GetObject("Track");
+    fMCTrack = dynamic_cast<TClonesArray*>(mgr->GetObject("MCTrack"));
+    fTrack = dynamic_cast<TClonesArray*>(mgr->GetObject("Track"));
     maxevent = mgr->CheckMaxEventNo();
 
     //------------------------------------------------------------------------
@@ -435,7 +435,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         // if(nHitsTrack>0) cout << "Track hits: " << nHitsTrack << endl;
         for (Int_t l = 0; l < nHitsTrack; l++)
         {
-            R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
+            R3BTrack* aTrack = dynamic_cast<R3BTrack*>(fTrack->At(l));
 
             LOG(debug) << "Charge " << aTrack->GetQ() << endl;
 
@@ -511,7 +511,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
             // cout << "Original MC Data is analyzed" << endl;
-            R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
+            R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fMCTrack->At(l));
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();

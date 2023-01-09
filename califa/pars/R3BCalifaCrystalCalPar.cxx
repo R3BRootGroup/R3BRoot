@@ -33,7 +33,6 @@ R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* tit
 // ----  Destructor ------------------------------------------------------------
 R3BCalifaCrystalCalPar::~R3BCalifaCrystalCalPar()
 {
-    clear();
     if (fCryCalParams)
         delete fCryCalParams;
 }

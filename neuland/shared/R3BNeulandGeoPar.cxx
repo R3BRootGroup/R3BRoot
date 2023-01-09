@@ -72,14 +72,14 @@ void R3BNeulandGeoPar::printParams()
 
 void R3BNeulandGeoPar::SetNeulandGeoNode(const TGeoNode* const p)
 {
-    fNeulandGeoNode = (TGeoNode*)p->Clone();
+    fNeulandGeoNode = dynamic_cast<TGeoNode*>(p->Clone());
     BuildPaddleLookup();
 }
 
 Double_t R3BNeulandGeoPar::GetPaddleHalfLength() const
 {
     // All paddles have to have the same length
-    return ((TGeoBBox*)fNeulandGeoNode->GetDaughter(0)->GetVolume()->GetShape())->GetDX();
+    return (dynamic_cast<TGeoBBox*>(fNeulandGeoNode->GetDaughter(0)->GetVolume()->GetShape()))->GetDX();
 }
 
 // Convert positions of e.g. points to the local coordinate of the respective paddle [(-135,135),(-2.5,2.5),(-2.5,2.5)]

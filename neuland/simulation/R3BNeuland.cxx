@@ -150,7 +150,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
                                                       fLightYield);
 
         // Increment number of LandPoints for this track
-        auto stack = (R3BStack*)gMC->GetStack();
+        auto stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kNEULAND);
         ResetValues();
     }
@@ -209,7 +209,7 @@ void R3BNeuland::ResetValues()
 void R3BNeuland::WriteParameterFile()
 {
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
-    fNeulandGeoPar = (R3BNeulandGeoPar*)rtdb->getContainer("R3BNeulandGeoPar");
+    fNeulandGeoPar = dynamic_cast<R3BNeulandGeoPar*>(rtdb->getContainer("R3BNeulandGeoPar"));
 
     // Really bad way to find the Neuland *node* (not the volume!)
     TGeoNode* geoNodeNeuland = nullptr;

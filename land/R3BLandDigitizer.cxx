@@ -97,7 +97,7 @@ void R3BLandDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    fLandDigiPar = dynamic_cast<R3BLandDigiPar*>(rtdb->getContainer("R3BLandDigiPar"));
 
     if (fVerbose && fLandDigiPar)
     {
@@ -114,7 +114,7 @@ InitStatus R3BLandDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fLandPoints = (TClonesArray*)ioman->GetObject("LandPoint");
+    fLandPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("LandPoint"));
 
     // Register output array LandDigi
     fLandDigi = new TClonesArray("R3BLandDigi", 1000);
@@ -245,7 +245,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentries; l++)
     {
-        R3BLandPoint* land_obj = (R3BLandPoint*)fLandPoints->At(l);
+        R3BLandPoint* land_obj = dynamic_cast<R3BLandPoint*>(fLandPoints->At(l));
 
         Int_t paddle = int(land_obj->GetSector()) - 1; // note that paddle starts at 1
         Int_t scint = int(land_obj->GetPaddleNb());

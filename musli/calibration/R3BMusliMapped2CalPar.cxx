@@ -78,16 +78,16 @@ void R3BMusliMapped2CalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "R3BMusliMapped2CalPar::SetParContainers(), FairRuntimeDb not found");
 
-    fMusliGeo_Par = (R3BTGeoPar*)rtdb->getContainer("MusliGeoPar");
+    fMusliGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("MusliGeoPar"));
     R3BLOG_IF(
         error, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to MusliGeoPar container.");
 
-    fMwAGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetA + "GeoPar");
+    fMwAGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetA + "GeoPar"));
     R3BLOG_IF(error,
               !fMwAGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetA + "GeoPar container.");
 
-    fMwBGeo_Par = (R3BTGeoPar*)rtdb->getContainer(fNameDetB + "GeoPar");
+    fMwBGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetB + "GeoPar"));
     R3BLOG_IF(error,
               !fMwBGeo_Par,
               "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetB + "GeoPar container.");
@@ -105,7 +105,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
+    fMusliMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("MusliMappedData"));
     if (!fMusliMappedDataCA)
     {
         LOG(error) << "R3BMusliMapped2CalPar: MusliMappedData not found";
@@ -113,7 +113,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     }
 
     // get access to hit data of the first Mwpc (A)
-    fMwAHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
+    fMwAHitDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetA + "HitData"));
     if (!fMwAHitDataCA)
     {
         LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetA + "HitData not found";
@@ -121,7 +121,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
     }
 
     // get access to hit data of the second Mwpc (B)
-    fMwBHitDataCA = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
+    fMwBHitDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetB + "HitData"));
     if (!fMwBHitDataCA)
     {
         LOG(error) << "R3BMusliMapped2CalPar: " + fNameDetB + "HitData not found";
@@ -135,7 +135,7 @@ InitStatus R3BMusliMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
+    fCal_Par = dynamic_cast<R3BMusliCalPar*>(rtdb->getContainer("musliCalPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BMusliMapped2CalPar::Couldn't get handle on musliCalPar container";
@@ -183,7 +183,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusliMappedData*)(fMusliMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusliMappedData*>(fMusliMappedDataCA->At(i));
         UInt_t signal_id = mappedData[i]->GetSignal() - 1; // signal_id is 0-based [0..17]
         if (multMap[signal_id] < fMaxMult)
         {
@@ -203,7 +203,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         return;
     else
     {
-        R3BMwpcHitData* hitDataMwA = (R3BMwpcHitData*)fMwAHitDataCA->At(0);
+        R3BMwpcHitData* hitDataMwA = dynamic_cast<R3BMwpcHitData*>(fMwAHitDataCA->At(0));
         fXA = hitDataMwA->GetX() + fMwAGeo_Par->GetPosX();
     }
 
@@ -213,7 +213,7 @@ void R3BMusliMapped2CalPar::Exec(Option_t* option)
         return;
     else
     {
-        R3BMwpcHitData* hitDataMwB = (R3BMwpcHitData*)fMwBHitDataCA->At(0);
+        R3BMwpcHitData* hitDataMwB = dynamic_cast<R3BMwpcHitData*>(fMwBHitDataCA->At(0));
         fXB = hitDataMwB->GetX() + fMwBGeo_Par->GetPosX();
     }
 
@@ -270,7 +270,7 @@ void R3BMusliMapped2CalPar::CalculatePosCalPar()
 
             sprintf(Name, "pfx_XvsDT_GroupAnode%02d", i);
             fh2_XvsDT[i]->ProfileX(Name);
-            h1_pfx_XvsDT[i] = (TH1D*)gDirectory->FindObject(Name);
+            h1_pfx_XvsDT[i] = dynamic_cast<TH1D*>(gDirectory->FindObject(Name));
             h1_pfx_XvsDT[i]->Fit(fit_pol1_XvsDT[i], "R+");
 
             Double_t offset_alignment = fit_pol1_XvsDT[i]->GetParameter(0);

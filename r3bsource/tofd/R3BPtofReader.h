@@ -52,7 +52,7 @@ class R3BPtofReader : public R3BReader
      * Copy data from the ucesb data stream to
      * native data containers, called by R3BUcesbSource.
      */
-    Bool_t Read();
+    Bool_t R3BRead();
 
     /*
      * Reset the internal output array.

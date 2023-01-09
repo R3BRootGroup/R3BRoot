@@ -69,7 +69,7 @@ InitStatus R3BMCTracks::Init()
         cout << "R3BMCTracks::Init()" << endl;
 
     FairRootManager* fManager = FairRootManager::Instance();
-    fTrackList = (TClonesArray*)fManager->GetObject("GeoTracks");
+    fTrackList = dynamic_cast<TClonesArray*>(fManager->GetObject("GeoTracks"));
     if (fTrackList == 0)
     {
         cout << "FairMCPointDraw::Init()  branch " << GetName() << " Not found! Task will be deactivated " << endl;
@@ -109,8 +109,8 @@ void R3BMCTracks::Exec(Option_t* option)
         {
             if (fVerbose > 2)
                 cout << "FairMCTracks::Exec " << i << endl;
-            tr = (TGeoTrack*)fTrackList->At(i);
-            TParticle* P = (TParticle*)tr->GetParticle();
+            tr = dynamic_cast<TGeoTrack*>(fTrackList->At(i));
+            TParticle* P = dynamic_cast<TParticle*>(tr->GetParticle());
 
             PEnergy = (P->Energy() - P->GetCalcMass()) * 1000; //[MeV]
             MinEnergyLimit = TMath::Min(PEnergy - 10, MinEnergyLimit);
@@ -132,7 +132,7 @@ void R3BMCTracks::Exec(Option_t* option)
             if ((PEnergy < fEventManager->GetMinEnergy()) || (PEnergy > fEventManager->GetMaxEnergy()))
                 continue;
 
-            ((R3BEventManager*)fEventManager)->AddParticlesToPdgDataBase(tr->GetPDG());
+            (dynamic_cast<R3BEventManager*>(fEventManager))->AddParticlesToPdgDataBase(tr->GetPDG());
             if (fVerbose > 3)
                 cout << "Particle with PDG " << tr->GetPDG() << " added to DataBase " << endl;
             if (fVerbose > 3)
@@ -168,7 +168,7 @@ void R3BMCTracks::Exec(Option_t* option)
             track->SetTitle(title);
 
             // Set the line width depending on energy
-            if (((R3BEventManager*)fEventManager)->IsScaleByEnergy())
+            if ((dynamic_cast<R3BEventManager*>(fEventManager))->IsScaleByEnergy())
             {
                 Int_t lineWidth =
                     (Int_t)(PEnergy / TMath::Min(fEventManager->GetMaxEnergy(), (Float_t)MaxEnergyLimit) * 15.0);

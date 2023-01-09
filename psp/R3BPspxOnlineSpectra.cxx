@@ -89,7 +89,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -105,10 +105,10 @@ InitStatus R3BPspxOnlineSpectra::Init()
     {
         for (Int_t f = 0; f < 2; f++)
         {
-            fMappedItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cMapped", d + 1, c_xy[f])));
-            fPrecalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cPrecal", d + 1, c_xy[f])));
-            fCalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cCal", d + 1, c_xy[f])));
-            fHitItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cHit", d + 1, c_xy[f])));
+            fMappedItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cMapped", d + 1, c_xy[f]))));
+            fPrecalItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cPrecal", d + 1, c_xy[f]))));
+            fCalItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cCal", d + 1, c_xy[f]))));
+            fHitItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cHit", d + 1, c_xy[f]))));
         }
 
         if (fMappedItemsPspx[0] == NULL)
@@ -313,7 +313,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
         fh_pspx_multiplicity[d]->Fill(nHits);
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx[d]->At(ihit);
+            R3BPspxMappedData* mappedData = dynamic_cast<R3BPspxMappedData*>(fMappedItemsPspx[d]->At(ihit));
 
             fh_pspx_strip_1[d]->Fill(mappedData->GetStrip1());
             fh_pspx_strip_2[d]->Fill(mappedData->GetStrip2());
@@ -329,8 +329,8 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BPspxCalData* calData1 = (R3BPspxCalData*)fCalItemsPspx[2 * d]->At(ihit);
-            R3BPspxCalData* calData2 = (R3BPspxCalData*)fCalItemsPspx[2 * d + 1]->At(ihit);
+            R3BPspxCalData* calData1 = dynamic_cast<R3BPspxCalData*>(fCalItemsPspx[2 * d]->At(ihit));
+            R3BPspxCalData* calData2 = dynamic_cast<R3BPspxCalData*>(fCalItemsPspx[2 * d + 1]->At(ihit));
             fh_pspx_cal_strip_frontback[d]->Fill(calData1->GetStrip(), calData2->GetStrip());
             fh_pspx_cal_pos_frontback[d]->Fill(calData1->GetPos(), calData2->GetPos());
             fh_pspx_cal_energy_frontback[d]->Fill(calData1->GetEnergy(), calData2->GetEnergy());
@@ -343,7 +343,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
         Int_t nHits_cal = fPrecalItemsPspx[d]->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits_cal; ihit++)
         {
-            R3BPspxPrecalData* precalData = (R3BPspxPrecalData*)fPrecalItemsPspx[d]->At(ihit);
+            R3BPspxPrecalData* precalData = dynamic_cast<R3BPspxPrecalData*>(fPrecalItemsPspx[d]->At(ihit));
             fh_pspx_cal_strip[d]->Fill(precalData->GetStrip());
         }
     }

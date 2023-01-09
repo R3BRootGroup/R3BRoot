@@ -65,9 +65,9 @@ InitStatus R3BOnlineSpectraSci2::Init()
     if (NULL == mgr)
         LOG(fatal) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
 
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -75,7 +75,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     // --- ------------------------- --- //
     // --- get access to mapped data --- //
     // --- ------------------------- --- //
-    fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
+    fMapped = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Mapped"));
     if (!fMapped)
     {
         LOG(fatal) << "Sci2Mapped not found";
@@ -85,7 +85,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     // --- ------------------------ --- //
     // --- get access to tcal data  --- //
     // --- ------------------------ --- //
-    fTcal = (TClonesArray*)mgr->GetObject("Sci2Tcal");
+    fTcal = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Tcal"));
     if (!fTcal)
     {
         LOG(warn) << "Sci2Tcal not found: is OK";
@@ -455,7 +455,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
         nHits = fMapped->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci2MappedData* hitmapped = (R3BSci2MappedData*)fMapped->At(ihit);
+            R3BSci2MappedData* hitmapped = dynamic_cast<R3BSci2MappedData*>(fMapped->At(ihit));
             if (!hitmapped)
                 continue;
             iDet = hitmapped->GetDetector() - 1;
@@ -472,7 +472,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
             nHits = fTcal->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fTcal->At(ihit);
+                R3BSci2TcalData* hittcal = dynamic_cast<R3BSci2TcalData*>(fTcal->At(ihit));
                 if (!hittcal)
                     continue;
                 iDet = hittcal->GetDetector() - 1;

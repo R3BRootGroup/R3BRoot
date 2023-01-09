@@ -30,7 +30,7 @@ class R3BSci8Reader : public R3BReader
     ~R3BSci8Reader();
 
     Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
+    Bool_t R3BRead();
     void Reset();
     virtual void FinishTask();
 

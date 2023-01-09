@@ -75,8 +75,8 @@ InitStatus R3BTofdDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTofdPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TOFdPoint"));
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array fTofdHits
     fTofdHits = new TClonesArray("R3BTofdHitData", 1000);
@@ -112,7 +112,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
     for (Int_t entry = 0; entry < n_entries; entry++)
     {
 
-        R3BTofdPoint* data_element = (R3BTofdPoint*)fTofdPoints->At(entry);
+        R3BTofdPoint* data_element = dynamic_cast<R3BTofdPoint*>(fTofdPoints->At(entry));
 
         Int_t DetectorID = data_element->GetDetectorID();
         Double_t energy_loss = data_element->GetEnergyLoss();

@@ -109,20 +109,20 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     }
     Int_t BinsChannelFebex = 65535;
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("", this);
 
     // get access to Mapped data
-    fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
+    fMappedItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaMappedData"));
     if (!fMappedItemsCalifa)
     {
         return kFATAL;
     }
 
     // get access to Cal data
-    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
+    fCalItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaCrystalCalData"));
     if (!fCalItemsCalifa)
     {
         LOG(info) << "R3BCalifaDemoOnlineSpectra::Init CalifaCrystalCalData not found";
@@ -130,21 +130,21 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     }
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    fHitItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaClusterData"));
     if (!fHitItemsCalifa)
     {
         LOG(info) << "R3BCalifaDemoOnlineSpectra::Init CalifaClusterData not found";
     }
 
     // get access to WR-Califa data
-    fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
+    fWRItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("WRCalifaData"));
     if (!fWRItemsCalifa)
     {
         LOG(info) << "R3BCalifaDemoOnlineSpectra::Init WRCalifaData not found";
     }
 
     // get access to WR-Master data
-    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+    fWRItemsMaster = dynamic_cast<TClonesArray*>(mgr->GetObject("WRMasterData"));
     if (!fWRItemsMaster)
     {
         LOG(info) << "R3BCalifaDemoOnlineSpectra::Init WRMasterData not found";
@@ -1076,7 +1076,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             wrc = hit->GetTimeStamp();
@@ -1088,13 +1088,13 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsMaster->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsMaster->At(ihit));
             if (!hit)
                 continue;
             wrm = hit->GetTimeStamp();
         }
     }
-    if (fWRItemsCalifa->GetEntriesFast() || fWRItemsMaster->GetEntriesFast())
+    if (wrc!=0 || wrm !=0)
     {
         fh_Califa_wr->Fill(wrc - wrm);
     }
@@ -1111,7 +1111,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaMappedData* hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
+            R3BCalifaMappedData* hit = dynamic_cast<R3BCalifaMappedData*>(fMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1151,7 +1151,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaCrystalCalData* hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
+            R3BCalifaCrystalCalData* hit = dynamic_cast<R3BCalifaCrystalCalData*>(fCalItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1210,7 +1210,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaClusterData* hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaClusterData* hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;
