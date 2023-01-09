@@ -68,7 +68,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BBeamMonitorReader::Read()
+Bool_t R3BBeamMonitorReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;

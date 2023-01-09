@@ -108,48 +108,48 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     }
 
     // Set Input: TClonesArray of R3BNeulandNeutrons
-    if ((TClonesArray*)ioman->GetObject(fInput) == nullptr)
+    if (dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)) == nullptr)
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No " << fInput << "!";
         return kFATAL;
     }
-    if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
                    << " does not contain "
                       "R3BNeulandNeutrons!";
         return kFATAL;
     }
-    fReconstructedNeutrons = (TClonesArray*)ioman->GetObject(fInput);
+    fReconstructedNeutrons = dynamic_cast<TClonesArray*>(ioman->GetObject(fInput));
 
     // Set Input: TClonesArray of FairMCPoints
-    if ((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints") == nullptr)
+    if (dynamic_cast<TClonesArray*>(ioman->GetObject("NeulandPrimaryPoints")) == nullptr)
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No NeulandPrimaryPoints!";
         return kFATAL;
     }
-    if (!TString(((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints"))->GetClass()->GetName())
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("NeulandPrimaryPoints")))->GetClass()->GetName())
              .EqualTo("R3BNeulandPoint"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryPoints "
                       "does not contain R3BNeulandPoint!";
         return kFATAL;
     }
-    fPrimaryNeutronInteractionPoints = (TClonesArray*)ioman->GetObject("NeulandPrimaryPoints");
+    fPrimaryNeutronInteractionPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("NeulandPrimaryPoints"));
 
     // Set Input: TClonesArray of R3BMCTrack
-    if ((TClonesArray*)ioman->GetObject("MCTrack") == nullptr)
+    if (dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")) == nullptr)
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No MCTrack!";
         return kFATAL;
     }
-    if (!TString(((TClonesArray*)ioman->GetObject("MCTrack"))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
                       "does not contain FairMCPoints!";
         return kFATAL;
     }
-    fMCTracks = (TClonesArray*)ioman->GetObject("MCTrack");
+    fMCTracks = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     TH1::AddDirectory(kFALSE);
 
@@ -179,7 +179,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
     neutrons.reserve(nReconstructedNeutrons);
     for (Int_t i = 0; i < nReconstructedNeutrons; i++)
     {
-        neutrons.push_back(*((R3BNeulandNeutron*)fReconstructedNeutrons->At(i)));
+        neutrons.push_back(*(dynamic_cast<R3BNeulandNeutron*>(fReconstructedNeutrons->At(i))));
     }
 
     const Int_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
@@ -187,7 +187,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
     npnips.reserve(nReconstructedNeutrons);
     for (Int_t i = 0; i < nNPNIPS; i++)
     {
-        npnips.push_back(*((R3BNeulandPoint*)fPrimaryNeutronInteractionPoints->At(i)));
+        npnips.push_back(*(dynamic_cast<R3BNeulandPoint*>(fPrimaryNeutronInteractionPoints->At(i))));
     }
     fhCountN->Fill(nReconstructedNeutrons);
     fhCountNdiff->Fill((Int_t)nNPNIPS - (Int_t)nReconstructedNeutrons);
@@ -252,7 +252,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
         for (const auto& npnip : npnips)
         {
             // Workaround mom = 0
-            R3BMCTrack* MCTrack = (R3BMCTrack*)fMCTracks->At(npnip.GetTrackID());
+            R3BMCTrack* MCTrack = dynamic_cast<R3BMCTrack*>(fMCTracks->At(npnip.GetTrackID()));
             p4_npnips += TLorentzVector(MCTrack->GetPx() * 1000.,
                                         MCTrack->GetPy() * 1000.,
                                         MCTrack->GetPz() * 1000.,
@@ -264,7 +264,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
         const Int_t nMCTracks = fMCTracks->GetEntries();
         for (Int_t i = 0; i < nMCTracks; i++)
         {
-            MCTrack = (R3BMCTrack*)fMCTracks->At(i);
+            MCTrack = dynamic_cast<R3BMCTrack*>(fMCTracks->At(i));
             // We are only interested in primary particles, these should come first,
             // thus we can stop once the Mother Id != -1
             if (MCTrack->GetMotherId() != -1)

@@ -94,27 +94,27 @@ InitStatus R3BMusicOnlineSpectra::Init()
         LOG(fatal) << "R3BMusicOnlineSpectra::Init FairRootManager not found";
         return kFATAL;
     }
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     // get access to mapped data of the MUSIC
-    fMappedItemsMus = (TClonesArray*)mgr->GetObject("MusicMappedData");
+    fMappedItemsMus = dynamic_cast<TClonesArray*>(mgr->GetObject("MusicMappedData"));
     if (!fMappedItemsMus)
     {
         return kFATAL;
     }
 
     // get access to cal data of the MUSIC
-    fCalItemsMus = (TClonesArray*)mgr->GetObject("MusicCalData");
+    fCalItemsMus = dynamic_cast<TClonesArray*>(mgr->GetObject("MusicCalData"));
     if (!fCalItemsMus)
         LOG(warn) << "R3BMusicOnlineSpectra: MusicCalData not found";
 
     // get access to hit data of the MUSIC
-    fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
+    fHitItemsMus = dynamic_cast<TClonesArray*>(mgr->GetObject("MusicHitData"));
     if (!fHitItemsMus)
         LOG(warn) << "R3BMusicOnlineSpectra: MusicHitData not found";
 
@@ -511,7 +511,7 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fMappedItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicMappedData* hit = (R3BMusicMappedData*)fMappedItemsMus->At(ihit);
+            R3BMusicMappedData* hit = dynamic_cast<R3BMusicMappedData*>(fMappedItemsMus->At(ihit));
             if (!hit)
                 continue;
             multhit[hit->GetAnodeID()]++;
@@ -581,7 +581,7 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fCalItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicCalData* hit = (R3BMusicCalData*)fCalItemsMus->At(ihit);
+            R3BMusicCalData* hit = dynamic_cast<R3BMusicCalData*>(fCalItemsMus->At(ihit));
             if (!hit)
                 continue;
             fh1_Muscal_Pos[hit->GetAnodeID()]->Fill(hit->GetDTime());
@@ -594,7 +594,7 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fHitItemsMus->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            R3BMusicHitData* hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
             if (!hit)
                 continue;
             fh1_Mushit_z->Fill(hit->GetZcharge());

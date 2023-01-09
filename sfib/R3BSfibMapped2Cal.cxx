@@ -52,7 +52,7 @@ InitStatus R3BSfibMapped2Cal::Init()
         return kERROR;
     }
     auto name = "SfibMapped";
-    fMappedItems = (TClonesArray*)mgr->GetObject(name);
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fMappedItems)
     {
         LOG(error) << "Branch " << name << " not found.";
@@ -65,7 +65,7 @@ InitStatus R3BSfibMapped2Cal::Init()
 void R3BSfibMapped2Cal::SetParContainers()
 {
     auto name = "SfibTCalPar";
-    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    fTCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name));
     if (!fTCalPar)
     {
         LOG(error) << "Could not get access to " << name << " container.";
@@ -84,7 +84,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
     LOG(debug) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BSfibMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BSfibMappedData*>(fMappedItems->At(i));
         assert(mapped);
 
         auto channel = mapped->GetChannel();

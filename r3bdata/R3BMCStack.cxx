@@ -205,7 +205,7 @@ TParticle* R3BStack::PopPrimaryForTracking(Int_t iPrim)
 
     // Return the iPrim-th TParticle from the fParticle array. This should be
     // a primary.
-    TParticle* part = (TParticle*)fParticles->At(iPrim);
+    TParticle* part = dynamic_cast<TParticle*>(fParticles->At(iPrim));
     if (!(part->GetMother(0) < 0))
     {
         LOG(fatal) << "R3BStack:: Not a primary track! " << iPrim;
@@ -295,7 +295,7 @@ void R3BStack::FillTrackArray()
     fIndexMap[-1] = -1;
 
     // --> Screen output
-    Print(0);
+    PrintStack(0);
 }
 // -------------------------------------------------------------------------
 
@@ -311,7 +311,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
     // First update mother ID in MCTracks
     for (Int_t i = 0; i < fNTracks; i++)
     {
-        R3BMCTrack* track = (R3BMCTrack*)fTracks->At(i);
+        R3BMCTrack* track = dynamic_cast<R3BMCTrack*>(fTracks->At(i));
         Int_t iMotherOld = track->GetMotherId();
         fIndexIter = fIndexMap.find(iMotherOld);
         if (fIndexIter == fIndexMap.end())
@@ -325,7 +325,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
     TIterator* detIter = detList->MakeIterator();
     detIter->Reset();
     FairDetector* det = NULL;
-    while ((det = (FairDetector*)detIter->Next()))
+    while ((det = dynamic_cast<FairDetector*>(detIter->Next())))
     {
 
         // --> Get hit collections from detector
@@ -339,7 +339,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList)
             // --> Update track index for all MCPoints in the collection
             for (Int_t iPoint = 0; iPoint < nPoints; iPoint++)
             {
-                FairMCPoint* point = (FairMCPoint*)hitArray->At(iPoint);
+                FairMCPoint* point = dynamic_cast<FairMCPoint*>(hitArray->At(iPoint));
                 Int_t iTrack = point->GetTrackID();
 
                 LOG(debug) << "R3BMCStack TrackID Get : " << iTrack;
@@ -382,7 +382,7 @@ void R3BStack::Register() { FairRootManager::Instance()->Register("MCTrack", "St
 // -------------------------------------------------------------------------
 
 // -----   Public method Print  --------------------------------------------
-void R3BStack::Print(Int_t iVerbose) const
+void R3BStack::PrintStack(Int_t iVerbose) const
 {
     LOG(info) << "R3BStack: Number of primaries = " << fNPrimaries;
     LOG(info) << "          Total number of particles = " << fNParticles;
@@ -393,7 +393,7 @@ void R3BStack::Print(Int_t iVerbose) const
         {
             char str[100];
             sprintf(str, "%d", iTrack);
-            ((R3BMCTrack*)fTracks->At(iTrack))->Print((Option_t*)str);
+            (dynamic_cast<R3BMCTrack*>(fTracks->At(iTrack)))->Print((Option_t*)str);
         }
     }
 }
@@ -439,7 +439,7 @@ TParticle* R3BStack::GetParticle(Int_t trackID) const
     {
         LOG(fatal) << "-E- R3BStack: Particle index " << trackID << " out of range";
     }
-    return (TParticle*)fParticles->At(trackID);
+    return dynamic_cast<TParticle*>(fParticles->At(trackID));
 }
 // -------------------------------------------------------------------------
 

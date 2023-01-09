@@ -100,39 +100,39 @@ InitStatus R3BRpcOnlineSpectra::Init()
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     // Look for the R3BEventHeader
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         R3BLOG(warn, "EventHeader. not found");
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(info, "EventHeader. found");
 
     // Get access to Mapped data
 
-    fMappedDataItems = (TClonesArray*)mgr->GetObject("R3BRpcMappedData");
+    fMappedDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("R3BRpcMappedData"));
     if (!fMappedDataItems)
     {
         R3BLOG(fatal, "RpcMappedData not found");
         return kFATAL;
     }
 
-    fPreCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcPreCalData");
+    fPreCalDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("R3BRpcPreCalData"));
     if (!fPreCalDataItems)
     {
         R3BLOG(fatal, "R3BRpcPreCalData not found");
         return kFATAL;
     }
 
-    fCalDataItems = (TClonesArray*)mgr->GetObject("R3BRpcCalData");
+    fCalDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("R3BRpcCalData"));
     if (!fCalDataItems)
     {
         R3BLOG(fatal, "R3BRpcCalData not found");
         return kFATAL;
     }
 
-    fHitDataItems = (TClonesArray*)mgr->GetObject("R3BRpcHitData");
+    fHitDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("R3BRpcHitData"));
     if (!fHitDataItems)
     {
         R3BLOG(fatal, "RpcHitData not found");
@@ -846,7 +846,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nMappedHits; ihit++)
         {
 
-            R3BRpcMappedData* hit = (R3BRpcMappedData*)fMappedDataItems->At(ihit);
+            R3BRpcMappedData* hit = dynamic_cast<R3BRpcMappedData*>(fMappedDataItems->At(ihit));
 
             if (!hit)
                 continue;
@@ -911,7 +911,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nPreCalHits; ihit++)
         {
 
-            R3BRpcPreCalData* hit = (R3BRpcPreCalData*)fPreCalDataItems->At(ihit);
+            R3BRpcPreCalData* hit = dynamic_cast<R3BRpcPreCalData*>(fPreCalDataItems->At(ihit));
 
             Int_t side = hit->GetSide();
 
@@ -957,7 +957,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nStripCalHits; ihit++)
         {
 
-            R3BRpcCalData* hit = (R3BRpcCalData*)fCalDataItems->At(ihit);
+            R3BRpcCalData* hit = dynamic_cast<R3BRpcCalData*>(fCalDataItems->At(ihit));
 
             if (hit->GetDetId() == 0)
             {
@@ -985,7 +985,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nStripHits; ihit++)
         {
 
-            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            R3BRpcHitData* hit = dynamic_cast<R3BRpcHitData*>(fHitDataItems->At(ihit));
 
             detId = hit->GetDetId();
             channelId = hit->GetChannelId();
@@ -1018,7 +1018,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nStripHits; ihit++)
         {
 
-            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            R3BRpcHitData* hit = dynamic_cast<R3BRpcHitData*>(fHitDataItems->At(ihit));
             detId = hit->GetDetId();
             channelId = hit->GetChannelId();
             pos = hit->GetPos();
@@ -1069,7 +1069,7 @@ void R3BRpcOnlineSpectra::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nStripHits; ihit++)
         {
 
-            R3BRpcHitData* hit = (R3BRpcHitData*)fHitDataItems->At(ihit);
+            R3BRpcHitData* hit = dynamic_cast<R3BRpcHitData*>(fHitDataItems->At(ihit));
             detId = hit->GetDetId();
             channelId = hit->GetChannelId();
             pos = hit->GetPos();

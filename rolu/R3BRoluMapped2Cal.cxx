@@ -92,17 +92,17 @@ InitStatus R3BRoluMapped2Cal::Init()
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(warn) << "R3BRoluMapped2Cal::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(info) << "R3BRoluMapped2Cal::Init() R3BEventHeader found";
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("RoluMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluMapped"));
     if (NULL == fMappedItems)
     {
         LOG(fatal) << "R3BRoluMapped2Cal::Branch RoluMapped not found";
@@ -110,7 +110,7 @@ InitStatus R3BRoluMapped2Cal::Init()
     }
 
     // get access to Trigger Mapped data
-    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerMapped");
+    fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerMapped"));
     if (!fMappedTriggerItems)
         LOG(warn) << "R3BRoluMapped2Cal::Branch RoluTriggerMapped not found";
 
@@ -130,7 +130,7 @@ InitStatus R3BRoluMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BRoluMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("RoluTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
 
     LOG(info) << "R3BRoluMapped2Cal::SetParContainers() ROLU TCAL PARAMETERS SET";
 
@@ -166,7 +166,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         Double_t times_ns = 0. / 0.;
         Double_t times_raw_ns = 0. / 0.;
 
-        R3BRoluMappedData* hit = (R3BRoluMappedData*)fMappedItems->At(ihit);
+        R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
@@ -231,7 +231,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BRoluCalData* aCalItem = (R3BRoluCalData*)fCalItems->At(iCal);
+            R3BRoluCalData* aCalItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iCal));
 
             if (aCalItem->GetDetector() != iDet)
             {
@@ -348,7 +348,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
-            auto mapped = (R3BRoluMappedData const*)fMappedTriggerItems->At(mapped_i);
+            auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTriggerItems->At(mapped_i));
 
             // Tcal parameters.
             auto* par = fTcalPar->GetModuleParAt(3, 1, 1);

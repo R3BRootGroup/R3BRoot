@@ -159,7 +159,7 @@ Bool_t R3BTrloiiSampReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BTrloiiSampReader::Read()
+Bool_t R3BTrloiiSampReader::R3BRead()
 {
     if (1 == fSNum && 1 == fSCNum)
     {

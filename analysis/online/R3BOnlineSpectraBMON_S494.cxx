@@ -110,7 +110,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("", this);
@@ -121,13 +121,13 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
     }
     maxevent = mgr->CheckMaxEventNo();
 
@@ -419,7 +419,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRoluMappedData* hit = (R3BRoluMappedData*)det->At(ihit);
+            R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -463,7 +463,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 /*
                  * nParts is the number of particle passing through detector in one event
                  */
-                R3BRoluCalData* calData = (R3BRoluCalData*)det->At(iPart);
+                R3BRoluCalData* calData = dynamic_cast<R3BRoluCalData*>(det->At(iPart));
                 iDet = calData->GetDetector();
 
                 for (Int_t iCha = 0; iCha < 4; iCha++)
@@ -519,7 +519,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
         {
 
-            R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)detBmon->At(ihit);
+            R3BBeamMonitorMappedData* hit = dynamic_cast<R3BBeamMonitorMappedData*>(detBmon->At(ihit));
             if (!hit)
                 continue;
 

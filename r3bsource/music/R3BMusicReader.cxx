@@ -71,7 +71,7 @@ Bool_t R3BMusicReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BMusicReader::Read()
+Bool_t R3BMusicReader::R3BRead()
 {
     // Read data for different dates, if needed!
     ReadData201911();

@@ -77,7 +77,7 @@ Bool_t R3BSci8Reader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BSci8Reader::Read()
+Bool_t R3BSci8Reader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_SCI8_onion* data = (EXT_STR_h101_SCI8_onion*)fData;

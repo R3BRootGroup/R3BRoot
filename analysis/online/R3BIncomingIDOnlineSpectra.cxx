@@ -85,10 +85,10 @@ void R3BIncomingIDOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, NULL == rtdb, "FairRuntimeDb not found");
 
-    fMw0GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc0GeoPar");
+    fMw0GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc0GeoPar"));
     R3BLOG_IF(error, !fMw0GeoPar, "Could not get access to Mwpc0GeoPar container.");
 
-    fMw1GeoPar = (R3BTGeoPar*)rtdb->getContainer("Mwpc1GeoPar");
+    fMw1GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc1GeoPar"));
     R3BLOG_IF(error, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
     return;
 }
@@ -102,17 +102,17 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(error, !header, "Branch EventHeader. not found");
 
     // get access to mapped data of FRS
-    fHitFrs = (TClonesArray*)mgr->GetObject("FrsData");
+    fHitFrs = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
     R3BLOG_IF(fatal, !fHitFrs, "Branch FrsData not found");
-    fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
+    fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     R3BLOG_IF(fatal, !fHitLos, "Branch LosHitData not found");
-    fMwpc0HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc0HitData");
+    fMwpc0HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc0HitData"));
     R3BLOG_IF(fatal, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
-    fMwpc1HitDataCA = (TClonesArray*)mgr->GetObject("Mwpc1HitData");
+    fMwpc1HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc1HitData"));
     R3BLOG_IF(fatal, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
 
     // Create histograms for detectors
@@ -382,7 +382,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fHitFrs->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFrsData* hit = (R3BFrsData*)fHitFrs->At(ihit);
+            R3BFrsData* hit = dynamic_cast<R3BFrsData*>(fHitFrs->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetStaId() != fStaId)
@@ -398,13 +398,13 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             auto nHits_Mw1 = fMwpc1HitDataCA->GetEntriesFast();
             for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
             {
-                auto hit_mw0 = (R3BMwpcHitData*)fMwpc0HitDataCA->At(iMw0);
+                auto hit_mw0 = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(iMw0));
                 if (!hit_mw0)
                     continue;
                 auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
                 for (Int_t iMw1 = 0; iMw1 < nHits_Mw1; iMw1++)
                 {
-                    auto hit_mw1 = (R3BMwpcHitData*)fMwpc1HitDataCA->At(iMw1);
+                    auto hit_mw1 = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(iMw1));
                     if (!hit_mw1)
                         continue;
                     auto mwpc1x = hit_mw1->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
@@ -428,7 +428,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
                 Int_t nHitsLos = fHitLos->GetEntriesFast();
                 for (Int_t ihitLos = 0; ihitLos < nHitsLos; ihitLos++)
                 {
-                    R3BLosHitData* hitLos = (R3BLosHitData*)fHitLos->At(ihitLos);
+                    R3BLosHitData* hitLos = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihitLos));
                     if (!hitLos)
                         continue;
                     fh2_LosE_Tof->Fill(hit->GetTof(), hitLos->GetZ());
@@ -444,7 +444,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             Int_t nHitsLos = fHitLos->GetEntriesFast();
             for (Int_t ihitLos = 0; ihitLos < nHitsLos; ihitLos++)
             {
-                R3BLosHitData* hitLos = (R3BLosHitData*)fHitLos->At(ihitLos);
+                R3BLosHitData* hitLos = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihitLos));
                 if (!hitLos)
                     continue;
                 fh1_LosE_withoutTof->Fill(hitLos->GetZ());

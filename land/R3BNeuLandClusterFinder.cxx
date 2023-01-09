@@ -97,7 +97,7 @@ InitStatus R3BNeuLandClusterFinder::Init()
     }
 
     // Get pointer to LAND digi array
-    fArrayDigi = (TClonesArray*)rootMgr->GetObject("LandDigi");
+    fArrayDigi = dynamic_cast<TClonesArray*>(rootMgr->GetObject("LandDigi"));
     // Check pointer
     if (NULL == fArrayDigi)
     {
@@ -127,7 +127,7 @@ void R3BNeuLandClusterFinder::Exec(Option_t* option)
     R3BLandDigi* digi1;
     for (Int_t i = 0; i < nDigis; i++)
     {
-        digi1 = (R3BLandDigi*)fArrayDigi->At(i);
+        digi1 = dynamic_cast<R3BLandDigi*>(fArrayDigi->At(i));
         fVectorDigi.push_back(digi1);
     } // loop over entries
 
@@ -203,7 +203,7 @@ void R3BNeuLandClusterFinder::Exec(Option_t* option)
                             clusNo = belongsToCluster[i];
                             belongsToCluster[k] = nClusters - 1;
                             // Get pointer to the current cluster
-                            cluster = (R3BNeuLandCluster*)fArrayCluster->At(clusNo);
+                            cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(clusNo));
                             // Update information of the cluster
                             cluster->SetE(cluster->GetE() + digi2->GetQdc());
                             cluster->SetSize(cluster->GetSize() + 1);
@@ -239,7 +239,7 @@ void R3BNeuLandClusterFinder::Exec(Option_t* option)
         Int_t totalSize = 0;
         for (Int_t i = 0; i < nClusters; i++)
         {
-            cluster = (R3BNeuLandCluster*)fArrayCluster->At(i);
+            cluster = dynamic_cast<R3BNeuLandCluster*>(fArrayCluster->At(i));
             fhClusterSize->Fill(cluster->GetSize());
             fhClusterEnergy->Fill(cluster->GetE());
             totalSize += cluster->GetSize();

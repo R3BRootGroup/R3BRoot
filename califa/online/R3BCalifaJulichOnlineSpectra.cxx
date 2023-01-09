@@ -92,7 +92,7 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     // Create histograms for all the detectors
 
     // Get access to Mapped data
-    fMappedItemsSi = (TClonesArray*)mgr->GetObject("AmsMappedData");
+    fMappedItemsSi = dynamic_cast<TClonesArray*>(mgr->GetObject("AmsMappedData"));
     if (!fMappedItemsSi)
     {
         LOG(fatal) << "R3BCalifaJulichOnlineSpectra::AmsMappedData not found";
@@ -100,7 +100,7 @@ InitStatus R3BCalifaJulichOnlineSpectra::Init()
     }
 
     // Get access to Mapped data
-    fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
+    fMappedItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaMappedData"));
     if (!fMappedItemsCalifa)
     {
         LOG(fatal) << "R3BCalifaJulichOnlineSpectra::CalifaMappedData not found";
@@ -194,7 +194,7 @@ void R3BCalifaJulichOnlineSpectra::Exec(Option_t* option)
         auto nHits = fMappedItemsSi->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsSi->At(ihit);
+            R3BAmsMappedData* hit = dynamic_cast<R3BAmsMappedData*>(fMappedItemsSi->At(ihit));
             if (!hit)
                 continue;
             fh2_EnergyVsStrip[hit->GetDetectorId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());

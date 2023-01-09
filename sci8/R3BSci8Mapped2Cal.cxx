@@ -96,10 +96,10 @@ InitStatus R3BSci8Mapped2Cal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("Sci8Mapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci8Mapped"));
 
     if (NULL == fMappedItems)
         LOG(fatal) << "Branch Sci8Mapped not found";
@@ -114,7 +114,7 @@ InitStatus R3BSci8Mapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BSci8Mapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci8TCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci8TCalPar"));
     if (!fTcalPar)
     {
         LOG(error) << "Could not get access to Sci8TCalPar-Container.";
@@ -140,7 +140,7 @@ void R3BSci8Mapped2Cal::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_Sci8 * NTypes = 2 * 3
     {
 
-        R3BSci8MappedData* hit = (R3BSci8MappedData*)fMappedItems->At(ihit);
+        R3BSci8MappedData* hit = dynamic_cast<R3BSci8MappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
@@ -206,7 +206,7 @@ void R3BSci8Mapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BSci8CalData* aCalItem = (R3BSci8CalData*)fCalItems->At(iCal);
+            R3BSci8CalData* aCalItem = dynamic_cast<R3BSci8CalData*>(fCalItems->At(iCal));
 
             if (aCalItem->GetDetector() != iDet)
             {

@@ -79,7 +79,7 @@ void R3BMusliMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BMusliCalPar*)rtdb->getContainer("musliCalPar");
+    fCal_Par = dynamic_cast<R3BMusliCalPar*>(rtdb->getContainer("musliCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(error, "R3BMusliMapped2Cal::SetParContainers() Couldn't get handle on musliCalPar container");
@@ -128,9 +128,9 @@ InitStatus R3BMusliMapped2Cal::Init()
         return kFATAL;
     }
 
-    fHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
-    
-    fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
+    fHeader = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));    
+    fMusliMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("MusliMappedData"));
+
     if (!fMusliMappedDataCA)
     {
         R3BLOG(fatal, "R3BMusliMapped2Cal::Init() MusliMappedData not found.");
@@ -185,7 +185,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusliMappedData*)(fMusliMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusliMappedData*>(fMusliMappedDataCA->At(i));
         signalId = mappedData[i]->GetSignal() - 1;
 
         if (0 <= signalId && signalId < fNumSignals)
@@ -253,7 +253,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
 	}
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

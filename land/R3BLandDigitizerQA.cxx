@@ -55,21 +55,21 @@ InitStatus R3BLandDigitizerQA::Init()
         return kERROR;
     }
 
-    fTracks = (TClonesArray*)rm->GetObject("MCTrack");
+    fTracks = dynamic_cast<TClonesArray*>(rm->GetObject("MCTrack"));
     if (NULL == fTracks)
     {
         LOG(error) << "R3BLandDigitizerQA: no MCTrack array...";
         return kERROR;
     }
 
-    fPoints = (TClonesArray*)rm->GetObject("LandPoint");
+    fPoints = dynamic_cast<TClonesArray*>(rm->GetObject("LandPoint"));
     if (NULL == fPoints)
     {
         LOG(error) << "R3BLandDigitizerQA: no LandPoint array...";
         return kERROR;
     }
 
-    fDigis = (TClonesArray*)rm->GetObject("LandDigi");
+    fDigis = dynamic_cast<TClonesArray*>(rm->GetObject("LandDigi"));
     if (NULL == fDigis)
     {
         LOG(error) << "R3BLandDigitizerQA: no LandDigi array...";
@@ -103,7 +103,7 @@ void R3BLandDigitizerQA::Exec(Option_t* option)
     Int_t pdg;
     for (Int_t i = 0; i < nPoints; i++)
     {
-        point = (R3BLandPoint*)fPoints->At(i);
+        point = dynamic_cast<R3BLandPoint*>(fPoints->At(i));
         eloss = point->GetEnergyLoss() * 1000.;
         media = Int_t(point->GetPaddleType());
         light = point->GetLightYield() * 1000.;
@@ -112,7 +112,7 @@ void R3BLandDigitizerQA::Exec(Option_t* option)
             totEnergy += eloss;
             totEnergyLee += light;
             time = point->GetTime();
-            pdg = ((R3BMCTrack*)fTracks->At(point->GetTrackID()))->GetPdgCode();
+            pdg = (dynamic_cast<R3BMCTrack*>(fTracks->At(point->GetTrackID())))->GetPdgCode();
             fhElossPdg->Fill(pdg, eloss);
         }
     }
@@ -130,7 +130,7 @@ void R3BLandDigitizerQA::Exec(Option_t* option)
     Double_t qdc_first;
     for (Int_t i = 0; i < nDigis; i++)
     {
-        digi = (R3BLandDigi*)fDigis->At(i);
+        digi = dynamic_cast<R3BLandDigi*>(fDigis->At(i));
         qdc = digi->GetQdc();
         fhPaddleE->Fill(qdc);
         fhElossTime->Fill(tdc, qdc);

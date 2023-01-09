@@ -27,7 +27,7 @@
 
 // -----   Default constructor   -----------------------------------------------
 R3BTcutPar::R3BTcutPar(const TString& cutname)
-    : fCutName(cutname)
+    : TNamed(cutname, cutname)
     , fMaxPoints(40)
     , fCut(NULL)
 {
@@ -44,11 +44,12 @@ void R3BTcutPar::putParams(FairParamList* list)
         Double_t a[2];
         fCut->GetPoint(n, a[0], a[1]);
 
-        TString name = fCutName + "Point" + n;
+        TString name = GetNameObj() + "Point" + n;
         p->AddAt(a[0], 0);
         p->AddAt(a[1], 1);
         list->add(name, *p);
     }
+    delete p;
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -59,11 +60,11 @@ TCutG* R3BTcutPar::getParams(FairParamList* list)
     TArrayF* p = new TArrayF(2);
     for (int n = 0; n < fMaxPoints; n++)
     {
-        TString name = fCutName + "Point" + n;
+        TString name = GetNameObj() + "Point" + n;
         if (list->fill(name, p))
         {
             if (fCut == NULL)
-                fCut = new TCutG(fCutName, 1);
+                fCut = new TCutG(GetNameObj(), 1);
             fCut->SetPoint(n, p->GetAt(0), p->GetAt(1));
         }
         else
@@ -71,6 +72,7 @@ TCutG* R3BTcutPar::getParams(FairParamList* list)
             break;
         }
     }
+    delete p;
     return fCut;
 }
 

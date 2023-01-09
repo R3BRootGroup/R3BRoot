@@ -55,7 +55,7 @@ Bool_t R3BStrawtubesReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BStrawtubesReader::Read()
+Bool_t R3BStrawtubesReader::R3BRead()
 {
     for (int plane_i = 0; LENGTH(fOnion->STRAW) > plane_i; ++plane_i)
     {

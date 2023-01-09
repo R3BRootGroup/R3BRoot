@@ -66,7 +66,7 @@ InitStatus R3BSingleAlpideCorrelationOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    fHitItems = (TClonesArray*)mgr->GetObject("AlpideHitData");
+    fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideHitData"));
     if (!fHitItems)
     {
         R3BLOG(fatal, "AlpideHitData not found");
@@ -184,7 +184,7 @@ void R3BSingleAlpideCorrelationOnlineSpectra::Exec(Option_t* option)
         int size1 = 0, size2 = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BAlpideHitData*)fHitItems->At(ihit);
+            auto hit = dynamic_cast<R3BAlpideHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
             Int_t senid = hit->GetSensorId();

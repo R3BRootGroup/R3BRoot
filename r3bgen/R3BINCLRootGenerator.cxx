@@ -205,7 +205,7 @@ void R3BINCLRootGenerator::RegisterIons()
     std::map<Int_t, FairIon*> ions;
 
     fInput = new TFile(fFileName);
-    Tree = (TTree*)fInput->Get("et");
+    Tree = dynamic_cast<TTree*>(fInput->Get("et"));
 
     fEvtRoot = Tree->GetEntries();
     R3BLOG(info, "Root file entries " << fEvtRoot);

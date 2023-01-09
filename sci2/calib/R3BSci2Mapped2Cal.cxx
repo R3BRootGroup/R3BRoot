@@ -86,12 +86,12 @@ InitStatus R3BSci2Mapped2Cal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("Sci2Mapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Mapped"));
 
     if (NULL == fMappedItems)
     {
@@ -109,7 +109,7 @@ InitStatus R3BSci2Mapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BSci2Mapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci2TCalPar"));
     if (!fTcalPar)
     {
         LOG(fatal) << "Could not get access to Sci2TCalPar-Container.";
@@ -138,7 +138,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_Sci2 * NTypes = 2 * 3
     {
 
-        R3BSci2MappedData* hit = (R3BSci2MappedData*)fMappedItems->At(ihit);
+        R3BSci2MappedData* hit = dynamic_cast<R3BSci2MappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
@@ -204,7 +204,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BSci2CalData* aCalItem = (R3BSci2CalData*)fCalItems->At(iCal);
+            R3BSci2CalData* aCalItem = dynamic_cast<R3BSci2CalData*>(fCalItems->At(iCal));
 
             if (aCalItem->GetDetector() != iDet)
             {

@@ -97,21 +97,21 @@ InitStatus R3BMwpcOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to mapped data of mwpcs
-    fMapItemsMwpc = (TClonesArray*)mgr->GetObject(fNameDet + "MappedData");
+    fMapItemsMwpc = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet + "MappedData"));
     if (!fMapItemsMwpc)
     {
         return kFATAL;
     }
 
     // get access to cal data of mwpcs
-    fCalItemsMwpc = (TClonesArray*)mgr->GetObject(fNameDet + "CalData");
+    fCalItemsMwpc = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet + "CalData"));
     if (!fCalItemsMwpc)
     {
         return kFATAL;
     }
 
     // get access to hit data of mwpcs
-    fHitItemsMwpc = (TClonesArray*)mgr->GetObject(fNameDet + "HitData");
+    fHitItemsMwpc = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet + "HitData"));
     if (!fHitItemsMwpc)
         LOG(warn) << "R3BMwpcOnlineSpectra: " + fNameDet + "HitData not found";
 
@@ -478,7 +478,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fMapItemsMwpc->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcMappedData* hit = (R3BMwpcMappedData*)fMapItemsMwpc->At(ihit);
+            R3BMwpcMappedData* hit = dynamic_cast<R3BMwpcMappedData*>(fMapItemsMwpc->At(ihit));
             if (!hit)
                 continue;
             nPadsPerEvent[hit->GetPlane() - 1]++;
@@ -503,7 +503,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* option)
         Int_t maxpadx = -1, maxpady = -1, maxqx = 0, maxqy = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcCalData* hit = (R3BMwpcCalData*)fCalItemsMwpc->At(ihit);
+            R3BMwpcCalData* hit = dynamic_cast<R3BMwpcCalData*>(fCalItemsMwpc->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetPlane() == 1 || hit->GetPlane() == 2)
@@ -538,7 +538,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fHitItemsMwpc->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMwpcHitData* hit = (R3BMwpcHitData*)fHitItemsMwpc->At(ihit);
+            R3BMwpcHitData* hit = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpc->At(ihit));
             if (!hit)
                 continue;
             fh1_Xpos->Fill(hit->GetX());

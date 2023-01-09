@@ -67,7 +67,7 @@ void R3BTofdHitPar::printParams()
     LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
-        R3BTofdHitModulePar* t_par = (R3BTofdHitModulePar*)fHitParams->At(i);
+        R3BTofdHitModulePar* t_par = dynamic_cast<R3BTofdHitModulePar*>(fHitParams->At(i));
         LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
@@ -87,7 +87,7 @@ R3BTofdHitModulePar* R3BTofdHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
         Int_t index;
         for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
         {
-            par = (R3BTofdHitModulePar*)fHitParams->At(i);
+            par = dynamic_cast<R3BTofdHitModulePar*>(fHitParams->At(i));
             if (NULL == par)
             {
                 continue;
@@ -125,7 +125,7 @@ R3BTofdHitModulePar* R3BTofdHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
         return NULL;
     }
     Int_t arind = fIndexMap[index];
-    R3BTofdHitModulePar* par = (R3BTofdHitModulePar*)fHitParams->At(arind);
+    R3BTofdHitModulePar* par = dynamic_cast<R3BTofdHitModulePar*>(fHitParams->At(arind));
     return par;
 }
 

@@ -74,16 +74,16 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    fHitItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaClusterData"));
     R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaClusterData not found");
 
-    fHitItemsTofd = (TClonesArray*)mgr->GetObject("TofdHit");
+    fHitItemsTofd = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdHit"));
     R3BLOG_IF(warn, !fHitItemsTofd, "TofdHit not found");
 
     // Create histograms for detectors
@@ -167,7 +167,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     bool fZminus1 = false;
     for (Int_t ihit = 0; ihit < fHitItemsTofd->GetEntriesFast(); ihit++)
     {
-        auto hit = (R3BTofdHitData*)fHitItemsTofd->At(ihit);
+        auto hit = dynamic_cast<R3BTofdHitData*>(fHitItemsTofd->At(ihit));
         if (!hit)
             continue;
         if (hit->GetDetId() == 1 && hit->GetEloss() > (fZselection - 0.5) && hit->GetEloss() < (fZselection + 0.5))
@@ -177,7 +177,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     Int_t nHits = fHitItemsCalifa->GetEntriesFast();
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+        auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
         if (hit->GetEnergy() < fMinProtonE)
             continue;
 
@@ -198,7 +198,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

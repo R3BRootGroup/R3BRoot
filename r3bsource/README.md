@@ -104,7 +104,7 @@ Write detector specific reader classes
 
 Have a look at r3bsource/R3BUnpackReader.[cxx/h].
 Your detector specific reader class should almost be a copy of this, mostly replacing 'unpack' with e.g. 'raw_pos'.
-And you will have to make sure that in the Read() function your detector specific data containers are filled with the data from the ucesb structure.
+And you will have to make sure that in the R3BRead() function your detector specific data containers are filled with the data from the ucesb structure.
 
 
 Write or modify your R3BROOT steering macro

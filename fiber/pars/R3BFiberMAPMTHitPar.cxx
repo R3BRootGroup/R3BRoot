@@ -67,7 +67,7 @@ void R3BFiberMAPMTHitPar::printParams()
     LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
-        R3BFiberMAPMTHitModulePar* t_par = (R3BFiberMAPMTHitModulePar*)fHitParams->At(i);
+        R3BFiberMAPMTHitModulePar* t_par = dynamic_cast<R3BFiberMAPMTHitModulePar*>(fHitParams->At(i));
         LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
@@ -86,7 +86,7 @@ R3BFiberMAPMTHitModulePar* R3BFiberMAPMTHitPar::GetModuleParAt(Int_t fiber)
         Int_t index;
         for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
         {
-            par = (R3BFiberMAPMTHitModulePar*)fHitParams->At(i);
+            par = dynamic_cast<R3BFiberMAPMTHitModulePar*>(fHitParams->At(i));
             if (NULL == par)
             {
                 continue;
@@ -121,7 +121,7 @@ R3BFiberMAPMTHitModulePar* R3BFiberMAPMTHitPar::GetModuleParAt(Int_t fiber)
         return NULL;
     }
     Int_t arind = fIndexMap[index];
-    R3BFiberMAPMTHitModulePar* par = (R3BFiberMAPMTHitModulePar*)fHitParams->At(arind);
+    R3BFiberMAPMTHitModulePar* par = dynamic_cast<R3BFiberMAPMTHitModulePar*>(fHitParams->At(arind));
     return par;
 }
 

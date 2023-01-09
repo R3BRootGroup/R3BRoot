@@ -78,7 +78,7 @@ class R3BUcesbSource : public FairSource
     /* Get readers */
     const TObjArray* GetReaders() const { return fReaders; }
 
-    virtual void FillEventHeader(R3BEventHeader* feh);
+    virtual void FillEventHeader(FairEventHeader* feh);
 
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 

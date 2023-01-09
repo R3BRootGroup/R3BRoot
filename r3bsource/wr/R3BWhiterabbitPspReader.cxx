@@ -61,11 +61,11 @@ Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)
 
     // Look for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         LOG(warn) << "R3BWhiterabbitPspReader::Init() EventHeader. not found";
-        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
     }
     else
         LOG(info) << "R3BWhiterabbitPspReader::Init() R3BEventHeader found";
@@ -78,7 +78,7 @@ Bool_t R3BWhiterabbitPspReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitPspReader::Read()
+Bool_t R3BWhiterabbitPspReader::R3BRead()
 {
     if (!fData->TIMESTAMP_PSPX_ID)
     {

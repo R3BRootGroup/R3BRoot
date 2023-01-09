@@ -80,7 +80,7 @@ void R3BCalifaMapped2CrystalCalPar::SetParContainers()
         LOG(error) << "FairRuntimeDb not opened!";
     }
 
-    fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
+    fMap_Par = dynamic_cast<R3BCalifaMappingPar*>(rtdb->getContainer("califaMappingPar"));
     if (!fMap_Par)
     {
         LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaMappingPar container";
@@ -120,7 +120,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
         return kFATAL;
     }
 
-    fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
+    fCalifaMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("CalifaMappedData"));
     if (!fCalifaMappedDataCA)
     {
         LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() CalifaMappedData not found";
@@ -134,7 +134,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
+    fCal_Par = dynamic_cast<R3BCalifaCrystalCalPar*>(rtdb->getContainer("califaCrystalCalPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
@@ -189,7 +189,7 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        MapHit[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
+        MapHit[i] = dynamic_cast<R3BCalifaMappedData*>(fCalifaMappedDataCA->At(i));
         crystalId = MapHit[i]->GetCrystalId();
         // Fill histograms
         if (fMap_Par->GetInUse(crystalId) == 1)
@@ -197,7 +197,7 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
     }
 
     if (MapHit)
-        delete MapHit;
+        delete[] MapHit;
     return;
 }
 

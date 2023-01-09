@@ -69,7 +69,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BAmsReader::Read()
+Bool_t R3BAmsReader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
     // Read AMS detectors

@@ -61,7 +61,7 @@ void R3BTraDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTraDigiPar = (R3BTraDigiPar*)(rtdb->getContainer("R3BTraDigiPar"));
+    fTraDigiPar = dynamic_cast<R3BTraDigiPar*>(rtdb->getContainer("R3BTraDigiPar"));
 
     if (fTraDigiPar)
     {
@@ -77,9 +77,9 @@ InitStatus R3BTraDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTraPoints = (TClonesArray*)ioman->GetObject("TraPoint");
-    fTraMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTraPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TraPoint"));
+    fTraMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array TraDigi
     fTraDigi = new TClonesArray("R3BTraDigi", 1000);
@@ -159,7 +159,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
     {
         //   LOG(info)<<"entries "<<l;
 
-        R3BTraPoint* Tra_obj = (R3BTraPoint*)fTraPoints->At(l);
+        R3BTraPoint* Tra_obj = dynamic_cast<R3BTraPoint*>(fTraPoints->At(l));
 
         //     Int_t DetID = Tra_obj->GetDetectorID();
         Double_t fX_In = Tra_obj->GetXIn();
@@ -169,7 +169,7 @@ void R3BTraDigitizer::Exec(Option_t* opt)
         Double_t fY_Out = Tra_obj->GetYOut();
         Double_t fZ_Out = Tra_obj->GetZOut();
         TrackIdTra = Tra_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTraMCTrack->At(TrackIdTra);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTraMCTrack->At(TrackIdTra));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

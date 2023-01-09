@@ -93,7 +93,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
  * Converts plain raw data to multi-dimensional array.
  * Ignores energies with an error message.
  */
-Bool_t R3BPspxReader::Read()
+Bool_t R3BPspxReader::R3BRead()
 {
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
 

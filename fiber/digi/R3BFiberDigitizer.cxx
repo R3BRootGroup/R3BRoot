@@ -68,7 +68,7 @@ void R3BFiberDigitizer::SetYPositionResolution(Double_t y) { ysigma = y; }
 void R3BFiberDigitizer::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    fFiGeoPar = (R3BTGeoPar*)rtdb->getContainer(fName + "GeoPar");
+    fFiGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fName + "GeoPar"));
     if (!fFiGeoPar)
     {
         R3BLOG(error, "R3BFiberDigitizer::SetParContainers() : Could not get access to " + fName + "GeoPar container.");
@@ -101,10 +101,10 @@ InitStatus R3BFiberDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     R3BLOG_IF(fatal, !ioman, "FairRootManager not found");
 
-    fFiPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
+    fFiPoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
     R3BLOG_IF(fatal, !fFiPoints, fName + "Point not found");
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array DchDigi
     fFiHits = new TClonesArray("R3BBunchedFiberHitData");
@@ -135,10 +135,10 @@ void R3BFiberDigitizer::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        pointData[i] = (R3BFibPoint*)(fFiPoints->At(i));
+        pointData[i] = dynamic_cast<R3BFibPoint*>(fFiPoints->At(i));
         TrackId = pointData[i]->GetTrackID();
 
-        R3BMCTrack* Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        R3BMCTrack* Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
         // mother = Track->GetMotherId();
 

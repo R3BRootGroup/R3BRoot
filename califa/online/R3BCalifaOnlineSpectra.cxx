@@ -128,7 +128,7 @@ void R3BCalifaOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
+    fMap_Par = dynamic_cast<R3BCalifaMappingPar*>(rtdb->getContainer("califaMappingPar"));
     if (!fMap_Par)
     {
         R3BLOG(error, "Couldn't get handle on califaMappingPar container");
@@ -182,13 +182,13 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     // get access to Mapped data
-    fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
+    fMappedItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaMappedData"));
     if (!fMappedItemsCalifa)
     {
         R3BLOG(error, "R3BCalifaOnlineSpectra::CalifaCrystalMappedData not found");
@@ -196,23 +196,23 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     }
 
     // get access to trigger Mapped data
-    fTrigMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedtrigData");
+    fTrigMappedItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaMappedtrigData"));
     R3BLOG_IF(warn, !fTrigMappedItemsCalifa, "CalifaMappedtrigData not found");
 
     // get access to Cal data
-    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
+    fCalItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaCrystalCalData"));
     R3BLOG_IF(warn, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    fHitItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaClusterData"));
     R3BLOG_IF(warn, !fHitItemsCalifa, "CalifaClusterData not found");
 
     // get access to WR-Califa data
-    fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
+    fWRItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("WRCalifaData"));
     R3BLOG_IF(warn, !fWRItemsCalifa, "WRCalifaData not found");
 
     // get access to WR-Master data
-    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+    fWRItemsMaster = dynamic_cast<TClonesArray*>(mgr->GetObject("WRMasterData"));
     R3BLOG_IF(warn, !fWRItemsMaster, "WRMasterData not found");
 
     SetParameter();
@@ -1344,7 +1344,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Int_t nHits = fWRItemsCalifa->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BWRData* hit = (R3BWRData*)fWRItemsCalifa->At(ihit);
+            R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             wr[ihit] = hit->GetTimeStamp();
@@ -1358,7 +1358,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             nHits = fWRItemsMaster->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+                R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsMaster->At(ihit));
                 if (!hit)
                     continue;
                 wrm = hit->GetTimeStamp();
@@ -1375,7 +1375,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         e[1] = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaMappedData*)fTrigMappedItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaMappedData*>(fTrigMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             Int_t ch = hit->GetCrystalId() - 1;
@@ -1383,7 +1383,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         }
         if (e[0] > 0 && e[1] > 0)
             fh2_Califa_EtrigCor[0]->Fill(e[0], e[1]);
-        if (e[0] > 0 && e[1] > 0 && header->GetTrigger() == 1)
+        if (e[0] > 0 && e[1] > 0 && header && header->GetTrigger() == 1)
             fh2_Califa_EtrigCor[1]->Fill(e[0], e[1]);
 
         if (e[0] > 0)
@@ -1400,7 +1400,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Int_t Crymult = 0;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaMappedData*)fMappedItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaMappedData*>(fMappedItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1458,7 +1458,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaCrystalCalData*>(fCalItemsCalifa->At(ihit));
             if (!hit)
                 continue;
 
@@ -1491,7 +1491,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+            auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

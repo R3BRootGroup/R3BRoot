@@ -226,7 +226,7 @@ Bool_t R3BPsp::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of PspPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kPSP);
 
         ResetParameters();
@@ -288,7 +288,7 @@ void R3BPsp::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BPspPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BPspPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BPspPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BPspPoint(*oldpoint);
@@ -332,7 +332,7 @@ void R3BPsp::ConstructGeometry()
         if (!fCombiTrans.IsIdentity())
         {
             TGeoNode* n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
-            TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)n)->GetMatrix();
+            TGeoCombiTrans* combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(n))->GetMatrix());
 
             *combtrans = fCombiTrans;
         }
@@ -340,15 +340,15 @@ void R3BPsp::ConstructGeometry()
         TGeoNode* psp_node = gGeoManager->GetTopVolume()->GetNode("PSPWorld_0");
 
         TGeoNode* node = psp_node->GetVolume()->GetNode("PSP1LogWorld_1");
-        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        TGeoCombiTrans* combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDz(fZ1);
 
         node = psp_node->GetVolume()->GetNode("PSP2LogWorld_2");
-        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDz(fZ2);
 
         node = psp_node->GetVolume()->GetNode("PSP3LogWorld_3");
-        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDz(fZ3);
     }
     else

@@ -46,7 +46,6 @@ R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, co
 // ----  Destructor ------------------------------------------------------------
 R3BCalifaMappingPar::~R3BCalifaMappingPar()
 {
-    clear();
     if (fHalf)
         delete fHalf;
     if (fRing)

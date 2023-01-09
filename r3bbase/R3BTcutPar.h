@@ -20,7 +20,7 @@
 
 class FairParamList;
 
-class R3BTcutPar : public TObject
+class R3BTcutPar : public TNamed
 {
   public:
     /** Default constructor **/
@@ -39,17 +39,15 @@ class R3BTcutPar : public TObject
     TCutG* getParams(FairParamList* list);
 
     /** Accessor functions **/
-    TString& GetName() { return fCutName; }
     TCutG* GetCut() { return fCut; }
 
-    void SetName(TString& n) { fCutName = n; }
     void SetMaxPoints(UInt_t p) { fMaxPoints = p; }
     void SetCut(TCutG* c) { fCut = c; }
+    TString GetNameObj() {return GetName();}
 
   private:
     UInt_t fMaxPoints;
     TCutG* fCut;
-    TString fCutName;
 
   public:
     ClassDef(R3BTcutPar, 0);

@@ -71,7 +71,7 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BCalifaFebexReader::Read()
+Bool_t R3BCalifaFebexReader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
 

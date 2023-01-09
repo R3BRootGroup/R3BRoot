@@ -80,9 +80,9 @@ InitStatus R3BsfiDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fPoints = (TClonesArray*)ioman->GetObject("SFIPoint");
+    fPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("SFIPoint"));
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array DchDigi
     Hits = new TClonesArray("R3BFi4HitItem", 1000);
@@ -151,7 +151,7 @@ void R3BsfiDigitizer::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < entryNum; ++i)
     {
-        R3BFi4Point* data_element = (R3BFi4Point*)fPoints->At(i);
+        R3BFi4Point* data_element = dynamic_cast<R3BFi4Point*>(fPoints->At(i));
 
         TempHits.push_back(
             TempHit(data_element->GetDetectorID(), data_element->GetEnergyLoss(), data_element->GetTime()));

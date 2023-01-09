@@ -56,7 +56,7 @@ InitStatus R3BWhiterabbitPropagator::Init()
     }
 
     // get access to input data
-    fInputItem = (TClonesArray*)frm->GetObject(fNameWR + "Data");
+    fInputItem = dynamic_cast<TClonesArray*>(frm->GetObject(fNameWR + "Data"));
     if (!fInputItem)
     {
         LOG(fatal) << "R3BWhiterabbitPropagator::Init() " + fNameWR + "Data not found";

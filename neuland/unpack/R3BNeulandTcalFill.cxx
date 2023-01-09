@@ -76,18 +76,18 @@ InitStatus R3BNeulandTcalFill::Init()
     {
         return kFATAL;
     }
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     /*   if (!header)
        {
            return kFATAL;
        }*/
-    fHits = (TClonesArray*)rm->GetObject("NeulandMappedData");
+    fHits = dynamic_cast<TClonesArray*>(rm->GetObject("NeulandMappedData"));
     if (!fHits)
     {
         return kFATAL;
     }
 
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LandTCalPar"));
     fCal_Par->setChanged();
 
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
@@ -122,7 +122,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BPaddleTamexMappedData*)fHits->At(i);
+        hit = dynamic_cast<R3BPaddleTamexMappedData*>(fHits->At(i));
         if (!hit)
         {
             continue;

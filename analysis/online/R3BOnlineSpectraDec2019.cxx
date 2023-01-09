@@ -136,9 +136,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
 
@@ -149,13 +149,13 @@ InitStatus R3BOnlineSpectraDec2019::Init()
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
     }
 
     //------------------------------------------------------------------------
@@ -1300,7 +1300,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         Int_t nHitsSamp = det->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHitsSamp; ihit++)
         {
-            auto hit = (R3BSamplerMappedData*)det->At(ihit);
+            auto hit = dynamic_cast<R3BSamplerMappedData*>(det->At(ihit));
             // time is in steps of 10 ns
             // is is a 34 bit number, so max 1073741823
             samplerCurr = hit->GetTime();
@@ -1464,7 +1464,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
         {
-            R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)det->At(ihit);
+            R3BBeamMonitorMappedData* hit = dynamic_cast<R3BBeamMonitorMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -1543,7 +1543,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRoluMappedData* hit = (R3BRoluMappedData*)det->At(ihit);
+            R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -1590,7 +1590,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
             /*
              * nParts is the number of particle passing through detector in one event
              */
-            R3BRoluCalData* calData = (R3BRoluCalData*)det->At(iPart);
+            R3BRoluCalData* calData = dynamic_cast<R3BRoluCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             for (Int_t iCha = 0; iCha < 4; iCha++)
@@ -1649,7 +1649,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
 
-    Double_t time_MTDC[32][8] = { 0.0 / 0.0 };
+    Double_t time_MTDC[32][8] = { {0.0 / 0.0} };
     Double_t LosTresMTDC[32] = { 0.0 / 0.0 };
 
     Double_t timeLosV[fNofLosDetectors][32];
@@ -1665,7 +1665,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     Double_t yToT_cm[fNofLosDetectors][32];
     Double_t xV_cm[fNofLosDetectors][32];
     Double_t yV_cm[fNofLosDetectors][32];
-    Double_t time_V_temp[32][8] = { 0. / 0. };
+    Double_t time_V_temp[32][8] = { {0. / 0.} };
 
     for (int i = 0; i < fNofLosDetectors; i++)
     {
@@ -1705,7 +1705,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -1736,15 +1736,15 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         nPart = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { 0. };
-        Double_t time_V_LOS2[32][8] = { 0. };
+        Double_t time_V_LOS1[32][8] = { {0.} };
+        Double_t time_V_LOS2[32][8] = { {0.} };
 
         for (Int_t iPart = 0; iPart < nPart; iPart++)
         {
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
             Int_t nVftx = 0;
             Int_t nTamexL = 0;
@@ -2151,16 +2151,16 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     // SCI8 detector
     //----------------------------------------------------------------------
 
-    Double_t timeS8_V[10][2] = { 0.0 / 0.0 }; // [multihit][pm]
-    Double_t timeS8_L[10][2] = { 0.0 / 0.0 };
-    Double_t timeS8_T[10][2] = { 0.0 / 0.0 };
+    Double_t timeS8_V[10][2] = { {0.0 / 0.0} }; // [multihit][pm]
+    Double_t timeS8_L[10][2] = { {0.0 / 0.0} };
+    Double_t timeS8_T[10][2] = { {0.0 / 0.0} };
     Double_t timeSci8M[10] = { 0.0 };
     Double_t Sci8TresM[10] = { 0.0 / 0.0 };
     Double_t timeSci8T[10] = { 0.0 };
     Double_t Sci8TresT[10] = { 0.0 / 0.0 };
     Double_t timeSci8[10] = { 0.0 };
     Double_t totsumS8[10] = { 0.0 };
-    Double_t totS8[10][8] = { 0.0 / 0.0 };
+    Double_t totS8[10][8] = { {0.0 / 0.0} };
 
     Int_t MultipS8 = -1;
 
@@ -2173,7 +2173,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci8MappedData* hit = (R3BSci8MappedData*)det->At(ihit);
+            R3BSci8MappedData* hit = dynamic_cast<R3BSci8MappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -2207,7 +2207,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
              * nPart is the number of particle passing through Sci8 detector in one event
              */
 
-            R3BSci8CalData* calDataS8 = (R3BSci8CalData*)det->At(iPart);
+            R3BSci8CalData* calDataS8 = dynamic_cast<R3BSci8CalData*>(det->At(iPart));
             iDet = calDataS8->GetDetector();
 
             // VFTX Channels 1-2:
@@ -2398,7 +2398,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
             std::vector<UInt_t> spmt_num(16);
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)detMapped->At(ihit);
+                R3BBunchedFiberMappedData* hit = dynamic_cast<R3BBunchedFiberMappedData*>(detMapped->At(ihit));
                 if (!hit)
                     continue;
 
@@ -2454,7 +2454,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                 Double_t tMAPMT = 0. / 0.;
                 Double_t tSPMT = 0. / 0.;
 
-                R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)detHit->At(ihit);
+                R3BBunchedFiberHitData* hit = dynamic_cast<R3BBunchedFiberHitData*>(detHit->At(ihit));
                 if (!hit)
                     continue;
 
@@ -2612,7 +2612,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         Int_t iPlaneMem = 1, iBarMem = 0;
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
-            auto mapped = (R3BTofdMappedData const*)det->At(imapped);
+            auto mapped = dynamic_cast<R3BTofdMappedData const*>(det->At(imapped));
             if (!mapped)
                 continue; // should not happen
 
@@ -2653,26 +2653,26 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         auto det = fCalItems.at(DET_TOFD);
         Int_t nCals = det->GetEntriesFast();
 
-        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
-        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0. / 0. };
+        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
 
-        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { false };
+        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{false}} };
 
         Int_t iBarMem = 0;
-        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { 0 };
+        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {0} };
 
         unsigned long long time0 = header->GetTimeStamp();
         double_t time1 = -1.;
 
         for (Int_t ical = 0; ical < nCals; ical++)
         {
-            auto cal = (R3BTofdCalData const*)det->At(ical);
+            auto cal = dynamic_cast<R3BTofdCalData const*>(det->At(ical));
             if (!cal)
                 continue; // should not happen
 
@@ -2845,7 +2845,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
+            R3BPaddleCalData* hit = dynamic_cast<R3BPaddleCalData*>(det->At(ihit));
 
             if (!hit)
                 continue; // should not happen
@@ -2913,7 +2913,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         //		LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
+            R3BPaddleCalData* hit = dynamic_cast<R3BPaddleCalData*>(det->At(ihit));
 
             if (!hit)
                 continue; // should not happen

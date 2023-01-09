@@ -51,7 +51,7 @@ InitStatus R3BNeulandCal2Hit::Init()
         throw std::runtime_error("R3BNeulandCal2Hit: No FairRootManager");
     }
 
-    fEventHeader = (R3BEventHeader*)ioman->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("EventHeader."));
     if (fEventHeader == nullptr)
     {
         throw std::runtime_error("R3BNeulandCal2Hit: No R3BEventHeader");
@@ -66,7 +66,7 @@ InitStatus R3BNeulandCal2Hit::Init()
 
 void R3BNeulandCal2Hit::SetParContainers()
 {
-    fPar = (R3BNeulandHitPar*)FairRuntimeDb::instance()->getContainer("NeulandHitPar");
+    fPar = dynamic_cast<R3BNeulandHitPar*>(FairRuntimeDb::instance()->getContainer("NeulandHitPar"));
 }
 
 void R3BNeulandCal2Hit::SetParameter()

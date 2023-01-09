@@ -70,7 +70,7 @@ void R3BMwpc3Mapped2Cal::SetParContainers()
         LOG(error) << "FairRuntimeDb not opened!";
     }
 
-    fCal_Par = (R3BMwpc3CalPar*)rtdb->getContainer("mwpc3CalPar");
+    fCal_Par = dynamic_cast<R3BMwpc3CalPar*>(rtdb->getContainer("mwpc3CalPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BMwpc3Mapped2Cal::Init() Couldn't get handle on mwpc3CalPar container";
@@ -112,7 +112,7 @@ InitStatus R3BMwpc3Mapped2Cal::Init()
         return kFATAL;
     }
 
-    fMwpcMappedDataCA = (TClonesArray*)rootManager->GetObject("Mwpc3MappedData");
+    fMwpcMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc3MappedData"));
     if (!fMwpcMappedDataCA)
     {
         return kFATAL;
@@ -157,7 +157,7 @@ void R3BMwpc3Mapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMwpcMappedData*)(fMwpcMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
         planeId = mappedData[i]->GetPlane();
         padId = mappedData[i]->GetPad() - 1;
         if (planeId == 1)
@@ -177,7 +177,7 @@ void R3BMwpc3Mapped2Cal::Exec(Option_t* option)
         }
     }
     if (mappedData)
-        delete mappedData;
+        delete[] mappedData;
     return;
 }
 

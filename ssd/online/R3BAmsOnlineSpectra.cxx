@@ -95,7 +95,7 @@ void R3BAmsOnlineSpectra::SetParContainers()
         LOG(error) << "FairRuntimeDb not opened!";
     }
 
-    fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
+    fMap_Par = dynamic_cast<R3BAmsMappingPar*>(rtdb->getContainer("amsMappingPar"));
     if (!fMap_Par)
     {
         LOG(error) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
@@ -131,7 +131,7 @@ InitStatus R3BAmsOnlineSpectra::Init()
     // create histograms of all detectors
 
     // get access to Mapped data
-    fMappedItemsAms = (TClonesArray*)mgr->GetObject("AmsMappedData");
+    fMappedItemsAms = dynamic_cast<TClonesArray*>(mgr->GetObject("AmsMappedData"));
     if (!fMappedItemsAms)
     {
         LOG(fatal) << "R3BAmsOnlineSpectra::AmsMappedData not found";
@@ -139,12 +139,12 @@ InitStatus R3BAmsOnlineSpectra::Init()
     }
 
     // get access to Cal data
-    fCalItemsAms = (TClonesArray*)mgr->GetObject("AmsStripCalData");
+    fCalItemsAms = dynamic_cast<TClonesArray*>(mgr->GetObject("AmsStripCalData"));
     if (!fCalItemsAms)
         LOG(warn) << "R3BAmsOnlineSpectra::AmsStripCalData not found";
 
     // get access to Hit data
-    fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
+    fHitItemsAms = dynamic_cast<TClonesArray*>(mgr->GetObject("AmsHitData"));
     if (!fHitItemsAms)
         LOG(warn) << "R3BAmsOnlineSpectra::AmsHitData not found";
 
@@ -551,7 +551,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << "hit:"<<nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsAms->At(ihit);
+            R3BAmsMappedData* hit = dynamic_cast<R3BAmsMappedData*>(fMappedItemsAms->At(ihit));
             if (!hit)
                 continue;
             fh_Ams_energy_allStrips[hit->GetDetectorId()]->Fill(hit->GetStripId(), hit->GetEnergy());
@@ -565,7 +565,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << "hit:"<<nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsStripCalData* hit = (R3BAmsStripCalData*)fCalItemsAms->At(ihit);
+            R3BAmsStripCalData* hit = dynamic_cast<R3BAmsStripCalData*>(fCalItemsAms->At(ihit));
             if (!hit)
                 continue;
             fh_Ams_energy_allCalStrips[hit->GetDetId() * 2 + hit->GetSideId()]->Fill(hit->GetStripId(),
@@ -596,7 +596,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         // std::cout << nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
+            R3BAmsHitData* hit = dynamic_cast<R3BAmsHitData*>(fHitItemsAms->At(ihit));
             if (!hit)
                 continue;
             DetId = hit->GetDetId();

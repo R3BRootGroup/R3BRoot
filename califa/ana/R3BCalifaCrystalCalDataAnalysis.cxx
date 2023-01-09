@@ -29,7 +29,7 @@ R3BCalifaCrystalCalDataAnalysis::~R3BCalifaCrystalCalDataAnalysis() {}
 InitStatus R3BCalifaCrystalCalDataAnalysis::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
-    fCrystalData = (TClonesArray*)fMan->GetObject("CalifaCrystalCalData");
+    fCrystalData = dynamic_cast<TClonesArray*>(fMan->GetObject("CalifaCrystalCalData"));
     CreateHistos();
 
     return kSUCCESS;
@@ -41,7 +41,7 @@ void R3BCalifaCrystalCalDataAnalysis::Exec(Option_t* option)
     R3BCalifaCrystalCalData* hit;
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BCalifaCrystalCalData*)fCrystalData->At(i);
+        hit = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalData->At(i));
         thCrystalID->Fill(hit->GetCrystalId());
         thEnergy->Fill(hit->GetEnergy());
         thNf->Fill(hit->GetNf());

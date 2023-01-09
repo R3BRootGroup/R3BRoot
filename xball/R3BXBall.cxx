@@ -210,7 +210,7 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol)
                    fELoss);
 
             // Increment number of XBallPoints for this track
-            R3BStack* stack = (R3BStack*)gMC->GetStack();
+            R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
             stack->AddPoint(kCAL);
         }
 
@@ -236,13 +236,13 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol)
             {
                 for (Int_t i = 0; i < nCrystalHits; i++)
                 {
-                    if (((R3BXBallCrystalHitSim*)(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() == copyNo)
+                    if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() == copyNo)
                     {
-                        ((R3BXBallCrystalHitSim*)(fXBallCrystalHitCollection->At(i)))
+                        (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))
                             ->AddMoreEnergy(NUSmearing(fELoss));
-                        if (((R3BXBallCrystalHitSim*)(fXBallCrystalHitCollection->At(i)))->GetTime() > fTime)
+                        if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetTime() > fTime)
                         {
-                            ((R3BXBallCrystalHitSim*)(fXBallCrystalHitCollection->At(i)))->SetTime(fTime);
+                            (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->SetTime(fTime);
                         }
                         existHit = 1; // to avoid the creation of a new CrystalHit
                         break;
@@ -449,7 +449,7 @@ void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BXBallPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BXBallPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BXBallPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);

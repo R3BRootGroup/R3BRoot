@@ -40,10 +40,10 @@ InitStatus R3BEventHeaderPropagator::Init()
 {
     LOG(info) << "R3BEventHeaderPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
-    fHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fHeader)
     {
-        fHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
         LOG(warn) << "R3BEventHeaderPropagator::Init() FairEventHeader not found";
     }
     else

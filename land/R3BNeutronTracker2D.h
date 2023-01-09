@@ -27,10 +27,11 @@
 
 #include "R3BNeuLandCluster.h"
 #include "R3BPrimPart.h"
+#include <TH1F.h>
+class TH2F;
+class R3BLandDigiPar;
 
 class TClonesArray;
-class TH1F;
-class TH2F;
 
 class R3BNeutronTracker2D : public FairTask
 {

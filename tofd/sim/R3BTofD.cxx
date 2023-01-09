@@ -201,7 +201,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
                fA_in);
 
         // Increment number of TofdPoints for this track
-        auto stack = (R3BStack*)gMC->GetStack();
+        auto stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kTOFD);
 
         ResetParameters();
@@ -264,7 +264,7 @@ void R3BTofD::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BTofdPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BTofdPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BTofdPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);

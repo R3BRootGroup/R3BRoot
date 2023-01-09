@@ -60,7 +60,7 @@ InitStatus R3BRpcMapped2PreCal::Init()
         return kFATAL;
     }
 
-    fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
+    fMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("R3BRpcMappedData"));
     if (!fMappedDataCA)
     {
         LOG(error) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
@@ -73,7 +73,7 @@ InitStatus R3BRpcMapped2PreCal::Init()
         LOG(error) << "R3BRpcMapped2PreCal:: FairRuntimeDb not opened";
     }
 
-    fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
+    fTCalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer("RpcTCalPar"));
     if (!fTCalPar)
     {
         LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
@@ -145,7 +145,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
     Int_t nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
+        auto map1 = dynamic_cast<R3BRpcMappedData*>(fMappedDataCA->At(i));
 
         UInt_t iDetector = map1->GetDetId();
         if (iDetector != 2)
@@ -199,7 +199,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 
-        auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
+        auto map1 = dynamic_cast<R3BRpcMappedData*>(fMappedDataCA->At(i));
         UInt_t iDetector = map1->GetDetId();
 
         if (iDetector == 2)

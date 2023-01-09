@@ -162,7 +162,7 @@ R3BTofdCal2HitS494::~R3BTofdCal2HitS494()
 InitStatus R3BTofdCal2HitS494::Init()
 {
     R3BLOG(info, "");
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -180,17 +180,17 @@ InitStatus R3BTofdCal2HitS494::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
-    fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
     R3BLOG_IF(fatal, NULL == fCalItems, "TofdCal not found");
 
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
     R3BLOG_IF(warn, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
     // CheckMaxEventNo
@@ -207,7 +207,7 @@ InitStatus R3BTofdCal2HitS494::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdCal2HitS494::SetParContainers()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -339,7 +339,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
@@ -356,7 +356,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     std::vector<R3BTofdCalData const*> trig_map;
     for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
     {
-        auto trig = (R3BTofdCalData const*)fCalTriggerItems->At(i);
+        auto trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(i));
         if (trig_map.size() < trig->GetBarId())
         {
             trig_map.resize(trig->GetBarId());

@@ -29,7 +29,7 @@ class R3BSfibReader : public R3BReader
     R3BSfibReader(EXT_STR_h101_sfib*, UInt_t);
 
     Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
+    Bool_t R3BRead();
     void Reset();
 
   private:

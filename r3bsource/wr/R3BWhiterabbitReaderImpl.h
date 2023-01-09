@@ -46,7 +46,7 @@
         return kTRUE;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
-    Bool_t R3B##ClassName##Reader::Read()                                                                           \
+    Bool_t R3B##ClassName##Reader::R3BRead()                                                                           \
     {                                                                                                               \
         if (fData->TIMESTAMP_MASTER_ID != 0 && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)                        \
         {                                                                                                           \
