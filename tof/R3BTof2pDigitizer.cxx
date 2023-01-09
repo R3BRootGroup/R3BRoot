@@ -62,7 +62,7 @@ void R3BTof2pDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTof2pDigiPar = (R3BTof2pDigiPar*)(rtdb->getContainer("R3BTof2pDigiPar"));
+    fTof2pDigiPar = dynamic_cast<R3BTof2pDigiPar*>(rtdb->getContainer("R3BTof2pDigiPar"));
 
     if (fTof2pDigiPar)
     {
@@ -79,8 +79,8 @@ InitStatus R3BTof2pDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTofPoints = (TClonesArray*)ioman->GetObject("TOFPoint");
-    fTofMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTofPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TOFPoint"));
+    fTofMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array TofDigi
     fTof2pDigi = new TClonesArray("R3BTof2pDigi", 1000);
@@ -170,10 +170,10 @@ void R3BTof2pDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesTof; l++)
     {
 
-        R3BTofPoint* tof_obj = (R3BTofPoint*)fTofPoints->At(l);
+        R3BTofPoint* tof_obj = dynamic_cast<R3BTofPoint*>(fTofPoints->At(l));
 
         TrackIdTof = tof_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTofMCTrack->At(TrackIdTof);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTofMCTrack->At(TrackIdTof));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

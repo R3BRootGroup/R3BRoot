@@ -113,7 +113,7 @@ void R3BDchDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fDchDigiPar = (R3BDchDigiPar*)(rtdb->getContainer("R3BDchDigiPar"));
+    fDchDigiPar = dynamic_cast<R3BDchDigiPar*>(rtdb->getContainer("R3BDchDigiPar"));
 
     if (fDchDigiPar)
     {
@@ -129,8 +129,8 @@ InitStatus R3BDchDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fDchPoints = (TClonesArray*)ioman->GetObject("DCHPoint");
-    fDchMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fDchPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("DCHPoint"));
+    fDchMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array DchDigi
     fDchDigi = new TClonesArray("R3BDchDigi", 1000);
@@ -231,7 +231,7 @@ void R3BDchDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesDch; l++)
     {
 
-        R3BDchPoint* dch_obj = (R3BDchPoint*)fDchPoints->At(l);
+        R3BDchPoint* dch_obj = dynamic_cast<R3BDchPoint*>(fDchPoints->At(l));
 
         Int_t DetID = dch_obj->GetDetectorID();
 
@@ -255,7 +255,7 @@ void R3BDchDigitizer::Exec(Option_t* opt)
     for (Int_t l = 0; l < nentriesDch; l++)
     {
 
-        R3BDchPoint* dch_obj = (R3BDchPoint*)fDchPoints->At(l);
+        R3BDchPoint* dch_obj = dynamic_cast<R3BDchPoint*>(fDchPoints->At(l));
 
         Int_t DetID = dch_obj->GetDetectorID();
         Double_t fPx = dch_obj->GetPx();
@@ -274,7 +274,7 @@ void R3BDchDigitizer::Exec(Option_t* opt)
         //     Double_t fY_Global_Out = dch_obj->GetYOut();
         //     Double_t fZ_Global_Out = dch_obj->GetZOut();
         TrackId = dch_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fDchMCTrack->At(TrackId);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fDchMCTrack->At(TrackId));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
         Double_t fPx_track = aTrack->GetPx();

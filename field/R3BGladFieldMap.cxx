@@ -556,7 +556,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
     }
 
     TTree* fTreeMap = NULL;
-    fTreeMap = (TTree*)fFile->Get("tree");
+    fTreeMap = dynamic_cast<TTree*>(fFile->Get("tree"));
 
     if (!fTreeMap)
     {

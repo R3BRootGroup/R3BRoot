@@ -87,18 +87,18 @@ InitStatus R3BNeulandMapped2Cal::Init()
         LOG(fatal) << "FairRootManager not found";
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (NULL == header)
     {
         LOG(fatal) << "Branch R3BEventHeader not found";
     }
 
-    fMapped = (TClonesArray*)mgr->GetObject("NeulandMappedData");
+    fMapped = dynamic_cast<TClonesArray*>(mgr->GetObject("NeulandMappedData"));
     if (NULL == fMapped)
     {
         LOG(fatal) << "Branch NeulandMapped not found";
     }
-    fMappedTrigger = (TClonesArray*)mgr->GetObject("NeulandTrigMappedData");
+    fMappedTrigger = dynamic_cast<TClonesArray*>(mgr->GetObject("NeulandTrigMappedData"));
     if (NULL == fMappedTrigger)
     {
         LOG(info) << "Branch NeulandTrigMapped not found";
@@ -123,10 +123,10 @@ void R3BNeulandMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
-    fMapPar = (R3BNeulandMappingPar*)rtdb->getContainer("neulandMappingPar");
+    fMapPar = dynamic_cast<R3BNeulandMappingPar*>(rtdb->getContainer("neulandMappingPar"));
     R3BLOG_IF(warn, !fMapPar, "Could not get access to neulandMappingPar container");
 
-    fTcalPar = (R3BTCalPar*)rtdb->getContainer("LandTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer("LandTCalPar"));
 
     if (!fTcalPar)
     {
@@ -200,7 +200,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         nHits = fMappedTrigger->GetEntriesFast();
         for (int i = 0; i < nHits; ++i)
         {
-            auto* mapped = (R3BPaddleTamexMappedData*)fMappedTrigger->At(i);
+            auto* mapped = dynamic_cast<R3BPaddleTamexMappedData*>(fMappedTrigger->At(i));
             auto iBar = mapped->GetBarId();
             auto par = fTcalPar->GetModuleParAt(100, iBar, 10);
             if (!par)
@@ -221,7 +221,7 @@ void R3BNeulandMapped2Cal::MakeCal()
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(ihit);
+        R3BPaddleTamexMappedData* hit = dynamic_cast<R3BPaddleTamexMappedData*>(fMapped->At(ihit));
         if (NULL == hit)
         {
             continue;

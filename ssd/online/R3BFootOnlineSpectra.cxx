@@ -74,28 +74,28 @@ InitStatus R3BFootOnlineSpectra::Init()
     if (NULL == mgr)
         LOG(fatal) << "R3BFootOnlineSpectra::FairRootManager not found";
     // Look for the R3BEventHeader
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         LOG(warn) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(info) << "R3BFootOnlineSpectra::Init() EventHeader. found";
     // Get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("FootMappedData");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootMappedData"));
     if (!fMappedItems)
     {
         LOG(fatal) << "R3BFootOnlineSpectra::FootMappedData not found";
         return kFATAL;
     }
     // Get access to Cal data
-    fCalItems = (TClonesArray*)mgr->GetObject("FootCalData");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootCalData"));
     if (!fCalItems)
         LOG(warn) << "R3BFootOnlineSpectra::FootCalData not found";
 
     // Get access to Hit data
-    fHitItems = (TClonesArray*)mgr->GetObject("FootHitData");
+    fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootHitData"));
     if (!fHitItems)
         LOG(warn) << "R3BFootOnlineSpectra::FootHitData not found";
 
@@ -335,7 +335,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         auto nHits = fMappedItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFootMappedData* hit = (R3BFootMappedData*)fMappedItems->At(ihit);
+            R3BFootMappedData* hit = dynamic_cast<R3BFootMappedData*>(fMappedItems->At(ihit));
             if (!hit)
                 continue;
             fh2_EnergyVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
@@ -348,7 +348,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         auto nHits = fCalItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFootCalData* hit = (R3BFootCalData*)fCalItems->At(ihit);
+            R3BFootCalData* hit = dynamic_cast<R3BFootCalData*>(fCalItems->At(ihit));
             if (!hit)
                 continue;
             fh2_EnergyVsStrip_cal[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
@@ -361,7 +361,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         auto nHits = fHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFootHitData* hit = (R3BFootHitData*)fHitItems->At(ihit);
+            R3BFootHitData* hit = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
@@ -372,8 +372,8 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         {
             for (Int_t jhit = ihit + 1; jhit < nHits; jhit++)
             {
-                R3BFootHitData* hitI = (R3BFootHitData*)fHitItems->At(ihit);
-                R3BFootHitData* hitJ = (R3BFootHitData*)fHitItems->At(jhit);
+                R3BFootHitData* hitI = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
+                R3BFootHitData* hitJ = dynamic_cast<R3BFootHitData*>(fHitItems->At(jhit));
                 if (!hitI)
                     continue;
                 if (!hitJ)

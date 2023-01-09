@@ -92,7 +92,7 @@ void R3BTofdMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
-    fTcalPar = (R3BTCalPar*)rtdb->getContainer("TofdTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer("TofdTCalPar"));
     if (!fTcalPar)
     {
         R3BLOG(error, "Could not get access to TofdTCalPar-Container.");
@@ -121,14 +121,14 @@ InitStatus R3BTofdMapped2Cal::Init()
     }
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdMapped"));
     if (!fMappedItems)
     {
         R3BLOG(fatal, "TofdMapped not found");
         return kFATAL;
     }
 
-    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerMapped");
+    fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerMapped"));
     if (!fMappedTriggerItems)
     {
         R3BLOG(warn, "TofdTriggerMapped not found");
@@ -181,7 +181,7 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
     std::vector<std::vector<Cal>> cal_vec(fNofPlanes * fPaddlesPerPlane * 2);
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {
-        auto mapped = (R3BTofdMappedData const*)fMappedItems->At(mapped_i);
+        auto mapped = dynamic_cast<R3BTofdMappedData const*>(fMappedItems->At(mapped_i));
 
         if ((mapped->GetDetectorId() < 1) || (mapped->GetDetectorId() > fNofPlanes))
         {
@@ -295,7 +295,7 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
     mapped_num = fMappedTriggerItems->GetEntriesFast();
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {
-        auto mapped = (R3BTofdMappedData const*)fMappedTriggerItems->At(mapped_i);
+        auto mapped = dynamic_cast<R3BTofdMappedData const*>(fMappedTriggerItems->At(mapped_i));
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {

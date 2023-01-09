@@ -28,7 +28,7 @@ class R3BTimestampMasterReader : public R3BReader
     R3BTimestampMasterReader(EXT_STR_h101_timestamp_master*, size_t);
 
     Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
+    Bool_t R3BRead();
     void Reset();
 
   private:

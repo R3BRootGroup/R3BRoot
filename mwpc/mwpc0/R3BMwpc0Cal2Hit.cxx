@@ -69,7 +69,7 @@ InitStatus R3BMwpc0Cal2Hit::Init()
         return kFATAL;
     }
 
-    fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc0CalData");
+    fMwpcCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc0CalData"));
     if (!fMwpcCalDataCA)
     {
         return kFATAL;
@@ -113,7 +113,7 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
+        calData[i] = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
         planeId = calData[i]->GetPlane();
         padId = calData[i]->GetPad() - 1;
         q = calData[i]->GetQ();

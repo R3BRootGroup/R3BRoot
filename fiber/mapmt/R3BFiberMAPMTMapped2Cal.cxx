@@ -59,7 +59,7 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
         return kFATAL;
     }
     auto name = fName + "Mapped";
-    fMappedItems = (TClonesArray*)mgr->GetObject(name);
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fMappedItems)
     {
         R3BLOG(fatal, "Branch " << name << " not found.");
@@ -104,7 +104,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMappedItems->At(i));
         assert(mapped);
 
         auto channel = mapped->GetChannel();

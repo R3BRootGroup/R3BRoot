@@ -103,15 +103,15 @@ InitStatus R3BTrackerTestS454::Init()
 
     FairRunOnline* run = FairRunOnline::Instance();
 
-    fTofdPoints = (TClonesArray*)mgr->GetObject("TOFdPoint");
-    fFi3aPoints = (TClonesArray*)mgr->GetObject("Fi3aPoint");
-    fFi3bPoints = (TClonesArray*)mgr->GetObject("Fi3bPoint");
-    fFi10Points = (TClonesArray*)mgr->GetObject("Fi10Point");
-    fFi11Points = (TClonesArray*)mgr->GetObject("Fi11Point");
-    fFi12Points = (TClonesArray*)mgr->GetObject("Fi12Point");
-    fFi13Points = (TClonesArray*)mgr->GetObject("Fi13Point");
+    fTofdPoints = dynamic_cast<TClonesArray*>(mgr->GetObject("TOFdPoint"));
+    fFi3aPoints = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi3aPoint"));
+    fFi3bPoints = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi3bPoint"));
+    fFi10Points = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi10Point"));
+    fFi11Points = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi11Point"));
+    fFi12Points = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi12Point"));
+    fFi13Points = dynamic_cast<TClonesArray*>(mgr->GetObject("Fi13Point"));
 
-    fMCTrack = (TClonesArray*)mgr->GetObject("MCTrack");
+    fMCTrack = dynamic_cast<TClonesArray*>(mgr->GetObject("MCTrack"));
     if (fMCTrack)
         mgr->Register("MCTrack", "Monte Carlo Tracks", fMCTrack, kTRUE);
 
@@ -784,7 +784,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
-            R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
+            R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fMCTrack->At(l));
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
@@ -863,7 +863,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BTofdPoint* hit = (R3BTofdPoint*)fTofdPoints->At(i);
+        R3BTofdPoint* hit = dynamic_cast<R3BTofdPoint*>(fTofdPoints->At(i));
         Int_t ID = hit->GetDetectorID();
         if (ID <= 122)
         {
@@ -931,7 +931,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi3aPoints->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi3aPoints->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi3aPoints->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 137.61468;
         if (qqq >= 5)
@@ -954,7 +954,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi3bPoints->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi3bPoints->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi3bPoints->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 137.61468;
         if (qqq >= 5)
@@ -978,7 +978,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi10Points->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi10Points->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi10Points->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 89.060413;
         if (qqq >= 5)
@@ -1001,7 +1001,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi11Points->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi11Points->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi11Points->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 89.060413;
         if (qqq >= 5)
@@ -1024,7 +1024,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi12Points->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi12Points->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi12Points->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 89.060413;
         if (qqq >= 5)
@@ -1047,7 +1047,7 @@ void R3BTrackerTestS454::Exec(Option_t* option)
     nHits = fFi13Points->GetEntriesFast();
     for (Int_t i = 0; i < nHits; i++)
     {
-        R3BFibPoint* hit = (R3BFibPoint*)fFi13Points->At(i);
+        R3BFibPoint* hit = dynamic_cast<R3BFibPoint*>(fFi13Points->At(i));
         Int_t ID = hit->GetDetectorID();
         qqq = sqrt(hit->GetEnergyLoss()) * 89.060413;
         if (qqq >= 5)

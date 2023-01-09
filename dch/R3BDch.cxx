@@ -194,7 +194,7 @@ void R3BDch::FindNodePath(TObjArray* arr)
 
     for (Int_t i = 0; i < arr->GetEntries(); i++)
     {
-        TGeoNode* aNode = (TGeoNode*)arr->At(i);
+        TGeoNode* aNode = dynamic_cast<TGeoNode*>(arr->At(i));
         TString nodName = aNode->GetName();
         if (nodName.Contains("DCH1") || nodName.Contains(sVol.Data()))
         {
@@ -280,7 +280,7 @@ void R3BDch::RecordFullMcHit()
         AddFullHit(trackId, mod, layer, cell, pos, lpos, mom, lmom, time, length, eLoss);
 
         // Increment number of DCH Points for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kDCH);
 
         ResetParameters();
@@ -421,7 +421,7 @@ void R3BDch::RecordPartialMcHit()
                fELoss);
 
         // Increment number of DCH Points for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kDCH);
 
         ResetParameters();
@@ -623,7 +623,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         R3BDchFullPoint* oldpoint = NULL;
         for (Int_t i = 0; i < nEntries; i++)
         {
-            oldpoint = (R3BDchFullPoint*)cl1->At(i);
+            oldpoint = dynamic_cast<R3BDchFullPoint*>(cl1->At(i));
             Int_t index = oldpoint->GetTrackID() + offset;
             oldpoint->SetTrackID(index);
             new (clref[fPosIndex]) R3BDchFullPoint(*oldpoint);
@@ -635,7 +635,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         R3BDchPoint* oldpoint = NULL;
         for (Int_t i = 0; i < nEntries; i++)
         {
-            oldpoint = (R3BDchPoint*)cl1->At(i);
+            oldpoint = dynamic_cast<R3BDchPoint*>(cl1->At(i));
             Int_t index = oldpoint->GetTrackID() + offset;
             oldpoint->SetTrackID(index);
             new (clref[fPosIndex]) R3BDchPoint(*oldpoint);
@@ -697,21 +697,21 @@ void R3BDch::ConstructGeometry()
         TGeoNode* dch_node = gGeoManager->GetTopVolume()->GetNode("DCH_0");
 
         TGeoNode* node = dch_node->GetVolume()->GetNode("DCH1_0");
-        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        TGeoCombiTrans* combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDx(fPos1.X());
         combtrans->SetDy(fPos1.Y());
         combtrans->SetDz(fPos1.Z());
         combtrans->SetRotation(fRot1);
 
         node = dch_node->GetVolume()->GetNode("DCH1_1");
-        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDx(fPos2.X());
         combtrans->SetDy(fPos2.Y());
         combtrans->SetDz(fPos2.Z());
         combtrans->SetRotation(fRot2);
 
         node = dch_node->GetVolume()->GetNode("HeParaLog_0");
-        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         combtrans->SetDx((fPos1.X() + fPos2.X()) / 2.);
         combtrans->SetDy(fPos2.Y());
         combtrans->SetDz((fPos1.Z() + fPos2.Z()) / 2.);

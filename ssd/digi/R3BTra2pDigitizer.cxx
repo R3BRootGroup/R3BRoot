@@ -61,7 +61,7 @@ void R3BTra2pDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTra2pDigiPar = (R3BTra2pDigiPar*)(rtdb->getContainer("R3BTra2pDigiPar"));
+    fTra2pDigiPar = dynamic_cast<R3BTra2pDigiPar*>(rtdb->getContainer("R3BTra2pDigiPar"));
 
     if (fTra2pDigiPar)
     {
@@ -78,9 +78,9 @@ InitStatus R3BTra2pDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTra2pPoints = (TClonesArray*)ioman->GetObject("TraPoint");
-    fTra2pMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTra2pPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TraPoint"));
+    fTra2pMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array Tra2pDigi
     fTra2pDigi = new TClonesArray("R3BTra2pDigi", 1000);
@@ -160,7 +160,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
     {
         //   LOG(info)<<"entries "<<l;
 
-        R3BTraPoint* Tra2p_obj = (R3BTraPoint*)fTra2pPoints->At(l);
+        R3BTraPoint* Tra2p_obj = dynamic_cast<R3BTraPoint*>(fTra2pPoints->At(l));
 
         //     Int_t DetID = Tra2p_obj->GetDetectorID();
         Double_t fX_In = Tra2p_obj->GetXIn();
@@ -170,7 +170,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
         Double_t fY_Out = Tra2p_obj->GetYOut();
         Double_t fZ_Out = Tra2p_obj->GetZOut();
         TrackIdTra = Tra2p_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTra2pMCTrack->At(TrackIdTra);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTra2pMCTrack->At(TrackIdTra));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

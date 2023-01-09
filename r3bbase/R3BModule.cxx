@@ -55,7 +55,7 @@ void R3BModule::ConstructGeometry()
     ConstructRootGeometry();
 }
 
-void R3BModule::ConstructRootGeometry()
+void R3BModule::ConstructRootGeometry(TGeoMatrix*)
 {
     LOG(info) << "R3BModule: Constructing " << GetName() << " (which is a " << ClassName()
               << ") geometry from ROOT file " << GetGeometryFileName() << " ...";
@@ -64,7 +64,7 @@ void R3BModule::ConstructRootGeometry()
     if (!fCombiTrans.IsIdentity())
     {
         auto n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
-        ((TGeoNodeMatrix*)n)->SetMatrix(fCombiTrans.MakeClone());
+        (dynamic_cast<TGeoNodeMatrix*>(n))->SetMatrix(fCombiTrans.MakeClone());
     }
 }
 

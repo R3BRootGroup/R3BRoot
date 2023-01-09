@@ -14,7 +14,7 @@
 #ifndef _R3BREADER_H
 #define _R3BREADER_H 1
 
-#include "TObject.h"
+#include "TNamed.h"
 #include "TString.h"
 
 extern "C"
@@ -25,7 +25,7 @@ extern "C"
 class TClonesArray;
 class R3BEventHeader;
 
-class R3BReader : public TObject
+class R3BReader : public TNamed
 {
   public:
     R3BReader(TString const&);
@@ -36,14 +36,10 @@ class R3BReader : public TObject
     virtual void SetParContainers() {}
     virtual Bool_t ReInit() { return kTRUE; }
     /* Read data from full event structure */
-    virtual Bool_t Read() = 0;
+    virtual Bool_t R3BRead() = 0;
     /* Reset */
     virtual void Reset() = 0;
     /* Return actual name of the reader */
-    const char* GetName() { return fName.Data(); }
-
-  protected:
-    TString fName;
 
   public:
     ClassDef(R3BReader, 0);

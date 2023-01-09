@@ -61,7 +61,7 @@ InitStatus R3BPdcMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMapped = (TClonesArray*)rm->GetObject("PdcMapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("PdcMapped"));
     if (!fMapped)
     {
         return kFATAL;
@@ -69,7 +69,7 @@ InitStatus R3BPdcMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("PdcTCalPar"));
     if (!fCalPar)
     {
         LOG(error) << "R3BPdcMapped2CalPar::Init() Couldn't get handle on PdcTCalPar. ";
@@ -90,7 +90,7 @@ void R3BPdcMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto mapped = (R3BPdcMappedData const*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BPdcMappedData const*>(fMapped->At(i));
 
         fEngine->Fill(mapped->GetPlaneId(), mapped->GetWireId(), mapped->GetEdgeId(), mapped->GetTimeFine());
     }

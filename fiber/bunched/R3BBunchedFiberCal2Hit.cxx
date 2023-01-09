@@ -143,20 +143,20 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, !mgr, "FairRootManager not found.");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     auto name = fName + "Cal";
-    fCalItems = (TClonesArray*)mgr->GetObject(name);
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     R3BLOG_IF(fatal, !fCalItems, "Branch " << name << " not found.");
 
     auto name_mapmt_trig = fName + "TriggerCal";
-    fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
+    fMAPMTCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name_mapmt_trig));
     R3BLOG_IF(fatal, !fMAPMTCalTriggerItems, "Branch " << name_mapmt_trig << " not found.");
 
     auto name_spmt_trig = "BunchedFiberSPMTTrigCal";
-    fSPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_spmt_trig);
+    fSPMTCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name_spmt_trig));
     R3BLOG_IF(warning, !fSPMTCalTriggerItems, "Branch " << name_spmt_trig << " not found.");
 
     // maxevent = mgr->CheckMaxEventNo();
@@ -179,7 +179,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
-        fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        fHitPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(container));
 
         if (!fHitPar)
         {
@@ -300,7 +300,7 @@ InitStatus R3BBunchedFiberCal2Hit::ReInit()
 
 void R3BBunchedFiberCal2Hit::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     if (!fMapPar)
     {
         R3BLOG(error, "Couldn't get " << fName << "MappingPar");
@@ -315,7 +315,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
         R3BLOG(info, "Nb of fibers for " << fName << ": " << fNumFibers);
     }
 
-    fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    fCalPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(fName + "HitPar"));
     R3BLOG_IF(error, !fCalPar, "Couldn't get " << fName << "HitPar.");
 }
 
@@ -340,7 +340,7 @@ void R3BBunchedFiberCal2Hit::S515()
     // std::cout << mapmt_trig_table.size() << std::endl;
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
-        auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
+        auto cal = dynamic_cast<R3BBunchedFiberCalData const*>(fMAPMTCalTriggerItems->At(j));
         auto idx = cal->GetChannel() - 1;
         if (idx >= mapmt_trig_table.size())
             mapmt_trig_table.resize(idx + 1);
@@ -358,7 +358,7 @@ void R3BBunchedFiberCal2Hit::S515()
     int s_mult = 0;
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsLeading())
         {
             ++n_lead;
@@ -380,7 +380,7 @@ void R3BBunchedFiberCal2Hit::S515()
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
 
         if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT())
             continue;
@@ -523,7 +523,7 @@ void R3BBunchedFiberCal2Hit::Standard()
     std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0]);
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
-        auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
+        auto cal = dynamic_cast<R3BBunchedFiberCalData const*>(fMAPMTCalTriggerItems->At(j));
         auto idx = cal->GetChannel() - 1;
         if (idx >= mapmt_trig_table.size())
             mapmt_trig_table.resize(idx + 1);
@@ -538,7 +538,7 @@ void R3BBunchedFiberCal2Hit::Standard()
     {
         for (size_t j = 0; j < spmt_trig_num; ++j)
         {
-            auto cal = (R3BBunchedFiberCalData const*)fSPMTCalTriggerItems->At(j);
+            auto cal = dynamic_cast<R3BBunchedFiberCalData const*>(fSPMTCalTriggerItems->At(j));
             auto idx = cal->GetChannel() - 1;
             if (idx >= spmt_trig_table.size())
                 spmt_trig_table.resize(idx + 1);
@@ -557,7 +557,7 @@ void R3BBunchedFiberCal2Hit::Standard()
     int s_mult = 0;
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsLeading())
         {
             ++n_lead;
@@ -583,7 +583,7 @@ void R3BBunchedFiberCal2Hit::Standard()
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->IsMAPMT() ? 0 : 1;

@@ -180,7 +180,7 @@ class R3BStack : public FairGenericStack
     /** Output to screen
      **@param iVerbose: 0=events summary, 1=track info
      **/
-    virtual void Print(Int_t iVerbose) const;
+    virtual void PrintStack(Int_t iVerbose) const;
 
     /** Modifiers  **/
     void StoreSecondaries(Bool_t choice = kTRUE) { fStoreSecondaries = choice; }

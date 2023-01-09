@@ -70,7 +70,7 @@ void R3BCave::ConstructGeometry()
     FairRun* fRun = FairRun::Instance();
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
 
-    R3BGeoPassivePar* par = (R3BGeoPassivePar*)(rtdb->getContainer("R3BGeoPassivePar"));
+    R3BGeoPassivePar* par = dynamic_cast<R3BGeoPassivePar*>(rtdb->getContainer("R3BGeoPassivePar"));
     TObjArray* fSensNodes = par->GetGeoSensitiveNodes();
     TObjArray* fPassNodes = par->GetGeoPassiveNodes();
 
@@ -78,7 +78,7 @@ void R3BCave::ConstructGeometry()
     FairGeoNode* node = NULL;
     FairGeoVolume* aVol = NULL;
 
-    while ((node = (FairGeoNode*)iter.Next()))
+    while ((node = dynamic_cast<FairGeoNode*>(iter.Next())))
     {
         aVol = dynamic_cast<FairGeoVolume*>(node);
         if (node->isSensitive())

@@ -111,11 +111,11 @@ InitStatus R3BRoluCal2Hit::Init()
     if (NULL == mgr)
         LOG(fatal) << "R3BRoluCal2Hit::Init() FairRootManager not found";
 
-    fCalItems = (TClonesArray*)mgr->GetObject("RoluCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluCal"));
     if (NULL == fCalItems)
         LOG(fatal) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
 
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerCal"));
     if (NULL == fCalTriggerItems)
         LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
 
@@ -168,7 +168,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
     Double_t lead_trig_ns = 0. / 0.;
     for (UInt_t j = 0; j < nTrig; ++j)
     {
-        auto cur_cal = (R3BRoluCalData*)fCalTriggerItems->At(j);
+        auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(j));
         lead_trig_ns = cur_cal->GetTimeL_ns(0);
         // cout<<"Trigger: "<<lead_trig_ns<<endl;
     }
@@ -192,7 +192,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
         /*
          * nParts is the number of particle passing through detector in one event
          */
-        R3BRoluCalData* calItem = (R3BRoluCalData*)fCalItems->At(iPart);
+        R3BRoluCalData* calItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
         iDet = calItem->GetDetector();
 
         for (Int_t iCha = 0; iCha < 4; iCha++)

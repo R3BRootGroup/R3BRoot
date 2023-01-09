@@ -73,7 +73,7 @@ Bool_t R3BMusliReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BMusliReader::Read()
+Bool_t R3BMusliReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_MUSLI_onion* data = (EXT_STR_h101_MUSLI_onion*)fData;

@@ -107,7 +107,7 @@ InitStatus R3BSci8Cal2Hit::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    fCalItems = (TClonesArray*)mgr->GetObject("Sci8Cal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci8Cal"));
     if (NULL == fCalItems)
         LOG(fatal) << "Branch Sci8Cal not found";
 
@@ -130,15 +130,15 @@ void R3BSci8Cal2Hit::Exec(Option_t* option)
 
     // missing times are NAN, hence other times will also
     // be NAN if one time is missing.
-    Double_t time_V[10][2] = { 0.0 / 0.0 }; // [multihit][pm]
-    Double_t time_L[10][2] = { 0.0 / 0.0 };
-    Double_t time_T[10][2] = { 0.0 / 0.0 };
+    Double_t time_V[10][2] = { {0.0 / 0.0} }; // [multihit][pm]
+    Double_t time_L[10][2] = { {0.0 / 0.0} };
+    Double_t time_T[10][2] = { {0.0 / 0.0} };
     Double_t timeM[10] = { 0.0 };
     Double_t TresM[10] = { 0.0 / 0.0 };
     Double_t timeT[10] = { 0.0 };
     Double_t TresT[10] = { 0.0 / 0.0 };
     Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][2] = { 0.0 / 0.0 };
+    Double_t tot[10][2] = { {0.0 / 0.0} };
     Double_t x_cm[10] = { 0.0 / 0.0 };
     Double_t xT_cm[10] = { 0.0 / 0.0 };
     Double_t Z[10] = { 0.0 };
@@ -222,7 +222,7 @@ void R3BSci8Cal2Hit::Exec(Option_t* option)
         /*
          * nPart is the number of particle passing through Sci8 detector in one event
          */
-        R3BSci8CalData* calItem = (R3BSci8CalData*)fCalItems->At(iPart);
+        R3BSci8CalData* calItem = dynamic_cast<R3BSci8CalData*>(fCalItems->At(iPart));
         nDet = calItem->GetDetector();
 
         // VFTX Channels 1-2:

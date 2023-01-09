@@ -116,10 +116,10 @@ InitStatus R3BTofiMapped2Cal::Init()
         LOG(fatal) << "FairRootManager not found";
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("TofiMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofiMapped"));
     if (NULL == fMappedItems)
         LOG(fatal) << "Branch TofiMapped not found";
-    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("TofiTriggerMapped");
+    fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofiTriggerMapped"));
     if (NULL == fMappedTriggerItems)
         LOG(fatal) << "Branch TofiTriggerMapped not found";
 
@@ -133,7 +133,7 @@ InitStatus R3BTofiMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BTofiMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofiTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofiTCalPar"));
     if (!fTcalPar)
     {
         LOG(error) << "Could not get access to TofiTCalPar-Container.";
@@ -175,7 +175,7 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
     std::vector<std::vector<Cal>> cal_vec(fNofPlanes * fPaddlesPerPlane * 2);
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {
-        auto mapped = (R3BTofiMappedData const*)fMappedItems->At(mapped_i);
+        auto mapped = dynamic_cast<R3BTofiMappedData const*>(fMappedItems->At(mapped_i));
 
         if ((mapped->GetDetectorId() < 1) || (mapped->GetDetectorId() > fNofPlanes))
         {
@@ -292,7 +292,7 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
     mapped_num = fMappedTriggerItems->GetEntriesFast();
     for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
     {
-        auto mapped = (R3BTofiMappedData const*)fMappedTriggerItems->At(mapped_i);
+        auto mapped = dynamic_cast<R3BTofiMappedData const*>(fMappedTriggerItems->At(mapped_i));
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {

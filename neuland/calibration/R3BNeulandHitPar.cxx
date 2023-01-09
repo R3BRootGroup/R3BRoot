@@ -74,7 +74,7 @@ void R3BNeulandHitPar::printParams()
     LOG(info) << " Number of Parameters " << fParams->GetEntries();
     for (Int_t i = 0; i < fParams->GetEntries(); i++)
     {
-        R3BNeulandHitModulePar* t_par = (R3BNeulandHitModulePar*)fParams->At(i);
+        R3BNeulandHitModulePar* t_par = dynamic_cast<R3BNeulandHitModulePar*>(fParams->At(i));
         LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {

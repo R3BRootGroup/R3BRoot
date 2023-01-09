@@ -74,8 +74,8 @@ InitStatus R3BMusicDigitizer::Init()
     if (!ioman)
         LOG(fatal) << "Init::No FairRootManager";
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    fMusicPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fMusicPoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
 
     // Register output array fMusicCal
     fMusicCal = new TClonesArray("R3BMusicCalData", 10);
@@ -109,10 +109,10 @@ void R3BMusicDigitizer::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        pointData[i] = (R3BMusicPoint*)(fMusicPoints->At(i));
+        pointData[i] = dynamic_cast<R3BMusicPoint*>(fMusicPoints->At(i));
         TrackId = pointData[i]->GetTrackID();
 
-        R3BMCTrack* Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        R3BMCTrack* Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
         anodeId = pointData[i]->GetDetCopyID();
         // std::cout<<anodeId<<std::endl;

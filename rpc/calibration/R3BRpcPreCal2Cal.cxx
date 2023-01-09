@@ -69,14 +69,14 @@ InitStatus R3BRpcPreCal2Cal::Init()
         LOG(error) << "R3BRpcPreCal2Cal:: FairRuntimeDb not opened";
     }
 
-    fPreCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcPreCalData");
+    fPreCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("R3BRpcPreCalData"));
     if (!fPreCalDataCA)
     {
         LOG(error) << "R3BRpcPreCal2CalPar::Init() fPreCalDataCA not found";
         return kFATAL;
     }
 
-    fTotCalPar = (R3BRpcTotCalPar*)rtdb->getContainer("RpcTotCalPar");
+    fTotCalPar = dynamic_cast<R3BRpcTotCalPar*>(rtdb->getContainer("RpcTotCalPar"));
     if (!fTotCalPar)
     {
         LOG(error) << "R3BRpcPreCal2CalPar::Init() Couldn't get handle on RpcTotCalPar container";
@@ -109,7 +109,7 @@ void R3BRpcPreCal2Cal::Exec(Option_t* option)
     Int_t nHits = fPreCalDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcPreCalData*)(fPreCalDataCA->At(i));
+        auto map1 = dynamic_cast<R3BRpcPreCalData*>(fPreCalDataCA->At(i));
 
         UInt_t iDetector = map1->GetDetId();
         if (iDetector == 2)
@@ -119,7 +119,7 @@ void R3BRpcPreCal2Cal::Exec(Option_t* option)
         UInt_t inum = (iDetector * 41 + map1->GetChannelId()) * 2 + map1->GetSide() - 2;
         for (Int_t ii = i + 1; ii < nHits; ii++)
         {
-            auto nxt_chn = (R3BRpcPreCalData*)fPreCalDataCA->At(ii);
+            auto nxt_chn = dynamic_cast<R3BRpcPreCalData*>(fPreCalDataCA->At(ii));
             if (map1->GetChannelId() == nxt_chn->GetChannelId() && map1->GetSide() != nxt_chn->GetSide())
             {
                 UInt_t nxt_inum = (iDetector * 41 + nxt_chn->GetChannelId()) * 2 + nxt_chn->GetSide() - 2;

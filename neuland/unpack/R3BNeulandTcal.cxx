@@ -88,7 +88,7 @@ InitStatus R3BNeulandTcal::Init()
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
         }
     */
-    fMappedHit = (TClonesArray*)mgr->GetObject("NeulandMappedData");
+    fMappedHit = dynamic_cast<TClonesArray*>(mgr->GetObject("NeulandMappedData"));
     if (NULL == fMappedHit)
     {
         LOG(fatal) << "Branch NeulandMappedData not found";
@@ -103,7 +103,7 @@ void R3BNeulandTcal::SetParContainers()
 {
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
+    fTcalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer("LandTCalPar"));
 }
 
 InitStatus R3BNeulandTcal::ReInit()
@@ -141,7 +141,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        hit = (R3BPaddleTamexMappedData*)fMappedHit->At(ihit);
+        hit = dynamic_cast<R3BPaddleTamexMappedData*>(fMappedHit->At(ihit));
         if (NULL == hit)
         {
             continue;

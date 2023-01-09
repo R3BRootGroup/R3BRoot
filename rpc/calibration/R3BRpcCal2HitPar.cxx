@@ -81,7 +81,7 @@ InitStatus R3BRpcCal2HitPar::Init()
         return kFATAL;
     }
 
-    fCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
+    fCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("R3BRpcCalData"));
     if (!fCalDataCA)
     {
         LOG(error) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
@@ -95,7 +95,7 @@ InitStatus R3BRpcCal2HitPar::Init()
         return kFATAL;
     }
 
-    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
+    fHitPar = dynamic_cast<R3BRpcHitPar*>(rtdb->getContainer("RpcHitPar"));
     if (!fHitPar)
 
     {
@@ -133,7 +133,7 @@ void R3BRpcCal2HitPar::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcCalData*)(fCalDataCA->At(i));
+        auto map1 = dynamic_cast<R3BRpcCalData*>(fCalDataCA->At(i));
         iDetector = map1->GetDetId();
         inum = iDetector * 41 + map1->GetChannelId() - 1;
 
@@ -278,7 +278,7 @@ void R3BRpcCal2HitPar::CalculateParsStrip()
 
         fhTime[t]->Fit("gaus");
 
-        TF1* g = (TF1*)fhTime[t]->GetListOfFunctions()->FindObject("gaus");
+        TF1* g = dynamic_cast<TF1*>(fhTime[t]->GetListOfFunctions()->FindObject("gaus"));
         fHitPar->SetCalParams3(g->GetParameter(1), t);
     }
 }
@@ -326,7 +326,7 @@ void R3BRpcCal2HitPar::CalculateParsPmt()
 
             fhPos[t]->Fit("gaus");
 
-            TF1* g = (TF1*)fhPos[t]->GetListOfFunctions()->FindObject("gaus");
+            TF1* g = dynamic_cast<TF1*>(fhPos[t]->GetListOfFunctions()->FindObject("gaus"));
 
             v.push_back(g->GetParameter(1));
             average += g->GetParameter(1);

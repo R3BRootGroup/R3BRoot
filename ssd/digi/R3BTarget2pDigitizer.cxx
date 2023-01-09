@@ -74,7 +74,7 @@ void R3BTarget2pDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fTarget2pDigiPar = (R3BTarget2pDigiPar*)(rtdb->getContainer("R3BTarget2pDigiPar"));
+    fTarget2pDigiPar = dynamic_cast<R3BTarget2pDigiPar*>(rtdb->getContainer("R3BTarget2pDigiPar"));
 
     if (fTarget2pDigiPar)
     {
@@ -91,9 +91,9 @@ InitStatus R3BTarget2pDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTarget2pPoints = (TClonesArray*)ioman->GetObject("TraPoint");
-    fTarget2pMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fTarget2pPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TraPoint"));
+    fTarget2pMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array TraDigi
     fTarget2pDigi = new TClonesArray("R3BTarget2pDigi", 1000);
@@ -170,7 +170,7 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt)
         // if (l<4){
         //   LOG(info)<<"entries "<<l;
         //}
-        R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fMCTrack->At(l));
 
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
@@ -286,12 +286,12 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt)
     {
         //   LOG(info)<<"entries "<<l;
 
-        R3BTraPoint* Tra_obj = (R3BTraPoint*)fTarget2pPoints->At(l);
+        R3BTraPoint* Tra_obj = dynamic_cast<R3BTraPoint*>(fTarget2pPoints->At(l));
 
         //     Int_t DetID = Tra_obj->GetDetectorID();
 
         TrackIdTra = Tra_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fTarget2pMCTrack->At(TrackIdTra);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fTarget2pMCTrack->At(TrackIdTra));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

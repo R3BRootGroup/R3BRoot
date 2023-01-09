@@ -62,7 +62,7 @@ void R3BGfiDigitizer::SetParContainers()
     if (!rtdb)
         LOG(fatal) << "SetParContainers: No runtime database";
 
-    fGfiDigiPar = (R3BGfiDigiPar*)(rtdb->getContainer("R3BGfiDigiPar"));
+    fGfiDigiPar = dynamic_cast<R3BGfiDigiPar*>(rtdb->getContainer("R3BGfiDigiPar"));
 
     if (fGfiDigiPar)
     {
@@ -79,8 +79,8 @@ InitStatus R3BGfiDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fGfiPoints = (TClonesArray*)ioman->GetObject("GFIPoint");
-    fGfiMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fGfiPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("GFIPoint"));
+    fGfiMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
 
     // Register output array GfiDigi
     fGfiDigi = new TClonesArray("R3BGfiDigi", 1000);
@@ -117,7 +117,7 @@ void R3BGfiDigitizer::Exec(Option_t* opt)
     {
         //   cout<<"entries "<<l<<endl;
 
-        R3BGfiPoint* Gfi_obj = (R3BGfiPoint*)fGfiPoints->At(l);
+        R3BGfiPoint* Gfi_obj = dynamic_cast<R3BGfiPoint*>(fGfiPoints->At(l));
 
         //     Int_t DetID = Gfi_obj->GetDetectorID();
         Double_t fX_In = Gfi_obj->GetXIn();
@@ -125,7 +125,7 @@ void R3BGfiDigitizer::Exec(Option_t* opt)
         Double_t fZ_In = Gfi_obj->GetZIn();
         Double_t fZ_Out = Gfi_obj->GetZOut();
         TrackIdGfi = Gfi_obj->GetTrackID();
-        R3BMCTrack* aTrack = (R3BMCTrack*)fGfiMCTrack->At(TrackIdGfi);
+        R3BMCTrack* aTrack = dynamic_cast<R3BMCTrack*>(fGfiMCTrack->At(TrackIdGfi));
         Int_t PID = aTrack->GetPdgCode();
         Int_t mother = aTrack->GetMotherId();
 

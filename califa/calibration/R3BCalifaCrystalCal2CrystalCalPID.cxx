@@ -93,7 +93,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::Register()
         LOG(fatal) << "Init: No FairRootManager";
         return;
     }
-    fCrystalCalDataCA = (TClonesArray*)fMan->GetObject("CalifaCrystalCalData");
+    fCrystalCalDataCA = dynamic_cast<TClonesArray*>(fMan->GetObject("CalifaCrystalCalData"));
     if (NULL == fCrystalCalDataCA)
     {
         LOG(fatal) << "Branch CalifaCrystalCalData not found";

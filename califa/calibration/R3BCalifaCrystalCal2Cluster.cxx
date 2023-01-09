@@ -55,7 +55,7 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     , fRand(kFALSE)
     , fRandFile("")
 {
-    SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
+    R3BCalifaCrystalCal2Cluster::SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
     fCalifatoTargetPos.SetXYZ(0., 0., 0.);
 }
 

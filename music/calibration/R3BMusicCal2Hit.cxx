@@ -83,7 +83,7 @@ void R3BMusicCal2Hit::SetParContainers()
         LOG(error) << "FairRuntimeDb not found";
     }
 
-    fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
+    fCal_Par = dynamic_cast<R3BMusicHitPar*>(rtdb->getContainer("musicHitPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BMusicCal2HitPar::Init() Couldn't get handle on musicHitPar container";
@@ -152,7 +152,7 @@ InitStatus R3BMusicCal2Hit::Init()
         return kFATAL;
     }
 
-    fMusicCalDataCA = (TClonesArray*)rootManager->GetObject("MusicCalData");
+    fMusicCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("MusicCalData"));
     if (!fMusicCalDataCA)
     {
         LOG(error) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
@@ -214,7 +214,7 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
+        CalDat[i] = dynamic_cast<R3BMusicCalData*>(fMusicCalDataCA->At(i));
         anodeId = CalDat[i]->GetAnodeID();
         energyperanode[anodeId] = CalDat[i]->GetEnergy();
         dt[anodeId] = CalDat[i]->GetDTime();
@@ -289,7 +289,7 @@ void R3BMusicCal2Hit::ExecSim(int nHits)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
+        CalDat[i] = dynamic_cast<R3BMusicCalData*>(fMusicCalDataCA->At(i));
         anodeId = CalDat[i]->GetAnodeID();
         energyperanode[anodeId] = CalDat[i]->GetEnergy();
         dt[anodeId] = CalDat[i]->GetDTime();

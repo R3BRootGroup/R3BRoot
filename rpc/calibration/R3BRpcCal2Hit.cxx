@@ -72,14 +72,14 @@ InitStatus R3BRpcCal2Hit::Init()
         return kFATAL;
     }
 
-    fR3BEventHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    fR3BEventHeader = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!fR3BEventHeader)
     {
         LOG(error) << "R3BRpcCal2HitPar::Init() EventHeader. not found";
         return kFATAL;
     }
 
-    fHitPar = (R3BRpcHitPar*)rtdb->getContainer("RpcHitPar");
+    fHitPar = dynamic_cast<R3BRpcHitPar*>(rtdb->getContainer("RpcHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "R3BRpcCal2Hit::Init() Couldn't get handle on RPCHitPar container";
@@ -89,7 +89,7 @@ InitStatus R3BRpcCal2Hit::Init()
         LOG(info) << "R3BRpcCal2Hit:: RPCHitPar container open";
     }
 
-    fRpcCalDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcCalData");
+    fRpcCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("R3BRpcCalData"));
     if (!fRpcCalDataCA)
     {
         LOG(error) << "R3BRpcCal2HitPar::Init() R3BRpcCalData not found";
@@ -134,7 +134,7 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto map1 = (R3BRpcCalData*)(fRpcCalDataCA->At(i));
+        auto map1 = dynamic_cast<R3BRpcCalData*>(fRpcCalDataCA->At(i));
         iDetector = map1->GetDetId();
         inum = iDetector * 41 + map1->GetChannelId() - 1;
 

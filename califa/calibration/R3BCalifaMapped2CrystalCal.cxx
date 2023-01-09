@@ -54,7 +54,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
+    fCal_Par = dynamic_cast<R3BCalifaCrystalCalPar*>(rtdb->getContainer("califaCrystalCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(error, "Couldn't get handle on califaCrystalCalPar container");
@@ -64,7 +64,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
         R3BLOG(info, "califaCrystalCalPar container opened");
     }
 
-    fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
+    fTotCal_Par = dynamic_cast<R3BCalifaTotCalPar*>(rtdb->getContainer("CalifaTotCalPar"));
     if (!fTotCal_Par)
     {
         R3BLOG(warn, "Couldn't get handle on CalifaTotCalPar container");
@@ -158,7 +158,7 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
         return kFATAL;
     }
 
-    fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
+    fCalifaMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("CalifaMappedData"));
     if (!fCalifaMappedDataCA)
     {
         R3BLOG(fatal, "CalifaMappedData not found");
@@ -224,7 +224,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BCalifaMappedData*>(fCalifaMappedDataCA->At(i));
         auto crystalId = mappedData[i]->GetCrystalId();
         auto wrts = mappedData[i]->GetWrts();
         auto ov = mappedData[i]->GetOverFlow();
@@ -253,7 +253,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
                         pow(raw[idx], (fNumParams == 1) ? 1 : p) * fCalParams->GetAt(fNumParams * (crystalId - 1) + p);
                 }
         else
-            for (int idx; idx < 3; idx++)
+          for (int idx{}; idx < 3; idx++)
                 cal[idx] = NAN;
 
         double TotCal = Tot;

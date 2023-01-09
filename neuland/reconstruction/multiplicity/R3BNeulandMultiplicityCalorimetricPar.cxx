@@ -84,10 +84,10 @@ std::map<UInt_t, TCutG*> R3BNeulandMultiplicityCalorimetricPar::GetNeutronCuts()
 
     TObjString* key;
     TIterator* nextobj = fNeutronCuts->MakeIterator();
-    while ((key = (TObjString*)nextobj->Next()))
+    while ((key = dynamic_cast<TObjString*>(nextobj->Next())))
     {
         UInt_t nNeutrons = key->GetString().Atoi();
-        map[nNeutrons] = (TCutG*)fNeutronCuts->GetValue(key)->Clone();
+        map[nNeutrons] = dynamic_cast<TCutG*>(fNeutronCuts->GetValue(key)->Clone());
     }
 
     return map;
@@ -111,10 +111,10 @@ UInt_t R3BNeulandMultiplicityCalorimetricPar::GetNeutronMultiplicity(const Doubl
 
     TObjString* key;
     TIterator* nextobj = fNeutronCuts->MakeIterator();
-    while ((key = (TObjString*)nextobj->Next()))
+    while ((key = dynamic_cast<TObjString*>(nextobj->Next())))
     {
         // UInt_t nNeutrons = key->GetString().Atoi();
-        if (((TCutG*)fNeutronCuts->GetValue(key))->IsInside(energy, nClusters))
+        if ((dynamic_cast<TCutG*>(fNeutronCuts->GetValue(key)))->IsInside(energy, nClusters))
         {
             return (UInt_t)key->GetString().Atoi();
         }

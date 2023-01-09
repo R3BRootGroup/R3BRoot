@@ -116,9 +116,9 @@ void R3BLand::Initialize()
         fMapMcId[id3] = 3;
     }
 
-    TGeoBBox* box = (TGeoBBox*)gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape();
-    TGeoBBox* bbox = (TGeoBBox*)gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape();
-    TGeoBBox* bbbox = (TGeoBBox*)gGeoManager->GetVolume("CELL")->GetShape();
+    TGeoBBox* box = dynamic_cast<TGeoBBox*>(gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape());
+    TGeoBBox* bbox = dynamic_cast<TGeoBBox*>(gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape());
+    TGeoBBox* bbbox = dynamic_cast<TGeoBBox*>(gGeoManager->GetVolume("CELL")->GetShape());
     Int_t maxPlane;
     Int_t maxPaddle;
     maxPlane = (Int_t)(bbbox->GetDZ() / bbox->GetDZ());
@@ -135,7 +135,7 @@ void R3BLand::Initialize()
         maxPaddle = (Int_t)(maxPlane * ((Int_t)(box->GetDX() / box->GetDY())));
     }
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
-    R3BLandDigiPar* par = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    R3BLandDigiPar* par = dynamic_cast<R3BLandDigiPar*>(rtdb->getContainer("R3BLandDigiPar"));
     par->SetGeometryFileName(GetGeometryFileName());
     par->SetMaxPaddle(maxPaddle);
     par->SetMaxPlane(maxPlane);
@@ -289,7 +289,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol)
                fLightYield);
 
         // Increment number of LandPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kLAND);
 
         ResetParameters();
@@ -400,7 +400,7 @@ void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BLandPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BLandPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BLandPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BLandPoint(*oldpoint);

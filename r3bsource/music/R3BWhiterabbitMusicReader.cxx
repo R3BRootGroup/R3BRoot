@@ -57,7 +57,7 @@ Bool_t R3BWhiterabbitMusicReader::Init(ext_data_struct_info* a_struct_info)
 
     // Look for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         LOG(warn) << "R3BWhiterabbitMusicReader::Init() EventHeader. not found";
@@ -73,7 +73,7 @@ Bool_t R3BWhiterabbitMusicReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitMusicReader::Read()
+Bool_t R3BWhiterabbitMusicReader::R3BRead()
 {
     if (!fData->TIMESTAMP_MUSIC_ID)
     {

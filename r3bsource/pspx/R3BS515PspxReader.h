@@ -16,6 +16,7 @@
 
 #include "R3BReader.h"
 #include <Rtypes.h>
+#include <cassert>
 
 struct EXT_STR_h101_PSP_t;
 typedef struct EXT_STR_h101_PSP_t EXT_STR_h101_PSP;
@@ -42,7 +43,7 @@ class R3BS515PspxReader : public R3BReader
     virtual Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t Read() override;
+    virtual Bool_t R3BRead() override;
 
     // Write data into MappedData
     virtual Bool_t WriteMappedData(EXT_STR_h101_PSP_onion* source);

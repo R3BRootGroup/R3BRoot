@@ -88,7 +88,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BNeulandTamexReader::Read()
+Bool_t R3BNeulandTamexReader::R3BRead()
 {
     const auto data = fData;
 

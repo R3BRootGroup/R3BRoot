@@ -153,10 +153,10 @@ InitStatus R3BTofdCal2HitPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
 
-    fCalData = (TClonesArray*)rm->GetObject("TofdCal");
+    fCalData = dynamic_cast<TClonesArray*>(rm->GetObject("TofdCal"));
     if (!fCalData)
     {
         return kFATAL;
@@ -167,7 +167,7 @@ InitStatus R3BTofdCal2HitPar::Init()
         LOG(error) << "R3BTofdCal2HitPar::Init() Number of modules not set. ";
         return kFATAL;
     }
-    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
+    fCalItemsLos = dynamic_cast<TClonesArray*>(rm->GetObject("LosCal"));
     if (NULL == fCalItemsLos)
         LOG(fatal) << "Branch LosCal not found";
 
@@ -178,7 +178,7 @@ void R3BTofdCal2HitPar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fCal_Par = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
@@ -205,7 +205,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(fCalItemsLos->At(ihit));
 
             Int_t iDet = calData->GetDetector();
             // Int_t iCha=calData->GetChannel();
@@ -244,7 +244,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalData->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
@@ -727,8 +727,8 @@ void R3BTofdCal2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Doubl
     cfit_exp->Clear();
     cfit_exp->Divide(1, 3);
     cfit_exp->cd(1);
-    TH2F* histo1 = (TH2F*)histo->Clone();
-    TH2F* histo2 = (TH2F*)histo->Clone();
+    TH2F* histo1 = dynamic_cast<TH2F*>(histo->Clone());
+    TH2F* histo2 = dynamic_cast<TH2F*>(histo->Clone());
 
     histo1->Draw("colz");
 

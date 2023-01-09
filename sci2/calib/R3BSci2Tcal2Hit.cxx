@@ -69,7 +69,7 @@ void R3BSci2Tcal2Hit::SetParContainers()
     {
         LOG(error) << "FairRuntimeDb not opened!";
     }
-    fSci2Hit_Par = (R3BSci2HitPar*)rtdb->getContainer("Sci2HitPar");
+    fSci2Hit_Par = dynamic_cast<R3BSci2HitPar*>(rtdb->getContainer("Sci2HitPar"));
     if (!fSci2Hit_Par)
     {
         LOG(error) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
@@ -94,7 +94,7 @@ InitStatus R3BSci2Tcal2Hit::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    fCalItems = (TClonesArray*)mgr->GetObject("Sci2Tcal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Tcal"));
     if (NULL == fCalItems)
         LOG(fatal) << "R3BSci2Tcal2Hit::Init() Sci2Tcal not found";
 
@@ -149,7 +149,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
         nHits = fCalItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fCalItems->At(ihit);
+            R3BSci2TcalData* hittcal = dynamic_cast<R3BSci2TcalData*>(fCalItems->At(ihit));
             if (!hittcal)
                 continue;
             iDet = hittcal->GetDetector() - 1;

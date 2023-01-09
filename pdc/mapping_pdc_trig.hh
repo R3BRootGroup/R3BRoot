@@ -1,5 +1,5 @@
 // Generated Mon Jul  6 11:44:01 CEST 2020
-unsigned g_pdc_trig_map[4][144] = {0};
+unsigned g_pdc_trig_map[4][144] = {{0}};
 void pdc_trig_map_setup() {
 	g_pdc_trig_map[0][0] = 0;
 	g_pdc_trig_map[0][1] = 0;

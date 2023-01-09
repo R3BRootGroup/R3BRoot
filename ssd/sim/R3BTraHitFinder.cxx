@@ -47,7 +47,7 @@ InitStatus R3BTraHitFinder::Init()
     FairRootManager* ioManager = FairRootManager::Instance();
     if (!ioManager)
         LOG(fatal) << "Init: No FairRootManager";
-    fTrackerHitCA = (TClonesArray*)ioManager->GetObject("TraPoint");
+    fTrackerHitCA = dynamic_cast<TClonesArray*>(ioManager->GetObject("TraPoint"));
 
     // Register output array TraHit
     fTraHitCA = new TClonesArray("R3BTrackerHit", 1000);
@@ -587,7 +587,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
         for (Int_t i = 0; i < traHitsPerEvent; i++)
         {
             traHit[i] = new R3BTraPoint;
-            traHit[i] = (R3BTraPoint*)fTrackerHitCA->At(i);
+            traHit[i] = dynamic_cast<R3BTraPoint*>(fTrackerHitCA->At(i));
             Energy = ExpResSmearing(traHit[i]->GetEnergyLoss());
             // Energy = traHit[i]->GetEnergyLoss();
             Detector = traHit[i]->GetDetCopyID();

@@ -109,9 +109,9 @@ InitStatus R3BOnlineSpectraSfib::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
 
@@ -121,13 +121,13 @@ InitStatus R3BOnlineSpectraSfib::Init()
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
     }
 
     //------------------------------------------------------------------------
@@ -557,7 +557,7 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
         Int_t nMapped = det->GetEntriesFast();
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
-            auto mapped = (R3BSfibMappedData const*)det->At(imapped);
+            auto mapped = dynamic_cast<R3BSfibMappedData const*>(det->At(imapped));
             if (!mapped)
             {
                 continue; // should not happen
@@ -946,11 +946,11 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
         // mapping of fired fiber 2019.03.12 J.Tanaka
         Int_t sfib_fired[5] = { -100 }; // sfib_fired[multiplicity]
         Int_t sfib_map[256][256] = {
-            -100
+            {-100}
         }; // convert from Sipm number on top 256 times bot 256 to fiber number 4096. sfib_map[top][bot]
-        Double_t sfib_multi_tot[2][5] = { -100 };
-        Double_t sfib_tot_fired[2][2048] = { -100 };
-        Int_t sfib_multi_ch[2][256] = { -100 };
+        Double_t sfib_multi_tot[2][5] = { {-100} };
+        Double_t sfib_tot_fired[2][2048] = { {-100} };
+        Int_t sfib_multi_ch[2][256] = { {-100} };
         // Double_t sfib_multi_clus_tot[2][5]={-100};
         // Double_t sfib_multi_clus_fired[2][2048]={-100};
 

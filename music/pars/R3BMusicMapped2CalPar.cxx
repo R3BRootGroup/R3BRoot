@@ -87,7 +87,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
+    fMusicMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("MusicMappedData"));
     if (!fMusicMappedDataCA)
     {
         LOG(error) << "R3BMusicMapped2CalPar: MusicMappedData not found";
@@ -98,7 +98,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
 
     if (fNameDetA == "Los")
     {
-        fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "Hit");
+        fHitItemsDetA = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetA + "Hit"));
         if (!fHitItemsDetA)
         {
             LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetA + "Hit not found";
@@ -107,7 +107,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
     }
     else
     {
-        fHitItemsDetA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
+        fHitItemsDetA = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetA + "HitData"));
         if (!fHitItemsDetA)
         {
             LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetA + "HitData not found";
@@ -115,7 +115,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
         }
     }
 
-    fHitItemsDetB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
+    fHitItemsDetB = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetB + "HitData"));
     if (!fHitItemsDetB)
     {
         LOG(error) << "R3BMusicMapped2CalPar: " + fNameDetB + "HitData not found";
@@ -128,7 +128,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
+    fCal_Par = dynamic_cast<R3BMusicCalPar*>(rtdb->getContainer("musicCalPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BMusicMapped2CalPar:: Couldn't get handle on musicCalPar container";
@@ -175,14 +175,14 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
     R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
     for (Int_t i = 0; i < nHitsA; i++)
     {
-        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsDetA->At(i));
+        hitMwAData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsDetA->At(i));
         PosDetA.SetX(hitMwAData[i]->GetX());
         // LOG(info) <<hitMwAData[i]->GetX();
     }
     R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
-        hitMwBData[i] = (R3BMwpcHitData*)(fHitItemsDetB->At(i));
+        hitMwBData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsDetB->At(i));
         PosDetB.SetX(hitMwBData[i]->GetX());
         // LOG(info) <<hitMwBData[i]->GetX();
     }
@@ -202,7 +202,7 @@ void R3BMusicMapped2CalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMusicMappedData*)(fMusicMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMusicMappedData*>(fMusicMappedDataCA->At(i));
         anodeId = mappedData[i]->GetAnodeID();
 
         if (anodeId < fNumAnodes)

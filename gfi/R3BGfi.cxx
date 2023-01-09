@@ -240,7 +240,7 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of GfiPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kGFI);
 
         ResetParameters();
@@ -310,7 +310,7 @@ void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     R3BGfiPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BGfiPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<R3BGfiPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) R3BGfiPoint(*oldpoint);
@@ -351,12 +351,12 @@ void R3BGfi::ConstructGeometry()
         TGeoNode* gfi_node = gGeoManager->GetTopVolume()->GetNode("GFI_0");
 
         TGeoNode* node = gfi_node->GetVolume()->GetNode("GFILogWorld_0");
-        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        TGeoCombiTrans* combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         TGeoTranslation* tr1 = new TGeoTranslation(fPos1.X(), fPos1.Y(), fPos1.Z());
         *combtrans = { *tr1, *fRot1 };
 
         node = gfi_node->GetVolume()->GetNode("GFILogWorld_1");
-        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans = dynamic_cast<TGeoCombiTrans*>((dynamic_cast<TGeoNodeMatrix*>(node))->GetMatrix());
         TGeoTranslation* tr2 = new TGeoTranslation(fPos2.X(), fPos2.Y(), fPos2.Z());
         *combtrans = { *tr2, *fRot2 };
     }

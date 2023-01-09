@@ -132,17 +132,17 @@ InitStatus R3BPdcCal2Hit::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
-    fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PdcCal"));
     if (NULL == fCalItems)
         LOG(fatal) << "Branch PdcCal not found";
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("PdcTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PdcTriggerCal"));
     if (NULL == fCalTriggerItems)
         LOG(fatal) << "Branch PdcTriggerCal not found";
     maxevent = mgr->CheckMaxEventNo();
@@ -195,7 +195,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
     std::vector<R3BPdcCalData const*> trig_table(LENGTH(EXT_STR_h101_PDC_onion::PDC_P));
     for (size_t j = 0; j < trig_num; ++j)
     {
-        auto cal = (R3BPdcCalData const*)fCalTriggerItems->At(j);
+        auto cal = dynamic_cast<R3BPdcCalData const*>(fCalTriggerItems->At(j));
         trig_table.at(cal->GetWireId() - 1) = cal;
     }
 
@@ -211,7 +211,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
     unsigned n_trail = 0;
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BPdcCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BPdcCalData const*>(fCalItems->At(j));
         if (cur_cal->GetEdgeId() == 1)
         {
             ++n_lead;
@@ -234,7 +234,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BPdcCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BPdcCalData const*>(fCalItems->At(j));
         if (cur_cal->GetEdgeId() == 2)
         {
             Double_t c_period = 4096. * (1000. / fClockFreq);

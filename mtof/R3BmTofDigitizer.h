@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BMTOFDIGITIZER_H
-#define R3BMTOFDDIGITISER_H 1
+#define R3BMTOFDIGITIZER_H 1
 
 #include "FairTask.h"
 #include "R3BmTofDigi.h"

@@ -131,7 +131,7 @@ InitStatus R3BCalifaEventDisplay::Init()
     if (!ioManager)
         LOG(fatal) << "Init: No FairRootManager";
     if (!fCrystalHitCA)
-        fCrystalHitCA = (TClonesArray*)ioManager->GetObject("CalifaCrystalCalData");
+        fCrystalHitCA = dynamic_cast<TClonesArray*>(ioManager->GetObject("CalifaCrystalCalData"));
 
     fEventManager = FairEventManager::Instance();
 
@@ -168,7 +168,7 @@ void R3BCalifaEventDisplay::Exec(Option_t* opt)
         // Loop in Crystal Hits
         for (Int_t i = 0; i < crystalHits; i++)
         {
-            crystalHit = (R3BCalifaCrystalCalData*)fCrystalHitCA->At(i);
+            crystalHit = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalHitCA->At(i));
             GetAngles(fGeometryVersion, crystalHit->GetCrystalId(), &theta, &phi, &rho);
         }
 
@@ -235,7 +235,7 @@ void R3BCalifaEventDisplay::Exec(Option_t* opt)
         sceneLeftBottom->AddElement(axes);
 
         fProjManager2 = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
-        fCalo2d = (TEveCalo2D*)fProjManager2->ImportElements(fCalo3d);
+        fCalo2d = dynamic_cast<TEveCalo2D*>(fProjManager2->ImportElements(fCalo3d));
         sceneRightBottom->AddElement(fCalo2d);
         TEveProjectionAxes* axes2 = new TEveProjectionAxes(fProjManager2);
         sceneRightBottom->AddElement(axes2);

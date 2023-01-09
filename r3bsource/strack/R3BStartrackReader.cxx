@@ -68,13 +68,13 @@ Bool_t R3BStartrackReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BStartrackReader::Read()
+Bool_t R3BStartrackReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_STAR_onion_t* data = (EXT_STR_h101_STAR_onion_t*)fData;
 
     // Display data
-    // LOG(info) << "R3BStartrackReader::Read() Event data:";
+    // LOG(info) << "R3BStartrackReader::R3BRead() Event data:";
 
     Int_t wordtype = -1;
     Int_t hitbit = -1;

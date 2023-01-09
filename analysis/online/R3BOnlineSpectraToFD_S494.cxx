@@ -103,11 +103,11 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(warn) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(info) << "R3BOnlineSpectraToFD_S494::Init() EventHeader. found";
@@ -115,11 +115,11 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("/Tasks", this);
 
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
     if (NULL == fCalTriggerItems)
         printf("Branch TofdTriggerCal not found.\n");
 
-    fLosTriggerCalDataItems = (TClonesArray*)mgr->GetObject("LosTriggerCal");
+    fLosTriggerCalDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerCal"));
     if (!fLosTriggerCalDataItems)
     {
         // R3BLOG(fatal, "LOS Data not found");
@@ -127,7 +127,7 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
         LOG(fatal) << "los trigger not found";
     }
 
-    fLosCalDataItems = (TClonesArray*)mgr->GetObject("LosCal");
+    fLosCalDataItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
     if (!fLosCalDataItems)
     {
         // R3BLOG(fatal, "LOS Hit Data not found");
@@ -139,13 +139,13 @@ InitStatus R3BOnlineSpectraToFD_S494::Init()
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
     }
 
     tofd_trig_map_setup();
@@ -572,7 +572,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         Int_t nsum_bot[N_PLANE_MAX_TOFD_S494] = { 0 };
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
         {
-            auto mapped = (R3BTofdMappedData const*)det->At(imapped);
+            auto mapped = dynamic_cast<R3BTofdMappedData const*>(det->At(imapped));
             if (!mapped)
                 continue; // should not happen
 
@@ -620,12 +620,12 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
     Float_t losTime = 0.0;
     Float_t losTriggerTime = 0.0;
 
-    R3BLosCalData* losHit = (R3BLosCalData*)fLosCalDataItems->At(0);
+    R3BLosCalData* losHit = dynamic_cast<R3BLosCalData*>(fLosCalDataItems->At(0));
     Int_t losChannel = losHit->GetDetector();
     // std::cout<<"LOS Time : "<<losHit->GetTimeT_ns(losChannel)<<std::endl;
     losTime = losHit->GetTimeT_ns(losChannel);
 
-    R3BLosCalData* losTriggerHit = (R3BLosCalData*)fLosTriggerCalDataItems->At(0);
+    R3BLosCalData* losTriggerHit = dynamic_cast<R3BLosCalData*>(fLosTriggerCalDataItems->At(0));
     Int_t losChannelTrigger = losTriggerHit->GetDetector();
     // std::cout<<"LOS Time (Trigger) :
     // "<<losTriggerHit->Ge(losHit->GetTime()-losCalTriggerHits->GetTimeL_ns(channelLos)tTimeL_ns(0)<<"
@@ -669,7 +669,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         //   puts("Event");
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto* hit = (R3BTofdCalData*)det->At(ihit);
+            auto* hit = dynamic_cast<R3BTofdCalData*>(det->At(ihit));
             size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
             auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
@@ -683,7 +683,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         std::vector<R3BTofdCalData*> trig_map;
         for (int i = 0; i < fCalTriggerItems->GetEntries(); ++i)
         {
-            auto trig = (R3BTofdCalData*)fCalTriggerItems->At(i);
+            auto trig = dynamic_cast<R3BTofdCalData*>(fCalTriggerItems->At(i));
             if (trig_map.size() < trig->GetBarId())
             {
                 trig_map.resize(trig->GetBarId());
@@ -966,7 +966,7 @@ void R3BOnlineSpectraToFD_S494::Exec(Option_t* option)
         Int_t nMulti[N_PLANE_MAX_TOFD_S494] = { 0 }, iCounts[N_PLANE_MAX_TOFD_S494] = { 0 };
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+            R3BTofdHitData* hitTofd = dynamic_cast<R3BTofdHitData*>(detTofd->At(ihit));
 
             if (IS_NAN(hitTofd->GetTime()))
                 continue;

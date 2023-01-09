@@ -121,7 +121,7 @@ R3BLandGenerator::R3BLandGenerator(const char* fileName)
     if (!fInputFile->IsOpen())
         LOG(fatal) << "R3BLandGenerator: Cannot open input file.";
 
-    tree = (TTree*)fInputFile->Get("Tree");
+    tree = dynamic_cast<TTree*>(fInputFile->Get("Tree"));
     lPDG = (TLeaf*)tree->GetLeaf("PDG");
     lM = (TLeaf*)tree->GetLeaf("M");
     lZ = (TLeaf*)tree->GetLeaf("Z");
