@@ -14,6 +14,7 @@
 // -------------------------------------------------------------------------
 // -----                      R3BFieldPar source file                  -----
 // -------------------------------------------------------------------------
+
 #include "R3BFieldPar.h"
 #include "R3BAladinFieldMap.h"
 #include "R3BFieldConst.h"
@@ -92,7 +93,6 @@ void R3BFieldPar::putParams(FairParamList* list)
 // --------   Get parameters   ---------------------------------------------
 Bool_t R3BFieldPar::getParams(FairParamList* list)
 {
-
     if (!list)
         return kFALSE;
 
@@ -189,11 +189,12 @@ void R3BFieldPar::SetParameters(FairField* field)
     { // field map to be implemented for the case of R3B
         fBx = fBy = fBz = 0.;
         fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-
+        fScale = 1.0;
+        fMapName = field->GetName();
+        fMapFileName = "";
         if (1 == fType)
         {
             R3BAladinFieldMap* aladinFieldMap = dynamic_cast<R3BAladinFieldMap*>(field);
-            fMapName = aladinFieldMap->GetName();
             fScale = aladinFieldMap->GetScale();
             fCurrent = aladinFieldMap->GetCurrent();
         }
