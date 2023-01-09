@@ -60,7 +60,7 @@ InitStatus R3BSfibCal2Hit::Init()
     }
 
     auto name = "SfibCal";
-    fCalItems = (TClonesArray*)mgr->GetObject(name);
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fCalItems)
     {
         LOG(fatal) << "Branch " << name << " not found.";
@@ -129,7 +129,7 @@ void R3BSfibCal2Hit::Exec(Option_t* option)
     unsigned n_trail = 0;
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BSfibCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BSfibCalData const*>(fCalItems->At(j));
         if (cur_cal->IsLeading())
         {
             ++n_lead;
@@ -150,7 +150,7 @@ void R3BSfibCal2Hit::Exec(Option_t* option)
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BSfibCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BSfibCalData const*>(fCalItems->At(j));
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->IsTop() ? 1 : 0;

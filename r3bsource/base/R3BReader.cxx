@@ -14,8 +14,7 @@
 #include "R3BReader.h"
 
 R3BReader::R3BReader(TString const& a_name)
-    : TObject()
-    , fName(a_name)
+    : TNamed(a_name, a_name)
 {
 }
 

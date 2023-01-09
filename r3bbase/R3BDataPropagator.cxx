@@ -45,7 +45,7 @@ InitStatus R3BDataPropagator::Init()
     LOG(info) << "R3BDataPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
 
-    fInputData = (TClonesArray*)frm->GetObject(fNameBranch);
+    fInputData = dynamic_cast<TClonesArray*>(frm->GetObject(fNameBranch));
     if (!fInputData)
     {
         R3BLOG(fatal, "branch " << fNameBranch << "not found");

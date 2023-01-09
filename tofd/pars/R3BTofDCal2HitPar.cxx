@@ -146,16 +146,16 @@ InitStatus R3BTofDCal2HitPar::Init()
         return kFATAL;
     }
 
-    fHeader = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
 
-    fCalData = (TClonesArray*)rm->GetObject("TofdCal");
+    fCalData = dynamic_cast<TClonesArray*>(rm->GetObject("TofdCal"));
     R3BLOG_IF(fatal, NULL == fCalData, "TofdCal not found");
 
-    fCalTriggerItems = (TClonesArray*)rm->GetObject("TofdTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(rm->GetObject("TofdTriggerCal"));
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
-    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
+    fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
         R3BLOG(error, "Could not get access to tofdHitPar container");
@@ -174,7 +174,7 @@ InitStatus R3BTofDCal2HitPar::Init()
 
 void R3BTofDCal2HitPar::SetParContainers()
 {
-    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
     R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
 }
 
@@ -215,7 +215,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalData->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalData->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
@@ -247,8 +247,8 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {
-                auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
-                auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                auto top_trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(top_trig_i));
+                auto bot_trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(bot_trig_i));
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
                 ++n1;
@@ -726,7 +726,7 @@ void R3BTofDCal2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars,
     TCanvas* c1 = new TCanvas(strName, "", 100, 100, 800, 800);
     c1->Divide(1, 3);
     c1->cd(1);
-    auto* h = (TH2F*)histo->Clone();
+    auto* h = dynamic_cast<TH2F*>(histo->Clone());
     h->Draw("colz");
     h->SetAxisRange(min, max, "Y");
     // Projection of charge axis
@@ -963,9 +963,9 @@ void R3BTofDCal2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t
     cfit_smiley->Clear();
     cfit_smiley->Divide(1, 4);
     cfit_smiley->cd(1);
-    TH2F* histo1 = (TH2F*)histo->Clone();
+    TH2F* histo1 = dynamic_cast<TH2F*>(histo->Clone());
     histo1->Draw("colz");
-    TH2F* histo2 = (TH2F*)histo->Clone();
+    TH2F* histo2 = dynamic_cast<TH2F*>(histo->Clone());
     histo2->RebinX(50);
     histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
     // histo2->SetAxisRange(fTofdTotLow,fTofdTotHigh,"Y");
@@ -1081,8 +1081,8 @@ void R3BTofDCal2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Doubl
     cfit_exp->Clear();
     cfit_exp->Divide(1, 3);
     cfit_exp->cd(1);
-    TH2F* histo1 = (TH2F*)histo->Clone();
-    TH2F* histo2 = (TH2F*)histo->Clone();
+    TH2F* histo1 = dynamic_cast<TH2F*>(histo->Clone());
+    TH2F* histo2 = dynamic_cast<TH2F*>(histo->Clone());
     histo1->Draw("colz");
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)

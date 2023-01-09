@@ -90,16 +90,16 @@ InitStatus R3BTwimMapped2CalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
         R3BLOG(info, "fExpId :" << fExpId);
     }
 
-    fTwimMappedDataCA = (TClonesArray*)rootManager->GetObject("TwimMappedData");
+    fTwimMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("TwimMappedData"));
     if (!fTwimMappedDataCA)
     {
         R3BLOG(error, "TwimMappedData not found");
@@ -107,14 +107,14 @@ InitStatus R3BTwimMapped2CalPar::Init()
     }
 
     // get access to hit data of mwpcs
-    fHitItemsMwpcA = (TClonesArray*)rootManager->GetObject(fNameDetA + "HitData");
+    fHitItemsMwpcA = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetA + "HitData"));
     if (!fHitItemsMwpcA)
     {
         R3BLOG(error, fNameDetA << "HitData not found");
         return kFATAL;
     }
 
-    fHitItemsMwpcB = (TClonesArray*)rootManager->GetObject(fNameDetB + "HitData");
+    fHitItemsMwpcB = dynamic_cast<TClonesArray*>(rootManager->GetObject(fNameDetB + "HitData"));
     if (!fHitItemsMwpcB)
     {
         R3BLOG(error, fNameDetB << "HitData not found");
@@ -127,7 +127,7 @@ InitStatus R3BTwimMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
+    fCal_Par = dynamic_cast<R3BTwimCalPar*>(rtdb->getContainer("twimCalPar"));
     if (!fCal_Par)
     {
         R3BLOG(error, "Couldn't get handle on twimCalPar container");
@@ -187,14 +187,14 @@ void R3BTwimMapped2CalPar::Exec(Option_t* option)
     R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
     for (Int_t i = 0; i < nHitsA; i++)
     {
-        hitMwAData[i] = (R3BMwpcHitData*)(fHitItemsMwpcA->At(i));
+        hitMwAData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpcA->At(i));
         PosMwpcA.SetX(hitMwAData[i]->GetX());
         // R3BLOG(info,hitMwAData[i]->GetX());
     }
     R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
     for (Int_t i = 0; i < nHitsB; i++)
     {
-        hitMwBData[i] = (R3BMwpcHitData*)(fHitItemsMwpcB->At(i));
+        hitMwBData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsMwpcB->At(i));
         PosMwpcB.SetX(hitMwBData[i]->GetX());
         // R3BLOG(info,hitMwBData[i]->GetX());
     }
@@ -216,7 +216,7 @@ void R3BTwimMapped2CalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BTwimMappedData*)(fTwimMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BTwimMappedData*>(fTwimMappedDataCA->At(i));
         secId = mappedData[i]->GetSecID() - 1;
         anodeId = mappedData[i]->GetAnodeID() - 1;
 

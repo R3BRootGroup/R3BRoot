@@ -99,7 +99,7 @@ InitStatus R3BPtofMapped2Cal::Init()
         LOG(fatal) << "FairRootManager not found";
 
     // get access to Mapped data
-    fMappedItems = (TClonesArray*)mgr->GetObject("PtofMapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("PtofMapped"));
     if (NULL == fMappedItems)
         LOG(fatal) << "Branch PtofMapped not found";
 
@@ -112,7 +112,7 @@ InitStatus R3BPtofMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BPtofMapped2Cal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("PtofTCalPar"));
     if (!fTcalPar)
         LOG(error) << "Could not get access to PtofTCalPar-Container.";
 }
@@ -129,7 +129,7 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        R3BPaddleTamexMappedData* mapped = (R3BPaddleTamexMappedData*)fMappedItems->At(ihit);
+        R3BPaddleTamexMappedData* mapped = dynamic_cast<R3BPaddleTamexMappedData*>(fMappedItems->At(ihit));
 
         Int_t iPlane = mapped->GetPlaneId(); // 1..n; no need to check range
         Int_t iBar = mapped->GetBarId();     // 1..n

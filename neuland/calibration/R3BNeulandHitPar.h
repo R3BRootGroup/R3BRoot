@@ -90,7 +90,7 @@ class R3BNeulandHitPar : public FairParGenericSet
      * @param idx an index of a module.
      * @return parameter container of this module.
      */
-    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) const { return (R3BNeulandHitModulePar*)fParams->At(idx); }
+    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) const { return dynamic_cast<R3BNeulandHitModulePar*>(fParams->At(idx)); }
 
     // Global time offset in ns
     inline Double_t GetGlobalTimeOffset() const { return fGlobalTimeOffset; }

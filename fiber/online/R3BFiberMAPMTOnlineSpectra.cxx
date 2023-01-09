@@ -111,7 +111,7 @@ R3BFiberMAPMTOnlineSpectra::~R3BFiberMAPMTOnlineSpectra()
 
 void R3BFiberMAPMTOnlineSpectra::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     R3BLOG_IF(error, !fMapPar, "Couldn't get " << fName << "MappingPar");
     if (fMapPar)
     {
@@ -138,11 +138,11 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         R3BLOG(warn, "EventHeader. not found");
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(info, " EventHeader. found");
@@ -152,16 +152,16 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // Get data levels
-    fMappedItems = (TClonesArray*)mgr->GetObject(fName + "Mapped");
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Mapped"));
     R3BLOG_IF(fatal, NULL == fMappedItems, fName + "Mapped not found");
 
-    fCalItems = (TClonesArray*)mgr->GetObject(fName + "Cal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Cal"));
     R3BLOG_IF(fatal, NULL == fCalItems, fName + "Cal not found");
 
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject(fName + "TriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "TriggerCal"));
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, fName + "TriggerCal not found");
 
-    fHitItems = (TClonesArray*)mgr->GetObject(fName + "Hit");
+    fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Hit"));
     R3BLOG_IF(warn, NULL == fHitItems, fName + "Hit not found");
 
     //------------------------------------------------------------------------
@@ -419,7 +419,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
         auto nMapp = fMappedItems->GetEntries();
         for (Int_t i = 0; i < nMapp; i++)
         {
-            auto map_lead = (R3BFiberMappedData const*)fMappedItems->At(i);
+            auto map_lead = dynamic_cast<R3BFiberMappedData const*>(fMappedItems->At(i));
 
             if (map_lead->IsLeading())
             {
@@ -460,7 +460,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
         Double_t tl, tt; // lead and trail times of the trigger
         for (UInt_t j = 0; j < cal_num; ++j)
         {
-            auto cur_cal = (R3BFiberMAPMTCalData const*)fCalTriggerItems->At(j);
+            auto cur_cal = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalTriggerItems->At(j));
             auto ch = cur_cal->GetChannel() - 1;
             tl = cur_cal->GetTime_ns();
             trig_time[ch] = tl;
@@ -480,7 +480,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 
         for (size_t j = 0; j < nCals; ++j)
         {
-            auto cur_cal_lead = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+            auto cur_cal_lead = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
 
             if (cur_cal_lead->IsLeading())
             {
@@ -528,7 +528,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 
         for (size_t j = 0; j < nCals; ++j)
         {
-            auto cur_cal_trail = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+            auto cur_cal_trail = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
 
             if (cur_cal_trail->IsTrailing())
             {
@@ -570,7 +570,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 
         for (size_t j = 0; j < nCals; ++j)
         {
-            auto cur_cal_top = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+            auto cur_cal_top = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
             if (cur_cal_top->IsLeading() && cur_cal_top->GetSide() == 2) // choose leading top times
             {
                 auto cht_i = cur_cal_top->GetChannel() - 1;
@@ -579,7 +579,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
                     fmod(cur_cal_top->GetTime_ns() - time_trig_top + c_period + c_period / 2, c_period) - c_period / 2;
                 for (size_t k = 0; k < nCals; ++k)
                 {
-                    auto cur_cal_bot = (R3BFiberMAPMTCalData const*)fCalItems->At(k);
+                    auto cur_cal_bot = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(k));
                     if (cur_cal_bot->IsLeading() && cur_cal_bot->GetSide() == 1) // choose leading bottom times
                     {
                         auto chb_i = cur_cal_bot->GetChannel() - 1;
@@ -627,7 +627,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
             Double_t tDown = 0. / 0.;
             Double_t tUp = 0. / 0.;
 
-            auto hit = (R3BFiberMAPMTHitData*)fHitItems->At(ihit);
+            auto hit = dynamic_cast<R3BFiberMAPMTHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
 

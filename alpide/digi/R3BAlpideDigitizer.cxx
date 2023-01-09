@@ -129,7 +129,7 @@ void R3BAlpideDigitizer::Exec(Option_t* opt)
         TrackId = pointData[i]->GetTrackID();
         auto sid = pointData[i]->GetSensorID();
 
-        auto Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        auto Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
 
         // if (PID > 1000080160) // Z=8 and A=16

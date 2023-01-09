@@ -49,13 +49,13 @@ InitStatus R3BStrawtubesMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMapped = (TClonesArray*)rm->GetObject("StrawtubesMapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("StrawtubesMapped"));
     if (!fMapped)
     {
         return kFATAL;
     }
 
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("StrawtubesTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("StrawtubesTCalPar"));
     fCalPar->setChanged();
 
     fEngine = new R3BTCalEngine(fCalPar, fMinStats);
@@ -68,7 +68,7 @@ void R3BStrawtubesMapped2CalPar::Exec(Option_t* option)
     Int_t mapped_num = fMapped->GetEntries();
     for (Int_t i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BStrawtubesMappedData*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BStrawtubesMappedData*>(fMapped->At(i));
         if (!mapped)
         {
             LOG(error) << "R3BStrawtubesMapped2CalPar::Exec(): What is this crap?";

@@ -170,7 +170,7 @@ Bool_t ELILuMon::ProcessHits(FairVolume* vol)
                fELoss);
 
         // Increment number of LuMonPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kLUMON);
 
         ResetParameters();
@@ -254,7 +254,7 @@ void ELILuMon::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     ELILuMonPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (ELILuMonPoint*)cl1->At(i);
+        oldpoint = dynamic_cast<ELILuMonPoint*>(cl1->At(i));
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
         new (clref[fPosIndex]) ELILuMonPoint(*oldpoint);

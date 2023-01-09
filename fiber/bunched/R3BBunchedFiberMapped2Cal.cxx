@@ -107,7 +107,7 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
         return kERROR;
     }
     auto name = fName + "Mapped";
-    fMappedItems = (TClonesArray*)mgr->GetObject(name);
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fMappedItems)
     {
         R3BLOG(error, "Branch " << name << " not found.");
@@ -166,7 +166,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMappedItems->At(i));
         auto channel = mapped->GetChannel();
         R3BLOG(debug, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 

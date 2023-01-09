@@ -193,7 +193,7 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
 
 InitStatus R3BTofdCal2Hit::Init()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -210,21 +210,21 @@ InitStatus R3BTofdCal2Hit::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (header == nullptr)
     {
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
         R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
-    fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
     maxevent = mgr->CheckMaxEventNo();
-    fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
+    fCalItemsLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
     if (NULL == fCalItemsLos)
         LOG(warn) << "Branch LosCal not found";
-    fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
+    fHitItemsLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     if (NULL == fHitItemsLos)
         LOG(warn) << "Branch LosHit not found";
 
@@ -237,7 +237,7 @@ InitStatus R3BTofdCal2Hit::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdCal2Hit::SetParContainers()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -315,7 +315,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         {
             countloshit++;
             LOG(warn) << "LOS Ihit  " << ihit << " " << nHits;
-            R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
+            R3BLosHitData* hitData = dynamic_cast<R3BLosHitData*>(fHitItemsLos->At(ihit));
             if (ihit == 0)
                 timeLos = hitData->fTime_ns;
             LOG(warn) << "LOS Time " << timeLos;
@@ -387,7 +387,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     std::map<size_t, Entry> bar_map;
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
         //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';

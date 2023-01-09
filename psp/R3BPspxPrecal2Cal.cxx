@@ -104,7 +104,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
     }
 
     // R3BEventHeader for trigger information, if needed!
-    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    fHeader = dynamic_cast<R3BEventHeader*>(fMan->GetObject("R3BEventHeader"));
 
     // Figure out how many detectors were registered by the reader
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
@@ -114,7 +114,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f])); // = branch name in TTree
+            tmp[f] = dynamic_cast<TClonesArray*>(fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f]))); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
@@ -163,7 +163,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
         LOG(info) << "R3BPspxPrecal2Cal::SetParContainers()";
     }
 
-    fCalPar = (R3BPspxCalPar*)rtdb->getContainer("R3BPspxCalPar");
+    fCalPar = dynamic_cast<R3BPspxCalPar*>(rtdb->getContainer("R3BPspxCalPar"));
     if (!fCalPar)
     {
         LOG(error) << "R3BPspxPrecal2Cal::Could not get access to R3BPspxCalPar-Container.";
@@ -221,7 +221,7 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
         for (Int_t i = 0; i < nPrecal; i++)
         {
 
-            R3BPspxPrecalData* precalData = (R3BPspxPrecalData*)fPrecalItems[d]->At(i);
+            R3BPspxPrecalData* precalData = dynamic_cast<R3BPspxPrecalData*>(fPrecalItems[d]->At(i));
 
             Int_t strip = precalData->GetStrip();
             Float_t energy = (precalData->GetEnergy1() + precalData->GetEnergy2()) * gain[d][strip - 1];

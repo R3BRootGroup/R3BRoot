@@ -118,7 +118,7 @@ InitStatus R3BGlobalAnalysis::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     FairRunOnline* run = FairRunOnline::Instance();
 
     // Get objects for detectors on all levels
@@ -134,17 +134,17 @@ InitStatus R3BGlobalAnalysis::Init()
                         fCalItems.push_back((TClonesArray *)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
                         fHitItems.push_back((TClonesArray *)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
         */
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
         if (NULL == fCalItems.at(det))
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
         if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
@@ -538,7 +538,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosHitData* hitData = (R3BLosHitData*)det->At(ihit);
+            R3BLosHitData* hitData = dynamic_cast<R3BLosHitData*>(det->At(ihit));
             timeLos[ihit] = hitData->fTime_ns;
 
             fh_los_pos->Fill(hitData->fX_cm, hitData->fY_cm);
@@ -575,7 +575,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BTofdHitData* hit = (R3BTofdHitData*)det->At(ihit);
+                R3BTofdHitData* hit = dynamic_cast<R3BTofdHitData*>(det->At(ihit));
                 if (!hit)
                     continue; // should not happen
                 if (ihit > 15)
@@ -647,7 +647,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
             std::vector<UInt_t> spmt_num(16);
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)detMapped->At(ihit);
+                R3BBunchedFiberMappedData* hit = dynamic_cast<R3BBunchedFiberMappedData*>(detMapped->At(ihit));
                 if (!hit)
                     continue;
 
@@ -718,7 +718,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                 Double_t tMAPMT = 0. / 0.;
                 Double_t tSPMT = 0. / 0.;
 
-                R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)detHit->At(ihit);
+                R3BBunchedFiberHitData* hit = dynamic_cast<R3BBunchedFiberHitData*>(detHit->At(ihit));
                 if (!hit)
                     continue;
 

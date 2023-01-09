@@ -78,7 +78,7 @@ void R3BIncomingBeta::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
+    fIncomingID_Par = dynamic_cast<R3BIncomingIDPar*>(rtdb->getContainer("IncomingIDPar"));
     R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
     R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
 
@@ -108,18 +108,18 @@ InitStatus R3BIncomingBeta::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     // Get access to Sci2 data at hit level
-    fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
+    fHitSci2 = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Hit"));
     R3BLOG_IF(warn, !fHitSci2, "Could not find Sci2Hit");
 
     // Get access to hit data of the LOS
-    fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
+    fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     R3BLOG_IF(warn, !fHitLos, "LosHit not found");
 
     // Output data
-    fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
+    fFrsDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
     if (fFrsDataCA == NULL)
     {
         fFrsDataCA = new TClonesArray("R3BFrsData");
@@ -182,7 +182,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
         nHits = fHitSci2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci2HitData* hittcal = (R3BSci2HitData*)fHitSci2->At(ihit);
+            R3BSci2HitData* hittcal = dynamic_cast<R3BSci2HitData*>(fHitSci2->At(ihit));
             numDet = hittcal->GetSciId();
             if (numDet > fNumDet)
             {
@@ -207,7 +207,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosHitData* hittcal = (R3BLosHitData*)fHitLos->At(ihit);
+            R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
             numDet = hittcal->GetDetector();
 
             if (multLos[numDet - 1] >= MAXMULT)

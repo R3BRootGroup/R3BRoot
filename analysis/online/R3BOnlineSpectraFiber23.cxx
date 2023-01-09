@@ -96,7 +96,7 @@ InitStatus R3BOnlineSpectraFiber23::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
@@ -107,22 +107,22 @@ InitStatus R3BOnlineSpectraFiber23::Init()
     printf("**** Have %d fiber detectors ==>.\n", NOF_FIB_DET);
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
         if (NULL == fCalItems.at(det))
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalTriggerItems.push_back((TClonesArray*)mgr->GetObject(Form("%sTriggerCal", fDetectorNames[det])));
+        fCalTriggerItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sTriggerCal", fDetectorNames[det]))));
         if (NULL == fCalTriggerItems.at(det))
         {
             printf("Could not find CalTrigger data for '%s'.\n", fDetectorNames[det]);
         }
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
         if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
@@ -254,7 +254,7 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
         if (ihita < 100)
         {
             xpos_global = 0. / 0.;
-            R3BFiberMAPMTHitData* hitFi23a = (R3BFiberMAPMTHitData*)detFib23a->At(ihita);
+            R3BFiberMAPMTHitData* hitFi23a = dynamic_cast<R3BFiberMAPMTHitData*>(detFib23a->At(ihita));
             xpos_global = hitFi23a->GetX();
 
             auto detFib23b = fHitItems.at(DET_FI23B);
@@ -262,7 +262,7 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
             for (Int_t ihitb = 0; ihitb < nHitsb; ihitb++) // just first hit
             {
                 ypos_global = 0. / 0.;
-                R3BFiberMAPMTHitData* hitFi23b = (R3BFiberMAPMTHitData*)detFib23b->At(ihitb);
+                R3BFiberMAPMTHitData* hitFi23b = dynamic_cast<R3BFiberMAPMTHitData*>(detFib23b->At(ihitb));
                 ypos_global = hitFi23b->GetY();
                 auto dtime =
                     fmod(hitFi23a->GetTime() - hitFi23b->GetTime() + c_period + c_period / 2, c_period) - c_period / 2;

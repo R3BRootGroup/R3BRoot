@@ -52,8 +52,8 @@ InitStatus R3BNeutronCalibr2D::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fArrayDigi = (TClonesArray*)ioman->GetObject("LandDigi");
-    fArrayCluster = (TClonesArray*)ioman->GetObject("NeuLandCluster");
+    fArrayDigi = dynamic_cast<TClonesArray*>(ioman->GetObject("LandDigi"));
+    fArrayCluster = dynamic_cast<TClonesArray*>(ioman->GetObject("NeuLandCluster"));
 
     CreateHistograms();
 
@@ -74,7 +74,7 @@ void R3BNeutronCalibr2D::Exec(Option_t* opt)
     R3BLandDigi* digi;
     for (Int_t id = 0; id < fArrayDigi->GetEntries(); id++)
     {
-        digi = (R3BLandDigi*)fArrayDigi->At(id);
+        digi = dynamic_cast<R3BLandDigi*>(fArrayDigi->At(id));
         eTot += digi->GetQdc();
     }
 

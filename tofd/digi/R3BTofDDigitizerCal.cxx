@@ -52,7 +52,7 @@ InitStatus R3BTofDDigitizerCal::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     LOG_IF(fatal, !ioman) << "Init: No FairRootManager";
 
-    fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
+    fTofdPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TOFdPoint"));
 
     // fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
     // ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
@@ -113,7 +113,7 @@ void R3BTofDDigitizerCal::Exec(Option_t* opt)
         std::vector<TempHit> TempHits;
         for (Int_t i = 0; i < entryNum; ++i)
         {
-            R3BTofdPoint* data_element = (R3BTofdPoint*)Points->At(i);
+            R3BTofdPoint* data_element = dynamic_cast<R3BTofdPoint*>(Points->At(i));
             // Plane and paddle data members in 1-base
             auto channel = (data_element->GetPlane() - 1) * number_paddles + data_element->GetPaddle() - 1;
             TempHits.push_back(TempHit(channel, // channel nummer

@@ -87,12 +87,12 @@ InitStatus R3BSci2Mapped2Tcal::Init()
     }
 
     // try to get a handle on the EventHeader.
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     // --- get access to Mapped data --- //
-    fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
+    fMapped = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Mapped"));
     if (!fMapped)
     {
         LOG(fatal) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped Data not found.";
@@ -112,7 +112,7 @@ InitStatus R3BSci2Mapped2Tcal::Init()
 // Note that the container may still be empty at this point.
 void R3BSci2Mapped2Tcal::SetParContainers()
 {
-    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
+    fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("Sci2TCalPar"));
     if (!fTcalPar)
     {
         LOG(error) << "Could not get access to Sci2TCalPar container.";
@@ -141,7 +141,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_Sci2 * NTypes = 2 * 3
     {
 
-        R3BSci2MappedData* hit = (R3BSci2MappedData*)fMapped->At(ihit);
+        R3BSci2MappedData* hit = dynamic_cast<R3BSci2MappedData*>(fMapped->At(ihit));
         if (!hit)
             continue;
 

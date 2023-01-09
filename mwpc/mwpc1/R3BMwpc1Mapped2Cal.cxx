@@ -70,7 +70,7 @@ void R3BMwpc1Mapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
-    fCal_Par = (R3BMwpc1CalPar*)rtdb->getContainer("mwpc1CalPar");
+    fCal_Par = dynamic_cast<R3BMwpc1CalPar*>(rtdb->getContainer("mwpc1CalPar"));
     if (!fCal_Par)
     {
         R3BLOG(error, "Couldn't get handle on mwpc1CalPar container.");
@@ -113,7 +113,7 @@ InitStatus R3BMwpc1Mapped2Cal::Init()
         return kFATAL;
     }
 
-    fMwpcMappedDataCA = (TClonesArray*)rootManager->GetObject("Mwpc1MappedData");
+    fMwpcMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc1MappedData"));
     if (!fMwpcMappedDataCA)
     {
         R3BLOG(fatal, "Mwpc1MappedData not found");
@@ -163,7 +163,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = (R3BMwpcMappedData*)(fMwpcMappedDataCA->At(i));
+        mappedData[i] = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
         planeId = mappedData[i]->GetPlane();
         padId = mappedData[i]->GetPad() - 1;
         if (planeId == 1) // X

@@ -29,7 +29,7 @@
 
 // -----   Default constructor   -----------------------------------------------
 R3BTsplinePar::R3BTsplinePar(const TString& name)
-    : fSplineName(name)
+  : TNamed(name, name)
     , fSpline(NULL)
     , fMaxPoints(4000) // 100
     , fxmin(-100.50)
@@ -51,19 +51,20 @@ void R3BTsplinePar::putParams(FairParamList* list)
         Double_t b[6];
         fSpline->GetKnot(n, a[0], a[1]);
         fSpline->GetCoeff(n, b[0], b[1], b[2], b[3], b[4]);
-        TString name = fSplineName + "Point" + n;
+        TString name = GetNameObj() + "Point" + n;
         p->AddAt(a[0], 0);
         p->AddAt(a[1], 1);
         p->AddAt(b[2], 2);
         p->AddAt(b[3], 3);
         p->AddAt(b[4], 4);
         list->add(name, *p);
-        /*TString namecoeff = fSplineName + "PointCoeff" + n;
+        /*TString namecoeff = GetNameObj() + "PointCoeff" + n;
         q->AddAt(b[0], 0);
         q->AddAt(b[1], 1);
         q->AddAt(b[2], 2);
         list->add(namecoeff, *q);*/
     }
+    delete p;
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -76,8 +77,8 @@ TSpline3* R3BTsplinePar::getParams(FairParamList* list)
     // TArrayF* q = new TArrayF(3);
     for (int n = 0; n < fMaxPoints; n++)
     {
-        TString name = fSplineName + "Point" + n;
-        // TString namecoeff = fSplineName + "PointCoeff" + n;
+        TString name = GetNameObj() + "Point" + n;
+        // TString namecoeff = GetNameObj() + "PointCoeff" + n;
         if (list->fill(name, p))
         {
             fSpline->SetPoint(n, p->GetAt(0), p->GetAt(1));
@@ -88,6 +89,7 @@ TSpline3* R3BTsplinePar::getParams(FairParamList* list)
             break;
         }
     }
+    delete p;
     // std::cout << "Np spline = " << fSpline->GetNp() << std::endl;
     return fSpline;
 }

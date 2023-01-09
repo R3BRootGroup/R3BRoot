@@ -87,21 +87,21 @@ InitStatus R3BMusliOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to the MAPPED data of the MUSIC
-    fMapItemsMusli = (TClonesArray*)mgr->GetObject("MusliMappedData");
+    fMapItemsMusli = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliMappedData"));
     if (!fMapItemsMusli)
     {
         return kFATAL;
     }
 
     // get access to the CAL data of the MUSIC
-    fCalItemsMusli = (TClonesArray*)mgr->GetObject("MusliCalData");
+    fCalItemsMusli = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliCalData"));
     if (!fCalItemsMusli)
     {
         LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliCalData found";
     }
 
     // get access to the HIT data of the MUSIC
-    fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
+    fHitItemsMusli = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliHitData"));
     if (!fHitItemsMusli)
     {
         LOG(info) << "R3BMusliOnlineSpectra::Init() No MusliHitData found";
@@ -1270,7 +1270,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fMapItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliMappedData* hit = (R3BMusliMappedData*)fMapItemsMusli->At(ihit);
+            R3BMusliMappedData* hit = dynamic_cast<R3BMusliMappedData*>(fMapItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -1416,7 +1416,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fCalItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliCalData* hit = (R3BMusliCalData*)fCalItemsMusli->At(ihit);
+            R3BMusliCalData* hit = dynamic_cast<R3BMusliCalData*>(fCalItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetSignal() - 1;
@@ -1459,7 +1459,7 @@ void R3BMusliOnlineSpectra::Exec(Option_t* option)
         nHits = fHitItemsMusli->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BMusliHitData* hit = (R3BMusliHitData*)fHitItemsMusli->At(ihit);
+            R3BMusliHitData* hit = dynamic_cast<R3BMusliHitData*>(fHitItemsMusli->At(ihit));
             if (!hit)
                 continue;
             rank = hit->GetType() - 1;

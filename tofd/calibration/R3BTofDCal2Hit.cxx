@@ -155,10 +155,10 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
 
 void R3BTofDCal2Hit::SetParContainers()
 {
-    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
     R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
 
-    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
+    fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
         R3BLOG(error, "Could not get access to tofdHitPar container");
@@ -191,13 +191,13 @@ InitStatus R3BTofDCal2Hit::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == header, "EventHeader. not found");
 
-    fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
     R3BLOG_IF(fatal, NULL == fCalItems, "TofdCal not found");
 
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
     maxevent = mgr->CheckMaxEventNo();
@@ -317,7 +317,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
@@ -334,7 +334,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     std::vector<R3BTofdCalData const*> trig_map;
     for (int i = 0; i < fCalTriggerItems->GetEntriesFast(); ++i)
     {
-        auto trig = (R3BTofdCalData const*)fCalTriggerItems->At(i);
+        auto trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(i));
         if (trig_map.size() < trig->GetBarId())
         {
             trig_map.resize(trig->GetBarId());

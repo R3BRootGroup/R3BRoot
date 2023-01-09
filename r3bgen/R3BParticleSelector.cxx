@@ -47,7 +47,7 @@ void R3BParticleSelector::AddParticle(FairParticle* particle) { addParticle(part
 
 void R3BParticleSelector::AddParticle(const char* particleName)
 {
-    auto particle = (FairParticle*)FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName);
+    auto particle = dynamic_cast<FairParticle*>(FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName));
     if (!particle)
         LOG(fatal) << "R3BParticleSelector:  Particle is not defined!";
 
@@ -63,7 +63,7 @@ void R3BParticleSelector::AddParticle(const char* particleName,
                                       bool stable,
                                       double decaytime_ns)
 {
-    auto particle = (FairParticle*)FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName);
+    auto particle = dynamic_cast<FairParticle*>(FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName));
     if (!particle)
     {
         particle = new FairParticle(particleName, z, a, s, mass_GeV, charge, stable, decaytime_ns);
@@ -127,7 +127,7 @@ void R3BParticleSelector::AddParticle(int z, int a)
     const auto pdgCode = ChargeMass2PDGCode(z, a);
     const auto particleName = TString::Format("particle_%d", pdgCode);
 
-    auto particle = (FairParticle*)FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName);
+    auto particle = dynamic_cast<FairParticle*>(FairRunSim::Instance()->GetUserDefParticles()->FindObject(particleName));
 
     if (!particle)
     {

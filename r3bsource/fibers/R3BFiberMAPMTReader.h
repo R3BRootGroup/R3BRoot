@@ -119,7 +119,7 @@ class R3BFiberMAPMTReader : public R3BReader
 
     R3BFiberMAPMTReader(char const*, UInt_t, size_t);
     Bool_t Init();
-    Bool_t Read();
+    Bool_t R3BRead();
     void Reset();
 
     // Accessor to select online mode

@@ -124,7 +124,7 @@ InitStatus R3BCalifaClusterEventDisplay::Init()
     if (!ioManager)
         LOG(fatal) << "Init:No FairRootManager";
     if (!fCaloHitCA)
-        fCaloHitCA = (TClonesArray*)ioManager->GetObject("CalifaClusterData");
+        fCaloHitCA = dynamic_cast<TClonesArray*>(ioManager->GetObject("CalifaClusterData"));
 
     fEventManager = FairEventManager::Instance();
 
@@ -164,7 +164,7 @@ void R3BCalifaClusterEventDisplay::Exec(Option_t* opt)
         {
 
             Int_t binx = -1, biny = -1;
-            caloHit = (R3BCalifaClusterData*)fCaloHitCA->At(i);
+            caloHit = dynamic_cast<R3BCalifaClusterData*>(fCaloHitCA->At(i));
             theta = caloHit->GetTheta();
             phi = caloHit->GetPhi();
 
@@ -227,7 +227,7 @@ void R3BCalifaClusterEventDisplay::Exec(Option_t* opt)
         sceneLeftBottom->AddElement(axes);
 
         fProjManager2 = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
-        fCalo2d = (TEveCalo2D*)fProjManager2->ImportElements(fCalo3d);
+        fCalo2d = dynamic_cast<TEveCalo2D*>(fProjManager2->ImportElements(fCalo3d));
         sceneRightBottom->AddElement(fCalo2d);
         TEveProjectionAxes* axes2 = new TEveProjectionAxes(fProjManager2);
         sceneRightBottom->AddElement(axes2);

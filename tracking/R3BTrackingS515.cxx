@@ -101,7 +101,7 @@ InitStatus R3BTrackingS515::Init()
         LOG(fatal) << "FairRootManager not found";
     }
 
-    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fHeader)
     {
         LOG(warn) << "R3BTrackingS515::Init() EventHeader. not found";
@@ -111,7 +111,7 @@ InitStatus R3BTrackingS515::Init()
     LOG(info) << "Reading " << NOF_FIB_DET << " fiber detectors";
     for (int det = 0; det < DET_MAX; det++)
     {
-        fDataItems.push_back((TClonesArray*)mgr->GetObject(Form("%s", fDetectorNames[det])));
+        fDataItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%s", fDetectorNames[det]))));
         if (NULL == fDataItems.at(det))
         {
             R3BLOG(fatal, Form("\n\n Cannot find tree branch %s \n\n", fDetectorNames[det]));
@@ -180,17 +180,17 @@ void R3BTrackingS515::Exec(Option_t* option)
 
     // Get hit data from every upstream detector
     // (for now using only one/first hit)
-    auto los_data = (R3BLosHitData*)los_DataItems->At(0);
+    auto los_data = dynamic_cast<R3BLosHitData*>(los_DataItems->At(0));
 
-    auto frs_data = (R3BFrsData*)frs_DataItems->At(0);
+    auto frs_data = dynamic_cast<R3BFrsData*>(frs_DataItems->At(0));
     if (!IsInsideFrsEllipticPIDCut(frs_data->GetZ(), frs_data->GetAq()))
         return;
 
-    auto music_hit = (R3BMusicHitData*)music_DataItems->At(0);
+    auto music_hit = dynamic_cast<R3BMusicHitData*>(music_DataItems->At(0));
     if (music_hit->GetZcharge() < MusicZMin || music_hit->GetZcharge() > MusicZMax)
         return;
 
-    auto mwpc_hit = (R3BMwpcHitData*)mwpc_DataItems->At(0);
+    auto mwpc_hit = dynamic_cast<R3BMwpcHitData*>(mwpc_DataItems->At(0));
 
     // Reading fiber detectors (using only highest energy hit)
     R3BBunchedFiberHitData *f10_hit{}, *f11_hit{}, *f12_hit{}, *this_hit{};
@@ -201,21 +201,21 @@ void R3BTrackingS515::Exec(Option_t* option)
         energy = 0;
         for (auto i = 0; i < fDataItems.at(f)->GetEntriesFast(); ++i)
         {
-            this_hit = (R3BBunchedFiberHitData*)fDataItems.at(f)->At(i);
+            this_hit = dynamic_cast<R3BBunchedFiberHitData*>(fDataItems.at(f)->At(i));
             if (this_hit->GetEloss() > FiberEnergyMin && this_hit->GetEloss() < FiberEnergyMax &&
                 this_hit->GetEloss() > energy)
             {
                 if (f == DET_FI10)
                 {
-                    f10_hit = (R3BBunchedFiberHitData*)fDataItems.at(f)->At(i);
+                    f10_hit = dynamic_cast<R3BBunchedFiberHitData*>(fDataItems.at(f)->At(i));
                 }
                 else if (f == DET_FI11)
                 {
-                    f11_hit = (R3BBunchedFiberHitData*)fDataItems.at(f)->At(i);
+                    f11_hit = dynamic_cast<R3BBunchedFiberHitData*>(fDataItems.at(f)->At(i));
                 }
                 else if (f == DET_FI12)
                 {
-                    f12_hit = (R3BBunchedFiberHitData*)fDataItems.at(f)->At(i);
+                    f12_hit = dynamic_cast<R3BBunchedFiberHitData*>(fDataItems.at(f)->At(i));
                 }
                 energy = this_hit->GetEloss();
             }
@@ -231,7 +231,7 @@ void R3BTrackingS515::Exec(Option_t* option)
     bool is_good_tofd = false;
     for (auto i = 0; i < tofd_DataItems->GetEntriesFast(); ++i)
     {
-        tofd_hit = (R3BTofdHitData*)tofd_DataItems->At(i);
+        tofd_hit = dynamic_cast<R3BTofdHitData*>(tofd_DataItems->At(i));
         if (tofd_hit->GetDetId() == 1) // only hits from first plane
             is_good_tofd = true;
     }

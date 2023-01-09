@@ -93,11 +93,11 @@ InitStatus R3BOnlineSpillAnalysis::Init()
         LOG(fatal) << "FairRootManager not found";
 
     // Look for the R3BEventHeader
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(warn) << "R3BOnlineSpillAnalysis::Init() EventHeader. not found";
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         LOG(info) << "R3BOnlineSpillAnalysis::Init() EventHeader. found";
@@ -109,7 +109,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     // fServer->RegisterCommand(“ProcessRequests”, Form(“/Server/%s/->ProcessRequests()”, fServer->GetName()));
 
     // Get objects for detectors on all levels
-    fSamplerMappedItems = (TClonesArray*)mgr->GetObject("SamplerMapped");
+    fSamplerMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("SamplerMapped"));
     if (NULL == fSamplerMappedItems)
     {
         cout << "Could not find mapped data for Sampler." << endl;
@@ -415,7 +415,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
         // cout << "Hits sampler: " << nHitsSamp << endl;
         for (Int_t ihit = 0; ihit < nHitsSamp; ihit++)
         {
-            auto hit = (R3BSamplerMappedData*)det->At(ihit);
+            auto hit = dynamic_cast<R3BSamplerMappedData*>(det->At(ihit));
             // time is in steps of 10 ns
             // is is a 34 bit number, so max 1073741823
             samplerCurr = hit->GetTime();

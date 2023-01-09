@@ -22,7 +22,6 @@ R3BCalifaCrystalPars4Sim::R3BCalifaCrystalPars4Sim(const char* name, const char*
 
 R3BCalifaCrystalPars4Sim::~R3BCalifaCrystalPars4Sim()
 {
-    clear();
     if (fCrystalIDArray)
         delete fCrystalIDArray;
     if (fThresholdArray)

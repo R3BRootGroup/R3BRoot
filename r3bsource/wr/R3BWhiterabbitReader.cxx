@@ -63,7 +63,7 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitReader::Read()
+Bool_t R3BWhiterabbitReader::R3BRead()
 {
     if (!fData->TIMESTAMP_MASTER_ID)
     {

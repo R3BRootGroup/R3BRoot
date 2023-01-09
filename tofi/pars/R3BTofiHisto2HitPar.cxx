@@ -121,9 +121,9 @@ InitStatus R3BTofiHisto2HitPar::Init()
     {
         return kFATAL;
     }
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
     // may be = NULL!
-    fCalData = (TClonesArray*)rm->GetObject("TofiCal");
+    fCalData = dynamic_cast<TClonesArray*>(rm->GetObject("TofiCal"));
     if (!fCalData)
     {
         return kFATAL;
@@ -150,7 +150,7 @@ void R3BTofiHisto2HitPar::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+    fCal_Par = dynamic_cast<R3BTofiHitPar*>(FairRuntimeDb::instance()->getContainer("TofiHitPar"));
     if (!fCal_Par)
     {
         LOG(error) << "R3BTofiHisto2HitPar::Init() Couldn't get handle on TofiHitPar. ";
@@ -209,7 +209,7 @@ void R3BTofiHisto2HitPar::FinishTask()
                     {
                         LOG(warn) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                        smiley((TH2F*)hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
+                        smiley(dynamic_cast<TH2F*>(hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))),
                                min2,
                                max2,
                                para2);
@@ -241,7 +241,7 @@ void R3BTofiHisto2HitPar::FinishTask()
                     {
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)hifilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                            dynamic_cast<TH2F*>(hifilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -255,7 +255,7 @@ void R3BTofiHisto2HitPar::FinishTask()
                     {
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            (TH2F*)hifilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                            dynamic_cast<TH2F*>(hifilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -286,7 +286,7 @@ void R3BTofiHisto2HitPar::FinishTask()
                 {
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    zcorr((TH2F*)hifilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars);
+                    zcorr(dynamic_cast<TH2F*>(hifilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, pars);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
                     Double_t veff = par->GetVeff();
@@ -322,7 +322,7 @@ void R3BTofiHisto2HitPar::calcOffset()
         if (hifilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
         {
             LOG(warn) << "Found histo Time_Diff_Plane_" << i + 1;
-            auto* h = (TH2F*)hifilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
+            auto* h = dynamic_cast<TH2F*>(hifilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone());
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 cout << "1\n";
@@ -366,7 +366,7 @@ void R3BTofiHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             if (hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = (TH2F*)hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
+                auto* h = dynamic_cast<TH2F*>(hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
@@ -409,7 +409,7 @@ void R3BTofiHisto2HitPar::calcSync()
         if (hifilename->Get(Form("Time_Sync_Plane_%i", i + 1)))
         {
             LOG(warn) << "Found histo Time_Sync_Plane_" << i + 1;
-            auto* h = (TH2F*)hifilename->Get(Form("Time_Sync_Plane_%i", i + 1))->Clone();
+            auto* h = dynamic_cast<TH2F*>(hifilename->Get(Form("Time_Sync_Plane_%i", i + 1))->Clone());
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 cSync->cd(i + 1);
@@ -451,7 +451,7 @@ void R3BTofiHisto2HitPar::calcVeff()
                     LOG(info) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
                     continue;
                 }
-                auto* h = (TH2F*)hifilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
+                auto* h = dynamic_cast<TH2F*>(hifilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone());
                 cVeff->cd(i + 1);
                 h->Draw("colz");
                 TH1F* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
@@ -491,7 +491,7 @@ void R3BTofiHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
             if (hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = (TH2F*)hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
+                auto* h = dynamic_cast<TH2F*>(hifilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
@@ -538,8 +538,8 @@ void R3BTofiHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     cfit_exp->Clear();
     cfit_exp->Divide(1, 3);
     cfit_exp->cd(1);
-    TH2F* histo1 = (TH2F*)histo->Clone();
-    TH2F* histo2 = (TH2F*)histo->Clone();
+    TH2F* histo1 = dynamic_cast<TH2F*>(histo->Clone());
+    TH2F* histo2 = dynamic_cast<TH2F*>(histo->Clone());
     histo1->Draw("colz");
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
@@ -621,9 +621,9 @@ void R3BTofiHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
     cfit_smiley->Clear();
     cfit_smiley->Divide(1, 4);
     cfit_smiley->cd(1);
-    TH2F* histo1 = (TH2F*)histo->Clone();
+    TH2F* histo1 = dynamic_cast<TH2F*>(histo->Clone());
     histo1->Draw("colz");
-    TH2F* histo2 = (TH2F*)histo->Clone();
+    TH2F* histo2 = dynamic_cast<TH2F*>(histo->Clone());
     histo2->RebinX(50);
     histo2->GetYaxis()->SetRangeUser(fTofiTotLow, fTofiTotHigh);
     // histo2->SetAxisRange(fTofiTotLow,fTofiTotHigh,"Y");
@@ -730,7 +730,7 @@ void R3BTofiHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     TCanvas* c1 = new TCanvas("c1", "c1", 100, 100, 800, 800);
     c1->Divide(1, 3);
     c1->cd(1);
-    auto* h = (TH2F*)histo->Clone();
+    auto* h = dynamic_cast<TH2F*>(histo->Clone());
     h->Draw("colz");
     h->SetAxisRange(min, max, "Y");
     // Projection of charge axis

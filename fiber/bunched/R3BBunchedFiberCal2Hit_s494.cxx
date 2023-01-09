@@ -108,14 +108,14 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
     }
 
     auto name = fName + "Cal";
-    fCalItems = (TClonesArray*)mgr->GetObject(name);
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fCalItems)
     {
         LOG(fatal) << "Branch " << name << " not found.";
         return kERROR;
     }
     auto name_mapmt_trig = fName + "TriggerCal";
-    fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
+    fMAPMTCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name_mapmt_trig));
     if (NULL == fMAPMTCalTriggerItems)
         LOG(fatal) << "Branch " << name_mapmt_trig << " not found";
 
@@ -134,7 +134,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
-        fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        fHitPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(container));
         if (!fHitPar)
         {
             LOG(error) << "Could not get " << container << " container.";
@@ -219,7 +219,7 @@ void R3BBunchedFiberCal2Hit_s494::SetParContainers()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    fCalPar = dynamic_cast<R3BBunchedFiberHitPar*>(FairRuntimeDb::instance()->getContainer(fName + "HitPar"));
     if (!fCalPar)
     {
         LOG(error) << "R3BFiberCal2Hit_s494::Init() Couldn't get " << fName << "HitPar. ";
@@ -259,7 +259,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
     std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0] / 128);
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
-        auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
+        auto cal = dynamic_cast<R3BBunchedFiberCalData const*>(fMAPMTCalTriggerItems->At(j));
         mapmt_trig_table.at(cal->GetChannel() - 1) = cal;
     }
 
@@ -275,7 +275,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
     int s_mult = 0;
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsLeading())
         {
             ++n_lead;
@@ -301,7 +301,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->GetSide(); // cur_cal->IsMAPMT() ? 0 : 1;

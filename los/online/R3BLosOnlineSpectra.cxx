@@ -78,9 +78,9 @@ InitStatus R3BLosOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -90,9 +90,9 @@ InitStatus R3BLosOnlineSpectra::Init()
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
     for (int det = 0; det < DET_MAX; det++)
     {
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        fMappedItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sMapped", fDetectorNames[det]))));
         R3BLOG_IF(fatal, NULL == fMappedItems.at(det), "LosMapped not found");
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        fCalItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sCal", fDetectorNames[det]))));
         R3BLOG_IF(warn, NULL == fCalItems.at(det), "LosCal not found");
     }
 
@@ -391,7 +391,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
     Double_t tot[fNofLosDetectors][32][8];
-    Double_t time_MTDC[32][8] = { 0. };
+    Double_t time_MTDC[32][8] = { {0.} };
     Double_t LosTresMTDC[32];
 
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
@@ -451,7 +451,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -470,15 +470,15 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         nPartLOS = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { 0. };
-        Double_t time_V_LOS2[32][8] = { 0. };
+        Double_t time_V_LOS1[32][8] = { {0.} };
+        Double_t time_V_LOS2[32][8] = { {0.} };
 
         for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
         {
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;

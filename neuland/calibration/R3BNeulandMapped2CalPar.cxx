@@ -68,17 +68,17 @@ InitStatus R3BNeulandMapped2CalPar::Init()
     {
         return kFATAL;
     }
-    header = (R3BEventHeader*)rm->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
     if (!header)
     {
         return kFATAL;
     }
-    fHits = (TClonesArray*)rm->GetObject("NeulandMappedData");
+    fHits = dynamic_cast<TClonesArray*>(rm->GetObject("NeulandMappedData"));
     if (!fHits)
     {
         return kFATAL;
     }
-    fHitsTrigger = (TClonesArray*)rm->GetObject("NeulandTrigMappedData");
+    fHitsTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("NeulandTrigMappedData"));
     if (!fHitsTrigger)
     {
         LOG(info) << "Branch NeulandTrigMapped not found";
@@ -86,7 +86,7 @@ InitStatus R3BNeulandMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the land directory)
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
+    fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LandTCalPar"));
     fCal_Par->setChanged();
 
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
@@ -133,7 +133,7 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto hit = (R3BPaddleTamexMappedData*)fHits->At(i);
+        auto hit = dynamic_cast<R3BPaddleTamexMappedData*>(fHits->At(i));
         if (!hit)
         {
             continue;
@@ -192,7 +192,7 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
         nHits = fHitsTrigger->GetEntriesFast();
         for (Int_t i = 0; i < nHits; i++)
         {
-            auto hit = (R3BPaddleTamexMappedData*)fHitsTrigger->At(i);
+            auto hit = dynamic_cast<R3BPaddleTamexMappedData*>(fHitsTrigger->At(i));
             if (!hit)
             {
                 continue;

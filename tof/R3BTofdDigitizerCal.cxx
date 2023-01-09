@@ -63,9 +63,9 @@ InitStatus R3BTofdDigitizerCal::Init()
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
 
-    fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
+    fTofdPoints = dynamic_cast<TClonesArray*>(ioman->GetObject("TOFdPoint"));
 
-    fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
     ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
 
     // Register output array fTofdCals
@@ -139,7 +139,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
         for (Int_t i = 0; i < entryNum; ++i)
         {
-            R3BTofdPoint* data_element = (R3BTofdPoint*)Points->At(i);
+            R3BTofdPoint* data_element = dynamic_cast<R3BTofdPoint*>(Points->At(i));
 
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // channel nummer
                                        data_element->GetEnergyLoss(),

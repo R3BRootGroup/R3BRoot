@@ -72,7 +72,7 @@ R3BFiberMAPMTCorrelationOnlineSpectra::~R3BFiberMAPMTCorrelationOnlineSpectra()
 
 void R3BFiberMAPMTCorrelationOnlineSpectra::SetParContainers()
 {
-    fMapPar1 = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName1 + "MappingPar");
+    fMapPar1 = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName1 + "MappingPar"));
     R3BLOG_IF(error, !fMapPar1, "Couldn't get " << fName1 << "MappingPar");
     if (fMapPar1)
     {
@@ -80,7 +80,7 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::SetParContainers()
         R3BLOG(info, fName1 << "MappingPar found with " << fNbfibers1 << " fibers");
     }
 
-    fMapPar2 = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName2 + "MappingPar");
+    fMapPar2 = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName2 + "MappingPar"));
     R3BLOG_IF(error, !fMapPar2, "Couldn't get " << fName2 << "MappingPar");
     if (fMapPar2)
     {
@@ -102,11 +102,11 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         R3BLOG(warn, "EventHeader. not found");
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(info, " EventHeader. found");
@@ -115,10 +115,10 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    fHitItems1 = (TClonesArray*)mgr->GetObject(fName1 + "Hit");
+    fHitItems1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fName1 + "Hit"));
     R3BLOG_IF(warn, NULL == fHitItems1, fName1 + "Hit not found");
 
-    fHitItems2 = (TClonesArray*)mgr->GetObject(fName2 + "Hit");
+    fHitItems2 = dynamic_cast<TClonesArray*>(mgr->GetObject(fName2 + "Hit"));
     R3BLOG_IF(warn, NULL == fHitItems2, fName2 + "Hit not found");
 
     //------------------------------------------------------------------------
@@ -233,7 +233,7 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::Exec(Option_t* option)
 
         for (Int_t ihit = 0; ihit < nHits1; ihit++)
         {
-            auto hit = (R3BFiberMAPMTHitData*)fHitItems1->At(ihit);
+            auto hit = dynamic_cast<R3BFiberMAPMTHitData*>(fHitItems1->At(ihit));
             if (!hit)
                 continue;
             // Looking for the maximum
@@ -248,7 +248,7 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::Exec(Option_t* option)
         Int_t nHits2 = fHitItems2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits2; ihit++)
         {
-            auto hit = (R3BFiberMAPMTHitData*)fHitItems2->At(ihit);
+            auto hit = dynamic_cast<R3BFiberMAPMTHitData*>(fHitItems2->At(ihit));
             if (!hit)
                 continue;
             // Looking for the maximum

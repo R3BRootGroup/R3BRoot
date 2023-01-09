@@ -116,15 +116,15 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, !mgr, "FairRootManager not found.");
 
-    fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
 
     auto name = fName + "Cal";
-    fCalItems = (TClonesArray*)mgr->GetObject(name);
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     R3BLOG_IF(fatal, !fCalItems, "Branch " << name << " not found.");
 
     auto name_mapmt_trig = fName + "TriggerCal";
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name_mapmt_trig));
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "Branch " << name_mapmt_trig << " not found");
 
     // maxevent = mgr->CheckMaxEventNo();
@@ -234,7 +234,7 @@ InitStatus R3BFiberMAPMTCal2Hit::ReInit()
 
 void R3BFiberMAPMTCal2Hit::SetParContainers()
 {
-    fMapPar = (R3BFiberMappingPar*)FairRuntimeDb::instance()->getContainer(fName + "MappingPar");
+    fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     if (!fMapPar)
     {
         R3BLOG(error, "Couldn't get " << fName << "MappingPar");
@@ -246,7 +246,7 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     }
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
+    fCalPar = dynamic_cast<R3BFiberMAPMTHitPar*>(FairRuntimeDb::instance()->getContainer(fName + "HitPar"));
     R3BLOG_IF(info, fCalPar, "Container " << fName << "HitPar initialized");
     R3BLOG_IF(error, !fCalPar, "Couldn't get " << fName << "HitPar");
 
@@ -254,7 +254,7 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     {
         // Get calibration parameters if we're not a calibrator.
         auto container = fName + "HitPar";
-        fHitPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(container);
+        fHitPar = dynamic_cast<R3BFiberMAPMTHitPar*>(FairRuntimeDb::instance()->getContainer(container));
         R3BLOG_IF(error, !fHitPar, "Could not get " << container << " container.");
     }
 }
@@ -279,7 +279,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
     Double_t tl, tt; // lead and trile times of the trigger
     for (UInt_t j = 0; j < cal_num_trig; ++j)
     {
-        auto cur_cal = (R3BFiberMAPMTCalData*)fCalTriggerItems->At(j);
+        auto cur_cal = dynamic_cast<R3BFiberMAPMTCalData*>(fCalTriggerItems->At(j));
         auto ch = cur_cal->GetChannel() - 1;
         tl = cur_cal->GetTime_ns();
         trig_time[ch] = tl;
@@ -289,7 +289,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal_lead = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+        auto cur_cal_lead = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
 
         if (cur_cal_lead->IsLeading())
         {
@@ -302,7 +302,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
     for (size_t j = 0; j < cal_num; ++j)
     {
-        auto cur_cal_trail = (R3BFiberMAPMTCalData const*)fCalItems->At(j);
+        auto cur_cal_trail = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
 
         if (cur_cal_trail->IsTrailing())
         {

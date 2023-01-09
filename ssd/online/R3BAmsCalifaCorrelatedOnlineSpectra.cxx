@@ -93,7 +93,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -101,21 +101,21 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     // create histograms of all detectors
 
     // get access to Hit data
-    fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
+    fHitItemsAms = dynamic_cast<TClonesArray*>(mgr->GetObject("AmsHitData"));
     if (!fHitItemsAms)
     {
         LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
     }
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    fHitItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaClusterData"));
     if (!fHitItemsCalifa)
     {
         LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaClusterData not found";
     }
 
     // get access to Hit data
-    fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
+    fCalItemsLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
     if (!fCalItemsLos)
     {
         LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
@@ -342,16 +342,16 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
 
     // los
 
-    Double_t time_V[10][8] = { 0.0 / 0.0 }; // [multihit][pm]
-    Double_t time_L[10][8] = { 0.0 / 0.0 };
-    Double_t time_T[10][8] = { 0.0 / 0.0 };
+    Double_t time_V[10][8] = { {0.0 / 0.0} }; // [multihit][pm]
+    Double_t time_L[10][8] = { {0.0 / 0.0} };
+    Double_t time_T[10][8] = { {0.0 / 0.0} };
     Double_t timeLosM[10] = { 0.0 };
     Double_t LosTresM[10] = { 0.0 / 0.0 };
     Double_t timeLosT[10] = { 0.0 };
     Double_t LosTresT[10] = { 0.0 / 0.0 };
     Double_t timeLos[10] = { 0.0 };
     Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][8] = { 0.0 / 0.0 };
+    Double_t tot[10][8] = { {0.0 / 0.0} };
     Double_t xT_cm[10] = { 0.0 / 0.0 };
     Double_t yT_cm[10] = { 0.0 / 0.0 };
     Double_t xV_cm[10] = { 0.0 / 0.0 };
@@ -376,7 +376,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItemsLos->At(iPart);
+            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(fCalItemsLos->At(iPart));
             iDet = calData->GetDetector();
 
             // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7
@@ -579,7 +579,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
+            R3BAmsHitData* hit = dynamic_cast<R3BAmsHitData*>(fHitItemsAms->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetEnergyS() < 80 || hit->GetEnergyK() < 80 || hit->GetEnergyS() > 8500 ||
@@ -640,7 +640,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaClusterData* hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaClusterData* hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;

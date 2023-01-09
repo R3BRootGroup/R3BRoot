@@ -104,6 +104,8 @@ Ctest_Submit()
 
 if (_ctest_test_ret_val)
   Message(ERROR "Some tests failed, printing output of failed tests:")
-  execute_process(COMMAND ctest  --rerun-failed --output-on-failure )
+  execute_process(
+    WORKING_DIRECTORY "${CTEST_BINARY_DIRECTORY}"
+    COMMAND ctest  --rerun-failed --output-on-failure )
   Message(FATAL_ERROR "End of failed tests output.")
 endif()

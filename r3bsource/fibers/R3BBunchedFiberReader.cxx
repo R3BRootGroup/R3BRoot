@@ -34,7 +34,7 @@ R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
     counter.insert(std::make_pair(fShortName, 0));
 }
 
-Bool_t R3BBunchedFiberReader::Init()
+Bool_t R3BBunchedFiberReader::Init(ext_data_struct_info*)
 {
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
@@ -60,7 +60,7 @@ Bool_t R3BBunchedFiberReader::Init()
     return kTRUE;
 }
 
-Bool_t R3BBunchedFiberReader::Read()
+Bool_t R3BBunchedFiberReader::R3BRead()
 {
     auto it = counter.find(fShortName);
     // LOG(error) << "R3BBunchedFiberReader::Read BEGIN";

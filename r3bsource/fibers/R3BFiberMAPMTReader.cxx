@@ -50,7 +50,7 @@ Bool_t R3BFiberMAPMTReader::Init()
     return kTRUE;
 }
 
-Bool_t R3BFiberMAPMTReader::Read()
+Bool_t R3BFiberMAPMTReader::R3BRead()
 {
     R3BLOG(debug, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)

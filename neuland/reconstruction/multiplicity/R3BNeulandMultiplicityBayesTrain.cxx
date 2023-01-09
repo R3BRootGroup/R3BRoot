@@ -33,7 +33,7 @@ void R3BNeulandMultiplicityBayesTrain::SetParContainers()
         return;
     }
 
-    fPar = (R3BNeulandMultiplicityBayesPar*)rtdb->getContainer("R3BNeulandMultiplicityBayesPar");
+    fPar = dynamic_cast<R3BNeulandMultiplicityBayesPar*>(rtdb->getContainer("R3BNeulandMultiplicityBayesPar"));
     if (fPar == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityBayesTrain::Init: No R3BNeulandMultiplicityBayesPar!";

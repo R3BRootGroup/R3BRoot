@@ -20,7 +20,7 @@
 
 class FairParamList;
 
-class R3BTsplinePar : public TObject
+class R3BTsplinePar : public TNamed
 {
   public:
     /** Default constructor **/
@@ -39,17 +39,15 @@ class R3BTsplinePar : public TObject
     TSpline3* getParams(FairParamList* list);
 
     /** Accessor functions **/
-    TString& GetName() { return fSplineName; }
+    TString GetNameObj() { return GetName(); }
     TSpline3* GetSpline() { return fSpline; }
 
-    void SetName(TString& n) { fSplineName = n; }
     void SetMaxPoints(UInt_t p) { fMaxPoints = p; }
     void SetSpline(TSpline3* c) { fSpline = c; }
 
   private:
     UInt_t fMaxPoints;
     TSpline3* fSpline;
-    TString fSplineName;
     Double_t fxmin;
     Double_t fxmax;
 

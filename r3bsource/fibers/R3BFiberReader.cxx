@@ -412,7 +412,7 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BFiberReader::Read()
+Bool_t R3BFiberReader::R3BRead()
 {
     R3BLOG(debug1, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)

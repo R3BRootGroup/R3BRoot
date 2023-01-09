@@ -1009,8 +1009,8 @@ Bool_t R3BFileSource::SpecifyRunId()
 
 void R3BFileSource::FillEventHeader(FairEventHeader* feh)
 {
-    ((R3BEventHeader*)feh)->SetRunId(fRunId);
-    ((R3BEventHeader*)feh)->SetInputFileId(0);
+    (dynamic_cast<R3BEventHeader*>(feh))->SetRunId(fRunId);
+    (dynamic_cast<R3BEventHeader*>(feh))->SetInputFileId(0);
     return;
 }
 

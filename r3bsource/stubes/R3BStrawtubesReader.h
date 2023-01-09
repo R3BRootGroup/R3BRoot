@@ -28,7 +28,7 @@ class R3BStrawtubesReader : public R3BReader
     virtual ~R3BStrawtubesReader();
 
     Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
+    Bool_t R3BRead();
     void Reset();
 
   private:

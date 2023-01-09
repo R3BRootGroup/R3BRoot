@@ -144,7 +144,7 @@ R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
 
 InitStatus R3BTofdCal2HitS454::Init()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -162,12 +162,12 @@ InitStatus R3BTofdCal2HitS454::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
-    fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
+    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
-    fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
+    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
     if (NULL == fCalTriggerItems)
         LOG(fatal) << "Branch TofdTriggerCal not found";
     maxevent = mgr->CheckMaxEventNo();
@@ -183,7 +183,7 @@ InitStatus R3BTofdCal2HitS454::Init()
 // Note that the container may still be empty at this point.
 void R3BTofdCal2HitS454::SetParContainers()
 {
-    fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
+    fHitPar = dynamic_cast<R3BTofdHitPar*>(FairRuntimeDb::instance()->getContainer("TofdHitPar"));
     if (!fHitPar)
     {
         LOG(error) << "Could not get access to TofdHitPar-Container.";
@@ -273,7 +273,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
+        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
         /*std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
@@ -314,8 +314,8 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
             {
-                auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
-                auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                auto top_trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(top_trig_i));
+                auto bot_trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(bot_trig_i));
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
                 /*

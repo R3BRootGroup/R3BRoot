@@ -93,26 +93,26 @@ InitStatus R3BCalifavsFootOnlineSpectra::Init()
 
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     // get access to Cal data
-    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
+    fCalItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaCrystalCalData"));
     R3BLOG_IF(fatal, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    fHitItemsCalifa = dynamic_cast<TClonesArray*>(mgr->GetObject("CalifaClusterData"));
     R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaClusterData not found");
 
-    fMappedItemsFoot = (TClonesArray*)mgr->GetObject("FootMappedData");
+    fMappedItemsFoot = dynamic_cast<TClonesArray*>(mgr->GetObject("FootMappedData"));
     R3BLOG_IF(fatal, !fMappedItemsFoot, "FootMappedData not found");
 
-    fCalItemsFoot = (TClonesArray*)mgr->GetObject("FootCalData");
+    fCalItemsFoot = dynamic_cast<TClonesArray*>(mgr->GetObject("FootCalData"));
     R3BLOG_IF(warn, !fCalItemsFoot, "FootCalData not found");
 
-    fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
+    fHitItemsFoot = dynamic_cast<TClonesArray*>(mgr->GetObject("FootHitData"));
     R3BLOG_IF(warn, !fHitItemsFoot, "FootHitData not found");
 
     // Create histograms for detectors
@@ -180,7 +180,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
     bool ffoot = false;
     for (Int_t ihit = 0; ihit < fMappedItemsFoot->GetEntriesFast(); ihit++)
     {
-        auto hit = (R3BFootMappedData*)fMappedItemsFoot->At(ihit);
+        auto hit = dynamic_cast<R3BFootMappedData*>(fMappedItemsFoot->At(ihit));
         if (!hit)
             continue;
         if (hit->GetDetId() == 11 && hit->GetEnergy() > 500)
@@ -191,7 +191,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+        auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
         if (hit->GetEnergy() < 50e3) // 50MeV
             continue;
 

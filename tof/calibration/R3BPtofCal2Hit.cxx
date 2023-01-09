@@ -70,7 +70,7 @@ InitStatus R3BPtofCal2Hit::Init()
         LOG(fatal) << "FairRootManager not found";
     }
 
-    fCalItems = (TClonesArray*)fMan->GetObject("PtofCal");
+    fCalItems = dynamic_cast<TClonesArray*>(fMan->GetObject("PtofCal"));
     if (!fCalItems)
     {
         LOG(fatal) << "PtofCalData not found";
@@ -84,7 +84,7 @@ InitStatus R3BPtofCal2Hit::Init()
 
 void R3BPtofCal2Hit::SetParContainers()
 {
-    fHitPar = (R3BPtofHitPar*)FairRuntimeDb::instance()->getContainer("PtofHitPar");
+    fHitPar = dynamic_cast<R3BPtofHitPar*>(FairRuntimeDb::instance()->getContainer("PtofHitPar"));
     ;
 }
 
@@ -141,7 +141,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nItems; i++)
     {
-        R3BPaddleCalData* caldata = (R3BPaddleCalData*)fCalItems->At(i);
+        R3BPaddleCalData* caldata = dynamic_cast<R3BPaddleCalData*>(fCalItems->At(i));
         Int_t iPlane = caldata->GetPlane() - 1;
         Int_t iBar = caldata->GetBar() - 1;
         assert(iBar >= 0 && iBar < PtofPaddlesPerPlane);

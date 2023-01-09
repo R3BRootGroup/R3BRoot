@@ -42,7 +42,7 @@ class R3BFootReader : public R3BReader
     virtual Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t Read() override;
+    virtual Bool_t R3BRead() override;
 
     // Reset
     virtual void Reset() override;

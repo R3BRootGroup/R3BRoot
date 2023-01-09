@@ -59,7 +59,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
         return kERROR;
     }
     auto name = "BunchedFiberSPMTTrigMapped";
-    fMappedItems = (TClonesArray*)mgr->GetObject(name);
+    fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name));
     if (!fMappedItems)
     {
         LOG(error) << "Branch " << name << " not found.";
@@ -72,7 +72,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 void R3BBunchedFiberSPMTTrigMapped2Cal::SetParContainers()
 {
     auto name = "BunchedFiberSPMTTrigTCalPar";
-    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    fTCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name));
     if (!fTCalPar)
     {
         LOG(error) << "Could not get access to " << name << " container.";
@@ -91,7 +91,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
     LOG(debug) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
-        auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
+        auto mapped = dynamic_cast<R3BFiberMappedData*>(fMappedItems->At(i));
         auto channel = mapped->GetChannel();
         auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
         if (!par)

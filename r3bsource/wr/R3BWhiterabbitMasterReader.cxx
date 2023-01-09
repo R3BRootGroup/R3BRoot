@@ -62,11 +62,11 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
 
     // Looking for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
         R3BLOG(warn, "EventHeader. not found");
-        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
     }
     else
         R3BLOG(info, "EventHeader. found");
@@ -79,7 +79,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitMasterReader::Read()
+Bool_t R3BWhiterabbitMasterReader::R3BRead()
 {
     if (!fData->TIMESTAMP_MASTER_ID)
     {

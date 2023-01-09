@@ -69,12 +69,12 @@ InitStatus R3BTofiMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMapped = (TClonesArray*)rm->GetObject("TofiMapped");
+    fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("TofiMapped"));
     if (!fMapped)
     {
         return kFATAL;
     }
-    fMappedTrigger = (TClonesArray*)rm->GetObject("TofiTriggerMapped");
+    fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("TofiTriggerMapped"));
     if (!fMapped)
     {
         return kFATAL;
@@ -82,7 +82,7 @@ InitStatus R3BTofiMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofiTCalPar");
+    fCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("TofiTCalPar"));
     if (!fCalPar)
     {
         LOG(error) << "R3BTofiMapped2CalPar::Init() Couldn't get handle on TofiTCalPar. ";
@@ -109,7 +109,7 @@ void R3BTofiMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto mapped = (R3BTofiMappedData const*)fMapped->At(i);
+        auto mapped = dynamic_cast<R3BTofiMappedData const*>(fMapped->At(i));
 
         if (mapped->GetDetectorId() > fNofPlanes)
         {
@@ -133,7 +133,7 @@ void R3BTofiMapped2CalPar::Exec(Option_t* option)
     // Loop over mapped triggers
     for (Int_t i = 0; i < nHits; i++)
     {
-        auto mapped = (R3BTofiMappedData const*)fMappedTrigger->At(i);
+        auto mapped = dynamic_cast<R3BTofiMappedData const*>(fMappedTrigger->At(i));
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {
