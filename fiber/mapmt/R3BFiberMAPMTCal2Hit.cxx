@@ -519,11 +519,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     if (!fIsCalibrator)
                     {
-                        if (tof >= ftofmin && tof <= ftofmax)
-                        {
                             new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BFiberMAPMTHitData(
                                 fDetId, x, y, eloss, tof, fiber_id, t_down, t_up, tot_down, tot_up);
-                        }
                     }
                 }
             }
