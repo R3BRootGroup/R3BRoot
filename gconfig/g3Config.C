@@ -29,9 +29,11 @@ void Config()
         cout << "-I- G3Config: Geant3 native has been created." << endl;
     }
     // create Fair Specific Stack
-    FairStack* st = new FairStack();
-    st->SetMinPoints(0);
-    geant3->SetStack(st);
+    R3BStack* stack = new R3BStack();
+    stack->SetDebug(kFALSE);
+    stack->StoreSecondaries(kTRUE);
+    stack->SetMinPoints(1);
+    geant3->SetStack(stack);
 
     // ******* Geant3 configuration for simulated Runs  *******
     geant3->SetTRIG(1); // Number of events to be processed
@@ -58,7 +60,7 @@ void Config()
     geant3->SetOPTI(2); // Select optimisation level for GEANT geometry searches (0,1,2)
     geant3->SetERAN(5.e-7);
 
-    Float_t cut = 1. e - 3; // 1MeV cut by default
+    Float_t cut = 1.e-3; // 1MeV cut by default
     Float_t tofmax = 1.e10;
     // Float_t cut2 =  1.e-10; // 1 keV?
     Float_t cut2 = cut;
