@@ -111,6 +111,10 @@ endforeach()
 
 if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
 #  find_package2(PUBLIC FairMQ VERSION 1.4.0)
+
+if( "${FairRoot_VERSION}"  VERSION_GREATER_EQUAL 18.6.4 )
+  add_definitions(-DACTIVATEOVERRIDE)
+endif()
   
   find_package2(PUBLIC DDS)
 
