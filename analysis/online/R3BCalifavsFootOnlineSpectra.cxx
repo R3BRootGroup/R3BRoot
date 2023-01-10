@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifavsFootOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BEventHeader.h"
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
@@ -103,8 +103,8 @@ InitStatus R3BCalifavsFootOnlineSpectra::Init()
     R3BLOG_IF(fatal, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaHitData not found");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaClusterData not found");
 
     fMappedItemsFoot = (TClonesArray*)mgr->GetObject("FootMappedData");
     R3BLOG_IF(fatal, !fMappedItemsFoot, "FootMappedData not found");
@@ -191,7 +191,7 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
         if (hit->GetEnergy() < 50e3) // 50MeV
             continue;
 

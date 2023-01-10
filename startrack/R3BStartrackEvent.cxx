@@ -18,7 +18,7 @@ ClassImp(R3BStartrackEvent)
     R3BStartrackEvent::R3BStartrackEvent()
     : fSTHits(new TObjArray())
     , // clusters in the Silicon Tracker
-    fCalifaHits(new TObjArray())
+    fCalifaClusters(new TObjArray())
     ,                        // CALIFA hit
     fGeometryST("geom.root") // geometry Silicon Tracker
 {
@@ -36,7 +36,7 @@ ClassImp(R3BStartrackEvent)
 R3BStartrackEvent::R3BStartrackEvent(Int_t nhitsST, Int_t nhitsCalifa)
     : fSTHits()
     , // clusters in the Silicon Tracker
-    fCalifaHits()
+    fCalifaClusters()
     ,                   // CALIFA hit
     fGeometryST("geom") // geometry Silicon Tracker
 {
@@ -49,7 +49,7 @@ R3BStartrackEvent::R3BStartrackEvent(Int_t nhitsST, Int_t nhitsCalifa)
         fVtxError[i] = 0.0;
     }
     fSTHits = new TObjArray(nhitsST);
-    fCalifaHits = new TObjArray(nhitsCalifa);
+    fCalifaClusters = new TObjArray(nhitsCalifa);
 }
 
 //-----------------------------------------------
@@ -61,12 +61,12 @@ R3BStartrackEvent::R3BStartrackEvent(const R3BStartrackEvent& stevent)
       // fVtxPosition(stevent.fVtxPosition),
       // fVtxError(stevent.fVtxError),
     fSTHits(stevent.fSTHits)
-    , fCalifaHits(stevent.fCalifaHits)
+    , fCalifaClusters(stevent.fCalifaClusters)
     , fGeometryST(stevent.fGeometryST)
 {
     // copy constructor
     //  fSTHits= new TObjArray(stevent.fSTHits);
-    //  fCalifaHits=new TObjArray(stevent.fCalifaHits);
+    //  fCalifaClusters=new TObjArray(stevent.fCalifaClusters);
 
     for (Int_t i = 0; i < 3; i++)
     {
@@ -85,6 +85,6 @@ R3BStartrackEvent::~R3BStartrackEvent()
     // destructor
     if (fSTHits)
         delete fSTHits;
-    if (fCalifaHits)
-        delete fCalifaHits;
+    if (fCalifaClusters)
+        delete fCalifaClusters;
 }

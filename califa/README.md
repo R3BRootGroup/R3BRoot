@@ -14,7 +14,7 @@ Tasks are:
 
 - ./sim/R3BCalifaDigitizer.h
 - ./calibration/R3BCalifaMapped2CrystalCal.h
-- ./calibration/R3BCalifaCrystalCal2Hit.h
+- ./calibration/R3BCalifaCrystalCal2Cluster.h
 - ./calibration/R3BCalifaCrystalCal2CrystalCalPID.h
 
 ### Parameter containers
@@ -24,7 +24,7 @@ These files generally hold channel-specific data used for calibration and the li
 - ./pars/R3BCalifaMappingPar.h
 - ./pars/R3BCalifaCrystalCalPar.h
 - ./pars/R3BCalifaTotCalPar.h
-- ./pars/R3BCalifaHitPar.h
+- ./pars/R3BCalifaClusterPar.h
 - ./pars/R3BCalifaGeometry.h -- helper class to fetch infos on the positions and orientation of the crystals
 - ./pars/R3BCalifaContFact.h
 
@@ -76,9 +76,9 @@ to generate [[../r3bdata/califaData/R3BCalifaCrystalCalData.h]] by applying per-
 ### Processing to hit level aka clustering
 
 [[../r3bdata/califaData/R3BCalifaCrystalCalData.h]] data from either source (sim/exp) is converted by
-{{./R3BCalifaCrystalCal2Hit.h}}
+{{./R3BCalifaCrystalCal2Cluster.h}}
 to
-[[../r3bdata/califaData/R3BCalifaHitData.h]]
+[[../r3bdata/califaData/R3BCalifaClusterData.h]]
 
 
 

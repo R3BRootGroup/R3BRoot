@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #include "R3BCalifavsTofDOnlineSpectra.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTofdHitData.h"
@@ -80,8 +80,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaHitData not found");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaClusterData not found");
 
     fHitItemsTofd = (TClonesArray*)mgr->GetObject("TofdHit");
     R3BLOG_IF(warn, !fHitItemsTofd, "TofdHit not found");
@@ -177,7 +177,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     Int_t nHits = fHitItemsCalifa->GetEntriesFast();
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
         if (hit->GetEnergy() < fMinProtonE)
             continue;
 
@@ -198,7 +198,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

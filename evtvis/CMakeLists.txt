@@ -44,7 +44,7 @@ set(SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
 R3BCalifaEventDisplay.cxx
-R3BCalifaHitEventDisplay.cxx
+R3BCalifaClusterEventDisplay.cxx
 R3BMCTracks.cxx
 R3BIonName.cxx
 )

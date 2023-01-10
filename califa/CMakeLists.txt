@@ -57,12 +57,12 @@ set(SRCS
 ./pars/R3BCalifaMappingPar.cxx
 ./pars/R3BCalifaCrystalCalPar.cxx
 ./pars/R3BCalifaTotCalPar.cxx
-./pars/R3BCalifaHitPar.cxx
+./pars/R3BCalifaClusterPar.cxx
 ./pars/R3BCalifaCrystalPars4Sim.cxx
 ./calibration/R3BCalifaMapped2CrystalCalPar.cxx
 ./calibration/R3BCalifaCrystalCal2TotCalPar.cxx
 ./calibration/R3BCalifaMapped2CrystalCal.cxx
-./calibration/R3BCalifaCrystalCal2Hit.cxx
+./calibration/R3BCalifaCrystalCal2Cluster.cxx
 ./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
 ./online/R3BCalifaOnlineSpectra.cxx
 ./online/R3BCalifaJulichOnlineSpectra.cxx

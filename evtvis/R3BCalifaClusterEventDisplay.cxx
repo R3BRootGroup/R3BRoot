@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 // --------------------------------------------------------------------
-// -----          R3BCalifaHitEventDisplay source file            -----
+// -----          R3BCalifaClusterEventDisplay source file            -----
 // --------------------------------------------------------------------
 
-#include "R3BCalifaHitEventDisplay.h"
+#include "R3BCalifaClusterEventDisplay.h"
 
 #include "FairEventManager.h"
 #include "FairLogger.h"
@@ -26,7 +26,7 @@
 #include "TClonesArray.h"
 #include "TObjArray.h"
 
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 
 #include "TEveBrowser.h"
 #include "TEveCalo.h"
@@ -55,8 +55,8 @@ using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-R3BCalifaHitEventDisplay::R3BCalifaHitEventDisplay()
-    : FairTask("R3BCalifaHitEventDisplay", 0)
+R3BCalifaClusterEventDisplay::R3BCalifaClusterEventDisplay()
+    : FairTask("R3BCalifaClusterEventDisplay", 0)
     , fEventManager(NULL)
     , fDataHist(NULL)
     , fCalo3d(NULL)
@@ -84,7 +84,7 @@ R3BCalifaHitEventDisplay::R3BCalifaHitEventDisplay()
 // -----------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
-R3BCalifaHitEventDisplay::R3BCalifaHitEventDisplay(const char* name, Int_t iVerbose)
+R3BCalifaClusterEventDisplay::R3BCalifaClusterEventDisplay(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fEventManager(NULL)
     , fDataHist(NULL)
@@ -113,18 +113,18 @@ R3BCalifaHitEventDisplay::R3BCalifaHitEventDisplay(const char* name, Int_t iVerb
 // -----------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-R3BCalifaHitEventDisplay::~R3BCalifaHitEventDisplay() {}
+R3BCalifaClusterEventDisplay::~R3BCalifaClusterEventDisplay() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Init   --------------------------------------------
-InitStatus R3BCalifaHitEventDisplay::Init()
+InitStatus R3BCalifaClusterEventDisplay::Init()
 {
 
     FairRootManager* ioManager = FairRootManager::Instance();
     if (!ioManager)
         LOG(fatal) << "Init:No FairRootManager";
     if (!fCaloHitCA)
-        fCaloHitCA = (TClonesArray*)ioManager->GetObject("CalifaHitData");
+        fCaloHitCA = (TClonesArray*)ioManager->GetObject("CalifaClusterData");
 
     fEventManager = FairEventManager::Instance();
 
@@ -136,10 +136,10 @@ InitStatus R3BCalifaHitEventDisplay::Init()
 }
 
 // -----   Public method ReInit   --------------------------------------------
-InitStatus R3BCalifaHitEventDisplay::ReInit() { return kSUCCESS; }
+InitStatus R3BCalifaClusterEventDisplay::ReInit() { return kSUCCESS; }
 
 // -----   Public method Exec   --------------------------------------------
-void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
+void R3BCalifaClusterEventDisplay::Exec(Option_t* opt)
 {
     if (IsActive())
     {
@@ -147,7 +147,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
         Reset();
 
         // Besides if conditions, both objects must be defined
-        R3BCalifaHitData* caloHit;
+        R3BCalifaClusterData* caloHit;
 
         Int_t caloHits = 0; // Nb of CaloHits in current event
         caloHits = fCaloHitCA->GetEntriesFast();
@@ -164,7 +164,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
         {
 
             Int_t binx = -1, biny = -1;
-            caloHit = (R3BCalifaHitData*)fCaloHitCA->At(i);
+            caloHit = (R3BCalifaClusterData*)fCaloHitCA->At(i);
             theta = caloHit->GetTheta();
             phi = caloHit->GetPhi();
 
@@ -249,7 +249,7 @@ void R3BCalifaHitEventDisplay::Exec(Option_t* opt)
 }
 
 // ---- Public method Reset   --------------------------------------------------
-void R3BCalifaHitEventDisplay::Reset()
+void R3BCalifaClusterEventDisplay::Reset()
 {
 
     hcalohit->Reset();
@@ -261,10 +261,10 @@ void R3BCalifaHitEventDisplay::Reset()
 }
 
 // ---- Public method Finish   --------------------------------------------------
-void R3BCalifaHitEventDisplay::Finish() {}
+void R3BCalifaClusterEventDisplay::Finish() {}
 
 // -----   Private method CreateHistograms  -------------------------------------
-void R3BCalifaHitEventDisplay::CreateHistograms()
+void R3BCalifaClusterEventDisplay::CreateHistograms()
 {
 
     // Variable x-bin size: defined by crystals polar angle edges
@@ -291,7 +291,7 @@ void R3BCalifaHitEventDisplay::CreateHistograms()
 }
 
 // -----   Private method MakeSlots  -------------------------------------
-void R3BCalifaHitEventDisplay::MakeSlots()
+void R3BCalifaClusterEventDisplay::MakeSlots()
 {
 
     // frames
@@ -317,7 +317,7 @@ void R3BCalifaHitEventDisplay::MakeSlots()
 }
 
 // -----   Private method MakeViewerScene  ---------------------------------
-void R3BCalifaHitEventDisplay::MakeViewerScene()
+void R3BCalifaClusterEventDisplay::MakeViewerScene()
 {
 
     slotLeftTop->MakeCurrent();
@@ -351,4 +351,4 @@ void R3BCalifaHitEventDisplay::MakeViewerScene()
     overlay->SetCaloLego(fLego);
 }
 
-ClassImp(R3BCalifaHitEventDisplay)
+ClassImp(R3BCalifaClusterEventDisplay)

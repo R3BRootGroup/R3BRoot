@@ -11,19 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaHitPar.h"
+#include "R3BCalifaClusterPar.h"
 #include "TMath.h"
 #include <iostream>
 
-R3BCalifaHitPar::R3BCalifaHitPar(const char* name, const char* title, const char* context)
+R3BCalifaClusterPar::R3BCalifaClusterPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
     clear();
 }
 
-void R3BCalifaHitPar::putParams(FairParamList* list)
+void R3BCalifaClusterPar::putParams(FairParamList* list)
 {
-    std::cout << "-I- R3BCalifaHitPar::putParams() called" << std::endl;
+    std::cout << "-I- R3BCalifaClusterPar::putParams() called" << std::endl;
 
     if (!list)
         return;
@@ -36,12 +36,12 @@ void R3BCalifaHitPar::putParams(FairParamList* list)
     list->add("fParCluster1", (Double_t)fParCluster1);
 }
 
-Bool_t R3BCalifaHitPar::getParams(FairParamList* list)
+Bool_t R3BCalifaClusterPar::getParams(FairParamList* list)
 {
-    std::cout << "-I- R3BCalifaHitPar::getParams() called" << std::endl;
+    std::cout << "-I- R3BCalifaClusterPar::getParams() called" << std::endl;
     if (!list)
         return kFALSE;
-    std::cout << "-I- R3BCalifaHitPar::getParams() 1 ";
+    std::cout << "-I- R3BCalifaClusterPar::getParams() 1 ";
 
     if (!list->fill("fThreshold", &fThreshold, 1))
         return kFALSE;
@@ -61,9 +61,9 @@ Bool_t R3BCalifaHitPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BCalifaHitPar::Print(Option_t* option) const
+void R3BCalifaClusterPar::Print(Option_t* option) const
 {
-    std::cout << "-I- CALIFA HitFinder Parameters:" << std::endl;
+    std::cout << "-I- CALIFA ClusterFinder Parameters:" << std::endl;
     std::cout << "fThreshold " << fThreshold << std::endl;
     std::cout << "fDRThreshold " << fDRThreshold << std::endl;
     std::cout << "fDeltaPolar " << fDeltaPolar << std::endl;
@@ -73,4 +73,4 @@ void R3BCalifaHitPar::Print(Option_t* option) const
     std::cout << "fParCluster1 " << fParCluster1 << std::endl;
 }
 
-ClassImp(R3BCalifaHitPar);
+ClassImp(R3BCalifaClusterPar);

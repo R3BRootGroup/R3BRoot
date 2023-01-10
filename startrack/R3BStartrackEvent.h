@@ -14,7 +14,7 @@
 #ifndef R3BStartrackEvent_H
 #define R3BStartrackEvent_H
 
-#include "../califaData/R3BCalifaHitData.h"
+#include "../califaData/R3BCalifaClusterData.h"
 #include "R3BStartrackerHit.h"
 #include <TObjArray.h>
 #include <TObject.h>
@@ -44,7 +44,7 @@ class R3BStartrackEvent : public TObject
     Double_t GetVtxPositionX() { return fVtxPosition[0]; }
     Double_t* GetVtxError() { return fVtxError; }
     TObjArray* GetSTHits() const { return (TObjArray*)fSTHits; }
-    TObjArray* GetCalifaHits() const { return (TObjArray*)fCalifaHits; }
+    TObjArray* GetCalifaClusters() const { return (TObjArray*)fCalifaClusters; }
     TString GetGeometryST() { return fGeometryST; }
 
     // setters
@@ -93,9 +93,9 @@ class R3BStartrackEvent : public TObject
         fSTHits = sthits;
         return;
     }
-    void SetCalifaHits(TObjArray* califahits)
+    void SetCalifaClusters(TObjArray* califahits)
     {
-        fCalifaHits = califahits;
+        fCalifaClusters = califahits;
         return;
     }
     void SetSTGeometry(TString geometry = "geometry.root") { fGeometryST = geometry.Data(); }
@@ -107,7 +107,7 @@ class R3BStartrackEvent : public TObject
     Double_t fVtxPosition[3];    // primary vertex position
     Double_t fVtxError[3];       // primary vertex error
     TObjArray* fSTHits;          // Hits in the Silicon Tracker (R3BSTaRTrackerHit), min 3 (1 track), or 6 (2 protons)
-    TObjArray* fCalifaHits;      // CALIFA hit (R3BCalifaHitData)
+    TObjArray* fCalifaClusters;      // CALIFA hit (R3BCalifaClusterData)
     TString fGeometryST;         // geometry Silicon Tracker
 
     ClassDef(R3BStartrackEvent, 1);
