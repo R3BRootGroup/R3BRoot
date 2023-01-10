@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----             R3BCalifaHitEventDisplay header file              -----
+// -----             R3BCalifaClusterEventDisplay header file              -----
 // -----              Created 26/10/2012  by P.Cabanelas               -----
 // -------------------------------------------------------------------------
 
@@ -35,17 +35,17 @@ class FairRootManager;
 
 class TH2F;
 
-class R3BCalifaHitEventDisplay : public FairTask
+class R3BCalifaClusterEventDisplay : public FairTask
 {
   public:
     /** Default constructor **/
-    R3BCalifaHitEventDisplay();
+    R3BCalifaClusterEventDisplay();
 
     /** Standard Constructor **/
-    R3BCalifaHitEventDisplay(const char* name, Int_t iVerbose = 1);
+    R3BCalifaClusterEventDisplay(const char* name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    ~R3BCalifaHitEventDisplay();
+    ~R3BCalifaClusterEventDisplay();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -105,7 +105,7 @@ class R3BCalifaHitEventDisplay : public FairTask
     void MakeSlots();
     void MakeViewerScene();
 
-    ClassDef(R3BCalifaHitEventDisplay, 2);
+    ClassDef(R3BCalifaClusterEventDisplay, 2);
 };
 
 #endif

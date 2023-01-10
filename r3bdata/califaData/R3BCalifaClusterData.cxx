@@ -11,9 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 
-R3BCalifaHitData::R3BCalifaHitData()
+R3BCalifaClusterData::R3BCalifaClusterData()
     : FairMultiLinkedData()
     , fNbOfCrystalHits(0)
     , fEnergy(NAN)
@@ -23,13 +23,13 @@ R3BCalifaHitData::R3BCalifaHitData()
 {
 }
 
-R3BCalifaHitData::R3BCalifaHitData(UInt_t Nb,
-                                   Double_t ene,
-                                   Double_t nf,
-                                   Double_t ns,
-                                   Double_t theta,
-                                   Double_t phi,
-                                   ULong64_t time)
+R3BCalifaClusterData::R3BCalifaClusterData(UInt_t Nb,
+                                           Double_t ene,
+                                           Double_t nf,
+                                           Double_t ns,
+                                           Double_t theta,
+                                           Double_t phi,
+                                           ULong64_t time)
     : FairMultiLinkedData()
     , fNbOfCrystalHits(Nb)
     , fEnergy(ene)
@@ -41,7 +41,7 @@ R3BCalifaHitData::R3BCalifaHitData(UInt_t Nb,
 {
 }
 
-R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
+R3BCalifaClusterData::R3BCalifaClusterData(const R3BCalifaClusterData& right)
     : FairMultiLinkedData(right)
     , fNbOfCrystalHits(right.fNbOfCrystalHits)
     , fEnergy(right.fEnergy)
@@ -53,4 +53,4 @@ R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
 {
 }
 
-ClassImp(R3BCalifaHitData);
+ClassImp(R3BCalifaClusterData);

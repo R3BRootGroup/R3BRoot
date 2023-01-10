@@ -30,7 +30,7 @@
 #pragma link C++ class R3BXBallCrystalHitSim+;
 #pragma link C++ class R3BCalifaMappedData+;
 #pragma link C++ class R3BCalifaCrystalCalData+;
-#pragma link C++ class R3BCalifaHitData+;
+#pragma link C++ class R3BCalifaClusterData+;
 #pragma link C++ class R3BCalifaPoint+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BDchFullPoint+;

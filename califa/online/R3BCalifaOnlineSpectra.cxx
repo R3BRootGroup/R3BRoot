@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifaOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
@@ -204,8 +204,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     R3BLOG_IF(warn, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(warn, !fHitItemsCalifa, "CalifaHitData not found");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    R3BLOG_IF(warn, !fHitItemsCalifa, "CalifaClusterData not found");
 
     // get access to WR-Califa data
     fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
@@ -1491,7 +1491,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

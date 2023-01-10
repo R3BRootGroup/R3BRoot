@@ -20,13 +20,13 @@
 #include "FairParGenericSet.h"
 #include "FairParamList.h"
 
-class R3BCalifaHitPar : public FairParGenericSet
+class R3BCalifaClusterPar : public FairParGenericSet
 {
   public:
-    R3BCalifaHitPar(const char* name = "R3BCalifaHitPar",
-                    const char* title = "The Hit Finder Parameters",
+    R3BCalifaClusterPar(const char* name = "R3BCalifaClusterPar",
+                    const char* title = "The Cluster Finder Parameters",
                     const char* context = "TestDefaultContext");
-    ~R3BCalifaHitPar(void){};
+    ~R3BCalifaClusterPar(void){};
     void clear(void){};
     void putParams(FairParamList* list);
     Bool_t getParams(FairParamList* list);
@@ -50,7 +50,7 @@ class R3BCalifaHitPar : public FairParGenericSet
     void SetParCluster1(Double_t value) { fParCluster1 = value; }
 
   private:
-    // Minimum energy requested in a crystal to be considered in a calorimeter Hit
+    // Minimum energy requested in a crystal to be considered in a calorimeter Cluster
     Double_t fThreshold;
     // Threshold for selecting gamma or proton branch in double reading channels
     Double_t fDRThreshold;
@@ -65,7 +65,7 @@ class R3BCalifaHitPar : public FairParGenericSet
     // Clustering parameter 1
     Double_t fParCluster1;
 
-    ClassDef(R3BCalifaHitPar, 2); //
+    ClassDef(R3BCalifaClusterPar, 2); //
 };
 
-#endif /* !R3BCALIFAHITPAR_H*/
+#endif /* !R3BCALIFACLUSTERPAR_H*/

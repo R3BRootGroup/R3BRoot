@@ -853,7 +853,7 @@ void R3BTrackS454::Exec(Option_t* option)
         return;
     }
 
-    Bool_t CalifaHit = false;
+    Bool_t CalifaCluster = false;
     if (fMappedItems.at(DET_CALIFA))
     {
         // CALIFA
@@ -873,11 +873,11 @@ void R3BTrackS454::Exec(Option_t* option)
             if (Energy > 0)
             {
                 fh_califa_energy->Fill(Crystal, Energy);
-                CalifaHit = true;
+                CalifaCluster = true;
             }
         }
     }
-    if (CalifaHit)
+    if (CalifaCluster)
     {
         counterCalifa++;
         //		return;
