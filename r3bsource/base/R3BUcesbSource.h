@@ -55,7 +55,13 @@ class R3BUcesbSource : public FairSource
      * R3BRoot. It makes use of the ext_data_ interface of ucesb.
      * */
     virtual Bool_t Init();
+   
+#ifdef ACTIVATEOVERRIDE
+    virtual Bool_t SpecifyRunId() override;
+#else
     virtual Bool_t SpecifyRunId();
+#endif
+    
     virtual Bool_t InitUnpackers();
     virtual void SetParUnpackers();
     virtual Bool_t ReInitUnpackers();
