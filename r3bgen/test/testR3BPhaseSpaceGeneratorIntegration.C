@@ -1,5 +1,34 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+#include <TStopwatch.h>
+#include <TString.h>
+#include <TSystem.h>
+#include <memory>
+#include <iostream>
+
 void testR3BPhaseSpaceGeneratorIntegration()
 {
+    // Timer
+    TStopwatch timer;
+    timer.Start();
+    
+    // Logging
+    auto logger = FairLogger::GetLogger();
+    logger->SetLogVerbosityLevel("low");
+    logger->SetLogScreenLevel("warn");
+    logger->SetColoredLog(true);
+
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
     gSystem->Setenv("GEOMPATH", workDirectory + "/geometry");
@@ -53,7 +82,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
     rtdb->print();
 
     // Go
-    run.Run(1);
+    run.Run(10);
 
     // Test Output
     auto file = TFile::Open("testR3BPhaseSpaceGeneratorIntegration.root");
@@ -64,28 +93,27 @@ void testR3BPhaseSpaceGeneratorIntegration()
     tree->GetEvent(0);
     if (mctc->GetEntries() < 3)
     {
-        cout << "Not enough particles produced" << endl;
+        std::cout << "Not enough particles produced" << std::endl;
         return;
     }
 
     auto track = (R3BMCTrack*)mctc->At(1);
     if (track->GetPdgCode() != 2112 || track->GetMotherId() != -1)
     {
-        cout << "Not the correct primary particle" << endl;
+        std::cout << "Not the correct primary particle" << std::endl;
         return;
     }
 
     const Double_t ekin = track->GetEnergy() - track->GetMass();
-    cout << "Ekin of primary neutron:" << ekin << endl;
+    std::cout << "Ekin of primary neutron:" << ekin << std::endl;
     if (abs(ekin - 0.6) > 0.02)
     {
-        cout << "Primary neutron doesn't have the correct energy!" << endl;
+        std::cout << "Primary neutron doesn't have the correct energy!" << std::endl;
         return;
     }
 
-    // Note: Prevent test from succeeding if macro gets dumped on error
-    cout << " Test "
-         << "passed" << endl;
-    cout << " All "
-         << "ok " << endl;
+    // Report
+    timer.Stop();
+    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
+    std::cout << "Macro finished successfully." << std::endl;
 }
