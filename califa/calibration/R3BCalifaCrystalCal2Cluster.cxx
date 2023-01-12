@@ -41,7 +41,7 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalCalData(NULL)
     , fCalifaClusterData(NULL)
-    , fGeometryVersion(2021) // BARREL+iPhos
+    , fGeometryVersion(2021) // Half BARREL+iPhos
     , fThreshold(0.)         // no threshold
     , fDRThreshold(15000)    // in keV, for real data (15000 = 15MeV)
     , fDeltaPolar(0.25)
@@ -52,7 +52,7 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     , fCalifaGeo(NULL)
     , fNbCrystalsGammaRange(2432) // during 2019 it was 5000
     , fOnline(kFALSE)
-    , fRand(0)
+    , fRand(kFALSE)
     , fRandFile("")
 {
     SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);

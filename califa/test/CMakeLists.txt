@@ -11,8 +11,6 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-cmake_minimum_required(VERSION 3.0)
-
 enable_testing()
 set(PROJECT_TEST_NAME CalifaUnitTests)
 set(GTEST_ROOT ${SIMPATH})
@@ -27,9 +25,9 @@ include_directories(
     ${BASE_INCLUDE_DIRECTORIES}
     ${R3BROOT_SOURCE_DIR}/r3bbase
     ${R3BROOT_SOURCE_DIR}/r3bdata
-    ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
-    ${R3BROOT_SOURCE_DIR}/califa
+    ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
     ${R3BROOT_SOURCE_DIR}/califa/sim
+    ${R3BROOT_SOURCE_DIR}/califa/calibration
     ${R3BROOT_SOURCE_DIR}/califa/pars
     )
 

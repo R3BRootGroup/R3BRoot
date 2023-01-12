@@ -22,10 +22,10 @@
 #pragma link C++ class R3BModule+;
 #pragma link C++ class R3BDetector+;
 #pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BWhiterabbitPropagator+;
 #pragma link C++ class R3BDataPropagator+;
 #pragma link C++ class R3BFileSource+;
+#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BLogger+;
 #pragma link C++ class R3BTcutPar+;
 #pragma link C++ class R3BTsplinePar+;

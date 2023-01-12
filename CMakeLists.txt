@@ -73,25 +73,20 @@ execute_process(
 if( "${FairRoot_VERSION}"  VERSION_LESS 18.2.1 )
   Message(FATAL_ERROR "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later")
 else()
-  message(info "You seem to be using FairRoot ${FairRoot_VERSION}.")
+  message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
 endif()
 
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
-# Load some basic macros which are needed later on
-include(FairMacros)
-include(R3BMacros)
-include(WriteConfigFile_r3b)
-include(WriteEnvCache)
-include(Dart)
-include(CheckCompiler)
-
 if(SIMPATH)
   set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
 endif()
 
-find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
+# Load some basic macros which are needed later on
+include(FairMacros)
+
+find_package2(PUBLIC ROOT  VERSION 6.10.00 REQUIRED)
 if("${ROOT_vmc_FOUND}" MATCHES "no")
   find_package2(PUBLIC VMC REQUIRED)
   set(VMCLIB VMCLibrary)
@@ -99,6 +94,11 @@ else()
   set(VMCLIB VMC)
 endif()
 
+include(R3BMacros)
+include(WriteConfigFile_r3b)
+include(WriteEnvCache)
+include(Dart)
+include(CheckCompiler)
 include(ROOTMacros) # This is from FR, see https://github.com/FairRootGroup/FairRoot/issues/1221
 
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
@@ -110,12 +110,10 @@ foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
 endforeach()
 
 if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
+  add_definitions(-DACTIVATEOVERRIDE)
+
 #  find_package2(PUBLIC FairMQ VERSION 1.4.0)
 
-if( "${FairRoot_VERSION}"  VERSION_GREATER_EQUAL 18.6.4 )
-  add_definitions(-DACTIVATEOVERRIDE)
-endif()
-  
   find_package2(PUBLIC DDS)
 
 #If(FAIRSOFT_EXTERN)
@@ -412,7 +410,6 @@ if(NOT MODULE)
     endif (Atima_FOUND)
     set(ENV{VMCWORKDIR} ${CMAKE_CURRENT_SOURCE_DIR})
     add_subdirectory(passive)
-    add_subdirectory(califa)
     add_subdirectory(xball)
     add_subdirectory(dch)
     add_subdirectory(gfi)
@@ -435,7 +432,6 @@ if(NOT MODULE)
     add_subdirectory(music)
     add_subdirectory(r3bdata)
     add_subdirectory(field)
-    add_subdirectory(macros)
     add_subdirectory(r3bgen)
     add_subdirectory(lumon)
     add_subdirectory(evtvis)
@@ -447,6 +443,7 @@ if(NOT MODULE)
     add_subdirectory(analysis)
     add_subdirectory(tracker_rene)
     add_subdirectory(pdc)
+    add_subdirectory(califa)
     add_subdirectory(rpc)
     add_subdirectory(alpide)
     add_subdirectory(mwpc)
@@ -470,6 +467,7 @@ if(NOT MODULE)
     if(WITH_ASYEOS)
         add_subdirectory(asyeos)
     endif(WITH_ASYEOS)
+    add_subdirectory(macros)
 endif(NOT MODULE)
 
 # add_subdirectory(gconfig)

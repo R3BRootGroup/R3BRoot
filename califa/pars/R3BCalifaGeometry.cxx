@@ -64,20 +64,24 @@ bool R3BCalifaGeometry::Init(Int_t version)
             break;
 
         case 2020:
-            // Full BARREL+iPhos version
-            geoPath += "califa_2020.geo.root";
+            // Half BARREL+ 6 IPHOS sectors
+            geoPath += "califa_v2019.11.geo.root";
             fNumCrystals = 4864;
             break;
 
         case 2021:
             // s455 Experiment: Half Barrel + Full IPHOS
-            geoPath += "califa_2021_s455.geo.root";
+            geoPath += "califa_v2021.3.geo.root";
             fNumCrystals = 4864;
             break;
 
         default:
-            R3BLOG(error, "Unsupported geometry version: " << version);
-            return kFALSE;
+            // Full Barrel + Full IPHOS
+            geoPath += "califa_full.geo.root";
+            fNumCrystals = 4864;
+            R3BLOG(warn,
+                   "Unsupported geometry version: " << version << ", so standard full configuration will be used.");
+            // return kFALSE;
     }
 
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)

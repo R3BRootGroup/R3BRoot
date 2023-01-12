@@ -56,7 +56,6 @@ file(GLOB SRCS
 ./ana/*.cxx
 )
 
-
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")

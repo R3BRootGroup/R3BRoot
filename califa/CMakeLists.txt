@@ -48,26 +48,12 @@ ${FAIRROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SRCS
-#Put here your sourcefiles
-./sim/R3BCalifa.cxx
-./sim/R3BCalifaDigitizer.cxx
-./pars/R3BCalifaContFact.cxx
-./pars/R3BCalifaGeometry.cxx
-./pars/R3BCalifaMappingPar.cxx
-./pars/R3BCalifaCrystalCalPar.cxx
-./pars/R3BCalifaTotCalPar.cxx
-./pars/R3BCalifaClusterPar.cxx
-./pars/R3BCalifaCrystalPars4Sim.cxx
-./calibration/R3BCalifaMapped2CrystalCalPar.cxx
-./calibration/R3BCalifaCrystalCal2TotCalPar.cxx
-./calibration/R3BCalifaMapped2CrystalCal.cxx
-./calibration/R3BCalifaCrystalCal2Cluster.cxx
-./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
-./online/R3BCalifaOnlineSpectra.cxx
-./online/R3BCalifaJulichOnlineSpectra.cxx
-./online/R3BCalifaDemoOnlineSpectra.cxx
-./ana/R3BCalifaCrystalCalDataAnalysis.cxx
+file(GLOB SRCS 
+./sim/*.cxx
+./pars/*.cxx 
+./online/*.cxx
+./calibration/*.cxx
+./ana/*.cxx
 )
 
 # fill list of header files from list of source files

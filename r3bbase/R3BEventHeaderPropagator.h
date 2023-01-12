@@ -18,7 +18,7 @@
 #include <Rtypes.h>
 
 #include "R3BEventHeader.h"
-#include "R3BFileSource.h"
+class R3BFileSource;
 
 class R3BEventHeaderPropagator : public FairTask
 {
