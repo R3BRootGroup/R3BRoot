@@ -21,7 +21,12 @@ R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
     , fLosCalData("LosCal")
     , fLosTriggerCalData("LosTriggerCal")
+    , fLosHitData("LosHit")
+    , fLosTriggerData("LosTriggerTCal")
     , fEventHeader(nullptr)
+    , edgeL(0.)
+    , edgeR(0.)
+    , fUseTrigHit(kFALSE)
 {
 }
 
@@ -30,6 +35,12 @@ InitStatus R3BLosProvideTStart::Init()
     R3BLOG(info, "");
     fLosCalData.Init();
     fLosTriggerCalData.Init();
+
+    if(fUseTrigHit)
+    {
+	fLosHitData.Init();
+    	fLosTriggerData.Init();
+    }
 
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
@@ -49,7 +60,16 @@ InitStatus R3BLosProvideTStart::Init()
     return kSUCCESS;
 }
 
-void R3BLosProvideTStart::Exec(Option_t*) { fEventHeader->SetTStart(GetTStart()); }
+void R3BLosProvideTStart::Exec(Option_t*) 
+{ 
+    if(fUseTrigHit)
+    {
+        fEventHeader->SetTStart(GetTStartTrigHit()); 
+	return;
+    }
+	
+	fEventHeader->SetTStart(GetTStart()); 
+}
 
 Double_t R3BLosProvideTStart::GetTStart() const
 {
@@ -59,8 +79,8 @@ Double_t R3BLosProvideTStart::GetTStart() const
     auto T1 = 10240; // TAMEX, range is 2048*5ns
     auto T2 = 40960; // VFTX, range is 40960*5ns
 
-    const int c1 = std::min(T1, T2);
-    const int c2 = std::max(T1, T2);
+    const int c1 = std::min(T1,T2);
+    const int c2 = std::max(T1,T2);
 
     if (losCalData.empty())
     {
@@ -86,6 +106,30 @@ Double_t R3BLosProvideTStart::GetTStart() const
                 losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0), "vftx", "tamex");
         }
     }
+}
+
+Double_t R3BLosProvideTStart::GetTStartTrigHit() const
+{
+    const auto losHitData = fLosHitData.Retrieve();
+    const auto losTriggerData = fLosTriggerData.Retrieve();
+    if (losHitData.empty())
+    {
+        return std::numeric_limits<Double_t>::quiet_NaN();
+    }
+    else if (losTriggerData.empty())
+    {
+        return std::numeric_limits<Double_t>::quiet_NaN();
+    }
+    else
+    {
+	for (auto it = losHitData.rbegin(); it != losHitData.rend(); ++it)
+	{
+		Double_t tref_t = fTimeStitch->GetTime((*it)->GetTime() - losTriggerData.front()->GetRawTimeNs(), "vftx", "vftx");
+		if(tref_t > edgeL && tref_t < edgeR)
+			return tref_t;
+	}   
+    }
+    return std::numeric_limits<Double_t>::quiet_NaN();
 }
 
 bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart()); }

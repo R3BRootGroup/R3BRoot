@@ -53,38 +53,49 @@ class R3BMusliCalPar : public FairParGenericSet
     const Int_t GetNumGroupsAnodes() { return fNumGroupsAnodes; }
     const Int_t GetNumParamsEneFit() { return fNumParamsEneFit; }
     const Int_t GetNumParamsPosFit() { return fNumParamsPosFit; }
+    const Int_t GetNumParamsMulHit() { return fNumParamsMultHit; }
     const Int_t GetMaxMult() { return fMaxMult; }
     const Int_t GetInUse(Int_t signal) { return fIn_use->GetAt(signal - 1); }
     TArrayF* GetEneCalParams() { return fEneCalParams; }
     TArrayF* GetPosCalParams() { return fPosCalParams; }
+    TArrayF* GetMultHitCalParams() { return fMultHitCalParams; }
 
     void SetNumSignals(Int_t n) { fNumSignals = n; }
     void SetNumGroupsAnodes(Int_t n) { fNumGroupsAnodes = n; }
     void SetNumParamsEneFit(Int_t n) { fNumParamsEneFit = n; }
     void SetNumParamsPosFit(Int_t n) { fNumParamsPosFit = n; }
+    void SetNumParamsMultHit(Int_t n) { fNumParamsMultHit = n; }
     void SetMaxMult(Int_t max) { fMaxMult = max; }
     void SetInUse(Int_t value, Int_t signal) { fIn_use->AddAt(value, signal - 1); }
     void SetEneParams(Float_t val, Int_t signal, Int_t indexpar)
     {
-        // 1-base
-        int index = (signal - 1) * fNumParamsEneFit + indexpar - 1;
+        // 0-base
+        int index = (signal - 1) * fNumParamsEneFit + indexpar;
         fEneCalParams->AddAt(val, index);
     }
     void SetPosParams(Float_t val, Int_t signal, Int_t indexpar)
     {
-        // 1-base
-        int index = (signal - 1) * fNumParamsPosFit + indexpar - 1;
+        // 0-base
+        int index = (signal - 1) * fNumParamsPosFit + indexpar;
         fPosCalParams->AddAt(val, index);
+    }
+    void SetMultHitParams(Float_t val, Int_t signal, Int_t indexpar)
+    {
+        // 0-base
+        int index = (signal - 1) * fNumParamsMultHit + indexpar;
+        fMultHitCalParams->AddAt(val, index);
     }
 
   private:
     TArrayF* fEneCalParams; // Energy calibration parameters for anodes
     TArrayF* fPosCalParams; // Position calibration parameters for anodes
+    TArrayF* fMultHitCalParams; // Calibration parameters for using multihits
     TArrayI* fIn_use;       // 1: anode ready, 0:otherwise
     Int_t fNumSignals;      // number of signals at the Mapped level (group of anodes + Tref + Ttrig)
     Int_t fNumGroupsAnodes; // number of groups of anodes signals (each of them have energy and time)
     Int_t fNumParamsEneFit; // number of cal parameters in the fit
     Int_t fNumParamsPosFit; // number of parameters for position calibration
+    Int_t fNumParamsMultHit; // number of parameters for Multhit Calibration
     Int_t fMaxMult;         // Max. multiplicity per anode
 
     const R3BMusliCalPar& operator=(const R3BMusliCalPar&);

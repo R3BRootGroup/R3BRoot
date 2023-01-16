@@ -65,15 +65,15 @@ class R3BMusliHitPar : public FairParGenericSet
     void SetEaveVsBetaHitParams(Double_t val, Int_t type) { fEaveVsBetaHitParams->AddAt(val, type - 1); }
     void SetEcorrBetaHitParams(Double_t val, Int_t type, Int_t deg)
     {
-        // 1 - based
+        // 0 - based
         int index = (type - 1) * fNumParamsEcorrBetaFit + deg - 1;
         fEcorrBetaHitParams->AddAt(val, index);
     }
     void SetZHitParams(Double_t val, Int_t type, Int_t deg)
     {
-        // 1 - based
+        // 0 - based
         int index = (type - 1) * fNumParamsZFit + deg - 1;
-        fZHitParams->AddAt(val, type - 1);
+        fZHitParams->AddAt(val, index);
     }
 
   private:

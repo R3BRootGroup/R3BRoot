@@ -51,6 +51,7 @@ calib/R3BLosMapped2Cal.cxx
 calib/R3BLosMapped2TCal.cxx
 params/R3BLosMapped2CalPar.cxx
 calib/R3BLosCal2Hit.cxx
+calib/R3BLosTCal2Hit.cxx
 R3BLosProvideTStart.cxx
 params/R3BLosHitPar.cxx
 params/R3BLosContFact.cxx

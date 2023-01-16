@@ -29,6 +29,7 @@
 #include "R3BMusliCalPar.h"
 #include "R3BMusliMapped2Cal.h"
 #include "R3BMusliMappedData.h"
+#include "R3BEventHeader.h"
 
 #include <iomanip>
 
@@ -45,13 +46,19 @@ R3BMusliMapped2Cal::R3BMusliMapped2Cal(const char* name, Int_t iVerbose)
     , fNumGroupsAnodes(15)
     , fNumParamsEneFit(2)
     , fNumParamsPosFit(2)
+    , fNumParamsMultHit(2)
     , fMaxMult(20)
     , fEneCalParams(NULL)
     , fPosCalParams(NULL)
+    , fMultHitCalParams(NULL)
     , fCal_Par(NULL)
     , fMusliMappedDataCA(NULL)
     , fMusliCalDataCA(NULL)
     , fOnline(kFALSE)
+    , fHeader(NULL)
+    , winL(0.)
+    , winR(0.)
+    , fUseMultHit(kFALSE)
 {
 }
 
@@ -101,6 +108,11 @@ void R3BMusliMapped2Cal::SetParameters()
     fPosCalParams = new TArrayF();
     fPosCalParams->Set(array_pos);
     fPosCalParams = fCal_Par->GetPosCalParams();
+    
+    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
+    fMultHitCalParams = new TArrayF();
+    fMultHitCalParams->Set(array_mult);
+    fMultHitCalParams = fCal_Par->GetMultHitCalParams();
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -116,6 +128,8 @@ InitStatus R3BMusliMapped2Cal::Init()
         return kFATAL;
     }
 
+    fHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    
     fMusliMappedDataCA = (TClonesArray*)rootManager->GetObject("MusliMappedData");
     if (!fMusliMappedDataCA)
     {
@@ -183,13 +197,12 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
         }
     }
 
-    // Fill data only if there is only one TREF signal
-    if (mult_signalmap[16] == 1)
-    {
-        for (Int_t i = 0; i < fNumGroupsAnodes; i++)
-        {
-            pedestal = fEneCalParams->GetAt(fNumParamsEneFit * i);
-            slope = fEneCalParams->GetAt(fNumParamsEneFit * i + 1);
+    for (Int_t i = 0; i < fNumGroupsAnodes; i++)
+    { 
+        pedestal = fEneCalParams->GetAt(fNumParamsEneFit * i);
+        slope = fEneCalParams->GetAt(fNumParamsEneFit * i + 1);
+        if (mult_signalmap[16] == 1 && mult_signalmap[i] == 1)
+	{
             for (Int_t j = 0; j < mult_signalmap[i]; j++)
             {
                 dt = 0.;
@@ -203,6 +216,41 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
                     AddCalData(signal[j][i], dt, e);
             }
         }
+
+	else if((mult_signalmap[16] > 1 || mult_signalmap[i] > 1) && fUseMultHit)
+	{
+	    Double_t good_t;
+	    Int_t no_of_dt = 0;
+	    for(Int_t j = 0; j < mult_signalmap[16]; j++)
+	    {
+		Double_t cfd_t = ((time[j][16]*25./256.) - fHeader->GetTStart());
+		if(cfd_t > winL && cfd_t < winR)
+		{
+		    no_of_dt++;
+		    good_t = time[j][16];
+		}	
+	    }
+	    if(no_of_dt == 1)
+	    {
+		for(Int_t j = 0; j < mult_signalmap[i]; j++)
+		{
+		    Double_t diff_t = time[j][i] - good_t;
+		    if(diff_t > fMultHitCalParams->GetAt(fNumParamsMultHit * i + 0) && diff_t < fMultHitCalParams->GetAt(fNumParamsMultHit * i + 1))
+		    {
+		        dt = 0.;
+			for (Int_t k = 0; k < fNumParamsPosFit; k++)
+			{
+	    		    pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
+			    dt += pospar[k] * pow(diff_t, k);
+			}
+			e = pedestal + slope * energy[j][i];
+			if (e > 0.)
+	    		    AddCalData(signal[j][i], dt, e);
+		    }
+		}
+	    }	
+
+	}
     }
     if (mappedData)
         delete mappedData;
