@@ -143,9 +143,9 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns > fClockFreq)
         {
-            R3BLOG(error,
-                   "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
-                       << ",ns=" << fine_ns << ").");
+            //R3BLOG(error,
+            //       "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
+            //           << ",ns=" << fine_ns << ").");
             continue;
         }
 

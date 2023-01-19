@@ -531,7 +531,9 @@ InitStatus R3BTofDOnlineSpectra::Init()
         {
             char strNameLos_c[255];
             sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
-            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, 0, 60);
+            char strNameLos_d[255];
+            sprintf(strNameLos_d, "tofd-los timediff plane %d", i + 1);
+            fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_d, 44, 1, 45, 20000, 0, 60);
             fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
             fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF [ns]");
             fh_tofd_time_los_h2[i]->GetXaxis()->CenterTitle(true);

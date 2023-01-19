@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -161,6 +161,10 @@ class R3BTofDCal2HitPar : public FairTask
      * Method for setting the upper range of ToT for offset calibration
      */
     void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
+    
+    void SetTotRange(Double_t totmin, Double_t totmax) {fToTMin = totmin; fToTMax = totmax;}
+
+    inline void ReadHistoFile(TString file) { fHistoFile = file; }
 
   private:
     R3BCoarseTimeStitch* fTimeStitch;
@@ -168,7 +172,8 @@ class R3BTofDCal2HitPar : public FairTask
      * Method for creating histograms.
      */
     void CreateHistograms(Int_t, Int_t);
-
+    void SetHistogramsNULL(Int_t, Int_t);
+void calcZoffset();
     void calcOffset();
     void calcSync();
     void calcVeff();
@@ -181,7 +186,7 @@ class R3BTofDCal2HitPar : public FairTask
     /**
      * Method for calculation of z correction.
      */
-    void zcorr(TH2F* histo, Int_t min, Int_t max, Double_t*, Int_t index);
+    int zcorr(TH2F* histo, Double_t min, Double_t max, Double_t*, Int_t, Int_t, Int_t index);
 
     /**
      * Method for calculation of ToT offset.
@@ -192,6 +197,7 @@ class R3BTofDCal2HitPar : public FairTask
      * new Method for walk calculation.
      */
     Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
+
 
     /**
      * Method for calculation of saturation.
@@ -216,7 +222,10 @@ class R3BTofDCal2HitPar : public FairTask
     R3BEventHeader* fHeader;        /* Event header  */
     Double_t fTofdY;
     Double_t fTofdQ;
+    Double_t fMinQ;
     Double_t fMaxQ;
+    Double_t fToTMin;
+    Double_t fToTMax;
     Int_t fNbZPeaks;
     Bool_t fTofdSmiley;
     Bool_t fTofdZ;
@@ -224,19 +233,29 @@ class R3BTofDCal2HitPar : public FairTask
     Double_t fTofdTotLow;
     Double_t fTofdTotHigh;
     Double_t fMeanTof;
+    TString fHistoFile;
 
     // Arrays of control histograms
-    TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX][3];
+    TH2F* fh_tofd_TotPm1[N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fh_tofd_TotPm2[N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH1F* fh1_tofsync[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    // TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhQXvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+     TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-
+    TH2F* fhTofsync[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhlos[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhlost[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhtott[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fh1_walk_t[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fh1_walk_b[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+   TH2F* fZoffset[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
   public:
     ClassDef(R3BTofDCal2HitPar, 1)
 };

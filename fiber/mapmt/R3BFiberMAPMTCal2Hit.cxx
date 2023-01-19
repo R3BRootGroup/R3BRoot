@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -73,7 +73,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , fnEvents(0)
     , ftofmin(-1000)
     , ftofmax(1000)
-    , fWrite(false)
+    , fWrite(true)
     , fGate_ns(100.)
     , fOnline(kFALSE)
     , fOrientation(STANDARD)
@@ -94,7 +94,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
         fDetId = 33;
     else
     {
-        R3BLOG(error, "Fiber " << fName << " not found");
+        R3BLOG(ERROR, "Fiber " << fName << " not found");
     }
 }
 
@@ -112,9 +112,9 @@ R3BFiberMAPMTCal2Hit::~R3BFiberMAPMTCal2Hit()
 
 InitStatus R3BFiberMAPMTCal2Hit::Init()
 {
-    R3BLOG(info, "For firber " << fName);
+    R3BLOG(INFO, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
-    R3BLOG_IF(fatal, !mgr, "FairRootManager not found.");
+    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found.");
 
     fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
@@ -237,12 +237,12 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     fMapPar = dynamic_cast<R3BFiberMappingPar*>(FairRuntimeDb::instance()->getContainer(fName + "MappingPar"));
     if (!fMapPar)
     {
-        R3BLOG(error, "Couldn't get " << fName << "MappingPar");
+        R3BLOG(ERROR, "Couldn't get " << fName << "MappingPar");
     }
     else
     {
         fNumFibers = fMapPar->GetNbChannels();
-        R3BLOG(info, "Nb of fibers: " << fNumFibers);
+        R3BLOG(INFO, "Nb of fibers: " << fNumFibers);
     }
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the tof directory)
@@ -390,12 +390,29 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     Double_t t_down = down_tot.lead_ns;
                     Double_t t_up = up_tot.lead_ns;
                     Double_t dtime = fTimeStitch->GetTime(t_up - t_down, "clocktdc", "clocktdc");
-                    Double_t tof =
-                        fHeader ? fTimeStitch->GetTime((t_up + t_down) / 2. - fHeader->GetTStart(), "vftx", "clocktdc")
-                                : (t_up + t_down) / 2.;
+                    
+                    Double_t tof0 = fHeader ? fTimeStitch->GetTime(t_up - fHeader->GetTStart(), "vftx", "clocktdc")
+                                : t_up;
+                    Double_t tof1 = fHeader ? fTimeStitch->GetTime(t_down - fHeader->GetTStart(), "vftx", "clocktdc")
+                                : t_down;
+                    
+                    Double_t tof00 = (tof0 + tof1) / 2.;
 
+                    Double_t tof01 = fHeader ? fTimeStitch->GetTime((t_up+t_down)/2., "vftx", "clocktdc")
+                                : 0./0.;
+                    Double_t tof11 = fHeader ? fTimeStitch->GetTime(fHeader->GetTStart(), "vftx", "clocktdc")
+                                : 0./0.;
+                    
+                    //Double_t tof = tof01 - tof11;
+                    Double_t tof = fHeader ? fTimeStitch->GetTime((t_up+t_down)/2. - fHeader->GetTStart(), "vftx", "clocktdc")
+                                : 0./0.;
+
+                  //  if(!TMath::IsNaN(tof)) cout<<"tof "<<tof<<" tof2 "<<tof00<<" tu "<<t_up<<" td "<<t_down<<" tu|td "<<(t_up+t_down)/2.<<" header "<<fHeader->GetTStart()<<" x "<<(t_up+t_down)/2. - fHeader->GetTStart()<<endl;
+                    tof = (t_up+t_down)/2. - fHeader->GetTStart();
+                    //if(tof != tof00) return;
                     // Fill histograms for gain match, offset and sync.
-                    if (fWrite)
+               
+                    if (fWrite /*&& cal_num == 1*/)
                     {
                         fh_ToT_bottom_Fib_raw->Fill(fiber_id, tot_down);
                         fh_ToT_top_Fib_raw->Fill(fiber_id, tot_up);
@@ -431,8 +448,9 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     // t_up -= offsetUp;
                     // t_up -= tsync;
                     dtime -= offsetDT;
+                   // cout<<"tofb "<<tof<<" tsync "<<tsync;
                     tof -= tsync;
-
+                   // cout<<" tofa "<<tof<<endl;
                     // histogram after gain match, sync....
                     if (fWrite)
                     {
@@ -519,7 +537,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     if (!fIsCalibrator)
                     {
-                        if (tof >= ftofmin && tof <= ftofmax)
+                        if ((tof >= ftofmin && tof <= ftofmax ) || 1)
                         {
                             new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BFiberMAPMTHitData(
                                 fDetId, x, y, eloss, tof, fiber_id, t_down, t_up, tot_down, tot_up);
@@ -561,8 +579,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
     if (fIsCalibrator)
     {
         Bool_t Redo = false; // Add a redo flag, to redo a calibration, if Maximum falls on noise.
-        Double_t PercentOfMax = 0.5;
-
+        Double_t PercentOfMax = 0.9;
         R3BFiberMAPMTHitModulePar* mpar;
 
         for (UInt_t i = 1; i <= fNumFibers; i++)
@@ -603,7 +620,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                         R3BFiberMAPMTHitModulePar* par = fCalPar->GetModuleParAt(i);
                         par->SetGainDown(proj->GetBinCenter(j));
 
-                        R3BLOG(info, fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j));
+                        if(i<10){ R3BLOG(INFO, fName << " fiberId: " << i << ",gainDown: " << proj->GetBinCenter(j));}
                         if (Redo == true)
                         {
                             PartMax = proj->GetMaximum() * PercentOfMax;
@@ -640,7 +657,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
                     {
                         R3BFiberMAPMTHitModulePar* par1 = fCalPar->GetModuleParAt(i);
                         par1->SetGainUp(proj1->GetBinCenter(j));
-                        R3BLOG(info, fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j));
+                        if(i<10) {R3BLOG(INFO, fName << " fiberId: " << i << ",gainUp: " << proj1->GetBinCenter(j));}
                         break;
                     }
                 }
@@ -652,19 +669,19 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
             // par2->SetOffsetUp(0.5 * proj2->GetBinCenter(proj2->GetMaximumBin()));
             auto Max = proj2->GetXaxis()->GetBinCenter(proj2->GetMaximumBin());
             TF1* fGauss = new TF1("fgaus", "gaus", Max - 8., Max + 8.);
-            proj2->Fit("fgaus", "QR0");
+            //proj2->Fit("fgaus", "QR0");
             auto offsetdt = fGauss->GetParameter(1);
             par2->SetOffsetDown(offsetdt);
             // fGauss->Draw("LSAME");
             // proj2->Write();
 
             // tsync
-            // R3BFiberMAPMTHitModulePar* par3 = fCalPar->GetModuleParAt(i);
+            R3BFiberMAPMTHitModulePar* par3 = fCalPar->GetModuleParAt(i);
             auto proj3 = (TH1F*)fh_Fib_ToF_raw->ProjectionY("", i, i, 0);
             auto sync = proj3->GetXaxis()->GetBinCenter(proj3->GetMaximumBin());
-            par2->SetSync(sync);
+            par3->SetSync(sync);
 
-            R3BLOG(info, fName << " fiberId: " << i << ", offset_DT: " << offsetdt << ", sync: " << sync);
+            if(i<10) {R3BLOG(INFO, fName << " fiberId: " << i << ", offset_DT: " << offsetdt << ", sync: " << sync);}
         }
 
         fCalPar->setChanged();
