@@ -248,8 +248,8 @@ if (COMMAND check_external_package_install_dir)
   check_external_package_install_dir()
 endif()
 
-set(Boost_NO_SYSTEM_PATHS TRUE)
-set(Boost_NO_BOOST_CMAKE TRUE)
+#set(Boost_NO_SYSTEM_PATHS TRUE)
+#set(Boost_NO_BOOST_CMAKE TRUE)
 
 If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
   set(BOOST_ROOT ${SIMPATH})
@@ -383,6 +383,17 @@ if(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 else(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
       message("${BYellow}ASYEOS framework not found${CR}")
 endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  message("CMAKE_CXX_STANDARD is unset, setting from root-config")
+  execute_process(
+    COMMAND   root-config --cflags
+    COMMAND grep -o "std=c++[0-9]*"
+    COMMAND sed "s/[^0-9]*//"
+    OUTPUT_VARIABLE CMAKE_CXX_STANDARD
+    COMMAND_ERROR_IS_FATAL ANY)
+  message("CMAKE_CXX_STANDARD is now ${CMAKE_CXX_STANDARD}")
+endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
 
