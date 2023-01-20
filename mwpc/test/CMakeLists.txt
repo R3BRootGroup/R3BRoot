@@ -11,50 +11,9 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-cmake_minimum_required(VERSION 3.0)
-
-enable_testing()
-set(PROJECT_TEST_NAME MwpcUnitTests)
-set(GTEST_ROOT ${SIMPATH})
-find_package(GTest)
-
-if(GTEST_FOUND)
-file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/mwpc/test/*.cxx)
-
-include_directories(
-    ${GTEST_INCLUDE_DIRS}
-    ${SYSTEM_INCLUDE_DIRECTORIES}
-    ${BASE_INCLUDE_DIRECTORIES}
-    ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/r3bdata
-    ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
-    ${R3BROOT_SOURCE_DIR}/mwpc/sim
-    ${R3BROOT_SOURCE_DIR}/mwpc/digi
-    ${R3BROOT_SOURCE_DIR}/mwpc/mwpc0
-    ${R3BROOT_SOURCE_DIR}/mwpc/mwpc1
-    ${R3BROOT_SOURCE_DIR}/mwpc/mwpc2
-    ${R3BROOT_SOURCE_DIR}/mwpc/mwpc3
-    )
-
-link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
-                 ${Boost_LIBRARY_DIRS})
-
-set(TEST_DEPENDENCIES
-    ${GTEST_BOTH_LIBRARIES}
-    ${ROOT_LIBRARIES}
-    FairTools
-    R3BData
-    R3BMwpc
-    ParBase
-    GeoBase)
-
-add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
-target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
-add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
-endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/test/testMwpcSimulation.C)
-add_test(MwpcSimulation ${R3BROOT_BINARY_DIR}/mwpc/test/testMwpcSimulation.sh)
+add_test(NAME MwpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/mwpc/test/testMwpcSimulation.sh)
 set_tests_properties(MwpcSimulation PROPERTIES TIMEOUT "2000")
 set_tests_properties(MwpcSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
