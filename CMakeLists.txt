@@ -86,7 +86,13 @@ endif()
 # Load some basic macros which are needed later on
 include(FairMacros)
 
-find_package2(PUBLIC ROOT  VERSION 6.10.00 REQUIRED)
+list(APPEND required_root_components RIO)
+list(APPEND optional_root_components opengl)
+list(APPEND optional_root_components gdml vmc)
+find_package2(PUBLIC ROOT  VERSION 6.10.00 REQUIRED
+  COMPONENTS ${required_root_components}
+  OPTIONAL_COMPONENTS ${optional_root_components})
+  
 if("${ROOT_vmc_FOUND}" MATCHES "no")
   find_package2(PUBLIC VMC REQUIRED)
   set(VMCLIB VMCLibrary)
@@ -99,7 +105,7 @@ include(WriteConfigFile_r3b)
 include(WriteEnvCache)
 include(Dart)
 include(CheckCompiler)
-include(ROOTMacros) # This is from FR, see https://github.com/FairRootGroup/FairRoot/issues/1221
+include(ROOTMacros)
 
 find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
 
@@ -190,9 +196,6 @@ find_package(HEPMC)
 find_package2(PUBLIC IWYU)
 
 find_package2(PUBLIC GSL)
-if(NOT DEFINED GTEST_ROOT)
-  set(GTEST_ROOT ${SIMPATH})
-endif()
 
 find_package2(PUBLIC Git)
 set (Git_VERSION ${GIT_VERSION_STRING})
@@ -219,8 +222,7 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
-option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are
-used." OFF)
+option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used." OFF)
 if(USE_PATH_INFO)
     set(PATH $ENV{PATH})
     if(APPLE)

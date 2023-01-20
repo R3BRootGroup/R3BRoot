@@ -19,36 +19,9 @@ else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
 message(STATUS "${BYellow}Twin-Music standard root geometry already created${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/twinmusic_v22.geo.root")
 
-enable_testing()
-
-set(GTEST_ROOT ${SIMPATH})
-find_package(GTest)
-
-if(GTEST_FOUND)
-
-include_directories(
-    ${GTEST_INCLUDE_DIRS}
-    ${SYSTEM_INCLUDE_DIRECTORIES}
-    ${BASE_INCLUDE_DIRECTORIES}
-    ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/twim/geobase
-    )
-
-link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
-                 ${Boost_LIBRARY_DIRS})
-
-set(TEST_DEPENDENCIES
-    ${GTEST_BOTH_LIBRARIES}
-    ${ROOT_LIBRARIES}
-    FairTools
-    R3BTwim
-    ParBase
-    GeoBase)
-
-endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/twim/geobase/create_twin_geo.C)
-add_test(TwimRootGeometry ${R3BROOT_BINARY_DIR}/twim/geobase/create_twin_geo.sh)
+add_test(NAME TwimRootGeometry COMMAND ${R3BROOT_BINARY_DIR}/twim/geobase/create_twin_geo.sh)
 set_tests_properties(TwimRootGeometry PROPERTIES TIMEOUT "2000")
 set_tests_properties(TwimRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
