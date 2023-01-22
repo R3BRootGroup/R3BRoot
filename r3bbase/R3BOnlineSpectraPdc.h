@@ -126,9 +126,12 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_Pdc_Wire_vs_Events[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_ToT_vs_Time[144];
     TH2F* fh_Pdc_ToT_vs_Hit[144];
+    TH2F* fh_Pdc_xvsx_fi0;
     TH2F* fh_Pdc_xvsx;
-    TH2F* fh_Pdc_wvsw;
+    TH2F* fh_Pdc_yvsy_fi0;
+    TH2F* fh_Pdc_xvsy_fi0;
     TH2F* fh_Pdc_yvsy;
+    TH2F* fh_Pdc_wvsw;
     TH2F* fh_pdc_ebene4;
     TH2F* fh_Pdc_tvst[2];
     TH2F* fh_Pdc_evse[2];
@@ -154,6 +157,9 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_fi0_pdc_time;
     TH2F* fh_fi0_pdc_eloss;
     TH2F* fh_fi0_1_pdc;
+    TH2F* fh_fi0_tot2_tot1;
+    TH2F* fh_fi0_cor;
+    TH2F* fh_fi0_eff;
     
     TH1F* fh_fi1a_fiber;
     TH1F* fh_fi1b_fiber;

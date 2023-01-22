@@ -250,7 +250,7 @@ void R3BFi31DigitizerCal::Exec(Option_t* opt)
                     {
                         for (Int_t j = 0; j < 8; j++)
                         {
-                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, 0.);
+                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, timernd);
                         }
                         first = false;
                     }

@@ -263,7 +263,7 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                     {
                         for (Int_t j = 0; j < 4; j++)
                         {
-                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, 0.);
+                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, timernd);
                         }
                         first = false;
                     }

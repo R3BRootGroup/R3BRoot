@@ -264,11 +264,12 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 			// Double_t thetaX = fAngle;
 			fPx = tan(thetaX) * fPz;
 		}
-		else
+		//else 
 		{
 			Double_t thetaY = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
 			//Double_t thetaY = 0.;
 			fPy = tan(thetaY) * fPz;
+			//fPy = 0.;
 		}
 
 		//Double_t thetaY = 0.04;

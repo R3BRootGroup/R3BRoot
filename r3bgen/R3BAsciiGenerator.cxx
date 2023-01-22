@@ -104,7 +104,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
     // Add small component for incoming beam
-    Bool_t incoming_corretions = false;
+    Bool_t incoming_corretions = true;
     Double_t dpx;
     Double_t dpy;
     Double_t dvx;
@@ -224,7 +224,7 @@ void R3BAsciiGenerator::RegisterIons()
                 if (ions.find(pdg) == ions.end())
                 {
                     const double mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
-                    LOG(INFO) << "Test " << mass / 0.931494028;
+                    LOG(INFO) << "Test mass: " << mass << "  " << mass / 0.931494028;
                     LOG(INFO) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
                     ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
                 }

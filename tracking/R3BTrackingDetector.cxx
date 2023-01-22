@@ -159,7 +159,7 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
     Double_t z_local = local.Z();
     //  cout<< "GlobalToLocal:"<<endl;
     //  cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
-    // cout << "GlobalToLocal Local x: " << x_local << " y: " << y_local <<  " z: " << z_local <<endl;
+    //  cout << "GlobalToLocal Local x: " << x_local << " y: " << y_local <<  " z: " << z_local <<endl;
     //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
 }
 

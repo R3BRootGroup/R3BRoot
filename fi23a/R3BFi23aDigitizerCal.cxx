@@ -154,6 +154,9 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
 
             Int_t fiberID = Hit.fiberID;
 
+			//cout << "Hit fiber: " << Hit.fiberID << " t: " << Hit.Time  << " e: " << Hit.Energy
+			//	 << " y: " << Hit.Y << endl;
+				 
             // pile-up simulation:
             if (Hit.Time - time[fiberID].back() < 30.)
             {
@@ -220,10 +223,14 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                      */
                     yrnd = prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma);
                     ernd = prnd->Gaus(energyl, esigma) * 1000. * 2.; // GeV->MeV
+                    
+                    //cout << "y: " << yrnd << " e: " << ernd << endl;
+                    
                     ToT_MA = ernd * exp(-(5. - yrnd) / 100.); // just to come to the tot region we measure in experiment
                     ToT_SA = ernd * exp(-(5. + yrnd) / 100.);
                     ens = sqrt(ToT_MA * ToT_SA);
 
+					//cout << "ToT: " << ens << " up: " << ToT_MA << " down: " << ToT_SA << endl;
                     /* Now, make from ToT and time leading and trailing times:
                      * time=(timeMA_lead+timeSA_lead)/2, and timeMA_lead-timeSA_lead=y => timeMA_lead, timeSA_lead
                      * time_trail = time_lead+ToT
@@ -236,6 +243,9 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                     timeMA_trail = timeMA_lead + ToT_MA;
                     timeSA_trail = timeSA_lead + ToT_SA;
 
+					//cout << "Time: " << timernd << " up lead: " << timeMA_lead << " down lead: " << timeSA_lead << endl;
+					//cout << "average time: " << (timeMA_lead+timeSA_lead)/2. << endl;
+                  
                     /* CalData format:                      --> in Tree
                         fSide 0-1            --> FibXYCal.fIsMAPMT
                        ,fChannel(a_channel)  1-SubNum*256   --> FibXYCal.fChannel
@@ -259,7 +269,7 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                     {
                         for (Int_t j = 0; j < 4; j++)
                         {
-                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, 0.);
+                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BFiberMAPMTCalData(2, j + 1, 1, timernd);
                         }
                         first = false;
                     }
