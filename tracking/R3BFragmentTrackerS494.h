@@ -207,7 +207,6 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_px_r;
     TH1F* fh_py_r;
     TH1F* fh_pz_r;
-    TH1F* fh_Erel;
     TH2F* fh_p_vs_ch2;
     TH2F* fh_xfi30_fi23a_track;
     TH2F* fh_xfi30_fi32_track;

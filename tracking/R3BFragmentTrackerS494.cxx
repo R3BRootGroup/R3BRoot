@@ -104,7 +104,6 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fPmin(0)
 {
     // this is the list of detectors (active areas) we use for tracking
-/*    
     fDetectorsLeft->AddDetector("target", kTarget, "TargetGeoPar");
     fDetectorsLeft->AddDetector("fi23a", kTargetGlad, "fi23aGeoPar", "Fi23aHit");
     fDetectorsLeft->AddDetector("fi23b", kTargetGlad, "fi23bGeoPar", "Fi23bHit");
@@ -118,17 +117,6 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     fDetectorsRight->AddDetector("fi31", kAfterGlad, "fi31GeoPar", "Fi31Hit");
     fDetectorsRight->AddDetector("fi33", kAfterGlad, "fi33GeoPar", "Fi33Hit");
     fDetectorsRight->AddDetector("tofd", kTof, "tofdGeoPar", "TofdHit");
-*/
-
-    fDetectors->AddDetector("target", kTarget, "TargetGeoPar");
-    fDetectors->AddDetector("fi23a", kTargetGlad, "fi23aGeoPar", "Fi23aHit");
-    fDetectors->AddDetector("fi23b", kTargetGlad, "fi23bGeoPar", "Fi23bHit");
-    fDetectors->AddDetector("fi31", kAfterGlad, "fi31GeoPar", "Fi31Hit");
-    fDetectors->AddDetector("fi30", kAfterGlad, "fi30GeoPar", "Fi30Hit");
-    fDetectors->AddDetector("fi33", kAfterGlad, "fi33GeoPar", "Fi33Hit");
-    fDetectors->AddDetector("fi32", kAfterGlad, "fi32GeoPar", "Fi32Hit");
-    fDetectors->AddDetector("tofd", kTof, "tofdGeoPar", "TofdHit");
-
 }
 
 R3BFragmentTrackerS494::~R3BFragmentTrackerS494() {}
@@ -229,8 +217,8 @@ InitStatus R3BFragmentTrackerS494::Init()
         return kERROR;
     }
 
-    //fDetectorsLeft->Init();
-    //fDetectorsRight->Init();
+    fDetectorsLeft->Init();
+    fDetectorsRight->Init();
     fDetectors->Init();
     if (fMappedItems.at(DET_CALIFA))
     {
@@ -264,7 +252,6 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_eloss_fi33 = new TH1F("h_eloss_fi33", "Energy loss fi33", 2000, 0., 50.);
     fh_ncand = new TH1F("h_ncand", "Number of candidates", 100, -0.5, 99.5);
     fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 2000., 0., 20.);
-    fh_Erel = new TH1F("h_Erel", "Erel", 100., 0., 10.);
     fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 2000., 0., 20.);
     fh_mom_res = new TH1F("h_mom_res", "Momentum resolution", 2000, -100., 100.);
     fh_mom_res_x = new TH1F("h_mom_res_x", "Momentum resolution px in %", 2000, -100., 100.);
@@ -560,8 +547,8 @@ void R3BFragmentTrackerS494::SetParContainers()
 {
     fFieldPar = (R3BFieldPar*)FairRuntimeDb::instance()->getContainer("R3BFieldPar");
 
-    //fDetectorsLeft->SetParContainers();
-    //fDetectorsRight->SetParContainers();
+    fDetectorsLeft->SetParContainers();
+    fDetectorsRight->SetParContainers();
     fDetectors->SetParContainers();
 }
 
@@ -585,7 +572,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-<<<<<<< HEAD
     Bool_t debug_loopout = false;
     Bool_t debug_loopin = false;
     Bool_t bestevents = false;
@@ -614,14 +600,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             }
         }
     }
-=======
-    Bool_t debug = true;
-    Int_t fNevOut = 0;
-    if (fNEvents == 147041 || fNEvents == 184888)
-        fNevOut = fNEvents;
-    if (fNEvents == fNevOut)
-        debug = true;
->>>>>>> working on the optimization of geometry
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -632,7 +610,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
      * Then call fit_fragment() to optimize the track and calculate
      * particle properties.
      */
-<<<<<<< HEAD
     fDetectorsLeft->CopyHits();
     fDetectorsRight->CopyHits();
 
@@ -647,22 +624,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     // R3BHit(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t hitId)
     // target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-=======
-    //fDetectorsLeft->CopyHits();
-    //fDetectorsRight->CopyHits();
-    fDetectors->CopyHits();
-    
-    R3BTrackingDetector* target = fDetectors->GetByName("target");
-    R3BTrackingDetector* fi23a = fDetectors->GetByName("fi23a");
-    R3BTrackingDetector* fi23b = fDetectors->GetByName("fi23b");
-    R3BTrackingDetector* fi31 = fDetectors->GetByName("fi31");
-    R3BTrackingDetector* fi30 = fDetectors->GetByName("fi30");
-    R3BTrackingDetector* fi33 = fDetectors->GetByName("fi33");
-    R3BTrackingDetector* fi32 = fDetectors->GetByName("fi32");
-    R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
-
-    target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
->>>>>>> working on the optimization of geometry
 
     if (debug_loopout)
         // cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
@@ -1099,16 +1060,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             // R3BTrackingParticle* candidate =
             //                      new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
 
-<<<<<<< HEAD
             if (debug_loopin)
                 cout << "Mass: " << m0 << endl;
             if (debug_loopin)
-=======
-            if (debug){
-                cout << "Mass: " << m0 << endl;
->>>>>>> working on the optimization of geometry
                 cout << "Position on TofD: " << tof->hits.at(i)->GetX() << endl;
-			}
             if (!tof->free_hit[i]) // if the hit was used already, continue
             {
                 if (debug_loopin)
@@ -1204,14 +1159,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                        ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.00);*/
                 }
 
-<<<<<<< HEAD
                 R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
                 target->hits.clear();
                 if (fNEventsLeft == 0)
-=======
-                //R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
-                //if (fNEventsLeft == 0)
->>>>>>> working on the optimization of geometry
                 {
                     target->hits.push_back(new R3BHit(0, 0.0, 0.0, 0., 0., 0));
                 }
@@ -1279,7 +1229,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 // Create object for particle which will be fitted
                                 if (l < 2)
-<<<<<<< HEAD
                                 {
                                     candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
                                 }
@@ -1288,50 +1237,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     candidate = new R3BTrackingParticle(
                                         charge, xmem, ymem, zmem, 0., 0., pBeamz - pzmem, beta0, m0);
                                 }
-=======
-                                    ixtmax = 1;
-                                if (l == 2)
-                                    ixtmax = 1;
-                                for (Int_t ixt = 0; ixt < ixtmax; ixt++)
-                                {
-                                    if (ixt == 0)
-                                    {
-                                        x0 = 0.0;
-                                        y0 = 0.0;
-                                    }
-                                    else if (ixt == 1)
-                                    {
-                                        x0 = 0.1;
-                                        y0 = 0.1;
-                                    }
-                                    else if (ixt == 2)
-                                    {
-                                        x0 = 0.1;
-                                        y0 = -0.1;
-                                    }
-                                    else if (ixt == 3)
-                                    {
-                                        x0 = -0.1;
-                                        y0 = 0.1;
-                                    }
-                                    else if (ixt == 4)
-                                    {
-                                        x0 = -0.1;
-                                        y0 = -0.1;
-                                    }
-                                    z0 = 0;
-
-                                    // Create object for particle which will be fitted
-                                    if (l < 2)
-                                    {
-                                        candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
-                                    }
-                                    else
-                                    {
-                                        candidate =
-                                            new R3BTrackingParticle(charge, xmem, ymem, zmem, 0., 0., p0, beta0, m0);
-                                    }
->>>>>>> working on the optimization of geometry
 
                                 if (debug_loopin)
                                 {
@@ -1347,7 +1252,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     if (ifi23b > -1)
                                         cout << " left Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
                                              << endl;
-<<<<<<< HEAD
                                     if (ifi30 > -1)
                                         cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX()
                                              << ", q: " << fi30->hits.at(ifi30)->GetEloss() << endl;
@@ -1401,36 +1305,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 if (10 > status)
                                 {
-=======
-                                    if (ifi30 > -1 && debug)
-                                        cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX() << endl;
-                                    if (ifi32 > -1 && debug)
-                                        cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX() << endl;
-                                    if (debug)
-                                        cout << "Hit target # "
-                                             << " x: " << target->hits.at(ixt)->GetX() << endl;
-                                    // add points through which tracker has to go:
-                                    candidate->AddHit("target", 0);
-                                    candidate->AddHit("tofd", i);
-                                    candidate->AddHit("fi23a", ifi23a);
-                                    candidate->AddHit("fi23b", ifi23b);
-                                    candidate->AddHit("fi32", ifi32);
-                                    candidate->AddHit("fi30", ifi30);
-
-                                    //fDetectors = fDetectorsLeft;
-
-                                    Int_t status = 10;
->>>>>>> working on the optimization of geometry
                                     if (fForward)
                                     {
                                         candidate->Reset();
                                     }
                                     else
                                     {
-                                        candidate->SetStartPosition(candidate->GetPosition());
-                                        candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                        candidate->SetStartBeta(beta0);
-                                        candidate->UpdateMomentum();
+                                        //candidate->SetStartPosition(candidate->GetPosition());
+                                        //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+                                        //candidate->SetStartBeta(beta0);
+                                        //candidate->UpdateMomentum();
 
                                         // candidate->SetStartPosition(candidate->GetPosition()); // @target
                                         // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
@@ -1448,41 +1332,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     {
                                         // if(candidate->GetChi2() < 3.)
                                         {
-<<<<<<< HEAD
                                             fFragments.push_back(candidate);
-=======
-                                            candidate->Reset();
-                                        }
-                                        else
-                                        {
-                                            //candidate->SetStartPosition(candidate->GetPosition());
-                                            //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                            //candidate->SetStartBeta(beta0);
-                                            //candidate->UpdateMomentum();
-
-                                            // candidate->SetStartPosition(candidate->GetPosition()); // @target
-                                            // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                            // candidate->SetStartBeta(0.8328);
-                                            // candidate->SetStartBeta(beta0);
-                                            // candidate->UpdateMomentum();
-                                            candidate->Reset();
-
-                                            // candidate->GetStartPosition().Print();
-                                            // candidate->GetStartMomentum().Print();
-                                            // cout << "chi2: " << candidate->GetChi2() << endl;
-                                            // status = FitFragment(candidate);
-                                        }
-                                        if (10 > status)
-                                        {
-                                            // if(candidate->GetChi2() < 3.)
-                                            {
-                                                fFragments.push_back(candidate);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            delete candidate;
->>>>>>> working on the optimization of geometry
                                         }
                                     }
                                     else
@@ -1609,14 +1459,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                       ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.00);*/
                 }
 
-<<<<<<< HEAD
                 R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
                 target->hits.clear();
                 if (fNEventsRight == 0)
-=======
-                //R3BTrackingDetector* target = fDetectorsRight->GetByName("target");
-                //if (fNEventsRight == 0)
->>>>>>> working on the optimization of geometry
                 {
                     // R3BHit(detId, x,  y, eloss,  time, hitId = -1);
                     target->hits.push_back(new R3BHit(0, 0.0, 0.0, 0., 0., 0));
@@ -1671,11 +1516,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if ((l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                     (l == 2 && ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                                 std::abs(det_hit_xC[1] - fi23a->hits.at(ifi23a)->GetX()) <
-<<<<<<< HEAD
                                                     dfib))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
-=======
-                                                    0.03))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
->>>>>>> working on the optimization of geometry
                                                             // was used already, continue
                                 {
                                     if (debug_loopin)
@@ -1688,7 +1529,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 // Create object for particle which will be fitted
                                 if (l < 2)
-<<<<<<< HEAD
                                 {
                                     candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
                                 }
@@ -1697,50 +1537,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     candidate = new R3BTrackingParticle(
                                         charge, xmem, ymem, zmem, 0., 0., pBeamz - pzmem, beta0, m0);
                                 }
-=======
-                                    ixtmax = 1;
-                                if (l == 2)
-                                    ixtmax = 1;
-                                for (Int_t ixt = 0; ixt < ixtmax; ixt++)
-                                {
-                                    if (ixt == 0)
-                                    {
-                                        x0 = 0.0; 
-                                        y0 = 0.0;
-                                    }
-                                    else if (ixt == 1)
-                                    {
-                                        x0 = 0.1;
-                                        y0 = 0.1;
-                                    }
-                                    else if (ixt == 2)
-                                    {
-                                        x0 = 0.1;
-                                        y0 = -0.1;
-                                    }
-                                    else if (ixt == 3)
-                                    {
-                                        x0 = -0.1;
-                                        y0 = 0.1;
-                                    }
-                                    else if (ixt == 4)
-                                    {
-                                        x0 = -0.1;
-                                        y0 = -0.1;
-                                    }
-                                    z0 = 0;
-
-                                    // Create object for particle which will be fitted
-                                    if (l < 2)
-                                    {
-                                        candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, m0);
-                                    }
-                                    else
-                                    {
-                                        candidate =
-                                            new R3BTrackingParticle(charge, xmem, ymem, zmem, 0., 0., p0, beta0, m0);
-                                    }
->>>>>>> working on the optimization of geometry
 
                                 if (debug_loopin)
                                 {
@@ -1756,7 +1552,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                              << ", q: " << fi23a->hits.at(ifi23a)->GetEloss() << endl;
                                     if (ifi23b > -1)
                                         cout << "right Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
-<<<<<<< HEAD
                                              << ", q: " << fi23b->hits.at(ifi23b)->GetEloss() << endl;
                                     if (ifi33 > -1)
                                         cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX()
@@ -1811,37 +1606,16 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                 if (10 > status)
                                 {
-=======
-                                             << endl;
-                                    if (ifi33 > -1 && debug)
-                                        cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX() << endl;
-                                    if (ifi31 > -1 && debug)
-                                        cout << "Fi31  # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX() << endl;
-                                    if (debug)
-                                        cout << "Hit target # "
-                                             << " x: " << target->hits.at(ixt)->GetX() << endl;
-
-                                    candidate->AddHit("target", 0);
-                                    candidate->AddHit("tofd", i);
-                                    candidate->AddHit("fi23a", ifi23a);
-                                    candidate->AddHit("fi23b", ifi23b);
-                                    candidate->AddHit("fi31", ifi31);
-                                    candidate->AddHit("fi33", ifi33);
-
-                                    //fDetectors = fDetectorsRight;
-
-                                    Int_t status = 10;
->>>>>>> working on the optimization of geometry
                                     if (fForward)
                                     {
                                         candidate->Reset();
                                     }
                                     else
                                     {
-                                        candidate->SetStartPosition(candidate->GetPosition());
-                                        candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                        candidate->SetStartBeta(beta0);
-                                        candidate->UpdateMomentum();
+                                        //candidate->SetStartPosition(candidate->GetPosition());
+                                        //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+                                        //candidate->SetStartBeta(beta0);
+                                        //candidate->UpdateMomentum();
 
                                         // candidate->SetStartPosition(candidate->GetPosition());
                                         // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
@@ -1858,42 +1632,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     }
                                     if (10 > status)
                                     {
-<<<<<<< HEAD
                                         // if(candidate->GetChi2() < 3.)
-=======
-                                        if (fForward)
-                                        {
-                                            candidate->Reset();
-                                        }
-                                        else
-                                        {
-                                            //candidate->SetStartPosition(candidate->GetPosition());
-                                            //candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                            //candidate->SetStartBeta(beta0);
-                                            //candidate->UpdateMomentum();
-
-                                            // candidate->SetStartPosition(candidate->GetPosition());
-                                            // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                            // candidate->SetStartBeta(0.8328);
-                                            // candidate->SetStartBeta(beta0);
-                                            // candidate->UpdateMomentum();
-
-                                            candidate->Reset();
-
-                                            // candidate->GetStartPosition().Print();
-                                            // candidate->GetStartMomentum().Print();
-                                            // cout << "chi2: " << candidate->GetChi2() << endl;
-                                            // status = FitFragment(candidate);
-                                        }
-                                        if (10 > status)
-                                        {
-                                            // if(candidate->GetChi2() < 3.)
-                                            {
-                                                fFragments.push_back(candidate);
-                                            }
-                                        }
-                                        else
->>>>>>> working on the optimization of geometry
                                         {
                                             fFragments.push_back(candidate);
                                         }
@@ -1970,75 +1709,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 parChi2 = xChi2;
                 if (parChi2 < minChi2)
                 {
-<<<<<<< HEAD
                     bestcandidate = x;
                     minChi2 = parChi2;
                     // cout << "New min chi2: " << minChi2 << endl;
                     // cout << "Corresponding Mass   : " << x->GetMass() << endl;
                     // cout << "Corresponding Mass   : " << bestcandidate->GetMass() << endl;
-=======
-                    if (parChi2 < minChi2)
-                    {
-                        bestcandidate = x;
-                        minChi2 = parChi2;
-                        pzmem = x->GetStartMomentum().Z();
-                        xmem = x->GetStartPosition().X();
-                        ymem = x->GetStartPosition().Y();
-                        zmem = x->GetStartPosition().Z();
-                        if (l == 1)
-                        {
-                            pCx = x->GetStartMomentum().X() * 1000.;
-                            pCy = x->GetStartMomentum().Y() * 1000.;
-                            pCz = x->GetStartMomentum().Z() * 1000.;
-                            carbonP.SetPxPyPzE(
-                                pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
-                            p12C = carbonP.Vect();
-                            // cout << "For event: "<<fNEvents_nonull<<" new min chi2 for C: " << minChi2 <<endl;
-                            minChi2_12C = minChi2;
-                        }
-                        // cout << "New min chi2: " << minChi2 << endl;
-                        // cout << "Corresponding Mass   : " << x->GetMass() << endl;
-                        // cout << "Corresponding Mass   : " << bestcandidate->GetMass() << endl;
-                    }
-                }
-                if (l == 2) // 4He
-                {
-                    Double_t pHex = x->GetStartMomentum().X() * 1000.;
-                    Double_t pHey = x->GetStartMomentum().Y() * 1000.;
-                    Double_t pHez = x->GetStartMomentum().Z() * 1000.;
-                    alphaP.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
-                    Double_t theta_26 = alphaP.Angle(carbonP.Vect()) * TMath::RadToDeg(); // angle alpha carbon (theta)
-                    Double_t m_inva = (alphaP + carbonP).M();                             // invariant mass
-                    Erel = m_inva - mHe - mC;                                             // relative Energy
-                    Double_t Erel_check = 3.87359e-01 - 3.55075e-01 * theta_26 + 6.57182e-01 * theta_26 * theta_26;
-					fh_Erel->Fill(Erel);
-                    // cout<<"4He selecting: "<<endl;
-                    // cout << "Erel: " << Erel << "; chi2 C/He: " << minChi2_12C <<", "<<minChi2 << endl;
-                    // cout<<"candidate: "<<x->GetStartMomentum().Z()<<", "<<x->GetStartPosition().X()<<", "<<
-                    // x->GetStartPosition().Y()<<endl;
-
-                    // cout << "For event: "<<fNEvents_nonull<<" possible He: " << parChi2 << ", Erel: "<<Erel<<",
-                    // "<<Erel_check<<endl;
-
-                    if (parChi2 < minChi2)
-                    // if (abs(Erel-Erel_check) < 1.1  && parChi2 < minChi2)
-                    {
-                        // if (parChi2 < minChi2)
-                        {
-                            bestcandidate = x;
-                            minChi2 = parChi2;
-
-                            // cout << "For event: "<<fNEvents_nonull<<" new min chi2 for He: " << minChi2 << ", Erel:
-                            // "<<Erel<<", "<<Erel_check<<endl;
-
-                            // cout << "Corresponding Mass   : " << x->GetMass() << endl;
-                            // cout << "Corresponding Mass   : " << bestcandidate->GetMass() << endl;
-                        }
-                    }
-                    //	cout<<"selected: "<<bestcandidate->GetStartMomentum().Z()<<",
-                    //"<<bestcandidate->GetStartPosition().X()<<", "<< 	bestcandidate->GetStartPosition().Y()<<",
-                    //"<<minChi2<<", "<<Erel<<endl;
->>>>>>> working on the optimization of geometry
                 }
             }
 
@@ -3025,7 +2700,6 @@ void R3BFragmentTrackerS494::Finish()
     fh_dxdy->Write();
     fh_mass_corel->Write();
     fh_Erel->Write();
-<<<<<<< HEAD
     fh_psum->Write();
     fh_theta->Write();
     px_vs_x->Write();
@@ -3050,8 +2724,6 @@ void R3BFragmentTrackerS494::Finish()
         fh_califa_energy->Write();
         fh_califa_energy_select->Write();
     }
-=======
->>>>>>> working on the optimization of geometry
 
     if (fVis)
     {
