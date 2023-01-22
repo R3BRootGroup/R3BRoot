@@ -30,6 +30,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
+
 ${R3BROOT_SOURCE_DIR}/fiber
 ${Geant4_INCLUDE_DIRS}
 )
@@ -51,9 +53,11 @@ R3BFragmentFitterGeneric.cxx
 #R3BFragmentTracker.cxx
 #R3BFragmentTrackerS454.cxx
 R3BFragmentTrackerS494.cxx
+#R3BFragmentTrackerS494_work.cxx
 #R3BFragmentFitterChi2.cxx
 #R3BFragmentFitterChi2S454.cxx
 R3BFragmentFitterChi2S494.cxx
+#R3BFragmentFitterChi2S494_work.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx

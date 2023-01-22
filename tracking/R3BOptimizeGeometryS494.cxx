@@ -1502,7 +1502,7 @@ void R3BOptimizeGeometryS494::Finish()
             // -131.0271, 599.8577, -192.6675, -195.2851, 0.9899833, 0., 0., 91.2 }; // chi=6.6469 with scale with
             // momentum contribution and sigmap = 0.001 and 1000 events { -111.0873, 537.5657, -130.9271, 599.8577,
             // -192.6675, -195.2851, 0.9899833, 0., 0., 91.2 }; // chi=5.05003 with scale with momentum contribution and
-            //sigmap = 0.001 and 1000 events { -111.0659, 537.5871, -130.9057, 599.8791, -192.6654, -195.2830, 1.0, 0.,
+            // sigmap = 0.001 and 1000 events { -111.0659, 537.5871, -130.9057, 599.8791, -192.6654, -195.2830, 1.0, 0.,
             // 0., 91.2
             //}; // chi=8.0800 with scale with momentum contribution and sigmap = 0.0005 and 1000 events
 
@@ -1595,7 +1595,7 @@ void R3BOptimizeGeometryS494::Finish()
 
             //{ -112.6789, 537.9168, -131.7994, 597.7871, -193.8252, -193.8686, 1.001, 0.00185, 0.012968, 91.05297 }; //
             // chi=10.1793675 without scale and with momentum contribution and sigmap=0.0005 and 1000 events {
-            // -112.6789, 537.9168, -131.7994, 597.7871, -193.8252, -193.8686, 1.0011, 0.00185, 0.012968, 91.05297 };  //
+            // -112.6789, 537.9168, -131.7994, 597.7871, -193.8252, -193.8686, 1.0011, 0.00185, 0.012968, 91.05297 }; //
             // chi=10.1642725 without scale and with momentum contribution and sigmap=0.0005 and 1000 events {
             // -112.6787, 537.9180, -131.7982, 597.7883, -193.8251, -193.8251, 1.001112, 0.00085, 0.013088, 91.05417 };
             // // chi=10.155750 without scale and with momentum contribution and sigmap=0.0005 and 1000 events

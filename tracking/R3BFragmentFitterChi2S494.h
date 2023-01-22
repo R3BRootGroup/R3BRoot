@@ -60,6 +60,12 @@ class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
     R3BTPropagator* fPropagator;
    	//Double_t amu = 0.938272;
    	Double_t amu = 0.931494028;   // Gev/c**2
+   	
+    TVector3 pos3max;
+    TVector3 pos3min;
+    TVector3 pos23a;
+    TVector3 pos23b;
+    TVector3 pinv;
 
     ClassDef(R3BFragmentFitterChi2S494, 1)
 };

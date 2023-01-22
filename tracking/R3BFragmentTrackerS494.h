@@ -101,13 +101,14 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t fNEventsLeft = 0;
     Int_t fNEventsRight=0;
     Int_t sumwrite = 0;
-    Int_t counter1 = 0, fNEvents_nonull=0, counterHe=0, counterC=0;
+    Int_t counter1 = 0, fNEvents_nonull=0, counterHe=0, counterC=0,counter_wo = 0;
     Double_t fBfield;
     
     Int_t icount100 = 0;
     
     enum DetectorInstances
     {
+        DET_CALIFA,
         DET_FI_FIRST,
         DET_FI23A = DET_FI_FIRST,
         DET_FI23B,
@@ -122,7 +123,7 @@ class R3BFragmentTrackerS494 : public FairTask
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",
+    const char* fDetectorNames[DET_MAX + 1] = { "Califa","Fi23a", "Fi23b", "Fi30",
                                                 "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
     TLorentzVector Oxygen; 
     TVector3 pos16O0;
@@ -147,16 +148,18 @@ class R3BFragmentTrackerS494 : public FairTask
     Double_t minChi2;
     Double_t minChi2_12C;
     TLorentzVector alphaP, carbonP;
-    TVector3 p12C;
-    Double_t mHe = 3727.409;
-	Double_t mC = 11174.950;
+    TVector3 p12C, p4He;
+    Double_t mHe = 3.728401291*1e3; // 3727.409;
+	Double_t mC = 11.17486339*1.e3; //11174.950;
 	Double_t x_l[8];
     Double_t y_l[8];
+    Double_t eloss_hit[8];
     Double_t det_hit_x[8];
     Double_t det_hit_y[8];
     Double_t det_hit_xC[8];
     Double_t det_hit_yC[8];
     Int_t fNwriteout=0;
+	Int_t counterCalifa = 0;
 
     TH1F* fh_mult_fi23a;
     TH1F* fh_mult_fi23b;
@@ -209,6 +212,10 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_xfi31_fi23a_track;
     TH2F* fh_xfi31_fi33_track;
     TH2F* fh_xfi31_tofd_track;
+    
+    TH1F* fh_Erel;
+    TH1F* fh_psum;
+    TH1F* fh_theta;
             
     TH2F* fh_xfi30_fi23a_exp;
     TH2F* fh_xfi30_fi32_exp;
@@ -217,7 +224,11 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_xfi31_fi33_exp;
     TH2F* fh_xfi31_tofd_exp;   
     TH2F* fh_yC_vs_yHe_Tofd;
-    TH2F* fh_yC_vs_yHe_Tofd_exp;
+    TH2F* fh_yC_vs_yHe_Tofd_exp;  
+    TH2F* fh_yC_vs_yHe_fib23;
+    TH2F* fh_yC_vs_yHe_fib23_exp; 
+    TH2F* fh_xC_vs_xHe_fib23;
+    TH2F* fh_xC_vs_xHe_fib23_exp;
     TH2F* fh_tofd_track_exp;
     TH2F* fh_fi23b_track_exp;
     TH2F* fh_yFi23b_tofd_track;
@@ -233,6 +244,26 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_dxdy;
     TH2F* fh_mass_corel;
     TH2F* fh_mass_vs_ch2;
+    TH2F* px_vs_x;
+    TH2F* py_vs_x;
+    TH2F* pz_vs_x;
+    TH2F* p_vs_x;
+    TH2F* px_vs_y;
+    TH2F* py_vs_y;
+    TH2F* pz_vs_y;
+    TH2F* p_vs_y;
+    TH2F* fh_px_p;
+    TH2F* fh_py_p;
+    TH2F* fh_Erel_vs_x;
+    TH2F* fh_Erel_vs_y;
+    TH2F* fh_theta_vs_x;
+    TH2F* fh_theta_vs_y;
+    TH2F* fh_Erel_vs_nhits23a;    
+    TH2F* fh_Erel_vs_nhits23b;
+    
+
+    TH2F* fh_califa_energy;
+    TH2F* fh_califa_energy_select;
 
     ClassDef(R3BFragmentTrackerS494, 1)
 };

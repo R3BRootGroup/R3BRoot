@@ -40,7 +40,7 @@ R3BTrack::R3BTrack(Double_t x,
                    Double_t py,
                    Double_t pz,
                    Int_t q,
-                   Int_t AoZ,
+                   Double_t AoZ,
                    Double_t chix,
                    Double_t chiy,
                    Int_t quality)

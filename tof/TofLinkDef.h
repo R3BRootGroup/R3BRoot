@@ -48,6 +48,7 @@
 #pragma link C++ class R3BTofi+;
 #pragma link C++ class R3BTofdDigitizer+;
 #pragma link C++ class R3BTofdDigitizerCal+;
+#pragma link C++ class R3BTofdDigitizerHit+;
 #pragma link C++ class R3BTofiDigitizerCal+;
 #pragma link C++ class R3BGeoTofd+;
 #pragma link C++ class R3BGeoTofi+;

@@ -84,6 +84,7 @@ R3BTofd.cxx
 R3BTofi.cxx
 R3BTofdDigitizer.cxx
 R3BTofdDigitizerCal.cxx
+R3BTofdDigitizerHit.cxx
 R3BTofiDigitizerCal.cxx
 R3BGeoTofd.cxx   
 R3BGeoTofi.cxx   

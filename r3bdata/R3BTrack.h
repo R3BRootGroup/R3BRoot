@@ -25,7 +25,7 @@ class R3BTrack : public TObject
 {
   public:
     R3BTrack();
-    R3BTrack(Double_t x, Double_t y, Double_t z, Double_t px, Double_t py, Double_t pz, Int_t q, Int_t AoZ, Double_t chix, Double_t chiy, Int_t quality);
+    R3BTrack(Double_t x, Double_t y, Double_t z, Double_t px, Double_t py, Double_t pz, Int_t q, Double_t AoZ, Double_t chix, Double_t chiy, Int_t quality);
     virtual ~R3BTrack();
 
     inline const Double_t& GetX() const { return fX; }

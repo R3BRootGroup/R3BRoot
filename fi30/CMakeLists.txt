@@ -47,6 +47,7 @@ R3BFi30Mapped2Cal.cxx
 R3BFi30ContFact.cxx
 R3BFi30Digitizer.cxx
 R3BFi30DigitizerCal.cxx
+R3BFi30DigitizerHit.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")

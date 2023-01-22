@@ -25,5 +25,6 @@
 #pragma link C++ class R3BFi30ContFact+;
 #pragma link C++ class R3BFi30Digitizer+;
 #pragma link C++ class R3BFi30DigitizerCal+;
+#pragma link C++ class R3BFi30DigitizerHit+;
 
 #endif

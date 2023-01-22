@@ -108,7 +108,6 @@ Bool_t R3BTofdReader::Read()
     // if (fNEvents / 10000. == (int)fNEvents / 10000)
     //   std::cout << "ToFD Events: " << fNEvents << std::endl;
     fNEvents += 1;
-    cout << "ToFD ReaderEvent: " << fNEvents << ", " << fNEventUnpack << endl;
 
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;

@@ -146,9 +146,15 @@ class R3BPreTrackS494 : public FairTask
     {
 		fAverage = averageValues;
 	}
-	void SetXlimits(Double_t xmin, Double_t xmax){
-		fXmin=xmin;
-		fXmax=xmax;
+	inline void SetIdeal(Bool_t idealData)
+    {
+		fidealData = idealData;
+	}
+	void SetXlimits(Double_t xmin1, Double_t xmax1, Double_t xmin2, Double_t xmax2){
+		fX1min=xmin1;
+		fX1max=xmax1;
+		fX2min=xmin2;
+		fX2max=xmax2;
 	}
   private:
     std::vector<TClonesArray*> fMappedItems;
@@ -205,26 +211,27 @@ class R3BPreTrackS494 : public FairTask
 	Bool_t fPairs;
 	Bool_t fGraphCuts;
 	Bool_t fSimu;
+	Bool_t fidealData;
 	Int_t fB;
 	Bool_t tracker = true;
-	Double_t fXmin, fXmax;
+	Double_t fX1min, fX1max, fX2min, fX2max;
 	Double_t delta;
 	Bool_t ftrackerType;
 	Bool_t fAverage;
-	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0;
+	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0,countdet_written[10]={0};
 	
 
-	TCutG *cut_fi31_fi23a;
-	TCutG *cut_fi30_fi23b;
-	TCutG *cut_Fi33vsFi31;
-	TCutG *cut_Fi30vsFi32;
+	TCutG *cut_qfi31_qfi33;
+	TCutG *cut_qfi30_qfi32;
+	
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0, fNeventstrack=0, fNeventselect=0; /**< Event counter. */
 
     Int_t maxevent;
-    Int_t ncorell = 0, nanticorell = 0;
+    Int_t ncorellx = 0, nanticorellx = 0;
+    Int_t ncorelly = 0, nanticorelly = 0;
 
     Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
     Double_t calib_SEE = 1.;   // SEETRAM calibration factor
@@ -285,7 +292,19 @@ class R3BPreTrackS494 : public FairTask
 	Double_t hits33bc = 0;
 	Bool_t increment1 = false;
     Bool_t increment2 = false;
-                    
+    Int_t Nevent_singles=0;  
+    Int_t Nevent_wrongcharge =0;
+    Int_t fNeventpair=0;
+    Int_t Nevent_zerofi23a_corel = 0;
+    Int_t Nevent_notzerofi23a_corel = 0;
+    Int_t Nevent_zerofi23b_corel = 0;
+    Int_t Nevent_notzerofi23b_corel = 0;
+    Int_t Nevent_zerofi3032_corel = 0;
+    Int_t Nevent_notzerofi3032_corel = 0;
+    Int_t Nevent_zerofi3133_corel = 0;
+    Int_t Nevent_notzerofi3133_corel = 0;
+    Int_t Nevent_goodQtofd = 0, Nevent_goodQ = 0, Nevent_zerofi3x_corel =0,Neventafterfibcor=0;
+    Int_t Nhits_before_fibcor = 0, Nhits_after_fibcor = 0;
 
     UInt_t num_spills = 0;
 
@@ -315,11 +334,21 @@ class R3BPreTrackS494 : public FairTask
     TH2F* fh_Fibs_vs_Tofd_ac[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events_ac[NOF_FIB_DET];
-
+    TH2F* fh_qtofd_vs_qFib[NOF_FIB_DET];
+    TH2F* fh_qtofd_vs_qFib_ac[NOF_FIB_DET];
+    TH2F* fh_Fib_ToF_vs_Qtofd[NOF_FIB_DET];
+    TH2F* fh_Fib32_vs_Fib30_tot;
+    TH2F* fh_Fib33_vs_Fib31_tot;
+    
+    TH2F* fh_Fi23aToF_Q[21];
+    TH2F* fh_Fi23bToF_Q[21];
+    
+    
+    
 	TH2F* fh_Fib30_vs_Fib23a;
 	TH2F* fh_Fib30_vs_Fib23a_dx;
 	TH2F* fh_Fib30_vs_Fib23a_dt;
-	TH2F* fh_Fib31_vs_Fib23b;
+	TH2F* fh_tofdright_vs_Fib23b;
 	TH2F* fh_Fib31_vs_Fib23b_dx;
 	TH2F* fh_Fib31_vs_Fib23b_dt;
 
@@ -332,10 +361,11 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_Fib32_vs_Fib30;
 	TH2F* fh_Fib32_vs_Fib30_dx;
 	TH2F* fh_Fib32_vs_Fib30_dt;
-	TH2F* fh_Fib30_vs_Fib23b;
+	TH2F* fh_tofdleft_vs_Fib23b;
 	TH2F* fh_Fib30_vs_Fib23b_dx;
 	TH2F* fh_Fib30_vs_Fib23b_dt;
-	
+	TH2F* fh_Fib23a_vs_Fib3X_tot;
+	TH2F* fh_Fib23b_vs_Fib3X_tot;	
 	TH2F* fh_tofd_vs_Fib31;
     TH2F* fh_ytofd_vs_yFib31;
     TH2F* fh_tofd_vs_Fib31_ac;
@@ -347,11 +377,11 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_Fib33_vs_Fib31_dx_ac;
 	TH2F* fh_Fib31_vs_Fib23a_ac;
 	TH2F* fh_Fib31_vs_Fib23a_dx_ac;
-	TH2F* fh_Fib31_vs_Fib23b_ac;
+	TH2F* fh_tofdright_vs_Fib23b_ac;
 	TH2F* fh_Fib31_vs_Fib23b_dx_ac;
 	TH2F* fh_Fib32_vs_Fib30_ac;
 	TH2F* fh_Fib32_vs_Fib30_dx_ac;
-	TH2F* fh_Fib30_vs_Fib23b_ac;
+	TH2F* fh_tofdleft_vs_Fib23b_ac;
 	TH2F* fh_Fib30_vs_Fib23b_dx_ac;
 	TH2F* fh_Fib30_vs_Fib23a_ac;
 	TH2F* fh_Fib30_vs_Fib23a_dx_ac;
@@ -393,6 +423,8 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_check_TvsX[7];
 	TH2F* fh_check_XvsY[7];
 	TH2F* fh_tofd_x_vs_y_z[6];
+	TH2F* fh_qsum_mult_fi23a;
+	TH2F* fh_qsum_mult_fi23b;
 
 	
   public:

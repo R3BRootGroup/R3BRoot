@@ -28,6 +28,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include "TCutG.h"
 #include <TLorentzVector.h>
 #include <cstdlib>
 
@@ -136,6 +137,10 @@ class R3BGlobalAnalysisS494 : public FairTask
     {
         fB = B;
     }
+    inline void SetGraphicalCuts(Bool_t graphCuts)
+    {
+        fGraphCuts = graphCuts;
+    }
     
     inline void SetChi2(Double_t cut_chiX, Double_t cut_chiY)
     {
@@ -148,7 +153,9 @@ class R3BGlobalAnalysisS494 : public FairTask
     std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
     TClonesArray* fTrack;
-
+    TClonesArray* fMappedItemsCalifa;
+    TClonesArray* fCalItemsCalifa;
+    TClonesArray* fHitItemsCalifa;
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -157,6 +164,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Bool_t fCuts;
 	Bool_t fGhost;
 	Bool_t fPairs;
+	Bool_t fGraphCuts;
 	Bool_t fSimu;
 	Int_t fB;
 	Bool_t tracker = true;
@@ -175,7 +183,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     Double_t counts_TofD = 0;
 
 	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;
-	Int_t mtrackHe, mtrackC, mtrackO;	
+	Double_t mtrackHe, mtrackC, mtrackO;	
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
 	Double_t XHe_mc, YHe_mc, ZHe_mc, XC_mc, YC_mc, ZC_mc, THe_mc, TC_mc;	
@@ -185,12 +193,15 @@ class R3BGlobalAnalysisS494 : public FairTask
      Double_t fcut_chiX ;
      Double_t fcut_chiY ;
         
-	Double_t amu = 931.49410242;
+	//Double_t amu = 931.49410242; // 0.931494028
 //	Double_t mHe = 4.00260325413*amu;
 //	Double_t mC = 12. * amu;
-	Double_t mHe = 3727.409;
-	Double_t mC = 11174.950;
+// Geant3:
+	Double_t amu = 0.931494028;
+	Double_t mHe = 3728.401291;
+	Double_t mC = 11174.86339;
 	Double_t mO = 15.99065084 * amu;
+
 	Double_t Erel, m_inva, phi_bc_cm;
 	Double_t ErelMC, m_invaMC, phiMC_bc_cm;
 	TVector3 pa, pc, paMC, pcMC;
@@ -210,7 +221,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Int_t counter3 = 0;
 	Int_t counter4 = 0;
 	Int_t countdet;
-	
+	TCutG *cut_EHe_EC;
 	Int_t clocal = 0;
 	
     UInt_t num_spills = 0;
@@ -243,7 +254,9 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_chiy_vs_chix_C;
     TH2F* fh_chiy_vs_chix;
     TH2F* fh_phi26_vs_chi;
-    TH2F* fh_py_vs_chi;
+    TH2F* fh_psum_vs_theta26_nc;
+    TH2F* fh_Erel_vs_psum;
+    TH2F* fh_phiMC_bc_cm_polar;
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -260,6 +273,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_dpyHe;
     TH1F* fh_dpzHe;
     TH1F* fh_dpHe;
+    TH1F* fh_dp;
     TH2F* fh_thetax_dpx_C;
     TH2F* fh_thetay_dpy_C;
     TH2F* fh_thetax_dpx_He;
@@ -275,6 +289,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_px_px;
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
+    TH2F* fh_p_p;
     TH2F* fh_Erel_vs_phibc;
     TH2F* fh_Erel_vs_phibcMC;
     TH2F* fh_psum_vs_event;  
@@ -285,7 +300,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_thetay_px;
     
     TH2F* fh_pHe_vs_theta26;
-    TH2F* fh_pC_vs_theta26;
+    TH2F* fh_psum_vs_theta26;
     
     TH2F* fh_theta26_vs_chi;  
     TH2F* fh_Erel_vs_chi; 
@@ -341,15 +356,33 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_Erel_vs_thetaMC;
 	TH1F* fh_psum;
 	TH1F* fh_psum_MC;
+	TH1F* fh_pzsum;
+	TH1F* fh_pzsum_MC;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;
 
-	TH2F* fh_dErel_vs_x;
-	TH2F* fh_dErel_vs_y;
-	TH2F* fh_dErel_vs_z;
+	TH2F* fh_phibcm_vs_px;
+	TH2F* fh_phibcm_vs_py;
+	TH2F* fh_phibcm_vs_pz;
+	TH2F* fh_phibcm_vs_psum;	
+	TH2F* fh_phibcm_vs_px_MC;
+	TH2F* fh_phibcm_vs_py_MC;
+	TH2F* fh_phibcm_vs_pz_MC;
+	TH2F* fh_phibcm_vs_psum_MC;
 	TH2F* fh_mass_nc;
 	TH2F* fh_mass;
-	
+	TH2F* fh_energy_nc;
+	TH2F* fh_energy;
+	TH2F* fh_psum_vs_r_nc;
+	TH2F* fh_pz_vs_r;
+	TH2F* fh_px_vs_r;
+	TH2F* fh_py_vs_r;
+	TH2F* fh_califa_energy;
+	TH2F* fh_califa_energy_nc;
+	TH2F* fh_califa_calenergy;
+	TH2F* fh_califa_hitenergy;
+	TH1F* fh_minv_simu;
+	TH1F* fh_minv;
   public:
     ClassDef(R3BGlobalAnalysisS494, 1)
 };
