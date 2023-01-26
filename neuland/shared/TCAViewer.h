@@ -14,10 +14,11 @@
 #ifndef TCAVIEWER
 #define TCAVIEWER
 
-#include "FairRootManager.h"
+#include "FairRun.h"
 #include "TClonesArray.h"
-#include <gsl/gsl>
-#include <string_view>
+#include <FairEventHeader.h>
+#include <boost/core/span.hpp>
+#include <string>
 #include <utility>
 
 namespace TCAViewer
@@ -33,7 +34,8 @@ namespace TCAViewer
 
     template <typename DataType,
               Mode mode = in,
-              typename = typename std::enable_if<std::is_base_of<TObject, DataType>::value>::type>
+              typename = typename std::enable_if<std::is_base_of<TObject, DataType>::value>::type,
+              typename = typename std::enable_if<sizeof(TObject*) == sizeof(DataType*)>::type>
     class Data
     {
       public:
@@ -47,11 +49,16 @@ namespace TCAViewer
 
         auto GetBranchName() -> std::string& { return mBranchName; }
 
-        void Init(FairRootManager* rootMan = FairRootManager::Instance())
+        void Init(FairRun* run = FairRun::Instance(), FairRootManager* rootMan = FairRootManager::Instance())
         {
             if (rootMan == nullptr)
             {
                 LOG(fatal) << "TCAViewer: No FairRootManager for" << mBranchName;
+            }
+
+            if (run == nullptr)
+            {
+                LOG(fatal) << "TCAViewer: No FairRun for" << mBranchName;
             }
 
             if (mBranchName.empty())
@@ -59,10 +66,11 @@ namespace TCAViewer
                 LOG(fatal) << "TCAViewer: cannot init without branch name specified.";
             }
 
+            eventHeader = run->GetEventHeader();
+
             mTCA = (mode == in) ? InputInit(rootMan) : OutputInit(rootMan);
         }
 
-        // [[nodiscard]] auto GetData() -> gsl::span<DataType*>
         [[nodiscard]] auto Get() -> decltype(auto)
         {
             if constexpr (mode == in)
@@ -77,6 +85,21 @@ namespace TCAViewer
 
         auto GetTCA() -> TClonesArray* { return mTCA; }
 
+        auto CheckCapcitySize() -> bool
+        {
+            auto is_changed = true;
+            auto tempSize = mTCA->Capacity();
+            if (mContCapcitySize)
+            {
+                is_changed = mContCapcitySize != tempSize;
+            }
+            if (is_changed)
+            {
+                mContCapcitySize = tempSize;
+            }
+            return is_changed;
+        }
+
       private:
         void DisableGuard() { mSafeGuard = false; }
         void EnableGuard() { mSafeGuard = true; }
@@ -85,7 +108,7 @@ namespace TCAViewer
         {
             if (mTCA == nullptr)
             {
-                LOG(error) << "TCAViewer: Cannot reset non-existed TClonesArray!";
+                LOG(error) << "TCAViewer<out>: Cannot reset non-existed TClonesArray!";
             }
             mTCA->Clear("C");
         }
@@ -95,7 +118,7 @@ namespace TCAViewer
             auto* tTCA = dynamic_cast<TClonesArray*>(rootMan->GetObject(mBranchName.data()));
             if (tTCA == nullptr)
             {
-                LOG(fatal) << "TCAViewer: No TClonesArray called " << mBranchName
+                LOG(fatal) << "TCAViewer<in>: No TClonesArray called " << mBranchName
                            << "could be obtained from the FairRootManager!";
             }
             return tTCA;
@@ -108,28 +131,40 @@ namespace TCAViewer
             return mTCA_out.get();
         }
 
-        [[nodiscard]] auto InputGet() -> gsl::span<DataType*>
+        [[nodiscard]] auto InputGet() -> decltype(auto)
         {
-            static_assert(mode == in, "TCAViewer::Data cannot be called in output mode!");
             if (mTCA == nullptr)
             {
-                LOG(warn) << "TCAViewer: get data from a non-existed TClonesArray!";
+                LOG(warn) << "TCAViewer<in>: get data from a non-existed TClonesArray!";
             }
-            auto is_sucess = (mFirstAddr == nullptr) ? SetFirstAddr() : true;
-            return is_sucess ? gsl::span<DataType*>(mFirstAddr, mTCA->GetEntriesFast()) : gsl::span<DataType*>();
+            auto is_sucess = CheckCapcitySize() ? SetFirstAddr() : true;
+            return is_sucess ? std::span<DataType* const>(mCont, mTCA->GetEntriesFast()) : std::span<DataType* const>();
         }
 
         [[nodiscard]] auto OutputGet() -> TCAOutput_SafeGuard<DataType>
         {
             if (mSafeGuard)
             {
-                LOG(fatal) << "TCAViewer: Get() function can only be called once in the scope. ";
+                LOG(fatal) << "TCAViewer<out>: Get() function can only be called once in the scope. ";
             }
             else
             {
+                // make sure this function get called every event
+                LogMCEntryNumber();
                 Clear();
             }
             return TCAOutput_SafeGuard<DataType>(this);
+        }
+
+        template <typename... Args>
+        void Emplace_back(Args&&... args)
+        {
+            static_assert(mode == out, "TCAViewer<out>::Emplace_back cannot be called in input mode!");
+            if (mTCA == nullptr)
+            {
+                LOG(error) << "TCAViewer<out>: Cannot emplace back a non-existed TClonesArray!";
+            }
+            new ((*mTCA_out)[mTCA_out->GetEntries()]) DataType(std::forward<Args>(args)...);
         }
 
         auto SetFirstAddr() -> bool
@@ -139,34 +174,51 @@ namespace TCAViewer
             {
                 if (dynamic_cast<DataType*>((*mTCA)[0]) == nullptr)
                 {
-                    LOG(fatal) << "cannot convert the element in " << mBranchName << " to the type "
+                    LOG(fatal) << "TCAViewer<in>: Cannot convert the element in " << mBranchName << " to the type "
                                << DataType::Class_Name();
                 }
                 else
                 {
-                    mFirstAddr = reinterpret_cast<DataType**>(&(*mTCA)[0]);
+                    mCont = reinterpret_cast<DataType**>(mTCA->GetObjectRef());
                     is_success = true;
                 }
             }
             return is_success;
         }
 
-        template <typename... Args>
-        void Emplace_back(Args&&... args)
+        void LogMCEntryNumber()
         {
-            static_assert(mode == out, "TCAViewer::Emplace_back cannot be called in input mode!");
-            if (mTCA == nullptr)
+            auto tempEntryNumber = GetMCEntryNumber();
+            if (mMCEntryNumber.has_value())
             {
-                LOG(error) << "TCAViewer: Cannot emplace back a non-existed TClonesArray!";
+                MCEntryNumDiagnose(tempEntryNumber);
             }
-            new ((*mTCA_out)[mTCA_out->GetEntries()]) DataType(std::forward<Args>(args)...);
+            mMCEntryNumber = tempEntryNumber;
         }
 
+        void MCEntryNumDiagnose(int currentEntryNumber)
+        {
+            if (mMCEntryNumber.value() == currentEntryNumber)
+            {
+                LOG(fatal) << "TCAViewer<out>: Event number diagnositcs fails. Event number is not incremented.";
+            }
+            else if (currentEntryNumber - mMCEntryNumber.value() > 1)
+            {
+                LOG(fatal) << "TCAViewer<out>: Event number diagnositcs fails. Please make sure Get() is called in "
+                              "every event!";
+            }
+        }
+
+        inline auto GetMCEntryNumber() -> int { return eventHeader->GetMCEntryNumber(); }
+
+        std::optional<int> mMCEntryNumber;
+        std::optional<int> mContCapcitySize;
         std::string mBranchName;
-        DataType** mFirstAddr = nullptr;
+        DataType** mCont = nullptr;
         TClonesArray* mTCA = nullptr;
         bool mSafeGuard = false;
         std::unique_ptr<TClonesArray> mTCA_out; // owning
+        FairEventHeader* eventHeader = nullptr; // non-owning
     };
 
     template <typename Datatype>
@@ -180,7 +232,7 @@ namespace TCAViewer
             mPointers->EnableGuard();
         }
 
-        ~TCAOutput_SafeGuard() { mPointers->DisableGuard(); }
+        ~TCAOutput_SafeGuard() noexcept { mPointers->DisableGuard(); }
         TCAOutput_SafeGuard(const TCAOutput_SafeGuard&) = delete;
         TCAOutput_SafeGuard(TCAOutput_SafeGuard&&) = delete;
         auto operator=(const TCAOutput_SafeGuard&) -> TCAOutput_SafeGuard& = delete;

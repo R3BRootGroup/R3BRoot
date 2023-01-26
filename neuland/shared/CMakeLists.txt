@@ -13,25 +13,13 @@
 
 cmake_minimum_required(VERSION 3.14)
 
-
-include(FetchContent)
-
-FetchContent_Declare(GSL
-    GIT_REPOSITORY "https://github.com/microsoft/GSL"
-    GIT_TAG "v4.0.0"
-    GIT_SHALLOW ON
-)
-
-FetchContent_MakeAvailable(GSL)
-
 set(LIBRARY_NAME R3BNeulandShared)
 set(LINKDEF NeulandSharedLinkDef.h)
 
-set(DEPENDENCIES R3BData R3BBase ParBase Microsoft.GSL::GSL)
+set(DEPENDENCIES R3BData R3BBase ParBase)
 
 set(INCLUDE_DIRECTORIES 
 ${INCLUDE_DIRECTORIES} 
-${gsl_SOURCE_DIR}/include
 )
 
 include_directories(${INCLUDE_DIRECTORIES} )
