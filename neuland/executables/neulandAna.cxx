@@ -49,7 +49,7 @@ class MyTask : public FairTask
             // auto output_Viewer = mNeulandOutputPoints.Get(); // this will cause error
             auto neulandPoint = *point;
             neulandPoint.SetEnergyLoss(neulandPoint.GetEnergyLoss() + 0.005);
-            outputPointers_Viewer->Emplace_back(std::move(neulandPoint));
+            outputPointers_Viewer.Emplace_back(std::move(neulandPoint));
         }
     }
 

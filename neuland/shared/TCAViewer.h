@@ -117,7 +117,7 @@ namespace TCAViewer
             return is_sucess ? gsl::span<DataType*>(mFirstAddr, mTCA->GetEntriesFast()) : gsl::span<DataType*>();
         }
 
-        [[nodiscard]] auto OutputGet() -> std::unique_ptr<TCAOutput_SafeGuard<DataType>>
+        [[nodiscard]] auto OutputGet() -> TCAOutput_SafeGuard<DataType>
         {
             if (mSafeGuard)
             {
@@ -126,9 +126,8 @@ namespace TCAViewer
             else
             {
                 Clear();
-                EnableGuard();
             }
-            return std::make_unique<TCAOutput_SafeGuard<DataType>>(this);
+            return TCAOutput_SafeGuard<DataType>(this);
         }
 
         auto SetFirstAddr() -> bool
@@ -176,6 +175,7 @@ namespace TCAViewer
         explicit TCAOutput_SafeGuard(Pointers_out* pointers)
             : mPointers{ pointers }
         {
+            mPointers->EnableGuard();
         }
 
         ~TCAOutput_SafeGuard() { mPointers->DisableGuard(); }
