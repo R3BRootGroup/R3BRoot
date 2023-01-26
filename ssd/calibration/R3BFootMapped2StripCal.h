@@ -63,6 +63,15 @@ class R3BFootMapped2StripCal : public FairTask
      */
     void SetThresholdSigma(Double_t th) { fTimesSigma = th; }
 
+    /**
+     * Method for setting the N of strip hit per foot: fNStrip
+     */
+    void SetNStrip(Double_t nstrip) { fNStrip = nstrip; }
+
+
+  
+  
+  
   private:
     void SetParameter();
 
@@ -70,6 +79,7 @@ class R3BFootMapped2StripCal : public FairTask
     Int_t NumStrips;
     Int_t NumParams;
     Int_t MaxSigma;
+    Double_t fNStrip;
     Double_t fTimesSigma;
     TArrayF* CalParams;
 
