@@ -56,7 +56,6 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
 	  
 {
 }
-
 // Virtual R3BFootMapped2StripCal: Destructor
 R3BFootMapped2StripCal::~R3BFootMapped2StripCal()
 {
