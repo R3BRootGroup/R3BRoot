@@ -53,6 +53,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
 	, fFootMappedData(NULL)
 	, fFootCalData(NULL)
 	  , fOnline(kFALSE)
+	  
 {
 }
 
@@ -291,6 +292,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 	if (mappedData)
 		delete[] mappedData;
 	return;
+	
 }
 
 // -----   Public method Reset   ------------------------------------------------
