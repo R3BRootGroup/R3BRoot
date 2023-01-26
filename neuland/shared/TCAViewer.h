@@ -31,12 +31,14 @@ namespace TCAViewer
     template <typename Datatype>
     class TCAOutput_SafeGuard;
 
-    template <typename DataType, Mode mode = in>
-    class Pointers
+    template <typename DataType,
+              Mode mode = in,
+              typename = typename std::enable_if<std::is_base_of<TObject, DataType>::value>::type>
+    class Data
     {
       public:
         friend TCAOutput_SafeGuard<DataType>;
-        explicit Pointers(std::string branchName = "")
+        explicit Data(std::string branchName = "")
             : mBranchName{ std::move(branchName) }
         {
         }
@@ -171,7 +173,7 @@ namespace TCAViewer
     class TCAOutput_SafeGuard
     {
       public:
-        using Pointers_out = Pointers<Datatype, out>;
+        using Pointers_out = Data<Datatype, out>;
         explicit TCAOutput_SafeGuard(Pointers_out* pointers)
             : mPointers{ pointers }
         {

@@ -55,8 +55,8 @@ class MyTask : public FairTask
 
   private:
     TClonesArray* tracks = nullptr;
-    TCAViewer::Pointers<R3BNeulandPoint, TCAViewer::in> mNeulandInputPoints;
-    TCAViewer::Pointers<R3BNeulandPoint, TCAViewer::out> mNeulandOutputPoints;
+    TCAViewer::Data<R3BNeulandPoint, TCAViewer::in> mNeulandInputPoints;
+    TCAViewer::Data<R3BNeulandPoint, TCAViewer::out> mNeulandOutputPoints;
     TCAInputConnector<R3BNeulandPoint> fPoints;
 };
 
