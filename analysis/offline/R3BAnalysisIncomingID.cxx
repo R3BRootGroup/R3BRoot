@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------
-// -----       R3BAnalysisIncomingID source file              -----
+// -----             R3BAnalysisIncomingID                    -----
 // -----     Created 01/11/21 by M. Feijoo Fontan             -----
 // ----------------------------------------------------------------
 
@@ -27,6 +27,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BAnalysisIncomingID.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BIncomingIDPar.h"
@@ -34,6 +35,7 @@
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
 #include "R3BLosMappedData.h"
+#include "R3BLosTCalData.h"
 #include "R3BMusicHitData.h"
 #include "R3BMusicHitPar.h"
 #include "R3BMusliHitData.h"
@@ -49,10 +51,10 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID()
 
 R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fHeader(NULL)
     , fHitItemsMus(NULL)
     , fHitItemsMusli(NULL)
     , fHitLos(NULL)
+    , fTriggerLos(NULL)
     , fHitPspx1_x(NULL)
     , fHitPspx1_y(NULL)
     , fFrsDataCA(NULL)
@@ -68,6 +70,8 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fNumDet(1)
     , fUseLOS(kFALSE)
     , fUsePspx1(kTRUE)
+    , fUseTref(kFALSE)
+    , fTimeStitch(nullptr)
     , fCutS2(NULL)
     , fCutCave(NULL)
 {
@@ -150,6 +154,13 @@ InitStatus R3BAnalysisIncomingID::Init()
     fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     R3BLOG_IF(warn, !fHitLos, "LosHit not found");
 
+    if (fUseTref)
+    {
+        // Get access to trigger data of the LOS
+        fTriggerLos = (TClonesArray*)mgr->GetObject("LosTriggerTCal");
+        R3BLOG_IF(warn, !fTriggerLos, "LosTriggerTCal not found");
+    }
+
     // Get access to hit data of PSPX1
     fHitPspx1_x = dynamic_cast<TClonesArray*>(mgr->GetObject("Pspx1_xHit"));
     R3BLOG_IF(warn, !fHitPspx1_x, "Pspx1_xHit not found");
@@ -163,6 +174,9 @@ InitStatus R3BAnalysisIncomingID::Init()
         fFrsDataCA = new TClonesArray("R3BFrsData");
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
     }
+
+    // Definition of a time stich object to correlate times coming from different systems
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     SetParameter();
     return kSUCCESS;
@@ -210,6 +224,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
     Double_t Zlos[fNumDet];
     UInt_t nHits = 0;
     Double_t posLosX_cm[fNumDet];
+    Double_t trigTimeV[fNumDet];
     Double_t Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
     Double_t AoQ_m1_corr = 0.;
     Int_t multLos[fNumDet];
@@ -220,6 +235,20 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         multLos[i] = 0;
         Zlos[i] = 0.;
         posLosX_cm[i] = 0.;
+        trigTimeV[i] = 0.;
+    }
+    // --- read Trigger data from LOS --- //
+    if (fTriggerLos && fTriggerLos->GetEntriesFast() > 0)
+    {
+        Int_t numDet = 1;
+        Int_t tHits = fTriggerLos->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < tHits; ihit++)
+        {
+            R3BLosTCalData* hittcal = (R3BLosTCalData*)fTriggerLos->At(ihit);
+            numDet = hittcal->GetDetector();
+            if (hittcal->GetType() == 0)
+                trigTimeV[numDet - 1] = hittcal->GetRawTimeNs();
+        } // --- end of loop over hit data --- //
     }
 
     // --- read hit from LOS data --- //
@@ -231,12 +260,24 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         {
             R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
             numDet = hittcal->GetDetector();
-            if (multLos[numDet - 1] == 0)
+            if (fUseTref)
             {
-                posLosX_cm[numDet - 1] = hittcal->GetX_cm();
-                Zlos[numDet - 1] = hittcal->GetZ();
-                multLos[numDet - 1]++;
+                Double_t time = fTimeStitch->GetTime(hittcal->GetTime() - trigTimeV[numDet - 1], "vftx", "vftx");
+                if (time == fHeader->GetTStart())
+                {
+                    posLosX_cm[numDet - 1] = hittcal->GetX_cm();
+                    Zlos[numDet - 1] = hittcal->GetZ();
+                }
             }
+            else
+            {
+                if (multLos[numDet - 1] == 0)
+                {
+                    posLosX_cm[numDet - 1] = hittcal->GetX_cm();
+                    Zlos[numDet - 1] = hittcal->GetZ();
+                }
+            }
+            multLos[numDet - 1]++;
         } // --- end of loop over hit data --- //
     }
 
@@ -270,7 +311,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         // in R3BRoot, X is increasing from right to left
         //    Bro = fBrho0 * (1 + xMwpc0/fDCC - xS2/fDS2)
 
-        if (multLos[i] >= 1)
+        if (multLos[i] > 0)
         {
             Double_t betaS2 = 0.;
             Double_t PosXS2 = 0.;
@@ -286,6 +327,8 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         continue;
                     betaS2 = hitfrs->GetBeta();
                     PosXS2 = hitfrs->GetXS2();
+                    if (TMath::IsNaN(PosXS2) && fHeader->GetExpId() == 509) // NaN indicator for one S2 pmt missing
+                        PosXS2 = 0.;
                 }
             }
 
