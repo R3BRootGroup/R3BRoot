@@ -26,6 +26,7 @@ class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
 class R3BTcutPar;
+class R3BCoarseTimeStitch;
 
 /**
  * This taks reads all detector data items for the analysis of incoming
@@ -97,20 +98,27 @@ class R3BAnalysisIncomingID : public FairTask
     // Accessor to select the LOS for the incoming ID
     void SetLosForPID() { fUseLOS = kTRUE, fUsePspx1 = kFALSE; }
 
+    // Acsessor to set use of trigger corrected times
+    void SetUseTref() { fUseTref = kTRUE; }
+  protected:
+    R3BEventHeader* fHeader{};   // Event header
+
   private:
     void SetParameter();
+    R3BCoarseTimeStitch* fTimeStitch;
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
     TClonesArray* fHitItemsMus;
     TClonesArray* fHitItemsMusli;
     TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
     TClonesArray* fHitLos;
+    TClonesArray* fTriggerLos;
     TClonesArray* fHitPspx1_x;
     TClonesArray* fHitPspx1_y;
 
-    R3BEventHeader* fHeader;   // Event header
     Bool_t fOnline;            // Don't store data for online
     Bool_t fUseLOS, fUsePspx1; // Use LOS or PSPX1 charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
+    Bool_t fUseTref; // Use trigger corrected times
 
     Double_t fPos_p0;
     Double_t fPos_p1;

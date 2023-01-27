@@ -14,7 +14,7 @@
 #ifndef R3BIncomingBeta_H
 #define R3BIncomingBeta_H 1
 
-// ROOT headers
+// ROOT header
 #include "TMath.h"
 #include <TArrayF.h>
 #include <array>
@@ -99,6 +99,9 @@ class R3BIncomingBeta : public FairTask
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
     void SetUseTref() { fUseTref = kTRUE; }
+    void SetUseMultHit() { fUseMultHit = kTRUE; }
+  protected:
+    R3BEventHeader* fHeader{}; // Event header
 
   private:
     void SetParameter();
@@ -106,22 +109,23 @@ class R3BIncomingBeta : public FairTask
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
     TClonesArray* fFrsDataCA;          /**< Array with FRS-output data. >*/
 
-    TClonesArray* fHitSci2; /**< Array with Tcal items. */
+    TClonesArray* fHitSci2;
     TClonesArray* fHitLos;
+    TClonesArray* fTcalSci2; /**< Array with Tcal items. */
 
-    R3BEventHeader* fHeader; // Event header
     Bool_t fOnline;          // Don't store data for online
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;
     Double_t fPos_p1;
 
-    Int_t fNumDet;
+    UInt_t fNumDet;
     TArrayF* fToFoffset;
     TArrayF *fPosS2Left, *fPosS2Right;
     TArrayF *fTof2InvV_p0, *fTof2InvV_p1;
     Float_t fBeta_max, fBeta_min;
     Bool_t fUseTref;
+    Bool_t fUseMultHit;
 
     /** Private method FrsData **/
     //** Adds a FrsData to the analysis
