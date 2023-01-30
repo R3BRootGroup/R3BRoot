@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -15,7 +15,6 @@
 
 R3BCalifaClusterData::R3BCalifaClusterData()
     : FairMultiLinkedData()
-    , fNbOfCrystalHits(0)
     , fEnergy(NAN)
     , fTheta(NAN)
     , fPhi(NAN)
@@ -23,33 +22,36 @@ R3BCalifaClusterData::R3BCalifaClusterData()
 {
 }
 
-R3BCalifaClusterData::R3BCalifaClusterData(UInt_t Nb,
-                                           Double_t ene,
-                                           Double_t nf,
-                                           Double_t ns,
-                                           Double_t theta,
-                                           Double_t phi,
-                                           ULong64_t time)
+R3BCalifaClusterData::R3BCalifaClusterData(std::vector<Int_t> crystalList,
+                                   Double_t ene,
+                                   Double_t nf,
+                                   Double_t ns,
+                                   Double_t theta,
+                                   Double_t phi,
+                                   ULong64_t time,
+                                   Int_t clusterType)
     : FairMultiLinkedData()
-    , fNbOfCrystalHits(Nb)
+    , fCrystalList(crystalList)
     , fEnergy(ene)
     , fNf(nf)
     , fNs(ns)
     , fTheta(theta)
     , fPhi(phi)
     , fTime(time)
+    , fClusterType(clusterType)
 {
 }
 
 R3BCalifaClusterData::R3BCalifaClusterData(const R3BCalifaClusterData& right)
     : FairMultiLinkedData(right)
-    , fNbOfCrystalHits(right.fNbOfCrystalHits)
+    , fCrystalList(right.fCrystalList)
     , fEnergy(right.fEnergy)
     , fNf(right.fNf)
     , fNs(right.fNs)
     , fTheta(right.fTheta)
     , fPhi(right.fPhi)
     , fTime(right.fTime)
+    , fClusterType(right.fClusterType)
 {
 }
 
