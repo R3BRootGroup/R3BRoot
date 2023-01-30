@@ -62,3 +62,7 @@ glad-tpc/
 frs/
 
 asyeos/
+
+#local configuration
+
+c3w.conf

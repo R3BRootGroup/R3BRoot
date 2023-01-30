@@ -30,6 +30,7 @@
 #include "R3BTCalPar.h"
 #include "R3BCoarseTimeStitch.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"

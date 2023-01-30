@@ -553,6 +553,11 @@ WRITE_CONFIG_FILE(config.csh_install)
 
 write_env_cache(env_cache.sh)
 
+# get rid of leftover c3w configuration
+execute_process(COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/GNUmakefile ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
+if (EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
+  add_subdirectory(util/c3w)
+endif()
 # Summary ######################################################################
 if(CMAKE_CXX_FLAGS)
   message(STATUS "  ")

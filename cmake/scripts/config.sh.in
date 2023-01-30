@@ -2,7 +2,13 @@
 
 export Linux_Flavour_="@_linux_flavour@"
 export System_="@_system@"
-. @_BINDIR@/check_system.sh
+if test "$1" != "--no-check"
+then
+    . @_BINDIR@/check_system.sh
+else
+    export same_system=1
+fi
+
 if [ $same_system -eq 1 ]; then
 	export SIMPATH="@SIMPATH@"
 	export ROOTSYS="@ROOTSYS@"
