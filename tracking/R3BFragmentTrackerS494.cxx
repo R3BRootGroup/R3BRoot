@@ -275,7 +275,7 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_r = new TH1F("h_py_r", "momentum py right", 1000, -500., 500.);
     fh_pz_r = new TH1F("h_pz_r", "momentum pz right", 2000, 0., 20.);
 
-    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 200, 0., 20);
+    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 600, -10., 50);
     fh_psum = new TH1F("h_psum", "psum / MeV/c", 500, 16000., 18000.);
     fh_theta = new TH1F("h_theta", "theta / deg", 500, 0., 5);
 
@@ -497,7 +497,7 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_p->GetYaxis()->SetTitle("p / GeV/c");
 
     fh_Erel_vs_x =
-        new TH2F("h_Erel_vs_x", "Erel_vs_x", 429, -6.006, 6.006, 200, 0., 20.); // 89, -60, 60.15, 200, 0., 20.);
+        new TH2F("h_Erel_vs_x", "Erel_vs_x", 429, -6.006, 6.006, 200, 0., 20.); // 89, -60, 60.15, 2000, -50., 150.);
     fh_Erel_vs_x->GetXaxis()->SetTitle("x fib23a / cm");
     fh_Erel_vs_x->GetYaxis()->SetTitle("Erel / MeV");
 
@@ -572,7 +572,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug_loopout = false;
+    Bool_t debug_loopout = true;
     Bool_t debug_loopin = false;
     Bool_t bestevents = false;
 

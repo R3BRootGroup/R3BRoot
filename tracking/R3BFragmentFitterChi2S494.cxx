@@ -268,8 +268,11 @@ double Chi2MomentumForward(const double* xx)
                 {
                     chi2temp = 0.;
                 }
-                else
-                    chi2temp = chi2temp * 100.;
+                else 
+                {
+					//cout << "Testcase: " << chi2temp << endl;
+					chi2temp = chi2temp * 100.;
+				}
             }
             else
             {
