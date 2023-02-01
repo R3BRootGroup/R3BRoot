@@ -391,7 +391,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
     Double_t tot[fNofLosDetectors][32][8];
-    Double_t time_MTDC[32][8] = { {0.} };
+    Double_t time_MTDC[32][8] = { { 0. } };
     Double_t LosTresMTDC[32];
 
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
@@ -470,8 +470,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         nPartLOS = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { {0.} };
-        Double_t time_V_LOS2[32][8] = { {0.} };
+        Double_t time_V_LOS1[32][8] = { { 0. } };
+        Double_t time_V_LOS2[32][8] = { { 0. } };
 
         for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
         {

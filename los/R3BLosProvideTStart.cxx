@@ -36,10 +36,10 @@ InitStatus R3BLosProvideTStart::Init()
     fLosCalData.Init();
     fLosTriggerCalData.Init();
 
-    if(fUseTrigHit)
+    if (fUseTrigHit)
     {
-	fLosHitData.Init();
-    	fLosTriggerData.Init();
+        fLosHitData.Init();
+        fLosTriggerData.Init();
     }
 
     auto ioman = FairRootManager::Instance();
@@ -60,15 +60,15 @@ InitStatus R3BLosProvideTStart::Init()
     return kSUCCESS;
 }
 
-void R3BLosProvideTStart::Exec(Option_t*) 
-{ 
-    if(fUseTrigHit)
+void R3BLosProvideTStart::Exec(Option_t*)
+{
+    if (fUseTrigHit)
     {
-        fEventHeader->SetTStart(GetTStartTrigHit()); 
-	return;
+        fEventHeader->SetTStart(GetTStartTrigHit());
+        return;
     }
-	
-	fEventHeader->SetTStart(GetTStart()); 
+
+    fEventHeader->SetTStart(GetTStart());
 }
 
 Double_t R3BLosProvideTStart::GetTStart() const
@@ -79,8 +79,8 @@ Double_t R3BLosProvideTStart::GetTStart() const
     auto T1 = 10240; // TAMEX, range is 2048*5ns
     auto T2 = 40960; // VFTX, range is 40960*5ns
 
-    const int c1 = std::min(T1,T2);
-    const int c2 = std::max(T1,T2);
+    const int c1 = std::min(T1, T2);
+    const int c2 = std::max(T1, T2);
 
     if (losCalData.empty())
     {
@@ -122,12 +122,13 @@ Double_t R3BLosProvideTStart::GetTStartTrigHit() const
     }
     else
     {
-	for (auto it = losHitData.rbegin(); it != losHitData.rend(); ++it)
-	{
-		Double_t tref_t = fTimeStitch->GetTime((*it)->GetTime() - losTriggerData.front()->GetRawTimeNs(), "vftx", "vftx");
-		if(tref_t > edgeL && tref_t < edgeR)
-			return tref_t;
-	}   
+        for (auto it = losHitData.rbegin(); it != losHitData.rend(); ++it)
+        {
+            Double_t tref_t =
+                fTimeStitch->GetTime((*it)->GetTime() - losTriggerData.front()->GetRawTimeNs(), "vftx", "vftx");
+            if (tref_t > edgeL && tref_t < edgeR)
+                return tref_t;
+        }
     }
     return std::numeric_limits<Double_t>::quiet_NaN();
 }

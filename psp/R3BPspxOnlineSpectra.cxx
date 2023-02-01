@@ -105,8 +105,10 @@ InitStatus R3BPspxOnlineSpectra::Init()
     {
         for (Int_t f = 0; f < 2; f++)
         {
-            fMappedItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cMapped", d + 1, c_xy[f]))));
-            fPrecalItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cPrecal", d + 1, c_xy[f]))));
+            fMappedItemsPspx.push_back(
+                dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cMapped", d + 1, c_xy[f]))));
+            fPrecalItemsPspx.push_back(
+                dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cPrecal", d + 1, c_xy[f]))));
             fCalItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cCal", d + 1, c_xy[f]))));
             fHitItemsPspx.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("Pspx%d_%cHit", d + 1, c_xy[f]))));
         }

@@ -18,7 +18,7 @@
 R3BDchDigiPar::R3BDchDigiPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
-  R3BDchDigiPar::clear();
+    R3BDchDigiPar::clear();
 }
 
 void R3BDchDigiPar::putParams(FairParamList* list)

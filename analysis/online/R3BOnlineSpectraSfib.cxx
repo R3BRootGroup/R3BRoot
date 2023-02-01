@@ -946,11 +946,11 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
         // mapping of fired fiber 2019.03.12 J.Tanaka
         Int_t sfib_fired[5] = { -100 }; // sfib_fired[multiplicity]
         Int_t sfib_map[256][256] = {
-            {-100}
+            { -100 }
         }; // convert from Sipm number on top 256 times bot 256 to fiber number 4096. sfib_map[top][bot]
-        Double_t sfib_multi_tot[2][5] = { {-100} };
-        Double_t sfib_tot_fired[2][2048] = { {-100} };
-        Int_t sfib_multi_ch[2][256] = { {-100} };
+        Double_t sfib_multi_tot[2][5] = { { -100 } };
+        Double_t sfib_tot_fired[2][2048] = { { -100 } };
+        Int_t sfib_multi_ch[2][256] = { { -100 } };
         // Double_t sfib_multi_clus_tot[2][5]={-100};
         // Double_t sfib_multi_clus_fired[2][2048]={-100};
 

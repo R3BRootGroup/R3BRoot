@@ -113,7 +113,8 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No " << fInput << "!";
         return kFATAL;
     }
-    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)))->GetClass()->GetName())
+             .EqualTo("R3BNeulandNeutron"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
                    << " does not contain "
@@ -143,7 +144,8 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No MCTrack!";
         return kFATAL;
     }
-    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")))->GetClass()->GetName())
+             .EqualTo("R3BMCTrack"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
                       "does not contain FairMCPoints!";

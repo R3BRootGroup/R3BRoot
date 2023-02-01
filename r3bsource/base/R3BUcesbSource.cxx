@@ -356,9 +356,9 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 //_____________________________________________________________________________
 void R3BUcesbSource::FillEventHeader(FairEventHeader* feh)
 {
-  auto r3beh=dynamic_cast<R3BEventHeader*>(feh);
-  assert(r3beh && "Event header cast failed.");
-  r3beh->SetRunId(fRunId);
+    auto r3beh = dynamic_cast<R3BEventHeader*>(feh);
+    assert(r3beh && "Event header cast failed.");
+    r3beh->SetRunId(fRunId);
 }
 
 ClassImp(R3BUcesbSource);
