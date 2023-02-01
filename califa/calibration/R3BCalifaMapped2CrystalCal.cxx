@@ -253,7 +253,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
                         pow(raw[idx], (fNumParams == 1) ? 1 : p) * fCalParams->GetAt(fNumParams * (crystalId - 1) + p);
                 }
         else
-          for (int idx{}; idx < 3; idx++)
+            for (int idx{}; idx < 3; idx++)
                 cal[idx] = NAN;
 
         double TotCal = Tot;

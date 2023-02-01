@@ -130,15 +130,15 @@ void R3BSci8Cal2Hit::Exec(Option_t* option)
 
     // missing times are NAN, hence other times will also
     // be NAN if one time is missing.
-    Double_t time_V[10][2] = { {0.0 / 0.0} }; // [multihit][pm]
-    Double_t time_L[10][2] = { {0.0 / 0.0} };
-    Double_t time_T[10][2] = { {0.0 / 0.0} };
+    Double_t time_V[10][2] = { { 0.0 / 0.0 } }; // [multihit][pm]
+    Double_t time_L[10][2] = { { 0.0 / 0.0 } };
+    Double_t time_T[10][2] = { { 0.0 / 0.0 } };
     Double_t timeM[10] = { 0.0 };
     Double_t TresM[10] = { 0.0 / 0.0 };
     Double_t timeT[10] = { 0.0 };
     Double_t TresT[10] = { 0.0 / 0.0 };
     Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][2] = { {0.0 / 0.0} };
+    Double_t tot[10][2] = { { 0.0 / 0.0 } };
     Double_t x_cm[10] = { 0.0 / 0.0 };
     Double_t xT_cm[10] = { 0.0 / 0.0 };
     Double_t Z[10] = { 0.0 };

@@ -16,7 +16,6 @@
 // -----      Created January 17th 2023 by N.Mozumdar      -----
 // -------------------------------------------------------------
 
-#include <FairRootManager.h>
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
@@ -34,6 +33,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
+#include <FairRootManager.h>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -213,7 +213,6 @@ InitStatus R3BLosTCal2Hit::Init()
             tot_par[ivec][3] = 1.; // Normalization factor
         }
     }
-
 
     SetParameter();
     return kSUCCESS;
