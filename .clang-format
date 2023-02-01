@@ -111,7 +111,9 @@ SpacesInContainerLiterals: true
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard:        Cpp17
+# Note: Standard: 14, 17 are not supported by
+# clang-format
+Standard:        Cpp11
 TabWidth:        4
 UseTab:          Never
 ...
