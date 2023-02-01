@@ -11,8 +11,16 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/test/testAlpideSimulation.C)
-add_test(NAME AlpideSimulation COMMAND ${R3BROOT_BINARY_DIR}/alpide/test/testAlpideSimulation.sh)
-set_tests_properties(AlpideSimulation PROPERTIES TIMEOUT "2000")
-set_tests_properties(AlpideSimulation PROPERTIES PASS_REGULAR_EXPRESSION
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/target_area_alpide_twoarms_v23.geo.root")
+message(STATUS "Starting to generate the standard root geometry for ALPIDE v23")
+execute_process(COMMAND root -l -q -x ${R3BROOT_SOURCE_DIR}/alpide/geobase/create_target_area_2023_geo.C)
+message(STATUS "${BYellow}ALPIDE v23 standard root geometry has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/target_area_alpide_twoarms_v23.geo.root")
+message(STATUS "${BYellow}ALPIDE v23 standard root geometry already created${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/target_area_alpide_twoarms_v23.geo.root")
+
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/geobase/create_target_area_2023_geo.C)
+add_test(AlpideRootGeometry ${R3BROOT_BINARY_DIR}/alpide/geobase/create_target_area_2023_geo.sh)
+set_tests_properties(AlpideRootGeometry PROPERTIES TIMEOUT "2000")
+set_tests_properties(AlpideRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

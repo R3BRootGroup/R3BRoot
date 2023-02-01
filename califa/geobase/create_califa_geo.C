@@ -13,14 +13,10 @@
 
 // FINAL CALIFA CARREL + iPHOS
 // Usage after loading:
-// create_califa_barrel_iphos_geo(A, B, C)
-// A: geoTag. Name tagging the output root file.
-// B: known alignment for some experiments
+// create_califa_geo_selector(A, B)
+// A: known alignment for some experiments
 //    [nominal, s522, s509, s455, s515, s494, s444, s467]
-// C: File with Installed Crystal
-//    [./califa_AllCrystalsInstalled.txt,
-//     ./califa_InstalledCrystals_March2021.txt,
-//     ./califa_InstalledCrystals_Nov2019.txt]
+// B: geoTag. Name tagging the output root file.
 // Requires file CLF-ALL-oneCrystal.txt for crystals coordinates
 // Requires file CLF-ALL-onePart.txt for alveoli coordinates
 
@@ -33,17 +29,7 @@ const int nbcrystals = 2432;
 
 Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
 
-void create_califa_geo(const char* expNumber = "nominal", TString geoTag = "full");
-
-void create_califa_geo(const int index)
-{
-    if (index == 1)
-        create_califa_geo("s467");
-    else if (index == 2)
-        create_califa_geo("s455");
-}
-
-void create_califa_geo(const char* expNumber, TString geoTag)
+void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTag = "full")
 {
     TGeoRotation* fRefRot = NULL;
     TGeoManager* gGeoMan = NULL;
@@ -114,7 +100,7 @@ void create_califa_geo(const char* expNumber, TString geoTag)
                       << " \033[0m" << std::endl;
         }*/
 
-    TString fFilePath = geoPath + "/macros/r3b/geo/" + installedCrystalsFile;
+    TString fFilePath = geoPath + "/califa/geobase/files/" + installedCrystalsFile;
     fFilePath.ReplaceAll("./", "/");
     fFilePath.ReplaceAll("//", "/");
 
@@ -135,8 +121,8 @@ void create_califa_geo(const char* expNumber, TString geoTag)
 
     ifstream wc1, in1, in2;
     wc1.open(fFilePath.Data());
-    in1.open((geoPath + "/macros/r3b/geo/CLF-ALL-onePart.txt").Data());
-    in2.open((geoPath + "/macros/r3b/geo/CLF-ALL-oneCrystal.txt").Data());
+    in1.open((geoPath + "/califa/geobase/files/CLF-ALL-onePart.txt").Data());
+    in2.open((geoPath + "/califa/geobase/files/CLF-ALL-oneCrystal.txt").Data());
 
     if (wc1.fail())
     {
@@ -840,4 +826,20 @@ Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
             found = kTRUE;
     }
     return found;
+}
+
+void create_califa_geo(const int index=0)
+{
+   if (index == 1)
+   {
+        create_califa_geo_selector("s467");
+   }
+   else if (index == 2)
+   {
+        create_califa_geo_selector("s455");
+   } 
+   else
+   {
+     create_califa_geo_selector();
+   }
 }

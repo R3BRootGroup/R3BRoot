@@ -42,13 +42,6 @@
 #pragma link C++ class R3BMwpc2Mapped2CalPar+;
 #pragma link C++ class R3BMwpc2Cal2Hit+;
 
-#pragma link C++ class R3BMwpc3+;
-#pragma link C++ class R3BMwpc3ContFact+;
-#pragma link C++ class R3BMwpc3CalPar+;
-#pragma link C++ class R3BMwpc3Mapped2Cal+;
-#pragma link C++ class R3BMwpc3Mapped2CalPar+;
-#pragma link C++ class R3BMwpc3Cal2Hit+;
-
 #pragma link C++ class R3BMwpcOnlineSpectra+;
 #pragma link C++ class R3BMwpcCorrelationOnlineSpectra+;
 

@@ -56,11 +56,7 @@ class R3BUcesbSource : public FairSource
      * */
     virtual Bool_t Init();
    
-#ifdef ACTIVATEOVERRIDE
-    virtual Bool_t SpecifyRunId() override;
-#else
     virtual Bool_t SpecifyRunId();
-#endif
     
     virtual Bool_t InitUnpackers();
     virtual void SetParUnpackers();

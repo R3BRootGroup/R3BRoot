@@ -31,13 +31,12 @@ ${R3BROOT_SOURCE_DIR}/mwpc/mwpc3
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 )
 
-if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-#set(WITH_SOFIA true)
+if(WITH_SOFIA)
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/sofia/sofdata/tofwData
 )
-endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+endif(WITH_SOFIA)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -52,19 +51,7 @@ mwpc1/*.cxx
 mwpc2/*.cxx
 digi/*.cxx
 online/*.cxx
-mwpc3/R3BMwpc3.cxx
-mwpc3/R3BMwpc3ContFact.cxx
-mwpc3/R3BMwpc3CalPar.cxx
-mwpc3/R3BMwpc3Mapped2Cal.cxx
-mwpc3/R3BMwpc3Mapped2CalPar.cxx
 )
-
-if(WITH_SOFIA)
-file(GLOB SRCS 
-${SRCS}
-mwpc3/R3BMwpc3Cal2Hit.cxx
-)
-endif(WITH_SOFIA)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -76,6 +63,10 @@ set(DEPENDENCIES
   R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+if(WITH_SOFIA)
+  add_subdirectory(mwpc3)
+endif(WITH_SOFIA)
 
 if(BUILD_GEOMETRY)
   add_subdirectory(geobase)
