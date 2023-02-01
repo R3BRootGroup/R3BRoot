@@ -13,6 +13,7 @@
 
 #include "R3BNeulandTacquilaMapped2QCalPar.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
 #include "R3BNeulandQCalPar.h"

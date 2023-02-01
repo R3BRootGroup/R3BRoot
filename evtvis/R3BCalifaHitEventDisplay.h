@@ -19,7 +19,6 @@
 #ifndef R3BCALIFAHITEVENTDISPLAY_H
 #define R3BCALIFAHITEVENTDISPLAY_H
 
-#include "FairMCTracks.h"
 #include "FairTask.h"
 
 #include "TEveCalo.h"

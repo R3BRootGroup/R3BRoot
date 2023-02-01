@@ -13,6 +13,7 @@
 
 #include "R3BFiberMAPMTMapped2CalPar.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BFiberMAPMTMappedData.h"
 #include "R3BTCalEngine.h"
@@ -21,9 +22,9 @@
 #include <cassert>
 
 R3BFiberMAPMTMapped2CalPar::R3BFiberMAPMTMapped2CalPar(const char* a_name,
-                                                           Int_t a_verbose,
-                                                           Int_t a_update_rate,
-                                                           Int_t a_min_stats)
+                                                       Int_t a_verbose,
+                                                       Int_t a_update_rate,
+                                                       Int_t a_min_stats)
     : FairTask(TString("R3B") + a_name + "Mapped2CalPar", a_verbose)
     , fName(a_name)
     , fUpdateRate(a_update_rate)
@@ -62,7 +63,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            LOG(ERROR) << "Could not get " << name << '.';                             \
+            LOG(error) << "Could not get " << name << '.';                             \
             abort();                                                                   \
             return kFATAL;                                                             \
         }                                                                              \
@@ -84,9 +85,10 @@ void R3BFiberMAPMTMapped2CalPar::Exec(Option_t* option)
         assert(mapped);
         if (!mapped->IsTrigger())
         {
-            fMAPMTEngine->Fill(1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), mapped->GetSide()+1, mapped->GetFine());
+            fMAPMTEngine->Fill(
+                1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), mapped->GetSide() + 1, mapped->GetFine());
         }
-        else 
+        else
         {
             fMAPMTTrigEngine->Fill(1, mapped->GetChannel(), 1, mapped->GetFine());
         }

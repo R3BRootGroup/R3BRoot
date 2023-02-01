@@ -30,19 +30,19 @@ Bool_t R3BTofUnpack::Init() { return kTRUE; }
 
 Bool_t R3BTofUnpack::DoUnpack(Int_t* data, Int_t size)
 {
-    LOG(INFO) << "R3BTofUnpack : Unpacking " << size << " double words of data ...";
+    LOG(info) << "R3BTofUnpack : Unpacking " << size << " double words of data ...";
 
     // Clear data map
     fmap_leading_t.clear();
     fmap_leading_c.clear();
 
     // Produce hex output
-    LOG(INFO) << "!!!!!!! " << std::hex;
+    LOG(info) << "!!!!!!! " << std::hex;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << data[i] << " ";
+        LOG(info) << data[i] << " ";
     }
-    LOG(INFO) << std::dec;
+    LOG(info) << std::dec;
 
     // Loop over double words of input data
     for (Int_t i = 1; i < size; i++)
@@ -63,7 +63,7 @@ Bool_t R3BTofUnpack::DoUnpack(Int_t* data, Int_t size)
         UInt_t l_i = 0;
 
         UInt_t nr_cha = 0x1ff & (p1[l_i] >> 9);
-        LOG(INFO) << "R3BTofUnpack : Number of raw channels to read: " << nr_cha;
+        LOG(info) << "R3BTofUnpack : Number of raw channels to read: " << nr_cha;
 
         if (nr_cha)
         {
@@ -124,12 +124,12 @@ Bool_t R3BTofUnpack::DoUnpack(Int_t* data, Int_t size)
             c_leading = fmap_leading_c[i];
             t_trailing = fmap_trailing_t[i];
             c_trailing = fmap_trailing_c[i];
-            LOG(INFO) << "######### ch:" << i << ", Leading: tdc=" << t_leading << ", clock=" << c_leading
+            LOG(info) << "######### ch:" << i << ", Leading: tdc=" << t_leading << ", clock=" << c_leading
                       << ";   Trailing: tdc=" << t_trailing << ",  clock=" << c_trailing;
         }
     }
 
-    LOG(INFO) << "R3BTofUnpack : Number of hits in TFW: " << nhits;
+    LOG(info) << "R3BTofUnpack : Number of hits in TFW: " << nhits;
 
     return kTRUE;
 }

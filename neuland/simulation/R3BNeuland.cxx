@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BNeuland.h"
+#include "FairRootManager.h"
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "R3BMCStack.h"
@@ -85,7 +86,7 @@ R3BNeuland::~R3BNeuland()
 
 void R3BNeuland::Initialize()
 {
-    LOG(INFO) << "R3BNeuland initialization ...";
+    LOG(info) << "R3BNeuland initialization ...";
 
     FairDetector::Initialize();
 
@@ -100,7 +101,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     {
         if (!fLastHitDone)
         {
-            LOG(WARNING) << "R3BNeuland: Incomplete hit discarded";
+            LOG(warning) << "R3BNeuland: Incomplete hit discarded";
             ResetValues();
         }
 
@@ -133,7 +134,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
         gMC->TrackMomentum(fMomOut);
 
         // Add Point
-        LOG(DEBUG) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
+        LOG(debug) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
                    << ") cm,  paddle " << fPaddleID << ", track " << fTrackID << ", energy loss " << fELoss << " GeV "
                    << gMC->GetStack()->GetCurrentParentTrackNumber();
 
@@ -184,7 +185,7 @@ void R3BNeuland::Register()
 
 void R3BNeuland::Print(Option_t*) const
 {
-    LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
+    LOG(info) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
 }
 
 void R3BNeuland::Reset()

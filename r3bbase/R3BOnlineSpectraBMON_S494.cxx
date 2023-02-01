@@ -44,11 +44,11 @@
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
+#include "TDatime.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
-#include "TDatime.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -113,7 +113,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraBMON_S494::Init ";
+    LOG(info) << "R3BOnlineSpectraBMON_S494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -146,7 +146,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     fTrloiiItems = (TClonesArray*)mgr->GetObject("TrloiiData");
     if (!fTrloiiItems)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: fTrloiiItems not found"; // return kFATAL;
+        LOG(warning) << "R3BOnlineSpectra: fTrloiiItems not found"; // return kFATAL;
     }
 
     maxevent = mgr->CheckMaxEventNo();
@@ -415,7 +415,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
@@ -612,7 +612,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             IC = hit->GetIC(); // negative values if offset not high enough
             counts_IC += (double)IC;
 
-            if(hit->GetSEETRAM() != 0) SEETRAM_raw = hit->GetSEETRAM();           // raw counts
+            if (hit->GetSEETRAM() != 0)
+                SEETRAM_raw = hit->GetSEETRAM();       // raw counts
             SEETRAM = (double)SEETRAM_raw * calib_SEE; // calibrated SEETRAM counts
             // cout<<SEETRAM_raw<<" "<<calib_SEE<<" "<<SEETRAM<<"\n";
             counts_SEE += SEETRAM;
@@ -620,7 +621,8 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             TOFDOR = hit->GetTOFDOR(); // only positive values possible
             counts_TofD += TOFDOR;
 
-            if (fNEvents == fNEvents_start) // this counts the number of incoming particles until we receive the first spill start signal
+            if (fNEvents == fNEvents_start) // this counts the number of incoming particles until we receive the first
+                                            // spill start signal
             {
                 see_start = SEETRAM;
                 ic_start = IC;
@@ -1077,14 +1079,15 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     cout << " " << endl;
     cout << "nEvents total " << fNEvents << endl;
     cout << "nEvents Rolu " << fNEventsRolu << endl;
-    cout << "Time_start      : " << time_begin << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear()
-                     << " " << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
+    cout << "Time_start      : " << time_begin << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear() << " "
+         << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
     t.Set(time_end / 1e9);
-    cout << "Time end        : " << time_end << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear()
-                     << " " << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
+    cout << "Time end        : " << time_end << ": " << t.GetDay() << "." << t.GetMonth() << "." << t.GetYear() << " "
+         << t.GetHour() << ":" << t.GetMinute() << ":" << t.GetSecond() << endl;
     cout << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec" << endl;
     cout << "nSpill          : " << fNSpills << endl;
-    cout << "Total num of 16O in last complete spill: " << nBeamParticle << " include events of last incomplete spill: " << ySEE << endl;
+    cout << "Total num of 16O in last complete spill: " << nBeamParticle
+         << " include events of last incomplete spill: " << ySEE << endl;
     for (Int_t i = 4; i < 8; i++)
     {
         cout << "Counters for Tpat  " << i + 1 << " => BDT= " << SumBDT[i] << ", ADT= " << SumADT[i]

@@ -37,7 +37,7 @@ const char* R3BGeoTofd::getModuleName(Int_t m)
     // Returns the module name of sts number m
     if (m < 0)
     {
-        LOG(ERROR) <<"R3BGeoTofd::getModuleName:: Module number " << m << " not known!";
+        LOG(error) << "R3BGeoTofd::getModuleName:: Module number " << m << " not known!";
         return "";
     }
     if (m < 9)

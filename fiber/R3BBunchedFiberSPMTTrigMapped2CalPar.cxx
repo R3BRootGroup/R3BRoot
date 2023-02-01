@@ -13,6 +13,7 @@
 
 #include "R3BBunchedFiberSPMTTrigMapped2CalPar.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BBunchedFiberMappedData.h"
 #include "R3BTCalEngine.h"

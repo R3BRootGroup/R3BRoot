@@ -12,6 +12,8 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
+#include "FairRootManager.h"
+
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"

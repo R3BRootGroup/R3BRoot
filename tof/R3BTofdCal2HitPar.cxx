@@ -164,7 +164,7 @@ InitStatus R3BTofdCal2HitPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdCal2HitPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdCal2HitPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
@@ -181,7 +181,7 @@ void R3BTofdCal2HitPar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdCal2HitPar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //	    fCal_Par->setChanged();
 }
@@ -300,13 +300,13 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -352,7 +352,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
@@ -599,19 +599,19 @@ void R3BTofdCal2HitPar::calcOffset()
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 if (fhTdiff[i][j]) {
-                    LOG(WARNING) << " Plane "<< i+1<<" Bar "<< j+1;
+                    LOG(warning) << " Plane "<< i+1<<" Bar "<< j+1;
                     nfound=0;
                     TH1F *h = (TH1F*) fhTdiff[i][j]->Clone("h");
                     h->Draw();
                     TSpectrum *s = new TSpectrum(2*npeaks);
-                    LOG(DEBUG) << " Search for peaks ";
+                    LOG(debug) << " Search for peaks ";
                     nfound = s->Search(h,sigma,"", sens);
-                    LOG(DEBUG) << " Found "<< nfound<<" peaks.";
+                    LOG(debug) << " Found "<< nfound<<" peaks.";
 
                     Double_t *xpeaks = s->GetPositionX();
                     for (Int_t p=0;p<nfound;p++) {
                         xp = xpeaks[p];
-                        LOG(WARNING) << " Position "<< xp;
+                        LOG(warning) << " Position "<< xp;
                     }
                  }
              }
@@ -632,7 +632,7 @@ void R3BTofdCal2HitPar::calcOffset()
                 Double_t veff = mpar->GetVeff();
                 Int_t binmax = histo_py->GetMaximumBin();
                 offset = histo_py->GetXaxis()->GetBinCenter(binmax);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
                 mpar->SetPlane(i + 1);
                 mpar->SetPaddle(j + 1);
                 mpar->SetOffset1(-offset / 2.);
@@ -665,7 +665,7 @@ void R3BTofdCal2HitPar::calcSync()
                 par->SetOffset1(offset1);
                 par->SetOffset2(offset2);
                 par->SetSync(sync);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
     }
@@ -686,7 +686,7 @@ void R3BTofdCal2HitPar::calcVeff()
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                    LOG(info) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
                     continue;
                 }
 
@@ -700,9 +700,9 @@ void R3BTofdCal2HitPar::calcVeff()
 
                 max = max + offset1 - offset2;
                 veff = fTofdY / max; // effective speed of light in [cm/s]
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
                 par->SetVeff(veff);
             }
         }

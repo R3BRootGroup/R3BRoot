@@ -18,6 +18,7 @@
 
 #include "R3BSci8Cal2Hit.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "R3BSci8CalData.h"
 #include "R3BSci8HitData.h"
 #include "R3BSci8Mapped2Cal.h"

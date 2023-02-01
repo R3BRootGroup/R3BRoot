@@ -81,7 +81,7 @@ InitStatus R3BPtofMapped2CalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BPtofMapped2CalPar::Init() Couldn't get handle on PtofTCalPar. ";
+        LOG(error) << "R3BPtofMapped2CalPar::Init() Couldn't get handle on PtofTCalPar. ";
         return kFATAL;
     }
 

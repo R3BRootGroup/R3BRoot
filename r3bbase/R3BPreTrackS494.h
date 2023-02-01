@@ -190,13 +190,14 @@ class R3BPreTrackS494 : public FairTask
         DET_FI33,
         DET_FI_LAST = DET_FI33,
         DET_TOFD,
+        DET_TOFI,
         DET_MAX
     };
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
     const char* fDetectorNames[DET_MAX + 1] = { "Califa", "BeamMonitor", "Rolu", "Fi23a", "Fi23b", "Fi30",
-                                                "Fi31",   "Fi32",        "Fi33", "Tofd", NULL };
+                                                "Fi31",   "Fi32",        "Fi33", "Tofd",  "Tofi", NULL };
 
     // If FiberI is present or not:
     Int_t ifibdet;
@@ -262,8 +263,6 @@ class R3BPreTrackS494 : public FairTask
 	Double_t mC = 11174.950;
 	
 	Int_t Q = 0;
-	Double_t tPrev[10];
-	Int_t detPrev[10];
 	
 	Int_t counter1 = 0, counterwo=0;
 	Int_t counter1mem = 0;
@@ -271,6 +270,7 @@ class R3BPreTrackS494 : public FairTask
 	Int_t counter3 = 0;
 	Int_t counter4 = 0;
 	Int_t counterTofd = 0;
+	Int_t counterTofi = 0;
 	Int_t counterTofdMulti = 0;
 	Int_t counterCalifa = 0;
 	Int_t counterWrongTpat = 0;
@@ -425,6 +425,19 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_tofd_x_vs_y_z[6];
 	TH2F* fh_qsum_mult_fi23a;
 	TH2F* fh_qsum_mult_fi23b;
+	
+	TH1F* fh_tofi_mult;
+    TH2F* fh_tofi_time;
+    TH2F* fh_tofi_charge;
+    TH2F* fh_xy_tofi;
+    TH2F* fh_tofi_tofd_x;
+    TH2F* fh_tofi_tofd_y;
+    TH2F* fh_tofi_tofd_Q;
+    TH2F* fh_tofi_tofd_t;
+    TH2F* fh_tofi_fi23a_x;
+    TH2F* fh_tofi_fi23a_t;
+    TH2F* fh_tofi_fi23b_y;
+    TH2F* fh_tofi_fi23b_t;
 
 	
   public:

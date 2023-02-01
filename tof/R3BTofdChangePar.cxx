@@ -98,7 +98,7 @@ InitStatus R3BTofdChangePar::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
-        std::cout<<"no manager\n";
+        std::cout << "no manager\n";
         return kFATAL;
     }
 
@@ -108,13 +108,13 @@ InitStatus R3BTofdChangePar::Init()
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
     if (!fCalData)
     {
-        std::cout<<"no CalData\n";
+        std::cout << "no CalData\n";
         return kFATAL;
     }
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdChangePar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdChangePar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -128,7 +128,7 @@ void R3BTofdChangePar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdChangePar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdChangePar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //	    fCal_Par->setChanged();
 }
@@ -187,7 +187,7 @@ void R3BTofdChangePar::FinishTask()
             if (p == 6)
                 changeDoubleExp(plane, bar, pm, pars);
             if (p == 7)
-                changePol3(plane, bar, pm, pars);                
+                changePol3(plane, bar, pm, pars);
             if (p == 8)
                 changeZ(plane, bar, pm, pars);
             if (p == 9)

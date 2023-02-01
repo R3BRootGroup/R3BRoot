@@ -25,6 +25,7 @@
 #include "R3BPdcMappedData.h"
 #include "R3BTCalEngine.h"
 
+#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 
 extern "C"
@@ -70,11 +71,11 @@ InitStatus R3BPdcMapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container PdcTCalPar";
+        LOG(error) << "There are no TCal parameters in container PdcTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BPdcMapped2Cal::Init : read " << fNofTcalPars << " modules";
+    LOG(info) << "R3BPdcMapped2Cal::Init : read " << fNofTcalPars << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -100,7 +101,7 @@ void R3BPdcMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PdcTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to PdcTCalPar-Container.";
+        LOG(error) << "Could not get access to PdcTCalPar-Container.";
         fNofTcalPars = 0;
     }
 }
@@ -114,14 +115,14 @@ InitStatus R3BPdcMapped2Cal::ReInit()
 void R3BPdcMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BPdcMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BPdcMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BPdcMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto wire = mapped->GetWireId();
-        LOG(DEBUG) << " R3BPdcMapped2Cal::Exec:wire=" << wire
+        LOG(debug) << " R3BPdcMapped2Cal::Exec:wire=" << wire
                    << ":Edge=" << (mapped->GetEdgeId() == 1 ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -142,18 +143,18 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BPdcMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BPdcMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
+            LOG(error) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }
 
         time_ns = mapped->GetTimeCoarse() * fClockFreq - fine_ns;
 
-        // LOG(DEBUG) << " R3BPdcMapped2Cal::Exec (" << fName << "): wire=" << wire
+        // LOG(debug) << " R3BPdcMapped2Cal::Exec (" << fName << "): wire=" << wire
         //               << ": Time=" << time_ns << "ns.";
 
         // cout << "mapped2cal plane: " << mapped->GetPlaneId() << " Wire: " << mapped->GetWireId()

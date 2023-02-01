@@ -85,7 +85,7 @@ R3BAmsCalifaCorrelatedOnlineSpectra::~R3BAmsCalifaCorrelatedOnlineSpectra() {}
 InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init ";
+    LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -104,21 +104,21 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
     if (!fHitItemsAms)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
     }
 
     // get access to Hit data
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
     if (!fHitItemsCalifa)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaHitData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaHitData not found";
     }
 
     // get access to Hit data
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
     if (!fCalItemsLos)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
     }
 
     // CANVAS 7
@@ -303,7 +303,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
 
 void R3BAmsCalifaCorrelatedOnlineSpectra::Reset_AMS_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo";
+    LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo";
 
     fh_Califa_coinc_petal1->Reset();
     fh_Califa_coinc_petal2->Reset();

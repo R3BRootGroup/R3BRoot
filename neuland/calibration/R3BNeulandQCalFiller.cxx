@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BNeulandQCalFiller.h"
+#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BNeulandTacquilaMappedData.h"
 #include "TClonesArray.h"

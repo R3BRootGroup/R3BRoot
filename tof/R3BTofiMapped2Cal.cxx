@@ -33,6 +33,7 @@
 #include "TMath.h"
 
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 
 #include "R3BTCalEngine.h"
@@ -102,11 +103,11 @@ InitStatus R3BTofiMapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container TofiTCalPar";
+        LOG(error) << "There are no TCal parameters in container TofiTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BTofiMapped2Cal::Init : read " << fNofTcalPars << " modules";
+    LOG(info) << "R3BTofiMapped2Cal::Init : read " << fNofTcalPars << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -135,7 +136,7 @@ void R3BTofiMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofiTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to TofiTCalPar-Container.";
+        LOG(error) << "Could not get access to TofiTCalPar-Container.";
         fNofTcalPars = 0;
     }
 }
@@ -178,12 +179,12 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
 
         if ((mapped->GetDetectorId() < 1) || (mapped->GetDetectorId() > fNofPlanes))
         {
-            LOG(DEBUG) << "R3BTofiMapped2Cal::Exec : Plane number out of range: " << mapped->GetDetectorId();
+            LOG(debug) << "R3BTofiMapped2Cal::Exec : Plane number out of range: " << mapped->GetDetectorId();
             continue;
         }
         if ((mapped->GetBarId() < 1) || (mapped->GetBarId() > fPaddlesPerPlane))
         {
-            LOG(DEBUG) << "R3BTofiMapped2Cal::Exec : Bar number out of range: " << mapped->GetBarId() << ", "
+            LOG(debug) << "R3BTofiMapped2Cal::Exec : Bar number out of range: " << mapped->GetBarId() << ", "
                        << fPaddlesPerPlane;
             continue;
         }
@@ -193,7 +194,7 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
             mapped->GetDetectorId(), mapped->GetBarId(), 2 * mapped->GetSideId() + mapped->GetEdgeId() - 2);
         if (!par)
         {
-            LOG(ERROR) << "R3BTofiMapped2Cal::Exec : Tcal par not found, Plane: " << mapped->GetDetectorId()
+            LOG(error) << "R3BTofiMapped2Cal::Exec : Tcal par not found, Plane: " << mapped->GetDetectorId()
                        << ", Bar: " << mapped->GetBarId() << ", Side: " << mapped->GetSideId()
                        << ", Edge: " << mapped->GetEdgeId();
             continue;
@@ -225,9 +226,9 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
         auto& ch = *it;
         if (ch.empty())
             continue;
-         //for (auto it2 = ch.begin(); ch.end() != it2; ++it2) {
-         //std::cout << it2->mapped->GetEdgeId() << ": " << it2->time_ns << '\n';
-         //}
+        // for (auto it2 = ch.begin(); ch.end() != it2; ++it2) {
+        // std::cout << it2->mapped->GetEdgeId() << ": " << it2->time_ns << '\n';
+        //}
         size_t lead_i = 0;
         size_t trail_i;
         for (trail_i = 0; trail_i < ch.size() && 2 != ch.at(trail_i).mapped->GetEdgeId(); ++trail_i)
@@ -295,7 +296,7 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {
-            LOG(DEBUG) << "R3BTofiMapped2Cal::Exec : Trigger plane number out of range: " << mapped->GetDetectorId();
+            LOG(debug) << "R3BTofiMapped2Cal::Exec : Trigger plane number out of range: " << mapped->GetDetectorId();
             continue;
         }
 
@@ -303,7 +304,7 @@ void R3BTofiMapped2Cal::Exec(Option_t* option)
         auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), 1);
         if (!par)
         {
-            LOG(INFO) << "R3BTofiMapped2Cal::Exec : Trigger Tcal par not found, Plane: " << mapped->GetDetectorId()
+            LOG(info) << "R3BTofiMapped2Cal::Exec : Trigger Tcal par not found, Plane: " << mapped->GetDetectorId()
                       << ", Bar: " << mapped->GetBarId();
             continue;
         }

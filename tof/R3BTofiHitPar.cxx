@@ -36,7 +36,7 @@ R3BTofiHitPar::~R3BTofiHitPar()
 
 void R3BTofiHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTofiHitPar::putParams() called";
+    LOG(info) << "R3BTofiHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -62,13 +62,13 @@ void R3BTofiHitPar::clear() {}
 void R3BTofiHitPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " Time Calib. Parameters -------------  ";
+    LOG(info) << " -----------  " << GetName() << " Time Calib. Parameters -------------  ";
 
-    LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries();
+    LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
         R3BTofiHitModulePar* t_par = (R3BTofiHitModulePar*)fHitParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();
@@ -96,14 +96,14 @@ R3BTofiHitModulePar* R3BTofiHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
             tpaddle = par->GetPaddle();
             if (tplane < 1 || tplane > N_TOFI_HIT_PLANE_MAX || tpaddle < 1 || tpaddle > N_TOFI_HIT_PADDLE_MAX)
             {
-                LOG(ERROR) << "R3BTofiHitPar::GetModuleParAt : error in plane/paddle indexing. " << tplane << " / "
+                LOG(error) << "R3BTofiHitPar::GetModuleParAt : error in plane/paddle indexing. " << tplane << " / "
                            << tpaddle;
                 continue;
             }
             index = (tplane - 1) * N_TOFI_HIT_PADDLE_MAX + tpaddle - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BTofiHitPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
+                LOG(error) << "R3BTofiHitPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
                            << tpaddle;
                 continue;
             }
@@ -114,14 +114,14 @@ R3BTofiHitModulePar* R3BTofiHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
 
     if (plane < 1 || plane > N_TOFI_HIT_PLANE_MAX || paddle < 1 || paddle > N_TOFI_HIT_PADDLE_MAX)
     {
-        LOG(ERROR) << "R3BTofiHitPar::GetModuleParAt : error in plane/paddle indexing. " << plane << " / " << paddle;
+        LOG(error) << "R3BTofiHitPar::GetModuleParAt : error in plane/paddle indexing. " << plane << " / " << paddle;
         return NULL;
     }
     Int_t index = (plane - 1) * N_TOFI_HIT_PADDLE_MAX + paddle - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        LOG(WARNING) << "R3BTofiHitPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle;
+        LOG(warning) << "R3BTofiHitPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle;
         return NULL;
     }
     Int_t arind = fIndexMap[index];

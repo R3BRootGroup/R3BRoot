@@ -15,6 +15,15 @@
 #define R3BSTRAWTUBESMAPPED2CAL
 
 #include "FairTask.h"
+#include <array>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include "TCutG.h"
+
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <cstdlib>
 
 class R3BTCalPar;
 

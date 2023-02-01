@@ -18,6 +18,7 @@
 
 #include "FairTask.h"
 #include <list>
+#include "TClonesArray.h"
 
 class TH1F;
 class TH2F;

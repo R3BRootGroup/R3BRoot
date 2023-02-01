@@ -15,6 +15,7 @@
 #define R3BNEULANDMAPPED2CALPAR_H
 
 #include "FairTask.h"
+#include "TClonesArray.h"
 
 class R3BTCalPar;
 class R3BEventHeader;

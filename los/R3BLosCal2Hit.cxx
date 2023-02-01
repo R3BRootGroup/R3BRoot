@@ -18,6 +18,7 @@
 
 #include "R3BLosCal2Hit.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
@@ -326,13 +327,13 @@ InitStatus R3BLosCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
-        LOG(ERROR) << "Branch LosCal not found";
+        LOG(error) << "Branch LosCal not found";
 
     // request storage of Hit data in output tree
     mgr->Register("LosHit", "Land", fHitItems, kTRUE);
@@ -647,7 +648,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                     {
                         time_V[iDetcount - 1][iPart][ipm] = time_V_LOS1[iPart][ipm];
                         //	cout<<"Test_sort Det1"<<Icount<<"; "<<nPartLos[iDetcount-1]<<", "<<ipm <<"  "<<iPart<<"  "<<
-                        //time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
+                        // time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
                     }
                 }
             }
@@ -671,7 +672,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                 {
                     time_V[iDetcount - 1][iPart][ipm] = time_V_LOS2[iPart][ipm];
                     //	cout<<"Test_sort Det2"<<Icount<<"; "<<nPartLos[iDetcount-1]<<", "<<ipm <<"  "<<iPart<<"  "<<
-                    //time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
+                    // time_V_LOS1[iPart][ipm]<<", "<<time_V[iDetcount-1][iPart][ipm]<<endl;
                 }
             }
         }

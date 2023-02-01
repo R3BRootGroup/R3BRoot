@@ -36,7 +36,7 @@ R3BFiberMAPMTHitPar::~R3BFiberMAPMTHitPar()
 
 void R3BFiberMAPMTHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFiberMAPMTHitPar::putParams() called";
+    LOG(info) << "R3BFiberMAPMTHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -62,13 +62,13 @@ void R3BFiberMAPMTHitPar::clear() {}
 void R3BFiberMAPMTHitPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " Fiber Hit Parameters -------------  ";
+    LOG(info) << " -----------  " << GetName() << " Fiber Hit Parameters -------------  ";
 
-    LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries();
+    LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
         R3BFiberMAPMTHitModulePar* t_par = (R3BFiberMAPMTHitModulePar*)fHitParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();
@@ -94,13 +94,13 @@ R3BFiberMAPMTHitModulePar* R3BFiberMAPMTHitPar::GetModuleParAt(Int_t fiber)
             tFiber = par->GetFiber();
             if (tFiber < 1 || tFiber > N_FIBER_MAX)
             {
-                LOG(ERROR) << "R3BFiberMAPMTHitPar::GetModuleParAt : error in fiber indexing. " << tFiber;
+                LOG(error) << "R3BFiberMAPMTHitPar::GetModuleParAt : error in fiber indexing. " << tFiber;
                 continue;
             }
             index = tFiber - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BFiberMAPMTHitPar::GetModuleParAt : parameter found more than once. " << tFiber;
+                LOG(error) << "R3BFiberMAPMTHitPar::GetModuleParAt : parameter found more than once. " << tFiber;
                 continue;
             }
             fIndexMap[index] = i;
@@ -110,14 +110,14 @@ R3BFiberMAPMTHitModulePar* R3BFiberMAPMTHitPar::GetModuleParAt(Int_t fiber)
 
     if (fiber < 1 || fiber > N_FIBER_MAX)
     {
-        LOG(ERROR) << "R3BFiberMAPMTHitPar::GetModuleParAt : error in fiber indexing. " << fiber;
+        LOG(error) << "R3BFiberMAPMTHitPar::GetModuleParAt : error in fiber indexing. " << fiber;
         return NULL;
     }
     Int_t index = fiber - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        LOG(WARNING) << "R3BFiberMAPMTHitPar::GetModuleParAt : parameter not found for: " << fiber;
+        LOG(warning) << "R3BFiberMAPMTHitPar::GetModuleParAt : parameter not found for: " << fiber;
         return NULL;
     }
     Int_t arind = fIndexMap[index];

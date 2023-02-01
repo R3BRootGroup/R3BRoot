@@ -36,9 +36,9 @@ R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar()
     //    , fNofPMTs(0)
     , fNEvents(0)
     , fCal_Par(NULL)
+// , fHits
 {
 }
-
 R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMinStats(100000)
@@ -46,9 +46,9 @@ R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar(const char* name, Int_t iVerbos
     //, fNofPMTs(0)
     , fNEvents(0)
     , fCal_Par(NULL)
+// , fHits
 {
 }
-
 R3BNeulandMapped2CalPar::~R3BNeulandMapped2CalPar()
 {
     if (fCal_Par)

@@ -45,7 +45,7 @@ const char* R3BGeoTofi::getModuleName(Int_t m)
     }
     if (m < 9)
         sprintf(modName, "calstation0%i", m + 1);
-    else
+    else if (m > 8 && m < 99)
         sprintf(modName, "calstation%i", m + 1);
     return modName;
 }

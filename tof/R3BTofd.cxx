@@ -82,13 +82,13 @@ void R3BTofd::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BTofd: initialisation";
-    LOG(DEBUG) << "R3BTofd: Sci. Vol. (McId0) " << gMC->VolId("TOFdLog101");
+    LOG(info) << "R3BTofd: initialisation";
+    LOG(debug) << "R3BTofd: Sci. Vol. (McId0) " << gMC->VolId("TOFdLog101");
 }
 
 void R3BTofd::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BTofd: Adding customized Physics cut ... ";
+    LOG(info) << "-I- R3BTofd: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -112,7 +112,7 @@ void R3BTofd::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BTofd: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+            LOG(info) << "-I- R3BTofd: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
                       << " GeV";
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE);
@@ -273,7 +273,7 @@ TClonesArray* R3BTofd::GetCollection(Int_t iColl) const
 void R3BTofd::Print(Option_t* option) const
 {
     Int_t nHits = fTofdCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTofd: " << nHits << " points registered in this event";
+    LOG(info) << "R3BTofd: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -289,7 +289,7 @@ void R3BTofd::Reset()
 void R3BTofd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTofd: " << nEntries << " entries to add";
+    LOG(info) << "R3BTofd: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BTofdPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -300,7 +300,7 @@ void R3BTofd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTofd: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BTofd: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -317,7 +317,7 @@ R3BTofdPoint* R3BTofd::AddHit(Int_t trackID,
     TClonesArray& clref = *fTofdCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BTofd: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BTofd: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BTofdPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

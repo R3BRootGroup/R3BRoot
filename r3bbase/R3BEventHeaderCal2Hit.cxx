@@ -17,6 +17,7 @@
 // ------------------------------------------------------------
 
 #include "R3BEventHeaderCal2Hit.h"
+#include "FairRootManager.h"
 
 R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit(int a_verbose)
     : FairTask("R3BEventHeaderCal2Hit", a_verbose)
@@ -25,25 +26,19 @@ R3BEventHeaderCal2Hit::R3BEventHeaderCal2Hit(int a_verbose)
 {
 }
 
-R3BEventHeaderCal2Hit::~R3BEventHeaderCal2Hit()
-{
-    delete fHeader;
-}
+R3BEventHeaderCal2Hit::~R3BEventHeaderCal2Hit() { delete fHeader; }
 
 InitStatus R3BEventHeaderCal2Hit::Init()
 {
     FairRootManager* mgr = FairRootManager::Instance();
-    fHeader = (R3BEventHeader *)mgr->GetObject("R3BEventHeader");
+    fHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     mgr->Register("R3BEventHeaderCal2Hit", "EventHeader", fHeader, kTRUE);
     return kSUCCESS;
 }
 
 void R3BEventHeaderCal2Hit::SetParContainers() {}
 
-InitStatus R3BEventHeaderCal2Hit::ReInit()
-{
-    return kSUCCESS;
-}
+InitStatus R3BEventHeaderCal2Hit::ReInit() { return kSUCCESS; }
 
 void R3BEventHeaderCal2Hit::Exec(Option_t* option) {}
 

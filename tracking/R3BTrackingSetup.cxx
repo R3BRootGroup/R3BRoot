@@ -52,7 +52,7 @@ R3BTrackingDetector* R3BTrackingSetup::GetByName(const string& name)
 {
     if (fMapIndex.find(name) == fMapIndex.end())
     {
-        LOG(ERROR) << "Detector " << name << " was not found in setup.";
+        LOG(error) << "Detector " << name << " was not found in setup.";
         return nullptr;
     }
 

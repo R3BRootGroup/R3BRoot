@@ -17,6 +17,7 @@
 #include "FairTask.h"
 
 #include <R3BTCalEngine.h>
+#include "TClonesArray.h"
 
 #include <list>
 

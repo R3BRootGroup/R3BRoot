@@ -114,7 +114,7 @@ InitStatus R3BLosCal2HitPar::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BLosCal2HitPar::Init ";
+    LOG(info) << "R3BLosCal2HitPar::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -126,7 +126,7 @@ InitStatus R3BLosCal2HitPar::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItems)
-        LOG(ERROR) << "Branch LosCal not found";
+        LOG(error) << "Branch LosCal not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -192,7 +192,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
@@ -206,7 +206,7 @@ void R3BLosCal2HitPar::Exec(Option_t* option)
     if (fTpat_bit >= 0)
     {
         itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+        tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if ((tpatvalue == 0))
             return;
     }
@@ -581,7 +581,7 @@ void R3BLosCal2HitPar::FinishTask()
     }
 
     for (Int_t k = 0; k < NPAR; k++)
-        cout << setprecision(10) << k << " " << params[k] << " " << step[k] << endl;
+        cout << k << " " << params[k] << " " << step[k] << endl;
 
     // Choose method upon creation between:
     // Migrad, Simplex, Combined,
@@ -639,7 +639,7 @@ void R3BLosCal2HitPar::FinishTask()
     // 1 - covariance only approximate
     // 2 - full matrix but forced pos def
     // 3 - full accurate matrix
-    cout << setprecision(10) << "CovMatrixStatus = " << cmStatus << endl;
+    cout << "CovMatrixStatus = " << cmStatus << endl;
 
     double corr[6];
     for (Int_t i = 0; i < NPAR - 1; i++)
@@ -652,7 +652,7 @@ void R3BLosCal2HitPar::FinishTask()
     }
 
     int fitStatus = min->Status();
-    cout << setprecision(10) << "Fit status = " << fitStatus << endl;
+    cout << "Fit status = " << fitStatus << endl;
 
     cout << " " << endl;
 
@@ -676,7 +676,7 @@ void R3BLosCal2HitPar::FinishTask()
 
     cout << "Minimum: f " << calc_time_residual(xs) << " using " << fNEvents << " events." << endl;
     for (Int_t k = 0; k < NPAR; k++)
-        cout << setprecision(10) << " par" << k << "=" << xs[k] << ", error= " << err[k] << endl;
+        cout << " par" << k << "=" << xs[k] << ", error= " << err[k] << endl;
     cout << endl;
 
     // expected minimum is 0
@@ -696,11 +696,10 @@ void R3BLosCal2HitPar::FinishTask()
     {
         cout << "Output file open" << endl;
 
-        out << setprecision(10) << "Fmin= " << fmin << "; Edm= " << edm << "; Function called " << ncall << " times."
-            << endl;
+        out << "Fmin= " << fmin << "; Edm= " << edm << "; Function called " << ncall << " times." << endl;
 
         for (Int_t k = 0; k < NPAR; k++)
-            out << setprecision(10) << k << " " << xs[k] << " " << err[k] << endl;
+            out << k << " " << xs[k] << " " << err[k] << endl;
         out << endl;
 
         cout << "Output file written; it will be closed now." << endl;

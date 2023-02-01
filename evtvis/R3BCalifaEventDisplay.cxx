@@ -19,7 +19,6 @@
 
 #include "FairEventManager.h"
 #include "FairLogger.h"
-#include "FairMCTracks.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"

@@ -45,7 +45,7 @@ R3BFiberMAPMTHitModulePar::~R3BFiberMAPMTHitModulePar() {}
 
 void R3BFiberMAPMTHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BFiberMAPMTHitModulePar::putParams() called";
+    LOG(info) << "R3BFiberMAPMTHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -75,14 +75,14 @@ void R3BFiberMAPMTHitModulePar::clear() { fFiber = 0; }
 
 void R3BFiberMAPMTHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BFiberMAPMTHitModulePar: FIBER HIT Calibration Parameters: ";
-    LOG(INFO) << "   fFiber: " << fFiber;
-    LOG(INFO) << "   fOffsetUp: " << fOffsetUp;
-    LOG(INFO) << "   fOffsetDown: " << fOffsetDown;
-    LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fGainUp: " << fGainUp;
-    LOG(INFO) << "   fGainDown: " << fGainDown;
-    LOG(INFO) << "   fSync: " << fSync;
+    LOG(info) << "   R3BFiberMAPMTHitModulePar: FIBER HIT Calibration Parameters: ";
+    LOG(info) << "   fFiber: " << fFiber;
+    LOG(info) << "   fOffsetUp: " << fOffsetUp;
+    LOG(info) << "   fOffsetDown: " << fOffsetDown;
+    LOG(info) << "   fVeff: " << fVeff;
+    LOG(info) << "   fGainUp: " << fGainUp;
+    LOG(info) << "   fGainDown: " << fGainDown;
+    LOG(info) << "   fSync: " << fSync;
 }
 
 void R3BFiberMAPMTHitModulePar::DrawParams()

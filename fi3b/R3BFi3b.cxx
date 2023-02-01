@@ -81,13 +81,13 @@ void R3BFi3b::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BFi3b: initialisation";
-    LOG(DEBUG) << "R3BFi3b: Vol. (McId) " << gMC->VolId("FI3BLog");
+    LOG(info) << "R3BFi3b: initialisation";
+    LOG(debug) << "R3BFi3b: Vol. (McId) " << gMC->VolId("FI3BLog");
 }
 
 void R3BFi3b::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BFi3b: Adding customized Physics cut ... ";
+    LOG(info) << "-I- R3BFi3b: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -111,7 +111,7 @@ void R3BFi3b::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi3b: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "-I- R3BFi3b: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -132,7 +132,7 @@ void R3BFi3b::SetSpecialPhysicsCuts()
 Bool_t R3BFi3b::ProcessHits(FairVolume* vol)
 {
     // 2 Simple Det PLane
-    // get Info from DCH planes
+    // get info from DCH planes
     Int_t copyNo = -1;
     Int_t planeNr = -1;
     // Get the Geo info from MC Point
@@ -254,7 +254,7 @@ TClonesArray* R3BFi3b::GetCollection(Int_t iColl) const
 void R3BFi3b::Print(Option_t* option) const
 {
     Int_t nHits = fFi3bCollection->GetEntriesFast();
-    LOG(INFO) << "R3BFi3b: " << nHits << " points registered in this event";
+    LOG(info) << "R3BFi3b: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -270,7 +270,7 @@ void R3BFi3b::Reset()
 void R3BFi3b::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BFi3b: " << nEntries << " entries to add";
+    LOG(info) << "R3BFi3b: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -281,7 +281,7 @@ void R3BFi3b::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BFi3b: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BFi3b: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -300,7 +300,7 @@ R3BFibPoint* R3BFi3b::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BFi3b: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BFi3b: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);

@@ -24,6 +24,8 @@
 #include <R3BTCalEngine.h>
 
 class R3BTCalPar;
+class TClonesArray;
+class R3BEventHeader;
 
 /**
  * An analysis task to apply TCAL calibration.

@@ -18,6 +18,7 @@
 
 #include "R3BBunchedFiberSPMTTrigMapped2Cal.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberMappedData.h"
@@ -39,26 +40,26 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
+        LOG(error) << "TCal parameter containers missing, "
                       "did you forget SetParContainers?";
         return kERROR;
     }
     if (0 == fTCalPar->GetNumModulePar())
     {
-        LOG(ERROR) << "No TCal parameters in containers " << fTCalPar->GetName() << ".";
+        LOG(error) << "No TCal parameters in containers " << fTCalPar->GetName() << ".";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = "BunchedFiberSPMTTrigMapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register("BunchedFiberSPMTTrigCal", "Land", fCalItems, kTRUE);
@@ -71,7 +72,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::SetParContainers()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get access to " << name << " container.";
+        LOG(error) << "Could not get access to " << name << " container.";
     }
 }
 
@@ -84,7 +85,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::ReInit()
 void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BBunchedFiberMappedData*)fMappedItems->At(i);
@@ -92,7 +93,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
         if (!par)
         {
-            LOG(WARNING) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(warning) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                          << ": TCal par not found.";
             continue;
         }
@@ -105,11 +106,11 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         if (fine_ns < 0. || fine_ns > 5)
         {
-            LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(error) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }
@@ -120,7 +121,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         auto time_ns = mapped->GetCoarse() * 5. - fine_ns;
 
-        LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
+        LOG(debug) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         new ((*fCalItems)[fCalItems->GetEntriesFast()])
             R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
     }

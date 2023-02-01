@@ -167,7 +167,7 @@ InitStatus R3BFragmentTrackerS494::Init()
 
     if (NULL == fArrayMCTracks)
     {
-        LOG(INFO) << "No MC Track array found in input file.";
+        LOG(info) << "No MC Track array found in input file.";
         // return kERROR;
     }
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
@@ -362,6 +362,21 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_xfi30_tofd_exp->GetXaxis()->SetTitle("xToFD / cm");
     fh_xfi30_tofd_exp->GetYaxis()->SetTitle("xFi30 / cm");
 
+    fh_xfi30_fi23a_exp_select =
+        new TH2F("h_xFi30vsFi23a_exp_select", "xFi23a vs xFi30 exp for A/Z=2", 429, -6.006, 6.006, 600, -30, 30);
+    fh_xfi30_fi23a_exp_select->GetXaxis()->SetTitle("xFi23a / cm");
+    fh_xfi30_fi23a_exp_select->GetYaxis()->SetTitle("xFi30 / cm");
+
+    fh_xfi30_fi32_exp_select =
+        new TH2F("h_xFi30vsFi32_exp_select", "xFi32 vs xFi30 exp for A/Z=2", 600, -30, 30, 600, -30, 30);
+    fh_xfi30_fi32_exp_select->GetXaxis()->SetTitle("xFi30 / cm");
+    fh_xfi30_fi32_exp_select->GetYaxis()->SetTitle("xFi32 / cm");
+
+    fh_xfi30_tofd_exp_select =
+        new TH2F("h_xFi30vsToFD_exp_select", "xToFD vs xFi30 exp for A/Z=2", 89, -60, 60.15, 600, -30, 30);
+    fh_xfi30_tofd_exp_select->GetXaxis()->SetTitle("xToFD / cm");
+    fh_xfi30_tofd_exp_select->GetYaxis()->SetTitle("xFi30 / cm");
+
     fh_fi23b_track_exp =
         new TH2F("h_yFi23b_track_vs_exp", "yFi23b track vs yFi23b exp", 429, -6.006, 6.006, 429, -6.006, 6.006);
     fh_fi23b_track_exp->GetXaxis()->SetTitle("yFib23b track / cm");
@@ -376,8 +391,8 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_yFi23b_tofd_track->GetXaxis()->SetTitle("yTofd / cm");
 
     fh_yFi23b_tofd_exp = new TH2F("h_yTofdvsFi23b_exp", "yFi23b vs yTofd exp", 120, -60, 60, 429, -6.006, 6.006);
-    fh_yFi23b_tofd_track->GetYaxis()->SetTitle("yFi23b / cm");
-    fh_yFi23b_tofd_track->GetXaxis()->SetTitle("yTofd / cm");
+    fh_yFi23b_tofd_exp->GetYaxis()->SetTitle("yFi23b / cm");
+    fh_yFi23b_tofd_exp->GetXaxis()->SetTitle("yTofd / cm");
 
     fh_xfi31_fi23a_exp = new TH2F("h_xFi31vsFi23a_exp", "xFi23a vs xFi31 exp", 429, -6.006, 6.006, 600, -30, 30);
     fh_xfi31_fi23a_exp->GetXaxis()->SetTitle("xFi23a / cm");
@@ -390,6 +405,26 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_xfi31_tofd_exp = new TH2F("h_xFi31vsToFD_exp", "xToFD vs xFi31 exp", 120, -60, 60, 600, -30, 30);
     fh_xfi31_tofd_exp->GetXaxis()->SetTitle("xToFD / cm");
     fh_xfi31_tofd_exp->GetYaxis()->SetTitle("xFi31/ cm");
+
+    fh_yFi23b_tofd_exp_select =
+        new TH2F("h_yTofdvsFi23b_exp_select", "yFi23b vs yTofd exp for A/Z=2", 120, -60, 60, 429, -6.006, 6.006);
+    fh_yFi23b_tofd_exp_select->GetYaxis()->SetTitle("yFi23b / cm");
+    fh_yFi23b_tofd_exp_select->GetXaxis()->SetTitle("yTofd / cm");
+
+    fh_xfi31_fi23a_exp_select =
+        new TH2F("h_xFi31vsFi23a_exp_select", "xFi23a vs xFi31 exp for A/Z=2", 429, -6.006, 6.006, 600, -30, 30);
+    fh_xfi31_fi23a_exp_select->GetXaxis()->SetTitle("xFi23a / cm");
+    fh_xfi31_fi23a_exp_select->GetYaxis()->SetTitle("xFi31 / cm");
+
+    fh_xfi31_fi33_exp_select =
+        new TH2F("h_xFi31vsFi33_exp_select", "xFi33 vs xFi31 exp for A/Z=2", 600, -30, 30, 600, -30, 30);
+    fh_xfi31_fi33_exp_select->GetXaxis()->SetTitle("xFi31 / cm");
+    fh_xfi31_fi33_exp_select->GetYaxis()->SetTitle("xFi33 / cm");
+
+    fh_xfi31_tofd_exp_select =
+        new TH2F("h_xFi31vsToFD_exp_select", "xToFD vs xFi31 exp for A/Z=2", 120, -60, 60, 600, -30, 30);
+    fh_xfi31_tofd_exp_select->GetXaxis()->SetTitle("xToFD / cm");
+    fh_xfi31_tofd_exp_select->GetYaxis()->SetTitle("xFi31/ cm");
 
     fh_yC_vs_yHe_Tofd = new TH2F("h_yC_vs_yHe_Tofd", "yC_vs_yHe_Tofd track", 120, -60, 60, 120, -60, 60);
     fh_yC_vs_yHe_Tofd->GetXaxis()->SetTitle("yC / cm");
@@ -479,12 +514,8 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_Erel_vs_nhits23b->GetXaxis()->SetTitle("nhits23b");
     fh_Erel_vs_nhits23b->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_theta_vs_x = new TH2F("h_Erel_vs_x", "Erel_vs_x", 429, -6.006, 6.006, 200, 0., 20.);
-    fh_theta_vs_x->GetXaxis()->SetTitle("x fib23a / cm");
-    fh_theta_vs_x->GetYaxis()->SetTitle("Erel / MeV");
-
     fh_theta_vs_x = new TH2F("h_theta_vs_x", "theta_vs_x", 429, -6.006, 6.006, 125, 0., 5.);
-    fh_theta_vs_x->GetXaxis()->SetTitle("x fib23b / cm");
+    fh_theta_vs_x->GetXaxis()->SetTitle("x fib23a / cm");
     fh_theta_vs_x->GetYaxis()->SetTitle("theta / deg");
 
     fh_theta_vs_y = new TH2F("h_theta_vs_y", "theta_vs_y", 429, -6.006, 6.006, 125, 0., 5.);
@@ -726,7 +757,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             Int_t PID = ion->GetPdgCode();
             Int_t mother = ion->GetMotherId();
-            LOG(DEBUG) << "PID " << PID << endl;
+            LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -741,10 +772,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     pz0He = ion->GetPz();    // GeV/c
                     pHe = ion->GetP();
                     massHe = ion->GetMass();
-                    LOG(DEBUG) << "MC ************ 4He **************";
-                    LOG(DEBUG) << "MC position x: " << x0He << " y: " << y0He << " z: " << z0He;
-                    LOG(DEBUG) << "MC momentum p: " << pHe << " px " << px0He << " py " << py0He << " pz " << pz0He;
-                    LOG(DEBUG) << "MC mass 4He: " << massHe << " beta: " << betaHe << endl;
+                    LOG(debug) << "MC ************ 4He **************";
+                    LOG(debug) << "MC position x: " << x0He << " y: " << y0He << " z: " << z0He;
+                    LOG(debug) << "MC momentum p: " << pHe << " px " << px0He << " py " << py0He << " pz " << pz0He;
+                    LOG(debug) << "MC mass 4He: " << massHe << " beta: " << betaHe << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -758,10 +789,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     pz0C = ion->GetPz();
                     pC = ion->GetP();
                     massC = ion->GetMass();
-                    LOG(DEBUG) << "MC ************ 12C **************";
-                    LOG(DEBUG) << "MC position x: " << x0C << " y: " << y0C << " z: " << z0C;
-                    LOG(DEBUG) << "MC momentum p: " << pC << " px " << px0C << " py " << py0C << " pz " << pz0C;
-                    LOG(DEBUG) << "MC mass 12C: " << massC << " beta: " << betaC << endl;
+                    LOG(debug) << "MC ************ 12C **************";
+                    LOG(debug) << "MC position x: " << x0C << " y: " << y0C << " z: " << z0C;
+                    LOG(debug) << "MC momentum p: " << pC << " px " << px0C << " py " << py0C << " pz " << pz0C;
+                    LOG(debug) << "MC mass 12C: " << massC << " beta: " << betaC << endl;
                 }
                 if (PID == 1000080160)
                 {
@@ -775,10 +806,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     pz0O = ion->GetPz();
                     pO = ion->GetP();
                     massO = ion->GetMass();
-                    LOG(DEBUG) << "MC ************ 16O **************";
-                    LOG(DEBUG) << "MC position x: " << x0O << " y: " << y0O << " z: " << z0O;
-                    LOG(DEBUG) << "MC momentum p: " << pO << " px " << px0O << " py " << py0O << " pz " << pz0O;
-                    LOG(DEBUG) << "MC mass: " << massO << " beta: " << betaO;
+                    LOG(debug) << "MC ************ 16O **************";
+                    LOG(debug) << "MC position x: " << x0O << " y: " << y0O << " z: " << z0O;
+                    LOG(debug) << "MC momentum p: " << pO << " px " << px0O << " py " << py0O << " pz " << pz0O;
+                    LOG(debug) << "MC mass: " << massO << " beta: " << betaO;
                 }
             }
         }
@@ -1800,7 +1831,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                      << " pz: " << bestcandidate->GetStartMomentum().Z() << endl;
 
                 //   cout << "Beta   : " << bestcandidate->GetStartBeta() << endl;
-                // LOG(DEBUG) << "chi2: " << bestcandidate->GetChi2() << endl;
+                // LOG(debug) << "chi2: " << bestcandidate->GetChi2() << endl;
                 cout << "chi: " << minChi2 << endl;
             }
             /*
@@ -1842,14 +1873,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if(status > 9) return;
 
 
-                        LOG(INFO) << "Final result:";
-                        LOG(INFO) << "Position x: " << bestcandidate->GetStartPosition().X() <<
+                        LOG(info) << "Final result:";
+                        LOG(info) << "Position x: " << bestcandidate->GetStartPosition().X() <<
                             " y: " << bestcandidate->GetStartPosition().Y() << " z: " <<
-               bestcandidate->GetStartPosition().Z(); LOG(INFO) << "Momentum : " <<
+               bestcandidate->GetStartPosition().Z(); LOG(info) << "Momentum : " <<
                bestcandidate->GetStartMomentum().Mag() << " px : " << bestcandidate->GetStartMomentum().X() << " py: "
-               << bestcandidate->GetStartMomentum().Y() << " pz: " << bestcandidate->GetStartMomentum().Z(); LOG(INFO)
-               << "Mass   : " << bestcandidate->GetMass(); LOG(INFO) << "Beta : " << bestcandidate->GetStartBeta();
-               LOG(INFO) << "chi2: " << bestcandidate->GetChi2() << endl;
+               << bestcandidate->GetStartMomentum().Y() << " pz: " << bestcandidate->GetStartMomentum().Z(); LOG(info)
+               << "Mass   : " << bestcandidate->GetMass(); LOG(info) << "Beta : " << bestcandidate->GetStartBeta();
+               LOG(info) << "chi2: " << bestcandidate->GetChi2() << endl;
 
                         fh_A_overZ->Fill(Charge, bestcandidate->GetMass() / Charge / amu);
                         fh_mom_res->Fill((bestcandidate->GetStartMomentum().Mag() - particle->GetStartMomentum().Mag())
@@ -1859,7 +1890,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         fh_beta_res->Fill((bestcandidate->GetStartBeta() - particle->GetStartBeta()) /
                particle->GetStartBeta());
                         // bestcandidate->GetStartPosition().Print();
-                        // LOG(INFO) << (bestcandidate->GetMass() / amu);
+                        // LOG(info) << (bestcandidate->GetMass() / amu);
             */
             totalChi2P += minChi2;
             fh_p_vs_ch2->Fill(minChi2, bestcandidate->GetStartMomentum().Mag());
@@ -1988,7 +2019,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 fh_xy_target_C->Fill(bestcandidate->GetStartPosition().X(), bestcandidate->GetStartPosition().Y());
 
             // bestcandidate->GetStartPosition().Print();
-            // LOG(INFO) << (bestcandidate->GetMass() / amu);
+            // LOG(info) << (bestcandidate->GetMass() / amu);
 
             if (charge_requested == 6)
             {
@@ -2012,7 +2043,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                        iAoverZ == 2 && iAoverZmem == 2 &&
                        sqrt(minChi2*minChi2 + minChi2_12C*minChi2_12C) < 5) bestevents = true;
                 */
-                    if (iAoverZ == 2 && iAoverZmem == 2 && sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5)
+                    if (iAoverZ == 2 && iAoverZmem == 2 && sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5 &&
+                        psum > 17380. && psum < 17450.)
                         bestevents = true;
                 }
 
@@ -2075,6 +2107,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 {
                     det_hit_xC[ic] = -10000.;
                     det_hit_yC[ic] = -10000.;
+                }
+                if (l == 2)
+                {
+                    det_hit_xHe[ic] = -10000.;
+                    det_hit_yHe[ic] = -10000.;
                 }
             }
 
@@ -2170,6 +2207,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 {
                     det_hit_xC[iDet] = hit->GetX();
                     det_hit_yC[iDet] = hit->GetY();
+                }
+                if (hit && l == 2)
+                {
+                    det_hit_xHe[iDet] = hit->GetX();
+                    det_hit_yHe[iDet] = hit->GetY();
                 }
                 if (hit && iDet == 7 && l == 1)
                 {
@@ -2305,6 +2347,29 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 fh_tofd_track_exp->Fill(y_l[7], det_hit_y[7]);
                 fh_fi23b_track_exp->Fill(y_l[2], det_hit_y[2]);
+            }
+            if (bestevents)
+            {
+                fh_xfi30_fi23a_exp_select->Fill(det_hit_xC[1], det_hit_xC[3]);
+                fh_xfi30_fi23a_exp_select->Fill(det_hit_xHe[1], det_hit_xHe[3]);
+
+                fh_xfi30_fi32_exp_select->Fill(det_hit_xC[3], det_hit_xC[5]);
+                fh_xfi30_fi32_exp_select->Fill(det_hit_xHe[3], det_hit_xHe[5]);
+
+                fh_xfi30_tofd_exp_select->Fill(det_hit_xC[7], det_hit_xC[5]);
+                fh_xfi30_tofd_exp_select->Fill(det_hit_xHe[7], det_hit_xHe[5]);
+
+                fh_xfi31_fi23a_exp_select->Fill(det_hit_xC[1], det_hit_xC[4]);
+                fh_xfi31_fi23a_exp_select->Fill(det_hit_xHe[1], det_hit_xHe[4]);
+
+                fh_xfi31_fi33_exp_select->Fill(det_hit_xC[4], det_hit_xC[6]);
+                fh_xfi31_fi33_exp_select->Fill(det_hit_xHe[4], det_hit_xHe[6]);
+
+                fh_xfi31_tofd_exp_select->Fill(det_hit_xC[7], det_hit_xC[4]);
+                fh_xfi31_tofd_exp_select->Fill(det_hit_xHe[7], det_hit_xHe[4]);
+
+                fh_yFi23b_tofd_exp_select->Fill(det_hit_yC[7], det_hit_yC[2]);
+                fh_yFi23b_tofd_exp_select->Fill(det_hit_yHe[7], det_hit_yHe[2]);
             }
 
             if (fWriteOut)
@@ -2475,7 +2540,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     {
         counter1++;
 
-        LOG(INFO) << "Found Tracks: " << counter1 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
+        LOG(info) << "Found Tracks: " << counter1 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
                   << ", and Erel/MeV: " << Erel << ", from selected NEvents: " << fNEvents_nonull
                   << ", num total events: " << fNEvents << ", max Events: " << maxevent << endl;
         if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5)
@@ -2490,7 +2555,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     {
         counter1++;
 
-        LOG(INFO) << "Found Tracks: " << counter1 << " with chi2 O = " << minChi2
+        LOG(info) << "Found Tracks: " << counter1 << " with chi2 O = " << minChi2
                   << ", from selected NEvents: " << fNEvents_nonull << ", num total events: " << fNEvents
                   << ", max Events: " << maxevent << endl;
     }
@@ -2603,6 +2668,16 @@ void R3BFragmentTrackerS494::Finish()
     fh_xfi31_fi23a_exp->Write();
     fh_xfi31_fi33_exp->Write();
     fh_xfi31_tofd_exp->Write();
+    fh_yFi23b_tofd_exp->Write();
+
+    fh_xfi30_fi23a_exp_select->Write();
+    fh_xfi30_fi32_exp_select->Write();
+    fh_xfi30_tofd_exp_select->Write();
+    fh_xfi31_fi23a_exp_select->Write();
+    fh_xfi31_fi33_exp_select->Write();
+    fh_xfi31_tofd_exp_select->Write();
+    fh_yFi23b_tofd_exp_select->Write();
+
     fh_yC_vs_yHe_Tofd->Write();
     fh_yC_vs_yHe_Tofd_exp->Write();
     fh_yC_vs_yHe_fib23->Write();
@@ -2724,7 +2799,7 @@ void R3BFragmentTrackerS494::Finish()
         Int_t bin2 = fh_A_reco2->FindLastBinAbove(fh_A_reco2->GetMaximum() / 2.);
         Double_t fwhm = fh_A_reco2->GetBinCenter(bin2) - fh_A_reco2->GetBinCenter(bin1);
 
-        LOG(DEBUG) << fwhm / fh_A_reco2->GetMean();
+        LOG(debug) << fwhm / fh_A_reco2->GetMean();
 
         new TCanvas("c7", "", 500, 600, 500, 500);
         fh_chi2->Draw();
@@ -2786,7 +2861,7 @@ Bool_t R3BFragmentTrackerS494::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field.";
+        LOG(error) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

@@ -13,6 +13,7 @@
 
 #include "R3BBunchedFiberMapped2CalPar.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BBunchedFiberMappedData.h"
 #include "R3BTCalEngine.h"
@@ -68,7 +69,7 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            LOG(ERROR) << "Could not get " << name << '.';                             \
+            LOG(error) << "Could not get " << name << '.';                             \
             abort();                                                                   \
             return kFATAL;                                                             \
         }                                                                              \

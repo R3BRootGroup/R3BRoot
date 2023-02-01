@@ -87,7 +87,7 @@ void R3BMusic::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BMusic: initialisation";
+    LOG(info) << "R3BMusic: initialisation";
     LOG(DEBUG) << "-I- R3BMusic: Vol (McId) def" << gMC->VolId("Anode");
 }
 
@@ -197,7 +197,7 @@ TClonesArray* R3BMusic::GetCollection(Int_t iColl) const
 void R3BMusic::Print(Option_t* option) const
 {
     Int_t nHits = fMusicCollection->GetEntriesFast();
-    LOG(INFO) << "R3BMusic: " << nHits << " points registered in this event";
+    LOG(info) << "R3BMusic: " << nHits << " points registered in this event";
 }
 
 // -----   Public method Reset   ----------------------------------------------
@@ -211,7 +211,7 @@ void R3BMusic::Reset()
 void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BMusic: " << nEntries << " entries to add";
+    LOG(info) << "R3BMusic: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BMusicPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -222,7 +222,7 @@ void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BMusicPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BMusic: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BMusic: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -242,7 +242,7 @@ R3BMusicPoint* R3BMusic::AddPoint(Int_t trackID,
     TClonesArray& clref = *fMusicCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BMusic: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BMusic: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size])
         R3BMusicPoint(trackID, detID, volid, Z, A, posIn, posOut, momIn, momOut, time, length, eLoss);
@@ -253,7 +253,7 @@ Bool_t R3BMusic::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Anode"))
     {
-        LOG(INFO) << "Found MUSIC geometry from ROOT file: " << name;
+        LOG(info) << "Found MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

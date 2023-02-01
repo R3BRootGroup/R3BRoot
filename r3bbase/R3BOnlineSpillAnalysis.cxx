@@ -78,7 +78,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpillAnalysis::Init ";
+    LOG(info) << "R3BOnlineSpillAnalysis::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -139,9 +139,9 @@ InitStatus R3BOnlineSpillAnalysis::Init()
 
     fh_SAMP_tDiff_pois = new TH1F("Random_distributed_tDIFF", "Random_tDiff", 20000, 0., 1.); // 0-1 ms, 5ns bin
 
-    fh_FFT = new TH1F("FFT", "FFT", 1000000, 0., 10.);
-    fh_FFT_adj = new TH1F("adj_FFT", "FFT", 1000000, 0., 10.);
-    fh_FFT_add = new TH1F("added_FFT", "added FFT", 1000000, 0., 10.);
+    fh_FFT = new TH1("FFT", "FFT", 1000000, 0., 10.);
+    fh_FFT_adj = new TH1("adj_FFT", "FFT", 1000000, 0., 10.);
+    fh_FFT_add = new TH1("added_FFT", "added FFT", 1000000, 0., 10.);
 
     fh_hans_sum = new TH1F("Spillquality_sum", "Spill quality HT", 600, -300., 300.);
     fh_hans_sum_byMax = new TH1F("Spillquality_sum_byMax", "Spill quality HT", 600, -300., 300.);
@@ -322,7 +322,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 

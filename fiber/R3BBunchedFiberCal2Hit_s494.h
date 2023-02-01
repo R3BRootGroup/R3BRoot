@@ -18,6 +18,7 @@
 
 #include <R3BTCalEngine.h>
 
+#include "TClonesArray.h"
 #include <list>
 
 class TH1F;

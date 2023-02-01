@@ -18,12 +18,14 @@
 
 #include "R3BFiberMAPMTMapped2Cal.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
 #include <cassert>
+#include <iostream>
 
 R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_verbose)
     : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)

@@ -183,7 +183,7 @@ InitStatus R3BTofdCal2Histo::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdCal2Histo::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -199,7 +199,7 @@ void R3BTofdCal2Histo::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdCal2Histo::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdCal2Histo::Init() Couldn't get handle on TofdHitPar. ";
     }
     //    fCal_Par->setChanged();
 }
@@ -235,20 +235,20 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
     for (int i = 0; i < 16; i++)
     {
         tpatbin = (header->GetTpat() & (1 << i));
-        LOG(DEBUG) << "tpatbin " << tpatbin;
+        LOG(debug) << "tpatbin " << tpatbin;
         if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
         {
             return;
         }
         if (tpatbin != 0)
         {
-            LOG(DEBUG) << "Accepted Tpat: " << i + 1;
+            LOG(debug) << "Accepted Tpat: " << i + 1;
         }
         tpatsum += tpatbin;
     }
     if (tpatsum < 1)
     {
-        LOG(DEBUG) << "No Tpat info";
+        LOG(debug) << "No Tpat info";
         return;
     }
 
@@ -353,7 +353,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -392,13 +392,13 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -410,7 +410,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare offset and sync calculation
                 if (fTofdQ < 0.1)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -430,16 +430,16 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     auto posToT = 0.;
                     if (fTofdY == 0.)
                     {
-                        LOG(INFO) << "Will prepare for offset and sync calculation";
+                        LOG(info) << "Will prepare for offset and sync calculation";
                         posToT = TMath::Log(top_tot / bot_tot);
                     }
                     else
                     {
-                        LOG(INFO) << "Will prepare for veff and lambda calculation";
+                        LOG(info) << "Will prepare for veff and lambda calculation";
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
-                            LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                            LOG(error) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                        << ", Bar: " << top->GetBarId();
                             continue;
                         }
@@ -455,12 +455,12 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
                 else
                 {
-                    LOG(INFO) << "Will prepare for position dependent charge calculation";
+                    LOG(info) << "Will prepare for position dependent charge calculation";
                     // get parameter
                     R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(error) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                    << ", Bar: " << top->GetBarId();
                         continue;
                     }
@@ -471,7 +471,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     // walk corrections
                     if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. || para->GetPar3Walk() == 0. ||
                         para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.)
-                        LOG(INFO) << "Walk correction not found!";
+                        LOG(info) << "Walk correction not found!";
                     bot_ns = bot_ns - walk(bot_tot,
                                            para->GetPar1Walk(),
                                            para->GetPar2Walk(),
@@ -508,11 +508,11 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare double exponential fit
                 if (!fTofdSmiley && fTofdQ > 0.1)
                 {
-                    LOG(INFO) << "Prepare histo for double exponential fit";
+                    LOG(info) << "Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
@@ -528,12 +528,12 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
-                    LOG(INFO) << "Prepare histo for quenching correction";
+                    LOG(info) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }

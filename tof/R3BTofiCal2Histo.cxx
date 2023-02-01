@@ -181,7 +181,7 @@ InitStatus R3BTofiCal2Histo::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -197,7 +197,7 @@ void R3BTofiCal2Histo::SetParContainers()
     fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
     }
     //    fCal_Par->setChanged();
 }
@@ -210,7 +210,6 @@ namespace
 void R3BTofiCal2Histo::Exec(Option_t* option)
 {
 
-	
     if (fNEvents / 10000. == fNEvents / 10000)
         std::cout << "Events: " << fNEvents << " / " << maxevent << " (" << (Int_t)(fNEvents * 100. / maxevent)
                   << " %)             \r" << std::flush;
@@ -252,7 +251,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
 
     static bool s_was_trig_missing = false;
     UInt_t trig_num = fCalTriggerItems->GetEntriesFast();
-    //if (trig_num>0) cout << "Trigger information: " << trig_num << endl;
+    // if (trig_num>0) cout << "Trigger information: " << trig_num << endl;
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -300,7 +299,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -340,7 +339,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -348,7 +347,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;
@@ -360,9 +359,9 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 multihits[iPlane - 1][iBar - 1] += 1;
 
                 // prepare offset and sync calculation
-                if (fTofiQ < 0.1)
+                if (fTofiQ < 0.1 && bot_tot < 70 && top_tot < 70)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -376,19 +375,19 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     fh_Tofi_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
                     // Time differences of one paddle; offset  histo
-                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
+                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff); // zoom in by factor 10 for easy fitting
 
                     // offset histo via ToT
                     auto posToT = 0.;
                     if (fTofiY == 0.)
-                        posToT = TMath::Log(top_tot / bot_tot);
+                        posToT = TMath::Log(top_tot / bot_tot) * 10.;
                     else
                     {
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
-                            LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                       << ", Bar: " << top->GetBarId();
+                            LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                                      << ", Bar: " << top->GetBarId();
                             ++top_i;
                             ++bot_i;
                             continue;
@@ -409,8 +408,8 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     R3BTofiHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                   << ", Bar: " << top->GetBarId();
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                                  << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
                         continue;
@@ -422,7 +421,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     // walk corrections
                     if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. || para->GetPar3Walk() == 0. ||
                         para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.)
-                        LOG(INFO) << "Walk correction not found!";
+                        LOG(info) << "Walk correction not found!";
                     bot_ns = bot_ns - walk(bot_tot,
                                            para->GetPar1Walk(),
                                            para->GetPar2Walk(),
@@ -460,11 +459,11 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 if (!fTofiSmiley)
                 {
 
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(debug) << "Prepare histo for double exponential fit";
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
@@ -481,12 +480,12 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofiZ == true)
                 {
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
@@ -564,25 +563,25 @@ void R3BTofiCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
     Double_t max_charge = 60.;
     if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
     {
-		char strName[255];
-		sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-		if (iPlane < 3)
-		fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-		if (iPlane > 2)
-		fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-		fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-		fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+        char strName[255];
+        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        if (iPlane < 3)
+            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        if (iPlane > 2)
+            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
-	if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
+    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
     {
-		char strName[255];
-		sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-		if (iPlane < 3)
-		fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-		if (iPlane > 2)
-		fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-		fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-		fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
+        char strName[255];
+        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        if (iPlane < 3)
+            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        if (iPlane > 2)
+            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
     }
     if (NULL == fhTdiff[iPlane - 1])
     {

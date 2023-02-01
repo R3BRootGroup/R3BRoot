@@ -191,7 +191,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                                         }
                     */
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    LOG(INFO) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                    LOG(info) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
                               << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
                               << " eloss = " << Energy_Loss[channel];
 

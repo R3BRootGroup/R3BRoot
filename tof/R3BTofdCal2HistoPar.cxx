@@ -132,17 +132,17 @@ InitStatus R3BTofdCal2HistoPar::Init()
     }
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdCal2HistoPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdCal2HistoPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
     // if (NULL == fCalItemsLos)
     //    LOG(fatal) << "Branch LosCal not found";
-    LOG(INFO) << "Histo filename: " << fHistoFile;
+    LOG(info) << "Histo filename: " << fHistoFile;
     hfilename = TFile::Open(fHistoFile);
     if (hfilename == 0)
     {
-        LOG(ERROR) << "Cannot open Histo file!";
+        LOG(error) << "Cannot open Histo file!";
         return kFATAL;
     }
     return kSUCCESS;
@@ -155,7 +155,7 @@ void R3BTofdCal2HistoPar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdCal2HistoPar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdCal2HistoPar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //  fCal_Par->setChanged();
 }
@@ -172,24 +172,24 @@ void R3BTofdCal2HistoPar::FinishTask()
         // assumes a sweep run in the middle of the ToF wall horizontally.
         // Since all paddles are mounted vertically one can determine the offset.
         // Half of the offset is added to PM1 and half to PM2.
-        LOG(WARNING) << "Calling function calcOffset";
+        LOG(warning) << "Calling function calcOffset";
         calcOffset();
         // Determine ToT offset between top and bottom PMT
-        LOG(WARNING) << "Calling function calcToTOffset";
+        LOG(warning) << "Calling function calcToTOffset";
         calcToTOffset(fTofdTotLow, fTofdTotHigh);
         // Determine sync offset between paddles
-        LOG(WARNING) << "Calling function calcSync";
+        LOG(warning) << "Calling function calcSync";
         calcSync();
-        LOG(ERROR) << "Call walk correction before next step!";
+        LOG(error) << "Call walk correction before next step!";
     }
 
     if (fParameter == 2)
     {
         // Determine effective speed of light in [cm/s] for each paddle
-        LOG(WARNING) << "Calling function calcVeff";
+        LOG(warning) << "Calling function calcVeff";
         calcVeff();
         // Determine light attenuation lambda for each paddle
-        LOG(WARNING) << "Calling function calcLambda";
+        LOG(warning) << "Calling function calcLambda";
         calcLambda(fTofdTotLow, fTofdTotHigh);
     }
 
@@ -198,7 +198,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         // calculation of position dependend charge
         if (fTofdSmiley)
         {
-            LOG(WARNING) << "Calling function smiley";
+            LOG(warning) << "Calling function smiley";
             Double_t para2[4];
             Double_t min2 = -40.; // -40 effective bar length
             Double_t max2 = 40.;  // 40 effective bar length = 80 cm
@@ -209,7 +209,7 @@ void R3BTofdCal2HistoPar::FinishTask()
                 {
                     if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
                     {
-                        LOG(WARNING) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                        LOG(warning) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         smiley((TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
                                min2,
@@ -230,7 +230,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         }
         else
         {
-            LOG(WARNING) << "Calling function doubleExp";
+            LOG(warning) << "Calling function doubleExp";
             Double_t para[4];
             Double_t min = -40.; // effective bar length
             Double_t max = 40.;  // effective bar length = 80 cm
@@ -276,7 +276,7 @@ void R3BTofdCal2HistoPar::FinishTask()
     if (fParameter == 4)
     {
         // Z correction for each plane
-        LOG(WARNING) << "Calling function zcorr";
+        LOG(warning) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
         Int_t min = 10, max = 60; // select range for peak search
@@ -321,7 +321,7 @@ void R3BTofdCal2HistoPar::calcOffset()
     {
         if (hfilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
         {
-            LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+            LOG(warning) << "Found histo Time_Diff_Plane_" << i + 1;
             auto* h = (TH2F*)hfilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -336,7 +336,7 @@ void R3BTofdCal2HistoPar::calcOffset()
                 TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
                 mpar->SetPlane(i + 1);
                 mpar->SetPaddle(j + 1);
                 mpar->SetOffset1(-offset / 2.);
@@ -359,7 +359,7 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
-                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(warning) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 auto* h = (TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 h->Draw("colz");
@@ -382,7 +382,7 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 delete h;
                 delete histo_py;
             }
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
+            LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
             par->SetToTOffset1(sqrt(exp(offset)));
             par->SetToTOffset2(1. / sqrt(exp(offset)));
         }
@@ -398,7 +398,7 @@ void R3BTofdCal2HistoPar::calcSync()
     {
         if (hfilename->Get(Form("Time_Sync_Plane_%i", i + 1)))
         {
-            LOG(WARNING) << "Found histo Time_Sync_Plane_" << i + 1;
+            LOG(warning) << "Found histo Time_Sync_Plane_" << i + 1;
             auto* h = (TH2F*)hfilename->Get(Form("Time_Sync_Plane_%i", i + 1))->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -414,9 +414,10 @@ void R3BTofdCal2HistoPar::calcSync()
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
-                //cout << "old value: " << par << " binmax: " <<  binmax << " Max: " << Max << " Maxentry: " << MaxEntry
+                // cout << "old value: " << par << " binmax: " <<  binmax << " Max: " << Max << " Maxentry: " <<
+                // MaxEntry
                 //<< " sync: " << sync << endl;
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
     }
@@ -435,11 +436,11 @@ void R3BTofdCal2HistoPar::calcVeff()
             Double_t veff = 7.;
             if (hfilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
             {
-                LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+                LOG(warning) << "Found histo Time_Diff_Plane_" << i + 1;
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                 if (!par)
                 {
-                    LOG(INFO) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                    LOG(info) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
                     continue;
                 }
                 auto* h = (TH2F*)hfilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
@@ -458,9 +459,9 @@ void R3BTofdCal2HistoPar::calcVeff()
                 max = fgaus->GetParameter(1) + offset1 - offset2; /// TODO: needs to be tested
                 // max = max+offset1-offset2;
                 veff = fTofdY / max; // effective speed of light in [cm/s]
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
                 par->SetVeff(veff);
             }
         }
@@ -479,7 +480,7 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
             R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
-                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(warning) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 auto* h = (TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 h->Draw("colz");
@@ -501,9 +502,9 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
+            LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                          << "\n";
             par->SetLambda(lambda);
         }

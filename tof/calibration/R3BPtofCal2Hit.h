@@ -26,7 +26,7 @@
 
 class TClonesArray;
 class R3BPtofHitPar;
-class TArrayD;
+#include "TArrayD.h"
 
 class R3BPtofCal2Hit : public FairTask
 {

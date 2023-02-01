@@ -23,6 +23,16 @@
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
 
+#include <array>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include "TCutG.h"
+
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <cstdlib>
+
 class R3BTCalPar;
 
 /**

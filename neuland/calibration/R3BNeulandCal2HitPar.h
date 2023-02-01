@@ -21,7 +21,6 @@
 #include "FairTask.h"
 
 #include "R3BNeulandCommon.h"
-
 class TClonesArray;
 
 class R3BEventHeader;

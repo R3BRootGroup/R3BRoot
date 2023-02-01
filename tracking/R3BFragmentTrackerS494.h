@@ -158,6 +158,8 @@ class R3BFragmentTrackerS494 : public FairTask
     Double_t det_hit_y[8];
     Double_t det_hit_xC[8];
     Double_t det_hit_yC[8];
+    Double_t det_hit_xHe[8];
+    Double_t det_hit_yHe[8];
     Int_t fNwriteout=0;
 	Int_t counterCalifa = 0;
 
@@ -216,13 +218,21 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_Erel;
     TH1F* fh_psum;
     TH1F* fh_theta;
-            
     TH2F* fh_xfi30_fi23a_exp;
     TH2F* fh_xfi30_fi32_exp;
     TH2F* fh_xfi30_tofd_exp;
     TH2F* fh_xfi31_fi23a_exp;
     TH2F* fh_xfi31_fi33_exp;
-    TH2F* fh_xfi31_tofd_exp;   
+    TH2F* fh_xfi31_tofd_exp;
+           
+    TH2F* fh_xfi30_fi23a_exp_select;
+    TH2F* fh_xfi30_fi32_exp_select;
+    TH2F* fh_xfi30_tofd_exp_select;
+    TH2F* fh_xfi31_fi23a_exp_select;
+    TH2F* fh_xfi31_fi33_exp_select;
+    TH2F* fh_xfi31_tofd_exp_select;
+    TH2F* fh_yFi23b_tofd_exp_select; 
+     
     TH2F* fh_yC_vs_yHe_Tofd;
     TH2F* fh_yC_vs_yHe_Tofd_exp;  
     TH2F* fh_yC_vs_yHe_fib23;

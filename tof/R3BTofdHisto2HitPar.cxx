@@ -40,13 +40,13 @@
 #include "TGraph.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TImage.h"
 #include "TLegend.h"
 #include "TLine.h"
 #include "TMath.h"
 #include "TProfile.h"
 #include "TSpectrum.h"
 #include "TVirtualFitter.h"
-#include "TImage.h"
 
 #include <iostream>
 #include <limits>
@@ -133,17 +133,17 @@ InitStatus R3BTofdHisto2HitPar::Init()
     }
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofdHisto2HitPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofdHisto2HitPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
     // if (NULL == fCalItemsLos)
     //    LOG(fatal) << "Branch LosCal not found";
-    LOG(INFO) << "Histo filename: " << fHistoFile;
+    LOG(info) << "Histo filename: " << fHistoFile;
     histofilename = TFile::Open(fHistoFile);
     if (histofilename == 0)
     {
-        LOG(ERROR) << "Cannot open Histo file!";
+        LOG(error) << "Cannot open Histo file!";
         return kFATAL;
     }
     return kSUCCESS;
@@ -156,7 +156,7 @@ void R3BTofdHisto2HitPar::SetParContainers()
     fCal_Par = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofdHisto2HitPar::Init() Couldn't get handle on TofdHitPar. ";
+        LOG(error) << "R3BTofdHisto2HitPar::Init() Couldn't get handle on TofdHitPar. ";
     }
     //  fCal_Par->setChanged();
 }
@@ -173,24 +173,24 @@ void R3BTofdHisto2HitPar::FinishTask()
         // assumes a sweep run in the middle of the ToF wall horizontally.
         // Since all paddles are mounted vertically one can determine the offset.
         // Half of the offset is added to PM1 and half to PM2.
-        LOG(WARNING) << "Calling function calcOffset";
+        LOG(warning) << "Calling function calcOffset";
         calcOffset();
         // Determine ToT offset between top and bottom PMT
-        LOG(WARNING) << "Calling function calcToTOffset";
+        LOG(warning) << "Calling function calcToTOffset";
         calcToTOffset(fTofdCutLow, fTofdCutHigh);
         // Determine sync offset between paddles
-        LOG(WARNING) << "Calling function calcSync";
+        LOG(warning) << "Calling function calcSync";
         calcSync();
-        LOG(INFO) << "Call walk correction before next step!";
+        LOG(info) << "Call walk correction before next step!";
     }
 
     if (fParameter == 2)
     {
         // Determine effective speed of light in [cm/s] for each paddle
-        LOG(WARNING) << "Calling function calcVeff";
+        LOG(warning) << "Calling function calcVeff";
         calcVeff();
         // Determine light attenuation lambda for each paddle
-        LOG(WARNING) << "Calling function calcLambda";
+        LOG(warning) << "Calling function calcLambda";
         calcLambda(fTofdCutLow, fTofdCutHigh);
     }
 
@@ -199,7 +199,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         // calculation of position dependend charge
         if (fTofdSmiley)
         {
-            LOG(WARNING) << "Calling function smiley";
+            LOG(warning) << "Calling function smiley";
             Double_t para2[4];
             Double_t min2 = -50.; // -40 effective bar length
             Double_t max2 = 50.;  // 40 effective bar length = 80 cm
@@ -210,7 +210,7 @@ void R3BTofdHisto2HitPar::FinishTask()
                 {
                     if (histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
                     {
-                        LOG(WARNING) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                        LOG(warning) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         smiley((TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
                                min2,
@@ -233,7 +233,7 @@ void R3BTofdHisto2HitPar::FinishTask()
         }
         else
         {
-            LOG(WARNING) << "Calling function doubleExp";
+            LOG(warning) << "Calling function doubleExp";
             Double_t para[4];
             Double_t min = -50.; // effective bar length
             Double_t max = 50.;  // effective bar length = 80 cm
@@ -245,8 +245,13 @@ void R3BTofdHisto2HitPar::FinishTask()
                     if (histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                        doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para, i, j, 1);
+                        doubleExp((TH2F*)histofilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)),
+                                  min,
+                                  max,
+                                  para,
+                                  i,
+                                  j,
+                                  1);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -259,8 +264,13 @@ void R3BTofdHisto2HitPar::FinishTask()
                     if (histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                        doubleExp(
-                            (TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para, i, j, 2);
+                        doubleExp((TH2F*)histofilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)),
+                                  min,
+                                  max,
+                                  para,
+                                  i,
+                                  j,
+                                  2);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -279,22 +289,28 @@ void R3BTofdHisto2HitPar::FinishTask()
     if (fParameter == 4)
     {
         // Z correction for each plane
-        LOG(WARNING) << "Calling function zcorr";
+        LOG(warning) << "Calling function zcorr";
         TCanvas* czcorr = new TCanvas("czcorr", "czcorr", 100, 100, 800, 800);
         Double_t para[8];
         Double_t pars[3];
         Int_t min = fTofdCutLow, max = fTofdCutHigh; // select range for peak search
-        //for (Int_t i = 0; i < fNofPlanes; i++)
+        // for (Int_t i = 0; i < fNofPlanes; i++)
         for (Int_t i = 1; i < 2; i++)
         {
-            //for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
+            // for (Int_t j = 0; j < fPaddlesPerPlane; j++) //
             for (Int_t j = 37; j < 41; j++) //
             {
                 if (histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    zcorr((TH2F*)histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars, i, j, czcorr);
+                    zcorr((TH2F*)histofilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)),
+                          min,
+                          max,
+                          pars,
+                          i,
+                          j,
+                          czcorr);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
                     Double_t veff = par->GetVeff();
@@ -328,7 +344,7 @@ void R3BTofdHisto2HitPar::calcOffset()
     {
         if (histofilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
         {
-            LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+            LOG(warning) << "Found histo Time_Diff_Plane_" << i + 1;
             auto* h = (TH2F*)histofilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -343,7 +359,7 @@ void R3BTofdHisto2HitPar::calcOffset()
                 TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Offset  " << offset;
                 mpar->SetPlane(i + 1);
                 mpar->SetPaddle(j + 1);
                 mpar->SetOffset1(-offset / 2.);
@@ -366,7 +382,7 @@ void R3BTofdHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
             if (histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
-                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(warning) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 auto* h = (TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 h->Draw("colz");
@@ -384,14 +400,14 @@ void R3BTofdHisto2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 histo_py->SetAxisRange(Max - 1.4, Max + 1.4, "X");
                 h->SetAxisRange(Max - 1.4, Max + 1.4, "X");
                 h->SetAxisRange(totLow, totHigh, "Y");
-                std::cout<<"Mean: "<<offset<<"\n";
+                std::cout << "Mean: " << offset << "\n";
                 cToTOffset->Update();
                 gPad->WaitPrimitive();
                 delete fgaus;
                 delete h;
                 delete histo_py;
             }
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
+            LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
             par->SetToTOffset1(sqrt(exp(offset)));
             par->SetToTOffset2(1. / sqrt(exp(offset)));
         }
@@ -407,7 +423,7 @@ void R3BTofdHisto2HitPar::calcSync()
     {
         if (histofilename->Get(Form("Time_Sync_Plane_%i", i + 1)))
         {
-            LOG(WARNING) << "Found histo Time_Sync_Plane_" << i + 1;
+            LOG(warning) << "Found histo Time_Sync_Plane_" << i + 1;
             auto* h = (TH2F*)histofilename->Get(Form("Time_Sync_Plane_%i", i + 1))->Clone();
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
@@ -423,7 +439,7 @@ void R3BTofdHisto2HitPar::calcSync()
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
                 par->SetSync(sync);
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
         }
     }
@@ -442,11 +458,11 @@ void R3BTofdHisto2HitPar::calcVeff()
             Double_t veff = 7.;
             if (histofilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
             {
-                LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+                LOG(warning) << "Found histo Time_Diff_Plane_" << i + 1;
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                 if (!par)
                 {
-                    LOG(INFO) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                    LOG(info) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
                     continue;
                 }
                 auto* h = (TH2F*)histofilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
@@ -465,9 +481,9 @@ void R3BTofdHisto2HitPar::calcVeff()
                 max = fgaus->GetParameter(1) + offset1 - offset2; /// TODO: needs to be tested
                 // max = max+offset1-offset2;
                 veff = fTofdY / max; // effective speed of light in [cm/s]
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
-                LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " offset  " << par->GetOffset1();
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " max  " << max;
+                LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " veff  " << veff;
                 par->SetVeff(veff);
             }
         }
@@ -486,7 +502,7 @@ void R3BTofdHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
             R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
             if (histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
-                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                LOG(warning) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
                 auto* h = (TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 h->Draw("colz");
@@ -508,9 +524,9 @@ void R3BTofdHisto2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(error) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
+            LOG(warning) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                          << "\n";
             par->SetLambda(lambda);
         }
@@ -547,7 +563,7 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
-        if ((x[n] < -40. || x[n] > 40.))// || y[n] < 40.)
+        if ((x[n] < -40. || x[n] > 40.)) // || y[n] < 40.)
         {
             delete histo_py;
             continue;
@@ -602,9 +618,9 @@ void R3BTofdHisto2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     f1->Draw("SAME");
     f2->Draw("SAME");
     cfit_exp->Update();
-    //TImage *img = TImage::Create();
-    //img->FromPad(cfit_exp);
-    //img->WriteImage(Form("./calib/dexp/dexp_%i_%i_%i.png",p,b,s));
+    // TImage *img = TImage::Create();
+    // img->FromPad(cfit_exp);
+    // img->WriteImage(Form("./calib/dexp/dexp_%i_%i_%i.png",p,b,s));
     // gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete gr1;
@@ -725,9 +741,9 @@ void R3BTofdHisto2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
     f1->Draw("SAME");
     f2->Draw("SAME");
     cfit_smiley->Update();
-    TImage *img = TImage::Create();
+    TImage* img = TImage::Create();
     img->FromPad(cfit_smiley);
-    img->WriteImage(Form("./calib/pol3/pol3_%i_%i.png",p,b));
+    img->WriteImage(Form("./calib/pol3/pol3_%i_%i.png", p, b));
     // gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete histo1;
@@ -743,7 +759,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     Double_t par[3000] = { 0 };
     Int_t maxplane = 1, maxbar = 44, nPeaks = 180, fNPeaks = 0;
     Double_t x[3000] = { 0 };
-    //TCanvas* czcorr = new TCanvas("czcorr", "czcorr", 100, 100, 800, 800);
+    // TCanvas* czcorr = new TCanvas("czcorr", "czcorr", 100, 100, 800, 800);
     czcorr->Divide(1, 3);
     czcorr->cd(1);
     auto* h = (TH2F*)histo->Clone();
@@ -758,7 +774,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     // Use TSpectrum to find the peak candidates
     TSpectrum* s = new TSpectrum(nPeaks);
     Int_t nfound = s->Search(h1, 1, "", 0.001); // lower threshold than default 0.05
-    Double_t *xpeaks = new Double_t[nfound];
+    Double_t* xpeaks = new Double_t[nfound];
     std::cout << "Found " << nfound << " candidate peaks to fit\n";
     czcorr->Update();
     // Eliminate background peaks
@@ -771,10 +787,10 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         Double_t yp = h1->GetBinContent(bin);
         if (yp - TMath::Sqrt(yp) < 1.)
         {
-            //std::cout<<"peak @ "<<xp<<" to small, continue\n";
+            // std::cout<<"peak @ "<<xp<<" to small, continue\n";
             continue;
         }
-        //std::cout<<"peak @ "<<xp<<"\n";
+        // std::cout<<"peak @ "<<xp<<"\n";
         par[2 * nPeaks] = yp;
         par[2 * nPeaks + 1] = xp;
         nPeaks++;
@@ -787,7 +803,7 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         {
             for (Int_t i = 0; i < nPeaks; i++)
             {
-                std::cout<<"Not enough peaks\nGive charge of main peak:\n";
+                std::cout << "Not enough peaks\nGive charge of main peak:\n";
                 std::cout << "Peak @ " << par[2 * nPeaks + 1];
                 Double_t z = 0;
                 while ((std::cout << " corresponds to Z=") && !(std::cin >> z))
@@ -796,12 +812,13 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
                     std::cin.clear();
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 }
-                if (z != 0) xus = (Double_t)z;
+                if (z != 0)
+                    xus = (Double_t)z;
             }
             std::cout << "Do again? (y/n) ";
             std::cin >> doagain;
         } while (doagain != "n");
-        pars[0] = xus/par[2 * nPeaks + 1];
+        pars[0] = xus / par[2 * nPeaks + 1];
         pars[1] = 0.;
         pars[2] = 1;
         return;
@@ -812,11 +829,11 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     {
         peaks[i] = 0;
     }
-    //Double_t peaks[nPeaks] = {0};
+    // Double_t peaks[nPeaks] = {0};
 
     for (Int_t i = 0; i < nPeaks; i++)
     {
-        printf("Found peak @ %f\n",xpeaks[i]);
+        printf("Found peak @ %f\n", xpeaks[i]);
         peaks[i] = par[2 * i + 1];
         TLine* l = new TLine(par[2 * i + 1], 0, par[2 * i + 1], par[2 * i]);
         l->SetLineColor(kRed);
@@ -874,10 +891,12 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     if (nfp < 2)
     {
         delete s;
-        //delete czcorr;
+        // delete czcorr;
         std::cout << "Not enough Peaks to fit! Will set charge to main peak.\n";
-        if (zpeaks[0] != 0) pars[0] = x[0]/zpeaks[0];
-        else pars[0] = 1;
+        if (zpeaks[0] != 0)
+            pars[0] = x[0] / zpeaks[0];
+        else
+            pars[0] = 1;
         pars[1] = 0.;
         pars[2] = 1.;
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
@@ -903,14 +922,14 @@ void R3BTofdHisto2HitPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
     }
     czcorr->Update();
-    //TImage *img = TImage::Create();
-    //img->FromPad(czcorr);
-    //img->WriteImage(Form("./calib/zcorrpol3/zcorr_pol3_%i_%i.png",pl,b));
+    // TImage *img = TImage::Create();
+    // img->FromPad(czcorr);
+    // img->WriteImage(Form("./calib/zcorrpol3/zcorr_pol3_%i_%i.png",pl,b));
     gPad->WaitPrimitive();
     gSystem->Sleep(3000);
     delete s;
     delete gr1;
-    //delete czcorr;
+    // delete czcorr;
     delete fitz;
 }
 

@@ -108,8 +108,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
-        return kERROR;
+        LOG(fatal) << "FairRootManager not found.";
+        //        return kError;
     }
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -119,8 +119,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fCalItems = (TClonesArray*)mgr->GetObject(name);
     if (!fCalItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
-        return kERROR;
+        LOG(fatal) << "Branch " << name << " not found.";
+        //        return kError;
     }
     auto name_mapmt_trig = fName + "TriggerCal";
     fMAPMTCalTriggerItems = (TClonesArray*)mgr->GetObject(name_mapmt_trig);
@@ -146,7 +146,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
     if (!fHitPar)
     {
-        LOG(INFO) << "Could not get " << container << " container.";
+        LOG(info) << "Could not get " << container << " container.";
         fNofHitPars = 0;
     }
     else
@@ -157,7 +157,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
         if (0 == fNofHitPars)
         {
-            LOG(INFO) << "No Hit parameters in " << container << " container.";
+            LOG(info) << "No Hit parameters in " << container << " container.";
             fHitPar = nullptr;
         }
     }
@@ -488,7 +488,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
     fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
+        LOG(error) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
     }
 }
 

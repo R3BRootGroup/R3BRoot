@@ -21,12 +21,14 @@
 #include "R3BNeulandHitPar.h"
 
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH2F.h"
 
+#include "TROOT.h"
 using namespace Neuland;
 using std::isnan;
 
@@ -74,10 +76,10 @@ InitStatus R3BNeulandCal2HitPar::Init()
     }
 
     fNeulandHitPar = static_cast<R3BNeulandHitPar*>(FairRuntimeDb::instance()->getContainer("NeulandHitPar"));
-    LOG(INFO) << "R3BNeulandCal2HitPar::Init: "
+    LOG(info) << "R3BNeulandCal2HitPar::Init: "
               << "Number of Hit-Paramteres found: " << fNeulandHitPar->GetNumModulePar();
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::Init: "
+    LOG(info) << "R3BNeulandCal2HitPar::Init: "
               << "Initializing NeulandHitCalibrationEngine.";
     fHitCalEngine->Init(fNeulandHitPar);
 
@@ -106,12 +108,12 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
     ++fIgorcnt0;
 
-    LOG(DEBUG) << "R3BNeulandCal2HitPar::Exec: Event " << fEventNumber - 1;
+    LOG(debug) << "R3BNeulandCal2HitPar::Exec: Event " << fEventNumber - 1;
     const auto nItems = fCalNeuland->GetEntriesFast();
 
     if (nItems < 8)
     {
-        LOG(DEBUG) << "   Event cannot be used: too few signals : " << nItems << "!";
+        LOG(debug) << "   Event cannot be used: too few signals : " << nItems << "!";
         return;
     }
 
@@ -141,7 +143,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
     if (addedPoints < 6)
     {
-        LOG(DEBUG) << "   Event cannot be used: too few Points : " << addedPoints << " (" << nItems << ")!";
+        LOG(debug) << "   Event cannot be used: too few Points : " << addedPoints << " (" << nItems << ")!";
         return;
     }
 
@@ -151,23 +153,23 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
     if (cosmicTrack.Interactions.size() == 0)
     {
-        LOG(DEBUG) << "   Getting Cosmic Track :  Failure!";
+        LOG(debug) << "   Getting Cosmic Track :  Failure!";
         return;
     }
 
-    LOG(DEBUG) << "   Getting Cosmic Track:  Success!";
+    LOG(debug) << "   Getting Cosmic Track:  Success!";
     ++fAcceptedEventNumber;
 
-    LOG(DEBUG) << "   Adding data to calibration";
+    LOG(debug) << "   Adding data to calibration";
     fHitCalEngine->Add(cosmicTrack, fEventNumber);
 }
 
 void R3BNeulandCal2HitPar::FinishTask()
 {
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Saved " << fAcceptedEventNumber << " Events.                       ";
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Starting Neuland Hit Calibration with " << fAcceptedEventNumber << " Events.";
 
     const auto batchMode = gROOT->IsBatch();
@@ -200,12 +202,12 @@ void R3BNeulandCal2HitPar::FinishTask()
     }
 
     fNeulandHitPar->SetEnergyCutoff(maxThreshold);
-    LOG(INFO) << TString::Format("R3BNeulandCal2HitPar::FinishTask: Recommended Minimum Energy Cutoff : >%4.2f MeV\n",
+    LOG(info) << TString::Format("R3BNeulandCal2HitPar::FinishTask: Recommended Minimum Energy Cutoff : >%4.2f MeV\n",
                                  maxThreshold);
 
     fNeulandHitPar->setChanged();
 
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask: "
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
               << "Number of calibrated Bars: " << fNeulandHitPar->GetNumModulePar();
 }
 

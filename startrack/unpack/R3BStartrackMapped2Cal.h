@@ -30,7 +30,9 @@
 #include "R3BStartrackMapped2CalPar.h"
 //#include "R3BStartrackCalData.h"
 #include "R3BStartrackMappedData.h"
-
+#include <stdint.h>
+#include <vector>
+using namespace std;
 class TClonesArray;
 class TH2F;
 // class R3BStartrackMapped2CalPar;

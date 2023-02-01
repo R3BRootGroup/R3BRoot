@@ -24,6 +24,7 @@
 #include "R3BPdcHitPar.h"
 
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
 #include "TF1.h"
@@ -98,7 +99,7 @@ InitStatus R3BPdcCal2Hit::Init()
     fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+        LOG(error) << "Could not get access to PdcHitPar-Container.";
         fNofHitPars = 0;
         // return kFATAL;
     }
@@ -107,7 +108,7 @@ InitStatus R3BPdcCal2Hit::Init()
         fNofHitPars = fHitPar->GetNumModulePar();
         if (fNofHitPars == 0)
         {
-            LOG(ERROR) << "There are no Hit parameters in container PdcHitPar";
+            LOG(error) << "There are no Hit parameters in container PdcHitPar";
             // return kFATAL;
         }
     }
@@ -286,7 +287,7 @@ void R3BPdcCal2Hit::SetParContainers()
     fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+        LOG(error) << "Could not get access to PdcHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -512,26 +513,26 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                     }
                 }
                 tsync_pdc = t_pdc - tsync;
-                
-                //cout<<"Tsync: "<<ID<<", "<<wire<<", "<<tsync<<", "<<t_pdc<<", "<<tsync_pdc<<endl;
 
-                //cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc << endl;
+                // cout<<"Tsync: "<<ID<<", "<<wire<<", "<<tsync<<", "<<t_pdc<<", "<<tsync_pdc<<endl;
+
+                // cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc <<
+                // endl;
 
                 // cuts
                 if (tot_pdc < 35.)
                 {
-                    //continue;
+                    // continue;
                 }
                 if (!fIsSync && (tsync_pdc < -50. || tsync_pdc > 250.))
                 {
                     continue;
                 }
 
-
                 // store first hit in wire
-                //if(1>0) // v48
-                //if(first)  //v49
-                if (tot_pdc > TotMax) //v50
+                // if(1>0) // v48
+                // if(first)  //v49
+                if (tot_pdc > TotMax) // v50
                 {
                     TotMax = tot_pdc;
                     ID_new = ID;
@@ -575,7 +576,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
             if (ID_new == ID_old && wire_new - 1 == wire_old)
             {
-                //cout  << "found Pair: " << ID_new << "  " << wire_new << "  " << wire_old << endl;
+                // cout  << "found Pair: " << ID_new << "  " << wire_new << "  " << wire_old << endl;
                 Double_t pos = 0.;
                 Double_t x = 0.;
                 Double_t y = 0.;
@@ -605,26 +606,26 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
                     if (!method2)
                     {
-						// Version MH
-                        
-                         R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID_new - 1) * N_WIRE_MAX + wire_new);
-                         if (par)
-                         {
-                             dtmin = par->GetdTmin();
-                             dtmax = par->GetdTmax();
-                             //cout  << "Parameter: " << dtmin << "  " << dtmax << endl;
-                         }
-                         // calculate radius
-                         Double_t m = wire_distance / (dtmax - dtmin);
-                         Double_t b = wire_distance / 2. - m * dtmax;
-                         r = m * (tsync_new - tsync_old) + b;
-                         //cout  << "dt: " << (t_new - t_old) << " Radius: " << r << endl;
+                        // Version MH
 
-                         fh_radius_dt[ID_new - 1]->Fill(wire_new, r);
-                        
+                        R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID_new - 1) * N_WIRE_MAX + wire_new);
+                        if (par)
+                        {
+                            dtmin = par->GetdTmin();
+                            dtmax = par->GetdTmax();
+                            // cout  << "Parameter: " << dtmin << "  " << dtmax << endl;
+                        }
+                        // calculate radius
+                        Double_t m = wire_distance / (dtmax - dtmin);
+                        Double_t b = wire_distance / 2. - m * dtmax;
+                        r = m * (tsync_new - tsync_old) + b;
+                        // cout  << "dt: " << (t_new - t_old) << " Radius: " << r << endl;
+
+                        fh_radius_dt[ID_new - 1]->Fill(wire_new, r);
+
                         // end version MH
-                        
-                        //Version AK
+
+                        // Version AK
                         /*
                         R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID_new - 1) * N_WIRE_MAX + wire_new);
                         if (par)
@@ -639,7 +640,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                                 x_xtc[ic] = *(xtc_x + ic);
                                 t_xtc[ic] = *(xtc_t + ic);
                             }
-                            LOG(DEBUG) << "Parameter: " << dtmin << "  " << dtmax << endl;
+                            LOG(debug) << "Parameter: " << dtmin << "  " << dtmax << endl;
 
                             Double_t ttemp1 = 0, ttemp2 = 0;
                             if (xtc_npoints < 1)
@@ -676,11 +677,10 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                             }
 
                             fh_radius_dt[ID_new - 1]->Fill(tdrift, r);
-							cout << "Test tdrift = : " << tdrift << "  r = " << r << endl;
+                            cout << "Test tdrift = : " << tdrift << "  r = " << r << endl;
                         }
-						*/
-						// end version AK
-                        
+                        */
+                        // end version AK
                     }
 
                     if (method2)
@@ -700,7 +700,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                                 t_xtc[ic] = *(xtc_t + ic);
                             }
 
-                            LOG(DEBUG) << "Parameter: " << dtmin << "  " << dtmax << endl;
+                            LOG(debug) << "Parameter: " << dtmin << "  " << dtmax << endl;
                         }
 
                         if (xtc_npoints < 1)
@@ -732,7 +732,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                                 }
                             }
 
-                            LOG(DEBUG) << "Radius1: " << r1 << endl;
+                            LOG(debug) << "Radius1: " << r1 << endl;
                         }
                         // cout<<"Radius 1: "<<r1<<", "<<tsync_old<<", "<<xtc_npoints<<", "<<dtmin<<"; "<<dtmax<<endl;
 
@@ -749,7 +749,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                                 x_xtc[ic] = *(xtc_x + ic);
                                 t_xtc[ic] = *(xtc_t + ic);
                             }
-                            LOG(DEBUG) << "Parameter: " << dtmin << "  " << dtmax << endl;
+                            LOG(debug) << "Parameter: " << dtmin << "  " << dtmax << endl;
                         }
                         Double_t ttemp1 = 0, ttemp2 = 0;
                         if (xtc_npoints < 1)
@@ -785,7 +785,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                                 }
                             }
 
-                            LOG(DEBUG) << "Radius2: " << r2 << endl;
+                            LOG(debug) << "Radius2: " << r2 << endl;
                         }
 
                         //  cout<<"Radius 2: "<<r2<<", "<<tsync_new<<", "<<xtc_npoints<<", "<<dtmin<<"; "<<dtmax<<",
@@ -847,15 +847,15 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
                 if (!fIsCalibrator)
                 {
-                    //if (tsync_new > -100 && tsync_new < 300 && tsync_old > -100 && tsync_old < 300)
+                    // if (tsync_new > -100 && tsync_new < 300 && tsync_old > -100 && tsync_old < 300)
                     {
 
                         new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(
                             (tsync_new + tsync_old) / 2., x, y, sqrt(tot_new * tot_old), ID_new, wire_new);
 
-						//cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " <<
-						//	sqrt(tot_new * tot_old) << " t: " << (tsync_new + tsync_old) / 2. << " wire: " << wire_new << endl;
-
+                        // cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " <<
+                        //	sqrt(tot_new * tot_old) << " t: " << (tsync_new + tsync_old) / 2. << " wire: " << wire_new
+                        //<< endl;
                     }
                 }
             }
@@ -927,10 +927,10 @@ void R3BPdcCal2Hit::FinishTask()
                 {
                     Double_t tsync = -10000.;
                     TH1D* proj0 = fh_time_raw[plane]->ProjectionY("", i + 1, i + 1, 0);
-					// one can look for the highest bin an use this for sync
-                    //Double_t tsync = proj0->GetBinCenter(proj0->GetMaximumBin());
+                    // one can look for the highest bin an use this for sync
+                    // Double_t tsync = proj0->GetBinCenter(proj0->GetMaximumBin());
 
-					// but one can also look at the sharp increasing edge and find the 50% value
+                    // but one can also look at the sharp increasing edge and find the 50% value
                     Int_t numBins = proj0->GetNbinsX() - 2;
                     for (Int_t j = 1; j < numBins; j++)
                     {
@@ -938,7 +938,7 @@ void R3BPdcCal2Hit::FinishTask()
                         {
                             tsync = proj0->GetBinCenter(j);
                         }
-					}
+                    }
 
                     R3BPdcHitModulePar* par0 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
                     par0->SetSync(tsync);
@@ -952,56 +952,56 @@ void R3BPdcCal2Hit::FinishTask()
             // Bool_t method2 = false; -> in header file included
             if (!method2)
             {
-				// short version MH
-                
-				for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
-				{
-				  for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
-				  {
-					  R3BPdcHitModulePar* par0 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
-					  Double_t tsync = par0->GetSync();
+                // short version MH
 
-					  // find maximum value of drift times
-					  TH1D* proj = fh_time_drift[plane]->ProjectionY("", i + 1, i + 1, 0);
-					  // Double_t wire_distance = 7.8; // in mm
-					  Double_t tmin = -10000.;
-					  Double_t tmax = -10000.;
-					  Int_t numBins = proj->GetNbinsX() - 2;
-					  if (proj->GetSum() < 100)
-						  continue;
-					  for (UInt_t j = 1; j < numBins; j++)
-					  {
-						  // cout << "sum: " << sum << "  " << proj->GetBinContent(j)/proj->GetSum() * 8. << endl;
-						  // cout << "Bin: " << proj->GetBinCenter(j) <<  "  " << proj->GetBinContent(j) << endl;
-						  // cout << "Maximum: " << proj->GetMaximum() << endl;
-						  // cout << "Test1: " << proj->GetBinContent(j)/proj->GetMaximum() << endl;
-						  // cout << "Test2: " << proj->GetBinContent(numBins-j)/proj->GetMaximum() << endl;
-						  if (proj->GetBinContent(j) / proj->GetMaximum() * 100. > 5. && tmin < -9999)
-						  {
-							  tmin = proj->GetBinCenter(j);
-						  }
-						  if (proj->GetBinContent(numBins - j) / proj->GetMaximum() * 100. > 5. && tmax < -9999)
-						  {
-							  tmax = proj->GetBinCenter(numBins - j);
-						  }
-					  }
+                for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
+                {
+                    for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
+                    {
+                        R3BPdcHitModulePar* par0 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
+                        Double_t tsync = par0->GetSync();
 
-					  // tmin -= 70.;
-					  // tmax += 70.;
+                        // find maximum value of drift times
+                        TH1D* proj = fh_time_drift[plane]->ProjectionY("", i + 1, i + 1, 0);
+                        // Double_t wire_distance = 7.8; // in mm
+                        Double_t tmin = -10000.;
+                        Double_t tmax = -10000.;
+                        Int_t numBins = proj->GetNbinsX() - 2;
+                        if (proj->GetSum() < 100)
+                            continue;
+                        for (UInt_t j = 1; j < numBins; j++)
+                        {
+                            // cout << "sum: " << sum << "  " << proj->GetBinContent(j)/proj->GetSum() * 8. << endl;
+                            // cout << "Bin: " << proj->GetBinCenter(j) <<  "  " << proj->GetBinContent(j) << endl;
+                            // cout << "Maximum: " << proj->GetMaximum() << endl;
+                            // cout << "Test1: " << proj->GetBinContent(j)/proj->GetMaximum() << endl;
+                            // cout << "Test2: " << proj->GetBinContent(numBins-j)/proj->GetMaximum() << endl;
+                            if (proj->GetBinContent(j) / proj->GetMaximum() * 100. > 5. && tmin < -9999)
+                            {
+                                tmin = proj->GetBinCenter(j);
+                            }
+                            if (proj->GetBinContent(numBins - j) / proj->GetMaximum() * 100. > 5. && tmax < -9999)
+                            {
+                                tmax = proj->GetBinCenter(numBins - j);
+                            }
+                        }
 
-					  R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
-					  par2->SetdTmin(tmin);
-					  par2->SetdTmax(tmax);
-					  par2->SetSync(tsync);
+                        // tmin -= 70.;
+                        // tmax += 70.;
 
-					  cout << "Plane: " << plane << "  " << plane * N_WIRE_MAX + i << endl;
-					  cout << "Set parameter of wire: " << i << " tmin: " << tmin << " tmax: " << tmax
-						   << " tsync: " << tsync << endl;
-				  }
-				}
-				// end of short version
+                        R3BPdcHitModulePar* par2 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + i);
+                        par2->SetdTmin(tmin);
+                        par2->SetdTmax(tmax);
+                        par2->SetSync(tsync);
 
-				// long version from AK
+                        cout << "Plane: " << plane << "  " << plane * N_WIRE_MAX + i << endl;
+                        cout << "Set parameter of wire: " << i << " tmin: " << tmin << " tmax: " << tmax
+                             << " tsync: " << tsync << endl;
+                    }
+                }
+                // end of short version
+
+                // long version from AK
                 /*
                 if (!fIsSync)
                 {
@@ -1183,11 +1183,11 @@ void R3BPdcCal2Hit::FinishTask()
                                     rebinned_points++;
                                 }
                             }
-                            
-                            if (rebinned_points > 300) 
+
+                            if (rebinned_points > 300)
                             {
-								rebinned_points = 300;
-							}
+                                rebinned_points = 300;
+                            }
                             rebind_sum = rebinned_points;
                             for (Int_t irp = 0; irp < rebind_sum; irp++)
                             {
@@ -1275,8 +1275,8 @@ void R3BPdcCal2Hit::FinishTask()
                     fh_error[plane]->SetMarkerStyle(22);
                     fh_error[plane]->Draw("hist p pmc");
                 }
-				// end of long version
-				*/
+                // end of long version
+                */
             }
 
             if (method2)
@@ -1312,12 +1312,12 @@ void R3BPdcCal2Hit::FinishTask()
                         tmin = 0;
                         tmax = 0;
                         npoints = 0;
-						for (Int_t icount = 0; icount < xtc_points; icount++)
-						{
-							t_ns[icount] = -10000;
-							x_mm[icount] = -1;
-						}
-                        
+                        for (Int_t icount = 0; icount < xtc_points; icount++)
+                        {
+                            t_ns[icount] = -10000;
+                            x_mm[icount] = -1;
+                        }
+
                         for (Int_t icount = 0; icount < xtc_points; icount++)
                         {
                             rebinned_x_mm[icount] = -1;
@@ -1349,7 +1349,7 @@ void R3BPdcCal2Hit::FinishTask()
                                 if (proj->GetBinContent(j) <= 0.1 * maxContent)
                                 {
                                     index_low = j;
-                                    //cout << "index low: " << j << ", " << index_low << ", " << proj->GetBinContent(j)
+                                    // cout << "index low: " << j << ", " << index_low << ", " << proj->GetBinContent(j)
                                     //     << ", " << 0.1 * maxContent << ", " << maxContent << endl;
                                 }
                                 if (proj->GetBinContent(j) >= 0.9 * maxContent)
@@ -1383,9 +1383,9 @@ void R3BPdcCal2Hit::FinishTask()
                                                                                  (index_high - index_low) /
                                                                                  (content_high - content_low);
 
-                            Int_t index_start = findex_start;                            
+                            Int_t index_start = findex_start;
                             Int_t index_end = findex_start + 240. / proj->GetBinWidth(0);
-                            
+
                             cout << "Index start: " << index_start << " Index end: " << index_end << endl;
 
                             for (UInt_t j = index_start; j < index_end; j++)
@@ -1422,117 +1422,117 @@ void R3BPdcCal2Hit::FinishTask()
                             {
                                 fh_running_sum->Fill(t_ns[j], x_mm[j]);
                                 fh_xtc->Fill(t_ns[j], x_mm[j]);
-                                
                             }
 
-/*
-                            // +++++++++++++++++++++++++++++++++
-                            //    Rebin (remove points)
-                            // +++++++++++++++++++++++++++++++++
-                            Double_t max_err = 0.015;
+                            /*
+                                                        // +++++++++++++++++++++++++++++++++
+                                                        //    Rebin (remove points)
+                                                        // +++++++++++++++++++++++++++++++++
+                                                        Double_t max_err = 0.015;
 
-                            Double_t max_abs_err;
-                            rebinned_points = 0;
-                            rebinned_x_mm[rebinned_points] = x_mm[0];
-                            rebinned_t_ns[rebinned_points] = t_ns[0];
-                            UInt_t rebinned_counter = 0;
+                                                        Double_t max_abs_err;
+                                                        rebinned_points = 0;
+                                                        rebinned_x_mm[rebinned_points] = x_mm[0];
+                                                        rebinned_t_ns[rebinned_points] = t_ns[0];
+                                                        UInt_t rebinned_counter = 0;
 
-                            for (Int_t index = 1; index < npoints; index++)
-                            {
-                                if (rebinned_counter + 2 > npoints)
-                                {
-                                    break;
-                                }
-                                for (Int_t ij = rebinned_counter + 2; ij < npoints; ij++)
-                                {
+                                                        for (Int_t index = 1; index < npoints; index++)
+                                                        {
+                                                            if (rebinned_counter + 2 > npoints)
+                                                            {
+                                                                break;
+                                                            }
+                                                            for (Int_t ij = rebinned_counter + 2; ij < npoints; ij++)
+                                                            {
 
-                                    if (rebinned_counter > 600)
-                                        max_err = 0.002;
-                                    Double_t temp_x = x_mm[ij];
-                                    Double_t temp_t = t_ns[ij];
+                                                                if (rebinned_counter > 600)
+                                                                    max_err = 0.002;
+                                                                Double_t temp_x = x_mm[ij];
+                                                                Double_t temp_t = t_ns[ij];
 
-                                    Double_t start_x = rebinned_x_mm[rebinned_points - 1];
-                                    Double_t start_t = rebinned_t_ns[rebinned_points - 1];
+                                                                Double_t start_x = rebinned_x_mm[rebinned_points - 1];
+                                                                Double_t start_t = rebinned_t_ns[rebinned_points - 1];
 
-                                    Double_t dx = temp_x - start_x;
-                                    Double_t dt = temp_t - start_t;
+                                                                Double_t dx = temp_x - start_x;
+                                                                Double_t dt = temp_t - start_t;
 
-                                    Double_t apar = dx / dt;
-                                    Double_t bpar = start_x - apar * start_t;
+                                                                Double_t apar = dx / dt;
+                                                                Double_t bpar = start_x - apar * start_t;
 
-                                    Double_t tc;
-                                    Double_t xc;
-                                    Int_t isum = 0;
-                                    Double_t err = 0;
-                                    for (Int_t iz = rebinned_counter; iz < ij; iz++)
-                                    {
-                                        tc = t_ns[iz];
-                                        xc = apar * tc + bpar;
+                                                                Double_t tc;
+                                                                Double_t xc;
+                                                                Int_t isum = 0;
+                                                                Double_t err = 0;
+                                                                for (Int_t iz = rebinned_counter; iz < ij; iz++)
+                                                                {
+                                                                    tc = t_ns[iz];
+                                                                    xc = apar * tc + bpar;
 
-                                        err = err + (xc - x_mm[iz]) * (xc - x_mm[iz]);
-                                        isum++;
-                                    }
+                                                                    err = err + (xc - x_mm[iz]) * (xc - x_mm[iz]);
+                                                                    isum++;
+                                                                }
 
-                                    Double_t err_check = sqrt(err / float(isum));
+                                                                Double_t err_check = sqrt(err / float(isum));
 
-                                    if (err_check > max_err)
-                                    {
-                                        rebinned_points++;
-                                        rebinned_x_mm[rebinned_points] = x_mm[ij];
-                                        rebinned_t_ns[rebinned_points] = t_ns[ij];
-                                        rebinned_counter = ij;
+                                                                if (err_check > max_err)
+                                                                {
+                                                                    rebinned_points++;
+                                                                    rebinned_x_mm[rebinned_points] = x_mm[ij];
+                                                                    rebinned_t_ns[rebinned_points] = t_ns[ij];
+                                                                    rebinned_counter = ij;
 
-                                        break;
-                                    }
-                                }
+                                                                    break;
+                                                                }
+                                                            }
 
-                                fh_xtc->Fill(rebinned_t_ns[rebinned_points], rebinned_x_mm[rebinned_points]);
-                            }
+                                                            fh_xtc->Fill(rebinned_t_ns[rebinned_points],
+                               rebinned_x_mm[rebinned_points]);
+                                                        }
 
-                            tmin = rebinned_t_ns[0];
-                            tmax = rebinned_t_ns[rebinned_points];
+                                                        tmin = rebinned_t_ns[0];
+                                                        tmax = rebinned_t_ns[rebinned_points];
 
-                            Double_t err = 0;
-                            Double_t err_check = 0;
-                            Int_t isum = 0;
+                                                        Double_t err = 0;
+                                                        Double_t err_check = 0;
+                                                        Int_t isum = 0;
 
-                            for (UInt_t j = 0; j < npoints; j++)
-                            {
-                                Double_t temp_x = x_mm[j];
-                                Double_t temp_t = t_ns[j];
+                                                        for (UInt_t j = 0; j < npoints; j++)
+                                                        {
+                                                            Double_t temp_x = x_mm[j];
+                                                            Double_t temp_t = t_ns[j];
 
-                                for (UInt_t k = 0; k < rebinned_points - 1; k++)
-                                {
-                                    if (temp_t >= rebinned_t_ns[k] && temp_t < rebinned_t_ns[k + 1])
-                                    {
+                                                            for (UInt_t k = 0; k < rebinned_points - 1; k++)
+                                                            {
+                                                                if (temp_t >= rebinned_t_ns[k] && temp_t <
+                               rebinned_t_ns[k + 1])
+                                                                {
 
-                                        Double_t x1 = rebinned_x_mm[k];
-                                        Double_t t1 = rebinned_t_ns[k];
-                                        Double_t x2 = rebinned_x_mm[k + 1];
-                                        Double_t t2 = rebinned_t_ns[k + 1];
+                                                                    Double_t x1 = rebinned_x_mm[k];
+                                                                    Double_t t1 = rebinned_t_ns[k];
+                                                                    Double_t x2 = rebinned_x_mm[k + 1];
+                                                                    Double_t t2 = rebinned_t_ns[k + 1];
 
-                                        Double_t dx = x2 - x1;
-                                        Double_t dt = t2 - t1;
+                                                                    Double_t dx = x2 - x1;
+                                                                    Double_t dt = t2 - t1;
 
-                                        Double_t apar = dx / dt;
-                                        Double_t bpar = x1 - apar * t1;
+                                                                    Double_t apar = dx / dt;
+                                                                    Double_t bpar = x1 - apar * t1;
 
-                                        Double_t xc = apar * temp_t + bpar;
+                                                                    Double_t xc = apar * temp_t + bpar;
 
-                                        err = err + (xc - temp_x) * (xc - temp_x);
-                                        isum++;
-                                    }
-                                }
-                            }
-                            err_check = sqrt(err / float(isum));
-                            fh_error[plane]->Fill(i, err_check);
-                            // cout<<"Err: "<<err_check<<", "<<err<<", "<<isum<<endl;
-*/
-
+                                                                    err = err + (xc - temp_x) * (xc - temp_x);
+                                                                    isum++;
+                                                                }
+                                                            }
+                                                        }
+                                                        err_check = sqrt(err / float(isum));
+                                                        fh_error[plane]->Fill(i, err_check);
+                                                        // cout<<"Err: "<<err_check<<", "<<err<<", "<<isum<<endl;
+                            */
                         }
-						tmin = t_ns[0];
-						tmax = t_ns[npoints-1];
-												
+                        tmin = t_ns[0];
+                        tmax = t_ns[npoints - 1];
+
                         R3BPdcHitModulePar* par3 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + iwire);
                         par3->SetTmin(tmin);
                         par3->SetTmax(tmax);
@@ -1542,44 +1542,43 @@ void R3BPdcCal2Hit::FinishTask()
                         par3->SetXT_xArray(x_mm, npoints);
                         par3->SetXT_tArray(t_ns, npoints);
 
-/*
-                        for (Int_t icount = 0; icount < xtc_points; icount++)
-                        {
-                            xt_tarray[icount] = -10000;
-                            xt_xarray[icount] = -1;
-                        }
+                        /*
+                                                for (Int_t icount = 0; icount < xtc_points; icount++)
+                                                {
+                                                    xt_tarray[icount] = -10000;
+                                                    xt_xarray[icount] = -1;
+                                                }
 
-                        for (Int_t icount = 0; icount < rebinned_points; icount++)
-                        {
-                            xt_tarray[icount] = rebinned_t_ns[icount];
-                            xt_xarray[icount] = rebinned_x_mm[icount];
-                        }
+                                                for (Int_t icount = 0; icount < rebinned_points; icount++)
+                                                {
+                                                    xt_tarray[icount] = rebinned_t_ns[icount];
+                                                    xt_xarray[icount] = rebinned_x_mm[icount];
+                                                }
 
-                        par3->SetXT_xArray(xt_xarray, rebinned_points);
-                        par3->SetXT_tArray(xt_tarray, rebinned_points);
+                                                par3->SetXT_xArray(xt_xarray, rebinned_points);
+                                                par3->SetXT_tArray(xt_tarray, rebinned_points);
 
-*/
-
+                        */
 
                         cout << "Plane: " << plane + 1 << ", wire: " << i << ", channel: " << plane * N_WIRE_MAX + iwire
                              << ", tmin: " << tmin << ", tmax: " << tmax
-                             << ", tsync: " << tsync_mem[plane * N_WIRE_MAX + iwire - 1]
-                             << ", xtc points: " << npoints << endl;
+                             << ", tsync: " << tsync_mem[plane * N_WIRE_MAX + iwire - 1] << ", xtc points: " << npoints
+                             << endl;
                     }
-                    //cfit->cd(plane + 1);
-                    //fh_error[plane]->SetMarkerStyle(22);
-                    //fh_error[plane]->Draw("hist p pmc");
+                    // cfit->cd(plane + 1);
+                    // fh_error[plane]->SetMarkerStyle(22);
+                    // fh_error[plane]->Draw("hist p pmc");
                 }
             }
         }
-        
+
         fHitPar->setChanged();
         fh_running_sum->Write();
         fh_xtc->Write();
-//        for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
-//        {
-//            fh_error[j]->Write();
-//        }
+        //        for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
+        //        {
+        //            fh_error[j]->Write();
+        //        }
     }
 }
 

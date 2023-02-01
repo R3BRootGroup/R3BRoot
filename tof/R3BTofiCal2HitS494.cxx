@@ -25,6 +25,7 @@
 #include "R3BTofiHitPar.h"
 
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "TF1.h"
 #include "TH1F.h"
@@ -96,6 +97,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494()
         {
             fhQ[i] = NULL;
             fhxy[i] = NULL;
+            fhxycm[i] = NULL;
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
             fhTsync[i] = NULL;
@@ -149,6 +151,7 @@ R3BTofiCal2HitS494::R3BTofiCal2HitS494(const char* name, Int_t iVerbose)
             fh_Tofi_TotPm[i] = NULL;
             fhQ[i] = NULL;
             fhxy[i] = NULL;
+            fhxycm[i] = NULL;
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
             fhTsync[i] = NULL;
@@ -172,6 +175,8 @@ R3BTofiCal2HitS494::~R3BTofiCal2HitS494()
                 delete fhQ[i];
             if (fhxy[i])
                 delete fhxy[i];
+            if (fhxycm[i])
+                delete fhxycm[i];
             if (fhQvsEvent[i])
                 delete fhQvsEvent[i];
             if (fhTdiff[i])
@@ -207,14 +212,14 @@ InitStatus R3BTofiCal2HitS494::Init()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofiHitPar";
+        LOG(error) << "There are no Hit parameters in container TofiHitPar";
         return kFATAL;
     }
 
@@ -235,7 +240,7 @@ InitStatus R3BTofiCal2HitS494::Init()
     mgr->Register("TofiHit", "Land", fHitItems, kTRUE);
 
     if (!fTofiHisto)
-        LOG(INFO) << "No Cal2Hit Histograms will be created!";
+        LOG(info) << "No Cal2Hit Histograms will be created!";
 
     tofi_trig_map_setup();
 
@@ -248,7 +253,7 @@ void R3BTofiCal2HitS494::SetParContainers()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -350,7 +355,8 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                           << ' ' << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
         */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
+        // auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
         events_in_cal_level++;
     }
@@ -414,7 +420,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -454,7 +460,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -462,7 +468,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;
@@ -485,7 +491,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 R3BTofiHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(info) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     ++top_i;
                     ++bot_i;
@@ -494,7 +500,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(INFO) << "Walk correction not found!";
+                    LOG(info) << "Walk correction not found!";
                 auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                  par->GetPar1Walk(),
                                                  par->GetPar2Walk(),
@@ -514,7 +520,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
-                    LOG(FATAL) << "ToFi THit not found";
+                    LOG(fatal) << "ToFi THit not found";
                 }
                 if (timeP0 == 0.)
                     timeP0 = THit;
@@ -610,20 +616,20 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
-                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
                 else
-                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
+                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 +
                                           (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
@@ -631,16 +637,16 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width + (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
                 }
-                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
+                LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
@@ -657,9 +663,9 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (fTofiHisto)
                 {
                     // fill control histograms
-                    fhTsync[iPlane - 1]->Fill(iBar, THit);
+                    // a  fhTsync[iPlane - 1]->Fill(iBar, THit);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                    // a fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
                     // fhQvsTHit[iPlane - 1][iBar - 1]->Fill(qb, THit);
                     // fhTvsTHit[iPlane - 1][iBar - 1]->Fill(dt_mod, THit);
                 }
@@ -670,19 +676,19 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(DEBUG) << "Not in bar coincidence increase top counter";
+                LOG(debug) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(DEBUG) << "Not in bar coincidence increase bot counter";
+                LOG(debug) << "Not in bar coincidence increase bot counter";
             }
         }
     }
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << event.size();
+    LOG(debug) << "Hits in this event: " << event.size();
     if (event.empty())
         events_wo_tofi_hits++;
 
@@ -706,10 +712,10 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+    LOG(debug) << "Charge Time xpos ypos plane bar";
     for (Int_t hit = 0; hit < event.size(); hit++)
     {
-        LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
+        LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
                    << " " << event[hit].plane << " " << event[hit].bar;
     }
 
@@ -721,9 +727,17 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         for (; ihit < event.size();)
         { // loop over all hits
             eventstore++;
-            fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge); // charge per plane
-            fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge); // charge vs event #
-            fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos);  // xy of plane
+
+            if (abs(event[ihit].time) < 50)
+            {
+                fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge);   // charge per plane
+                fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge);   // charge vs event #
+                fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos);    // xy of plane
+                fhxycm[event[ihit].plane - 1]->Fill(event[ihit].xpos, event[ihit].ypos); // xy of plane
+
+                fhTsync[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].time);
+                fhQvsPos[event[ihit].plane - 1][event[ihit].bar - 1]->Fill(event[ihit].ypos, event[ihit].charge);
+            }
             ihit++;
         }
     }
@@ -746,15 +760,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         }
     }
 
-    LOG(DEBUG) << "Used up hits in this event:";
+    LOG(debug) << "Used up hits in this event:";
     for (Int_t a = 0; a < event.size(); a++)
     {
-        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
+        LOG(debug) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL) << "Not all events analyzed!";
+            LOG(fatal) << "Not all events analyzed!";
     }
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
     fnEvents++;
 }
 
@@ -766,7 +780,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
-        sprintf(strName, "Time_sync_Plane_%d", iPlane);
+        sprintf(strName, "Time_sync_Tofi_Plane_%d", iPlane);
         fhTsync[iPlane - 1] =
             new TH2F(strName, "", fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 10000, -2000., 2000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
@@ -777,9 +791,10 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName1[255];
         char strName2[255];
-        sprintf(strName1, "Time_diff_Plane_%d", iPlane);
-        sprintf(strName2, "Time diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 400, -8., 8.);
+        sprintf(strName1, "Time_diff_Tofi_Plane_%d", iPlane);
+        sprintf(strName2, "Time diff Tofi Plane %d", iPlane);
+        fhTdiff[iPlane - 1] =
+            new TH2F(strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 10000, -2000., 2000.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
     }
@@ -787,7 +802,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "Z_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        sprintf(strName, "Z_vs_Pos_Tofi_Plane_%d_Bar_%d", iPlane, iBar);
         fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, -100, 100, max_charge * 10, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
@@ -796,7 +811,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQvsTHit[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "Q_vs_THit_Plane_%d_Bar_%d", iPlane, iBar);
+        sprintf(strName, "Q_vs_THit_Tofi_Plane_%d_Bar_%d", iPlane, iBar);
         fhQvsTHit[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40);
         fhQvsTHit[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("THit in ns");
         fhQvsTHit[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
@@ -806,7 +821,7 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhTvsTHit[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "T_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
+        sprintf(strName, "T_vs_ToF_Tofi_Plane_%d_Bar_%d", iPlane, iBar);
         fhTvsTHit[iPlane - 1][iBar - 1] = new TH2F(strName, "", 625, -25, 25, 1000, -10, 40);
         fhTvsTHit[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("THit in ns");
         fhTvsTHit[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("T1-T2 in ns");
@@ -815,32 +830,32 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQ[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "Z_Plane_%d", iPlane);
+        sprintf(strName1, "Z_Tofi_Plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "Z Plane %d ", iPlane);
+        sprintf(strName2, "Z_Tofi Plane %d ", iPlane);
         fhQ[iPlane - 1] = new TH2F(
             strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, max_charge * 10, 0., max_charge);
         fhQ[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQ[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
     }
-    /*
-    if (NULL == fhxy[iPlane - 1])
+
+    if (NULL == fhxycm[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "xy_Plane_%d", iPlane);
+        sprintf(strName1, "xycm_Tofi_Plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "xy of Plane %d ", iPlane);
-        fhxy[iPlane - 1] = new TH2F(strName1, strName2, 320, -80, 80, 400, -100., 100.);
-        fhxy[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
-        fhxy[iPlane - 1]->GetXaxis()->SetTitle("x-position in cm");
+        sprintf(strName2, "xycm of Tofi Plane %d ", iPlane);
+        fhxycm[iPlane - 1] = new TH2F(strName1, strName2, 320, -80, 80, 400, -100., 100.);
+        fhxycm[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
+        fhxycm[iPlane - 1]->GetXaxis()->SetTitle("x-position in cm");
     }
-    */
+
     if (NULL == fhxy[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "xy_plane_%d", iPlane);
+        sprintf(strName1, "xy_Tofi_plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "xy of plane %d ", iPlane);
+        sprintf(strName2, "xy of Tofi plane %d ", iPlane);
         fhxy[iPlane - 1] =
             new TH2F(strName1, strName2, fPaddlesPerPlane + 2, 0, fPaddlesPerPlane + 2, 400, -100., 100.);
         fhxy[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
@@ -850,9 +865,9 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fhQvsEvent[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "ZvsEvent_Plane_%d", iPlane);
+        sprintf(strName1, "ZvsEvent_Tofi_Plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "Charge vs Event # Plane %d ", iPlane);
+        sprintf(strName2, "Charge vs Event # Tofi Plane %d ", iPlane);
         fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e5, 0, 2e9, max_charge * 10, 0., max_charge);
         fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
@@ -860,9 +875,9 @@ void R3BTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
     if (NULL == fh_Tofi_TotPm[iPlane - 1])
     {
         char strName1[255];
-        sprintf(strName1, "ToTVsPM_Plane_%d", iPlane);
+        sprintf(strName1, "ToTVsPM_Tofi_Plane_%d", iPlane);
         char strName2[255];
-        sprintf(strName2, "ToT vs PM # Plane %d ", iPlane);
+        sprintf(strName2, "ToT vs PM # Tofi Plane %d ", iPlane);
         fh_Tofi_TotPm[iPlane - 1] = new TH2F(strName1, strName2, 50, -25, 25, 300, 0, 300);
         fh_Tofi_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT");
         fh_Tofi_TotPm[iPlane - 1]->GetXaxis()->SetTitle("PM");
@@ -887,6 +902,8 @@ void R3BTofiCal2HitS494::FinishTask()
                 fhQ[i]->Write();
             if (fhxy[i])
                 fhxy[i]->Write();
+            if (fhxycm[i])
+                fhxycm[i]->Write();
             if (fhQvsEvent[i])
                 fhQvsEvent[i]->Write();
             if (fhTdiff[i])
@@ -912,7 +929,7 @@ void R3BTofiCal2HitS494::FinishTask()
             }
         }
     }
-    std::cout << "\n\nSome statistics:\n"
+    std::cout << "\n\nSome statistics for Tofi:\n"
               << "Total number of events in tree   " << maxevent << "\n"
               << "Max Event analyzed               " << fnEvents + wrongtrigger + wrongtpat << "\n"
               << "Events skipped due to trigger    " << wrongtrigger << "\n"

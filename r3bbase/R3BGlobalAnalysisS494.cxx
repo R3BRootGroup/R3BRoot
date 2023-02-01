@@ -69,6 +69,8 @@
 #include "TH1F.h"
 #include "TH2F.h"
 
+#include "TFile.h"
+
 #include "tracker_routines.h"
 
 #include "TClonesArray.h"
@@ -125,7 +127,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
         LOG(fatal) << "FairRootManager not found";
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-    FairRunOnline* run = FairRunOnline::Instance();
+    FairRunAna* run = FairRunAna::Instance();
 
     // Get objects for detectors on all levels
     fMCTrack = (TClonesArray*)mgr->GetObject("MCTrack");
@@ -135,13 +137,13 @@ InitStatus R3BGlobalAnalysisS494::Init()
     // get access to data of Califa
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
-        LOG(WARNING) << "GlobalAnalysis: CalifaMappedData not found";
+        LOG(warning) << "GlobalAnalysis: CalifaMappedData not found";
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
     if (!fCalItemsCalifa)
-        LOG(WARNING) << "GlobalAnalysis: CalifaCrystalCalData not found";
+        LOG(warning) << "GlobalAnalysis: CalifaCrystalCalData not found";
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
     if (!fHitItemsCalifa)
-        LOG(WARNING) << "GlobalAnalysis: CalifaHitData not found";
+        LOG(warning) << "GlobalAnalysis: CalifaHitData not found";
 
     cout << "R3BGlobalAnalysisS494::Max num events: " << maxevent << endl;
 
@@ -702,6 +704,10 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Erel_vs_theta26->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta26->GetYaxis()->SetTitle("Erel / MeV");
 
+    fh_Erel_vs_theta16O = new TH2F("Erel_vs_theta16O", "Erel both sides vs. theta 16O*", 125, 0., 5, 200, 0, 20.);
+    fh_Erel_vs_theta16O->GetXaxis()->SetTitle("angle / deg");
+    fh_Erel_vs_theta16O->GetYaxis()->SetTitle("Erel / MeV");
+
     fh_Erel_vs_theta26_nc = new TH2F("Erel_vs_theta_nc", "Erel both sides vs. theta all ci2", 250, 0., 5, 200, 0, 20.);
     fh_Erel_vs_theta26_nc->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta26_nc->GetYaxis()->SetTitle("Erel / MeV");
@@ -990,7 +996,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         {
             R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
 
-            //  LOG(DEBUG) << "Charge " << aTrack->GetQ() << endl;
+            //  LOG(debug) << "Charge " << aTrack->GetQ() << endl;
 
             if (aTrack->GetQ() == 2)
             {
@@ -1010,11 +1016,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 is_alpha = true;
                 alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 4He"
+                LOG(debug) << "******************************************" << endl;
+                LOG(debug) << "Track In 4He"
                            << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                LOG(DEBUG) << "px " << pHex << " py " << pHey << " z " << pHez << endl;
-                LOG(DEBUG) << "chiHex " << chiHex << ", " << chiHey << endl;
+                LOG(debug) << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                LOG(debug) << "chiHex " << chiHex << ", " << chiHey << endl;
             }
             if (aTrack->GetQ() == 6)
             {
@@ -1034,11 +1040,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 is_carbon = true;
                 carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 12C"
+                LOG(debug) << "******************************************" << endl;
+                LOG(debug) << "Track In 12C"
                            << "x " << XC << " y " << YC << " z " << ZC << endl;
-                LOG(DEBUG) << "px " << pCx << " py " << pCy << " z " << pCz << endl;
-                LOG(DEBUG) << "chiCx " << chiCx << ", " << chiCy << endl;
+                LOG(debug) << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                LOG(debug) << "chiCx " << chiCx << ", " << chiCy << endl;
             }
             if (aTrack->GetQ() == 8)
             {
@@ -1056,10 +1062,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 chix = aTrack->GetChix();
                 chiy = aTrack->GetChiy();
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 16O"
+                LOG(debug) << "******************************************" << endl;
+                LOG(debug) << "Track In 16O"
                            << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                LOG(debug) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
             }
         }
     }
@@ -1077,7 +1083,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
-            //  LOG(DEBUG) << "PID " << PID << endl;
+            //  LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -1098,10 +1104,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                                        pHez_mc,
                                        sqrt(pow(pHex_mc, 2) + pow(pHey_mc, 2) + pow(pHez_mc, 2) + pow(mHe, 2)));
 
-                    //  LOG(DEBUG) << "******************************************" << endl;
-                    //  LOG(DEBUG) << "MC Track In 4He"
+                    //  LOG(debug) << "******************************************" << endl;
+                    //  LOG(debug) << "MC Track In 4He"
                     //             << "x " << XHe_mc << " y " << YHe_mc << " z " << ZHe_mc << endl;
-                    // LOG(DEBUG) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
+                    // LOG(debug) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -1119,10 +1125,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     carbonMC.SetPxPyPzE(
                         pCx_mc, pCy_mc, pCz_mc, sqrt(pow(pCx_mc, 2) + pow(pCy_mc, 2) + pow(pCz_mc, 2) + pow(mC, 2)));
 
-                    //  LOG(DEBUG) << "******************************************" << endl;
-                    //  LOG(DEBUG) << "MC Track In 12C"
+                    //  LOG(debug) << "******************************************" << endl;
+                    //  LOG(debug) << "MC Track In 12C"
                     //             << "x " << XC_mc << " y " << YC_mc << " z " << ZC_mc << endl;
-                    //  LOG(DEBUG) << "px " << pCx_mc << " py " << pCy_mc << " pz " << pCz_mc << endl;
+                    //  LOG(debug) << "px " << pCx_mc << " py " << pCy_mc << " pz " << pCz_mc << endl;
                 }
                 if (PID == 1000080160)
                 {
@@ -1138,10 +1144,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     is_oxygen = true;
                     Pf_tot_mc = sqrt((Pxf_mc * Pxf_mc) + (Pyf_mc * Pyf_mc) + (Pzf_mc * Pzf_mc));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "MC Track In 16O"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "MC Track In 16O"
                                << "x " << Xf_mc << " y " << Yf_mc << " z " << Zf_mc << endl;
-                    LOG(DEBUG) << "px " << Pxf_mc << " py " << Pyf_mc << " z " << Pzf_mc << endl;
+                    LOG(debug) << "px " << Pxf_mc << " py " << Pyf_mc << " z " << Pzf_mc << endl;
                 }
             }
         }
@@ -1181,7 +1187,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         Double_t sq_chi = sqrt(chiHex * chiHex + chiCx * chiCx);
         fh_chiy_vs_chix_He_nc->Fill(chiHex, chiCx);
 
-        LOG(DEBUG) << "Entering Pair analysis***" << endl;
+        LOG(debug) << "Entering Pair analysis***" << endl;
         // if (chiHex < fcut_chiX && chiHey < fcut_chiY && chiCx < fcut_chiX && chiCy < fcut_chiY)
         //		&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
         if (alpha.Pz() > 0 && carbon.Pz() > 0)
@@ -1402,6 +1408,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     fh_ErelL->Fill(Erel);
 
                 fh_Erel_vs_theta26->Fill(theta_26, Erel);
+                fh_Erel_vs_theta16O->Fill(theta_16O, Erel);
                 fh_pHe_vs_theta26->Fill(pa.Mag(), theta_26 * TMath::DegToRad() * 1000.);
                 fh_psum_vs_theta26->Fill(theta_26, (pa + pc).Mag());
 
@@ -2206,6 +2213,7 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_ErelL->Write();
     fh_Erel_vs_psum->Write();
     fh_Erel_vs_theta26->Write();
+    fh_Erel_vs_theta16O->Write();
     fh_Erel_vs_phibc->Write();
     fh_phi_bc_cm->Write();
     fh_phibcm_vs_px->Write();
