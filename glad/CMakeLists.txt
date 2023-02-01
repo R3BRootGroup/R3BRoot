@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BPassive" which includes the source files given 
+# Create a library called "libR3BGlad" which includes the source files given 
 # in the array. The extension is already found. Any number of sources could be
 # listed here.
 
@@ -24,6 +24,7 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/glad
 ${R3BROOT_SOURCE_DIR}/tracking)
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -37,26 +38,21 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BCave.cxx
-R3BGeoCave.cxx
-R3BGeoPassivePar.cxx
-R3BGeoTarget.cxx
-R3BAladinMagnet.cxx
-R3BNeutronWindowAndSomeAir.cxx
-R3BPassiveContFact.cxx
-R3BPipe.cxx
-R3BVacVesselCool.cxx
-R3BTarget.cxx
-R3BCollimator.cxx
+R3BGladMagnet.cxx
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF PassiveLinkDef.h)
-Set(LIBRARY_NAME R3BPassive)
+Set(LINKDEF GladLinkDef.h)
+Set(LIBRARY_NAME R3BGlad)
 Set(DEPENDENCIES
     R3BBase Field R3BTracking)
 
 GENERATE_LIBRARY()
+
+if(BUILD_GEOMETRY)
+add_subdirectory(geobase)
+endif()
+

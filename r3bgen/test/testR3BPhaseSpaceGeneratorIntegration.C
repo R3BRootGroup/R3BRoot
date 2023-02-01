@@ -46,7 +46,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
     run.AddModule(cave);
 
     // Magnet
-    run.AddModule(new R3BGladMagnet("glad_v17_flange.geo.root"));
+    // run.AddModule(new R3BGladMagnet("glad_v2023.1.geo.root"));
     auto magField = new R3BGladFieldMap("R3BGladMap");
     magField->SetScale(-0.6);
     run.SetField(magField);
@@ -64,7 +64,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
 
     // Logging
     run.SetStoreTraj(false);
-    FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+    FairLogger::GetLogger()->SetLogVerbosityLevel("low");
     FairLogger::GetLogger()->SetLogScreenLevel("info");
 
     // Init & Special MC Settings
