@@ -268,11 +268,11 @@ double Chi2MomentumForward(const double* xx)
                 {
                     chi2temp = 0.;
                 }
-                else 
+                else
                 {
-					//cout << "Testcase: " << chi2temp << endl;
-					chi2temp = chi2temp * 100.;
-				}
+                    // cout << "Testcase: " << chi2temp << endl;
+                    chi2temp = chi2temp * 100.;
+                }
             }
             else
             {
@@ -902,8 +902,6 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     TVector3 startMomentum;
     TVector3 startPosition;
     TVector3 startPosOptimized;
-    TVector3 startPositionOptimized;
-    TVector3 startMomentumOptimized;
 
     Double_t x0 = gCandidate->GetStartPosition().X();
     Double_t y0 = gCandidate->GetStartPosition().Y();
@@ -1072,7 +1070,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
         TVector3 startPositionOptimized(minimum_m->X()[3], minimum_m->X()[4], minimum_m->X()[5]);
         TVector3 startMomentumOptimized(px0_cand, py0_cand, minimum_m->X()[2]);
-        //TVector3 startMomentumOptimized(minimum_m->X()[0], minimum_m->X()[1], minimum_m->X()[2]);
+        // TVector3 startMomentumOptimized(minimum_m->X()[0], minimum_m->X()[1], minimum_m->X()[2]);
         Double_t newChi = minimum_m->MinValue();
         gCandidate->SetChi2(newChi);
         gCandidate->SetStartPosition(startPositionOptimized);
@@ -1114,7 +1112,6 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     TVector3 pos2;
     TVector3 pos3;
     TVector3 direction0;
-    TVector3 startMomentum;
     TVector3 startPosition;
     TVector3 startPosOptimized;
     TVector3 startPositionOptimized;
@@ -1153,14 +1150,11 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
     direction0.SetMag(mom);
 
-    startMomentum.SetX(direction0.X());
-    startMomentum.SetY(direction0.Y());
-    startMomentum.SetZ(direction0.Z());
     cout << "mom: " << mom << endl;
     direction0.Print();
     TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
 
-	pos3.SetY(600. / 700. * pos0.Y());
+    pos3.SetY(600. / 700. * pos0.Y());
     gCandidate->Reset();
     gCandidate->SetPosition(pos3);
     gCandidate->SetMomentum(startMomentum);
@@ -1284,8 +1278,8 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     Double_t px_inv = (-1.) * gCandidate->GetMomentum().X();
     Double_t py_inv = (-1.) * gCandidate->GetMomentum().Y();
     Double_t pz_inv = (-1.) * gCandidate->GetMomentum().Z();
-    TVector3 pinv(px_inv, py_inv, pz_inv);
-    gCandidate->SetStartMomentum(pinv);
+    TVector3 p_inv(px_inv, py_inv, pz_inv);
+    gCandidate->SetStartMomentum(p_inv);
 
     //  gCandidate->SetStartMomentum(-1. * gCandidate->GetMomentum());
     gCandidate->SetStartPosition(gCandidate->GetPosition());
