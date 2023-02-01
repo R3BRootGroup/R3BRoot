@@ -210,6 +210,18 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable")
   endif()
 endif()
+
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  message("CMAKE_CXX_STANDARD is unset, setting from root-config")
+  execute_process(
+    COMMAND   root-config --cflags
+    COMMAND grep -o "std=c++[0-9]*"
+    COMMAND sed "s/[^0-9]*//"
+    OUTPUT_VARIABLE CMAKE_CXX_STANDARD
+    COMMAND_ERROR_IS_FATAL ANY)
+  message("CMAKE_CXX_STANDARD is now ${CMAKE_CXX_STANDARD}")
+endif()
+
 set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}" )
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # used by clang-tidy
