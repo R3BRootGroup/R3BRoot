@@ -1,0 +1,66 @@
+# This is a basic workflow to help you get started with Actions
+name: CI C17++ nov22p1
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master and dev branches
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially
+jobs:
+  # This workflow contains a single job called "clang-format"
+  clang-format:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Code formatting
+        run: |
+          cd $GITHUB_WORKSPACE
+          singularity exec /data.local2/kresan/debian10-nov22p1-v18.8.0-ucesb.sif $PWD/util/clang-format-check.sh clang-format-8
+  # Single job called "build-r3broot"
+  build-r3broot:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: clang-format
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          singularity exec /data.local2/kresan/debian10-nov22p1-v18.8.0-ucesb.sif $PWD/.githubfiles/run_build_test_nov22p1.sh
+  # Single job called "build-r3broot-sofia"
+  build-r3broot-sofia:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    needs: build-r3broot
+    if: always()
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: Run Dart.sh
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone -b dev https://github.com/R3BRootGroup/macros.git
+          git clone -b dev https://github.com/R3BRootGroup/sofia.git
+          singularity exec /data.local2/kresan/debian10-nov22p1-v18.8.0-ucesb.sif $PWD/.githubfiles/run_build_test_nov22p1.sh
+
+
