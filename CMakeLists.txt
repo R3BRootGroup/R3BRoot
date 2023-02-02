@@ -237,11 +237,11 @@ check_out_of_source_build()
 
 # Check if we are on an UNIX system. If not stop with an error message
 if(NOT UNIX)
-    message(
-        FATAL_ERROR
-            "You're not on an UNIX system. The project was up to now only tested on UNIX systems, so we break here. If you want to go on please edit the CMakeLists.txt in the source directory."
-        )
+    message(FATAL_ERROR "You're not on an UNIX system. The project was up to now only tested on UNIX systems, so we break here. If you want to go on please edit the CMakeLists.txt in the source directory.")
 endif(NOT UNIX)
+
+# Set option(s)
+option(BUILD_GEOMETRY "Build all ROOT geometries" ON)
 
 # Check if the external packages are installed into a separate install directory
 if (COMMAND check_external_package_install_dir)
@@ -400,6 +400,14 @@ if(MODULE)
 endif(MODULE)
 
 if(NOT MODULE)
+if(BUILD_GEOMETRY)
+    set(ROOTSYS ${SIMPATH})
+    set(unitgeo_summary "${BGreen} YES${CR}    (default, disable with ${BMagenta}-DBUILD_GEOMETRY=OFF${CR})")
+else()
+    set(unitgeo_summary "${BRed} NO${CR}     (enable with ${BMagenta}-DBUILD_GEOMETRY=ON${CR})")
+endif()
+message(STATUS "  ${BWhite}ROOT geometries${CR}          ${unitgeo_summary}")
+
     add_subdirectory(r3bbase)
     if(WITH_UCESB)
         add_subdirectory(r3bsource)
@@ -644,5 +652,7 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
   endforeach()
 endif()
 
+message(STATUS "  ")
+message(STATUS "  ${BWhite}Generation of ROOT geometries${CR}          ${unitgeo_summary}")
 message(STATUS "  ")
 ################################################################################
