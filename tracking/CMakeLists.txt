@@ -25,14 +25,13 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/tof
+${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-
-${R3BROOT_SOURCE_DIR}/fiber
 ${Geant4_INCLUDE_DIRS}
 )
 
@@ -50,14 +49,8 @@ set(SRCS
 R3BTPropagator.cxx
 R3BTGeoPar.cxx
 R3BFragmentFitterGeneric.cxx
-#R3BFragmentTracker.cxx
-#R3BFragmentTrackerS454.cxx
 R3BFragmentTrackerS494.cxx
-#R3BFragmentTrackerS494_work.cxx
-#R3BFragmentFitterChi2.cxx
-#R3BFragmentFitterChi2S454.cxx
 R3BFragmentFitterChi2S494.cxx
-#R3BFragmentFitterChi2S494_work.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
@@ -72,7 +65,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF TrackingLinkDef.h)
 Set(LIBRARY_NAME R3BTracking)
 Set(DEPENDENCIES
-    Base ParBase Minuit R3BData)
+    Base ParBase TrkBase Minuit R3BData)
 
 GENERATE_LIBRARY()
 

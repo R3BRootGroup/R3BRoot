@@ -25,10 +25,6 @@
 #include "R3BReader.h"
 #include "TObjArray.h"
 #include "TString.h"
-#include <Rtypes.h>
-
-#include <fstream>
-#include <list>
 
 /* External data client interface (ucesb) */
 #include "ext_data_clnt.hh"
@@ -44,28 +40,21 @@ typedef struct EXT_STR_h101_t EXT_STR_h101;
 
 class FairLogger;
 
-class R3BEventHeader;
-
 class R3BUcesbSource : public FairSource
 {
   public:
     R3BUcesbSource(const TString&, const TString&, const TString&, EXT_STR_h101*, size_t);
-    virtual ~R3BUcesbSource();
+    ~R3BUcesbSource();
 
     Source_Type GetSourceType() { return kONLINE; }
 
     /* Init() will fork a ucesb instance to deliver the unpacked data for
      * R3Broot. It makes use of the ext_data_ interface of ucesb.
      * */
-    virtual Bool_t Init();
-#ifdef ACTIVATEOVERRIDE
-    virtual Bool_t SpecifyRunId() override;
-#else
-    virtual Bool_t SpecifyRunId();
-#endif
-    virtual Bool_t InitUnpackers();
-    virtual void SetParUnpackers();
-    virtual Bool_t ReInitUnpackers();
+    Bool_t Init();
+    Bool_t InitUnpackers();
+    void SetParUnpackers();
+    Bool_t ReInitUnpackers();
     /* A wrapper for ext_data_fetch_event() */
     Int_t ReadEvent(UInt_t);
     /* Close the ext_data_ interface */
@@ -79,10 +68,6 @@ class R3BUcesbSource : public FairSource
     /* Get readers */
     const TObjArray* GetReaders() const { return fReaders; }
 
-    virtual void FillEventHeader(R3BEventHeader* feh);
-
-    void SetInputFileName(TString tstr) { fInputFileName = tstr; }
-    
   private:
     /* File descriptor returned from popen() */
     FILE* fFd;
@@ -107,12 +92,7 @@ class R3BUcesbSource : public FairSource
     FairLogger* fLogger;
     /* The array of readers */
     TObjArray* fReaders;
-    /* R3B header */
-    R3BEventHeader* fEventHeader;
-    Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
-    TString fInputFileName;
-    std::ifstream fInputFile;
-    Int_t fEntryMax;
+   
 	
 
   public:

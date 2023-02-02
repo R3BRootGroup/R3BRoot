@@ -18,6 +18,8 @@
 
 #include "Rtypes.h"
 
+#include "TString.h"
+#include <vector>
 class FairParSet;
 
 /**
@@ -49,7 +51,8 @@ class R3BTCalContFact : public FairContFact
      */
     FairParSet* createContainer(FairContainer* c);
 
-  private:
+  private:  
+    std::vector<const char*> containerNames;
     /**
      * Method to add a standard container
      */

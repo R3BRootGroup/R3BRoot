@@ -2043,8 +2043,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                        iAoverZ == 2 && iAoverZmem == 2 &&
                        sqrt(minChi2*minChi2 + minChi2_12C*minChi2_12C) < 5) bestevents = true;
                 */
-                    if (iAoverZ == 2 && iAoverZmem == 2 && sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5 &&
-                        psum > 17380. && psum < 17450.)
+                    // if (iAoverZ == 2 && iAoverZmem == 2 && sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5 &&
+                    //  psum > 17380. && psum < 17450.)
+                    // bestevents = true;
+
+                    if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5)
                         bestevents = true;
                 }
 

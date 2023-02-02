@@ -73,15 +73,15 @@ Bool_t R3BUnpackReader::Read()
     //		fData->TRIGGER);
     //  LOG(info) << strMessage;
 
-    // fNEvent = fData->EVENTNO;
+    fNEvent = fData->EVENTNO;
 
     if (0 == (fNEvent % 1000))
     {
-        LOG(debug1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER;
+        LOG(DEBUG1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER;
     }
 
     fHeader->SetTrigger(fData->TRIGGER);
-    fHeader->SetEventno(fNEvent++);
+    fHeader->SetEventno(fNEvent);
 
     //    if(fData->TRIGGER != 1) cout<<"R3BUnpack: "<<fData->TRIGGER<<endl;
 

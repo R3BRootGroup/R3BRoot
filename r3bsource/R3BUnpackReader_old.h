@@ -12,15 +12,13 @@
  ******************************************************************************/
 
 #ifndef R3BUNPACKREADER_H
-#define R3BUNPACKREADER_H 1
+#define R3BUNPACKREADER_H
 
 #include "R3BReader.h"
-#include <Rtypes.h>
 
 struct EXT_STR_h101_unpack_t;
 typedef struct EXT_STR_h101_unpack_t EXT_STR_h101_unpack;
 
-class ext_data_struct_info;
 class FairLogger;
 class R3BEventHeader;
 
@@ -28,12 +26,11 @@ class R3BUnpackReader : public R3BReader
 {
   public:
     R3BUnpackReader(EXT_STR_h101_unpack*, UInt_t);
-    
-    virtual ~R3BUnpackReader();
+    ~R3BUnpackReader();
 
-    virtual Bool_t Init(ext_data_struct_info*) override;
-    virtual Bool_t Read() override;
-    virtual void Reset() override;
+    Bool_t Init(ext_data_struct_info*);
+    Bool_t Read();
+    void Reset();
 
   private:
     /* An event counter */
@@ -47,7 +44,7 @@ class R3BUnpackReader : public R3BReader
     R3BEventHeader* fHeader;
 
   public:
-    ClassDefOverride(R3BUnpackReader, 0);
+    ClassDef(R3BUnpackReader, 0);
 };
 
 #endif

@@ -142,7 +142,7 @@ InitStatus R3BOptimizeGeometryS494::Init()
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
     if (NULL == fArrayMCTracks)
     {
-        LOG(ERROR) << "No MC Track array found in input file.";
+        LOG(error) << "No MC Track array found in input file.";
         //        return kERROR;
     }
 
@@ -1164,18 +1164,18 @@ double R3BOptimizeGeometryS494::Chi2()
         // mChi2 = sqrt(candidate->GetChi2() * candidate->GetChi2() + pChi2 * pChi2);
         // mChi2 = pChi2;
         // cout << "pchi: " << pChi2 << " mchi " << candidate->GetChi2() << " total " << mChi2 << endl;
-        LOG(INFO) << "Results after tracking mass:";
-        LOG(INFO) << "Position x: " << candidate->GetStartPosition().X() << " y: " << candidate->GetStartPosition().Y()
+        LOG(info) << "Results after tracking mass:";
+        LOG(info) << "Position x: " << candidate->GetStartPosition().X() << " y: " << candidate->GetStartPosition().Y()
                   << " z: " << candidate->GetStartPosition().Z();
-        LOG(INFO) << "Momentum : " << candidate->GetStartMomentum().Mag()
+        LOG(info) << "Momentum : " << candidate->GetStartMomentum().Mag()
                   << " px : " << candidate->GetStartMomentum().X() << " py: " << candidate->GetStartMomentum().Y()
                   << " pz: " << candidate->GetStartMomentum().Z() << endl;
-        LOG(INFO) << "Mass   : " << candidate->GetMass();
-        LOG(INFO) << "Beta   : " << candidate->GetStartBeta();
-        LOG(INFO) << "chi2: " << candidate->GetChi2() << endl;
-        LOG(INFO) << "mchi2: " << mChi2 << endl;
-        LOG(INFO) << "test p0 p: " << p0 << "  " << candidate->GetStartMomentum().Mag() << endl;
-        LOG(INFO) << "test pchi: " << pChi2 << endl;
+        LOG(info) << "Mass   : " << candidate->GetMass();
+        LOG(info) << "Beta   : " << candidate->GetStartBeta();
+        LOG(info) << "chi2: " << candidate->GetChi2() << endl;
+        LOG(info) << "mchi2: " << mChi2 << endl;
+        LOG(info) << "test p0 p: " << p0 << "  " << candidate->GetStartMomentum().Mag() << endl;
+        LOG(info) << "test pchi: " << pChi2 << endl;
 
         fh_residuals->Fill(candidate->GetStartMomentum().Mag() - p0);
 
@@ -1777,7 +1777,7 @@ void R3BOptimizeGeometryS494::Finish()
         Int_t bin2 = fh_A_reco2->FindLastBinAbove(fh_A_reco2->GetMaximum() / 2.);
         Double_t fwhm = fh_A_reco2->GetBinCenter(bin2) - fh_A_reco2->GetBinCenter(bin1);
 
-        LOG(INFO) << fwhm / fh_A_reco2->GetMean();
+        LOG(info) << fwhm / fh_A_reco2->GetMean();
 
         new TCanvas("c7", "", 50, 50, 400, 400);
         fh_chi2->Draw();
@@ -1829,7 +1829,7 @@ Bool_t R3BOptimizeGeometryS494::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field.";
+        LOG(error) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

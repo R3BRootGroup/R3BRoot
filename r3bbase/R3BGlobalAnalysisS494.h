@@ -199,6 +199,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 // Geant3:
 	Double_t amu = 0.931494028;
 	Double_t mHe = 3728.401291;
+	Double_t m3He = 2809.41328;
 	Double_t mC = 11174.86339;
 	Double_t mO = 15.99065084 * amu;
 
@@ -206,7 +207,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Double_t ErelMC, m_invaMC, phiMC_bc_cm;
 	TVector3 pa, pc, paMC, pcMC;
 	
-    TLorentzVector alpha, carbon, oxygen;
+    TLorentzVector alpha, carbon, oxygen, helium3;
     TLorentzVector alphaMC, carbonMC, oxygenMC;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector alphaMC_cm, carbonMC_cm, oxygenMC_cm;
@@ -305,7 +306,6 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_theta26_vs_chi;  
     TH2F* fh_Erel_vs_chi; 
     TH2F* fh_psum_vs_chi; 
-    TH2F* fh_Erel_dErel;
     TH2F* fh_target_xy_MC;
     
     TH2F* fh_target_xy_nc;
@@ -332,6 +332,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_ErelB_nc;
 	TH1F* fh_theta_bc_cm_nc;
 	TH1F* fh_phi_bc_cm_nc;
+	TH1F* fh_Erel_withCalifa;
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
@@ -340,13 +341,13 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_phi_16O;	
 	TH1F* fh_theta26_cm;	
 	TH1F* fh_phi26_cm;
-	TH1F* fh_theta_4He_cm;
-	TH1F* fh_phi_4He_cm;
+	TH2F* fh_theta_4He_cm;
+	TH2F* fh_phi_4He_cm;
 	TH1F* fh_phi_bc_cm;
 	TH1F* fh_phiMC_bc_cm;
-	TH1F* fh_theta_bc_cm;
-	TH1F* fh_theta_12C_cm;
-	TH1F* fh_phi_12C_cm;
+	TH2F* fh_theta_bc_cm;
+	TH2F* fh_theta_12C_cm;
+	TH2F* fh_phi_12C_cm;
 	TH1F* fh_Erel;
 	TH1F* fh_ErelL;
 	TH1F* fh_ErelR;
@@ -354,6 +355,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_phi_bc_cm_polar;
 	TH2F* fh_Erel_vs_theta26;
 	TH2F* fh_Erel_vs_theta16O;
+	TH2F* fh_Erel_vs_theta16O_3He12C;
 	TH2F* fh_Erel_vs_thetaMC;
 	TH1F* fh_psum;
 	TH1F* fh_psum_MC;
@@ -361,23 +363,14 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_pzsum_MC;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;
+	TH2F* fh_Erel_vs_ptransHe;
+	TH2F* fh_Erel_vs_ptransC;
+	
 
-	TH2F* fh_phibcm_vs_px;
-	TH2F* fh_phibcm_vs_py;
-	TH2F* fh_phibcm_vs_pz;
-	TH2F* fh_phibcm_vs_psum;	
-	TH2F* fh_phibcm_vs_px_MC;
-	TH2F* fh_phibcm_vs_py_MC;
-	TH2F* fh_phibcm_vs_pz_MC;
-	TH2F* fh_phibcm_vs_psum_MC;
 	TH2F* fh_mass_nc;
 	TH2F* fh_mass;
 	TH2F* fh_energy_nc;
 	TH2F* fh_energy;
-	TH2F* fh_psum_vs_r_nc;
-	TH2F* fh_pz_vs_r;
-	TH2F* fh_px_vs_r;
-	TH2F* fh_py_vs_r;
 	TH2F* fh_califa_energy;
 	TH2F* fh_califa_energy_nc;
 	TH2F* fh_califa_calenergy;

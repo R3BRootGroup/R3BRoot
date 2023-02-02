@@ -16,10 +16,6 @@
 #include <string>
 
 #include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-
-#include "R3BEventHeader.h"
 #include "R3BUcesbSource.h"
 
 #include "ext_data_client.h"
@@ -44,38 +40,20 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fEvent(event)
     , fEventSize(event_size)
     , fLastEventNo(-1)
-    , fEventHeader(nullptr)
-    , fInputFile()
-    , fEntryMax(0)
+    , fLogger(FairLogger::GetLogger())
     , fReaders(new TObjArray())
 {
 }
 
 R3BUcesbSource::~R3BUcesbSource()
 {
-    if (fReaders)
-    {
-        fReaders->Delete();
-        delete fReaders;
-    }
+    fReaders->Delete();
+    delete fReaders;
     Close();
 }
 
 Bool_t R3BUcesbSource::Init()
 {
-    auto run = FairRun::Instance();
-    auto eventHeader = dynamic_cast<R3BEventHeader*>(run->GetEventHeader());
-    if (eventHeader)
-    {
-        LOG(info) << "EventHeader. was defined properly" << endl;
-    }
-    else
-    {
-        eventHeader = new R3BEventHeader();
-        run->SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
-        LOG(warn) << "EventHeader. has been created from R3BEventHeader" << endl;
-    }
-
     Bool_t status;
     std::ostringstream command;
 
@@ -114,22 +92,6 @@ Bool_t R3BUcesbSource::Init()
 
 Bool_t R3BUcesbSource::InitUnpackers()
 {
-    // Register of R3BEventHeader in the output root file
-    FairRootManager* frm = FairRootManager::Instance();
-    if (!frm)
-        LOG(fatal) << "FairRootManager in ucesb no found" << endl;
-
-    LOG(info) << "Checking the register of R3BEventHeader" << endl;
-    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
-    if (fEventHeader)
-    {
-        LOG(info) << "EventHeader. was defined properly" << endl;
-    }
-    else
-    {
-        LOG(error) << "EventHeader. was not defined properly!" << endl;
-    }
-
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
@@ -142,13 +104,13 @@ Bool_t R3BUcesbSource::InitUnpackers()
     }
 
     /* Setup client */
-    //#ifdef EXT_DATA_ITEM_MAP_MATCH
+#ifdef EXT_DATA_ITEM_MAP_MATCH
     /* this is the version for ucesb setup with extended mapping info */
     uint32_t struct_map_success = 0;
     Bool_t status = fClient.setup(NULL, 0, &fStructInfo, &struct_map_success, fEventSize);
-    //#else
-    //   Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
-    //#endif
+#else
+    Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
+#endif
     if (status != 0)
     {
         perror("ext_data_clnt::setup()");
@@ -199,14 +161,6 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     return kTRUE;
 }
 
-Int_t R3BUcesbSource::ReadIntFromString(const std::string& wholestr, const std::string& pattern)
-{
-    std::string tempstr = wholestr;
-    tempstr.replace(0, tempstr.find(pattern) + pattern.length(), "");
-    tempstr.replace(0, tempstr.find('=') + 1, "");
-    return atoi(tempstr.c_str());
-}
-
 Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 {
     const void* raw;
@@ -219,30 +173,6 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     LOG(debug1) << "R3BUcesbSource::ReadEvent " << fNEvent;
 
-    if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
-    {
-
-        LOG(info) << "ReadEvent()" << endl;
-
-        std::string buffer;
-        do
-        {
-            getline(fInputFile, buffer);
-            LOG(info) << "read from file: \"" << buffer << "\"";
-            if (buffer.find("EVENT BEGIN") == 0)
-            {
-                fRunId = ReadIntFromString(buffer, "RUNID");
-                fEventHeader->SetRunId(fRunId);
-            }
-            if (buffer.find("EVENT") == 0)
-                continue;
-            Int_t fInit = atoi(buffer.c_str());
-            buffer.erase(0, buffer.find(' ') + 1);
-            fEntryMax = atoi(buffer.c_str());
-
-        } while (fInputFile && buffer.compare("EVENT END"));
-    }
-
     /* Need to initialize first */
     if (nullptr == fFd)
     {
@@ -251,6 +181,8 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     /* Fetch data */
     ret = fClient.fetch_event(fEvent, fEventSize);
+
+    // cout << "R3BUcesbSource::ReadEvent " << fNEvent << ", " << fEventSize << endl;
 
     if (0 == ret)
     {
@@ -335,13 +267,5 @@ void R3BUcesbSource::Reset()
         ((R3BReader*)fReaders->At(i))->Reset();
     }
 }
-
-Bool_t R3BUcesbSource::SpecifyRunId()
-{
-    if (ReadEvent(0) == 0)
-        return true;
-    return false;
-}
-void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
 
 ClassImp(R3BUcesbSource)

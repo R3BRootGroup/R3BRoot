@@ -32,8 +32,6 @@
 
 using namespace std;
 
-ClassImp(R3BTCalContFact);
-
 static R3BTCalContFact gR3BTCalContFact;
 
 R3BTCalContFact::R3BTCalContFact()
@@ -117,9 +115,8 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BTCalContFact::createContainer : " << name;
+    LOG(info) << "R3BTCalContFact::createContainer : " << name;
 
-    vector<const char*> containerNames;
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
     containerNames.push_back("RoluTCalPar");
@@ -173,22 +170,25 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("Sci2TCalPar");
     containerNames.push_back("Sci8TCalPar");
 
-    bool found = false;
+    // bool found = false;
     for (auto containerName : containerNames)
     {
         if (strncmp(name, containerName, strlen(containerName)) == 0)
         {
-            found = true;
-            break;
+            // found = true;
+            // break;
+            return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
         }
     }
 
-    if (found == true)
-    {
-        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else
-    {
-        return nullptr;
-    }
+    /* if (found == true)
+     {
+         return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+     }
+     else
+     {*/
+    return nullptr;
+    // }
 }
+
+ClassImp(R3BTCalContFact);
