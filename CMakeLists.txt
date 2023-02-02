@@ -449,7 +449,7 @@ if(NOT MODULE)
     add_subdirectory(evtvis)
     add_subdirectory(mfi)
     add_subdirectory(psp)
-    add_subdirectory(compilehelper)
+#    add_subdirectory(compilehelper) # is this used for anything? --pklenze
     add_subdirectory(tcal)
     add_subdirectory(tracking)
     add_subdirectory(analysis)

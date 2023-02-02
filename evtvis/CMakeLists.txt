@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/eventdisplay
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/evtvis
+${R3BROOT_SOURCE_DIR}/r3bbase
 )
 
 

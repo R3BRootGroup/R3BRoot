@@ -16,6 +16,7 @@
 
 #include "R3BReader.h"
 #include <Rtypes.h>
+#include "R3BCalifaMappedData.h"
 
 class TClonesArray;
 
@@ -66,8 +67,8 @@ class R3BCalifaFebexReader : public R3BReader
     // Don't store data for online
     Bool_t fOnline;
     // Output array
-    TClonesArray* fArray;
-    TClonesArray* fArraytrig;
+    using map_t=R3BCalifaMappedData::container_t;
+    map_t * fOutMap=new map_t;
     ext_data_struct_info* fStructInfo{};
   public:
     ClassDefOverride(R3BCalifaFebexReader, 0);

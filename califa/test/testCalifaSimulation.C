@@ -28,6 +28,8 @@ void testCalifaSimulation(const int nbevents = 100)
     logger->SetLogScreenLevel("warn");
     logger->SetColoredLog(true);
 
+    //logger->SetLogScreenLevel("debug");
+
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
     gSystem->Setenv("GEOMPATH", workDirectory + "/geometry");
@@ -61,13 +63,13 @@ void testCalifaSimulation(const int nbevents = 100)
 
     // Geometry: Califa
     auto calsim = new R3BCalifa("califa_full.geo.root", {0., 0., 0.});
-    calsim->SelectGeometryVersion(0);
+    calsim->SelectGeometryVersion(9999);
     run->AddModule(calsim);
 
     // Digitizer: Califa
     auto califaDig = new R3BCalifaDigitizer();
     run->AddTask(califaDig);
-    
+
     auto califaCal2Cluster = new R3BCalifaCrystalCal2Cluster();
     califaCal2Cluster->SetCrystalThreshold(0.0001); // 100 keV
     run->AddTask(califaCal2Cluster);

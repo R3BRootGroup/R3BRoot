@@ -14,14 +14,19 @@
 #ifndef R3BCALIFACRYSTALCALDATA_H
 #define R3BCALIFACRYSTALCALDATA_H
 
-#include "FairMultiLinkedData.h"
 #include "TObject.h"
+#include <Math/Vector3D.h>
+#include <map>
 
-class R3BCalifaCrystalCalData : public FairMultiLinkedData
+struct R3BCalifaCrystalCalData : public TObject
 {
-  public:
+    using container_t=std::map<int, R3BCalifaCrystalCalData>;
+    static constexpr char default_container_name[]="CalifaCrystalCalMap";
+    static constexpr char tca_name[]="CalifaCrystalCalData";
     /** Default constructor **/
-    R3BCalifaCrystalCalData();
+    R3BCalifaCrystalCalData(int crId=0xffff)
+      : fCrystalId(crId)
+  {}
 
     /** Constructor with arguments
      *@param fCrystalId   Crystal unique identifier
@@ -31,6 +36,7 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
      *@param fTime        Time since event start [ns]
      *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
      **/
+    [[deprecated]]
     R3BCalifaCrystalCalData(Int_t ident,
                             Double_t energy,
                             Double_t Nf,
@@ -38,43 +44,41 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
                             uint64_t time,
                             Double_t tot_energy = 0);
 
-    /** Copy constructor **/
-    R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData&);
-
-    R3BCalifaCrystalCalData& operator=(const R3BCalifaCrystalCalData&) { return *this; }
-
-    /** Destructor **/
-    virtual ~R3BCalifaCrystalCalData() {}
+    // DO not add any fake assignment methods here!
 
     /** Accessors **/
     inline const Int_t& GetCrystalId() const { return fCrystalId; }
     inline const Double_t& GetEnergy() const { return fEnergy; }
-    inline const Double_t& GetToT_Energy() const { return fToT_Energy; }
+    inline const Double_t& GetToT_Energy() const { return fToTEnergy; }
     inline const Double_t& GetNf() const { return fNf; }
     inline const Double_t& GetNs() const { return fNs; }
-    inline const uint64_t& GetTime() const { return fTime; }
+    inline const uint64_t& GetTime() const { return fWrts; }
 
     /** Modifiers **/
     void SetCrystalId(Int_t ident) { fCrystalId = ident; }
     void SetEnergy(Double32_t energy) { fEnergy = energy; }
-    void SetToT_Energy(Double32_t energy) { fToT_Energy = energy; }
+    void SetToTEnergy(Double32_t energy) { fToTEnergy = energy; }
     void SetNf(Double32_t Nf) { fNf = Nf; }
     void SetNs(Double32_t Ns) { fNs = Ns; }
-    void SetTime(uint64_t time) { fTime = time; }
+    void SetTime(uint64_t time) { fWrts = time; }
     void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
     void AddMoreNf(Double32_t moreNf) { fNf += moreNf; }
     void AddMoreNs(Double32_t moreNs) { fNs += moreNs; }
 
-  protected:
-    Double32_t fEnergy;     // total energy in the crystal
-    Double32_t fNf;         // total Nf in the crystal
-    Double32_t fNs;         // total Nf in the crystal
-    Double32_t fToT_Energy; // total energy in the crystal from ToT
-    uint64_t fTime;         // time of the interaction
-    Int_t fCrystalId;       // crystal unique identifier
+    double fEnergy;     // total energy in the crystal
+    double fNf;         // total Nf in the crystal
+    double fNs;         // total Nf in the crystal
+    double fToTEnergy; // total energy in the crystal from ToT
+    uint64_t fWrts;         // time of the interaction (WRTS)
+    int fCrystalId;       // crystal unique identifier
 
-  public:
-    ClassDef(R3BCalifaCrystalCalData, 1)
+    // written by clustering:
+    mutable int fClusterId{};
+    mutable ROOT::Math::XYZVector fPos{}; //! position. not stored in file. 
+
+    // set by mapped2cal again:
+    R3BCalifaCrystalCalData* otherRange{}; //! <-- comment exclamation mark means transient (not stored in file)
+    ClassDef(R3BCalifaCrystalCalData, 2)
 };
 
 #endif

@@ -39,5 +39,12 @@
 #pragma link C++ class R3BCalifaOnlineSpectra+;
 #pragma link C++ class R3BCalifaJulichOnlineSpectra+;
 #pragma link C++ class R3BCalifaDemoOnlineSpectra+;
+#pragma link C++ class R3BCalifaLegacyWriter+;
+
+#pragma link C++ class  R3BCalifaClusterMatcher;
+#pragma link C++ class  R3BCalifaCone;
+#pragma link C++ class  R3BCalifaRectangle;
+#pragma link C++ class  R3BCalifaSphere;
+
 
 #endif

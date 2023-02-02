@@ -27,11 +27,6 @@
 
 #include "FairLogger.h"
 
-class R3BLogger;
-
-class R3BLogger : public FairLogger
-{
-  public:
 #define R3BLOG(severity, x)                                                                                        \
     if (true)                                                                                                      \
     {                                                                                                              \
@@ -55,12 +50,18 @@ class R3BLogger : public FairLogger
     else                                                                                                      \
         (void)0
 
-  private:
-    R3BLogger();
-    ~R3BLogger();
-
-  public:
-    ClassDefOverride(R3BLogger, 0)
+namespace R3BLog
+{
+  inline std::string GetLocation(const char* file, int line, const char* function)
+  {
+    std::string fileName(file);
+    std::stringstream ss;
+    ss << fileName.substr(fileName.find_last_of("/") + 1) << ":" << line << ":" << function << "(): "; \
+    return ss.str();
+  }
 };
+#define R3BLOCATION R3BLog::GetLocation(__FILE__, __LINE__, __FUNCTION__)
+#define LLOG(severity) LOG(severity) << R3BLOCATION 
+#define LLOG_IF(severity, condition) LOG_IF(severity, condition) << R3BLOCATION 
 
 #endif // R3BLogger_H

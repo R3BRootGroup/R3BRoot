@@ -26,7 +26,6 @@
 #include "TGeoNode.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-
 #include <iostream>
 #include <stdlib.h>
 
@@ -80,10 +79,8 @@ void R3BCalifa::Initialize()
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
 
-    if (!R3BCalifaGeometry::Instance()->Init(fGeometryVersion))
-    {
-        R3BLOG(error, "Califa geometry not found");
-    }
+    fCalifaGeo=R3BCalifaGeometry::Instance(fGeometryVersion);
+    assert(fCalifaGeo);
     return;
 }
 

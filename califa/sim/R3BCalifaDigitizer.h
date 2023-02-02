@@ -29,9 +29,6 @@ class R3BCalifaDigitizer : public FairTask
     /** Standard contructor **/
     R3BCalifaDigitizer();
 
-    /** Destructor **/
-    virtual ~R3BCalifaDigitizer();
-
     /** Virtual method Init **/
     virtual InitStatus Init();
 
@@ -85,8 +82,9 @@ class R3BCalifaDigitizer : public FairTask
     void SetParameter();
 
     TClonesArray* fCalifaPointDataCA;  //!  The crystal hit collection
-    TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
+    R3BCalifaCrystalCalData::container_t* fCalifaCryCalData=new R3BCalifaCrystalCalData::container_t;
 
+  
     Double_t fNonUniformity; // Experimental non-uniformity parameter
     Double_t fResolution;    // Experimental resolution @ 1 MeV
     Double_t fComponentRes;  // Experimental resolution for Nf and Ns
@@ -122,7 +120,9 @@ class R3BCalifaDigitizer : public FairTask
 
     /** Private method AddCrystalCal
      **
-     ** Adds a CalifaCrystalCal data
+     ** Adds a CalifaCrystalCal data. 
+     ** If the hit already exists, will add energy, Nf, Ns
+     ** and set fWrts to max(fWrts, time)
      **/
     R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident,
                                            Double_t energy,

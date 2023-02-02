@@ -15,7 +15,6 @@
 #define R3BCALIFAHITPAR_H
 
 #include <TObjString.h>
-#include <TVector3.h>
 
 #include "FairParGenericSet.h"
 #include "FairParamList.h"

@@ -14,38 +14,25 @@
 #ifndef R3BCALIFAMAPPEDDATA_H
 #define R3BCALIFAMAPPEDDATA_H
 
+
 #include "TObject.h"
 #include <stdint.h>
+#include <map>
 
-class R3BCalifaMappedData : public TObject
+struct R3BCalifaMappedData : public TObject
 {
 
   public:
+    using container_t=std::map<uint16_t, R3BCalifaMappedData>;
+    static constexpr char default_container_name[]="CalifaMappedMap";
+    static constexpr char tca_name[]="CalifaMappedData";
     // Default Constructor
-    R3BCalifaMappedData();
+    R3BCalifaMappedData()
+    {}
 
-    /** Standard Constructor
-     *@param crystalId   Crystal unique identifier
-     *@param energy      Total energy deposited in the crystal [GeV]
-     *@param nf          Total fast amplitude deposited in the crystal [a.u.]
-     *@param ns          Total slow amplitude deposited on the crystal [a.u.]
-     *@param febextime   Internal febex time per crystal [ns]
-     *@param wrts        Timestamp per crystal or time since event start in simulation [ns]
-     *@param ov          Overflow bits
-     *@param pu          Pileup bits
-     *@param dc          Discard bits
-     *@param tot         Time-over-threshold
-     **/
-    R3BCalifaMappedData(UShort_t crystalId,
-                        int16_t energy,
-                        int16_t nf,
-                        int16_t ns,
-                        uint64_t febextime,
-                        uint64_t wrts,
-                        uint32_t ov,
-                        uint16_t pu,
-                        uint16_t dc,
-                        uint16_t tot);
+    R3BCalifaMappedData(uint16_t crystalId)
+      : fCrystalId(crystalId)
+      {}
 
     // Destructor
     virtual ~R3BCalifaMappedData() {}
@@ -62,20 +49,21 @@ class R3BCalifaMappedData : public TObject
     inline const uint16_t& GetDiscard() const { return fDiscard; }
     inline const uint16_t& GetTot() const { return fTot; }
 
-  protected:
-    UShort_t fCrystalId; // Crystal unique identifier
-    int16_t fEnergy;     // Total energy in the crystal
-    int16_t fNf;         // Total fast amplitude in the crystal
-    int16_t fNs;         // Total slow amplitude in the crystal
-    uint64_t fFebexTime; // Internal febex time
-    uint64_t fWrts;      // Timestamp per crystal
-    uint32_t fOverFlow;  // Overflow bits
-    uint16_t fPileup;    // Pileup bits
-    uint16_t fDiscard;   // Discard bits
-    uint16_t fTot;       // Time-over-treshold
+    uint16_t fCrystalId{0xffff}; // Crystal unique identifier
+    int16_t fEnergy{};     // Total energy in the crystal
+    int16_t fNf{};         // Total fast amplitude in the crystal
+    int16_t fNs{};         // Total slow amplitude in the crystal
+    uint64_t fFebexTime{}; // Internal febex time
+    uint64_t fWrts{};      // Timestamp per crystal
+    uint32_t fOverFlow{};  // Overflow bits
+    uint16_t fPileup{};    // Pileup bits
+    uint16_t fDiscard{};   // Discard bits
+    uint16_t fTot{};       // Time-over-treshold
 
   public:
-    ClassDef(R3BCalifaMappedData, 4)
+    ClassDef(R3BCalifaMappedData, 5)
 };
+
+
 
 #endif

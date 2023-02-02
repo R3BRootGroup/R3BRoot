@@ -19,7 +19,7 @@
 #include "TObjArray.h"
 #include "TRandom.h"
 #include "TSpectrum.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
 
 #include "FairLogger.h"
 #include "FairRootManager.h"

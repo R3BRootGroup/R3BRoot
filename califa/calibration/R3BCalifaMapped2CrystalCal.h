@@ -30,7 +30,6 @@
 
 #include <TRandom.h>
 
-class TClonesArray;
 class R3BCalifaCrystalCalPar;
 class R3BCalifaTotCalPar;
 
@@ -39,9 +38,6 @@ class R3BCalifaMapped2CrystalCal : public FairTask
   public:
     /** Default constructor **/
     R3BCalifaMapped2CrystalCal();
-
-    /** Destructor **/
-    virtual ~R3BCalifaMapped2CrystalCal();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
@@ -64,27 +60,18 @@ class R3BCalifaMapped2CrystalCal : public FairTask
   private:
     void SetParameter();
 
-    UInt_t fNumCrystals;
-    UInt_t fNumParams;
-    UInt_t fNumTotParams;
-    TArrayF* fCalParams;
-    TArrayF* fCalTotParams;
+    UInt_t fNumCrystals{};
+    UInt_t fNumParams{};
+    UInt_t fNumTotParams{};
+    TArrayF* fCalParams{};
+    TArrayF* fCalTotParams{};
     // Don't store data for online
-    Bool_t fOnline;
+    Bool_t fOnline{};
 
-    R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/
-    R3BCalifaTotCalPar* fTotCal_Par;   /**< Tot Parameter container. >*/
-    TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/
-    TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
-
-    /** Private method AddCalData **/
-    R3BCalifaCrystalCalData* AddCalData(Int_t id,
-                                        Double_t energy,
-                                        Double_t Nf,
-                                        Double_t Ns,
-                                        uint64_t wrts,
-                                        Double_t tot_energy);
-
+    R3BCalifaCrystalCalPar* fCal_Par{};  /**< Parameter container. >*/
+    R3BCalifaTotCalPar* fTotCal_Par{};   /**< Tot Parameter container. >*/
+    const R3BCalifaMappedData::container_t* fCalifaMappedData; 
+    R3BCalifaCrystalCalData::container_t* fCalifaCryCalData=new R3BCalifaCrystalCalData::container_t;
   public:
     // Class definition
     ClassDef(R3BCalifaMapped2CrystalCal, 1)

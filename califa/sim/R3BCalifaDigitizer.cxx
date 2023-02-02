@@ -20,36 +20,19 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TRandom.h"
-#include "TVector3.h"
 #include <iostream>
 #include <stdlib.h>
+#include "R3BLogger.h"
 
 R3BCalifaDigitizer::R3BCalifaDigitizer()
     : FairTask("R3B CALIFA Digitizer")
     , fCalifaPointDataCA(NULL)
-    , fCalifaCryCalDataCA(NULL)
     , fRealConfig(0)
     , fNonUniformity(0.) // perfect crystals
     , fResolution(0.)    // perfect crystals
     , fComponentRes(0.)  // perfect crystals
     , fThreshold(0.)     // no threshold
 {
-}
-
-R3BCalifaDigitizer::~R3BCalifaDigitizer()
-{
-    LOG(info) << "R3BCalifaDigitizer: Delete instance";
-
-    if (fCalifaPointDataCA)
-    {
-        fCalifaPointDataCA->Delete();
-        delete fCalifaPointDataCA;
-    }
-    if (fCalifaCryCalDataCA)
-    {
-        fCalifaCryCalDataCA->Delete();
-        delete fCalifaCryCalDataCA;
-    }
 }
 
 void R3BCalifaDigitizer::SetParContainers()
@@ -102,8 +85,7 @@ InitStatus R3BCalifaDigitizer::Init()
         return kFATAL;
     }
 
-    fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData", 10);
-    rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
+    rootManager->RegisterAny(R3BCalifaCrystalCalData::default_container_name, fCalifaCryCalData, true);
 
     SetParameter();
     return kSUCCESS;
@@ -116,134 +98,65 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
 
     // Reading the Input -- Point data --
     Int_t nHits = fCalifaPointDataCA->GetEntries();
-    if (!nHits)
-        return;
-
+    LLOG(debug) << "processing "<< nHits <<" R3BCalifaPoint.";
     R3BCalifaPoint** pointData = NULL;
     pointData = new R3BCalifaPoint*[nHits];
     for (Int_t i = 0; i < nHits; i++)
         pointData[i] = dynamic_cast<R3BCalifaPoint*>(fCalifaPointDataCA->At(i));
 
-    Int_t crystalId;
-    Double_t Nf;
-    Double_t Ns;
-    Double_t time;
-    Double_t energy;
-
     for (Int_t i = 0; i < nHits; i++)
     {
+      Int_t crystalId;
+      Double_t Nf;
+      Double_t Ns;
+      Double_t time;
+      Double_t energy;
+
         crystalId = pointData[i]->GetCrystalId();
         Nf = pointData[i]->GetNf();
         Ns = pointData[i]->GetNs();
         time = pointData[i]->GetTime();
         energy = pointData[i]->GetEnergyLoss();
+	LLOG(debug1) << "Adding " << energy <<"GeV for crystal id "<<crystalId;
 
-        Int_t nCrystalCals = fCalifaCryCalDataCA->GetEntriesFast();
-        Bool_t existHit = 0;
-        if (nCrystalCals == 0)
-            AddCrystalCal(crystalId, NUSmearing(energy), Nf, Ns, time, 0);
-        else
-        {
-            for (Int_t j = 0; j < nCrystalCals; j++)
-            {
-                if ((dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->GetCrystalId() == crystalId)
-                {
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))
-                        ->AddMoreEnergy(NUSmearing(energy));
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->AddMoreNf(Nf);
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->AddMoreNs(Ns);
-                    if ((dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->GetTime() > time)
-                    {
-                        (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->SetTime(time);
-                    }
-                    existHit = 1; // to avoid the creation of a new CrystalHit
-
-                    break;
-                }
-            }
-            if (!existHit)
-                AddCrystalCal(crystalId, NUSmearing(energy), Nf, Ns, time, 0);
-        }
-        existHit = 0;
+	AddCrystalCal(crystalId, NUSmearing(energy), Nf, Ns, time, 0); 
     }
 
     if (pointData)
         delete[] pointData;
 
-    Int_t nCrystalCals = fCalifaCryCalDataCA->GetEntriesFast();
-    if (nCrystalCals == 0)
-        return;
 
-    Double_t temp = 0;
-    Int_t tempCryID, parThres;
-    Bool_t inUse;
-    Int_t tempIndex;
-    Float_t parReso;
-
-    for (Int_t i = 0; i < nCrystalCals; i++)
+   for (auto& it: *fCalifaCryCalData)
     {
-
-        tempCryID = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetCrystalId();
-
-        if (!fRealConfig)
+      auto crId=it.first;
+      auto& hit=it.second;
+      bool skip;
+      if (!fRealConfig)
         {
-
-            temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetEnergy();
-            if (temp < fThreshold)
-            {
-                fCalifaCryCalDataCA->RemoveAt(i);
-                fCalifaCryCalDataCA->Compress();
-                nCrystalCals--; // remove from CalData those below threshold
-                i--;
-                continue;
-            }
-
-            if (fResolution > 0)
-                (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp));
-            if (fComponentRes > 0)
-            {
-                temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetNf();
-                (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetNf(CompSmearing(temp));
-                temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetNs();
-                (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
-            }
-        }
-
-        /* ----- Setting Real Config ----- */
-
-        else
-        {
-
-            temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetEnergy();
-
-            inUse = fSim_Par->GetInUse(tempCryID - 1);
-            fResolution = fSim_Par->GetResolution(tempCryID - 1);
-            parThres = fSim_Par->GetThreshold(tempCryID - 1);
-
-            if (inUse && parThres < temp * 1000000)
-            { // Thresholds are in KeV!!
-
-                (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp));
-
-                if (fComponentRes > 0)
-                {
-                    temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetNf();
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetNf(CompSmearing(temp));
-                    temp = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetNs();
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
-                }
-            }
-
-            else
-            {
-
-                fCalifaCryCalDataCA->RemoveAt(i); // remove from CalData those below threshold
-                fCalifaCryCalDataCA->Compress();
-                nCrystalCals--;
-                i--;
-                continue;
-            }
-        }
+	  skip = hit.fEnergy < fThreshold;
+	}
+      else
+	{
+	  bool inUse = fSim_Par->GetInUse(crId - 1);
+	  fResolution = fSim_Par->GetResolution(crId - 1);
+	  double parThres = fSim_Par->GetThreshold(crId - 1);
+	  skip=!inUse || parThres < hit.fEnergy *1e6; // GeV (sim, root units) -> keV (exp calibration)
+	}
+      if (skip)
+	{
+	  LLOG(debug) << "skipping crId ==" << crId;
+	  fCalifaCryCalData->erase(crId);
+	  continue;
+	}
+      if (fResolution > 0)
+	hit.fEnergy=ExpResSmearing(hit.fEnergy);
+      
+      if (fComponentRes > 0)
+	{
+	  hit.fNf=CompSmearing(hit.fNf);
+	  hit.fNs=CompSmearing(hit.fNs);
+	}
+      
     }
 }
 
@@ -251,9 +164,7 @@ void R3BCalifaDigitizer::Reset()
 {
     // Clear the CA structure
     LOG(debug) << "Clearing CalifaCrystalCalData Structure";
-    if (fCalifaCryCalDataCA)
-        fCalifaCryCalDataCA->Clear();
-
+    fCalifaCryCalData->clear();
     ResetParameters();
 }
 
@@ -269,21 +180,26 @@ void R3BCalifaDigitizer::SetRealConfig(Bool_t isRealSet)
     LOG(info) << "R3BCalifaDigitizer::SetRealConfig to " << isRealSet;
 }
 
-R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
+R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t crystalId,
                                                            Double_t energy,
                                                            Double_t Nf,
                                                            Double_t Ns,
                                                            ULong64_t time,
                                                            Double_t tot_energy)
 {
-    TClonesArray& clref = *fCalifaCryCalDataCA;
-    Int_t size = clref.GetEntriesFast();
-    if (fVerbose > 1)
-        LOG(info) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
-                  << " with unique identifier " << ident << " entering with " << energy * 1e06 << " keV Nf=" << Nf
-                  << " Ns=" << Ns << " Time=" << time << " tot_energy=" << tot_energy;
-
-    return new (clref[size]) R3BCalifaCrystalCalData(ident, energy, Nf, Ns, time, tot_energy);
+    
+  auto res=fCalifaCryCalData->emplace(std::make_pair(crystalId, R3BCalifaCrystalCalData(crystalId, 0, 0, 0, 0, 0)));
+  LLOG(debug) << " Adding "<<(res.second?"a new":"to existing")<<" CrystalCalData "
+	      << " with crystal Id " << crystalId << ": energy" << energy * 1e06 << " keV Nf=" << Nf
+	      << " Ns=" << Ns << " Time=" << time << " tot_energy=" << tot_energy;
+  auto& hit=res.first->second;
+    hit.fEnergy+=energy;
+    hit.fNf+=Nf;
+    hit.fNs+=Ns;
+    if (time>hit.fWrts)
+      hit.fWrts=time;
+    hit.fToTEnergy+=tot_energy;
+    return  &hit;
 }
 
 void R3BCalifaDigitizer::SetExpEnergyRes(Double_t crystalRes)

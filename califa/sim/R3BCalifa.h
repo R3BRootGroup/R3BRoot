@@ -16,7 +16,7 @@
 
 #include "R3BDetector.h"
 #include "Rtypes.h"
-#include "TLorentzVector.h"
+#include <TLorentzVector.h>
 #include <map>
 
 class TClonesArray;
@@ -127,10 +127,9 @@ class R3BCalifa : public R3BDetector
 
     // Selecting the geometry of the CALIFA calorimeter (final BARREL+iPhos: 2020)
     Int_t fGeometryVersion;
-
+    R3BCalifaGeometry* fCalifaGeo{}; // pointer to singleton
     Double_t fCsIDensity;
 
-    R3BCalifaGeometry* fCalifaGeo;
 
     /** Private method AddPoint
      **

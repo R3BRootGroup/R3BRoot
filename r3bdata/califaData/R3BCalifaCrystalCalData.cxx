@@ -13,16 +13,6 @@
 
 #include "R3BCalifaCrystalCalData.h"
 
-R3BCalifaCrystalCalData::R3BCalifaCrystalCalData()
-    : FairMultiLinkedData()
-    , fEnergy(-1.)
-    , fNf(-1.)
-    , fNs(-1.)
-    , fToT_Energy(-1.)
-    , fTime(0)
-    , fCrystalId(-1)
-{
-}
 
 R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(Int_t ident,
                                                  Double_t energy,
@@ -30,25 +20,14 @@ R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(Int_t ident,
                                                  Double_t Ns,
                                                  uint64_t time,
                                                  Double_t tot_energy)
-    : FairMultiLinkedData()
-    , fEnergy(energy)
+    : fEnergy(energy)
     , fNf(Nf)
     , fNs(Ns)
-    , fToT_Energy(tot_energy)
-    , fTime(time)
+    , fToTEnergy(tot_energy)
+    , fWrts(time)
     , fCrystalId(ident)
 {
 }
 
-R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData& right)
-    : FairMultiLinkedData(right)
-    , fEnergy(right.fEnergy)
-    , fNf(right.fNf)
-    , fNs(right.fNs)
-    , fToT_Energy(right.fToT_Energy)
-    , fTime(right.fTime)
-    , fCrystalId(right.fCrystalId)
-{
-}
 
 ClassImp(R3BCalifaCrystalCalData);

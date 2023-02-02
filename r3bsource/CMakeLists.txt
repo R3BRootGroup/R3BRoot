@@ -132,7 +132,6 @@ set(SRCS
 ./tofi/R3BTofiReader.cxx
 ./pdc/R3BPdcReader.cxx
 ./califa/R3BCalifaFebexReader.cxx
-./califa/R3BCalifaJulichReader.cxx
 ./tofd/R3BPtofReader.cxx
 ./neuland/R3BNeulandTamexReader.cxx
 ./neuland/R3BNeulandTacquilaReader.cxx

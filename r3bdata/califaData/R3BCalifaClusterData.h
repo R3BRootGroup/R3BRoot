@@ -15,86 +15,86 @@
 #define R3BCALIFACLUSTERDATA_H 1
 
 #include "TObject.h"
-
-#include "FairMultiLinkedData.h"
+#include "R3BLogger.h"
 #include "R3BCalifaCrystalCalData.h"
+#include <vector>
+#include <cmath>
 
-class R3BCalifaClusterData : public FairMultiLinkedData
+
+struct R3BCalifaClusterData : public TObject
 {
   public:
+    using container_t=std::vector<R3BCalifaClusterData>;
+    static constexpr char default_container_name[]="CalifaClusterVector";
+    static constexpr char tca_name[]="CalifaClusterData";
     /** Default constructor **/
-    R3BCalifaClusterData();
+    R3BCalifaClusterData() {}
 
     /** Constructor with arguments
      *@param fNbOfCrystalHits		Crystal unique identifier
-     *@param fEnergy				Total energy deposited
-     *@param fTheta					Reconstructed theta
      *@param fPhi					Reconstructed phi
      **/
-    R3BCalifaClusterData(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns, Double_t theta, Double_t phi, ULong64_t time);
+    //R3BCalifaClusterData(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns, Double_t theta, Double_t phi, ULong64_t time);
 
-    R3BCalifaClusterData(uint64_t time, double theta, double phi, uint32_t clusterId)
-        : fTime(time)
-        , fTheta(theta)
-        , fPhi(phi)
+   R3BCalifaClusterData(uint64_t time, const ROOT::Math::XYZVector& pos, uint32_t clusterId)
+        : fWrts(time)
+        , fPos(pos)
         , fClusterId(clusterId)
-        , fEnergy(0.)
-        , fNf(0.)
-        , fNs(0)
-        , fNbOfCrystalHits(0)
     {
     }
 
-    /** Copy constructor **/
-    R3BCalifaClusterData(const R3BCalifaClusterData&);
-
     /** += operator **/
-    R3BCalifaClusterData& operator+=(R3BCalifaCrystalCalData& cH)
+    R3BCalifaClusterData& operator+=(const R3BCalifaCrystalCalData& cH)
     {
+        static bool warned{};
         this->fEnergy += cH.GetEnergy();
         this->fNf += cH.GetNf();
         this->fNs += cH.GetNs();
-        this->fNbOfCrystalHits++;
+        this->fMult++;
+	if (!cH.fClusterId)
+	  {
+	    cH.fClusterId=this->fClusterId;
+	  }
+	else
+	  {
+	    if (!warned)
+	      {
+		LLOG(warning) << "R3BCalifaCrystalCalData was already set by a different task. It will not be overwritten.";
+		warned=1;
+	      }
+	  }
         return *this;
     }
 
-    R3BCalifaClusterData& operator=(const R3BCalifaClusterData&) { return *this; }
-
-    /** Destructor **/
-    virtual ~R3BCalifaClusterData() {}
+    // NEVER DO THIS:
+    //R3BCalifaClusterData& operator=(const R3BCalifaClusterData&) { return *this; }
 
     /** Accessors **/
-    UInt_t GetNbOfCrystalHits() const { return fNbOfCrystalHits; }
+    UInt_t GetNbOfCrystalHits() const { return fMult; }
     Double_t GetEnergy() const { return fEnergy; }
     Double_t GetNf() const { return fNf; }
     Double_t GetNs() const { return fNs; }
-    Double_t GetTheta() const { return fTheta; }
-    Double_t GetPhi() const { return fPhi; }
-    ULong64_t GetTime() const { return fTime; }
+    Double_t GetTheta() const { return fPos.Theta(); }
+    Double_t GetPhi() const { return fPos.Phi(); }
+    ULong64_t GetTime() const { return fWrts; }
     uint32_t GetClusterId() const { return fClusterId; }
 
     /** Modifiers **/
-    void SetNbOfCrystalHits(UInt_t number) { fNbOfCrystalHits = number; }
-    void SetEnergy(Double_t ene) { fEnergy = ene; }
-    void SetNf(Double_t nf) { fNf = nf; }
-    void SetNs(Double_t ns) { fNs = ns; }
-    void SetTheta(Double_t theta) { fTheta = theta; }
-    void SetPhi(Double_t phi) { fPhi = phi; }
-    void SetTime(ULong64_t time) { fTime = time; }
-    void SetClusterId(uint32_t id) { fClusterId = id; }
 
-  protected:
+  public:
     // Basic Hit information
-    UInt_t fNbOfCrystalHits; // number of crystals contribuying to the R3BCalifaClusterData
-    Double_t fEnergy;        // total energy deposited
-    Double_t fNf;            // total Nf deposited
-    Double_t fNs;            // total Ns deposited
-    Double_t fTheta;         // reconstructed theta
-    Double_t fPhi;           // reconstructed phi
-    ULong64_t fTime;         // WR time stamp
-    uint32_t fClusterId;
+    // additive quantities
+    UInt_t fMult{};            // number of crystals contribuying to the R3BCalifaClusterData
+    Double_t fEnergy{};        // total energy deposited
+    Double_t fNf{};            // total Nf deposited
+    Double_t fNs{};            // total Ns deposited
 
-    ClassDef(R3BCalifaClusterData, 3)
+    // set by cluster defining crystal:
+    ROOT::Math::XYZVector fPos {NAN, NAN, NAN};
+    ULong64_t fWrts{};           // WR time stamp
+    uint32_t fClusterId{};
+
+    ClassDef(R3BCalifaClusterData, 5)
 };
 
 using R3BCalifaHitData [[deprecated("R3BCalifaHitData was renamed to R3BCalifaClusterData.")]] =R3BCalifaClusterData;
