@@ -25,7 +25,7 @@ class R3BTofDHitPar;
 class R3BEventHeader;
 class R3BTofDMappingPar;
 class R3BTofDHitPar;
-class R3BTimeStitch;
+class R3BCoarseTimeStitch;
 class TH1F;
 class TH2F;
 
@@ -139,7 +139,7 @@ class R3BTofDCal2Hit : public FairTask
      */
     Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
 
-    R3BTimeStitch* fTimeStitch;
+    R3BCoarseTimeStitch* fTimeStitch;
     R3BEventHeader* header; /**< Event header - input data. */
     R3BTofDHitPar* fHitPar; /**< Hit parameter container. */
     R3BTofDMappingPar* fMapPar;

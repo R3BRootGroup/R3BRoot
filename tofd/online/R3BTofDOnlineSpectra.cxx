@@ -40,7 +40,7 @@
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BTofDMappingPar.h"
 #include "R3BTofDOnlineSpectra.h"
 #include "R3BTofdCalData.h"
@@ -597,7 +597,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     run->GetHttpServer()->RegisterCommand("Reset_TofD_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

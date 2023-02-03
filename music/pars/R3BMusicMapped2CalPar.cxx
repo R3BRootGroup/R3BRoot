@@ -35,7 +35,7 @@
 #include "R3BMusicMapped2CalPar.h"
 #include "R3BMusicMappedData.h"
 #include "R3BMwpcHitData.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 
 // R3BMusicMapped2CalPar: Default Constructor --------------------------
 R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
@@ -136,7 +136,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
     }
 
     // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     // Define TGraph for fits
     char Name1[255];

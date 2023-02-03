@@ -29,6 +29,6 @@
 #pragma link C++ class R3BLogger+;
 #pragma link C++ class R3BTcutPar+;
 #pragma link C++ class R3BTsplinePar+;
-#pragma link C++ class R3BTimeStitch+;
+#pragma link C++ class R3BCoarseTimeStitch+;
 
 #endif

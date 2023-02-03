@@ -28,7 +28,7 @@
 #include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -160,7 +160,7 @@ InitStatus R3BLosTCal2Hit::Init()
 
     fHitItems->Clear();
 
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
     // file with walk-correction parameters
     ifstream infile(fwalk_param_file.c_str());
     if (infile.is_open())

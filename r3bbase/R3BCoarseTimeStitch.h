@@ -11,29 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTimeStitch_H
-#define R3BTimeStitch_H 1
+#ifndef R3BCoarseTimeStitch_H
+#define R3BCoarseTimeStitch_H 1
 
 #include "TObject.h"
 #include "TString.h"
 #include <Rtypes.h>
 
-class R3BTimeStitch : public TObject
+class R3BCoarseTimeStitch : public TObject
 {
   public:
     // Default Constructor for sync two tamex channels
-    R3BTimeStitch();
+    R3BCoarseTimeStitch();
 
     // Destructor
-    virtual ~R3BTimeStitch() {}
+    virtual ~R3BCoarseTimeStitch() {}
 
     Float_t GetRange1() const { return fRange1; }
     Float_t GetRange2() const { return fRange2; }
-    Double_t GetTime(Double_t) const;
-    Double_t GetTime(Double_t, TString, TString);
+    Double_t GetTime(Double_t, TString name1 = "tamex", TString name2 = "tamex");
 
     void SetRange1(Float_t range) { fRange1 = range; }
     void SetRange2(Float_t range) { fRange2 = range; }
+
+    void SetClockTDC150() { fRangeClockTDC = fRangeClockTDC150; }
 
   private:
     Double_t fRange1;
@@ -42,9 +43,10 @@ class R3BTimeStitch : public TObject
     Double_t fRangeVftx;
     Double_t fRangeTrb;
     Double_t fRangeClockTDC;
+    Double_t fRangeClockTDC150;
 
   public:
-    ClassDef(R3BTimeStitch, 1)
+    ClassDef(R3BCoarseTimeStitch, 1)
 };
 
 #endif

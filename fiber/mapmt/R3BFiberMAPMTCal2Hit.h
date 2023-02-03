@@ -21,7 +21,7 @@
 class TH1F;
 class TH2F;
 class R3BEventHeader;
-class R3BTimeStitch;
+class R3BCoarseTimeStitch;
 class R3BFiberMAPMTCalData;
 class R3BFiberMAPMTHitPar;
 class R3BFiberMappingPar;
@@ -131,7 +131,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Bool_t fOnline;
 
     R3BEventHeader* fHeader; /* Event header  */
-    R3BTimeStitch* fTimeStitch;
+    R3BCoarseTimeStitch* fTimeStitch;
     Direction fDirection;
     Orientation fOrientation;
     TClonesArray* fCalItems;

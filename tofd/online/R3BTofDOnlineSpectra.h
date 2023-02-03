@@ -27,7 +27,7 @@
 class TClonesArray;
 class TH1F;
 class TH2F;
-class R3BTimeStitch;
+class R3BCoarseTimeStitch;
 class R3BEventHeader;
 class R3BTofDMappingPar;
 
@@ -117,7 +117,7 @@ class R3BTofDOnlineSpectra : public FairTask
 
   private:
     void SetParameter();
-    R3BTimeStitch* fTimeStitch;
+    R3BCoarseTimeStitch* fTimeStitch;
     TClonesArray* fMappedItems;
     TClonesArray* fCalItems;
     TClonesArray* fHitItems;

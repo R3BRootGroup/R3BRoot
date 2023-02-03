@@ -20,7 +20,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
@@ -215,7 +215,7 @@ InitStatus R3BTofDCal2Hit::Init()
     }
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

@@ -29,7 +29,7 @@
 #include "R3BLogger.h"
 #include "R3BLosHitData.h"
 #include "R3BSci2HitData.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -130,7 +130,7 @@ InitStatus R3BIncomingBeta::Init()
     SetParameter();
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

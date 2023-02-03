@@ -15,7 +15,7 @@
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
@@ -55,7 +55,7 @@ InitStatus R3BLosProvideTStart::Init()
         R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }
