@@ -24,7 +24,7 @@
 
 #include "R3BAmsCalifaCorrelatedOnlineSpectra.h"
 #include "R3BAmsHitData.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "THttpServer.h"

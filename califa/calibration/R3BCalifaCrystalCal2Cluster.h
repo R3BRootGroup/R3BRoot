@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,28 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFACRYSTALCAL2HIT_H
-#define R3BCALIFACRYSTALCAL2HIT_H
+#ifndef R3BCALIFACRYSTALCAL2CLUSTAR_H
+#define R3BCALIFACRYSTALCAL2CLUSTAR_H 1
 
 #include "FairTask.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaClusterData.h"
+#include "Rtypes.h"
 
+#include "TH2F.h"
 #include <TVector3.h>
 
 class TClonesArray;
 class R3BTGeoPar;
 
-class R3BCalifaCrystalCal2Hit : public FairTask
+class R3BCalifaCrystalCal2Cluster : public FairTask
 {
 
   public:
     /** Default constructor
      **/
-    R3BCalifaCrystalCal2Hit();
+    R3BCalifaCrystalCal2Cluster();
 
     /** Destructor **/
-    ~R3BCalifaCrystalCal2Hit();
+    virtual ~R3BCalifaCrystalCal2Cluster();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -119,9 +121,6 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
 
-    /** Virtual method Finish **/
-    // virtual void Finish();
-
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
 
@@ -151,35 +150,27 @@ class R3BCalifaCrystalCal2Hit : public FairTask
         }
     }
 
-  protected:
     /** Virtual method Init **/
     virtual InitStatus Init();
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
+    void SetRandomization(Bool_t rand) { fRand = rand; }
+
+    void SetRandomizationFile(TString file)
+    {
+
+        fRandFile = file;
+        fHistoFile = new TFile(fRandFile);
+    }
+
+  protected:
     /** Method GetAnglesVector (calls R3BCalifaGeometry::GetAngles(id)) **/
     TVector3 GetAnglesVector(int id);
     TVector3 fTargetPos;
     TVector3 fCalifaPos;
     TVector3 fCalifatoTargetPos;
-
-    TClonesArray* fCrystalHitCA;
-    TClonesArray* fCalifaHitCA;
-
-    R3BTGeoPar* fTargetGeoPar;
-    R3BTGeoPar* fCalifaGeoPar;
-
-    Bool_t fOnline;              // Selector for online data storage
-    Int_t fGeometryVersion;      // Selecting the geometry of the CALIFA calorimeter
-    Int_t fNbCrystalsGammaRange; // Define max. number of crystals with gamma range
-    Double_t fDeltaPolar;        // Angular window (polar angle)
-    Double_t fDeltaAzimuthal;    // Angular window (azimuthal angle)
-    Double_t fDeltaAngleClust;   // Angular opening used for the cluster condition
-    Double_t fParCluster1;       // Clustering parameter 1
-    Double_t fThreshold;         // Minimum energy requested in a crystal to be included in a Cal
-    Double_t fDRThreshold;       // Threshold for selecting gamma or proton branch in double reading channels
-    Double_t energyFactor;
 
     // Clustering algorithm selector
     enum
@@ -194,17 +185,36 @@ class R3BCalifaCrystalCal2Hit : public FairTask
         PETAL = 7
     } fClusterAlgorithmSelector; // Clustering algorithm selector
 
+  private:
+    TClonesArray* fCrystalCalData;
+    TClonesArray* fCalifaClusterData;
+
+    R3BTGeoPar* fTargetGeoPar;
+    R3BTGeoPar* fCalifaGeoPar;
+
+    Bool_t fOnline;              // Selector for online data storage
+    Int_t fGeometryVersion;      // Selecting the geometry of the CALIFA calorimeter
+    Int_t fNbCrystalsGammaRange; // Define max. number of crystals with gamma range
+    Double_t fDeltaPolar;        // Angular window (polar angle)
+    Double_t fDeltaAzimuthal;    // Angular window (azimuthal angle)
+    Double_t fDeltaAngleClust;   // Angular opening used for the cluster condition
+    Double_t fParCluster1;       // Clustering parameter 1
+    Double_t fThreshold;         // Minimum energy requested in a crystal to be included in a Cal
+    Double_t fDRThreshold;       // Threshold for selecting gamma or proton branch in double reading channels
+    Double_t energyFactor;
     // Parameter class
-    // R3BCalifaHitPar* fCalifaHitPar;
+    // R3BCalifaClusterPar* fCalifaClusterPar;
 
     R3BCalifaGeometry* fCalifaGeo;
-
-  private:
+    Bool_t fRand;      // Flag to set randomization procedure
+    TString fRandFile; // File with angular coverages for each crystal
+    TFile* fHistoFile;
+    TH2F** fAngularDistributions;
     /** Private method AddHit
      **
-     ** Adds a CalifaHit to the HitCollection
+     ** Adds a CalifaCluster to the HitCollection
      **/
-    R3BCalifaHitData* AddHit(UInt_t Nbcrystals,
+    R3BCalifaClusterData* AddHit(UInt_t Nbcrystals,
                              Double_t ene,
                              Double_t Nf,
                              Double_t Ns,
@@ -218,7 +228,7 @@ class R3BCalifaCrystalCal2Hit : public FairTask
      **/
     virtual bool Match(R3BCalifaCrystalCalData* ref, R3BCalifaCrystalCalData* hit);
 
-    ClassDef(R3BCalifaCrystalCal2Hit, 2);
+    ClassDef(R3BCalifaCrystalCal2Cluster, 2);
 };
 
-#endif
+#endif /* R3BCALIFACRYSTALCAL2CLUSTAR_H */

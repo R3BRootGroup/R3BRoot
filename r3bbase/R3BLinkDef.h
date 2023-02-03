@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BModule+;
+#pragma link C++ class R3BLogger+;
 #pragma link C++ class R3BDetector+;
 #pragma link C++ class R3BEventHeader+;
 #pragma link C++ class R3BEventHeaderCal2Hit+;

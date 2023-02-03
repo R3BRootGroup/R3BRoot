@@ -129,7 +129,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
 
@@ -163,7 +163,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
         fHitPar = (R3BFiberMAPMTHitPar*)FairRuntimeDb::instance()->getContainer(container);
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get " << container << " container.";
+            LOG(error) << "Could not get " << container << " container.";
             fNofHitPars = 0;
         }
         else
@@ -171,7 +171,7 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
             fNofHitPars = fHitPar->GetNumModulePar();
             if (0 == fNofHitPars)
             {
-                LOG(ERROR) << "No Hit parameters in " << container << " container.";
+                LOG(error) << "No Hit parameters in " << container << " container.";
                 fHitPar = nullptr;
             }
         }
@@ -270,7 +270,7 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
         cout << "R3BFiberCal2Hit::Init() container " << fName << "HitPar initialized. " << endl;
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
+        LOG(error) << "R3BFiberCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
     }
 }
 
@@ -585,6 +585,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
 void R3BFiberMAPMTCal2Hit::FinishEvent()
 {
+    fCalItems->Clear();
+    fCalTriggerItems->Clear();
     fHitItems->Clear();
     fNofHitItems = 0;
 }

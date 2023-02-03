@@ -51,7 +51,6 @@ class R3BFi31DigitizerHit : public FairTask
     void SetTimeResolution(Double_t t);
     void SetXPositionResolution(Double_t x);
     void SetYPositionResolution(Double_t y);
-	//void GlobalToLocal(const TVector3 posGlobal, Double_t x_local, Double_t y_local);    
 
   protected:
     TClonesArray* fFi31Points;

@@ -103,10 +103,12 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
     Int_t n_entries = fTofdPoints->GetEntries();
     Bool_t ChannelFired[1000] = { kFALSE };
 
-    Float_t X_Pos[10000] = { 0 };
-    Float_t Y_Pos[10000] = { 0 };
-    Float_t Time[10000] = { 0 };
-    Float_t Energy_Loss[10000] = { 0 };
+    Double_t X_Pos[10000] = { 0 };
+    Double_t Y_Pos[10000] = { 0 };
+    Double_t Z_Pos[10000] = { 0 };
+    Double_t Time[10000] = { 0 };
+    Double_t Energy_Loss[10000] = { 0 };
+
     Int_t number_paddles_hit = 0;
 
     for (Int_t entry = 0; entry < n_entries; entry++)
@@ -162,13 +164,39 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
                         layer_label = 1;
                         paddle_number = channel - 200 - 1;
                         // paddle_number = channel - 100;
-                    }
+                    }            
 
-                    X_Pos[channel] = -detector_width / 2. + paddle_width / 2. * (1 + layer_label) +
+                    Double_t xpaddle = -detector_width / 2. + paddle_width / 2. * (1 + layer_label) +
                                      paddle_number * paddle_width + paddle_number * air_gap_paddles;
-
-                    X_Pos[channel] = vPoints[channel].at(point)->GetXIn();
-                    Y_Pos[channel] = vPoints[channel].at(point)->GetYIn(); // get y-position //local
+                    
+                    X_Pos[channel] = (vPoints[channel].at(point)->GetXIn() + vPoints[channel].at(point)->GetXOut())/2.;
+                    Y_Pos[channel] = (vPoints[channel].at(point)->GetYIn() + vPoints[channel].at(point)->GetYOut())/2.; // get y-position //local
+                    Z_Pos[channel] = (vPoints[channel].at(point)->GetZIn() + vPoints[channel].at(point)->GetZOut())/2.; // get y-position //local
+                    
+                    Double_t PositionX =  -129.3;
+					Double_t PositionY =  0.;
+					Double_t PositionZ =  685.4;
+					Double_t RotationY =  -18.;
+										
+					TVector3 posGlobal; 
+				    posGlobal.SetX(X_Pos[channel]);
+				    posGlobal.SetY(Y_Pos[channel]);
+				    posGlobal.SetZ(Z_Pos[channel]);
+				   
+					TVector3 pos0;
+					pos0.SetX(0);
+					pos0.SetY(0);
+					pos0.SetZ(0);
+					pos0.RotateY(RotationY * TMath::DegToRad());
+					TVector3 trans(PositionX, PositionY, PositionZ);
+					pos0 += trans;
+								
+					TVector3 local = posGlobal - pos0;
+					local.RotateY(-RotationY * TMath::DegToRad());
+					Double_t x_local = local.X();
+					Double_t y_local = local.Y();
+                    
+                    
                     Time[channel] = vPoints[channel].at(point)->GetTime();
                     Energy_Loss[channel] = vPoints[channel].at(point)->GetEnergyLoss();
                     /*
@@ -186,22 +214,31 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
                                         }
                     */
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    LOG(DEBUG) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
-                               << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
-                               << " eloss = " << Energy_Loss[channel];
+
+                    LOG(debug) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                              << " x = " << x_local << " y = " << y_local << " t = " << Time[channel]
+                              << " eloss = " << Energy_Loss[channel];
+                              
 
                     //                    if(channel < 200)
 
-                    MapOfHits.insert(pair<Int_t, R3BTofdHitData*>(
+                   
+                   Int_t qcharge = (int)(88.339847*Energy_Loss[channel]+1.5039877+0.5);
+                   
+                  //  if(layer_label == 0)
+                    {
+						MapOfHits.insert(pair<Int_t, R3BTofdHitData*>(
                         channel,
                         new R3BTofdHitData(0.,
                                            // fRnd->Uniform((X_Pos[channel] - 1.35), (X_Pos[channel] + 1.35)),
-                                           X_Pos[channel],
-                                           Y_Pos[channel],
+                                           x_local,
+                                           y_local,
                                            0.,
                                            Time[channel],
-                                           Energy_Loss[channel],
+                                           qcharge, //Energy_Loss[channel],
                                            layer_label + 1)));
+					}
+
                 }
 
                 else

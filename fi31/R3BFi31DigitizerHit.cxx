@@ -45,6 +45,7 @@
 
 using std::cout;
 using std::endl;
+using namespace std;
 
 R3BFi31DigitizerHit::R3BFi31DigitizerHit()
     : FairTask("R3B Fi31 Digitization scheme ")
@@ -109,6 +110,7 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
         std::vector<Double_t>* time = new std::vector<Double_t>[NumOfFibers];
         std::vector<Double_t>* x = new std::vector<Double_t>[NumOfFibers];
         std::vector<Double_t>* y = new std::vector<Double_t>[NumOfFibers];
+        std::vector<Double_t>* z = new std::vector<Double_t>[NumOfFibers];
 
         for (Int_t i = 0; i < NumOfFibers; ++i)
         {
@@ -116,6 +118,7 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
             energy[i].push_back(0);
             x[i].push_back(0);
             y[i].push_back(0);
+            z[i].push_back(0);
         }
 
         struct TempHit
@@ -125,13 +128,15 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
             Double_t Time;
             Double_t X;
             Double_t Y;
+            Double_t Z;
 
-            TempHit(Int_t id, Double_t e, Double_t t, Double_t x, Double_t y)
+            TempHit(Int_t id, Double_t e, Double_t t, Double_t x, Double_t y, Double_t z)
                 : fiberID(id)
                 , Energy(e)
                 , Time(t)
                 , X(x)
                 , Y(y)
+                , Z(z)
             {
             }
         };
@@ -147,8 +152,9 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
             TempHits.push_back(TempHit(data_element->GetDetectorID(),
                                        data_element->GetEnergyLoss(),
                                        data_element->GetTime(),
-                                       data_element->GetXIn(),
-                                       data_element->GetYIn()));
+                                       (data_element->GetXIn()+data_element->GetXOut())/2.,
+                                       (data_element->GetYIn()+data_element->GetYOut())/2.,
+                                       (data_element->GetZIn()+data_element->GetZOut())/2.));
         }
 
         std::sort(TempHits.begin(), TempHits.end(), [](const TempHit& lhs, const TempHit& rhs) {
@@ -165,15 +171,16 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
             }
 
             Int_t fiberID = Hit.fiberID;
-
-            LOG(DEBUG) << "Hit Fi31 in: fiber: " << Hit.fiberID << " x: " << Hit.X << " y: " << Hit.Y
-                       << " Eloss: " << Hit.Energy << " t: " << Hit.Time;
-
+			
+			LOG(debug) << "Hit Fi31 in: fiber: " << Hit.fiberID << " x: " << Hit.X << " y: " << Hit.Y 
+			<< " Eloss: " << Hit.Energy << " t: " << Hit.Time ;
+            
             if (Hit.Time - time[fiberID].back() < 30)
             {
                 energy[fiberID].back() += Hit.Energy;
                 x[fiberID].back() = (time[fiberID].back() > Hit.Time) ? Hit.X : x[fiberID].back();
                 y[fiberID].back() = (time[fiberID].back() > Hit.Time) ? Hit.Y : y[fiberID].back();
+                z[fiberID].back() = (time[fiberID].back() > Hit.Time) ? Hit.Z : z[fiberID].back();
                 time[fiberID].back() = (time[fiberID].back() > Hit.Time) ? Hit.Time : time[fiberID].back();
             }
             else
@@ -182,6 +189,7 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
                 time[fiberID].push_back(Hit.Time);
                 x[fiberID].push_back(Hit.X);
                 y[fiberID].push_back(Hit.Y);
+                z[fiberID].push_back(Hit.Z);
             }
         }
 
@@ -194,20 +202,47 @@ void R3BFi31DigitizerHit::Exec(Option_t* opt)
                 if (energyl > 0.0001)
                 {
                     Double_t fiber_id = i;
-                    LOG(DEBUG) << "Hit Fi31 out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
-                               << " y: " << (y[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
-                               << " t: " << time[i].at(&energyl - energy[i].data());
+					LOG(debug) << "Hit Fi31 out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
+					<< " y: " << (y[i].at(&energyl - energy[i].data())) 
+					<< " Eloss: " << energyl << " t: " << time[i].at(&energyl - energy[i].data()) ;
+					
+					Double_t PositionX =  -112.6733;
+					Double_t PositionY =  0.;
+					Double_t PositionZ =  537.9038;
+					Double_t RotationY =  -193.8265;
+					
+					TVector3 posGlobal; 
+				    posGlobal.SetX(x[i].at(&energyl - energy[i].data()));
+				    posGlobal.SetY(y[i].at(&energyl - energy[i].data()));
+				    posGlobal.SetZ(z[i].at(&energyl - energy[i].data()));
+				   
+					TVector3 pos0;
+					pos0.SetX(0);
+					pos0.SetY(0);
+					pos0.SetZ(0);
+					pos0.RotateY(RotationY * TMath::DegToRad());
+					TVector3 trans(PositionX, PositionY, PositionZ);
+					pos0 += trans;
+						
+					TVector3 local = posGlobal - pos0;
+					local.RotateY(-RotationY * TMath::DegToRad());
+					Double_t x_local = local.X();
+					Double_t y_local = local.Y();
+						
+					
+                    Int_t qcharge = (int)(470.61775*energyl+1.5642724+0.5);
+                    
                     new ((*Hits)[Hits->GetEntries()])
                         R3BFiberMAPMTHitData(1,
-                                             prnd->Gaus((x[i].at(&energyl - energy[i].data())), xsigma),
-                                             prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma),
-                                             prnd->Gaus(energyl, esigma),
-                                             prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
-                                             i,
-                                             0.,
-                                             0.,
-                                             0.,
-                                             0.);
+                                               prnd->Gaus(x_local, xsigma),
+                                               prnd->Gaus(y_local, ysigma),
+                                               qcharge,
+                                               prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
+                                               i,
+                                               0.,
+                                               0.,
+                                               0.,
+                                               0.); 
                 }
             }
         }
@@ -234,29 +269,5 @@ void R3BFi31DigitizerHit::Reset()
 }
 
 void R3BFi31DigitizerHit::Finish() {}
-/*
-void R3BFi31DigitizerHit::GlobalToLocal(const TVector3 posGlobal, Double_t x_local, Double_t y_local)
-{
-    // position of detector
-    Double_t fi30X = -62.18069;
-    Double_t fi30Y = 0.0;
-    Double_t fi30Z = 570.59330;
-    angle = -13.68626;
-    pos0 = TVector3(0., 0., 0.);
-    pos0.RotateY(angle * TMath::DegToRad());
-    TVector3 trans(fi30X, fi30Y, fi30Z);
-    pos0 += trans;
-
-    TVector3 local = posGlobal - pos0;
-    local.RotateY(-angle * TMath::DegToRad());
-    x_local = local.X();
-    y_local = local.Y();
-    Double_t z_local = local.Z();
-    //  cout<< "GlobalToLocal:"<<endl;
-    //  cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
-    // cout << "GlobalToLocal Local x: " << x_local << " y: " << y_local <<  " z: " << z_local <<endl;
-    //  cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
-}
-*/
 
 ClassImp(R3BFi31DigitizerHit)

@@ -69,6 +69,7 @@ wrData/R3BWRMasterData.cxx
 wrData/R3BWRCalifaData.cxx
 wrData/R3BWRAmsData.cxx
 wrData/R3BWRLosData.cxx
+wrData/R3BWRData.cxx
 R3BHit.cxx
 R3BTrack.cxx
 R3BDouble.cxx
@@ -76,8 +77,8 @@ xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
 califaData/R3BCalifaCrystalCalData.cxx
+califaData/R3BCalifaClusterData.cxx
 califaData/R3BCalifaMappedData.cxx
-califaData/R3BCalifaHitData.cxx
 califaData/R3BCalifaPoint.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx

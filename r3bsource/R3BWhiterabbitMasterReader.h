@@ -12,11 +12,13 @@
  ******************************************************************************/
 
 #ifndef R3BWhiterabbitMasterReader_H
-#define R3BWhiterabbitMasterReader_H
+#define R3BWhiterabbitMasterReader_H 1
 #include "R3BReader.h"
+#include <Rtypes.h>
 
 struct EXT_STR_h101_WRMASTER_t;
 typedef struct EXT_STR_h101_WRMASTER_t EXT_STR_h101_WRMASTER;
+class ext_data_struct_info;
 
 class FairLogger;
 class TClonesArray;
@@ -26,11 +28,12 @@ class R3BWhiterabbitMasterReader : public R3BReader
 {
   public:
     R3BWhiterabbitMasterReader(EXT_STR_h101_WRMASTER*, UInt_t, UInt_t);
-    ~R3BWhiterabbitMasterReader();
+    
+    virtual ~R3BWhiterabbitMasterReader();
 
-    Bool_t Init(ext_data_struct_info*);
-    Bool_t Read();
-    void Reset();
+    virtual Bool_t Init(ext_data_struct_info*) override;
+    virtual Bool_t Read() override;
+    virtual void Reset() override;
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -54,6 +57,6 @@ class R3BWhiterabbitMasterReader : public R3BReader
     TClonesArray* fArray;
 
   public:
-    ClassDef(R3BWhiterabbitMasterReader, 0);
+    ClassDefOverride(R3BWhiterabbitMasterReader, 0);
 };
 #endif

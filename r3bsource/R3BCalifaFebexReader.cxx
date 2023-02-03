@@ -46,12 +46,12 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
         fArray = (new TClonesArray("R3BCalifaMappedData"));
 
     int ok;
-    LOG(INFO) << __PRETTY_FUNCTION__;
+    LOG(info) << __PRETTY_FUNCTION__;
     EXT_STR_h101_califa_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_califa, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << __PRETTY_FUNCTION__ << ": Failed to setup structure information.";
+        LOG(error) << __PRETTY_FUNCTION__ << ": Failed to setup structure information.";
         return false;
     }
 
@@ -78,6 +78,14 @@ Bool_t R3BCalifaFebexReader::Read()
         m.fFebexTS = cast_shift(fData->CALIFA_TSMSBv[crystal], 32)
           | cast_shift(fData->CALIFA_TSLSBv[crystal], 0);
 
+// Below are not in s494 unpacker:       
+        m.fWRTS = 0;
+       
+        m.fOverflow = 0;
+        m.fPileup = 0;
+        m.fDiscard = 0;
+        
+/*
         m.fWRTS = cast_shift(fData->CALIFA_WRTS_T4v[crystal], 48)
           | cast_shift(fData->CALIFA_WRTS_T3v[crystal], 32)
           | cast_shift(fData->CALIFA_WRTS_T2v[crystal], 16)
@@ -87,6 +95,7 @@ Bool_t R3BCalifaFebexReader::Read()
         m.fOverflow = fData->CALIFA_OVv[crystal];
         m.fPileup = fData->CALIFA_PILEUPv[crystal];
         m.fDiscard = fData->CALIFA_DISCARDv[crystal];
+*/
     }
     fNEvent += 1;
     return true;

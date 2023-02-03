@@ -25,6 +25,7 @@
 
 #pragma link C++ class R3BCalifaMapped2CrystalCal+;
 #pragma link C++ class R3BCalifaMapped2CrystalCalPar+;
+#pragma link C++ class R3BCalifaCrystalCal2Cluster+;
 #pragma link C++ class R3BCalifaCrystalCal2TotCalPar+;
 #pragma link C++ class R3BCalifaCrystalCalDataAnalysis+;
 #pragma link C++ class R3BCalifaCrystalCal2CrystalCalPID+;
@@ -35,7 +36,7 @@
 #pragma link C++ class R3BCalifaDigitizer+;
 //#pragma link C++ class R3BCalifaDUCalPar+;
 
-#pragma link C++ class R3BCalifaCrystalCal2Hit+;
+//#pragma link C++ class R3BCalifaCrystalCal2Hit+;
 #pragma link C++ class R3BCalifaHitPar+;
 #pragma link C++ class R3BCalifaMappingPar+;
 #pragma link C++ class R3BCalifaCrystalPars4Sim+;

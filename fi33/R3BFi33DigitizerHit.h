@@ -67,6 +67,7 @@ class R3BFi33DigitizerHit : public FairTask
     Double_t xsigma;
 	Int_t fiber_nbr = 512;
 
+
     ClassDef(R3BFi33DigitizerHit, 1);
 };
 

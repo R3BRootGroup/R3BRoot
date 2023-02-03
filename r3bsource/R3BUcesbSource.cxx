@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,13 +20,10 @@
 #include "FairRunOnline.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BUcesbSource.h"
 
 #include "ext_data_client.h"
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-using namespace std;
 
 R3BUcesbSource::R3BUcesbSource(const TString& FileName,
                                const TString& NtupleOptions,
@@ -45,7 +42,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fEventSize(event_size)
     , fLastEventNo(-1)
     , fEventHeader(nullptr)
-    , fInputFile()
+    // , fInputFile()
     , fEntryMax(0)
     , fReaders(new TObjArray())
 {
@@ -53,6 +50,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
 
 R3BUcesbSource::~R3BUcesbSource()
 {
+    R3BLOG(debug1, "R3BUcesbSource destructor.");
     if (fReaders)
     {
         fReaders->Delete();
@@ -63,17 +61,20 @@ R3BUcesbSource::~R3BUcesbSource()
 
 Bool_t R3BUcesbSource::Init()
 {
+    // Register of R3BEventHeader in the output root file
+
+    R3BLOG(debug, "checking whether R3BEventHeader has been defined in FairRun");
     auto run = FairRun::Instance();
     auto eventHeader = dynamic_cast<R3BEventHeader*>(run->GetEventHeader());
     if (eventHeader)
     {
-        LOG(info) << "EventHeader. was defined properly" << endl;
+        R3BLOG(info, "EventHeader. was defined properly");
     }
     else
     {
         eventHeader = new R3BEventHeader();
         run->SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
-        LOG(warn) << "EventHeader. has been created from R3BEventHeader" << endl;
+        R3BLOG(warn, "EventHeader. has been created from R3BEventHeader");
     }
 
     Bool_t status;
@@ -87,15 +88,13 @@ Bool_t R3BUcesbSource::Init()
     {
         command << " --max-events=" << fLastEventNo;
     }
-
-    std::cout << "Calling ucesb with command: " << command.str() << std::endl;
+    LOG(info) << "Calling ucesb with command: " << command.str();
 
     /* Fork off ucesb (calls fork() and pipe()) */
     fFd = popen(command.str().c_str(), "r");
     if (nullptr == fFd)
     {
-        perror("popen()");
-        LOG(fatal) << "popen() failed";
+        R3BLOG(fatal, "popen() failed");
         return kFALSE;
     }
 
@@ -103,12 +102,24 @@ Bool_t R3BUcesbSource::Init()
     status = fClient.connect(fileno(fFd));
     if (kFALSE == status)
     {
-        perror("ext_data_clnt::connect()");
-        LOG(error) << "ext_data_clnt::connect() failed";
-        LOG(fatal) << "ucesb: " << fClient.last_error();
+        R3BLOG(error, "ext_data_clnt::connect() failed");
+        R3BLOG(fatal, "ucesb error: " << fClient.last_error());
         return kFALSE;
     }
-
+    /*
+        // Open configuration file with runid values if needed in this step
+        fInputFile.open(fInputFileName.Data(), std::fstream::in);
+        if (!fInputFile.is_open())
+        {
+            R3BLOG(warn, "Input file for RunIds could not be open, it is Ok!");
+        }
+        else
+        {
+            R3BLOG(info, "Input file for RunIds " << fInputFileName.Data() << " is open!");
+            fInputFile.clear();
+            fInputFile.seekg(0, std::ios::beg);
+        }
+    */
     return kTRUE;
 }
 
@@ -116,47 +127,40 @@ Bool_t R3BUcesbSource::InitUnpackers()
 {
     // Register of R3BEventHeader in the output root file
     FairRootManager* frm = FairRootManager::Instance();
-    if (!frm)
-        LOG(fatal) << "FairRootManager in ucesb no found" << endl;
+    R3BLOG_IF(fatal, !frm, "FairRootManager no found");
 
-    LOG(info) << "Checking the register of R3BEventHeader" << endl;
+    R3BLOG(info, "Checking the register of R3BEventHeader");
     fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (fEventHeader)
     {
-        LOG(info) << "EventHeader. was defined properly" << endl;
+        R3BLOG(info, "EventHeader. was defined properly");
     }
     else
     {
-        LOG(error) << "EventHeader. was not defined properly!" << endl;
+        R3BLOG(error, "EventHeader. was not defined properly!");
     }
 
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        // cout << "InitUnpacker: " << i << ", " << fReaders->GetEntriesFast() << endl;
         if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
         {
-            LOG(fatal) << "ucesb: " << fClient.last_error();
+            R3BLOG(fatal, "UCESB error: " << fClient.last_error());
             return kFALSE;
         }
     }
 
     /* Setup client */
-    //#ifdef EXT_DATA_ITEM_MAP_MATCH
     /* this is the version for ucesb setup with extended mapping info */
     uint32_t struct_map_success = 0;
     Bool_t status = fClient.setup(NULL, 0, &fStructInfo, &struct_map_success, fEventSize);
-    //#else
-    //   Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
-    //#endif
     if (status != 0)
     {
-        perror("ext_data_clnt::setup()");
-        LOG(error) << "ext_data_clnt::setup() failed";
-        LOG(fatal) << "ucesb: %s" << fClient.last_error();
+        // perror("ext_data_clnt::setup()");
+        R3BLOG(error, "ext_data_clnt::setup() failed");
+        R3BLOG(fatal, "UCESB error: " << fClient.last_error());
         return kFALSE;
     }
-#ifdef EXT_DATA_ITEM_MAP_MATCH
     /*
      * It is not needed, that *all* items are matched.
      * However, mapping should fail, if items are requested that don't exist
@@ -166,12 +170,17 @@ Bool_t R3BUcesbSource::InitUnpackers()
     uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
     if (struct_map_success & ~(map_ok))
     {
-        perror("ext_data_clnt::setup()");
-        LOG(error) << "ext_data_clnt::setup() failed";
+        R3BLOG(warn, "ext_data_clnt::setup() failed to map all items:");
         ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
+        /* FairRunOnline::Init() ignores the return value from
+         * GetSource()->InitUnpackers(); so do a (FATAL) error.
+         */
+        R3BLOG(error,
+               "ext_data_clnt::setup() mapping failure may "
+               "cause unexpected analysis results due to missing "
+               "data members. Unpacker needs fixing.");
         return kFALSE;
     }
-#endif
 
     return kTRUE;
 }
@@ -191,7 +200,7 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     {
         if (!((R3BReader*)fReaders->At(i))->ReInit())
         {
-            LOG(fatal) << "ReInit of a reader failed.";
+            R3BLOG(fatal, "ReInit of a reader failed.");
             return kFALSE;
         }
     }
@@ -215,34 +224,34 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     int ret;
     (void)i; /* Why is i not used? Outer loop seems not to use it. */
 
+    R3BLOG(debug1, "ReadEvent " << fNEvent);
+
     fNEvent++;
-
-    LOG(debug1) << "R3BUcesbSource::ReadEvent " << fNEvent;
-
-    if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
-    {
-
-        LOG(info) << "ReadEvent()" << endl;
-
-        std::string buffer;
-        do
+    /*
+        if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
         {
-            getline(fInputFile, buffer);
-            LOG(info) << "read from file: \"" << buffer << "\"";
-            if (buffer.find("EVENT BEGIN") == 0)
+
+            R3BLOG(info, "ReadEvent()");
+
+            std::string buffer;
+            do
             {
-                fRunId = ReadIntFromString(buffer, "RUNID");
-                fEventHeader->SetRunId(fRunId);
-            }
-            if (buffer.find("EVENT") == 0)
-                continue;
-            Int_t fInit = atoi(buffer.c_str());
-            buffer.erase(0, buffer.find(' ') + 1);
-            fEntryMax = atoi(buffer.c_str());
+                getline(fInputFile, buffer);
+                LOG(info) << "read from file: \"" << buffer << "\"";
+                if (buffer.find("EVENT BEGIN") == 0)
+                {
+                    fRunId = ReadIntFromString(buffer, "RUNID");
+                    fEventHeader->SetRunId(fRunId);
+                }
+                if (buffer.find("EVENT") == 0)
+                    continue;
+                Int_t fInit = atoi(buffer.c_str());
+                buffer.erase(0, buffer.find(' ') + 1);
+                fEntryMax = atoi(buffer.c_str());
 
-        } while (fInputFile && buffer.compare("EVENT END"));
-    }
-
+            } while (fInputFile && buffer.compare("EVENT END"));
+        }
+    */
     /* Need to initialize first */
     if (nullptr == fFd)
     {
@@ -251,17 +260,16 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 
     /* Fetch data */
     ret = fClient.fetch_event(fEvent, fEventSize);
-
     if (0 == ret)
     {
-        LOG(info) << "R3BUcesbSource::End of input";
+        LOG(info) << "End of input";
         return 1;
     }
     if (-1 == ret)
     {
         perror("ext_data_clnt::fetch_event()");
-        LOG(error) << "ext_data_clnt::fetch_event() failed";
-        LOG(fatal) << "ucesb: " << fClient.last_error();
+        R3BLOG(error, "ext_data_clnt::fetch_event() failed");
+        R3BLOG(fatal, "UCESB error: " << fClient.last_error());
         return 0;
     }
 
@@ -270,7 +278,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     if (0 != ret)
     {
         perror("ext_data_clnt::get_raw_data()");
-        LOG(fatal) << "Failed to get raw data.";
+        R3BLOG(fatal, "Failed to get raw data.");
         return 0;
     }
 
@@ -306,12 +314,14 @@ void R3BUcesbSource::Close()
 {
     int ret;
 
+    LOG(info) << "R3BUcesbSource::Close() called";
+
     /* Close client connection */
     ret = fClient.close();
     if (0 != ret)
     {
-        perror("ext_data_clnt::close()");
-        LOG(fatal) << "ext_data_clnt::close() failed";
+        // perror("ext_data_clnt::close()");
+        R3BLOG(fatal, "ext_data_clnt::close() failed");
     }
 
     /* Close pipe */
@@ -321,11 +331,14 @@ void R3BUcesbSource::Close()
         status = pclose(fFd);
         if (-1 == status)
         {
-            perror("pclose()");
-            LOG(fatal) << "pclose() failed";
+            // perror("pclose()");
+            R3BLOG(fatal, "pclose() failed");
             abort();
         }
     }
+
+    //  if (fInputFile.is_open())
+    //    fInputFile.close();
 }
 
 void R3BUcesbSource::Reset()
@@ -342,6 +355,8 @@ Bool_t R3BUcesbSource::SpecifyRunId()
         return true;
     return false;
 }
+
+//_____________________________________________________________________________
 void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
 
-ClassImp(R3BUcesbSource)
+ClassImp(R3BUcesbSource);

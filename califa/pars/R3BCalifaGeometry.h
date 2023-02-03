@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,10 +12,11 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFAGEOMETRY_H
-#define R3BCALIFAGEOMETRY_H
+#define R3BCALIFAGEOMETRY_H 1
 
+#include "Rtypes.h"
+#include "TObject.h"
 #include <TFile.h>
-#include <TObject.h>
 
 class TVector3;
 class TGeoNavigator;
@@ -35,7 +36,7 @@ class R3BCalifaGeometry : public TObject
     R3BCalifaGeometry(Int_t version);
 
     /** Destructor **/
-    ~R3BCalifaGeometry();
+    virtual ~R3BCalifaGeometry();
 
     /**
      * Gets position in polar coordinates of crystal with given ID.
@@ -111,17 +112,18 @@ class R3BCalifaGeometry : public TObject
      * @param version Geometry version to use. If in doubt, use 2020.
      * @return Instance of R3BCalifaGeometry
      */
-    static R3BCalifaGeometry* Instance(Int_t version);
+    static R3BCalifaGeometry* Instance();
+
+    bool Init(Int_t fGeo);
 
   private:
     Int_t fGeometryVersion;
     Int_t fNumCrystals;
     Bool_t fIsSimulation;
+    Bool_t IsInitialize;
     TFile* f;
-
-    static R3BCalifaGeometry* inst;
 
     ClassDef(R3BCalifaGeometry, 8);
 };
 
-#endif
+#endif /* R3BCALIFAGEOMETRY_H */

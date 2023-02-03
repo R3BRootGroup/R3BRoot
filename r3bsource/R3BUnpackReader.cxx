@@ -58,6 +58,12 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 
     FairRootManager* mgr = FairRootManager::Instance();
     mgr->Register("R3BEventHeader", "EventHeader", fHeader, kTRUE);
+    if (!fHeader)
+    {
+        LOG(warn) << "EventHeader. not found" << endl;
+    }
+    else
+        LOG(info) << "EventHeader. found" << endl;
 
     return kTRUE;
 }

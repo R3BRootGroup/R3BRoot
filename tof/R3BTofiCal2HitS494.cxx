@@ -749,14 +749,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             tArrU[hit] = true;
             // store single hits
             singlehit++;
-            new ((*fHitItems)[fNofHitItems++]) R3BTofiHitData(event[hit].time,
-                                                              event[hit].xpos,
-                                                              event[hit].ypos,
-                                                              event[hit].charge,
-                                                              -1.,
-                                                              event[hit].charge,
-                                                              event[hit].plane,
-                                                              event[hit].bar);
+            new ((*fHitItems)[fNofHitItems++])
+                R3BTofiHitData(event[hit].time,
+                               event[hit].xpos,
+                               event[hit].ypos,
+                               event[hit].charge,
+                               -1.,
+                               event[hit].charge,
+                               event[hit].plane + 2, // +2 in order to add Tofi as 3rd Tofd plane
+                               event[hit].bar);
         }
     }
 

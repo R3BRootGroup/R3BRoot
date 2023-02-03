@@ -15,7 +15,9 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
-#include "R3BWRMasterData.h"
+//#include "R3BWRMasterData.h"
+#include "R3BWRData.h"
+
 #include "TClonesArray.h"
 
 extern "C"
@@ -28,7 +30,7 @@ R3BWhiterabbitMasterReader::R3BWhiterabbitMasterReader(EXT_STR_h101_WRMASTER* da
                                                        UInt_t offset,
                                                        UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitMasterReader")
-    , fNEvent(0)
+    , fNEvent(1)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
@@ -50,29 +52,30 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitMasterReader::Init";
+    LOG(info) << "R3BWhiterabbitMasterReader::Init";
     EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMASTER, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitMasterReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitMasterReader::Failed to setup structure information.";
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    FairRootManager* frm = FairRootManager::Instance();
+    fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
 
-    // Register output array in tree
-    if (!fOnline)
+    if (!fEventHeader)
     {
-        FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kTRUE);
+        LOG(warn) << "EventHeader. not found" << std::endl;
+        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-    {
-        FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kFALSE);
-    }
+        LOG(info) << "EventHeader. found" << std::endl;
 
-    fData->TIMESTAMP_MASTER_ID = 0;
+    // Register output array in tree
+    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
+    Reset();
+    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
@@ -106,7 +109,7 @@ Bool_t R3BWhiterabbitMasterReader::Read()
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T3 << 32) |
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_MASTER_WR_T1;
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
     }
     else
     {
@@ -121,7 +124,7 @@ void R3BWhiterabbitMasterReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    fNEvent = 0;
+    // fNEvent = 0;
 }
 
 ClassImp(R3BWhiterabbitMasterReader)

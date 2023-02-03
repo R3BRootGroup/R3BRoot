@@ -23,7 +23,8 @@
  */
 
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
+//#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaMappedData.h"
 
 #include "R3BLosCalData.h"
@@ -491,23 +492,23 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_phi26_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi26_cm->GetYaxis()->SetTitle("counts");
 
-    fh_theta_4He_cm = new TH2F("theta_4He_cm", "Theta 4He in cm-system", 500, -1., 1., 1000, 0, 20);
+    fh_theta_4He_cm = new TH2F("theta_4He_cm", "Theta 4He in cm-system", 200, -1., 1., 200, 0, 20);
     fh_theta_4He_cm->GetXaxis()->SetTitle("cos(theta_cm)");
     fh_theta_4He_cm->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_phi_4He_cm = new TH2F("phi_4He_cm", "phi 4He in cm-system", 360, 0., 180., 1000, 0, 20);
+    fh_phi_4He_cm = new TH2F("phi_4He_cm", "phi 4He in cm-system", 360, 0., 180., 200, 0, 20);
     fh_phi_4He_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_4He_cm->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_theta_12C_cm = new TH2F("theta_12C_cm", "Theta 12C in cm-system", 500, -1, 1., 1000, 0, 20);
+    fh_theta_12C_cm = new TH2F("theta_12C_cm", "Theta 12C in cm-system", 200, -1, 1., 200, 0, 20);
     fh_theta_12C_cm->GetXaxis()->SetTitle("cos(theta_cm)");
     fh_theta_12C_cm->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_phi_12C_cm = new TH2F("phi_12C_cm", "phi 12C in cm-system", 360, 0., 180., 1000, 0, 20);
+    fh_phi_12C_cm = new TH2F("phi_12C_cm", "phi 12C in cm-system", 180, 0., 180., 200, 0, 20);
     fh_phi_12C_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_12C_cm->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_theta_bc_cm = new TH2F("theta_bc_cm", "Theta bc in cm-system", 360, 0., 180., 1000, 0, 20);
+    fh_theta_bc_cm = new TH2F("theta_bc_cm", "Theta bc in cm-system", 180, 0., 180., 200, 0, 20);
     fh_theta_bc_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta_bc_cm->GetYaxis()->SetTitle("Erel / MeV");
 
@@ -527,11 +528,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_phiMC_bc_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phiMC_bc_cm->GetYaxis()->SetTitle("counts");
 
-    fh_phi_bc_cm_polar = new TH2F("phi_bc_cm_polar", "phi_bc_cm_polar", 720, 0., 360., 100, 0., 10.);
+    fh_phi_bc_cm_polar = new TH2F("phi_bc_cm_polar", "phi_bc_cm_polar", 360, 0., 360., 100, 0., 10.);
     fh_phi_bc_cm_polar->GetXaxis()->SetTitle("angle / degree");
     fh_phi_bc_cm_polar->GetYaxis()->SetTitle("counts");
 
-    fh_phiMC_bc_cm_polar = new TH2F("phiMC_bc_cm_polar", "phiMC_bc_cm_polar", 720, 0., 360., 100, 0., 10.);
+    fh_phiMC_bc_cm_polar = new TH2F("phiMC_bc_cm_polar", "phiMC_bc_cm_polar", 360, 0., 360., 100, 0., 10.);
     fh_phiMC_bc_cm_polar->GetXaxis()->SetTitle("angle / degree");
     fh_phiMC_bc_cm_polar->GetYaxis()->SetTitle("counts");
 
@@ -627,12 +628,12 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_psum_vs_chi->GetYaxis()->SetTitle("p / MeV/c");
     fh_psum_vs_chi->GetXaxis()->SetTitle("chi2");
 
-    fh_psum_vs_event = new TH2F("psum_vs_event", "psum vs. event number", 10000, 0, 1e6, 80, 17000., 17800.);
+    fh_psum_vs_event = new TH2F("psum_vs_event", "psum vs. event number", 100, 0, 1e6, 80, 17000., 17800.);
     fh_psum_vs_event->GetXaxis()->SetTitle("Event number");
     fh_psum_vs_event->GetYaxis()->SetTitle("p / MeV/c");
 
     fh_psum_vs_event_nc =
-        new TH2F("psum_vs_event_nc", "psum vs. event number all chi2", 10000, 0, 1e6, 80, 17000., 17800.);
+        new TH2F("psum_vs_event_nc", "psum vs. event number all chi2", 100, 0, 1e6, 80, 17000., 17800.);
     fh_psum_vs_event_nc->GetXaxis()->SetTitle("Event number");
     fh_psum_vs_event_nc->GetYaxis()->SetTitle("p / MeV/c");
 
@@ -652,40 +653,40 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_dtheta->GetYaxis()->SetTitle("counts");
     fh_dtheta->GetXaxis()->SetTitle("Delta theta / deg");
 
-    fh_Erel_vs_theta26 = new TH2F("Erel_vs_theta", "Erel vs. theta", 250, 0., 5, 2000, 0, 20.);
+    fh_Erel_vs_theta26 = new TH2F("Erel_vs_theta", "Erel vs. theta", 125, 0., 5, 200, 0, 20.);
     fh_Erel_vs_theta26->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta26->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_theta16O = new TH2F("Erel_vs_theta16O", "Erel vs. theta 16O*", 250, 0., 5, 2000, 0, 20.);
+    fh_Erel_vs_theta16O = new TH2F("Erel_vs_theta16O", "Erel vs. theta 16O*", 125, 0., 5, 500, 0, 50.);
     fh_Erel_vs_theta16O->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta16O->GetYaxis()->SetTitle("Erel / MeV");
 
     fh_Erel_vs_theta16O_3He12C =
-        new TH2F("Erel_vs_theta16O_3He12C", "Erel vs. theta 16O* for 3He+12C", 250, 0., 5, 5000, 0, 100.);
+        new TH2F("Erel_vs_theta16O_3He12C", "Erel vs. theta 16O* for 3He+12C", 125, 0., 5, 500, 0, 50.);
     fh_Erel_vs_theta16O_3He12C->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta16O_3He12C->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_theta26_nc = new TH2F("Erel_vs_theta_nc", "Erel vs. theta all ci2", 250, 0., 5, 200, 0, 20.);
+    fh_Erel_vs_theta26_nc = new TH2F("Erel_vs_theta_nc", "Erel vs. theta all ci2", 125, 0., 5, 200, 0, 20.);
     fh_Erel_vs_theta26_nc->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta26_nc->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_thetaMC = new TH2F("Erel_vs_thetaMC", "Erel vs. theta MC", 250, 0., 5, 2000, 0, 20.);
+    fh_Erel_vs_thetaMC = new TH2F("Erel_vs_thetaMC", "Erel vs. theta MC", 125, 0., 5, 200, 0, 20.);
     fh_Erel_vs_thetaMC->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_thetaMC->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_phibc = new TH2F("Erel_vs_phibccm", "Erel vs. phi_bc_cm", 2000, 0, 20., 400, 0., 400.);
+    fh_Erel_vs_phibc = new TH2F("Erel_vs_phibccm", "Erel vs. phi_bc_cm", 200, 0, 20., 400, 0., 400.);
     fh_Erel_vs_phibc->GetYaxis()->SetTitle("phi angle bc / deg");
     fh_Erel_vs_phibc->GetXaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_ptransHe = new TH2F("Erel_vs_ptransHe", "Erel vs. ptransHe", 1000, -500, 500, 2000, 0, 20.);
+    fh_Erel_vs_ptransHe = new TH2F("Erel_vs_ptransHe", "Erel vs. ptransHe", 1000, -500, 500, 200, 0, 20.);
     fh_Erel_vs_ptransHe->GetXaxis()->SetTitle("ptrans / MeV(c");
     fh_Erel_vs_ptransHe->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_ptransC = new TH2F("Erel_vs_ptransC", "Erel vs. ptransC", 1000, -500, 500, 2000, 0, 20.);
+    fh_Erel_vs_ptransC = new TH2F("Erel_vs_ptransC", "Erel vs. ptransC", 1000, -500, 500, 200, 0, 20.);
     fh_Erel_vs_ptransC->GetXaxis()->SetTitle("ptrans / MeV(c");
     fh_Erel_vs_ptransC->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_phibcMC = new TH2F("Erel_vs_phibccmMC", "Erel vs. phi_bc_cm MCtrack", 2000, 0, 20., 400, 0., 400.);
+    fh_Erel_vs_phibcMC = new TH2F("Erel_vs_phibccmMC", "Erel vs. phi_bc_cm MCtrack", 200, 0, 20., 400, 0., 400.);
     fh_Erel_vs_phibcMC->GetYaxis()->SetTitle("phi angle bc / deg");
     fh_Erel_vs_phibcMC->GetXaxis()->SetTitle("Erel / MeV");
 
@@ -1332,7 +1333,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     becut = true;
             }
             // Dima's tracker only one chi2;
-            if (sq_chi < (fcut_chiX + fcut_chiY) && becut) //  abs(carbon.Pz()+alpha.Pz()-17390.) < 400. )
+            if (sq_chi < (fcut_chiX + fcut_chiY) && becut && mtrackHe > 3.5 && mtrackHe < 4.5 && mtrackC > 11.5 &&
+                mtrackC < 12.5) //  abs(carbon.Pz()+alpha.Pz()-17390.) < 400. )
             {
                 //  if ((alpha.Px() > 0. && carbon.Px() > 0.) || (alpha.Px() < 0. && carbon.Px() < 0.)) return;
                 //  if ((alpha.Py() > 0. && carbon.Py() > 0.) || (alpha.Py() < 0. && carbon.Py() < 0.)) return;
@@ -1390,12 +1392,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_pHe_vs_theta26->Fill(pa.Mag(), theta_26 * TMath::DegToRad() * 1000.);
                 fh_psum_vs_theta26->Fill(theta_26, (pa + pc).Mag());
 
-                Double_t ptransHe = sqrt(alpha_cm.Px() * alpha_cm.Px() + alpha_cm.Py() * alpha_cm.Py() +
-                                         alpha_cm.Pz() * alpha_cm.Pz()) *
-                                    alpha_cm.Theta();
-                Double_t ptransC = sqrt(carbon_cm.Px() * carbon_cm.Px() + carbon_cm.Py() * carbon_cm.Py() +
-                                        carbon_cm.Py() * carbon_cm.Py()) *
-                                   carbon_cm.Theta();
+                Double_t ptransHe = alpha_cm.Perp();
+                Double_t ptransC = carbon_cm.Perp();
                 fh_Erel_vs_ptransHe->Fill(ptransHe, Erel);
                 fh_Erel_vs_ptransC->Fill(ptransC, Erel);
 
@@ -1412,9 +1410,9 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_phi26_cm->Fill(phi);     // phi between alpha + carbon in cm
                 fh_theta26_cm->Fill(theta); // angle between alpha + carbon in cm
 
-                fh_theta_4He_cm->Fill(cos(alpha_cm.Theta()), Erel);
+                fh_theta_4He_cm->Fill(alpha_cm.CosTheta(), Erel);
                 fh_phi_4He_cm->Fill(alpha_cm.Phi() * TMath::RadToDeg(), Erel);
-                fh_theta_12C_cm->Fill(cos(carbon_cm.Theta()), Erel);
+                fh_theta_12C_cm->Fill(carbon_cm.CosTheta(), Erel);
                 fh_phi_12C_cm->Fill(carbon_cm.Phi() * TMath::RadToDeg(), Erel);
 
                 fh_theta_bc_cm->Fill(alpha_cm.Theta() * TMath::RadToDeg(), Erel);
@@ -1638,10 +1636,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     {
         // CALIFA
         auto detCalifa = fMappedItemsCalifa;
-        Int_t nHitsCalifa = detCalifa->GetEntriesFast();
-        // cout<<"Califa hits: "<<nHitsCalifa<<endl;
+        Int_t nHitsCalifaM = detCalifa->GetEntriesFast();
+        // cout<<"Califa hits: "<<nHitsCalifaM<<endl;
 
-        for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
+        for (Int_t ihit = 0; ihit < nHitsCalifaM; ihit++)
         {
             R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)detCalifa->At(ihit);
             if (!hitCalifa)
@@ -1660,10 +1658,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     {
         // CALIFA
         auto detCalifa = fCalItemsCalifa;
-        Int_t nHitsCalifa = detCalifa->GetEntriesFast();
-        // cout<<"Califa hits: "<<nHitsCalifa<<endl;
+        Int_t nHitsCalifaC = detCalifa->GetEntriesFast();
+        // cout<<"Califa hits: "<<nHitsCalifaC<<endl;
 
-        for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
+        for (Int_t ihit = 0; ihit < nHitsCalifaC; ihit++)
         {
             R3BCalifaCrystalCalData* hitCalifa = (R3BCalifaCrystalCalData*)detCalifa->At(ihit);
             if (!hitCalifa)
@@ -1682,12 +1680,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     {
         // CALIFA
         auto detCalifa = fHitItemsCalifa;
-        Int_t nHitsCalifa = detCalifa->GetEntriesFast();
-        // cout<<"Califa hits: "<<nHitsCalifa<<endl;
+        Int_t nHitsCalifaH = detCalifa->GetEntriesFast();
+        // cout<<"Califa hits: "<<nHitsCalifaH<<endl;
 
-        for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
+        for (Int_t ihit = 0; ihit < nHitsCalifaH; ihit++)
         {
-            R3BCalifaHitData* hitCalifa = (R3BCalifaHitData*)detCalifa->At(ihit);
+            R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihit);
             if (!hitCalifa)
                 continue;
 

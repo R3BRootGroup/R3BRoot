@@ -14,7 +14,7 @@
 #ifndef R3BStartrackEvent_H
 #define R3BStartrackEvent_H
 
-#include "../califaData/R3BCalifaHitData.h"
+#include "../califaData/R3BCalifaClusterData.h"
 #include "R3BStartrackerHit.h"
 #include <TObjArray.h>
 #include <TObject.h>

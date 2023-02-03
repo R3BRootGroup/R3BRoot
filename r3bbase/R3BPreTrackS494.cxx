@@ -166,27 +166,14 @@ InitStatus R3BPreTrackS494::Init()
         mgr->Register("MCTrack", "Monte Carlo Tracks", fMCTrack, kTRUE);
 
     assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
+
+    printf("Have %d detectors.\n", DET_MAX);
     printf("Have %d fiber detectors.\n", NOF_FIB_DET);
 
-    // CALIFA
-    fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMappedData", fDetectorNames[0])));
-    if (NULL == fMappedItems.at(0))
+    for (int det = 0; det < DET_MAX; det++)
     {
-        printf("Could not find mapped data for '%s'.\n", fDetectorNames[0]);
-    }
-    fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCrystalCalData", fDetectorNames[0])));
-    if (NULL == fCalItems.at(0))
-    {
-        printf("Could not find Cal data for '%s'.\n", fDetectorNames[0]);
-    }
-    fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[0])));
-    if (NULL == fHitItems.at(0))
-    {
-        printf("Could not find hit data for '%s'.\n", fDetectorNames[0]);
-    }
-    // The rest
-    for (int det = 1; det < DET_MAX; det++)
-    {
+        cout << "Reading detector " << det << ", " << fDetectorNames[det] << endl;
+
         fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
         if (NULL == fMappedItems.at(det))
         {
@@ -194,18 +181,21 @@ InitStatus R3BPreTrackS494::Init()
         }
         if (det == 9)
             maxevent = mgr->CheckMaxEventNo();
-        fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+        if (det == 0) // CALIFA
+            fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCrystalCalData", fDetectorNames[0])));
+        else
+            fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
         if (NULL == fCalItems.at(det))
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+
         if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
     }
-
     mgr->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
     mgr->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
     mgr->Register("Fi23bHit", "Land", fFi23bHitItems, kTRUE);
@@ -1365,14 +1355,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Bool_t debug_fibcut = false;
     Bool_t debug_write = false;
 
-    if (fNEvents == 22609 || fNEvents == 111385 || fNEvents == 297730 || fNEvents == 325745 || fNEvents == 336201)
-    {
-        debug_tofd = true;
-        debug_fib = false;
-        debug_fibcut = false;
-        debug_write = true;
-    }
-
+    /*
+        if (fNEvents == 22609 || fNEvents == 111385 || fNEvents == 297730 || fNEvents == 325745 || fNEvents == 336201)
+        {
+            debug_tofd = true;
+            debug_fib = false;
+            debug_fibcut = false;
+            debug_write = true;
+        }
+    */
     Bool_t fibCuts = true;
 
     // only consider fiber with maximum energy deposit, only for sweep runs with beam
@@ -1471,8 +1462,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
     //   cout<<"*** Entering analysis ***"<<endl;
 
     // **********************************
+
+    /* R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
+       target->hits.push_back(new R3BHit(0, 0.0, 0.0, 0., 0., 0));*/
+
     auto detTofi = fHitItems.at(DET_TOFI);
     Int_t nHitsTofi = detTofi->GetEntriesFast();
+
+    auto detTofd = fHitItems.at(DET_TOFD);
+    Int_t nHits = detTofd->GetEntriesFast();
 
     if (nHitsTofi > 0)
     {
@@ -1494,15 +1492,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Int_t iplaneTofi = hitTofi->GetDetId();
         Int_t ibarTofi = hitTofi->GetBarId();
 
+        cout << "Tofi original data: " << iplaneTofi << ", " << ibarTofi << ", " << xTofi << ", " << yTofi << "; "
+             << qTofi << endl;
+
         fh_tofi_time->Fill(xTofi, tTofi);
         fh_tofi_charge->Fill(yTofi, qTofi);
         fh_xy_tofi->Fill(xTofi, yTofi);
 
         // corel with tofd:
-        auto detTofd = fHitItems.at(DET_TOFD);
         Int_t nhits = detTofd->GetEntriesFast();
-
-        //   detTofd->hits.push_back(new R3BTofdHitData(0, 0.0, 0.0, 0., 0., 0));
 
         for (Int_t ihit1 = 0; ihit1 < nhits; ihit1++)
         {
@@ -1534,9 +1532,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
         }
     }
     // ***********************************+
-
-    auto detTofd = fHitItems.at(DET_TOFD);
-    Int_t nHits = detTofd->GetEntriesFast();
 
     if (nHits > 0)
     {
@@ -1606,6 +1601,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         Int_t iplane = hitTofd->GetDetId();
         Int_t ibar = hitTofd->GetBarId();
+
+        if (iplane == 3)
+            cout << "Tofi data pushed in Tofd: " << iplane << ", " << ibar << ", " << xxx << ", " << yyy << "; " << qqq
+                 << endl;
 
         if (iplane == 2 && ibar == 24)
             continue;
@@ -5504,7 +5503,6 @@ void R3BPreTrackS494::FinishEvent()
     fFi32HitItems->Clear();
     fNofFi33HitItems = 0;
     fFi33HitItems->Clear();
-
     for (Int_t det = 0; det < DET_MAX; det++)
     {
         if (fMappedItems.at(det))

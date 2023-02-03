@@ -165,10 +165,10 @@ void R3BFi23bDigitizerHit::Exec(Option_t* opt)
             }
 
             Int_t fiberID = Hit.fiberID;
-
-            LOG(DEBUG) << "Hit Fi23b in: fiber: " << Hit.fiberID << " x: " << Hit.X << " y: " << Hit.Y
-                       << " Eloss: " << Hit.Energy << " t: " << Hit.Time;
-
+			
+			LOG(debug) << "Hit Fi23b in: fiber: " << Hit.fiberID << " x: " << Hit.X << " y: " << Hit.Y 
+			<< " Eloss: " << Hit.Energy << " t: " << Hit.Time ;
+            
             if (Hit.Time - time[fiberID].back() < 30)
             {
                 energy[fiberID].back() += Hit.Energy;
@@ -194,20 +194,21 @@ void R3BFi23bDigitizerHit::Exec(Option_t* opt)
                 if (energyl > 0.0001)
                 {
                     Double_t fiber_id = i;
-                    LOG(DEBUG) << "Hit Fi23b out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
-                               << " y: " << (y[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
-                               << " t: " << time[i].at(&energyl - energy[i].data());
+
+					LOG(debug) << "Hit Fi23b out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
+					<< " y: " << (y[i].at(&energyl - energy[i].data())) 
+					<< " Eloss: " << energyl << " t: " << time[i].at(&energyl - energy[i].data()) ;
                     new ((*Hits)[Hits->GetEntries()])
                         R3BFiberMAPMTHitData(1,
-                                             prnd->Gaus((x[i].at(&energyl - energy[i].data())), xsigma),
-                                             prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma),
-                                             prnd->Gaus(energyl, esigma),
-                                             prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
-                                             i,
-                                             0.,
-                                             0.,
-                                             0.,
-                                             0.);
+                                               prnd->Gaus((x[i].at(&energyl - energy[i].data())), xsigma),
+                                               prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma),
+                                               prnd->Gaus(energyl, esigma),
+                                               prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
+                                               i,
+                                               0.,
+                                               0.,
+                                               0.,
+                                               0.); 
                 }
             }
         }

@@ -18,8 +18,8 @@
 #include <TLeaf.h>
 #include <TTree.h>
 
+#include "../r3bdata/califaData/R3BCalifaClusterData.h"
 #include "../r3bdata/califaData/R3BCalifaCrystalCalData.h"
-#include "../r3bdata/califaData/R3BCalifaHitData.h"
 #include "../r3bdata/califaData/R3BCalifaMappedData.h"
 
 #include "R3BTreeWrapper.h"
@@ -46,9 +46,9 @@ namespace R3BCalifaTimestitcher
             type = CalifaCrystalCalData;
         }
         // ...R3BCalifaHitData
-        else if (branchmap.count("CalifaHitData") > 0)
+        else if (branchmap.count("CalifaClusterData") > 0)
         {
-            ptrObjArr = static_cast<TObjArray*>(branchmap["CalifaHitData"]);
+            ptrObjArr = static_cast<TObjArray*>(branchmap["CalifaClusterData"]);
             type = CalifaHitData;
         }
         else
@@ -85,9 +85,9 @@ namespace R3BCalifaTimestitcher
 
             case CalifaHitData:
             {
-                R3BCalifaHitData* califaHit = dynamic_cast<R3BCalifaHitData*>(ptrObjArr->At(0));
+                R3BCalifaClusterData* califaHit = dynamic_cast<R3BCalifaClusterData*>(ptrObjArr->At(0));
                 if (!califaHit)
-                    throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaHitData!");
+                    throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaClusterData!");
 
                 return califaHit->GetTime();
                 break;

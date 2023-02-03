@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifaDemoOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BEventHeader.h"
 #include "R3BWRCalifaData.h"

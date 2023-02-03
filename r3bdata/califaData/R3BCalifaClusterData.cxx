@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 
-#include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
-
-R3BCalifaHitData::R3BCalifaHitData()
+R3BCalifaClusterData::R3BCalifaClusterData()
     : FairMultiLinkedData()
     , fNbOfCrystalHits(0)
     , fEnergy(NAN)
@@ -29,13 +23,13 @@ R3BCalifaHitData::R3BCalifaHitData()
 {
 }
 
-R3BCalifaHitData::R3BCalifaHitData(UInt_t Nb,
-                                   Double_t ene,
-                                   Double_t nf,
-                                   Double_t ns,
-                                   Double_t theta,
-                                   Double_t phi,
-                                   ULong64_t time)
+R3BCalifaClusterData::R3BCalifaClusterData(UInt_t Nb,
+                                           Double_t ene,
+                                           Double_t nf,
+                                           Double_t ns,
+                                           Double_t theta,
+                                           Double_t phi,
+                                           ULong64_t time)
     : FairMultiLinkedData()
     , fNbOfCrystalHits(Nb)
     , fEnergy(ene)
@@ -47,7 +41,7 @@ R3BCalifaHitData::R3BCalifaHitData(UInt_t Nb,
 {
 }
 
-R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
+R3BCalifaClusterData::R3BCalifaClusterData(const R3BCalifaClusterData& right)
     : FairMultiLinkedData(right)
     , fNbOfCrystalHits(right.fNbOfCrystalHits)
     , fEnergy(right.fEnergy)
@@ -59,13 +53,4 @@ R3BCalifaHitData::R3BCalifaHitData(const R3BCalifaHitData& right)
 {
 }
 
-R3BCalifaHitData::~R3BCalifaHitData() {}
-
-void R3BCalifaHitData::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BCalifaHitData: a CALIFA Hit made of " << fNbOfCrystalHits << " crystalHits. Energy = " << fEnergy
-         << " GeV" << endl;
-    cout << "    Theta(polar) " << fTheta << " deg  " << endl;
-    cout << "    Phi(azimuthal) " << fPhi << " deg  " << endl;
-}
-// -------------------------------------------------------------------------
+ClassImp(R3BCalifaClusterData);

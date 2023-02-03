@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum fÃ¼r Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,20 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAHITDATA_H
-#define R3BCALIFAHITDATA_H
+#ifndef R3BCALIFACLUSTERDATA_H
+#define R3BCALIFACLUSTERDATA_H 1
 
 #include "TObject.h"
 
 #include "FairMultiLinkedData.h"
 #include "R3BCalifaCrystalCalData.h"
 
-class R3BCalifaHitData : public FairMultiLinkedData
+class R3BCalifaClusterData : public FairMultiLinkedData
 {
-
   public:
     /** Default constructor **/
-    R3BCalifaHitData();
+    R3BCalifaClusterData();
 
     /** Constructor with arguments
      *@param fNbOfCrystalHits		Crystal unique identifier
@@ -32,9 +31,9 @@ class R3BCalifaHitData : public FairMultiLinkedData
      *@param fTheta					Reconstructed theta
      *@param fPhi					Reconstructed phi
      **/
-    R3BCalifaHitData(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns, Double_t theta, Double_t phi, ULong64_t time);
+    R3BCalifaClusterData(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns, Double_t theta, Double_t phi, ULong64_t time);
 
-    R3BCalifaHitData(uint64_t time, double theta, double phi, uint32_t clusterId)
+    R3BCalifaClusterData(uint64_t time, double theta, double phi, uint32_t clusterId)
         : fTime(time)
         , fTheta(theta)
         , fPhi(phi)
@@ -47,10 +46,10 @@ class R3BCalifaHitData : public FairMultiLinkedData
     }
 
     /** Copy constructor **/
-    R3BCalifaHitData(const R3BCalifaHitData&);
+    R3BCalifaClusterData(const R3BCalifaClusterData&);
 
     /** += operator **/
-    R3BCalifaHitData& operator+=(R3BCalifaCrystalCalData& cH)
+    R3BCalifaClusterData& operator+=(R3BCalifaCrystalCalData& cH)
     {
         this->fEnergy += cH.GetEnergy();
         this->fNf += cH.GetNf();
@@ -59,10 +58,10 @@ class R3BCalifaHitData : public FairMultiLinkedData
         return *this;
     }
 
-    R3BCalifaHitData& operator=(const R3BCalifaHitData&) { return *this; }
+    R3BCalifaClusterData& operator=(const R3BCalifaClusterData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BCalifaHitData();
+    virtual ~R3BCalifaClusterData() {}
 
     /** Accessors **/
     UInt_t GetNbOfCrystalHits() const { return fNbOfCrystalHits; }
@@ -84,12 +83,9 @@ class R3BCalifaHitData : public FairMultiLinkedData
     void SetTime(ULong64_t time) { fTime = time; }
     void SetClusterId(uint32_t id) { fClusterId = id; }
 
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
-
   protected:
     // Basic Hit information
-    UInt_t fNbOfCrystalHits; // number of crystals contribuying to the R3BCalifaHitData
+    UInt_t fNbOfCrystalHits; // number of crystals contribuying to the R3BCalifaClusterData
     Double_t fEnergy;        // total energy deposited
     Double_t fNf;            // total Nf deposited
     Double_t fNs;            // total Ns deposited
@@ -98,7 +94,9 @@ class R3BCalifaHitData : public FairMultiLinkedData
     ULong64_t fTime;         // WR time stamp
     uint32_t fClusterId;
 
-    ClassDef(R3BCalifaHitData, 3)
+    ClassDef(R3BCalifaClusterData, 3)
 };
 
-#endif
+using R3BCalifaHitData [[deprecated("R3BCalifaHitData was renamed to R3BCalifaClusterData.")]] =R3BCalifaClusterData;
+
+#endif /* R3BCALIFACLUSTERDATA_H */

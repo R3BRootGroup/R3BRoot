@@ -64,6 +64,7 @@ link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
 R3BModule.cxx 
+R3BLogger.cxx
 R3BDetector.cxx 
 R3BEventHeader.cxx
 R3BEventHeaderCal2Hit.cxx

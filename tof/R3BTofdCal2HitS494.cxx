@@ -377,7 +377,7 @@ void R3BTofdCal2HitS494::Exec(Option_t* option)
     Double_t timeP0 = 0.;
     Double_t randx;
 
-    UInt_t vmultihits[N_PLANE_MAX + 1][N_TOFD_HIT_PADDLE_MAX + 1];
+    UInt_t vmultihits[N_TOFD_HIT_PLANE_MAX + 1][N_TOFD_HIT_PADDLE_MAX + 1];
     for (Int_t i = 0; i <= fNofPlanes; i++)
     {
         for (Int_t j = 0; j <= N_TOFD_HIT_PADDLE_MAX; j++)

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -40,9 +40,6 @@
  * */
 struct EXT_STR_h101_t;
 typedef struct EXT_STR_h101_t EXT_STR_h101;
-/*#include "ext_h101.h"*/
-
-class FairLogger;
 
 class R3BEventHeader;
 
@@ -55,23 +52,25 @@ class R3BUcesbSource : public FairSource
     Source_Type GetSourceType() { return kONLINE; }
 
     /* Init() will fork a ucesb instance to deliver the unpacked data for
-     * R3Broot. It makes use of the ext_data_ interface of ucesb.
+     * R3BRoot. It makes use of the ext_data_ interface of ucesb.
      * */
     virtual Bool_t Init();
+   
 #ifdef ACTIVATEOVERRIDE
     virtual Bool_t SpecifyRunId() override;
 #else
     virtual Bool_t SpecifyRunId();
 #endif
+    
     virtual Bool_t InitUnpackers();
     virtual void SetParUnpackers();
     virtual Bool_t ReInitUnpackers();
     /* A wrapper for ext_data_fetch_event() */
     Int_t ReadEvent(UInt_t);
     /* Close the ext_data_ interface */
-    void Close();
+    virtual void Close();
     /* Reset the readers */
-    void Reset();
+    virtual void Reset();
     /* The reader interface */
     void AddReader(R3BReader* a_reader) { fReaders->Add(a_reader); }
     /* Limit the number of events */
@@ -81,8 +80,8 @@ class R3BUcesbSource : public FairSource
 
     virtual void FillEventHeader(R3BEventHeader* feh);
 
-    void SetInputFileName(TString tstr) { fInputFileName = tstr; }
-    
+ //   void SetInputFileName(TString tstr) { fInputFileName = tstr; }
+
   private:
     /* File descriptor returned from popen() */
     FILE* fFd;
@@ -97,14 +96,12 @@ class R3BUcesbSource : public FairSource
     /* The location of the unpacker */
     const TString fUcesbPath;
     /* The event counter */
-    unsigned int fNEvent=0;
+    unsigned int fNEvent;
     /* The full event structure */
     EXT_STR_h101* fEvent;
     size_t fEventSize;
     /* Last event requested */
     int fLastEventNo;
-    /* FairLogger */
-    FairLogger* fLogger;
     /* The array of readers */
     TObjArray* fReaders;
     /* R3B header */
@@ -113,11 +110,10 @@ class R3BUcesbSource : public FairSource
     TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
-	
 
   public:
-    /* Create dictionary */
+    // Create dictionary
     ClassDef(R3BUcesbSource, 1)
 };
 
-#endif
+#endif /* __R3BROOT__R3BUCESBSOURCE__ */
