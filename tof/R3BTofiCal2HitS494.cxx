@@ -532,7 +532,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 auto posToT =
                     par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
-                cout << "Pos tdiff: " << pos << " pos ToT: " << posToT << endl;
+                // cout << "Pos tdiff: " << pos << " pos ToT: " << posToT << endl;
                 // cout << top-> GetBarId() << "  pos  " << posToT << "   Lambda:   " << par->GetLambda()  << ",  top
                 // TOT | Totoffset:  " << top_tot << "   " << par->GetToTOffset2()
                 //<< ",  bottom TOT| TotOffset:  " << bot_tot  << "   " <<  par->GetToTOffset1() << endl;

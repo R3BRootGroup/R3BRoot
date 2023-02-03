@@ -1121,13 +1121,13 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     }
 
     Bool_t is_califa = false;
+    Int_t nHitsCalifa = 0;
     if (fMappedItemsCalifa)
     {
         // CALIFA
         auto detCalifa = fMappedItemsCalifa;
-        Int_t nHitsCalifa = detCalifa->GetEntriesFast();
+        nHitsCalifa = detCalifa->GetEntriesFast();
         // cout<<"Califa hits: "<<nHitsCalifa<<endl;
-
         for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
         {
             R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)detCalifa->At(ihit);
