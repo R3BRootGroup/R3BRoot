@@ -24,7 +24,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BEventHeader.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 
@@ -107,7 +107,7 @@ InitStatus R3BRpcCal2Hit::Init()
     fParCont4 = fHitPar->GetCalParams4();
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

@@ -19,7 +19,7 @@
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 
 #include "TH1F.h"
 #include "TH2F.h"
@@ -287,7 +287,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fh_time_Fib->GetYaxis()->SetTitle("time / ns");
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

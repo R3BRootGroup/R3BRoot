@@ -23,7 +23,7 @@
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -295,7 +295,7 @@ InitStatus R3BLosOnlineSpectra::Init()
     }
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     return kSUCCESS;
 }

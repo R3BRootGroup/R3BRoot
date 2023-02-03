@@ -32,7 +32,7 @@ class R3BTofDHitPar;
 class TClonesArray;
 class R3BEventHeader;
 class R3BTofDMappingPar;
-class R3BTimeStitch;
+class R3BCoarseTimeStitch;
 class TH1F;
 class TH2F;
 
@@ -163,7 +163,7 @@ class R3BTofDCal2HitPar : public FairTask
     void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
 
   private:
-    R3BTimeStitch* fTimeStitch;
+    R3BCoarseTimeStitch* fTimeStitch;
     /**
      * Method for creating histograms.
      */

@@ -30,7 +30,7 @@
 // TWIM headers
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BTimeStitch.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BTwimCalData.h"
 #include "R3BTwimCalPar.h"
 #include "R3BTwimMapped2Cal.h"
@@ -181,7 +181,7 @@ InitStatus R3BTwimMapped2Cal::Init()
     fTwimCalDataCA->Clear();
 
     // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BTimeStitch();
+    fTimeStitch = new R3BCoarseTimeStitch();
 
     SetParameter();
     return kSUCCESS;
