@@ -32,7 +32,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 )
 
 if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-set(WITH_SOFIA true)
+#set(WITH_SOFIA true)
 set(INCLUDE_DIRECTORIES
 ${INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/sofia/sofdata/tofwData

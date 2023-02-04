@@ -45,35 +45,12 @@ message(STATUS "${BYellow}MWPC3 standard root geometry already created${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/mwpc_3.geo.root")
 endif(WITH_SOFIA)
 
-enable_testing()
-
-include_directories(
-    ${GTEST_INCLUDE_DIRS}
-    ${SYSTEM_INCLUDE_DIRECTORIES}
-    ${BASE_INCLUDE_DIRECTORIES}
-    ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/r3bdata
-    ${R3BROOT_SOURCE_DIR}/mwpc/geobase
-    )
-
-link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
-                 ${Boost_LIBRARY_DIRS})
-
-set(TEST_DEPENDENCIES
-    GTest::GTest
-    GTest::Main
-    FairTools
-    R3BData
-    R3BMwpc
-    ParBase
-    GeoBase)
-
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc0_geo.C)
 add_test(NAME Mwpc0RootGeometry COMMAND ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc0_geo.sh)
 set_tests_properties(Mwpc0RootGeometry PROPERTIES TIMEOUT "2000")
 set_tests_properties(Mwpc0RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
-                                                  
+                                                                                                    
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc1and2_geo.C)
 add_test(NAME Mwpc1RootGeometry COMMAND ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc1and2_geo.sh)
 set_tests_properties(Mwpc1RootGeometry PROPERTIES TIMEOUT "2000")
