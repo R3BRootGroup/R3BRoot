@@ -54,3 +54,6 @@ make -j8 test
 ## Simulations and Data Analysis
 This is performed from the GitHub parameter and data analysis repository, which contains all the macros and parameter files needed by the user to carry out the simulations and data analysis of each experiment. There is one repository per experiment, please, visit the [R3B-Wiki](https://wiki.r3b-nustar.de) for more details.
 
+## Contributing
+Please ask your questions, request features, and report issues by [creating a github issue](https://github.com/R3BRootGroup/R3BRoot/issues/new).
+
