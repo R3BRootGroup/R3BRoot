@@ -48,6 +48,10 @@ Set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics
     Matrix MathCore Hist Graf Gpad Net Imt RIO RHTTP Spectrum)
 
+if( "${FairRoot_VERSION}"  VERSION_GREATER_EQUAL 18.8.0 )
+    set(DEPENDENCIES ${DEPENDENCIES} online)
+endif()
+
 Set(LIBRARY_NAME R3BBase)
 
 GENERATE_LIBRARY()
