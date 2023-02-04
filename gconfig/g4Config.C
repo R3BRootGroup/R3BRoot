@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,11 +12,8 @@
  ******************************************************************************/
 
 // Configuration macro for Geant4 VirtualMC
-
 void Config()
 {
-    cout << "[g4Config]: Creating TGeant4 VirtualMC ..." << endl;
-
     /* Create the run configuration
      *
      * In constructor user has to specify the geometry input
@@ -45,25 +42,40 @@ void Config()
      */
 
     // Enable setting the physics list from outside via environment variable
-    TString physicsList = gSystem->Getenv("PHYSICSLIST");
-    if (physicsList == "")
-    {
-        physicsList = "QGSP_BERT_HP";
-    }
+    // physicsList = "QGSP_BERT_EMV";
+    // physicsList = "QGSP_INCLXX_EMV";
 
-    auto runConfiguration =
-        new TG4RunConfiguration("geomRoot", physicsList, "stepLimiter+specialCuts+specialControls");
-    auto geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
+    Bool_t mtMode = FairRunSim::Instance()->IsMT();
+    Bool_t specialStacking = false;
+    // FairFastSimRunConfiguration* runConfiguration = new FairFastSimRunConfiguration(
+    //  "geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
+    TG4RunConfiguration* runConfiguration = new TG4RunConfiguration(
+        "geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
 
-    auto stack = new R3BStack(1000);
+    // Create the G4 VMC
+    TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
+    LOG(info) << "Geant4 has been created.";
+
+    // create the Specific stack
+    R3BStack* stack = new R3BStack(1000);
     stack->SetDebug(kFALSE);
     stack->StoreSecondaries(kTRUE);
     stack->SetMinPoints(0);
     geant4->SetStack(stack);
 
-    geant4->SetMaxNStep(10000);
+    if (FairRunSim::Instance()->IsExtDecayer())
+    {
+        TVirtualMCDecayer* decayer = TVirtualMC::GetMC()->GetDecayer();
+        geant4->SetExternalDecayer(decayer);
+    }
 
-    const TString geant4macro = TString(gSystem->Getenv("VMCWORKDIR")) + TString("/gconfig/g4config.in");
-    cout << "[g4Config]: Processing additional Geant4 macro file " << geant4macro << endl;
-    geant4->ProcessGeantMacro(geant4macro);
+    // Customise Geant4 setting
+    // (verbose level, global range cut, ..)
+    TString configm(gSystem->Getenv("VMCWORKDIR"));
+    const TString configm1 = configm + "/gconfig/g4config.in";
+    LOG(info) << "g4Config() using g4conf  macro: " << configm1;
+
+    // set geant4 specific stuff
+    geant4->SetMaxNStep(30000);
+    geant4->ProcessGeantMacro(configm1.Data());
 }

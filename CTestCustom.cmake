@@ -1,6 +1,17 @@
-# -*- mode: cmake -*-
+##############################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
 
-#message(" -- Read CTestCustom.cmake --")
+# -*- mode: cmake -*-
 
 # -----------------------------------------------------------
 # -- Number of warnings to display
@@ -20,16 +31,6 @@ set(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   "50" )
 
 set(CTEST_CUSTOM_WARNING_EXCEPTION
 	${CTEST_CUSTOM_WARNING_EXCEPTION}
-
-	# -- doxygen warnings
-# 	"of command \@param is not found in the argument list of" 
-#	"for \\link command"
-#	"for \\ref command"
-#	"\\class statement"
-#	"\\file statement"
-#	"are not documented:"
-#	"Skipping documentation"
-#	"has a brief description"
 
  	# -- CLHEP and Pluto warnings
         "/include/CLHEP/"
@@ -105,6 +106,18 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # -- FairTSBufferFunctional.h has to be fixed by Tobias
 	"MbsAPI"
 	"FairTSBufferFunctional.h"
+	
+        # filter warnings from generated files
+        "FairTestDetectorPayloadDigi_generated.h"
+        "FairTestDetectorPayloadHit_generated.h"
+        "FairTestDetectorPayload.pb"
+        "MyPayload.pb"
+        "G__.*Dict"
+
+        # filter warnings from internal gtest headers
+        "gtest/internal"
+        "gtest/gtest-test-part.h"
+        "gtest/gtest.h"
   )
 
 # -----------------------------------------------------------
@@ -112,3 +125,19 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
 # -----------------------------------------------------------
 set(CTEST_CUSTOM_WARNING_MATCH	${CTEST_CUSTOM_WARNING_MATCH}
 	)
+
+Set (CTEST_CUSTOM_COVERAGE_EXCLUDE
+     ".*Dict.h"
+     ".*Dict.cxx"
+     "_.*"
+    )
+
+# -----------------------------------------------------------
+# -- Error execptions
+# -- Get rid of boost warnings which are misinterpreted as errors
+# -----------------------------------------------------------
+
+Set(CTEST_CUSTOM_ERROR_EXCEPTION
+	${CTEST_CUSTOM_ERROR_EXCEPTION}
+        "/include/boost/"
+)
