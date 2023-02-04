@@ -16,19 +16,32 @@
 # binary directory of the project as ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}. This difference
 # is is important for the base classes which are in R3BROOT and PANDAROOT.
 
+if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+  message(FATAL_ERROR "In-source builds are not supported, please, create a folder build.")
+endif()
+
 # Check if cmake has the required version
 cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
 # set cmake policies
 cmake_policy(VERSION 3.11...3.20)
 
+if(APPLE)
+  if(NOT DEFINED CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER clang)
+  endif()
+  if(NOT DEFINED CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER clang++)
+  endif()
+endif()
+
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
-    message(FATAL_ERROR
-            "\nmacros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
-           )
+    message(STATUS "  ")
+    message(ERROR " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git")
+    message(STATUS "  ")
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
 # Check for needed environment variables
@@ -115,7 +128,7 @@ foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
   endif()
 endforeach()
 
-if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
+if("${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
   add_definitions(-DACTIVATEOVERRIDE)
 
 #  find_package2(PUBLIC FairMQ VERSION 1.4.0)
@@ -477,7 +490,9 @@ message(STATUS "  ${BWhite}ROOT geometries${CR}          ${unitgeo_summary}")
     if(WITH_ASYEOS)
         add_subdirectory(asyeos)
     endif(WITH_ASYEOS)
-    add_subdirectory(macros)
+    if("${PROJECT_SOURCE_DIR}/macros")
+        add_subdirectory(macros)
+    endif("${PROJECT_SOURCE_DIR}/macros")
 endif(NOT MODULE)
 
 # add_subdirectory(gconfig)
