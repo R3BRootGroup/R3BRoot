@@ -237,8 +237,8 @@ class R3BTofdTofiCal2HitS494 : public FairTask
     UInt_t goodpair7=0;
     UInt_t events_wo_tofi_hits=0;
 
-    Double_t ytofd_offsetZ2[2][44]={0},ytofd_offsetZ6[2][44]={0},ytofd_offsetZ8[2][44]={0};
-	Double_t ytofd_offsetZ3[2][44]={0},ytofd_offsetZ4[2][44]={0},ytofd_offsetZ5[2][44]={0},ytofd_offsetZ7[2][44]={0};
+    Double_t ytofd_offsetZ2[3][44]={0},ytofd_offsetZ6[3][44]={0},ytofd_offsetZ8[3][44]={0};
+	Double_t ytofd_offsetZ3[3][44]={0},ytofd_offsetZ4[3][44]={0},ytofd_offsetZ5[3][44]={0},ytofd_offsetZ7[3][44]={0};
 
     // arrays of control histograms
     TH1F* fhTpat;

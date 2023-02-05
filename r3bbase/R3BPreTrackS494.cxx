@@ -22,6 +22,7 @@
  *
  */
 
+#include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
@@ -113,6 +114,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fX1max(100)
     , fX2min(-100)
     , fX2max(100)
+    , fCalifaOpt(0)
     , fNEvents(0)
     , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
     , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
@@ -713,11 +715,11 @@ InitStatus R3BPreTrackS494::Init()
     {
 
         // xy:
-        fh_xy_tofd = new TH2F("tofd_xy", "tofd xy", 200, -100., 100., 200, -100., 100.);
+        fh_xy_tofd = new TH2F("tofd_xy", "tofd xy", 240, -60., 60., 200, -100., 100.);
         fh_xy_tofd->GetXaxis()->SetTitle("x / cm ");
         fh_xy_tofd->GetYaxis()->SetTitle("y / cm");
 
-        fh_xy_tofd_ac = new TH2F("tofd_xy_ac", "tofd xy after cuts", 200, -100., 100., 200, -100., 100.);
+        fh_xy_tofd_ac = new TH2F("tofd_xy_ac", "tofd xy after cuts", 240, -60., 60., 200, -100., 100.);
         fh_xy_tofd_ac->GetXaxis()->SetTitle("x / cm ");
         fh_xy_tofd_ac->GetYaxis()->SetTitle("y / cm");
 
@@ -795,56 +797,8 @@ InitStatus R3BPreTrackS494::Init()
             fh_tofd_x_vs_y_z[i]->GetYaxis()->SetTitle("y / cm");
         }
     }
-    if (fHitItems.at(DET_TOFI))
-    {
-        fh_tofi_mult = new TH1F("tofi_mult", "tofi mult", 200, 0, 200);
 
-        fh_tofi_time = new TH2F("tofi_time", "tofi time", 80, -20, 20, 200, -100., 100.);
-        fh_tofi_time->GetXaxis()->SetTitle("x tofi / cm");
-        fh_tofi_time->GetYaxis()->SetTitle("time tofi / ns");
-
-        fh_tofi_charge = new TH2F("tofi_charge", "tofi charge", 400, -100, 100, 100, 0., 10.);
-        fh_tofi_charge->GetXaxis()->SetTitle("y tofi / cm");
-        fh_tofi_charge->GetYaxis()->SetTitle("charge tofi");
-
-        fh_xy_tofi = new TH2F("tofi_xy", "tofi xy", 80, -20, 20, 400, -100, 100);
-        fh_xy_tofi->GetXaxis()->SetTitle("x tofi / cm");
-        fh_xy_tofi->GetYaxis()->SetTitle("y tofi / cm");
-
-        fh_tofi_tofd_x = new TH2F("tofi_tofd_x", "tofd x vs tofi x", 80, -20, 20, 44, -59.4, 59.4);
-        fh_tofi_tofd_x->GetXaxis()->SetTitle("x tofi / cm");
-        fh_tofi_tofd_x->GetYaxis()->SetTitle("x tofd / cm");
-
-        fh_tofi_tofd_y = new TH2F("tofi_tofd_y", "tofd y vs tofi y", 400, -100, 100, 400, -100, 100);
-        fh_tofi_tofd_y->GetXaxis()->SetTitle("y tofi / cm");
-        fh_tofi_tofd_y->GetYaxis()->SetTitle("y tofd / cm");
-
-        fh_tofi_tofd_Q = new TH2F("tofi_tofd_q", "tofd q vs tofi q", 100, 0, 10, 100, 0, 10);
-        fh_tofi_tofd_Q->GetXaxis()->SetTitle("q tofi ");
-        fh_tofi_tofd_Q->GetYaxis()->SetTitle("q tofd ");
-
-        fh_tofi_tofd_t = new TH2F("tofi_tofd_t", "tofd - tofi tof", 44, -59.4, 59.4, 1000, -500, 500);
-        fh_tofi_tofd_t->GetXaxis()->SetTitle("x tofd / cm");
-        fh_tofi_tofd_t->GetYaxis()->SetTitle("tof tofd-tofi / ns");
-
-        fh_tofi_fi23a_x = new TH2F("tofi_fi23a_x", "fi23a x vs tofi x", 44, -59.4, 59.4, 423, -6.006, 6.006);
-        fh_tofi_fi23a_x->GetXaxis()->SetTitle("x tofi / cm");
-        fh_tofi_fi23a_x->GetYaxis()->SetTitle("x fi23a / cm");
-
-        fh_tofi_fi23a_t = new TH2F("tofi_fi23a_t", "fi23a - tofi tof", 423, -6.006, 6.006, 1000, -500, 500);
-        fh_tofi_fi23a_t->GetXaxis()->SetTitle("x fi23a / cm");
-        fh_tofi_fi23a_t->GetYaxis()->SetTitle("x fi23a / cm");
-
-        fh_tofi_fi23b_y = new TH2F("tofi_fi23b_y", "fi23b y vs tofi y", 400, -100, 100, 423, -6.006, 6.006);
-        fh_tofi_fi23b_y->GetXaxis()->SetTitle("y tofi / cm");
-        fh_tofi_fi23b_y->GetYaxis()->SetTitle("tof fi23a-tofi / ns");
-
-        fh_tofi_fi23b_t = new TH2F("tofi_fi23b_t", "fi23b - tofi tof", 423, -6.006, 6.006, 1000, -500, 500);
-        fh_tofi_fi23b_t->GetXaxis()->SetTitle("x fi23b / cm");
-        fh_tofi_fi23b_t->GetYaxis()->SetTitle("tof fi23b-tofi / ns");
-    }
-
-    if (fMappedItems.at(DET_CALIFA))
+    if (fCalItems.at(DET_CALIFA))
     {
         fh_califa_energy = new TH2F("fh_califa_energy", "Califa E vs crystal id", 2000, 0, 2000, 1000, 0., 1000.);
         fh_califa_energy->GetYaxis()->SetTitle("Energy / MeV");
@@ -865,11 +819,11 @@ InitStatus R3BPreTrackS494::Init()
         fh_check_XvsY[i] =
             new TH2F(Form("fhCheckXvsY%d", i), Form("Check X vs Y det%d", i), 300, -30, 30, 300, -30, 30);
     }
-    fh_check_QvsX[6] = new TH2F(Form("fhCheckQvsX%d", 6), Form("Check Q vs X det%d", 6), 200, -100., 100., 20, 0, 10);
+    fh_check_QvsX[6] = new TH2F(Form("fhCheckQvsX%d", 6), Form("Check Q vs X det%d", 6), 100, -135., 135., 20, 0, 10);
     fh_check_TvsX[6] =
-        new TH2F(Form("fhCheckTvsX%d", 6), Form("Check T vs X det%d", 6), 200, -100., 100., 500, -100, 100);
+        new TH2F(Form("fhCheckTvsX%d", 6), Form("Check T vs X det%d", 6), 240, -60., 60., 500, -100, 100);
     fh_check_XvsY[6] =
-        new TH2F(Form("fhCheckXvsY%d", 6), Form("Check X vs Y det%d", 6), 100, -135., 135., 200, -100., 100.);
+        new TH2F(Form("fhCheckXvsY%d", 6), Form("Check X vs Y det%d", 6), 240, -60., 60., 200, -100., 100.);
 
     /*
            TCanvas* check = new TCanvas("CheckingMom", "CheckingMom", 10, 10, 1100, 700);
@@ -1049,16 +1003,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
     }
 
     Bool_t CalifaHit = false;
-    if (fMappedItems.at(DET_CALIFA))
+    Int_t nHitsCalifa = 0;
+    if (fCalItems.at(DET_CALIFA))
     {
         // CALIFA
-        auto detCalifa = fMappedItems.at(DET_CALIFA);
-        Int_t nHitsCalifa = detCalifa->GetEntriesFast();
+        auto detCalifa = fCalItems.at(DET_CALIFA);
+        nHitsCalifa = detCalifa->GetEntriesFast();
         // cout<<"Califa hits: "<<nHitsCalifa<<endl;
-
         for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
         {
-            R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)detCalifa->At(ihit);
+            R3BCalifaCrystalCalData* hitCalifa = (R3BCalifaCrystalCalData*)detCalifa->At(ihit);
             if (!hitCalifa)
                 continue;
 
@@ -1071,12 +1025,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 CalifaHit = true;
             }
         }
+        if (CalifaHit)
+            counterCalifa++;
+        if (fCalifaOpt == 1 && nHitsCalifa > 0)
+            return; // Analyse only when Califa didn't see anything
+        if (fCalifaOpt == 2 && nHitsCalifa < 1)
+            return; // Analyse only if Califa saw something
     }
-    if (CalifaHit)
-    {
-        counterCalifa++;
-        //	return;
-    }
+
     if (fMCTrack) // for simulated data
     {
         // read in Monte Carlo Track parameter
@@ -1188,6 +1144,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Double_t yTofd2rs[max];
     Double_t tTofd2rs[max];
 
+    Double_t qTofd3ls[max];
+    Double_t xTofd3ls[max];
+    Double_t yTofd3ls[max];
+    Double_t tTofd3ls[max];
+
+    Double_t qTofd3rs[max];
+    Double_t xTofd3rs[max];
+    Double_t yTofd3rs[max];
+    Double_t tTofd3rs[max];
+
     Int_t detector_s[max];
     Double_t xFi33[max];
     Double_t yFi33[max];
@@ -1229,19 +1195,23 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Bool_t cTofd1rs[max];
     Bool_t cTofd2ls[max];
     Bool_t cTofd2rs[max];
+    Bool_t cTofd3ls[max];
+    Bool_t cTofd3rs[max];
     Bool_t maxWertFi30;
     Bool_t maxWertFi31;
     Bool_t maxWertFi32;
     Bool_t maxWertFi33;
     Int_t detTofd1l[max] = { 0 };
     Int_t detTofd2l[max] = { 0 };
+    Int_t detTofd3l[max] = { 0 };
     Int_t detTofd1r[max] = { 0 };
     Int_t detTofd2r[max] = { 0 };
+    Int_t detTofd3r[max] = { 0 };
     Bool_t cTofddet[max];
-    Double_t xtofdtemp6[40], xtofdtemp7[40], xtofdtemp8[40], xtofdtemp9[40];
-    Double_t ytofdtemp6[40], ytofdtemp7[40], ytofdtemp8[40], ytofdtemp9[40];
-    Double_t qtofdtemp6[40], qtofdtemp7[40], qtofdtemp8[40], qtofdtemp9[40];
-    Double_t ttofdtemp6[40], ttofdtemp7[40], ttofdtemp8[40], ttofdtemp9[40];
+    Double_t xtofdtemp6[40], xtofdtemp7[40], xtofdtemp8[40], xtofdtemp9[40], xtofdtemp10[40], xtofdtemp11[40];
+    Double_t ytofdtemp6[40], ytofdtemp7[40], ytofdtemp8[40], ytofdtemp9[40], ytofdtemp10[40], ytofdtemp11[40];
+    Double_t qtofdtemp6[40], qtofdtemp7[40], qtofdtemp8[40], qtofdtemp9[40], qtofdtemp10[40], qtofdtemp11[40];
+    Double_t ttofdtemp6[40], ttofdtemp7[40], ttofdtemp8[40], ttofdtemp9[40], ttofdtemp10[40], ttofdtemp11[40];
 
     for (int i = 0; i < max; i++)
     {
@@ -1255,6 +1225,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         cTofd1rs[i] = false;
         cTofd2ls[i] = false;
         cTofd2rs[i] = false;
+        cTofd3ls[i] = false;
+        cTofd3rs[i] = false;
         xTofd1ls[i] = -1000;
         yTofd1ls[i] = -1000;
         qTofd1ls[i] = -1;
@@ -1271,6 +1243,14 @@ void R3BPreTrackS494::Exec(Option_t* option)
         yTofd2rs[i] = -1000;
         qTofd2rs[i] = -1;
         tTofd2rs[i] = -1000;
+        xTofd3ls[i] = -1000;
+        yTofd3ls[i] = -1000;
+        qTofd3ls[i] = -1;
+        tTofd3ls[i] = -1000;
+        xTofd3rs[i] = -1000;
+        yTofd3rs[i] = -1000;
+        qTofd3rs[i] = -1;
+        tTofd3rs[i] = -1000;
         timeFi23b[i] = -1000;
         xFi23b[i] = -1000;
         yFi23b[i] = -1000;
@@ -1422,12 +1402,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
     Int_t tofd1lc = 7;
     Int_t tofd2rc = 8;
     Int_t tofd2lc = 9;
-    Int_t tofd1r = 10;
-    Int_t tofd1l = 11;
-    Int_t tofd2r = 12;
-    Int_t tofd2l = 13;
-    Int_t fi23ar = 14;
-    Int_t fi23al = 15;
+    Int_t tofd3rc = 10;
+    Int_t tofd3lc = 11;
+    Int_t tofd1r = 12;
+    Int_t tofd1l = 13;
+    Int_t tofd2r = 14;
+    Int_t tofd2l = 15;
+    Int_t tofd3r = 16;
+    Int_t tofd3l = 17;
+    Int_t fi23ar = 18;
+    Int_t fi23al = 19;
 
     Double_t tof = 0.;
     Bool_t pair = false;
@@ -1463,76 +1447,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
     // **********************************
 
-    /* R3BTrackingDetector* target = fDetectorsLeft->GetByName("target");
-       target->hits.push_back(new R3BHit(0, 0.0, 0.0, 0., 0., 0));*/
-
-    auto detTofi = fHitItems.at(DET_TOFI);
-    Int_t nHitsTofi = detTofi->GetEntriesFast();
-
     auto detTofd = fHitItems.at(DET_TOFD);
     Int_t nHits = detTofd->GetEntriesFast();
-
-    if (nHitsTofi > 0)
-    {
-        fh_tofi_mult->Fill(nHitsTofi);
-        counterTofi++;
-    }
-    for (Int_t ihit = 0; ihit < nHitsTofi; ihit++)
-    {
-
-        R3BTofiHitData* hitTofi = (R3BTofiHitData*)detTofi->At(ihit);
-
-        if (IS_NAN(hitTofi->GetTime()))
-            continue;
-
-        Double_t tTofi = hitTofi->GetTime();
-        Double_t qTofi = hitTofi->GetEloss();
-        Double_t xTofi = hitTofi->GetX();
-        Double_t yTofi = hitTofi->GetY();
-        Int_t iplaneTofi = hitTofi->GetDetId();
-        Int_t ibarTofi = hitTofi->GetBarId();
-
-        cout << "Tofi original data: " << iplaneTofi << ", " << ibarTofi << ", " << xTofi << ", " << yTofi << "; "
-             << qTofi << endl;
-
-        fh_tofi_time->Fill(xTofi, tTofi);
-        fh_tofi_charge->Fill(yTofi, qTofi);
-        fh_xy_tofi->Fill(xTofi, yTofi);
-
-        // corel with tofd:
-        Int_t nhits = detTofd->GetEntriesFast();
-
-        for (Int_t ihit1 = 0; ihit1 < nhits; ihit1++)
-        {
-
-            R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit1);
-            if (IS_NAN(hitTofd->GetTime()))
-                continue;
-
-            fh_tofi_tofd_x->Fill(xTofi, hitTofd->GetX());
-            fh_tofi_tofd_y->Fill(yTofi, hitTofd->GetY());
-            fh_tofi_tofd_Q->Fill(qTofi, hitTofd->GetEloss());
-            fh_tofi_tofd_t->Fill(hitTofd->GetX(), tTofi - hitTofd->GetTime());
-        }
-
-        // corel with fi23a/b
-        for (Int_t ihita = 0; ihita < nHits23aa; ihita++)
-        {
-
-            R3BBunchedFiberHitData* hit23a = (R3BBunchedFiberHitData*)detHit23aa->At(ihita);
-            fh_tofi_fi23a_x->Fill(xTofi, hit23a->GetX());
-            fh_tofi_fi23a_t->Fill(hit23a->GetX(), tTofi - hit23a->GetTime());
-        }
-        for (Int_t ihitb = 0; ihitb < nHits23bb; ihitb++)
-        {
-
-            R3BBunchedFiberHitData* hit23b = (R3BBunchedFiberHitData*)detHit23bb->At(ihitb);
-            fh_tofi_fi23b_y->Fill(yTofi, hit23b->GetY());
-            fh_tofi_fi23b_t->Fill(hit23b->GetX(), tTofi - hit23b->GetTime());
-        }
-    }
-    // ***********************************+
-
     if (nHits > 0)
     {
         fh_tofd_mult->Fill(nHits);
@@ -1548,8 +1464,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         return;
 
     Int_t multTofd = 0;
-    Int_t i1l = 0, i1r = 0, i2l = 0, i2r = 0;
-    Int_t i1lc = 0, i1rc = 0, i2lc = 0, i2rc = 0;
+    Int_t i1l = 0, i1r = 0, i2l = 0, i2r = 0, i3l = 0, i3r = 0;
+    Int_t i1lc = 0, i1rc = 0, i2lc = 0, i2rc = 0, i3lc = 0, i3rc = 0;
     // loop over ToFD
 
     if (debug_tofd)
@@ -1602,12 +1518,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Int_t iplane = hitTofd->GetDetId();
         Int_t ibar = hitTofd->GetBarId();
 
-        if (iplane == 3)
-            cout << "Tofi data pushed in Tofd: " << iplane << ", " << ibar << ", " << xxx << ", " << yyy << "; " << qqq
-                 << endl;
-
-        if (iplane == 2 && ibar == 24)
-            continue;
+        //  if (iplane == 2 && ibar == 24)
+        //    continue;
 
         if (!fSimu)
         {
@@ -1727,6 +1639,17 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     det2 = tofd2r;
                 }
             }
+            else if (id2 == 3)
+            {
+                if (maxWerte || !fibCuts)
+                {
+                    det2 = tofd3rc;
+                }
+                else
+                {
+                    det2 = tofd3r;
+                }
+            }
         }
         else
         {
@@ -1751,6 +1674,17 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 else
                 {
                     det2 = tofd2l;
+                }
+            }
+            else if (id2 == 3)
+            {
+                if (maxWerte || !fibCuts)
+                {
+                    det2 = tofd3lc;
+                }
+                else
+                {
+                    det2 = tofd3l;
                 }
             }
         }
@@ -1871,6 +1805,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 cTofd2ls[i2lc] = cTofddet[ic];
                 i2lc++;
             }
+            if (detector[ic] == tofd3l || detector[ic] == tofd3lc)
+            {
+                xTofd3ls[i3lc] = xdet[ic];
+                yTofd3ls[i3lc] = ydet[ic];
+                tTofd3ls[i3lc] = tdet[ic];
+                qTofd3ls[i3lc] = qdet[ic];
+                cTofd3ls[i3lc] = cTofddet[ic];
+                i3lc++;
+            }
             if (detector[ic] == tofd1r || detector[ic] == tofd1rc)
             {
                 xTofd1rs[i1rc] = xdet[ic];
@@ -1888,6 +1831,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 qTofd2rs[i2rc] = qdet[ic];
                 cTofd2rs[i2rc] = cTofddet[ic];
                 i2rc++;
+            }
+            if (detector[ic] == tofd3r || detector[ic] == tofd3rc)
+            {
+                xTofd3rs[i3rc] = xdet[ic];
+                yTofd3rs[i3rc] = ydet[ic];
+                tTofd3rs[i3rc] = tdet[ic];
+                qTofd3rs[i3rc] = qdet[ic];
+                cTofd3rs[i3rc] = cTofddet[ic];
+                i3rc++;
             }
         }
 
@@ -3486,6 +3438,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
             }
 
             if (debug_fibcut)
+                cout << "**Loop over Tofd3r (Tofi) ****" << endl;
+
+            for (Int_t i1 = 0; i1 < i3rc; i1++)
+            {
+
+                if (qTofd3rs[i1] > 0 && !cTofd3rs[i1])
+                {
+                    detector[countdet] = tofd3rc;
+                    xdet[countdet] = xTofd3rs[i1];
+                    ydet[countdet] = yTofd3rs[i1];
+                    zdet[countdet] = 0.;
+                    tdet[countdet] = tTofd3rs[i1];
+                    qdet[countdet] = (int)(qTofd3rs[i1] + 0.5); // q for tracker must be integer
+
+                    if (debug_fibcut)
+                        cout << "Tofd3r saved in fibcuts: " << xdet[countdet] * 100 << "; " << ydet[countdet] * 100
+                             << "; " << qdet[countdet] << endl;
+
+                    // fh_xy_tofd_ac->Fill(x1[tofd3r] * 100., y1[tofd3r] * 100.);
+
+                    countdet++;
+                    cTofd3rs[i1] = true;
+                }
+            }
+            if (debug_fibcut)
                 cout << "**** FibCuts ON THE LEFT SIDE *****" << endl;
 
             if (debug_fibcut)
@@ -4056,6 +4033,31 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     }
                 }
             }
+
+            if (debug_fibcut)
+                cout << "**Loop over Tofd3l (Tofi) ****" << endl;
+
+            for (Int_t i1 = 0; i1 < i3lc; i1++)
+            {
+                if (qTofd3ls[i1] > 0 && !cTofd3ls[i1])
+                {
+                    detector[countdet] = tofd3lc;
+                    xdet[countdet] = xTofd3ls[i1];
+                    ydet[countdet] = yTofd3ls[i1];
+                    zdet[countdet] = 0.;
+                    tdet[countdet] = tTofd3ls[i1];
+                    qdet[countdet] = (int)(qTofd3ls[i1] + 0.5); // q for tracker must be integer
+
+                    if (debug_fibcut)
+                        cout << "Tofd3l saved in fibcuts: " << xdet[countdet] * 100 << "; " << ydet[countdet] * 100
+                             << "; " << qdet[countdet] << endl;
+
+                    //  fh_xy_tofd_ac->Fill(x1[tofd3l] * 100., y1[tofd3l] * 100.);
+
+                    countdet++;
+                    cTofd3ls[i1] = true;
+                }
+            }
         }
 
         if (countdet > 50)
@@ -4413,28 +4415,37 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         if (fPairs && temp_cond)
         {
-            Int_t ncount[n_det] = { 0 }, ncounttemp6 = 0, ncounttemp7 = 0, ncounttemp8 = 0, ncounttemp9 = 0;
+            Int_t ncount[n_det] = { 0 }, ncounttemp6 = 0, ncounttemp7 = 0, ncounttemp8 = 0, ncounttemp9 = 0,
+                  ncounttemp10 = 0, ncounttemp11 = 0;
             Double_t x23ltemp[40], x23rtemp[40];
 
-            Double_t qsum6 = 0., qsum7 = 0, qsum8 = 0, qsum9 = 0;
+            Double_t qsum6 = 0., qsum7 = 0, qsum8 = 0, qsum9 = 0, qsum10 = 0, qsum11 = 0;
             for (Int_t i = 0; i < 40; i++)
             {
                 xtofdtemp6[i] = -1000;
                 xtofdtemp7[i] = -1000;
                 xtofdtemp8[i] = -1000;
                 xtofdtemp9[i] = -1000;
+                xtofdtemp10[i] = -1000;
+                xtofdtemp11[i] = -1000;
                 ytofdtemp6[i] = -1000;
                 ytofdtemp7[i] = -1000;
                 ytofdtemp8[i] = -1000;
                 ytofdtemp9[i] = -1000;
+                ytofdtemp10[i] = -1000;
+                ytofdtemp11[i] = -1000;
                 qtofdtemp6[i] = -1000;
                 qtofdtemp7[i] = -1000;
                 qtofdtemp8[i] = -1000;
                 qtofdtemp9[i] = -1000;
+                qtofdtemp10[i] = -1000;
+                qtofdtemp11[i] = -1000;
                 ttofdtemp6[i] = -1000;
                 ttofdtemp7[i] = -1000;
                 ttofdtemp8[i] = -1000;
                 ttofdtemp9[i] = -1000;
+                ttofdtemp10[i] = -1000;
+                ttofdtemp11[i] = -1000;
             }
 
             fNeventpair++;
@@ -4470,8 +4481,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp7[ncounttemp7] = ydet[i];
                     qtofdtemp7[ncounttemp7] = qdet[i];
                     ttofdtemp7[ncounttemp7] = tdet[i];
-                    if (xtofdtemp7[ncounttemp7] * 100. < 6.85) // after exclusion of bar 24 plane 2
-                        edgetofd = true;
                     qsum7 += qdet[i];
                     ncounttemp7 += 1;
                 }
@@ -4495,12 +4504,82 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp9[ncounttemp9] = ydet[i];
                     qtofdtemp9[ncounttemp9] = qdet[i];
                     ttofdtemp9[ncounttemp9] = tdet[i];
-                    if (xtofdtemp9[ncounttemp9] * 100. > 57.54) // || xtofdtemp9[ncounttemp9] * 100. < 5.48)
+                    if (xtofdtemp9[ncounttemp9] * 100. > 57.54 || xtofdtemp9[ncounttemp9] * 100. < 5.48)
                         edgetofd = true;
                     qsum9 += qdet[i];
                     ncounttemp9 += 1;
                 }
+                if (detector[i] == 10)
+                {
+                    xtofdtemp10[ncounttemp10] = xdet[i];
+                    ytofdtemp10[ncounttemp10] = ydet[i];
+                    qtofdtemp10[ncounttemp10] = qdet[i];
+                    ttofdtemp10[ncounttemp10] = tdet[i];
+                    qsum10 += qdet[i];
+                    if (debug_write)
+                        cout << "tofdtemp10: " << xtofdtemp10[ncounttemp10] * 100 << ", "
+                             << ytofdtemp10[ncounttemp10] * 100 << ", " << qtofdtemp10[ncounttemp10] << endl;
+                    ncounttemp10 += 1;
+                }
+                if (detector[i] == 11)
+                {
+                    xtofdtemp11[ncounttemp11] = xdet[i];
+                    ytofdtemp11[ncounttemp11] = ydet[i];
+                    qtofdtemp11[ncounttemp11] = qdet[i];
+                    ttofdtemp11[ncounttemp11] = tdet[i];
+                    qsum11 += qdet[i];
+                    ncounttemp11 += 1;
+                }
                 ncount[detector[i]] += 1;
+            }
+            // Combine plane 2 (tofd) and plane 3 (tofi)
+            Double_t qdiff = 100, xdiff = 100.;
+            for (Int_t iw10 = 0; iw10 < ncounttemp10; iw10++)
+            {
+                for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+                {
+
+                    qdiff = std::abs(qtofdtemp10[iw10] - qtofdtemp8[iw8]);
+                    xdiff = std::abs(xtofdtemp10[iw10] - xtofdtemp8[iw8]) * 100;
+                    if (qdiff < 1 && xdiff < 1.38 && xtofdtemp8[iw8] * 100. < -2.74 &&
+                        xtofdtemp8[iw8] * 100. > -5.48) // bar 21 plane 2
+                    {
+                        // cout<<"plane 2, bar 21 before: "<<qtofdtemp8[iw8]<<"; "<<qtofdtemp10[iw10]<<";
+                        // "<<xtofdtemp8[iw8]*100<<
+                        // ", "<<xtofdtemp10[iw10] *100<<endl;
+
+                        qtofdtemp8[iw8] = qtofdtemp8[iw8];
+                        xtofdtemp8[iw8] = xtofdtemp10[iw10];
+                        ytofdtemp8[iw8] = (ytofdtemp8[iw8] + ytofdtemp10[iw10]) / 2.;
+
+                        // cout<<"plane 2, bar 21 after: "<<qtofdtemp8[iw8]<<"; "<<qtofdtemp10[iw10]<<";
+                        // "<<xtofdtemp8[iw8]*100<<
+                        // ", "<<xtofdtemp10[iw10] *100<<endl;
+                    }
+                }
+            }
+            for (Int_t iw11 = 0; iw11 < ncounttemp11; iw11++)
+            {
+                for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
+                {
+                    qdiff = std::abs(qtofdtemp11[iw11] - qtofdtemp9[iw9]);
+                    xdiff = std::abs(xtofdtemp11[iw11] - xtofdtemp9[iw9]) * 100.;
+                    if (qdiff < 1 && xdiff < 1.38 && xtofdtemp9[iw9] * 100. > 2.74 &&
+                        xtofdtemp9[iw9] * 100. < 5.48) // bar 24 plane 2
+                    {
+                        // cout<<"plane 2, bar 24 before: "<<qtofdtemp9[iw9]<<"; "<<qtofdtemp11[iw11]<<";
+                        // "<<xtofdtemp9[iw9]*100<<
+                        //", "<<xtofdtemp11[iw11] *100<<endl;
+
+                        qtofdtemp9[iw9] = qtofdtemp11[iw11];
+                        xtofdtemp9[iw9] = xtofdtemp11[iw11];
+                        ytofdtemp9[iw9] = (ytofdtemp9[iw9] + ytofdtemp11[iw11]) / 2.;
+
+                        // cout<<"plane 2, bar 24 after: "<<qtofdtemp9[iw9]<<"; "<<qtofdtemp11[iw11]<<";
+                        // "<<xtofdtemp9[iw9]*100<<
+                        //", "<<xtofdtemp11[iw11] *100<<endl;
+                    }
+                }
             }
 
             Bool_t goodQ = false;
@@ -5073,7 +5152,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     nfin[6] = 0;
                     Double_t qleft[20] = { 0 }, qright[20] = { 0 }, xleft[20], yleft[20], tleft[20], xright[20],
                              yright[20], tright[20];
-                    Double_t qdiff = 100., xdiff = 100.;
+                    qdiff = 100.;
+                    xdiff = 100.;
                     Int_t iright = 0, ileft = 0;
                     Bool_t imemleft[20], imemright[20];
                     for (Int_t i = 0; i < 20; i++)
@@ -5721,7 +5801,7 @@ void R3BPreTrackS494::FinishTask()
         fh_IC->Write();
     }
 
-    if (fMappedItems.at(DET_CALIFA))
+    if (fCalItems.at(DET_CALIFA))
     {
         fh_califa_energy->Write();
     }
@@ -5739,21 +5819,6 @@ void R3BPreTrackS494::FinishTask()
         fh_tofd_mult_ac->Write();
         fh_tofd_q2_vs_q1->Write();
         fh_tofd_q2_vs_q1_ac->Write();
-    }
-    if (fHitItems.at(DET_TOFI))
-    {
-        fh_tofi_mult->Write();
-        fh_tofi_time->Write();
-        fh_tofi_charge->Write();
-        fh_xy_tofi->Write();
-        fh_tofi_tofd_x->Write();
-        fh_tofi_tofd_y->Write();
-        fh_tofi_tofd_Q->Write();
-        fh_tofi_tofd_t->Write();
-        fh_tofi_fi23a_x->Write();
-        fh_tofi_fi23a_t->Write();
-        fh_tofi_fi23b_y->Write();
-        fh_tofi_fi23b_t->Write();
     }
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)

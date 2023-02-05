@@ -19,7 +19,6 @@
 #include "R3BTofdTofiCal2HitS494.h"
 
 #include "R3BEventHeader.h"
-//#include "R3BTCalEngine.h"
 #include "R3BTofdCalData.h"
 
 #include "R3BTofdHitData.h"
@@ -60,9 +59,6 @@ void tofi_trig_map_setup();
 using namespace std;
 #define IS_NAN(x) TMath::IsNaN(x)
 
-#define N_TOFD_HIT_PLANE_MAX 4
-#define N_TOFD_HIT_PADDLE_MAX 44
-
 namespace
 {
     double c_range_ns = 2048 * 5;
@@ -71,7 +67,6 @@ namespace
 
 R3BTofdTofiCal2HitS494::R3BTofdTofiCal2HitS494()
     : FairTask("TofdTofiCal2Hit", 1)
-    , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitItems(0)
     , fNofHitPars(0)
@@ -118,7 +113,6 @@ R3BTofdTofiCal2HitS494::R3BTofdTofiCal2HitS494()
 
 R3BTofdTofiCal2HitS494::R3BTofdTofiCal2HitS494(const char* name, Int_t iVerbose)
     : FairTask("TofdTofiCal2Hit", 1)
-    , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitItems(0)
     , fNofHitPars(0)
@@ -261,19 +255,17 @@ InitStatus R3BTofdTofiCal2HitS494::Init()
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
 
-    // For testing purpose *****
-    //    std::string foff_param_file =
-    //    "/u/kelic/R3BRoot/macros/r3b/tracking/s494/offset_ytofd_run0872_0060lmd_allCharges.dat";
+    // Getting y offsets *****
     std::string foff_param_file =
-        "/u/kelic/R3BRoot/macros/r3b/tracking/s494/offset_ytofd_run0906_0073lmds_allCharges.dat";
+        "/u/kelic/R3BRoot/macros/r3b/unpack/s494/parameter/offset_ytofd_ytofi_run0906_0073lmds_allCharges.dat";
     ifstream infile(foff_param_file.c_str());
     Int_t iplane, ibar;
     if (!(infile.is_open()))
         cout << "** WARNING ** OFFSET FILE NOT FOUND! " << foff_param_file.c_str() << endl;
     if (infile.is_open())
     {
-        cout << "TOFD OFFSET PARAMS WILL BE READ" << endl;
-        for (Int_t ivec = 0; ivec < 88; ivec++)
+        cout << "TOFD/TOFI y-OFFSET PARAMS WILL BE READ" << endl;
+        for (Int_t ivec = 0; ivec < 132; ivec++)
         {
             infile >> iplane >> ibar;
             infile >> ytofd_offsetZ2[iplane - 1][ibar - 1] >> ytofd_offsetZ3[iplane - 1][ibar - 1] >>
@@ -281,10 +273,10 @@ InitStatus R3BTofdTofiCal2HitS494::Init()
                 ytofd_offsetZ6[iplane - 1][ibar - 1] >> ytofd_offsetZ7[iplane - 1][ibar - 1] >>
                 ytofd_offsetZ8[iplane - 1][ibar - 1];
 
-            /* cout<<iplane <<", "<< ibar <<", "<<
-                   ytofd_offsetZ2[iplane-1][ibar-1] <<", "<<
-                   ytofd_offsetZ6[iplane-1][ibar-1] <<", "<<
-                   ytofd_offsetZ8[iplane-1][ibar-1]<<endl;*/
+            /*  cout<<iplane <<", "<< ibar <<", "<<
+                    ytofd_offsetZ2[iplane-1][ibar-1] <<", "<<
+                    ytofd_offsetZ6[iplane-1][ibar-1] <<", "<<
+                    ytofd_offsetZ8[iplane-1][ibar-1]<<endl;*/
         }
     }
     // *******
@@ -734,7 +726,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                         // fill control histograms
                         fhTsync[iPlane - 1]->Fill(iBar, THit);
                         fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
-                        fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                        // fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
                         // fhQvsTHit[iPlane - 1][iBar - 1]->Fill(qb, THit);
                         // fhTvsTHit[iPlane - 1][iBar - 1]->Fill(dt_mod, THit);
                     }
@@ -938,18 +930,6 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
             }
         }
 
-        if (fTofdHisto)
-        {
-            size_t ihit = 0;
-            for (; ihit < event.size();)
-            {                                                                          // loop over all hits
-                fhQ[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].charge); // charge per plane
-                fhQvsEvent[event[ihit].plane - 1]->Fill(fnEvents, event[ihit].charge); // charge vs event #
-                fhxy[event[ihit].plane - 1]->Fill(event[ihit].bar, event[ihit].ypos);  // xy of plane
-                ihit++;
-            }
-        }
-
         // store events
         for (Int_t hit = 0; hit < event.size(); hit++)
         { // loop over hits
@@ -963,17 +943,23 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                 {
                     Int_t iplane = event[hit].plane;
                     Int_t ibar = event[hit].bar;
+
+                    event[hit].ypos = event[hit].ypos * sqrt(event[hit].charge) / sqrt(8.);
+
                     if (fYOffset)
                     {
                         if (event[hit].charge > 1.4 && event[hit].charge < 2.6)
                         {
+                            // cout<<"Zfrag=2 orig: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                            // "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
                             event[hit].ypos = event[hit].ypos - ytofd_offsetZ2[iplane - 1][ibar - 1];
-                            // cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
+                            // cout<<"Zfrag=2 corr: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                            // "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
                         }
                         if (event[hit].charge >= 2.6 && event[hit].charge < 3.5)
                         {
                             event[hit].ypos = event[hit].ypos - ytofd_offsetZ3[iplane - 1][ibar - 1];
-                            // cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
+                            //  cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
                         }
                         if (event[hit].charge >= 3.5 && event[hit].charge < 4.5)
                         {
@@ -987,8 +973,11 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                         }
                         if (event[hit].charge >= 5.5 && event[hit].charge < 6.6)
                         {
+                            //   cout<<"Zfrag=6 orig: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                            //   "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
                             event[hit].ypos = event[hit].ypos - ytofd_offsetZ6[iplane - 1][ibar - 1];
-                            // cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
+                            //  cout<<"Zfrag=6 corr: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                            //  "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
                         }
                         if (event[hit].charge >= 6.6 && event[hit].charge <= 7.2)
                         {
@@ -997,12 +986,20 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                         }
                         if (event[hit].charge > 7.2)
                         { //&& event[hit].charge < 8.8) {
+                          //  cout<<"Zfrag=8 orig: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                          //  "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
                             event[hit].ypos = event[hit].ypos - ytofd_offsetZ8[iplane - 1][ibar - 1];
-                            // cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
+                            //   cout<<"Zfrag=8 corr: "<<iplane<<", "<<ibar<<", "<<event[hit].ypos<<",
+                            //   "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
                         }
                     }
-
-                    event[hit].ypos = event[hit].ypos * sqrt(event[hit].charge) / sqrt(8.);
+                }
+                if (fTofdHisto)
+                {
+                    fhQ[event[hit].plane - 1]->Fill(event[hit].bar, event[hit].charge);  // charge per plane
+                    fhQvsEvent[event[hit].plane - 1]->Fill(fnEvents, event[hit].charge); // charge vs event #
+                    fhxy[event[hit].plane - 1]->Fill(event[hit].bar, event[hit].ypos);   // xy of plane
+                    fhQvsPos[event[hit].plane - 1][event[hit].bar - 1]->Fill(event[hit].ypos, event[hit].charge);
                 }
                 new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,
                                                                   event[hit].xpos,
@@ -1416,34 +1413,77 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
 
         // Now we can analyze the hits in this event
 
-        if (fTofdHisto)
-        {
-            size_t ihit = 0;
-            for (; ihit < event.size();)
-            { // loop over all hits
-                tofi_eventstore++;
-
-                if (abs(event[ihit].time) < 50)
-                {
-                    fhQ[event[ihit].plane + fNofPlanes - 1]->Fill(event[ihit].bar,
-                                                                  event[ihit].charge); // charge per plane
-                    fhQvsEvent[event[ihit].plane + fNofPlanes - 1]->Fill(fnEvents,
-                                                                         event[ihit].charge); // charge vs event #
-                    fhTsync[event[ihit].plane + fNofPlanes - 1]->Fill(event[ihit].bar, event[ihit].time);
-                    fhQvsPos[event[ihit].plane + fNofPlanes - 1][event[ihit].bar - 1]->Fill(event[ihit].ypos,
-                                                                                            event[ihit].charge);
-                    fhxy[event[ihit].plane + fNofPlanes - 1]->Fill(event[ihit].bar, event[ihit].ypos); // xy of plane
-                }
-                ihit++;
-            }
-        }
-
         for (Int_t hit = 0; hit < event.size(); hit++)
         { // loop over hits
             if (tArrU[hit] == false)
             {
                 tArrU[hit] = true;
                 // store single hits
+                if (fTofiTotPos && !fSimu)
+                {
+                    Int_t iplane = event[hit].plane + fNofPlanes;
+                    Int_t ibar = event[hit].bar;
+
+                    event[hit].ypos = event[hit].ypos * sqrt(event[hit].charge) / sqrt(8.);
+
+                    if (fYOffset)
+                    {
+                        // cout<<"Tofi y in: "<<event[hit].charge<<", "<<event[hit].ypos<<endl;
+                        if (event[hit].charge > 1.4 && event[hit].charge < 2.6)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ2[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge >= 2.6 && event[hit].charge < 3.5)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ3[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=3: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ3[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge >= 3.5 && event[hit].charge < 4.5)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ4[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=4: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ4[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge >= 4.5 && event[hit].charge < 5.5)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ5[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=5: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ5[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge >= 5.5 && event[hit].charge < 6.6)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ6[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge >= 6.6 && event[hit].charge <= 7.2)
+                        {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ7[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=7: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ7[iplane-1][ibar-1]<<endl;
+                        }
+                        if (event[hit].charge > 7.2)
+                        { //&& event[hit].charge < 8.8) {
+                            event[hit].ypos = event[hit].ypos - ytofd_offsetZ8[iplane - 1][ibar - 1];
+                            // cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
+                        }
+                        // cout<<"Tofi y first out: "<<event[hit].charge<<", "<<event[hit].ypos<<endl;
+                    }
+                }
+                if (fTofdHisto)
+                {
+                    tofi_eventstore++;
+
+                    // if (abs(event[ihit].time) < 50)
+                    {
+                        fhQ[event[hit].plane + fNofPlanes - 1]->Fill(event[hit].bar,
+                                                                     event[hit].charge); // charge per plane
+                        fhQvsEvent[event[hit].plane + fNofPlanes - 1]->Fill(fnEvents,
+                                                                            event[hit].charge); // charge vs event #
+                        fhTsync[event[hit].plane + fNofPlanes - 1]->Fill(event[hit].bar, event[hit].time);
+                        fhQvsPos[event[hit].plane + fNofPlanes - 1][event[hit].bar - 1]->Fill(event[hit].ypos,
+                                                                                              event[hit].charge);
+                        fhxy[event[hit].plane + fNofPlanes - 1]->Fill(event[hit].bar, event[hit].ypos); // xy of plane
+                    }
+                }
+
                 tofi_singlehit++;
                 new ((*fHitItems)[fNofHitItems++])
                     R3BTofdHitData(event[hit].time,
@@ -1521,7 +1561,7 @@ void R3BTofdTofiCal2HitS494::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
         fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, -100, 100, max_charge * 10, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
-        fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+        fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("y Position in cm");
     }
 
     if (NULL == fhQ[iPlane - 1])
