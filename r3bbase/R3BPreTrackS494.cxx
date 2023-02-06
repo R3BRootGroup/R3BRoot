@@ -1488,7 +1488,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Double_t ttt = hitTofd->GetTime();
         fh_tofd_time->Fill(ttt);
 
-        if (fCuts && (ttt < -100. || ttt > 100.)) // change time cuts
+        if (fCuts && (ttt < -150. || ttt > 100.)) // change time cuts
         {                                         // trigger window -1500, 1500
             if (debug_tofd)
                 cout << "No trigger particle!" << endl;
@@ -1536,10 +1536,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     //cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
                 }*/
 
-            yyy = yyy * (-1.); // -1 until we solve problem with y direction
-            if (qqq > 1.4 && qqq < 2.6)
+            if (iplane < 3)
             {
-                yyy = (yyy + 0.7495721) * 7.6358668 / 4.7541388 - 0.0817257;
+                yyy = yyy * (-1.); // -1 until we solve problem with y direction
+                if (qqq > 1.4 && qqq < 2.6)
+                {
+                    yyy = (yyy + 0.7495721) * 7.6358668 / 4.7541388 - 0.0817257;
+                }
             }
 
             if (iplane == 1)

@@ -50,7 +50,7 @@ R3BFi10ContFact::R3BFi10ContFact()
 {
     // Constructor (called when the library is loaded)
     fName = "R3BFi10ContFact";
-    fTitle = "Factory for parameter containers in libR3BdTof";
+    fTitle = "Factory for parameter containers in libR3BFi10";
     setAllContainers();
     FairRuntimeDb::instance()->addContFactory(this);
 }

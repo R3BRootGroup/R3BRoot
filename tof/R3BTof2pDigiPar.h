@@ -40,4 +40,4 @@ class R3BTof2pDigiPar : public FairParGenericSet
     ClassDef(R3BTof2pDigiPar, 1); //
 };
 
-#endif /* !R3BDTOFDIGIPAR_H*/
+#endif /* !R3BTOF2PDIGIPAR_H*/

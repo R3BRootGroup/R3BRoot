@@ -101,7 +101,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
 
@@ -135,7 +135,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
         fHitPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(container);
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get " << container << " container.";
+            LOG(error) << "Could not get " << container << " container.";
             fNofHitPars = 0;
         }
         else
@@ -143,7 +143,7 @@ InitStatus R3BBunchedFiberCal2Hit_s494::Init()
             fNofHitPars = fHitPar->GetNumModulePar();
             if (0 == fNofHitPars)
             {
-                LOG(ERROR) << "No Hit parameters in " << container << " container.";
+                LOG(error) << "No Hit parameters in " << container << " container.";
                 fHitPar = nullptr;
             }
         }
@@ -216,7 +216,7 @@ void R3BBunchedFiberCal2Hit_s494::SetParContainers()
     fCalPar = (R3BBunchedFiberHitPar*)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BFiberCal2Hit_s494::Init() Couldn't get " << fName << "HitPar. ";
+        LOG(error) << "R3BFiberCal2Hit_s494::Init() Couldn't get " << fName << "HitPar. ";
     }
 }
 

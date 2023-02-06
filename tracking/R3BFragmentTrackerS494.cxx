@@ -572,7 +572,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         fFragments.clear();
     }
 
-    Bool_t debug_loopout = true;
+    Bool_t debug_loopout = false;
     Bool_t debug_loopin = false;
     Bool_t bestevents = false;
 

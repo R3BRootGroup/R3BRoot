@@ -402,7 +402,20 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
     }
     */
     headertpat++;
+    struct finhit
+    {
+        Double_t charge;
+        Double_t time;
+        Double_t xpos;
+        Double_t ypos;
+        Int_t plane;
+        Int_t bar;
+        Double_t time_raw;
+    };
 
+    //    std::cout<<"new event!*************************************\n";
+
+    std::vector<finhit> finevent;
     // beginning of Tofd
     if (1 == 1)
     {
@@ -431,6 +444,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
         //    std::cout<<"new event!*************************************\n";
 
         std::vector<hit> event;
+
         auto detTofd = fCalItems.at(DET_TOFD);
         Int_t nHits = detTofd->GetEntriesFast();
 
@@ -777,7 +791,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
         std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
         // Now we have all hits in this event time sorted
 
-        LOG(debug) << "Charge Time xpos ypos plane bar";
+        LOG(debug) << "Tofd: Charge Time xpos ypos plane bar";
         for (Int_t hit = 0; hit < event.size(); hit++)
         {
             LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " "
@@ -1001,15 +1015,21 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     fhxy[event[hit].plane - 1]->Fill(event[hit].bar, event[hit].ypos);   // xy of plane
                     fhQvsPos[event[hit].plane - 1][event[hit].bar - 1]->Fill(event[hit].ypos, event[hit].charge);
                 }
-                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,
-                                                                  event[hit].xpos,
-                                                                  event[hit].ypos,
-                                                                  event[hit].charge,
-                                                                  -1.,
-                                                                  event[hit].charge,
-                                                                  event[hit].plane,
-                                                                  event[hit].bar,
-                                                                  event[hit].time_raw);
+                /*AKH     new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(event[hit].time,
+                                                                       event[hit].xpos,
+                                                                       event[hit].ypos,
+                                                                       event[hit].charge,
+                                                                       -1.,
+                                                                       event[hit].charge,
+                                                                       event[hit].plane,
+                                                                       event[hit].bar,
+                                                                       event[hit].time_raw); AKH*/
+                finevent.push_back({ event[hit].charge,
+                                     event[hit].time,
+                                     event[hit].xpos,
+                                     event[hit].ypos,
+                                     event[hit].plane,
+                                     event[hit].bar });
             }
         }
 
@@ -1038,6 +1058,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                 vmultihits[i][j] = 0;
             }
         }
+
         struct hit
         {
             Double_t charge;
@@ -1050,6 +1071,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
 
         //    std::cout<<"new event!*************************************\n";
         std::vector<hit> event;
+
         auto detTofi = fCalItems.at(DET_TOFI);
         Int_t nHits = detTofi->GetEntries();
         // Organize cals into bars.
@@ -1404,7 +1426,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
         std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
         // Now we have all hits in this event time sorted
 
-        LOG(debug) << "Charge Time xpos ypos plane bar";
+        LOG(debug) << "Tofi: Charge Time xpos ypos plane bar";
         for (Int_t hit = 0; hit < event.size(); hit++)
         {
             LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " "
@@ -1485,15 +1507,22 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                 }
 
                 tofi_singlehit++;
-                new ((*fHitItems)[fNofHitItems++])
-                    R3BTofdHitData(event[hit].time,
-                                   event[hit].xpos,
-                                   event[hit].ypos,
-                                   event[hit].charge,
-                                   -1.,
-                                   event[hit].charge,
-                                   event[hit].plane + fNofPlanes, // +2 in order to add Tofi as 3rd Tofd plane
-                                   event[hit].bar);
+
+                /*AKH     new ((*fHitItems)[fNofHitItems++])
+                         R3BTofdHitData(event[hit].time,
+                                        event[hit].xpos,
+                                        event[hit].ypos,
+                                        event[hit].charge,
+                                        -1.,
+                                        event[hit].charge,
+                                        event[hit].plane + fNofPlanes, // +2 in order to add Tofi as 3rd Tofd plane
+                                        event[hit].bar); AKH*/
+                finevent.push_back({ event[hit].charge,
+                                     event[hit].time,
+                                     event[hit].xpos,
+                                     event[hit].ypos,
+                                     event[hit].plane + 2,
+                                     event[hit].bar });
             }
         }
 
@@ -1507,6 +1536,22 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
 
         LOG(debug) << "------------------------------------------------------\n";
     } // end Tofi
+
+    LOG(debug) << "Tofi+Tofd: Charge Time xpos ypos plane bar";
+    for (Int_t hit = 0; hit < finevent.size(); hit++)
+    {
+        LOG(debug) << finevent[hit].charge << " " << finevent[hit].time << " " << finevent[hit].xpos << " "
+                   << finevent[hit].ypos << " " << finevent[hit].plane << " " << finevent[hit].bar;
+
+        new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(finevent[hit].time,
+                                                          finevent[hit].xpos,
+                                                          finevent[hit].ypos,
+                                                          finevent[hit].charge,
+                                                          -1.,
+                                                          finevent[hit].charge,
+                                                          finevent[hit].plane,
+                                                          finevent[hit].bar);
+    }
 
     fnEvents++;
 }
@@ -1700,8 +1745,8 @@ void R3BTofdTofiCal2HitS494::FinishTask()
               << " (Events in bar coincidence)\n"
               << "tofi Events stored                     " << tofi_eventstore << " <-> " << tofi_inbarcoincidence
               << " (Events in bar coincidence)\n"
-              << "Events in single planes           " << tofd_singlehit << "\n"
-              << "Events in single planes           " << tofi_singlehit
+              << "tofd Events in single planes           " << tofd_singlehit << "\n"
+              << "tofi Events in single planes           " << tofi_singlehit
               << "\n"
               //<< "Good events in total            " << eventstore << " <-> " << singlehit << " = singlehit \n";
               << "Really good events                " << goodpair4 << " 2 particles 2 times in 2 planes \n"
