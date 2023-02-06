@@ -63,44 +63,44 @@ jobs:
           git clone -b dev https://github.com/R3BRootGroup/sofia.git
           singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
   # Single job called "build-r3broot-asyeos"
-  build-r3broot-asyeos:
+#  build-r3broot-asyeos:
     # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: build-r3broot
-    if: always()
+#    runs-on: self-hosted
+#    needs: build-r3broot
+#    if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
+#    steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+#      - uses: actions/checkout@v3
 
       # Runs a set of commands using the runners shell
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-          git clone -b dev https://github.com/R3BRootGroup/asyeos.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
+#      - name: Run Dart.sh
+#        run: |
+#          cd $GITHUB_WORKSPACE
+#          git clone -b dev https://github.com/R3BRootGroup/macros.git
+#          git clone -b dev https://github.com/R3BRootGroup/asyeos.git
+#          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
   # Single job called "build-r3broot-glad-tpc"
-  build-r3broot-glad-tpc:
+#  build-r3broot-glad-tpc:
     # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: build-r3broot
-    if: always()
+#    runs-on: self-hosted
+#    needs: build-r3broot
+#    if: always()
 
     # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
+#    steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+#      - uses: actions/checkout@v3
 
       # Runs a set of commands using the runners shell
       # git clone -b dev https://github.com/R3BRootGroup/glad-tpc.git
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
-  # Single job called "build-r3broot-frs"
+#      - name: Run Dart.sh
+#        run: |
+#          cd $GITHUB_WORKSPACE
+#          git clone -b dev https://github.com/R3BRootGroup/macros.git
+#          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
+#  # Single job called "build-r3broot-frs"
   build-r3broot-frs:
     # The type of runner that the job will run on
     runs-on: self-hosted
