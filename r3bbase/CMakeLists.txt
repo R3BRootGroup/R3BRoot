@@ -49,7 +49,7 @@ Set(DEPENDENCIES
     Matrix MathCore Hist Graf Gpad Net Imt RIO RHTTP Spectrum)
 
 if( "${FairRoot_VERSION}"  VERSION_GREATER_EQUAL 18.8.0 )
-    set(DEPENDENCIES ${DEPENDENCIES} online)
+    set(DEPENDENCIES ${DEPENDENCIES} Online)
 endif()
 
 Set(LIBRARY_NAME R3BBase)
