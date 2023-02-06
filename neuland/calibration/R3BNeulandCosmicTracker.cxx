@@ -67,12 +67,13 @@ namespace Neuland
         }
 
         CosmicTracker::CosmicTracker()
-            : fFit("CosmicTracker:fFit", "pol1")
+            : fDistances{ 0. }
+            , fFit("CosmicTracker:fFit", "pol1")
         {
             fDistances.reserve(MaxNumberOfPlanes);
-            for (auto p = 0; p < MaxNumberOfPlanes; ++p)
+            while (fDistances.size() < MaxNumberOfPlanes)
             {
-                fDistances[p] = p * BarSize_Z;
+                fDistances.push_back(fDistances.back() + BarSize_Z);
             }
             fTrack.Interactions.reserve(256);
             fBarIDs.reserve(256);
@@ -418,20 +419,22 @@ namespace Neuland
             const auto invRedPoints = 1. / (points - 1);
             const auto xMean = invPoints * std::accumulate(x, x + points, 0.);
             const auto yMean = std::accumulate(y, y + points, 0.) / points;
-            const auto xVar =
-                invRedPoints * std::accumulate(x, x + points, 0., [xMean](const Double_t acc, const Double_t val) {
-                    return acc + Sqr(val - xMean);
-                });
+            const auto xVar = invRedPoints * std::accumulate(x,
+                                                             x + points,
+                                                             0.,
+                                                             [xMean](const Double_t acc, const Double_t val)
+                                                             { return acc + Sqr(val - xMean); });
 
             if (xVar == 0)
             {
                 // we have a vertical line
                 return { Inf, xMean };
             }
-            const auto yVar =
-                invRedPoints * std::accumulate(y, y + points, 0., [yMean](const Double_t acc, const Double_t val) {
-                    return acc + Sqr(val - yMean);
-                });
+            const auto yVar = invRedPoints * std::accumulate(y,
+                                                             y + points,
+                                                             0.,
+                                                             [yMean](const Double_t acc, const Double_t val)
+                                                             { return acc + Sqr(val - yMean); });
 
             auto xyVar = 0.;
             for (auto p = 0; p < points; ++p)
@@ -463,8 +466,8 @@ namespace Neuland
             Int_t currentPlane = 0, currentBar;
             track.EntryPoint += track.Direction * TimeEps;
 
-            while (!WithinBounds(track.EntryPoint.Z(), fDistances[currentPlane], fDistances[currentPlane + 1]) &&
-                   currentPlane < fDistances.size() - 1)
+            while (currentPlane < fDistances.size() - 1 &&
+                   !WithinBounds(track.EntryPoint.Z(), fDistances[currentPlane], fDistances[currentPlane + 1]))
             {
                 ++currentPlane;
             }
@@ -584,6 +587,10 @@ namespace Neuland
                     missedEnergy += trackLength * MIPStoppingPower;
                     if (missedEnergy > 10. || (missedEnergy > 7. && nMissedHits > 1))
                     {
+                        if (lastValidSize == 0)
+                        {
+                            return;
+                        }
                         track.Interactions.resize(lastValidSize);
                         track.TotalTrackLength = track.Interactions.back().ExitTime * CLight;
                         track.Stopped = kTRUE;
