@@ -313,6 +313,8 @@ void R3BUcesbSource::Close()
 {
     int ret;
 
+    if (!fFd) // not open
+      return; 
     /* Close client connection */
     ret = fClient.close();
     if (0 != ret)
@@ -322,17 +324,15 @@ void R3BUcesbSource::Close()
     }
 
     /* Close pipe */
-    if (nullptr != fFd)
-    {
-        int status;
-        status = pclose(fFd);
-        if (-1 == status)
-        {
-            // perror("pclose()");
-            R3BLOG(fatal, "pclose() failed");
-            abort();
-        }
-    }
+    int status;
+    status = pclose(fFd);
+    if (-1 == status)
+      {
+	// perror("pclose()");
+	R3BLOG(fatal, "pclose() failed");
+	abort();
+      }
+    fFd=nullptr;
 
     if (fInputFile.is_open())
         fInputFile.close();
