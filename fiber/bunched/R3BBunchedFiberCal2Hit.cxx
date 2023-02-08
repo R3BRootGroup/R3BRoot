@@ -202,13 +202,13 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
             {
                 if (!fIsGain && fIsTsync) // gain already made, tsync will be done now
                 {
-                    R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
+		  R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
                     if (par && par->GetGainMA() > 0.)
                         gain_temp[i - 1] = par->GetGainMA();
                 }
                 if (fIsGain && !fIsTsync) // tsync already made, gain will be done now
                 {
-                    R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
+		  R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(i);
                     if (par)
                         tsync_temp[i - 1] = par->GetSync();
                 }
@@ -222,7 +222,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     // ToT MAPMT:
     chistName = fName + "_ToT_MAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
+    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 200, 0., 100.);
     fh_ToT_MA_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_MA_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -243,7 +243,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     // ToT single PMT:
     chistName = fName + "_ToT_SAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
+    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 500, 0., 100.);//binning changed from 100 to 500
     fh_ToT_Single_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_Single_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -254,7 +254,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         snprintf(number, sizeof(number), "%d", i);
         chistName = fName + "_ToT_SAPMT" + number;
         chistTitle = fName + " ToT of single PMTs " + number;
-        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 100, 0., 100.);
+        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), fNumFibers, 1, fNumFibers + 1, 500, 0., 100.);
         fh_ToT_s_Fib[i]->GetXaxis()->SetTitle("Fiber number");
         fh_ToT_s_Fib[i]->GetYaxis()->SetTitle("ToT / ns");
     }
@@ -333,6 +333,16 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
 void R3BBunchedFiberCal2Hit::S515()
 {
+    for (auto side_i = 0; side_i < 2; ++side_i)
+    {
+        // Clear local helper containers.
+        auto& array = fChannelArray[side_i];
+        for (auto it = array.begin(); array.end() != it; ++it)
+        {
+            it->lead_list.clear();
+            it->tot_list.clear();
+        }
+    }
     auto cal_num = fCalItems->GetEntriesFast();
 
     auto mapmt_trig_num = fMAPMTCalTriggerItems->GetEntriesFast();
@@ -360,8 +370,9 @@ void R3BBunchedFiberCal2Hit::S515()
     {
         auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
         if (cur_cal->IsLeading())
-        {
+        { 
             ++n_lead;
+            //auto side_i = 0;
             auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
             auto ch_i = cur_cal->GetChannel() - 1;
             auto& channel = fChannelArray[side_i].at(ch_i);
@@ -379,121 +390,125 @@ void R3BBunchedFiberCal2Hit::S515()
     }
 
     for (size_t j = 0; j < cal_num; ++j)
+<<<<<<< HEAD
     {
         auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
+=======
+    {  
+        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+                if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT()) continue;//Valerii
+                //auto side_i = 0;
+                auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
+                auto ch_i = cur_cal->GetChannel() - 1;
+                auto& channel = fChannelArray[side_i].at(ch_i);//comment
+                if (channel.lead_list.empty())
+                {
+                    continue;
+                }
+                auto lead = channel.lead_list.front();
+>>>>>>> corrected bug with missing loop
 
-        if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT())
-            continue;
-        auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
-        auto ch_i = cur_cal->GetChannel() - 1;
-        auto& channel = fChannelArray[side_i].at(ch_i);
-        if (channel.lead_list.empty())
-        {
-            continue;
-        }
-        auto lead = channel.lead_list.front();
+                Double_t cur_cal_trig_ns = 0;
+                Double_t lead_trig_ns = 0;
+                if (cur_cal->IsMAPMT() && fMapPar)
+                {
+                    auto cur_cal_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1); // fMAPMTTriggerMap[ch_i];
+                    auto lead_trig_i = fMapPar->GetTrigMap(side_i + 1, lead->GetChannel());
+                    // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
+                    // lead->GetChannel() - 1, lead_trig_i, mapmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
+                    // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
+                    if (cur_cal_trig_i < mapmt_trig_table.size() && lead_trig_i < mapmt_trig_table.size())
+                    {
+                        auto cur_cal_trig = mapmt_trig_table.at(cur_cal_trig_i);
+                        auto lead_trig = mapmt_trig_table.at(lead_trig_i);
+                        cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
+                        lead_trig_ns = lead_trig->GetTime_ns();
+                    }
+                }
 
-        Double_t cur_cal_trig_ns = 0;
-        Double_t lead_trig_ns = 0;
-        if (cur_cal->IsMAPMT() && fMapPar)
-        {
-            auto cur_cal_trig_i = fMapPar->GetTrigMap(side_i + 1, ch_i + 1); // fMAPMTTriggerMap[ch_i];
-            auto lead_trig_i = fMapPar->GetTrigMap(side_i + 1, lead->GetChannel());
-            // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
-            // lead->GetChannel() - 1, lead_trig_i, mapmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
-            // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
-            if (cur_cal_trig_i < mapmt_trig_table.size() && lead_trig_i < mapmt_trig_table.size())
-            {
-                auto cur_cal_trig = mapmt_trig_table.at(cur_cal_trig_i);
-                auto lead_trig = mapmt_trig_table.at(lead_trig_i);
-                cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
-                lead_trig_ns = lead_trig->GetTime_ns();
-            }
-        }
+                Double_t cur_cal_ns = 0.;
+                Double_t lead_ns = 0.;
+                Double_t tot_ns = 0.;
+                if (side_i == 0)
+                {
+                    cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "clocktdc", "clocktdc");
+                    lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "clocktdc", "clocktdc");
+                    tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
+                }
+                else
+                {
+                    cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "tamex", "tamex");
+                    lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "tamex", "tamex");
+                    tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "tamex", "tamex");
+                }
 
-        Double_t cur_cal_ns = 0.;
-        Double_t lead_ns = 0.;
-        Double_t tot_ns = 0.;
-        if (side_i == 0)
-        {
-            cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "clocktdc", "clocktdc");
-            lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "clocktdc", "clocktdc");
-            tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "clocktdc", "clocktdc");
-        }
-        else
-        {
-            cur_cal_ns = fTimeStitch->GetTime(cur_cal->GetTime_ns() - cur_cal_trig_ns, "tamex", "tamex");
-            lead_ns = fTimeStitch->GetTime(lead->GetTime_ns() - lead_trig_ns, "tamex", "tamex");
-            tot_ns = fTimeStitch->GetTime(cur_cal_ns - lead_ns, "tamex", "tamex");
-        }
+                 auto fiber_id = (lead->GetChannel() - 1) * fChPerSub[1] + 1;
 
-        auto fiber_id = (lead->GetChannel() - 1) * fChPerSub[1] + 1;
+                // Apply calibration.
+                Double_t gainMA = gain_temp[fiber_id - 1]; // 10.;
+                Double_t gainS = gain_temp[fiber_id - 1];
+                Double_t offset1 = 0.;
+                Double_t offset2 = 0.;
+                Double_t tsync = tsync_temp[fiber_id - 1]; // 0.;
 
-        // Apply calibration.
-        Double_t gainMA = gain_temp[fiber_id - 1]; // 10.;
-        Double_t gainS = gain_temp[fiber_id - 1];
-        Double_t offset1 = 0.;
-        Double_t offset2 = 0.;
-        Double_t tsync = tsync_temp[fiber_id - 1]; // 0.;
+                double tof = 0.;
 
-        double tof = 0.;
+                if (!fIsCalibrator && fHitPar)
+                {
+                    R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(fiber_id);
+                    if (par)
+                    {
+                        gainMA = par->GetGainMA();
+                        tsync = par->GetSync();
+                        gainS = par->GetGainS();
+                        offset1 = par->GetOffset1();
+                        offset2 = par->GetOffset2();
+                    }
+                }
 
-        if (!fIsCalibrator && fHitPar)
-        {
-            R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(fiber_id);
-            if (par)
-            {
-                gainMA = par->GetGainMA();
-                tsync = par->GetSync();
-                gainS = par->GetGainS();
-                offset1 = par->GetOffset1();
-                offset2 = par->GetOffset2();
-            }
-        }
+                fh_time_Fib->Fill(fiber_id, lead_ns);
 
-        fh_time_Fib->Fill(fiber_id, lead_ns);
+                tof = lead_ns - tsync;
+                auto caltot_ns = tot_ns * 10. / gainMA;
 
-        tof = lead_ns - tsync;
-        auto caltot_ns = tot_ns * 10. / gainMA;
+                // if (fIsCalibrator)
+                {
+                // histogram for offset determination
 
-        // if (fIsCalibrator)
-        {
-            // histogram for offset determination
-
-            // Fill histograms for gain match, and for debugging.
-            fh_Fib_ToF->Fill(fiber_id, tof);
-            if (caltot_ns > 0.)
+                // Fill histograms for gain match, and for debugging.
+                fh_Fib_ToF->Fill(fiber_id, tof);
+                if (caltot_ns > 0.)
                 fh_ToT_MA_Fib->Fill(fiber_id, caltot_ns);
-        }
+                }
 
-        Double_t x = -10000.;
-        Double_t y = -10000.;
-        Double_t veff = 12. / 2.; // cm/ns
+                Double_t x = -10000.;
+                Double_t y = -10000.;
+                Double_t veff = 12. / 2.; // cm/ns
 
-        if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
-        {
-            Float_t fiber_thickness = 0.050000;
-            Int_t fiber_nbr = 1024;
-            Float_t dead_layer = 0.9;
-            Float_t air_layer = 0.0; // relative to fiber_thickness
-            Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+                if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
+                {
+                    Float_t fiber_thickness = 0.050000;
+                    Int_t fiber_nbr = 1024;
+                    Float_t dead_layer = 0.9;
+                    Float_t air_layer = 0.0; // relative to fiber_thickness
+                    Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 
-            if (fDirection == VERTICAL)
-            {
-                x = (fOrientation == STANDARD ? 1.0 : -1.0) *
-                    (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
-                y = 0;
-            }
-            else
-            {
-                x = 0.;
-                y = (fOrientation == STANDARD ? 1.0 : -1.0) *
-                    (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
-            }
-        }
+                    if (fDirection == VERTICAL)
+                    {
+                        x = (fOrientation == STANDARD ? 1.0 : -1.0) *
+                        (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
+                        y = 0;
+                    }
+                    else
+                    {
+                        x = 0.;
+                        y = (fOrientation == STANDARD ? 1.0 : -1.0) *
+                        (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
+                    }
+                }
 
-        new ((*fHitItems)[fHitItems->GetEntriesFast()])
-            R3BBunchedFiberHitData(fDetId, x, y, caltot_ns, tof, fiber_id, lead_ns, 0., caltot_ns, 0.);
+                new ((*fHitItems)[fHitItems->GetEntriesFast()])
+                R3BBunchedFiberHitData(fDetId, x, y, caltot_ns, tof, fiber_id, lead_ns, 0., caltot_ns, 0.);   
     }
 }
 
@@ -987,7 +1002,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
             }
 
             // SPMT
-            for (UInt_t i = 1; i <= max; i++)
+           /* for (UInt_t i = 1; i <= max; i++)
             {
                 TH1D* proj = fh_ToT_Single_Fib->ProjectionY("", i, i, 0);
                 for (UInt_t j = proj->GetNbinsX(); j > 0; j--)
@@ -1007,7 +1022,22 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                         break;
                     }
                 }
-            }
+            }*/
+
+	    //Spmt-test
+	    for(UInt_t i = 1;i<=max; i++)
+	    {
+		    TH1D* proj = fh_ToT_Single_Fib->ProjectionY("",i,i, 0);
+		    Int_t binmax = proj->GetMaximumBin();
+		    auto s_tot = proj->GetXaxis()->GetBinCenter(binmax);
+
+                    R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
+		    par->SetGainS(s_tot);
+
+                    cout << "SPMT fiber: " << i << " par: " << s_tot << endl;
+
+		    
+	    }
         }
 
         fCalPar->setChanged();
