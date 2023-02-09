@@ -356,9 +356,10 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 //_____________________________________________________________________________
 void R3BUcesbSource::FillEventHeader(FairEventHeader* feh)
 {
-  auto r3beh=dynamic_cast<R3BEventHeader*>(feh);
-  assert(r3beh && "Event header cast failed.");
-  r3beh->SetRunId(fRunId);
+  // note: as of 2023-02-09, FairRootManager will always pass us a pointer to
+  // FairEventHeader, never to R3BEventHeader. Investigation is under way.
+  //    --Philipp
+  feh->SetRunId(fRunId); // we can still set the run ID, though. 
 }
 
 ClassImp(R3BUcesbSource);
