@@ -74,7 +74,8 @@ void writeout(std::map<T, TH1D*>& map, const std::string& what, const int nEvent
         std::ofstream of;
         if (FairRun::Instance() != nullptr)
         {
-            const std::string f = FairRun::Instance()->GetOutputFile()->GetName() + std::string(".") + what + ".dat";
+            const std::string f =
+                std::string{ FairRun::Instance()->GetUserOutputFileName().Data() } + std::string(".") + what + ".dat";
             std::cout << "Writing to file " << f << std::endl;
             of.open(f);
             out = &of;
@@ -408,40 +409,51 @@ void R3BNeulandMCMon::Exec(Option_t*)
             auto& tracks = tracksByPrimaryNeutronID[primaryNeutronID];
             fhnProducts->Fill(tracks.size());
 
-            fhnProductsCharged->Fill(
-                std::accumulate(tracks.begin(), tracks.end(), 0, [](const int a, const R3BMCTrack* b) {
-                    if (b->GetPdgCode() == 2112 || b->GetPdgCode() == 22 || b->GetPdgCode() == 111)
-                    {
-                        return a;
-                    }
-                    else
-                    {
-                        return a + 1;
-                    }
-                }));
+            fhnProductsCharged->Fill(std::accumulate(tracks.begin(),
+                                                     tracks.end(),
+                                                     0,
+                                                     [](const int a, const R3BMCTrack* b)
+                                                     {
+                                                         if (b->GetPdgCode() == 2112 || b->GetPdgCode() == 22 ||
+                                                             b->GetPdgCode() == 111)
+                                                         {
+                                                             return a;
+                                                         }
+                                                         else
+                                                         {
+                                                             return a + 1;
+                                                         }
+                                                     }));
 
-            fhnSecondaryNeutrons->Fill(
-                std::accumulate(tracks.begin(), tracks.end(), 0, [](const int c, const R3BMCTrack* t) {
-                    if (t->GetPdgCode() == 2112)
-                    {
-                        return c + 1;
-                    }
-                    return c;
-                }));
+            fhnSecondaryNeutrons->Fill(std::accumulate(tracks.begin(),
+                                                       tracks.end(),
+                                                       0,
+                                                       [](const int c, const R3BMCTrack* t)
+                                                       {
+                                                           if (t->GetPdgCode() == 2112)
+                                                           {
+                                                               return c + 1;
+                                                           }
+                                                           return c;
+                                                       }));
 
-            fhnSecondaryProtons->Fill(
-                std::accumulate(tracks.begin(), tracks.end(), 0, [](const int c, const R3BMCTrack* t) {
-                    if (t->GetPdgCode() == 2212)
-                    {
-                        return c + 1;
-                    }
-                    return c;
-                }));
+            fhnSecondaryProtons->Fill(std::accumulate(tracks.begin(),
+                                                      tracks.end(),
+                                                      0,
+                                                      [](const int c, const R3BMCTrack* t)
+                                                      {
+                                                          if (t->GetPdgCode() == 2212)
+                                                          {
+                                                              return c + 1;
+                                                          }
+                                                          return c;
+                                                      }));
 
-            const Double_t sumProductEnergy =
-                std::accumulate(tracks.begin(), tracks.end(), 0., [](const Double_t a, const R3BMCTrack* b) {
-                    return a + 1000. * (b->GetEnergy() - b->GetMass());
-                });
+            const Double_t sumProductEnergy = std::accumulate(tracks.begin(),
+                                                              tracks.end(),
+                                                              0.,
+                                                              [](const Double_t a, const R3BMCTrack* b)
+                                                              { return a + 1000. * (b->GetEnergy() - b->GetMass()); });
 
             fhSumProductEnergy->Fill(sumProductEnergy);
 
@@ -499,14 +511,18 @@ void R3BNeulandMCMon::Exec(Option_t*)
                     hCountRed->Fill(kv.second);
                 }
 
-                std::sort(tracks.begin(), tracks.end(), [](const R3BMCTrack* a, const R3BMCTrack* b) {
-                    return a->GetPdgCode() < b->GetPdgCode();
-                });
+                std::sort(tracks.begin(),
+                          tracks.end(),
+                          [](const R3BMCTrack* a, const R3BMCTrack* b) { return a->GetPdgCode() < b->GetPdgCode(); });
 
                 // std::vector<int> filteredPdgCodes{ 22, -211, 211, 111 };
                 std::vector<int> filteredPdgCodes{ 22, 111 };
                 const TString reaction = std::accumulate(
-                    tracks.begin(), tracks.end(), TString(), [&](TString s, const R3BMCTrack* b) -> TString {
+                    tracks.begin(),
+                    tracks.end(),
+                    TString(),
+                    [&](TString s, const R3BMCTrack* b) -> TString
+                    {
                         if (std::find(filteredPdgCodes.begin(), filteredPdgCodes.end(), b->GetPdgCode()) !=
                             filteredPdgCodes.end())
                         {
