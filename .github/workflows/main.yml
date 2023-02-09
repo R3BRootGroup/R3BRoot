@@ -3,11 +3,11 @@ name: CI C17++
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master and dev branches
+  # Triggers the workflow on push or pull request events but only for the dev branch
   push:
-    branches: [ master, dev ]
+    branches: [ dev ]
   pull_request:
-    branches: [ master, dev ]
+    branches: [ dev ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
       - name: Code formatting
         run: |
           cd $GITHUB_WORKSPACE
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/util/clang-format-check.sh clang-format-8
+          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/util/clang-format-check.sh clang-format-14
   # Single job called "build-r3broot"
   build-r3broot:
     # The type of runner that the job will run on

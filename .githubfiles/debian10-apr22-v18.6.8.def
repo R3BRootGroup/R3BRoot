@@ -21,7 +21,7 @@ apt-get -y install autoconf automake binutils \
 	python3-dev protobuf-compiler-grpc rsync sed subversion tar unzip wget xutils-dev xz-utils
 apt-get -y -t buster-backports install cmake || \
 	apt-get -y install cmake
-apt-get -y install clang-format-8/buster-backports
+apt-get -y install clang-format-14/buster-backports
 apt-get -y clean
 
 mkdir -p ~/.subversion
