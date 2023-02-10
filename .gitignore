@@ -34,10 +34,10 @@
 # Storage files
 *.gam
 
-#emacs and gedit
+# Emacs and gedit
 *~
 
-#clangd file
+# Clangd file
 compile_commands.json
 
 # Generated folders and files 
@@ -62,3 +62,6 @@ glad-tpc/
 frs/
 
 asyeos/
+
+# Local configuration
+c3w.conf
