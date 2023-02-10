@@ -1,0 +1,57 @@
+# -*-sh-*-
+# do not directly source or run this script.
+
+# automatically provided variables
+# $LUSTRE -  a location with access to lustre
+# (either /lustre or a sshfs $HOME/lustre )
+# $BUILD  - the build path of R3BRoot
+# ${UPEXP_DIR} 
+# $VMCWORKDIR 
+
+# put custom locations to shell variables like this:
+
+UNPACK=${UPEXP_DIR}/202205_s509/
+PARS=/u/land/latar/s509/R3BParams_S509
+
+
+# a directory where you want to store the output.
+# should be somewhere on $LUSTRE
+# note that during execution on worker nodes, OUTPUT
+# will point to a temporary directory and only moved
+# after completion. 
+OUTPUT=$LUSTRE/r3b/$(whoami)/c3w/
+
+
+# Where the tarball will be stored.
+# This should be a location on lustre in your personal
+# directory ending in .tar
+# Note that a script will also be created with the same name
+# but for the ending sh instead of tar. 
+C3WTAR=$LUSTRE/r3b/$(whoami)/c3w.tar
+
+# A list of environment variables pointing to directories
+# which will be included in the tarball.
+# Please notice that on the worker node these environment
+# variables will point to locations which hold the same
+# content, but the pathes will be different.
+# So always refer to them by getenv("MYVAR") (in C++)
+# or ${MYVAR} (in shell).
+# Do not include /lustre/ and /cvmfs/ pathes here.
+LOCATIONS=BUILD:VMCWORKDIR:UNPACK:PARS:HBOOK
+
+# Special handling of some cases:
+# VMCWORKDIR should be in $HOME. A symbolic link at the same location
+# will be created so that ROOTs CLING is happy.
+#
+# It is assumed that UNPACK is the location of a single experiment
+# unpacker and that it will search for hbook in $UNPACK/../../ucesb/hbook
+
+# If you need to do more of this sort, the content of the following
+# variable get executed just before the payload is run:
+TRICKERY=
+
+# you can specify default options to sbatch here:
+SBATCH=""
+# try --signal SIGINT to get sigint 60 seconds before your time slice
+# ends if you care more about generating some usable output than
+# processing all of the input. 
