@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFACRYSTALCAL2CLUSTER_H
-#define R3BCALIFACRYSTALCAL2CLUSTER_H
+#define R3BCALIFACRYSTALCAL2CLUSTER_H 1
 
 #include "FairTask.h"
 #include "R3BCalifaGeometry.h"
@@ -26,10 +26,8 @@ class TClonesArray;
 class R3BTGeoPar;
 class R3BCalifaMappingPar;
 
-
 class R3BCalifaCrystalCal2Cluster : public FairTask
 {
-
   public:
     /** Default constructor
      **/
@@ -47,20 +45,17 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     /** Public method SelectGeometryVersion **/
     void SelectGeometryVersion(Int_t version);
 
-
     void SetCrystalThreshold(Double_t cryThresh)    {fCrystalThreshold = cryThresh;}
 
     void SetGammaClusterThreshold(Double_t clusterThresh){fGammaClusterThreshold = clusterThresh;}
 
     void SetProtonClusterThreshold(Double_t clusterThresh){fProtonClusterThreshold = clusterThresh;}
 
-
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -71,12 +66,9 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     void SetRandomization(Bool_t rand){fRand=rand;}
 
     void SetRandomizationFile(TString file) {
-
       fRandFile = file;
       fHistoFile = new TFile(fRandFile);
-
     }
-
 
     void IsSimulation(Bool_t simu) {fSimulation = simu;}
 
