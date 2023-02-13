@@ -128,6 +128,8 @@ InitStatus R3BMusliMapped2Cal::Init()
         return kFATAL;
     }
 
+    fHeader = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
+
     fMusliMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("MusliMappedData"));
     if (!fMusliMappedDataCA)
     {
