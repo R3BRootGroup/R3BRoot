@@ -54,4 +54,14 @@ jobs:
           sudo mount -t cvmfs fairsoft.gsi.de /cvmfs/fairsoft.gsi.de
           ls -l /cvmfs/fairsoft.gsi.de
 
+      - name: build-r3broot
+        run: |
+          cd $GITHUB_WORKSPACE
+          git clone https://github.com/R3BRootGroup/macros.git
+          mkdir build
+          cd build
+          export SIMPATH=/cvmfs/fairsoft.gsi.de/ubuntu1804/fairsoft/nov20
+          export FAIRROOTPATH=/cvmfs/fairsoft.gsi.de/ubuntu1804/fairroot/v18.4.2_fs_nov20
+          cmake ..
+          make -j2
 
