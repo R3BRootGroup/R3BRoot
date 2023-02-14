@@ -46,11 +46,12 @@ jobs:
           rm -f cvmfs-release-latest_all.deb
           sudo apt-get update
           sudo apt-get install -y cvmfs
-          wget https://sf.gsi.de/f/808e09b3d6e74278a027/?dl=1
+          wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
           sudo mv masterkey.gsi.de.pub /etc/cvmfs/keys
           echo 'CVMFS_SERVER_URL="http://cvmfs-s1.gsi.de/cvmfs/fairsoft.gsi.de"\nCVMFS_HTTP_PROXY="DIRECT"\nCVMFS_PUBLIC_KEY="/etc/cvmfs/keys/masterkey.gsi.de.pub\n"' > fairsoft.gsi.de.conf
           sudo mv fairsoft.gsi.de.conf /etc/cvmfs/config.d
           sudo mkdir -p /cvmfs/fairsoft.gsi.de
           sudo mount -t cvmfs fairsoft.gsi.de /cvmfs/fairsoft.gsi.de
+          ls -l /cvmfs/fairsoft.gsi.de
 
 
