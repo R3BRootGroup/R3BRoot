@@ -22,12 +22,12 @@
  **/
 
 #ifndef R3BMusicMappedData_H
-#define R3BMusicMappedData_H
+#define R3BMusicMappedData_H 1
+
 #include "TObject.h"
 
 class R3BMusicMappedData : public TObject
 {
-
   public:
     /** Default constructor **/
     R3BMusicMappedData();
@@ -52,7 +52,7 @@ class R3BMusicMappedData : public TObject
     void SetTime(UShort_t time) { fTime = time; };
     void SetEnergy(UShort_t energy) { fEnergy = energy; };
 
-  protected:
+  private:
     UShort_t fAnodeID;
     UShort_t fTime;
     UShort_t fEnergy;

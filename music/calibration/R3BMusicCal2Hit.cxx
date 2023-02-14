@@ -176,7 +176,7 @@ InitStatus R3BMusicCal2Hit::ReInit()
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMusicCal2Hit::Exec(Option_t* option)
+void R3BMusicCal2Hit::Exec(Option_t*)
 {
     // Reset entries in output arrays, local arrays
     Reset();

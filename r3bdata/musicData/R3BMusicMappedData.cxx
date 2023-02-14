@@ -35,4 +35,4 @@ R3BMusicMappedData::R3BMusicMappedData(UShort_t anodeID, UShort_t time, UShort_t
 }
 // -------------------------------------------------------------------------
 
-ClassImp(R3BMusicMappedData)
+ClassImp(R3BMusicMappedData);

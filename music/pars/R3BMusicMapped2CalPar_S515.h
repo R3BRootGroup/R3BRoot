@@ -13,12 +13,12 @@
 
 // -----------------------------------------------------------------
 // -----                                                       -----
-// -----                R3BMusicMapped2CalPar_S515                  -----
-// -----        Created 23/03/2022 M. Feijoo Fontán    -----
+// -----                R3BMusicMapped2CalPar_S515             -----
+// -----            Created 23/03/2022 M. Feijoo Fontán        -----
 // -----------------------------------------------------------------
 
 #ifndef R3BMusicMapped2CalPar_S515_H
-#define R3BMusicMapped2CalPar_S515_H
+#define R3BMusicMapped2CalPar_S515_H 1
 
 #include "FairTask.h"
 #include "R3BMusicMapped2Cal.h"
@@ -46,7 +46,7 @@ class R3BMusicMapped2CalPar_S515 : public FairTask
     virtual ~R3BMusicMapped2CalPar_S515();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t*);
 
     /** Virtual method FinishEvent **/
     virtual void FinishEvent();

@@ -20,16 +20,15 @@
  **/
 
 #ifndef R3BMusicPoint_H
-#define R3BMusicPoint_H
+#define R3BMusicPoint_H 1
+
+#include "FairMCPoint.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 
-#include "FairMCPoint.h"
-
 class R3BMusicPoint : public FairMCPoint
 {
-
   public:
     /** Default constructor **/
     R3BMusicPoint();
@@ -61,9 +60,6 @@ class R3BMusicPoint : public FairMCPoint
                   Double_t length,
                   Double_t eLoss);
 
-    /** Copy constructor **/
-    R3BMusicPoint(const R3BMusicPoint& point) { *this = point; };
-
     /** Destructor **/
     virtual ~R3BMusicPoint();
 
@@ -89,18 +85,12 @@ class R3BMusicPoint : public FairMCPoint
     Double_t GetX(Double_t z) const;
     Double_t GetY(Double_t z) const;
 
-    /** Check for distance between in and out **/
-    Bool_t IsUsable() const;
-
     /** Modifiers **/
     void SetPositionOut(TVector3 pos);
     void SetMomentumOut(TVector3 mom);
     void SetDetCopyID(Int_t id) { fDetCopyID = id; };
 
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
-
-  protected:
+  private:
     Double32_t fX_out, fY_out, fZ_out;
     Double32_t fPx_out, fPy_out, fPz_out;
     Int_t fDetCopyID;

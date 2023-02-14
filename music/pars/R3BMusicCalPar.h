@@ -53,12 +53,12 @@ class R3BMusicCalPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Int_t GetNumAnodes() { return fNumAnodes; }
-    const Int_t GetNumParamsEFit() { return fNumParamsEFit; }
-    const Int_t GetNumParamsPosFit() { return fNumParamsPosFit; }
-    const Int_t GetInUse(Int_t anode) { return fIn_use->GetAt(anode - 1); }
-    TArrayF* GetAnodeCalParams() { return fAnodeCalParams; }
-    TArrayF* GetPosParams() { return fPosParams; }
+    Int_t GetNumAnodes() const { return fNumAnodes; }
+    Int_t GetNumParamsEFit() const { return fNumParamsEFit; }
+    Int_t GetNumParamsPosFit() const { return fNumParamsPosFit; }
+    Int_t GetInUse(Int_t anode) const { return fIn_use->GetAt(anode - 1); }
+    TArrayF* GetAnodeCalParams() const { return fAnodeCalParams; }
+    TArrayF* GetPosParams() const { return fPosParams; }
 
     void SetNumAnodes(Int_t numberAnodes) { fNumAnodes = numberAnodes; }
     void SetNumParamsEFit(Int_t numberParams) { fNumParamsEFit = numberParams; }

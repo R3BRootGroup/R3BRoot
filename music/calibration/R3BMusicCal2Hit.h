@@ -43,7 +43,7 @@ class R3BMusicCal2Hit : public FairTask
     virtual ~R3BMusicCal2Hit();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t*);
 
     /** Virtual method Reset **/
     virtual void Reset();

@@ -17,12 +17,12 @@
 // -------------------------------------------------------------------------
 
 #ifndef R3BMusicHitData_H
-#define R3BMusicHitData_H
+#define R3BMusicHitData_H 1
+
 #include "TObject.h"
 
 class R3BMusicHitData : public TObject
 {
-
   public:
     /** Default constructor **/
     R3BMusicHitData();
@@ -50,7 +50,7 @@ class R3BMusicHitData : public TObject
     void SetEave(Double_t ene) { fE = ene; };
     void SetDt(Double_t dt) { fDt = dt; };
 
-  protected:
+  private:
     Double_t fTheta, fZ, fE, fDt;
 
     ClassDef(R3BMusicHitData, 1)

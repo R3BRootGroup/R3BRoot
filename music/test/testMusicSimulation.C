@@ -56,7 +56,7 @@ void testMusicSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Music
-    run->AddModule(new R3BMusic("music_s467.geo.root", { 0., 0., 60. }));
+    run->AddModule(new R3BMusic("music_v2023.2.geo.root", { 0., 0., 60. }));
 
     // Digitizer: Music
     auto musicdigitizer = new R3BMusicDigitizer();
