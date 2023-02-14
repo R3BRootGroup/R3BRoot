@@ -48,4 +48,4 @@ R3BMusicHitData::R3BMusicHitData(Double_t theta, Double_t z, Double_t ene, Doubl
     , fDt(good_dt)
 {
 }
-ClassImp(R3BMusicHitData)
+ClassImp(R3BMusicHitData);

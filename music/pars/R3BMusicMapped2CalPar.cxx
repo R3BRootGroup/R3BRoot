@@ -31,11 +31,11 @@
 #include "FairRuntimeDb.h"
 
 // R3B headers
+#include "R3BCoarseTimeStitch.h"
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2CalPar.h"
 #include "R3BMusicMappedData.h"
 #include "R3BMwpcHitData.h"
-#include "R3BCoarseTimeStitch.h"
 
 // R3BMusicMapped2CalPar: Default Constructor --------------------------
 R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
@@ -161,7 +161,7 @@ InitStatus R3BMusicMapped2CalPar::Init()
 InitStatus R3BMusicMapped2CalPar::ReInit() { return kSUCCESS; }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMusicMapped2CalPar::Exec(Option_t* option)
+void R3BMusicMapped2CalPar::Exec(Option_t*)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMusicMappedDataCA->GetEntriesFast();

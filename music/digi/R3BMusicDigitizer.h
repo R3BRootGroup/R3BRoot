@@ -28,7 +28,6 @@ class TClonesArray;
 
 class R3BMusicDigitizer : public FairTask
 {
-
   public:
     /** Default constructor **/
     R3BMusicDigitizer();
@@ -37,28 +36,29 @@ class R3BMusicDigitizer : public FairTask
     R3BMusicDigitizer(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BMusicDigitizer();
+    ~R3BMusicDigitizer() override;
 
-    /** Virtual method Init **/
-    virtual InitStatus Init() override;
+    /** Method Init **/
+    InitStatus Init() override;
 
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit() override;
+    /** Method ReInit **/
+    InitStatus ReInit() override;
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* opt) override;
+    /** Method Exec **/
+    void Exec(Option_t*) override;
 
-    virtual void Reset();
+    /** Method Reset **/
+    void Reset();
 
   private:
     TClonesArray* fMCTrack;
     TClonesArray* fMusicPoints;
     TClonesArray* fMusicCal;
-    Float_t fsigma_x;
+    double fsigma_x;
     TString fName;
 
     // Add a MusicCalData to the HitCollection
-    R3BMusicCalData* AddHitData(Int_t anodeId, Double_t pos, Double_t e);
+    R3BMusicCalData* AddHitData(int anodeId, double pos, double e);
 
   public:
     // Class definition

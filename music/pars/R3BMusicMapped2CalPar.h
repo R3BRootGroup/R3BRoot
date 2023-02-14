@@ -46,7 +46,7 @@ class R3BMusicMapped2CalPar : public FairTask
     virtual ~R3BMusicMapped2CalPar();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t*);
 
     /** Virtual method FinishTask **/
     virtual void FinishTask();

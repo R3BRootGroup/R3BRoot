@@ -27,6 +27,7 @@
 #include <iostream>
 #include <string>
 
+#include "R3BLogger.h"
 #include "R3BMCTrack.h"
 #include "R3BMusicCalData.h"
 #include "R3BMusicDigitizer.h"
@@ -45,7 +46,7 @@ R3BMusicDigitizer::R3BMusicDigitizer()
 
 // R3BMusicDigitizer: Standard Constructor --------------------------
 R3BMusicDigitizer::R3BMusicDigitizer(const TString& name, Int_t iVerbose)
-    : FairTask(name + "Digi", iVerbose)
+    : FairTask("R3B" + name + "Digitizer", iVerbose)
     , fName(name)
     , fMCTrack(NULL)
     , fMusicPoints(NULL)
@@ -57,84 +58,86 @@ R3BMusicDigitizer::R3BMusicDigitizer(const TString& name, Int_t iVerbose)
 // Virtual R3BMusicDigitizer: Destructor ----------------------------
 R3BMusicDigitizer::~R3BMusicDigitizer()
 {
-    LOG(info) << "R3B" + fName + "Digitizer: Delete instance";
-    if (fMusicPoints)
-        delete fMusicPoints;
+    R3BLOG(debug1, "for " << fName);
     if (fMusicCal)
+    {
         delete fMusicCal;
+    }
 }
 
 // ----   Public method Init  -----------------------------------------
 InitStatus R3BMusicDigitizer::Init()
 {
-    LOG(info) << "R3B" + fName + "Digitizer::Init()";
+    R3BLOG(info, "for " << fName);
 
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
-        LOG(fatal) << "Init::No FairRootManager";
+    R3BLOG_IF(fatal, !ioman, "FairRootManager not found.");
 
     fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
     fMusicPoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
 
     // Register output array fMusicCal
-    fMusicCal = new TClonesArray("R3BMusicCalData", 10);
+    fMusicCal = new TClonesArray("R3BMusicCalData");
     ioman->Register(fName + "CalData", "Digital response in " + fName, fMusicCal, kTRUE);
 
     return kSUCCESS;
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMusicDigitizer::Exec(Option_t* opt)
+void R3BMusicDigitizer::Exec(Option_t*)
 {
     // The idea of this digitizer is to provide the charge of the fragments
     // from the sum of energy loss in the anodes.
 
     Reset();
     // Reading the Input -- Point Data --
-    Int_t nHits = fMusicPoints->GetEntriesFast();
-    if (!nHits)
+    int nHits = fMusicPoints->GetEntriesFast();
+    if (nHits == 0)
+    {
         return;
+    }
+
     // Data from Point level
-    R3BMusicPoint** pointData;
-    pointData = new R3BMusicPoint*[nHits];
-    Int_t TrackId = 0, PID = 0, anodeId = 0;
-    Double_t x[8], zf[4], y = 0., z = 0.;
-    Double_t eloss[8];
-    for (Int_t i = 0; i < 8; i++)
+    auto pointData = new R3BMusicPoint*[nHits];
+    int TrackId = 0, PID = 0, anodeId = 0;
+    int NbAnodes = 8;
+    double x[NbAnodes], y = 0., z = 0.;
+    double eloss[NbAnodes];
+    for (Int_t i = 0; i < NbAnodes; i++)
     {
         x[i] = 0.;
         eloss[i] = 0.;
     }
 
-    for (Int_t i = 0; i < nHits; i++)
+    for (int i = 0; i < nHits; i++)
     {
         pointData[i] = dynamic_cast<R3BMusicPoint*>(fMusicPoints->At(i));
         TrackId = pointData[i]->GetTrackID();
 
-        R3BMCTrack* Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
+        auto Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
-        anodeId = pointData[i]->GetDetCopyID();
-        // std::cout<<anodeId<<std::endl;
-        // eloss[anodeId] = eloss[anodeId] + pointData[i]->GetEnergyLoss();
+        anodeId = pointData[i]->GetDetCopyID() - 1;
 
         if (PID > 1000020040) // Z=2 and A=4
         {
-            Double_t fX_in = pointData[i]->GetXIn();
-            Double_t fX_out = pointData[i]->GetXOut();
-            x[anodeId] = (fX_out + fX_in) / 2. + gRandom->Gaus(0., fsigma_x);
-            eloss[anodeId] = eloss[anodeId] + pointData[i]->GetEnergyLoss();
+            double fX_in = pointData[i]->GetXIn();
+            double fX_out = pointData[i]->GetXOut();
+            x[anodeId] = (fX_out + fX_in) * 5. + gRandom->Gaus(0., fsigma_x);       // mm
+            eloss[anodeId] = eloss[anodeId] + pointData[i]->GetEnergyLoss() * 1e-3; // MeV
         }
     }
 
-    for (Int_t i = 0; i < 8; i++)
-    {
+    for (int i = 0; i < NbAnodes; i++)
         if (eloss[i] > 0.)
+        {
             AddHitData(i + 1, x[i], eloss[i]);
-    }
+        }
 
     if (pointData)
-        delete pointData;
+    {
+        delete[] pointData;
+    }
     return;
 }
 
@@ -146,7 +149,9 @@ void R3BMusicDigitizer::Reset()
 {
     LOG(debug) << "Clearing R3B" + fName + "Digitizer Structure";
     if (fMusicCal)
+    {
         fMusicCal->Clear();
+    }
 }
 
 // -----   Private method AddR3BHitData  -------------------------------------------
@@ -154,7 +159,7 @@ R3BMusicCalData* R3BMusicDigitizer::AddHitData(Int_t anodeId, Double_t pos, Doub
 {
     // It fills the R3BMusicCalData
     TClonesArray& clref = *fMusicCal;
-    Int_t size = clref.GetEntriesFast();
+    int size = clref.GetEntriesFast();
     return new (clref[size]) R3BMusicCalData(anodeId, pos, e);
 }
 

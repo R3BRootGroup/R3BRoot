@@ -35,4 +35,4 @@ R3BMusicCalData::R3BMusicCalData(UShort_t anodeID, Double_t dt, Double_t energy)
 }
 // -------------------------------------------------------------------------
 
-ClassImp(R3BMusicCalData)
+ClassImp(R3BMusicCalData);

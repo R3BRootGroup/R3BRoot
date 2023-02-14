@@ -176,7 +176,7 @@ InitStatus R3BMusicMapped2CalPar_S515::Init()
 InitStatus R3BMusicMapped2CalPar_S515::ReInit() { return kSUCCESS; }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMusicMapped2CalPar_S515::Exec(Option_t* option)
+void R3BMusicMapped2CalPar_S515::Exec(Option_t*)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMusicMappedDataCA->GetEntriesFast();

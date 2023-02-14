@@ -62,4 +62,7 @@ set(DEPENDENCIES
 
 GENERATE_LIBRARY()
 
+if(BUILD_GEOMETRY)
+  add_subdirectory(geobase)
+endif()
 add_subdirectory(test)

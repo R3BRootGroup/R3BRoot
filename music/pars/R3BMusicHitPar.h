@@ -53,12 +53,12 @@ class R3BMusicHitPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Int_t GetNumParZFit() { return fNumParamsZFit; }
-    const Int_t GetNumAnodes() { return fNumAnodes; }
-    const Int_t GetInUse(Int_t anode) { return fIn_use->GetAt(anode - 1); }
-    const Float_t GetAnodePos(Int_t anode) { return fAnode_pos->GetAt(anode - 1); }
-    TArrayF* GetZHitPar() { return fDetZHitParams; }
-    TArrayF* GetAngCorPar() { return fAngCorParams; }
+    Int_t GetNumParZFit() const { return fNumParamsZFit; }
+    Int_t GetNumAnodes() const { return fNumAnodes; }
+    Int_t GetInUse(Int_t anode) const { return fIn_use->GetAt(anode - 1); }
+    Float_t GetAnodePos(Int_t anode) const { return fAnode_pos->GetAt(anode - 1); }
+    TArrayF* GetZHitPar() const { return fDetZHitParams; }
+    TArrayF* GetAngCorPar() const { return fAngCorParams; }
 
     void SetNumParZFit(Int_t nbParams) { fNumParamsZFit = nbParams; }
     void SetNumAnodes(Int_t nbAnodes) { fNumAnodes = nbAnodes; }

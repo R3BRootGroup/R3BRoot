@@ -47,7 +47,7 @@ class R3BMusicMapped2Cal : public FairTask
     virtual ~R3BMusicMapped2Cal();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t*);
 
     /** Virtual method Reset **/
     virtual void Reset();

@@ -17,12 +17,12 @@
 // -------------------------------------------------------------------------
 
 #ifndef R3BMusicCalData_H
-#define R3BMusicCalData_H
+#define R3BMusicCalData_H 1
+
 #include "TObject.h"
 
 class R3BMusicCalData : public TObject
 {
-
   public:
     /** Default constructor **/
     R3BMusicCalData();
@@ -47,7 +47,7 @@ class R3BMusicCalData : public TObject
     void SetDTime(Double_t dt) { fDT = dt; };
     void SetEnergy(Double_t energy) { fEnergy = energy; };
 
-  protected:
+  private:
     UShort_t fAnodeID;
     Double_t fDT, fEnergy;
 

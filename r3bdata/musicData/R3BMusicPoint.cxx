@@ -16,12 +16,7 @@
 // -------------------------------------------------------------------------
 
 #include "R3BMusicPoint.h"
-
 #include <iostream>
-
-using std::cout;
-using std::endl;
-using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BMusicPoint::R3BMusicPoint()
@@ -64,17 +59,6 @@ R3BMusicPoint::R3BMusicPoint(Int_t trackID,
 R3BMusicPoint::~R3BMusicPoint() {}
 // -------------------------------------------------------------------------
 
-// -----   Public method Print   -------------------------------------------
-void R3BMusicPoint::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BMusicPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
-    cout << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm" << endl;
-    cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV" << endl;
-    cout << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
-         << endl;
-}
-// -------------------------------------------------------------------------
-
 // -----   Point x coordinate from linear extrapolation   ------------------
 Double_t R3BMusicPoint::GetX(Double_t z) const
 {
@@ -97,14 +81,4 @@ Double_t R3BMusicPoint::GetY(Double_t z) const
 }
 // -------------------------------------------------------------------------
 
-// -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BMusicPoint::IsUsable() const
-{
-    Double_t dz = fZ_out - fZ;
-    if (TMath::Abs(dz) < 1.e-4)
-        return kFALSE;
-    return kTRUE;
-}
-// -------------------------------------------------------------------------
-
-ClassImp(R3BMusicPoint)
+ClassImp(R3BMusicPoint);
