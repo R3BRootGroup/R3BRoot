@@ -16,6 +16,7 @@
 
 #include "R3BEventHeaderPropagator.h"
 #include "R3BFileSource.h"
+#include "R3BLogger.h"
 
 R3BEventHeaderPropagator::R3BEventHeaderPropagator()
     : R3BEventHeaderPropagator("R3BEventHeaderPropagator", 1, "EventHeader.")
@@ -33,36 +34,33 @@ R3BEventHeaderPropagator::R3BEventHeaderPropagator(const TString& name, Int_t iV
 R3BEventHeaderPropagator::~R3BEventHeaderPropagator()
 {
     if (fHeader)
+    {
         delete fHeader;
+    }
 }
 
 InitStatus R3BEventHeaderPropagator::Init()
 {
-    LOG(info) << "R3BEventHeaderPropagator::Init()";
+    R3BLOG(info, "");
     FairRootManager* frm = FairRootManager::Instance();
     fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
-    if (!fHeader)
-    {
-        fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
-        LOG(warn) << "R3BEventHeaderPropagator::Init() FairEventHeader not found";
-    }
-    else
-        LOG(info) << "R3BEventHeaderPropagator::Init() EventHeader found";
+    R3BLOG_IF(fatal, !fHeader, "EventHeader. not found.");
+    R3BLOG_IF(info, fHeader, "EventHeader. found.");
 
     frm->Register(fNameHeader, "EventHeader", fHeader, kTRUE);
 
     fSource = R3BFileSource::Instance();
-    if (!fSource)
-    {
-        LOG(error) << "R3BEventHeaderPropagator::Init() R3BFileSource not found";
-    }
+    R3BLOG_IF(fatal, !fSource, "R3BFileSource not found.");
+
     return kSUCCESS;
 }
 
-void R3BEventHeaderPropagator::Exec(Option_t* option)
+void R3BEventHeaderPropagator::Exec(Option_t*)
 {
     if (fSource)
+    {
         fHeader->SetRunId(fSource->GetRunId());
+    }
     return;
 }
 

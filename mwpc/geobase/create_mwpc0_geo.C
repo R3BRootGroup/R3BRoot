@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,7 +16,7 @@
 //
 //         Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
 //
-//         Last Update: 26/12/19 (Jose Luis)
+//         Last Update: 18/02/23 (Jose Luis)
 //
 //         Comments:
 //
@@ -27,7 +27,7 @@
 #include <iostream>
 #include <string>
 
-void create_mwpc0_geo(TString geoTag = "0")
+void create_mwpc0_geo(const TString geoTag = "v2021.3")
 {
     // --------------------------------------------------------------------------
     // Configurable geometry for the MWPC0 detector.
@@ -42,7 +42,7 @@ void create_mwpc0_geo(TString geoTag = "0")
     TGeoRotation* fRefRot = NULL;
     TGeoManager* gGeoMan = NULL;
 
-    TString detName = "MWPC" + geoTag;
+    TString detName = "MWPC0";
     TString WorldName = detName + "World";
 
     // -------   Load media from media file   -----------------------------------
@@ -56,7 +56,7 @@ void create_mwpc0_geo(TString geoTag = "0")
     // --------------------------------------------------------------------------
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = geoPath + "/geometry/mwpc_";
+    TString geoFileName = geoPath + "/geometry/mwpc0_";
     geoFileName = geoFileName + geoTag + ".geo.root";
     // --------------------------------------------------------------------------
 

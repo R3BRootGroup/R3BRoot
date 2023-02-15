@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -56,10 +56,10 @@ void testMwpcSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Mwpc0
-    run->AddModule(new R3BMwpc0("mwpc_0.geo.root", { 0., 0., 20. }));
+    run->AddModule(new R3BMwpc0("mwpc0_v2021.3.geo.root", { 0., 0., 20. }));
 
     // Geometry: Mwpc1
-    run->AddModule(new R3BMwpc1("mwpc_1.geo.root", { 0., 0., 40. }));
+    run->AddModule(new R3BMwpc1("mwpc1_v2021.3.geo.root", { 0., 0., 40. }));
 
     // Geometry: Mwpc2
     // run->AddModule(new R3BMwpc2("mwpc_2.geo.root", { 0., 0., 60. }));

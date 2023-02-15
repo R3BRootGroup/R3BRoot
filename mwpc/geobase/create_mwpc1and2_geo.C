@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,11 +12,11 @@
  ******************************************************************************/
 
 //
-//   ----- General macro for generating the MWPC 1&2  geometries
+//   ----- General macro for generating the MWPC 1&2 geometries
 //
-//         Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
+//         Author: Jose Luis <j.l.rodriguez.sanchez@udc.es>
 //
-//         Last Update: 06/10/19 (Jose Luis)
+//         Last Update: 18/02/23 (Jose Luis)
 //
 //         Comments:
 //
@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <iostream>
 
-void create_mwpc1and2_geo(int geoId = 1)
+void create_mwpc1and2_geo(int geoId = 1, const TString geoTag = "v2021.3")
 {
     // --------------------------------------------------------------------------
     // Configurable geometry for the MWPC1 and MWPC2 detectors.
@@ -47,10 +47,10 @@ void create_mwpc1and2_geo(int geoId = 1)
         std::cin >> geoId;
     }
 
-    TString geoTag = Form("%01d", geoId);
+    TString detTag = Form("%01d", geoId);
 
-    TString detName = "MWPC" + geoTag;
-    TString WorldName = "MWPCWorld" + geoTag;
+    TString detName = "MWPC" + detTag;
+    TString WorldName = detName + "World";
 
     if (detName != "MWPC1" && detName != "MWPC2")
     {
@@ -69,8 +69,8 @@ void create_mwpc1and2_geo(int geoId = 1)
     // --------------------------------------------------------------------------
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = geoPath + "/geometry/mwpc_";
-    geoFileName = geoFileName + geoTag + ".geo.root";
+    TString geoFileName = geoPath + "/geometry/mwpc";
+    geoFileName = geoFileName + detTag + "_" + geoTag + ".geo.root";
     // --------------------------------------------------------------------------
 
     // -----------------   Get and create the required media    -----------------

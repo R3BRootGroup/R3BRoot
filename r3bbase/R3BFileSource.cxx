@@ -63,8 +63,8 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
     , fInTree(0)
     , fListFolder(new TObjArray(16))
     , fRtdb(FairRuntimeDb::instance())
-    , fCbmout(0)
-    , fCbmroot(0)
+    , fFolderOut(0)
+    , fFolderIn(0)
     , fSourceIdentifier(0)
     , fNoOfEntries(-1)
     , IsInitialized(kFALSE)
@@ -117,8 +117,8 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
     , fInTree(0)
     , fListFolder(new TObjArray(16))
     , fRtdb(FairRuntimeDb::instance())
-    , fCbmout(0)
-    , fCbmroot(0)
+    , fFolderOut(0)
+    , fFolderIn(0)
     , fSourceIdentifier(0)
     , fNoOfEntries(-1)
     , IsInitialized(kFALSE)
@@ -172,8 +172,8 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
     , fInTree(0)
     , fListFolder(new TObjArray(16))
     , fRtdb(FairRuntimeDb::instance())
-    , fCbmout(0)
-    , fCbmroot(0)
+    , fFolderOut(0)
+    , fFolderIn(0)
     , fSourceIdentifier(0)
     , fNoOfEntries(-1)
     , IsInitialized(kFALSE)
@@ -241,20 +241,24 @@ Bool_t R3BFileSource::Init()
 
     // Get the folder structure from file which describes the input tree.
     // There are two different names possible, so check both.
-    fCbmroot = dynamic_cast<TFolder*>(fRootFile->Get(FairRootManager::GetFolderName()));
-    if (!fCbmroot)
+    fFolderIn = dynamic_cast<TFolder*>(fRootFile->Get(FairRootManager::GetFolderName()));
+    if (!fFolderIn)
     {
-        fCbmroot = dynamic_cast<TFolder*>(fRootFile->Get("cbmroot"));
-        if (!fCbmroot)
+        fFolderIn = dynamic_cast<TFolder*>(fRootFile->Get("r3broot"));
+        if (!fFolderIn)
         {
-            fCbmroot = dynamic_cast<TFolder*>(fRootFile->Get("cbmout"));
-            if (!fCbmroot)
+            fFolderIn = dynamic_cast<TFolder*>(fRootFile->Get("cbmout"));
+            if (!fFolderIn)
             {
-                fCbmroot = gROOT->GetRootFolder()->AddFolder(FairRootManager::GetFolderName(), "Main Folder");
-            }
-            else
-            {
-                fCbmroot->SetName(FairRootManager::GetFolderName());
+                fFolderIn = dynamic_cast<TFolder*>(fRootFile->Get("cbmroot"));
+                if (!fFolderIn)
+                {
+                    fFolderIn = gROOT->GetRootFolder()->AddFolder(FairRootManager::GetFolderName(), "Main Folder");
+                }
+                else
+                {
+                    fFolderIn->SetName(FairRootManager::GetFolderName());
+                }
             }
         }
     }
@@ -297,8 +301,8 @@ Bool_t R3BFileSource::Init()
         }
     }
 
-    gROOT->GetListOfBrowsables()->Add(fCbmroot);
-    fListFolder->Add(fCbmroot);
+    gROOT->GetListOfBrowsables()->Add(fFolderIn);
+    fListFolder->Add(fFolderIn);
 
     // Store the information about the unique runids in the input file
     // together with the filename and the number of events for each runid
@@ -724,18 +728,24 @@ void R3BFileSource::CreateNewFriendChain(TString inputFile, TString inputLevel)
     added = dynamic_cast<TFolder*>(f->Get(folderName1));
     if (!added)
     {
-        folderName = "/cbmout";
-        folderName1 = "cbmout";
-        added = dynamic_cast<TFolder*>(f->Get("cbmout"));
+        folderName = "/r3broot";
+        folderName1 = "r3broot";
+        added = dynamic_cast<TFolder*>(f->Get("r3broot"));
         if (!added)
         {
-            folderName = "/cbmroot";
-            folderName1 = "cbmroot";
-            added = dynamic_cast<TFolder*>(f->Get("cbmroot"));
+            folderName = "/cbmout";
+            folderName1 = "cbmout";
+            added = dynamic_cast<TFolder*>(f->Get("cbmout"));
             if (!added)
             {
-                LOG(fatal) << "Could not find folder cbmout nor cbmroot.";
-                exit(-1);
+                folderName = "/cbmroot";
+                folderName1 = "cbmroot";
+                added = dynamic_cast<TFolder*>(f->Get("cbmroot"));
+                if (!added)
+                {
+                    LOG(fatal) << "Could not find folder r3broot, cbmout nor cbmroot.";
+                    exit(-1);
+                }
             }
         }
     }

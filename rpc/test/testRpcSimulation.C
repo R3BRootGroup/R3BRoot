@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -56,7 +56,7 @@ void testRpcSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: RPC
-    run->AddModule(new R3BTwim("tof_rpc_v22.geo.root", { 0., 0., 60. }));
+    run->AddModule(new R3BTwim("tof_rpc_v2022.12.geo.root", { 0., 0., 60. }));
 
     // Init
     run->Init();

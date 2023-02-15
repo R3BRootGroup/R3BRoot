@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,9 +14,9 @@
 //
 //   ----- General macro for generating the MWPC3 geometry
 //
-//         Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
+//         Author: Jose Luis <j.l.rodriguez.sanchez@udc.es>
 //
-//         Last Update: 07/10/19 (Jose Luis)
+//         Last Update: 18/02/23 (Jose Luis)
 //
 //         Comments:
 //
@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <iostream>
 
-void create_mwpc3_geo(const char* geoTag = "3")
+void create_mwpc3_geo(const TString geoTag = "v2021.3")
 {
     // --------------------------------------------------------------------------
     // Configurable geometry for the MWPC3 detectors.
@@ -52,7 +52,7 @@ void create_mwpc3_geo(const char* geoTag = "3")
     // --------------------------------------------------------------------------
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = geoPath + "/geometry/mwpc_";
+    TString geoFileName = geoPath + "/geometry/mwpc3_";
     geoFileName = geoFileName + geoTag + ".geo.root";
     // --------------------------------------------------------------------------
 
@@ -152,7 +152,7 @@ void create_mwpc3_geo(const char* geoTag = "3")
     // Defintion of the Mother Volume
     TGeoShape* pCBWorld = new TGeoBBox("MWPC_box", 120.0 / 2.0, 80.0 / 2.0, 9.0 / 2.0);
 
-    TGeoVolume* pWorld = new TGeoVolume("MWPCWorld_3", pCBWorld, pMedAir);
+    TGeoVolume* pWorld = new TGeoVolume("MWPC3World", pCBWorld, pMedAir);
 
     TGeoCombiTrans* t0 = new TGeoCombiTrans(0., 0., 0., rot_mwpc);
 

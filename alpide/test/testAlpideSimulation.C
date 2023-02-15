@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -60,7 +60,7 @@ void testAlpideSimulation(int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Alpide
-    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v23.geo.root", { 0., 0., 0. }));
+    run->AddModule(new R3BAlpide("target_area_alpide_twoarms_v2023.1.geo.root", { 0., 0., 0. }));
 
     // Digitizer: Alpide
     auto digi = new R3BAlpideDigitizer("Alpide");

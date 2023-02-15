@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -55,9 +55,8 @@ Double_t det_xAlPos = 177; //!  x-size of Aluminium box
 Double_t det_yAlPos = 131; //!  y-size of Aluminium box
 Double_t det_zAlPos = 0.3; //!  z-size of Aluminium box
 
-void create_rpc_geo(const char* geoTag = "v22")
+void create_rpc_geo(const TString geoTag = "v2022.12")
 {
-
     // -------   Load media from media file   -----------------------------------
     FairGeoLoader* geoLoad = new FairGeoLoader("TGeo", "FairGeoLoader");
     FairGeoInterface* geoFace = geoLoad->getGeoInterface();

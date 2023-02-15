@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,9 +13,9 @@
 
 //   ----- General macro for generating the Twin-Music geometry
 //
-//         Author: Jose Luis <joseluis.rodriguez.sanchez@usc.es>
+//         Author: Jose Luis <j.l.rodriguez.sanchez@udc.es>
 //
-//         Last Update: 20/11/2022 (Jose Luis)
+//         Last Update: 18/02/2023 (Jose Luis)
 //
 //         Comments:
 //
@@ -25,7 +25,7 @@
 #include <iomanip>
 #include <iostream>
 
-void create_twin_geo(const char* geoTag = "v22")
+void create_twin_geo(const TString geoTag = "v2021.3")
 {
     // --------------------------------------------------------------------------
     // Configurable geometry for the TWIM-MUSIC.

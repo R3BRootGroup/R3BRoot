@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BEVENTHEADERPROPAGATOR_H
-#define R3BEVENTHEADERPROPAGATOR_H
+#define R3BEVENTHEADERPROPAGATOR_H 1
 
 #include "FairTask.h"
 #include <Rtypes.h>
@@ -41,7 +41,7 @@ class R3BEventHeaderPropagator : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BEventHeaderPropagator();
+    ~R3BEventHeaderPropagator() override;
 
     /**
      * Method for task initialization.
@@ -49,14 +49,14 @@ class R3BEventHeaderPropagator : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init() override;
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option) override;
+    void Exec(Option_t*) override;
 
   private:
     TString fNameHeader;

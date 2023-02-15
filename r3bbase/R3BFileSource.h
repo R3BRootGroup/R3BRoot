@@ -43,7 +43,7 @@ class R3BFileSource : public FairSource
     R3BFileSource(const TString* RootFileName, const char* Title = "InputRootFile", UInt_t identifier = 0);
     R3BFileSource(const TString RootFileName, const char* Title = "InputRootFile", UInt_t identifier = 0);
 
-    virtual ~R3BFileSource();
+    ~R3BFileSource() override;
 
     /**
      * static instance
@@ -55,21 +55,21 @@ class R3BFileSource : public FairSource
     void Close() override;
     void Reset() override;
 
-    virtual Source_Type GetSourceType() override { return kFILE; }
+    Source_Type GetSourceType() override { return kFILE; }
 
-    virtual void SetParUnpackers() override {}
+    void SetParUnpackers() override {}
 
-    virtual Bool_t InitUnpackers() override { return kTRUE; }
+    Bool_t InitUnpackers() override { return kTRUE; }
 
-    virtual Bool_t ReInitUnpackers() override { return kTRUE; }
+    Bool_t ReInitUnpackers() override { return kTRUE; }
 
     /**Check the maximum event number we can run to*/
-    virtual Int_t CheckMaxEventNo(Int_t EvtEnd = 0) override;
+    Int_t CheckMaxEventNo(Int_t EvtEnd = 0) override;
     /**Read the tree entry on one branch**/
-    virtual void ReadBranchEvent(const char* BrName) override;
+    void ReadBranchEvent(const char* BrName) override;
     /**Read specific tree entry on one branch**/
-    virtual void ReadBranchEvent(const char* BrName, Int_t Entry) override;
-    virtual void FillEventHeader(FairEventHeader* feh) override;
+    void ReadBranchEvent(const char* BrName, Int_t Entry) override;
+    void FillEventHeader(FairEventHeader* feh) override;
 
     const TFile* GetRootFile() { return fRootFile; }
     /** Add a friend file (input) by name)*/
@@ -94,7 +94,7 @@ class R3BFileSource : public FairSource
     /**Set the input tree when running on PROOF worker*/
     void SetInTree(TTree* tempTree);
     TObjArray* GetListOfFolders() { return fListFolder; }
-    TFolder* GetBranchDescriptionFolder() { return fCbmroot; }
+    TFolder* GetBranchDescriptionFolder() { return fFolderIn; }
     UInt_t GetEntries() { return fNoOfEntries; }
 
     void SetInputFile(TString name);
@@ -111,7 +111,7 @@ class R3BFileSource : public FairSource
     void SetFileHeader(FairFileHeader* f) { fFileHeader = f; }
     Double_t GetEventTime();
 
-    virtual Bool_t ActivateObject(TObject** obj, const char* BrName) override;
+    Bool_t ActivateObject(TObject** obj, const char* BrName) override;
 
     /**Set the status of the EvtHeader
      *@param Status:  True: The header was creatged in this session and has to be filled
@@ -127,8 +127,11 @@ class R3BFileSource : public FairSource
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
     /**Read one event from source to find out which RunId to use*/
-    // Bool_t SpecifyRunId() override;
+#if ROOT_VERSION_CODE <= ROOT_VERSION(6, 22, 8)
     Bool_t SpecifyRunId();
+#else
+    Bool_t SpecifyRunId() override;
+#endif    
 
   private:
     // static pointer to this class
@@ -155,9 +158,9 @@ class R3BFileSource : public FairSource
     /** RuntimeDb*/
     FairRuntimeDb* fRtdb;
     /**folder structure of output*/
-    TFolder* fCbmout;
+    TFolder* fFolderOut;
     /**folder structure of input*/
-    TFolder* fCbmroot;
+    TFolder* fFolderIn;
     /***/
     UInt_t fSourceIdentifier;
     /**No of Entries in this source*/
