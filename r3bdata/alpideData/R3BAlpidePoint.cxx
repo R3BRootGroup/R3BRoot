@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,16 +17,14 @@
 
 #include "R3BAlpidePoint.h"
 
-#include <iostream>
-
 // -----   Default constructor   -------------------------------------------
 R3BAlpidePoint::R3BAlpidePoint()
     : FairMCPoint()
 {
     fSensorID = 0;
+    fPid = 0;
     fX_out = fY_out = fZ_out = fEloss = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
-    fPid = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -45,11 +43,11 @@ R3BAlpidePoint::R3BAlpidePoint(Int_t trackID,
     : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss)
 {
     fSensorID = sensorID;
+    fPid = PId;
     fX_out = posOut.X();
     fY_out = posOut.Y();
     fZ_out = posOut.Z();
     fEloss = eLoss;
-    fPid = PId;
     fPx_out = momOut.Px();
     fPy_out = momOut.Py();
     fPz_out = momOut.Pz();
@@ -77,16 +75,6 @@ Double_t R3BAlpidePoint::GetY(Double_t z) const
         return (fY_out + fY) / 2.;
     Double_t dz = fZ_out - fZ;
     return (fY + (z - fZ) / dz * (fY_out - fY));
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BAlpidePoint::IsUsable() const
-{
-    Double_t dz = fZ_out - fZ;
-    if (TMath::Abs(dz) < 1.e-4)
-        return kFALSE;
-    return kTRUE;
 }
 // -------------------------------------------------------------------------
 

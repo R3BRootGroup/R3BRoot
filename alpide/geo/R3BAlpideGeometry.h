@@ -106,7 +106,7 @@ class R3BAlpideGeometry : public TObject
     /**
      * @return if we are running the simulation or data analysis
      */
-    const bool IsSimulation() { return fIsSimulation; }
+    bool IsSimulation() const { return fIsSimulation; }
 
     /**
      * Returns singleton instance of R3BAlpideGeometry for given geometry version.

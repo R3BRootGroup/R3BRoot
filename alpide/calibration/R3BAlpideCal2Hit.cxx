@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -165,7 +165,7 @@ InitStatus R3BAlpideCal2Hit::ReInit()
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BAlpideCal2Hit::Exec(Option_t* option)
+void R3BAlpideCal2Hit::Exec(Option_t*)
 {
     R3BLOG(debug, "New event");
     // Reset entries in the output arrays

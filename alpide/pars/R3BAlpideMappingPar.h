@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -55,9 +55,9 @@ class R3BAlpideMappingPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Int_t GetNbSensors() { return fNbSensors; }
-    const Int_t GetGeoVersion() { return fGeoVersion; }
-    const Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) { return fIn_use[col - 1][row - 1][sensor - 1]; }
+    Int_t GetNbSensors() const { return fNbSensors; }
+    Int_t GetGeoVersion() const { return fGeoVersion; }
+    Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) const { return fIn_use[col - 1][row - 1][sensor - 1]; }
 
     void SetNbSensors(Int_t n);
     void SetGeoVersion(Int_t v) { fGeoVersion = v; }

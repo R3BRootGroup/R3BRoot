@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -37,11 +37,11 @@ class R3BAlpideCluster : public TObject
     virtual ~R3BAlpideCluster() {}
 
     // Getters
-    const UShort_t& GetSensorId() const { return fSensorId; }
-    const Int_t& GetClusterId() const { return fClusterId; }
-    const Int_t& GetCol() const { return fCol; }
-    const Int_t& GetRow() const { return fRow; }
-    const Bool_t& GetAct() const { return fActive; }
+    UShort_t GetSensorId() const { return fSensorId; }
+    Int_t GetClusterId() const { return fClusterId; }
+    Int_t GetCol() const { return fCol; }
+    Int_t GetRow() const { return fRow; }
+    Bool_t GetAct() const { return fActive; }
 
   protected:
     UShort_t fSensorId;

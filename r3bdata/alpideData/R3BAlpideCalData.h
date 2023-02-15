@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,7 +17,7 @@
 // -----------------------------------------------------------------
 
 #ifndef R3BAlpideCalData_H
-#define R3BAlpideCalData_H
+#define R3BAlpideCalData_H 1
 
 #include "TObject.h"
 #include <stdint.h>
@@ -39,9 +39,9 @@ class R3BAlpideCalData : public TObject
     virtual ~R3BAlpideCalData() {}
 
     // Getters
-    inline const UShort_t GetSensorId() const { return fSenId; }
-    inline const Int_t GetCol() const { return fCol; }
-    inline const Int_t GetRow() const { return fRow; }
+    inline UShort_t GetSensorId() const { return fSenId; }
+    inline Int_t GetCol() const { return fCol; }
+    inline Int_t GetRow() const { return fRow; }
 
   protected:
     UShort_t fSenId;

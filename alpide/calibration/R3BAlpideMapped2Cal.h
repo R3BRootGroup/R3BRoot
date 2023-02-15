@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,22 +38,21 @@ class R3BAlpideMapped2Cal : public FairTask
     R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BAlpideMapped2Cal();
+    ~R3BAlpideMapped2Cal() override;
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* option) override;
+    /** Method Exec **/
+    void Exec(Option_t*) override;
 
     /** Virtual method Reset **/
     virtual void Reset();
 
-    virtual void SetParContainers() override;
+    void SetParContainers() override;
 
-    // Fair specific
-    /** Virtual method Init **/
-    virtual InitStatus Init() override;
+    /** Method Init **/
+    InitStatus Init() override;
 
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit() override;
+    /** Method ReInit **/
+    InitStatus ReInit() override;
 
     // Method to setup online mode
     void SetOnline(Bool_t option) { fOnline = option; }
