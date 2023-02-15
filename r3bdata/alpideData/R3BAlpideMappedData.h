@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -42,12 +42,12 @@ class R3BAlpideMappedData : public TObject
     virtual ~R3BAlpideMappedData() {}
 
     // Getters
-    inline const UShort_t GetSensorId() const { return fSenId; }
-    inline const UShort_t GetReg() const { return fReg; }
-    inline const UShort_t GetAds() const { return fAds; }
-    inline const UShort_t GetChip() const { return fChip; }
-    inline const UShort_t GetRow() const { return fRow; }
-    inline const UShort_t GetCol() const { return fCol; }
+    inline UShort_t GetSensorId() const { return fSenId; }
+    inline UShort_t GetReg() const { return fReg; }
+    inline UShort_t GetAds() const { return fAds; }
+    inline UShort_t GetChip() const { return fChip; }
+    inline UShort_t GetRow() const { return fRow; }
+    inline UShort_t GetCol() const { return fCol; }
 
   protected:
     UShort_t fSenId; // Sensor unique identifier

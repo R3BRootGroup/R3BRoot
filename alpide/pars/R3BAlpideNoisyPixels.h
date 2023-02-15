@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -39,17 +39,16 @@ class R3BAlpideNoisyPixels : public FairTask
     R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BAlpideNoisyPixels();
+    ~R3BAlpideNoisyPixels() override;
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* option) override;
+    /** Method Exec **/
+    void Exec(Option_t*) override;
 
-    // Fair specific
-    /** Virtual method Init **/
-    virtual InitStatus Init() override;
+    /** Method Init **/
+    InitStatus Init() override;
 
-    /** Virtual method FinishTask **/
-    virtual void FinishTask() override;
+    /** Method FinishTask **/
+    void FinishTask() override;
 
     void SetNbSensors(UInt_t n);
 

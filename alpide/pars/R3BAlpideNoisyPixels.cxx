@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -98,12 +98,11 @@ InitStatus R3BAlpideNoisyPixels::Init()
         R3BLOG(fatal, "Couldn't get handle on alpideMappingPar container");
         return kFATAL;
     }
-
     return kSUCCESS;
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BAlpideNoisyPixels::Exec(Option_t* option)
+void R3BAlpideNoisyPixels::Exec(Option_t*)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fAlpideMappedData->GetEntries();

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,11 +19,11 @@
 #ifndef R3BAlpidePoint_H
 #define R3BAlpidePoint_H 1
 
+#include "FairMCPoint.h"
+
 #include "TObject.h"
 #include "TVector3.h"
 #include <stdint.h>
-
-#include "FairMCPoint.h"
 
 class R3BAlpidePoint : public FairMCPoint
 {
@@ -55,9 +55,6 @@ class R3BAlpidePoint : public FairMCPoint
                    Double_t length,
                    Double_t eLoss,
                    Int_t pid);
-
-    /** Copy constructor **/
-    R3BAlpidePoint(const R3BAlpidePoint& point) { *this = point; };
 
     /** Destructor **/
     virtual ~R3BAlpidePoint();
@@ -96,19 +93,16 @@ class R3BAlpidePoint : public FairMCPoint
     Double_t GetX(Double_t z) const;
     Double_t GetY(Double_t z) const;
 
-    /** Check for distance between in and out **/
-    Bool_t IsUsable() const;
-
     /** Modifiers **/
     void SetPositionOut(TVector3 pos);
     void SetMomentumOut(TVector3 mom);
     void SetBarrelID(Int_t id) { fDetectorID = id; };
     void SetSensorID(Int_t id) { fSensorID = id; };
 
-  protected:
+  private:
+    Int_t fSensorID, fPid;
     Double32_t fX_out, fY_out, fZ_out, fEloss;
     Double32_t fPx_out, fPy_out, fPz_out;
-    Int_t fSensorID, fPid;
 
     ClassDef(R3BAlpidePoint, 1)
 };

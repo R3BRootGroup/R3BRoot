@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,7 +58,7 @@ class R3BAlpide : public R3BDetector
      ** collection.
      *@param vol  Pointer to the active volume
      **/
-    Bool_t ProcessHits(FairVolume* vol = 0) override;
+    Bool_t ProcessHits(FairVolume*) override;
 
     Bool_t CheckIfSensitive(std::string name) override;
 

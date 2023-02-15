@@ -382,7 +382,7 @@ void R3BAlpide::SetSpecialPhysicsCuts()
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BAlpide::ProcessHits(FairVolume* vol)
+Bool_t R3BAlpide::ProcessHits(FairVolume*)
 {
     if (TVirtualMC::GetMC()->IsTrackEntering())
     {
@@ -463,7 +463,7 @@ TClonesArray* R3BAlpide::GetCollection(Int_t iColl) const
 // ----------------------------------------------------------------------------
 
 // -----   Public method Print   ----------------------------------------------
-void R3BAlpide::Print(Option_t* option) const
+void R3BAlpide::Print(Option_t*) const
 {
     Int_t nHits = fAlpidePoint->GetEntriesFast();
     R3BLOG(info, nHits << " points registered in this event");

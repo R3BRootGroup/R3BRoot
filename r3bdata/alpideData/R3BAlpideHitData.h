@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,16 +38,16 @@ class R3BAlpideHitData : public TObject
     virtual ~R3BAlpideHitData() {}
 
     // Getters
-    inline const UInt_t& GetSensorId() const { return fSensorId; }
-    inline const UInt_t& GetClusterSize() const { return fClustersize; }
-    inline const Double_t& GetPosl() const { return fX; }
-    inline const Double_t& GetPost() const { return fY; }
-    inline const Double_t& GetTheta() const { return fTheta; }
-    inline const Double_t& GetPhi() const { return fPhi; }
-    inline const Double_t& GetX() const { return fX; }
-    inline const Double_t& GetY() const { return fY; }
-    inline const Double_t& GetZ() const { return fZ; }
-    inline const TVector3 GetTrack() const { return fTrack; }
+    inline UInt_t GetSensorId() const { return fSensorId; }
+    inline UInt_t GetClusterSize() const { return fClustersize; }
+    inline Double_t GetPosl() const { return fX; }
+    inline Double_t GetPost() const { return fY; }
+    inline Double_t GetTheta() const { return fTheta; }
+    inline Double_t GetPhi() const { return fPhi; }
+    inline Double_t GetX() const { return fX; }
+    inline Double_t GetY() const { return fY; }
+    inline Double_t GetZ() const { return fZ; }
+    inline TVector3 GetTrack() const { return fTrack; }
 
   protected:
     TVector3 fTrack;
