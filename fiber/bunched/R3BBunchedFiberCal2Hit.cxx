@@ -369,6 +369,7 @@ void R3BBunchedFiberCal2Hit::S515()
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
+        //auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
         if (cur_cal->IsLeading())
         { 
             ++n_lead;
@@ -390,23 +391,19 @@ void R3BBunchedFiberCal2Hit::S515()
     }
 
     for (size_t j = 0; j < cal_num; ++j)
-<<<<<<< HEAD
-    {
-        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
-=======
     {  
-        auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
-                if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT()) continue;//Valerii
+        auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
+        //auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
+                if (!cur_cal->IsTrailing() || !cur_cal->IsMAPMT()) continue;
                 //auto side_i = 0;
                 auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
                 auto ch_i = cur_cal->GetChannel() - 1;
-                auto& channel = fChannelArray[side_i].at(ch_i);//comment
+                auto& channel = fChannelArray[side_i].at(ch_i);
                 if (channel.lead_list.empty())
                 {
                     continue;
                 }
                 auto lead = channel.lead_list.front();
->>>>>>> corrected bug with missing loop
 
                 Double_t cur_cal_trig_ns = 0;
                 Double_t lead_trig_ns = 0;
@@ -573,6 +570,7 @@ void R3BBunchedFiberCal2Hit::Standard()
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
+        //auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
         if (cur_cal->IsLeading())
         {
             ++n_lead;
@@ -599,6 +597,7 @@ void R3BBunchedFiberCal2Hit::Standard()
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal = dynamic_cast<R3BBunchedFiberCalData const*>(fCalItems->At(j));
+        //auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
         if (cur_cal->IsTrailing())
         {
             auto side_i = cur_cal->IsMAPMT() ? 0 : 1;
