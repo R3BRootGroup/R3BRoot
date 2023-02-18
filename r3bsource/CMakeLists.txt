@@ -64,7 +64,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
@@ -137,7 +136,6 @@ set(SRCS
 ./neuland/R3BNeulandTamexReader.cxx
 ./neuland/R3BNeulandTacquilaReader.cxx
 ./stubes/R3BStrawtubesReader.cxx
-./strack/R3BStartrackReader.cxx
 ./ams/R3BAmsReader.cxx
 ./foot/R3BFootReader.cxx
 ./foot/R3BFootSiReader.cxx
@@ -201,7 +199,6 @@ Set(STRUCT_HEADERS
 ./neuland/ext_h101_raw_nnp_tacquila.h
 ./neuland/ext_h101_raw_nnp_tamex.h
 ./stubes/ext_h101_strawtubes.h
-./strack/ext_h101_star.h
 ./ams/ext_h101_ams.h
 ./foot/ext_h101_foot.h
 ./alpide/ext_h101_alpide.h
