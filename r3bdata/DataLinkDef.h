@@ -51,8 +51,6 @@
 #pragma link C++ class R3BTofiCalData+;
 #pragma link C++ class R3BTofiHitData+;
 #pragma link C++ class R3BVetoPoint+;
-#pragma link C++ class R3BStartrackPoint+;
-#pragma link C++ class R3BStartrackHit+;
 #pragma link C++ class R3BAmsMappedData+;
 #pragma link C++ class R3BAmsStripCalData+;
 #pragma link C++ class R3BAmsHitData+;
@@ -91,9 +89,6 @@
 #pragma link C++ class R3BMusliCalData+;
 #pragma link C++ class R3BMusliHitData+;
 
-#pragma link C++ class R3BStartrackerDigitHit+;
-#pragma link C++ class R3BStartrackMappedData+;
-#pragma link C++ class R3BStartrackCalData+;
 #pragma link C++ class R3BTraPoint+;
 #pragma link C++ class R3BTraHit+;
 #pragma link C++ class R3BTrackerHit+;
