@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 
 // ----------------------------------------------------------------
 // -----            R3BMusicDigitizer source file             -----
-// -----         Created 18/10/21  by JL Rodriguez            -----
+// -----          Created 18/10/21 by JL Rodriguez            -----
 // ----------------------------------------------------------------
 
 #ifndef R3BMusicDigitizer_H
@@ -50,12 +50,15 @@ class R3BMusicDigitizer : public FairTask
     /** Method Reset **/
     void Reset();
 
+    /** Setter position resolution **/
+    void SetPosResolution(double sig) { fSigmaX = sig; }
+
   private:
+    TString fName;
+    double fSigmaX;
     TClonesArray* fMCTrack;
     TClonesArray* fMusicPoints;
     TClonesArray* fMusicCal;
-    double fsigma_x;
-    TString fName;
 
     // Add a MusicCalData to the HitCollection
     R3BMusicCalData* AddHitData(int anodeId, double pos, double e);

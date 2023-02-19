@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 
 // ----------------------------------------------------------------
 // -----            R3BMusicDigitizer source file             -----
-// -----         Created 18/10/21  by JL Rodriguez            -----
+// -----          Created 18/10/21 by JL Rodriguez            -----
 // ----------------------------------------------------------------
 
 #include "FairLogger.h"
@@ -35,12 +35,7 @@
 
 // R3BMusicDigitizer: Default Constructor --------------------------
 R3BMusicDigitizer::R3BMusicDigitizer()
-    : FairTask("R3BMusic Digitizer", 1)
-    , fName("Music")
-    , fMCTrack(NULL)
-    , fMusicPoints(NULL)
-    , fMusicCal(NULL)
-    , fsigma_x(0.003) // sigma=0.03mm
+    : R3BMusicDigitizer("Music", 1)
 {
 }
 
@@ -48,10 +43,10 @@ R3BMusicDigitizer::R3BMusicDigitizer()
 R3BMusicDigitizer::R3BMusicDigitizer(const TString& name, Int_t iVerbose)
     : FairTask("R3B" + name + "Digitizer", iVerbose)
     , fName(name)
-    , fMCTrack(NULL)
-    , fMusicPoints(NULL)
-    , fMusicCal(NULL)
-    , fsigma_x(0.003)
+    , fMCTrack(nullptr)
+    , fMusicPoints(nullptr)
+    , fMusicCal(nullptr)
+    , fSigmaX(0.03) // mm
 {
 }
 
@@ -75,7 +70,10 @@ InitStatus R3BMusicDigitizer::Init()
     R3BLOG_IF(fatal, !ioman, "FairRootManager not found.");
 
     fMCTrack = dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack"));
+    R3BLOG_IF(fatal, !fMCTrack, "MCTrack not found.");
+
     fMusicPoints = dynamic_cast<TClonesArray*>(ioman->GetObject(fName + "Point"));
+    R3BLOG_IF(fatal, !fMusicPoints, fName << "Point not found.");
 
     // Register output array fMusicCal
     fMusicCal = new TClonesArray("R3BMusicCalData");
@@ -87,9 +85,6 @@ InitStatus R3BMusicDigitizer::Init()
 // -----   Public method Execution   --------------------------------------------
 void R3BMusicDigitizer::Exec(Option_t*)
 {
-    // The idea of this digitizer is to provide the charge of the fragments
-    // from the sum of energy loss in the anodes.
-
     Reset();
     // Reading the Input -- Point Data --
     int nHits = fMusicPoints->GetEntriesFast();
@@ -98,13 +93,11 @@ void R3BMusicDigitizer::Exec(Option_t*)
         return;
     }
 
-    // Data from Point level
-    auto pointData = new R3BMusicPoint*[nHits];
     int TrackId = 0, PID = 0, anodeId = 0;
     int NbAnodes = 8;
-    double x[NbAnodes], y = 0., z = 0.;
-    double eloss[NbAnodes];
-    for (Int_t i = 0; i < NbAnodes; i++)
+    double x[8], y = 0., z = 0.;
+    double eloss[8];
+    for (int i = 0; i < NbAnodes; i++)
     {
         x[i] = 0.;
         eloss[i] = 0.;
@@ -112,19 +105,20 @@ void R3BMusicDigitizer::Exec(Option_t*)
 
     for (int i = 0; i < nHits; i++)
     {
-        pointData[i] = dynamic_cast<R3BMusicPoint*>(fMusicPoints->At(i));
-        TrackId = pointData[i]->GetTrackID();
+        // Data from Point
+        auto pointData = dynamic_cast<R3BMusicPoint*>(fMusicPoints->At(i));
+        TrackId = pointData->GetTrackID();
 
         auto Track = dynamic_cast<R3BMCTrack*>(fMCTrack->At(TrackId));
         PID = Track->GetPdgCode();
-        anodeId = pointData[i]->GetDetCopyID() - 1;
+        anodeId = pointData->GetDetCopyID() - 1;
+        eloss[anodeId] = eloss[anodeId] + pointData->GetEnergyLoss() * 1e3; // MeV
 
         if (PID > 1000020040) // Z=2 and A=4
         {
-            double fX_in = pointData[i]->GetXIn();
-            double fX_out = pointData[i]->GetXOut();
-            x[anodeId] = (fX_out + fX_in) * 5. + gRandom->Gaus(0., fsigma_x);       // mm
-            eloss[anodeId] = eloss[anodeId] + pointData[i]->GetEnergyLoss() * 1e-3; // MeV
+            double fX_in = pointData->GetXIn();
+            double fX_out = pointData->GetXOut();
+            x[anodeId] = (fX_out + fX_in) * 5. + gRandom->Gaus(0., fSigmaX); // mm
         }
     }
 
@@ -134,10 +128,7 @@ void R3BMusicDigitizer::Exec(Option_t*)
             AddHitData(i + 1, x[i], eloss[i]);
         }
 
-    if (pointData)
-    {
-        delete[] pointData;
-    }
+    R3BLOG(info, fMusicCal->GetEntriesFast() << " points registered in this event");
     return;
 }
 
@@ -155,7 +146,7 @@ void R3BMusicDigitizer::Reset()
 }
 
 // -----   Private method AddR3BHitData  -------------------------------------------
-R3BMusicCalData* R3BMusicDigitizer::AddHitData(Int_t anodeId, Double_t pos, Double_t e)
+R3BMusicCalData* R3BMusicDigitizer::AddHitData(int anodeId, double pos, double e)
 {
     // It fills the R3BMusicCalData
     TClonesArray& clref = *fMusicCal;

@@ -39,10 +39,10 @@ class R3BMusicHitData : public TObject
     virtual ~R3BMusicHitData() {}
 
     /** Accessors **/
-    inline const Double_t& GetTheta() const { return fTheta; }
-    inline const Double_t& GetZcharge() const { return fZ; }
-    inline const Double_t& GetEave() const { return fE; }
-    inline const Double_t& GetGoodDt() const { return fDt; }
+    Double_t GetTheta() const { return fTheta; }
+    Double_t GetZcharge() const { return fZ; }
+    Double_t GetEave() const { return fE; }
+    Double_t GetGoodDt() const { return fDt; }
 
     /** Modifiers **/
     void SetTheta(Double_t theta) { fTheta = theta; };
