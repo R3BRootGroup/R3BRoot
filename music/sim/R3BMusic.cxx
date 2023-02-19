@@ -13,7 +13,7 @@
 
 // -------------------------------------------------------------------------
 // -----                        R3BMusic source file                   -----
-// -----                  Created 08/10/19  by JL Rodriguez            -----
+// -----                  Created 08/10/19 by JL Rodriguez             -----
 // -------------------------------------------------------------------------
 
 #include "FairLogger.h"
@@ -68,83 +68,70 @@ void R3BMusic::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, "");
-    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("Anode"));
+    R3BLOG(debug, "Vol (McId) def " << TVirtualMC::GetMC()->VolId("Anode"));
 }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BMusic::ProcessHits(FairVolume* vol)
 {
-
-    if (gMC->IsTrackEntering())
+    if (TVirtualMC::GetMC()->IsTrackEntering())
     {
-        gGeoManager->cd(gMC->CurrentVolPath());
-        Int_t nodeId = gGeoManager->GetNodeId();
-    }
-    if (gMC->IsTrackEntering())
-    {
+        gGeoManager->cd(TVirtualMC::GetMC()->CurrentVolPath());
         fELoss = 0.;
-        fNSteps = 0; // FIXME
-        fTime = gMC->TrackTime() * 1.0e09;
-        fLength = gMC->TrackLength();
-        gMC->TrackPosition(fPosIn);
-        gMC->TrackMomentum(fMomIn);
-        fEinc = gMC->Etot() - gMC->TrackMass(); // be aware!! Relativistic mass!
+        fTime = TVirtualMC::GetMC()->TrackTime() * 1.0e09;
+        fLength = TVirtualMC::GetMC()->TrackLength();
+        TVirtualMC::GetMC()->TrackPosition(fPosIn);
+        TVirtualMC::GetMC()->TrackMomentum(fMomIn);
     }
 
     // Sum energy loss for all steps in the active volume
-    Double_t dE = gMC->Edep() * 1000.;                          // in MeV
-    Double_t post_E = (gMC->Etot() - gMC->TrackMass()) * 1000.; // in MeV
-    TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
+    gGeoManager->cd(TVirtualMC::GetMC()->CurrentVolPath());
+    Int_t nodeId = gGeoManager->GetNodeId();
+    Double_t post_E = (TVirtualMC::GetMC()->Etot() - TVirtualMC::GetMC()->TrackMass()) * 1000.; // in MeV
+    TString ptype = TVirtualMC::GetMC()->GetStack()->GetCurrentTrack()->GetName();
 
-    Double_t M_in = gMC->TrackMass() * 1000.;
+    Double_t M_in = TVirtualMC::GetMC()->TrackMass() * 1000.;
     Double_t fA_in = M_in / U_MEV;
-    Double_t fZ_in = gMC->TrackCharge();
+    Double_t fZ_in = TVirtualMC::GetMC()->TrackCharge();
 
-    fELoss += dE / 1000.; // back to GeV
+    fELoss += TVirtualMC::GetMC()->Edep();
 
-    if (dE > 0)
+    // Set additional parameters at exit of active volume. Create R3BMusicPoint.
+    if (TVirtualMC::GetMC()->IsTrackExiting() || TVirtualMC::GetMC()->IsTrackStop() ||
+        TVirtualMC::GetMC()->IsTrackDisappeared())
     {
+        fTrackID = TVirtualMC::GetMC()->GetStack()->GetCurrentTrackNumber();
+        fParentTrackID = TVirtualMC::GetMC()->GetStack()->GetCurrentParentTrackNumber();
+        fVolumeID = vol->getMCid();
+        fDetCopyID = vol->getCopyNo();
+        fTrackPID = TVirtualMC::GetMC()->TrackPid();
 
-        fNSteps++;
+        TVirtualMC::GetMC()->TrackPosition(fPosOut);
+        TVirtualMC::GetMC()->TrackMomentum(fMomOut);
 
-        // Set additional parameters at exit of active volume. Create R3BMusicPoint.
-        if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
+        if (fELoss == 0.)
         {
-
-            fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-            fParentTrackID = gMC->GetStack()->GetCurrentParentTrackNumber();
-            fVolumeID = vol->getMCid();
-            fDetCopyID = vol->getCopyNo();
-            fTrackPID = gMC->TrackPid();
-            fUniqueID = gMC->GetStack()->GetCurrentTrack()->GetUniqueID();
-
-            gMC->TrackPosition(fPosOut);
-            gMC->TrackMomentum(fMomOut);
-
-            if (fELoss == 0.)
-                return kFALSE;
-
-            AddPoint(fTrackID,
-                     fVolumeID,
-                     fDetCopyID,
-                     fZ_in,
-                     fA_in,
-                     TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
-                     TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
-                     TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
-                     TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
-                     fTime,
-                     fLength,
-                     fELoss);
-
-            // Increment number of MusicPoints for this track
-            R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
-            stack->AddPoint(kMUSIC);
-
-            ResetParameters();
+            return kFALSE;
         }
-    }
 
+        AddPoint(fTrackID,
+                 fVolumeID,
+                 fDetCopyID,
+                 fZ_in,
+                 fA_in,
+                 TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
+                 TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
+                 TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
+                 TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
+                 fTime,
+                 fLength,
+                 fELoss);
+
+        // Increment number of MusicPoints for this track
+        R3BStack* stack = dynamic_cast<R3BStack*>(TVirtualMC::GetMC()->GetStack());
+        stack->AddPoint(kMUSIC);
+        ResetParameters();
+    }
     return kTRUE;
 }
 
@@ -169,16 +156,20 @@ void R3BMusic::Register()
 TClonesArray* R3BMusic::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
+    {
         return fMusicCollection;
+    }
     else
-        return NULL;
+    {
+        return nullptr;
+    }
 }
 
 // -----   Public method Print   ----------------------------------------------
-void R3BMusic::Print(Option_t* option) const
+void R3BMusic::Print(Option_t*) const
 {
     Int_t nHits = fMusicCollection->GetEntriesFast();
-    LOG(info) << "R3BMusic: " << nHits << " points registered in this event";
+    R3BLOG(info, nHits << " points registered in this event");
 }
 
 // -----   Public method Reset   ----------------------------------------------
@@ -188,22 +179,22 @@ void R3BMusic::Reset()
     ResetParameters();
 }
 
-// -----   Public method CopyClones   -----------------------------------------
-void R3BMusic::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+// -----   Private method ResetParameters   -----------------------------------
+void R3BMusic::ResetParameters()
 {
-    Int_t nEntries = cl1->GetEntriesFast();
-    R3BLOG(info, nEntries << " entries to add");
-    TClonesArray& clref = *cl2;
-    R3BMusicPoint* oldpoint = NULL;
-    for (Int_t i = 0; i < nEntries; i++)
-    {
-        oldpoint = dynamic_cast<R3BMusicPoint*>(cl1->At(i));
-        Int_t index = oldpoint->GetTrackID() + offset;
-        oldpoint->SetTrackID(index);
-        new (clref[fPosIndex]) R3BMusicPoint(*oldpoint);
-        fPosIndex++;
-    }
-    R3BLOG(info, cl2->GetEntriesFast() << " merged entries");
+    fTrackID = 0;
+    fVolumeID = 0;
+    fParentTrackID = 0;
+    fTrackPID = 0;
+    fDetCopyID = 0;
+    fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fTime = 0.;
+    fLength = 0.;
+    fELoss = 0.;
+    fPosIndex = 0;
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -237,7 +228,7 @@ Bool_t R3BMusic::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("Anode"))
     {
-        LOG(debug) << "Found MUSIC geometry from ROOT file: " << name;
+        // LOG(debug) << "Found MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

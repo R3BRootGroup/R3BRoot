@@ -34,19 +34,15 @@ class R3BMusicPoint : public FairMCPoint
     R3BMusicPoint();
 
     /** Constructor with arguments
-     *@param trackID  Index of MCTrack
-     *@param detID    Detector ID
      *@param detVolID Detector Copy ID
      *@param Z        Atomic number fragment
      *@param A        Mass number fragment
-     *@param posIn    Ccoordinates at entrance to active volume [cm]
+     *@param posIn    Coordinates at entrance to active volume [cm]
      *@param posOut   Coordinates at exit of active volume [cm]
      *@param momIn    Momentum of track at entrance [GeV]
      *@param momOut   Momentum of track at exit [GeV]
-     *@param tof      Time since event start [ns]
-     *@param length   Track length since creation [cm]
-     *@param eLoss    Energy deposit [GeV]
      **/
+
     R3BMusicPoint(Int_t trackID,
                   Int_t detID,
                   Int_t detCopyID,

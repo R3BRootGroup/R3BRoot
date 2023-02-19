@@ -16,11 +16,6 @@
 // -----         Created 15/10/19 by J.L. Rodriguez-Sanchez            -----
 // -------------------------------------------------------------------------
 
-/**  R3BMusicMappedData
- **  A HitData is the representation of the
- **  information obtained from the MUSIC detector.
- **/
-
 #ifndef R3BMusicMappedData_H
 #define R3BMusicMappedData_H 1
 
@@ -43,9 +38,9 @@ class R3BMusicMappedData : public TObject
     virtual ~R3BMusicMappedData() {}
 
     /** Accessors **/
-    inline const UShort_t& GetAnodeID() const { return fAnodeID; }
-    inline const UShort_t& GetTime() const { return fTime; }
-    inline const UShort_t& GetEnergy() const { return fEnergy; }
+    UShort_t GetAnodeID() const { return fAnodeID; }
+    UShort_t GetTime() const { return fTime; }
+    UShort_t GetEnergy() const { return fEnergy; }
 
     /** Modifiers **/
     void SetAnodeID(UShort_t id) { fAnodeID = id; };

@@ -38,9 +38,9 @@ class R3BMusicCalData : public TObject
     virtual ~R3BMusicCalData() {}
 
     /** Accessors **/
-    inline const UShort_t& GetAnodeID() const { return fAnodeID; }
-    inline const Double_t& GetDTime() const { return fDT; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
+    UShort_t GetAnodeID() const { return fAnodeID; }
+    Double_t GetDTime() const { return fDT; }
+    Double_t GetEnergy() const { return fEnergy; }
 
     /** Modifiers **/
     void SetAnodeID(UShort_t id) { fAnodeID = id; };
