@@ -447,7 +447,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
                 angles = fCalifaGeo->GetAngles(thisCryId) - fCalifatoTargetPos;
 
                 if (InsideClusterWindow(mother_angles, angles))
-                    addCrystal2Cluster(&cluster, allCrystalVec.at(j), "gammas", &usedCrystals, fTotalCrystals);
+                    addCrystal2Cluster(&cluster, allCrystalVec.at(j), "gamma", &usedCrystals, fTotalCrystals);
             }
         }
 
@@ -474,7 +474,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
                 angles = fCalifaGeo->GetAngles(thisCryId) - fCalifatoTargetPos;
 
                 if (InsideClusterWindow(mother_angles, angles))
-                    addCrystal2Cluster(&cluster, allCrystalVec.at(j), "gammas", &usedCrystals, fTotalCrystals);
+                    addCrystal2Cluster(&cluster, allCrystalVec.at(j), "gamma", &usedCrystals, fTotalCrystals);
             }
         }
 
