@@ -40,13 +40,19 @@
 # Clangd file
 compile_commands.json
 
+# External Git repositories
+macros/
+sofia/
+glad-tpc/
+frs/
+asyeos/
+R3BParams_*/
+
 # Generated folders and files 
 geometry/neuland_v*.root
 geometry/*.geo.root
 build*/
 input/
-
-macros/
 
 .cache
 .idea/
@@ -54,14 +60,6 @@ macros/
 .DS_Store
 build-r3broot.sh
 cmake-build-debug/
-
-sofia/
-
-glad-tpc/
-
-frs/
-
-asyeos/
 
 # Local configuration
 c3w.conf
