@@ -40,25 +40,21 @@ class R3BTwimMapped2Cal : public FairTask
     R3BTwimMapped2Cal();
 
     /** Standard constructor **/
-    R3BTwimMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BTwimMapped2Cal(const TString& name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BTwimMapped2Cal();
+    ~R3BTwimMapped2Cal() override = default;
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t*) override;
 
-    /** Virtual method Reset **/
-    virtual void Reset();
+    void SetParContainers() override;
 
-    virtual void SetParContainers();
+    /** Method Init **/
+    InitStatus Init() override;
 
-    // Fair specific
-    /** Virtual method Init **/
-    virtual InitStatus Init();
-
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    /** Method ReInit **/
+    InitStatus ReInit() override;
 
     /** Method to set up the experiment ID **/
     void SetExpId(Int_t exp)
@@ -71,9 +67,13 @@ class R3BTwimMapped2Cal : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
+    /** Method to set parameters **/
     void SetParameter();
 
-    R3BEventHeader* header; /**< Event header. */
+    /** Method Reset **/
+    void Reset();
+
+    R3BEventHeader* header;
 
     Int_t fNumSec;
     Int_t fNumAnodes;
@@ -92,7 +92,7 @@ class R3BTwimMapped2Cal : public FairTask
     Double_t fE[4][20][16 + 4];
     Double_t fDT[4][20][16 + 4];
 
-    Bool_t fOnline; // Don't store data for online
+    Bool_t fOnline;
 
     R3BCoarseTimeStitch* fTimeStitch;
     R3BTwimCalPar* fCal_Par;         /**< Parameter container. >*/
@@ -100,12 +100,11 @@ class R3BTwimMapped2Cal : public FairTask
     TClonesArray* fTwimCalDataCA;    /**< Array with Cal-output data. >*/
 
     /** Private method AddCalData **/
-    // Adds a SofTwimCalData to the TwimCalCollection
     R3BTwimCalData* AddCalData(Int_t secID, Int_t anodeID, Double_t dtime, Double_t energy);
 
   public:
     // Class definition
-    ClassDef(R3BTwimMapped2Cal, 1)
+    ClassDefOverride(R3BTwimMapped2Cal, 1)
 };
 
 #endif

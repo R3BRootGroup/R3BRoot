@@ -28,9 +28,9 @@
 #include "FairRuntimeDb.h"
 
 // TWIM headers
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BCoarseTimeStitch.h"
 #include "R3BTwimCalData.h"
 #include "R3BTwimCalPar.h"
 #include "R3BTwimMapped2Cal.h"
@@ -43,7 +43,7 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal()
 }
 
 // R3BTwimMapped2CalPar::Standard Constructor --------------------------
-R3BTwimMapped2Cal::R3BTwimMapped2Cal(const char* name, Int_t iVerbose)
+R3BTwimMapped2Cal::R3BTwimMapped2Cal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNumSec(4)
     , fNumAnodes(16)    // 16 anodes
@@ -67,14 +67,6 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal(const char* name, Int_t iVerbose)
         CalEParams[s] = NULL;
         PosParams[s] = NULL;
     }
-}
-
-// Virtual R3BTwimMapped2Cal::Destructor
-R3BTwimMapped2Cal::~R3BTwimMapped2Cal()
-{
-    R3BLOG(debug1, "");
-    if (fTwimCalDataCA)
-        delete fTwimCalDataCA;
 }
 
 void R3BTwimMapped2Cal::SetParContainers()
@@ -151,16 +143,12 @@ InitStatus R3BTwimMapped2Cal::Init()
 {
     R3BLOG(info, "");
 
-    FairRootManager* rootManager = FairRootManager::Instance();
-    if (!rootManager)
-    {
-        R3BLOG(fatal, "FairRootManager not found");
-        return kFATAL;
-    }
+    auto* frm = FairRootManager::Instance();
+    R3BLOG_IF(fatal, !frm, "FairRootManager not found.");
 
-    header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
-    if (!header)
-        header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
+    header = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
+    R3BLOG_IF(error, !header, "EventHeader. not found.");
+
     if (fExpId == 0) // Obtain global ExpId if it's not set locally.
     {
         fExpId = header->GetExpId();
@@ -168,17 +156,13 @@ InitStatus R3BTwimMapped2Cal::Init()
     }
 
     // INPUT DATA
-    fTwimMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("TwimMappedData"));
-    if (!fTwimMappedDataCA)
-    {
-        R3BLOG(fatal, "TwimMappedData not found");
-        return kFATAL;
-    }
+    fTwimMappedDataCA = dynamic_cast<TClonesArray*>(frm->GetObject("TwimMappedData"));
+    R3BLOG_IF(fatal, !fTwimMappedDataCA, "TwimMappedData not found.");
 
     // OUTPUT DATA
     fTwimCalDataCA = new TClonesArray("R3BTwimCalData");
-    rootManager->Register("TwimCalData", "TWIM_Cal", fTwimCalDataCA, !fOnline);
-    fTwimCalDataCA->Clear();
+    frm->Register("TwimCalData", "TWIM_Cal", fTwimCalDataCA, !fOnline);
+    Reset();
 
     // Definition of a time stich object to correlate VFTX times
     fTimeStitch = new R3BCoarseTimeStitch();
@@ -196,7 +180,7 @@ InitStatus R3BTwimMapped2Cal::ReInit()
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BTwimMapped2Cal::Exec(Option_t* option)
+void R3BTwimMapped2Cal::Exec(Option_t*)
 {
     // Reset entries in output arrays, local arrays
     Reset();
@@ -206,7 +190,7 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
     if (nHits == 0)
         return;
 
-    R3BTwimMappedData** mappedData = new R3BTwimMappedData*[nHits];
+    auto** mappedData = new R3BTwimMappedData*[nHits];
     Int_t secId = 0;
     Int_t anodeId = 0;
     Double_t pedestal = 0.;
@@ -307,9 +291,11 @@ void R3BTwimMapped2Cal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BTwimMapped2Cal::Reset()
 {
-    R3BLOG(debug1, "Clearing TwimCalData Structure");
+    R3BLOG(debug1, "");
     if (fTwimCalDataCA)
+    {
         fTwimCalDataCA->Clear();
+    }
 }
 
 // -----   Private method AddCalData  --------------------------------------------
