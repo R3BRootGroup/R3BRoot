@@ -17,6 +17,7 @@
 #include "TF2.h"
 #include "TMath.h"
 #include "TSpectrum.h"
+#include "TFile.h"
 #include <FairRootManager.h>
 #include <TClonesArray.h>
 
