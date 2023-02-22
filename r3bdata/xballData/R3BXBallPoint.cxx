@@ -19,10 +19,6 @@
 
 #include <iostream>
 
-using std::cout;
-using std::endl;
-using std::flush;
-
 // -----   Default constructor   -------------------------------------------
 R3BXBallPoint::R3BXBallPoint()
     : FairMCPoint()
@@ -61,17 +57,6 @@ R3BXBallPoint::R3BXBallPoint(Int_t trackID,
 
 // -----   Destructor   ----------------------------------------------------
 R3BXBallPoint::~R3BXBallPoint() {}
-// -------------------------------------------------------------------------
-
-// -----   Public method Print   -------------------------------------------
-void R3BXBallPoint::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BXBallPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
-    cout << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm" << endl;
-    cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV" << endl;
-    cout << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
-         << endl;
-}
 // -------------------------------------------------------------------------
 
 // -----   Point x coordinate from linear extrapolation   ------------------

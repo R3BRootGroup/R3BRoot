@@ -20,12 +20,12 @@
 
 #include "R3BHit.h"
 
-class R3BSfibHitData: public R3BHit
+class R3BSfibHitData : public R3BHit
 {
   public:
     R3BSfibHitData();
     R3BSfibHitData(Int_t, Double_t, Double_t, Double_t, Double_t);
-    
+
     virtual ~R3BSfibHitData();
 
     Int_t GetFiberId() const;
@@ -47,7 +47,3 @@ class R3BSfibHitData: public R3BHit
 };
 
 #endif
-
-    
-
-

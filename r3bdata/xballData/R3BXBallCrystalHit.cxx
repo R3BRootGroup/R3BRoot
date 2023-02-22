@@ -49,7 +49,7 @@ R3BXBallCrystalHit::~R3BXBallCrystalHit() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Print   -------------------------------------------
-void R3BXBallCrystalHit::Print(const Option_t* opt) const
+void R3BXBallCrystalHit::Print(const Option_t*) const
 {
     cout << "-I- R3BXBallCrystalHit: a calo crystalHit in crystal number " << fCrystalNb << endl;
     cout << "    Energy = " << fEnergy << " GeV" << endl;

@@ -40,8 +40,6 @@ class R3BMwpcHitData : public TObject
     inline const Double_t& GetY() const { return fY; }
     inline const Int_t& GetPlane() const { return fPlane; }
 
-
-
     /** Modifiers **/
     void SetX(Double_t x) { fX = x; };
     void SetY(Double_t y) { fY = y; };

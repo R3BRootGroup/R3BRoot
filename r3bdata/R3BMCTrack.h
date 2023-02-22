@@ -24,7 +24,6 @@
 
 class R3BMCTrack : public TObject
 {
-
   public:
     /**  Default constructor  **/
     R3BMCTrack();

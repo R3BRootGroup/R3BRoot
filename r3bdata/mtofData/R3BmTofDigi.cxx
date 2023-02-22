@@ -65,7 +65,7 @@ R3BmTofDigi::R3BmTofDigi(Int_t ntmul,
 R3BmTofDigi::~R3BmTofDigi() {}
 
 // -----   Public method Print   -------------------------------------------
-void R3BmTofDigi::Print(const Option_t* opt) const {}
+void R3BmTofDigi::Print(const Option_t*) const {}
 // -------------------------------------------------------------------------
 
 ClassImp(R3BmTofDigi)

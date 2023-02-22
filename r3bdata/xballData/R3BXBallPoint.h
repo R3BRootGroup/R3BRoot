@@ -57,9 +57,6 @@ class R3BXBallPoint : public FairMCPoint
                   Double_t length,
                   Double_t eLoss);
 
-    /** Copy constructor **/
-    R3BXBallPoint(const R3BXBallPoint& point) { *this = point; };
-
     /** Destructor **/
     virtual ~R3BXBallPoint();
 
@@ -89,9 +86,6 @@ class R3BXBallPoint : public FairMCPoint
     /** Modifiers **/
     void SetPositionOut(TVector3 pos);
     void SetMomentumOut(TVector3 mom);
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Double32_t fX_out, fY_out, fZ_out;

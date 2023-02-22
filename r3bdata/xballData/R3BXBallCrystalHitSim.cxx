@@ -67,7 +67,7 @@ R3BXBallCrystalHitSim::~R3BXBallCrystalHitSim() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Print   -------------------------------------------
-void R3BXBallCrystalHitSim::Print(const Option_t* opt) const
+void R3BXBallCrystalHitSim::Print(const Option_t*) const
 {
     cout << "-I- R3BXBallCrystalHitSim: a calo crystalHit in crystal type " << fCrystalType
          << " and unique crystal identifier number: " << fCrystalNb << endl;

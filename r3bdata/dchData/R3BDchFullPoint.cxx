@@ -19,10 +19,6 @@
 
 #include <iostream>
 
-using std::cout;
-using std::endl;
-using std::flush;
-
 // -----   Default constructor   -------------------------------------------
 R3BDchFullPoint::R3BDchFullPoint()
     : FairMCPoint()
@@ -63,39 +59,9 @@ R3BDchFullPoint::R3BDchFullPoint(Int_t trackId,
     , fCell(cell)
 {
 }
-// -------------------------------------------------------------------------
-
-R3BDchFullPoint::R3BDchFullPoint(const R3BDchFullPoint& right)
-    : FairMCPoint(right)
-    , fLocalX(right.fLocalX)
-    , fLocalY(right.fLocalY)
-    , fLocalZ(right.fLocalZ)
-    , fLocalPx(right.fLocalPx)
-    , fLocalPy(right.fLocalPy)
-    , fLocalPz(right.fLocalPz)
-    , fModule(right.fModule)
-    , fLayer(right.fLayer)
-    , fCell(right.fCell)
-{
-}
 
 // -----   Destructor   ----------------------------------------------------
 R3BDchFullPoint::~R3BDchFullPoint() {}
-// -------------------------------------------------------------------------
-
-// -----   Public method Print   -------------------------------------------
-void R3BDchFullPoint::Print(const Option_t* opt) const
-{
-    cout << "-I- R3BDchFullPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
-    cout << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm" << endl;
-    cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV" << endl;
-    cout << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
-         << endl;
-}
-// -------------------------------------------------------------------------
-
-// -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BDchFullPoint::IsUsable() const { return kTRUE; }
 // -------------------------------------------------------------------------
 
 ClassImp(R3BDchFullPoint)

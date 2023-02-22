@@ -29,7 +29,6 @@
 
 class R3BDchFullPoint : public FairMCPoint
 {
-
   public:
     /** Default constructor **/
     R3BDchFullPoint();
@@ -57,11 +56,6 @@ class R3BDchFullPoint : public FairMCPoint
                     Double_t length,
                     Double_t eLoss);
 
-    /** Copy constructor **/
-    R3BDchFullPoint(const R3BDchFullPoint&);
-
-    R3BDchFullPoint& operator=(const R3BDchFullPoint&) { return *this; }
-
     /** Destructor **/
     virtual ~R3BDchFullPoint();
 
@@ -73,12 +67,6 @@ class R3BDchFullPoint : public FairMCPoint
     Double_t GetLocalPx() const { return fLocalPx; }
     Double_t GetLocalPy() const { return fLocalPy; }
     Double_t GetLocalPz() const { return fLocalPz; }
-
-    /** Check for distance between in and out **/
-    Bool_t IsUsable() const;
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Double32_t fLocalX, fLocalY, fLocalZ;
