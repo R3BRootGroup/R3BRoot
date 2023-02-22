@@ -43,8 +43,8 @@ class R3BTrloiiData : public TObject
     inline const uint32_t& GetCounts() const { return fCounts; }
 
   protected:
-    UInt_t fType;    // Type of data
-    Int_t fCh;       // Scaler channel
+    UInt_t fType;     // Type of data
+    Int_t fCh;        // Scaler channel
     uint32_t fCounts; // Number of counts
 
   public:

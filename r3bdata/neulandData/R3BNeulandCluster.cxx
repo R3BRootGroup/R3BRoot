@@ -18,9 +18,10 @@
 
 R3BNeulandHit R3BNeulandCluster::GetForemostHit() const
 {
-    auto min = std::min_element(fHits.cbegin(), fHits.cend(), [](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return a.GetPosition().Z() < b.GetPosition().Z();
-    });
+    auto min = std::min_element(fHits.cbegin(),
+                                fHits.cend(),
+                                [](const R3BNeulandHit& a, const R3BNeulandHit& b)
+                                { return a.GetPosition().Z() < b.GetPosition().Z(); });
     if (min == fHits.end())
     {
         throw std::logic_error("R3BNeulandCluster::GetFirstHit(): Cluster has no Hits!");
@@ -30,9 +31,9 @@ R3BNeulandHit R3BNeulandCluster::GetForemostHit() const
 
 R3BNeulandHit R3BNeulandCluster::GetFirstHit() const
 {
-    auto min = std::min_element(fHits.cbegin(), fHits.cend(), [](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return a.GetT() < b.GetT();
-    });
+    auto min = std::min_element(fHits.cbegin(),
+                                fHits.cend(),
+                                [](const R3BNeulandHit& a, const R3BNeulandHit& b) { return a.GetT() < b.GetT(); });
     if (min == fHits.end())
     {
         throw std::logic_error("R3BNeulandCluster::GetFirstHit(): Cluster has no Hits!");
@@ -42,9 +43,9 @@ R3BNeulandHit R3BNeulandCluster::GetFirstHit() const
 
 R3BNeulandHit R3BNeulandCluster::GetLastHit() const
 {
-    auto max = std::max_element(fHits.cbegin(), fHits.cend(), [](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return a.GetT() < b.GetT();
-    });
+    auto max = std::max_element(fHits.cbegin(),
+                                fHits.cend(),
+                                [](const R3BNeulandHit& a, const R3BNeulandHit& b) { return a.GetT() < b.GetT(); });
     if (max == fHits.end())
     {
         throw std::logic_error("R3BNeulandCluster::GetLastHit(): Cluster has no Hits!");
@@ -54,9 +55,9 @@ R3BNeulandHit R3BNeulandCluster::GetLastHit() const
 
 R3BNeulandHit R3BNeulandCluster::GetMaxEnergyHit() const
 {
-    auto max = std::max_element(fHits.cbegin(), fHits.cend(), [](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return a.GetE() < b.GetE();
-    });
+    auto max = std::max_element(fHits.cbegin(),
+                                fHits.cend(),
+                                [](const R3BNeulandHit& a, const R3BNeulandHit& b) { return a.GetE() < b.GetE(); });
     if (max == fHits.end())
     {
         throw std::logic_error("R3BNeulandCluster::GetLastHit(): Cluster has no Hits!");
@@ -77,19 +78,22 @@ TVector3 R3BNeulandCluster::GetPosition() const { return GetFirstHit().GetPositi
 TVector3 R3BNeulandCluster::GetEnergyCentroid() const
 {
     // analog to Geometrical Centroid \vec{c} = \frac{\sum_i (\vec{r}_{i} \cdot V_i)}{\sum_i V_i}
-    TVector3 centroid =
-        std::accumulate(fHits.cbegin(), fHits.cend(), TVector3(), [](const TVector3& c, const R3BNeulandHit& hit) {
-            return c + (hit.GetPosition() * hit.GetE());
-        });
+    TVector3 centroid = std::accumulate(fHits.cbegin(),
+                                        fHits.cend(),
+                                        TVector3(),
+                                        [](const TVector3& c, const R3BNeulandHit& hit)
+                                        { return c + (hit.GetPosition() * hit.GetE()); });
     return centroid * (1. / GetE());
 }
 
 Double_t R3BNeulandCluster::GetEnergyMoment() const
 {
     const TVector3 centroid = GetEnergyCentroid();
-    Double_t mom = std::accumulate(fHits.cbegin(), fHits.cend(), 0., [&](const Double_t c, const R3BNeulandHit& hit) {
-        return c + (hit.GetPosition() - centroid).Mag() * hit.GetE();
-    });
+    Double_t mom = std::accumulate(fHits.cbegin(),
+                                   fHits.cend(),
+                                   0.,
+                                   [&](const Double_t c, const R3BNeulandHit& hit)
+                                   { return c + (hit.GetPosition() - centroid).Mag() * hit.GetE(); });
     return mom / GetE();
 }
 

@@ -56,9 +56,6 @@ class R3BXBallCrystalHitSim : public R3BXBallCrystalHit
                           Int_t pdgid,
                           Int_t uniqueid);
 
-    /** Copy constructor **/
-    R3BXBallCrystalHitSim(const R3BXBallCrystalHitSim& hit) { *this = hit; };
-
     /** Destructor **/
     virtual ~R3BXBallCrystalHitSim();
 
@@ -84,7 +81,7 @@ class R3BXBallCrystalHitSim : public R3BXBallCrystalHit
     void SetTrackUniqueID(Int_t uniqueid) { fTrackUniqueID = uniqueid; }
 
     /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
+    virtual void Print(const Option_t*) const;
 
   protected:
     Int_t fCrystalType;   // crystal type (1-5, the four kind of crystal shapes in the CB

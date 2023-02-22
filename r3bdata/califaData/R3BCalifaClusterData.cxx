@@ -23,13 +23,13 @@ R3BCalifaClusterData::R3BCalifaClusterData()
 }
 
 R3BCalifaClusterData::R3BCalifaClusterData(std::vector<Int_t> crystalList,
-                                   Double_t ene,
-                                   Double_t nf,
-                                   Double_t ns,
-                                   Double_t theta,
-                                   Double_t phi,
-                                   ULong64_t time,
-                                   Int_t clusterType)
+                                           Double_t ene,
+                                           Double_t nf,
+                                           Double_t ns,
+                                           Double_t theta,
+                                           Double_t phi,
+                                           ULong64_t time,
+                                           Int_t clusterType)
     : FairMultiLinkedData()
     , fCrystalList(crystalList)
     , fEnergy(ene)

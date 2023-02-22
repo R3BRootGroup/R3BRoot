@@ -31,11 +31,17 @@ class R3BCalifaClusterData : public FairMultiLinkedData
      *@param fTheta					Reconstructed theta
      *@param fPhi					Reconstructed phi
      **/
-    R3BCalifaClusterData(std::vector<Int_t> crystalList, Double_t ene, Double_t nf, Double_t ns, Double_t theta, Double_t phi, ULong64_t time,Int_t clusterType);
+    R3BCalifaClusterData(std::vector<Int_t> crystalList,
+                         Double_t ene,
+                         Double_t nf,
+                         Double_t ns,
+                         Double_t theta,
+                         Double_t phi,
+                         ULong64_t time,
+                         Int_t clusterType);
 
     /** Copy constructor **/
     R3BCalifaClusterData(const R3BCalifaClusterData&);
-
 
     R3BCalifaClusterData& operator=(const R3BCalifaClusterData&) { return *this; }
 
@@ -50,11 +56,10 @@ class R3BCalifaClusterData : public FairMultiLinkedData
     Double_t GetPhi() const { return fPhi; }
     ULong64_t GetTime() const { return fTime; }
     uint32_t GetClusterType() const { return fClusterType; }
-    Int_t GetNbOfCrystalHits()  const { return fCrystalList.size(); }
+    Int_t GetNbOfCrystalHits() const { return fCrystalList.size(); }
 
-    std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
-    Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
-
+    std::vector<Int_t> GetCrystalList() const { return fCrystalList; }
+    Int_t GetMotherCrystal() const { return fCrystalList.at(0); }
 
     /** Modifiers **/
     void SetEnergy(Double_t ene) { fEnergy = ene; }
@@ -64,15 +69,15 @@ class R3BCalifaClusterData : public FairMultiLinkedData
     void SetPhi(Double_t phi) { fPhi = phi; }
     void SetTime(ULong64_t time) { fTime = time; }
     void SetClusterType(uint32_t id) { fClusterType = id; }
-    void SetCrystalList(std::vector<Int_t> list) {fCrystalList = std::move(list);}
-  protected:
+    void SetCrystalList(std::vector<Int_t> list) { fCrystalList = std::move(list); }
 
-    Double_t fEnergy;        // total energy deposited
-    Double_t fNf;            // total Nf deposited
-    Double_t fNs;            // total Ns deposited
-    Double_t fTheta;         // reconstructed theta
-    Double_t fPhi;           // reconstructed phi
-    ULong64_t fTime;         // WR time stamp
+  protected:
+    Double_t fEnergy; // total energy deposited
+    Double_t fNf;     // total Nf deposited
+    Double_t fNs;     // total Ns deposited
+    Double_t fTheta;  // reconstructed theta
+    Double_t fPhi;    // reconstructed phi
+    ULong64_t fTime;  // WR time stamp
     uint32_t fClusterType;
     std::vector<Int_t> fCrystalList; // List with crystals inside the cluster. First one is the mother crystal
 

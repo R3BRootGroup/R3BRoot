@@ -21,7 +21,6 @@
 
 class R3BCalifaPoint : public FairMCPoint
 {
-
   public:
     /** Default constructor **/
     R3BCalifaPoint();
@@ -67,9 +66,6 @@ class R3BCalifaPoint : public FairMCPoint
     Double_t GetNf() const { return fNf; }
     Double_t GetNs() const { return fNs; }
     void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
-
-    /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
 
   protected:
     Int_t fCrystalId;    ///< crystal index

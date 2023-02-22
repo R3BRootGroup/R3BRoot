@@ -42,14 +42,11 @@ class R3BmTofDigi : public TObject
                 Double_t ntfpz,
                 Double_t ntfe);
 
-    /** Copy constructor **/
-    R3BmTofDigi(const R3BmTofDigi& point) { *this = point; };
-
     /** Destructor **/
     virtual ~R3BmTofDigi();
 
     /** Output to screen **/
-    virtual void Print(const Option_t* opt) const;
+    virtual void Print(const Option_t* opt = "") const;
 
     void Setntmul(Int_t mul) { Ntmul = mul; }
     Double_t Getntmul() { return Ntmul; }

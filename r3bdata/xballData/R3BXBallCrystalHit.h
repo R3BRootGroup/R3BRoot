@@ -40,9 +40,6 @@ class R3BXBallCrystalHit : public FairMultiLinkedData
      **/
     R3BXBallCrystalHit(Int_t crysnb, Double_t energy, Double_t time);
 
-    /** Copy constructor **/
-    R3BXBallCrystalHit(const R3BXBallCrystalHit& hit) { *this = hit; };
-
     /** Destructor **/
     virtual ~R3BXBallCrystalHit();
 

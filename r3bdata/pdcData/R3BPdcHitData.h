@@ -32,7 +32,7 @@ class R3BPdcHitData : public R3BHit
     virtual ~R3BPdcHitData() {}
     Int_t GetWireId() const;
 
-	private:
+  private:
     Int_t fWireId;
 
     ClassDef(R3BPdcHitData, 2)
