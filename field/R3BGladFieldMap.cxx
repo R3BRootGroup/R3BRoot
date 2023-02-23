@@ -24,6 +24,7 @@
 #include "TMath.h"
 
 #include "R3BGladFieldMap.h"
+#include "R3BLogger.h"
 
 using std::cerr;
 using std::cout;
@@ -55,14 +56,14 @@ R3BGladFieldMap::R3BGladFieldMap()
 
 // -------------   Standard constructor   ---------------------------------
 //
-R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
-    : FairField(mapName)
+R3BGladFieldMap::R3BGladFieldMap(const TString& mapName, const TString& fileType)
+    : FairField(mapName.Data())
 {
     // Default field positions (in cm) in lab:
     // between target position (0,0,0) and GLAD rotation point (field origin)
     // Override these values by calling SetPosition(x,y,z) before Init()
     fPosX = 0.;
-    fPosY = 0.;
+    fPosY = 1.75;
     fPosZ = 163.4;
 
     // Default translation vector of the local filed coordiantes
@@ -74,21 +75,43 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
     fYAngle = -14.;
     fZAngle = 0.;
 
-    fXmin = fYmin = fZmin = 0.;
-    fXmax = fYmax = fZmax = 0.;
-    fXstep = fYstep = fZstep = 0.;
-    fNx = fNy = fNz = 0;
+    fXmin = 0;
+    fYmin = 0;
+    fZmin = 0.;
+    fXmax = 0;
+    fYmax = 0;
+    fZmax = 0.;
+    fXstep = 0;
+    fYstep = 0;
+    fZstep = 0.;
+    fNx = 0;
+    fNy = 0;
+    fNz = 0;
     fScale = 1.;
-    fBx = fBy = fBz = NULL;
+    fBx = nullptr;
+    fBy = nullptr;
+    fBz = nullptr;
     fName = mapName;
     TString dir = getenv("VMCWORKDIR");
     fFileName = dir + "/field/magField/R3B/" + mapName;
     if (fileType[0] == 'R')
+    {
         fFileName += ".root";
+    }
     else
+    {
         fFileName += ".dat";
+    }
 
     fType = 2;
+}
+
+void R3BGladFieldMap::SetFieldfromCurrent(double current)
+{
+    R3BLOG_IF(fatal, TMath::Abs(current) > 3583.81, "GLAD current cannot be larger than 3583.81 A.");
+    fScale = current / 3583.81;
+    R3BLOG(info, "GLAD current set to " << current << " A, which corresponds to a scaling factor of " << fScale);
+    return;
 }
 
 // ------------   Constructor from R3BGladFieldPar   -----------------------
@@ -96,17 +119,29 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
 R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar)
 {
     fType = 2;
-    fPosX = fPosY = fPosZ = 0.;
-    fXAngle = fYAngle = fZAngle = 0.;
-    fXmin = fYmin = fZmin = 0.;
-    fXmax = fYmax = fZmax = 0.;
-    fXstep = fYstep = fZstep = 0.;
-    fNx = fNy = fNz = 0;
+    fPosX = 0;
+    fPosY = 0;
+    fPosZ = 0.;
+    fXAngle = 0;
+    fYAngle = 0;
+    fZAngle = 0.;
+    fXmin = 0;
+    fYmin = 0;
+    fZmin = 0.;
+    fXmax = 0;
+    fYmax = 0;
+    fZmax = 0.;
+    fXstep = 0;
+    fYstep = 0;
+    fZstep = 0.;
+    fNx = 0;
+    fNy = 0;
+    fNz = 0;
     fScale = 1.;
     fBx = fBy = fBz = NULL;
     if (!fieldPar)
     {
-        cerr << "-W- R3BGladFieldConst::R3BGladFieldMap: empty parameter container!" << endl;
+        R3BLOG(warn, "empty parameter container!");
         fName = "";
         fFileName = "";
         fType = 1;
@@ -150,8 +185,7 @@ void R3BGladFieldMap::Init()
         ReadRootFile(fFileName);
     else
     {
-        cerr << "-E- R3BGladFieldMap::Init: No proper file name defined! (" << fFileName << ")" << endl;
-        LOG(fatal) << "Init: No proper file name";
+        R3BLOG(fatal, "No proper file name defined! (" << fFileName.Data() << ")");
     }
     Print();
 }
@@ -160,7 +194,7 @@ void R3BGladFieldMap::Init()
 Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
 {
     TVector3 B = GetBtrans(x, y, z);
-    Double_t val = B.X() * 10.000000;
+    Double_t val = B.X() * 10.0;
     return (val); // should be in kGaus units
 }
 // -----------   Get y component of the field   ---------------------------
@@ -168,7 +202,7 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
 Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 {
     TVector3 B = GetBtrans(x, y, z);
-    Double_t val = B.Y() * 10.000000;
+    Double_t val = B.Y() * 10.0;
     return (val); // should be in kGaus units
 }
 
@@ -177,7 +211,7 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
 Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
 {
     TVector3 B = GetBtrans(x, y, z);
-    Double_t val = B.Z() * 10.000000;
+    Double_t val = B.Z() * 10.0;
     return (val); // should be in kGaus units
 }
 
@@ -317,14 +351,14 @@ Bool_t R3BGladFieldMap::IsInside(Double_t x,
 
 // ----------   Write the map to an ASCII file   --------------------------
 //
-void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
+void R3BGladFieldMap::WriteAsciiFile(const TString& fileName)
 {
     // Open file
-    cout << "-I- R3BGladFieldMap: Writing field map to ASCII file " << fileName << endl;
+    R3BLOG(info, "Writing field map to ASCII file " << fileName.Data());
     ofstream mapFile(fileName);
     if (!mapFile.is_open())
     {
-        cerr << "-E- R3BGladFieldMap:WriteAsciiFile: Could not open file! " << endl;
+        R3BLOG(error, "Could not open file!");
         return;
     }
 
@@ -345,7 +379,7 @@ void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
     Double_t factor = 10. * fScale; // Takes out scaling and converts kG->T
     cout << right;
     Int_t nTot = fNx * fNy * fNz;
-    cout << "-I- R3BGladFieldMap: " << fNx * fNy * fNz << " entries to write... " << setw(3) << 0 << " % ";
+    R3BLOG(info, fNx * fNy * fNz << " entries to write... " << setw(3) << 0 << " % ");
     Int_t index = 0;
     div_t modul;
     Int_t iDiv = TMath::Nint(nTot / 100.);
@@ -367,7 +401,7 @@ void R3BGladFieldMap::WriteAsciiFile(const char* fileName)
             } // z-Loop
         }     // y-Loop
     }         // x-Loop
-    cout << "   " << index + 1 << " written" << endl;
+    R3BLOG(info, "   " << index + 1 << " written");
     mapFile.close();
 }
 
@@ -383,46 +417,65 @@ void R3BGladFieldMap::SetPosition(Double_t x, Double_t y, Double_t z)
 
 // ---------   Screen output   --------------------------------------------
 //
-void R3BGladFieldMap::Print(Option_t* option) const
+void R3BGladFieldMap::Print(Option_t*) const
 {
     TString type = "Map";
     if (fType == 2)
+    {
         type = "Map sym2";
-    if (fType == 3)
+    }
+    else if (fType == 3)
+    {
         type = "Map sym3";
-    cout << "======================================================" << endl;
-    cout.precision(4);
-    cout << showpoint;
-    cout << "----  " << fTitle << " : " << fName << endl;
-    cout << "----" << endl;
-    cout << "----  Field type     : " << type << endl;
-    cout << "----" << endl;
-    cout << "----  Field map grid : " << endl;
-    cout << "----  x = " << setw(4) << fXmin << " to " << setw(4) << fXmax << " cm, " << fNx
-         << " grid points, dx = " << fXstep << " cm" << endl;
-    cout << "----  y = " << setw(4) << fYmin << " to " << setw(4) << fYmax << " cm, " << fNy
-         << " grid points, dy = " << fYstep << " cm" << endl;
-    cout << "----  z = " << setw(4) << fZmin << " to " << setw(4) << fZmax << " cm, " << fNz
-         << " grid points, dz = " << fZstep << " cm" << endl;
-    cout << endl;
-    cout << "----  Field centre position: ( " << setw(6) << fPosX << ", " << setw(6) << fPosY << ", " << setw(6)
-         << fPosZ << ") cm" << endl;
-    cout << "----  Field rotation X: " << setw(6) << fXAngle << " deg" << endl;
-    cout << "----  Field rotation Y: " << setw(6) << fYAngle << " deg" << endl;
-    cout << "----  Field rotation Z: " << setw(6) << fZAngle << " deg" << endl;
-    cout << "----  Field scaling factor: " << fScale << endl;
-    cout << "======================================================" << endl;
+    }
+
+    std::stringstream sprint;
+    sprint << endl;
+    sprint << "======================================================" << endl;
+    sprint.precision(4);
+    sprint << showpoint;
+    sprint << "----  " << fTitle << " : " << fName << endl;
+    sprint << "----" << endl;
+    sprint << "----  Field type     : " << type << endl;
+    sprint << "----" << endl;
+    sprint << "----  Field map grid : " << endl;
+    sprint << "----  x = " << setw(4) << fXmin << " to " << setw(4) << fXmax << " cm, " << fNx
+           << " grid points, dx = " << fXstep << " cm" << endl;
+    sprint << "----  y = " << setw(4) << fYmin << " to " << setw(4) << fYmax << " cm, " << fNy
+           << " grid points, dy = " << fYstep << " cm" << endl;
+    sprint << "----  z = " << setw(4) << fZmin << " to " << setw(4) << fZmax << " cm, " << fNz
+           << " grid points, dz = " << fZstep << " cm" << endl;
+    sprint << endl;
+    sprint << "----  Field centre position: ( " << setw(6) << fPosX << ", " << setw(6) << fPosY << ", " << setw(6)
+           << fPosZ << ") cm" << endl;
+    sprint << "----  Field rotation X: " << setw(6) << fXAngle << " deg" << endl;
+    sprint << "----  Field rotation Y: " << setw(6) << fYAngle << " deg" << endl;
+    sprint << "----  Field rotation Z: " << setw(6) << fZAngle << " deg" << endl;
+    sprint << "----  Field scaling factor: " << fScale << endl;
+    sprint << "======================================================" << endl;
+
+    R3BLOG(info, sprint.str());
 }
 
 // ---------    Reset parameters and data (private)  ----------------------
 //
 void R3BGladFieldMap::Reset()
 {
-    fPosX = fPosY = fPosZ = 0.;
-    fXmin = fYmin = fZmin = 0.;
-    fXmax = fYmax = fZmax = 0.;
-    fXstep = fYstep = fZstep = 0.;
-    fNx = fNy = fNz = 0;
+    fPosX = 0.;
+    fPosY = 0.;
+    fPosZ = 0.;
+    fXmin = 0.;
+    fYmin = 0.;
+    fZmin = 0.;
+    fXmax = 0.;
+    fYmax = 0.;
+    fZmax = 0.;
+    fXstep = 0.;
+    fYstep = 0.;
+    fZstep = 0.;
+    fNx = 0;
+    fNy = 0;
+    fNz = 0;
     fScale = 1.;
     if (fBx)
     {
@@ -443,29 +496,34 @@ void R3BGladFieldMap::Reset()
 
 // -----   Read field map from ASCII file (private)   ---------------------
 //
-void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
+void R3BGladFieldMap::ReadAsciiFile(const TString& fileName)
 {
     Double_t bx = 0., by = 0., bz = 0.;
     Double_t ax = 0., ay = 0., az = 0.;
 
     // Open file
-    cout << "-I- R3BGladFieldMap: Reading field map from ASCII file " << fileName << endl;
+    R3BLOG(info, "Reading field map from ASCII file " << fileName.Data());
     ifstream mapFile(fileName);
     if (!mapFile.is_open())
     {
-        cerr << "-E- R3BGladFieldMap:ReadAsciiFile: Could not open file! " << endl;
-        LOG(fatal) << "ReadAsciiFile: Could not open file";
+        R3BLOG(fatal, "Could not open file! ");
     }
     // Read map type
     TString type;
     mapFile >> type;
     Int_t iType = 0;
     if (type == "nosym")
+    {
         iType = 1;
-    if (type == "sym2")
+    }
+    else if (type == "sym2")
+    {
         iType = 2;
-    if (type == "sym3")
+    }
+    else if (type == "sym3")
+    {
         iType = 3;
+    }
 
     // Read grid parameters
     mapFile >> fXmin >> fXmax >> fNx;
@@ -487,7 +545,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
     Double_t factor = fScale * 10.; // Factor 10 for T -> kG
     cout << right;
     Int_t nTot = fNx * fNy * fNz;
-    cout << "-I- R3BGladFieldMap: " << nTot << " entries to read... " << setw(3) << 0 << " % ";
+    R3BLOG(info, nTot << " entries to read... " << setw(3) << 0 << " % ");
     Int_t index = 0;
     div_t modul;
     Int_t iDiv = TMath::Nint(nTot / 100.);
@@ -498,8 +556,9 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
             for (Int_t iz = 0; iz < fNz; iz++)
             {
                 if (!mapFile.good())
-                    cerr << "-E- R3BGladFieldMap::ReadAsciiFile: "
-                         << "I/O Error at " << ix << " " << iy << " " << iz << endl;
+                {
+                    R3BLOG(error, "I/O Error at " << ix << " " << iy << " " << iz);
+                }
                 index = ix * fNy * fNz + iy * fNz + iz;
                 modul = div(index, iDiv);
                 if (modul.rem == 0)
@@ -527,9 +586,9 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
                 //  cout << "-I- " << bx << " : " << by << " : "  << bz  << " : " << endl;
                 if (mapFile.eof())
                 {
-                    cerr << endl
-                         << "-E- R3BGladFieldMap::ReadAsciiFile: EOF"
-                         << " reached at " << ix << " " << iy << " " << iz << endl;
+                    R3BLOG(error,
+                           " EOF"
+                               << " reached at " << ix << " " << iy << " " << iz);
                     mapFile.close();
                     break;
                 }
@@ -537,22 +596,20 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName)
         }     // y-Loop
     }         // x-Loop
 
-    cout << "   " << index + 1 << " read" << endl;
-
+    R3BLOG(info, "   " << index + 1 << " read");
     mapFile.close();
 }
 
 // -----   Read field map from ROOT file (private)   ---------------------
 //
-void R3BGladFieldMap::ReadRootFile(const char* fileName)
+void R3BGladFieldMap::ReadRootFile(const TString& fileName)
 {
     // Opening root file
-    cout << "-I- R3BGladFieldMap: Reading field map from ROOT file " << fileName;
+    R3BLOG(info, "Reading field map from ROOT file " << fileName.Data());
     fFile = new TFile(fileName, "READ");
     if (!(fFile->IsOpen()))
     {
-        cerr << "-E- R3BGladFieldMap::ReadRootFile: Cannot read from file! " << endl;
-        LOG(fatal) << "ReadRootFile: Cannot read from file";
+        R3BLOG(fatal, "Cannot read from file!");
     }
 
     TTree* fTreeMap = NULL;
@@ -560,8 +617,8 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
 
     if (!fTreeMap)
     {
-        cerr << "-E- R3BGladFieldMap::ReadRootFile: no TTree named 'tree' found in the file" << fileName;
-        LOG(fatal) << "No field map data";
+        R3BLOG(error, "No TTree named 'tree' found in the file " << fileName.Data());
+        R3BLOG(fatal, "No field map data");
     }
 
     Double_t tBx, tBy, tBz; // branches
@@ -596,7 +653,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
 
     Long64_t Nentries = fTreeMap->GetEntries();
 
-    cout << "\n-I- Reading GLAD field data from root tree" << endl;
+    R3BLOG(info, "Reading GLAD field data from root tree");
 
     TVector3 fBvec;
 
@@ -613,7 +670,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName)
         fBy->AddAt(fBvec.Y(), ev - 3);
         fBz->AddAt(fBvec.Z(), ev - 3);
     }
-    cout << "\n-I- Finished reading root tree" << endl;
+    R3BLOG(info, "Finished reading root tree");
 
     return;
 }

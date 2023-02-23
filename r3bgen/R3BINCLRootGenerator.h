@@ -63,17 +63,17 @@ class R3BINCLRootGenerator : public FairGenerator
     /**
      ** Method to simulate only fission events
      **/
-    void SetOnlyFission(Bool_t Opt) { fOnlyFission = Opt; }
+    void SetOnlyFission(Bool_t Opt = true) { fOnlyFission = Opt; }
 
     /**
      **  Method to simulate only spallation events
      **/
-    void SetOnlySpallation(Bool_t Opt) { fOnlySpallation = Opt; }
+    void SetOnlySpallation(Bool_t Opt = true) { fOnlySpallation = Opt; }
 
     /**
      **  Method to simulate only p2p-fission events
      **/
-    void SetOnlyP2pFission(Bool_t Opt) { fOnlyP2pFission = Opt; }
+    void SetOnlyP2pFission(Bool_t Opt = true) { fOnlyP2pFission = Opt; }
 
   private:
     TString fFileName; // Input file name
@@ -86,7 +86,7 @@ class R3BINCLRootGenerator : public FairGenerator
      ** any ion needed. TODO: Should not be needed by FairRoot. **/
     void RegisterIons();
 
-    inline Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10 * 1000 * z + 10 * a; }
+    inline Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10000 * z + 10 * a; }
 
     Int_t fEvt;
     TTree* Tree;

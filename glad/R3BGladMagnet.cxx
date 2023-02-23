@@ -18,7 +18,7 @@
 //       for the geometry creation (v17) and (v2023.1).
 //       These will move also old files.
 const Double_t __GLAD_POS_DX = -42.0; // offset on the Z axis
-const Double_t __GLAD_POS_DY = 2.0;   // offset on the Y axis (2cm with respect to the beam line)
+const Double_t __GLAD_POS_DY = 1.75;  // offset on the Y axis (2cm with respect to the beam line)
 const Double_t __GLAD_POS_DZ = 308.8; // offset on the Z axis (distance from target)
 const Double_t __GLAD_ROT = 14;       // rotation on the -Y axis
 const TString __GLAD_NAME = "Glad Magnet";
