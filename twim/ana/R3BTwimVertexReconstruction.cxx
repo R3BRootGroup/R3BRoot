@@ -59,23 +59,15 @@ InitStatus R3BTwimVertexReconstruction::Init()
 {
     R3BLOG(info, "");
     FairRootManager* rootManager = FairRootManager::Instance();
-    if (!rootManager)
-    {
-        R3BLOG(fatal, "FairRootManager not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, !rootManager, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("EventHeader."));
-    R3BLOG_IF(error, !header, "EventHeadder. not found");
+    R3BLOG_IF(warn, !header, "EventHeadder. not found");
 
     // INPUT DATA
     // get access to twim hit data
     fTwimHitDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("TwimHitData"));
-    if (!fTwimHitDataCA)
-    {
-        R3BLOG(fatal, "TwimHitData not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, !fTwimHitDataCA, "TwimHitData not found");
 
     return kSUCCESS;
 }
