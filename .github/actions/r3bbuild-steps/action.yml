@@ -1,0 +1,49 @@
+name: build-steps
+description: 'steps to build R3BRoot and ucesb'
+
+
+inputs:
+  ucesb-cache-existed:
+    description: 'has ucesb build cache'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: check
+      run: |
+        echo "${{ inputs.ucesb-cache-existed }}"
+      shell: bash
+
+    - name: build ucesb
+      if: inputs.ucesb-cache-existed != 'true'
+      run: |
+        echo "ucesb directory is set as ${UCESB_DIR}"
+        export LD_LIBRARY_PATH="${SIMPATH}/lib/:${LD_LIBRARY_PATH}"
+        git clone https://git.chalmers.se/expsubphys/ucesb.git ${UCESB_DIR}
+        cd ${UCESB_DIR} && make -j${NUM_THREADS} empty/empty
+      shell: bash
+
+    - if: ${{ matrix.url }}
+      name: add other repos
+      run: |
+        cd $GITHUB_WORKSPACE
+        for url in ${{ matrix.url }};
+        do
+          git clone -b dev ${url}
+        done
+      shell: bash
+
+    - name: cmake configure ${{ matrix.repos }}
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        git clone https://github.com/R3BRootGroup/macros.git
+        cmake --fresh . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DBUILD_GEOMETRY=OFF -DUSE_DIFFERENT_COMPILER=TRUE \
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+      shell: bash
+
+    - name: cmake build ${{ matrix.repos }}
+      run: |
+        cmake --build ./build -- -j ${NUM_THREADS}
+      shell: bash
