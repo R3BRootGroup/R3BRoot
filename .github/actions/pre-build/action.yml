@@ -1,0 +1,37 @@
+name: pre build
+description: 'steps before building R3BRoot'
+
+runs:
+  using: composite
+  steps:
+    - name: set env variables
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        echo "UCESB_DIR=$GITHUB_WORKSPACE/ucesb/" >> $GITHUB_ENV
+        export SIMPATH=${CVMDIR}/debian10/fairsoft/nov22p1
+        echo "SIMPATH=${SIMPATH}" >> $GITHUB_ENV
+        echo "FAIRROOTPATH=${CVMDIR}/debian10/fairroot/v18.8.0_fs_nov22p1" >> $GITHUB_ENV
+        echo "${SIMPATH}/bin" >> $GITHUB_PATH
+        # variables for ccache
+        echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+        echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+        echo "SOURCEDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+        echo "BUILDDIR=$GITHUB_WORKSPACE/build" >> $GITHUB_ENV
+        echo "cacheSHA=$([[ ${{github.event_name}} = "push" ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
+      shell: bash
+
+
+    - name: mount cvmfs
+      run: |
+        apt-get install -y ccache
+        wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
+        mv masterkey.gsi.de.pub /etc/cvmfs/keys
+        cp .githubfiles/fairsoft.gsi.de.conf /etc/cvmfs/config.d
+        mkdir -p ${CVMDIR}
+        mount -t cvmfs fairsoft.gsi.de ${CVMDIR}
+        mkdir -p ${UCESB_DIR}
+        mkdir -p ${CCACHE_DIR}
+        echo $PATH
+      shell: bash

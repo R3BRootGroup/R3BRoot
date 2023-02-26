@@ -1,0 +1,36 @@
+name: cache-steps
+description: 'steps to cache R3BRoot and ucesb'
+
+
+inputs:
+  r3b-dev-SHA:
+    description: 'SHA for r3b dev cache'
+    required: true
+  repo:
+    description: 'repository name'
+    required: true
+outputs:
+  ucesb-hit:
+    description: 'whether ucesb cache is hit'
+    value: ${{steps.cache-ucesb.outputs.cache-hit}}
+  r3b-hit:
+    description: 'whether r3b cache is hit'
+    value: ${{steps.cache-r3b.outputs.cache-hit}}
+
+runs:
+  using: composite
+  steps:
+    - name: cache ucesb
+      # if: inputs.repo == 'r3broot'
+      id: cache-ucesb
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.UCESB_DIR }}
+        key: ucesb-build
+
+    - name: cache r3b
+      id: cache-r3b
+      uses: actions/cache@v3
+      with:
+        path: .ccache
+        key: r3b-build-${{ inputs.repo }}-${{ inputs.r3b-dev-SHA }}

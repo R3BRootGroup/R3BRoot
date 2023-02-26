@@ -42,7 +42,7 @@ if(GTEST_FOUND)
 
     add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
     target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
-    gtest_discover_tests(${PROJECT_TEST_NAME})
+    gtest_discover_tests(${PROJECT_TEST_NAME} DISCOVERY_TIMEOUT 600)
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
