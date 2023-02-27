@@ -30,11 +30,14 @@
 class TH1D;
 class TH2D;
 class TH3D;
+class TH1I;
 
 class R3BNeulandHitMon : public FairTask
 {
   public:
-    R3BNeulandHitMon(TString input = "NeulandHits", TString output = "NeulandHitMon", const Option_t* option = "");
+    explicit R3BNeulandHitMon(TString input = "NeulandHits",
+                              TString output = "NeulandHitMon",
+                              const Option_t* option = "");
 
     ~R3BNeulandHitMon() override = default;
 
@@ -49,40 +52,40 @@ class R3BNeulandHitMon : public FairTask
     void Finish() override;
 
   public:
-    void Exec(Option_t*) override;
+    void Exec(Option_t* /*option*/) override;
 
-    void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
+    void SetDistanceToTarget(double distance) { fDistanceToTarget = distance; }
 
   private:
     TString fOutput;
 
     TCAInputConnector<R3BNeulandHit> fHits;
 
-    double fDistanceToTarget;
+    double fDistanceToTarget = 0.;
 
-    Bool_t fIs3DTrackEnabled;
-    TH3D* fh3;
+    Bool_t fIs3DTrackEnabled = false;
+    TH3D* fh3 = nullptr;
 
-    TH1D* hTime;
-    TH1D* hTimeAdj;
-    TH1D* hMult;
-    TH1D* hDepth;
-    TH1D* hForemostEnergy;
-    TH1D* hSternmostEnergy;
-    TH2D* hDepthVSForemostEnergy;
-    TH2D* hDepthVSSternmostEnergy;
-    TH1D* hEtot;
-    TH1D* hE;
-    TH1D* hX;
-    TH1D* hY;
-    TH1D* hT;
-    TH1D* hTNeigh;
-    TH2D* hDepthVSEtot;
-    TH2D* hPosVSEnergy;
-    TH2D* hdeltaEE;
-    TH1D* hBeta;
+    TH1D* hTime = nullptr;
+    TH1D* hTimeAdj = nullptr;
+    TH1I* hMult = nullptr;
+    TH1D* hDepth = nullptr;
+    TH1D* hForemostEnergy = nullptr;
+    TH1D* hSternmostEnergy = nullptr;
+    TH2D* hDepthVSForemostEnergy = nullptr;
+    TH2D* hDepthVSSternmostEnergy = nullptr;
+    TH1D* hEtot = nullptr;
+    TH1D* hE = nullptr;
+    TH1D* hX = nullptr;
+    TH1D* hY = nullptr;
+    TH1D* hT = nullptr;
+    TH1D* hTNeigh = nullptr;
+    TH2D* hDepthVSEtot = nullptr;
+    TH2D* hPosVSEnergy = nullptr;
+    TH2D* hdeltaEE = nullptr;
+    TH1D* hBeta = nullptr;
 
-    ClassDefOverride(R3BNeulandHitMon, 0);
+    ClassDefOverride(R3BNeulandHitMon, 0); // NOLINT
 };
 
 #endif // R3BNEULANDHITMON_H

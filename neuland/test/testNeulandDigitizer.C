@@ -16,7 +16,7 @@ void testNeulandDigitizer()
     TStopwatch timer;
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("warn");
+    FairLogger::GetLogger()->SetLogScreenLevel("debug");
 
     FairRunAna run;
     run.SetSource(new FairFileSource("test.simu.root"));
@@ -26,7 +26,7 @@ void testNeulandDigitizer()
     io->open("test.para.root");
     run.GetRuntimeDb()->setFirstInput(io);
 
-    run.AddTask(new R3BNeulandDigitizer());
+    run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::channelTamex));
     run.AddTask(new R3BNeulandClusterFinder());
     run.AddTask(new R3BNeulandPrimaryInteractionFinder());
     run.AddTask(new R3BNeulandPrimaryClusterFinder());
