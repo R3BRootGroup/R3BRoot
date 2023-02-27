@@ -8,6 +8,35 @@
 #include "TStopwatch.h"
 #include <iostream>
 
+// trailing return
+int myfun() { return 0; }
+
+void test()
+{
+    // uninitialzed variable:
+    int num;
+
+    // c array:
+    int c_arr[3];
+
+    // magic number:
+    int magic = 78;
+
+    // delete:
+    auto file = new TString{};
+    delete file;
+
+    // mordenize using
+    typedef int intv;
+
+    // ranged for loop:
+    auto vec = std::vector<intv>(10, 0);
+    for (int i = 0; i < vec.size(); i++)
+    {
+        vec[i] = 1;
+    }
+}
+
 int main()
 {
     TStopwatch timer;
