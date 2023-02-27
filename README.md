@@ -55,5 +55,10 @@ make -j8 test
 This is performed from the GitHub parameter and data analysis repository, which contains all the macros and parameter files needed by the user to carry out the simulations and data analysis of each experiment. There is one repository per experiment, please, visit the [R3B-Wiki](https://wiki.r3b-nustar.de) for more details.
 
 ## Contributing
-Please ask your questions, request features, and report issues by [creating a github issue](https://github.com/R3BRootGroup/R3BRoot/issues/new).
+Please ask your questions, request features, and report issues by [creating a github issue](https://github.com/R3BRootGroup/R3BRoot/issues/new/choose).
 
+## Code Formatting
+The R3BRoot project uses clang-format-15 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
+~~~bash
+source util/clang-format-all.sh
+~~~
