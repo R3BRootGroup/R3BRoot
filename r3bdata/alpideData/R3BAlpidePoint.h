@@ -104,7 +104,7 @@ class R3BAlpidePoint : public FairMCPoint
     Double32_t fX_out, fY_out, fZ_out, fEloss;
     Double32_t fPx_out, fPy_out, fPz_out;
 
-    ClassDef(R3BAlpidePoint, 1)
+    ClassDef(R3BAlpidePoint, 2)
 };
 
 inline void R3BAlpidePoint::SetPositionOut(TVector3 pos)
