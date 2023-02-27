@@ -1,0 +1,48 @@
+name: static analysis
+on:
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+    container: 
+      image: yanzhaowang/fairroot:v18.8.0
+      options: --user root
+    steps:
+    - name: install deps
+      run: |
+        apt-get update -y && apt-get install -y git
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: cmake configure
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        git clone https://github.com/R3BRootGroup/macros.git
+        cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=on 
+
+    - name: clang-tidy check
+      run: |
+        mkdir -p clang-tidy-result
+        git diff -U0 HEAD^ | clang-tidy-diff-15.py -p1 -path build -export-fixes clang-tidy-result/fixes.yml |\
+        sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): warning:/::warning file=\1,line=\2,col=\3::/'
+        echo "WARN_NUM=$(grep -w "^ *Message:" clang-tidy-result/fixes.yml | wc -l | xargs)" >> $GITHUB_ENV
+
+    - name: clang-tidy results
+      run: |
+          if [ "${{ env.WARN_NUM }}" -eq "0" ]; then
+            echo "::notice::All clean, LGTM!"
+          else
+            cat clang-tidy-result/fixes.yml
+            echo "::notice::Clang-tidy generates ${{ env.WARN_NUM }} warnings! Please fix them before being merged."
+            exit 1
+          fi
+      shell: bash
