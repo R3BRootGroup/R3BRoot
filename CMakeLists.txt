@@ -92,7 +92,7 @@ list(APPEND optional_root_components gdml vmc)
 find_package2(PUBLIC ROOT  VERSION 6.10.00 REQUIRED
   COMPONENTS ${required_root_components}
   OPTIONAL_COMPONENTS ${optional_root_components})
-  
+
 if("${ROOT_vmc_FOUND}" MATCHES "no")
   find_package2(PUBLIC VMC REQUIRED)
   set(VMCLIB VMCLibrary)
@@ -151,7 +151,7 @@ if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
 #if(BUILD_UNITTESTS)
 # list(APPEND boost_dependencies unit_test_framework)
 #endif()
-  
+
 #  find_package2(PUBLIC Boost
 #  VERSION 1.67
 #  COMPONENTS ${boost_dependencies}
@@ -439,7 +439,7 @@ if(NOT MODULE)
     add_subdirectory(fi30)
     add_subdirectory(fi31)
     add_subdirectory(fi32)
-    add_subdirectory(fi33)    
+    add_subdirectory(fi33)
     add_subdirectory(sfi)
     add_subdirectory(land)
     add_subdirectory(neuland)
@@ -533,6 +533,18 @@ WRITE_CONFIG_FILE(config.sh_install)
 WRITE_CONFIG_FILE(config.csh_install)
 
 write_env_cache(env_cache.sh)
+
+# Get rid of leftover c3w configuration
+execute_process(COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/GNUmakefile
+                              ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
+
+if (EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
+  set(BUILD_C3W ON)
+  set(c3w_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/util/c3w/${CR}")
+  add_subdirectory(util/c3w)
+else()
+  set(c3w_summary "${BYellow}NO${CR}")
+endif()
 
 # Summary ######################################################################
 if(CMAKE_CXX_FLAGS)
@@ -658,6 +670,8 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     unset(version_req_str)
   endforeach()
 endif()
+
+message(STATUS "  ${BWhite}C3W${CR}                  ${c3w_summary}")
 
 message(STATUS "  ")
 ################################################################################
