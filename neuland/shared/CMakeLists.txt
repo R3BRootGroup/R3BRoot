@@ -14,16 +14,12 @@
 set(LIBRARY_NAME R3BNeulandShared)
 set(LINKDEF NeulandSharedLinkDef.h)
 
-set(DEPENDENCIES R3BData R3BBase ParBase)
+set(DEPENDENCIES R3BData R3BBase ParBase Boost::program_options)
 
 include_directories(${INCLUDE_DIRECTORIES})
 
-set(SRCS
-    ElasticScattering.cxx
-    IsElastic.cxx
-    R3BNeulandGeoPar.cxx
-    R3BNeulandContFact.cxx
-    R3BNeulandVisualizer.cxx)
+set(SRCS ElasticScattering.cxx IsElastic.cxx R3BNeulandGeoPar.cxx R3BNeulandContFact.cxx
+         R3BProgramOptions.cxx R3BNeulandVisualizer.cxx)
 
 set(HEADERS
     ClusteringEngine.h
@@ -32,6 +28,7 @@ set(HEADERS
     TCAConnector.h
     Validated.h
     IsElastic.h
+    R3BProgramOptions.h
     R3BNeulandGeoPar.h
     R3BNeulandContFact.h
     R3BNeulandVisualizer.h

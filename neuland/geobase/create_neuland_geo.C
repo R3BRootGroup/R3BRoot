@@ -17,7 +17,7 @@
 #include <iomanip>
 #include <iostream>
 
-void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v2022.5")
+void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v3")
 {
     new FairGeoLoader("TGeo", "FairGeoLoader");
     gGeoManager->SetName("NEULANDgeom");
@@ -61,7 +61,10 @@ void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v2022.
     gGeoManager->Test();
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = TString(gSystem->Getenv("VMCWORKDIR")) + "/geometry/neuland_" + geoTag + ".geo.root";
+    TString geoFileName = TString::Format("%s/geometry/neuland_%s_%ddp.geo.root",
+                                          TString(gSystem->Getenv("VMCWORKDIR")).Data(),
+                                          geoTag.Data(),
+                                          nPlanes / 2);
     TFile* geoFile = new TFile(geoFileName, "RECREATE");
     top->Write();
     geoFile->Close();
