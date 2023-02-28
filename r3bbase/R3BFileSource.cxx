@@ -491,7 +491,7 @@ Int_t R3BFileSource::ReadEvent(UInt_t i)
         fflush(stdout);
     }
 
-    if (nextts >= 0 && prevts >= 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
+    if (nextts > 0 && prevts >= 0 && (fEvtHeader->GetTimeStamp() > nextts || fEvtHeader->GetTimeStamp() < prevts))
     {
         fRunId = GetRunid(fEvtHeader->GetTimeStamp());
     }
