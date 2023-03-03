@@ -107,7 +107,7 @@ class R3BUcesbSource : public FairSource
     /* R3B header */
     R3BEventHeader* fEventHeader;
     Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
-    TString fInputFileName;
+ //   TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
 

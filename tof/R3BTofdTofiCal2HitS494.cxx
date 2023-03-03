@@ -33,6 +33,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 #include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -219,25 +220,32 @@ InitStatus R3BTofdTofiCal2HitS494::Init()
         return kFATAL;
     }
 
-    fHitParTofi = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
-    if (!fHitParTofi)
+    // if(!fSimu)
     {
-        LOG(error) << "Could not get access to TofiHitPar-Container.";
-        fNofHitParsTofi = 0;
-        return kFATAL;
-    }
-    fNofHitParsTofi = fHitParTofi->GetNumModulePar();
-    if (fNofHitParsTofi == 0)
-    {
-        LOG(error) << "There are no Hit parameters in container TofiHitPar";
-        return kFATAL;
+        fHitParTofi = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+        if (!fHitParTofi)
+        {
+            LOG(error) << "Could not get access to TofiHitPar-Container.";
+            fNofHitParsTofi = 0;
+            return kFATAL;
+        }
+        fNofHitParsTofi = fHitParTofi->GetNumModulePar();
+        if (fNofHitParsTofi == 0)
+        {
+            LOG(error) << "There are no Hit parameters in container TofiHitPar";
+            return kFATAL;
+        }
     }
 
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     for (int det = 0; det < DET_MAX; det++)
     {
@@ -312,12 +320,15 @@ void R3BTofdTofiCal2HitS494::SetParContainers()
         fNofHitPars = 0;
         return;
     }
-    fHitParTofi = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
-    if (!fHitParTofi)
+    // if(!fSimu)
     {
-        LOG(error) << "Could not get access to TofiHitPar-Container.";
-        fNofHitParsTofi = 0;
-        return;
+        fHitParTofi = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
+        if (!fHitParTofi)
+        {
+            LOG(error) << "Could not get access to TofiHitPar-Container.";
+            fNofHitParsTofi = 0;
+            return;
+        }
     }
 }
 
@@ -339,7 +350,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
         std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %)"
                   << std::flush;
     ++counter;
-
+    // cout<<"trigger soll: "<<fTrigger <<", triggert ist: "<<header->GetTrigger()<<endl;
     // test for requested trigger (if possible)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
     {
@@ -558,8 +569,8 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     Int_t iBar = top->GetBarId();        // 1..n
                     if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                     {
-                        LOG(error) << "R3BTofdCal2HitS494Par::Exec() : more planes than expected! Det: " << iPlane
-                                   << " allowed are 1.." << fNofPlanes;
+                        //   LOG(error) << "R3BTofdCal2HitS494Par::Exec() : more planes than expected! Det: " << iPlane
+                        //            << " allowed are 1.." << fNofPlanes;
                         continue;
                     }
                     if (iBar > fPaddlesPerPlane) // same here
@@ -627,6 +638,9 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     auto posToT =
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
+                    //    cout<<"TOFD POS: "<<posToT<<"; "<<par->GetLambda() <<", "<<par->GetToTOffset2()<<";
+                    //    "<<par->GetToTOffset1()<<", "<<top_tot<<", "<<bot_tot<<endl;
+
                     // cout << "Test2: " << posToT << " bot: " << bot_tot << " top: " << top_tot << " offsets: " <<
                     // par->GetToTOffset1() << "  " << par->GetToTOffset2() << " lambda: " << par->GetLambda() << endl;
 
@@ -670,6 +684,8 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                             qb = TMath::Sqrt(top_tot * bot_tot) /
                                  (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                             qb = qb * fTofdQ;
+
+                            //   cout<<"TOFD Q: "<<para[0]<<"; "<<para[1]<<"; "<<para[2]<<", "<<para[3]<<", "<<qb<<endl;
                         }
                         else
                         {
@@ -702,6 +718,8 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     parz[0] = par->GetPar1za();
                     parz[1] = par->GetPar1zb();
                     parz[2] = par->GetPar1zc();
+
+                    // cout<<"parz: "<<parz[0]<<", "<<parz[1]<<", "<<parz[2]<<endl;
 
                     if (parz[0] > 0 && parz[2] > 0)
                         LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1]
@@ -1045,7 +1063,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
     } // End of ToFD
 
     // ***** TOFI *****************
-    if (1 == 1)
+    if (1 == 1) //&& !fSimu)
     {
         Double_t timeP0 = 0.;
         Double_t randx;
@@ -1250,6 +1268,10 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     auto posToT = parTofi->GetLambda() *
                                   log((top_tot * parTofi->GetToTOffset2()) / (bot_tot * parTofi->GetToTOffset1()));
 
+                    //  cout<<"TOFI POS: "<<posToT<<", "<<parTofi->GetLambda()<<", "<<parTofi->GetToTOffset2()<<",
+                    //  "<<parTofi->GetToTOffset1()<<"; "<<top_tot<<
+                    //", "<<bot_tot<<endl;
+
                     if (fTofiTotPos)
                         pos = posToT;
 
@@ -1261,8 +1283,8 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     if (fTofiGap > 0.)
                         gap_center_layer = fTofiGap;
                     // define number of layers and paddles with sizes of the detector
-                    Int_t number_layers = N_TOFI_HIT_PLANE_MAX;   // Sabina 2;   // number of layers
-                    Int_t number_paddles = N_TOFI_HIT_PADDLE_MAX; // number of paddles per layer
+                    Int_t number_layers = fNofPlanesTofi;        // Sabina 2;   // number of layers
+                    Int_t number_paddles = fPaddlesPerPlaneTofi; // number of paddles per layer
                     Float_t detector_width =
                         number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + gap_center_layer;
                     Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
@@ -1299,9 +1321,12 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                         para[1] = parTofi->GetPolb();
                         para[2] = parTofi->GetPolc();
                         para[3] = parTofi->GetPold();
+
                         qb = TMath::Sqrt(top_tot * bot_tot) /
                              (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                         qb = qb * fTofiQ;
+
+                        // cout<<"TOFI Q: "<<para[0]<<"; "<<para[1]<<"; "<<para[2]<<", "<<para[3]<<", "<<qb<<endl;
                     }
                     else
                     {
@@ -1362,6 +1387,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     }
                     LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
+                    // cout<<"parz: "<<parz[0]<<", "<<parz[1]<<", "<<parz[2]<<endl;
                     if (parz[0] > 0 && parz[2] > 0)
                     {
                         event.push_back({ parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar });
@@ -1517,6 +1543,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                                         event[hit].charge,
                                         event[hit].plane + fNofPlanes, // +2 in order to add Tofi as 3rd Tofd plane
                                         event[hit].bar); AKH*/
+
                 finevent.push_back({ event[hit].charge,
                                      event[hit].time,
                                      event[hit].xpos,

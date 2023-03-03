@@ -51,7 +51,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
@@ -67,6 +67,8 @@ R3BModule.cxx
 R3BLogger.cxx
 R3BDetector.cxx 
 R3BEventHeader.cxx
+R3BEventHeaderPropagator.cxx
+R3BFileSource.cxx
 R3BEventHeaderCal2Hit.cxx
 R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx

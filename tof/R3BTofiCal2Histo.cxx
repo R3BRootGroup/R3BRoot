@@ -25,6 +25,7 @@
 #include "FairRtdbRun.h"
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TCanvas.h"
 #include "TClonesArray.h"
@@ -165,7 +166,12 @@ InitStatus R3BTofiCal2Histo::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
+
     // may be = NULL!
 
     fCalData = (TClonesArray*)rm->GetObject("TofiCal");

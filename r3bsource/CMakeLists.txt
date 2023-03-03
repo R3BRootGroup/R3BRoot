@@ -33,7 +33,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
-${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
@@ -41,7 +41,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
-${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
+#${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
@@ -113,7 +113,7 @@ R3BLosReader.cxx
 R3BRoluReader.cxx
 R3BSci2Reader.cxx
 R3BSci8Reader.cxx
-R3BSfibReader.cxx
+#R3BSfibReader.cxx
 R3BTofdReader.cxx
 R3BTofiReader.cxx
 R3BPdcReader.cxx
@@ -121,7 +121,7 @@ R3BCalifaFebexReader.cxx
 R3BPtofReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
-R3BStrawtubesReader.cxx
+#R3BStrawtubesReader.cxx
 R3BStartrackReader.cxx
 R3BAmsReader.cxx
 R3BMusicReader.cxx
@@ -169,7 +169,7 @@ ext/ext_h101_fib33.h
 ext/ext_h101_rolu.h
 ext/ext_h101_sci2.h
 ext/ext_h101_sci8.h
-ext/ext_h101_sfib.h
+#ext/ext_h101_sfib.h
 ext/ext_h101_tofd.h
 ext/ext_h101_tofd.h
 ext/ext_h101_ptof.h
@@ -177,7 +177,7 @@ ext/ext_h101_psp.h
 ext/ext_h101_califa.h
 ext/ext_h101_raw_nnp_tacquila.h
 ext/ext_h101_raw_nnp_tamex.h
-ext/ext_h101_strawtubes.h
+#ext/ext_h101_strawtubes.h
 ext/ext_h101_star.h
 ext/ext_h101_fibfour.h
 ext/ext_h101_ams.h
@@ -195,7 +195,7 @@ set(LINKDEF_FILE R3BLinkDef.h)
 set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools
     R3Bbase R3BData Core Geom GenVector
-    Physics Matrix MathCore R3BPsp
+    Physics Matrix MathCore R3BPsp R3BCalifa
     ${ucesb_LIBRARY_SHARED})
 set(LIBRARY_NAME R3Bsource)
 

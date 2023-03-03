@@ -35,6 +35,8 @@
 #include "R3BTrackingParticle.h"
 #include "R3BTrackingSetup.h"
 
+#include "R3BCalifaClusterData.h"
+#include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTHitData.h"
@@ -47,6 +49,8 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "R3BEventHeader.h"
+#include "R3BLogger.h"
 
 #include "TArc.h"
 #include "TClonesArray.h"
@@ -160,6 +164,12 @@ InitStatus R3BFragmentTrackerS494::Init()
 
     FairRootManager* man = FairRootManager::Instance();
 
+    header = dynamic_cast<R3BEventHeader*>(man->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
+
     // Get objects for detectors on all levels
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
     if (fArrayMCTracks)
@@ -175,41 +185,49 @@ InitStatus R3BFragmentTrackerS494::Init()
 
     for (int det = 0; det < DET_MAX; det++)
     {
-        fArrayHits.push_back((TClonesArray*)man->GetObject(Form("%sHit", fDetectorNames[det])));
+        cout << "Reading detector " << det << ", " << fDetectorNames[det] << endl;
 
-        if (det == DET_MAX - 1)
+        if (det == 0) // CALIFA
+            fMappedItems.push_back((TClonesArray*)man->GetObject(Form("%sMappedData", fDetectorNames[0])));
+        else
+            fMappedItems.push_back((TClonesArray*)man->GetObject(Form("%sMapped", fDetectorNames[det])));
+        if (NULL == fMappedItems.at(det))
+        {
+            printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
+        }
+        if (det == 9)
             maxevent = man->CheckMaxEventNo();
+        if (det == 0) // CALIFA
+            fCalItems.push_back((TClonesArray*)man->GetObject(Form("%sCrystalCalData", fDetectorNames[0])));
+        else
+            fCalItems.push_back((TClonesArray*)man->GetObject(Form("%sCal", fDetectorNames[det])));
+        if (NULL == fCalItems.at(det))
+        {
+            printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
+        }
+        if (det == 0) // CALIFA
+            fHitItems.push_back((TClonesArray*)man->GetObject(Form("%sClusterData", fDetectorNames[0])));
+        else
+            fHitItems.push_back((TClonesArray*)man->GetObject(Form("%sHit", fDetectorNames[det])));
 
-        if (NULL == fArrayHits.at(det))
+        if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
-        else
-        {
-            printf("Found hit data for '%s'.\n", fDetectorNames[det]);
-        }
-    }
-    // CALIFA
-    fMappedItems.push_back((TClonesArray*)man->GetObject(Form("%sMappedData", fDetectorNames[0])));
-    if (NULL == fMappedItems.at(0))
-    {
-        printf("Could not find mapped data for '%s'.\n", fDetectorNames[0]);
-    }
-    fCalItems.push_back((TClonesArray*)man->GetObject(Form("%sCrystalCalData", fDetectorNames[0])));
-    if (NULL == fCalItems.at(0))
-    {
-        printf("Could not find Cal data for '%s'.\n", fDetectorNames[0]);
     }
 
-    man->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
-    man->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
-    man->Register("Fi23bHit", "Land", fFi23bHitItems, kTRUE);
-    man->Register("Fi30Hit", "Land", fFi30HitItems, kTRUE);
-    man->Register("Fi31Hit", "Land", fFi31HitItems, kTRUE);
-    man->Register("Fi32Hit", "Land", fFi32HitItems, kTRUE);
-    man->Register("Fi33Hit", "Land", fFi33HitItems, kTRUE);
+    if (fWriteOut)
+    {
+        man->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
+        man->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
+        man->Register("Fi23bHit", "Land", fFi23bHitItems, kTRUE);
+        man->Register("Fi30Hit", "Land", fFi30HitItems, kTRUE);
+        man->Register("Fi31Hit", "Land", fFi31HitItems, kTRUE);
+        man->Register("Fi32Hit", "Land", fFi32HitItems, kTRUE);
+        man->Register("Fi33Hit", "Land", fFi33HitItems, kTRUE);
+    }
 
-    man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
+    //    man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
     man->Register("Track", "Land", fTrackItems, kTRUE);
 
     if (!InitPropagator())
@@ -434,6 +452,10 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_yC_vs_yHe_Tofd_exp->GetXaxis()->SetTitle("yC / cm");
     fh_yC_vs_yHe_Tofd_exp->GetYaxis()->SetTitle("yHe / cm");
 
+    fh_xC_vs_xHe_Tofd_exp = new TH2F("h_xC_vs_xHe_Tofd_exp", "xC_vs_xHe_Tofd exp", 240, -60, 60, 240, -60, 60);
+    fh_xC_vs_xHe_Tofd_exp->GetXaxis()->SetTitle("xC / cm");
+    fh_xC_vs_xHe_Tofd_exp->GetYaxis()->SetTitle("xHe / cm");
+
     fh_yC_vs_yHe_fib23 = new TH2F("h_yC_vs_yHe_fib23", "yC_vs_yHe_fib23 track", 429, -6.006, 6.006, 429, -6.006, 6.006);
     fh_yC_vs_yHe_fib23->GetXaxis()->SetTitle("yC / cm");
     fh_yC_vs_yHe_fib23->GetYaxis()->SetTitle("yHe / cm");
@@ -497,20 +519,20 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_p->GetYaxis()->SetTitle("p / GeV/c");
 
     fh_Erel_vs_x =
-        new TH2F("h_Erel_vs_x", "Erel_vs_x", 429, -6.006, 6.006, 200, 0., 20.); // 89, -60, 60.15, 2000, -50., 150.);
+        new TH2F("h_Erel_vs_x", "Erel_vs_x", 429, -6.006, 6.006, 2000, 0., 20.); // 89, -60, 60.15, 2000, -50., 150.);
     fh_Erel_vs_x->GetXaxis()->SetTitle("x fib23a / cm");
     fh_Erel_vs_x->GetYaxis()->SetTitle("Erel / MeV");
 
     fh_Erel_vs_y =
-        new TH2F("h_Erel_vs_y", "Erel_vs_y", 429, -6.006, 6.006, 200, 0., 20.); // 89, -60, 60.15, 200, 0., 20.);
+        new TH2F("h_Erel_vs_y", "Erel_vs_y", 429, -6.006, 6.006, 2000, 0., 20.); // 89, -60, 60.15, 200, 0., 20.);
     fh_Erel_vs_y->GetXaxis()->SetTitle("y fib23b / cm");
     fh_Erel_vs_y->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_nhits23a = new TH2F("h_Erel_vs_nhits23a", "Erel_vs_nhits23a", 20, 0, 20, 200, 0., 20.);
+    fh_Erel_vs_nhits23a = new TH2F("h_Erel_vs_nhits23a", "Erel_vs_nhits23a", 20, 0, 20, 2000, 0., 20.);
     fh_Erel_vs_nhits23a->GetXaxis()->SetTitle("nhits23a");
     fh_Erel_vs_nhits23a->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_nhits23b = new TH2F("h_Erel_vs_nhits23b", "Erel_vs_nhits23b", 20, 0, 20, 200, 0., 20.);
+    fh_Erel_vs_nhits23b = new TH2F("h_Erel_vs_nhits23b", "Erel_vs_nhits23b", 20, 0, 20, 2000, 0., 20.);
     fh_Erel_vs_nhits23b->GetXaxis()->SetTitle("nhits23b");
     fh_Erel_vs_nhits23b->GetYaxis()->SetTitle("Erel / MeV");
 
@@ -556,9 +578,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 {
     //  ofstream outfile("event_numbers.dat",ios_base::out|ios_base::app);
 
-    if (fNEvents / 1000. == (int)fNEvents / 1000)
-        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::endl;
+    //   if (fNEvents / 1000. == (int)fNEvents / 1000)
+    //     std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+    //             << " %) " << std::endl;
+
+    ULong64_t timeTS = header->GetTimeStamp();
+    ULong64_t eventTS = header->GetEventno();
 
     fNEvents += 1;
 
@@ -575,29 +600,43 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Bool_t debug_loopout = false;
     Bool_t debug_loopin = false;
     Bool_t bestevents = false;
+    Bool_t bestevents_writeout = false;
 
     Bool_t CalifaHit = false;
-    if (fMappedItems.at(DET_CALIFA))
+    if (fHitItems.at(DET_CALIFA))
     {
+        CalifaHit = true;
+
         // CALIFA
-        auto detCalifa = fMappedItems.at(DET_CALIFA);
+        auto detCalifa = fHitItems.at(DET_CALIFA);
         Int_t nHitsCalifa = detCalifa->GetEntriesFast();
         // cout<<"Califa hits: "<<nHitsCalifa<<endl;
-
         for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
         {
-            R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)detCalifa->At(ihit);
+            R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihit);
             if (!hitCalifa)
                 continue;
 
-            Int_t Crystal = hitCalifa->GetCrystalId();
-            Int_t Energy = hitCalifa->GetEnergy();
-            // cout << "Califa: " << Crystal << " Energy: " << Energy << endl;
-            if (Energy > 0)
-            {
-                fh_califa_energy->Fill(Crystal, Energy);
-                CalifaHit = true;
-            }
+            ULong64_t timeCalifa = hitCalifa->GetTime();
+            Double_t timerelCalifa = (double)(timeCalifa - timeTS);
+            // cout<<"califa time: "<<time <<", "<< timeCalifa<<", "<<diff<<endl;
+            Int_t CrystalNb = hitCalifa->GetCrystalList().size();
+            Double_t Energy = hitCalifa->GetEnergy();
+
+            /*
+                Double_t GetEnergy() const { return fEnergy; }
+                Double_t GetNf() const { return fNf; }
+                Double_t GetNs() const { return fNs; }
+                Double_t GetTheta() const { return fTheta; }
+                Double_t GetPhi() const { return fPhi; }
+                ULong64_t GetTime() const { return fTime; }
+                uint32_t GetClusterType() const { return fClusterType; }
+                Int_t GetNbOfCrystalHits()  const { return fCrystalList.size(); }
+                std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
+                Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
+            */
+
+            fh_califa_energy->Fill(hitCalifa->GetMotherCrystal(), Energy);
         }
     }
 
@@ -1075,8 +1114,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 cout << "AT START: "
                      << "Mass: " << m0 << ", Momentum: " << p0 << endl;
 
-            if (tof->hits.at(i)->GetX() > 0 && fi30->hits.size() > 0 && fi32->hits.size() > 0 &&
-                fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
+            if (tof->hits.at(i)->GetX() > 0 && tof->hits.at(i)->GetX() != 4.11 && fi30->hits.size() > 0 &&
+                fi32->hits.size() > 0 && fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
             {
                 // left branch in beam direction, don't consider hits in the detectors of the other side
 
@@ -1172,7 +1211,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         fh_eloss_fi32_mc->Fill(1000. * fi32->hits.at(ifi32)->GetEloss()); // MeV
 
                     if ((ifi32 >= 0 && !fi32->free_hit[ifi32]) ||
-                        charge_requested != fi32->hits.at(ifi32)->GetEloss()) // if the hit was used already, continue
+                        charge_requested != fi32->hits.at(ifi32)->GetEloss() ||
+                        (l == 2 && std::abs(det_hit_xC[5] - fi32->hits.at(ifi32)->GetX()) <
+                                       0.1060)) // if the hit was used already, continue
                     {
                         if (debug_loopin)
                             cout << "Fi32 hit already used or not correct charge " << charge_requested << ", "
@@ -1185,8 +1226,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (ifi30 >= 0)
                             fh_eloss_fi30_mc->Fill(1000. * fi30->hits.at(ifi30)->GetEloss()); // MeV
                         if ((ifi30 >= 0 && !fi30->free_hit[ifi30]) ||
-                            charge_requested !=
-                                fi30->hits.at(ifi30)->GetEloss()) // if the hit was used already, continue
+                            charge_requested != fi30->hits.at(ifi30)->GetEloss() ||
+                            (l == 2 && std::abs(det_hit_xC[3] - fi30->hits.at(ifi30)->GetX()) <
+                                           0.1060)) // if the hit was used already, continue
                         {
                             if (debug_loopin)
                                 cout << "Fi30 hit already used or not correct charge " << charge_requested << ", "
@@ -1198,14 +1240,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         {
                             if (ifi23b >= 0)
                                 fh_eloss_fi23b_mc->Fill(1000. * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
-                            if ((l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
+                            if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512 ||
+                                (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                 (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
-                                            std::abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
+                                            abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
                                                 dfib))) // if the hit was used already, continue
                             {
                                 if (debug_loopin)
                                     cout << "left - Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
                                          << ", " << det_hit_yC[2] << endl;
+                                if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
+                                    cout << "left fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
+                                         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -1214,7 +1260,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             {
                                 if (ifi23a >= 0)
                                     fh_eloss_fi23a_mc->Fill(1000. * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
-                                if ((l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
+                                if (fi23a->hits.at(ifi23a)->GetX() < 0.1512 ||
+                                    (l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                     (l == 2 && ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                                 std::abs(det_hit_xC[1] - fi23a->hits.at(ifi23a)->GetX()) <
                                                     dfib))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
@@ -1472,7 +1519,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     if (ifi33 >= 0)
                         fh_eloss_fi33_mc->Fill(1000. * fi33->hits.at(ifi33)->GetEloss()); // MeV
                     if ((ifi33 >= 0 && !fi33->free_hit[ifi33]) ||
-                        charge_requested != fi33->hits.at(ifi33)->GetEloss()) // if the hit was used already, continue
+                        charge_requested != fi33->hits.at(ifi33)->GetEloss() ||
+                        (l == 2 && std::abs(det_hit_xC[6] - fi33->hits.at(ifi33)->GetX()) <
+                                       0.1060)) // if the hit was used already, continue
                     {
                         if (debug_loopin)
                             cout << "Fi33 hit already used or not correct charge " << charge_requested << ", "
@@ -1485,8 +1534,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (ifi31 >= 0)
                             fh_eloss_fi31_mc->Fill(1000. * fi31->hits.at(ifi31)->GetEloss()); // MeV
                         if ((ifi31 >= 0 && !fi31->free_hit[ifi31]) ||
-                            charge_requested !=
-                                fi31->hits.at(ifi31)->GetEloss()) // if the hit was used already, continue
+                            charge_requested != fi31->hits.at(ifi31)->GetEloss() ||
+                            (l == 2 && std::abs(det_hit_xC[4] - fi31->hits.at(ifi31)->GetX()) <
+                                           0.1060)) // if the hit was used already, continue
                         {
                             if (debug_loopin)
                                 cout << "Fi31 hit already used or not correct charge " << charge_requested << ", "
@@ -1498,14 +1548,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         {
                             if (ifi23b >= 0)
                                 fh_eloss_fi23b_mc->Fill(1000. * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
-                            if ((l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
+                            if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512 ||
+                                (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                 (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
-                                            std::abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
+                                            abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
                                                 dfib))) // if the hit was used already, continue
                             {
                                 if (debug_loopin)
                                     cout << "right Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
                                          << ", " << det_hit_yC[2] << endl;
+                                if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
+                                    cout << "right fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
+                                         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -1513,7 +1567,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             {
                                 if (ifi23a >= 0)
                                     fh_eloss_fi23a_mc->Fill(1000. * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
-                                if ((l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
+                                if (fi23a->hits.at(ifi23a)->GetX() > -0.1512 ||
+                                    (l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                     (l == 2 && ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                                 std::abs(det_hit_xC[1] - fi23a->hits.at(ifi23a)->GetX()) <
                                                     dfib))) //(ifi23a >= 0 && !fi23a->free_hit[ifi23a]) // if the hit
@@ -2041,16 +2096,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                        theta_26 > 2.64 && theta_26 < 2.80 &&
                        psum > 17380. && psum < 17450. &&
                        iAoverZ == 2 && iAoverZmem == 2 &&
-                       sqrt(minChi2*minChi2 + minChi2_12C*minChi2_12C) < 5) bestevents = true;
+                       sqrt(minChi2*minChi2 + minChi2_12C*minChi2_12C) < 10) bestevents = true;
                 */
                     // if (iAoverZ == 2 && iAoverZmem == 2 && sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5 &&
                     //  psum > 17380. && psum < 17450.)
                     // bestevents = true;
 
-                    if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5)
+                    if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10 && iAoverZ == 2 && iAoverZmem == 2 &&
+                        Erel < 0.4)
                         bestevents = true;
                 }
 
+                bestevents_writeout = true;
                 new ((*fTrackItems)[fNofTrackItems++]) R3BTrack(xmem, // cm
                                                                 ymem, // cm
                                                                 zmem, // cm
@@ -2105,16 +2162,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 y_l[ic] = -10000.;
                 det_hit_x[ic] = -10000.;
                 det_hit_y[ic] = -10000.;
+                det_hit_t[ic] = -10000.;
                 eloss_hit[ic] = 0;
                 if (l == 1)
                 {
                     det_hit_xC[ic] = -10000.;
                     det_hit_yC[ic] = -10000.;
+                    det_hit_tC[ic] = -10000.;
                 }
                 if (l == 2)
                 {
                     det_hit_xHe[ic] = -10000.;
                     det_hit_yHe[ic] = -10000.;
+                    det_hit_tHe[ic] = -10000.;
                 }
             }
 
@@ -2204,17 +2264,24 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 {
                     det_hit_x[iDet] = hit->GetX();
                     det_hit_y[iDet] = hit->GetY();
+                    det_hit_t[iDet] = hit->GetTime();
                     eloss_hit[iDet] = hit->GetEloss();
                 }
                 if (hit && l == 1)
                 {
                     det_hit_xC[iDet] = hit->GetX();
                     det_hit_yC[iDet] = hit->GetY();
+                    det_hit_tC[iDet] = hit->GetTime();
                 }
                 if (hit && l == 2)
                 {
                     det_hit_xHe[iDet] = hit->GetX();
                     det_hit_yHe[iDet] = hit->GetY();
+                    det_hit_tHe[iDet] = hit->GetTime();
+                }
+                if (hit && iDet == 2 && abs(hit->GetY()) < 0.1512)
+                {
+                    cout << "wrong fib23b in output: " << l << "; " << hit->GetY() << "; " << y_l[iDet] << endl;
                 }
                 if (hit && iDet == 7 && l == 1)
                 {
@@ -2252,6 +2319,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     fh_yC_vs_yHe_Tofd->Fill(yC, y_l[iDet]);
                     fh_pyC_vs_pyHe->Fill(pCy, bestcandidate->GetStartMomentum().Y() * 1000.);
                     fh_yC_vs_yHe_Tofd_exp->Fill(yCexp, det_hit_y[iDet]);
+                    fh_xC_vs_xHe_Tofd_exp->Fill(det_hit_xC[iDet], det_hit_x[iDet]);
                 }
 
                 if (hit && det->res_x > 1e-6)
@@ -2327,7 +2395,56 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             }
 
             bestcandidate->Reset();
+            /*
+              Double_t xCebene1,xCebene2;
+              Double_t xHeebene1,xHeebene2;
+              if(det_hit_xC[3]>-60) xCebene1=det_hit_xC[3];
+              else xCebene1=det_hit_xC[4];
+              if(det_hit_xHe[3]>-60) xHeebene1=det_hit_xHe[3];
+              else xHeebene1=det_hit_xHe[4];
+              if(det_hit_xC[5]>-60) xCebene2=det_hit_xC[5];
+              else xCebene2=det_hit_xC[6];
+              if(det_hit_xHe[5]>-60) xHeebene2=det_hit_xHe[5];
+              else xHeebene2=det_hit_xHe[6];
 
+              Int_t ibothsides;
+              if(det_hit_xC[3]>-60 && det_hit_xHe[3]>-60) ibothsides = 0;
+              else if(det_hit_xC[4]>-60 && det_hit_xHe[4]>-60) ibothsides = 0;
+              else ibothsides = 1;
+
+
+              Double_t chiav = sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C);
+              if((Erel<1. && Erel>0) && l==2 && chiav<10)
+              {
+                  cout<<"Erel= "<<Erel<<", chi2: "<<chiav<<", bothsides= "<<ibothsides<<", xfi23a C/He:
+              "<<det_hit_xC[1]<<"/"<<det_hit_xHe[1]<<", yfi23a C/He: "<< det_hit_yC[2]<<"/"<<det_hit_yHe[2]<<", pos on
+              fi30 C/He: "<<det_hit_xC[3]<<"/"<<det_hit_xHe[3]<<", pos on fi31 C/He:
+              "<<det_hit_xC[4]<<"/"<<det_hit_xHe[4]<<endl; cout<<", pos on fi32 C/He:
+              "<<det_hit_xC[5]<<"/"<<det_hit_xHe[5]<<", pos on fi33 C/He: "<<det_hit_xC[6]<<"/"<<det_hit_xHe[6]<<
+                  ", xpos on tofd C/He: "<<det_hit_xC[7]<<"/"<<det_hit_xHe[7]<<
+                  ", ypos on tofd C/He: "<<det_hit_yC[7]<<"/"<<det_hit_yHe[7]<<endl;
+                  cout<<", dx1 = "<<det_hit_xC[1]-det_hit_xHe[1]<<", dx2 = "<<xCebene1-xHeebene1<<", "<<", dx3 =
+              "<<xCebene2-xHeebene2<<
+                  ", dx4 = "<< det_hit_xC[7]-det_hit_xHe[7]<<endl;
+
+                  cout<<" "<<endl;
+              }
+              if((Erel > 4.0 && Erel <4.5) && ibothsides == 0 && l==2 && chiav<10)
+              {
+                  cout<<"Erel= "<<Erel<<", chi2: "<<chiav<<", bothsides= "<<ibothsides<<", xfi23a C/He:
+              "<<det_hit_xC[1]<<"/"<<det_hit_xHe[1]<<", yfi23a C/He: "<< det_hit_yC[2]<<"/"<<det_hit_yHe[2]<<", pos on
+              fi30 C/He: "<<det_hit_xC[3]<<"/"<<det_hit_xHe[3]<<", pos on fi31 C/He:
+              "<<det_hit_xC[4]<<"/"<<det_hit_xHe[4]<<endl; cout<<", pos on fi32 C/He:
+              "<<det_hit_xC[5]<<"/"<<det_hit_xHe[5]<<", pos on fi33 C/He: "<<det_hit_xC[6]<<"/"<<det_hit_xHe[6]<<
+                  ", xpos on tofd C/He: "<<det_hit_xC[7]<<"/"<<det_hit_xHe[7]<<
+                  ", ypos on tofd C/He: "<<det_hit_yC[7]<<"/"<<det_hit_yHe[7]<<endl;
+                  cout<<", dx1 = "<<det_hit_xC[1]-det_hit_xHe[1]<<", dx2 = "<<xCebene1-xHeebene1<<", "<<", dx3 =
+              "<<xCebene2-xHeebene2<<
+                  ", dx4 = "<< det_hit_xC[7]-det_hit_xHe[7]<<endl;
+
+                  cout<<" "<<endl;
+              }
+           */
             if (l < 3)
             {
                 fh_xfi23a_target_track->Fill(x_l[0], x_l[1]);
@@ -2378,47 +2495,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (fWriteOut)
             {
 
-                /*
-                                 if (l > 0)
-                                {
-                                    fNwriteout++;
-                                    if (1 == 1)// fNwriteout < 1001)
-                                    {
-                                        new ((*fFi23aHitItems)[fNofFi23aHitItems++])
-                                            R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 2, 0, 0, 0, 0., 0, 0.);
-
-                                        new ((*fFi23bHitItems)[fNofFi23bHitItems++])
-                                            R3BFiberMAPMTHitData(0, det_hit_x[2], det_hit_y[2], 2, 0, 0, 0, 0., 0, 0.);
-
-                                        if (det_hit_x[3] > -1000)
-                                            new ((*fFi30HitItems)[fNofFi30HitItems++])
-                                                R3BFiberMAPMTHitData(0, det_hit_x[3], det_hit_y[3], 2, 0, 0, 0, 0., 0,
-                   0.);
-
-                                        if (det_hit_x[4] > -1000)
-                                            new ((*fFi31HitItems)[fNofFi31HitItems++])
-                                                R3BFiberMAPMTHitData(0, det_hit_x[4], det_hit_y[4], 2, 0, 0, 0, 0., 0,
-                   0.);
-
-                                        if (det_hit_x[5] > -1000)
-                                            new ((*fFi32HitItems)[fNofFi32HitItems++])
-                                                R3BFiberMAPMTHitData(0, det_hit_x[5], det_hit_y[5], 2, 0, 0, 0, 0., 0,
-                   0.);
-
-                                        if (det_hit_x[6] > -1000)
-                                            new ((*fFi33HitItems)[fNofFi33HitItems++])
-                                                R3BFiberMAPMTHitData(0, det_hit_x[6], det_hit_y[6], 2, 0, 0, 0, 0., 0,
-                   0.);
-
-                                        new ((*fTofdHitItems)[fNofTofdHitItems++])
-                                            R3BTofdHitData(0, det_hit_x[7], det_hit_y[7], 2, 0, 2, 1, 1, 0);
-                                    }
-                                }
-                 */
                 // if (l == 2 && p12C.Mag() >= 13030. && p12C.Mag() <= 13050. &&
                 //    bestcandidate->GetStartMomentum().Mag() * 1000. >= 4340. &&
                 //   bestcandidate->GetStartMomentum().Mag() * 1000. <= 4360. && carbon && alpha )
-                if (bestevents)
+                if (bestevents_writeout)
                 //&& p12C.Mag() >= 12980. && p12C.Mag() <= 13070. &&
                 // bestcandidate->GetStartMomentum().Mag() * 1000. >= 4300. &&
                 // bestcandidate->GetStartMomentum().Mag() * 1000. <= 4420. && carbon && alpha)
@@ -2431,54 +2511,54 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // cout<<"Number of written event: "<<fNwriteout<<endl;
 
                         new ((*fFi23aHitItems)[fNofFi23aHitItems++])
-                            R3BFiberMAPMTHitData(0, det_hit_xC[1], det_hit_yC[1], 6, 0, 0, 0, 0., 0, 0.);
+                            R3BFiberMAPMTHitData(0, det_hit_xC[1], det_hit_yC[1], 6, det_hit_tC[1], 0, 0, 0., 0, 0.);
 
                         new ((*fFi23bHitItems)[fNofFi23bHitItems++])
-                            R3BFiberMAPMTHitData(0, det_hit_xC[2], det_hit_yC[2], 6, 0, 0, 0, 0., 0, 0.);
+                            R3BFiberMAPMTHitData(0, det_hit_xC[2], det_hit_yC[2], 6, det_hit_tC[2], 0, 0, 0., 0, 0.);
 
                         if (det_hit_xC[3] > -1000)
-                            new ((*fFi30HitItems)[fNofFi30HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_xC[3], det_hit_yC[3], 6, 0, 0, 0, 0., 0, 0.);
+                            new ((*fFi30HitItems)[fNofFi30HitItems++]) R3BFiberMAPMTHitData(
+                                0, det_hit_xC[3], det_hit_yC[3], 6, det_hit_tC[3], 0, 0, 0., 0, 0.);
 
                         if (det_hit_xC[4] > -1000)
-                            new ((*fFi31HitItems)[fNofFi31HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_xC[4], det_hit_yC[4], 6, 0, 0, 0, 0., 0, 0.);
+                            new ((*fFi31HitItems)[fNofFi31HitItems++]) R3BFiberMAPMTHitData(
+                                0, det_hit_xC[4], det_hit_yC[4], 6, det_hit_tC[4], 0, 0, 0., 0, 0.);
 
                         if (det_hit_xC[5] > -1000)
-                            new ((*fFi32HitItems)[fNofFi32HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_xC[5], det_hit_yC[5], 6, 0, 0, 0, 0., 0, 0.);
+                            new ((*fFi32HitItems)[fNofFi32HitItems++]) R3BFiberMAPMTHitData(
+                                0, det_hit_xC[5], det_hit_yC[5], 6, det_hit_tC[5], 0, 0, 0., 0, 0.);
 
                         if (det_hit_xC[6] > -1000)
-                            new ((*fFi33HitItems)[fNofFi33HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_xC[6], det_hit_yC[6], 6, 0, 0, 0, 0., 0, 0.);
+                            new ((*fFi33HitItems)[fNofFi33HitItems++]) R3BFiberMAPMTHitData(
+                                0, det_hit_xC[6], det_hit_yC[6], 6, det_hit_tC[6], 0, 0, 0., 0, 0.);
 
                         new ((*fTofdHitItems)[fNofTofdHitItems++])
-                            R3BTofdHitData(0, det_hit_xC[7], det_hit_yC[7], 6, 0, 6, 1, 1, 0);
+                            R3BTofdHitData(det_hit_tC[7], det_hit_xC[7], det_hit_yC[7], 6, 0, 6, 1, 1, 0);
 
                         new ((*fFi23aHitItems)[fNofFi23aHitItems++])
-                            R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 2, 0, 0, 0, 0., 0, 0.);
+                            R3BFiberMAPMTHitData(0, det_hit_x[1], det_hit_y[1], 2, det_hit_t[1], 0, 0, 0., 0, 0.);
 
                         new ((*fFi23bHitItems)[fNofFi23bHitItems++])
-                            R3BFiberMAPMTHitData(0, det_hit_x[2], det_hit_y[2], 2, 0, 0, 0, 0., 0, 0.);
+                            R3BFiberMAPMTHitData(0, det_hit_x[2], det_hit_y[2], 2, det_hit_t[2], 0, 0, 0., 0, 0.);
 
                         if (det_hit_x[3] > -1000)
                             new ((*fFi30HitItems)[fNofFi30HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_x[3], det_hit_y[3], 2, 0, 0, 0, 0., 0, 0.);
+                                R3BFiberMAPMTHitData(0, det_hit_x[3], det_hit_y[3], 2, det_hit_t[3], 0, 0, 0., 0, 0.);
 
                         if (det_hit_x[4] > -1000)
                             new ((*fFi31HitItems)[fNofFi31HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_x[4], det_hit_y[4], 2, 0, 0, 0, 0., 0, 0.);
+                                R3BFiberMAPMTHitData(0, det_hit_x[4], det_hit_y[4], 2, det_hit_t[4], 0, 0, 0., 0, 0.);
 
                         if (det_hit_x[5] > -1000)
                             new ((*fFi32HitItems)[fNofFi32HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_x[5], det_hit_y[5], 2, 0, 0, 0, 0., 0, 0.);
+                                R3BFiberMAPMTHitData(0, det_hit_x[5], det_hit_y[5], 2, det_hit_t[5], 0, 0, 0., 0, 0.);
 
                         if (det_hit_x[6] > -1000)
                             new ((*fFi33HitItems)[fNofFi33HitItems++])
-                                R3BFiberMAPMTHitData(0, det_hit_x[6], det_hit_y[6], 2, 0, 0, 0, 0., 0, 0.);
+                                R3BFiberMAPMTHitData(0, det_hit_x[6], det_hit_y[6], 2, det_hit_t[6], 0, 0, 0., 0, 0.);
 
                         new ((*fTofdHitItems)[fNofTofdHitItems++])
-                            R3BTofdHitData(0, det_hit_x[7], det_hit_y[7], 2, 0, 2, 1, 1, 0);
+                            R3BTofdHitData(det_hit_t[7], det_hit_x[7], det_hit_y[7], 2, 0, 2, 1, 1, 0);
                     }
                 }
 
@@ -2545,8 +2625,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
         LOG(info) << "Found Tracks: " << counter1 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
                   << ", and Erel/MeV: " << Erel << ", from selected NEvents: " << fNEvents_nonull
-                  << ", num total events: " << fNEvents << ", max Events: " << maxevent << endl;
-        if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 5)
+                  << ", done: " << (double)fNEvents / (double)maxevent * 100. << " %" << endl;
+        if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10)
         {
             fh_Erel->Fill(Erel);
             fh_psum->Fill(psum);
@@ -2572,9 +2652,9 @@ void R3BFragmentTrackerS494::FinishEvent()
     fNofTrackItems = 0;
     for (Int_t det = 0; det < DET_MAX; det++)
     {
-        if (fArrayHits.at(det))
+        if (fHitItems.at(det))
         {
-            fArrayHits.at(det)->Clear();
+            fHitItems.at(det)->Clear();
         }
     }
 
@@ -2683,6 +2763,7 @@ void R3BFragmentTrackerS494::Finish()
 
     fh_yC_vs_yHe_Tofd->Write();
     fh_yC_vs_yHe_Tofd_exp->Write();
+    fh_xC_vs_xHe_Tofd_exp->Write();
     fh_yC_vs_yHe_fib23->Write();
     fh_yC_vs_yHe_fib23_exp->Write();
     fh_xC_vs_xHe_fib23->Write();

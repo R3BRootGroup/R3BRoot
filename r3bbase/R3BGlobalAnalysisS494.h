@@ -147,16 +147,44 @@ class R3BGlobalAnalysisS494 : public FairTask
         fcut_chiX = cut_chiX;
         fcut_chiY = cut_chiY;
     }
+    inline void SetThetaGrazing(Double_t theta)
+    {
+		fThetaGrazing = theta;
+	}
+	inline void SetFib23Cuts(Double_t xfibcut, Double_t yfibcut)
+	{
+		fxfibcut = xfibcut;
+		fyfibcut = yfibcut;
+	}
+	inline void SetVisual(Bool_t vis)
+	{
+		fvis = vis;
+	}
   private:
-    std::vector<TClonesArray*> fMappedItems;
-    std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
     TClonesArray* fTrack;
-    TClonesArray* fMappedItemsCalifa;
-    TClonesArray* fCalItemsCalifa;
     TClonesArray* fHitItemsCalifa;
+    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
 
+    enum DetectorInstances
+    {
+        DET_FI_FIRST,
+        DET_FI23A = DET_FI_FIRST,
+        DET_FI23B,
+        DET_FI30,
+        DET_FI31,
+        DET_FI32,
+        DET_FI33,
+        DET_FI_LAST = DET_FI33,
+        DET_TOFD,
+        DET_MAX
+    };
+
+#define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
+
+    const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",
+                                                "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
@@ -166,8 +194,11 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Bool_t fPairs;
 	Bool_t fGraphCuts;
 	Bool_t fSimu;
+	Bool_t fvis;
 	Int_t fB;
+	Double_t fThetaGrazing;
 	Bool_t tracker = true;
+	Double_t fxfibcut, fyfibcut;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -197,21 +228,24 @@ class R3BGlobalAnalysisS494 : public FairTask
 //	Double_t mHe = 4.00260325413*amu;
 //	Double_t mC = 12. * amu;
 // Geant3:
-	Double_t amu = 0.931494028;
-	Double_t mHe = 3728.401291;
+	Double_t amu = 0.931494028;  // GeV
+	Double_t mHe = 3728.401291;  // MeV
 	Double_t m3He = 2809.41328;
 	Double_t mC = 11174.86339;
-	Double_t mO = 15.99065084 * amu;
+	Double_t mO = 15.99065084 * amu * 1000.;
 
 	Double_t Erel, m_inva, phi_bc_cm;
 	Double_t ErelMC, m_invaMC, phiMC_bc_cm;
 	TVector3 pa, pc, paMC, pcMC;
+	TVector3 pa_cm, pc_cm, poexc;
+	TVector3 pbeam;
 	
     TLorentzVector alpha, carbon, oxygen, helium3;
     TLorentzVector alphaMC, carbonMC, oxygenMC;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector alphaMC_cm, carbonMC_cm, oxygenMC_cm;
     TLorentzVector photon, photonMC;
+    TLorentzVector oxygenBeam;
 
 	Int_t Q = 0;
 	Double_t tPrev[10];
@@ -250,9 +284,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_pz_O;
     TH1F* fh_p_O;
 
-    TH2F* fh_chiy_vs_chix_He_nc;
-    TH2F* fh_chiy_vs_chix_He;
-    TH1F* fh_chiy_vs_chix_C;
+    TH2F* fh_chiy_vs_chix_nc;
     TH2F* fh_chiy_vs_chix;
     TH2F* fh_phi26_vs_chi;
     TH2F* fh_psum_vs_theta26_nc;
@@ -291,7 +323,8 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
     TH2F* fh_p_p;
-    TH2F* fh_Erel_vs_phibc;
+    TH2F* fh_Erel_vs_phibc_bg;
+    TH2F* fh_Erel_vs_phibc_ag;
     TH2F* fh_Erel_vs_phibcMC;
     TH2F* fh_psum_vs_event;  
     
@@ -327,8 +360,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_psum_nc;
 	TH2F* fh_psum_vs_event_nc;				
 	TH1F* fh_theta26_nc;
-	TH1F* fh_Erel_nc;                   
-	TH2F* fh_Erel_vs_theta26_nc;
+	TH1F* fh_Erel_nc;
 	TH1F* fh_ErelB_nc;
 	TH1F* fh_theta_bc_cm_nc;
 	TH1F* fh_phi_bc_cm_nc;
@@ -339,22 +371,24 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_theta26;
 	TH1F* fh_theta_16O;	
 	TH1F* fh_phi_16O;	
-	TH1F* fh_theta26_cm;	
-	TH1F* fh_phi26_cm;
 	TH2F* fh_theta_4He_cm;
+	TH2F* fh_thetaB_4He_cm;
 	TH2F* fh_phi_4He_cm;
 	TH1F* fh_phi_bc_cm;
 	TH1F* fh_phiMC_bc_cm;
 	TH2F* fh_theta_bc_cm;
 	TH2F* fh_theta_12C_cm;
+	TH2F* fh_thetaB_12C_cm;
 	TH2F* fh_phi_12C_cm;
 	TH1F* fh_Erel;
 	TH1F* fh_ErelL;
 	TH1F* fh_ErelR;
 	TH1F* fh_ErelB;
-	TH2F* fh_phi_bc_cm_polar;
-	TH2F* fh_Erel_vs_theta26;
+	TH2F* fh_phi_bc_cm_polar;                   
+	TH2F* fh_Erel_vs_theta26_bg;
+	TH2F* fh_Erel_vs_theta26_ag;
 	TH2F* fh_Erel_vs_theta16O;
+	TH2F* fh_ErelB_vs_theta16O;
 	TH2F* fh_Erel_vs_theta16O_3He12C;
 	TH2F* fh_Erel_vs_thetaMC;
 	TH1F* fh_psum;
@@ -363,20 +397,45 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_pzsum_MC;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;
-	TH2F* fh_Erel_vs_ptransHe;
-	TH2F* fh_Erel_vs_ptransC;
+	TH2F* fh_erel_vs_ptransHe;
+	TH2F* fh_erel_vs_ptransC;
+	TH2F* fh_erelB_vs_ptransHe;
+	TH2F* fh_erelB_vs_ptransC;
 	
-
 	TH2F* fh_mass_nc;
 	TH2F* fh_mass;
 	TH2F* fh_energy_nc;
 	TH2F* fh_energy;
-	TH2F* fh_califa_energy;
-	TH2F* fh_califa_energy_nc;
-	TH2F* fh_califa_calenergy;
-	TH2F* fh_califa_hitenergy;
+	
+//	TH2F* fh_califa_energy;
+//	TH2F* fh_califa_energy_nc;
+//	TH2F* fh_califa_calenergy;
+	TH2F* fh_califa_tofd;
+	TH2F* fh_califa_hitenergy_ag;
+	TH2F* fh_califa_hitenergy_bg;
+	TH1F* fh_califa_hitenergy_select;
+	TH1F* fh_califa_hitenergy_nc;
+	TH1F* fh_califa_hitenergy_boost;
+	TH2F* fh_Erel_vs_theta16O_withcalifa;
+	TH2F* fh_Ecalifa_vs_theta;
+	TH2F* fh_Erel_withCalifa_2d;
+	TH2F* fh_theta_vs_theta;
 	TH1F* fh_minv_simu;
 	TH1F* fh_minv;
+	
+	TH2F* fh_Erel_vs_xdet[DET_MAX];		                                		
+	TH2F* fh_Erel_vs_ydet[DET_MAX];                                		
+	TH2F* fh_Erel_vs_nhits[2];
+	TH2F* fh_yfi23_vs_ytofd_bc;
+	TH2F* fh_yfi23_vs_ytofd;
+	TH2F* fh_xfi23_vs_xtofd_bc;
+	TH2F* fh_xfi23_vs_xtofd;
+	TH2F* fh_xy_fib23;
+	TH2F* fh_xy_fib23_bc;
+	TH1F* fh_dt_fib23_bc;
+	
+	
+	
   public:
     ClassDef(R3BGlobalAnalysisS494, 1)
 };

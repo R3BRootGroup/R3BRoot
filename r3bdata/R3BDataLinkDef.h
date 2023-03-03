@@ -128,9 +128,9 @@
 #pragma link C++ class R3BPdcHitData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;
-#pragma link C++ class R3BStrawtubesMappedData+;
-#pragma link C++ class R3BStrawtubesCalData+;
-#pragma link C++ class R3BStrawtubesHitData+;
+//#pragma link C++ class R3BStrawtubesMappedData+;
+//#pragma link C++ class R3BStrawtubesCalData+;
+//#pragma link C++ class R3BStrawtubesHitData+;
 #pragma link C++ class R3BPtofHit+;
 #pragma link C++ class R3BBunchedFiberCalData+;
 #pragma link C++ class R3BBunchedFiberHitData+;
@@ -149,9 +149,9 @@
 #pragma link C++ class R3BSci8HitData+;
 #pragma link C++ class R3BBeamMonitorMappedData+;
 #pragma link C++ class R3BSamplerMappedData+;
-#pragma link C++ class R3BSfibMappedData+;
-#pragma link C++ class R3BSfibCalData+;
-#pragma link C++ class R3BSfibHitData+;
+//#pragma link C++ class R3BSfibMappedData+;
+//#pragma link C++ class R3BSfibCalData+;
+//#pragma link C++ class R3BSfibHitData+;
 #pragma link C++ class R3BFrsData+;
 
 #endif

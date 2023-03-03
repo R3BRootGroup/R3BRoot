@@ -22,6 +22,7 @@
  *
  */
 
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BLosCalData.h"
@@ -62,6 +63,8 @@
 #include "R3BBunchedFiberHitData.h"
 #include "R3BBunchedFiberMappedData.h"
 
+#include "R3BWRData.h"
+
 #include "R3BMCTrack.h"
 #include "R3BTrack.h"
 
@@ -70,6 +73,7 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -81,12 +85,14 @@
 #include "TClonesArray.h"
 #include "TFile.h"
 #include "TMath.h"
+#include "TRandom.h"
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <array>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #define IS_NAN(x) TMath::IsNaN(x)
@@ -116,6 +122,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fX2max(100)
     , fCalifaOpt(0)
     , fNEvents(0)
+    , fWRItemsMaster(NULL)
     , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
     , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi23bHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
@@ -123,6 +130,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fFi31HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi32HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi33HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fCalifaHitItems(new TClonesArray("R3BCalifaClusterData"))
     , fNofTofdHitItems(0)
     , fNofFi23aHitItems(0)
     , fNofFi23bHitItems(0)
@@ -130,6 +138,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fNofFi31HitItems(0)
     , fNofFi32HitItems(0)
     , fNofFi33HitItems(0)
+    , fNofCalifaHitItems(0)
 {
 }
 
@@ -158,7 +167,11 @@ InitStatus R3BPreTrackS494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     FairRunAna* run = FairRunAna::Instance();
 
@@ -176,7 +189,10 @@ InitStatus R3BPreTrackS494::Init()
     {
         cout << "Reading detector " << det << ", " << fDetectorNames[det] << endl;
 
-        fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+        if (det == 0) // CALIFA
+            fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMappedData", fDetectorNames[0])));
+        else
+            fMappedItems.push_back((TClonesArray*)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
         if (NULL == fMappedItems.at(det))
         {
             printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
@@ -191,13 +207,24 @@ InitStatus R3BPreTrackS494::Init()
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        if (det == 0) // CALIFA
+            fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sClusterData", fDetectorNames[0])));
+        else
+            fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
 
         if (NULL == fHitItems.at(det))
         {
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
     }
+
+    // get access to WR-Master data
+    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+    if (NULL == fWRItemsMaster)
+        R3BLOG(info, "WR Master was not found");
+    else
+        R3BLOG(info, "WR Master was found");
+
     mgr->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
     mgr->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
     mgr->Register("Fi23bHit", "Land", fFi23bHitItems, kTRUE);
@@ -205,25 +232,9 @@ InitStatus R3BPreTrackS494::Init()
     mgr->Register("Fi31Hit", "Land", fFi31HitItems, kTRUE);
     mgr->Register("Fi32Hit", "Land", fFi32HitItems, kTRUE);
     mgr->Register("Fi33Hit", "Land", fFi33HitItems, kTRUE);
+    if (fHitItems.at(DET_CALIFA))
+        mgr->Register("CalifaClusterData", "Land", fCalifaHitItems, kTRUE);
 
-    // For testing purpose *****
-    std::string foff_param_file = "/u/kelic/R3BRoot/macros/r3b/tracking/s494/offset_ytofd_run0872_60lmds.dat";
-    ifstream infile(foff_param_file.c_str());
-    Int_t iplane, ibar, iz2, iz6, iz8;
-    if (infile.is_open())
-    {
-        for (Int_t ivec = 0; ivec < 88; ivec++)
-        {
-            infile >> iplane >> ibar;
-            infile >> iz2 >> ytofd_offsetZ2[iplane - 1][ibar - 1] >> iz6 >> ytofd_offsetZ6[iplane - 1][ibar - 1] >>
-                iz8 >> ytofd_offsetZ8[iplane - 1][ibar - 1];
-
-            /*    cout<<iplane <<", "<< ibar <<", "<< iz2 <<", "<<
-                     ytofd_offsetZ2[iplane-1][ibar-1] <<", "<< iz6 <<", "<<
-                     ytofd_offsetZ6[iplane-1][ibar-1] <<", "<< iz8 <<", "<<
-                     ytofd_offsetZ8[iplane-1][ibar-1]<<endl;*/
-        }
-    }
     // *******
     //------------------------------------------------------------------------
     // graphical cuts
@@ -233,12 +244,16 @@ InitStatus R3BPreTrackS494::Init()
         cout << "READING GRAPHICAL CUTS " << endl;
         cut_qfi31_qfi33 = NULL;
         cut_qfi30_qfi32 = NULL;
+        cut_qtofi_bar14 = NULL;
 
         TFile* f31_33 = TFile::Open("Cut_Fi31Fi33_Z6.root", "read");
         cut_qfi31_qfi33 = dynamic_cast<TCutG*>(f31_33->Get("CutFi31Fi33_12C"));
 
         TFile* f30_32 = TFile::Open("Cut_Fi30Fi32_Z6.root", "read");
         cut_qfi30_qfi32 = dynamic_cast<TCutG*>(f30_32->Get("CutFi30Fi32_12C"));
+
+        TFile* qtofi = TFile::Open("qtofibar14.root", "read");
+        cut_qtofi_bar14 = dynamic_cast<TCutG*>(qtofi->Get("qtofi_bar14"));
 
         cout << "GRAPHICAL CUTS ARE READ" << endl;
     }
@@ -290,15 +305,42 @@ InitStatus R3BPreTrackS494::Init()
             LOG(debug) << "I am creating canvas " << detName << endl;
 
             // xy:
-            fh_xy_Fib[ifibcount] =
-                new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 1000, -50., 50., 1000, -50., 50);
-            fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm ");
-            fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("y / cm");
+            if (ifibcount == 0)
+            {
+                fh_xy_Fib[ifibcount] =
+                    new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 429, -6.006, 6.006, 1000, -50., 50);
+                fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("y / cm");
 
-            fh_xy_Fib_ac[ifibcount] =
-                new TH2F(Form("%s_xy_ac", detName), Form("%s xy after cuts", detName), 1000, -50., 50, 1000, -50., 50);
-            fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("x / cm ");
-            fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("y / cm");
+                fh_xy_Fib_ac[ifibcount] = new TH2F(
+                    Form("%s_xy_ac", detName), Form("%s xy after cuts", detName), 429, -6.006, 6.006, 1000, -50., 50);
+                fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("y / cm");
+            }
+            else if (ifibcount == 1)
+            {
+                fh_xy_Fib[ifibcount] =
+                    new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 1000, -50., 50, 429, -6.006, 6.006);
+                fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("y / cm");
+
+                fh_xy_Fib_ac[ifibcount] = new TH2F(
+                    Form("%s_xy_ac", detName), Form("%s xy after cuts", detName), 1000, -50., 50, 429, -6.006, 6.006);
+                fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("y / cm");
+            }
+            else
+            {
+                fh_xy_Fib[ifibcount] =
+                    new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 1000, -50., 50., 1000, -50., 50);
+                fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("y / cm");
+
+                fh_xy_Fib_ac[ifibcount] = new TH2F(
+                    Form("%s_xy_ac", detName), Form("%s xy after cuts", detName), 1000, -50., 50, 1000, -50., 50);
+                fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+                fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("y / cm");
+            }
 
             // Multiplicity (number of hit fibers):
             fh_mult_Fib[ifibcount] = new TH1F(Form("%s_mult", detName), Form("%s # of fibers", detName), 200, 0., 200.);
@@ -622,6 +664,10 @@ InitStatus R3BPreTrackS494::Init()
     fh_yTofd_vs_yTofd->GetYaxis()->SetTitle("Tofd 2 y / cm");
     fh_yTofd_vs_yTofd->GetXaxis()->SetTitle("Tofd 1 y / cm");
 
+    fh_qtofi_vs_qtofd = new TH2F("qtofi_vs_qtofd", "fh_qtofi_vs_qtofd", 200, 0, 10, 200, 0, 10);
+    fh_qtofi_vs_qtofd->GetYaxis()->SetTitle("Q tofi");
+    fh_qtofi_vs_qtofd->GetXaxis()->SetTitle("Q tofd");
+
     fh_xy_target = new TH2F("fh_xy_target", "fh_xy_target", 420, -6, 6, 420, -6, 6);
     fh_xy_target->GetYaxis()->SetTitle(" y / cm");
     fh_xy_target->GetXaxis()->SetTitle("x / cm");
@@ -798,12 +844,68 @@ InitStatus R3BPreTrackS494::Init()
         }
     }
 
-    if (fCalItems.at(DET_CALIFA))
+    if (fHitItems.at(DET_CALIFA))
     {
-        fh_califa_energy = new TH2F("fh_califa_energy", "Califa E vs crystal id", 2000, 0, 2000, 1000, 0., 1000.);
-        fh_califa_energy->GetYaxis()->SetTitle("Energy / MeV");
-        fh_califa_energy->GetXaxis()->SetTitle("Crystal #");
+        fh_califa_energy = new TH2F("fh_califa_energy", "Califa E vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
+        fh_califa_energy->GetYaxis()->SetTitle("Energy / keV");
+        fh_califa_energy->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_energy_dc =
+            new TH2F("fh_califa_energy_dc", "Califa E  doppler-corrected vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
+        fh_califa_energy_dc->GetYaxis()->SetTitle("Energy / keV");
+        fh_califa_energy_dc->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_time = new TH2F("fh_califa_time", "Califa time vs Nb crystals", 50, 0, 50, 1500, 1000., 4000.);
+        fh_califa_time->GetYaxis()->SetTitle("time / ns");
+        fh_califa_time->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 20000, -1000, 1000);
+        fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
+        fh_califa_tofd->GetXaxis()->SetTitle("califa tome / ns");
+
+        fh_califa_energy_select =
+            new TH2F("fh_califa_energy_select", "Califa E vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
+        fh_califa_energy_select->GetYaxis()->SetTitle("Energy / MeV");
+        fh_califa_energy_select->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_cluster =
+            new TH2F("fh_califa_cluster", "Califa MotherId vs Nb crystals", 50, 0, 50, 1100, 900., 2000.);
+        fh_califa_cluster->GetYaxis()->SetTitle("MotherId");
+        fh_califa_cluster->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_energy_rolu =
+            new TH2F("fh_califa_energy_rolu", "Califa E vs Nb crystals rolu=true", 50, 0, 50, 1000, 0., 10000.);
+        fh_califa_energy_rolu->GetYaxis()->SetTitle("Energy / keV");
+        fh_califa_energy_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_time_rolu =
+            new TH2F("fh_califa_time_rolu", "Califa time vs Nb crystals rolu=true", 50, 0, 50, 1500, 1000., 4000.);
+        fh_califa_time_rolu->GetYaxis()->SetTitle("time / ns");
+        fh_califa_time_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_cluster_rolu = new TH2F(
+            "fh_califa_cluster_rolu", "Califa MotherId vs Nb crystals rolu=true", 50, 0, 50, 1100, 900., 2000.);
+        fh_califa_cluster_rolu->GetYaxis()->SetTitle("MotherId");
+        fh_califa_cluster_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+
+        fh_califa_overflow = new TH1F("fh_califa_overflow", "CalifaMapped overflow", 1100, 900., 2000.);
+        fh_califa_overflow->GetXaxis()->SetTitle("Crystal Id");
+
+        fh_califa_good = new TH1F("fh_califa_good", "CalifaMapped good", 1100, 900., 2000.);
+        fh_califa_good->GetXaxis()->SetTitle("Crystal Id");
+
+        fh_califa_motherid_clustertype =
+            new TH2F("fh_califa_motherid_clustertype", "ClusterType vs MotherId", 1100, 900., 2000., 5, 0, 5);
+        fh_califa_motherid_clustertype->GetXaxis()->SetTitle("MotherID");
+        fh_califa_motherid_clustertype->GetYaxis()->SetTitle("ClusterType");
+
+        fh_califa_crystallist =
+            new TH2F("fh_califa_crystallist", "ClusterNum vs MotherId", 1100, 900., 2000., 1100, 900., 2000);
+        fh_califa_crystallist->GetYaxis()->SetTitle("MotherID");
+        fh_califa_crystallist->GetXaxis()->SetTitle("ClusterNum");
     }
+
+    // Output spectra:
     for (int i = 0; i < 2; i++)
     {
         fh_check_QvsX[i] = new TH2F(Form("fhCheckQvsX%d", i), Form("Check Q vs X det%d", i), 1000, -5, 5, 20, 0, 10);
@@ -851,22 +953,23 @@ InitStatus R3BPreTrackS494::Init()
 
 void R3BPreTrackS494::Exec(Option_t* option)
 {
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
-                  << " %) " << std::flush;
-    if (fNEvents / 10000. == (int)fNEvents / 10000)
-        cout << "" << endl;
-    // cout << "Event: " << fNEvents << endl;
+    /*
+        if (fNEvents / 10000. == (int)fNEvents / 10000)
+            std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
+                      << " %) " << std::flush;
+    */
     fNEvents += 1;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
+    ULong64_t eventTS = header->GetEventno();
     if (header && !fSimu)
     {
         time = header->GetTimeStamp();
-        //		if (time > 0) cout << "header time: " << time << endl;
+
+        // if (time > 0) cout << "header time: " << time << endl;
         if (time_start == 0 && time > 0)
         {
             time_start = time;
@@ -876,15 +979,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
         if (header->GetTrigger() == 12)
         {
-            // spill start in nsec
-            // cout << "spill start" << endl;
+            cout << "spill start" << endl;
             num_spills++;
             // cout << "Spill: " << num_spills << endl;
         }
         if (header->GetTrigger() == 13)
         {
-            // spill end  in nsec
-            // cout << "spill stop" << endl;
+            //  cout << "spill stop" << endl;
         }
 
         fh_Trigger->Fill(header->GetTrigger());
@@ -914,6 +1015,19 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 counterWrongTpat++;
                 return;
             }
+        }
+    }
+    // WR master TS
+    int64_t wrm = 0.0;
+    if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
+    {
+        Int_t nHitsWR = fWRItemsMaster->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHitsWR; ihit++)
+        {
+            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
+            if (!hit)
+                continue;
+            wrm = hit->GetTimeStamp();
         }
     }
 
@@ -995,34 +1109,102 @@ void R3BPreTrackS494::Exec(Option_t* option)
             RoluCut = true;
         }
     }
+
     if (RoluCut && !fSimu)
     {
-        // cout << "ROLU cut applied !!!" << endl;
+
+        if (fHitItems.at(DET_CALIFA))
+        {
+            // CALIFA
+            auto detCalifa = fHitItems.at(DET_CALIFA);
+            Int_t nHitsCalifa = detCalifa->GetEntriesFast();
+            // cout<<"Califa hits: "<<nHitsCalifa<<endl;
+            for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
+            {
+                R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihit);
+                if (!hitCalifa)
+                    continue;
+
+                if (hitCalifa->GetClusterType() == 1) // gammas
+                {
+                    ULong64_t timeCalifa = hitCalifa->GetTime();
+                    Double_t timerelCalifa = (double)(timeCalifa - time);
+                    Int_t CrystalNb = hitCalifa->GetCrystalList().size();
+                    Double_t Energy = hitCalifa->GetEnergy();
+
+                    if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
+                        hitCalifa->GetMotherCrystal() < 1953) // barrel gamma-channels
+                    {
+                        fh_califa_energy_rolu->Fill(hitCalifa->GetCrystalList().size(), Energy);
+                        fh_califa_time_rolu->Fill(hitCalifa->GetCrystalList().size(), timerelCalifa);
+                        fh_califa_cluster_rolu->Fill(hitCalifa->GetCrystalList().size(), hitCalifa->GetMotherCrystal());
+                    }
+                }
+            }
+        }
+
         counterRolu++;
         return;
     }
 
     Bool_t CalifaHit = false;
     Int_t nHitsCalifa = 0;
-    if (fCalItems.at(DET_CALIFA))
+    vector<double> eCalifa;
+    vector<double> tCalifa;
+    Double_t E_0 = 15.99065084 * 931.494028;
+    Double_t E_Beam = E_0 + 16. * 500.;
+    Double_t BETA = sqrt(1. - (E_0 * E_0) / (E_Beam * E_Beam));
+    Double_t GAMMA = 1. / (sqrt(1. - BETA * BETA));
+    if (fHitItems.at(DET_CALIFA))
     {
+        CalifaHit = true;
+
         // CALIFA
-        auto detCalifa = fCalItems.at(DET_CALIFA);
+        auto detCalifa = fHitItems.at(DET_CALIFA);
         nHitsCalifa = detCalifa->GetEntriesFast();
         // cout<<"Califa hits: "<<nHitsCalifa<<endl;
         for (Int_t ihit = 0; ihit < nHitsCalifa; ihit++)
         {
-            R3BCalifaCrystalCalData* hitCalifa = (R3BCalifaCrystalCalData*)detCalifa->At(ihit);
+            R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihit);
             if (!hitCalifa)
                 continue;
 
-            Int_t Crystal = hitCalifa->GetCrystalId();
-            Int_t Energy = hitCalifa->GetEnergy();
-            // cout << "Califa: " << Crystal << " Energy: " << Energy << endl;
-            if (Energy > 0)
+            ULong64_t timeCalifa = hitCalifa->GetTime();
+            Double_t timerelCalifa = (double)(timeCalifa - time);
+            // cout<<"califa time: "<<time <<", "<< timeCalifa<<", "<<diff<<endl;
+            Int_t CrystalNb = hitCalifa->GetCrystalList().size();
+            Double_t Energy = hitCalifa->GetEnergy();
+            Double_t theta = hitCalifa->GetTheta();
+            Double_t Energy_dc = Energy * GAMMA * (1 - BETA * TMath::Cos(theta));
+
+            /*
+                Double_t GetEnergy() const { return fEnergy; }
+                Double_t GetNf() const { return fNf; }
+                Double_t GetNs() const { return fNs; }
+                Double_t GetTheta() const { return fTheta; }
+                Double_t GetPhi() const { return fPhi; }
+                ULong64_t GetTime() const { return fTime; }
+                uint32_t GetClusterType() const { return fClusterType; }
+                Int_t GetNbOfCrystalHits()  const { return fCrystalList.size(); }
+                std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
+                Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
+            */
+            fh_califa_motherid_clustertype->Fill(hitCalifa->GetMotherCrystal(), hitCalifa->GetClusterType());
+            for (Int_t ic = 0; ic < hitCalifa->GetCrystalList().size(); ic++)
             {
-                fh_califa_energy->Fill(Crystal, Energy);
-                CalifaHit = true;
+                fh_califa_crystallist->Fill(hitCalifa->GetCrystalList().at(ic), hitCalifa->GetMotherCrystal());
+            }
+            if (hitCalifa->GetClusterType() == 1) // gammas
+            {
+
+                if (hitCalifa->GetMotherCrystal() > 927 &&
+                    hitCalifa->GetMotherCrystal() < 1953) // barrel gamma-channels
+                {
+                    fh_califa_energy->Fill(hitCalifa->GetCrystalList().size(), Energy);
+                    fh_califa_energy_dc->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
+                    fh_califa_time->Fill(hitCalifa->GetCrystalList().size(), timerelCalifa);
+                    fh_califa_cluster->Fill(hitCalifa->GetCrystalList().size(), hitCalifa->GetMotherCrystal());
+                }
             }
         }
         if (CalifaHit)
@@ -1106,6 +1288,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
         }
     }
 
+    Bool_t SelectedPairs = false;
     Double_t xTest = 0.;
     Double_t yTest = 0.;
 
@@ -1463,9 +1646,63 @@ void R3BPreTrackS494::Exec(Option_t* option)
     if (nHits > 100)
         return;
 
+    // Trying to restore Q of tofi bar 14
+    Double_t qplane2[10], qplane3[10], tplane3[10];
+    for (Int_t i = 0; i < 10; i++)
+    {
+        qplane3[i] = -1000;
+        qplane2[i] = -1000;
+        tplane3[i] = -1000;
+    }
+    Int_t nplane2 = 0, nplane3 = 0;
+    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    {
+
+        R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
+
+        if (IS_NAN(hitTofd->GetTime()))
+            continue;
+
+        Int_t iplane = hitTofd->GetDetId();
+        Int_t ibar = hitTofd->GetBarId();
+
+        if (iplane == 2 && ibar == 24)
+        {
+            qplane2[nplane2] = hitTofd->GetEloss();
+            nplane2++;
+        }
+
+        if (iplane == 3 && ibar == 14)
+        {
+            qplane3[nplane3] = hitTofd->GetEloss();
+            tplane3[nplane3] = hitTofd->GetTime();
+            nplane3++;
+        }
+    }
+
+    Bool_t qtofi_bar14_z6[nplane3];
+    for (Int_t i = 0; i < nplane3; i++)
+    {
+        qtofi_bar14_z6[i] = false;
+    }
+    for (Int_t i = 0; i < nplane2; i++)
+    {
+        for (Int_t j = 0; j < nplane3; j++)
+        {
+            fh_qtofi_vs_qtofd->Fill(qplane2[i], qplane3[j]);
+
+            if (fGraphCuts)
+            {
+                if (cut_qtofi_bar14->IsInside(qplane2[i], qplane3[j]))
+                    qtofi_bar14_z6[j] = true;
+            }
+        }
+    }
+
     Int_t multTofd = 0;
     Int_t i1l = 0, i1r = 0, i2l = 0, i2r = 0, i3l = 0, i3r = 0;
     Int_t i1lc = 0, i1rc = 0, i2lc = 0, i2rc = 0, i3lc = 0, i3rc = 0;
+    Int_t icountplane3bar14 = 0;
     // loop over ToFD
 
     if (debug_tofd)
@@ -1485,17 +1722,40 @@ void R3BPreTrackS494::Exec(Option_t* option)
                          << hitTofd->GetTime() << endl;
                 }
         */
+
+        Int_t iplane = hitTofd->GetDetId();
+        Int_t ibar = hitTofd->GetBarId();
+
+        //  if (iplane == 2 && ibar == 24)
+        //    continue;
+
+        Double_t qqq = hitTofd->GetEloss(); // / 1.132;
+
+        if (iplane == 3 && ibar == 14)
+        {
+            if (qqq > 5 && qqq < 7 && !qtofi_bar14_z6[icountplane3bar14])
+                qqq = 100; // we will use q=6 only if cut true; not to get values outside of cut we set 100
+
+            if (qtofi_bar14_z6[icountplane3bar14])
+                qqq = 6;
+
+            if (nplane3 > 1)
+                icountplane3bar14++;
+        }
+
+        if (iplane == 3 && ibar == 13)
+            continue; // no charge resolution
+
         Double_t ttt = hitTofd->GetTime();
         fh_tofd_time->Fill(ttt);
 
-        if (fCuts && (ttt < -150. || ttt > 100.)) // change time cuts
+        if (fCuts && (ttt < -150. || ttt > 100.)) // change time cuts  -150,100
         {                                         // trigger window -1500, 1500
             if (debug_tofd)
                 cout << "No trigger particle!" << endl;
             continue;
         }
 
-        Double_t qqq = hitTofd->GetEloss(); // / 1.132;
         // if (fB == -1710)
         //{
         //    qqq = qqq * 1.11; // / 1.132;
@@ -1515,27 +1775,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
         Double_t xxx = hitTofd->GetX();
         Double_t yyy = hitTofd->GetY();
 
-        Int_t iplane = hitTofd->GetDetId();
-        Int_t ibar = hitTofd->GetBarId();
-
-        //  if (iplane == 2 && ibar == 24)
-        //    continue;
-
         if (!fSimu)
         {
-            /*	if(qqq > 1.4 && qqq < 2.6) {
-                    yyy = yyy - ytofd_offsetZ2[iplane-1][ibar-1];
-                    //cout<<"Zfrag=2: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ2[iplane-1][ibar-1]<<endl;
-                }
-                if(qqq > 5.5 && qqq < 6.6) {
-                    yyy = yyy - ytofd_offsetZ6[iplane-1][ibar-1];
-                    //cout<<"Zfrag=6: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ6[iplane-1][ibar-1]<<endl;
-                }
-                if(qqq > 7.2 && qqq < 8.8) {
-                    yyy = yyy - ytofd_offsetZ8[iplane-1][ibar-1];
-                    //cout<<"Zfrag=8: "<<iplane<<", "<<ibar<<", "<<ytofd_offsetZ8[iplane-1][ibar-1]<<endl;
-                }*/
-
             if (iplane < 3)
             {
                 yyy = yyy * (-1.); // -1 until we solve problem with y direction
@@ -1964,10 +2205,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fPairs)
                 continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
-                continue;
-            // if (fCuts && (tof < -30 || tof > 40) && !fSimu && fPairs)
-            //   continue;
+            //  if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
+            //    continue;
+
             if (fCuts && (t1[det] < -15 || t1[det] > 15) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 30 || tof > 80) && !fSimu && !fPairs)
@@ -2110,17 +2350,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
             hits31bc++;
 
             // Cuts on Fi31
-            //            if (fCuts && x1[det] * 100. < -24.4)
-            // if (fCuts && x1[det] * 100. < -25.75)
-            // continue;
             if (fCuts && (t1[det] < -60 || t1[det] > 50) && fPairs)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fPairs)
                 continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
-                continue;
-            // if (fCuts && (tof < -30 || tof > 40) && !fSimu && fPairs)
-            //  continue;
+            //   if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
+            //     continue;
+
             if (fCuts && (t1[det] < -15 || t1[det] > 15) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 30 || tof > 80) && !fSimu && !fPairs)
@@ -2277,10 +2513,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fPairs)
                 continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
-                continue;
-            //  if (fCuts && (tof < -40 || tof > 50) && !fSimu && fPairs)
+            //  if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
             //    continue;
+
             if (fCuts && (t1[det] < -20 || t1[det] > 30) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 20 || tof > 50) && !fSimu && !fPairs)
@@ -2421,10 +2656,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 continue;
             if (fCuts && (x1[det] < -0.3 || x1[det] > 0.3) && fPairs)
                 continue;
-            if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
-                continue;
-            //  if (fCuts && (tof < -40 || tof > 40) && !fSimu && fPairs)
+            //  if (fCuts && (y1[det] < -0.3 || y1[det] > 0.3) && fPairs)
             //    continue;
+
             if (fCuts && (t1[det] < -20 || t1[det] > 30) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 20 || tof > 50) && !fSimu && !fPairs)
@@ -2568,16 +2802,15 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // Cuts on Fi23a
             // if (fCuts && (y1[det] * 100. < -7.5 || y1[det] * 100. > 7.5) && !fSimu)
             //   continue;
-            //    if (fCuts && (tof < -20 || tof > 50) && !fSimu && fPairs)
-            //      continue;
             //   if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB == -1710)
             //       continue;
-            /*  if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
-                  continue;*/
+            if (fCuts && (abs(x1[det] * 100.) < 0.1512))
+                continue;
             //  if (fCuts && (x1[det] < -0.06 || x1[det] > 0.06))
             //    continue;
-            if (fCuts && (y1[det] < -0.1 || y1[det] > 0.1) && fPairs)
-                continue;
+            // if (fCuts && (y1[det] < -0.1 || y1[det] > 0.1) && fPairs)
+            //   continue;
+
             if (fCuts && (y1[det] < -0.03 || y1[det] > 0.03) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 10 || tof > 90) && !fSimu && !fPairs)
@@ -2709,16 +2942,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
             // Cuts on Fi23b
             // if (fCuts && (x1[det] * 100. < -7.5 || x1[det] * 100. > 7.5) && !fSimu)
             //   continue;
-            //  if (fCuts && (tof < -20 || tof > 50) && !fSimu && fPairs)
-            //    continue;
             //   if (fCuts && (t1[det] < -40 || t1[det] > 40) && !fSimu && fB == -1710)
             //      continue;
-            /*    if (fCuts && (tof < -50 || tof > 50) && !fSimu && fB == -1710)
-                   continue;*/
-            //   if (fCuts && (y1[det] < -0.03 || y1[det] > 0.03))
-            //     continue;
-            if (fCuts && (x1[det] < -0.1 || x1[det] > 0.1) && fPairs)
+            if (fCuts && (abs(y1[det] * 100.) < 0.1512))
                 continue;
+
             if (fCuts && (y1[det] < -0.03 || y1[det] > 0.03) && !fSimu && !fPairs)
                 continue;
             if (fCuts && (tof < 10 || tof > 90) && !fSimu && !fPairs)
@@ -3233,7 +3461,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                         tempFi33 = false;
                         // if (fSimu)
-                        // tempFi33 = true;
+                        //   tempFi33 = true;
                         if (abs(timeFi31[i] - timeFi33[j]) < dtft && (tTofd2rs[i1] - timeFi33[j]) < 30 &&
                             (tTofd2rs[i1] - timeFi33[j]) > -25.)
                             tempFi33 = true;
@@ -3627,7 +3855,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                         // tempFi23al = true;
                         if ((tTofd1ls[i1] - timeFi23a[j]) < 28. && (tTofd1ls[i1] - timeFi23a[j]) > -25.)
                             tempFi23al = true;
-                        // if (abs(xFi30[i] * 100. - x30) < dx2 && xFi30[i]*100. > -30 && xFi23a[j]*100. > -6 &&
 
                         if ((!fPairs) ||
                             //  (fPairs && (xFi23a[j] * 100.) > 0.26 && tempFi23al)) // && abs(xFi30[i] * 100. - x30) <
@@ -3691,7 +3918,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                         tempFi23bl = false;
                         // if (fSimu)
-                        // tempFi23bl = true;
+                        //  tempFi23bl = true;
                         if ((tTofd1ls[i1] - timeFi23b[j]) < 25. && (tTofd1ls[i1] - timeFi23b[j]) > -25.)
                             tempFi23bl = true;
 
@@ -3909,10 +4136,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                         tempFi23al = false;
                         // if (fSimu)
-                        // tempFi23al = true;
+                        //  tempFi23al = true;
                         if ((tTofd2ls[i1] - timeFi23a[j]) < 28. && (tTofd2ls[i1] - timeFi23a[j]) > -25.)
                             tempFi23al = true;
-                        // if (abs(xFi30[i] * 100. - x30) < dx2 && xFi30[i]*100. > -30 && xFi23a[j]*100. > -6 &&
 
                         if ((!fPairs) ||
                             //  (fPairs && (xFi23a[j] * 100.) > 0.26 && tempFi23al)) // && abs(xFi30[i] * 100. - x30) <
@@ -3976,7 +4202,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                         tempFi23bl = false;
                         // if (fSimu)
-                        // tempFi23bl = true;
+                        //  tempFi23bl = true;
                         if ((tTofd2ls[i1] - timeFi23b[j]) < 25. && (tTofd2ls[i1] - timeFi23b[j]) > -25.)
                             tempFi23bl = true;
 
@@ -4453,6 +4679,8 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             fNeventpair++;
 
+            Bool_t bar24plane2 = false;
+            Bool_t bar21plane2 = false;
             Bool_t edgetofd = false;
             for (Int_t i = 0; i < countdet; i++)
             {
@@ -4472,7 +4700,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ttofdtemp6[ncounttemp6] = tdet[i];
                     if (xtofdtemp6[ncounttemp6] * 100. < -58.91)
                         edgetofd = true;
-                    qsum6 += qdet[i];
                     if (debug_write)
                         cout << "tofdtemp6: " << xtofdtemp6[ncounttemp6] * 100 << ", " << ytofdtemp6[ncounttemp6] * 100
                              << ", " << qtofdtemp6[ncounttemp6] << endl;
@@ -4484,7 +4711,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp7[ncounttemp7] = ydet[i];
                     qtofdtemp7[ncounttemp7] = qdet[i];
                     ttofdtemp7[ncounttemp7] = tdet[i];
-                    qsum7 += qdet[i];
                     ncounttemp7 += 1;
                 }
                 if (detector[i] == 8)
@@ -4493,9 +4719,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp8[ncounttemp8] = ydet[i];
                     qtofdtemp8[ncounttemp8] = qdet[i];
                     ttofdtemp8[ncounttemp8] = tdet[i];
+                    if (xtofdtemp8[ncounttemp8] * 100. < -4.0 && xtofdtemp8[ncounttemp8] * 100. > -4.2)
+                        bar21plane2 = true;
                     if (xtofdtemp8[ncounttemp8] * 100. > -5.48)
                         edgetofd = true;
-                    qsum8 += qdet[i];
                     if (debug_write)
                         cout << "tofdtemp8: " << xtofdtemp8[ncounttemp8] * 100 << ", " << ytofdtemp8[ncounttemp8] * 100
                              << ", " << qtofdtemp8[ncounttemp8] << endl;
@@ -4507,9 +4734,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp9[ncounttemp9] = ydet[i];
                     qtofdtemp9[ncounttemp9] = qdet[i];
                     ttofdtemp9[ncounttemp9] = tdet[i];
+                    if (xtofdtemp9[ncounttemp9] * 100. > 4.0 && xtofdtemp9[ncounttemp9] * 100. < 4.2)
+                        bar24plane2 = true;
                     if (xtofdtemp9[ncounttemp9] * 100. > 57.54 || xtofdtemp9[ncounttemp9] * 100. < 5.48)
                         edgetofd = true;
-                    qsum9 += qdet[i];
                     ncounttemp9 += 1;
                 }
                 if (detector[i] == 10)
@@ -4518,7 +4746,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp10[ncounttemp10] = ydet[i];
                     qtofdtemp10[ncounttemp10] = qdet[i];
                     ttofdtemp10[ncounttemp10] = tdet[i];
-                    qsum10 += qdet[i];
                     if (debug_write)
                         cout << "tofdtemp10: " << xtofdtemp10[ncounttemp10] * 100 << ", "
                              << ytofdtemp10[ncounttemp10] * 100 << ", " << qtofdtemp10[ncounttemp10] << endl;
@@ -4530,68 +4757,358 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ytofdtemp11[ncounttemp11] = ydet[i];
                     qtofdtemp11[ncounttemp11] = qdet[i];
                     ttofdtemp11[ncounttemp11] = tdet[i];
-                    qsum11 += qdet[i];
                     ncounttemp11 += 1;
                 }
                 ncount[detector[i]] += 1;
             }
             // Combine plane 2 (tofd) and plane 3 (tofi)
             Double_t qdiff = 100, xdiff = 100.;
-            for (Int_t iw10 = 0; iw10 < ncounttemp10; iw10++)
+            Bool_t checktof = false;
+
+            Bool_t tofd11used[ncounttemp11];
+            for (Int_t iw8 = 0; iw8 < ncounttemp11; iw8++)
             {
-                for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+                tofd11used[iw8] = false;
+            }
+
+            if (debug_write)
+            {
+                if (ncounttemp11 > 0 || ncounttemp10 > 0)
+                    checktof = true;
+                if (ncounttemp11 < 1 && bar24plane2)
+                    checktof = true;
+            }
+
+            if (checktof) //&& debug_write)
+            {
+                cout << "******************************************" << endl;
+
+                for (Int_t iw8 = 0; iw8 < ncounttemp7; iw8++)
                 {
-
-                    qdiff = std::abs(qtofdtemp10[iw10] - qtofdtemp8[iw8]);
-                    xdiff = std::abs(xtofdtemp10[iw10] - xtofdtemp8[iw8]) * 100;
-                    if (qdiff < 1 && xdiff < 1.38 && xtofdtemp8[iw8] * 100. < -2.74 &&
-                        xtofdtemp8[iw8] * 100. > -5.48) // bar 21 plane 2
-                    {
-                        // cout<<"plane 2, bar 21 before: "<<qtofdtemp8[iw8]<<"; "<<qtofdtemp10[iw10]<<";
-                        // "<<xtofdtemp8[iw8]*100<<
-                        // ", "<<xtofdtemp10[iw10] *100<<endl;
-
-                        qtofdtemp8[iw8] = qtofdtemp8[iw8];
-                        xtofdtemp8[iw8] = xtofdtemp10[iw10];
-                        ytofdtemp8[iw8] = (ytofdtemp8[iw8] + ytofdtemp10[iw10]) / 2.;
-
-                        // cout<<"plane 2, bar 21 after: "<<qtofdtemp8[iw8]<<"; "<<qtofdtemp10[iw10]<<";
-                        // "<<xtofdtemp8[iw8]*100<<
-                        // ", "<<xtofdtemp10[iw10] *100<<endl;
-                    }
+                    cout << "Before change det7: " << xtofdtemp7[iw8] * 100. << "; " << ytofdtemp7[iw8] * 100. << " "
+                         << qtofdtemp7[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp9; iw8++)
+                {
+                    cout << "Before change det9: " << xtofdtemp9[iw8] * 100. << "; " << ytofdtemp9[iw8] * 100. << " "
+                         << qtofdtemp9[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp11; iw8++)
+                {
+                    cout << "Before change det11: " << xtofdtemp11[iw8] * 100. << "; " << ytofdtemp11[iw8] * 100. << " "
+                         << qtofdtemp11[iw8] << endl;
                 }
             }
-            for (Int_t iw11 = 0; iw11 < ncounttemp11; iw11++)
+
+            if (ncounttemp9 < 1 &&
+                ncounttemp11 > 0) // trying to recover hits "lost" in bar 24 due to high counting rate
+            {
+                ncounttemp9 = 0;
+                for (Int_t iw11 = 0; iw11 < ncounttemp11; iw11++)
+                {
+                    if (checktof)
+                        cout << "First select in: " << xtofdtemp9[ncounttemp9] * 100 << ", " << xtofdtemp11[iw11] * 100
+                             << endl;
+                    xtofdtemp9[ncounttemp9] = xtofdtemp11[iw11];
+                    ytofdtemp9[ncounttemp9] = ytofdtemp11[iw11];
+                    qtofdtemp9[ncounttemp9] = qtofdtemp11[iw11];
+                    ttofdtemp9[ncounttemp9] = ttofdtemp11[iw11];
+                    ncounttemp9++;
+                    if (checktof)
+                        cout << "First select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                             << xtofdtemp9[ncounttemp9 - 1] * 100 << ", " << qtofdtemp9[ncounttemp9 - 1] << endl;
+                }
+            }
+            else if (ncounttemp9 > 0)
             {
                 for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
                 {
-                    qdiff = std::abs(qtofdtemp11[iw11] - qtofdtemp9[iw9]);
-                    xdiff = std::abs(xtofdtemp11[iw11] - xtofdtemp9[iw9]) * 100.;
-                    if (qdiff < 1 && xdiff < 1.38 && xtofdtemp9[iw9] * 100. > 2.74 &&
-                        xtofdtemp9[iw9] * 100. < 5.48) // bar 24 plane 2
+                    if (xtofdtemp9[iw9] * 100. > 2.74 && xtofdtemp9[iw9] * 100. < 5.48) // plane 2, bar 24
                     {
-                        // cout<<"plane 2, bar 24 before: "<<qtofdtemp9[iw9]<<"; "<<qtofdtemp11[iw11]<<";
-                        // "<<xtofdtemp9[iw9]*100<<
-                        //", "<<xtofdtemp11[iw11] *100<<endl;
+                        if (ncounttemp11 == 0) // no corresponding hit in plane 3, ignore bar 24
+                        {
+                            if (checktof)
+                                cout << "Second select in: " << xtofdtemp9[iw9] * 100 << ", event num: " << fNEvents
+                                     << endl;
+                            qtofdtemp9[iw9] = 0;
+                            xtofdtemp9[iw9] = -1000;
+                            ytofdtemp9[iw9] = -1000;
 
-                        qtofdtemp9[iw9] = qtofdtemp11[iw11];
-                        xtofdtemp9[iw9] = xtofdtemp11[iw11];
-                        ytofdtemp9[iw9] = (ytofdtemp9[iw9] + ytofdtemp11[iw11]) / 2.;
+                            if (checktof)
+                                cout << "Second select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                                     << xtofdtemp9[ncounttemp9] * 100 << ", " << qtofdtemp9[ncounttemp9] << endl;
+                        }
+                        for (Int_t iw11 = 0; iw11 < ncounttemp11; iw11++)
+                        {
+                            qdiff = std::abs(qtofdtemp11[iw11] - qtofdtemp9[iw9]);
+                            xdiff = std::abs(xtofdtemp11[iw11] - xtofdtemp9[iw9]) * 100.;
+                            if (checktof)
+                                cout << "3rd sel, xdiff, qdiff: " << ncounttemp9 << "; " << ncounttemp11 << "; "
+                                     << qdiff << ", " << xdiff << ", " << tofd11used[iw11] << endl;
+                            if (checktof)
+                                cout << "Third select first: " << iw9 << "; " << iw11 << ", " << xtofdtemp9[iw9] * 100
+                                     << ", " << xtofdtemp11[iw11] * 100 << " " << qtofdtemp9[iw9] << ", "
+                                     << qtofdtemp11[iw11] << endl;
+                            if (!tofd11used[iw11])
+                            {
+                                if (xdiff < 1.38)
+                                {
+                                    if (checktof)
+                                        cout << "Third select in: " << xtofdtemp9[iw9] * 100 << ", "
+                                             << xtofdtemp11[iw11] * 100 << " " << qtofdtemp9[iw9] << ", "
+                                             << qtofdtemp11[iw11] << endl;
+                                    qtofdtemp9[iw9] = qtofdtemp11[iw11];
+                                    xtofdtemp9[iw9] = xtofdtemp11[iw11];
+                                    ytofdtemp9[iw9] = ytofdtemp11[iw11];
+                                    tofd11used[iw11] = true;
+                                    if (checktof)
+                                        cout << "Third select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                                             << xtofdtemp9[iw9] * 100 << ", " << qtofdtemp9[iw9] << endl;
+                                }
+                                else
+                                {
+                                    if (checktof)
+                                        cout << "Fourth select in: " << xtofdtemp9[iw9] * 100 << ", "
+                                             << xtofdtemp11[iw11] * 100 << " " << qtofdtemp9[iw9] << ", "
+                                             << qtofdtemp11[iw11] << endl;
+                                    qtofdtemp9[iw9] = 0;
+                                    xtofdtemp9[iw9] = -1000;
+                                    ytofdtemp9[iw9] = -1000;
+                                    tofd11used[iw11] = true;
+                                    if (checktof)
+                                        cout << "Fourth select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                                             << xtofdtemp9[ncounttemp9] * 100 << ", " << qtofdtemp9[ncounttemp9]
+                                             << endl;
+                                }
+                            }
+                        }
+                    }
 
-                        // cout<<"plane 2, bar 24 after: "<<qtofdtemp9[iw9]<<"; "<<qtofdtemp11[iw11]<<";
-                        // "<<xtofdtemp9[iw9]*100<<
-                        //", "<<xtofdtemp11[iw11] *100<<endl;
+                    if (xtofdtemp9[iw9] * 100. > 5.48 && !bar24plane2) // plane 2, bar 25
+                    {
+                        for (Int_t iw11 = 0; iw11 < ncounttemp11; iw11++)
+                        {
+                            qdiff = std::abs(qtofdtemp11[iw11] - qtofdtemp9[iw9]);
+                            xdiff = std::abs(xtofdtemp11[iw11] - xtofdtemp9[iw9]) * 100.;
+                            if (checktof && debug_write)
+                                cout << "Fifth select in: " << xtofdtemp9[iw9] * 100 << ", " << xtofdtemp11[iw11] * 100
+                                     << " " << qtofdtemp9[iw9] << ", " << qtofdtemp11[iw11] << endl;
+                            if (qdiff < 1.5 && xdiff < 1.38 && !tofd11used[iw11])
+                            {
+                                xtofdtemp9[iw9] = (xtofdtemp11[iw11] + xtofdtemp9[iw9]) / 2.;
+                                tofd11used[iw11] = true;
+
+                                if (checktof && debug_write)
+                                    cout << "Fifth select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                                         << xtofdtemp9[iw9] * 100 << ", " << qtofdtemp9[iw9] << endl;
+                            }
+                            if (xtofdtemp11[iw11] * 100 < 5.54 && !tofd11used[iw11])
+                            {
+                                xtofdtemp9[ncounttemp9] = xtofdtemp11[iw11];
+                                ytofdtemp9[ncounttemp9] = ytofdtemp11[iw11];
+                                qtofdtemp9[ncounttemp9] = qtofdtemp11[iw11];
+                                ttofdtemp9[ncounttemp9] = ttofdtemp11[iw11];
+                                tofd11used[iw11] = true;
+
+                                if (checktof && debug_write)
+                                    cout << "Fifth select: " << ncounttemp11 << ", " << ncounttemp9 << ", "
+                                         << xtofdtemp9[ncounttemp9] * 100 << ", " << qtofdtemp9[ncounttemp9] << endl;
+                                ncounttemp9++;
+                            }
+                        }
                     }
                 }
+            }
+
+            for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
+            {
+                if (xtofdtemp9[iw9] * 100. == 4.11)
+                {
+                    xtofdtemp9[iw9] = -1000;
+                    ytofdtemp9[iw9] = -1000;
+                    qtofdtemp9[iw9] = 0;
+                }
+            }
+
+            Int_t imem = 0;
+            Bool_t wo9[ncounttemp9];
+            for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
+            {
+                wo9[iw9] = true;
+                if (qtofdtemp9[iw9] < 1)
+                {
+                    wo9[iw9] = false;
+                }
+            }
+            for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
+            {
+                if (checktof)
+                    cout << "reordering 1: " << iw9 << "; " << wo9[iw9] << ", " << xtofdtemp9[iw9] << endl;
+                if (wo9[iw9])
+                {
+                    xtofdtemp9[imem] = xtofdtemp9[iw9];
+                    ytofdtemp9[imem] = ytofdtemp9[iw9];
+                    qtofdtemp9[imem] = qtofdtemp9[iw9];
+                    ttofdtemp9[imem] = ttofdtemp9[iw9];
+                    if (checktof)
+                        cout << "reordering 2: " << imem << ", " << iw9 << "; " << wo9[iw9] << ", "
+                             << ", " << xtofdtemp9[imem] << ", " << xtofdtemp9[iw9] << endl;
+                    imem++;
+                }
+            }
+
+            ncounttemp9 = imem;
+
+            if (checktof)
+            {
+                for (Int_t iw8 = 0; iw8 < ncounttemp7; iw8++)
+                {
+                    cout << "After change det7: " << xtofdtemp7[iw8] * 100. << "; " << ytofdtemp7[iw8] * 100. << " "
+                         << qtofdtemp7[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp9; iw8++)
+                {
+                    cout << "After change det9: " << xtofdtemp9[iw8] * 100. << "; " << ytofdtemp9[iw8] * 100. << " "
+                         << qtofdtemp9[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp11; iw8++)
+                {
+                    cout << "After change det11: " << xtofdtemp11[iw8] * 100. << "; " << ytofdtemp11[iw8] * 100. << " "
+                         << qtofdtemp11[iw8] << endl;
+                }
+            }
+
+            if (checktof && debug_write)
+            {
+                for (Int_t iw8 = 0; iw8 < ncounttemp6; iw8++)
+                {
+                    cout << "Before change det6: " << xtofdtemp6[iw8] * 100. << "; " << ytofdtemp6[iw8] * 100. << " "
+                         << qtofdtemp6[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+                {
+                    cout << "Before change det8: " << xtofdtemp8[iw8] * 100. << "; " << ytofdtemp8[iw8] * 100. << " "
+                         << qtofdtemp8[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp10; iw8++)
+                {
+                    cout << "Before change det10: " << xtofdtemp10[iw8] * 100. << "; " << ytofdtemp10[iw8] * 100. << " "
+                         << qtofdtemp10[iw8] << endl;
+                }
+            }
+            Bool_t tof10used[ncounttemp10];
+            for (Int_t i = 0; i < ncounttemp10; i++)
+            {
+                tof10used[i] = false;
+            }
+            if (ncounttemp10 > 0 && ncounttemp8 < 1)
+            {
+                for (Int_t iw10 = 0; iw10 < ncounttemp10; iw10++)
+                {
+                    xtofdtemp8[ncounttemp8] = xtofdtemp10[iw10];
+                    ytofdtemp8[ncounttemp8] = ytofdtemp10[iw10];
+                    qtofdtemp8[ncounttemp8] = qtofdtemp10[iw10];
+                    ttofdtemp8[ncounttemp8] = ttofdtemp10[iw10];
+                    ncounttemp8++;
+                }
+            }
+            else if (ncounttemp8 > 0)
+            {
+                for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+                {
+                    if (xtofdtemp8[iw8] * 100. < -2.74 && xtofdtemp8[iw8] * 100. > -5.48) // bar 21 plane 2
+                    {
+                        if (ncounttemp10 == ncounttemp8 - 1 && ncounttemp6 == ncounttemp8 - 1)
+                            xtofdtemp8[iw8] = -3.71 / 100.;
+
+                        for (Int_t iw10 = 0; iw10 < ncounttemp10; iw10++)
+                        {
+                            qdiff = std::abs(qtofdtemp10[iw10] - qtofdtemp8[iw8]);
+                            xdiff = std::abs(xtofdtemp10[iw10] - xtofdtemp8[iw8]) * 100;
+
+                            if (qdiff < 1 && xdiff < 1.8 && !tof10used[iw10])
+                            {
+                                xtofdtemp8[iw8] = (xtofdtemp8[iw8] + xtofdtemp10[iw10]) / 2.;
+                                tof10used[iw10] = true;
+                            }
+                        }
+                    }
+                    if (xtofdtemp8[iw8] * 100. < -5.49 && xtofdtemp8[iw8] * 100. > -8.21) // bar 20 plane 2
+                    {
+                        for (Int_t iw10 = 0; iw10 < ncounttemp10; iw10++)
+                        {
+                            qdiff = std::abs(qtofdtemp10[iw10] - qtofdtemp8[iw8]);
+                            xdiff = std::abs(xtofdtemp10[iw10] - xtofdtemp8[iw8]) * 100;
+
+                            if (qdiff < 1 && xdiff < 1.38 && !tof10used[iw10])
+                            {
+                                xtofdtemp8[iw8] = (xtofdtemp8[iw8] + xtofdtemp10[iw10]) / 2.;
+                                tof10used[iw10] = true;
+                            }
+                            if (!bar21plane2 && !tof10used[iw10])
+                            {
+                                xtofdtemp8[ncounttemp8] = xtofdtemp10[iw10];
+                                ytofdtemp8[ncounttemp8] = ytofdtemp10[iw10];
+                                qtofdtemp8[ncounttemp8] = qtofdtemp10[iw10];
+                                ttofdtemp8[ncounttemp8] = ttofdtemp10[iw10];
+                                tof10used[iw10] = true;
+                                ncounttemp8++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (checktof && debug_write)
+            {
+                for (Int_t iw8 = 0; iw8 < ncounttemp6; iw8++)
+                {
+                    cout << "After change det6: " << xtofdtemp6[iw8] * 100. << "; " << ytofdtemp6[iw8] * 100. << " "
+                         << qtofdtemp6[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+                {
+                    cout << "After change det8: " << xtofdtemp8[iw8] * 100. << "; " << ytofdtemp8[iw8] * 100. << " "
+                         << qtofdtemp8[iw8] << endl;
+                }
+                for (Int_t iw8 = 0; iw8 < ncounttemp10; iw8++)
+                {
+                    cout << "After change det10: " << xtofdtemp10[iw8] * 100. << "; " << ytofdtemp10[iw8] * 100. << " "
+                         << qtofdtemp10[iw8] << endl;
+                }
+            }
+
+            for (Int_t iw8 = 0; iw8 < ncounttemp8; iw8++)
+            {
+                qsum8 += qtofdtemp8[iw8];
+            }
+
+            for (Int_t iw8 = 0; iw8 < ncounttemp6; iw8++)
+            {
+                qsum6 += qtofdtemp6[iw8];
+            }
+
+            for (Int_t iw8 = 0; iw8 < ncounttemp9; iw8++)
+            {
+                qsum9 += qtofdtemp9[iw8];
+            }
+
+            for (Int_t iw8 = 0; iw8 < ncounttemp7; iw8++)
+            {
+                qsum7 += qtofdtemp7[iw8];
             }
 
             Bool_t goodQ = false;
             Bool_t goodQtofd = false;
             Int_t isumtofd = ncounttemp6 + ncounttemp7 + ncounttemp8 + ncounttemp9;
             Double_t Qsum = qsum6 + qsum7 + qsum8 + qsum9;
+            ncount[6] = ncounttemp6;
+            ncount[7] = ncounttemp7;
+            ncount[8] = ncounttemp8;
+            ncount[9] = ncounttemp9;
             if (debug_write)
-                cout << "Sum of Tofd charges after fibcuts: " << qsum6 << ", " << qsum7 << ", " << qsum8 << ", "
-                     << qsum9 << ", total: " << Qsum << endl;
+                cout << "Sum of Tofd charges after fibcuts: qsum6: " << qsum6 << ", qsum7: " << qsum7
+                     << ", qsum8: " << qsum8 << ", qsum9: " << qsum9 << ", total: " << Qsum << endl;
             if (debug_write)
                 cout << "Tofd counts after fibcuts: " << ncount[6] << "; " << ncount[7] << "; " << ncount[8] << ", "
                      << ncount[9] << ", total: " << isumtofd << endl;
@@ -4626,8 +5143,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 goodQ = true;
 
             if (debug_write && !goodQ)
-                cout << "!goodQ: " << Qsum30 << ", " << Qsum32 << ", " << Qsum31 << ", " << Qsum33 << ", " << Qsum
-                     << endl;
+                cout << "!goodQ: "
+                     << "Qsum30: " << Qsum30 << ", QSum32: " << Qsum32 << ", QSum31: " << Qsum31
+                     << ", QSum33: " << Qsum33 << ", QSumTod: " << Qsum << endl;
 
             Bool_t goodFi3032counts = false;
             Bool_t goodFi3133counts = false;
@@ -4814,190 +5332,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     ttofdHe[15], ttofdC[15], qfi30[10], qfi31[10], qfi32[10], qfi33[10], qfi23b[15], qfi23a[15],
                     tfi23b[15], tfi23a[15];
 
-                Bool_t writeOut1 = false, writeOut2 = false, writeOut3 = true;
-
-                Double_t xbin6[23], xbin7[23];
-                for (Int_t i = 0; i < 23; i++)
-                {
-                    xbin7[i] = 2.74 + 2.74 * double(i);
-                    xbin6[i] = 2.74 + 2.74 * double(i);
-                }
                 Int_t count = 0;
                 Double_t xbinavr;
                 Double_t ffact;
-                /*
-                                for (Int_t i = 0; i < countdet_s; i++)
-                                {
-
-                                    if (detector_s[i] == 6)
-                                    {
-                                        Int_t xbincheck = 17;
-                                        Double_t xabs = abs(xdet_s[i] * 100.);
-
-                                        for (Int_t k = 0; k < 23; k++)
-                                        {
-                                            if (xabs >= xbin6[k] - 2.74 / 2. && xabs < xbin6[k] + 2.74 / 2.) // && xabs
-                   < xbin6[k+1])
-                                            {
-                                                if (k == xbincheck)
-                                                {
-                                                    // IcountwriteOut1[k] += 1;
-                                                    increment1 = true;
-                                                    for (Int_t ik = 0; ik < 23; ik++)
-                                                    {
-                                                        IcountwriteOut1[ik] = 0;
-                                                    }
-                                                }
-                                                // if((IcountwriteOut1[xbincheck]- IcountwriteOut1mem) == 1 && k!=
-                   xbincheck )
-                                                // IcountwriteOut1[k] += 1;
-
-                                                // xbinavr = 0.5*(xbin6[k+1]+xbin6[k]);
-                                                xbinavr = xbin6[k];
-                                                // count = int(exp(-0.5*((xbinavr-2.37542e+01)/3.56058e+01)*
-                                                //
-                   ((xbinavr-2.37542e+01)/3.56058e+01))/0.062877291 +
-                                                // 0.5); count = int(exp(-0.5*((xbinavr-8.90825e+00)/2.22813e+01)*
-                                                //
-                   ((xbinavr-8.90825e+00)/2.22813e+01))/0.0083772106 +
-                                                // 0.5);
-
-                                                ffact = exp(-0.5 * ((-60. - 8.77158e+00) / 2.16350e+01) *
-                                                            ((-60. - 8.77158e+00) / 2.16350e+01));
-                                                count = int(exp(-0.5 * ((xbinavr - 8.77158e+00) / 2.16350e+01) *
-                                                                ((xbinavr - 8.77158e+00) / 2.16350e+01)) /
-                                                                ffact +
-                                                            0.5);
-                                                if (count < 1)
-                                                    count = 1;
-
-                                                if (xabs < 30 && xabs > 15)
-                                                    count = count * 4;
-                                                if (xabs < 15)
-                                                    count = count * 8;
-
-                                                //    if (IcountwriteOut1[k] / (double)count == (int)IcountwriteOut1[k]
-                   / count)
-                                                //       writeOut1 = true;
-
-                                                // if(IcountwriteOut1[k] == IcountwriteOut1[xbincheck] &&
-                   IcountwriteOut1[xbincheck] >
-                                                // 0)  writeOut1 = true;
-
-                                                if (increment1)
-                                                {
-                                                    IcountwriteOut1[k] += 1;
-                                                    if (IcountwriteOut1[k] == 1)
-                                                        writeOut1 = true;
-                                                    else
-                                                        writeOut1 = false;
-                                                }
-
-                                                if (writeOut1)
-                                                    cout << "TOFD 6: " << xdet_s[i] * 100. << ", " << k << ", " <<
-                   xbinavr << ", "
-                                                         << count << ", " << IcountwriteOut1[k] << ", " <<
-                   IcountwriteOut1[xbincheck]
-                                                         << ", " << increment1 << ", " << writeOut1 << endl;
-
-                                                // if(k == xbincheck) IcountwriteOut1mem = IcountwriteOut1[k];
-                                            }
-                                        }
-                                        if (xabs < 4.05)
-                                            writeOut3 = false;
-                                    }
-                                    if (detector_s[i] == 7)
-                                    {
-                                        Int_t xbincheck = 17;
-                                        Double_t xabs = abs(xdet_s[i] * 100.);
-
-                                        for (Int_t k = 0; k < 23; k++)
-                                        {
-                                            if (xabs >= xbin7[k] - 2.74 / 2. && xabs < xbin7[k] + 2.74 / 2.) // && xabs
-                   < xbin7[k+1])
-                                            {
-                                                if (k == xbincheck)
-                                                {
-                                                    // IcountwriteOut2[k] += 1;
-                                                    increment2 = true;
-                                                    for (Int_t ik = 0; ik < 23; ik++)
-                                                    {
-                                                        IcountwriteOut2[ik] = 0;
-                                                    }
-                                                }
-                                                // if((IcountwriteOut2[xbincheck]- IcountwriteOut2mem) == 1 && k!=
-                   xbincheck)
-                                                // IcountwriteOut2[k] += 1;
-
-                                                // xbinavr = 0.5*(xbin7[k+1]+xbin7[k]);
-                                                xbinavr = xbin7[k];
-
-                                                // count = int(1.10891e+05 * exp(-0.5*((xbinavr+3.54984)/2.28616e+01)*
-                                                // ((xbinavr+3.54984)/2.28616e+01))*ffact  + 0.5);
-
-                                                // count = int(exp(-0.5*((xbinavr-8.96846e-02)/1.64014e+01)*
-                                                //
-                   ((xbinavr-8.96846e-02)/1.64014e+01))/0.0019629072 +
-                                                // 0.5);
-                                                ffact = exp(-0.5 * ((58. + 4.45754e+00) / 1.73268e+01) *
-                                                            ((58. + 4.45754e+00) / 1.73268e+01));
-                                                count = int(exp(-0.5 * ((xbinavr + 4.45754e+00) / 1.73268e+01) *
-                                                                ((xbinavr + 4.45754e+00) / 1.73268e+01)) /
-                                                                ffact +
-                                                            0.5);
-                                                if (count < 1)
-                                                    count = 1;
-
-                                                if (xabs < 30 && xabs > 15)
-                                                    count = count * 4;
-                                                if (xabs < 15)
-                                                    count = count * 16;
-
-                                                //   if (IcountwriteOut2[k] / (double)count == (int)IcountwriteOut2[k] /
-                   count)
-                                                //     writeOut2 = true;
-
-                                                // if(IcountwriteOut2[k] == IcountwriteOut2[xbincheck] &&
-                   IcountwriteOut2[xbincheck] >
-                                                // 0)  writeOut2 = true;
-
-                                                if (increment2)
-                                                {
-                                                    IcountwriteOut2[k] += 1;
-                                                    if (IcountwriteOut2[k] == 1)
-                                                        writeOut2 = true;
-                                                    else
-                                                        writeOut2 = false;
-                                                }
-
-                                                if (writeOut2)
-                                                    cout << "TOFD 7: " << xdet_s[i] * 100. << ", " << k << ", " <<
-                   xbinavr << ", "
-                                                         << count << ", " << IcountwriteOut2[k] << ", " <<
-                   IcountwriteOut2[xbincheck]
-                                                         << ", " << increment2 << ", " << writeOut2 << endl;
-
-                                                // if(k == xbincheck) IcountwriteOut2mem = IcountwriteOut2[k];
-                                            }
-                                        }
-                                        if (xabs < 4.05)
-                                            writeOut3 = false;
-                                    }
-                                }
-                */
-                // writeOut1 = true;
-                // writeOut2 = true;
-                // cout<<"Writeouts1/2/3: "<<writeOut1 <<", "<< writeOut2<<"; "<< writeOut3<<endl;
-                // if ((writeOut1 || writeOut2) && writeOut3)
-
-                // if((ncount[9] + ncount[7] + ncount[6] + ncount[8]) > 1 &&  (ncount[9] + ncount[7] + ncount[6] +
-                // ncount[8])<4)
 
                 if (1 == 1)
                 {
                     counterwo++;
                     //   cout << "* counter written out: " << counterwo << ", from Nevents: " << fNEvents << ", " <<
                     //   fNeventselect << endl;
+                    SelectedPairs = true;
 
                     for (Int_t i = 0; i < countdet_s; i++)
                     {
@@ -5187,7 +5531,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qright[iright] = (qtofdtemp8[iw8] + qtofdtemp6[iw6]) / 2.;
+                                    // if(xtofdtemp8[iw8]*100. < -5.62)
                                     xright[iright] = (xtofdtemp8[iw8] + xtofdtemp6[iw6]) / 2.;
+                                    //	else
+                                    //	xright[iright] = xtofdtemp8[iw8];
                                     yright[iright] = (ytofdtemp8[iw8] + ytofdtemp6[iw6]) / 2.;
                                     tright[iright] = (ttofdtemp8[iw8] + ttofdtemp6[iw6]) / 2.;
                                     iright++;
@@ -5207,7 +5554,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qright[iright] = (qtofdtemp8[iw8] + qtofdtemp6[iw6]) / 2.;
+                                    //  if(xtofdtemp8[iw8]*100. < -5.62)
                                     xright[iright] = (xtofdtemp8[iw8] + xtofdtemp6[iw6]) / 2.;
+                                    // else
+                                    //	xright[iright] = xtofdtemp8[iw8];
                                     yright[iright] = (ytofdtemp8[iw8] + ytofdtemp6[iw6]) / 2.;
                                     tright[iright] = (ttofdtemp8[iw8] + ttofdtemp6[iw6]) / 2.;
                                     imemright[iw8] = true;
@@ -5238,7 +5588,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qright[iright] = (qtofdtemp8[iw8] + qtofdtemp6[iw6]) / 2.;
+                                    // if(xtofdtemp8[iw8]*100. < -5.62)
                                     xright[iright] = (xtofdtemp8[iw8] + xtofdtemp6[iw6]) / 2.;
+                                    //	else
+                                    //	xright[iright] = xtofdtemp8[iw8];
                                     yright[iright] = (ytofdtemp8[iw8] + ytofdtemp6[iw6]) / 2.;
                                     tright[iright] = (ttofdtemp8[iw8] + ttofdtemp6[iw6]) / 2.;
                                     imemright[iw6] = true;
@@ -5261,6 +5614,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                     if (debug_write)
                     {
+                        cout << "**** FINAL VALUES ****" << endl;
                         for (Int_t i = 0; i < iright; i++)
                         {
                             cout << "Right side values: " << xright[i] * 100 << ", " << yright[i] * 100 << ", "
@@ -5279,7 +5633,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qleft[ileft] = (qtofdtemp9[iw9] + qtofdtemp7[iw7]) / 2.;
-                                    xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    if (xtofdtemp9[iw9] * 100 > 5.83)
+                                        xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    else
+                                        xleft[ileft] = xtofdtemp9[iw9];
                                     yleft[ileft] = (ytofdtemp9[iw9] + ytofdtemp7[iw7]) / 2.;
                                     tleft[ileft] = (ttofdtemp9[iw9] + ttofdtemp7[iw7]) / 2.;
                                     ileft++;
@@ -5287,6 +5644,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                             }
                         }
                     }
+
                     if (ncounttemp9 > ncounttemp7)
                     {
                         for (Int_t iw9 = 0; iw9 < ncounttemp9; iw9++)
@@ -5298,7 +5656,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qleft[ileft] = (qtofdtemp9[iw9] + qtofdtemp7[iw7]) / 2.;
-                                    xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    if (xtofdtemp9[iw9] * 100 > 5.83)
+                                        xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    else
+                                        xleft[ileft] = xtofdtemp9[iw9];
                                     yleft[ileft] = (ytofdtemp9[iw9] + ytofdtemp7[iw7]) / 2.;
                                     tleft[ileft] = (ttofdtemp9[iw9] + ttofdtemp7[iw7]) / 2.;
                                     imemleft[iw9] = true;
@@ -5329,7 +5690,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (qdiff < 0.5 && xdiff < 1.38)
                                 {
                                     qleft[ileft] = (qtofdtemp9[iw9] + qtofdtemp7[iw7]) / 2.;
-                                    xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    if (xtofdtemp9[iw9] * 100 > 5.83)
+                                        xleft[ileft] = (xtofdtemp9[iw9] + xtofdtemp7[iw7]) / 2.;
+                                    else
+                                        xleft[ileft] = xtofdtemp9[iw9];
                                     yleft[ileft] = (ytofdtemp9[iw9] + ytofdtemp7[iw7]) / 2.;
                                     tleft[ileft] = (ttofdtemp9[iw9] + ttofdtemp7[iw7]) / 2.;
                                     imemleft[iw7] = true;
@@ -5352,6 +5716,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
                     if (debug_write)
                     {
+                        cout << "***** FINAL VALUES ********" << endl;
                         for (Int_t i = 0; i < ileft; i++)
                         {
                             cout << "Left side values: " << xleft[i] * 100 << ", " << yleft[i] * 100 << ", " << qleft[i]
@@ -5565,6 +5930,65 @@ void R3BPreTrackS494::Exec(Option_t* option)
             tMax[i] = -1000.;
         }
 
+        if (fMappedItems.at(DET_CALIFA) && SelectedPairs)
+        {
+            auto mapCalifa = fMappedItems.at(DET_CALIFA);
+            Int_t nMappCalifa = mapCalifa->GetEntriesFast();
+            for (Int_t ihitMapp = 0; ihitMapp < nMappCalifa; ihitMapp++)
+            {
+
+                R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)mapCalifa->At(ihitMapp);
+                if (!hitCalifa)
+                    continue;
+                auto crystalId = hitCalifa->GetCrystalId();
+                auto ov = hitCalifa->GetOverflow();
+
+                if (ov > 0)
+                    fh_califa_overflow->Fill(crystalId);
+                if (ov == 0)
+                    fh_califa_good->Fill(crystalId);
+            }
+        }
+
+        if (fHitItems.at(DET_CALIFA) && SelectedPairs)
+        {
+            // CALIFA
+            auto detCalifa = fHitItems.at(DET_CALIFA);
+            nHitsCalifa = detCalifa->GetEntriesFast();
+            for (Int_t ihitC = 0; ihitC < nHitsCalifa; ihitC++)
+            {
+                R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihitC);
+                if (!hitCalifa)
+                    continue;
+                Double_t theta = hitCalifa->GetTheta();
+                Double_t Energy_dc = hitCalifa->GetEnergy() * GAMMA * (1 - BETA * TMath::Cos(theta));
+                if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
+                    hitCalifa->GetMotherCrystal() < 1953) // gammas
+                {
+                    ULong64_t timeCalifa = hitCalifa->GetTime();
+                    Double_t timerelCalifa = (double)(timeCalifa - time);
+                    fh_califa_tofd->Fill(timerelCalifa, tStart);
+                    fh_califa_energy_select->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
+                    // cout<<"tofd & califa: "<<fNEvents<<", "<<time<<", "<<timeCalifa <<", "<<diff<<", "<<tStart<<",
+                    // "<<diff-tStart<<endl;
+
+                    // if (Energy > 0)
+                    {
+
+                        new ((*fCalifaHitItems)[fNofCalifaHitItems++])
+                            R3BCalifaClusterData(hitCalifa->GetCrystalList(),
+                                                 hitCalifa->GetEnergy(),
+                                                 hitCalifa->GetNf(),
+                                                 hitCalifa->GetNs(),
+                                                 hitCalifa->GetTheta(),
+                                                 hitCalifa->GetPhi(),
+                                                 hitCalifa->GetTime(),
+                                                 hitCalifa->GetClusterType());
+                    }
+                }
+            }
+        }
+
     } // end ToFD loop
 
     if (multTofd > 0)
@@ -5586,6 +6010,11 @@ void R3BPreTrackS494::FinishEvent()
     fFi32HitItems->Clear();
     fNofFi33HitItems = 0;
     fFi33HitItems->Clear();
+    if (fHitItems.at(DET_CALIFA))
+    {
+        fNofCalifaHitItems = 0;
+        fCalifaHitItems->Clear();
+    }
     for (Int_t det = 0; det < DET_MAX; det++)
     {
         if (fMappedItems.at(det))
@@ -5804,11 +6233,6 @@ void R3BPreTrackS494::FinishTask()
         fh_IC->Write();
     }
 
-    if (fCalItems.at(DET_CALIFA))
-    {
-        fh_califa_energy->Write();
-    }
-
     if (fHitItems.at(DET_TOFD))
     {
         fh_xy_tofd->Write();
@@ -5912,6 +6336,7 @@ void R3BPreTrackS494::FinishTask()
     fh_xy_target->Write();
     fh_qsum_mult_fi23a->Write();
     fh_qsum_mult_fi23b->Write();
+    fh_qtofi_vs_qtofd->Write();
     /*
        for(Int_t i=0; i<21;i++){
            fh_Fi23aToF_Q[i]->Write();
@@ -5927,6 +6352,22 @@ void R3BPreTrackS494::FinishTask()
         fh_check_QvsX[i]->Write();
         fh_check_TvsX[i]->Write();
         fh_check_XvsY[i]->Write();
+    }
+    //  if (fCalItems.at(DET_CALIFA))
+    {
+        fh_califa_energy->Write();
+        fh_califa_energy_dc->Write();
+        fh_califa_energy_select->Write();
+        fh_califa_time->Write();
+        fh_califa_tofd->Write();
+        fh_califa_cluster->Write();
+        fh_califa_energy_rolu->Write();
+        fh_califa_time_rolu->Write();
+        fh_califa_cluster_rolu->Write();
+        fh_califa_overflow->Write();
+        fh_califa_good->Write();
+        fh_califa_motherid_clustertype->Write();
+        fh_califa_crystallist->Write();
     }
 }
 

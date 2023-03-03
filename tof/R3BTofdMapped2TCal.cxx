@@ -37,6 +37,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -93,7 +94,11 @@ InitStatus R3BTofdMapped2TCal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");

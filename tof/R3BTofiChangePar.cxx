@@ -32,6 +32,7 @@
 #include "FairRtdbRun.h"
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TCanvas.h"
 #include "TClonesArray.h"

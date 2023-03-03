@@ -71,7 +71,7 @@ int R3BMCTrack::GetNPoints(DetectorId detId) const
 {
     if (detId < 0 || detId >= fNPoints.size())
     {
-        LOG(ERROR) << "Unknown detector ID " << detId;
+        LOG(error) << "Unknown detector ID " << detId;
         return 0;
     }
     return fNPoints.at(detId);

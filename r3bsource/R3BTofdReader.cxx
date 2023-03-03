@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTofdMappedData.h"
 #include "TClonesArray.h"
 #include "ext_data_struct_info.hh"
@@ -57,7 +58,7 @@ R3BTofdReader::~R3BTofdReader()
 Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTofdReader::Init";
+    LOG(info) << "R3BTofdReader::Init";
     EXT_STR_h101_TOFD_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TOFD, 0);
 
     if (!ok)
@@ -81,9 +82,12 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
+        LOG(error) << "FairRootManager not found";
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
     for (int d = 0; d < MAX_TOFD_PLANES; d++)
@@ -104,7 +108,7 @@ Bool_t R3BTofdReader::Read()
     Int_t fNEventUnpack = header->GetEventno();
     //  cout<<"nEvent from Unpack: "<<fNEventUnpack<<endl;
 
-    LOG(DEBUG) << "R3BTofdReader::Read() Event data.";
+    LOG(debug) << "R3BTofdReader::Read() Event data.";
     // if (fNEvents / 10000. == (int)fNEvents / 10000)
     //   std::cout << "ToFD Events: " << fNEvents << std::endl;
     fNEvents += 1;

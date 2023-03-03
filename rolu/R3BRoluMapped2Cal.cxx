@@ -29,6 +29,7 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -100,7 +101,11 @@ InitStatus R3BRoluMapped2Cal::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("RoluMapped");

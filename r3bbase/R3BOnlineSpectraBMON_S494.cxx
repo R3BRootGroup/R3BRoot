@@ -43,6 +43,7 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 #include "TCanvas.h"
 #include "TDatime.h"
 #include "TGaxis.h"
@@ -122,7 +123,12 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
+
     FairRunOnline* run = FairRunOnline::Instance();
 
     run->GetHttpServer()->Register("/Tasks", this);

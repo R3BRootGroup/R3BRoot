@@ -16,6 +16,7 @@
 #include "FairRootManager.h"
 #include "R3BBeamMonitorMappedData.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "TClonesArray.h"
 extern "C"
 {
@@ -50,15 +51,19 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     EXT_STR_h101_BMON_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_BMON, 0);
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup structure information.";
+        LOG(error) << "Failed to setup structure information.";
 
         return kFALSE;
     }

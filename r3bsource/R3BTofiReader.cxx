@@ -14,6 +14,8 @@
 #include "R3BTofiReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BTofiMappedData.h"
 #include "TClonesArray.h"
 
@@ -56,9 +58,13 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     EXT_STR_h101_TOFI_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TOFI, 0);
 

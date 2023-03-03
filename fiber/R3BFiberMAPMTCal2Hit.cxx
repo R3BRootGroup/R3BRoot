@@ -362,10 +362,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             trail_raw = cur_cal_trail->GetTime_ns();
             trail_trig_ns = cur_cal_trig_ns;
 
-            if (fName == "Fi23a" && fnEvents == 60929)
-                cout << "Cal2Hit Fi23a 0th: " << fnEvents << ", " << chlead_i << "; " << lead->GetChannel() << "; "
-                     << lead_raw << ", " << lead_ns << ", " << trail_raw << endl;
-
             if (tot_ns < fGate_ns && tot_ns > 0.)
             {
                 //	if(chlead_i == 0 && fName=="Fi31") cout<<"Side: "<<side_i<<", "<<lead_raw<<", "<<lead_trig_ns<<",

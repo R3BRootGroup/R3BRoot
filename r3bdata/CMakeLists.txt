@@ -45,13 +45,13 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
-${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
+#${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 )
 
@@ -143,9 +143,9 @@ sci8Data/R3BSci8MappedData.cxx
 sci8Data/R3BSci8CalData.cxx
 sci8Data/R3BSci8HitData.cxx
 actarData/R3BActarPoint.cxx
-strawtubesData/R3BStrawtubesMappedData.cxx
-strawtubesData/R3BStrawtubesCalData.cxx
-strawtubesData/R3BStrawtubesHitData.cxx
+#strawtubesData/R3BStrawtubesMappedData.cxx
+#strawtubesData/R3BStrawtubesCalData.cxx
+#strawtubesData/R3BStrawtubesHitData.cxx
 neulandData/R3BPaddleTamexMappedData.cxx
 tofData/R3BTofdMappedData.cxx
 tofData/R3BTofdCalData.cxx
@@ -183,9 +183,9 @@ musicData/R3BMusicMappedData.cxx
 musicData/R3BMusicCalData.cxx
 musicData/R3BMusicHitData.cxx
 sampData/R3BSamplerMappedData.cxx
-sfibData/R3BSfibMappedData.cxx
-sfibData/R3BSfibCalData.cxx
-sfibData/R3BSfibHitData.cxx
+#sfibData/R3BSfibMappedData.cxx
+#sfibData/R3BSfibCalData.cxx
+#sfibData/R3BSfibHitData.cxx
 frsData/R3BFrsData.cxx
 )
 

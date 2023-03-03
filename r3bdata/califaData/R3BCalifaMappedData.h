@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,35 +13,69 @@
 
 #ifndef R3BCALIFAMAPPEDDATA_H
 #define R3BCALIFAMAPPEDDATA_H
+
 #include "TObject.h"
 #include <stdint.h>
 
-class R3BCalifaFebexReader;
-
 class R3BCalifaMappedData : public TObject
 {
-#define MEMBER_PLUS_GETTER(type, name)                                  \
-    protected: type f##name {};                                         \
-    public: inline const type& Get##name() const { return f##name ; }
-    
-    MEMBER_PLUS_GETTER(uint16_t, CrystalId);
-    
-    MEMBER_PLUS_GETTER( int16_t, Energy);
-    MEMBER_PLUS_GETTER( int16_t, Ns);
-    MEMBER_PLUS_GETTER( int16_t, Nf);
-    MEMBER_PLUS_GETTER(uint16_t, Tot);
 
-    MEMBER_PLUS_GETTER(uint64_t, FebexTS);
-    MEMBER_PLUS_GETTER(uint64_t, WRTS);
-
-    MEMBER_PLUS_GETTER(uint32_t, Overflow);
-    MEMBER_PLUS_GETTER(uint16_t, Pileup);
-    MEMBER_PLUS_GETTER(uint16_t, Discard);
-
-#undef MEMBER_PLUS_GETTER
-    friend class R3BCalifaFebexReader;
   public:
-    ClassDef(R3BCalifaMappedData, 5);
+    // Default Constructor
+    R3BCalifaMappedData();
+
+    /** Standard Constructor
+     *@param crystalId   Crystal unique identifier
+     *@param energy      Total energy deposited in the crystal [GeV]
+     *@param nf          Total fast amplitude deposited in the crystal [a.u.]
+     *@param ns          Total slow amplitude deposited on the crystal [a.u.]
+     *@param febextime   Internal febex time per crystal [ns]
+     *@param wrts        Timestamp per crystal or time since event start in simulation [ns]
+     *@param ov          Overflow bits
+     *@param pu          Pileup bits
+     *@param dc          Discard bits
+     *@param tot         Time-over-threshold
+     **/
+    R3BCalifaMappedData(UShort_t crystalId,
+                        int16_t energy,
+                        int16_t nf,
+                        int16_t ns,
+                        uint64_t febextime,
+                        uint64_t wrts,
+                        uint32_t ov,
+                        uint16_t pu,
+                        uint16_t dc,
+                        uint16_t tot);
+
+    // Destructor
+    virtual ~R3BCalifaMappedData() {}
+
+    // Getters
+    inline const UShort_t& GetCrystalId() const { return fCrystalId; }
+    inline const int16_t& GetEnergy() const { return fEnergy; }
+    inline const int16_t& GetNf() const { return fNf; }
+    inline const int16_t& GetNs() const { return fNs; }
+    inline const uint64_t& GetFebexTime() const { return fFebexTime; }
+    inline const uint64_t& GetWRTS() const { return fWrts; }
+    inline const uint32_t& GetOverflow() const { return fOverFlow; }
+    inline const uint16_t& GetPileup() const { return fPileup; }
+    inline const uint16_t& GetDiscard() const { return fDiscard; }
+    inline const uint16_t& GetTot() const { return fTot; }
+
+  protected:
+    UShort_t fCrystalId; // Crystal unique identifier
+    int16_t fEnergy;     // Total energy in the crystal
+    int16_t fNf;         // Total fast amplitude in the crystal
+    int16_t fNs;         // Total slow amplitude in the crystal
+    uint64_t fFebexTime; // Internal febex time
+    uint64_t fWrts;      // Timestamp per crystal
+    uint32_t fOverFlow;  // Overflow bits
+    uint16_t fPileup;    // Pileup bits
+    uint16_t fDiscard;   // Discard bits
+    uint16_t fTot;       // Time-over-treshold
+
+  public:
+    ClassDef(R3BCalifaMappedData, 4)
 };
 
 #endif

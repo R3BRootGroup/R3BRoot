@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAONLINESPECTRA
-#define R3BCALIFAONLINESPECTRA
+#ifndef R3BCALIFAONLINESPECTRA_H
+#define R3BCALIFAONLINESPECTRA_H 1
 
 #include "FairTask.h"
 #include "TCanvas.h"
-#include "THStack.h"
 #include "TMath.h"
 #include <array>
 #include <cstdlib>
@@ -32,6 +31,7 @@
 class TClonesArray;
 class R3BCalifaMappingPar;
 class TH1F;
+class TH1I;
 class TH2F;
 class R3BEventHeader;
 
@@ -40,7 +40,6 @@ class R3BEventHeader;
  */
 class R3BCalifaOnlineSpectra : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -157,21 +156,40 @@ class R3BCalifaOnlineSpectra : public FairTask
      */
     void Febex2Preamp_CALIFA_Histo();
 
+    /**
+     * Method for setting the trigger
+     */
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+
+    /**
+     * Method for selecting tpat values.
+     */
+    void SetTpat(Int_t tpat1, Int_t tpat2)
+    {
+        fTpat1 = tpat1;
+        fTpat2 = tpat2;
+    }
+
   private:
     void SetParameter();
 
     Int_t fMapHistos_max;
     Int_t fMapHistos_bins;
+    Int_t fTpat1;
+    Int_t fTpat2;
 
     R3BCalifaMappingPar* fMap_Par;    /**< Container with mapping parameters. >*/
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
-    TClonesArray* fCalItemsCalifa;    /**< Array with cal items.       */
-    TClonesArray* fHitItemsCalifa;    /**< Array with hit items.       */
-    TClonesArray* fWRItemsMaster;     /**< Array with WR-Master items. */
+    TClonesArray* fTrigMappedItemsCalifa;
+    TClonesArray* fCalItemsCalifa; /**< Array with cal items.       */
+    TClonesArray* fHitItemsCalifa; /**< Array with hit items.       */
+    TClonesArray* fWRItemsCalifa;  /**< Array with WR-Califa items. */
+    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
     Int_t fNEvents;         /**< Event counter. */
+    Int_t fTrigger;
 
     Int_t fNbCalifaCrystals;              /**< Number of Crystals in Califa. */
     Int_t fNumSides;                      /**< Number of Sides, left and right.   */
@@ -216,12 +234,11 @@ class R3BCalifaOnlineSpectra : public FairTask
 
     // WR data
     TCanvas* cCalifa_wr;
-    TH1F* fh1_Califa_wr;
+    TH1I* fh1_Califa_wr;
     TCanvas* cWrs;
     TH1I* fh1_wrs[2];
     TCanvas* cCalifa_sync;
     TH1F* fh1_Califa_sync[3];
-    THStack* stack_wrs;
     TCanvas* cCalifa_wr_energy;
 
     // Histograms
@@ -247,9 +264,11 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
     TH2F* fh2_Califa_NsNf;
+    TH2F* fh2_Califa_EtrigCor[4];
+    TH1F* fh1_Califa_Etrig[2];
 
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)
 };
 
-#endif
+#endif /* R3BCALIFAONLINESPECTRA_H */

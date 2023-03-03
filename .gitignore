@@ -39,7 +39,8 @@
 
 # Generated folders and files 
 geometry/neuland_v*.root
-build/
+geometry/*.geo.root
+build*/
 input/
 
 macros/

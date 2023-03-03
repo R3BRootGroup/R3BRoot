@@ -16,6 +16,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BWRLosData.h"
 #include "TClonesArray.h"
 using namespace std;
@@ -58,8 +59,11 @@ Bool_t R3BWhiterabbitLosReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
     FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (fEventHeader)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
     // Register output array in tree
     if (!fOnline)
     {

@@ -12,10 +12,9 @@
  ******************************************************************************/
 
 #include "R3BUnpackReader.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
-
+#include "R3BLogger.h"
 extern "C"
 {
 #include "ext_data_client.h"
@@ -30,7 +29,6 @@ R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, UInt_t offset)
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
     , fHeader(new R3BEventHeader())
 {
 }
@@ -47,23 +45,24 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
 
+    R3BLOG(info, "");
     EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_unpack, 0);
 
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    mgr->Register("R3BEventHeader", "EventHeader", fHeader, kTRUE);
+    // Look for the R3BEventHeader
+    auto frm = FairRootManager::Instance();
+    fHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fHeader)
     {
-        LOG(warn) << "EventHeader. not found" << endl;
+        R3BLOG(warn, "EventHeader. not found");
     }
     else
-        LOG(info) << "EventHeader. found" << endl;
+        R3BLOG(info, "EventHeader. found");
 
     return kTRUE;
 }
@@ -94,6 +93,6 @@ Bool_t R3BUnpackReader::Read()
     return kTRUE;
 }
 
-void R3BUnpackReader::Reset() { fNEvent = 0; }
+void R3BUnpackReader::Reset() {}
 
 ClassImp(R3BUnpackReader)

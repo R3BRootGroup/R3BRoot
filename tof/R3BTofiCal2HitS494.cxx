@@ -27,6 +27,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 #include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -227,7 +228,12 @@ InitStatus R3BTofiCal2HitS494::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
+
     fCalItems = (TClonesArray*)mgr->GetObject("TofiCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofiCal not found";

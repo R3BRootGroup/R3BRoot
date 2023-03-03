@@ -11,12 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BWhiterabbitMasterReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
+
 #include "R3BEventHeader.h"
-//#include "R3BWRMasterData.h"
+#include "R3BLogger.h"
 #include "R3BWRData.h"
+#include "R3BWhiterabbitMasterReader.h"
 
 #include "TClonesArray.h"
 
@@ -27,17 +28,16 @@ extern "C"
 }
 
 R3BWhiterabbitMasterReader::R3BWhiterabbitMasterReader(EXT_STR_h101_WRMASTER* data,
-                                                       UInt_t offset,
+                                                       size_t offset,
                                                        UInt_t whiterabbit_id)
     : R3BReader("R3BWhiterabbitMasterReader")
     , fNEvent(1)
     , fData(data)
     , fOffset(offset)
-    , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
+    , fOnline(kTRUE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
-    , fArray(new TClonesArray("R3BWRMasterData"))
+    , fArray(new TClonesArray("R3BWRData"))
 {
 }
 
@@ -47,33 +47,36 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
     {
         delete fArray;
     }
+    if (fEventHeader)
+    {
+        // Do not even think about deleting stuff you don't own!
+    }
 }
 
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(info) << "R3BWhiterabbitMasterReader::Init";
+    R3BLOG(info, "");
     EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMASTER, 0);
-
     if (!ok)
     {
-        LOG(error) << "R3BWhiterabbitMasterReader::Failed to setup structure information.";
+        R3BLOG(fatal, "Failed to setup structure information");
         return kFALSE;
     }
 
+    // Looking for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
-
+    fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
     if (!fEventHeader)
     {
-        LOG(warn) << "EventHeader. not found" << std::endl;
-        fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
+        R3BLOG(warn, "EventHeader. not found");
+        fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
     }
     else
-        LOG(info) << "EventHeader. found" << std::endl;
+        R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
+    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kTRUE); // !fOnline);
     Reset();
     memset(fData, 0, sizeof *fData);
 
@@ -109,6 +112,9 @@ Bool_t R3BWhiterabbitMasterReader::Read()
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T3 << 32) |
                              ((uint64_t)fData->TIMESTAMP_MASTER_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_MASTER_WR_T1;
         fNEvent = fEventHeader->GetEventno();
+        fEventHeader->SetTimeStamp(timestamp);
+        if (fNEvent == 1)
+            fEventHeader->SetTStart(timestamp);
         new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp);
     }
     else
@@ -124,7 +130,6 @@ void R3BWhiterabbitMasterReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    // fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitMasterReader)
+ClassImp(R3BWhiterabbitMasterReader);

@@ -29,6 +29,7 @@
 #include "FairRtdbRun.h"
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TMath.h"
 #include <TRandom3.h>
@@ -113,7 +114,11 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     }
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     auto name = fName + "Cal";
     fCalItems = (TClonesArray*)mgr->GetObject(name);

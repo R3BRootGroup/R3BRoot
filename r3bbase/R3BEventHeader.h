@@ -11,10 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BEVENTHEADER
-#define R3BEVENTHEADER
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+#ifndef R3BEVENTHEADER_h
+#define R3BEVENTHEADER_h 1
 
 #include "FairEventHeader.h"
+#include <stdexcept>
 
 class R3BEventHeader : public FairEventHeader
 {
@@ -22,27 +36,41 @@ class R3BEventHeader : public FairEventHeader
     R3BEventHeader();
     virtual ~R3BEventHeader();
 
-    inline void SetEventno(const UInt_t eventno) { fEventno = eventno; }
-    inline void SetTrigger(const UInt_t trigger) { fTrigger = trigger; }
-    inline void SetTimeStamp(const ULong_t timeStamp) { fTimeStamp = timeStamp; }
-    inline void SetTpat(const UShort_t tpat) { fTpat = tpat; }
-    inline void SetTStart(const Double_t tStart) { fTStart = tStart; }
+    void SetExpId(const Int_t expid) { fExpId = expid; }
+    void SetEventno(const uint64_t eventno) { fEventno = eventno; }
+    void SetTrigger(const Int_t trigger) { fTrigger = trigger; }
+    void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
+    void SetTpat(const Int_t tpat) { fTpat = tpat; }
+    void SetTStart(const Double_t tStart) { fTStart = tStart; }
 
-    inline UInt_t GetEventno() const { return fEventno; }
-    inline UInt_t GetTrigger() const { return fTrigger; }
-    inline ULong_t GetTimeStamp() const { return fTimeStamp; }
-    inline UShort_t GetTpat() const { return fTpat; }
-    inline Double_t GetTStart() const { return fTStart; }
+    Int_t GetExpId() const { return fExpId; }
+    uint64_t GetEventno() const { return fEventno; }
+    Int_t GetTrigger() const { return fTrigger; }
+    uint64_t GetTimeStamp() const { return fTimeStamp; }
+    Int_t GetTpat() const { return fTpat; }
+
+/*
+    static constexpr uint32_t MakeTpatBit(uint8_t trigNo)
+    {
+        return (1 <= trigNo && trigNo <= 16) ? (1 << (trigNo - 1)) : throw std::runtime_error("Bad trigNo.");
+    }
+
+    bool HasTpatTrig(int trigNo) const { return fTpat & MakeTpatBit(trigNo); }
+*/
+    Double_t GetTStart() const { return fTStart; }
+
+    virtual void Register(Bool_t Persistance = kTRUE);
 
   private:
-    UInt_t fEventno;
-    UInt_t fTrigger;
-    ULong_t fTimeStamp;
-    UShort_t fTpat;
+    Int_t fExpId;
+    uint64_t fEventno;
+    Int_t fTrigger;
+    uint64_t fTimeStamp;
+    Int_t fTpat;
     Double_t fTStart;
 
-  public:
-    ClassDef(R3BEventHeader, 5)
+    ClassDef(R3BEventHeader, 8)
 };
 
-#endif
+#endif /* R3BEVENTHEADER_h */
+

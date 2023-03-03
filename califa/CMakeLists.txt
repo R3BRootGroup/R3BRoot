@@ -65,7 +65,7 @@ set(SRCS
 #./calibration/R3BCalifaCrystalCal2Hit.cxx
 ./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
 ./online/R3BCalifaOnlineSpectra.cxx
-./online/R3BCalifaDemoOnlineSpectra.cxx
+#./online/R3BCalifaDemoOnlineSpectra.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 )
 

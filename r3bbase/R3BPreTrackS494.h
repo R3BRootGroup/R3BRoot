@@ -165,7 +165,9 @@ class R3BPreTrackS494 : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
+    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
     TClonesArray* fMCTrack;
+    
     TClonesArray* fTofdHitItems;       
     Int_t fNofTofdHitItems = 0;
     TClonesArray* fFi23aHitItems;       
@@ -180,6 +182,8 @@ class R3BPreTrackS494 : public FairTask
     Int_t fNofFi32HitItems = 0;
     TClonesArray* fFi33HitItems;       
     Int_t fNofFi33HitItems = 0;
+    TClonesArray* fCalifaHitItems;       
+    Int_t fNofCalifaHitItems = 0;
 
     enum DetectorInstances
     {
@@ -229,6 +233,7 @@ class R3BPreTrackS494 : public FairTask
 
 	TCutG *cut_qfi31_qfi33;
 	TCutG *cut_qfi30_qfi32;
+	TCutG *cut_qtofi_bar14;
 	
 	
     unsigned long long time_start = 0, time = 0;
@@ -321,6 +326,18 @@ class R3BPreTrackS494 : public FairTask
     TH1F* fh_TOFDOR;
 
     TH2F* fh_califa_energy;
+	TH2F* fh_califa_energy_select;
+	TH2F* fh_califa_tofd;
+	TH2F* fh_califa_time;
+	TH2F* fh_califa_energy_dc;
+	TH2F* fh_califa_cluster;
+	TH2F* fh_califa_energy_rolu;
+	TH2F* fh_califa_time_rolu;
+	TH2F* fh_califa_cluster_rolu;
+	TH1F* fh_califa_overflow;
+	TH1F* fh_califa_good;
+	TH2F* fh_califa_motherid_clustertype;
+	TH2F* fh_califa_crystallist;
 	
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
@@ -429,6 +446,7 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_tofd_x_vs_y_z[6];
 	TH2F* fh_qsum_mult_fi23a;
 	TH2F* fh_qsum_mult_fi23b;
+	TH2F* fh_qtofi_vs_qtofd;
 
 
 	

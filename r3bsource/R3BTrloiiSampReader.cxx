@@ -2,6 +2,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BSamplerMappedData.h"
 #include "TClonesArray.h"
 
@@ -46,7 +47,7 @@ Bool_t R3BTrloiiSampReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     auto mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader");
 
     FairRootManager::Instance()->Register("SamplerMapped", "Land", fArray, kTRUE);
     fArray->Clear();

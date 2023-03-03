@@ -24,6 +24,8 @@
 #pragma link C++ class R3BDetector+;
 #pragma link C++ class R3BEventHeader+;
 #pragma link C++ class R3BEventHeaderCal2Hit+;
+#pragma link C++ class R3BFileSource+;
+#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BOnlineSpectra+;
 //#pragma link C++ class R3BOnlineSpectraLosEngRun2019+;
 #pragma link C++ class R3BOnlineSpectraDec2019+;

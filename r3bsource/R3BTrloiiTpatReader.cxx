@@ -15,6 +15,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 
 extern "C"
 {
@@ -49,7 +50,11 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     auto mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (fEventHeader)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     return kTRUE;
 }
@@ -74,7 +79,7 @@ Bool_t R3BTrloiiTpatReader::Read()
     if (0 == (fNEvent % 1000000))
     {
 
-        LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent;
+        LOG(debug1) << "R3BTrloiiTpatReader : event : " << fNEvent;
     }
 
     /* Display data */

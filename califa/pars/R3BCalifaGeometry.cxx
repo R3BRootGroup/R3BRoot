@@ -58,7 +58,8 @@ bool R3BCalifaGeometry::Init(Int_t version)
 
         case 2021:
             // s455 Experiment: Half Barrel + Full IPHOS
-            geoPath += "califa_v2021.3.geo.root";
+            //  geoPath += "califa_v2021.3.geo.root";
+            geoPath += "califa_2021_s455.geo.root";
             fNumCrystals = 4864;
             break;
 

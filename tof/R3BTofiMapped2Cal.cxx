@@ -35,6 +35,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "R3BTCalEngine.h"
 #include "R3BTofiCalData.h"
@@ -114,6 +115,12 @@ InitStatus R3BTofiMapped2Cal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
+
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
 
     // get access to Mapped data
     fMappedItems = (TClonesArray*)mgr->GetObject("TofiMapped");

@@ -43,8 +43,8 @@ R3BRoluReader::R3BRoluReader(EXT_STR_h101_ROLU* data, UInt_t offset)
 
 R3BRoluReader::~R3BRoluReader()
 {
-  delete fArray;
-  delete fArrayTrigger;
+    delete fArray;
+    delete fArrayTrigger;
 }
 
 Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
@@ -58,7 +58,7 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
     if (NULL == mgr)
         LOG(ERROR) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    // header = (R3BEventHeader*)mgr->GetObject("EventHeader");
 
     EXT_STR_h101_ROLU_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_ROLU, 0);
     if (!ok)

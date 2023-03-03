@@ -49,7 +49,7 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     FairRootManager* mgr = FairRootManager::Instance();
-    fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader");
 
     fData->TIMESTAMP_MASTER_ID = 0;
 

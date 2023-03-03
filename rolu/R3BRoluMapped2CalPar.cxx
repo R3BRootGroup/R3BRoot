@@ -34,6 +34,7 @@
 #include "FairRtdbRun.h"
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
+#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 #include "TF1.h"
@@ -86,7 +87,11 @@ InitStatus R3BRoluMapped2CalPar::Init()
         return kFATAL;
     }
 
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
+    if (header)
+        R3BLOG(info, "EventHeader. was found");
+    else
+        R3BLOG(info, "EventHeader. was not found");
     // may be = NULL!
 
     fMapped = (TClonesArray*)rm->GetObject("RoluMapped");

@@ -32,6 +32,7 @@ class R3BTrackingParticle;
 class R3BTrackingSetup;
 class R3BTGeoPar ;
 class R3BFragmentFitterGeneric;
+class R3BEventHeader;
 
 class TH1F;
 class TH2F;
@@ -67,6 +68,7 @@ class R3BFragmentTrackerS494 : public FairTask
     
   private:
     Bool_t InitPropagator();
+    R3BEventHeader* header; /**< Event header. */
     Double_t fPmin, fPmax;
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
@@ -81,7 +83,7 @@ class R3BFragmentTrackerS494 : public FairTask
     TClonesArray* fMCTrack;
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
-    std::vector<TClonesArray*> fArrayHits;
+    std::vector<TClonesArray*> fHitItems;
     Int_t fNofTrackItems;
     TClonesArray* fTofdHitItems;       
     Int_t fNofTofdHitItems;
@@ -156,10 +158,13 @@ class R3BFragmentTrackerS494 : public FairTask
     Double_t eloss_hit[8];
     Double_t det_hit_x[8];
     Double_t det_hit_y[8];
+    Double_t det_hit_t[8];
     Double_t det_hit_xC[8];
     Double_t det_hit_yC[8];
+    Double_t det_hit_tC[8];
     Double_t det_hit_xHe[8];
     Double_t det_hit_yHe[8];
+    Double_t det_hit_tHe[8];
     Int_t fNwriteout=0;
 	Int_t counterCalifa = 0;
 
@@ -234,7 +239,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_yFi23b_tofd_exp_select; 
      
     TH2F* fh_yC_vs_yHe_Tofd;
-    TH2F* fh_yC_vs_yHe_Tofd_exp;  
+    TH2F* fh_yC_vs_yHe_Tofd_exp; 
+    TH2F* fh_xC_vs_xHe_Tofd_exp;  
     TH2F* fh_yC_vs_yHe_fib23;
     TH2F* fh_yC_vs_yHe_fib23_exp; 
     TH2F* fh_xC_vs_xHe_fib23;

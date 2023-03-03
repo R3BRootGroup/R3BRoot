@@ -316,9 +316,8 @@ void R3BUcesbSource::Close()
 
     LOG(info) << "R3BUcesbSource::Close() called";
 
-    if (!fFd)
+    if (!fFd) // not open
         return;
-
     /* Close client connection */
     ret = fClient.close();
     if (0 != ret)
@@ -335,6 +334,8 @@ void R3BUcesbSource::Close()
         R3BLOG(fatal, "pclose() failed");
         abort();
     }
+    fFd = nullptr;
+    ;
 
     fFd=nullptr;
 
