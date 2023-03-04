@@ -176,10 +176,10 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
                     Z_Pos[channel] = (vPoints[channel].at(point)->GetZIn() + vPoints[channel].at(point)->GetZOut()) /
                                      2.; // get y-position //local
 
-                    Double_t PositionX = -129.3;
+                    Double_t PositionX = -160.;
                     Double_t PositionY = 0.;
-                    Double_t PositionZ = 685.4;
-                    Double_t RotationY = -18.;
+                    Double_t PositionZ = 700.;
+                    Double_t RotationY = -14.;
 
                     TVector3 posGlobal;
                     posGlobal.SetX(X_Pos[channel]);

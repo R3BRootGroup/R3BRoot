@@ -29,18 +29,46 @@ void SetCuts()
 
     TVirtualMC* MC = TVirtualMC::GetMC();
 
-    MC->SetProcess("PAIR", 1); /** pair production*/
-    MC->SetProcess("COMP", 1); /**Compton scattering*/
-    MC->SetProcess("PHOT", 1); /** photo electric effect */
-    MC->SetProcess("PFIS", 0); /**photofission*/
-    MC->SetProcess("DRAY", 1); /**delta-ray*/
-    MC->SetProcess("ANNI", 1); /**annihilation*/
-    MC->SetProcess("BREM", 1); /**bremsstrahlung*/
-    MC->SetProcess("HADR", 1); /**hadronic process*/
-    MC->SetProcess("MUNU", 1); /**muon nuclear interaction*/
-    MC->SetProcess("DCAY", 1); /**decay*/
-    MC->SetProcess("LOSS", 1); /**energy loss*/
-    MC->SetProcess("MULS", 1); /**multiple scattering*/
+    MC->SetProcess("PAIR", 1); // pair production
+    MC->SetProcess("COMP", 1); // Compton scattering
+    MC->SetProcess("PHOT", 1); // photo electric effect 
+    MC->SetProcess("PFIS", 0); // photofission
+    MC->SetProcess("DCAY", 1); // decay
+    MC->SetProcess("ANNI", 1); // annihilation
+    MC->SetProcess("BREM", 1); // bremsstrahlung
+    MC->SetProcess("MUNU", 1); // muon nuclear interaction
+    MC->SetProcess("MULS", 1); // multiple scattering
+
+    //default version of dev branch
+    //MC->SetProcess("DRAY", 1); // delta-ray
+    //MC->SetProcess("HADR", 1); // hadronic process
+    //MC->SetProcess("LOSS", 1); // energy loss
+
+	// MH version
+    MC->SetProcess("DRAY",0); // Delta rays
+    MC->SetProcess("CKOV",1); // Cerenkov production
+    MC->SetProcess("HADR",5); // Hadronic interactions
+    MC->SetProcess("LOSS",2); // Energy loss (2=complete fluct.)
+    MC->SetProcess("RAYL",1); // Rayleigh scattering
+
+
+/*
+	MC->SetProcess("DCAY",0); // Particle decay
+	MC->SetProcess("PAIR",0); // Pair production
+	MC->SetProcess("COMP",0); // Compton scattering
+	MC->SetProcess("PHOT",0); // Photo effect
+	MC->SetProcess("PFIS",0); // Photo fission
+	MC->SetProcess("DRAY",0); // Delta rays
+	MC->SetProcess("ANNI",0); // Positron annihilation
+	MC->SetProcess("BREM",0); // Bremstrahlung
+	MC->SetProcess("MUNU",0); // Muon nuclear interactions
+	MC->SetProcess("CKOV",0); // Cerenkov production
+	MC->SetProcess("HADR",0); // Hadronic interactions
+	MC->SetProcess("LOSS",4); // Energy loss (2=complete fluct.)
+	MC->SetProcess("MULS",0); // Multiple scattering
+	MC->SetProcess("RAYL",0); // Rayleigh scattering
+*/
+
 
     const Double_t cut1 = 1.0E-4; // GeV --> 100 keV
     const Double_t cut2 = 1.0E-2; // GeV --> 10 MeV

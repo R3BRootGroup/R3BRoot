@@ -133,7 +133,8 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         // Ions: -1, Particles +1
-        int pdg = iPid == -1 ? GetIonPdg(iZ, iA) : iPid;
+        // int pdg = iPid == -1 ? GetIonPdg(iZ, iA) : iPid;
+        int pdg = iPid == -1 ? GetIonPdg(iZ, iA) : iA;
 
         if (!fPointVtxIsSet)
         {
@@ -142,8 +143,9 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             vz = ivz;
         }
 
-        LOG(debug) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
-                   << "" << pz << "\t" << vx << "\t" << vy << "" << vz;
+        LOG(debug) << "R3BAsciiGenerator: Adding track with iPid: " << iPid << " Z: " << iZ << " A: " << iA
+                   << " px: " << px << " py: " << py << " pz: " << pz << " vx: " << vx << " vy: " << vy << " vz:" << vz;
+        LOG(debug) << "pdg: " << pdg;
         primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
 
     } //! tracks

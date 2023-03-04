@@ -247,6 +247,15 @@ void R3BFi30DigitizerHit::Exec(Option_t* opt)
                     // cout<<setprecision(10)<< "Hit Fi30 global-dx,dy,dz: "<<posGlobalcheck.X()-posGlobal.X()<<",
                     // "<<posGlobalcheck.Y()-posGlobal.Y()<<", "<<posGlobalcheck.Z()-posGlobal.Z()<<endl;
 
+                    Bool_t granularity = false;
+                    if (granularity)
+                    {
+                        LOG(debug) << "x before granularity: " << x_local;
+                        Double_t fiber_width = 0.1; // cm
+                        x_local = (int)((x_local + fiber_width / 2.) / fiber_width) * fiber_width;
+                        LOG(debug) << "x after granularity: " << x_local;
+                    }
+
                     Int_t qcharge = (int)(470.61775 * energyl + 1.5642724 + 0.5);
 
                     new ((*Hits)[Hits->GetEntries()])

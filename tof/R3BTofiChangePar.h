@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // ------------------------------------------------------
-// -----       Change hit parameters for TOFD       -----
+// -----       Change hit parameters for TOFI       -----
 // -----         Created Sep 2019 by L.Bott         -----
 // ------------------------------------------------------
 
@@ -138,6 +138,7 @@ class R3BTofiChangePar : public FairTask
     virtual void changeLambda(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeZ(Int_t plane, Int_t bar, Int_t pm, Double_t*);
+    virtual void changePol3(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeWalk(Int_t plane, Int_t bar, Int_t pm, Double_t*);
 
   private:

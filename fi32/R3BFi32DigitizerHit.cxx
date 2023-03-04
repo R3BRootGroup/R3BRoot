@@ -228,6 +228,15 @@ void R3BFi32DigitizerHit::Exec(Option_t* opt)
                     Double_t x_local = local.X();
                     Double_t y_local = local.Y();
 
+                    Bool_t granularity = false;
+                    if (granularity)
+                    {
+                        LOG(debug) << "x before granularity: " << x_local;
+                        Double_t fiber_width = 0.1; // cm
+                        x_local = (int)((x_local + fiber_width / 2.) / fiber_width) * fiber_width;
+                        LOG(debug) << "x after granularity: " << x_local;
+                    }
+
                     Int_t qcharge = (int)(470.61775 * energyl + 1.5642724 + 0.5);
 
                     new ((*Hits)[Hits->GetEntries()])
