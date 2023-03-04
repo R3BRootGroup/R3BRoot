@@ -75,15 +75,15 @@ void R3BTargetDigitizer::SetParContainers()
 
     if (fTargetDigiPar)
     {
-        LOG(INFO) << "R3BTargetDigitizer::SetParContainers() ";
-        LOG(INFO) << "Container R3BTargetDigiPar  loaded ";
+        LOG(info) << "R3BTargetDigitizer::SetParContainers() ";
+        LOG(info) << "Container R3BTargetDigiPar  loaded ";
     }
 }
 
 InitStatus R3BTargetDigitizer::Init()
 {
 
-    //  LOG(INFO)<<"Init ";
+    //  LOG(info)<<"Init ";
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
@@ -110,7 +110,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
     Reset();
     eventNoTra += 1;
     if (eventNoTra / 1000. == (int)eventNoTra / 1000.)
-        LOG(INFO) << "Event #: " << eventNoTra - 1;
+        LOG(info) << "Event #: " << eventNoTra - 1;
 
     Int_t nentriesTra = fTargetPoints->GetEntries();
     Int_t nentries = fMCTrack->GetEntries();
@@ -149,7 +149,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentries; l++)
     {
-        //   LOG(INFO)<<"entries "<<l;
+        //   LOG(info)<<"entries "<<l;
 
         R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
 
@@ -170,11 +170,11 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
             Pxf = (Px * 1000);
             Pyf = (Py * 1000);
             Pzf = (Pz * 1000);
-            //   LOG(INFO)<<"In "<<"Pxf "<<Pxf<<" Pyf "<<Pyf<<" Pzf "<<Pzf;
+            //   LOG(info)<<"In "<<"Pxf "<<Pxf<<" Pyf "<<Pyf<<" Pzf "<<Pzf;
             Pf_tot = sqrt(SQR(Pxf) + SQR(Pyf) + SQR(Pzf));
             //   f_beta=0.7579865;
             f_beta = sqrt((SQR(Pf_tot)) / ((SQR(MASS_15O_MEV_C2)) + (SQR(Pf_tot))));
-            //   LOG(INFO)<<"In "<<"Pf_tot "<<Pf_tot<<" f_beta "<<f_beta;
+            //   LOG(info)<<"In "<<"Pf_tot "<<Pf_tot<<" f_beta "<<f_beta;
         }
 
         if (mother < 0 && PID == 2212 /*&& l==1*/)
@@ -182,11 +182,11 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
             Pxp1 = (Px * 1000);
             Pyp1 = (Py * 1000);
             Pzp1 = (Pz * 1000);
-            //   LOG(INFO)<<"In "<<"Pxp1 "<<Pxp1<<" Pyp1 "<<Pyp1<<" Pzp1 "<<Pzp1;
+            //   LOG(info)<<"In "<<"Pxp1 "<<Pxp1<<" Pyp1 "<<Pyp1<<" Pzp1 "<<Pzp1;
             Pp1_tot = sqrt(SQR(Pxp1) + SQR(Pyp1) + SQR(Pzp1));
             //   p1_beta=0.7579865;
             p1_beta = sqrt((SQR(Pp1_tot)) / ((SQR(MASS_PROTON_MEV_C2)) + (SQR(Pp1_tot))));
-            //   LOG(INFO)<<"In "<<"Pp1_tot "<<Pp1_tot<<" p1_beta "<<p1_beta;
+            //   LOG(info)<<"In "<<"Pp1_tot "<<Pp1_tot<<" p1_beta "<<p1_beta;
         }
 
         if (mother < 0)
@@ -209,18 +209,18 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
     Double_t py = SQR(Pyp1 + Pyf);
     Double_t pz = SQR(Pzp1 + Pzf);
     p2 = px + py + pz; // MeV^2/c^2
-                       //   LOG(INFO)<<"In "<<"px "<<px<<" py "<<py<<" pz "<<pz<<" sqrt_p2 "<<sqrt(p2);
+                       //   LOG(info)<<"In "<<"px "<<px<<" py "<<py<<" pz "<<pz<<" sqrt_p2 "<<sqrt(p2);
 
     Double_t E_f = 1.0 / sqrt(1 - f_beta * f_beta) * MASS_15O_MEV_C2;       // *c
     Double_t E_p1 = 1.0 / sqrt(1 - p1_beta * p1_beta) * MASS_PROTON_MEV_C2; // *c
     E2 = (E_f + E_p1) * (E_f + E_p1);                                       // MeV^2/c^2
-    //   LOG(INFO)<<"In "<<"E_f "<<E_f<<" E_p1 "<<E_p1<<" sqrt_E2 "<<sqrt(E2);
+    //   LOG(info)<<"In "<<"E_f "<<E_f<<" E_p1 "<<E_p1<<" sqrt_E2 "<<sqrt(E2);
 
     //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
     // estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
     estar = sqrt(E2 - p2) - (MASS_15O_MEV_C2 + MASS_PROTON_MEV_C2); // *c2
 
-    //   LOG(INFO)<<"Estar In "<<Estar;
+    //   LOG(info)<<"Estar In "<<Estar;
 
     ExEnIn_his->Fill(estar);
 
@@ -233,7 +233,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentriesTra; l++)
     {
-        //   LOG(INFO)<<"entries "<<l;
+        //   LOG(info)<<"entries "<<l;
 
         R3BTraPoint* Tra_obj = (R3BTraPoint*)fTargetPoints->At(l);
 
@@ -315,7 +315,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt)
 void R3BTargetDigitizer::Reset()
 {
     // Clear the structure
-    //   LOG(INFO) << " -I- Digit Reset() called ";
+    //   LOG(info) << " -I- Digit Reset() called ";
 
     if (fTargetDigi)
         fTargetDigi->Clear();

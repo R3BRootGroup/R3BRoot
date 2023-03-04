@@ -49,12 +49,12 @@ R3BMusicReader::~R3BMusicReader()
 Bool_t R3BMusicReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BMusicReader::Init";
+    LOG(info) << "R3BMusicReader::Init";
     EXT_STR_h101_MUSIC_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_MUSIC, 0);
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup structure information.";
+        LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -159,14 +159,14 @@ Bool_t R3BMusicReader::ReadData201911()
         UShort_t idAnodeTime = fData->MUSIC_TMI[a] - 1;
         UShort_t idAnodeEnergy = fData->MUSIC_EMI[a] - 1;
         if (idAnodeEnergy != idAnodeTime)
-            LOG(ERROR) << "R3BMusicReader::ReadData ERROR ! MISMATCH FOR ANODE ID IN "
+            LOG(error) << "R3BMusicReader::ReadData ERROR ! MISMATCH FOR ANODE ID IN "
                           "ENERGY #"
                        << idAnodeEnergy << " AND TIME #" << idAnodeTime;
         uint32_t nextAnodeTimeStart = fData->MUSIC_TME[a];
         uint32_t nextAnodeEnergyStart = fData->MUSIC_EME[a];
         multPerAnode[idAnodeTime] = nextAnodeTimeStart - curAnodeTimeStart;
         if (multPerAnode[idAnodeTime] != (nextAnodeEnergyStart - curAnodeEnergyStart))
-            LOG(ERROR) << "R3BMusicReader::ReadData ERROR ! MISMATCH FOR "
+            LOG(error) << "R3BMusicReader::ReadData ERROR ! MISMATCH FOR "
                           "MULTIPLICITY PER ANODE IN ENERGY AND TIME";
         for (int hit = curAnodeTimeStart; hit < nextAnodeTimeStart; hit++)
         { // idAnodeEnergy from 1 to 8, so -1 to get from 0 to 7

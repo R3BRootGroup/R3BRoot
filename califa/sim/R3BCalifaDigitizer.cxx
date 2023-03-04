@@ -56,7 +56,7 @@ R3BCalifaDigitizer::R3BCalifaDigitizer(const TString& geoFile)
 
 R3BCalifaDigitizer::~R3BCalifaDigitizer()
 {
-    LOG(INFO) << "R3BCalifaDigitizer: Delete instance";
+    LOG(info) << "R3BCalifaDigitizer: Delete instance";
 
     if (fCalifaPointDataCA)
     {
@@ -78,18 +78,18 @@ void R3BCalifaDigitizer::SetParContainers()
         FairRuntimeDb* rtdb = FairRuntimeDb::instance();
         if (!rtdb)
         {
-            LOG(ERROR) << "R3BCalifaDigitizer:: FairRuntimeDb not opened!";
+            LOG(error) << "R3BCalifaDigitizer:: FairRuntimeDb not opened!";
         }
 
         fSim_Par = (R3BCalifaCrystalPars4Sim*)rtdb->getContainer("califaCrystalPars4Sim");
         if (!fSim_Par)
         {
-            LOG(ERROR) << "R3BCalifaDigitizer::Init() Couldn't get handle on "
+            LOG(error) << "R3BCalifaDigitizer::Init() Couldn't get handle on "
                           "califaCrystalPars4Sim container";
         }
         if (fSim_Par)
         {
-            LOG(INFO) << "R3BCalifaDigitizer:: califaCrystalPars4Sim container opened";
+            LOG(info) << "R3BCalifaDigitizer:: califaCrystalPars4Sim container opened";
         }
     }
 }
@@ -104,14 +104,14 @@ void R3BCalifaDigitizer::SetParameter()
 
         fSim_Par->printParams();
 
-        LOG(INFO) << "R3BCalifaDigitizer:: Max Crystal ID " << fNumCrystals;
-        LOG(INFO) << "R3BCalifaDigitizer:: Nb of parameters used in the Simulation " << fNumberOfParams;
+        LOG(info) << "R3BCalifaDigitizer:: Max Crystal ID " << fNumCrystals;
+        LOG(info) << "R3BCalifaDigitizer:: Nb of parameters used in the Simulation " << fNumberOfParams;
     }
 }
 
 InitStatus R3BCalifaDigitizer::Init()
 {
-    LOG(INFO) << "R3BCalifaDigitizer::Init ";
+    LOG(info) << "R3BCalifaDigitizer::Init ";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
@@ -284,7 +284,7 @@ void R3BCalifaDigitizer::Register()
 void R3BCalifaDigitizer::Reset()
 {
     // Clear the CA structure
-    LOG(DEBUG) << "Clearing CalifaCrystalCalData Structure";
+    LOG(debug) << "Clearing CalifaCrystalCalData Structure";
     if (fCalifaCryCalDataCA)
         fCalifaCryCalDataCA->Clear();
 
@@ -296,13 +296,13 @@ void R3BCalifaDigitizer::FinishEvent() {}
 void R3BCalifaDigitizer::SetDetectionThreshold(Double_t thresholdEne)
 {
     fThreshold = thresholdEne;
-    LOG(INFO) << "R3BCalifaDigitizer::SetDetectionThreshold to " << fThreshold << " GeV.";
+    LOG(info) << "R3BCalifaDigitizer::SetDetectionThreshold to " << fThreshold << " GeV.";
 }
 
 void R3BCalifaDigitizer::SetRealConfig(Bool_t isRealSet)
 {
     fRealConfig = isRealSet;
-    LOG(INFO) << "R3BCalifaDigitizer::SetRealConfig to " << isRealSet;
+    LOG(info) << "R3BCalifaDigitizer::SetRealConfig to " << isRealSet;
 }
 
 R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
@@ -315,7 +315,7 @@ R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
     TClonesArray& clref = *fCalifaCryCalDataCA;
     Int_t size = clref.GetEntriesFast();
     if (fVerbose > 1)
-        LOG(INFO) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
+        LOG(info) << "-I- R3BCalifaDigitizer: Adding CrystalCalData "
                   << " with unique identifier " << ident << " entering with " << energy * 1e06 << " keV Nf=" << Nf
                   << " Ns=" << Ns << " Time=" << time << " tot_energy=" << tot_energy;
 
@@ -325,13 +325,13 @@ R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
 void R3BCalifaDigitizer::SetExpEnergyRes(Double_t crystalRes)
 {
     fResolution = crystalRes;
-    LOG(INFO) << "R3BCalifaDigitizer::SetExpEnergyRes to " << fResolution << "% @ 1 MeV.";
+    LOG(info) << "R3BCalifaDigitizer::SetExpEnergyRes to " << fResolution << "% @ 1 MeV.";
 }
 
 void R3BCalifaDigitizer::SetComponentRes(Double_t componentRes)
 {
     fComponentRes = componentRes;
-    LOG(INFO) << "R3BCalifaDigitizer::SetComponentRes to " << fComponentRes;
+    LOG(info) << "R3BCalifaDigitizer::SetComponentRes to " << fComponentRes;
 }
 
 Double_t R3BCalifaDigitizer::NUSmearing(Double_t inputEnergy)
@@ -346,7 +346,7 @@ Double_t R3BCalifaDigitizer::NUSmearing(Double_t inputEnergy)
 void R3BCalifaDigitizer::SetNonUniformity(Double_t nonU)
 {
     fNonUniformity = nonU;
-    LOG(INFO) << "R3BCalifaDigitizer::SetNonUniformity to " << fNonUniformity << " %";
+    LOG(info) << "R3BCalifaDigitizer::SetNonUniformity to " << fNonUniformity << " %";
 }
 
 Double_t R3BCalifaDigitizer::ExpResSmearing(Double_t inputEnergy)

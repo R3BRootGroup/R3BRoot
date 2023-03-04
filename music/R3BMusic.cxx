@@ -88,7 +88,7 @@ void R3BMusic::Initialize()
     FairDetector::Initialize();
 
     LOG(info) << "R3BMusic: initialisation";
-    LOG(DEBUG) << "-I- R3BMusic: Vol (McId) def" << gMC->VolId("Anode");
+    LOG(debug) << "-I- R3BMusic: Vol (McId) def" << gMC->VolId("Anode");
 }
 
 // -----   Public method ProcessHits  --------------------------------------

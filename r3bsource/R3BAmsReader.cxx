@@ -49,12 +49,12 @@ R3BAmsReader::~R3BAmsReader()
 Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BAmsReader::Init";
+    LOG(info) << "R3BAmsReader::Init";
     EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_AMS, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BAmsReader::Failed to setup structure information.";
+        LOG(error) << "R3BAmsReader::Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -73,7 +73,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BAmsReader::Read()
 {
-    LOG(DEBUG) << "R3BAmsReader::Read() Event data.";
+    LOG(debug) << "R3BAmsReader::Read() Event data.";
     // Read AMS detectors
     for (int d = 0; d < 6; d++)
         if (fData->SST[d]._ == 1024)

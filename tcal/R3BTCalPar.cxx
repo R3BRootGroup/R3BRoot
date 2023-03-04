@@ -37,7 +37,7 @@ R3BTCalPar::~R3BTCalPar()
 
 void R3BTCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTCalPar::putParams() called";
+    LOG(info) << "R3BTCalPar::putParams() called";
     if (!list)
     {
         return;
@@ -63,13 +63,13 @@ void R3BTCalPar::clear() {}
 void R3BTCalPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " Time Calib. Parameters -------------  ";
+    LOG(info) << " -----------  " << GetName() << " Time Calib. Parameters -------------  ";
 
-    LOG(INFO) << " Number of TCal Parameters " << fTCalParams->GetEntries();
+    LOG(info) << " Number of TCal Parameters " << fTCalParams->GetEntries();
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
         R3BTCalModulePar* t_par = (R3BTCalModulePar*)fTCalParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();
@@ -100,14 +100,14 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
             if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
                 tside > N_SIDE_MAX)
             {
-                LOG(ERROR) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << tplane << " / "
+                LOG(error) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << tplane << " / "
                            << tpaddle << " / " << tside;
                 continue;
             }
             index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BTCalPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
+                LOG(error) << "R3BTCalPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
                            << tpaddle << " / " << tside;
                 continue;
             }
@@ -118,7 +118,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
 
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)
     {
-        LOG(ERROR) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << plane << " / " << paddle
+        LOG(error) << "R3BTCalPar::GetModuleParAt : error in plane/paddle/side indexing. " << plane << " / " << paddle
                    << " / " << side;
         return NULL;
     }
@@ -126,7 +126,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        LOG(WARNING) << "R3BTCalPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle << " / "
+        LOG(warning) << "R3BTCalPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle << " / "
                      << side;
         return NULL;
     }
@@ -165,7 +165,7 @@ Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_
     {
         if (par->GetSlopeAt(0) > 0)
         {
-            LOG(ERROR) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila.";
+            LOG(error) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila.";
             return kFALSE;
         }
         Int_t i = 0;
@@ -188,16 +188,16 @@ void R3BTCalPar::SavePar(TString runNumber)
     FairRtdbRun* r1 = (FairRtdbRun*)gDirectory->Get(runNumber);
     if (NULL == r1)
     {
-        LOG(ERROR) << "Run " << runNumber << " does not exist in parameter file! Aborting.";
+        LOG(error) << "Run " << runNumber << " does not exist in parameter file! Aborting.";
         return;
     }
     FairParVersion* ver = r1->getParVersion(GetName());
     if (NULL == ver)
     {
-        LOG(ERROR) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting.";
+        LOG(error) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting.";
         return;
     }
     ver->setRootVersion(ver->getRootVersion() + 1);
     r1->Write();
-    LOG(INFO) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion();
+    LOG(info) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion();
 }

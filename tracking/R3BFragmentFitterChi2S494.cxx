@@ -101,7 +101,7 @@ double Chi2(const double* xx)
 
             // chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
 
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
 
@@ -284,7 +284,7 @@ double Chi2MomentumForward(const double* xx)
             chi2 += chi2temp;
 
             // chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
                        << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2temp << endl;
 
@@ -312,7 +312,7 @@ double Chi2MomentumForward(const double* xx)
 
             // chi2 += TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
 
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug) << "chi2calc y: " << det->GetDetectorName().Data() << " res: " << det->res_y << " pos: " << y_l
                        << " hit: " << hit->GetY() << " dev: " << y_l - hit->GetY() << " chi2: " << chi2temp << endl;
 
@@ -463,7 +463,7 @@ double Chi2MomentumBackward(const double* xx)
             chi2 += chi2temp;
 
             // chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug3) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
                         << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2;
 
@@ -483,7 +483,7 @@ double Chi2MomentumBackward(const double* xx)
             chi2 += chi2temp;
 
             // chi2 += TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug3) << "chi2calc y: " << det->GetDetectorName().Data() << " res: " << det->res_y << " pos: " << y_l
                         << " hit: " << hit->GetY() << " dev: " << y_l - hit->GetY() << " chi2: " << chi2;
 
@@ -557,7 +557,7 @@ double Chi2Beta(const double* xx)
         if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
 
@@ -631,7 +631,7 @@ double Chi2Backward(const double* xx)
         // if(kAfterGlad == det->section)
         // {
         //     chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-        // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+        // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
         //    nchi2 += 1;
         //}
         Double_t chi2temp;
@@ -756,7 +756,7 @@ double Chi2Backward2D(const double* xx)
         if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug3) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
                         << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2;
             nchi2 += 1;
@@ -764,7 +764,7 @@ double Chi2Backward2D(const double* xx)
         if (hit && det->res_y > 1e-6)
         {
             chi2 += TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             LOG(debug3) << "chi2calc y: " << det->GetDetectorName().Data() << " res: " << det->res_y << " pos: " << y_l
                         << " hit: " << hit->GetY() << " dev: " << y_l - hit->GetY() << " chi2: " << chi2;
             nchi2 += 1;
@@ -1159,7 +1159,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     gCandidate->SetPosition(pos3);
     gCandidate->SetMomentum(startMomentum);
 
-    // LOG(DEBUG3)
+    // LOG(debug3)
     cout << "mom: " << mom << endl;
 
     px0 = direction0.X();
@@ -1402,7 +1402,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle,
         }
     }
 
-    // LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
+    // LOG(info) << "1 Start beta:" << gCandidate->GetStartBeta()
     //<< ",  Beta:" << gCandidate->GetBeta();
 
     gCandidate->SetStartBeta(gCandidate->GetBeta());
@@ -1411,7 +1411,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle,
 
     // Double_t chi2 = Chi2Backward(variable);
 
-    // LOG(INFO) << "2 chi2 = " << chi2;
+    // LOG(info) << "2 chi2 = " << chi2;
 
     // return 0;
 
@@ -1509,7 +1509,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward2D(R3BTrackingParticle* particl
         }
     }
 
-    // LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
+    // LOG(info) << "1 Start beta:" << gCandidate->GetStartBeta()
     //<< ",  Beta:" << gCandidate->GetBeta();
 
     gCandidate->SetStartBeta(gCandidate->GetBeta());
@@ -1518,7 +1518,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward2D(R3BTrackingParticle* particl
 
     // Double_t chi2 = Chi2Backward(variable);
 
-    // LOG(INFO) << "2 chi2 = " << chi2;
+    // LOG(info) << "2 chi2 = " << chi2;
 
     // return 0;
 
@@ -1659,7 +1659,7 @@ Double_t R3BFragmentFitterChi2S494::Velocity(R3BTrackingParticle* candidate)
         // TrackFragment(candidate);
         Double_t beta = candidate->GetLength() / (fDetectors->GetHit("tofd",
        candidate->GetHitIndexByName("tofd"))->GetTime() - fDetectors->GetHit("target",
-       candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT; LOG(INFO) << "Velocity estimation (TOF) "
+       candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT; LOG(info) << "Velocity estimation (TOF) "
        << beta << "   length = " << candidate->GetLength();
 
         return beta;*/

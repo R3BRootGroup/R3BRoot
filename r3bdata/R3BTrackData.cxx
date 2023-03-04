@@ -25,18 +25,18 @@ R3BTrackData::R3BTrackData()
 }
 
 R3BTrackData::R3BTrackData(Double_t x,
-							Double_t y,
-							Double_t z,
-							Double_t px,
-							Double_t py,
-							Double_t pz,
-							Int_t q,
-							Double_t AoZ,
-						    Double_t chix,
-						    Double_t chiy,
-						    Int_t quality,
-						    std::vector<Double_t> detPos,
-						    Double_t t)
+                           Double_t y,
+                           Double_t z,
+                           Double_t px,
+                           Double_t py,
+                           Double_t pz,
+                           Int_t q,
+                           Double_t AoZ,
+                           Double_t chix,
+                           Double_t chiy,
+                           Int_t quality,
+                           std::vector<Double_t> detPos,
+                           Double_t t)
     : R3BTrack(x, x, z, px, py, pz, q, AoZ, chix, chiy, quality)
     , fDetPos(detPos)
     , fTime(t)

@@ -53,7 +53,6 @@ R3BCalifaFebexReader::~R3BCalifaFebexReader()
 Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(info, "");
     EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_CALIFA, 1);
 
     if (!ok)
@@ -75,7 +74,6 @@ Bool_t R3BCalifaFebexReader::Read()
 {
     R3BLOG(debug1, "Event data.");
 
-    R3BLOG(info, "");
     // SELECT THE FOR LOOP BASED ON THE MAPPING...
     for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal)
     {
@@ -100,7 +98,6 @@ Bool_t R3BCalifaFebexReader::Read()
             R3BCalifaMappedData(channelNumber, energy, nf, ns, febextime, wrts, ov, pu, dc, tot);
     }
 
-    R3BLOG(info, "");
     // Trigger signals for correlations
     for (int i = 0; i < fData->CALIFA_TRG; ++i)
     {
@@ -110,7 +107,6 @@ Bool_t R3BCalifaFebexReader::Read()
             R3BCalifaMappedData(channelNumber, energy, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    R3BLOG(info, "");
     fNEvent += 1;
     return kTRUE;
 }

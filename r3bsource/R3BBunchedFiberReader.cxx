@@ -33,7 +33,7 @@ R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
     fChannelNum[1] = a_sub_num * a_spmt_channel_num;
     counter.insert(std::make_pair(fShortName, 0));
 
-    // LOG(INFO)<<"R3BBunchedFiber Start "<<a_name<<", "<<fChannelNum[0]<<", "<<fChannelNum[1];
+    // LOG(info)<<"R3BBunchedFiber Start "<<a_name<<", "<<fChannelNum[0]<<", "<<fChannelNum[1];
 }
 
 Bool_t R3BBunchedFiberReader::Init()
@@ -47,7 +47,7 @@ Bool_t R3BBunchedFiberReader::Init()
                 auto const& ch = fMHL[side_i][edge_i][prec_i];
                 if (fChannelNum[side_i] != ch._MI_len)
                 {
-                    LOG(FATAL) << "Multi-hit array sizes mismatch (fChannelNum[" << side_i
+                    LOG(fatal) << "Multi-hit array sizes mismatch (fChannelNum[" << side_i
                                << "]=" << fChannelNum[side_i] << " != MI-len=" << ch._MI_len << ").";
                     return kFALSE;
                 }
@@ -67,14 +67,14 @@ Bool_t R3BBunchedFiberReader::Read()
 {
     auto it = counter.find(fShortName);
 
-    LOG(DEBUG) << "R3BBunchedFiberReader::Read BEGIN";
+    LOG(debug) << "R3BBunchedFiberReader::Read BEGIN";
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
-        LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side " << fShortName << ", " << side_i;
+        LOG(debug) << "R3BBunchedFiberReader::Read fiber/side " << fShortName << ", " << side_i;
 
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
         {
-            //  LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/side/edge " << fShortName << ", " << side_i << ", "
+            //  LOG(debug) << "R3BBunchedFiberReader::Read fiber/side/edge " << fShortName << ", " << side_i << ", "
             // << edge_i;
 
             auto const& e = fMHL[side_i][edge_i];
@@ -85,18 +85,18 @@ Bool_t R3BBunchedFiberReader::Read()
             uint32_t c_ = *e[0]._;
             uint32_t f_ = *e[1]._;
 
-            LOG(DEBUG) << "R3BBunchedFiberReader::Read fiber/c_M/f_M " << fShortName << ", " << c_M << ", " << f_M;
+            LOG(debug) << "R3BBunchedFiberReader::Read fiber/c_M/f_M " << fShortName << ", " << c_M << ", " << f_M;
 
             if (c_M != f_M || c_ != f_)
             {
-                LOG(WARNING) << "Coarse and fine multi-hit list counts mismatch "
+                LOG(warning) << "Coarse and fine multi-hit list counts mismatch "
                                 "(edge="
                              << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).";
                 return kFALSE;
             }
             if (c_M > e[0]._MI_len || c_M > e[0]._ME_len || c_ > e[0]._v_len)
             {
-                LOG(WARNING) << "Multi-hit indexing out of range "
+                LOG(warning) << "Multi-hit indexing out of range "
                                 "(edge="
                              << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
                              << ");(_=" << c_ << ")>=(v=" << e[0]._v_len << ")).";
@@ -137,7 +137,7 @@ Bool_t R3BBunchedFiberReader::Read()
 
                 if (c_MI != f_MI || c_ME != f_ME)
                 {
-                    LOG(WARNING) << "Coarse and fine multi-hit data mismatch "
+                    LOG(warning) << "Coarse and fine multi-hit data mismatch "
                                     "(edge="
                                  << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
                                  << "}).";
@@ -147,7 +147,7 @@ Bool_t R3BBunchedFiberReader::Read()
                 for (; cur_entry < c_ME; cur_entry++)
                 {
 
-                    // LOG(DEBUG)  << "Data FIBERS det/side/channel/edge/times " << fShortName<<", "<<side_i<<", "<<c_MI
+                    // LOG(debug)  << "Data FIBERS det/side/channel/edge/times " << fShortName<<", "<<side_i<<", "<<c_MI
                     // << ", " << edge_i<<
                     //   ", "<<e[0]._v[cur_entry] << ", "<< e[1]._v[cur_entry];
 
@@ -172,11 +172,11 @@ Bool_t R3BBunchedFiberReader::Read()
         uint32_t c_ = *e[0]._;
         uint32_t f_ = *e[1]._;
 
-        LOG(DEBUG) << "Trigger times coarse = " << c_ << " fine = " << f_;
+        LOG(debug) << "Trigger times coarse = " << c_ << " fine = " << f_;
 
         if (c_ != f_)
         {
-            LOG(WARNING) << "Coarse and fine single-hit list counts mismatch "
+            LOG(warning) << "Coarse and fine single-hit list counts mismatch "
                             "(_{c="
                          << c_ << ",f=" << f_ << "}).";
             return kFALSE;
@@ -210,7 +210,7 @@ Bool_t R3BBunchedFiberReader::Read()
             if (cur_entry < c_ME)
             {
 
-                //  LOG(DEBUG)
+                //  LOG(debug)
                 //   std::cout<< "Data MAPMT Trigger FIBERS!!!!!! "<<fShortName
                 //       <<"; "<<c_MI << "," << e[0]._v[cur_entry] << ", " <<e[1]._v[cur_entry]<<std::endl;
 
@@ -281,7 +281,7 @@ Bool_t R3BBunchedFiberReader::Read()
     }
     ++it->second;
 
-    LOG(DEBUG) << "R3BBunchedFiberReader::Read END";
+    LOG(debug) << "R3BBunchedFiberReader::Read END";
     return kTRUE;
 }
 

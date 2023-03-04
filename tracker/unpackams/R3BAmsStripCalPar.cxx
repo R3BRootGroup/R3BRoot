@@ -59,14 +59,14 @@ void R3BAmsStripCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BAmsStripCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BAmsStripCalPar::putParams() called";
+    LOG(info) << "R3BAmsStripCalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = fNumDets * fNumStrips * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fStripCalParams->Set(array_size);
 
@@ -81,7 +81,7 @@ void R3BAmsStripCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BAmsStripCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BAmsStripCalPar::getParams() called";
+    LOG(info) << "R3BAmsStripCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -113,12 +113,12 @@ Bool_t R3BAmsStripCalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumDets * fNumStrips * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
     fStripCalParams->Set(array_size);
 
     if (!(list->fill("amsStripCalPar", fStripCalParams)))
     {
-        LOG(INFO) << "---Could not initialize amsStripCalPar";
+        LOG(info) << "---Could not initialize amsStripCalPar";
         return kFALSE;
     }
 
@@ -128,7 +128,7 @@ Bool_t R3BAmsStripCalPar::getParams(FairParamList* list)
 // ----  Method printParams ----------------------------------------------------
 void R3BAmsStripCalPar::printParams()
 {
-    LOG(INFO) << "R3BAmsStripCalPar: ams strip Parameters: ";
+    LOG(info) << "R3BAmsStripCalPar: ams strip Parameters: ";
     Int_t array_size = fNumDets * fNumStrips * fNumParamsFit;
 
     for (Int_t d = 0; d < fNumDets; d++)

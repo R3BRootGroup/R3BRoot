@@ -50,7 +50,7 @@ void R3BCalifaCrystalCalDataAnalysis::Exec(Option_t* option)
     }
     if (0 == (fnEvents % 100))
     {
-        LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits;
+        LOG(info) << fnEvents << " events, multiplicity:  " << nHits;
     }
     fnEvents += 1;
 }
@@ -79,7 +79,7 @@ void R3BCalifaCrystalCalDataAnalysis::WriteHistos()
     thNf->Write();
     thNs->Write();
     thTime->Write();
-    LOG(INFO) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ...";
+    LOG(info) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ...";
 }
 
 ClassImp(R3BCalifaCrystalCalDataAnalysis)

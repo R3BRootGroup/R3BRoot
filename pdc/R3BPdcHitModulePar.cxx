@@ -43,7 +43,7 @@ R3BPdcHitModulePar::~R3BPdcHitModulePar() {}
 
 void R3BPdcHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BPdcHitModulePar::putParams() called";
+    LOG(info) << "R3BPdcHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -89,17 +89,17 @@ const Double_t* R3BPdcHitModulePar::GetXT_xArray() const { return fXT_xArray; }
 const Double_t* R3BPdcHitModulePar::GetXT_tArray() const { return fXT_tArray; }
 void R3BPdcHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BPdcHitModulePar: FIBER HIT Calibration Parameters: ";
-    LOG(INFO) << "   fWire: " << fWire;
-    LOG(INFO) << "   fdTmin: " << fdTmin;
-    LOG(INFO) << "   fdTmax: " << fdTmax;
-    LOG(INFO) << "   fTmin: " << fTmin;
-    LOG(INFO) << "   fTmax: " << fTmax;
-    LOG(INFO) << "   fSync: " << fSync;
-    LOG(INFO) << " fnpoints: " << fnpoints;
+    LOG(info) << "   R3BPdcHitModulePar: FIBER HIT Calibration Parameters: ";
+    LOG(info) << "   fWire: " << fWire;
+    LOG(info) << "   fdTmin: " << fdTmin;
+    LOG(info) << "   fdTmax: " << fdTmax;
+    LOG(info) << "   fTmin: " << fTmin;
+    LOG(info) << "   fTmax: " << fTmax;
+    LOG(info) << "   fSync: " << fSync;
+    LOG(info) << " fnpoints: " << fnpoints;
     for (Int_t i = 0; i < fnpoints; i++)
     {
-        LOG(INFO) << " t_ns & x_mm: " << i << ", " << fXT_tArray[i] << ", " << fXT_xArray[i];
+        LOG(info) << " t_ns & x_mm: " << i << ", " << fXT_tArray[i] << ", " << fXT_xArray[i];
     }
 }
 

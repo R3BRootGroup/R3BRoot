@@ -127,8 +127,8 @@ void R3BDch::Initialize()
 
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BDch: initialisation";
-    LOG(DEBUG) << "R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog");
+    LOG(info) << "R3BDch: initialisation";
+    LOG(debug) << "R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog");
 
     // get the transformation matrixes for
     // the sensitive nodes.
@@ -140,7 +140,7 @@ void R3BDch::Initialize()
 
 void R3BDch::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BDch: Adding customized Physics cut: ";
+    LOG(info) << "-I- R3BDch: Adding customized Physics cut: ";
 
     if (gGeoManager)
     {
@@ -168,7 +168,7 @@ void R3BDch::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Drift chamber Gas Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
+            LOG(info) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -199,12 +199,12 @@ void R3BDch::FindNodePath(TObjArray* arr)
         if (nodName.Contains("DCH1") || nodName.Contains(sVol.Data()))
         {
             path += "/" + nodName;
-            LOG(INFO) << "intermediate path: " << path;
+            LOG(info) << "intermediate path: " << path;
         }
         FindNodePath(aNode->GetNodes());
     }
 
-    LOG(INFO) << "found path: " << path;
+    LOG(info) << "found path: " << path;
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -371,10 +371,10 @@ void R3BDch::RecordPartialMcHit()
 
             if (fPosIn.Z() < 30. && newpos[2] > 30.02)
             {
-                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+                LOG(error) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
                            << " with safety = " << safety;
-                LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
-                LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
+                LOG(error) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
+                LOG(error) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
             }
 
             fPosOut.SetX(newpos[0]);
@@ -431,7 +431,7 @@ void R3BDch::RecordPartialMcHit()
 void R3BDch::PrintInfo()
 {
     // dump of Hit Information
-    LOG(INFO) << "X(cm)    "
+    LOG(info) << "X(cm)    "
               << "Y(cm)    "
               << "Z(cm)  "
               << "KinE(MeV)   "
@@ -444,28 +444,28 @@ void R3BDch::PrintInfo()
     // Position
     Double_t x, y, z;
     gMC->TrackPosition(x, y, z);
-    LOG(INFO) << setw(8) << setprecision(3) << x << " " << setw(8) << setprecision(3) << y << " " << setw(8)
+    LOG(info) << setw(8) << setprecision(3) << x << " " << setw(8) << setprecision(3) << y << " " << setw(8)
               << setprecision(3) << z << "  ";
 
     // Kinetic energy
     Double_t px, py, pz, etot;
     gMC->TrackMomentum(px, py, pz, etot);
     Double_t ekin = etot - gMC->TrackMass();
-    LOG(INFO) << setw(9) << setprecision(4) << ekin * 1e03 << " ";
+    LOG(info) << setw(9) << setprecision(4) << ekin * 1e03 << " ";
 
     // Energy deposit
-    LOG(INFO) << setw(9) << setprecision(4) << gMC->Edep() * 1e03 << " ";
+    LOG(info) << setw(9) << setprecision(4) << gMC->Edep() * 1e03 << " ";
     // Step length
-    LOG(INFO) << setw(8) << setprecision(3) << gMC->TrackStep() << " ";
+    LOG(info) << setw(8) << setprecision(3) << gMC->TrackStep() << " ";
 
     // Track length
-    LOG(INFO) << setw(8) << setprecision(3) << gMC->TrackLength() << "     ";
+    LOG(info) << setw(8) << setprecision(3) << gMC->TrackLength() << "     ";
 
     // Volume
     if (gMC->CurrentVolName() != 0)
-        LOG(INFO) << setw(4) << gMC->CurrentVolName() << "  ";
+        LOG(info) << setw(4) << gMC->CurrentVolName() << "  ";
     else
-        LOG(INFO) << setw(4) << "None"
+        LOG(info) << setw(4) << "None"
                   << "  ";
 
     // Process involved
@@ -473,9 +473,9 @@ void R3BDch::PrintInfo()
     Int_t nofProcesses = gMC->StepProcesses(processes);
 
     for (int ip = 0; ip < nofProcesses; ip++)
-        LOG(INFO) << TMCProcessName[processes[ip]] << " / ";
+        LOG(info) << TMCProcessName[processes[ip]] << " / ";
 
-    LOG(INFO);
+    LOG(info);
 }
 
 void R3BDch::SetStepToNextCollision()
@@ -599,7 +599,7 @@ TClonesArray* R3BDch::GetCollection(Int_t iColl) const
 void R3BDch::Print(Option_t* option) const
 {
     Int_t nHits = fDchCollection->GetEntriesFast();
-    LOG(INFO) << "R3BDch: " << nHits << " points registered in this event";
+    LOG(info) << "R3BDch: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -615,7 +615,7 @@ void R3BDch::Reset()
 void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BDch: " << nEntries << " entries to add";
+    LOG(info) << "R3BDch: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
 
     if (fDynamicStepSize)
@@ -642,7 +642,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
             fPosIndex++;
         }
     }
-    LOG(INFO) << "R3BDch: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BDch: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -691,7 +691,7 @@ void R3BDch::ConstructGeometry()
     TString fileName = GetGeometryFileName();
     if (fileName.EndsWith(".root"))
     {
-        LOG(INFO) << "Constructing DCH geometry from ROOT file " << fileName.Data();
+        LOG(info) << "Constructing DCH geometry from ROOT file " << fileName.Data();
         ConstructRootGeometry();
 
         TGeoNode* dch_node = gGeoManager->GetTopVolume()->GetNode("DCH_0");
@@ -719,7 +719,7 @@ void R3BDch::ConstructGeometry()
     }
     else
     {
-        LOG(FATAL) << "DCH geometry file name is not set";
+        LOG(fatal) << "DCH geometry file name is not set";
         exit(1);
     }
 }

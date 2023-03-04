@@ -21,9 +21,9 @@
 #include <cassert>
 
 R3BSfibMapped2CalPar::R3BSfibMapped2CalPar(Int_t a_verbose,
-                                                           enum R3BTCalEngine::CTDCVariant a_ctdc_variant,
-                                                           Int_t a_update_rate,
-                                                           Int_t a_min_stats)
+                                           enum R3BTCalEngine::CTDCVariant a_ctdc_variant,
+                                           Int_t a_update_rate,
+                                           Int_t a_min_stats)
     : FairTask("R3BSfibMapped2CalPar", a_verbose)
     , fCTDCVariant(a_ctdc_variant)
     , fUpdateRate(a_update_rate)
@@ -57,8 +57,8 @@ InitStatus R3BSfibMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-	    LOG(ERROR) << "Could not get SfibTCalPar.";
-	    return kFATAL;
+        LOG(error) << "Could not get SfibTCalPar.";
+        return kFATAL;
     }
     fTCalPar->setChanged();
     fEngine = new R3BTCalEngine(fTCalPar, fMinStats);
@@ -73,10 +73,8 @@ void R3BSfibMapped2CalPar::Exec(Option_t* option)
     {
         auto mapped = (R3BSfibMappedData*)fMapped->At(i);
         assert(mapped);
-	fEngine->Fill(1 + mapped->IsTop(),
-		mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0),
-		1,
-		mapped->GetFine());
+        fEngine->Fill(
+            1 + mapped->IsTop(), mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
     }
 }
 

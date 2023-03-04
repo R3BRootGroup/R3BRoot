@@ -161,7 +161,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             // Convert TDC to [ns]
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 
@@ -170,7 +170,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 
@@ -185,7 +185,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             */
             if (timeLE < 0. || timeLE > fClockFreq || timeTE < 0. || timeTE > fClockFreq)
             {
-                LOG(ERROR) << "R3BNeulandTcal::Exec : error in time calibration: ch= " << channel << ", tdc= " << tdc
+                LOG(error) << "R3BNeulandTcal::Exec : error in time calibration: ch= " << channel << ", tdc= " << tdc
                            << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE;
                 continue;
             }

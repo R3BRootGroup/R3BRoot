@@ -56,7 +56,7 @@ R3BCalifaCrystalCal2TotCalPar::R3BCalifaCrystalCal2TotCalPar(const char* name, I
 
 R3BCalifaCrystalCal2TotCalPar::~R3BCalifaCrystalCal2TotCalPar()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar: Delete instance";
+    LOG(info) << "R3BCalifaCrystalCal2TotCalPar: Delete instance";
     if (fCrystalCalDataCA)
         delete fCrystalCalDataCA;
 }
@@ -68,16 +68,16 @@ void R3BCalifaCrystalCal2TotCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on califamappingpar container";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on califamappingpar container";
     }
     else
     {
-        LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar:: califamappingpar container open";
+        LOG(info) << "R3BCalifaCrystalCal2TotCalPar:: califamappingpar container open";
     }
 }
 
@@ -85,36 +85,36 @@ void R3BCalifaCrystalCal2TotCalPar::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
+        LOG(error) << "R3BCalifaMapped2CrystalCalPar::Container califaMappingPar not found.";
     }
     //--- Parameter Container ---
     fNumCrystals = fMap_Par->GetNumCrystals(); // Number of crystals x 2
-    LOG(INFO) << "R3BCalifaMapped2CrystalCalPar::NumCry " << fNumCrystals;
+    LOG(info) << "R3BCalifaMapped2CrystalCalPar::NumCry " << fNumCrystals;
     // fMap_Par->printParams();
 }
 
 InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar::Init()";
+    LOG(info) << "R3BCalifaCrystalCal2TotCalPar::Init()";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fCrystalCalDataCA = (TClonesArray*)rootManager->GetObject("CalifaCrystalCalData");
     if (!fCrystalCalDataCA)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() CalifaCrystalCalData not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() CalifaCrystalCalData not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
@@ -122,7 +122,7 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
     if (!fTotCal_Par)
 
     {
-        LOG(ERROR) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
+        LOG(error) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
         return kFATAL;
     }
 
@@ -132,7 +132,7 @@ InitStatus R3BCalifaCrystalCal2TotCalPar::Init()
     // Create histograms for crystal calibration
     char name[100];
     energy_vs_tot_crystal = new TGraph*[fNumCrystals];
-    LOG(DEBUG) << "fNumCrystals = " << fNumCrystals;
+    LOG(debug) << "fNumCrystals = " << fNumCrystals;
     for (Int_t i = 0; i < fNumCrystals; i++)
         if (fMap_Par->GetInUse(i + 1) == 1)
         {
@@ -181,8 +181,8 @@ void R3BCalifaCrystalCal2TotCalPar::Exec(Option_t* opt)
         if (CalHit[i]->GetEnergy() > fThreshold)
             energy_vs_tot_crystal[crystalId - 1]->SetPoint(
                 energy_vs_tot_crystal[crystalId - 1]->GetN(), CalHit[i]->GetToT_Energy(), CalHit[i]->GetEnergy());
-        LOG(DEBUG) << "Tot = " << CalHit[i]->GetToT_Energy();
-        LOG(DEBUG) << "Energy = " << CalHit[i]->GetEnergy();
+        LOG(debug) << "Tot = " << CalHit[i]->GetToT_Energy();
+        LOG(debug) << "Energy = " << CalHit[i]->GetEnergy();
     }
 
     if (CalHit)
@@ -216,7 +216,7 @@ void R3BCalifaCrystalCal2TotCalPar::Search_TotParams()
     }
     else
     {
-        LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar::Search_TotParams() Wrong number of fit parameters, therefore, by "
+        LOG(info) << "R3BCalifaCrystalCal2TotCalPar::Search_TotParams() Wrong number of fit parameters, therefore, by "
                      "default "
                      "NumberParameters=2";
         f1 = new TF1("f1", "[0]*TMath::Exp(x/[1])", fLeft, fRight);
@@ -236,7 +236,7 @@ void R3BCalifaCrystalCal2TotCalPar::Search_TotParams()
 
         else
         {
-            LOG(WARNING) << "R3BCalifaCrystalCal2TotCalPar::Histogram number " << i + 1 << " not Fitted";
+            LOG(warning) << "R3BCalifaCrystalCal2TotCalPar::Histogram number " << i + 1 << " not Fitted";
         }
 
     fTotCal_Par->setChanged();

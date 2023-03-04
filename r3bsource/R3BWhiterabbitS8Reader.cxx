@@ -48,12 +48,12 @@ R3BWhiterabbitS8Reader::~R3BWhiterabbitS8Reader()
 Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitS8Reader::Init";
+    LOG(info) << "R3BWhiterabbitS8Reader::Init";
     EXT_STR_h101_WRS8_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRS8, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitS8Reader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitS8Reader::Failed to setup structure information.";
         return kFALSE;
     }
 

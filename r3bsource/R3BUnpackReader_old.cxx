@@ -77,7 +77,7 @@ Bool_t R3BUnpackReader::Read()
 
     if (0 == (fNEvent % 1000))
     {
-        LOG(DEBUG1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER;
+        LOG(debug1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER;
     }
 
     fHeader->SetTrigger(fData->TRIGGER);

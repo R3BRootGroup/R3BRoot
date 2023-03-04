@@ -128,7 +128,7 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
     fnEvents += 1;
     // if (0 == (fnEvents % 1000))
     //{
-    //    LOG(INFO) << "R3BNeulandMappedHist : " << fnEvents << " events collected";
+    //    LOG(info) << "R3BNeulandMappedHist : " << fnEvents << " events collected";
     //}
 }
 

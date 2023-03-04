@@ -130,7 +130,7 @@ void R3BPdcMapped2Cal::Exec(Option_t* option)
         par = fTcalPar->GetModuleParAt(mapped->GetPlaneId(), mapped->GetWireId(), mapped->GetEdgeId());
         if (!par)
         {
-            LOG(WARNING) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire << ": TCal par not found.";
+            LOG(warning) << "R3BPdcMapped2Cal::Exec (" << fName << "): Wire=" << wire << ": TCal par not found.";
             continue;
         }
         Double_t time_ns = -1;

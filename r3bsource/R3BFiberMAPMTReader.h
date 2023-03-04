@@ -63,7 +63,7 @@ do                                                                           \
 	EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
 	if (!ok)                                                                               \
 	{                                                                                      \
-		LOG(ERROR) << "Failed to setup UCESB structure information.";                      \
+		LOG(error) << "Failed to setup UCESB structure information.";                      \
 		return kFALSE;                                                                     \
 	} \
 	memset(data, 0, sizeof *data);                                           \
@@ -89,7 +89,7 @@ do                                                                           \
 	dst._ME_len = LENGTH(src##ME);                    \
 	if (dst._MI_len != dst._ME_len)                   \
 	{                                                 \
-		LOG(ERROR) << "UCESB multi-hit array error."; \
+		LOG(error) << "UCESB multi-hit array error."; \
 		exit(EXIT_FAILURE);                           \
 	}                                                 \
 	dst._ = &src;                                     \

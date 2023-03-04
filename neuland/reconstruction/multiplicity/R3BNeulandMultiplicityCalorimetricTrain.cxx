@@ -54,20 +54,20 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricTrain:Init: No FairRootManager";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain:Init: No FairRootManager";
         return kFATAL;
     }
 
     auto rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No FairRuntimeDb!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No FairRuntimeDb!";
         return kFATAL;
     }
     fPar = (R3BNeulandMultiplicityCalorimetricPar*)rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar");
     if (fPar == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No R3BNeulandMultiplicityCalorimetricPar!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No R3BNeulandMultiplicityCalorimetricPar!";
         return kFATAL;
     }
     // FIXME: FairRuntimeDB needs to be forced to load the Data from the second file with Run Id 1
@@ -139,7 +139,7 @@ void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 
     min->Minimize();
 
-    LOG(INFO) << "R3BNeulandMultiplicityCalorimetricTrain::Optimize done!";
+    LOG(info) << "R3BNeulandMultiplicityCalorimetricTrain::Optimize done!";
 }
 
 TCutG* R3BNeulandMultiplicityCalorimetricTrain::GetCut(const unsigned int nNeutrons,

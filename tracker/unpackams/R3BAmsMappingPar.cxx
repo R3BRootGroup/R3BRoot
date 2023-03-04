@@ -65,7 +65,7 @@ void R3BAmsMappingPar::clear()
 
 void R3BAmsMappingPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BAmsMappingPar::putParams() called";
+    LOG(info) << "R3BAmsMappingPar::putParams() called";
     if (!list)
     {
         return;
@@ -88,7 +88,7 @@ void R3BAmsMappingPar::putParams(FairParamList* list)
 
 Bool_t R3BAmsMappingPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BAmsMappingPar::getParams() called";
+    LOG(info) << "R3BAmsMappingPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -104,37 +104,37 @@ Bool_t R3BAmsMappingPar::getParams(FairParamList* list)
     fSam->Set(fNumDet);
     if (!(list->fill("amsSamPar", fSam)))
     {
-        LOG(INFO) << "---Could not initialize amsSamPar";
+        LOG(info) << "---Could not initialize amsSamPar";
         return kFALSE;
     }
     fGtb->Set(fNumDet);
     if (!(list->fill("amsGtbPar", fGtb)))
     {
-        LOG(INFO) << "---Could not initialize amsGtbPar";
+        LOG(info) << "---Could not initialize amsGtbPar";
         return kFALSE;
     }
     fSiderem->Set(fNumDet);
     if (!(list->fill("amsSideremPar", fSiderem)))
     {
-        LOG(INFO) << "---Could not initialize amsSideremPar";
+        LOG(info) << "---Could not initialize amsSideremPar";
         return kFALSE;
     }
     fDistance2target->Set(fNumDet);
     if (!(list->fill("amsDistance2targetPar", fDistance2target)))
     {
-        LOG(INFO) << "---Could not initialize amsDistance2targetPar";
+        LOG(info) << "---Could not initialize amsDistance2targetPar";
         return kFALSE;
     }
     fAngleTheta->Set(fNumDet);
     if (!(list->fill("amsAngleThetaPar", fAngleTheta)))
     {
-        LOG(INFO) << "---Could not initialize amsAngleThetaPar";
+        LOG(info) << "---Could not initialize amsAngleThetaPar";
         return kFALSE;
     }
     fOffsetY->Set(fNumDet);
     if (!(list->fill("amsOffsetYPar", fOffsetY)))
     {
-        LOG(INFO) << "---Could not initialize amsOffsetYPar";
+        LOG(info) << "---Could not initialize amsOffsetYPar";
         return kFALSE;
     }
 
@@ -143,9 +143,9 @@ Bool_t R3BAmsMappingPar::getParams(FairParamList* list)
 
 void R3BAmsMappingPar::printParams()
 {
-    LOG(INFO) << "R3BAmsMappingPar: AMS Mapping Parameters for Geometry " << fGeo << ": ";
+    LOG(info) << "R3BAmsMappingPar: AMS Mapping Parameters for Geometry " << fGeo << ": ";
 
-    LOG(INFO) << "Detector"
+    LOG(info) << "Detector"
               << " "
               << "Sam"
               << " "
@@ -161,7 +161,7 @@ void R3BAmsMappingPar::printParams()
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
-        LOG(INFO) << i + 1 << "\t" << fSam->GetAt(i) << "\t" << fGtb->GetAt(i) << "\t" << fSiderem->GetAt(i) << "\t"
+        LOG(info) << i + 1 << "\t" << fSam->GetAt(i) << "\t" << fGtb->GetAt(i) << "\t" << fSiderem->GetAt(i) << "\t"
                   << fDistance2target->GetAt(i) << "\t\t" << fAngleTheta->GetAt(i) << "\t" << fOffsetY->GetAt(i);
     }
 }

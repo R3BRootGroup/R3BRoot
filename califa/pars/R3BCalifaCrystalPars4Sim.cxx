@@ -39,7 +39,7 @@ void R3BCalifaCrystalPars4Sim::clear()
 
 void R3BCalifaCrystalPars4Sim::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaCrystalPars4Sim::putParams() called";
+    LOG(info) << "R3BCalifaCrystalPars4Sim::putParams() called";
     if (!list)
     {
         return;
@@ -60,7 +60,7 @@ void R3BCalifaCrystalPars4Sim::putParams(FairParamList* list)
 
 Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaCrystalPars4Sim::getParams() called";
+    LOG(info) << "R3BCalifaCrystalPars4Sim::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -79,21 +79,21 @@ Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
     fCrystalIDArray->Set(fNumCrystals);
     if (!(list->fill("califaCrystalIDPar", fCrystalIDArray)))
     {
-        LOG(INFO) << "---Could not initialize califaCrystalIDPar";
+        LOG(info) << "---Could not initialize califaCrystalIDPar";
         return kFALSE;
     }
 
     fThresholdArray->Set(fNumCrystals);
     if (!(list->fill("califaThresholdPar", fThresholdArray)))
     {
-        LOG(INFO) << "---Could not initialize califaThresholdPar";
+        LOG(info) << "---Could not initialize califaThresholdPar";
         return kFALSE;
     }
 
     fResolutionArray->Set(fNumCrystals);
     if (!(list->fill("califaResolutionPar", fResolutionArray)))
     {
-        LOG(INFO) << "---Could not initialize califaResolutionPar";
+        LOG(info) << "---Could not initialize califaResolutionPar";
         return kFALSE;
     }
 
@@ -102,9 +102,9 @@ Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
 
 void R3BCalifaCrystalPars4Sim::printParams()
 {
-    LOG(INFO) << "R3BCalifaCrystalPars4Sim: Califa Crystal Simulation Parameters: ";
+    LOG(info) << "R3BCalifaCrystalPars4Sim: Califa Crystal Simulation Parameters: ";
 
-    LOG(INFO) << "Crystal ID"
+    LOG(info) << "Crystal ID"
               << " "
               << "Threshold"
               << " "
@@ -113,7 +113,7 @@ void R3BCalifaCrystalPars4Sim::printParams()
     for (Int_t i = 0; i < fNumCrystals; i++)
 
     {
-        LOG(INFO) << i + 1 << " " << fCrystalIDArray->GetAt(i) << " " << fThresholdArray->GetAt(i) << " "
+        LOG(info) << i + 1 << " " << fCrystalIDArray->GetAt(i) << " " << fThresholdArray->GetAt(i) << " "
                   << fResolutionArray->GetAt(i);
     }
 }

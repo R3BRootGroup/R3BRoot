@@ -79,7 +79,7 @@ R3BMusicOnlineSpectra::R3BMusicOnlineSpectra(const TString& name, Int_t iVerbose
 
 R3BMusicOnlineSpectra::~R3BMusicOnlineSpectra()
 {
-    LOG(INFO) << "R3BMusicOnlineSpectra::Delete instance";
+    LOG(info) << "R3BMusicOnlineSpectra::Delete instance";
     if (fMappedItemsMus)
         delete fMappedItemsMus;
     if (fCalItemsMus)
@@ -90,7 +90,7 @@ R3BMusicOnlineSpectra::~R3BMusicOnlineSpectra()
 
 InitStatus R3BMusicOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BMusicOnlineSpectra::Init ";
+    LOG(info) << "R3BMusicOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -98,7 +98,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(FATAL) << "R3BMusicOnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3BMusicOnlineSpectra::Init FairRootManager not found";
         return kFATAL;
     }
     // header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
@@ -116,12 +116,12 @@ InitStatus R3BMusicOnlineSpectra::Init()
     // get access to cal data of the MUSIC
     fCalItemsMus = (TClonesArray*)mgr->GetObject("MusicCalData");
     if (!fCalItemsMus)
-        LOG(WARNING) << "R3BMusicOnlineSpectra: MusicCalData not found";
+        LOG(warning) << "R3BMusicOnlineSpectra: MusicCalData not found";
 
     // get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
     if (!fHitItemsMus)
-        LOG(WARNING) << "R3BMusicOnlineSpectra: MusicHitData not found";
+        LOG(warning) << "R3BMusicOnlineSpectra: MusicHitData not found";
 
     // This changes the energy range for some experiments
     if (fExpId == 515)
@@ -457,7 +457,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
 
 void R3BMusicOnlineSpectra::Reset_Histo()
 {
-    LOG(INFO) << "R3BMusicOnlineSpectra::Reset_Histo";
+    LOG(info) << "R3BMusicOnlineSpectra::Reset_Histo";
     // Map data
     for (Int_t j = 0; j < NbAnodesMus; j++)
     {
@@ -499,7 +499,7 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BMusicOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BMusicOnlineSpectra::Exec FairRootManager not found";
 
     // Fill mapped data
     if (fMappedItemsMus && fMappedItemsMus->GetEntriesFast() > 0)

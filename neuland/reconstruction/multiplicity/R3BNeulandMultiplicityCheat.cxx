@@ -21,7 +21,7 @@ InitStatus R3BNeulandMultiplicityCheat::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "TCAInputConnector: No FairRootManager";
+        LOG(fatal) << "TCAInputConnector: No FairRootManager";
         return kFATAL;
     }
     ioman->RegisterAny(fOutputName, fMultiplicity, true);

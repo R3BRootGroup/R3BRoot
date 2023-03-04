@@ -224,7 +224,7 @@ void R3BNeuland::WriteParameterFile()
 
     if (!geoNodeNeuland)
     {
-        LOG(FATAL) << "volNeuland not found";
+        LOG(fatal) << "volNeuland not found";
     }
 
     fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);

@@ -25,8 +25,7 @@
 #include "TClonesArray.h"
 #include <cassert>
 
-R3BSfibMapped2Cal::R3BSfibMapped2Cal(Int_t a_verbose,
-		enum R3BTCalEngine::CTDCVariant a_variant)
+R3BSfibMapped2Cal::R3BSfibMapped2Cal(Int_t a_verbose, enum R3BTCalEngine::CTDCVariant a_variant)
     : FairTask("R3BSfibMapped2Cal", a_verbose)
     , fTCalPar(nullptr)
     , fMappedItems(nullptr)
@@ -35,30 +34,27 @@ R3BSfibMapped2Cal::R3BSfibMapped2Cal(Int_t a_verbose,
 {
 }
 
-R3BSfibMapped2Cal::~R3BSfibMapped2Cal()
-{
-    delete fCalItems;
-}
+R3BSfibMapped2Cal::~R3BSfibMapped2Cal() { delete fCalItems; }
 
 InitStatus R3BSfibMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
+        LOG(error) << "TCal parameter containers missing, "
                       "did you forget SetParContainers?";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = "SfibMapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register("SfibCal", "Land", fCalItems, kTRUE);
@@ -67,12 +63,12 @@ InitStatus R3BSfibMapped2Cal::Init()
 
 void R3BSfibMapped2Cal::SetParContainers()
 {
-	auto name = "SfibTCalPar";
-	fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
-	if (!fTCalPar)
-	{
-		LOG(ERROR) << "Could not get access to " << name << " container.";
-	}
+    auto name = "SfibTCalPar";
+    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    if (!fTCalPar)
+    {
+        LOG(error) << "Could not get access to " << name << " container.";
+    }
 }
 
 InitStatus R3BSfibMapped2Cal::ReInit()
@@ -84,25 +80,24 @@ InitStatus R3BSfibMapped2Cal::ReInit()
 void R3BSfibMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BSfibMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
+        LOG(debug) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;
-	auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
-	par = fTCalPar->GetModuleParAt(1 + mapped->IsTop(), tcal_channel_i, 1);
-//std::cout << 1 + mapped->IsTop() << ' ' << channel << ' ' << tcal_channel_i << ' ' << par << std::endl;
+        auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
+        par = fTCalPar->GetModuleParAt(1 + mapped->IsTop(), tcal_channel_i, 1);
+        // std::cout << 1 + mapped->IsTop() << ' ' << channel << ' ' << tcal_channel_i << ' ' << par << std::endl;
         if (!par)
         {
-            LOG(WARNING) << "R3BSfibMapped2Cal::Exec: Channel=" << channel
-                         << ": TCal par not found.";
+            LOG(warning) << "R3BSfibMapped2Cal::Exec: Channel=" << channel << ": TCal par not found.";
             continue;
         }
 
@@ -114,33 +109,29 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         Double_t time_ns = -1;
-	if (fine_ns < 0. || fine_ns >= fClockFreq)
-	{
-		LOG(ERROR) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
-			<< ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
-		continue;
-	}
+        if (fine_ns < 0. || fine_ns >= fClockFreq)
+        {
+            LOG(error) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
+                       << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
+            continue;
+        }
 
-	// Calculate final time with clock cycles.
-	//		time_ns = mapped->GetCoarse() * fClockFreq +
-	//		(mapped->IsLeading() ? -fine_ns : fine_ns);
-	// new clock TDC firmware need here a minus
-	time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
+        // Calculate final time with clock cycles.
+        //		time_ns = mapped->GetCoarse() * fClockFreq +
+        //		(mapped->IsLeading() ? -fine_ns : fine_ns);
+        // new clock TDC firmware need here a minus
+        time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-	LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Channel=" << channel
-		<< ": Time=" << time_ns << "ns.";
-	new ((*fCalItems)[fCalItems->GetEntriesFast()])
-		R3BSfibCalData(1 + mapped->IsTop(), channel, mapped->IsLeading(), time_ns);
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Channel=" << channel << ": Time=" << time_ns << "ns.";
+        new ((*fCalItems)[fCalItems->GetEntriesFast()])
+            R3BSfibCalData(1 + mapped->IsTop(), channel, mapped->IsLeading(), time_ns);
     }
 }
 
-void R3BSfibMapped2Cal::FinishEvent()
-{
-    fCalItems->Clear();
-}
+void R3BSfibMapped2Cal::FinishEvent() { fCalItems->Clear(); }
 
 void R3BSfibMapped2Cal::FinishTask() {}
 

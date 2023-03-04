@@ -71,8 +71,8 @@ void R3BStartrackDigit::SetParContainers()
 
     if (fStartrackHitPar)
     {
-        LOG(INFO) << "-I- R3BStartrackDigit::SetParContainers() ";
-        LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded ";
+        LOG(info) << "-I- R3BStartrackDigit::SetParContainers() ";
+        LOG(info) << "-I- Container R3BStartrackHitPar  loaded ";
     }
 }
 

@@ -45,7 +45,7 @@ R3BSci2Reader::~R3BSci2Reader() {}
 Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BSci2Reader::Init";
+    LOG(info) << "R3BSci2Reader::Init";
     EXT_STR_h101_SCI2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SCI2, 0);
 
     if (!ok)
@@ -167,7 +167,7 @@ Bool_t R3BSci2Reader::Read()
                     coarse_vftx = coarse_vftx + 8192;
 
                 if (fprint)
-                    LOG(INFO) << "SCI2 READER VFTX: " << fNEvents << ", " << Sum << ", " << channel << ", "
+                    LOG(info) << "SCI2 READER VFTX: " << fNEvents << ", " << Sum << ", " << channel << ", "
                               << data->SCITWO_VTFv[j] << ", " << data->SCITWO_VTCv[j] << ", " << coarse_vftx << ", "
                               << mean_coarse_vftx;
 

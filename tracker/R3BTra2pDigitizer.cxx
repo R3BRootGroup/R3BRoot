@@ -65,15 +65,15 @@ void R3BTra2pDigitizer::SetParContainers()
 
     if (fTra2pDigiPar)
     {
-        LOG(INFO) << "-I- R3BTra2pDigitizer::SetParContainers() ";
-        LOG(INFO) << "-I- Container R3BTra2pDigiPar  loaded ";
+        LOG(info) << "-I- R3BTra2pDigitizer::SetParContainers() ";
+        LOG(info) << "-I- Container R3BTra2pDigiPar  loaded ";
     }
 }
 
 InitStatus R3BTra2pDigitizer::Init()
 {
 
-    //  LOG(INFO)<<"Init ";
+    //  LOG(info)<<"Init ";
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
@@ -98,7 +98,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
 
     Reset();
     eventNoTra += 1;
-    //     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1;
+    //     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(info)<<"Event #: "<<eventNoTra-1;
 
     Int_t nentriesTra = fTra2pPoints->GetEntries();
     //     Int_t nentries = fMCTrack->GetEntries();
@@ -158,7 +158,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
 
     for (Int_t l = 0; l < nentriesTra; l++)
     {
-        //   LOG(INFO)<<"entries "<<l;
+        //   LOG(info)<<"entries "<<l;
 
         R3BTraPoint* Tra2p_obj = (R3BTraPoint*)fTra2pPoints->At(l);
 
@@ -207,7 +207,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
                 ss03_kbw_p1 = 2; // kpos for 1 SST swop (with 3.9936-) - requirement for tracker
                 ss03_karea_p1 = 0;
                 ss03_keta_p1 = 0;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
 
             // if (DetID==15 && l>1)
@@ -237,7 +237,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
                 ss03_kbw_p2 = 2; // kpos for 1 SST swop (with 3.9936-) - requirement for tracker
                 ss03_karea_p2 = 0;
                 ss03_keta_p2 = 0;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
 
             // if (DetID==16 && l==1)
@@ -265,7 +265,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
                 ss06_kbw_p1 = 2;
                 ss06_karea_p1 = 0;
                 ss06_keta_p1 = 0;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
 
             // if (DetID==16 && l>1)
@@ -294,7 +294,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
                 ss06_kbw_p2 = 2;
                 ss06_karea_p2 = 0;
                 ss06_keta_p2 = 0;
-                //	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
+                //	LOG(info)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
             }
         }
     }
@@ -345,7 +345,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt)
 void R3BTra2pDigitizer::Reset()
 {
     // Clear the structure
-    //   LOG(INFO) << " -I- Digit Reset() called ";
+    //   LOG(info) << " -I- Digit Reset() called ";
 
     if (fTra2pDigi)
         fTra2pDigi->Clear();

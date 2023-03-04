@@ -92,10 +92,10 @@ bool R3BChannelAccessGroupEPICS::PendIO(char const* op)
         case ECA_NORMAL:
             return true;
         case ECA_TIMEOUT:
-            LOG(ERROR) << "R3BChannelAccessGroupEPICS::Get : CA " << op << " failed.";
+            LOG(error) << "R3BChannelAccessGroupEPICS::Get : CA " << op << " failed.";
             return false;
         default:
-            LOG(ERROR) << "R3BChannelAccessGroupEPICS::Get : Unexpected CA " << op << " error.";
+            LOG(error) << "R3BChannelAccessGroupEPICS::Get : Unexpected CA " << op << " error.";
             return false;
     }
 }

@@ -86,7 +86,7 @@ double Chi2(const double* xx)
         // if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
 
@@ -131,7 +131,7 @@ double Chi2Beta(const double* xx)
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
 
-            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
+            LOG(debug2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
                         << gCandidate->GetMomentum().Y() << gCandidate->GetMomentum().Z();
         }
 
@@ -158,7 +158,7 @@ double Chi2Beta(const double* xx)
         if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
 
@@ -205,7 +205,7 @@ double Chi2Backward(const double* xx)
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
 
-            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
+            LOG(debug2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
                         << gCandidate->GetMomentum().Y() << ", " << gCandidate->GetMomentum().Z();
         }
 
@@ -229,7 +229,7 @@ double Chi2Backward(const double* xx)
         // if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
 
@@ -298,7 +298,7 @@ double Chi2Backward2D(const double* xx)
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
 
-            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
+            LOG(debug2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
                         << gCandidate->GetMomentum().Y() << gCandidate->GetMomentum().Z();
         }
 
@@ -324,7 +324,7 @@ double Chi2Backward2D(const double* xx)
         if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(info) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
     }
@@ -526,7 +526,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
         }
     }
 
-    // LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
+    // LOG(info) << "1 Start beta:" << gCandidate->GetStartBeta()
     //<< ",  Beta:" << gCandidate->GetBeta();
 
     gCandidate->SetStartBeta(gCandidate->GetBeta());
@@ -535,7 +535,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
 
     // Double_t chi2 = Chi2Backward(variable);
 
-    // LOG(INFO) << "2 chi2 = " << chi2;
+    // LOG(info) << "2 chi2 = " << chi2;
 
     // return 0;
 
@@ -613,7 +613,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R
         }
     }
 
-    // LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
+    // LOG(info) << "1 Start beta:" << gCandidate->GetStartBeta()
     //<< ",  Beta:" << gCandidate->GetBeta();
 
     gCandidate->SetStartBeta(gCandidate->GetBeta());
@@ -622,7 +622,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R
 
     // Double_t chi2 = Chi2Backward(variable);
 
-    // LOG(INFO) << "2 chi2 = " << chi2;
+    // LOG(info) << "2 chi2 = " << chi2;
 
     // return 0;
 
@@ -673,8 +673,8 @@ Double_t R3BFragmentFitterChi2::TrackFragment(R3BTrackingParticle* particle,
         // Propagate through the setup, defined by array of detectors
         for (auto const& det : fDetectors->GetArray())
         {
-            LOG(DEBUG2);
-            LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z();
+            LOG(debug2);
+            LOG(debug2) << "Propagating to z=" << det->pos0.Z();
 
             if(kTarget != det->section)
             {
@@ -726,17 +726,17 @@ Double_t R3BFragmentFitterChi2::TrackFragment(R3BTrackingParticle* particle,
 
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
 
-            LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
+            LOG(debug2) << "Track length " << particle->GetLength() << " cm";
         }
 
         sdev /= 2;
 
         chi2 /= (fDetectors->GetArray().size() - 2);
 
-        LOG(DEBUG2) << "Deviation at TOF wall : " << sdev;
-        LOG(DEBUG2) << "                 chi2 : " << chi2;
-        LOG(DEBUG2) << "                 time : " << time;
-        LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
+        LOG(debug2) << "Deviation at TOF wall : " << sdev;
+        LOG(debug2) << "                 chi2 : " << chi2;
+        LOG(debug2) << "                 time : " << time;
+        LOG(debug2) << "Track length " << particle->GetLength() << " cm";
 
         return sdev;*/
     return 0.;
@@ -758,7 +758,7 @@ Double_t R3BFragmentFitterChi2::Velocity(R3BTrackingParticle* candidate)
         // TrackFragment(candidate);
         Double_t beta = candidate->GetLength() / (fDetectors->GetHit("tofd",
        candidate->GetHitIndexByName("tofd"))->GetTime() - fDetectors->GetHit("target",
-       candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT; LOG(INFO) << "Velocity estimation (TOF) "
+       candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT; LOG(info) << "Velocity estimation (TOF) "
        << beta << "   length = " << candidate->GetLength();
 
         return beta;*/
@@ -776,12 +776,12 @@ Double_t R3BFragmentFitterChi2::DbetaDx(R3BTrackingParticle* candidate)
     Double_t time;
     Double_t chi2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1;
+    LOG(debug1) << "beta1 = " << beta1;
     Double_t dev1 = TrackFragment(candidate, kTRUE, devTof, time, chi2);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2;
+    LOG(debug1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -791,7 +791,7 @@ Double_t R3BFragmentFitterChi2::DbetaDx(R3BTrackingParticle* candidate)
 
     Double_t dbetadx = dbeta / (dev2 - dev1);
 
-    LOG(DEBUG1) << "dbeta/dx = " << dbetadx << " 1/cm";
+    LOG(debug1) << "dbeta/dx = " << dbetadx << " 1/cm";
 
     return dbetadx;
 }
@@ -804,12 +804,12 @@ Double_t R3BFragmentFitterChi2::DbetaChi2(R3BTrackingParticle* candidate)
     Double_t time;
     Double_t chi2_1, chi2_2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1;
+    LOG(debug1) << "beta1 = " << beta1;
     TrackFragment(candidate, kTRUE, devTof, time, chi2_1);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2;
+    LOG(debug1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -819,7 +819,7 @@ Double_t R3BFragmentFitterChi2::DbetaChi2(R3BTrackingParticle* candidate)
 
     Double_t dbetachi2 = dbeta / (chi2_2 - chi2_1);
 
-    LOG(DEBUG1) << "dbeta/dchi2 = " << dbetachi2 << " 1/cm";
+    LOG(debug1) << "dbeta/dchi2 = " << dbetachi2 << " 1/cm";
 
     return dbetachi2;
 }
@@ -832,12 +832,12 @@ Double_t R3BFragmentFitterChi2::DbetaDt(R3BTrackingParticle* candidate)
     Double_t time1, time2;
     Double_t chi2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1;
+    LOG(debug1) << "beta1 = " << beta1;
     TrackFragment(candidate, kTRUE, devTof, time1, chi2);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2;
+    LOG(debug1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -847,7 +847,7 @@ Double_t R3BFragmentFitterChi2::DbetaDt(R3BTrackingParticle* candidate)
 
     Double_t dbetadt = dbeta / (time2 - time1);
 
-    LOG(DEBUG1) << "dbeta/dt = " << dbetadt << " 1/ns";
+    LOG(debug1) << "dbeta/dt = " << dbetadt << " 1/ns";
 
     return dbetadt;
 }
@@ -863,12 +863,12 @@ Double_t R3BFragmentFitterChi2::DmDx(R3BTrackingParticle* candidate, Bool_t ener
     Double_t time;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1;
+    LOG(debug1) << "m1 = " << m1;
     Double_t dev1 = TrackFragment(candidate, energy_loss, devTof, time, chi2);
 
     Double_t dm = 0.01;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2;
+    LOG(debug1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -878,7 +878,7 @@ Double_t R3BFragmentFitterChi2::DmDx(R3BTrackingParticle* candidate, Bool_t ener
 
     Double_t dmdx = dm / (dev2 - dev1);
 
-    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm";
+    LOG(debug1) << "dm/dx = " << dmdx << " GeV/cm";
 
     return dmdx;
 }
@@ -894,12 +894,12 @@ Double_t R3BFragmentFitterChi2::DmDxTof(R3BTrackingParticle* candidate, Bool_t e
     Double_t time;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1;
+    LOG(debug1) << "m1 = " << m1;
     TrackFragment(candidate, energy_loss, devTof1, time, chi2);
 
     Double_t dm = 0.5;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2;
+    LOG(debug1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -909,7 +909,7 @@ Double_t R3BFragmentFitterChi2::DmDxTof(R3BTrackingParticle* candidate, Bool_t e
 
     Double_t dmdx = dm / (devTof2 - devTof1);
 
-    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm";
+    LOG(debug1) << "dm/dx = " << dmdx << " GeV/cm";
 
     return dmdx;
 }
@@ -926,12 +926,12 @@ Double_t R3BFragmentFitterChi2::DmDt(R3BTrackingParticle* candidate, Bool_t ener
     Double_t time2;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1;
+    LOG(debug1) << "m1 = " << m1;
     TrackFragment(candidate, energy_loss, devTof, time1, chi2);
 
     Double_t dm = 0.5;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2;
+    LOG(debug1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -941,7 +941,7 @@ Double_t R3BFragmentFitterChi2::DmDt(R3BTrackingParticle* candidate, Bool_t ener
 
     Double_t dmdt = dm / (time2 - time1);
 
-    LOG(DEBUG1) << "dm/dt = " << dmdt << " GeV/ns";
+    LOG(debug1) << "dm/dt = " << dmdt << " GeV/ns";
 
     return dmdt;
 }
@@ -1008,7 +1008,7 @@ void R3BFragmentTracker::FitFragment(R3BTrackingParticle* candidate)
 
     for (Int_t i = 0; i < maxIter; i++)
     {
-        LOG(DEBUG1) << "Starting iteration " << (i + 1) << "   mass = " << mass << "   beta = " << beta
+        LOG(debug1) << "Starting iteration " << (i + 1) << "   mass = " << mass << "   beta = " << beta
                    ;
 
         // Always start an iteration from the target
@@ -1019,7 +1019,7 @@ void R3BFragmentTracker::FitFragment(R3BTrackingParticle* candidate)
         // Calculate deviation of track from a measured TOF hit
         sdev = TrackFragment(candidate, kTRUE, devTof, time, chi2);
 
-        LOG(DEBUG1) << sdev << "  " << (time - tof->hit_time) << "  chi2=" << chi2;
+        LOG(debug1) << sdev << "  " << (time - tof->hit_time) << "  chi2=" << chi2;
 
         stopHere = kTRUE;
 

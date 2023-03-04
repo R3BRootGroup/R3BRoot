@@ -74,7 +74,7 @@ R3BMusicMapped2Cal::R3BMusicMapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BMusicMapped2Cal: Destructor
 R3BMusicMapped2Cal::~R3BMusicMapped2Cal()
 {
-    LOG(INFO) << "R3BMusicMapped2Cal: Delete instance";
+    LOG(info) << "R3BMusicMapped2Cal: Delete instance";
     if (fMusicMappedDataCA)
         delete fMusicMappedDataCA;
     if (fMusicCalDataCA)
@@ -88,17 +88,17 @@ void R3BMusicMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fCal_Par = (R3BMusicCalPar*)rtdb->getContainer("musicCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2CalPar::Init() Couldn't get handle on musicCalPar container";
+        LOG(error) << "R3BMusicMapped2CalPar::Init() Couldn't get handle on musicCalPar container";
     }
     else
     {
-        LOG(INFO) << "R3BMusicMapped2CalPar:: musicCalPar container open";
+        LOG(info) << "R3BMusicMapped2CalPar:: musicCalPar container open";
     }
 }
 
@@ -109,15 +109,15 @@ void R3BMusicMapped2Cal::SetParameters()
     fNumParams = fCal_Par->GetNumParamsEFit();      // Number of Parameters
     fNumPosParams = fCal_Par->GetNumParamsPosFit(); // Number of Parameters
 
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb anodes: " << fNumAnodes;
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters from pedestal fit: " << fNumParams;
+    LOG(info) << "R3BMusicMapped2Cal: Nb anodes: " << fNumAnodes;
+    LOG(info) << "R3BMusicMapped2Cal: Nb parameters from pedestal fit: " << fNumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = fNumAnodes * fNumParams;
     CalParams->Set(array_size);
     CalParams = fCal_Par->GetAnodeCalParams(); // Array with the Cal parameters
 
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters for position fit: " << fNumPosParams;
+    LOG(info) << "R3BMusicMapped2Cal: Nb parameters for position fit: " << fNumPosParams;
     PosParams = new TArrayF();
     Int_t array_pos = fNumAnodes * fNumPosParams;
     PosParams->Set(array_pos);
@@ -128,26 +128,26 @@ void R3BMusicMapped2Cal::SetParameters()
     for (Int_t i = 0; i < fNumAnodes; i++)
         if (CalParams->GetAt(fNumParams * i + 1) == -1)
             numdeadanodes++;
-    LOG(INFO) << "R3BMusicMapped2Cal: Nb of dead anodes in MUSIC : " << numdeadanodes;
+    LOG(info) << "R3BMusicMapped2Cal: Nb of dead anodes in MUSIC : " << numdeadanodes;
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BMusicMapped2Cal::Init()";
+    LOG(info) << "R3BMusicMapped2Cal::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal::Init() Root-manager not found.";
+        LOG(error) << "R3BMusicMapped2Cal::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal::Init() MusicMappedData not found.";
+        LOG(error) << "R3BMusicMapped2Cal::Init() MusicMappedData not found.";
         return kFATAL;
     }
 
@@ -183,13 +183,13 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
 
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicMapped2Cal: NOT Container Parameter!!";
+        LOG(error) << "R3BMusicMapped2Cal: NOT Container Parameter!!";
     }
 
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMusicMappedDataCA->GetEntries();
     // if (nHits != fNumAnodes && nHits > 0)
-    //  LOG(WARNING) << "R3BMusicMapped2Cal: nHits!=" << nHits << " NumAnodes:NumDets" << fNumAnodes << ":" << fNumDets;
+    //  LOG(warning) << "R3BMusicMapped2Cal: nHits!=" << nHits << " NumAnodes:NumDets" << fNumAnodes << ":" << fNumDets;
     if (!nHits)
         return;
 
@@ -217,14 +217,14 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
         {
             pedestal = CalParams->GetAt(fNumParams * anodeId + 1);
             // sigma=CalParams->GetAt(fNumParams*anodeId+2);
-            // LOG(INFO) << detId << " " << anodeId<<" "<< mappedData[i]->GetEnergy()<< " " << pedestal;
+            // LOG(info) << detId << " " << anodeId<<" "<< mappedData[i]->GetEnergy()<< " " << pedestal;
             energy[mulanode[anodeId]][anodeId] = mappedData[i]->GetEnergy() - pedestal;
             dtime[mulanode[anodeId]][anodeId] = mappedData[i]->GetTime();
             mulanode[anodeId]++;
         }
         else if (anodeId >= fNumAnodes)
         {
-            // LOG(INFO) <<"a="<< anodeId<<" e="<< mappedData[i]->GetEnergy()<< "  t=" << mappedData[i]->GetTime();
+            // LOG(info) <<"a="<< anodeId<<" e="<< mappedData[i]->GetEnergy()<< "  t=" << mappedData[i]->GetTime();
             dtime[mulanode[anodeId]][anodeId] = mappedData[i]->GetTime(); // Ref. Time
             mulanode[anodeId]++;
         }
@@ -256,7 +256,7 @@ void R3BMusicMapped2Cal::Finish() {}
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicMapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing MusicCalData Structure";
+    LOG(debug) << "Clearing MusicCalData Structure";
     if (fMusicCalDataCA)
         fMusicCalDataCA->Clear();
 }

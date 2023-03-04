@@ -91,7 +91,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const TString& name, Int_t iV
 // R3BAmsMapped2StripCalPar: Destructor ----------------------------------------
 R3BAmsMapped2StripCalPar::~R3BAmsMapped2StripCalPar()
 {
-    LOG(INFO) << "R3BAmsMapped2StripCalPar: Delete instance";
+    LOG(info) << "R3BAmsMapped2StripCalPar: Delete instance";
     if (fAmsMappedDataCA)
         delete fAmsMappedDataCA;
 }
@@ -103,17 +103,17 @@ void R3BAmsMapped2StripCalPar::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
     }
     else
     {
-        LOG(INFO) << "R3BAmsMapped2StripCalPar:: amsMappingPar container open";
+        LOG(info) << "R3BAmsMapped2StripCalPar:: amsMappingPar container open";
     }
 }
 
@@ -121,11 +121,11 @@ void R3BAmsMapped2StripCalPar::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(WARNING) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
+        LOG(warning) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
     }
     //--- Parameter Container ---
     fNumDets = fMap_Par->GetNumDets(); // Number of ams detectors
-    LOG(INFO) << "R3BAmsMapped2StripCalPar::NumDet " << fNumDets;
+    LOG(info) << "R3BAmsMapped2StripCalPar::NumDet " << fNumDets;
     fMap_Par->printParams();
 }
 
@@ -133,7 +133,7 @@ void R3BAmsMapped2StripCalPar::SetParameter()
 InitStatus R3BAmsMapped2StripCalPar::Init()
 {
 
-    LOG(INFO) << "R3BAmsMapped2StripCalPar: Init";
+    LOG(info) << "R3BAmsMapped2StripCalPar: Init";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
@@ -156,7 +156,7 @@ InitStatus R3BAmsMapped2StripCalPar::Init()
     fStrip_Par = (R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
     if (!fStrip_Par)
     {
-        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
+        LOG(error) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
         return kFATAL;
     }
 
@@ -223,7 +223,7 @@ void R3BAmsMapped2StripCalPar::FinishTask()
 void R3BAmsMapped2StripCalPar::PrintParamsDaq()
 {
 
-    LOG(INFO) << "R3BAmsMapped2StripCalPar: Printing parameters for DAQ";
+    LOG(info) << "R3BAmsMapped2StripCalPar: Printing parameters for DAQ";
 
     FILE* fOut1 = fopen("sidped.txt", "wt");
     FILE* fOut2 = fopen("sidsig_r.txt", "wt");
@@ -268,7 +268,7 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq()
 void R3BAmsMapped2StripCalPar::SearchPedestals()
 {
 
-    LOG(INFO) << "R3BAmsMapped2StripCalPar: Search pedestals";
+    LOG(info) << "R3BAmsMapped2StripCalPar: Search pedestals";
 
     Int_t numPars = 3; // by default number of parameters=3
 
@@ -333,14 +333,14 @@ void R3BAmsMapped2StripCalPar::SearchPedestals()
                 {
                     fStrip_Par->SetStripCalParams(-1, nbstrip + 1); // dead strip
                     fStrip_Par->SetStripCalParams(0, nbstrip + 2);
-                    // LOG(WARNING)<<"Dead strip, detector: " << d+1 << ", strip: "<< i+1 <<", "<< f1->GetParameter(2);
+                    // LOG(warning)<<"Dead strip, detector: " << d+1 << ", strip: "<< i+1 <<", "<< f1->GetParameter(2);
                 }
             }
             else
             {
                 fStrip_Par->SetStripCalParams(-1, nbstrip + 1); // dead strip
                 fStrip_Par->SetStripCalParams(0, nbstrip + 2);
-                LOG(WARNING) << "Histogram NO Fitted, detector: " << d + 1 << ", strip: " << i + 1;
+                LOG(warning) << "Histogram NO Fitted, detector: " << d + 1 << ", strip: " << i + 1;
             }
         }
         // Draw sigma for pedestals

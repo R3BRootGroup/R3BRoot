@@ -43,7 +43,7 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
     printf("Length: %lu\n", LENGTH(data_o->PSPX));
-    LOG(INFO) << "R3BPspxReader: Created " << 2 * LENGTH(data_o->PSPX) << " detectors.";
+    LOG(info) << "R3BPspxReader: Created " << 2 * LENGTH(data_o->PSPX) << " detectors.";
 }
 
 R3BPspxReader::~R3BPspxReader()
@@ -61,7 +61,7 @@ R3BPspxReader::~R3BPspxReader()
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BPspxReader::Init";
+    LOG(info) << "R3BPspxReader::Init";
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
 
     if (!ok)
@@ -92,7 +92,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
                                                       fMappedItems[2 * d + f],
                                                       kFALSE);
             }
-            LOG(INFO) << "Registered Pspx" << d + 1 << "_" << xy[f];
+            LOG(info) << "Registered Pspx" << d + 1 << "_" << xy[f];
         }
     }
     return kTRUE;

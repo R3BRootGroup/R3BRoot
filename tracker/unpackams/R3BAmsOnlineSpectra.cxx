@@ -76,7 +76,7 @@ R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const TString& name, Int_t iVerbose)
 
 R3BAmsOnlineSpectra::~R3BAmsOnlineSpectra()
 {
-    LOG(INFO) << "R3BAmsOnlineSpectra: Delete instance";
+    LOG(info) << "R3BAmsOnlineSpectra: Delete instance";
     if (fMappedItemsAms)
         delete fMappedItemsAms;
     if (fCalItemsAms)
@@ -92,17 +92,17 @@ void R3BAmsOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
+        LOG(error) << "R3BAmsOnlineSpectra::Couldn't get handle on amsMappingPar container";
     }
     else
     {
-        LOG(INFO) << "R3BAmsOnlineSpectra::amsMappingPar container open";
+        LOG(info) << "R3BAmsOnlineSpectra::amsMappingPar container open";
     }
 }
 
@@ -110,17 +110,17 @@ void R3BAmsOnlineSpectra::SetParameter()
 {
     if (!fMap_Par)
     {
-        LOG(ERROR) << "R3BAmsOnlineSpectra::amsMappingPar container not found";
+        LOG(error) << "R3BAmsOnlineSpectra::amsMappingPar container not found";
     }
     //--- Parameter Container ---
     fNbDet = fMap_Par->GetNumDets(); // Number of detectors
-    LOG(INFO) << "R3BAmsOnlineSpectra::NumDets " << fNbDet;
+    LOG(info) << "R3BAmsOnlineSpectra::NumDets " << fNbDet;
 }
 
 InitStatus R3BAmsOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3BAmsOnlineSpectra::Init ";
+    LOG(info) << "R3BAmsOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -145,12 +145,12 @@ InitStatus R3BAmsOnlineSpectra::Init()
     // get access to Cal data
     fCalItemsAms = (TClonesArray*)mgr->GetObject("AmsStripCalData");
     if (!fCalItemsAms)
-        LOG(WARNING) << "R3BAmsOnlineSpectra: AmsStripCalData not found";
+        LOG(warning) << "R3BAmsOnlineSpectra: AmsStripCalData not found";
 
     // get access to Hit data
     fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
     if (!fHitItemsAms)
-        LOG(WARNING) << "R3BAmsOnlineSpectra: AmsHitData not found";
+        LOG(warning) << "R3BAmsOnlineSpectra: AmsHitData not found";
 
     SetParameter();
 
@@ -504,7 +504,7 @@ InitStatus R3BAmsOnlineSpectra::Init()
 
 void R3BAmsOnlineSpectra::Reset_AMS_Histo()
 {
-    LOG(INFO) << "R3BAmsOnlineSpectra::Reset_AMS_Histo";
+    LOG(info) << "R3BAmsOnlineSpectra::Reset_AMS_Histo";
 
     // Mapped data
     for (Int_t i = 0; i < fNbDet; i++)
@@ -551,7 +551,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BAmsOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BAmsOnlineSpectra::Exec FairRootManager not found";
 
     // Fill mapped data
     if (fMappedItemsAms && fMappedItemsAms->GetEntriesFast() > 0)

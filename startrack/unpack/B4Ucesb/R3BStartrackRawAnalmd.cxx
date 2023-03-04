@@ -130,7 +130,7 @@ void R3BStartrackRawAna::WriteHistos()
     thtsExtlbdiff->Write();
     thif->Write();
     thic->Write();
-    LOG(INFO) << "R3BStartrackRawAna --- Histograms writed to the Root File ...";
+    LOG(info) << "R3BStartrackRawAna --- Histograms writed to the Root File ...";
 }
 
 ClassImp(R3BStartrackRawAna)

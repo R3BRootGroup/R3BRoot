@@ -35,7 +35,7 @@
         if (!ok)                                                                                                    \
         {                                                                                                           \
             perror("ext_data_struct_info_item");                                                                    \
-            LOG(ERROR) << "Failed to setup structure information.";                                                 \
+            LOG(error) << "Failed to setup structure information.";                                                 \
             return kFALSE;                                                                                          \
         }                                                                                                           \
                                                                                                                     \
@@ -50,7 +50,7 @@
 		/* The unpacker checks this, R3BRoot shouldn't have to. */                                                  \
         if (0 && fData->TIMESTAMP_MASTER_ID != 0 && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)                   \
         {                                                                                                           \
-            LOG(ERROR) << "Event " << fEventHeader->GetEventno()                                                    \
+            LOG(error) << "Event " << fEventHeader->GetEventno()                                                    \
                        << ": "                                                                                      \
                           "Whiterabbit ID mismatch: expect "                                                        \
                        << fWhiterabbitId << ", got " << fData->TIMESTAMP_MASTER_ID << "\n";                         \

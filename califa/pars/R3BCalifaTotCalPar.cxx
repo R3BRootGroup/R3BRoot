@@ -47,14 +47,14 @@ void R3BCalifaTotCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BCalifaTotCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaTotCalPar::putParams() called";
+    LOG(info) << "R3BCalifaTotCalPar::putParams() called";
     if (!list)
     {
         return;
     }
 
     Int_t array_size = fNumCrystals * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
 
     fCryCalParams->Set(array_size);
 
@@ -66,7 +66,7 @@ void R3BCalifaTotCalPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaTotCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BCalifaTotCalPar::getParams() called";
+    LOG(info) << "R3BCalifaTotCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -83,12 +83,12 @@ Bool_t R3BCalifaTotCalPar::getParams(FairParamList* list)
     }
 
     Int_t array_size = fNumCrystals * fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    LOG(info) << "Array Size: " << array_size;
     fCryCalParams->Set(array_size);
 
     if (!(list->fill("califaCrystalCalPar", fCryCalParams)))
     {
-        LOG(INFO) << "---Could not initialize califaCrystalCalPar";
+        LOG(info) << "---Could not initialize califaCrystalCalPar";
         return kFALSE;
     }
 
@@ -101,15 +101,15 @@ void R3BCalifaTotCalPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BCalifaTotCalPar::printParams()
 {
-    LOG(INFO) << "R3BCalifaTotCalPar: Califa Crystal Calibration Parameters: ";
+    LOG(info) << "R3BCalifaTotCalPar: Califa Crystal Calibration Parameters: ";
     Int_t array_size = fNumCrystals * fNumParamsFit;
 
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
-        LOG(INFO) << "Califa Crystal number: " << i + 1;
+        LOG(info) << "Califa Crystal number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
+            LOG(info) << "FitParam(" << j << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

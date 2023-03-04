@@ -334,7 +334,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found";
 
     // if(header->GetTrigger()!=1){cout << header->GetTrigger()<<endl;}
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != 1))

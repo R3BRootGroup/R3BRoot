@@ -250,7 +250,7 @@ Bool_t R3BOptimizeMagfieldS494::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field.";
+        LOG(error) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

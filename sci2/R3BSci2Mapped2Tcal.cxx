@@ -50,7 +50,7 @@ R3BSci2Mapped2Tcal::R3BSci2Mapped2Tcal(const char* name, Int_t iVerbose)
 
 R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
 {
-    LOG(INFO) << "R3BSci2Mapped2Tcal: Delete instance";
+    LOG(info) << "R3BSci2Mapped2Tcal: Delete instance";
     if (fMapped)
     {
         delete fMapped;
@@ -64,12 +64,12 @@ R3BSci2Mapped2Tcal::~R3BSci2Mapped2Tcal()
 
 InitStatus R3BSci2Mapped2Tcal::Init()
 {
-    LOG(INFO) << "R3BSci2Mapped2Tcal: Init";
+    LOG(info) << "R3BSci2Mapped2Tcal: Init";
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
+        LOG(error) << "R3BSci2Mapped2Tcal::Init() Couldn't instance the FairRootManager";
     }
 
     // try to get a handle on the EventHeader. EventHeader may not be
@@ -80,11 +80,11 @@ InitStatus R3BSci2Mapped2Tcal::Init()
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
     if (!fMapped)
     {
-        LOG(ERROR) << "R3BSci2Mapped2Tcal::Init() Couldn't get handle on Sci2Mappe container";
+        LOG(error) << "R3BSci2Mapped2Tcal::Init() Couldn't get handle on Sci2Mappe container";
     }
     else
     {
-        LOG(INFO) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped found";
+        LOG(info) << "R3BSci2Mapped2Tcal::Init() Sci2Mapped found";
     }
 
     // --- output tcal data --- //
@@ -96,10 +96,10 @@ InitStatus R3BSci2Mapped2Tcal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container Sci2TCalPar";
+        LOG(error) << "There are no TCal parameters in container Sci2TCalPar";
         return kFATAL;
     }
-    LOG(INFO) << "R3BSci2Mapped2Tcal::Init : read " << fNofModules << " modules";
+    LOG(info) << "R3BSci2Mapped2Tcal::Init : read " << fNofModules << " modules";
 
     return kSUCCESS;
 }
@@ -110,7 +110,7 @@ void R3BSci2Mapped2Tcal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to Sci2TCalPar-Container.";
+        LOG(error) << "Could not get access to Sci2TCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -144,7 +144,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(INFO) << "R3BSci2Mapped2Tcal::Exec : Detector number out of range: " << iDet;
+            LOG(info) << "R3BSci2Mapped2Tcal::Exec : Detector number out of range: " << iDet;
             continue;
         }
 
@@ -155,7 +155,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
 
         if (!par)
         {
-            LOG(INFO) << "R3BSci2Mapped2Tcal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
+            LOG(info) << "R3BSci2Mapped2Tcal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
                       << ", Type: " << iType;
             continue;
         }
@@ -164,7 +164,7 @@ void R3BSci2Mapped2Tcal::Exec(Option_t* option)
         Double_t times_raw_ns = par->GetTimeVFTX(hit->GetTimeFine());
         if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
         {
-            LOG(INFO) << "R3BSci2Mapped2Tcal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
+            LOG(info) << "R3BSci2Mapped2Tcal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
                       << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
                       << ", time in ns = " << times_raw_ns;
             continue;

@@ -57,7 +57,7 @@ Bool_t R3BTrloiiScalerReader::Init(ext_data_struct_info* a_struct_info)
 
     if (!ok)
     {
-        LOG(ERROR) << "TRLOII Failed to setup structure information";
+        LOG(error) << "TRLOII Failed to setup structure information";
         return kFALSE;
     }
 

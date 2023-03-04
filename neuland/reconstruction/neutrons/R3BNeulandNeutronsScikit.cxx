@@ -54,7 +54,7 @@ InitStatus R3BNeulandNeutronsScikit::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronsScikit: No FairRootManager";
+        LOG(fatal) << "R3BNeulandNeutronsScikit: No FairRootManager";
         return kFATAL;
     }
 

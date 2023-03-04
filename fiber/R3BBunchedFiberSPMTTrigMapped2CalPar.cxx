@@ -56,7 +56,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get " << name << '.';
+        LOG(error) << "Could not get " << name << '.';
         abort();
         return kFATAL;
     }

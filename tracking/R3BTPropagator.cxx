@@ -199,7 +199,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
             tpos = particle->GetPosition();
             // particle->GetPosition().Print();
             // particle->GetMomentum().Print();
-            // LOG(INFO) << particle->GetCharge();
+            // LOG(info) << particle->GetCharge();
             result = PropagateToPlaneRK(particle, v1, v2, v3);
             // cout<<"particle after propagaging: "<<endl;
             // particle->GetPosition().Print();
@@ -256,7 +256,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         LOG(debug2);
         return kTRUE;
     }
-    // LOG(ERROR) << "!!! Failed !!!";
+    // LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 
@@ -379,7 +379,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         return kTRUE;
     } * /
 
-    // LOG(ERROR) << "!!! Failed !!!";
+    // LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 */
@@ -484,7 +484,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         return kTRUE;
     }
 
-    // LOG(ERROR) << "!!! Failed !!!";
+    // LOG(error) << "!!! Failed !!!";
     return kFALSE;
 }
 

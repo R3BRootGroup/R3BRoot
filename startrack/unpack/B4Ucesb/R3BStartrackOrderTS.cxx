@@ -830,7 +830,7 @@ void R3BStartrackOrderTS::FinishTask()
     // gr3->Draw("AL");
     gr3->Write();
 
-    // LOG(INFO) << "Number of Entries: " << fh_tdc[15]->GetEntries();
+    // LOG(info) << "Number of Entries: " << fh_tdc[15]->GetEntries();
 
     // adding calibration:
     // for(Int_t iModule =0; iModule <16; iModule++){

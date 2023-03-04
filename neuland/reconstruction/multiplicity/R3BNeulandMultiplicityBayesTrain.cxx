@@ -29,14 +29,14 @@ void R3BNeulandMultiplicityBayesTrain::SetParContainers()
     auto rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayesTrain::Init: No FairRuntimeDb!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayesTrain::Init: No FairRuntimeDb!";
         return;
     }
 
     fPar = (R3BNeulandMultiplicityBayesPar*)rtdb->getContainer("R3BNeulandMultiplicityBayesPar");
     if (fPar == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayesTrain::Init: No R3BNeulandMultiplicityBayesPar!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayesTrain::Init: No R3BNeulandMultiplicityBayesPar!";
         return;
     }
 }

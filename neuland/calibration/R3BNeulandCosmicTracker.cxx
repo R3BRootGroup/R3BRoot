@@ -122,18 +122,18 @@ namespace Neuland
 
         const R3BNeulandCosmicTrack& CosmicTracker::GetTrack()
         {
-            LOG(DEBUG) << "CosmicTracker::Fit : Number of Points: X-Z: " << fXZ.GetN() << "   Y-Z: " << fYZ.GetN();
+            LOG(debug) << "CosmicTracker::Fit : Number of Points: X-Z: " << fXZ.GetN() << "   Y-Z: " << fYZ.GetN();
 
             if (fYZ.GetN() < MinPoints || fXZ.GetN() < MinPoints)
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Not enough Points to make reasonable fit.";
+                LOG(debug) << "CosmicTracker::Fit : Not enough Points to make reasonable fit.";
                 return fTrack;
             }
 
             filter(fYZ);
             if (fYZ.GetN() < MinPoints)
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Not enough Points to make reasonable fit after "
+                LOG(debug) << "CosmicTracker::Fit : Not enough Points to make reasonable fit after "
                               "horizontal filtering.";
                 return fTrack;
             }
@@ -141,7 +141,7 @@ namespace Neuland
             filter(fXZ);
             if (fXZ.GetN() < MinPoints)
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Not enough Points to make reasonable fit after vertical "
+                LOG(debug) << "CosmicTracker::Fit : Not enough Points to make reasonable fit after vertical "
                               "filtering.";
                 return fTrack;
             }
@@ -156,20 +156,20 @@ namespace Neuland
             const auto yFit = fit(fYZ);
             if (isnan(yFit[0]))
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Could not get a reasonable vertical fit.";
+                LOG(debug) << "CosmicTracker::Fit : Could not get a reasonable vertical fit.";
                 return fTrack;
             }
 
             if (fabs(yFit[0]) < 0.1)
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Y-Slope too small. Better reject this Track.";
+                LOG(debug) << "CosmicTracker::Fit : Y-Slope too small. Better reject this Track.";
                 return fTrack;
             }
 
             const auto xFit = fit(fXZ);
             if (isnan(xFit[0]))
             {
-                LOG(DEBUG) << "CosmicTracker::Fit : Could not get a reasonable horizontal fit.";
+                LOG(debug) << "CosmicTracker::Fit : Could not get a reasonable horizontal fit.";
                 return fTrack;
             }
 
@@ -215,9 +215,9 @@ namespace Neuland
 
             entryPoint += direction * (flightTimeEntry - TimeEps);
 
-            LOG(DEBUG) << "X: " << entryPoint[0] << " + t * " << direction[0];
-            LOG(DEBUG) << "Y: " << entryPoint[1] << " + t * " << direction[1];
-            LOG(DEBUG) << "Z: " << entryPoint[2] << " + t * " << direction[2];
+            LOG(debug) << "X: " << entryPoint[0] << " + t * " << direction[0];
+            LOG(debug) << "Y: " << entryPoint[1] << " + t * " << direction[1];
+            LOG(debug) << "Z: " << entryPoint[2] << " + t * " << direction[2];
 
             fillInteractions(fTrack);
             if (fTrack.Interactions.size() < 3) // ig || fTrack.Interactions.size() < fBarIDs.size() - 3)
@@ -226,7 +226,7 @@ namespace Neuland
                 fTrack.TotalTrackLength = 0.;
             }
 
-            LOG(DEBUG) << "Interactions: " << fTrack.Interactions.size();
+            LOG(debug) << "Interactions: " << fTrack.Interactions.size();
 
             return fTrack;
         }
@@ -268,7 +268,7 @@ namespace Neuland
                 }
             }
 
-            LOG(DEBUG) << "   Removed : " << nRemove;
+            LOG(debug) << "   Removed : " << nRemove;
 
             if (nRemove > 0)
             {
@@ -501,7 +501,7 @@ namespace Neuland
             auto currentPoint = track.EntryPoint;
             auto tof = 0.;
 
-            LOG(DEBUG) << "Entry Plane: " << currentPlane << " at " << currentPoint.X() << " " << currentPoint.Y()
+            LOG(debug) << "Entry Plane: " << currentPlane << " at " << currentPoint.X() << " " << currentPoint.Y()
                        << " " << currentPoint.Z();
 
             while (kTRUE)
@@ -600,7 +600,7 @@ namespace Neuland
                                   { -0.5 * BarLength, 0.5 * BarLength },
                                   { fDistances[0], fDistances.back() + BarSize_Z }))
                 {
-                    LOG(DEBUG) << "Left NeuLAND at Plane " << currentPlane << " with " << currentPoint.X() << " "
+                    LOG(debug) << "Left NeuLAND at Plane " << currentPlane << " with " << currentPoint.X() << " "
                                << currentPoint.Y() << " " << currentPoint.Z();
                     break;
                 }

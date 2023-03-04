@@ -63,8 +63,8 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
 {
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)
     {
-        LOG(ERROR) << "R3BTCalEngine::Fill : index out of max range " << plane << " / " << paddle << " / " << side;
-        LOG(ERROR) << "R3BTCalEngine::Fill : ranges: " << N_PLANE_MAX << " / " << N_PADDLE_MAX << " / " << N_SIDE_MAX;
+        LOG(error) << "R3BTCalEngine::Fill : index out of max range " << plane << " / " << paddle << " / " << side;
+        LOG(error) << "R3BTCalEngine::Fill : ranges: " << N_PLANE_MAX << " / " << N_PADDLE_MAX << " / " << N_SIDE_MAX;
         return;
     }
     if (NULL == fhData[plane - 1][paddle - 1][side - 1])
@@ -77,7 +77,7 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
     }
     fhData[plane - 1][paddle - 1][side - 1]->Fill(tdc);
 
-    //  LOG(INFO) << "R3BTCalEngine:: " << plane << " " << paddle<< " "<<side<<" "<< fhData[plane - 1][paddle - 1][side
+    //  LOG(info) << "R3BTCalEngine:: " << plane << " " << paddle<< " "<<side<<" "<< fhData[plane - 1][paddle - 1][side
     //  - 1]->GetEntries();
 }
 
@@ -117,7 +117,7 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
                 {
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Range of channels: " << iMin << " - " << iMax;
+                LOG(info) << "R3BTCalEngine::CalculateParamClockTDC() : Range of channels: " << iMin << " - " << iMax;
 
                 Int_t nparam = 0;
                 auto pTCal = new R3BTCalModulePar;
@@ -140,12 +140,12 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
                 }
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Number of parameters: " << nparam;
+                LOG(info) << "R3BTCalEngine::CalculateParamClockTDC() : Number of parameters: " << nparam;
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Module: " << (i + 1) << " / " << (j + 1)
+                LOG(info) << "R3BTCalEngine::CalculateParamClockTDC() : Module: " << (i + 1) << " / " << (j + 1)
                           << " / " << (k + 1) << " is calibrated."
 
                     ;
@@ -182,7 +182,7 @@ void R3BTCalEngine::CalculateParamTacquila()
                 {
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Range of channels: " << iMin << " - " << iMax;
+                LOG(info) << "R3BTCalEngine::CalculateParamTacquila() : Range of channels: " << iMin << " - " << iMax;
 
                 Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
                 for (Int_t ii = iMin; ii <= iMax; ii++)
@@ -281,12 +281,12 @@ void R3BTCalEngine::CalculateParamTacquila()
 
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Number of parameters: " << nparam;
+                LOG(info) << "R3BTCalEngine::CalculateParamTacquila() : Number of parameters: " << nparam;
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Module: " << (i + 1) << " / " << (j + 1)
+                LOG(info) << "R3BTCalEngine::CalculateParamTacquila() : Module: " << (i + 1) << " / " << (j + 1)
                           << " / " << (k + 1) << " is calibrated."
 
                     ;
@@ -303,25 +303,25 @@ void R3BTCalEngine::CalculateParamVFTX()
 
     for (Int_t i = 0; i < N_PLANE_MAX; i++)
     {
-        //  LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Plane: " << i;
+        //  LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Plane: " << i;
         for (Int_t j = 0; j < N_PADDLE_MAX; j++)
         {
-            //	 LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Paddle: " << j;
+            //	 LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Paddle: " << j;
 
             for (Int_t k = 0; k < N_SIDE_MAX; k++)
             {
 
-                // if(i == 0)   LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Detector: "<<i<<", Channel: "<<j<<",
+                // if(i == 0)   LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Detector: "<<i<<", Channel: "<<j<<",
                 // Type: " << k;
 
                 if (NULL == fhData[i][j][k])
                 {
-                    //			LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : NULL: " << fhData[i][j][k];
+                    //			LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : NULL: " << fhData[i][j][k];
                     continue;
                 }
                 if (fhData[i][j][k]->GetEntries() < fMinStats)
                 {
-                    //			LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : fMinStatus: " <<
+                    //			LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : fMinStatus: " <<
                     // fhData[i][j][k]->GetEntries()<<", "<<fMinStats;
                     continue;
                 }
@@ -333,7 +333,7 @@ void R3BTCalEngine::CalculateParamVFTX()
                 {
                     return;
                 }
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Range of channels: " << iMin << " - " << iMax;
+                LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Range of channels: " << iMin << " - " << iMax;
 
                 Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
                 for (Int_t ii = iMin; ii <= iMax; ii++)
@@ -366,12 +366,12 @@ void R3BTCalEngine::CalculateParamVFTX()
 
                 fCal_Par->AddModulePar(pTCal);
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Number of parameters: " << nparam;
+                LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Number of parameters: " << nparam;
 
                 fhData[i][j][k]->Write();
                 fhTime[i][j][k]->Write();
 
-                LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Module: " << (i + 1) << " / " << (j + 1) << " / "
+                LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Module: " << (i + 1) << " / " << (j + 1) << " / "
                           << (k + 1) << " is calibrated."
 
                     ;

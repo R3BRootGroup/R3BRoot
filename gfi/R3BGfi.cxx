@@ -95,13 +95,13 @@ void R3BGfi::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BGfi: initialisation";
-    LOG(DEBUG) << "R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog");
+    LOG(info) << "R3BGfi: initialisation";
+    LOG(debug) << "R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog");
 }
 
 void R3BGfi::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BGfi: Adding customized Physics cut ... ";
+    LOG(info) << "-I- R3BGfi: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -125,7 +125,7 @@ void R3BGfi::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BGfi: plasticForGFI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+            LOG(info) << "-I- R3BGfi: plasticForGFI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
                       << " GeV";
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -217,10 +217,10 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
 
             if (fPosIn.Z() < 30. && newpos[2] > 30.02)
             {
-                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+                LOG(error) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
                            << " with safety = " << safety;
-                LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
-                LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
+                LOG(error) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
+                LOG(error) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
             }
 
             fPosOut.SetX(newpos[0]);
@@ -289,7 +289,7 @@ TClonesArray* R3BGfi::GetCollection(Int_t iColl) const
 void R3BGfi::Print(Option_t* option) const
 {
     Int_t nHits = fGfiCollection->GetEntriesFast();
-    LOG(INFO) << "R3BGfi: " << nHits << " points registered in this event";
+    LOG(info) << "R3BGfi: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -305,7 +305,7 @@ void R3BGfi::Reset()
 void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BGfi: " << nEntries << " entries to add";
+    LOG(info) << "R3BGfi: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BGfiPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -316,7 +316,7 @@ void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BGfiPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BGfi: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BGfi: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -334,7 +334,7 @@ R3BGfiPoint* R3BGfi::AddHit(Int_t trackID,
     TClonesArray& clref = *fGfiCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BGfiPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -345,7 +345,7 @@ void R3BGfi::ConstructGeometry()
     TString fileName = GetGeometryFileName();
     if (fileName.EndsWith(".root"))
     {
-        LOG(INFO) << "Constructing GFI geometry from ROOT file " << fileName.Data();
+        LOG(info) << "Constructing GFI geometry from ROOT file " << fileName.Data();
         ConstructRootGeometry();
 
         TGeoNode* gfi_node = gGeoManager->GetTopVolume()->GetNode("GFI_0");
@@ -362,7 +362,7 @@ void R3BGfi::ConstructGeometry()
     }
     else
     {
-        LOG(FATAL) << "GFI geometry file is not specified";
+        LOG(fatal) << "GFI geometry file is not specified";
         exit(1);
     }
 }

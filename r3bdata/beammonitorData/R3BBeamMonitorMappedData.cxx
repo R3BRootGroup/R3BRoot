@@ -40,7 +40,7 @@ R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(UInt_t IC,
     , fSROLU2(SROLU2)
 {
     /*
-     LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
+     LOG(info)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
 
     */
 }

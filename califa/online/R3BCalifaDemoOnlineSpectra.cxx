@@ -83,7 +83,7 @@ R3BCalifaDemoOnlineSpectra::R3BCalifaDemoOnlineSpectra(const char* name, Int_t i
 
 R3BCalifaDemoOnlineSpectra::~R3BCalifaDemoOnlineSpectra()
 {
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra: Delete instance";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra: Delete instance";
     delete fMappedItemsCalifa;
     delete fCalItemsCalifa;
     delete fHitItemsCalifa;
@@ -94,14 +94,14 @@ R3BCalifaDemoOnlineSpectra::~R3BCalifaDemoOnlineSpectra()
 InitStatus R3BCalifaDemoOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init ";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BCalifaDemoOnlineSpectra::Init FairRootManager not found";
+        LOG(fatal) << "R3BCalifaDemoOnlineSpectra::Init FairRootManager not found";
 
     // Define Preamp sequence for histograms
     Int_t PreampOrder[16] = { 6, 5, 4, 3, 2, 1, 0, 7, 8, 15, 14, 13, 12, 11, 10, 9 };
@@ -127,7 +127,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
     if (!fCalItemsCalifa)
     {
-        LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init CalifaCrystalCalData not found";
+        LOG(info) << "R3BCalifaDemoOnlineSpectra::Init CalifaCrystalCalData not found";
         fCalON = kFALSE;
     }
 
@@ -135,21 +135,21 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
     if (!fHitItemsCalifa)
     {
-        LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init CalifaHitData not found";
+        LOG(info) << "R3BCalifaDemoOnlineSpectra::Init CalifaHitData not found";
     }
 
     // get access to WR-Califa data
     fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
     if (!fWRItemsCalifa)
     {
-        LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init WRCalifaData not found";
+        LOG(info) << "R3BCalifaDemoOnlineSpectra::Init WRCalifaData not found";
     }
 
     // get access to WR-Master data
     fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
     if (!fWRItemsMaster)
     {
-        LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Init WRMasterData not found";
+        LOG(info) << "R3BCalifaDemoOnlineSpectra::Init WRMasterData not found";
     }
 
     // reading the file
@@ -157,7 +157,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     ifstream* FileHistos = new ifstream(fCalifaFile);
     if (!FileHistos->is_open())
     {
-        LOG(WARNING) << "R3BCalifaDemoOnlineSpectra:  No Histogram definition file";
+        LOG(warning) << "R3BCalifaDemoOnlineSpectra:  No Histogram definition file";
         noFile = kTRUE;
     }
 
@@ -614,7 +614,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
 
 void R3BCalifaDemoOnlineSpectra::Reset_CALIFA_DEMO_Histo()
 {
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Reset_CALIFA_Histo";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra::Reset_CALIFA_Histo";
 
     fh_Califa_cryId_petal->Reset();
     fh_Califa_wr->Reset();
@@ -662,7 +662,7 @@ void R3BCalifaDemoOnlineSpectra::Reset_CALIFA_DEMO_Histo()
 
 void R3BCalifaDemoOnlineSpectra::Log_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Log_CALIFA_Histo";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra::Log_CALIFA_Histo";
 
     for (Int_t i = 0; i < fCalifaNumPetals; i++)
     {
@@ -725,7 +725,7 @@ void R3BCalifaDemoOnlineSpectra::Log_CALIFA_Histo()
 
 void R3BCalifaDemoOnlineSpectra::Map2Cal_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Map2Cal_CALIFA_Histo";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra::Map2Cal_CALIFA_Histo";
 
     char Name[255];
 
@@ -927,7 +927,7 @@ void R3BCalifaDemoOnlineSpectra::Map2Cal_CALIFA_Histo()
 
 void R3BCalifaDemoOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Febex2Preamp_CALIFA_Histo";
+    LOG(info) << "R3BCalifaDemoOnlineSpectra::Febex2Preamp_CALIFA_Histo";
 
     char Name[255];
 
@@ -1070,7 +1070,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BCalifaDemoOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BCalifaDemoOnlineSpectra::Exec FairRootManager not found";
 
     uint64_t wrc = 0;
     if (fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast())

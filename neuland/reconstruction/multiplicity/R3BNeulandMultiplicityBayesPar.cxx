@@ -106,7 +106,7 @@ bool R3BNeulandMultiplicityBayesPar::CheckIfProperlyLoaded() const
 {
     if (std::accumulate(fHits.cbegin(), fHits.cend(), 0, [](int i, const TArrayI& a) { return i + a.GetSum(); }) < 1)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayesPar: Empty dataset -> Not properly loaded!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayesPar: Empty dataset -> Not properly loaded!";
     }
     return true;
 }

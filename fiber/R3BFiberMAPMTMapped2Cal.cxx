@@ -52,26 +52,26 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
 {
     if (!fMAPMTTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
+        LOG(error) << "TCal parameter containers missing, "
                       "did you forget SetParContainers?";
         return kERROR;
     }
     if (0 == fMAPMTTCalPar->GetNumModulePar())
     {
-        LOG(ERROR) << "No TCal parameters in containers " << fMAPMTTCalPar->GetName() << ".";
+        LOG(error) << "No TCal parameters in containers " << fMAPMTTCalPar->GetName() << ".";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = fName + "Mapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register(fName + "Cal", "Land", fCalItems, kTRUE);
@@ -88,7 +88,7 @@ void R3BFiberMAPMTMapped2Cal::SetParContainers()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            LOG(ERROR) << "Could not get access to " << name << " container.";         \
+            LOG(error) << "Could not get access to " << name << " container.";         \
         }                                                                              \
     } while (0)
     GET_TCALPAR(MAPMT);
@@ -104,7 +104,7 @@ InitStatus R3BFiberMAPMTMapped2Cal::ReInit()
 void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BFiberMAPMTMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BFiberMAPMTMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
 
     // if(mapped_num > 0) cout<<"Mapped Items: "<<fName<<", "<<mapped_num-8<<endl;
 
@@ -114,7 +114,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec:Channel=" << channel << ":Side=" << mapped->GetSide()
+        LOG(debug) << " R3BFiberMAPMTMapped2Cal::Exec:Channel=" << channel << ":Side=" << mapped->GetSide()
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -130,7 +130,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         }
         if (!par)
         {
-            LOG(WARNING) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(warning) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
                          << ": TCal par not found.";
             continue;
         }
@@ -143,13 +143,13 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BFiberMAPMTMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(error) << "R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }
@@ -167,7 +167,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                 }
 
         */
-        LOG(DEBUG) << " R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" << time_ns
+        LOG(debug) << " R3BFiberMAPMTMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" << time_ns
                    << "ns.";
 
         //       cout<<"Input M2C: "<<fName<<", "<<  i<<", "<<fCalItems->GetEntriesFast()<<", "<<channel<<",

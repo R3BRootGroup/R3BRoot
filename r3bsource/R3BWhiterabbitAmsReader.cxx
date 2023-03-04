@@ -48,12 +48,12 @@ R3BWhiterabbitAmsReader::~R3BWhiterabbitAmsReader()
 Bool_t R3BWhiterabbitAmsReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitAmsReader::Init";
+    LOG(info) << "R3BWhiterabbitAmsReader::Init";
     EXT_STR_h101_WRAMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRAMS, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BWhiterabbitAmsReader::Failed to setup structure information.";
+        LOG(error) << "R3BWhiterabbitAmsReader::Failed to setup structure information.";
         return kFALSE;
     }
 

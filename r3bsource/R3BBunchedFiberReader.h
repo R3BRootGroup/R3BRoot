@@ -62,7 +62,7 @@ class TClonesArray;
     EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
     if (!ok)                                                                               \
     {                                                                                      \
-        LOG(ERROR) << "Failed to setup UCESB structure information.";                      \
+        LOG(error) << "Failed to setup UCESB structure information.";                      \
         return kFALSE;                                                                     \
     }
 #define R3B_BUNCHED_FIBER_INIT_END_ return R3BBunchedFiberReader::Init()
@@ -132,7 +132,7 @@ class TClonesArray;
         dst._v_len = LENGTH(src##v);                       \
         if (dst._MI_len != dst._v_len)                     \
         {                                                  \
-            LOG(ERROR) << "UCESB single-hit array error."; \
+            LOG(error) << "UCESB single-hit array error."; \
             exit(EXIT_FAILURE);                            \
         }                                                  \
     } while (0)
@@ -146,7 +146,7 @@ class TClonesArray;
         dst._ME_len = LENGTH(src##ME);                    \
         if (dst._MI_len != dst._ME_len)                   \
         {                                                 \
-            LOG(ERROR) << "UCESB multi-hit array error."; \
+            LOG(error) << "UCESB multi-hit array error."; \
             exit(EXIT_FAILURE);                           \
         }                                                 \
         dst._ = &src;                                     \

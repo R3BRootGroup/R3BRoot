@@ -36,7 +36,7 @@ R3BPdcHitPar::~R3BPdcHitPar()
 
 void R3BPdcHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BPdcHitPar::putParams() called";
+    LOG(info) << "R3BPdcHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -62,13 +62,13 @@ void R3BPdcHitPar::clear() {}
 void R3BPdcHitPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " Pdc Hit Parameters -------------  ";
+    LOG(info) << " -----------  " << GetName() << " Pdc Hit Parameters -------------  ";
 
-    LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries();
+    LOG(info) << " Number of HIT Parameters " << fHitParams->GetEntries();
     for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
     {
         R3BPdcHitModulePar* t_par = (R3BPdcHitModulePar*)fHitParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();
@@ -92,15 +92,15 @@ R3BPdcHitModulePar* R3BPdcHitPar::GetModuleParAt(Int_t wire)
                 continue;
             }
             tWire = par->GetWire();
-            if (tWire < 1 || tWire > N_WIRE_MAX*N_PLANE_MAX_PDC)
+            if (tWire < 1 || tWire > N_WIRE_MAX * N_PLANE_MAX_PDC)
             {
-                LOG(ERROR) << "R3BPdcHitPar::GetModuleParAt : error in Wire indexing. " << tWire;
+                LOG(error) << "R3BPdcHitPar::GetModuleParAt : error in Wire indexing. " << tWire;
                 continue;
             }
             index = tWire - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BPdcHitPar::GetModuleParAt : parameter found more than once. " << tWire;
+                LOG(error) << "R3BPdcHitPar::GetModuleParAt : parameter found more than once. " << tWire;
                 continue;
             }
             fIndexMap[index] = i;
@@ -108,16 +108,16 @@ R3BPdcHitModulePar* R3BPdcHitPar::GetModuleParAt(Int_t wire)
         fMapInit = kTRUE;
     }
 
-    if (wire < 1 || wire > N_WIRE_MAX*N_PLANE_MAX_PDC)
+    if (wire < 1 || wire > N_WIRE_MAX * N_PLANE_MAX_PDC)
     {
-        LOG(ERROR) << "R3BPdcHitPar::GetModuleParAt : error in wire indexing. " << wire;
+        LOG(error) << "R3BPdcHitPar::GetModuleParAt : error in wire indexing. " << wire;
         return NULL;
     }
     Int_t index = wire - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {
-        LOG(WARNING) << "R3BPdcHitPar::GetModuleParAt : parameter not found for: " << wire;
+        LOG(warning) << "R3BPdcHitPar::GetModuleParAt : parameter not found for: " << wire;
         return NULL;
     }
     Int_t arind = fIndexMap[index];

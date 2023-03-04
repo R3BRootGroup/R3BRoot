@@ -85,17 +85,17 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 {
     if (!list)
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
+        LOG(warning) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
         return kFALSE;
     }
     Int_t ndus;
     if (!list->fill("NrOfDUnits", &ndus))
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
+        LOG(warning) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
         return kFALSE;
     }
 
-    LOG(DEBUG) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
+    LOG(debug) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
 
     TArrayD* values = new TArrayD(9);
 

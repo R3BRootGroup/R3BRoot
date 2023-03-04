@@ -23,7 +23,7 @@ R3BStartrackHitPar::R3BStartrackHitPar(const char* name, const char* title, cons
 
 void R3BStartrackHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "-I- R3BStartrackHitPar::putParams() called";
+    LOG(info) << "-I- R3BStartrackHitPar::putParams() called";
     if (!list)
         return;
     list->add("fThreshold", (Double_t)fThreshold);
@@ -35,10 +35,10 @@ void R3BStartrackHitPar::putParams(FairParamList* list)
 
 Bool_t R3BStartrackHitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "-I- R3BStartrackHitPar::getParams() called";
+    LOG(info) << "-I- R3BStartrackHitPar::getParams() called";
     if (!list)
         return kFALSE;
-    LOG(INFO) << "-I- R3BStartrackHitPar::getParams() 1 ";
+    LOG(info) << "-I- R3BStartrackHitPar::getParams() 1 ";
 
     if (!list->fill("fThreshold", &fThreshold, 1))
         return kFALSE;
@@ -52,12 +52,12 @@ Bool_t R3BStartrackHitPar::getParams(FairParamList* list)
 
 void R3BStartrackHitPar::Print(Option_t* option) const
 {
-    LOG(INFO) << "-I- STaRTracker Hit Parameters:";
-    LOG(INFO) << " Energy Threshold   = " << fThreshold;
-    LOG(INFO) << " Energy resolution  = " << fEStripResolution;
+    LOG(info) << "-I- STaRTracker Hit Parameters:";
+    LOG(info) << " Energy Threshold   = " << fThreshold;
+    LOG(info) << " Energy resolution  = " << fEStripResolution;
 
-    //    LOG(INFO)<<"   Max Paddle   = "<<nMaxPaddle;
-    //    LOG(INFO)<<"   Max Plane   = "<<nMaxPlane;
+    //    LOG(info)<<"   Max Paddle   = "<<nMaxPaddle;
+    //    LOG(info)<<"   Max Plane   = "<<nMaxPlane;
 }
 
 ClassImp(R3BStartrackHitPar);

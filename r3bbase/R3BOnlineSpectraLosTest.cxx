@@ -3377,7 +3377,7 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
         // once again
 
         nHits = det->GetEntriesFast();
-        //		LOG(DEBUG) << "nHits: " << nHits;
+        //		LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);

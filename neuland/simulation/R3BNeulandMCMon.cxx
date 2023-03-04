@@ -105,19 +105,19 @@ R3BNeulandMCMon::R3BNeulandMCMon(const Option_t* option)
     , fNeulandPoints("NeulandPoints")
     , nEvents(0)
 {
-    LOG(INFO) << "Using R3B NeuLAND Neuland Monte Carlo Monitor";
+    LOG(info) << "Using R3B NeuLAND Neuland Monte Carlo Monitor";
 
     TString opt = option;
     opt.ToUpper();
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization";
+        LOG(info) << "... with 3D track visualization";
     }
     if (opt.Contains("FULLSIMANA"))
     {
         fIsFullSimAnaEnabled = true;
-        LOG(INFO) << "... with full simulation neutron reaction product analysis";
+        LOG(info) << "... with full simulation neutron reaction product analysis";
     }
 }
 

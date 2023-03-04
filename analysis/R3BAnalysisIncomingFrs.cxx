@@ -125,7 +125,7 @@ InitStatus R3BAnalysisIncomingFrs::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BAnalysisIncomingFrs::Init ";
+    LOG(info) << "R3BAnalysisIncomingFrs::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -152,13 +152,13 @@ InitStatus R3BAnalysisIncomingFrs::Init()
     fTcalSci2 = (TClonesArray*)mgr->GetObject("Sci2Tcal");
     if (!fTcalSci2)
     {
-        LOG(INFO) << "R3BAnalysisIncomingFrs::Init()  Could not find ci2Tcal";
+        LOG(info) << "R3BAnalysisIncomingFrs::Init()  Could not find ci2Tcal";
     }
 
     // get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
     if (!fHitItemsMus)
-        LOG(WARNING) << "R3BAnalysisIncomingFrs: MusicHitData not found";
+        LOG(warning) << "R3BAnalysisIncomingFrs: MusicHitData not found";
 
     // OUTPUT DATA
     fFrsDataCA = new TClonesArray("R3BFrsData", 5);
@@ -182,7 +182,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
@@ -330,7 +330,7 @@ void R3BAnalysisIncomingFrs::Exec(Option_t* option)
     Int_t nPartc[fNofLosDetectors];
     for (Int_t d = 0; d < fNofLosDetectors; d++)
         nPartc[d] = 0;
-    
+
     Bool_t iLOSType[fNofLosDetectors][32];
     Bool_t iLOSPileUp[fNofLosDetectors][32];
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)

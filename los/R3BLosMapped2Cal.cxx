@@ -89,7 +89,7 @@ InitStatus R3BLosMapped2Cal::Init()
     fNofTcalPars = fTcalPar->GetNumModulePar();
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container LosTCalPar";
+        LOG(error) << "There are no TCal parameters in container LosTCalPar";
         return kFATAL;
     }
 
@@ -100,7 +100,7 @@ InitStatus R3BLosMapped2Cal::Init()
 
     {
         //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return kFATAL;
     }
 
@@ -112,7 +112,7 @@ InitStatus R3BLosMapped2Cal::Init()
     if (NULL == fMappedItems)
     {
         //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosMapped not found");
-        LOG(ERROR) << "Branch LosMapped not found";
+        LOG(error) << "Branch LosMapped not found";
         return kFATAL;
     }
 
@@ -137,7 +137,7 @@ void R3BLosMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to LosTCalPar-Container.";
+        LOG(error) << "Could not get access to LosTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -186,13 +186,13 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(INFO) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << iDet;
+            LOG(info) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << iDet;
             continue;
         }
 
         if (hit->GetTimeCoarse() > 8192)
         {
-            LOG(WARNING) << "R3BLosMapped2Cal::Exec : coarse counter > 8192: " << iDet;
+            LOG(warning) << "R3BLosMapped2Cal::Exec : coarse counter > 8192: " << iDet;
             continue;
         }
 
@@ -205,7 +205,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
             if (!par)
             {
-                LOG(INFO) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
+                LOG(info) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
                           << ", Type: " << iType;
                 continue;
             }
@@ -217,7 +217,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
             {
 
-                LOG(INFO) << "R3BLosMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
+                LOG(info) << "R3BLosMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
                           << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
                           << ", time in ns = " << times_raw_ns;
                 continue;
@@ -325,7 +325,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 3:
-                    {   // change to 3
+                    { // change to 3
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))
@@ -335,7 +335,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 5:
-                    {   // change to 5
+                    { // change to 5
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))
@@ -345,7 +345,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 7:
-                    {   // change to 7
+                    { // change to 7
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6)))
@@ -355,7 +355,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                     }
                     break;
                     case 2:
-                    {   // change to 2
+                    { // change to 2
                         /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))
                              goto skip_event_pileup;
                          if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))
@@ -411,7 +411,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeV_ns[iCha - 1] = times_ns;
             if (calItem->fTimeV_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeV_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeV_ns: " << calItem->fTimeV_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeV_ns: " << calItem->fTimeV_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -419,7 +419,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeL_ns[iCha - 1] = times_ns;
             if (calItem->fTimeL_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -427,7 +427,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -435,7 +435,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeM_ns[iCha - 1] = times_ns;
             if (calItem->fTimeM_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeM_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -447,7 +447,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         continue;
         // skip_event_pileup:
-        //   LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
+        //   LOG(warning) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
         //              << " iCal: " << iCal << " Skip event because of pileup.";
     }
 

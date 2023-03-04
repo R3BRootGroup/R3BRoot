@@ -66,15 +66,15 @@ void R3BStartrackCalibParFinder::SetParContainers()
 
     if (fVerbose && fStartrackCalibPar)
     {
-        LOG(INFO) << "R3BStartrackCalibParFinder::SetParContainers() ";
-        LOG(INFO) << "Container R3BStartrackCalibPar loaded ";
+        LOG(info) << "R3BStartrackCalibParFinder::SetParContainers() ";
+        LOG(info) << "Container R3BStartrackCalibPar loaded ";
     }
 }
 
 // Register: Protected method
 void R3BStartrackCalibParFinder::Register()
 {
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {

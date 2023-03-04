@@ -71,9 +71,9 @@ void R3BStartrack::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BStartrack: initialisation";
-    //    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
-    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1");
+    LOG(info) << "R3BStartrack: initialisation";
+    //    LOG(debug) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
+    LOG(debug) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1");
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -244,7 +244,7 @@ TClonesArray* R3BStartrack::GetCollection(Int_t iColl) const
 void R3BStartrack::Print(Option_t* option) const
 {
     Int_t nHits = fTraCollection->GetEntriesFast();
-    LOG(INFO) << "R3BStartrack: " << nHits << " points registered in this event";
+    LOG(info) << "R3BStartrack: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ void R3BStartrack::Reset()
 void R3BStartrack::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BStartrack: " << nEntries << " entries to add";
+    LOG(info) << "R3BStartrack: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BStartrackPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -271,7 +271,7 @@ void R3BStartrack::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset
         new (clref[fPosIndex]) R3BStartrackPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BStartrack: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BStartrack: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -289,7 +289,7 @@ R3BStartrackPoint* R3BStartrack::AddHit(Int_t trackID,
     TClonesArray& clref = *fTraCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BStartrack: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BStartrack: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BStartrackPoint(
         trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss); // detCopy added by Marc

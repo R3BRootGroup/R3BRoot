@@ -84,7 +84,7 @@ void R3BNeulandCal2Hit::SetParameter()
         fAttenuationValues[id] = exp(Neuland::TotalBarLength / fParMap[id].GetLightAttenuationLength());
     }
 
-    LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar();
+    LOG(info) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar();
 }
 
 InitStatus R3BNeulandCal2Hit::ReInit()

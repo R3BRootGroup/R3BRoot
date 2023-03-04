@@ -108,12 +108,12 @@ void R3BXBallv0::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BXBallv0 initialisation";
-    LOG(DEBUG) << "R3BXBallv0: Vol. (McId)";
-    LOG(DEBUG) << "R3BXBallv0: Crystal A   : " << gMC->VolId("crystalLogNAJA");
-    LOG(DEBUG) << "R3BXBallv0: Crystal B   : " << gMC->VolId("crystalLogNAJB");
-    LOG(DEBUG) << "R3BXBallv0: Crystal C   : " << gMC->VolId("crystalLogNAJC");
-    LOG(DEBUG) << "R3BXBallv0: Crystal D   : " << gMC->VolId("crystalLogNAJD");
+    LOG(info) << "R3BXBallv0 initialisation";
+    LOG(debug) << "R3BXBallv0: Vol. (McId)";
+    LOG(debug) << "R3BXBallv0: Crystal A   : " << gMC->VolId("crystalLogNAJA");
+    LOG(debug) << "R3BXBallv0: Crystal B   : " << gMC->VolId("crystalLogNAJB");
+    LOG(debug) << "R3BXBallv0: Crystal C   : " << gMC->VolId("crystalLogNAJC");
+    LOG(debug) << "R3BXBallv0: Crystal D   : " << gMC->VolId("crystalLogNAJD");
 
     // Crystals type ID
     //  type   ID
@@ -252,7 +252,7 @@ TClonesArray* R3BXBallv0::GetCollection(Int_t iColl) const
 void R3BXBallv0::Print() const
 {
     Int_t nHits = fXBallCollection->GetEntriesFast();
-    LOG(INFO) << "R3BXBallv0: " << nHits << " points registered in this event";
+    LOG(info) << "R3BXBallv0: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -268,7 +268,7 @@ void R3BXBallv0::Reset()
 void R3BXBallv0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BXBallv0: " << nEntries << " entries to add";
+    LOG(info) << "R3BXBallv0: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BXBallPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -279,7 +279,7 @@ void R3BXBallv0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BXBallv0: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BXBallv0: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -298,7 +298,7 @@ R3BXBallPoint* R3BXBallv0::AddHit(Int_t trackID,
     TClonesArray& clref = *fXBallCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BXBallv0: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BXBallv0: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BXBallPoint(trackID, detID, type, cp, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -308,7 +308,7 @@ void R3BXBallv0::ConstructGeometry() { return ConstructGeometry2(); }
 void R3BXBallv0::ConstructGeometry2()
 {
 
-    LOG(INFO) << "##################################################################"
+    LOG(info) << "##################################################################"
 
               << "*     -I- R3BXBallv0 R3BXBallv0::ConstructGeometry()                     *"
 
@@ -2797,8 +2797,8 @@ void R3BXBallv0::ConstructGeometry2()
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BXBallv0::ConstructGeometry1()
 {
-    LOG(ERROR) << "R3BXBallv0 Dummy function called !!! ";
-    LOG(ERROR) << "no Crystal geometry will be created ... ";
+    LOG(error) << "R3BXBallv0 Dummy function called !!! ";
+    LOG(error) << "no Crystal geometry will be created ... ";
     return;
 }
 

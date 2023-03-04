@@ -29,7 +29,7 @@ R3BEventManager* R3BEventManager::Instance() { return fgRinstance; }
 R3BEventManager::R3BEventManager()
     : FairEventManager()
 {
-    LOG(INFO) << "calling ctor Event Manager";
+    LOG(info) << "calling ctor Event Manager";
     fgRinstance = this;
 }
 
