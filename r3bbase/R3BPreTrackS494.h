@@ -156,16 +156,11 @@ class R3BPreTrackS494 : public FairTask
 		fX2min=xmin2;
 		fX2max=xmax2;
 	}
-	inline void SetCalifaOptions(Int_t icalopt)
-	{
-		fCalifaOpt = icalopt;
-	}
 	
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
-    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
     TClonesArray* fMCTrack;
     
     TClonesArray* fTofdHitItems;       
@@ -222,7 +217,6 @@ class R3BPreTrackS494 : public FairTask
 	Bool_t fSimu;
 	Bool_t fidealData;
 	Int_t fB;
-	Int_t fCalifaOpt;
 	Bool_t tracker = true;
 	Double_t fX1min, fX1max, fX2min, fX2max;
 	Double_t delta;

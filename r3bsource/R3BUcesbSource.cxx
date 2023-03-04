@@ -337,7 +337,7 @@ void R3BUcesbSource::Close()
     fFd = nullptr;
     ;
 
-    fFd=nullptr;
+    fFd = nullptr;
 
     if (fInputFile.is_open())
         fInputFile.close();

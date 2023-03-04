@@ -120,9 +120,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fX1max(100)
     , fX2min(-100)
     , fX2max(100)
-    , fCalifaOpt(0)
     , fNEvents(0)
-    , fWRItemsMaster(NULL)
     , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
     , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi23bHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
@@ -217,13 +215,6 @@ InitStatus R3BPreTrackS494::Init()
             printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
         }
     }
-
-    // get access to WR-Master data
-    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    if (NULL == fWRItemsMaster)
-        R3BLOG(info, "WR Master was not found");
-    else
-        R3BLOG(info, "WR Master was found");
 
     mgr->Register("TofdHit", "Land", fTofdHitItems, kTRUE);
     mgr->Register("Fi23aHit", "Land", fFi23aHitItems, kTRUE);
@@ -859,7 +850,7 @@ InitStatus R3BPreTrackS494::Init()
         fh_califa_time->GetYaxis()->SetTitle("time / ns");
         fh_califa_time->GetXaxis()->SetTitle("Nb crystals in clustre");
 
-        fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 20000, -1000, 1000);
+        fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 200, -200, 200);
         fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
         fh_califa_tofd->GetXaxis()->SetTitle("califa tome / ns");
 
@@ -888,11 +879,11 @@ InitStatus R3BPreTrackS494::Init()
         fh_califa_cluster_rolu->GetYaxis()->SetTitle("MotherId");
         fh_califa_cluster_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
 
-        fh_califa_overflow = new TH1F("fh_califa_overflow", "CalifaMapped overflow", 1100, 900., 2000.);
-        fh_califa_overflow->GetXaxis()->SetTitle("Crystal Id");
+        fh_califa_overflow = new TH1F("fh_califa_overflow", "Califa overflow is_nan(en)", 1100, 900., 2000.);
+        fh_califa_overflow->GetXaxis()->SetTitle("motherId");
 
-        fh_califa_good = new TH1F("fh_califa_good", "CalifaMapped good", 1100, 900., 2000.);
-        fh_califa_good->GetXaxis()->SetTitle("Crystal Id");
+        fh_califa_good = new TH1F("fh_califa_good", "Califa good !(is:nan(en))", 1100, 900., 2000.);
+        fh_califa_good->GetXaxis()->SetTitle("motherId");
 
         fh_califa_motherid_clustertype =
             new TH2F("fh_califa_motherid_clustertype", "ClusterType vs MotherId", 1100, 900., 2000., 5, 0, 5);
@@ -1017,26 +1008,13 @@ void R3BPreTrackS494::Exec(Option_t* option)
             }
         }
     }
-    // WR master TS
-    int64_t wrm = 0.0;
-    if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
-    {
-        Int_t nHitsWR = fWRItemsMaster->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHitsWR; ihit++)
-        {
-            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
-            if (!hit)
-                continue;
-            wrm = hit->GetTimeStamp();
-        }
-    }
 
     if (fMappedItems.at(DET_BMON) && !fSimu)
     {
-        unsigned long IC;
-        unsigned long SEETRAM_raw;
-        Double_t SEETRAM;
-        unsigned long TOFDOR;
+        unsigned long IC = 0;
+        unsigned long SEETRAM_raw = 0;
+        Double_t SEETRAM = 0;
+        unsigned long TOFDOR = 0;
 
         auto detBmon = fMappedItems.at(DET_BMON);
         Int_t nHitsbm = detBmon->GetEntriesFast();
@@ -1133,7 +1111,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     Double_t Energy = hitCalifa->GetEnergy();
 
                     if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
-                        hitCalifa->GetMotherCrystal() < 1953) // barrel gamma-channels
+                        hitCalifa->GetMotherCrystal() < 1953 && !(IS_NAN(Energy))) // barrel gamma-channels
                     {
                         fh_califa_energy_rolu->Fill(hitCalifa->GetCrystalList().size(), Energy);
                         fh_califa_time_rolu->Fill(hitCalifa->GetCrystalList().size(), timerelCalifa);
@@ -1194,7 +1172,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
             {
                 fh_califa_crystallist->Fill(hitCalifa->GetCrystalList().at(ic), hitCalifa->GetMotherCrystal());
             }
-            if (hitCalifa->GetClusterType() == 1) // gammas
+            if (hitCalifa->GetClusterType() == 1 && !(IS_NAN(Energy))) // gammas
             {
 
                 if (hitCalifa->GetMotherCrystal() > 927 &&
@@ -1209,10 +1187,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
         }
         if (CalifaHit)
             counterCalifa++;
-        if (fCalifaOpt == 1 && nHitsCalifa > 0)
-            return; // Analyse only when Califa didn't see anything
-        if (fCalifaOpt == 2 && nHitsCalifa < 1)
-            return; // Analyse only if Califa saw something
     }
 
     if (fMCTrack) // for simulated data
@@ -5930,26 +5904,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             tMax[i] = -1000.;
         }
 
-        if (fMappedItems.at(DET_CALIFA) && SelectedPairs)
-        {
-            auto mapCalifa = fMappedItems.at(DET_CALIFA);
-            Int_t nMappCalifa = mapCalifa->GetEntriesFast();
-            for (Int_t ihitMapp = 0; ihitMapp < nMappCalifa; ihitMapp++)
-            {
-
-                R3BCalifaMappedData* hitCalifa = (R3BCalifaMappedData*)mapCalifa->At(ihitMapp);
-                if (!hitCalifa)
-                    continue;
-                auto crystalId = hitCalifa->GetCrystalId();
-                auto ov = hitCalifa->GetOverflow();
-
-                if (ov > 0)
-                    fh_califa_overflow->Fill(crystalId);
-                if (ov == 0)
-                    fh_califa_good->Fill(crystalId);
-            }
-        }
-
         if (fHitItems.at(DET_CALIFA) && SelectedPairs)
         {
             // CALIFA
@@ -5961,19 +5915,22 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 if (!hitCalifa)
                     continue;
                 Double_t theta = hitCalifa->GetTheta();
+                Double_t Energy = hitCalifa->GetEnergy();
                 Double_t Energy_dc = hitCalifa->GetEnergy() * GAMMA * (1 - BETA * TMath::Cos(theta));
-                if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
-                    hitCalifa->GetMotherCrystal() < 1953) // gammas
-                {
-                    ULong64_t timeCalifa = hitCalifa->GetTime();
-                    Double_t timerelCalifa = (double)(timeCalifa - time);
-                    fh_califa_tofd->Fill(timerelCalifa, tStart);
-                    fh_califa_energy_select->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
-                    // cout<<"tofd & califa: "<<fNEvents<<", "<<time<<", "<<timeCalifa <<", "<<diff<<", "<<tStart<<",
-                    // "<<diff-tStart<<endl;
 
-                    // if (Energy > 0)
+                if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
+                    hitCalifa->GetMotherCrystal() < 1953) // gammas in barrel
+                {
+                    if (IS_NAN(Energy))
+                        fh_califa_overflow->Fill(hitCalifa->GetMotherCrystal());
+                    else
                     {
+                        fh_califa_good->Fill(hitCalifa->GetMotherCrystal());
+
+                        ULong64_t timeCalifa = hitCalifa->GetTime();
+                        Double_t timerelCalifa = (double)(timeCalifa - time);
+                        fh_califa_tofd->Fill(timerelCalifa, tStart);
+                        fh_califa_energy_select->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
 
                         new ((*fCalifaHitItems)[fNofCalifaHitItems++])
                             R3BCalifaClusterData(hitCalifa->GetCrystalList(),

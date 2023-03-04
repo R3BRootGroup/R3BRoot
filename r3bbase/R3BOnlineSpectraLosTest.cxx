@@ -117,7 +117,7 @@ R3BOnlineSpectraLosTest::~R3BOnlineSpectraLosTest()
         delete fh_channels_single_Fib[i];
     }
     /*
-      LOG(INFO) << "R3BSofTwimOnlineSpectra::Delete instance";
+      LOG(info) << "R3BSofTwimOnlineSpectra::Delete instance";
        if (fMappedItemsTwim)
            delete fMappedItemsTwim;
        if (fCalItemsTwim)
@@ -133,7 +133,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraLosTest::Init ";
+    LOG(info) << "R3BOnlineSpectraLosTest::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -166,18 +166,18 @@ InitStatus R3BOnlineSpectraLosTest::Init()
     fMappedItemsTwim = (TClonesArray*)mgr->GetObject("TwimMappedData");
     if (!fMappedItemsTwim)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: TwimMappedData not found"; // return kFATAL;
+        LOG(warning) << "R3BOnlineSpectra: TwimMappedData not found"; // return kFATAL;
     }
 
     // get access to cal data of the TWIM
     fCalItemsTwim = (TClonesArray*)mgr->GetObject("TwimCalData");
     if (!fCalItemsTwim)
-        LOG(WARNING) << "R3BOnlineSpectra: TwimCalData not found";
+        LOG(warning) << "R3BOnlineSpectra: TwimCalData not found";
 
     // get access to hit data of the TWIM
     fHitItemsTwim = (TClonesArray*)mgr->GetObject("TwimHitData");
     if (!fHitItemsTwim)
-        LOG(WARNING) << "R3BOnlineSpectra: TwimHitData not found";
+        LOG(warning) << "R3BOnlineSpectra: TwimHitData not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -1075,7 +1075,7 @@ InitStatus R3BOnlineSpectraLosTest::Init()
 
         if (fMappedItems.at(DET_PSPX))
         {
-            // LOG(INFO) << "Init MappedPspx";
+            // LOG(info) << "Init MappedPspx";
 
             for (UInt_t i = 0; i < N_PSPX; i++)
             {
@@ -1466,7 +1466,7 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
@@ -3309,7 +3309,7 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
         Bool_t bar_quer2 = false;
 
         Int_t nHits = det->GetEntriesFast();
-        LOG(DEBUG) << "nHits: " << nHits;
+        LOG(debug) << "nHits: " << nHits;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
@@ -3328,9 +3328,9 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
                 continue;
 
             fh_ptof_channels->Fill(iBar);
-            LOG(DEBUG) << "Bar: " << iBar;
-            LOG(DEBUG) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
-            LOG(DEBUG) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
+            LOG(debug) << "Bar: " << iBar;
+            LOG(debug) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
+            LOG(debug) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
             if (iBar == 7)
                 bar_quer1 = true;
             if (iBar == 8)
@@ -3357,15 +3357,15 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
             tot1 = t1t - t1l;
             if (tot1 < 0)
             {
-                LOG(WARNING) << "Negative ToT " << tot1;
-                LOG(WARNING) << "times1: " << t1t << " " << t1l;
+                LOG(warning) << "Negative ToT " << tot1;
+                LOG(warning) << "times1: " << t1t << " " << t1l;
             }
 
             tot2 = t2t - t2l;
             if (tot2 < 0)
             {
-                LOG(WARNING) << "Negative ToT " << tot2;
-                LOG(WARNING) << "times2: " << t2t << " " << t2l;
+                LOG(warning) << "Negative ToT " << tot2;
+                LOG(warning) << "times2: " << t2t << " " << t2l;
             }
 
             fh_ptof_TotPm1[iBar]->Fill(tot1);
@@ -3416,15 +3416,15 @@ void R3BOnlineSpectraLosTest::Exec(Option_t* option)
             tot1 = t1t - t1l;
             if (tot1 < 0)
             {
-                LOG(WARNING) << "Negative ToT " << tot1;
-                LOG(WARNING) << "times1: " << t1t << " " << t1l;
+                LOG(warning) << "Negative ToT " << tot1;
+                LOG(warning) << "times1: " << t1t << " " << t1l;
             }
 
             tot2 = t2t - t2l;
             if (tot2 < 0)
             {
-                LOG(WARNING) << "Negative ToT " << tot2;
-                LOG(WARNING) << "times2: " << t2t << " " << t2l;
+                LOG(warning) << "Negative ToT " << tot2;
+                LOG(warning) << "times2: " << t2t << " " << t2l;
             }
 
             if (bar_quer1 && bar_quer2)
@@ -3548,7 +3548,7 @@ void R3BOnlineSpectraLosTest::FinishTask()
 
     if (fMappedItems.at(DET_PSPX))
     {
-        // LOG(INFO) << "Finish MappedPspx";
+        // LOG(info) << "Finish MappedPspx";
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {

@@ -18,12 +18,15 @@
 
 #include <string>
 #include <vector>
+#include "R3BTrackData.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
 #include <TLorentzVector.h>
 #include <cstdlib>
+#include "Rtypes.h"
 
+#include <TVector3.h>
 class TClonesArray;
 class R3BFieldPar;
 class R3BTPropagator;
@@ -81,24 +84,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TClonesArray* fArrayFragments;
     TClonesArray* fTrackItems;
     TClonesArray* fMCTrack;
-    std::vector<TClonesArray*> fMappedItems;
-    std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
     Int_t fNofTrackItems;
-    TClonesArray* fTofdHitItems;       
-    Int_t fNofTofdHitItems;
-    TClonesArray* fFi23aHitItems;       
-    Int_t fNofFi23aHitItems;
-    TClonesArray* fFi23bHitItems;       
-    Int_t fNofFi23bHitItems;
-    TClonesArray* fFi30HitItems;       
-    Int_t fNofFi30HitItems;
-    TClonesArray* fFi31HitItems;       
-    Int_t fNofFi31HitItems;
-    TClonesArray* fFi32HitItems;       
-    Int_t fNofFi32HitItems;
-    TClonesArray* fFi33HitItems;       
-    Int_t fNofFi33HitItems;    
     Int_t fNEvents = 0;
     Int_t fNEventsLeft = 0;
     Int_t fNEventsRight=0;
@@ -130,7 +117,20 @@ class R3BFragmentTrackerS494 : public FairTask
     TLorentzVector Oxygen; 
     TVector3 pos16O0;
     TVector3 pos16O3;    
-                                           
+    
+    R3BTrackData* AddTrack(Double_t x, 
+									   Double_t y, 
+									   Double_t z, 
+										Double_t px, 
+										Double_t py, 
+										Double_t pz, 
+										Int_t q, 
+										Double_t AoZ, 
+										Double_t chix, 
+										Double_t chiy, 
+										Int_t quality, 
+										std::vector<Double_t> detPos, 
+										Double_t t);                                     
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
    	Double_t amu = 0.931494028;   // Gev/c**2
@@ -276,6 +276,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_theta_vs_y;
     TH2F* fh_Erel_vs_nhits23a;    
     TH2F* fh_Erel_vs_nhits23b;
+    TH2F* fh_xFi23a_tofd_exp;
+    TH2F* fh_xFi23a_tofd_exp_select;
     
 
     TH2F* fh_califa_energy;

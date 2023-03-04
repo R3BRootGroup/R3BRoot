@@ -231,6 +231,7 @@ Bool_t R3BFileSource::Init()
         R3BLOG(info, "R3BFileSource already initialized");
         return kTRUE;
     }
+
     if (!fInChain)
     {
         fInChain = new TChain(FairRootManager::GetTreeName(), Form("/%s", FairRootManager::GetFolderName()));
@@ -262,6 +263,7 @@ Bool_t R3BFileSource::Init()
             }
         }
     }
+
     // Get The list of branches from the input file and add it to the
     // actual list of existing branches.
     // Add this list of branches also to the map of input trees, which
@@ -349,9 +351,10 @@ Bool_t R3BFileSource::Init()
         inputFile->Close();
         gFile = temp;
     }
+
     fNoOfEntries = fInChain->GetEntries();
 
-    R3BLOG(debug, "Entries in this Source " << fNoOfEntries);
+    R3BLOG(info, "Entries in this Source " << fNoOfEntries);
 
     for (Int_t i = 0; i < fListFolder->GetEntriesFast(); i++)
     {
@@ -362,6 +365,9 @@ Bool_t R3BFileSource::Init()
         {
             ActivateObject(reinterpret_cast<TObject**>(&fEvtHeader), "EventHeader.");
         }
+        else
+            R3BLOG(warn, "EventHEader not found " << fListFolder->At(i));
+
         if (fMCHeader)
         {
             ActivateObject(reinterpret_cast<TObject**>(&fMCHeader), "MCEventHeader.");
@@ -382,6 +388,7 @@ Bool_t R3BFileSource::Init()
         FairRootManager::Instance()->SetTimeBasedBranchNameList(timebasedlist);
     }
 
+    R3BLOG(info, " ");
     // Open configuration file with runid values if needed in this step
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
@@ -395,6 +402,7 @@ Bool_t R3BFileSource::Init()
         fInputFile.seekg(0, std::ios::beg);
     }
 
+    R3BLOG(info, "Reading RunId file");
     if (fInputFile.is_open())
     {
         R3BLOG(info, "Reading RunId file");
@@ -1021,7 +1029,7 @@ void R3BFileSource::FillEventHeader(FairEventHeader* feh)
 {
     // see comment in R3BUcesbSource::FillEventHeader
     feh->SetRunId(fRunId);
-  //  feh->SetInputFileId(0);
+    //  feh->SetInputFileId(0);
     return;
 }
 

@@ -132,7 +132,7 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BGlobalCorrelationsS494::Init ";
+    LOG(info) << "R3BGlobalCorrelationsS494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -177,7 +177,7 @@ InitStatus R3BGlobalCorrelationsS494::Init()
     //    fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     //    if (!fMappedItemsCalifa)
     //    {
-    //        LOG(WARNING) << "R3BOnlineSpectra: CalifaMappedData not found";
+    //        LOG(warning) << "R3BOnlineSpectra: CalifaMappedData not found";
     //    }
 
     cout << "*** In init, before creating histogramms ***" << endl;
@@ -1370,7 +1370,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
               {
                     auto detHitTofi = fHitItems.at(DET_TOFI);
                     Int_t nHitsTofi = detHitTofi->GetEntriesFast();
-                    LOG(DEBUG) << "Tofi hits: " << nHitsTofi << endl;
+                    LOG(debug) << "Tofi hits: " << nHitsTofi << endl;
 
                     Int_t icl=0, icr=0;
                     for (Int_t ihitTofi = 0; ihitTofi < nHitsTofi; ihitTofi++)
@@ -1472,7 +1472,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                         // loop over fiber 23b
                         auto detHit23b = fHitItems.at(DET_FI23B);
                         Int_t nHits23b = detHit23b->GetEntriesFast();
-                        LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                        LOG(debug) << "Fi23b hits: " << nHits23b << endl;
                         for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
                         {
                             det = fi23b;
@@ -1545,7 +1545,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                             // loop over fiber 23b
                             auto detHit23b = fHitItems.at(DET_FI23B);
                             Int_t nHits23b = detHit23b->GetEntriesFast();
-                            LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                            LOG(debug) << "Fi23b hits: " << nHits23b << endl;
                             for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
                             {
                                 det = fi23b;
@@ -1610,7 +1610,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             // loop over fiber 31
             auto detHit31 = fHitItems.at(DET_FI31);
             Int_t nHits31 = detHit31->GetEntriesFast();
-            LOG(DEBUG) << "Fi31 hits: " << nHits31 << endl;
+            LOG(debug) << "Fi31 hits: " << nHits31 << endl;
             for (Int_t ihit31 = 0; ihit31 < nHits31; ihit31++)
             {
                 det = fi31;
@@ -1668,7 +1668,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 // loop over fiber 33
                 auto detHit33 = fHitItems.at(DET_FI33);
                 Int_t nHits33 = detHit33->GetEntriesFast();
-                LOG(DEBUG) << "Fi33 hits: " << nHits33 << endl;
+                LOG(debug) << "Fi33 hits: " << nHits33 << endl;
                 for (Int_t ihit33 = 0; ihit33 < nHits33; ihit33++)
                 {
                     det = fi33;
@@ -1736,7 +1736,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 // loop over fiber 23a
                 auto detHit23a = fHitItems.at(DET_FI23A);
                 Int_t nHits23a = detHit23a->GetEntriesFast();
-                LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+                LOG(debug) << "Fi23a hits: " << nHits23a << endl;
                 for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
                 {
                     det = fi23a;
@@ -1799,7 +1799,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 // loop over fiber 23b
                 auto detHit23b = fHitItems.at(DET_FI23B);
                 Int_t nHits23b = detHit23b->GetEntriesFast();
-                LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                LOG(debug) << "Fi23b hits: " << nHits23b << endl;
                 for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
                 {
                     det = fi23b;
@@ -1897,7 +1897,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
             // loop over fiber 30
             auto detHit30 = fHitItems.at(DET_FI30);
             Int_t nHits30 = detHit30->GetEntriesFast();
-            LOG(DEBUG) << "Fi30 hits: " << nHits30 << endl;
+            LOG(debug) << "Fi30 hits: " << nHits30 << endl;
             for (Int_t ihit30 = 0; ihit30 < nHits30; ihit30++)
             {
                 det = fi30;
@@ -1954,7 +1954,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 // loop over fiber 32
                 auto detHit32 = fHitItems.at(DET_FI32);
                 Int_t nHits32 = detHit32->GetEntriesFast();
-                LOG(DEBUG) << "Fi32 hits: " << nHits32 << endl;
+                LOG(debug) << "Fi32 hits: " << nHits32 << endl;
                 for (Int_t ihit32 = 0; ihit32 < nHits32; ihit32++)
                 {
                     det = fi32;
@@ -2021,7 +2021,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
                 // loop over fiber 23a
                 auto detHit23a = fHitItems.at(DET_FI23A);
                 Int_t nHits23a = detHit23a->GetEntriesFast();
-                LOG(DEBUG) << "Fi23a hits: " << nHits23a << endl;
+                LOG(debug) << "Fi23a hits: " << nHits23a << endl;
                 for (Int_t ihit23a = 0; ihit23a < nHits23a; ihit23a++)
                 {
                     det = fi23a;
@@ -2084,7 +2084,7 @@ void R3BGlobalCorrelationsS494::Exec(Option_t* option)
 
                 auto detHit23b = fHitItems.at(DET_FI23B);
                 Int_t nHits23b = detHit23b->GetEntriesFast();
-                LOG(DEBUG) << "Fi23b hits: " << nHits23b << endl;
+                LOG(debug) << "Fi23b hits: " << nHits23b << endl;
                 for (Int_t ihit23b = 0; ihit23b < nHits23b; ihit23b++)
                 {
                     det = fi23b;

@@ -51,7 +51,7 @@ R3BOnlineSpectraSci2::R3BOnlineSpectraSci2(const char* name, Int_t iVerbose)
 
 R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Delete instance";
+    LOG(info) << "R3BOnlineSpectraSci2::Delete instance";
     if (fMapped)
         delete fMapped;
     if (fTcal)
@@ -61,14 +61,14 @@ R3BOnlineSpectraSci2::~R3BOnlineSpectraSci2()
 InitStatus R3BOnlineSpectraSci2::Init()
 {
 
-    LOG(INFO) << "R3BOnlineSpectraSci2::Init ";
+    LOG(info) << "R3BOnlineSpectraSci2::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraSci2::Init FairRootManager not found";
 
     fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
@@ -81,12 +81,12 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fMapped = (TClonesArray*)mgr->GetObject("Sci2Mapped");
     if (!fMapped)
     {
-        LOG(ERROR) << "Sci2Mapped not found: is OK";
+        LOG(error) << "Sci2Mapped not found: is OK";
         return (kFATAL);
     }
     else
     {
-        LOG(INFO) << "Sci2Mapped found";
+        LOG(info) << "Sci2Mapped found";
     }
 
     // --- ------------------------ --- //
@@ -95,7 +95,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
     fTcal = (TClonesArray*)mgr->GetObject("Sci2Tcal");
     if (!fTcal)
     {
-        LOG(INFO) << "Sci2Tcal not found: is OK";
+        LOG(info) << "Sci2Tcal not found: is OK";
     }
 
     // --- ------------------------------ --- //
@@ -369,7 +369,7 @@ InitStatus R3BOnlineSpectraSci2::Init()
 
 void R3BOnlineSpectraSci2::Reset_Histo()
 {
-    LOG(INFO) << "R3BOnlineSpectraSci2::Reset_Histo";
+    LOG(info) << "R3BOnlineSpectraSci2::Reset_Histo";
     for (Int_t i = 0; i < fNbDetectors; i++)
     {
         // === MULTIPLICITY === //
@@ -400,7 +400,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BOnlineSpectraSci2::Exec FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraSci2::Exec FairRootManager not found";
 
     // --- -------------- --- //
     // --- TPAT CONDITION --- //

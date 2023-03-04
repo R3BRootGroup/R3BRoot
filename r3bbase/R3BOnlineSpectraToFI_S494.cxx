@@ -84,7 +84,7 @@ InitStatus R3BOnlineSpectraToFI_S494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraToFI_S494::Init ";
+    LOG(info) << "R3BOnlineSpectraToFI_S494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -386,7 +386,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
     Bool_t time_header = false;
@@ -593,7 +593,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
+                        LOG(error) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
                         s_was_trig_missing = true;
                     }
                 }
@@ -639,7 +639,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
+                        LOG(error) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
                         s_was_trig_missing = true;
                     }
                 }
@@ -707,7 +707,7 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missingc)
                     {
-                        LOG(ERROR) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
+                        LOG(error) << "R3BOnlineSpectraToFI::Exec() : Missing trigger information!";
                         s_was_trig_missingc = true;
                     }
                     ++n2;
@@ -750,13 +750,13 @@ void R3BOnlineSpectraToFI_S494::Exec(Option_t* option)
                     Int_t iBar = topc->GetBarId();        // 1..n
                     if (iPlane > fNofPlanes)              // this also errors for iDetector==0
                     {
-                        LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more detectors than expected! Det: " << iPlane
+                        LOG(error) << "R3BTOnlineSpectraToFI::Exec() : more detectors than expected! Det: " << iPlane
                                    << " allowed are 1.." << fNofPlanes;
                         continue;
                     }
                     if (iBar > fPaddlesPerPlane) // same here
                     {
-                        LOG(ERROR) << "R3BTOnlineSpectraToFI::Exec() : more bars then expected! Det: " << iBar
+                        LOG(error) << "R3BTOnlineSpectraToFI::Exec() : more bars then expected! Det: " << iBar
                                    << " allowed are 1.." << fPaddlesPerPlane;
                         continue;
                     }

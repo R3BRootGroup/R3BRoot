@@ -45,8 +45,7 @@
 
 #include "R3BMCTrack.h"
 #include "R3BTrack.h"
-
-#include "R3BWRData.h"
+#include "R3BTrackData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -74,6 +73,7 @@
 #include <iostream>
 #include <sstream>
 #define IS_NAN(x) TMath::IsNaN(x)
+
 using namespace std;
 
 R3BGlobalAnalysisS494::R3BGlobalAnalysisS494()
@@ -99,7 +99,6 @@ R3BGlobalAnalysisS494::R3BGlobalAnalysisS494(const char* name, Int_t iVerbose)
     , fvis(0)
     , fNEvents(0)
     , fHitItemsCalifa(NULL)
-    , fWRItemsMaster(NULL)
 {
 }
 
@@ -129,38 +128,13 @@ InitStatus R3BGlobalAnalysisS494::Init()
 
     // Get objects for detectors on all levels
     fMCTrack = (TClonesArray*)mgr->GetObject("MCTrack");
-    fTrack = (TClonesArray*)mgr->GetObject("Track");
+    fTrack = (TClonesArray*)mgr->GetObject("TrackData");
     maxevent = mgr->CheckMaxEventNo();
 
     // get access to data of Califa
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
     if (!fHitItemsCalifa)
         LOG(warning) << "GlobalAnalysis: CalifaClusterData not found";
-
-    // get acces to hit data of other detectors:
-    assert(DET_MAX + 1 == sizeof(fDetectorNames) / sizeof(fDetectorNames[0]));
-
-    printf("Have %d detectors.\n", DET_MAX);
-    printf("Have %d fiber detectors.\n", NOF_FIB_DET);
-
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        cout << "Reading detector " << det << ", " << fDetectorNames[det] << endl;
-
-        fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
-
-        if (NULL == fHitItems.at(det))
-        {
-            printf("Could not find hit data for '%s'.\n", fDetectorNames[det]);
-        }
-    }
-
-    // get access to WR-Master data
-    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    if (NULL == fWRItemsMaster)
-        R3BLOG(info, "WR Master was not found");
-    else
-        R3BLOG(info, "WR Master was found");
 
     cout << "R3BGlobalAnalysisS494::Max num events: " << maxevent << endl;
 
@@ -728,14 +702,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_psum_vs_theta26_nc->GetYaxis()->SetTitle("angle / deg");
     fh_psum_vs_theta26_nc->GetXaxis()->SetTitle("p / MeV/c");
 
-    Int_t nbins;
-    Double_t binmin, binmax;
-    for (int det = 0; det < DET_MAX; det++)
+    Int_t nbins = 100;
+    Double_t binmin = 0, binmax = 10;
+    for (Int_t det = 0; det < N_DET_MAX; det++)
     {
-        if (det == 1)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
+        cout << "making hist for det: " << det << " " << fDetectorNames[det] << endl;
         if (det < 2)
         {
             nbins = 429;
@@ -762,37 +733,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
                                         200,
                                         0,
                                         20);
-        if (det == 0)
-        {
-            fh_Erel_vs_nhits[det] = new TH2F(Form("Erel_vs_nhits%s", fDetectorNames[det]),
-                                             Form("Erel vs nhits%s", fDetectorNames[det]),
-                                             10,
-                                             0,
-                                             10,
-                                             200,
-                                             0,
-                                             20);
-        }
-    }
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        if (det == 0 || det == 2 || det == 3 || det == 4 || det == 5)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
 
-        if (det < 2)
-        {
-            nbins = 429;
-            binmin = -6.006;
-            binmax = 6.006;
-        }
-        else if (det == 6)
-        {
-            nbins = 120;
-            binmin = -60.;
-            binmax = 60.;
-        }
         fh_Erel_vs_ydet[det] = new TH2F(Form("Erel_vs_y%s", fDetectorNames[det]),
                                         Form("Erel vs y%s", fDetectorNames[det]),
                                         nbins,
@@ -801,17 +742,6 @@ InitStatus R3BGlobalAnalysisS494::Init()
                                         200,
                                         0,
                                         20);
-        if (det == 1)
-        {
-            fh_Erel_vs_nhits[det] = new TH2F(Form("Erel_vs_nhits%s", fDetectorNames[det]),
-                                             Form("Erel vs nhits%s", fDetectorNames[det]),
-                                             10,
-                                             0,
-                                             10,
-                                             200,
-                                             0,
-                                             20);
-        }
     }
     fh_yfi23_vs_ytofd_bc = new TH2F("yfi23_vs_ytofd_bc", " yFi23b vs yTofd bc", 120, -60, 60, 429, -6.006, 6.006);
     fh_yfi23_vs_ytofd = new TH2F("yfi23_vs_ytofd", " yFi23b vs yTofd", 120, -60, 60, 429, -6.006, 6.006);
@@ -830,7 +760,16 @@ InitStatus R3BGlobalAnalysisS494::Init()
 
         fh_Erel_withCalifa_2d = new TH2F("Erel_vs_numCrystalCalifa", "Erel vs Numb of Crystal", 40, 0, 40, 200, 0., 20);
         fh_Erel_withCalifa_2d->GetYaxis()->SetTitle("Erel / MeV");
-        fh_Erel_withCalifa_2d->GetXaxis()->SetTitle("num crystals in cluster");
+        fh_Erel_withCalifa_2d->GetXaxis()->SetTitle("No crystals in cluster");
+
+        fh_Erel_withCalifa_tof = new TH2F("Erel_vs_tofCalifa", "Erel vs tof Califa", 1500, 1000., 4000, 200, 0., 20);
+        fh_Erel_withCalifa_tof->GetYaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_tof->GetXaxis()->SetTitle("tof / ns");
+
+        fh_Erel_withCalifa_motherId =
+            new TH2F("Erel_vs_motherId", "Erel vs motherId Califa", 1100, 900., 2000, 200, 0., 20);
+        fh_Erel_withCalifa_motherId->GetYaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_motherId->GetXaxis()->SetTitle("motherId");
 
         fh_Erel_vs_theta16O_withcalifa =
             new TH2F("Erel_vs_theta16O_withcalifa", "Erel vs. theta 16O* with califa", 125, 0., 5, 200, 0, 20.);
@@ -864,21 +803,6 @@ InitStatus R3BGlobalAnalysisS494::Init()
         fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 20000, -1000, 1000);
         fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
         fh_califa_tofd->GetXaxis()->SetTitle("califa tome / ns");
-        /*
-                fh_califa_calenergy =
-                    new TH2F("califa_cal_energy", "Califa calE vs crystal id for is_track true", 5000, 0, 5000, 200, 0.,
-           10000.); fh_califa_calenergy->GetYaxis()->SetTitle("Energy / keV");
-                fh_califa_calenergy->GetXaxis()->SetTitle("Crystal #");
-
-                fh_califa_energy = new TH2F("califa_energy", "Califa mapE vs crystal id for is_track true", 5000, 0,
-           5000, 200, 0., 10000.); fh_califa_energy->GetYaxis()->SetTitle("Energy / keV");
-                fh_califa_energy->GetXaxis()->SetTitle("Crystal #");
-
-                fh_califa_energy_nc = new TH2F(
-                    "califa_energy_nc", "Califa mapE vs crystal id no pair selection", 5000, 0, 5000, 1000, 0., 10000.);
-                fh_califa_energy_nc->GetYaxis()->SetTitle("Energy / keV");
-                fh_califa_energy_nc->GetXaxis()->SetTitle("Crystal #");
-        */
 
         if (fvis)
         {
@@ -1118,9 +1042,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     YC_mc = -100;
     ZC_mc = -100;
     Double_t px, py, pz;
-    Double_t theta_16O = 0., theta_16Omem = 0., theta_26 = 0.;
+    Double_t theta_16O = 0., theta_26 = 0.;
     Double_t costh26 = 0.;
-    Double_t Erelmem = 0.;
     Double_t chiHex = 1.e+36, chiHey = 1.e+36, chiCx = 1.e+36, chiCy = 1.e+36;
     Double_t chix = 1.e+36, chiy = 1.e+36;
     pbeam.SetXYZ(0, 0, 17391.5);
@@ -1137,103 +1060,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     Int_t nHitsTrack = 0;
     Int_t nHitsMCTrack = 0;
 
-    // WR master TS
-    int64_t wrm = 0.0;
-    if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
-    {
-        Int_t nHitsWR = fWRItemsMaster->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHitsWR; ihit++)
-        {
-            R3BWRData* hit = (R3BWRData*)fWRItemsMaster->At(ihit);
-            if (!hit)
-                continue;
-            wrm = hit->GetTimeStamp();
-        }
-    }
+    vector<Double_t> posdetHe;
+    vector<Double_t> posdetC;
 
-    //   cout<<"Before fibers"<<endl;
-    Int_t detnHits;
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        if (det == 1)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
-
-        auto detHit = fHitItems.at(det);
-        detnHits = detHit->GetEntriesFast();
-
-        if (det == 0)
-        {
-            for (Int_t ihit = 0; ihit < detnHits; ihit++)
-            {
-                R3BFiberMAPMTHitData* hitdetx = (R3BFiberMAPMTHitData*)detHit->At(ihit);
-
-                auto detHit23b = fHitItems.at(DET_FI23B);
-                Int_t detnHits23b = detHit23b->GetEntriesFast();
-                for (Int_t ihit23b = 0; ihit23b < detnHits23b; ihit23b++)
-                {
-                    R3BFiberMAPMTHitData* hitdety23b = (R3BFiberMAPMTHitData*)detHit23b->At(ihit23b);
-
-                    fh_xy_fib23_bc->Fill(hitdetx->GetX(), hitdety23b->GetY());
-                    fh_dt_fib23_bc->Fill(hitdetx->GetTime() - hitdety23b->GetTime());
-                    //	cout<<"time difference: "<<hitdetx->GetTime()-hitdety23b->GetTime()<<endl;
-                }
-            }
-        }
-        else
-        {
-
-            for (Int_t ihit = 0; ihit < detnHits; ihit++)
-            {
-                R3BTofdHitData* hitdetx = (R3BTofdHitData*)detHit->At(ihit);
-
-                auto detHit23 = fHitItems.at(DET_FI23A);
-                Int_t detnHits23 = detHit23->GetEntriesFast();
-                for (Int_t ihit23 = 0; ihit23 < detnHits23; ihit23++)
-                {
-                    R3BFiberMAPMTHitData* hitdetx23 = (R3BFiberMAPMTHitData*)detHit23->At(ihit23);
-
-                    fh_xfi23_vs_xtofd_bc->Fill(hitdetx->GetX(), hitdetx23->GetX());
-                }
-            }
-        }
-    }
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        if (det == 0 || det == 2 || det == 3 || det == 4 || det == 5)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
-
-        auto detHit = fHitItems.at(det);
-        detnHits = detHit->GetEntriesFast();
-
-        if (det == 1)
-        {
-
-            for (Int_t ihit = 0; ihit < detnHits; ihit++)
-            {
-                R3BFiberMAPMTHitData* hitdety = (R3BFiberMAPMTHitData*)detHit->At(ihit);
-            }
-        }
-        else if (det == 6)
-        {
-            for (Int_t ihit = 0; ihit < detnHits; ihit++)
-            {
-                R3BTofdHitData* hitdety = (R3BTofdHitData*)detHit->At(ihit);
-
-                auto detHit23 = fHitItems.at(DET_FI23B);
-                Int_t detnHits23 = detHit23->GetEntriesFast();
-                for (Int_t ihit23 = 0; ihit23 < detnHits23; ihit23++)
-                {
-                    R3BFiberMAPMTHitData* hitdety23 = (R3BFiberMAPMTHitData*)detHit23->At(ihit23);
-
-                    fh_yfi23_vs_ytofd_bc->Fill(hitdety->GetY(), hitdety23->GetY());
-                }
-            }
-        }
-    }
+    Double_t tHetofd = -10000., tCtofd = -10000.;
 
     if (fTrack)
     {
@@ -1246,9 +1076,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         // cout << "Track hits: " << nHitsTrack << endl;
         for (Int_t l = 0; l < nHitsTrack; l++)
         {
-            R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
-
-            //  LOG(debug) << "Charge " << aTrack->GetQ() << endl;
+            R3BTrackData* aTrack = (R3BTrackData*)fTrack->At(l);
 
             if (aTrack->GetQ() == 2)
             {
@@ -1264,6 +1092,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 chiHex = aTrack->GetChix();
                 chiHey = aTrack->GetChiy();
+                posdetHe = aTrack->GetDetPos();
+                tHetofd = aTrack->GetTime();
 
                 is_alpha = true;
                 alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
@@ -1291,6 +1121,9 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                 chiCx = aTrack->GetChix();
                 chiCy = aTrack->GetChiy();
+
+                posdetC = aTrack->GetDetPos();
+                tCtofd = aTrack->GetTime();
 
                 is_carbon = true;
                 carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
@@ -1412,6 +1245,14 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     if (fTrack && is_carbon && is_alpha && fPairs && chiHex < 1.e+36) // 17364.240
     {
         fNeventstrack += 1;
+
+        // (0,1) = (xfi23a,yfi23a), .. (12,13) = (xtofd,ytofd)
+        fh_xy_fib23_bc->Fill(posdetHe.at(0), posdetHe.at(3));
+        fh_xy_fib23_bc->Fill(posdetC.at(0), posdetC.at(3));
+        fh_xfi23_vs_xtofd_bc->Fill(posdetHe.at(12), posdetHe.at(0));
+        fh_xfi23_vs_xtofd_bc->Fill(posdetC.at(12), posdetC.at(0));
+        fh_yfi23_vs_ytofd_bc->Fill(posdetHe.at(13), posdetHe.at(3));
+        fh_yfi23_vs_ytofd_bc->Fill(posdetC.at(13), posdetC.at(3));
 
         Double_t sq_chi = sqrt(chiHex * chiHex + chiCx * chiCx);
         fh_chi2->Fill(sq_chi);
@@ -1612,10 +1453,80 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 //  if ((alpha.Py() > 0. && carbon.Py() > 0.) || (alpha.Py() < 0. && carbon.Py() < 0.)) return;
                 //   if((pa + pc).Mag() < 17352. || (pa + pc).Mag()> 17432.) return;
 
+                // (0,1) = (xfi23a,yfi23a), .. (12,13) = (xtofd,ytofd)
+                fh_xy_fib23->Fill(posdetHe.at(0), posdetHe.at(3));
+                fh_xy_fib23->Fill(posdetC.at(0), posdetC.at(3));
+                fh_xfi23_vs_xtofd->Fill(posdetHe.at(12), posdetHe.at(0));
+                fh_xfi23_vs_xtofd->Fill(posdetC.at(12), posdetC.at(0));
+                fh_yfi23_vs_ytofd->Fill(posdetHe.at(13), posdetHe.at(3));
+                fh_yfi23_vs_ytofd->Fill(posdetC.at(13), posdetC.at(3));
+
+                for (Int_t idet = 0; idet < N_DET_MAX; idet++)
+                {
+                    fh_Erel_vs_xdet[idet]->Fill(posdetC.at(2 * idet), Erel);
+                    fh_Erel_vs_xdet[idet]->Fill(posdetHe.at(2 * idet), Erel);
+                    fh_Erel_vs_ydet[idet]->Fill(posdetC.at(2 * idet + 1), Erel);
+                    fh_Erel_vs_ydet[idet]->Fill(posdetHe.at(2 * idet + 1), Erel);
+                }
+
+                if (fHitItemsCalifa)
+                {
+                    // CALIFA
+                    auto detCalifa = fHitItemsCalifa;
+                    Int_t nHitsCalifaH = detCalifa->GetEntriesFast();
+
+                    for (Int_t ihitC = 0; ihitC < nHitsCalifaH; ihitC++)
+                    {
+                        R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihitC);
+                        if (!hitCalifa)
+                            continue;
+
+                        ULong64_t timeCalifa = hitCalifa->GetTime();
+                        Double_t timerelCalifa = (double)(timeCalifa - timeTS);
+                        Double_t tof = timerelCalifa - tCtofd;
+                        Int_t CrystalNb = hitCalifa->GetCrystalList().size();
+                        Double_t Energy = hitCalifa->GetEnergy();
+                        Double_t theta = hitCalifa->GetTheta();
+                        Double_t Energy_dc = Energy * GAMMA * (1 - BETA * TMath::Cos(theta));
+
+                        /*
+                            Double_t GetEnergy() const { return fEnergy; }
+                            Double_t GetNf() const { return fNf; }
+                            Double_t GetNs() const { return fNs; }
+                            Double_t GetTheta() const { return fTheta; }
+                            Double_t GetPhi() const { return fPhi; }
+                            ULong64_t GetTime() const { return fTime; }
+                            uint32_t GetClusterType() const { return fClusterType; }
+                            Int_t GetNbOfCrystalHits()  const { return fCrystalList.size(); }
+                            std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
+                            Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
+                        */
+                        if (hitCalifa->GetClusterType() == 1 &&
+                            !(IS_NAN(Energy))) // gammas (IS_NAN(Energy) == overflow)
+                        {
+                            if (hitCalifa->GetMotherCrystal() > 927 && hitCalifa->GetMotherCrystal() < 1953) // barrel
+                            {
+                                fh_theta_vs_theta->Fill(theta_16O, hitCalifa->GetTheta() * TMath::RadToDeg());
+                                fh_califa_hitenergy_boost->Fill(Energy_dc);
+                                fh_califa_hitenergy_select->Fill(Energy);
+                                fh_Erel_withCalifa->Fill(Erel);
+                                fh_Erel_withCalifa_2d->Fill(hitCalifa->GetCrystalList().size(), Erel);
+                                fh_Erel_withCalifa_tof->Fill(timerelCalifa - tCtofd, Erel);
+                                fh_Erel_withCalifa_motherId->Fill(hitCalifa->GetMotherCrystal(), Erel);
+                                fh_Erel_vs_theta16O_withcalifa->Fill(theta_16O, Erel);
+                                if (theta_16O < fThetaGrazing)
+                                    fh_califa_hitenergy_bg->Fill(Erel, Energy_dc);
+                                else
+                                    fh_califa_hitenergy_ag->Fill(Erel, Energy_dc);
+
+                                fh_califa_tofd->Fill(timerelCalifa, tCtofd);
+                            }
+                        }
+                    }
+                }
+
                 is_tracked = true;
                 nTracksFound += 1;
-                Erelmem = Erel;
-                theta_16Omem = theta_16O;
                 fh_energy->Fill(Ec, Ea);
 
                 Double_t mche = mHe * mC / mO;
@@ -1933,161 +1844,6 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
         }
     }
 
-    if (is_tracked)
-    {
-        LOG(debug) << "correlations with detectors" << endl;
-
-        for (int det = 0; det < DET_MAX; det++)
-        {
-
-            if (det == 1)
-                continue;
-            if (!fHitItems.at(det))
-                continue;
-
-            auto detHit = fHitItems.at(det);
-            detnHits = detHit->GetEntriesFast();
-
-            if (det == 0)
-                fh_Erel_vs_nhits[det]->Fill(detnHits, Erel);
-
-            if (det < 6)
-            {
-                for (Int_t ihit = 0; ihit < detnHits; ihit++)
-                {
-                    R3BFiberMAPMTHitData* hitdetx = (R3BFiberMAPMTHitData*)detHit->At(ihit);
-                    fh_Erel_vs_xdet[det]->Fill(hitdetx->GetX(), Erel);
-
-                    if (det == 0)
-                    {
-                        auto detHit23bb = fHitItems.at(DET_FI23B);
-                        Int_t detnHits23bb = detHit23bb->GetEntriesFast();
-                        for (Int_t ihit23bb = 0; ihit23bb < detnHits23bb; ihit23bb++)
-                        {
-                            R3BFiberMAPMTHitData* hitdety23bb = (R3BFiberMAPMTHitData*)detHit23bb->At(ihit23bb);
-
-                            fh_xy_fib23->Fill(hitdetx->GetX(), hitdety23bb->GetY());
-                        }
-                    }
-                }
-            }
-            else
-            {
-
-                for (Int_t ihit = 0; ihit < detnHits; ihit++)
-                {
-                    R3BTofdHitData* hitdetx = (R3BTofdHitData*)detHit->At(ihit);
-                    fh_Erel_vs_xdet[det]->Fill(hitdetx->GetX(), Erel);
-
-                    auto detHit23 = fHitItems.at(DET_FI23A);
-                    Int_t detnHits23 = detHit23->GetEntriesFast();
-                    for (Int_t ihit23 = 0; ihit23 < detnHits23; ihit23++)
-                    {
-                        R3BFiberMAPMTHitData* hitdetx23 = (R3BFiberMAPMTHitData*)detHit23->At(ihit23);
-
-                        fh_xfi23_vs_xtofd->Fill(hitdetx->GetX(), hitdetx23->GetX());
-                    }
-                }
-            }
-        }
-        for (int det = 0; det < DET_MAX; det++)
-        {
-            if (det == 0 || det == 2 || det == 3 || det == 4 || det == 5)
-                continue;
-            if (!fHitItems.at(det))
-                continue;
-
-            auto detHit = fHitItems.at(det);
-            detnHits = detHit->GetEntriesFast();
-
-            if (det == 1)
-            {
-                fh_Erel_vs_nhits[det]->Fill(detnHits, Erel);
-                for (Int_t ihit = 0; ihit < detnHits; ihit++)
-                {
-                    R3BFiberMAPMTHitData* hitdety = (R3BFiberMAPMTHitData*)detHit->At(ihit);
-
-                    fh_Erel_vs_ydet[det]->Fill(hitdety->GetY(), Erel);
-                }
-            }
-            else if (det == 6)
-            {
-                for (Int_t ihit = 0; ihit < detnHits; ihit++)
-                {
-                    R3BTofdHitData* hitdety = (R3BTofdHitData*)detHit->At(ihit);
-
-                    fh_Erel_vs_ydet[det]->Fill(hitdety->GetY(), Erel);
-                    auto detHit23 = fHitItems.at(DET_FI23B);
-                    Int_t detnHits23b = detHit23->GetEntriesFast();
-                    for (Int_t ihit23 = 0; ihit23 < detnHits23b; ihit23++)
-                    {
-                        R3BFiberMAPMTHitData* hitdety23 = (R3BFiberMAPMTHitData*)detHit23->At(ihit23);
-
-                        fh_yfi23_vs_ytofd->Fill(hitdety->GetY(), hitdety23->GetY());
-                    }
-                    if (fHitItemsCalifa)
-                    {
-                        // CALIFA
-                        auto detCalifa = fHitItemsCalifa;
-                        Int_t nHitsCalifaH = detCalifa->GetEntriesFast();
-                        // cout<<"Califa hits: "<<nHitsCalifaH<<endl;
-                        Double_t E_0 = 15.99065084 * 931.494028;
-                        Double_t E_Beam = E_0 + 16. * 500.;
-                        Double_t BETA = sqrt(1. - (E_0 * E_0) / (E_Beam * E_Beam));
-                        Double_t GAMMA = 1. / (sqrt(1. - BETA * BETA));
-
-                        for (Int_t ihitC = 0; ihitC < nHitsCalifaH; ihitC++)
-                        {
-                            R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihitC);
-                            if (!hitCalifa)
-                                continue;
-
-                            ULong64_t timeCalifa = hitCalifa->GetTime();
-                            Double_t timerelCalifa = (double)(timeCalifa - timeTS);
-                            Double_t tof = timerelCalifa - hitdety->GetTime();
-                            Int_t CrystalNb = hitCalifa->GetCrystalList().size();
-                            Double_t Energy = hitCalifa->GetEnergy();
-                            Double_t theta = hitCalifa->GetTheta();
-                            Double_t Energy_dc = Energy * GAMMA * (1 - BETA * TMath::Cos(theta));
-
-                            /*
-                                Double_t GetEnergy() const { return fEnergy; }
-                                Double_t GetNf() const { return fNf; }
-                                Double_t GetNs() const { return fNs; }
-                                Double_t GetTheta() const { return fTheta; }
-                                Double_t GetPhi() const { return fPhi; }
-                                ULong64_t GetTime() const { return fTime; }
-                                uint32_t GetClusterType() const { return fClusterType; }
-                                Int_t GetNbOfCrystalHits()  const { return fCrystalList.size(); }
-                                std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
-                                Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
-                            */
-                            if (hitCalifa->GetClusterType() == 1) // gammas
-                            {
-                                if (hitCalifa->GetMotherCrystal() > 927 &&
-                                    hitCalifa->GetMotherCrystal() < 1953) // barrel
-                                {
-                                    fh_theta_vs_theta->Fill(theta_16Omem, hitCalifa->GetTheta() * TMath::RadToDeg());
-                                    fh_califa_hitenergy_boost->Fill(Energy_dc);
-                                    fh_califa_hitenergy_select->Fill(Energy);
-                                    fh_Erel_withCalifa->Fill(Erelmem);
-                                    fh_Erel_withCalifa_2d->Fill(hitCalifa->GetCrystalList().size(), Erelmem);
-                                    fh_Erel_vs_theta16O_withcalifa->Fill(theta_16Omem, Erelmem);
-                                    if (theta_16Omem < fThetaGrazing)
-                                        fh_califa_hitenergy_bg->Fill(Erelmem, Energy_dc);
-                                    else
-                                        fh_califa_hitenergy_ag->Fill(Erelmem, Energy_dc);
-
-                                    fh_califa_tofd->Fill(timerelCalifa, hitdety->GetTime());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     fNEvents += 1;
 
     return;
@@ -2100,11 +1856,6 @@ void R3BGlobalAnalysisS494::FinishEvent()
         fMCTrack->Clear();
     if (fHitItemsCalifa)
         fHitItemsCalifa->Clear();
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        if (fHitItems.at(det))
-            fHitItems.at(det)->Clear();
-    }
 }
 
 void R3BGlobalAnalysisS494::FinishTask()
@@ -2262,48 +2013,22 @@ void R3BGlobalAnalysisS494::FinishTask()
         fh_califa_hitenergy_select->Write();
         fh_Erel_vs_theta16O_withcalifa->Write();
         fh_Erel_withCalifa_2d->Write();
+        fh_Erel_withCalifa_tof->Write();
+        fh_Erel_withCalifa_motherId->Write();
         fh_theta_vs_theta->Write();
         fh_califa_tofd->Write();
     }
-    for (int det = 0; det < DET_MAX; det++)
+    for (int det = 0; det < N_DET_MAX; det++)
     {
-        if (det == 1)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
-        if (det == 0)
-        {
-            fh_Erel_vs_nhits[0]->Write();
-        }
-
         fh_Erel_vs_xdet[det]->Write();
-    }
-    for (int det = 0; det < DET_MAX; det++)
-    {
-        if (det == 0 || det == 2 || det == 3 || det == 4 || det == 5)
-            continue;
-        if (!fHitItems.at(det))
-            continue;
-        if (det == 1)
-        {
-            ;
-            fh_Erel_vs_nhits[1]->Write();
-        }
         fh_Erel_vs_ydet[det]->Write();
     }
-    if (fHitItems.at(DET_FI23B))
-        fh_yfi23_vs_ytofd_bc->Write();
-    if (fHitItems.at(DET_FI23B))
-        fh_yfi23_vs_ytofd->Write();
-    if (fHitItems.at(DET_FI23A))
-        fh_xfi23_vs_xtofd_bc->Write();
-    if (fHitItems.at(DET_FI23A))
-        fh_xfi23_vs_xtofd->Write();
-    if (fHitItems.at(DET_FI23A))
-        fh_xy_fib23->Write();
-    if (fHitItems.at(DET_FI23A))
-        fh_xy_fib23_bc->Write();
-    if (fHitItems.at(DET_FI23A))
-        fh_dt_fib23_bc->Write();
+    fh_yfi23_vs_ytofd_bc->Write();
+    fh_yfi23_vs_ytofd->Write();
+    fh_xfi23_vs_xtofd_bc->Write();
+    fh_xfi23_vs_xtofd->Write();
+    fh_xy_fib23->Write();
+    fh_xy_fib23_bc->Write();
+    fh_dt_fib23_bc->Write();
 }
 ClassImp(R3BGlobalAnalysisS494)

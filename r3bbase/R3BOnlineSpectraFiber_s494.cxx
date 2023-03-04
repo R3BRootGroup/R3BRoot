@@ -122,7 +122,7 @@ InitStatus R3BOnlineSpectraFiber_s494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraFiber_s494::Init ";
+    LOG(info) << "R3BOnlineSpectraFiber_s494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -511,7 +511,7 @@ void R3BOnlineSpectraFiber_s494::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 

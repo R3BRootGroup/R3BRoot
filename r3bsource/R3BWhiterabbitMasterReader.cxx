@@ -76,7 +76,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
         R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kTRUE); // !fOnline);
+    FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
     Reset();
     memset(fData, 0, sizeof *fData);
 

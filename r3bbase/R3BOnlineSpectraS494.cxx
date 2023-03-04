@@ -9,9 +9,9 @@
  *
  */
 
+#include "R3BOnlineSpectraS494.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-#include "R3BOnlineSpectraS494.h"
 
 #include "R3BSci8CalData.h"
 #include "R3BSci8MappedData.h"
@@ -35,8 +35,8 @@
 //#include "R3BBunchedFiberCalData.h"
 //#include "R3BBunchedFiberHitData.h"
 //#include "R3BBunchedFiberMappedData.h"
-#include "R3BFiberMAPMTMappedData.h"
 #include "R3BFiberMAPMTCalData.h"
+#include "R3BFiberMAPMTMappedData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -107,7 +107,7 @@ InitStatus R3BOnlineSpectraS494::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraS494::Init ";
+    LOG(info) << "R3BOnlineSpectraS494::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -407,8 +407,8 @@ InitStatus R3BOnlineSpectraS494::Init()
             fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Channels:
-            fh_channels_single_Fib[ifibcount] =
-                new TH1F(Form("%s_channels_single", detName), Form("%s channels of single PMTs", detName), 550, 0., 520.);
+            fh_channels_single_Fib[ifibcount] = new TH1F(
+                Form("%s_channels_single", detName), Form("%s channels of single PMTs", detName), 550, 0., 520.);
             fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
             fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
@@ -736,7 +736,7 @@ InitStatus R3BOnlineSpectraS494::Init()
 
     if (fMappedItems.at(DET_PSPX))
     {
-        // LOG(INFO) << "Init MappedPspx";
+        // LOG(info) << "Init MappedPspx";
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
@@ -1088,7 +1088,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 
@@ -1151,7 +1151,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
             return;
     }
 
-    //if (fMappedItems.at(DET_BMON))
+    // if (fMappedItems.at(DET_BMON))
     //{
     //    unsigned long IC;
     //    unsigned long SEETRAM, SEETRAM_raw;
@@ -1260,28 +1260,28 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //   r | |lb
     //   rb\ /b
 
-    //Double_t timeTofd = 0;
-    //Double_t time_V[10][8] = { 0.0 / 0.0 }; // [multihit][pm]
-    //Double_t time_L[10][8] = { 0.0 / 0.0 };
-    //Double_t time_T[10][8] = { 0.0 / 0.0 };
-    //Double_t timeLosM[10] = { 0.0 };
-    //Double_t LosTresM[10] = { 0.0 / 0.0 };
-    //Double_t timeLosT[10] = { 0.0 };
-    //Double_t LosTresT[10] = { 0.0 / 0.0 };
-    //Double_t timeLos[10] = { 0.0 };
-    //Double_t totsum[10] = { 0.0 };
-    //Double_t tot[10][8] = { 0.0 / 0.0 };
-    //Double_t xT_cm[10] = { 0.0 / 0.0 };
-    //Double_t yT_cm[10] = { 0.0 / 0.0 };
-    //Double_t xToT_cm[10] = { 0.0 / 0.0 };
-    //Double_t yToT_cm[10] = { 0.0 / 0.0 };
-    //Double_t xV_cm[10] = { 0.0 / 0.0 };
-    //Double_t yV_cm[10] = { 0.0 / 0.0 };
-    //Double_t time_V_temp[10][8] = { 0.0 / 0.0 };
+    // Double_t timeTofd = 0;
+    // Double_t time_V[10][8] = { 0.0 / 0.0 }; // [multihit][pm]
+    // Double_t time_L[10][8] = { 0.0 / 0.0 };
+    // Double_t time_T[10][8] = { 0.0 / 0.0 };
+    // Double_t timeLosM[10] = { 0.0 };
+    // Double_t LosTresM[10] = { 0.0 / 0.0 };
+    // Double_t timeLosT[10] = { 0.0 };
+    // Double_t LosTresT[10] = { 0.0 / 0.0 };
+    // Double_t timeLos[10] = { 0.0 };
+    // Double_t totsum[10] = { 0.0 };
+    // Double_t tot[10][8] = { 0.0 / 0.0 };
+    // Double_t xT_cm[10] = { 0.0 / 0.0 };
+    // Double_t yT_cm[10] = { 0.0 / 0.0 };
+    // Double_t xToT_cm[10] = { 0.0 / 0.0 };
+    // Double_t yToT_cm[10] = { 0.0 / 0.0 };
+    // Double_t xV_cm[10] = { 0.0 / 0.0 };
+    // Double_t yV_cm[10] = { 0.0 / 0.0 };
+    // Double_t time_V_temp[10][8] = { 0.0 / 0.0 };
 
-    //Int_t Multip;
+    // Int_t Multip;
 
-    //if (fMappedItems.at(DET_LOS))
+    // if (fMappedItems.at(DET_LOS))
     //{
     //    auto det = fMappedItems.at(DET_LOS);
     //    Int_t nHits = det->GetEntriesFast();
@@ -1302,8 +1302,8 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    }
     //}
 
-    //Int_t nPart;
-    //if (fCalItems.at(DET_LOS))
+    // Int_t nPart;
+    // if (fCalItems.at(DET_LOS))
     //{
     //    Bool_t LOSID = false;
 
@@ -1539,20 +1539,20 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     // SCI8 detector
     //----------------------------------------------------------------------
 
-    //Double_t timeS8_V[10][2] = { 0.0 / 0.0 }; // [multihit][pm]
-    //Double_t timeS8_L[10][2] = { 0.0 / 0.0 };
-    //Double_t timeS8_T[10][2] = { 0.0 / 0.0 };
-    //Double_t timeSci8M[10] = { 0.0 };
-    //Double_t Sci8TresM[10] = { 0.0 / 0.0 };
-    //Double_t timeSci8T[10] = { 0.0 };
-    //Double_t Sci8TresT[10] = { 0.0 / 0.0 };
-    //Double_t timeSci8[10] = { 0.0 };
-    //Double_t totsumS8[10] = { 0.0 };
-    //Double_t totS8[10][8] = { 0.0 / 0.0 };
+    // Double_t timeS8_V[10][2] = { 0.0 / 0.0 }; // [multihit][pm]
+    // Double_t timeS8_L[10][2] = { 0.0 / 0.0 };
+    // Double_t timeS8_T[10][2] = { 0.0 / 0.0 };
+    // Double_t timeSci8M[10] = { 0.0 };
+    // Double_t Sci8TresM[10] = { 0.0 / 0.0 };
+    // Double_t timeSci8T[10] = { 0.0 };
+    // Double_t Sci8TresT[10] = { 0.0 / 0.0 };
+    // Double_t timeSci8[10] = { 0.0 };
+    // Double_t totsumS8[10] = { 0.0 };
+    // Double_t totS8[10][8] = { 0.0 / 0.0 };
 
-    //Int_t MultipS8;
+    // Int_t MultipS8;
 
-    //if (fMappedItems.at(DET_SCI8))
+    // if (fMappedItems.at(DET_SCI8))
     //{
     //    auto det = fMappedItems.at(DET_SCI8);
     //    Int_t nHits = det->GetEntriesFast();
@@ -1573,9 +1573,9 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    }
     //}
 
-    //Int_t nPartS8;
+    // Int_t nPartS8;
 
-    //if (fCalItems.at(DET_SCI8))
+    // if (fCalItems.at(DET_SCI8))
     //{
     //    auto det = fCalItems.at(DET_SCI8);
     //    nPartS8 = det->GetEntriesFast();
@@ -1666,7 +1666,8 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //                for (int ipm = 0; ipm < 2; ipm++)
     //                {
 
-    //                    if (timeS8_T[iPart][ipm] > 0. && timeS8_L[iPart][ipm] > 0. && !(IS_NAN(timeS8_T[iPart][ipm])) &&
+    //                    if (timeS8_T[iPart][ipm] > 0. && timeS8_L[iPart][ipm] > 0. && !(IS_NAN(timeS8_T[iPart][ipm]))
+    //                    &&
     //                        !(IS_NAN(timeS8_L[iPart][ipm])))
     //                    {
     //                        while (timeS8_T[iPart][ipm] - timeS8_L[iPart][ipm] < 0.)
@@ -1752,7 +1753,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
         {
             Int_t nHits = detMapped->GetEntriesFast();
             std::vector<UInt_t> mapmt_num(512);
-            //std::vector<UInt_t> spmt_num(16);
+            // std::vector<UInt_t> spmt_num(16);
             std::vector<UInt_t> spmt_num(512);
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
@@ -1791,7 +1792,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
             }
         }
 
-        //if (detHit)
+        // if (detHit)
         //{
         //    Int_t nHits = detHit->GetEntriesFast();
 
@@ -1897,14 +1898,14 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
         //        fh_mult_Fib[ifibcount]->Fill(nHits);
 
         //} // end if(aHit[ifibcount])
-    }     // end for(ifibcount)
+    } // end for(ifibcount)
 
     //----------------------------------------------------------------------
     // TOFD
     //----------------------------------------------------------------------
 
-    //Int_t NumPaddles[4] = { 0 };
-    //if (fMappedItems.at(DET_TOFD))
+    // Int_t NumPaddles[4] = { 0 };
+    // if (fMappedItems.at(DET_TOFD))
     //{
     //    auto det = fMappedItems.at(DET_TOFD);
     //    Int_t nMapped = det->GetEntriesFast();
@@ -1947,7 +1948,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    }
     //}
 
-    //if (fCalItems.at(DET_TOFD))
+    // if (fCalItems.at(DET_TOFD))
     //{
     //    auto det = fCalItems.at(DET_TOFD);
     //    Int_t nCals = det->GetEntriesFast();
@@ -2101,19 +2102,21 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //                        fh_tofd_ToF[iPlane - 1]->Fill(iBar, ToF[jm][iPlane - 1][iBar - 1]);
     //                    }
     //                    // ToT
-    //                    tot1[jm][iPlane - 1][iBar - 1] = t1t[jm][iPlane - 1][iBar - 1] - t1l[jm][iPlane - 1][iBar - 1];
-    //                    if (tot1[jm][iPlane - 1][iBar - 1] < 0)
+    //                    tot1[jm][iPlane - 1][iBar - 1] = t1t[jm][iPlane - 1][iBar - 1] - t1l[jm][iPlane - 1][iBar -
+    //                    1]; if (tot1[jm][iPlane - 1][iBar - 1] < 0)
     //                    {
     //                        cout << "Negative ToT " << tot1[jm][iPlane - 1] << ", for hit= " << jm << endl;
-    //                        cout << "Times1: " << t1t[jm][iPlane - 1][iBar - 1] << " " << t1l[jm][iPlane - 1][iBar - 1]
+    //                        cout << "Times1: " << t1t[jm][iPlane - 1][iBar - 1] << " " << t1l[jm][iPlane - 1][iBar -
+    //                        1]
     //                             << endl;
     //                    }
 
-    //                    tot2[jm][iPlane - 1][iBar - 1] = t2t[jm][iPlane - 1][iBar - 1] - t2l[jm][iPlane - 1][iBar - 1];
-    //                    if (tot2[jm][iPlane - 1][iBar - 1] < 0)
+    //                    tot2[jm][iPlane - 1][iBar - 1] = t2t[jm][iPlane - 1][iBar - 1] - t2l[jm][iPlane - 1][iBar -
+    //                    1]; if (tot2[jm][iPlane - 1][iBar - 1] < 0)
     //                    {
     //                        cout << "Negative ToT " << tot2[jm][iPlane - 1][iBar - 1] << ", for hit= " << jm << endl;
-    //                        cout << "Times2: " << t2t[jm][iPlane - 1][iBar - 1] << " " << t2l[jm][iPlane - 1][iBar - 1]
+    //                        cout << "Times2: " << t2t[jm][iPlane - 1][iBar - 1] << " " << t2l[jm][iPlane - 1][iBar -
+    //                        1]
     //                             << endl;
     //                    }
 
@@ -2126,7 +2129,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PTOF
     //----------------------------------------------------------------------
-    //if (fCalItems.at(DET_PTOF))
+    // if (fCalItems.at(DET_PTOF))
     //{
     //    auto det = fCalItems.at(DET_PTOF);
 
@@ -2140,7 +2143,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    Bool_t bar_quer2 = false;
 
     //    Int_t nHits = det->GetEntriesFast();
-    //    LOG(DEBUG) << "nHits: " << nHits;
+    //    LOG(debug) << "nHits: " << nHits;
     //    for (Int_t ihit = 0; ihit < nHits; ihit++)
     //    {
     //        R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
@@ -2159,9 +2162,9 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //            continue;
 
     //        fh_ptof_channels->Fill(iBar);
-    //        LOG(DEBUG) << "Bar: " << iBar;
-    //        LOG(DEBUG) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
-    //        LOG(DEBUG) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
+    //        LOG(debug) << "Bar: " << iBar;
+    //        LOG(debug) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
+    //        LOG(debug) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
     //        if (iBar == 7)
     //            bar_quer1 = true;
     //        if (iBar == 8)
@@ -2188,15 +2191,15 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //        tot1 = t1t - t1l;
     //        if (tot1 < 0)
     //        {
-    //            LOG(WARNING) << "Negative ToT " << tot1;
-    //            LOG(WARNING) << "times1: " << t1t << " " << t1l;
+    //            LOG(warning) << "Negative ToT " << tot1;
+    //            LOG(warning) << "times1: " << t1t << " " << t1l;
     //        }
 
     //        tot2 = t2t - t2l;
     //        if (tot2 < 0)
     //        {
-    //            LOG(WARNING) << "Negative ToT " << tot2;
-    //            LOG(WARNING) << "times2: " << t2t << " " << t2l;
+    //            LOG(warning) << "Negative ToT " << tot2;
+    //            LOG(warning) << "times2: " << t2t << " " << t2l;
     //        }
 
     //        fh_ptof_TotPm1[iBar]->Fill(tot1);
@@ -2247,15 +2250,15 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //        tot1 = t1t - t1l;
     //        if (tot1 < 0)
     //        {
-    //            LOG(WARNING) << "Negative ToT " << tot1;
-    //            LOG(WARNING) << "times1: " << t1t << " " << t1l;
+    //            LOG(warning) << "Negative ToT " << tot1;
+    //            LOG(warning) << "times1: " << t1t << " " << t1l;
     //        }
 
     //        tot2 = t2t - t2l;
     //        if (tot2 < 0)
     //        {
-    //            LOG(WARNING) << "Negative ToT " << tot2;
-    //            LOG(WARNING) << "times2: " << t2t << " " << t2l;
+    //            LOG(warning) << "Negative ToT " << tot2;
+    //            LOG(warning) << "times2: " << t2t << " " << t2l;
     //        }
 
     //        if (bar_quer1 && bar_quer2)
@@ -2271,7 +2274,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PSPX
     //----------------------------------------------------------------------
-    //if (fMappedItems.at(DET_PSPX))
+    // if (fMappedItems.at(DET_PSPX))
     //{
     //    UInt_t mult_x[N_PSPX];
     //    UInt_t mult_y[N_PSPX];
@@ -2299,14 +2302,14 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //        UInt_t i = mappedData->GetDetector() - 1;
     //        if (mappedData->GetChannel() > N_STRIPS_PSPX * 2 && mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
     //        {
-    //            // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
+    //            // LOG(info) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
     //            // mappedData->GetChannel();
     //            channel_y[i][mult_y[i]] = mappedData->GetChannel();
     //            mult_y[i]++;
     //        }
     //        else if (mappedData->GetChannel() > 0 && mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
     //        {
-    //            // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
+    //            // LOG(info) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
     //            // mappedData->GetChannel();
     //            channel_x[i][mult_x[i]] = mappedData->GetChannel();
     //            mult_x[i]++;
@@ -2315,10 +2318,10 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
 
     //    for (UInt_t i = 0; i < N_PSPX; i++)
     //    {
-    //        // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i];
+    //        // LOG(info) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i];
     //        fh_pspx_multiplicity_x[i]->Fill(mult_x[i]);
     //        fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
-    //        // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
+    //        // LOG(info) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
 
     //        std::vector<int> v_ch_x, v_ch_y;
     //        for (Int_t j = 0; j < mult_x[i]; j++)
@@ -2362,7 +2365,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    }
     //}
 
-    //if (fCalItems.at(DET_PSPX))
+    // if (fCalItems.at(DET_PSPX))
     //{
     //    Int_t energy_front[N_PSPX];
     //    Int_t energy_back[N_PSPX];
@@ -2395,7 +2398,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
 
     //    for (UInt_t i = 0; i < N_PSPX; i++)
     //    {
-    //        // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i];
+    //        // LOG(info) << "Test " << i << " " << energy_front[i] << " " << energy_back[i];
     //        if (i != 2 && i != 3)
     //        {
     //            fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
@@ -2408,7 +2411,7 @@ void R3BOnlineSpectraS494::Exec(Option_t* option)
     //    }
     //}
 
-    //if (fHitItems.at(DET_PSPX))
+    // if (fHitItems.at(DET_PSPX))
     //{
     //    Int_t nHits = fHitItems.at(DET_PSPX)->GetEntriesFast();
 
@@ -2505,7 +2508,7 @@ void R3BOnlineSpectraS494::FinishTask()
 
     if (fMappedItems.at(DET_PSPX))
     {
-        // LOG(INFO) << "Finish MappedPspx";
+        // LOG(info) << "Finish MappedPspx";
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {

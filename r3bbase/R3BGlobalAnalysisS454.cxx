@@ -104,7 +104,7 @@ InitStatus R3BGlobalAnalysisS454::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BGlobalAnalysisS454::Init ";
+    LOG(info) << "R3BGlobalAnalysisS454::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -136,7 +136,7 @@ InitStatus R3BGlobalAnalysisS454::Init()
     Double_t fexp = float(fsens_SEE + 9);
     Double_t fpow = float(pow(10., fexp));
     calib_SEE = 135641.7786 * fpow;
-    LOG(DEBUG) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
+    LOG(debug) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
 
     fh_Tpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
     fh_Tpat->GetXaxis()->SetTitle("Tpat value");
@@ -441,7 +441,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         {
             R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
 
-            LOG(DEBUG) << "Charge " << aTrack->GetQ() << endl;
+            LOG(debug) << "Charge " << aTrack->GetQ() << endl;
 
             if (aTrack->GetQ() == 2)
             {
@@ -519,7 +519,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
-            LOG(DEBUG) << "PID " << PID << endl;
+            LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -537,10 +537,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     is_alpha = true;
                     alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 4He"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 4He"
                                << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                    LOG(DEBUG) << "px " << pHex << " py " << pHey << " pz " << pHez << endl;
+                    LOG(debug) << "px " << pHex << " py " << pHey << " pz " << pHez << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -557,10 +557,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     is_carbon = true;
                     carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 12C"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 12C"
                                << "x " << XC << " y " << YC << " z " << ZC << endl;
-                    LOG(DEBUG) << "px " << pCx << " py " << pCy << " pz " << pCz << endl;
+                    LOG(debug) << "px " << pCx << " py " << pCy << " pz " << pCz << endl;
                 }
                 if (PID == 1000080160)
                 {
@@ -574,10 +574,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     Pzf = aTrack->GetPz() * 1000.;
                     Pf_tot = sqrt((Pxf * Pxf) + (Pyf * Pyf) + (Pzf * Pzf));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 16O"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 16O"
                                << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                    LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                    LOG(debug) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
                 }
             }
         }
@@ -680,7 +680,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_phi_bc_cm->Fill(phi_bc_cm);
             fh_phi_bc_cm_polar->Fill(phi_bc_cm, 1);
 
-			fh_sum_pz->Fill(alpha_cm.Pz() + carbon_cm.Pz());
+            fh_sum_pz->Fill(alpha_cm.Pz() + carbon_cm.Pz());
 
             /*
                         // rotation in oxygen direction
@@ -1104,7 +1104,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_py_py_cm->Fill(pHey_cm, pCy_cm);
             fh_pz_pz_cm->Fill(pHez_cm, pCz_cm);
 
-			fh_sum_pz->Fill(pHez_cm + pCz_cm);
+            fh_sum_pz->Fill(pHez_cm + pCz_cm);
 
         } // end if chi2
     }     // end if trackHits>1

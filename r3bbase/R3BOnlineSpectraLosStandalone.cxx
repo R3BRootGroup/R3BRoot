@@ -144,7 +144,7 @@ InitStatus R3BOnlineSpectraLosStandalone::Init()
     fWRLos = (TClonesArray*)mgr->GetObject("WRLosData");
     if (!fWRLos)
     {
-        LOG(WARNING) << "R3BOnlineSpectra: WR LOS not found"; // return kFATAL;
+        LOG(warning) << "R3BOnlineSpectra: WR LOS not found"; // return kFATAL;
         wrlos_bool = false;
     }
 
@@ -386,7 +386,7 @@ void R3BOnlineSpectraLosStandalone::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
     Int_t iTrigger = header->GetTrigger();

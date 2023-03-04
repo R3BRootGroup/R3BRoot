@@ -72,6 +72,7 @@ wrData/R3BWRLosData.cxx
 wrData/R3BWRData.cxx
 R3BHit.cxx
 R3BTrack.cxx
+R3BTrackData.cxx
 R3BDouble.cxx
 xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx

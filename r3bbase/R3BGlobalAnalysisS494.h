@@ -32,6 +32,14 @@
 #include <TLorentzVector.h>
 #include <cstdlib>
 
+// For 16O@500AMeV
+#define E_0 (15.99065084 * 931.494028)
+#define E_Beam  (E_0 + 16. * 500.)
+#define BETA  (sqrt(1. - (E_0 * E_0) / (E_Beam * E_Beam)))
+#define GAMMA  (1. / (sqrt(1. - BETA * BETA)))
+// 7 detectors in s494 fi23a,b,fi30-33,tofd
+#define N_DET_MAX 7
+
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -161,30 +169,11 @@ class R3BGlobalAnalysisS494 : public FairTask
 		fvis = vis;
 	}
   private:
-    std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
     TClonesArray* fTrack;
     TClonesArray* fHitItemsCalifa;
-    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
-
-    enum DetectorInstances
-    {
-        DET_FI_FIRST,
-        DET_FI23A = DET_FI_FIRST,
-        DET_FI23B,
-        DET_FI30,
-        DET_FI31,
-        DET_FI32,
-        DET_FI33,
-        DET_FI_LAST = DET_FI33,
-        DET_TOFD,
-        DET_MAX
-    };
-
-#define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
-
-    const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", "Fi30",
-                                                "Fi31",   "Fi32", "Fi33", "Tofd", NULL };
+    
+    const char* fDetectorNames[N_DET_MAX + 1] = {"Fi23a", "Fi23b",  "Fi30", "Fi31"," Fi32", "Fi33", "Tofd", NULL };
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
@@ -419,13 +408,14 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_Erel_vs_theta16O_withcalifa;
 	TH2F* fh_Ecalifa_vs_theta;
 	TH2F* fh_Erel_withCalifa_2d;
+	TH2F* fh_Erel_withCalifa_tof;
+	TH2F* fh_Erel_withCalifa_motherId;
 	TH2F* fh_theta_vs_theta;
 	TH1F* fh_minv_simu;
 	TH1F* fh_minv;
 	
-	TH2F* fh_Erel_vs_xdet[DET_MAX];		                                		
-	TH2F* fh_Erel_vs_ydet[DET_MAX];                                		
-	TH2F* fh_Erel_vs_nhits[2];
+	TH2F* fh_Erel_vs_xdet[N_DET_MAX];		                                		
+	TH2F* fh_Erel_vs_ydet[N_DET_MAX];  
 	TH2F* fh_yfi23_vs_ytofd_bc;
 	TH2F* fh_yfi23_vs_ytofd;
 	TH2F* fh_xfi23_vs_xtofd_bc;

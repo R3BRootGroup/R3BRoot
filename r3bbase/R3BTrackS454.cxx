@@ -121,7 +121,7 @@ InitStatus R3BTrackS454::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BTrackS454::Init ";
+    LOG(info) << "R3BTrackS454::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -218,7 +218,7 @@ InitStatus R3BTrackS454::Init()
     Double_t fexp = float(fsens_SEE + 9);
     Double_t fpow = float(pow(10., fexp));
     calib_SEE = 135641.7786 * fpow;
-    LOG(DEBUG) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
+    LOG(debug) << fsens_SEE << ", " << fexp << ", " << fpow << ", " << calib_SEE << endl;
 
     fh_Tpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
     fh_Tpat->GetXaxis()->SetTitle("Tpat value");
@@ -400,7 +400,7 @@ InitStatus R3BTrackS454::Init()
             const char* detName2;
             detName = fDetectorNames[DET_FI_FIRST + ifibcount];
 
-            LOG(DEBUG) << "I am creating canvas " << detName << endl;
+            LOG(debug) << "I am creating canvas " << detName << endl;
 
             // xy:
             fh_xy_Fib[ifibcount] =
@@ -944,7 +944,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
-            LOG(DEBUG) << "PID " << PID << endl;
+            LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -960,10 +960,10 @@ void R3BTrackS454::Exec(Option_t* option)
                     pHezs = aTrack->GetPz() * 1000.;
                     pHes = sqrt((pHexs * pHexs) + (pHeys * pHeys) + (pHezs * pHezs));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 4He"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 4He"
                                << "x " << XHes << " y " << YHes << " z " << ZHes << endl;
-                    LOG(DEBUG) << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
+                    LOG(debug) << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -978,10 +978,10 @@ void R3BTrackS454::Exec(Option_t* option)
                     pCzs = aTrack->GetPz() * 1000.;
                     pCs = sqrt((pCxs * pCxs) + (pCys * pCys) + (pCzs * pCzs));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 12C"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 12C"
                                << "x " << XCs << " y " << YCs << " z " << ZCs << endl;
-                    LOG(DEBUG) << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+                    LOG(debug) << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
                 }
                 if (PID == 1000080160)
                 {
@@ -995,10 +995,10 @@ void R3BTrackS454::Exec(Option_t* option)
                     Pzf = aTrack->GetPz() * 1000.;
                     Pf_tot = sqrt((Pxf * Pxf) + (Pyf * Pyf) + (Pzf * Pzf));
 
-                    LOG(DEBUG) << "******************************************" << endl;
-                    LOG(DEBUG) << "Track In 16O"
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "Track In 16O"
                                << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                    LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                    LOG(debug) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
                 }
             }
         }
@@ -1547,7 +1547,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 13
         auto detHit13 = fHitItems.at(DET_FI13);
         Int_t nHits13 = detHit13->GetEntriesFast();
-        LOG(DEBUG) << "Fi13 hits: " << nHits13 << endl;
+        LOG(debug) << "Fi13 hits: " << nHits13 << endl;
 
         Int_t mult13 = 0;
         for (Int_t ihit13 = 0; ihit13 < nHits13; ihit13++)
@@ -1659,7 +1659,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 11
         auto detHit11 = fHitItems.at(DET_FI11);
         Int_t nHits11 = detHit11->GetEntriesFast();
-        LOG(DEBUG) << "Fi11 hits: " << nHits11 << endl;
+        LOG(debug) << "Fi11 hits: " << nHits11 << endl;
         Int_t mult11 = 0;
         for (Int_t ihit11 = 0; ihit11 < nHits11; ihit11++)
         {
@@ -1769,7 +1769,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 10
         auto detHit10 = fHitItems.at(DET_FI10);
         Int_t nHits10 = detHit10->GetEntriesFast();
-        LOG(DEBUG) << "Fi10 hits: " << nHits10 << endl;
+        LOG(debug) << "Fi10 hits: " << nHits10 << endl;
         Int_t mult10 = 0;
         for (Int_t ihit10 = 0; ihit10 < nHits10; ihit10++)
         {
@@ -1872,7 +1872,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 12
         auto detHit12 = fHitItems.at(DET_FI12);
         Int_t nHits12 = detHit12->GetEntriesFast();
-        LOG(DEBUG) << "Fi12 hits: " << nHits12 << endl;
+        LOG(debug) << "Fi12 hits: " << nHits12 << endl;
         Int_t mult12 = 0;
         for (Int_t ihit12 = 0; ihit12 < nHits12; ihit12++)
         {
@@ -1975,7 +1975,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 3a
         auto detHit3a = fHitItems.at(DET_FI3A);
         Int_t nHits3a = detHit3a->GetEntriesFast();
-        LOG(DEBUG) << "Fi3a hits: " << nHits3a << endl;
+        LOG(debug) << "Fi3a hits: " << nHits3a << endl;
         Int_t mult3a = 0;
         fh_mult_Fib[fi3a]->Fill(nHits3a);
         for (Int_t ihit3a = 0; ihit3a < nHits3a; ihit3a++)
@@ -2076,7 +2076,7 @@ void R3BTrackS454::Exec(Option_t* option)
         // loop over fiber 3b
         auto detHit3b = fHitItems.at(DET_FI3B);
         Int_t nHits3b = detHit3b->GetEntriesFast();
-        LOG(DEBUG) << "Fi3b hits: " << nHits3b << endl;
+        LOG(debug) << "Fi3b hits: " << nHits3b << endl;
         Int_t mult3b = 0;
         fh_mult_Fib[fi3b]->Fill(nHits3b);
 
@@ -2385,7 +2385,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
             for (Int_t i = 0; i < ndet; i++)
             {
-                LOG(DEBUG2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i]
+                LOG(debug2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i]
                             << " max q: " << qMax[i] << endl;
             }
         }
@@ -2548,7 +2548,7 @@ void R3BTrackS454::Exec(Option_t* option)
                     qTrack[i] = -1000.;
                 }
                 Int_t charge = 0;
-                LOG(DEBUG2) << "# of points back" << countdet << endl;
+                LOG(debug2) << "# of points back" << countdet << endl;
                 for (Int_t i = 0; i < countdet; i++)
                 {
 
@@ -2729,7 +2729,7 @@ void R3BTrackS454::Exec(Option_t* option)
                     qTrack[i] = -1000.;
                 }
                 Int_t charge = 0;
-                LOG(DEBUG2) << "# of points back" << countdet << endl;
+                LOG(debug2) << "# of points back" << countdet << endl;
                 for (Int_t i = 0; i < countdet; i++)
                 {
 
@@ -2988,7 +2988,7 @@ void R3BTrackS454::Exec(Option_t* option)
                     qTrack[i] = -1000.;
                 }
                 Int_t charge = 0;
-                LOG(DEBUG2) << "# of points back" << countdet << endl;
+                LOG(debug2) << "# of points back" << countdet << endl;
                 for (Int_t i = 0; i < countdet; i++)
                 {
 
@@ -3058,7 +3058,7 @@ void R3BTrackS454::Exec(Option_t* option)
             Double_t Erelbs = m_invs - mHe - mC;
 
             fh_Erel_simu->Fill(Erelbs);
-            LOG(DEBUG) << "Theta 26 simu: " << theta_26s << " Erel simu: " << Erelas << " " << Erelbs << endl;
+            LOG(debug) << "Theta 26 simu: " << theta_26s << " Erel simu: " << Erelas << " " << Erelbs << endl;
         }
 
         for (Int_t i = 0; i < 12; i++)
@@ -3108,8 +3108,8 @@ void R3BTrackS454::Output1(Double_t track[12], Double_t chi[6])
     pCy = track[10];
     pCz = track[11];
 
-    LOG(DEBUG) << "He: " << pHex << "  " << pHey << "  " << pHez << endl;
-    LOG(DEBUG) << "C: " << pCx << "  " << pCy << "  " << pCz << endl;
+    LOG(debug) << "He: " << pHex << "  " << pHey << "  " << pHez << endl;
+    LOG(debug) << "C: " << pCx << "  " << pCy << "  " << pCz << endl;
 
     fh_target_xy->Fill(track[0] * 100., track[1] * 100.);
     fh_px_He->Fill(pHex);
@@ -3158,11 +3158,11 @@ void R3BTrackS454::Output2(Double_t track_parameter[12], Double_t chi_single_par
 {
     // compare
 
-    LOG(DEBUG) << "******************************************" << endl;
-    LOG(DEBUG) << "chi_sqingle_parameter " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
-    LOG(DEBUG) << "xyz: " << track_parameter[0] * 100. << "  " << track_parameter[1] * 100. << "  "
+    LOG(debug) << "******************************************" << endl;
+    LOG(debug) << "chi_sqingle_parameter " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
+    LOG(debug) << "xyz: " << track_parameter[0] * 100. << "  " << track_parameter[1] * 100. << "  "
                << track_parameter[2] * 100. << endl;
-    LOG(DEBUG) << "p: " << track_parameter[3] << "  " << track_parameter[4] << "  " << track_parameter[5] << endl;
+    LOG(debug) << "p: " << track_parameter[3] << "  " << track_parameter[4] << "  " << track_parameter[5] << endl;
     Double_t p_tot = sqrt(track_parameter[3] * track_parameter[3] + track_parameter[4] * track_parameter[4] +
                           track_parameter[5] * track_parameter[5]);
 

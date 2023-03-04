@@ -108,7 +108,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraPdc::Init ";
+    LOG(info) << "R3BOnlineSpectraPdc::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -219,7 +219,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_1_mult->GetXaxis()->SetTitle("mult");
         fh_fi0_1_mult->GetYaxis()->SetTitle("Counts");
 
-        fh_fi0_0_Tot = new TH2F("Fi0_ToT", "Fi0 ToT", ch, 0., ch, int(30./0.4167), 0, 30);
+        fh_fi0_0_Tot = new TH2F("Fi0_ToT", "Fi0 ToT", ch, 0., ch, int(30. / 0.4167), 0, 30);
         fh_fi0_0_Tot->GetXaxis()->SetTitle("Fiber");
         fh_fi0_0_Tot->GetYaxis()->SetTitle("ToT");
 
@@ -227,7 +227,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_1_Tot->GetXaxis()->SetTitle("Fiber");
         fh_fi0_1_Tot->GetYaxis()->SetTitle("ToT");
 
-        fh_fi0_0_Time = new TH2F("Fi0_Time", "Fi0 time", ch, 0., ch, int(200./0.4167), -100, 100);
+        fh_fi0_0_Time = new TH2F("Fi0_Time", "Fi0 time", ch, 0., ch, int(200. / 0.4167), -100, 100);
         fh_fi0_0_Time->GetXaxis()->SetTitle("Fiber");
         fh_fi0_0_Time->GetYaxis()->SetTitle("time");
 
@@ -235,7 +235,8 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_1_Time->GetXaxis()->SetTitle("Fiber");
         fh_fi0_1_Time->GetYaxis()->SetTitle("time");
 
-        fh_fi0_tot2_tot1 = new TH2F("Fi0_ToT1_vs_ToT2", "Fi0 ToT1 vs. ToT2", int(30./0.4167), 0, 30, int(30./0.4167), 0, 30);
+        fh_fi0_tot2_tot1 =
+            new TH2F("Fi0_ToT1_vs_ToT2", "Fi0 ToT1 vs. ToT2", int(30. / 0.4167), 0, 30, int(30. / 0.4167), 0, 30);
         fh_fi0_tot2_tot1->GetXaxis()->SetTitle("ToT1");
         fh_fi0_tot2_tot1->GetYaxis()->SetTitle("ToT2");
 
@@ -264,7 +265,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_1_mult_mc->GetXaxis()->SetTitle("mult");
         fh_fi0_1_mult_mc->GetYaxis()->SetTitle("Counts");
 
-        fh_fi0_0_Tot_mc = new TH2F("Fi0_ToT_mc", "Fi0 ToT with cuts", ch, 0., ch, int(30./0.4167), 0, 30);
+        fh_fi0_0_Tot_mc = new TH2F("Fi0_ToT_mc", "Fi0 ToT with cuts", ch, 0., ch, int(30. / 0.4167), 0, 30);
         fh_fi0_0_Tot_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi0_0_Tot_mc->GetYaxis()->SetTitle("ToT");
 
@@ -272,7 +273,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fh_fi0_1_Tot_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi0_1_Tot_mc->GetYaxis()->SetTitle("ToT");
 
-        fh_fi0_0_Time_mc = new TH2F("Fi0_Time_mc", "Fi0 time with cuts", ch, 0., ch, int(200./0.4167), -100, 100);
+        fh_fi0_0_Time_mc = new TH2F("Fi0_Time_mc", "Fi0 time with cuts", ch, 0., ch, int(200. / 0.4167), -100, 100);
         fh_fi0_0_Time_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi0_0_Time_mc->GetYaxis()->SetTitle("time");
 
@@ -793,7 +794,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
     /*
@@ -1012,7 +1013,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             if (x[plane - 1] > 0)
             {
 
-                //cout << "Plane: " << plane << " wire: " << wire << " x: " << x[plane - 1] << endl;
+                // cout << "Plane: " << plane << " wire: " << wire << " x: " << x[plane - 1] << endl;
 
                 fh_Pdc_x[plane - 1]->Fill(x[plane - 1]);
                 xPair[plane - 1] = x[plane - 1];
@@ -1023,23 +1024,18 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             if (y[plane - 1] > 0)
             {
 
-                //cout << "Plane: " << plane << " wire: " << wire << " y: " << y[plane - 1] << endl;
+                // cout << "Plane: " << plane << " wire: " << wire << " y: " << y[plane - 1] << endl;
 
                 fh_Pdc_y[plane - 1]->Fill(y[plane - 1]);
                 yPair[plane - 1] = y[plane - 1];
                 TotMax[plane - 1] = eloss[plane - 1];
             }
-            
+
             if (plane == 4 && y[plane - 1] > 350. && y[plane - 1] < 390.)
             {
-                yPdc4test = y[plane - 1] ;
+                yPdc4test = y[plane - 1];
             }
-            
-
         }
-		
-		
-
 
         Bool_t true1 = false, true2 = false, true3 = false;
 
@@ -1106,8 +1102,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             // cout << "Test: " << xPdc1 << "  " << yPdc2 << "  " << xPdc3 << "  " << yPdc4 << endl;
             fh_Pdc_xvsx->Fill(xPdc1, xPdc3);
             fh_Pdc_yvsy->Fill(yPdc2, yPdc4);
-			fh_Pdc_xvsy_fi0->Fill((xPdc1+xPdc3)/2., (yPdc2+yPdc4)/2.);
-
+            fh_Pdc_xvsy_fi0->Fill((xPdc1 + xPdc3) / 2., (yPdc2 + yPdc4) / 2.);
         }
     }
     if (ipl[0] > 1 || ipl[1] > 1 || ipl[2] > 1 || ipl[3] > 1)
@@ -1184,8 +1179,8 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 fh_fi0_0_Tot->Fill(iFib, tot);
                 fh_fi0_0_Time->Fill(iFib, tMAPMT);
             }
-			Double_t tot1 = 0.;
-			Double_t tot2 = 0.;
+            Double_t tot1 = 0.;
+            Double_t tot2 = 0.;
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
                 tMAPMT = 0. / 0.;
@@ -1199,19 +1194,19 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 tMAPMT = hit->GetTime();  //+ 5444.;
                 tot = hit->GetEloss();
 
-				// fiber correlation plot. Loop again over all fibers
-				for (Int_t jhit = 0; jhit < nHits; jhit++)
-				{
-					R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi0->At(jhit);
-					if (!hit2)
-						continue;
+                // fiber correlation plot. Loop again over all fibers
+                for (Int_t jhit = 0; jhit < nHits; jhit++)
+                {
+                    R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi0->At(jhit);
+                    if (!hit2)
+                        continue;
 
-					iFib2 = hit2->GetFiberId(); // 1..
-					if(iFib != iFib2)
-					{
-						fh_fi0_cor->Fill(iFib,iFib2);
-					}
-				}
+                    iFib2 = hit2->GetFiberId(); // 1..
+                    if (iFib != iFib2)
+                    {
+                        fh_fi0_cor->Fill(iFib, iFib2);
+                    }
+                }
 
                 // cuts ***********************************
                 // if not in the right time window, go to next
@@ -1220,8 +1215,10 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                     continue;
                 }
 
-				if(nHits == 2 && ihit == 0) tot1 = tot;
-				if(nHits == 2 && ihit == 1) tot2 = tot;
+                if (nHits == 2 && ihit == 0)
+                    tot1 = tot;
+                if (nHits == 2 && ihit == 1)
+                    tot2 = tot;
 
                 if (tot < 15 || tot > 25)
                 {
@@ -1243,11 +1240,11 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
                 // if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
                 // if (yPdc4 > 0. && nHits > 0 && nHits < 2 )
-                //if (yPdc4 > 0. && nHits > 0 && mult_pdc4 == 1)
-                //if (yPdc4 > 0. && nHits > 0 )
-                if (yPdc4test > 0. && nHits > 0 )
+                // if (yPdc4 > 0. && nHits > 0 && mult_pdc4 == 1)
+                // if (yPdc4 > 0. && nHits > 0 )
+                if (yPdc4test > 0. && nHits > 0)
                 {
-                    //fh_fi0_0_pdc->Fill(iFib, yPdc4);
+                    // fh_fi0_0_pdc->Fill(iFib, yPdc4);
                     fh_fi0_0_pdc->Fill(iFib, yPdc4test);
                     fh_fi0_pdc_time->Fill(tMAPMT, tPair[3]);
                     fh_fi0_pdc_eloss->Fill(tot, eloss[3]);
@@ -1260,14 +1257,14 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                     // fh_fi0_1_pdc->Fill(iFib, xPdc3test);
                 }
             } // end for(ihit)
-			if(xPdc1 > 0 && xPdc3 > 0 && yPdc2 > 0 && yPdc4 > 0 && nHits>0)
-			{
-				fh_Pdc_xvsx_fi0->Fill(xPdc1, xPdc3);
-				fh_Pdc_yvsy_fi0->Fill(yPdc2, yPdc4);
-				fh_fi0_eff->Fill((xPdc1+xPdc3)/2., (yPdc2+yPdc4)/2.);
-			}
+            if (xPdc1 > 0 && xPdc3 > 0 && yPdc2 > 0 && yPdc4 > 0 && nHits > 0)
+            {
+                fh_Pdc_xvsx_fi0->Fill(xPdc1, xPdc3);
+                fh_Pdc_yvsy_fi0->Fill(yPdc2, yPdc4);
+                fh_fi0_eff->Fill((xPdc1 + xPdc3) / 2., (yPdc2 + yPdc4) / 2.);
+            }
 
-            fh_fi0_tot2_tot1->Fill(tot1,tot2);
+            fh_fi0_tot2_tot1->Fill(tot1, tot2);
             Int_t multi_fi0 = 0;
             Int_t multi_fi1 = 0;
             for (Int_t i = 0; i < 128; i++)
@@ -1278,7 +1275,6 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 fh_fi0_0_mult_mc->Fill(multi_fi0);
         }
     }
-
 
     //----------------------------------------------------------------------
     // Fiber1 detectors
@@ -1670,7 +1666,7 @@ void R3BOnlineSpectraPdc::FinishTask()
         fh_Pdc_xvsx_fi0->Write();
         fh_Pdc_xvsx->Write();
         fh_Pdc_yvsy_fi0->Write();
-        fh_Pdc_xvsy_fi0->Write();        
+        fh_Pdc_xvsy_fi0->Write();
         fh_Pdc_yvsy->Write();
         fh_Pdc_wvsw->Write();
         fh_pdc_ebene4->Write();
