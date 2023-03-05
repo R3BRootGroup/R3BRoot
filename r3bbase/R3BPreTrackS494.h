@@ -325,13 +325,16 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_califa_time;
 	TH2F* fh_califa_energy_dc;
 	TH2F* fh_califa_cluster;
-	TH2F* fh_califa_energy_rolu;
-	TH2F* fh_califa_time_rolu;
+	TH2F* fh_califa_overflow_rolu;
+	TH2F* fh_califa_overflow_antirolu;
 	TH2F* fh_califa_cluster_rolu;
-	TH1F* fh_califa_overflow;
-	TH1F* fh_califa_good;
+	TH2F* fh_califa_overflow;
+	TH2F* fh_califa_good;
+	TH2F* fh_califa_good_rolu;
+	TH2F* fh_califa_good_antirolu;
 	TH2F* fh_califa_motherid_clustertype;
-	TH2F* fh_califa_crystallist;
+	TH2F* fh_califa_crystallist_gamma;
+	TH2F* fh_califa_crystallist_satu;
 	
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];

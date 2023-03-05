@@ -62,8 +62,7 @@ class R3BFragmentTrackerS494 : public FairTask
     void SetSimu(Int_t simu) {fSimu = simu;}
     void SetForward(Bool_t forward) {fForward = forward;}
     void SetOptimizeGeometry(Int_t optimizeGeometry) {fOptimizeGeometry = optimizeGeometry;}
-    void SetBfield(Double_t Bfield) {fBfield = Bfield;}
-    void SetOutput(Bool_t WriteOut){fWriteOut = WriteOut;}
+    void SetPairs(Bool_t pairs) {fPairs = pairs;}
     void SetPlimits(Double_t pmin, Double_t pmax){
 		fPmin=pmin;
 		fPmax=pmax;
@@ -80,18 +79,24 @@ class R3BFragmentTrackerS494 : public FairTask
     R3BTrackingSetup* fDetectorsLeft; // array of R3BTrackingDetector
     R3BTrackingSetup* fDetectorsRight; // array of R3BTrackingDetector
     R3BTGeoPar* fGeo;
+ // input arrays   
+    std::vector<TClonesArray*> fHitItems;
+    TClonesArray* fMCTrack;
+ // output ararys   
+    TClonesArray* fTrackItems;
+    Int_t fNofTrackItems;
+    TClonesArray* fCalifaHitItems;       
+    Int_t fNofCalifaHitItems = 0;
+    
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;
-    TClonesArray* fTrackItems;
-    TClonesArray* fMCTrack;
-    std::vector<TClonesArray*> fHitItems;
-    Int_t fNofTrackItems;
+    
     Int_t fNEvents = 0;
     Int_t fNEventsLeft = 0;
     Int_t fNEventsRight=0;
     Int_t sumwrite = 0;
     Int_t counter1 = 0, fNEvents_nonull=0, counterHe=0, counterC=0,counter_wo = 0;
-    Double_t fBfield;
+    Bool_t fPairs;
     
     Int_t icount100 = 0;
     
@@ -145,7 +150,6 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fForward;
     Bool_t fOptimizeGeometry;
     Double_t fAfterGladResolution;
-    Bool_t fWriteOut;
     Int_t eventCounter = 0;
     Double_t minChi2;
     Double_t minChi2_12C;

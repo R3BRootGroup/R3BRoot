@@ -706,7 +706,6 @@ InitStatus R3BGlobalAnalysisS494::Init()
     Double_t binmin = 0, binmax = 10;
     for (Int_t det = 0; det < N_DET_MAX; det++)
     {
-        cout << "making hist for det: " << det << " " << fDetectorNames[det] << endl;
         if (det < 2)
         {
             nbins = 429;
@@ -827,7 +826,9 @@ InitStatus R3BGlobalAnalysisS494::Init()
             checkCalifa->cd(9);
             fh_theta_vs_theta->Draw("colz");
         }
-
+    }
+    if (fvis)
+    {
         TCanvas* check = new TCanvas("CheckingGlobal", "CheckingGlobal", 10, 10, 900, 900);
         if (fPairs)
         {
@@ -994,7 +995,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
                 fh_dpy_dpx->Draw("colz");
             }
         }
-    }
+    } // for fvis
 
     return kSUCCESS;
 }

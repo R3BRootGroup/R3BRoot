@@ -21,11 +21,11 @@
 
 #pragma link C++ class R3BTPropagator+;
 #pragma link C++ class R3BTGeoPar+;
-//#pragma link C++ class R3BFragmentTrackerS494+;
-#pragma link C++ class R3BFragmentTrackerPAS+;
+#pragma link C++ class R3BFragmentTrackerS494+;
+//#pragma link C++ class R3BFragmentTrackerPAS+;
 #pragma link C++ class R3BFragmentFitterGeneric+;
-//#pragma link C++ class R3BFragmentFitterChi2S494+;
-#pragma link C++ class R3BFragmentFitterChi2PAS+;
+#pragma link C++ class R3BFragmentFitterChi2S494+;
+//#pragma link C++ class R3BFragmentFitterChi2PAS+;
 #pragma link C++ class R3BTrackingDetector+;
 #pragma link C++ class R3BTrackingParticle+;
 #pragma link C++ class R3BTrackingSetup+;

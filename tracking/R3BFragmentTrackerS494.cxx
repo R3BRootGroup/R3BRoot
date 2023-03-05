@@ -59,6 +59,7 @@
 
 #include <fstream>
 #include <iostream>
+#define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
 #define SPEED_OF_LIGHT 29.9792458 // cm/ns
@@ -82,10 +83,12 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fEnergyLoss(kTRUE)
     , fSimu(kFALSE)
     , fForward(kTRUE)
-    , fBfield(-1710.)
+    , fPairs(kTRUE)
     , fOptimizeGeometry(kFALSE)
     , fTrackItems(new TClonesArray("R3BTrackData"))
-    , fNofTrackItems()
+    , fCalifaHitItems(new TClonesArray("R3BCalifaClusterData"))
+    , fNofTrackItems(0)
+    , fNofCalifaHitItems(0)
     , fPmax(20000)
     , fPmin(0)
 {
@@ -188,7 +191,11 @@ InitStatus R3BFragmentTrackerS494::Init()
     }
 
     //    man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
+    // Register track data:
     man->Register("TrackData", "Land", fTrackItems, kTRUE);
+    // If califa hit present, also register:
+    if (fHitItems.at(0))
+        man->Register("CalifaClusterData", "Land", fCalifaHitItems, kTRUE);
 
     if (!InitPropagator())
     {
@@ -559,7 +566,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Bool_t debug_loopout = false;
     Bool_t debug_loopin = false;
     Bool_t bestevents = false;
-    Bool_t bestevents_writeout = false;
 
     /* this part needs to be adopted to each experiment / setup
      *
@@ -599,7 +605,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                  << "  " << fi30->hits.size() << endl;
         }
 
-    if (abs(fBfield) == 1710.0)
+    if (fPairs)
     {
         if (tof->hits.size() < 2)
             return;
@@ -859,7 +865,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Bool_t alpha = kFALSE;
     Bool_t carbon = kFALSE;
     Bool_t oxygen = kFALSE;
-    Bool_t writeOutC = kFALSE;
 
     R3BTrackingParticle* candidate;
     // The idea is to loop twice over the ToF wall hits.
@@ -870,7 +875,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     Int_t lmin;
     Int_t lmax;
-    if (fBfield != -1710.0)
+    if (!fPairs)
     {
         lmin = 0;
         lmax = 1;
@@ -2183,6 +2188,34 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                          0,
                          posHe,
                          det_hit_tHe[7]);
+
+                if (fHitItems.at(DET_CALIFA))
+                {
+                    // CALIFA
+                    auto detCalifa = fHitItems.at(DET_CALIFA);
+                    Int_t nHitsCalifa = detCalifa->GetEntriesFast();
+                    for (Int_t ihitC = 0; ihitC < nHitsCalifa; ihitC++)
+                    {
+                        R3BCalifaClusterData* hitCalifa = (R3BCalifaClusterData*)detCalifa->At(ihitC);
+                        if (!hitCalifa)
+                            continue;
+
+                        if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
+                            hitCalifa->GetMotherCrystal() < 1953 &&
+                            !(IS_NAN(hitCalifa->GetEnergy()))) // gammas in barrel
+                        {
+                            new ((*fCalifaHitItems)[fNofCalifaHitItems++])
+                                R3BCalifaClusterData(hitCalifa->GetCrystalList(),
+                                                     hitCalifa->GetEnergy(),
+                                                     hitCalifa->GetNf(),
+                                                     hitCalifa->GetNs(),
+                                                     hitCalifa->GetTheta(),
+                                                     hitCalifa->GetPhi(),
+                                                     hitCalifa->GetTime(),
+                                                     hitCalifa->GetClusterType());
+                        }
+                    }
+                }
             }
             if (l == 0)
             {
@@ -2317,7 +2350,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         //} // end for TofD
     } // end for two particle (12C and 4He)
 
-    if ((alpha && carbon && fBfield == -1710.0))
+    if ((alpha && carbon && fPairs))
     {
         counter1++;
 
@@ -2332,7 +2365,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
     }
 
-    if ((oxygen && fBfield != -1710.0))
+    if ((oxygen && !fPairs))
     {
         counter1++;
 
@@ -2355,19 +2388,24 @@ void R3BFragmentTrackerS494::FinishEvent()
             fHitItems.at(det)->Clear();
         }
     }
+    if (fHitItems.at(DET_CALIFA))
+    {
+        fNofCalifaHitItems = 0;
+        fCalifaHitItems->Clear();
+    }
 }
 
 void R3BFragmentTrackerS494::Finish()
 {
     cout << "Total chi2 for mass: " << totalChi2Mass / totalEvents << endl;
     //    cout << "Total chi2 for momentum: " << totalChi2P / totalEvents << endl;
-    if (fBfield == -1710.0)
+    if (fPairs)
     {
         cout << "found pairs: " << counter1 << endl;
         cout << "found 4He:   " << counterHe << endl;
         cout << "found 12C:   " << counterC << endl;
     }
-    if (fBfield != -1710.0)
+    if (!fPairs)
     {
         cout << "found 16O: " << counter1 << endl;
     }

@@ -206,10 +206,10 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib - 1 << ", " << time_ns << ", " << mapped->IsLeading() << endl;
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
                 }
@@ -219,7 +219,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
                 }
@@ -231,10 +231,10 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib - 1 << ", " << time_ns << ", " << mapped->IsLeading() << endl;
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
                 }
@@ -249,10 +249,10 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib - 1 << ", " << time_ns << ", " << mapped->IsLeading() << endl;
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
                 }
@@ -262,7 +262,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
 
@@ -291,10 +291,10 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
                     new ((*fCalItems)[fNoCalItems++]) // fCalItems->GetEntriesFast()])
                         R3BFiberMAPMTCalData(mapped->GetSide(), iFib + 4, mapped->IsLeading(), time_ns);
 
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib - 1 << ", " << time_ns << ", " << mapped->IsLeading() << endl;
-                    if (fName == "Fi23a" && fnEvents == 60929)
+                    if (fName == "Fi23a" && fnEvents == -60929)
                         cout << "Mapped2Cal Fi23a: " << fnEvents << ", " << mapped->GetSide() << "; " << channel << "; "
                              << iFib << ", " << time_ns << ", " << mapped->IsLeading() << endl;
                 }

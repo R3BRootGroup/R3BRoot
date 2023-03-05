@@ -839,61 +839,91 @@ InitStatus R3BPreTrackS494::Init()
     {
         fh_califa_energy = new TH2F("fh_califa_energy", "Califa E vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
         fh_califa_energy->GetYaxis()->SetTitle("Energy / keV");
-        fh_califa_energy->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_energy->GetXaxis()->SetTitle("Num crystals in clustre");
 
         fh_califa_energy_dc =
-            new TH2F("fh_califa_energy_dc", "Califa E  doppler-corrected vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
+            new TH2F("fh_califa_energy_dc", "Califa E  Doppler-corrected vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
         fh_califa_energy_dc->GetYaxis()->SetTitle("Energy / keV");
-        fh_califa_energy_dc->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_energy_dc->GetXaxis()->SetTitle("Num crystals in clustre");
 
         fh_califa_time = new TH2F("fh_califa_time", "Califa time vs Nb crystals", 50, 0, 50, 1500, 1000., 4000.);
         fh_califa_time->GetYaxis()->SetTitle("time / ns");
-        fh_califa_time->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_time->GetXaxis()->SetTitle("Num crystals in clustre");
 
         fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 200, -200, 200);
         fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
         fh_califa_tofd->GetXaxis()->SetTitle("califa tome / ns");
 
         fh_califa_energy_select =
-            new TH2F("fh_califa_energy_select", "Califa E vs Nb crystals", 50, 0, 50, 1000, 0., 10000.);
+            new TH2F("fh_califa_energy_select", "Califa E Doppler-corrected after cuts", 50, 0, 50, 1000, 0., 10000.);
         fh_califa_energy_select->GetYaxis()->SetTitle("Energy / MeV");
-        fh_califa_energy_select->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_energy_select->GetXaxis()->SetTitle("Num crystals in clustre");
 
         fh_califa_cluster =
-            new TH2F("fh_califa_cluster", "Califa MotherId vs Nb crystals", 50, 0, 50, 1100, 900., 2000.);
+            new TH2F("fh_califa_cluster", "Califa MotherId vs Nb crystals rolu=false", 50, 0, 50, 1100, 900., 2000.);
         fh_califa_cluster->GetYaxis()->SetTitle("MotherId");
-        fh_califa_cluster->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_cluster->GetXaxis()->SetTitle("Num crystals in clustre");
 
-        fh_califa_energy_rolu =
-            new TH2F("fh_califa_energy_rolu", "Califa E vs Nb crystals rolu=true", 50, 0, 50, 1000, 0., 10000.);
-        fh_califa_energy_rolu->GetYaxis()->SetTitle("Energy / keV");
-        fh_califa_energy_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_overflow_antirolu = new TH2F(
+            "fh_califa_overflow_antirolu", "Califa overflow is_nan(en) rolu=false", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_overflow_antirolu->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_overflow_antirolu->GetYaxis()->SetTitle("motherId");
 
-        fh_califa_time_rolu =
-            new TH2F("fh_califa_time_rolu", "Califa time vs Nb crystals rolu=true", 50, 0, 50, 1500, 1000., 4000.);
-        fh_califa_time_rolu->GetYaxis()->SetTitle("time / ns");
-        fh_califa_time_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_overflow_rolu =
+            new TH2F("fh_califa_overflow_rolu", "Califa overflow is_nan(en) rolu=true", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_overflow_rolu->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_overflow_rolu->GetYaxis()->SetTitle("motherId");
 
         fh_califa_cluster_rolu = new TH2F(
             "fh_califa_cluster_rolu", "Califa MotherId vs Nb crystals rolu=true", 50, 0, 50, 1100, 900., 2000.);
         fh_califa_cluster_rolu->GetYaxis()->SetTitle("MotherId");
-        fh_califa_cluster_rolu->GetXaxis()->SetTitle("Nb crystals in clustre");
+        fh_califa_cluster_rolu->GetXaxis()->SetTitle("Num crystals in clustre");
 
-        fh_califa_overflow = new TH1F("fh_califa_overflow", "Califa overflow is_nan(en)", 1100, 900., 2000.);
-        fh_califa_overflow->GetXaxis()->SetTitle("motherId");
+        fh_califa_overflow =
+            new TH2F("fh_califa_overflow", "Califa overflow is_nan(en) after cuts", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_overflow->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_overflow->GetYaxis()->SetTitle("motherId");
 
-        fh_califa_good = new TH1F("fh_califa_good", "Califa good !(is:nan(en))", 1100, 900., 2000.);
-        fh_califa_good->GetXaxis()->SetTitle("motherId");
+        fh_califa_good_rolu =
+            new TH2F("fh_califa_good_rolu", "Califa good !(is:nan(en)) rolu=true", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_good_rolu->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_good_rolu->GetYaxis()->SetTitle("motherId");
+
+        fh_califa_good_antirolu =
+            new TH2F("fh_califa_good_antirolu", "Califa good !(is:nan(en)) rolu=false", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_good_antirolu->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_good_antirolu->GetYaxis()->SetTitle("motherId");
+
+        fh_califa_good = new TH2F("fh_califa_good", "Califa good !(is:nan(en)) after cuts", 5, 0, 5, 1100, 900., 2000.);
+        fh_califa_good->GetXaxis()->SetTitle("ClusterType");
+        fh_califa_good->GetYaxis()->SetTitle("motherId");
 
         fh_califa_motherid_clustertype =
             new TH2F("fh_califa_motherid_clustertype", "ClusterType vs MotherId", 1100, 900., 2000., 5, 0, 5);
         fh_califa_motherid_clustertype->GetXaxis()->SetTitle("MotherID");
         fh_califa_motherid_clustertype->GetYaxis()->SetTitle("ClusterType");
 
-        fh_califa_crystallist =
-            new TH2F("fh_califa_crystallist", "ClusterNum vs MotherId", 1100, 900., 2000., 1100, 900., 2000);
-        fh_califa_crystallist->GetYaxis()->SetTitle("MotherID");
-        fh_califa_crystallist->GetXaxis()->SetTitle("ClusterNum");
+        fh_califa_crystallist_gamma = new TH2F("fh_califa_crystallist_gamma",
+                                               "CrystalIds vs MotherId for ClusterType==1",
+                                               1100,
+                                               900.,
+                                               2000.,
+                                               1100,
+                                               900.,
+                                               2000);
+        fh_califa_crystallist_gamma->GetYaxis()->SetTitle("MotherId of cluster");
+        fh_califa_crystallist_gamma->GetXaxis()->SetTitle("CrystalId in cluster");
+
+        fh_califa_crystallist_satu = new TH2F("fh_califa_crystallist_satu",
+                                              "CrystalIds vs MotherId for ClusterType==2",
+                                              1100,
+                                              900.,
+                                              2000.,
+                                              1100,
+                                              900.,
+                                              2000);
+        fh_califa_crystallist_satu->GetYaxis()->SetTitle("MotherId of cluster");
+        fh_califa_crystallist_satu->GetXaxis()->SetTitle("CrystalId in cluster");
     }
 
     // Output spectra:
@@ -1103,6 +1133,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 if (!hitCalifa)
                     continue;
 
+                if (IS_NAN(hitCalifa->GetEnergy()))
+                    fh_califa_overflow_rolu->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+                else
+                    fh_califa_good_rolu->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+
                 if (hitCalifa->GetClusterType() == 1) // gammas
                 {
                     ULong64_t timeCalifa = hitCalifa->GetTime();
@@ -1113,8 +1148,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
                     if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
                         hitCalifa->GetMotherCrystal() < 1953 && !(IS_NAN(Energy))) // barrel gamma-channels
                     {
-                        fh_califa_energy_rolu->Fill(hitCalifa->GetCrystalList().size(), Energy);
-                        fh_califa_time_rolu->Fill(hitCalifa->GetCrystalList().size(), timerelCalifa);
                         fh_califa_cluster_rolu->Fill(hitCalifa->GetCrystalList().size(), hitCalifa->GetMotherCrystal());
                     }
                 }
@@ -1167,10 +1200,19 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
                 Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
             */
+            if (IS_NAN(Energy))
+                fh_califa_overflow_antirolu->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+            else
+                fh_califa_good_antirolu->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+
             fh_califa_motherid_clustertype->Fill(hitCalifa->GetMotherCrystal(), hitCalifa->GetClusterType());
             for (Int_t ic = 0; ic < hitCalifa->GetCrystalList().size(); ic++)
             {
-                fh_califa_crystallist->Fill(hitCalifa->GetCrystalList().at(ic), hitCalifa->GetMotherCrystal());
+                if (hitCalifa->GetClusterType() == 1)
+                    fh_califa_crystallist_gamma->Fill(hitCalifa->GetCrystalList().at(ic),
+                                                      hitCalifa->GetMotherCrystal());
+                else if (hitCalifa->GetClusterType() == 2)
+                    fh_califa_crystallist_satu->Fill(hitCalifa->GetCrystalList().at(ic), hitCalifa->GetMotherCrystal());
             }
             if (hitCalifa->GetClusterType() == 1 && !(IS_NAN(Energy))) // gammas
             {
@@ -5918,30 +5960,28 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 Double_t Energy = hitCalifa->GetEnergy();
                 Double_t Energy_dc = hitCalifa->GetEnergy() * GAMMA * (1 - BETA * TMath::Cos(theta));
 
+                if (IS_NAN(Energy))
+                    fh_califa_overflow->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+                else
+                    fh_califa_good->Fill(hitCalifa->GetClusterType(), hitCalifa->GetMotherCrystal());
+
                 if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
-                    hitCalifa->GetMotherCrystal() < 1953) // gammas in barrel
+                    hitCalifa->GetMotherCrystal() < 1953 && !(IS_NAN(Energy))) // gammas in barrel
                 {
-                    if (IS_NAN(Energy))
-                        fh_califa_overflow->Fill(hitCalifa->GetMotherCrystal());
-                    else
-                    {
-                        fh_califa_good->Fill(hitCalifa->GetMotherCrystal());
 
-                        ULong64_t timeCalifa = hitCalifa->GetTime();
-                        Double_t timerelCalifa = (double)(timeCalifa - time);
-                        fh_califa_tofd->Fill(timerelCalifa, tStart);
-                        fh_califa_energy_select->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
+                    ULong64_t timeCalifa = hitCalifa->GetTime();
+                    Double_t timerelCalifa = (double)(timeCalifa - time);
+                    fh_califa_tofd->Fill(timerelCalifa, tStart);
+                    fh_califa_energy_select->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
 
-                        new ((*fCalifaHitItems)[fNofCalifaHitItems++])
-                            R3BCalifaClusterData(hitCalifa->GetCrystalList(),
-                                                 hitCalifa->GetEnergy(),
-                                                 hitCalifa->GetNf(),
-                                                 hitCalifa->GetNs(),
-                                                 hitCalifa->GetTheta(),
-                                                 hitCalifa->GetPhi(),
-                                                 hitCalifa->GetTime(),
-                                                 hitCalifa->GetClusterType());
-                    }
+                    new ((*fCalifaHitItems)[fNofCalifaHitItems++]) R3BCalifaClusterData(hitCalifa->GetCrystalList(),
+                                                                                        hitCalifa->GetEnergy(),
+                                                                                        hitCalifa->GetNf(),
+                                                                                        hitCalifa->GetNs(),
+                                                                                        hitCalifa->GetTheta(),
+                                                                                        hitCalifa->GetPhi(),
+                                                                                        hitCalifa->GetTime(),
+                                                                                        hitCalifa->GetClusterType());
                 }
             }
         }
@@ -6318,13 +6358,16 @@ void R3BPreTrackS494::FinishTask()
         fh_califa_time->Write();
         fh_califa_tofd->Write();
         fh_califa_cluster->Write();
-        fh_califa_energy_rolu->Write();
-        fh_califa_time_rolu->Write();
+        fh_califa_overflow_rolu->Write();
+        fh_califa_overflow_antirolu->Write();
         fh_califa_cluster_rolu->Write();
         fh_califa_overflow->Write();
         fh_califa_good->Write();
+        fh_califa_good_rolu->Write();
+        fh_califa_good_antirolu->Write();
         fh_califa_motherid_clustertype->Write();
-        fh_califa_crystallist->Write();
+        fh_califa_crystallist_gamma->Write();
+        fh_califa_crystallist_satu->Write();
     }
 }
 
