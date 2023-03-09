@@ -2200,9 +2200,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (!hitCalifa)
                             continue;
 
-                        if (hitCalifa->GetClusterType() == 1 && hitCalifa->GetMotherCrystal() > 927 &&
-                            hitCalifa->GetMotherCrystal() < 1953 &&
-                            !(IS_NAN(hitCalifa->GetEnergy()))) // gammas in barrel
+                        if (hitCalifa->GetClusterType() == 1 && !(IS_NAN(hitCalifa->GetEnergy()))) // gammas
                         {
                             new ((*fCalifaHitItems)[fNofCalifaHitItems++])
                                 R3BCalifaClusterData(hitCalifa->GetCrystalList(),
@@ -2355,8 +2353,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         counter1++;
 
         LOG(info) << "Found Tracks: " << counter1 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
-                  << ", and Erel/MeV: " << Erel << ", from selected NEvents: " << fNEvents_nonull
-                  << ", done: " << (double)fNEvents / (double)maxevent * 100. << " %" << endl;
+                  << ", and Erel/MeV: " << Erel << ", from selected NEvents: " << fNEvents_nonull << endl;
+
         if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10)
         {
             fh_Erel->Fill(Erel);

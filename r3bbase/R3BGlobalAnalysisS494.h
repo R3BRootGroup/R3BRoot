@@ -353,7 +353,6 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_ErelB_nc;
 	TH1F* fh_theta_bc_cm_nc;
 	TH1F* fh_phi_bc_cm_nc;
-	TH1F* fh_Erel_withCalifa;
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
@@ -395,22 +394,30 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_mass;
 	TH2F* fh_energy_nc;
 	TH2F* fh_energy;
+	    
+    TH1F* fh_califa_hitenergy_boost_barrel;
+    TH1F* fh_Erel_withCalifa_barrel;
+    TH2F* fh_califaenergy_2d_barrel;
+    TH2F* fh_Erel_withCalifa_2d_barrel;
+    TH2F* fh_Erel_vs_theta16O_withcalifa_barrel;
+    TH2F* fh_califa_hitenergy_bg_barrel;
+    TH2F* fh_califa_hitenergy_ag_barrel;       	
+
+	TH2F* fh_Erel_withCalifa_2d_iphos;
+	TH2F* fh_califa_hitenergy_ag_iphos;
+	TH2F* fh_califa_hitenergy_bg_iphos;
+	TH1F* fh_califa_hitenergy_boost_iphos;
+	TH2F* fh_Erel_vs_theta16O_withcalifa_iphos;
+	TH1F* fh_Erel_withCalifa_iphos;
 	
-//	TH2F* fh_califa_energy;
-//	TH2F* fh_califa_energy_nc;
-//	TH2F* fh_califa_calenergy;
 	TH2F* fh_califa_tofd;
-	TH2F* fh_califa_hitenergy_ag;
-	TH2F* fh_califa_hitenergy_bg;
 	TH1F* fh_califa_hitenergy_select;
 	TH1F* fh_califa_hitenergy_nc;
-	TH1F* fh_califa_hitenergy_boost;
-	TH2F* fh_Erel_vs_theta16O_withcalifa;
 	TH2F* fh_Ecalifa_vs_theta;
-	TH2F* fh_Erel_withCalifa_2d;
 	TH2F* fh_Erel_withCalifa_tof;
 	TH2F* fh_Erel_withCalifa_motherId;
 	TH2F* fh_theta_vs_theta;
+	
 	TH1F* fh_minv_simu;
 	TH1F* fh_minv;
 	

@@ -42,7 +42,7 @@ R3BUcesbSource::R3BUcesbSource(const TString& FileName,
     , fEventSize(event_size)
     , fLastEventNo(-1)
     , fEventHeader(nullptr)
-    // , fInputFile()
+    , fInputFile()
     , fEntryMax(0)
     , fReaders(new TObjArray())
 {
@@ -56,7 +56,7 @@ R3BUcesbSource::~R3BUcesbSource()
         fReaders->Delete();
         delete fReaders;
     }
-    Close();
+    R3BUcesbSource::Close();
 }
 
 Bool_t R3BUcesbSource::Init()
@@ -106,20 +106,20 @@ Bool_t R3BUcesbSource::Init()
         R3BLOG(fatal, "ucesb error: " << fClient.last_error());
         return kFALSE;
     }
-    /*
-        // Open configuration file with runid values if needed in this step
-        fInputFile.open(fInputFileName.Data(), std::fstream::in);
-        if (!fInputFile.is_open())
-        {
-            R3BLOG(warn, "Input file for RunIds could not be open, it is Ok!");
-        }
-        else
-        {
-            R3BLOG(info, "Input file for RunIds " << fInputFileName.Data() << " is open!");
-            fInputFile.clear();
-            fInputFile.seekg(0, std::ios::beg);
-        }
-    */
+
+    // Open configuration file with runid values if needed in this step
+    fInputFile.open(fInputFileName.Data(), std::fstream::in);
+    if (!fInputFile.is_open())
+    {
+        R3BLOG(warn, "Input file for RunIds could not be open, it is Ok!");
+    }
+    else
+    {
+        R3BLOG(info, "Input file for RunIds " << fInputFileName.Data() << " is open!");
+        fInputFile.clear();
+        fInputFile.seekg(0, std::ios::beg);
+    }
+
     return kTRUE;
 }
 
@@ -143,7 +143,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        if (!((R3BReader*)fReaders->At(i))->Init(&fStructInfo))
+        if (!(dynamic_cast<R3BReader*>(fReaders->At(i)))->Init(&fStructInfo))
         {
             R3BLOG(fatal, "UCESB error: " << fClient.last_error());
             return kFALSE;
@@ -189,7 +189,7 @@ void R3BUcesbSource::SetParUnpackers()
 {
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        ((R3BReader*)fReaders->At(i))->SetParContainers();
+        (dynamic_cast<R3BReader*>(fReaders->At(i)))->SetParContainers();
     }
 }
 
@@ -198,7 +198,7 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        if (!((R3BReader*)fReaders->At(i))->ReInit())
+        if (!(dynamic_cast<R3BReader*>(fReaders->At(i)))->ReInit())
         {
             R3BLOG(fatal, "ReInit of a reader failed.");
             return kFALSE;
@@ -220,38 +220,37 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 {
     const void* raw;
     ssize_t raw_words;
-
     int ret;
     (void)i; /* Why is i not used? Outer loop seems not to use it. */
 
     R3BLOG(debug1, "ReadEvent " << fNEvent);
 
     fNEvent++;
-    /*
-        if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
+
+    if (fNEvent > fEntryMax && fEntryMax != -1 && fInputFile.is_open())
+    {
+
+        R3BLOG(info, "ReadEvent()");
+
+        std::string buffer;
+        do
         {
-
-            R3BLOG(info, "ReadEvent()");
-
-            std::string buffer;
-            do
+            getline(fInputFile, buffer);
+            LOG(info) << "read from file: \"" << buffer << "\"";
+            if (buffer.find("EVENT BEGIN") == 0)
             {
-                getline(fInputFile, buffer);
-                LOG(info) << "read from file: \"" << buffer << "\"";
-                if (buffer.find("EVENT BEGIN") == 0)
-                {
-                    fRunId = ReadIntFromString(buffer, "RUNID");
-                    fEventHeader->SetRunId(fRunId);
-                }
-                if (buffer.find("EVENT") == 0)
-                    continue;
-                Int_t fInit = atoi(buffer.c_str());
-                buffer.erase(0, buffer.find(' ') + 1);
-                fEntryMax = atoi(buffer.c_str());
+                fRunId = ReadIntFromString(buffer, "RUNID");
+                fEventHeader->SetRunId(fRunId);
+            }
+            if (buffer.find("EVENT") == 0)
+                continue;
+            Int_t fInit = atoi(buffer.c_str());
+            buffer.erase(0, buffer.find(' ') + 1);
+            fEntryMax = atoi(buffer.c_str());
 
-            } while (fInputFile && buffer.compare("EVENT END"));
-        }
-    */
+        } while (fInputFile && buffer.compare("EVENT END"));
+    }
+
     /* Need to initialize first */
     if (nullptr == fFd)
     {
@@ -285,7 +284,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     /* Run detector specific readers */
     for (int r = 0; r < fReaders->GetEntriesFast(); ++r)
     {
-        R3BReader* reader = (R3BReader*)fReaders->At(r);
+        R3BReader* reader = dynamic_cast<R3BReader*>(fReaders->At(r));
 
         LOG(debug1) << "  Reading reader " << r << " (" << reader->GetName() << ")";
         reader->Read();
@@ -314,10 +313,11 @@ void R3BUcesbSource::Close()
 {
     int ret;
 
-    LOG(info) << "R3BUcesbSource::Close() called";
-
     if (!fFd) // not open
         return;
+
+    R3BLOG(info, "");
+
     /* Close client connection */
     ret = fClient.close();
     if (0 != ret)
@@ -331,12 +331,10 @@ void R3BUcesbSource::Close()
     status = pclose(fFd);
     if (-1 == status)
     {
+        // perror("pclose()");
         R3BLOG(fatal, "pclose() failed");
         abort();
     }
-    fFd = nullptr;
-    ;
-
     fFd = nullptr;
 
     if (fInputFile.is_open())
@@ -347,7 +345,7 @@ void R3BUcesbSource::Reset()
 {
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i)
     {
-        ((R3BReader*)fReaders->At(i))->Reset();
+        (dynamic_cast<R3BReader*>(fReaders->At(i)))->Reset();
     }
 }
 
@@ -359,6 +357,12 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 }
 
 //_____________________________________________________________________________
-void R3BUcesbSource::FillEventHeader(R3BEventHeader* feh) { ((R3BEventHeader*)feh)->SetRunId(fRunId); }
+void R3BUcesbSource::FillEventHeader(FairEventHeader* feh)
+{
+    // note: as of 2023-02-09, FairRootManager will always pass us a pointer to
+    // FairEventHeader, never to R3BEventHeader. Investigation is under way.
+    //    --Philipp
+    feh->SetRunId(fRunId); // we can still set the run ID, though.
+}
 
 ClassImp(R3BUcesbSource);

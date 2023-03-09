@@ -753,51 +753,110 @@ InitStatus R3BGlobalAnalysisS494::Init()
 
     if (fHitItemsCalifa)
     {
-        fh_Erel_withCalifa = new TH1F("Erel_withCalifa", "Erel with is_califa", 200, 0., 20);
-        fh_Erel_withCalifa->GetXaxis()->SetTitle("Erel / MeV");
-        fh_Erel_withCalifa->GetYaxis()->SetTitle("counts");
+        fh_Erel_withCalifa_barrel = new TH1F("Erel_withCalifa_barrel", "Erel with is_califa_barrel", 2000, 0., 20);
+        fh_Erel_withCalifa_barrel->GetXaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_barrel->GetYaxis()->SetTitle("counts");
 
-        fh_Erel_withCalifa_2d = new TH2F("Erel_vs_numCrystalCalifa", "Erel vs Numb of Crystal", 40, 0, 40, 200, 0., 20);
-        fh_Erel_withCalifa_2d->GetYaxis()->SetTitle("Erel / MeV");
-        fh_Erel_withCalifa_2d->GetXaxis()->SetTitle("No crystals in cluster");
+        fh_Erel_withCalifa_2d_barrel =
+            new TH2F("Erel_vs_numCrystalCalifa_barrel", "Erel vs Numb of Crystal_barrel", 40, 0, 40, 200, 0., 20);
+        fh_Erel_withCalifa_2d_barrel->GetYaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_2d_barrel->GetXaxis()->SetTitle("No crystals in cluster");
+
+        fh_califaenergy_2d_barrel = new TH2F(
+            "Ecalifa_vs_numCrystalCalifa_barrel", "Ecalifa vs Numb of Crystal_barrel", 40, 0, 40, 1000, 0., 10000.);
+        fh_califaenergy_2d_barrel->GetYaxis()->SetTitle("Ecalifa / keV");
+        fh_califaenergy_2d_barrel->GetXaxis()->SetTitle("No crystals in cluster");
+
+        fh_Erel_vs_theta16O_withcalifa_barrel = new TH2F(
+            "Erel_vs_theta16O_withcalifa_barrel", "Erel vs. theta 16O* with califa_barrel", 125, 0., 5, 200, 0, 20.);
+        fh_Erel_vs_theta16O_withcalifa_barrel->GetXaxis()->SetTitle("angle / deg");
+        fh_Erel_vs_theta16O_withcalifa_barrel->GetYaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_ag_barrel = new TH2F("califa_hit_energy_vs_erel_ag_barrel",
+                                                 "Califa hitE_barrel vs Erel above grazing",
+                                                 2000,
+                                                 0,
+                                                 20,
+                                                 1000,
+                                                 0.,
+                                                 10000.);
+        fh_califa_hitenergy_ag_barrel->GetYaxis()->SetTitle("Califa energy / keV");
+        fh_califa_hitenergy_ag_barrel->GetXaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_bg_barrel = new TH2F("califa_hit_energy_vs_erel_bg_barrel",
+                                                 "Califa hitE_barrel vs Erel below grazing",
+                                                 2000,
+                                                 0,
+                                                 20,
+                                                 1000,
+                                                 0.,
+                                                 10000.);
+        fh_califa_hitenergy_bg_barrel->GetYaxis()->SetTitle("Califa energy / keV");
+        fh_califa_hitenergy_bg_barrel->GetXaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_boost_barrel =
+            new TH1F("hit_califa_energy_DC_barrel", "Califa hitE_barrel is_track true DopCorr", 1000, 0., 10000.);
+        fh_califa_hitenergy_boost_barrel->GetYaxis()->SetTitle("Counts");
+        fh_califa_hitenergy_boost_barrel->GetXaxis()->SetTitle("Energy / keV");
+
+        fh_Erel_withCalifa_iphos = new TH1F("Erel_withCalifa_iphos", "Erel with is_califa_iphos", 2000, 0., 20);
+        fh_Erel_withCalifa_iphos->GetXaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_iphos->GetYaxis()->SetTitle("counts");
+
+        fh_Erel_withCalifa_2d_iphos =
+            new TH2F("Erel_vs_numCrystalCalifa_iphos", "Erel vs Numb of Crystal_iphos", 40, 0, 40, 200, 0., 20);
+        fh_Erel_withCalifa_2d_iphos->GetYaxis()->SetTitle("Erel / MeV");
+        fh_Erel_withCalifa_2d_iphos->GetXaxis()->SetTitle("No crystals in cluster");
+
+        fh_Erel_vs_theta16O_withcalifa_iphos = new TH2F(
+            "Erel_vs_theta16O_withcalifa_iphos", "Erel vs. theta 16O* with califa_iphos", 125, 0., 5, 200, 0, 20.);
+        fh_Erel_vs_theta16O_withcalifa_iphos->GetXaxis()->SetTitle("angle / deg");
+        fh_Erel_vs_theta16O_withcalifa_iphos->GetYaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_ag_iphos = new TH2F("califa_hit_energy_vs_erel_ag_iphos",
+                                                "Califa hitE_iphos vs Erel above grazing",
+                                                2000,
+                                                0,
+                                                20,
+                                                1000,
+                                                0.,
+                                                10000.);
+        fh_califa_hitenergy_ag_iphos->GetYaxis()->SetTitle("Califa energy / keV");
+        fh_califa_hitenergy_ag_iphos->GetXaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_bg_iphos = new TH2F("califa_hit_energy_vs_erel_bg_iphos",
+                                                "Califa hitE_iphos vs Erel below grazing",
+                                                2000,
+                                                0,
+                                                20,
+                                                1000,
+                                                0.,
+                                                10000.);
+        fh_califa_hitenergy_bg_iphos->GetYaxis()->SetTitle("Califa energy / keV");
+        fh_califa_hitenergy_bg_iphos->GetXaxis()->SetTitle("Erel / MeV");
+
+        fh_califa_hitenergy_boost_iphos =
+            new TH1F("hit_califa_energy_DC_iphos", "Califa hitE_iphos is_track true DopCorr", 1000, 0., 10000.);
+        fh_califa_hitenergy_boost_iphos->GetYaxis()->SetTitle("Counts");
+        fh_califa_hitenergy_boost_iphos->GetXaxis()->SetTitle("Energy / keV");
 
         fh_Erel_withCalifa_tof = new TH2F("Erel_vs_tofCalifa", "Erel vs tof Califa", 1500, 1000., 4000, 200, 0., 20);
         fh_Erel_withCalifa_tof->GetYaxis()->SetTitle("Erel / MeV");
         fh_Erel_withCalifa_tof->GetXaxis()->SetTitle("tof / ns");
 
         fh_Erel_withCalifa_motherId =
-            new TH2F("Erel_vs_motherId", "Erel vs motherId Califa", 1100, 900., 2000, 200, 0., 20);
+            new TH2F("Erel_vs_motherId", "Erel vs motherId Califa", 1600, 900., 2500, 200, 0., 20);
         fh_Erel_withCalifa_motherId->GetYaxis()->SetTitle("Erel / MeV");
         fh_Erel_withCalifa_motherId->GetXaxis()->SetTitle("motherId");
-
-        fh_Erel_vs_theta16O_withcalifa =
-            new TH2F("Erel_vs_theta16O_withcalifa", "Erel vs. theta 16O* with califa", 125, 0., 5, 200, 0, 20.);
-        fh_Erel_vs_theta16O_withcalifa->GetXaxis()->SetTitle("angle / deg");
-        fh_Erel_vs_theta16O_withcalifa->GetYaxis()->SetTitle("Erel / MeV");
 
         fh_theta_vs_theta = new TH2F("theta_vs_theta", "Califa theta vs 16O* theta", 125, 0, 5, 360, -180, 180);
         fh_theta_vs_theta->GetYaxis()->SetTitle("theta Califa / deg");
         fh_theta_vs_theta->GetXaxis()->SetTitle("theta 16O* / deg");
 
-        fh_califa_hitenergy_ag =
-            new TH2F("califa_hit_energy_vs_erel_ag", "Califa hitE vs Erel above grazing", 200, 0, 20, 1000, 0., 10000.);
-        fh_califa_hitenergy_ag->GetYaxis()->SetTitle("Califa energy / keV");
-        fh_califa_hitenergy_ag->GetXaxis()->SetTitle("Erel / MeV");
-
-        fh_califa_hitenergy_bg =
-            new TH2F("califa_hit_energy_vs_erel_bg", "Califa hitE vs Erel below grazing", 200, 0, 20, 1000, 0., 10000.);
-        fh_califa_hitenergy_bg->GetYaxis()->SetTitle("Califa energy / keV");
-        fh_califa_hitenergy_bg->GetXaxis()->SetTitle("Erel / MeV");
-
         fh_califa_hitenergy_select =
             new TH1F("hit_califa_energy_select", "Califa hitE if is_track true", 1000, 0., 10000.);
         fh_califa_hitenergy_select->GetYaxis()->SetTitle("Counts");
         fh_califa_hitenergy_select->GetXaxis()->SetTitle("Energy / keV");
-
-        fh_califa_hitenergy_boost =
-            new TH1F("hit_califa_energy_DC", "Califa hitE is_track true DopCorr", 1000, 0., 10000.);
-        fh_califa_hitenergy_boost->GetYaxis()->SetTitle("Counts");
-        fh_califa_hitenergy_boost->GetXaxis()->SetTitle("Energy / keV");
 
         fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 20000, -1000, 1000);
         fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
@@ -809,22 +868,23 @@ InitStatus R3BGlobalAnalysisS494::Init()
             checkCalifa->Clear();
             checkCalifa->Divide(3, 3);
             checkCalifa->cd(1);
+            fh_califa_hitenergy_boost_barrel->Draw();
             checkCalifa->cd(2);
-            fh_califa_hitenergy_select->Draw();
+            fh_califa_hitenergy_boost_iphos->Draw();
             checkCalifa->cd(3);
-            fh_califa_hitenergy_boost->Draw();
+            fh_Erel_withCalifa_barrel->Draw();
             checkCalifa->cd(4);
-            fh_Erel_withCalifa->Draw();
+            fh_Erel_withCalifa_iphos->Draw();
             checkCalifa->cd(5);
-            fh_califa_hitenergy_bg->Draw("colz");
+            fh_califa_hitenergy_bg_barrel->Draw("colz");
             checkCalifa->cd(6);
-            fh_califa_hitenergy_ag->Draw("colz");
+            fh_califa_hitenergy_ag_barrel->Draw("colz");
             checkCalifa->cd(7);
-            fh_Erel_vs_theta16O_withcalifa->Draw("colz");
+            fh_califa_hitenergy_bg_iphos->Draw("colz");
             checkCalifa->cd(8);
-            fh_Erel_withCalifa_2d->Draw("colz");
+            fh_califa_hitenergy_bg_barrel->Draw("colz");
             checkCalifa->cd(9);
-            fh_theta_vs_theta->Draw("colz");
+            fh_califa_tofd->Draw("colz");
         }
     }
     if (fvis)
@@ -1502,25 +1562,40 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                             std::vector<Int_t> GetCrystalList() const {return fCrystalList; }
                             Int_t GetMotherCrystal() const {return fCrystalList.at(0); }
                         */
+
                         if (hitCalifa->GetClusterType() == 1 &&
                             !(IS_NAN(Energy))) // gammas (IS_NAN(Energy) == overflow)
                         {
+                            fh_Erel_withCalifa_motherId->Fill(hitCalifa->GetMotherCrystal(), Erel);
+                            fh_theta_vs_theta->Fill(theta_16O, hitCalifa->GetTheta() * TMath::RadToDeg());
+                            fh_califa_hitenergy_select->Fill(Energy_dc);
+                            fh_califa_tofd->Fill(timerelCalifa, tCtofd);
+                            fh_Erel_withCalifa_tof->Fill(timerelCalifa - tCtofd, Erel);
+
                             if (hitCalifa->GetMotherCrystal() > 927 && hitCalifa->GetMotherCrystal() < 1953) // barrel
                             {
-                                fh_theta_vs_theta->Fill(theta_16O, hitCalifa->GetTheta() * TMath::RadToDeg());
-                                fh_califa_hitenergy_boost->Fill(Energy_dc);
-                                fh_califa_hitenergy_select->Fill(Energy);
-                                fh_Erel_withCalifa->Fill(Erel);
-                                fh_Erel_withCalifa_2d->Fill(hitCalifa->GetCrystalList().size(), Erel);
-                                fh_Erel_withCalifa_tof->Fill(timerelCalifa - tCtofd, Erel);
-                                fh_Erel_withCalifa_motherId->Fill(hitCalifa->GetMotherCrystal(), Erel);
-                                fh_Erel_vs_theta16O_withcalifa->Fill(theta_16O, Erel);
+                                fh_califa_hitenergy_boost_barrel->Fill(Energy_dc);
+                                fh_Erel_withCalifa_barrel->Fill(Erel);
+                                fh_Erel_withCalifa_2d_barrel->Fill(hitCalifa->GetCrystalList().size(), Erel);
+                                fh_califaenergy_2d_barrel->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
+                                fh_Erel_vs_theta16O_withcalifa_barrel->Fill(theta_16O, Erel);
                                 if (theta_16O < fThetaGrazing)
-                                    fh_califa_hitenergy_bg->Fill(Erel, Energy_dc);
+                                    fh_califa_hitenergy_bg_barrel->Fill(Erel, Energy_dc);
                                 else
-                                    fh_califa_hitenergy_ag->Fill(Erel, Energy_dc);
+                                    fh_califa_hitenergy_ag_barrel->Fill(Erel, Energy_dc);
+                            }
 
-                                fh_califa_tofd->Fill(timerelCalifa, tCtofd);
+                            if (hitCalifa->GetMotherCrystal() > 1952 && hitCalifa->GetMotherCrystal() < 2433) // iphos
+                            {
+                                fh_califa_hitenergy_boost_iphos->Fill(Energy_dc);
+                                fh_Erel_withCalifa_iphos->Fill(Erel);
+                                fh_Erel_withCalifa_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Erel);
+                                fh_Erel_vs_theta16O_withcalifa_iphos->Fill(theta_16O, Erel);
+                                fh_Erel_withCalifa_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Erel);
+                                if (theta_16O < fThetaGrazing)
+                                    fh_califa_hitenergy_bg_iphos->Fill(Erel, Energy_dc);
+                                else
+                                    fh_califa_hitenergy_ag_iphos->Fill(Erel, Energy_dc);
                             }
                         }
                     }
@@ -2007,13 +2082,22 @@ void R3BGlobalAnalysisS494::FinishTask()
 
     if (fHitItemsCalifa)
     {
-        fh_Erel_withCalifa->Write();
-        fh_califa_hitenergy_boost->Write();
-        fh_califa_hitenergy_ag->Write();
-        fh_califa_hitenergy_bg->Write();
+        fh_Erel_withCalifa_barrel->Write();
+        fh_califa_hitenergy_boost_barrel->Write();
+        fh_califa_hitenergy_ag_barrel->Write();
+        fh_califa_hitenergy_bg_barrel->Write();
+        fh_Erel_withCalifa_2d_barrel->Write();
+        fh_califaenergy_2d_barrel->Write();
+        fh_Erel_vs_theta16O_withcalifa_barrel->Write();
+
+        fh_Erel_withCalifa_iphos->Write();
+        fh_califa_hitenergy_boost_iphos->Write();
+        fh_califa_hitenergy_ag_iphos->Write();
+        fh_califa_hitenergy_bg_iphos->Write();
+        fh_Erel_withCalifa_2d_iphos->Write();
+        fh_Erel_vs_theta16O_withcalifa_iphos->Write();
+
         fh_califa_hitenergy_select->Write();
-        fh_Erel_vs_theta16O_withcalifa->Write();
-        fh_Erel_withCalifa_2d->Write();
         fh_Erel_withCalifa_tof->Write();
         fh_Erel_withCalifa_motherId->Write();
         fh_theta_vs_theta->Write();

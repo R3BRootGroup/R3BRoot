@@ -56,11 +56,7 @@ class R3BUcesbSource : public FairSource
      * */
     virtual Bool_t Init();
    
-#ifdef ACTIVATEOVERRIDE
-    virtual Bool_t SpecifyRunId() override;
-#else
     virtual Bool_t SpecifyRunId();
-#endif
     
     virtual Bool_t InitUnpackers();
     virtual void SetParUnpackers();
@@ -78,9 +74,9 @@ class R3BUcesbSource : public FairSource
     /* Get readers */
     const TObjArray* GetReaders() const { return fReaders; }
 
-    virtual void FillEventHeader(R3BEventHeader* feh);
+    virtual void FillEventHeader(FairEventHeader* feh);
 
- //   void SetInputFileName(TString tstr) { fInputFileName = tstr; }
+    void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
   private:
     /* File descriptor returned from popen() */
@@ -107,7 +103,7 @@ class R3BUcesbSource : public FairSource
     /* R3B header */
     R3BEventHeader* fEventHeader;
     Int_t ReadIntFromString(const std::string& wholestr, const std::string& pattern);
- //   TString fInputFileName;
+    TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
 

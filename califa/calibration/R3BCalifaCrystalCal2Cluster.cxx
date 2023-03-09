@@ -159,7 +159,7 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     , fCalifaGeo(NULL)
     , fTargetGeoPar(NULL)
     , fCalifaGeoPar(NULL)
-    , fWindowAlg("Square") // "Rectangular")
+    , fWindowAlg("Rectangular") // "Rectangular")
     , fOnline(kFALSE)
     , fRand(0)
     , fTotalCrystals(2432)
@@ -256,20 +256,17 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
             fHistoFile->GetObject(name, fAngularDistributions[i]);
         }
     }
-    R3BLOG(info, "end of init");
     return kSUCCESS;
 }
 
 InitStatus R3BCalifaCrystalCal2Cluster::ReInit()
 {
     SetParContainers();
-    R3BLOG(info, "end of reinit");
     return kSUCCESS;
 }
 
 void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
 {
-    R3BLOG(info, "start exec");
 
     Reset();
 
@@ -321,7 +318,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
                 protonCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
         }
     }
-    R3BLOG(info, "vectors read");
     /* ----- Remove duplicate entries in gamma clusters ----- */
     for (int k = 0; k < gammaCandidatesVec.size(); k++)
     {
@@ -374,7 +370,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
             cluster.phi = mother_angles.Phi();
         }
 
-        R3BLOG(info, "after sorting");
         cluster.time = protonCandidatesVec.at(0)->GetTime();
 
         addCrystal2Cluster(&cluster, protonCandidatesVec.at(0), "proton", &usedCrystals, fTotalCrystals);
@@ -557,7 +552,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
             usedCrystals, allCrystalVec, protonCandidatesVec, gammaCandidatesVec, saturatedCandidatesVec);
     }
 
-    R3BLOG(info, "end exec");
     return;
 }
 
