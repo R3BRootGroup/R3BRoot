@@ -108,6 +108,8 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     fCalTotParams = fTotCal_Par->GetCryCalParams(); // Array with the Tot Cal parameters
     assert(fCalTotParams->GetSize() >= fNumCrystals * fNumTotParams);
 
+    R3BLOG(info, "Nb of ToT parameters used in the fits " << fNumTotParams);
+
     // handle old calibrations which mapped to barrel protons to crId+2432:
     // If you cal[id] is zero or nan (you wish),
     // And cal[id+2432] is nonzero,

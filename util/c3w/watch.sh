@@ -13,7 +13,7 @@
 
 #!/bin/bash
 
-OUT=/lustre/land/$(whoami)/data/2021/s494/rootfiles/c3w/bmon/logs/$1_*
+OUT=/lustre/land/$(whoami)/s494/rootfiles/cw3/logs/$1_*
 
 cat $OUT
 echo "that was the content of "
