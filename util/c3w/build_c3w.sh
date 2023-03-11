@@ -104,7 +104,7 @@ cp $SCRIPT .
 INPUTS+=" $(basename $SCRIPT)"
 
 
-TARCMD="tar cf ${C3WTAR}  --exclude \*.o --exclude \*.d --exclude-vcs -P ${TRANSFORM} ${INPUTS}"
+TARCMD="tar cf ${C3WTAR}  --exclude \*.o --exclude \*.d --exclude-vcs --exclude $VMCWORKDIR/macros -P ${TRANSFORM} ${INPUTS}"
 echo will run $TARCMD
 time $TARCMD || die "tar failed."
 
