@@ -153,6 +153,7 @@ class R3BTofdTofiCal2HitS494 : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat1, Int_t tpat2) { fTpat1 = tpat1;  fTpat2 = tpat2;}
     inline void SetYOffset(Bool_t yoffset) { fYOffset = yoffset;}
+    inline void SetOffsetFile(std::string file){fOffsetFile = file;}
     /**
      * Methods for setting number of planes and paddles
      */
@@ -203,6 +204,7 @@ class R3BTofdTofiCal2HitS494 : public FairTask
     Bool_t fTofdTotPos, fTofiTotPos;
     Bool_t fYOffset;
     Bool_t fSimu;
+    std::string fOffsetFile;
     UInt_t fnEvents=0;
     UInt_t lasttpatevent=0;
     UInt_t fNofPlanes;

@@ -89,6 +89,7 @@ R3BTofdTofiCal2HitS494::R3BTofdTofiCal2HitS494()
     , fTofiTotPos(true)
     , fShowProgress(true)
     , fYOffset(true)
+    , fOffsetFile("")
     , fSimu(false)
 {
     if (fTofdHisto)
@@ -135,6 +136,7 @@ R3BTofdTofiCal2HitS494::R3BTofdTofiCal2HitS494(const char* name, Int_t iVerbose)
     , fTofiTotPos(true)
     , fShowProgress(true)
     , fYOffset(true)
+    , fOffsetFile("")
     , fSimu(false)
 {
     if (fTofdHisto)
@@ -264,15 +266,14 @@ InitStatus R3BTofdTofiCal2HitS494::Init()
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
 
     // Getting y offsets *****
-    std::string foff_param_file =
-        "/u/kelic/R3BRoot/macros/r3b/unpack/s494/parameter/offset_ytofd_ytofi_run0906_0073lmds_allCharges.dat";
+    std::string foff_param_file = fOffsetFile;
     ifstream infile(foff_param_file.c_str());
     Int_t iplane, ibar;
     if (!(infile.is_open()))
         cout << "** WARNING ** OFFSET FILE NOT FOUND! " << foff_param_file.c_str() << endl;
     if (infile.is_open())
     {
-        cout << "TOFD/TOFI y-OFFSET PARAMS WILL BE READ" << endl;
+        LOG(info) << "TOFD/TOFI y-OFFSET PARAMS READ FROM FILE " << foff_param_file.c_str() << endl;
         for (Int_t ivec = 0; ivec < 132; ivec++)
         {
             infile >> iplane >> ibar;
@@ -602,7 +603,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     // walk corrections
                     if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                         par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                        LOG(info) << "Walk correction not found!";
+                        LOG(debug) << "Walk correction not found!";
                     auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                      par->GetPar1Walk(),
                                                      par->GetPar2Walk(),
@@ -1235,7 +1236,7 @@ void R3BTofdTofiCal2HitS494::Exec(Option_t* option)
                     // walk corrections
                     if (parTofi->GetPar1Walk() == 0. || parTofi->GetPar2Walk() == 0. || parTofi->GetPar3Walk() == 0. ||
                         parTofi->GetPar4Walk() == 0. || parTofi->GetPar5Walk() == 0.)
-                        LOG(info) << "Walk correction not found!";
+                        LOG(debug) << "Walk correction not found!";
                     auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                      parTofi->GetPar1Walk(),
                                                      parTofi->GetPar2Walk(),

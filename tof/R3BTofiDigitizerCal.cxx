@@ -252,16 +252,20 @@ void R3BTofiDigitizerCal::Exec(Option_t* opt)
                       , fLeading_ns(lead)     --> TofiCal.fLeading_ns
                       , fTrailing_ns(trail)   --> TofiCal.fTrailing_ns
                     */
-                    new ((*Hits)[Hits->GetEntries()])
-                        R3BTofiCalData(layer_label + 1, paddle_number + 1, 1, timeL_up, timeT_up);
-
-                    new ((*Hits)[Hits->GetEntries()])
-                        R3BTofiCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
-
-                    // Int_t card = (int)paddle_number/8.+layer_label*6;
-                    for (Int_t j = 0; j < 12; j++)
+                    // in s494, only plane 1 with paddes: 7-18
+                    if (layer_label == 0 && (paddle_number > 5 && paddle_number < 18))
                     {
-                        new ((*Trigger)[Trigger->GetEntries()]) R3BTofiCalData(5, j + 1, 1, 0., 0.);
+                        new ((*Hits)[Hits->GetEntries()])
+                            R3BTofiCalData(layer_label + 1, paddle_number + 1, 1, timeL_up, timeT_up);
+
+                        new ((*Hits)[Hits->GetEntries()])
+                            R3BTofiCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
+
+                        // Int_t card = (int)paddle_number/8.+layer_label*6;
+                        for (Int_t j = 0; j < 12; j++)
+                        {
+                            new ((*Trigger)[Trigger->GetEntries()]) R3BTofiCalData(5, j + 1, 1, 0., 0.);
+                        }
                     }
                 }
             }

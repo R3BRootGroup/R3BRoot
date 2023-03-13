@@ -121,6 +121,9 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fX2min(-100)
     , fX2max(100)
     , fNEvents(0)
+    , fFi31Fi33Cut("")
+    , fFi30Fi32Cut("")
+    , fTofiCut("")
     , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
     , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi23bHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
@@ -223,7 +226,7 @@ InitStatus R3BPreTrackS494::Init()
     mgr->Register("Fi31Hit", "Land", fFi31HitItems, kTRUE);
     mgr->Register("Fi32Hit", "Land", fFi32HitItems, kTRUE);
     mgr->Register("Fi33Hit", "Land", fFi33HitItems, kTRUE);
-    if (fHitItems.at(DET_CALIFA))
+    if (fHitItems.at(DET_CALIFA) && !fSimu)
         mgr->Register("CalifaClusterData", "Land", fCalifaHitItems, kTRUE);
 
     // *******
@@ -237,14 +240,29 @@ InitStatus R3BPreTrackS494::Init()
         cut_qfi30_qfi32 = NULL;
         cut_qtofi_bar14 = NULL;
 
-        TFile* f31_33 = TFile::Open("Cut_Fi31Fi33_Z6.root", "read");
-        cut_qfi31_qfi33 = dynamic_cast<TCutG*>(f31_33->Get("CutFi31Fi33_12C"));
+        if (fFi31Fi33Cut)
+        {
+            TFile* f31_33 = TFile::Open(fFi31Fi33Cut, "read");
+            cut_qfi31_qfi33 = dynamic_cast<TCutG*>(f31_33->Get("CutFi31Fi33_12C"));
+        }
+        else
+            R3BLOG(warn, "fFi31Fi33Cut file not defined");
 
-        TFile* f30_32 = TFile::Open("Cut_Fi30Fi32_Z6.root", "read");
-        cut_qfi30_qfi32 = dynamic_cast<TCutG*>(f30_32->Get("CutFi30Fi32_12C"));
+        if (fFi30Fi32Cut)
+        {
+            TFile* f30_32 = TFile::Open(fFi30Fi32Cut, "read");
+            cut_qfi30_qfi32 = dynamic_cast<TCutG*>(f30_32->Get("CutFi30Fi32_12C"));
+        }
+        else
+            R3BLOG(warn, "fFi30Fi32Cut file not defined");
 
-        TFile* qtofi = TFile::Open("qtofibar14.root", "read");
-        cut_qtofi_bar14 = dynamic_cast<TCutG*>(qtofi->Get("qtofi_bar14"));
+        if (fTofiCut)
+        {
+            TFile* qtofi = TFile::Open(fTofiCut, "read");
+            cut_qtofi_bar14 = dynamic_cast<TCutG*>(qtofi->Get("qtofi_bar14"));
+        }
+        else
+            R3BLOG(warn, "fTofiCut file not defined");
 
         cout << "GRAPHICAL CUTS ARE READ" << endl;
     }
@@ -5926,7 +5944,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
             tMax[i] = -1000.;
         }
 
-        if (fHitItems.at(DET_CALIFA) && SelectedPairs)
+        if (fHitItems.at(DET_CALIFA) && SelectedPairs && !fSimu)
         {
             // CALIFA
             auto detCalifa = fHitItems.at(DET_CALIFA);
@@ -6337,7 +6355,7 @@ void R3BPreTrackS494::FinishTask()
         fh_check_TvsX[i]->Write();
         fh_check_XvsY[i]->Write();
     }
-    //  if (fCalItems.at(DET_CALIFA))
+    if (fHitItems.at(DET_CALIFA))
     {
         fh_califa_energy->Write();
         fh_califa_energy_dc->Write();
