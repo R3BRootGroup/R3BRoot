@@ -1,4 +1,5 @@
 /******************************************************************************
+/******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
@@ -88,7 +89,7 @@ void R3BTCalContFact::setAllContainers()
     ADD_FIBER(Fi10, FI10);
     ADD_FIBER(Fi11, FI11);
     ADD_FIBER(Fi12, FI12);
-    ADD_FIBER(Fi13, FI13);
+    ADD_FIBER(Fi60, FI60);
 
 #define ADD_FIBER_MAPMT(Name, NAME)                                                                 \
     do                                                                                              \
@@ -152,6 +153,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     PUSH_FIBER(Fi11);
     PUSH_FIBER(Fi12);
     PUSH_FIBER(Fi13);
+    PUSH_FIBER(Fi60);
 
 #define PUSH_FIBER_MAPMT(Name)                              \
     do                                                      \

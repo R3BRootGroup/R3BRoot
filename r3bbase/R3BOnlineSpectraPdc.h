@@ -85,7 +85,7 @@ class R3BOnlineSpectraPdc : public FairTask
 
     void Reset_PDC_Histo();
     void Reset_Fi0_Histo();
-    void Reset_Fi1_Histo();
+    void Reset_Fi60_Histo();
 
   private:
     TClonesArray* fMappedItems; /**< Array with Cal items - input data. */
@@ -96,13 +96,9 @@ class R3BOnlineSpectraPdc : public FairTask
     TClonesArray* fCalItems_fi0;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems_fi0;    /**< Array with Cal items - input data. */
 
-    TClonesArray* fMappedItems_fi1a; /**< Array with Cal items - input data. */
-    TClonesArray* fCalItems_fi1a;    /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems_fi1a;    /**< Array with Cal items - input data. */
-
-    TClonesArray* fMappedItems_fi1b; /**< Array with Cal items - input data. */
-    TClonesArray* fCalItems_fi1b;    /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems_fi1b;    /**< Array with Cal items - input data. */
+    TClonesArray* fMappedItems_fi60; /**< Array with Cal items - input data. */
+    TClonesArray* fCalItems_fi60;    /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems_fi60;    /**< Array with Cal items - input data. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -127,66 +123,47 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_Pdc_ToT_vs_Time[144];
     TH2F* fh_Pdc_ToT_vs_Hit[144];
     TH2F* fh_Pdc_xvsx_fi0;
-    TH2F* fh_Pdc_xvsx;
     TH2F* fh_Pdc_yvsy_fi0;
     TH2F* fh_Pdc_xvsy_fi0;
+    TH2F* fh_Pdc_xvsx_fi60;
+    TH2F* fh_Pdc_yvsy_fi60;
+    TH2F* fh_Pdc_xvsy_fi60;
     TH2F* fh_Pdc_yvsy;
+    TH2F* fh_Pdc_xvsx;
     TH2F* fh_Pdc_wvsw;
     TH2F* fh_pdc_ebene4;
-    TH2F* fh_Pdc_tvst[2];
-    TH2F* fh_Pdc_evse[2];
 
-    TH1F* fh_fi0_0_fiber;
-    TH1F* fh_fi0_1_fiber;
-    TH1F* fh_fi0_0_mult;
-    TH1F* fh_fi0_1_mult;
-    TH2F* fh_fi0_0_Tot;
-    TH2F* fh_fi0_1_Tot;
-    TH2F* fh_fi0_0_Time;
-    TH2F* fh_fi0_1_Time;
-    TH1F* fh_fi0_0_fiber_mc;
-    TH1F* fh_fi0_1_fiber_mc;
-    TH1F* fh_fi0_0_mult_mc;
-    TH1F* fh_fi0_1_mult_mc;
-    TH2F* fh_fi0_0_Tot_mc;
-    TH2F* fh_fi0_1_Tot_mc;
-    TH2F* fh_fi0_0_Time_mc;
-    TH2F* fh_fi0_1_Time_mc;
+    TH1F* fh_fi0_fiber;
+    TH1F* fh_fi0_mult;
+    TH2F* fh_fi0_Tot;
+    TH2F* fh_fi0_Time;
+    TH1F* fh_fi0_fiber_mc;
+    TH1F* fh_fi0_mult_mc;
+    TH2F* fh_fi0_Tot_mc;
+    TH2F* fh_fi0_Time_mc;
     
-    TH2F* fh_fi0_0_pdc;
+    TH1F* fh_fi60_fiber;
+    TH1F* fh_fi60_mult;
+    TH2F* fh_fi60_Tot;
+    TH2F* fh_fi60_Time;
+    TH1F* fh_fi60_fiber_mc;
+    TH1F* fh_fi60_mult_mc;
+    TH2F* fh_fi60_Tot_mc;
+    TH2F* fh_fi60_Time_mc;
+
+    TH2F* fh_fi0_pdc;
     TH2F* fh_fi0_pdc_time;
     TH2F* fh_fi0_pdc_eloss;
-    TH2F* fh_fi0_1_pdc;
     TH2F* fh_fi0_tot2_tot1;
     TH2F* fh_fi0_cor;
     TH2F* fh_fi0_eff;
     
-    TH1F* fh_fi1a_fiber;
-    TH1F* fh_fi1b_fiber;
-    TH1F* fh_fi1a_mult;
-    TH1F* fh_fi1b_mult;
-    TH2F* fh_fi1a_Tot;
-    TH2F* fh_fi1b_Tot;
-    TH2F* fh_fi1a_Time;
-    TH2F* fh_fi1b_Time;
-    TH1F* fh_fi1a_fiber_mc;
-    TH1F* fh_fi1b_fiber_mc;
-    TH1F* fh_fi1a_mult_mc;
-    TH1F* fh_fi1b_mult_mc;
-    TH2F* fh_fi1a_Tot_mc;
-    TH2F* fh_fi1b_Tot_mc;
-    TH2F* fh_fi1a_Time_mc;
-    TH2F* fh_fi1b_Time_mc;
-    TH2F* fh_fi1a_pdc_eloss;
-    TH2F* fh_fi1b_pdc_eloss;    
-    TH2F* fh_fi1a_pdc;
-    TH2F* fh_fi1a_pdc_time;
-    TH2F* fh_fi1b_pdc;
-    TH2F* fh_fi1b_pdc_time;
-    
-    TH2F* fh_fi1_xy;
-    TH2F* fh_fi1_tot;
-    TH2F* fh_fi1_time;
+    TH2F* fh_fi60_pdc;
+    TH2F* fh_fi60_pdc_time;
+    TH2F* fh_fi60_pdc_eloss;
+    TH2F* fh_fi60_tot2_tot1;
+    TH2F* fh_fi60_cor;
+    TH2F* fh_fi60_eff;
 
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)

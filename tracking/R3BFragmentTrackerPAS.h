@@ -88,6 +88,8 @@ class R3BFragmentTrackerPAS : public FairTask
     Int_t fNofFi61HitItems;    
     TClonesArray* fFi62HitItems;       
     Int_t fNofFi62HitItems;    
+    TClonesArray* fFi63HitItems;       
+    Int_t fNofFi63HitItems;    
     Int_t fNEvents = 0;
     Int_t fNEventsLeft = 0;
     Int_t fNEventsRight=0;
@@ -104,7 +106,8 @@ class R3BFragmentTrackerPAS : public FairTask
         DET_FI60,
         DET_FI61,
         DET_FI62,
-        DET_FI_LAST = DET_FI62,
+        DET_FI63,
+        DET_FI_LAST = DET_FI63,
         DET_TOFD,
         DET_MAX
     };
@@ -112,7 +115,7 @@ class R3BFragmentTrackerPAS : public FairTask
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
     const char* fDetectorNames[DET_MAX + 1] = { "Fi23a", "Fi23b", 
-                                                "Fi60", "Fi61", "Fi62", "Tofd", NULL };
+                                                "Fi60", "Fi61", "Fi62", "Fi63", "Tofd", NULL };
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
    	Double_t amu = 0.931494028;   // Gev/c**2
@@ -142,6 +145,7 @@ class R3BFragmentTrackerPAS : public FairTask
     TH1F* fh_mult_fi60;
     TH1F* fh_mult_fi61;
     TH1F* fh_mult_fi62;
+    TH1F* fh_mult_fi63;
     TH1F* fh_mult_tofd;
     TH1F* fh_eloss_fi23a_mc;
     TH1F* fh_eloss_fi23a;
@@ -153,6 +157,8 @@ class R3BFragmentTrackerPAS : public FairTask
     TH1F* fh_eloss_fi61;
     TH1F* fh_eloss_fi62_mc;
     TH1F* fh_eloss_fi62;
+    TH1F* fh_eloss_fi63_mc;
+    TH1F* fh_eloss_fi63;
     TH1F* fh_ncand;
     TH1F* fh_x_res[8];
     TH1F* fh_x_pull[8];

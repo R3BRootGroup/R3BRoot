@@ -500,9 +500,8 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
 
-    // cout<<"in exec "<<fName<<endl;
     //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
-
+    LOG(debug) << "In R3BFiberCal2Hit";
     if (fnEvents / 100000. == (int)fnEvents / 100000)
     {
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
@@ -535,13 +534,18 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
     size_t mapmt_trig_num = fMAPMTCalTriggerItems->GetEntries();
     // cout<<"mapmt_trig_num = "<<mapmt_trig_num<<endl;
-
+    if (mapmt_trig_num == 0)
+    {
+        LOG(error) << "No trigger times found!!!" << endl;
+        return;
+    }
     double trig_time[8];
     Double_t tl, tt; // lead and trile times of the trigger
 
     std::vector<R3BBunchedFiberCalData const*> mapmt_trig_table(fSubNum * fChPerSub[0] / 128);
     // cout<<"mapmt_trig_table size: "<<fName<<", "<<fSubNum * fChPerSub[0] / 128<<endl;
 
+    // cout << "mapmt_trig_num: " << mapmt_trig_num << endl;
     for (size_t j = 0; j < mapmt_trig_num; ++j)
     {
         auto cal = (R3BBunchedFiberCalData const*)fMAPMTCalTriggerItems->At(j);
@@ -572,8 +576,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         spmt_trig_table.at(idx) = cal;
     }
 
-    //  cout << "sapmt trig read " << fName << "  " << spmt_trig_num << endl;
-
+    // cout << "sapmt trig read " << fName << "  " << spmt_trig_num << endl;
     // Find multi-hit ToT for every channel.
     // The easiest safe way to survive ugly cases is to record all
     // leading edges per channel, and then pair up with whatever
@@ -602,8 +605,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         }
     }
 
-    // cout<<"channel side read "<<fName<<endl;
-
     if (n_lead != n_trail)
     {
         //    return;
@@ -618,9 +619,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     {
         auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
 
-        //   cout<<"Cal2Hit *** "<<fName<<", Nev="<<fnEvents<<", iHit="<<j<<
-        // ", iCha="<<cur_cal->GetChannel() <<", isLead="<<cur_cal->IsLeading()<<
-        //", time="<<cur_cal->GetTime_ns()<<endl;
+        // cout<<"Cal2Hit *** "<<fName<<", Nev="<<fnEvents<<", iHit="<<j<<
+        //	", iCha="<<cur_cal->GetChannel() <<", isLead="<<cur_cal->IsLeading()<<
+        //	", time="<<cur_cal->GetTime_ns()<<endl;
 
         if (cur_cal->IsTrailing())
         {
@@ -647,6 +648,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             {
                 auto cur_cal_trig_i = fMAPMTTriggerMap[ch_i];
                 auto lead_trig_i = fMAPMTTriggerMap[lead->GetChannel() - 1];
+
+                // cout << "cur_cal_trig_i: " << cur_cal_trig_i << " lead_trig_i: " << lead_trig_i << " ch_i: " << ch_i
+                // << endl;
                 if (cur_cal_trig_i < mapmt_trig_table.size() && lead_trig_i < mapmt_trig_table.size())
                 {
                     auto cur_cal_trig = mapmt_trig_table.at(cur_cal_trig_i);
@@ -654,11 +658,11 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
                     lead_trig_ns = lead_trig->GetTime_ns();
 
-                    //  cout<<"Detector: "<<fName<<", trig times: "<<lead_trig_ns<<", "<<cur_cal_trig_ns<<", times: "<<
+                    // cout<<"Detector: "<<fName<<", trig times: "<<lead_trig_ns<<", "<<cur_cal_trig_ns<<", times: "<<
                     //       lead->GetTime_ns()<<", "<<cur_cal->GetTime_ns()<<endl;
                 }
             }
-            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 1) // Don't use this for s454
+            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 0) // Don't use this for s454
             {
                 auto cur_cal_trig_i = fSPMTTriggerMap[ch_i];
                 auto lead_trig_i = fSPMTTriggerMap[lead->GetChannel() - 1];
@@ -676,8 +680,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             auto lead_ns = fmod(lead->GetTime_ns() - lead_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
             auto tot_ns = fmod(cur_cal_ns - lead_ns + c_period + c_period / 2, c_period) - c_period / 2;
 
-            //	if(side_i==0) cout<<"Trigger "<<fName<<", "<<lead->GetTime_ns()<<", "<<lead_trig_ns<<",
-            //"<<lead->GetChannel()<<
+            // if(side_i==0) cout<<"Trigger "<<fName<<", "<<lead->GetTime_ns()<<", "<<lead_trig_ns<<
+            //	", "<<lead->GetChannel()<<
             //	", "<<fMAPMTTriggerMap[lead->GetChannel() - 1]<<", "<<cur_cal->GetChannel()<<endl;
 
             lead_raw = lead->GetTime_ns();
@@ -721,7 +725,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             }
         }
     }
-
     cond = true;
     if (summsm1 + summsm2 + summsm3 + summsm4 < 1)
     {
@@ -815,13 +818,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
             tdiff0 = (mapmt_tot.lead_ns - tlmem0);
 
-            if (mapmt_tot.lead_raw - tlmem1 < 0 && fnEvents == 499)
-            {
-                cout << "Leading " << fName << ", " << fnEvents << ", " << mch + 1 << ", " << tlmem1 << ", "
-                     << mapmt_tot.lead_raw << ", " << triglmem << ", " << mapmt_tot.lead_trig_ns << endl;
-                cout << "Trailin " << fName << ", " << fnEvents << ", " << mch + 1 << ", " << ttmem1 << ", "
-                     << mapmt_tot.trail_raw << ", " << trigtmem << ", " << mapmt_tot.trail_trig_ns << endl;
-            }
             tlmem0 = mapmt_tot.lead_ns;
             emem0 = mapmt_tot.tot_ns;
             ttmem0 = mapmt_tot.trail_ns;
@@ -830,8 +826,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             triglmem = mapmt_tot.lead_trig_ns;
             trigtmem = mapmt_tot.trail_trig_ns;
 
-            //   if(fName=="Fi1b") cout<<"Second: "<<fName<<", "<<"0; "<<mapmt_tot.lead->GetChannel()<<",
-            //   "<<mapmt_tot.lead_ns<<"; "<<mapmt_tot.tot_ns<<endl;
+            LOG(debug) << "Hit: " << fName << ", "
+                       << "0; " << mapmt_tot.lead->GetChannel() << ",  " << mapmt_tot.lead_ns << "; "
+                       << mapmt_tot.tot_ns << endl;
 
             int single = 0;
             Int_t isumNSA = 0;
@@ -926,7 +923,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     Double_t t_mapmt_raw = mapmt_tot.lead_raw;
                     Double_t t_trig_mapmt = mapmt_tot.lead_trig_ns;
 
-                    // cout<<fName<<", "<<fiber_id<<", "<<t_mapmt_raw<<", "<<t_trig_mapmt<<", "<<t_mapmt<<endl;
+                    LOG(debug) << fName << ", " << fiber_id << ", " << t_mapmt_raw << ", " << t_trig_mapmt << ", "
+                               << t_mapmt << endl;
 
                     /*
                     Double_t dt_trig = t_trig_sapmt - t_trig_mapmt;
@@ -983,6 +981,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                             tsync = par->GetSync();
                             offset1 = par->GetOffset1();
                             offset2 = par->GetOffset2();
+                            LOG(debug) << "Read cal parameter, gain:" << gainMA << " tsync: "
+                                       << " offsets: " << offset1 << "  " << offset2;
                         }
                     }
 
@@ -1059,9 +1059,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                                 ((double)(fiber_id - 1) + ((double)(fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
                     }
-                    if (fName == "Fi0")
+                    if (fName == "Fi0" || fName == "Fi60")
                     {
-                        Float_t fiber_thickness = 0.2; // MH remove *2 when taking SPMT into analysis
+                        Float_t fiber_thickness = 0.1; // MH remove *2 when taking SPMT into analysis
                         Int_t fiber_nbr = 128;         // MH remove /2 when taking SPMT into analysis
                         Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01; // relative to fiber_thickness
@@ -1080,7 +1080,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         }
                     }
 
-                    // cout<<"Fiber y " << y << endl;
+                    LOG(debug) << "Fiber x,y " << x << "  " << y;
                     // MH                    if (y < -100 || y > 100)
                     // MH                    {
                     // MH                        continue;
@@ -1183,8 +1183,6 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     fnEvents++;
 
     //  cout<<"order "<<tfirst<<", "<<tsecond<<", "<<tthird<<", "<<tfourth<<endl;
-
-    // cout<<"end exec"<<endl;
 }
 
 void R3BBunchedFiberCal2Hit::FinishEvent()
@@ -1265,7 +1263,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
     {
         fh_ToT_s_Fib[i]->Write();
     }
-
+    cout << "Test1: " << fIsCalibrator << endl;
     if (fIsCalibrator)
     {
 
@@ -1274,6 +1272,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
         UInt_t max = N_FIBER_MAX;
         if (fh_ToT_MA_Fib->GetNbinsX() < N_FIBER_MAX)
             max = fh_ToT_MA_Fib->GetNbinsX();
+        cout << "max: " << max << endl;
 
         for (UInt_t i = 1; i <= max; i++)
         {
@@ -1281,6 +1280,8 @@ void R3BBunchedFiberCal2Hit::FinishTask()
             mpar->SetFiber(i);
             fCalPar->AddModulePar(mpar);
         }
+
+        cout << "before TSYNC: " << endl;
 
         // tsync
         if (fIsTsync)
@@ -1302,12 +1303,9 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                 TH1D* proj2 = fh_Fib_ToF->ProjectionY("", i + 1, i + 1, 0);
                 Double_t tsync = proj2->GetBinCenter(proj2->GetMaximumBin());
                 par2->SetSync(proj2->GetBinCenter(proj2->GetMaximumBin()));
-
-                if (i < 257)
-                    cout << fName << " Fiber: " << i << ", tsync" << proj2->GetBinCenter(proj2->GetMaximumBin())
-                         << ", offset: " << 0.5 * proj1->GetBinCenter(proj1->GetMaximumBin()) << endl;
             }
         }
+        cout << "before GAIN: " << endl;
         if (fIsGain)
         {
             for (UInt_t i = 1; i <= max; i++)
@@ -1333,8 +1331,6 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                         R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
                         par->SetGainMA(proj->GetBinCenter(j));
 
-                        if (i < 257)
-                            cout << fName << " Fiber: " << i << " gain MA: " << proj->GetBinCenter(j) << endl;
                         break;
                     }
                 }
@@ -1351,8 +1347,6 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                         R3BBunchedFiberHitModulePar* par3 = fCalPar->GetModuleParAt(i);
                         par3->SetGainS(proj->GetBinCenter(j));
 
-                        if (i < 257)
-                            cout << fName << " Fiber: " << i << " gain SA: " << proj3->GetBinCenter(j) << endl;
                         break;
                     }
                 }
@@ -1381,6 +1375,8 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                     }
                 }
         */
+        cout << "end " << endl;
+
         fCalPar->setChanged();
     }
 }

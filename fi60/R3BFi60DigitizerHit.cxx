@@ -248,11 +248,11 @@ void R3BFi60DigitizerHit::Exec(Option_t* opt)
                     // cout<<setprecision(10)<< "Hit Fi60 global-dx,dy,dz: "<<posGlobalcheck.X()-posGlobal.X()<<",
                     // "<<posGlobalcheck.Y()-posGlobal.Y()<<", "<<posGlobalcheck.Z()-posGlobal.Z()<<endl;
 
-                    Bool_t granularity = true;
+                    Bool_t granularity = false;
                     if (granularity)
                     {
                         LOG(debug) << "x before granularity: " << x_local;
-                        Double_t fiber_gran = 0.1; // cm
+                        Double_t fiber_gran = 0.05; // cm
                         x_local = (int)((x_local + fiber_gran / 2.) / fiber_gran) * fiber_gran;
                         LOG(debug) << "x after granularity: " << x_local;
                     }

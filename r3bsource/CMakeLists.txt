@@ -109,6 +109,7 @@ R3BFi30Reader.cxx
 R3BFi31Reader.cxx
 R3BFi32Reader.cxx
 R3BFi33Reader.cxx
+R3BFi60Reader.cxx
 R3BLosReader.cxx
 R3BRoluReader.cxx
 R3BSci2Reader.cxx
@@ -141,6 +142,7 @@ ext/ext_h101_tpat.h
 ext/ext_h101_timestamp_master.h
 ext/ext_h101_bmon.h
 ext/ext_h101_fibzero.h
+ext/ext_h101_fibsixty.h
 ext/ext_h101_fibonea.h
 ext/ext_h101_fiboneb.h
 ext/ext_h101_wrlos.h

@@ -44,7 +44,7 @@ set(SRCS
 R3BFi60.cxx  
 R3BFi60Cal2Hit.cxx
 R3BFi60Mapped2Cal.cxx
-R3BFi60ContFact.cxx
+#R3BFi60ContFact.cxx
 R3BFi60Digitizer.cxx
 R3BFi60DigitizerCal.cxx
 R3BFi60DigitizerHit.cxx

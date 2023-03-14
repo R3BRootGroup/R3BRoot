@@ -212,9 +212,9 @@ void R3BFi62DigitizerHit::Exec(Option_t* opt)
                                << " z: " << (z[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
                                << " t: " << time[i].at(&energyl - energy[i].data()) << endl;
 
-                    Double_t PositionX = -145.;
+                    Double_t PositionX = -142.;
                     Double_t PositionY = 0.;
-                    Double_t PositionZ = 643.;
+                    Double_t PositionZ = 633.;
                     Double_t RotationY = -14.;
 
                     TVector3 posGlobal(x[i].at(&energyl - energy[i].data()),
@@ -245,11 +245,11 @@ void R3BFi62DigitizerHit::Exec(Option_t* opt)
                     // cout<<setprecision(10)<< "Hit Fi62 global-dx,dy,dz: "<<posGlobalcheck.X()-posGlobal.X()<<",
                     // "<<posGlobalcheck.Y()-posGlobal.Y()<<", "<<posGlobalcheck.Z()-posGlobal.Z()<<endl;
 
-                    Bool_t granularity = true;
+                    Bool_t granularity = false;
                     if (granularity)
                     {
                         LOG(debug) << "y before granularity: " << y_local;
-                        Double_t fiber_gran = 0.1; // cm
+                        Double_t fiber_gran = 0.05; // cm
                         y_local = (int)((y_local + fiber_gran / 2.) / fiber_gran) * fiber_gran;
                         LOG(debug) << "y after granularity: " << y_local;
                     }

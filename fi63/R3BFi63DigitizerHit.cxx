@@ -245,11 +245,11 @@ void R3BFi63DigitizerHit::Exec(Option_t* opt)
                     // cout<<setprecision(10)<< "Hit Fi63 global-dx,dy,dz: "<<posGlobalcheck.X()-posGlobal.X()<<",
                     // "<<posGlobalcheck.Y()-posGlobal.Y()<<", "<<posGlobalcheck.Z()-posGlobal.Z()<<endl;
 
-                    Bool_t granularity = true;
+                    Bool_t granularity = false;
                     if (granularity)
                     {
                         LOG(debug) << "y before granularity: " << y_local;
-                        Double_t fiber_gran = 0.1; // cm
+                        Double_t fiber_gran = 0.05; // cm
                         y_local = (int)((y_local + fiber_gran / 2.) / fiber_gran) * fiber_gran;
                         LOG(debug) << "y after granularity: " << y_local;
                     }

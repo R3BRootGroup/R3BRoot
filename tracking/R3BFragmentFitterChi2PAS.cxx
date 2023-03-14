@@ -197,8 +197,8 @@ double Chi2MomentumForward(const double* xx)
     LOG(debug3) << "Nach setzen der Startwerte" << endl;
     LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
                 << "  " << gCandidate->GetMomentum().Z() << endl;
-    LOG(debug3) << "*** Current lab position: " << gCandidate->GetPosition().X() << "  "
-                << gCandidate->GetPosition().Y() << "  " << gCandidate->GetPosition().Z() << endl;
+    LOG(debug) << "*** Current lab position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
+               << "  " << gCandidate->GetPosition().Z() << endl;
 
     // Propagate forward through the setup, defined by array of detectors
     for (Int_t i = 0; i < (gSetup->GetArray().size() - 0); i++)
@@ -229,11 +229,11 @@ double Chi2MomentumForward(const double* xx)
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
 
-        //  cout<<"In fragment_fitter_chi2 Global2Local: "<<endl;
-        //  cout<<det->GetDetectorName().Data()<<", "<<gCandidate->GetPosition().X()<<",
-        //  "<<gCandidate->GetPosition().Y()<<
-        //  ", "<<gCandidate->GetPosition().Z()<<
-        //  ", "<<x_l<<", "<<y_l<<endl;
+        // cout<<"In fragment_fitter_chi2 Global2Local: "<<endl;
+        // cout<<det->GetDetectorName().Data()<<", "<<gCandidate->GetPosition().X()<<
+        //", "<<gCandidate->GetPosition().Y()<<
+        //", "<<gCandidate->GetPosition().Z()<<
+        //", "<<x_l<<", "<<y_l<<endl;
 
         // TVector3 out;
         // det->LocalToGlobal(out, x_l, y_l);
@@ -291,7 +291,7 @@ double Chi2MomentumForward(const double* xx)
 
             chi2temp = TMath::Power((y_l - hit->GetY()) / yres, 2);
 
-            if (det->GetDetectorName() == "fi23b" || det->GetDetectorName() == "fi62")
+            if (det->GetDetectorName() == "fi23b" || det->GetDetectorName() == "fi63")
             {
                 if (TMath::Abs(y_l - hit->GetY()) < det->res_y)
                 {
@@ -332,36 +332,13 @@ double Chi2MomentumForward(const double* xx)
 double Chi2MomentumBackward(const double* xx)
 {
 
-    LOG(debug3) << "In chi2 backward" << endl;
-    LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
-                << "  " << gCandidate->GetMomentum().Z() << endl;
-    LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
-                << "  " << gCandidate->GetPosition().Z() << endl;
-
     Double_t x_l = 0.;
     Double_t y_l = 0.;
     Double_t chi2 = 0.;
     Int_t nchi2 = 0;
     TVector3 pos2;
     TVector3 pos3;
-    // LOG(debug3) << "Test: " << gCandidate->GetHitIndexByName("fi12") << "  " << gCandidate->GetHitIndexByName("fi10")
-    // << endl;
-    /*
-        if (gCandidate->GetHitIndexByName("fi30") > -1)
-        {
-            auto fi30 = gSetup->GetByName("fi30");
-            fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
-        }
-        else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
-        {
-            auto fi33 = gSetup->GetByName("fi33");
-            fi33->LocalToGlobal(pos3, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
-        }
-        else
-        {
-            return 10;
-        }
-    */
+
     Double_t px0 = xx[0];
     Double_t py0 = xx[1];
     Double_t pz0 = xx[2];
@@ -370,28 +347,17 @@ double Chi2MomentumBackward(const double* xx)
     double y0 = xx[4];
     double z0 = xx[5];
 
-    LOG(debug3) << "Variables momentum: " << px0 << "  " << py0 << "  " << pz0 << endl;
-    LOG(debug3) << "Variables position: " << x0 << "  " << y0 << "  " << z0 << endl;
-
     TVector3 startPosition(x0, y0, z0);
     TVector3 startMomentum(px0, py0, pz0);
 
     gCandidate->SetPosition(startPosition);
     gCandidate->SetMomentum(startMomentum);
-    // gCandidate->UpdateMomentum();
-    // gCandidate->Reset();
 
-    LOG(debug3) << "Nach setzen von Werten" << endl;
-    LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
-                << "  " << gCandidate->GetMomentum().Z() << endl;
-    LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
-                << "  " << gCandidate->GetPosition().Z() << endl;
-
-    LOG(debug3) << "Test momentum: " << gCandidate->GetMomentum().X() << ", " << gCandidate->GetMomentum().Y() << ", "
-                << gCandidate->GetMomentum().Z() << endl;
-    LOG(debug3) << "Test position: " << gCandidate->GetPosition().X() << ", " << gCandidate->GetPosition().Y() << ", "
-                << gCandidate->GetPosition().Z() << endl;
-    LOG(debug3) << "Test charge: " << gCandidate->GetCharge() << endl;
+    LOG(debug) << "In chi2 backward" << endl;
+    LOG(debug) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y() << "  "
+               << gCandidate->GetMomentum().Z() << endl;
+    LOG(debug) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y() << "  "
+               << gCandidate->GetPosition().Z() << endl;
 
     // Propagate backward through the setup, defined by array of detectors
     for (Int_t i = (gSetup->GetArray().size() - 1); i >= 0; i--)
@@ -405,15 +371,6 @@ double Chi2MomentumBackward(const double* xx)
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
 
-            LOG(debug3) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
-                        << gCandidate->GetMomentum().Y() << ", " << gCandidate->GetMomentum().Z();
-
-            LOG(debug3) << "Vor Energieverlust" << endl;
-            LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  "
-                        << gCandidate->GetMomentum().Y() << "  " << gCandidate->GetMomentum().Z() << endl;
-            LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  "
-                        << gCandidate->GetPosition().Y() << "  " << gCandidate->GetPosition().Z() << endl;
-
             if (gEnergyLoss)
             {
                 Double_t weight = 1.;
@@ -423,11 +380,6 @@ double Chi2MomentumBackward(const double* xx)
                 }
                 gCandidate->PassThroughDetectorBackward(det, weight);
             }
-            LOG(debug3) << "Nach Energieverlust" << endl;
-            LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  "
-                        << gCandidate->GetMomentum().Y() << "  " << gCandidate->GetMomentum().Z() << endl;
-            LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  "
-                        << gCandidate->GetPosition().Y() << "  " << gCandidate->GetPosition().Z() << endl;
         }
 
         // Convert global track coordinates into local on the det plane
@@ -455,8 +407,8 @@ double Chi2MomentumBackward(const double* xx)
 
             // chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
-            LOG(debug3) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
-                        << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2;
+            LOG(debug) << "chi2calc x: " << det->GetDetectorName().Data() << " res: " << det->res_x << " pos: " << x_l
+                       << " hit: " << hit->GetX() << " dev: " << x_l - hit->GetX() << " chi2: " << chi2;
 
             nchi2 += 1;
         }
@@ -475,17 +427,17 @@ double Chi2MomentumBackward(const double* xx)
 
             // chi2 += TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
-            LOG(debug3) << "chi2calc y: " << det->GetDetectorName().Data() << " res: " << det->res_y << " pos: " << y_l
-                        << " hit: " << hit->GetY() << " dev: " << y_l - hit->GetY() << " chi2: " << chi2;
+            LOG(debug) << "chi2calc y: " << det->GetDetectorName().Data() << " res: " << det->res_y << " pos: " << y_l
+                       << " hit: " << hit->GetY() << " dev: " << y_l - hit->GetY() << " chi2: " << chi2;
 
             nchi2 += 1;
         }
     }
-    LOG(debug3) << "Ende chi2" << endl;
-    LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
-                << "  " << gCandidate->GetMomentum().Z() << endl;
-    LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
-                << "  " << gCandidate->GetPosition().Z() << endl;
+    LOG(debug) << "Ende chi2" << endl;
+    LOG(debug) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y() << "  "
+               << gCandidate->GetMomentum().Z() << endl;
+    LOG(debug) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y() << "  "
+               << gCandidate->GetPosition().Z() << endl;
 
     gCandidate->SetChi2(chi2);
 
@@ -1029,8 +981,7 @@ Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumForward(R3BTrackingParticle* par
 
 Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumBackward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
-    // LOG(debug3)
-    cout << "In track momentum backward" << endl;
+    LOG(debug) << "In track momentum backward";
     gCandidate = particle;
     gSetup = setup;
 
@@ -1049,84 +1000,78 @@ Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumBackward(R3BTrackingParticle* pa
     TVector3 startPosOptimized;
     TVector3 startPositionOptimized;
     TVector3 startMomentumOptimized;
+    Double_t y1, y2;
+    Double_t x1, x2;
 
-    if (gCandidate->GetHitIndexByName("fi32") > -1 && gCandidate->GetHitIndexByName("fi30") > -1)
-    {
-        auto fi32 = gSetup->GetByName("fi32");
-        auto fi30 = gSetup->GetByName("fi30");
-        fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX(), 0.);
-        fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
-    }
-    else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
-    {
-        auto fi31 = gSetup->GetByName("fi31");
-        auto fi33 = gSetup->GetByName("fi33");
-        fi33->LocalToGlobal(pos2, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
-        fi31->LocalToGlobal(pos3, gSetup->GetHit("fi31", gCandidate->GetHitIndexByName("fi31"))->GetX(), 0.);
-    }
-    else
-    {
-        return 10;
-    }
-
+    // works so far only for simulations
+    // Start at hit of ToFD and track backward
     if (gCandidate->GetHitIndexByName("tofd") > -1)
     {
         auto tofd = gSetup->GetByName("tofd");
-        tofd->LocalToGlobal(pos0,
+        tofd->LocalToGlobal(pos3,
                             gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(),
                             gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
     }
 
-    direction0 = (pos3 - pos2).Unit();
-    // direction0 = (pos2 - pos0).Unit();
+    if (gCandidate->GetHitIndexByName("fi60") > -1)
+    {
+        // if fi60 is present, we go in the direction of this hit
+        auto fi60 = gSetup->GetByName("fi60");
+        fi60->LocalToGlobal(pos2,
+                            gSetup->GetHit("fi60", gCandidate->GetHitIndexByName("fi60"))->GetX(),
+                            gSetup->GetHit("fi60", gCandidate->GetHitIndexByName("fi60"))->GetY());
+    }
+    else if (gCandidate->GetHitIndexByName("fi61") > -1)
+    {
+        // if fi61 is present, we go in the direction of this hit
+        auto fi61 = gSetup->GetByName("fi61");
+        fi61->LocalToGlobal(pos2,
+                            gSetup->GetHit("fi61", gCandidate->GetHitIndexByName("fi61"))->GetX(),
+                            gSetup->GetHit("fi61", gCandidate->GetHitIndexByName("fi61"))->GetY());
+    }
+    pos2.SetX(pos2.X() - 1.);
+    direction0 = (pos2 - pos3).Unit();
+    LOG(debug) << "direction: " << direction0.X() << "  " << direction0.Y() << "  " << direction0.Z();
 
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
     direction0.SetMag(mom);
 
-    cout << "mom: " << mom << endl;
-    direction0.Print();
+    LOG(debug) << "mom: " << mom;
     TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
 
-    pos3.SetY(600. / 700. * pos0.Y());
     gCandidate->Reset();
     gCandidate->SetPosition(pos3);
     gCandidate->SetMomentum(startMomentum);
-
-    // LOG(DEBUG3)
-    cout << "mom: " << mom << endl;
 
     px0 = direction0.X();
     py0 = direction0.Y();
     pz0 = direction0.Z();
 
-    x0 = pos0.X();
-    y0 = pos0.Y();
-    z0 = pos0.Z();
-
-    gCandidate->Reset();
-    gCandidate->SetPosition(pos0);
-    gCandidate->SetMomentum(startMomentum);
+    x0 = pos3.X();
+    y0 = pos3.Y();
+    z0 = pos3.Z();
 
     LOG(info) << "Start values momentum lab: " << px0 << "  " << py0 << "  " << pz0;
     LOG(info) << "Start values position lab: " << x0 << "  " << y0 << "  " << z0;
 
-    Double_t x_l, y_l;
-    if (gCandidate->GetHitIndexByName("tofd") > -1)
-    {
-        auto tofd = gSetup->GetByName("tofd");
-        tofd->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
-        cout << "Start values position ToFd recalc: " << x_l << "  " << y_l << endl;
-    }
-
+    /*
+        Double_t x_l, y_l;
+        if (gCandidate->GetHitIndexByName("tofd") > -1)
+        {
+            auto tofd = gSetup->GetByName("tofd");
+            tofd->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+            cout << "Start values position ToFd recalc: " << x_l << "  " << y_l << endl;
+        }
+    */
     double variable[6] = { px0, py0, pz0, x0, y0, z0 };
-    double step[6] = { 0.01, 0.01, 0.01, 0.1, 0.1, 0.1 };
+    double step[6] = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };
 
     //    ROOT::Math::Minimizer* minimum_a = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     ROOT::Math::Minimizer* minimum_a = ROOT::Math::Factory::CreateMinimizer("Minuit2", "SIMPLEX");
 
     // set tolerance , etc...
-    minimum_a->SetMaxFunctionCalls(10000); // for Minuit/Minuit2
-    minimum_a->SetMaxIterations(1000);     // for GSL
+    minimum_a->SetMaxFunctionCalls(1000); // for Minuit/Minuit2
+    minimum_a->SetMaxIterations(100);     // for GSL
     minimum_a->SetTolerance(10.0);
     minimum_a->SetPrintLevel(0);
 
@@ -1136,14 +1081,18 @@ Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumBackward(R3BTrackingParticle* pa
     minimum_a->SetFunction(fa);
 
     // Set the free variables to be minimized!
-    minimum_a->SetLimitedVariable(0, "px", variable[0], step[0], px0 - 10., px0 + 10.);
+    minimum_a->SetLimitedVariable(0, "px", variable[0], step[0], px0 - 30., px0 + 30.);
     minimum_a->SetLimitedVariable(1, "py", variable[1], step[1], -30., 30.);
     minimum_a->SetLimitedVariable(
-        2, "pz", variable[2], step[2], gCandidate->GetMomentum().Z() - 20., gCandidate->GetMomentum().Z() + 20.);
+        2, "pz", variable[2], step[2], gCandidate->GetMomentum().Z() - 30., gCandidate->GetMomentum().Z() + 30.);
 
     minimum_a->SetLimitedVariable(3, "x0", variable[3], step[3], x0 - 5., x0 + 5.);
     minimum_a->SetLimitedVariable(4, "y0", variable[4], step[4], y0 - 5., y0 + 5.);
     minimum_a->SetLimitedVariable(5, "z0", variable[5], step[5], z0 - 1., z0 + 1.);
+
+    minimum_m->FixVariable(3);
+    minimum_m->FixVariable(4);
+    minimum_m->FixVariable(5);
 
     gCandidate->SetStartBeta(gCandidate->GetBeta());
     gCandidate->SetCharge(-1. * gCandidate->GetCharge());
@@ -1155,14 +1104,11 @@ Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumBackward(R3BTrackingParticle* pa
     minimum_a->Minimize();
 
     status = minimum_a->Status();
-    // LOG(debug3) << "Status: " << status ;
 
-    // LOG(debug3)
-    cout << "optimized momentum: " << minimum_a->X()[0] << "  " << minimum_a->X()[1] << "  " << minimum_a->X()[2]
-         << endl;
-    // LOG(debug3)
-    cout << "optimized position: " << minimum_a->X()[3] << "  " << minimum_a->X()[4] << "  " << minimum_a->X()[5]
-         << endl;
+    LOG(debug3) << "optimized momentum: " << minimum_a->X()[0] << "  " << minimum_a->X()[1] << "  "
+                << minimum_a->X()[2];
+    LOG(debug3) << "optimized position: " << minimum_a->X()[3] << "  " << minimum_a->X()[4] << "  "
+                << minimum_a->X()[5];
 
     startMomentumOptimized.SetX(minimum_a->X()[0]);
     startMomentumOptimized.SetY(minimum_a->X()[1]);
@@ -1182,9 +1128,8 @@ Int_t R3BFragmentFitterChi2PAS::FitTrackMomentumBackward(R3BTrackingParticle* pa
         auto det = gSetup->GetArray().at(i);
         if (i < (gSetup->GetArray().size() - 1))
         {
-            // LOG(debug3)
-            cout << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
-                 << gCandidate->GetMomentum().Y() << ", " << gCandidate->GetMomentum().Z() << endl;
+            LOG(debug3) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
+                        << gCandidate->GetMomentum().Y() << ", " << gCandidate->GetMomentum().Z() << endl;
 
             gProp->PropagateToDetectorBackward(gCandidate, det);
 

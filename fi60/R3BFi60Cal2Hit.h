@@ -14,12 +14,12 @@
 #ifndef R3BFI60CAL2HIT
 #define R3BFI60CAL2HIT
 
-#include "R3BBunchedFiberCal2Hit_s494.h"
+#include "R3BBunchedFiberCal2Hit.h"
 
-class R3BFi60Cal2Hit : public R3BBunchedFiberCal2Hit_s494
+class R3BFi60Cal2Hit : public R3BBunchedFiberCal2Hit
 {
   public:
-    R3BFi60Cal2Hit(enum R3BTCalEngine::CTDCVariant, Bool_t, Bool_t, Bool_t, Int_t = 1);
+    R3BFi60Cal2Hit(Bool_t, Bool_t, Bool_t, Int_t = 1);
     virtual ~R3BFi60Cal2Hit();
     UInt_t FixMistake(UInt_t);
 

@@ -86,12 +86,14 @@ R3BFragmentTrackerPAS::R3BFragmentTrackerPAS(const char* name, Bool_t vis, Int_t
     , fFi60HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi61HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi62HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
+    , fFi63HitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fNofTofdHitItems(0)
     , fNofFi23aHitItems(0)
     , fNofFi23bHitItems(0)
     , fNofFi60HitItems(0)
     , fNofFi61HitItems(0)
     , fNofFi62HitItems(0)
+    , fNofFi63HitItems(0)
     , fWriteOut(kFALSE)
     , fPmax(20000)
     , fPmin(0)
@@ -103,6 +105,7 @@ R3BFragmentTrackerPAS::R3BFragmentTrackerPAS(const char* name, Bool_t vis, Int_t
     fDetectors->AddDetector("fi60", kAfterGlad, "fi60GeoPar", "Fi60Hit");
     fDetectors->AddDetector("fi61", kAfterGlad, "fi61GeoPar", "Fi61Hit");
     fDetectors->AddDetector("fi62", kAfterGlad, "fi62GeoPar", "Fi62Hit");
+    fDetectors->AddDetector("fi63", kAfterGlad, "fi63GeoPar", "Fi63Hit");
     fDetectors->AddDetector("tofd", kTof, "tofdGeoPar", "TofdHit");
 }
 
@@ -194,6 +197,7 @@ InitStatus R3BFragmentTrackerPAS::Init()
     man->Register("Fi60Hit", "Land", fFi60HitItems, kTRUE);
     man->Register("Fi61Hit", "Land", fFi61HitItems, kTRUE);
     man->Register("Fi62Hit", "Land", fFi62HitItems, kTRUE);
+    man->Register("Fi63Hit", "Land", fFi63HitItems, kTRUE);
 
     man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
     man->Register("Track", "Land", fTrackItems, kTRUE);
@@ -210,6 +214,7 @@ InitStatus R3BFragmentTrackerPAS::Init()
     fh_mult_fi60 = new TH1F("h_mult_fi60", "Multiplicity fi60", 20, -0.5, 19.5);
     fh_mult_fi61 = new TH1F("h_mult_fi61", "Multiplicity fi61", 20, -0.5, 19.5);
     fh_mult_fi62 = new TH1F("h_mult_fi62", "Multiplicity fi62", 20, -0.5, 19.5);
+    fh_mult_fi63 = new TH1F("h_mult_fi63", "Multiplicity fi63", 20, -0.5, 19.5);
     fh_mult_tofd = new TH1F("h_mult_tofd", "Multiplicity TOFd", 20, -0.5, 19.5);
     fh_eloss_fi23a_mc = new TH1F("h_eloss_fi23a_mc", "Energy loss fi23a (MC truth)", 2000, 0., 50.);
     fh_eloss_fi23a = new TH1F("h_eloss_fi23a", "Energy loss fi23a", 2000, 0., 50.);
@@ -221,6 +226,8 @@ InitStatus R3BFragmentTrackerPAS::Init()
     fh_eloss_fi61 = new TH1F("h_eloss_fi61", "Energy loss fi61", 2000, 0., 50.);
     fh_eloss_fi62_mc = new TH1F("h_eloss_fi62_mc", "Energy loss fi62 (MC truth)", 2000, 0., 50.);
     fh_eloss_fi62 = new TH1F("h_eloss_fi62", "Energy loss fi62", 2000, 0., 50.);
+    fh_eloss_fi63_mc = new TH1F("h_eloss_fi63_mc", "Energy loss fi63 (MC truth)", 2000, 0., 50.);
+    fh_eloss_fi63 = new TH1F("h_eloss_fi63", "Energy loss fi63", 2000, 0., 50.);
     fh_ncand = new TH1F("h_ncand", "Number of candidates", 100, -0.5, 99.5);
     fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 2000., 0., 20.);
     fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 2000., 0., 20.);
@@ -344,6 +351,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
     R3BTrackingDetector* fi60 = fDetectors->GetByName("fi60");
     R3BTrackingDetector* fi61 = fDetectors->GetByName("fi61");
     R3BTrackingDetector* fi62 = fDetectors->GetByName("fi62");
+    R3BTrackingDetector* fi63 = fDetectors->GetByName("fi63");
     R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
 
     // R3BHit(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t hitId)
@@ -354,10 +362,10 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
         cout << "*************** NEW EVENT ****" << fNEvents << endl;
         cout << "Hits ToFD: " << tof->hits.size() << endl;
         cout << "Hits: " << fi23a->hits.size() << "  " << fi23b->hits.size() << "  " << fi60->hits.size() << "  "
-             << fi61->hits.size() << "  " << fi62->hits.size() << endl;
+             << fi61->hits.size() << "  " << fi62->hits.size() << "  " << fi63->hits.size() << endl;
     }
 
-    if (fi23a->hits.size() > 0 && fi23b->hits.size() > 0)
+    if (fi23a->hits.size() > 0 && fi23b->hits.size() > 0 && tof->hits.size() > 0)
     {
         // we have a proton in the entrance channel
         counter1++;
@@ -369,11 +377,9 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
         return;
     if (fi23b->hits.size() < 1)
         return;
-    if (fi60->hits.size() < 1)
+    if (fi60->hits.size() + fi61->hits.size() + fi62->hits.size() < 2)
         return;
-    if (fi61->hits.size() < 1)
-        return;
-    if (fi62->hits.size() < 1)
+    if (fi63->hits.size() < 1)
         return;
     if (tof->hits.size() < 1)
         return;
@@ -453,6 +459,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
     fh_mult_fi60->Fill(fi60->hits.size());
     fh_mult_fi61->Fill(fi61->hits.size());
     fh_mult_fi62->Fill(fi62->hits.size());
+    fh_mult_fi63->Fill(fi63->hits.size());
     fh_mult_tofd->Fill(tof->hits.size());
 
     /* Note:
@@ -473,6 +480,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
     Int_t ifi60 = 0;
     Int_t ifi61 = 0;
     Int_t ifi62 = 0;
+    Int_t ifi63 = 0;
     Int_t itof = 0;
     if (0 == fi23a->hits.size())
     {
@@ -493,6 +501,10 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
     if (0 == fi62->hits.size())
     {
         ifi62 = -1;
+    }
+    if (0 == fi63->hits.size())
+    {
+        ifi63 = -1;
     }
     if (0 == tof->hits.size())
     {
@@ -530,6 +542,11 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
         {
             cout << "Fib62 hits: " << i << ", x: " << fi62->hits.at(i)->GetX()
                  << ", Q: " << fi62->hits.at(i)->GetEloss() << endl;
+        }
+        for (Int_t i = 0; i < fi63->hits.size(); i++)
+        {
+            cout << "Fib63 hits: " << i << ", x: " << fi63->hits.at(i)->GetX()
+                 << ", Q: " << fi63->hits.at(i)->GetEloss() << endl;
         }
 
         for (Int_t i = 0; i < tof->hits.size(); i++)
@@ -602,193 +619,216 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
             cout << "AT START: "
                  << "Mass: " << mass0 << ", Momentum: " << p0 << endl;
 
-        do // fi62
+        do // fi63
         {
-            if (ifi62 >= 0)
-                fh_eloss_fi62_mc->Fill(1000. * fi62->hits.at(ifi62)->GetEloss()); // MeV
-            if ((ifi62 >= 0 && !fi62->free_hit[ifi62])) // if the hit was used already, continue
+            if (ifi63 >= 0)
+                fh_eloss_fi63_mc->Fill(1000. * fi63->hits.at(ifi63)->GetEloss()); // MeV
+            if ((ifi63 >= 0 && !fi63->free_hit[ifi63])) // if the hit was used already, continue
             {
                 if (debug_loopin)
-                    cout << "Fi62 hit already used or not correct charge " << charge_requested << ", "
-                         << fi62->hits.at(ifi62)->GetEloss() << endl;
-                ifi62 += 1;
+                    cout << "Fi63 hit already used or not correct charge " << charge_requested << ", "
+                         << fi63->hits.at(ifi63)->GetEloss() << endl;
+                ifi63 += 1;
                 continue;
             }
-            do // fi61
+            do // fi62
             {
-                if (ifi61 >= 0)
-                    fh_eloss_fi61_mc->Fill(1000. * fi61->hits.at(ifi61)->GetEloss()); // MeV
-                if ((ifi61 >= 0 && !fi61->free_hit[ifi61])) // if the hit was used already, continue
+                if (ifi62 >= 0)
+                    fh_eloss_fi62_mc->Fill(1000. * fi62->hits.at(ifi62)->GetEloss()); // MeV
+                if ((ifi62 >= 0 && !fi62->free_hit[ifi62])) // if the hit was used already, continue
                 {
                     if (debug_loopin)
-                        cout << "Fi61 hit already used or not correct charge " << charge_requested << ", "
-                             << fi61->hits.at(ifi61)->GetEloss() << endl;
-                    ifi61 += 1;
+                        cout << "Fi62 hit already used or not correct charge " << charge_requested << ", "
+                             << fi62->hits.at(ifi62)->GetEloss() << endl;
+                    ifi62 += 1;
                     continue;
                 }
-                do // fi60
+                do // fi61
                 {
-                    if (ifi60 >= 0)
-                        fh_eloss_fi60_mc->Fill(1000. * fi60->hits.at(ifi60)->GetEloss()); // MeV
-                    if ((ifi60 >= 0 && !fi60->free_hit[ifi60])) // if the hit was used already, continue
+                    if (ifi61 >= 0)
+                        fh_eloss_fi61_mc->Fill(1000. * fi61->hits.at(ifi61)->GetEloss()); // MeV
+                    if ((ifi61 >= 0 && !fi61->free_hit[ifi61])) // if the hit was used already, continue
                     {
                         if (debug_loopin)
-                            cout << "Fi60 hit already used or not correct charge " << charge_requested << ", "
-                                 << fi60->hits.at(ifi60)->GetEloss() << endl;
-                        ifi60 += 1;
+                            cout << "Fi61 hit already used or not correct charge " << charge_requested << ", "
+                                 << fi61->hits.at(ifi61)->GetEloss() << endl;
+                        ifi61 += 1;
                         continue;
                     }
-                    do // fi23b
+                    do // fi60
                     {
-                        if (ifi23b >= 0)
-                            fh_eloss_fi23b_mc->Fill(1000. * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
-                        if (ifi23b >= 0 && !fi23b->free_hit[ifi23b]) // if the hit was used already, continue
+                        if (ifi60 >= 0)
+                            fh_eloss_fi60_mc->Fill(1000. * fi60->hits.at(ifi60)->GetEloss()); // MeV
+                        if ((ifi60 >= 0 && !fi60->free_hit[ifi60])) // if the hit was used already, continue
                         {
                             if (debug_loopin)
-                                cout << "Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used" << endl;
-                            ifi23b += 1;
+                                cout << "Fi60 hit already used or not correct charge " << charge_requested << ", "
+                                     << fi60->hits.at(ifi60)->GetEloss() << endl;
+                            ifi60 += 1;
                             continue;
                         }
-                        do // fi23a
+                        do // fi23b
                         {
-                            if (ifi23a >= 0)
-                                fh_eloss_fi23a_mc->Fill(1000. * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
-                            if (ifi23a >= 0 && !fi23a->free_hit[ifi23a])                             // if the hit
-                                                                         // was used already, continue
+                            if (ifi23b >= 0)
+                                fh_eloss_fi23b_mc->Fill(1000. * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
+                            if (ifi23b >= 0 && !fi23b->free_hit[ifi23b]) // if the hit was used already, continue
                             {
                                 if (debug_loopin)
-                                    cout << "Fi23a hit already used" << endl;
-                                ifi23a += 1;
+                                    cout << "Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used" << endl;
+                                ifi23b += 1;
                                 continue;
                             }
-
-                            // Create object for particle which will be fitted
-                            candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, mass0);
-
-                            if (debug_loopin)
+                            do // fi23a
                             {
-                                cout << "Charge requested: " << charge_requested << endl;
-                                cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
-                                     << " p0: " << p0 << " beta0: " << beta0 << " mass0: " << mass0 << endl;
-                                cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
-                                     << " y: " << tof->hits.at(i)->GetY() << endl;
+                                if (ifi23a >= 0)
+                                    fh_eloss_fi23a_mc->Fill(1000. * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
+                                if (ifi23a >= 0 && !fi23a->free_hit[ifi23a])                             // if the hit
+                                                                             // was used already, continue
+                                {
+                                    if (debug_loopin)
+                                        cout << "Fi23a hit already used" << endl;
+                                    ifi23a += 1;
+                                    continue;
+                                }
 
-                                cout << "Hit target # "
-                                     << " x: " << target->hits.at(0)->GetX() << endl;
-                                if (ifi23a > -1)
-                                    cout << " Fi23a right # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
-                                         << ", q: " << fi23a->hits.at(ifi23a)->GetEloss() << endl;
-                                if (ifi23b > -1)
-                                    cout << "right Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
-                                         << ", q: " << fi23b->hits.at(ifi23b)->GetEloss() << endl;
-                                if (ifi60 > -1)
-                                    cout << "Fi60  # " << ifi60 << " x: " << fi60->hits.at(ifi60)->GetX()
-                                         << ", q: " << fi60->hits.at(ifi60)->GetEloss() << endl;
-                                if (ifi61 > -1)
-                                    cout << "Fi61 # " << ifi61 << " x: " << fi61->hits.at(ifi61)->GetX()
-                                         << ", q: " << fi61->hits.at(ifi61)->GetEloss() << endl;
-                                if (ifi62 > -1)
-                                    cout << "Fi62 # " << ifi62 << " x: " << fi62->hits.at(ifi62)->GetX()
-                                         << ", q: " << fi62->hits.at(ifi62)->GetEloss() << endl;
-                            }
+                                // Create object for particle which will be fitted
+                                candidate = new R3BTrackingParticle(charge, x0, y0, z0, 0., 0., p0, beta0, mass0);
 
-                            candidate->AddHit("target", 0);
-                            candidate->AddHit("tofd", i);
-                            candidate->AddHit("fi23a", ifi23a);
-                            candidate->AddHit("fi23b", ifi23b);
-                            candidate->AddHit("fi60", ifi60);
-                            candidate->AddHit("fi61", ifi61);
-                            candidate->AddHit("fi62", ifi62);
+                                if (debug_loopin)
+                                {
+                                    cout << "Charge requested: " << charge_requested << endl;
+                                    cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
+                                         << " p0: " << p0 << " beta0: " << beta0 << " mass0: " << mass0 << endl;
+                                    cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
+                                         << " y: " << tof->hits.at(i)->GetY() << endl;
 
-                            Int_t status = 10;
-                            if (fForward)
-                            {
-                                status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
-                            }
-                            else
-                            {
-                                // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
-                                status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
-                            }
-                            if (debug_loopin)
-                                cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
-                                     << candidate->GetStartMomentum().Mag() << " dp.Mag "
-                                     << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
-                                            (candidate->GetStartMomentum().Mag() - p0)
-                                     << endl;
-                            if (debug_loopin)
-                                cout << "--------------------------------" << endl;
-                            nCand += 1;
+                                    cout << "Hit target # "
+                                         << " x: " << target->hits.at(0)->GetX() << endl;
+                                    if (ifi23a > -1)
+                                        cout << " Fi23a right # " << ifi23a << " x: " << fi23a->hits.at(ifi23a)->GetX()
+                                             << ", q: " << fi23a->hits.at(ifi23a)->GetEloss() << endl;
+                                    if (ifi23b > -1)
+                                        cout << "right Fi23b # " << ifi23b << " y: " << fi23b->hits.at(ifi23b)->GetY()
+                                             << ", q: " << fi23b->hits.at(ifi23b)->GetEloss() << endl;
+                                    if (ifi60 > -1)
+                                        cout << "Fi60  # " << ifi60 << " x: " << fi60->hits.at(ifi60)->GetX()
+                                             << ", q: " << fi60->hits.at(ifi60)->GetEloss() << endl;
+                                    if (ifi61 > -1)
+                                        cout << "Fi61 # " << ifi61 << " x: " << fi61->hits.at(ifi61)->GetX()
+                                             << ", q: " << fi61->hits.at(ifi61)->GetEloss() << endl;
+                                    if (ifi62 > -1)
+                                        cout << "Fi62 # " << ifi62 << " x: " << fi62->hits.at(ifi62)->GetX()
+                                             << ", q: " << fi62->hits.at(ifi62)->GetEloss() << endl;
+                                    if (ifi63 > -1)
+                                        cout << "Fi63 # " << ifi63 << " x: " << fi63->hits.at(ifi63)->GetX()
+                                             << ", q: " << fi63->hits.at(ifi63)->GetEloss() << endl;
+                                }
 
-                            //    cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
-                            //    candidate->GetMomentum().Mag()<<", Momentum Z:
-                            //    "<<candidate->GetMomentum().Z()<<
-                            //   ", Momentum X: "<<candidate->GetMomentum().X() << " status: "<<status<<endl;
+                                candidate->AddHit("target", 0);
+                                candidate->AddHit("tofd", i);
+                                candidate->AddHit("fi23a", ifi23a);
+                                candidate->AddHit("fi23b", ifi23b);
+                                candidate->AddHit("fi60", ifi60);
+                                candidate->AddHit("fi61", ifi61);
+                                candidate->AddHit("fi62", ifi62);
+                                candidate->AddHit("fi63", ifi63);
 
-                            if (TMath::IsNaN(candidate->GetMomentum().Z()))
-                            {
-                                delete candidate;
-                                continue;
-                            }
-
-                            if (10 > status)
-                            {
+                                Int_t status = 10;
                                 if (fForward)
                                 {
-                                    candidate->Reset();
+                                    status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
                                 }
                                 else
                                 {
-                                    candidate->Reset();
+                                    // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
+                                    status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
                                 }
+                                if (debug_loopin)
+                                    cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
+                                         << candidate->GetStartMomentum().Mag() << " dp.Mag "
+                                         << 1000. * (candidate->GetStartMomentum().Mag() - p0) *
+                                                (candidate->GetStartMomentum().Mag() - p0)
+                                         << endl;
+                                if (debug_loopin)
+                                    cout << "--------------------------------" << endl;
+                                nCand += 1;
+
+                                //    cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
+                                //    candidate->GetMomentum()Mag()<<", Momentum Z:
+                                //    "<<candidate->GetMomentum().Z()<<
+                                //   ", Momentum X: "<<candidate->GetMomentum().X() << " status: "<<status<<endl;
+
+                                if (TMath::IsNaN(candidate->GetMomentum().Z()))
+                                {
+                                    delete candidate;
+                                    continue;
+                                }
+
                                 if (10 > status)
                                 {
-                                    // if(candidate->GetChi2() < 3.)
+                                    if (fForward)
                                     {
-                                        fFragments.push_back(candidate);
+                                        candidate->Reset();
+                                    }
+                                    else
+                                    {
+                                        candidate->Reset();
+                                    }
+                                    if (10 > status)
+                                    {
+                                        // if(candidate->GetChi2() < 3.)
+                                        {
+                                            fFragments.push_back(candidate);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        delete candidate;
                                     }
                                 }
                                 else
                                 {
                                     delete candidate;
                                 }
-                            }
-                            else
-                            {
-                                delete candidate;
-                            }
-                            //  } // for target x0 y0
+                                //  } // for target x0 y0
 
-                            // return;
-                            ifi23a += 1;
-                        } while (ifi23a < fi23a->hits.size());
-                        ifi23a = 0;
-                        if (0 == fi23a->hits.size())
-                            ifi23a = -1;
+                                // return;
+                                ifi23a += 1;
+                            } while (ifi23a < fi23a->hits.size());
+                            ifi23a = 0;
+                            if (0 == fi23a->hits.size())
+                                ifi23a = -1;
 
-                        ifi23b += 1;
-                    } while (ifi23b < fi23b->hits.size());
-                    ifi23b = 0;
-                    if (0 == fi23b->hits.size())
-                        ifi23b = -1;
+                            ifi23b += 1;
+                        } while (ifi23b < fi23b->hits.size());
+                        ifi23b = 0;
+                        if (0 == fi23b->hits.size())
+                            ifi23b = -1;
 
-                    ifi60 += 1;
-                } while (ifi60 < fi60->hits.size());
-                ifi60 = 0;
-                if (0 == fi60->hits.size())
-                    ifi60 = -1;
+                        ifi60 += 1;
+                    } while (ifi60 < fi60->hits.size());
+                    ifi60 = 0;
+                    if (0 == fi60->hits.size())
+                        ifi60 = -1;
 
-                ifi61 += 1;
-            } while (ifi61 < fi61->hits.size());
-            ifi61 = 0;
-            if (0 == fi61->hits.size())
-                ifi61 = -1;
+                    ifi61 += 1;
+                } while (ifi61 < fi61->hits.size());
+                ifi61 = 0;
+                if (0 == fi61->hits.size())
+                    ifi61 = -1;
 
-            ifi62 += 1;
-        } while (ifi62 < fi62->hits.size());
-        ifi62 = 0;
-        if (0 == fi62->hits.size())
-            ifi62 = -1;
+                ifi62 += 1;
+            } while (ifi62 < fi62->hits.size());
+            ifi62 = 0;
+            if (0 == fi62->hits.size())
+                ifi62 = -1;
+
+            ifi63 += 1;
+        } while (ifi63 < fi63->hits.size());
+        ifi63 = 0;
+        if (0 == fi63->hits.size())
+            ifi63 = -1;
+
     } // end for TofD
 
     fh_ncand->Fill(nCand);
@@ -825,6 +865,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
         fi60->free_hit[bestcandidate->GetHitIndexByName("fi60")] = false;
         fi61->free_hit[bestcandidate->GetHitIndexByName("fi61")] = false;
         fi62->free_hit[bestcandidate->GetHitIndexByName("fi62")] = false;
+        fi63->free_hit[bestcandidate->GetHitIndexByName("fi63")] = false;
         tof->free_hit[bestcandidate->GetHitIndexByName("tofd")] = false;
 
         Double_t x0soll = 0.;
@@ -887,7 +928,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
             fh_pz->Fill(bestcandidate->GetStartMomentum().Z());
         }
 
-        if (minChi2 < 10)
+        if (minChi2 < 20)
         {
             // good tracking
             counter3++;
@@ -974,13 +1015,20 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
             if (det->GetDetectorName().EqualTo("fi62"))
             { // fi62
                 Double_t eloss = det->GetEnergyLoss(bestcandidate);
-                fh_eloss_fi61->Fill(eloss);
+                fh_eloss_fi62->Fill(eloss);
                 iDet = 5;
+            }
+
+            if (det->GetDetectorName().EqualTo("fi63"))
+            { // fi63
+                Double_t eloss = det->GetEnergyLoss(bestcandidate);
+                fh_eloss_fi63->Fill(eloss);
+                iDet = 6;
             }
 
             if (det->GetDetectorName().EqualTo("tofd"))
             { // tofd
-                iDet = 6;
+                iDet = 7;
             }
 
             if (fEnergyLoss)
@@ -1042,7 +1090,7 @@ void R3BFragmentTrackerPAS::Exec(const Option_t*)
                 {
                     yres = 0.;
                 }
-                if (iDet == 6)
+                if (iDet == 7)
                     yres = TMath::Power((y_l[iDet] - det_hit_y[iDet]) / det->res_y, 2);
                 if (debug_loopout)
                     cout << "For charge: " << charge_requested
@@ -1099,6 +1147,8 @@ void R3BFragmentTrackerPAS::FinishEvent()
     fFi61HitItems->Clear();
     fNofFi62HitItems = 0;
     fFi62HitItems->Clear();
+    fNofFi63HitItems = 0;
+    fFi63HitItems->Clear();
 }
 
 void R3BFragmentTrackerPAS::Finish()
@@ -1106,7 +1156,7 @@ void R3BFragmentTrackerPAS::Finish()
     cout << "Total chi2: " << totalChi2Mass / totalEvents << endl;
     //    cout << "Total chi2 for momentum: " << totalChi2P / totalEvents << endl;
 
-    cout << "Protons on Fi23: " << counter1 << endl;
+    cout << "Protons on Fi23 and ToFD: " << counter1 << endl;
     cout << "Hits on all detectors: " << counter2 << endl;
     cout << "Good tracks: " << counter3 << endl;
     cout << "Efficiency tracking in %: " << (float)counter3 / (float)counter1 * 100. << endl;
@@ -1124,6 +1174,8 @@ void R3BFragmentTrackerPAS::Finish()
     fh_eloss_fi61->Write();
     fh_eloss_fi62_mc->Write();
     fh_eloss_fi62->Write();
+    fh_eloss_fi63_mc->Write();
+    fh_eloss_fi63->Write();
     fh_ncand->Write();
     fh_A_reco1->Write();
     fh_A_reco2->Write();

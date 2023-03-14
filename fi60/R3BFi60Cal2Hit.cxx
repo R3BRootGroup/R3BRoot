@@ -14,21 +14,17 @@
 #include "R3BFi60Cal2Hit.h"
 #include "mapping_fib60_trig.hh"
 
-R3BFi60Cal2Hit::R3BFi60Cal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
-                               Bool_t a_is_calibrator,
-                               Bool_t a_is_gain,
-                               Bool_t a_is_tsync,
-                               Int_t a_verbose)
-    : R3BBunchedFiberCal2Hit_s494("Fi60",
-                                  a_verbose,
-                                  a_variant,
-                                  VERTICAL,
-                                  2,
-                                  256,
-                                  256,
-                                  a_is_calibrator,
-                                  a_is_gain,
-                                  a_is_tsync)
+R3BFi60Cal2Hit::R3BFi60Cal2Hit(Bool_t a_is_calibrator, Bool_t a_is_gain, Bool_t a_is_tsync, Int_t a_verbose)
+    : R3BBunchedFiberCal2Hit("Fi60",
+                             a_verbose,
+                             R3BTCalEngine::CTDC_16_BWD_150,
+                             VERTICAL,
+                             1,
+                             128,
+                             0,
+                             a_is_calibrator,
+                             a_is_gain,
+                             a_is_tsync)
 {
     fib60_trig_map_setup();
     BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib60m_trig_map, g_fib60s_trig_map);
