@@ -97,6 +97,7 @@ R3BGlobalAnalysisS494::R3BGlobalAnalysisS494(const char* name, Int_t iVerbose)
     , fxfibcut(0.1)
     , fyfibcut(0.1)
     , fvis(0)
+    , fEvsE("")
     , fNEvents(0)
     , fHitItemsCalifa(NULL)
 {
@@ -136,20 +137,24 @@ InitStatus R3BGlobalAnalysisS494::Init()
     if (!fHitItemsCalifa)
         LOG(warning) << "GlobalAnalysis: CalifaClusterData not found";
 
-    cout << "R3BGlobalAnalysisS494::Max num events: " << maxevent << endl;
-
     //------------------------------------------------------------------------
     // graphical cuts
     //------------------------------------------------------------------------
     if (fGraphCuts)
     {
-        cout << "READING GRAPHICAL CUTS " << endl;
+        LOG(info) << "READING GRAPHICAL CUTS " << endl;
         cut_EHe_EC = NULL;
+        if (!fEvsE)
+        {
+            LOG(warn) << "No file with graphical cuts loaded!" << endl;
+        }
+        else
+        {
+            TFile* fevse = TFile::Open(fEvsE, "read");
+            cut_EHe_EC = dynamic_cast<TCutG*>(fevse->Get("Cut_EHeEC"));
 
-        TFile* fevse = TFile::Open("Cut_global_evse.root", "read");
-        cut_EHe_EC = dynamic_cast<TCutG*>(fevse->Get("Cut_EHeEC"));
-
-        cout << "GRAPHICAL CUTS ARE READ" << endl;
+            LOG(info) << "GRAPHICAL CUTS ARE READ" << endl;
+        }
     }
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -163,6 +168,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     //-----------------------------------------------------------------------
     //
 
+    R3BLOG(info, "Starting to define histograms");
     fh_px_He = new TH1F("px_He", " px He", 500, -500., 500);
     fh_px_He->GetXaxis()->SetTitle("px / MeV/c");
     fh_px_He->GetYaxis()->SetTitle("counts");
@@ -518,30 +524,6 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_phi_16O->GetXaxis()->SetTitle("angle / degree");
     fh_phi_16O->GetYaxis()->SetTitle("counts");
 
-    fh_theta_4He_cm = new TH2F("theta_4He_cm", "Theta 4He in cm-system", 200, -1., 1., 2000, 0, 20);
-    fh_theta_4He_cm->GetXaxis()->SetTitle("cos(theta_cm)");
-    fh_theta_4He_cm->GetYaxis()->SetTitle("Erel / MeV");
-
-    fh_thetaB_4He_cm = new TH2F("thetaB_4He_cm", "ThetaB 4He in cm-system", 200, -1., 1., 2000, 0, 20);
-    fh_thetaB_4He_cm->GetXaxis()->SetTitle("cos(theta_cm)");
-    fh_thetaB_4He_cm->GetYaxis()->SetTitle("ErelB / MeV");
-
-    fh_phi_4He_cm = new TH2F("phi_4He_cm", "phi 4He in cm-system", 360, 0., 360., 2000, 0, 20);
-    fh_phi_4He_cm->GetXaxis()->SetTitle("angle / degree");
-    fh_phi_4He_cm->GetYaxis()->SetTitle("Erel / MeV");
-
-    fh_theta_12C_cm = new TH2F("theta_12C_cm", "Theta 12C in cm-system", 200, -1, 1., 2000, 0, 20);
-    fh_theta_12C_cm->GetXaxis()->SetTitle("cos(theta_cm)");
-    fh_theta_12C_cm->GetYaxis()->SetTitle("Erel / MeV");
-
-    fh_thetaB_12C_cm = new TH2F("thetaB_12C_cm", "ThetaB 12C in cm-system", 200, -1, 1., 2000, 0, 20);
-    fh_thetaB_12C_cm->GetXaxis()->SetTitle("cos(theta_cm)");
-    fh_thetaB_12C_cm->GetYaxis()->SetTitle("ErelB / MeV");
-
-    fh_phi_12C_cm = new TH2F("phi_12C_cm", "phi 12C in cm-system", 360, 0., 360., 2000, 0, 20);
-    fh_phi_12C_cm->GetXaxis()->SetTitle("angle / degree");
-    fh_phi_12C_cm->GetYaxis()->SetTitle("Erel / MeV");
-
     fh_theta_bc_cm = new TH2F("theta_bc_cm", "Theta bc in cm-system", 180, 0., 180., 2000, 0, 20);
     fh_theta_bc_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta_bc_cm->GetYaxis()->SetTitle("Erel / MeV");
@@ -660,43 +642,153 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Erel_vs_theta16O_3He12C->GetXaxis()->SetTitle("angle / deg");
     fh_Erel_vs_theta16O_3He12C->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_Erel_vs_theta26_bg = new TH2F("Erel_vs_theta_bg", "Erel vs. theta below grazing", 125, 0., 5, 2000, 0, 20.);
-    fh_Erel_vs_theta26_bg->GetXaxis()->SetTitle("angle / deg");
-    fh_Erel_vs_theta26_bg->GetYaxis()->SetTitle("Erel / MeV");
+    fh_pHe_vs_theta26 = new TH2F("pHe_vs_theta", "theta vs pHe", 400, 2000, 6000, 200, 0, 100.);
+    fh_pHe_vs_theta26->GetYaxis()->SetTitle("angle / mrad");
+    fh_pHe_vs_theta26->GetXaxis()->SetTitle("p / MeV/c");
 
-    fh_Erel_vs_theta26_ag = new TH2F("Erel_vs_theta_ag", "Erel vs. theta above grazing", 125, 0., 5, 200, 0, 20.);
-    fh_Erel_vs_theta26_ag->GetXaxis()->SetTitle("angle / deg");
-    fh_Erel_vs_theta26_ag->GetYaxis()->SetTitle("Erel / MeV");
+    fh_ErelB_vs_phibc_bg =
+        new TH2F("ErelB_vs_phibccm_bg", "ErelB vs. phi_bc_cm below grazing", 2000, 0, 20., 400, 0., 400.);
+    fh_ErelB_vs_phibc_bg->GetYaxis()->SetTitle("phi angle bc / deg");
+    fh_ErelB_vs_phibc_bg->GetXaxis()->SetTitle("Erel / MeV");
+
+    fh_ErelB_vs_theta26_bg = new TH2F("b", "ErelB vs. theta below grazing", 125, 0., 5, 2000, 0, 20.);
+    fh_ErelB_vs_theta26_bg->GetXaxis()->SetTitle("angle / deg");
+    fh_ErelB_vs_theta26_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erelB_vs_ptransHe_bg =
+        new TH2F("erelB_vs_ptransHe_bg", "ErelB vs. ptransHe below grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erelB_vs_ptransHe_bg->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erelB_vs_ptransHe_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erelB_vs_ptransC_bg =
+        new TH2F("erelB_vs_ptransC_bg", "ErelB vs. ptransC below grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erelB_vs_ptransC_bg->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erelB_vs_ptransC_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_thetaB_4He_cm_bg =
+        new TH2F("thetaB_4He_cm_bg", "ThetaB 4He in cm-system below grazing", 200, -1., 1., 2000, 0, 20);
+    fh_thetaB_4He_cm_bg->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_thetaB_4He_cm_bg->GetYaxis()->SetTitle("ErelB / MeV");
+
+    fh_phiB_4He_cm_bg = new TH2F("phiB_4He_cm_bg", "phiB 4He in cm-system below grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phiB_4He_cm_bg->GetXaxis()->SetTitle("angle / degree");
+    fh_phiB_4He_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_thetaB_12C_cm_bg =
+        new TH2F("thetaB_12C_cm_bg", "ThetaB 12C in cm-system below grazing", 200, -1, 1., 2000, 0, 20);
+    fh_thetaB_12C_cm_bg->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_thetaB_12C_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_phiB_12C_cm_bg = new TH2F("phiB_12C_cm_bg", "phiB 12C in cm-system below grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phiB_12C_cm_bg->GetXaxis()->SetTitle("angle / degree");
+    fh_phiB_12C_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_ErelB_vs_phibc_ag =
+        new TH2F("ErelB_vs_phibccm_ag", "ErelB vs. phi_bc_cm above grazing", 2000, 0, 20., 400, 0., 400.);
+    fh_ErelB_vs_phibc_ag->GetYaxis()->SetTitle("phi angle bc / deg");
+    fh_ErelB_vs_phibc_ag->GetXaxis()->SetTitle("Erel / MeV");
+
+    fh_ErelB_vs_theta26_ag = new TH2F("ErelB_vs_theta_ag", "ErelB vs. theta above grazing", 125, 0., 5, 2000, 0, 20.);
+    fh_ErelB_vs_theta26_ag->GetXaxis()->SetTitle("angle / deg");
+    fh_ErelB_vs_theta26_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erelB_vs_ptransHe_ag =
+        new TH2F("erelB_vs_ptransHe_ag", "ErelB vs. ptransHe above grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erelB_vs_ptransHe_ag->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erelB_vs_ptransHe_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erelB_vs_ptransC_ag =
+        new TH2F("erelB_vs_ptransC_ag", "ErelB vs. ptransC above grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erelB_vs_ptransC_ag->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erelB_vs_ptransC_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_thetaB_4He_cm_ag =
+        new TH2F("thetaB_4He_cm_ag", "ThetaB 4He in cm-system above grazing", 200, -1., 1., 2000, 0, 20);
+    fh_thetaB_4He_cm_ag->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_thetaB_4He_cm_ag->GetYaxis()->SetTitle("ErelB / MeV");
+
+    fh_phiB_4He_cm_ag = new TH2F("phiB_4He_cm_ag", "phiB 4He in cm-system above grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phiB_4He_cm_ag->GetXaxis()->SetTitle("angle / degree");
+    fh_phiB_4He_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_thetaB_12C_cm_ag =
+        new TH2F("thetaB_12C_cm_ag", "ThetaB 12C in cm-system above grazing", 200, -1, 1., 2000, 0, 20);
+    fh_thetaB_12C_cm_ag->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_thetaB_12C_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_phiB_12C_cm_ag = new TH2F("phiB_12C_cm_ag", "phiB 12C in cm-system above grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phiB_12C_cm_ag->GetXaxis()->SetTitle("angle / degree");
+    fh_phiB_12C_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
 
     fh_Erel_vs_phibc_bg =
         new TH2F("Erel_vs_phibccm_bg", "Erel vs. phi_bc_cm below grazing", 2000, 0, 20., 400, 0., 400.);
     fh_Erel_vs_phibc_bg->GetYaxis()->SetTitle("phi angle bc / deg");
     fh_Erel_vs_phibc_bg->GetXaxis()->SetTitle("Erel / MeV");
 
+    fh_Erel_vs_theta26_bg = new TH2F("Erel_vs_theta_bg", "Erel vs. theta below grazing", 125, 0., 5, 2000, 0, 20.);
+    fh_Erel_vs_theta26_bg->GetXaxis()->SetTitle("angle / deg");
+    fh_Erel_vs_theta26_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erel_vs_ptransHe_bg =
+        new TH2F("erel_vs_ptransHe_bg", "ErelB vs. ptransHe below grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erel_vs_ptransHe_bg->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erel_vs_ptransHe_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_erel_vs_ptransC_bg =
+        new TH2F("erel_vs_ptransC_bg", "Erel vs. ptransC below grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erel_vs_ptransC_bg->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erel_vs_ptransC_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_theta_4He_cm_bg = new TH2F("theta_4He_cm_bg", "Theta 4He in cm-system below grazing", 200, -1., 1., 2000, 0, 20);
+    fh_theta_4He_cm_bg->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_theta_4He_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_phi_4He_cm_bg = new TH2F("phi_4He_cm_bg", "phi 4He in cm-system below grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phi_4He_cm_bg->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_4He_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_theta_12C_cm_bg = new TH2F("theta_12C_cm_bg", "Theta 12C in cm-system below grazing", 200, -1, 1., 2000, 0, 20);
+    fh_theta_12C_cm_bg->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_theta_12C_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_phi_12C_cm_bg = new TH2F("phi_12C_cm_bg", "phi 12C in cm-system below grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phi_12C_cm_bg->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_12C_cm_bg->GetYaxis()->SetTitle("Erel / MeV");
+
     fh_Erel_vs_phibc_ag =
         new TH2F("Erel_vs_phibccm_ag", "Erel vs. phi_bc_cm above grazing", 2000, 0, 20., 400, 0., 400.);
     fh_Erel_vs_phibc_ag->GetYaxis()->SetTitle("phi angle bc / deg");
     fh_Erel_vs_phibc_ag->GetXaxis()->SetTitle("Erel / MeV");
 
-    fh_erel_vs_ptransHe = new TH2F("erel_vs_ptransHe", "Erel vs. ptransHe", 2000, -1000, 1000, 150, 0., 15);
-    fh_erel_vs_ptransHe->GetXaxis()->SetTitle("ptrans / MeV/c");
-    fh_erel_vs_ptransHe->GetYaxis()->SetTitle("Erel / MeV");
+    fh_Erel_vs_theta26_ag = new TH2F("Erel_vs_theta_ag", "Erel vs. theta above grazing", 125, 0., 5, 2000, 0, 20.);
+    fh_Erel_vs_theta26_ag->GetXaxis()->SetTitle("angle / deg");
+    fh_Erel_vs_theta26_ag->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_erel_vs_ptransC = new TH2F("erel_vs_ptransC", "Erel vs. ptransC", 2000, -1000, 1000, 150, 0., 15);
-    fh_erel_vs_ptransC->GetXaxis()->SetTitle("ptrans / MeV/c");
-    fh_erel_vs_ptransC->GetYaxis()->SetTitle("Erel / MeV");
+    fh_erel_vs_ptransHe_ag =
+        new TH2F("erelB_vs_ptransHe_ag", "ErelB vs. ptransHe above grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erel_vs_ptransHe_ag->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erel_vs_ptransHe_ag->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_erelB_vs_ptransHe = new TH2F("erelB_vs_ptransHe", "ErelB vs. ptransHe", 2000, -1000, 1000, 150, 0., 15);
-    fh_erelB_vs_ptransHe->GetXaxis()->SetTitle("ptrans / MeV/c");
-    fh_erelB_vs_ptransHe->GetYaxis()->SetTitle("Erel / MeV");
+    fh_erel_vs_ptransC_ag =
+        new TH2F("erel_vs_ptransC_ag", "Erel vs. ptransC above grazing", 2000, -1000, 1000, 150, 0., 15);
+    fh_erel_vs_ptransC_ag->GetXaxis()->SetTitle("ptrans / MeV/c");
+    fh_erel_vs_ptransC_ag->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_erelB_vs_ptransC = new TH2F("erelB_vs_ptransC", "ErelB vs. ptransC", 2000, -1000, 1000, 150, 0., 15);
-    fh_erelB_vs_ptransC->GetXaxis()->SetTitle("ptrans / MeV/c");
-    fh_erelB_vs_ptransC->GetYaxis()->SetTitle("Erel / MeV");
+    fh_theta_4He_cm_ag = new TH2F("theta_4He_cm_ag", "Theta 4He in cm-system above grazing", 200, -1., 1., 2000, 0, 20);
+    fh_theta_4He_cm_ag->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_theta_4He_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
 
-    fh_pHe_vs_theta26 = new TH2F("pHe_vs_theta", "theta vs pHe", 400, 2000, 6000, 200, 0, 100.);
-    fh_pHe_vs_theta26->GetYaxis()->SetTitle("angle / mrad");
-    fh_pHe_vs_theta26->GetXaxis()->SetTitle("p / MeV/c");
+    fh_phi_4He_cm_ag = new TH2F("phi_4He_cm_ag", "phi 4He in cm-system above grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phi_4He_cm_ag->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_4He_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_theta_12C_cm_ag = new TH2F("theta_12C_cm_ag", "Theta 12C in cm-system above grazing", 200, -1, 1., 2000, 0, 20);
+    fh_theta_12C_cm_ag->GetXaxis()->SetTitle("cos(theta_cm)");
+    fh_theta_12C_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
+
+    fh_phi_12C_cm_ag = new TH2F("phi_12C_cm_ag", "phi 12C in cm-system above grazing", 360, 0., 360., 2000, 0, 20);
+    fh_phi_12C_cm_ag->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_12C_cm_ag->GetYaxis()->SetTitle("Erel / MeV");
 
     fh_psum_vs_theta26_nc = new TH2F("psum_vs_theta_nc", "theta vs psum nc", 125, 0., 5, 600, 16000., 19000);
     fh_psum_vs_theta26_nc->GetYaxis()->SetTitle("angle / deg");
@@ -808,6 +900,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
         fh_Erel_withCalifa_2d_iphos->GetYaxis()->SetTitle("Erel / MeV");
         fh_Erel_withCalifa_2d_iphos->GetXaxis()->SetTitle("No crystals in cluster");
 
+        fh_califaenergy_2d_iphos = new TH2F(
+            "Ecalifa_vs_numCrystalCalifa_iphos", "Ecalifa vs Numb of Crystal_iphos", 40, 0, 40, 1000, 0., 10000.);
+        fh_califaenergy_2d_iphos->GetYaxis()->SetTitle("Ecalifa / keV");
+        fh_califaenergy_2d_iphos->GetXaxis()->SetTitle("No crystals in cluster");
+
         fh_Erel_vs_theta16O_withcalifa_iphos = new TH2F(
             "Erel_vs_theta16O_withcalifa_iphos", "Erel vs. theta 16O* with califa_iphos", 125, 0., 5, 200, 0, 20.);
         fh_Erel_vs_theta16O_withcalifa_iphos->GetXaxis()->SetTitle("angle / deg");
@@ -861,76 +958,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
         fh_califa_tofd = new TH2F("fh_califa_tofd", "Califa time vs tofd time", 1500, 1000., 4000., 20000, -1000, 1000);
         fh_califa_tofd->GetYaxis()->SetTitle("tofd time / ns");
         fh_califa_tofd->GetXaxis()->SetTitle("califa tome / ns");
-
-        if (fvis)
-        {
-            TCanvas* checkCalifa = new TCanvas("CheckingGlobalCalifa", "CheckingGlobalCalifa", 10, 10, 900, 900);
-            checkCalifa->Clear();
-            checkCalifa->Divide(3, 3);
-            checkCalifa->cd(1);
-            fh_califa_hitenergy_boost_barrel->Draw();
-            checkCalifa->cd(2);
-            fh_califa_hitenergy_boost_iphos->Draw();
-            checkCalifa->cd(3);
-            fh_Erel_withCalifa_barrel->Draw();
-            checkCalifa->cd(4);
-            fh_Erel_withCalifa_iphos->Draw();
-            checkCalifa->cd(5);
-            fh_califa_hitenergy_bg_barrel->Draw("colz");
-            checkCalifa->cd(6);
-            fh_califa_hitenergy_ag_barrel->Draw("colz");
-            checkCalifa->cd(7);
-            fh_califa_hitenergy_bg_iphos->Draw("colz");
-            checkCalifa->cd(8);
-            fh_califa_hitenergy_bg_barrel->Draw("colz");
-            checkCalifa->cd(9);
-            fh_califa_tofd->Draw("colz");
-        }
     }
     if (fvis)
     {
-        TCanvas* check = new TCanvas("CheckingGlobal", "CheckingGlobal", 10, 10, 900, 900);
         if (fPairs)
         {
-            check->Divide(4, 4);
-            check->cd(1);
-            fh_chi2->Draw();
-            check->cd(2);
-            gPad->SetLogz();
-            fh_psum_vs_chi->Draw("colz");
-            check->cd(3);
-            gPad->SetLogz();
-            fh_theta26_vs_chi->Draw("colz");
-            check->cd(4);
-            gPad->SetLogz();
-            fh_Erel_vs_chi->Draw("colz");
-            check->cd(5);
-            gPad->SetLogz();
-            fh_target_xy_nc->Draw("colz");
-            check->cd(6);
-            gPad->SetLogz();
-            fh_px_px_nc->Draw("colz");
-            check->cd(7);
-            gPad->SetLogz();
-            fh_py_py_nc->Draw("colz");
-            check->cd(8);
-            gPad->SetLogz();
-            fh_pz_pz_nc->Draw("colz");
-            check->cd(9);
-            fh_p_He_nc->Draw();
-            check->cd(10);
-            fh_p_C_nc->Draw();
-            check->cd(11);
-            fh_psum_nc->Draw();
-            check->cd(12);
-            fh_Erel_nc->Draw();
-            check->cd(14);
-            fh_theta26_nc->Draw();
-            check->cd(15);
-            fh_theta_bc_cm_nc->Draw();
-            check->cd(16);
-            fh_phi_bc_cm_nc->Draw("colz");
-
             TCanvas* check1 = new TCanvas("SelectedChi2", "SelectedChi2", 10, 10, 900, 900);
             check1->Divide(4, 3);
             check1->cd(1);
@@ -955,7 +987,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
             check1->cd(9);
             fh_Erel_vs_theta26_bg->Draw("colz");
             check1->cd(10);
-            fh_erel_vs_ptransHe->Draw("colz");
+            fh_erel_vs_ptransHe_bg->Draw("colz");
             check1->cd(11);
             fh_Erel_vs_theta16O->Draw("colz");
             check1->cd(12);
@@ -963,7 +995,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
         }
         else
         {
-
+            TCanvas* check = new TCanvas("SelectedChi2", "SelectedChi2", 10, 10, 900, 900);
             check->Divide(4, 4);
             check->cd(1);
             fh_chi2->Draw();
@@ -1072,8 +1104,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    ULong64_t timeTS = header->GetTimeStamp();
-    ULong64_t eventTS = header->GetEventno();
+    if (header)
+    {
+        timeTS = header->GetTimeStamp();
+        eventTS = header->GetEventno();
+    }
     //  cout<<"header time eventnum and time: "<<eventTS<<", "<<timeTS<<endl;
 
     pHex = -100.;
@@ -1232,7 +1267,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
             Int_t PID = aTrack->GetPdgCode();
             Int_t mother = aTrack->GetMotherId();
-            //  LOG(debug) << "PID " << PID << endl;
+            LOG(debug) << "PID " << PID << endl;
             if (mother < 0)
             {
                 if (PID == 1000020040)
@@ -1253,10 +1288,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                                        pHez_mc,
                                        sqrt(pow(pHex_mc, 2) + pow(pHey_mc, 2) + pow(pHez_mc, 2) + pow(mHe, 2)));
 
-                    //  LOG(debug) << "******************************************" << endl;
-                    //  LOG(debug) << "MC Track In 4He"
-                    //             << "x " << XHe_mc << " y " << YHe_mc << " z " << ZHe_mc << endl;
-                    // LOG(debug) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
+                    LOG(debug) << "******************************************" << endl;
+                    LOG(debug) << "MC Track In 4He"
+                               << "x " << XHe_mc << " y " << YHe_mc << " z " << ZHe_mc << endl;
+                    LOG(debug) << "px " << pHex_mc << " py " << pHey_mc << " pz " << pHez_mc << endl;
                 }
                 if (PID == 1000060120)
                 {
@@ -1508,11 +1543,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
             }
             // Dima's tracker only one chi2;&& becut
             if (sq_chi < (fcut_chiX + fcut_chiY) && mtrackHe > 3.5 && mtrackHe < 4.5 && mtrackC > 11.5 &&
-                mtrackC < 12.5 && becut) // abs(carbon.Pz()+alpha.Pz()-17390.) < 400. )
+                mtrackC < 12.5 && becut &&
+                ((alpha.Px() > 0. && carbon.Px() < 0.) ||
+                 (alpha.Px() < 0. && carbon.Px() > 0.))) // abs(carbon.Pz()+alpha.Pz()-17390.) < 400. )
             {
-                //  if ((alpha.Px() > 0. && carbon.Px() > 0.) || (alpha.Px() < 0. && carbon.Px() < 0.)) return;
-                //  if ((alpha.Py() > 0. && carbon.Py() > 0.) || (alpha.Py() < 0. && carbon.Py() < 0.)) return;
-                //   if((pa + pc).Mag() < 17352. || (pa + pc).Mag()> 17432.) return;
 
                 // (0,1) = (xfi23a,yfi23a), .. (12,13) = (xtofd,ytofd)
                 fh_xy_fib23->Fill(posdetHe.at(0), posdetHe.at(3));
@@ -1574,28 +1608,35 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
                             if (hitCalifa->GetMotherCrystal() > 927 && hitCalifa->GetMotherCrystal() < 1953) // barrel
                             {
-                                fh_califa_hitenergy_boost_barrel->Fill(Energy_dc);
-                                fh_Erel_withCalifa_barrel->Fill(Erel);
                                 fh_Erel_withCalifa_2d_barrel->Fill(hitCalifa->GetCrystalList().size(), Erel);
                                 fh_califaenergy_2d_barrel->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
-                                fh_Erel_vs_theta16O_withcalifa_barrel->Fill(theta_16O, Erel);
-                                if (theta_16O < fThetaGrazing)
-                                    fh_califa_hitenergy_bg_barrel->Fill(Erel, Energy_dc);
-                                else
-                                    fh_califa_hitenergy_ag_barrel->Fill(Erel, Energy_dc);
+                                if (hitCalifa->GetCrystalList().size() > 1 && hitCalifa->GetCrystalList().size() < 5)
+                                {
+                                    fh_califa_hitenergy_boost_barrel->Fill(Energy_dc);
+                                    fh_Erel_withCalifa_barrel->Fill(Erel);
+                                    fh_Erel_vs_theta16O_withcalifa_barrel->Fill(theta_16O, Erel);
+                                    if (theta_16O < fThetaGrazing)
+                                        fh_califa_hitenergy_bg_barrel->Fill(Erel, Energy_dc);
+                                    else
+                                        fh_califa_hitenergy_ag_barrel->Fill(Erel, Energy_dc);
+                                }
                             }
 
                             if (hitCalifa->GetMotherCrystal() > 1952 && hitCalifa->GetMotherCrystal() < 2433) // iphos
                             {
-                                fh_califa_hitenergy_boost_iphos->Fill(Energy_dc);
-                                fh_Erel_withCalifa_iphos->Fill(Erel);
                                 fh_Erel_withCalifa_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Erel);
-                                fh_Erel_vs_theta16O_withcalifa_iphos->Fill(theta_16O, Erel);
-                                fh_Erel_withCalifa_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Erel);
-                                if (theta_16O < fThetaGrazing)
-                                    fh_califa_hitenergy_bg_iphos->Fill(Erel, Energy_dc);
-                                else
-                                    fh_califa_hitenergy_ag_iphos->Fill(Erel, Energy_dc);
+                                fh_califaenergy_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Energy_dc);
+                                if (hitCalifa->GetCrystalList().size() > 1 && hitCalifa->GetCrystalList().size() < 5)
+                                {
+                                    fh_califa_hitenergy_boost_iphos->Fill(Energy_dc);
+                                    fh_Erel_withCalifa_iphos->Fill(Erel);
+                                    fh_Erel_vs_theta16O_withcalifa_iphos->Fill(theta_16O, Erel);
+                                    fh_Erel_withCalifa_2d_iphos->Fill(hitCalifa->GetCrystalList().size(), Erel);
+                                    if (theta_16O < fThetaGrazing)
+                                        fh_califa_hitenergy_bg_iphos->Fill(Erel, Energy_dc);
+                                    else
+                                        fh_califa_hitenergy_ag_iphos->Fill(Erel, Energy_dc);
+                                }
                             }
                         }
                     }
@@ -1636,7 +1677,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_pz_C->Fill(carbon.Pz());
                 fh_p_C->Fill(pc.Mag());
 
-                if (Erel < 0.4)
+                // if (Erel < 0.4)
                 {
                     fh_px_px->Fill(alpha.Px(), carbon.Px());
                     fh_py_py->Fill(alpha.Py(), carbon.Py());
@@ -1656,54 +1697,80 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     fh_ErelR->Fill(Erel);
                 if (alpha.Px() > 0. && carbon.Px() > 0.)
                     fh_ErelL->Fill(Erel);
-
-                fh_Erel_vs_theta16O->Fill(theta_16O, Erel);
-                fh_pHe_vs_theta26->Fill(pa.Mag(), theta_26 * TMath::DegToRad() * 1000.);
-                fh_psum_vs_theta26->Fill(theta_26, (pa + pc).Mag());
-
-                fh_erel_vs_ptransHe->Fill(ptransHe, Erel);
-                fh_erel_vs_ptransC->Fill(ptransC, Erel);
-
                 if ((alpha.Px() > 0. && carbon.Px() < 0.) || (alpha.Px() < 0. && carbon.Px() > 0.))
                 {
                     // if (theta_26 > 0.7)
                     fh_ErelB->Fill(Erel);
                     fh_ErelB_vs_theta16O->Fill(theta_16O, Erel);
-                    fh_erelB_vs_ptransHe->Fill(ptransHe, Erel);
-                    fh_erelB_vs_ptransC->Fill(ptransC, Erel);
-                    fh_thetaB_4He_cm->Fill(alpha_cm.CosTheta(), Erel);
-                    fh_thetaB_12C_cm->Fill(carbon_cm.CosTheta(), Erel);
                 }
+
+                fh_Erel_vs_theta16O->Fill(theta_16O, Erel);
+                fh_pHe_vs_theta26->Fill(pa.Mag(), theta_26 * TMath::DegToRad() * 1000.);
+                fh_psum_vs_theta26->Fill(theta_26, (pa + pc).Mag());
 
                 fh_Erel_vs_psum->Fill((pa + pc).Mag(), Erel);
                 fh_theta_16O->Fill(theta_16O); // theta oxygen
                 fh_phi_16O->Fill(phi_16O);
 
-                fh_theta_4He_cm->Fill(alpha_cm.CosTheta(), Erel);
                 Double_t alpha_cm_Phi = alpha_cm.Phi() * TMath::RadToDeg();
                 if (alpha_cm_Phi < 0.)
                     alpha_cm_Phi += 360;
-                fh_phi_4He_cm->Fill(alpha_cm_Phi, Erel);
 
                 Double_t carbon_cm_Phi = carbon_cm.Phi() * TMath::RadToDeg();
                 if (carbon_cm_Phi < 0.)
                     carbon_cm_Phi += 360;
-                fh_theta_12C_cm->Fill(carbon_cm.CosTheta(), Erel);
-                fh_phi_12C_cm->Fill(carbon_cm_Phi, Erel);
 
                 fh_theta_bc_cm->Fill(alpha_cm.Theta() * TMath::RadToDeg(), Erel);
 
                 fh_phi_bc_cm_polar->Fill(phi_bc_cm, 1);
 
+                if ((alpha.Px() > 0. && carbon.Px() < 0.) || (alpha.Px() < 0. && carbon.Px() > 0.))
+                {
+                    if (theta_16O < fThetaGrazing)
+                    {
+                        fh_ErelB_vs_phibc_bg->Fill(Erel, phi_bc_cm);
+                        fh_ErelB_vs_theta26_bg->Fill(theta_26, Erel);
+                        fh_erelB_vs_ptransHe_bg->Fill(ptransHe, Erel);
+                        fh_erelB_vs_ptransC_bg->Fill(ptransC, Erel);
+                        fh_thetaB_4He_cm_bg->Fill(alpha_cm.CosTheta(), Erel);
+                        fh_phiB_4He_cm_bg->Fill(alpha_cm_Phi, Erel);
+                        fh_thetaB_12C_cm_bg->Fill(carbon_cm.CosTheta(), Erel);
+                        fh_phiB_12C_cm_bg->Fill(carbon_cm_Phi, Erel);
+                    }
+                    else
+                    {
+                        fh_ErelB_vs_phibc_ag->Fill(Erel, phi_bc_cm);
+                        fh_ErelB_vs_theta26_ag->Fill(theta_26, Erel);
+                        fh_erelB_vs_ptransHe_ag->Fill(ptransHe, Erel);
+                        fh_erelB_vs_ptransC_ag->Fill(ptransC, Erel);
+                        fh_thetaB_4He_cm_ag->Fill(alpha_cm.CosTheta(), Erel);
+                        fh_phiB_4He_cm_ag->Fill(alpha_cm_Phi, Erel);
+                        fh_thetaB_12C_cm_ag->Fill(carbon_cm.CosTheta(), Erel);
+                        fh_phiB_12C_cm_ag->Fill(carbon_cm_Phi, Erel);
+                    }
+                }
+
                 if (theta_16O < fThetaGrazing)
                 {
                     fh_Erel_vs_phibc_bg->Fill(Erel, phi_bc_cm);
                     fh_Erel_vs_theta26_bg->Fill(theta_26, Erel);
+                    fh_erel_vs_ptransHe_bg->Fill(ptransHe, Erel);
+                    fh_erel_vs_ptransC_bg->Fill(ptransC, Erel);
+                    fh_theta_4He_cm_bg->Fill(alpha_cm.CosTheta(), Erel);
+                    fh_phi_4He_cm_bg->Fill(alpha_cm_Phi, Erel);
+                    fh_theta_12C_cm_bg->Fill(carbon_cm.CosTheta(), Erel);
+                    fh_phi_12C_cm_bg->Fill(carbon_cm_Phi, Erel);
                 }
                 else
                 {
                     fh_Erel_vs_phibc_ag->Fill(Erel, phi_bc_cm);
                     fh_Erel_vs_theta26_ag->Fill(theta_26, Erel);
+                    fh_erel_vs_ptransHe_ag->Fill(ptransHe, Erel);
+                    fh_erel_vs_ptransC_ag->Fill(ptransC, Erel);
+                    fh_theta_4He_cm_ag->Fill(alpha_cm.CosTheta(), Erel);
+                    fh_phi_4He_cm_ag->Fill(alpha_cm_Phi, Erel);
+                    fh_theta_12C_cm_ag->Fill(carbon_cm.CosTheta(), Erel);
+                    fh_phi_12C_cm_ag->Fill(carbon_cm_Phi, Erel);
                 }
 
                 fh_thetax_px->Fill(pHex, thetaxHe);
@@ -2002,18 +2069,10 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_ErelR->Write();
     fh_ErelL->Write();
     fh_Erel_vs_psum->Write();
-    fh_Erel_vs_theta26_bg->Write();
-    fh_Erel_vs_theta26_ag->Write();
     fh_Erel_vs_theta16O->Write();
     fh_ErelB_vs_theta16O->Write();
     fh_Erel_vs_theta16O_3He12C->Write();
-    fh_Erel_vs_phibc_bg->Write();
-    fh_Erel_vs_phibc_ag->Write();
     fh_phi_bc_cm->Write();
-    fh_erel_vs_ptransHe->Write();
-    fh_erel_vs_ptransC->Write();
-    fh_erelB_vs_ptransHe->Write();
-    fh_erelB_vs_ptransC->Write();
 
     fh_thetax_px->Write();
     fh_thetay_py->Write();
@@ -2022,14 +2081,41 @@ void R3BGlobalAnalysisS494::FinishTask()
 
     fh_theta_16O->Write();
     fh_phi_16O->Write();
-    fh_theta_4He_cm->Write();
-    fh_thetaB_4He_cm->Write();
-    fh_phi_4He_cm->Write();
     fh_theta_bc_cm->Write();
     fh_phi_bc_cm_polar->Write();
-    fh_theta_12C_cm->Write();
-    fh_thetaB_12C_cm->Write();
-    fh_phi_12C_cm->Write();
+
+    fh_ErelB_vs_phibc_bg->Write();
+    fh_ErelB_vs_theta26_bg->Write();
+    fh_erelB_vs_ptransHe_bg->Write();
+    fh_erelB_vs_ptransC_bg->Write();
+    fh_thetaB_4He_cm_bg->Write();
+    fh_phiB_4He_cm_bg->Write();
+    fh_thetaB_12C_cm_bg->Write();
+    fh_phiB_12C_cm_bg->Write();
+    fh_ErelB_vs_phibc_ag->Write();
+    fh_ErelB_vs_theta26_ag->Write();
+    fh_erelB_vs_ptransHe_ag->Write();
+    fh_erelB_vs_ptransC_ag->Write();
+    fh_thetaB_4He_cm_ag->Write();
+    fh_phiB_4He_cm_ag->Write();
+    fh_thetaB_12C_cm_ag->Write();
+    fh_phiB_12C_cm_ag->Write();
+    fh_Erel_vs_phibc_bg->Write();
+    fh_Erel_vs_theta26_bg->Write();
+    fh_erel_vs_ptransHe_bg->Write();
+    fh_erel_vs_ptransC_bg->Write();
+    fh_theta_4He_cm_bg->Write();
+    fh_phi_4He_cm_bg->Write();
+    fh_theta_12C_cm_bg->Write();
+    fh_phi_12C_cm_bg->Write();
+    fh_Erel_vs_phibc_ag->Write();
+    fh_Erel_vs_theta26_ag->Write();
+    fh_erel_vs_ptransHe_ag->Write();
+    fh_erel_vs_ptransC_ag->Write();
+    fh_theta_4He_cm_ag->Write();
+    fh_phi_4He_cm_ag->Write();
+    fh_theta_12C_cm_ag->Write();
+    fh_phi_12C_cm_ag->Write();
 
     fh_mass_nc->Write();
     fh_mass->Write();
@@ -2088,6 +2174,7 @@ void R3BGlobalAnalysisS494::FinishTask()
         fh_califa_hitenergy_bg_barrel->Write();
         fh_Erel_withCalifa_2d_barrel->Write();
         fh_califaenergy_2d_barrel->Write();
+        fh_califaenergy_2d_iphos->Write();
         fh_Erel_vs_theta16O_withcalifa_barrel->Write();
 
         fh_Erel_withCalifa_iphos->Write();

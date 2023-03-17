@@ -75,6 +75,7 @@ R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
     , ftofmin(TOF_MIN)
     , ftofmax(TOF_MAX)
     , fWrite(true)
+    , fSimu(false)
     , fGate_ns(100.) // make it constructor parameter
 {
     // Trigger mappin from included mapping files for each det.
@@ -560,6 +561,32 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     // "Fi33") eloss = -298.60978+130.07812*eloss-18.699849*eloss*eloss+0.89852388*eloss*eloss*eloss;
 
                     Double_t t = tof;
+
+                    if (fSimu)
+                    { // for s494 exp
+                        Double_t elossin = eloss;
+                        if (fName == "Fi30")
+                        {
+                            eloss =
+                                (6. - 2.) / (14.8183 - 1.455) * elossin + 6. - (6. - 2.) / (14.8183 - 1.455) * 14.8183;
+                        }
+                        if (fName == "Fi31")
+                        {
+                            eloss = (6. - 2.) / (14.853 - 1.461) * elossin + 6. - (6. - 2.) / (14.853 - 1.461) * 14.853;
+                        }
+                        if (fName == "Fi32")
+                        {
+                            eloss =
+                                (6. - 2.) / (14.6603 - 1.457) * elossin + 6. - (6. - 2.) / (14.6603 - 1.457) * 14.6603;
+                        }
+                        if (fName == "Fi33")
+                        {
+                            eloss =
+                                (6. - 2.) / (14.7451 - 1.473) * elossin + 6. - (6. - 2.) / (14.7451 - 1.473) * 14.7451;
+                        }
+
+                        eloss = (int)(eloss + 0.5);
+                    }
 
                     multi++;
 

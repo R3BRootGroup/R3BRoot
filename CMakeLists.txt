@@ -107,7 +107,7 @@ include(Dart)
 include(CheckCompiler)
 include(ROOTMacros)
 
-find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
+find_package2(PUBLIC FairLogger  VERSION 1.6.0 REQUIRED)
 
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
   if(NOT dep STREQUAL "Boost")
@@ -539,16 +539,16 @@ WRITE_CONFIG_FILE(config.csh_install)
 write_env_cache(env_cache.sh)
 
 # Get rid of leftover c3w configuration
-execute_process(COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/GNUmakefile
-                              ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
+	execute_process(COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/GNUmakefile
+								  ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
 
-if (EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
-  set(BUILD_C3W ON)
-  set(c3w_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/util/c3w/${CR}")
-  add_subdirectory(util/c3w)
-else()
-  set(c3w_summary "${BYellow}NO${CR}")
-endif()
+	if (EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
+	  set(BUILD_C3W ON)
+	  set(c3w_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/util/c3w/${CR}")
+	  add_subdirectory(util/c3w)
+	else()
+	  set(c3w_summary "${BYellow}NO${CR}")
+	endif()
 
 # Summary ######################################################################
 if(CMAKE_CXX_FLAGS)

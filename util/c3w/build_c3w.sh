@@ -31,10 +31,10 @@ cat >$SCRIPT <<EOF
 #!/bin/bash
 #SBATCH --output $OUTPUTREAL/logs/%j_%N.out
 # for running unpackers:
-#SBATCH --mem-per-cpu=8192 
-#SBATCH --cpus-per-task 2 
-#SBATCH --partition long --time 1-12:00:00
-#SBATCH $SBATCH # set by $CONF
+# #SBATCH --mem-per-cpu=8192 
+# #SBATCH --cpus-per-task 2 
+# #SBATCH --partition long --time 1-12:00:00
+# #SBATCH $SBATCH # set by $CONF
 #this script was automatically created by $USER on $(date)
 #from $CONF
 echo "Running \$0 \$@"

@@ -992,7 +992,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
 
-    ULong64_t eventTS = header->GetEventno();
     if (header && !fSimu)
     {
         time = header->GetTimeStamp();
@@ -2180,21 +2179,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit33->GetEloss();
 
-            if (fSimu)
-            {
-                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009336;
-                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001009;
-                //  Double_t qn=q1[det];
-                //  q1[det] = q1[det] * 477.46109 + 1.5414827;
-                //  cout<<"*** FIBER 33 : "<<qn<<", "<<q1[det] <<endl;
-                // for digiHit_s494_500AMeV_breakup_all_geant3_ideal.root
-                // q1[det] = (int)(q1[det] * 483.24587 + 1.5002657 + 0.5);
-                if (q1[det] > 12.4 && q1[det] < 18.2)
-                    q1[det] = 6.;
-                if (q1[det] > 1.1 && q1[det] < 2.3)
-                    q1[det] = 2.;
-            }
-
             t1[det] = hit33->GetTime();
             tof = tStart - t1[det];
 
@@ -2208,9 +2192,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
 
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi33 bc: " << ihit33 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             hits33bc++;
 
@@ -2233,7 +2217,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             if (debug_fib)
                 cout << "Fi33 ac: " << ihit33 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
             hits33++;
 
             if (q1[det] > qMax[det])
@@ -2278,7 +2262,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
 
-                if (debug_fib && 1 == 2)
+                if (debug_fib)
                     cout << "Fi33: " << detector[countdet] << " x1: " << xdet[countdet] * 100
                          << " y1: " << ydet[countdet] * 100 << " q1: " << qdet[countdet] << " t1: " << tdet[countdet]
                          << endl;
@@ -2332,19 +2316,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit31->GetEloss();
 
-            if (fSimu)
-            {
-                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009401;
-                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001083;
-                // q1[det] = q1[det] * 473.63022 + 1.5434806;
-                // for digiHit_s494_500AMeV_breakup_all_geant3_ideal.root
-                //  q1[det] = (int)(q1[det] * 480.71550 + 1.5002866 + 0.5);
-                if (q1[det] > 12.4 && q1[det] < 18.2)
-                    q1[det] = 6.;
-                if (q1[det] > 1.1 && q1[det] < 2.3)
-                    q1[det] = 2.;
-            }
-
             t1[det] = hit31->GetTime();
             tof = tStart - t1[det];
 
@@ -2358,9 +2329,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
 
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi31 bc: " << ihit31 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
             hits31bc++;
 
             // Cuts on Fi31
@@ -2382,7 +2353,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             if (debug_fib)
                 cout << "Fi31 ac: " << ihit31 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             hits31++;
 
@@ -2490,19 +2461,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit32->GetEloss();
 
-            if (fSimu)
-            {
-                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.009298;
-                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.0009719;
-                // q1[det] = q1[det] * 479.53477 + 1.5475484;
-                // for digiHit_s494_500AMeV_breakup_all_geant3_ideal.root
-                // q1[det] = (int)(q1[det] * 485.28024 + 1.5065864+0.5);
-                if (q1[det] > 12.4 && q1[det] < 18.2)
-                    q1[det] = 6.;
-                if (q1[det] > 1.1 && q1[det] < 2.3)
-                    q1[det] = 2.;
-            }
-
             t1[det] = hit32->GetTime();
             tof = tStart - t1[det];
 
@@ -2518,9 +2476,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             hits32bc++;
 
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi32 bc: " << ihit32 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             // Cuts on Fi32
             if (fCuts && (t1[det] < -60 || t1[det] > 50) && fPairs)
@@ -2541,7 +2499,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             if (debug_fib)
                 cout << "Fi32 ac: " << ihit32 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             xFi32[mult32] = x1[det];
             yFi32[mult32] = y1[det];
@@ -2585,11 +2543,12 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
-                countdet++;
 
                 if (debug_fib)
-                    cout << "Fi32: " << ihit32 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                         << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                    cout << "Fi32: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
+
+                countdet++;
             }
         }
 
@@ -2610,6 +2569,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug_fib)
+                cout << "Fi32: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
             if (hits32 > 0)
@@ -2633,19 +2596,6 @@ void R3BPreTrackS494::Exec(Option_t* option)
             z1[det] = 0.;
             q1[det] = hit30->GetEloss();
 
-            if (fSimu)
-            {
-                //	if(q1[det] > 0.07) q1[det] = q1[det] * 6. / 0.00938;
-                //	if(q1[det] < 0.03) q1[det] = q1[det] * 2. / 0.001;
-                // q1[det] = q1[det] * 474.18529 + 1.5557648;
-                // for digiHit_s494_500AMeV_breakup_all_geant3_ideal.root
-                // q1[det] = (int)(q1[det] * 481.83251 + 1.5027777 + 0.5);
-                if (q1[det] > 12.4 && q1[det] < 18.2)
-                    q1[det] = 6.;
-                if (q1[det] > 1.1 && q1[det] < 2.3)
-                    q1[det] = 2.;
-            }
-
             t1[det] = hit30->GetTime();
             tof = tStart - t1[det];
 
@@ -2661,9 +2611,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             hits30bc++;
 
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi30 bc: " << ihit30 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             // Cuts on Fi30
             if (fCuts && (t1[det] < -50 || t1[det] > 40) && fPairs)
@@ -2683,15 +2633,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             hits30++;
             if (debug_fib)
                 cout << "Fi30 ac: " << ihit30 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             xFi30[mult30] = x1[det];
             yFi30[mult30] = y1[det];
-            /*   if (q1[det] > 7.2 && !fSimu)
-                   qFi30[mult30] = 6.;
-               else
-                   qFi30[mult30] = 2.;
-               if (fSimu) */
             qFi30[mult30] = q1[det];
             tFi30[mult30] = tof;
             timeFi30[mult30] = t1[det];
@@ -2726,11 +2671,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
-                countdet++;
 
                 if (debug_fib)
-                    cout << "Fi30: " << ihit30 << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                         << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                    cout << "Fi30: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
+                countdet++;
             }
         }
 
@@ -2752,6 +2697,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug_fib)
+                cout << "Fi30: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
             maxWertFi30 = true;
@@ -2802,9 +2751,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
 
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi23a bc: " << ihit23a << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             Double_t tmem = 0;
             if (ihit23a > 0)
@@ -2832,7 +2781,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
 
             if (debug_fib)
                 cout << "Fi23a ac: " << ihit23a << " x1: " << x1[det] * 100 << " y1: " << y1[det] * 100
-                     << " q1: " << q1[det] << " t1: " << t1[det] << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             if (q1[det] > qMax[det])
             {
@@ -2872,6 +2821,11 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = q1[det];
                 tdet[countdet] = t1[det];
+
+                if (debug_fib)
+                    cout << "Fi23a: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
+
                 countdet++;
             }
         }
@@ -2899,6 +2853,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug_fib)
+                cout << "Fi23a: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
         }
@@ -2949,9 +2907,9 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 fh_TimePreviousEventFi23b->Fill(tDiffTofd, tmem - t1[det1]);
             }
             tmem = t1[det1];
-            if (debug_fib && 1 == 2)
+            if (debug_fib)
                 cout << "Fi23b bc: " << ihit23b << " x1: " << x1[det] * 100. << " y1: " << y1[det] * 100.
-                     << " q1: " << q1[det] << " t1: " << tof << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
 
             // Cuts on Fi23b
             // if (fCuts && (x1[det] * 100. < -7.5 || x1[det] * 100. > 7.5) && !fSimu)
@@ -3004,12 +2962,16 @@ void R3BPreTrackS494::Exec(Option_t* option)
                 zdet[countdet] = z1[det];
                 qdet[countdet] = 0;
                 tdet[countdet] = t1[det];
+
+                if (debug_fib)
+                    cout << "Fi23b: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                         << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
                 countdet++;
             }
 
             if (debug_fib)
                 cout << "Fi23b ac: " << ihit23b << " x1: " << x1[det] * 100. << " y1: " << y1[det] * 100.
-                     << " q1: " << q1[det] << " t1: " << tof << endl;
+                     << " q1: " << q1[det] << " t1: " << t1[det] << ", det: " << det << endl;
         }
         /*
                for(Int_t i23b=0; i23b<mult23b;i23b++)
@@ -3036,6 +2998,10 @@ void R3BPreTrackS494::Exec(Option_t* option)
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, xdet[countdet] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tStart - tdet[countdet]);
             fh_Fib_Time_ac[det]->Fill(xdet[countdet] * 100., tdet[countdet]);
+
+            if (debug_fib)
+                cout << "Fi23b: " << detector[countdet] << " x1: " << xdet[countdet] << " y1: " << ydet[countdet]
+                     << " q1: " << qdet[countdet] << " t1: " << tdet[countdet] << endl;
 
             countdet++;
         }
@@ -3226,7 +3192,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi31[i])
                                 {
                                     Double_t qtemp = qFi31[i];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi31_qfi33->IsInside(qFi33[j], qFi31[i]))
                                             qtemp = 6.;
@@ -3245,7 +3211,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi33[j])
                                 {
                                     Double_t qtemp = qFi33[j];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi31_qfi33->IsInside(qFi33[j], qFi31[i]))
                                             qtemp = 6.;
@@ -3507,7 +3473,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi31[i])
                                 {
                                     Double_t qtemp = qFi31[i];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi31_qfi33->IsInside(qFi33[j], qFi31[i]))
                                             qtemp = 6.;
@@ -3526,7 +3492,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi33[j])
                                 {
                                     Double_t qtemp = qFi33[j];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi31_qfi33->IsInside(qFi33[j], qFi31[i]))
                                             qtemp = 6.;
@@ -3816,7 +3782,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi30[i])
                                 {
                                     Double_t qtemp = qFi30[i];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi30_qfi32->IsInside(qFi32[j], qFi30[i]))
                                             qtemp = 6.;
@@ -3835,7 +3801,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi32[j])
                                 {
                                     Double_t qtemp = qFi32[j];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi30_qfi32->IsInside(qFi32[j], qFi30[i]))
                                             qtemp = 6.;
@@ -4100,7 +4066,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi30[i])
                                 {
                                     Double_t qtemp = qFi30[i];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi30_qfi32->IsInside(qFi32[j], qFi30[i]))
                                             qtemp = 6.;
@@ -4119,7 +4085,7 @@ void R3BPreTrackS494::Exec(Option_t* option)
                                 if (!fFi32[j])
                                 {
                                     Double_t qtemp = qFi32[j];
-                                    if (fGraphCuts)
+                                    if (fGraphCuts && !fSimu)
                                     {
                                         if (cut_qfi30_qfi32->IsInside(qFi32[j], qFi30[i]))
                                             qtemp = 6.;

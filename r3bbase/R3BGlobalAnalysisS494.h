@@ -168,6 +168,9 @@ class R3BGlobalAnalysisS494 : public FairTask
 	{
 		fvis = vis;
 	}
+	
+	inline void SetEvsECut(TString file){fEvsE = file;}
+  
   private:
     TClonesArray* fMCTrack;
     TClonesArray* fTrack;
@@ -188,6 +191,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Double_t fThetaGrazing;
 	Bool_t tracker = true;
 	Double_t fxfibcut, fyfibcut;
+	TString fEvsE;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -228,7 +232,9 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TVector3 pa, pc, paMC, pcMC;
 	TVector3 pa_cm, pc_cm, poexc;
 	TVector3 pbeam;
-	
+	ULong64_t timeTS ;
+    ULong64_t eventTS ;
+    
     TLorentzVector alpha, carbon, oxygen, helium3;
     TLorentzVector alphaMC, carbonMC, oxygenMC;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
@@ -312,8 +318,6 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
     TH2F* fh_p_p;
-    TH2F* fh_Erel_vs_phibc_bg;
-    TH2F* fh_Erel_vs_phibc_ag;
     TH2F* fh_Erel_vs_phibcMC;
     TH2F* fh_psum_vs_event;  
     
@@ -358,23 +362,15 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_Erel_simu;
 	TH1F* fh_theta26;
 	TH1F* fh_theta_16O;	
-	TH1F* fh_phi_16O;	
-	TH2F* fh_theta_4He_cm;
-	TH2F* fh_thetaB_4He_cm;
-	TH2F* fh_phi_4He_cm;
+	TH1F* fh_phi_16O;
 	TH1F* fh_phi_bc_cm;
 	TH1F* fh_phiMC_bc_cm;
 	TH2F* fh_theta_bc_cm;
-	TH2F* fh_theta_12C_cm;
-	TH2F* fh_thetaB_12C_cm;
-	TH2F* fh_phi_12C_cm;
 	TH1F* fh_Erel;
 	TH1F* fh_ErelL;
 	TH1F* fh_ErelR;
 	TH1F* fh_ErelB;
-	TH2F* fh_phi_bc_cm_polar;                   
-	TH2F* fh_Erel_vs_theta26_bg;
-	TH2F* fh_Erel_vs_theta26_ag;
+	TH2F* fh_phi_bc_cm_polar;
 	TH2F* fh_Erel_vs_theta16O;
 	TH2F* fh_ErelB_vs_theta16O;
 	TH2F* fh_Erel_vs_theta16O_3He12C;
@@ -385,10 +381,39 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_pzsum_MC;
 	TH1F* fh_dErel;
 	TH1F* fh_dtheta;
-	TH2F* fh_erel_vs_ptransHe;
-	TH2F* fh_erel_vs_ptransC;
-	TH2F* fh_erelB_vs_ptransHe;
-	TH2F* fh_erelB_vs_ptransC;
+	
+	TH2F* fh_ErelB_vs_phibc_bg;
+	TH2F* fh_ErelB_vs_theta26_bg;
+	TH2F* fh_erelB_vs_ptransHe_bg;
+	TH2F* fh_erelB_vs_ptransC_bg;
+	TH2F* fh_thetaB_4He_cm_bg;
+	TH2F* fh_phiB_4He_cm_bg;
+	TH2F* fh_thetaB_12C_cm_bg;
+	TH2F* fh_phiB_12C_cm_bg  ;
+	TH2F* fh_ErelB_vs_phibc_ag;
+	TH2F* fh_ErelB_vs_theta26_ag;
+	TH2F* fh_erelB_vs_ptransHe_ag;
+	TH2F* fh_erelB_vs_ptransC_ag;
+	TH2F* fh_thetaB_4He_cm_ag;
+	TH2F* fh_phiB_4He_cm_ag;
+	TH2F* fh_thetaB_12C_cm_ag;
+	TH2F* fh_phiB_12C_cm_ag;
+	TH2F* fh_Erel_vs_phibc_bg;
+	TH2F* fh_Erel_vs_theta26_bg;
+	TH2F* fh_erel_vs_ptransHe_bg;
+	TH2F* fh_erel_vs_ptransC_bg;
+	TH2F* fh_theta_4He_cm_bg;
+	TH2F* fh_phi_4He_cm_bg;
+	TH2F* fh_theta_12C_cm_bg;
+	TH2F* fh_phi_12C_cm_bg;
+	TH2F* fh_Erel_vs_phibc_ag;
+	TH2F* fh_Erel_vs_theta26_ag;
+	TH2F* fh_erel_vs_ptransHe_ag;
+	TH2F* fh_erel_vs_ptransC_ag;
+	TH2F* fh_theta_4He_cm_ag;
+	TH2F* fh_phi_4He_cm_ag;
+	TH2F* fh_theta_12C_cm_ag;
+	TH2F* fh_phi_12C_cm_ag;
 	
 	TH2F* fh_mass_nc;
 	TH2F* fh_mass;
@@ -398,6 +423,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH1F* fh_califa_hitenergy_boost_barrel;
     TH1F* fh_Erel_withCalifa_barrel;
     TH2F* fh_califaenergy_2d_barrel;
+    TH2F* fh_califaenergy_2d_iphos;
     TH2F* fh_Erel_withCalifa_2d_barrel;
     TH2F* fh_Erel_vs_theta16O_withcalifa_barrel;
     TH2F* fh_califa_hitenergy_bg_barrel;

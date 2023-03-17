@@ -269,8 +269,8 @@ InitStatus R3BTofdTofiCal2HitS494::Init()
     std::string foff_param_file = fOffsetFile;
     ifstream infile(foff_param_file.c_str());
     Int_t iplane, ibar;
-    if (!(infile.is_open()))
-        cout << "** WARNING ** OFFSET FILE NOT FOUND! " << foff_param_file.c_str() << endl;
+    if (!(infile.is_open()) && fYOffset)
+        cout << "** ERROR ** Y-OFFSET FILE NOT FOUND! Yoffsets SET to ZERO " << foff_param_file.c_str() << endl;
     if (infile.is_open())
     {
         LOG(info) << "TOFD/TOFI y-OFFSET PARAMS READ FROM FILE " << foff_param_file.c_str() << endl;
