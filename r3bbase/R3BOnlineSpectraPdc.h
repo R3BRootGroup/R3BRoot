@@ -106,6 +106,12 @@ class R3BOnlineSpectraPdc : public FairTask
     Int_t fTpat;
     Int_t fSamp;
     Int_t fNEvents;
+    Int_t totalFi0 = 0;
+    Int_t totalFi60 = 0;
+    Int_t triggerCountsFi0 = 0;
+    Int_t triggerCountsFi60 = 0;
+    Int_t detectedFi0 = 0;
+    Int_t detectedFi60 = 0;
 
     TH1F* fhTpat;
     TH1F* fh_spill_length;
@@ -157,6 +163,7 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_fi0_tot2_tot1;
     TH2F* fh_fi0_cor;
     TH2F* fh_fi0_eff;
+    TH2F* fh_fi0_eff_vs_time;
     
     TH2F* fh_fi60_pdc;
     TH2F* fh_fi60_pdc_time;
@@ -164,6 +171,7 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_fi60_tot2_tot1;
     TH2F* fh_fi60_cor;
     TH2F* fh_fi60_eff;
+    TH2F* fh_fi60_eff_vs_time;
 
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)

@@ -148,6 +148,7 @@ double Chi2MomentumForward(const double* xx)
     Double_t x0 = xx[3];
     Double_t y0 = xx[4];
     Double_t z0 = xx[5];
+    Double_t diff = 0.;
 
     TVector3 pos23a;
     TVector3 pos23b;
@@ -157,8 +158,15 @@ double Chi2MomentumForward(const double* xx)
     {
         auto fi23a = gSetup->GetByName("fi23a");
         fi23a->LocalToGlobal(pos23a, gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(), 0.);
-        px0 = (pos23a.X() - x0) / pos23a.Z() * pz0;
-
+        if (gCandidate->GetMass() > 3.7 && gCandidate->GetMass() < 3.8) // alpha
+        {
+            diff = 0.0093; // correction for deviation in the magnetic field for protons 1 GeV
+        }
+        else if (gCandidate->GetMass() > 11.1 && gCandidate->GetMass() < 11.2) // C
+        {
+            diff = 0.0093;
+        }
+        px0 = (pos23a.X() - diff - x0) / pos23a.Z() * pz0;
         //   cout << "fib23a x: " << pos23a.X()<< ", fib23a z: " <<pos23a.Z()  << " x0: " << x0 << " px0: " << px0 <<
         //  "pz0: "<<pz0<<endl;
     }
@@ -321,7 +329,7 @@ double Chi2MomentumForward(const double* xx)
     }
 
     // gCandidate->SetChi2(chi2);
-    LOG(debug) << "Ende chi2: " << chi2 << endl;
+    LOG(debug3) << "Ende chi2: " << chi2 << endl;
     LOG(debug3) << "current momentum: " << gCandidate->GetMomentum().X() << "  " << gCandidate->GetMomentum().Y()
                 << "  " << gCandidate->GetMomentum().Z() << endl;
     LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
@@ -705,7 +713,6 @@ double Chi2Backward2D(const double* xx)
 
     double mass = xx[0];
 
-    // cout << "Set mass: " << mass << endl;
     gCandidate->SetMass(mass);
     gCandidate->UpdateMomentum();
 
@@ -1066,7 +1073,16 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
                     << minimum_m->X()[5] << endl;
 
         py0_cand = (pos23b.Y() - minimum_m->X()[4]) / pos23b.Z() * minimum_m->X()[2];
-        px0_cand = (pos23a.X() - minimum_m->X()[3]) / pos23a.Z() * minimum_m->X()[2];
+        Double_t diff = 0.; // correction for deviation in the magnetic field for protons 1 GeV
+        if (gCandidate->GetMass() > 3.7 && gCandidate->GetMass() < 3.8) // alpha
+        {
+            diff = 0.0093; // correction for deviation in the magnetic field for protons 1 GeV
+        }
+        else if (gCandidate->GetMass() > 11.1 && gCandidate->GetMass() < 11.2) // C
+        {
+            diff = 0.0093;
+        }
+        px0_cand = (pos23a.X() - diff - minimum_m->X()[3]) / pos23a.Z() * minimum_m->X()[2];
 
         TVector3 startPositionOptimized(minimum_m->X()[3], minimum_m->X()[4], minimum_m->X()[5]);
         TVector3 startMomentumOptimized(px0_cand, py0_cand, minimum_m->X()[2]);

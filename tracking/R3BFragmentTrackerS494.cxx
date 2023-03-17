@@ -967,12 +967,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 //   Charge = sqrt(tof->hits.at(i)->GetEloss()) * 26.76;
 
                 // if digi used
-                Charge = tof->hits.at(i)->GetEloss();
-                charge = (int)(Charge + 0.5);
+                // Charge = tof->hits.at(i)->GetEloss();
+                // charge = (int)(Charge + 0.5);
 
                 // if digiHit used
-                //  charge = (int)(tof->hits.at(i)->GetEloss() * 88.196293 + 1.5024036 + 0.5);
-                //  Charge = tof->hits.at(i)->GetEloss() * 88.196293 + 1.5024036;
+                charge = (int)(tof->hits.at(i)->GetEloss() + 0.5);
+                Charge = tof->hits.at(i)->GetEloss();
             }
             else
             {
@@ -1099,9 +1099,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (debug_loopin)
                                     cout << "left - Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
                                          << ", " << det_hit_yC[2] << endl;
-                                if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
-                                    cout << "left fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
-                                         << endl;
+                                // if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
+                                //    cout << "left fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
+                                //         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -1325,9 +1325,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (debug_loopin)
                                     cout << "right Fi23b hit : " << fi23b->hits.at(ifi23b)->GetY() << " already used"
                                          << ", " << det_hit_yC[2] << endl;
-                                if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
-                                    cout << "right fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
-                                         << endl;
+                                // if (abs(fi23b->hits.at(ifi23b)->GetY()) < 0.1512)
+                                //    cout << "right fi23b not good: " << fi23b->hits.at(ifi23b)->GetY() << ", " << l
+                                //         << endl;
                                 ifi23b += 1;
                                 continue;
                             }
@@ -1637,26 +1637,23 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 beta0soll = betaHe;
                 counterHe += 1;
             }
-            if (debug_loopout)
-            {
-                cout << "Results after tracking :" << endl;
-                cout << "Charge   : " << charge << endl;
-                cout << "Position (soll) x: " << x0soll << " y: " << y0soll << " z: " << z0soll << endl;
-                cout << "Position (ist)  x: " << bestcandidate->GetStartPosition().X()
-                     << " y: " << bestcandidate->GetStartPosition().Y()
-                     << " z: " << bestcandidate->GetStartPosition().Z() << endl;
+            LOG(debug) << "Results after tracking :" << endl;
+            LOG(debug) << "Charge   : " << charge << endl;
+            LOG(debug) << "Position (soll) x: " << x0soll << " y: " << y0soll << " z: " << z0soll << endl;
+            LOG(debug) << "Position (ist)  x: " << bestcandidate->GetStartPosition().X()
+                       << " y: " << bestcandidate->GetStartPosition().Y()
+                       << " z: " << bestcandidate->GetStartPosition().Z() << endl;
 
-                cout << "Momentum (soll): " << psoll << " px : " << px0soll << " py: " << py0soll << " pz: " << pz0soll
-                     << endl;
-                cout << "Momentum (ist) : " << bestcandidate->GetStartMomentum().Mag()
-                     << " px : " << bestcandidate->GetStartMomentum().X()
-                     << " py: " << bestcandidate->GetStartMomentum().Y()
-                     << " pz: " << bestcandidate->GetStartMomentum().Z() << endl;
+            LOG(debug) << "Momentum (soll): " << psoll << " px : " << px0soll << " py: " << py0soll
+                       << " pz: " << pz0soll << endl;
+            LOG(debug) << "Momentum (ist) : " << bestcandidate->GetStartMomentum().Mag()
+                       << " px : " << bestcandidate->GetStartMomentum().X()
+                       << " py: " << bestcandidate->GetStartMomentum().Y()
+                       << " pz: " << bestcandidate->GetStartMomentum().Z() << endl;
 
-                //   cout << "Beta   : " << bestcandidate->GetStartBeta() << endl;
-                // LOG(debug) << "chi2: " << bestcandidate->GetChi2() << endl;
-                cout << "chi: " << minChi2 << endl;
-            }
+            //   cout << "Beta   : " << bestcandidate->GetStartBeta() << endl;
+            // LOG(debug) << "chi2: " << bestcandidate->GetChi2() << endl;
+            LOG(debug) << "chi: " << minChi2 << endl;
             /*
               cout<<"Momentum (ist) : " << bestcandidate->GetStartMomentum().Mag()
                        << " px : " << bestcandidate->GetStartMomentum().X() << " py: " <<

@@ -212,6 +212,7 @@ void R3BFi30DigitizerHit::Exec(Option_t* opt)
                                << " z: " << (z[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
                                << " t: " << time[i].at(&energyl - energy[i].data()) << endl;
 
+                    // for s494 simulations
                     Double_t PositionX = -62.18069;
                     Double_t PositionY = 0.;
                     Double_t PositionZ = 570.59330;

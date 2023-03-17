@@ -205,10 +205,10 @@ void R3BFi33DigitizerHit::Exec(Option_t* opt)
                     LOG(debug) << "Hit Fi33 out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
                                << " y: " << (y[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
                                << " t: " << time[i].at(&energyl - energy[i].data());
-                    Double_t PositionX = -142.;
+                    Double_t PositionX = -131.8124;
                     Double_t PositionY = 0.;
-                    Double_t PositionZ = 633.;
-                    Double_t RotationY = -194.;
+                    Double_t PositionZ = 597.7741;
+                    Double_t RotationY = -193.86990;
 
                     TVector3 posGlobal;
                     posGlobal.SetX(x[i].at(&energyl - energy[i].data()));
