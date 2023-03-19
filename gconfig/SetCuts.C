@@ -47,7 +47,7 @@ void SetCuts()
 	// MH version
     MC->SetProcess("DRAY",0); // Delta rays
     MC->SetProcess("CKOV",1); // Cerenkov production
-    MC->SetProcess("HADR",5); // Hadronic interactions
+    MC->SetProcess("HADR",1); // Hadronic interactions 5
     MC->SetProcess("LOSS",2); // Energy loss (2=complete fluct.)
     MC->SetProcess("RAYL",1); // Rayleigh scattering
 

@@ -765,7 +765,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_Erel_vs_theta26_ag->GetYaxis()->SetTitle("Erel / MeV");
 
     fh_erel_vs_ptransHe_ag =
-        new TH2F("erelB_vs_ptransHe_ag", "ErelB vs. ptransHe above grazing", 2000, -1000, 1000, 150, 0., 15);
+        new TH2F("erel_vs_ptransHe_ag", "Erel vs. ptransHe above grazing", 2000, -1000, 1000, 150, 0., 15);
     fh_erel_vs_ptransHe_ag->GetXaxis()->SetTitle("ptrans / MeV/c");
     fh_erel_vs_ptransHe_ag->GetYaxis()->SetTitle("Erel / MeV");
 
