@@ -42,12 +42,12 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal()
 // R3BFootMapped2StripCalPar: Standard Constructor --------------------------
 R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , NumDets(1)
+    , NumDets(16)
     , NumStrips(640)
     , NumParams(2)
     , MaxSigma(5)
-    , fTimesSigma(3.)
-    , fNStrip(250.)
+    , fTimesSigma(2.)
+    , fNStrip(350.)
     , CalParams(NULL)
     , fCal_Par(NULL)
     , fFootMappedData(NULL)
@@ -259,8 +259,8 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 
         Int_t ASIC1 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC1];
-
+       // energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC1];
+        energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma - Ave[detId] - AveASIC[detId][ASIC1];
         if (energy > 0. && pedestal != -1)
         {
             StripCounter[detId]++;
@@ -281,10 +281,11 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 
         Int_t ASIC3 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC3];
-
-        if (energy > fTimesSigma * sigma && pedestal != -1 && StripCounter[detId] < fNStrip)
-        {
+        //energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC3];
+	energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma - Ave[detId] - AveASIC[detId][ASIC3];
+       // if (energy > fTimesSigma * sigma && pedestal != -1 && StripCounter[detId] < fNStrip)
+       	if (energy > 0. && pedestal != -1 && StripCounter[detId] < fNStrip)
+	{
             AddCalData(detId + 1, stripId + 1, energy);
         }
     }
