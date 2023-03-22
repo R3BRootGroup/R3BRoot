@@ -51,17 +51,17 @@ class R3BFootHitData : public FairMultiLinkedData
     virtual ~R3BFootHitData() {}
 
     /** Accessors **/
-    inline const Int_t& GetDetId() const { return fDetId; }
-    inline const Int_t& GetNbHit() const { return fNbHit; }
-    inline const Int_t& GetMulStrip() const { return fMulStrip; }
-    inline const Double_t& GetPos() const { return fPos; }
-    inline const Double_t& GetEta() const { return fEta; }
-    inline const Double_t& GetTheta() const { return fTheta; }
-    inline const Double_t& GetPhi() const { return fPhi; }
-    inline const TVector3 GetPosLab() const { return fmaster; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
+    Int_t& GetDetId() const { return fDetId; }
+    Int_t& GetNbHit() const { return fNbHit; }
+    Int_t& GetMulStrip() const { return fMulStrip; }
+    Double_t& GetPos() const { return fPos; }
+    Double_t& GetEta() const { return fEta; }
+    Double_t& GetTheta() const { return fTheta; }
+    Double_t& GetPhi() const { return fPhi; }
+    TVector3 GetPosLab() const { return fmaster; }
+    Double_t& GetEnergy() const { return fEnergy; }
 
-  protected:
+  private:
     Int_t fDetId;
     Int_t fNbHit;
     Int_t fMulStrip;
@@ -71,7 +71,7 @@ class R3BFootHitData : public FairMultiLinkedData
     TVector3 fmaster;
     Double_t fEnergy;
 
-    ClassDef(R3BFootHitData, 1)
+    ClassDef(R3BFootHitData, 2)
 };
 
 #endif /* R3BFootHitData_H */
