@@ -51,15 +51,15 @@ class R3BFootHitData : public FairMultiLinkedData
     virtual ~R3BFootHitData() {}
 
     /** Accessors **/
-    Int_t& GetDetId() const { return fDetId; }
-    Int_t& GetNbHit() const { return fNbHit; }
-    Int_t& GetMulStrip() const { return fMulStrip; }
-    Double_t& GetPos() const { return fPos; }
-    Double_t& GetEta() const { return fEta; }
-    Double_t& GetTheta() const { return fTheta; }
-    Double_t& GetPhi() const { return fPhi; }
+    Int_t GetDetId() const { return fDetId; }
+    Int_t GetNbHit() const { return fNbHit; }
+    Int_t GetMulStrip() const { return fMulStrip; }
+    Double_t GetPos() const { return fPos; }
+    Double_t GetEta() const { return fEta; }
+    Double_t GetTheta() const { return fTheta; }
+    Double_t GetPhi() const { return fPhi; }
     TVector3 GetPosLab() const { return fmaster; }
-    Double_t& GetEnergy() const { return fEnergy; }
+    Double_t GetEnergy() const { return fEnergy; }
 
   private:
     Int_t fDetId;
