@@ -27,6 +27,7 @@
 
 #include "FairLogger.h"
 
+// NOLINTBEGIN
 class R3BLogger;
 
 class R3BLogger : public FairLogger
@@ -61,5 +62,6 @@ class R3BLogger : public FairLogger
   public:
     ClassDefOverride(R3BLogger, 0)
 };
+// NOLINTEND
 
 #endif // R3BLogger_H
