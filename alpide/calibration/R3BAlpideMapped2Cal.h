@@ -60,7 +60,8 @@ class R3BAlpideMapped2Cal : public FairTask
   private:
     void SetParameter();
     int GetCol(int reg, int dcol, int ads);
-    int GetRow(int ads);
+    int GetRow(                    int 
+    ads);
 
     Bool_t fOnline; // Don't store data for online
 

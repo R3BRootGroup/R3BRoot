@@ -43,7 +43,7 @@ R3BAlpideMapped2Cal::R3BAlpideMapped2Cal()
 R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fAlpideMappedData(NULL)
-    , fAlpideCalData(NULL)
+    , fAlpideCalData(   NULL)
     , fMap_Par(NULL)
     , fOnline(kFALSE)
 {
@@ -65,7 +65,7 @@ void R3BAlpideMapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
+    fMap_Par = (R3BAlpideMappingPar*)(rtdb->getContainer("alpideMappingPar"));
     R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 }
 
@@ -91,13 +91,13 @@ InitStatus R3BAlpideMapped2Cal::Init()
     fAlpideMappedData = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideMappedData"));
     if (!fAlpideMappedData)
     {
-        R3BLOG(fatal, "AlpideMappedData not found");
-        return kFATAL;
+        R3BLOG(fatal                       , "AlpideMappedData not found");
+        return k FATAL;
     }
 
     // OUTPUT DATA
     fAlpideCalData = new TClonesArray("R3BAlpideCalData");
-    mgr->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
+    mgr->Register("AlpideCalData"               , "ALPIDE_Cal", fAlpideCalData, !fOnline);
     Reset();
 
     SetParameter();
@@ -129,7 +129,7 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = dynamic_cast<R3BAlpideMappedData*>(fAlpideMappedData->At(i));
-        auto det = mappedData[i]->GetSensorId();
+        auto det = mappedData[i]-         >GetSensorId();
         auto col = mappedData[i]->GetCol();
         auto row = mappedData[i]->GetRow();
         // std::cout << det <<" "<< col <<" "<< row <<std::endl;
