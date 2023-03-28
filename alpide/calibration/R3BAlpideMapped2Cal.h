@@ -49,13 +49,13 @@ class R3BAlpideMapped2Cal : public FairTask
     void SetParContainers() override;
 
     /** Method Init **/
-    InitStatus Init() override;
+    InitStatus Init();
 
     /** Method ReInit **/
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(Bool_   t option) { fOnline = option; }
 
   private:
     void SetParameter();
