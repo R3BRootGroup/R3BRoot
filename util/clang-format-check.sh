@@ -4,6 +4,7 @@ test "$1" == "--ci" && AUTOFIX=1 && CI=1 && shift
 
 CLANG_FORMAT=${1:-clang-format}
 
+# Starting
 echo -n "Running clang-format checks, version: "
 ${CLANG_FORMAT} --version
 
@@ -12,14 +13,9 @@ if [ 0 != $? ]; then
     exit 1
 fi
 
-if [ "$TRAVIS" != "true" ] ; then
-  # Not in a pull request, so compare against parent commit
-  base_commit="origin/dev"
-  echo "Checking against parent commit $(git rev-parse $base_commit)"
-else
-  base_commit="$TRAVIS_COMMIT_RANGE"
-  echo "Checking against commit $base_commit"
-fi
+git fetch --all
+base_commit="origin/dev"
+echo "Checking against parent commit $(git rev-parse $base_commit)"
 
 # To simplify CI debugging, tell what files are considered.
 echo "--- Listing all changed files:"
@@ -28,7 +24,7 @@ echo "---"
 
 FMT_FILE=$(mktemp)
 
-filesToCheck="$(git diff --name-only ${base_commit} | grep -e '.(\.C\|\.cpp\|\.cxx\|\.h)$' || true)"
+filesToCheck="$(git diff --name-only ${base_commit} | grep -E '[.](cxx|h|C)$' || true)"
 for f in $filesToCheck; do
     if test -n "$AUTOFIX"
     then
@@ -44,23 +40,23 @@ for f in $filesToCheck; do
     fi
 done
 
-
-
-if  test -n "$CI"
+if test -n "$CI"
 then
-    if test -n "$(git status --porcelain)" ; then
-    echo -e "\033[1;31mYou must pass the clang-format checks before submitting a pull request.\033[0m"
-    echo "Changes:"
-    git diff
-    echo "Trying to upload clang-format patch here:"
-    git diff | curl -F 'sprunge=<-' http://sprunge.us
+  if test -n "$fail" ; then
+    echo -e "\033[1;31mYou must pass the clang-format checks before submitting a pull request for the files: \033[0m"
+    for f in $filesToCheck; do
+        d=$(diff -u "$f" <($CLANG_FORMAT -style=file "$f") || true)
+	if ! [ -z "$d" ]; then
+            echo "${f}"
+	fi
+    done
     exit 1
-    else
-        echo -e "\033[1;32m\xE2\x9C\x93 passed clang-format checks\033[0m $1";
-    fi
+  else
+    echo -e "\033[1;32m\xE2\x9C\x93 passed clang-format checks\033[0m $1";
+  fi
 else
-    if test -n "$fail"
-    then
+
+  if test -n "$fail"; then
         echo "Clang-format check failed. Try --autofix to fix it in the code."
-    fi
+  fi
 fi
