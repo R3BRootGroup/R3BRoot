@@ -42,4 +42,9 @@ CheckOptions:
     value: 'true'
   - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
     value: 'true'
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 40
+  - key: readability-function-cognitive-complexity.IgnoreMacros
+    value: 'true'
+
 FormatStyle: 'file'
