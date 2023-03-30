@@ -95,6 +95,8 @@ class R3BMwpc1Cal2Hit : public FairTask
     Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
     /** Private method to obtain the position Y **/
     Double_t GetPositionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup);
+    /** Private method to obtain the position Y **/
+    [[nodiscard]] Double_t GetPositionYCoG(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup) const ;
 
   public:
     // Class definition
