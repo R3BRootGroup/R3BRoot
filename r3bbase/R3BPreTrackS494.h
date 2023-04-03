@@ -159,6 +159,10 @@ class R3BPreTrackS494 : public FairTask
 	inline void SetFi30Fi32Cut(TString file){fFi30Fi32Cut = file;}
 	inline void SetFi31Fi33Cut(TString file){fFi31Fi33Cut = file;}
 	inline void SetTofiCut(TString file){fTofiCut = file;}
+    inline void SetHisto(Bool_t histo)
+    {
+        fHisto = histo;
+    }
 	    
   private:
     std::vector<TClonesArray*> fMappedItems;
@@ -225,6 +229,7 @@ class R3BPreTrackS494 : public FairTask
 	Double_t delta;
 	Bool_t ftrackerType;
 	Bool_t fAverage;
+	Bool_t fHisto;
 	TString fFi30Fi32Cut, fFi31Fi33Cut, fTofiCut;
     
 	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0,countdet_written[10]={0};

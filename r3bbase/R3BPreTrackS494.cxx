@@ -124,6 +124,7 @@ R3BPreTrackS494::R3BPreTrackS494(const char* name, Int_t iVerbose)
     , fFi31Fi33Cut("")
     , fFi30Fi32Cut("")
     , fTofiCut("")
+    , fHisto(1)
     , fTofdHitItems(new TClonesArray("R3BTofdHitData"))
     , fFi23aHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
     , fFi23bHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
@@ -6192,153 +6193,156 @@ void R3BPreTrackS494::FinishTask()
     cout << "Tofd8:  " << countdet_written[8] << endl;
     cout << "Tofd9:  " << countdet_written[9] << endl;
 
-    fh_Tpat->Write();
-    fh_Trigger->Write();
-    if (fMappedItems.at(DET_BMON))
+    if (fHisto)
     {
-        fh_TOFDOR->Write();
-        fh_SEE->Write();
-        fh_IC->Write();
-    }
-
-    if (fHitItems.at(DET_TOFD))
-    {
-        fh_xy_tofd->Write();
-        fh_xy_tofd_ac->Write();
-        fh_tofd_charge->Write();
-        fh_tofd_charge_ac->Write();
-        fh_TimePreviousEvent->Write();
-        fh_tofd_time->Write();
-        fh_tofd_time_ac->Write();
-        fh_tofd_mult->Write();
-        fh_tofd_mult_ac->Write();
-        fh_tofd_q2_vs_q1->Write();
-        fh_tofd_q2_vs_q1_ac->Write();
-    }
-
-    for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
-    {
-        if (fHitItems.at(ifibcount + DET_FI_FIRST))
+        fh_Tpat->Write();
+        fh_Trigger->Write();
+        if (fMappedItems.at(DET_BMON))
         {
-            fh_xy_Fib[ifibcount]->Write();
-            fh_xy_Fib_ac[ifibcount]->Write();
-            fh_mult_Fib[ifibcount]->Write();
-            fh_mult_Fib_ac[ifibcount]->Write();
-            fh_ToT_Fib[ifibcount]->Write();
-            fh_ToT_Fib_ac[ifibcount]->Write();
-            fh_Fib_vs_Events[ifibcount]->Write();
-            fh_Fib_vs_Events_ac[ifibcount]->Write();
-            fh_Fibs_vs_Tofd[ifibcount]->Write();
-            fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
-            fh_Fib_ToF[ifibcount]->Write();
-            fh_Fib_ToF_ac[ifibcount]->Write();
-            fh_ToF_vs_Events[ifibcount]->Write();
-            fh_ToF_vs_Events_ac[ifibcount]->Write();
-            fh_Fib_Time[ifibcount]->Write();
-            fh_Fib_Time_ac[ifibcount]->Write();
-            fh_qtofd_vs_qFib[ifibcount]->Write();
-            fh_qtofd_vs_qFib_ac[ifibcount]->Write();
-            fh_Fib_ToF_vs_Qtofd[ifibcount]->Write();
+            fh_TOFDOR->Write();
+            fh_SEE->Write();
+            fh_IC->Write();
         }
-    }
 
-    fh_TimePreviousEventFi23a->Write();
-    fh_TimePreviousEventFi23b->Write();
-    fh_tofd_vs_Fib31->Write();
-    fh_ytofd_vs_yFib31->Write();
-    fh_tofd_vs_Fib31_ac->Write();
-    fh_tofd_vs_Fib30->Write();
-    fh_ytofd_vs_yFib30->Write();
-    fh_tofd_vs_Fib30_ac->Write();
-    fh_Fib33_vs_Fib31->Write();
-    fh_Fib33_vs_Fib31_dx->Write();
-    fh_Fib33_vs_Fib31_dt->Write();
-    fh_Fib31_vs_Fib23a->Write();
-    fh_Fib31_vs_Fib23a_dx->Write();
-    fh_Fib31_vs_Fib23a_dt->Write();
-    fh_Fib32_vs_Fib30->Write();
-    fh_Fib32_vs_Fib30_dx->Write();
-    fh_Fib32_vs_Fib30_dt->Write();
-    fh_tofdleft_vs_Fib23b->Write();
-    fh_Fib30_vs_Fib23b_dx->Write();
-    fh_Fib30_vs_Fib23b_dt->Write();
-    fh_Fib30_vs_Fib23a->Write();
-    fh_Fib30_vs_Fib23a_dx->Write();
-    fh_Fib30_vs_Fib23a_dt->Write();
-    fh_tofdright_vs_Fib23b->Write();
-    fh_Fib31_vs_Fib23b_dx->Write();
-    fh_Fib31_vs_Fib23b_dt->Write();
-    fh_Fib33_vs_Fib31_ac->Write();
-    fh_Fib33_vs_Fib31_dx_ac->Write();
-    fh_Fib31_vs_Fib23a_ac->Write();
-    fh_Fib31_vs_Fib23a_dx_ac->Write();
-    fh_Fib32_vs_Fib30_ac->Write();
-    fh_Fib32_vs_Fib30_dx_ac->Write();
-    fh_tofdleft_vs_Fib23b_ac->Write();
-    fh_Fib30_vs_Fib23b_dx_ac->Write();
-    fh_Fib30_vs_Fib23a_ac->Write();
-    fh_Fib30_vs_Fib23a_dx_ac->Write();
-    fh_tofdright_vs_Fib23b_ac->Write();
-    fh_Fib31_vs_Fib23b_dx_ac->Write();
-    fh_Fib32_vs_Fib30_tot->Write();
-    fh_Fib33_vs_Fib31_tot->Write();
-    fh_Fib23a_vs_Fib3X_tot->Write();
-    fh_Fib23b_vs_Fib3X_tot->Write();
-    fh_Fi23bY_TofdY_He->Write();
-    fh_Fi23bY_TofdY_C->Write();
-    fh_Fi23aX_TofdX_He->Write();
-    fh_Fi23aX_TofdX_C->Write();
-    fh_Fi301Y_TofdY_He->Write();
-    fh_Fi301Y_TofdY_C->Write();
-    fh_Fi301X_TofdX_He->Write();
-    fh_Fi301X_TofdX_C->Write();
-    fh_Fi323Y_TofdY_He->Write();
-    fh_Fi323Y_TofdY_C->Write();
-    fh_Fi323X_TofdX_He->Write();
-    fh_Fi323X_TofdX_C->Write();
-    fh_Fi23aX_TofdX_bw1->Write();
-    fh_Fi23aX_TofdX_bw2->Write();
-    fh_yTofd_vs_yTofd->Write();
-    fh_yTofdHe_vs_yTofdC->Write();
-    fh_xTofdHe_vs_xTofdC->Write();
-    fh_xy_target->Write();
-    fh_qsum_mult_fi23a->Write();
-    fh_qsum_mult_fi23b->Write();
-    fh_qtofi_vs_qtofd->Write();
-    /*
-       for(Int_t i=0; i<21;i++){
-           fh_Fi23aToF_Q[i]->Write();
-           fh_Fi23bToF_Q[i]->Write();
-       }
-       for (int i = 0; i < 6; i++)
-       {
-           fh_tofd_x_vs_y_z[i]->Write();
-       }
-   */
-    for (int i = 0; i < 7; i++)
-    {
-        fh_check_QvsX[i]->Write();
-        fh_check_TvsX[i]->Write();
-        fh_check_XvsY[i]->Write();
-    }
-    if (fHitItems.at(DET_CALIFA))
-    {
-        fh_califa_energy->Write();
-        fh_califa_energy_dc->Write();
-        fh_califa_energy_select_barrel->Write();
-        fh_califa_energy_select_iphos->Write();
-        fh_califa_time->Write();
-        fh_califa_tofd_barrel->Write();
-        fh_califa_tofd_iphos->Write();
-        fh_califa_cluster->Write();
-        fh_califa_overflow_rolu->Write();
-        fh_califa_overflow_antirolu->Write();
-        fh_califa_cluster_rolu->Write();
-        fh_califa_overflow->Write();
-        fh_califa_good->Write();
-        fh_califa_good_rolu->Write();
-        fh_califa_good_antirolu->Write();
-        fh_califa_motherid_clustertype->Write();
+        if (fHitItems.at(DET_TOFD))
+        {
+            fh_xy_tofd->Write();
+            fh_xy_tofd_ac->Write();
+            fh_tofd_charge->Write();
+            fh_tofd_charge_ac->Write();
+            fh_TimePreviousEvent->Write();
+            fh_tofd_time->Write();
+            fh_tofd_time_ac->Write();
+            fh_tofd_mult->Write();
+            fh_tofd_mult_ac->Write();
+            fh_tofd_q2_vs_q1->Write();
+            fh_tofd_q2_vs_q1_ac->Write();
+        }
+
+        for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
+        {
+            if (fHitItems.at(ifibcount + DET_FI_FIRST))
+            {
+                fh_xy_Fib[ifibcount]->Write();
+                fh_xy_Fib_ac[ifibcount]->Write();
+                fh_mult_Fib[ifibcount]->Write();
+                fh_mult_Fib_ac[ifibcount]->Write();
+                fh_ToT_Fib[ifibcount]->Write();
+                fh_ToT_Fib_ac[ifibcount]->Write();
+                fh_Fib_vs_Events[ifibcount]->Write();
+                fh_Fib_vs_Events_ac[ifibcount]->Write();
+                fh_Fibs_vs_Tofd[ifibcount]->Write();
+                fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
+                fh_Fib_ToF[ifibcount]->Write();
+                fh_Fib_ToF_ac[ifibcount]->Write();
+                fh_ToF_vs_Events[ifibcount]->Write();
+                fh_ToF_vs_Events_ac[ifibcount]->Write();
+                fh_Fib_Time[ifibcount]->Write();
+                fh_Fib_Time_ac[ifibcount]->Write();
+                fh_qtofd_vs_qFib[ifibcount]->Write();
+                fh_qtofd_vs_qFib_ac[ifibcount]->Write();
+                fh_Fib_ToF_vs_Qtofd[ifibcount]->Write();
+            }
+        }
+
+        fh_TimePreviousEventFi23a->Write();
+        fh_TimePreviousEventFi23b->Write();
+        fh_tofd_vs_Fib31->Write();
+        fh_ytofd_vs_yFib31->Write();
+        fh_tofd_vs_Fib31_ac->Write();
+        fh_tofd_vs_Fib30->Write();
+        fh_ytofd_vs_yFib30->Write();
+        fh_tofd_vs_Fib30_ac->Write();
+        fh_Fib33_vs_Fib31->Write();
+        fh_Fib33_vs_Fib31_dx->Write();
+        fh_Fib33_vs_Fib31_dt->Write();
+        fh_Fib31_vs_Fib23a->Write();
+        fh_Fib31_vs_Fib23a_dx->Write();
+        fh_Fib31_vs_Fib23a_dt->Write();
+        fh_Fib32_vs_Fib30->Write();
+        fh_Fib32_vs_Fib30_dx->Write();
+        fh_Fib32_vs_Fib30_dt->Write();
+        fh_tofdleft_vs_Fib23b->Write();
+        fh_Fib30_vs_Fib23b_dx->Write();
+        fh_Fib30_vs_Fib23b_dt->Write();
+        fh_Fib30_vs_Fib23a->Write();
+        fh_Fib30_vs_Fib23a_dx->Write();
+        fh_Fib30_vs_Fib23a_dt->Write();
+        fh_tofdright_vs_Fib23b->Write();
+        fh_Fib31_vs_Fib23b_dx->Write();
+        fh_Fib31_vs_Fib23b_dt->Write();
+        fh_Fib33_vs_Fib31_ac->Write();
+        fh_Fib33_vs_Fib31_dx_ac->Write();
+        fh_Fib31_vs_Fib23a_ac->Write();
+        fh_Fib31_vs_Fib23a_dx_ac->Write();
+        fh_Fib32_vs_Fib30_ac->Write();
+        fh_Fib32_vs_Fib30_dx_ac->Write();
+        fh_tofdleft_vs_Fib23b_ac->Write();
+        fh_Fib30_vs_Fib23b_dx_ac->Write();
+        fh_Fib30_vs_Fib23a_ac->Write();
+        fh_Fib30_vs_Fib23a_dx_ac->Write();
+        fh_tofdright_vs_Fib23b_ac->Write();
+        fh_Fib31_vs_Fib23b_dx_ac->Write();
+        fh_Fib32_vs_Fib30_tot->Write();
+        fh_Fib33_vs_Fib31_tot->Write();
+        fh_Fib23a_vs_Fib3X_tot->Write();
+        fh_Fib23b_vs_Fib3X_tot->Write();
+        fh_Fi23bY_TofdY_He->Write();
+        fh_Fi23bY_TofdY_C->Write();
+        fh_Fi23aX_TofdX_He->Write();
+        fh_Fi23aX_TofdX_C->Write();
+        fh_Fi301Y_TofdY_He->Write();
+        fh_Fi301Y_TofdY_C->Write();
+        fh_Fi301X_TofdX_He->Write();
+        fh_Fi301X_TofdX_C->Write();
+        fh_Fi323Y_TofdY_He->Write();
+        fh_Fi323Y_TofdY_C->Write();
+        fh_Fi323X_TofdX_He->Write();
+        fh_Fi323X_TofdX_C->Write();
+        fh_Fi23aX_TofdX_bw1->Write();
+        fh_Fi23aX_TofdX_bw2->Write();
+        fh_yTofd_vs_yTofd->Write();
+        fh_yTofdHe_vs_yTofdC->Write();
+        fh_xTofdHe_vs_xTofdC->Write();
+        fh_xy_target->Write();
+        fh_qsum_mult_fi23a->Write();
+        fh_qsum_mult_fi23b->Write();
+        fh_qtofi_vs_qtofd->Write();
+        /*
+           for(Int_t i=0; i<21;i++){
+               fh_Fi23aToF_Q[i]->Write();
+               fh_Fi23bToF_Q[i]->Write();
+           }
+           for (int i = 0; i < 6; i++)
+           {
+               fh_tofd_x_vs_y_z[i]->Write();
+           }
+       */
+        for (int i = 0; i < 7; i++)
+        {
+            fh_check_QvsX[i]->Write();
+            fh_check_TvsX[i]->Write();
+            fh_check_XvsY[i]->Write();
+        }
+        if (fHitItems.at(DET_CALIFA))
+        {
+            fh_califa_energy->Write();
+            fh_califa_energy_dc->Write();
+            fh_califa_energy_select_barrel->Write();
+            fh_califa_energy_select_iphos->Write();
+            fh_califa_time->Write();
+            fh_califa_tofd_barrel->Write();
+            fh_califa_tofd_iphos->Write();
+            fh_califa_cluster->Write();
+            fh_califa_overflow_rolu->Write();
+            fh_califa_overflow_antirolu->Write();
+            fh_califa_cluster_rolu->Write();
+            fh_califa_overflow->Write();
+            fh_califa_good->Write();
+            fh_califa_good_rolu->Write();
+            fh_califa_good_antirolu->Write();
+            fh_califa_motherid_clustertype->Write();
+        }
     }
 }
 

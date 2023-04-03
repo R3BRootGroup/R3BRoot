@@ -34,6 +34,7 @@ cat >$SCRIPT <<EOF
 #SBATCH --mem-per-cpu=8192 
 #SBATCH --cpus-per-task 2 
 #SBATCH --partition main --time 8:00:00
+#SBATCH --exclude=lxbk0805,lxbk0860
 # #SBATCH $SBATCH # set by $CONF
 #this script was automatically created by $USER on $(date)
 #from $CONF

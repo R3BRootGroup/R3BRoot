@@ -67,6 +67,10 @@ class R3BFragmentTrackerS494 : public FairTask
 		fPmin=pmin;
 		fPmax=pmax;
 	}
+    inline void SetHisto(Bool_t histo)
+    {
+        fHisto = histo;
+    }
     
   private:
     Bool_t InitPropagator();
@@ -149,6 +153,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fSimu;
     Bool_t fForward;
     Bool_t fOptimizeGeometry;
+    Bool_t fHisto;
     Double_t fAfterGladResolution;
     Int_t eventCounter = 0;
     Double_t minChi2;

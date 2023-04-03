@@ -226,11 +226,13 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Double_t m3He = 2809.41328;
 	Double_t mC = 11174.86339;
 	Double_t mO = 15.99065084 * amu * 1000.;
+	
+	Double_t tofCalifa_shift=119.52; //ns
 
 	Double_t Erel, m_inva, phi_bc_cm;
 	Double_t ErelMC, m_invaMC, phiMC_bc_cm;
 	TVector3 pa, pc, paMC, pcMC;
-	TVector3 pa_cm, pc_cm, poexc;
+	TVector3 pa_cm, pc_cm, poexc, paMC_cm, pcMC_cm;
 	TVector3 pbeam;
 	ULong64_t timeTS ;
     ULong64_t eventTS ;
@@ -415,6 +417,15 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_theta_12C_cm_ag;
 	TH2F* fh_phi_12C_cm_ag;
 	
+    TH2F* fh_ErelB_vs_phibc_MC;
+    TH2F* fh_erelB_vs_ptransHe_MC;
+    TH2F* fh_erelB_vs_ptransC_MC;
+    TH2F* fh_thetaB_4He_cm_MC;
+    TH2F* fh_phiB_4He_cm_MC;
+    TH2F* fh_thetaB_12C_cm_MC;
+    TH2F* fh_phiB_12C_cm_MC;
+    TH2F* fh_ErelB_vs_theta16O_MC;
+	
 	TH2F* fh_mass_nc;
 	TH2F* fh_mass;
 	TH2F* fh_energy_nc;
@@ -437,6 +448,8 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_Erel_withCalifa_iphos;
 	
 	TH2F* fh_califa_tofd;
+	TH2F* fh_califa_tofd_cut_barrel;
+	TH2F* fh_califa_tofd_cut_iphos;
 	TH1F* fh_califa_hitenergy_select;
 	TH1F* fh_califa_hitenergy_nc;
 	TH2F* fh_Ecalifa_vs_theta;

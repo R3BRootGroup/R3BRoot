@@ -85,6 +85,7 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fForward(kTRUE)
     , fPairs(kTRUE)
     , fOptimizeGeometry(kFALSE)
+    , fHisto(kTRUE)
     , fTrackItems(new TClonesArray("R3BTrackData"))
     , fCalifaHitItems(new TClonesArray("R3BCalifaClusterData"))
     , fNofTrackItems(0)
@@ -1863,8 +1864,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 //  psum > 17380. && psum < 17450.)
                 // bestevents = true;
 
-                if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10 && iAoverZ == 2 && iAoverZmem == 2 &&
-                    Erel < 0.4)
+                if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10 && iAoverZ == 2 && iAoverZmem == 2)
                     bestevents = true;
             }
 
@@ -2406,116 +2406,119 @@ void R3BFragmentTrackerS494::Finish()
     }
     cout << "from selected NEvents: " << fNEvents_nonull << "num total events: " << fNEvents << endl;
 
-    fh_mult_fi23a->Write();
-    fh_mult_fi23b->Write();
-    fh_mult_fi30->Write();
-    fh_mult_tofd->Write();
-    fh_eloss_fi23a_mc->Write();
-    fh_eloss_fi23a->Write();
-    fh_eloss_fi23b_mc->Write();
-    fh_eloss_fi23b->Write();
-    fh_eloss_fi30_mc->Write();
-    fh_eloss_fi30->Write();
-    fh_eloss_fi32_mc->Write();
-    fh_eloss_fi32->Write();
-    fh_eloss_fi31_mc->Write();
-    fh_eloss_fi31->Write();
-    fh_eloss_fi33_mc->Write();
-    fh_eloss_fi33->Write();
-    fh_ncand->Write();
-    fh_A_reco1->Write();
-    fh_A_reco2->Write();
-    fh_mom_res->Write();
-    fh_mom_res_x->Write();
-    fh_mom_res_y->Write();
-    fh_mom_res_z->Write();
-    fh_mass_res->Write();
-    fh_chi2->Write();
-    for (Int_t i = 0; i < 8; i++)
+    if (fHisto)
     {
-        fh_x_res[i]->Write();
-        fh_x_pull[i]->Write();
-        fh_y_res[i]->Write();
-        fh_y_pull[i]->Write();
+        fh_mult_fi23a->Write();
+        fh_mult_fi23b->Write();
+        fh_mult_fi30->Write();
+        fh_mult_tofd->Write();
+        fh_eloss_fi23a_mc->Write();
+        fh_eloss_fi23a->Write();
+        fh_eloss_fi23b_mc->Write();
+        fh_eloss_fi23b->Write();
+        fh_eloss_fi30_mc->Write();
+        fh_eloss_fi30->Write();
+        fh_eloss_fi32_mc->Write();
+        fh_eloss_fi32->Write();
+        fh_eloss_fi31_mc->Write();
+        fh_eloss_fi31->Write();
+        fh_eloss_fi33_mc->Write();
+        fh_eloss_fi33->Write();
+        fh_ncand->Write();
+        fh_A_reco1->Write();
+        fh_A_reco2->Write();
+        fh_mom_res->Write();
+        fh_mom_res_x->Write();
+        fh_mom_res_y->Write();
+        fh_mom_res_z->Write();
+        fh_mass_res->Write();
+        fh_chi2->Write();
+        for (Int_t i = 0; i < 8; i++)
+        {
+            fh_x_res[i]->Write();
+            fh_x_pull[i]->Write();
+            fh_y_res[i]->Write();
+            fh_y_pull[i]->Write();
+        }
+        fh_vz_res->Write();
+        fh_beta_res->Write();
+        fh_A_overZ->Write();
+        fh_p->Write();
+        fh_px->Write();
+        fh_py->Write();
+        fh_pz->Write();
+        fh_px_l->Write();
+        fh_py_l->Write();
+        fh_pz_l->Write();
+        fh_px_r->Write();
+        fh_py_r->Write();
+        fh_pz_r->Write();
+        fh_p_vs_ch2->Write();
+        fh_mass_vs_ch2->Write();
+        fh_xfi30_fi23a_track->Write();
+        fh_xfi30_fi32_track->Write();
+        fh_xfi30_tofd_track->Write();
+        fh_tofd_track_exp->Write();
+        fh_xfi31_fi23a_track->Write();
+        fh_xfi31_fi33_track->Write();
+        fh_xfi31_tofd_track->Write();
+
+        fh_xfi30_fi23a_exp->Write();
+        fh_xfi30_fi32_exp->Write();
+        fh_xfi30_tofd_exp->Write();
+        fh_xfi31_fi23a_exp->Write();
+        fh_xfi31_fi33_exp->Write();
+        fh_xfi31_tofd_exp->Write();
+        fh_xFi23a_tofd_exp->Write();
+
+        fh_xfi30_fi23a_exp_select->Write();
+        fh_xfi30_fi32_exp_select->Write();
+        fh_xfi30_tofd_exp_select->Write();
+        fh_xfi31_fi23a_exp_select->Write();
+        fh_xfi31_fi33_exp_select->Write();
+        fh_xfi31_tofd_exp_select->Write();
+        fh_yFi23b_tofd_exp_select->Write();
+        fh_xFi23a_tofd_exp_select->Write();
+
+        fh_yC_vs_yHe_Tofd->Write();
+        fh_yC_vs_yHe_Tofd_exp->Write();
+        fh_xC_vs_xHe_Tofd_exp->Write();
+        fh_yC_vs_yHe_fib23->Write();
+        fh_yC_vs_yHe_fib23_exp->Write();
+        fh_xC_vs_xHe_fib23->Write();
+        fh_xC_vs_xHe_fib23_exp->Write();
+        fh_yFi23b_tofd_track->Write();
+        fh_yFi23b_tofd_exp->Write();
+        fh_fi23b_track_exp->Write();
+        fh_pyC_vs_pyHe->Write();
+        fh_theta_16O->Write();
+        fh_phi_16O->Write();
+        fh_xfi23a_target_track->Write();
+        fh_yfi23b_target_track->Write();
+        fh_xy_target_C->Write();
+        fh_xy_target_He->Write();
+        fh_dxdy->Write();
+        fh_mass_corel->Write();
+        fh_Erel->Write();
+        fh_psum->Write();
+        fh_theta->Write();
+        px_vs_x->Write();
+        py_vs_x->Write();
+        pz_vs_x->Write();
+        p_vs_x->Write();
+        px_vs_y->Write();
+        py_vs_y->Write();
+        pz_vs_y->Write();
+        p_vs_y->Write();
+        fh_px_p->Write();
+        fh_py_p->Write();
+        fh_Erel_vs_x->Write();
+        fh_Erel_vs_y->Write();
+        fh_theta_vs_x->Write();
+        fh_theta_vs_y->Write();
+        fh_Erel_vs_nhits23a->Write();
+        fh_Erel_vs_nhits23b->Write();
     }
-    fh_vz_res->Write();
-    fh_beta_res->Write();
-    fh_A_overZ->Write();
-    fh_p->Write();
-    fh_px->Write();
-    fh_py->Write();
-    fh_pz->Write();
-    fh_px_l->Write();
-    fh_py_l->Write();
-    fh_pz_l->Write();
-    fh_px_r->Write();
-    fh_py_r->Write();
-    fh_pz_r->Write();
-    fh_p_vs_ch2->Write();
-    fh_mass_vs_ch2->Write();
-    fh_xfi30_fi23a_track->Write();
-    fh_xfi30_fi32_track->Write();
-    fh_xfi30_tofd_track->Write();
-    fh_tofd_track_exp->Write();
-    fh_xfi31_fi23a_track->Write();
-    fh_xfi31_fi33_track->Write();
-    fh_xfi31_tofd_track->Write();
-
-    fh_xfi30_fi23a_exp->Write();
-    fh_xfi30_fi32_exp->Write();
-    fh_xfi30_tofd_exp->Write();
-    fh_xfi31_fi23a_exp->Write();
-    fh_xfi31_fi33_exp->Write();
-    fh_xfi31_tofd_exp->Write();
-    fh_xFi23a_tofd_exp->Write();
-
-    fh_xfi30_fi23a_exp_select->Write();
-    fh_xfi30_fi32_exp_select->Write();
-    fh_xfi30_tofd_exp_select->Write();
-    fh_xfi31_fi23a_exp_select->Write();
-    fh_xfi31_fi33_exp_select->Write();
-    fh_xfi31_tofd_exp_select->Write();
-    fh_yFi23b_tofd_exp_select->Write();
-    fh_xFi23a_tofd_exp_select->Write();
-
-    fh_yC_vs_yHe_Tofd->Write();
-    fh_yC_vs_yHe_Tofd_exp->Write();
-    fh_xC_vs_xHe_Tofd_exp->Write();
-    fh_yC_vs_yHe_fib23->Write();
-    fh_yC_vs_yHe_fib23_exp->Write();
-    fh_xC_vs_xHe_fib23->Write();
-    fh_xC_vs_xHe_fib23_exp->Write();
-    fh_yFi23b_tofd_track->Write();
-    fh_yFi23b_tofd_exp->Write();
-    fh_fi23b_track_exp->Write();
-    fh_pyC_vs_pyHe->Write();
-    fh_theta_16O->Write();
-    fh_phi_16O->Write();
-    fh_xfi23a_target_track->Write();
-    fh_yfi23b_target_track->Write();
-    fh_xy_target_C->Write();
-    fh_xy_target_He->Write();
-    fh_dxdy->Write();
-    fh_mass_corel->Write();
-    fh_Erel->Write();
-    fh_psum->Write();
-    fh_theta->Write();
-    px_vs_x->Write();
-    py_vs_x->Write();
-    pz_vs_x->Write();
-    p_vs_x->Write();
-    px_vs_y->Write();
-    py_vs_y->Write();
-    pz_vs_y->Write();
-    p_vs_y->Write();
-    fh_px_p->Write();
-    fh_py_p->Write();
-    fh_Erel_vs_x->Write();
-    fh_Erel_vs_y->Write();
-    fh_theta_vs_x->Write();
-    fh_theta_vs_y->Write();
-    fh_Erel_vs_nhits23a->Write();
-    fh_Erel_vs_nhits23b->Write();
 
     if (fVis)
     {
