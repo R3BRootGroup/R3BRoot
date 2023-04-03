@@ -37,10 +37,34 @@ file(GLOB SRCS
 *.cxx 
 )
 
-# fill list of header files from list of source files
-# by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
-install(FILES "R3BLogger.h" DESTINATION include)
+set(SRCS
+    R3BCoarseTimeStitch.cxx
+    R3BDataPropagator.cxx
+    R3BDetector.cxx
+    R3BEventHeader.cxx
+    R3BEventHeaderPropagator.cxx
+    R3BFileSource.cxx
+    R3BLogger.cxx
+    R3BModule.cxx
+    R3BTcutPar.cxx
+    R3BTsplinePar.cxx
+    R3BWhiterabbitPropagator.cxx
+    )
+
+set(HEADERS 
+    R3BCoarseTimeStitch.h
+    R3BDataPropagator.h
+    R3BDetector.h
+    R3BEventHeader.h
+    R3BEventHeaderPropagator.h
+    R3BFileSource.h
+    R3BLogger.h
+    R3BModule.h
+    R3BShared.h
+    R3BTcutPar.h
+    R3BTsplinePar.h
+    R3BWhiterabbitPropagator.h
+    )
 
 Set(LINKDEF BaseLinkDef.h)
 
