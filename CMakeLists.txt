@@ -281,6 +281,12 @@ if(    yaml-cpp_FOUND
   )
 endif()
 
+find_package(GTest)
+if(NOT GTEST_FOUND)
+    message(STATUS "GTest is not found in local system!")
+    include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
+endif()
+
 SetBasicVariables()
 
 # Set the library version in the main CMakeLists.txt
