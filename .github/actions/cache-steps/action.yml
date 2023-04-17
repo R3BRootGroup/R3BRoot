@@ -17,6 +17,7 @@ outputs:
     description: 'whether r3b cache is hit'
     value: ${{steps.cache-r3b.outputs.cache-hit}}
 
+
 runs:
   using: composite
   steps:
@@ -27,6 +28,7 @@ runs:
       with:
         path: ${{ env.UCESB_DIR }}
         key: ucesb-build
+        restore-key: ucesb-build
 
     - name: cache r3b
       id: cache-r3b
@@ -34,3 +36,4 @@ runs:
       with:
         path: .ccache
         key: r3b-build-${{ inputs.repo }}-${{ inputs.r3b-dev-SHA }}
+        restore-key: r3b-build-${{ inputs.repo }}-
