@@ -5,10 +5,12 @@ description: 'steps to cache R3BRoot and ucesb'
 inputs:
   r3b-dev-SHA:
     description: 'SHA for r3b dev cache'
-    required: true
+    required: false
+    default: ''
   repo:
     description: 'repository name'
-    required: true
+    required: false
+    default: 'false'
 outputs:
   ucesb-hit:
     description: 'whether ucesb cache is hit'
@@ -21,7 +23,6 @@ runs:
   using: composite
   steps:
     - name: cache ucesb
-      # if: inputs.repo == 'r3broot'
       id: cache-ucesb
       uses: actions/cache@v3
       with:
@@ -29,6 +30,7 @@ runs:
         key: ucesb-build
 
     - name: cache r3b
+      if: inputs.repo != 'false'
       id: cache-r3b
       uses: actions/cache@v3
       with:
