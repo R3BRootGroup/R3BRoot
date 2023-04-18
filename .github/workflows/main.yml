@@ -55,7 +55,6 @@ jobs:
         uses: './.github/actions/cache-steps'
         with: 
           r3b-dev-SHA: ${{ env.cacheSHA }}
-          # repo: ${{ matrix.repos }}
           repo: ${{ matrix.cache }}
 
       - name: build r3broot
@@ -64,7 +63,6 @@ jobs:
           ucesb-cache-existed: ${{ steps.caching.outputs.ucesb-hit }}
 
       - name: ctest
-        # run: source $GITHUB_WORKSPACE/Dart.sh Experimental $GITHUB_WORKSPACE/.githubfiles/dart_github_CICD.cfg
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           source $GITHUB_WORKSPACE/util/generate_geo_test.sh

@@ -7,15 +7,14 @@ inputs:
     description: 'has ucesb build cache'
     required: false
     default: 'false'
+  build-needed:
+    description: 'build process is needed'
+    required: false
+    default: 'true'
 
 runs:
   using: composite
   steps:
-    - name: check
-      run: |
-        echo "${{ inputs.ucesb-cache-existed }}"
-      shell: bash
-
     - name: build ucesb
       if: inputs.ucesb-cache-existed != 'true'
       run: |
@@ -44,6 +43,7 @@ runs:
       shell: bash
 
     - name: cmake build ${{ matrix.repos }}
+      if: inputs.build-needed == 'true'
       run: |
         cmake --build ./build -- -j ${NUM_THREADS}
       shell: bash
