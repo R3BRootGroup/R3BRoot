@@ -25,6 +25,8 @@ class FairField;
 class R3BTrackingParticle;
 class R3BTrackingDetector;
 
+constexpr int N_PARTICLE_INFO = 7;
+
 class R3BTPropagator : public TObject
 {
   public:
@@ -50,11 +52,26 @@ class R3BTPropagator : public TObject
                               const TVector3& v2,
                               const TVector3& v3);
 
+    Bool_t PropagateToPlaneRK_eloss(R3BTrackingParticle* particle,
+                                    const TVector3& point1,
+                                    const TVector3& point2,
+                                    const TVector3& point3,
+                                    double& Tot_Tof,
+                                    double step,
+                                    bool eloss);
+
     Bool_t LineIntersectPlane(const TVector3& pos,
                               const TVector3& mom,
                               const TVector3& v1,
                               const TVector3& normal,
                               TVector3& intersect);
+
+    static Double_t Energy_loss_in_air(double beta, double step, double charge, double mass);
+
+    static void update_particle(R3BTrackingParticle* particle,
+                                Double_t length,
+                                std::array<double, N_PARTICLE_INFO>& vecOut,
+                                bool eloss);
 
     void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
 
