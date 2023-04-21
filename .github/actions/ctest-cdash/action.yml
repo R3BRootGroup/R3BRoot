@@ -1,0 +1,35 @@
+name: ctest-cdash
+description: 'steps to perform ctest and submit the report to cdash'
+
+inputs:
+  repo:
+    description: 'repository name'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: set env variables for push
+      if: github.event_name == 'push'
+      run: |
+        echo "TEST_MODEL=Continuous" >> $GITHUB_ENV
+        echo "TEST_NAME=\"${{ inputs.repo }} (commit ${cacheSHA})\"" >> $GITHUB_ENV
+      shell: bash
+
+    - name: set env variables for pull request
+      if: github.event_name != 'push'
+      run: |
+        echo "TEST_MODEL=Experimental" >> $GITHUB_ENV
+        export PULL_NR=${{ github.event.number }}
+        echo "TEST_NAME=\"${{ inputs.repo }} (pull request No.${PULL_NR})\"" >> $GITHUB_ENV
+      shell: bash
+
+    - name: running ctest
+      run: |
+        source $GITHUB_WORKSPACE/util/generate_geo_test.sh
+        ctest -S cmake/CI_CD/CDash.cmake -DBUILD_J=${NUM_THREADS}\
+              -DTEST_MODEL=${TEST_MODEL}\
+              -DTEST_NAME=${{ env.TEST_NAME }}\
+              -DSITE_NAME="Github hosted (${{ github.repository }})"\
+              -V -E "(run_gen_sim|run_digi|run_aladin_digi|califasim2|landreco|elsim)"
+      shell: bash

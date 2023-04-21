@@ -41,16 +41,15 @@ jobs:
     - name: pre-build
       uses: './.github/actions/pre-build'
 
-    - name: caching
-      id: caching
-      uses: './.github/actions/cache-steps'
+    - name: install deps
+      id: restore-caching
+      uses: './.github/actions/install-deps'
       with: 
         repo: 'false'
 
     - name: configure r3broot
       uses: './.github/actions/r3bbuild-steps'
       with:
-        ucesb-cache-existed: ${{ steps.caching.outputs.ucesb-hit }}
         build-needed: 'false'
 
     - name: clang-tidy check

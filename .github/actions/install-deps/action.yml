@@ -1,0 +1,45 @@
+name: install-deps
+description: 'steps to install deps'
+
+inputs:
+  r3b-dev-key:
+    description: 'key for r3b dev cache'
+    required: false
+    default: ''
+  cache-name:
+    description: 'repository name'
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: cache ucesb
+      if: github.event_name == 'pull_request'
+      id: cache-ucesb
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          ${{ env.UCESB_DIR }}
+          ${{ github.workspace }}/build/_deps
+        key: build-deps
+
+    - name: cache r3b
+      if: inputs.cache-name != 'false' && github.event_name == 'pull_request'
+      id: cache-r3b
+      uses: actions/cache/restore@v3
+      with:
+        path: .ccache
+        key: r3b-build-${{ inputs.cache-name }}-${{ inputs.r3b-dev-key }}
+        restore-keys: |
+          r3b-build-${{ inputs.cache-name }}-
+          r3b-build-
+
+    - name: build ucesb
+      if: steps.cache-ucesb.outputs.cache-hit != 'true'
+      run: |
+        echo "ucesb directory is set as ${UCESB_DIR}"
+        export LD_LIBRARY_PATH="${SIMPATH}/lib/:${LD_LIBRARY_PATH}"
+        git clone https://git.chalmers.se/expsubphys/ucesb.git ${UCESB_DIR}
+        cd ${UCESB_DIR} && make -j${NUM_THREADS} empty/empty
+      shell: bash
