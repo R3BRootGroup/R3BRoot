@@ -1,0 +1,31 @@
+name: cache-save
+description: 'steps to cache R3BRoot and ucesb'
+
+inputs:
+  r3b-dev-key:
+    description: 'key for r3b dev cache'
+    required: false
+    default: ''
+  cache-name:
+    description: 'repository name'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: cache ucesb
+      id: cache-ucesb
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          ${{ env.UCESB_DIR }}
+          ${{ github.workspace }}/build/_deps
+        key: build-deps
+
+    - name: cache r3b
+      if: matrix.save != 'false'
+      id: cache-r3b
+      uses: actions/cache/save@v3
+      with:
+        path: .ccache
+        key: r3b-build-${{ inputs.cache-name }}-${{ inputs.r3b-dev-key }}

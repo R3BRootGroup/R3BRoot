@@ -3,7 +3,8 @@
 if [ -z "${GITHUB_WORKSPACE}" ];
 then
     echo "Not in github CI/CD test!"
-    exit 0
+    export GITHUB_WORKSPACE=$( pwd )
+    # exit 0
 fi
 
 config=${GITHUB_WORKSPACE}/build/config.sh
@@ -11,9 +12,11 @@ if [ -f "${config}" ];
 then
     source ${config}
 else
-    echo "Failed to source config.sh in the build folder!"
+    echo "Failed to source ${config} in the build folder!"
     exit 1
 fi
+
+echo "Generating geo files for ctest"
 
 root -l -q -x ${GITHUB_WORKSPACE}/music/geobase/create_music_geo.C
 root -l -q -x ${GITHUB_WORKSPACE}/rpc/geobase/create_rpc_geo.C

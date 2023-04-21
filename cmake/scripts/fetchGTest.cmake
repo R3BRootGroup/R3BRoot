@@ -11,18 +11,18 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-find_package(GTest)
-if(NOT GTEST_FOUND)
-    message(STATUS "GTest is not found in local system!")
-    message(STATUS "Fetching GTest...")
-    include(FetchContent)
-    fetchcontent_declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG release-1.12.1)
-    fetchcontent_makeavailable(googletest)
-    set(GTEST_FOUND true)
-endif()
+# find_package(GTest)
+# if(NOT GTEST_FOUND)
+# message(STATUS "GTest is not found in local system!")
+message(STATUS "Fetching GTest...")
+include(FetchContent)
+fetchcontent_declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.12.1)
+fetchcontent_makeavailable(googletest)
+set(GTEST_FOUND true)
+# endif()
 
 enable_testing()
 include(GoogleTest)
