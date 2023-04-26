@@ -52,7 +52,7 @@ void R3BMCTrack::Print(Option_t* option) const
     std::cout << "Track " << option << ", mother : " << fMotherId << ", Type " << fPdgCode << ", momentum ("
               << fMomentumMass.Px() << ", " << fMomentumMass.Py() << ", " << fMomentumMass.Pz() << ") GeV" << std::endl;
     std::cout << "       Ref " << GetNPoints(kREF) << ", DCH " << GetNPoints(kDCH) << ", CAL " << GetNPoints(kCAL)
-              << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", TOFd " << GetNPoints(kTOFD)
+              << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", TOFd " << GetNPoints(kTOFD1)
               << ", TOF " << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA) << ", CALIFA " << GetNPoints(kCALIFA)
               << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP) << ", VETO " << GetNPoints(kVETO)
               << ", RPC " << GetNPoints(kRPC) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "

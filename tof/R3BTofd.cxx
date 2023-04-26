@@ -55,7 +55,7 @@ R3BTofd::R3BTofd(const TString& geoFile, const TGeoTranslation& trans, const TGe
 }
 
 R3BTofd::R3BTofd(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BTofd", kTOFD, geoFile, combi)
+    : R3BDetector("R3BTofd", kTOFD1, geoFile, combi)
     , fTofdCollection(new TClonesArray("R3BTofdPoint"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
@@ -211,7 +211,7 @@ Bool_t R3BTofd::ProcessHits(FairVolume* vol)
 
         // Increment number of TofdPoints for this track
         R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
-        stack->AddPoint(kTOFD);
+        stack->AddPoint(kTOFD1);
 
         ResetParameters();
     }

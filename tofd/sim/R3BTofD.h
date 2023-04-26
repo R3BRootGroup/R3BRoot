@@ -20,6 +20,7 @@
 #define R3BTofD_H 1
 
 #include "R3BDetector.h"
+#include "R3BDetectorList.h"
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -37,13 +38,20 @@ class R3BTofD : public R3BDetector
      *@param trans   position
      *@param rot     rotation
      */
-    R3BTofD(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+    R3BTofD(const TString& geoFile,
+            DetectorId type = kTOFD1,
+            const TGeoTranslation& trans = TGeoTranslation(),
+            const TGeoRotation& rot = TGeoRotation(),
+            const TString& namedetId = "NULL");
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param combi   position + rotation
      */
-    R3BTofD(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    R3BTofD(const TString& geoFile,
+            DetectorId type = kTOFD1,
+            const TGeoCombiTrans& combi = TGeoCombiTrans(),
+            const TString& namedetId = "NULL");
 
     /** Destructor **/
     virtual ~R3BTofD();
@@ -102,9 +110,11 @@ class R3BTofD : public R3BDetector
   private:
     /** Track information to be stored until the track leaves the
     active volume. **/
-    Int_t fTrackID;                 //!  track index
-    Int_t fPlaneID;                 //!  Plane id
-    Int_t fPaddleID;                //!  Paddle id
+    Int_t fTrackID;  //!  track index
+    Int_t fPlaneID;  //!  Plane id
+    Int_t fPaddleID; //!  Paddle id
+    DetectorId fDetId;
+    TString fNameDetId;
     TLorentzVector fPosIn, fPosOut; //!  position
     TLorentzVector fMomIn, fMomOut; //!  momentum
     Double32_t fTime_in;            //!  time when entering active volume

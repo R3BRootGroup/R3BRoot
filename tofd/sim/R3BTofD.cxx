@@ -37,19 +37,25 @@
 #include <boost/regex.hpp>
 
 R3BTofD::R3BTofD()
-    : R3BTofD("")
+    : R3BDetector()
 {
 }
 
-R3BTofD::R3BTofD(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
-    : R3BTofD(geoFile, { trans, rot })
+R3BTofD::R3BTofD(const TString& geoFile,
+                 DetectorId type,
+                 const TGeoTranslation& trans,
+                 const TGeoRotation& rot,
+                 const TString& namedetId)
+    : R3BTofD(geoFile, type, { trans, rot }, namedetId)
 {
 }
 
-R3BTofD::R3BTofD(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BTofD", kTOFD, geoFile, combi)
+R3BTofD::R3BTofD(const TString& geoFile, DetectorId type, const TGeoCombiTrans& combi, const TString& namedetId)
+    : R3BDetector(namedetId == "NULL" ? "R3BTofD" : "R3BTofD" + namedetId, type, geoFile, combi)
     , fTofdCollection(new TClonesArray("R3BTofdPoint"))
     , fPosIndex(0)
+    , fDetId(type)
+    , fNameDetId(namedetId)
 {
     ResetParameters();
 }
@@ -202,7 +208,7 @@ Bool_t R3BTofD::ProcessHits(FairVolume* vol)
 
         // Increment number of TofdPoints for this track
         auto stack = dynamic_cast<R3BStack*>(gMC->GetStack());
-        stack->AddPoint(kTOFD);
+        stack->AddPoint(fDetId);
 
         ResetParameters();
     }
@@ -225,7 +231,14 @@ void R3BTofD::EndOfEvent()
 void R3BTofD::Register()
 {
     R3BLOG(debug, "");
-    FairRootManager::Instance()->Register("TofDPoint", GetName(), fTofdCollection, kTRUE);
+    if (fDetId == kTOFD1)
+    {
+        FairRootManager::Instance()->Register("TofDPoint", GetName(), fTofdCollection, kTRUE);
+    }
+    else
+    {
+        FairRootManager::Instance()->Register("TofD" + fNameDetId + "Point", GetName(), fTofdCollection, kTRUE);
+    }
 }
 // ----------------------------------------------------------------------------
 
