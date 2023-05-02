@@ -1,9 +1,53 @@
-# This is a basic workflow to help you get started with Actions
-name: CI C17++
+# This is the main CI workflow for pull requests to the R3BRoot dev branch.
+
+# To speed up this workflow, a public github action called 'cache' is used to
+# cache important compiled files which are needed for multiple different runs.
+# Currently there are two caches used for each job: one is related to the build
+# of r3broot and another to some dependencies (such as googletest or ucesb). As
+# can also be seen in the comments below, a new cache for the R3BRoot build
+# process is created each time a pull request is being merged to the dev
+# branch. The name (or key) of the cache follows the pattern of
+# "r3broot-build-[job name]-[merge commit SHA]". If a run needs a specific
+# cache file and fails to find it, any cache files containing
+# "r3broot-build-[job name]-" will be used instead. On the other hand, the
+# cache name for dependencies should always be the same (currently
+# "r3broot-build-deps"). Each cache will be automatically deleted if not used
+# for one week and the total size of all caches should not exceed 10GB for one
+# project. More information about this cache management can be seen at
+# https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows.
+
+# The compiled files from the r3broot build process can not be directly cached.
+# This is because for some reasons, cmake still treats those cached built files
+# as new files and compiles everything again from scratch. Such a problem can
+# be solved using another tool called 'ccache', which caches all compiled files
+# during the build process and reuses them for the next build. Therefore, it is
+# the cache folder of 'ccache' (defined by env variable $CCACHE_DIR) that is
+# cached by the github action 'cache' instead of the build folder.
+
+# To have successful and fast compilation and build processes, a Docker
+# container embedded with the cvmfs is also used in the workflow. The cvmfs is
+# very similar to sshfs which directly mounts a remote folder to the local
+# filesystem. Using cvmfs inside a docker container further improves the speed
+# of the workflow: saving install time for some essential dependencies (gcc,
+# llvm clang, cvmfs etc.).
+
+# It must be also noted that the speed of the worksflow varies a lot depending
+# on the CPUs of the Github hosted servers. Current servers (free version) have at
+# most 2 cores for each run and bigger servers (paid version) can have up
+# to 4, 8 or even 16 cores.
+
+# The workflow also submits the configure, build and test results to CDash
+# (cmake dashborad) with two different models: Experimental and Continuous for
+# the pull request and merge respectively. For the pull request (Experimental),
+# the project is built with the cache files from ccache while for the merge
+# (Continuous) it's built from scratch without using any cache files.
+
+name: CI-CD
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the dev branch
+  # Triggers the workflow in case of a push or pull request events (but only for
+  # the dev branch)
   push:
     branches: [ dev ]
   pull_request:
@@ -12,110 +56,141 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially
+# A workflow run is made up of one or more jobs that can run sequentially or
+# parallelly. As has been specified above, all the jobs below will be
+# triggered either by a pull request or a merge of a pull request.
 jobs:
-  # This workflow contains a single job called "clang-format"
-  clang-format:
-    runs-on: self-hosted
+  build-test:
+    runs-on: ubuntu-latest
+    # A strategy matrix gives different settings separately to different jobs
+    # which are run parallelly.
+    strategy:
+      # If fail-fast is true, all jobs running parallelly will be stopped if
+      # any of them fail. By setting it to false, all jobs will be run
+      # undisruptively.
+      fail-fast: false
+      # Definition of the strategy matrix
+      matrix:
+        # Here are the groups of repositories that need to be downloaded inside
+        # r3broot. Each group is used by only one job.
+        repos: [ r3broot, glad-tpc, sofia-frs-asy ]
+        # The list under "include" defines some properties for each group:
+        #
+        # repos: the name of the group. It must exist in matrix.repos as
+        # defined above.
+        #
+        # cache: the name of the cache file that will be created/used for the
+        # job. Each group can have their own cache file. But the total size of
+        # the cache files are limited to 10 GB per project. Therefore, the
+        # number of caches should be kept to a minimum. If there isn't too
+        # much difference between glad-tpc and the base r3broot, the cache file
+        # generated from r3broot build can be used.
+        #
+        # skip-save: whether to save the cache or not. Cache saving is disabled
+        # when true. This is neccessary when two parellel jobs share one cache
+        # name.
+        #
+        # url: the github repository urls that need to be downloaded during the
+        # run
+        include:
+          # This job is only for testing R3BRoot without downloading any
+          # dependencies.
+          - repos: r3broot
+            cache: r3broot
+          # The job for testing with glad-tpc
+          - repos: glad-tpc
+            url: https://github.com/R3BRootGroup/glad-tpc.git
+            cache: glad-tpc
+            # skip-save: true
+          # The job for testing with sofia, frs and asyeos dependencies. All three
+          # repositories are downloaded and run together in the job.
+          - repos: sofia-frs-asy
+            # If more than one repos needs to be downloaded in a job. "url" needs
+            # to be a space separated list of urls using the operator ">-". Append
+            # more urls to this list if more repos need to be added.
+            url: >-
+              https://github.com/R3BRootGroup/sofia.git
+              https://github.com/R3BRootGroup/frs.git
+              https://github.com/R3BRootGroup/asyeos.git
+            # Using own cache file
+            cache: other-repos
 
+    # Jobs are run inside a Docker container, which provides different compiled
+    # tool-kits for the building, such as clang-tidy and cvmfs. For more
+    # information, please visit the Docker repository at Dockerhub.
+    container: 
+      image: yanzhaowang/cvmfs_clang:v15
+      volumes:
+        - /tmp:/cvmfs
+      env:
+        CVMDIR: /cvmfs/fairsoft.gsi.de
+        # Specifying the number of threads available for the building and
+        # testing. Github hosted runners can have at most 2 cores. The number
+        # of the cores can be increased with a larger runner, thus increasing
+        # the speed of the run.
+        NUM_THREADS: 2
+      # Options for the Docker container to be run with cvmfs.
+      options: --user root --privileged  --ulimit nofile=10000:10000 --cap-add SYS_ADMIN --device /dev/fuse
+
+    # Each job contains different steps that are executed sequentially. Each
+    # step could be multiple shell commands or a composite action either from
+    # another github repo or a self-defined one in .github/actions.
     steps:
+      # Fetch updates from pull request branches using a public github action.
       - uses: actions/checkout@v3
+        with:
+          # This allows all commits of all branches to be fetched.
+          fetch-depth: 0
 
-      - name: Code formatting
-        run: |
-          cd $GITHUB_WORKSPACE
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/util/clang-format-check.sh clang-format-8
-  # Single job called "build-r3broot"
-  build-r3broot:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: clang-format
-    if: always()
+      # A self-defined composite action. It sets multiple necessary environment
+      # variables and mounts the cmvfs folder of fairroot and fairsoft.
+      - name: pre-build
+        uses: './.github/actions/pre-build'
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      # A self-defined composite action, which restores the caches of
+      # dependencies and builds and install them if the cache doesn't exist.
+      # The two inputs for this action, r3b-dev-key and cache-name, determine
+      # the name (key) of the R3BRoot build cache being used in the the run.
+      # Its name is defined as
+      # "r3b-build-${cache-name}-${r3b-dev-key}". Apart from r3b build cache,
+      # there is another cache called "r3b-build-deps", which contains all
+      # dependencies for the R3BRoot build, such as googletest and ucesb. The
+      # cache restoring step is only used for the run triggered with
+      # "pull_request" and disabled for the merge event.
+      - name: install dependencies
+        id: restore-cache
+        uses: './.github/actions/install-deps'
+        with: 
+          cache-name: ${{ matrix.cache }}
+          r3b-dev-key: ${{ env.cacheSHA }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
-  # Single job called "build-r3broot-sofia"
-  build-r3broot-sofia:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: build-r3broot
-    if: always()
+      # A self-defined composite action for the cmake configuration and build
+      # of r3broot (along with necessary dep repos).
+      - name: configure-build
+        uses: './.github/actions/r3bbuild-steps'
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      # A self-defined composite action to perform the ctest and push the
+      # results to the cdash (cmake-dashborad). To fully show the errors and
+      # warnings during the configure and build processes, the two processes
+      # are rerun after 'make clean'.
+      - name: ctest-cdash
+        if: always()
+        uses: './.github/actions/ctest-cdash'
+        with:
+          repo: ${{ matrix.repos }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-          git clone -b dev https://github.com/R3BRootGroup/sofia.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
-  # Single job called "build-r3broot-asyeos"
-#  build-r3broot-asyeos:
-    # The type of runner that the job will run on
-#    runs-on: self-hosted
-#    needs: build-r3broot
-#    if: always()
+      # A composite action to save the ccaahe created from the merge events.
+      # Cache names (key) should be consistent with the names used in the
+      # cache restoring step.
+      - name: save-cache
+        if: github.event_name == 'push' && matrix.skip-save != true
+        id: save-cache
+        uses: './.github/actions/cache-save'
+        with: 
+          cache-name: ${{ matrix.cache }}
+          r3b-dev-key: ${{ env.cacheSHA }}
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-#    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#      - uses: actions/checkout@v3
-
-      # Runs a set of commands using the runners shell
-#      - name: Run Dart.sh
-#        run: |
-#          cd $GITHUB_WORKSPACE
-#          git clone -b dev https://github.com/R3BRootGroup/macros.git
-#          git clone -b dev https://github.com/R3BRootGroup/asyeos.git
-#          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
-  # Single job called "build-r3broot-glad-tpc"
-#  build-r3broot-glad-tpc:
-    # The type of runner that the job will run on
-#    runs-on: self-hosted
-#    needs: build-r3broot
-#    if: always()
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-#    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#      - uses: actions/checkout@v3
-
-      # Runs a set of commands using the runners shell
-      # git clone -b dev https://github.com/R3BRootGroup/glad-tpc.git
-#      - name: Run Dart.sh
-#        run: |
-#          cd $GITHUB_WORKSPACE
-#          git clone -b dev https://github.com/R3BRootGroup/macros.git
-#          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
-#  # Single job called "build-r3broot-frs"
-  build-r3broot-frs:
-    # The type of runner that the job will run on
-    runs-on: self-hosted
-    needs: build-r3broot-sofia
-    if: always()
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a set of commands using the runners shell
-      - name: Run Dart.sh
-        run: |
-          cd $GITHUB_WORKSPACE
-          git clone -b dev https://github.com/R3BRootGroup/macros.git
-          git clone -b dev https://github.com/R3BRootGroup/frs.git
-          singularity exec /data.local2/kresan/debian10-apr22-v18.6.8-ucesb.sif $PWD/.githubfiles/run_build_test_apr22.sh
+      # Show the cache hit rate from ccache.
+      - name: ccache stats
+        if: github.event_name == 'pull_request' && always()
+        run: ccache --show-stats

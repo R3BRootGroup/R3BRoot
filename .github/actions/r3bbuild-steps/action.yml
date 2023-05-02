@@ -1,0 +1,35 @@
+name: build-steps
+description: 'steps to build R3BRoot and ucesb'
+
+
+inputs:
+  build-needed:
+    description: 'build process is needed'
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - if: ${{ matrix.url }}
+      name: add other repos
+      run: |
+        cd $GITHUB_WORKSPACE
+        for url in ${{ matrix.url }};
+        do
+          git clone -b dev ${url}
+        done
+      shell: bash
+
+    - name: cmake configure ${{ matrix.repos }}
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        git clone https://github.com/R3BRootGroup/macros.git
+        cmake . -B build -C cmake/CI_CD/configure_options.cmake
+      shell: bash
+
+    - name: ctest ${{ matrix.repos }}
+      if: inputs.build-needed == 'true'
+      run: |
+        cmake --build ./build -- -j ${NUM_THREADS}
+      shell: bash

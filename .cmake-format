@@ -36,3 +36,7 @@ always_wrap = []
 
 # Don't reformat comments
 enable_markup = False
+
+# If true, the argument lists which are known to be sortable will be sorted
+  # lexicographicall
+enable_sort = True

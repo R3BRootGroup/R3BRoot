@@ -47,7 +47,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
     , NumParams(2)
     , MaxSigma(5)
     , fTimesSigma(2.)
-    , fNStrip(350.)
+    , fNStrip(640.)
     , CalParams(NULL)
     , fCal_Par(NULL)
     , fFootMappedData(NULL)

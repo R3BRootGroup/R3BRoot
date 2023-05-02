@@ -281,6 +281,8 @@ if(    yaml-cpp_FOUND
   )
 endif()
 
+include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
+
 SetBasicVariables()
 
 # Set the library version in the main CMakeLists.txt

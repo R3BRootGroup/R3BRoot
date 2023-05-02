@@ -10,6 +10,20 @@ on:
 permissions: write-all
 
 jobs:
+  # This workflow contains a single job called "clang-format"
+  clang-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Code formatting
+        run: |
+          cd $GITHUB_WORKSPACE
+          sudo apt-get update
+          sudo apt-get install clang-format-15
+          ./util/clang-format-check.sh clang-format-15
+        shell: bash
+        
   clang-tidy:
     runs-on: ubuntu-latest
     container: 
@@ -24,22 +38,19 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: mount cvmfs
-      run: |
-        wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
-        mv masterkey.gsi.de.pub /etc/cvmfs/keys
-        cp .githubfiles/fairsoft.gsi.de.conf /etc/cvmfs/config.d
-        mkdir -p ${CVMDIR}
-        mount -t cvmfs fairsoft.gsi.de ${CVMDIR}
+    - name: pre-build
+      uses: './.github/actions/pre-build'
 
-    - name: cmake configure
-      run: |
-        export SIMPATH=${CVMDIR}/debian10/fairsoft/nov22p1
-        export FAIRROOTPATH=${CVMDIR}/debian10/fairroot/v18.8.0_fs_nov22p1
-        export PATH=${SIMPATH}/bin:$PATH
-        git config --global --add safe.directory $GITHUB_WORKSPACE
-        git clone https://github.com/R3BRootGroup/macros.git
-        cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=on -DBUILD_GEOMETRY=OFF -DUSE_DIFFERENT_COMPILER=TRUE
+    - name: install deps
+      id: restore-caching
+      uses: './.github/actions/install-deps'
+      with: 
+        repo: 'false'
+
+    - name: configure r3broot
+      uses: './.github/actions/r3bbuild-steps'
+      with:
+        build-needed: 'false'
 
     - name: clang-tidy check
       run: |

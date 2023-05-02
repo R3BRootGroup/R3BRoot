@@ -55,7 +55,7 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
 	: FairTask(name, iVerbose)
 	, fPitch(157.7)
 	, fMiddle(50.)
-	, fThSum(20.)
+	, fThSum(10.)
 	, fMaxNumDet(16)
 	, fExpId(522)
 	, fMaxNumClusters(200) // Max number of clusters per foot detector set to 3
@@ -214,7 +214,17 @@ Double_t R3BFootStripCal2Hit::EtaCorr_Lagni(TF1* ffZ3,TF1* ffZ4, TF1* ffZ5, TF1*
 	Double_t EZ7 = ffZ7->Eval(fEta);
 	Double_t EnergyCorr = NAN;
 
-	if(fEnergy<EZ4 && fEnergy>EZ3){
+	if(fEnergy<EZ3){
+
+		Double_t gap = EZ3;  // or constant
+		Double_t prop = fEnergy/gap;
+
+		Double_t corr1 = 1.-ffZ3NoOff->Eval(fEta);
+		Double_t corr2 = 1.;
+
+		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
+
+	}else if(fEnergy<EZ4 && fEnergy>EZ3){
 
 		Double_t gap = EZ4-EZ3;
 		Double_t prop = (fEnergy-EZ3)/gap;
