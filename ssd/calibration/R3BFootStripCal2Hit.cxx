@@ -51,11 +51,11 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit()
 }
 
 // R3BFootStripCal2HitPar::Standard Constructor ---------------------------------
-R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
+R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, int iVerbose)
 	: FairTask(name, iVerbose)
 	, fPitch(157.7)
 	, fMiddle(50.)
-	, fThSum(10.)
+	, fThSum(20.)
 	, fMaxNumDet(16)
 	, fExpId(522)
 	, fMaxNumClusters(200) // Max number of clusters per foot detector set to 3
@@ -107,7 +107,7 @@ void R3BFootStripCal2Hit::SetParameter()
 	//--- Parameter Container ---
 	fMaxNumDet = fMap_Par->GetNumDets(); // Number of foot detectors
 	LOG(info) << "R3BFootStripCal2Hit::NumDet from mapping " << fMaxNumDet;
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
 		fDistTarget[i] = fMap_Par->GetDist2target(i + 1);
 		fAngleTheta[i] = fMap_Par->GetAngleTheta(i + 1);
@@ -118,83 +118,88 @@ void R3BFootStripCal2Hit::SetParameter()
 	fMap_Par->printParams();
 }
 
-Double_t R3BFootStripCal2Hit::EtaCorr_Barriere(TF1 *ffZ4, TF1* ffZ5, TF1* ffZ6, TF1* ffZ7, TF1* ffZ8, TF1* ffZ9, TF1 *ffZ4NoOff, TF1* ffZ5NoOff, TF1* ffZ6NoOff,   TF1* ffZ7NoOff, TF1* ffZ8NoOff, TF1* ffZ9NoOff, double fEnergy, double fEta)
+
+
+
+double R3BFootStripCal2Hit::EtaCorr_Barriere(TF1 *ffZ4, TF1* ffZ5, TF1* ffZ6, TF1* ffZ7, TF1* ffZ8, TF1* ffZ9, TF1 *ffZ4NoOff, TF1* ffZ5NoOff, TF1* ffZ6NoOff,   TF1* ffZ7NoOff, TF1* ffZ8NoOff, TF1* ffZ9NoOff, double fEnergy, double fEta)
 {
 
-	Double_t EZ4 = ffZ4->Eval(fEta);
-	Double_t EZ5 = ffZ5->Eval(fEta);
-	Double_t EZ6 = ffZ6->Eval(fEta);
-	Double_t EZ7 = ffZ7->Eval(fEta);
-	Double_t EZ8 = ffZ8->Eval(fEta);
-	Double_t EZ9 = ffZ9->Eval(fEta);
-	Double_t EnergyCorr = NAN;
+	double EZ4 = ffZ4->Eval(fEta);
+	double EZ5 = ffZ5->Eval(fEta);
+	double EZ6 = ffZ6->Eval(fEta);
+	double EZ7 = ffZ7->Eval(fEta);
+	double EZ8 = ffZ8->Eval(fEta);
+	double EZ9 = ffZ9->Eval(fEta);
+	double EnergyCorr = NAN;
+
+
 
 	if(fEnergy<EZ4){
 
-		Double_t gap = EZ4;  // or constant
-		Double_t prop = fEnergy/gap;
+		double gap = EZ4;  // or constant
+		double prop = fEnergy/gap;
 
-		Double_t corr1 = 1.-ffZ4NoOff->Eval(fEta);
-		Double_t corr2 = 1.;
+		double corr1 = 1.-ffZ4NoOff->Eval(fEta);
+		double corr2 = 1.;
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
         }else if(fEnergy>EZ4 && fEnergy<EZ5){
 
-                Double_t gap = EZ5-EZ4;
-                Double_t prop = (fEnergy-EZ4)/gap;
+                double gap = EZ5-EZ4;
+                double prop = (fEnergy-EZ4)/gap;
 
-                Double_t corr1 = 1.-ffZ5NoOff->Eval(fEta);
-                Double_t corr2 = 1.-ffZ4NoOff->Eval(fEta);
+                double corr1 = 1.-ffZ5NoOff->Eval(fEta);
+                double corr2 = 1.-ffZ4NoOff->Eval(fEta);
 
                 EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ5 && fEnergy<EZ6){
 
-		Double_t gap = EZ6-EZ5;
-		Double_t prop = (fEnergy-EZ5)/gap;
+		double gap = EZ6-EZ5;
+		double prop = (fEnergy-EZ5)/gap;
 
-		Double_t corr1 = 1.-ffZ6NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ5NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ6NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ5NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ6 && fEnergy<EZ7){
 
-		Double_t gap = EZ7-EZ6;
-		Double_t prop = (fEnergy-EZ6)/gap;
+		double gap = EZ7-EZ6;
+		double prop = (fEnergy-EZ6)/gap;
 
-		Double_t corr1 = 1.-ffZ7NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ6NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ7NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ6NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ7 && fEnergy<EZ8){
 
-		Double_t gap = EZ8-EZ7;
-		Double_t prop = (fEnergy-EZ7)/gap;
+		double gap = EZ8-EZ7;
+		double prop = (fEnergy-EZ7)/gap;
 
-		Double_t corr1 = 1.-ffZ8NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ7NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ8NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ7NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ8 && fEnergy<EZ9){
-		Double_t gap = EZ9-EZ8;
-		Double_t prop = (fEnergy-EZ8)/gap;
+		double gap = EZ9-EZ8;
+		double prop = (fEnergy-EZ8)/gap;
 
-		Double_t corr1 = 1.-ffZ9NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ8NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ9NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ8NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ9){
 
-		Double_t gap = 4000-EZ9;  // or constant
-		Double_t prop = (fEnergy-EZ9)/gap;
+		double gap = 4000-EZ9;  // or constant
+		double prop = (fEnergy-EZ9)/gap;
 
-		Double_t corr1 = 1.;
-		Double_t corr2 = 1.-ffZ9NoOff->Eval(fEta);
+		double corr1 = 1.;
+		double corr2 = 1.-ffZ9NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
@@ -204,83 +209,77 @@ Double_t R3BFootStripCal2Hit::EtaCorr_Barriere(TF1 *ffZ4, TF1* ffZ5, TF1* ffZ6, 
 
 }
 
-Double_t R3BFootStripCal2Hit::EtaCorr_Lagni(TF1* ffZ3,TF1* ffZ4, TF1* ffZ5, TF1* ffZ6, TF1* ffZ7, TF1* ffZ3NoOff, TF1* ffZ4NoOff, TF1* ffZ5NoOff, TF1* ffZ6NoOff, TF1* ffZ7NoOff, double fEnergy, double fEta)
+
+
+
+double R3BFootStripCal2Hit::EtaCorr_Lagni(TF1* ffZ3,TF1* ffZ4, TF1* ffZ5, TF1* ffZ6, TF1* ffZ7, TF1* ffZ3NoOff, TF1* ffZ4NoOff, TF1* ffZ5NoOff, TF1* ffZ6NoOff, TF1* ffZ7NoOff, double fEnergy, double fEta)
 {
 
-	Double_t EZ3 = ffZ3->Eval(fEta);
-	Double_t EZ4 = ffZ4->Eval(fEta);
-	Double_t EZ5 = ffZ5->Eval(fEta);
-	Double_t EZ6 = ffZ6->Eval(fEta);
-	Double_t EZ7 = ffZ7->Eval(fEta);
-	Double_t EnergyCorr = NAN;
+	double EZ3 = ffZ3->Eval(fEta);
+	double EZ4 = ffZ4->Eval(fEta);
+	double EZ5 = ffZ5->Eval(fEta);
+	double EZ6 = ffZ6->Eval(fEta);
+	double EZ7 = ffZ7->Eval(fEta);
+	double EnergyCorr = NAN;
 
 	if(fEnergy<EZ3){
 
-		Double_t gap = EZ3;  // or constant
-		Double_t prop = fEnergy/gap;
+		double gap = EZ3;
+		double prop = fEnergy/gap;
 
-		Double_t corr1 = 1.-ffZ3NoOff->Eval(fEta);
-		Double_t corr2 = 1.;
+		double corr1 = 1.-ffZ3NoOff->Eval(fEta);
+		double corr2 = 1.;
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
-	}else if(fEnergy<EZ4 && fEnergy>EZ3){
+	}
+	else if(fEnergy<EZ4 && fEnergy>EZ3){
 
-		Double_t gap = EZ4-EZ3;
-		Double_t prop = (fEnergy-EZ3)/gap;
+		double gap = EZ4-EZ3;
+		double prop = (fEnergy-EZ3)/gap;
 
-		Double_t corr1 = 1.-ffZ4NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ3NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ4NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ3NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy<EZ5 && fEnergy>EZ4){
 
-		Double_t gap = EZ5-EZ4;
-		Double_t prop = (fEnergy-EZ4)/gap;
+		double gap = EZ5-EZ4;
+		double prop = (fEnergy-EZ4)/gap;
 
-		Double_t corr1 = 1.-ffZ5NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ4NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ5NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ4NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ5 && fEnergy<EZ6){
 
-		Double_t gap = EZ6-EZ5;
-		Double_t prop = (fEnergy-EZ5)/gap;
+		double gap = EZ6-EZ5;
+		double prop = (fEnergy-EZ5)/gap;
 
-		Double_t corr1 = 1.-ffZ6NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ5NoOff->Eval(fEta);
-
-		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
-
-	}else if(fEnergy<EZ4){
-
-		Double_t gap = EZ4;
-		Double_t prop = fEnergy/gap;
-
-		Double_t corr1 = 1.-ffZ4NoOff->Eval(fEta);
-		Double_t corr2 = 1.;
+		double corr1 = 1.-ffZ6NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ5NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ6 && fEnergy<EZ7){
 
-		Double_t gap = EZ7-EZ6;
-		Double_t prop = (fEnergy-EZ6)/gap;
+		double gap = EZ7-EZ6;
+		double prop = (fEnergy-EZ6)/gap;
 
-		Double_t corr1 = 1.-ffZ7NoOff->Eval(fEta);
-		Double_t corr2 = 1.-ffZ6NoOff->Eval(fEta);
+		double corr1 = 1.-ffZ7NoOff->Eval(fEta);
+		double corr2 = 1.-ffZ6NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
 	}else if(fEnergy>EZ7){
 
-		Double_t gap = 2000.-EZ7;
-		Double_t prop = (fEnergy-EZ7)/gap;
+		double gap = 2000.-EZ7;
+		double prop = (fEnergy-EZ7)/gap;
 
-		Double_t corr1 = 1.;
-		Double_t corr2 = 1.-ffZ7NoOff->Eval(fEta);
+		double corr1 = 1.;
+		double corr2 = 1.-ffZ7NoOff->Eval(fEta);
 
 		EnergyCorr = fEnergy+prop*corr1+(1.-prop)*corr2;
 
@@ -289,6 +288,7 @@ Double_t R3BFootStripCal2Hit::EtaCorr_Lagni(TF1* ffZ3,TF1* ffZ4, TF1* ffZ5, TF1*
 	return EnergyCorr;
 
 }
+
 
 // -----   Public method Init   -------------------------------------------------
 InitStatus R3BFootStripCal2Hit::Init()
@@ -313,6 +313,8 @@ InitStatus R3BFootStripCal2Hit::Init()
 	// Set container with mapping parameters
 	SetParameter();
 
+
+
 	R3BFootStripCal2Hit::fZ3 = new TF1("fZ3","TMath::Exp(3.9982-28.8242*x)+18.59",0.,0.5);
 	R3BFootStripCal2Hit::fZ4 = new TF1("fZ4","TMath::Exp(5.34286-22.9916*x)+101.193",0.,0.5);
 	R3BFootStripCal2Hit::fZ5 = new TF1("fZ5","TMath::Exp(6.12994-15.9781*x)+216.47",0.,0.5);
@@ -323,6 +325,9 @@ InitStatus R3BFootStripCal2Hit::Init()
 	R3BFootStripCal2Hit::fZ5NoOff = new TF1("fZ5NoOff","TMath::Exp(6.12994-15.9781*x)",0.,0.5);
 	R3BFootStripCal2Hit::fZ6NoOff = new TF1("fZ6NoOff","TMath::Exp(6.59235-13.8799*x)",0.,0.5);
 	R3BFootStripCal2Hit::fZ7NoOff = new TF1("fZ7NoOff","TMath::Exp(6.95883-10.7827583*x)",0.,0.5);
+
+
+
 
 	fZ4_0 = new TF1("fZ4_0"," 432.145 -3055.91*TMath::Power(x,1) + 5817.12*TMath::Power(x,2) + 51526.8*TMath::Power(x,3) -316706*TMath::Power(x,4) +  761651*TMath::Power(x,5) -938861*TMath::Power(x,6) + 585658*TMath::Power(x,7) -146060*TMath::Power(x,8)",0.,1.);
 	fZ5_0 = new TF1("fZ5_0"," 814.617 -6322.35*TMath::Power(x,1) + 33083.1*TMath::Power(x,2) -99704.7*TMath::Power(x,3) + 184652*TMath::Power(x,4) -204802*TMath::Power(x,5) + 123208*TMath::Power(x,6) -31778.6*TMath::Power(x,7) + 1642.45*TMath::Power(x,8)",0.,1.);
@@ -384,7 +389,7 @@ InitStatus R3BFootStripCal2Hit::Init()
 	fFootHitData->Clear();
 
 	char Name[255];
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
 		sprintf(Name, "hssd_%d", i + 1);
 		hssd.push_back(new TH1F(Name, "", 640, -0.5, 640.5));
@@ -408,18 +413,18 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 	Reset();
 
 	// Reading the Input Cal Data
-	Int_t nHits = fFootCalData->GetEntriesFast();
+	int nHits = fFootCalData->GetEntriesFast();
 	if (nHits == 0)
 		return;
 
 	// Data from cal level
 	R3BFootCalData** calData = new R3BFootCalData*[nHits];
-	Int_t detId;
-	Int_t stripId;
-	Double_t energy;
-	Double_t x = 0., y = 0., z = 0.;
-	vector<vector<Int_t>> StripI;
-	vector<vector<Double_t>> StripE;
+	int detId;
+	int stripId;
+	double energy;
+	double x = 0., y = 0., z = 0.;
+	vector<vector<int>> StripI;
+	vector<vector<double>> StripE;
 
 	// Clustering algorithm - A. Revel
 	// Init
@@ -453,10 +458,12 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 		ClusterI[i].resize(200);
 		ClusterE[i].resize(200);
 
+
 	}
 
+
 	// Filling vectors
-	for (Int_t i = 0; i < nHits; i++)
+	for (int i = 0; i < nHits; i++)
 	{
 		calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
 		detId = calData[i]->GetDetId() - 1;
@@ -468,20 +475,20 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 	}
 
 	// Sort (should be good by default but just in case)
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
 		if (StripI[i].size() > 1)
 		{
-			for (Int_t j = 0; j < StripI[i].size() - 1; j++)
+			for (int j = 0; j < StripI[i].size() - 1; j++)
 			{
-				for (Int_t k = j + 1; k < StripI[i].size(); k++)
+				for (int k = j + 1; k < StripI[i].size(); k++)
 				{
 					if (StripI[i][j] > StripI[i][k])
 					{
-						Int_t tempI = StripI[i][j];
+						auto tempI = StripI[i][j];
 						StripI[i][j] = StripI[i][k];
 						StripI[i][k] = tempI;
-						Int_t tempD = StripE[i][j];
+						auto tempD = StripE[i][j];
 						StripE[i][j] = StripE[i][k];
 						StripE[i][k] = tempD;
 					}
@@ -491,13 +498,13 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 	}
 
 	// Clustering
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
 
-		Int_t ClusterCount = 0;
-		Int_t TempI = 0;
+		int ClusterCount = 0;
+		auto TempI = 0;
 
-		Int_t j = 0;
+		int j = 0;
 
 		while (j < StripI[i].size())
 		{
@@ -511,7 +518,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 			ClusterI[i][ClusterCount].push_back(StripI[i][j]);
 			ClusterE[i][ClusterCount].push_back(StripE[i][j]);
 
-			Int_t k = j + 1;
+			int k = j + 1;
 
 			while (k < StripI[i].size() && (StripI[i][k] - TempI) == 1)
 			{
@@ -531,36 +538,37 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 		ClusterMult[i] = ClusterCount;
 	}
 
+
 	// Compute Sum Energy, Position and Eta
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
-		for (Int_t j = 0; j < ClusterMult[i]; j++)
+		for (int j = 0; j < ClusterMult[i]; j++)
 		{
-			for (Int_t k = 0; k < ClusterNStrip[i][j]; k++)
+			for (int k = 0; k < ClusterNStrip[i][j]; k++)
 			{
 				ClusterESum[i][j] += ClusterE[i][j][k];
 				ClusterPos[i][j] += ClusterE[i][j][k] * ClusterI[i][j][k];
 			}
 			ClusterPos[i][j] = ClusterPos[i][j] / ClusterESum[i][j];
-			Eta[i][j] = ClusterPos[i][j] - (Int_t)ClusterPos[i][j];
+			Eta[i][j] = ClusterPos[i][j] - (double)ClusterPos[i][j];
 		}
 	}
 
 	// Sort Cluster from Higher to Lower Energy
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
-		for (Int_t j = 0; j < ClusterMult[i] - 1; j++)
+		for (int j = 0; j < ClusterMult[i] - 1; j++)
 		{
-			for (Int_t k = j + 1; k < ClusterMult[i]; k++)
+			for (int k = j + 1; k < ClusterMult[i]; k++)
 			{
 				if (ClusterESum[i][j] < ClusterESum[i][k])
 				{
 
-					Int_t tempI = ClusterNStrip[i][j];
+					auto tempI = ClusterNStrip[i][j];
 					ClusterNStrip[i][j] = ClusterNStrip[i][k];
 					ClusterNStrip[i][k] = tempI;
 
-					Double_t tempD = ClusterESum[i][j];
+					double tempD = ClusterESum[i][j];
 					ClusterESum[i][j] = ClusterESum[i][k];
 					ClusterESum[i][k] = tempD;
 
@@ -577,12 +585,12 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 	}
 
 	// Filling HitData
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 	{
-		for (Int_t j = 0; j < ClusterMult[i]; j++)
+		for (int j = 0; j < ClusterMult[i]; j++)
 		{
 
-			Double_t pos = 100. * ClusterPos[i][j] / 640. - 50.;
+			double pos = 100. * ClusterPos[i][j] / 640. - 50.;
 
 			if (fAnglePhi[i] == 0.)
 			{ // X-Foot (StripId numbered from left to right)
@@ -614,6 +622,8 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 			}
 
 			TVector3 master(x, y, z);
+
+
 
 			if(Eta[0][j]>0 && Eta[0][j]<1){
 				if(fExpId==522){    
@@ -651,20 +661,20 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 
 
 			/*// Sort Cluster from Higher to Lower Energy after the eta correction step
-			  for (Int_t i = 0; i < fMaxNumDet; i++)
+			  for (int i = 0; i < fMaxNumDet; i++)
 			  {
-			  for (Int_t j = 0; j < ClusterMult[i] - 1; j++)
+			  for (int j = 0; j < ClusterMult[i] - 1; j++)
 			  {
-			  for (Int_t k = j + 1; k < ClusterMult[i]; k++)
+			  for (int k = j + 1; k < ClusterMult[i]; k++)
 			  {
 			  if (ClusterESum[i][j] < ClusterESum[i][k])
 			  {
 
-			  Int_t tempI = ClusterNStrip[i][j];
+			  int tempI = ClusterNStrip[i][j];
 			  ClusterNStrip[i][j] = ClusterNStrip[i][k];
 			  ClusterNStrip[i][k] = tempI;
 
-			  Double_t tempD = ClusterESum[i][j];
+			  double tempD = ClusterESum[i][j];
 			  ClusterESum[i][j] = ClusterESum[i][k];
 			  ClusterESum[i][k] = tempD;
 
@@ -680,6 +690,8 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 			  }
 			  }*/   // we cannot use that directly -> AddHitData is working cluster by cluster  => sorting in analysis macros...
 
+
+
 			if (ClusterESum[i][j] > fThSum && j < fMaxNumClusters)
 			{
 				AddHitData(i + 1, ClusterNStrip[i][j], pos, Eta[i][j], master, ClusterESum[i][j], ClusterMult[i]);
@@ -687,7 +699,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 		}
 	}
 
-	for (Int_t i = 0; i < fMaxNumDet; i++)
+	for (int i = 0; i < fMaxNumDet; i++)
 		hssd[i]->Reset();
 	if (calData)
 		delete[] calData;
@@ -704,17 +716,17 @@ void R3BFootStripCal2Hit::Reset()
 }
 
 // -----   Private method AddHitData  -------------------------------------------
-R3BFootHitData* R3BFootStripCal2Hit::AddHitData(Int_t detid,
-		Int_t numhit,
-		Double_t s,
-		Double_t eta,
+R3BFootHitData* R3BFootStripCal2Hit::AddHitData(int detid,
+		int numhit,
+		double s,
+		double eta,
 		TVector3 master,
-		Double_t energy_s,
-		Int_t mulS)
+		double energy_s,
+		int mulS)
 {
 	// It fills the R3BFootHitData
 	TClonesArray& clref = *fFootHitData;
-	Int_t size = clref.GetEntriesFast();
+		int size = clref.GetEntriesFast();
 	return new (clref[size]) R3BFootHitData(detid, numhit, s, eta, master, energy_s, mulS);
 }
 
