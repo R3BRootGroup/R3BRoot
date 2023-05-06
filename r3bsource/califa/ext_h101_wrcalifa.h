@@ -108,49 +108,6 @@ typedef struct EXT_STR_h101_WRCALIFA_onion_t
  * (version checks, etc)
  */
 
-typedef struct EXT_STR_h101_WRCALIFA_layout_t
-{
-    uint32_t _magic;
-    uint32_t _size_info;
-    uint32_t _size_struct;
-    uint32_t _size_struct_onion;
-    uint32_t _pack_list_items;
-
-    uint32_t _num_items;
-    struct
-    {
-        uint32_t _offset;
-        uint32_t _size;
-        uint32_t _xor;
-        const char* _name;
-    } _items[1];
-    uint32_t _pack_list[12];
-} EXT_STR_h101_WRCALIFA_layout;
-
-#define EXT_STR_h101_WRCALIFA_LAYOUT_INIT                                    \
-    { 0x57e65c96,                                                            \
-      sizeof(EXT_STR_h101_WRCALIFA_layout),                                  \
-      sizeof(EXT_STR_h101_WRCALIFA),                                         \
-      sizeof(EXT_STR_h101_WRCALIFA_onion),                                   \
-      12,                                                                    \
-      1,                                                                     \
-      {                                                                      \
-          { 0, sizeof(EXT_STR_h101_WRCALIFA), 0x644959df, "h101_WRCALIFA" }, \
-      },                                                                     \
-      {                                                                      \
-          0x40000000,                                                        \
-          0x40000004,                                                        \
-          0x40000008,                                                        \
-          0x4000000c,                                                        \
-          0x40000010,                                                        \
-          0x40000014,                                                        \
-          0x40000018,                                                        \
-          0x4000001c,                                                        \
-          0x40000020,                                                        \
-          0x40000024,                                                        \
-          0x40000028,                                                        \
-          0x4000002c,                                                        \
-      } };
 
 #endif /*__GUARD_H101_WRCALIFA_EXT_H101_WRCALIFA_H__*/
 
