@@ -148,7 +148,8 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
             {
                 if ((dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->GetCrystalId() == crystalId)
                 {
-                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->AddMoreEnergy(NUSmearing(energy));
+                    (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))
+                        ->AddMoreEnergy(NUSmearing(energy));
                     (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->AddMoreNf(Nf);
                     (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->AddMoreNs(Ns);
                     if ((dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(j)))->GetTime() > time)

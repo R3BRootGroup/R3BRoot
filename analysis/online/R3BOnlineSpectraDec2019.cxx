@@ -1649,7 +1649,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
 
-    Double_t time_MTDC[32][8] = { {0.0 / 0.0} };
+    Double_t time_MTDC[32][8] = { { 0.0 / 0.0 } };
     Double_t LosTresMTDC[32] = { 0.0 / 0.0 };
 
     Double_t timeLosV[fNofLosDetectors][32];
@@ -1665,7 +1665,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     Double_t yToT_cm[fNofLosDetectors][32];
     Double_t xV_cm[fNofLosDetectors][32];
     Double_t yV_cm[fNofLosDetectors][32];
-    Double_t time_V_temp[32][8] = { {0. / 0.} };
+    Double_t time_V_temp[32][8] = { { 0. / 0. } };
 
     for (int i = 0; i < fNofLosDetectors; i++)
     {
@@ -1736,8 +1736,8 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         nPart = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { {0.} };
-        Double_t time_V_LOS2[32][8] = { {0.} };
+        Double_t time_V_LOS1[32][8] = { { 0. } };
+        Double_t time_V_LOS2[32][8] = { { 0. } };
 
         for (Int_t iPart = 0; iPart < nPart; iPart++)
         {
@@ -1830,12 +1830,16 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         // detector 1
         if (nPartLos[0] > 0)
         {
-            std::qsort(time_V_LOS1, nPartLos[0], sizeof(*time_V_LOS1), [](const void* arg1, const void* arg2) -> int {
-                double const* lhs = static_cast<double const*>(arg1);
-                double const* rhs = static_cast<double const*>(arg2);
+            std::qsort(time_V_LOS1,
+                       nPartLos[0],
+                       sizeof(*time_V_LOS1),
+                       [](const void* arg1, const void* arg2) -> int
+                       {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
 
-                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-            });
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
             for (Int_t iPart = 0; iPart < nPartLos[0]; iPart++)
             {
                 for (int ipm = 0; ipm < 8; ipm++)
@@ -1849,12 +1853,16 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         // detector 2
         if (nPartLos[1] > 0)
         {
-            std::qsort(time_V_LOS2, nPartLos[1], sizeof(*time_V_LOS2), [](const void* arg1, const void* arg2) -> int {
-                double const* lhs = static_cast<double const*>(arg1);
-                double const* rhs = static_cast<double const*>(arg2);
+            std::qsort(time_V_LOS2,
+                       nPartLos[1],
+                       sizeof(*time_V_LOS2),
+                       [](const void* arg1, const void* arg2) -> int
+                       {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
 
-                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-            });
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
             for (Int_t iPart = 0; iPart < nPartLos[1]; iPart++)
             {
                 for (int ipm = 0; ipm < 8; ipm++)
@@ -2151,16 +2159,16 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     // SCI8 detector
     //----------------------------------------------------------------------
 
-    Double_t timeS8_V[10][2] = { {0.0 / 0.0} }; // [multihit][pm]
-    Double_t timeS8_L[10][2] = { {0.0 / 0.0} };
-    Double_t timeS8_T[10][2] = { {0.0 / 0.0} };
+    Double_t timeS8_V[10][2] = { { 0.0 / 0.0 } }; // [multihit][pm]
+    Double_t timeS8_L[10][2] = { { 0.0 / 0.0 } };
+    Double_t timeS8_T[10][2] = { { 0.0 / 0.0 } };
     Double_t timeSci8M[10] = { 0.0 };
     Double_t Sci8TresM[10] = { 0.0 / 0.0 };
     Double_t timeSci8T[10] = { 0.0 };
     Double_t Sci8TresT[10] = { 0.0 / 0.0 };
     Double_t timeSci8[10] = { 0.0 };
     Double_t totsumS8[10] = { 0.0 };
-    Double_t totS8[10][8] = { {0.0 / 0.0} };
+    Double_t totS8[10][8] = { { 0.0 / 0.0 } };
 
     Int_t MultipS8 = -1;
 
@@ -2653,19 +2661,19 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         auto det = fCalItems.at(DET_TOFD);
         Int_t nCals = det->GetEntriesFast();
 
-        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
 
-        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{false}} };
+        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { false } } };
 
         Int_t iBarMem = 0;
-        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {0} };
+        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { 0 } };
 
         unsigned long long time0 = header->GetTimeStamp();
         double_t time1 = -1.;

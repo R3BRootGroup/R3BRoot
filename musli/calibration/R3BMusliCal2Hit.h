@@ -70,7 +70,10 @@ class R3BMusliCal2Hit : public FairTask
     void SetParameters();
     Double_t BetaCorr_pol1(Double_t beta, Double_t p0, Double_t p1) { return p0 + p1 * beta; }
     Double_t BetaCorr_std(Double_t beta, Double_t p0, Double_t p1) { return p0 + p1 * pow(beta, -5. / 3.); }
-    Double_t SqrtE2Z(Double_t SqrtE, Double_t p0, Double_t p1, Double_t p2) { return p0 + p1 * SqrtE + p2 * SqrtE * SqrtE; }
+    Double_t SqrtE2Z(Double_t SqrtE, Double_t p0, Double_t p1, Double_t p2)
+    {
+        return p0 + p1 * SqrtE + p2 * SqrtE * SqrtE;
+    }
 
     //    R3BEventHeader* header; /**< Event header. */
 

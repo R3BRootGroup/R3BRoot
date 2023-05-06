@@ -38,7 +38,8 @@ class R3BDistribution
 
     R3BDistribution(std::array<R3BDistribution<1>, dimension> dists)
     {
-        fLookupFunction = [dists](const Array rndvalues) mutable {
+        fLookupFunction = [dists](const Array rndvalues) mutable
+        {
             Array retArray;
             for (int i = 0; i < dimension; ++i)
                 retArray[i] = dists[i].GetRandomValues({ rndvalues[i] })[0];
@@ -59,12 +60,14 @@ class R3BDistribution
         CreateValues();
     }
     R3BDistribution(const Array& lvalues, const Array& uvalues)
-        : fLookupFunction([lvalues, uvalues](const Array rndvalues) {
-            Array v;
-            for (int i = 0; i < dimension; ++i)
-                v[i] = rndvalues[i] * (uvalues[i] - lvalues[i]) + lvalues[i];
-            return v;
-        })
+        : fLookupFunction(
+              [lvalues, uvalues](const Array rndvalues)
+              {
+                  Array v;
+                  for (int i = 0; i < dimension; ++i)
+                      v[i] = rndvalues[i] * (uvalues[i] - lvalues[i]) + lvalues[i];
+                  return v;
+              })
     {
         CreateValues();
     }

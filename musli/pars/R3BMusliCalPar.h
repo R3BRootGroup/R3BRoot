@@ -87,16 +87,16 @@ class R3BMusliCalPar : public FairParGenericSet
     }
 
   private:
-    TArrayF* fEneCalParams; // Energy calibration parameters for anodes
-    TArrayF* fPosCalParams; // Position calibration parameters for anodes
+    TArrayF* fEneCalParams;     // Energy calibration parameters for anodes
+    TArrayF* fPosCalParams;     // Position calibration parameters for anodes
     TArrayF* fMultHitCalParams; // Calibration parameters for using multihits
-    TArrayI* fIn_use;       // 1: anode ready, 0:otherwise
-    Int_t fNumSignals;      // number of signals at the Mapped level (group of anodes + Tref + Ttrig)
-    Int_t fNumGroupsAnodes; // number of groups of anodes signals (each of them have energy and time)
-    Int_t fNumParamsEneFit; // number of cal parameters in the fit
-    Int_t fNumParamsPosFit; // number of parameters for position calibration
-    Int_t fNumParamsMultHit; // number of parameters for Multhit Calibration
-    Int_t fMaxMult;         // Max. multiplicity per anode
+    TArrayI* fIn_use;           // 1: anode ready, 0:otherwise
+    Int_t fNumSignals;          // number of signals at the Mapped level (group of anodes + Tref + Ttrig)
+    Int_t fNumGroupsAnodes;     // number of groups of anodes signals (each of them have energy and time)
+    Int_t fNumParamsEneFit;     // number of cal parameters in the fit
+    Int_t fNumParamsPosFit;     // number of parameters for position calibration
+    Int_t fNumParamsMultHit;    // number of parameters for Multhit Calibration
+    Int_t fMaxMult;             // Max. multiplicity per anode
 
     const R3BMusliCalPar& operator=(const R3BMusliCalPar&);
     R3BMusliCalPar(const R3BMusliCalPar&);
