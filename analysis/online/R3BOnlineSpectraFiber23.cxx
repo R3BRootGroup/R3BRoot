@@ -117,7 +117,8 @@ InitStatus R3BOnlineSpectraFiber23::Init()
         {
             printf("Could not find Cal data for '%s'.\n", fDetectorNames[det]);
         }
-        fCalTriggerItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sTriggerCal", fDetectorNames[det]))));
+        fCalTriggerItems.push_back(
+            dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sTriggerCal", fDetectorNames[det]))));
         if (NULL == fCalTriggerItems.at(det))
         {
             printf("Could not find CalTrigger data for '%s'.\n", fDetectorNames[det]);

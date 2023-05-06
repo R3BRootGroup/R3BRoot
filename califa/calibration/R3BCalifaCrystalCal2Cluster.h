@@ -15,12 +15,12 @@
 #define R3BCALIFACRYSTALCAL2CLUSTER_H 1
 
 #include "FairTask.h"
-#include "R3BCalifaGeometry.h"
 #include "R3BCalifaClusterData.h"
+#include "R3BCalifaGeometry.h"
 #include "Rtypes.h"
 
-#include <TVector3.h>
 #include "TH2F.h"
+#include <TVector3.h>
 
 class TClonesArray;
 class R3BTGeoPar;
@@ -45,11 +45,11 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     /** Public method SelectGeometryVersion **/
     void SelectGeometryVersion(Int_t version);
 
-    void SetCrystalThreshold(Double_t cryThresh)    {fCrystalThreshold = cryThresh;}
+    void SetCrystalThreshold(Double_t cryThresh) { fCrystalThreshold = cryThresh; }
 
-    void SetGammaClusterThreshold(Double_t clusterThresh){fGammaClusterThreshold = clusterThresh;}
+    void SetGammaClusterThreshold(Double_t clusterThresh) { fGammaClusterThreshold = clusterThresh; }
 
-    void SetProtonClusterThreshold(Double_t clusterThresh){fProtonClusterThreshold = clusterThresh;}
+    void SetProtonClusterThreshold(Double_t clusterThresh) { fProtonClusterThreshold = clusterThresh; }
 
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
@@ -63,16 +63,17 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    void SetRandomization(Bool_t rand){fRand=rand;}
+    void SetRandomization(Bool_t rand) { fRand = rand; }
 
-    void SetRandomizationFile(TString file) {
-      fRandFile = file;
-      fHistoFile = new TFile(fRandFile);
+    void SetRandomizationFile(TString file)
+    {
+        fRandFile = file;
+        fHistoFile = new TFile(fRandFile);
     }
 
-    void IsSimulation(Bool_t simu) {fSimulation = simu;}
+    void IsSimulation(Bool_t simu) { fSimulation = simu; }
 
-    void SetTotalCrystals(Int_t total) {fTotalCrystals = total;}
+    void SetTotalCrystals(Int_t total) { fTotalCrystals = total; }
 
     bool InsideClusterWindow(TVector3 mother, TVector3 crystal);
 
@@ -81,20 +82,18 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     void SetRoundWindow(Double_t window);
 
   private:
-
-
     TClonesArray* fCrystalCalData;
     TClonesArray* fCalifaClusterData;
 
-    TVector3 fTargetPos={0,0,0};
-    TVector3 fCalifaPos={0,0,0};
-    TVector3 fCalifatoTargetPos={0,0,0};
+    TVector3 fTargetPos = { 0, 0, 0 };
+    TVector3 fCalifaPos = { 0, 0, 0 };
+    TVector3 fCalifatoTargetPos = { 0, 0, 0 };
 
     R3BTGeoPar* fTargetGeoPar;
     R3BTGeoPar* fCalifaGeoPar;
 
-    Bool_t fOnline;                   // Selector for online data storage
-    Int_t fGeometryVersion;           // Selecting the geometry of the CALIFA calorimeter
+    Bool_t fOnline;         // Selector for online data storage
+    Int_t fGeometryVersion; // Selecting the geometry of the CALIFA calorimeter
     Int_t fTotalCrystals;
 
     Double_t fCrystalThreshold;       // Minimum energy requested in a crystal to be included in a cluster
@@ -102,30 +101,29 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     Double_t fGammaClusterThreshold;  // Minimum energy in a crystal to be considered as a gamma cluster candidate
     Double_t fProtonThreshold;        // Defines the cut energy between proton and gamma readout
 
-    Double_t fRoundWindow;        // Cluster window
-    Bool_t fSimulation;           // Simulation flag
+    Double_t fRoundWindow; // Cluster window
+    Bool_t fSimulation;    // Simulation flag
 
     R3BCalifaGeometry* fCalifaGeo;
-    Bool_t fRand;                // Flag to set randomization procedure
-    TString fRandFile;           // File with angular coverages for each crystal
-    TFile *fHistoFile = NULL;
-    TH2F **fAngularDistributions;
+    Bool_t fRand;      // Flag to set randomization procedure
+    TString fRandFile; // File with angular coverages for each crystal
+    TFile* fHistoFile = NULL;
+    TH2F** fAngularDistributions;
     TString fWindowAlg;
     Float_t fThetaLimit;
     Float_t fPhiLimit;
-     /** Private method AddCluster
-     **
-     ** Adds a CalifaCluster to the ClusterCollection
-     **/
+    /** Private method AddCluster
+    **
+    ** Adds a CalifaCluster to the ClusterCollection
+    **/
     R3BCalifaClusterData* AddCluster(std::vector<Int_t> crystalList,
-                             Double_t ene,
-                             Double_t Nf,
-                             Double_t Ns,
-                             Double_t pAngle,
-                             Double_t aAngle,
-                             ULong64_t time,
-                             Int_t clusterType);
-
+                                     Double_t ene,
+                                     Double_t Nf,
+                                     Double_t Ns,
+                                     Double_t pAngle,
+                                     Double_t aAngle,
+                                     ULong64_t time,
+                                     Int_t clusterType);
 
     ClassDef(R3BCalifaCrystalCal2Cluster, 3);
 };

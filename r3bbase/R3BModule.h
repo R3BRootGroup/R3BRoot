@@ -39,8 +39,8 @@ class R3BModule : public FairModule
               const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Construct geometry from root files */
-    virtual void ConstructGeometry()      override;
-    virtual void ConstructRootGeometry(TGeoMatrix* p=nullptr)  override;
+    virtual void ConstructGeometry() override;
+    virtual void ConstructRootGeometry(TGeoMatrix* p = nullptr) override;
 
     /** Method to setup the position of the detector-origin. */
     virtual void SetPosition(const TGeoTranslation& trans) { fCombiTrans.SetTranslation(trans); }
@@ -51,8 +51,8 @@ class R3BModule : public FairModule
   protected:
     TGeoCombiTrans fCombiTrans;
 
-  //ClassDef(R3BModule, 3)
-  ClassDefOverride(R3BModule, 3)
+    // ClassDef(R3BModule, 3)
+    ClassDefOverride(R3BModule, 3)
 };
 
 #endif // R3BMODULE_H

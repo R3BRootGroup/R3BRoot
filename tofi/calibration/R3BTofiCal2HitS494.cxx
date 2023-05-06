@@ -43,15 +43,15 @@
 // table every time -> linker nor happy.
 // So do some forward declaration for now, and keep the include in just one
 // place, for now R3BTofiCal2Histo.cxx.
-//#include "mapping_tofi_trig.hh"
+// #include "mapping_tofi_trig.hh"
 extern unsigned g_tofi_trig_map[2][24];
 void tofi_trig_map_setup();
 
 using namespace std;
 #define IS_NAN(x) TMath::IsNaN(x)
 
-//#define N_TOFI_HIT_PLANE_MAX 2
-//#define N_TOFI_HIT_PADDLE_MAX 24
+// #define N_TOFI_HIT_PLANE_MAX 2
+// #define N_TOFI_HIT_PADDLE_MAX 24
 
 namespace
 {

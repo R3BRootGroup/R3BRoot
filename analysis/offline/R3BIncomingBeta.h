@@ -100,6 +100,7 @@ class R3BIncomingBeta : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
     void SetUseTref() { fUseTref = kTRUE; }
     void SetUseMultHit() { fUseMultHit = kTRUE; }
+
   protected:
     R3BEventHeader* fHeader{}; // Event header
 
@@ -113,7 +114,7 @@ class R3BIncomingBeta : public FairTask
     TClonesArray* fHitLos;
     TClonesArray* fTcalSci2; /**< Array with Tcal items. */
 
-    Bool_t fOnline;          // Don't store data for online
+    Bool_t fOnline; // Don't store data for online
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;

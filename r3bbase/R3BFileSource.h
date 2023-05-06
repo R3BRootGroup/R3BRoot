@@ -131,7 +131,7 @@ class R3BFileSource : public FairSource
     Bool_t SpecifyRunId();
 #else
     Bool_t SpecifyRunId() override;
-#endif    
+#endif
 
   private:
     // static pointer to this class

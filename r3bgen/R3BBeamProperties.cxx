@@ -32,11 +32,12 @@ void R3BBeamProperties::SetEnergyDistribution(R3BDistribution<1> energyDistribut
 {
     const auto nucleonMass = (mass_MeV == 0. ? nNucleons * AMU_MeV : mass_MeV);
 
-    fBeta = R3BDistribution<1>([energyDistribution_AMeV, nucleonMass, nNucleons](
-                                   std::array<double, 1> values) mutable -> std::array<double, 1> {
-        const auto energy = energyDistribution_AMeV.GetRandomValues(values)[0];
-        const auto gamma = (nNucleons * energy) / nucleonMass + 1.;
-        const auto beta = std::sqrt(1. - 1. / (gamma * gamma));
-        return { beta };
-    });
+    fBeta = R3BDistribution<1>(
+        [energyDistribution_AMeV, nucleonMass, nNucleons](std::array<double, 1> values) mutable -> std::array<double, 1>
+        {
+            const auto energy = energyDistribution_AMeV.GetRandomValues(values)[0];
+            const auto gamma = (nNucleons * energy) / nucleonMass + 1.;
+            const auto beta = std::sqrt(1. - 1. / (gamma * gamma));
+            return { beta };
+        });
 }
