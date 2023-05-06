@@ -37,8 +37,8 @@ class R3BDetector : public FairDetector
                 const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Construct geometry from root files */
-    virtual void ConstructGeometry()      override;
-    virtual void ConstructRootGeometry(TGeoMatrix* p=nullptr)  override;
+    virtual void ConstructGeometry() override;
+    virtual void ConstructRootGeometry(TGeoMatrix* p = nullptr) override;
 
     /** Method to setup the position of the detector-origin. */
     virtual void SetPosition(const TGeoTranslation& trans) { fCombiTrans.SetTranslation(trans); }
@@ -57,7 +57,7 @@ class R3BDetector : public FairDetector
     TGeoCombiTrans fCombiTrans;
     Double_t fCutE;
 
-    //ClassDef(R3BDetector, 3)
+    // ClassDef(R3BDetector, 3)
     ClassDefOverride(R3BDetector, 3)
 };
 

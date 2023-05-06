@@ -30,7 +30,7 @@
 
 extern "C"
 {
-//#include "ext_data_client.h"
+// #include "ext_data_client.h"
 #include "ext_h101_pdc.h"
 }
 #define LENGTH(x) (sizeof x / sizeof *x)

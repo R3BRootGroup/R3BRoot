@@ -43,7 +43,7 @@ class R3BTcutPar : public TNamed
 
     void SetMaxPoints(UInt_t p) { fMaxPoints = p; }
     void SetCut(TCutG* c) { fCut = c; }
-    TString GetNameObj() {return GetName();}
+    TString GetNameObj() { return GetName(); }
 
   private:
     UInt_t fMaxPoints;

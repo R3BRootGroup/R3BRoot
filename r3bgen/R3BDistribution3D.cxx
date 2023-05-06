@@ -44,66 +44,74 @@ R3BDistribution<Dim> R3BDistribution3D::Gaussian(const Arr means, const Arr sigm
     for (int i = 0; i < Dim; ++i)
     {
         const auto invSigma2 = 1 / (sigmas[i] * sigmas[i]), mean = means[i];
-        graphs[i] = createLookupGraph(
-            [mean, invSigma2](const Double_t value) {
-                return TMath::Exp(-0.5 * (value - mean) * (value - mean) * invSigma2);
-            },
-            means[0] - nSigma * sigmas[0],
-            means[0] + nSigma * sigmas[0]);
+        graphs[i] = createLookupGraph([mean, invSigma2](const Double_t value)
+                                      { return TMath::Exp(-0.5 * (value - mean) * (value - mean) * invSigma2); },
+                                      means[0] - nSigma * sigmas[0],
+                                      means[0] + nSigma * sigmas[0]);
     }
 
-    return R3BDistribution<Dim>([graphs](Arr values) -> Arr {
-        Arr ret;
-        for (int i = 0; i < Dim; ++i)
-            ret[i] = graphs[i].Eval(values[i]);
-        return ret;
-    });
+    return R3BDistribution<Dim>(
+        [graphs](Arr values) -> Arr
+        {
+            Arr ret;
+            for (int i = 0; i < Dim; ++i)
+                ret[i] = graphs[i].Eval(values[i]);
+            return ret;
+        });
 }
 
 R3BDistribution<Dim> R3BDistribution3D::Cube(const Arr center, const Double_t edgeLength)
 {
-    return R3BDistribution<Dim>([center, edgeLength](Arr values) -> Arr {
-        return { center[0] + edgeLength * (values[0] - 0.5),
-                 center[1] + edgeLength * (values[1] - 0.5),
-                 center[2] + edgeLength * (values[2] - 0.5) };
-    });
+    return R3BDistribution<Dim>(
+        [center, edgeLength](Arr values) -> Arr
+        {
+            return { center[0] + edgeLength * (values[0] - 0.5),
+                     center[1] + edgeLength * (values[1] - 0.5),
+                     center[2] + edgeLength * (values[2] - 0.5) };
+        });
 }
 
 R3BDistribution<Dim> R3BDistribution3D::Sphere(const Arr center, const Double_t radius)
 {
-    return R3BDistribution<Dim>([center, radius](Arr values) -> Arr {
-        const auto r = radius * cbrt(values[0]);
-        const auto phi = 2 * TMath::Pi() * values[1];
-        const auto theta = TMath::Pi() * values[2];
+    return R3BDistribution<Dim>(
+        [center, radius](Arr values) -> Arr
+        {
+            const auto r = radius * cbrt(values[0]);
+            const auto phi = 2 * TMath::Pi() * values[1];
+            const auto theta = TMath::Pi() * values[2];
 
-        const auto x = center[0] + r * sin(theta) * cos(phi);
-        const auto y = center[1] + r * sin(theta) * sin(phi);
-        const auto z = center[2] + r * cos(theta);
+            const auto x = center[0] + r * sin(theta) * cos(phi);
+            const auto y = center[1] + r * sin(theta) * sin(phi);
+            const auto z = center[2] + r * cos(theta);
 
-        return { x, y, z };
-    });
+            return { x, y, z };
+        });
 }
 
 R3BDistribution<Dim> R3BDistribution3D::SphereSurface(const Arr center, const Double_t radius)
 {
-    return R3BDistribution<Dim>([center, radius](Arr values) -> Arr {
-        const auto phi = 2 * TMath::Pi() * values[1];
-        const auto theta = TMath::Pi() * values[2];
+    return R3BDistribution<Dim>(
+        [center, radius](Arr values) -> Arr
+        {
+            const auto phi = 2 * TMath::Pi() * values[1];
+            const auto theta = TMath::Pi() * values[2];
 
-        const auto x = center[0] + radius * sin(theta) * cos(phi);
-        const auto y = center[1] + radius * sin(theta) * sin(phi);
-        const auto z = center[2] + radius * cos(theta);
+            const auto x = center[0] + radius * sin(theta) * cos(phi);
+            const auto y = center[1] + radius * sin(theta) * sin(phi);
+            const auto z = center[2] + radius * cos(theta);
 
-        return { x, y, z };
-    });
+            return { x, y, z };
+        });
 }
 
 R3BDistribution<Dim> R3BDistribution3D::Prism(R3BDistribution<2> xydist, R3BDistribution<1> zdist)
 {
-    return R3BDistribution<Dim>([xydist, zdist](const Arr values) mutable -> Arr {
-        Arr ret;
-        const auto xy = xydist.GetRandomValues({ values[0], values[1] });
-        const auto z = zdist.GetRandomValues({ values[2] })[0];
-        return { xy[0], xy[1], z };
-    });
+    return R3BDistribution<Dim>(
+        [xydist, zdist](const Arr values) mutable -> Arr
+        {
+            Arr ret;
+            const auto xy = xydist.GetRandomValues({ values[0], values[1] });
+            const auto z = zdist.GetRandomValues({ values[2] })[0];
+            return { xy[0], xy[1], z };
+        });
 }

@@ -57,8 +57,14 @@ class R3BMusliMapped2Cal : public FairTask
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-    
-    void SetLosMusWindow(Double_t min, Double_t max) { winL = min; winR = max; fUseMultHit = kTRUE;}
+
+    void SetLosMusWindow(Double_t min, Double_t max)
+    {
+        winL = min;
+        winR = max;
+        fUseMultHit = kTRUE;
+    }
+
   private:
     void SetParameters();
 
@@ -80,7 +86,7 @@ class R3BMusliMapped2Cal : public FairTask
     Double_t winR;
 
     Bool_t fUseMultHit;
-    R3BEventHeader* fHeader; // Event header
+    R3BEventHeader* fHeader;          // Event header
     R3BMusliCalPar* fCal_Par;         /**< Parameter container. > */
     TClonesArray* fMusliMappedDataCA; /**< Array with Musli Mapped-input data. >*/
     TClonesArray* fMusliCalDataCA;    /**< Array with Musli Cal-output data. >*/

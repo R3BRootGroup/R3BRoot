@@ -96,7 +96,8 @@ void R3BTofiDigitizerCal::Exec(Option_t* opt)
 
     //    cout<<"R3BTofiDigitizerCal Exec Before Digitize"<<endl;
 
-    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels) {
+    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels)
+    {
         Int_t entryNum = Points->GetEntries();
 
         if (!entryNum)
@@ -150,9 +151,9 @@ void R3BTofiDigitizerCal::Exec(Option_t* opt)
                                        data_element->GetYIn()));
         }
 
-        std::sort(TempHits.begin(), TempHits.end(), [](const TempHit& lhs, const TempHit& rhs) {
-            return lhs.Time < rhs.Time;
-        });
+        std::sort(TempHits.begin(),
+                  TempHits.end(),
+                  [](const TempHit& lhs, const TempHit& rhs) { return lhs.Time < rhs.Time; });
 
         Int_t number_paddles_hit = 0;
         for (TempHit& Hit : TempHits) // loop over full range of TempHits; Hit is reference to each TempHit

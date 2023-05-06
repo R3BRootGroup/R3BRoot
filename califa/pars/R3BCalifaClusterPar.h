@@ -24,8 +24,8 @@ class R3BCalifaClusterPar : public FairParGenericSet
 {
   public:
     R3BCalifaClusterPar(const char* name = "R3BCalifaClusterPar",
-                    const char* title = "The Cluster Finder Parameters",
-                    const char* context = "TestDefaultContext");
+                        const char* title = "The Cluster Finder Parameters",
+                        const char* context = "TestDefaultContext");
     ~R3BCalifaClusterPar(void){};
     void clear(void){};
     void putParams(FairParamList* list);

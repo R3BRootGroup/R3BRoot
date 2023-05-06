@@ -122,7 +122,8 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
         R3BLOG(warn, "Not checking calibration in former proton range.");
         return;
     }
-    auto invalid = [&cal](int id) {
+    auto invalid = [&cal](int id)
+    {
         auto a = cal.GetAt(2 * (id - 1) + 0);
         auto b = cal.GetAt(2 * (id - 1) + 1);
         return (std::isnan(a) || a == 0.0) && (std::isnan(a) || a == 0.0);
@@ -230,9 +231,8 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
         auto ov = mappedData[i]->GetOverFlow();
         auto Tot = mappedData[i]->GetTot();
 
-        auto validate_smear = [](uint16_t err_cond, double raw) {
-            return err_cond ? NAN : raw + gRandom->Rndm() - 0.5;
-        };
+        auto validate_smear = [](uint16_t err_cond, double raw)
+        { return err_cond ? NAN : raw + gRandom->Rndm() - 0.5; };
         enum id
         {
             en = 0,
@@ -253,7 +253,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
                         pow(raw[idx], (fNumParams == 1) ? 1 : p) * fCalParams->GetAt(fNumParams * (crystalId - 1) + p);
                 }
         else
-          for (int idx{}; idx < 3; idx++)
+            for (int idx{}; idx < 3; idx++)
                 cal[idx] = NAN;
 
         double TotCal = Tot;

@@ -342,16 +342,16 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
 
     // los
 
-    Double_t time_V[10][8] = { {0.0 / 0.0} }; // [multihit][pm]
-    Double_t time_L[10][8] = { {0.0 / 0.0} };
-    Double_t time_T[10][8] = { {0.0 / 0.0} };
+    Double_t time_V[10][8] = { { 0.0 / 0.0 } }; // [multihit][pm]
+    Double_t time_L[10][8] = { { 0.0 / 0.0 } };
+    Double_t time_T[10][8] = { { 0.0 / 0.0 } };
     Double_t timeLosM[10] = { 0.0 };
     Double_t LosTresM[10] = { 0.0 / 0.0 };
     Double_t timeLosT[10] = { 0.0 };
     Double_t LosTresT[10] = { 0.0 / 0.0 };
     Double_t timeLos[10] = { 0.0 };
     Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][8] = { {0.0 / 0.0} };
+    Double_t tot[10][8] = { { 0.0 / 0.0 } };
     Double_t xT_cm[10] = { 0.0 / 0.0 };
     Double_t yT_cm[10] = { 0.0 / 0.0 };
     Double_t xV_cm[10] = { 0.0 / 0.0 };
@@ -407,12 +407,16 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
 
             // Sorting VFTX data:
 
-            std::qsort(time_V, nPart, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
-                double const* lhs = static_cast<double const*>(arg1);
-                double const* rhs = static_cast<double const*>(arg2);
+            std::qsort(time_V,
+                       nPart,
+                       sizeof(*time_V),
+                       [](const void* arg1, const void* arg2) -> int
+                       {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
 
-                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-            });
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
             // End sorting
 
             /*
