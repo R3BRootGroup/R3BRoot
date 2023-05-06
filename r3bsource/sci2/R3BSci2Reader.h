@@ -14,10 +14,10 @@
 #ifndef R3BSCI2READER_H
 #define R3BSCI2READER_H
 
-#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BReader.h"
 #include <Rtypes.h>
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_SCI2_t;
 typedef struct EXT_STR_h101_SCI2_t EXT_STR_h101_SCI2;

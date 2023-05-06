@@ -46,7 +46,7 @@
         return kTRUE;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
-    Bool_t R3B##ClassName##Reader::R3BRead()                                                                           \
+    Bool_t R3B##ClassName##Reader::R3BRead()                                                                        \
     {                                                                                                               \
         if (fData->TIMESTAMP_MASTER_ID != 0 && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)                        \
         {                                                                                                           \
@@ -73,7 +73,10 @@
         return kTRUE;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
-    void R3B##ClassName##Reader::Reset() { fNEvent = 0; }                                                           \
+    void R3B##ClassName##Reader::Reset()                                                                            \
+    {                                                                                                               \
+        fNEvent = 0;                                                                                                \
+    }                                                                                                               \
                                                                                                                     \
     ClassImp(R3B##ClassName##Reader)
 
