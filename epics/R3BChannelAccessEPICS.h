@@ -31,8 +31,8 @@
 #ifndef __R3BROOT__R3BCHANNELACCESSEPICS__
 #define __R3BROOT__R3BCHANNELACCESSEPICS__
 
-#include <TClonesArray.h>
 #include "R3BChannelAccess.h"
+#include <TClonesArray.h>
 #include <cadef.h>
 
 class R3BChannelAccessEPICS : public R3BChannelAccess

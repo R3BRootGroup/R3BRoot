@@ -43,7 +43,7 @@
 // table every time -> linker nor happy.
 // So do some forward declaration for now, and keep the include in just one
 // place, for now R3BTofdCal2Histo.cxx.
-//#include "mapping_tofd_trig.hh"
+// #include "mapping_tofd_trig.hh"
 extern unsigned g_tofd_trig_map[4][2][48];
 void tofd_trig_map_setup();
 

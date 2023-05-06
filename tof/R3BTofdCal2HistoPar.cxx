@@ -211,10 +211,11 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         LOG(warn) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                        smiley(dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))),
-                               min2,
-                               max2,
-                               para2);
+                        smiley(
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min2,
+                            max2,
+                            para2);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -243,7 +244,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min,
+                            max,
+                            para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -257,7 +261,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min,
+                            max,
+                            para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -288,7 +295,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                 {
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    zcorr(dynamic_cast<TH2F*>(hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, pars);
+                    zcorr(dynamic_cast<TH2F*>(hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                          min,
+                          max,
+                          pars);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
                     Double_t veff = par->GetVeff();
@@ -360,7 +370,8 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
+                auto* h =
+                    dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
@@ -478,7 +489,8 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
+                auto* h =
+                    dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");

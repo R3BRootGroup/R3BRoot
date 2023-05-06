@@ -131,15 +131,18 @@ namespace Neuland
         while (it != fTmxPeaks.end())
         {
             Int_t i = 0;
-            it = std::find_if(fTmxPeaks.begin(), fTmxPeaks.end(), [&](const TmxPeak& p) {
-                bool res = false;
-                if (index != i)
-                {
-                    res = (p == fTmxPeaks[index]);
-                }
-                i++;
-                return res;
-            });
+            it = std::find_if(fTmxPeaks.begin(),
+                              fTmxPeaks.end(),
+                              [&](const TmxPeak& p)
+                              {
+                                  bool res = false;
+                                  if (index != i)
+                                  {
+                                      res = (p == fTmxPeaks[index]);
+                                  }
+                                  i++;
+                                  return res;
+                              });
 
             if (it == fTmxPeaks.end())
                 continue;
@@ -215,9 +218,10 @@ namespace Neuland
         auto signals = std::vector<Signal>{};
         signals.reserve(fTmxPeaks.size());
 
-        std::transform(fTmxPeaks.begin(), fTmxPeaks.end(), std::back_inserter(signals), [](TmxPeak& peak) {
-            return static_cast<Signal>(peak);
-        });
+        std::transform(fTmxPeaks.begin(),
+                       fTmxPeaks.end(),
+                       std::back_inserter(signals),
+                       [](TmxPeak& peak) { return static_cast<Signal>(peak); });
         RemoveZero(signals);
         fSignals.set(std::move(signals));
     }

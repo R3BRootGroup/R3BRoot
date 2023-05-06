@@ -92,10 +92,10 @@ void R3BNeulandHitMon::Exec(Option_t*)
         if (result.second == false)
             result.first->second++;
     }
-    auto max = std::max_element(
-        paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs) {
-            return (lhs.second < rhs.second);
-        });
+    auto max = std::max_element(paddlenum.begin(),
+                                paddlenum.end(),
+                                [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs)
+                                { return (lhs.second < rhs.second); });
     LOG(debug) << "max dupli: " << max->second;
 
     if (fIs3DTrackEnabled)
@@ -133,9 +133,10 @@ void R3BNeulandHitMon::Exec(Option_t*)
         }
     }
 
-    auto maxDepthHit = std::max_element(hits.begin(), hits.end(), [](R3BNeulandHit* a, R3BNeulandHit* b) {
-        return a->GetPosition().Z() < b->GetPosition().Z();
-    });
+    auto maxDepthHit = std::max_element(hits.begin(),
+                                        hits.end(),
+                                        [](R3BNeulandHit* a, R3BNeulandHit* b)
+                                        { return a->GetPosition().Z() < b->GetPosition().Z(); });
     if (maxDepthHit != hits.end())
     {
         hDepth->Fill((*maxDepthHit)->GetPosition().Z());
@@ -143,9 +144,10 @@ void R3BNeulandHitMon::Exec(Option_t*)
         hDepthVSSternmostEnergy->Fill((*maxDepthHit)->GetPosition().Z(), (*maxDepthHit)->GetE());
     }
 
-    auto minDepthHit = std::min_element(hits.begin(), hits.end(), [](R3BNeulandHit* a, R3BNeulandHit* b) {
-        return a->GetPosition().Z() < b->GetPosition().Z();
-    });
+    auto minDepthHit = std::min_element(hits.begin(),
+                                        hits.end(),
+                                        [](R3BNeulandHit* a, R3BNeulandHit* b)
+                                        { return a->GetPosition().Z() < b->GetPosition().Z(); });
     auto Etot = std::accumulate(
         hits.begin(), hits.end(), Double_t(0.), [](const Double_t a, R3BNeulandHit* b) { return a + b->GetE(); });
 

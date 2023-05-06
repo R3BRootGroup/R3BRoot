@@ -20,8 +20,8 @@
 #ifndef R3BPTOFCAL2HIT_H
 #define R3BPTOFCAL2HIT_H
 
-#include <TArrayD.h>
 #include "FairTask.h"
+#include <TArrayD.h>
 
 #define PtofPaddlesPerPlane 8
 

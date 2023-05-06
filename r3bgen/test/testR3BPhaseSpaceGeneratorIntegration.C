@@ -14,15 +14,15 @@
 #include <TStopwatch.h>
 #include <TString.h>
 #include <TSystem.h>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 void testR3BPhaseSpaceGeneratorIntegration()
 {
     // Timer
     TStopwatch timer;
     timer.Start();
-    
+
     // Logging
     auto logger = FairLogger::GetLogger();
     logger->SetLogVerbosityLevel("low");

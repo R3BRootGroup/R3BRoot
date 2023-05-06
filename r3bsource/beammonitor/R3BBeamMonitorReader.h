@@ -14,9 +14,9 @@
 #ifndef R3BBEAMMONITORREADER_H
 #define R3BBEAMMONITORREADER_H 1
 
-#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BReader.h"
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_BMON_t;
 typedef struct EXT_STR_h101_BMON_t EXT_STR_h101_BMON;

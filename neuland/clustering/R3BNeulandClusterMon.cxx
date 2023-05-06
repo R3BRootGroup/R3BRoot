@@ -338,9 +338,9 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         }
     }
 
-    std::sort(clusters.begin(), clusters.end(), [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
-        return a->GetT() < b->GetT();
-    });
+    std::sort(clusters.begin(),
+              clusters.end(),
+              [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) { return a->GetT() < b->GetT(); });
 
     for (auto cluster : clusters)
     {

@@ -205,10 +205,10 @@ void R3BNeulandOnlineReconstruction::Exec(Option_t*)
         }
     }
 
-    const double etot =
-        std::accumulate(clusters.begin(), clusters.end(), 0., [](const double sum, const R3BNeulandCluster* c) {
-            return sum + c->GetE();
-        });
+    const double etot = std::accumulate(clusters.begin(),
+                                        clusters.end(),
+                                        0.,
+                                        [](const double sum, const R3BNeulandCluster* c) { return sum + c->GetE(); });
     if (etot > 10)
     {
         hEtotVSNClusters->Fill(etot, nClusters);

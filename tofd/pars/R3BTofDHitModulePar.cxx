@@ -16,8 +16,8 @@
 #include "FairLogger.h"
 #include "FairParamList.h"
 
-//#include "TF1.h"
-//#include "TH1F.h"
+// #include "TF1.h"
+// #include "TH1F.h"
 
 R3BTofDHitModulePar::R3BTofDHitModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)

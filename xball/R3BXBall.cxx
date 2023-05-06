@@ -236,11 +236,13 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol)
             {
                 for (Int_t i = 0; i < nCrystalHits; i++)
                 {
-                    if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() == copyNo)
+                    if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() ==
+                        copyNo)
                     {
                         (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))
                             ->AddMoreEnergy(NUSmearing(fELoss));
-                        if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetTime() > fTime)
+                        if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetTime() >
+                            fTime)
                         {
                             (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->SetTime(fTime);
                         }

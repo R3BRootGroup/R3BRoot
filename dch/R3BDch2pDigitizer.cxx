@@ -51,23 +51,23 @@
 #define PDC2_Z0 535.093884
 #define PDC1_Aparm 31.000000
 #define PDC1_Atilt 8.880000
-//#define PDC1_Atilt	-8.880000
+// #define PDC1_Atilt	-8.880000
 #define PDC2_Aparm 31.000000
 #define PDC2_Atilt -9.350000
-//#define PDC2_Atilt	9.350000
+// #define PDC2_Atilt	9.350000
 
 // Dead wire areas, determined from s318 DHIT data:
 #define PDC1_X_DEAD_1_LO 22.16 // cm, DHIT level, >
 #define PDC1_X_DEAD_1_HI 23.55 // cm, DHIT level, <=
-//#define PDC1_Y_DEAD_1_LO	13.85	//cm, DHIT level, >
-//#define PDC1_Y_DEAD_1_HI	15.24	//cm, DHIT level, <=
-//#define PDC1_Y_DEAD_2_LO	54.73	//cm, DHIT level, >
-//#define PDC1_Y_DEAD_2_HI	55.42	//cm, DHIT level, <=
-//#define PDC1_Y_DEAD_3_LO	58.88	//cm, DHIT level, >
-//#define PDC1_Y_DEAD_3_HI	60.97	//cm, DHIT level, <=
-//#define PDC1_Y_DEAD_4_LO	64.41	//cm, DHIT level, >
-//#define PDC1_Y_DEAD_4_HI	66.50	//cm, DHIT level, <=
-// update: HIT level values, translated to dhit
+// #define PDC1_Y_DEAD_1_LO	13.85	//cm, DHIT level, >
+// #define PDC1_Y_DEAD_1_HI	15.24	//cm, DHIT level, <=
+// #define PDC1_Y_DEAD_2_LO	54.73	//cm, DHIT level, >
+// #define PDC1_Y_DEAD_2_HI	55.42	//cm, DHIT level, <=
+// #define PDC1_Y_DEAD_3_LO	58.88	//cm, DHIT level, >
+// #define PDC1_Y_DEAD_3_HI	60.97	//cm, DHIT level, <=
+// #define PDC1_Y_DEAD_4_LO	64.41	//cm, DHIT level, >
+// #define PDC1_Y_DEAD_4_HI	66.50	//cm, DHIT level, <=
+//  update: HIT level values, translated to dhit
 #define PDC1_Y_DEAD_1_LO 14.3 // cm, DHIT level, >
 #define PDC1_Y_DEAD_1_HI 15.5 // cm, DHIT level, <=
 #define PDC1_Y_DEAD_2_LO 54.8 // cm, DHIT level, >
@@ -83,8 +83,8 @@
 #define PDC2_X_DEAD_1_HI 15.26 // cm, DHIT level, <=
 
 // Size of active area
-//#define PDC_L_X		100.0	//length of active area
-//#define PDC_L_Y		80.0	//length of active area
+// #define PDC_L_X		100.0	//length of active area
+// #define PDC_L_Y		80.0	//length of active area
 #define PDC_L_X 99.07 // x length of active area
 #define PDC_L_Y 77.60 // y length of active area
 
