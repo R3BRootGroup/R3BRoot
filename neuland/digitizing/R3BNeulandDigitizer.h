@@ -14,7 +14,6 @@
 #ifndef R3B_NEULAND_DIGITIZER_H
 #define R3B_NEULAND_DIGITIZER_H
 
-#include <TClonesArray.h>
 #include "DigitizingEngine.h"
 #include "FairTask.h"
 #include "Filterable.h"
@@ -23,6 +22,7 @@
 #include "R3BNeulandHitPar.h"
 #include "R3BNeulandPoint.h"
 #include "TCAConnector.h"
+#include <TClonesArray.h>
 
 class TGeoNode;
 class TH1F;

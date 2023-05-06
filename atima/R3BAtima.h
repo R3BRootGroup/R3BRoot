@@ -100,7 +100,7 @@ namespace R3BAtima
                                  Double_t projEnergy_per_u,
                                  const TargetMaterial& targetMaterial,
                                  Double_t tarThickness_mm);
-    
+
 }; // namespace R3BAtima
 
 #endif

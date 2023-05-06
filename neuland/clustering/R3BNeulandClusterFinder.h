@@ -24,12 +24,12 @@
  *
  */
 
-#include <TClonesArray.h>
 #include "ClusteringEngine.h"
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
 #include "TCAConnector.h"
+#include <TClonesArray.h>
 
 class R3BNeulandClusterFinder : public FairTask
 {

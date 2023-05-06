@@ -23,8 +23,8 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BEventHeader.h"
 #include "R3BCoarseTimeStitch.h"
+#include "R3BEventHeader.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 

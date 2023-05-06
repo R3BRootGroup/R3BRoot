@@ -146,10 +146,10 @@ namespace Neuland
                 {
                     compareValues[j] = CompareSignals(leftSignals[i], rightSignals[j]);
                 }
-                auto compareValues_it = std::min_element(
-                    compareValues.begin(), compareValues.end(), [](const Double_t& left, const Double_t& right) {
-                        return left < right;
-                    });
+                auto compareValues_it =
+                    std::min_element(compareValues.begin(),
+                                     compareValues.end(),
+                                     [](const Double_t& left, const Double_t& right) { return left < right; });
 
                 if (compareValues_it == compareValues.end())
                     LOG(fatal) << "DigitizingEngine.cxx::GetIndexMap(): failed to find minimum value!";
@@ -157,9 +157,10 @@ namespace Neuland
                 valueMap[i] = *compareValues_it;
                 auto indexMatch = static_cast<int>(compareValues_it - compareValues.begin());
 
-                auto findResult = std::find_if(indexMap.begin(), indexMap.end(), [indexMatch](const Pair<int>& pair) {
-                    return pair.right == indexMatch;
-                });
+                auto findResult =
+                    std::find_if(indexMap.begin(),
+                                 indexMap.end(),
+                                 [indexMatch](const Pair<int>& pair) { return pair.right == indexMatch; });
                 if (findResult == indexMap.end())
                 {
                     indexMap[i] = { i, indexMatch };

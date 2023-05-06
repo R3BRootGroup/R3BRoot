@@ -27,11 +27,13 @@ R3BNeulandClusterFinder::R3BNeulandClusterFinder(const Double_t dx,
     , fDigis(input)
     , fClusters(output)
 {
-    fClusteringEngine.SetClusteringCondition([=](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
-               std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
-               std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
-    });
+    fClusteringEngine.SetClusteringCondition(
+        [=](const R3BNeulandHit& a, const R3BNeulandHit& b)
+        {
+            return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
+                   std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
+                   std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
+        });
 }
 
 InitStatus R3BNeulandClusterFinder::Init()

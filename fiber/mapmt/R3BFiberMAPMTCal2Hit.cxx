@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BFiberMAPMTCal2Hit.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTHitData.h"
@@ -19,7 +20,6 @@
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
 
 #include "TF1.h"
 #include "TH1F.h"

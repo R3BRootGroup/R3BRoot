@@ -20,9 +20,9 @@
 #ifndef R3BFIBERMAPMTMAPPED2CAL_H
 #define R3BFIBERMAPMTMAPPED2CAL_H 1
 
-#include <TClonesArray.h>
 #include "FairTask.h"
 #include <R3BTCalEngine.h>
+#include <TClonesArray.h>
 
 class R3BTCalPar;
 

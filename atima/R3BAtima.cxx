@@ -60,11 +60,11 @@ namespace R3BAtima
     {
         TransportResult res;
 
-        const auto invTotRatio = std::accumulate(
-            targetMaterial.Compounds.begin(),
-            targetMaterial.Compounds.end(),
-            0.,
-            [](const Double_t sum, const MaterialCompound& comp) -> Double_t { return sum + comp.Ratio; });
+        const auto invTotRatio = std::accumulate(targetMaterial.Compounds.begin(),
+                                                 targetMaterial.Compounds.end(),
+                                                 0.,
+                                                 [](const Double_t sum, const MaterialCompound& comp) -> Double_t
+                                                 { return sum + comp.Ratio; });
 
         Int_t tcompsize = 3, tcompnum = targetMaterial.Compounds.size(), pn = 2;
         std::vector<Double_t> tarFortran;

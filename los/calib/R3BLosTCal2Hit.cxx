@@ -18,8 +18,9 @@
 
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
-#include "FairRuntimeDb.h"
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
@@ -28,7 +29,6 @@
 #include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
-#include "R3BCoarseTimeStitch.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -212,7 +212,6 @@ InitStatus R3BLosTCal2Hit::Init()
             tot_par[ivec][3] = 1.; // Normalization factor
         }
     }
-
 
     SetParameter();
     return kSUCCESS;

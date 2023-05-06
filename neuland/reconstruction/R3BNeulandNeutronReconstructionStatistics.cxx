@@ -78,7 +78,8 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
     const auto actualNegative = fSecondaryClusters.Retrieve();
     const auto predictedPositive = fPredictedNeutrons.Retrieve();
 
-    auto comp = [](const R3BNeulandNeutron* n, const R3BNeulandCluster* c) {
+    auto comp = [](const R3BNeulandNeutron* n, const R3BNeulandCluster* c)
+    {
         return almost_equal(c->GetT(), n->GetT(), 2) && almost_equal(c->GetPosition().X(), n->GetPosition().X(), 2) &&
                almost_equal(c->GetPosition().Y(), n->GetPosition().Y(), 2) &&
                almost_equal(c->GetPosition().Z(), n->GetPosition().Z(), 2);
@@ -125,7 +126,8 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
     const double precision = truePositives / (truePositives + falsePositives);
     const double recall = truePositives / (truePositives + falseNegatives);
 
-    auto Fbeta = [&](double beta) {
+    auto Fbeta = [&](double beta)
+    {
         if (precision == 0. && recall == 0.)
             return 0.;
         return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall);
@@ -151,9 +153,8 @@ void R3BNeulandNeutronReconstructionStatistics::Finish()
 
     const double precision = (double)fTP / ((double)fTP + (double)fFP);
     const double recall = (double)fTP / ((double)fTP + (double)fFN);
-    auto Fbeta = [&](double beta) {
-        return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall);
-    };
+    auto Fbeta = [&](double beta)
+    { return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall); };
     const double accuracy = (double)(fTP + fTN) / (double)(fTP + fTN + fFP + fFN);
 
     fOut << "PREC DATA"

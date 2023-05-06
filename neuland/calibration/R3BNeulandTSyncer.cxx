@@ -237,8 +237,9 @@ namespace Neuland
 
             std::vector<Element> lhs(numberOfEquations);
             const auto numberOfVariables = BarsPerPlane * nPlanes;
-            auto function = [&lhs, numberOfVariables](
-                                long mode, LSQR_DOUBLE_VECTOR* xVec, LSQR_DOUBLE_VECTOR* yVec, void* data) {
+            auto function =
+                [&lhs, numberOfVariables](long mode, LSQR_DOUBLE_VECTOR* xVec, LSQR_DOUBLE_VECTOR* yVec, void* data)
+            {
                 double* x = xVec->elements;
                 double* y = yVec->elements;
 

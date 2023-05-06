@@ -16,8 +16,8 @@
 
 #include "FairTask.h"
 #include "R3BLosCalData.h"
-#include "R3BLosTCalData.h"
 #include "R3BLosHitData.h"
+#include "R3BLosTCalData.h"
 #include "TCAConnector.h"
 
 class R3BEventHeader;
@@ -30,8 +30,13 @@ class R3BLosProvideTStart : public FairTask
 
     InitStatus Init() override;
     void Exec(Option_t*) override;
-    // Setter to fix trigger peak window 
-    void SetWindow(Double_t left, Double_t right){edgeL = left; edgeR = right; fUseTrigHit = kTRUE;}
+    // Setter to fix trigger peak window
+    void SetWindow(Double_t left, Double_t right)
+    {
+        edgeL = left;
+        edgeR = right;
+        fUseTrigHit = kTRUE;
+    }
 
   private:
     TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
@@ -48,7 +53,7 @@ class R3BLosProvideTStart : public FairTask
     Bool_t fUseTrigHit;
 
     Double_t edgeL, edgeR;
- 
+
     ClassDefOverride(R3BLosProvideTStart, 0)
 };
 

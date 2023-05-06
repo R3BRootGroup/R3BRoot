@@ -145,11 +145,11 @@ class R3BLosTCal2Hit : public FairTask
 
   private:
     void SetParameter();
-    R3BLosHitPar* fLosHit_Par;       // Parameter container
-    TClonesArray* fTCalItems;        /**< Array with Cal items - input data. */
-    TClonesArray* fTCalTriggerItems; /**< Array with Trigger Cal items - input data. */
-    TClonesArray* fHitItems;         /**< Array with Hit items - output data. */
-    R3BCoarseTimeStitch* fTimeStitch;      /**< Array with Hit items - output data. */
+    R3BLosHitPar* fLosHit_Par;        // Parameter container
+    TClonesArray* fTCalItems;         /**< Array with Cal items - input data. */
+    TClonesArray* fTCalTriggerItems;  /**< Array with Trigger Cal items - input data. */
+    TClonesArray* fHitItems;          /**< Array with Hit items - output data. */
+    R3BCoarseTimeStitch* fTimeStitch; /**< Array with Hit items - output data. */
     Float_t fp0, fp1;
     TArrayF* fLEMatchParams;
     TArrayF* fTEMatchParams;

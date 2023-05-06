@@ -87,7 +87,7 @@ namespace Neuland
             // Getters:
             const Tamex::Params& GetPar() const { return par; }
             const std::vector<TmxPeak>& GetTmxPeaks() const { return fTmxPeaks; }
-            const Double_t GetTrigTime() const override; 
+            const Double_t GetTrigTime() const override;
 
             void SetPaddle(Digitizing::Paddle* paddle) override;
             Signal TmxPeakToSignal(const TmxPeak& peak) const;

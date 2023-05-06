@@ -45,7 +45,7 @@ namespace Neuland
             Double_t GetQDC() const;
             Double_t GetTDC() const;
             Double_t GetEnergy() const;
-            const Double_t GetTrigTime() const override { return GetTDC(); } 
+            const Double_t GetTrigTime() const override { return GetTDC(); }
 
           private:
             // NOTE: Some expensive calculations and random distributions are cached
@@ -66,7 +66,7 @@ namespace Neuland
 
             void ConstructSignals() const override
             {
-                 fSignals.set({Signal{GetQDC(), GetTDC(), GetEnergy(), this->GetSide()}});
+                fSignals.set({ Signal{ GetQDC(), GetTDC(), GetEnergy(), this->GetSide() } });
             }
         };
 

@@ -36,11 +36,11 @@
 #include "FairRuntimeDb.h"
 
 // R3B headers
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
 #include "R3BTofDMappingPar.h"
 #include "R3BTofDOnlineSpectra.h"
 #include "R3BTofdCalData.h"

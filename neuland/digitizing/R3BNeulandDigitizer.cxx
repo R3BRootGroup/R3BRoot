@@ -126,15 +126,13 @@ void R3BNeulandDigitizer::Exec(Option_t*)
     // Fill control histograms
     hMultOne->Fill(std::count_if(paddles.begin(),
                                  paddles.end(),
-                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
-                                     return kv.second->HasHalfFired();
-                                 }));
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv)
+                                 { return kv.second->HasHalfFired(); }));
 
     hMultTwo->Fill(std::count_if(paddles.begin(),
                                  paddles.end(),
-                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
-                                     return kv.second->HasFired();
-                                 }));
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv)
+                                 { return kv.second->HasFired(); }));
 
     // Create Hits
     for (const auto& kv : paddles)

@@ -114,7 +114,8 @@ InitStatus R3BPspxPrecal2Cal::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = dynamic_cast<TClonesArray*>(fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f]))); // = branch name in TTree
+            tmp[f] = dynamic_cast<TClonesArray*>(
+                fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f]))); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
