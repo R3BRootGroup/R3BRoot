@@ -314,7 +314,7 @@ void R3BUcesbSource::Close()
     int ret;
 
     if (!fFd) // not open
-      return; 
+        return;
     /* Close client connection */
     ret = fClient.close();
     if (0 != ret)
@@ -327,12 +327,12 @@ void R3BUcesbSource::Close()
     int status;
     status = pclose(fFd);
     if (-1 == status)
-      {
-	// perror("pclose()");
-	R3BLOG(fatal, "pclose() failed");
-	abort();
-      }
-    fFd=nullptr;
+    {
+        // perror("pclose()");
+        R3BLOG(fatal, "pclose() failed");
+        abort();
+    }
+    fFd = nullptr;
 
     if (fInputFile.is_open())
         fInputFile.close();
@@ -356,10 +356,10 @@ Bool_t R3BUcesbSource::SpecifyRunId()
 //_____________________________________________________________________________
 void R3BUcesbSource::FillEventHeader(FairEventHeader* feh)
 {
-  // note: as of 2023-02-09, FairRootManager will always pass us a pointer to
-  // FairEventHeader, never to R3BEventHeader. Investigation is under way.
-  //    --Philipp
-  feh->SetRunId(fRunId); // we can still set the run ID, though. 
+    // note: as of 2023-02-09, FairRootManager will always pass us a pointer to
+    // FairEventHeader, never to R3BEventHeader. Investigation is under way.
+    //    --Philipp
+    feh->SetRunId(fRunId); // we can still set the run ID, though.
 }
 
 ClassImp(R3BUcesbSource);

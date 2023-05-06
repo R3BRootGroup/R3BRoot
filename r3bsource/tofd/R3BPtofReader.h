@@ -15,8 +15,8 @@
 #define R3BPTOFREADER_H
 
 /* Include the parent reader class definition */
-#include <TClonesArray.h>
 #include "R3BReader.h"
+#include <TClonesArray.h>
 
 /* The structure containing the data layout of PTOF detector */
 struct EXT_STR_h101_ptof_t;
