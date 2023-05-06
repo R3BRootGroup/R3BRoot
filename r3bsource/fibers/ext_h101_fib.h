@@ -89,47 +89,6 @@ typedef struct EXT_STR_h101_FIB_onion_t
                                                                                                           \
     } while (0);
 
-/********************************************************
- *
- * For internal use by the network data reader:
- * (version checks, etc)
- */
-
-typedef struct EXT_STR_h101_FIB_layout_t
-{
-    uint32_t _magic;
-    uint32_t _size_info;
-    uint32_t _size_struct;
-    uint32_t _size_struct_onion;
-    uint32_t _pack_list_items;
-
-    uint32_t _num_items;
-    struct
-    {
-        uint32_t _offset;
-        uint32_t _size;
-        uint32_t _xor;
-        const char* _name;
-    } _items[1];
-    uint32_t _pack_list[20];
-} EXT_STR_h101_FIB_layout;
-
-#define EXT_STR_h101_FIB_LAYOUT_INIT                                                          \
-    { 0x57e65c96,                                                                             \
-      sizeof(EXT_STR_h101_FIB_layout),                                                        \
-      sizeof(EXT_STR_h101_FIB),                                                               \
-      sizeof(EXT_STR_h101_FIB_onion),                                                         \
-      20,                                                                                     \
-      1,                                                                                      \
-      {                                                                                       \
-          { 0, sizeof(EXT_STR_h101_FIB), 0x2b06d4a2, "h101_FIB" },                            \
-      },                                                                                      \
-      {                                                                                       \
-          0x40000000, 0x40000004, 0xc0000008, 0x00000003, 0x00000002, 0x4000000c, 0x40000018, \
-          0x40000010, 0x4000001c, 0x40000014, 0x40000020, 0xc0000024, 0x00000003, 0x00000002, \
-          0x40000028, 0x40000034, 0x4000002c, 0x40000038, 0x40000030, 0x4000003c,             \
-      } };
-
 #endif /*__GUARD_H101_FIB_EXT_H101_FIB_H__*/
 
 /*******************************************************/
