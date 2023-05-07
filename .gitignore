@@ -47,6 +47,7 @@ glad-tpc/
 frs/
 asyeos/
 R3BParams_*/
+R3BFileSource/
 
 # Generated folders and files 
 geometry/neuland_v*.root
