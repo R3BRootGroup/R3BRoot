@@ -15,10 +15,6 @@
 #include "R3BPdcHitData.h"
 #include "R3BPdcMappedData.h"
 
-#include "R3BBunchedFiberCalData.h"
-#include "R3BBunchedFiberHitData.h"
-#include "R3BBunchedFiberMappedData.h"
-
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
 
@@ -67,42 +63,7 @@ R3BOnlineSpectraPdc::R3BOnlineSpectraPdc(const char* name, Int_t iVerbose)
 {
 }
 
-R3BOnlineSpectraPdc::~R3BOnlineSpectraPdc()
-{
-    //	delete fhTpat ;
-    //	delete fhTrigger;
-    //	delete fh_SEETRAM;
-    /*
-    delete fh_fi0_0_fiber;
-    delete fh_fi0_1_fiber;
-    delete fh_fi0_0_mult;
-    delete fh_fi0_1_mult;
-    delete fh_fi0_0_Tot;
-    delete fh_fi0_1_Tot;
-    delete fh_fi0_0_Time;
-    delete fh_fi0_1_Time;
-    */
-    /*
-    delete fMappedItems_fi1a;
-    delete fHitItems_fi1a;
-    */
-    /*
-    cout << "vor delete" << endl;
-        for (int i = 0; i < N_PLANE_MAX_PDC; i++)
-        {
-            delete fh_Pdc_Wire[i];
-            delete fh_Pdc_Tot[i];
-            delete fh_Pdc_mult[i];
-            delete fh_Pdc_ToF[i];
-            delete fh_Pdc_xy[i];
-            delete fh_Pdc_x[i];
-            delete fh_Pdc_y[i];
-            delete fh_Pdc_Time[i];
-            delete fh_Pdc_Wire_vs_Events[i];
-        }
-    cout << "nach delete" << endl;
-    */
-}
+R3BOnlineSpectraPdc::~R3BOnlineSpectraPdc() {}
 
 InitStatus R3BOnlineSpectraPdc::Init()
 {
@@ -124,46 +85,18 @@ InitStatus R3BOnlineSpectraPdc::Init()
 
     run->GetHttpServer()->Register("/Tasks", this);
 
-    /*
-        // Get objects for detectors on all levels
-        fMappedItems = (TClonesArray*)mgr->GetObject("PdcMapped");
-        if (NULL == fMappedItems)
-            LOG(fatal) << "Branch PdcMapped not found";
-
-        fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
-        if (NULL == fCalItems)
-            LOG(fatal) << "Branch PdcCal not found";
-
-        fHitItems = (TClonesArray*)mgr->GetObject("PdcHit");
-        if (NULL == fHitItems)
-            LOG(fatal) << "Branch PdcHit not found";
-    */
-
     // Get objects for detectors on all levels
-    fMappedItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Mapped");
-    if (NULL == fMappedItems_fi0)
-        LOG(fatal) << "Branch Fi0Mapped not found";
+    fMappedItems = (TClonesArray*)mgr->GetObject("PdcMapped");
+    if (NULL == fMappedItems)
+        LOG(fatal) << "Branch PdcMapped not found";
 
-    fCalItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Cal");
-    if (NULL == fCalItems_fi0)
-        LOG(fatal) << "Branch Fi0Cal not found";
+    fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
+    if (NULL == fCalItems)
+        LOG(fatal) << "Branch PdcCal not found";
 
-    fHitItems_fi0 = (TClonesArray*)mgr->GetObject("Fi0Hit");
-    if (NULL == fHitItems_fi0)
-        LOG(fatal) << "Branch Fi0Hit not found";
-
-    // Get objects for detectors on all levels
-    fMappedItems_fi60 = (TClonesArray*)mgr->GetObject("Fi60Mapped");
-    if (NULL == fMappedItems_fi60)
-        LOG(fatal) << "Branch Fi60Mapped not found";
-
-    fCalItems_fi60 = (TClonesArray*)mgr->GetObject("Fi60Cal");
-    if (NULL == fCalItems_fi60)
-        LOG(fatal) << "Branch Fi60Cal not found";
-
-    fHitItems_fi60 = (TClonesArray*)mgr->GetObject("Fi60Hit");
-    if (NULL == fHitItems_fi60)
-        LOG(fatal) << "Branch Fi60Hit not found";
+    fHitItems = (TClonesArray*)mgr->GetObject("PdcHit");
+    if (NULL == fHitItems)
+        LOG(fatal) << "Branch PdcHit not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -186,235 +119,12 @@ InitStatus R3BOnlineSpectraPdc::Init()
         fhTpat->Draw();
         cTrigg->cd(0);
     */
-    //---------------------------------------------------------------------------------------------------
-    // Fiber0_0 and Fiber0_1 detectors
-    if (NULL != fMappedItems_fi0)
-    {
-        Int_t ch = 150;
-        TCanvas* cFib = new TCanvas("Fib0", "Fiber0 detectors", 50, 50, 500, 500);
-        cFib->Divide(4, 2);
-
-        fh_fi0_fiber = new TH1F("Fi0_fibers", "Fi0 fibers", ch, 0., ch);
-        fh_fi0_fiber->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_fiber->GetYaxis()->SetTitle("Counts");
-
-        fh_fi0_mult = new TH1F("Fi0_mult", "Fi0 mult", 140, 0., 140);
-        fh_fi0_mult->GetXaxis()->SetTitle("mult");
-        fh_fi0_mult->GetYaxis()->SetTitle("Counts");
-
-        fh_fi0_Tot = new TH2F("Fi0_ToT", "Fi0 ToT", ch, 0., ch, int(500. / 0.4167), 0, 500);
-        fh_fi0_Tot->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_Tot->GetYaxis()->SetTitle("ToT");
-
-        fh_fi0_Time = new TH2F("Fi0_Time", "Fi0 time", ch, 0., ch, int(200. / 0.4167), -1000, 1000);
-        fh_fi0_Time->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_Time->GetYaxis()->SetTitle("time");
-
-        fh_fi0_tot2_tot1 =
-            new TH2F("Fi0_ToT1_vs_ToT2", "Fi0 ToT1 vs. ToT2", int(30. / 0.4167), 0, 30, int(30. / 0.4167), 0, 30);
-        fh_fi0_tot2_tot1->GetXaxis()->SetTitle("ToT1");
-        fh_fi0_tot2_tot1->GetYaxis()->SetTitle("ToT2");
-
-        fh_fi0_cor = new TH2F("Fi0_cor", "Fi0 correlation plot", 128, 0, 128, 128, 0, 128);
-        fh_fi0_cor->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_cor->GetYaxis()->SetTitle("Fiber");
-
-        fh_fi0_eff = new TH2F("fi0_eff", "Fi0 hits for PDC x vs y", 1500, 0, 1500, 1500, 0, 1500);
-        fh_fi0_eff->GetXaxis()->SetTitle("x in mm");
-        fh_fi0_eff->GetYaxis()->SetTitle("y in mm");
-
-        fh_fi0_eff_vs_time = new TH2F("fi0_eff_vs_time", "Fi0 eff vs. time", 10000, 0, 10000, 100, 0, 100);
-        fh_fi0_eff_vs_time->GetXaxis()->SetTitle("number of hits");
-        fh_fi0_eff_vs_time->GetYaxis()->SetTitle("eff");
-
-        // with cuts
-        fh_fi0_fiber_mc = new TH1F("Fi0_fibers_mc", "Fi0 fibers with cuts", ch, 0., ch);
-        fh_fi0_fiber_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_fiber_mc->GetYaxis()->SetTitle("Counts");
-
-        fh_fi0_mult_mc = new TH1F("Fi0_mult_mc", "Fi0 mult with cuts", 140, 0., 140);
-        fh_fi0_mult_mc->GetXaxis()->SetTitle("mult");
-        fh_fi0_mult_mc->GetYaxis()->SetTitle("Counts");
-
-        fh_fi0_Tot_mc = new TH2F("Fi0_ToT_mc", "Fi0 ToT with cuts", ch, 0., ch, int(500. / 0.4167), 0, 500);
-        fh_fi0_Tot_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_Tot_mc->GetYaxis()->SetTitle("ToT");
-
-        fh_fi0_Time_mc = new TH2F("Fi0_Time_mc", "Fi0 time with cuts", ch, 0., ch, int(200. / 0.4167), -1000, 1000);
-        fh_fi0_Time_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi0_Time_mc->GetYaxis()->SetTitle("time");
-
-        fh_fi0_pdc = new TH2F("Fi0_pdc", "Fi0 vs. PDC", 130, 0, 130, 2000, 200., 600.);
-        fh_fi0_pdc->GetXaxis()->SetTitle("Fiber0 position ");
-        fh_fi0_pdc->GetYaxis()->SetTitle("PDC position ");
-
-        fh_fi0_pdc_eloss = new TH2F("Fi0_pdc_eloss", "Fi0 vs. PDC eloss", 200, 0, 100, 3000, 0., 300.);
-        fh_fi0_pdc_eloss->GetXaxis()->SetTitle("Fiber0 tot in ns");
-        fh_fi0_pdc_eloss->GetYaxis()->SetTitle("PDC tot in ns");
-
-        fh_fi0_pdc_time = new TH2F("Fi0_pdc_time", "Fi0 vs. PDC time", 1600, -800., 800., 1600, -800, 800);
-        fh_fi0_pdc_time->GetXaxis()->SetTitle("Fiber0 time in ns");
-        fh_fi0_pdc_time->GetYaxis()->SetTitle("PDC time in ns");
-
-        cFib->cd(1);
-        fh_fi0_fiber->Draw();
-        cFib->cd(2);
-        fh_fi0_mult->Draw();
-        cFib->cd(3);
-        fh_fi0_Tot->Draw("colz");
-        cFib->cd(4);
-        fh_fi0_Time->Draw("colz");
-        cFib->cd(5);
-        fh_fi0_fiber_mc->Draw();
-        cFib->cd(6);
-        fh_fi0_mult_mc->Draw();
-        cFib->cd(7);
-        fh_fi0_Tot_mc->Draw("colz");
-        cFib->cd(8);
-        fh_fi0_Time_mc->Draw("colz");
-
-        cFib->cd(0);
-        run->AddObject(cFib);
-        run->GetHttpServer()->RegisterCommand("Reset_Fi0", Form("/Tasks/%s/->Reset_Fi0_Histo()", GetName()));
-    }
-
-    //---------------------------------------------------------------------------------------------------
-    // Fiber60 detector
-    if (fMappedItems_fi60)
-    {
-        Int_t ch = 260;
-
-        fh_fi60_fiber = new TH1F("Fi60_fibers", "Fi60 fibers", ch, 0., ch);
-        fh_fi60_fiber->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_fiber->GetYaxis()->SetTitle("Counts");
-
-        fh_fi60_mult = new TH1F("Fi60_mult", "Fi60 mult", ch, 0., ch);
-        fh_fi60_mult->GetXaxis()->SetTitle("mult");
-        fh_fi60_mult->GetYaxis()->SetTitle("Counts");
-
-        fh_fi60_Tot = new TH2F("Fi60_ToT", "Fi60 ToT", ch, 0., ch, 500, 0, 500);
-        fh_fi60_Tot->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_Tot->GetYaxis()->SetTitle("ToT");
-
-        fh_fi60_Time = new TH2F("Fi60_Time", "Fi60 time", ch, 0., ch, 2500, -1500, 1000);
-        fh_fi60_Time->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_Time->GetYaxis()->SetTitle("time");
-
-        // with cuts
-        fh_fi60_fiber_mc = new TH1F("Fi60_fibers_mc", "Fi60 fibers with cuts", ch, 0., ch);
-        fh_fi60_fiber_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_fiber_mc->GetYaxis()->SetTitle("Counts");
-
-        fh_fi60_mult_mc = new TH1F("Fi60_mult_mc", "Fi60 mult with cuts", ch, 0., ch);
-        fh_fi60_mult_mc->GetXaxis()->SetTitle("mult");
-        fh_fi60_mult_mc->GetYaxis()->SetTitle("Counts");
-
-        fh_fi60_Tot_mc = new TH2F("Fi60_ToT_mc", "Fi60 ToT with cuts", ch, 0., ch, 100, 0, 100);
-        fh_fi60_Tot_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_Tot_mc->GetYaxis()->SetTitle("ToT");
-
-        fh_fi60_Time_mc = new TH2F("Fi60_Time_mc", "Fi60 time with cuts", ch, 0., ch, 1000, -500, 500);
-        fh_fi60_Time_mc->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_Time_mc->GetYaxis()->SetTitle("time");
-
-        fh_fi60_pdc = new TH2F("Fi60_pdc", "Fi60 vs. PDC", 256, 0, 256, 2000, 400., 800.); // 286, -3.003, 3.003
-        fh_fi60_pdc->GetXaxis()->SetTitle("Fiber60 x-position in cm");
-        fh_fi60_pdc->GetYaxis()->SetTitle("PDC position in cm");
-
-        fh_fi60_pdc_time = new TH2F("Fi60_pdc_time", "Fi60 vs. PDC time", 1600, -800., 800., 1600, -800, 800);
-        fh_fi60_pdc_time->GetXaxis()->SetTitle("Fiber60 time in ns");
-        fh_fi60_pdc_time->GetYaxis()->SetTitle("PDC time in ns");
-
-        fh_fi60_pdc_eloss = new TH2F("Fi60_pdc_eloss", "Fi60 vs. PDC eloss", 200, 0, 100, 3000, 0., 300.);
-        fh_fi60_pdc_eloss->GetXaxis()->SetTitle("Fiber60 tot in ns");
-        fh_fi60_pdc_eloss->GetYaxis()->SetTitle("PDC tot in ns");
-
-        fh_fi60_cor = new TH2F("Fi60_cor", "Fi60 correlation plot", 128, 0, 128, 128, 0, 128);
-        fh_fi60_cor->GetXaxis()->SetTitle("Fiber");
-        fh_fi60_cor->GetYaxis()->SetTitle("Fiber");
-
-        fh_fi60_tot2_tot1 =
-            new TH2F("Fi60_ToT1_vs_ToT2", "Fi60 ToT1 vs. ToT2", int(30. / 0.4167), 0, 30, int(30. / 0.4167), 0, 30);
-        fh_fi60_tot2_tot1->GetXaxis()->SetTitle("ToT1");
-        fh_fi60_tot2_tot1->GetYaxis()->SetTitle("ToT2");
-
-        fh_fi60_eff = new TH2F("fi60_eff", "Fi60 hits for PDC x vs y", 1500, 0, 1500, 1500, 0, 1500);
-        fh_fi60_eff->GetXaxis()->SetTitle("x in mm");
-        fh_fi60_eff->GetYaxis()->SetTitle("y in mm");
-
-        fh_fi60_eff_vs_time = new TH2F("fi60_eff_vs_time", "Fi60 eff vs. time", 10000, 0, 10000, 100, 0, 100);
-        fh_fi60_eff_vs_time->GetXaxis()->SetTitle("number of hits");
-        fh_fi60_eff_vs_time->GetYaxis()->SetTitle("eff");
-
-        /*
-                TCanvas* cFib1_correl = new TCanvas("Fib1_pdc", "Fiber1_pdc detectors", 50, 50, 800, 800);
-                cFib1_correl->Divide(3, 4);
-
-                cFib1_correl->cd(1);
-                gPad->SetLogz();
-                fh_fi0_pdc->Draw("colz");
-                cFib1_correl->cd(2);
-                gPad->SetLogz();
-                fh_fi0_pdc_time->Draw("colz");
-                cFib1_correl->cd(3);
-                gPad->SetLogz();
-                fh_fi0_pdc_eloss->Draw("colz");
-
-                cFib1_correl->cd(4);
-                gPad->SetLogz();
-                fh_fi60_pdc->Draw("colz");
-                cFib1_correl->cd(5);
-                gPad->SetLogz();
-                fh_fi60_pdc_time->Draw("colz");
-                cFib1_correl->cd(6);
-                gPad->SetLogz();
-                fh_fi60_pdc_eloss->Draw("colz");
-
-                cFib1_correl->cd(10);
-                gPad->SetLogz();
-
-                cFib1_correl->cd(0);
-                run->AddObject(cFib1_correl);
-        */
-        TCanvas* cFib60 = new TCanvas("Fib60", "Fiber60 detectors", 50, 50, 500, 500);
-        cFib60->Divide(4, 2);
-
-        cFib60->cd(1);
-        gPad->SetLogy();
-        fh_fi60_fiber->Draw();
-        cFib60->cd(2);
-        gPad->SetLogy();
-        fh_fi60_mult->Draw();
-        cFib60->cd(3);
-        gPad->SetLogz();
-        fh_fi60_Tot->Draw("colz");
-        cFib60->cd(4);
-        gPad->SetLogz();
-        fh_fi60_Time->Draw("colz");
-
-        cFib60->cd(5);
-        gPad->SetLogy();
-        fh_fi60_fiber_mc->Draw();
-        cFib60->cd(6);
-        gPad->SetLogy();
-        fh_fi60_mult_mc->Draw();
-        cFib60->cd(7);
-        gPad->SetLogz();
-        fh_fi60_Tot_mc->Draw("colz");
-        cFib60->cd(8);
-        gPad->SetLogz();
-        fh_fi60_Time_mc->Draw("colz");
-
-        cFib60->cd(0);
-        run->AddObject(cFib60);
-        run->GetHttpServer()->RegisterCommand("Reset_Fi60", Form("/Tasks/%s/->Reset_Fi60_Histo()", GetName()));
-    }
 
     //---------------------------------------------------------------------------------------------------
     // PDC detector
-
     if (fMappedItems)
     {
+        Double_t bs = 1000. / 150. / 16.;
         TCanvas* cPdc_planes = new TCanvas("PDC_planes", "PDC planes", 50, 50, 800, 1200);
         cPdc_planes->Divide(6, 4);
 
@@ -455,7 +165,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
             sprintf(strName3, "pdc_ToT_plane_%d", j + 1);
             char strName4[255];
             sprintf(strName4, "PDC ToT plane %d", j + 1);
-            fh_Pdc_Tot[j] = new TH2F(strName3, strName4, 150, 0, 150, 3000, 0., 300.);
+            fh_Pdc_Tot[j] = new TH2F(strName3, strName4, 150, 0, 150, (int)(800. / bs), 0., 800.);
             fh_Pdc_Tot[j]->GetXaxis()->SetTitle("Wire");
             fh_Pdc_Tot[j]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -468,10 +178,10 @@ InitStatus R3BOnlineSpectraPdc::Init()
             fh_Pdc_mult[j]->GetYaxis()->SetTitle("multiplicity");
 
             char strName5[255];
-            sprintf(strName5, "ped_ToF_plane_%d", j + 1);
+            sprintf(strName5, "pdc_ToF_plane_%d", j + 1);
             char strName6[255];
             sprintf(strName6, "PDC ToF plane %d", j + 1);
-            fh_Pdc_ToF[j] = new TH2F(strName5, strName6, 150, 0, 150, 1000, 0, 100);
+            fh_Pdc_ToF[j] = new TH2F(strName5, strName6, 150, 0, 150, (int)(100. / bs), 0, 100);
             fh_Pdc_ToF[j]->GetXaxis()->SetTitle("Wire");
             fh_Pdc_ToF[j]->GetYaxis()->SetTitle("ToF / ns");
 
@@ -479,7 +189,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
             sprintf(strName7, "pdc_time_plane_%d", j + 1);
             char strName8[255];
             sprintf(strName8, "PDC Time-trigger time plane %d", j + 1);
-            fh_Pdc_Time[j] = new TH2F(strName7, strName8, 150, 0, 150, 1000, -1000, 1000);
+            fh_Pdc_Time[j] = new TH2F(strName7, strName8, 150, 0, 150, (int)(2000. / bs), -1000, 1000);
             fh_Pdc_Time[j]->GetXaxis()->SetTitle("Wire");
             fh_Pdc_Time[j]->GetYaxis()->SetTitle("Time / ns");
 
@@ -613,22 +323,6 @@ void R3BOnlineSpectraPdc::Reset_PDC_Histo()
     }
 }
 
-void R3BOnlineSpectraPdc::Reset_Fi0_Histo()
-{
-    fh_fi0_fiber->Reset();
-    fh_fi0_mult->Reset();
-    fh_fi0_Tot->Reset();
-    fh_fi0_Time->Reset();
-}
-
-void R3BOnlineSpectraPdc::Reset_Fi60_Histo()
-{
-    fh_fi60_fiber->Reset();
-    fh_fi60_mult->Reset();
-    fh_fi60_Tot->Reset();
-    fh_fi60_Time->Reset();
-}
-
 void R3BOnlineSpectraPdc::Exec(Option_t* option)
 {
     fNEvents++;
@@ -683,7 +377,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     // PDC
     //----------------------------------------------------------------------
 
-    if (fMappedItems && 1 == 0)
+    if (fMappedItems)
     {
         Int_t mult[5][145] = { 0 };
 
@@ -701,7 +395,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             // cout << "Plane: " << iPlane << " Wire: " << iWire << " Edge: " << iEdge << endl;
             Int_t wire = iWire;
 
-            // cout << "Plane: " << iPlane << " wire: " << iWire << endl;
+            // if(iEdge==1) cout << "Mapped Plane: " << iPlane << " wire: " << iWire << endl;
             mult[iPlane - 1][iWire - 1]++;
             if (iPlane <= N_PLANE_MAX_PDC)
             {
@@ -742,7 +436,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             }
         }
     }
-    if (fCalItems && 1 == 0)
+    if (fCalItems)
     {
         auto det = fCalItems;
         Int_t nCals = det->GetEntriesFast();
@@ -789,13 +483,12 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
     Int_t mult_pdc4 = 0;
     Int_t mult_pdc3 = 0;
 
-    if (fHitItems && 1 == 0)
+    if (fHitItems)
     {
         Int_t mult[5][145] = { 0 };
         auto det = fHitItems;
         Int_t nHits = det->GetEntriesFast();
-
-        if (nHits == 4)
+        if (nHits > 0)
         {
             Int_t plane = 0;
             Int_t wire = 0;
@@ -838,7 +531,8 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 fh_Pdc_Tot[plane - 1]->Fill(wire, eloss[plane - 1]);
                 fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
 
-                // cout << "Plane: " << plane << " wire: " << wire << " x: " << x[plane - 1]
+                // cout << "Hit Plane: " << plane << " wire: " << wire << endl;
+                //" x: " << x[plane - 1]
                 //	<< " y: " << y[plane - 1] << " eloss: " << eloss[plane - 1] << endl;
 
                 if (plane == 3)
@@ -890,394 +584,21 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             }
         }
     }
-
-    //----------------------------------------------------------------------
-    // Fiber0 detectors
-    //----------------------------------------------------------------------
-    if (NULL != fMappedItems_fi0)
-    {
-        Int_t mult_fi0 = 0;
-        Int_t iFib = 0;
-        Int_t iFib2 = 0;
-        auto det = fMappedItems_fi0;
-        Int_t nMapped = det->GetEntriesFast();
-        for (Int_t imapped = 0; imapped < nMapped; imapped++)
-        {
-            auto mapped = (R3BBunchedFiberMappedData const*)det->At(imapped);
-            if (!mapped)
-            {
-                continue; // should not happen
-            }
-            if (mapped->IsMAPMTTrigger())
-            {
-                triggerCountsFi0++;
-            }
-            if (!mapped->IsMAPMT())
-            {
-                continue;
-            }
-
-            if (mapped->IsLeading())
-            {
-                iFib = mapped->GetChannel(); // 1..n
-                mult_fi0++;
-                fh_fi0_fiber->Fill(iFib);
-            }
-        }
-        // if (mult_fi0 > 0)
-        {
-            // cout << "mult: " << mult_fi0 << endl;
-            fh_fi0_mult->Fill(mult_fi0);
-            totalFi0 += mult_fi0;
-            // cout << " total Fi0: " << totalFi0 << endl;
-            // cout << " trigger Fi0: " << triggerCountsFi0 << endl;
-        }
-
-        // Cal Items
-        if (NULL != fCalItems_fi0)
-        {
-        }
-
-        // Hit Items
-        if (NULL != fHitItems_fi0)
-        {
-            Int_t multi[128] = { 0 };
-            Int_t nHits = fHitItems_fi0->GetEntriesFast();
-            Double_t xpos = 0. / 0.;
-            Double_t ypos = 0. / 0.;
-            Double_t tfib = 0. / 0., tof_fib = 0. / 0.;
-            Double_t randx;
-
-            Double_t tMAPMT = 0. / 0.;
-            Double_t tMAPMT2 = 0. / 0.;
-            Double_t tSPMT1 = 0. / 0.;
-            Double_t tSPMT2 = 0. / 0.;
-            Double_t tot = 0. / 0.;
-            Double_t tot1 = 0.;
-            Double_t tot2 = 0.;
-            for (Int_t ihit = 0; ihit < nHits; ihit++)
-            {
-                tMAPMT = 0. / 0.;
-                tot = 0. / 0.;
-                Double_t dtime = 0. / 0.;
-                R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)fHitItems_fi0->At(ihit);
-                if (!hit)
-                    continue;
-
-                iFib = hit->GetFiberId(); // 1..
-                tMAPMT = hit->GetTime();
-                tot = hit->GetEloss();
-
-                fh_fi0_Tot->Fill(iFib, tot);
-                fh_fi0_Time->Fill(iFib, tMAPMT);
-
-                // fiber correlation plot. Loop again over all fibers
-                for (Int_t jhit = 0; jhit < nHits; jhit++)
-                {
-                    R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi0->At(jhit);
-                    if (!hit2)
-                        continue;
-
-                    iFib2 = hit2->GetFiberId(); // 1..
-                    tMAPMT2 = hit2->GetTime();  //+ 5444.;
-                    tot2 = hit2->GetEloss();
-                    if (iFib != iFib2)
-                    {
-                        fh_fi0_cor->Fill(iFib, iFib2);
-                        fh_fi0_tot2_tot1->Fill(tot, tot2);
-                    }
-                }
-
-                // cuts ***********************************
-                if (tMAPMT < -330 || tMAPMT > -290)
-                {
-                    continue;
-                }
-
-                if (tot < 0 || tot > 2500)
-                {
-                    continue;
-                }
-                xpos = hit->GetX();
-                ypos = dtime;
-                multi[iFib - 1]++;
-                fh_fi0_Tot_mc->Fill(iFib, tot);
-                fh_fi0_Time_mc->Fill(iFib, tMAPMT);
-                fh_fi0_fiber_mc->Fill(iFib);
-                // if (yPdc4 > 0. && eloss[3] > 35 && nHits == 1)
-                if (nHits > 0 && nHits < 3)
-                {
-                    // cout << "Fib0: fiber = " << iFib << endl;
-                }
-
-                // if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
-                // if (yPdc4 > 0. && nHits > 0 && nHits < 2 )
-                // if (yPdc4 > 0. && nHits > 0 && mult_pdc4 == 1)
-                // if (yPdc4 > 0. && nHits > 0 )
-                if (yPdc4test > 0. && nHits > 0)
-                {
-                    // fh_fi0_pdc->Fill(iFib, yPdc4);
-                    fh_fi0_pdc->Fill(iFib, yPdc4test);
-                    fh_fi0_pdc_time->Fill(tMAPMT, tPair[3]);
-                    fh_fi0_pdc_eloss->Fill(tot, eloss[3]);
-                }
-                // if (xPdc3test > 0. && nHits > 0 && nHits < 2 )
-                // if (xPdc1 > 0. && nHits > 0 && nHits < 2 )
-            } // end for(ihit)
-            if (xPdc1 > 0 && xPdc3 > 0 && yPdc2 > 0 && yPdc4 > 0 && nHits > 0)
-            {
-                fh_Pdc_xvsx_fi0->Fill(xPdc1, xPdc3);
-                fh_Pdc_yvsy_fi0->Fill(yPdc2, yPdc4);
-                fh_fi0_eff->Fill((xPdc1 + xPdc3) / 2., (yPdc2 + yPdc4) / 2.);
-            }
-
-            Int_t multi_fi0 = 0;
-            Int_t multi_fi1 = 0;
-            for (Int_t i = 0; i < 128; i++)
-            {
-                multi_fi0 = multi_fi0 + multi[i];
-            }
-            if (multi_fi0 > 0)
-            {
-                fh_fi0_mult_mc->Fill(multi_fi0);
-                detectedFi0++;
-            }
-            fh_fi0_eff_vs_time->Fill(triggerCountsFi0, (float)detectedFi0 / (float)triggerCountsFi0 * 100.);
-        }
-    }
-
-    //----------------------------------------------------------------------
-    // Fiber60 detectors
-    //----------------------------------------------------------------------
-    if (fMappedItems_fi60)
-    {
-        Int_t mult_fi60 = 0;
-        Int_t iFib = 0;
-        Int_t iFib2 = 0;
-
-        auto det = fMappedItems_fi60;
-        Int_t nMapped = det->GetEntriesFast();
-        for (Int_t imapped = 0; imapped < nMapped; imapped++)
-        {
-            auto mapped = (R3BBunchedFiberMappedData const*)det->At(imapped);
-            if (!mapped)
-                continue; // should not happen
-            if (mapped->IsMAPMTTrigger())
-            {
-                triggerCountsFi60++;
-            }
-            if (!mapped->IsMAPMT())
-            {
-                continue;
-            }
-            if (mapped->IsLeading())
-            {
-                iFib = mapped->GetChannel(); // 1..n
-                mult_fi60++;
-                fh_fi60_fiber->Fill(iFib);
-            }
-        }
-        // if (mult_fi0_0 > 0)
-        {
-            totalFi60 += mult_fi60;
-            fh_fi60_mult->Fill(mult_fi60);
-        }
-        // Cal Items
-        if (fCalItems_fi60)
-        {
-        }
-
-        // Hit Items
-        Double_t tmin = -175;
-        Double_t tmax = -150;
-        if (fHitItems_fi60)
-        {
-            Int_t multi[128] = { 0 };
-            Int_t nHits = fHitItems_fi60->GetEntriesFast();
-            Double_t xpos = 0. / 0.;
-            Double_t ypos = 0. / 0.;
-            Double_t tfib = 0. / 0., tof_fib = 0. / 0.;
-            Double_t randx;
-            // cout<<"new event: "<< nHits<<"  "<<ifibcount<<endl;
-
-            Double_t tMAPMT = 0. / 0.;
-            Double_t tMAPMT2 = 0. / 0.;
-            Double_t tSPMT1 = 0. / 0.;
-            Double_t tSPMT2 = 0. / 0.;
-            Double_t tot = 0. / 0.;
-            Double_t tot2 = 0. / 0.;
-
-            for (Int_t ihit = 0; ihit < nHits; ihit++)
-            {
-                tMAPMT = 0. / 0.;
-                tot = 0. / 0.;
-                Double_t dtime = 0. / 0.;
-                R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)fHitItems_fi60->At(ihit);
-                if (!hit)
-                    continue;
-
-                iFib = hit->GetFiberId(); // 1..
-                tMAPMT = hit->GetTime();  //+ 5444.;
-                tot = hit->GetEloss();
-                fh_fi60_Tot->Fill(iFib, tot);
-                fh_fi60_Time->Fill(iFib, tMAPMT);
-
-                // fiber correlation plot. Loop again over all fibers
-                Int_t mult = 0;
-                for (Int_t jhit = 0; jhit < nHits; jhit++)
-                {
-                    R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi60->At(jhit);
-                    if (!hit2)
-                        continue;
-
-                    iFib2 = hit2->GetFiberId(); // 1..
-                    tot2 = hit2->GetEloss();
-                    tMAPMT2 = hit2->GetTime(); //+ 5444.;
-
-                    if (iFib != iFib2)
-                    {
-                        fh_fi60_cor->Fill(iFib, iFib2);
-                        fh_fi60_tot2_tot1->Fill(tot, tot2);
-                    }
-                    if (tMAPMT2 < tmin || tMAPMT2 > tmax)
-                    {
-                        mult++;
-                    }
-                }
-
-                // cuts ***********************************
-                // if not in the right time window, go to next
-                if (tMAPMT < tmin || tMAPMT > tmax)
-                {
-                    continue;
-                }
-
-                if (tot < 0 || tot > 2500)
-                {
-                    continue;
-                }
-
-                if (mult < 1)
-                {
-                    continue;
-                }
-
-                // cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
-                xpos = hit->GetX();
-                ypos = dtime;
-                multi[iFib - 1]++;
-                fh_fi60_Tot_mc->Fill(iFib, tot);
-                fh_fi60_Time_mc->Fill(iFib, tMAPMT);
-                fh_fi60_fiber_mc->Fill(iFib);
-
-                // if (yPdc4 > 0. && eloss[3] > 35 && nHits == 1)
-                if (nHits > 0 && nHits < 3)
-                {
-                    // cout << "Fib0: fiber = " << iFib << endl;
-                }
-
-                // if (yPdc4test > 0. && nHits > 0 && nHits < 2 )
-                // if (yPdc4 > 0. && nHits > 0 && nHits < 2 )
-                // if (yPdc4 > 0. && nHits > 0 && mult_pdc4 == 1)
-                // if (yPdc4 > 0. && nHits > 0 )
-                if (yPdc4test > 0. && nHits > 0)
-                {
-                    // fh_fi0_0_pdc->Fill(iFib, yPdc4);
-                    fh_fi60_pdc->Fill(iFib, yPdc4test);
-                    fh_fi60_pdc_time->Fill(tMAPMT, tPair[3]);
-                    fh_fi60_pdc_eloss->Fill(tot, eloss[3]);
-                }
-            } // end for(ihit)
-
-            if (xPdc1 > 0 && xPdc3 > 0 && yPdc2 > 0 && yPdc4 > 0 && nHits > 0)
-            {
-                fh_Pdc_xvsx_fi60->Fill(xPdc1, xPdc3);
-                fh_Pdc_yvsy_fi60->Fill(yPdc2, yPdc4);
-                fh_fi60_eff->Fill((xPdc1 + xPdc3) / 2., (yPdc2 + yPdc4) / 2.);
-            }
-
-            Int_t multi_fi60 = 0;
-            for (Int_t i = 0; i < 128; i++)
-            {
-                multi_fi60 = multi_fi60 + multi[i];
-            }
-            if (multi_fi60 > 0)
-            {
-                fh_fi60_mult_mc->Fill(multi_fi60);
-                detectedFi60++;
-            }
-            fh_fi60_eff_vs_time->Fill(triggerCountsFi60, (float)detectedFi60 / (float)triggerCountsFi60 * 100.);
-        }
-    }
 }
 
 void R3BOnlineSpectraPdc::FinishEvent()
 {
-    /*
-        if (fMappedItems)
-            fMappedItems->Clear();
-        if (fCalItems)
-            fCalItems->Clear();
-        if (fHitItems)
-            fHitItems->Clear();
-    */
-    if (NULL != fMappedItems_fi0)
-        fMappedItems_fi0->Clear();
-    if (NULL != fCalItems_fi0)
-        fCalItems_fi0->Clear();
-    if (NULL != fHitItems_fi0)
-        fHitItems_fi0->Clear();
-    if (fMappedItems_fi60)
-        fMappedItems_fi60->Clear();
-    if (fCalItems_fi60)
-        fCalItems_fi60->Clear();
-    if (fHitItems_fi60)
-        fHitItems_fi60->Clear();
+
+    if (fMappedItems)
+        fMappedItems->Clear();
+    if (fCalItems)
+        fCalItems->Clear();
+    if (fHitItems)
+        fHitItems->Clear();
 }
 
 void R3BOnlineSpectraPdc::FinishTask()
 {
-    cout << "Total Fi0: " << totalFi0 << endl;
-    cout << "Total Fi60: " << totalFi60 << endl;
-    cout << "trigger Fi0: " << triggerCountsFi0 << endl;
-    cout << "trigger Fi60: " << triggerCountsFi60 << endl;
-    if (NULL != fMappedItems_fi0)
-    {
-        fh_fi0_fiber->Write();
-        fh_fi0_mult->Write();
-        fh_fi0_Tot->Write();
-        fh_fi0_Time->Write();
-        fh_fi0_fiber_mc->Write();
-        fh_fi0_mult_mc->Write();
-        fh_fi0_Tot_mc->Write();
-        fh_fi0_Time_mc->Write();
-        fh_fi0_pdc->Write();
-        fh_fi0_pdc_time->Write();
-        fh_fi0_pdc_eloss->Write();
-        fh_fi0_tot2_tot1->Write();
-        fh_fi0_cor->Write();
-        fh_fi0_eff->Write();
-        fh_fi0_eff_vs_time->Write();
-    }
-
-    if (fMappedItems_fi60)
-    {
-        fh_fi60_fiber->Write();
-        fh_fi60_mult->Write();
-        fh_fi60_Tot->Write();
-        fh_fi60_Time->Write();
-        fh_fi60_fiber_mc->Write();
-        fh_fi60_mult_mc->Write();
-        fh_fi60_Tot_mc->Write();
-        fh_fi60_Time_mc->Write();
-        fh_fi60_pdc->Write();
-        fh_fi60_pdc_time->Write();
-        fh_fi60_pdc_eloss->Write();
-        fh_fi60_tot2_tot1->Write();
-        fh_fi60_cor->Write();
-        fh_fi60_eff->Write();
-        fh_fi60_eff_vs_time->Write();
-    }
 
     if (fMappedItems)
     {

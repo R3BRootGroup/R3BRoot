@@ -186,8 +186,8 @@ class R3BBunchedFiberCal2Hit : public FairTask
     double tot_spmt_max = -1;
     int tot_mapmt_max_fiber_id = 0;
     int tot_spmt_max_fiber_id = 0;
-    double ttemp[100][512],etemp[100][512];
-    int    mtemp[512];
+    double ttemp[100][1024],etemp[100][1024];
+    int    mtemp[1024];
     int ichan = 254;
     Bool_t ctest;
     size_t cal_num;
@@ -235,10 +235,6 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_Fib_ToF_ac;
     TH2F* fh_ecorell;
     TH2F* fh_tcorell;
-    TH2F* fh_hit1;
-    TH2F* fh_hit2;
-    TH2F* fh_hit1_ac;
-    TH2F* fh_hit2_ac;
     TH2F* fh_tmapmt;
     TH2F* fh_tsapmt;
     TH2F* fh_tmapmt_ac;

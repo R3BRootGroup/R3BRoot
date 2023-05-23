@@ -30,6 +30,7 @@
 //#pragma link C++ class R3BOnlineSpectraLosEngRun2019+;
 #pragma link C++ class R3BOnlineSpectraDec2019+;
 #pragma link C++ class R3BOnlineSpectraPdc+;
+#pragma link C++ class R3BOnlineFib60+;
 //#pragma link C++ class R3BOnlineSpectraS494+;
 //#pragma link C++ class R3BOnlineSpectraSfib+;
 #pragma link C++ class R3BOnlineSpectraLosStandalone+;

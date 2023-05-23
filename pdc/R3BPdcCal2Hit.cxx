@@ -89,7 +89,7 @@ R3BPdcCal2Hit::~R3BPdcCal2Hit()
         delete fHitItems;
         fHitItems = NULL;
     }
-    delete fHitPar;
+    // delete fHitPar;
 }
 
 InitStatus R3BPdcCal2Hit::Init()
@@ -112,6 +112,7 @@ InitStatus R3BPdcCal2Hit::Init()
             // return kFATAL;
         }
     }
+
     if (fIsCalibrator && !fIsSync && fHitPar)
     {
         for (Int_t iplane = 0; iplane < N_PLANE_MAX_PDC; iplane++)
@@ -123,7 +124,7 @@ InitStatus R3BPdcCal2Hit::Init()
                 if (par)
                 {
                     tsync_mem[ii - 1] = par->GetSync();
-                    //	cout<<"Tsync_mem: "<<iplane<<", "<<iwire<<"; "<<ii<<", "<<tsync_mem[ii-1] <<endl;
+                    // cout<<"Tsync_mem: "<<iplane<<", "<<iwire<<"; "<<ii<<", "<<tsync_mem[ii-1] <<endl;
                 }
             }
         }
@@ -165,7 +166,7 @@ InitStatus R3BPdcCal2Hit::Init()
 
         sprintf(chistName, "pdc_tsync_plane_%d", j + 1);
         sprintf(chistTitle, "PDC tsync plane %d", j + 1);
-        fh_tsync[j] = new TH2F(chistName, chistTitle, 150, 0, 150., 2400, -1400., 600.);
+        fh_tsync[j] = new TH2F(chistName, chistTitle, 150, 0, 150., 500, -500., 500.);
         fh_tsync[j]->GetXaxis()->SetTitle("wire");
         fh_tsync[j]->GetYaxis()->SetTitle("tsync / ns");
 
@@ -283,7 +284,6 @@ InitStatus R3BPdcCal2Hit::Init()
 // Note that the container may still be empty at this point.
 void R3BPdcCal2Hit::SetParContainers()
 {
-
     fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
     if (!fHitPar)
     {
@@ -318,10 +318,18 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
     // Make direct mapping tables for trigger items.
     size_t trig_num = fCalTriggerItems->GetEntries();
+    // cout << "trig num: " << trig_num << endl;
+    if (trig_num < 4)
+    {
+        // LOG(error) << "No trigger times found!!!" << endl;
+        // return;
+    }
+
     std::vector<R3BPdcCalData const*> trig_table(LENGTH(EXT_STR_h101_PDC_onion::PDC_P));
     for (size_t j = 0; j < trig_num; ++j)
     {
         auto cal = (R3BPdcCalData const*)fCalTriggerItems->At(j);
+        // cout << "cal: " << cal << " wire: " << cal->GetWireId() << endl;
         trig_table.at(cal->GetWireId() - 1) = cal;
     }
 
@@ -385,14 +393,22 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
             assert(plane_i == lead->GetPlaneId() - 1);
             assert(wire_i == lead->GetWireId() - 1);
 
+            // cout << "Plane: " << plane_i << endl;
+            // cout << "wire: " << wire_i << endl;
+
             // Trigger time is the same for leading and trailing,
             // but we still need to subtract it for when we want the
             // edge times.
 
             auto cur_cal_trig_i = g_pdc_trig_map[plane_i][wire_i];
-            auto cur_cal_trig = trig_table.at(cur_cal_trig_i);
-            cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
+            // cout << "cur_cal_trig_i: " << cur_cal_trig_i << endl;
+            // if(cur_cal_trig_i == 1) cur_cal_trig_i=0; // please remove again MH
 
+            auto cur_cal_trig = trig_table.at(cur_cal_trig_i);
+            // cout << "cur_cal_trig: " << cur_cal_trig << endl;
+
+            cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
+            // cout << "trigger time: " << cur_cal_trig_ns << endl;
             auto cur_cal_ns =
                 fmod(cur_cal->GetTime_ns() - cur_cal_trig_ns + c_period + c_period / 2, c_period) - c_period / 2;
             auto lead_ns =
@@ -447,6 +463,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 auto const& pdc_tot = *it_pdc_tot;
                 auto plane = pdc_tot.lead->GetPlaneId();
                 auto wire = pdc_tot.lead->GetWireId();
+                // cout << "Cal2Hit plane: " << plane << " wire: " << wire << endl;
                 /*
                                 cout << "wire before: " << wire << endl;
                                 if(wire%8 == 1) wire=wire;
@@ -506,6 +523,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
 
                 if (!fIsSync && fHitPar)
                 {
+                    // cout << "reading sync parameter" << endl;
                     R3BPdcHitModulePar* par = fHitPar->GetModuleParAt((ID - 1) * N_WIRE_MAX + wire);
                     if (par)
                     {
@@ -513,7 +531,6 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                     }
                 }
                 tsync_pdc = t_pdc - tsync;
-
                 // cout<<"Tsync: "<<ID<<", "<<wire<<", "<<tsync<<", "<<t_pdc<<", "<<tsync_pdc<<endl;
 
                 // cout  << "plane: " << plane <<  " time: " << t_pdc << " wire: " << wire << " ToT: " << tot_pdc <<
@@ -526,7 +543,7 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 }
                 if (!fIsSync && (tsync_pdc < -50. || tsync_pdc > 250.))
                 {
-                    continue;
+                    // continue;
                 }
 
                 // store first hit in wire
@@ -545,26 +562,26 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 }
                 lastTrailing = tsync_pdc + tot_pdc;
                 sumTot += tot_pdc;
-                /*
-                    Double_t x = 0.;
-                    Double_t y = 0.;
 
-                    if(ID == 1 || ID == 3)
-                    {
-                        x = wire * wire_distance;
-                        y = 0.;
-                    }
-                    if(ID == 2 || ID == 4)
-                    {
-                        y = wire * wire_distance;
-                        x = 0;
-                    }
-                */
+                Double_t x = 0.;
+                Double_t y = 0.;
 
-                // new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(t_pdc, x, y, tot_pdc, ID, wire);
+                if (ID == 1 || ID == 3)
+                {
+                    x = wire * wire_distance;
+                    y = 0.;
+                }
+                if (ID == 2 || ID == 4)
+                {
+                    y = wire * wire_distance;
+                    x = 0;
+                }
 
-                // cout << "plane: " << ID << " wire: " << wire << " ToT: " << tot_pdc << " t: " << t_pdc << endl;
-                // cout << firstLeading << "  " << lastTrailing << endl;
+                // MH
+                new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(t_pdc, x, y, tot_pdc, ID, wire);
+
+                // cout << "cal2hit plane: " << ID << " wire: " << wire << " ToT: " << tot_pdc << " t: " << t_pdc <<
+                // endl; cout << firstLeading << "  " << lastTrailing << endl;
             }
             Double_t totalToT = lastTrailing - firstLeading;
             if (mult > 0)
@@ -682,7 +699,6 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                         */
                         // end version AK
                     }
-
                     if (method2)
                     {
                         R3BPdcHitModulePar* par1 = fHitPar->GetModuleParAt((ID_old - 1) * N_WIRE_MAX + wire_old);
@@ -690,7 +706,6 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                         {
                             dtmin = par1->GetTmin();
                             dtmax = par1->GetTmax();
-
                             xtc_npoints = par1->GetNPoints();
                             xtc_x = par1->GetXT_xArray();
                             xtc_t = par1->GetXT_tArray();
@@ -849,9 +864,10 @@ void R3BPdcCal2Hit::Exec(Option_t* option)
                 {
                     // if (tsync_new > -100 && tsync_new < 300 && tsync_old > -100 && tsync_old < 300)
                     {
-
-                        new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(
-                            (tsync_new + tsync_old) / 2., x, y, sqrt(tot_new * tot_old), ID_new, wire_new);
+                        // MH
+                        //                        new ((*fHitItems)[fNofHitItems++]) R3BPdcHitData(
+                        //                            (tsync_new + tsync_old) / 2., x, y, sqrt(tot_new * tot_old),
+                        //                            ID_new, wire_new);
 
                         // cout << "Hit level ID: " << ID_new << " x: " << x << " y: " << y << " ToT: " <<
                         //	sqrt(tot_new * tot_old) << " t: " << (tsync_new + tsync_old) / 2. << " wire: " << wire_new
@@ -884,7 +900,6 @@ void R3BPdcCal2Hit::FinishEvent()
 
 void R3BPdcCal2Hit::FinishTask()
 {
-    cout << "IN FINISH TASK" << endl;
 
     for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
     {
@@ -1283,10 +1298,8 @@ void R3BPdcCal2Hit::FinishTask()
             {
                 if (!fIsSync)
                 {
-                    fHitPar->Clear();
+                    // fHitPar->Clear();
                 }
-
-                cout << "Entering method2" << endl;
 
                 TCanvas* cfit = new TCanvas("cfit", "fit", 50, 50, 500, 500);
                 cfit->Clear();
@@ -1303,7 +1316,6 @@ void R3BPdcCal2Hit::FinishTask()
                 Int_t rebinned_points = 0;
                 for (Int_t plane = 0; plane < N_PLANE_MAX_PDC; plane++)
                 {
-                    cout << "Starting plane " << plane << endl;
 
                     for (UInt_t i = 1; i <= N_WIRE_MAX; i++)
                     {
@@ -1335,7 +1347,7 @@ void R3BPdcCal2Hit::FinishTask()
                         uint maxContent = proj->GetMaximum();
 
                         // make running sum of drift times
-                        if (maxContent > 50.)
+                        if (maxContent > 2.)
                         {
                             //   cout<<"For plane "<<plane<<", wire "<<i<<", maxContent "<<maxContent<<endl;
 
@@ -1355,16 +1367,16 @@ void R3BPdcCal2Hit::FinishTask()
                                 if (proj->GetBinContent(j) >= 0.9 * maxContent)
                                 {
                                     index_high = j;
-                                    cout << "index low: " << j << ", " << index_low << ", " << proj->GetBinContent(j)
-                                         << ", " << 0.1 * maxContent << ", " << maxContent << endl;
-                                    cout << "index high: " << j << ", " << index_high << ", " << proj->GetBinContent(j)
-                                         << ". " << 0.9 * maxContent << "; " << maxContent << endl;
+                                    cout << "index low: " << index_low << ", " << proj->GetBinContent(index_low) << ", "
+                                         << 0.1 * maxContent << ", " << maxContent << endl;
+                                    cout << "index high: " << index_high << ", " << proj->GetBinContent(j) << ". "
+                                         << 0.9 * maxContent << "; " << maxContent << endl;
 
                                     break;
                                 }
                             }
 
-                            cout << "Final indexes: " << index_low << ", " << index_high << ", " << endl;
+                            // cout << "Final indexes: " << index_low << ", " << index_high << ", " << endl;
 
                             int content_low = proj->GetBinContent(index_low);
                             int content_high = proj->GetBinContent(index_high);
@@ -1386,7 +1398,7 @@ void R3BPdcCal2Hit::FinishTask()
                             Int_t index_start = findex_start;
                             Int_t index_end = findex_start + 240. / proj->GetBinWidth(0);
 
-                            cout << "Index start: " << index_start << " Index end: " << index_end << endl;
+                            // cout << "Index start: " << index_start << " Index end: " << index_end << endl;
 
                             for (UInt_t j = index_start; j < index_end; j++)
                             {
@@ -1413,6 +1425,8 @@ void R3BPdcCal2Hit::FinishTask()
                                         // add current position to xt curve
                                         x_mm[npoints] = sum / total * wire_distance;
                                         t_ns[npoints] = time_ns;
+                                        // cout << "Test point: " << npoints << " sum: " << sum << " x: " <<
+                                        // x_mm[npoints] << " t: " << t_ns[npoints] << endl;
                                         npoints++;
                                     }
                                 }
@@ -1532,16 +1546,16 @@ void R3BPdcCal2Hit::FinishTask()
                         }
                         tmin = t_ns[0];
                         tmax = t_ns[npoints - 1];
-
+                        cout << "reading par: " << plane << "  " << iwire << endl;
                         R3BPdcHitModulePar* par3 = fHitPar->GetModuleParAt(plane * N_WIRE_MAX + iwire);
                         par3->SetTmin(tmin);
                         par3->SetTmax(tmax);
+                        cout << "Tmin, Tmax: " << tmin << "  " << tmax << endl;
                         par3->SetSync(tsync_mem[plane * N_WIRE_MAX + iwire - 1]);
                         par3->SetNPoints(npoints);
-
                         par3->SetXT_xArray(x_mm, npoints);
                         par3->SetXT_tArray(t_ns, npoints);
-
+                        cout << "Npoints: " << npoints << endl;
                         /*
                                                 for (Int_t icount = 0; icount < xtc_points; icount++)
                                                 {

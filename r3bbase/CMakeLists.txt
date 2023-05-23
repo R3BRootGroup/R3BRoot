@@ -73,6 +73,7 @@ R3BEventHeaderCal2Hit.cxx
 R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BOnlineSpectraPdc.cxx
+R3BOnlineFib60.cxx
 #R3BOnlineSpectraSfib.cxx
 #R3BOnlineSpectraLosEngRun2019.cxx
 R3BOnlineSpectraLosStandalone.cxx

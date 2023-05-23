@@ -20,7 +20,7 @@ R3BFi60Cal2Hit::R3BFi60Cal2Hit(Bool_t a_is_calibrator, Bool_t a_is_gain, Bool_t 
                              R3BTCalEngine::CTDC_16_BWD_150,
                              VERTICAL,
                              1,
-                             128,
+                             1024,
                              0,
                              a_is_calibrator,
                              a_is_gain,

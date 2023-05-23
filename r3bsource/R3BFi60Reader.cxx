@@ -21,7 +21,7 @@ extern "C"
 }
 
 R3BFi60Reader::R3BFi60Reader(EXT_STR_h101_FIBSIXTY* a_data, UInt_t a_offset)
-    : R3BBunchedFiberReader("Fi60", a_offset, 1, 128, 0)
+    : R3BBunchedFiberReader("Fi60", a_offset, 1, 1024, 0)
     , fData((EXT_STR_h101_FIBSIXTY_onion*)a_data)
 {
 }

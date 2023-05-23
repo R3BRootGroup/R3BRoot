@@ -84,21 +84,11 @@ class R3BOnlineSpectraPdc : public FairTask
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     void Reset_PDC_Histo();
-    void Reset_Fi0_Histo();
-    void Reset_Fi60_Histo();
 
   private:
     TClonesArray* fMappedItems; /**< Array with Cal items - input data. */
     TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems;    /**< Array with Cal items - input data. */
-
-    TClonesArray* fMappedItems_fi0; /**< Array with Cal items - input data. */
-    TClonesArray* fCalItems_fi0;    /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems_fi0;    /**< Array with Cal items - input data. */
-
-    TClonesArray* fMappedItems_fi60; /**< Array with Cal items - input data. */
-    TClonesArray* fCalItems_fi60;    /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems_fi60;    /**< Array with Cal items - input data. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
@@ -106,12 +96,6 @@ class R3BOnlineSpectraPdc : public FairTask
     Int_t fTpat;
     Int_t fSamp;
     Int_t fNEvents;
-    Int_t totalFi0 = 0;
-    Int_t totalFi60 = 0;
-    Int_t triggerCountsFi0 = 0;
-    Int_t triggerCountsFi60 = 0;
-    Int_t detectedFi0 = 0;
-    Int_t detectedFi60 = 0;
 
     TH1F* fhTpat;
     TH1F* fh_spill_length;
@@ -138,40 +122,6 @@ class R3BOnlineSpectraPdc : public FairTask
     TH2F* fh_Pdc_xvsx;
     TH2F* fh_Pdc_wvsw;
     TH2F* fh_pdc_ebene4;
-
-    TH1F* fh_fi0_fiber;
-    TH1F* fh_fi0_mult;
-    TH2F* fh_fi0_Tot;
-    TH2F* fh_fi0_Time;
-    TH1F* fh_fi0_fiber_mc;
-    TH1F* fh_fi0_mult_mc;
-    TH2F* fh_fi0_Tot_mc;
-    TH2F* fh_fi0_Time_mc;
-    
-    TH1F* fh_fi60_fiber;
-    TH1F* fh_fi60_mult;
-    TH2F* fh_fi60_Tot;
-    TH2F* fh_fi60_Time;
-    TH1F* fh_fi60_fiber_mc;
-    TH1F* fh_fi60_mult_mc;
-    TH2F* fh_fi60_Tot_mc;
-    TH2F* fh_fi60_Time_mc;
-
-    TH2F* fh_fi0_pdc;
-    TH2F* fh_fi0_pdc_time;
-    TH2F* fh_fi0_pdc_eloss;
-    TH2F* fh_fi0_tot2_tot1;
-    TH2F* fh_fi0_cor;
-    TH2F* fh_fi0_eff;
-    TH2F* fh_fi0_eff_vs_time;
-    
-    TH2F* fh_fi60_pdc;
-    TH2F* fh_fi60_pdc_time;
-    TH2F* fh_fi60_pdc_eloss;
-    TH2F* fh_fi60_tot2_tot1;
-    TH2F* fh_fi60_cor;
-    TH2F* fh_fi60_eff;
-    TH2F* fh_fi60_eff_vs_time;
 
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)
