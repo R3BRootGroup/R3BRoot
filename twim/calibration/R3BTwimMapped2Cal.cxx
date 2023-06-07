@@ -28,13 +28,15 @@
 #include "FairRuntimeDb.h"
 
 // TWIM headers
-#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTwimCalData.h"
 #include "R3BTwimCalPar.h"
 #include "R3BTwimMapped2Cal.h"
 #include "R3BTwimMappedData.h"
+
+constexpr int S444 = 444;
+constexpr int S467 = 467;
 
 // R3BTwimMapped2Cal::Default Constructor --------------------------
 R3BTwimMapped2Cal::R3BTwimMapped2Cal()
@@ -60,13 +62,9 @@ R3BTwimMapped2Cal::R3BTwimMapped2Cal(const TString& name, Int_t iVerbose)
     , fExpId(0)
     , fOnline(kFALSE)
 {
-    CalEParams.resize(fNumSec);
-    PosParams.resize(fNumSec);
-    for (Int_t s = 0; s < fNumSec; s++)
-    {
-        CalEParams[s] = NULL;
-        PosParams[s] = NULL;
-    }
+    CalEParams.resize(fNumSec, nullptr);
+    PosParams.resize(fNumSec, nullptr);
+    fTwimCal.resize(fNumSec);
 }
 
 void R3BTwimMapped2Cal::SetParContainers()
@@ -127,13 +125,18 @@ void R3BTwimMapped2Cal::SetParameter()
     }
 
     // Count the number of dead anodes or not used
-    for (Int_t s = 0; s < fNumSec; s++)
+    for (Int_t secId = 0; secId < fNumSec; secId++)
     {
         Int_t numdeadanodes = 0;
-        for (Int_t i = 0; i < fNumAnodes; i++)
-            if (CalEParams[s]->GetAt(fNumEParams * i + 1) == -1 || fCal_Par->GetInUse(s + 1, i + 1) == 0)
+        for (Int_t anodeId = 0; anodeId < fNumAnodes; anodeId++)
+        {
+            if (CalEParams[secId]->GetAt(fNumEParams * anodeId + 1) == -1 ||
+                fCal_Par->GetInUse(secId + 1, anodeId + 1) == 0)
+            {
                 numdeadanodes++;
-        R3BLOG(info, "Dead (or not used) anodes in section " << s + 1 << ": " << numdeadanodes);
+            }
+        }
+        R3BLOG(info, "Dead (or not used) anodes in section " << secId + 1 << ": " << numdeadanodes);
     }
     return;
 }
@@ -164,9 +167,6 @@ InitStatus R3BTwimMapped2Cal::Init()
     frm->Register("TwimCalData", "TWIM_Cal", fTwimCalDataCA, !fOnline);
     Reset();
 
-    // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BCoarseTimeStitch();
-
     SetParameter();
     return kSUCCESS;
 }
@@ -179,8 +179,44 @@ InitStatus R3BTwimMapped2Cal::ReInit()
     return kSUCCESS;
 }
 
+void R3BTwimMapped2Cal::CalAnode::Init()
+{
+    fmult = 0;
+    fE.clear();
+    fDT.clear();
+    fE.resize(MAXNUMANODE, NAN);
+    fDT.resize(MAXNUMANODE, 0);
+}
+
+R3BTwimMapped2Cal::CalSection::CalSection()
+{
+    fAnode.clear();
+    fAnode.resize(MAXNUMANODE);
+
+    fTref.clear();
+    fTref.resize(MAXNUMTREF);
+
+    fTrig.clear();
+    fTrig.resize(MAXNUMTRIG);
+}
+void R3BTwimMapped2Cal::CalSection::Init()
+{
+    for (auto& val : fAnode)
+    {
+        val.Init();
+    }
+    for (auto& val : fTref)
+    {
+        val.Init();
+    }
+    for (auto& val : fTrig)
+    {
+        val.Init();
+    }
+}
+
 // -----   Public method Execution   --------------------------------------------
-void R3BTwimMapped2Cal::Exec(Option_t*)
+void R3BTwimMapped2Cal::Exec(Option_t* /*option*/) // NOLINT(readability-function-cognitive-complexity)
 {
     // Reset entries in output arrays, local arrays
     Reset();
@@ -190,101 +226,83 @@ void R3BTwimMapped2Cal::Exec(Option_t*)
     if (nHits == 0)
         return;
 
-    auto** mappedData = new R3BTwimMappedData*[nHits];
-    Int_t secId = 0;
-    Int_t anodeId = 0;
-    Double_t pedestal = 0.;
-    Double_t slope = 1.;
-
-    for (Int_t s = 0; s < fNumSec; s++)
-        for (Int_t i = 0; i < (fNumAnodes + fNumAnodesRef + fNumAnodesTrig); i++)
-        {
-            mulanode[s][i] = 0;
-            for (Int_t j = 0; j < fMaxMult; j++)
-            {
-                fE[s][j][i] = 0.;
-                fDT[s][j][i] = 0.;
-            }
-        }
-
+    for (Int_t sec = 0; sec < fNumSec; sec++)
+    {
+        fTwimCal.at(sec).Init();
+    }
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = dynamic_cast<R3BTwimMappedData*>(fTwimMappedDataCA->At(i));
-        secId = mappedData[i]->GetSecID() - 1;
-        anodeId = mappedData[i]->GetAnodeID() - 1;
-
+        auto* mappedData = dynamic_cast<R3BTwimMappedData*>(fTwimMappedDataCA->At(i));
+        auto secId = static_cast<Int_t>(mappedData->GetSecID()) - 1;
+        auto anodeId = static_cast<Int_t>(mappedData->GetAnodeID()) - 1;
         if (anodeId < fNumAnodes && fCal_Par->GetInUse(secId + 1, anodeId + 1) == 1)
         {
-            pedestal = CalEParams[secId]->GetAt(fNumEParams * anodeId);
-            slope = CalEParams[secId]->GetAt(fNumEParams * anodeId + 1);
-
-            fE[secId][mulanode[secId][anodeId]][anodeId] = pedestal + slope * mappedData[i]->GetEnergy();
-            fDT[secId][mulanode[secId][anodeId]][anodeId] = mappedData[i]->GetTime();
-            mulanode[secId][anodeId]++;
+            auto pedestal = CalEParams[secId]->GetAt(fNumEParams * anodeId);
+            auto slope = CalEParams[secId]->GetAt(fNumEParams * anodeId + 1);
+            fTwimCal.at(secId).GetAnode(anodeId).SetVal(pedestal + slope * mappedData->GetEnergy(),
+                                                        mappedData->GetTime());
         }
-        else if (anodeId >= fNumAnodes)
+        else if (anodeId >= fNumAnodes && anodeId < fNumAnodes + fNumAnodesRef)
         {
-            fDT[secId][mulanode[secId][anodeId]][anodeId] = mappedData[i]->GetTime(); // Ref. Time
-            mulanode[secId][anodeId]++;
+            auto TrefId = anodeId - fNumAnodes;
+            if ((fExpId == S444 || fExpId == S467) && secId != 0)
+            {
+                secId = 0;
+                TrefId++;
+            }
+            fTwimCal.at(secId).GetTref(TrefId).SetVal(NAN, mappedData->GetTime());
         }
     }
 
-    // Fill data only if there is TREF signal
-    for (Int_t s = 0; s < fNumSec; s++)
-        if (mulanode[s][fNumAnodes] == 1)
+    auto calc_dtime = [&](Int_t sec, Int_t mul_anode, Int_t id_anode, Int_t mul_tref)
+    {
+        Int_t id_tref = 0;
+        if ((fExpId == S444 || fExpId == S467) && id_anode >= fNumAnodes / 2)
         {
-            for (Int_t i = 0; i < fNumAnodes; i++)
+            // s444 and s467: 2020
+            // anodes 1 to 16 : energy and time
+            // anode 17 and 18 : reference time
+            // will be cabled anode 19 and 20 : trigger time
+            id_tref = 1;
+        }
+        const auto tdiff = static_cast<Double_t>(fTwimCal.at(sec).GetAnode(id_anode).GetDT(mul_anode) -
+                                                 fTwimCal.at(sec).GetTref(id_tref).GetDT(mul_tref));
+        //
+        auto i_param = fNumPosParams * id_anode;
+        auto par0 = PosParams[sec]->GetAt(i_param);
+        auto par1 = PosParams[sec]->GetAt(i_param + 1);
+        auto par2 = 0.0;
+        if (fNumPosParams > 2)
+        {
+            par2 = PosParams[sec]->GetAt(i_param + 2);
+        }
+        return par0 + par1 * tdiff + par2 * pow(tdiff, 2);
+    };
+
+    // Fill data only if there is TREF signal
+    for (Int_t sec = 0; sec < fNumSec; sec++)
+    {
+        if (fTwimCal.at(sec).GetTref().GetMult() != 1)
+        {
+            continue;
+        }
+        for (Int_t anodeId = 0; anodeId < fNumAnodes; anodeId++)
+        {
+            for (Int_t mult = 0; mult < fTwimCal.at(sec).GetAnode(anodeId).GetMult(); mult++)
             {
-                Int_t ii = fNumPosParams * i;
-                Float_t a0 = PosParams[s]->GetAt(ii);
-                Float_t a1 = PosParams[s]->GetAt(ii + 1);
-                Float_t a2 = 0.0;
-                if (fNumPosParams > 2)
-                    a2 = PosParams[s]->GetAt(ii + 2);
-                for (Int_t j = 0; j < mulanode[s][fNumAnodes]; j++)
-                    for (Int_t k = 0; k < mulanode[s][i]; k++)
-                    {
-                        if (fExpId == 444 || fExpId == 467)
-                        {
-                            // s444 and s467: 2020
-                            // anodes 1 to 16 : energy and time
-                            // anode 17 and 18 : reference time --> will be changed to 17 only when the full Twin-MUSIC
-                            // will be cabled anode 19 and 20 : trigger time   --> will be changed to 18 only when the
-                            // full Twin-MUSIC will be cabled
-                            if (i < 8) // Check if fNumAnodes+1 and +2 values
-                            {
-                                if (fE[s][k][i] > 0.)
-                                    AddCalData(s + 1,
-                                               i + 1,
-                                               a0 + a1 * fTimeStitch->GetTime(
-                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 1], "vftx", "vftx"),
-                                               fE[s][k][i]);
-                            }
-                            else
-                            {
-                                if (fE[s][k][i] > 0.)
-                                    AddCalData(s + 1,
-                                               i + 1,
-                                               a0 + a1 * fTimeStitch->GetTime(
-                                                             fDT[s][k][i] - fDT[s][j][fNumAnodes + 2], "vftx", "vftx"),
-                                               fE[s][k][i]);
-                            }
-                        }
-                        else if (fExpId == 455 && fE[s][k][i] > 0.)
-                        {
-                            auto dtime = a0 + a1 * (fDT[s][k][i] - fDT[s][j][fNumAnodes]) +
-                                         a2 * pow((fDT[s][k][i] - fDT[s][j][fNumAnodes]), 2);
-                            if (dtime > fMinDT && dtime < fMaxDT)
-                            {
-                                AddCalData(s + 1, i + 1, dtime, fE[s][k][i]);
-                            }
-                        }
-                    }
+                if (fTwimCal.at(sec).GetAnode(anodeId).GetE(mult) <= 0.)
+                {
+                    continue;
+                }
+                const Int_t mult_Tref = 0; // mulanode != 1 hits are rejected already.
+                auto dtime = calc_dtime(sec, mult, anodeId, mult_Tref);
+                if (dtime > fMinDT && dtime < fMaxDT)
+                {
+                    AddCalData(sec + 1, anodeId + 1, dtime, fTwimCal.at(sec).GetAnode(anodeId).GetE(mult));
+                }
             }
         }
-
-    if (mappedData)
-        delete[] mappedData;
+    }
     return;
 }
 

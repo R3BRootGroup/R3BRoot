@@ -28,9 +28,15 @@
 #include <stdint.h>
 #include <vector>
 
+constexpr Int_t MAXNUMSEC = 4;
+constexpr Int_t MAXNUMANODE = 16;
+constexpr Int_t MAXNUMTREF = 2;
+constexpr Int_t MAXNUMTRIG = 2;
+constexpr Int_t MAXNUMCH = MAXNUMANODE + MAXNUMTREF + MAXNUMTRIG;
+constexpr Int_t MAXMULT = 20;
+
 class TClonesArray;
 class R3BEventHeader;
-class R3BCoarseTimeStitch;
 class R3BTwimCalPar;
 
 class R3BTwimMapped2Cal : public FairTask
@@ -88,13 +94,51 @@ class R3BTwimMapped2Cal : public FairTask
     std::vector<TArrayF*> CalEParams;
     std::vector<TArrayF*> PosParams;
 
-    Int_t mulanode[4][16 + 4];
-    Double_t fE[4][20][16 + 4];
-    Double_t fDT[4][20][16 + 4];
+  public:
+    class CalAnode
+    {
+      public:
+        CalAnode() = default;
+        void Init();
+        void AddMult() { fmult++; };
+        void SetE(Double_t val) { fE.at(fmult) = val; };
+        void SetDt(Int_t val) { fDT.at(fmult) = val; };
+        void SetVal(Double_t ene, Int_t dtime)
+        {
+            fE.at(fmult) = ene;
+            fDT.at(fmult) = dtime;
+            fmult++;
+        };
+        [[nodiscard]] auto GetMult() const { return fmult; };
+        auto GetE(Int_t mult) { return fE.at(mult); };
+        auto GetDT(Int_t mult) { return fDT.at(mult); };
+
+      private:
+        Int_t fmult{ 0 };
+        std::vector<Double_t> fE;
+        std::vector<Int_t> fDT;
+    };
+
+    class CalSection
+    {
+      public:
+        CalSection();
+        void Init();
+        auto& GetAnode(Int_t val) { return fAnode.at(val); };
+        auto& GetTrig(Int_t val = 0) { return fTrig.at(val); };
+        auto& GetTref(Int_t val = 0) { return fTref.at(val); };
+
+      private:
+        std::vector<CalAnode> fAnode;
+        std::vector<CalAnode> fTref;
+        std::vector<CalAnode> fTrig;
+    };
+
+  private:
+    std::vector<CalSection> fTwimCal;
 
     Bool_t fOnline;
 
-    R3BCoarseTimeStitch* fTimeStitch;
     R3BTwimCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fTwimMappedDataCA; /**< Array with Mapped-input data. >*/
     TClonesArray* fTwimCalDataCA;    /**< Array with Cal-output data. >*/

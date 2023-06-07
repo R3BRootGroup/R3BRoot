@@ -133,8 +133,11 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     // stack when they crash (e.g. because of SIGFPE, which GEANT4 helpfully
     // activates on Tuesdays and Debug builds (->G4FPE_debug).
 
-    auto makeCompFun = [](std::array<double, 5> p)
-    { return [p](double x) { return (x > 0.0) ? 1. / (p[0] + p[1] * pow(x, p[2]) + p[3] / pow(x, p[4])) : 0.0; }; };
+    auto makeCompFun = [](std::array<double, 5> par)
+    {
+        return [par](double val)
+        { return (val > 0.0) ? 1. / (par[0] + par[1] * pow(val, par[2]) + par[3] / pow(val, par[4])) : 0.0; };
+    };
     auto tf_dNf_dE = makeCompFun({ -1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1 });
     auto tf_dNs_dE = makeCompFun({ -1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3 });
 
@@ -220,8 +223,10 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 
 void R3BCalifa::EndOfEvent()
 {
-    // if (fVerboseLevel > 1)
-    Print();
+    if (fVerboseLevel > 1)
+    {
+        Print();
+    }
     fCalifaCollection->Clear();
     ResetParameters();
 }
