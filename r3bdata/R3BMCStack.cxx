@@ -384,11 +384,11 @@ void R3BStack::Register() { FairRootManager::Instance()->Register("MCTrack", "St
 // -----   Public method Print  --------------------------------------------
 void R3BStack::PrintStack(Int_t iVerbose) const
 {
-    LOG(info) << "R3BStack: Number of primaries = " << fNPrimaries;
-    LOG(info) << "          Total number of particles = " << fNParticles;
-    LOG(info) << "          Number of tracks in output = " << fNTracks;
     if (1 == iVerbose)
     {
+        LOG(info) << "R3BStack: Number of primaries = " << fNPrimaries;
+        LOG(info) << "          Total number of particles = " << fNParticles;
+        LOG(info) << "          Number of tracks in output = " << fNTracks;
         for (Int_t iTrack = 0; iTrack < fNTracks; iTrack++)
         {
             char str[100];

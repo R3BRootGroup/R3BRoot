@@ -47,12 +47,13 @@ class R3BTwimReader : public R3BReader
     // Accessor to select events without pileup
     void SetSkipPileup() { fPileup = kTRUE; }
 
-  private:
-    Bool_t ReadData(EXT_STR_h101_SOFTWIM_onion*, UShort_t);
     void SetNumSections(Int_t num) { fSections = num; }
     void SetNumAnodes(Int_t num) { fAnodes = num; }
     void SetNumTref(Int_t num) { fTref = num; }
     void SetNumTtrig(Int_t num) { fTtrig = num; }
+
+  private:
+    Bool_t ReadData(EXT_STR_h101_SOFTWIM_onion*, UShort_t);
 
     /* Reader specific data structure from ucesb */
     EXT_STR_h101_SOFTWIM* fData;
