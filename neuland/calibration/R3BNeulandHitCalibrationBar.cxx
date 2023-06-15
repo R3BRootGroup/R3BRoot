@@ -499,13 +499,14 @@ namespace Neuland
         void HitCalibrationBar::positionCalibration(int firstHit, int nHits)
         {
             FitGraph.Set(0);
-            for (auto p = 0; p < nHits; ++p)
+            const auto loopSize = (LastHits.size() >= (firstHit + nHits)) ? nHits : (LastHits.size() - firstHit);
+            for (auto index = 0; index < loopSize; ++index)
             {
-                const auto& hit = LastHits[firstHit + p];
+                const auto& hit = LastHits[firstHit + index];
 
                 const auto meanPosition = 0.5 * (hit.EntryPosition + hit.ExitPosition);
                 const auto tdiff = hit.Time[1] - hit.Time[0];
-                FitGraph.SetPoint(p, meanPosition, tdiff);
+                FitGraph.SetPoint(index, meanPosition, tdiff);
             }
 
             TF1 linearFit("", "pol1", -TotalBarLength * 0.5, TotalBarLength * 0.5);
@@ -529,26 +530,29 @@ namespace Neuland
 
         void HitCalibrationBar::energyCalibration(int firstHit, int nHits)
         {
+            const auto loopSize = (LastHits.size() >= (firstHit + nHits)) ? nHits : (LastHits.size() - firstHit);
             if (!IsStatus(Validity, PedestalCalibrationBit))
             {
                 // This is the first calibration
                 // if we do not have pedestals yet, get them and subtract them from the hits
 
                 pedestalCalibration();
-                for (auto h = 0; h < nHits; ++h)
+                for (auto h_index = 0; h_index < loopSize; ++h_index)
                 {
-                    auto& hit = LastHits[firstHit + h];
+                    auto& hit = LastHits[firstHit + h_index];
                     for (auto side = 0; side < 2; ++side)
+                    {
                         hit.QDC[side] = std::max(hit.QDC[side] - Pedestal[side], 1);
+                    }
                 }
             }
 
             FitGraph.Set(0);
-            for (auto h = 0; h < nHits; ++h)
+            for (auto h_index = 0; h_index < loopSize; ++h_index)
             {
-                const auto& hit = LastHits[firstHit + h];
+                const auto& hit = LastHits[firstHit + h_index];
                 const auto centerPosition = (hit.EntryPosition + hit.ExitPosition) * 0.5;
-                FitGraph.SetPoint(h, centerPosition, log(hit.QDC[1] * 1. / hit.QDC[0]));
+                FitGraph.SetPoint(h_index, centerPosition, log(hit.QDC[1] * 1. / hit.QDC[0]));
             }
 
             TF1 linearFit("", "pol1", -TotalBarLength * 0.5, TotalBarLength * 0.5);
@@ -562,9 +566,9 @@ namespace Neuland
             Log.LightAttenuationLength.SetPointError(
                 logLightAttLenPoints, 0, 0.5 * linearFit.GetParError(1) / Sqr(InvLightAttenuationLength));
 
-            for (auto h = 0; h < nHits; ++h)
+            for (auto h_index = 0; h_index < loopSize; ++h_index)
             {
-                const auto& hit = LastHits[firstHit + h];
+                const auto& hit = LastHits[firstHit + h_index];
                 const auto centerPosition = (hit.EntryPosition + hit.ExitPosition) * 0.5;
                 for (auto side = 0; side < 2; ++side)
                 {
@@ -576,9 +580,9 @@ namespace Neuland
 
             std::array<TH1F, 2> hGainCal = { TH1F("", "", 200, 0., 40.), TH1F("", "", 200, 0., 40.) };
 
-            for (auto h = 0; h < nHits; ++h)
+            for (auto h_index = 0; h_index < loopSize; ++h_index)
             {
-                const auto& hit = LastHits[firstHit + h];
+                const auto& hit = LastHits[firstHit + h_index];
                 const auto centerPosition = (hit.EntryPosition + hit.ExitPosition) * 0.5;
                 for (auto side = 0; side < 2; ++side)
                 {
@@ -741,9 +745,10 @@ namespace Neuland
             posCal.SetTitle("Position Calibration;Position / cm;Time Difference / ns");
             posCal.Expand(nHits);
 
-            for (auto h = 0; h < nHits; ++h)
+            const auto loopSize = (LastHits.size() > nHits) ? nHits : LastHits.size();
+            for (auto h_index = 0; h_index < loopSize; ++h_index)
             {
-                const auto& hit = LastHits[h];
+                const auto& hit = LastHits[h_index];
                 const auto tdiff = hit.Time[1] - hit.Time[0];
                 posCal.SetPoint(posCal.GetN(), hit.EntryPosition, tdiff);
             }
