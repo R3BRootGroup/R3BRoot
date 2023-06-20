@@ -128,3 +128,24 @@ macro(print_error)
         message(FATAL_ERROR "End of failed tests output.")
     endif()
 endmacro()
+
+macro(cdash_submit)
+    ctest_submit(RETURN_VALUE _ctest_submit_ret_val BUILD_ID cdash_build_id RETRY_COUNT 3 RETRY_DELAY 2)
+    if(_ctest_submit_ret_val)
+        message(WARNING " ctest_submit() failed. Continueing")
+    endif()
+
+    if(cdash_build_id)
+        message(
+            STATUS
+                " CDash Build Summary ..: "
+                "${CTEST_DROP_METHOD}://${CTEST_DROP_SITE}/buildSummary.php?buildid=${cdash_build_id}"
+        )
+        message(
+            STATUS
+                " CDash Test List ......: "
+                "${CTEST_DROP_METHOD}://${CTEST_DROP_SITE}/viewTest.php?buildid=${cdash_build_id}")
+    else()
+        message(STATUS "  /!\\  CDash submit likely failed")
+    endif()
+endmacro()
