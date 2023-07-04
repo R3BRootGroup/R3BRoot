@@ -28,12 +28,15 @@
 namespace R3B::Digitizing::Neuland::Tamex
 {
     // some declarations for static functions:
-    template <class T>
-    static auto CheckOverlapping(const T& peak, std::vector<T>& peaks) -> decltype(peaks.begin());
-    template <class T>
-    static void ReOverlapping(typename std::vector<T>::iterator v_iter, std::vector<T>& peaks);
-    template <class T>
-    static void RemovePeakAt(typename std::vector<T>::iterator v_iter, std::vector<T>& peaks);
+    namespace
+    {
+        template <class T>
+        auto CheckOverlapping(const T& peak, std::vector<T>& peaks) -> decltype(peaks.begin());
+        template <class T>
+        void ReOverlapping(typename std::vector<T>::iterator v_iter, std::vector<T>& peaks);
+        template <class T>
+        void RemovePeakAt(typename std::vector<T>::iterator v_iter, std::vector<T>& peaks);
+    } // namespace
 
     // global variables for default options:
     const size_t TmxPeaksInitialCapacity = 10;
@@ -41,18 +44,18 @@ namespace R3B::Digitizing::Neuland::Tamex
     R3BNeulandHitPar const* Channel::fNeulandHitPar = nullptr; // NOLINT
 
     Params::Params(TRandom3& rnd)
-        : fPMTThresh(1.)                // [MeV]
-        , fSaturationCoefficient(0.012) //
-        , fExperimentalDataIsCorrectedForSaturation(true)
-        , fTimeRes(0.15) // time + Gaus(0., fTimeRes) [ns]
-        , fEResRel(0.05) // Gaus(e, fEResRel * e) []
-        , fEnergyGain(15.0)
-        , fPedestal(14.0)
-        , fTimeMax(1000.)
-        , fTimeMin(1)
-        , fQdcMin(0.67)
-        , fRnd(rnd)
+        : fRnd{ &rnd }
     {
+    }
+
+    Params::Params(const Params& other)
+    {
+        if (other.fRnd == nullptr)
+        {
+            throw std::runtime_error(
+                "R3BDigitizingTamex: copy constructor of Params cannot take nullptr of random generator!");
+        }
+        *this = other;
     }
 
     PMTPeak::PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel& channel)
@@ -86,7 +89,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             LOG(fatal) << "channel is not bound to FQTPeak object!";
         }
-        auto par = channel->GetParConstRef();
+        const auto& par = channel->GetParConstRef();
 
         // calculate the time and the width of the signal
         fWidth = QdcToWidth(fQdc, par);
@@ -115,8 +118,13 @@ namespace R3B::Digitizing::Neuland::Tamex
     }
 
     Channel::Channel(ChannelSide side, TRandom3& rnd)
+        : Channel{ side, Params{ rnd } }
+    {
+    }
+
+    Channel::Channel(ChannelSide side, const Params& par)
         : Digitizing::Channel{ side }
-        , par{ rnd }
+        , par_{ par }
     {
         fPMTPeaks.reserve(TmxPeaksInitialCapacity);
     }
@@ -156,11 +164,11 @@ namespace R3B::Digitizing::Neuland::Tamex
             if (CheckPaddleIDInHitModulePar())
             {
                 auto side = GetSide();
-                par.fSaturationCoefficient = fNeulandHitModulePar->GetPMTSaturation(static_cast<int>(side));
-                par.fEnergyGain = fNeulandHitModulePar->GetEnergyGain(static_cast<int>(side));
-                par.fPedestal = fNeulandHitModulePar->GetPedestal(static_cast<int>(side));
-                par.fPMTThresh = fNeulandHitModulePar->GetPMTThreshold(static_cast<int>(side));
-                par.fQdcMin = 1 / par.fEnergyGain;
+                par_.fSaturationCoefficient = fNeulandHitModulePar->GetPMTSaturation(static_cast<int>(side));
+                par_.fEnergyGain = fNeulandHitModulePar->GetEnergyGain(static_cast<int>(side));
+                par_.fPedestal = fNeulandHitModulePar->GetPedestal(static_cast<int>(side));
+                par_.fPMTThresh = fNeulandHitModulePar->GetPMTThreshold(static_cast<int>(side));
+                par_.fQdcMin = 1 / par_.fEnergyGain;
             }
         }
     }
@@ -209,7 +217,7 @@ namespace R3B::Digitizing::Neuland::Tamex
 
     void Channel::AddHit(Hit newHit)
     {
-        if (newHit.time < par.fTimeMin || newHit.time > par.fTimeMax)
+        if (newHit.time < par_.fTimeMin || newHit.time > par_.fTimeMax)
         {
             return;
         }
@@ -318,18 +326,18 @@ namespace R3B::Digitizing::Neuland::Tamex
     auto Channel::ToQdc(double qdc) const -> double
     {
         // apply energy smearing
-        qdc = par.fRnd.Gaus(qdc, par.fEResRel * qdc);
+        qdc = par_.fRnd->Gaus(qdc, par_.fEResRel * qdc);
         return qdc;
     }
 
-    auto Channel::ToTdc(double time) const -> double { return time + par.fRnd.Gaus(0., par.fTimeRes); }
+    auto Channel::ToTdc(double time) const -> double { return time + par_.fRnd->Gaus(0., par_.fTimeRes); }
 
     auto Channel::ToUnSatQdc(double qdc) const -> double
     {
         // Apply reverse saturation
-        if (par.fExperimentalDataIsCorrectedForSaturation)
+        if (par_.fExperimentalDataIsCorrectedForSaturation)
         {
-            qdc = qdc / (1 - par.fSaturationCoefficient * qdc);
+            qdc = qdc / (1 - par_.fSaturationCoefficient * qdc);
         }
         // Apply reverse attenuation
         return qdc;

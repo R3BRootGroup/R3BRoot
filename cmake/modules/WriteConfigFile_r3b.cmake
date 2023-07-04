@@ -163,7 +163,8 @@ MACRO (WRITE_CONFIG_FILE filename)
   CONVERT_LIST_TO_STRING(${PYTHONPATH})
   SET(MY_PYTHONPATH ${output})
 
-  SET (PATH ${ROOTSYS}/bin ${PATH})
+    # TODO: this should change to CMAKE_INSTALL_PREFIX/bin in the future
+  SET (PATH ${ROOTSYS}/bin ${CMAKE_BINARY_DIR}/bin ${PATH})
   UNIQUE(PATH "${PATH}")
   CONVERT_LIST_TO_STRING(${PATH})
   Set(MY_PATH ${output})
