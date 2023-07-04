@@ -16,6 +16,9 @@
 #include "FairTask.h"
 #include "Filterable.h"
 #include "R3BDigitizingEngine.h"
+#include "R3BDigitizingPaddleNeuland.h"
+#include "R3BDigitizingTacQuila.h"
+#include "R3BDigitizingTamex.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandHitPar.h"
@@ -27,7 +30,6 @@
 class TGeoNode;
 class TH1F;
 class TH2F;
-namespace Digitizing = R3B::Digitizing;
 
 /**
  * NeuLAND digitizing finder task
@@ -40,20 +42,28 @@ namespace Digitizing = R3B::Digitizing;
  *   Additional output: Some control histograms
  *
  */
+namespace Digitizing = R3B::Digitizing;
 
 class R3BNeulandDigitizer : public FairTask
 {
   public:
     enum class Options
     {
-        channelTamex,
-        channelTacquila
+        neulandTamex,
+        neulandTacquila
     };
+    using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
+    using TacquilaChannel = Digitizing::Neuland::TacQuila::Channel;
+    using TamexChannel = Digitizing::Neuland::Tamex::Channel;
+    template <typename Type>
+    using UseChannel = Digitizing::UseChannel<Type>;
+    template <typename Type>
+    using UsePaddle = Digitizing::UsePaddle<Type>;
+
     explicit R3BNeulandDigitizer(TString input = "NeulandPoints", TString output = "NeulandHits");
     explicit R3BNeulandDigitizer(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine,
                                  TString input = "NeulandPoints",
                                  TString output = "NeulandHits");
-    explicit R3BNeulandDigitizer(Options option);
 
     ~R3BNeulandDigitizer() override = default;
 
@@ -88,5 +98,21 @@ class R3BNeulandDigitizer : public FairTask
     TH1F* hRLTimeToTrig = nullptr;
 
   public:
+    template <typename... Args>
+    explicit R3BNeulandDigitizer(Options option, Args&&... args)
+        : R3BNeulandDigitizer()
+    {
+        switch (option)
+        {
+            case Options::neulandTamex:
+                fDigitizingEngine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
+                                                             UseChannel<TamexChannel>(std::forward<Args>(args)...));
+                break;
+            case Options::neulandTacquila:
+                fDigitizingEngine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
+                                                             UseChannel<TacquilaChannel>(std::forward<Args>(args)...));
+                break;
+        }
+    }
     ClassDefOverride(R3BNeulandDigitizer, 1) // NOLINT
 };

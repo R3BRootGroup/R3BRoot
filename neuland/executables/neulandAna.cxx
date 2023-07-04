@@ -63,16 +63,26 @@ int main(int argc, const char** argv)
     }
 
     auto const channelInit = [&]() { Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar->value()); };
+
+    auto tamexParameter = Digitizing::Neuland::Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
+    tamexParameter.fPMTThresh = 1.;
+    tamexParameter.fTimeMin = 1.;
+
     const auto neulandEngines = std::map<std::pair<const std::string, const std::string>,
                                          std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
         { { "neuland", "tamex" },
           [&]()
-          { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(), channelInit); } },
+          {
+              return Digitizing::CreateEngine(
+                  UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+          } },
         { { "neuland", "tacquila" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
         { { "mock", "tamex" },
-          [&]()
-          { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(), channelInit); } },
+          [&]() {
+              return Digitizing::CreateEngine(
+                  UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+          } },
         { { "neuland", "mock" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
         { { "mock", "mock" },

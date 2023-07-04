@@ -26,7 +26,7 @@ void testNeulandDigitizer()
     io->open("test.para.root");
     run.GetRuntimeDb()->setFirstInput(io);
 
-    run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::channelTamex));
+    run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::neulandTamex));
     run.AddTask(new R3BNeulandClusterFinder());
     run.AddTask(new R3BNeulandPrimaryInteractionFinder());
     run.AddTask(new R3BNeulandPrimaryClusterFinder());

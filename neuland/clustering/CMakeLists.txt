@@ -23,3 +23,4 @@ set(SRCS R3BNeulandClusterMon.cxx R3BNeulandClusterFinder.cxx)
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 generate_library()
+target_include_directories(R3BNeulandClustering PUBLIC .)

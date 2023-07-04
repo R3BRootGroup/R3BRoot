@@ -80,14 +80,12 @@ namespace R3B::Digitizing
         void InvalidateSignals() { fSignals.invalidate(); }
         void InvalidateTrigTime() { fTrigTime.invalidate(); }
         virtual void AttachToPaddle(Paddle* paddle) { fPaddle = paddle; };
-
-      protected:
-        static auto GetRandom3Ref() -> TRandom3&;
+        static auto GetDefaultRandomGen() -> TRandom3&;
 
       private:
         virtual auto ConstructSignals() -> Signals = 0;
         Paddle* fPaddle = nullptr;           // pointer to the paddle who owns this channel
-        const ChannelSide fSide;             // side of the channel
+        ChannelSide fSide;                   // side of the channel
         mutable Validated<Signals> fSignals; // output signals from the channel
         mutable Validated<double> fTrigTime;
     };
