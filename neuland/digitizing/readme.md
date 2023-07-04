@@ -6,6 +6,87 @@ Digitizing is the process of converting the "raw" Monte Carlo energy depositions
 
 The Digitizing task `R3BNeulandDigitizer` handles the Input and Output of data. The task takes the `R3BNeulandPoints` from the Simulation, runs them through a `DigitizingEngine` and fills `R3BNeulandHits`. It also requires the configuration storage `NeulandGeoPar` to convert position coordinates.
 
+## Examples for users
+It's encouraged to create an executable file to use this digitization task. However, users are still able to use the task in ROOT Macro file, with much less configurability though.
+
+### Using a ROOT Macro file
+For the ROOT Macro file, the input parameter of the digitization task can only be one of the two options: `neulandTamex` and `neulandTacquila`.  
+Example:
+```cpp
+    FairRunAna run;
+    run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::neulandTamex));
+
+    // or with Tacquila digitizer:
+    // run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::neulandTacquila));
+```
+
+### Using a C++ executable
+Much more options are available when the task is used in a C++ executable. Such an example can be found in the source file [neulandAna.cxx](../executbales/neulandAna.cxx) implemented with some program options. To see what kind of options can be used with this executable, go to the folder `build/bin` and run the executable with:
+```shell
+./neulandAna -h
+```
+Before running any executable, please make sure the configuration file `build/config.sh` has been sourced.
+
+#### How to create an engine for the task
+The digitization task must be set with a digitization engine, which specifies the type of the scintillator and the digitization channel.
+
+An engine can be created with
+```cpp
+namespace Digitizing = R3B::Digitizing;
+using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
+using TamexChannel = Digitizing::Neuland::Tamex::Channel;
+using Digitizing::UseChannel;
+using Digitizing::UsePaddle;
+
+auto engine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>());
+```
+which chooses the Neuland scintillator and the Tamex channel for the digitization engine. Then, the task can be setup with this engine by
+```cpp
+auto run = std::make_unique<FairRunAna>();
+auto digiNeuland = std::make_unique<R3BNeulandDigitizer>();
+digiNeuland->SetEngine(std::move(engine));
+
+// add the task to the FairRun
+run->AddTask(digiNeuland.release());
+```
+
+#### Setup the parameter for channels
+The Tamex channel has an option to setup its parameters through an object in the type `R3B::Digitizing::Neuland::Tamex::Params`:
+```cpp
+namespace Tamex = Digitizing::Neuland::Tamex;
+using TamexChannel = Digitizing::Neuland::Tamex::Channel;
+auto tamexParameter = Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
+tamexParameter.fPMTThresh = 1.;
+tamexParameter.fTimeMin = 1.;
+
+auto engine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(tamexParameter));
+```
+
+Following table shows all the parameters that can be modified for the Tamex channel:
+| Name                                      | Type   | Default value | Meaning                                                |
+|-------------------------------------------|--------|---------------|--------------------------------------------------------|
+| fPMTThresh                                | double | 1. [MeV]      | Value of the PMT threshold                             |
+| fSaturationCoefficient                    | double | 0.012         | Saturation coefficient of PMTs                         |
+| fExperimentalDataIsCorrectedForSaturation | bool   | true          | If true, the PMT saturation effect is enabled          |
+| fTimeRes                                  | double | 0.15 [ns]     | Time resolution of channel outputs                     |
+| fEResRel                                  | double | 0.05 [MeV]    | Energy resolution of channel outputs                   |
+| fEnergyGain                               | double | 15.0          | Value of the PMT gain (used for the width calculation) |
+| fPedestal                                 | double | 14.0          | Pedestal value (used for the width calculation)        |
+| fTimeMax                                  | double | 1000. [ns]    | Maximum time cutoff                                    |
+| fTimeMin                                  | double | 1. [ns]       | Minimum time cutoff                                    |
+| fQdcMin                                   | double | 0.67 [MeV]    | Minimum energy cutoff                                  |
+
+On the other hand, users are also allowed to set the parameters of each channel according to a parameter container from the calibration process:
+```cpp
+auto fileio = std::make_unique<FairParRootFileIo>();
+fileio->open("params_sync.root");
+run->GetRuntimeDb()->setFirstInput(fileio.release());
+
+using TamexChannel = Digitizing::Neuland::Tamex::Channel;
+auto const channelInit = []() { TamexChannel::GetHitPar("NeulandHitPar"); };
+auto engine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(), channelInit);
+```
+In the example above, the object with the name "NeulandHitPar" should have the type `R3BNeulandHitPar` in the root file "params_sync.root".
 
 ## DigitizingEngine
 A `DigitizingEngine` object handles the actual data processing, which requires another two objects as the input parameters for its instantiation: `UseChannel` and `UsePaddle`. As suggested by their names, these two objects behave like factories, which are used by `DigitizingEngine` to generate `Channel` and `Paddle` objects. 
@@ -36,7 +117,7 @@ class MyDigitizingEngine : public DigitizingEngineInterface
 int main(){
     MyDigitizingEngine* myEngine = Make_engine<MyDigitizingEngine>();
     auto myDigi = MyDigitizer();
-    myDigi.SetDigiEngine(myEngine);
+    myDigi.SetDigiEngine(std::move(myEngine));
 }
 ```
 Here instead of letting the class member `engine_` directly have the type `MyDigitizingEngine`, let its type be the base class `DigitizingEngineInterface`. Such a design pattern has two major advantages:

@@ -21,7 +21,7 @@ namespace R3B::Digitizing
     {
     }
 
-    auto Channel::GetRandom3Ref() -> TRandom3&
+    auto Channel::GetDefaultRandomGen() -> TRandom3&
     {
         static auto random3 = TRandom3{};
         return random3;

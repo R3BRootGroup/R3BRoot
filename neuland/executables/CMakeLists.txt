@@ -39,3 +39,5 @@ include_directories(${INCLUDE_DIRECTORIES})
 set(SRCS neulandAna.cxx)
 
 generate_executable()
+
+add_subdirectory(templates)
