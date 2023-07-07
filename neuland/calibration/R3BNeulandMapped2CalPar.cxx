@@ -51,10 +51,6 @@ R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar(const char* name, Int_t iVerbos
 
 R3BNeulandMapped2CalPar::~R3BNeulandMapped2CalPar()
 {
-    if (fCal_Par)
-    {
-        delete fCal_Par;
-    }
     if (fEngine)
     {
         delete fEngine;

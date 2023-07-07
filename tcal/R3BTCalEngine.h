@@ -70,7 +70,6 @@ class R3BTCalEngine : public TObject
      * Destructor.
      * Releases memory used by the object.
      */
-    virtual ~R3BTCalEngine();
 
     /**
      * A method to fill TDC distribution for a specific module.
