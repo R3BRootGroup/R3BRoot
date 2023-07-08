@@ -52,7 +52,7 @@ InitStatus R3BNeulandHitMon::Init()
         const auto xbinN = 60;
         const auto ybinN = 50;
         const auto zbinN = 50;
-        fh3 = r3b::root_owned<TH3D>("hHits", "hHits", xbinN, 1400., 1700., ybinN, -125., 125., zbinN, -125., 125.);
+        fh3 = R3B::root_owned<TH3D>("hHits", "hHits", xbinN, 1400., 1700., ybinN, -125., 125., zbinN, -125., 125.);
         fh3->SetTitle("NeuLAND Hits");
         fh3->GetXaxis()->SetTitle("Z");
         fh3->GetYaxis()->SetTitle("X");
@@ -69,31 +69,31 @@ InitStatus R3BNeulandHitMon::Init()
     const auto posXYBinN = 300;
     const auto velocityBinN = 200;
 
-    hTime = r3b::root_owned<TH1D>("hTime", "Hit time", timeBinN, -1000., 1000.);
-    hTimeAdj = r3b::root_owned<TH1D>("hTimeAdj", "Hit Time adjusted for flight path", timeBinN, -1000., 1000.);
+    hTime = R3B::root_owned<TH1D>("hTime", "Hit time", timeBinN, -1000., 1000.);
+    hTimeAdj = R3B::root_owned<TH1D>("hTimeAdj", "Hit Time adjusted for flight path", timeBinN, -1000., 1000.);
 
-    hMult = r3b::root_owned<TH1I>("hMult", "Hit Multiplicity", maxHitNum, 0, maxHitNum);
+    hMult = R3B::root_owned<TH1I>("hMult", "Hit Multiplicity", maxHitNum, 0, maxHitNum);
 
-    hDepth = r3b::root_owned<TH1D>("hDepth", "Maxial penetration depth", zDepBinN, 1400., 1700.);
-    hDepthVSForemostEnergy = r3b::root_owned<TH2D>(
+    hDepth = R3B::root_owned<TH1D>("hDepth", "Maxial penetration depth", zDepBinN, 1400., 1700.);
+    hDepthVSForemostEnergy = R3B::root_owned<TH2D>(
         "hDepthVSFrontEnergy", "Depth vs Foremost Energy", zDepBinN, 1400., 1700., energyBinN, 0., 100.);
-    hDepthVSSternmostEnergy = r3b::root_owned<TH2D>(
+    hDepthVSSternmostEnergy = R3B::root_owned<TH2D>(
         "hDepthVSSternmostEnergy", "Depth vs Sternmost Energy", zDepBinN, 1400., 1700., energyBinN, 0, 100.);
     hDepthVSEtot =
-        r3b::root_owned<TH2D>("hDepthVSEtot", "Depth vs Total Energy", zDepBinN, 1400., 1700., totenergyBinN, 0, 1000.);
-    hForemostEnergy = r3b::root_owned<TH1D>("hForemostEnergy", "Foremost energy deposition", energyBinN, 0, 100.);
-    hSternmostEnergy = r3b::root_owned<TH1D>("hSternmostEnergy", "Sternmost energy deposition", energyBinN, 0, 100.);
-    hEtot = r3b::root_owned<TH1D>("hEtot", "Total Energy", totenergyBinN, 0, 10000.);
-    hdeltaEE = r3b::root_owned<TH2D>(
+        R3B::root_owned<TH2D>("hDepthVSEtot", "Depth vs Total Energy", zDepBinN, 1400., 1700., totenergyBinN, 0, 1000.);
+    hForemostEnergy = R3B::root_owned<TH1D>("hForemostEnergy", "Foremost energy deposition", energyBinN, 0, 100.);
+    hSternmostEnergy = R3B::root_owned<TH1D>("hSternmostEnergy", "Sternmost energy deposition", energyBinN, 0, 100.);
+    hEtot = R3B::root_owned<TH1D>("hEtot", "Total Energy", totenergyBinN, 0, 10000.);
+    hdeltaEE = R3B::root_owned<TH2D>(
         "hdeltaEE", "Energy in Foremost Plane vs Etot", energyBinN, 0, 2000., energyBinN, 0, 250.);
-    hPosVSEnergy = r3b::root_owned<TH2D>(
+    hPosVSEnergy = R3B::root_owned<TH2D>(
         "hPosVSEnergy", "Position vs Energy deposition", zDepBinN, 1400., 1700., totenergyBinN, 0, 1000.);
-    hBeta = r3b::root_owned<TH1D>("hBeta", "Velocity", velocityBinN, 0., 1.);
-    hE = r3b::root_owned<TH1D>("hE", "Hit Energy", energyBinN, 0., 100.);
-    hX = r3b::root_owned<TH1D>("hX", "Hit X", posXYBinN, -150., 150.);
-    hY = r3b::root_owned<TH1D>("hY", "Hit Y", posXYBinN, -150., 150.);
-    hT = r3b::root_owned<TH1D>("hT", "Hit Delta T", timeBinN, -15., -15.);
-    hTNeigh = r3b::root_owned<TH1D>("hTNeigh", "Hit Neigh Delta T", timeBinN, -15., -15.);
+    hBeta = R3B::root_owned<TH1D>("hBeta", "Velocity", velocityBinN, 0., 1.);
+    hE = R3B::root_owned<TH1D>("hE", "Hit Energy", energyBinN, 0., 100.);
+    hX = R3B::root_owned<TH1D>("hX", "Hit X", posXYBinN, -150., 150.);
+    hY = R3B::root_owned<TH1D>("hY", "Hit Y", posXYBinN, -150., 150.);
+    hT = R3B::root_owned<TH1D>("hT", "Hit Delta T", timeBinN, -15., -15.);
+    hTNeigh = R3B::root_owned<TH1D>("hTNeigh", "Hit Neigh Delta T", timeBinN, -15., -15.);
 
     return kSUCCESS;
 }
