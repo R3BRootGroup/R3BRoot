@@ -30,7 +30,7 @@ auto main(int argc, const char** argv) -> int
     auto timer = TStopwatch{};
     timer.Start();
 
-    auto programOptions = r3b::ProgramOptions("options for neuland data analysis");
+    auto programOptions = R3B::ProgramOptions("options for neuland data analysis");
     auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
     auto paraFileName =
         programOptions.Create_Option<std::string>("paraFile", "set the filename of parameter sink", "para.root");

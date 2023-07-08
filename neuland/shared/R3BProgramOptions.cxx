@@ -1,6 +1,6 @@
 #include "R3BProgramOptions.h"
 
-namespace r3b
+namespace R3B
 {
     bool ProgramOptions::Verify(int argc, const char** argv)
     {
@@ -32,4 +32,4 @@ namespace r3b
         }
         return true;
     }
-} // namespace r3b
+} // namespace R3B

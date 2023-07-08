@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace r3b
+namespace R3B
 {
     using std::runtime_error;
 
@@ -147,4 +147,4 @@ namespace r3b
         Type value_{};
         ProgramOptions* program_;
     };
-}; // namespace r3b
+}; // namespace R3B

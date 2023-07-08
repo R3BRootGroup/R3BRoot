@@ -80,12 +80,12 @@ InitStatus R3BNeulandDigitizer::Init()
 
     // Initialize control histograms
     auto const PaddleMulSize = 3000;
-    hMultOne = r3b::root_owned<TH1I>(
+    hMultOne = R3B::root_owned<TH1I>(
         "MultiplicityOne", "Paddle multiplicity: only one PMT per paddle", PaddleMulSize, 0, PaddleMulSize);
-    hMultTwo = r3b::root_owned<TH1I>(
+    hMultTwo = R3B::root_owned<TH1I>(
         "MultiplicityTwo", "Paddle multiplicity: both PMTs of a paddle", PaddleMulSize, 0, PaddleMulSize);
     auto const timeBinSize = 200;
-    hRLTimeToTrig = r3b::root_owned<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
+    hRLTimeToTrig = R3B::root_owned<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
 
     return kSUCCESS;
 }
