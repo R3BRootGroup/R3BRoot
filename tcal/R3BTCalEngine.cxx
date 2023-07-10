@@ -39,27 +39,6 @@ R3BTCalEngine::R3BTCalEngine(R3BTCalPar* param, Int_t minStats)
     }
 }
 
-R3BTCalEngine::~R3BTCalEngine()
-{
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
-    {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
-        {
-            for (Int_t k = 0; k < N_SIDE_MAX; k++)
-            {
-                if (fhData[i][j][k])
-                {
-                    delete fhData[i][j][k];
-                }
-                if (fhTime[i][j][k])
-                {
-                    delete fhTime[i][j][k];
-                }
-            }
-        }
-    }
-}
-
 void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
 {
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)

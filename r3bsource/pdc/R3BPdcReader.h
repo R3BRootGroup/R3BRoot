@@ -14,8 +14,8 @@
 #ifndef R3BPDCREADER_H
 #define R3BPDCREADER_H
 
-#include <TClonesArray.h>
 #include "R3BReader.h"
+#include <TClonesArray.h>
 struct EXT_STR_h101_PDC_t;
 typedef struct EXT_STR_h101_PDC_t EXT_STR_h101_PDC;
 

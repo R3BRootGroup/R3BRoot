@@ -115,12 +115,12 @@ Double_t R3BMwpc1Cal2Hit::GetPositionX(Double_t qmax, Int_t padmax, Double_t qle
 /* ----   Protected method to obtain the position Y ---- */
 Double_t R3BMwpc1Cal2Hit::GetPositionYCoG(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup) const
 {
-   const double pos1 = (padmax-1) * fwy - (fSize / 2) + (fwy / 2);
-   const double pos2 = padmax * fwy - (fSize / 2) + (fwy / 2);
-   const double pos3 = (padmax+1) * fwy - (fSize / 2) + (fwy / 2);
-   const double center_of_mass = (pos1*qdown + pos2*qmax + pos3*qup)/(qmax+qdown+qup);
+    const double pos1 = (padmax - 1) * fwy - (fSize / 2) + (fwy / 2);
+    const double pos2 = padmax * fwy - (fSize / 2) + (fwy / 2);
+    const double pos3 = (padmax + 1) * fwy - (fSize / 2) + (fwy / 2);
+    const double center_of_mass = (pos1 * qdown + pos2 * qmax + pos3 * qup) / (qmax + qdown + qup);
 
-   return center_of_mass;
+    return center_of_mass;
 }
 
 /* ----   Protected method to obtain the position Y ---- */
@@ -218,9 +218,12 @@ void R3BMwpc1Cal2Hit::S467()
         qdown = fy[padmy - 1];
         qup = fy[padmy + 1];
         // TODO: check if systematic statistics loss is experiment specific, put general solution if not
-        if (header->GetExpId()==S522 ||  header->GetExpId()==S509){
+        if (header->GetExpId() == S522 || header->GetExpId() == S509)
+        {
             y = GetPositionYCoG(qmy, padmy, qdown, qup);
-        } else if (qdown > 0 && qup > 0){
+        }
+        else if (qdown > 0 && qup > 0)
+        {
             y = GetPositionY(qmy, padmy, qdown, qup);
         }
 

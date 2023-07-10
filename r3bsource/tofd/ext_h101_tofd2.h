@@ -153,48 +153,6 @@ typedef struct EXT_STR_h101_onion_t
                                                                                                             \
     } while (0);
 
-/********************************************************
- *
- * For internal use by the network data reader:
- * (version checks, etc)
- */
-
-typedef struct EXT_STR_h101_layout_t
-{
-    uint32_t _magic;
-    uint32_t _size_info;
-    uint32_t _size_struct;
-    uint32_t _size_struct_onion;
-    uint32_t _pack_list_items;
-
-    uint32_t _num_items;
-    struct
-    {
-        uint32_t _offset;
-        uint32_t _size;
-        uint32_t _xor;
-        const char* _name;
-    } _items[1];
-    uint32_t _pack_list[34];
-} EXT_STR_h101_layout;
-
-#define EXT_STR_h101_LAYOUT_INIT                                                                                      \
-    { 0x57e65c93,                                                                                                     \
-      sizeof(EXT_STR_h101_layout),                                                                                    \
-      sizeof(EXT_STR_h101),                                                                                           \
-      sizeof(EXT_STR_h101_onion),                                                                                     \
-      34,                                                                                                             \
-      1,                                                                                                              \
-      {                                                                                                               \
-          { 0, sizeof(EXT_STR_h101), 0x44a5f05f, "h101" },                                                            \
-      },                                                                                                              \
-      {                                                                                                               \
-          0x40000000, 0x40000004, 0x40000008, 0x4000000c, 0x40000010, 0x40000014, 0x40000018, 0x4000001c, 0x40000020, \
-          0x40000024, 0x40000028, 0x4000002c, 0x40000030, 0x40000034, 0x40000038, 0x4000003c, 0x40000040, 0x40000044, \
-          0x40000048, 0x4000004c, 0x40000050, 0x40000054, 0x40000058, 0x4000005c, 0x40000060, 0x40000064, 0x40000068, \
-          0x4000006c, 0x40000070, 0x40000074, 0x40000078, 0x4000007c, 0x40000080, 0x40000084,                         \
-      } };
-
 #endif /*__GUARD_H101_EXT_H101_H__*/
 
 /*******************************************************/

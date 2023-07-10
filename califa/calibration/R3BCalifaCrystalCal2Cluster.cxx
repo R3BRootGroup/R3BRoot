@@ -31,9 +31,9 @@
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaMappingPar.h"
+#include <cmath>
 #include <list>
 #include <vector>
-#include <cmath>
 
 using namespace std;
 
@@ -180,10 +180,11 @@ void R3BCalifaCrystalCal2Cluster::SetParContainers()
     if (!fCalifaGeoPar)
     {
         R3BLOG_IF(warn, !fCalifaGeoPar, "Could not get access to CalifaGeoPar container. Setting nominal position.");
-        fCalifaPos.SetXYZ(0.0,0.0,0.0);
+        fCalifaPos.SetXYZ(0.0, 0.0, 0.0);
     }
 
-    else{
+    else
+    {
 
         R3BLOG(info, "Container CalifaGeoPar found.");
         fCalifaPos.SetXYZ(fCalifaGeoPar->GetPosX(), fCalifaGeoPar->GetPosY(), fCalifaGeoPar->GetPosZ());
@@ -192,17 +193,18 @@ void R3BCalifaCrystalCal2Cluster::SetParContainers()
     if (!fCalifaGeoPar || !fTargetGeoPar)
     {
         R3BLOG_IF(warn, !fTargetGeoPar, "Could not get access to TargetGeoPar container. Setting nominal position. ");
-        fTargetPos.SetXYZ(0.0,0.0,0.0);
+        fTargetPos.SetXYZ(0.0, 0.0, 0.0);
     }
 
-    else {
+    else
+    {
 
         R3BLOG(info, "Container TargetGeoPar found.");
         fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
-     }
+    }
 
-    LOG(info)<<"Califa position : X = "<<fCalifaPos.X()<<" Y = "<<fCalifaPos.Y()<<" Z = "<<fCalifaPos.Z();
-    LOG(info)<<"Target position : X = "<<fTargetPos.X()<<" Y = "<<fTargetPos.Y()<<" Z = "<<fTargetPos.Z();
+    LOG(info) << "Califa position : X = " << fCalifaPos.X() << " Y = " << fCalifaPos.Y() << " Z = " << fCalifaPos.Z();
+    LOG(info) << "Target position : X = " << fTargetPos.X() << " Y = " << fTargetPos.Y() << " Z = " << fTargetPos.Z();
 
     return;
 }
@@ -228,7 +230,8 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
     R3BLOG_IF(error, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
 
     fCalifatoTargetPos = fTargetPos - fCalifaPos;
-    cout<<"Correction : "<<fCalifatoTargetPos.X()<<" "<<fCalifatoTargetPos.Y()<<" "<<fCalifatoTargetPos.Z()<<endl;
+    cout << "Correction : " << fCalifatoTargetPos.X() << " " << fCalifatoTargetPos.Y() << " " << fCalifatoTargetPos.Z()
+         << endl;
     if (fRand)
     {
         R3BLOG_IF(fatal, !fHistoFile, "Randomization file not found");
@@ -555,13 +558,13 @@ void R3BCalifaCrystalCal2Cluster::SelectGeometryVersion(Int_t version)
 }
 
 R3BCalifaClusterData* R3BCalifaCrystalCal2Cluster::AddCluster(vector<Int_t> crystalList,
-                                                          Double_t ene,
-                                                          Double_t Nf,
-                                                          Double_t Ns,
-                                                          Double_t pAngle,
-                                                          Double_t aAngle,
-                                                          ULong64_t time,
-                                                          Int_t clusterType)
+                                                              Double_t ene,
+                                                              Double_t Nf,
+                                                              Double_t Ns,
+                                                              Double_t pAngle,
+                                                              Double_t aAngle,
+                                                              ULong64_t time,
+                                                              Int_t clusterType)
 {
     TClonesArray& clref = *fCalifaClusterData;
     Int_t size = clref.GetEntriesFast();

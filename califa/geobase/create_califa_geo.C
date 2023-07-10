@@ -828,18 +828,18 @@ Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
     return found;
 }
 
-void create_califa_geo(const int index=0)
+void create_califa_geo(const int index = 0)
 {
-   if (index == 1)
-   {
+    if (index == 1)
+    {
         create_califa_geo_selector("s467");
-   }
-   else if (index == 2)
-   {
+    }
+    else if (index == 2)
+    {
         create_califa_geo_selector("s455");
-   } 
-   else
-   {
-     create_califa_geo_selector();
-   }
+    }
+    else
+    {
+        create_califa_geo_selector();
+    }
 }

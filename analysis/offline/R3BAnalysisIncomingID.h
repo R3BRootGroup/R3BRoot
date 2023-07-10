@@ -100,8 +100,9 @@ class R3BAnalysisIncomingID : public FairTask
 
     // Acsessor to set use of trigger corrected times
     void SetUseTref() { fUseTref = kTRUE; }
+
   protected:
-    R3BEventHeader* fHeader{};   // Event header
+    R3BEventHeader* fHeader{}; // Event header
 
   private:
     void SetParameter();

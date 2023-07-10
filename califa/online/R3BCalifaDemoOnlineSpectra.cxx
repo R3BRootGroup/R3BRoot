@@ -1094,7 +1094,7 @@ void R3BCalifaDemoOnlineSpectra::Exec(Option_t* option)
             wrm = hit->GetTimeStamp();
         }
     }
-    if (wrc!=0 || wrm !=0)
+    if (wrc != 0 || wrm != 0)
     {
         fh_Califa_wr->Fill(wrc - wrm);
     }

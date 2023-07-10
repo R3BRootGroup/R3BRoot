@@ -177,12 +177,10 @@ R3BDistribution<Dim> R3BDistribution1D::Flat(const Double_t lower_value, const D
 R3BDistribution<Dim> R3BDistribution1D::Gaussian(const Double_t mean, const Double_t sigma)
 {
     const auto invSigma = 1 / sigma;
-    auto g = createLookupGraph(
-        [mean, invSigma](const Double_t value) {
-            return TMath::Exp(-0.5 * (value - mean) * (value - mean) * invSigma);
-        },
-        mean - nSigma * sigma,
-        mean + nSigma * sigma);
+    auto g = createLookupGraph([mean, invSigma](const Double_t value)
+                               { return TMath::Exp(-0.5 * (value - mean) * (value - mean) * invSigma); },
+                               mean - nSigma * sigma,
+                               mean + nSigma * sigma);
     return R3BDistribution<Dim>([g](Arr values) -> Arr { return { g.Eval(values[0]) }; });
 }
 

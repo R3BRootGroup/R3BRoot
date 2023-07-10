@@ -14,8 +14,8 @@
 #ifndef R3BSFIBREADER_H
 #define R3BSFIBREADER_H
 
-#include <TClonesArray.h>
 #include "R3BReader.h"
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_sfib_t;
 typedef struct EXT_STR_h101_sfib_t EXT_STR_h101_sfib;

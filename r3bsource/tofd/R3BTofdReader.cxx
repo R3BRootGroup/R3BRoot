@@ -27,7 +27,7 @@ extern "C"
 #include "ext_h101_tofd.h"
 }
 
-//#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
+// #define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
 #define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
 R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD_onion* data, size_t offset)

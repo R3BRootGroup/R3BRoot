@@ -1448,11 +1448,11 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     //   rb\ /b
 
     Double_t timeTofd = 0;
-    Double_t time_V[10][8] = { {0.0 / 0.0} }; // [multihit][pm]
-    Double_t time_L[10][8] = { {0.0 / 0.0} };
-    Double_t time_T[10][8] = { {0.0 / 0.0} };
+    Double_t time_V[10][8] = { { 0.0 / 0.0 } }; // [multihit][pm]
+    Double_t time_L[10][8] = { { 0.0 / 0.0 } };
+    Double_t time_T[10][8] = { { 0.0 / 0.0 } };
 
-    Double_t time_M[10][8] = { {0.0 / 0.0} };
+    Double_t time_M[10][8] = { { 0.0 / 0.0 } };
     Double_t LosTresM[10] = { 0.0 / 0.0 };
 
     Double_t timeLosV[10] = { 0.0 };
@@ -1461,14 +1461,14 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     Double_t LosTresT[10] = { 0.0 / 0.0 };
     Double_t timeLos[10] = { 0.0 };
     Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][8] = { {0.0 / 0.0} };
+    Double_t tot[10][8] = { { 0.0 / 0.0 } };
     Double_t xT_cm[10] = { 0.0 / 0.0 };
     Double_t yT_cm[10] = { 0.0 / 0.0 };
     Double_t xToT_cm[10] = { 0.0 / 0.0 };
     Double_t yToT_cm[10] = { 0.0 / 0.0 };
     Double_t xV_cm[10] = { 0.0 / 0.0 };
     Double_t yV_cm[10] = { 0.0 / 0.0 };
-    Double_t time_V_temp[10][8] = { {0.0 / 0.0} };
+    Double_t time_V_temp[10][8] = { { 0.0 / 0.0 } };
 
     Int_t Multip;
 
@@ -1548,12 +1548,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
         // Sorting VFTX data:
 
-        std::qsort(time_V, nPart, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
-            double const* lhs = static_cast<double const*>(arg1);
-            double const* rhs = static_cast<double const*>(arg2);
+        std::qsort(time_V,
+                   nPart,
+                   sizeof(*time_V),
+                   [](const void* arg1, const void* arg2) -> int
+                   {
+                       double const* lhs = static_cast<double const*>(arg1);
+                       double const* rhs = static_cast<double const*>(arg2);
 
-            return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-        });
+                       return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                   });
         // End sorting
 
         signed long long time_first = -1;
@@ -1728,16 +1732,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     // SCI8 detector
     //----------------------------------------------------------------------
 
-    Double_t timeS8_V[10][2] = { {0.0 / 0.0} }; // [multihit][pm]
-    Double_t timeS8_L[10][2] = { {0.0 / 0.0} };
-    Double_t timeS8_T[10][2] = { {0.0 / 0.0} };
+    Double_t timeS8_V[10][2] = { { 0.0 / 0.0 } }; // [multihit][pm]
+    Double_t timeS8_L[10][2] = { { 0.0 / 0.0 } };
+    Double_t timeS8_T[10][2] = { { 0.0 / 0.0 } };
     Double_t timeSci8M[10] = { 0.0 };
     Double_t Sci8TresM[10] = { 0.0 / 0.0 };
     Double_t timeSci8T[10] = { 0.0 };
     Double_t Sci8TresT[10] = { 0.0 / 0.0 };
     Double_t timeSci8[10] = { 0.0 };
     Double_t totsumS8[10] = { 0.0 };
-    Double_t totS8[10][8] = { {0.0 / 0.0} };
+    Double_t totS8[10][8] = { { 0.0 / 0.0 } };
 
     Int_t MultipS8 = -1;
 
@@ -2142,19 +2146,19 @@ void R3BOnlineSpectra::Exec(Option_t* option)
         auto det = fCalItems.at(DET_TOFD);
         Int_t nCals = det->GetEntriesFast();
 
-        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
-        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{0. / 0.}} };
+        Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t_paddle[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t1l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t2l[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t1t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t t2t[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
+        Double_t ToF[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { 0. / 0. } } };
 
-        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {{false}} };
+        Bool_t Bar_present[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { { false } } };
 
         Int_t iBarMem = 0;
-        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { {0} };
+        Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = { { 0 } };
 
         unsigned long long time0 = header->GetTimeStamp();
         double_t time1 = -1.;

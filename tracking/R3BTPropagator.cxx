@@ -346,6 +346,57 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     return kTRUE;
 }
 
+Bool_t R3BTPropagator::PropagateToPlaneRK_eloss(R3BTrackingParticle* particle,
+                                                const TVector3& point1,
+                                                const TVector3& point2,
+                                                const TVector3& point3,
+                                                double& Tot_Tof,
+                                                double step,
+                                                bool eloss)
+{
+
+    std::array<double, N_PARTICLE_INFO> vecRKIn{};
+    std::array<double, N_PARTICLE_INFO> vecOut{};
+
+    particle->GetPosition(vecRKIn.data());
+    particle->GetCosines(&vecRKIn[3]);
+
+    const TVector3 norm = ((point2 - point1).Cross(point3 - point1)).Unit();
+    TVector3 intersect;
+
+    LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), point1, norm, intersect);
+    Double_t length = 0.;
+    bool continue_while = true;
+    if ((intersect - particle->GetPosition()).Mag() - step < step)
+    {
+        LOG(error) << "step " << step << " is too big compared with wanted step of "
+                   << (intersect - particle->GetPosition()).Mag();
+        return kFALSE;
+    }
+    // propagates the particle with a fixed step
+    while (LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), point1, norm, intersect) &&
+           continue_while)
+    {
+        if ((intersect - particle->GetPosition()).Mag() - step < step)
+        {
+            step = (intersect - particle->GetPosition()).Mag();
+            continue_while = false;
+        }
+        length = fFairProp->OneStepRungeKutta(particle->GetCharge(), step, vecRKIn.data(), vecOut.data());
+        // update particle info
+        update_particle(particle, length, vecOut, eloss);
+        // update position and momentum array
+        std::copy_n(vecOut.begin(), vecOut.size(), vecRKIn.begin());
+        if (particle->GetBeta() < 0)
+        {
+            LOG(error) << "particle was stopped did not reach destination";
+            return kFALSE;
+        }
+        Tot_Tof += length / (particle->GetBeta() * (TMath::C() / (1e7)));
+    }
+    return kTRUE;
+}
+
 Bool_t R3BTPropagator::LineIntersectPlane(const TVector3& pos,
                                           const TVector3& mom,
                                           const TVector3& v1,
@@ -368,6 +419,53 @@ Bool_t R3BTPropagator::LineIntersectPlane(const TVector3& pos,
         intersect = pos + mom * t;
     }
     return kTRUE;
+}
+
+void R3BTPropagator::update_particle(R3BTrackingParticle* particle,
+                                     Double_t length,
+                                     std::array<double, N_PARTICLE_INFO>& vecOut,
+                                     bool eloss)
+{
+    if (eloss)
+    {
+        const Double_t DeltaE =
+            Energy_loss_in_air(particle->GetBeta(), length, particle->GetCharge(), particle->GetMass());
+        particle->SetStartBeta(particle->GetBeta());
+        const Double_t deltaBeta = particle->DeltaEToDeltaBeta(DeltaE);
+        particle->SetBeta(particle->GetBeta() - deltaBeta);
+        particle->SetPosition(vecOut.data());
+        particle->SetCosines(&vecOut[3]);
+        particle->AddStep(length);
+        particle->UpdateMomentum();
+        vecOut[6] = particle->GetMomentum().Mag(); // NOLINT
+    }
+    else
+    {
+        particle->SetPosition(vecOut.data());
+        particle->SetCosines(&vecOut[3]);
+        particle->AddStep(length);
+    }
+}
+
+Double_t R3BTPropagator::Energy_loss_in_air(double beta, double step, double charge, double mass)
+{
+    // Values taken from https://pdg.lbl.gov/2022/AtomicNuclearProperties/HTML/air_dry_1_atm.html
+    constexpr double me = 0.51099895;  // NOLINT // MeV/c^2 (electron mass)
+    constexpr double ZoAair = 0.49919; // mol/g (A over Z for air)
+    constexpr double I = 85.7e-6;      // NOLINT // MeV (mean excitation energy taken from PDG site)
+    constexpr double rho = 0.001205;   // g/cm^3 (density of air at STP)
+    constexpr double K = 0.307075;     // NOLINT // MeV mol^-1 cm^2 (constant factor)
+    const double gamma = 1 / (sqrt(1 - pow(beta, 2)));
+    const double Tmax =
+        (2 * me * pow(beta * gamma, 2)) /
+        (1 + 2 * gamma * me / (mass * 1000.) +
+         pow(me / (mass * 1000.), 2)); // maximum transfered kinetic energy to a free electron in a single collision
+
+    // Bethe Bloch formula
+    const double delta = K * rho * (ZoAair)*pow(charge / beta, 2) * 0.5 *
+                         (log((2 * me * pow(beta * gamma, 2) * Tmax) / pow(I, 2)) - pow(beta, 2));
+
+    return delta * step / 1000.;
 }
 
 ClassImp(R3BTPropagator)

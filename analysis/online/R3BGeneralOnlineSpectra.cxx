@@ -143,18 +143,18 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     R3BLOG_IF(warn, !fMwpc0Online, "Mwpc0OnlineSpectra not found");
 
     // Looking for Mwpc0_1 online
-    fMwpc01Online =
-        dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(FairRunOnline::Instance()->GetTask("Mwpc0_1CorrelationOnlineSpectra"));
+    fMwpc01Online = dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(
+        FairRunOnline::Instance()->GetTask("Mwpc0_1CorrelationOnlineSpectra"));
     R3BLOG_IF(warn, !fMwpc01Online, "Mwpc0_1CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc0_2 online
-    fMwpc02Online =
-        dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(FairRunOnline::Instance()->GetTask("Mwpc0_2CorrelationOnlineSpectra"));
+    fMwpc02Online = dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(
+        FairRunOnline::Instance()->GetTask("Mwpc0_2CorrelationOnlineSpectra"));
     R3BLOG_IF(warn, !fMwpc02Online, "Mwpc0_2CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc1_2 online
-    fMwpc12Online =
-        dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(FairRunOnline::Instance()->GetTask("Mwpc1_2CorrelationOnlineSpectra"));
+    fMwpc12Online = dynamic_cast<R3BMwpcCorrelationOnlineSpectra*>(
+        FairRunOnline::Instance()->GetTask("Mwpc1_2CorrelationOnlineSpectra"));
     R3BLOG_IF(warn, !fMwpc12Online, "Mwpc1_2CorrelationOnlineSpectra not found");
 
     // Looking for Mwpc1 online
@@ -195,8 +195,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     R3BLOG_IF(warn, !fTofdOnlineSpectra, "TofdOnlineSpectra not found");
 
     // Looking for Incoming Tracking online
-    fIncomingTrackingOnline =
-        dynamic_cast<R3BIncomingTrackingOnlineSpectra*>(FairRunOnline::Instance()->GetTask("IncomingTrackingOnlineSpectra"));
+    fIncomingTrackingOnline = dynamic_cast<R3BIncomingTrackingOnlineSpectra*>(
+        FairRunOnline::Instance()->GetTask("IncomingTrackingOnlineSpectra"));
     R3BLOG_IF(warn, !fIncomingTrackingOnline, "IncomingTrackingOnlineSpectra not found");
 
     // Looking for Incoming Tracking online

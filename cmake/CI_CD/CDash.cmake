@@ -22,6 +22,6 @@ cdash_build()
 
 cdash_test()
 
-ctest_submit(RETRY_COUNT 3 RETRY_DELAY 2)
+cdash_submit()
 
 print_error()

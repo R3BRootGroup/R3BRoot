@@ -89,7 +89,7 @@ void R3BMusliCalPar::putParams(FairParamList* list)
     LOG(info) << "Array size  musli position calibration: " << array_pos;
     fPosCalParams->Set(array_pos);
     list->add("musliPosCalPar", *fPosCalParams);
-    
+
     Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
     LOG(info) << "Array size  musli Multi hit calibration: " << array_mult;
     fMultHitCalParams->Set(array_pos);
@@ -158,7 +158,7 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
         LOG(error) << "Could not initialize musliPosCalPar";
         return kFALSE;
     }
-    
+
     if (!list->fill("musliNumParamsMultHitPar", &fNumParamsMultHit))
     {
         LOG(error) << "Could not initialize musliNumParamsMultHitPar";
@@ -207,7 +207,7 @@ void R3BMusliCalPar::printParams()
             LOG(info) << "FitParam(" << j << ") = " << fPosCalParams->GetAt(i * fNumParamsPosFit + j);
         }
     }
-    
+
     R3BLOG(info, "Musli anode parameters for multi hit calibration");
     R3BLOG(info, "Nb of multi hit parameter per signal: " << fNumParamsMultHit);
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)

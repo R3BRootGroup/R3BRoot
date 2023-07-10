@@ -348,8 +348,9 @@ Bool_t R3BSci2Reader::R3BRead()
                 uint32_t pmtid_TC = data->SCITWO_VTCMI[pmmult];
                 if (pmtid_TF != pmtid_TC)
                 {
-                    LOG(error) << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
-                                  "and TC for SofSci !";
+                    LOG(error)
+                        << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
+                           "and TC for SofSci !";
                 }
                 uint32_t nextChannelStart = data->SCITWO_VTFME[pmmult];
                 // put the mapped items {det,pmt,finetime, coarsetime} one after the other in the fArray

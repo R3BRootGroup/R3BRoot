@@ -40,10 +40,10 @@
 #include "R3BTraPoint.h"
 
 #define SQR(x) ((x) * (x))
-//#define U_MEV_C2 931.494
-//#define MASS_PROTON_MEV_C2 938.279
-//#define MASS_17NE_MEV_C2   15846.9
-//#define MASS_15O_MEV_C2    13971.3
+// #define U_MEV_C2 931.494
+// #define MASS_PROTON_MEV_C2 938.279
+// #define MASS_17NE_MEV_C2   15846.9
+// #define MASS_15O_MEV_C2    13971.3
 ////#define MASS_PROTON_MEV_C2 938.272046
 ////#define MASS_17NE_MEV_C2   29796.65565  //Ar
 ////#define MASS_15O_MEV_C2    27922.79434  //S

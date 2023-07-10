@@ -19,14 +19,11 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class Neuland::Digitizing::PMTHit+;
-#pragma link C++ class Neuland::Digitizing::Channel+;
-#pragma link C++ class Neuland::Digitizing::Paddle+;
-#pragma link C++ class Neuland::DigitizingEngine+;
-#pragma link C++ class Neuland::TacQuila::Channel+;
-#pragma link C++ class Neuland::DigitizingTacQuila+;
-#pragma link C++ class Neuland::Tamex::Channel+;
-#pragma link C++ class Neuland::DigitizingTamex+;
+#pragma link C++ class R3B::Digitizing::Channel+;
+#pragma link C++ class R3B::Digitizing::Paddle+;
+#pragma link C++ class R3B::Digitizing::Neuland::NeulandPaddle+;
+#pragma link C++ class R3B::Digitizing::Neuland::TacQuila::Channel+;
+#pragma link C++ class R3B::Digitizing::Neuland::Tamex::Channel+;
 #pragma link C++ class R3BNeulandHitMon+;
 #pragma link C++ class R3BNeulandDigitizer+;
 

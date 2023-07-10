@@ -46,8 +46,8 @@ namespace
         };
 
         auto clusterer = Neuland::ClusteringEngine<DummyDigi>();
-        clusterer.SetClusteringCondition(
-            [](const DummyDigi& a, const DummyDigi& b) { return std::abs(b.a - a.a) <= 1; });
+        clusterer.SetClusteringCondition([](const DummyDigi& one, const DummyDigi& another)
+                                         { return std::abs(another.a - one.a) <= 1; });
 
         std::vector<DummyDigi> digis{ 28, 13, 23, 22, 15, 16, 3, 6, 4, 26, 10, 11, 19, 8, 29, 12, 25, 30, 17, 18, 24 };
         std::vector<std::vector<DummyDigi>> clusters = clusterer.Clusterize(digis);
@@ -74,9 +74,3 @@ namespace
     }
 
 } // namespace
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

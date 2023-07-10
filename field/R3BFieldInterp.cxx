@@ -117,7 +117,7 @@ double R3BFieldInterp::interp(int ic[3], double dc[3] /*,int &outside*/)
         ic0[i] = ic[i];
         ic1[i] = ic[i] + 1;
 
-//#define RETNAN return NAN
+// #define RETNAN return NAN
 #define RETNAN
 
         if (ic0[i] < 0)
