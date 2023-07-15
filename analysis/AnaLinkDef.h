@@ -47,5 +47,6 @@
 #pragma link C++ class R3BFibervsTofDOnlineSpectra+;
 #pragma link C++ class R3BGeneralOnlineSpectra+;
 #pragma link C++ class R3BIncomingIDOnlineSpectra+;
+#pragma link C++ class R3BOnlineJuelich2023+;
 
 #endif

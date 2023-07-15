@@ -102,7 +102,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     // Create histograms for all the detectors
     // Energy range for strips
     Double_t binsE = 3000;
-    Double_t minE = 0;
+    Double_t minE = -10;
     Double_t maxE = 3000;
 
     char Name1[255];
@@ -116,7 +116,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     mainfol->Add(mapfol);
 
     auto cMap = new TCanvas("FOOT_mapped", "mapped info", 10, 10, 500, 500);
-    cMap->Divide(4, 3);
+    cMap->Divide(2, 1);
     mapfol->Add(cMap);
 
     //================  Mapped data =====================
@@ -152,7 +152,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     //============ CAL data ==================
 
     auto cCal = new TCanvas("FOOT_cal", "cal info", 10, 10, 500, 500);
-    cCal->Divide(4, 3);
+    cCal->Divide(2, 1);
     calfol->Add(cCal);
 
     if (fCalItems)
@@ -191,8 +191,8 @@ InitStatus R3BFootOnlineSpectra::Init()
     //================ HIT data ==========================
 
     auto cHit = new TCanvas("FOOT_hit", "hit info", 10, 10, 500, 500);
-    cHit->Divide(3, 2);
-    hitfol->Add(cHit);
+    cHit->Divide(2, 2);
+
     if (fHitItems)
     {
         i_pad = 1; // pad iterator
@@ -208,6 +208,7 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
             fh1_pos[i]->GetXaxis()->CenterTitle(true);
             fh1_pos[i]->GetYaxis()->CenterTitle(true);
+            fh1_pos[i]->SetFillColor(31);
             sprintf(Name1, "fh1_ene_det_%d", i + 1);
             sprintf(Name2, "Cluster energy for FOOT Det: %d", i + 1);
             fh1_ene[i] = new TH1F(Name1, Name2, binsE, minE, maxE);
@@ -216,40 +217,38 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_ene[i]->GetYaxis()->SetTitleOffset(1.4);
             fh1_ene[i]->GetXaxis()->CenterTitle(true);
             fh1_ene[i]->GetYaxis()->CenterTitle(true);
-
-            int foot_num = i + 1;
-            if (foot_num == 2 || foot_num == 4 || foot_num == 11)
-            {
-                cHit->cd(i_pad);
-                fh1_pos[i]->Draw();
-                hitfol->Add(fh1_pos[i]);
-                i_pad++;
-                cHit->cd(i_pad);
-                fh1_ene[i]->Draw();
-                hitfol->Add(fh1_ene[i]);
-                i_pad++;
-                hitfol->Add(fh1_pos[i]);
-            }
+            fh1_ene[i]->SetFillColor(31);
+            cHit->cd(i_pad);
+            fh1_pos[i]->Draw();
+            hitfol->Add(fh1_pos[i]);
+            i_pad++;
+            cHit->cd(i_pad);
+            fh1_ene[i]->Draw();
+            hitfol->Add(fh1_ene[i]);
+            i_pad++;
         }
+        hitfol->Add(cHit);
     }
 
     auto cInBeam = new TCanvas("FOOT_inBeam", "inBeam info", 10, 10, 500, 500);
-    cInBeam->Divide(3, 2);
+    cInBeam->Divide(2, 2);
 
     if (fHitItems)
     {
+        hitfol->Add(cInBeam);
         fh1_mult.resize(fNbDet);
         fh2_BeamSpot = new TH2F("BeamSpot", "BeamSpot", 600, -50., 50., 600, -50., 50.);
-        fh2_BeamSpot->GetYaxis()->SetTitle("Position [mm]");
+        fh2_BeamSpot->GetXaxis()->SetTitle("Position X [mm]");
+        fh2_BeamSpot->GetYaxis()->SetTitle("Position Y [mm]");
         fh2_BeamSpot->GetYaxis()->SetTitleOffset(1.4);
         fh2_BeamSpot->GetXaxis()->CenterTitle(true);
         fh2_BeamSpot->GetYaxis()->CenterTitle(true);
-        cInBeam->cd(1);
+        cInBeam->cd(3);
         fh2_BeamSpot->Draw("colz");
 
         fh2_BeamSpotE = new TH2F("BeamSpotEnergy", "BeamSpotEnergy", binsE, minE, maxE, binsE, minE, maxE);
-        fh2_BeamSpotE->GetXaxis()->SetTitle("Energy [ch]");
-        fh2_BeamSpotE->GetYaxis()->SetTitle("Energy [ch]");
+        fh2_BeamSpotE->GetXaxis()->SetTitle("Energy-X [ch]");
+        fh2_BeamSpotE->GetYaxis()->SetTitle("Energy-Y [ch]");
         fh2_BeamSpotE->GetYaxis()->SetTitleOffset(1.4);
         fh2_BeamSpotE->GetXaxis()->CenterTitle(true);
         fh2_BeamSpotE->GetYaxis()->CenterTitle(true);
@@ -265,11 +264,12 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_mult[i]->GetYaxis()->SetTitleOffset(1.4);
             fh1_mult[i]->GetXaxis()->CenterTitle(true);
             fh1_mult[i]->GetYaxis()->CenterTitle(true);
+            fh1_mult[i]->SetFillColor(31);
         }
+        cInBeam->cd(1);
+        fh1_mult[0]->Draw();
         cInBeam->cd(2);
         fh1_mult[1]->Draw();
-        cInBeam->cd(3);
-        fh1_mult[3]->Draw();
     }
     if (fCalItems)
     {
@@ -361,7 +361,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         auto nHits = fHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFootHitData* hit = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
+            auto hit = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
@@ -378,33 +378,10 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
                     continue;
                 if (!hitJ)
                     continue;
-                if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
-                    (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
+                if ((hitI->GetDetId() == 1 && hitJ->GetDetId() == 2))
                 {
-                    if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
-                    {
-                        fh2_BeamSpot->Fill(hitI->GetPos(), hitJ->GetPos());
-                        fh2_BeamSpotE->Fill(hitI->GetEnergy(), hitJ->GetEnergy());
-                    }
-                    else
-                    {
-                        fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
-                        fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
-                        if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
-                            (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
-                        {
-                            if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
-                            {
-                                fh2_BeamSpot->Fill(hitI->GetPos(), hitJ->GetPos());
-                                fh2_BeamSpotE->Fill(hitI->GetEnergy(), hitJ->GetEnergy());
-                            }
-                            else
-                            {
-                                fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
-                                fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
-                            }
-                        }
-                    }
+                    fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
+                    fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
                 }
             }
         }

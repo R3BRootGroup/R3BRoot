@@ -86,6 +86,8 @@
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
 #pragma link C++ class EXT_STR_h101_FIB_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBZERO_onion_t;
+#pragma link C++ class EXT_STR_h101_FIBSIXTY_onion_t;
+#pragma link C++ class EXT_STR_h101_FIBSIXTYONE_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBONEA_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBONEB_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBTHREEA_onion_t;

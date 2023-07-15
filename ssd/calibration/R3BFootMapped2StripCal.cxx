@@ -46,7 +46,7 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
     , NumStrips(640)
     , NumParams(2)
     , MaxSigma(5)
-    , fTimesSigma(3.)
+    , fTimesSigma(1.)
     , fNStrip(250.)
     , CalParams(NULL)
     , fCal_Par(NULL)
@@ -104,7 +104,7 @@ void R3BFootMapped2StripCal::SetParameter()
         Int_t numdeadstrips = 0;
         for (Int_t i = 0; i < NumStrips; i++)
         {
-            if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
+            if (CalParams->GetAt(NumParams * i + NumStrips * d * NumParams) == -1)
                 numdeadstrips++;
         }
         LOG(info) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
@@ -225,7 +225,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
             sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
         }
 
-        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId];
+        energy = mappedData[i]->GetEnergy() - pedestal; // - Ave[detId];
 
         // only use strips with signal below threshold for correction
         if (energy < fTimesSigma * sigma)
@@ -259,9 +259,9 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 
         Int_t ASIC1 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC1];
+        energy = mappedData[i]->GetEnergy() - pedestal; // - Ave[detId] - AveASIC[detId][ASIC1];
 
-        if (energy > 0. && pedestal != -1)
+        if (energy > fTimesSigma * sigma && pedestal != -1)
         {
             StripCounter[detId]++;
         }
@@ -277,13 +277,15 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
         {
             pedestal = CalParams->GetAt(NumParams * stripId + detId * NumParams * NumStrips);
             sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
+
+            // std::cout<<detId<<" "<<stripId<<" "<<pedestal<<" "<<sigma<<std::endl;
         }
 
         Int_t ASIC3 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC3];
+        energy = mappedData[i]->GetEnergy() - pedestal; // - Ave[detId] - AveASIC[detId][ASIC3];
 
-        if (energy > fTimesSigma * sigma && pedestal != -1 && StripCounter[detId] < fNStrip)
+        if (energy > fTimesSigma * sigma && pedestal != -1)
         {
             AddCalData(detId + 1, stripId + 1, energy);
         }
