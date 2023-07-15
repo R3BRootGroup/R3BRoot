@@ -49,6 +49,8 @@ class R3BFootSiReader : public R3BReader
 
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
+    
+    void SetNbDetectors(Int_t n) { fNbDet=n; }
 
   private:
     // An event counter

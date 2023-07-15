@@ -78,7 +78,7 @@ Bool_t R3BFootSiReader::R3BRead()
         {
             for (Int_t strip = 0; strip < fData->FOOT[d]._; ++strip)
             {
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1, strip + 1, fData->FOOT[d].E[strip]);
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BFootMappedData(d + 1-14, strip + 1, fData->FOOT[d].E[strip]);
             }
         }
         else if (fData->FOOT[d]._ == 0)

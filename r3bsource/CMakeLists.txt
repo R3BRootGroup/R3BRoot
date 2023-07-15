@@ -167,6 +167,8 @@ Set(STRUCT_HEADERS
 ./beammonitor/ext_h101_bmon.h
 ./fibers/ext_h101_fib.h
 ./fibers/ext_h101_fibzero.h
+./fibers/ext_h101_fibsixty.h
+./fibers/ext_h101_fibsixtyone.h
 ./fibers/ext_h101_fibonea.h
 ./fibers/ext_h101_fiboneb.h
 ./fibers/ext_h101_fibthreea.h

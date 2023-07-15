@@ -373,28 +373,16 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 
             Double_t pos = 100. * ClusterPos[i][j] / 640. - 50.;
 
-            if (fAnglePhi[i] == 0.)
-            { // X-Foot (StripId numbered from left to right)
-                x = pos * TMath::Cos(fAngleTheta[i] * TMath::DegToRad()) + fOffsetX[i];
-                y = fOffsetY[i];
-                z = pos * TMath::Sin(fAngleTheta[i] * TMath::DegToRad()) + fDistTarget[i];
-            }
-            else if (fAnglePhi[i] == 90.)
-            { // Y-Foot (StripId numbered from bottom to top)
+            if (i == 0)
+            { // Y-Foot (StripId numbered from left to right)
                 x = fOffsetX[i];
                 y = pos + fOffsetY[i];
                 z = fDistTarget[i];
             }
-            else if (fAnglePhi[i] == 180.)
-            { // X-Foot (StripId numbered from right to left)
-                x = -pos * TMath::Cos(fAngleTheta[i] * TMath::DegToRad()) + fOffsetX[i];
+            else if (i == 1)
+            { // X-Foot (StripId numbered from bottom to top)
+                x = pos + fOffsetX[i];
                 y = fOffsetY[i];
-                z = -pos * TMath::Sin(fAngleTheta[i] * TMath::DegToRad()) + fDistTarget[i];
-            }
-            else if (fAnglePhi[i] == 270.)
-            { // Y-Foot (StripId numbered from top to bottom)
-                x = fOffsetX[i];
-                y = -pos + fOffsetY[i];
                 z = fDistTarget[i];
             }
             else
@@ -425,6 +413,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     if (calData)
         delete[] calData;
     // delete ss;
+
     return;
 }
 

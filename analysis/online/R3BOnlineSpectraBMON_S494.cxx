@@ -146,10 +146,12 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     cTrigg->Divide(2, 1);
     cTrigg->cd(1);
     gPad->SetLogy();
+    fh_Trigger->SetFillColor(31);
     fh_Trigger->Draw();
     cTrigg->cd(2);
     gPad->SetLogy();
     fh_Tpat->Draw();
+    fh_Tpat->SetFillColor(31);
     cTrigg->cd(0);
 
     //------------------------------------------------------------------------
@@ -158,7 +160,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
     if (fMappedItems.at(DET_ROLU))
     {
         TCanvas* cROLU = new TCanvas("ROLU", "ROLU", 10, 10, 650, 350);
-        fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT", 10, 0, 10, 600, 0, 300);
+        fh_rolu_tot = new TH2F("Rolu_tot", "PMT ToT", 6, 0, 6, 600, 0, 300);
         fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
         fh_rolu_tot->GetXaxis()->CenterTitle(true);
@@ -168,21 +170,43 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_rolu_tof->GetXaxis()->SetTitle("Channel number");
         fh_rolu_tof->GetYaxis()->SetTitle("Rolu time / ns");
 
-        fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels", 6, 0, 6);
+        fh_rolu_channels = new TH1F("Rolu_channels", "PMT channels", 6, 0, 6);
         fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
         fh_rolu_channels->GetYaxis()->SetTitle("Counts");
         fh_rolu_channels->SetFillColor(31);
         fh_rolu_channels->GetXaxis()->CenterTitle(true);
         fh_rolu_channels->GetYaxis()->CenterTitle(true);
+        
+        fsci_channels = new TH1F("SCI_channels", "SCI rates", 3, 0.5, 3.5);
+        fsci_channels->GetXaxis()->SetTitle("SCI number");
+        fsci_channels->GetYaxis()->SetTitle("Counts");
+        fsci_channels->SetFillColor(31);
+        fsci_channels->GetXaxis()->CenterTitle(true);
+        fsci_channels->GetYaxis()->CenterTitle(true);
+        fsci_channels->GetXaxis()->SetBinLabel(1, "Sci1");
+        fsci_channels->GetXaxis()->SetBinLabel(2, "Sci2");
+        fsci_channels->GetXaxis()->SetBinLabel(3, "Sci1 & Sci2");
+        
+        fsci_pos = new TH1F("SCI_position", "SCI position", 2400, -200, 200);
+        fsci_pos->GetXaxis()->SetTitle("Position");
+        fsci_pos->GetYaxis()->SetTitle("Counts");
+        fsci_pos->SetFillColor(31);
+        fsci_pos->GetXaxis()->CenterTitle(true);
+        fsci_pos->GetYaxis()->CenterTitle(true);
 
-        cROLU->Divide(1, 2);
+        cROLU->Divide(2, 2);
         cROLU->cd(1);
         fh_rolu_channels->Draw();
         cROLU->cd(2);
         fh_rolu_tot->Draw("colz");
+        cROLU->cd(3);
+        fsci_channels->Draw();
+        cROLU->cd(4);
+        fsci_pos->Draw();
 
         auto mainfolRolu = new TFolder("ROLU", "ROLU info");
         mainfolRolu->Add(cROLU);
+        mainfolRolu->Add(cTrigg);
 
         run->AddObject(mainfolRolu);
         run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
@@ -300,6 +324,8 @@ void R3BOnlineSpectraBMON_S494::Reset_ROLU_Histo()
 {
     fh_rolu_channels->Reset();
     fh_rolu_tot->Reset();
+    fsci_channels->Reset();
+    fsci_pos->Reset();
     fh_Trigger->Reset();
     fh_Tpat->Reset();
     if (fHitItems.at(DET_TOFD))
@@ -416,7 +442,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     {
         auto det = fMappedItems.at(DET_ROLU);
         Int_t nHits = det->GetEntriesFast();
-
+        bool ch_active[4]={false};
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(det->At(ihit));
@@ -426,12 +452,23 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             // channel numbers are stored 1-based (1..n)
             Int_t iDet = hit->GetDetector(); // 1..
             Int_t iCha = hit->GetChannel();  // 1..
+            
+            ch_active[iCha-1]=true;
 
             if (iDet < 2)
                 fh_rolu_channels->Fill(iCha); // ROLU 1
             if (iDet > 1)
                 fh_rolu_channels->Fill(iCha + 4); // ROLU 2
         }
+        
+        if (ch_active[0]==true&&ch_active[1]==true)
+                    fsci_channels->Fill(1);
+                    
+        if (ch_active[2]==true&&ch_active[3]==true)
+                    fsci_channels->Fill(2);
+                    
+        if (ch_active[0]==true&&ch_active[1]==true&&ch_active[2]==true&&ch_active[3]==true)
+                    fsci_channels->Fill(3);      
     }
 
     if (fCalItems.at(DET_ROLU))
@@ -490,11 +527,12 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
                     }
 
-                    if (iDet < 2)
-                        fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
-                    if (iDet > 1)
-                        fh_rolu_tot->Fill(iCha + 5, totRolu[iPart][iDet - 1][iCha]);
+                    fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);     
                 }
+                
+                if(timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0.)
+                    fsci_pos->Fill( timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0]);// positive right side
+                
 
                 if (!calData)
                 {
@@ -653,6 +691,8 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     {
         fh_rolu_channels->Write();
         fh_rolu_tot->Write();
+        fsci_channels->Write();
+        fsci_pos->Write();
         if (fHitItems.at(DET_TOFD))
             fh_rolu_tof->Write();
     }
