@@ -23,6 +23,7 @@
  */
 #include "R3BOnlineSpectraBMON_S494.h"
 
+#include "R3BFootHitData.h"
 #include "R3BRoluCalData.h"
 #include "R3BRoluHitData.h"
 #include "R3BRoluMappedData.h"
@@ -81,6 +82,7 @@ R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494()
 
 R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fFootHitItems(NULL)
     , fTrigger(-1)
     , fTpat1(-1)
     , fTpat2(-1)
@@ -130,6 +132,11 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fHitItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(Form("%sHit", fDetectorNames[det]))));
     }
     maxevent = mgr->CheckMaxEventNo();
+
+    // Get access to FOOTHit data
+    fFootHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootHitData"));
+    if (!fFootHitItems)
+        LOG(warn) << "R3BOnlineSpectraBMON_S494::FootHitData not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -221,9 +228,16 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         cROLU->cd(6);
         fsci_posXZ->Draw("colz");
 
+        fscifoot_posXcor = new TH2F("SCI_Foot_cor", "SCI1-X vs Foot-X", 400., -50., 50., 400, -50., 50.);
+        fscifoot_posXcor->GetXaxis()->SetTitle("Position-X SCI-1 [mm]");
+        fscifoot_posXcor->GetYaxis()->SetTitle("Position-X FOOT [mm]");
+        fscifoot_posXcor->GetXaxis()->CenterTitle(true);
+        fscifoot_posXcor->GetYaxis()->CenterTitle(true);
+
         auto mainfolRolu = new TFolder("ROLU", "ROLU info");
         mainfolRolu->Add(cROLU);
         mainfolRolu->Add(cTrigg);
+        mainfolRolu->Add(fscifoot_posXcor);
 
         run->AddObject(mainfolRolu);
         run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
@@ -231,8 +245,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
 
     if (fMappedItems.at(DET_BMON))
     {
-
-        // get the theoretical calib factors for SEETRAM
+        // Get the theoretical calib factors for SEETRAM
         Double_t fexp = float(fsens_SEE + 9);
         Double_t fpow = float(pow(10., fexp));
         calib_SEE = 104457.9 * fpow;
@@ -345,6 +358,7 @@ void R3BOnlineSpectraBMON_S494::Reset_ROLU_Histo()
     fsci_pos1->Reset();
     fsci_pos2->Reset();
     fsci_posXZ->Reset();
+    fscifoot_posXcor->Reset();
     fh_Trigger->Reset();
     fh_Tpat->Reset();
     if (fHitItems.at(DET_TOFD))
@@ -492,6 +506,25 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
     if (fCalItems.at(DET_ROLU))
     {
+        // Fill hit data
+        float xfoot = NAN;
+        if (fFootHitItems && fFootHitItems->GetEntriesFast() > 0)
+        {
+            auto nHits = fFootHitItems->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = dynamic_cast<R3BFootHitData*>(fFootHitItems->At(ihit));
+                if (!hit)
+                {
+                    continue;
+                }
+                if (hit->GetDetId() == 2)
+                {
+                    xfoot = hit->GetPos();
+                    break;
+                }
+            }
+        }
         Int_t nParts = 0;
         auto det = fCalItems.at(DET_ROLU);
         nParts = det->GetEntriesFast();
@@ -549,9 +582,13 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
                 }
 
-                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0.)
-                    fsci_pos1->Fill(fA1 +
-                                    fS1 * (timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0])); // positive right side
+                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0. && xfoot)
+                {
+                    // positive -> left side
+                    float x1 = fA1 + fS1 * (timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0]);
+                    fsci_pos1->Fill(x1);
+                    fscifoot_posXcor->Fill(x1, xfoot);
+                }
 
                 if (timeRolu_L[iPart][0][2] > 0. && timeRolu_L[iPart][0][3] > 0.)
                     fsci_pos2->Fill(fA2 +
@@ -730,6 +767,7 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fsci_pos1->Write();
         fsci_pos2->Write();
         fsci_posXZ->Write();
+        fscifoot_posXcor->Write();
         if (fHitItems.at(DET_TOFD))
             fh_rolu_tof->Write();
     }
