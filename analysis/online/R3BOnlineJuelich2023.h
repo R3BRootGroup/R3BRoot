@@ -23,7 +23,7 @@ class TH1F;
 class TH2F;
 class R3BEventHeader;
 
-#define N_PLANE_MAX_PDC 4 
+#define N_PLANE_MAX_PDC 4
 /**
  * This taks reads all detector data items and plots histograms
  * for online checks.
@@ -88,13 +88,14 @@ class R3BOnlineJuelich2023 : public FairTask
     void Reset_Fi60_Histo();
     void Reset_Fi61_Histo();
     void Reset_Fi61vsFi60_Histo();
+
   private:
     TClonesArray* fMappedItems_rolu; /**< Array with Cal items - input data. */
     TClonesArray* fCalItems_rolu;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems_rolu;    /**< Array with Cal items - input data. */
-    TClonesArray* fMappedItems_fi0; /**< Array with Cal items - input data. */
-    TClonesArray* fCalItems_fi0;    /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems_fi0;    /**< Array with Cal items - input data. */
+    TClonesArray* fMappedItems_fi0;  /**< Array with Cal items - input data. */
+    TClonesArray* fCalItems_fi0;     /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems_fi0;     /**< Array with Cal items - input data. */
     TClonesArray* fMappedItems_fi60; /**< Array with Cal items - input data. */
     TClonesArray* fCalItems_fi60;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems_fi60;    /**< Array with Cal items - input data. */
@@ -108,7 +109,7 @@ class R3BOnlineJuelich2023 : public FairTask
     Int_t fTpat;
     Int_t fSamp;
     Int_t fNEvents;
-	Double_t ClockFreq = 5.;    
+    Double_t ClockFreq = 5.;
     Int_t totalFi0 = 0;
     Int_t triggerCountsFi0 = 0;
     Int_t detectedFi0 = 0;
@@ -143,7 +144,7 @@ class R3BOnlineJuelich2023 : public FairTask
     TH2F* fh_fi0_cor;
     TH2F* fh_fi0_eff;
     TH2F* fh_fi0_eff_vs_time;
-    
+
     TH1F* fh_fi60_fiber;
     TH1F* fh_fi60_mult;
     TH2F* fh_fi60_Tot;
@@ -153,7 +154,7 @@ class R3BOnlineJuelich2023 : public FairTask
     TH1F* fh_fi60_mult_mc;
     TH2F* fh_fi60_Tot_mc;
     TH2F* fh_fi60_Tot_ave;
-    TH2F* fh_fi60_Time_mc;    
+    TH2F* fh_fi60_Time_mc;
     TH2F* fh_fi60_pdc;
     TH2F* fh_fi60_pdc_time;
     TH2F* fh_fi60_pdc_eloss;
@@ -172,7 +173,7 @@ class R3BOnlineJuelich2023 : public FairTask
     TH2F* fh_fi61_Tot_mc;
     TH2F* fh_fi61_Tot_ave;
     TH2F* fh_fi61_Time_mc;
-    
+
     TH2F* fh_fi61_pdc;
     TH2F* fh_fi61_pdc_time;
     TH2F* fh_fi61_pdc_eloss;
@@ -180,12 +181,12 @@ class R3BOnlineJuelich2023 : public FairTask
     TH2F* fh_fi61_cor;
     TH2F* fh_fi61_eff;
     TH2F* fh_fi61_eff_vs_time;
-    
+
     TH2F* fh_fi61_vs_fi60_tot;
     TH2F* fh_fi61_vs_fi60_fibers;
     TH2F* fh_fi60_vs_fi0_fibers;
     TH2F* fh_fi61_vs_fi0_fibers;
-    
+
   public:
     ClassDef(R3BOnlineJuelich2023, 2)
 };
