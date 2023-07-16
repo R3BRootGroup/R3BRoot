@@ -49,6 +49,7 @@
 #include "TH2F.h"
 #include "THttpServer.h"
 #include "TMath.h"
+#include "TRandom.h"
 #include <vector>
 #define IS_NAN(x) TMath::IsNaN(x)
 
@@ -187,18 +188,24 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fsci_channels->GetXaxis()->SetBinLabel(3, "Sci1 & Sci2");
 
         fsci_pos1 = new TH1F("SCI1_position", "SCI-1 position", 2400, -200, 200);
-        fsci_pos1->GetXaxis()->SetTitle("Position");
+        fsci_pos1->GetXaxis()->SetTitle("Position X [mm]");
         fsci_pos1->GetYaxis()->SetTitle("Counts");
         fsci_pos1->SetFillColor(31);
         fsci_pos1->GetXaxis()->CenterTitle(true);
         fsci_pos1->GetYaxis()->CenterTitle(true);
 
         fsci_pos2 = new TH1F("SCI2_position", "SCI-2 position", 2400, -200, 200);
-        fsci_pos2->GetXaxis()->SetTitle("Position");
+        fsci_pos2->GetXaxis()->SetTitle("Position X [mm]");
         fsci_pos2->GetYaxis()->SetTitle("Counts");
         fsci_pos2->SetFillColor(31);
         fsci_pos2->GetXaxis()->CenterTitle(true);
         fsci_pos2->GetYaxis()->CenterTitle(true);
+
+        fsci_posXZ = new TH2F("SCI_tracking", "Tracking XZ", 1430. * 2., -30., 1400., 700, -80., 80.);
+        fsci_posXZ->GetXaxis()->SetTitle("Position-Z [mm]");
+        fsci_posXZ->GetYaxis()->SetTitle("Position-X [mm]");
+        fsci_posXZ->GetXaxis()->CenterTitle(true);
+        fsci_posXZ->GetYaxis()->CenterTitle(true);
 
         cROLU->Divide(3, 2);
         cROLU->cd(1);
@@ -211,6 +218,8 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fsci_channels->Draw();
         cROLU->cd(5);
         fsci_pos2->Draw();
+        cROLU->cd(6);
+        fsci_posXZ->Draw("colz");
 
         auto mainfolRolu = new TFolder("ROLU", "ROLU info");
         mainfolRolu->Add(cROLU);
@@ -335,6 +344,7 @@ void R3BOnlineSpectraBMON_S494::Reset_ROLU_Histo()
     fsci_channels->Reset();
     fsci_pos1->Reset();
     fsci_pos2->Reset();
+    fsci_posXZ->Reset();
     fh_Trigger->Reset();
     fh_Tpat->Reset();
     if (fHitItems.at(DET_TOFD))
@@ -547,6 +557,19 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fsci_pos2->Fill(fA2 +
                                     fS2 * (timeRolu_L[iPart][0][3] - timeRolu_L[iPart][0][2])); // positive left side
 
+                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0. && timeRolu_L[iPart][0][2] > 0. &&
+                    timeRolu_L[iPart][0][3] > 0.)
+                {
+                    float x1 = fA1 + fS1 * (timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0]);
+                    float x2 = fA2 + fS2 * (timeRolu_L[iPart][0][3] - timeRolu_L[iPart][0][2]);
+                    float angle = (x2 - x1) / 1385.;
+                    for (int ev = 0; ev < 15; ev++)
+                    {
+                        float ztrack = gRandom->Uniform(0., 1400.);
+                        fsci_posXZ->Fill(ztrack, x1 + angle * ztrack);
+                    }
+                }
+
                 if (!calData)
                 {
                     cout << "Rolu !calData" << endl;
@@ -671,7 +694,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
 void R3BOnlineSpectraBMON_S494::FinishEvent()
 {
-
     for (Int_t det = 0; det < DET_MAX; det++)
     {
         if (fMappedItems.at(det))
@@ -707,6 +729,7 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
         fsci_channels->Write();
         fsci_pos1->Write();
         fsci_pos2->Write();
+        fsci_posXZ->Write();
         if (fHitItems.at(DET_TOFD))
             fh_rolu_tof->Write();
     }
