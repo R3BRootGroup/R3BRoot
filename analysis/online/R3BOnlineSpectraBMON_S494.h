@@ -187,7 +187,8 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     Double_t counts_SEE = 0;
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
-    unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0, fNSpills = 0; /**< Event counter. */
+    unsigned long fNEvents = 0, fNEvents_start = 0, fNEventsRolu = 0, fNEventsScisFoot = 0,
+                  fNSpills = 0; /**< Event counter. */
 
     TH1F* fh_Tpat;
     TH1F* fh_spill_length;

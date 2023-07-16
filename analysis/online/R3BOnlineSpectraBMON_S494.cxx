@@ -501,7 +501,10 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             fsci_channels->Fill(2);
 
         if (ch_active[0] == true && ch_active[1] == true && ch_active[2] == true && ch_active[3] == true)
+        {
             fsci_channels->Fill(3);
+            fNEventsRolu += 1;
+        }
     }
 
     if (fCalItems.at(DET_ROLU))
@@ -531,7 +534,6 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
 
         if (nParts > 0)
         {
-            fNEventsRolu += 1;
             Int_t iDet = 0;
             /*
              * Note: double x[nParts][2][4]={NAN};
@@ -582,12 +584,16 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                     fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
                 }
 
-                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0. && xfoot)
+                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0.)
                 {
                     // positive -> left side
                     float x1 = fA1 + fS1 * (timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0]);
                     fsci_pos1->Fill(x1);
-                    fscifoot_posXcor->Fill(x1, xfoot);
+                    if (xfoot && timeRolu_L[iPart][0][2] > 0. && timeRolu_L[iPart][0][3] > 0.)
+                    {
+                        fscifoot_posXcor->Fill(x1, xfoot);
+                        fNEventsScisFoot++;
+                    }
                 }
 
                 if (timeRolu_L[iPart][0][2] > 0. && timeRolu_L[iPart][0][3] > 0.)
@@ -753,7 +759,9 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
     R3BLOG(info,
            "\n"
                << "nEvents total " << fNEvents << "\n"
-               << "nEvents Rolu " << fNEventsRolu << "\n"
+               << "nEvents SCI1&SCI2 " << fNEventsRolu << "\n"
+               << "nEvents SCI1&SCI2&Foot " << fNEventsScisFoot << "\n"
+               << "FOOT eff. " << fNEventsScisFoot * 1.0 / (1.0 * fNEventsRolu) << "\n"
                << "Time_start      : " << time_begin << "\n"
                << "Time end        : " << time_end << "\n"
                << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec \n"
