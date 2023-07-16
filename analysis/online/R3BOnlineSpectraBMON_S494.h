@@ -125,6 +125,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
+    TClonesArray* fFootHitItems;
 
     float fA1, fA2, fS1, fS2;
 
@@ -214,6 +215,8 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fsci_pos1;
     TH1F* fsci_pos2;
     TH2F* fsci_posXZ;
+
+    TH2F* fscifoot_posXcor;
 
     TH2F* fh_rolu_tot;
     TH2F* fh_rolu_tof;
