@@ -371,7 +371,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
         for (Int_t j = 0; j < ClusterMult[i]; j++)
         {
 
-            Double_t pos = 100. * ClusterPos[i][j] / 640. - 50.;
+            Double_t pos = 50. - 100. * ClusterPos[i][j] / 640.;
 
             if (i == 0)
             { // Y-Foot (StripId numbered from left to right)
