@@ -758,10 +758,10 @@ void R3BOnlineSpectraBMON_S494::FinishTask()
 {
     R3BLOG(info,
            "\n"
-               << "nEvents total " << fNEvents << "\n"
-               << "nEvents SCI1&SCI2 " << fNEventsRolu << "\n"
-               << "nEvents SCI1&SCI2&Foot " << fNEventsScisFoot << "\n"
-               << "FOOT eff. " << fNEventsScisFoot * 1.0 / (1.0 * fNEventsRolu) << "\n"
+               << "nEvents total : " << fNEvents << "\n"
+               << "nEvents SCI1&SCI2 : " << fNEventsRolu << "\n"
+               << "nEvents SCI1&SCI2&Foot : " << fNEventsScisFoot << "\n"
+               << "FOOT eff. : " << fNEventsScisFoot * 1.0 / (1.0 * fNEventsRolu) << "\n"
                << "Time_start      : " << time_begin << "\n"
                << "Time end        : " << time_end << "\n"
                << "Time duration   : " << (double)(time_end - time_begin) / 1.e9 << " sec \n"
