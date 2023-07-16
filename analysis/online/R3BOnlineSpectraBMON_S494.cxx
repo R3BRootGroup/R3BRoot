@@ -85,15 +85,14 @@ R3BOnlineSpectraBMON_S494::R3BOnlineSpectraBMON_S494(const char* name, Int_t iVe
     , fTpat2(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
+    , fA1(0.)
+    , fA2(0.)
+    , fS1(1.)
+    , fS2(1.)
 {
 }
 
-R3BOnlineSpectraBMON_S494::~R3BOnlineSpectraBMON_S494()
-{
-    //	delete fh_Tpat ;
-    //	delete fh_Trigger;
-    //	delete fh_SEETRAM;
-}
+R3BOnlineSpectraBMON_S494::~R3BOnlineSpectraBMON_S494() {}
 
 InitStatus R3BOnlineSpectraBMON_S494::Init()
 {
@@ -176,7 +175,7 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fh_rolu_channels->SetFillColor(31);
         fh_rolu_channels->GetXaxis()->CenterTitle(true);
         fh_rolu_channels->GetYaxis()->CenterTitle(true);
-        
+
         fsci_channels = new TH1F("SCI_channels", "SCI rates", 3, 0.5, 3.5);
         fsci_channels->GetXaxis()->SetTitle("SCI number");
         fsci_channels->GetYaxis()->SetTitle("Counts");
@@ -186,14 +185,14 @@ InitStatus R3BOnlineSpectraBMON_S494::Init()
         fsci_channels->GetXaxis()->SetBinLabel(1, "Sci1");
         fsci_channels->GetXaxis()->SetBinLabel(2, "Sci2");
         fsci_channels->GetXaxis()->SetBinLabel(3, "Sci1 & Sci2");
-        
+
         fsci_pos1 = new TH1F("SCI1_position", "SCI-1 position", 2400, -200, 200);
         fsci_pos1->GetXaxis()->SetTitle("Position");
         fsci_pos1->GetYaxis()->SetTitle("Counts");
         fsci_pos1->SetFillColor(31);
         fsci_pos1->GetXaxis()->CenterTitle(true);
         fsci_pos1->GetYaxis()->CenterTitle(true);
-        
+
         fsci_pos2 = new TH1F("SCI2_position", "SCI-2 position", 2400, -200, 200);
         fsci_pos2->GetXaxis()->SetTitle("Position");
         fsci_pos2->GetYaxis()->SetTitle("Counts");
@@ -452,7 +451,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
     {
         auto det = fMappedItems.at(DET_ROLU);
         Int_t nHits = det->GetEntriesFast();
-        bool ch_active[4]={false};
+        bool ch_active[4] = { false };
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(det->At(ihit));
@@ -462,23 +461,23 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
             // channel numbers are stored 1-based (1..n)
             Int_t iDet = hit->GetDetector(); // 1..
             Int_t iCha = hit->GetChannel();  // 1..
-            
-            ch_active[iCha-1]=true;
+
+            ch_active[iCha - 1] = true;
 
             if (iDet < 2)
                 fh_rolu_channels->Fill(iCha); // ROLU 1
             if (iDet > 1)
                 fh_rolu_channels->Fill(iCha + 4); // ROLU 2
         }
-        
-        if (ch_active[0]==true&&ch_active[1]==true)
-                    fsci_channels->Fill(1);
-                    
-        if (ch_active[2]==true&&ch_active[3]==true)
-                    fsci_channels->Fill(2);
-                    
-        if (ch_active[0]==true&&ch_active[1]==true&&ch_active[2]==true&&ch_active[3]==true)
-                    fsci_channels->Fill(3);      
+
+        if (ch_active[0] == true && ch_active[1] == true)
+            fsci_channels->Fill(1);
+
+        if (ch_active[2] == true && ch_active[3] == true)
+            fsci_channels->Fill(2);
+
+        if (ch_active[0] == true && ch_active[1] == true && ch_active[2] == true && ch_active[3] == true)
+            fsci_channels->Fill(3);
     }
 
     if (fCalItems.at(DET_ROLU))
@@ -537,14 +536,16 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                             timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
                     }
 
-                    fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);     
+                    fh_rolu_tot->Fill(iCha + 1, totRolu[iPart][iDet - 1][iCha]);
                 }
-                
-                if(timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0.)
-                    fsci_pos1->Fill( timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0]);// positive right side
-                    
-                if(timeRolu_L[iPart][0][2] > 0. && timeRolu_L[iPart][0][3] > 0.)
-                    fsci_pos2->Fill( timeRolu_L[iPart][0][3] - timeRolu_L[iPart][0][2]);// positive left side
+
+                if (timeRolu_L[iPart][0][0] > 0. && timeRolu_L[iPart][0][1] > 0.)
+                    fsci_pos1->Fill(fA1 +
+                                    fS1 * (timeRolu_L[iPart][0][1] - timeRolu_L[iPart][0][0])); // positive right side
+
+                if (timeRolu_L[iPart][0][2] > 0. && timeRolu_L[iPart][0][3] > 0.)
+                    fsci_pos2->Fill(fA2 +
+                                    fS2 * (timeRolu_L[iPart][0][3] - timeRolu_L[iPart][0][2])); // positive left side
 
                 if (!calData)
                 {

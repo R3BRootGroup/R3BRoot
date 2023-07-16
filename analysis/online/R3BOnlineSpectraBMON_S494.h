@@ -113,10 +113,20 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     void Reset_ROLU_Histo();
     void Reset_BMON_Histo();
 
+    void SetSciCalParameters(float a1, float b1, float a2, float b2)
+    {
+        fA1 = a1;
+        fA2 = a2;
+        fS1 = b1;
+        fS2 = b2;
+    }
+
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
+
+    float fA1, fA2, fS1, fS2;
 
     enum DetectorInstances
     {

@@ -82,9 +82,7 @@ R3BOnlineJuelich2023::R3BOnlineJuelich2023(const char* name, Int_t iVerbose)
 {
 }
 
-R3BOnlineJuelich2023::~R3BOnlineJuelich2023()
-{
-}
+R3BOnlineJuelich2023::~R3BOnlineJuelich2023() {}
 
 InitStatus R3BOnlineJuelich2023::Init()
 {
@@ -143,7 +141,6 @@ InitStatus R3BOnlineJuelich2023::Init()
     if (NULL == fHitItems_fi60)
         LOG(error) << "Branch Fi60Hit not found";
 
-
     fMappedItems_fi61 = (TClonesArray*)mgr->GetObject("Fi61Mapped");
     if (NULL == fMappedItems_fi61)
         LOG(error) << "Branch Fi61Mapped not found";
@@ -155,7 +152,7 @@ InitStatus R3BOnlineJuelich2023::Init()
     fHitItems_fi61 = (TClonesArray*)mgr->GetObject("Fi61Hit");
     if (NULL == fHitItems_fi61)
         LOG(error) << "Branch Fi61Hit not found";
-        
+
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
@@ -219,7 +216,7 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi0_mult->GetXaxis()->SetTitle("mult");
         fh_fi0_mult->GetYaxis()->SetTitle("Counts");
 
-        fh_fi0_Tot = new TH2F("Fi0_ToT", "Fi0 ToT", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi0_Tot = new TH2F("Fi0_ToT", "Fi0 ToT", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi0_Tot->GetXaxis()->SetTitle("Fiber");
         fh_fi0_Tot->GetYaxis()->SetTitle("ToT");
 
@@ -240,15 +237,15 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi0_mult_mc->GetXaxis()->SetTitle("mult");
         fh_fi0_mult_mc->GetYaxis()->SetTitle("Counts");
 
-        fh_fi0_Tot_mc = new TH2F("Fi0_ToT_mc", "Fi0 ToT with cuts", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi0_Tot_mc = new TH2F("Fi0_ToT_mc", "Fi0 ToT with cuts", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi0_Tot_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi0_Tot_mc->GetYaxis()->SetTitle("ToT");
 
-        fh_fi0_Tot_ave = new TH2F("Fi0_ToT_ave", "Fi0 ToT sum vs. fiber average", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi0_Tot_ave = new TH2F("Fi0_ToT_ave", "Fi0 ToT sum vs. fiber average", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi0_Tot_ave->GetXaxis()->SetTitle("Fiber");
         fh_fi0_Tot_ave->GetYaxis()->SetTitle("ToT");
 
-        fh_fi0_Time_mc = new TH2F("Fi0_Time_mc", "Fi0 time with cuts", ch, 0., ch, (int)(1000./ds), -500, 500);
+        fh_fi0_Time_mc = new TH2F("Fi0_Time_mc", "Fi0 time with cuts", ch, 0., ch, (int)(1000. / ds), -500, 500);
         fh_fi0_Time_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi0_Time_mc->GetYaxis()->SetTitle("time");
 
@@ -318,7 +315,7 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi60_mult->GetXaxis()->SetTitle("mult");
         fh_fi60_mult->GetYaxis()->SetTitle("Counts");
 
-        fh_fi60_Tot = new TH2F("Fi60_ToT", "Fi60 ToT", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi60_Tot = new TH2F("Fi60_ToT", "Fi60 ToT", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi60_Tot->GetXaxis()->SetTitle("Fiber");
         fh_fi60_Tot->GetYaxis()->SetTitle("ToT");
 
@@ -339,15 +336,16 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi60_mult_mc->GetXaxis()->SetTitle("mult");
         fh_fi60_mult_mc->GetYaxis()->SetTitle("Counts");
 
-        fh_fi60_Tot_mc = new TH2F("Fi60_ToT_mc", "Fi60 ToT with cuts", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi60_Tot_mc = new TH2F("Fi60_ToT_mc", "Fi60 ToT with cuts", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi60_Tot_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi60_Tot_mc->GetYaxis()->SetTitle("ToT");
 
-        fh_fi60_Tot_ave = new TH2F("Fi60_ToT_ave", "Fi60 ToT sum vs. fiber average", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi60_Tot_ave =
+            new TH2F("Fi60_ToT_ave", "Fi60 ToT sum vs. fiber average", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi60_Tot_ave->GetXaxis()->SetTitle("Fiber");
         fh_fi60_Tot_ave->GetYaxis()->SetTitle("ToT");
 
-        fh_fi60_Time_mc = new TH2F("Fi60_Time_mc", "Fi60 time with cuts", ch, 0., ch, (int)(1000./ds), -500, 500);
+        fh_fi60_Time_mc = new TH2F("Fi60_Time_mc", "Fi60 time with cuts", ch, 0., ch, (int)(1000. / ds), -500, 500);
         fh_fi60_Time_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi60_Time_mc->GetYaxis()->SetTitle("time");
 
@@ -402,7 +400,6 @@ InitStatus R3BOnlineJuelich2023::Init()
         run->GetHttpServer()->RegisterCommand("Reset_Fi60", Form("/Tasks/%s/->Reset_Fi60_Histo()", GetName()));
     }
 
-
     //---------------------------------------------------------------------------------------------------
     // Fiber61 detector
     if (fMappedItems_fi61)
@@ -418,7 +415,7 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi61_mult->GetXaxis()->SetTitle("mult");
         fh_fi61_mult->GetYaxis()->SetTitle("Counts");
 
-        fh_fi61_Tot = new TH2F("Fi61_ToT", "Fi61 ToT", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi61_Tot = new TH2F("Fi61_ToT", "Fi61 ToT", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi61_Tot->GetXaxis()->SetTitle("Fiber");
         fh_fi61_Tot->GetYaxis()->SetTitle("ToT");
 
@@ -439,15 +436,16 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi61_mult_mc->GetXaxis()->SetTitle("mult");
         fh_fi61_mult_mc->GetYaxis()->SetTitle("Counts");
 
-        fh_fi61_Tot_mc = new TH2F("Fi61_ToT_mc", "Fi61 ToT with cuts", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi61_Tot_mc = new TH2F("Fi61_ToT_mc", "Fi61 ToT with cuts", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi61_Tot_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi61_Tot_mc->GetYaxis()->SetTitle("ToT");
 
-        fh_fi61_Tot_ave = new TH2F("Fi61_ToT_ave", "Fi61 ToT sum vs. fiber average", ch, 0., ch, (int)(500./ds), 0, 500);
+        fh_fi61_Tot_ave =
+            new TH2F("Fi61_ToT_ave", "Fi61 ToT sum vs. fiber average", ch, 0., ch, (int)(500. / ds), 0, 500);
         fh_fi61_Tot_ave->GetXaxis()->SetTitle("Fiber");
         fh_fi61_Tot_ave->GetYaxis()->SetTitle("ToT");
 
-        fh_fi61_Time_mc = new TH2F("Fi61_Time_mc", "Fi61 time with cuts", ch, 0., ch, (int)(1000./ds), -500, 500);
+        fh_fi61_Time_mc = new TH2F("Fi61_Time_mc", "Fi61 time with cuts", ch, 0., ch, (int)(1000. / ds), -500, 500);
         fh_fi61_Time_mc->GetXaxis()->SetTitle("Fiber");
         fh_fi61_Time_mc->GetYaxis()->SetTitle("time");
 
@@ -513,7 +511,8 @@ InitStatus R3BOnlineJuelich2023::Init()
         fh_fi61_vs_fi60_fibers->GetXaxis()->SetTitle("Fiber Fi60");
         fh_fi61_vs_fi60_fibers->GetYaxis()->SetTitle("Fiber Fi61");
 
-        fh_fi61_vs_fi60_tot = new TH2F("Fi61_vs_Fi60_ToT", "Fi61 vs. Fi60 ToT", (int)(500./ds), 0, 500, (int)(500./ds), 0, 500);
+        fh_fi61_vs_fi60_tot =
+            new TH2F("Fi61_vs_Fi60_ToT", "Fi61 vs. Fi60 ToT", (int)(500. / ds), 0, 500, (int)(500. / ds), 0, 500);
         fh_fi61_vs_fi60_tot->GetXaxis()->SetTitle("ToT Fi60");
         fh_fi61_vs_fi60_tot->GetYaxis()->SetTitle("ToT Fi61");
 
@@ -529,26 +528,24 @@ InitStatus R3BOnlineJuelich2023::Init()
         cFib61vsFib60->Divide(2, 3);
 
         cFib61vsFib60->cd(1);
-        //gPad->SetLogy();
+        // gPad->SetLogy();
         fh_fi61_vs_fi60_fibers->Draw("colz");
         cFib61vsFib60->cd(2);
-        //gPad->SetLogy();
+        // gPad->SetLogy();
         fh_fi61_vs_fi60_tot->Draw("colz");
         cFib61vsFib60->cd(3);
-		fh_fi60_Tot_ave->Draw("colz");
+        fh_fi60_Tot_ave->Draw("colz");
         cFib61vsFib60->cd(4);
-		fh_fi61_Tot_ave->Draw("colz");
-        cFib61vsFib60->cd(5);		
-		fh_fi60_vs_fi0_fibers->Draw("colz");
-        cFib61vsFib60->cd(6);		
-		fh_fi61_vs_fi0_fibers->Draw("colz");
-		
-		
+        fh_fi61_Tot_ave->Draw("colz");
+        cFib61vsFib60->cd(5);
+        fh_fi60_vs_fi0_fibers->Draw("colz");
+        cFib61vsFib60->cd(6);
+        fh_fi61_vs_fi0_fibers->Draw("colz");
+
         run->AddObject(cFib61vsFib60);
-        run->GetHttpServer()->RegisterCommand("Reset_Fi61vsFi60", Form("/Tasks/%s/->Reset_Fi61vsFi60_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_Fi61vsFi60",
+                                              Form("/Tasks/%s/->Reset_Fi61vsFi60_Histo()", GetName()));
     }
-
-
 
     return kSUCCESS;
 }
@@ -603,21 +600,21 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
     //   check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
     {
-        //return;
-	}
-	
-	struct FibHit
+        // return;
+    }
+
+    struct FibHit
     {
         Double_t X;
         Double_t ToT;
 
-		FibHit(Double_t x, Double_t tot)
-			: X(x)
-			, ToT(tot)
-		{
-		}
-	};
-                
+        FibHit(Double_t x, Double_t tot)
+            : X(x)
+            , ToT(tot)
+        {
+        }
+    };
+
     std::vector<FibHit> Fib60Hits;
     std::vector<FibHit> Fib61Hits;
     std::vector<FibHit> Fib0Hits;
@@ -684,8 +681,8 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
         auto det = fCalItems_rolu;
         nParts = det->GetEntriesFast();
-        //if (nParts < 1)
-            //return;
+        // if (nParts < 1)
+        // return;
 
         Int_t iDet = 0;
         /*
@@ -721,7 +718,8 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
                 { // TAMEX trailing
                     timeRolu_T[iPart][iDet - 1][iCha] = calData->GetTimeT_ns(iCha);
                 }
-				//cout << "ROLU: " << timeRolu_L[iPart][iDet - 1][iCha] << "  " << timeRolu_T[iPart][iDet - 1][iCha] << endl;
+                // cout << "ROLU: " << timeRolu_L[iPart][iDet - 1][iCha] << "  " << timeRolu_T[iPart][iDet - 1][iCha] <<
+                // endl;
                 if (timeRolu_T[iPart][iDet - 1][iCha] > 0. && timeRolu_L[iPart][iDet - 1][iCha] > 0. &&
                     !(IS_NAN(timeRolu_T[iPart][iDet - 1][iCha])) && !(IS_NAN(timeRolu_L[iPart][iDet - 1][iCha])))
                 {
@@ -791,7 +789,7 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
         // Hit Items
         Double_t tmin = -15;
-        Double_t tmax =  15;
+        Double_t tmax = 15;
         if (fHitItems_fi0)
         {
             Int_t multi[1024] = { 0 };
@@ -804,8 +802,8 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
             Double_t tot_sum = 0.;
             Double_t m = 0.;
             Int_t fib_old = 0;
-            
-            //cout << "new event: " << nHits << "  " << endl;
+
+            // cout << "new event: " << nHits << "  " << endl;
 
             Double_t tMAPMT = 0. / 0.;
             Double_t tMAPMT2 = 0. / 0.;
@@ -866,52 +864,52 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
                 if (mult < 1)
                 {
-                    //continue;
+                    // continue;
                 }
-				//cout << "Fiber: " << iFib << " tot: " << tot << endl;
-				if(ihit == 0)
-				{
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-				}
-				Double_t diff = 3.1;
-				if(iFib - fib_old < diff && ihit> 0 )
-				{
-					fib_ave += (float)iFib;
-					tot_sum += tot;
-					m += 1.;
-					fib_old = iFib;
-				}
-				
-				if(iFib - fib_old > diff) 
-				{
-					// plot average and reset it
-					//cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
-					Fib0Hits.push_back(FibHit(fib_ave / m, tot_sum));
-					
-					fh_fi0_fiber_ave->Fill(fib_ave / m);
-					fh_fi0_Tot_ave->Fill(fib_ave / m, tot_sum);
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-				}
-				if(ihit + 1 == nHits)
-				{
-					fh_fi0_fiber_ave->Fill(fib_ave / m);
-					fh_fi0_Tot_ave->Fill(fib_ave / m, tot_sum);
-				}
-				//cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
-                // cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
+                // cout << "Fiber: " << iFib << " tot: " << tot << endl;
+                if (ihit == 0)
+                {
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                Double_t diff = 3.1;
+                if (iFib - fib_old < diff && ihit > 0)
+                {
+                    fib_ave += (float)iFib;
+                    tot_sum += tot;
+                    m += 1.;
+                    fib_old = iFib;
+                }
+
+                if (iFib - fib_old > diff)
+                {
+                    // plot average and reset it
+                    // cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
+                    Fib0Hits.push_back(FibHit(fib_ave / m, tot_sum));
+
+                    fh_fi0_fiber_ave->Fill(fib_ave / m);
+                    fh_fi0_Tot_ave->Fill(fib_ave / m, tot_sum);
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                if (ihit + 1 == nHits)
+                {
+                    fh_fi0_fiber_ave->Fill(fib_ave / m);
+                    fh_fi0_Tot_ave->Fill(fib_ave / m, tot_sum);
+                }
+                // cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
+                //  cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
                 xpos = hit->GetX();
                 ypos = dtime;
                 multi[iFib - 1]++;
                 fh_fi0_Tot_mc->Fill(iFib, tot);
                 fh_fi0_Time_mc->Fill(iFib, tMAPMT);
                 fh_fi0_fiber_mc->Fill(iFib);
-				
+
                 if (nHits > 0 && nHits < 3)
                 {
                     // cout << "Fib0: fiber = " << iFib << endl;
@@ -931,9 +929,7 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
             }
             fh_fi0_eff_vs_time->Fill(triggerCountsFi0, (float)detectedFi0 / (float)triggerCountsFi0 * 100.);
         }
-        
     }
-
 
     //----------------------------------------------------------------------
     // Fiber60 detectors
@@ -978,7 +974,7 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
         // Hit Items
         Double_t tmin = -15;
-        Double_t tmax =  15;
+        Double_t tmax = 15;
         if (fHitItems_fi60)
         {
             Int_t multi[1024] = { 0 };
@@ -991,8 +987,8 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
             Double_t tot_sum = 0.;
             Double_t m = 0.;
             Int_t fib_old = 0;
-            
-            //cout << "new event: " << nHits << "  " << endl;
+
+            // cout << "new event: " << nHits << "  " << endl;
 
             Double_t tMAPMT = 0. / 0.;
             Double_t tMAPMT2 = 0. / 0.;
@@ -1054,51 +1050,51 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
                 if (mult < 1)
                 {
-                    //continue;
+                    // continue;
                 }
-				//cout << "Fiber: " << iFib << " tot: " << tot << endl;
-				if(ihit == 0)
-				{
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-				}
-				Double_t diff = 3.1;
-				if(iFib - fib_old < diff && ihit> 0 )
-				{
-					fib_ave += (float)iFib;
-					tot_sum += tot;
-					m += 1.;
-					fib_old = iFib;
-				}
-				
-				if(iFib - fib_old > diff) 
-				{
-					// plot average and reset it
-					//cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
-					Fib60Hits.push_back(FibHit(fib_ave / m, tot_sum));
-					fh_fi60_fiber_ave->Fill(fib_ave / m);
-					fh_fi60_Tot_ave->Fill(fib_ave / m, tot_sum);
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-				}
-				if(ihit + 1 == nHits)
-				{
-					fh_fi60_fiber_ave->Fill(fib_ave / m);
-					fh_fi60_Tot_ave->Fill(fib_ave / m, tot_sum);
-				}
-				//cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
-                // cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
+                // cout << "Fiber: " << iFib << " tot: " << tot << endl;
+                if (ihit == 0)
+                {
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                Double_t diff = 3.1;
+                if (iFib - fib_old < diff && ihit > 0)
+                {
+                    fib_ave += (float)iFib;
+                    tot_sum += tot;
+                    m += 1.;
+                    fib_old = iFib;
+                }
+
+                if (iFib - fib_old > diff)
+                {
+                    // plot average and reset it
+                    // cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
+                    Fib60Hits.push_back(FibHit(fib_ave / m, tot_sum));
+                    fh_fi60_fiber_ave->Fill(fib_ave / m);
+                    fh_fi60_Tot_ave->Fill(fib_ave / m, tot_sum);
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                if (ihit + 1 == nHits)
+                {
+                    fh_fi60_fiber_ave->Fill(fib_ave / m);
+                    fh_fi60_Tot_ave->Fill(fib_ave / m, tot_sum);
+                }
+                // cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
+                //  cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
                 xpos = hit->GetX();
                 ypos = dtime;
                 multi[iFib - 1]++;
                 fh_fi60_Tot_mc->Fill(iFib, tot);
                 fh_fi60_Time_mc->Fill(iFib, tMAPMT);
                 fh_fi60_fiber_mc->Fill(iFib);
-				
+
                 if (nHits > 0 && nHits < 3)
                 {
                     // cout << "Fib0: fiber = " << iFib << endl;
@@ -1118,9 +1114,7 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
             }
             fh_fi60_eff_vs_time->Fill(triggerCountsFi60, (float)detectedFi60 / (float)triggerCountsFi60 * 100.);
         }
-        
     }
-
 
     //----------------------------------------------------------------------
     // Fiber61 detectors
@@ -1165,7 +1159,7 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
         // Hit Items
         Double_t tmin = -15;
-        Double_t tmax =  15;
+        Double_t tmax = 15;
         if (fHitItems_fi61)
         {
             Int_t multi[1024] = { 0 };
@@ -1178,8 +1172,8 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
             Double_t tot_sum = 0.;
             Double_t m = 0.;
             Int_t fib_old = 0;
-            
-            //cout << "new event: " << nHits << "  " << endl;
+
+            // cout << "new event: " << nHits << "  " << endl;
 
             Double_t tMAPMT = 0. / 0.;
             Double_t tMAPMT2 = 0. / 0.;
@@ -1204,28 +1198,28 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
                 fh_fi61_Time->Fill(iFib, tMAPMT);
                 // fiber correlation plot. Loop again over all fibers
                 Int_t mult = 0;
-/*
-                for (Int_t jhit = 0; jhit < nHits; jhit++)
-                {
-                    R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi61->At(jhit);
-                    if (!hit2)
-                        continue;
+                /*
+                                for (Int_t jhit = 0; jhit < nHits; jhit++)
+                                {
+                                    R3BBunchedFiberHitData* hit2 = (R3BBunchedFiberHitData*)fHitItems_fi61->At(jhit);
+                                    if (!hit2)
+                                        continue;
 
-                    iFib2 = hit2->GetFiberId(); // 1..
-                    tot2 = hit2->GetEloss();
-                    tMAPMT2 = hit2->GetTime(); //+ 5444.;
+                                    iFib2 = hit2->GetFiberId(); // 1..
+                                    tot2 = hit2->GetEloss();
+                                    tMAPMT2 = hit2->GetTime(); //+ 5444.;
 
-                    if (iFib != iFib2)
-                    {
-                        fh_fi61_cor->Fill(iFib, iFib2);
-                        fh_fi61_tot2_tot1->Fill(tot, tot2);
-                    }
-                    if (tMAPMT2 < tmin || tMAPMT2 > tmax)
-                    {
-                        mult++;
-                    }
-                }
-*/
+                                    if (iFib != iFib2)
+                                    {
+                                        fh_fi61_cor->Fill(iFib, iFib2);
+                                        fh_fi61_tot2_tot1->Fill(tot, tot2);
+                                    }
+                                    if (tMAPMT2 < tmin || tMAPMT2 > tmax)
+                                    {
+                                        mult++;
+                                    }
+                                }
+                */
                 // cuts ***********************************
                 // if not in the right time window, go to next
                 if (tMAPMT < tmin || tMAPMT > tmax)
@@ -1240,52 +1234,51 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
                 if (mult < 1)
                 {
-                    //continue;
+                    // continue;
                 }
-				//cout << "Fiber: " << iFib << " tot: " << tot << endl;
-				if(ihit == 0)
-				{
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-				}
-				Double_t diff = 3.1;
-				if(iFib - fib_old < diff && ihit> 0 )
-				{
-					fib_ave += (float)iFib;
-					tot_sum += tot;
-					m += 1.;
-					fib_old = iFib;
-				}
-				
-				if(iFib - fib_old > diff) 
-				{
-					// plot average and reset it
-					//cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
-					Fib61Hits.push_back(FibHit(fib_ave / m, tot_sum));
-					fh_fi61_fiber_ave->Fill(fib_ave / m);
-					fh_fi61_Tot_ave->Fill(fib_ave / m, tot_sum);
-					fib_ave = (float)iFib;
-					tot_sum = tot;
-					m = 1.;
-					fib_old = iFib;
-					
-				}
-				if(ihit + 1 == nHits)
-				{
-					fh_fi61_fiber_ave->Fill(fib_ave / m);
-					fh_fi61_Tot_ave->Fill(fib_ave / m, tot_sum);
-				}
-				//cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
-                // cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
+                // cout << "Fiber: " << iFib << " tot: " << tot << endl;
+                if (ihit == 0)
+                {
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                Double_t diff = 3.1;
+                if (iFib - fib_old < diff && ihit > 0)
+                {
+                    fib_ave += (float)iFib;
+                    tot_sum += tot;
+                    m += 1.;
+                    fib_old = iFib;
+                }
+
+                if (iFib - fib_old > diff)
+                {
+                    // plot average and reset it
+                    // cout << "fill: " << fib_ave << " tot sum: " << tot_sum << endl;
+                    Fib61Hits.push_back(FibHit(fib_ave / m, tot_sum));
+                    fh_fi61_fiber_ave->Fill(fib_ave / m);
+                    fh_fi61_Tot_ave->Fill(fib_ave / m, tot_sum);
+                    fib_ave = (float)iFib;
+                    tot_sum = tot;
+                    m = 1.;
+                    fib_old = iFib;
+                }
+                if (ihit + 1 == nHits)
+                {
+                    fh_fi61_fiber_ave->Fill(fib_ave / m);
+                    fh_fi61_Tot_ave->Fill(fib_ave / m, tot_sum);
+                }
+                // cout << "average: " << fib_ave / m << " tot sum: " << tot_sum << endl;
+                //  cout << "Test: " << tSPMT1 << IS_NAN(tSPMT1) << endl;
                 xpos = hit->GetX();
                 ypos = dtime;
                 multi[iFib - 1]++;
                 fh_fi61_Tot_mc->Fill(iFib, tot);
                 fh_fi61_Time_mc->Fill(iFib, tMAPMT);
                 fh_fi61_fiber_mc->Fill(iFib);
-				
+
                 if (nHits > 0 && nHits < 3)
                 {
                     // cout << "Fib0: fiber = " << iFib << endl;
@@ -1308,50 +1301,46 @@ void R3BOnlineJuelich2023::Exec(Option_t* option)
 
         if (fHitItems_fi61 && fHitItems_fi61)
         {
-			for (FibHit& HitFi60 : Fib60Hits)
-			{
-				for (FibHit& HitFi61 : Fib61Hits)
-				{
-					fh_fi61_vs_fi60_tot->Fill(HitFi60.ToT, HitFi61.ToT);
-					fh_fi61_vs_fi60_fibers->Fill(HitFi60.X, HitFi61.X);
-				}
-			}
+            for (FibHit& HitFi60 : Fib60Hits)
+            {
+                for (FibHit& HitFi61 : Fib61Hits)
+                {
+                    fh_fi61_vs_fi60_tot->Fill(HitFi60.ToT, HitFi61.ToT);
+                    fh_fi61_vs_fi60_fibers->Fill(HitFi60.X, HitFi61.X);
+                }
+            }
 
-			for (FibHit& HitFi0 : Fib0Hits)
-			{
-				for (FibHit& HitFi60 : Fib60Hits)
-				{
-					fh_fi60_vs_fi0_fibers->Fill(HitFi60.X, HitFi0.X);
-				}
-				for (FibHit& HitFi61 : Fib61Hits)
-				{
-					fh_fi61_vs_fi0_fibers->Fill(HitFi61.X, HitFi0.X);
-				}
-			}
-			
-			
-			
+            for (FibHit& HitFi0 : Fib0Hits)
+            {
+                for (FibHit& HitFi60 : Fib60Hits)
+                {
+                    fh_fi60_vs_fi0_fibers->Fill(HitFi60.X, HitFi0.X);
+                }
+                for (FibHit& HitFi61 : Fib61Hits)
+                {
+                    fh_fi61_vs_fi0_fibers->Fill(HitFi61.X, HitFi0.X);
+                }
+            }
         }
     }
-
 }
 
 void R3BOnlineJuelich2023::FinishEvent()
-{    
+{
     if (fMappedItems_fi0)
         fMappedItems_fi0->Clear();
     if (fCalItems_fi0)
         fCalItems_fi0->Clear();
     if (fHitItems_fi0)
         fHitItems_fi0->Clear();
-	
+
     if (fMappedItems_fi60)
         fMappedItems_fi60->Clear();
     if (fCalItems_fi60)
         fCalItems_fi60->Clear();
     if (fHitItems_fi60)
         fHitItems_fi60->Clear();
-        
+
     if (fMappedItems_fi61)
         fMappedItems_fi61->Clear();
     if (fCalItems_fi61)
@@ -1360,11 +1349,11 @@ void R3BOnlineJuelich2023::FinishEvent()
         fHitItems_fi61->Clear();
     if (fHitItems_fi61 && fHitItems_fi60)
     {
-		fh_fi61_vs_fi60_tot->Clear(); 
-		fh_fi61_vs_fi60_fibers->Clear(); 
-		fh_fi60_vs_fi0_fibers->Clear();
-		fh_fi61_vs_fi0_fibers->Clear();
-	}
+        fh_fi61_vs_fi60_tot->Clear();
+        fh_fi61_vs_fi60_fibers->Clear();
+        fh_fi60_vs_fi0_fibers->Clear();
+        fh_fi61_vs_fi0_fibers->Clear();
+    }
 }
 
 void R3BOnlineJuelich2023::FinishTask()
@@ -1434,11 +1423,11 @@ void R3BOnlineJuelich2023::FinishTask()
     }
     if (fHitItems_fi61 && fHitItems_fi60)
     {
-		fh_fi61_vs_fi60_tot->Write(); 
-		fh_fi61_vs_fi60_fibers->Write(); 
-		fh_fi60_vs_fi0_fibers->Write(); 
-		fh_fi61_vs_fi0_fibers->Write(); 
-	}
+        fh_fi61_vs_fi60_tot->Write();
+        fh_fi61_vs_fi60_fibers->Write();
+        fh_fi60_vs_fi0_fibers->Write();
+        fh_fi61_vs_fi0_fibers->Write();
+    }
 }
 
 ClassImp(R3BOnlineJuelich2023)
