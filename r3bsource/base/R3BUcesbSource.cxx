@@ -175,7 +175,7 @@ Bool_t R3BUcesbSource::InitUnpackers()
         /* FairRunOnline::Init() ignores the return value from
          * GetSource()->InitUnpackers(); so do a FATAL error.
          */
-        R3BLOG(fatal,
+        R3BLOG(error,
                "ext_data_clnt::setup() mapping failure may "
                "cause unexpected analysis results due to missing "
                "data members. Unpacker needs fixing.");
