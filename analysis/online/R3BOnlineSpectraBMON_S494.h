@@ -213,6 +213,7 @@ class R3BOnlineSpectraBMON_S494 : public FairTask
     TH1F* fsci_channels;
     TH1F* fsci_pos1;
     TH1F* fsci_pos2;
+    TH2F* fsci_posXZ;
 
     TH2F* fh_rolu_tot;
     TH2F* fh_rolu_tof;
