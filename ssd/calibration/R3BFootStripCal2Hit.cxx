@@ -216,6 +216,8 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
         }
     }
 
+    float stripmaxenergy[2]={0.,0.};
+    float stripmax[2]={NAN};
     // Filling vectors
     for (Int_t i = 0; i < nHits; i++)
     {
@@ -226,6 +228,12 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
 
         StripI[detId].push_back(stripId);
         StripE[detId].push_back(energy);
+        
+        if(energy > stripmaxenergy[detId])
+        {
+         stripmaxenergy[detId] = energy;
+         stripmax[detId] = stripId;
+        }   
     }
 
     // Sort (should be good by default but just in case)
@@ -334,7 +342,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
             Nu[i][j] = ClusterPos[i][j] - (Int_t)ClusterPos[i][j];
         }
     }
-
+/*
     // Sort Cluster from Higher to Lower Energy
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
@@ -363,47 +371,35 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
                 }
             }
         }
-    }
+    }*/
 
     // Filling HitData
     for (Int_t i = 0; i < fMaxNumDet; i++)
     {
-        for (Int_t j = 0; j < ClusterMult[i]; j++)
+        for (Int_t j = 0; j < 1; j++)
         {
-
-            Double_t pos = 50. - 100. * ClusterPos[i][j] / 640.;
-
+            TVector3 master(x, y, z);
             if (i == 0)
-            { // Y-Foot (StripId numbered from left to right)
+            { // Y-Foot (StripId numbered from bottom to top)
+                Double_t pos = -50. + 100. * stripmax[i] / 640.;
                 x = fOffsetX[i];
                 y = pos + fOffsetY[i];
                 z = fDistTarget[i];
+                energy = stripmaxenergy[i];
+                AddHitData(i + 1, 1, x, master, energy, 1);
             }
             else if (i == 1)
-            { // X-Foot (StripId numbered from bottom to top)
+            { // X-Foot (StripId numbered from left to right)
+                Double_t pos = 50. - 100. * stripmax[i] / 640.;
                 x = pos + fOffsetX[i];
                 y = fOffsetY[i];
                 z = fDistTarget[i];
+                energy = stripmaxenergy[i];
+                AddHitData(i + 1, 1, x, master, energy, 1);
             }
             else
             {
                 LOG(info) << "R3BFootStripCal2Hit::AnglePhi is Wrong !";
-            }
-
-            TVector3 master(x, y, z);
-
-            Double_t energy_corr = 0.;
-
-            for (Int_t k = 1; k < fPolPar; k++)
-            {
-                energy_corr += fEnevsPosCorrPar[i][k] * TMath::Power(Nu[i][j], k);
-            }
-
-            energy = ClusterESum[i][j] - energy_corr;
-
-            if (ClusterESum[i][j] > fThSum && j < fMaxNumClusters)
-            {
-                AddHitData(i + 1, ClusterNStrip[i][j], x, master, energy, ClusterMult[i]);
             }
         }
     }
