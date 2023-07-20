@@ -378,13 +378,13 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
     {
         for (Int_t j = 0; j < 1; j++)
         {
-            TVector3 master(x, y, z);
             if (i == 0)
             { // Y-Foot (StripId numbered from bottom to top)
                 Double_t pos = -50. + 100. * stripmax[i] / 640.;
                 x = fOffsetX[i];
                 y = pos + fOffsetY[i];
                 z = fDistTarget[i];
+                TVector3 master(x, y, z);
                 energy = stripmaxenergy[i];
                 AddHitData(i + 1, 1, x, master, energy, 1);
             }
@@ -394,6 +394,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* option)
                 x = pos + fOffsetX[i];
                 y = fOffsetY[i];
                 z = fDistTarget[i];
+                TVector3 master(x, y, z);
                 energy = stripmaxenergy[i];
                 AddHitData(i + 1, 1, x, master, energy, 1);
             }
