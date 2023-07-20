@@ -171,4 +171,6 @@
 #pragma link C++ class R3BSfibHitData+;
 #pragma link C++ class R3BFrsData+;
 
+#pragma link C++ class R3BGadastMappedData+;
+
 #endif

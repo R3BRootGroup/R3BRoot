@@ -48,6 +48,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofi
 ${R3BROOT_SOURCE_DIR}/r3bsource/rpc
+${R3BROOT_SOURCE_DIR}/r3bsource/gadast
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
@@ -63,6 +64,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
+${R3BROOT_SOURCE_DIR}/r3bdata/gadastData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
@@ -145,6 +147,7 @@ set(SRCS
 ./twim/R3BTwimReader.cxx
 ./musli/R3BMusliReader.cxx
 ./mwpc/R3BMwpcReader.cxx
+./gadast/R3BGadastReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -188,6 +191,7 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fib31.h
 ./fibers/ext_h101_fib32.h
 ./fibers/ext_h101_fib33.h
+./gadast/ext_h101_gadast.h
 ./los/ext_h101_los_dez19.h
 ./rolu/ext_h101_rolu.h
 ./sci2/ext_h101_sci2.h
