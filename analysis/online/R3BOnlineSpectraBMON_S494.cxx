@@ -524,7 +524,7 @@ void R3BOnlineSpectraBMON_S494::Exec(Option_t* option)
                 if (hit->GetDetId() == 2)
                 {
                     xfoot = hit->GetPos();
-                    break;
+                   // break;
                 }
             }
         }
