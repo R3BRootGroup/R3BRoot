@@ -17,9 +17,15 @@
 
 set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
 
-set(INCLUDE_DIRECTORIES #put here all directories where header files are located
-    ${R3BROOT_SOURCE_DIR}/r3bbase ${R3BROOT_SOURCE_DIR}/tcal ${R3BROOT_SOURCE_DIR}/r3bdata
-    ${R3BROOT_SOURCE_DIR}/r3bdata/wrData ${Boost_INCLUDE_DIRS})
+set(INCLUDE_DIRECTORIES
+#put here all directories where header files are located
+${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bbase/pars
+)
 
 include_directories(${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -39,7 +45,11 @@ set(SRCS
     R3BModule.cxx
     R3BTcutPar.cxx
     R3BTsplinePar.cxx
-    R3BWhiterabbitPropagator.cxx)
+    R3BWhiterabbitPropagator.cxx
+    ./pars/R3BMSOffsetPar.cxx
+    ./pars/R3BMSOffsetContFact.cxx
+    ./pars/R3BMSOffsetFinder.cxx
+    )
 
 set(HEADERS
     R3BCoarseTimeStitch.h
@@ -55,7 +65,11 @@ set(HEADERS
     R3BShared.h
     R3BTcutPar.h
     R3BTsplinePar.h
-    R3BWhiterabbitPropagator.h)
+    R3BWhiterabbitPropagator.h
+    ./pars/R3BMSOffsetPar.h
+    ./pars/R3BMSOffsetContFact.h
+    ./pars/R3BMSOffsetFinder.h
+    )
 
 set(LINKDEF BaseLinkDef.h)
 

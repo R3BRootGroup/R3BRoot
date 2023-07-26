@@ -12,14 +12,12 @@ class R3BSamplerMappedData : public TObject
     R3BSamplerMappedData();
 
     // Standard Constructor
-    R3BSamplerMappedData(UInt_t);
+    explicit R3BSamplerMappedData(int);
 
-    UInt_t GetTime() const;
+    [[nodiscard]] int GetTime() const;
 
-  public:
-    UInt_t fTime;
+    int fTime;
 
-  public:
     ClassDef(R3BSamplerMappedData, 1)
 };
 

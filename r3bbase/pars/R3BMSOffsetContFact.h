@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
@@ -12,26 +10,24 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+#pragma once
 
-#ifdef __CINT__
+#include "FairContFact.h"
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+class FairContainer;
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BWhiterabbitPropagator+;
-#pragma link C++ class R3BDataPropagator+;
-#pragma link C++ class R3BFileSource+;
-#pragma link C++ class R3BFileSource2+;
-#pragma link C++ class R3BEventHeaderPropagator+;
-#pragma link C++ class R3BLogger+;
-#pragma link C++ class R3BTcutPar+;
-#pragma link C++ class R3BTsplinePar+;
-#pragma link C++ class R3BCoarseTimeStitch+;
-#pragma link C++ class R3BMSOffsetContFact+;
-#pragma link C++ class R3BMSOffsetPar+;
-#pragma link C++ class R3BMSOffsetFinder+;
-#endif
+class R3BMSOffsetContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
+
+  public:
+    R3BMSOffsetContFact();
+    R3BMSOffsetContFact(const R3BMSOffsetContFact&) = delete;
+    R3BMSOffsetContFact(R3BMSOffsetContFact&&) = delete;
+    R3BMSOffsetContFact& operator=(const R3BMSOffsetContFact&) = delete;
+    R3BMSOffsetContFact& operator=(R3BMSOffsetContFact&&) = delete;
+    ~R3BMSOffsetContFact() override = default;
+    FairParSet* createContainer(FairContainer* /*unused*/) override;
+    ClassDefOverride(R3BMSOffsetContFact, 0) // Factory for all MSOffset parameter containers
+};
