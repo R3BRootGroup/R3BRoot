@@ -28,91 +28,94 @@ extern "C"
 #include "ext_h101_sampms.h"
 }
 
-using namespace std;
-
-R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMP* data, size_t offset)
+R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMP_onion* data, size_t offset)
     : R3BReader("R3BTrloiiSampReader")
     , fSampData(data)
+    , fSampLosData(nullptr)
+    , fSampMSData(nullptr)
+    , fSampLosMSData(nullptr)
     , fOffset(offset)
     , fSNum(1)
     , fSCNum(1)
     , fArray(new TClonesArray("R3BSamplerMappedData"))
+    , fArrayLH(nullptr)
     , fOnline(kFALSE)
 {
 }
 
-R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPLOS* data, size_t offset)
+R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPLOS_onion* data, size_t offset)
     : R3BReader("R3BTrloiiSampReader")
+    , fSampData(nullptr)
     , fSampLosData(data)
+    , fSampMSData(nullptr)
+    , fSampLosMSData(nullptr)
     , fOffset(offset)
     , fSNum(1)
     , fSCNum(2)
+    , fArray(nullptr)
     , fArrayLH(new TClonesArray("R3BSampLosMappedData"))
     , fOnline(kFALSE)
 {
 }
 
-R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPMS* data, size_t offset)
+R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPMS_onion* data, size_t offset)
     : R3BReader("R3BTrloiiSampMSReader")
+    , fSampData(nullptr)
+    , fSampLosData(nullptr)
     , fSampMSData(data)
+    , fSampLosMSData(nullptr)
     , fOffset(offset)
     , fSNum(2)
     , fSCNum(1)
     , fArray(new TClonesArray("R3BSamplerMappedData"))
+    , fArrayLH(nullptr)
     , fOnline(kFALSE)
 {
 }
 
-R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPLOSMS* data, size_t offset)
+R3BTrloiiSampReader::R3BTrloiiSampReader(EXT_STR_h101_SAMPLOSMS_onion* data, size_t offset)
     : R3BReader("R3BTrloiiSampMSReader")
+    , fSampData(nullptr)
+    , fSampLosData(nullptr)
+    , fSampMSData(nullptr)
     , fSampLosMSData(data)
     , fOffset(offset)
     , fSNum(2)
     , fSCNum(2)
+    , fArray(nullptr)
     , fArrayLH(new TClonesArray("R3BSampLosMappedData"))
     , fOnline(kFALSE)
 {
 }
 
-R3BTrloiiSampReader::~R3BTrloiiSampReader()
-{
-    if (fArray)
-    {
-        delete fArray;
-    }
-
-    if (fArrayLH)
-    {
-        delete fArrayLH;
-    }
-}
+R3BTrloiiSampReader::~R3BTrloiiSampReader() = default;
 
 Bool_t R3BTrloiiSampReader::Init(ext_data_struct_info* a_struct_info)
 {
-    Int_t ok = 0;
+    size_t okey = 0;
 
     if (1 == fSNum && 1 == fSCNum)
     {
-        EXT_STR_h101_SAMP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMP, 0);
+        EXT_STR_h101_SAMP_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_SAMP_onion, 0); // NOLINT
         R3BLOG(info, "R3BTrloiiSampReader::Init() SAMP");
     }
     else if (1 == fSNum && 2 == fSCNum)
     {
-        EXT_STR_h101_SAMPLOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOS, 0);
+        EXT_STR_h101_SAMPLOS_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOS_onion, 0); // NOLINT
         R3BLOG(info, "R3BTrloiiSampReader::Init() SAMPLOS");
     }
     else if (2 == fSNum && 1 == fSCNum)
     {
-        EXT_STR_h101_SAMPMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPMS, 0);
+        EXT_STR_h101_SAMPMS_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_SAMPMS_onion, 0); // NOLINT
         R3BLOG(info, "R3BTrloiiSampReader::Init() SAMP master start");
     }
     else if (2 == fSNum && 2 == fSCNum)
     {
-        EXT_STR_h101_SAMPLOSMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOSMS, 0);
+        EXT_STR_h101_SAMPLOSMS_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_SAMPLOSMS, 0); // NOLINT
         R3BLOG(info, "R3BTrloiiSampReader::Init() SAMPLOS master start");
     }
 
-    if (!ok)
+    if (okey == 0U)
     {
         perror("ext_data_struct_info_item");
         R3BLOG(error, "Failed to setup structure information.");

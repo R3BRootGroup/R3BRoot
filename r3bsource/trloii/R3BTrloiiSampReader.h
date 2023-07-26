@@ -42,10 +42,10 @@ class R3BTrloiiSampReader : public R3BReader
 {
   public:
     // Parametrized constructors
-    R3BTrloiiSampReader(EXT_STR_h101_SAMP*, size_t);
-    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOS*, size_t);
-    R3BTrloiiSampReader(EXT_STR_h101_SAMPMS*, size_t);
-    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOSMS*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMP_onion*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOS_onion*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPMS_onion*, size_t);
+    R3BTrloiiSampReader(EXT_STR_h101_SAMPLOSMS_onion*, size_t);
 
     // Destructor
     virtual ~R3BTrloiiSampReader();
@@ -61,10 +61,10 @@ class R3BTrloiiSampReader : public R3BReader
 
   private:
     /* Reader specific data structure from ucesb */
-    EXT_STR_h101_SAMP* fSampData;
-    EXT_STR_h101_SAMPLOS* fSampLosData;
-    EXT_STR_h101_SAMPMS* fSampMSData;
-    EXT_STR_h101_SAMPLOSMS* fSampLosMSData;
+    EXT_STR_h101_SAMP_onion* fSampData;
+    EXT_STR_h101_SAMPLOS_onion* fSampLosData;
+    EXT_STR_h101_SAMPMS_onion* fSampMSData;
+    EXT_STR_h101_SAMPLOSMS_onion* fSampLosMSData;
 
     /* Offset of detector specific data in full data structure */
     size_t fOffset;
