@@ -47,13 +47,11 @@ namespace R3B::Digitizing::Neuland
         {
             if (leftSignal.side == rightSignal.side)
             {
-                LOG(fatal)
-                    << "DigitizingPaddleNeuland.cxx::ComputePosition(): cannot comput position with signals from "
-                       "same side!";
+                R3BLOG(fatal, "cannot compute position with signals from same side!");
                 return 0.F;
             }
-            return (leftSignal.side == ChannelSide::left) ? (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium
-                                                          : (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium;
+            return (leftSignal.side == ChannelSide::left) ? (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium
+                                                          : (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium;
         }
         auto ComputeChannelHits(const Hit& hit) const -> Pair<Channel::Hit> override
         {
@@ -67,7 +65,7 @@ namespace R3B::Digitizing::Neuland
         static constexpr double gCMedium = 30.;     // speed of light in material in [cm/ns]
         static auto GenerateMockChannelHit(Double_t mcTime, Double_t mcLight, Double_t dist) -> Channel::Hit
         {
-            auto time = mcTime + (MockPaddle::gHalfLength + dist) / MockPaddle::gCMedium;
+            auto time = mcTime - (MockPaddle::gHalfLength + dist) / MockPaddle::gCMedium;
             auto light = mcLight;
             return { time, light };
         }

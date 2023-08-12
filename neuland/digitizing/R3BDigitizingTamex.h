@@ -145,7 +145,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         void AttachToPaddle(Digitizing::Paddle* paddle) override;
         std::vector<PMTPeak> fPMTPeaks;
         std::vector<Peak> fFQTPeaks;
-        static R3BNeulandHitPar const* fNeulandHitPar; // NOLINT
+        static R3BNeulandHitPar* fNeulandHitPar; // NOLINT
         R3BNeulandHitModulePar* fNeulandHitModulePar = nullptr;
         Tamex::Params par_;
 

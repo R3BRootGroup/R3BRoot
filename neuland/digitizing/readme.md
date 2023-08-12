@@ -86,7 +86,7 @@ using TamexChannel = Digitizing::Neuland::Tamex::Channel;
 auto const channelInit = []() { TamexChannel::GetHitPar("NeulandHitPar"); };
 auto engine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(), channelInit);
 ```
-In the example above, the object with the name "NeulandHitPar" should have the type `R3BNeulandHitPar` in the root file "params_sync.root".
+In the example above, the object with the name "NeulandHitPar" should have the type `R3BNeulandHitPar` in the root file "params_sync.root". **Be aware that the runID in the parameter root file must be the same runID in the simulation input file.**
 
 ## DigitizingEngine
 A `DigitizingEngine` object handles the actual data processing, which requires another two objects as the input parameters for its instantiation: `UseChannel` and `UsePaddle`. As suggested by their names, these two objects behave like factories, which are used by `DigitizingEngine` to generate `Channel` and `Paddle` objects. 
