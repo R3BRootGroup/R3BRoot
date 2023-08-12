@@ -19,11 +19,10 @@
 #include "R3BNeulandHitModulePar.h"
 #include "R3BNeulandHitPar.h"
 #include <FairRunAna.h>
+#include <R3BLogger.h>
 #include <algorithm>
 #include <iostream>
 #include <utility>
-
-#include "FairLogger.h"
 
 namespace R3B::Digitizing::Neuland::Tamex
 {
@@ -40,8 +39,8 @@ namespace R3B::Digitizing::Neuland::Tamex
 
     // global variables for default options:
     const size_t TmxPeaksInitialCapacity = 10;
-    const double PMTPeak::peakWidth = 15.0;                    // ns
-    R3BNeulandHitPar const* Channel::fNeulandHitPar = nullptr; // NOLINT
+    const double PMTPeak::peakWidth = 15.0;              // ns
+    R3BNeulandHitPar* Channel::fNeulandHitPar = nullptr; // NOLINT
 
     Params::Params(TRandom3& rnd)
         : fRnd{ &rnd }
@@ -141,7 +140,8 @@ namespace R3B::Digitizing::Neuland::Tamex
         fNeulandHitPar = dynamic_cast<R3BNeulandHitPar*>(rtdb->findContainer(hitParName.c_str()));
         if (fNeulandHitPar != nullptr)
         {
-            LOG(info) << "DigitizingTamex: HitPar " << hitParName << " has been found in the root file";
+            LOG(info) << "DigitizingTamex: HitPar " << hitParName
+                      << " has been found in the root file. Using calibration values in rootfile.";
         }
         else
         {
@@ -200,11 +200,17 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             return false;
         }
+        if (not fNeulandHitPar->hasChanged())
+        {
+            R3BLOG(warn, "Can't setup parameter in the root file correctly!.");
+            return false;
+        }
 
         auto PaddleId_max = fNeulandHitPar->GetNumModulePar();
         if (GetPaddle()->GetPaddleID() > PaddleId_max)
         {
-            LOG(warn) << "Paddle id exceeds the id in the parameter file!";
+            LOG(warn) << "Paddle id " << GetPaddle()->GetPaddleID() << " exceeds the id " << PaddleId_max
+                      << " in the parameter file!";
             is_valid = false;
         }
         else

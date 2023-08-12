@@ -66,12 +66,11 @@ namespace R3B::Digitizing::Neuland
     {
         if (leftSignal.side == rightSignal.side)
         {
-            LOG(fatal) << "DigitizingPaddleNeuland.cxx::ComputePosition(): cannot comput position with signals from "
-                          "same side!";
+            R3BLOG(fatal, "cannot compute position with signals from same side!");
             return 0.F;
         }
-        return (leftSignal.side == ChannelSide::left) ? (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium
-                                                      : (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium;
+        return (leftSignal.side == ChannelSide::left) ? (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium
+                                                      : (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium;
     }
 
     auto NeulandPaddle::ComputeChannelHits(const Hit& hit) const -> Paddle::Pair<Channel::Hit>

@@ -17,6 +17,8 @@
 #include <iostream>
 #include <string>
 
+constexpr int DEFAULT_RUNID = 999;
+
 int main(int argc, const char** argv)
 {
     auto timer = TStopwatch{};
@@ -29,13 +31,14 @@ int main(int argc, const char** argv)
     auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
     auto eventNum = programOptions.Create_Option<int>("eventNum", "set total event number", defaultEventNum);
     auto eventPrintNum = programOptions.Create_Option<int>("eventPrint", "set event print number", 1);
+    auto runID = programOptions.Create_Option<int>("runID", "set runID", DEFAULT_RUNID);
     auto multi = programOptions.Create_Option<int>("multiplicity", "set particle multiplicity", 1);
     auto pEnergy = programOptions.Create_Option<double>("energy", "set energy value (GeV) of the particle", 1);
     auto simuFileName =
         programOptions.Create_Option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
     auto paraFileName =
         programOptions.Create_Option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
-    auto logLevel = programOptions.Create_Option<std::string>("logLevel", "set log level of fairlog", "error");
+    auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");
 
     if (!programOptions.Verify(argc, argv))
     {
@@ -60,6 +63,7 @@ int main(int argc, const char** argv)
     // Basic simulation setup
     auto run = std::make_unique<FairRunSim>();
     run->SetName("TGeant4");
+    run->SetRunId(runID->value());
     run->SetStoreTraj(false);
     run->SetMaterials("media_r3b.geo");
     run->SetSink(std::make_unique<FairRootFileSink>(simuFileName->value().c_str()));

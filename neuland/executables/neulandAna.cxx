@@ -14,6 +14,7 @@
 #include "R3BProgramOptions.h"
 #include "TRandom3.h"
 #include "TStopwatch.h"
+#include <TObjString.h>
 #include <boost/program_options.hpp>
 
 namespace Digitizing = R3B::Digitizing;
@@ -45,6 +46,8 @@ auto main(int argc, const char** argv) -> int
         programOptions.Create_Option<std::string>("simuFile", "set the filename of simulation input", "simu.root");
     auto paraFileName =
         programOptions.Create_Option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
+    auto paraFileName2 =
+        programOptions.Create_Option<std::string>("paraFile2", "set the filename of the second parameter sink", "");
     auto digiFileName =
         programOptions.Create_Option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
     auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");
@@ -63,7 +66,14 @@ auto main(int argc, const char** argv) -> int
         return 0;
     }
 
-    auto const channelInit = [&]() { Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar->value()); };
+    auto const channelInit = [&]()
+    {
+        if (not hitLevelPar->value().empty())
+        {
+            FairRuntimeDb::instance()->getContainer(hitLevelPar->value().c_str());
+            Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar->value());
+        }
+    };
 
     auto tamexParameter = Digitizing::Neuland::Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
     tamexParameter.fPMTThresh = 1.;
@@ -101,6 +111,13 @@ auto main(int argc, const char** argv) -> int
     auto fileio = std::make_unique<FairParRootFileIo>();
     fileio->open(paraFileName->value().c_str());
     run->GetRuntimeDb()->setFirstInput(fileio.release());
+
+    if (const auto& filename = paraFileName2->value(); not filename.empty())
+    {
+        auto fileio2 = std::make_unique<FairParRootFileIo>();
+        fileio2->open(paraFileName2->value().c_str());
+        run->GetRuntimeDb()->setSecondInput(fileio2.release());
+    }
 
     auto digiNeuland = std::make_unique<R3BNeulandDigitizer>();
     digiNeuland->SetEngine((neulandEngines.at({ paddleName->value(), channelName->value() }))());

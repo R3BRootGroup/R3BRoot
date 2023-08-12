@@ -156,6 +156,27 @@ namespace
         ASSERT_EQ(signals.size(), 2) << "Fail to reconstruct the same number of signals!";
     }
 
+    TEST_F(testNeulandPaddle, check_output_singal) // NOLINT
+    {
+        auto* paddle = GetPaddle();
+        paddle->DepositLight(PaddleHit{ 10., 20., 0.5 * NeulandPaddle::gHalfLength });
+        const auto& leftHits = GetChannels().left->hits_;
+        const auto& rightHits = GetChannels().right->hits_;
+        AddChannelSignal<ChannelSide::left>(leftHits[0].time, leftHits[0].light);
+        AddChannelSignal<ChannelSide::right>(rightHits[0].time, rightHits[0].light);
+        EXPECT_CALL(*GetChannels().left, ConstructSignals())
+            .Times(1)
+            .WillOnce(Return(ExtractChannelSignals<ChannelSide::left>()));
+        EXPECT_CALL(*GetChannels().right, ConstructSignals())
+            .Times(1)
+            .WillOnce(Return(ExtractChannelSignals<ChannelSide::right>()));
+        auto const& signals = paddle->GetSignals();
+        ASSERT_EQ(signals.size(), 1) << "Fail to reconstruct the same number of signals!";
+        const double err = 0.1 * 0.5 * NeulandPaddle::gHalfLength;
+        ASSERT_NEAR(0.5 * NeulandPaddle::gHalfLength, signals.front().position, err)
+            << "reconstructed position is way different to predefined position!";
+    }
+
     // TEST_F(testNeulandPaddle, check_coupling_NoEQ_counts) // NOLINT
     // {
     //     auto* paddle = GetPaddle();

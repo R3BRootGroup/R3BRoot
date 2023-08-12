@@ -15,7 +15,7 @@
 #define DIGITIZING_PADDLE_H
 
 #include "R3BDigitizingChannel.h"
-#include <FairLogger.h>
+#include <R3BLogger.h>
 #include <RtypesCore.h>
 #include <functional>
 #include <memory>
