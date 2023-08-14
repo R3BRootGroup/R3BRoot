@@ -8,6 +8,7 @@
 #include "R3BDigitizingPaddleNeuland.h"
 #include "R3BDigitizingTacQuila.h"
 #include "R3BDigitizingTamex.h"
+#include "R3BFileSource2.h"
 #include "R3BNeulandDigitizer.h"
 #include "R3BNeulandHitMon.h"
 #include "R3BProgramOptions.h"
@@ -29,12 +30,12 @@ using Digitizing::UsePaddle;
 //     return []() { Digitizing::Neuland::Tamex::Channel::GetHitPar("test"); };
 // }
 
-int main(int argc, const char** argv)
+auto main(int argc, const char** argv) -> int
 {
     auto timer = TStopwatch{};
     timer.Start();
 
-    auto programOptions = r3b::ProgramOptions("options for neuland data analysis");
+    auto programOptions = R3B::ProgramOptions("options for neuland data analysis");
     auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
     auto paddleName =
         programOptions.Create_Option<std::string>("paddle", R"(set the paddle name. e.g. "neuland")", "neuland");
@@ -63,16 +64,26 @@ int main(int argc, const char** argv)
     }
 
     auto const channelInit = [&]() { Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar->value()); };
+
+    auto tamexParameter = Digitizing::Neuland::Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
+    tamexParameter.fPMTThresh = 1.;
+    tamexParameter.fTimeMin = 1.;
+
     const auto neulandEngines = std::map<std::pair<const std::string, const std::string>,
                                          std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
         { { "neuland", "tamex" },
           [&]()
-          { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(), channelInit); } },
+          {
+              return Digitizing::CreateEngine(
+                  UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+          } },
         { { "neuland", "tacquila" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
         { { "mock", "tamex" },
-          [&]()
-          { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(), channelInit); } },
+          [&]() {
+              return Digitizing::CreateEngine(
+                  UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+          } },
         { { "neuland", "mock" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
         { { "mock", "mock" },
@@ -82,7 +93,7 @@ int main(int argc, const char** argv)
     FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
 
     auto run = std::make_unique<FairRunAna>();
-    auto filesource = std::make_unique<FairFileSource>(simuFileName->value().c_str());
+    auto filesource = std::make_unique<R3BFileSource2>(simuFileName->value().c_str());
     auto filesink = std::make_unique<FairRootFileSink>(digiFileName->value().c_str());
     run->SetSource(filesource.release());
     run->SetSink(filesink.release());

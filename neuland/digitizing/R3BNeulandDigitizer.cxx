@@ -16,9 +16,6 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "R3BDigitizingPaddleNeuland.h"
-#include "R3BDigitizingTacQuila.h"
-#include "R3BDigitizingTamex.h"
 #include "TGeoManager.h"
 #include "TGeoNode.h"
 #include "TH1F.h"
@@ -30,12 +27,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <utility>
-
-using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
-using TacquilaChannel = Digitizing::Neuland::TacQuila::Channel;
-using TamexChannel = Digitizing::Neuland::Tamex::Channel;
-using Digitizing::UseChannel;
-using Digitizing::UsePaddle;
 
 R3BNeulandDigitizer::R3BNeulandDigitizer(TString input, TString output)
     : R3BNeulandDigitizer(Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()),
@@ -52,20 +43,6 @@ R3BNeulandDigitizer::R3BNeulandDigitizer(std::unique_ptr<Digitizing::DigitizingE
     , fHits(std::move(output))
     , fDigitizingEngine(std::move(engine))
 {
-}
-
-R3BNeulandDigitizer::R3BNeulandDigitizer(Options option)
-    : R3BNeulandDigitizer()
-{
-    switch (option)
-    {
-        case Options::channelTamex:
-            fDigitizingEngine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>());
-            break;
-        case Options::channelTacquila:
-            fDigitizingEngine = Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>());
-            break;
-    }
 }
 
 void R3BNeulandDigitizer::SetEngine(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine)
@@ -94,16 +71,6 @@ void R3BNeulandDigitizer::SetParContainers()
     }
 
     fDigitizingEngine->Init();
-    // fNeulandHitPar = dynamic_cast<R3BNeulandHitPar*>(rtdb->findContainer(fHitParName));
-    // if (fNeulandHitPar != nullptr)
-    // {
-    //     LOG(info) << "R3BNeulandDigitizer::SetHitParContainers: HitPar found from " << fHitParName;
-    // }
-    // else
-    // {
-    //     LOG(info) << "R3BNeulandDigitizer::SetHitParContainers: HitPar rootfile not found. Using default values.";
-    //     fNeulandHitPar.reset();
-    // }
 }
 
 InitStatus R3BNeulandDigitizer::Init()
@@ -113,12 +80,12 @@ InitStatus R3BNeulandDigitizer::Init()
 
     // Initialize control histograms
     auto const PaddleMulSize = 3000;
-    hMultOne = r3b::root_owned<TH1I>(
+    hMultOne = R3B::root_owned<TH1I>(
         "MultiplicityOne", "Paddle multiplicity: only one PMT per paddle", PaddleMulSize, 0, PaddleMulSize);
-    hMultTwo = r3b::root_owned<TH1I>(
+    hMultTwo = R3B::root_owned<TH1I>(
         "MultiplicityTwo", "Paddle multiplicity: both PMTs of a paddle", PaddleMulSize, 0, PaddleMulSize);
     auto const timeBinSize = 200;
-    hRLTimeToTrig = r3b::root_owned<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
+    hRLTimeToTrig = R3B::root_owned<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
 
     return kSUCCESS;
 }

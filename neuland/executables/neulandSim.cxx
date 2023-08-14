@@ -24,7 +24,7 @@ int main(int argc, const char** argv)
     auto const defaultEventNum = 10;
     timer.Start();
 
-    auto programOptions = r3b::ProgramOptions("options for neuland simulation");
+    auto programOptions = R3B::ProgramOptions("options for neuland simulation");
 
     auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
     auto eventNum = programOptions.Create_Option<int>("eventNum", "set total event number", defaultEventNum);

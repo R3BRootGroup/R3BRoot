@@ -12,6 +12,8 @@
  ******************************************************************************/
 
 #pragma once
+#include <FairLogger.h>
+#include <TFile.h>
 #include <type_traits>
 #include <utility>
 
@@ -19,7 +21,7 @@ class TF1;
 class TH1;
 class TTree;
 
-namespace r3b
+namespace R3B
 {
     // ROOT types owned by ROOT: TH1, TF1;
     template <typename... Types>
@@ -38,10 +40,28 @@ namespace r3b
     template <typename Type>
     inline constexpr bool is_root_owned = is_based_on<Type, RootTypes>;
 
+    struct TFileDeleter
+    {
+        void operator()(TFile* rootfile)
+        {
+
+            LOG(debug2) << "Closing file " << rootfile->GetName();
+            rootfile->Close();
+        }
+    };
+
     template <typename RootType, typename... Args>
     inline auto root_owned(Args&&... args)
     {
         static_assert(is_root_owned<RootType>, "root_owned: such type cannot be owned by ROOT!");
         return new RootType(std::forward<Args>(args)...); // NOLINT
     }
-} // namespace r3b
+
+    using unique_rootfile = std::unique_ptr<TFile, TFileDeleter>;
+
+    template <typename... Args>
+    inline auto make_rootfile(Args&&... args)
+    {
+        return unique_rootfile{ new TFile(std::forward<Args>(args)...) };
+    }
+} // namespace R3B

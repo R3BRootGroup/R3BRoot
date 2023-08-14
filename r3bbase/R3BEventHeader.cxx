@@ -21,6 +21,8 @@ R3BEventHeader::R3BEventHeader()
     , fTimeStamp(0)
     , fTpat(0)
     , fTStart(0)
+    , fTprev(0)
+    , fTnext(0)
 {
 }
 

@@ -35,19 +35,26 @@ namespace R3B::Digitizing::Neuland::Tamex
     class Channel;
     struct Params
     {
-        double fPMTThresh;             // [MeV]
-        double fSaturationCoefficient; // Saturation coefficient of PMTs
-        bool fExperimentalDataIsCorrectedForSaturation;
-        double fTimeRes; // time + Gaus(0., fTimeRes) [ns]
-        double fEResRel; // Gaus(e, fEResRel * e) []
-        double fEnergyGain;
-        double fPedestal;
-        double fTimeMax;
-        double fTimeMin;
-        double fQdcMin;
-        TRandom3& fRnd;
+        double fPMTThresh = 1.;                // [MeV]
+        double fSaturationCoefficient = 0.012; // Saturation coefficient of PMTs
+        bool fExperimentalDataIsCorrectedForSaturation = true;
+        double fTimeRes = 0.15; // time + Gaus(0., fTimeRes) [ns]
+        double fEResRel = 0.05; // Gaus(e, fEResRel * e) []
+        double fEnergyGain = 15.0;
+        double fPedestal = 14.0;
+        double fTimeMax = 1000.; // ns
+        double fTimeMin = 1.;    // ns
+        double fQdcMin = 0.67;
+        TRandom3* fRnd = nullptr;
 
         explicit Params(TRandom3&);
+
+        // rule of 5
+        Params(Params&&) = delete;
+        Params& operator=(const Params&) = default;
+        Params& operator=(Params&&) = delete;
+        ~Params() = default;
+        Params(const Params& other);
     };
 
     class PMTPeak
@@ -116,15 +123,16 @@ namespace R3B::Digitizing::Neuland::Tamex
     {
       public:
         Channel(ChannelSide, TRandom3&);
+        Channel(ChannelSide, const Params&);
         explicit Channel(ChannelSide side)
-            : Channel(side, GetRandom3Ref())
+            : Channel(side, GetDefaultRandomGen())
         {
         }
         void AddHit(Hit /*hit*/) override;
 
         // Getters:
-        auto GetPar() -> Tamex::Params& { return par; }
-        auto GetParConstRef() const -> const Tamex::Params& { return par; }
+        auto GetPar() -> Tamex::Params& { return par_; }
+        auto GetParConstRef() const -> const Tamex::Params& { return par_; }
         auto GetFQTPeaks() -> const std::vector<Peak>&;
         auto GetPMTPeaks() -> const std::vector<PMTPeak>&;
 
@@ -139,7 +147,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         std::vector<Peak> fFQTPeaks;
         static R3BNeulandHitPar const* fNeulandHitPar; // NOLINT
         R3BNeulandHitModulePar* fNeulandHitModulePar = nullptr;
-        Tamex::Params par;
+        Tamex::Params par_;
 
         auto CheckPaddleIDInHitPar() const -> bool;
         auto CheckPaddleIDInHitModulePar() const -> bool;
