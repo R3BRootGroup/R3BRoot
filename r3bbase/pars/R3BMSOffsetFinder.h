@@ -69,16 +69,16 @@ class R3BMSOffsetFinder : public FairTask // NOLINT
 
   private:
     // Number of histograms, limits and bining
-    Double_t fMSOffset;
+    Double_t fMSOffset = 0.0;
 
     // Minimum statistics and parameters
-    Int_t fMinStatistics{};
+    Int_t fMinStatistics = 1;
 
-    R3BMSOffsetPar* fMSOffsetPar;   /**< Parameter container. >*/
-    TClonesArray* fSamplerMapped;   /**< Array with SAMP Mapped input data. >*/
-    TClonesArray* fSamplerMSMapped; /**< Array with SAMPMS MApped input data. >*/
+    R3BMSOffsetPar* fMSOffsetPar = nullptr;   /**< Parameter container. >*/
+    TClonesArray* fSamplerMapped = nullptr;   /**< Array with SAMP Mapped input data. >*/
+    TClonesArray* fSamplerMSMapped = nullptr; /**< Array with SAMPMS MApped input data. >*/
 
-    TH1F* fh_Offset_Finder;
+    TH1F* fh_Offset_Finder = nullptr;
 
   public:
     ClassDefOverride(R3BMSOffsetFinder, 1); // NOLINT
