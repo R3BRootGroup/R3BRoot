@@ -42,6 +42,7 @@ set(SRCS
     R3BTcutPar.cxx
     R3BTsplinePar.cxx
     R3BWhiterabbitPropagator.cxx
+    R3BTprevTnext.cxx
     ./pars/R3BMSOffsetPar.cxx
     ./pars/R3BMSOffsetContFact.cxx
     ./pars/R3BMSOffsetFinder.cxx)
@@ -62,6 +63,7 @@ set(HEADERS
     R3BTcutPar.h
     R3BTsplinePar.h
     R3BWhiterabbitPropagator.h
+    R3BTprevTnext.h
     ./pars/R3BMSOffsetPar.h
     ./pars/R3BMSOffsetContFact.h
     ./pars/R3BMSOffsetFinder.h)

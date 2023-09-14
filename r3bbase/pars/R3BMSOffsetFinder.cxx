@@ -43,12 +43,6 @@ R3BMSOffsetFinder::R3BMSOffsetFinder()
 // R3BMSOffsetFinder: Standard Constructor --------------------------
 R3BMSOffsetFinder::R3BMSOffsetFinder(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fMSOffset(0.0)
-    , fMinStatistics(1)
-    , fMSOffsetPar(nullptr)
-    , fSamplerMapped(nullptr)
-    , fSamplerMSMapped(nullptr)
-    , fh_Offset_Finder(nullptr)
 {
 }
 
