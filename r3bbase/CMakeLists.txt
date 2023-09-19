@@ -60,6 +60,7 @@ set(HEADERS
     R3BException.h
     R3BFileSource.h
     R3BFileSource2.h
+    R3BIOConnector.h
     R3BLogger.h
     R3BModule.h
     R3BShared.h
