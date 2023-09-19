@@ -11,101 +11,86 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// NOTE: comments below are only meant for eduational purpose. DO NOT include them in your code!
+
 // ROOT headers
-#include "TClonesArray.h"
-#include "TMath.h"
-#include "TRandom.h"
+#include <TClonesArray.h>
+#include <TMath.h>
+#include <TRandom.h>
 
 // Fair headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 // R3B headers
 #include "NewTask.h"
+#include <R3BLogger.h>
+#include <fmt/core.h>
 
-// ---- Default constructor -------------------------------------------
-NewTask::NewTask()
-    : NewTask("NewTask", 1)
+namespace R3B
 {
-}
-
-// ---- Standard Constructor ------------------------------------------
-NewTask::NewTask(const TString& name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
-    , fOnline(kFALSE)
-{
-}
-
-// ---- Destructor ----------------------------------------------------
-NewTask::~NewTask()
-{
-    LOG(debug) << "Destructor of NewTask";
-    if (fDataInput)
-        delete fDataInput;
-}
-
-// ----  Initialisation  ----------------------------------------------
-void NewTask::SetParContainers()
-{
-    LOG(debug) << "SetParContainers of NewTask";
-    // Load all necessary parameter containers from the runtime data base
-}
-
-// ---- Init ----------------------------------------------------------
-InitStatus NewTask::Init()
-{
-    LOG(info) << "NewTask::Init()";
-
-    // Get a handle from the IO manager
-    FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
+    // ---- Standard Constructor ------------------------------------------
+    NewTask::NewTask(const std::string& name, int iVerbose)
+        : FairTask(name.c_str(), iVerbose)
     {
-        return kFATAL;
     }
 
-    // Get a pointer to the previous already existing data level
-    /*
-    fDataInput = (TClonesArray*) ioman->GetObject("InputDataLevelName");
-    if ( ! fDataInput ) {
-    return kERROR;
+    // ---- Default constructor -------------------------------------------
+    // use constructor delegation
+    NewTask::NewTask()
+        : NewTask("NewTask", 1)
+    {
     }
-  */
 
-    // Create the TClonesArray for the output data and register it
-    /*
-    fDataOutput = new TClonesArray("OutputDataLevelName", 10);
-    ioman->Register("OutputDataLevelName","OutputDataLevelName",fDataOutput,fOnline);
-  */
+    // ----  Initialisation  ----------------------------------------------
+    void NewTask::SetParContainers()
+    {
+        R3BLOG(debug, "SetParContainers of NewTask");
+        // Load all necessary parameter containers from the runtime data base
+    }
 
-    // Do whatever else is needed at the initilization stage
-    // Create histograms to be filled
-    // initialize variables
+    // ---- Init ----------------------------------------------------------
+    InitStatus NewTask::Init()
+    {
+        R3BLOG(debug, "NewTask::Init()");
 
-    return kSUCCESS;
-}
+        // Get a handle from the IO manager
+        if (auto* ioman = FairRootManager::Instance(); ioman == nullptr)
+        {
+            return kFATAL;
+        }
 
-// ---- ReInit  -------------------------------------------------------
-InitStatus NewTask::ReInit()
-{
-    LOG(debug) << "ReInit of NewTask";
-    SetParContainers();
-    return kSUCCESS;
-}
+        input_data_.init();
+        output_data_.init();
 
-// ---- Exec ----------------------------------------------------------
-void NewTask::Exec(Option_t* opt) { LOG(debug) << "Exec of NewTask"; }
+        // Do whatever else is needed at the initilization stage
+        // Create histograms to be filled
+        // initialize variables
 
-// ---- Finish --------------------------------------------------------
-void NewTask::Finish() { LOG(debug) << "Finish of NewTask"; }
+        return kSUCCESS;
+    }
 
-// ---- Reset ---------------------------------------------------------
-void NewTask::Reset()
-{
-    LOG(debug) << "Reset Data Structures";
-    if (fDataOutput)
-        fDataOutput->Clear();
-}
+    // ---- Exec ----------------------------------------------------------
+    void NewTask::Exec(Option_t* /*opt*/)
+    {
+        R3BLOG(debug, "Exec of NewTask");
+        output_data_.clear();
 
-ClassImp(NewTask);
+        // Read input data
+        for (const auto& calData : input_data_)
+        {
+            // do something with calData
+            fmt::print("qdc value: {}", calData.GetQdc());
+
+            // to write data:
+            output_data_.get().emplace_back();
+        }
+    }
+
+    // ---- Finish --------------------------------------------------------
+    void NewTask::Finish() { R3BLOG(debug, "Finish of NewTask"); }
+} // namespace R3B
+
+ClassImp(R3B::NewTask);
