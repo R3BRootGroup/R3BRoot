@@ -11,6 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include "FairLogger.h"
+#include "R3BLogger.h"
 #include "R3BFi23a.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -146,6 +148,7 @@ Bool_t R3BFi23a::ProcessHits(FairVolume* vol)
         fLength_in = gMC->TrackLength();
         gMC->TrackPosition(fPosIn);
         gMC->TrackMomentum(fMomIn);
+        R3BLOG(debug,"entering fi23a");
     }
 
     // Sum energy loss for all steps in the active volume

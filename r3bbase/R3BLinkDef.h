@@ -58,5 +58,10 @@
 #pragma link C++ class R3BOnlineSpectraToFD_S494+;
 #pragma link C++ class R3BOnlineSpectraToFI_S494+;
 #pragma link C++ class R3BOnlineSpectraBMON_S494+;
+//#pragma link C++ class R3BNDataCheckToFDS494+;
+#pragma link C++ class R3BDataCheckToFDS494+;
+#pragma link C++ class R3BDataCheckToFDHitS494+;
+#pragma link C++ class R3BDataCheckToFIS494+;
+#pragma link C++ class R3BDataCheckFibS494+;
 
 #endif

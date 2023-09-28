@@ -15,7 +15,7 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
@@ -23,7 +23,7 @@ Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
@@ -63,9 +63,9 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
-R3BModule.cxx 
+R3BModule.cxx
 R3BLogger.cxx
-R3BDetector.cxx 
+R3BDetector.cxx
 R3BEventHeader.cxx
 R3BEventHeaderPropagator.cxx
 R3BFileSource.cxx
@@ -83,9 +83,15 @@ R3BGlobalAnalysisS454.cxx
 R3BGlobalAnalysisS494.cxx
 #R3BGlobalCorrelationsS494.cxx
 R3BTrackS454.cxx
+##R3BTrackPrep.cxx
+##R3BPrepTrackS494.cxx
+##R3BTrackAnalysisS454.cxx
+##R3BTrackAnalysisS494.cxx
 R3BTrackS494.cxx
 R3BTrackDoubleS494.cxx
 R3BPreTrackS494.cxx
+##R3BTrackS494L.cxx
+##R3BSelectEvent.cxx
 R3BTrackerTestS454.cxx
 R3BTrackerTestS494.cxx
 #R3BOnlineSpillAnalysis.cxx
@@ -101,6 +107,10 @@ R3BOnlineSpectraFiber23.cxx
 R3BOnlineSpectraToFD_S494.cxx
 R3BOnlineSpectraToFI_S494.cxx
 R3BOnlineSpectraBMON_S494.cxx
+R3BDataCheckToFDS494.cxx
+R3BDataCheckToFDHitS494.cxx
+R3BDataCheckToFIS494.cxx
+R3BDataCheckFibS494.cxx
 )
 
 # fill list of header files from list of source files
@@ -115,4 +125,3 @@ Set(DEPENDENCIES
 Set(LIBRARY_NAME R3Bbase)
 
 GENERATE_LIBRARY()
-

@@ -18,7 +18,7 @@
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
- 
+
 #pragma link C++ class R3BGeoTof+;
 #pragma link C++ class R3BGeoTofPar;
 #pragma link C++ class R3BTof+;
@@ -41,7 +41,7 @@
 #pragma link C++ class R3BTofdCal2Hit+;
 #pragma link C++ class R3BTofdCal2HitS454+;
 #pragma link C++ class R3BTofdTofiCal2HitS494+;
-//#pragma link C++ class R3BTofdCal2HitS494+;
+#pragma link C++ class R3BTofdCal2HitS494+;
 //#pragma link C++ class R3BTofiCal2HitS494+;
 #pragma link C++ class R3BTofdHitModulePar+;
 #pragma link C++ class R3BTofiHitModulePar+;
@@ -68,4 +68,3 @@
 #pragma link C++ class R3BPtofParFact+;
 #pragma link C++ class R3BTofiHisto2HitPar+;
 #endif
-

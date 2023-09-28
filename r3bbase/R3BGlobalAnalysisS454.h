@@ -149,7 +149,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 	Bool_t fPairs;
 	Int_t fB;
 	Bool_t tracker = true;
-	
+
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
@@ -163,7 +163,7 @@ class R3BGlobalAnalysisS454 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;	
+	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
 
@@ -173,7 +173,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 	Double_t mHe = 3727.409;
 	Double_t mC = 11174.950;
 	Double_t mO = 15.99065084 * amu;
-	
+
     TLorentzVector alpha, carbon, oxygen;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector photon;
@@ -181,13 +181,13 @@ class R3BGlobalAnalysisS454 : public FairTask
 	Int_t Q = 0;
 	Double_t tPrev[10];
 	Int_t detPrev[10];
-	
+
 	Int_t counter1 = 0;
 	Int_t counter2 = 0;
 	Int_t counter3 = 0;
 	Int_t counter4 = 0;
 	Int_t countdet;
-	
+
     UInt_t num_spills = 0;
 
     TH1F* fh_Tpat;
@@ -213,7 +213,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 
     TH2F* fh_chiy_vs_chix_He;
     TH2F* fh_chiy_vs_chix_C;
-    
+
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -236,14 +236,14 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH2F* fh_px_px;
     TH2F* fh_py_py;
     TH2F* fh_pz_pz;
-    
+
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
 	TH1F* fh_theta26;
-	TH1F* fh_theta_16O;	
-	TH1F* fh_phi_16O;	
-	TH1F* fh_theta26_cm;	
+	TH1F* fh_theta_16O;
+	TH1F* fh_phi_16O;
+	TH1F* fh_theta26_cm;
 	TH1F* fh_phi26_cm;
 	TH1F* fh_theta_4He_cm;
 	TH1F* fh_phi_4He_cm;
@@ -260,7 +260,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	TH1F* fh_sum_pz;
-	
+
   public:
     ClassDef(R3BGlobalAnalysisS454, 1)
 };
