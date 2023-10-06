@@ -18,14 +18,10 @@
 set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
-#put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase
-${R3BROOT_SOURCE_DIR}/tcal
-${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/r3bdata/wrData
-${R3BROOT_SOURCE_DIR}/r3bbase/pars
-)
+    #put here all directories where header files are located
+    ${R3BROOT_SOURCE_DIR}/r3bbase ${R3BROOT_SOURCE_DIR}/tcal ${R3BROOT_SOURCE_DIR}/r3bdata
+    ${R3BROOT_SOURCE_DIR}/r3bdata/sampData ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+    ${R3BROOT_SOURCE_DIR}/r3bbase/pars)
 
 include_directories(${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -48,8 +44,7 @@ set(SRCS
     R3BWhiterabbitPropagator.cxx
     ./pars/R3BMSOffsetPar.cxx
     ./pars/R3BMSOffsetContFact.cxx
-    ./pars/R3BMSOffsetFinder.cxx
-    )
+    ./pars/R3BMSOffsetFinder.cxx)
 
 set(HEADERS
     R3BCoarseTimeStitch.h
@@ -68,8 +63,7 @@ set(HEADERS
     R3BWhiterabbitPropagator.h
     ./pars/R3BMSOffsetPar.h
     ./pars/R3BMSOffsetContFact.h
-    ./pars/R3BMSOffsetFinder.h
-    )
+    ./pars/R3BMSOffsetFinder.h)
 
 set(LINKDEF BaseLinkDef.h)
 
@@ -92,8 +86,11 @@ set(DEPENDENCIES
     Imt
     RIO
     RHTTP
-    Spectrum
-    stdc++fs)
+    Spectrum)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
+    set(DEPENDENCIES ${DEPENDENCIES} -lstdc++fs)
+endif()
 
 if("${FairRoot_VERSION}" VERSION_GREATER_EQUAL 18.8.0)
     set(DEPENDENCIES ${DEPENDENCIES} Online)

@@ -17,7 +17,7 @@
 # is is important for the base classes which are in R3BROOT and PANDAROOT.
 
 if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
-  message(FATAL_ERROR "In-source builds are not supported, please, create a folder build.")
+    message(FATAL_ERROR "In-source builds are not supported, please, create a folder build.")
 endif()
 
 # Check if cmake has the required version
@@ -31,27 +31,36 @@ project(R3BROOT LANGUAGES C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(STATUS "  ")
-    message(ERROR " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git")
+    message(
+        ERROR
+        " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
+    )
     message(STATUS "  ")
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
 # Check for needed environment variables
-IF(NOT DEFINED ENV{SIMPATH})
-  MESSAGE(FATAL_ERROR "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again.")
-ENDIF(NOT DEFINED ENV{SIMPATH})
-SET(SIMPATH $ENV{SIMPATH})
+if(NOT DEFINED ENV{SIMPATH})
+    message(
+        FATAL_ERROR
+            "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again."
+    )
+endif(NOT DEFINED ENV{SIMPATH})
+set(SIMPATH $ENV{SIMPATH})
 
-IF(NOT DEFINED ENV{FAIRROOTPATH})
-  MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
-ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
-SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
+if(NOT DEFINED ENV{FAIRROOTPATH})
+    message(
+        FATAL_ERROR
+            "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again."
+    )
+endif(NOT DEFINED ENV{FAIRROOTPATH})
+set(FAIRROOTPATH $ENV{FAIRROOTPATH})
 
-STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
+string(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
 set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 
-Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
+set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 
 # Set option(s)
 option(BUILD_GEOMETRY "Build all ROOT geometries" ON)
@@ -68,36 +77,39 @@ option(BUILD_C3W "Build C3W" OFF)
 
 find_package(FairCMakeModules 1.0.0 QUIET)
 if(FairCMakeModules_FOUND)
-  include(FairFindPackage2)
+    include(FairFindPackage2)
+    include(FairFormattedOutput)
 else()
-  message(STATUS "Could not find FairCMakeModules. "
-          "It is recommended to install https://github.com/FairRootGroup/FairCMakeModules")
+    message(STATUS "Could not find FairCMakeModules. "
+                   "It is recommended to install https://github.com/FairRootGroup/FairCMakeModules")
 endif()
 
 if(COMMAND find_package2)
-  find_package2(PUBLIC FairRoot VERSION 18.6.4 QUIET)
+    find_package2(PUBLIC FairRoot VERSION 18.6.4 QUIET)
 else()
-  find_package(FairRoot)
+    find_package(FairRoot)
 endif()
 
 # FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
 execute_process(
-  COMMAND ${FAIRROOTPATH}/bin/fairroot-config --version
-  COMMAND sed "s/^v//"
-  OUTPUT_VARIABLE FairRoot_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-if( "${FairRoot_VERSION}"  VERSION_LESS 18.2.1 )
-  Message(FATAL_ERROR "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later")
+    COMMAND ${FAIRROOTPATH}/bin/fairroot-config --version
+    COMMAND sed "s/^v//"
+    OUTPUT_VARIABLE FairRoot_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+if("${FairRoot_VERSION}" VERSION_LESS 18.2.1)
+    message(
+        FATAL_ERROR
+            "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later"
+    )
 else()
-  message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
+    message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
 endif()
 
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
 if(SIMPATH)
-  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+    set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
 endif()
 
 # Load some basic macros which are needed later on
@@ -106,15 +118,25 @@ include(FairMacros)
 list(APPEND required_root_components RIO)
 list(APPEND optional_root_components opengl)
 list(APPEND optional_root_components gdml vmc)
-find_package2(PUBLIC ROOT  VERSION 6.16.00 REQUIRED
-  COMPONENTS ${required_root_components}
-  OPTIONAL_COMPONENTS ${optional_root_components})
-  
+
+# TODO: ROOT package should be found with CONFIG mode
+find_package2(
+    PUBLIC
+    ROOT
+    VERSION
+    6.16.00
+    MODULE
+    REQUIRED
+    COMPONENTS
+    ${required_root_components}
+    OPTIONAL_COMPONENTS
+    ${optional_root_components})
+
 if("${ROOT_vmc_FOUND}" MATCHES "no")
-  find_package2(PUBLIC VMC REQUIRED)
-  set(VMCLIB VMCLibrary)
+    find_package2(PUBLIC VMC REQUIRED)
+    set(VMCLIB VMCLibrary)
 else()
-  set(VMCLIB VMC)
+    set(VMCLIB VMC)
 endif()
 
 include(R3BMacros)
@@ -124,76 +146,114 @@ include(Dart)
 include(CheckCompiler)
 include(ROOTMacros)
 
-find_package2(PUBLIC FairLogger  VERSION 1.6.0 REQUIRED)
+find_package2(PUBLIC FairLogger VERSION 1.6.0 REQUIRED)
 
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
-  if(NOT dep STREQUAL "Boost")
-    find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
-  endif()
+    if(NOT dep STREQUAL "Boost")
+        find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
+    endif()
 endforeach()
 
-if("${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
-  
-  find_package2(PUBLIC FairMQ VERSION 1.4.0 REQUIRED)
-  find_package2(PUBLIC DDS)
+if("${FairRoot_VERSION}" VERSION_GREATER 18.6.4)
 
-  If(FAIRSOFT_EXTERN)
-   set(BOOST_ROOT ${SIMPATH})
-   set(GSL_DIR ${SIMPATH})
-  Else(FAIRSOFT_EXTERN)
-   set(BOOST_ROOT ${SIMPATH}/basics/boost)
-   set(GSL_DIR ${SIMPATH}/basics/gsl)
-  EndIf(FAIRSOFT_EXTERN)
+    find_package2(PUBLIC FairMQ VERSION 1.4.0 REQUIRED)
+    find_package2(PUBLIC DDS)
 
-  if(NOT DEFINED Boost_NO_SYSTEM_PATHS)
-   Set(Boost_NO_SYSTEM_PATHS TRUE)
-  endif()
-  if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
-   Set(Boost_NO_BOOST_CMAKE TRUE)
-  endif()
-  if(Boost_NO_BOOST_CMAKE)
-   # If an older version of boost is found both of the variables below are
-   # cached and in a second cmake run, a good boost version is found even
-   # if the version is to old.
-   # To overcome this problem both variables are cleared before checking
-   # for boost.
-   Unset(Boost_INCLUDE_DIR CACHE)
-   Unset(Boost_LIBRARY_DIRS CACHE)
-  endif()
+    if(FAIRSOFT_EXTERN)
+        set(BOOST_ROOT ${SIMPATH})
+        set(GSL_DIR ${SIMPATH})
+    else(FAIRSOFT_EXTERN)
+        set(BOOST_ROOT ${SIMPATH}/basics/boost)
+        set(GSL_DIR ${SIMPATH}/basics/gsl)
+    endif(FAIRSOFT_EXTERN)
 
-  list(APPEND boost_dependencies thread system timer program_options random filesystem chrono exception iostreams regex serialization log atomic)
-  
-  find_package2(PUBLIC Boost
-  VERSION 1.67
-  COMPONENTS ${boost_dependencies}
-  ADD_REQUIREMENTS_OF FairMQ
-  )
-#  If (FairMQ_FOUND AND Boost_FOUND)
-#    add_subdirectory(base/MQ)
-#    add_subdirectory(parmq)
-#  Else ()
-#    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
-#  EndIf ()
+    if(NOT DEFINED Boost_NO_SYSTEM_PATHS)
+        set(Boost_NO_SYSTEM_PATHS TRUE)
+    endif()
+    if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
+        set(Boost_NO_BOOST_CMAKE TRUE)
+    endif()
+    if(Boost_NO_BOOST_CMAKE)
+        # If an older version of boost is found both of the variables below are
+        # cached and in a second cmake run, a good boost version is found even
+        # if the version is to old.
+        # To overcome this problem both variables are cleared before checking
+        # for boost.
+        unset(Boost_INCLUDE_DIR CACHE)
+        unset(Boost_LIBRARY_DIRS CACHE)
+    endif()
+
+    list(
+        APPEND
+        boost_dependencies
+        thread
+        system
+        timer
+        program_options
+        random
+        filesystem
+        chrono
+        exception
+        iostreams
+        regex
+        serialization
+        log
+        atomic)
+
+    find_package2(
+        PUBLIC
+        Boost
+        VERSION
+        1.67
+        COMPONENTS
+        ${boost_dependencies}
+        ADD_REQUIREMENTS_OF
+        FairMQ)
+    #  If (FairMQ_FOUND AND Boost_FOUND)
+    #    add_subdirectory(base/MQ)
+    #    add_subdirectory(parmq)
+    #  Else ()
+    #    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
+    #  EndIf ()
 else()
-set(Boost_NO_SYSTEM_PATHS TRUE)
-set(Boost_NO_BOOST_CMAKE TRUE)
+    set(Boost_NO_SYSTEM_PATHS TRUE)
+    set(Boost_NO_BOOST_CMAKE TRUE)
 
-If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
-  set(BOOST_ROOT ${SIMPATH})
-  set(GSL_DIR ${SIMPATH})
-Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
-  set(BOOST_ROOT ${SIMPATH}/basics/boost)
-  set(GSL_DIR ${SIMPATH}/basics/gsl)
-EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+    if(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+        set(BOOST_ROOT ${SIMPATH})
+        set(GSL_DIR ${SIMPATH})
+    else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+        set(BOOST_ROOT ${SIMPATH}/basics/boost)
+        set(GSL_DIR ${SIMPATH}/basics/gsl)
+    endif(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
 
-unset(Boost_INCLUDE_DIR CACHE)
-unset(Boost_LIBRARY_DIRS CACHE)
-find_package2(PUBLIC Boost
-  VERSION 1.67 ${FairMQ_Boost_VERSION}
-  COMPONENTS thread system timer program_options random filesystem chrono exception iostreams regex serialization log log_setup atomic date_time ${FairMQ_Boost_COMPONENTS}
- REQUIRED
-)
-Endif()
+    unset(Boost_INCLUDE_DIR CACHE)
+    unset(Boost_LIBRARY_DIRS CACHE)
+    find_package2(
+        PUBLIC
+        Boost
+        VERSION
+        1.67
+        ${FairMQ_Boost_VERSION}
+        COMPONENTS
+        thread
+        system
+        timer
+        program_options
+        random
+        filesystem
+        chrono
+        exception
+        iostreams
+        regex
+        serialization
+        log
+        log_setup
+        atomic
+        date_time
+        ${FairMQ_Boost_COMPONENTS}
+        REQUIRED)
+endif()
 
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
@@ -213,22 +273,29 @@ find_package2(PUBLIC IWYU)
 find_package2(PUBLIC GSL)
 
 find_package2(PUBLIC Git)
-set (Git_VERSION ${GIT_VERSION_STRING})
-string(REPLACE "git" " " Git_ROOT ${GIT_EXECUTABLE} )
+set(Git_VERSION ${GIT_VERSION_STRING})
+string(REPLACE "git" " " Git_ROOT ${GIT_EXECUTABLE})
 
 # Check the compiler and set the compile and link flags
 check_compiler()
 
 if(DEFINED ENV{WERROR} AND "$ENV{WERROR}")
-  message(STATUS "Will compile with -Werror. ")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wformat-security -Werror -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable -Wfatal-errors")
+    message(STATUS "Will compile with -Werror. ")
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wall -Wformat-security -Werror -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable -Wfatal-errors"
+    )
 else()
-  if (NOT APPLE)
-    message(STATUS "Set env WERROR to 1 to enable -Werror. If origin/dev compiles on your platform with that option, it is definitly a good idea to do that.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wformat-security -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable")
-  endif()
+    if(NOT APPLE)
+        message(
+            STATUS
+                "Set env WERROR to 1 to enable -Werror. If origin/dev compiles on your platform with that option, it is definitly a good idea to do that."
+        )
+        set(CMAKE_CXX_FLAGS
+            "${CMAKE_CXX_FLAGS} -Wall -Wformat-security -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable"
+        )
+    endif()
 endif()
-set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}" )
+set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # used by clang-tidy
 
@@ -251,16 +318,19 @@ check_out_of_source_build()
 
 # Check if we are on an UNIX system. If not stop with an error message
 if(NOT UNIX)
-    message(FATAL_ERROR "You're not on an UNIX system. The project was up to now only tested on UNIX systems, so we break here. If you want to go on please edit the CMakeLists.txt in the source directory.")
+    message(
+        FATAL_ERROR
+            "You're not on an UNIX system. The project was up to now only tested on UNIX systems, so we break here. If you want to go on please edit the CMakeLists.txt in the source directory."
+    )
 endif(NOT UNIX)
 
 # Check if the external packages are installed into a separate install directory
-if (COMMAND check_external_package_install_dir)
-  check_external_package_install_dir()
+if(COMMAND check_external_package_install_dir)
+    check_external_package_install_dir()
 endif()
 
 if(Boost_FOUND)
-  set(Boost_Avail 1)
+    set(Boost_Avail 1)
 else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
@@ -269,21 +339,19 @@ find_package2(PUBLIC yaml-cpp)
 # Workaround missing exported include directories
 # Upstream has fixed this in https://github.com/jbeder/yaml-cpp/commit/ab5f9259a4e67d3fe0e4832bd407a9e596e2d884 (since 0.6.3)
 if(yaml-cpp_FOUND)
-  get_filename_component(YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}" REALPATH BASE_DIR "/")
+    get_filename_component(YAML_CPP_INCLUDE_DIR "${YAML_CPP_INCLUDE_DIR}" REALPATH BASE_DIR "/")
 endif()
-if(    yaml-cpp_FOUND
+if(yaml-cpp_FOUND
    AND TARGET yaml-cpp
    AND EXISTS YAML_CPP_INCLUDE_DIR
-   AND yaml-cpp_VERSION VERSION_LESS 0.6.3
-)
-  set_target_properties(yaml-cpp PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${YAML_CPP_INCLUDE_DIR}"
-  )
+   AND yaml-cpp_VERSION VERSION_LESS 0.6.3)
+    set_target_properties(yaml-cpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+                                              "${YAML_CPP_INCLUDE_DIR}")
 endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
 
-SetBasicVariables()
+setbasicvariables()
 
 # Set the library version in the main CMakeLists.txt
 set(R3BROOT_MAJOR_VERSION 0)
@@ -296,17 +364,10 @@ if(NOT DEFINED ROOT_FOUND_VERSION)
 endif()
 message("ROOT_FOUND_VERSION = ${ROOT_FOUND_VERSION}")
 
-set(FAIRROOT_LIBRARY_PROPERTIES
-    ${FAIRROOT_LIBRARY_PROPERTIES}
-    VERSION
-    "${R3BROOT_VERSION}"
-    SOVERSION
-    "${R3BROOT_VERSION}")
+set(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES} VERSION "${R3BROOT_VERSION}"
+                                SOVERSION "${R3BROOT_VERSION}")
 
-string(COMPARE EQUAL
-               "${CMAKE_GENERATOR}"
-               "Xcode"
-               IS_XCODE)
+string(COMPARE EQUAL "${CMAKE_GENERATOR}" "Xcode" IS_XCODE)
 set(R3BLIBDIR ${CMAKE_BINARY_DIR}/lib)
 if(${IS_XCODE})
     set(LD_LIBRARY_PATH ${R3BLIBDIR}/RELWITHDEBINFO ${R3BLIBDIR} ${LD_LIBRARY_PATH})
@@ -317,28 +378,30 @@ endif(${IS_XCODE})
 find_package(ucesb)
 if(ucesb_FOUND)
     set(WITH_UCESB ON)
-    SET(UCESBPATH $ENV{UCESB_DIR})
+    set(UCESBPATH $ENV{UCESB_DIR})
     set(ucesb_summary "${BGreen}YES${CR}       ${BMagenta}${UCESBPATH}${CR}")
     set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
 else(ucesb_FOUND)
-  message(WARNING "${BMagenta}No UCESB configured. You will not be able to unpack lmd files. Set UCESB_DIR"
-    " to a ucesb installation to fix this.${CR}")
+    message(
+        WARNING
+            "${BMagenta}No UCESB configured. You will not be able to unpack lmd files. Set UCESB_DIR"
+            " to a ucesb installation to fix this.${CR}")
 endif(ucesb_FOUND)
 
 find_package(EPICS)
 if(EPICS_FOUND)
-  set(WITH_EPICS ON)
-  set(epics_summary "${BGreen}YES${CR}       ${BMagenta}${EPICS_LIBRARY_DIR}${CR}")
-  set(LD_LIBRARY_PATH ${EPICS_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+    set(WITH_EPICS ON)
+    set(epics_summary "${BGreen}YES${CR}       ${BMagenta}${EPICS_LIBRARY_DIR}${CR}")
+    set(LD_LIBRARY_PATH ${EPICS_LIBRARY_DIR} ${LD_LIBRARY_PATH})
 else(EPICS_FOUND)
-   set(epics_summary "${BYellow}NO${CR}")
+    set(epics_summary "${BYellow}NO${CR}")
 endif(EPICS_FOUND)
 
 find_package(Atima)
 if(Atima_FOUND)
-   set(atima_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/atima/${CR}")
+    set(atima_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/atima/${CR}")
 else(Atima_FOUND)
-   set(atima_summary "${BYellow}NO${CR}")
+    set(atima_summary "${BYellow}NO${CR}")
 endif(Atima_FOUND)
 
 find_package(Garfield)
@@ -365,7 +428,8 @@ endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
 if(EXISTS "${R3BROOT_SOURCE_DIR}/NeuLAND_DNN/")
     message("Building NeuLAND DNN framework...")
     set(WITH_NeuLAND_DNN ON)
-    set(neuland_dnn_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/NeuLAND_DNN/${CR}")
+    set(neuland_dnn_summary
+        "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/NeuLAND_DNN/${CR}")
     add_definitions(-DNEULAND_DNN)
 else(EXISTS "${R3BROOT_SOURCE_DIR}/NeuLAND_DNN/")
     message("${BYellow}NeuLAND_DNN framework not found${CR}")
@@ -402,7 +466,8 @@ else(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
     set(asyeos_summary "${BYellow}NO${CR}")
 endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 
-configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in
+               "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
 
 r3b_generate_version_info()
 
@@ -411,7 +476,7 @@ r3b_generate_version_info()
 
 # FIXME in FairSoft / FairRoot
 find_package(VMC QUIET)
-set (BASE_INCLUDE_DIRECTORIES ${BASE_INCLUDE_DIRECTORIES} ${VMC_INCLUDE_DIRS})
+set(BASE_INCLUDE_DIRECTORIES ${BASE_INCLUDE_DIRECTORIES} ${VMC_INCLUDE_DIRS})
 
 if(MODULE)
     add_subdirectory(${MODULE})
@@ -419,22 +484,24 @@ endif(MODULE)
 
 if(NOT MODULE)
     if(BUILD_GEOMETRY)
-      set(ROOTSYS ${SIMPATH})
-      set(unitgeo_summary "${BGreen} YES${CR}       (default, disable with ${BMagenta}-DBUILD_GEOMETRY=OFF${CR})")
+        set(ROOTSYS ${SIMPATH})
+        set(unitgeo_summary
+            "${BGreen} YES${CR}       (default, disable with ${BMagenta}-DBUILD_GEOMETRY=OFF${CR})")
     else()
-      set(unitgeo_summary "${BRed} NO${CR}        (enable with ${BMagenta}-DBUILD_GEOMETRY=ON${CR})")
+        set(unitgeo_summary
+            "${BRed} NO${CR}        (enable with ${BMagenta}-DBUILD_GEOMETRY=ON${CR})")
     endif()
     message(STATUS "  ${BWhite}ROOT geometries${CR}          ${unitgeo_summary}")
     add_subdirectory(r3bbase)
     if(WITH_UCESB)
         add_subdirectory(r3bsource)
     endif(WITH_UCESB)
-    if (WITH_EPICS)
-      add_subdirectory (epics)
-    endif (WITH_EPICS)
-    if (Atima_FOUND)
-      add_subdirectory (atima)
-    endif (Atima_FOUND)
+    if(WITH_EPICS)
+        add_subdirectory(epics)
+    endif(WITH_EPICS)
+    if(Atima_FOUND)
+        add_subdirectory(atima)
+    endif(Atima_FOUND)
     add_subdirectory(passive)
     add_subdirectory(glad)
     add_subdirectory(xball)
@@ -500,158 +567,162 @@ endif(NOT MODULE)
 # add_subdirectory(gconfig)
 add_subdirectory(cmake)
 
-If(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-  Execute_Process(COMMAND ${GIT_EXECUTABLE} describe --tags
-                  OUTPUT_VARIABLE R3BROOT_GIT_VERSION
-                  OUTPUT_STRIP_TRAILING_WHITESPACE
-                  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                 )
-Else()
-  Set(R3BROOT_GIT_VERSION v${R3BROOT_MAJOR_VERSION}.${R3BROOT_MINOR_VERSION}.${R3BROOT_PATCH_VERSION})
-EndIf()
+if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags
+        OUTPUT_VARIABLE R3BROOT_GIT_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+else()
+    set(R3BROOT_GIT_VERSION
+        v${R3BROOT_MAJOR_VERSION}.${R3BROOT_MINOR_VERSION}.${R3BROOT_PATCH_VERSION})
+endif()
 
 write_config_file(config.sh)
 write_config_file(config.csh)
-WRITE_CONFIG_FILE(config.sh_install)
-WRITE_CONFIG_FILE(config.csh_install)
+write_config_file(config.sh_install)
+write_config_file(config.csh_install)
 
 write_env_cache(env_cache.sh)
 
 # Get rid of leftover c3w configuration
 execute_process(COMMAND rm -f ${CMAKE_CURRENT_BINARY_DIR}/GNUmakefile
-                              ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
+                        ${CMAKE_CURRENT_BINARY_DIR}/c3w.sh)
 
-if (EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
-  set(BUILD_C3W ON)
-  set(c3w_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/util/c3w/${CR}")
-  add_subdirectory(util/c3w)
+if(EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
+    set(BUILD_C3W ON)
+    set(c3w_summary "${BGreen}YES${CR}       ${BMagenta}${R3BROOT_SOURCE_DIR}/util/c3w/${CR}")
+    add_subdirectory(util/c3w)
 else()
-  set(c3w_summary "${BYellow}NO${CR}")
+    set(c3w_summary "${BYellow}NO${CR}")
 endif()
 
 # Summary ######################################################################
 if(CMAKE_CXX_FLAGS)
-  message(STATUS "  ")
-  message(STATUS "  ${Cyan}GLOBAL CXX FLAGS${CR}  ${BGreen}${CMAKE_CXX_FLAGS}${CR}")
+    message(STATUS "  ")
+    message(STATUS "  ${Cyan}GLOBAL CXX FLAGS${CR}  ${BGreen}${CMAKE_CXX_FLAGS}${CR}")
 endif()
 if(CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "  ")
-  message(STATUS "  ${Cyan}BUILD TYPE         CXX FLAGS${CR}")
-  string(TOUPPER "${CMAKE_BUILD_TYPE}" selected_type)
-  foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
-   string(TOUPPER "${type}" type_upper)
-   if(type_upper STREQUAL selected_type)
-     pad("${type}" 18 " " type_padded)
-     message(STATUS "${BGreen}* ${type_padded}${CMAKE_CXX_FLAGS_${type_upper}}${CR}")
-   else()
-     pad("${type}" 18 " " type_padded)
-     message(STATUS "  ${BWhite}${type_padded}${CR}${CMAKE_CXX_FLAGS_${type_upper}}")
-   endif()
-   unset(type_padded)
-   unset(type_upper)
- endforeach()
-message(STATUS "  ")
-message(STATUS "  (Change the build type with ${BMagenta}-DCMAKE_BUILD_TYPE=...${CR})")
+    message(STATUS "  ")
+    message(STATUS "  ${Cyan}BUILD TYPE         CXX FLAGS${CR}")
+    string(TOUPPER "${CMAKE_BUILD_TYPE}" selected_type)
+    foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
+        string(TOUPPER "${type}" type_upper)
+        if(type_upper STREQUAL selected_type)
+            fair_pad("${type}" 19 " " type_padded)
+            message(STATUS "${BGreen}* ${type_padded}${CMAKE_CXX_FLAGS_${type_upper}}${CR}")
+        else()
+            fair_pad("${type}" 19 " " type_padded)
+            message(STATUS "  ${BWhite}${type_padded}${CR}${CMAKE_CXX_FLAGS_${type_upper}}")
+        endif()
+        unset(type_padded)
+        unset(type_upper)
+    endforeach()
+    message(STATUS "  ")
+    message(STATUS "  (Change the build type with ${BMagenta}-DCMAKE_BUILD_TYPE=...${CR})")
 endif()
 
 if(PROJECT_PACKAGE_DEPENDENCIES)
-  message(STATUS "  ")
-  message(STATUS "  ${Cyan}DEPENDENCY FOUND     VERSION                   PREFIX${CR}")
-  foreach(dep IN LISTS PROJECT_PACKAGE_DEPENDENCIES)
-    if(${dep}_VERSION)
-      if(${dep} STREQUAL DDS)
-        set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
-      elseif(${dep} STREQUAL Boost)
-        if(Boost_VERSION_MAJOR)
-          set(version_str "${BGreen}${${dep}_VERSION_MAJOR}.${${dep}_VERSION_MINOR}${CR}")
+    message(STATUS "  ")
+    message(STATUS "  ${Cyan}DEPENDENCY FOUND     VERSION                   PREFIX${CR}")
+    foreach(dep IN LISTS PROJECT_PACKAGE_DEPENDENCIES)
+        if(${dep}_VERSION)
+            if(${dep} STREQUAL DDS)
+                set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
+            elseif(${dep} STREQUAL Boost)
+                if(Boost_VERSION_MAJOR)
+                    set(version_str "${BGreen}${${dep}_VERSION_MAJOR}.${${dep}_VERSION_MINOR}${CR}")
+                else()
+                    set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
+                endif()
+            else()
+                set(version_str "${BGreen}${${dep}_VERSION}${CR}")
+            endif()
         else()
-          set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
+            set(version_str "${BYellow}unknown${CR}")
         endif()
-      else()
-        set(version_str "${BGreen}${${dep}_VERSION}${CR}")
-      endif()
-    else()
-      set(version_str "${BYellow}unknown${CR}")
-    endif()
-    if(PROJECT_${dep}_VERSION)
-      set(version_req_str " (>= ${PROJECT_${dep}_VERSION})")
-    endif()
-    pad(${dep} 20 " " dep_padded)
-    if(DISABLE_COLOR)
-      pad("${version_str}${version_req_str}" 25 " " version_padded)
-    else()
-      pad("${version_str}${version_req_str}" 25 " " version_padded COLOR 1)
-    endif()
-    set(prefix ${${dep}_PREFIX})
-    if(${dep} STREQUAL Boost)
-      if(TARGET Boost::headers)
-        get_target_property(boost_include Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
-      else()
-        get_target_property(boost_include Boost::boost INTERFACE_INCLUDE_DIRECTORIES)
-      endif()
-      get_filename_component(prefix ${boost_include}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL Protobuf)
-      get_filename_component(prefix ${Protobuf_INCLUDE_DIRS}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL msgpack)
-      get_target_property(msgpack_include msgpackc INTERFACE_INCLUDE_DIRECTORIES)
-      get_filename_component(prefix ${msgpack_include}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL Pythia6)
-      get_filename_component(prefix ${PYTHIA6_LIBRARY_DIR}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL Pythia8)
-      get_filename_component(prefix ${PYTHIA8_LIB_DIR}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL FairLogger)
-      if(FairLogger_PREFIX)
-        set(prefix ${FairLogger_PREFIX})
-      else()
-        set(prefix ${FairLogger_ROOT})
-      endif()
-    elseif(${dep} STREQUAL FairMQ)
-      if(FairMQ_PREFIX)
-        set(prefix ${FairMQ_PREFIX})
-      else()
-        set(prefix ${FairMQ_ROOT})
-      endif()
-    elseif(${dep} STREQUAL yaml-cpp)
-      get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL Geant4VMC)
-      string(REPLACE ":" ";" geant4vmc_include ${Geant4VMC_INCLUDE_DIRS})
-      list(GET geant4vmc_include 0 geant4vmc_include)
-      get_filename_component(prefix ${geant4vmc_include}/../.. ABSOLUTE)
-    elseif(${dep} STREQUAL Geant3)
-      string(REPLACE ":" ";" geant3_include ${Geant3_INCLUDE_DIRS})
-      list(GET geant3_include 0 geant3_include)
-      get_filename_component(prefix ${geant3_include}/../.. ABSOLUTE)
-    elseif(${dep} STREQUAL Geant4)
-      list(GET Geant4_INCLUDE_DIRS 0 geant4_include)
-      get_filename_component(prefix ${geant4_include}/../.. ABSOLUTE)
-    elseif(${dep} STREQUAL VGM)
-      string(REPLACE ":" ";" vgm_include ${VGM_INCLUDE_DIRS})
-      list(GET vgm_include 0 vgm_include)
-      get_filename_component(prefix ${vgm_include}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL ROOT)
-      set(prefix ${ROOT_INSTALL_DIR})
-    elseif(${dep} STREQUAL IWYU)
-      get_filename_component(prefix ${IWYU_BINARY}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL yaml-cpp)
-      get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
-    endif()
+        if(PROJECT_${dep}_VERSION)
+            set(version_req_str " (>= ${PROJECT_${dep}_VERSION})")
+        endif()
+        fair_pad(${dep} 21 " " dep_padded)
+        if(DISABLE_COLOR)
+            fair_pad("${version_str}${version_req_str}" 26 " " version_padded)
+        else()
+            fair_pad("${version_str}${version_req_str}" 26 " " version_padded COLOR 1)
+        endif()
+        set(prefix ${${dep}_PREFIX})
+        if(${dep} STREQUAL Boost)
+            if(TARGET Boost::headers)
+                get_target_property(boost_include Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
+            else()
+                get_target_property(boost_include Boost::boost INTERFACE_INCLUDE_DIRECTORIES)
+            endif()
+            get_filename_component(prefix ${boost_include}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL Protobuf)
+            get_filename_component(prefix ${Protobuf_INCLUDE_DIRS}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL msgpack)
+            get_target_property(msgpack_include msgpackc INTERFACE_INCLUDE_DIRECTORIES)
+            get_filename_component(prefix ${msgpack_include}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL Pythia6)
+            get_filename_component(prefix ${PYTHIA6_LIBRARY_DIR}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL Pythia8)
+            get_filename_component(prefix ${PYTHIA8_LIB_DIR}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL FairLogger)
+            if(FairLogger_PREFIX)
+                set(prefix ${FairLogger_PREFIX})
+            else()
+                set(prefix ${FairLogger_ROOT})
+            endif()
+        elseif(${dep} STREQUAL FairMQ)
+            if(FairMQ_PREFIX)
+                set(prefix ${FairMQ_PREFIX})
+            else()
+                set(prefix ${FairMQ_ROOT})
+            endif()
+        elseif(${dep} STREQUAL yaml-cpp)
+            get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL Geant4VMC)
+            string(REPLACE ":" ";" geant4vmc_include ${Geant4VMC_INCLUDE_DIRS})
+            list(GET geant4vmc_include 0 geant4vmc_include)
+            get_filename_component(prefix ${geant4vmc_include}/../.. ABSOLUTE)
+        elseif(${dep} STREQUAL Geant3)
+            string(REPLACE ":" ";" geant3_include ${Geant3_INCLUDE_DIRS})
+            list(GET geant3_include 0 geant3_include)
+            get_filename_component(prefix ${geant3_include}/../.. ABSOLUTE)
+        elseif(${dep} STREQUAL Geant4)
+            list(GET Geant4_INCLUDE_DIRS 0 geant4_include)
+            get_filename_component(prefix ${geant4_include}/../.. ABSOLUTE)
+        elseif(${dep} STREQUAL VGM)
+            string(REPLACE ":" ";" vgm_include ${VGM_INCLUDE_DIRS})
+            list(GET vgm_include 0 vgm_include)
+            get_filename_component(prefix ${vgm_include}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL ROOT)
+            set(prefix ${ROOT_INSTALL_DIR})
+        elseif(${dep} STREQUAL IWYU)
+            get_filename_component(prefix ${IWYU_BINARY}/.. ABSOLUTE)
+        elseif(${dep} STREQUAL yaml-cpp)
+            get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
+        endif()
 
-    message(STATUS "  ${BWhite}${dep_padded}${CR}${version_padded}${prefix}")
+        message(STATUS "  ${BWhite}${dep_padded}${CR}${version_padded}${prefix}")
 
-#    if(${dep} STREQUAL Geant3)
-#      message(STATUS "                                          G3SYS: ${Geant3_SYSTEM_DIR}")
-#    endif()
-    if(${dep} STREQUAL Geant4)
-      foreach(dataset IN LISTS Geant4_DATASETS)
-        pad(${Geant4_DATASET_${dataset}_ENVVAR} 20 " " envvar_padded LEFT)
-        message(STATUS "                          ${envvar_padded}: ${Geant4_DATASET_${dataset}_PATH}")
-      endforeach()
-    endif()
+        #    if(${dep} STREQUAL Geant3)
+        #      message(STATUS "                                          G3SYS: ${Geant3_SYSTEM_DIR}")
+        #    endif()
+        if(${dep} STREQUAL Geant4)
+            foreach(dataset IN LISTS Geant4_DATASETS)
+                fair_pad(${Geant4_DATASET_${dataset}_ENVVAR} 21 " " envvar_padded LEFT)
+                message(
+                    STATUS
+                        "                          ${envvar_padded}: ${Geant4_DATASET_${dataset}_PATH}"
+                )
+            endforeach()
+        endif()
 
-    unset(version_str)
-    unset(version_padded)
-    unset(version_req_str)
-  endforeach()
+        unset(version_str)
+        unset(version_padded)
+        unset(version_req_str)
+    endforeach()
 endif()
 
 # Summary frameworks ###########################################################

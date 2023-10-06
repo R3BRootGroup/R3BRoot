@@ -217,6 +217,6 @@ set(HEADERS ${HEADERS} R3BDetectorList.h)
 
 set(LINKDEF DataLinkDef.h)
 set(LIBRARY_NAME R3BData)
-set(DEPENDENCIES Base FairTools ${VMCLIB} FairLogger::FairLogger)
+set(DEPENDENCIES Base FairTools VMCLibrary FairLogger::FairLogger)
 
 generate_library()
