@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -26,13 +26,14 @@
 #include "R3BTofDMappingPar.h"
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
-#include <FairRootManager.h>
 
+#include <FairRootManager.h>
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THnSparse.h"
+#include "TFile.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -155,10 +156,10 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
 
 void R3BTofDCal2Hit::SetParContainers()
 {
-    fMapPar = dynamic_cast<R3BTofDMappingPar*>(FairRuntimeDb::instance()->getContainer("tofdMappingPar"));
-    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
+    fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
+    R3BLOG_IF(warning, !fMapPar, "Could not get access to tofdMappingPar container");
 
-    fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
+    fHitPar = (R3BTofDHitPar*)FairRuntimeDb::instance()->getContainer("tofdHitPar");
     if (!fHitPar)
     {
         R3BLOG(error, "Could not get access to tofdHitPar container");
@@ -191,13 +192,13 @@ InitStatus R3BTofDCal2Hit::Init()
         return kFATAL;
     }
 
-    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     R3BLOG_IF(fatal, NULL == header, "EventHeader. not found");
 
-    fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
+    fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     R3BLOG_IF(fatal, NULL == fCalItems, "TofdCal not found");
 
-    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
+    fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
     maxevent = mgr->CheckMaxEventNo();
@@ -317,7 +318,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
+        auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
 
         // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
@@ -334,7 +335,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     std::vector<R3BTofdCalData const*> trig_map;
     for (int i = 0; i < fCalTriggerItems->GetEntriesFast(); ++i)
     {
-        auto trig = dynamic_cast<R3BTofdCalData const*>(fCalTriggerItems->At(i));
+        auto trig = (R3BTofdCalData const*)fCalTriggerItems->At(i);
         if (trig_map.size() < trig->GetBarId())
         {
             trig_map.resize(trig->GetBarId());
@@ -388,9 +389,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    R3BLOG(error, "Missing trigger information!");
-                    R3BLOG(error, "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId());
-                    R3BLOG(error, "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId());
+                    //R3BLOG(error, "Missing trigger information!");
+                    //R3BLOG(error, "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId());
+                    //R3BLOG(error, "Bot: " << bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId());
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -434,10 +435,24 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 auto top_tot = fmod(top->GetTimeTrailing_ns() - top->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
 
-                auto THit_raw = (bot->GetTimeLeading_ns() + top->GetTimeLeading_ns()) / 2.; // needed for TOF for ROLUs
+               // auto THit_raw = (bot->GetTimeLeading_ns() + top->GetTimeLeading_ns()) / 2.; // needed for TOF for ROLUs
+                auto THit_raw = fTimeStitch->GetTime((bot_trig_ns + top_trig_ns) / 2. - header->GetTStart(),"tamex","vftx"); // needed for TOF for ROLUs
 
-                // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
-
+                //std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
+                 //std::cout<<"BarT: "<<top->GetBarId()<<" BarB: "<<bot->GetBarId()<<endl;
+                if(top->GetBarId() == bot->GetBarId()){ 
+                    bool both = false;
+                    nev++;
+                    if(top_tot > c_range_ns/10 && bot_tot > c_range_ns/10){ nev_lmboth++; both = true;}
+                    if(top_tot > c_range_ns/10){ 
+                        top_tot = bot_tot;
+                        if(!both) nev_lmt++;
+                    }
+                    if(bot_tot > c_range_ns/10){
+                         bot_tot = top_tot;
+                         if(!both) nev_lmb++;
+                    }
+                }
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
 
@@ -448,6 +463,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     continue;
                 }
 
+                Double_t Ctop_tot = top_tot * par->GetToTOffset2();
+                Double_t Cbot_tot = bot_tot * par->GetToTOffset1();
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
@@ -456,13 +473,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
                 else
                 {
-                    auto bot_ns_walk = bot_ns - walk(bot_tot,
+                    auto bot_ns_walk = bot_ns - walk(Cbot_tot,
                                                      par->GetPar1Walk(),
                                                      par->GetPar2Walk(),
                                                      par->GetPar3Walk(),
                                                      par->GetPar4Walk(),
                                                      par->GetPar5Walk());
-                    auto top_ns_walk = top_ns - walk(top_tot,
+                    auto top_ns_walk = top_ns - walk(Ctop_tot,
                                                      par->GetPar1Walk(),
                                                      par->GetPar2Walk(),
                                                      par->GetPar3Walk(),
@@ -475,6 +492,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // calculate time of hit
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
+          ///      cout<<"GetSynch "<<par->GetSync()<<" tb "<<bot_ns<<" tt "<<top_ns<<" THit_raw "<<(bot_ns + top_ns) / 2.<<" THit "<<(bot_ns + top_ns) / 2. - par->GetSync()<<endl;
                 if (std::isnan(THit))
                 {
                     R3BLOG(fatal, "TofD THit not found");
@@ -487,7 +505,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // calculate y-position from ToT
                 auto posToT =
-                    par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+                    par->GetLambda() * log((Ctop_tot) / (Cbot_tot));
+                //    par->GetLambda() * log((top_tot) / (bot_tot));
+        ///            cout<<"Lambda "<<par->GetLambda()<<" GetVeff "<<par->GetVeff()<<endl;
 
                 if (fTofdTotPos)
                 {
@@ -516,7 +536,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 Double_t para[4];
                 Double_t qb = 0.;
-                if (fTofdQ > 0)
+                if (fTofdQ > 0 /*&& 1*/)
                 {
                     if (fTofdTotPos)
                     {
@@ -525,8 +545,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                         para[1] = par->GetPolb();
                         para[2] = par->GetPolc();
                         para[3] = par->GetPold();
-                        qb = TMath::Sqrt(top_tot * bot_tot) /
-                             (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                 //       qb = TMath::Sqrt(Ctop_tot * Cbot_tot) /
+                        qb = TMath::Sqrt(Ctop_tot * Cbot_tot) *
+                             (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3)/*1.*/);
                         qb = qb * fTofdQ;
                     }
                     else
@@ -536,13 +557,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                         para[1] = par->GetPar1b();
                         para[2] = par->GetPar1c();
                         para[3] = par->GetPar1d();
-                        auto q1 = bot_tot /
+                        auto q1 = Cbot_tot /
                                   (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                         para[0] = par->GetPar2a();
                         para[1] = par->GetPar2b();
                         para[2] = par->GetPar2c();
                         para[3] = par->GetPar2d();
-                        auto q2 = top_tot /
+                        auto q2 = Ctop_tot /
                                   (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                         q1 = q1 * fTofdQ;
                         q2 = q2 * fTofdQ;
@@ -551,9 +572,12 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
                 else
                 {
-                    qb = TMath::Sqrt(top_tot * bot_tot);
+                    qb = TMath::Sqrt(Ctop_tot * Cbot_tot);
+                    //qb = fTofdQ*(Ctop_tot + Cbot_tot) / 2.;
                 }
-
+                qb = qb / 200.;
+                if(qb > 70.) qb = qb / 200.;
+               // std::cout<<"qb "<<qb<<std::endl;
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();
                 parz[1] = par->GetPar1zb();
@@ -578,16 +602,25 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
-                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-                // auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
-                auto tof_corr = tof - par->GetTofSyncOffset();
+                //auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. , "tamex", "vftx") - fTimeStitch->GetTime(header->GetTStart(), "tamex", "vftx");(bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())
+                auto tof = fTimeStitch->GetTime((bot_ns + par->GetOffset1() + top_ns+par->GetOffset2()) / 2.,"tamex","tamex") - fTimeStitch->GetTime(header->GetTStart(), "tamex", "vftx");
+                auto tof_corr = -par->GetTofSyncOffset() + /*par->GetTofSyncSlope() **/ tof;
+               // cout<<"tof_raw "<<tof<<" offset "<<par->GetTofSyncOffset()<<" slope "<<par->GetTofSyncSlope()<<" tof_corr "<<par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof<<endl;
+
+
 
                 // if (parz[1] > 0)
                 // {
                 event.push_back(
-                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                    //{ parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                    { (parz[0] + (parz[1] * qb)/* - 0.153*/ + parz[2] * qb * qb), THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                   // { qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
                 // }
-
+                //if((parz[0] + (parz[1] * qb) - 0.153 + parz[2] * qb * qb) > 0.){
+                //    cout<<"p1 "<<parz[0]<<" p2 "<<parz[1]<<" p3 "<<parz[2]<<" qb "<<qb<<endl;
+                //    std::cout<<"Q "<<(parz[0] + (parz[1] * qb) - 0.153 + parz[2] * qb * qb)<<std::endl;
+                //}
+               // if(0==parz[0] + (parz[1] * qb) /*- 0.153*/ + parz[2] * qb * qb) exit(0);
                 /* if (parz[0] > 0 && parz[2] > 0)
                  {
                      event.push_back(
@@ -1063,6 +1096,9 @@ void R3BTofDCal2Hit::FinishTask()
     sprint << "n1=" << n1 << " n2=" << n2;
 
     R3BLOG(info, sprint.str());
+
+    cout<<"missing leading edges:\n";
+    cout<<"nev: "<<nev<<" both sides: "<<100.* (double)nev_lmboth / (double)nev<<"%  top: "<<100.* (double)nev_lmt / (double)nev<<"%  bot: "<<100.* (double)nev_lmb / (double)nev<<"%"<<endl;
 }
 
 Double_t R3BTofDCal2Hit::walk(Double_t Q,

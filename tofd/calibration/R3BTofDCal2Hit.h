@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -180,6 +180,10 @@ class R3BTofDCal2Hit : public FairTask
     UInt_t goodpair5;
     UInt_t goodpair6;
     UInt_t goodpair7;
+    Int_t nev = 0;
+    Int_t nev_lmboth = 0;
+    Int_t nev_lmt = 0;
+    Int_t nev_lmb = 0;
 
     // arrays of control histograms
     TH1F* fhTpat;
