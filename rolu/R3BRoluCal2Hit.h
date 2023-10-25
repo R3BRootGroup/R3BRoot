@@ -25,6 +25,8 @@
 
 #include "FairTask.h"
 
+#define VFTX_CLOCK_MHZ 200
+
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -52,7 +54,7 @@ class R3BRoluCal2Hit : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BRoluCal2Hit(const char* name, Int_t iVerbose = 1);
+    R3BRoluCal2Hit(const char* name, int iVerbose = 1);
 
     /*
      * Destructor.
@@ -95,32 +97,35 @@ class R3BRoluCal2Hit : public FairTask
     virtual void FinishTask();
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option) { fOnline = option; }
 
-    inline void SetNofModules(Int_t nDets, Int_t nChs)
+    // Accessor to select online mode
+    void SetSkipTrigger(bool skip) { fSkipTrigger = skip; }
+
+    inline void SetNofModules(int nDets, int nChs)
     {
         fNofDetectors = nDets;
         fNofChannels = nChs; //=4
     }
 
   private:
-    TClonesArray* fCalItems; /* < Array with Cal items - input data. */
+    TClonesArray* fCalItems{}; /* < Array with Cal items - input data. */
+    TClonesArray* fCalTriggerItems{};
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
-    TClonesArray* fCalTriggerItems;
-    Double_t fClockFreq;  /* < Clock cycle in [ns]. */
-    UInt_t fNofDetectors; /**< Number of detectors. */
-    UInt_t fNofChannels;  /**< Number of channels per detector. */
-    Int_t fnEvents;
-    TClonesArray* fMapped; /* < Array with mapped data - input data. */
+    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.;  /* < Clock cycle in [ns]. */
+    unsigned int fNofDetectors = 1; /**< Number of detectors. */
+    unsigned int fNofChannels = 4;  /**< Number of channels per detector. */
+    int fnEvents = 0;
 
-    TH1F* fhQ_R[2];
-    TH1F* fhQ_O[2];
-    TH1F* fhQ_L[2];
-    TH1F* fhQ_U[2];
+    TH1F* fhQ_R[2]{};
+    TH1F* fhQ_O[2]{};
+    TH1F* fhQ_L[2]{};
+    TH1F* fhQ_U[2]{};
 
-    Int_t maxevent;
+    int maxevent = 100000;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
+    bool fSkipTrigger = false;
 
   public:
     ClassDef(R3BRoluCal2Hit, 2)

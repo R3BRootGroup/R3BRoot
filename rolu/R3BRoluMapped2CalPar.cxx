@@ -50,29 +50,15 @@ R3BRoluMapped2CalPar::R3BRoluMapped2CalPar()
 {
 }
 
-R3BRoluMapped2CalPar::R3BRoluMapped2CalPar(const char* name, Int_t iVerbose)
+R3BRoluMapped2CalPar::R3BRoluMapped2CalPar(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fUpdateRate(1000000)
-    , fMinStats(100000)
-    , fTrigger(-1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
-    , fNofTypes(0)
-    , fNEvents(0)
-    , fCal_Par(NULL)
 {
 }
 
 R3BRoluMapped2CalPar::~R3BRoluMapped2CalPar()
 {
-    if (fCal_Par)
-    {
-        delete fCal_Par;
-    }
-    if (fEngine)
-    {
-        delete fEngine;
-    }
+    if (fCal_Par) {delete fCal_Par;}
+    if (fEngine)  {delete fEngine;}
 }
 
 InitStatus R3BRoluMapped2CalPar::Init()
@@ -86,7 +72,6 @@ InitStatus R3BRoluMapped2CalPar::Init()
     }
 
     header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
-    // may be = NULL!
     if (!header)
     {
         LOG(warn) << "R3BRoluMapped2CalPar::Init() EventHeader. not found";
@@ -102,20 +87,17 @@ InitStatus R3BRoluMapped2CalPar::Init()
         return kFATAL;
     }
 
-    fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("RoluTriggerMapped"));
-    if (!fMappedTrigger)
+    if (fSkipTrigger == false)
     {
-        LOG(warn) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
+    	fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("RoluTriggerMapped"));
+    	if (!fMappedTrigger)
+    	{
+    	    LOG(warn) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
+    	}
     }
 
     fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
     fCal_Par->setChanged();
-
-    if (!fNofModules)
-    {
-        LOG(fatal) << "R3BRoluMapped2CalPar::Init() Number of modules not set. ";
-        return kFATAL;
-    }
 
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
@@ -125,69 +107,57 @@ InitStatus R3BRoluMapped2CalPar::Init()
 void R3BRoluMapped2CalPar::Exec(Option_t* option)
 {
     // test for requested trigger (if possible)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) return;
 
-    UInt_t nHits = fMapped->GetEntries();
+    unsigned int nHits = fMapped->GetEntries();
 
     // Loop over mapped hits
-    for (UInt_t i = 0; i < nHits; i++)
+    for (unsigned int iHit = 0; iHit < nHits; iHit++)
     {
-        R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMapped->At(i));
-        if (!hit)
-        {
-            continue; // should not happen
-        }
+        R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMapped->At(iHit));
+        if (!hit) {continue;}
 
         // channel numbers are supposed to be 1-based (1..n)
-        UInt_t iDetector = hit->GetDetector() - 1; // now 0..n-1
-        UInt_t iChannel = hit->GetChannel() - 1;   // now 0..n-1
-        UInt_t iType = hit->GetType();             // 0,1
+        unsigned int iDetector = hit->GetDetector() - 1; // now 0..n-1
+        unsigned int iChannel = hit->GetChannel() - 1;   // now 0..n-1
+        unsigned int iType = hit->GetType();             // 0,1
 
         if (iDetector > (fNofDetectors - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
-                       << " allowed are 1.." << fNofDetectors;
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1) << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
-                       << " allowed are 1.." << fNofChannels;
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1) << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
-                       << " allowed are 0.." << (fNofTypes - 1);
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType << " allowed are 0.." << (fNofTypes - 1);
             continue;
         }
 
         // Fill TAC histogram for VFTX and TAMEX
-
         fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
     }
 
-    if (fMappedTrigger)
+    if (fMappedTrigger && fSkipTrigger == false)
     {
         nHits = fMappedTrigger->GetEntries();
         // Loop over mapped triggers
-        for (Int_t i = 0; i < nHits; i++)
+        for (int i = 0; i < nHits; i++)
         {
             auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTrigger->At(i));
             fEngine->Fill(3, 1, 1, mapped->GetTimeFine());
         }
     }
-
-    // Increment events
-    fNEvents += 1;
 }
 
 void R3BRoluMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
-
     fCal_Par->printParams();
 }
 

@@ -42,6 +42,7 @@ set(SRCS
 R3BRoluMapped2Cal.cxx
 R3BRoluMapped2CalPar.cxx
 R3BRoluCal2Hit.cxx
+R3BRoluOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

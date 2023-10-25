@@ -57,6 +57,7 @@
 #pragma link C++ class R3BFiberReader+;
 #pragma link C++ class R3BLosReader+;
 #pragma link C++ class R3BRoluReader+;
+#pragma link C++ class R3BRoluReaderOnline+;
 #pragma link C++ class R3BSci2Reader+;
 #pragma link C++ class R3BSci8Reader+;
 #pragma link C++ class R3BTofdReader+;
@@ -108,6 +109,7 @@
 #pragma link C++ class EXT_STR_h101_SCI2_onion_t;
 #pragma link C++ class EXT_STR_h101_SCI8_onion_t;
 #pragma link C++ class EXT_STR_h101_ROLU_onion_t;
+#pragma link C++ class EXT_STR_h101_ROLU_NOTRIG_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFD_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFI_onion_t;
 #pragma link C++ class EXT_STR_h101_PTOF_onion_t;

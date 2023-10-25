@@ -124,6 +124,7 @@ set(SRCS
 ./fibers/R3BFiberReader.cxx
 ./los/R3BLosReader.cxx
 ./rolu/R3BRoluReader.cxx
+./rolu/R3BRoluReaderOnline.cxx
 ./sci2/R3BSci2Reader.cxx
 ./sci8/R3BSci8Reader.cxx
 ./fibers/R3BSfibReader.cxx
@@ -188,6 +189,7 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fib33.h
 ./los/ext_h101_los_dez19.h
 ./rolu/ext_h101_rolu.h
+./rolu/ext_h101_rolu_online.h
 ./sci2/ext_h101_sci2.h
 ./sci8/ext_h101_sci8.h
 ./fibers/ext_h101_sfib.h
