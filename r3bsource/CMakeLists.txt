@@ -48,6 +48,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/fibers
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofd
 ${R3BROOT_SOURCE_DIR}/r3bsource/tofi
 ${R3BROOT_SOURCE_DIR}/r3bsource/rpc
+${R3BROOT_SOURCE_DIR}/r3bsource/sync_check
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
@@ -75,6 +76,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BROOT_SOURCE_DIR}/r3bdata/synccheckData
 )
 
 set(LINK_DIRECTORIES
@@ -145,6 +147,7 @@ set(SRCS
 ./twim/R3BTwimReader.cxx
 ./musli/R3BMusliReader.cxx
 ./mwpc/R3BMwpcReader.cxx
+./sync_check/R3BSyncCheckReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -212,6 +215,7 @@ Set(STRUCT_HEADERS
 ./trloii/ext_h101_samplosms.h
 ./pdc/ext_h101_pdc.h
 ./rpc/ext_h101_rpc.h
+./sync_check/ext_h101_sync_check.h
 )
 
 # fill list of header files from list of source files
