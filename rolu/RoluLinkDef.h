@@ -22,6 +22,7 @@
 #pragma link C++ class R3BRoluMapped2Cal+;
 #pragma link C++ class R3BRoluMapped2CalPar+;
 #pragma link C++ class R3BRoluCal2Hit+;
+#pragma link C++ class R3BRoluOnlineSpectra+;
 
 #endif
 

@@ -22,9 +22,10 @@
 #define R3BROLUMAPPED2CAL_H
 
 #include <map>
-
 #include "FairTask.h"
 #include "R3BRoluCalData.h"
+
+#define VFTX_CLOCK_MHZ 200
 
 class TClonesArray;
 class R3BTCalModulePar;
@@ -54,7 +55,7 @@ class R3BRoluMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BRoluMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BRoluMapped2Cal(const char* name, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -100,48 +101,43 @@ class R3BRoluMapped2Cal : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTrigger(int trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting the number of modules.
      * @param nPMTs a number of photomultipliers.
      */
-    inline void SetNofModules(Int_t nDets, Int_t nChs)
-    {
-        fNofDetectors = nDets;
-        fNofChannels = nChs; //=4
-        fNofTypes = 2;       // leading, trailing
-        fNofModules = nChs * nDets * 2;
-    }
+    void SetNofModules(int nDets) {fNofDetectors = nDets;}
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option) { fOnline = option; }
+
+    // Accessor to select online mode
+    void SetSkipTrigger(bool skip) { fSkipTrigger = skip; }
 
   private:
-    TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
-    TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;           /**< Array with cal items - output data. */
-    TClonesArray* fCalTriggerItems;    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;                /**< Number of produced time items per event. */
+    TClonesArray* fMappedItems{};        /**< Array with mapped items - input data. */
+    TClonesArray* fMappedTriggerItems{}; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;             /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems{};    /**< Array with cal items - output data. */
+    int fNofCalItems = 0;                /**< Number of produced time items per event. */
 
-    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
+    R3BTCalPar* fTcalPar{}; /**< TCAL parameter container. */
+    unsigned int fNofTcalPars = 0;  /**< Number of modules in parameter file. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
+    R3BEventHeader* header{}; /**< Event header. */
+    int fTrigger = 1;         /**< Trigger value. */
 
-    UInt_t fNofDetectors; /**< Number of detectors. */
-    UInt_t fNofChannels;  /**< Number of channels per detector. */
-    UInt_t fNofTypes = 2;
-    UInt_t fNofModules;  /**< Total number of channels. */
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    UInt_t fNEvent;
+    bool fSkipTrigger = false;
+    unsigned int fNofDetectors = 1; /**< Number of detectors. */
+    double fClockFreq = (1. / VFTX_CLOCK_MHZ * 1000.); /**< Clock cycle in [ns]. */
+    unsigned int fNEvent = 0;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
 
   public:
-    ClassDef(R3BRoluMapped2Cal, 2)
+    ClassDef(R3BRoluMapped2Cal, 1)
 };
 
 #endif // R3BROLUMAPPED2CAL_H

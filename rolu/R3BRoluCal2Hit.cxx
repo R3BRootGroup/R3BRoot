@@ -22,7 +22,6 @@
 #include "R3BRoluCalData.h"
 #include "R3BRoluHitData.h"
 #include "R3BRoluMapped2Cal.h"
-#include "R3BRoluMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include <FairRootManager.h>
@@ -63,38 +62,20 @@ R3BRoluCal2Hit::R3BRoluCal2Hit()
 {
 }
 
-R3BRoluCal2Hit::R3BRoluCal2Hit(const char* name, Int_t iVerbose)
+R3BRoluCal2Hit::R3BRoluCal2Hit(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItems(NULL)
-    , fCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BRoluHitData"))
-    , fNofDetectors(1)
-    , fNofChannels(1)
-    , fnEvents(0)
-    , fOnline(kFALSE)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
-    for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
-    {
-        fhQ_R[iDet] = NULL;
-        fhQ_O[iDet] = NULL;
-        fhQ_L[iDet] = NULL;
-        fhQ_U[iDet] = NULL;
-    }
 }
 
 R3BRoluCal2Hit::~R3BRoluCal2Hit()
 {
-    for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
+    for (int iDet = 0; iDet < fNofDetectors; iDet++)
     {
-        if (fhQ_L[iDet])
-            delete (fhQ_L[iDet]);
-        if (fhQ_R[iDet])
-            delete (fhQ_R[iDet]);
-        if (fhQ_O[iDet])
-            delete (fhQ_O[iDet]);
-        if (fhQ_U[iDet])
-            delete (fhQ_U[iDet]);
+        if (fhQ_L[iDet]) delete (fhQ_L[iDet]);
+        if (fhQ_R[iDet]) delete (fhQ_R[iDet]);
+        if (fhQ_O[iDet]) delete (fhQ_O[iDet]);
+        if (fhQ_U[iDet]) delete (fhQ_U[iDet]);
     }
 
     if (fHitItems)
@@ -115,9 +96,12 @@ InitStatus R3BRoluCal2Hit::Init()
     if (NULL == fCalItems)
         LOG(fatal) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
 
-    fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerCal"));
-    if (NULL == fCalTriggerItems)
-        LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
+    if (fSkipTrigger == false)
+    {
+    	fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerCal"));
+    	if (NULL == fCalTriggerItems)
+    	    LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
+    }
 
     // request storage of Hit data in output tree
     mgr->Register("RoluHit", "RoluHitData", fHitItems, !fOnline);
@@ -134,14 +118,13 @@ InitStatus R3BRoluCal2Hit::ReInit() { return kSUCCESS; }
 void R3BRoluCal2Hit::Exec(Option_t* option)
 {
     if (fnEvents / 100000. == (int)fnEvents / 100000)
-        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
-                  << " %) " << std::flush;
+        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent) << " %) " << std::flush;
 
     // min,max,Nbins for ToT spectra
-    Double_t fhQmin = 0.;
-    Double_t fhQmax = 200; // 300.; //150
-    Int_t fhQbin = 4000;   // 0; //3000; //1500
-    for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
+    double fhQmin = 0.;
+    double fhQmax = 200; // 300.; //150
+    int fhQbin = 4000;   // 0; //3000; //1500
+    for (int iDet = 0; iDet < fNofDetectors; iDet++)
     {
         if (NULL == fhQ_R[iDet])
         {
@@ -164,20 +147,25 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
         }
     }
 
-    Int_t nTrig = fCalTriggerItems->GetEntriesFast();
-    Double_t lead_trig_ns = 0. / 0.;
-    for (UInt_t j = 0; j < nTrig; ++j)
+    int nTrig = 0;
+    double lead_trig_ns = 0. / 0.;
+    //Calibrate the trigger
+    if (fSkipTrigger == false)
     {
-        auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(j));
-        lead_trig_ns = cur_cal->GetTimeL_ns(0);
-        // cout<<"Trigger: "<<lead_trig_ns<<endl;
+    	nTrig = fCalTriggerItems->GetEntriesFast();
+    	for (unsigned int j = 0; j < nTrig; ++j)
+    	{
+    	    auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(j));
+    	    lead_trig_ns = cur_cal->GetTimeL_ns(0);
+    	    // cout<<"Trigger: "<<lead_trig_ns<<endl;
+    	}
     }
-    Int_t nParts = fCalItems->GetEntriesFast();
+    
+    int nParts = fCalItems->GetEntriesFast();
 
-    if (nParts < 1 || nTrig < 1)
-        return;
+    if (nParts < 1 || nTrig < 1) return;
 
-    Int_t iDet = 0;
+    int iDet = 0;
     using A = boost::multi_array<double, 3>;
     auto dims = boost::extents[nParts][fNofDetectors][4];
     A timeRolu_L(dims);
@@ -187,15 +175,13 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
     A totRolu(dims);
     init_array(totRolu, NAN);
 
-    for (Int_t iPart = 0; iPart < nParts; iPart++)
+    for (int iPart = 0; iPart < nParts; iPart++)
     {
-        /*
-         * nParts is the number of particle passing through detector in one event
-         */
+        //Parts is the number of particle passing through detector in one event
         R3BRoluCalData* calItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
         iDet = calItem->GetDetector();
 
-        for (Int_t iCha = 0; iCha < 4; iCha++)
+        for (int iCha = 0; iCha < 4; iCha++)
         {
 
             if (!(IS_NAN(calItem->GetTimeL_ns(iCha))))
@@ -218,9 +204,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
                 totRolu[iPart][iDet - 1][iCha] = timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
             }
 
-            Double_t time_to_trig =
-                fmod(timeRolu_L[iPart][iDet - 1][iCha] - lead_trig_ns + c_period + c_period / 2, c_period) -
-                c_period / 2;
+            double time_to_trig = fmod(timeRolu_L[iPart][iDet - 1][iCha] - lead_trig_ns + c_period + c_period/2, c_period) - c_period / 2;
 
             // cout<<"ROLU cal2hit: "<<iDet<<", "<<iCha+1<<"; "<<timeRolu_L[iPart][iDet - 1][iCha]<<",
             // "<<totRolu[iPart][iDet - 1][iCha]<<endl;
@@ -247,7 +231,7 @@ void R3BRoluCal2Hit::FinishEvent()
 
 void R3BRoluCal2Hit::FinishTask()
 {
-    for (Int_t iDet = 0; iDet < fNofDetectors; iDet++)
+    for (int iDet = 0; iDet < fNofDetectors; iDet++)
     {
         if (fhQ_L[iDet])
             fhQ_L[iDet]->Write();

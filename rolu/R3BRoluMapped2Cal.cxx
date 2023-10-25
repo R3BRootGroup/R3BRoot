@@ -43,33 +43,16 @@ R3BRoluMapped2Cal::R3BRoluMapped2Cal()
 {
 }
 
-R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, Int_t iVerbose)
+R3BRoluMapped2Cal::R3BRoluMapped2Cal(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fMappedItems(NULL)
-    , fMappedTriggerItems(NULL)
     , fCalItems(new TClonesArray("R3BRoluCalData"))
-    , fCalTriggerItems(new TClonesArray("R3BRoluCalData"))
-    , fNofCalItems(0)
-    , fNofTcalPars(0)
-    , fNofModules(0)
-    , fTcalPar(NULL)
-    , fTrigger(1) // trigger 1 - onspill, 2 - offspill, -1 - all events
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvent(0)
-    , fOnline(kFALSE)
 {
 }
 
 R3BRoluMapped2Cal::~R3BRoluMapped2Cal()
 {
-    if (fCalItems)
-    {
-        delete fCalItems;
-    }
-    if (fCalTriggerItems)
-    {
-        delete fCalTriggerItems;
-    }
+    if (fCalItems) {delete fCalItems;}
+    if (fCalTriggerItems) {delete fCalTriggerItems;}
 }
 
 InitStatus R3BRoluMapped2Cal::Init()
@@ -81,8 +64,6 @@ InitStatus R3BRoluMapped2Cal::Init()
         return kFATAL;
     }
 
-    LOG(info) << "R3BRoluMapped2Cal::Init()::read " << fNofModules << " modules";
-
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
@@ -90,16 +71,13 @@ InitStatus R3BRoluMapped2Cal::Init()
         return kFATAL;
     }
 
-    // try to get a handle on the EventHeader. EventHeader may not be
-    // present though and hence may be null. Take care when using.
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
     {
         LOG(warn) << "R3BRoluMapped2Cal::Init() EventHeader. not found";
         header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
     }
-    else
-        LOG(info) << "R3BRoluMapped2Cal::Init() R3BEventHeader found";
+    else LOG(info) << "R3BRoluMapped2Cal::Init() R3BEventHeader found";
 
     // get access to Mapped data
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluMapped"));
@@ -110,19 +88,22 @@ InitStatus R3BRoluMapped2Cal::Init()
     }
 
     // get access to Trigger Mapped data
-    fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerMapped"));
-    if (!fMappedTriggerItems)
-        LOG(warn) << "R3BRoluMapped2Cal::Branch RoluTriggerMapped not found";
+    if (fSkipTrigger == false)
+    {
+    	fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerMapped"));
+    	if (!fMappedTriggerItems)
+    	    LOG(warn) << "R3BRoluMapped2Cal::Branch RoluTriggerMapped not found";
+
+    	if (fMappedTriggerItems)
+    	{
+    	    mgr->Register("RoluTriggerCal", "RoluTriggerCal data", fCalTriggerItems, !fOnline);
+    	    fCalTriggerItems->Clear();
+    	}
+    }
 
     // request storage of Cal data in output tree
     mgr->Register("RoluCal", "RoluCal data", fCalItems, !fOnline);
     fCalItems->Clear();
-
-    if (fMappedTriggerItems)
-    {
-        mgr->Register("RoluTriggerCal", "RoluTriggerCal data", fCalTriggerItems, !fOnline);
-        fCalTriggerItems->Clear();
-    }
 
     return kSUCCESS;
 }
@@ -151,29 +132,26 @@ InitStatus R3BRoluMapped2Cal::ReInit()
 void R3BRoluMapped2Cal::Exec(Option_t* option)
 {
     // check for requested trigger (Todo: should be done globablly / somewhere else)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) return;
 
-    Int_t nHits = fMappedItems->GetEntriesFast();
+    int nHits = fMappedItems->GetEntriesFast();
 
-    if (nHits < 1)
-        return;
+    if (nHits < 1) return;
 
     // cout<<"Rolu Mapped2Cal nHits: "<<nHits<<endl;
 
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    for (int ihit = 0; ihit < nHits; ihit++)
     {
-        Double_t times_ns = 0. / 0.;
-        Double_t times_raw_ns = 0. / 0.;
+        double times_ns = 0. / 0.;
+        double times_raw_ns = 0. / 0.;
 
         R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
-        if (!hit)
-            continue;
+        if (!hit) continue;
 
         // channel numbers are stored 1-based (1..n)
-        UInt_t iDet = hit->GetDetector(); // 1..
-        UInt_t iCha = hit->GetChannel();  // 1..4
-        UInt_t iType = hit->GetType();    // 0,1
+        unsigned int iDet = hit->GetDetector(); // 1..
+        unsigned int iCha = hit->GetChannel();  // 1..4
+        unsigned int iType = hit->GetType();    // 0,1
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
@@ -185,8 +163,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
         if (!par)
         {
-            LOG(warn) << "R3BRoluMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
-                      << ", Type: " << iType;
+            LOG(warn) << "R3BRoluMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType;
             continue;
         }
 
@@ -196,34 +173,12 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
         {
 
-            LOG(warn) << "R3BRoluMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
-                      << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
-                      << ", time in ns = " << times_raw_ns;
+            LOG(warn) << "R3BRoluMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha << ", type= " << iType << ", time in channels = " << hit->GetTimeFine() << ", time in ns = " << times_raw_ns;
             continue;
         }
 
         // ... and add clock time
         times_ns = fClockFreq - times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
-
-        // cout<<"M2Cal: "<<iCha<<", "<<iType<<"; "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<",
-        // "<<times_ns<<endl;
-
-        /* Note: we have multi-hit data...
-         *
-         * So the map needs to have one item per detector and (multi-)hit
-         * Then we need to establish a time window
-         * Here, we have the hits unsorted in time and channel. If we
-         * reconstruct a detector hit using a time window, So:
-         *
-         * For each single hit, search the list of detector hits. If a
-         * matching hit is found (dt < window and item not yet set), add
-         * item. Else create new detector hit.
-         *
-         * This way, we theoretically *might* end up with two calItems
-         * which are actually just one. Hm... this should be very rare.
-         * Care about that later if it becomes necessary.
-         *
-         */
 
         // see if there is already a detector hit around that time
         R3BRoluCalData* calItem = NULL;
@@ -233,15 +188,11 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         {
             R3BRoluCalData* aCalItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iCal));
 
-            if (aCalItem->GetDetector() != iDet)
-            {
-                // Do not consider an item for another detector.
-                continue;
-            }
+            if (aCalItem->GetDetector() != iDet) {continue;}
 
-            Double_t Rolu_COINC_WINDOW_NS;
-            Double_t Tdev;
-            Bool_t Rolu_COINC = false;
+            double Rolu_COINC_WINDOW_NS;
+            double Tdev;
+            bool Rolu_COINC = false;
 
             if (iType == 0)
             {
@@ -312,38 +263,29 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
         {
             // there is no detector hit with matching time. Hence, create a new one.
             calItem = new ((*fCalItems)[fNofCalItems++]) R3BRoluCalData(iDet);
-            // fNofCalItems += 1;
         }
-        // set the time to the correct cal item
 
         if (iType == 0)
         {
             calItem->fTimeL_ns[iCha - 1] = times_ns;
             if (calItem->fTimeL_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha - 1]))
-                LOG(warn) << "Problem with fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
-                          << endl;
-
-            //		cout<<" TEST2: "<<iCha<<", "<<iType<<", "<<calItem->fTimeL_ns[iCha-1]<<endl;
+                LOG(warn) << "Problem with fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " " << endl;
         }
 
         if (iType == 1)
         {
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
-                LOG(warn) << "Problem with fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
-                          << endl;
-
-            //		cout<<" TEST3: "<<iCha<<", "<<iType<<", "<<calItem->fTimeT_ns[iCha-1]<<endl;
+                LOG(warn) << "Problem with fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " " << endl;
         }
 
         continue;
-    skip_event_pileup:
-        LOG(warn) << "R3BRoluMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                  << " iCal: " << iCal << " Skip event because of pileup.";
+	skip_event_pileup:
+        LOG(warn) << "R3BRoluMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType << " iCal: " << iCal << " Skip event because of pileup.";
     }
-
+    
     // Calibrate trigger channels.
-    if (fMappedTriggerItems)
+    if (fMappedTriggerItems && fSkipTrigger == false)
     {
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
@@ -367,22 +309,14 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
             cal->fTimeL_ns[0] = time_ns;
         }
     }
-
     ++fNEvent;
 }
 
 void R3BRoluMapped2Cal::FinishEvent()
 {
     fNofCalItems = 0;
-    if (fCalItems)
-    {
-        fCalItems->Clear();
-    }
-
-    if (fCalTriggerItems)
-    {
-        fCalTriggerItems->Clear();
-    }
+    if (fCalItems) {fCalItems->Clear();}
+    if (fCalTriggerItems) {fCalTriggerItems->Clear();}
 }
 
 ClassImp(R3BRoluMapped2Cal);
