@@ -37,6 +37,9 @@ class R3BSyncCheckReader : public R3BReader
     // Read data from full event structure
     virtual Bool_t R3BRead() override;
 
+    // Store data in the output tree
+    void SetStoreData(Bool_t option) { fStoreData = option; }
+
     // Reset
     virtual void Reset() override;
 
@@ -49,6 +52,8 @@ class R3BSyncCheckReader : public R3BReader
     size_t fOffset;
     // Output array
     TClonesArray* fArray;
+    // A flag to store ttree data for online
+    Bool_t fStoreData;
 
   public:
     ClassDefOverride(R3BSyncCheckReader, 0);

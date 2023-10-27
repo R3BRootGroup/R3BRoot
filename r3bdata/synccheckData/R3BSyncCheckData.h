@@ -14,6 +14,7 @@
 #ifndef R3BSyncCheckData_H
 #define R3BSyncCheckData_H 1
 
+#include "R3BLogger.h"
 #include "TObject.h"
 #include <Rtypes.h>
 
@@ -26,8 +27,7 @@ class R3BSyncCheckData : public TObject
                      uint32_t music,
                      uint32_t rpc,
                      uint32_t s2,
-                     uint32_t foot1,
-                     uint32_t foot2);
+                     std::vector<uint32_t>& foot_input);
 
     virtual ~R3BSyncCheckData() {}
 
@@ -36,8 +36,11 @@ class R3BSyncCheckData : public TObject
     inline const uint32_t& GetMusic() const { return fMusic; }
     inline const uint32_t& GetRpc() const { return fRpc; }
     inline const uint32_t& GetS2() const { return fS2; }
-    inline const uint32_t& GetFoot1() const { return fFoot1; }
-    inline const uint32_t& GetFoot2() const { return fFoot2; }
+    const uint32_t& GetFoot(int num) const
+    {
+        R3BLOG_IF(fatal, (num <= 0 || num > NFOOTS), "Bad FOOT number!");
+        return fFoot.at(num - 1);
+    }
 
   protected:
     // following the order from ext file
@@ -46,8 +49,8 @@ class R3BSyncCheckData : public TObject
     uint32_t fMusic;
     uint32_t fRpc;
     uint32_t fS2;
-    uint32_t fFoot1;
-    uint32_t fFoot2;
+    static constexpr int NFOOTS = 16;
+    std::vector<uint32_t> fFoot;
 
   public:
     ClassDef(R3BSyncCheckData, 1)
