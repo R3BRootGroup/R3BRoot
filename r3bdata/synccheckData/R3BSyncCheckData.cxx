@@ -19,8 +19,6 @@ R3BSyncCheckData::R3BSyncCheckData()
     , fMusic(0)
     , fRpc(0)
     , fS2(0)
-    , fFoot1(0)
-    , fFoot2(0)
 {
 }
 
@@ -29,16 +27,17 @@ R3BSyncCheckData::R3BSyncCheckData(uint32_t master,
                                    uint32_t music,
                                    uint32_t rpc,
                                    uint32_t s2,
-                                   uint32_t foot1,
-                                   uint32_t foot2)
+                                   std::vector<uint32_t>& foot_input)
     : fMaster(master)
     , fMasterRef(masterref)
     , fMusic(music)
     , fRpc(rpc)
     , fS2(s2)
-    , fFoot1(foot1)
-    , fFoot2(foot2)
 {
+    for (auto& val : foot_input)
+    {
+        fFoot.push_back(val);
+    }
 }
 
 ClassImp(R3BSyncCheckData);

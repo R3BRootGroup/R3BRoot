@@ -32,6 +32,7 @@ R3BSyncCheckReader::R3BSyncCheckReader(EXT_STR_h101_SYNC_CHECK* data, size_t off
     , fData(data)
     , fOffset(offset)
     , fArray(new TClonesArray("R3BSyncCheckData"))
+    , fStoreData(kFALSE)
 {
 }
 
@@ -54,7 +55,7 @@ Bool_t R3BSyncCheckReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
     // Register output array in tree
-    FairRootManager::Instance()->Register("SyncCheckData", "SyncCheck", fArray, kTRUE);
+    FairRootManager::Instance()->Register("SyncCheckData", "SyncCheck", fArray, fStoreData);
     Reset();
     memset(fData, 0, sizeof *fData);
     return kTRUE;
@@ -62,14 +63,32 @@ Bool_t R3BSyncCheckReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BSyncCheckReader::R3BRead()
 {
+    std::vector<uint32_t> foot_input;
+    foot_input.push_back(fData->SYNC_CHECK_FT1V);
+    foot_input.push_back(fData->SYNC_CHECK_FT2V);
+    foot_input.push_back(fData->SYNC_CHECK_FT3V);
+    foot_input.push_back(fData->SYNC_CHECK_FT4V);
+    foot_input.push_back(fData->SYNC_CHECK_FT5V);
+    foot_input.push_back(fData->SYNC_CHECK_FT6V);
+    foot_input.push_back(fData->SYNC_CHECK_FT7V);
+    foot_input.push_back(fData->SYNC_CHECK_FT8V);
+    foot_input.push_back(fData->SYNC_CHECK_FT9V);
+    foot_input.push_back(fData->SYNC_CHECK_FT10V);
+    foot_input.push_back(fData->SYNC_CHECK_FT11V);
+    foot_input.push_back(fData->SYNC_CHECK_FT12V);
+    foot_input.push_back(fData->SYNC_CHECK_FT13V);
+    foot_input.push_back(fData->SYNC_CHECK_FT14V);
+    foot_input.push_back(fData->SYNC_CHECK_FT15V);
+    foot_input.push_back(fData->SYNC_CHECK_FT16V);
+
     new ((*fArray)[fArray->GetEntriesFast()]) R3BSyncCheckData(fData->SYNC_CHECK_MASTER,
                                                                fData->SYNC_CHECK_MASTERRR,
                                                                fData->SYNC_CHECK_MUSIC,
                                                                fData->SYNC_CHECK_RPC,
                                                                fData->SYNC_CHECK_STWO,
-                                                               fData->SYNC_CHECK_FT1V,
-                                                               fData->SYNC_CHECK_FT2V);
+                                                               foot_input);
     fNEvent++;
+    foot_input.clear();
     return kTRUE;
 }
 
