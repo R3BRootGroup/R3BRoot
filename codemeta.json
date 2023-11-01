@@ -244,6 +244,21 @@
       "@type": "Person",
       "givenName": "Lorenzo",
       "familyName": "Zanetti"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Konstanze",
+      "familyName": "Boretzky"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Leandro",
+      "familyName": "Milhomens da Fonseca"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Nikhil",
+      "familyName": "Mozumdar"
     }
   ]
 }
