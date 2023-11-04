@@ -288,7 +288,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
     if (fMappedTriggerItems && fSkipTrigger == false)
     {
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
-        for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+        for (int mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
             auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTriggerItems->At(mapped_i));
 
@@ -301,7 +301,7 @@ void R3BRoluMapped2Cal::Exec(Option_t* option)
             }
 
             // Convert TDC to [ns] ...
-            Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
+            double time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
             // ... and subtract it from the next clock cycle.
             time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
 

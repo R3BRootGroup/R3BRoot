@@ -46,7 +46,7 @@ class R3BRoluReaderOnline : public R3BReader
     void SetOnline(bool option) { fOnline = option; }
 
     // Accessor to select the number of detectors
-    void SetNbDet(unsigned int nb) { fNbDet = nb; }
+    void SetNbDet(unsigned int nbb) { fNbDet = nbb; }
 
   private:
     // Reader specific data structure from ucesb

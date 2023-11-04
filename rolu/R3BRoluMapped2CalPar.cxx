@@ -147,9 +147,9 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
     {
         nHits = fMappedTrigger->GetEntries();
         // Loop over mapped triggers
-        for (int i = 0; i < nHits; i++)
+        for (int iHit = 0; iHit < nHits; iHit++)
         {
-            auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTrigger->At(i));
+            auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTrigger->At(iHit));
             fEngine->Fill(3, 1, 1, mapped->GetTimeFine());
         }
     }
