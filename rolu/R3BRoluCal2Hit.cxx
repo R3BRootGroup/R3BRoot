@@ -47,8 +47,8 @@ static void init_array(T& array, double init)
     // (e.g. python's dict().keys())
     // thus we can not really use a range based for loop
     // and instead wrangle pointers like it is 1980 again.
-    for (double* e = array.origin(); e < array.origin() + array.num_elements(); ++e)
-        *e = init;
+    for (double* eee = array.origin(); eee < array.origin() + array.num_elements(); ++eee)
+        *eee = init;
 }
 
 namespace
@@ -153,9 +153,9 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
     if (fSkipTrigger == false)
     {
     	nTrig = fCalTriggerItems->GetEntriesFast();
-    	for (unsigned int j = 0; j < nTrig; ++j)
+    	for (unsigned int iTrig = 0; iTrig < nTrig; ++iTrig)
     	{
-    	    auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(j));
+    	    auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(iTrig));
     	    lead_trig_ns = cur_cal->GetTimeL_ns(0);
     	    // cout<<"Trigger: "<<lead_trig_ns<<endl;
     	}

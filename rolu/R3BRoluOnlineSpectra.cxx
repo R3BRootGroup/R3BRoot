@@ -92,21 +92,23 @@ InitStatus R3BRoluOnlineSpectra::Init()
     //------------------------------------------------------------------------
     // Rolu detector
     TCanvas* cRolu[fNofRoluDetectors];
+    TString histName;
+    TString canName;
     if (fMappedItems)
     {
         for (int irolucount = 0; irolucount < fNofRoluDetectors; irolucount++)
         {
-            char detName[255];
-            sprintf(detName, "ROLU%d", irolucount + 1);
-            cRolu[irolucount] = new TCanvas(detName, detName, 10, 10, 1010, 810);
+            histName = Form("ROLU%d", irolucount + 1);
+            cRolu[irolucount] = new TCanvas(canName.Data(), canName.Data(), 10, 10, 1010, 810);
 
-            fh_rolu_channels[irolucount] =
-                new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 5, 0., 5.);
+            histName = Form("Rolu%d_channels", irolucount);
+            fh_rolu_channels[irolucount] = new TH1F(histName.Data(),histName.Data(), 5, 0., 5.);
             fh_rolu_channels[irolucount]->GetXaxis()->SetTitle("Channel number");
             fh_rolu_channels[irolucount]->SetFillColor(31);
 
+            histName = Form("Rolu%d_tot", irolucount);
             fh_rolu_tot[irolucount] =
-                new TH2F(Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 5, 0, 5, 1500, 0., 300.);
+                new TH2F(histName.Data(),histName.Data(), 5, 0, 5, 1500, 0., 300.);
             fh_rolu_tot[irolucount]->GetXaxis()->SetTitle("PMT number");
             fh_rolu_tot[irolucount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -175,14 +177,14 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
         {
             R3BRoluCalData* calData = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
 	    assert(calData && "dynamic cast failed!");
-	    for (int ch=0; ch<4; ch++)
+	    for (int chan=0; chan<4; chan++)
             //if (!(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))) && !(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))))
             { // TAMEX leading
-                double time_L  = calData->GetTimeL_ns(ch);
-                double time_T  = calData->GetTimeT_ns(ch);
+                double time_L  = calData->GetTimeL_ns(chan);
+                double time_T  = calData->GetTimeT_ns(chan);
                 tot = fmod(time_T - time_L + c_range_ns + c_range_ns/2., c_range_ns) - c_range_ns/2.;
                 if (!std::isnan(tot))
-		   fh_rolu_tot[calData->GetDetector()-1]->Fill(ch, tot);
+		   fh_rolu_tot[calData->GetDetector()-1]->Fill(chan, tot);
             }
 	}
     } // if fCallItems
