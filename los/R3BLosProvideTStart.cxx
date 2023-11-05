@@ -13,9 +13,9 @@
 
 #include "R3BLosProvideTStart.h"
 #include "FairRootManager.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BCoarseTimeStitch.h"
 
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
@@ -36,10 +36,10 @@ InitStatus R3BLosProvideTStart::Init()
     fLosCalData.Init();
     fLosTriggerCalData.Init();
 
-    if(fUseTrigHit)
+    if (fUseTrigHit)
     {
-	fLosHitData.Init();
-    	fLosTriggerData.Init();
+        fLosHitData.Init();
+        fLosTriggerData.Init();
     }
 
     auto ioman = FairRootManager::Instance();
@@ -55,20 +55,20 @@ InitStatus R3BLosProvideTStart::Init()
         R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     return kSUCCESS;
 }
 
-void R3BLosProvideTStart::Exec(Option_t*) 
-{ 
-    if(fUseTrigHit)
+void R3BLosProvideTStart::Exec(Option_t*)
+{
+    if (fUseTrigHit)
     {
-        fEventHeader->SetTStart(GetTStartTrigHit()); 
-	return;
+        fEventHeader->SetTStart(GetTStartTrigHit());
+        return;
     }
-	
-	fEventHeader->SetTStart(GetTStart()); 
+
+    fEventHeader->SetTStart(GetTStart());
 }
 
 Double_t R3BLosProvideTStart::GetTStart() const
@@ -79,8 +79,8 @@ Double_t R3BLosProvideTStart::GetTStart() const
     auto T1 = 10240; // TAMEX, range is 2048*5ns
     auto T2 = 40960; // VFTX, range is 40960*5ns
 
-    const int c1 = std::min(T1,T2);
-    const int c2 = std::max(T1,T2);
+    const int c1 = std::min(T1, T2);
+    const int c2 = std::max(T1, T2);
 
     if (losCalData.empty())
     {
@@ -96,14 +96,15 @@ Double_t R3BLosProvideTStart::GetTStart() const
         if (losTriggerCalData.back()->GetTimeV_ns(0) > 0.)
         {
             R3BLOG(debug1, "CalData with VFTX trigger info for LOS");
-            return fTimeStitch->GetTime(
-                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(0), "vftx", "vftx");
+            return fCyclicCorrector->GetVFTXTime(losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(0));
         }
         else
         {
             R3BLOG(debug1, "CalData with Tamex trigger info for LOS");
-            return fTimeStitch->GetTime(
-                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeL_ns(0), "vftx", "tamex");
+            auto mean_vftx = fCyclicCorrector->GetVFTXTime(losCalData.back()->GetMeanTimeVFTX());
+            auto los_trig = fCyclicCorrector->GetTAMEXTime(losTriggerCalData.back()->GetTimeL_ns(0));
+            auto tdiff = mean_vftx - los_trig;
+            return tdiff;
         }
     }
 }
@@ -122,12 +123,12 @@ Double_t R3BLosProvideTStart::GetTStartTrigHit() const
     }
     else
     {
-	for (auto it = losHitData.rbegin(); it != losHitData.rend(); ++it)
-	{
-		Double_t tref_t = fTimeStitch->GetTime((*it)->GetTime() - losTriggerData.front()->GetRawTimeNs(), "vftx", "vftx");
-		if(tref_t > edgeL && tref_t < edgeR)
-			return tref_t;
-	}   
+        for (auto it = losHitData.rbegin(); it != losHitData.rend(); ++it)
+        {
+            Double_t tref_t = fCyclicCorrector->GetVFTXTime((*it)->GetTime() - losTriggerData.front()->GetRawTimeNs());
+            if (tref_t > edgeL && tref_t < edgeR)
+                return tref_t;
+        }
     }
     return std::numeric_limits<Double_t>::quiet_NaN();
 }

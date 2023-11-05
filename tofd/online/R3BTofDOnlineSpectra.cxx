@@ -40,7 +40,7 @@
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BTofDMappingPar.h"
 #include "R3BTofDOnlineSpectra.h"
 #include "R3BTofdCalData.h"
@@ -74,7 +74,7 @@ R3BTofDOnlineSpectra::R3BTofDOnlineSpectra(const TString& name, Int_t iVerbose)
     , fMappedItems(NULL)
     , fCalItems(NULL)
     , fHitItems(NULL)
-    , fTimeStitch(nullptr)
+    , fCyclicCorrector(nullptr)
     , fMapPar(NULL)
     , fMaxmul(100)
     , fC_range_ns(2048 * 5)     // nanoseconds
@@ -597,7 +597,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     run->GetHttpServer()->RegisterCommand("Reset_TofD_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     return kSUCCESS;
 }
@@ -951,8 +951,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
                 // Shift the cyclic difference window by half a window-length and move it back,
                 // this way the trigger time will be at 0.
-                auto topc_ns = fTimeStitch->GetTime(topc->GetTimeLeading_ns() - topc_trig_ns);
-                auto botc_ns = fTimeStitch->GetTime(botc->GetTimeLeading_ns() - botc_trig_ns);
+                auto topc_ns = fCyclicCorrector->GetTAMEXTime(topc->GetTimeLeading_ns() - topc_trig_ns);
+                auto botc_ns = fCyclicCorrector->GetTAMEXTime(botc->GetTimeLeading_ns() - botc_trig_ns);
 
                 auto dt = topc_ns - botc_ns;
                 // Handle wrap-around.
@@ -985,8 +985,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                         continue;
                     }
 
-                    auto topc_tot = fTimeStitch->GetTime(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns());
-                    auto botc_tot = fTimeStitch->GetTime(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns());
+                    auto topc_tot = fCyclicCorrector->GetTAMEXTime(topc->GetTimeTrailing_ns() - topc->GetTimeLeading_ns());
+                    auto botc_tot = fCyclicCorrector->GetTAMEXTime(botc->GetTimeTrailing_ns() - botc->GetTimeLeading_ns());
 
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(-iBar - 1, botc_tot);
                     fh_tofd_TotPm_coinc[iPlane - 1]->Fill(iBar, topc_tot);
@@ -1024,8 +1024,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                         for (Int_t imult2 = 0; imult2 < vmultihits[ipl - 1][ibr - 1]; imult2++)
                         {
                             Double_t tof_plane = 0. / 0.;
-                            tof_plane = fTimeStitch->GetTime(time_bar[ipl][ibr - 1][imult1] -
-                                                             time_bar[ipl - 1][ibr - 1][imult2]);
+                            tof_plane = fCyclicCorrector->GetTAMEXTime(time_bar[ipl][ibr - 1][imult1] - time_bar[ipl - 1][ibr - 1][imult2]);
                             fh_tofd_dt[ipl - 1]->Fill(ibr, tof_plane);
                         }
                     }
@@ -1093,7 +1092,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     for (Int_t im2 = 0; im2 < iCounts[i - 1]; im2++)
                     {
-                        Double_t tdif = fTimeStitch->GetTime(t[i][im1] - t[i - 1][im2]);
+                        Double_t tdif = fCyclicCorrector->GetTAMEXTime(t[i][im1] - t[i - 1][im2]);
                         fh_tofd_dt_hit[i - 1]->Fill(bar[i][im1], tdif);
                     }
                 }

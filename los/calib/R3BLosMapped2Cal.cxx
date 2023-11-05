@@ -126,6 +126,7 @@ InitStatus R3BLosMapped2Cal::Init()
 void R3BLosMapped2Cal::SetParContainers()
 {
     fTcalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("LosTCalPar"));
+    fTcalPar->printParams();
     if (!fTcalPar)
     {
         R3BLOG(fatal, "Could not get access to LosTCalPar-Container.");
@@ -164,9 +165,9 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             continue;
 
         // channel numbers are stored 1-based (1..n)
-        UInt_t iDet = hit->GetDetector(); // 1..
-        UInt_t iCha = hit->GetChannel();  // 1..
-        UInt_t iType = hit->GetType();    // 0,1,2,3
+        unsigned int iDet = hit->GetDetector(); // 1..
+        unsigned int iCha = hit->GetChannel();  // 1..
+        unsigned int iType = hit->GetType();    // 0,1,2,3
 
         //   cout<<"Mapped info: "<<ihit<<"; "<<iDet<<", "<<iCha<<"; "<<iType<<", timeFine "<<hit->GetTimeFine()<<endl;
 
@@ -432,31 +433,21 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                 LOG(info) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
-
-        // if(fNEvent == 25383 || fNEvent == 322367 || fNEvent == 399481)
-
-        // if(fNEvent == 24733) cout<<"Mapped2Cal "<<fNEvent<<"; "<<fNofCalItems<<", "<<nHits<<", "<<iCha<<",
-        // "<<iType<<", "<<
-        //                            times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;
-
         continue;
-        // skip_event_pileup:
-        //   LOG(warn) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-        //              << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     // Calibrate trigger channels -----------------------------------------------
     if (fMappedTriggerItems && fMappedTriggerItems->GetEntriesFast() > 0)
     {
         auto mapped_num = fMappedTriggerItems->GetEntriesFast();
-        UInt_t prevdet = 0;
+        unsigned int prevdet = 0;
         R3BLosCalData* caltrigger = NULL;
         for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
         {
             auto mapped = dynamic_cast<R3BLosMappedData const*>(fMappedTriggerItems->At(mapped_i));
-            UInt_t iDetector = mapped->GetDetector();
-            UInt_t iChannel = mapped->GetChannel();
-            UInt_t iType = mapped->GetType() + 1; // 1, 2, ... 4
+            unsigned int iDetector = mapped->GetDetector();
+            unsigned int iChannel = mapped->GetChannel();
+            unsigned int iType = mapped->GetType() + 1; // 1, 2, ... 4
 
             if (!caltrigger || prevdet != mapped->GetDetector())
             {

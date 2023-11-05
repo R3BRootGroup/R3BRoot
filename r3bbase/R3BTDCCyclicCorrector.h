@@ -11,42 +11,37 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCoarseTimeStitch_H
-#define R3BCoarseTimeStitch_H 1
+#ifndef R3BTDCCyclicCorrector_H
+#define R3BTDCCyclicCorrector_H 1
 
 #include "TObject.h"
 #include "TString.h"
 #include <Rtypes.h>
 
-class R3BCoarseTimeStitch : public TObject
+class R3BTDCCyclicCorrector : public TObject
 {
   public:
     // Default Constructor for sync two tamex channels
-    R3BCoarseTimeStitch();
+    R3BTDCCyclicCorrector(){};
 
-    // Destructor
-    virtual ~R3BCoarseTimeStitch() {}
-
-    Float_t GetRange1() const { return fRange1; }
-    Float_t GetRange2() const { return fRange2; }
-    Double_t GetTime(Double_t, TString name1 = "tamex", TString name2 = "tamex");
-
-    void SetRange1(Float_t range) { fRange1 = range; }
-    void SetRange2(Float_t range) { fRange2 = range; }
-
-    void SetClockTDC150() { fRangeClockTDC = fRangeClockTDC150; }
+    double GetTAMEXTime(double);
+    double GetVFTXTime(double);
+    double GetTRBTime(double);
+    double GetClockTDCTime(double);
+    double GetClockTDColdTime(double);
+    double GetKilomTime(double);
 
   private:
-    Double_t fRange1;
-    Double_t fRange2;
-    Double_t fRangeTamex;
-    Double_t fRangeVftx;
-    Double_t fRangeTrb;
-    Double_t fRangeClockTDC;
-    Double_t fRangeClockTDC150;
+    double range{};
+    double rangeTamex = 2048 * 1000. / 200.;       // ns
+    double rangeTrb = 2048 * 1000. / 200.;         // ns
+    double rangeVftx = 8192 * 1000. / 200.;        // ns
+    double rangeClockTDC = 4096 * 1000. / 250.;    // ns - should verify with Michael which detector ran on this clock and if this frequency is correct
+    double rangeClockTDC150 = 4096 * 1000. / 150.; // ns
+    double rangeKilom = 4096 * 1000. / 150.;       // ns
 
   public:
-    ClassDef(R3BCoarseTimeStitch, 1)
+    ClassDef(R3BTDCCyclicCorrector, 1)
 };
 
 #endif

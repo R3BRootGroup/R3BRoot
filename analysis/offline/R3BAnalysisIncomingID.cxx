@@ -27,7 +27,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BAnalysisIncomingID.h"
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BIncomingIDPar.h"
@@ -71,7 +71,7 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fUseLOS(kFALSE)
     , fUsePspx1(kTRUE)
     , fUseTref(kFALSE)
-    , fTimeStitch(nullptr)
+    , fCyclicCorrector(nullptr)
     , fCutS2(NULL)
     , fCutCave(NULL)
 {
@@ -176,7 +176,7 @@ InitStatus R3BAnalysisIncomingID::Init()
     }
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     SetParameter();
     return kSUCCESS;
@@ -262,7 +262,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             numDet = hittcal->GetDetector();
             if (fUseTref)
             {
-                Double_t time = fTimeStitch->GetTime(hittcal->GetTime() - trigTimeV[numDet - 1], "vftx", "vftx");
+                Double_t time = fCyclicCorrector->GetVFTXTime(hittcal->GetTime() - trigTimeV[numDet - 1]);
                 if (time == fHeader->GetTStart())
                 {
                     posLosX_cm[numDet - 1] = hittcal->GetX_cm();

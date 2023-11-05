@@ -26,7 +26,7 @@ class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
 class R3BTcutPar;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 
 /**
  * This taks reads all detector data items for the analysis of incoming
@@ -106,7 +106,7 @@ class R3BAnalysisIncomingID : public FairTask
 
   private:
     void SetParameter();
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
     TClonesArray* fHitItemsMus;
     TClonesArray* fHitItemsMusli;

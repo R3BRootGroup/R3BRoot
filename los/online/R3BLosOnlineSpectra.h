@@ -33,7 +33,7 @@
 #include <cstdlib>
 
 class TClonesArray;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
@@ -57,7 +57,7 @@ class R3BLosOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosOnlineSpectra(const char* name, Int_t iVerbose = 1);
+    R3BLosOnlineSpectra(const char* name, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -96,14 +96,14 @@ class R3BLosOnlineSpectra : public FairTask
     /**
      * Methods for setting position offset and effective velocity of light
      */
-    inline void SetLosXYMCFD(Double_t offsetX1,
-                             Double_t offsetY1,
-                             Double_t veffX1,
-                             Double_t veffY1,
-                             Double_t offsetX2,
-                             Double_t offsetY2,
-                             Double_t veffX2,
-                             Double_t veffY2)
+    inline void SetLosXYMCFD(double offsetX1,
+                             double offsetY1,
+                             double veffX1,
+                             double veffY1,
+                             double offsetX2,
+                             double offsetY2,
+                             double veffX2,
+                             double veffY2)
     {
         flosOffsetXV[0] = offsetX1;
         flosOffsetYV[0] = offsetY1;
@@ -115,14 +115,14 @@ class R3BLosOnlineSpectra : public FairTask
         flosVeffYV[1] = veffY2;
     }
 
-    inline void SetLosXYTAMEX(Double_t offsetXT1,
-                              Double_t offsetYT1,
-                              Double_t veffXT1,
-                              Double_t veffYT1,
-                              Double_t offsetXT2,
-                              Double_t offsetYT2,
-                              Double_t veffXT2,
-                              Double_t veffYT2)
+    inline void SetLosXYTAMEX(double offsetXT1,
+                              double offsetYT1,
+                              double veffXT1,
+                              double veffYT1,
+                              double offsetXT2,
+                              double offsetYT2,
+                              double veffXT2,
+                              double veffYT2)
     {
         flosOffsetXT[0] = offsetXT1;
         flosOffsetYT[0] = offsetYT1;
@@ -134,14 +134,14 @@ class R3BLosOnlineSpectra : public FairTask
         flosVeffYT[1] = veffYT2;
     }
 
-    inline void SetLosXYToT(Double_t offsetXQ1,
-                            Double_t offsetYQ1,
-                            Double_t veffXQ1,
-                            Double_t veffYQ1,
-                            Double_t offsetXQ2,
-                            Double_t offsetYQ2,
-                            Double_t veffXQ2,
-                            Double_t veffYQ2)
+    inline void SetLosXYToT(double offsetXQ1,
+                            double offsetYQ1,
+                            double veffXQ1,
+                            double veffYQ1,
+                            double offsetXQ2,
+                            double offsetYQ2,
+                            double veffXQ2,
+                            double veffYQ2)
     {
         flosOffsetXQ[0] = offsetXQ1;
         flosOffsetYQ[0] = offsetYQ1;
@@ -153,10 +153,10 @@ class R3BLosOnlineSpectra : public FairTask
         flosVeffYQ[1] = veffYQ2;
     }
     /* Method for pile-up */
-    inline void SetEpileup(Double_t Epileup) { fEpileup = Epileup; }
+    inline void SetEpileup(double Epileup) { fEpileup = Epileup; }
 
     /* Method for setting number of LOS detectors */
-    inline void SetNofLosModules(Int_t nDets)
+    inline void SetNofLosModules(int nDets)
     {
         fNofLosDetectors = nDets;
 
@@ -186,8 +186,8 @@ class R3BLosOnlineSpectra : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTrigger(int trigger) { fTrigger = trigger; }
+    inline void SetTpat(int tpat) { fTpat = tpat; }
 
     void Reset_LOS_Histo();
 
@@ -195,7 +195,7 @@ class R3BLosOnlineSpectra : public FairTask
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
 
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
     TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
 
@@ -209,27 +209,27 @@ class R3BLosOnlineSpectra : public FairTask
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat;
-    Int_t fSamp;
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    Int_t nLosEvents = 0;
+    int fTrigger;           /**< Trigger value. */
+    int fTpat;
+    int fSamp;
+    double fClockFreq; /**< Clock cycle in [ns]. */
+    int nLosEvents = 0;
     //   TClonesArray *fbmonMappedItems;
-    Int_t fNofLosDetectors; /**< Number of LOS detectors. */
+    int fNofLosDetectors; /**< Number of LOS detectors. */
 
-    Double_t flosVeffXV[2];
-    Double_t flosVeffYV[2];
-    Double_t flosOffsetXV[2];
-    Double_t flosOffsetYV[2];
-    Double_t flosVeffXT[2];
-    Double_t flosVeffYT[2];
-    Double_t flosOffsetXT[2];
-    Double_t flosOffsetYT[2];
-    Double_t flosVeffXQ[2];
-    Double_t flosVeffYQ[2];
-    Double_t flosOffsetXQ[2];
-    Double_t flosOffsetYQ[2];
-    Int_t foptcond;
+    double flosVeffXV[2];
+    double flosVeffYV[2];
+    double flosOffsetXV[2];
+    double flosOffsetYV[2];
+    double flosVeffXT[2];
+    double flosVeffYT[2];
+    double flosOffsetXT[2];
+    double flosOffsetYT[2];
+    double flosVeffXQ[2];
+    double flosVeffYQ[2];
+    double flosOffsetXQ[2];
+    double flosOffsetYQ[2];
+    int foptcond;
 
     unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
     std::vector<unsigned long long> time_prev;
@@ -239,10 +239,10 @@ class R3BLosOnlineSpectra : public FairTask
     unsigned long long time_spill_start = 0, time_spill_end = 0;
     unsigned long long time_previous_event = 0;
 
-    Double_t time_clear = -1.;
-    Double_t tdiff = 0.;
-    Double_t fNorm = 1.;
-    Double_t fEpileup;
+    double time_clear = -1.;
+    double tdiff = 0.;
+    double fNorm = 1.;
+    double fEpileup;
 
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 

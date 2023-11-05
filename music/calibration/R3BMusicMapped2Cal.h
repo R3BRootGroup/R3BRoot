@@ -31,7 +31,6 @@
 #define MAX_NB_MUSICTREF 2
 
 class TClonesArray;
-class R3BCoarseTimeStitch;
 class R3BMusicCalPar;
 
 class R3BMusicMapped2Cal : public FairTask
@@ -82,7 +81,6 @@ class R3BMusicMapped2Cal : public FairTask
 
     Bool_t fOnline; // Don't store data for online
 
-    R3BCoarseTimeStitch* fTimeStitch;
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
     TClonesArray* fMusicCalDataCA;    /**< Array with Music Cal-output data. >*/

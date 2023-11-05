@@ -24,7 +24,7 @@
 #include "FairRuntimeDb.h"
 
 #include "R3BEventHeader.h"
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 
@@ -107,7 +107,7 @@ InitStatus R3BRpcCal2Hit::Init()
     fParCont4 = fHitPar->GetCalParams4();
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     return kSUCCESS;
 }
@@ -162,7 +162,9 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
                 double time = (time_left + time_right) / 2. - fParCont3->GetAt(inum);
 
-                auto tof = fTimeStitch->GetTime(time - fR3BEventHeader->GetTStart());
+                auto tof_rpc = fCyclicCorrector->GetTRBTime(time);
+                auto tof_los = fCyclicCorrector->GetVFTXTime(fR3BEventHeader->GetTStart());
+		auto tof = tof_rpc - tof_los;
                 AddHitStrip(iDetector, ichn_right, time, position, charge, tof);
             }
         }
@@ -175,7 +177,9 @@ void R3BRpcCal2Hit::Exec(Option_t* opt)
 
             double time = (map1->GetTimeR_B() + map1->GetTimeL_T()) / 2.;
 
-            auto tof = fTimeStitch->GetTime(time - fR3BEventHeader->GetTStart());
+            auto tof_rpc = fCyclicCorrector->GetTRBTime(time);
+            auto tof_los = fCyclicCorrector->GetVFTXTime(fR3BEventHeader->GetTStart());
+	    auto tof = tof_rpc - tof_los;
 
             AddHitStrip(iDetector, map1->GetChannelId(), time, position, charge, tof);
         }

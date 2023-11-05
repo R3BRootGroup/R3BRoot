@@ -31,7 +31,7 @@
 #include "FairRuntimeDb.h"
 
 // R3B headers
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BMusicCalPar.h"
 #include "R3BMusicMapped2CalPar.h"
 #include "R3BMusicMappedData.h"
@@ -45,7 +45,7 @@ R3BMusicMapped2CalPar::R3BMusicMapped2CalPar()
 
 // R3BMusicMapped2CalParPar: Standard Constructor --------------------------
 R3BMusicMapped2CalPar::R3BMusicMapped2CalPar(const TString& name,
-                                             Int_t iVerbose,
+                                             int iVerbose,
                                              const TString& namedeta,
                                              const TString& namedetb)
     : FairTask(name, iVerbose)
@@ -136,12 +136,12 @@ InitStatus R3BMusicMapped2CalPar::Init()
     }
 
     // Definition of a time stich object to correlate VFTX times
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     // Define TGraph for fits
     char Name1[255];
     fg_anode = new TGraph*[fNumAnodes];
-    for (Int_t i = 0; i < fNumAnodes; i++)
+    for (int i = 0; i < fNumAnodes; i++)
     {
         fg_anode[i] = new TGraph();
         sprintf(Name1, "fg1_Anode_%d", i + 1);
@@ -164,23 +164,23 @@ InitStatus R3BMusicMapped2CalPar::ReInit() { return kSUCCESS; }
 void R3BMusicMapped2CalPar::Exec(Option_t*)
 {
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusicMappedDataCA->GetEntriesFast();
-    Int_t nHitsA = fHitItemsDetA->GetEntriesFast();
-    Int_t nHitsB = fHitItemsDetB->GetEntriesFast();
+    int nHits = fMusicMappedDataCA->GetEntriesFast();
+    int nHitsA = fHitItemsDetA->GetEntriesFast();
+    int nHitsB = fHitItemsDetB->GetEntriesFast();
     if (nHits < 3 || nHitsA != 1 || nHitsB != 1)
         return;
 
     TVector3 PosDetA(0., 0., fPosDetA);
     TVector3 PosDetB(0., 0., fPosDetB);
     R3BMwpcHitData** hitMwAData = new R3BMwpcHitData*[nHitsA];
-    for (Int_t i = 0; i < nHitsA; i++)
+    for (int i = 0; i < nHitsA; i++)
     {
         hitMwAData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsDetA->At(i));
         PosDetA.SetX(hitMwAData[i]->GetX());
         // LOG(info) <<hitMwAData[i]->GetX();
     }
     R3BMwpcHitData** hitMwBData = new R3BMwpcHitData*[nHitsB];
-    for (Int_t i = 0; i < nHitsB; i++)
+    for (int i = 0; i < nHitsB; i++)
     {
         hitMwBData[i] = dynamic_cast<R3BMwpcHitData*>(fHitItemsDetB->At(i));
         PosDetB.SetX(hitMwBData[i]->GetX());
@@ -190,17 +190,17 @@ void R3BMusicMapped2CalPar::Exec(Option_t*)
     R3BMusicMappedData** mappedData = new R3BMusicMappedData*[nHits];
     UShort_t anodeId = 0;
 
-    for (Int_t i = 0; i < (fNumAnodes + fNumAnodesRef); i++)
+    for (int i = 0; i < (fNumAnodes + fNumAnodesRef); i++)
     {
         mulanode[i] = 0;
-        for (Int_t j = 0; j < fMaxMult; j++)
+        for (int j = 0; j < fMaxMult; j++)
         {
             energy[j][i] = 0.;
             dtime[j][i] = 0.;
         }
     }
 
-    for (Int_t i = 0; i < nHits; i++)
+    for (int i = 0; i < nHits; i++)
     {
         mappedData[i] = dynamic_cast<R3BMusicMappedData*>(fMusicMappedDataCA->At(i));
         anodeId = mappedData[i]->GetAnodeID();
@@ -224,15 +224,15 @@ void R3BMusicMapped2CalPar::Exec(Option_t*)
         TF1* fa = new TF1("fa", "pol1", fPosDetA, fPosDetB);
         fa->SetParameter(0, PosDetA.X());
         fa->SetParameter(1, (PosDetB - PosDetA).X() / (fPosDetB - fPosDetA));
-        for (Int_t i = 0; i < fNumAnodes; i++)
+        for (int i = 0; i < fNumAnodes; i++)
         {
-            for (Int_t j = 0; j < mulanode[fNumAnodes]; j++)
-                for (Int_t k = 0; k < mulanode[i]; k++)
+            for (int j = 0; j < mulanode[fNumAnodes]; j++)
+                for (int k = 0; k < mulanode[i]; k++)
                 {
                     if (energy[k][i] > 0.)
                     { // Anode is 50mm, first anode is at 175mm with respect to the center of music detector
                         fg_anode[i]->SetPoint(fg_anode[i]->GetN() + 1,
-                                              fTimeStitch->GetTime(dtime[k][i] - dtime[j][fNumAnodes], "vftx", "vftx"),
+                                              fCyclicCorrector->GetVFTXTime(dtime[k][i] - dtime[j][fNumAnodes]),
                                               fa->Eval(fPosMusic - 175.0 + i * 50.0));
                     }
                 }
@@ -257,13 +257,13 @@ void R3BMusicMapped2CalPar::FinishTask()
 
     TF1* fit = new TF1("fit", "pol1", fLimit_left, fLimit_right);
     fit->SetLineColor(2);
-    for (Int_t i = 0; i < fNumAnodes; i++)
+    for (int i = 0; i < fNumAnodes; i++)
     {
         if (fg_anode[i]->GetN() > fMinStadistics)
         {
             fCal_Par->SetInUse(1, i + 1);
             fg_anode[i]->Fit("fit", "QR0");
-            Double_t par[fNumPosParams];
+            double par[fNumPosParams];
             fit->GetParameters(&par[0]);
             fCal_Par->SetPosParams(par[0], i * fNumPosParams);
             fCal_Par->SetPosParams(par[1], i * fNumPosParams + 1);

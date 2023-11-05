@@ -27,7 +27,7 @@
 class TClonesArray;
 class R3BTGeoPar;
 class R3BEventHeader;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 
 class R3BRpcCal2Hit : public FairTask
 {
@@ -62,7 +62,7 @@ class R3BRpcCal2Hit : public FairTask
     virtual InitStatus ReInit();
 
   private:
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     R3BEventHeader* fR3BEventHeader; /**< Event header - input data. */
 
     TClonesArray* fRpcCalDataCA;

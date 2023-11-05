@@ -18,8 +18,9 @@
 
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
-#include "FairRuntimeDb.h"
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BEventHeader.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
@@ -28,7 +29,6 @@
 #include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
-#include "R3BCoarseTimeStitch.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -49,12 +49,12 @@ R3BLosTCal2Hit::R3BLosTCal2Hit()
 {
 }
 
-R3BLosTCal2Hit::R3BLosTCal2Hit(const char* name, Int_t iVerbose)
+R3BLosTCal2Hit::R3BLosTCal2Hit(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
     , fTCalItems(NULL)
     , fTCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BLosHitData"))
-    , fTimeStitch(NULL)
+    , fCyclicCorrector(NULL)
     , fLEMatchParams(NULL)
     , fTEMatchParams(NULL)
     , fNofHitItems(0)
@@ -124,12 +124,12 @@ void R3BLosTCal2Hit::SetParameter()
     flosVeffX = fLosHit_Par->Getxveff_MCFD();
     flosVeffY = fLosHit_Par->Getyveff_MCFD();
 
-    Int_t array_LE = 8 * fNumParamsTamexLE;
+    int array_LE = 8 * fNumParamsTamexLE;
     fLEMatchParams = new TArrayF();
     fLEMatchParams->Set(array_LE);
     fLEMatchParams = fLosHit_Par->GetLEMatchParams();
 
-    Int_t array_TE = 8 * fNumParamsTamexTE;
+    int array_TE = 8 * fNumParamsTamexTE;
     fTEMatchParams = new TArrayF();
     fTEMatchParams->Set(array_TE);
     fTEMatchParams = fLosHit_Par->GetTEMatchParams();
@@ -160,12 +160,12 @@ InitStatus R3BLosTCal2Hit::Init()
 
     fHitItems->Clear();
 
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
     // file with walk-correction parameters
     ifstream infile(fwalk_param_file.c_str());
     if (infile.is_open())
     {
-        for (Int_t ivec = 0; ivec < 16; ivec++)
+        for (int ivec = 0; ivec < 16; ivec++)
         {
             /*
              ************* Parameters 0-7 MCFD  **********************
@@ -180,11 +180,11 @@ InitStatus R3BLosTCal2Hit::Init()
     else
     {
         LOG(warn) << "UNABLE TO OPEN FILE WITH WALK PARAMETERS! Parameters set to zero!";
-        for (Int_t ivec = 0; ivec < 16; ivec++)
+        for (int ivec = 0; ivec < 16; ivec++)
         {
             walk_par[ivec][0] = 10.;
             walk_par[ivec][1] = 1000.;
-            for (Int_t iv = 2; iv < 11; iv++)
+            for (int iv = 2; iv < 11; iv++)
             {
                 walk_par[ivec][iv] = 0.;
                 ;
@@ -196,7 +196,7 @@ InitStatus R3BLosTCal2Hit::Init()
 
     if (infile1.is_open())
     {
-        for (Int_t ivec = 0; ivec < 8; ivec++)
+        for (int ivec = 0; ivec < 8; ivec++)
         {
             infile1 >> tot_par[ivec][0] >> tot_par[ivec][1] >> tot_par[ivec][2] >> tot_par[ivec][3];
         }
@@ -204,7 +204,7 @@ InitStatus R3BLosTCal2Hit::Init()
     else
     {
         LOG(warn) << "UNABLE TO OPEN FILE WITH ToT PARAMETERS! Parameters set to zero!";
-        for (Int_t ivec = 0; ivec < 8; ivec++)
+        for (int ivec = 0; ivec < 8; ivec++)
         {
             tot_par[ivec][0] = 0.;
             tot_par[ivec][1] = 0.;
@@ -212,7 +212,6 @@ InitStatus R3BLosTCal2Hit::Init()
             tot_par[ivec][3] = 1.; // Normalization factor
         }
     }
-
 
     SetParameter();
     return kSUCCESS;
@@ -232,48 +231,48 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
+    int fTpat_bit = fTpat - 1;
     if (fTpat_bit >= 0)
     {
-        Int_t itpat = header->GetTpat();
-        Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+        int itpat = header->GetTpat();
+        int tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if ((header) && (tpatvalue == 0))
             return;
     }
 
-    Int_t trigHits = fTCalTriggerItems->GetEntries();
-    Double_t trigTime[trigHits];
+    int trigHits = fTCalTriggerItems->GetEntries();
+    double trigTime[trigHits];
     if (trigHits == 0)
         return;
-    for (Int_t ihit = 0; ihit < trigHits; ihit++)
+    for (int ihit = 0; ihit < trigHits; ihit++)
     {
         R3BLosTCalData* hit = (R3BLosTCalData*)fTCalTriggerItems->At(ihit);
-        Int_t typ = hit->GetType();
+        int typ = hit->GetType();
         trigTime[typ] = hit->GetRawTimeNs();
     }
 
-    Int_t nHits = fTCalItems->GetEntries();
-    Int_t hits[fNofDetectors], v_npmt[fNofDetectors][nHits], tle_npmt[fNofDetectors][nHits],
+    int nHits = fTCalItems->GetEntries();
+    int hits[fNofDetectors], v_npmt[fNofDetectors][nHits], tle_npmt[fNofDetectors][nHits],
         tte_npmt[fNofDetectors][nHits];
-    Double_t vTime[fNofDetectors * 8][nHits], TLeTime[fNofDetectors * 8][nHits], TTeTime[fNofDetectors * 8][nHits],
+    double vTime[fNofDetectors * 8][nHits], TLeTime[fNofDetectors * 8][nHits], TTeTime[fNofDetectors * 8][nHits],
         avg_v[fNofDetectors][nHits], avg_t[fNofDetectors][nHits];
-    Bool_t tHit[fNofDetectors * 8 * 3][nHits];
-    for (Int_t d = 0; d < fNofDetectors; d++)
+    bool tHit[fNofDetectors * 8 * 3][nHits];
+    for (int d = 0; d < fNofDetectors; d++)
     {
         hits[d] = 0;
-        for (Int_t i = 0; i < nHits; i++)
+        for (int i = 0; i < nHits; i++)
         {
             v_npmt[d][i] = 0;
             tle_npmt[d][i] = 0;
             tte_npmt[d][i] = 0;
             avg_v[d][i] = 0.;
             avg_t[d][i] = 0.;
-            for (Int_t ch = 0; ch < 8; ch++)
+            for (int ch = 0; ch < 8; ch++)
             {
                 vTime[d * 8 + ch][i] = 0.;
                 TLeTime[d * 8 + ch][i] = 0.;
                 TTeTime[d * 8 + ch][i] = 0.;
-                for (Int_t typ = 0; typ < 3; typ++)
+                for (int typ = 0; typ < 3; typ++)
                     tHit[d * 8 * 3 + ch * 3 + typ][i] = false;
             }
         }
@@ -282,26 +281,26 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
     if (nHits == 0)
         return;
 
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    for (int ihit = 0; ihit < nHits; ihit++)
     {
         R3BLosTCalData* hit = (R3BLosTCalData*)fTCalItems->At(ihit);
-        Int_t ch = hit->GetChannel();
-        Int_t typ = hit->GetType();
-        Int_t det = hit->GetDetector();
-        Double_t rawTime = hit->GetRawTimeNs();
-        Bool_t inHit = false;
+        int ch = hit->GetChannel();
+        int typ = hit->GetType();
+        int det = hit->GetDetector();
+        double rawTime = hit->GetRawTimeNs();
+        bool inHit = false;
 
-        Int_t hitNo = 0, detNo = 0;
-        for (Int_t d = 0; d < fNofDetectors; d++)
+        int hitNo = 0, detNo = 0;
+        for (int d = 0; d < fNofDetectors; d++)
         {
             if ((det - 1) != d)
                 continue;
-            for (Int_t i = 0; i < hits[d]; i++)
+            for (int i = 0; i < hits[d]; i++)
             {
                 if (typ == 0)
                 {
-                    Double_t t_ref = 0.;
-                    t_ref = fTimeStitch->GetTime(rawTime - trigTime[typ], "vftx", "vftx");
+                    double t_ref = 0.;
+                    t_ref = fCyclicCorrector->GetVFTXTime(rawTime - trigTime[typ]);
                     if (fabs((avg_v[d][i] / v_npmt[d][i]) - t_ref) < fWindowV)
                     {
                         v_npmt[d][i]++;
@@ -311,7 +310,7 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
                             return;
                         }
                         vTime[d * 8 + ch - 1][i] = rawTime;
-                        avg_v[d][i] += fTimeStitch->GetTime(rawTime - trigTime[typ], "vftx", "vftx");
+                        avg_v[d][i] += fCyclicCorrector->GetVFTXTime(rawTime - trigTime[typ]);
                         tHit[d * 8 * 3 + (ch - 1) * 3 + typ][i] = true;
                         inHit = true;
                     }
@@ -320,9 +319,10 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
                 {
                     if (v_npmt[d][i] != 8)
                         continue;
-                    Double_t t_ref = 0., tdiff = 0.;
-                    t_ref = fTimeStitch->GetTime(rawTime - trigTime[typ], "tamex", "tamex");
-                    tdiff = fTimeStitch->GetTime(t_ref - avg_v[d][i] / 8., "tamex", "vftx");
+                    double t_ref = 0., t_avg = 0., tdiff = 0.;
+                    t_ref = fCyclicCorrector->GetTAMEXTime(rawTime - trigTime[typ]);
+                    t_avg = fCyclicCorrector->GetVFTXTime(avg_v[d][i] / 8.);
+                    tdiff = t_ref - t_avg;
                     if (tdiff > fLEMatchParams->GetAt(fNumParamsTamexLE * (ch - 1) + 0) &&
                         tdiff < fLEMatchParams->GetAt(fNumParamsTamexLE * (ch - 1) + 1) && tle_npmt[d][i] < 8)
                     {
@@ -341,7 +341,7 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
                             break;
                         }
                         TLeTime[d * 8 + ch - 1][i] = rawTime;
-                        avg_t[d][i] += fTimeStitch->GetTime(rawTime - trigTime[typ], "tamex", "tamex");
+                        avg_t[d][i] += fCyclicCorrector->GetTAMEXTime(rawTime - trigTime[typ]);
                         tHit[d * 8 * 3 + (ch - 1) * 3 + typ][i] = true;
                         hitNo = i;
                         detNo = d;
@@ -352,9 +352,9 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
                 {
                     if (tle_npmt[d][i] != 8)
                         continue;
-                    Double_t t_ref = 0., tdiff = 0.;
-                    t_ref = fTimeStitch->GetTime(rawTime - trigTime[1], "tamex", "tamex");
-                    tdiff = fTimeStitch->GetTime(t_ref - avg_t[d][i] / 8., "tamex", "tamex");
+                    double t_ref = 0., tdiff = 0.;
+                    t_ref = fCyclicCorrector->GetTAMEXTime(rawTime - trigTime[1]);
+                    tdiff = fCyclicCorrector->GetTAMEXTime(t_ref - avg_t[d][i] / 8.);
                     if (tdiff > fTEMatchParams->GetAt(fNumParamsTamexTE * (ch - 1) + 0) &&
                         tdiff < fTEMatchParams->GetAt(fNumParamsTamexTE * (ch - 1) + 1) && tte_npmt[d][i] < 8)
                     {
@@ -388,19 +388,19 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
             vTime[(det - 1) * 8 + ch - 1][hits[det - 1]] = rawTime;
             tHit[(det - 1) * 8 * 3 + (ch - 1) * 3 + typ][hits[det - 1]] = true;
             v_npmt[(det - 1)][hits[det - 1]]++;
-            avg_v[(det - 1)][hits[det - 1]] += fTimeStitch->GetTime(rawTime - trigTime[typ], "vftx", "vftx");
+            avg_v[(det - 1)][hits[det - 1]] += fCyclicCorrector->GetVFTXTime(rawTime - trigTime[typ]);
             hits[det - 1]++;
         }
     }
-    for (Int_t d = 0; d < fNofDetectors; d++)
+    for (int d = 0; d < fNofDetectors; d++)
     {
-        for (Int_t i = 0; i < hits[d]; i++)
+        for (int i = 0; i < hits[d]; i++)
         {
 
             if (v_npmt[d][i] != 8)
                 continue;
-            Double_t t_hit = 0., Z = 0., x_cm = 0., y_cm = 0.;
-            for (Int_t pm = 0; pm < 8; pm++)
+            double t_hit = 0., Z = 0., x_cm = 0., y_cm = 0.;
+            for (int pm = 0; pm < 8; pm++)
             {
                 t_hit += vTime[d * 8 + pm][i];
             }
@@ -416,13 +416,13 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
 
             if (tle_npmt[d][i] == 8 && tte_npmt[d][i] == 8)
             {
-                Double_t tot = 0.;
-                for (Int_t pm = 0; pm < 8; pm++)
+                double tot = 0.;
+                for (int pm = 0; pm < 8; pm++)
                 {
-                    Double_t tle_ref = 0., tte_ref = 0.;
-                    tle_ref = fTimeStitch->GetTime(TLeTime[d * 8 + pm][i] - trigTime[1], "tamex", "tamex");
-                    tte_ref = fTimeStitch->GetTime(TTeTime[d * 8 + pm][i] - trigTime[1], "tamex", "tamex");
-                    tot += fTimeStitch->GetTime(tte_ref - tle_ref, "tamex", "tamex");
+                    double tle_ref = 0., tte_ref = 0.;
+                    tle_ref = fCyclicCorrector->GetTAMEXTime(TLeTime[d * 8 + pm][i] - trigTime[1]);
+                    tte_ref = fCyclicCorrector->GetTAMEXTime(TTeTime[d * 8 + pm][i] - trigTime[1]);
+                    tot += fCyclicCorrector->GetTAMEXTime(tte_ref - tle_ref);
                 }
                 tot = tot / 8.;
                 Z = tot * fp1 + fp0;
@@ -444,15 +444,15 @@ void R3BLosTCal2Hit::FinishEvent()
     }
 }
 
-Double_t R3BLosTCal2Hit::walk(Int_t inum, Double_t tot)
+double R3BLosTCal2Hit::walk(int inum, double tot)
 {
 
-    Double_t y = 0. / 0., ysc = 0. / 0., term[8] = { 0. };
-    Double_t x;
+    double y = 0. / 0., ysc = 0. / 0., term[8] = { 0. };
+    double x;
 
     x = tot;
     term[0] = x;
-    for (Int_t i = 0; i < 7; i++)
+    for (int i = 0; i < 7; i++)
     {
         term[i + 1] = term[i] * x;
     }
@@ -467,10 +467,10 @@ Double_t R3BLosTCal2Hit::walk(Int_t inum, Double_t tot)
     return ysc;
 }
 
-Double_t R3BLosTCal2Hit::satu(Int_t inum, Double_t tot, Double_t dt)
+double R3BLosTCal2Hit::satu(int inum, double tot, double dt)
 {
 
-    Double_t ysc = 0. / 0.;
+    double ysc = 0. / 0.;
 
     // if(tot_par[inum][0] > 0.)
     // ysc  = (tot_par[inum][0]*tot+tot_par[inum][1])/(tot_par[inum][2]-tot)*tot_par[inum][3] ;

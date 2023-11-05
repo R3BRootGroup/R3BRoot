@@ -31,7 +31,7 @@ class TH1F;
 class TH2F;
 class R3BEventHeader;
 class R3BLosHitPar;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 
 class R3BLosTCal2Hit : public FairTask
 {
@@ -149,7 +149,7 @@ class R3BLosTCal2Hit : public FairTask
     TClonesArray* fTCalItems;        /**< Array with Cal items - input data. */
     TClonesArray* fTCalTriggerItems; /**< Array with Trigger Cal items - input data. */
     TClonesArray* fHitItems;         /**< Array with Hit items - output data. */
-    R3BCoarseTimeStitch* fTimeStitch;      /**< Array with Hit items - output data. */
+    R3BTDCCyclicCorrector* fCyclicCorrector;      /**< Array with Hit items - output data. */
     Float_t fp0, fp1;
     TArrayF* fLEMatchParams;
     TArrayF* fTEMatchParams;

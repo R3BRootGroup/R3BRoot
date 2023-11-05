@@ -27,7 +27,7 @@
 #include "TH1F.h"
 
 class TClonesArray;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 class R3BMusicCalPar;
 
 class R3BMusicMapped2CalPar : public FairTask
@@ -38,7 +38,7 @@ class R3BMusicMapped2CalPar : public FairTask
 
     /** Standard constructor **/
     R3BMusicMapped2CalPar(const TString& name,
-                          Int_t iVerbose = 1,
+                          int iVerbose = 1,
                           const TString& namedeta = "Mwpc0",
                           const TString& namedetb = "Mwpc2");
 
@@ -58,45 +58,45 @@ class R3BMusicMapped2CalPar : public FairTask
     virtual InitStatus ReInit();
 
     /** Method to set up the position of DetA **/
-    void SetPosDetA(Float_t pos) { fPosDetA = pos; }
+    void SetPosDetA(float pos) { fPosDetA = pos; }
 
     /** Method to set up the position of DetB **/
-    void SetPosDetB(Float_t pos) { fPosDetB = pos; }
+    void SetPosDetB(float pos) { fPosDetB = pos; }
 
     /** Method to set up the position of Music **/
-    void SetPosMusic(Float_t pos) { fPosMusic = pos; }
+    void SetPosMusic(float pos) { fPosMusic = pos; }
 
     /** Method to set up the limits for fit **/
-    void SetFitLimits(Int_t left, Int_t right)
+    void SetFitLimits(int left, int right)
     {
         fLimit_left = left;
         fLimit_right = right;
     }
 
   private:
-    Int_t fNumAnodes;
-    Int_t fMaxMult;
-    Int_t fMinStadistics;
-    Int_t fNumParams;
-    Int_t fNumPosParams;
-    Int_t fNumAnodesRef;
-    Int_t fLimit_left;
-    Int_t fLimit_right;
-    Int_t fMaxSigma;
+    int fNumAnodes;
+    int fMaxMult;
+    int fMinStadistics;
+    int fNumParams;
+    int fNumPosParams;
+    int fNumAnodesRef;
+    int fLimit_left;
+    int fLimit_right;
+    int fMaxSigma;
     TArrayF* CalParams;
     TArrayF* PosParams;
 
     TString fNameDetA;
-    Float_t fPosDetA; // Position in the beam direction in mm
+    float fPosDetA; // Position in the beam direction in mm
     TString fNameDetB;
-    Float_t fPosDetB;  // Position in the beam direction in mm
-    Float_t fPosMusic; // Position in the beam direction in mm
+    float fPosDetB;  // Position in the beam direction in mm
+    float fPosMusic; // Position in the beam direction in mm
 
-    Int_t mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
-    Double_t energy[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
-    Double_t dtime[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
+    int mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
+    double energy[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
+    double dtime[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
 
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
     TClonesArray* fHitItemsDetA;      /**< Array with hit items. */

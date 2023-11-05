@@ -23,7 +23,7 @@
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BEventHeader.h"
 #include "R3BIncomingBeta.h"
 #include "R3BIncomingIDPar.h"
@@ -53,7 +53,7 @@ R3BIncomingBeta::R3BIncomingBeta(const char* name, Int_t iVerbose)
     , fZprimary(50.)
     , fZoffset(-1.3)
     , fOnline(kFALSE)
-    , fTimeStitch(nullptr)
+    , fCyclicCorrector(nullptr)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
     , fUseTref(kFALSE)
@@ -139,7 +139,7 @@ InitStatus R3BIncomingBeta::Init()
     SetParameter();
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     return kSUCCESS;
 }
@@ -276,11 +276,11 @@ void R3BIncomingBeta::Exec(Option_t* option)
             {
                 if (fUseTref)
                 {
-                    ToFraw_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
+                    ToFraw_m1 = fCyclicCorrector->GetVFTXTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2]);
                 }
                 else
                 {
-                    ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
+                    ToFraw_m1 = fCyclicCorrector->GetVFTXTime(timeLosV[i][i_L] - TimeSci2_m1[i][i_2]);
                     if (ToFraw_m1 > 0. && fHeader->GetExpId() == 515)
                         ToFraw_m1 = ToFraw_m1 - 40960.;
                 }
@@ -317,15 +317,13 @@ void R3BIncomingBeta::Exec(Option_t* option)
                     {
                         if (fUseTref)
                         {
-                            ToFraw_m1 = fTimeStitch->GetTime(
-                                fHeader->GetTStart() - (TimeSci2_tcal[i * 3 + nCh][i0] - TimeSci2_tcal[i * 3 + 2][0]),
-                                "vftx",
-                                "vftx");
+                            ToFraw_m1 = fCyclicCorrector->GetVFTXTime(
+                                fHeader->GetTStart() - (TimeSci2_tcal[i * 3 + nCh][i0] - TimeSci2_tcal[i * 3 + 2][0]));
                         }
                         else
                         {
-                            ToFraw_m1 = fTimeStitch->GetTime(
-                                timeLosV[i][i_L] - (TimeSci2_tcal[i * 3 + nCh][i0]), "vftx", "vftx");
+                            ToFraw_m1 =
+                                fCyclicCorrector->GetVFTXTime(timeLosV[i][i_L] - (TimeSci2_tcal[i * 3 + nCh][i0]));
                         }
                         Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
                                         fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]

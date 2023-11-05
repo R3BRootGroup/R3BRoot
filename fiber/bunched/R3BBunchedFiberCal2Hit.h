@@ -25,7 +25,7 @@ class TH1F;
 class TH2F;
 
 class R3BFiberMappingPar;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
@@ -155,7 +155,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
     double fClockFreq;
     Direction fDirection;
     Orientation fOrientation;
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;

@@ -20,7 +20,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
+#include "R3BTDCCyclicCorrector.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
@@ -62,7 +62,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
-    , fTimeStitch(nullptr)
+    , fCyclicCorrector(nullptr)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitPars(0)
     , fHitPar(NULL)
@@ -215,7 +215,7 @@ InitStatus R3BTofDCal2Hit::Init()
     }
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fCyclicCorrector = new R3BTDCCyclicCorrector();
 
     return kSUCCESS;
 }
@@ -398,8 +398,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
             // Shift the cyclic difference window by half a window-length and move it back,
             // this way the trigger time will be at 0.
-            auto top_ns = fTimeStitch->GetTime(top->GetTimeLeading_ns() - top_trig_ns);
-            auto bot_ns = fTimeStitch->GetTime(bot->GetTimeLeading_ns() - bot_trig_ns);
+            auto top_ns = fCyclicCorrector->GetTAMEXTime(top->GetTimeLeading_ns() - top_trig_ns);
+            auto bot_ns = fCyclicCorrector->GetTAMEXTime(bot->GetTimeLeading_ns() - bot_trig_ns);
 
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
@@ -578,7 +578,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 // Tof with respect LOS detector
-                auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
+                auto tof = fCyclicCorrector->GetTAMEXTime((bot_ns + top_ns) / 2. - header->GetTStart());
                 // auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
                 auto tof_corr = tof - par->GetTofSyncOffset();
 

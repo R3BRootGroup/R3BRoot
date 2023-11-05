@@ -21,7 +21,7 @@
 #include "TCAConnector.h"
 
 class R3BEventHeader;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 
 class R3BLosProvideTStart : public FairTask
 {
@@ -39,7 +39,7 @@ class R3BLosProvideTStart : public FairTask
     TCAOptionalInputConnector<R3BLosHitData> fLosHitData;
     TCAOptionalInputConnector<R3BLosTCalData> fLosTriggerData;
     R3BEventHeader* fEventHeader;
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
 
     bool IsBeam() const;
     Double_t GetTStart() const;

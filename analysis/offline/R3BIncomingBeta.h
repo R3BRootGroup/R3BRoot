@@ -35,7 +35,7 @@
 class R3BIncomingIDPar;
 class TClonesArray;
 class R3BEventHeader;
-class R3BCoarseTimeStitch;
+class R3BTDCCyclicCorrector;
 
 class R3BIncomingBeta : public FairTask
 {
@@ -106,7 +106,7 @@ class R3BIncomingBeta : public FairTask
 
   private:
     void SetParameter();
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BTDCCyclicCorrector* fCyclicCorrector;
     R3BIncomingIDPar* fIncomingID_Par; // Parameter container
     TClonesArray* fFrsDataCA;          /**< Array with FRS-output data. >*/
 
