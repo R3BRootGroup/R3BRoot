@@ -11,60 +11,73 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEWTASK_H
-#define NEWTASK_H
+#pragma once
 
-#include "FairTask.h"
-#include <Rtypes.h>
+// NOTE: comments below are only meant for eduational purpose. DO NOT include them in your code!
 
-class TClonesArray;
+#include <FairTask.h>
+#include <R3BIOConnector.h>
+#include <R3BNeulandCalData.h>
+#include <R3BNeulandHit.h>
+#include <string>
 
-class NewTask : public FairTask
+// namespace here is optional.
+namespace R3B
 {
-  public:
-    // Default constructor
-    NewTask();
+    // If R3B namespace is not used, the task should be named with R3BNewTask
+    class NewTask : public FairTask
+    {
+      public:
+        // Default constructor
+        NewTask();
 
-    // Standard constructor
-    NewTask(const TString& name, Int_t iVerbose = 1);
+        // Standard constructor
+        explicit NewTask(const std::string& name, int iVerbose = 1);
 
-    // Destructor
-    virtual ~NewTask();
+        // Other speical functions. Either define all these 5 functions or none of them (rule of 5).
+        // Defining none of them is preferred (rule of 0).
+        // ~NewTask() override;
+        // NewTask(const NewTask&) = delete;
+        // NewTask(NewTask&&) = delete;
+        // NewTask& operator=(const NewTask&) = delete;
+        // NewTask& operator=(NewTask&&) = delete;
 
-    // Initiliazation of task at the beginning of a run
-    virtual InitStatus Init() override;
+        // Method to setup online mode
+        void SetOnline(bool is_online) { is_online_ = is_online; }
 
-    // ReInitiliazation of task when the runID changes
-    virtual InitStatus ReInit() override;
+      private:
+        // NOTE: all member variables should be default initiliazed
 
-    // Executed for each event
-    virtual void Exec(Option_t* opt) override;
+        // Store data for online
+        // Naming convenction of a boolean variable should be started with is_ or has_
+        bool is_online_ = false;
 
-    // Load the parameter container from the runtime database
-    virtual void SetParContainers() override;
+        // Input data from previous already existing data level
+        InputConnector<std::vector<R3BNeulandCalData>> input_data_{ "NeulandCalData" };
+        // or
+        // R3B::InputVectorConnector<R3BNeulandCalData> input_data_ { "NeulandCalData" };
 
-    // Finish task called at the end of the run
-    virtual void Finish() override;
+        // Output array to  new data level
+        OutputConnector<std::vector<R3BNeulandHit>> output_data_{ "NeulandHit" };
+        // or
+        // R3B::OutputVectorConnector<R3BNeulandHit> output_data_{ "NeulandHit" };
 
-    // Virtual method Reset
-    virtual void Reset();
+        // virtual functions should be private
 
-    // Method to setup online mode
-    void SetOnline(Bool_t opt) { fOnline = opt; }
+        // Initiliazation of task at the beginning of a run
+        InitStatus Init() override;
 
-  private:
-    // Store data for online
-    Bool_t fOnline;
+        // Executed for each event
+        void Exec(Option_t* opt) override;
 
-    // Input array from previous already existing data level
-    TClonesArray* fDataInput;
+        // Load the parameter container from the runtime database
+        void SetParContainers() override;
 
-    // Output array to  new data level
-    TClonesArray* fDataOutput;
+        // Finish task called at the end of the run
+        void Finish() override;
 
-  public:
-    // Class definition
-    ClassDefOverride(NewTask, 1);
-};
-
-#endif /* NewTask_H */
+      public:
+        // Class definition
+        ClassDefOverride(NewTask, 1); // NOLINT
+    };
+} // namespace R3B

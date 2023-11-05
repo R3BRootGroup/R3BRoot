@@ -56,7 +56,7 @@ jobs:
       run: |
         mkdir -p clang-tidy-result
         git diff -U0 HEAD^ | python3 $PWD/util/clang-tidy-diff.py -p1 -path build -j4 -use-color \
-        -iregex '.*\.(cpp|cc|c\+\+|cxx|cl|h|hh|hpp|m|mm|inc)' \
+        -iregex '^(.*\/)(?!ext_)([^\/]*\.(cpp|cc|c\+\+|cxx|cl|hpp|hh|h|m|mm|inc))$' \
         > clang-tidy-result/fixes.yml
         cat clang-tidy-result/fixes.yml |\
         sed -e 's/\x1b\[[0-9;]*m//g' |\

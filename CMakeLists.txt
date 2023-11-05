@@ -47,6 +47,10 @@ if(NOT DEFINED ENV{SIMPATH})
 endif(NOT DEFINED ENV{SIMPATH})
 set(SIMPATH $ENV{SIMPATH})
 
+if(SIMPATH)
+    set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+endif()
+
 if(NOT DEFINED ENV{FAIRROOTPATH})
     message(
         FATAL_ERROR
@@ -75,20 +79,15 @@ option(WITH_FRS "Build FRS" OFF)
 option(WITH_ASYEOS "Build ASYEOS" OFF)
 option(BUILD_C3W "Build C3W" OFF)
 
-find_package(FairCMakeModules 1.0.0 QUIET)
-if(FairCMakeModules_FOUND)
-    include(FairFindPackage2)
-    include(FairFormattedOutput)
-else()
-    message(STATUS "Could not find FairCMakeModules. "
-                   "It is recommended to install https://github.com/FairRootGroup/FairCMakeModules")
+find_package(FairCMakeModules 1.0.0 CONFIG REQUIRED)
+if(NOT FairCMakeModules_FOUND)
+    message(FATAL_ERROR "Could not find FairCMakeModules! ")
 endif()
 
-if(COMMAND find_package2)
-    find_package2(PUBLIC FairRoot VERSION 18.6.4 QUIET)
-else()
-    find_package(FairRoot)
-endif()
+include(FairFindPackage2)
+include(FairFormattedOutput)
+
+find_package2(PUBLIC FairRoot REQUIRED)
 
 # FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
 execute_process(
@@ -107,10 +106,6 @@ endif()
 
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
-
-if(SIMPATH)
-    set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
-endif()
 
 # Load some basic macros which are needed later on
 include(FairMacros)
@@ -559,6 +554,9 @@ if(NOT MODULE)
     if(WITH_ASYEOS)
         add_subdirectory(asyeos)
     endif(WITH_ASYEOS)
+    if(EXISTS "${PROJECT_SOURCE_DIR}/R3BFileSource")
+        add_subdirectory(R3BFileSource)
+    endif(EXISTS "${PROJECT_SOURCE_DIR}/R3BFileSource")
     if(EXISTS "${PROJECT_SOURCE_DIR}/macros")
         add_subdirectory(macros)
     endif(EXISTS "${PROJECT_SOURCE_DIR}/macros")
