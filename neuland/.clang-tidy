@@ -1,0 +1,50 @@
+# vi: ft=yaml
+Checks: >
+  -*,
+  bugprone-*,
+  cert-dcl21-cpp,
+  cert-dcl50-cpp,
+  cert-env33-c,
+  cert-err34-c,
+  cert-err52-cpp,
+  cert-err60-cpp,
+  cert-flp30-c,
+  cert-msc50-cpp,
+  cert-msc51-cpp,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  google-build-using-namespace,
+  google-explicit-constructor,
+  google-global-names-in-headers,
+  google-readability-casting,
+  google-runtime-int,
+  google-runtime-operator,
+  hicpp-*,
+  -hicpp-vararg,
+  misc-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -hicpp-new-delete-operators,
+  -modernize-use-trailing-return-type
+
+CheckOptions:
+  - key: bugprone-argument-comment.StrictMode
+    value: 1
+  - key: bugprone-easily-swappable-parameters.MinimumLength
+    value: 4
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 1
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: '^it$'
+  - key: readability-magic-numbers.IgnoreAllFloatingPointValues
+    value: 'true'
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
+    value: 'true'
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 40
+  - key: readability-function-cognitive-complexity.IgnoreMacros
+    value: 'true'
+
+FormatStyle: 'file'

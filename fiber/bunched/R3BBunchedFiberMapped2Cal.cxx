@@ -123,15 +123,15 @@ void R3BBunchedFiberMapped2Cal::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
-#define GET_TCALPAR(NAME)                                                      \
-    do                                                                         \
-    {                                                                          \
-        auto name = fName + #NAME "TCalPar";                                   \
-        f##NAME##TCalPar = (R3BTCalPar*)rtdb->getContainer(name);              \
-        if (!f##NAME##TCalPar)                                                 \
-        {                                                                      \
-            R3BLOG(error, "Could not get access to " << name << " container"); \
-        }                                                                      \
+#define GET_TCALPAR(NAME)                                                       \
+    do                                                                          \
+    {                                                                           \
+        auto name = fName + #NAME "TCalPar";                                    \
+        f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(rtdb->getContainer(name)); \
+        if (!f##NAME##TCalPar)                                                  \
+        {                                                                       \
+            R3BLOG(error, "Could not get access to " << name << " container");  \
+        }                                                                       \
     } while (0)
 
     GET_TCALPAR(MAPMT);

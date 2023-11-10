@@ -90,7 +90,7 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
     // no multi-hit capabiity
-    EXT_STR_h101_SOFMWPC_onion* data = (EXT_STR_h101_SOFMWPC_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SOFMWPC_onion*>(fData);
     for (int d = 0; d < NUM_SOFMWPC_DETECTORS; d++)
         for (int p = 0; p < NUM_SOFMWPC_PLANES_MAX; p++)
             data->SOFMWPC[d].Plane[p].Q = 0;
@@ -100,7 +100,7 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BMwpcReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_SOFMWPC_onion* data = (EXT_STR_h101_SOFMWPC_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SOFMWPC_onion*>(fData);
 
     // loop over all detectors
     for (int d = 0; d < NUM_SOFMWPC_DETECTORS; d++)

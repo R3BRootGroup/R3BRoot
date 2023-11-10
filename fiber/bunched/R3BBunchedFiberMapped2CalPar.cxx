@@ -58,18 +58,18 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
 {
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
-#define GET_TCALPAR(NAME)                                                              \
-    do                                                                                 \
-    {                                                                                  \
-        auto name = fName + #NAME "TCalPar";                                           \
-        f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
-        if (!f##NAME##TCalPar)                                                         \
-        {                                                                              \
-            R3BLOG(error, "Could not get " << name);                                   \
-            return kFATAL;                                                             \
-        }                                                                              \
-        f##NAME##TCalPar->setChanged();                                                \
-        f##NAME##Engine = new R3BTCalEngine(f##NAME##TCalPar, fMinStats);              \
+#define GET_TCALPAR(NAME)                                                                            \
+    do                                                                                               \
+    {                                                                                                \
+        auto name = fName + #NAME "TCalPar";                                                         \
+        f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name)); \
+        if (!f##NAME##TCalPar)                                                                       \
+        {                                                                                            \
+            R3BLOG(error, "Could not get " << name);                                                 \
+            return kFATAL;                                                                           \
+        }                                                                                            \
+        f##NAME##TCalPar->setChanged();                                                              \
+        f##NAME##Engine = new R3BTCalEngine(f##NAME##TCalPar, fMinStats);                            \
     } while (0)
 
     auto rm = FairRootManager::Instance();

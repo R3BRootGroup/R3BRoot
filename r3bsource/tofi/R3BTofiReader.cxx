@@ -71,7 +71,7 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
     Reset();
 
     // initial clear (set number of hits to 0)
-    EXT_STR_h101_TOFI_onion* data = (EXT_STR_h101_TOFI_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_TOFI_onion*>(fData);
     memset(data, 0, sizeof *data);
 
     return kTRUE;
@@ -80,7 +80,7 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BTofiReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_TOFI_onion* data = (EXT_STR_h101_TOFI_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_TOFI_onion*>(fData);
 
     // puts("NEW Event");
     // Leading.

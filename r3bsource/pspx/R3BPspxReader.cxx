@@ -29,29 +29,28 @@ extern "C"
 #include "ext_h101_psp.h"
 }
 
-#define LENGTH(x) (sizeof x / sizeof *x)
+#define LENGTH(x) (sizeof(x) / sizeof(x)[0])
 
+auto constexpr NUM_PSPX = LENGTH((EXT_STR_h101_PSP_onion::PSPX));
 R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, size_t offset)
     : R3BReader("R3BPspxReader")
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fMappedItems(2 * LENGTH(((EXT_STR_h101_PSP_onion*)data)->PSPX)) // number of faces of detectors
+    , fMappedItems(2 * NUM_PSPX) // number of faces of detectors
 {
-    EXT_STR_h101_PSP_onion* data_o = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2 * LENGTH(data_o->PSPX); d++)
+    for (Int_t d = 0; d < 2 * NUM_PSPX; d++)
     {
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
-    printf("Length: %lu\n", LENGTH(data_o->PSPX));
-    R3BLOG(info, "Created " << 2 * LENGTH(data_o->PSPX) << " detectors.");
+    printf("Length: %lu\n", NUM_PSPX);
+    R3BLOG(info, "Created " << 2 * NUM_PSPX << " detectors.");
 }
 
 R3BPspxReader::~R3BPspxReader()
 {
     R3BLOG(debug1, "");
-    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
+    for (Int_t d = 0; d < 2 * NUM_PSPX; d++)
     {
         delete fMappedItems[d];
     }
@@ -69,8 +68,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
     }
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Register output array in tree
-    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < LENGTH(data->PSPX); d++)
+    for (Int_t d = 0; d < NUM_PSPX; d++)
     {
         for (Int_t f = 0; f < 2; f++)
         {
@@ -95,7 +93,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
  */
 Bool_t R3BPspxReader::R3BRead()
 {
-    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_PSP_onion*>(fData);
 
 #if 0
     // this is the data structure we have to read:
@@ -150,8 +148,7 @@ Bool_t R3BPspxReader::R3BRead()
 
 void R3BPspxReader::Reset()
 {
-    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
+    for (Int_t d = 0; d < 2 * NUM_PSPX; d++)
     {
         fMappedItems[d]->Clear();
     }
