@@ -55,7 +55,7 @@ Bool_t R3BPtofReader::Init(ext_data_struct_info* a_struct_info)
     FairRootManager::Instance()->Register("PtofMapped", "Land", fArray, kTRUE);
 
     // initial clear (set number of hits to 0)
-    EXT_STR_h101_PTOF_onion* data = (EXT_STR_h101_PTOF_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_PTOF_onion*>(fData);
     data->PTOF_TFLM = 0;
 
     return kTRUE;
@@ -455,7 +455,7 @@ Bool_t R3BPtofReader::R3BRead()
 {
 
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_PTOF_onion* data = (EXT_STR_h101_PTOF_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_PTOF_onion*>(fData);
 
     // find out coarse counter reference
     FindCoarseCounterReference(data);

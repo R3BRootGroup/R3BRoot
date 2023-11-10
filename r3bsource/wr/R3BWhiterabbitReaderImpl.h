@@ -14,6 +14,19 @@
 #ifndef R3BWHITERABBITREADERIMPL_H
 #define R3BWHITERABBITREADERIMPL_H
 
+// TODO:
+// Note: this is not how you do metaprogramming in C++.
+// A sane implementation would use
+// template <typename exth101struct, auto exth101_ITEMS_OK, fixed_string prefix>
+// class WhiteRabbitReader
+// or something.
+
+// Also, every WR reader gets to overwrite the header timestamp?!
+// That seems like a terrible idea.
+// Instead, the event header might contain a std::map<uint16_t, int64_t> for the ts
+// or just an array with id>>8 as an index, plus a SetTimestamp(uint16_t id, int64_t ts) method.
+// -- pklenze
+
 #define R3B_WHITERABBIT_READER_IMPL(ClassName, struct_name, id)                                                     \
     R3B##ClassName##Reader::R3B##ClassName##Reader(EXT_STR_h101_##struct_name* a_data, size_t a_offset)             \
         : R3BReader("R3B" #ClassName "Reader")                                                                      \
@@ -39,9 +52,8 @@
         }                                                                                                           \
                                                                                                                     \
         FairRootManager* mgr = FairRootManager::Instance();                                                         \
-        fEventHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");                                             \
-        if (!fEventHeader)                                                                                          \
-            fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");                                       \
+        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));                               \
+        /* we already asked the FRM for an event header, no need to ask it again*/                                  \
                                                                                                                     \
         return kTRUE;                                                                                               \
     }                                                                                                               \

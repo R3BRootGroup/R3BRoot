@@ -123,7 +123,7 @@ InitStatus R3BIncomingBeta::Init()
     // Get access to Sci2 data at Tcal level
     if (fHeader->GetExpId() == 509)
     {
-        fTcalSci2 = (TClonesArray*)mgr->GetObject("Sci2Tcal");
+        fTcalSci2 = dynamic_cast<TClonesArray*>(mgr->GetObject("Sci2Tcal"));
         R3BLOG_IF(warn, !fTcalSci2, "Could not find Sci2Tcal");
     }
 
@@ -195,7 +195,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
         nHits = fTcalSci2->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fTcalSci2->At(ihit);
+            R3BSci2TcalData* hittcal = dynamic_cast<R3BSci2TcalData*>(fTcalSci2->At(ihit));
             UInt_t numDet = hittcal->GetDetector();
             UInt_t ch = hittcal->GetChannel() - 1;
             if (numDet > fNumDet)

@@ -78,7 +78,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
     Reset();
 
     // initial clear (set number of hits to 0)
-    EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_TOFD_onion*>(fData);
     for (int d = 0; d < MAX_TOFD_PLANES; d++)
     {
         for (int t = 0; t < 2; t++)
@@ -95,7 +95,7 @@ Bool_t R3BTofdReader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_TOFD_onion*>(fData);
 
     // puts("Event");
     for (uint32_t d = 0; d < MAX_TOFD_PLANES; d++)

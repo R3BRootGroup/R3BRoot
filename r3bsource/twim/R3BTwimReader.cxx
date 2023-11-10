@@ -69,7 +69,7 @@ Bool_t R3BTwimReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_SOFTWIM_onion* data = (EXT_STR_h101_SOFTWIM_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SOFTWIM_onion*>(fData);
     for (int s = 0; s < fSections; s++)
     {
         data->SOFTWIM_S[s].EM = 0;
@@ -84,7 +84,7 @@ Bool_t R3BTwimReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BTwimReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_SOFTWIM_onion* data = (EXT_STR_h101_SOFTWIM_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SOFTWIM_onion*>(fData);
 
     // loop over all planes and sections
     for (UShort_t s = 0; s < fSections; s++)

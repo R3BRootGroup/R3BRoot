@@ -61,7 +61,7 @@ Bool_t R3BSci8Reader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_SCI8_onion* data = (EXT_STR_h101_SCI8_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SCI8_onion*>(fData);
 
     for (int d = 0; d < NUM_SCI8_DETECTORS; d++)
     {
@@ -80,7 +80,7 @@ Bool_t R3BSci8Reader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BSci8Reader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_SCI8_onion* data = (EXT_STR_h101_SCI8_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_SCI8_onion*>(fData);
 
     /*
      * For variable definition, see structure EXT_STR_h101_SCI8_onion_t

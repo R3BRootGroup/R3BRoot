@@ -22,7 +22,7 @@ extern "C"
 
 R3BFi1aReader::R3BFi1aReader(EXT_STR_h101_FIBONEA* a_data, UInt_t a_offset)
     : R3BBunchedFiberReader("Fi1a", a_offset, 1, 256, 1)
-    , fData((EXT_STR_h101_FIBONEA_onion*)a_data)
+    , fData(reinterpret_cast<EXT_STR_h101_FIBONEA_onion*>(a_data))
 {
 }
 

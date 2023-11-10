@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BFiberMAPMTCal2Hit.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BFiberMAPMTCalData.h"
 #include "R3BFiberMAPMTHitData.h"
@@ -19,7 +20,6 @@
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
 
 #include "TF1.h"
 #include "TH1F.h"
@@ -648,7 +648,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
             // time offset
             R3BFiberMAPMTHitModulePar* par2 = fCalPar->GetModuleParAt(i);
-            auto proj2 = (TH1F*)fh_dt_Fib_raw->ProjectionY("", i, i, 0);
+            auto proj2 = fh_dt_Fib_raw->ProjectionY("", i, i, 0);
             // par2->SetOffsetUp(0.5 * proj2->GetBinCenter(proj2->GetMaximumBin()));
             auto Max = proj2->GetXaxis()->GetBinCenter(proj2->GetMaximumBin());
             TF1* fGauss = new TF1("fgaus", "gaus", Max - 8., Max + 8.);
@@ -660,7 +660,7 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
 
             // tsync
             // R3BFiberMAPMTHitModulePar* par3 = fCalPar->GetModuleParAt(i);
-            auto proj3 = (TH1F*)fh_Fib_ToF_raw->ProjectionY("", i, i, 0);
+            auto proj3 = fh_Fib_ToF_raw->ProjectionY("", i, i, 0);
             auto sync = proj3->GetXaxis()->GetBinCenter(proj3->GetMaximumBin());
             par2->SetSync(sync);
 

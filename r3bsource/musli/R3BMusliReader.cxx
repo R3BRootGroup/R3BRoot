@@ -64,7 +64,7 @@ Bool_t R3BMusliReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_MUSLI_onion* data = (EXT_STR_h101_MUSLI_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_MUSLI_onion*>(fData);
     data->MUSLI_EM = 0;
     data->MUSLI_TM = 0;
     data->MUSLI_TREFM = 0;
@@ -76,7 +76,7 @@ Bool_t R3BMusliReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BMusliReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_MUSLI_onion* data = (EXT_STR_h101_MUSLI_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_MUSLI_onion*>(fData);
 
     ReadData(data);
     return kTRUE;

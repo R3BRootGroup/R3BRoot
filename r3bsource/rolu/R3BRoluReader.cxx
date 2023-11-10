@@ -93,7 +93,7 @@ Bool_t R3BRoluReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BRoluReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_ROLU_onion* data = (EXT_STR_h101_ROLU_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_ROLU_onion*>(fData);
 
     /*
      * For variable definition, see structure EXT_STR_h101_ROLU_onion_t

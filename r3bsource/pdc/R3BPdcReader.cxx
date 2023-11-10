@@ -50,7 +50,7 @@ Bool_t R3BPdcReader::Init(ext_data_struct_info* a_struct_info)
 
     FairRootManager::Instance()->Register("PdcMapped", "Land", fMappedArray, kTRUE);
 
-    auto data = (EXT_STR_h101_PDC_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_PDC_onion*>(fData);
     memset(data, 0, sizeof *data);
     return kTRUE;
 }
@@ -58,7 +58,7 @@ Bool_t R3BPdcReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BPdcReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    auto data = (EXT_STR_h101_PDC_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_PDC_onion*>(fData);
 
     // puts("Event");
     for (uint32_t p = 0; p < LENGTH(data->PDC_P); p++)

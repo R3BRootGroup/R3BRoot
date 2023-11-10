@@ -26,7 +26,7 @@ extern "C"
 
 R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a_data, size_t a_offset)
     : R3BReader("R3BBunchedFiberSPMTTrigReader")
-    , fData((EXT_STR_h101_FIB_onion*)a_data)
+    , fData(reinterpret_cast<EXT_STR_h101_FIB_onion*>(a_data))
     , fOffset(a_offset)
     , fOnline(kFALSE)
     , fMappedArray(new TClonesArray("R3BFiberMappedData"))
@@ -59,7 +59,7 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BBunchedFiberSPMTTrigReader::R3BRead()
 {
-    EXT_STR_h101_FIB_onion* data = (EXT_STR_h101_FIB_onion*)fData;
+    auto* data = reinterpret_cast<EXT_STR_h101_FIB_onion*>(fData);
 
     // Leading TAMEX trigger times.
     auto numChannels = data->FIB_TRIGSLF;

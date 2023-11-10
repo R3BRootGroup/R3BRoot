@@ -47,7 +47,7 @@ void R3BFieldInterp::init()
     _m2 = _np[2];
     _n = _np[0] * _np[1] * _np[2];
 
-    float* d = (float*)realloc(_data, sizeof(float) * _n);
+    float* d = reinterpret_cast<float*>(realloc(_data, sizeof(float) * _n));
 
     if (!d)
         cout << "-E- Field interpolation, memory allocation failure." << endl;

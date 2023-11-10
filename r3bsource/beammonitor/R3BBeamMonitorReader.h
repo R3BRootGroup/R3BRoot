@@ -14,13 +14,15 @@
 #ifndef R3BBEAMMONITORREADER_H
 #define R3BBEAMMONITORREADER_H 1
 
-#include <TClonesArray.h>
 #include "FairTask.h"
 #include "R3BReader.h"
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_BMON_t;
 typedef struct EXT_STR_h101_BMON_t EXT_STR_h101_BMON;
 
+struct EXT_STR_h101_BMON_onion_t;
+typedef struct EXT_STR_h101_BMON_onion_t EXT_STR_h101_BMON_onion;
 class R3BBeamMonitorReader : public R3BReader
 {
   public:
@@ -44,7 +46,7 @@ class R3BBeamMonitorReader : public R3BReader
 
   private:
     /* Reader specific data structure from ucesb */
-    EXT_STR_h101_BMON* fData;
+    EXT_STR_h101_BMON_onion* fData;
     /* Data offset */
     size_t fOffset;
     // Don't store data for online

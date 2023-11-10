@@ -29,7 +29,7 @@ using namespace std;
 
 R3BBeamMonitorReader::R3BBeamMonitorReader(EXT_STR_h101_BMON* data, size_t offset)
     : R3BReader("R3BBeamMonitorReader")
-    , fData(data)
+    , fData(reinterpret_cast<EXT_STR_h101_BMON_onion*>(data))
     , fOffset(offset)
     , fOnline(kFALSE)
     , fArray(new TClonesArray("R3BBeamMonitorMappedData"))
@@ -60,7 +60,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;
+    auto* data = fData;
     data->IC = 0;
     data->SEETRAM = 0;
     data->TOFDOR = 0;
@@ -71,7 +71,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BBeamMonitorReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_BMON_onion* data = (EXT_STR_h101_BMON_onion*)fData;
+    EXT_STR_h101_BMON_onion* data = fData;
 
     new ((*fArray)[fArray->GetEntriesFast()]) R3BBeamMonitorMappedData(data->IC, data->SEETRAM, data->TOFDOR);
 

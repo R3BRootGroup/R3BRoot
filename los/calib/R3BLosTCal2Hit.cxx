@@ -18,8 +18,9 @@
 
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
-#include "FairRuntimeDb.h"
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
@@ -28,7 +29,6 @@
 #include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
-#include "R3BCoarseTimeStitch.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -100,7 +100,7 @@ void R3BLosTCal2Hit::SetParContainers()
     {
         LOG(error) << "FairRuntimeDb not opened!";
     }
-    fLosHit_Par = (R3BLosHitPar*)rtdb->getContainer("LosHitPar");
+    fLosHit_Par = dynamic_cast<R3BLosHitPar*>(rtdb->getContainer("LosHitPar"));
     if (!fLosHit_Par)
     {
         LOG(error) << "R3BLosTcal2Hit:: Couldn't get handle on R3BLosHitPar container";
@@ -142,13 +142,13 @@ InitStatus R3BLosTCal2Hit::Init()
     if (NULL == mgr)
         LOG(error) << "FairRootManager not found";
 
-    header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
+    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!header)
-        header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
-    fTCalItems = (TClonesArray*)mgr->GetObject("LosTCal");
+    fTCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTCal"));
 
-    fTCalTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerTCal");
+    fTCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerTCal"));
     if (NULL == fTCalItems)
     {
         LOG(fatal) << "Branch LosTCal not found";
@@ -213,7 +213,6 @@ InitStatus R3BLosTCal2Hit::Init()
         }
     }
 
-
     SetParameter();
     return kSUCCESS;
 }
@@ -247,7 +246,7 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
         return;
     for (Int_t ihit = 0; ihit < trigHits; ihit++)
     {
-        R3BLosTCalData* hit = (R3BLosTCalData*)fTCalTriggerItems->At(ihit);
+        R3BLosTCalData* hit = dynamic_cast<R3BLosTCalData*>(fTCalTriggerItems->At(ihit));
         Int_t typ = hit->GetType();
         trigTime[typ] = hit->GetRawTimeNs();
     }
@@ -284,7 +283,7 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        R3BLosTCalData* hit = (R3BLosTCalData*)fTCalItems->At(ihit);
+        R3BLosTCalData* hit = dynamic_cast<R3BLosTCalData*>(fTCalItems->At(ihit));
         Int_t ch = hit->GetChannel();
         Int_t typ = hit->GetType();
         Int_t det = hit->GetDetector();

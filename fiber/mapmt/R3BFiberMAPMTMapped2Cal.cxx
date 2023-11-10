@@ -73,15 +73,15 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
 
 void R3BFiberMAPMTMapped2Cal::SetParContainers()
 {
-#define GET_TCALPAR(NAME)                                                              \
-    do                                                                                 \
-    {                                                                                  \
-        auto name = fName + #NAME "TCalPar";                                           \
-        f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
-        if (!f##NAME##TCalPar)                                                         \
-        {                                                                              \
-            R3BLOG(error, "Could not get access to " << name << " container.");        \
-        }                                                                              \
+#define GET_TCALPAR(NAME)                                                                            \
+    do                                                                                               \
+    {                                                                                                \
+        auto name = fName + #NAME "TCalPar";                                                         \
+        f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name)); \
+        if (!f##NAME##TCalPar)                                                                       \
+        {                                                                                            \
+            R3BLOG(error, "Could not get access to " << name << " container.");                      \
+        }                                                                                            \
     } while (0)
     GET_TCALPAR(MAPMT);
     GET_TCALPAR(MAPMTTrig);

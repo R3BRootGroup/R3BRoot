@@ -157,7 +157,7 @@ InitStatus R3BAnalysisIncomingID::Init()
     if (fUseTref)
     {
         // Get access to trigger data of the LOS
-        fTriggerLos = (TClonesArray*)mgr->GetObject("LosTriggerTCal");
+        fTriggerLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerTCal"));
         R3BLOG_IF(warn, !fTriggerLos, "LosTriggerTCal not found");
     }
 
@@ -244,7 +244,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         Int_t tHits = fTriggerLos->GetEntriesFast();
         for (Int_t ihit = 0; ihit < tHits; ihit++)
         {
-            R3BLosTCalData* hittcal = (R3BLosTCalData*)fTriggerLos->At(ihit);
+            R3BLosTCalData* hittcal = dynamic_cast<R3BLosTCalData*>(fTriggerLos->At(ihit));
             numDet = hittcal->GetDetector();
             if (hittcal->GetType() == 0)
                 trigTimeV[numDet - 1] = hittcal->GetRawTimeNs();

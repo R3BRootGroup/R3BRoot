@@ -211,10 +211,11 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         LOG(warn) << "Calling Plane " << i + 1 << " Bar " << j + 1;
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                        smiley(dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))),
-                               min2,
-                               max2,
-                               para2);
+                        smiley(
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min2,
+                            max2,
+                            para2);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -243,7 +244,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min,
+                            max,
+                            para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -257,7 +261,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                     {
                         R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                         doubleExp(
-                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, para);
+                            dynamic_cast<TH2F*>(hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                            min,
+                            max,
+                            para);
                         Double_t offset1 = par->GetOffset1();
                         Double_t offset2 = par->GetOffset2();
                         Double_t veff = par->GetVeff();
@@ -288,7 +295,10 @@ void R3BTofdCal2HistoPar::FinishTask()
                 {
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
-                    zcorr(dynamic_cast<TH2F*>(hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))), min, max, pars);
+                    zcorr(dynamic_cast<TH2F*>(hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1))),
+                          min,
+                          max,
+                          pars);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
                     Double_t veff = par->GetVeff();
@@ -329,7 +339,7 @@ void R3BTofdCal2HistoPar::calcOffset()
                 Double_t offset = 0.;
                 cOffset->cd(i + 1);
                 h->Draw("colz");
-                TH1F* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = h->ProjectionY("histo_py", j + 2, j + 2, "");
                 histo_py->Rebin(4);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -360,10 +370,11 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
+                auto* h =
+                    dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
-                auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
+                auto* histo_py = h->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
                 histo_py->Rebin(2);
                 histo_py->Draw();
@@ -404,7 +415,7 @@ void R3BTofdCal2HistoPar::calcSync()
             {
                 cSync->cd(i + 1);
                 h->Draw("colz");
-                auto* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = h->ProjectionY("histo_py", j + 2, j + 2, "");
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -443,7 +454,7 @@ void R3BTofdCal2HistoPar::calcVeff()
                 auto* h = dynamic_cast<TH2F*>(hfilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone());
                 cVeff->cd(i + 1);
                 h->Draw("colz");
-                TH1F* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = h->ProjectionY("histo_py", j + 2, j + 2, "");
                 Int_t binmax = histo_py->GetMaximumBin();
                 max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t maxEntry = histo_py->GetBinContent(binmax);
@@ -478,10 +489,11 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
             if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
             {
                 LOG(warn) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
-                auto* h = dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
+                auto* h =
+                    dynamic_cast<TH2F*>(hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone());
                 cToTOffset->cd(1);
                 h->Draw("colz");
-                auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
+                auto* histo_py = h->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
                 histo_py->Draw();
                 Int_t binmax = histo_py->GetMaximumBin();
@@ -530,7 +542,7 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
     {
-        TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo1->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
@@ -564,7 +576,7 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
         Double_t ymean = para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3];
         histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
         histo2->Draw("colz");
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
@@ -627,7 +639,7 @@ void R3BTofdCal2HistoPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         l->SetLineWidth(2.);
         l->Draw();
         cfit_smiley->cd(3);
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         // cfit_smiley->Update();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
@@ -668,7 +680,7 @@ void R3BTofdCal2HistoPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         Double_t ymean = f1->Eval(pos);
         histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
         histo2->Draw("colz");
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();

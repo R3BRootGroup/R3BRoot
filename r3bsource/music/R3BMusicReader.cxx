@@ -61,7 +61,6 @@ Bool_t R3BMusicReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    // EXT_STR_h101_MUSIC_onion* data = (EXT_STR_h101_MUSIC_onion*)fData;
     fData->MUSIC_EM = 0;
     fData->MUSIC_TM = 0;
     fData->MUSIC_TREFM = 0;

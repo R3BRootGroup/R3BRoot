@@ -294,7 +294,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
     if (raw)
     {
         int w, j;
-        const uint32_t* u = (const uint32_t*)raw;
+        const uint32_t* u = reinterpret_cast<const uint32_t*>(raw);
 
         LOG(info) << "  Raw data:";
         for (w = 0; w < raw_words; w += 8)

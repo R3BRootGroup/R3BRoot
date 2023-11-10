@@ -13,7 +13,7 @@ tidy.txt: $(ALL)
 
 $(OBJDIR)/%.tidy: $(SRCDIR)/%.cxx  #$(SRCDIR)/%.h
 	@mkdir -p $(shell dirname $@)
-	clang-tidy $(FIX) -p $(OBJDIR)  -header-filter=.*  $^ 2>&1 | tee $@
+	clang-tidy $(FIX) -p $(OBJDIR)  -header-filter=.*  $^ 2>&1 | grep -v "to display errors from all non-system headers" | tee $@
 #-system-headers
 
 tidy-clean:

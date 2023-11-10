@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 #include "R3BTofDCal2HitPar.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
-#include "R3BCoarseTimeStitch.h"
 #include "R3BTofDHitModulePar.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
@@ -620,7 +620,7 @@ void R3BTofDCal2HitPar::calcOffset()
                 Double_t offset = 0.;
                 cOffset->cd(i + 1);
                 fhTdiff[i]->Draw("colz");
-                TH1F* histo_py = (TH1F*)fhTdiff[i]->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = fhTdiff[i]->ProjectionY("histo_py", j + 2, j + 2, "");
                 histo_py->Rebin(4);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -654,7 +654,7 @@ void R3BTofDCal2HitPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 // auto* h = fhSqrtQvsPosToT[i][j]->Clone();
                 cToTOffset->cd(1);
                 fhSqrtQvsPosToT[i][j]->Draw("colz");
-                auto histo_py = (TH2F*)fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
+                auto histo_py = fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
                 histo_py->Rebin(2);
                 histo_py->Draw();
@@ -693,7 +693,7 @@ void R3BTofDCal2HitPar::calcSync()
             {
                 cSync->cd(i + 1);
                 fhTsync[i]->Draw("colz");
-                auto* histo_py = (TH1F*)fhTsync[i]->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = fhTsync[i]->ProjectionY("histo_py", j + 2, j + 2, "");
                 R3BTofDHitModulePar* par = fHitPar->GetModuleParAt(i + 1, j + 1);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -883,7 +883,7 @@ void R3BTofDCal2HitPar::calcVeff()
                 // auto* h = (TH2F*)histofilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
                 cVeff->cd(i + 1);
                 // h->Draw("colz");
-                TH1F* histo_py = (TH1F*)fhTdiff[i]->ProjectionY("histo_py", j + 2, j + 2, "");
+                auto* histo_py = fhTdiff[i]->ProjectionY("histo_py", j + 2, j + 2, "");
                 Int_t binmax = histo_py->GetMaximumBin();
                 max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t maxEntry = histo_py->GetBinContent(binmax);
@@ -921,7 +921,7 @@ void R3BTofDCal2HitPar::calcLambda(Double_t totLow, Double_t totHigh)
                 // auto* h = (TH2F*)histofilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
                 cToTOffset->cd(1);
                 fhSqrtQvsPosToT[i][j]->Draw("colz");
-                auto* histo_py = (TH2F*)fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
+                auto* histo_py = fhSqrtQvsPosToT[i][j]->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
                 histo_py->Draw();
                 Int_t binmax = histo_py->GetMaximumBin();
@@ -983,7 +983,7 @@ void R3BTofDCal2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t
         l->SetLineWidth(2.);
         l->Draw();
         cfit_smiley->cd(3);
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         // cfit_smiley->Update();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
@@ -1024,7 +1024,7 @@ void R3BTofDCal2HitPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t
         Double_t ymean = f1->Eval(pos);
         histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
         histo2->Draw("colz");
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
@@ -1087,7 +1087,7 @@ void R3BTofDCal2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Doubl
     cfit_exp->cd(2);
     for (Int_t i = 1; i < histo1->GetNbinsX() - 1; i++)
     {
-        TH1F* histo_py = (TH1F*)histo1->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo1->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo1->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
@@ -1121,7 +1121,7 @@ void R3BTofDCal2HitPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Doubl
         Double_t ymean = para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3];
         histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
         histo2->Draw("colz");
-        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        auto* histo_py = histo2->ProjectionY("histo_py", i, i, "");
         histo_py->Draw();
         x[n] = histo2->GetXaxis()->GetBinCenter(i);
         Int_t binmax = histo_py->GetMaximumBin();
