@@ -62,3 +62,6 @@ The R3BRoot project uses clang-format-15 to ensure a common code formatting. The
 ~~~bash
 source util/clang-format-all.sh
 ~~~
+
+## Static analyzer using Clang-tidy
+Please go to this [instruction](config/clang_tidy/README.md).
