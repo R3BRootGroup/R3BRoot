@@ -320,6 +320,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
     // Sort all vectors by energy
     std::sort(gammaCandidatesVec.begin(), gammaCandidatesVec.end(), compareByEnergy);
     std::sort(protonCandidatesVec.begin(), protonCandidatesVec.end(), compareByEnergy);
+    std::sort(allCrystalVec.begin(), allCrystalVec.end(), compareByEnergy);
 
     TVector3 mother_angles, angles;
     Double_t fRandTheta, fRandPhi;
