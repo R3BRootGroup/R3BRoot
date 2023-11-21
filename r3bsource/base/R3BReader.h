@@ -16,6 +16,7 @@
 
 #include "TNamed.h"
 #include "TString.h"
+#include <R3BUcesbMappingFlag.h>
 
 extern "C"
 {
@@ -30,6 +31,14 @@ class R3BReader : public TNamed
   public:
     R3BReader(TString const&);
     virtual ~R3BReader();
+    [[nodiscard]] virtual bool MismappedItemRequired(std::string_view /*item_name*/) const { return false; }
+    bool AllowExtraCondition(R3B::UcesbMap map_flag, R3B::UcesbMap success_condition)
+    {
+        return (map_flag & ~(success_condition | extra_conditions_)) == R3B::UcesbMap::zero;
+    }
+
+    void SetExtraConditions(R3B::UcesbMap conditions) { extra_conditions_ = conditions; }
+    void AddExtraConditions(R3B::UcesbMap conditions) { extra_conditions_ |= conditions; }
 
     /* Setup structure information */
     virtual Bool_t Init(ext_data_struct_info*) = 0;
@@ -40,6 +49,12 @@ class R3BReader : public TNamed
     /* Reset */
     virtual void Reset() = 0;
     /* Return actual name of the reader */
+
+    // actions when closed
+    virtual void Close(){};
+
+  private:
+    R3B::UcesbMap extra_conditions_ = R3B::UcesbMap::zero;
 
   public:
     ClassDef(R3BReader, 0);

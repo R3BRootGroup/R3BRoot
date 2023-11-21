@@ -25,6 +25,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bsource/base
+${R3BROOT_SOURCE_DIR}/r3bsource/base/utils
 ${R3BROOT_SOURCE_DIR}/r3bsource/wr
 ${R3BROOT_SOURCE_DIR}/r3bsource/trloii
 ${R3BROOT_SOURCE_DIR}/r3bsource/beammonitor
@@ -91,7 +92,10 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
+./base/utils/R3BUcesbLauncher.cxx
+./base/utils/R3BUcesbStructInfo.cxx
 ./base/R3BUcesbSource.cxx
+./base/R3BUcesbSource2.cxx
 ./base/R3BReader.cxx
 ./base/R3BUnpackReader.cxx
 ./wr/R3BWhiterabbitMasterReader.cxx
@@ -237,3 +241,4 @@ set(DEPENDENCIES
 set(LIBRARY_NAME R3Bsource)
 
 GENERATE_LIBRARY()
+target_include_directories(R3Bsource PUBLIC neuland base base/utils trloii wr ${SYSTEM_INCLUDE_DIRECTORIES})
