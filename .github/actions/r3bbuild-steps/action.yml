@@ -25,11 +25,15 @@ runs:
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
         git clone https://github.com/R3BRootGroup/macros.git
-        cmake . -B build -C cmake/CI_CD/configure_options.cmake
+        echo ""
+        echo "path environment variable: $PATH\n"
+        echo ""
+        ./build.py -p -c --cmake-extra-args="-DBUILD_GEOMETRY=OFF;-C $GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
       shell: bash
 
-    - name: ctest ${{ matrix.repos }}
+    - name: build ${{ matrix.repos }}
       if: inputs.build-needed == 'true'
       run: |
-        cmake --build ./build -- -j ${NUM_THREADS}
+        ./build.py -b -j ${NUM_THREADS} 
+        # ./build_thisr3broot.sh -b build -j ${NUM_THREADS}
       shell: bash

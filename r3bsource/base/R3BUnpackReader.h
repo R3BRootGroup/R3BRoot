@@ -28,9 +28,6 @@ class R3BUnpackReader : public R3BReader
   public:
     R3BUnpackReader(EXT_STR_h101_unpack*, size_t);
 
-    // Destructor
-    virtual ~R3BUnpackReader();
-
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
 

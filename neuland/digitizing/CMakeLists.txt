@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
@@ -10,18 +11,22 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
+
 set(SRCS
+    # cmake-format: sortable
     R3BDigitizingChannel.cxx
+    R3BDigitizingChannelMock.h
     R3BDigitizingPaddle.cxx
+    R3BDigitizingPaddleMock.h
+    R3BDigitizingPaddleNeuland.cxx
     R3BDigitizingTacQuila.cxx
     R3BDigitizingTamex.cxx
-    R3BDigitizingPaddleNeuland.cxx
-    R3BNeulandHitMon.cxx
     R3BNeulandDigitizer.cxx
-    R3BDigitizingPaddleMock.h
-    R3BDigitizingChannelMock.h)
+    R3BNeulandHitMon.cxx)
 
 set(HEADERS
+    # cmake-format: sortable
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h
     R3BDigitizingEngine.h
@@ -36,5 +41,10 @@ set(HEADERS
 add_library(R3BNeulandDigitizing SHARED ${SRCS})
 target_include_directories(R3BNeulandDigitizing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(R3BNeulandDigitizing PUBLIC R3BData R3BNeulandShared R3BNeulandCalibration)
-root_generate_dictionary(R3BNeulandDigitizing_dict ${HEADERS} MODULE R3BNeulandDigitizing LINKDEF
-                         NeulandDigitizingLinkDef.h)
+root_generate_dictionary(
+    R3BNeulandDigitizing_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandDigitizing
+    LINKDEF
+    NeulandDigitizingLinkDef.h)

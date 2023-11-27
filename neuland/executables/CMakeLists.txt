@@ -1,3 +1,9 @@
+add_subdirectory(templates)
+
+add_executable(neulandSim neulandSim.cxx)
+target_link_libraries(neulandSim PUBLIC R3B::Neuland ExTestDetector)
+
+# set(EXE_NAME neulandSim)
 # set(DEPENDENCIES
 #     R3BNeulandShared
 #     R3BNeulandSimulation

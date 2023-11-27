@@ -18,7 +18,7 @@
 #set(GTEST_ROOT ${SIMPATH})
 #find_package(GTest)
 
-#if(GTEST_FOUND)
+#if(GTest_FOUND)
 #file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/atima/test/*.cxx)
 
 #include_directories(${GTEST_INCLUDE_DIRS}
@@ -39,4 +39,4 @@
 #add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
 #target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
 #add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
-#endif(GTEST_FOUND)
+#endif()

@@ -2,13 +2,19 @@
 
 namespace R3B
 {
-    auto ProgramOptions::Verify(int argc, const char** argv) -> bool
+    auto ProgramOptions::verify(int argc, const char** argv) -> bool
     {
-
         try
         {
             po::store(po::command_line_parser(argc, argv).positional(pos_desc_).options(desc_).run(), varMap_);
             po::notify(varMap_);
+
+            if (varMap_.count("help") == 1)
+            {
+                std::cout << get_desc_ref() << std::endl;
+                return false;
+            }
+
             for (auto& registrie : registries_)
             {
                 registrie.second->Retrieve(varMap_);

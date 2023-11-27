@@ -96,7 +96,7 @@ endif()
 include(FairFindPackage2)
 include(FairFormattedOutput)
 
-find_package2(PUBLIC FairRoot REQUIRED)
+find_package2(PUBLIC FairRoot REQUIRED MODULE)
 
 # FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
 execute_process(
@@ -120,12 +120,9 @@ list(APPEND required_root_components RIO)
 list(APPEND optional_root_components opengl)
 list(APPEND optional_root_components gdml vmc)
 
-# TODO: ROOT package should be found with CONFIG mode
 find_package2(
     PUBLIC
     ROOT
-    # VERSION
-    # 6.16.00
     CONFIG
     REQUIRED
     COMPONENTS
@@ -255,6 +252,14 @@ else()
         REQUIRED)
 endif()
 
+find_package(range-v3 REQUIRED)
+find_package(Microsoft.GSL REQUIRED)
+find_package(nlohmann_json REQUIRED)
+set(JSON_ImplicitConversions
+    OFF
+    CACHE BOOL "disable implicit conversion of JSON" FORCE)
+find_package(GTest REQUIRED)
+
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 find_package2(PUBLIC Protobuf)
@@ -349,7 +354,7 @@ if(yaml-cpp_FOUND
                                               "${YAML_CPP_INCLUDE_DIR}")
 endif()
 
-include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
+# include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
 
 setbasicvariables()
 
@@ -375,7 +380,7 @@ else(${IS_XCODE})
     set(LD_LIBRARY_PATH ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 endif(${IS_XCODE})
 
-find_package(ucesb)
+find_package(ucesb MODULE)
 if(ucesb_FOUND)
     set(WITH_UCESB ON)
     set(UCESBPATH $ENV{UCESB_DIR})

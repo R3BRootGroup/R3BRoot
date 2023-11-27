@@ -37,32 +37,32 @@ auto main(int argc, const char** argv) -> int
     timer.Start();
 
     auto programOptions = R3B::ProgramOptions("options for neuland data analysis");
-    auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
+    auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto paddleName =
-        programOptions.Create_Option<std::string>("paddle", R"(set the paddle name. e.g. "neuland")", "neuland");
+        programOptions.create_option<std::string>("paddle", R"(set the paddle name. e.g. "neuland")", "neuland");
     auto channelName =
-        programOptions.Create_Option<std::string>("channel", R"(set the channel name. e.g. "tamex")", "tacquila");
+        programOptions.create_option<std::string>("channel", R"(set the channel name. e.g. "tamex")", "tacquila");
     auto simuFileName =
-        programOptions.Create_Option<std::string>("simuFile", "set the filename of simulation input", "simu.root");
+        programOptions.create_option<std::string>("simuFile", "set the filename of simulation input", "simu.root");
     auto paraFileName =
-        programOptions.Create_Option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
+        programOptions.create_option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
     auto paraFileName2 =
-        programOptions.Create_Option<std::string>("paraFile2", "set the filename of the second parameter sink", "");
+        programOptions.create_option<std::string>("paraFile2", "set the filename of the second parameter sink", "");
     auto digiFileName =
-        programOptions.Create_Option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
-    auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");
-    auto eventNum = programOptions.Create_Option<int>("eventNum,n", "set total event number", 0);
+        programOptions.create_option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
+    auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
+    auto eventNum = programOptions.create_option<int>("eventNum,n", "set total event number", 0);
     auto hitLevelPar =
-        programOptions.Create_Option<std::string>("hitLevelPar", "set the name of hit level parameter if needed.", "");
+        programOptions.create_option<std::string>("hitLevelPar", "set the name of hit level parameter if needed.", "");
 
-    if (!programOptions.Verify(argc, argv))
+    if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;
     }
 
     if (help->value())
     {
-        std::cout << programOptions.Get_DescRef() << std::endl;
+        std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
     }
 

@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2024 Members of R3B Collaboration                     #
@@ -10,15 +11,17 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
 
 set(SRCS
+    # cmake-format: sortable
     R3BMCStack.cxx
     R3BMCTrack.cxx
     wrData/R3BWRData.cxx
     trloiiData/R3BTrloiiData.cxx
     R3BHit.cxx
-    R3BTrack.cxx
     R3BDouble.cxx
+    R3BTrack.cxx
     xballData/R3BXBallPoint.cxx
     xballData/R3BXBallCrystalHit.cxx
     xballData/R3BXBallCrystalHitSim.cxx
@@ -114,6 +117,7 @@ set(SRCS
     fibData/R3BFibCalData.cxx
     fibData/R3BFibPoint.cxx
     fibData/R3BFiberMAPMTCalData.cxx
+    neulandData/R3BPaddleTamexMappedData2.cxx
     fibData/R3BFiberMAPMTHitData.cxx
     fibData/R3BFiberMAPMTMappedData.cxx
     amsData/R3BAmsMappedData.cxx
@@ -156,6 +160,7 @@ set(SRCS
     synccheckData/R3BSyncCheckData.cxx)
 
 set(HEADERS
+    # cmake-format: sortable
     R3BMCStack.h
     R3BMCTrack.h
     wrData/R3BWRData.h
@@ -300,6 +305,7 @@ set(HEADERS
     synccheckData/R3BSyncCheckData.h)
 
 set(DIRS
+    # cmake-format: sortable
     actarData
     alpideData
     amsData

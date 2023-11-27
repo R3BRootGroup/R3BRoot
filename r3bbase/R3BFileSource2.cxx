@@ -17,8 +17,12 @@
 #include <FairEventHeader.h>
 #include <FairFileHeader.h>
 #include <FairRootManager.h>
+#include <FairRun.h>
 #include <TFolder.h>
 #include <TKey.h>
+#include <fmt/chrono.h>
+#include <fmt/color.h>
+#include <fmt/core.h>
 #include <vector>
 
 namespace
@@ -101,6 +105,60 @@ namespace
         return FairRootManager::Instance()->GetInChain();
     }
 } // namespace
+
+void R3BEventProgressPrinter::SetRefreshRate_Hz(float rate)
+{
+    if (rate <= 0.)
+    {
+        throw R3B::logic_error(fmt::format("Refresh rate {} must be a positive floating point value", rate));
+    }
+
+    refresh_rate_ = rate;
+    refresh_period_ = std::chrono::milliseconds(static_cast<int>(1000. / rate));
+}
+
+void R3BEventProgressPrinter::ShowProgress(uint64_t event_num)
+{
+    if (event_num < 1)
+    {
+        return;
+    }
+    if (max_event_num_ == 0)
+    {
+        throw R3B::logic_error("Maximal event number has not been set up!");
+    }
+    const auto now_t = std::chrono::steady_clock::now();
+    const auto time_spent = std::chrono::ceil<std::chrono::milliseconds>(now_t - previous_t_);
+    if (time_spent > refresh_period_)
+    {
+        const auto processed_events = event_num - previous_event_num_;
+        const auto events_per_millisecond =
+            static_cast<double>(processed_events) / static_cast<double>(time_spent.count());
+        Print(event_num, events_per_millisecond);
+
+        previous_t_ = now_t;
+        previous_event_num_ = event_num;
+    }
+}
+
+void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
+{
+    const auto event_num_str =
+        fmt::format(fg(fmt::terminal_color::bright_green) | fmt::emphasis::bold, "{:^5d}k", event_num / 1000);
+    const auto speed_str = fmt::format(fg(fmt::color::white), "{:^6.1F}k/s", speed_per_ms);
+    const auto progress_str = fmt::format(fg(fmt::terminal_color::bright_yellow) | fmt::emphasis::bold,
+                                          "{:^6.2F}",
+                                          100. * static_cast<double>(event_num) / static_cast<double>(max_event_num_));
+    const auto time_left_ms =
+        std::chrono::milliseconds{ (max_event_num_ - event_num) / static_cast<int>(std::ceil(speed_per_ms)) };
+    fmt::print("Events processed: {0} ({1})  Progress: {2}% (time left: {3:%H h %M m %S s})   Run ID: {4}\r",
+               event_num_str,
+               speed_str,
+               progress_str,
+               std::chrono::ceil<std::chrono::seconds>(time_left_ms),
+               run_id_);
+    std::cout << std::flush;
+}
 
 auto R3BInputRootFiles::AddFileName(std::string fileName) -> std::optional<std::string>
 {
@@ -332,6 +390,9 @@ Bool_t R3BFileSource2::Init()
         inputDataFiles_.SetFriend(friendGroup);
     }
 
+    event_progress_.SetMaxEventNum(inputDataFiles_.GetEntries());
+    event_progress_.SetRunID(inputDataFiles_.GetInitialRunID());
+
     return true;
 }
 
@@ -363,10 +424,12 @@ void R3BFileSource2::FillEventHeader(FairEventHeader* evtHeader)
 
 Int_t R3BFileSource2::CheckMaxEventNo(Int_t EvtEnd)
 {
-    return (EvtEnd == 0) ? inputDataFiles_.GetEntries() : EvtEnd; // NOLINT
+    event_end_ = (EvtEnd == 0) ? inputDataFiles_.GetEntries() : EvtEnd; // NOLINT
+    R3BLOG(info, fmt::format("Setting printing event max to {}", event_end_));
+    event_progress_.SetMaxEventNum(event_end_);
+    return event_end_;
 }
 
-//----------------------------------------------------------------
 void R3BFileSource2::ReadBranchEvent(const char* BrName)
 {
     auto const currentEventID = evtHeader_->GetMCEntryNumber();
@@ -384,25 +447,11 @@ void R3BFileSource2::ReadBranchEvent(const char* BrName, Int_t entryID)
 
 Int_t R3BFileSource2::ReadEvent(UInt_t eventID)
 {
-    // fCurrentEntryNo = eventID;
-    // fEventTime = GetEventTime();
-
-    // TODO: make colors as variables
-    // TODO: add disable option
     auto* chain = inputDataFiles_.GetChain();
-    auto const total_entries_num = chain->GetEntries();
-    if (allow_print_ && eventID > 0)
+    if (fair::Logger::GetConsoleSeverity() == fair::Severity::info)
     {
-        fmt::print("Processed: \033[32m {0} \033[0m of \033[34m {1} \033[0m (\033[33m {2:8.2f} \033[0m of "
-                   "100), current RunId \033[31m {3:3d} \033[0m \r",
-                   (eventID + 1),
-                   total_entries_num,
-                   100. * (eventID / static_cast<double>(total_entries_num)),
-                   fRunId);
-        std::cout << std::flush;
+        event_progress_.ShowProgress(eventID);
     }
-
-    // TODO: clean this mess
 
     auto read_bytes = chain->GetEntry(eventID);
     if (read_bytes == 0)
@@ -419,6 +468,16 @@ Bool_t R3BFileSource2::ActivateObject(TObject** obj, const char* BrName)
     chain->SetBranchStatus(BrName, true);
     chain->SetBranchAddress(BrName, obj);
     return kTRUE;
+}
+
+Bool_t R3BFileSource2::ActivateObjectAny(void** obj, const std::type_info& info, const char* BrName)
+{
+    auto* chain = inputDataFiles_.GetChain();
+    if (chain != nullptr)
+    {
+        return ActivateObjectAnyImpl(chain, obj, info, BrName);
+    }
+    return kFALSE;
 }
 
 ClassImp(R3BFileSource2);

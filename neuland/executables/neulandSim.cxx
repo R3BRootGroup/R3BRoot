@@ -28,26 +28,26 @@ int main(int argc, const char** argv)
 
     auto programOptions = R3B::ProgramOptions("options for neuland simulation");
 
-    auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
-    auto eventNum = programOptions.Create_Option<int>("eventNum", "set total event number", defaultEventNum);
-    auto eventPrintNum = programOptions.Create_Option<int>("eventPrint", "set event print number", 1);
-    auto runID = programOptions.Create_Option<int>("runID", "set runID", DEFAULT_RUNID);
-    auto multi = programOptions.Create_Option<int>("multiplicity", "set particle multiplicity", 1);
-    auto pEnergy = programOptions.Create_Option<double>("energy", "set energy value (GeV) of the particle", 1);
+    auto help = programOptions.create_option<bool>("help,h", "help message", false);
+    auto eventNum = programOptions.create_option<int>("eventNum", "set total event number", defaultEventNum);
+    auto eventPrintNum = programOptions.create_option<int>("eventPrint", "set event print number", 1);
+    auto runID = programOptions.create_option<int>("runID", "set runID", DEFAULT_RUNID);
+    auto multi = programOptions.create_option<int>("multiplicity", "set particle multiplicity", 1);
+    auto pEnergy = programOptions.create_option<double>("energy", "set energy value (GeV) of the particle", 1);
     auto simuFileName =
-        programOptions.Create_Option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
+        programOptions.create_option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
     auto paraFileName =
-        programOptions.Create_Option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
-    auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");
+        programOptions.create_option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
+    auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
 
-    if (!programOptions.Verify(argc, argv))
+    if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;
     }
 
     if (help->value())
     {
-        std::cout << programOptions.Get_DescRef() << std::endl;
+        std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
     }
 

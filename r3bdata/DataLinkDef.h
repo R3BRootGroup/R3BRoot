@@ -13,6 +13,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <vector>
+#include <map>
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -138,6 +140,14 @@
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;
 #pragma link C++ class R3BPaddleTamexMappedData+;
+#pragma link C++ class R3B::SingleEdgeSignal+;
+#pragma link C++ class R3B::DoubleEdgeSignal+;
+#pragma link C++ class R3B::MapBarSignal+;
+#pragma link C++ class unordered_map<unsigned int, R3B::MapBarSignal>+;
+#pragma link C++ class R3BPaddleTamexTrigMappedData+;
+#pragma link C++ class R3BPaddleTamexMappedData2+;
+#pragma link C++ class map<unsigned int, R3BPaddleTamexTrigMappedData>+;
+#pragma link C++ class vector<R3BPaddleTamexMappedData2>+;
 #pragma link C++ class R3BPaddleCalData+;
 #pragma link C++ class R3BTofdMappedData+;
 #pragma link C++ class R3BTofdCalData+;

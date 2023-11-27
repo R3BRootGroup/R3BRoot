@@ -12,6 +12,7 @@
 ##############################################################################
 
 set(SRCS
+    # cmake-format: sortable
     R3BCoarseTimeStitch.cxx
     R3BDataPropagator.cxx
     R3BDetector.cxx
@@ -20,6 +21,7 @@ set(SRCS
     R3BException.cxx
     R3BFileSource.cxx
     R3BFileSource2.cxx
+    R3BDataMonitor.cxx
     R3BLogger.cxx
     R3BModule.cxx
     R3BTcutPar.cxx
@@ -27,6 +29,7 @@ set(SRCS
     R3BWhiterabbitPropagator.cxx)
 
 set(HEADERS
+    # cmake-format: sortable
     R3BCoarseTimeStitch.h
     R3BDataPropagator.h
     R3BDetector.h
@@ -35,18 +38,21 @@ set(HEADERS
     R3BException.h
     R3BFileSource.h
     R3BFileSource2.h
+    R3BDataMonitor.h
     R3BIOConnector.h
     R3BLogger.h
     R3BModule.h
     R3BShared.h
     R3BTcutPar.h
     R3BTsplinePar.h
-    R3BWhiterabbitPropagator.h)
+    R3BWhiterabbitPropagator.h
+    R3BFormatters.h
+    R3BValueError.h)
 
 add_library(R3BBase SHARED ${SRCS})
 target_include_directories(R3BBase PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(
-    R3BBase
+    R3BBase # cmake-format: sortable
     PUBLIC GeoBase
            ParBase
            Base
@@ -74,5 +80,4 @@ target_link_directories(R3BBase PUBLIC ${FAIRROOTPATH}/lib)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
     target_link_libraries(R3BBase PRIVATE -lstdc++fs)
 endif()
-
 root_generate_dictionary(R3BBase_dict ${HEADERS} MODULE R3BBase LINKDEF BaseLinkDef.h)
