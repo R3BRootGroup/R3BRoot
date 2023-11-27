@@ -1,7 +1,9 @@
 #pragma once
 
 #include <boost/program_options.hpp>
+#include <fmt/format.h>
 #include <iostream>
+#include <optional>
 #include <unordered_map>
 #include <utility>
 
@@ -9,6 +11,7 @@ namespace R3B
 {
     namespace po = boost::program_options;
 
+    // TODO: C++20 use concepts
     template <typename>
     struct is_bool : std::false_type
     {
@@ -19,9 +22,25 @@ namespace R3B
     {
     };
 
+    template <typename T, typename = void>
+    struct IsString : std::false_type
+    {
+    };
+
+    template <typename T>
+    struct IsString<T, std::void_t<decltype(std::string_view{ std::declval<T>() })>> : std::true_type
+    {
+    };
+
+    template <typename T>
+    constexpr bool IsString_v = IsString<T>::value;
+
     class OptionConcept;
     template <typename Type>
     class Option;
+
+    template <typename Type>
+    class OptionHandle;
 
     class ProgramOptions
     {
@@ -33,25 +52,25 @@ namespace R3B
         }
 
         template <typename OptionType>
-        auto Create_Option(const std::string& optionName,
+        auto create_option(const std::string& optionName,
                            const std::string& option_desc,
-                           OptionType defaultValue = OptionType{}) -> decltype(auto)
+                           std::optional<OptionType> defaultValue = {}) -> decltype(auto)
         {
             if (auto search = registries_.find(optionName); search != registries_.end())
             {
                 std::cerr << "ERROR: option has been already defined!" << std::endl;
                 exit(1);
             }
-            auto option = std::make_unique<Option<OptionType>>(optionName, std::move(defaultValue), this);
-            option->Add(option_desc);
+            auto option = std::make_unique<Option<OptionType>>(optionName, defaultValue.value_or(OptionType{}), this);
+            option->add(option_desc, not defaultValue.has_value());
             registries_.emplace(optionName, option.get());
-            return option;
+            return OptionHandle{ std::move(option) };
         }
 
-        auto Verify(int argc, const char** argv) -> bool;
-        void Delete_Option(const std::string& optionName) { registries_.erase(optionName); }
-        auto Get_PosDescRef() -> auto& { return pos_desc_; }
-        auto Get_DescRef() -> auto& { return desc_; }
+        auto verify(int argc, const char** argv) -> bool;
+        void delete_option(const std::string& optionName) { registries_.erase(optionName); }
+        auto get_posDescRef() -> auto& { return pos_desc_; }
+        auto get_desc_ref() -> auto& { return desc_; }
 
       private:
         std::unordered_map<std::string, OptionConcept*> registries_;
@@ -69,7 +88,7 @@ namespace R3B
         auto operator=(OptionConcept&&) -> OptionConcept& = delete;
         virtual ~OptionConcept() = default;
         OptionConcept() = default;
-        virtual void Retrieve(const po::variables_map& varMap) = 0;
+        virtual void retrieve(const po::variables_map& varMap) = 0;
     };
 
     template <typename Type>
@@ -95,24 +114,40 @@ namespace R3B
                 key_ = name_;
             }
         }
-        ~Option() override { program_->Delete_Option(name_); }
+        ~Option() override { program_->delete_option(name_); }
 
-        void Add(const std::string& desc)
+        void add(const std::string& desc, bool is_requried = false)
         {
-            auto& po_desc = program_->Get_DescRef();
+            auto& po_desc = program_->get_desc_ref();
+            is_required_ = is_requried;
+
+            auto desc_full = fmt::format("{} [ required ]", desc);
+            if (not is_required_)
+            {
+                desc_full = fmt::format("{} [ = {} ]", desc, value_);
+                if constexpr (IsString_v<Type>)
+                {
+                    desc_full = fmt::format("{} [ = {:?} ]", desc, value_);
+                }
+            }
+
             if constexpr (is_bool<Type>::value)
             {
-                po_desc.add_options()(name_.c_str(), desc.c_str());
+                po_desc.add_options()(name_.c_str(), desc_full.c_str());
             }
             else
             {
-                po_desc.add_options()(name_.c_str(), po::value<Type>(), desc.c_str());
+                po_desc.add_options()(name_.c_str(), po::value<Type>(), desc_full.c_str());
             }
         }
 
-        void MakePositional(int option) { program_->Get_PosDescRef().add(name_.c_str(), option); }
+        void as_positional(int option)
+        {
+            program_->get_posDescRef().add(key_.c_str(), option);
+            is_positional_ = true;
+        }
 
-        void Retrieve(const po::variables_map& varMap) override
+        void retrieve(const po::variables_map& varMap) override
         {
             if (varMap.count(key_) != 0U)
             {
@@ -126,23 +161,49 @@ namespace R3B
                     value_ = varMap[key_].template as<Type>();
                 }
             }
-            else if (is_required)
+            else if (is_required_)
             {
-                const auto error_msg = "program option " + name_ + " is required.";
+                const auto error_msg = fmt::format(R"(Program option "--{}" is required! )", name_);
                 throw std::runtime_error(error_msg);
             }
         }
 
-        void Set_required(bool p_rq) { is_required = p_rq; }
+        void set_required(bool p_rq = true) { is_required_ = p_rq; }
 
         [[nodiscard]] auto value() const { return value_; }
+        [[nodiscard]] auto is_required() const -> bool { return is_required_; }
+        [[nodiscard]] auto is_positional() const -> bool { return is_positional_; }
 
       private:
+        bool is_positional_ = false;
+        bool is_required_ = false;
         std::string name_;
         std::string key_;
         std::string desc_;
-        bool is_required = false;
         Type value_{};
         ProgramOptions* program_;
     };
+
+    template <typename Type>
+    class OptionHandle
+    {
+      public:
+        explicit OptionHandle(std::unique_ptr<Option<Type>> option)
+            : option_{ std::move(option) }
+        {
+        }
+
+        auto value() const { return option_->value(); }
+        auto operator()() const { return option_->value(); }
+        auto make_positional(int pos) -> OptionHandle<Type>&&
+        {
+            option_->as_positional(pos);
+            return std::move(*this);
+        }
+        auto operator->() -> Option<Type>* { return option_.get(); }
+
+      private:
+        std::unique_ptr<Option<Type>> option_ = nullptr;
+    };
+
 }; // namespace R3B

@@ -13,50 +13,51 @@
 
 #include "R3BNeulandHit.h"
 
-constexpr Double_t c = 29.97924580000000105;   // cm/ns
-constexpr Double_t c2 = 898.75517873681758374; // cm²/ns²
+constexpr double light_speed = 29.97924580000000105; // cm/ns
+// constexpr double light_speed_square = 898.75517873681758374; // cm²/ns²
 
-R3BNeulandHit::R3BNeulandHit(Int_t paddle,
-                             Double_t TdcL,
-                             Double_t TdcR,
-                             Double_t time,
-                             Double_t QdcL,
-                             Double_t QdcR,
-                             Double_t energy,
+R3BNeulandHit::R3BNeulandHit(int paddle,
+                             double TdcL,
+                             double TdcR,
+                             double time_val,
+                             double QdcL,
+                             double QdcR,
+                             double energy_val,
                              const TVector3& pos,
                              const TVector3& pix)
-    : fPaddle(paddle)
-    , fTdcL(TdcL)
-    , fTdcR(TdcR)
-    , fT(time)
-    , fQdcL(QdcL)
-    , fQdcR(QdcR)
-    , fE(energy)
-    , fPosition(pos)
-    , fPixel(pix)
+    : module_id(paddle)
+    , tdc_left(TdcL)
+    , tdc_right(TdcR)
+    , time(time_val)
+    , qdc_left(QdcL)
+    , qdc_right(QdcR)
+    , energy(energy_val)
+    , position(pos)
+    , pixel(pix)
 {
 }
 
-Double_t R3BNeulandHit::GetBeta() const { return GetPosition().Mag() / (GetT() * c); }
+auto R3BNeulandHit::GetBeta() const -> double { return position.Mag() / (time * light_speed); }
 
-Double_t R3BNeulandHit::GetEToF(const Double_t mass) const
+auto R3BNeulandHit::GetEToF(const double mass) const -> double
 {
-    const Double_t v2 = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
-    const Double_t gamma = 1. / std::sqrt(1. - (v2 / c2));
+    const auto beta = GetBeta();
+    const auto gamma = 1. / std::sqrt(1. - beta * beta);
     const auto etof = (gamma - 1.) * mass;
     return 1.81522 + 0.984612 * etof; // TODO: EToF is ever so slightly off. Maybe some rounding/mass error?
 }
 
-std::ostream& operator<<(std::ostream& os, const R3BNeulandHit& hit)
+auto operator<<(std::ostream& os_stream, const R3BNeulandHit& hit) -> std::ostream&
 {
-    os << "R3BNeulandHit: NeuLAND Hit in Paddle " << hit.GetPaddle() << std::endl
-       << "    TdcL: " << hit.GetTdcL() << "    TdcR: " << hit.GetTdcR() << "    Time: " << hit.GetT() << std::endl
-       << "    QdcL: " << hit.GetQdcL() << "    QdcR: " << hit.GetQdcR() << "    Energy: " << hit.GetE() << std::endl
-       << "    Position XYZ: " << hit.GetPosition().X() << "    " << hit.GetPosition().Y() << "    "
-       << hit.GetPosition().Z() << std::endl;
-    return os;
+    os_stream << "R3BNeulandHit: NeuLAND Hit in Paddle " << hit.module_id << std::endl
+              << "    TdcL: " << hit.tdc_left << "    TdcR: " << hit.tdc_right << "    Time: " << hit.time << std::endl
+              << "    QdcL: " << hit.qdc_left << "    QdcR: " << hit.qdc_right << "    Energy: " << hit.energy
+              << std::endl
+              << "    Position XYZ: " << hit.position.X() << "    " << hit.position.Y() << "    "
+              << hit.GetPosition().Z() << std::endl;
+    return os_stream;
 }
 
-void R3BNeulandHit::Print(const Option_t*) const { std::cout << *this; }
+void R3BNeulandHit::Print(const Option_t* /*unused*/) const { std::cout << *this; }
 
 ClassImp(R3BNeulandHit)

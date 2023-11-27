@@ -12,5 +12,6 @@
  ******************************************************************************/
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 
 ClassImp(R3BEventHeader)

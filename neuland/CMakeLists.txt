@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
@@ -26,3 +27,4 @@ add_subdirectory(unpack)
 if(BUILD_GEOMETRY)
     add_subdirectory(geobase)
 endif()
+add_subdirectory(executables)

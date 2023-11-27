@@ -25,17 +25,8 @@
 #include <cstdint>
 #include <exception>
 #include <ext_data_client.h>
-#include <fairlogger/Logger.h>
-#include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
-// NOLINTBEGIN
-#include <fmt/chrono.h> //IWYU pragma: keep
-#include <fmt/ranges.h> //IWYU pragma: keep
-// NOLINTEND
-#include <memory>
-#include <mutex>
-#include <string_view>
-#include <sys/types.h>
 #include <thread>
 
 namespace R3B
@@ -92,9 +83,15 @@ namespace R3B
             command_string = fmt::format("{} --max-events={}", command_string, max_event_num_);
         }
         LOGP(info, "Calling ucesb with command: {}", command_string);
+<<<<<<< HEAD
         ucesb_server_launcher_ = std::make_unique<UcesbServerLauncher>(&ucesb_client_); //!
         ucesb_server_launcher_->SetLaunchCmd(command_string);
         ucesb_server_launcher_->Launch();
+=======
+
+        ucesb_server_launcher_.SetLaunchCmd(command_string);
+        ucesb_server_launcher_.Launch();
+>>>>>>> 89b2964a (neuland calibration process reformat and millepde)
     }
 
     bool UcesbSource::InitUnpackers()

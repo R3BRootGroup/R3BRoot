@@ -19,7 +19,7 @@
 
 constexpr int DEFAULT_RUNID = 999;
 
-int main(int argc, const char** argv)
+auto main(int argc, const char** argv) -> int
 {
     auto timer = TStopwatch{};
     auto const defaultEventNum = 10;
@@ -27,32 +27,32 @@ int main(int argc, const char** argv)
 
     auto programOptions = R3B::ProgramOptions("options for neuland simulation");
 
-    auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
-    auto eventNum = programOptions.Create_Option<int>("eventNum", "set total event number", defaultEventNum);
-    auto eventPrintNum = programOptions.Create_Option<int>("eventPrint", "set event print number", 1);
-    auto runID = programOptions.Create_Option<int>("runID", "set runID", DEFAULT_RUNID);
-    auto multi = programOptions.Create_Option<int>("multiplicity", "set particle multiplicity", 1);
-    auto pEnergy = programOptions.Create_Option<double>("energy", "set energy value (GeV) of the particle", 1);
-    auto simuFileName = programOptions.Create_Option<std::string>(
-        "simuFile", "set the base filename of simulation output", "simu.root");
+    auto help = programOptions.create_option<bool>("help,h", "help message", false);
+    auto eventNum = programOptions.create_option<int>("eventNum", "set total event number", defaultEventNum);
+    auto eventPrintNum = programOptions.create_option<int>("eventPrint", "set event print number", 1);
+    auto runID = programOptions.create_option<int>("runID", "set runID", DEFAULT_RUNID);
+    auto multi = programOptions.create_option<int>("multiplicity", "set particle multiplicity", 1);
+    auto pEnergy = programOptions.create_option<double>("energy", "set energy value (GeV) of the particle", 1);
+    auto simuFileName =
+        programOptions.create_option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
     auto paraFileName =
-        programOptions.Create_Option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
-    auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");
+        programOptions.create_option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
+    auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
 
-    if (!programOptions.Verify(argc, argv))
+    if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;
     }
 
-    if (help->value())
+    if (help())
     {
-        std::cout << programOptions.Get_DescRef() << std::endl;
+        std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
     }
 
     // Logging
     // FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
@@ -65,7 +65,7 @@ int main(int argc, const char** argv)
     run->SetRunId(runID->value());
     run->SetStoreTraj(true);
     run->SetMaterials("media_r3b.geo");
-    run->SetSink(std::make_unique<FairRootFileSink>(simuFileName->value().c_str()));
+    run->SetSink(std::make_unique<FairRootFileSink>(simuFileName().c_str()));
     auto fairField = std::make_unique<R3BFieldConst>();
     run->SetField(fairField.release());
 
@@ -111,19 +111,19 @@ int main(int argc, const char** argv)
 
     // event print out:
     auto* grun = G4RunManager::GetRunManager();
-    grun->SetPrintProgress(eventPrintNum->value());
+    grun->SetPrintProgress(eventPrintNum());
     auto* event = dynamic_cast<TG4EventAction*>(const_cast<G4UserEventAction*>(grun->GetUserEventAction())); // NOLINT
     event->VerboseLevel(0);
 
     // Connect runtime parameter file
     auto parFileIO = std::make_unique<FairParRootFileIo>(true);
-    parFileIO->open(paraFileName->value().c_str());
+    parFileIO->open(paraFileName().c_str());
     auto* rtdb = run->GetRuntimeDb();
     rtdb->setOutput(parFileIO.release());
     rtdb->saveOutput();
 
     // Simulate
-    run->Run(eventNum->value());
+    run->Run(eventNum());
 
     // Report
     timer.Stop();

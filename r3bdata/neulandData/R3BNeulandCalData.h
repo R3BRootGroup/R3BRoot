@@ -21,13 +21,13 @@ class R3BNeulandCalData : public TObject
 {
   public:
     R3BNeulandCalData() = default;
-    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Double_t triggertime, Int_t qdc);
+    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Double_t triggertime, double qdc);
 
     Int_t GetBarId() const { return fBarId; }
     Int_t GetSide() const { return fSide; }
     Double_t GetTime() const { return fTime; }
     Double_t GetTriggerTime() const { return fTriggerTime; }
-    Int_t GetQdc() const { return fQdc; }
+    [[nodiscard]] auto GetQdc() const -> double { return fQdc; }
 
     void Print(const Option_t*) const override;
 
@@ -36,7 +36,7 @@ class R3BNeulandCalData : public TObject
     Int_t fSide;
     Double_t fTime;
     Double_t fTriggerTime;
-    Int_t fQdc;
+    double fQdc;
 
     ClassDefOverride(R3BNeulandCalData, 2)
 };

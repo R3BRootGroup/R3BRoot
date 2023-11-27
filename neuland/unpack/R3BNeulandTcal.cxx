@@ -133,7 +133,7 @@ void R3BNeulandTcal::Exec(Option_t*)
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    Int_t channel;
+    Int_t channel = 0;
     Int_t tdc;
     R3BTCalModulePar* par;
     Double_t timeLE;

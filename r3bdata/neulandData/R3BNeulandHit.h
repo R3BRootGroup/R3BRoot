@@ -10,63 +10,85 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-#ifndef R3BNEULANDHIT_H
-#define R3BNEULANDHIT_H
+#pragma once
 
 #include "TObject.h"
 #include "TVector3.h"
+#include <R3BFormatters.h>
+#include <Rtypes.h>
 #include <iostream>
 
-class R3BNeulandHit : public TObject
+constexpr auto NEUTRON_MASS_MEV = 939.565;
+
+struct R3BNeulandHit : public TObject
 {
-  public:
+    int module_id = 0;
+    double tdc_left = 0.;
+    double tdc_right = 0.;
+    double time = 0.;
+    double qdc_left = 0.;
+    double qdc_right = 0.;
+    double energy = 0.;
+    TVector3 position{};
+    TVector3 pixel{};
+
     R3BNeulandHit() = default;
     R3BNeulandHit(Int_t paddle,
-                  Double_t TdcL,
-                  Double_t TdcR,
-                  Double_t time,
-                  Double_t QdcL,
-                  Double_t QdcR,
-                  Double_t energy,
+                  double TdcL,
+                  double TdcR,
+                  double time,
+                  double QdcL,
+                  double QdcR,
+                  double energy,
                   const TVector3& pos,
                   const TVector3& pix);
 
-    Int_t GetPaddle() const { return fPaddle; }
-    Double_t GetTdcR() const { return fTdcR; }
-    Double_t GetTdcL() const { return fTdcL; }
-    Double_t GetT() const { return fT; }
-    Double_t GetQdcR() const { return fQdcR; }
-    Double_t GetQdcL() const { return fQdcL; }
-    Double_t GetE() const { return fE; }
-    TVector3 GetPosition() const { return fPosition; }
-    TVector3 GetPixel() const { return fPixel; }
-
-    Double_t GetBeta() const;
-    Double_t GetEToF(Double_t mass = 939.565) const; // 939.565379
-
-    void Print(const Option_t*) const override;
-
-    bool operator==(const R3BNeulandHit& b) const
+    void Print(const Option_t* /*option*/) const override;
+    auto operator==(const R3BNeulandHit& other) const -> bool
     {
         // TODO: Change this if multi-hit capability is introduced
-        return this->GetPaddle() == b.GetPaddle();
+        return this->GetPaddle() == other.GetPaddle();
     }
 
-  private:
-    Int_t fPaddle;
-    Double_t fTdcL;
-    Double_t fTdcR;
-    Double_t fT;
-    Double_t fQdcL;
-    Double_t fQdcR;
-    Double_t fE;
-    TVector3 fPosition;
-    TVector3 fPixel;
+    // NOTE: for backward compabitlity
+    [[nodiscard]] auto GetPaddle() const -> int { return module_id; }
+    [[nodiscard]] auto GetTdcR() const -> double { return tdc_right; }
+    [[nodiscard]] auto GetTdcL() const -> double { return tdc_left; }
+    [[nodiscard]] auto GetT() const -> double { return time; }
+    [[nodiscard]] auto GetQdcR() const -> double { return qdc_right; }
+    [[nodiscard]] auto GetQdcL() const -> double { return qdc_left; }
+    [[nodiscard]] auto GetE() const -> double { return energy; }
+    [[nodiscard]] auto GetPosition() const -> TVector3 { return position; }
+    [[nodiscard]] auto GetPixel() const -> TVector3 { return pixel; }
 
-    ClassDefOverride(R3BNeulandHit, 1)
+    [[nodiscard]] auto GetBeta() const -> double;
+    [[nodiscard]] auto GetEToF(double mass = NEUTRON_MASS_MEV) const -> double;
+
+    ClassDefOverride(R3BNeulandHit, 2);
 };
 
-std::ostream& operator<<(std::ostream&, const R3BNeulandHit&); // Support easy printing
-
-#endif // R3BNEULANDHIT_H
+auto operator<<(std::ostream&, const R3BNeulandHit&) -> std::ostream&; // Support easy printing
+                                                                       //
+template <>
+class fmt::formatter<R3BNeulandHit>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3BNeulandHit& hit, FmtContent& ctn) const
+    {
+        return format_to(
+            ctn.out(),
+            "{{module_id: {}, left_tdc: {}, right_tdc: {}, time: {} ns, left_qdc: {}, right_qdc: {}, energy: "
+            "{} MeV, position: {} cm, pixel: {}}}",
+            hit.module_id,
+            hit.tdc_left,
+            hit.tdc_right,
+            hit.time,
+            hit.qdc_left,
+            hit.qdc_right,
+            hit.energy,
+            hit.position,
+            hit.pixel);
+    }
+};

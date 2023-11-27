@@ -11,18 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULANDCOMMON_H
-#define NEULANDCOMMON_H
-
+#pragma once
+#include <TObject.h>
+#include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <vector>
 
-namespace Neuland
+namespace R3B::Neuland
 {
     // Constants
 
-    constexpr auto __sqrt12 = 3.464101615;
+    constexpr auto SQRT_12 = 3.464101615;
     constexpr auto NaN = std::numeric_limits<double>::quiet_NaN();
     constexpr auto Inf = std::numeric_limits<double>::infinity();
 
@@ -33,6 +34,9 @@ namespace Neuland
     {
         return val * val;
     }
+
+    // Miscellaneous defaults:
+    constexpr auto DEFAULT_EFFECTIVE_C = 8.; // cm/ns
 
     // Initialize variables from Birk' s Law
 
@@ -55,14 +59,16 @@ namespace Neuland
 
     // Electronics Constants
 
+    constexpr auto COARSE_TIME_CLOCK_FREQUENCY_MHZ = 200.F;
     constexpr auto MaxCalTime = 5. * 2048;
-
+    constexpr auto MaxFTValue = 4097;
+    constexpr auto MAXCTValue = 2048U;
     // Geometry & Material Constants
 
     constexpr auto BarSize_XY = 5.0;                                  // cm NeuLAND parameter
-    constexpr auto BarUncertainty_XY = BarSize_XY / __sqrt12;         // cm NeuLAND parameter
+    constexpr auto BarUncertainty_XY = BarSize_XY / SQRT_12;          // cm NeuLAND parameter
     constexpr auto BarSize_Z = 5.0;                                   // cm NeuLAND parameter
-    constexpr auto BarUncertainty_Z = BarSize_Z / __sqrt12;           // cm NeuLAND parameter
+    constexpr auto BarUncertainty_Z = BarSize_Z / SQRT_12;            // cm NeuLAND parameter
     constexpr auto BarLength = 250.0;                                 // cm NeuLAND parameter
     constexpr auto LightGuideLength = 10.0;                           // cm NeuLAND parameter
     constexpr auto TotalBarLength = BarLength + 2 * LightGuideLength; // cm NeuLAND parameter, Bar including Light Guide
@@ -73,12 +79,38 @@ namespace Neuland
 
     constexpr auto FirstHorizontalPlane = 0;
     constexpr auto BarsPerPlane = 50;
-    constexpr auto MaxNumberOfPlanes = 60;
+    constexpr auto MaxNumberOfPlanes = 26;
     constexpr auto MaxNumberOfBars = MaxNumberOfPlanes * BarsPerPlane;
 
-    constexpr bool IsPlaneHorizontal(const int plane) { return (plane % 2 == FirstHorizontalPlane); }
-    constexpr bool IsPlaneVertical(const int plane) { return !IsPlaneHorizontal(plane); }
-    constexpr int GetPlaneNumber(const int barID) { return barID / BarsPerPlane; }
+    // naming convention:
+    // _num starts at 1 and _id starts at 0
+    // module number has the range of 1 ~ BarsPerPlane * NumOfPlanes
+    // bar number has the range of 1 ~ BarsPerPlane
+    inline constexpr auto GetBarVerticalDisplacement(int module_num) -> double
+    {
+        const auto bar_num = module_num % BarsPerPlane;
+        return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
+    }
+    inline constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
+    inline constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
+    inline constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+    inline constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+    // planeNum, barNum and ModuleNum is 1-based
+    inline constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
+    {
+        assert(planeNum > 0);
+        return (planeNum - 1) * BarsPerPlane + barNum;
+    }
+    template <typename T = double>
+    inline constexpr auto PlaneID2ZPos(int plane_id) -> T
+    {
+        return static_cast<T>((plane_id + 0.5) * BarSize_Z);
+    }
+    template <typename T = double>
+    inline constexpr auto ModuleNum2ZPos(int module_num) -> T
+    {
+        return PlaneID2ZPos<T>(ModuleID2PlaneID(module_num - 1));
+    }
 
     // Average Parameters
 
@@ -90,6 +122,6 @@ namespace Neuland
 
     constexpr auto SaturationCoefficient = 1.75e-3; // 1 / ns
 
-} // namespace Neuland
-
-#endif
+    // NeuLAND TPAT:
+    constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
+} // namespace R3B::Neuland

@@ -35,5 +35,6 @@ runs:
     - name: build ${{ matrix.repos }}
       if: inputs.build-needed == 'true'
       run: |
-        cmake --build ./build -- -j ${NUM_THREADS}
+        ./build.py -b -j ${NUM_THREADS} 
+        # ./build_thisr3broot.sh -b build -j ${NUM_THREADS}
       shell: bash

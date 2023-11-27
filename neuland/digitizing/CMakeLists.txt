@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
@@ -11,17 +12,20 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 set(SRCS
+    # cmake-format: sortable
     R3BDigitizingChannel.cxx
+    R3BDigitizingChannelMock.h
     R3BDigitizingPaddle.cxx
+    R3BDigitizingPaddleMock.h
+    R3BDigitizingPaddleNeuland.cxx
     R3BDigitizingTacQuila.cxx
     R3BDigitizingTamex.cxx
-    R3BDigitizingPaddleNeuland.cxx
-    R3BNeulandHitMon.cxx
     R3BNeulandDigitizer.cxx
     R3BNeulandHitMon.cxx
     NeulandPointFilter.cxx)
 
 set(HEADERS
+    # cmake-format: sortable
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h
     R3BDigitizingEngine.h

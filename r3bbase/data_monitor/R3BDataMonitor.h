@@ -14,6 +14,7 @@
 #pragma once
 
 #include "R3BDataMonitorCanvas.h"
+#include "R3BLogger.h"
 #include "R3BShared.h"
 #include <FairRun.h>
 #include <R3BException.h>

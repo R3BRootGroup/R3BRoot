@@ -19,6 +19,6 @@ set(HEADERS R3BNeuland.h R3BNeulandMCMon.h R3BNeulandPrimaryClusterFinder.h
 
 add_library(R3BNeulandSimulation SHARED ${SRCS})
 target_include_directories(R3BNeulandSimulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandSimulation PUBLIC R3BNeulandShared R3BPassive)
+target_link_libraries(R3BNeulandSimulation PUBLIC R3BNeulandShared #[[ R3BPassive ]])
 root_generate_dictionary(R3BNeulandSimulation_dict ${HEADERS} MODULE R3BNeulandSimulation LINKDEF
                          NeulandSimulationLinkDef.h)

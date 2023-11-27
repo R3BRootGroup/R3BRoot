@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #pragma once
-
+#include "R3BException.h"
 #include "R3BLogger.h"
 #include <FairLogger.h>
 #include <R3BValueError.h>
@@ -89,8 +89,9 @@ namespace R3B
     }
 
     // -------------------------------------------------------------------------
-    // Get the length of a C array:
+    // sides enum class:
     // clang-format off
+    // Get the length of a C array:
     template <typename DataType, std::size_t size>
     constexpr std::size_t GetSize(const DataType (&/*unused*/)[size]) // NOLINT
     {

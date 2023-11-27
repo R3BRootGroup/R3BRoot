@@ -67,6 +67,7 @@
 #pragma link C++ class R3BCalifaFebexReader+;
 #pragma link C++ class R3BPtofReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
+#pragma link C++ class R3BNeulandTamexReader2+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
 #pragma link C++ class R3BAmsReader+;
 #pragma link C++ class R3BMusicReader+;
