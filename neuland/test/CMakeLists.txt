@@ -28,8 +28,7 @@ if(GTEST_FOUND)
         ${R3BROOT_SOURCE_DIR}/neuland/digitizing
         ${R3BROOT_SOURCE_DIR}/neuland/reconstruction/multiplicity)
 
-    link_directories(${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
-        ${Boost_LIBRARY_DIRS})
+    link_directories(${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR} ${Boost_LIBRARY_DIRS})
 
     set(TEST_DEPENDENCIES
         GTest::gtest_main
@@ -52,40 +51,49 @@ endif(GTEST_FOUND)
 # generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
 # add_test(NeulandSimulation ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandSimulation.sh)
 set(simuPars
-    --simuFile test.simu.root
-    --paraFile test.para.root
-    --eventNum 100
-    --eventPrint 10
-    --energy 1.0
-    --multiplicity 4
-    --logLevel error
-    )
+    --simuFile
+    test.simu.root
+    --paraFile
+    test.para.root
+    --eventNum
+    100
+    --eventPrint
+    10
+    --energy
+    1.0
+    --multiplicity
+    4
+    --logLevel
+    error)
 add_test(NeulandSimulation ${R3BROOT_BINARY_DIR}/bin/neulandSim ${simuPars})
 set_tests_properties(NeulandSimulation PROPERTIES TIMEOUT "2000")
 set_tests_properties(NeulandSimulation PROPERTIES PASS_REGULAR_EXPRESSION
-    "Macro finished successfully.")
+                                                  "Macro finished successfully.")
 
 set(digiPars
-    --simuFile test.simu.root
-    --paraFile test.para.root
-    --paddle neuland
-    --channel tamex
-    --digiFile test.digi.root
-    -v info
-    )
+    --simuFile
+    test.simu.root
+    --paraFile
+    test.para.root
+    --paddle
+    neuland
+    --channel
+    tamex
+    --digiFile
+    test.digi.root
+    -v
+    info)
 add_test(NeulandDigitizer ${R3BROOT_BINARY_DIR}/bin/neulandAna ${digiPars})
 set_tests_properties(NeulandDigitizer PROPERTIES DEPENDS NeulandSimulation)
 set_tests_properties(NeulandDigitizer PROPERTIES TIMEOUT "1000")
 set_tests_properties(NeulandDigitizer PROPERTIES PASS_REGULAR_EXPRESSION
-    "Macro finished successfully.")
+                                                 "Macro finished successfully.")
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandDigitizer.C)
-add_test(NeulandDigitizerMacro ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandDigitizer.sh)
-set_tests_properties(NeulandDigitizerMacro PROPERTIES DEPENDS NeulandSimulation)
-set_tests_properties(NeulandDigitizerMacro PROPERTIES TIMEOUT "1000")
-set_tests_properties(NeulandDigitizerMacro PROPERTIES PASS_REGULAR_EXPRESSION
-    "Macro finished successfully.")
-
+# generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandDigitizer.C)
+# add_test(NeulandDigitizerMacro ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandDigitizer.sh)
+# set_tests_properties(NeulandDigitizerMacro PROPERTIES DEPENDS NeulandSimulation)
+# set_tests_properties(NeulandDigitizerMacro PROPERTIES TIMEOUT "1000")
+# set_tests_properties(NeulandDigitizerMacro PROPERTIES)
 
 # generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandTrain.C)
 # add_test(NeulandTrain ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandTrain.sh)

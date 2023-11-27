@@ -23,6 +23,8 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/r3bsource/base
+${R3BROOT_SOURCE_DIR}/r3bsource/base/utils
 ${R3BROOT_SOURCE_DIR}/psp
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata
@@ -33,7 +35,9 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/tracking)
+${R3BROOT_SOURCE_DIR}/tracking
+$ENV{UCESB_DIR}/hbook
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -57,6 +61,7 @@ R3BPspDigitizer.cxx
 R3BPspxMapped2Precal.cxx
 R3BPspxPrecal2Cal.cxx
 R3BPspxCal2Hit.cxx
+R3BPspxReader.cxx
 R3BPspxOnlineSpectra.cxx
 par/R3BPspxMappedPar.cxx
 par/R3BPspxPrecalPar.cxx
@@ -72,6 +77,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF PspLinkDef.h)
 Set(LIBRARY_NAME R3BPsp)
 Set(DEPENDENCIES
-  R3BBase R3BData R3BTracking)
+  R3BBase R3BSource R3BTracking)
 
 GENERATE_LIBRARY()
