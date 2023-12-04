@@ -73,6 +73,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
+${R3BROOT_SOURCE_DIR}/r3bdata/ttt10Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
@@ -146,6 +147,7 @@ set(SRCS
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
 ./twim/R3BTwimReader.cxx
+./ttt10/R3BTTTXReader.cxx
 ./musli/R3BMusliReader.cxx
 ./mwpc/R3BMwpcReader.cxx
 ./sync_check/R3BSyncCheckReader.cxx
@@ -209,6 +211,7 @@ Set(STRUCT_HEADERS
 ./alpide/ext_h101_alpide.h
 ./music/ext_h101_music.h
 ./twim/ext_h101_twim.h
+./ttt10/ext_h101_ttt10.h
 ./musli/ext_h101_musli.h
 ./mwpc/ext_h101_mwpc.h
 ./trloii/ext_h101_samp.h

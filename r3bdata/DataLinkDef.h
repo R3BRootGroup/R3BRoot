@@ -85,6 +85,8 @@
 #pragma link C++ class R3BTwimHitData+;
 #pragma link C++ class R3BTwimPoint+;
 
+#pragma link C++ class R3BTTTXMappedData+;
+
 #pragma link C++ class R3BMusliMappedData+;
 #pragma link C++ class R3BMusliCalData+;
 #pragma link C++ class R3BMusliHitData+;
