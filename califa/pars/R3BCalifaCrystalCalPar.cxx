@@ -24,7 +24,7 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumCrystals(4864)
+    , fNumCrystals(5088)
     , fNumParamsFit(2) // pol1
 {
     fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
