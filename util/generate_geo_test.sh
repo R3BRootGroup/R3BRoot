@@ -25,6 +25,7 @@ root -l -q -x ${GITHUB_WORKSPACE}/mwpc/geobase/create_mwpc0_geo.C
 root -l -q -x ${GITHUB_WORKSPACE}/mwpc/geobase/create_mwpc1and2_geo.C
 root -l -q -x ${GITHUB_WORKSPACE}/twim/geobase/create_twin_geo.C
 root -l -q -x ${GITHUB_WORKSPACE}/neuland/geobase/create_neuland_geo.C
+root -l -q -x ${GITHUB_WORKSPACE}/califa/geobase/create_califa_geo.C
 
 if [ -d "${GITHUB_WORKSPACE}/sofia" ];
 then
