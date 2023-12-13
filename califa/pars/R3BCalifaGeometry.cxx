@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -40,7 +40,7 @@ R3BCalifaGeometry* R3BCalifaGeometry::Instance()
 R3BCalifaGeometry::R3BCalifaGeometry()
     : TObject()
     , IsInitialize(kFALSE)
-    , fNumCrystals(4864)
+    , fNumCrystals(5088)
 {
 }
 
@@ -75,10 +75,16 @@ bool R3BCalifaGeometry::Init(Int_t version)
             fNumCrystals = 4864;
             break;
 
+        case 2024:
+            // s118-s091 Experiment: Half Barrel (extended) + Full IPHOS + Full CEPA
+            geoPath += "califa_v2024.1.geo.root";
+            fNumCrystals = 5088;
+            break;
+
         default:
             // Full Barrel + Full IPHOS
             geoPath += "califa_full.geo.root";
-            fNumCrystals = 4864;
+            fNumCrystals = 5088;
             R3BLOG(warn,
                    "Unsupported geometry version: " << version << ", so standard full configuration will be used.");
             // return kFALSE;
@@ -196,23 +202,58 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
             alveolusCopy = (Int_t)((iD - 33 - (alvType - 2) * 128) / 4); // copy from 0 to 31
             cryType = iD - 33 - (alvType - 2) * 128 - alveolusCopy * 4 + 1; // Four crystal types (1,2,3,4)
         }
-        else
+        else if (iD < 2433)
         {                                                                     // 3-crystals alveoli in iPhos
             alvType = (Int_t)((iD - 2337) / 24) + 20;                         // Alveolus type (20, 21, 22, 23)
             alveolusCopy = (Int_t)((iD - 2337 - (alvType - 20) * 24) / 3);    // copy from 0 to 7
             cryType = iD - 2337 - (alvType - 20) * 24 - alveolusCopy * 3 + 1; // Three crystal types (1,2,3)
         }
+        else if (iD < 2465) // CEPA_CsI, four crystals alveoli (iD from 2433 to 2464)
+        {
+            alvType = 1;
+            alveolusCopy = (Int_t)((iD - 2433) / 4);    // copy from 0 to 7
+            cryType = iD - 2433 - alveolusCopy * 4 + 1; // Four crystal types (1,2,3,4)
+        }
+        else if (iD < 2513) // CEPA_CsI, six crystals alveoli (iD from 2465 to 2512)
+        {
+            alvType = 2;
+            alveolusCopy = (Int_t)((iD - 2465) / 6);    // copy from 0 to 7
+            cryType = iD - 2465 - alveolusCopy * 6 + 1; // Four crystal types (1,2,3,4,5,6)
+        }
+        else if (iD < 2545) // CEPA_CsI, four crystals alveoli (iD from 2513 to 2544)
+        {
+            alvType = 3;
+            alveolusCopy = (Int_t)((iD - 2513) / 4);    // copy from 0 to 7
+            cryType = iD - 2513 - alveolusCopy * 4 + 1; // Four crystal types (1,2,3,4)
+        }
         char name_Alv[23][3] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
                                  "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" };
-        sprintf(nameVolume,
-                "/cave_1/CalifaWorld_0/Alveolus_%s_%i/InnerAlv_%s_0/WrapCry_%s_%i_0/Crystal_%s_%i_0",
-                name_Alv[alvType - 1],
-                alveolusCopy,
-                name_Alv[alvType - 1],
-                name_Alv[alvType - 1],
-                cryType,
-                name_Alv[alvType - 1],
-                cryType);
+
+        if (iD < 2433)
+        {
+            sprintf(nameVolume,
+                    "/cave_1/CalifaWorld_0/Alveolus_%s_%i/InnerAlv_%s_0/WrapCry_%s_%i_0/Crystal_%s_%i_0",
+                    name_Alv[alvType - 1],
+                    alveolusCopy,
+                    name_Alv[alvType - 1],
+                    name_Alv[alvType - 1],
+                    cryType,
+                    name_Alv[alvType - 1],
+                    cryType);
+        }
+        else
+        {
+            sprintf(nameVolume,
+                    "/cave_1/CalifaWorld_0/Alveolus_CCSI_%s_%i/InnerAlv_CCSI_%s_0/WrapCry_CCSI_%s_%i_0/"
+                    "Crystal_CCSI__%s_%i_0",
+                    name_Alv[alvType - 1],
+                    alveolusCopy,
+                    name_Alv[alvType - 1],
+                    name_Alv[alvType - 1],
+                    cryType,
+                    name_Alv[alvType - 1],
+                    cryType);
+        }
     }
     else
     {
@@ -302,7 +343,7 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
    * instead of possible out of bounds access consequences (nasal demons etc).
    * Also, it hopefully works with the 2019/s444 geo file too, now.
    */
-    static auto restr = "Alveolus_([0-9]+)_([0-9]+).*Crystal_[^_]+_([0-9]+)_";
+    static auto restr = "(Alveolus|Alveolus_CCSI)_([0-9]+)_([0-9]+).*(Crystal|Crystal_CCSI)_[^_]+_([0-9]+)_";
     static auto re = boost::regex(restr, boost::regex::extended);
     boost::cmatch m;
     if (!boost::regex_search(volumePath, m, re))
@@ -316,27 +357,47 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     }
 
     Int_t crystalId;
-    Int_t alvType = std::stoi(m[1].str());      // converting to int the alveolus type
-    Int_t alveolusCopy = std::stoi(m[2].str()); // converting to int the alveolus copy
-    Int_t cryType = std::stoi(m[3].str());      // converting to int the crystal type
+    Bool_t isCCSI = m[1].str() == "Alveolus_CCSI"; // Adding CEPA CSI
+    Int_t alvType = std::stoi(m[2].str());         // converting to int the alveolus type
+    Int_t alveolusCopy = std::stoi(m[3].str());    // converting to int the alveolus copy
+    Int_t cryType = std::stoi(m[5].str());         // converting to int the crystal type
+    Bool_t invalid = kFALSE;
 
+    // cryType runs from 1 to 4 while alvType runs from 1 to 23, otherwise invaled
     if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
-    { // cryType runs from 1 to 4 while alvType runs from 1 to 23
+        invalid = kTRUE;
+    // EXCEPTION: cryType runs up to 6 in CEPA CSI alveoli 2
+    if (isCCSI && alvType == 2 && (cryType == 5 || cryType == 6))
+        invalid = kFALSE;
+    if (invalid)
+    {
         R3BLOG(error, "Wrong crystal numbers (1)");
         LOG(info) << "---- cryType: " << cryType << "   alvType: " << alvType;
         LOG(info) << "path=" << volumePath;
         return 0;
     }
 
-    if (alvType == 1)
-        crystalId = 1 + alveolusCopy; // first alveoli ring, one crystal per alveolus
-    else if (alvType < 20)
-        crystalId = 33 + (alvType - 2) * 128 + alveolusCopy * 4 + (cryType - 1); // four crystal per alveolus
+    if (isCCSI)
+    {
+        if (alvType == 1)
+            crystalId = 2433 + alveolusCopy * 4 + (cryType - 1); // four crystal per alveolus (2433 to 2464)
+        if (alvType == 2)
+            crystalId = 2465 + alveolusCopy * 6 + (cryType - 1); // six crystal per alveolus (2465 to 2512)
+        if (alvType == 3)
+            crystalId = 2513 + alveolusCopy * 4 + (cryType - 1); // four crystal per alveolus (2513 to 2544)
+    }
     else
-        crystalId = 2337 + (alvType - 20) * 24 + alveolusCopy * 3 + (cryType - 1); // three crystal per alveolus
+    {
+        if (alvType == 1)
+            crystalId = 1 + alveolusCopy; // first alveoli ring, one crystal per alveolus
+        else if (alvType < 20)
+            crystalId = 33 + (alvType - 2) * 128 + alveolusCopy * 4 + (cryType - 1); // four crystal per alveolus
+        else
+            crystalId = 2337 + (alvType - 20) * 24 + alveolusCopy * 3 + (cryType - 1); // three crystal per alveolus
+    }
 
-    if (crystalId < 1 || crystalId > 2432)
-    { // crystalId runs from 1 to 2432
+    if (crystalId < 1 || crystalId > 2544)
+    { // crystalId runs from 1 to 2544
         R3BLOG(error, "Wrong crystal numbers (2)");
         LOG(info) << "---- crystalId: " << crystalId;
         return 0;

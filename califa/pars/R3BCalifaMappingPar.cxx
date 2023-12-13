@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,7 +24,7 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumCrystals(4864)
+    , fNumCrystals(5088)
 {
     fHalf = new TArrayI(fNumCrystals);
     fRing = new TArrayI(fNumCrystals);
@@ -33,6 +33,7 @@ R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, co
     fCrystal_type = new TArrayI(fNumCrystals);
     fApd_number = new TArrayI(fNumCrystals);
     fVoltage = new TArrayF(fNumCrystals);
+    fFebex_pc = new TArrayI(fNumCrystals);
     fFebex_slot = new TArrayI(fNumCrystals);
     fFebex_mod = new TArrayI(fNumCrystals);
     fFebex_channel = new TArrayI(fNumCrystals);
@@ -60,6 +61,8 @@ R3BCalifaMappingPar::~R3BCalifaMappingPar()
         delete fApd_number;
     if (fVoltage)
         delete fVoltage;
+    if (fFebex_pc)
+        delete fFebex_pc;
     if (fFebex_slot)
         delete fFebex_slot;
     if (fFebex_mod)
@@ -107,6 +110,8 @@ void R3BCalifaMappingPar::putParams(FairParamList* list)
     list->add("califaApdNumberPar", *fApd_number);
     fVoltage->Set(fNumCrystals);
     list->add("califaVoltagePar", *fVoltage);
+    fFebex_pc->Set(fNumCrystals);
+    list->add("califaFebexPCPar", *fFebex_pc);
     fFebex_slot->Set(fNumCrystals);
     list->add("califaFebexSlotPar", *fFebex_slot);
     fFebex_mod->Set(fNumCrystals);
@@ -178,6 +183,12 @@ Bool_t R3BCalifaMappingPar::getParams(FairParamList* list)
     if (!(list->fill("califaVoltagePar", fVoltage)))
     {
         LOG(info) << "---Could not initialize califaVoltagePar";
+        return kFALSE;
+    }
+    fFebex_pc->Set(fNumCrystals);
+    if (!(list->fill("califaFebexPCPar", fFebex_pc)))
+    {
+        LOG(info) << "---Could not initialize califaFebexPCPar";
         return kFALSE;
     }
     fFebex_slot->Set(fNumCrystals);
@@ -257,6 +268,7 @@ void R3BCalifaMappingPar::printMapCrystalInfo(const UInt_t cryID)
               << "crystal_type " << fCrystal_type->GetAt(index) << " , "
               << "apd_number " << fApd_number->GetAt(index) << " , "
               << "voltage " << fVoltage->GetAt(index) << " , "
+              << "febex_pc " << fFebex_pc->GetAt(index) << " , "
               << "febex_slot " << fFebex_slot->GetAt(index) << " , "
               << "febex_mod " << fFebex_mod->GetAt(index) << " , "
               << "febex_channel " << fFebex_channel->GetAt(index) << " , "
@@ -288,6 +300,8 @@ void R3BCalifaMappingPar::printParams()
               << " "
               << "voltage"
               << " "
+              << "febex_pc"
+              << " "
               << "febex_slot"
               << " "
               << "febex_mod"
@@ -307,9 +321,10 @@ void R3BCalifaMappingPar::printParams()
     {
         LOG(info) << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "
                   << fChannel->GetAt(i) << " " << fCrystal_type->GetAt(i) << " " << fApd_number->GetAt(i) << " "
-                  << fVoltage->GetAt(i) << " " << fFebex_slot->GetAt(i) << " " << fFebex_mod->GetAt(i) << " "
-                  << fFebex_channel->GetAt(i) << " " << fLab->GetAt(i) << " " << fMrcc_module->GetAt(i) << " "
-                  << fMrcc_bus->GetAt(i) << " " << fMrcc_preamp->GetAt(i) << " " << fIn_use->GetAt(i);
+                  << fVoltage->GetAt(i) << " " << fFebex_pc->GetAt(i) << " " << fFebex_slot->GetAt(i) << " "
+                  << fFebex_mod->GetAt(i) << " " << fFebex_channel->GetAt(i) << " " << fLab->GetAt(i) << " "
+                  << fMrcc_module->GetAt(i) << " " << fMrcc_bus->GetAt(i) << " " << fMrcc_preamp->GetAt(i) << " "
+                  << fIn_use->GetAt(i);
     }
 }
 
