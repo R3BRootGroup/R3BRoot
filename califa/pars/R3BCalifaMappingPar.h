@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,6 +58,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     const Int_t GetCrystalType(Int_t crystal) { return fCrystal_type->GetAt(crystal - 1); }
     const Int_t GetApdNumber(Int_t crystal) { return fApd_number->GetAt(crystal - 1); }
     const Float_t GetVoltage(Int_t crystal) { return fVoltage->GetAt(crystal - 1); }
+    const Int_t GetFebexPC(Int_t crystal) { return fFebex_pc->GetAt(crystal - 1); }
     const Int_t GetFebexSlot(Int_t crystal) { return fFebex_slot->GetAt(crystal - 1); }
     const Int_t GetFebexMod(Int_t crystal) { return fFebex_mod->GetAt(crystal - 1); }
     const Int_t GetFebexChannel(Int_t crystal) { return fFebex_channel->GetAt(crystal - 1); }
@@ -75,6 +76,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     void SetCrystalType(Int_t value, Int_t crystal) { fCrystal_type->AddAt(value, crystal - 1); }
     void SetApdNumber(Int_t value, Int_t crystal) { fApd_number->AddAt(value, crystal - 1); }
     void SetVoltage(Float_t value, Int_t crystal) { fVoltage->AddAt(value, crystal - 1); }
+    void SetFebexPC(Int_t value, Int_t crystal) { fFebex_pc->AddAt(value, crystal - 1); }
     void SetFebexSlot(Int_t value, Int_t crystal) { fFebex_slot->AddAt(value, crystal - 1); }
     void SetFebexMod(Int_t value, Int_t crystal) { fFebex_mod->AddAt(value, crystal - 1); }
     void SetFebexChannel(Int_t value, Int_t crystal) { fFebex_channel->AddAt(value, crystal - 1); }
@@ -93,6 +95,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     TArrayI* fCrystal_type;  // crystal type (crystal engineering model)
     TArrayI* fApd_number;    // APD number attached to the crystal
     TArrayF* fVoltage;       // nominal voltage for gain=50 (volts)
+    TArrayI* fFebex_pc;      // FEBEX pc from 0 to 1
     TArrayI* fFebex_slot;    // FEBEX spf from 0 to 3
     TArrayI* fFebex_mod;     // FEBEX module from 0 to 15 (0 to f)
     TArrayI* fFebex_channel; // FEBEX channel from 0 to 15

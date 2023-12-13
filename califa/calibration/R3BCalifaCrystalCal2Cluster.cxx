@@ -158,7 +158,7 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     , fWindowAlg("Round")
     , fOnline(kFALSE)
     , fRand(0)
-    , fTotalCrystals(2432)
+    , fTotalCrystals(2544)
     , fRandFile("")
 {
 }

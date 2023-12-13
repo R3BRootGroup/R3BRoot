@@ -64,7 +64,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fTrigger(-1)
     , fTpat1(-1)
     , fTpat2(-1)
-    , fNbCalifaCrystals(4864)
+    , fNbCalifaCrystals(5088)
     , fNumSides(Nb_Sides)
     , fNumRings(Nb_Rings)
     , fNumPreamps(Nb_Preamps)
