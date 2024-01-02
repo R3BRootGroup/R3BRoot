@@ -11,32 +11,32 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BEVENTHEADER_h
-#define R3BEVENTHEADER_h 1
+#pragma once
 
-#include "FairEventHeader.h"
+#include <FairEventHeader.h>
 #include <stdexcept>
 
 class R3BEventHeader : public FairEventHeader
 {
   public:
-    R3BEventHeader();
-    virtual ~R3BEventHeader();
+    R3BEventHeader() = default;
 
-    void SetExpId(const Int_t expid) { fExpId = expid; }
-    void SetEventno(const uint64_t eventno) { fEventno = eventno; }
-    void SetTrigger(const Int_t trigger) { fTrigger = trigger; }
-    void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
-    void SetTpat(const Int_t tpat) { fTpat = tpat; }
-    void SetTStart(const Double_t tStart) { fTStart = tStart; }
-    void SetTprev(const Double_t tPrev) { fTprev = tPrev; }
-    void SetTnext(const Double_t tNext) { fTnext = tNext; }
+    ~R3BEventHeader() override = default;
 
-    [[nodiscard]] Int_t GetExpId() const { return fExpId; }
-    [[nodiscard]] uint64_t GetEventno() const { return fEventno; }
-    [[nodiscard]] Int_t GetTrigger() const { return fTrigger; }
-    [[nodiscard]] uint64_t GetTimeStamp() const { return fTimeStamp; }
-    [[nodiscard]] Int_t GetTpat() const { return fTpat; }
+    inline void SetExpId(const int expid) { fExpId = expid; }
+    inline void SetEventno(const uint64_t eventno) { fEventno = eventno; }
+    inline void SetTrigger(const int trigger) { fTrigger = trigger; }
+    inline void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
+    inline void SetTpat(const int tpat) { fTpat = tpat; }
+    inline void SetTStart(const double tStart) { fTStart = tStart; }
+    inline void SetTprev(const double tPrev) { fTprev = tPrev; }
+    inline void SetTnext(const double tNext) { fTnext = tNext; }
+
+    [[nodiscard]] inline int GetExpId() const { return fExpId; }
+    [[nodiscard]] inline uint64_t GetEventno() const { return fEventno; }
+    [[nodiscard]] inline int GetTrigger() const { return fTrigger; }
+    [[nodiscard]] inline uint64_t GetTimeStamp() const { return fTimeStamp; }
+    [[nodiscard]] inline int GetTpat() const { return fTpat; }
 
     static constexpr uint32_t MakeTpatBit(uint8_t trigNo)
     {
@@ -45,25 +45,24 @@ class R3BEventHeader : public FairEventHeader
 
     bool HasTpatTrig(int trigNo) const { return fTpat & MakeTpatBit(trigNo); }
 
-    [[nodiscard]] Double_t GetTStart() const { return fTStart; }
+    [[nodiscard]] inline double GetTStart() const { return fTStart; }
 
-    [[nodiscard]] Double_t GetTprev() const { return fTprev; }
+    [[nodiscard]] inline double GetTprev() const { return fTprev; }
 
-    [[nodiscard]] Double_t GetTnext() const { return fTnext; }
+    [[nodiscard]] inline double GetTnext() const { return fTnext; }
 
-    virtual void Register(Bool_t Persistance = kTRUE);
+    void Register(bool Persistance = true) override{};
 
   private:
-    Int_t fExpId;
-    uint64_t fEventno;
-    Int_t fTrigger;
-    uint64_t fTimeStamp;
-    Int_t fTpat;
-    Double_t fTStart;
-    Double_t fTprev;
-    Double_t fTnext;
+    int fExpId = 0;
+    uint64_t fEventno = 0;
+    int fTrigger = 0;
+    uint64_t fTimeStamp = 0;
+    int fTpat = 0;
+    double fTStart = 0;
+    double fTprev = 0;
+    double fTnext = 0;
 
-    ClassDef(R3BEventHeader, 9)
+  public:
+    ClassDefOverride(R3BEventHeader, 9)
 };
-
-#endif /* R3BEVENTHEADER_h */

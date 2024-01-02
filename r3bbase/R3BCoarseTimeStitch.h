@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCoarseTimeStitch_H
-#define R3BCoarseTimeStitch_H 1
+#pragma once
 
-#include "TObject.h"
-#include "TString.h"
 #include <Rtypes.h>
+#include <TObject.h>
+#include <TString.h>
 
 class R3BCoarseTimeStitch : public TObject
 {
@@ -25,28 +24,27 @@ class R3BCoarseTimeStitch : public TObject
     R3BCoarseTimeStitch();
 
     // Destructor
-    virtual ~R3BCoarseTimeStitch() {}
+    ~R3BCoarseTimeStitch() override = default;
 
-    Float_t GetRange1() const { return fRange1; }
-    Float_t GetRange2() const { return fRange2; }
-    Double_t GetTime(Double_t, TString name1 = "tamex", TString name2 = "tamex");
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline double GetRange1() const { return fRange1; }
+    [[nodiscard]] inline double GetRange2() const { return fRange2; }
+    [[nodiscard]] double GetTime(double, TString const& name1 = "tamex", TString const& name2 = "tamex");
 
-    void SetRange1(Float_t range) { fRange1 = range; }
-    void SetRange2(Float_t range) { fRange2 = range; }
+    inline void SetRange1(Float_t range) { fRange1 = range; }
+    inline void SetRange2(Float_t range) { fRange2 = range; }
 
-    void SetClockTDC150() { fRangeClockTDC = fRangeClockTDC150; }
+    inline void SetClockTDC150() { fRangeClockTDC = fRangeClockTDC150; }
 
   private:
-    Double_t fRange1;
-    Double_t fRange2;
-    Double_t fRangeTamex;
-    Double_t fRangeVftx;
-    Double_t fRangeTrb;
-    Double_t fRangeClockTDC;
-    Double_t fRangeClockTDC150;
+    double fRange1;
+    double fRange2;
+    double fRangeTamex;
+    double fRangeVftx;
+    double fRangeTrb;
+    double fRangeClockTDC;
+    double fRangeClockTDC150;
 
   public:
-    ClassDef(R3BCoarseTimeStitch, 1)
+    ClassDefOverride(R3BCoarseTimeStitch, 1)
 };
-
-#endif

@@ -13,7 +13,7 @@
 
 #include "R3BDetector.h"
 #include "R3BLogger.h"
-#include "TGeoManager.h"
+#include <TGeoManager.h>
 
 R3BDetector::R3BDetector()
     : FairDetector()
@@ -69,4 +69,4 @@ void R3BDetector::ConstructRootGeometry(TGeoMatrix*)
     }
 }
 
-ClassImp(R3BDetector);
+ClassImp(R3BDetector)
