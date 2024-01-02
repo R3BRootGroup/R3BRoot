@@ -14,7 +14,7 @@
 #include "R3BCoarseTimeStitch.h"
 #include "R3BLogger.h"
 
-#include "TMath.h"
+#include <TMath.h>
 #define IS_NAN(x) TMath::IsNaN(x)
 
 // Standard constructur
@@ -29,7 +29,7 @@ R3BCoarseTimeStitch::R3BCoarseTimeStitch()
 {
 }
 
-Double_t R3BCoarseTimeStitch::GetTime(Double_t time, TString name1, TString name2)
+double R3BCoarseTimeStitch::GetTime(double time, TString const& name1, TString const& name2)
 {
     if (name1 == "tamex")
     {
@@ -73,12 +73,12 @@ Double_t R3BCoarseTimeStitch::GetTime(Double_t time, TString name1, TString name
         R3BLOG(fatal, "Module " << name2 << " does not exist.");
     }
 
-    Double_t c1 = TMath::Min(fRange1, fRange2);
-    Double_t c2 = TMath::Max(fRange1, fRange2);
+    const double const1 = TMath::Min(fRange1, fRange2);
+    const double const2 = TMath::Max(fRange1, fRange2);
 
     R3BLOG(debug,
            "Time: " << time << " , range1(" << name1 << "): " << fRange1 << " , range2(" << name1 << "): " << fRange2);
-    return fmod(time + c2 + c1 / 2., c1) - c1 / 2.;
+    return fmod(time + const2 + const1 / 2., const1) - const1 / 2.;
 }
 
-ClassImp(R3BCoarseTimeStitch);
+ClassImp(R3BCoarseTimeStitch)

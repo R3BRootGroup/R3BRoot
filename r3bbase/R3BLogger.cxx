@@ -18,4 +18,4 @@
 
 #include "R3BLogger.h"
 
-ClassImp(R3BLogger);
+ClassImp(R3BLogger)

@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDETECTOR_H
-#define R3BDETECTOR_H
+#pragma once
 
-#include "FairDetector.h"
-#include "TGeoMatrix.h"
-#include "TString.h"
+#include <FairDetector.h>
+#include <TGeoMatrix.h>
+#include <TString.h>
 
 class R3BDetector : public FairDetector
 {
@@ -37,8 +36,8 @@ class R3BDetector : public FairDetector
                 const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Construct geometry from root files */
-    virtual void ConstructGeometry() override;
-    virtual void ConstructRootGeometry(TGeoMatrix* p = nullptr) override;
+    void ConstructGeometry() override;
+    void ConstructRootGeometry(TGeoMatrix* geo = nullptr) override;
 
     /** Method to setup the position of the detector-origin. */
     virtual void SetPosition(const TGeoTranslation& trans) { fCombiTrans.SetTranslation(trans); }
@@ -57,8 +56,6 @@ class R3BDetector : public FairDetector
     TGeoCombiTrans fCombiTrans;
     Double_t fCutE;
 
-    // ClassDef(R3BDetector, 3)
+  public:
     ClassDefOverride(R3BDetector, 3)
 };
-
-#endif // R3BDETECTOR_H

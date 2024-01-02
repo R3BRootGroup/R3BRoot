@@ -16,8 +16,7 @@
 // -----             Created 15/12/21 by J.L. Rodriguez-Sanchez     -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BLogger_H
-#define R3BLogger_H 1
+#pragma once
 
 #include <cstdlib>
 #include <fstream>
@@ -25,7 +24,7 @@
 #include <sstream>
 #include <string>
 
-#include "FairLogger.h"
+#include <FairLogger.h>
 
 // NOLINTBEGIN
 class R3BLogger;
@@ -63,5 +62,3 @@ class R3BLogger : public FairLogger
     ClassDefOverride(R3BLogger, 0)
 };
 // NOLINTEND
-
-#endif // R3BLogger_H

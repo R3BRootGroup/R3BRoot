@@ -13,21 +13,4 @@
 
 #include "R3BEventHeader.h"
 
-R3BEventHeader::R3BEventHeader()
-    : FairEventHeader()
-    , fExpId(0)
-    , fEventno(0)
-    , fTrigger(0)
-    , fTimeStamp(0)
-    , fTpat(0)
-    , fTStart(0)
-    , fTprev(0)
-    , fTnext(0)
-{
-}
-
-R3BEventHeader::~R3BEventHeader() {}
-
-void R3BEventHeader::Register(Bool_t Persistence) {}
-
-ClassImp(R3BEventHeader);
+ClassImp(R3BEventHeader)
