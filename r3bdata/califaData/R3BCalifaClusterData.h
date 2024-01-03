@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,77 +11,76 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFACLUSTERDATA_H
-#define R3BCALIFACLUSTERDATA_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-#include "FairMultiLinkedData.h"
-#include "R3BCalifaCrystalCalData.h"
-
-class R3BCalifaClusterData : public FairMultiLinkedData
+class R3BCalifaClusterData : public TObject
 {
-
   public:
-    /** Default constructor **/
-    R3BCalifaClusterData();
+    // Default constructor
+    R3BCalifaClusterData() = default;
 
-    /** Constructor with arguments
-     *@param fEnergy				Total energy deposited
-     *@param fTheta					Reconstructed theta
-     *@param fPhi					Reconstructed phi
-     **/
-    R3BCalifaClusterData(std::vector<Int_t> crystalList,
-                         Double_t ene,
-                         Double_t nf,
-                         Double_t ns,
-                         Double_t theta,
-                         Double_t phi,
-                         ULong64_t time,
-                         Int_t clusterType);
+    // Constructor with arguments  (explicit)
+    explicit R3BCalifaClusterData(std::vector<uint16_t> crystalList,
+                                  double ene,
+                                  double nf,
+                                  double ns,
+                                  double theta,
+                                  double phi,
+                                  ULong64_t time,
+                                  uint8_t clusterType);
 
-    /** Copy constructor **/
+    // Copy constructor
     R3BCalifaClusterData(const R3BCalifaClusterData&);
 
     R3BCalifaClusterData& operator=(const R3BCalifaClusterData&) { return *this; }
 
-    /** Destructor **/
-    virtual ~R3BCalifaClusterData() {}
+    // Destructor
+    virtual ~R3BCalifaClusterData() = default;
 
-    /** Accessors **/
-    Double_t GetEnergy() const { return fEnergy; }
-    Double_t GetNf() const { return fNf; }
-    Double_t GetNs() const { return fNs; }
-    Double_t GetTheta() const { return fTheta; }
-    Double_t GetPhi() const { return fPhi; }
-    ULong64_t GetTime() const { return fTime; }
-    uint32_t GetClusterType() const { return fClusterType; }
-    Int_t GetNbOfCrystalHits() const { return fCrystalList.size(); }
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const std::vector<uint16_t> GetCrystalList() const { return fCrystalList; }
+    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const double& GetNf() const { return fNf; }
+    [[nodiscard]] inline const double& GetNs() const { return fNs; }
+    [[nodiscard]] inline const double& GetTheta() const { return fTheta; }
+    [[nodiscard]] inline const double& GetPhi() const { return fPhi; }
+    [[nodiscard]] inline const ULong64_t& GetTime() const { return fTime; }
+    [[nodiscard]] inline const uint8_t& GetClusterType() const { return fClusterType; }
+    [[nodiscard]] inline const int GetNbOfCrystalHits() const { return fCrystalList.size(); }
+    [[nodiscard]] inline const int GetMotherCrystal() const { return fCrystalList.at(0); }
 
-    std::vector<Int_t> GetCrystalList() const { return fCrystalList; }
-    Int_t GetMotherCrystal() const { return fCrystalList.at(0); }
+    // Modifiers
+    inline void SetCrystalList(std::vector<uint16_t> list) { fCrystalList = std::move(list); }
+    inline void SetEnergy(double ene) { fEnergy = ene; }
+    inline void SetNf(double nf) { fNf = nf; }
+    inline void SetNs(double ns) { fNs = ns; }
+    inline void SetTheta(double theta) { fTheta = theta; }
+    inline void SetPhi(double phi) { fPhi = phi; }
+    inline void SetTime(ULong64_t time) { fTime = time; }
+    inline void SetClusterType(uint8_t id) { fClusterType = id; }
 
-    /** Modifiers **/
-    void SetEnergy(Double_t ene) { fEnergy = ene; }
-    void SetNf(Double_t nf) { fNf = nf; }
-    void SetNs(Double_t ns) { fNs = ns; }
-    void SetTheta(Double_t theta) { fTheta = theta; }
-    void SetPhi(Double_t phi) { fPhi = phi; }
-    void SetTime(ULong64_t time) { fTime = time; }
-    void SetClusterType(uint32_t id) { fClusterType = id; }
-    void SetCrystalList(std::vector<Int_t> list) { fCrystalList = std::move(list); }
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
-    Double_t fEnergy; // total energy deposited
-    Double_t fNf;     // total Nf deposited
-    Double_t fNs;     // total Ns deposited
-    Double_t fTheta;  // reconstructed theta
-    Double_t fPhi;    // reconstructed phi
-    ULong64_t fTime;  // WR time stamp
-    uint32_t fClusterType;
-    std::vector<Int_t> fCrystalList; // List with crystals inside the cluster. First one is the mother crystal
+    std::vector<uint16_t> fCrystalList; // List with crystals inside the cluster. First one is the mother crystal
+    double fEnergy = 0;                 // total energy deposited
+    double fNf = 0;                     // total Nf deposited
+    double fNs = 0;                     // total Ns deposited
+    double fTheta = 0;                  // reconstructed theta
+    double fPhi = 0;                    // reconstructed phi
+    ULong64_t fTime = 0;                // WR time stamp
+    uint8_t fClusterType = 0;           // Cluster type: 0 proton, 1 gamma, 2 saturation
 
-    ClassDef(R3BCalifaClusterData, 3)
+  public:
+    ClassDefOverride(R3BCalifaClusterData, 4)
 };
 
-#endif
+// Operator overloading for printing R3BCalifaClusterData
+std::ostream& operator<<(std::ostream& os, const R3BCalifaClusterData& data);

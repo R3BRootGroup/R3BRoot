@@ -180,8 +180,8 @@ void R3BCalifaCrystalCal2TotCalPar::Exec(Option_t* opt)
         // Fill histograms
         if (CalHit[i]->GetEnergy() > fThreshold)
             energy_vs_tot_crystal[crystalId - 1]->SetPoint(
-                energy_vs_tot_crystal[crystalId - 1]->GetN(), CalHit[i]->GetToT_Energy(), CalHit[i]->GetEnergy());
-        LOG(debug) << "Tot = " << CalHit[i]->GetToT_Energy();
+                energy_vs_tot_crystal[crystalId - 1]->GetN(), CalHit[i]->GetToTEnergy(), CalHit[i]->GetEnergy());
+        LOG(debug) << "Tot = " << CalHit[i]->GetToTEnergy();
         LOG(debug) << "Energy = " << CalHit[i]->GetEnergy();
     }
 

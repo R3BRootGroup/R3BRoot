@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,18 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAMAPPEDDATA_H
-#define R3BCALIFAMAPPEDDATA_H
+#pragma once
 
-#include "TObject.h"
-#include <stdint.h>
+#include <TObject.h>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
 class R3BCalifaMappedData : public TObject
 {
-
   public:
     // Default Constructor
-    R3BCalifaMappedData();
+    R3BCalifaMappedData() = default;
 
     /** Standard Constructor
      *@param crystalId   Crystal unique identifier
@@ -36,31 +36,35 @@ class R3BCalifaMappedData : public TObject
      *@param dc          Discard bits
      *@param tot         Time-over-threshold
      **/
-    R3BCalifaMappedData(UShort_t crystalId,
-                        int16_t energy,
-                        int16_t nf,
-                        int16_t ns,
-                        uint64_t febextime,
-                        uint64_t wrts,
-                        uint32_t ov,
-                        uint16_t pu,
-                        uint16_t dc,
-                        uint16_t tot);
+    explicit R3BCalifaMappedData(UShort_t crystalId,
+                                 int16_t energy,
+                                 int16_t nf,
+                                 int16_t ns,
+                                 uint64_t febextime,
+                                 uint64_t wrts,
+                                 uint32_t ov,
+                                 uint16_t pu,
+                                 uint16_t dc,
+                                 uint16_t tot);
 
     // Destructor
-    virtual ~R3BCalifaMappedData() {}
+    virtual ~R3BCalifaMappedData() = default;
 
-    // Getters
-    inline const UShort_t& GetCrystalId() const { return fCrystalId; }
-    inline const int16_t& GetEnergy() const { return fEnergy; }
-    inline const int16_t& GetNf() const { return fNf; }
-    inline const int16_t& GetNs() const { return fNs; }
-    inline const uint64_t& GetFebexTime() const { return fFebexTime; }
-    inline const uint64_t& GetWrts() const { return fWrts; }
-    inline const uint32_t& GetOverFlow() const { return fOverFlow; }
-    inline const uint16_t& GetPileup() const { return fPileup; }
-    inline const uint16_t& GetDiscard() const { return fDiscard; }
-    inline const uint16_t& GetTot() const { return fTot; }
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const UShort_t& GetCrystalId() const { return fCrystalId; }
+    [[nodiscard]] inline const int16_t& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const int16_t& GetNf() const { return fNf; }
+    [[nodiscard]] inline const int16_t& GetNs() const { return fNs; }
+    [[nodiscard]] inline const uint64_t& GetFebexTime() const { return fFebexTime; }
+    [[nodiscard]] inline const uint64_t& GetWrts() const { return fWrts; }
+    [[nodiscard]] inline const uint32_t& GetOverFlow() const { return fOverFlow; }
+    [[nodiscard]] inline const uint16_t& GetPileup() const { return fPileup; }
+    [[nodiscard]] inline const uint16_t& GetDiscard() const { return fDiscard; }
+    [[nodiscard]] inline const uint16_t& GetTot() const { return fTot; }
+
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
     UShort_t fCrystalId; // Crystal unique identifier
@@ -75,7 +79,8 @@ class R3BCalifaMappedData : public TObject
     uint16_t fTot;       // Time-over-treshold
 
   public:
-    ClassDef(R3BCalifaMappedData, 4)
+    ClassDefOverride(R3BCalifaMappedData, 4)
 };
 
-#endif
+// Operator overloading for printing R3BCalifaMappedData
+std::ostream& operator<<(std::ostream& os, const R3BCalifaMappedData& data);
