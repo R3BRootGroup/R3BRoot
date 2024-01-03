@@ -11,11 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAMAPPED2CRYSTALCALPAR_H
-#define R3BCALIFAMAPPED2CRYSTALCALPAR_H
+#pragma once
 
-#include "FairTask.h"
-#include "TH1F.h"
+#ifndef R3BCALIFAMAPPED2CRYSTALCALPAR_H
+#define R3BCALIFAMAPPED2CRYSTALCALPAR_H 1
+
+#include <FairTask.h>
+#include <TArrayF.h>
+#include <TH1F.h>
 
 class TClonesArray;
 class R3BCalifaMappingPar;
