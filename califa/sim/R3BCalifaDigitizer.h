@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFADIGITIZER_H
-#define R3BCALIFADIGITIZER_H
+#pragma once
 
-#include "FairTask.h"
-#include "R3BCalifa.h"
-#include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaCrystalPars4Sim.h"
-#include "R3BCalifaPoint.h"
-#include "Rtypes.h"
+#ifndef R3BCALIFADIGITIZER_H
+#define R3BCALIFADIGITIZER_H 1
+
+#include <FairTask.h>
+#include <R3BCalifa.h>
+#include <R3BCalifaCrystalCalData.h>
+#include <R3BCalifaCrystalPars4Sim.h>
+#include <R3BCalifaPoint.h>
+#include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <string>
 
 class TClonesArray;
 
@@ -29,19 +33,15 @@ class R3BCalifaDigitizer : public FairTask
     /** Standard contructor **/
     R3BCalifaDigitizer();
 
-    /** Destructor **/
-    virtual ~R3BCalifaDigitizer();
+    ~R3BCalifaDigitizer();
 
     /** Virtual method Init **/
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* opt);
+    void Exec(Option_t*) override;
 
-    /** Virtual method Reset **/
-    virtual void Reset();
-
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /** Public method SetRealConfig
      **
@@ -50,13 +50,13 @@ class R3BCalifaDigitizer : public FairTask
      *@param isRealSet  Bool parameter used to set the experimental Resolution and
      *Thresholds
      **/
-    void SetRealConfig(Bool_t isRealSet);
+    void SetRealConfig(bool isRealSet = false);
 
     /** Public method SetExpEnergyRes
      **
      ** Sets the experimental energy resolution of the CsI crystals
      **/
-    void SetExpEnergyRes(Double_t crystalRes);
+    void SetExpEnergyRes(double crystalRes);
 
     /** Public method SetComponentRes
      **
@@ -64,7 +64,7 @@ class R3BCalifaDigitizer : public FairTask
      *@param componentRes  Double parameter used to set the experimental
      *resolution in MeV
      **/
-    void SetComponentRes(Double_t componentRes);
+    void SetComponentRes(double componentRes);
 
     /** Public method SetDetectionThreshold
      **
@@ -72,30 +72,36 @@ class R3BCalifaDigitizer : public FairTask
      *CrystalCal
      *@param thresholdEne  Double parameter used to set the threshold (in GeV)
      **/
-    void SetDetectionThreshold(Double_t thresholdEne);
+    void SetDetectionThreshold(double thresholdEne);
 
     /** Public method SetNonUniformity
      **
      ** Defines the fNonUniformity parameter in % deviation from the central value
      *@param nonU  Double parameter setting the maximum non-uniformity allowed
      **/
-    void SetNonUniformity(Double_t nonU);
+    void SetNonUniformity(double nonU);
 
   private:
     void SetParameter();
 
-    TClonesArray* fCalifaPointDataCA;  //!  The crystal hit collection
-    TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
+    // Input array
+    TClonesArray* fCalifaPointDataCA = nullptr;
 
-    Double_t fNonUniformity; // Experimental non-uniformity parameter
-    Double_t fResolution;    // Experimental resolution @ 1 MeV
-    Double_t fComponentRes;  // Experimental resolution for Nf and Ns
-    Double_t fThreshold;     // Minimum energy requested to create a Cal
-    Bool_t fRealConfig;      // Real Configuration in CALIFA
-    Int_t fNumberOfParams = 0;
-    Int_t fNumCrystals = 0;
+    // Output array to new data level
+    // R3B::OutputConnector<std::vector<R3BCalifaCrystalCalData>> output_data{ "CalifaCrystalCalData" };
 
-    R3BCalifaCrystalPars4Sim* fSim_Par; // Parameter Container for a Realistic Simulation
+    //  Array to store output data
+    TClonesArray* fCalifaCryCalDataCA = nullptr;
+
+    double fNonUniformity = 1.; // Experimental non-uniformity parameter
+    double fResolution = 0.;    // Experimental resolution @ 1 MeV
+    double fComponentRes = 0.;  // Experimental resolution for Nf and Ns
+    double fThreshold = 0.;     // Minimum energy requested to create a Cal
+    bool fRealConfig = false;   // Real Configuration in CALIFA
+    int fNumberOfParams = 0;
+    int fNumCrystals = 0;
+
+    R3BCalifaCrystalPars4Sim* fSim_Par = nullptr; // Parameter Container for a Realistic Simulation
 
     /** Private method NUSmearing
      **
@@ -103,7 +109,7 @@ class R3BCalifaDigitizer : public FairTask
      ** Very simple scheme where the NU is introduced as a flat random
      ** distribution with limits fNonUniformity (%) of the energy value.
      **/
-    Double_t NUSmearing(Double_t inputEnergy);
+    double NUSmearing(double inputEnergy);
 
     /** Private method ExpResSmearing
      **
@@ -112,29 +118,26 @@ class R3BCalifaDigitizer : public FairTask
      ** is introduced as a gaus random distribution with a width given by the
      ** parameter fCrystalResolution(in % @ MeV). Scales according to 1/sqrt(E)
      **/
-    Double_t ExpResSmearing(Double_t inputEnergy);
+    double ExpResSmearing(double inputEnergy);
 
     /** Private method CompSmearing
      **
      ** Smears the CsI(Tl) components Ns and Nf
      **/
-    Double_t CompSmearing(Double_t inputComponent);
+    double CompSmearing(double inputComponent);
 
-    /** Private method AddCrystalCal
-     **
-     ** Adds a CalifaCrystalCal data
+    /**
+     ** Private method AddCrystalCal
      **/
-    R3BCalifaCrystalCalData* AddCrystalCal(Int_t ident,
-                                           Double_t energy,
-                                           Double_t Nf,
-                                           Double_t Ns,
-                                           ULong64_t time,
-                                           Double_t tot_energy = 0.);
-
-    inline void ResetParameters(){};
+    R3BCalifaCrystalCalData* AddCrystalCal(int crysid,
+                                           double energy,
+                                           double Nf,
+                                           double Ns,
+                                           uint64_t time,
+                                           double tot_energy = 0.);
 
   public:
-    ClassDef(R3BCalifaDigitizer, 1);
+    ClassDefOverride(R3BCalifaDigitizer, 1);
 };
 
 #endif /* R3BCALIFADIGITIZER_H */

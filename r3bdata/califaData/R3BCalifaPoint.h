@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -10,14 +10,14 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+#pragma once
 
 #ifndef R3BCALIFAPOINT_H
-#define R3BCALIFAPOINT_H
+#define R3BCALIFAPOINT_H 1
 
-#include "TObject.h"
-#include "TVector3.h"
-
-#include "FairMCPoint.h"
+#include <FairMCPoint.h>
+#include <TObject.h>
+#include <TVector3.h>
 
 class R3BCalifaPoint : public FairMCPoint
 {
@@ -28,27 +28,23 @@ class R3BCalifaPoint : public FairMCPoint
     /** Constructor with arguments
      *@param trackID  Index of MCTrack
      *@param detID    Detector ID
+     *@param trackPID Particle PID
      *@param ident    Crystal ID
      *@param posIn    Ccoordinates at entrance to active volume [cm]
      *@param momIn    Momentum of track at entrance [GeV]
      *@param tof      Time since event start [ns]
      *@param length   Track length since creation [cm]
      *@param eLoss    Energy deposit [GeV]
-     *@param Nf       Fast component of CsI(Tl) light [a.u.]
-     *@param Ns       Slow component of CsI(Tl) light [a.u.]
-     *@param EventId  Event Identifier
      **/
-    R3BCalifaPoint(Int_t trackID,
-                   Int_t detID,
-                   Int_t ident,
+    R3BCalifaPoint(int trackID,
+                   int detID,
+                   int trackPID,
+                   int ident,
                    TVector3 posIn,
                    TVector3 momIn,
-                   Double_t tof,
-                   Double_t length,
-                   Double_t eLoss,
-                   Double_t Nf,
-                   Double_t Ns,
-                   UInt_t EventId);
+                   double tof,
+                   double length,
+                   double eLoss);
 
     /** Copy constructor **/
     R3BCalifaPoint(const R3BCalifaPoint&);
@@ -59,17 +55,16 @@ class R3BCalifaPoint : public FairMCPoint
     virtual ~R3BCalifaPoint();
 
     /** Accessors **/
-    Int_t GetCrystalId() const { return fCrystalId; }
-    Double_t GetXIn() const { return fX; }
-    Double_t GetYIn() const { return fY; }
-    Double_t GetZIn() const { return fZ; }
-    Double_t GetNf() const { return fNf; }
-    Double_t GetNs() const { return fNs; }
+    int GetCrystalId() const { return fCrystalId; }
+    int GetTrackPid() const { return fTrackPID; }
+    double GetXIn() const { return fX; }
+    double GetYIn() const { return fY; }
+    double GetZIn() const { return fZ; }
     void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
 
   protected:
-    Int_t fCrystalId;    ///< crystal index
-    Double32_t fNf, fNs; ///< nf, ns components
+    int fCrystalId; ///< crystal index
+    int fTrackPID;
 
     ClassDef(R3BCalifaPoint, 2)
 };

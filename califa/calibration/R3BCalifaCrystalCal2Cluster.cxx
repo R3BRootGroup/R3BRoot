@@ -147,9 +147,8 @@ R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
     , fCrystalCalData(NULL)
     , fCalifaClusterData(NULL)
     , fGeometryVersion(2021)
-    , fCrystalThreshold(100.)
-    , fGammaClusterThreshold(1000)
-    , fProtonClusterThreshold(50000)
+    , fCrystalThreshold(0)
+    , fGammaClusterThreshold(0)
     , fRoundWindow(0.25)
     , fSimulation(kFALSE)
     , fCalifaGeo(NULL)
@@ -173,9 +172,10 @@ R3BCalifaCrystalCal2Cluster::~R3BCalifaCrystalCal2Cluster()
 void R3BCalifaCrystalCal2Cluster::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
-    fCalifaGeoPar = (R3BTGeoPar*)rtdb->getContainer("CalifaGeoPar");
-    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    fCalifaGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("CalifaGeoPar"));
+    fTargetGeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("TargetGeoPar"));
 
     if (!fCalifaGeoPar)
     {
@@ -213,15 +213,15 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
 {
     R3BLOG(info, "");
     assert(!fCalifaClusterData); // in case someone calls Init() twice.
-    SetParContainers();
+    SetParContainers();          // TODO: This should not be here!!!
 
-    FairRootManager* ioManager = FairRootManager::Instance();
-    R3BLOG_IF(fatal, !ioManager, "FairRootManager not found");
+    auto* rootman = FairRootManager::Instance();
+    R3BLOG_IF(fatal, !rootman, "FairRootManager not found");
 
-    fCrystalCalData = (TClonesArray*)ioManager->GetObject("CalifaCrystalCalData");
+    fCrystalCalData = dynamic_cast<TClonesArray*>(rootman->GetObject("CalifaCrystalCalData"));
 
     fCalifaClusterData = new TClonesArray("R3BCalifaClusterData");
-    ioManager->Register("CalifaClusterData", "CALIFA Cluster", fCalifaClusterData, !fOnline);
+    rootman->Register("CalifaClusterData", "CALIFA Cluster", fCalifaClusterData, !fOnline);
 
     fCalifaGeo = R3BCalifaGeometry::Instance();
 
@@ -260,7 +260,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
 {
     Reset();
 
-    const int numCrystalHits = fCrystalCalData->GetEntries();
+    const int numCrystalHits = fCrystalCalData->GetEntriesFast();
 
     R3BLOG(debug1, "Crystal hits at start:" << numCrystalHits);
 

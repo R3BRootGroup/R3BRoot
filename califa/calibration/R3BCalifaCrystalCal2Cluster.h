@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -10,6 +10,8 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+
+#pragma once
 
 #ifndef R3BCALIFACRYSTALCAL2CLUSTER_H
 #define R3BCALIFACRYSTALCAL2CLUSTER_H 1
@@ -96,10 +98,11 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     Int_t fGeometryVersion; // Selecting the geometry of the CALIFA calorimeter
     Int_t fTotalCrystals;
 
-    Double_t fCrystalThreshold;       // Minimum energy requested in a crystal to be included in a cluster
-    Double_t fProtonClusterThreshold; // Minimum energy in a crystal to be considered as a proton cluster candidate
-    Double_t fGammaClusterThreshold;  // Minimum energy in a crystal to be considered as a gamma cluster candidate
-    Double_t fProtonThreshold;        // Defines the cut energy between proton and gamma readout
+    Double_t fCrystalThreshold; // Minimum energy requested in a crystal to be included in a cluster
+    Double_t fProtonClusterThreshold =
+        50.;                         // Minimum energy in a crystal to be considered as a proton cluster candidate
+    Double_t fGammaClusterThreshold; // Minimum energy in a crystal to be considered as a gamma cluster candidate
+    Double_t fProtonThreshold;       // Defines the cut energy between proton and gamma readout
 
     Double_t fRoundWindow; // Cluster window
     Bool_t fSimulation;    // Simulation flag

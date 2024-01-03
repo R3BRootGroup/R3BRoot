@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,41 +11,36 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BCalifaPoint.h"
+#include <R3BCalifaPoint.h>
 
 #include <iostream>
 
 R3BCalifaPoint::R3BCalifaPoint()
     : FairMCPoint()
-    , fCrystalId(-1)
-    , fNf(0.)
-    , fNs(0.)
+    , fCrystalId(0)
+    , fTrackPID(0)
 {
 }
 
-R3BCalifaPoint::R3BCalifaPoint(Int_t trackID,
-                               Int_t detID,
-                               Int_t ident,
+R3BCalifaPoint::R3BCalifaPoint(int trackID,
+                               int detID,
+                               int trackPID,
+                               int ident,
                                TVector3 posIn,
                                TVector3 momIn,
-                               Double_t tof,
-                               Double_t length,
-                               Double_t eLoss,
-                               Double_t Nf,
-                               Double_t Ns,
-                               UInt_t EventId)
-    : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss, EventId)
+                               double tof,
+                               double length,
+                               double eLoss)
+    : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss)
     , fCrystalId(ident)
-    , fNf(Nf)
-    , fNs(Ns)
+    , fTrackPID(trackPID)
 {
 }
 
 R3BCalifaPoint::R3BCalifaPoint(const R3BCalifaPoint& right)
     : FairMCPoint(right)
     , fCrystalId(right.fCrystalId)
-    , fNf(right.fNf)
-    , fNs(right.fNs)
+    , fTrackPID(right.fTrackPID)
 {
 }
 

@@ -60,16 +60,16 @@ void testCalifaSimulation(const int nbevents = 100)
     run->AddModule(cave);
 
     // Geometry: Califa
-    auto calsim = new R3BCalifa("califa_full.geo.root", {0., 0., 0.});
+    auto calsim = new R3BCalifa("califa_full.geo.root", { 0., 0., 0. });
     calsim->SelectGeometryVersion(0);
     run->AddModule(calsim);
 
     // Digitizer: Califa
     auto califaDig = new R3BCalifaDigitizer();
     run->AddTask(califaDig);
-    
+
     auto califaCal2Cluster = new R3BCalifaCrystalCal2Cluster();
-    califaCal2Cluster->SetCrystalThreshold(0.0001); // 100 keV
+    califaCal2Cluster->SetCrystalThreshold(0.1); // 100 keV
     run->AddTask(califaCal2Cluster);
 
     // Init
