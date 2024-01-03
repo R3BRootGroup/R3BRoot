@@ -11,14 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#pragma once
+
 #ifndef R3BCALIFAGEOMETRY_H
 #define R3BCALIFAGEOMETRY_H 1
 
-#include "Rtypes.h"
-#include "TObject.h"
+#include <Rtypes.h>
 #include <TFile.h>
+#include <TObject.h>
+#include <TVector3.h>
+#include <iostream>
+#include <sstream>
 
-class TVector3;
 class TGeoNavigator;
 
 /**
@@ -30,20 +34,22 @@ class R3BCalifaGeometry : public TObject
     /** Default constructor */
     R3BCalifaGeometry();
 
-    /** Standard constructor.
-     *@param version geometry version
-     */
-    R3BCalifaGeometry(Int_t version);
-
     /** Destructor **/
-    virtual ~R3BCalifaGeometry();
+    ~R3BCalifaGeometry();
+
+    // Initialization with a Root version
+    bool Init(int fGeo);
+
+    // Setter and getter for a CALIFA reference point, by default (0,0,0)
+    void SetReferencePoint(const TVector3 refpoint) { fRefPoint = refpoint; }
+    const TVector3& SetReferencePoint() { return fRefPoint; }
 
     /**
      * Gets position in polar coordinates of crystal with given ID.
      * On error, the x,y and z component of the TVector3 are set to NAN.
      * @param iD crystal ID (depending on geometry version)
      */
-    const TVector3& GetAngles(Int_t iD);
+    const TVector3& GetAngles(int iD);
 
     /**
      * Legacy: Gets position in polar coordinates of crystal with given ID.
@@ -56,7 +62,7 @@ class R3BCalifaGeometry : public TObject
      * @param azimuthal [out] Will be filled with azimuthal angle (radians) of crystal center
      * @param rho [out] Will be filled with distance (cm) of crystal center to target position (0,0,0)
      */
-    void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
+    void GetAngles(int iD, double* polar, double* azimuthal, double* rho);
 
     /**
      * Gets volume path of crystal with given ID.
@@ -64,7 +70,7 @@ class R3BCalifaGeometry : public TObject
      * @param iD crystal ID (depending on geometry version)
      * @return Volume path
      */
-    const char* GetCrystalVolumePath(Int_t iD);
+    std::string GetCrystalVolumePath(int iD);
 
     /**
      * Gets crystal ID for given volume path.
@@ -72,7 +78,7 @@ class R3BCalifaGeometry : public TObject
      * @param volumePath Volume path
      * @return Crystal ID
      */
-    int GetCrystalId(const char* volumePath);
+    int GetCrystalId(const std::string volumePath);
 
     /**
      * Calculate the distance of a given straight track through the active detector volume (crystal(s)). Usefull for
@@ -97,13 +103,17 @@ class R3BCalifaGeometry : public TObject
     double GetDistanceThroughCrystals(TVector3& startVertex,
                                       TVector3& direction,
                                       TVector3* hitPos = NULL,
-                                      Int_t* numCrystals = NULL,
-                                      Int_t* crystalIds = NULL);
+                                      int* numCrystals = NULL,
+                                      int* crystalIds = NULL);
 
     /**
      * @return if we are running the simulation or data analysis
      */
     const bool IsSimulation() { return fIsSimulation; }
+
+    const int GetNbCrystals() { return fNumCrystals; }
+
+    const int GetGeoVersion() { return fGeometryVersion; }
 
     /**
      * Returns singleton instance of R3BCalifaGeometry for given geometry version.
@@ -114,16 +124,16 @@ class R3BCalifaGeometry : public TObject
      */
     static R3BCalifaGeometry* Instance();
 
-    bool Init(Int_t fGeo);
-
   private:
-    Int_t fGeometryVersion;
-    Int_t fNumCrystals;
-    Bool_t fIsSimulation;
-    Bool_t IsInitialize;
+    int fGeometryVersion = 2024;
+    int fNumCrystals = 5088;
+    bool fIsSimulation = false;
+    bool IsInitialize = false;
+    TVector3 fRefPoint;
     TFile* f;
 
-    ClassDef(R3BCalifaGeometry, 8);
+  public:
+    ClassDefOverride(R3BCalifaGeometry, 9);
 };
 
 #endif /* R3BCALIFAGEOMETRY_H */

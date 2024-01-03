@@ -11,22 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <R3BCalifaGeometry.h>
+#include <R3BLogger.h>
+
+#include <FairLogger.h>
+
 #include <TFile.h>
 #include <TGeoManager.h>
 #include <TGeoNavigator.h>
 #include <TGeoVolume.h>
 #include <TMath.h>
-#include <TString.h>
 #include <TSystem.h>
-#include <TVector3.h>
-#include <iostream>
-#include <stdlib.h>
 #include <vector>
-
-#include <FairLogger.h>
-
-#include "R3BCalifaGeometry.h"
-#include "R3BLogger.h"
 
 #include <boost/regex.hpp>
 
@@ -39,17 +35,19 @@ R3BCalifaGeometry* R3BCalifaGeometry::Instance()
 
 R3BCalifaGeometry::R3BCalifaGeometry()
     : TObject()
-    , IsInitialize(kFALSE)
-    , fNumCrystals(5088)
 {
 }
 
-bool R3BCalifaGeometry::Init(Int_t version)
+bool R3BCalifaGeometry::Init(int version)
 {
     if (!IsInitialize)
+    {
         IsInitialize = kTRUE;
+    }
     else
+    {
         return kTRUE;
+    }
 
     R3BLOG(info, "");
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
@@ -61,30 +59,33 @@ bool R3BCalifaGeometry::Init(Int_t version)
             // BARREL: demonstrator from 2019
             geoPath += "califa_s444.geo.root";
             fNumCrystals = 10000;
+            fGeometryVersion = version;
             break;
 
         case 2020:
             // Half BARREL+ 6 IPHOS sectors
             geoPath += "califa_v2019.11.geo.root";
             fNumCrystals = 4864;
+            fGeometryVersion = version;
             break;
 
         case 2021:
-            // s455 Experiment: Half Barrel + Full IPHOS
+            // s455, S515, S509, S522 experiments: Half Barrel + Full IPHOS
             geoPath += "califa_v2021.3.geo.root";
             fNumCrystals = 4864;
+            fGeometryVersion = version;
             break;
 
         case 2024:
-            // s118-s091 Experiment: Half Barrel (extended) + Full IPHOS + Full CEPA
+            // S118, S091 experiments: Half Barrel (extended) + Full IPHOS + Full CEPA
             geoPath += "califa_v2024.1.geo.root";
             fNumCrystals = 5088;
+            fGeometryVersion = version;
             break;
 
         default:
             // Full Barrel + Full IPHOS
             geoPath += "califa_full.geo.root";
-            fNumCrystals = 5088;
             R3BLOG(warn,
                    "Unsupported geometry version: " << version << ", so standard full configuration will be used.");
             // return kFALSE;
@@ -111,7 +112,9 @@ bool R3BCalifaGeometry::Init(Int_t version)
 
     v->SetName("cave");
     if (!gGeoManager)
+    {
         gGeoManager = new TGeoManager();
+    }
     gGeoManager->SetTopVolume(v);
     fIsSimulation = kFALSE;
     return kTRUE;
@@ -121,24 +124,30 @@ R3BCalifaGeometry::~R3BCalifaGeometry()
 {
     R3BLOG(debug1, "");
     if (gGeoManager)
+    {
         delete gGeoManager;
+    }
     if (f)
+    {
         f->Close();
+    }
 }
 
-const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
+const TVector3& R3BCalifaGeometry::GetAngles(int iD)
 {
     static std::map<int, TVector3> cache;
     Double_t local[3] = { 0, 0, 0 };
     Double_t master[3];
     const static TVector3 invalid(NAN, NAN, NAN);
-    const char* nameVolume;
+    std::string nameVolume;
     if (cache.count(iD))
+    {
         return cache[iD];
+    }
 
     // SOLUTION FOR DOUBLE READING CHANNELS
     if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
-        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
+        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to max.[2544])
 
     if (iD >= 1 && iD <= fNumCrystals / 2)
     {
@@ -146,8 +155,8 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
 
         gGeoManager->CdTop();
 
-        if (gGeoManager->CheckPath(nameVolume))
-            gGeoManager->cd(nameVolume);
+        if (gGeoManager->CheckPath(nameVolume.c_str()))
+            gGeoManager->cd(nameVolume.c_str());
         else
         {
             R3BLOG(error, "Invalid crystal path: " << nameVolume);
@@ -161,10 +170,12 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
         return invalid;
     }
 
-    return cache[iD] = master;
+    cache[iD] = master - fRefPoint;
+
+    return cache[iD];
 }
 
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
+void R3BCalifaGeometry::GetAngles(int iD, double* polar, double* azimuthal, double* rho)
 {
     auto& masterV = this->GetAngles(iD);
     *polar = masterV.Theta();
@@ -176,17 +187,22 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal
     }
 }
 
-const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
+std::string R3BCalifaGeometry::GetCrystalVolumePath(int iD)
 {
-    Int_t alveolusCopy = -1;
-    Int_t alvType = -1;
-    Int_t cryType = -1;
+    int alveolusCopy = -1;
+    int alvType = -1;
+    int cryType = -1;
 
     // SOLUTION FOR DOUBLE READING CHANNELS
     if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
-        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
+    {
+        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to max.[2544])
+    }
 
-    static char nameVolume[400];
+    std::ostringstream oss;
+    static constexpr int kMaxNameAlv = 23;
+    std::string name_Alv[kMaxNameAlv] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                                          "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" };
 
     if (iD >= 1 && iD <= fNumCrystals / 2)
     {
@@ -226,33 +242,18 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
             alveolusCopy = (Int_t)((iD - 2513) / 4);    // copy from 0 to 7
             cryType = iD - 2513 - alveolusCopy * 4 + 1; // Four crystal types (1,2,3,4)
         }
-        char name_Alv[23][3] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
-                                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" };
 
         if (iD < 2433)
         {
-            sprintf(nameVolume,
-                    "/cave_1/CalifaWorld_0/Alveolus_%s_%i/InnerAlv_%s_0/WrapCry_%s_%i_0/Crystal_%s_%i_0",
-                    name_Alv[alvType - 1],
-                    alveolusCopy,
-                    name_Alv[alvType - 1],
-                    name_Alv[alvType - 1],
-                    cryType,
-                    name_Alv[alvType - 1],
-                    cryType);
+            oss << "/cave_1/CalifaWorld_0/Alveolus_" << name_Alv[alvType - 1] << "_" << alveolusCopy << "/InnerAlv_"
+                << name_Alv[alvType - 1] << "_0/WrapCry_" << name_Alv[alvType - 1] << "_" << cryType << "_0/Crystal_"
+                << name_Alv[alvType - 1] << "_" << cryType << "_0";
         }
         else
         {
-            sprintf(nameVolume,
-                    "/cave_1/CalifaWorld_0/Alveolus_CCSI_%s_%i/InnerAlv_CCSI_%s_0/WrapCry_CCSI_%s_%i_0/"
-                    "Crystal_CCSI__%s_%i_0",
-                    name_Alv[alvType - 1],
-                    alveolusCopy,
-                    name_Alv[alvType - 1],
-                    name_Alv[alvType - 1],
-                    cryType,
-                    name_Alv[alvType - 1],
-                    cryType);
+            oss << "/cave_1/CalifaWorld_0/Alveolus_CCSI_" << name_Alv[alvType - 1] << "_" << alveolusCopy
+                << "/InnerAlv_CCSI_" << name_Alv[alvType - 1] << "_0/WrapCry_CCSI_" << name_Alv[alvType - 1] << "_"
+                << cryType << "_0/Crystal_CCSI_" << name_Alv[alvType - 1] << "_" << cryType << "_0";
         }
     }
     else
@@ -260,16 +261,16 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
         R3BLOG(error, "Invalid crystalId: " << iD);
     }
 
-    return nameVolume;
+    return oss.str();
 }
 
 double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
                                                      TVector3& direction,
                                                      TVector3* hitPos,
-                                                     Int_t* numCrystals,
-                                                     Int_t* crystalIds)
+                                                     int* numCrystals,
+                                                     int* crystalIds)
 {
-    Int_t maxNumCrystals = 0;
+    int maxNumCrystals = 0;
 
     if (numCrystals != NULL && crystalIds != NULL)
     {
@@ -301,7 +302,6 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
         if (inCrystal)
             distance += gGeoManager->GetStep();
 
-        // inCrystal = nodeName.BeginsWith("Crystal_");
         inCrystal = nodeName.BeginsWith("WrapCry_"); // can't enter to Crystal volume
 
         if (inCrystal && maxNumCrystals != 0)
@@ -334,7 +334,7 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
 //    return gSystem->Load(buf);
 //}();
 
-int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
+int R3BCalifaGeometry::GetCrystalId(const std::string volumePath)
 { /*
    * Yes, regex matching in the stepping action is probably slow.
    * But if we cared about speed, we would not use string processing here
@@ -346,7 +346,7 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     static auto restr = "(Alveolus|Alveolus_CCSI)_([0-9]+)_([0-9]+).*(Crystal|Crystal_CCSI)_[^_]+_([0-9]+)_";
     static auto re = boost::regex(restr, boost::regex::extended);
     boost::cmatch m;
-    if (!boost::regex_search(volumePath, m, re))
+    if (!boost::regex_search(volumePath.c_str(), m, re))
     {
         R3BLOG(error,
                "\"" << volumePath
@@ -356,12 +356,12 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
         return 0;
     }
 
-    Int_t crystalId;
-    Bool_t isCCSI = m[1].str() == "Alveolus_CCSI"; // Adding CEPA CSI
-    Int_t alvType = std::stoi(m[2].str());         // converting to int the alveolus type
-    Int_t alveolusCopy = std::stoi(m[3].str());    // converting to int the alveolus copy
-    Int_t cryType = std::stoi(m[5].str());         // converting to int the crystal type
-    Bool_t invalid = kFALSE;
+    int crystalId = 0;
+    bool isCCSI = m[1].str() == "Alveolus_CCSI"; // Adding CEPA CSI
+    int alvType = std::stoi(m[2].str());         // converting to int the alveolus type
+    int alveolusCopy = std::stoi(m[3].str());    // converting to int the alveolus copy
+    int cryType = std::stoi(m[5].str());         // converting to int the crystal type
+    bool invalid = kFALSE;
 
     // cryType runs from 1 to 4 while alvType runs from 1 to 23, otherwise invaled
     if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
@@ -396,8 +396,8 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
             crystalId = 2337 + (alvType - 20) * 24 + alveolusCopy * 3 + (cryType - 1); // three crystal per alveolus
     }
 
-    if (crystalId < 1 || crystalId > 2544)
-    { // crystalId runs from 1 to 2544
+    if (crystalId < 1 || crystalId > fNumCrystals / 2)
+    { // crystalId runs from 1 to fNumCrystals/2
         R3BLOG(error, "Wrong crystal numbers (2)");
         LOG(info) << "---- crystalId: " << crystalId;
         return 0;
@@ -406,4 +406,4 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     return crystalId;
 }
 
-ClassImp(R3BCalifaGeometry);
+ClassImp(R3BCalifaGeometry)

@@ -13,25 +13,15 @@
 
 #include "R3BCalifaClusterData.h"
 
-R3BCalifaClusterData::R3BCalifaClusterData()
-    : FairMultiLinkedData()
-    , fEnergy(NAN)
-    , fTheta(NAN)
-    , fPhi(NAN)
-    , fTime(0)
-{
-}
-
-R3BCalifaClusterData::R3BCalifaClusterData(std::vector<Int_t> crystalList,
-                                           Double_t ene,
-                                           Double_t nf,
-                                           Double_t ns,
-                                           Double_t theta,
-                                           Double_t phi,
+R3BCalifaClusterData::R3BCalifaClusterData(std::vector<int> crystalList,
+                                           double ene,
+                                           double nf,
+                                           double ns,
+                                           double theta,
+                                           double phi,
                                            ULong64_t time,
-                                           Int_t clusterType)
-    : FairMultiLinkedData()
-    , fCrystalList(crystalList)
+                                           uint32_t clusterType)
+    : fCrystalList(crystalList)
     , fEnergy(ene)
     , fNf(nf)
     , fNs(ns)
@@ -43,8 +33,7 @@ R3BCalifaClusterData::R3BCalifaClusterData(std::vector<Int_t> crystalList,
 }
 
 R3BCalifaClusterData::R3BCalifaClusterData(const R3BCalifaClusterData& right)
-    : FairMultiLinkedData(right)
-    , fCrystalList(right.fCrystalList)
+    : fCrystalList(right.fCrystalList)
     , fEnergy(right.fEnergy)
     , fNf(right.fNf)
     , fNs(right.fNs)

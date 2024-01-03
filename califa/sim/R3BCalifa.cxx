@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,59 +11,44 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairVolume.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairVolume.h>
 
-#include "R3BCalifa.h"
-#include "R3BCalifaGeometry.h"
-#include "R3BCalifaPoint.h"
-#include "R3BLogger.h"
-#include "R3BMCStack.h"
+#include <R3BCalifa.h>
+#include <R3BCalifaGeometry.h>
+#include <R3BCalifaPoint.h>
+#include <R3BLogger.h>
+#include <R3BMCStack.h>
 
-#include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TGeoNode.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
+#include <TClonesArray.h>
+#include <TGeoManager.h>
+#include <TGeoNode.h>
+#include <TParticle.h>
+#include <TVirtualMC.h>
 
 #include <iostream>
 #include <stdlib.h>
-
-#define U_MEV 931.4940954
-
-inline double BETA(const double M, const double E_kin) { return sqrt(1. - M * M / ((M + E_kin) * (M + E_kin))); }
-
-inline double GAMMA(const double M, const double E_kin) { return 1. + E_kin / M; }
 
 R3BCalifa::R3BCalifa()
     : R3BCalifa("")
 {
 }
 
-R3BCalifa::R3BCalifa(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+R3BCalifa::R3BCalifa(const std::string& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
     : R3BCalifa(geoFile, { trans, rot })
 {
 }
 
-R3BCalifa::R3BCalifa(const TString& geoFile, const TGeoCombiTrans& combi)
+R3BCalifa::R3BCalifa(const std::string& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BCalifa", kCALIFA, geoFile, combi)
-    , fCsIDensity(0.)
-    , fCalifaGeo(NULL)
 {
     ResetParameters();
     fCalifaCollection = new TClonesArray("R3BCalifaPoint");
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fGeometryVersion = 2020; // final BARREL+iPhos: 2020
 }
 
 R3BCalifa::~R3BCalifa()
 {
-    if (flGeoPar)
-    {
-        delete flGeoPar;
-    }
     if (fCalifaCollection)
     {
         fCalifaCollection->Delete();
@@ -77,7 +62,7 @@ void R3BCalifa::Initialize()
 
     R3BLOG(info, " ");
 
-    TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
+    TGeoVolume* vol = static_cast<TGeoVolume*>(gGeoManager->GetVolume("CalifaWorld"));
     vol->SetVisibility(kFALSE);
 
     if (!R3BCalifaGeometry::Instance()->Init(fGeometryVersion))
@@ -89,132 +74,46 @@ void R3BCalifa::Initialize()
 
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 {
-    Int_t crystalId = fCalifaGeo->GetCrystalId(gMC->CurrentVolPath());
-    if (!fCsIDensity) // fill it in the first crystal
-        fCsIDensity = gGeoManager->GetCurrentVolume()->GetMaterial()->GetDensity();
+    int crystalId = R3BCalifaGeometry::Instance()->GetCrystalId(TVirtualMC::GetMC()->CurrentVolPath());
 
-    if (gMC->IsTrackEntering())
+    if (TVirtualMC::GetMC()->IsTrackEntering())
     {
         fELoss = 0.;
-        fNf = 0.;
-        fNs = 0.;
-        fNSteps = 0; // FIXME
-        fTime = gMC->TrackTime() * 1.0e09;
-        fLength = gMC->TrackLength();
-        gMC->TrackPosition(fPosIn);
-        gMC->TrackMomentum(fMomIn);
-        fEinc = gMC->Etot() - gMC->TrackMass(); // be aware!! Relativistic mass!
+        fTime = TVirtualMC::GetMC()->TrackTime() * 1.0e09;
+        fLengthzero = TVirtualMC::GetMC()->TrackLength();
+        TVirtualMC::GetMC()->TrackPosition(fPosIn);
+        TVirtualMC::GetMC()->TrackMomentum(fMomIn);
     }
 
     // Sum energy loss for all steps in the active volume
-    Double_t dE = gMC->Edep() * 1000.;                          // in MeV
-    Double_t post_E = (gMC->Etot() - gMC->TrackMass()) * 1000.; // in MeV
-    TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
-    Double_t dx = gMC->TrackStep() * fCsIDensity;
-
-    Double_t M_in = gMC->TrackMass() * 1000.;
-    Double_t A_in = M_in / U_MEV;
-    Double_t Z_in = gMC->TrackCharge();
-
-    const double Z_CsI = 54.;
-    const double A_CsI = 129.905;   // g/mol
-    const double E_delta = 5.30227; // MeV
-    const double m_e = .5109989461; // MeV
-    const double slope_e = 1.33055;
-    const double K = .307075; // MeV cm**2/mol
-    // quenching
-    const double q_1 = 0.0396113;
-    const double q_2 = -0.0828619;
-    const double q_3 = 0.780435;
-
-    fELoss += dE / 1000.; // back to GeV
-
-    // Note: TF1s and friends are evil, because they will generally break the
-    // stack when they crash (e.g. because of SIGFPE, which GEANT4 helpfully
-    // activates on Tuesdays and Debug builds (->G4FPE_debug).
-
-    auto makeCompFun = [](std::array<double, 5> par)
-    {
-        return [par](double val)
-        { return (val > 0.0) ? 1. / (par[0] + par[1] * pow(val, par[2]) + par[3] / pow(val, par[4])) : 0.0; };
-    };
-    auto tf_dNf_dE = makeCompFun({ -1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1 });
-    auto tf_dNs_dE = makeCompFun({ -1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3 });
-
-    if (dE > 0 && dx > 0)
-    {
-        if (ptype != "gamma" && post_E >= A_in * E_delta)
-        {
-            double beta_cut = BETA(M_in, A_in * E_delta);
-            double gamma_cut = GAMMA(M_in, A_in * E_delta);
-            double beta = BETA(M_in, post_E);
-            double gamma = GAMMA(M_in, post_E);
-            double T_cut = 2. * m_e * beta_cut * beta_cut * gamma_cut * gamma_cut /
-                           (1. + 2. * gamma_cut * m_e / M_in + (m_e / M_in) * (m_e / M_in));
-            double T_max =
-                2. * m_e * beta * beta * gamma * gamma / (1. + 2. * gamma * m_e / M_in + (m_e / M_in) * (m_e / M_in));
-            double C = 0.5 * K * Z_in * Z_in * Z_CsI / (A_CsI * beta * beta);
-
-            // quenching
-            double part1 =
-                q_1 / q_2 * (1 / T_max - 1 / T_cut + (log(T_cut / T_max) + log((T_max - q_2) / (T_cut - q_2)) / q_2));
-            double part2 = q_1 * beta * beta / T_max * (log(T_cut / T_max) + log((T_max - q_2) / (T_cut - q_2)) / q_2);
-            double N = 1 / T_cut - 1 / T_max - (beta * beta) / T_max * log(T_max / T_cut);
-            double part3 = q_3 * N;
-            double scaling = 1.;
-
-            double dE_dxe = C * (log(T_max / T_cut) - beta * beta * (T_max - T_cut) / T_max);
-            double dE_e = dE_dxe * dx;
-            if (dE_e > dE)
-            {
-                dE_e = dE;
-            }
-            if (T_max < 2.)
-            {
-                scaling = (part1 + part2 + part3) / N;
-            }
-            else
-            {
-                scaling = q_3;
-            }
-            fNf += (dE_e * scaling / (1 + slope_e)) / 1000.;
-            fNs += (dE_e * scaling / (1. / slope_e + 1)) / 1000.;
-            dE -= dE_e;
-        }
-        fNf += tf_dNf_dE(dE / dx) * dE / 1000.;
-        fNs += tf_dNs_dE(dE / dx) * dE / 1000.;
-    }
-
-    fNSteps++;
+    fELoss += TVirtualMC::GetMC()->Edep() * 1000.; // in MeV
 
     // Set additional parameters at exit of active volume. Create R3BCalifaPoint.
-    if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
+    if (TVirtualMC::GetMC()->IsTrackExiting() || TVirtualMC::GetMC()->IsTrackStop() ||
+        TVirtualMC::GetMC()->IsTrackDisappeared())
     {
-        fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fParentTrackID = gMC->GetStack()->GetCurrentParentTrackNumber();
-        fVolumeID = vol->getMCid();
-        fTrackPID = gMC->TrackPid();
-        fUniqueID = gMC->GetStack()->GetCurrentTrack()->GetUniqueID();
-        // updating the value of the track length when exiting or stopping
-        fLength = gMC->TrackLength();
-
         if (fELoss == 0.)
+        {
             return kFALSE;
+        }
+
+        fTrackID = TVirtualMC::GetMC()->GetStack()->GetCurrentTrackNumber();
+        fVolumeID = vol->getMCid();
+        fLength = TVirtualMC::GetMC()->TrackLength();
+        fTrackPID = TVirtualMC::GetMC()->TrackPid();
 
         AddPoint(fTrackID,
                  fVolumeID,
+                 fTrackPID,
                  crystalId,
                  TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                  TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
                  fTime,
-                 fLength,
-                 fELoss,
-                 fNf,
-                 fNs,
-                 gMC->CurrentEvent());
+                 (fLength - fLengthzero),
+                 fELoss);
 
         // Increment number of CalifaPoints for this track
-        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
+        auto* stack = dynamic_cast<R3BStack*>(TVirtualMC::GetMC()->GetStack());
         stack->AddPoint(kCALIFA);
         ResetParameters();
     }
@@ -233,7 +132,7 @@ void R3BCalifa::EndOfEvent()
 
 void R3BCalifa::Register()
 {
-    FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCalifaCollection, kTRUE);
+    FairRootManager::Instance()->Register("CalifaPoint", GetName(), fCalifaCollection, kTRUE);
 }
 
 TClonesArray* R3BCalifa::GetCollection(Int_t iColl) const
@@ -243,10 +142,12 @@ TClonesArray* R3BCalifa::GetCollection(Int_t iColl) const
         return fCalifaCollection;
     }
     else
-        return NULL;
+    {
+        return nullptr;
+    }
 }
 
-void R3BCalifa::Print(Option_t* option) const
+void R3BCalifa::Print(Option_t* /*opt*/) const
 {
     Int_t nPoints = fCalifaCollection->GetEntriesFast();
     LOG(info) << "R3BCalifa: " << nPoints << " points registered in this event";
@@ -275,26 +176,24 @@ void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     LOG(info) << "R3BCalifa: " << cl2->GetEntriesFast() << " merged entries";
 }
 
-R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
-                                    Int_t detID,
-                                    Int_t ident,
+R3BCalifaPoint* R3BCalifa::AddPoint(int trackID,
+                                    int detID,
+                                    int trackPID,
+                                    int cryID,
                                     TVector3 posIn,
                                     TVector3 momIn,
-                                    Double_t time,
-                                    Double_t length,
-                                    Double_t eLoss,
-                                    Double_t Nf,
-                                    Double_t Ns,
-                                    UInt_t EventId)
+                                    double time,
+                                    double length,
+                                    double eLoss)
 {
     TClonesArray& clref = *fCalifaCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
         LOG(info) << "R3BCalifa: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+                  << ") cm,  crystal " << cryID << ", track " << trackPID << ", energy loss " << eLoss << " MeV";
     }
-    return new (clref[size]) R3BCalifaPoint(trackID, detID, ident, posIn, momIn, time, length, eLoss, Nf, Ns, EventId);
+    return new (clref[size]) R3BCalifaPoint(trackID, detID, trackPID, cryID, posIn, momIn, time, length, eLoss);
 }
 
 void R3BCalifa::SelectGeometryVersion(Int_t version) { fGeometryVersion = version; }
