@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,70 +11,78 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFACRYSTALCALDATA_H
-#define R3BCALIFACRYSTALCALDATA_H
+#pragma once
 
-#include "FairMultiLinkedData.h"
-#include "TObject.h"
+#include <TObject.h>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
-class R3BCalifaCrystalCalData : public FairMultiLinkedData
+class R3BCalifaCrystalCalData : public TObject
 {
   public:
-    /** Default constructor **/
-    R3BCalifaCrystalCalData();
+    // Default constructor
+    R3BCalifaCrystalCalData() = default;
 
-    /** Constructor with arguments
+    /** Constructor with arguments (explicit)
      *@param fCrystalId   Crystal unique identifier
-     *@param fEnergy      Total energy deposited on the crystal ([GeV] in sim)
-     *@param fNf  				Total Nf (fast)
-     *@param fNs					Total Ns (slow)
+     *@param fEnergy      Total energy deposited on the crystal ([MeV] in sim)
+     *@param fNf  	  Total Nf (fast) ([MeV] in sim)
+     *@param fNs	  Total Ns (slow) ([MeV] in sim)
      *@param fTime        Time since event start [ns]
-     *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
+     *@param fToT_Energy  Total energy deposited on the crystal from ToT ([MeV] in sim)
      **/
-    R3BCalifaCrystalCalData(Int_t ident,
-                            Double_t energy,
-                            Double_t Nf,
-                            Double_t Ns,
-                            uint64_t time,
-                            Double_t tot_energy = 0);
+    explicit R3BCalifaCrystalCalData(uint16_t cryid,
+                                     double energy,
+                                     double Nf,
+                                     double Ns,
+                                     ULong64_t time = 0,
+                                     double tot_energy = 0);
 
-    /** Copy constructor **/
+    // Destructor virtual
+    virtual ~R3BCalifaCrystalCalData() = default;
+
+    // Copy constructor
     R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData&);
-
     R3BCalifaCrystalCalData& operator=(const R3BCalifaCrystalCalData&) { return *this; }
 
-    /** Destructor **/
-    virtual ~R3BCalifaCrystalCalData() {}
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const uint16_t& GetCrystalId() const { return fCrystalId; }
+    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const double& GetNf() const { return fNf; }
+    [[nodiscard]] inline const double& GetNs() const { return fNs; }
+    [[nodiscard]] inline const ULong64_t& GetTime() const { return fTime; }
+    [[nodiscard]] inline const double& GetToTEnergy() const { return fToT_Energy; }
 
-    /** Accessors **/
-    inline const Int_t& GetCrystalId() const { return fCrystalId; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
-    inline const Double_t& GetToT_Energy() const { return fToT_Energy; }
-    inline const Double_t& GetNf() const { return fNf; }
-    inline const Double_t& GetNs() const { return fNs; }
-    inline const uint64_t& GetTime() const { return fTime; }
+    // Modifiers
+    inline void SetCrystalId(uint16_t cryid) { fCrystalId = cryid; }
+    inline void SetEnergy(double energy) { fEnergy = energy; }
+    inline void SetNf(double Nf) { fNf = Nf; }
+    inline void SetNs(double Ns) { fNs = Ns; }
+    inline void SetTime(ULong64_t time) { fTime = time; }
+    inline void SetToTEnergy(double energy) { fToT_Energy = energy; }
 
-    /** Modifiers **/
-    void SetCrystalId(Int_t ident) { fCrystalId = ident; }
-    void SetEnergy(Double32_t energy) { fEnergy = energy; }
-    void SetToT_Energy(Double32_t energy) { fToT_Energy = energy; }
-    void SetNf(Double32_t Nf) { fNf = Nf; }
-    void SetNs(Double32_t Ns) { fNs = Ns; }
-    void SetTime(uint64_t time) { fTime = time; }
-    void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
-    void AddMoreNf(Double32_t moreNf) { fNf += moreNf; }
-    void AddMoreNs(Double32_t moreNs) { fNs += moreNs; }
+    // Adding more values
+    inline void AddMoreEnergy(double moreEnergy) { fEnergy += moreEnergy; }
+    inline void AddMoreNf(double moreNf) { fNf += moreNf; }
+    inline void AddMoreNs(double moreNs) { fNs += moreNs; }
+    inline void AddMoreTot(double moreTot) { fToT_Energy += moreTot; }
+
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
-    Double32_t fEnergy;     // total energy in the crystal
-    Double32_t fNf;         // total Nf in the crystal
-    Double32_t fNs;         // total Nf in the crystal
-    Double32_t fToT_Energy; // total energy in the crystal from ToT
-    uint64_t fTime;         // time of the interaction
-    Int_t fCrystalId;       // crystal unique identifier
+    uint16_t fCrystalId = 0; // crystal unique identifier
+    double fEnergy = 0;      // total energy in the crystal
+    double fNf = 0;          // total Nf in the crystal
+    double fNs = 0;          // total Nf in the crystal
+    ULong64_t fTime = 0;     // time of the interaction
+    double fToT_Energy = 0;  // total energy in the crystal from ToT
 
   public:
-    ClassDef(R3BCalifaCrystalCalData, 1)
+    ClassDefOverride(R3BCalifaCrystalCalData, 2)
 };
 
-#endif
+// Operator overloading for printing R3BCalifaCrystalCalData
+std::ostream& operator<<(std::ostream& os, const R3BCalifaCrystalCalData& data);
