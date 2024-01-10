@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
+#   Copyright (C) 2019-2024 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -24,7 +24,7 @@ endif()
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # set cmake policies
-cmake_policy(VERSION 3.15...3.23)
+cmake_policy(VERSION 3.15...3.24)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
