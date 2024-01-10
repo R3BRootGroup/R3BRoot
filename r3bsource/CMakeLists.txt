@@ -28,6 +28,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/base
 ${R3BROOT_SOURCE_DIR}/r3bsource/wr
 ${R3BROOT_SOURCE_DIR}/r3bsource/trloii
 ${R3BROOT_SOURCE_DIR}/r3bsource/beammonitor
+${R3BROOT_SOURCE_DIR}/r3bsource/frssci
 ${R3BROOT_SOURCE_DIR}/r3bsource/sci2
 ${R3BROOT_SOURCE_DIR}/r3bsource/sci8
 ${R3BROOT_SOURCE_DIR}/r3bsource/rolu
@@ -58,6 +59,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
+${R3BROOT_SOURCE_DIR}/r3bdata/frssciData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
@@ -126,6 +128,7 @@ set(SRCS
 ./fibers/R3BFiberReader.cxx
 ./los/R3BLosReader.cxx
 ./rolu/R3BRoluReader.cxx
+./frssci/R3BFrssciReader.cxx
 ./sci2/R3BSci2Reader.cxx
 ./sci8/R3BSci8Reader.cxx
 ./fibers/R3BSfibReader.cxx
@@ -191,6 +194,7 @@ Set(STRUCT_HEADERS
 ./fibers/ext_h101_fib33.h
 ./los/ext_h101_los_dez19.h
 ./rolu/ext_h101_rolu.h
+./frssci/ext_h101_frssci.h
 ./sci2/ext_h101_sci2.h
 ./sci8/ext_h101_sci8.h
 ./fibers/ext_h101_sfib.h

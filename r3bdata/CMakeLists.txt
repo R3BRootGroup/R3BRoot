@@ -37,6 +37,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/frssciData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
@@ -48,8 +49,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/alpideData
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
@@ -133,6 +132,7 @@ losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx
 roluData/R3BRoluHitData.cxx
+frssciData/R3BFrssciMappedData.cxx
 sci2Data/R3BSci2MappedData.cxx
 sci2Data/R3BSci2TcalData.cxx
 sci2Data/R3BSci2CalData.cxx
