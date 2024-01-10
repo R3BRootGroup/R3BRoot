@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------
-// -----               R3BTTTXHitData header file                -----
+// -----               R3BTttxHitData header file                -----
 // -----      Created 11/01/2024 by J. L. Rodriguez-Sanchez      -----
 // -------------------------------------------------------------------
 
@@ -24,17 +24,17 @@
 #include <iostream>
 #include <string>
 
-class R3BTTTXHitData : public TObject
+class R3BTttxHitData : public TObject
 {
   public:
     // Default constructor
-    R3BTTTXHitData() = default;
+    R3BTttxHitData() = default;
 
     // Constructor with arguments (explicit)
-    explicit R3BTTTXHitData(double xpos, double energy, double ang, double charge, double time = 0);
+    explicit R3BTttxHitData(double xpos, double energy, double ang, double charge, double time = 0);
 
     // Destructor virtual
-    virtual ~R3BTTTXHitData() = default;
+    virtual ~R3BTttxHitData() = default;
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const double& GetX() const { return fXpos; }
@@ -62,8 +62,8 @@ class R3BTTTXHitData : public TObject
     double fTime = std::nan("");
 
   public:
-    ClassDefOverride(R3BTTTXHitData, 1)
+    ClassDefOverride(R3BTttxHitData, 1)
 };
 
-// Operator overloading for printing R3BTTTXHitData
-std::ostream& operator<<(std::ostream& os, const R3BTTTXHitData& data);
+// Operator overloading for printing R3BTttxHitData
+std::ostream& operator<<(std::ostream& os, const R3BTttxHitData& data);

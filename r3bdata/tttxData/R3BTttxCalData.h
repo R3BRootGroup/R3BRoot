@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------
-// -----               R3BTTTXCalData header file                -----
+// -----               R3BTttxCalData header file                -----
 // -----      Created 11/01/2024 by J. L. Rodriguez-Sanchez      -----
 // -------------------------------------------------------------------
 
@@ -24,17 +24,17 @@
 #include <iostream>
 #include <string>
 
-class R3BTTTXCalData : public TObject
+class R3BTttxCalData : public TObject
 {
   public:
     // Default constructor
-    R3BTTTXCalData() = default;
+    R3BTttxCalData() = default;
 
     // Constructor with arguments (explicit)
-    explicit R3BTTTXCalData(uint8_t detID, uint8_t stripID, double time, double energy);
+    explicit R3BTttxCalData(uint8_t detID, uint8_t stripID, double time, double energy);
 
     // Destructor virtual
-    virtual ~R3BTTTXCalData() = default;
+    virtual ~R3BTttxCalData() = default;
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint8_t& GetDetID() const { return fDetID; }
@@ -59,8 +59,8 @@ class R3BTTTXCalData : public TObject
     double fEnergy = std::nan("");
 
   public:
-    ClassDefOverride(R3BTTTXCalData, 1)
+    ClassDefOverride(R3BTttxCalData, 1)
 };
 
-// Operator overloading for printing R3BTTTXCalData
-std::ostream& operator<<(std::ostream& os, const R3BTTTXCalData& data);
+// Operator overloading for printing R3BTttxCalData
+std::ostream& operator<<(std::ostream& os, const R3BTttxCalData& data);

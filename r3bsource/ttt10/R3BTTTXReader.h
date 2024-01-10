@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTTTXREADER_H
-#define R3BTTTXREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
-#include "TClonesArray.h"
 #include <Rtypes.h>
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_TTTX_t;
 typedef struct EXT_STR_h101_TTTX_t EXT_STR_h101_TTTX;
@@ -72,5 +71,3 @@ class R3BTTTXReader : public R3BReader
   public:
     ClassDefOverride(R3BTTTXReader, 0);
 };
-
-#endif // R3BTTTXREADER_H

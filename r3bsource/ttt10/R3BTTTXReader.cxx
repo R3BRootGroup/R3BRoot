@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,13 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 #include <TClonesArray.h>
 
 #include "R3BLogger.h"
-#include "R3BTTTXMappedData.h"
 #include "R3BTTTXReader.h"
+#include "R3BTttxMappedData.h"
 
 extern "C"
 {
@@ -37,7 +37,7 @@ R3BTTTXReader::R3BTTTXReader(EXT_STR_h101_TTTX* data, size_t offset)
     , fTref(1)
     , fTtrig(1)
     , fPileup(kFALSE)
-    , fArray(new TClonesArray("R3BTTTXMappedData"))
+    , fArray(new TClonesArray("R3BTttxMappedData"))
 {
 }
 
@@ -62,7 +62,7 @@ Bool_t R3BTTTXReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("TTTXMappedData", "MappedTTTX", fArray, !fOnline);
+    FairRootManager::Instance()->Register("tttxMappedData", "MappedTTTX", fArray, !fOnline);
 
     Reset();
     memset(fData, 0, sizeof *fData);
@@ -73,7 +73,7 @@ Bool_t R3BTTTXReader::Init(ext_data_struct_info* a_struct_info)
     auto* data = reinterpret_cast<EXT_STR_h101_TTTX_onion*>(fData);
     if (data == nullptr)
     {
-        R3BLOG(error, "TTTXMappedData NOT FOUND!!!!");
+        R3BLOG(error, "tttxMappedData NOT FOUND!");
     }
     for (int i_det = 0; i_det < fDets; i_det++)
     {
@@ -154,7 +154,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
         for (int i_hit = curTref; i_hit < nextTref; i_hit++)
         {
             new ((*fArray)[fArray->GetEntriesFast()])
-                R3BTTTXMappedData(i_det + 1, idChannelTref + 1, data->TTTX_ID[i_det].TREFv[i_hit], 0, false, false);
+                R3BTttxMappedData(i_det + 1, idChannelTref + 1, data->TTTX_ID[i_det].TREFv[i_hit], 0, false, false);
             curTref = nextTref;
         }
     }
@@ -173,7 +173,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
         for (int i_hit = curTtrig; i_hit < nextTtrig; i_hit++)
         {
             new ((*fArray)[fArray->GetEntriesFast()])
-                R3BTTTXMappedData(i_det + 1, idChannelTtrig + 1, data->TTTX_ID[i_det].TTRIGv[i_hit], 0, false, false);
+                R3BTttxMappedData(i_det + 1, idChannelTtrig + 1, data->TTTX_ID[i_det].TTRIGv[i_hit], 0, false, false);
             curTtrig = nextTtrig;
         }
     }
@@ -208,7 +208,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
             pileupFLAG = (data->TTTX_ID[i_det].Ev[i_hit] & 0x00040000) >> 18;
             overflowFLAG = (data->TTTX_ID[i_det].Ev[i_hit] & 0x00080000) >> 19;
             if (pileupFLAG == kFALSE || !fPileup)
-                new ((*fArray)[fArray->GetEntriesFast()]) R3BTTTXMappedData(i_det + 1,
+                new ((*fArray)[fArray->GetEntriesFast()]) R3BTttxMappedData(i_det + 1,
                                                                             idChannelEnergy + 1,
                                                                             data->TTTX_ID[i_det].Tv[i_hit],
                                                                             data->TTTX_ID[i_det].Ev[i_hit],
@@ -222,4 +222,4 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
     return kTRUE;
 }
 
-ClassImp(R3BTTTXReader);
+ClassImp(R3BTTTXReader)
