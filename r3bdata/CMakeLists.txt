@@ -56,7 +56,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
-${R3BROOT_SOURCE_DIR}/r3bdata/ttt10Data
+${R3BROOT_SOURCE_DIR}/r3bdata/tttxData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/synccheckData
 )
@@ -208,9 +208,9 @@ twimData/R3BTwimPoint.cxx
 twimData/R3BTwimMappedData.cxx
 twimData/R3BTwimCalData.cxx
 twimData/R3BTwimHitData.cxx
-ttt10Data/R3BTTTXMappedData.cxx
-ttt10Data/R3BTTTXCalData.cxx
-ttt10Data/R3BTTTXHitData.cxx
+tttxData/R3BTttxMappedData.cxx
+tttxData/R3BTttxCalData.cxx
+tttxData/R3BTttxHitData.cxx
 musliData/R3BMusliMappedData.cxx
 musliData/R3BMusliCalData.cxx
 musliData/R3BMusliHitData.cxx

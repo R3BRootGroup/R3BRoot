@@ -12,37 +12,39 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                  R3BTTTXHitData source file                   -----
+// -----                      R3BTttxMappedData source file            -----
 // -------------------------------------------------------------------------
 
-#include "R3BTTTXHitData.h"
+#include "R3BTttxMappedData.h"
 #include <fmt/core.h>
 
-R3BTTTXHitData::R3BTTTXHitData(double xpos, double energy, double angle, double charge, double time)
-    : fXpos(xpos)
-    , fEnergy(energy)
-    , fAng(angle)
-    , fCharge(charge)
+R3BTttxMappedData::R3BTttxMappedData(uint8_t DetID, uint8_t StripID, int32_t time, int32_t energy, bool pu, bool ov)
+    : fDetID(DetID)
+    , fStripID(StripID)
     , fTime(time)
+    , fEnergy(energy)
+    , fPileup(pu)
+    , fOverflow(ov)
 {
 }
 
-std::string R3BTTTXHitData::toString() const
+std::string R3BTttxMappedData::toString() const
 {
-    return fmt::format("Xpos(mm): {:.2f}, Energy: {:.2f}, Angle: {:.3f}, ChargeZ: {:.2f}, Time: {}",
-                       GetX(),
+    return fmt::format("DetID: {}, StripID: {}, Time: {}, Energy: {}, Pileup: {}, Overflow: {}",
+                       GetDetID(),
+                       GetStripID(),
+                       GetTime(),
                        GetEnergy(),
-                       GetAngle(),
-                       GetChargeZ(),
-                       GetTime());
+                       GetPileupStatus(),
+                       GetOverflowStatus());
 }
 
-void R3BTTTXHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BTttxMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
 
-std::ostream& operator<<(std::ostream& os, const R3BTTTXHitData& data)
+std::ostream& operator<<(std::ostream& os, const R3BTttxMappedData& data)
 {
     os << data.toString();
     return os;
 }
 
-ClassImp(R3BTTTXHitData)
+ClassImp(R3BTttxMappedData)

@@ -12,32 +12,37 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                  R3BTTTXCalData source file                   -----
+// -----                  R3BTttxHitData source file                   -----
 // -------------------------------------------------------------------------
 
-#include "R3BTTTXCalData.h"
+#include "R3BTttxHitData.h"
 #include <fmt/core.h>
 
-R3BTTTXCalData::R3BTTTXCalData(uint8_t DetID, uint8_t StripID, double time, double energy)
-    : fDetID(DetID)
-    , fStripID(StripID)
-    , fTime(time)
+R3BTttxHitData::R3BTttxHitData(double xpos, double energy, double angle, double charge, double time)
+    : fXpos(xpos)
     , fEnergy(energy)
+    , fAng(angle)
+    , fCharge(charge)
+    , fTime(time)
 {
 }
 
-std::string R3BTTTXCalData::toString() const
+std::string R3BTttxHitData::toString() const
 {
-    return fmt::format(
-        "DetID: {}, StripID: {}, Time: {}, Energy: {}", GetDetID(), GetStripID(), GetTime(), GetEnergy());
+    return fmt::format("Xpos(mm): {:.2f}, Energy: {:.2f}, Angle: {:.3f}, ChargeZ: {:.2f}, Time: {}",
+                       GetX(),
+                       GetEnergy(),
+                       GetAngle(),
+                       GetChargeZ(),
+                       GetTime());
 }
 
-void R3BTTTXCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BTttxHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
 
-std::ostream& operator<<(std::ostream& os, const R3BTTTXCalData& data)
+std::ostream& operator<<(std::ostream& os, const R3BTttxHitData& data)
 {
     os << data.toString();
     return os;
 }
 
-ClassImp(R3BTTTXCalData)
+ClassImp(R3BTttxHitData)

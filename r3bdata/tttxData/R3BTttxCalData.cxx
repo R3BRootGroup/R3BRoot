@@ -12,39 +12,32 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                      R3BTTTXMappedData source file            -----
+// -----                  R3BTttxCalData source file                   -----
 // -------------------------------------------------------------------------
 
-#include "R3BTTTXMappedData.h"
+#include "R3BTttxCalData.h"
 #include <fmt/core.h>
 
-R3BTTTXMappedData::R3BTTTXMappedData(uint8_t DetID, uint8_t StripID, int32_t time, int32_t energy, bool pu, bool ov)
+R3BTttxCalData::R3BTttxCalData(uint8_t DetID, uint8_t StripID, double time, double energy)
     : fDetID(DetID)
     , fStripID(StripID)
     , fTime(time)
     , fEnergy(energy)
-    , fPileup(pu)
-    , fOverflow(ov)
 {
 }
 
-std::string R3BTTTXMappedData::toString() const
+std::string R3BTttxCalData::toString() const
 {
-    return fmt::format("DetID: {}, StripID: {}, Time: {}, Energy: {}, Pileup: {}, Overflow: {}",
-                       GetDetID(),
-                       GetStripID(),
-                       GetTime(),
-                       GetEnergy(),
-                       GetPileupStatus(),
-                       GetOverflowStatus());
+    return fmt::format(
+        "DetID: {}, StripID: {}, Time: {}, Energy: {}", GetDetID(), GetStripID(), GetTime(), GetEnergy());
 }
 
-void R3BTTTXMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BTttxCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }
 
-std::ostream& operator<<(std::ostream& os, const R3BTTTXMappedData& data)
+std::ostream& operator<<(std::ostream& os, const R3BTttxCalData& data)
 {
     os << data.toString();
     return os;
 }
 
-ClassImp(R3BTTTXMappedData)
+ClassImp(R3BTttxCalData)

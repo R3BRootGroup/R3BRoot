@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------
-// -----           R3BTTTXMappedData header file                 -----
+// -----           R3BTttxMappedData header file                 -----
 // -----       Created 01/12/2023 by M. Whitehead                -----
 // -------------------------------------------------------------------
 
@@ -23,14 +23,14 @@
 #include <iostream>
 #include <string>
 
-class R3BTTTXMappedData : public TObject
+class R3BTttxMappedData : public TObject
 {
   public:
     // Default constructor
-    R3BTTTXMappedData() = default;
+    R3BTttxMappedData() = default;
 
     // Constructor with arguments (explicit)
-    explicit R3BTTTXMappedData(uint8_t detID,
+    explicit R3BTttxMappedData(uint8_t detID,
                                uint8_t stripID,
                                int32_t time,
                                int32_t energy,
@@ -38,7 +38,7 @@ class R3BTTTXMappedData : public TObject
                                bool overflow);
 
     // Destructor virtual
-    virtual ~R3BTTTXMappedData() = default;
+    virtual ~R3BTttxMappedData() = default;
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint8_t& GetDetID() const { return fDetID; }
@@ -69,8 +69,8 @@ class R3BTTTXMappedData : public TObject
     bool fOverflow = false;
 
   public:
-    ClassDefOverride(R3BTTTXMappedData, 1)
+    ClassDefOverride(R3BTttxMappedData, 1)
 };
 
-// Operator overloading for printing R3BTTTXMappedData
-std::ostream& operator<<(std::ostream& os, const R3BTTTXMappedData& data);
+// Operator overloading for printing R3BTttxMappedData
+std::ostream& operator<<(std::ostream& os, const R3BTttxMappedData& data);
