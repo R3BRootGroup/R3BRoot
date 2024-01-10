@@ -228,17 +228,15 @@ void R3BCalifaDigitizer::Exec(Option_t*)
 void R3BCalifaDigitizer::FillRealConfig(int nCrystalCals)
 {
     double tempE = 0;
-    double realE = 0;
     double tempNf = 0;
-    double realNf = 0;
     double tempNs = 0;
-    double realNs = 0;
     int tempCryID = 0;
     int parThres = 0;
     bool inUse = false;
 
     for (int i = 0; i < nCrystalCals; i++)
     {
+        tempCryID = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetCrystalId();
         tempE = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetEnergy();
 
         inUse = fSim_Par->GetInUse(tempCryID - 1);
