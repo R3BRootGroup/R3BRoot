@@ -128,6 +128,7 @@
 #pragma link C++ class R3BRoluMappedData+;
 #pragma link C++ class R3BRoluCalData+;
 #pragma link C++ class R3BRoluHitData+;
+#pragma link C++ class R3BFrssciMappedData+;
 #pragma link C++ class R3BSci2MappedData+;
 #pragma link C++ class R3BSci2TcalData+;
 #pragma link C++ class R3BSci2CalData+;
