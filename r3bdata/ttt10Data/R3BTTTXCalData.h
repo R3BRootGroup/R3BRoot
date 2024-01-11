@@ -12,49 +12,41 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------
-// -----           R3BTTTXMappedData header file                 -----
-// -----       Created 01/12/2023 by M. Whitehead                -----
+// -----               R3BTTTXCalData header file                -----
+// -----      Created 11/01/2024 by J. L. Rodriguez-Sanchez      -----
 // -------------------------------------------------------------------
 
 #pragma once
 
 #include <TObject.h>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <string>
 
-class R3BTTTXMappedData : public TObject
+class R3BTTTXCalData : public TObject
 {
   public:
     // Default constructor
-    R3BTTTXMappedData() = default;
+    R3BTTTXCalData() = default;
 
     // Constructor with arguments (explicit)
-    explicit R3BTTTXMappedData(uint8_t detID,
-                               uint8_t stripID,
-                               int32_t time,
-                               int32_t energy,
-                               bool pileup,
-                               bool overflow);
+    explicit R3BTTTXCalData(uint8_t detID, uint8_t stripID, double time, double energy);
 
     // Destructor virtual
-    virtual ~R3BTTTXMappedData() = default;
+    virtual ~R3BTTTXCalData() = default;
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint8_t& GetDetID() const { return fDetID; }
     [[nodiscard]] inline const uint8_t& GetStripID() const { return fStripID; }
-    [[nodiscard]] inline const int32_t& GetTime() const { return fTime; }
-    [[nodiscard]] inline const int32_t& GetEnergy() const { return fEnergy; }
-    [[nodiscard]] inline const bool& GetPileupStatus() const { return fPileup; }
-    [[nodiscard]] inline const bool& GetOverflowStatus() const { return fOverflow; }
+    [[nodiscard]] inline const double& GetTime() const { return fTime; }
+    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
 
     // Modifiers
     inline void SetDetID(uint8_t id) { fDetID = id; }
     inline void SetStripID(uint8_t id) { fStripID = id; }
-    inline void SetTime(int32_t time) { fTime = time; }
-    inline void SetEnergy(int32_t energy) { fEnergy = energy; }
-    inline void SetPileup(bool pu) { fPileup = pu; }
-    inline void SetOverflow(bool ov) { fOverflow = ov; }
+    inline void SetTime(double time) { fTime = time; }
+    inline void SetEnergy(double energy) { fEnergy = energy; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
@@ -63,14 +55,12 @@ class R3BTTTXMappedData : public TObject
   protected:
     uint8_t fDetID = 0;
     uint8_t fStripID = 0;
-    int32_t fTime = 0;
-    int32_t fEnergy = 0;
-    bool fPileup = false;
-    bool fOverflow = false;
+    double fTime = std::nan("");
+    double fEnergy = std::nan("");
 
   public:
-    ClassDefOverride(R3BTTTXMappedData, 1)
+    ClassDefOverride(R3BTTTXCalData, 1)
 };
 
-// Operator overloading for printing R3BTTTXMappedData
-std::ostream& operator<<(std::ostream& os, const R3BTTTXMappedData& data);
+// Operator overloading for printing R3BTTTXCalData
+std::ostream& operator<<(std::ostream& os, const R3BTTTXCalData& data);
