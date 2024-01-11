@@ -12,39 +12,37 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                      R3BTTTXMappedData source file            -----
+// -----                  R3BTTTXHitData source file                   -----
 // -------------------------------------------------------------------------
 
-#include "R3BTTTXMappedData.h"
+#include "R3BTTTXHitData.h"
 #include <fmt/core.h>
 
-R3BTTTXMappedData::R3BTTTXMappedData(uint8_t DetID, uint8_t StripID, int32_t time, int32_t energy, bool pu, bool ov)
-    : fDetID(DetID)
-    , fStripID(StripID)
-    , fTime(time)
+R3BTTTXHitData::R3BTTTXHitData(double xpos, double energy, double angle, double charge, double time)
+    : fXpos(xpos)
     , fEnergy(energy)
-    , fPileup(pu)
-    , fOverflow(ov)
+    , fAng(angle)
+    , fCharge(charge)
+    , fTime(time)
 {
 }
 
-std::string R3BTTTXMappedData::toString() const
+std::string R3BTTTXHitData::toString() const
 {
-    return fmt::format("DetID: {}, StripID: {}, Time: {}, Energy: {}, Pileup: {}, Overflow: {}",
-                       GetDetID(),
-                       GetStripID(),
-                       GetTime(),
+    return fmt::format("Xpos(mm): {:.2f}, Energy: {:.2f}, Angle: {:.3f}, ChargeZ: {:.2f}, Time: {}",
+                       GetX(),
                        GetEnergy(),
-                       GetPileupStatus(),
-                       GetOverflowStatus());
+                       GetAngle(),
+                       GetChargeZ(),
+                       GetTime());
 }
 
-void R3BTTTXMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BTTTXHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
 
-std::ostream& operator<<(std::ostream& os, const R3BTTTXMappedData& data)
+std::ostream& operator<<(std::ostream& os, const R3BTTTXHitData& data)
 {
     os << data.toString();
     return os;
 }
 
-ClassImp(R3BTTTXMappedData)
+ClassImp(R3BTTTXHitData)
