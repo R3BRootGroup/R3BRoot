@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,20 +12,7 @@
  ******************************************************************************/
 
 #include "R3BCalifaMappedData.h"
-
-R3BCalifaMappedData::R3BCalifaMappedData()
-    : fCrystalId(0)
-    , fEnergy(0)
-    , fNf(0)
-    , fNs(0)
-    , fFebexTime(0)
-    , fWrts(0)
-    , fOverFlow(0)
-    , fPileup(0)
-    , fDiscard(0)
-    , fTot(0)
-{
-}
+#include <fmt/core.h>
 
 R3BCalifaMappedData::R3BCalifaMappedData(UShort_t crystalId,
                                          int16_t energy,
@@ -50,4 +37,24 @@ R3BCalifaMappedData::R3BCalifaMappedData(UShort_t crystalId,
 {
 }
 
-ClassImp(R3BCalifaMappedData);
+std::string R3BCalifaMappedData::toString() const
+{
+    return fmt::format("CrystalId: {}, Energy(ch): {}, Nf: {}, Ns: {}, OverFlow: {}, Pileup: {}, Discard: {}",
+                       GetCrystalId(),
+                       GetEnergy(),
+                       GetNf(),
+                       GetNs(),
+                       GetOverFlow(),
+                       GetPileup(),
+                       GetDiscard());
+}
+
+void R3BCalifaMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+
+std::ostream& operator<<(std::ostream& os, const R3BCalifaMappedData& data)
+{
+    os << data.toString();
+    return os;
+}
+
+ClassImp(R3BCalifaMappedData)

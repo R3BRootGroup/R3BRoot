@@ -82,5 +82,5 @@ class R3BCalifaClusterData : public TObject
     ClassDefOverride(R3BCalifaClusterData, 4)
 };
 
-// Operator overloading for printing R3BCalifaCrystalCalData
+// Operator overloading for printing R3BCalifaClusterData
 std::ostream& operator<<(std::ostream& os, const R3BCalifaClusterData& data);
