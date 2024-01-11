@@ -118,14 +118,14 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     **
     ** Adds a CalifaCluster to the ClusterCollection
     **/
-    R3BCalifaClusterData* AddCluster(std::vector<Int_t> crystalList,
+    R3BCalifaClusterData* AddCluster(std::vector<uint16_t> crystalList,
                                      Double_t ene,
                                      Double_t Nf,
                                      Double_t Ns,
                                      Double_t pAngle,
                                      Double_t aAngle,
                                      ULong64_t time,
-                                     Int_t clusterType);
+                                     uint8_t clusterType);
 
   public:
     ClassDefOverride(R3BCalifaCrystalCal2Cluster, 3);

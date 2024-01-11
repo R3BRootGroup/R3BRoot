@@ -11,16 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include <R3BCalifaPoint.h>
-
-#include <iostream>
-
-R3BCalifaPoint::R3BCalifaPoint()
-    : FairMCPoint()
-    , fCrystalId(0)
-    , fTrackPID(0)
-{
-}
+#include "R3BCalifaPoint.h"
 
 R3BCalifaPoint::R3BCalifaPoint(int trackID,
                                int detID,
@@ -44,6 +35,4 @@ R3BCalifaPoint::R3BCalifaPoint(const R3BCalifaPoint& right)
 {
 }
 
-R3BCalifaPoint::~R3BCalifaPoint() {}
-
-ClassImp(R3BCalifaPoint);
+ClassImp(R3BCalifaPoint)

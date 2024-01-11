@@ -12,30 +12,45 @@
  ******************************************************************************/
 
 #include "R3BCalifaCrystalCalData.h"
+#include <fmt/core.h>
 
-R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(Int_t cryid,
-                                                 Double_t energy,
-                                                 Double_t Nf,
-                                                 Double_t Ns,
-                                                 uint64_t time,
-                                                 Double_t tot_energy)
+R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(uint16_t cryid,
+                                                 double energy,
+                                                 double Nf,
+                                                 double Ns,
+                                                 ULong64_t time,
+                                                 double tot_energy)
     : fCrystalId(cryid)
     , fEnergy(energy)
     , fNf(Nf)
     , fNs(Ns)
-    , fToT_Energy(tot_energy)
     , fTime(time)
+    , fToT_Energy(tot_energy)
 {
 }
 
 R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData& right)
-    : fCrystalId(right.fCrystalId)
-    , fEnergy(right.fEnergy)
-    , fNf(right.fNf)
-    , fNs(right.fNs)
-    , fToT_Energy(right.fToT_Energy)
-    , fTime(right.fTime)
+    : R3BCalifaCrystalCalData(right.fCrystalId, right.fEnergy, right.fNf, right.fNs, right.fTime, right.fToT_Energy)
 {
 }
 
-ClassImp(R3BCalifaCrystalCalData);
+std::string R3BCalifaCrystalCalData::toString() const
+{
+    return fmt::format("CrystalId: {}, Energy(MeV): {:.3f}, Nf: {:.3f}, Ns: {:.3f}, Time: {}, ToT: {:.3f}",
+                       GetCrystalId(),
+                       GetEnergy(),
+                       GetNf(),
+                       GetNs(),
+                       GetTime(),
+                       GetToTEnergy());
+}
+
+void R3BCalifaCrystalCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+
+std::ostream& operator<<(std::ostream& os, const R3BCalifaCrystalCalData& data)
+{
+    os << data.toString();
+    return os;
+}
+
+ClassImp(R3BCalifaCrystalCalData)

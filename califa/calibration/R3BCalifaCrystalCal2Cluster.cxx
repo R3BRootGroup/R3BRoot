@@ -16,12 +16,12 @@
 #include <FairRunAna.h>
 #include <FairRuntimeDb.h>
 
-#include <R3BCalifaCrystalCal2Cluster.h>
-#include <R3BCalifaCrystalCalData.h>
-#include <R3BCalifaGeometry.h>
-#include <R3BCalifaMappingPar.h>
-#include <R3BLogger.h>
-#include <R3BTGeoPar.h>
+#include "R3BCalifaCrystalCal2Cluster.h"
+#include "R3BCalifaCrystalCalData.h"
+#include "R3BCalifaGeometry.h"
+#include "R3BCalifaMappingPar.h"
+#include "R3BLogger.h"
+#include "R3BTGeoPar.h"
 
 #include <TClonesArray.h>
 #include <TGeoManager.h>
@@ -39,7 +39,7 @@ using namespace std;
 struct califa_candidate
 {
     Int_t motherId;
-    vector<Int_t> crystalList;
+    vector<uint16_t> crystalList;
     Double_t energy;
     Double_t ns;
     Double_t nf;
@@ -64,7 +64,7 @@ void R3BCalifaCrystalCal2Cluster::SetRoundWindow(Double_t window)
 
 bool compareByEnergy(R3BCalifaCrystalCalData* a, R3BCalifaCrystalCalData* b) { return a->GetEnergy() > b->GetEnergy(); }
 
-bool isInside(vector<Int_t>& vec, Int_t cryId) { return find(vec.begin(), vec.end(), cryId) != vec.end(); }
+bool isInside(vector<uint16_t>& vec, Int_t cryId) { return find(vec.begin(), vec.end(), cryId) != vec.end(); }
 
 bool R3BCalifaCrystalCal2Cluster::InsideClusterWindow(TVector3 mother, TVector3 crystal)
 {
@@ -79,7 +79,7 @@ bool R3BCalifaCrystalCal2Cluster::InsideClusterWindow(TVector3 mother, TVector3 
         return 0;
 }
 
-void RemoveUsedCrystals(vector<Int_t>& used,
+void RemoveUsedCrystals(vector<uint16_t>& used,
                         vector<R3BCalifaCrystalCalData*>& all,
                         vector<R3BCalifaCrystalCalData*>& proton,
                         vector<R3BCalifaCrystalCalData*>& gamma,
@@ -122,8 +122,8 @@ void RemoveUsedCrystals(vector<Int_t>& used,
 void addCrystal2Cluster(struct califa_candidate* cluster,
                         R3BCalifaCrystalCalData* crystalCal,
                         string range,
-                        vector<Int_t>* usedCrystals,
-                        Int_t totalCrystals)
+                        vector<uint16_t>* usedCrystals,
+                        uint16_t totalCrystals)
 {
     cluster->energy += crystalCal->GetEnergy();
     cluster->ns += crystalCal->GetNs();
@@ -274,10 +274,10 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
     vector<R3BCalifaCrystalCalData*> gammaCandidatesVec;
     vector<R3BCalifaCrystalCalData*> saturatedCandidatesVec;
 
-    vector<Int_t> usedCrystals;
+    vector<uint16_t> usedCrystals;
 
-    Double_t cryEnergy;
-    Int_t cryId;
+    Double_t cryEnergy = 0.;
+    Int_t cryId = 0;
 
     for (Int_t i = 0; i < numCrystalHits; i++)
     {
@@ -327,13 +327,13 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
     std::sort(allCrystalVec.begin(), allCrystalVec.end(), compareByEnergy);
 
     TVector3 mother_angles, angles;
-    Double_t fRandTheta, fRandPhi;
+    Double_t fRandTheta = 0., fRandPhi = 0.;
 
     while (protonCandidatesVec.size())
     {
         Int_t motherId = protonCandidatesVec.at(0)->GetCrystalId();
 
-        califa_candidate cluster = { motherId, vector<Int_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
+        califa_candidate cluster = { motherId, vector<uint16_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         if (motherId <= fTotalCrystals)
         {
@@ -415,7 +415,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
     {
         Int_t motherId = gammaCandidatesVec.at(0)->GetCrystalId();
 
-        califa_candidate cluster = { motherId, vector<Int_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
+        califa_candidate cluster = { motherId, vector<uint16_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         if (motherId <= fTotalCrystals)
             mother_angles = R3BCalifaGeometry::Instance()->GetAngles(motherId);
@@ -499,7 +499,7 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
     {
         Int_t motherId = saturatedCandidatesVec.at(0)->GetCrystalId();
 
-        califa_candidate cluster = { motherId, vector<Int_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
+        califa_candidate cluster = { motherId, vector<uint16_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         mother_angles = R3BCalifaGeometry::Instance()->GetAngles(motherId);
 
@@ -563,14 +563,14 @@ void R3BCalifaCrystalCal2Cluster::SelectGeometryVersion(Int_t version)
     R3BLOG(info, "to " << fGeometryVersion);
 }
 
-R3BCalifaClusterData* R3BCalifaCrystalCal2Cluster::AddCluster(vector<Int_t> crystalList,
+R3BCalifaClusterData* R3BCalifaCrystalCal2Cluster::AddCluster(vector<uint16_t> crystalList,
                                                               Double_t ene,
                                                               Double_t Nf,
                                                               Double_t Ns,
                                                               Double_t pAngle,
                                                               Double_t aAngle,
                                                               ULong64_t time,
-                                                              Int_t clusterType)
+                                                              uint8_t clusterType)
 {
     TClonesArray& clref = *fCalifaClusterData;
     Int_t size = clref.GetEntriesFast();

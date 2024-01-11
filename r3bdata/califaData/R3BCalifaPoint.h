@@ -10,10 +10,8 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-#pragma once
 
-#ifndef R3BCALIFAPOINT_H
-#define R3BCALIFAPOINT_H 1
+#pragma once
 
 #include <FairMCPoint.h>
 #include <TObject.h>
@@ -22,37 +20,36 @@
 class R3BCalifaPoint : public FairMCPoint
 {
   public:
-    /** Default constructor **/
-    R3BCalifaPoint();
+    // Default constructor
+    R3BCalifaPoint() = default;
 
     /** Constructor with arguments
      *@param trackID  Index of MCTrack
      *@param detID    Detector ID
      *@param trackPID Particle PID
-     *@param ident    Crystal ID
+     *@param cryId    Crystal ID
      *@param posIn    Ccoordinates at entrance to active volume [cm]
      *@param momIn    Momentum of track at entrance [GeV]
      *@param tof      Time since event start [ns]
      *@param length   Track length since creation [cm]
-     *@param eLoss    Energy deposit [GeV]
+     *@param eLoss    Energy deposit [MeV]
      **/
     R3BCalifaPoint(int trackID,
                    int detID,
                    int trackPID,
-                   int ident,
+                   int cryId,
                    TVector3 posIn,
                    TVector3 momIn,
                    double tof,
                    double length,
                    double eLoss);
 
-    /** Copy constructor **/
+    // Copy constructor
     R3BCalifaPoint(const R3BCalifaPoint&);
-
     R3BCalifaPoint& operator=(const R3BCalifaPoint&) { return *this; }
 
-    /** Destructor **/
-    virtual ~R3BCalifaPoint();
+    // Destructor
+    ~R3BCalifaPoint() override = default;
 
     /** Accessors **/
     int GetCrystalId() const { return fCrystalId; }
@@ -63,10 +60,8 @@ class R3BCalifaPoint : public FairMCPoint
     void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
 
   protected:
-    int fCrystalId; ///< crystal index
-    int fTrackPID;
+    int fCrystalId = 0; // Crystal index
+    int fTrackPID = 0;  // PID
 
-    ClassDef(R3BCalifaPoint, 2)
+    ClassDefOverride(R3BCalifaPoint, 2)
 };
-
-#endif
