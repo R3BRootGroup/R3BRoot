@@ -567,9 +567,9 @@ double R3BCalifaDigitizer::ExpResSmearing(double inputEnergy)
         return inputEnergy;
     else
     {
-        // Energy in MeV, that is the reason for the factor 1000...
-        double randomIs = gRandom->Gaus(0., inputEnergy * fResolution * 1000. / (235. * sqrt(inputEnergy * 1000.)));
-        return inputEnergy + randomIs / 1000.;
+        // Energy in MeV
+        double randomIs = gRandom->Gaus(0., inputEnergy * fResolution * 1. / (235. * sqrt(inputEnergy)));
+        return inputEnergy + randomIs / 1.;
     }
 }
 
@@ -581,10 +581,9 @@ double R3BCalifaDigitizer::CompSmearing(double inputComponent)
         return inputComponent;
     else if (fComponentRes != 0 && inputComponent != 0)
     {
-        // Energy in MeV, that is the reason for the factor 1000...
-        double randomIs =
-            gRandom->Gaus(0, inputComponent * fComponentRes * 1000. / (235. * sqrt(inputComponent * 1000.)));
-        return inputComponent + randomIs / 1000.;
+        // Energy in MeV
+        double randomIs = gRandom->Gaus(0, inputComponent * fComponentRes * 1. / (235. * sqrt(inputComponent)));
+        return inputComponent + randomIs / 1.;
     }
 
     else
