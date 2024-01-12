@@ -57,6 +57,7 @@
 #pragma link C++ class R3BFiberReader+;
 #pragma link C++ class R3BLosReader+;
 #pragma link C++ class R3BRoluReader+;
+#pragma link C++ class R3BFrssciReader+;
 #pragma link C++ class R3BSci2Reader+;
 #pragma link C++ class R3BSci8Reader+;
 #pragma link C++ class R3BTofdReader+;

@@ -28,6 +28,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource/base
 ${R3BROOT_SOURCE_DIR}/r3bsource/wr
 ${R3BROOT_SOURCE_DIR}/r3bsource/trloii
 ${R3BROOT_SOURCE_DIR}/r3bsource/beammonitor
+${R3BROOT_SOURCE_DIR}/r3bsource/frssci
 ${R3BROOT_SOURCE_DIR}/r3bsource/sci2
 ${R3BROOT_SOURCE_DIR}/r3bsource/sci8
 ${R3BROOT_SOURCE_DIR}/r3bsource/rolu
