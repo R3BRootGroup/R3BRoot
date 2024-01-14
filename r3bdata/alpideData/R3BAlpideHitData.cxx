@@ -16,29 +16,32 @@
 // -------------------------------------------------------------------
 
 #include "R3BAlpideHitData.h"
+#include <fmt/core.h>
 
-R3BAlpideHitData::R3BAlpideHitData()
-    : fTrack(0., 0., 0.)
-    , fSensorId(0)
-    , fClustersize(0)
-    , fX(NAN)
-    , fY(NAN)
-    , fZ(NAN)
-    , fTheta(NAN)
-    , fPhi(NAN)
-{
-}
-
-R3BAlpideHitData::R3BAlpideHitData(UInt_t sensorId, UInt_t clustersize, Double_t x, Double_t y, Double_t z)
+R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId, uint16_t clustersize, double posx, double posy, double posz)
     : fSensorId(sensorId)
     , fClustersize(clustersize)
-    , fX(x)
-    , fY(y)
-    , fZ(z)
+    , fX(posx)
+    , fY(posy)
+    , fZ(posz)
 {
-    fTrack.SetXYZ(x, y, z);
+    fTrack.SetXYZ(posx, posy, posz);
     fTheta = fTrack.Theta();
     fPhi = fTrack.Phi();
 }
 
-ClassImp(R3BAlpideHitData);
+std::string R3BAlpideHitData::toString() const
+{
+    return fmt::format(
+        "SensorID: {}, ClusterSize: {}, Xpos: {}, Ypos: {}", GetSensorId(), GetClusterSize(), GetX(), GetY());
+}
+
+void R3BAlpideHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+
+std::ostream& operator<<(std::ostream& os, const R3BAlpideHitData& data)
+{
+    os << data.toString();
+    return os;
+}
+
+ClassImp(R3BAlpideHitData)

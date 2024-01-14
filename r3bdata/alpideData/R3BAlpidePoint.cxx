@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -52,11 +52,6 @@ R3BAlpidePoint::R3BAlpidePoint(Int_t trackID,
     fPy_out = momOut.Py();
     fPz_out = momOut.Pz();
 }
-// -------------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
-R3BAlpidePoint::~R3BAlpidePoint() {}
-// -------------------------------------------------------------------------
 
 // -----   Point x coordinate from linear extrapolation   ------------------
 Double_t R3BAlpidePoint::GetX(Double_t z) const
@@ -78,4 +73,4 @@ Double_t R3BAlpidePoint::GetY(Double_t z) const
 }
 // -------------------------------------------------------------------------
 
-ClassImp(R3BAlpidePoint);
+ClassImp(R3BAlpidePoint)

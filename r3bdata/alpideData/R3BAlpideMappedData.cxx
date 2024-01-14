@@ -16,23 +16,14 @@
 // -----------------------------------------------------------------------
 
 #include "R3BAlpideMappedData.h"
+#include <fmt/core.h>
 
-R3BAlpideMappedData::R3BAlpideMappedData()
-    : fSenId(0)
-    , fReg(0)
-    , fAds(0)
-    , fChip(0)
-    , fRow(0)
-    , fCol(0)
-{
-}
-
-R3BAlpideMappedData::R3BAlpideMappedData(UShort_t senId,
-                                         UShort_t reg,
-                                         UShort_t ads,
-                                         UShort_t chip,
-                                         UShort_t row,
-                                         UShort_t col)
+R3BAlpideMappedData::R3BAlpideMappedData(uint16_t senId,
+                                         uint16_t reg,
+                                         uint16_t ads,
+                                         uint16_t chip,
+                                         uint16_t row,
+                                         uint16_t col)
     : fSenId(senId)
     , fReg(reg)
     , fAds(ads)
@@ -42,4 +33,23 @@ R3BAlpideMappedData::R3BAlpideMappedData(UShort_t senId,
 {
 }
 
-ClassImp(R3BAlpideMappedData);
+std::string R3BAlpideMappedData::toString() const
+{
+    return fmt::format("SensorID: {}, Region: {}, Address: {}, Chip: {}, Row: {}, Col: {}",
+                       GetSensorId(),
+                       GetReg(),
+                       GetAds(),
+                       GetChip(),
+                       GetRow(),
+                       GetCol());
+}
+
+void R3BAlpideMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+
+std::ostream& operator<<(std::ostream& os, const R3BAlpideMappedData& data)
+{
+    os << data.toString();
+    return os;
+}
+
+ClassImp(R3BAlpideMappedData)

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -135,7 +135,7 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
         // std::cout << det <<" "<< col <<" "<< row <<std::endl;
         if (fMap_Par->GetInUse(det, col, row) == 1)
         {
-            AddCalData(det, col, row);
+            AddCalData(det, row, col);
         }
     }
     if (mappedData)
@@ -170,12 +170,12 @@ void R3BAlpideMapped2Cal::Reset()
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BAlpideCalData* R3BAlpideMapped2Cal::AddCalData(UShort_t senId, Int_t col, Int_t row)
+R3BAlpideCalData* R3BAlpideMapped2Cal::AddCalData(UShort_t senId, Int_t row, Int_t col)
 {
     // It fills the R3BAlpideCalData
     TClonesArray& clref = *fAlpideCalData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideCalData(senId, col, row);
+    return new (clref[size]) R3BAlpideCalData(senId, row, col);
 }
 
 ClassImp(R3BAlpideMapped2Cal);

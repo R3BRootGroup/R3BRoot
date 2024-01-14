@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -69,7 +69,7 @@ class R3BAlpideMapped2Cal : public FairTask
     TClonesArray* fAlpideCalData;    // Array with Alpide Cal output data
 
     // Private method AddCalData
-    R3BAlpideCalData* AddCalData(UShort_t senId, Int_t col, Int_t row);
+    R3BAlpideCalData* AddCalData(UShort_t senId, Int_t row, Int_t col);
 
   public:
     // Class definition
