@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,20 +12,18 @@
  ******************************************************************************/
 
 #include "R3BCalifaCrystalCalPar.h"
+#include "R3BLogger.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
 
-#include "TMath.h"
-#include "TString.h"
-
+#include <TMath.h>
+#include <TString.h>
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumCrystals(5088)
-    , fNumParamsFit(2) // pol1
 {
     fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
 }
@@ -99,18 +97,11 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 void R3BCalifaCrystalCalPar::print() { printParams(); }
 
 // ----  Method printCalCrystalInfo --------------------------------------------
-void R3BCalifaCrystalCalPar::printCalCrystalInfo(const UInt_t cryID)
+void R3BCalifaCrystalCalPar::printCalCrystalInfo(const int cryID)
 {
-    if (cryID < 1)
-    {
-        LOG(error) << "crystal_id must be given in 1-base";
-        return;
-    }
-    else if (cryID > fNumCrystals)
-    {
-        LOG(error) << "crystal_id does not exist, crystal_id<=" << fNumCrystals;
-        return;
-    }
+    assert(std::clamp(cryID, 1, fNumCrystals) == cryID && "crystal_id must be given in 1-base");
+    R3BLOG_IF(fatal, cryID > fNumCrystals, "crystal_id does not exist, crystal_id<=" << fNumCrystals);
+
     auto index = cryID - 1;
     LOG(info) << "Califa Crystal number: " << cryID;
     for (Int_t j = 0; j < fNumParamsFit; j++)
@@ -135,4 +126,4 @@ void R3BCalifaCrystalCalPar::printParams()
     }
 }
 
-ClassImp(R3BCalifaCrystalCalPar);
+ClassImp(R3BCalifaCrystalCalPar)
