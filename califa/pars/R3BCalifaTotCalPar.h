@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCalifaTotCalPar_H
-#define R3BCalifaTotCalPar_H
+#pragma once
 
-#include "FairParGenericSet.h"
-#include "TObject.h"
+#include <FairParGenericSet.h>
 
-#include "TArrayF.h"
-#include "TObjArray.h"
+#include <TArrayF.h>
+#include <TObjArray.h>
 #include <TObjString.h>
+#include <TObject.h>
 
 class FairParamList;
 
@@ -49,27 +48,30 @@ class R3BCalifaTotCalPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Double_t GetNumCrystals() { return fNumCrystals; }
-    const Double_t GetNumParametersFit() { return fNumParamsFit; }
+    [[nodiscard]] inline const int GetNumCrystals() const { return fNumCrystals; }
+    [[nodiscard]] inline const int GetNumParametersFit() const { return fNumParamsFit; }
     TArrayF* GetCryCalParams() { return fCryCalParams; }
 
-    void SetNumCrystals(Int_t numberCry) { fNumCrystals = numberCry; }
-    void SetNumParametersFit(Int_t numberParams) { fNumParamsFit = numberParams; }
-    void SetCryCalParams(Float_t cc, Int_t ii) { fCryCalParams->AddAt(cc, ii); }
+    inline void SetNumCrystals(int numberCry) { fNumCrystals = numberCry; }
+    inline void SetNumParametersFit(int numberParams) { fNumParamsFit = numberParams; }
+    inline void SetCryCalParams(Float_t cc, int cry)
+    {
+        assert(std::clamp(cry, 1, fNumCrystals) == cry && "Number of crystal out of range");
+        fCryCalParams->AddAt(cc, cry);
+    }
 
     /** Create more Methods if you need them! **/
 
   private:
-    TArrayF* fCryCalParams; /*< Calibration Parameters of Crystals>*/
-    Int_t fNumCrystals;     /*< number of crystals>*/
-    Int_t fNumParamsFit;    /*< number of cal parameters in the fit
-                  pol1: A_fit & B_fit
-                  pol2: A_fit, B_fit & C_fit>*/
+    TArrayF* fCryCalParams;  /*< Calibration Parameters of Crystals>*/
+    int fNumCrystals = 5088; /*< number of crystals>*/
+    int fNumParamsFit = 2;   /*< number of cal parameters in the fit
+                 pol1: A_fit & B_fit
+                 pol2: A_fit, B_fit & C_fit>*/
 
     const R3BCalifaTotCalPar& operator=(const R3BCalifaTotCalPar&);
     R3BCalifaTotCalPar(const R3BCalifaTotCalPar&);
 
+  public:
     ClassDef(R3BCalifaTotCalPar, 1);
 };
-
-#endif /* R3BCalifaTotCalPar_H */

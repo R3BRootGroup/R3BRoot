@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFACONTFACT_H
-#define R3BCALIFACONTFACT_H
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
 class FairContainer;
 
@@ -29,5 +28,3 @@ class R3BCalifaContFact : public FairContFact
     FairParSet* createContainer(FairContainer*);
     ClassDef(R3BCalifaContFact, 0) // Factory for all CALIFA parameter containers
 };
-
-#endif /* !R3BCALIFACONTFACT_H */
