@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,22 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAONLINESPECTRA_H
-#define R3BCALIFAONLINESPECTRA_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
-#include "TMath.h"
+#include <FairTask.h>
+#include <TCanvas.h>
+#include <TMath.h>
 #include <array>
+#include <boost/multi_array.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 
-#define Nb_Sides 2
-#define Nb_Rings 5
-#define Nb_Preamps 16
-#define Nb_PreampCh 16
+#include "R3BShared.h"
+
+using namespace boost;
+
+constexpr const int Nb_Sides = 2;
+constexpr const int Nb_Rings = 6;
+constexpr const int Nb_Preamps = 16;
+constexpr const int Nb_PreampCh = 16;
+constexpr const int Nb_SlotandModule = 4; // Febex slot and module info: 0 slot and 1 module, (PR) 2 slot and 3 module
+constexpr const int BinsChannelFebex = 5000; // Number of Bins per Febex channel
+constexpr const int MaxBinChannelFebex = 65535;
+constexpr const int MaxNbCrystals = 5088; // gamma + proton range channels
 
 class TClonesArray;
 class R3BCalifaMappingPar;
@@ -53,16 +61,16 @@ class R3BCalifaOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbose = 1);
+    explicit R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BCalifaOnlineSpectra();
+    ~R3BCalifaOnlineSpectra() = default;
 
     /** Virtual method SetParContainers **/
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /**
      * Method for task initialization.
@@ -70,30 +78,30 @@ class R3BCalifaOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Method for setting number of rings
@@ -159,12 +167,12 @@ class R3BCalifaOnlineSpectra : public FairTask
     /**
      * Method for setting the trigger
      */
-    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for selecting tpat values.
      */
-    void SetTpat(Int_t tpat1, Int_t tpat2)
+    inline void SetTpat(Int_t tpat1, Int_t tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
@@ -173,43 +181,45 @@ class R3BCalifaOnlineSpectra : public FairTask
   private:
     void SetParameter();
 
-    Int_t fMapHistos_max;
-    Int_t fMapHistos_bins;
-    Int_t fTpat1;
-    Int_t fTpat2;
+    int fMapHistos_max = 4000;
+    int fMapHistos_bins = 500;
+    int fTpat1 = -1;
+    int fTpat2 = -1;
 
-    R3BCalifaMappingPar* fMap_Par;    /**< Container with mapping parameters. >*/
-    TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
-    TClonesArray* fTrigMappedItemsCalifa;
-    TClonesArray* fCalItemsCalifa; /**< Array with cal items.       */
-    TClonesArray* fHitItemsCalifa; /**< Array with hit items.       */
-    TClonesArray* fWRItemsCalifa;  /**< Array with WR-Califa items. */
-    TClonesArray* fWRItemsMaster;  /**< Array with WR-Master items. */
+    R3BCalifaMappingPar* fMap_Par = nullptr;    /**< Container with mapping parameters. >*/
+    TClonesArray* fMappedItemsCalifa = nullptr; /**< Array with mapped items.    */
+    TClonesArray* fTrigMappedItemsCalifa = nullptr;
+    TClonesArray* fCalItemsCalifa = nullptr; /**< Array with cal items.       */
+    TClonesArray* fHitItemsCalifa = nullptr; /**< Array with hit items.       */
+    TClonesArray* fWRItemsCalifa = nullptr;  /**< Array with WR-Califa items. */
+    TClonesArray* fWRItemsMaster = nullptr;  /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header.  */
-    Int_t fNEvents;         /**< Event counter. */
-    Int_t fTrigger;
+    R3BEventHeader* header = nullptr; /**< Event header.  */
+    int fNEvents = 0;                 /**< Event counter. */
+    int fTrigger = -1;
 
-    Int_t fNbCalifaCrystals;              /**< Number of Crystals in Califa. */
-    Int_t fNumSides;                      /**< Number of Sides, left and right.   */
-    Int_t fNumRings;                      /**< Number of Rings.   */
-    Int_t fNumPreamps;                    /**< Number of Preamps per ring.   */
-    Int_t fNumCrystalPreamp;              /**< Number of Crystals/Channels per Preamp. */
-    Int_t fBinsChannelFebex;              /**< Number of Bins per Febex channel. */
-    Int_t fMaxBinChannelFebex;            /**< Maximum bin for Febex histograms. */
-    Int_t fOrderFebexPreamp[Nb_PreampCh]; /**< Selector for febex or preamp sequence. */
-    Float_t fMinProtonE;                  /**< Min proton energy (in keV) to calculate the opening angle */
+    int fNbCalifaCrystals = MaxNbCrystals;        /**< Number of Crystals in Califa. */
+    int fNumSides = Nb_Sides;                     /**< Number of Sides, left and right.   */
+    int fNumRings = Nb_Rings;                     /**< Number of Rings.   */
+    int fNumPreamps = Nb_Preamps;                 /**< Number of Preamps per ring.   */
+    int fNumCrystalPreamp = Nb_PreampCh;          /**< Number of Crystals/Channels per Preamp. */
+    int fBinsChannelFebex = BinsChannelFebex;     /**< Number of Bins per Febex channel. */
+    int fMaxBinChannelFebex = MaxBinChannelFebex; /**< Maximum bin for Febex histograms. */
 
-    TString fCalifaFile;    /**< Config file name. */
-    Int_t fMaxEnergyBarrel; /**< Max. energy for Barrel histograms at CAL level. */
-    Int_t fMaxEnergyIphos;  /**< Max. energy for Iphos histograms at CAL level. */
-    Bool_t fLogScale;       /**< Selecting scale. */
-    Bool_t fRaw2Cal;        /**< Mapped or Cal selector. */
-    Bool_t fFebex2Preamp;   /**< Febex or Preamp selector. */
-    Bool_t fTotHist;        /**< Tot histograms selector. */
-    Int_t fFebexInfo[Nb_Sides][Nb_Rings][Nb_Preamps]
-                    [4]; /**< Febex slot and module info: 0 slot and 1 module, (PR) 2 slot and 3 module. */
+    // Selector for febex or preamp sequence
+    const std::array<int, Nb_PreampCh> fOrderFebexPreamp{ 6, 5, 4, 3, 2, 1, 0, 7, 8, 15, 14, 13, 12, 11, 10, 9 };
+
+    float fMinProtonE = 50000.; /**< Min proton energy (in keV) to calculate the opening angle */
+
+    TString fCalifaFile;       /**< Config file name. */
+    int fMaxEnergyBarrel = 10; /**< Max. energy for Barrel histograms at CAL level. */
+    int fMaxEnergyIphos = 30;  /**< Max. energy for Iphos histograms at CAL level. */
+    bool fLogScale = true;     /**< Selecting scale. */
+    bool fRaw2Cal = false;     /**< Mapped or Cal selector. */
+    bool fFebex2Preamp = true; /**< Febex or Preamp selector. */
+    bool fTotHist = false;     /**< Tot histograms selector. */
+    multi_array<int, 4> fFebexInfo;
 
     // Canvas
     TCanvas* cCalifaMult;
@@ -268,7 +278,5 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_Califa_Etrig[2];
 
   public:
-    ClassDef(R3BCalifaOnlineSpectra, 1)
+    ClassDefOverride(R3BCalifaOnlineSpectra, 1)
 };
-
-#endif /* R3BCALIFAONLINESPECTRA_H */

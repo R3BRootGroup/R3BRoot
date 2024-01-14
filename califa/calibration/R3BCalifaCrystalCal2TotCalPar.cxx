@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,31 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "TClonesArray.h"
-#include "TF1.h"
-#include "TGraph.h"
-#include "TH1F.h"
-#include "TMath.h"
-#include "TObjArray.h"
-#include "TRandom.h"
-#include "TSpectrum.h"
-#include "TVector3.h"
-
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 #include "R3BCalifaCrystalCal2TotCalPar.h"
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BCalifaTotCalPar.h"
 
+#include <TClonesArray.h>
+#include <TF1.h>
+#include <TGraph.h>
+#include <TH1F.h>
+#include <TMath.h>
+#include <TObjArray.h>
+#include <TRandom.h>
+#include <TSpectrum.h>
+#include <TVector3.h>
 #include <iostream>
 #include <stdlib.h>
 
 R3BCalifaCrystalCal2TotCalPar::R3BCalifaCrystalCal2TotCalPar()
-    : R3BCalifaCrystalCal2TotCalPar("R3B CALIFA Tot Calibration Parameters Finder ", 1)
+    : R3BCalifaCrystalCal2TotCalPar("R3BCalifaCrystalCal2TotCalPar", 1)
 {
 }
 
@@ -56,7 +55,6 @@ R3BCalifaCrystalCal2TotCalPar::R3BCalifaCrystalCal2TotCalPar(const char* name, I
 
 R3BCalifaCrystalCal2TotCalPar::~R3BCalifaCrystalCal2TotCalPar()
 {
-    LOG(info) << "R3BCalifaCrystalCal2TotCalPar: Delete instance";
     if (fCrystalCalDataCA)
         delete fCrystalCalDataCA;
 }
@@ -230,7 +228,7 @@ void R3BCalifaCrystalCal2TotCalPar::Search_TotParams()
             energy_vs_tot_crystal[i]->Fit("f1", "R0");
             for (Int_t h = 0; h < fNumParam; h++)
             {
-                fTotCal_Par->SetCryCalParams(f1->GetParameter(h), fNumParam * i + h);
+                fTotCal_Par->SetCryCalParams(f1->GetParameter(h), fNumParam * i + h + 1); // 1-base
             }
         }
 

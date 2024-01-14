@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,19 +13,16 @@
 
 #include "R3BCalifaTotCalPar.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
 
-#include "TMath.h"
-#include "TString.h"
-
+#include <TMath.h>
+#include <TString.h>
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BCalifaTotCalPar::R3BCalifaTotCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumCrystals(5088)
-    , fNumParamsFit(2) // pol1
 {
     fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
 }
@@ -109,7 +106,7 @@ void R3BCalifaTotCalPar::printParams()
         LOG(info) << "Califa Crystal number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            LOG(info) << "FitParam(" << j << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
+            LOG(info) << "FitParam(" << j + 1 << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

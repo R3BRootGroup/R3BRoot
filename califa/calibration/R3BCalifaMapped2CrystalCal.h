@@ -22,10 +22,7 @@
 
 #pragma once
 
-#ifndef R3BCALIFAMAPPED2CRYSTALCAL_H
-#define R3BCALIFAMAPPED2CRYSTALCAL_H 1
-
-#include "FairTask.h"
+#include <FairTask.h>
 
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaMappedData.h"
@@ -67,18 +64,18 @@ class R3BCalifaMapped2CrystalCal : public FairTask
   private:
     void SetParameter();
 
-    UInt_t fNumCrystals;
-    UInt_t fNumParams;
-    UInt_t fNumTotParams;
+    UInt_t fNumCrystals = 5088;
+    UInt_t fNumParams = 2;
+    UInt_t fNumTotParams = 2;
     TArrayF* fCalParams;
     TArrayF* fCalTotParams;
     // Don't store data for online
-    Bool_t fOnline;
+    Bool_t fOnline = false;
 
-    R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/
-    R3BCalifaTotCalPar* fTotCal_Par;   /**< Tot Parameter container. >*/
-    TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/
-    TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
+    R3BCalifaCrystalCalPar* fCal_Par = nullptr;  /**< Parameter container. >*/
+    R3BCalifaTotCalPar* fTotCal_Par = nullptr;   /**< Tot Parameter container. >*/
+    TClonesArray* fCalifaMappedDataCA = nullptr; /**< Array with CALIFA Mapped- input data. >*/
+    TClonesArray* fCalifaCryCalDataCA = nullptr; /**< Array with CALIFA Cal- output data. >*/
 
     /** Private method AddCalData **/
     R3BCalifaCrystalCalData* AddCalData(Int_t id,
@@ -92,5 +89,3 @@ class R3BCalifaMapped2CrystalCal : public FairTask
     // Class definition
     ClassDef(R3BCalifaMapped2CrystalCal, 1)
 };
-
-#endif /* R3BCALIFAMAPPED2CRYSTALCAL_H */
