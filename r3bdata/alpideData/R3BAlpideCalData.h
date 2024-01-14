@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,40 +16,46 @@
 // -----          Created 28/01/2022 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideCalData_H
-#define R3BAlpideCalData_H 1
+#pragma once
 
-#include "TObject.h"
-#include <stdint.h>
+#include <TObject.h>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
 class R3BAlpideCalData : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideCalData();
+    R3BAlpideCalData() = default;
 
     /** Standard Constructor
      *@param senId    Sensor unique identifier
      *@param col    Longitudinal position
      *@param row    Transverse position
      **/
-    R3BAlpideCalData(UShort_t senId, Int_t col, Int_t row);
+    explicit R3BAlpideCalData(uint16_t senId, uint16_t row, uint16_t col);
 
     // Destructor
-    virtual ~R3BAlpideCalData() {}
+    virtual ~R3BAlpideCalData() = default;
 
-    // Getters
-    inline UShort_t GetSensorId() const { return fSenId; }
-    inline Int_t GetCol() const { return fCol; }
-    inline Int_t GetRow() const { return fRow; }
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const uint16_t GetSensorId() const { return fSenId; }
+    [[nodiscard]] inline const uint16_t GetRow() const { return fRow; }
+    [[nodiscard]] inline const uint16_t GetCol() const { return fCol; }
+
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
-    UShort_t fSenId;
-    Int_t fCol;
-    Int_t fRow;
+    uint16_t fSenId = 0;
+    uint16_t fRow = 0;
+    uint16_t fCol = 0;
 
   public:
-    ClassDef(R3BAlpideCalData, 1)
+    ClassDefOverride(R3BAlpideCalData, 1)
 };
 
-#endif /* R3BAlpideCalData */
+// Operator overloading for printing R3BAlpideCalData
+std::ostream& operator<<(std::ostream& os, const R3BAlpideCalData& data);

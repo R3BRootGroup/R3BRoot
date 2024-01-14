@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,51 +16,58 @@
 // -----          Created 28/01/2022 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideHitData_H
-#define R3BAlpideHitData_H 1
+#pragma once
 
-#include "TObject.h"
-#include "TVector3.h"
-#include <stdint.h>
+#include <TObject.h>
+#include <TVector3.h>
+#include <cmath>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
 class R3BAlpideHitData : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideHitData();
+    R3BAlpideHitData() = default;
 
     /** Standard Constructor
      *@param track    Reconstructed trajectory
      **/
-    R3BAlpideHitData(UInt_t sensorId, UInt_t clustersize, Double_t, Double_t, Double_t z = 0.0);
+    explicit R3BAlpideHitData(uint16_t sensorId, uint16_t clustersize, double posx, double posy, double posz = 0.);
 
     // Destructor
-    virtual ~R3BAlpideHitData() {}
+    virtual ~R3BAlpideHitData() = default;
 
-    // Getters
-    inline UInt_t GetSensorId() const { return fSensorId; }
-    inline UInt_t GetClusterSize() const { return fClustersize; }
-    inline Double_t GetPosl() const { return fX; }
-    inline Double_t GetPost() const { return fY; }
-    inline Double_t GetTheta() const { return fTheta; }
-    inline Double_t GetPhi() const { return fPhi; }
-    inline Double_t GetX() const { return fX; }
-    inline Double_t GetY() const { return fY; }
-    inline Double_t GetZ() const { return fZ; }
-    inline TVector3 GetTrack() const { return fTrack; }
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const uint16_t GetSensorId() const { return fSensorId; }
+    [[nodiscard]] inline const uint16_t GetClusterSize() const { return fClustersize; }
+    [[nodiscard]] inline const double GetX() const { return fX; }
+    [[nodiscard]] inline const double GetY() const { return fY; }
+    [[nodiscard]] inline const double GetZ() const { return fZ; }
+    [[nodiscard]] inline const double GetPosl() const { return fX; }
+    [[nodiscard]] inline const double GetPost() const { return fY; }
+    [[nodiscard]] inline const double GetTheta() const { return fTheta; }
+    [[nodiscard]] inline const double GetPhi() const { return fPhi; }
+    [[nodiscard]] inline const TVector3 GetTrack() const { return fTrack; }
+
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
+    uint16_t fSensorId = 0;
+    uint16_t fClustersize = 0;
+    double fX = std::nan("");
+    double fY = std::nan("");
+    double fZ = std::nan("");
     TVector3 fTrack;
-    UInt_t fSensorId;
-    UInt_t fClustersize;
-    Double_t fX;
-    Double_t fY;
-    Double_t fZ;
-    Double_t fTheta; // Reconstructed Theta
-    Double_t fPhi;   // Reconstructed Phi
+    double fTheta = std::nan(""); // Reconstructed Theta
+    double fPhi = std::nan("");   // Reconstructed Phi
 
   public:
-    ClassDef(R3BAlpideHitData, 1)
+    ClassDefOverride(R3BAlpideHitData, 1)
 };
 
-#endif /* R3BAlpideHitData */
+// Operator overloading for printing R3BAlpideHitData
+std::ostream& operator<<(std::ostream& os, const R3BAlpideHitData& data);
