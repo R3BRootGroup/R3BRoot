@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,17 +16,18 @@
 // -----          Created 11/10/2021 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideMappedData_H
-#define R3BAlpideMappedData_H 1
+#pragma once
 
-#include "TObject.h"
-#include <stdint.h>
+#include <TObject.h>
+#include <cstdint>
+#include <iostream>
+#include <string>
 
 class R3BAlpideMappedData : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideMappedData();
+    R3BAlpideMappedData() = default;
 
     /** Standard Constructor
      *@param senId    Sensor unique identifier
@@ -36,29 +37,34 @@ class R3BAlpideMappedData : public TObject
      *@param row      Row identifier
      *@param col      Column identifier
      **/
-    R3BAlpideMappedData(UShort_t senId, UShort_t reg, UShort_t ads, UShort_t chip, UShort_t row, UShort_t col);
+    explicit R3BAlpideMappedData(uint16_t senId, uint16_t reg, uint16_t ads, uint16_t chip, uint16_t row, uint16_t col);
 
     // Destructor
-    virtual ~R3BAlpideMappedData() {}
+    virtual ~R3BAlpideMappedData() = default;
 
-    // Getters
-    inline UShort_t GetSensorId() const { return fSenId; }
-    inline UShort_t GetReg() const { return fReg; }
-    inline UShort_t GetAds() const { return fAds; }
-    inline UShort_t GetChip() const { return fChip; }
-    inline UShort_t GetRow() const { return fRow; }
-    inline UShort_t GetCol() const { return fCol; }
+    // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const uint16_t GetSensorId() const { return fSenId; }
+    [[nodiscard]] inline const uint16_t GetReg() const { return fReg; }
+    [[nodiscard]] inline const uint16_t GetAds() const { return fAds; }
+    [[nodiscard]] inline const uint16_t GetChip() const { return fChip; }
+    [[nodiscard]] inline const uint16_t GetRow() const { return fRow; }
+    [[nodiscard]] inline const uint16_t GetCol() const { return fCol; }
+
+    // Support for printing
+    [[nodiscard]] std::string toString() const;
+    void Print(const Option_t*) const override;
 
   protected:
-    UShort_t fSenId; // Sensor unique identifier
-    UShort_t fReg;   // Region identifier from 1 to 32
-    UShort_t fAds;   // Address identifier from 1 to 1024
-    UShort_t fChip;  // Chip identifier
-    UShort_t fRow;   // Row identifier from 1 to 512
-    UShort_t fCol;   // Column identifier from 1 to 1024
+    uint16_t fSenId = 0; // Sensor unique identifier
+    uint16_t fReg = 0;   // Region identifier from 1 to 32
+    uint16_t fAds = 0;   // Address identifier from 1 to 1024
+    uint16_t fChip = 0;  // Chip identifier
+    uint16_t fRow = 0;   // Row identifier from 1 to 512
+    uint16_t fCol = 0;   // Column identifier from 1 to 1024
 
   public:
-    ClassDef(R3BAlpideMappedData, 2)
+    ClassDefOverride(R3BAlpideMappedData, 2)
 };
 
-#endif /* R3BAlpideMappedData */
+// Operator overloading for printing R3BAlpideMappedData
+std::ostream& operator<<(std::ostream& os, const R3BAlpideMappedData& data);

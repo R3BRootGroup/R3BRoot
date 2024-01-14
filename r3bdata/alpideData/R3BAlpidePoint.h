@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,13 +16,12 @@
 // -----          Created 11/10/2021 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpidePoint_H
-#define R3BAlpidePoint_H 1
+#pragma once
 
-#include "FairMCPoint.h"
+#include <FairMCPoint.h>
 
-#include "TObject.h"
-#include "TVector3.h"
+#include <TObject.h>
+#include <TVector3.h>
 #include <stdint.h>
 
 class R3BAlpidePoint : public FairMCPoint
@@ -57,7 +56,7 @@ class R3BAlpidePoint : public FairMCPoint
                    Int_t pid);
 
     /** Destructor **/
-    virtual ~R3BAlpidePoint();
+    virtual ~R3BAlpidePoint() = default;
 
     /** Accessors **/
     Int_t GetBarrelID() const { return fDetectorID; }
@@ -104,7 +103,7 @@ class R3BAlpidePoint : public FairMCPoint
     Double32_t fX_out, fY_out, fZ_out, fEloss;
     Double32_t fPx_out, fPy_out, fPz_out;
 
-    ClassDef(R3BAlpidePoint, 2)
+    ClassDefOverride(R3BAlpidePoint, 2)
 };
 
 inline void R3BAlpidePoint::SetPositionOut(TVector3 pos)
@@ -120,5 +119,3 @@ inline void R3BAlpidePoint::SetMomentumOut(TVector3 mom)
     fPy_out = mom.Py();
     fPz_out = mom.Pz();
 }
-
-#endif /* R3BAlpidePoint_H */
