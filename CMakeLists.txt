@@ -29,6 +29,9 @@ cmake_policy(VERSION 3.15...3.23)
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
 
+# use default gnu install convention:
+include(GNUInstallDirs)
+
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(STATUS "  ")
     message(
@@ -109,9 +112,6 @@ if("${FairRoot_VERSION}" VERSION_LESS 18.2.1)
 else()
     message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
 endif()
-
-# added a variable to point to r3broot path in the system
-set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
 # Load some basic macros which are needed later on
 include(FairMacros)
