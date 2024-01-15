@@ -35,4 +35,8 @@
 #pragma link C++ class R3BMSOffsetPar+;
 #pragma link C++ class R3BMSOffsetFinder+;
 #pragma link C++ class R3BTprevTnext+;
+#pragma link C++ class R3B::ValueError<double>+;
+#pragma link C++ class pair<R3B::ValueError<double>, R3B::ValueError<double>>+;
+#pragma link C++ class R3B::LRPair<R3B::ValueError<double>>+;
+#pragma link C++ class R3B::LRPair<int>+;
 #endif

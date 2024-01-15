@@ -1,43 +1,22 @@
-set(EXE_NAME neulandSim)
-set(DEPENDENCIES
-    R3BNeulandShared
-    R3BNeulandSimulation
-    R3BPassive
-    R3BData
-    R3BBase
-    Gen
-    ${Geant4_LIBRARIES}
-    ${Geant4VMC_LIBRARIES}
-    ExTestDetector
-    Boost::program_options)
+# add_subdirectory(templates)
 
-set(INCLUDE_DIRECTORIES
-    ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/passive ${R3BROOT_SOURCE_DIR}/neuland/executables
-    ${R3BROOT_SOURCE_DIR}/neuland/simulation ${Geant4_INCLUDE_DIRS} ${Geant4VMC_INCLUDE_DIRS})
+add_executable(neulandSim neulandSim.cxx)
+target_link_libraries(neulandSim PRIVATE R3BNeulandSimulation ExTestDetector R3BPassive ${Geant4_LIBRARIES} geant4vmc)
 
-message(STATUS "include dir: ${Geant4_INCLUDE_DIRS}")
-include_directories(${INCLUDE_DIRECTORIES})
-set(SRCS neulandSim.cxx)
+add_executable(neulandAna neulandAna.cxx)
+target_link_libraries(neulandAna PRIVATE R3BData R3BNeulandDigitizing)
 
-generate_executable()
+add_executable(neuland_lmd_to_map neuland_lmd_to_map.cxx)
+target_link_libraries(neuland_lmd_to_map PRIVATE R3BNeulandCalibration R3BSource -pthread)
 
-set(EXE_NAME neulandAna)
-set(DEPENDENCIES
-    R3BNeulandShared
-    R3BNeulandDigitizing
-    R3BPassive
-    R3BData
-    R3BBase
-    Gen
-    Boost::program_options)
+add_executable(neuland_map_to_cal neuland_map_to_cal.cxx)
+target_link_libraries(neuland_map_to_cal PRIVATE R3BNeulandCalibration R3BSource)
 
-set(INCLUDE_DIRECTORIES
-    ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/passive ${R3BROOT_SOURCE_DIR}/neuland/executables
-    ${R3BROOT_SOURCE_DIR}/neuland/digitizing ${R3BROOT_SOURCE_DIR}/neuland/calibration)
+add_executable(neuland_cal_to_hit neuland_cal_to_hit.cxx)
+target_link_libraries(neuland_cal_to_hit PRIVATE R3BNeulandCalibration R3BSource)
 
-include_directories(${INCLUDE_DIRECTORIES})
-set(SRCS neulandAna.cxx)
+add_executable(neuland_online_monitor neuland_online_monitor.cxx)
+target_link_libraries(neuland_online_monitor PRIVATE R3BNeulandOnline R3BLos R3BSource -pthread)
 
-generate_executable()
-
-add_subdirectory(templates)
+add_executable(neuland_par_merger neuland_par_merger.cxx)
+target_link_libraries(neuland_par_merger PRIVATE R3BNeulandShared)

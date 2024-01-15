@@ -39,7 +39,6 @@
 #pragma link C++ class R3BTrloiiScalerReader_s467+;
 #pragma link C++ class R3BTimestampMasterReader+;
 #pragma link C++ class R3BBeamMonitorReader+;
-#pragma link C++ class R3BPspxReader+;
 #pragma link C++ class R3BS515PspxReader+;
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigReader+;
@@ -66,6 +65,7 @@
 #pragma link C++ class R3BCalifaFebexReader+;
 #pragma link C++ class R3BPtofReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
+#pragma link C++ class R3BNeulandTamexReader2+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
 #pragma link C++ class R3BStrawtubesReader+;
 #pragma link C++ class R3BAmsReader+;

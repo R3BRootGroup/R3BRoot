@@ -22,7 +22,6 @@ runs:
         echo "cacheSHA=$([[ ${{github.event_name}} = "push" ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
       shell: bash
 
-
     - name: mount cvmfs
       run: |
         apt-get install -y ccache
@@ -33,5 +32,4 @@ runs:
         mount -t cvmfs fairsoft.gsi.de ${CVMDIR}
         mkdir -p ${UCESB_DIR}
         mkdir -p ${CCACHE_DIR}
-        echo $PATH
       shell: bash

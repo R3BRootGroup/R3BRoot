@@ -11,18 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULANDCOMMON_H
-#define NEULANDCOMMON_H
-
+#pragma once
+#include <TObject.h>
+#include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <limits>
 #include <vector>
 
-namespace Neuland
+namespace R3B::Neuland
 {
     // Constants
 
-    constexpr auto __sqrt12 = 3.464101615;
+    constexpr auto SQRT_12 = 3.464101615;
     constexpr auto NaN = std::numeric_limits<double>::quiet_NaN();
     constexpr auto Inf = std::numeric_limits<double>::infinity();
 
@@ -55,14 +56,16 @@ namespace Neuland
 
     // Electronics Constans
 
+    constexpr auto COARSE_TIME_CLOCK_FREQUENCY_MHZ = 200.F;
     constexpr auto MaxCalTime = 5. * 2048;
-
+    constexpr auto MaxFTValue = 4097;
+    constexpr auto MAXCTValue = 2048U;
     // Geometry & Material Constants
 
     constexpr auto BarSize_XY = 5.0;                                  // cm NeuLAND parameter
-    constexpr auto BarUncertainty_XY = BarSize_XY / __sqrt12;         // cm NeuLAND parameter
+    constexpr auto BarUncertainty_XY = BarSize_XY / SQRT_12;          // cm NeuLAND parameter
     constexpr auto BarSize_Z = 5.0;                                   // cm NeuLAND parameter
-    constexpr auto BarUncertainty_Z = BarSize_Z / __sqrt12;           // cm NeuLAND parameter
+    constexpr auto BarUncertainty_Z = BarSize_Z / SQRT_12;            // cm NeuLAND parameter
     constexpr auto BarLength = 250.0;                                 // cm NeuLAND parameter
     constexpr auto LightGuideLength = 10.0;                           // cm NeuLAND parameter
     constexpr auto TotalBarLength = BarLength + 2 * LightGuideLength; // cm NeuLAND parameter, Bar including Light Guide
@@ -73,12 +76,19 @@ namespace Neuland
 
     constexpr auto FirstHorizontalPlane = 0;
     constexpr auto BarsPerPlane = 50;
-    constexpr auto MaxNumberOfPlanes = 60;
+    constexpr auto MaxNumberOfPlanes = 26;
     constexpr auto MaxNumberOfBars = MaxNumberOfPlanes * BarsPerPlane;
 
-    constexpr bool IsPlaneHorizontal(const int plane) { return (plane % 2 == FirstHorizontalPlane); }
-    constexpr bool IsPlaneVertical(const int plane) { return !IsPlaneHorizontal(plane); }
-    constexpr int GetPlaneNumber(const int barID) { return barID / BarsPerPlane; }
+    inline constexpr auto IsPlaneHorizontal(int plane) -> bool { return (plane % 2 == FirstHorizontalPlane); }
+    inline constexpr auto IsPlaneVertical(int plane) -> bool { return !IsPlaneHorizontal(plane); }
+    inline constexpr auto GetPlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+    inline constexpr auto GetPlaneNum(int moduleID) -> int { return GetPlaneID(moduleID) + 1; }
+    // planeNum, barNum and ModuleNum is 1-based
+    inline constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
+    {
+        assert(planeNum > 0);
+        return (planeNum - 1) * BarsPerPlane + barNum;
+    }
 
     // Average Parameters
 
@@ -90,6 +100,6 @@ namespace Neuland
 
     constexpr auto SaturationCoefficient = 1.75e-3; // 1 / ns
 
-} // namespace Neuland
-
-#endif
+    // NeuLAND TPAT:
+    constexpr auto NeulandOnSpillTpatPos = 0U;   // 0 based
+} // namespace R3B::Neuland

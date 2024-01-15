@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 
 R3BEventHeader::R3BEventHeader()
     : FairEventHeader()
@@ -26,7 +27,7 @@ R3BEventHeader::R3BEventHeader()
 {
 }
 
-R3BEventHeader::~R3BEventHeader() {}
+R3BEventHeader::~R3BEventHeader() { R3BLOG(debug, "event header is deleted here."); }
 
 void R3BEventHeader::Register(Bool_t Persistence) {}
 

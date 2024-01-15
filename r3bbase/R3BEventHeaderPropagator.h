@@ -19,6 +19,7 @@
 
 #include "R3BEventHeader.h"
 class R3BFileSource;
+class FairSource;
 
 class R3BEventHeaderPropagator : public FairTask
 {
@@ -38,12 +39,6 @@ class R3BEventHeaderPropagator : public FairTask
     R3BEventHeaderPropagator(const TString& name, Int_t iVerbose = 1, const TString& nameheader = "EventHeader.");
 
     /**
-     * Destructor.
-     * Frees the memory used by the object.
-     */
-    ~R3BEventHeaderPropagator() override;
-
-    /**
      * Method for task initialization.
      * This function is called by the framework before
      * the event loop.
@@ -61,7 +56,7 @@ class R3BEventHeaderPropagator : public FairTask
   private:
     TString fNameHeader;
     R3BEventHeader* fHeader;
-    R3BFileSource* fSource;
+    FairSource* fSource;
 
   public:
     ClassDefOverride(R3BEventHeaderPropagator, 0)

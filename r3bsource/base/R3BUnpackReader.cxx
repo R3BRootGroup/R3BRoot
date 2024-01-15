@@ -33,15 +33,6 @@ R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack* data, size_t offset)
 {
 }
 
-R3BUnpackReader::~R3BUnpackReader()
-{
-    R3BLOG(debug1, "");
-    if (fHeader)
-    {
-        delete fHeader;
-    }
-}
-
 Bool_t R3BUnpackReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;

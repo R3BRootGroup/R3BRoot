@@ -31,14 +31,6 @@ R3BEventHeaderPropagator::R3BEventHeaderPropagator(const TString& name, Int_t iV
 {
 }
 
-R3BEventHeaderPropagator::~R3BEventHeaderPropagator()
-{
-    if (fHeader)
-    {
-        delete fHeader;
-    }
-}
-
 InitStatus R3BEventHeaderPropagator::Init()
 {
     R3BLOG(info, "");
@@ -49,7 +41,7 @@ InitStatus R3BEventHeaderPropagator::Init()
 
     frm->Register(fNameHeader, "EventHeader", fHeader, kTRUE);
 
-    fSource = R3BFileSource::Instance();
+    fSource = frm->GetSource();
     R3BLOG_IF(fatal, !fSource, "R3BFileSource not found.");
 
     return kSUCCESS;

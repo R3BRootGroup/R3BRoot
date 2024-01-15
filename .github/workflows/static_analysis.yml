@@ -27,7 +27,7 @@ jobs:
   clang-tidy:
     runs-on: ubuntu-latest
     container: 
-      image: yanzhaowang/cvmfs_clang:v15
+      image: yanzhaowang/cvmfs_clang:latest
       volumes:
         - /tmp:/cvmfs
       env:
@@ -45,7 +45,7 @@ jobs:
       id: restore-caching
       uses: './.github/actions/install-deps'
       with: 
-        repo: 'false'
+        cache-name: 'false'
 
     - name: configure r3broot
       uses: './.github/actions/r3bbuild-steps'

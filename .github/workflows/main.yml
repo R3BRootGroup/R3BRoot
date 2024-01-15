@@ -122,7 +122,7 @@ jobs:
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
     container: 
-      image: yanzhaowang/cvmfs_clang:v15
+      image: yanzhaowang/cvmfs_clang:latest
       volumes:
         - /tmp:/cvmfs
       env:
@@ -133,7 +133,7 @@ jobs:
         # the speed of the run.
         NUM_THREADS: 2
       # Options for the Docker container to be run with cvmfs.
-      options: --user root --privileged  --ulimit nofile=10000:10000 --cap-add SYS_ADMIN --device /dev/fuse
+      options: --user root --privileged  --ulimit nofile=10000:10000 -it --cap-add SYS_ADMIN --device /dev/fuse
 
     # Each job contains different steps that are executed sequentially. Each
     # step could be multiple shell commands or a composite action either from

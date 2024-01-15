@@ -123,9 +123,8 @@ namespace R3B
     {
       public:
         using RawDataType = std::remove_const_t<std::remove_cv_t<OutputType>>;
-        explicit OutputConnector(std::string_view branchName, bool persistance = true)
-            : persistance_{ persistance }
-            , branch_name_{ branchName }
+        explicit OutputConnector(std::string_view branchName)
+            : branch_name_{ branchName }
         {
         }
 
@@ -136,11 +135,11 @@ namespace R3B
         OutputConnector& operator=(const OutputConnector& other) = delete;
         OutputConnector& operator=(OutputConnector&&) = delete;
 
-        void init(const boost::source_location& loc = BOOST_CURRENT_LOCATION)
+        void init(bool persistance = true, const boost::source_location& loc = BOOST_CURRENT_LOCATION)
         {
             if (auto* ioman = FairRootManager::Instance(); ioman != nullptr)
             {
-                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, true);
+                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, persistance);
             }
             else
             {
@@ -162,7 +161,6 @@ namespace R3B
         }
 
       private:
-        bool persistance_ = true;
         std::string branch_name_;
         RawDataType data_;
         RawDataType* data_ptr_ = &data_;

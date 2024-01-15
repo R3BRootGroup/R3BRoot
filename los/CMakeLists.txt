@@ -68,3 +68,4 @@ Set(DEPENDENCIES
     R3BBase R3BData R3BTracking R3BTCal)
 
 GENERATE_LIBRARY()
+target_include_directories(R3BLos PUBLIC calib online params ${CMAKE_CURRENT_SOURCE_DIR})

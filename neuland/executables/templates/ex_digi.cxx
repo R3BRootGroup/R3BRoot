@@ -31,21 +31,21 @@ auto main(int argc, const char** argv) -> int
     timer.Start();
 
     auto programOptions = R3B::ProgramOptions("options for neuland data analysis");
-    auto help = programOptions.Create_Option<bool>("help,h", "help message", false);
+    auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto paraFileName =
-        programOptions.Create_Option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
+        programOptions.create_option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
     auto digiFileName =
-        programOptions.Create_Option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
+        programOptions.create_option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
     auto simuFileName =
-        programOptions.Create_Option<std::string>("simuFile", "set the filename of simulation input", "simu.root");
-    if (!programOptions.Verify(argc, argv))
+        programOptions.create_option<std::string>("simuFile", "set the filename of simulation input", "simu.root");
+    if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;
     }
 
     if (help->value())
     {
-        std::cout << programOptions.Get_DescRef() << std::endl;
+        std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
     }
 
