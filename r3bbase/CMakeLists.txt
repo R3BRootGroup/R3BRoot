@@ -78,6 +78,6 @@ target_link_libraries(
 target_link_directories(R3BBase PUBLIC ${FAIRROOTPATH}/lib)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
-    target_link_libraries(R3BBase PRIVATE -lstdc++fs)
+    target_link_libraries(R3BBase PUBLIC -lstdc++fs)
 endif()
 root_generate_dictionary(R3BBase_dict ${HEADERS} MODULE R3BBase LINKDEF BaseLinkDef.h)

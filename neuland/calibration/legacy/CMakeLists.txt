@@ -13,27 +13,6 @@
 ##############################################################################
 # cmake-format: on
 
-set(LIBRARY_NAME R3BNeulandCalibrationLegacy)
-set(LINKDEF NeulandCalibrationLinkDef.h)
-
-# set(CMAKE_CXX_STANDARD 14)
-
-set(DEPENDENCIES
-    # cmake-format: sortable
-    R3BBase
-    R3BData
-    R3BNeulandShared
-    R3BTCal)
-
-set(INCLUDE_DIRECTORIES
-    # cmake-format: sortable
-    ${INCLUDE_DIRECTORIES}
-    ${R3BROOT_SOURCE_DIR}/neuland/calibration/legacy
-    ${R3BROOT_SOURCE_DIR}/neuland/shared
-    ${R3BROOT_SOURCE_DIR}/r3bdata/losData
-    ${R3BROOT_SOURCE_DIR}/tcal)
-include_directories(${INCLUDE_DIRECTORIES})
-
 set(SRCS
     # cmake-format: sortable
     LSQR.cxx
@@ -59,11 +38,38 @@ set(SRCS
     R3BNeulandTacquilaMapped2QCalPar.cxx
     R3BNeulandTSyncer.cxx)
 
-change_file_extension(
-    *.cxx
-    *.h
-    HEADERS
-    "${SRCS}")
+set(HEADERS
+    # cmake-format: sortable
+    LSQR.h
+    R3BNeulandCal2Hit.h
+    R3BNeulandCal2HitPar.h
+    R3BNeulandCosmicTracker.h
+    R3BNeulandHitCalibrationBar.h
+    R3BNeulandHitCalibrationEngine.h
+    R3BNeulandHitHist.h
+    # R3BNeulandCalTest.h
+    R3BNeulandHitModulePar.h
+    R3BNeulandHitPar.h
+    R3BNeulandMapped2Cal.h
+    R3BNeulandMapped2CalPar.h
+    R3BNeulandMappedHist.h
+    R3BNeulandMappingPar.h
+    R3BNeulandParFact.h
+    R3BNeulandProvideTStart.h
+    R3BNeulandQCalFiller.h
+    R3BNeulandQCalPar.h
+    R3BNeulandTacquilaMapped2Cal.h
+    R3BNeulandTacquilaMapped2CalPar.h
+    R3BNeulandTacquilaMapped2QCalPar.h
+    R3BNeulandTSyncer.h)
 
-generate_library()
+add_library(R3BNeulandCalibrationLegacy SHARED ${SRCS})
 target_include_directories(R3BNeulandCalibrationLegacy PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(R3BNeulandCalibrationLegacy PUBLIC R3BData R3BTCal R3BNeulandShared)
+root_generate_dictionary(
+    R3BNeulandCalibrationLegacy_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandCalibrationLegacy
+    LINKDEF
+    NeulandCalibrationLinkDef.h)

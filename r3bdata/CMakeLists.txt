@@ -91,6 +91,7 @@ set(SRCS
     strawtubesData/R3BStrawtubesCalData.cxx
     strawtubesData/R3BStrawtubesHitData.cxx
     neulandData/R3BPaddleTamexMappedData.cxx
+    neulandData/R3BPaddleTamexMappedData2.cxx
     tofData/R3BTofdMappedData.cxx
     tofData/R3BTofdCalData.cxx
     tofData/R3BTofdHitData.cxx
@@ -237,6 +238,7 @@ set(HEADERS
     strawtubesData/R3BStrawtubesCalData.h
     strawtubesData/R3BStrawtubesHitData.h
     neulandData/R3BPaddleTamexMappedData.h
+    neulandData/R3BPaddleTamexMappedData2.h
     tofData/R3BTofdMappedData.h
     tofData/R3BTofdCalData.h
     tofData/R3BTofdHitData.h

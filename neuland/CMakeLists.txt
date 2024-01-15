@@ -13,9 +13,6 @@
 ##############################################################################
 # cmake-format: on
 
-add_library(R3BNeuland INTERFACE)
-add_library(R3B::Neuland ALIAS R3BNeuland)
-
 add_subdirectory(calibration)
 add_subdirectory(clustering)
 add_subdirectory(digitizing)

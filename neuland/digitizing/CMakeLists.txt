@@ -40,7 +40,7 @@ set(HEADERS
 
 add_library(R3BNeulandDigitizing SHARED ${SRCS})
 target_include_directories(R3BNeulandDigitizing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandDigitizing PUBLIC R3BData R3BNeulandShared R3BNeulandCalibration)
+target_link_libraries(R3BNeulandDigitizing PUBLIC R3BNeulandShared R3BNeulandCalibrationLegacy)
 root_generate_dictionary(
     R3BNeulandDigitizing_dict
     ${HEADERS}

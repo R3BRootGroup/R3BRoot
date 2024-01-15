@@ -13,39 +13,31 @@
 ##############################################################################
 # cmake-format: on
 
-project(NeulandCalToHit CXX)
-
 set(LIBRARY_NAME R3BNeulandCalToHit)
 set(LINKDEF NeulandCalToHitLinkDef.h)
 
 set(SRCS
     # cmake-format: sortable
     engine/R3BNeulandLSQREngineAdaptor.cxx
-    R3BNeulandCalToHitTask.cxx
+    R3BNeulandCalToHitPar.cxx
     R3BNeulandCalToHitParTask.cxx
-    R3BNeulandCalToHitPar.cxx)
+    R3BNeulandCalToHitTask.cxx)
 
-set(INCLUDE_DIRECTORIES
+set(HEADERS
     # cmake-format: sortable
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/engine
-    ${R3BROOT_SOURCE_DIR}/neuland/calibration/legacy
-    ${R3BROOT_SOURCE_DIR}/neuland/calibration/map_to_cal
-    ${R3BROOT_SOURCE_DIR}/neuland/calibration/share
-    ${R3BROOT_SOURCE_DIR}/neuland/shared
-    ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData)
+    engine/R3BNeulandCosmicEngine.h
+    engine/R3BNeulandLSQREngineAdaptor.h
+    R3BNeulandCalToHitPar.h
+    R3BNeulandCalToHitParTask.h
+    R3BNeulandCalToHitTask.h)
 
-set(DEPENDENCIES
-    # cmake-format: sortable
-    R3BBase
-    R3BData
-    R3BNeulandCalibrationLegacy
-    R3BNeulandCalibrationShare
-    R3BNeulandMapToCal
-    R3BNeulandShared
-    range-v3::range-v3)
-
-generate_library()
+add_library(R3BNeulandCalToHit SHARED ${SRCS})
 target_include_directories(R3BNeulandCalToHit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} engine)
-target_link_libraries(R3BNeuland INTERFACE R3BNeulandCalToHit)
+target_link_libraries(R3BNeulandCalToHit PUBLIC R3BNeulandMapToCal R3BNeulandCalibrationLegacy)
+root_generate_dictionary(
+    R3BNeulandCalToHit_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandCalToHit
+    LINKDEF
+    NeulandCalToHitLinkDef.h)

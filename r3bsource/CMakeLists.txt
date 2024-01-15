@@ -13,8 +13,11 @@
 
 set(SRCS
     ./base/R3BUcesbSource.cxx
+    ./base/R3BUcesbSource2.cxx
     ./base/R3BReader.cxx
     ./base/R3BUnpackReader.cxx
+    ./base/utils/R3BUcesbLauncher.cxx
+    ./base/utils/R3BUcesbStructInfo.cxx
     ./wr/R3BWhiterabbitMasterReader.cxx
     ./califa/R3BWhiterabbitCalifaReader.cxx
     ./neuland/R3BWhiterabbitNeulandReader.cxx
@@ -57,11 +60,13 @@ set(SRCS
     ./califa/R3BCalifaJulichReader.cxx
     ./tofd/R3BPtofReader.cxx
     ./neuland/R3BNeulandTamexReader.cxx
+    ./neuland/R3BNeulandTamexReader2.cxx
     ./neuland/R3BNeulandTacquilaReader.cxx
     ./stubes/R3BStrawtubesReader.cxx
     ./ams/R3BAmsReader.cxx
     ./foot/R3BFootReader.cxx
     ./foot/R3BFootSiReader.cxx
+    ./pspx/R3BS515PspxReader.cxx
     ./alpide/R3BAlpideReader.cxx
     ./music/R3BMusicReader.cxx
     ./rpc/R3BRpcReader.cxx
@@ -72,6 +77,7 @@ set(SRCS
 
 set(HEADERS
     ./base/R3BUcesbSource.h
+    ./base/R3BUcesbSource2.h
     ./base/R3BReader.h
     ./base/R3BUnpackReader.h
     ./base/utils/R3BUcesbDecl.h
@@ -121,6 +127,7 @@ set(HEADERS
     ./califa/R3BCalifaJulichReader.h
     ./tofd/R3BPtofReader.h
     ./neuland/R3BNeulandTamexReader.h
+    ./neuland/R3BNeulandTamexReader2.h
     ./neuland/R3BNeulandTacquilaReader.h
     ./stubes/R3BStrawtubesReader.h
     ./ams/R3BAmsReader.h
@@ -232,5 +239,5 @@ set(DIRS
 
 add_library(R3BSource SHARED ${SRCS})
 target_include_directories(R3BSource PUBLIC ${DIRS})
-target_link_libraries(R3BSource PUBLIC R3BData MbsAPI Ucesb)
+target_link_libraries(R3BSource PUBLIC R3BData MbsAPI Ucesb Microsoft.GSL::GSL range-v3::range-v3)
 root_generate_dictionary(R3BSource_dict ${HEADERS} MODULE R3BSource LINKDEF SourceLinkDef.h)

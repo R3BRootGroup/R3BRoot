@@ -13,11 +13,6 @@
 ##############################################################################
 # cmake-format: on
 
-project(NeulandMapToCal CXX)
-
-set(LIBRARY_NAME R3BNeulandMapToCal)
-set(LINKDEF NeulandMapToCalLinkDef.h)
-
 set(SRCS
     # cmake-format: sortable
     R3BFTCalEngine.cxx
@@ -26,24 +21,23 @@ set(SRCS
     R3BNeulandMapToCalTask.cxx
     R3BTrigIDMappingFinder.cxx)
 
-set(INCLUDE_DIRECTORIES
+set(HEADERS
     # cmake-format: sortable
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${R3BROOT_SOURCE_DIR}/neuland/calibration/share
-    ${R3BROOT_SOURCE_DIR}/neuland/shared
-    ${R3BROOT_SOURCE_DIR}/r3bbase
-    ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData)
+    R3BFTCalEngine.h
+    R3BNeulandCalData2.h
+    R3BNeulandMapToCalPar.h
+    R3BNeulandMapToCalParTask.h
+    R3BNeulandMapToCalTask.h
+    R3BTrigIDMappingFinder.h)
 
-set(DEPENDENCIES
-    # cmake-format: sortable
-    nlohmann_json::nlohmann_json
-    R3BBase
-    R3BData
-    R3BNeulandCalibrationShare
-    R3BNeulandShared
-    R3BTCal
-    range-v3::range-v3)
-
-generate_library()
+add_library(R3BNeulandMapToCal SHARED ${SRCS})
 target_include_directories(R3BNeulandMapToCal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeuland INTERFACE R3BNeulandMapToCal)
+target_link_libraries(R3BNeulandMapToCal PUBLIC R3BNeulandCalibrationShare nlohmann_json::nlohmann_json)
+
+root_generate_dictionary(
+    R3BNeulandMapToCal_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandMapToCal
+    LINKDEF
+    NeulandMapToCalLinkDef.h)

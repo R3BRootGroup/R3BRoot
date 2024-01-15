@@ -17,3 +17,11 @@ add_subdirectory(legacy)
 add_subdirectory(share)
 add_subdirectory(map_to_cal)
 add_subdirectory(cal_to_hit)
+
+add_library(R3BNeulandCalibration INTERFACE)
+target_link_libraries(
+    R3BNeulandCalibration
+    INTERFACE R3BNeulandCalibrationShare
+              R3BNeulandMapToCal
+              R3BNeulandCalToHit
+              R3BNeulandCalibrationLegacy)

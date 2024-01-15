@@ -42,8 +42,8 @@ set(HEADERS
     R3BNeulandOnlineSpectra2.h)
 
 add_library(R3BNeulandOnline SHARED ${SRCS})
-target_include_directories(R3BNeulandOnline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandOnline PUBLIC R3BTCal R3BNeulandShared)
+target_include_directories(R3BNeulandOnline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} canvases)
+target_link_libraries(R3BNeulandOnline PUBLIC R3BNeulandCalibration #[[ R3BTCal R3BNeulandShared ]])
 root_generate_dictionary(
     R3BNeulandOnline_dict
     ${HEADERS}
