@@ -29,6 +29,9 @@ cmake_policy(VERSION 3.15...3.23)
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
 
+# use default gnu install convention:
+include(GNUInstallDirs)
+
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(STATUS "  ")
     message(
@@ -63,6 +66,12 @@ string(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
 set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/scripts" ${CMAKE_MODULE_PATH})
+
+# For CMakeLists that still use the old way
+set(ROOT_FOUND_VERSION 600000)
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 
 set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 
@@ -104,9 +113,6 @@ else()
     message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
 endif()
 
-# added a variable to point to r3broot path in the system
-set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
-
 # Load some basic macros which are needed later on
 include(FairMacros)
 
@@ -118,9 +124,9 @@ list(APPEND optional_root_components gdml vmc)
 find_package2(
     PUBLIC
     ROOT
-    VERSION
-    6.16.00
-    MODULE
+    # VERSION
+    # 6.16.00
+    CONFIG
     REQUIRED
     COMPONENTS
     ${required_root_components}
@@ -139,7 +145,6 @@ include(WriteConfigFile_r3b)
 include(WriteEnvCache)
 include(Dart)
 include(CheckCompiler)
-include(ROOTMacros)
 
 find_package2(PUBLIC FairLogger VERSION 1.6.0 REQUIRED)
 
@@ -294,8 +299,8 @@ set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # used by clang-tidy
 
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
@@ -473,6 +478,14 @@ r3b_generate_version_info()
 find_package(VMC QUIET)
 set(BASE_INCLUDE_DIRECTORIES ${BASE_INCLUDE_DIRECTORIES} ${VMC_INCLUDE_DIRS})
 
+find_program(
+    ROOT_CINT_EXECUTABLE
+    NAMES rootcint
+    PATHS ${ROOT_BINDIR}
+    NO_DEFAULT_PATH)
+
+include(RootCTest)
+
 if(MODULE)
     add_subdirectory(${MODULE})
 endif(MODULE)
@@ -488,16 +501,22 @@ if(NOT MODULE)
     endif()
     message(STATUS "  ${BWhite}ROOT geometries${CR}          ${unitgeo_summary}")
     add_subdirectory(r3bbase)
+    add_subdirectory(r3bdata)
+    add_subdirectory(field)
+    add_subdirectory(tracking)
+    add_subdirectory(passive)
+    add_subdirectory(tcal)
     if(WITH_UCESB)
         add_subdirectory(r3bsource)
-    endif(WITH_UCESB)
+    endif()
+    add_subdirectory(neuland)
+    include(ROOTMacros)
     if(WITH_EPICS)
         add_subdirectory(epics)
     endif(WITH_EPICS)
     if(Atima_FOUND)
         add_subdirectory(atima)
     endif(Atima_FOUND)
-    add_subdirectory(passive)
     add_subdirectory(glad)
     add_subdirectory(xball)
     add_subdirectory(dch)
@@ -505,7 +524,6 @@ if(NOT MODULE)
     add_subdirectory(gfi)
     add_subdirectory(mfi)
     add_subdirectory(land)
-    add_subdirectory(neuland)
     add_subdirectory(los)
     add_subdirectory(rolu)
     add_subdirectory(sci2)
@@ -518,15 +536,11 @@ if(NOT MODULE)
     add_subdirectory(ssd)
     add_subdirectory(strawtubes)
     add_subdirectory(music)
-    add_subdirectory(r3bdata)
-    add_subdirectory(field)
     add_subdirectory(r3bgen)
     add_subdirectory(lumon)
     add_subdirectory(evtvis)
     add_subdirectory(psp)
     add_subdirectory(compilehelper)
-    add_subdirectory(tcal)
-    add_subdirectory(tracking)
     add_subdirectory(analysis)
     add_subdirectory(tracker_rene)
     add_subdirectory(pdc)
