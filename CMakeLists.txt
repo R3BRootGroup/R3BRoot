@@ -380,7 +380,7 @@ else(${IS_XCODE})
     set(LD_LIBRARY_PATH ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 endif(${IS_XCODE})
 
-find_package(ucesb MODULE)
+find_package(ucesb)
 if(ucesb_FOUND)
     set(WITH_UCESB ON)
     set(UCESBPATH $ENV{UCESB_DIR})
