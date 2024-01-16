@@ -12,9 +12,14 @@
  ******************************************************************************/
 
 #pragma once
+#include "R3BException.h"
+#include "R3BLogger.h"
 #include <FairLogger.h>
 #include <R3BValueError.h>
 #include <TFile.h>
+#include <filesystem>
+#include <fmt/std.h>
+#include <regex>
 #include <type_traits>
 #include <utility>
 
@@ -159,5 +164,45 @@ namespace R3B
             exp *= exp;
         }
         return exp;
+    }
+
+    // -------------------------------------------------------------------------
+    // File handling
+    namespace fs = std::filesystem;
+    inline auto GetParentDir(std::string_view filename) -> fs::path
+    {
+
+        auto path = fs::path{ filename };
+        auto parent_folder = path.parent_path();
+        if (not fs::exists(parent_folder))
+        {
+            R3BLOG(
+                error,
+                fmt::format(R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
+                            filename));
+            return ".";
+        }
+        return parent_folder;
+    }
+
+    inline auto GetFilesFromRegex(std::string_view filename_regex) -> std::vector<std::string>
+    {
+        auto regex_path = fs::path{ filename_regex };
+        auto parent_folder = GetParentDir(filename_regex);
+        const auto regex_string = regex_path.filename().string();
+        auto filelist = std::vector<std::string>{};
+        for (const auto& dir_entry : fs::directory_iterator(parent_folder))
+        {
+            if (std::regex_match(dir_entry.path().filename().string(), std::regex{ regex_string }))
+            {
+                filelist.emplace_back(fs::absolute(dir_entry.path()));
+            }
+        }
+        if (filelist.empty())
+        {
+            R3BLOG(error, fmt::format(R"(Cannot find any files with regex "{}")", regex_string));
+        }
+        std::sort(filelist.begin(), filelist.end());
+        return filelist;
     }
 } // namespace R3B

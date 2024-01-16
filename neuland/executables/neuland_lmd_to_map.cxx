@@ -36,6 +36,7 @@ struct EXT_STR_h101_t
 };
 
 constexpr int DEFAULT_EVENT_NUM = 1000;
+constexpr int DEFAULT_RUN_ID = 999;
 constexpr auto DEFAULT_UNPACKER_PATH = "202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
 
@@ -53,11 +54,11 @@ auto main(int argc, const char** argv) -> int
     auto no_trig_neuland = programOptions.create_option<bool>("no-trig", "auto detect trigID", false);
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "info");
     auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
-    auto input_dir = programOptions.create_option<std::string>("inDir,i", "set the input directory", "");
-    auto output_dir = programOptions.create_option<std::string>("outDir,o", "set the output directory", ".");
+    auto input_files = programOptions.create_option<std::string>("in,i", "set the input files");
+    auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
     auto jsonName =
         programOptions.create_option<std::string>("json", "set the json filename of trigIDMap", "TrigMapping.json");
-    auto inputRunID = programOptions.create_option<int>("runID,r", "set the input runID", 0);
+    auto inputRunID = programOptions.create_option<int>("runID,r", "set the input runID", DEFAULT_RUN_ID);
     auto neulandDP = programOptions.create_option<int>(
         "dp", "set the number of double planes for neuland", NEULAND_DEFAULT_DOUBLE_PLANE);
     auto wr_ID = programOptions.create_option<std::string>("wrID", "set the white rabbit id", "0x1000U");
@@ -68,12 +69,6 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    if (help->value())
-    {
-        std::cout << programOptions.get_desc_ref() << std::endl;
-        return 0;
-    }
-
     //====================================================================================
     // Input definitions:
     FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
@@ -82,9 +77,9 @@ auto main(int argc, const char** argv) -> int
 
     const unsigned int planeNum = neulandDP->value() * 2;
     const auto runID = inputRunID->value();
-    constexpr auto lmdFilePattern = "main{0:04d}_*.lmd";
-    constexpr auto ouputFilePattern = "map{0:04d}.root";
-    constexpr auto ouputParFilePattern = "mapPar{0:04d}.root";
+    const auto outputfile_path = fs::path{ output_file->value() };
+    const auto outputDir = R3B::GetParentDir(output_file->value());
+    const auto parfile = outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
     const auto ntuple_options = "RAW,time-stitch=4000"s;
     // const auto ntuple_options = "RAW"s;
     auto const* ucesb_dir = getenv("UCESB_DIR");
@@ -95,31 +90,24 @@ auto main(int argc, const char** argv) -> int
     }
     const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
     const auto upexps_exe = fs::path{ upexps_dir } / unpacker_path->value();
-    const auto inputDir = input_dir->value();
-    const auto outputDir = output_dir->value();
     const auto max_event_num = (eventNum->value() == 0) ? -1 : eventNum->value();
-
-    const auto lmdfile = fmt::format(lmdFilePattern, runID);
-    const auto outFile = fmt::format(ouputFilePattern, runID);
-    const auto parFile = fmt::format(ouputParFilePattern, runID);
 
     auto ucesb_command = upexps_exe.string() + " --allow-errors --input-buffer=150Mi"s;
     // auto ucesb_command = upexps_exe.string();
     ucesb_command = std::regex_replace(ucesb_command, std::regex("//"), "/");
-    const auto lmdfilePath = fs::path{ inputDir } / fs::path{ lmdfile };
 
     auto ucesbStruct = EXT_STR_h101{};
     auto source = std::make_unique<R3BUcesbSource2>(
-        lmdfilePath.string(), ntuple_options, ucesb_command, &ucesbStruct, sizeof(ucesbStruct));
+        input_files->value(), ntuple_options, ucesb_command, &ucesbStruct, sizeof(ucesbStruct));
     source->SetMaxEvents(max_event_num);
 
     //====================================================================================
     // Adding readers
-    source->AddReader(std::make_unique<R3BUnpackReader>(&ucesbStruct.unpack, offsetof(EXT_STR_h101, unpack)));
-    source->AddReader(std::make_unique<R3BTrloiiTpatReader>(&ucesbStruct.tpat, offsetof(EXT_STR_h101, tpat)));
+    source->AddReader<R3BUnpackReader>(&ucesbStruct.unpack, offsetof(EXT_STR_h101, unpack));
+    source->AddReader<R3BTrloiiTpatReader>(&ucesbStruct.tpat, offsetof(EXT_STR_h101, tpat));
 
-    auto* neulandReader = source->AddReader(
-        std::make_unique<R3BNeulandTamexReader2>(&ucesbStruct.raw_nnp, offsetof(EXT_STR_h101, raw_nnp)));
+    auto* neulandReader =
+        source->AddReader<R3BNeulandTamexReader2>(&ucesbStruct.raw_nnp, offsetof(EXT_STR_h101, raw_nnp));
     neulandReader->AddExtraConditions(R3B::UcesbMap::array_fewer);
     neulandReader->SetMaxNbPlanes(planeNum);
     if (no_trig_neuland->value())
@@ -128,23 +116,8 @@ auto main(int argc, const char** argv) -> int
         neulandReader->SetSkipTriggerTimes();
     }
 
-    source->AddReader(std::make_unique<R3BWhiterabbitMasterReader>(
-        static_cast<EXT_STR_h101_WRMASTER*>(&ucesbStruct.wrmaster), offsetof(EXT_STR_h101, wrmaster), whiterabbit_id));
-
-    //====================================================================================
-    // setup neuland reader
-    // constexpr auto HITSIZE_HIST = 10;
-    // auto multiHits = R3B::make_hist<TH1I>("multiHits", "multi hits", HITSIZE_HIST, 0.5, 0.5 + HITSIZE_HIST);
-
-    // neulandReader->AddHistAction(std::move(multiHits),
-    //                              [](const R3BPaddleTamexMappedData2& data, TH1* hist)
-    //                              {
-    //                                  for (const auto& [_, barSignal] : data.bars)
-    //                                  {
-    //                                      hist->Fill(static_cast<int>(barSignal.left.size() +
-    //                                      barSignal.right.size()));
-    //                                  }
-    //                              });
+    source->AddReader<R3BWhiterabbitMasterReader>(
+        static_cast<EXT_STR_h101_WRMASTER*>(&ucesbStruct.wrmaster), offsetof(EXT_STR_h101, wrmaster), whiterabbit_id);
 
     //====================================================================================
     auto run = std::make_unique<FairRunOnline>();
@@ -152,15 +125,13 @@ auto main(int argc, const char** argv) -> int
     auto EvntHeader = std::make_unique<R3BEventHeader>();
     run->SetEventHeader(EvntHeader.release());
     run->SetRunId(runID);
-    const auto outputFile_fullpath = fs::path{ outputDir } / fs::path{ outFile };
-    run->SetSink(std::make_unique<FairRootFileSink>(outputFile_fullpath.c_str()));
+    run->SetSink(std::make_unique<FairRootFileSink>(output_file->value().c_str()));
 
     //=====================================================================================
     // set parameter files:
     auto* rtdb = run->GetRuntimeDb();
     auto parOut = std::make_unique<FairParRootFileIo>(true);
-    const auto parFile_fullpath = fs::path{ outputDir } / fs::path{ parFile };
-    parOut->open(parFile_fullpath.c_str());
+    parOut->open(parfile.c_str());
     rtdb->setOutput(parOut.release());
     rtdb->saveOutput();
 
@@ -172,7 +143,7 @@ auto main(int argc, const char** argv) -> int
     calPar->SetTrigEnabled(not no_trig_neuland->value());
     // calPar->SetTrigIDMapPrintFormat(R3B::Neuland::TrigIDMappingPrintFormat::screen);
     calPar->SetTrigIDMapAutoFind(auto_id->value());
-    calPar->SetTrigIDMapDir(outputDir);
+    calPar->SetTrigIDMapDir(outputDir.string());
     calPar->SetTrigIDMapFileName(jsonName->value());
     run->AddTask(calPar.release());
 
@@ -183,7 +154,7 @@ auto main(int argc, const char** argv) -> int
         run->Init();
         run->Run(-1, eventNum->value());
         std::cout << "Macro finished succesfully." << std::endl;
-        std::cout << "Output file is " << outFile << std::endl;
+        std::cout << "Output file is " << output_file->value() << std::endl;
     }
     catch (fair::FatalException& ex)
     {

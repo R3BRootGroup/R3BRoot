@@ -118,13 +118,13 @@ namespace R3B
             auto& po_desc = program_->get_desc_ref();
             is_required_ = is_requried;
 
-            auto desc_full = desc;
+            auto desc_full = fmt::format("{} [ required ]", desc);
             if (not is_required_)
             {
-                desc_full = fmt::format("{} [ = {}]", desc, value_);
+                desc_full = fmt::format("{} [ = {} ]", desc, value_);
                 if constexpr (IsString_v<Type>)
                 {
-                    desc_full = fmt::format("{} [ = {:?}]", desc, value_);
+                    desc_full = fmt::format("{} [ = {:?} ]", desc, value_);
                 }
             }
 

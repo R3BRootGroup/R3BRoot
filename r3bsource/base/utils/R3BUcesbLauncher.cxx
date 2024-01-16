@@ -14,6 +14,7 @@
 #include "R3BUcesbLauncher.h"
 #include <R3BException.h>
 #include <R3BLogger.h>
+#include <R3BShared.h>
 #include <boost/algorithm/string.hpp>
 #include <filesystem>
 #include <fmt/os.h>
@@ -51,36 +52,10 @@ namespace
         }
     }
 
-    auto get_regex_filelist(std::string filename_regex) -> std::vector<std::string>
-    {
-        auto wildcard_path = fs::path{ filename_regex };
-        auto parent_folder = wildcard_path.parent_path();
-        if (not fs::exists(parent_folder))
-        {
-            R3BLOG(error, fmt::format("Cannot get the parent folder of the regex path {}", filename_regex));
-            return {};
-        }
-        // const auto regex_string = std::regex_replace(wildcard_path.filename().string(), std::regex{ "\\*" }, ".*");
-        const auto regex_string = wildcard_path.filename().string();
-        auto filelist = std::vector<std::string>{};
-        for (const auto& dir_entry : fs::directory_iterator(parent_folder))
-        {
-            if (std::regex_match(dir_entry.path().filename().string(), std::regex{ regex_string }))
-            {
-                filelist.emplace_back(fs::absolute(dir_entry.path()));
-            }
-        }
-        if (filelist.empty())
-        {
-            R3BLOG(error, fmt::format(R"(Cannot find any files with regex "{}")", regex_string));
-        }
-        return filelist;
-    }
-
-    void Append_lmds(std::vector<std::string>& lmds, std::string filename_regex)
+    void Append_lmds(std::vector<std::string>& lmds, std::string_view filename_regex)
     {
         // expand filenames on regex
-        Append_elements(lmds, get_regex_filelist(std::move(filename_regex)));
+        Append_elements(lmds, R3B::GetFilesFromRegex(filename_regex));
     }
 
     auto parse_splits(std::vector<std::string> splits) -> ResolveResult
@@ -98,7 +73,7 @@ namespace
             }
             else if (std::regex_match(split_item, lmd_regex))
             {
-                Append_lmds(result.lmds, std::move(split_item));
+                Append_lmds(result.lmds, split_item);
             }
             else if (Check_exist(split_item))
             {

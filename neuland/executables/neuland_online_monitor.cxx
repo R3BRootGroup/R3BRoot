@@ -77,7 +77,7 @@ auto main(int argc, const char** argv) -> int
         "unpack", "set the path of unpacker executable relative to ${UCESB_DIR}/../unexps/", DEFAULT_UNPACKER_PATH);
     auto port_number =
         programOptions.create_option<int>("port,p", "set the port number of the output https server", DEFAULT_PORT_NUM);
-    auto Offspill_bit = programOptions.create_option<int>(
+    auto off_spill_bit = programOptions.create_option<int>(
         "offspill", "set the position of bin set when offspill", DEFAULT_OFFSPILL_POS);
 
     if (!programOptions.verify(argc, argv))
@@ -104,7 +104,7 @@ auto main(int argc, const char** argv) -> int
     const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
     const auto upexps_exe = fs::path{ upexps_dir } / unpacker_path->value();
     const auto max_event_num = (eventNum->value() == 0) ? -1 : eventNum->value();
-    R3B::Neuland::NeulandOffSpillTpatPos = Offspill_bit->value();
+    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit->value();
 
     const auto lmd_file_path = input_fstream->value();
     const auto parFile = parameter_file->value();

@@ -28,9 +28,9 @@ auto main(int argc, const char** argv) -> int
     auto programOptions = R3B::ProgramOptions("options for neuland exp cal to hit analysis");
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
-    auto input_dir = programOptions.create_option<std::string>("inDir,i", "set the input directory", "");
-    auto output_dir = programOptions.create_option<std::string>("outDir,o", "set the output directory", "");
-    auto inputRunID = programOptions.create_option<int>("runid,r", "set the input runID", 0);
+    auto input_file = programOptions.create_option<std::string>("in,i", "set the input files (regex)");
+    auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
+    auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
     auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
 
     if (!programOptions.verify(argc, argv))
@@ -38,32 +38,26 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    if (help->value())
-    {
-        std::cout << programOptions.get_desc_ref() << std::endl;
-        return 0;
-    }
     FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
+    const auto outputDir = R3B::GetParentDir(output_file->value());
+    const auto outputfile_path = fs::path{ output_file->value() };
+    const auto outputParFileName =
+        outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
+    const auto input_filenames = R3B::GetFilesFromRegex(input_file->value());
 
-    auto const fileRunID = inputRunID->value();
-    auto const outputDir = output_dir->value().empty() ? input_dir->value() : output_dir->value();
 
-    auto const inputDataFile = fmt::format("cal{0:04d}.root", fileRunID);
-    auto const inputParFileName = fmt::format("calPar{0:04d}.root", fileRunID);
-    auto const outputFileName = fmt::format("hit{0:04d}.root", fileRunID);
+    R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());
+    R3BLOG(debug, fmt::format("input data par file: {}", input_par->value()).c_str());
+    R3BLOG(debug, fmt::format("output data file: {}", output_file->value()).c_str());
 
-    const auto full_inputpath = fs::path(input_dir->value()) / fs::path(inputDataFile);
-    const auto full_inputpar_filepath = fs::path(input_dir->value()) / fs::path{ inputParFileName };
-    const auto full_outputpath = fs::path{ outputDir } / fs::path(outputFileName);
-
-    R3BLOG(debug, fmt::format("input data file: {}", full_inputpath).c_str());
-    R3BLOG(debug, fmt::format("input data par file: {}", full_inputpar_filepath).c_str());
-    R3BLOG(debug, fmt::format("output data file: {}", full_outputpath).c_str());
 
     auto source = std::make_unique<R3BFileSource2>();
-    source->AddFile(full_inputpath);
+    for (const auto& filename : input_filenames)
+    {
+        source->AddFile(filename);
+    }
 
-    auto sinkFile = R3B::make_rootfile(full_outputpath.c_str(), "RECREATE");
+    auto sinkFile = R3B::make_rootfile(outputfile_path.c_str(), "RECREATE");
     auto sink = std::make_unique<FairRootFileSink>(sinkFile.release());
 
     auto run = std::make_unique<FairRunAna>();
@@ -76,7 +70,7 @@ auto main(int argc, const char** argv) -> int
         run->SetSink(sink.release());
 
         auto fileio = std::make_unique<FairParRootFileIo>();
-        fileio->open(full_inputpar_filepath.c_str());
+        fileio->open(input_par->value().c_str());
         run->GetRuntimeDb()->setFirstInput(fileio.release());
 
         // Add analysis task --------------------------------------------------------
@@ -84,7 +78,7 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(runIdTask.release());
 
         auto cal2hit = std::make_unique<R3B::Neuland::Cal2HitTask>();
-        cal2hit->SetTrigger(R3B::Neuland::CalTrigger::offspill);
+        cal2hit->SetTrigger(R3B::Neuland::CalTrigger::onspill);
         cal2hit->SetGlobalTimeOffset(NEULAND_GLOBAL_TIME_OFFSET_NS);
         run->AddTask(cal2hit.release());
 
@@ -101,6 +95,17 @@ auto main(int argc, const char** argv) -> int
     {
         std::cout << "A logic error has occured: \n";
         std::cerr << ex.what();
+        std::cout << "\n\n";
+    }
+    catch (std::exception& ex)
+    {
+        std::cout << "A error has occured: \n";
+        std::cerr << ex.what();
+        std::cout << "\n\n";
+    }
+    catch(...)
+    {
+        std::cout << "An unrecognized error has occured: \n";
         std::cout << "\n\n";
     }
 
