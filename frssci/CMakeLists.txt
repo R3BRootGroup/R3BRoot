@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BFrssci" which includes the source files given in
+# Create a library called "libR3BFrsSci" which includes the source files given in
 # the array. The extension is already found. Any number of sources could be
 # listed here.
 
@@ -40,15 +40,15 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-online/R3BOnlineSpectraFrssci.cxx
+online/R3BOnlineSpectraFrsSci.cxx
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF FrssciLinkDef.h)
-Set(LIBRARY_NAME R3BFrssci)
+Set(LINKDEF FrsSciLinkDef.h)
+Set(LIBRARY_NAME R3BFrsSci)
 Set(DEPENDENCIES
     R3BBase R3BData R3BTCal)
 

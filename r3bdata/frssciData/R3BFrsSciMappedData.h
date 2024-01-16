@@ -3,17 +3,17 @@
 
 #include "TObject.h"
 
-class R3BFrssciMappedData : public TObject
+class R3BFrsSciMappedData : public TObject
 {
   public:
     // Default Constructor
-    R3BFrssciMappedData();
+    R3BFrsSciMappedData();
 
     // Standard Constructor
-    R3BFrssciMappedData(UShort_t, UShort_t, UInt_t, UInt_t);
+    R3BFrsSciMappedData(UShort_t, UShort_t, UInt_t, UInt_t);
 
     // Destructor
-    virtual ~R3BFrssciMappedData() {}
+    virtual ~R3BFrsSciMappedData() {}
 
     // Getters
     inline const UShort_t& GetDetector() const { return fDetector; }
@@ -30,7 +30,7 @@ class R3BFrssciMappedData : public TObject
     Int_t fNEvents = 0;
 
   public:
-    ClassDef(R3BFrssciMappedData, 1)
+    ClassDef(R3BFrsSciMappedData, 1)
 };
 
 #endif
