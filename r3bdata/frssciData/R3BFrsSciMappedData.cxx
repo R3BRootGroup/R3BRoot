@@ -1,4 +1,4 @@
-#include "R3BFrssciMappedData.h"
+#include "R3BFrsSciMappedData.h"
 #include "FairLogger.h"
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
@@ -6,7 +6,7 @@
 
 using namespace std;
 
-R3BFrssciMappedData::R3BFrssciMappedData()
+R3BFrsSciMappedData::R3BFrsSciMappedData()
     : fDetector(0)    // Detector number: 1...n
     , fPmt(0)         // Pmt number:  1..3 [4 reserved for sync check]
     , fTimeCoarse(-1) // Coarse time
@@ -14,7 +14,7 @@ R3BFrssciMappedData::R3BFrssciMappedData()
 {
 }
 
-R3BFrssciMappedData::R3BFrssciMappedData(UShort_t detector, UShort_t pmt, UInt_t timeCoarse, UInt_t timeFine)
+R3BFrsSciMappedData::R3BFrsSciMappedData(UShort_t detector, UShort_t pmt, UInt_t timeCoarse, UInt_t timeFine)
     : fDetector(detector)
     , fPmt(pmt)
     , fTimeCoarse(timeCoarse)
@@ -22,4 +22,4 @@ R3BFrssciMappedData::R3BFrssciMappedData(UShort_t detector, UShort_t pmt, UInt_t
 {
 }
 
-ClassImp(R3BFrssciMappedData)
+ClassImp(R3BFrsSciMappedData)

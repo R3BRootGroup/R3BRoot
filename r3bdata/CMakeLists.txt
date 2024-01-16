@@ -133,7 +133,7 @@ losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx
 roluData/R3BRoluHitData.cxx
-frssciData/R3BFrssciMappedData.cxx
+frssciData/R3BFrsSciMappedData.cxx
 sci2Data/R3BSci2MappedData.cxx
 sci2Data/R3BSci2TcalData.cxx
 sci2Data/R3BSci2CalData.cxx

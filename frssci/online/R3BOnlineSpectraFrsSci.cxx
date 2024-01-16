@@ -24,15 +24,15 @@
 #include "TMath.h"
 
 #include "R3BEventHeader.h"
-#include "R3BFrssciMappedData.h"
-#include "R3BOnlineSpectraFrssci.h"
+#include "R3BFrsSciMappedData.h"
+#include "R3BOnlineSpectraFrsSci.h"
 
-R3BOnlineSpectraFrssci::R3BOnlineSpectraFrssci()
-    : R3BOnlineSpectraFrssci("FrssciOnlineSpectra", 1)
+R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci()
+    : R3BOnlineSpectraFrsSci("FrsSciOnlineSpectra", 1)
 {
 }
 
-R3BOnlineSpectraFrssci::R3BOnlineSpectraFrssci(const char* name, Int_t iVerbose)
+R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapped(NULL)
     , fNEvents(0)
@@ -41,16 +41,16 @@ R3BOnlineSpectraFrssci::R3BOnlineSpectraFrssci(const char* name, Int_t iVerbose)
 {
 }
 
-R3BOnlineSpectraFrssci::~R3BOnlineSpectraFrssci()
+R3BOnlineSpectraFrsSci::~R3BOnlineSpectraFrsSci()
 {
-    LOG(debug) << "R3BOnlineSpectraFrssci::Destructor";
+    LOG(debug) << "R3BOnlineSpectraFrsSci::Destructor";
     if (fMapped)
         delete fMapped;
 }
 
-InitStatus R3BOnlineSpectraFrssci::Init()
+InitStatus R3BOnlineSpectraFrsSci::Init()
 {
-    LOG(info) << "R3BOnlineSpectraFrssci::Init()";
+    LOG(info) << "R3BOnlineSpectraFrsSci::Init()";
 
     char Name1[255];
     char Name2[255];
@@ -60,7 +60,7 @@ InitStatus R3BOnlineSpectraFrssci::Init()
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(fatal) << "R3BOnlineSpectraFrssci::Init FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraFrsSci::Init FairRootManager not found";
 
     fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     if (!fEventHeader)
@@ -74,10 +74,10 @@ InitStatus R3BOnlineSpectraFrssci::Init()
     // --- ------------ --- //
 
     // === get access to mapped data ===//
-    fMapped = dynamic_cast<TClonesArray*>(mgr->GetObject("FrssciMapped"));
+    fMapped = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciMappedData"));
     if (!fMapped)
     {
-        LOG(fatal) << "FrssciMapped not found";
+        LOG(fatal) << "FrsSciMapped not found";
         return (kFATAL);
     }
 
@@ -104,7 +104,7 @@ InitStatus R3BOnlineSpectraFrssci::Init()
         for (UShort_t j = 0; j < fNbPmts; j++)
         {
             // === TH1F: fine time === //
-            sprintf(Name1, "Frssci%i_FineTimePmt%i", i + 1, j + 1);
+            sprintf(Name1, "FrsSci%i_FineTimePmt%i", i + 1, j + 1);
             fh1_finetime[i * fNbPmts + j] = new TH1I(Name1, Name1, 1000, 0, 1000);
             fh1_finetime[i * fNbPmts + j]->GetXaxis()->SetTitle("Fine time");
             fh1_finetime[i * fNbPmts + j]->GetYaxis()->SetTitle("Counts per bin");
@@ -118,9 +118,9 @@ InitStatus R3BOnlineSpectraFrssci::Init()
             fh1_finetime[i * fNbPmts + j]->Draw("");
 
             // === TH1I: 1D-mult at map level === //
-            sprintf(Name1, "Frssci%i_Pmt%i_MultPerEvent_Mapped", i + 1, j + 1);
+            sprintf(Name1, "FrsSci%i_Pmt%i_MultPerEvent_Mapped", i + 1, j + 1);
             sprintf(Name2,
-                    "Frssci%i_Pmt%i_MultPerEvent_Mapped (blue no condition on TPAT, red condition on TPAT = 1 or 2)",
+                    "FrsSci%i_Pmt%i_MultPerEvent_Mapped (blue no condition on TPAT, red condition on TPAT = 1 or 2)",
                     i + 1,
                     j + 1);
             fh1_multMap[i * fNbPmts + j] = new TH1I(Name1, Name1, 70, -0.5, 69.5);
@@ -140,7 +140,7 @@ InitStatus R3BOnlineSpectraFrssci::Init()
         }
 
         // === TH1F: multiplicity per event and channel at mapped level === //
-        sprintf(Name1, "Frssci%i_MultPerEvent", i + 1);
+        sprintf(Name1, "FrsSci%i_MultPerEvent", i + 1);
         fh2_multMap[i] = new TH2I(Name1, Name1, fNbPmts + 1, -0.5, fNbPmts + 0.5, 20, -0.5, 19.5);
         fh2_multMap[i]->GetXaxis()->SetTitle("channel: 1=PMT R,    2=PMT L,    3=COMMON REF, 4 = RESERVED FOR SYNC");
         fh2_multMap[i]->GetYaxis()->SetTitle("multiplicity per event");
@@ -154,7 +154,7 @@ InitStatus R3BOnlineSpectraFrssci::Init()
         fh2_multMap[i]->Draw("COL");
 
         // === TH1F: multiplicity per event and channel at mapped level === //
-        sprintf(Name1, "Frssci%i_MultPerEvent_RvsL", i + 1);
+        sprintf(Name1, "FrsSci%i_MultPerEvent_RvsL", i + 1);
         fh2_multMap_RvsL[i] = new TH2I(Name1, Name1, 40, -1.5, 38.5, 40, -1.5, 38.5);
         fh2_multMap_RvsL[i]->GetXaxis()->SetTitle("Multiplicity per event on the Left Pmt");
         fh2_multMap_RvsL[i]->GetYaxis()->SetTitle("Multiplicity per event on the Right Pmt");
@@ -172,7 +172,7 @@ InitStatus R3BOnlineSpectraFrssci::Init()
     // --- --------------- --- //
     // --- MAIN FOLDER-Sci --- //
     // --- --------------- --- //
-    TFolder* mainfolMap = new TFolder("FrssciMap", "Frssci Map info");
+    TFolder* mainfolMap = new TFolder("FrsSciMap", "FrsSci Map info");
     mainfolMap->Add(cMapFT);
     mainfolMap->Add(cMapMult1D);
     mainfolMap->Add(cMapMult2D);
@@ -185,9 +185,9 @@ InitStatus R3BOnlineSpectraFrssci::Init()
     return kSUCCESS;
 }
 
-void R3BOnlineSpectraFrssci::Reset_Histo()
+void R3BOnlineSpectraFrsSci::Reset_Histo()
 {
-    LOG(info) << "R3BOnlineSpectraFrssci::Reset_Histo";
+    LOG(info) << "R3BOnlineSpectraFrsSci::Reset_Histo";
     for (UShort_t i = 0; i < fNbDets; i++)
     {
         fh2_multMap[i]->Reset();
@@ -202,13 +202,13 @@ void R3BOnlineSpectraFrssci::Reset_Histo()
     }
 }
 
-void R3BOnlineSpectraFrssci::Exec(Option_t* option)
+void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
 {
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(fatal) << "R3BOnlineSpectraFrssci::Exec FairRootManager not found";
+        LOG(fatal) << "R3BOnlineSpectraFrsSci::Exec FairRootManager not found";
     }
     UInt_t nHits;
     UShort_t iDet; // 0-based
@@ -234,7 +234,7 @@ void R3BOnlineSpectraFrssci::Exec(Option_t* option)
             nHits = fMapped->GetEntriesFast();
             for (UInt_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BFrssciMappedData* hitmapped = dynamic_cast<R3BFrssciMappedData*>(fMapped->At(ihit));
+                R3BFrsSciMappedData* hitmapped = dynamic_cast<R3BFrsSciMappedData*>(fMapped->At(ihit));
                 if (!hitmapped)
                     continue;
                 iDet = hitmapped->GetDetector() - 1;
@@ -264,7 +264,7 @@ void R3BOnlineSpectraFrssci::Exec(Option_t* option)
     }
 }
 // -----   Public method Finish   -----------------------------------------------
-void R3BOnlineSpectraFrssci::FinishEvent()
+void R3BOnlineSpectraFrsSci::FinishEvent()
 {
     if (fMapped)
     {
@@ -272,7 +272,7 @@ void R3BOnlineSpectraFrssci::FinishEvent()
     }
 }
 
-void R3BOnlineSpectraFrssci::FinishTask()
+void R3BOnlineSpectraFrsSci::FinishTask()
 {
     for (UShort_t i = 0; i < fNbDets; i++)
     {
@@ -288,4 +288,4 @@ void R3BOnlineSpectraFrssci::FinishTask()
         }
     } // end of loop over fNbDets
 }
-ClassImp(R3BOnlineSpectraFrssci);
+ClassImp(R3BOnlineSpectraFrsSci);

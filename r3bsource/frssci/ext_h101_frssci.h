@@ -42,36 +42,36 @@ typedef int int32_t;
 typedef struct EXT_STR_h101_FRSSCI_t
 {
     /* RAW */
-    uint32_t FRSSCI1VTFM /* [1,4] */;
-    uint32_t FRSSCI1VTFMI[4 EXT_STRUCT_CTRL(FRSSCI1VTFM)] /* [1,4] */;
-    uint32_t FRSSCI1VTFME[4 EXT_STRUCT_CTRL(FRSSCI1VTFM)] /* [1,512] */;
-    uint32_t FRSSCI1VTF /* [0,512] */;
-    uint32_t FRSSCI1VTFv[512 EXT_STRUCT_CTRL(FRSSCI1VTF)] /* [0,65535] */;
-    uint32_t FRSSCI1VTCM /* [1,4] */;
-    uint32_t FRSSCI1VTCMI[4 EXT_STRUCT_CTRL(FRSSCI1VTCM)] /* [1,4] */;
-    uint32_t FRSSCI1VTCME[4 EXT_STRUCT_CTRL(FRSSCI1VTCM)] /* [1,512] */;
-    uint32_t FRSSCI1VTC /* [0,512] */;
-    uint32_t FRSSCI1VTCv[512 EXT_STRUCT_CTRL(FRSSCI1VTC)] /* [0,65535] */;
-    uint32_t FRSSCI2VTFM /* [1,4] */;
-    uint32_t FRSSCI2VTFMI[4 EXT_STRUCT_CTRL(FRSSCI2VTFM)] /* [1,4] */;
-    uint32_t FRSSCI2VTFME[4 EXT_STRUCT_CTRL(FRSSCI2VTFM)] /* [1,512] */;
-    uint32_t FRSSCI2VTF /* [0,512] */;
-    uint32_t FRSSCI2VTFv[512 EXT_STRUCT_CTRL(FRSSCI2VTF)] /* [0,65535] */;
-    uint32_t FRSSCI2VTCM /* [1,4] */;
-    uint32_t FRSSCI2VTCMI[4 EXT_STRUCT_CTRL(FRSSCI2VTCM)] /* [1,4] */;
-    uint32_t FRSSCI2VTCME[4 EXT_STRUCT_CTRL(FRSSCI2VTCM)] /* [1,512] */;
-    uint32_t FRSSCI2VTC /* [0,512] */;
-    uint32_t FRSSCI2VTCv[512 EXT_STRUCT_CTRL(FRSSCI2VTC)] /* [0,65535] */;
-    uint32_t FRSSCI3VTFM /* [1,4] */;
-    uint32_t FRSSCI3VTFMI[4 EXT_STRUCT_CTRL(FRSSCI3VTFM)] /* [1,4] */;
-    uint32_t FRSSCI3VTFME[4 EXT_STRUCT_CTRL(FRSSCI3VTFM)] /* [1,512] */;
-    uint32_t FRSSCI3VTF /* [0,512] */;
-    uint32_t FRSSCI3VTFv[512 EXT_STRUCT_CTRL(FRSSCI3VTF)] /* [0,65535] */;
-    uint32_t FRSSCI3VTCM /* [1,4] */;
-    uint32_t FRSSCI3VTCMI[4 EXT_STRUCT_CTRL(FRSSCI3VTCM)] /* [1,4] */;
-    uint32_t FRSSCI3VTCME[4 EXT_STRUCT_CTRL(FRSSCI3VTCM)] /* [1,512] */;
-    uint32_t FRSSCI3VTC /* [0,512] */;
-    uint32_t FRSSCI3VTCv[512 EXT_STRUCT_CTRL(FRSSCI3VTC)] /* [0,65535] */;
+    uint32_t FRSSCI1VTFM /* [1,3] */;
+    uint32_t FRSSCI1VTFMI[3 EXT_STRUCT_CTRL(FRSSCI1VTFM)] /* [1,3] */;
+    uint32_t FRSSCI1VTFME[3 EXT_STRUCT_CTRL(FRSSCI1VTFM)] /* [1,384] */;
+    uint32_t FRSSCI1VTF /* [0,384] */;
+    uint32_t FRSSCI1VTFv[384 EXT_STRUCT_CTRL(FRSSCI1VTF)] /* [0,65535] */;
+    uint32_t FRSSCI1VTCM /* [1,3] */;
+    uint32_t FRSSCI1VTCMI[3 EXT_STRUCT_CTRL(FRSSCI1VTCM)] /* [1,3] */;
+    uint32_t FRSSCI1VTCME[3 EXT_STRUCT_CTRL(FRSSCI1VTCM)] /* [1,384] */;
+    uint32_t FRSSCI1VTC /* [0,384] */;
+    uint32_t FRSSCI1VTCv[384 EXT_STRUCT_CTRL(FRSSCI1VTC)] /* [0,65535] */;
+    uint32_t FRSSCI2VTFM /* [1,3] */;
+    uint32_t FRSSCI2VTFMI[3 EXT_STRUCT_CTRL(FRSSCI2VTFM)] /* [1,3] */;
+    uint32_t FRSSCI2VTFME[3 EXT_STRUCT_CTRL(FRSSCI2VTFM)] /* [1,384] */;
+    uint32_t FRSSCI2VTF /* [0,384] */;
+    uint32_t FRSSCI2VTFv[384 EXT_STRUCT_CTRL(FRSSCI2VTF)] /* [0,65535] */;
+    uint32_t FRSSCI2VTCM /* [1,3] */;
+    uint32_t FRSSCI2VTCMI[3 EXT_STRUCT_CTRL(FRSSCI2VTCM)] /* [1,3] */;
+    uint32_t FRSSCI2VTCME[3 EXT_STRUCT_CTRL(FRSSCI2VTCM)] /* [1,384] */;
+    uint32_t FRSSCI2VTC /* [0,384] */;
+    uint32_t FRSSCI2VTCv[384 EXT_STRUCT_CTRL(FRSSCI2VTC)] /* [0,65535] */;
+    uint32_t FRSSCI3VTFM /* [1,3] */;
+    uint32_t FRSSCI3VTFMI[3 EXT_STRUCT_CTRL(FRSSCI3VTFM)] /* [1,3] */;
+    uint32_t FRSSCI3VTFME[3 EXT_STRUCT_CTRL(FRSSCI3VTFM)] /* [1,384] */;
+    uint32_t FRSSCI3VTF /* [0,384] */;
+    uint32_t FRSSCI3VTFv[384 EXT_STRUCT_CTRL(FRSSCI3VTF)] /* [0,65535] */;
+    uint32_t FRSSCI3VTCM /* [1,3] */;
+    uint32_t FRSSCI3VTCMI[3 EXT_STRUCT_CTRL(FRSSCI3VTCM)] /* [1,3] */;
+    uint32_t FRSSCI3VTCME[3 EXT_STRUCT_CTRL(FRSSCI3VTCM)] /* [1,384] */;
+    uint32_t FRSSCI3VTC /* [0,384] */;
+    uint32_t FRSSCI3VTCv[384 EXT_STRUCT_CTRL(FRSSCI3VTC)] /* [0,65535] */;
 
 } EXT_STR_h101_FRSSCI;
 
@@ -87,84 +87,84 @@ typedef struct EXT_STR_h101_FRSSCI_onion_t
     struct
     {
         uint32_t VTFM;
-        uint32_t VTFMI[4 /* VTFM */];
-        uint32_t VTFME[4 /* VTFM */];
+        uint32_t VTFMI[3 /* VTFM */];
+        uint32_t VTFME[3 /* VTFM */];
         uint32_t VTF;
-        uint32_t VTFv[512 /* VTF */];
+        uint32_t VTFv[384 /* VTF */];
         uint32_t VTCM;
-        uint32_t VTCMI[4 /* VTCM */];
-        uint32_t VTCME[4 /* VTCM */];
+        uint32_t VTCMI[3 /* VTCM */];
+        uint32_t VTCME[3 /* VTCM */];
         uint32_t VTC;
-        uint32_t VTCv[512 /* VTC */];
+        uint32_t VTCv[384 /* VTC */];
     } FRSSCI[3];
 
 } EXT_STR_h101_FRSSCI_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                         \
+#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                                \
     do                                                                                                             \
     {                                                                                                              \
         ok = 1;                                                                                                    \
         /* RAW */                                                                                                  \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI1VTFM, UINT32, "FRSSCI1VTFM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI1VTFM, UINT32, "FRSSCI1VTFM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTFMI, UINT32, "FRSSCI1VTFMI", "FRSSCI1VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTFME, UINT32, "FRSSCI1VTFME", "FRSSCI1VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI1VTF, UINT32, "FRSSCI1VTF", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI1VTF, UINT32, "FRSSCI1VTF", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTFv, UINT32, "FRSSCI1VTFv", "FRSSCI1VTF", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI1VTCM, UINT32, "FRSSCI1VTCM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI1VTCM, UINT32, "FRSSCI1VTCM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTCMI, UINT32, "FRSSCI1VTCMI", "FRSSCI1VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTCME, UINT32, "FRSSCI1VTCME", "FRSSCI1VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI1VTC, UINT32, "FRSSCI1VTC", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI1VTC, UINT32, "FRSSCI1VTC", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI1VTCv, UINT32, "FRSSCI1VTCv", "FRSSCI1VTC", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI2VTFM, UINT32, "FRSSCI2VTFM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI2VTFM, UINT32, "FRSSCI2VTFM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTFMI, UINT32, "FRSSCI2VTFMI", "FRSSCI2VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTFME, UINT32, "FRSSCI2VTFME", "FRSSCI2VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI2VTF, UINT32, "FRSSCI2VTF", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI2VTF, UINT32, "FRSSCI2VTF", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTFv, UINT32, "FRSSCI2VTFv", "FRSSCI2VTF", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI2VTCM, UINT32, "FRSSCI2VTCM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI2VTCM, UINT32, "FRSSCI2VTCM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTCMI, UINT32, "FRSSCI2VTCMI", "FRSSCI2VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTCME, UINT32, "FRSSCI2VTCME", "FRSSCI2VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI2VTC, UINT32, "FRSSCI2VTC", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI2VTC, UINT32, "FRSSCI2VTC", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI2VTCv, UINT32, "FRSSCI2VTCv", "FRSSCI2VTC", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI3VTFM, UINT32, "FRSSCI3VTFM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI3VTFM, UINT32, "FRSSCI3VTFM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTFMI, UINT32, "FRSSCI3VTFMI", "FRSSCI3VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTFME, UINT32, "FRSSCI3VTFME", "FRSSCI3VTFM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI3VTF, UINT32, "FRSSCI3VTF", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI3VTF, UINT32, "FRSSCI3VTF", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTFv, UINT32, "FRSSCI3VTFv", "FRSSCI3VTF", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI3VTCM, UINT32, "FRSSCI3VTCM", 4, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI3VTCM, UINT32, "FRSSCI3VTCM", 3, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTCMI, UINT32, "FRSSCI3VTCMI", "FRSSCI3VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTCME, UINT32, "FRSSCI3VTCME", "FRSSCI3VTCM", 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_LIM(                                                                                    \
-            ok, si, offset, struct_t, printerr, FRSSCI3VTC, UINT32, "FRSSCI3VTC", 512, 0 /*flags*/);               \
+            ok, si, offset, struct_t, printerr, FRSSCI3VTC, UINT32, "FRSSCI3VTC", 384, 0 /*flags*/);               \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                    \
             ok, si, offset, struct_t, printerr, FRSSCI3VTCv, UINT32, "FRSSCI3VTCv", "FRSSCI3VTC", 0 /*flags*/);    \
                                                                                                                    \

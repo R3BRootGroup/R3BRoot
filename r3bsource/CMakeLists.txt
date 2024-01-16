@@ -134,7 +134,7 @@ set(SRCS
 ./los/R3BLosReader.cxx
 ./rolu/R3BRoluReader.cxx
 ./rolu/R3BRoluReaderOnline.cxx
-./frssci/R3BFrssciReader.cxx
+./frssci/R3BFrsSciReader.cxx
 ./sci2/R3BSci2Reader.cxx
 ./sci8/R3BSci8Reader.cxx
 ./fibers/R3BSfibReader.cxx
