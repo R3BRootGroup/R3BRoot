@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BOnlineSpectraFrssci_H
-#define R3BOnlineSpectraFrssci_H
+#ifndef R3BOnlineSpectraFrsSci_H
+#define R3BOnlineSpectraFrsSci_H
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -25,14 +25,14 @@ class R3BEventHeader;
 /**
  * This taks reads SCI data and plots online histograms
  */
-class R3BOnlineSpectraFrssci : public FairTask
+class R3BOnlineSpectraFrsSci : public FairTask
 {
   public:
     /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BOnlineSpectraFrssci();
+    R3BOnlineSpectraFrsSci();
 
     /**
      * Standard constructor.
@@ -40,13 +40,13 @@ class R3BOnlineSpectraFrssci : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BOnlineSpectraFrssci(const char* name, Int_t iVerbose = 1);
+    R3BOnlineSpectraFrsSci(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BOnlineSpectraFrssci();
+    virtual ~R3BOnlineSpectraFrsSci();
 
     /**
      * Method for task initialization.
@@ -90,7 +90,7 @@ class R3BOnlineSpectraFrssci : public FairTask
   private:
     R3BEventHeader* fEventHeader; /**< Event header.      */
 
-    TClonesArray* fMapped; /**< Array with R3BFrssciMappedData */
+    TClonesArray* fMapped; /**< Array with R3BFrsSciMappedData */
     Int_t fNEvents;        /**< Event counter.     */
     UShort_t fNbDets;
     UShort_t fNbPmts;
@@ -107,7 +107,7 @@ class R3BOnlineSpectraFrssci : public FairTask
     TH2I** fh2_multMap_RvsL; // [fNbDets];
 
   public:
-    ClassDef(R3BOnlineSpectraFrssci, 1)
+    ClassDef(R3BOnlineSpectraFrsSci, 1)
 };
 
 #endif

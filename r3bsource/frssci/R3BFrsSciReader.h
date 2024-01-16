@@ -9,15 +9,15 @@
 struct EXT_STR_h101_FRSSCI_t;
 typedef struct EXT_STR_h101_FRSSCI_t EXT_STR_h101_FRSSCI;
 
-class R3BFrssciReader : public R3BReader
+class R3BFrsSciReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BFrssciReader(EXT_STR_h101_FRSSCI*, size_t);
-    R3BFrssciReader(EXT_STR_h101_FRSSCI*, size_t, UShort_t);
+    R3BFrsSciReader(EXT_STR_h101_FRSSCI*, size_t);
+    R3BFrsSciReader(EXT_STR_h101_FRSSCI*, size_t, UShort_t);
 
     // Destructor
-    virtual ~R3BFrssciReader();
+    virtual ~R3BFrsSciReader();
 
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
@@ -38,14 +38,14 @@ class R3BFrssciReader : public R3BReader
     size_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
-    // Output array of type R3BFrssciMapped
+    // Output array of type R3BFrsSciMapped
     TClonesArray* fArray;
 
     UInt_t fNumEntries;
     UShort_t fNumSci;
 
   public:
-    ClassDefOverride(R3BFrssciReader, 0);
+    ClassDefOverride(R3BFrsSciReader, 0);
 };
 
 #endif // R3BFRSSCIREADER_H
