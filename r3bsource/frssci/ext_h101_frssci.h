@@ -102,7 +102,7 @@ typedef struct EXT_STR_h101_FRSSCI_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                                \
+#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                         \
     do                                                                                                             \
     {                                                                                                              \
         ok = 1;                                                                                                    \
