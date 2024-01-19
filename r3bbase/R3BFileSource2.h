@@ -16,6 +16,7 @@
 #include "FairSource.h"
 #include "R3BShared.h"
 #include <TObjString.h>
+#include <optional>
 
 class FairRootManager;
 class TChain;
