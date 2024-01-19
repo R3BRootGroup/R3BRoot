@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -102,7 +102,7 @@ typedef struct EXT_STR_h101_FRSSCI_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                                \
+#define EXT_STR_h101_FRSSCI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                         \
     do                                                                                                             \
     {                                                                                                              \
         ok = 1;                                                                                                    \
