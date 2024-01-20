@@ -1,5 +1,8 @@
 # R3BRoot Software [![license](https://alfa-ci.gsi.de/shields/badge/license-GPL--3.0-orange.svg)](COPYRIGHT)
 
+[![CI-CD](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main.yml) [![Static Analysis](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/static_analysis.yml) [![Validate Codemeta](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/codemeta_validate.yaml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/codemeta_validate.yaml)
+
+
 ## The R3BRoot Framework
 The R3BRoot software is based on the FairRoot framework and can be used to perform Monte Carlo simulations and experimental data analysis of the R3B (Reactions with Relativistic Radioactive Beams) nuclear physics experiments at the GSI-FAIR research center (Facility for Antiproton and Ion Research). The user can create simulated data and/or perform analysis with the same framework. Geant3 and Geant4 transport engines are supported, however, the implemented tasks that create simulated data do not depend on a particular Monte Carlo engine. The framework delivers base classes which enable the users to construct their detectors and/or analysis tasks in a simple way, it also delivers some general functionality like track visualization. Moreover, an interface for reading experimental and/or simulated magnetic field maps is also implemented.
 
@@ -15,9 +18,9 @@ Please visit [releases](https://github.com/R3BRootGroup/R3BRoot/releases)
 ## Download
 
 ~~~bash
-git clone -b dev https://github.com/R3BRootGroup/R3BRoot.git
+git clone https://github.com/R3BRootGroup/R3BRoot.git
 cd R3BRoot
-git clone -b dev https://github.com/R3BRootGroup/macros.git
+git clone https://github.com/R3BRootGroup/macros.git
 ~~~
 
 ## Step by Step Installation
