@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
@@ -13,17 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BFrsSciContFact_H
+#define R3BFrsSciContFact_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
- 
-#pragma link C++ class R3BFrsSciContFact+;
-#pragma link C++ class R3BFrsSciTcalPar+;
-#pragma link C++ class R3BFrsSciMapped2Tcal+;
-#pragma link C++ class R3BFrsSciMapped2TcalPar+;
-#pragma link C++ class R3BOnlineSpectraFrsSci+;
+#include "FairContFact.h"
 
-#endif
+class FairContainer;
 
+class R3BFrsSciContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
+
+  public:
+    R3BFrsSciContFact();
+    ~R3BFrsSciContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    ClassDef(R3BFrsSciContFact, 0)
+};
+
+#endif // R3BFrsSciContFact_H
