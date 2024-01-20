@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
+#   Copyright (C) 2019-2024 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -76,7 +76,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/twimData
-${R3BROOT_SOURCE_DIR}/r3bdata/ttt10Data
+${R3BROOT_SOURCE_DIR}/r3bdata/tttxData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
