@@ -84,16 +84,38 @@ class R3BOnlineSpectraFrsSci : public FairTask
     /** Virtual method Reset **/
     virtual void Reset() {}
 
-    void SetNbDets(Int_t ndets) { fNbDets = ndets; }
-    void SetNbPmts(Int_t npmts) { fNbPmts = npmts; }
+    void SetNbDets(UShort_t ndets) { fNbDets = ndets; }
+    void SetNbPmts(UShort_t npmts) { fNbPmts = npmts; }
+    void SetNbTofs(UShort_t ndets)
+    {
+        switch (ndets)
+        {
+            case 1:
+                fNbTofs = 0;
+                break;
+            case 2:
+                fNbTofs = 1;
+                break;
+            default:
+                UShort_t fact1 = 1;
+                UShort_t fact2 = 1;
+                for (UShort_t i = 2; i <= ndets; i++)
+                    fact1 *= i;
+                for (UShort_t i = 2; i <= (ndets - 2); i++)
+                    fact2 *= i;
+                fNbTofs = fact1 / (2 * fact2);
+        }
+    }
 
   private:
     R3BEventHeader* fEventHeader; /**< Event header.      */
 
     TClonesArray* fMapped; /**< Array with R3BFrsSciMappedData */
+    TClonesArray* fTcal;   /**< Array with R3BFrsSciTcalData */
     Int_t fNEvents;        /**< Event counter.     */
     UShort_t fNbDets;
     UShort_t fNbPmts;
+    UShort_t fNbTofs;
 
     // Canvas at Mapped level
     TCanvas* cMapFT;
@@ -101,10 +123,18 @@ class R3BOnlineSpectraFrsSci : public FairTask
     TCanvas* cMapMult2D;
 
     // Histograms at Mapped level
-    TH1I** fh1_finetime;     // [fNbDets * NbPmts];
-    TH1I** fh1_multMap;      // [fNbDets * fNbPmts];
-    TH2I** fh2_multMap;      // [fNbDets];
-    TH2I** fh2_multMap_RvsL; // [fNbDets];
+    TH1I** fh1_finetime;     // [fNbDets * NbPmts]
+    TH1I** fh1_multMap;      // [fNbDets * fNbPmts]
+    TH2I** fh2_multMap;      // [fNbDets]
+    TH2I** fh2_multMap_RvsL; // [fNbDets! / (2! * (fNbDets-2)!]
+
+    // Canvas at Tcal level
+    TCanvas* cTcalPos;
+    TCanvas* cTcalTof;
+
+    // Histograms at Tcal level
+    TH1D** fh1_PosRawTcal1Hit; // [fNbDets]
+    TH1D** fh1_TofRawTcal1Hit; // [fNbDets-1]
 
   public:
     ClassDef(R3BOnlineSpectraFrsSci, 1)
