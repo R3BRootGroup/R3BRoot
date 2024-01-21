@@ -24,6 +24,8 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/frssci
+${R3BROOT_SOURCE_DIR}/frssci/parameters
+${R3BROOT_SOURCE_DIR}/frssci/calibration
 ${R3BROOT_SOURCE_DIR}/frssci/online
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/frssciData
@@ -40,6 +42,10 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
+parameters/R3BFrsSciContFact.cxx
+parameters/R3BFrsSciTcalPar.cxx
+calibration/R3BFrsSciMapped2TcalPar.cxx
+calibration/R3BFrsSciMapped2Tcal.cxx
 online/R3BOnlineSpectraFrsSci.cxx
 )
 
