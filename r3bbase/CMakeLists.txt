@@ -71,6 +71,7 @@ set(HEADERS
 set(LINKDEF BaseLinkDef.h)
 
 set(DEPENDENCIES
+    Boost::source_location
     GeoBase
     ParBase
     Base
