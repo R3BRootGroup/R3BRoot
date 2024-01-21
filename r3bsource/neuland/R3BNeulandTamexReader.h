@@ -14,7 +14,9 @@
 #ifndef R3BNEULANDTAMEXREADER_H
 #define R3BNEULANDTAMEXREADER_H
 
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BReader.h"
+#include <R3BIOConnector.h>
 #include <Rtypes.h>
 
 class TClonesArray;
@@ -50,15 +52,20 @@ class R3BNeulandTamexReader : public R3BReader
 
     // Accessor to skip trigger times
     void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    void SetT0Enabled(bool is_enabled = true) { is_t0_enabled_ = is_enabled; }
 
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
     size_t fOffset;                          // Data offset
     TClonesArray* fArray;                    // Output array
     TClonesArray* fArrayTrigger;             // Output array, cards' trigger
-    UInt_t fNofPlanes;                       // Number of planes
-    Bool_t fOnline;                          // Don't store data for online
-    Bool_t fSkiptriggertimes;                // Skip trigger times
+    R3B::OutputMapConnector<int, R3BPaddleTamexMappedData> trigger0_data_{ "NeulandTrig0MappedData" };
+    UInt_t fNofPlanes; // Number of planes
+    bool is_t0_enabled_ = false;
+    Bool_t fOnline;           // Don't store data for online
+    Bool_t fSkiptriggertimes; // Skip trigger times
+
+    void fill_trigger0();
 
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);

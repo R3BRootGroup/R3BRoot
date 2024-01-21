@@ -46,16 +46,22 @@ namespace R3B
 
         void init(const boost::source_location& loc = BOOST_CURRENT_LOCATION)
         {
+            if (not try_init(loc))
+            {
+                throw R3B::runtime_error(
+                    fmt::format("Initialisation of the input data with the branch name \"{}\" failed!", branch_name_),
+                    loc);
+            }
+        }
+
+        bool try_init(const boost::source_location& loc = BOOST_CURRENT_LOCATION)
+        {
             if (auto* ioman = FairRootManager::Instance(); ioman != nullptr)
             {
                 data_ = ioman->InitObjectAs<const RawDataType*>(branch_name_.c_str());
-
                 if (data_ == nullptr)
                 {
-                    throw R3B::runtime_error(
-                        fmt::format("Initialisation of the input data with the branch name \"{}\" failed!",
-                                    branch_name_),
-                        loc);
+                    return false;
                 }
             }
             else
@@ -65,6 +71,7 @@ namespace R3B
                                                      branch_name_),
                                          loc);
             }
+            return true;
         }
 
         [[nodiscard]] inline auto get(const boost::source_location& loc = BOOST_CURRENT_LOCATION) const

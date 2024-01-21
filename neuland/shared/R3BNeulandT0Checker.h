@@ -14,18 +14,31 @@
 #pragma once
 
 #include <optional>
+#include <unordered_map>
 
 namespace R3B::Neuland
 {
+    class T0Entry
+    {
+      public:
+        T0Entry() = default;
+        explicit T0Entry(int t0_value);
+        void SetInitial(int t0_value);
+        [[nodiscard]] auto GetCorrection(int coarse_time) const -> int;
+
+      private:
+        std::optional<int> t0_ref_;
+    };
+
     class T0Checker
     {
       public:
         T0Checker() = default;
-        void TestAndSet(int coarse_time);
-        [[nodiscard]] auto DoCorrection(int value) const -> int;
+        void Add(int module_num, int t0_value);
+        auto GetCorrection(int module_num, int t0_value) const -> int;
 
       private:
-        std::optional<int> correction_ = 0;
-        std::optional<int> cached_t0_;
+        std::unordered_map<int, T0Entry> entries_;
     };
+
 } // namespace R3B::Neuland

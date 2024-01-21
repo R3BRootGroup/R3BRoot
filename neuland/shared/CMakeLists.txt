@@ -18,8 +18,14 @@ set(DEPENDENCIES R3BData R3BBase ParBase Boost::program_options)
 
 include_directories(${INCLUDE_DIRECTORIES})
 
-set(SRCS ElasticScattering.cxx IsElastic.cxx R3BNeulandGeoPar.cxx R3BNeulandContFact.cxx
-         R3BProgramOptions.cxx R3BNeulandVisualizer.cxx)
+set(SRCS
+    ElasticScattering.cxx
+    IsElastic.cxx
+    R3BNeulandGeoPar.cxx
+    R3BNeulandContFact.cxx
+    R3BNeulandT0Checker.cxx
+    R3BProgramOptions.cxx
+    R3BNeulandVisualizer.cxx)
 
 set(HEADERS
     ClusteringEngine.h
@@ -31,6 +37,7 @@ set(HEADERS
     R3BProgramOptions.h
     R3BNeulandGeoPar.h
     R3BNeulandContFact.h
+    R3BNeulandT0Checker.h
     R3BNeulandVisualizer.h
     R3BNeulandCommon.h)
 

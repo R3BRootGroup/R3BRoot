@@ -139,6 +139,7 @@
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;
 #pragma link C++ class R3BPaddleTamexMappedData+;
+#pragma link C++ class std::unordered_map<int, R3BPaddleTamexMappedData>+;
 #pragma link C++ class R3BPaddleCalData+;
 #pragma link C++ class R3BTofdMappedData+;
 #pragma link C++ class R3BTofdCalData+;

@@ -15,7 +15,10 @@
 #define R3BNEULANDMAPPED2CAL_H
 
 #include "FairTask.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "TH2F.h"
+#include <R3BIOConnector.h>
+#include <R3BNeulandT0Checker.h>
 
 class TClonesArray;
 class R3BTCalModulePar;
@@ -134,13 +137,16 @@ class R3BNeulandMapped2Cal : public FairTask
     Int_t fNEvents;      /**< Event counter. */
     Bool_t fPulserMode;  /**< Running with pulser data. */
     Bool_t fWalkEnabled; /**< Enable / Disable walk correction. */
+    bool is_trig0_enabled = false;
 
-    TClonesArray* fMapped;        /**< Array with raw items - input data. */
-    TClonesArray* fMappedTrigger; /**< Array with raw items - input data. */
-    TClonesArray* fCal;           /**< Array with time items - output data. */
-    Int_t fNPmt;                  /**< Number of produced time items per event. */
+    TClonesArray* fMapped;                   /**< Array with raw items - input data. */
+    TClonesArray* fMappedTrigger;            /**< Array with raw items - input data. */
+    R3B::InputHashConnector<int, R3BPaddleTamexMappedData> trigger0_data_{ "NeulandTrig0MappedData" };
+    TClonesArray* fCal; /**< Array with time items - output data. */
+    Int_t fNPmt;        /**< Number of produced time items per event. */
 
     R3BNeulandMappingPar* fMapPar;
+    R3B::Neuland::T0Checker t0_checker_;
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
     UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
@@ -157,6 +163,8 @@ class R3BNeulandMapped2Cal : public FairTask
     void MakeCal();
 
     Double_t WalkCorrection(Double_t);
+
+    auto get_t0_correction(int module_num, int side) -> int;
 
     TH2F* htcal1;
     TH2F* htcal2;

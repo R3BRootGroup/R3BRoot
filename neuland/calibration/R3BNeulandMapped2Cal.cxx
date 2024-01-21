@@ -103,6 +103,10 @@ InitStatus R3BNeulandMapped2Cal::Init()
     {
         LOG(info) << "Branch NeulandTrigMapped not found";
     }
+    if (trigger0_data_.try_init())
+    {
+        is_trig0_enabled = true;
+    }
 
     mgr->Register("NeulandCalData", "Neuland", fCal, kTRUE);
     fCal->Clear();
@@ -165,6 +169,14 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         if (header->GetTrigger() != fTrigger)
         {
             return;
+        }
+    }
+
+    if (is_trig0_enabled)
+    {
+        for (const auto& [module_num, trig0_data] : trigger0_data_)
+        {
+            t0_checker_.Add(module_num, trig0_data.GetCoarseTime1LE());
         }
     }
 
@@ -312,7 +324,9 @@ void R3BNeulandMapped2Cal::MakeCal()
         if (fWalkEnabled)
             timeLE = timeLE + WalkCorrection(qdc);
 
-        new ((*fCal)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iBar, iSide, timeLE, trig_ns, qdc);
+        auto t0_corr = get_t0_correction((iPlane - 1) * 50 + iBar, iSide);
+        new ((*fCal)[fNPmt])
+            R3BNeulandCalData((iPlane - 1) * 50 + iBar, iSide, timeLE + t0_corr, trig_ns + t0_corr, qdc);
         fNPmt += 1;
 
         // Subtract trigger time.
@@ -327,6 +341,24 @@ void R3BNeulandMapped2Cal::MakeCal()
         // timeTE = fmod(timeTE + c_range + c_range/2, c_range) - c_range/2;
         // qdc = fmod(qdc + c_range + c_range/2, c_range) - c_range/2;
     }
+}
+
+auto to_t0_module_num(int signal_module_num, int side) -> int
+{
+    // TODO: placeholder
+    return 0;
+}
+
+auto R3BNeulandMapped2Cal::get_t0_correction(int module_num, int side) -> int
+{
+    auto t0_module_num = to_t0_module_num(module_num, side);
+    auto t0_entry = trigger0_data_.get().find(t0_module_num);
+    if (t0_entry == trigger0_data_.get().end())
+    {
+        LOG(error) << "cannot find trigger0 data corresponding to module number: " << module_num;
+        return 0;
+    }
+    return t0_checker_.GetCorrection(t0_module_num, t0_entry->second.GetCoarseTime1LE());
 }
 
 void R3BNeulandMapped2Cal::FinishEvent()

@@ -82,6 +82,12 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
     {
         fArrayTrigger = NULL;
     }
+
+    if (is_t0_enabled_)
+    {
+        trigger0_data_.init();
+    }
+
     Reset();
     memset(fData, 0, sizeof *fData);
 
@@ -91,6 +97,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BNeulandTamexReader::R3BRead()
 {
     const auto data = fData;
+    trigger0_data_.clear();
 
     for (int plane = 0; plane < fNofPlanes; ++plane)
     {
@@ -175,7 +182,32 @@ Bool_t R3BNeulandTamexReader::R3BRead()
         }
     }
 
+    if (is_t0_enabled_)
+    {
+        fill_trigger0();
+    }
+
     return kTRUE;
+}
+
+void R3BNeulandTamexReader::fill_trigger0()
+{
+    // NOLINTBEGIN
+    auto value_index = 0;
+    for (int module_index = 0; module_index < fData->NN_TRIGCM; ++module_index)
+    {
+        for (auto channel_num = fData->NN_TRIG0CMI[module_index]; value_index < fData->NN_TRIG0CME[module_index];
+             ++value_index)
+        {
+            auto coarse = fData->NN_TRIG0Cv[value_index];
+            auto fine = fData->NN_TRIG0Fv[value_index];
+            auto mapped = R3BPaddleTamexMappedData{ 0, static_cast<int>(channel_num) };
+            mapped.fCoarseTime1LE = coarse;
+            mapped.fFineTime1LE = fine;
+            trigger0_data_.get().insert(std::make_pair(channel_num, mapped));
+        }
+    }
+    // NOLINTEND
 }
 
 void R3BNeulandTamexReader::Reset()
@@ -183,6 +215,10 @@ void R3BNeulandTamexReader::Reset()
     fArray->Clear();
     if (fArrayTrigger)
         fArrayTrigger->Clear();
+    if (is_t0_enabled_)
+    {
+        trigger0_data_.clear();
+    }
 }
 
 ClassImp(R3BNeulandTamexReader);

@@ -16,7 +16,7 @@
 #include <R3BLogger.h>
 #include <boost/algorithm/string.hpp>
 #include <filesystem>
-#include <fmt/os.h>
+#include <fmt/std.h>
 #include <regex>
 
 #include <ext_data_clnt.hh>
