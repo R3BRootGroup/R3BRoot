@@ -39,7 +39,7 @@ FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
     const char* name = c->GetName();
     LOG(info) << "R3BFrsSciContFact: Create container name: " << name;
     FairParSet* p = 0;
-    if (strcmp(name, "FrsSciTcalTofPar") == 0)
+    if (strcmp(name, "FrsSciTcalPar") == 0)
     {
         p = new R3BFrsSciTcalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
