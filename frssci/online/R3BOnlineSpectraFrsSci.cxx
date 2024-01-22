@@ -25,6 +25,7 @@
 
 #include "R3BEventHeader.h"
 #include "R3BFrsSciMappedData.h"
+#include "R3BFrsSciTcalData.h"
 #include "R3BOnlineSpectraFrsSci.h"
 
 R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci()
@@ -35,9 +36,11 @@ R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci()
 R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapped(NULL)
+    , fTcal(NULL)
     , fNEvents(0)
-    , fNbDets(1)
-    , fNbPmts(4)
+    , fNbDets(3)
+    , fNbPmts(3)
+    , fNbTofs(3)
 {
 }
 
@@ -46,6 +49,8 @@ R3BOnlineSpectraFrsSci::~R3BOnlineSpectraFrsSci()
     LOG(debug) << "R3BOnlineSpectraFrsSci::Destructor";
     if (fMapped)
         delete fMapped;
+    if (fTcal)
+        delete fTcal;
 }
 
 InitStatus R3BOnlineSpectraFrsSci::Init()
@@ -142,7 +147,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         // === TH1F: multiplicity per event and channel at mapped level === //
         sprintf(Name1, "FrsSci%i_MultPerEvent", i + 1);
         fh2_multMap[i] = new TH2I(Name1, Name1, fNbPmts + 1, -0.5, fNbPmts + 0.5, 20, -0.5, 19.5);
-        fh2_multMap[i]->GetXaxis()->SetTitle("channel: 1=PMT R,    2=PMT L,    3=COMMON REF, 4 = RESERVED FOR SYNC");
+        fh2_multMap[i]->GetXaxis()->SetTitle("channel: 1=PMT R,    2=PMT L,    3=COMMON REF");
         fh2_multMap[i]->GetYaxis()->SetTitle("multiplicity per event");
         fh2_multMap[i]->GetXaxis()->CenterTitle(true);
         fh2_multMap[i]->GetYaxis()->CenterTitle(true);
@@ -169,6 +174,71 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
 
     } // end of loop over fNbDets
 
+    // --- ------------ --- //
+    // --- TCAL LEVEL --- //
+    // --- ------------ --- //
+
+    // === get access to tcal data ===//
+    fTcal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTcalData"));
+    if (!fTcal)
+    {
+        LOG(fatal) << "FrsSciTcal not found";
+        return (kFATAL);
+    }
+
+    // === declare and create TCanvas and Histogram === //
+
+    sprintf(Name1, "TcalPosRaw_1Hit");
+    cTcalPos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cTcalPos->Divide(1, fNbDets);
+    fh1_PosRawTcal1Hit = new TH1D*[fNbDets * fNbPmts];
+
+    sprintf(Name1, "TcalTofRaw_1Hit");
+    cTcalTof = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cTcalTof->Divide(1, fNbTofs);
+    fh1_TofRawTcal1Hit = new TH1D*[fNbTofs];
+
+    for (UShort_t i = 0; i < fNbDets; i++)
+    {
+        // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
+        sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
+        fh1_PosRawTcal1Hit[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
+        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
+        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetTitle("number of counts with mult1");
+        fh1_PosRawTcal1Hit[i]->GetXaxis()->CenterTitle(true);
+        fh1_PosRawTcal1Hit[i]->GetYaxis()->CenterTitle(true);
+        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetLabelSize(0.05);
+        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetTitleSize(0.05);
+        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetLabelSize(0.05);
+        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetTitleSize(0.05);
+        cTcalPos->cd(i + 1);
+        fh1_PosRawTcal1Hit[i]->Draw();
+    }
+
+    if (fNbTofs > 0)
+    {
+        UShort_t cpt = 0;
+        for (UShort_t sta = 1; sta < fNbDets; sta++)
+        {
+            for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+            {
+                sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
+                fh1_TofRawTcal1Hit[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
+                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
+                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
+                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->CenterTitle(true);
+                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->CenterTitle(true);
+                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetLabelSize(0.05);
+                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetTitleSize(0.05);
+                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetLabelSize(0.05);
+                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetTitleSize(0.05);
+                cTcalTof->cd(cpt + 1);
+                fh1_TofRawTcal1Hit[cpt]->Draw();
+                cpt++;
+            }
+        }
+    }
+
     // --- --------------- --- //
     // --- MAIN FOLDER-Sci --- //
     // --- --------------- --- //
@@ -177,7 +247,12 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     mainfolMap->Add(cMapMult1D);
     mainfolMap->Add(cMapMult2D);
 
+    TFolder* mainfolTcal = new TFolder("FrsSciTcal", "FrsSci Tcal info");
+    mainfolTcal->Add(cTcalPos);
+    mainfolTcal->Add(cTcalTof);
+
     run->AddObject(mainfolMap);
+    run->AddObject(mainfolTcal);
 
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_FRSSCI_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
@@ -199,6 +274,13 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
             fh1_finetime[i * fNbPmts + j]->Reset();
             fh1_multMap[i * fNbPmts + j]->Reset();
         }
+
+        fh1_PosRawTcal1Hit[i]->Reset();
+    }
+
+    for (UShort_t i = 0; i < fNbTofs; i++)
+    {
+        fh1_TofRawTcal1Hit[i]->Reset();
     }
 }
 
@@ -213,14 +295,18 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
     UInt_t nHits;
     UShort_t iDet; // 0-based
     UShort_t iPmt; // 0-based
+    UShort_t cpt;
 
     UInt_t multMap[fNbDets * fNbPmts];
+    UInt_t multTcal[fNbDets * fNbPmts];
+    Double_t Traw[fNbDets * fNbPmts];
 
     for (UShort_t i = 0; i < fNbDets; i++)
     {
         for (UShort_t j = 0; j < fNbPmts; j++)
         {
             multMap[i * fNbPmts + j] = 0;
+            multTcal[i * fNbPmts + j] = 0;
         }
     }
 
@@ -258,10 +344,66 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                 }
             }
 
-        } // --- end of if Mapped data --- //
+        } // --- end of if (fMapped->GetEntries() > 0) --- //
+
+        if (fTcal)
+        {
+            if (fTcal->GetEntries() > 0)
+            {
+                // --- -------------- --- //
+                // --- read tcal data --- //
+                // --- -------------- --- //
+                nHits = fTcal->GetEntriesFast();
+                for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                {
+                    R3BFrsSciTcalData* hittcal = dynamic_cast<R3BFrsSciTcalData*>(fTcal->At(ihit));
+                    if (!hittcal)
+                        continue;
+                    iDet = hittcal->GetDetector() - 1;
+                    iPmt = hittcal->GetPmt() - 1;
+                    multTcal[iDet * fNbPmts + iPmt]++;
+                    Traw[iDet * fNbPmts + iPmt] = hittcal->GetRawTimeNs();
+                } // end of loop over tcal data
+
+                // --- ------------------- --- //
+                // --- filling histogramms --- //
+                // --- ------------------- --- //
+                if (fNbPmts > 1 && fNbDets > 0)
+                {
+                    // PosRaw [ns] = Tright - Tleft -> x increasing from right to left
+                    for (UShort_t i = 0; i < fNbDets; i++)
+                    {
+                        if (multTcal[i * fNbPmts] == 1 && multTcal[i * fNbPmts + 1] == 1)
+                            fh1_PosRawTcal1Hit[i]->Fill(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]);
+                    }
+                    // TofRaw [ns] relatively to Tref
+                    if (fNbPmts > 2 && fNbDets > 1 && fNbTofs > 0)
+                    {
+                        cpt = 0;
+                        for (UShort_t sta = 0; sta < fNbDets - 1; sta++)
+                        {
+                            for (UShort_t sto = sta + 1; sto < fNbDets; sto++)
+                            {
+                                if (multTcal[sta * fNbPmts] == 1 && multTcal[sta * fNbPmts + 1] == 1 &&
+                                    multTcal[sta * fNbPmts + 2] == 1 && multTcal[sto * fNbPmts] == 1 &&
+                                    multTcal[sto * fNbPmts + 1] == 1 && multTcal[sto * fNbPmts + 2] == 1)
+                                {
+                                    fh1_TofRawTcal1Hit[cpt]->Fill(
+                                        0.5 * (Traw[sto * fNbPmts] + Traw[sto * fNbPmts + 1]) -
+                                        Traw[sto * fNbPmts + 2] -
+                                        0.5 * (Traw[sta + fNbPmts] + Traw[sta * fNbPmts + 1]) +
+                                        Traw[sta * fNbPmts + 2]);
+                                    cpt++;
+                                } // end of if mult = 1
+                            }     // end of loop over stop FrsSci
+                        }         // end of loop over start FrsSco
+                    }
+                }
+            } // --- end of if Tcal->GetEntries() >0 --- //
+        }     // end of if fTcal
 
         fNEvents++;
-    }
+    } // end of if fMapped
 }
 // -----   Public method Finish   -----------------------------------------------
 void R3BOnlineSpectraFrsSci::FinishEvent()
@@ -270,13 +412,17 @@ void R3BOnlineSpectraFrsSci::FinishEvent()
     {
         fMapped->Clear();
     }
+    if (fTcal)
+    {
+        fTcal->Clear();
+    }
 }
 
 void R3BOnlineSpectraFrsSci::FinishTask()
 {
-    for (UShort_t i = 0; i < fNbDets; i++)
+    if (fMapped)
     {
-        if (fMapped)
+        for (UShort_t i = 0; i < fNbDets; i++)
         {
             fh2_multMap[i]->Write();
             fh2_multMap_RvsL[i]->Write();
@@ -285,7 +431,18 @@ void R3BOnlineSpectraFrsSci::FinishTask()
                 fh1_finetime[i * fNbPmts + j]->Write();
                 fh1_multMap[i * fNbPmts + j]->Write();
             }
+        } // end of loop over fNbDets
+        if (fTcal)
+        {
+            for (UShort_t i = 0; i < fNbDets; i++)
+            {
+                fh1_PosRawTcal1Hit[i]->Write();
+            }
+            for (UShort_t i = 0; i < fNbTofs; i++)
+            {
+                fh1_TofRawTcal1Hit[i]->Write();
+            }
         }
-    } // end of loop over fNbDets
+    }
 }
 ClassImp(R3BOnlineSpectraFrsSci);
