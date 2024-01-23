@@ -26,7 +26,7 @@
 //#pragma link C++ class R3BTttxMapped2CalPar+;
 #pragma link C++ class R3BTttxMapped2Cal+;
 #pragma link C++ class R3BTttxCal2Hit+;
-//#pragma link C++ class R3BTttxOnlineSpectra+;
+#pragma link C++ class R3BTttxOnlineSpectra+;
 
 #endif
 

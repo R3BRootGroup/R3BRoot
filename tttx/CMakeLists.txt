@@ -57,7 +57,7 @@ set(SRCS
 #./calibration/R3BTttxMapped2CalPar.cxx
 ./calibration/R3BTttxMapped2Cal.cxx
 ./calibration/R3BTttxCal2Hit.cxx
-#./online/R3BTttxOnlineSpectra.cxx
+./online/R3BTttxOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files
