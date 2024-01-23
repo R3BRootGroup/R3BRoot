@@ -22,6 +22,7 @@
 
 #include "R3BTttxCalData.h"
 #include "R3BTttxMappedData.h"
+// #include "R3BLogger.h"
 
 #include <Rtypes.h>
 #include <TArrayF.h>
@@ -56,10 +57,17 @@ class R3BTttxMapped2Cal : public FairTask
 
     inline void SetOnline(Bool_t option) { fOnline = option; }
 
-    /**
-     * Method for setting the thresholds: Signal>sigma_strip*fTimesSigma
-     */
-    inline void SetThresholdSigma(double th) { fTimesSigma = th; }
+    [[nodiscard]] inline const uint8_t& GetTrefCh(uint8_t val) { return fch_tref; }
+    [[nodiscard]] inline const uint8_t& GetTrigCh(uint8_t val) { return fch_trig; }
+
+    inline void SetTimeWindow(int min, int max)
+    {
+        fTimeMin = min;
+        fTimeMax = max;
+    }
+    inline void SetTrefCh(int val) { fch_tref = val; }
+    inline void SetTrigCh(int val) { fch_trig = val; }
+    // inline void UseTrigTime(bool val) {fuse_trig = val};
 
   private:
     void Reset();
@@ -68,8 +76,10 @@ class R3BTttxMapped2Cal : public FairTask
     int NumDets = 0;
     int NumStrips = 0;
     int NumParams = 0;
-    int MaxSigma = 3;
-    double fTimesSigma = 3;
+    uint8_t fch_tref = 33; //(1-base)
+    uint8_t fch_trig = 34; // (1-base)
+    int fTimeMin = -65536;
+    int fTimeMax = 65536; // Maximum time for 2^16
     TArrayF* CalParams;
 
     bool fOnline = false; // Don't store data for online
@@ -78,6 +88,75 @@ class R3BTttxMapped2Cal : public FairTask
     TClonesArray* fTttxMapData = nullptr;
     TClonesArray* fTttxCalData = nullptr;
 
+  public:
+    class CalStrip
+    {
+      public:
+        CalStrip() = default;
+        void Init()
+        {
+            fmult = 0;
+            fEraw.clear();
+            fTime.clear();
+        };
+        void SetRawValues(R3BTttxMappedData* hit)
+        {
+            fEraw.push_back(static_cast<int>(hit->GetEnergy()));
+            fTime.push_back(static_cast<int>(hit->GetTime()));
+            fmult++;
+        };
+        [[nodiscard]] inline const auto& GetMult() { return fmult; };
+        auto GetE(int mult) { return fEraw.at(mult); };
+        auto GetT(int mult) { return fTime.at(mult); };
+
+      private:
+        int fmult{ 0 };
+        std::vector<int> fEraw;
+        std::vector<int> fTime;
+    };
+
+    class CalDetector
+    {
+      public:
+        CalDetector() { ReInit(); };
+        void ReInit(int NumS = 32, int NumTref = 1, int NumTrig = 1)
+        {
+            fStrip.clear();
+            fTref.clear();
+            fTrig.clear();
+            fStrip.resize(NumS);
+            fTref.resize(NumTref);
+            fTrig.resize(NumTrig);
+            Init();
+        };
+        void Init()
+        {
+            for (auto& val : fStrip)
+            {
+                val.Init();
+            }
+            for (auto& val : fTref)
+            {
+                val.Init();
+            }
+            for (auto& val : fTrig)
+            {
+                val.Init();
+            }
+        };
+        auto& GetStrip(int val) { return fStrip.at(val); };
+        auto& GetTref(int val = 0) { return fTref.at(val); };
+        auto& GetTrig(int val = 0) { return fTrig.at(val); };
+
+      private:
+        std::vector<CalStrip> fStrip;
+        std::vector<CalStrip> fTref;
+        std::vector<CalStrip> fTrig;
+    };
+
+  private:
+    std::vector<CalDetector> fTttx;
+    void CalculateStrip(int idet, int istrip, CalStrip& fStrip, CalStrip& fTrig);
     // Private method AddCalData
     R3BTttxCalData* AddCalData(uint8_t detid, uint8_t stripid, double time, double energy);
 

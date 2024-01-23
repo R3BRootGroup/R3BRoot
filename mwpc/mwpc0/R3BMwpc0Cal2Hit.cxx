@@ -104,7 +104,7 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
     Int_t padId;
     Int_t padmx = -1, padmy = -1;
     Double_t q = 0., qmx = 0., qmy = 0., qleft = 0., qright = 0., qdown = 0., qup = 0.;
-    Double_t x = -1000., y = -1000.;
+    Double_t x = NAN, y = NAN;
 
     for (Int_t i = 0; i < Mw0PadsX; i++)
         fx[i] = 0;

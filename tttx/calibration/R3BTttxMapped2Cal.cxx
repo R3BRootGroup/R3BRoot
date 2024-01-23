@@ -35,6 +35,9 @@
 #include "R3BTttxMappedData.h"
 #include "R3BTttxStripCalPar.h"
 
+constexpr int ov_mask = 0x8000;
+constexpr int pu_mask = 0x4000;
+
 // R3BTttxMapped2Cal: Default Constructor --------------------------
 R3BTttxMapped2Cal::R3BTttxMapped2Cal()
     : R3BTttxMapped2Cal("R3BTttxMapped2Cal", 1)
@@ -87,13 +90,12 @@ void R3BTttxMapped2Cal::SetParameter()
     CalParams->Set(array_size);
     CalParams = const_cast<TArrayF*>(fCal_Par->GetStripCalParams()); // Array with the Cal parameters
 
-    // Count the number of dead strips per AMS detector
     for (int d = 0; d < NumDets; d++)
     {
         int numdeadstrips = 0;
         for (int i = 0; i < NumStrips; i++)
         {
-            if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
+            if (fCal_Par->GetInUse(d + 1, i + 1) != 1)
                 numdeadstrips++;
         }
         R3BLOG(info, "Nb of dead strips in TTTX detector " << d << ": " << numdeadstrips);
@@ -117,6 +119,12 @@ InitStatus R3BTttxMapped2Cal::Init()
     rootManager->Register("tttxCalData", "TTTX strip Cal", fTttxCalData, fOnline ? false : true);
 
     SetParameter();
+    //
+    fTttx.resize(NumDets);
+    for (auto& val : fTttx)
+    {
+        val.ReInit(NumStrips);
+    }
     return kSUCCESS;
 }
 
@@ -134,19 +142,46 @@ void R3BTttxMapped2Cal::Exec(Option_t* /*option*/)
     // Reset entries in output arrays, local arrays
     Reset();
 
-    if (!fCal_Par)
-    {
-        LOG(error) << "NO Container Parameter";
-    }
+    R3BLOG_IF(error, !fCal_Par, "NO Container Parameter");
 
     // Reading the Input -- Mapped Data --
     auto nHits = fTttxMapData->GetEntriesFast();
     if (!nHits)
         return;
+    for (int ihit = 0; ihit < nHits; ihit++)
+    {
+        auto* hit = dynamic_cast<R3BTttxMappedData*>(fTttxMapData->At(ihit));
+        auto idet = static_cast<int>(hit->GetDetID()) - 1;
+        auto istrip = static_cast<int>(hit->GetStripID()) - 1;
+        if (istrip == fch_tref)
+        {
+            fTttx.at(idet).GetTref().SetRawValues(hit);
+        }
+        if (istrip == fch_trig)
+        {
+            fTttx.at(idet).GetTrig().SetRawValues(hit);
+        }
+        if (istrip < NumStrips)
+        {
+            fTttx.at(idet).GetStrip(istrip).SetRawValues(hit);
+        }
+    }
+    // End of reading data
 
-    // Your code
-    // AddCalData(uint8_t detid, uint8_t stripid, double time, double energy)
-
+    // Apply calibrations and addcaldata
+    for (int idet = 0; idet < NumDets; idet++)
+    {
+        auto fTrig = fTttx.at(idet).GetTrig();
+        R3BLOG(debug, "Multiplicity of Trigger: " << fTrig.GetMult());
+        R3BLOG_IF(error, fTrig.GetMult() > 1, "Multiple Trigger hits: " << fTrig.GetMult());
+        for (int istrip = 0; istrip < NumStrips; istrip++)
+        {
+            if (fCal_Par->GetInUse(idet + 1, istrip + 1) != 1)
+                continue;
+            CalculateStrip(idet, istrip, fTttx.at(idet).GetStrip(istrip), fTrig);
+        }
+        CalculateStrip(idet, fch_tref, fTttx.at(idet).GetTref(), fTrig); // Store Tref data also
+    }
     return;
 }
 
@@ -156,6 +191,44 @@ void R3BTttxMapped2Cal::Reset()
     R3BLOG(debug, "Clearing tttxCalData structure");
     if (fTttxCalData)
         fTttxCalData->Clear();
+    for (auto& val : fTttx)
+    {
+        val.Init();
+    }
+}
+
+void R3BTttxMapped2Cal::CalculateStrip(int idet, int istrip, CalStrip& fStrip, CalStrip& fTrig)
+{
+    for (int imult = 0; imult < fStrip.GetMult(); imult++)
+    {
+        auto dtime = fStrip.GetT(imult);
+        if (fTrig.GetMult() == 1)
+        {
+            dtime -= fStrip.GetT(0);
+        }
+        R3BLOG(debug, "idet=" << idet << ", istrip=" << istrip << ", time =" << dtime);
+        if (dtime < fTimeMin || dtime > fTimeMax)
+            return;
+        auto rawE = static_cast<int>(fStrip.GetE(imult));
+        double energy = 0.;
+        if ((ov_mask & rawE) != 0x0)
+        {
+            energy = TMath::Infinity();
+        }
+        else if ((pu_mask & rawE) != 0x0)
+        {
+            energy = std::nan("");
+        }
+        else if (rawE != 0 && istrip < NumStrips) // for the case of tref, rawE is 0
+        {
+            for (int power = 0; power < NumParams; power++)
+            {
+                energy += CalParams->GetAt((idet * NumStrips + istrip) * NumParams + power) *
+                          TMath::Power(static_cast<double>(rawE), power);
+            }
+        }
+        AddCalData(idet + 1, istrip + 1, dtime, energy);
+    }
 }
 
 // -----   Private method AddCalData  --------------------------------------------

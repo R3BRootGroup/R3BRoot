@@ -77,7 +77,7 @@
 #pragma link C++ class R3BCalifaJulichReader+;
 #pragma link C++ class R3BRpcReader+;
 #pragma link C++ class R3BTwimReader+;
-#pragma link C++ class R3BTTTXReader+;
+#pragma link C++ class R3BTttxReader+;
 #pragma link C++ class R3BMusliReader+;
 #pragma link C++ class R3BMwpcReader+;
 #pragma link C++ class R3BSyncCheckReader+;
