@@ -56,27 +56,28 @@ class R3BTttxStripCalPar : public FairParGenericSet
     [[nodiscard]] inline const int GetNumStrips() const { return fNumStrips; }
     [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsFit; }
     [[nodiscard]] inline TArrayF* GetStripCalParams() { return fStripCalParams; }
-    [[nodiscard]] inline int GetInUse(int strip)
+    [[nodiscard]] inline int GetInUse(int det, int strip)
     {
-        assert(std::clamp(strip, 1, fNumStrips) == strip && "Number of strip out of range");
-        return fIn_use->GetAt(strip - 1);
+        assert(std::clamp(det, 1, fNumDets) == det && "Number of detectors out of range");
+        assert(std::clamp(strip, 1, fNumStrips) == strip && "Number of strips out of range");
+        return fIn_use->GetAt(fNumStrips * (det - 1) + strip - 1);
     }
 
     inline void SetNumDets(int n) { fNumDets = n; }
     inline void SetNumStrips(int n) { fNumStrips = n; }
     inline void SetNumParsFit(int n) { fNumParsFit = n; }
-    inline void SetStripCalParams(double value, int strip)
+    inline void SetStripCalParams(double value, int det, int strip)
     {
+        assert(std::clamp(det, 1, fNumDets) == det && "Number of detectors out of range");
         assert(std::clamp(strip, 1, fNumStrips) == strip && "Number of strip out of range");
-        fStripCalParams->AddAt(value, strip - 1);
+        fStripCalParams->AddAt(value, fNumStrips * (det - 1) + strip - 1);
     }
-    inline void SetInUse(int value, int strip)
+    inline void SetInUse(int value, int det, int strip)
     {
+        assert(std::clamp(det, 1, fNumDets) == det && "Number of detectors out of range");
         assert(std::clamp(strip, 1, fNumStrips) == strip && "Number of strip out of range");
-        fIn_use->AddAt(value, strip - 1);
+        fIn_use->AddAt(value, fNumStrips * (det - 1) + strip - 1);
     }
-
-    /** Create more Methods if you need them! **/
 
   private:
     TArrayF* fStripCalParams; // Calibration Parameters of strip

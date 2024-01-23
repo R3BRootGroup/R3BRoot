@@ -154,7 +154,7 @@ set(SRCS
 ./music/R3BMusicReader.cxx
 ./rpc/R3BRpcReader.cxx
 ./twim/R3BTwimReader.cxx
-./ttt10/R3BTTTXReader.cxx
+./tttx/R3BTttxReader.cxx
 ./musli/R3BMusliReader.cxx
 ./mwpc/R3BMwpcReader.cxx
 ./sync_check/R3BSyncCheckReader.cxx
@@ -219,7 +219,7 @@ Set(STRUCT_HEADERS
 ./alpide/ext_h101_alpide.h
 ./music/ext_h101_music.h
 ./twim/ext_h101_twim.h
-./ttt10/ext_h101_ttt10.h
+./tttx/ext_h101_ttt10.h
 ./musli/ext_h101_musli.h
 ./mwpc/ext_h101_mwpc.h
 ./trloii/ext_h101_samp.h

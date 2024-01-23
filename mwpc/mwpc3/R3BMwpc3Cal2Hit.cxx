@@ -157,7 +157,7 @@ void R3BMwpc3Cal2Hit::S467()
         Int_t padId = 0;
         Int_t padmx = -1, padmy = -1;
         Double_t q = 0., qmx = 0., qmy = 0., qleft = 0., qright = 0., qdown = 0., qup = 0.;
-        Double_t x = -1000., y = -1000.;
+        Double_t x = NAN, y = NAN;
 
         vector<double> vQX, vQY;
         vector<int> vStripX, vStripY;

@@ -22,14 +22,14 @@ typedef struct EXT_STR_h101_TTTX_t EXT_STR_h101_TTTX;
 typedef struct EXT_STR_h101_TTTX_onion_t EXT_STR_h101_TTTX_onion;
 class ext_data_struct_info;
 
-class R3BTTTXReader : public R3BReader
+class R3BTttxReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BTTTXReader(EXT_STR_h101_TTTX*, size_t);
+    R3BTttxReader(EXT_STR_h101_TTTX*, size_t);
 
     // Destructor
-    virtual ~R3BTTTXReader();
+    virtual ~R3BTttxReader();
 
     // Setup structure information
     virtual Bool_t Init(ext_data_struct_info*) override;
@@ -69,5 +69,5 @@ class R3BTTTXReader : public R3BReader
     TClonesArray* fArray; /**< Output array. */
 
   public:
-    ClassDefOverride(R3BTTTXReader, 0);
+    ClassDefOverride(R3BTttxReader, 0);
 };
