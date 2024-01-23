@@ -174,7 +174,7 @@ void R3BMwpc1Cal2Hit::S467()
     Int_t padmx = -1, padmxu = -1, padmxd = -1, padmy = -1;
     Double_t q = 0., qmxu = 0., qmxd = 0., qleft = 0., qright = 0.;
     Double_t qmx = 0., qmy = 0., qdown = 0., qup = 0.;
-    Double_t x = -1000., y = -1000.;
+    Double_t x = NAN, y = NAN;
 
     for (Int_t i = 0; i < Mw1PadsX; i++)
         fx[i] = 0;

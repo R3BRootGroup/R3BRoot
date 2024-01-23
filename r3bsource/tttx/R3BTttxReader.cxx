@@ -16,8 +16,8 @@
 #include <TClonesArray.h>
 
 #include "R3BLogger.h"
-#include "R3BTTTXReader.h"
 #include "R3BTttxMappedData.h"
+#include "R3BTttxReader.h"
 
 extern "C"
 {
@@ -27,8 +27,8 @@ extern "C"
 
 using namespace std;
 
-R3BTTTXReader::R3BTTTXReader(EXT_STR_h101_TTTX* data, size_t offset)
-    : R3BReader("R3BTTTXReader")
+R3BTttxReader::R3BTttxReader(EXT_STR_h101_TTTX* data, size_t offset)
+    : R3BReader("R3BTttxReader")
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
@@ -41,7 +41,7 @@ R3BTTTXReader::R3BTTTXReader(EXT_STR_h101_TTTX* data, size_t offset)
 {
 }
 
-R3BTTTXReader::~R3BTTTXReader()
+R3BTttxReader::~R3BTttxReader()
 {
     R3BLOG(debug1, "Destructor");
     if (fArray)
@@ -50,7 +50,7 @@ R3BTTTXReader::~R3BTTTXReader()
     }
 }
 
-Bool_t R3BTTTXReader::Init(ext_data_struct_info* a_struct_info)
+Bool_t R3BTttxReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
     R3BLOG(info, "");
@@ -86,7 +86,7 @@ Bool_t R3BTTTXReader::Init(ext_data_struct_info* a_struct_info)
     return kTRUE;
 }
 
-Bool_t R3BTTTXReader::R3BRead()
+Bool_t R3BTttxReader::R3BRead()
 {
     // Convert plain raw data to multi-dimensional array
     auto* data = reinterpret_cast<EXT_STR_h101_TTTX_onion*>(fData);
@@ -100,13 +100,13 @@ Bool_t R3BTTTXReader::R3BRead()
     return kTRUE;
 }
 
-void R3BTTTXReader::Reset()
+void R3BTttxReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
 }
 
-Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
+Bool_t R3BTttxReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
 {
     Bool_t pileupFLAG = kFALSE;
     Bool_t overflowFLAG = kFALSE;
@@ -126,7 +126,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
     /*
     if ((nChannelsEnergy>0)||(nChannelsTref>0)) {
       std::cout << "------------------------------" << std::endl;
-      std::cout << "R3BTTTXReader::ReadDatai=()" << std::endl;
+      std::cout << "R3BTttxReader::ReadDatai=()" << std::endl;
       std::cout << "------------------------------" << std::endl;
       std::cout <<" * nChannelsTref = "<< nChannelsTref <<std::endl;
       std::cout <<"  * nChannelsTtrig = "<< nChannelsTtrig <<std::endl;
@@ -183,7 +183,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
     // 0<=nChannelsEnergy<32
     // 0<=nChannelsTime<32
     if (nChannelsEnergy != nChannelsTime)
-        LOG(error) << "R3BTTTXReader::ReadData error ! NOT THE SAME NUMBER OF CHANNELS HITTED IN ENERGY () AND TIME ()";
+        LOG(error) << "R3BTttxReader::ReadData error ! NOT THE SAME NUMBER OF CHANNELS HITTED IN ENERGY () AND TIME ()";
 
     // ENERGY AND TIME ARE SORTED
     uint32_t curChannelTimeStart = 0;
@@ -196,7 +196,7 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
 
         if (idChannelEnergy != idChannelTime)
         {
-            LOG(error) << "R3BTTTXReader::ReadData error ! MISMATCH FOR CHANNEL ID IN ENERGY #" << idChannelEnergy
+            LOG(error) << "R3BTttxReader::ReadData error ! MISMATCH FOR CHANNEL ID IN ENERGY #" << idChannelEnergy
                        << " AND TIME #" << idChannelTime;
         }
         uint32_t nextChannelTimeStart = data->TTTX_ID[i_det].TME[i_ch];
@@ -222,4 +222,4 @@ Bool_t R3BTTTXReader::ReadData(EXT_STR_h101_TTTX_onion* data, UShort_t i_det)
     return kTRUE;
 }
 
-ClassImp(R3BTTTXReader)
+ClassImp(R3BTttxReader)
