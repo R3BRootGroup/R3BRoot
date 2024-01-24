@@ -3,7 +3,6 @@
 #include "FairDetParIo.h"
 #include "FairLogger.h"
 #include "FairParamList.h"
-#include "TArrayF.h"
 #include "TMath.h"
 #include "TString.h"
 
@@ -12,11 +11,11 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BFrsSciTcalPar::R3BFrsSciTcalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumDets(2)
+    , fNumDets(3)
     , fNumPmts(3)
     , fNumPars(1000)
 {
-    fAllTcalParams = new TArrayF((UInt_t)(fNumDets * fNumPmts * fNumPars));
+    fAllTcalParams = new TArrayD((UInt_t)(fNumDets * fNumPmts * fNumPars));
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -101,6 +100,10 @@ Bool_t R3BFrsSciTcalPar::getParams(FairParamList* list)
 void R3BFrsSciTcalPar::printParams()
 {
     LOG(info) << "R3BFrsSciTcalPar: FrsSciTcal Parameters: ";
+
+    LOG(info) << "nDetsTcalPar = " << fNumDets;
+    LOG(info) << "nPmtsTcalPar = " << fNumPmts;
+    LOG(info) << "nTcalParsPerSignal = " << fNumPars;
 
     for (UShort_t det = 0; det < fNumDets; det++)
     {
