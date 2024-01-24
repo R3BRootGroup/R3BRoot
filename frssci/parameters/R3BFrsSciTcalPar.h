@@ -15,7 +15,7 @@
 #define R3BFRSSCITCALPAR_H
 
 #include "FairParGenericSet.h"
-#include "TArrayF.h"
+#include "TArrayD.h"
 #include "TObjArray.h"
 #include "TObject.h"
 
@@ -54,20 +54,23 @@ class R3BFrsSciTcalPar : public FairParGenericSet
     void SetNumPmts() { fNumPmts = 3; }
     void SetNumPars(Int_t n) { fNumPars = n; }
     void SetNumPars() { fNumPars = 1000; }
+    void SetMinStat(Int_t stat) { fMinStat = stat; }
     void SetOneTcalParam(Double_t ft_ns, UInt_t rank) { fAllTcalParams->AddAt(ft_ns, rank); }
 
     const Int_t GetNumDets() { return fNumDets; }
     const Int_t GetNumPmts() { return fNumPmts; }
     const Int_t GetNumPars() { return fNumPars; }
+    const Int_t GetMinStat() { return fMinStat; }
 
-    TArrayF* GetAllTcalParams() { return fAllTcalParams; }
+    TArrayD* GetAllTcalParams() { return fAllTcalParams; }
     Double_t GetOneTcalParam(UInt_t rank) { return (Double_t)fAllTcalParams->GetAt(rank); }
 
   private:
-    Int_t fNumDets;          // number of FrsSci detectors
-    Int_t fNumPmts;          // number of Pmts  (=3)
-    Int_t fNumPars;          // 1000 parameters per signal for VFTX calibration
-    TArrayF* fAllTcalParams; // Calibration Parameters for all signals of all detectors
+    Int_t fNumDets; // number of FrsSci detectors
+    Int_t fNumPmts; // number of Pmts  (=3)
+    Int_t fNumPars; // 1000 parameters per signal for VFTX calibration
+    Int_t fMinStat;
+    TArrayD* fAllTcalParams; // Calibration Parameters for all signals of all detectors
 
     const R3BFrsSciTcalPar& operator=(const R3BFrsSciTcalPar&);
     R3BFrsSciTcalPar(const R3BFrsSciTcalPar&);

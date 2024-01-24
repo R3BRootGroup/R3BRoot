@@ -25,7 +25,7 @@ void R3BFrsSciContFact::setAllContainers()
     // the list of containers for the STS library.
 
     FairContainer* p1 = new FairContainer(
-        "FrsSciTcalPar", "FrsSci Tcal parameters for VFTX time caliration in ns", "FrsSciTcalParContext");
+        "FrsSciTcalPar", "FrsSci Tcal parameters for VFTX time calibration in ns", "FrsSciTcalParContext");
     p1->addContext("FrsSciTcalParContext");
     containers->Add(p1);
 }
