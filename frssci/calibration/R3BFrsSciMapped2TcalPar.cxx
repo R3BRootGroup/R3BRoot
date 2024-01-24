@@ -19,7 +19,7 @@
 R3BFrsSciMapped2TcalPar::R3BFrsSciMapped2TcalPar()
     : FairTask("R3BFrsSciMapped2TcalPar", 1)
     , fMapped(NULL)
-    , fNumDets(2)
+    , fNumDets(3)
     , fNumPmts(3)
     , fNumPars(1000)
     , fMinStat(100000)
@@ -32,7 +32,7 @@ R3BFrsSciMapped2TcalPar::R3BFrsSciMapped2TcalPar()
 R3BFrsSciMapped2TcalPar::R3BFrsSciMapped2TcalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapped(NULL)
-    , fNumDets(2)
+    , fNumDets(3)
     , fNumPmts(3)
     , fNumPars(1000)
     , fMinStat(100000)
@@ -84,7 +84,12 @@ InitStatus R3BFrsSciMapped2TcalPar::Init()
         LOG(error) << "R3BFrsSciMapped2TcalPar::Init() Couldn't get handle on FrsSciTcalPar container";
         return kFATAL;
     }
-
+    else
+    {
+        fTcalPar->SetNumDets((Int_t)fNumDets);
+        fTcalPar->SetNumPmts((Int_t)fNumPmts);
+        fTcalPar->SetNumPars((Int_t)fNumPars);
+    }
     // histograms
     char name[100];
     fh_TimeFineBin = new TH1F*[fNumDets * fNumPmts];
@@ -153,10 +158,13 @@ void R3BFrsSciMapped2TcalPar::CalculateVftxTcalParams()
     Double_t IntegralPartial;
     Double_t Bin2Ns[fNumPars];
 
+    LOG(info) << " min stat is set to " << fMinStat;
+
     for (Int_t sig = 0; sig < fNumDets * fNumPmts; sig++)
     {
-        if (fh_TimeFineBin[sig]->GetEntries() > fMinStatistics)
+        if (fh_TimeFineBin[sig]->Integral() > fMinStat)
         {
+            LOG(info) << " Process calibration for signal " << sig;
             IntegralTot = (Double_t)fh_TimeFineBin[sig]->Integral();
             IntegralPartial = 0.;
             for (Int_t bin = 0; bin < fNumPars; bin++)
@@ -165,6 +173,13 @@ void R3BFrsSciMapped2TcalPar::CalculateVftxTcalParams()
                 Bin2Ns[bin] = 5. * IntegralPartial / IntegralTot;
                 fh_TimeFineNs[sig]->SetBinContent(bin + 1, Bin2Ns[bin]);
                 fTcalPar->SetOneTcalParam(Bin2Ns[bin], sig * fNumPars + bin);
+            }
+        }
+        else
+        {
+            for (Int_t bin = 0; bin < fNumPars; bin++)
+            {
+                fTcalPar->SetOneTcalParam(0, sig * fNumPars + bin);
             }
         }
         fh_TimeFineNs[sig]->Write(); // empty histo if stat <fMinStatistics
