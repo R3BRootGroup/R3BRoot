@@ -28,7 +28,6 @@
 
 #pragma link C++ class R3BRpcPreCal2CalPar+;
 #pragma link C++ class R3BRpcPreCal2Cal+;
-
 #pragma link C++ class R3BRpcTotCalPar+;
 
 #pragma link C++ class R3BRpcCal2Hit+;

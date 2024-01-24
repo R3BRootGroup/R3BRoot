@@ -64,6 +64,7 @@ class R3BRpcPreCal2CalPar : public FairTask
     Bool_t fDebugMode;
     Int_t fNumChannels;
 
+    R3BEventHeader* fR3BEventHeader;
     R3BRpcTotCalPar* fTotCalPar;
 
     TH1F* fhTot[N_NUM];

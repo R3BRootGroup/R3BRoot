@@ -107,7 +107,7 @@ InitStatus R3BRpcMapped2PreCal::Init()
             continue;
         }
         int chn = stoi(chn_id);
-        int fpga = floor(lines / 33.);
+        int fpga = (lines - 1) / 32.;
         lut[chn - 1][side_lut].push_back(fpga);
     }
     in.close();
@@ -155,7 +155,7 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
 
         UInt_t iFpga;
         if (map1->GetChannelId() == 7)
-        { //|| map1->GetChannelId() == 5) {
+        {
             iFpga = 5;
         }
         else
@@ -198,19 +198,24 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
     nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
-
         auto map1 = dynamic_cast<R3BRpcMappedData*>(fMappedDataCA->At(i));
         UInt_t iDetector = map1->GetDetId();
-
+        UInt_t iFpga;
+        if (map1->GetChannelId() == 7)
+        {
+            iFpga = 5;
+        }
+        else
+        {
+            iFpga = map1->GetChannelId(); // now 1..4
+        }
         if (iDetector == 2)
         {
             TClonesArray& clref = *fRpcPreCalDataCA;
             Int_t size = clref.GetEntriesFast();
-            new (clref[size]) R3BRpcPreCalData(2, map1->GetChannelId(), Ref_vec[map1->GetChannelId() - 1].time, 0, 0);
+            new (clref[size]) R3BRpcPreCalData(2, iFpga, Ref_vec[iFpga - 1].time, 0, 0);
         }
-
         // loop over strip data
-
         if (iDetector == 0)
         {
             UInt_t iStrip = map1->GetChannelId();                      // now 1..41
@@ -248,7 +253,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
 
         if (iDetector == 1)
         {
-
             UInt_t iPmt = map1->GetChannelId();                        // now 1..41
             UInt_t iEdge_Side = map1->GetEdge() * 2 + map1->GetSide(); // 0,3
             R3BTCalModulePar* par_Pmts = fTCalPar->GetModuleParAt(iDetector + 1, iPmt, iEdge_Side + 1);
@@ -307,7 +311,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
                 // It fills the R3BRpcStripCalData
                 TClonesArray& clref = *fRpcPreCalDataCA;
                 Int_t size = clref.GetEntriesFast();
-                // cout << "strip  " << entry_lead.time << " " << strip << " " << side <<endl;
                 new (clref[size]) R3BRpcPreCalData(0, strip + 1, entry_lead.time, tot, side);
                 ++lead_i;
                 ++trail_i;
@@ -342,7 +345,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
                 // It fills the R3BRpcPmtCalData
                 TClonesArray& clref = *fRpcPreCalDataCA;
                 Int_t size = clref.GetEntriesFast();
-                // cout << "pmt " << entry_lead.time << " " << bar << " " << side<<endl;
                 new (clref[size]) R3BRpcPreCalData(1, bar + 1, entry_lead.time, tot, side);
                 ++lead_i;
                 ++trail_i;
@@ -351,8 +353,6 @@ void R3BRpcMapped2PreCal::Exec(Option_t* option)
             }
         }
     }
-    //      if(leading_pmt !=0 && leading_strip != 0){	 std::cout<<leading_pmt << " " <<  leading_strip << " " <<
-    //      leading_strip - leading_pmt  <<  " " << fmod(leading_strip - leading_pmt + 1.5*c,c)-c/2 <<  std::endl;}
     return;
 }
 
