@@ -142,19 +142,19 @@ class R3BRpcOnlineSpectra : public FairTask
     Int_t fNEvents;         // Event counter.
 
     /* ----- Map Histograms -----*/
-    TH1F** stripCoarseRightHisto;
-    TH1F** stripFineRightHisto;
+    TH1F* stripCoarseRightHisto[41];
+    TH1F* stripFineRightHisto[41];
 
-    TH1F** stripCoarseLeftHisto;
-    TH1F** stripFineLeftHisto;
+    TH1F* stripCoarseLeftHisto[41];
+    TH1F* stripFineLeftHisto[41];
 
-    TH1F** pmtCoarseHistoTop;
-    TH1F** pmtFineHistoTop;
-    TH1F** pmtCoarseHistoBottom;
-    TH1F** pmtFineHistoBottom;
+    TH1F* pmtCoarseHistoTop[8];
+    TH1F* pmtFineHistoTop[8];
+    TH1F* pmtCoarseHistoBottom[8];
+    TH1F* pmtFineHistoBottom[8];
 
-    TH1F** refCoarseHisto;
-    TH1F** refFineHisto;
+    TH1F* refCoarseHisto[9];
+    TH1F* refFineHisto[9];
 
     TH2F* stripCoarseLeftCorr;
     TH2F* stripCoarseRightCorr;
@@ -185,12 +185,12 @@ class R3BRpcOnlineSpectra : public FairTask
     TH2F* stripRightTotCorr;
     TH2F* stripLeftTimeCorr;
     TH2F* stripRightTimeCorr;
-    TH2F** stripLeftBanana;
-    TH2F** stripRightBanana;
-    TH1F** pmtPreCalTimeHistoTop;
-    TH1F** pmtPreCalTotHistoTop;
-    TH1F** pmtPreCalTimeHistoBottom;
-    TH1F** pmtPreCalTotHistoBottom;
+    TH2F* stripLeftBanana;
+    TH2F* stripRightBanana;
+    TH1F* pmtPreCalTimeHistoTop[8];
+    TH1F* pmtPreCalTotHistoTop[8];
+    TH1F* pmtPreCalTimeHistoBottom[8];
+    TH1F* pmtPreCalTotHistoBottom[8];
 
     /* ----- Pre Cal Canvases ----- */
     TCanvas* stripLeftTotCorrCanvas;
@@ -220,7 +220,7 @@ class R3BRpcOnlineSpectra : public FairTask
 
     /* ------ ToF Correlations Histograms ------*/
     TH2F* tofCorr;
-    TH1F** stripTofHisto;
+    TH1F* stripTofHisto[41];
     TH2F* tofVsPosCorr;
 
     /* ------ ToF Correlations Canvases ------*/
@@ -236,7 +236,7 @@ class R3BRpcOnlineSpectra : public FairTask
     TCanvas* stripIdVsHitsCanvas;
 
     /* ------ Strip - Bar Correlation Histograms -----*/
-    TH1F** timeDiffStripPmtHisto;
+    TH1F* timeDiffStripPmtHisto[41];
     TH2F* timeDiffStripPmtCorr;
 
     TH2F* deltaTVsPosCorr;

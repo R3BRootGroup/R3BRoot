@@ -21,6 +21,7 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BEventHeader.h"
 #include "R3BRpcPreCal2CalPar.h"
 #include "R3BRpcTotCalPar.h"
 
@@ -37,10 +38,11 @@ R3BRpcPreCal2CalPar::R3BRpcPreCal2CalPar()
 
 R3BRpcPreCal2CalPar::R3BRpcPreCal2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fDebugMode(0)
+    , fNumChannels(64)
+    , fR3BEventHeader(NULL)
     , fTotCalPar(NULL)
     , fPreCalDataCA(NULL)
-    , fNumChannels(64)
-    , fDebugMode(0)
 {
     for (Int_t i = 0; i < N_NUM; i++)
     {
@@ -52,7 +54,6 @@ R3BRpcPreCal2CalPar::~R3BRpcPreCal2CalPar() { LOG(info) << "R3BRpcPreCal2CalPar:
 
 InitStatus R3BRpcPreCal2CalPar::Init()
 {
-    std::cout << "hre" << std::endl;
     LOG(info) << "R3BRpcPreCal2CalPar::Init()";
 
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -74,6 +75,14 @@ InitStatus R3BRpcPreCal2CalPar::Init()
         LOG(error) << "R3BRpcPreCal2CalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
+    fR3BEventHeader = (R3BEventHeader*)rootManager->GetObject("EventHeader.");
+    if (!fR3BEventHeader)
+    {
+        LOG(warning) << "EventHeader. not found";
+        fR3BEventHeader = (R3BEventHeader*)rootManager->GetObject("R3BEventHeader");
+    }
+    else
+        LOG(error) << "EventHeader. found";
 
     fTotCalPar = dynamic_cast<R3BRpcTotCalPar*>(rtdbPar->getContainer("RpcTotCalPar"));
     if (!fTotCalPar)
@@ -93,28 +102,32 @@ void R3BRpcPreCal2CalPar::Exec(Option_t* opt)
     // loop over strip data
     Int_t nHits = fPreCalDataCA->GetEntries();
     UInt_t iDetector = 0;
-    for (Int_t i = 0; i < nHits; i++)
+    bool tpat2 = fR3BEventHeader->GetTpat() & 0xf000;
+    if (tpat2 > 0)
     {
-        auto map1 = dynamic_cast<R3BRpcPreCalData*>(fPreCalDataCA->At(i));
-
-        UInt_t inum = (iDetector * 41 + map1->GetChannelId()) * 2 + map1->GetSide() - 2;
-        if (map1->GetDetId() == 0)
+        for (Int_t i = 0; i < nHits; i++)
         {
-            if (NULL == fhTot[inum])
+            auto map1 = dynamic_cast<R3BRpcPreCalData*>(fPreCalDataCA->At(i));
+            iDetector = map1->GetDetId();
+            UInt_t inum = (iDetector * 41 + map1->GetChannelId()) * 2 + map1->GetSide() - 2;
+            if (iDetector == 0)
             {
-                char strName[255];
-                sprintf(strName, "%s_totcaldata_%d", fTotCalPar->GetName(), inum);
-                fhTot[inum] = new TH1F(strName, "", 2500, 0, 120);
+                if (NULL == fhTot[inum])
+                {
+                    char strName[255];
+                    sprintf(strName, "%s_totcaldata_%d", fTotCalPar->GetName(), inum);
+                    fhTot[inum] = new TH1F(strName, "", 4800, 0, 120);
+                }
+                fhTot[inum]->Fill(map1->GetTot());
             }
-            fhTot[inum]->Fill(map1->GetTot());
-        }
-        if (map1->GetDetId() == 1)
-        {
-            if (NULL == fhTot[inum])
+            if (iDetector == 1)
             {
-                char strName[255];
-                sprintf(strName, "%s_totcaldata_%d", fTotCalPar->GetName(), inum);
-                fhTot[inum] = new TH1F(strName, "", 2500, 0, 120);
+                if (NULL == fhTot[inum])
+                {
+                    char strName[255];
+                    sprintf(strName, "%s_totcaldata_%d", fTotCalPar->GetName(), inum);
+                    fhTot[inum] = new TH1F(strName, "", 4800, 0, 120);
+                }
             }
         }
     }
@@ -138,26 +151,15 @@ void R3BRpcPreCal2CalPar::FinishTask()
         {
             continue;
         }
-        float bin_max = (fhTot[t]->GetMaximumBin());
-        float max_value = 0.3 * fhTot[t]->GetBinContent(bin_max);
-        float bin_min = 0;
-        for (int i = 1; i <= bin_max; i++)
+        std::vector<double> v;
+        fhTot[t]->Smooth(1, "R");
+        for (int s = 2; s <= 4800; s++)
         {
-            if (fhTot[t]->GetBinContent(i) >= max_value)
-            {
-                bin_min = (i - 1) * 120 / 2500;
-                break;
-            }
+            v.push_back((fhTot[t]->GetBinContent(s) - fhTot[t]->GetBinContent(s - 1)) / (120. / 4800.));
         }
-        bin_max = bin_max * 120 / 2500;
-        TF1* linear = new TF1("fitf", fitf, bin_min, bin_max, 2);
-        // Sets initial values and parameter names
-        // linear->SetParameters(90,700);
-        linear->SetParNames("intercept", "slope");
-        // Fit histogram in range defined by function
-        fhTot[t]->Fit(linear, "r");
-        std::cout << (-1.0 * (linear->GetParameter(0))) / linear->GetParameter(1) << "\n";
-        fTotCalPar->SetCalParams((-1.0 * (linear->GetParameter(0))) / linear->GetParameter(1), t);
+        int maxElementIndex = std::max_element(v.begin(), v.end()) - v.begin();
+        int it = maxElementIndex;
+        fTotCalPar->SetCalParams(it * (120. / 4800.), t);
     }
     fTotCalPar->setChanged();
     fTotCalPar->printParams();
