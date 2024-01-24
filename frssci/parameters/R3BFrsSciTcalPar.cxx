@@ -1,21 +1,32 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include "R3BFrsSciTcalPar.h"
 
-#include "FairDetParIo.h"
-#include "FairLogger.h"
-#include "FairParamList.h"
-#include "TMath.h"
-#include "TString.h"
+#include <FairDetParIo.h>
+#include <FairLogger.h>
+#include <FairParamList.h>
+#include <TMath.h>
+#include <TString.h>
 
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BFrsSciTcalPar::R3BFrsSciTcalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumDets(3)
-    , fNumPmts(3)
-    , fNumPars(1000)
 {
-    fAllTcalParams = new TArrayD((UInt_t)(fNumDets * fNumPmts * fNumPars));
+    fAllTcalParams = std::make_unique<TArrayD>((UInt_t)(fNumDets * fNumPmts * fNumPars));
+    fAllTcalParams->Reset();
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -23,10 +34,6 @@ R3BFrsSciTcalPar::~R3BFrsSciTcalPar()
 {
     status = kFALSE;
     resetInputVersions();
-    if (fAllTcalParams != NULL)
-    {
-        delete fAllTcalParams;
-    }
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -87,7 +94,7 @@ Bool_t R3BFrsSciTcalPar::getParams(FairParamList* list)
     LOG(info) << "R3BFrsSciTcalPar::getParams Array Size for VFTX tcal par: " << array_size;
     fAllTcalParams->Set(array_size);
 
-    if (!(list->fill("TcalPar", fAllTcalParams)))
+    if (!(list->fill("TcalPar", fAllTcalParams.get())))
     {
         LOG(error) << "---R3BFrsSciTcalPar::getParams Could not initialize fAllTcalParams";
         return kFALSE;
@@ -125,4 +132,4 @@ void R3BFrsSciTcalPar::printParams()
     }
 }
 
-ClassImp(R3BFrsSciTcalPar);
+ClassImp(R3BFrsSciTcalPar)
