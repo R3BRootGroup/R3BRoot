@@ -28,11 +28,27 @@ R3BTttxCalData::R3BTttxCalData(uint8_t DetID, uint8_t StripID, double time, doub
 
 std::string R3BTttxCalData::toString() const
 {
-    return fmt::format(
-        "DetID: {}, StripID: {}, Time: {}, Energy: {}", GetDetID(), GetStripID(), GetTime(), GetEnergy());
+    return fmt::format("DetID: {}, StripID: {}, Time: {:.2f} ns, Energy: {:.2f} keV",
+                       GetDetID(),
+                       GetStripID(),
+                       GetTime(),
+                       GetEnergy());
 }
 
 void R3BTttxCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+
+// Sort in energy with descending order
+Int_t R3BTttxCalData::Compare(const TObject* obj) const
+{
+    const R3BTttxCalData* other = dynamic_cast<const R3BTttxCalData*>(obj);
+    if (!other)
+        return 0;
+    if (fEnergy > other->GetEnergy())
+        return -1;
+    if (fEnergy < other->GetEnergy())
+        return 1;
+    return 0;
+}
 
 std::ostream& operator<<(std::ostream& os, const R3BTttxCalData& data)
 {

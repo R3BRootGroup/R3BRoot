@@ -172,8 +172,8 @@ void R3BTttxMapped2Cal::Exec(Option_t* /*option*/)
     for (int idet = 0; idet < NumDets; idet++)
     {
         auto fTrig = fTttx.at(idet).GetTrig();
-        R3BLOG(debug, "Multiplicity of Trigger: " << fTrig.GetMult());
-        R3BLOG_IF(error, fTrig.GetMult() > 1, "Multiple Trigger hits: " << fTrig.GetMult());
+        R3BLOG(debug, "Detector" << idet + 1 << "Multiplicity of Trigger: " << fTrig.GetMult());
+        R3BLOG_IF(warning, fTrig.GetMult() > 1, "Multiple Trigger hits: " << fTrig.GetMult());
         for (int istrip = 0; istrip < NumStrips; istrip++)
         {
             if (fCal_Par->GetInUse(idet + 1, istrip + 1) != 1)
@@ -201,12 +201,12 @@ void R3BTttxMapped2Cal::CalculateStrip(int idet, int istrip, CalStrip& fStrip, C
 {
     for (int imult = 0; imult < fStrip.GetMult(); imult++)
     {
-        auto dtime = fStrip.GetT(imult);
+        auto itime = fStrip.GetT(imult);
         if (fTrig.GetMult() == 1)
         {
-            dtime -= fStrip.GetT(0);
+            itime -= fStrip.GetT(0);
         }
-        R3BLOG(debug, "idet=" << idet << ", istrip=" << istrip << ", time =" << dtime);
+        auto dtime = fTimeResolution * static_cast<double>(itime);
         if (dtime < fTimeMin || dtime > fTimeMax)
             return;
         auto rawE = static_cast<int>(fStrip.GetE(imult));
@@ -227,6 +227,9 @@ void R3BTttxMapped2Cal::CalculateStrip(int idet, int istrip, CalStrip& fStrip, C
                           TMath::Power(static_cast<double>(rawE), power);
             }
         }
+        R3BLOG(debug,
+               "idet = " << idet << ", istrip = " << istrip << ", time = " << dtime << " ns, energy = " << energy
+                         << " keV");
         AddCalData(idet + 1, istrip + 1, dtime, energy);
     }
 }

@@ -18,8 +18,9 @@
 #include "R3BTttxHitData.h"
 #include <fmt/core.h>
 
-R3BTttxHitData::R3BTttxHitData(double xpos, double energy, double angle, double charge, double time)
-    : fXpos(xpos)
+R3BTttxHitData::R3BTttxHitData(int8_t idet, double xpos, double energy, double angle, double charge, double time)
+    : fDetID(idet)
+    , fXpos(xpos)
     , fEnergy(energy)
     , fAng(angle)
     , fCharge(charge)
@@ -29,12 +30,14 @@ R3BTttxHitData::R3BTttxHitData(double xpos, double energy, double angle, double 
 
 std::string R3BTttxHitData::toString() const
 {
-    return fmt::format("Xpos(mm): {:.2f}, Energy: {:.2f}, Angle: {:.3f}, ChargeZ: {:.2f}, Time: {}",
-                       GetX(),
-                       GetEnergy(),
-                       GetAngle(),
-                       GetChargeZ(),
-                       GetTime());
+    return fmt::format(
+        "Detector: {}, Xpos: {:.2f} mm, Energy: {:.2f} keV, Angle: {:.3f}, ChargeZ: {:.1f}, Time: {:.2f} ns",
+        GetDetID(),
+        GetX(),
+        GetEnergy(),
+        GetAngle(),
+        GetChargeZ(),
+        GetTime());
 }
 
 void R3BTttxHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
