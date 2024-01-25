@@ -59,6 +59,7 @@ void R3BTttxHitPar::putParams(FairParamList* list)
     }
 
     list->add("tttxDetNumberPar", fNumDets);
+    list->add("tttxNumberParsZFit", fNumParsZfit);
 
     auto array_size = fNumDets * fNumParsZfit;
     LOG(info) << "Size for array fZfitpar: " << array_size;
@@ -82,6 +83,12 @@ Bool_t R3BTttxHitPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
+    if (!list->fill("tttxNumberParsZFit", &fNumParsZfit))
+    {
+        R3BLOG(fatal, "Could not initialize tttxNumberParsZFit");
+        return kFALSE;
+    }
+
     auto array_size = fNumDets * fNumParsZfit;
     R3BLOG(info, "Total number of Z-fit parameters: " << array_size);
 
@@ -91,17 +98,18 @@ Bool_t R3BTttxHitPar::getParams(FairParamList* list)
         R3BLOG(fatal, "Could not initialize tttxZfitPar");
         return kFALSE;
     }
-
     return kTRUE;
 }
 
 // ----  Method print ----------------------------------------------------------
 void R3BTttxHitPar::print()
 {
+    R3BLOG(info, "Number of detectors: " << fNumDets);
+    R3BLOG(info, "Number of Z-fit parameters: " << fNumParsZfit);
     R3BLOG(info, "TTTX Hit Parameters");
     for (int d = 0; d < fNumDets; d++)
     {
-        R3BLOG(info, "Tttx detector: " << d + 1);
+        R3BLOG(info, "Detector: " << d + 1);
         for (Int_t j = 0; j < fNumParsZfit; j++)
         {
             LOG(info) << "FitParam(" << j + 1 << ") = " << fZfitpar->GetAt(d * fNumParsZfit + j);

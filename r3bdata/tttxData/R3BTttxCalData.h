@@ -52,6 +52,10 @@ class R3BTttxCalData : public TObject
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
 
+    // Sorting with Energy (high to low) within TClonesArray
+    Int_t Compare(const TObject* obj) const override;
+    Bool_t IsSortable() const override { return true; }
+
   protected:
     uint8_t fDetID = 0;
     uint8_t fStripID = 0;

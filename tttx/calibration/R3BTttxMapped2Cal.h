@@ -57,17 +57,18 @@ class R3BTttxMapped2Cal : public FairTask
 
     inline void SetOnline(Bool_t option) { fOnline = option; }
 
-    [[nodiscard]] inline const uint8_t& GetTrefCh(uint8_t val) { return fch_tref; }
-    [[nodiscard]] inline const uint8_t& GetTrigCh(uint8_t val) { return fch_trig; }
+    [[nodiscard]] inline const uint8_t& GetTrefCh() { return fch_tref; }
+    [[nodiscard]] inline const uint8_t& GetTrigCh() { return fch_trig; }
+    [[nodiscard]] inline const double& GetTimeResolution() { return fTimeResolution; }
 
-    inline void SetTimeWindow(int min, int max)
+    inline void SetTimeWindow(double min, double max)
     {
         fTimeMin = min;
         fTimeMax = max;
     }
-    inline void SetTrefCh(int val) { fch_tref = val; }
-    inline void SetTrigCh(int val) { fch_trig = val; }
-    // inline void UseTrigTime(bool val) {fuse_trig = val};
+    inline void SetTrefCh(uint8_t val) { fch_tref = val; }
+    inline void SetTrigCh(uint8_t val) { fch_trig = val; }
+    inline void SetTimeResolution(double val) { fTimeResolution = val; }
 
   private:
     void Reset();
@@ -78,8 +79,9 @@ class R3BTttxMapped2Cal : public FairTask
     int NumParams = 0;
     uint8_t fch_tref = 33; //(1-base)
     uint8_t fch_trig = 34; // (1-base)
-    int fTimeMin = -65536;
-    int fTimeMax = 65536; // Maximum time for 2^16
+    double fTimeMin = -1e5;
+    double fTimeMax = 1e5;               // Maximum time of +/-100us
+    double fTimeResolution = 25. / 128.; // For setting 3. in pico-second
     TArrayF* CalParams;
 
     bool fOnline = false; // Don't store data for online
@@ -157,6 +159,7 @@ class R3BTttxMapped2Cal : public FairTask
   private:
     std::vector<CalDetector> fTttx;
     void CalculateStrip(int idet, int istrip, CalStrip& fStrip, CalStrip& fTrig);
+
     // Private method AddCalData
     R3BTttxCalData* AddCalData(uint8_t detid, uint8_t stripid, double time, double energy);
 

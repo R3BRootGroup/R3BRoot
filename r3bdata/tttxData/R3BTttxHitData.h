@@ -31,12 +31,13 @@ class R3BTttxHitData : public TObject
     R3BTttxHitData() = default;
 
     // Constructor with arguments (explicit)
-    explicit R3BTttxHitData(double xpos, double energy, double ang, double charge, double time = 0);
+    explicit R3BTttxHitData(int8_t idet, double xpos, double energy, double ang, double charge, double time = 0);
 
     // Destructor virtual
     virtual ~R3BTttxHitData() = default;
 
     // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const int8_t& GetDetID() const { return fDetID; }
     [[nodiscard]] inline const double& GetX() const { return fXpos; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
     [[nodiscard]] inline const double& GetAngle() const { return fAng; }
@@ -44,6 +45,7 @@ class R3BTttxHitData : public TObject
     [[nodiscard]] inline const double& GetTime() const { return fTime; }
 
     // Modifiers
+    inline void SetDetID(int8_t idet) { fDetID = idet; }
     inline void SetXpos(double xpos) { fXpos = xpos; }
     inline void SetEnergy(double energy) { fEnergy = energy; }
     inline void SetAngle(double angle) { fAng = angle; }
@@ -55,6 +57,7 @@ class R3BTttxHitData : public TObject
     void Print(const Option_t*) const override;
 
   protected:
+    int8_t fDetID = -1; // 0: Reconstructed with all detectors, 1-: ID
     double fXpos = std::nan("");
     double fEnergy = std::nan("");
     double fAng = std::nan("");
