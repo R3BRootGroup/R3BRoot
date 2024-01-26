@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,14 +17,13 @@
 // -----           Fill MWPC online histograms            -----
 // ------------------------------------------------------------
 
-#ifndef R3BMwpcOnlineSpectra_H
-#define R3BMwpcOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
-#include "TH1.h"
-#include "TH2F.h"
-#include "TMath.h"
+#include <FairTask.h>
+#include <TCanvas.h>
+#include <TH1.h>
+#include <TH2F.h>
+#include <TMath.h>
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -59,7 +58,7 @@ class R3BMwpcOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BMwpcOnlineSpectra();
+    virtual ~R3BMwpcOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -67,27 +66,27 @@ class R3BMwpcOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Methods to clean histograms.
@@ -95,13 +94,13 @@ class R3BMwpcOnlineSpectra : public FairTask
     virtual void Reset_Histo();
 
   private:
-    TClonesArray* fMapItemsMwpc; // Array with mapped items
-    TClonesArray* fCalItemsMwpc; /**< Array with cal items. */
-    TClonesArray* fHitItemsMwpc; /**< Array with hit items. */
+    TClonesArray* fMapItemsMwpc = nullptr; // Array with mapped items
+    TClonesArray* fCalItemsMwpc = nullptr; /**< Array with cal items. */
+    TClonesArray* fHitItemsMwpc = nullptr; /**< Array with hit items. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
-    Int_t fNEvents;         /**< Event counter.     */
+    int fNEvents = 0;       /**< Event counter.     */
     TString fNameDet;
 
     // Canvas
@@ -128,7 +127,5 @@ class R3BMwpcOnlineSpectra : public FairTask
     TH2F* fh2_XYpos;
 
   public:
-    ClassDef(R3BMwpcOnlineSpectra, 1)
+    ClassDefOverride(R3BMwpcOnlineSpectra, 1)
 };
-
-#endif
