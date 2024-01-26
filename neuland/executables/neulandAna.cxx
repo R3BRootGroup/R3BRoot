@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include "FairFileSource.h"
 #include "FairParRootFileIo.h"
 #include "FairRootFileSink.h"
@@ -60,7 +73,7 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    if (help->value())
+    if (help())
     {
         std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
@@ -68,10 +81,10 @@ auto main(int argc, const char** argv) -> int
 
     auto const channelInit = [&]()
     {
-        if (not hitLevelPar->value().empty())
+        if (not hitLevelPar().empty())
         {
-            FairRuntimeDb::instance()->getContainer(hitLevelPar->value().c_str());
-            Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar->value());
+            FairRuntimeDb::instance()->getContainer(hitLevelPar().c_str());
+            Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar());
         }
     };
 
@@ -100,33 +113,33 @@ auto main(int argc, const char** argv) -> int
           []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
     };
 
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
 
     auto run = std::make_unique<FairRunAna>();
-    auto filesource = std::make_unique<R3BFileSource2>(simuFileName->value().c_str());
-    auto filesink = std::make_unique<FairRootFileSink>(digiFileName->value().c_str());
+    auto filesource = std::make_unique<R3BFileSource2>(simuFileName().c_str());
+    auto filesink = std::make_unique<FairRootFileSink>(digiFileName().c_str());
     run->SetSource(filesource.release());
     run->SetSink(filesink.release());
 
     auto fileio = std::make_unique<FairParRootFileIo>();
-    fileio->open(paraFileName->value().c_str());
+    fileio->open(paraFileName().c_str());
     run->GetRuntimeDb()->setFirstInput(fileio.release());
 
-    if (const auto& filename = paraFileName2->value(); not filename.empty())
+    if (const auto& filename = paraFileName2(); not filename.empty())
     {
         auto fileio2 = std::make_unique<FairParRootFileIo>();
-        fileio2->open(paraFileName2->value().c_str());
+        fileio2->open(paraFileName2().c_str());
         run->GetRuntimeDb()->setSecondInput(fileio2.release());
     }
 
     auto digiNeuland = std::make_unique<R3BNeulandDigitizer>();
-    digiNeuland->SetEngine((neulandEngines.at({ paddleName->value(), channelName->value() }))());
+    digiNeuland->SetEngine((neulandEngines.at({ paddleName(), channelName() }))());
     run->AddTask(digiNeuland.release());
     auto hitmon = std::make_unique<R3BNeulandHitMon>();
     run->AddTask(hitmon.release());
 
     run->Init();
-    run->Run(0, eventNum->value());
+    run->Run(0, eventNum());
 
     timer.Stop();
     auto* sink = run->GetSink();

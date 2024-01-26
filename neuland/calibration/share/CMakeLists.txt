@@ -14,10 +14,11 @@
 # cmake-format: on
 
 set(SRCS # cmake-format: sortable
-         R3BNeulandCalibrationTask.cxx R3BNeulandParSet.cxx)
+         R3BNeulandBasePar.cxx R3BNeulandCalibrationTask.cxx R3BNeulandParSet.cxx)
 
 set(HEADERS
     # cmake-format: sortable
+    R3BNeulandBasePar.h
     R3BNeulandCalibrationTask.h
     R3BNeulandParDirCreator.h
     R3BNeulandParSet.h

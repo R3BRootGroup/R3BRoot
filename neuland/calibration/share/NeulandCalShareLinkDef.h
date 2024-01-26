@@ -23,5 +23,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3B::Neuland::ParSet+;
+#pragma link C++ class R3B::Neuland::CalibrationBasePar+;
 
 #endif

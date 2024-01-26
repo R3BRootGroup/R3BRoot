@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include "R3BEventHeader.h"
 #include "R3BEventHeaderPropagator.h"
 #include "R3BFileSource2.h"
@@ -24,6 +37,7 @@
 namespace fs = std::filesystem;
 constexpr int DEFAULT_EVENT_NUM = 10;
 constexpr int DEFAULT_OFFSPILL_POS = 14;
+constexpr int DEFAULT_RUN_ID = 999;
 
 using namespace std::string_literals;
 auto main(int argc, const char** argv) -> int
@@ -33,7 +47,7 @@ auto main(int argc, const char** argv) -> int
 
     auto programOptions = R3B::ProgramOptions("options for neuland exp data analysis");
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
-    auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
+    auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "info");
     auto input_file = programOptions.create_option<std::string>("in,i", "set the input files (regex)");
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
     auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
@@ -46,18 +60,18 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
-    const auto outputDir = R3B::GetParentDir(output_file->value());
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
+    const auto outputDir = R3B::GetParentDir(output_file());
 
-    const auto outputfile_path = fs::path{ output_file->value() };
+    const auto outputfile_path = fs::path{ output_file() };
     const auto outputParFileName =
-        outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
-    const auto input_filenames = R3B::GetFilesFromRegex(input_file->value());
-    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit->value();
+        outputDir / fmt::format("{}.par{}", outputfile_path.stem().string(), outputfile_path.extension().string());
+    const auto input_filenames = R3B::GetFilesFromRegex(input_file());
+    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit();
 
     R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());
-    R3BLOG(debug, fmt::format("input data par file: {}", input_par->value()).c_str());
-    R3BLOG(debug, fmt::format("output data file: {}", output_file->value()).c_str());
+    R3BLOG(debug, fmt::format("input data par file: {}", input_par()).c_str());
+    R3BLOG(debug, fmt::format("output data file: {}", output_file()).c_str());
     R3BLOG(debug, fmt::format("output data par file: {}", outputParFileName).c_str());
 
     auto source = std::make_unique<R3BFileSource2>();
@@ -70,6 +84,7 @@ auto main(int argc, const char** argv) -> int
     auto sink = std::make_unique<FairRootFileSink>(sinkFile.release());
 
     auto run = std::make_unique<FairRunAna>();
+    source->SetRunId(DEFAULT_RUN_ID);
     FairRootManager::SetTreeName("evt");
 
     try
@@ -79,31 +94,31 @@ auto main(int argc, const char** argv) -> int
         run->SetSource(source.release());
         run->SetSink(sink.release());
 
-        auto fileio = std::make_unique<FairParRootFileIo>();
-        fileio->open(input_par->value().c_str());
-        run->GetRuntimeDb()->setFirstInput(fileio.release());
-
         // Add analysis task --------------------------------------------------------
         auto runIdTask = std::make_unique<R3BEventHeaderPropagator>();
         run->AddTask(runIdTask.release());
 
-        auto map2Cal = std::make_unique<R3BNeulandMapped2Cal2>();
+        auto map2Cal = std::make_unique<R3B::Neuland::Map2CalTask>();
         map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
         run->AddTask(map2Cal.release());
 
         auto cal2hitParMaker = std::make_unique<R3B::Neuland::Cal2HitParTask>();
-        cal2hitParMaker->SetTrigger(R3B::Neuland::CalTrigger::offspill);
+        cal2hitParMaker->SetTrigger(R3B::Neuland::CalTrigger::all);
         run->AddTask(cal2hitParMaker.release());
 
-        // set par output--------------------------------------------------------
+        // set par input/output--------------------------------------------------------
         auto* rtdb = run->GetRuntimeDb();
+
+        auto fileio = std::make_unique<FairParRootFileIo>();
+        fileio->open(input_par().c_str());
         auto parOut = std::make_unique<FairParRootFileIo>(true);
         parOut->open(outputParFileName.c_str());
+        rtdb->setFirstInput(fileio.release());
         rtdb->setOutput(parOut.release());
         rtdb->saveOutput();
 
         run->Init();
-        run->Run(0, eventNum->value());
+        run->Run(0, eventNum());
     }
     catch (R3B::runtime_error& ex)
     {
@@ -123,7 +138,7 @@ auto main(int argc, const char** argv) -> int
         std::cerr << ex.what();
         std::cout << "\n\n";
     }
-    catch(...)
+    catch (...)
     {
         std::cout << "An unrecognized error has occured: \n";
         std::cout << "\n\n";

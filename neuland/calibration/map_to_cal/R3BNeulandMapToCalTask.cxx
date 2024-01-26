@@ -109,7 +109,7 @@ namespace R3B::Neuland
 
     void Map2CalTask::set_pmt_num()
     {
-        if (plane_num_ = calibrationPar_->GetModuleInfo().primary_module_num; plane_num_ == 0)
+        if (plane_num_ = base_par_->GetNumOfPlanes(); plane_num_ == 0)
         {
             R3BLOG(warn, "plane number obtained from the calibration parameters is 0!");
         }
@@ -162,9 +162,9 @@ namespace R3B::Neuland
     void Map2CalTask::TriggeredExec() { calibrate(); }
 
     auto Map2CalTask::convert_to_real_time(R3BTCalPar2* calPar,
-                                          SingleEdgeSignal signal,
-                                          FTType ftType,
-                                          unsigned int module_num) const -> ValueError<double>
+                                           SingleEdgeSignal signal,
+                                           FTType ftType,
+                                           unsigned int module_num) const -> ValueError<double>
     {
         const auto& modulePar = calPar->GetParamAt(module_num);
         const auto fineTime = modulePar.GetFineTime(ftType, signal.fine);
@@ -177,7 +177,7 @@ namespace R3B::Neuland
     auto Map2CalTask::get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>
     {
 
-        const auto& triggerMap = calibrationPar_->GetTrigIDMap();
+        const auto& triggerMap = base_par_->GetTrigIDMap();
         auto triggerIDPair = triggerMap.find(module_num);
         if (triggerIDPair == triggerMap.end())
         {
@@ -204,7 +204,8 @@ namespace R3B::Neuland
         return convert_to_real_time(calibrationTrigPar_, trigData->second.signal, FTType::trigger, trigData->first);
     }
 
-    auto Map2CalTask::get_tot(DoubleEdgeSignal pmtSignal, unsigned int module_num, Side side) const -> ValueError<double>
+    auto Map2CalTask::get_tot(DoubleEdgeSignal pmtSignal, unsigned int module_num, Side side) const
+        -> ValueError<double>
     {
         const auto leadFType = (side == Side::left) ? FTType::leftleading : FTType::rightleading;
         const auto trailFType = (side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;
@@ -225,8 +226,8 @@ namespace R3B::Neuland
     }
 
     auto Map2CalTask::doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& dESignal,
-                                                   R3B::Side side,
-                                                   unsigned int module_num) const -> CalDataSignal
+                                                    R3B::Side side,
+                                                    unsigned int module_num) const -> CalDataSignal
     {
         auto calDataSignal = CalDataSignal{};
         const auto ftType = (side == R3B::Side::left) ? FTType::leftleading : FTType::rightleading;
@@ -242,8 +243,8 @@ namespace R3B::Neuland
     }
 
     auto Map2CalTask::mapBarSignal_to_calSignals(const MapBarSignal& barSignal,
-                                                unsigned int module_num,
-                                                R3B::Side side) const -> std::vector<CalDataSignal>
+                                                 unsigned int module_num,
+                                                 R3B::Side side) const -> std::vector<CalDataSignal>
     {
         const auto& signals = (side == Side::left) ? barSignal.left : barSignal.right;
         auto calSignals = std::vector<CalDataSignal>{};

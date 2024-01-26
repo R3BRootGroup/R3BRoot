@@ -43,16 +43,14 @@ namespace R3B::Neuland
             }
             else
             {
-                R3BLOG(info, "TrigIDMap is determined by reading from the JSON file!");
-                trigIDMappingFinder_.set_trigIDMap(trigIDIO.Read_json());
+                R3BLOG(info, "TrigIDMap is read from the base par file!");
+                // trigIDMappingFinder_.set_trigIDMap(base_par_->GetTrigIDMap());
             }
         }
 
-        auto moduleInfo = calibrationPar_->GetModuleInfo();
-        moduleInfo.primary_module_num = plane_num_;
-        calibrationPar_->SetModuleInfo(moduleInfo);
+        plane_num_ = base_par_->GetNumOfPlanes();
         calibrationPar_->SetTrigEnabled(is_trig_enabled_);
-        trigIDIO.SetNumOfModule(plane_num_ * BarsPerPlane);
+        // trigIDIO.SetNumOfModule(plane_num_ * BarsPerPlane);
     }
 
     void Map2CalParTask::TriggeredExec()
@@ -73,16 +71,10 @@ namespace R3B::Neuland
         WriteHists();
         write_parameter();
 
-        if (calibrationPar_->GetModuleInfo().primary_module_num == 0)
-        {
-            R3BLOG(warn,
-                   fmt::format("Plane numbers are not set for parameter {}! Please set it before the initialization",
-                               calibrationPar_->GetName()));
-        }
-        if (is_trig_enabled_)
-        {
-            PrintTrigID();
-        }
+        // if (is_trig_enabled_)
+        // {
+        //     PrintTrigID();
+        // }
     }
 
     void Map2CalParTask::RecordTrigMappingID()
@@ -140,7 +132,10 @@ namespace R3B::Neuland
     {
         R3BLOG(debug, "Starting to write calibration parameter...");
         mapCalEngine_.Writer_to_TCalPar(cal_strategy_, *calibrationPar_);
-        calibrationPar_->SetTrigIDMap(trigIDMappingFinder_.extract_trigIDMap());
+        if (is_trigID_auto_)
+        {
+            base_par_->SetTrigIDMap(trigIDMappingFinder_.extract_trigIDMap());
+        }
         calibrationPar_->SetSlowClockFrequency(coarse_time_frequency_);
 
         trigMapCalEngine_.Writer_to_TCalPar(cal_strategy_, *calibrationTrigPar_);
@@ -177,18 +172,18 @@ namespace R3B::Neuland
         }
     }
 
-    void Map2CalParTask::PrintTrigID() const
-    {
-        if (calibrationPar_ == nullptr)
-        {
-            throw R3B::runtime_error("Cannot print trigIDMapping from a nullptr parameter!");
-        }
+    // void Map2CalParTask::PrintTrigID() const
+    // {
+    //     if (calibrationPar_ == nullptr)
+    //     {
+    //         throw R3B::runtime_error("Cannot print trigIDMapping from a nullptr parameter!");
+    //     }
 
-        const auto& trigID = calibrationPar_->GetTrigIDMap();
-        if (is_trigID_auto_)
-        {
-            trigIDIO.Save_json(trigID);
-        }
-        trigIDIO.Print(trigID);
-    }
+    //     const auto& trigID = base_par_->GetTrigIDMap();
+    //     if (is_trigID_auto_)
+    //     {
+    //         trigIDIO.Save_json(trigID);
+    //     }
+    //     trigIDIO.Print(trigID);
+    // }
 } // namespace R3B::Neuland

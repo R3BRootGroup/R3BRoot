@@ -35,7 +35,7 @@ namespace R3B::Neuland
     void Cal2HitParTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
         cal_data_.init();
-        const auto plane_num = map_to_cal_par_->GetModuleInfo().primary_module_num;
+        const auto plane_num = base_par_->GetNumOfPlanes();
         if (plane_num == 0)
         {
             throw R3B::runtime_error("Plane number extracted from Map2CalPar is 0!");

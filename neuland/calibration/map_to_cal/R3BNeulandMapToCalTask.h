@@ -16,6 +16,7 @@
 #include "R3BNeulandMapToCalPar.h"
 #include "R3BPaddleTamexMappedData2.h"
 #include <R3BIOConnector.h>
+#include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalData.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCommon.h>
@@ -47,6 +48,7 @@ namespace R3B::Neuland
         InputMapConnector<unsigned int, PaddleTamexTrigMappedData> trigMappedData_{ "NeulandTrigMappedData" };
         OutputVectorConnector<BarCalData> calData_{ "NeulandCalData" };
 
+        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
         Map2CalPar* calibrationPar_ = InputPar<Map2CalPar>("LandTCalPar");
         Map2CalPar* calibrationTrigPar_ = InputPar<Map2CalPar>("LandTrigTCalPar");
 

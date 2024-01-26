@@ -38,17 +38,17 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
-    const auto outputDir = R3B::GetParentDir(output_file->value());
-    const auto outputfile_path = fs::path{ output_file->value() };
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
+    const auto outputDir = R3B::GetParentDir(output_file());
+    const auto outputfile_path = fs::path{ output_file() };
     const auto outputParFileName =
         outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
-    const auto input_filenames = R3B::GetFilesFromRegex(input_file->value());
+    const auto input_filenames = R3B::GetFilesFromRegex(input_file());
 
 
     R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());
-    R3BLOG(debug, fmt::format("input data par file: {}", input_par->value()).c_str());
-    R3BLOG(debug, fmt::format("output data file: {}", output_file->value()).c_str());
+    R3BLOG(debug, fmt::format("input data par file: {}", input_par()).c_str());
+    R3BLOG(debug, fmt::format("output data file: {}", output_file()).c_str());
 
 
     auto source = std::make_unique<R3BFileSource2>();
@@ -70,7 +70,7 @@ auto main(int argc, const char** argv) -> int
         run->SetSink(sink.release());
 
         auto fileio = std::make_unique<FairParRootFileIo>();
-        fileio->open(input_par->value().c_str());
+        fileio->open(input_par().c_str());
         run->GetRuntimeDb()->setFirstInput(fileio.release());
 
         // Add analysis task --------------------------------------------------------
@@ -83,7 +83,7 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(cal2hit.release());
 
         run->Init();
-        run->Run(eventNum->value());
+        run->Run(eventNum());
     }
     catch (R3B::runtime_error& ex)
     {

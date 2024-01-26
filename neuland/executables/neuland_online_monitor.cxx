@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRunOnline.h>
@@ -85,14 +98,14 @@ auto main(int argc, const char** argv) -> int
         return EXIT_FAILURE;
     }
 
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
 
     auto random_gen = TRandom3{};
     random_gen.SetSeed(0);
 
-    const auto whiterabbit_id = std::stoi(wr_ID->value(), nullptr, 16);
-    const unsigned int planeNum = neulandDP->value() * 2;
-    const auto runID = inputRunID->value();
+    const auto whiterabbit_id = std::stoi(wr_ID(), nullptr, 16);
+    const unsigned int planeNum = neulandDP() * 2;
+    const auto runID = inputRunID();
     const auto ntuple_options = "RAW,time-stitch=4000"s;
     // const auto ntuple_options = "RAW"s;
     auto const* ucesb_dir = getenv("UCESB_DIR");
@@ -102,12 +115,12 @@ auto main(int argc, const char** argv) -> int
         return 1;
     }
     const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
-    const auto upexps_exe = fs::path{ upexps_dir } / unpacker_path->value();
-    const auto max_event_num = (eventNum->value() == 0) ? -1 : eventNum->value();
-    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit->value();
+    const auto upexps_exe = fs::path{ upexps_dir } / unpacker_path();
+    const auto max_event_num = (eventNum() == 0) ? -1 : eventNum();
+    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit();
 
-    const auto lmd_file_path = input_fstream->value();
-    const auto parFile = parameter_file->value();
+    const auto lmd_file_path = input_fstream();
+    const auto parFile = parameter_file();
 
     auto ucesb_command = upexps_exe.string() + " --allow-errors --input-buffer=150Mi"s;
     ucesb_command = std::regex_replace(ucesb_command, std::regex("//"), "/");
@@ -128,7 +141,7 @@ auto main(int argc, const char** argv) -> int
     neulandReader->AddExtraConditions(R3B::UcesbMap::array_fewer);
     neulandReader->SetMaxNbPlanes(planeNum);
     neulandReader->SetOnline(true);
-    if (no_trig_neuland->value())
+    if (no_trig_neuland())
     {
         R3BLOG(info, "Disable NeuLAND trigger times");
         neulandReader->SetSkipTriggerTimes();
@@ -138,8 +151,8 @@ auto main(int argc, const char** argv) -> int
 
     // FairRun:
     auto run = FairRunOnline{ source.release() };
-    run.SetRunId(inputRunID->value());
-    run.ActivateHttpServer(DEFAULT_REFRESH_RATE, port_number->value());
+    run.SetRunId(inputRunID());
+    run.ActivateHttpServer(DEFAULT_REFRESH_RATE, port_number());
     auto EvntHeader = std::make_unique<R3BEventHeader>();
     run.SetEventHeader(EvntHeader.release());
     run.SetRunId(runID);
@@ -201,7 +214,7 @@ auto main(int argc, const char** argv) -> int
         std::cout << "\n\n";
         return 0;
     }
-    run.Run(-1, eventNum->value());
+    run.Run(-1, eventNum());
 
     return 0;
 }

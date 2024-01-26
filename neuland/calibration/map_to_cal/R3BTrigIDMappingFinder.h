@@ -3,6 +3,7 @@
 #include <R3BShared.h>
 #include <filesystem>
 #include <map>
+#include <optional>
 #include <unordered_map>
 
 namespace R3B ::Neuland

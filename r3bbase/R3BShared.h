@@ -174,6 +174,11 @@ namespace R3B
 
         auto path = fs::path{ filename };
         auto parent_folder = path.parent_path();
+        if (parent_folder.empty())
+        {
+            return ".";
+        }
+
         if (not fs::exists(parent_folder))
         {
             R3BLOG(
@@ -182,6 +187,7 @@ namespace R3B
                             filename));
             return ".";
         }
+
         return parent_folder;
     }
 

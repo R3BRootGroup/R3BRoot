@@ -16,13 +16,6 @@ namespace R3B
         ClassDefNV(FTChannel2TimeRelation, 1);
     };
 
-    struct TCalModuleInfo
-    {
-        unsigned int primary_module_num = 0;   // e.g. plane number
-        unsigned int secondary_module_num = 0; // e.g. bar number per plane
-        ClassDefNV(TCalModuleInfo, 1);
-    };
-
     enum class FTType
     {
         leftleading,
@@ -85,9 +78,6 @@ namespace R3B
             moduleParams_ = std::move(moduleParams);
         }
 
-        void SetModuleInfo(TCalModuleInfo info) { module_info_ = info; }
-        void SetTrigIDMap(TrigIDMap trigIDMap) { trigIDMap_ = std::move(trigIDMap); }
-
         // Getters:
         [[nodiscard]] auto GetSlowClockFrequency() const -> const auto& { return slow_clock_frequency_; }
         [[nodiscard]] auto GetParams() const -> const auto& { return moduleParams_; }
@@ -95,16 +85,12 @@ namespace R3B
         {
             return moduleParams_.at(module_num);
         }
-        [[nodiscard]] auto GetModuleInfo() const -> const auto& { return module_info_; }
-        [[nodiscard]] auto GetTrigIDMap() const -> const auto& { return trigIDMap_; }
         auto HasTrigEnabled() const -> bool { return is_trig_enabled_; }
 
       private:
         float slow_clock_frequency_ = 0; // GHz
         bool is_trig_enabled_ = true;
-        TCalModuleInfo module_info_;
         std::unordered_map<unsigned int, TCalVFTXModulePar> moduleParams_;
-        TrigIDMap trigIDMap_;
         std::string fairDetParName_ = "FairGenericParIo";
 
         void clear() override { moduleParams_.clear(); }

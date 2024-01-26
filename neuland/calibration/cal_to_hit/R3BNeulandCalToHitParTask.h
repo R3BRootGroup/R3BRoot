@@ -15,6 +15,7 @@
 
 #include "R3BNeulandCalToHitPar.h"
 #include <R3BIOConnector.h>
+#include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandLSQREngineAdaptor.h>
@@ -32,13 +33,16 @@ namespace R3B::Neuland
     {
       public:
         explicit Cal2HitParTask(std::string_view name = "NeulandCal2HitParMaker",
-                                 Cal2HitParMethod method = Cal2HitParMethod::LSQT,
-                                 int iVerbose = 1);
+                                Cal2HitParMethod method = Cal2HitParMethod::LSQT,
+                                int iVerbose = 1);
 
       private:
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
+
+        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
         Map2CalPar* map_to_cal_par_ = InputPar<Map2CalPar>("LandTCalPar");
         Cal2HitPar* hit_par_ = OutputPar<Cal2HitPar>("NeulandHitPar");
+
         std::unique_ptr<Calibration::CosmicEngineInterface> engine_;
 
         // overriden functions:

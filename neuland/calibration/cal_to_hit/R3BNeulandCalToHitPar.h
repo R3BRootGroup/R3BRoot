@@ -21,7 +21,7 @@ namespace R3B::Neuland
 {
     struct HitModulePar
     {
-        unsigned int module_num;                   // 1-based
+        unsigned int module_num = 0;               // 1-based
         ValueError<double> tDiff;                  // ns
         ValueError<double> tSync;                  // ns
         ValueError<double> effectiveSpeed;         // cm/ns

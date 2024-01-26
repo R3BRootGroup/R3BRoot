@@ -17,7 +17,7 @@ namespace R3B
 
             for (auto& registrie : registries_)
             {
-                registrie.second->Retrieve(varMap_);
+                registrie.second->retrieve(varMap_);
             }
         }
         catch (const std::runtime_error& err)

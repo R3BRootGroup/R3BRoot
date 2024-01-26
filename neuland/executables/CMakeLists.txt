@@ -1,7 +1,15 @@
 # add_subdirectory(templates)
 
+# find_package(cpr REQUIRED)
+
 add_executable(neulandSim neulandSim.cxx)
-target_link_libraries(neulandSim PRIVATE R3BNeulandSimulation ExTestDetector R3BPassive ${Geant4_LIBRARIES} geant4vmc)
+target_link_libraries(
+    neulandSim
+    PRIVATE R3BNeulandSimulation
+            ExTestDetector
+            R3BPassive
+            ${Geant4_LIBRARIES}
+            geant4vmc)
 
 add_executable(neulandAna neulandAna.cxx)
 target_link_libraries(neulandAna PRIVATE R3BData R3BNeulandDigitizing)
@@ -16,7 +24,15 @@ add_executable(neuland_cal_to_hit neuland_cal_to_hit.cxx)
 target_link_libraries(neuland_cal_to_hit PRIVATE R3BNeulandCalibration R3BSource)
 
 add_executable(neuland_online_monitor neuland_online_monitor.cxx)
-target_link_libraries(neuland_online_monitor PRIVATE R3BNeulandOnline R3BLos R3BSource -pthread)
+target_link_libraries(
+    neuland_online_monitor
+    PRIVATE R3BNeulandOnline
+            R3BLos
+            R3BSource
+            -pthread)
 
 add_executable(neuland_par_merger neuland_par_merger.cxx)
 target_link_libraries(neuland_par_merger PRIVATE R3BNeulandShared)
+
+add_executable(neuland_create_base_par neuland_create_base_par.cxx)
+target_link_libraries(neuland_create_base_par PRIVATE R3BNeulandCalibration R3BNeulandShared)

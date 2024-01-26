@@ -45,7 +45,7 @@ int main(int argc, const char** argv)
         return EXIT_FAILURE;
     }
 
-    if (help->value())
+    if (help())
     {
         std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
 
     // Logging
     // FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
@@ -63,19 +63,19 @@ int main(int argc, const char** argv)
     // Basic simulation setup
     auto run = std::make_unique<FairRunSim>();
     run->SetName("TGeant4");
-    run->SetRunId(runID->value());
+    run->SetRunId(runID());
     run->SetStoreTraj(false);
     run->SetMaterials("media_r3b.geo");
-    run->SetSink(std::make_unique<FairRootFileSink>(simuFileName->value().c_str()));
+    run->SetSink(std::make_unique<FairRootFileSink>(simuFileName().c_str()));
     auto fairField = std::make_unique<FairConstField>();
     run->SetField(fairField.release());
 
     // Primary particle generator
-    auto boxGen = std::make_unique<FairBoxGenerator>(PID, multi->value());
+    auto boxGen = std::make_unique<FairBoxGenerator>(PID, multi());
     boxGen->SetXYZ(0, 0, 0.);
     boxGen->SetThetaRange(0., 3.);
     boxGen->SetPhiRange(0., 360.);
-    boxGen->SetEkinRange(pEnergy->value(), pEnergy->value());
+    boxGen->SetEkinRange(pEnergy(), pEnergy());
     auto primGen = std::make_unique<FairPrimaryGenerator>();
     primGen->AddGenerator(boxGen.release());
     run->SetGenerator(primGen.release());
@@ -96,19 +96,19 @@ int main(int argc, const char** argv)
 
     // event print out:
     auto* grun = G4RunManager::GetRunManager();
-    grun->SetPrintProgress(eventPrintNum->value());
+    grun->SetPrintProgress(eventPrintNum());
     auto* event = dynamic_cast<TG4EventAction*>(const_cast<G4UserEventAction*>(grun->GetUserEventAction())); // NOLINT
     event->VerboseLevel(0);
 
     // Connect runtime parameter file
     auto parFileIO = std::make_unique<FairParRootFileIo>(true);
-    parFileIO->open(paraFileName->value().c_str());
+    parFileIO->open(paraFileName().c_str());
     auto* rtdb = run->GetRuntimeDb();
     rtdb->setOutput(parFileIO.release());
     rtdb->saveOutput();
 
     // Simulate
-    run->Run(eventNum->value());
+    run->Run(eventNum());
 
     // Report
     timer.Stop();

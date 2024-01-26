@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <ext_data_client.h>
 #include <fmt/format.h>
+#include <iostream>
 
 constexpr auto UCESB_MAP_BITSIZE = 32;
 

@@ -39,6 +39,9 @@ namespace R3B
     template <typename Type>
     class Option;
 
+    template <typename Type>
+    class OptionHandle;
+
     class ProgramOptions
     {
       public:
@@ -59,9 +62,9 @@ namespace R3B
                 exit(1);
             }
             auto option = std::make_unique<Option<OptionType>>(optionName, defaultValue.value_or(OptionType{}), this);
-            option->Add(option_desc, not defaultValue.has_value());
+            option->add(option_desc, not defaultValue.has_value());
             registries_.emplace(optionName, option.get());
-            return option;
+            return OptionHandle{ std::move(option) };
         }
 
         auto verify(int argc, const char** argv) -> bool;
@@ -85,7 +88,7 @@ namespace R3B
         auto operator=(OptionConcept&&) -> OptionConcept& = delete;
         virtual ~OptionConcept() = default;
         OptionConcept() = default;
-        virtual void Retrieve(const po::variables_map& varMap) = 0;
+        virtual void retrieve(const po::variables_map& varMap) = 0;
     };
 
     template <typename Type>
@@ -113,7 +116,7 @@ namespace R3B
         }
         ~Option() override { program_->delete_option(name_); }
 
-        void Add(const std::string& desc, bool is_requried = false)
+        void add(const std::string& desc, bool is_requried = false)
         {
             auto& po_desc = program_->get_desc_ref();
             is_required_ = is_requried;
@@ -138,9 +141,13 @@ namespace R3B
             }
         }
 
-        void MakePositional(int option) { program_->get_posDescRef().add(name_.c_str(), option); }
+        void as_positional(int option)
+        {
+            program_->get_posDescRef().add(key_.c_str(), option);
+            is_positional_ = true;
+        }
 
-        void Retrieve(const po::variables_map& varMap) override
+        void retrieve(const po::variables_map& varMap) override
         {
             if (varMap.count(key_) != 0U)
             {
@@ -156,7 +163,7 @@ namespace R3B
             }
             else if (is_required_)
             {
-                const auto error_msg = fmt::format(R"(Program option "--{} is required" )", name_);
+                const auto error_msg = fmt::format(R"(Program option "--{}" is required! )", name_);
                 throw std::runtime_error(error_msg);
             }
         }
@@ -164,13 +171,38 @@ namespace R3B
         void set_required(bool p_rq = true) { is_required_ = p_rq; }
 
         [[nodiscard]] auto value() const { return value_; }
+        [[nodiscard]] auto is_required() const -> bool { return is_required_; }
+        [[nodiscard]] auto is_positional() const -> bool { return is_positional_; }
 
       private:
+        bool is_positional_ = false;
+        bool is_required_ = false;
         std::string name_;
         std::string key_;
         std::string desc_;
-        bool is_required_ = false;
         Type value_{};
         ProgramOptions* program_;
     };
+
+    template <typename Type>
+    class OptionHandle
+    {
+      public:
+        explicit OptionHandle(std::unique_ptr<Option<Type>> option)
+            : option_{ std::move(option) }
+        {
+        }
+
+        auto operator()() const { return option_->value(); }
+        auto make_positional(int pos) -> OptionHandle<Type>&&
+        {
+            option_->as_positional(pos);
+            return std::move(*this);
+        }
+        auto operator->() -> Option<Type>* { return option_.get(); }
+
+      private:
+        std::unique_ptr<Option<Type>> option_ = nullptr;
+    };
+
 }; // namespace R3B

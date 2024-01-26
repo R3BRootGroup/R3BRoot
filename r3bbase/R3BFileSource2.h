@@ -17,6 +17,7 @@
 #include <FairFileSourceBase.h>
 #include <TObjString.h>
 #include <chrono>
+#include <optional>
 
 class FairRootManager;
 class TChain;

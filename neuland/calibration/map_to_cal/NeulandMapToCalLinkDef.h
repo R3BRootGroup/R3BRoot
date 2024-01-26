@@ -22,7 +22,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3B::FTChannel2TimeRelation+;
-#pragma link C++ class R3B::TCalModuleInfo+;
 #pragma link C++ class R3B::Map2CalPar+;
 #pragma link C++ class R3B::TCalVFTXModulePar+;
 #pragma link C++ class unordered_map<unsigned int, R3B::TCalVFTXModulePar>+;
