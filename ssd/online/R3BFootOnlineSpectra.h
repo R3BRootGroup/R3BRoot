@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,18 +13,17 @@
 
 // ------------------------------------------------------------
 // -----             R3BFootOnlineSpectra                 -----
-// -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
+// -----    Created 16/07/21 by J.L. Rodriguez-Sanchez    -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BFootOnlineSpectra_H
-#define R3BFootOnlineSpectra_H
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
-#include "TCanvas.h"
-#include "TMath.h"
 #include <Rtypes.h>
+#include <TCanvas.h>
+#include <TMath.h>
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -62,7 +61,7 @@ class R3BFootOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BFootOnlineSpectra();
+    virtual ~R3BFootOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -70,27 +69,27 @@ class R3BFootOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init() override;
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option) override;
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent() override;
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask() override;
+    void FinishTask() override;
 
     /**
      * Method to reset histograms
@@ -100,23 +99,25 @@ class R3BFootOnlineSpectra : public FairTask
     /**
      * Method to set the number of detectors
      */
-    void SetNbDet(Int_t ndet) { fNbDet = ndet; }
+    inline void SetNbDet(int ndet) { fNbDet = ndet; }
 
     /**
      * Method to set the trigger
      */
-    void SetTrigger(Int_t trigg) { fTrigger = trigg; }
+    inline void SetTrigger(int trigg) { fTrigger = trigg; }
+
+    inline void SetTpat(int tpat) { fTpat = tpat; }
 
   private:
-    R3BEventHeader* fEventHeader; // // Pointer to the R3BEventHeader structure
-    TClonesArray* fMappedItems;   // Array with mapped items.
-    TClonesArray* fCalItems;      // Array with cal items.
-    TClonesArray* fHitItems;      // Array with hit items.
+    R3BEventHeader* fEventHeader = nullptr; // // Pointer to the R3BEventHeader structure
+    TClonesArray* fMappedItems = nullptr;   // Array with mapped items.
+    TClonesArray* fCalItems = nullptr;      // Array with cal items.
+    TClonesArray* fHitItems = nullptr;      // Array with hit items.
 
-    R3BEventHeader* header; // Event header.
-    Int_t fTrigger;         // Trigger value.
-    Int_t fNEvents;         // Event counter.
-    Int_t fNbDet;           // Number of AMS detectors.
+    int fTrigger = -1; // Trigger value.
+    int fTpat = 0;
+    int fNEvents = 0; // Event counter.
+    int fNbDet = 16;  // Number of AMS detectors.
 
     // Histograms for map data
     std::vector<TH2F*> fh2_EnergyVsStrip;
@@ -133,5 +134,3 @@ class R3BFootOnlineSpectra : public FairTask
   public:
     ClassDefOverride(R3BFootOnlineSpectra, 1)
 };
-
-#endif /* R3BFootOnlineSpectra_H */

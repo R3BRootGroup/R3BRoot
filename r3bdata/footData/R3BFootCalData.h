@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,46 +13,46 @@
 
 // --------------------------------------------------------------------
 // -----              R3BFootCalData header file                  -----
-// -----       Created 16/07/21  by J.L. Rodriguez-Sanchez        -----
+// -----       Created 16/07/21 by J.L. Rodriguez-Sanchez         -----
 // --------------------------------------------------------------------
 
-#ifndef R3BFootCalData_H
-#define R3BFootCalData_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
+#include <cmath>
+#include <cstdint>
 
 class R3BFootCalData : public TObject
 {
   public:
     /** Default constructor **/
-    R3BFootCalData();
+    R3BFootCalData() = default;
 
     /** Constructor with arguments
      *@param fDetId    Detector unique identifier
      *@param fStripId  Strip unique identifier
      *@param fEnergy   Total energy deposited on the strip ([GeV] in sim)
      **/
-    R3BFootCalData(Int_t detid, Int_t stripid, Double_t energy);
+    explicit R3BFootCalData(uint8_t detid, uint16_t stripid, double energy);
 
     /** Destructor **/
-    virtual ~R3BFootCalData() {}
+    virtual ~R3BFootCalData() = default;
 
-    /** Accessors **/
-    inline const Int_t& GetDetId() const { return fDetId; }
-    inline const Int_t& GetStripId() const { return fStripId; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
+    // Accessors
+    [[nodiscard]] inline const uint8_t& GetDetId() const { return fDetId; }
+    [[nodiscard]] inline const uint16_t& GetStripId() const { return fStripId; }
+    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
 
-    /** Modifiers **/
-    void SetDetId(Int_t detid) { fDetId = detid; }
-    void SetStripId(Int_t stripid) { fStripId = stripid; }
-    void SetEnergy(Double32_t energy) { fEnergy = energy; }
+    // Modifiers
+    inline void SetDetId(uint8_t detid) { fDetId = detid; }
+    inline void SetStripId(uint16_t stripid) { fStripId = stripid; }
+    inline void SetEnergy(double energy) { fEnergy = energy; }
 
   protected:
-    Int_t fDetId;     // detector unique identifier
-    Int_t fStripId;   // strip unique identifier
-    Double_t fEnergy; // total energy in the strip
+    uint8_t fDetId = 0;            // detector unique identifier
+    uint16_t fStripId = 0;         // strip unique identifier
+    double fEnergy = std::nan(""); // total energy in the strip
 
-    ClassDef(R3BFootCalData, 1)
+  public:
+    ClassDefOverride(R3BFootCalData, 1)
 };
-
-#endif /* R3BFootCalData_H */

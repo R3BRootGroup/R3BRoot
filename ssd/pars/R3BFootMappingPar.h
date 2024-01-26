@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,19 +13,16 @@
 
 // ----------------------------------------------------------------
 // -----        R3BFootMappingPar source file                 -----
-// -----    Created 05/11/21  by J.L. Rodriguez-Sanchez       -----
+// -----    Created 05/11/21 by J.L. Rodriguez-Sanchez        -----
 // ----------------------------------------------------------------
 
-#ifndef R3BFootMappingPar_H
-#define R3BFootMappingPar_H
+#pragma once
 
-#include "FairParGenericSet.h"
-#include "TObject.h"
+#include <FairParGenericSet.h>
 
-#include "TArrayF.h"
-#include "TArrayI.h"
-#include "TObjArray.h"
-#include <TObjString.h>
+#include <TArrayF.h>
+#include <TArrayI.h>
+#include <TObject.h>
 
 class FairParamList;
 
@@ -91,5 +88,3 @@ class R3BFootMappingPar : public FairParGenericSet
   public:
     ClassDef(R3BFootMappingPar, 1);
 };
-
-#endif /* R3BFootMappingPar_H */

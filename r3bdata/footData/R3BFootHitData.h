@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,18 +16,17 @@
 // -----       Created 16/07/21  by J.L. Rodriguez-Sanchez      -----
 // ------------------------------------------------------------------
 
-#ifndef R3BFootHitData_H
-#define R3BFootHitData_H
+#pragma once
 
-#include "FairMultiLinkedData.h"
-#include "TObject.h"
-#include "TVector3.h"
+#include <TObject.h>
+#include <TVector3.h>
+#include <cmath>
 
-class R3BFootHitData : public FairMultiLinkedData
+class R3BFootHitData : public TObject
 {
   public:
     /** Default constructor **/
-    R3BFootHitData();
+    R3BFootHitData() = default;
 
     /** Constructor with arguments
      *@param fDetId     Detector unique identifier
@@ -38,7 +37,12 @@ class R3BFootHitData : public FairMultiLinkedData
      *@param fPhi       Master: Angle Phi [rad] (lab frame)
      *@param fEnergy    Total energy deposited by the hit ([GeV] in sim)
      **/
-    R3BFootHitData(Int_t detid, Int_t nbhit, Double_t pos, TVector3 master, Double_t energy, Int_t mulstrip = 0);
+    explicit R3BFootHitData(uint8_t detid,
+                            uint16_t nbhit,
+                            double pos,
+                            TVector3 master,
+                            double energy,
+                            uint16_t mulstrip = 0);
 
     /** Copy constructor **/
     R3BFootHitData(const R3BFootHitData&);
@@ -46,28 +50,28 @@ class R3BFootHitData : public FairMultiLinkedData
     R3BFootHitData& operator=(const R3BFootHitData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BFootHitData() {}
+    virtual ~R3BFootHitData() = default;
 
-    /** Accessors **/
-    inline const Int_t& GetDetId() const { return fDetId; }
-    inline const Int_t& GetNbHit() const { return fNbHit; }
-    inline const Int_t& GetMulStrip() const { return fMulStrip; }
-    inline const Double_t& GetPos() const { return fPos; }
-    inline const Double_t& GetTheta() const { return fTheta; }
-    inline const Double_t& GetPhi() const { return fPhi; }
-    inline const TVector3 GetPosLab() const { return fmaster; }
-    inline const Double_t& GetEnergy() const { return fEnergy; }
+    // Accessors
+    [[nodiscard]] inline const uint8_t& GetDetId() const { return fDetId; }
+    [[nodiscard]] inline const uint16_t& GetNbHit() const { return fNbHit; }
+    [[nodiscard]] inline const uint16_t& GetMulStrip() const { return fMulStrip; }
+    [[nodiscard]] inline const double& GetPos() const { return fPos; }
+    [[nodiscard]] inline const double& GetTheta() const { return fTheta; }
+    [[nodiscard]] inline const double& GetPhi() const { return fPhi; }
+    [[nodiscard]] inline const TVector3 GetPosLab() const { return fmaster; }
+    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
 
   protected:
-    Int_t fDetId;
-    Int_t fNbHit;
-    Int_t fMulStrip;
-    Double_t fPos;
-    Double_t fTheta, fPhi;
+    uint8_t fDetId = 0;
+    uint16_t fNbHit = 0;
+    double fPos = std::nan("");
+    double fTheta = std::nan("");
+    double fPhi = std::nan("");
     TVector3 fmaster;
-    Double_t fEnergy;
+    double fEnergy = std::nan("");
+    uint16_t fMulStrip = 0;
 
-    ClassDef(R3BFootHitData, 1)
+  public:
+    ClassDefOverride(R3BFootHitData, 1)
 };
-
-#endif /* R3BFootHitData_H */

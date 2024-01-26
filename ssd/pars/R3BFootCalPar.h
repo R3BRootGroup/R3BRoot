@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,14 +16,13 @@
 // -----         Created 07/09/21 by J.L. Rodriguez-Sanchez     -----
 // ------------------------------------------------------------------
 
-#ifndef R3BFootCalPar_H
-#define R3BFootCalPar_H
+#pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
-#include "TArrayF.h"
-#include "TObject.h"
 #include <Rtypes.h>
+#include <TArrayF.h>
+#include <TObject.h>
 
 class FairParamList;
 
@@ -39,35 +38,35 @@ class R3BFootCalPar : public FairParGenericSet
     virtual ~R3BFootCalPar();
 
     /** Method to reset all parameters **/
-    virtual void clear() override;
+    void clear() override;
 
     /** Method to store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list) override;
+    void putParams(FairParamList* list) override;
 
     /** Method to retrieve all parameters using FairRuntimeDB**/
     Bool_t getParams(FairParamList* list) override;
 
     /** Method to print values of parameters to the standard output **/
-    virtual void print() override;
+    void print() override;
 
     /** Accessor functions **/
-    const Double_t GetNumDets() { return fNumDets; }
-    const Double_t GetNumStrips() { return fNumStrips; }
-    const Double_t GetNumParsFit() { return fNumParsFit; }
+    [[nodiscard]] inline const int GetNumDets() const { return fNumDets; }
+    [[nodiscard]] inline const int GetNumStrips() const { return fNumStrips; }
+    [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsFit; }
     TArrayF* GetStripCalParams() { return fStripCalParams; }
 
-    void SetNumDets(Int_t n) { fNumDets = n; }
-    void SetNumStrips(Int_t n) { fNumStrips = n; }
-    void SetNumParsFit(Int_t n) { fNumParsFit = n; }
-    void SetStripCalParams(Double_t c, Int_t i) { fStripCalParams->AddAt(c, i); }
+    inline void SetNumDets(int ndet) { fNumDets = ndet; }
+    inline void SetNumStrips(int nstrip) { fNumStrips = nstrip; }
+    inline void SetNumParsFit(int npar) { fNumParsFit = npar; }
+    inline void SetStripCalParams(float c, int i) { fStripCalParams->AddAt(c, i); }
 
     /** Create more Methods if you need them! **/
 
   private:
+    int fNumDets = 16;        // Number of detectors
+    int fNumStrips = 640;     // Number of strips
+    int fNumParsFit = 2;      // Number of parameters for the fit
     TArrayF* fStripCalParams; // Calibration Parameters of strip
-    Int_t fNumDets;           // Number of detectors
-    Int_t fNumStrips;         // Number of strips
-    Int_t fNumParsFit;        // Number of parameters for the fit
 
     const R3BFootCalPar& operator=(const R3BFootCalPar&);
     R3BFootCalPar(const R3BFootCalPar&);
@@ -75,5 +74,3 @@ class R3BFootCalPar : public FairParGenericSet
   public:
     ClassDefOverride(R3BFootCalPar, 1);
 };
-
-#endif /* R3BFootCalPar_H */
