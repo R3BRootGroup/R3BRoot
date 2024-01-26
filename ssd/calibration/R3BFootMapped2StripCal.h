@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,14 +16,14 @@
 // -----     Created 08/09/21 by J.L. Rodriguez-Sanchez     -----
 // --------------------------------------------------------------
 
-#ifndef R3BFootMapped2StripCal_H
-#define R3BFootMapped2StripCal_H 1
-
-#include "FairTask.h"
+#pragma once
 
 #include "R3BFootCalData.h"
 
+#include <FairTask.h>
+
 #include <Rtypes.h>
+#include <TArrayF.h>
 
 class TClonesArray;
 class R3BFootCalPar;
@@ -41,22 +41,22 @@ class R3BFootMapped2StripCal : public FairTask
     virtual ~R3BFootMapped2StripCal();
 
     /** Virtual method Exec **/
-    virtual void Exec(Option_t* option) override;
+    void Exec(Option_t* /*option*/) override;
 
     /** Virtual method Reset **/
     virtual void Reset();
 
-    virtual void SetParContainers() override;
+    void SetParContainers() override;
 
     // Fair specific
     /** Virtual method Init **/
-    virtual InitStatus Init() override;
+    InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit() override;
+    InitStatus ReInit() override;
 
     // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option) { fOnline = option; }
 
     /**
      * Method for setting the thresholds: Signal>sigma_strip*fTimesSigma
@@ -71,26 +71,23 @@ class R3BFootMapped2StripCal : public FairTask
   private:
     void SetParameter();
 
-    Int_t NumDets;
-    Int_t NumStrips;
-    Int_t NumParams;
-    Int_t MaxSigma;
-    Double_t fNStrip;
-    Double_t fTimesSigma;
-    TArrayF* CalParams;
+    int fNDets = 16;
+    int fNStrip = 640;
+    int MaxSigma = 5;
+    int fNumParams = 2;
+    double fTimesSigma = 2.;
+    TArrayF* CalParams = nullptr;
 
-    Bool_t fOnline; // Don't store data for online
+    bool fOnline = false; // Don't store data for online
 
-    R3BFootCalPar* fCal_Par;       // Parameter container
-    TClonesArray* fFootMappedData; // Array with FOOT Mapped input data
-    TClonesArray* fFootCalData;    // Array with FOOT Cal output data
+    R3BFootCalPar* fCal_Par = nullptr;       // Parameter container
+    TClonesArray* fFootMappedData = nullptr; // Array with FOOT Mapped input data
+    TClonesArray* fFootCalData = nullptr;    // Array with FOOT Cal output data
 
     // Private method AddCalData
-    R3BFootCalData* AddCalData(Int_t detid, Int_t stripid, Double_t energy);
+    R3BFootCalData* AddCalData(int8_t detid, int16_t stripid, double energy);
 
   public:
     // Class definition
     ClassDefOverride(R3BFootMapped2StripCal, 1)
 };
-
-#endif /*  R3BFootMapped2StripCal_H */

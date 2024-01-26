@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,39 +16,36 @@
 // -----          Created 16/07/2021 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BFootMappedData_H
-#define R3BFootMappedData_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 
 class R3BFootMappedData : public TObject
 {
   public:
     // Default Constructor
-    R3BFootMappedData();
+    R3BFootMappedData() = default;
 
     /** Standard Constructor
      *@param detId       Detector unique identifier
      *@param stripId     Strip unique identifier
      *@param energy      Total energy deposited in the strip
      **/
-    R3BFootMappedData(Int_t detId, Int_t stripId, Int_t energy);
+    explicit R3BFootMappedData(uint8_t detId, uint16_t stripId, int energy);
 
-    // Destructor
-    virtual ~R3BFootMappedData() {}
+    // Destructor virtual
+    virtual ~R3BFootMappedData() = default;
 
     // Getters
-    inline const Int_t& GetDetId() const { return fDetId; }
-    inline const Int_t& GetStripId() const { return fStripId; }
-    inline const Int_t& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const uint8_t& GetDetId() const { return fDetId; }
+    [[nodiscard]] inline const uint16_t& GetStripId() const { return fStripId; }
+    [[nodiscard]] inline const int& GetEnergy() const { return fEnergy; }
 
   protected:
-    Int_t fDetId;   // Detector unique identifiers
-    Int_t fStripId; // Strip unique identifiers
-    Int_t fEnergy;  // Energy per strip
+    uint8_t fDetId = 0;    // Detector unique identifiers
+    uint16_t fStripId = 0; // Strip unique identifiers
+    int fEnergy = 0;       // Energy per strip
 
   public:
-    ClassDef(R3BFootMappedData, 1)
+    ClassDefOverride(R3BFootMappedData, 1)
 };
-
-#endif /* R3BFootMappedData */
