@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,9 @@
 // -----         Created 24/11/19 by J.L. Rodriguez-Sanchez     -----
 // ------------------------------------------------------------------
 
-#ifndef R3BTwimContFact_H
-#define R3BTwimContFact_H 1
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
 class FairContainer;
 
@@ -34,5 +33,3 @@ class R3BTwimContFact : public FairContFact
     FairParSet* createContainer(FairContainer*);
     ClassDef(R3BTwimContFact, 0) // Factory for all R3BTwim parameter containers
 };
-
-#endif /* R3BTwimContFact_H */

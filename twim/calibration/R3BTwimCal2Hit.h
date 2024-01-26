@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,8 +16,7 @@
 // -----    Created 30/11/19 by J.L. Rodriguez-Sanchez     -----
 // -------------------------------------------------------------
 
-#ifndef R3BTwimCal2Hit_H
-#define R3BTwimCal2Hit_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "R3BLogger.h"
@@ -135,5 +134,3 @@ class R3BTwimCal2Hit : public FairTask
     // Class definition
     ClassDef(R3BTwimCal2Hit, 1)
 };
-
-#endif

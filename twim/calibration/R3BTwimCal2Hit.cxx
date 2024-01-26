@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,22 +17,24 @@
 // -------------------------------------------------------------
 
 // ROOT headers
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TDecompSVD.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TMath.h"
-#include "TMatrixD.h"
-#include "TRandom.h"
-#include "TVector3.h"
-#include "TVectorD.h"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TDecompSVD.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TMatrixD.h>
+#include <TRandom.h>
+#include <TVector3.h>
+#include <TVectorD.h>
+#include <cmath>
+#include <cstdint>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 // Twim headers
 #include "R3BEventHeader.h"
@@ -313,7 +315,7 @@ void R3BTwimCal2Hit::Exec(Option_t* option)
         return;
     // At the moment we will use the expid to select the reconstruction
     // this should be changed in the future because expid is not necessary
-    if (fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
+    if (fExpId == 91 || fExpId == 118 || fExpId == 444 || fExpId == 467 || fExpId == 509 || fExpId == 522)
     {
         S467();
     }
@@ -424,12 +426,12 @@ void R3BTwimCal2Hit::S4551()
         Int_t secId = 0, anodeId = 0;
         Double_t energyperanode[fNumSec][fNumAnodes];
         Double_t dt[fNumSec][fNumAnodes];
-        Double_t good_dt[fNumAnodes];
+        double good_dt[fNumAnodes];
         Int_t nbdet = 0;
 
         for (Int_t j = 0; j < fNumAnodes; j++)
         {
-            good_dt[j] = 0;
+            good_dt[j] = std::nan("");
             for (Int_t i = 0; i < fNumSec; i++)
             {
                 energyperanode[i][j] = 0.;
@@ -550,12 +552,12 @@ void R3BTwimCal2Hit::S455()
     Int_t secId = 0, anodeId = 0;
     Double_t energyperanode[fNumSec][fNumAnodes];
     Double_t dt[fNumSec][fNumAnodes];
-    Double_t good_dt[fNumAnodes];
+    double good_dt[fNumAnodes];
     Int_t nbdet = 0;
 
     for (Int_t j = 0; j < fNumAnodes; j++)
     {
-        good_dt[j] = 0.;
+        good_dt[j] = std::nan("");
         for (Int_t i = 0; i < fNumSec; i++)
         {
             energyperanode[i][j] = 0.;
@@ -682,7 +684,7 @@ void R3BTwimCal2Hit::S455()
 
                 Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean;
                 // if (zhit > 0 && theta > -5000.)
-                if (zhit > 0)
+                if (zhit > 0 && !TMath::IsNaN(good_dt[7]))
                     AddHitData(i + 1, theta, zhit, good_dt[7], offset, Esum_mean);
             }
             else
@@ -690,7 +692,7 @@ void R3BTwimCal2Hit::S455()
                 Double_t Esum_mean = Esum / nba;
                 Double_t zhit = fZ0[i] + fZ1[i] * TMath::Sqrt(Esum_mean) + fZ2[i] * Esum_mean;
                 // if (zhit > 0 && theta > -5000.)
-                if (zhit > 0)
+                if (zhit > 0 && !TMath::IsNaN(good_dt[7]))
                     AddHitData(i + 1, theta, zhit, good_dt[7], offset, Esum_mean);
             }
         }
@@ -717,12 +719,12 @@ void R3BTwimCal2Hit::S467()
     Int_t secId, anodeId;
     Double_t energyperanode[fNumSec][fNumAnodes];
     Double_t dt[fNumSec][fNumAnodes];
-    Double_t good_dt[fNumAnodes];
+    double good_dt[fNumAnodes];
     Int_t nbdet = 0;
 
     for (Int_t j = 0; j < fNumAnodes; j++)
     {
-        good_dt[j] = 0.;
+        good_dt[j] = std::nan("");
         for (Int_t i = 0; i < fNumSec; i++)
         {
             energyperanode[i][j] = 0;
@@ -742,8 +744,7 @@ void R3BTwimCal2Hit::S467()
     // calculate truncated dE from 16 anodes, Twim-MUSIC
     for (Int_t i = 0; i < fNumSec; i++)
     {
-        Double_t nba = 0, offset = 0., theta = -5000., Esum = 0.;
-        Double_t zhit = 0;
+        Double_t nba = 0., offset = 0., theta = -5000., Esum = 0.;
         fNumAnodesAngleFit = 0;
         for (Int_t j = 0; j < fNumAnodes; j++)
         {
@@ -773,9 +774,9 @@ void R3BTwimCal2Hit::S467()
                 offset = c_svd_r[0];
                 theta = c_svd_r[1];
             }
-            zhit =
+            double zhit =
                 fZ0[i] + fZ1[i] * TMath::Sqrt(Esum / nba) + fZ2[i] * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
-            if (zhit > 0 && theta > -5000.)
+            if (zhit > 0 && theta > -5000. && good_dt[7] != std::nan("") && nba > 0) // NOLINT
                 AddHitData(i + 1, theta, zhit, good_dt[7], offset, Esum / nba);
         }
     }
@@ -819,4 +820,4 @@ void R3BTwimCal2Hit::FinishTask()
     }
 }
 
-ClassImp(R3BTwimCal2Hit);
+ClassImp(R3BTwimCal2Hit)

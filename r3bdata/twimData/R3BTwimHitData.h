@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,9 @@
 // -----       Created 13/10/19 by J.L. Rodriguez-Sanchez        -----
 // -------------------------------------------------------------------
 
-#ifndef R3BTwimHitData_H
-#define R3BTwimHitData_H 1
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 
 class R3BTwimHitData : public TObject
 {
@@ -75,5 +74,3 @@ class R3BTwimHitData : public TObject
   public:
     ClassDef(R3BTwimHitData, 1)
 };
-
-#endif
