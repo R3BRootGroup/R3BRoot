@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,15 +17,14 @@
 // -----           Fill TWIM online histograms            -----
 // ------------------------------------------------------------
 
-#ifndef R3BTwimOnlineSpectra_H
-#define R3BTwimOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "R3BLogger.h"
-#include "TCanvas.h"
-#include "TH1.h"
-#include "TH2F.h"
-#include "TMath.h"
+#include <FairTask.h>
+#include <R3BLogger.h>
+#include <TCanvas.h>
+#include <TH1.h>
+#include <TH2F.h>
+#include <TMath.h>
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -40,7 +39,6 @@ class R3BEventHeader;
  */
 class R3BTwimOnlineSpectra : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -60,7 +58,7 @@ class R3BTwimOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BTwimOnlineSpectra();
+    virtual ~R3BTwimOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -68,57 +66,57 @@ class R3BTwimOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Methods to clean histograms.
      */
     virtual void Reset_Histo();
 
-    void SetExpId(Int_t exp) {
-      R3BLOG(info, "fExpId is set locally. Original:" << fExpId <<", New value:" << exp);
-      R3BLOG(info, "Using R3BEventHeader::SetExpId() is recommended instead.");
-      fExpId = exp;
+    void SetExpId(Int_t exp)
+    {
+        R3BLOG(info, "fExpId is set locally. Original:" << fExpId << ", New value:" << exp);
+        R3BLOG(info, "Using R3BEventHeader::SetExpId() is recommended instead.");
+        fExpId = exp;
     }
 
   private:
     void s444_s467();
     void s455();
 
-    TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
-    TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
-    TClonesArray* fHitItemsTwim;    /**< Array with hit items. */
-    TClonesArray* fHitItemsMwpc3;   /**< Array with mw3-hit items. */
-    TClonesArray* fHitItemsTofW;    /**< Array with tofw-hit items. */
+    TClonesArray* fMappedItemsTwim = nullptr; /**< Array with mapped items. */
+    TClonesArray* fCalItemsTwim = nullptr;    /**< Array with cal items. */
+    TClonesArray* fHitItemsTwim = nullptr;    /**< Array with hit items. */
+    TClonesArray* fHitItemsMwpc3 = nullptr;   /**< Array with mw3-hit items. */
+    TClonesArray* fHitItemsTofW = nullptr;    /**< Array with tofw-hit items. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header.      */
-    Int_t fNEvents;         /**< Event counter.     */
-    Int_t fExpId;
-    Int_t fNbSections;
-    Int_t fNbAnodes;
-    Int_t fNbTref;
-    Int_t fNbTrig;
+    int fNEvents = 0;
+    int fExpId = 0;
+    int fNbSections = 1;
+    int fNbAnodes = 16;
+    int fNbTref = 1;
+    int fNbTrig = 1;
 
     // Canvas
     TCanvas** cTwimMap_E;
@@ -174,7 +172,5 @@ class R3BTwimOnlineSpectra : public FairTask
     TH1F* fh1_twim_ZSum[2];
 
   public:
-    ClassDef(R3BTwimOnlineSpectra, 1)
+    ClassDefOverride(R3BTwimOnlineSpectra, 1)
 };
-
-#endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -325,4 +325,4 @@ R3BTwimCalData* R3BTwimMapped2Cal::AddCalData(Int_t secID, Int_t anodeID, Double
     return new (clref[size]) R3BTwimCalData(secID, anodeID, dtime, energy);
 }
 
-ClassImp(R3BTwimMapped2Cal);
+ClassImp(R3BTwimMapped2Cal)
