@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,22 +16,19 @@
 // -----         Created 07/09/21 by J.L. Rodriguez-Sanchez     -----
 // ------------------------------------------------------------------
 
-#include "FairLogger.h"
-#include "FairParamList.h"
-
 #include "R3BFootCalPar.h"
 #include "R3BLogger.h"
 
-#include "TArrayF.h"
-#include "TMath.h"
-#include "TString.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
+
+#include <TArrayF.h>
+#include <TMath.h>
+#include <TString.h>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , fNumDets(20)
-    , fNumStrips(640)
-    , fNumParsFit(2)
 {
     detName = "FootCal";
     fStripCalParams = new TArrayF(fNumDets * fNumStrips * fNumParsFit);
@@ -117,7 +114,6 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
 void R3BFootCalPar::print()
 {
     R3BLOG(info, "Foot strip Parameters");
-    Int_t array_size = fNumDets * fNumStrips;
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
@@ -127,11 +123,11 @@ void R3BFootCalPar::print()
             LOG(info) << "Foot strip number: " << i + 1;
             for (Int_t j = 0; j < fNumParsFit; j++)
             {
-                LOG(info) << "FitParam(" << j
+                LOG(info) << "FitParam(" << j + 1
                           << ") = " << fStripCalParams->GetAt(d * fNumParsFit * fNumStrips + i * fNumParsFit + j);
             }
         }
     }
 }
 
-ClassImp(R3BFootCalPar);
+ClassImp(R3BFootCalPar)

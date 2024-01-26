@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,46 +17,35 @@
 
 #include "R3BFootHitData.h"
 
-// -----   Default constructor   ----------------------------------------
-R3BFootHitData::R3BFootHitData()
-    : FairMultiLinkedData()
-    , fDetId(-1)
-    , fNbHit(0)
-    , fMulStrip(0)
-    , fPos(0)
-    , fTheta(0)
-    , fPhi(0)
-    , fmaster(0, 0, 0)
-    , fEnergy(0)
-{
-}
-
 // -----   Standard constructor   ---------------------------------------
-R3BFootHitData::R3BFootHitData(Int_t detid, Int_t nbhit, Double_t pos, TVector3 master, Double_t energy, Int_t mulstrip)
-    : FairMultiLinkedData()
-    , fDetId(detid)
+R3BFootHitData::R3BFootHitData(uint8_t detid,
+                               uint16_t nbhit,
+                               double pos,
+                               TVector3 master,
+                               double energy,
+                               uint16_t mulstrip)
+    : fDetId(detid)
     , fNbHit(nbhit)
-    , fMulStrip(mulstrip)
     , fPos(pos)
     , fTheta(master.Theta())
     , fPhi(master.Phi())
     , fmaster(master)
     , fEnergy(energy)
+    , fMulStrip(mulstrip)
 {
 }
 
 // ----------------------------------------------------------------------
 R3BFootHitData::R3BFootHitData(const R3BFootHitData& right)
-    : FairMultiLinkedData(right)
-    , fDetId(right.fDetId)
+    : fDetId(right.fDetId)
     , fNbHit(right.fNbHit)
-    , fMulStrip(right.fMulStrip)
     , fPos(right.fPos)
     , fTheta(right.fmaster.Theta())
     , fPhi(right.fmaster.Phi())
     , fmaster(right.fmaster)
     , fEnergy(right.fEnergy)
+    , fMulStrip(right.fMulStrip)
 {
 }
 
-ClassImp(R3BFootHitData);
+ClassImp(R3BFootHitData)

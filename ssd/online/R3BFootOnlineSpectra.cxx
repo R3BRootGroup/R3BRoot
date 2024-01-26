@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,7 +13,7 @@
 
 // ------------------------------------------------------------
 // -----             R3BFootOnlineSpectra                 -----
-// -----    Created 16/07/21  by J.L. Rodriguez-Sanchez   -----
+// -----    Created 16/07/21 by J.L. Rodriguez-Sanchez    -----
 // -----          Fill FOOT online histograms             -----
 // ------------------------------------------------------------
 
@@ -22,25 +22,27 @@
  */
 
 #include "R3BFootOnlineSpectra.h"
+#include "R3BEventHeader.h"
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
 #include "R3BFootMappedData.h"
+#include "R3BLogger.h"
+#include "R3BShared.h"
 
-#include "R3BEventHeader.h"
-#include "THttpServer.h"
+#include <THttpServer.h>
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
-#include "TCanvas.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TLine.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
+#include <TCanvas.h>
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TLine.h>
 
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -54,50 +56,38 @@ R3BFootOnlineSpectra::R3BFootOnlineSpectra()
 
 R3BFootOnlineSpectra::R3BFootOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fEventHeader(nullptr)
-    , fMappedItems(NULL)
-    , fCalItems(NULL)
-    , fHitItems(NULL)
-    , fTrigger(-1)
-    , fNEvents(0)
-    , fNbDet(16)
 {
 }
 
-R3BFootOnlineSpectra::~R3BFootOnlineSpectra() { LOG(debug) << "R3BFootOnlineSpectra::Delete instance"; }
-
 InitStatus R3BFootOnlineSpectra::Init()
 {
-    LOG(info) << "R3BFootOnlineSpectra::Init()";
+    R3BLOG(info, "");
     // Looking for FairRootManager
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(fatal) << "R3BFootOnlineSpectra::FairRootManager not found";
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
+
     // Look for the R3BEventHeader
     fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!fEventHeader)
+    if (fEventHeader == nullptr)
     {
-        LOG(warn) << "R3BFootOnlineSpectra::Init() EventHeader. not found";
-        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
+        R3BLOG(error, "EventHeader. not found");
     }
     else
-        LOG(info) << "R3BFootOnlineSpectra::Init() EventHeader. found";
+    {
+        R3BLOG(info, "EventHeader. found");
+    }
+
     // Get access to Mapped data
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootMappedData"));
-    if (!fMappedItems)
-    {
-        LOG(fatal) << "R3BFootOnlineSpectra::FootMappedData not found";
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fMappedItems == nullptr, "FootMappedData not found");
+
     // Get access to Cal data
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootCalData"));
-    if (!fCalItems)
-        LOG(warn) << "R3BFootOnlineSpectra::FootCalData not found";
+    R3BLOG_IF(warn, fCalItems == nullptr, "FootCalData not found");
 
     // Get access to Hit data
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("FootHitData"));
-    if (!fHitItems)
-        LOG(warn) << "R3BFootOnlineSpectra::FootHitData not found";
+    R3BLOG_IF(warn, fHitItems == nullptr, "FootHitData not found");
 
     // Create histograms for all the detectors
     // Energy range for strips
@@ -126,7 +116,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     { // one histo per detector
         sprintf(Name1, "fh2_energy_vs_strip_det_%d", i + 1);
         sprintf(Name2, "Mapped energy vs strip number for FOOT Det: %d", i + 1);
-        fh2_EnergyVsStrip[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+        fh2_EnergyVsStrip[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
         fh2_EnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -163,7 +153,7 @@ InitStatus R3BFootOnlineSpectra::Init()
         {
             sprintf(Name1, "fh2_energy_vs_strip_cal_det_%d", i + 1);
             sprintf(Name2, "Cal-energy vs strip number for FOOT Det: %d", i + 1);
-            fh2_EnergyVsStrip_cal[i] = new TH2F(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+            fh2_EnergyVsStrip_cal[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
             fh2_EnergyVsStrip_cal[i]->GetXaxis()->SetTitle("Strip number");
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitle("Energy [channels]");
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -202,7 +192,7 @@ InitStatus R3BFootOnlineSpectra::Init()
         { // one histo per detector
             sprintf(Name1, "fh1_pos_det_%d", i + 1);
             sprintf(Name2, "Cluster position for FOOT Det: %d", i + 1);
-            fh1_pos[i] = new TH1F(Name1, Name2, 600, -50., 50.);
+            fh1_pos[i] = R3B::root_owned<TH1F>(Name1, Name2, 600, -50., 50.);
             fh1_pos[i]->GetXaxis()->SetTitle("Position [mm]");
             fh1_pos[i]->GetYaxis()->SetTitle("Counts");
             fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -210,7 +200,7 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_pos[i]->GetYaxis()->CenterTitle(true);
             sprintf(Name1, "fh1_ene_det_%d", i + 1);
             sprintf(Name2, "Cluster energy for FOOT Det: %d", i + 1);
-            fh1_ene[i] = new TH1F(Name1, Name2, binsE, minE, maxE);
+            fh1_ene[i] = R3B::root_owned<TH1F>(Name1, Name2, binsE, minE, maxE);
             fh1_ene[i]->GetXaxis()->SetTitle("Energy");
             fh1_ene[i]->GetYaxis()->SetTitle("Counts");
             fh1_ene[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -239,7 +229,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     if (fHitItems)
     {
         fh1_mult.resize(fNbDet);
-        fh2_BeamSpot = new TH2F("BeamSpot", "BeamSpot", 600, -50., 50., 600, -50., 50.);
+        fh2_BeamSpot = R3B::root_owned<TH2F>("BeamSpot", "BeamSpot", 600, -50., 50., 600, -50., 50.);
         fh2_BeamSpot->GetYaxis()->SetTitle("Position [mm]");
         fh2_BeamSpot->GetYaxis()->SetTitleOffset(1.4);
         fh2_BeamSpot->GetXaxis()->CenterTitle(true);
@@ -247,7 +237,7 @@ InitStatus R3BFootOnlineSpectra::Init()
         cInBeam->cd(1);
         fh2_BeamSpot->Draw("colz");
 
-        fh2_BeamSpotE = new TH2F("BeamSpotEnergy", "BeamSpotEnergy", binsE, minE, maxE, binsE, minE, maxE);
+        fh2_BeamSpotE = R3B::root_owned<TH2F>("BeamSpotEnergy", "BeamSpotEnergy", binsE, minE, maxE, binsE, minE, maxE);
         fh2_BeamSpotE->GetXaxis()->SetTitle("Energy [ch]");
         fh2_BeamSpotE->GetYaxis()->SetTitle("Energy [ch]");
         fh2_BeamSpotE->GetYaxis()->SetTitleOffset(1.4);
@@ -259,7 +249,7 @@ InitStatus R3BFootOnlineSpectra::Init()
         {
             sprintf(Name1, "fh1_mult_strip_%d", i + 1);
             sprintf(Name2, "Cluster strip Mult for FOOT Det: %d", i + 1);
-            fh1_mult[i] = new TH1F(Name1, Name2, 10, 0, 10);
+            fh1_mult[i] = R3B::root_owned<TH1F>(Name1, Name2, 10, 0, 10);
             fh1_mult[i]->GetXaxis()->SetTitle("Multplicity");
             fh1_mult[i]->GetYaxis()->SetTitle("Counts");
             fh1_mult[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -327,6 +317,9 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
 {
 
     if (fEventHeader->GetTrigger() != fTrigger && fTrigger > -1)
+        return;
+
+    if (fTpat > 0 && (fEventHeader->GetTpat() & fTpat) != fTpat)
         return;
 
     // Fill mapped data
@@ -457,4 +450,4 @@ void R3BFootOnlineSpectra::FinishTask()
     return;
 }
 
-ClassImp(R3BFootOnlineSpectra);
+ClassImp(R3BFootOnlineSpectra)

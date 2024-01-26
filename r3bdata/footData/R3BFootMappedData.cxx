@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,18 +17,11 @@
 
 #include "R3BFootMappedData.h"
 
-R3BFootMappedData::R3BFootMappedData()
-    : fDetId(0)
-    , fStripId(0)
-    , fEnergy(0)
-{
-}
-
-R3BFootMappedData::R3BFootMappedData(Int_t detId, Int_t stripId, Int_t energy)
+R3BFootMappedData::R3BFootMappedData(uint8_t detId, uint16_t stripId, int energy)
     : fDetId(detId)
     , fStripId(stripId)
     , fEnergy(energy)
 {
 }
 
-ClassImp(R3BFootMappedData);
+ClassImp(R3BFootMappedData)
