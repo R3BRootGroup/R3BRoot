@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,8 +17,7 @@
 // -----     Fill MWPC correlation online histograms      -----
 // ------------------------------------------------------------
 
-#ifndef R3BMwpcCorrelationOnlineSpectra_H
-#define R3BMwpcCorrelationOnlineSpectra_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -60,7 +59,7 @@ class R3BMwpcCorrelationOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BMwpcCorrelationOnlineSpectra();
+    virtual ~R3BMwpcCorrelationOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -68,27 +67,27 @@ class R3BMwpcCorrelationOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Methods to clean histograms.
@@ -96,14 +95,13 @@ class R3BMwpcCorrelationOnlineSpectra : public FairTask
     virtual void Reset_Histo();
 
   private:
-    TClonesArray* fCalItemsMwpc1; /**< Array with cal items. */
-    TClonesArray* fHitItemsMwpc1; /**< Array with hit items. */
-    TClonesArray* fCalItemsMwpc2; /**< Array with cal items. */
-    TClonesArray* fHitItemsMwpc2; /**< Array with hit items. */
+    TClonesArray* fCalItemsMwpc1 = nullptr; /**< Array with cal items. */
+    TClonesArray* fHitItemsMwpc1 = nullptr; /**< Array with hit items. */
+    TClonesArray* fCalItemsMwpc2 = nullptr; /**< Array with cal items. */
+    TClonesArray* fHitItemsMwpc2 = nullptr; /**< Array with hit items. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header.      */
-    Int_t fNEvents;         /**< Event counter.     */
+    int fNEvents = 0;
     TString fNameDet1, fNameDet2;
 
     // Canvas
@@ -116,7 +114,5 @@ class R3BMwpcCorrelationOnlineSpectra : public FairTask
     TH2F* fh2_mwpc_hity;
 
   public:
-    ClassDef(R3BMwpcCorrelationOnlineSpectra, 1)
+    ClassDefOverride(R3BMwpcCorrelationOnlineSpectra, 1)
 };
-
-#endif

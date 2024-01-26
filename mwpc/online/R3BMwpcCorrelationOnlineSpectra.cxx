@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,26 +23,25 @@
 
 #include "R3BMwpcCorrelationOnlineSpectra.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
-#include "THttpServer.h"
+#include "R3BShared.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TCanvas.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
-#include "TClonesArray.h"
-#include "TMath.h"
-#include "TRandom.h"
-#include <array>
-#include <cstdlib>
-#include <ctime>
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
+#include <TRandom.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -60,32 +59,13 @@ R3BMwpcCorrelationOnlineSpectra::R3BMwpcCorrelationOnlineSpectra(const TString& 
                                                                  const TString& namedet1,
                                                                  const TString& namedet2)
     : FairTask(name, iVerbose)
-    , fCalItemsMwpc1(NULL)
-    , fHitItemsMwpc1(NULL)
-    , fCalItemsMwpc2(NULL)
-    , fHitItemsMwpc2(NULL)
     , fNameDet1(namedet1)
     , fNameDet2(namedet2)
-    , fNEvents(0)
 {
-}
-
-R3BMwpcCorrelationOnlineSpectra::~R3BMwpcCorrelationOnlineSpectra()
-{
-    LOG(info) << "R3BMwpc" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Delete instance";
-    if (fCalItemsMwpc1)
-        delete fCalItemsMwpc1;
-    if (fHitItemsMwpc1)
-        delete fHitItemsMwpc1;
-    if (fCalItemsMwpc2)
-        delete fCalItemsMwpc2;
-    if (fHitItemsMwpc2)
-        delete fHitItemsMwpc2;
 }
 
 InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
 {
-
     LOG(info) << "R3B" + fNameDet1 + "vs" + fNameDet2 + "CorrelationOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
@@ -100,15 +80,10 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
 
     // get access to mapped data of the mwpc detectors
     fCalItemsMwpc1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet1 + "CalData"));
-    if (!fCalItemsMwpc1)
-    {
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fCalItemsMwpc1 == nullptr, fNameDet1 + "CalData not found");
+
     fCalItemsMwpc2 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet2 + "CalData"));
-    if (!fCalItemsMwpc2)
-    {
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fCalItemsMwpc2 == nullptr, fNameDet2 + "CalData not found");
 
     // get access to hit data of mwpcs
     fHitItemsMwpc1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fNameDet1 + "HitData"));
@@ -133,9 +108,9 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_calx";
     Name2 = "Position-X: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
-        fh2_mwpc_calx = new TH2F(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
+        fh2_mwpc_calx = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
     else
-        fh2_mwpc_calx = new TH2F(Name1, Name2, 64, 0.5, 64.5, 288, 0.5, 288.5);
+        fh2_mwpc_calx = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 288, 0.5, 288.5);
     fh2_mwpc_calx->GetXaxis()->SetTitle(fNameDet1 + "-X [pads]");
     fh2_mwpc_calx->GetYaxis()->SetTitle(fNameDet2 + "-X [pads]");
     fh2_mwpc_calx->GetYaxis()->SetTitleOffset(1.1);
@@ -151,9 +126,9 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_caly";
     Name2 = "Position-Y: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
-        fh2_mwpc_caly = new TH2F(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
+        fh2_mwpc_caly = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
     else
-        fh2_mwpc_caly = new TH2F(Name1, Name2, 64, 0.5, 64.5, 120, 0.5, 120.5);
+        fh2_mwpc_caly = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 120, 0.5, 120.5);
     fh2_mwpc_caly->GetXaxis()->SetTitle(fNameDet1 + "-Y [pads]");
     fh2_mwpc_caly->GetYaxis()->SetTitle(fNameDet2 + "-Y [pads]");
     fh2_mwpc_caly->GetYaxis()->SetTitleOffset(1.1);
@@ -174,9 +149,9 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hitx";
     Name2 = "Position-X: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
-        fh2_mwpc_hitx = new TH2F(Name1, Name2, 500, -100., 100., 500, -100., 100.);
+        fh2_mwpc_hitx = R3B::root_owned<TH2F>(Name1, Name2, 500, -100., 100., 500, -100., 100.);
     else
-        fh2_mwpc_hitx = new TH2F(Name1, Name2, 600, -100., 100., 1200, -450, 450);
+        fh2_mwpc_hitx = R3B::root_owned<TH2F>(Name1, Name2, 600, -100., 100., 1200, -450, 450);
     fh2_mwpc_hitx->GetXaxis()->SetTitle(fNameDet1 + "-X [mm]");
     fh2_mwpc_hitx->GetYaxis()->SetTitle(fNameDet2 + "-X [mm]");
     fh2_mwpc_hitx->GetYaxis()->SetTitleOffset(1.1);
@@ -192,9 +167,9 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hity";
     Name2 = "Position-Y: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
-        fh2_mwpc_hity = new TH2F(Name1, Name2, 500, -100., 100., 500, -100., 100.);
+        fh2_mwpc_hity = R3B::root_owned<TH2F>(Name1, Name2, 500, -100., 100., 500, -100., 100.);
     else
-        fh2_mwpc_hity = new TH2F(Name1, Name2, 600, -100., 100., 800, -300., 300.);
+        fh2_mwpc_hity = R3B::root_owned<TH2F>(Name1, Name2, 600, -100., 100., 800, -300., 300.);
     fh2_mwpc_hity->GetXaxis()->SetTitle(fNameDet1 + "-Y [mm]");
     fh2_mwpc_hity->GetYaxis()->SetTitle(fNameDet2 + "-Y [mm]");
     fh2_mwpc_hity->GetYaxis()->SetTitleOffset(1.1);
@@ -236,7 +211,7 @@ void R3BMwpcCorrelationOnlineSpectra::Reset_Histo()
     }
 }
 
-void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* option)
+void R3BMwpcCorrelationOnlineSpectra::Exec(Option_t* /*option*/)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -369,4 +344,4 @@ void R3BMwpcCorrelationOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BMwpcCorrelationOnlineSpectra);
+ClassImp(R3BMwpcCorrelationOnlineSpectra)
