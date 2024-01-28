@@ -180,6 +180,8 @@ class R3BLosOnlineSpectra : public FairTask
         fh_losTAMEX_vs_Events.resize(nDets);
         fh_losMCFD_vs_Events.resize(nDets);
         fh_los_vftx_tamex.resize(nDets);
+	fh_los_pmt_mult_VFTX.resize(nDets);
+	fh_los_pmt_mult_TAMEX.resize(nDets);
     }
 
     /**
@@ -268,6 +270,8 @@ class R3BLosOnlineSpectra : public FairTask
     std::vector<TH2F*> fh_losTAMEX_vs_Events;
     std::vector<TH2F*> fh_losMCFD_vs_Events;
     std::vector<TH1F*> fh_los_vftx_tamex;
+    std::vector<TH1F*> fh_los_pmt_mult_VFTX;
+    std::vector<TH1F*> fh_los_pmt_mult_TAMEX;
 
   public:
     ClassDef(R3BLosOnlineSpectra, 2)
