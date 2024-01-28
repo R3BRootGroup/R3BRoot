@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,14 +17,14 @@
 // -----         Fill tracking online histograms          -----
 // ------------------------------------------------------------
 
-#ifndef R3BIncomingTrackingOnlineSpectra_H
-#define R3BIncomingTrackingOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
-#include "TCutG.h"
-#include "TH1.h"
-#include "TH2F.h"
+#include <FairTask.h>
+#include <TCanvas.h>
+#include <TCutG.h>
+#include <TH1.h>
+#include <TH2F.h>
+#include <memory>
 
 class TClonesArray;
 class R3BEventHeader;
@@ -47,13 +47,13 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BIncomingTrackingOnlineSpectra(const TString& name, Int_t iVerbose = 1);
+    R3BIncomingTrackingOnlineSpectra(const TString& name, int iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BIncomingTrackingOnlineSpectra();
+    virtual ~R3BIncomingTrackingOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -61,32 +61,37 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
+
+    /**
+     * Methods to set the year configuration.
+     */
+    inline void SetYearConfiguration(uint16_t year = 2024) { fYearConf = year; }
 
     /**
      * Methods to clean histograms.
@@ -94,21 +99,24 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
     virtual void Reset_Histo();
 
   private:
-    TClonesArray* fMwpc0HitDataCA; /**< Array with Mwpc0 Hit-input data. >*/
-    TClonesArray* fMwpc1HitDataCA; /**< Array with Mwpc1 Hit-input data. >*/
-    TClonesArray* fFrsHitDataCA;   /**< Array with FRS Hit-input data. >*/
+    R3BEventHeader* fHeader = nullptr;
+    TClonesArray* fMwpc0HitDataCA = nullptr;
+    TClonesArray* fMwpc1HitDataCA = nullptr;
+    TClonesArray* fMwpc2HitDataCA = nullptr;
+    TClonesArray* fFrsHitDataCA = nullptr;
 
     // Parameters
-    R3BTGeoPar* fMw0GeoPar;
-    R3BTGeoPar* fTargetGeoPar;
-    R3BTGeoPar* fMw1GeoPar;
+    R3BTGeoPar* fTargetGeoPar = nullptr;
+    R3BTGeoPar* fMw0GeoPar = nullptr;
+    R3BTGeoPar* fMw1GeoPar = nullptr;
+    R3BTGeoPar* fMw2GeoPar = nullptr;
 
-    R3BEventHeader* header;
-    Int_t fNEvents;
-    Float_t fPosTarget;
-    Float_t fWidthTarget;
-    Float_t fDist_acelerator_glad;
-    TString fNameCut;
+    int fNEvents = 0;
+    uint16_t fYearConf = 2024;
+    float fPosTarget = 2576.0;
+    float fWidthTarget = 40.0;
+    float fDist_acelerator_glad = 3855.0;
+    TString fNameCut = "";
 
     // Canvas
     TCanvas* cTrackingXZ;
@@ -123,10 +131,8 @@ class R3BIncomingTrackingOnlineSpectra : public FairTask
     TH2F* fh2_ZvsBeta;
     TH2F* fh2_angvsposx;
     TH2F* fh2_angvsposy;
-    TCutG* fCutIncoming;
+    std::unique_ptr<TCutG> fCutIncoming = nullptr;
 
   public:
-    ClassDef(R3BIncomingTrackingOnlineSpectra, 1)
+    ClassDefOverride(R3BIncomingTrackingOnlineSpectra, 1)
 };
-
-#endif /* R3BIncomingTrackingOnlineSpectra_H */
