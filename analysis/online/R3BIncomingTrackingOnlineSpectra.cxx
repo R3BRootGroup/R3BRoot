@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -27,44 +27,38 @@
 #include "R3BLogger.h"
 #include "R3BMusicHitData.h"
 #include "R3BMwpcHitData.h"
+#include "R3BShared.h"
 #include "R3BTGeoPar.h"
 #include "R3BTwimHitData.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
-#include "TArrow.h"
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TLatex.h"
-#include "TLine.h"
-#include "TMath.h"
-#include "TRandom.h"
-#include "TVector3.h"
+#include <TArrow.h>
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TLatex.h>
+#include <TLine.h>
+#include <TMath.h>
+#include <TRandom.h>
+#include <TVector3.h>
+#include <cmath>
+#include <iostream>
 
 R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra()
     : R3BIncomingTrackingOnlineSpectra("IncomingTrackingOnlineSpectra", 1)
 {
 }
 
-R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString& name, Int_t iVerbose)
+R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString& name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fNEvents(0)
-    , fMwpc0HitDataCA(NULL)
-    , fMwpc1HitDataCA(NULL)
-    , fFrsHitDataCA(NULL)
-    , fDist_acelerator_glad(3855.0)
-    , fPosTarget(2773.0)
-    , fWidthTarget(40.0)
-    , fCutIncoming(NULL)
-    , fNameCut("")
 {
 }
 
@@ -74,38 +68,14 @@ R3BIncomingTrackingOnlineSpectra::R3BIncomingTrackingOnlineSpectra(const TString
                                                                    float aqmin,
                                                                    float aqmax)
     : FairTask("IncomingTrackingOnlineSpectra_" + name, 1)
-    , fNEvents(0)
-    , fMwpc0HitDataCA(NULL)
-    , fMwpc1HitDataCA(NULL)
-    , fFrsHitDataCA(NULL)
-    , fDist_acelerator_glad(3855.0)
-    , fPosTarget(2773.0)
-    , fWidthTarget(40.0)
     , fNameCut(name)
 {
-    fCutIncoming = new TCutG(name, 5);
+    fCutIncoming = std::make_unique<TCutG>(name, 5);
     fCutIncoming->SetPoint(0, zmin, aqmin);
     fCutIncoming->SetPoint(1, zmin, aqmax);
     fCutIncoming->SetPoint(2, zmax, aqmax);
     fCutIncoming->SetPoint(3, zmax, aqmin);
     fCutIncoming->SetPoint(4, zmin, aqmin);
-}
-
-R3BIncomingTrackingOnlineSpectra::~R3BIncomingTrackingOnlineSpectra()
-{
-    R3BLOG(debug1, "Destructor");
-    if (fMwpc0HitDataCA)
-    {
-        delete fMwpc0HitDataCA;
-    }
-    if (fMwpc1HitDataCA)
-    {
-        delete fMwpc1HitDataCA;
-    }
-    if (fFrsHitDataCA)
-    {
-        delete fFrsHitDataCA;
-    }
 }
 
 // -----   Public method SetParContainers   --------------------------------
@@ -123,6 +93,10 @@ void R3BIncomingTrackingOnlineSpectra::SetParContainers()
 
     fMw1GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc1GeoPar"));
     R3BLOG_IF(error, !fMw1GeoPar, "Could not get access to Mwpc1GeoPar container.");
+
+    fMw2GeoPar = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("Mwpc2GeoPar"));
+    R3BLOG_IF(error, !fMw2GeoPar, "Could not get access to Mwpc2GeoPar container.");
+
     return;
 }
 
@@ -137,28 +111,27 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
 {
     R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
 
     fMwpc0HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc0HitData"));
-    if (!fMwpc0HitDataCA)
+    if (fMwpc0HitDataCA == nullptr)
     {
         R3BLOG(fatal, "Mwpc0HitData not found");
         return kFATAL;
     }
 
     fMwpc1HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc1HitData"));
-    if (!fMwpc1HitDataCA)
+    if (fMwpc1HitDataCA == nullptr)
     {
         R3BLOG(fatal, "Mwpc1HitData not found");
         return kFATAL;
     }
 
+    fMwpc2HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc2HitData"));
+    R3BLOG_IF(error, fMwpc2HitDataCA == nullptr, "Mwpc2HitData not found");
+
     fFrsHitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
-    if (!fFrsHitDataCA)
-    {
-        R3BLOG(warning, "FrsData not found");
-        // return kFATAL;
-    }
+    R3BLOG_IF(warning, fFrsHitDataCA == nullptr, "FrsData not found");
 
     // Create histograms for detectors
     TString Name1;
@@ -171,7 +144,8 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     Name1 = "fh2_tracking_planeXZ" + fNameCut;
     Name2 = "Tracking (Lab.) plane XZ info " + fNameCut;
     Int_t histoYlim = 150;
-    fh2_tracking_planeXZ = new TH2F(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
+    fh2_tracking_planeXZ =
+        R3B::root_owned<TH2F>(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
     fh2_tracking_planeXZ->GetXaxis()->SetTitle("Beam direction-Z [mm]");
     fh2_tracking_planeXZ->GetYaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
     fh2_tracking_planeXZ->GetYaxis()->SetTitleOffset(1.1);
@@ -216,7 +190,8 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
         "Tracking_before_GLAD_YZ" + fNameCut, "Tracking (Lab.) plane YZ info " + fNameCut, 10, 10, 800, 700);
     Name1 = "fh2_tracking_planeYZ" + fNameCut;
     Name2 = "Tracking (Lab.) plane YZ info " + fNameCut;
-    fh2_tracking_planeYZ = new TH2F(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
+    fh2_tracking_planeYZ =
+        R3B::root_owned<TH2F>(Name1, Name2, 400, 0., fDist_acelerator_glad, 400, -1. * histoYlim, histoYlim);
     fh2_tracking_planeYZ->GetXaxis()->SetTitle("Beam direction-Z [mm]");
     fh2_tracking_planeYZ->GetYaxis()->SetTitle("Y [mm]");
     fh2_tracking_planeYZ->GetYaxis()->SetTitleOffset(1.1);
@@ -247,7 +222,7 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
         new TCanvas("Beam_profile_XY_at_target" + fNameCut, "Beam profile XY info " + fNameCut, 10, 10, 800, 700);
     Name1 = "fh2_beam_profile_XY" + fNameCut;
     Name2 = "Beam profile-XY (Lab.) at target position " + fNameCut;
-    fh2_target_PosXY = new TH2F(Name1, Name2, 200, -100., 100., 200, -100., 100.);
+    fh2_target_PosXY = R3B::root_owned<TH2F>(Name1, Name2, 200, -100., 100., 200, -100., 100.);
     fh2_target_PosXY->GetXaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
     fh2_target_PosXY->GetYaxis()->SetTitle("Y [mm]");
     fh2_target_PosXY->GetYaxis()->SetTitleOffset(1.1);
@@ -262,14 +237,14 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     // AngleX and positionX on the target position
     auto cAPX = new TCanvas(
         "AngleX_vs_positionX_target" + fNameCut, "Angle_XZ vs position X on target " + fNameCut, 10, 10, 800, 700);
-    fh2_angvsposx = new TH2F("AngXvsPosX" + fNameCut,
-                             "Angle vs position on target " + fNameCut,
-                             500,
-                             -fWidthTarget,
-                             fWidthTarget,
-                             500,
-                             -10.,
-                             10.);
+    fh2_angvsposx = R3B::root_owned<TH2F>("AngXvsPosX" + fNameCut,
+                                          "Angle vs position on target " + fNameCut,
+                                          500,
+                                          -fWidthTarget,
+                                          fWidthTarget,
+                                          500,
+                                          -10.,
+                                          10.);
     fh2_angvsposx->GetXaxis()->SetTitle("(Wixhausen)<---  X [mm]  ---> (Messel)");
     fh2_angvsposx->GetYaxis()->SetTitle("Angle plane_XZ [mrad]");
     fh2_angvsposx->GetYaxis()->SetTitleOffset(1.1);
@@ -285,14 +260,14 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     // AngleY and positionY on the target position
     auto cAPY = new TCanvas(
         "AngleY_vs_positionY_target" + fNameCut, "Angle_YZ vs position Y on target " + fNameCut, 10, 10, 800, 700);
-    fh2_angvsposy = new TH2F("AngYvsPosY" + fNameCut,
-                             "Angle vs position on target " + fNameCut,
-                             500,
-                             -fWidthTarget,
-                             fWidthTarget,
-                             500,
-                             -10.,
-                             10.);
+    fh2_angvsposy = R3B::root_owned<TH2F>("AngYvsPosY" + fNameCut,
+                                          "Angle vs position on target " + fNameCut,
+                                          500,
+                                          -fWidthTarget,
+                                          fWidthTarget,
+                                          500,
+                                          -10.,
+                                          10.);
     fh2_angvsposy->GetXaxis()->SetTitle("Y [mm]");
     fh2_angvsposy->GetYaxis()->SetTitle("Angle plane_YZ [mrad]");
     fh2_angvsposy->GetYaxis()->SetTitleOffset(1.1);
@@ -313,8 +288,8 @@ InitStatus R3BIncomingTrackingOnlineSpectra::Init()
     mainfol->Add(cAPX);
     mainfol->Add(cAPY);
 
-    FairRunOnline* run = FairRunOnline::Instance();
-    R3BLOG_IF(fatal, NULL == run, "FairRunOnline not found");
+    auto run = FairRunOnline::Instance();
+    R3BLOG_IF(fatal, run == nullptr, "FairRunOnline not found");
     run->GetHttpServer()->Register("", this);
     run->AddObject(mainfol);
 
@@ -335,10 +310,10 @@ void R3BIncomingTrackingOnlineSpectra::Reset_Histo()
     fh2_angvsposy->Reset();
 }
 
-void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
+void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    Double_t mwpc0x = -300., mwpc0y = -300., zrand = 0.;
-    Double_t xtarget = -500., ytarget = -500.;
+    double mwpc0x = -300., mwpc0y = -300., zrand = 0.;
+    double xtarget = -500., ytarget = -500.;
 
     if (fCutIncoming && fFrsHitDataCA)
     {
@@ -370,7 +345,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
         }
 
         // Fill Mwpc1 Hit data
-        if (fMwpc1HitDataCA && fMwpc1HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100.)
+        if (fMwpc1HitDataCA && fMwpc1HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100. && fYearConf == 2022)
         {
             nHits = fMwpc1HitDataCA->GetEntriesFast();
             Float_t mwpc1x = -150.;
@@ -384,23 +359,53 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* option)
                     continue;
                 mwpc1x = hit->GetX() + fMw1GeoPar->GetPosX() * 10.;
                 mwpc1y = hit->GetY() + fMw1GeoPar->GetPosY() * 10.;
-                // Float_t angX = (mwpc1x - mwpc0x) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
-                // Float_t angY = (mwpc1y - mwpc0y) / (fMw1GeoPar->GetPosZ() - fMw0GeoPar->GetPosZ()) / 10.;
                 angX = (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
                 angY = (mwpc0y - mwpc1y) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10.;
                 if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc1x > -150.)
                 {
                     zrand = gRandom->Uniform(0., fDist_acelerator_glad);
-                    // fh2_tracking_planeYZ->Fill(zrand, mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * zrand); //
-                    // mm ytarget = mwpc0y - angY * fMw0GeoPar->GetPosZ() * 10. + angY * fPosTarget;
-                    // fh2_tracking_planeXZ->Fill(zrand, mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * zrand); //
-                    // mm xtarget = mwpc0x - angX * fMw0GeoPar->GetPosZ() * 10. + angX * fPosTarget;
                     fh2_tracking_planeYZ->Fill(zrand, mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * zrand); // mm
                     ytarget = mwpc1y - angY * fMw1GeoPar->GetPosZ() * 10. + angY * fPosTarget;
                     fh2_tracking_planeXZ->Fill(zrand, mwpc1x - angX * fMw1GeoPar->GetPosZ() * 10. + angX * zrand); // mm
                     xtarget = mwpc1x - angX * fMw1GeoPar->GetPosZ() * 10. + angX * fPosTarget;
                 }
             }
+
+            if (xtarget > -500. && ytarget > -500.)
+            {
+                fh2_target_PosXY->Fill(xtarget, ytarget);
+                fh2_angvsposx->Fill(xtarget, angX * 1000.);
+                fh2_angvsposy->Fill(ytarget, angY * 1000.);
+            }
+        }
+
+        // Fill Mwpc2 Hit data
+        if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100. && fYearConf == 2024)
+        {
+            nHits = fMwpc2HitDataCA->GetEntriesFast();
+            Float_t mwpc2x = -150.;
+            Float_t mwpc2y = -150.;
+            Float_t angX = -500.;
+            Float_t angY = -500.;
+            for (int ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc2HitDataCA->At(ihit));
+                if (!hit)
+                    continue;
+                mwpc2x = hit->GetX() + fMw2GeoPar->GetPosX() * 10.;
+                mwpc2y = hit->GetY() + fMw2GeoPar->GetPosY() * 10.;
+                angX = std::atan((mwpc0x - mwpc2x) / (fMw0GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                angY = std::atan((mwpc0y - mwpc2y) / (fMw0GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc2x > -150.)
+                {
+                    zrand = gRandom->Uniform(0., fDist_acelerator_glad);
+                    fh2_tracking_planeYZ->Fill(zrand, mwpc2y - angY * fMw2GeoPar->GetPosZ() * 10. + angY * zrand); // mm
+                    ytarget = mwpc2y - angY * fMw2GeoPar->GetPosZ() * 10. + angY * fPosTarget;
+                    fh2_tracking_planeXZ->Fill(zrand, mwpc2x - angX * fMw2GeoPar->GetPosZ() * 10. + angX * zrand); // mm
+                    xtarget = mwpc2x - angX * fMw2GeoPar->GetPosZ() * 10. + angX * fPosTarget;
+                }
+            }
+
             if (xtarget > -500. && ytarget > -500.)
             {
                 fh2_target_PosXY->Fill(xtarget, ytarget);
@@ -443,4 +448,4 @@ void R3BIncomingTrackingOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BIncomingTrackingOnlineSpectra);
+ClassImp(R3BIncomingTrackingOnlineSpectra)
