@@ -135,6 +135,8 @@ roluData/R3BRoluCalData.cxx
 roluData/R3BRoluHitData.cxx
 frssciData/R3BFrsSciMappedData.cxx
 frssciData/R3BFrsSciTcalData.cxx
+frssciData/R3BFrsSciPosCalData.cxx
+frssciData/R3BFrsSciTofCalData.cxx
 sci2Data/R3BSci2MappedData.cxx
 sci2Data/R3BSci2TcalData.cxx
 sci2Data/R3BSci2CalData.cxx
