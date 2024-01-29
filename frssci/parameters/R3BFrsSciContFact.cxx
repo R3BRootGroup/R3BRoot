@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BFrsSciContFact.h"
+#include "R3BFrsSciCalPar.h"
 #include "R3BFrsSciTcalPar.h"
 
 #include <FairLogger.h>
@@ -41,6 +42,13 @@ void R3BFrsSciContFact::setAllContainers()
         "FrsSciTcalPar", "FrsSci Tcal parameters for VFTX time calibration in ns", "FrsSciTcalParContext");
     p1->addContext("FrsSciTcalParContext");
     containers->Add(p1);
+
+    FairContainer* p2 =
+        new FairContainer("FrsSciCalPar",
+                          "FrsSci Cal parameters: multi hit to single hit + params for position and Tofs",
+                          "FrsSciCalParContext");
+    p2->addContext("FrsSciCalParContext");
+    containers->Add(p2);
 }
 
 FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
@@ -55,6 +63,11 @@ FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
     if (strcmp(name, "FrsSciTcalPar") == 0)
     {
         p = new R3BFrsSciTcalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    return p;
+    if (strcmp(name, "FrsSciCalPar") == 0)
+    {
+        p = new R3BFrsSciCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
