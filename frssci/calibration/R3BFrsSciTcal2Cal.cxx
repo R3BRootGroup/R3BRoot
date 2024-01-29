@@ -146,7 +146,6 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
     // Variables to read the Tcal data
     UShort_t nDets = (UShort_t)fCalPar->GetNumDets();
     UShort_t nPmts = (UShort_t)fCalPar->GetNumPmts();
-    UShort_t nTofs = (UShort_t)fCalPar->GetNumTofs();
     UShort_t iDet;
     UShort_t iPmt;
     Double_t iTraw[nDets * nPmts][64]; // 64 hits max per VFTX channel
@@ -156,6 +155,10 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
     for (UShort_t i = 0; i < nDets * nPmts; i++)
     {
         mult[i] = 0;
+        for (UShort_t j = 0; j < 64; j++)
+        {
+            iTraw[i][j] = 0;
+        }
     }
 
     // Loop over the entries of the Tcal TClonesArray
@@ -213,8 +216,8 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
     {
         // Variables to fill PosCal and TofCal data
         Double_t iRawTimeSta = -1., iRawTimeSto = -1.;
-        Float_t iRawPosSta = -10000., iCalPosSta = -10000.;
-        Float_t iRawPosSto = -10000., iCalPosSto = -10000.;
+        Float_t iRawPosSta = -10000.;
+        Float_t iRawPosSto = -10000.;
         Double_t iRawTof = -1., iCalTof = -1, iBeta = -1, iCalVelo = -1.;
         Int_t selectLeftHit[nDets];
         Int_t selectRightHit[nDets];
@@ -275,7 +278,7 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
 
                                 if (dSta > 0)
                                 {
-                                    for (Int_t d = dSta; d < nDets - 1; dSta++)
+                                    for (Int_t d = dSta; d < nDets - 1; d++)
                                     {
                                         if (selectLeftHit_dSto[d] != selectLeftHit_dSto[d - 1])
                                             selectSameHit = kFALSE;
