@@ -342,9 +342,8 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
                 iRawTof = iRawTime[dSto] - iRawTime[dSta] + iTraw[dSta * nPmts + 2][0] - iTraw[dSto * nPmts + 2][0];
 
                 // Cal Tof
-                iCalVelo =
-                    1. / (fCalPar->GetTof2InvVOffsetAtRank(rank) + fCalPar->GetTof2InvVGainAtRank(rank) * iRawTof);
-                iCalTof = fCalPar->GetFlightLengthAtRank(rank) / iCalVelo;
+                iCalVelo = 1. / (fCalPar->GetTofCalOffsetAtRank(rank) + fCalPar->GetTofCalGainAtRank(rank) * iRawTof);
+                iCalTof = 1. / (fCalPar->GetTofCalGainAtRank(rank) * iCalVelo);
 
                 // Beta
                 iBeta = iCalVelo / (Double_t)SPEED_OF_LIGHT_MNS;
