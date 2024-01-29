@@ -16,6 +16,7 @@ class R3BFrsSciTofCalData : public TObject
     virtual ~R3BFrsSciTofCalData() {}
 
     // Getters
+    inline const UShort_t& GetRank() const { return fRank; }
     inline const UShort_t& GetDetIdSta() const { return fDetIdSta; }
     inline const UShort_t& GetDetIdSto() const { return fDetIdSto; }
     inline const Float_t& GetCalPosStaMm() const { return fCalPosStaMm; }

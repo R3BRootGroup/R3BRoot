@@ -25,7 +25,9 @@
 
 #include "R3BEventHeader.h"
 #include "R3BFrsSciMappedData.h"
+#include "R3BFrsSciPosCalData.h"
 #include "R3BFrsSciTcalData.h"
+#include "R3BFrsSciTofCalData.h"
 #include "R3BOnlineSpectraFrsSci.h"
 
 R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci()
@@ -37,6 +39,8 @@ R3BOnlineSpectraFrsSci::R3BOnlineSpectraFrsSci(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMapped(NULL)
     , fTcal(NULL)
+    , fPosCal(NULL)
+    , fTofCal(NULL)
     , fNEvents(0)
     , fNbDets(3)
     , fNbPmts(3)
@@ -51,6 +55,10 @@ R3BOnlineSpectraFrsSci::~R3BOnlineSpectraFrsSci()
         delete fMapped;
     if (fTcal)
         delete fTcal;
+    if (fPosCal)
+        delete fPosCal;
+    if (fTofCal)
+        delete fTofCal;
 }
 
 InitStatus R3BOnlineSpectraFrsSci::Init()
@@ -89,20 +97,20 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     // === declare and create TCanvas and Histogram === //
 
     sprintf(Name1, "MapFinetime");
-    cMapFT = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cMapFT->Divide(fNbPmts, fNbDets);
-    fh1_finetime = new TH1I*[fNbDets * fNbPmts];
+    cMap_FT = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cMap_FT->Divide(fNbPmts, fNbDets);
+    fh1_Map_finetime = new TH1I*[fNbDets * fNbPmts];
 
     sprintf(Name1, "MapMult1D");
-    cMapMult1D = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cMapMult1D->Divide(fNbPmts, fNbDets);
-    fh1_multMap = new TH1I*[fNbDets * fNbPmts];
+    cMap_Mult1D = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cMap_Mult1D->Divide(fNbPmts, fNbDets);
+    fh1_Map_mult = new TH1I*[fNbDets * fNbPmts];
 
     sprintf(Name1, "MapMult2D");
-    cMapMult2D = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cMapMult2D->Divide(2, fNbDets);
-    fh2_multMap = new TH2I*[fNbDets];
-    fh2_multMap_RvsL = new TH2I*[fNbDets];
+    cMap_Mult2D = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cMap_Mult2D->Divide(2, fNbDets);
+    fh2_Map_mult = new TH2I*[fNbDets];
+    fh2_Map_multRvsL = new TH2I*[fNbDets];
 
     for (UShort_t i = 0; i < fNbDets; i++)
     {
@@ -110,17 +118,17 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         {
             // === TH1F: fine time === //
             sprintf(Name1, "FrsSci%i_FineTimePmt%i", i + 1, j + 1);
-            fh1_finetime[i * fNbPmts + j] = new TH1I(Name1, Name1, 1000, 0, 1000);
-            fh1_finetime[i * fNbPmts + j]->GetXaxis()->SetTitle("Fine time");
-            fh1_finetime[i * fNbPmts + j]->GetYaxis()->SetTitle("Counts per bin");
-            fh1_finetime[i * fNbPmts + j]->GetXaxis()->CenterTitle(true);
-            fh1_finetime[i * fNbPmts + j]->GetYaxis()->CenterTitle(true);
-            fh1_finetime[i * fNbPmts + j]->GetXaxis()->SetLabelSize(0.05);
-            fh1_finetime[i * fNbPmts + j]->GetXaxis()->SetTitleSize(0.05);
-            fh1_finetime[i * fNbPmts + j]->GetYaxis()->SetLabelSize(0.05);
-            fh1_finetime[i * fNbPmts + j]->GetYaxis()->SetTitleSize(0.05);
-            cMapFT->cd(i * fNbPmts + j + 1);
-            fh1_finetime[i * fNbPmts + j]->Draw("");
+            fh1_Map_finetime[i * fNbPmts + j] = new TH1I(Name1, Name1, 1000, 0, 1000);
+            fh1_Map_finetime[i * fNbPmts + j]->GetXaxis()->SetTitle("Fine time");
+            fh1_Map_finetime[i * fNbPmts + j]->GetYaxis()->SetTitle("Counts per bin");
+            fh1_Map_finetime[i * fNbPmts + j]->GetXaxis()->CenterTitle(true);
+            fh1_Map_finetime[i * fNbPmts + j]->GetYaxis()->CenterTitle(true);
+            fh1_Map_finetime[i * fNbPmts + j]->GetXaxis()->SetLabelSize(0.05);
+            fh1_Map_finetime[i * fNbPmts + j]->GetXaxis()->SetTitleSize(0.05);
+            fh1_Map_finetime[i * fNbPmts + j]->GetYaxis()->SetLabelSize(0.05);
+            fh1_Map_finetime[i * fNbPmts + j]->GetYaxis()->SetTitleSize(0.05);
+            cMap_FT->cd(i * fNbPmts + j + 1);
+            fh1_Map_finetime[i * fNbPmts + j]->Draw("");
 
             // === TH1I: 1D-mult at map level === //
             sprintf(Name1, "FrsSci%i_Pmt%i_MultPerEvent_Mapped", i + 1, j + 1);
@@ -128,49 +136,49 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     "FrsSci%i_Pmt%i_MultPerEvent_Mapped (blue no condition on TPAT, red condition on TPAT = 1 or 2)",
                     i + 1,
                     j + 1);
-            fh1_multMap[i * fNbPmts + j] = new TH1I(Name1, Name1, 70, -0.5, 69.5);
-            fh1_multMap[i * fNbPmts + j]->GetXaxis()->SetTitle("Multiplicity per event");
-            fh1_multMap[i * fNbPmts + j]->GetYaxis()->SetTitle("Counts");
-            fh1_multMap[i * fNbPmts + j]->GetXaxis()->CenterTitle(true);
-            fh1_multMap[i * fNbPmts + j]->GetYaxis()->CenterTitle(true);
-            fh1_multMap[i * fNbPmts + j]->GetXaxis()->SetLabelSize(0.05);
-            fh1_multMap[i * fNbPmts + j]->GetXaxis()->SetTitleSize(0.05);
-            fh1_multMap[i * fNbPmts + j]->GetYaxis()->SetLabelSize(0.05);
-            fh1_multMap[i * fNbPmts + j]->GetYaxis()->SetTitleSize(0.05);
-            fh1_multMap[i * fNbPmts + j]->SetLineWidth(2);
-            fh1_multMap[i * fNbPmts + j]->SetLineColor(kBlue);
-            cMapMult1D->cd(i * fNbPmts + j + 1);
+            fh1_Map_mult[i * fNbPmts + j] = new TH1I(Name1, Name1, 70, -0.5, 69.5);
+            fh1_Map_mult[i * fNbPmts + j]->GetXaxis()->SetTitle("Multiplicity per event");
+            fh1_Map_mult[i * fNbPmts + j]->GetYaxis()->SetTitle("Counts");
+            fh1_Map_mult[i * fNbPmts + j]->GetXaxis()->CenterTitle(true);
+            fh1_Map_mult[i * fNbPmts + j]->GetYaxis()->CenterTitle(true);
+            fh1_Map_mult[i * fNbPmts + j]->GetXaxis()->SetLabelSize(0.05);
+            fh1_Map_mult[i * fNbPmts + j]->GetXaxis()->SetTitleSize(0.05);
+            fh1_Map_mult[i * fNbPmts + j]->GetYaxis()->SetLabelSize(0.05);
+            fh1_Map_mult[i * fNbPmts + j]->GetYaxis()->SetTitleSize(0.05);
+            fh1_Map_mult[i * fNbPmts + j]->SetLineWidth(2);
+            fh1_Map_mult[i * fNbPmts + j]->SetLineColor(kBlue);
+            cMap_Mult1D->cd(i * fNbPmts + j + 1);
             gPad->SetLogy();
-            fh1_multMap[i * fNbPmts + j]->Draw("");
+            fh1_Map_mult[i * fNbPmts + j]->Draw("");
         }
 
         // === TH1F: multiplicity per event and channel at mapped level === //
         sprintf(Name1, "FrsSci%i_MultPerEvent", i + 1);
-        fh2_multMap[i] = new TH2I(Name1, Name1, fNbPmts + 1, -0.5, fNbPmts + 0.5, 20, -0.5, 19.5);
-        fh2_multMap[i]->GetXaxis()->SetTitle("channel: 1=PMT R,    2=PMT L,    3=COMMON REF");
-        fh2_multMap[i]->GetYaxis()->SetTitle("multiplicity per event");
-        fh2_multMap[i]->GetXaxis()->CenterTitle(true);
-        fh2_multMap[i]->GetYaxis()->CenterTitle(true);
-        fh2_multMap[i]->GetXaxis()->SetLabelSize(0.05);
-        fh2_multMap[i]->GetXaxis()->SetTitleSize(0.05);
-        fh2_multMap[i]->GetYaxis()->SetLabelSize(0.05);
-        fh2_multMap[i]->GetYaxis()->SetTitleSize(0.05);
-        cMapMult2D->cd(i * 2 + 1);
-        fh2_multMap[i]->Draw("COL");
+        fh2_Map_mult[i] = new TH2I(Name1, Name1, fNbPmts + 1, -0.5, fNbPmts + 0.5, 20, -0.5, 19.5);
+        fh2_Map_mult[i]->GetXaxis()->SetTitle("channel: 1=PMT R,    2=PMT L,    3=COMMON REF");
+        fh2_Map_mult[i]->GetYaxis()->SetTitle("multiplicity per event");
+        fh2_Map_mult[i]->GetXaxis()->CenterTitle(true);
+        fh2_Map_mult[i]->GetYaxis()->CenterTitle(true);
+        fh2_Map_mult[i]->GetXaxis()->SetLabelSize(0.05);
+        fh2_Map_mult[i]->GetXaxis()->SetTitleSize(0.05);
+        fh2_Map_mult[i]->GetYaxis()->SetLabelSize(0.05);
+        fh2_Map_mult[i]->GetYaxis()->SetTitleSize(0.05);
+        cMap_Mult2D->cd(i * 2 + 1);
+        fh2_Map_mult[i]->Draw("COL");
 
         // === TH1F: multiplicity per event and channel at mapped level === //
         sprintf(Name1, "FrsSci%i_MultPerEvent_RvsL", i + 1);
-        fh2_multMap_RvsL[i] = new TH2I(Name1, Name1, 40, -1.5, 38.5, 40, -1.5, 38.5);
-        fh2_multMap_RvsL[i]->GetXaxis()->SetTitle("Multiplicity per event on the Left Pmt");
-        fh2_multMap_RvsL[i]->GetYaxis()->SetTitle("Multiplicity per event on the Right Pmt");
-        fh2_multMap_RvsL[i]->GetXaxis()->CenterTitle(true);
-        fh2_multMap_RvsL[i]->GetYaxis()->CenterTitle(true);
-        fh2_multMap_RvsL[i]->GetXaxis()->SetLabelSize(0.05);
-        fh2_multMap_RvsL[i]->GetXaxis()->SetTitleSize(0.05);
-        fh2_multMap_RvsL[i]->GetYaxis()->SetLabelSize(0.05);
-        fh2_multMap_RvsL[i]->GetYaxis()->SetTitleSize(0.05);
-        cMapMult2D->cd(i * 2 + 2);
-        fh2_multMap_RvsL[i]->Draw("COL");
+        fh2_Map_multRvsL[i] = new TH2I(Name1, Name1, 40, -1.5, 38.5, 40, -1.5, 38.5);
+        fh2_Map_multRvsL[i]->GetXaxis()->SetTitle("Multiplicity per event on the Left Pmt");
+        fh2_Map_multRvsL[i]->GetYaxis()->SetTitle("Multiplicity per event on the Right Pmt");
+        fh2_Map_multRvsL[i]->GetXaxis()->CenterTitle(true);
+        fh2_Map_multRvsL[i]->GetYaxis()->CenterTitle(true);
+        fh2_Map_multRvsL[i]->GetXaxis()->SetLabelSize(0.05);
+        fh2_Map_multRvsL[i]->GetXaxis()->SetTitleSize(0.05);
+        fh2_Map_multRvsL[i]->GetYaxis()->SetLabelSize(0.05);
+        fh2_Map_multRvsL[i]->GetYaxis()->SetTitleSize(0.05);
+        cMap_Mult2D->cd(i * 2 + 2);
+        fh2_Map_multRvsL[i]->Draw("COL");
 
     } // end of loop over fNbDets
 
@@ -188,31 +196,31 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
 
     // === declare and create TCanvas and Histogram === //
 
-    sprintf(Name1, "TcalPosRaw_1Hit");
-    cTcalPos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cTcalPos->Divide(1, fNbDets);
-    fh1_PosRawTcal1Hit = new TH1D*[fNbDets * fNbPmts];
+    sprintf(Name1, "Tcal1Hit_PosRaw");
+    cTcal_Pos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cTcal_Pos->Divide(1, fNbDets);
+    fh1_Tcal1Hit_PosRaw = new TH1D*[fNbDets];
 
-    sprintf(Name1, "TcalTofRaw_1Hit");
-    cTcalTof = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cTcalTof->Divide(1, fNbTofs);
-    fh1_TofRawTcal1Hit = new TH1D*[fNbTofs];
+    sprintf(Name1, "Tcal1Hit_TofRaw");
+    cTcal_Tof = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cTcal_Tof->Divide(1, fNbTofs);
+    fh1_Tcal1Hit_TofRaw = new TH1D*[fNbTofs];
 
     for (UShort_t i = 0; i < fNbDets; i++)
     {
         // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
         sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
-        fh1_PosRawTcal1Hit[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
-        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
-        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetTitle("number of counts with mult1");
-        fh1_PosRawTcal1Hit[i]->GetXaxis()->CenterTitle(true);
-        fh1_PosRawTcal1Hit[i]->GetYaxis()->CenterTitle(true);
-        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetLabelSize(0.05);
-        fh1_PosRawTcal1Hit[i]->GetXaxis()->SetTitleSize(0.05);
-        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetLabelSize(0.05);
-        fh1_PosRawTcal1Hit[i]->GetYaxis()->SetTitleSize(0.05);
-        cTcalPos->cd(i + 1);
-        fh1_PosRawTcal1Hit[i]->Draw();
+        fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
+        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
+        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
+        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
+        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->CenterTitle(true);
+        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
+        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
+        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
+        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
+        cTcal_Pos->cd(i + 1);
+        fh1_Tcal1Hit_PosRaw[i]->Draw();
     }
 
     if (fNbTofs > 0)
@@ -223,17 +231,149 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
             {
                 sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
-                fh1_TofRawTcal1Hit[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
-                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
-                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
-                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->CenterTitle(true);
-                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->CenterTitle(true);
-                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetLabelSize(0.05);
-                fh1_TofRawTcal1Hit[cpt]->GetXaxis()->SetTitleSize(0.05);
-                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetLabelSize(0.05);
-                fh1_TofRawTcal1Hit[cpt]->GetYaxis()->SetTitleSize(0.05);
-                cTcalTof->cd(cpt + 1);
-                fh1_TofRawTcal1Hit[cpt]->Draw();
+                fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
+                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
+                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
+                cTcal_Tof->cd(cpt + 1);
+                fh1_Tcal1Hit_TofRaw[cpt]->Draw();
+                cpt++;
+            }
+        }
+    }
+
+    // --- ------------ --- //
+    // --- CAL LEVELS --- //
+    // --- ------------ --- //
+
+    // === get access to pos cal data ===//
+    fPosCal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciPosCalData"));
+    if (!fPosCal)
+    {
+        LOG(fatal) << "FrsSciPosCal not found";
+        return (kFATAL);
+    }
+
+    // === get access to tof cal data ===//
+    fTofCal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTofCalData"));
+    if (!fTofCal)
+    {
+        LOG(fatal) << "FrsSciTofCal not found";
+        return (kFATAL);
+    }
+
+    // === declare and create TCanvas and Histogram === //
+
+    sprintf(Name1, "Cal_PosRaw");
+    cCal_PosRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cCal_PosRaw->Divide(1, fNbDets);
+    fh1_Cal_PosRaw = new TH1D*[fNbDets];
+
+    sprintf(Name1, "Cal_PosCal");
+    cCal_PosCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cCal_PosCal->Divide(1, fNbDets);
+    fh1_Cal_PosCal = new TH1D*[fNbDets];
+
+    sprintf(Name1, "Cal_TofRaw");
+    cCal_TofRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cCal_TofRaw->Divide(1, fNbTofs);
+    fh1_Cal_TofRaw = new TH1D*[fNbTofs];
+
+    sprintf(Name1, "Cal_TofCal");
+    cCal_TofCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cCal_TofCal->Divide(1, fNbTofs);
+    fh1_Cal_TofRaw = new TH1D*[fNbTofs];
+
+    sprintf(Name1, "Cal_Beta");
+    cCal_Beta = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+    cCal_Beta->Divide(1, fNbTofs);
+    fh1_Cal_Beta = new TH1D*[fNbTofs];
+
+    for (UShort_t i = 0; i < fNbDets; i++)
+    {
+        // === TH1F: Raw Position in Ns at Cal level=== //
+        sprintf(Name1, "FrsSci%i_PosRaw", i + 1);
+        fh1_Cal_PosRaw[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
+        fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns]");
+        fh1_Cal_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
+        fh1_Cal_PosRaw[i]->GetXaxis()->CenterTitle(true);
+        fh1_Cal_PosRaw[i]->GetYaxis()->CenterTitle(true);
+        fh1_Cal_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
+        fh1_Cal_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
+        fh1_Cal_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
+        fh1_Cal_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
+        cCal_PosRaw->cd(i + 1);
+        fh1_Cal_PosRaw[i]->SetLineColor(kRed);
+        fh1_Cal_PosRaw[i]->Draw();
+        fh1_Tcal1Hit_PosRaw[i]->Draw("same");
+
+        // === TH1F: calibrated Position in Ns at Cal level=== //
+        sprintf(Name1, "FrsSci%i_PosCal", i + 1);
+        fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 3000, -150, 150);
+        fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Positon [mm]");
+        fh1_Cal_PosCal[i]->GetYaxis()->SetTitle("number of counts");
+        fh1_Cal_PosCal[i]->GetXaxis()->CenterTitle(true);
+        fh1_Cal_PosCal[i]->GetYaxis()->CenterTitle(true);
+        fh1_Cal_PosCal[i]->GetXaxis()->SetLabelSize(0.05);
+        fh1_Cal_PosCal[i]->GetXaxis()->SetTitleSize(0.05);
+        fh1_Cal_PosCal[i]->GetYaxis()->SetLabelSize(0.05);
+        fh1_Cal_PosCal[i]->GetYaxis()->SetTitleSize(0.05);
+        cCal_PosCal->cd(i + 1);
+        fh1_Cal_PosRaw[i]->Draw();
+    }
+
+    if (fNbTofs > 0)
+    {
+        UShort_t cpt = 0;
+        for (UShort_t sta = 1; sta < fNbDets; sta++)
+        {
+            for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+            {
+                sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i", sta, sto);
+                fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
+                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
+                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
+                fh1_Cal_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
+                fh1_Cal_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
+                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
+                cCal_TofRaw->cd(cpt + 1);
+                fh1_Cal_TofRaw[cpt]->SetLineColor(kRed);
+                fh1_Cal_TofRaw[cpt]->Draw();
+                fh1_Tcal1Hit_TofRaw[cpt]->Draw("same");
+
+                sprintf(Name1, "TofCal_FrsSci%i_to_FrsSci%i", sta, sto);
+                fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 25000, 500, 3000.);
+                fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitle("calibrated Tof [ns]");
+                fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitle("number of counts");
+                fh1_Cal_TofCal[cpt]->GetXaxis()->CenterTitle(true);
+                fh1_Cal_TofCal[cpt]->GetYaxis()->CenterTitle(true);
+                fh1_Cal_TofCal[cpt]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Cal_TofCal[cpt]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitleSize(0.05);
+                cCal_TofCal->cd(cpt + 1);
+                fh1_Cal_TofRaw[cpt]->Draw();
+
+                sprintf(Name1, "Beta_FrsSci%i_to_FrsSci%i", sta, sto);
+                fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 5000, 0.5, 1.);
+                fh1_Cal_Beta[cpt]->GetXaxis()->SetTitle("Beta");
+                fh1_Cal_Beta[cpt]->GetYaxis()->SetTitle("number of counts");
+                fh1_Cal_Beta[cpt]->GetXaxis()->CenterTitle(true);
+                fh1_Cal_Beta[cpt]->GetYaxis()->CenterTitle(true);
+                fh1_Cal_Beta[cpt]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Cal_Beta[cpt]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Cal_Beta[cpt]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Cal_Beta[cpt]->GetYaxis()->SetTitleSize(0.05);
+                cCal_Beta->cd(cpt + 1);
+                fh1_Cal_Beta[cpt]->Draw();
                 cpt++;
             }
         }
@@ -243,16 +383,24 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     // --- MAIN FOLDER-Sci --- //
     // --- --------------- --- //
     TFolder* mainfolMap = new TFolder("FrsSciMap", "FrsSci Map info");
-    mainfolMap->Add(cMapFT);
-    mainfolMap->Add(cMapMult1D);
-    mainfolMap->Add(cMapMult2D);
+    mainfolMap->Add(cMap_FT);
+    mainfolMap->Add(cMap_Mult1D);
+    mainfolMap->Add(cMap_Mult2D);
 
     TFolder* mainfolTcal = new TFolder("FrsSciTcal", "FrsSci Tcal info");
-    mainfolTcal->Add(cTcalPos);
-    mainfolTcal->Add(cTcalTof);
+    mainfolTcal->Add(cTcal_Pos);
+    mainfolTcal->Add(cTcal_Tof);
+
+    TFolder* mainfolCal = new TFolder("FrsSciCal", "FrsSci Cal info");
+    mainfolCal->Add(cCal_PosRaw);
+    mainfolCal->Add(cCal_PosCal);
+    mainfolCal->Add(cCal_TofRaw);
+    mainfolCal->Add(cCal_TofCal);
+    mainfolCal->Add(cCal_Beta);
 
     run->AddObject(mainfolMap);
     run->AddObject(mainfolTcal);
+    run->AddObject(mainfolCal);
 
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_FRSSCI_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
@@ -265,22 +413,27 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
     LOG(info) << "R3BOnlineSpectraFrsSci::Reset_Histo";
     for (UShort_t i = 0; i < fNbDets; i++)
     {
-        fh2_multMap[i]->Reset();
-        fh2_multMap_RvsL[i]->Reset();
+        fh2_Map_mult[i]->Reset();
+        fh2_Map_multRvsL[i]->Reset();
 
         // === FINE TIME === //
         for (UShort_t j = 0; j < fNbPmts; j++)
         {
-            fh1_finetime[i * fNbPmts + j]->Reset();
-            fh1_multMap[i * fNbPmts + j]->Reset();
+            fh1_Map_finetime[i * fNbPmts + j]->Reset();
+            fh1_Map_mult[i * fNbPmts + j]->Reset();
         }
 
-        fh1_PosRawTcal1Hit[i]->Reset();
+        fh1_Tcal1Hit_PosRaw[i]->Reset();
+        fh1_Cal_PosRaw[i]->Reset();
+        fh1_Cal_PosCal[i]->Reset();
     }
 
     for (UShort_t i = 0; i < fNbTofs; i++)
     {
-        fh1_TofRawTcal1Hit[i]->Reset();
+        fh1_Tcal1Hit_TofRaw[i]->Reset();
+        fh1_Cal_TofRaw[i]->Reset();
+        fh1_Cal_TofCal[i]->Reset();
+        fh1_Cal_Beta[i]->Reset();
     }
 }
 
@@ -293,8 +446,9 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
         LOG(fatal) << "R3BOnlineSpectraFrsSci::Exec FairRootManager not found";
     }
     UInt_t nHits;
-    UShort_t iDet; // 0-based
-    UShort_t iPmt; // 0-based
+    UShort_t iDet;  // 0-based
+    UShort_t iPmt;  // 0-based
+    UShort_t iRank; // 0-based
     UShort_t cpt;
 
     UInt_t multMap[fNbDets * fNbPmts];
@@ -326,7 +480,7 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                 iDet = hitmapped->GetDetector() - 1;
                 iPmt = hitmapped->GetPmt() - 1;
                 multMap[iDet * fNbPmts + iPmt]++;
-                fh1_finetime[iDet * fNbPmts + iPmt]->Fill(hitmapped->GetTimeFine());
+                fh1_Map_finetime[iDet * fNbPmts + iPmt]->Fill(hitmapped->GetTimeFine());
             } // end of loop over mapped data
 
             // --- ----------------------------------------- --- //
@@ -335,12 +489,12 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
             for (UShort_t i = 0; i < fNbDets; i++)
             {
                 if (fNbPmts > 1)
-                    fh2_multMap_RvsL[i]->Fill(multMap[i * fNbPmts + 1], multMap[i * fNbPmts]);
+                    fh2_Map_multRvsL[i]->Fill(multMap[i * fNbPmts + 1], multMap[i * fNbPmts]);
 
                 for (UShort_t j = 0; j < fNbPmts; j++)
                 {
-                    fh1_multMap[i * fNbPmts + j]->Fill(multMap[i * fNbPmts + j]);
-                    fh2_multMap[i]->Fill(j + 1, multMap[i * fNbPmts + j]);
+                    fh1_Map_mult[i * fNbPmts + j]->Fill(multMap[i * fNbPmts + j]);
+                    fh2_Map_mult[i]->Fill(j + 1, multMap[i * fNbPmts + j]);
                 }
             }
 
@@ -374,7 +528,7 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                     for (UShort_t i = 0; i < fNbDets; i++)
                     {
                         if (multTcal[i * fNbPmts] == 1 && multTcal[i * fNbPmts + 1] == 1)
-                            fh1_PosRawTcal1Hit[i]->Fill(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]);
+                            fh1_Tcal1Hit_PosRaw[i]->Fill(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]);
                     }
                     // TofRaw [ns] relatively to Tref
                     if (fNbPmts > 2 && fNbDets > 1 && fNbTofs > 0)
@@ -388,7 +542,7 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                                     multTcal[sta * fNbPmts + 2] == 1 && multTcal[sto * fNbPmts] == 1 &&
                                     multTcal[sto * fNbPmts + 1] == 1 && multTcal[sto * fNbPmts + 2] == 1)
                                 {
-                                    fh1_TofRawTcal1Hit[cpt]->Fill(
+                                    fh1_Tcal1Hit_TofRaw[cpt]->Fill(
                                         0.5 * (Traw[sto * fNbPmts] + Traw[sto * fNbPmts + 1]) -
                                         Traw[sto * fNbPmts + 2] -
                                         0.5 * (Traw[sta + fNbPmts] + Traw[sta * fNbPmts + 1]) +
@@ -400,11 +554,57 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                     }
                 }
             } // --- end of if Tcal->GetEntries() >0 --- //
-        }     // end of if fTcal
+
+            // --- ---------------------------- --- //
+            // --- read cal data and fill histo --- //
+            // --- ---------------------------- --- //
+            if (fPosCal)
+            {
+                if (fPosCal->GetEntriesFast() > 0)
+                {
+                    // --- ---------------- --- //
+                    // --- read poscal data --- //
+                    // --- ---------------- --- //
+                    nHits = fPosCal->GetEntriesFast();
+                    for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                    {
+                        R3BFrsSciPosCalData* hitposcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCal->At(ihit));
+                        if (!hitposcal)
+                            continue;
+                        iDet = hitposcal->GetDetector() - 1;
+                        fh1_Cal_PosRaw[iDet]->Fill(hitposcal->GetRawPosNs());
+                        fh1_Cal_PosCal[iDet]->Fill(hitposcal->GetCalPosMm());
+                    } // end of loop over pos cal data
+                }     // --- end of if fPosCal->GetEntries() >0 --- //
+            }         // end of if fPosCal
+            if (fTofCal)
+            {
+                if (fTofCal->GetEntriesFast() > 0)
+                {
+                    // --- ---------------- --- //
+                    // --- read tofcal data --- //
+                    // --- ---------------- --- //
+                    nHits = fTofCal->GetEntriesFast();
+                    for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                    {
+                        R3BFrsSciTofCalData* hittofcal = dynamic_cast<R3BFrsSciTofCalData*>(fTofCal->At(ihit));
+                        if (!hittofcal)
+                            continue;
+                        iRank = hittofcal->GetRank() - 1;
+                        fh1_Cal_TofRaw[iRank]->Fill(hittofcal->GetRawTofNs());
+                        fh1_Cal_TofCal[iRank]->Fill(hittofcal->GetCalTofNs());
+                        fh1_Cal_Beta[iRank]->Fill(hittofcal->GetBeta());
+                    } // end of loop over tof cal data
+                }     // --- end of if fTofCal->GetEntries() >0 --- //
+            }         // end of if fTofCal
+
+        } // end of if Tcal
 
         fNEvents++;
+
     } // end of if fMapped
 }
+
 // -----   Public method Finish   -----------------------------------------------
 void R3BOnlineSpectraFrsSci::FinishEvent()
 {
@@ -416,6 +616,14 @@ void R3BOnlineSpectraFrsSci::FinishEvent()
     {
         fTcal->Clear();
     }
+    if (fPosCal)
+    {
+        fPosCal->Clear();
+    }
+    if (fTofCal)
+    {
+        fTofCal->Clear();
+    }
 }
 
 void R3BOnlineSpectraFrsSci::FinishTask()
@@ -424,23 +632,40 @@ void R3BOnlineSpectraFrsSci::FinishTask()
     {
         for (UShort_t i = 0; i < fNbDets; i++)
         {
-            fh2_multMap[i]->Write();
-            fh2_multMap_RvsL[i]->Write();
+            fh2_Map_mult[i]->Write();
+            fh2_Map_multRvsL[i]->Write();
             for (UShort_t j = 0; j < fNbPmts; j++)
             {
-                fh1_finetime[i * fNbPmts + j]->Write();
-                fh1_multMap[i * fNbPmts + j]->Write();
+                fh1_Map_finetime[i * fNbPmts + j]->Write();
+                fh1_Map_mult[i * fNbPmts + j]->Write();
             }
-        } // end of loop over fNbDets
+        }
         if (fTcal)
         {
             for (UShort_t i = 0; i < fNbDets; i++)
             {
-                fh1_PosRawTcal1Hit[i]->Write();
+                fh1_Tcal1Hit_PosRaw[i]->Write();
             }
             for (UShort_t i = 0; i < fNbTofs; i++)
             {
-                fh1_TofRawTcal1Hit[i]->Write();
+                fh1_Tcal1Hit_TofRaw[i]->Write();
+            }
+        }
+        if (fPosCal)
+        {
+            for (UShort_t i = 0; i < fNbDets; i++)
+            {
+                fh1_Cal_PosRaw[i]->Write();
+                fh1_Cal_PosRaw[i]->Write();
+            }
+        }
+        if (fTofCal)
+        {
+            for (UShort_t i = 0; i < fNbTofs; i++)
+            {
+                fh1_Cal_TofRaw[i]->Write();
+                fh1_Cal_TofCal[i]->Write();
+                fh1_Cal_Beta[i]->Write();
             }
         }
     }
