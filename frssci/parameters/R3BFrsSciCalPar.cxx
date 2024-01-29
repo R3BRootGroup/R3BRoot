@@ -23,17 +23,15 @@ R3BFrsSciCalPar::R3BFrsSciCalPar(const char* name, const char* title, const char
     {
         fMinTofs = new TArrayD(fNumDets - 1);
         fMaxTofs = new TArrayD(fNumDets - 1);
-        fTof2InvVGains = new TArrayD(fNumTofs);
-        fTof2InvVOffsets = new TArrayD(fNumTofs);
-        fFlightLengths = new TArrayD(fNumTofs);
+        fTofCalGains = new TArrayD(fNumTofs);
+        fTofCalOffsets = new TArrayD(fNumTofs);
     }
     else
     {
         fMinTofs = NULL;
         fMaxTofs = NULL;
-        fTof2InvVGains = NULL;
-        fTof2InvVOffsets = NULL;
-        fFlightLengths = NULL;
+        fTofCalGains = NULL;
+        fTofCalOffsets = NULL;
     }
     fMinPos = new TArrayF(fNumDets);
     fMaxPos = new TArrayF(fNumDets);
@@ -70,17 +68,13 @@ R3BFrsSciCalPar::~R3BFrsSciCalPar()
     {
         delete fPosCalOffsets;
     }
-    if (fTof2InvVGains != NULL)
+    if (fTofCalGains != NULL)
     {
-        delete fTof2InvVGains;
+        delete fTofCalGains;
     }
-    if (fTof2InvVOffsets != NULL)
+    if (fTofCalOffsets != NULL)
     {
-        delete fTof2InvVOffsets;
-    }
-    if (fFlightLengths != NULL)
-    {
-        delete fFlightLengths;
+        delete fTofCalOffsets;
     }
 }
 
@@ -117,12 +111,10 @@ void R3BFrsSciCalPar::putParams(FairParamList* list)
         list->add("fMaxTofs_CalPar", *fMaxTofs);
 
         LOG(info) << "R3BFrsSciCalPar::putParams Array Size for Tof calibration: " << fNumTofs;
-        fTof2InvVGains->Set(fNumTofs - 1);
-        list->add("fTof2InvVGains_CalPar", *fTof2InvVGains);
-        fTof2InvVOffsets->Set(fNumTofs - 1);
-        list->add("fTof2InvVOffsets_CalPar", *fTof2InvVOffsets);
-        fFlightLengths->Set(fNumTofs - 1);
-        list->add("fFlightLengths_CalPar", *fFlightLengths);
+        fTofCalGains->Set(fNumTofs - 1);
+        list->add("fTofCalGains_CalPar", *fTofCalGains);
+        fTofCalOffsets->Set(fNumTofs - 1);
+        list->add("fTofCalOffsets_CalPar", *fTofCalOffsets);
     }
 
     LOG(info) << "R3BFrsSciCalPar::putParams Array Size for PosCal gains and offsets: " << fNumDets;
@@ -196,22 +188,16 @@ Bool_t R3BFrsSciCalPar::getParams(FairParamList* list)
         }
 
         LOG(info) << "R3BFrsSciCalPar::getParams Array Size for Tof calibration: " << fNumTofs;
-        fTof2InvVGains->Set(fNumTofs - 1);
-        if (!(list->fill("fTof2InvVGains_CalPar", fTof2InvVGains)))
+        fTofCalGains->Set(fNumTofs - 1);
+        if (!(list->fill("fTofCalGains_CalPar", fTofCalGains)))
         {
-            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTof2InvVGains";
+            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTofCalGains";
             return kFALSE;
         }
-        fTof2InvVOffsets->Set(fNumTofs - 1);
-        if (!(list->fill("fTof2InvVOffsets_CalPar", fTof2InvVOffsets)))
+        fTofCalOffsets->Set(fNumTofs - 1);
+        if (!(list->fill("fTofCalOffsets_CalPar", fTofCalOffsets)))
         {
-            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTof2InvVOffsets";
-            return kFALSE;
-        }
-        fFlightLengths->Set(fNumTofs - 1);
-        if (!(list->fill("fFlightLengths_CalPar", fFlightLengths)))
-        {
-            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fFlightLengths";
+            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTofCalOffsets";
             return kFALSE;
         }
     }
