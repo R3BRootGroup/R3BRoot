@@ -111,29 +111,45 @@ class R3BOnlineSpectraFrsSci : public FairTask
 
     TClonesArray* fMapped; /**< Array with R3BFrsSciMappedData */
     TClonesArray* fTcal;   /**< Array with R3BFrsSciTcalData */
+    TClonesArray* fPosCal; /**< Array with R3BFrsSciPosCalData */
+    TClonesArray* fTofCal; /**< Array with R3BFrsSciTofCalData */
     Int_t fNEvents;        /**< Event counter.     */
     UShort_t fNbDets;
     UShort_t fNbPmts;
     UShort_t fNbTofs;
 
     // Canvas at Mapped level
-    TCanvas* cMapFT;
-    TCanvas* cMapMult1D;
-    TCanvas* cMapMult2D;
+    TCanvas* cMap_FT;
+    TCanvas* cMap_Mult1D;
+    TCanvas* cMap_Mult2D;
 
     // Histograms at Mapped level
-    TH1I** fh1_finetime;     // [fNbDets * NbPmts]
-    TH1I** fh1_multMap;      // [fNbDets * fNbPmts]
-    TH2I** fh2_multMap;      // [fNbDets]
-    TH2I** fh2_multMap_RvsL; // [fNbDets! / (2! * (fNbDets-2)!]
+    TH1I** fh1_Map_finetime; // [fNbDets * NbPmts]
+    TH1I** fh1_Map_mult;     // [fNbDets * fNbPmts]
+    TH2I** fh2_Map_mult;     // [fNbDets]
+    TH2I** fh2_Map_multRvsL; // [fNbDets! / (2! * (fNbDets-2)!]
 
     // Canvas at Tcal level
-    TCanvas* cTcalPos;
-    TCanvas* cTcalTof;
+    TCanvas* cTcal_Pos;
+    TCanvas* cTcal_Tof;
 
     // Histograms at Tcal level
-    TH1D** fh1_PosRawTcal1Hit; // [fNbDets]
-    TH1D** fh1_TofRawTcal1Hit; // [fNbDets-1]
+    TH1D** fh1_Tcal1Hit_PosRaw; // [fNbDets]
+    TH1D** fh1_Tcal1Hit_TofRaw; // [fNbTofs]
+
+    // Canvas at Cal level
+    TCanvas* cCal_PosRaw;
+    TCanvas* cCal_PosCal;
+    TCanvas* cCal_TofRaw;
+    TCanvas* cCal_TofCal;
+    TCanvas* cCal_Beta;
+
+    // Histograms at Tcal level
+    TH1D** fh1_Cal_PosRaw; // [fNbDets]
+    TH1D** fh1_Cal_PosCal; // [fNbDets]
+    TH1D** fh1_Cal_TofRaw; // [fNbTofs]
+    TH1D** fh1_Cal_TofCal; // [fNbTofs]
+    TH1D** fh1_Cal_Beta;   // [fNbTofs]
 
   public:
     ClassDef(R3BOnlineSpectraFrsSci, 1)
