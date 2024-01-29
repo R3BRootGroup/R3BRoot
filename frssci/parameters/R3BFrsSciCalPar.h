@@ -82,9 +82,8 @@ class R3BFrsSciCalPar : public FairParGenericSet
     void SetMinTof(Double_t min, UInt_t rank) { fMinTofs->AddAt(min, rank); }
     void SetMaxTof(Double_t max, UInt_t rank) { fMaxTofs->AddAt(max, rank); }
 
-    void SetTof2InvVGain(Double_t gain, UInt_t rank) { fTof2InvVGains->AddAt(gain, rank); }
-    void SetTof2InvVOffset(Double_t offset, UInt_t rank) { fTof2InvVOffsets->AddAt(offset, rank); }
-    void SetFlightLength(Double_t L, UInt_t rank) { fFlightLengths->AddAt(L, rank); }
+    void SetTofCalGain(Double_t gain, UInt_t rank) { fTofCalGains->AddAt(gain, rank); }
+    void SetTofCalOffset(Double_t offset, UInt_t rank) { fTofCalOffsets->AddAt(offset, rank); }
     void SetPosCalGain(Float_t gain, UInt_t rank) { fPosCalGains->AddAt(gain, rank); }
     void SetPosCalOffset(Float_t offset, UInt_t rank) { fPosCalOffsets->AddAt(offset, rank); }
 
@@ -105,14 +104,12 @@ class R3BFrsSciCalPar : public FairParGenericSet
     TArrayD* GetAllParams_fMinTofs() { return fMinTofs; }
     TArrayD* GetAllParams_fMaxTofs() { return fMaxTofs; }
 
-    const Double_t GetTof2InvVGainAtRank(UInt_t rank) { return fTof2InvVGains->At(rank); }
-    const Double_t GetTof2InvVOffsetAtRank(UInt_t rank) { return fTof2InvVOffsets->At(rank); }
-    const Double_t GetFlightLengthAtRank(UInt_t rank) { return fFlightLengths->At(rank); }
+    const Double_t GetTofCalGainAtRank(UInt_t rank) { return fTofCalGains->At(rank); }
+    const Double_t GetTofCalOffsetAtRank(UInt_t rank) { return fTofCalOffsets->At(rank); }
     const Float_t GetPosCalGainAtRank(UInt_t rank) { return fPosCalGains->At(rank); }
     const Float_t GetPosCalOffsetAtRank(UInt_t rank) { return fPosCalOffsets->At(rank); }
-    TArrayD* GetAllParams_fTof2InvVGains() { return fTof2InvVGains; }
-    TArrayD* GetAllParams_fTof2InvVOffsets() { return fTof2InvVOffsets; }
-    TArrayD* GetAllParams_fFlightLengths() { return fFlightLengths; }
+    TArrayD* GetAllParams_fTofCalGains() { return fTofCalGains; }
+    TArrayD* GetAllParams_fTofCalOffsets() { return fTofCalOffsets; }
     TArrayF* GetAllParams_fPosCalGains() { return fPosCalGains; }
     TArrayF* GetAllParams_fPosCalOffsets() { return fPosCalOffsets; }
 
@@ -136,13 +133,12 @@ class R3BFrsSciCalPar : public FairParGenericSet
     TArrayD* fMaxTofs; // size = fNumDets-1 (Cave C versus all the others)
 
     // parameters to calibrate all Tofs
-    TArrayD* fTof2InvVGains;   // number of Tofs
-    TArrayD* fTof2InvVOffsets; // number of Tofs
-    TArrayD* fFlightLengths;   // number of Tof
+    TArrayD* fTofCalOffsets; // size = fNumTofs
+    TArrayD* fTofCalGains;   // size = fNumTofs
 
     // parameters to calibrate the position in Mm
-    TArrayF* fPosCalGains;   // 1 gain per per detector
     TArrayF* fPosCalOffsets; // 1 offset per per detector
+    TArrayF* fPosCalGains;   // 1 gain per per detector
 
     const R3BFrsSciCalPar& operator=(const R3BFrsSciCalPar&);
     R3BFrsSciCalPar(const R3BFrsSciCalPar&);
