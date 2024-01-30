@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTOFDREADER_H
-#define R3BTOFDREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -34,19 +33,19 @@ class R3BTofdReader : public R3BReader
     virtual ~R3BTofdReader();
 
     // Setup structure information
-    virtual Bool_t Init(ext_data_struct_info*) override;
+    Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t R3BRead() override;
+    Bool_t R3BRead() override;
 
     // Reset
-    virtual void Reset() override;
+    void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option) { fOnline = option; }
 
     // Accessor to skip trigger times
-    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    inline void SetSkipTriggerTimes() { fSkiptriggertimes = true; }
 
   private:
     // Reader specific data structure from ucesb
@@ -54,9 +53,9 @@ class R3BTofdReader : public R3BReader
     // Data offset
     size_t fOffset;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
     // Skip trigger times
-    Bool_t fSkiptriggertimes;
+    bool fSkiptriggertimes = false;
     // Output array
     TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */
@@ -64,5 +63,3 @@ class R3BTofdReader : public R3BReader
   public:
     ClassDefOverride(R3BTofdReader, 0);
 };
-
-#endif /* R3BTOFDREADER_H */
