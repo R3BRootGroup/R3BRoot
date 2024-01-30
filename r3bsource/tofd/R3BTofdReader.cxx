@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BLogger.h"
 #include "R3BTofdMappedData.h"
 #include "R3BTofdReader.h"
 
-#include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
+#include <TClonesArray.h>
+#include <ext_data_struct_info.hh>
 
 extern "C"
 {
@@ -34,8 +34,6 @@ R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD_onion* data, size_t offset)
     : R3BReader("R3BTofdReader")
     , fData(data)
     , fOffset(offset)
-    , fOnline(kFALSE)
-    , fSkiptriggertimes(kFALSE)
     , fArray(new TClonesArray("R3BTofdMappedData"))
     , fArrayTrigger(new TClonesArray("R3BTofdMappedData"))
 {
@@ -73,7 +71,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
     }
     else
     {
-        fArrayTrigger = NULL;
+        fArrayTrigger = nullptr;
     }
     Reset();
 
@@ -168,15 +166,25 @@ Bool_t R3BTofdReader::R3BRead()
         } // for side
     }     // for planes
 
-    // Leading TAMEX trigger times.
+    // TAMEX trigger times.
     if (fArrayTrigger)
     {
-        auto numChannels = data->TOFD_TRIGFL;
-        for (uint32_t i = 0; i < numChannels; i++)
+        // Leading
+        auto numChannelsL = data->TOFD_TRIGFL;
+        for (uint32_t i = 0; i < numChannelsL; i++)
         {
             uint32_t channel = data->TOFD_TRIGFLI[i];
             new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
                 R3BTofdMappedData(MAX_TOFD_PLANES + 1, 1, channel, 1, data->TOFD_TRIGCLv[i], data->TOFD_TRIGFLv[i]);
+        }
+
+        // Trailing
+        auto numChannelsT = data->TOFD_TRIGFT;
+        for (uint32_t i = 0; i < numChannelsT; i++)
+        {
+            uint32_t channel = data->TOFD_TRIGFTI[i];
+            new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                R3BTofdMappedData(MAX_TOFD_PLANES + 1, 1, channel, 2, data->TOFD_TRIGCTv[i], data->TOFD_TRIGFTv[i]);
         }
     }
 
@@ -191,4 +199,4 @@ void R3BTofdReader::Reset()
         fArrayTrigger->Clear();
 }
 
-ClassImp(R3BTofdReader);
+ClassImp(R3BTofdReader)
