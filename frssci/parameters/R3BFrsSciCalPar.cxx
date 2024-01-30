@@ -1,7 +1,6 @@
 #include "R3BFrsSciCalPar.h"
 
 #include "FairDetParIo.h"
-#include "FairLogger.h"
 #include "FairParamList.h"
 #include "TArrayF.h"
 #include "TMath.h"
@@ -111,9 +110,9 @@ void R3BFrsSciCalPar::putParams(FairParamList* list)
         list->add("fMaxTofs_CalPar", *fMaxTofs);
 
         LOG(info) << "R3BFrsSciCalPar::putParams Array Size for Tof calibration: " << fNumTofs;
-        fTofCalGains->Set(fNumTofs - 1);
+        fTofCalGains->Set(fNumTofs);
         list->add("fTofCalGains_CalPar", *fTofCalGains);
-        fTofCalOffsets->Set(fNumTofs - 1);
+        fTofCalOffsets->Set(fNumTofs);
         list->add("fTofCalOffsets_CalPar", *fTofCalOffsets);
     }
 
@@ -188,13 +187,13 @@ Bool_t R3BFrsSciCalPar::getParams(FairParamList* list)
         }
 
         LOG(info) << "R3BFrsSciCalPar::getParams Array Size for Tof calibration: " << fNumTofs;
-        fTofCalGains->Set(fNumTofs - 1);
+        fTofCalGains->Set(fNumTofs);
         if (!(list->fill("fTofCalGains_CalPar", fTofCalGains)))
         {
             LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTofCalGains";
             return kFALSE;
         }
-        fTofCalOffsets->Set(fNumTofs - 1);
+        fTofCalOffsets->Set(fNumTofs);
         if (!(list->fill("fTofCalOffsets_CalPar", fTofCalOffsets)))
         {
             LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTofCalOffsets";

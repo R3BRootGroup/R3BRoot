@@ -75,8 +75,7 @@ void R3BFrsSciMapped2Tcal::SetParContainers()
     }
     else
     {
-        LOG(info) << "R3BFrsSciMapped2Tcal::SetParContainers() : FrsSciTcalPar-Container found with"
-                  << fTcalPar->GetNumDets() << " scintillators and " << fTcalPar->GetNumPmts() << " Pmts";
+        LOG(info) << "R3BFrsSciMapped2Tcal::SetParContainers() : FrsSciTcalPar-Container found";
     }
 }
 

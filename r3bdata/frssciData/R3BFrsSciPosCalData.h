@@ -1,5 +1,17 @@
-#ifndef R3BFRSSCIPOSCALITEM_H
-#define R3BFRSSCIPOSCALITEM_H
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+#pragma once
 
 #include "TObject.h"
 
@@ -30,5 +42,3 @@ class R3BFrsSciPosCalData : public TObject
   public:
     ClassDef(R3BFrsSciPosCalData, 2)
 };
-
-#endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,9 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BFRSSCICALPAR_H
-#define R3BFRSSCICALPAR_H
+#pragma once
 
+#include "FairLogger.h"
 #include "FairParGenericSet.h"
 #include "TArrayD.h"
 #include "TArrayF.h"
@@ -71,6 +71,7 @@ class R3BFrsSciCalPar : public FairParGenericSet
                     fact2 *= i;
                 fNumTofs = fact1 / (2 * fact2);
         }
+        LOG(info) << "R3BFrsSciCalPar::SetNumTofs(Int_t nDets = " << fNumDets << ") --> fNumTofs = " << fNumTofs;
     }
 
     void SetDetIdS2(Int_t id) { fDetIdS2 = id; }
@@ -145,5 +146,3 @@ class R3BFrsSciCalPar : public FairParGenericSet
 
     ClassDef(R3BFrsSciCalPar, 1);
 };
-
-#endif // R3BFRSSCICALPAR_H
