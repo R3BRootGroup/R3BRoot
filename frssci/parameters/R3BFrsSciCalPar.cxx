@@ -1,7 +1,6 @@
 #include "R3BFrsSciCalPar.h"
 
 #include "FairDetParIo.h"
-#include "FairLogger.h"
 #include "FairParamList.h"
 #include "TArrayF.h"
 #include "TMath.h"

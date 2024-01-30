@@ -14,6 +14,7 @@
 #ifndef R3BFRSSCICALPAR_H
 #define R3BFRSSCICALPAR_H
 
+#include "FairLogger.h"
 #include "FairParGenericSet.h"
 #include "TArrayD.h"
 #include "TArrayF.h"
@@ -71,6 +72,7 @@ class R3BFrsSciCalPar : public FairParGenericSet
                     fact2 *= i;
                 fNumTofs = fact1 / (2 * fact2);
         }
+        LOG(info) << "R3BFrsSciCalPar::SetNumTofs(Int_t nDets = " << fNumDets << ") --> fNumTofs = " << fNumTofs;
     }
 
     void SetDetIdS2(Int_t id) { fDetIdS2 = id; }

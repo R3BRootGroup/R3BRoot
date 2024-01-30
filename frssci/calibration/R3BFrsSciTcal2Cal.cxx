@@ -81,9 +81,7 @@ void R3BFrsSciTcal2Cal::SetParContainers()
     }
     else
     {
-        LOG(info) << "R3BFrsSciTcal2Cal::SetParContainers() : FrsSciCalPar-Container found with"
-                  << fCalPar->GetNumDets() << " FrsSciDets, " << fCalPar->GetNumPmts() << " Pmts and "
-                  << fCalPar->GetNumTofs() << " Tofs";
+        LOG(info) << "R3BFrsSciTcal2Cal::SetParContainers() : FrsSciCalPar-Container found ";
     }
 }
 
@@ -178,9 +176,9 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
     }
 
     // Select the proper hit in the multihit tcal data
-    // if nDets==1 -> Use the Position : not really selective, better use LOS (need to be coded !)
+    // if nDets==1 -> Use the Position : not really selective, better use LOS (need to be coded)
     // if nDets>1  -> Use the Tof
-    if (nDets == 1)
+    if (nDets == 1 && mult[0] > 0 && mult[1] > 0)
     {
         // Variables to fill PosCal and TofCal data
         Double_t iRawTime = -1.;
@@ -236,63 +234,79 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
             selectLeftHit_dSto[det] = -1;
             selectRightHit_dSto[det] = -1;
         }
+        Bool_t selectHit = kFALSE;
         Bool_t selectSameHit = kTRUE;
 
-        // loop over all the start detectors
-        for (Int_t dSta = 0; dSta < nDets - 1; dSta++)
+        // if data in Sto
+        if (mult[dSto * nPmts] > 0 && mult[dSto * nPmts + 1] > 0)
         {
             for (UShort_t multRsto = 0; multRsto < mult[dSto * nPmts]; multRsto++)
             {
                 for (UShort_t multLsto = 0; multLsto < mult[dSto * nPmts + 1]; multLsto++)
                 {
-                    // process only data with valid position
                     iRawPosSto = (iTraw[dSto * nPmts][multRsto] - iTraw[dSto * nPmts + 1][multLsto]);
-                    if ((iRawPosSto < fCalPar->GetMinPosAtRank(2 * dSto)) ||
-                        (iRawPosSto > fCalPar->GetMaxPosAtRank(2 * dSto)))
+                    // process only data with valid position
+                    if ((iRawPosSto < fCalPar->GetMinPosAtRank(dSto)) || (iRawPosSto > fCalPar->GetMaxPosAtRank(dSto)))
                         continue;
-                    for (UShort_t multRsta = 0; multRsta < mult[dSta * nPmts]; multRsta++)
+                    // loop over all Sta detector
+                    for (UShort_t dSta = 0; dSta < nDets - 1; dSta++)
                     {
-                        for (UShort_t multLsta = 0; multLsta < mult[dSta * nPmts + 1]; multLsta++)
+                        // if data in Sta
+                        if (mult[dSta * nPmts] > 0 && mult[dSta * nPmts + 1] > 0)
                         {
-                            // process only data with vali position
-                            iRawPosSta = (iTraw[dSta * nPmts][multRsta] - iTraw[dSta * nPmts + 1][multLsta]);
-                            if ((iRawPosSta < fCalPar->GetMinPosAtRank(2 * dSta)) ||
-                                (iRawPosSta > fCalPar->GetMaxPosAtRank(2 * dSta)))
-                                continue;
-                            // if position in Sta and Sto are valid, selection with Tof
-                            iRawTimeSta = 0.5 * (iTraw[dSta * nPmts][multRsta] + iTraw[dSta * nPmts + 1][multLsta]);
-                            iRawTimeSto = 0.5 * (iTraw[dSto * nPmts][multRsto] + iTraw[dSto * nPmts + 1][multLsto]);
-                            iRawTof =
-                                iRawTimeSto - iRawTimeSta + iTraw[dSta * nPmts + 2][0] - iTraw[dSto * nPmts + 2][0];
-                            if ((fCalPar->GetMinTofAtRank(dSta) <= iRawTof) &&
-                                (iRawTof <= fCalPar->GetMaxTofAtRank(dSta)))
+                            for (UShort_t multRsta = 0; multRsta < mult[dSta * nPmts]; multRsta++)
                             {
-                                selectLeftHit[dSta] = multLsta;
-                                selectLeftHit[dSto] = multLsto;
-
-                                selectRightHit[dSta] = multRsta;
-                                selectRightHit[dSto] = multRsto;
-
-                                selectLeftHit_dSto[dSta] = multLsto;
-                                selectRightHit_dSto[dSta] = multRsto;
-
-                                if (dSta > 0)
+                                for (UShort_t multLsta = 0; multLsta < mult[dSta * nPmts + 1]; multLsta++)
                                 {
-                                    for (Int_t d = dSta; d < nDets - 1; d++)
+                                    // process only data with vali position
+                                    iRawPosSta = (iTraw[dSta * nPmts][multRsta] - iTraw[dSta * nPmts + 1][multLsta]);
+                                    if ((iRawPosSta < fCalPar->GetMinPosAtRank(dSta)) ||
+                                        (iRawPosSta > fCalPar->GetMaxPosAtRank(dSta)))
+                                        continue;
+                                    // if position in Sta and Sto are valid, selection with Tof
+                                    iRawTimeSta =
+                                        0.5 * (iTraw[dSta * nPmts][multRsta] + iTraw[dSta * nPmts + 1][multLsta]);
+                                    iRawTimeSto =
+                                        0.5 * (iTraw[dSto * nPmts][multRsto] + iTraw[dSto * nPmts + 1][multLsto]);
+                                    iRawTof = iRawTimeSto - iRawTimeSta + iTraw[dSta * nPmts + 2][0] -
+                                              iTraw[dSto * nPmts + 2][0];
+                                    if ((fCalPar->GetMinTofAtRank(dSta) <= iRawTof) &&
+                                        (iRawTof <= fCalPar->GetMaxTofAtRank(dSta)))
                                     {
-                                        if (selectLeftHit_dSto[d] != selectLeftHit_dSto[d - 1])
-                                            selectSameHit = kFALSE;
-                                        if (selectRightHit_dSto[d] != selectRightHit_dSto[d - 1])
-                                            selectSameHit = kFALSE;
-                                    }
-                                }
-                            }
+                                        selectHit = kTRUE;
 
-                        } // end of loop over the left start mult
-                    }     // end of loop over the right start mult
-                }         // end of loop over the left stop mult
-            }             // end of loop over the right stop mult
-        }                 // end of loop over the start detectors
+                                        selectLeftHit[dSta] = multLsta;
+                                        selectLeftHit[dSto] = multLsto;
+
+                                        selectRightHit[dSta] = multRsta;
+                                        selectRightHit[dSto] = multRsto;
+
+                                        selectLeftHit_dSto[dSta] = multLsto;
+                                        selectRightHit_dSto[dSta] = multRsto;
+
+                                        if (dSta > 0)
+                                        {
+                                            for (UShort_t d = dSta; d < nDets - 1; d++)
+                                            {
+                                                if (selectLeftHit_dSto[d] != selectLeftHit_dSto[d - 1])
+                                                    selectSameHit = kFALSE;
+                                                if (selectRightHit_dSto[d] != selectRightHit_dSto[d - 1])
+                                                    selectSameHit = kFALSE;
+                                            }
+                                        }
+                                    }
+
+                                } // end of loop over the left start mult
+                            }     // end of loop over the right start mult
+                        }         // end of if data in Left and Right of Sta detector
+                    }             // end of loop over the start detectors
+                }                 // end of loop over the left stop mult
+            }                     // end of loop over the right stop mult
+        }                         // end of if data in Left and Right of Sto detector
+
+        // no hit found
+        if (selectHit == kFALSE)
+            return;
 
         // Fill CalData levels
         Double_t iRawTime[nDets];
@@ -318,6 +332,7 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
         }
         else // use the hit selection from the very first to the very last FrsSci)
         {
+            LOG(info) << "Tcal2Cal for single hit selection, selectSameHit==kFALSE";
             for (UShort_t det = 0; det < nDets - 1; det++)
             {
                 iRawTime[det] =
