@@ -190,63 +190,64 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     fTcal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTcalData"));
     if (!fTcal)
     {
-        LOG(fatal) << "FrsSciTcal not found";
-        return (kFATAL);
+        LOG(info) << "R3BOnlineSpectraFrsSci::Init() :: FrsSciTcal not found";
+        LOG(info) << "    No FrsSciTcal spectra ---> ok";
     }
-
-    // === declare and create TCanvas and Histogram === //
-
-    sprintf(Name1, "Tcal1Hit_PosRaw");
-    cTcal_Pos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cTcal_Pos->Divide(1, fNbDets);
-    fh1_Tcal1Hit_PosRaw = new TH1D*[fNbDets];
-
-    sprintf(Name1, "Tcal1Hit_TofRaw");
-    cTcal_Tof = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cTcal_Tof->Divide(1, fNbTofs);
-    fh1_Tcal1Hit_TofRaw = new TH1D*[fNbTofs];
-
-    for (UShort_t i = 0; i < fNbDets; i++)
+    else
     {
-        // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
-        sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
-        fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
-        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
-        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
-        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
-        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->CenterTitle(true);
-        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
-        fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
-        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
-        fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
-        cTcal_Pos->cd(i + 1);
-        fh1_Tcal1Hit_PosRaw[i]->Draw();
-    }
+        // === declare and create TCanvas and Histogram === //
 
-    if (fNbTofs > 0)
-    {
-        UShort_t cpt = 0;
-        for (UShort_t sta = 1; sta < fNbDets; sta++)
+        sprintf(Name1, "Tcal1Hit_PosRaw");
+        cTcal_Pos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cTcal_Pos->Divide(1, fNbDets);
+        fh1_Tcal1Hit_PosRaw = new TH1D*[fNbDets];
+
+        sprintf(Name1, "Tcal1Hit_TofRaw");
+        cTcal_Tof = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cTcal_Tof->Divide(1, fNbTofs);
+        fh1_Tcal1Hit_TofRaw = new TH1D*[fNbTofs];
+
+        for (UShort_t i = 0; i < fNbDets; i++)
         {
-            for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+            // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
+            sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
+            fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 1000, -250, 250);
+            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
+            fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
+            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
+            fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->CenterTitle(true);
+            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
+            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
+            fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
+            fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
+            cTcal_Pos->cd(i + 1);
+            fh1_Tcal1Hit_PosRaw[i]->Draw();
+        }
+
+        if (fNbTofs > 0)
+        {
+            UShort_t cpt = 0;
+            for (UShort_t sta = 1; sta < fNbDets; sta++)
             {
-                sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
-                fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
-                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
-                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
-                fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
-                cTcal_Tof->cd(cpt + 1);
-                fh1_Tcal1Hit_TofRaw[cpt]->Draw();
-                cpt++;
+                for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+                {
+                    sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
+                    fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 50000, -25000, 25000);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cTcal_Tof->cd(cpt + 1);
+                    fh1_Tcal1Hit_TofRaw[cpt]->Draw();
+                    cpt++;
+                }
             }
         }
     }
-
     // --- ------------ --- //
     // --- CAL LEVELS --- //
     // --- ------------ --- //
@@ -255,126 +256,152 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     fPosCal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciPosCalData"));
     if (!fPosCal)
     {
-        LOG(fatal) << "FrsSciPosCal not found";
-        return (kFATAL);
+        LOG(info) << "R3BOnlineSpectraFrsSci::Init() :: FrsSciPosCal not found";
+        LOG(info) << "    No FrsSciPosCal spectra ---> ok";
     }
+    else
+    {
+        // === declare and create TCanvas and Histogram === //
 
+        sprintf(Name1, "Cal_PosRaw");
+        cCal_PosRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_PosRaw->Divide(1, fNbDets);
+        fh1_Cal_PosRaw = new TH1D*[fNbDets];
+
+        sprintf(Name1, "Cal_PosCal");
+        cCal_PosCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_PosCal->Divide(1, fNbDets);
+        fh1_Cal_PosCal = new TH1D*[fNbDets];
+
+        for (UShort_t i = 0; i < fNbDets; i++)
+        {
+            // === TH1F: Raw Position in Ns at Cal level=== //
+            sprintf(Name1, "FrsSci%i_PosRaw", i + 1);
+            if (fh1_Tcal1Hit_PosRaw[i])
+            {
+                Int_t nbins = fh1_Tcal1Hit_PosRaw[i]->GetNbinsX();
+                fh1_Cal_PosRaw[i] =
+                    new TH1D(Name1,
+                             Name1,
+                             nbins,
+                             fh1_Tcal1Hit_PosRaw[i]->GetBinLowEdge(1),
+                             fh1_Tcal1Hit_PosRaw[i]->GetBinLowEdge(nbins) + fh1_Tcal1Hit_PosRaw[i]->GetBinWidth(nbins));
+            }
+            else
+                fh1_Cal_PosRaw[i] = new TH1D(Name1, Name1, 1000, -250, 250);
+            fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] in red CAL level, in blue TCAL-MULT1");
+            fh1_Cal_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
+            fh1_Cal_PosRaw[i]->GetXaxis()->CenterTitle(true);
+            fh1_Cal_PosRaw[i]->GetYaxis()->CenterTitle(true);
+            fh1_Cal_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
+            fh1_Cal_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
+            fh1_Cal_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
+            fh1_Cal_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
+            cCal_PosRaw->cd(i + 1);
+            fh1_Cal_PosRaw[i]->SetLineColor(kRed);
+            fh1_Cal_PosRaw[i]->Draw();
+            fh1_Tcal1Hit_PosRaw[i]->Draw("same");
+
+            // === TH1F: calibrated Position in Ns at Cal level=== //
+            sprintf(Name1, "FrsSci%i_PosCal", i + 1);
+            fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 3000, -150, 150);
+            fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Positon [mm]");
+            fh1_Cal_PosCal[i]->GetYaxis()->SetTitle("number of counts");
+            fh1_Cal_PosCal[i]->GetXaxis()->CenterTitle(true);
+            fh1_Cal_PosCal[i]->GetYaxis()->CenterTitle(true);
+            fh1_Cal_PosCal[i]->GetXaxis()->SetLabelSize(0.05);
+            fh1_Cal_PosCal[i]->GetXaxis()->SetTitleSize(0.05);
+            fh1_Cal_PosCal[i]->GetYaxis()->SetLabelSize(0.05);
+            fh1_Cal_PosCal[i]->GetYaxis()->SetTitleSize(0.05);
+            cCal_PosCal->cd(i + 1);
+            fh1_Cal_PosCal[i]->Draw();
+        }
+    }
     // === get access to tof cal data ===//
     fTofCal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTofCalData"));
     if (!fTofCal)
     {
-        LOG(fatal) << "FrsSciTofCal not found";
-        return (kFATAL);
+        LOG(info) << "R3BOnlineSpectraFrsSci::Init() :: FrsSciTofCal not found";
+        LOG(info) << "    No FrsSciTofCal spectra ---> ok";
     }
 
-    // === declare and create TCanvas and Histogram === //
-
-    sprintf(Name1, "Cal_PosRaw");
-    cCal_PosRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cCal_PosRaw->Divide(1, fNbDets);
-    fh1_Cal_PosRaw = new TH1D*[fNbDets];
-
-    sprintf(Name1, "Cal_PosCal");
-    cCal_PosCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cCal_PosCal->Divide(1, fNbDets);
-    fh1_Cal_PosCal = new TH1D*[fNbDets];
-
-    sprintf(Name1, "Cal_TofRaw");
-    cCal_TofRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cCal_TofRaw->Divide(1, fNbTofs);
-    fh1_Cal_TofRaw = new TH1D*[fNbTofs];
-
-    sprintf(Name1, "Cal_TofCal");
-    cCal_TofCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cCal_TofCal->Divide(1, fNbTofs);
-    fh1_Cal_TofRaw = new TH1D*[fNbTofs];
-
-    sprintf(Name1, "Cal_Beta");
-    cCal_Beta = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-    cCal_Beta->Divide(1, fNbTofs);
-    fh1_Cal_Beta = new TH1D*[fNbTofs];
-
-    for (UShort_t i = 0; i < fNbDets; i++)
+    else
     {
-        // === TH1F: Raw Position in Ns at Cal level=== //
-        sprintf(Name1, "FrsSci%i_PosRaw", i + 1);
-        fh1_Cal_PosRaw[i] = new TH1D(Name1, Name1, 1000, -5000, 5000);
-        fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns]");
-        fh1_Cal_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
-        fh1_Cal_PosRaw[i]->GetXaxis()->CenterTitle(true);
-        fh1_Cal_PosRaw[i]->GetYaxis()->CenterTitle(true);
-        fh1_Cal_PosRaw[i]->GetXaxis()->SetLabelSize(0.05);
-        fh1_Cal_PosRaw[i]->GetXaxis()->SetTitleSize(0.05);
-        fh1_Cal_PosRaw[i]->GetYaxis()->SetLabelSize(0.05);
-        fh1_Cal_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
-        cCal_PosRaw->cd(i + 1);
-        fh1_Cal_PosRaw[i]->SetLineColor(kRed);
-        fh1_Cal_PosRaw[i]->Draw();
-        fh1_Tcal1Hit_PosRaw[i]->Draw("same");
+        sprintf(Name1, "Cal_TofRaw");
+        cCal_TofRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_TofRaw->Divide(1, fNbTofs);
+        fh1_Cal_TofRaw = new TH1D*[fNbTofs];
 
-        // === TH1F: calibrated Position in Ns at Cal level=== //
-        sprintf(Name1, "FrsSci%i_PosCal", i + 1);
-        fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 3000, -150, 150);
-        fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Positon [mm]");
-        fh1_Cal_PosCal[i]->GetYaxis()->SetTitle("number of counts");
-        fh1_Cal_PosCal[i]->GetXaxis()->CenterTitle(true);
-        fh1_Cal_PosCal[i]->GetYaxis()->CenterTitle(true);
-        fh1_Cal_PosCal[i]->GetXaxis()->SetLabelSize(0.05);
-        fh1_Cal_PosCal[i]->GetXaxis()->SetTitleSize(0.05);
-        fh1_Cal_PosCal[i]->GetYaxis()->SetLabelSize(0.05);
-        fh1_Cal_PosCal[i]->GetYaxis()->SetTitleSize(0.05);
-        cCal_PosCal->cd(i + 1);
-        fh1_Cal_PosRaw[i]->Draw();
-    }
+        sprintf(Name1, "Cal_TofCal");
+        cCal_TofCal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_TofCal->Divide(1, fNbTofs);
+        fh1_Cal_TofCal = new TH1D*[fNbTofs];
 
-    if (fNbTofs > 0)
-    {
-        UShort_t cpt = 0;
-        for (UShort_t sta = 1; sta < fNbDets; sta++)
+        sprintf(Name1, "Cal_Beta");
+        cCal_Beta = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_Beta->Divide(1, fNbTofs);
+        fh1_Cal_Beta = new TH1D*[fNbTofs];
+
+        if (fNbTofs > 0)
         {
-            for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+            UShort_t cpt = 0;
+            for (UShort_t sta = 1; sta < fNbDets; sta++)
             {
-                sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i", sta, sto);
-                fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
-                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
-                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
-                fh1_Cal_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
-                fh1_Cal_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
-                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
-                fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
-                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
-                fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
-                cCal_TofRaw->cd(cpt + 1);
-                fh1_Cal_TofRaw[cpt]->SetLineColor(kRed);
-                fh1_Cal_TofRaw[cpt]->Draw();
-                fh1_Tcal1Hit_TofRaw[cpt]->Draw("same");
+                for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
+                {
+                    sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i", sta, sto);
+                    if (fh1_Tcal1Hit_TofRaw[cpt])
+                    {
+                        Int_t nbins = fh1_Tcal1Hit_TofRaw[cpt]->GetNbinsX();
+                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1,
+                                                       Name1,
+                                                       nbins,
+                                                       fh1_Tcal1Hit_TofRaw[cpt]->GetBinLowEdge(1),
+                                                       fh1_Tcal1Hit_TofRaw[cpt]->GetBinLowEdge(nbins) +
+                                                           fh1_Tcal1Hit_TofRaw[cpt]->GetBinWidth(nbins));
+                    }
+                    else
+                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
+                    fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] in red CAL level, in blue TCAL-MULT1");
+                    fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
+                    fh1_Cal_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Cal_TofRaw[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Cal_TofRaw[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Cal_TofRaw[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_TofRaw->cd(cpt + 1);
+                    fh1_Cal_TofRaw[cpt]->SetLineColor(kRed);
+                    fh1_Cal_TofRaw[cpt]->Draw();
+                    fh1_Tcal1Hit_TofRaw[cpt]->Draw("same");
 
-                sprintf(Name1, "TofCal_FrsSci%i_to_FrsSci%i", sta, sto);
-                fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 25000, 500, 3000.);
-                fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitle("calibrated Tof [ns]");
-                fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitle("number of counts");
-                fh1_Cal_TofCal[cpt]->GetXaxis()->CenterTitle(true);
-                fh1_Cal_TofCal[cpt]->GetYaxis()->CenterTitle(true);
-                fh1_Cal_TofCal[cpt]->GetXaxis()->SetLabelSize(0.05);
-                fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitleSize(0.05);
-                fh1_Cal_TofCal[cpt]->GetYaxis()->SetLabelSize(0.05);
-                fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitleSize(0.05);
-                cCal_TofCal->cd(cpt + 1);
-                fh1_Cal_TofRaw[cpt]->Draw();
+                    sprintf(Name1, "TofCal_FrsSci%i_to_FrsSci%i", sta, sto);
+                    fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 25000, 500, 3000.);
+                    fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitle("calibrated Tof [ns]");
+                    fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitle("number of counts");
+                    fh1_Cal_TofCal[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Cal_TofCal[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Cal_TofCal[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Cal_TofCal[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_TofCal->cd(cpt + 1);
+                    fh1_Cal_TofCal[cpt]->Draw();
 
-                sprintf(Name1, "Beta_FrsSci%i_to_FrsSci%i", sta, sto);
-                fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 5000, 0.5, 1.);
-                fh1_Cal_Beta[cpt]->GetXaxis()->SetTitle("Beta");
-                fh1_Cal_Beta[cpt]->GetYaxis()->SetTitle("number of counts");
-                fh1_Cal_Beta[cpt]->GetXaxis()->CenterTitle(true);
-                fh1_Cal_Beta[cpt]->GetYaxis()->CenterTitle(true);
-                fh1_Cal_Beta[cpt]->GetXaxis()->SetLabelSize(0.05);
-                fh1_Cal_Beta[cpt]->GetXaxis()->SetTitleSize(0.05);
-                fh1_Cal_Beta[cpt]->GetYaxis()->SetLabelSize(0.05);
-                fh1_Cal_Beta[cpt]->GetYaxis()->SetTitleSize(0.05);
-                cCal_Beta->cd(cpt + 1);
-                fh1_Cal_Beta[cpt]->Draw();
-                cpt++;
+                    sprintf(Name1, "Beta_FrsSci%i_to_FrsSci%i", sta, sto);
+                    fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 5000, 0.5, 1.);
+                    fh1_Cal_Beta[cpt]->GetXaxis()->SetTitle("Beta");
+                    fh1_Cal_Beta[cpt]->GetYaxis()->SetTitle("number of counts");
+                    fh1_Cal_Beta[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Cal_Beta[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Cal_Beta[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Cal_Beta[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Cal_Beta[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Cal_Beta[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_Beta->cd(cpt + 1);
+                    fh1_Cal_Beta[cpt]->Draw();
+                    cpt++;
+                }
             }
         }
     }
@@ -386,21 +413,31 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
     mainfolMap->Add(cMap_FT);
     mainfolMap->Add(cMap_Mult1D);
     mainfolMap->Add(cMap_Mult2D);
-
-    TFolder* mainfolTcal = new TFolder("FrsSciTcal", "FrsSci Tcal info");
-    mainfolTcal->Add(cTcal_Pos);
-    mainfolTcal->Add(cTcal_Tof);
-
-    TFolder* mainfolCal = new TFolder("FrsSciCal", "FrsSci Cal info");
-    mainfolCal->Add(cCal_PosRaw);
-    mainfolCal->Add(cCal_PosCal);
-    mainfolCal->Add(cCal_TofRaw);
-    mainfolCal->Add(cCal_TofCal);
-    mainfolCal->Add(cCal_Beta);
-
     run->AddObject(mainfolMap);
-    run->AddObject(mainfolTcal);
-    run->AddObject(mainfolCal);
+
+    if (fTcal)
+    {
+        TFolder* mainfolTcal = new TFolder("FrsSciTcal", "FrsSci Tcal info");
+        mainfolTcal->Add(cTcal_Pos);
+        mainfolTcal->Add(cTcal_Tof);
+        run->AddObject(mainfolTcal);
+    }
+    if (fPosCal || fTofCal)
+    {
+        TFolder* mainfolCal = new TFolder("FrsSciCal", "FrsSci Cal info");
+        if (fPosCal)
+        {
+            mainfolCal->Add(cCal_PosRaw);
+            mainfolCal->Add(cCal_PosCal);
+        }
+        if (fTofCal)
+        {
+            mainfolCal->Add(cCal_TofRaw);
+            mainfolCal->Add(cCal_TofCal);
+            mainfolCal->Add(cCal_Beta);
+        }
+        run->AddObject(mainfolCal);
+    }
 
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_FRSSCI_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
@@ -423,17 +460,25 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
             fh1_Map_mult[i * fNbPmts + j]->Reset();
         }
 
-        fh1_Tcal1Hit_PosRaw[i]->Reset();
-        fh1_Cal_PosRaw[i]->Reset();
-        fh1_Cal_PosCal[i]->Reset();
+        if (fTcal)
+            fh1_Tcal1Hit_PosRaw[i]->Reset();
+        if (fPosCal)
+        {
+            fh1_Cal_PosRaw[i]->Reset();
+            fh1_Cal_PosCal[i]->Reset();
+        }
     }
 
     for (UShort_t i = 0; i < fNbTofs; i++)
     {
-        fh1_Tcal1Hit_TofRaw[i]->Reset();
-        fh1_Cal_TofRaw[i]->Reset();
-        fh1_Cal_TofCal[i]->Reset();
-        fh1_Cal_Beta[i]->Reset();
+        if (fTcal)
+            fh1_Tcal1Hit_TofRaw[i]->Reset();
+        if (fTofCal)
+        {
+            fh1_Cal_TofRaw[i]->Reset();
+            fh1_Cal_TofCal[i]->Reset();
+            fh1_Cal_Beta[i]->Reset();
+        }
     }
 }
 
@@ -528,7 +573,9 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                     for (UShort_t i = 0; i < fNbDets; i++)
                     {
                         if (multTcal[i * fNbPmts] == 1 && multTcal[i * fNbPmts + 1] == 1)
-                            fh1_Tcal1Hit_PosRaw[i]->Fill(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]);
+                        {
+                            fh1_Tcal1Hit_PosRaw[i]->Fill((Float_t)(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]));
+                        }
                     }
                     // TofRaw [ns] relatively to Tref
                     if (fNbPmts > 2 && fNbDets > 1 && fNbTofs > 0)

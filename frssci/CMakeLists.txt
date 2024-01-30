@@ -47,6 +47,7 @@ parameters/R3BFrsSciTcalPar.cxx
 parameters/R3BFrsSciCalPar.cxx
 calibration/R3BFrsSciMapped2Tcal.cxx
 calibration/R3BFrsSciMapped2TcalPar.cxx
+calibration/R3BFrsSciTcal2Cal.cxx
 online/R3BOnlineSpectraFrsSci.cxx
 )
 

@@ -64,7 +64,6 @@ FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
     {
         p = new R3BFrsSciTcalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    return p;
     if (strcmp(name, "FrsSciCalPar") == 0)
     {
         p = new R3BFrsSciCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
