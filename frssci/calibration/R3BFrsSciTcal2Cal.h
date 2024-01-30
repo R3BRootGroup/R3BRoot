@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,8 +19,7 @@
 // ***     2/ calculate TofRaw and apply calibration parameters        *** //
 // *** *************************************************************** *** //
 
-#ifndef R3BFRSSCI_TCAL2CAL_H
-#define R3BFRSSCI_TCAL2CAL_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "R3BFrsSciCalPar.h"
@@ -80,5 +79,3 @@ class R3BFrsSciTcal2Cal : public FairTask
   public:
     ClassDef(R3BFrsSciTcal2Cal, 1)
 };
-
-#endif // R3BFRSSCI_TCAL2CAL_H
