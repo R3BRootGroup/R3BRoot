@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,16 +17,7 @@
 
 #include "R3BAlpideCluster.h"
 
-R3BAlpideCluster::R3BAlpideCluster()
-    : fSensorId(0)
-    , fClusterId(0)
-    , fCol(0)
-    , fRow(0)
-    , fActive(false)
-{
-}
-
-R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t col, Int_t row, Bool_t active)
+R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, int col, int row, bool active)
     : fSensorId(sensorid)
     , fCol(col)
     , fRow(row)
@@ -34,7 +25,7 @@ R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t col, Int_t row, Bool
 {
 }
 
-R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t clusterid, Int_t col, Int_t row)
+R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, int clusterid, int col, int row)
     : fSensorId(sensorid)
     , fClusterId(clusterid)
     , fCol(col)
@@ -42,4 +33,4 @@ R3BAlpideCluster::R3BAlpideCluster(UShort_t sensorid, Int_t clusterid, Int_t col
 {
 }
 
-ClassImp(R3BAlpideCluster);
+ClassImp(R3BAlpideCluster)

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,11 +17,10 @@
 // -----          Fill Alpide online histograms           -----
 // ------------------------------------------------------------
 
-#ifndef R3BAlpideOnlineSpectra_H
-#define R3BAlpideOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
+#include <FairTask.h>
+#include <TCanvas.h>
 #include <vector>
 
 class TClonesArray;
@@ -51,7 +50,7 @@ class R3BAlpideOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BAlpideOnlineSpectra();
+    virtual ~R3BAlpideOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -59,26 +58,26 @@ class R3BAlpideOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init() override;
+    InitStatus Init() override;
 
     /** Virtual method ReInit **/
-    virtual InitStatus ReInit() override;
+    InitStatus ReInit() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option) override;
+    void Exec(Option_t* /*option*/) override;
 
-    virtual void SetParContainers() override;
+    void SetParContainers() override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent() override;
+    void FinishEvent() override;
 
     /**
      * Methods to clean histograms.
@@ -89,8 +88,8 @@ class R3BAlpideOnlineSpectra : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat1, Int_t tpat2)
+    inline void SetTrigger(int trigger) { fTrigger = trigger; }
+    inline void SetTpat(int tpat1, int tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
@@ -99,16 +98,16 @@ class R3BAlpideOnlineSpectra : public FairTask
   private:
     void SetParameter();
 
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
-    TClonesArray* fHitItems;
+    TClonesArray* fMappedItems = nullptr;
+    TClonesArray* fCalItems = nullptr;
+    TClonesArray* fHitItems = nullptr;
 
-    R3BEventHeader* header;        /**< Event header. */
-    R3BAlpideMappingPar* fMap_Par; /**< Parameter container. >*/
-    Int_t fTrigger;                /**< Trigger value. */
-    Int_t fTpat1, fTpat2;
-    Int_t fNEvents;
-    UInt_t fNbSensors;
+    R3BEventHeader* header = nullptr;        /**< Event header. */
+    R3BAlpideMappingPar* fMap_Par = nullptr; /**< Parameter container. >*/
+    int fTrigger = -1;                       /**< Trigger value. */
+    int fTpat1 = 0, fTpat2 = 0;
+    int fNEvents = 0;
+    uint16_t fNbSensors = 24;
 
     std::vector<TH2F*> fh2_ColVsRow;
     std::vector<TH2F*> fh2_ColVsRowCal;
@@ -120,5 +119,3 @@ class R3BAlpideOnlineSpectra : public FairTask
   public:
     ClassDefOverride(R3BAlpideOnlineSpectra, 1)
 };
-
-#endif

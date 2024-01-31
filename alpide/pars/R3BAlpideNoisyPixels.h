@@ -16,10 +16,9 @@
 // -----     Created 22/03/22 by J.L. Rodriguez-Sanchez    -----
 // -------------------------------------------------------------
 
-#ifndef R3BAlpideNoisyPixels_H
-#define R3BAlpideNoisyPixels_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 #include "R3BAlpideMappingPar.h"
 
@@ -65,5 +64,3 @@ class R3BAlpideNoisyPixels : public FairTask
     // Class definition
     ClassDefOverride(R3BAlpideNoisyPixels, 1)
 };
-
-#endif /*  R3BAlpideNoisyPixels_H */
