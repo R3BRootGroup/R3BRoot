@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,8 +17,7 @@
 // -----           Fill Tofd online histograms            -----
 // ------------------------------------------------------------
 
-#ifndef R3BTofDOnlineSpectra_H
-#define R3BTofDOnlineSpectra_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -117,23 +116,23 @@ class R3BTofDOnlineSpectra : public FairTask
 
   private:
     void SetParameter();
-    R3BCoarseTimeStitch* fTimeStitch;
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
-    TClonesArray* fHitItems;
-    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+    R3BCoarseTimeStitch* fTimeStitch = nullptr;
+    TClonesArray* fMappedItems = nullptr;
+    TClonesArray* fCalItems = nullptr;
+    TClonesArray* fHitItems = nullptr;
+    TClonesArray* fCalTriggerItems = nullptr; /**< Array with trigger Cal items - input data. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    R3BTofDMappingPar* fMapPar;
-    Int_t fTrigger; /**< Trigger value. */
-    Int_t fTpat1, fTpat2;
-    UInt_t fNofPlanes;
-    Int_t fMaxmul;
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
-    Double_t fC_range_ns;
-    Double_t fC_bar_coincidence_ns;
-    unsigned long fNEvents; /**< Event counter. */
+    R3BEventHeader* header = nullptr; /**< Event header. */
+    R3BTofDMappingPar* fMapPar = nullptr;
+    Int_t fTrigger = -1; /**< Trigger value. */
+    Int_t fTpat1 = -1, fTpat2 = -1;
+    UInt_t fNofPlanes = 4;
+    Int_t fMaxmul = 100;
+    UInt_t fPaddlesPerPlane = 44;        /**< Number of paddles per plane. */
+    Double_t fC_range_ns = 2048 * 5;     // ns
+    Double_t fC_bar_coincidence_ns = 20; // ns
+    unsigned long fNEvents = 0;          /**< Event counter. */
 
     std::vector<TH1F*> fh_tofd_channels;
     std::vector<TH2F*> fh_tofd_multihit;
@@ -154,5 +153,3 @@ class R3BTofDOnlineSpectra : public FairTask
   public:
     ClassDef(R3BTofDOnlineSpectra, 1)
 };
-
-#endif /* R3BTofDOnlineSpectra_H */

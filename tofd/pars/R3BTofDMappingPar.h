@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,8 +16,7 @@
 // -----    Created 18/03/22 by J.L. Rodriguez-Sanchez     -----
 // -------------------------------------------------------------
 
-#ifndef R3BTofDMappingPar_H
-#define R3BTofDMappingPar_H 1
+#pragma once
 
 #include "FairParGenericSet.h"
 
@@ -79,7 +78,6 @@ class R3BTofDMappingPar : public FairParGenericSet
     const R3BTofDMappingPar& operator=(const R3BTofDMappingPar&);
     R3BTofDMappingPar(const R3BTofDMappingPar&);
 
+  public:
     ClassDef(R3BTofDMappingPar, 1);
 };
-
-#endif /* R3BTofDMappingPar_H */

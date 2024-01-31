@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,8 +16,7 @@
 // -----    Created 18/03/22 by J.L. Rodriguez-Sanchez     -----
 // -------------------------------------------------------------
 
-#ifndef R3BFiberMappingPar_H
-#define R3BFiberMappingPar_H 1
+#pragma once
 
 #include "FairParGenericSet.h"
 
@@ -72,7 +71,6 @@ class R3BFiberMappingPar : public FairParGenericSet
     const R3BFiberMappingPar& operator=(const R3BFiberMappingPar&);
     R3BFiberMappingPar(const R3BFiberMappingPar&);
 
+  public:
     ClassDef(R3BFiberMappingPar, 1);
 };
-
-#endif /* R3BFiberMappingPar_H */

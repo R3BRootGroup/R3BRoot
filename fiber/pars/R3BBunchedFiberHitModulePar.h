@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BBUNCHEDFIBERHITMODULEPAR_H
-#define R3BBUNCHEDFIBERHITMODULEPAR_H
+#pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
 #define NCHMAX 5000
 
@@ -101,7 +100,6 @@ class R3BBunchedFiberHitModulePar : public FairParGenericSet
     Double_t fGainMA;
     Double_t fGainS;
 
+  public:
     ClassDef(R3BBunchedFiberHitModulePar, 1);
 };
-
-#endif

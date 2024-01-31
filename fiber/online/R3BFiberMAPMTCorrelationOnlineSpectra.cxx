@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,6 +21,7 @@
 #include "R3BFiberMAPMTHitData.h"
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
+#include "R3BShared.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -103,23 +104,18 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-    {
-        R3BLOG(warn, "EventHeader. not found");
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
-    }
-    else
-        R3BLOG(info, " EventHeader. found");
+    R3BLOG_IF(warn, header == nullptr, "EventHeader. not found");
+    R3BLOG_IF(info, header, " EventHeader. found");
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fHitItems1 = dynamic_cast<TClonesArray*>(mgr->GetObject(fName1 + "Hit"));
-    R3BLOG_IF(warn, NULL == fHitItems1, fName1 + "Hit not found");
+    R3BLOG_IF(warn, fHitItems1 == nullptr, fName1 + "Hit not found");
 
     fHitItems2 = dynamic_cast<TClonesArray*>(mgr->GetObject(fName2 + "Hit"));
-    R3BLOG_IF(warn, NULL == fHitItems2, fName2 + "Hit not found");
+    R3BLOG_IF(warn, fHitItems2 == nullptr, fName2 + "Hit not found");
 
     //------------------------------------------------------------------------
     // create histograms
@@ -135,14 +131,14 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
         FibCanvas->Divide(3, 1);
 
         // Position X
-        fh_Fib_posX = new TH2F(fName1 + "_" + fName2 + "Hit_posX",
-                               fName1 + "_" + fName2 + " Hit X position",
-                               fNbfibers1,
-                               -25.6,
-                               25.6,
-                               fNbfibers2,
-                               -25.6,
-                               25.6);
+        fh_Fib_posX = R3B::root_owned<TH2F>(fName1 + "_" + fName2 + "Hit_posX",
+                                            fName1 + "_" + fName2 + " Hit X position",
+                                            fNbfibers1,
+                                            -25.6,
+                                            25.6,
+                                            fNbfibers2,
+                                            -25.6,
+                                            25.6);
         fh_Fib_posX->GetXaxis()->SetTitle(fName1 + " X position [cm]");
         fh_Fib_posX->GetYaxis()->SetTitle(fName2 + " X position [cm]");
         fh_Fib_posX->GetYaxis()->SetTitleOffset(1.02);
@@ -150,14 +146,14 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
         fh_Fib_posX->GetYaxis()->CenterTitle(true);
 
         // Position Y
-        fh_Fib_posY = new TH2F(fName1 + "_" + fName2 + "Hit_posY",
-                               fName1 + "_" + fName2 + " Hit Y position",
-                               fNbfibers1,
-                               -25.6,
-                               25.6,
-                               fNbfibers2,
-                               -25.6,
-                               25.6);
+        fh_Fib_posY = R3B::root_owned<TH2F>(fName1 + "_" + fName2 + "Hit_posY",
+                                            fName1 + "_" + fName2 + " Hit Y position",
+                                            fNbfibers1,
+                                            -25.6,
+                                            25.6,
+                                            fNbfibers2,
+                                            -25.6,
+                                            25.6);
         fh_Fib_posY->GetXaxis()->SetTitle(fName1 + " Y position [cm]");
         fh_Fib_posY->GetYaxis()->SetTitle(fName2 + " Y position [cm]");
         fh_Fib_posY->GetYaxis()->SetTitleOffset(1.02);
@@ -165,7 +161,7 @@ InitStatus R3BFiberMAPMTCorrelationOnlineSpectra::Init()
         fh_Fib_posY->GetYaxis()->CenterTitle(true);
 
         // ToT
-        fh_Fib_tot = new TH2F(
+        fh_Fib_tot = R3B::root_owned<TH2F>(
             fName1 + "_" + fName2 + "Hit_ToT", fName1 + "_" + fName2 + " Hit ToT", 200, 0., 100., 200, 0., 100.);
         fh_Fib_tot->GetXaxis()->SetTitle(fName1 + " ToT");
         fh_Fib_tot->GetYaxis()->SetTitle(fName2 + " ToT");
@@ -292,4 +288,4 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BFiberMAPMTCorrelationOnlineSpectra);
+ClassImp(R3BFiberMAPMTCorrelationOnlineSpectra)

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,19 +16,18 @@
 // -----    Created 25/04/22 by J.L. Rodriguez-Sanchez     -----
 // -------------------------------------------------------------
 
-#ifndef R3BFiberMAPMTOnlineSpectra_H
-#define R3BFiberMAPMTOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
+
+#include <TMath.h>
 #include <array>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <vector>
-
-#include "TMath.h"
-#include <cstdlib>
-#include <list>
 
 class TClonesArray;
 class TH1F;
@@ -153,5 +152,3 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
   public:
     ClassDef(R3BFiberMAPMTOnlineSpectra, 1)
 };
-
-#endif /* R3BFiberMAPMTOnlineSpectra_H */

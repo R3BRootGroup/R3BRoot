@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,16 +11,16 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BFiberMAPMTHITPAR_H
-#define R3BFiberMAPMTHITPAR_H 1
+#pragma once
 
 #define NMODULEMAX 6000
 
 #define N_FIBER_MAX 2048
 
-#include "FairParGenericSet.h"
 #include "R3BFiberMAPMTHitModulePar.h"
-#include "TObjArray.h"
+
+#include <FairParGenericSet.h>
+#include <TObjArray.h>
 #include <map>
 
 using namespace std;
@@ -134,7 +134,6 @@ class R3BFiberMAPMTHitPar : public FairParGenericSet
     Bool_t fMapInit;             /**< a boolean flag for indication whether the indexing map is initialized */
     map<Int_t, Int_t> fIndexMap; /**< a map between index of a container in array and plane,paddle,side */
 
+  public:
     ClassDef(R3BFiberMAPMTHitPar, 1);
 };
-
-#endif

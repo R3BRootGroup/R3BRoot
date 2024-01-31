@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTofDHitModulePar_H
-#define R3BTofDHitModulePar_H 1
+#pragma once
 
 #include "FairParGenericSet.h"
 
@@ -157,7 +156,6 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;                    /**< quench correction parameters */
     Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk; /**< walk correction parameters */
 
+  public:
     ClassDef(R3BTofDHitModulePar, 2);
 };
-
-#endif /* R3BTofDHitModulePar_H */
