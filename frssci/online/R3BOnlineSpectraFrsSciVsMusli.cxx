@@ -73,10 +73,6 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
     if (NULL == mgr)
         LOG(fatal) << "R3BOnlineSpectraFrsSciVsMusli::Init FairRootManager not found";
 
-    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!fEventHeader)
-        fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
-
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
