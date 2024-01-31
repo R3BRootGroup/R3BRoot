@@ -342,6 +342,12 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         cCal_Beta->Divide(1, fNbTofs);
         fh1_Cal_Beta = new TH1D*[fNbTofs];
 
+        sprintf(Name1, "Cal_BRho_AoQ");
+        cCal_AoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_AoQ->Divide(2, fNbTofs);
+        fh1_Cal_BRho = new TH1D*[fNbTofs];
+        fh1_Cal_AoQ = new TH1D*[fNbTofs];
+
         if (fNbTofs > 0)
         {
             UShort_t cpt = 0;
@@ -400,6 +406,33 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_Beta[cpt]->GetYaxis()->SetTitleSize(0.05);
                     cCal_Beta->cd(cpt + 1);
                     fh1_Cal_Beta[cpt]->Draw();
+
+                    sprintf(Name1, "BRho_FrsSci%i_to_FrsSci%i", sta, sto);
+                    fh1_Cal_BRho[cpt] = new TH1D(Name1, Name1, 5000, 5, 10.);
+                    fh1_Cal_BRho[cpt]->GetXaxis()->SetTitle("BRho [T.m]");
+                    fh1_Cal_BRho[cpt]->GetYaxis()->SetTitle("number of counts");
+                    fh1_Cal_BRho[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Cal_BRho[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Cal_BRho[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Cal_BRho[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Cal_BRho[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Cal_BRho[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_AoQ->cd(2 * cpt + 1);
+                    fh1_Cal_BRho[cpt]->Draw();
+
+                    sprintf(Name1, "AoQ_FrsSci%i_to_FrsSci%i", sta, sto);
+                    fh1_Cal_AoQ[cpt] = new TH1D(Name1, Name1, 3000, 0.5, 3.5);
+                    fh1_Cal_AoQ[cpt]->GetXaxis()->SetTitle("A/Q");
+                    fh1_Cal_AoQ[cpt]->GetYaxis()->SetTitle("number of counts");
+                    fh1_Cal_AoQ[cpt]->GetXaxis()->CenterTitle(true);
+                    fh1_Cal_AoQ[cpt]->GetYaxis()->CenterTitle(true);
+                    fh1_Cal_AoQ[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh1_Cal_AoQ[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh1_Cal_AoQ[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh1_Cal_AoQ[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_AoQ->cd(2 * (cpt + 1));
+                    fh1_Cal_AoQ[cpt]->Draw();
+
                     cpt++;
                 }
             }
@@ -478,6 +511,8 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
             fh1_Cal_TofRaw[i]->Reset();
             fh1_Cal_TofCal[i]->Reset();
             fh1_Cal_Beta[i]->Reset();
+            fh1_Cal_BRho[i]->Reset();
+            fh1_Cal_AoQ[i]->Reset();
         }
     }
 }
@@ -641,6 +676,8 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                         fh1_Cal_TofRaw[iRank]->Fill(hittofcal->GetRawTofNs());
                         fh1_Cal_TofCal[iRank]->Fill(hittofcal->GetCalTofNs());
                         fh1_Cal_Beta[iRank]->Fill(hittofcal->GetBeta());
+                        fh1_Cal_BRho[iRank]->Fill(hittofcal->GetBRho());
+                        fh1_Cal_AoQ[iRank]->Fill(hittofcal->GetAoQ());
                     } // end of loop over tof cal data
                 }     // --- end of if fTofCal->GetEntries() >0 --- //
             }         // end of if fTofCal
@@ -713,6 +750,8 @@ void R3BOnlineSpectraFrsSci::FinishTask()
                 fh1_Cal_TofRaw[i]->Write();
                 fh1_Cal_TofCal[i]->Write();
                 fh1_Cal_Beta[i]->Write();
+                fh1_Cal_BRho[i]->Write();
+                fh1_Cal_AoQ[i]->Write();
             }
         }
     }

@@ -48,7 +48,7 @@ class R3BFrsSciCalPar : public FairParGenericSet
     /** Method to print values of parameters to the standard output **/
     void printParams();
 
-    /** Accessor functions **/
+    /** Accessor functions : SET **/
 
     void SetNumDets(Int_t nDets) { fNumDets = nDets; }
     void SetNumPmts(Int_t nPmts) { fNumPmts = nPmts; }
@@ -88,6 +88,11 @@ class R3BFrsSciCalPar : public FairParGenericSet
     void SetPosCalGain(Float_t gain, UInt_t rank) { fPosCalGains->AddAt(gain, rank); }
     void SetPosCalOffset(Float_t offset, UInt_t rank) { fPosCalOffsets->AddAt(offset, rank); }
 
+    void SetBRho0(Double_t brho, UInt_t rank) { fBRho0->AddAt(brho, rank); }
+    void SetDispersion(Double_t D, UInt_t rank) { fDisp->AddAt(D, rank); }
+
+    /** Accessor functions : GET **/
+
     const Int_t GetNumDets() { return fNumDets; }
     const Int_t GetNumPmts() { return fNumPmts; }
     const Int_t GetNumTofs() { return fNumTofs; }
@@ -113,6 +118,11 @@ class R3BFrsSciCalPar : public FairParGenericSet
     TArrayD* GetAllParams_fTofCalOffsets() { return fTofCalOffsets; }
     TArrayF* GetAllParams_fPosCalGains() { return fPosCalGains; }
     TArrayF* GetAllParams_fPosCalOffsets() { return fPosCalOffsets; }
+
+    const Double_t GetBRho0AtRank(UInt_t rank) { return fBRho0->At(rank); }
+    const Double_t GetDispAtRank(UInt_t rank) { return fDisp->At(rank); }
+    TArrayD* GetAllParams_fBRho0() { return fBRho0; }
+    TArrayD* GetAllParams_fDisp() { return fDisp; }
 
   private:
     // parameters for dimension
@@ -140,6 +150,10 @@ class R3BFrsSciCalPar : public FairParGenericSet
     // parameters to calibrate the position in Mm
     TArrayF* fPosCalOffsets; // 1 offset per per detector
     TArrayF* fPosCalGains;   // 1 gain per per detector
+
+    // parameters to get AoQ
+    TArrayD* fBRho0; // one BRho0 per ToF
+    TArrayD* fDisp;  // one dispersion per detector (in fact per focal plane)
 
     const R3BFrsSciCalPar& operator=(const R3BFrsSciCalPar&);
     R3BFrsSciCalPar(const R3BFrsSciCalPar&);

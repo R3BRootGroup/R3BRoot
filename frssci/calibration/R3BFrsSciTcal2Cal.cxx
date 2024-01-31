@@ -216,7 +216,8 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
         Double_t iRawTimeSta = -1., iRawTimeSto = -1.;
         Float_t iRawPosSta = -10000.;
         Float_t iRawPosSto = -10000.;
-        Double_t iRawTof = -1., iCalTof = -1, iBeta = -1, iCalVelo = -1.;
+        Double_t iRawTof = -1., iCalTof = -1, iCalVelo = -1.;
+        Double_t iBeta = -1, iGamma = -1., iBRho = -1., iAoQ = -1.;
         Int_t selectLeftHit[nDets];
         Int_t selectRightHit[nDets];
         for (UShort_t det = 0; det < nDets; det++)
@@ -363,7 +364,18 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
                 // Beta
                 iBeta = iCalVelo / (Double_t)SPEED_OF_LIGHT_MNS;
 
-                AddTofCalData(rank + 1, dSta + 1, dSto + 1, iCalPos[dSta], iCalPos[dSto], iRawTof, iCalTof, iBeta);
+                // Gamma
+                iGamma = 1. / (sqrt(1. - pow(iBeta, 2)));
+
+                // Brho : the signs take car of the X direction (increasing from right to left)
+                iBRho = fCalPar->GetBRho0AtRank(rank) * (1 + iCalPos[dSta] / fCalPar->GetDispAtRank(dSta) -
+                                                         iCalPos[dSto] / fCalPar->GetDispAtRank(dSto));
+
+                // AoQ
+                iAoQ = iBRho / (3.10716 * iBeta * iGamma);
+
+                AddTofCalData(
+                    rank + 1, dSta + 1, dSto + 1, iCalPos[dSta], iCalPos[dSto], iRawTof, iCalTof, iBeta, iBRho, iAoQ);
                 rank++;
             }
         }
@@ -404,12 +416,15 @@ R3BFrsSciTofCalData* R3BFrsSciTcal2Cal::AddTofCalData(UShort_t rank,
                                                       Float_t calpossto,
                                                       Double_t rawtof,
                                                       Double_t caltof,
-                                                      Double_t beta)
+                                                      Double_t beta,
+                                                      Double_t brho,
+                                                      Double_t aoq)
 {
     // It fills the R3BFrsSciTcalData
     TClonesArray& clref = *fTofCal;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BFrsSciTofCalData(rank, detsta, detsto, calpossta, calpossto, rawtof, caltof, beta);
+    return new (clref[size])
+        R3BFrsSciTofCalData(rank, detsta, detsto, calpossta, calpossto, rawtof, caltof, beta, brho, aoq);
 }
 
 ClassImp(R3BFrsSciTcal2Cal);

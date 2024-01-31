@@ -21,7 +21,16 @@ class R3BFrsSciTofCalData : public TObject
     R3BFrsSciTofCalData();
 
     // Standard Constructor
-    R3BFrsSciTofCalData(UShort_t, UShort_t, UShort_t, Float_t, Float_t, Double_t, Double_t, Double_t);
+    R3BFrsSciTofCalData(UShort_t,
+                        UShort_t,
+                        UShort_t,
+                        Float_t,
+                        Float_t,
+                        Double_t,
+                        Double_t,
+                        Double_t,
+                        Double_t,
+                        Double_t);
 
     // Destructor
     virtual ~R3BFrsSciTofCalData() {}
@@ -35,6 +44,8 @@ class R3BFrsSciTofCalData : public TObject
     inline const Double_t& GetRawTofNs() const { return fRawTofNs; }
     inline const Double_t& GetCalTofNs() const { return fCalTofNs; }
     inline const Double_t& GetBeta() const { return fBeta; }
+    inline const Double_t& GetBRho() const { return fBRho; }
+    inline const Double_t& GetAoQ() const { return fAoQ; }
 
   private:
     UShort_t fRank;
@@ -45,6 +56,8 @@ class R3BFrsSciTofCalData : public TObject
     Double_t fRawTofNs;
     Double_t fCalTofNs;
     Double_t fBeta;
+    Double_t fBRho;
+    Double_t fAoQ;
 
   public:
     ClassDef(R3BFrsSciTofCalData, 2)

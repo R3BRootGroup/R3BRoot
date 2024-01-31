@@ -74,7 +74,9 @@ class R3BFrsSciTcal2Cal : public FairTask
                                        Float_t calpossto,
                                        Double_t rawtof,
                                        Double_t caltof,
-                                       Double_t beta);
+                                       Double_t beta,
+                                       Double_t gamma,
+                                       Double_t aoq);
 
   public:
     ClassDef(R3BFrsSciTcal2Cal, 1)
