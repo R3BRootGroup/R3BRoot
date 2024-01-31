@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,20 +18,20 @@
 // ------------------------------------------------------------
 
 // ROOT headers
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TGaxis.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TGaxis.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
 // R3B headers
 #include "R3BAlpideCalData.h"
@@ -41,6 +41,7 @@
 #include "R3BAlpideOnlineSpectra.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "R3BShared.h"
 
 // R3BAlpideOnlineSpectra::Default Constructor --------------------------
 R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra()
@@ -51,29 +52,17 @@ R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra()
 // R3BAlpideOnlineSpectra::Standard Constructor --------------------------
 R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fTrigger(-1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fNEvents(0)
-    , fNbSensors(1)
-    , fMap_Par(NULL)
-    , fMappedItems(NULL)
-    , fCalItems(NULL)
-    , fHitItems(NULL)
 {
 }
-
-// Virtual R3BAlpideOnlineSpectra::Destructor
-R3BAlpideOnlineSpectra::~R3BAlpideOnlineSpectra() { R3BLOG(debug, ""); }
 
 void R3BAlpideOnlineSpectra::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, rtdb == nullptr, "FairRuntimeDb not found");
 
     fMap_Par = dynamic_cast<R3BAlpideMappingPar*>(rtdb->getContainer("alpideMappingPar"));
-    R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
+    R3BLOG_IF(fatal, fMap_Par == nullptr, "Container alpideMappingPar not found");
 }
 
 void R3BAlpideOnlineSpectra::SetParameter()
@@ -93,36 +82,29 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-    {
-        R3BLOG(warn, "EventHeader. not found");
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
-    }
-    else
-    {
-        R3BLOG(info, "EventHeader. found");
-    }
+    R3BLOG_IF(error, header == nullptr, "EventHeader. not found");
+    R3BLOG_IF(info, header, "EventHeader. found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideMappedData"));
-    R3BLOG_IF(fatal, NULL == fMappedItems, "AlpideMappedData not found");
+    R3BLOG_IF(fatal, fMappedItems == nullptr, "AlpideMappedData not found");
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideCalData"));
-    R3BLOG_IF(warn, NULL == fCalItems, "AlpideCalData not found");
+    R3BLOG_IF(warn, fCalItems == nullptr, "AlpideCalData not found");
 
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideHitData"));
-    R3BLOG_IF(warn, NULL == fHitItems, "AlpideHitData not found");
+    R3BLOG_IF(warn, fHitItems == nullptr, "AlpideHitData not found");
 
     // MAIN FOLDER-ALPIDE
-    TFolder* mainfol = new TFolder("ALPIDE", "Alpide info");
+    auto* mainfol = new TFolder("ALPIDE", "Alpide info");
     // Folder for mapped data
-    TFolder* mapfol = new TFolder("Map", "Map Alpide info");
+    auto* mapfol = new TFolder("Map", "Map Alpide info");
     // Folder for cal data
-    TFolder* calfol = new TFolder("Cal", "Cal Alpide info");
+    auto* calfol = new TFolder("Cal", "Cal Alpide info");
     // Folder for hit data
-    TFolder* hitfol = new TFolder("Hit", "Hit Alpide info");
+    auto* hitfol = new TFolder("Hit", "Hit Alpide info");
 
     //
     // Create histograms
@@ -132,13 +114,13 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     char Name1[255];
     char Name2[255];
     fh2_ColVsRow.resize(fNbSensors);
-    for (Int_t s = 0; s < fNbSensors; s++)
+    for (int s = 0; s < fNbSensors; s++)
     {
         sprintf(Name1, "Sensor_%d_col_vs_row_map", s + 1);
-        auto cMap = new TCanvas(Name1, "mapped info", 10, 10, 500, 500);
+        auto* cMap = new TCanvas(Name1, "mapped info", 10, 10, 500, 500);
         sprintf(Name1, "fh2_col_vs_row_sensor_%d", s + 1);
         sprintf(Name2, "Mapped col vs row for sensor: %d", s + 1);
-        fh2_ColVsRow[s] = new TH2F(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
+        fh2_ColVsRow[s] = R3B::root_owned<TH2F>(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
         fh2_ColVsRow[s]->GetXaxis()->SetTitle("Col");
         fh2_ColVsRow[s]->GetYaxis()->SetTitle("Row");
         fh2_ColVsRow[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -154,14 +136,14 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     {
         fh2_ColVsRowCal.resize(fNbSensors);
         fh1_Calmult.resize(fNbSensors);
-        for (Int_t s = 0; s < fNbSensors; s++)
+        for (int s = 0; s < fNbSensors; s++)
         {
             sprintf(Name1, "Sensor_%d_col_vs_row_cal", s + 1);
-            auto cCal = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
+            auto* cCal = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
             cCal->Divide(2, 1);
             sprintf(Name1, "fh2_col_vs_row_cal_sensor_%d", s + 1);
             sprintf(Name2, "Cal col vs row for sensor: %d", s + 1);
-            fh2_ColVsRowCal[s] = new TH2F(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
+            fh2_ColVsRowCal[s] = R3B::root_owned<TH2F>(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
             fh2_ColVsRowCal[s]->GetXaxis()->SetTitle("Col");
             fh2_ColVsRowCal[s]->GetYaxis()->SetTitle("Row");
             fh2_ColVsRowCal[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -172,7 +154,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_mulcal_sensor_%d", s + 1);
             sprintf(Name2, "Cal_mult for sensor: %d", s + 1);
-            fh1_Calmult[s] = new TH1F(Name1, Name2, 1000, 0, 1000);
+            fh1_Calmult[s] = R3B::root_owned<TH1F>(Name1, Name2, 1000, 0, 1000);
             fh1_Calmult[s]->GetXaxis()->SetTitle("Pixel multiplicity");
             fh1_Calmult[s]->GetYaxis()->SetTitle("Counts");
             fh1_Calmult[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -192,14 +174,14 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         fh1_Clustermult.resize(fNbSensors);
         fh1_Clustersize.resize(fNbSensors);
         fh2_PosHit.resize(fNbSensors);
-        for (Int_t s = 0; s < fNbSensors; s++)
+        for (int s = 0; s < fNbSensors; s++)
         {
             sprintf(Name1, "Cluster_size_sensor_%d", s + 1);
-            auto cHit = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
+            auto* cHit = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
             cHit->Divide(2, 1);
             sprintf(Name1, "fh2_pos_hit_sensor_%d", s + 1);
             sprintf(Name2, "Hit-position for sensor: %d", s + 1);
-            fh2_PosHit[s] = new TH2F(Name1, Name2, 600, -15.0, 15.0, 300, -7.5, 7.5);
+            fh2_PosHit[s] = R3B::root_owned<TH2F>(Name1, Name2, 600, -15.0, 15.0, 300, -7.5, 7.5);
             fh2_PosHit[s]->GetXaxis()->SetTitle("Posl [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitle("Post [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -210,7 +192,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_cluster_size_sensor_%d", s + 1);
             sprintf(Name2, "Cluster_size for sensor: %d", s + 1);
-            fh1_Clustersize[s] = new TH1F(Name1, Name2, 160, 0, 160);
+            fh1_Clustersize[s] = R3B::root_owned<TH1F>(Name1, Name2, 160, 0, 160);
             fh1_Clustersize[s]->GetXaxis()->SetTitle("Cluster size [pixels]");
             fh1_Clustersize[s]->GetYaxis()->SetTitle("Counts");
             fh1_Clustersize[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -226,7 +208,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             auto cHitm = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
             sprintf(Name1, "fh1_cluster_multiplicity_sensor_%d", s + 1);
             sprintf(Name2, "Cluster_multiplicity for sensor: %d", s + 1);
-            fh1_Clustermult[s] = new TH1F(Name1, Name2, 60, 0, 60);
+            fh1_Clustermult[s] = R3B::root_owned<TH1F>(Name1, Name2, 60, 0, 60);
             fh1_Clustermult[s]->GetXaxis()->SetTitle("Cluster multiplicity");
             fh1_Clustermult[s]->GetYaxis()->SetTitle("Counts");
             fh1_Clustermult[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -262,45 +244,56 @@ void R3BAlpideOnlineSpectra::Reset_Histo()
 
     if (fMappedItems)
     {
-        for (Int_t s = 0; s < fNbSensors; s++)
-            fh2_ColVsRow[s]->Reset();
+        for (const auto& hist : fh2_ColVsRow)
+        {
+            hist->Reset();
+        }
     }
 
     if (fCalItems)
     {
-        for (Int_t s = 0; s < fNbSensors; s++)
+        for (const auto& hist : fh2_ColVsRowCal)
         {
-            fh2_ColVsRowCal[s]->Reset();
-            fh1_Calmult[s]->Reset();
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_Calmult)
+        {
+            hist->Reset();
         }
     }
 
     if (fHitItems)
     {
-        for (Int_t s = 0; s < fNbSensors; s++)
+        for (const auto& hist : fh1_Clustermult)
         {
-            fh1_Clustermult[s]->Reset();
-            fh1_Clustersize[s]->Reset();
-            fh2_PosHit[s]->Reset();
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_Clustersize)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh2_PosHit)
+        {
+            hist->Reset();
         }
     }
 
     return;
 }
 
-void R3BAlpideOnlineSpectra::Exec(Option_t* option)
+void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
 {
     // Check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
-    if (fTpat1 >= 0 && fTpat2 >= 0)
+    if (fTpat1 > 0 && fTpat2 > 0 && (header))
     {
         // fTpat = 1-16; fTpat_bit = 0-15
         Int_t fTpat_bit1 = fTpat1 - 1;
         Int_t fTpat_bit2 = fTpat2 - 1;
-        Int_t tpatbin;
-        for (Int_t i = 0; i < 16; i++)
+        Int_t tpatbin = 0;
+        for (int i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
@@ -314,7 +307,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
         auto nHits = fMappedItems->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        for (int ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BAlpideMappedData*>(fMappedItems->At(ihit));
             if (!hit)
@@ -328,26 +321,23 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
     {
         if (fCalItems->GetEntriesFast() > 0)
         {
-            Int_t mult[fNbSensors];
-            for (Int_t s = 0; s < fNbSensors; s++)
-                mult[s] = 0;
+            std::vector<int> mult(fNbSensors, 0);
             auto nHits = fCalItems->GetEntriesFast();
-            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            for (int ihit = 0; ihit < nHits; ihit++)
             {
                 auto hit = dynamic_cast<R3BAlpideCalData*>(fCalItems->At(ihit));
                 if (!hit)
                     continue;
-                Int_t senid = hit->GetSensorId() - 1;
+                auto senid = hit->GetSensorId() - 1;
                 fh2_ColVsRowCal[senid]->Fill(hit->GetCol(), hit->GetRow());
                 mult[senid]++;
             }
-
-            for (Int_t s = 0; s < fNbSensors; s++)
+            for (int s = 0; s < fNbSensors; s++)
                 fh1_Calmult[s]->Fill(mult[s]);
         }
         else
         {
-            for (Int_t s = 0; s < fNbSensors; s++)
+            for (int s = 0; s < fNbSensors; s++)
                 fh1_Calmult[s]->Fill(0);
         }
     }
@@ -355,21 +345,19 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
     // Fill hit data
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
     {
-        Int_t mult[fNbSensors];
-        for (Int_t s = 0; s < fNbSensors; s++)
-            mult[s] = 0;
+        std::vector<int> mult(fNbSensors, 0);
         auto nHits = fHitItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BAlpideHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
-            Int_t senid = hit->GetSensorId() - 1;
+            auto senid = hit->GetSensorId() - 1;
             fh1_Clustersize[senid]->Fill(hit->GetClusterSize());
             fh2_PosHit[senid]->Fill(hit->GetPosl(), hit->GetPost());
             mult[senid]++;
         }
-        for (Int_t s = 0; s < fNbSensors; s++)
+        for (int s = 0; s < fNbSensors; s++)
             fh1_Clustermult[s]->Fill(mult[s]);
     }
 
@@ -394,4 +382,4 @@ void R3BAlpideOnlineSpectra::FinishEvent()
     }
 }
 
-ClassImp(R3BAlpideOnlineSpectra);
+ClassImp(R3BAlpideOnlineSpectra)

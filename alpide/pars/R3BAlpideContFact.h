@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,24 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BAlpideContFact_H
-#define R3BAlpideContFact_H 1
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
 class FairContainer;
 
 class R3BAlpideContFact : public FairContFact
 {
+  public:
+    R3BAlpideContFact();
+    virtual ~R3BAlpideContFact() = default;
+
+    FairParSet* createContainer(FairContainer*) override;
+
   private:
     void setAllContainers();
 
   public:
-    R3BAlpideContFact();
-    virtual ~R3BAlpideContFact() {}
-
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BAlpideContFact, 0)
+    ClassDefOverride(R3BAlpideContFact, 0)
 };
-
-#endif /* R3BAlpideContFact_H */

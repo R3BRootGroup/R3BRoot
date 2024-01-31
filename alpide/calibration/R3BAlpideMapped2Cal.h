@@ -16,10 +16,9 @@
 // -----     Created 09/02/22 by J.L. Rodriguez-Sanchez    -----
 // -------------------------------------------------------------
 
-#ifndef R3BAlpideMapped2Cal_H
-#define R3BAlpideMapped2Cal_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 #include "R3BAlpideCalData.h"
 
@@ -55,14 +54,14 @@ class R3BAlpideMapped2Cal : public FairTask
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option) { fOnline = option; }
 
   private:
     void SetParameter();
     int GetCol(int reg, int dcol, int ads);
     int GetRow(int ads);
 
-    Bool_t fOnline; // Don't store data for online
+    bool fOnline; // Don't store data for online
 
     R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
     TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
@@ -75,5 +74,3 @@ class R3BAlpideMapped2Cal : public FairTask
     // Class definition
     ClassDefOverride(R3BAlpideMapped2Cal, 1)
 };
-
-#endif /*  R3BAlpideMapped2Cal_H */

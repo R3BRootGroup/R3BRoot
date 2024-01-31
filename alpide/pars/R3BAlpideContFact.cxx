@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,15 +17,14 @@
 // ----- Factory for the parameter containers in libR3BAlpide -----
 //-----------------------------------------------------------------
 
-#include "FairRuntimeDb.h"
+#include <FairRuntimeDb.h>
 
 #include "R3BAlpideContFact.h"
 #include "R3BAlpideMappingPar.h"
 #include "R3BLogger.h"
-
 #include "R3BTGeoPar.h"
 
-#include "TClass.h"
+#include <TClass.h>
 
 static R3BAlpideContFact gR3BAlpideContFact;
 
@@ -43,11 +42,11 @@ void R3BAlpideContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the Alpide library.
 
-    FairContainer* p1 = new FairContainer("AlpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
+    auto* p1 = new FairContainer("AlpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
     p1->addContext("GeometryParContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("alpideMappingPar", "ALPIDE Mapping Parameters", "AlpideMappingParContext");
+    auto* p2 = new FairContainer("alpideMappingPar", "ALPIDE Mapping Parameters", "AlpideMappingParContext");
     p2->addContext("AlpideMappingParContext");
     containers->Add(p2);
 }
@@ -56,18 +55,19 @@ FairParSet* R3BAlpideContFact::createContainer(FairContainer* c)
 {
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
-    const char* name = c->GetName();
-    R3BLOG(info, "Create container name: " << name);
-    FairParSet* p = 0;
-    if (strcmp(name, "AlpideGeoPar") == 0)
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
+
+    FairParSet* p = nullptr;
+    if (name == "AlpideGeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "alpideMappingPar") == 0)
+    else if (name == "alpideMappingPar")
     {
         p = new R3BAlpideMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-ClassImp(R3BAlpideContFact);
+ClassImp(R3BAlpideContFact)

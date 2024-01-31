@@ -16,10 +16,9 @@
 // -----     Created 22/03/22 by J.L. Rodriguez-Sanchez    -----
 // -------------------------------------------------------------
 
-#ifndef R3BAlpideCal2Hit_H
-#define R3BAlpideCal2Hit_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 #include <Rtypes.h>
 
 #include "R3BAlpideHitData.h"
@@ -58,14 +57,14 @@ class R3BAlpideCal2Hit : public FairTask
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option) { fOnline = option; }
 
   private:
     void SetParameter();
     void FindClusters();
     Double_t fPixelSize;
     Int_t fNbSensors;
-    Bool_t fOnline; // Don't store data for online
+    bool fOnline; // Don't store data for online
 
     TVector3 fTargetPos;
     TVector3 fAlpidePos;
@@ -79,7 +78,6 @@ class R3BAlpideCal2Hit : public FairTask
     TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
     TClonesArray* fAlpideHitData;  // Array with Alpide Hit output data
     TClonesArray* fAlpideCluster;  // Array with clusters
-                                   // TClonesArray* fAlpidePixel;
 
     // Private method AddHitData
     R3BAlpideHitData* AddHitData(UShort_t senId, UInt_t clustersize, Double_t x, Double_t y);
@@ -88,5 +86,3 @@ class R3BAlpideCal2Hit : public FairTask
     // Class definition
     ClassDefOverride(R3BAlpideCal2Hit, 1)
 };
-
-#endif /*  R3BAlpideCal2Hit_H */

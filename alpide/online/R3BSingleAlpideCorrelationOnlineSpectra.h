@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,14 +17,13 @@
 // ----- Fill Single ALPIDE correlation online histograms -----
 // ------------------------------------------------------------
 
-#ifndef R3BSingleAlpideCorrelationOnlineSpectra_H
-#define R3BSingleAlpideCorrelationOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TMath.h"
+#include <FairTask.h>
+#include <TCanvas.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TMath.h>
 
 class TClonesArray;
 class R3BEventHeader;
@@ -112,5 +111,3 @@ class R3BSingleAlpideCorrelationOnlineSpectra : public FairTask
   public:
     ClassDef(R3BSingleAlpideCorrelationOnlineSpectra, 1)
 };
-
-#endif

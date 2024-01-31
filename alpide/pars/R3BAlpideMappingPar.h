@@ -16,10 +16,9 @@
 // -----      Created 11/02/22 by J.L. Rodriguez-Sanchez    -----
 // --------------------------------------------------------------
 
-#ifndef R3BAlpideMappingPar_H
-#define R3BAlpideMappingPar_H 1
+#pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
 #include <Rtypes.h>
 #include <stdint.h>
@@ -79,5 +78,3 @@ class R3BAlpideMappingPar : public FairParGenericSet
   public:
     ClassDef(R3BAlpideMappingPar, 1);
 };
-
-#endif /* R3BAlpideMappingPar_H */

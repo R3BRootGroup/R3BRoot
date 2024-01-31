@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,25 +16,24 @@
 // -----          Created 28/01/2022 by J.L. Rodriguez         -----
 // -----------------------------------------------------------------
 
-#ifndef R3BAlpideCluster_H
-#define R3BAlpideCluster_H 1
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 #include <stdint.h>
 
 class R3BAlpideCluster : public TObject
 {
   public:
     // Default Constructor
-    R3BAlpideCluster();
+    R3BAlpideCluster() = default;
 
     // Standard Constructors
-    R3BAlpideCluster(UShort_t sensorid, Int_t col, Int_t row, Bool_t active = true);
+    R3BAlpideCluster(UShort_t sensorid, int col, int row, bool active = true);
 
-    R3BAlpideCluster(UShort_t sensorid, Int_t clusterid, Int_t col, Int_t row);
+    R3BAlpideCluster(UShort_t sensorid, int clusterid, int col, int row);
 
     // Destructor
-    virtual ~R3BAlpideCluster() {}
+    virtual ~R3BAlpideCluster() = default;
 
     // Getters
     UShort_t GetSensorId() const { return fSensorId; }
@@ -44,14 +43,12 @@ class R3BAlpideCluster : public TObject
     Bool_t GetAct() const { return fActive; }
 
   protected:
-    UShort_t fSensorId;
-    Int_t fClusterId;
-    Int_t fCol;
-    Int_t fRow;
-    Bool_t fActive;
+    UShort_t fSensorId = 0;
+    int fClusterId = 0;
+    int fCol = 0;
+    int fRow = 0;
+    bool fActive = false;
 
   public:
-    ClassDef(R3BAlpideCluster, 1)
+    ClassDefOverride(R3BAlpideCluster, 1)
 };
-
-#endif /* R3BAlpideCluster */
