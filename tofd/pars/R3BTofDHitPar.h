@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTofDHitPar_H
-#define R3BTofDHitPar_H 1
+#pragma once
 
 #define NMODULEMAX 6000
 
@@ -135,7 +134,6 @@ class R3BTofDHitPar : public FairParGenericSet
     Bool_t fMapInit;                  /**< a boolean flag for indication whether the indexing map is initialized */
     std::map<Int_t, Int_t> fIndexMap; /**< a map between index of a container in array and plane,paddle,side */
 
+  public:
     ClassDef(R3BTofDHitPar, 1);
 };
-
-#endif /* R3BTofDHitPar_H */

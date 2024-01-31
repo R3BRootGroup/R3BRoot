@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,7 @@
 #include "R3BFiberMappedData.h"
 #include "R3BFiberMappingPar.h"
 #include "R3BLogger.h"
+#include "R3BShared.h"
 #include "R3BTCalEngine.h"
 
 #include "FairLogger.h"
@@ -139,13 +140,8 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-    {
-        R3BLOG(warn, "EventHeader. not found");
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
-    }
-    else
-        R3BLOG(info, " EventHeader. found");
+    R3BLOG_IF(warn, header == nullptr, "EventHeader. not found");
+    R3BLOG_IF(info, header, " EventHeader. found");
 
     // uncomment lines below when ucesb avaliable
     FairRunOnline* run = FairRunOnline::Instance();
@@ -153,16 +149,16 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
 
     // Get data levels
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Mapped"));
-    R3BLOG_IF(fatal, NULL == fMappedItems, fName + "Mapped not found");
+    R3BLOG_IF(fatal, fMappedItems == nullptr, fName + "Mapped not found");
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Cal"));
-    R3BLOG_IF(fatal, NULL == fCalItems, fName + "Cal not found");
+    R3BLOG_IF(fatal, fCalItems == nullptr, fName + "Cal not found");
 
     fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "TriggerCal"));
-    R3BLOG_IF(fatal, NULL == fCalTriggerItems, fName + "TriggerCal not found");
+    R3BLOG_IF(fatal, fCalTriggerItems == nullptr, fName + "TriggerCal not found");
 
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject(fName + "Hit"));
-    R3BLOG_IF(warn, NULL == fHitItems, fName + "Hit not found");
+    R3BLOG_IF(warn, fHitItems == nullptr, fName + "Hit not found");
 
     //------------------------------------------------------------------------
     // create histograms
@@ -179,118 +175,120 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
         FibCanvas = new TCanvas(fName, fName, 10, 10, 910, 910);
         // Cal level
         // Channels:
-        fh_channels_Fib =
-            new TH1F(fName + "Mapped_channels_up", fName + "Mapped channels up", fNbfibersplot, 1., fNbfibersplot + 1.);
+        fh_channels_Fib = R3B::root_owned<TH1F>(
+            fName + "Mapped_channels_up", fName + "Mapped channels up", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_channels_Fib->GetXaxis()->SetTitle("PMT channel number");
         fh_channels_Fib->GetYaxis()->SetTitle("Counts");
         fh_channels_Fib->SetFillColor(31);
 
         // Channels:
-        fh_channels_single_Fib = new TH1F(
+        fh_channels_single_Fib = R3B::root_owned<TH1F>(
             fName + "Mapped_channels_down", fName + "Mapped channels down", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_channels_single_Fib->GetXaxis()->SetTitle("PMT channel number");
         fh_channels_single_Fib->GetYaxis()->SetTitle("Counts");
         fh_channels_single_Fib->SetFillColor(31);
 
         // Multihit MAPMT:
-        fh_multihit_m_Fib = new TH2F(
+        fh_multihit_m_Fib = R3B::root_owned<TH2F>(
             fName + "Cal_multihit_up", fName + "Cal multihits up", fNbfibersplot, 1., fNbfibersplot + 1., 20, 0., 20.);
         fh_multihit_m_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_multihit_m_Fib->GetYaxis()->SetTitle("Multihit");
 
         // Multihit SAPMT:
-        fh_multihit_s_Fib = new TH2F(fName + "Cal_multihit_down",
-                                     fName + "Cal multihits down",
-                                     fNbfibersplot,
-                                     1.,
-                                     fNbfibersplot + 1.,
-                                     20,
-                                     0.,
-                                     20.);
+        fh_multihit_s_Fib = R3B::root_owned<TH2F>(fName + "Cal_multihit_down",
+                                                  fName + "Cal multihits down",
+                                                  fNbfibersplot,
+                                                  1.,
+                                                  fNbfibersplot + 1.,
+                                                  20,
+                                                  0.,
+                                                  20.);
         fh_multihit_s_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_multihit_s_Fib->GetYaxis()->SetTitle("Multihit");
 
         // ToT raw up:
-        fh_raw_tot_up = new TH2F(
+        fh_raw_tot_up = R3B::root_owned<TH2F>(
             fName + "Cal_totraw_up", fName + "Cal ToT raw up", fNbfibersplot, 1., fNbfibersplot + 1., 200, 0., 100.);
         fh_raw_tot_up->GetXaxis()->SetTitle("Fiber number");
         fh_raw_tot_up->GetYaxis()->SetTitle("ToT / ns");
 
         // ToT SAPMT:
-        fh_raw_tot_down = new TH2F(
+        fh_raw_tot_down = R3B::root_owned<TH2F>(
             fName + "Cal_totraw_down", fName + "Cal ToT raw down", fNbfibersplot, 1., fNbfibersplot + 1, 200, 0., 100.);
         fh_raw_tot_down->GetXaxis()->SetTitle("Fiber number");
         fh_raw_tot_down->GetYaxis()->SetTitle("ToT / ns");
 
-        fh_chan_corell =
-            new TH2F(fName + "Cal_chan_vs_chan", fName + "Cal ch_up vs ch_down", 512, 0., 512, 512, 0., 512.);
+        fh_chan_corell = R3B::root_owned<TH2F>(
+            fName + "Cal_chan_vs_chan", fName + "Cal ch_up vs ch_down", 512, 0., 512, 512, 0., 512.);
         fh_chan_corell->GetXaxis()->SetTitle("Fiber number down");
         fh_chan_corell->GetYaxis()->SetTitle("Fiber number up");
 
-        fh_chan_dt_cal = new TH2F(fName + "Cal_TimevsChannel",
-                                  fName + "Cal Time bottom and top vs fiber number",
-                                  2 * fNbfibersplot,
-                                  -fNbfibersplot,
-                                  fNbfibersplot,
-                                  1700,
-                                  -1500.,
-                                  200.);
+        fh_chan_dt_cal = R3B::root_owned<TH2F>(fName + "Cal_TimevsChannel",
+                                               fName + "Cal Time bottom and top vs fiber number",
+                                               2 * fNbfibersplot,
+                                               -fNbfibersplot,
+                                               fNbfibersplot,
+                                               1700,
+                                               -1500.,
+                                               200.);
         fh_chan_dt_cal->GetXaxis()->SetTitle("Fiber number");
         fh_chan_dt_cal->GetYaxis()->SetTitle("time(up/down)-time_trigger / ns");
 
         // Hit level
         // Fibers:
-        fh_fibers_Fib = new TH1F(fName + "Hit_fibers", fName + "Hit fibers", fNbfibersplot, 1., fNbfibersplot + 1.);
+        fh_fibers_Fib =
+            R3B::root_owned<TH1F>(fName + "Hit_fibers", fName + "Hit fibers", fNbfibersplot, 1., fNbfibersplot + 1.);
         fh_fibers_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_fibers_Fib->GetYaxis()->SetTitle("Counts");
         fh_fibers_Fib->SetFillColor(31);
 
         // Multiplicity (number of hit fibers):
-        fh_mult_Fib = new TH1F(fName + "Hit_mult", fName + "Hit mult", 150, 0., 150);
+        fh_mult_Fib = R3B::root_owned<TH1F>(fName + "Hit_mult", fName + "Hit mult", 150, 0., 150);
         fh_mult_Fib->GetXaxis()->SetTitle("Multiplicity");
         fh_mult_Fib->GetYaxis()->SetTitle("Counts");
         fh_mult_Fib->SetFillColor(31);
 
         // ToT :
-        fh_ToT_Fib = new TH2F(
+        fh_ToT_Fib = R3B::root_owned<TH2F>(
             fName + "Hit_ToT_iFib", fName + "Hit ToT vs Fib", fNbfibersplot, 1., fNbfibersplot + 1, 200, 0., 100.);
         fh_ToT_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_ToT_Fib->GetYaxis()->SetTitle("ToT / ns");
 
         // Time of fiber:
-        fh_time_Fib = new TH2F(fName + "Hit_TimevsFiber",
-                               fName + "Hit Time vs Fiber",
-                               fNbfibersplot,
-                               1.,
-                               fNbfibersplot + 1.,
-                               fClockPeriods,
-                               -fClockPeriods / 2.,
-                               fClockPeriods / 2.);
+        fh_time_Fib = R3B::root_owned<TH2F>(fName + "Hit_TimevsFiber",
+                                            fName + "Hit Time vs Fiber",
+                                            fNbfibersplot,
+                                            1.,
+                                            fNbfibersplot + 1.,
+                                            fClockPeriods,
+                                            -fClockPeriods / 2.,
+                                            fClockPeriods / 2.);
         fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_time_Fib->GetYaxis()->SetTitle("(tUp+tDown)/2 / ns");
 
         // calibrated position
         auto cxy = new TCanvas(fName + "_xy", fName + "_xy", 10, 10, 910, 910);
-        fh_Fib_pos = new TH2F(fName + "Hit_pos", fName + "Hit calibrated position", 300, -30, 30, 500, -500, 500);
+        fh_Fib_pos =
+            R3B::root_owned<TH2F>(fName + "Hit_pos", fName + "Hit calibrated position", 300, -30, 30, 500, -500, 500);
         fh_Fib_pos->GetXaxis()->SetTitle("x position");
         fh_Fib_pos->GetYaxis()->SetTitle("y position");
         cxy->cd();
         fh_Fib_pos->Draw("colz");
 
         // hit fiber number vs. event number:
-        fh_Fib_vs_Events = new TH2F(fName + "Hit_fib_vs_event",
-                                    fName + "Hit Fiber # vs. Event #",
-                                    100,
-                                    0,
-                                    5e6,
-                                    fNbfibersplot,
-                                    1.,
-                                    fNbfibersplot + 1.);
+        fh_Fib_vs_Events = R3B::root_owned<TH2F>(fName + "Hit_fib_vs_event",
+                                                 fName + "Hit Fiber # vs. Event #",
+                                                 100,
+                                                 0,
+                                                 5e6,
+                                                 fNbfibersplot,
+                                                 1.,
+                                                 fNbfibersplot + 1.);
         fh_Fib_vs_Events->GetYaxis()->SetTitle("Fiber number");
         fh_Fib_vs_Events->GetXaxis()->SetTitle("Event number");
 
-        fh_ToTup_vs_ToTdown =
-            new TH2F(fName + "Hit_time_vs_event", fName + "Hit time # vs. Event #", 200, 0, 5e6, 2000, -1000., 1000.);
+        fh_ToTup_vs_ToTdown = R3B::root_owned<TH2F>(
+            fName + "Hit_time_vs_event", fName + "Hit time # vs. Event #", 200, 0, 5e6, 2000, -1000., 1000.);
         fh_ToTup_vs_ToTdown->GetXaxis()->SetTitle("Event number");
         fh_ToTup_vs_ToTdown->GetYaxis()->SetTitle("Time  / ns");
 
@@ -722,4 +720,4 @@ void R3BFiberMAPMTOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BFiberMAPMTOnlineSpectra);
+ClassImp(R3BFiberMAPMTOnlineSpectra)

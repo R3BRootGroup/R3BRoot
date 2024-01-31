@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,8 +16,7 @@
 // -----    Created 31/03/22 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------
 
-#ifndef R3BTOFDMAPPED2TCALPAR_H
-#define R3BTOFDMAPPED2TCALPAR_H 1
+#pragma once
 
 #include "FairTask.h"
 
@@ -108,5 +107,3 @@ class R3BTofDMapped2CalPar : public FairTask
   public:
     ClassDef(R3BTofDMapped2CalPar, 1)
 };
-
-#endif /* R3BTOFDMAPPED2TCALPAR_H */
