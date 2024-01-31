@@ -14,6 +14,7 @@
 # cmake-format: on
 
 add_subdirectory(legacy)
+add_subdirectory(mille)
 add_subdirectory(share)
 add_subdirectory(map_to_cal)
 add_subdirectory(cal_to_hit)
