@@ -24,6 +24,7 @@ R3BFrsSciCalPar::R3BFrsSciCalPar(const char* name, const char* title, const char
         fMaxTofs = new TArrayD(fNumDets - 1);
         fTofCalGains = new TArrayD(fNumTofs);
         fTofCalOffsets = new TArrayD(fNumTofs);
+        fBRho0 = new TArrayD(fNumTofs);
     }
     else
     {
@@ -36,6 +37,7 @@ R3BFrsSciCalPar::R3BFrsSciCalPar(const char* name, const char* title, const char
     fMaxPos = new TArrayF(fNumDets);
     fPosCalGains = new TArrayF(fNumDets);
     fPosCalOffsets = new TArrayF(fNumDets);
+    fDisp = new TArrayD(fNumDets);
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -74,6 +76,14 @@ R3BFrsSciCalPar::~R3BFrsSciCalPar()
     if (fTofCalOffsets != NULL)
     {
         delete fTofCalOffsets;
+    }
+    if (fBRho0 != NULL)
+    {
+        delete fBRho0;
+    }
+    if (fDisp != NULL)
+    {
+        delete fDisp;
     }
 }
 
@@ -114,6 +124,8 @@ void R3BFrsSciCalPar::putParams(FairParamList* list)
         list->add("fTofCalGains_CalPar", *fTofCalGains);
         fTofCalOffsets->Set(fNumTofs);
         list->add("fTofCalOffsets_CalPar", *fTofCalOffsets);
+        fBRho0->Set(fNumTofs);
+        list->add("fBRho0_CalPar", *fBRho0);
     }
 
     LOG(info) << "R3BFrsSciCalPar::putParams Array Size for PosCal gains and offsets: " << fNumDets;
@@ -125,6 +137,8 @@ void R3BFrsSciCalPar::putParams(FairParamList* list)
     list->add("fPosCalGains_CalPar", *fPosCalGains);
     fPosCalOffsets->Set(fNumDets);
     list->add("fPosCalOffsets_CalPar", *fPosCalOffsets);
+    fDisp->Set(fNumDets);
+    list->add("fDisp_CalPar", *fDisp);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -199,6 +213,12 @@ Bool_t R3BFrsSciCalPar::getParams(FairParamList* list)
             LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fTofCalOffsets";
             return kFALSE;
         }
+        fBRho0->Set(fNumTofs);
+        if (!(list->fill("fBRho0_CalPar", fBRho0)))
+        {
+            LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fBRho0";
+            return kFALSE;
+        }
     }
 
     LOG(info) << "R3BFrsSciCalPar::getParams Array Size for Pos limits and PosCal gains and offsets: " << fNumDets;
@@ -226,6 +246,12 @@ Bool_t R3BFrsSciCalPar::getParams(FairParamList* list)
         LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fPosCalOffsets";
         return kFALSE;
     }
+    fDisp->Set(fNumDets);
+    if (!(list->fill("fDisp_CalPar", fDisp)))
+    {
+        LOG(error) << "---R3BFrsSciCalPar::getParams Could not initialize fDisp";
+        return kFALSE;
+    }
 
     return kTRUE;
 }
@@ -246,6 +272,10 @@ void R3BFrsSciCalPar::printParams()
     for (UShort_t d = 0; d < fNumDets; d++)
     {
         LOG(info) << " for Det " << d + 1 << ", fMinPos = " << fMinPos->GetAt(d) << ", fMaxPos = " << fMaxPos->GetAt(d);
+        LOG(info) << "          "
+                  << ", fPosCalGains = " << fPosCalGains->GetAt(d) << ", fPosCalOffsets = " << fPosCalOffsets->GetAt(d);
+        LOG(info) << "          "
+                  << ", fDisp = " << fDisp->GetAt(d);
     }
     LOG(info) << "--- --------------------------------------------";
     if (fNumDets > 1)
