@@ -9,6 +9,8 @@ R3BFrsSciTofCalData::R3BFrsSciTofCalData()
     , fRawTofNs(0)
     , fCalTofNs(0)
     , fBeta(0)
+    , fBRho(0)
+    , fAoQ(0)
 {
 }
 
@@ -19,7 +21,9 @@ R3BFrsSciTofCalData::R3BFrsSciTofCalData(UShort_t rank,
                                          Float_t calPosSto,
                                          Double_t rawTof,
                                          Double_t calTof,
-                                         Double_t beta)
+                                         Double_t beta,
+                                         Double_t brho,
+                                         Double_t aq)
     : fRank(rank)
     , fDetIdSta(detIdSta)
     , fDetIdSto(detIdSto)
@@ -28,6 +32,8 @@ R3BFrsSciTofCalData::R3BFrsSciTofCalData(UShort_t rank,
     , fRawTofNs(rawTof)
     , fCalTofNs(calTof)
     , fBeta(beta)
+    , fBRho(brho)
+    , fAoQ(aq)
 {
 }
 ClassImp(R3BFrsSciTofCalData)
