@@ -26,6 +26,7 @@
 #pragma link C++ class R3BFrsSciMapped2TcalPar+;
 #pragma link C++ class R3BFrsSciTcal2Cal+;
 #pragma link C++ class R3BOnlineSpectraFrsSci+;
+#pragma link C++ class R3BOnlineSpectraFrsSciVsMusli+;
 
 #endif
 
