@@ -242,7 +242,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         run->AddObject(canvasPlaneXY);
     }
 
-    auto canvasPlaneSofia = new TCanvas("Timing!", "Timing!", 10, 10, 850, 850);
+    auto canvasPlaneSofia = new TCanvas("Timing", "Timing", 10, 10, 850, 850);
     canvasPlaneSofia->Divide(2, 2);
     hTofvsX = new TH2D("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
     hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
