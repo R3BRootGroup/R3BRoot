@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMusliMapped2Cal_H
-#define R3BMusliMapped2Cal_H 1
+#pragma once
 
 #include "TArrayF.h"
 
@@ -68,10 +67,10 @@ class R3BMusliMapped2Cal : public FairTask
   private:
     void SetParameters();
 
-    Int_t mult_signalmap[MAX_NB_SIGNALS_MAP];
-    UInt_t signal[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t energy[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t time[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    Int_t map_mult[MAX_NB_SIGNALS_MAP];
+    UInt_t map_sig[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    Double_t map_eraw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    Double_t map_traw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
 
     Int_t fNumSignals;
     Int_t fNumGroupsAnodes;
@@ -101,5 +100,3 @@ class R3BMusliMapped2Cal : public FairTask
     // Class definition
     ClassDef(R3BMusliMapped2Cal, 1)
 };
-
-#endif /* R3BMusliMapped2Cal_H */
