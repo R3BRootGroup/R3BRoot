@@ -95,21 +95,21 @@ void R3BMusliMapped2Cal::SetParameters()
     //--- Parameter Container ---
     fNumSignals = fCal_Par->GetNumSignals();           // Number of signals at Mapped
     fNumGroupsAnodes = fCal_Par->GetNumGroupsAnodes(); // Number of groups of anodes
-    fNumParamsEneFit = fCal_Par->GetNumParamsEneFit(); // Number of signals at Mapped
-    fNumParamsPosFit = fCal_Par->GetNumParamsPosFit(); // Number of signals at Mapped
-    fMaxMult = fCal_Par->GetMaxMult();
+    fNumParamsEneFit = fCal_Par->GetNumParamsEneFit(); // Number of ene calib params per group of anodes
+    fNumParamsPosFit = fCal_Par->GetNumParamsPosFit(); // Number of pos calib params per group of anodes
+    fMaxMult = fCal_Par->GetMaxMult();                 // maximum number of hit per output channel
 
-    Int_t array_ene = fNumGroupsAnodes * fNumParamsEneFit;
+    Int_t array_ene = fNumGroupsAnodes * fNumParamsEneFit; // array of ene calibration parameters
     fEneCalParams = new TArrayF();
     fEneCalParams->Set(array_ene);
     fEneCalParams = fCal_Par->GetEneCalParams();
 
-    Int_t array_pos = fNumGroupsAnodes * fNumParamsPosFit;
+    Int_t array_pos = fNumGroupsAnodes * fNumParamsPosFit; // arrays of pos calibration parameters
     fPosCalParams = new TArrayF();
     fPosCalParams->Set(array_pos);
     fPosCalParams = fCal_Par->GetPosCalParams();
 
-    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
+    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit; // array of dtraw limits for multi-hit analysis
     fMultHitCalParams = new TArrayF();
     fMultHitCalParams->Set(array_mult);
     fMultHitCalParams = fCal_Par->GetMultHitCalParams();
