@@ -152,6 +152,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             sprintf(Name1, "SciVsMusliCal_EvsAoQ");
             cCal_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
             cCal_EvsAoQ->Divide(5, 3);
+            fh2_Cal_EvsAoQ = new TH2D*[15];
 
             for (UShort_t i = 0; i < 15; i++)
             {
@@ -170,6 +171,11 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             }
             if (fMusli_Hit)
             {
+                sprintf(Name1, "SciVsMusliHit_EvsAoQ");
+                cHit_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+                cHit_EvsAoQ->Divide(2, 2);
+                fh2_Hit_EvsAoQ = new TH2D*[4];
+                fh2_Hit_ZvsAoQ = new TH2D*[4];
                 for (UShort_t i = 0; i < 4; i++)
                 {
                     sprintf(Name1, "Eave_vs_AoQ_typ%i", i + 1);
@@ -326,13 +332,13 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
                 if (iSig > 15)
                     continue;
                 if (iAoQ > 0)
-                    fh2_Cal_EvsAoQ[iSig]->Fill(iAoQ, hitcal->GetEnergy());
+                    fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
                 if (iSig > 8)
                     continue;
                 if (iRawPosCaveC != -1000.)
-                    fh2_Cal_PosRawVsDT[iSig]->Fill(hitcal->GetDT(), iRawPosCaveC);
+                    fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
                 if (iCalPosCaveC != -1000.)
-                    fh2_Cal_PosCalVsDT[iSig]->Fill(hitcal->GetDT(), iCalPosCaveC);
+                    fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
             }
         }
 
