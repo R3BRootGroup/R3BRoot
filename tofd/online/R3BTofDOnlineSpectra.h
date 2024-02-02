@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
+#include <FairTask.h>
 #include <vector>
 
 class TClonesArray;
@@ -129,10 +128,10 @@ class R3BTofDOnlineSpectra : public FairTask
     Int_t fTpat1 = -1, fTpat2 = -1;
     UInt_t fNofPlanes = 4;
     Int_t fMaxmul = 100;
-    UInt_t fPaddlesPerPlane = 44;        /**< Number of paddles per plane. */
-    Double_t fC_range_ns = 2048 * 5;     // ns
-    Double_t fC_bar_coincidence_ns = 20; // ns
-    unsigned long fNEvents = 0;          /**< Event counter. */
+    UInt_t fPaddlesPerPlane = 44;         /**< Number of paddles per plane. */
+    Double_t fC_range_ns = 2048 * 5.;     // ns
+    Double_t fC_bar_coincidence_ns = 20.; // ns
+    unsigned long fNEvents = 0;           /**< Event counter. */
 
     std::vector<TH1F*> fh_tofd_channels;
     std::vector<TH2F*> fh_tofd_multihit;
@@ -146,6 +145,7 @@ class R3BTofDOnlineSpectra : public FairTask
     std::vector<TH2F*> fh_tofd_time_hit;
     std::vector<TH1F*> fh_tofd_multihit_hit;
     std::vector<TH2F*> fh_tofd_dt_hit;
+    std::vector<TH2F*> fh2_tofd_ypos_cal;
 
     std::vector<TH2F*> fh_tofd_time_los_h2;
     std::vector<TH1F*> fh_tofd_time_los[44];

@@ -19,21 +19,21 @@
 // ------------------------------------------------------------
 
 // ROOT headers
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TGaxis.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
-#include "TVector3.h"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TGaxis.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
+#include <TVector3.h>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
 // R3B headers
 #include "R3BCoarseTimeStitch.h"
@@ -118,7 +118,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     R3BLOG_IF(fatal, fMappedItems == nullptr, "TofdMapped not found");
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
-    R3BLOG_IF(warn, fCalItems == nullptr, "TofdCal not found");
+    R3BLOG_IF(fatal, fCalItems == nullptr, "TofdCal not found");
 
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdHit"));
     R3BLOG_IF(warn, fHitItems == nullptr, "TofdHit not found");
@@ -133,7 +133,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     //------------------------------------------------------------------------
     // TofD detector
 
-    if (fMappedItems)
+    if (fMappedItems && fCalItems)
     {
         auto* cTofd_planes = new TCanvas("TofD_planes_Cal", "TOFD planes CAL data", 10, 10, 1100, 1000);
         cTofd_planes->Divide(6, fNofPlanes);
@@ -145,6 +145,13 @@ InitStatus R3BTofDOnlineSpectra::Init()
         fh_tofd_multihit.resize(fNofPlanes);
         fh_tofd_multihit_coinc.resize(fNofPlanes);
         fh_tofd_dt.resize(fNofPlanes - 1);
+
+        // Canvas to display the Y position as a function of paddle and per plane  ---------------
+        auto* cTofd_Y_per_planes =
+            new TCanvas("TofD_Ypos_planes_Cal", "TOFD: Y-pos per plane with CAL data", 10, 10, 1100, 1000);
+        cTofd_Y_per_planes->Divide(2, 2);
+
+        fh2_tofd_ypos_cal.resize(fNofPlanes);
 
         for (Int_t j = 0; j < fNofPlanes; j++)
         {
@@ -257,6 +264,21 @@ InitStatus R3BTofDOnlineSpectra::Init()
             fh_num_side[j]->GetXaxis()->SetTitleSize(0.045);
             fh_num_side[j]->GetYaxis()->SetLabelSize(0.045);
             fh_num_side[j]->GetYaxis()->SetTitleSize(0.045);
+
+            sprintf(strName13, "tofd_Ypos_plane_%d", j + 1);
+            sprintf(strName14, "Tofd Ypos for plane %d", j + 1);
+            fh2_tofd_ypos_cal[j] = R3B::root_owned<TH2F>(strName13, strName14, 45, 0, 45, 2000., -4000., 4000.);
+            fh2_tofd_ypos_cal[j]->GetXaxis()->SetTitle("Bar number");
+            fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitle("Y-position [ns]");
+            fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleOffset(1.);
+            fh2_tofd_ypos_cal[j]->GetXaxis()->CenterTitle(true);
+            fh2_tofd_ypos_cal[j]->GetYaxis()->CenterTitle(true);
+            fh2_tofd_ypos_cal[j]->GetXaxis()->SetLabelSize(0.045);
+            fh2_tofd_ypos_cal[j]->GetXaxis()->SetTitleSize(0.045);
+            fh2_tofd_ypos_cal[j]->GetYaxis()->SetLabelSize(0.045);
+            fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleSize(0.045);
+            cTofd_Y_per_planes->cd(j + 1);
+            fh2_tofd_ypos_cal[j]->Draw("colz");
         }
 
         cTofd_planes->cd(1);
@@ -338,6 +360,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
         // Adding this canvas to the main folder
         maintofd->Add(cTofd_planes);
+        maintofd->Add(cTofd_Y_per_planes);
     }
 
     if (fHitItems)
@@ -560,6 +583,7 @@ void R3BTofDOnlineSpectra::Reset_Histo()
         fh_tofd_TotPm[i]->Reset();
         fh_tofd_multihit_coinc[i]->Reset();
         fh_tofd_TotPm_coinc[i]->Reset();
+        fh2_tofd_ypos_cal[i]->Reset();
     }
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
@@ -913,6 +937,14 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     dt_mod -= fC_range_ns;
                 }
 
+                if (std::abs(dt_mod) < fC_bar_coincidence_ns * 10.)
+                {
+                    int iPlane = topc->GetDetectorId(); // 1..n
+                    int iBar = topc->GetBarId();        // 1..n
+                    // Histograms to display Y position
+                    fh2_tofd_ypos_cal[iPlane - 1]->Fill(iBar, dt_mod);
+                }
+
                 if (std::abs(dt_mod) < fC_bar_coincidence_ns)
                 {
                     // Hit!
@@ -1080,6 +1112,7 @@ void R3BTofDOnlineSpectra::FinishTask()
             fh_num_side[i]->Write();
             fh_tofd_multihit[i]->Write();
             fh_tofd_multihit_coinc[i]->Write();
+            fh2_tofd_ypos_cal[i]->Write();
         }
         for (Int_t i = 0; i < fNofPlanes - 1; i++)
         {
