@@ -31,14 +31,15 @@ namespace R3B::Neuland
     void EventHeaderCanvas::CanvasFill(DataMonitor& /*histograms*/)
     {
         auto* eventHeader = GetOnlineSpectra()->GetEventHeader();
+        const auto offspill_bit = GetOnlineSpectra()->GetBasePar()->GetOffSpillTpatPos();
         const auto tpat = eventHeader->GetTpat();
         h_tpats_->Fill(fmt::format("{:016b}", tpat).c_str(), 1);
 
-        if (CheckTriggerWithTpat(CalTrigger::onspill, tpat))
+        if (CheckTriggerWithTpat(CalTrigger::onspill, tpat, offspill_bit))
         {
             h_spill_stat_->Fill("onspill", 1);
         }
-        else if (CheckTriggerWithTpat(CalTrigger::offspill, tpat))
+        else if (CheckTriggerWithTpat(CalTrigger::offspill, tpat, offspill_bit))
         {
             h_spill_stat_->Fill("offspill", 1);
         }

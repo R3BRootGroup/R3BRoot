@@ -27,7 +27,7 @@ namespace R3B::Neuland
     }
 
     Map2CalParTask::Map2CalParTask()
-        : Map2CalParTask("NeulandMapped2Cal", 1)
+        : Map2CalParTask("NeulandMapToCalParTask", 1)
     {
     }
 
@@ -48,7 +48,7 @@ namespace R3B::Neuland
             }
         }
 
-        plane_num_ = base_par_->GetNumOfPlanes();
+        plane_num_ = GetBasePar()->GetNumOfPlanes();
         calibrationPar_->SetTrigEnabled(is_trig_enabled_);
         // trigIDIO.SetNumOfModule(plane_num_ * BarsPerPlane);
     }
@@ -134,7 +134,7 @@ namespace R3B::Neuland
         mapCalEngine_.Writer_to_TCalPar(cal_strategy_, *calibrationPar_);
         if (is_trigID_auto_)
         {
-            base_par_->SetTrigIDMap(trigIDMappingFinder_.extract_trigIDMap());
+            GetBasePar()->SetTrigIDMap(trigIDMappingFinder_.extract_trigIDMap());
         }
         calibrationPar_->SetSlowClockFrequency(coarse_time_frequency_);
 

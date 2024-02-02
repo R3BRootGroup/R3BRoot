@@ -13,6 +13,7 @@
  ******************************************************************************/
 
 #include "R3BDataMonitor.h"
+#include "R3BNeulandBasePar.h"
 #include "R3BNeulandTriggerTypes.h"
 #include <FairRuntimeDb.h>
 #include <FairTask.h>
@@ -39,6 +40,8 @@ namespace R3B::Neuland
         {
             is_write_hist_disabled_ = is_write_hist_disabled;
         }
+
+        auto GetBasePar() -> auto* { return base_par_; }
         // void SetOnline()
 
       protected:
@@ -57,10 +60,14 @@ namespace R3B::Neuland
       private:
         bool is_hist_disabled_ = false;
         bool is_write_hist_disabled_ = false;
+        int offspill_tpat_bit_ = 0;
+        int64_t passed_num_of_events = 0;
         CalTrigger trig_type_ = CalTrigger::all;
         R3BEventHeader* eventHeader_ = nullptr;
         std::vector<FairParSet*> input_pars_;
         std::vector<FairParSet*> output_pars_;
+
+        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
 
         // helpers:
         DataMonitor histograms_;

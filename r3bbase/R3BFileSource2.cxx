@@ -424,7 +424,7 @@ void R3BFileSource2::FillEventHeader(FairEventHeader* evtHeader)
 
 Int_t R3BFileSource2::CheckMaxEventNo(Int_t EvtEnd)
 {
-    event_end_ = (EvtEnd == 0) ? inputDataFiles_.GetEntries() : EvtEnd; // NOLINT
+    event_end_ = (EvtEnd <= 0) ? inputDataFiles_.GetEntries() : EvtEnd; // NOLINT
     R3BLOG(info, fmt::format("Setting printing event max to {}", event_end_));
     event_progress_.SetMaxEventNum(event_end_);
     return event_end_;

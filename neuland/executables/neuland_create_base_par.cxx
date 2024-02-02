@@ -92,6 +92,7 @@ auto main(int argc, const char** argv) -> int
         parOut->open(output().c_str(), "RECREATE");
         add_parameter(base_par.release(), rtdb.get());
         add_parameter(std::make_unique<FairBaseParSet>().release(), rtdb.get());
+        add_parameter(std::make_unique<FairGeoParSet>().release(), rtdb.get());
         add_parameter(std::make_unique<R3B::Map2CalPar>("LandTCalPar").release(), rtdb.get());
         add_parameter(std::make_unique<R3B::Map2CalPar>("LandTrigTCalPar").release(), rtdb.get());
         add_parameter(std::make_unique<R3B::Neuland::Cal2HitPar>("NeulandHitPar").release(), rtdb.get());

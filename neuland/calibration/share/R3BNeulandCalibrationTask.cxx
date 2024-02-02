@@ -1,4 +1,5 @@
 #include "R3BNeulandCalibrationTask.h"
+#include "R3BNeulandTriggerTypes.h"
 #include <FairParSet.h>
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
@@ -10,7 +11,6 @@
 
 namespace R3B::Neuland
 {
-    int NeulandOffSpillTpatPos = 14; // NOLINT
 
     CalibrationTask::CalibrationTask(std::string_view name, int iVerbose)
         : FairTask(name.data(), iVerbose)
@@ -46,6 +46,7 @@ namespace R3B::Neuland
             }
 
             check_input_par();
+            offspill_tpat_bit_ = base_par_->GetOffSpillTpatPos();
 
             ExtraInit(rootMan);
 
@@ -83,6 +84,7 @@ namespace R3B::Neuland
             return;
         }
         histograms_.get("condition_check")->Fill("success", 1);
+        passed_num_of_events++;
         TriggeredExec();
     }
 
@@ -90,6 +92,7 @@ namespace R3B::Neuland
     {
         if (check_trigger() and CheckConditions())
         {
+            passed_num_of_events++;
             TriggeredExec();
         }
     }
@@ -97,6 +100,11 @@ namespace R3B::Neuland
     void CalibrationTask::FinishTask()
     {
         EndOfTask();
+        R3BLOG(info,
+               fmt::format(R"(Passed events with the trigger type "{}" in task "{}": {})",
+                           CalTrigger2Str(trig_type_),
+                           GetName(),
+                           passed_num_of_events));
         if (not is_hist_disabled_ and not is_write_hist_disabled_)
         {
             histograms_.save(GetName());
@@ -110,8 +118,8 @@ namespace R3B::Neuland
                fmt::format(R"(From task "{}": tpat {}. Trig type {})",
                            GetName(),
                            eventHeader_->GetTpat(),
-                           CalTrigger2Tpat(trig_type_).to_string()));
-        return CheckTriggerWithTpat(trig_type_, eventHeader_->GetTpat());
+                           CalTrigger2Tpat(trig_type_, offspill_tpat_bit_).to_string()));
+        return CheckTriggerWithTpat(trig_type_, eventHeader_->GetTpat(), offspill_tpat_bit_);
     }
 
     void CalibrationTask::init_histogram()

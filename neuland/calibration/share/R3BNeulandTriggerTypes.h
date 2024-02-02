@@ -20,9 +20,6 @@ constexpr auto TPAT_BITSIZE = 16;
 
 namespace R3B::Neuland
 {
-    // TODO: Global variable is really bad! This value should be read from a file with an experiment ID
-    extern int NeulandOffSpillTpatPos; // NOLINT
-
     enum class CalTrigger
     {
         unrecognised,
@@ -47,19 +44,20 @@ namespace R3B::Neuland
         }
     }
 
-    inline constexpr auto CalTrigger2Tpat(CalTrigger cal_trigger) -> std::bitset<TPAT_BITSIZE>
+    // off_spill_bit is 1 based
+    inline constexpr auto CalTrigger2Tpat(CalTrigger cal_trigger, int off_spill_bit) -> std::bitset<TPAT_BITSIZE>
     {
         switch (cal_trigger)
         {
             case CalTrigger::onspill:
                 return std::bitset<TPAT_BITSIZE>{}.set(NeulandOnSpillTpatPos);
             case CalTrigger::offspill:
-                return std::bitset<TPAT_BITSIZE>{}.set(NeulandOffSpillTpatPos);
+                return std::bitset<TPAT_BITSIZE>{}.set(off_spill_bit - 1);
             case CalTrigger::allspill:
             {
                 auto tpat = std::bitset<TPAT_BITSIZE>{};
                 tpat.set(NeulandOnSpillTpatPos);
-                tpat.set(NeulandOffSpillTpatPos);
+                tpat.set(off_spill_bit - 1);
                 return tpat;
             }
             case CalTrigger::all:
@@ -69,14 +67,14 @@ namespace R3B::Neuland
         }
     }
 
-    inline auto CheckTriggerWithTpat(CalTrigger trigger, int tpat) -> bool
+    inline auto CheckTriggerWithTpat(CalTrigger trigger, int tpat, int off_spill_bit) -> bool
     {
         if (trigger == CalTrigger::all)
         {
             return true;
         }
         const auto tpatID = std::bitset<TPAT_BITSIZE>(tpat);
-        return (tpatID & CalTrigger2Tpat(trigger)).any();
+        return (tpatID & CalTrigger2Tpat(trigger, off_spill_bit)).any();
     }
 
     inline auto CalTrigger2Str(CalTrigger cal_trigger) -> std::string

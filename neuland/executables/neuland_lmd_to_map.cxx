@@ -143,7 +143,7 @@ auto main(int argc, const char** argv) -> int
     //=====================================================================================
     // set tasks:
     auto calPar = std::make_unique<R3B::Neuland::Map2CalParTask>();
-    calPar->SetTrigger(R3B::Neuland::CalTrigger::all);
+    calPar->SetTrigger(R3B::Neuland::CalTrigger::offspill);
     calPar->SetPlaneNum(planeNum);
     calPar->SetTrigEnabled(not no_trig_neuland());
     // calPar->SetTrigIDMapPrintFormat(R3B::Neuland::TrigIDMappingPrintFormat::screen);

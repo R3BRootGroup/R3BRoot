@@ -10,40 +10,39 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
 #pragma once
 
 #include "R3BNeulandCosmicEngine.h"
-#include <R3BNeulandCosmicTracker.h>
-#include <R3BNeulandHitCalibrationEngine.h>
-#include <R3BShared.h>
+#include <Mille.hpp>
 
 namespace R3B::Neuland::Calibration
 {
-    class LSQREngineAdaptor : public CosmicEngineInterface
+    class MillepedeEngine : public CosmicEngineInterface
     {
       public:
-        LSQREngineAdaptor() = default;
+        MillepedeEngine() = default;
+        void SetMinStat(int min) override { minimum_hit_ = min; }
 
       private:
-        HitCalibrationEngine hit_cal_engine_;
-        CosmicTracker cosmic_tracker_;
-        Cal2HitPar hit_parameters_;
+        int minimum_hit_ = 1;
+        float minimum_pos_z_ = 0;
+        float smallest_time_sum_ = 0.;
+        MilleDataPoint input_data_buffer_;
+        Mille binary_data_writer_{ "neuland_cosmic_mille.bin" };
 
-        void Init() override;
+        void Init() override{};
         void AddSignal(const BarCalData& signal) override;
         void Calibrate() override;
         void EndOfEvent(unsigned int event_num = 0) override;
-        [[nodiscard]] auto ExtractParameters() -> Cal2HitPar override { return std::move(hit_parameters_); }
-        void Reset() override
-        {
-            hit_cal_engine_.Reset();
-            cosmic_tracker_.Reset();
-        }
-        auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override { return signals.size() > 4; }
+        [[nodiscard]] auto ExtractParameters() -> Cal2HitPar override;
+        void Reset() override;
+        auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
 
-        // private non-virtual function
-        void add_bar_signal(const BarCalData& barSignal, Side side);
+        void buffer_clear();
+        void add_signal_t_sum(const BarCalData& signal);
+        void add_signal_t_diff(const BarCalData& signal);
+        void add_spacial_local_constraint(int module_num);
+        auto set_minimum_values(const std::vector<R3B::Neuland::BarCalData>& signals) -> bool;
     };
 
 } // namespace R3B::Neuland::Calibration

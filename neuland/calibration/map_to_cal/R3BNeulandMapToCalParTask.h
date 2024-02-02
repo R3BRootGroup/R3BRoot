@@ -48,7 +48,6 @@ namespace R3B::Neuland
         // IO data and paramters:
         InputVectorConnector<PaddleTamexMappedData> mappedData_{ "NeulandMappedData" };
         InputMapConnector<unsigned int, PaddleTamexTrigMappedData> trigMappedData_{ "NeulandTrigMappedData" };
-        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
         Map2CalPar* calibrationPar_ = OutputPar<Map2CalPar>("LandTCalPar");
         Map2CalPar* calibrationTrigPar_ = OutputPar<Map2CalPar>("LandTrigTCalPar");
 

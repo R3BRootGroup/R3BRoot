@@ -19,6 +19,7 @@ set(LINKDEF NeulandCalToHitLinkDef.h)
 set(SRCS
     # cmake-format: sortable
     engine/R3BNeulandLSQREngineAdaptor.cxx
+    engine/R3BNeulandMillepede.cxx
     R3BNeulandCalToHitPar.cxx
     R3BNeulandCalToHitParTask.cxx
     R3BNeulandCalToHitTask.cxx)
@@ -27,13 +28,17 @@ set(HEADERS
     # cmake-format: sortable
     engine/R3BNeulandCosmicEngine.h
     engine/R3BNeulandLSQREngineAdaptor.h
+    engine/R3BNeulandMillepede.h
     R3BNeulandCalToHitPar.h
     R3BNeulandCalToHitParTask.h
     R3BNeulandCalToHitTask.h)
 
 add_library(R3BNeulandCalToHit SHARED ${SRCS})
 target_include_directories(R3BNeulandCalToHit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} engine)
-target_link_libraries(R3BNeulandCalToHit PUBLIC R3BNeulandMapToCal R3BNeulandCalibrationLegacy)
+target_link_libraries(
+    R3BNeulandCalToHit
+    PUBLIC R3BNeulandMapToCal R3BNeulandCalibrationLegacy
+    PRIVATE R3BMille)
 root_generate_dictionary(
     R3BNeulandCalToHit_dict
     ${HEADERS}

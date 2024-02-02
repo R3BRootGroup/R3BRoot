@@ -17,7 +17,9 @@ namespace R3B::Neuland
 {
     auto OnlineCanvas::IsTriggered() const -> bool
     {
-        return CheckTriggerWithTpat(trigger_type_, online_spectra_->GetEventHeader()->GetTpat());
+        return CheckTriggerWithTpat(trigger_type_,
+                                    online_spectra_->GetEventHeader()->GetTpat(),
+                                    online_spectra_->GetBasePar()->GetOffSpillTpatPos());
     }
 
 } // namespace R3B::Neuland

@@ -36,8 +36,8 @@
 
 namespace fs = std::filesystem;
 constexpr int DEFAULT_EVENT_NUM = 10;
-constexpr int DEFAULT_OFFSPILL_POS = 14;
 constexpr int DEFAULT_RUN_ID = 999;
+constexpr int DEFAULT_MIN_STAT = 4;
 
 using namespace std::string_literals;
 auto main(int argc, const char** argv) -> int
@@ -52,8 +52,8 @@ auto main(int argc, const char** argv) -> int
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
     auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
     auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
-    auto off_spill_bit = programOptions.create_option<int>(
-        "offspill", "set the position of bin set when offspill", DEFAULT_OFFSPILL_POS);
+    auto min_stat =
+        programOptions.create_option<int>("min-stat,m", "set minimun statistics for calibration", DEFAULT_MIN_STAT);
 
     if (!programOptions.verify(argc, argv))
     {
@@ -67,7 +67,6 @@ auto main(int argc, const char** argv) -> int
     const auto outputParFileName =
         outputDir / fmt::format("{}.par{}", outputfile_path.stem().string(), outputfile_path.extension().string());
     const auto input_filenames = R3B::GetFilesFromRegex(input_file());
-    R3B::Neuland::NeulandOffSpillTpatPos = off_spill_bit();
 
     R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());
     R3BLOG(debug, fmt::format("input data par file: {}", input_par()).c_str());
@@ -99,12 +98,14 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(runIdTask.release());
 
         auto map2Cal = std::make_unique<R3B::Neuland::Map2CalTask>();
-        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
+        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::offspill);
         run->AddTask(map2Cal.release());
 
-        auto cal2hitParMaker = std::make_unique<R3B::Neuland::Cal2HitParTask>();
-        cal2hitParMaker->SetTrigger(R3B::Neuland::CalTrigger::all);
-        run->AddTask(cal2hitParMaker.release());
+        auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>();
+        cal2hitParTask->SetMethod(R3B::Neuland::Cal2HitParMethod::Millipede);
+        cal2hitParTask->SetTrigger(R3B::Neuland::CalTrigger::offspill);
+        cal2hitParTask->SetMinStat(min_stat.value());
+        run->AddTask(cal2hitParTask.release());
 
         // set par input/output--------------------------------------------------------
         auto* rtdb = run->GetRuntimeDb();
@@ -118,7 +119,7 @@ auto main(int argc, const char** argv) -> int
         rtdb->saveOutput();
 
         run->Init();
-        run->Run(0, eventNum());
+        run->Run(0, eventNum() <= 0 ? 0 : eventNum());
     }
     catch (R3B::runtime_error& ex)
     {

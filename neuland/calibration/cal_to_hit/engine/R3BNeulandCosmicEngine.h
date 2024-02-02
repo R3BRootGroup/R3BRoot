@@ -23,25 +23,27 @@ namespace R3B::Neuland::Calibration
     {
       public:
         CosmicEngineInterface() = default;
+        virtual ~CosmicEngineInterface() = default;
 
         CosmicEngineInterface(const CosmicEngineInterface&) = default;
         CosmicEngineInterface(CosmicEngineInterface&&) = delete;
         auto operator=(const CosmicEngineInterface&) -> CosmicEngineInterface& = default;
         auto operator=(CosmicEngineInterface&&) -> CosmicEngineInterface& = delete;
 
-        void SetModuleSize(unsigned int module_size) { module_size_ = module_size; }
+        void SetModuleSize(int module_size) { module_size_ = module_size; }
         [[nodiscard]] auto GetModuleSize() const -> auto { return module_size_; }
 
-        virtual ~CosmicEngineInterface() = default;
         virtual void Init() {}
+        virtual auto SignalFilter(const std::vector<BarCalData>& /*signals*/) -> bool { return true; }
         virtual void AddSignal(const BarCalData& signal) = 0;
         virtual void Calibrate() = 0;
+        virtual void SetMinStat(int min) {}
         [[nodiscard]] virtual auto ExtractParameters() -> Cal2HitPar = 0;
         virtual void EndOfEvent(unsigned int event_num){};
         virtual void Reset(){};
 
       private:
-        unsigned int module_size_ = 0;
+        int module_size_ = 0;
     };
 
 } // namespace R3B::Neuland::Calibration

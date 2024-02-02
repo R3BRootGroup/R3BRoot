@@ -13,21 +13,14 @@
 
 #include "R3BNeulandCalToHitParTask.h"
 #include <R3BLogger.h>
+#include <R3BNeulandLSQREngineAdaptor.h>
+#include <R3BNeulandMillepede.h>
 
 namespace R3B::Neuland
 {
-    Cal2HitParTask::Cal2HitParTask(std::string_view name, Cal2HitParMethod method, int iVerbose)
+    Cal2HitParTask::Cal2HitParTask(std::string_view name, int iVerbose)
         : CalibrationTask(name, iVerbose)
     {
-        switch (method)
-        {
-            case Cal2HitParMethod::LSQT:
-                engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
-                break;
-            case Cal2HitParMethod::Millipede:
-                throw R3B::logic_error("Millipede method is not yet implemented!");
-                break;
-        }
     }
 
     void Cal2HitParTask::HistogramInit(DataMonitor& histograms) {}
@@ -35,12 +28,24 @@ namespace R3B::Neuland
     void Cal2HitParTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
         cal_data_.init();
+
+        switch (method_)
+        {
+            case Cal2HitParMethod::LSQT:
+                engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
+                break;
+            case Cal2HitParMethod::Millipede:
+                engine_ = std::make_unique<Calibration::MillepedeEngine>();
+                break;
+        }
+
         const auto plane_num = base_par_->GetNumOfPlanes();
         if (plane_num == 0)
         {
             throw R3B::runtime_error("Plane number extracted from Map2CalPar is 0!");
         }
         engine_->SetModuleSize(plane_num * BarsPerPlane);
+        engine_->SetMinStat(min_stat_);
         engine_->Init();
     }
 
@@ -69,9 +74,5 @@ namespace R3B::Neuland
         *hit_par_ = engine_->ExtractParameters();
     }
 
-    auto Cal2HitParTask::CheckConditions() const -> bool
-    {
-        auto is_too_few_hits = cal_data_.size() < 4;
-        return not is_too_few_hits;
-    }
+    auto Cal2HitParTask::CheckConditions() const -> bool { return engine_->SignalFilter(cal_data_.get()); }
 } // namespace R3B::Neuland

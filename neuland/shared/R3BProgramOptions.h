@@ -193,6 +193,7 @@ namespace R3B
         {
         }
 
+        auto value() const { return option_->value(); }
         auto operator()() const { return option_->value(); }
         auto make_positional(int pos) -> OptionHandle<Type>&&
         {

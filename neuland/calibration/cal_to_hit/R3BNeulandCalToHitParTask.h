@@ -18,7 +18,7 @@
 #include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCalibrationTask.h>
-#include <R3BNeulandLSQREngineAdaptor.h>
+#include <R3BNeulandCosmicEngine.h>
 #include <R3BNeulandMapToCalPar.h>
 
 namespace R3B::Neuland
@@ -32,11 +32,13 @@ namespace R3B::Neuland
     class Cal2HitParTask : public CalibrationTask
     {
       public:
-        explicit Cal2HitParTask(std::string_view name = "NeulandCal2HitParMaker",
-                                Cal2HitParMethod method = Cal2HitParMethod::LSQT,
-                                int iVerbose = 1);
+        explicit Cal2HitParTask(std::string_view name = "NeulandCal2HitParTask", int iVerbose = 1);
+        void SetMethod(Cal2HitParMethod method) { method_ = method; }
+        void SetMinStat(int min) { min_stat_ = min; }
 
       private:
+        int min_stat_ = 1;
+        Cal2HitParMethod method_ = Cal2HitParMethod::LSQT;
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
 
         CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");

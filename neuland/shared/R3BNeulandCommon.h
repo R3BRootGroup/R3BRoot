@@ -79,8 +79,17 @@ namespace R3B::Neuland
     constexpr auto MaxNumberOfPlanes = 26;
     constexpr auto MaxNumberOfBars = MaxNumberOfPlanes * BarsPerPlane;
 
-    inline constexpr auto IsPlaneHorizontal(int plane) -> bool { return (plane % 2 == FirstHorizontalPlane); }
-    inline constexpr auto IsPlaneVertical(int plane) -> bool { return !IsPlaneHorizontal(plane); }
+    // naming convention:
+    // _num starts at 1 and _id starts at 0
+    // module number has the range of 1 ~ BarsPerPlane * NumOfPlanes
+    // bar number has the range of 1 ~ BarsPerPlane
+    inline constexpr auto GetBarVerticalDisplacement(int module_num) -> double
+    {
+        const auto bar_num = module_num % BarsPerPlane;
+        return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
+    }
+    inline constexpr auto IsPlaneHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
+    inline constexpr auto IsPlaneVertical(int plane_id) -> bool { return !IsPlaneHorizontal(plane_id); }
     inline constexpr auto GetPlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
     inline constexpr auto GetPlaneNum(int moduleID) -> int { return GetPlaneID(moduleID) + 1; }
     // planeNum, barNum and ModuleNum is 1-based
@@ -88,6 +97,16 @@ namespace R3B::Neuland
     {
         assert(planeNum > 0);
         return (planeNum - 1) * BarsPerPlane + barNum;
+    }
+    template <typename T = double>
+    inline constexpr auto GetPlaneZPos(int plane_id) -> T
+    {
+        return static_cast<T>((plane_id + 0.5) * BarSize_Z);
+    }
+    template <typename T = double>
+    inline constexpr auto GetModuleZPos(int module_num) -> T
+    {
+        return GetPlaneZPos<T>(GetPlaneID(module_num - 1));
     }
 
     // Average Parameters
@@ -101,5 +120,5 @@ namespace R3B::Neuland
     constexpr auto SaturationCoefficient = 1.75e-3; // 1 / ns
 
     // NeuLAND TPAT:
-    constexpr auto NeulandOnSpillTpatPos = 0U;   // 0 based
+    constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
 } // namespace R3B::Neuland
