@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -111,10 +111,10 @@ class R3BRoluCal2Hit : public FairTask
   private:
     TClonesArray* fCalItems{}; /* < Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems{};
-    TClonesArray* fHitItems; /* < Array with Hit items - output data. */
-    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.;  /* < Clock cycle in [ns]. */
-    unsigned int fNofDetectors = 1; /**< Number of detectors. */
-    unsigned int fNofChannels = 4;  /**< Number of channels per detector. */
+    TClonesArray* fHitItems;                         /* < Array with Hit items - output data. */
+    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.; /* < Clock cycle in [ns]. */
+    unsigned int fNofDetectors = 1;                  /**< Number of detectors. */
+    unsigned int fNofChannels = 4;                   /**< Number of channels per detector. */
     int fnEvents = 0;
 
     TH1F* fhQ_R[2]{};

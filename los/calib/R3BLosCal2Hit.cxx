@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -536,12 +536,16 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
     // Sorting VFTX data:
 
-    std::qsort(time_V, nHits, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
-        double const* lhs = static_cast<double const*>(arg1);
-        double const* rhs = static_cast<double const*>(arg2);
+    std::qsort(time_V,
+               nHits,
+               sizeof(*time_V),
+               [](const void* arg1, const void* arg2) -> int
+               {
+                   double const* lhs = static_cast<double const*>(arg1);
+                   double const* rhs = static_cast<double const*>(arg2);
 
-        return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-    });
+                   return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+               });
     // End sorting
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)

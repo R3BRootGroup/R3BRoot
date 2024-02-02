@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMCTRACKS_H
-#define R3BMCTRACKS_H
+#pragma once
 
-#include "FairTask.h" // for FairTask, InitStatus
+#include <FairTask.h>
 
 #include <Rtypes.h>              // for Double_t, etc
 #include <TEveTrackPropagator.h> // IWYU pragma: keep needed by cint
@@ -72,5 +71,3 @@ class R3BMCTracks : public FairTask
 
     ClassDef(R3BMCTracks, 1);
 };
-
-#endif

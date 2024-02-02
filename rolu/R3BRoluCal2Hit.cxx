@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -72,10 +72,14 @@ R3BRoluCal2Hit::~R3BRoluCal2Hit()
 {
     for (int iDet = 0; iDet < fNofDetectors; iDet++)
     {
-        if (fhQ_L[iDet]) delete (fhQ_L[iDet]);
-        if (fhQ_R[iDet]) delete (fhQ_R[iDet]);
-        if (fhQ_O[iDet]) delete (fhQ_O[iDet]);
-        if (fhQ_U[iDet]) delete (fhQ_U[iDet]);
+        if (fhQ_L[iDet])
+            delete (fhQ_L[iDet]);
+        if (fhQ_R[iDet])
+            delete (fhQ_R[iDet]);
+        if (fhQ_O[iDet])
+            delete (fhQ_O[iDet]);
+        if (fhQ_U[iDet])
+            delete (fhQ_U[iDet]);
     }
 
     if (fHitItems)
@@ -98,9 +102,9 @@ InitStatus R3BRoluCal2Hit::Init()
 
     if (fSkipTrigger == false)
     {
-    	fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerCal"));
-    	if (NULL == fCalTriggerItems)
-    	    LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
+        fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluTriggerCal"));
+        if (NULL == fCalTriggerItems)
+            LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
     }
 
     // request storage of Hit data in output tree
@@ -118,7 +122,8 @@ InitStatus R3BRoluCal2Hit::ReInit() { return kSUCCESS; }
 void R3BRoluCal2Hit::Exec(Option_t* option)
 {
     if (fnEvents / 100000. == (int)fnEvents / 100000)
-        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent) << " %) " << std::flush;
+        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
+                  << " %) " << std::flush;
 
     // min,max,Nbins for ToT spectra
     double fhQmin = 0.;
@@ -149,21 +154,22 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
 
     int nTrig = 0;
     double lead_trig_ns = 0. / 0.;
-    //Calibrate the trigger
+    // Calibrate the trigger
     if (fSkipTrigger == false)
     {
-    	nTrig = fCalTriggerItems->GetEntriesFast();
-    	for (unsigned int iTrig = 0; iTrig < nTrig; ++iTrig)
-    	{
-    	    auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(iTrig));
-    	    lead_trig_ns = cur_cal->GetTimeL_ns(0);
-    	    // cout<<"Trigger: "<<lead_trig_ns<<endl;
-    	}
+        nTrig = fCalTriggerItems->GetEntriesFast();
+        for (unsigned int iTrig = 0; iTrig < nTrig; ++iTrig)
+        {
+            auto cur_cal = dynamic_cast<R3BRoluCalData*>(fCalTriggerItems->At(iTrig));
+            lead_trig_ns = cur_cal->GetTimeL_ns(0);
+            // cout<<"Trigger: "<<lead_trig_ns<<endl;
+        }
     }
-    
+
     int nParts = fCalItems->GetEntriesFast();
 
-    if (nParts < 1 || nTrig < 1) return;
+    if (nParts < 1 || nTrig < 1)
+        return;
 
     int iDet = 0;
     using A = boost::multi_array<double, 3>;
@@ -177,7 +183,7 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
 
     for (int iPart = 0; iPart < nParts; iPart++)
     {
-        //Parts is the number of particle passing through detector in one event
+        // Parts is the number of particle passing through detector in one event
         R3BRoluCalData* calItem = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
         iDet = calItem->GetDetector();
 
@@ -204,7 +210,9 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
                 totRolu[iPart][iDet - 1][iCha] = timeRolu_T[iPart][iDet - 1][iCha] - timeRolu_L[iPart][iDet - 1][iCha];
             }
 
-            double time_to_trig = fmod(timeRolu_L[iPart][iDet - 1][iCha] - lead_trig_ns + c_period + c_period/2, c_period) - c_period / 2;
+            double time_to_trig =
+                fmod(timeRolu_L[iPart][iDet - 1][iCha] - lead_trig_ns + c_period + c_period / 2, c_period) -
+                c_period / 2;
 
             // cout<<"ROLU cal2hit: "<<iDet<<", "<<iCha+1<<"; "<<timeRolu_L[iPart][iDet - 1][iCha]<<",
             // "<<totRolu[iPart][iDet - 1][iCha]<<endl;

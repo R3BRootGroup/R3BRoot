@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -236,11 +236,13 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol)
             {
                 for (Int_t i = 0; i < nCrystalHits; i++)
                 {
-                    if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() == copyNo)
+                    if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetCrystalNumber() ==
+                        copyNo)
                     {
                         (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))
                             ->AddMoreEnergy(NUSmearing(fELoss));
-                        if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetTime() > fTime)
+                        if ((dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->GetTime() >
+                            fTime)
                         {
                             (dynamic_cast<R3BXBallCrystalHitSim*>(fXBallCrystalHitCollection->At(i)))->SetTime(fTime);
                         }

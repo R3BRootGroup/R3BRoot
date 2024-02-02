@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -145,11 +145,11 @@ class R3BLosTCal2Hit : public FairTask
 
   private:
     void SetParameter();
-    R3BLosHitPar* fLosHit_Par;       // Parameter container
-    TClonesArray* fTCalItems;        /**< Array with Cal items - input data. */
-    TClonesArray* fTCalTriggerItems; /**< Array with Trigger Cal items - input data. */
-    TClonesArray* fHitItems;         /**< Array with Hit items - output data. */
-    R3BCoarseTimeStitch* fTimeStitch;      /**< Array with Hit items - output data. */
+    R3BLosHitPar* fLosHit_Par;        // Parameter container
+    TClonesArray* fTCalItems;         /**< Array with Cal items - input data. */
+    TClonesArray* fTCalTriggerItems;  /**< Array with Trigger Cal items - input data. */
+    TClonesArray* fHitItems;          /**< Array with Hit items - output data. */
+    R3BCoarseTimeStitch* fTimeStitch; /**< Array with Hit items - output data. */
     Float_t fp0, fp1;
     TArrayF* fLEMatchParams;
     TArrayF* fTEMatchParams;

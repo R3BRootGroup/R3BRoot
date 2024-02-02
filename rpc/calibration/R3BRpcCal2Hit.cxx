@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,8 +23,8 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BEventHeader.h"
 #include "R3BCoarseTimeStitch.h"
+#include "R3BEventHeader.h"
 #include "TGeoManager.h"
 #include "TGeoMatrix.h"
 

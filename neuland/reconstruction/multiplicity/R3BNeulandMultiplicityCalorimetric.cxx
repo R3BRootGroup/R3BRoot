@@ -38,7 +38,8 @@ InitStatus R3BNeulandMultiplicityCalorimetric::Init()
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetric::Init: No FairRuntimeDb!";
         return kFATAL;
     }
-    fPar = dynamic_cast<R3BNeulandMultiplicityCalorimetricPar*>(rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar"));
+    fPar = dynamic_cast<R3BNeulandMultiplicityCalorimetricPar*>(
+        rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar"));
     if (fPar == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetric::Init: No R3BNeulandMultiplicityCalorimetricPar!";
@@ -55,10 +56,10 @@ void R3BNeulandMultiplicityCalorimetric::Exec(Option_t*)
     fMultiplicity->m.fill(0.);
 
     const auto clusters = fClusters.Retrieve();
-    const auto Etot =
-        std::accumulate(clusters.cbegin(), clusters.cend(), 0., [](const Double_t a, const R3BNeulandCluster* b) {
-            return a + b->GetE();
-        });
+    const auto Etot = std::accumulate(clusters.cbegin(),
+                                      clusters.cend(),
+                                      0.,
+                                      [](const Double_t a, const R3BNeulandCluster* b) { return a + b->GetE(); });
     const auto nClusters = clusters.size();
 
     // Calorimetric Multiplicity is One-Hot

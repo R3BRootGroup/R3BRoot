@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,9 @@
 // -----              Created 04/10/2011  by P.Cabanelas               -----
 // -------------------------------------------------------------------------
 
-#ifndef R3BIONNAME_H
-#define R3BIONNAME_H
+#pragma once
 
-#include "TNamed.h"
+#include <TNamed.h>
 
 class R3BIonName : public TNamed
 {
@@ -41,5 +40,3 @@ class R3BIonName : public TNamed
 
     ClassDef(R3BIonName, 1);
 };
-
-#endif

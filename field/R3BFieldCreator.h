@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,16 +12,15 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                    CbmFieldCreator header file                  -----
-// -----                Created 15/01/07  by M. Al-Turany              -----
+// -----                    R3BFieldCreator header file                -----
+// -----                Created 15/01/07 by M. Al-Turany               -----
 // -------------------------------------------------------------------------
 
-#ifndef R3BFIELDCREATOR_H
-#define R3BFIELDCREATOR_H
+#pragma once
 
-#include "FairField.h"
-#include "FairFieldFactory.h"
 #include "R3BFieldPar.h"
+#include <FairField.h>
+#include <FairFieldFactory.h>
 
 class R3BFieldCreator : public FairFieldFactory
 {
@@ -35,4 +34,3 @@ class R3BFieldCreator : public FairFieldFactory
   protected:
     R3BFieldPar* fFieldPar;
 };
-#endif // R3BFIELDCREATOR_H

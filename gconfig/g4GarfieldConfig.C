@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -28,58 +28,54 @@
 
 void Config()
 {
-/// The configuration function for Geant4 VMC for Garfield example
-/// called during MC application initialization. 
-/// For geometry defined with Root and Geant4 native navigation
+    /// The configuration function for Geant4 VMC for Garfield example
+    /// called during MC application initialization.
+    /// For geometry defined with Root and Geant4 native navigation
 
-  // cout << "Constructing Garfield::RunConfiguration " << endl;
+    // cout << "Constructing Garfield::RunConfiguration " << endl;
 
-  // Run configuration
-  VMC::Garfield::RunConfiguration* runConfiguration 
-      = new VMC::Garfield::RunConfiguration("geomRoot", "FTFP_BERT");
-  
-  cout << "Constructing TG4RunConfiguration " << endl;
+    // Run configuration
+    VMC::Garfield::RunConfiguration* runConfiguration = new VMC::Garfield::RunConfiguration("geomRoot", "FTFP_BERT");
 
-  // Run configuration with special cuts activated
-  // VMC::Garfield::RunConfiguration* runConfiguration 
-  //   = new VMC::Garfield::RunConfiguration("geomRootToGeant4", "FTFP_BERT", "specialCuts");
+    cout << "Constructing TG4RunConfiguration " << endl;
 
-  // TGeant4
-  TGeant4* geant4
-    = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
+    // Run configuration with special cuts activated
+    // VMC::Garfield::RunConfiguration* runConfiguration
+    //   = new VMC::Garfield::RunConfiguration("geomRootToGeant4", "FTFP_BERT", "specialCuts");
 
-  cout << "Geant4 has been created." << endl;
-  
-  // Customise Geant4 setting
-  // Fast simulation model configuration
-  // + verbose level, global range cuts, etc.
-  //geant4->ProcessGeantMacro("g4garfieldconfig.in");
+    // TGeant4
+    TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
 
+    cout << "Geant4 has been created." << endl;
 
-/// create the Specific stack
-   R3BStack *stack = new R3BStack(1000);
-   stack->SetDebug(kFALSE);
-   stack->StoreSecondaries(kTRUE);
-   stack->SetMinPoints(0);
-   geant4->SetStack(stack);
+    // Customise Geant4 setting
+    // Fast simulation model configuration
+    // + verbose level, global range cuts, etc.
+    // geant4->ProcessGeantMacro("g4garfieldconfig.in");
 
-   if(FairRunSim::Instance()->IsExtDecayer()){
-      TVirtualMCDecayer* decayer = TPythia6Decayer::Instance();
-      geant4->SetExternalDecayer(decayer);
-   }
+    /// create the Specific stack
+    R3BStack* stack = new R3BStack(1000);
+    stack->SetDebug(kFALSE);
+    stack->StoreSecondaries(kTRUE);
+    stack->SetMinPoints(0);
+    geant4->SetStack(stack);
 
-/// Customise Geant4 setting
-/// (verbose level, global range cut, ..)
+    if (FairRunSim::Instance()->IsExtDecayer())
+    {
+        TVirtualMCDecayer* decayer = TPythia6Decayer::Instance();
+        geant4->SetExternalDecayer(decayer);
+    }
 
-   TString configm(gSystem->Getenv("VMCWORKDIR"));
-   configm1 = configm + "/gconfig/g4garfieldconfig.in";
-   cout << " -I g4GarfieldConfig() using g4garfieldconf  macro: " << configm1 << endl;
+    /// Customise Geant4 setting
+    /// (verbose level, global range cut, ..)
 
-   //set geant4 specific stuff
-  geant4->SetMaxNStep(10000);  // default is 30000
-  geant4->ProcessGeantMacro(configm1.Data());
+    TString configm(gSystem->Getenv("VMCWORKDIR"));
+    configm1 = configm + "/gconfig/g4garfieldconfig.in";
+    cout << " -I g4GarfieldConfig() using g4garfieldconf  macro: " << configm1 << endl;
 
+    // set geant4 specific stuff
+    geant4->SetMaxNStep(10000); // default is 30000
+    geant4->ProcessGeantMacro(configm1.Data());
 
-  cout << "Processing Config() done." << endl;
+    cout << "Processing Config() done." << endl;
 }
-

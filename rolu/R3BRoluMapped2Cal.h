@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,9 +21,9 @@
 #ifndef R3BROLUMAPPED2CAL_H
 #define R3BROLUMAPPED2CAL_H
 
-#include <map>
 #include "FairTask.h"
 #include "R3BRoluCalData.h"
+#include <map>
 
 #define VFTX_CLOCK_MHZ 200
 
@@ -107,7 +107,7 @@ class R3BRoluMapped2Cal : public FairTask
      * Method for setting the number of modules.
      * @param nPMTs a number of photomultipliers.
      */
-    void SetNofModules(int nDets) {fNofDetectors = nDets;}
+    void SetNofModules(int nDets) { fNofDetectors = nDets; }
 
     // Accessor to select online mode
     void SetOnline(bool option) { fOnline = option; }
@@ -122,15 +122,15 @@ class R3BRoluMapped2Cal : public FairTask
     TClonesArray* fCalTriggerItems{};    /**< Array with cal items - output data. */
     int fNofCalItems = 0;                /**< Number of produced time items per event. */
 
-    R3BTCalPar* fTcalPar{}; /**< TCAL parameter container. */
-    unsigned int fNofTcalPars = 0;  /**< Number of modules in parameter file. */
+    R3BTCalPar* fTcalPar{};        /**< TCAL parameter container. */
+    unsigned int fNofTcalPars = 0; /**< Number of modules in parameter file. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header{}; /**< Event header. */
     int fTrigger = 1;         /**< Trigger value. */
 
     bool fSkipTrigger = false;
-    unsigned int fNofDetectors = 1; /**< Number of detectors. */
+    unsigned int fNofDetectors = 1;                    /**< Number of detectors. */
     double fClockFreq = (1. / VFTX_CLOCK_MHZ * 1000.); /**< Clock cycle in [ns]. */
     unsigned int fNEvent = 0;
     // Don't store data for online

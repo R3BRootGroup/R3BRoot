@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,11 +23,10 @@
  ** Parameter set for the CBM magnetic field. For the runtime database.
  **/
 
-#ifndef R3BFIELDPAR_H
-#define R3BFIELDPAR_H 1
+#pragma once
 
-#include "FairField.h"
-#include "FairParGenericSet.h"
+#include <FairField.h>
+#include <FairParGenericSet.h>
 
 class FairParamList;
 
@@ -107,7 +106,6 @@ class R3BFieldPar : public FairParGenericSet
 
     Double_t fCurrent;
 
+  public:
     ClassDef(R3BFieldPar, 2);
 };
-
-#endif

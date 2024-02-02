@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -27,11 +27,13 @@ R3BNeulandClusterFinder::R3BNeulandClusterFinder(const Double_t dx,
     , fDigis(input)
     , fClusters(output)
 {
-    fClusteringEngine.SetClusteringCondition([=](const R3BNeulandHit& a, const R3BNeulandHit& b) {
-        return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
-               std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
-               std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
-    });
+    fClusteringEngine.SetClusteringCondition(
+        [=](const R3BNeulandHit& a, const R3BNeulandHit& b)
+        {
+            return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
+                   std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
+                   std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
+        });
 }
 
 InitStatus R3BNeulandClusterFinder::Init()

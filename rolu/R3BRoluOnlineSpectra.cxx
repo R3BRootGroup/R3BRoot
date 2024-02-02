@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,25 +18,25 @@
 // ------------------------------------------------------------
 
 #include "R3BRoluOnlineSpectra.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BRoluCalData.h"
 #include "R3BRoluMappedData.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 
-#include "boost/multi_array.hpp"
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THttpServer.h"
 #include "TMath.h"
+#include "boost/multi_array.hpp"
 #include <vector>
 
 #define IS_NAN(x) TMath::IsNaN(x)
@@ -58,8 +58,8 @@ R3BRoluOnlineSpectra::R3BRoluOnlineSpectra(const char* name, int iVerbose)
 
 R3BRoluOnlineSpectra::~R3BRoluOnlineSpectra()
 {
-        delete fMappedItems;
-        delete fCalItems;
+    delete fMappedItems;
+    delete fCalItems;
 }
 
 InitStatus R3BRoluOnlineSpectra::Init()
@@ -102,16 +102,14 @@ InitStatus R3BRoluOnlineSpectra::Init()
             cRolu[irolucount] = new TCanvas(canName.Data(), canName.Data(), 10, 10, 1010, 810);
 
             histName = Form("Rolu%d_channels", irolucount);
-            fh_rolu_channels[irolucount] = new TH1F(histName.Data(),histName.Data(), 5, 0., 5.);
+            fh_rolu_channels[irolucount] = new TH1F(histName.Data(), histName.Data(), 5, 0., 5.);
             fh_rolu_channels[irolucount]->GetXaxis()->SetTitle("Channel number");
             fh_rolu_channels[irolucount]->SetFillColor(31);
 
             histName = Form("Rolu%d_tot", irolucount);
-            fh_rolu_tot[irolucount] =
-                new TH2F(histName.Data(),histName.Data(), 5, 0, 5, 1500, 0., 300.);
+            fh_rolu_tot[irolucount] = new TH2F(histName.Data(), histName.Data(), 5, 0, 5, 1500, 0., 300.);
             fh_rolu_tot[irolucount]->GetXaxis()->SetTitle("PMT number");
             fh_rolu_tot[irolucount]->GetYaxis()->SetTitle("ToT / ns");
-
 
             cRolu[irolucount]->Divide(2, 1);
             cRolu[irolucount]->cd(1);
@@ -145,9 +143,11 @@ void R3BRoluOnlineSpectra::Reset_ROLU_Histo()
 
 void R3BRoluOnlineSpectra::Exec(Option_t* option)
 {
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) return;
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
-    if ((fTpat > 0) && (header) && ((header->GetTpat() & fTpat) != fTpat)) return;
+    if ((fTpat > 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+        return;
 
     int nPartROLU = 0;
     double tot = 0;
@@ -156,15 +156,17 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
     {
         int nHits = fMappedItems->GetEntriesFast();
 
-        if (nHits > 0) nRoluEvents += 1;
+        if (nHits > 0)
+            nRoluEvents += 1;
 
         for (int ihit = 0; ihit < nHits; ihit++)
         {
             R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
-            if (!hit) continue;
+            if (!hit)
+                continue;
 
             // channel numbers are stored 1-based (1..n)
-            fh_rolu_channels[hit->GetDetector() - 1]->Fill(hit->GetChannel()); 
+            fh_rolu_channels[hit->GetDetector() - 1]->Fill(hit->GetChannel());
         }
     }
 
@@ -172,28 +174,35 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
     {
         nPartROLU = fCalItems->GetEntriesFast();
         int iDet = 0;
-    
+
         for (int iPart = 0; iPart < nPartROLU; iPart++)
         {
             R3BRoluCalData* calData = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
-	    assert(calData && "dynamic cast failed!");
-	    for (int chan=0; chan<4; chan++)
-            //if (!(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))) && !(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))))
+            assert(calData && "dynamic cast failed!");
+            for (int chan = 0; chan < 4; chan++)
+            // if (!(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))) &&
+            // !(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))))
             { // TAMEX leading
-                double time_L  = calData->GetTimeL_ns(chan);
-                double time_T  = calData->GetTimeT_ns(chan);
-                tot = fmod(time_T - time_L + c_range_ns + c_range_ns/2., c_range_ns) - c_range_ns/2.;
+                double time_L = calData->GetTimeL_ns(chan);
+                double time_T = calData->GetTimeT_ns(chan);
+                tot = fmod(time_T - time_L + c_range_ns + c_range_ns / 2., c_range_ns) - c_range_ns / 2.;
                 if (!std::isnan(tot))
-		   fh_rolu_tot[calData->GetDetector()-1]->Fill(chan, tot);
+                    fh_rolu_tot[calData->GetDetector() - 1]->Fill(chan, tot);
             }
-	}
+        }
     } // if fCallItems
 }
 
 void R3BRoluOnlineSpectra::FinishEvent()
 {
-     if (fMappedItems) {fMappedItems->Clear();}
-     if (fCalItems)    {fCalItems->Clear();}
+    if (fMappedItems)
+    {
+        fMappedItems->Clear();
+    }
+    if (fCalItems)
+    {
+        fCalItems->Clear();
+    }
 }
 
 void R3BRoluOnlineSpectra::FinishTask()

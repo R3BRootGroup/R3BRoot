@@ -506,4 +506,4 @@ Bool_t R3BAlpide::CheckIfSensitive(std::string name)
     return kFALSE;
 }
 
-ClassImp(R3BAlpide);
+ClassImp(R3BAlpide)

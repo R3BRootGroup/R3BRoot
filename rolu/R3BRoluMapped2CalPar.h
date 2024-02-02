@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -106,23 +106,23 @@ class R3BRoluMapped2CalPar : public FairTask
      * @param nDets number of detectors.
      * @param nCh number of channels per detector (4+master trigger?)
      */
-    inline void SetNofModules(int nDets) {fNofDetectors = nDets;}
+    inline void SetNofModules(int nDets) { fNofDetectors = nDets; }
 
     // Accessor to select online mode
     void SetSkipTrigger(bool skip) { fSkipTrigger = skip; }
 
   private:
     int fUpdateRate = 1000000; /**< An update rate. */
-    int fMinStats = 100000;   /**< Minimum statistics required per module. */
-    int fTrigger = -1;    /**< Trigger value. */
+    int fMinStats = 100000;    /**< Minimum statistics required per module. */
+    int fTrigger = -1;         /**< Trigger value. */
 
     unsigned int fNofDetectors = 1; /**< Number of detectors. */
     unsigned int fNofChannels = 4;  /**< Number of channels per detector. */
-    unsigned int fNofTypes = 2; /**< Number of time-types per channel ( TAMEX leading/trailing). */
+    unsigned int fNofTypes = 2;     /**< Number of time-types per channel ( TAMEX leading/trailing). */
 
     bool fSkipTrigger = false;
 
-    int fNEventsi = 0;               /**< Event counter. */
+    int fNEventsi = 0;              /**< Event counter. */
     R3BTCalPar* fCal_Par{};         /**< Parameter container. */
     TClonesArray* fMapped{};        /**< Array with mapped data - input data. */
     TClonesArray* fMappedTrigger{}; /**< Array with mapped trigger data - input data. */

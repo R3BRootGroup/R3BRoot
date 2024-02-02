@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,12 +16,11 @@
 // -----          Created 11/10/2021 by J.L. Rodriguez       -----
 // ---------------------------------------------------------------
 
-#ifndef R3BAlpide_H
-#define R3BAlpide_H 1
+#pragma once
 
 #include "R3BDetector.h"
-#include "Rtypes.h"
-#include "TLorentzVector.h"
+#include <Rtypes.h>
+#include <TLorentzVector.h>
 
 class TClonesArray;
 class R3BAlpidePoint;
@@ -154,5 +153,3 @@ inline void R3BAlpide::ResetParameters()
     fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fTime = fLength = fELoss = 0;
 };
-
-#endif /* R3BAlpide_H */

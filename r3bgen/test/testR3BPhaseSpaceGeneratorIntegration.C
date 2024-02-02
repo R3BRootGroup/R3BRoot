@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,15 +14,15 @@
 #include <TStopwatch.h>
 #include <TString.h>
 #include <TSystem.h>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 void testR3BPhaseSpaceGeneratorIntegration()
 {
     // Timer
     TStopwatch timer;
     timer.Start();
-    
+
     // Logging
     auto logger = FairLogger::GetLogger();
     logger->SetLogVerbosityLevel("low");

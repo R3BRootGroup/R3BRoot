@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BEVENTMANAGER_H
-#define R3BEVENTMANAGER_H
+#pragma once
 
-#include "FairEventManager.h"
+#include <FairEventManager.h>
 
 class R3BIonName;
 
@@ -37,5 +36,3 @@ class R3BEventManager : public FairEventManager
     static R3BEventManager* fgRinstance; //!
     ClassDef(R3BEventManager, 1);
 };
-
-#endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -114,7 +114,8 @@ InitStatus R3BPspxPrecal2Cal::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = dynamic_cast<TClonesArray*>(fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f]))); // = branch name in TTree
+            tmp[f] = dynamic_cast<TClonesArray*>(
+                fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f]))); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {

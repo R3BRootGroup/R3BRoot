@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,7 +21,7 @@
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
 #include "R3BFi4Point.h"
-//#include "R3BGeosfi.h"
+// #include "R3BGeosfi.h"
 #include "R3BMCStack.h"
 #include "TClonesArray.h"
 #include "TGeoArb8.h"

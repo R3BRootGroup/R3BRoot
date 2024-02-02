@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -93,7 +93,8 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
     //    cout<<"R3BTofdDigitizerCal Exec Before Digitize"<<endl;
 
-    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels) {
+    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels)
+    {
         Int_t entryNum = Points->GetEntries();
 
         if (!entryNum)
@@ -147,9 +148,9 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                                        data_element->GetYIn()));
         }
 
-        std::sort(TempHits.begin(), TempHits.end(), [](const TempHit& lhs, const TempHit& rhs) {
-            return lhs.Time < rhs.Time;
-        });
+        std::sort(TempHits.begin(),
+                  TempHits.end(),
+                  [](const TempHit& lhs, const TempHit& rhs) { return lhs.Time < rhs.Time; });
 
         Int_t number_paddles_hit = 0;
         for (TempHit& Hit : TempHits) // loop over full range of TempHits; Hit is reference to each TempHit
