@@ -18,19 +18,24 @@ jobs:
       - name: Setup Git
         run: git config --global user.email "actions@github.com" && git config --global user.name "GitHub Actions"
 
+      - name: Debugging Info
+        run: |
+          echo "Event Action: ${{ github.event.action }}"
+          echo "Head Ref (source branch of PR): ${{ github.event.pull_request.head.ref }}"
+          
       - name: Cleanup
         run: |
           gh extension install actions/gh-actions-cache
           
           echo "Fetching list of cache key"
-          cacheKeysForPR=$(gh actions-cache list -R R3BRootGroup/R3BRoot -B ${{ github.event.pull_request.base.ref }} -L 100 | cut -f 1 )
+          cacheKeysForPR=$(gh actions-cache list -R R3BRootGroup/R3BRoot -B ${{ github.event.pull_request.head.ref }} -L 100 | cut -f 1 )
 
           ## Setting this to not fail the workflow while deleting cache keys. 
           set +e
           echo "Deleting caches..."
           for cacheKey in $cacheKeysForPR
           do
-              gh actions-cache delete $cacheKey -R R3BRootGroup/R3BRoot -B ${{ github.event.pull_request.base.ref }} --confirm
+              gh actions-cache delete $cacheKey -R R3BRootGroup/R3BRoot -B ${{ github.event.pull_request.head.ref }} --confirm
           done
           echo "Done"
         env:

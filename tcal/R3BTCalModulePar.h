@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTCALMODULEPAR_H
-#define R3BTCALMODULEPAR_H
+#pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
 #define NCHMAX 5000
 
@@ -131,7 +130,6 @@ class R3BTCalModulePar : public FairParGenericSet
     Double_t fSlope[NCHMAX];  /**< Slope of liear interpolation. */
     Double_t fOffset[NCHMAX]; /**< Offset of linear interpolation [ns]. */
 
+  public:
     ClassDef(R3BTCalModulePar, 1);
 };
-
-#endif /* !R3BTCALMODULEPAR_H*/

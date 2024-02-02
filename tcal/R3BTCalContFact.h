@@ -11,13 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTCALCONTFACT_H
-#define R3BTCALCONTFACT_H 1
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
-#include "Rtypes.h"
-#include "TString.h"
+#include <Rtypes.h>
+#include <TString.h>
 #include <vector>
 
 class FairParSet;
@@ -86,7 +85,6 @@ class R3BTCalContFact : public FairContFact
      */
     void setAllContainers();
 
+  public:
     ClassDef(R3BTCalContFact, 1);
 };
-
-#endif /* !R3BTCALCONTFACT_H */

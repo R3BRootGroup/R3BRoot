@@ -17,10 +17,9 @@
 // -----            Following R3BLosMapped2CalPar             -----
 // ----------------------------------------------------------------
 
-#ifndef R3BROLUMAPPED2CALPAR_H
-#define R3BROLUMAPPED2CALPAR_H
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 class R3BTCalPar;
 class TClonesArray;
@@ -122,6 +121,7 @@ class R3BRoluMapped2CalPar : public FairTask
 
     bool fSkipTrigger = false;
 
+    int counter = 0;
     int fNEventsi = 0;              /**< Event counter. */
     R3BTCalPar* fCal_Par{};         /**< Parameter container. */
     TClonesArray* fMapped{};        /**< Array with mapped data - input data. */
@@ -133,5 +133,3 @@ class R3BRoluMapped2CalPar : public FairTask
   public:
     ClassDef(R3BRoluMapped2CalPar, 1)
 };
-
-#endif
