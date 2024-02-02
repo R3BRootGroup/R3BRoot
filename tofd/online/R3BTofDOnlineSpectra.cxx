@@ -267,7 +267,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
             sprintf(strName13, "tofd_Ypos_plane_%d", j + 1);
             sprintf(strName14, "Tofd Ypos for plane %d", j + 1);
-            fh2_tofd_ypos_cal[j] = R3B::root_owned<TH2F>(strName13, strName14, 45, 0, 45, 2000., -4000., 4000.);
+            fh2_tofd_ypos_cal[j] = R3B::root_owned<TH2F>(strName13, strName14, 45, 0, 45, 2000., -50., 50.);
             fh2_tofd_ypos_cal[j]->GetXaxis()->SetTitle("Bar number");
             fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitle("Y-position [ns]");
             fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleOffset(1.);
