@@ -109,7 +109,7 @@ class R3BOnlineSpectraFrsSciVsMusli : public FairTask
     TCanvas* cHit_EvsAoQ;
     TCanvas* cHit_ZvsAoQ;
 
-    // Histograms FrsSciCal vs MusliHit
+    //// Histograms FrsSciCal vs MusliHit
     TH2D** fh2_Hit_EvsAoQ; // AoQ calculated from S2 to Cave C, one histo per type of data
     TH2D** fh2_Hit_ZvsAoQ; // AoQ calculated from S2 to Cave C, one histo per type of data
 
