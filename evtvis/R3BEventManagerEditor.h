@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,10 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef ROOT_R3BEVENTMANAGEREDITOR
-#define ROOT_R3BEVENTMANAGEREDITOR
+#pragma once
 
-#include "TGedFrame.h"
+#include <TGedFrame.h>
+
 class R3BEventManager;
 class TGNumberEntry;
 class TGCheckButton;
@@ -50,5 +50,3 @@ class R3BEventManagerEditor : public TGedFrame
     virtual void DoScaleE();
     ClassDef(R3BEventManagerEditor, 0); // Specialization of TGedEditor for proper update propagation to TEveManager.
 };
-
-#endif

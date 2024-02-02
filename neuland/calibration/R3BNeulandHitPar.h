@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -90,7 +90,10 @@ class R3BNeulandHitPar : public FairParGenericSet
      * @param idx an index of a module.
      * @return parameter container of this module.
      */
-    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) const { return dynamic_cast<R3BNeulandHitModulePar*>(fParams->At(idx)); }
+    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) const
+    {
+        return dynamic_cast<R3BNeulandHitModulePar*>(fParams->At(idx));
+    }
 
     // Global time offset in ns
     inline Double_t GetGlobalTimeOffset() const { return fGlobalTimeOffset; }

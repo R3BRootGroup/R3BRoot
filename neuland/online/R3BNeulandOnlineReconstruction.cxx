@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -205,10 +205,10 @@ void R3BNeulandOnlineReconstruction::Exec(Option_t*)
         }
     }
 
-    const double etot =
-        std::accumulate(clusters.begin(), clusters.end(), 0., [](const double sum, const R3BNeulandCluster* c) {
-            return sum + c->GetE();
-        });
+    const double etot = std::accumulate(clusters.begin(),
+                                        clusters.end(),
+                                        0.,
+                                        [](const double sum, const R3BNeulandCluster* c) { return sum + c->GetE(); });
     if (etot > 10)
     {
         hEtotVSNClusters->Fill(etot, nClusters);

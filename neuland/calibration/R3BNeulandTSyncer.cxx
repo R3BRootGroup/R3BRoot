@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -237,8 +237,9 @@ namespace Neuland
 
             std::vector<Element> lhs(numberOfEquations);
             const auto numberOfVariables = BarsPerPlane * nPlanes;
-            auto function = [&lhs, numberOfVariables](
-                                long mode, LSQR_DOUBLE_VECTOR* xVec, LSQR_DOUBLE_VECTOR* yVec, void* data) {
+            auto function =
+                [&lhs, numberOfVariables](long mode, LSQR_DOUBLE_VECTOR* xVec, LSQR_DOUBLE_VECTOR* yVec, void* data)
+            {
                 double* x = xVec->elements;
                 double* y = yVec->elements;
 

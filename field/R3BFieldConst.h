@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -22,10 +22,9 @@
  ** A constant (homogeneous) magnetic field
  **/
 
-#ifndef R3BFIELDCONST_H
-#define R3BFIELDCONST_H 1
+#pragma once
 
-#include "FairField.h"
+#include <FairField.h>
 
 class R3BFieldPar;
 
@@ -115,7 +114,6 @@ class R3BFieldConst : public FairField
     Double_t fBy;
     Double_t fBz;
 
+  public:
     ClassDef(R3BFieldConst, 1);
 };
-
-#endif

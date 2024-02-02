@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,15 +16,14 @@
 // -----    Created 12/10/22 by J.L. Rodriguez Sanchez      -----
 // --------------------------------------------------------------
 
-#ifndef R3BAlpideDigitizer_H
-#define R3BAlpideDigitizer_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 #include "R3BAlpideHitData.h"
 
-#include "TRotation.h"
 #include <Rtypes.h>
+#include <TRotation.h>
 #include <string>
 
 class TClonesArray;
@@ -86,5 +85,3 @@ class R3BAlpideDigitizer : public FairTask
     // Class definition
     ClassDefOverride(R3BAlpideDigitizer, 1);
 };
-
-#endif /* R3BAlpideDigitizer_H */

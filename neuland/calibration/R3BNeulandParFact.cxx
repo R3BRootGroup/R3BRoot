@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -28,7 +28,7 @@
 #include "TList.h"   // for TList
 #include "TString.h" // for TString
 
-//#include <string.h> // for strcmp, NULL
+// #include <string.h> // for strcmp, NULL
 
 static R3BNeulandParFact gR3BNeulandParFact;
 

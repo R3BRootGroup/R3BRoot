@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,9 +14,9 @@
 #include "R3BLosHitPar.h"
 #include "FairLogger.h"
 #include "FairParamList.h"
+#include "TArrayF.h"
 #include "TMath.h"
 #include "TString.h"
-#include "TArrayF.h"
 
 #include <iostream>
 
@@ -31,9 +31,9 @@ R3BLosHitPar::R3BLosHitPar(const TString& name, const TString& title, const TStr
 }
 
 // ----  Destructor ------------------------------------------------------------
-R3BLosHitPar::~R3BLosHitPar() 
-{ 
-    clear(); 
+R3BLosHitPar::~R3BLosHitPar()
+{
+    clear();
     if (fLEMatchParams)
         delete fLEMatchParams;
     if (fTEMatchParams)
@@ -63,12 +63,12 @@ void R3BLosHitPar::putParams(FairParamList* list)
     list->add("yveff_MCFD", fyveff_MCFD);
     list->add("NumParamsTamexLE", fNumParamsTamexLE);
     list->add("NumParamsTamexTE", fNumParamsTamexTE);
-    
+
     Int_t array_LE = 8 * fNumParamsTamexLE;
     LOG(info) << "Array size LOS Tamex LE matching: " << array_LE;
     fLEMatchParams->Set(array_LE);
     list->add("LosLEMatchPar", *fLEMatchParams);
-    
+
     Int_t array_TE = 8 * fNumParamsTamexTE;
     LOG(info) << "Array size LOS Tamex TE matching: " << array_TE;
     fTEMatchParams->Set(array_TE);
@@ -95,7 +95,7 @@ Bool_t R3BLosHitPar::getParams(FairParamList* list)
         LOG(info) << "---Could not initialize LosHit p1 Par";
         return kFALSE;
     }
-    
+
     if (!(list->fill("xoffset_MCFD", &fxoffset_MCFD)))
     {
         LOG(info) << "---Could not initialize LosHit xoffset_MCFD Par";
@@ -139,7 +139,7 @@ Bool_t R3BLosHitPar::getParams(FairParamList* list)
         LOG(info) << "Could not initialize LosLEMatchPar";
         return kFALSE;
     }
-    
+
     Int_t array_TE = 8 * fNumParamsTamexTE;
     fLEMatchParams->Set(array_TE);
     if (!(list->fill("LosTEMatchPar", fTEMatchParams)))
@@ -165,7 +165,7 @@ void R3BLosHitPar::printParams()
               << " ";
 
     LOG(info) << fp0 << "\t" << fp1;
-    
+
     LOG(info) << "R3BLosHitPar: LOS Tamex LE match par:";
     LOG(info) << "Nb of Tamex LE match Par: ";
     LOG(info) << fNumParamsTamexLE;
@@ -176,7 +176,7 @@ void R3BLosHitPar::printParams()
             LOG(info) << "FitParam(" << j << ") = " << fLEMatchParams->GetAt(i * fNumParamsTamexLE + j);
         }
     }
-    
+
     LOG(info) << "R3BLosHitPar: LOS Tamex TE match par:";
     LOG(info) << "Nb of Tamex TE match Par: ";
     LOG(info) << fNumParamsTamexTE;

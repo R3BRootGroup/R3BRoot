@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGLADFIELDMAP_H
-#define R3BGLADFIELDMAP_H 1
+#pragma once
 
-#include "FairField.h"
 #include "R3BFieldPar.h"
-#include "TRotation.h"
-#include "TString.h"
-#include "TTree.h"
-#include "TVector3.h"
+
+#include <FairField.h>
+#include <TRotation.h>
+#include <TString.h>
+#include <TTree.h>
+#include <TVector3.h>
 
 class TArrayD;
 
@@ -183,7 +183,6 @@ class R3BGladFieldMap : public FairField
     // TTree with the map data when reading a ROOT file
     TFile* fFile; // root file with the map data
 
+  public:
     ClassDef(R3BGladFieldMap, 5)
 };
-
-#endif

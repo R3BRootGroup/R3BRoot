@@ -6,7 +6,7 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
-//#include "Math/GeneticMinimizer.h"
+// #include "Math/GeneticMinimizer.h"
 #include "TDirectory.h"
 #include <iostream>
 #include <numeric>
@@ -72,7 +72,8 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No FairRuntimeDb!";
         return kFATAL;
     }
-    fPar = dynamic_cast<R3BNeulandMultiplicityCalorimetricPar*>(rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar"));
+    fPar = dynamic_cast<R3BNeulandMultiplicityCalorimetricPar*>(
+        rtdb->getContainer("R3BNeulandMultiplicityCalorimetricPar"));
     if (fPar == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No R3BNeulandMultiplicityCalorimetricPar!";

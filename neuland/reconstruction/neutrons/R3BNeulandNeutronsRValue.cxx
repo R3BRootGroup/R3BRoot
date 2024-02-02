@@ -53,17 +53,18 @@ void R3BNeulandNeutronsRValue::Exec(Option_t*)
 
 void R3BNeulandNeutronsRValue::SortClustersByRValue(std::vector<R3BNeulandCluster*>& clusters) const
 {
-    std::sort(clusters.begin(), clusters.end(), [&](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
-        return a->GetRECluster(fEkinRefMeV) < b->GetRECluster(fEkinRefMeV);
-    });
+    std::sort(clusters.begin(),
+              clusters.end(),
+              [&](const R3BNeulandCluster* a, const R3BNeulandCluster* b)
+              { return a->GetRECluster(fEkinRefMeV) < b->GetRECluster(fEkinRefMeV); });
 }
 
 void R3BNeulandNeutronsRValue::PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster*>& clusters) const
 {
     auto timewiseFirstCluster =
-        std::min_element(clusters.begin(), clusters.end(), [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
-            return a->GetT() < b->GetT();
-        });
+        std::min_element(clusters.begin(),
+                         clusters.end(),
+                         [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) { return a->GetT() < b->GetT(); });
     // Put first cluster in front
     std::rotate(clusters.begin(), timewiseFirstCluster, timewiseFirstCluster + 1);
 }
@@ -79,9 +80,8 @@ void R3BNeulandNeutronsRValue::FilterClustersByKineticEnergy(std::vector<R3BNeul
 {
     clusters.erase(std::remove_if(clusters.begin(),
                                   clusters.end(),
-                                  [&](const R3BNeulandCluster* a) {
-                                      return std::abs(a->GetEToF() - fEkinRefMeV) / fEkinRefMeV > 0.05;
-                                  }),
+                                  [&](const R3BNeulandCluster* a)
+                                  { return std::abs(a->GetEToF() - fEkinRefMeV) / fEkinRefMeV > 0.05; }),
                    clusters.end());
 }
 

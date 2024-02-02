@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -155,7 +155,7 @@ bool R3BRoluReaderOnline::R3BRead()
         {
             uint32_t channel = data->ROLU[det].TTCLMI[chan];
             uint32_t nextChannelStart = data->ROLU[det].TTCLME[chan];
-            for (uint32_t nextchan = curChannelStart; nextchan<nextChannelStart; nextchan++)
+            for (uint32_t nextchan = curChannelStart; nextchan < nextChannelStart; nextchan++)
             {
                 uint32_t coarse_leading = data->ROLU[det].TTCLv[nextchan];
                 if (do_increment && coarse_leading < c_tamex3_range / 4)
@@ -178,7 +178,7 @@ bool R3BRoluReaderOnline::R3BRead()
         {
             uint32_t channel = data->ROLU[det].TTCTMI[chan];
             uint32_t nextChannelStart = data->ROLU[det].TTCTME[chan];
-            for (uint32_t nextchan = curChannelStart; nextchan<nextChannelStart; nextchan++)
+            for (uint32_t nextchan = curChannelStart; nextchan < nextChannelStart; nextchan++)
             {
                 uint32_t coarse_trailing = data->ROLU[det].TTCTv[nextchan];
                 if (do_increment && coarse_trailing < c_tamex3_range / 4)
@@ -203,11 +203,11 @@ bool R3BRoluReaderOnline::R3BRead()
                         // 30 units -> 30 * 5 = 150 ns.
                         if (tot <= 30 && tot >= 0)
                         {
-                            new ((*fArray)[fArray->GetEntriesFast()])
-                                R3BRoluMappedData(det + 1, channel, 1, data->ROLU[det].TTFTv[nextchan], coarse_trailing);
+                            new ((*fArray)[fArray->GetEntriesFast()]) R3BRoluMappedData(
+                                det + 1, channel, 1, data->ROLU[det].TTFTv[nextchan], coarse_trailing);
 
-                            //           cout<<"TAMEX trailing: "<< channel<<", "<<data->ROLU[det].TTFTv[nextchan]<<", "<<
-                            //           coarse_trailing<<endl;
+                            //           cout<<"TAMEX trailing: "<< channel<<", "<<data->ROLU[det].TTFTv[nextchan]<<",
+                            //           "<< coarse_trailing<<endl;
 
                             break;
                         }

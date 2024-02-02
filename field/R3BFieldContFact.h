@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,17 +23,15 @@
  ** Parameter container factory for field parameter container
  **/
 
-#ifndef R3BFIELDCONTFACT_H
-#define R3BFIELDCONTFACT_H 1
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
 class FairContainer;
 class FairParSet;
 
 class R3BFieldContFact : public FairContFact
 {
-
   public:
     /** Constructor **/
     R3BFieldContFact();
@@ -53,7 +51,6 @@ class R3BFieldContFact : public FairContFact
      **/
     void SetAllContainers();
 
+  public:
     ClassDef(R3BFieldContFact, 1);
 };
-
-#endif

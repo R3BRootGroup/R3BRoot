@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,13 +24,13 @@
 #include "R3BMCTrack.h"
 #include "R3BTGeoPar.h"
 
-#include "FairRootManager.h"
-#include "FairRuntimeDb.h"
-#include "TClonesArray.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
+#include <TClonesArray.h>
 
-#include "TMath.h"
-#include "TRandom.h"
-#include "TVector3.h"
+#include <TMath.h>
+#include <TRandom.h>
+#include <TVector3.h>
 #include <string>
 
 // R3BAlpideDigitizer: Default Constructor --------------------------
@@ -208,4 +208,4 @@ R3BAlpideHitData* R3BAlpideDigitizer::AddHitData(UInt_t sid, UInt_t clustersize,
     return new (clref[size]) R3BAlpideHitData(sid, clustersize, x, y, z);
 }
 
-ClassImp(R3BAlpideDigitizer);
+ClassImp(R3BAlpideDigitizer)

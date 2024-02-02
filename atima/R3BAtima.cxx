@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -60,11 +60,11 @@ namespace R3BAtima
     {
         TransportResult res;
 
-        const auto invTotRatio = std::accumulate(
-            targetMaterial.Compounds.begin(),
-            targetMaterial.Compounds.end(),
-            0.,
-            [](const Double_t sum, const MaterialCompound& comp) -> Double_t { return sum + comp.Ratio; });
+        const auto invTotRatio = std::accumulate(targetMaterial.Compounds.begin(),
+                                                 targetMaterial.Compounds.end(),
+                                                 0.,
+                                                 [](const Double_t sum, const MaterialCompound& comp) -> Double_t
+                                                 { return sum + comp.Ratio; });
 
         Int_t tcompsize = 3, tcompnum = targetMaterial.Compounds.size(), pn = 2;
         std::vector<Double_t> tarFortran;

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,12 +18,12 @@
 // ------------------------------------------------------------
 
 #include "R3BLosOnlineSpectra.h"
+#include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalEngine.h"
-#include "R3BCoarseTimeStitch.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -391,7 +391,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
     Double_t time_L[fNofLosDetectors][32][8];
     Double_t time_T[fNofLosDetectors][32][8];
     Double_t tot[fNofLosDetectors][32][8];
-    Double_t time_MTDC[32][8] = { {0.} };
+    Double_t time_MTDC[32][8] = { { 0. } };
     Double_t LosTresMTDC[32];
 
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
@@ -470,8 +470,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         nPartLOS = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { {0.} };
-        Double_t time_V_LOS2[32][8] = { {0.} };
+        Double_t time_V_LOS1[32][8] = { { 0. } };
+        Double_t time_V_LOS2[32][8] = { { 0. } };
 
         for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
         {
@@ -551,12 +551,16 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         // detector 1
         if (nPartc[0] > 0)
         {
-            std::qsort(time_V_LOS1, nPartc[0], sizeof(*time_V_LOS1), [](const void* arg1, const void* arg2) -> int {
-                double const* lhs = static_cast<double const*>(arg1);
-                double const* rhs = static_cast<double const*>(arg2);
+            std::qsort(time_V_LOS1,
+                       nPartc[0],
+                       sizeof(*time_V_LOS1),
+                       [](const void* arg1, const void* arg2) -> int
+                       {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
 
-                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-            });
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
             for (Int_t iPart = 0; iPart < nPartc[0]; iPart++)
             {
                 for (int ipm = 0; ipm < 8; ipm++)
@@ -569,12 +573,16 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         // detector 2
         if (fNofLosDetectors > 1 && nPartc[1] > 0)
         {
-            std::qsort(time_V_LOS2, nPartc[1], sizeof(*time_V_LOS2), [](const void* arg1, const void* arg2) -> int {
-                double const* lhs = static_cast<double const*>(arg1);
-                double const* rhs = static_cast<double const*>(arg2);
+            std::qsort(time_V_LOS2,
+                       nPartc[1],
+                       sizeof(*time_V_LOS2),
+                       [](const void* arg1, const void* arg2) -> int
+                       {
+                           double const* lhs = static_cast<double const*>(arg1);
+                           double const* rhs = static_cast<double const*>(arg2);
 
-                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-            });
+                           return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                       });
             for (Int_t iPart = 0; iPart < nPartc[1]; iPart++)
             {
                 for (int ipm = 0; ipm < 8; ipm++)

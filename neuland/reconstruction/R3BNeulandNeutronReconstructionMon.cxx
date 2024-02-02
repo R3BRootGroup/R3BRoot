@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -52,9 +52,8 @@ Double_t Score(const std::vector<std::pair<R3BNeulandNeutron, FairMCPoint>>& com
     return std::accumulate(combination.begin(),
                            combination.end(),
                            0.,
-                           [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair) {
-                               return sum + Distance(pair.first, pair.second);
-                           });
+                           [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair)
+                           { return sum + Distance(pair.first, pair.second); });
 }
 
 template <typename T, typename U>
@@ -113,7 +112,8 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No " << fInput << "!";
         return kFATAL;
     }
-    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject(fInput)))->GetClass()->GetName())
+             .EqualTo("R3BNeulandNeutron"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
                    << " does not contain "
@@ -143,7 +143,8 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init No MCTrack!";
         return kFATAL;
     }
-    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
+    if (!TString((dynamic_cast<TClonesArray*>(ioman->GetObject("MCTrack")))->GetClass()->GetName())
+             .EqualTo("R3BMCTrack"))
     {
         LOG(fatal) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
                       "does not contain FairMCPoints!";

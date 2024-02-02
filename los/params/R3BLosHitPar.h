@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -15,8 +15,8 @@
 #define R3BLosHitPar_H
 
 #include "FairParGenericSet.h"
-#include "TObjArray.h"
 #include "TArrayF.h"
+#include "TObjArray.h"
 #include "TObject.h"
 #include <TObjString.h>
 
@@ -73,6 +73,7 @@ class R3BLosHitPar : public FairParGenericSet
         int index = (pmt - 1) * fNumParamsTamexTE + indexpar - 1;
         fTEMatchParams->AddAt(val, index);
     }
+
   private:
     Float_t fp0, fp1;
     Float_t fxoffset_MCFD, fyoffset_MCFD, fxveff_MCFD, fyveff_MCFD;

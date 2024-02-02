@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,14 +12,13 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----             R3BCalifaClusterEventDisplay header file              -----
-// -----              Created 26/10/2012  by P.Cabanelas               -----
+// -----             R3BCalifaClusterEventDisplay header file          -----
+// -----              Created 26/10/2012 by P.Cabanelas                -----
 // -------------------------------------------------------------------------
 
-#ifndef R3BCALIFAHITEVENTDISPLAY_H
-#define R3BCALIFAHITEVENTDISPLAY_H
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 #include "TEveCalo.h"
 #include "TEveCaloData.h"
@@ -107,5 +106,3 @@ class R3BCalifaClusterEventDisplay : public FairTask
 
     ClassDef(R3BCalifaClusterEventDisplay, 2);
 };
-
-#endif

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGLADMAGNET_H
-#define R3BGLADMAGNET_H
+#pragma once
 
 #include "R3BModule.h"
 
@@ -35,5 +34,3 @@ class R3BGladMagnet : public R3BModule
     ClassDef(R3BGladMagnet, 3)
     // ClassDefOverride(R3BGladMagnet, 3)
 };
-
-#endif // R3BGLADMAGNET_H

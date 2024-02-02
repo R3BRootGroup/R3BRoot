@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -57,8 +57,14 @@ R3BRoluMapped2CalPar::R3BRoluMapped2CalPar(const char* name, int iVerbose)
 
 R3BRoluMapped2CalPar::~R3BRoluMapped2CalPar()
 {
-    if (fCal_Par) {delete fCal_Par;}
-    if (fEngine)  {delete fEngine;}
+    if (fCal_Par)
+    {
+        delete fCal_Par;
+    }
+    if (fEngine)
+    {
+        delete fEngine;
+    }
 }
 
 InitStatus R3BRoluMapped2CalPar::Init()
@@ -89,11 +95,11 @@ InitStatus R3BRoluMapped2CalPar::Init()
 
     if (fSkipTrigger == false)
     {
-    	fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("RoluTriggerMapped"));
-    	if (!fMappedTrigger)
-    	{
-    	    LOG(warn) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
-    	}
+        fMappedTrigger = dynamic_cast<TClonesArray*>(rm->GetObject("RoluTriggerMapped"));
+        if (!fMappedTrigger)
+        {
+            LOG(warn) << "R3BRoluMapped2CalPar::Branch RoluMapped not found";
+        }
     }
 
     fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
@@ -107,7 +113,8 @@ InitStatus R3BRoluMapped2CalPar::Init()
 void R3BRoluMapped2CalPar::Exec(Option_t* option)
 {
     // test for requested trigger (if possible)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) return;
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
     unsigned int nHits = fMapped->GetEntries();
 
@@ -115,7 +122,10 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
     for (unsigned int iHit = 0; iHit < nHits; iHit++)
     {
         R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMapped->At(iHit));
-        if (!hit) {continue;}
+        if (!hit)
+        {
+            continue;
+        }
 
         // channel numbers are supposed to be 1-based (1..n)
         unsigned int iDetector = hit->GetDetector() - 1; // now 0..n-1
@@ -124,18 +134,21 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
 
         if (iDetector > (fNofDetectors - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1) << " allowed are 1.." << fNofDetectors;
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
+                       << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1) << " allowed are 1.." << fNofChannels;
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
+                       << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes - 1))
         {
-            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType << " allowed are 0.." << (fNofTypes - 1);
+            LOG(error) << "R3BRoluMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
+                       << " allowed are 0.." << (fNofTypes - 1);
             continue;
         }
 

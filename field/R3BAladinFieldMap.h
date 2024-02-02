@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,14 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BALADINFIELDMAP_H
-#define R3BALADINFIELDMAP_H 1
+#pragma once
 
-#include "FairField.h"
 #include "R3BFieldInterp.h"
 #include "R3BFieldPar.h"
-#include "TRotation.h"
-#include "TVector3.h"
+#include <FairField.h>
+#include <TRotation.h>
+#include <TVector3.h>
 #include <map>
 
 // ------------------  Land02 internal Structures -----------------------//
@@ -227,5 +226,3 @@ class R3BAladinFieldMap : public FairField
 
     ClassDef(R3BAladinFieldMap, 1)
 };
-
-#endif
