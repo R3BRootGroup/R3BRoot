@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BLogger.h"
 #include "R3BRoluMappedData.h"
 #include "R3BRoluReaderOnline.h"
 
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 #include <iostream>
 
 /**
@@ -200,17 +200,9 @@ bool R3BRoluReaderOnline::R3BRead()
                     {
                         uint32_t coarse_leading = hit->GetTimeCoarse();
                         int32_t tot = coarse_trailing - coarse_leading;
-                        // 30 units -> 30 * 5 = 150 ns.
-                        if (tot <= 30 && tot >= 0)
-                        {
-                            new ((*fArray)[fArray->GetEntriesFast()]) R3BRoluMappedData(
-                                det + 1, channel, 1, data->ROLU[det].TTFTv[nextchan], coarse_trailing);
 
-                            //           cout<<"TAMEX trailing: "<< channel<<", "<<data->ROLU[det].TTFTv[nextchan]<<",
-                            //           "<< coarse_trailing<<endl;
-
-                            break;
-                        }
+                        new ((*fArray)[fArray->GetEntriesFast()])
+                            R3BRoluMappedData(det + 1, channel, 1, data->ROLU[det].TTFTv[nextchan], coarse_trailing);
                     }
                 }
             }
@@ -228,4 +220,4 @@ void R3BRoluReaderOnline::Reset()
     fArray->Clear();
 }
 
-ClassImp(R3BRoluReaderOnline);
+ClassImp(R3BRoluReaderOnline)

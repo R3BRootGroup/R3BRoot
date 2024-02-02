@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <TH1F.h>
+#include <TMath.h>
 #include <string>
 
-#include "TH1F.h"
-#include "TMath.h"
-
-#include "FairLogger.h"
+#include <FairLogger.h>
 
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
@@ -273,6 +272,7 @@ void R3BTCalEngine::CalculateParamTacquila()
 void R3BTCalEngine::CalculateParamVFTX()
 {
     fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.;
+    R3BLOG(info, "Num Det: " << N_PLANE_MAX << ", Num Paddles: " << N_PADDLE_MAX);
 
     for (Int_t i = 0; i < N_PLANE_MAX; i++)
     {
@@ -294,8 +294,7 @@ void R3BTCalEngine::CalculateParamVFTX()
                 }
                 if (fhData[i][j][k]->GetEntries() < fMinStats)
                 {
-                    //			LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : fMinStatus: " <<
-                    // fhData[i][j][k]->GetEntries()<<", "<<fMinStats;
+                    R3BLOG(info, " fMinStatus: " << fhData[i][j][k]->GetEntries() << ", " << fMinStats);
                     continue;
                 }
 
@@ -468,4 +467,4 @@ void R3BTCalEngine::LinearDown(TH1F* h1,
     }
 }
 
-ClassImp(R3BTCalEngine);
+ClassImp(R3BTCalEngine)

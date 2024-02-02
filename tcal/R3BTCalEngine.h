@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTCALENGINE_H
-#define R3BTCALENGINE_H 1
+#pragma once
 
 #define MAX_TACQUILA_SAM 7     // 0 .. 7
 #define MAX_TACQUILA_GTB 1     // 0 and 1
@@ -24,7 +23,7 @@
 #define CTDC_16_CLOCK_MHZ 150
 
 #include "R3BTCalPar.h"
-#include "TObject.h"
+#include <TObject.h>
 
 class TH1F;
 
@@ -147,5 +146,3 @@ class R3BTCalEngine : public TObject
   public:
     ClassDef(R3BTCalEngine, 1)
 };
-
-#endif

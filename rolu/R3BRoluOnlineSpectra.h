@@ -17,19 +17,18 @@
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BRoluOnlineSpectra_H
-#define R3BRoluOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 #include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
 
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TMath.h>
 #include <cstdlib>
 
 #define VFTX_CLOCK_MHZ 200
@@ -91,13 +90,15 @@ class R3BRoluOnlineSpectra : public FairTask
     int fNofRoluDetectors = 1;         /**< Number of ROLU detectors. */
     static constexpr int fNofRolu = 1; /**< Number of ROLU detectors. */
 
+    int counter[4] = { 0 };
+
     const char* fDetectorNames[fNofRolu] = { "Rolu" };
 
     TH1F* fh_rolu_channels[fNofRolu]{};
     TH2F* fh_rolu_tot[fNofRolu]{};
+    TH1F* fh_rolu_tot_1D[fNofRolu][4]{};
+    TH1F* fh_rolu_LE_raw[fNofRolu][4]{};
 
   public:
     ClassDef(R3BRoluOnlineSpectra, 0)
 };
-
-#endif

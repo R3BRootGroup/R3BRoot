@@ -29,16 +29,16 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRtdbRun.h"
-#include "FairRunIdGenerator.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRtdbRun.h>
+#include <FairRunIdGenerator.h>
+#include <FairRuntimeDb.h>
 
-#include "TClonesArray.h"
-#include "TF1.h"
-#include "TH1F.h"
-#include "math.h"
+#include <TClonesArray.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <math.h>
 
 #include <iostream>
 #include <stdlib.h>
@@ -105,6 +105,7 @@ InitStatus R3BRoluMapped2CalPar::Init()
     fCal_Par = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer("RoluTCalPar"));
     fCal_Par->setChanged();
 
+    printf("fMinStats: %d\n", fMinStats);
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
@@ -162,6 +163,7 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
         // Loop over mapped triggers
         for (int iHit = 0; iHit < nHits; iHit++)
         {
+            counter = counter + 1;
             auto mapped = dynamic_cast<R3BRoluMappedData const*>(fMappedTrigger->At(iHit));
             fEngine->Fill(3, 1, 1, mapped->GetTimeFine());
         }
@@ -170,8 +172,9 @@ void R3BRoluMapped2CalPar::Exec(Option_t* option)
 
 void R3BRoluMapped2CalPar::FinishTask()
 {
+    printf("counter: %d\n", counter);
     fEngine->CalculateParamVFTX();
     fCal_Par->printParams();
 }
 
-ClassImp(R3BRoluMapped2CalPar);
+ClassImp(R3BRoluMapped2CalPar)

@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTCALPAR_H
-#define R3BTCALPAR_H 1
+#pragma once
 
 #define NMODULEMAX 6000
 
@@ -20,9 +19,9 @@
 #define N_PADDLE_MAX 2048
 #define N_SIDE_MAX 10
 
-#include "FairParGenericSet.h" // for FairParGenericSet
 #include "R3BTCalModulePar.h"
-#include "TObjArray.h"
+#include <FairParGenericSet.h> // for FairParGenericSet
+#include <TObjArray.h>
 #include <map>
 
 using namespace std;
@@ -40,7 +39,6 @@ class FairParamList;
  */
 class R3BTCalPar : public FairParGenericSet
 {
-
   public:
     /**
      * Standard constructor. Creates instance of this class.
@@ -154,7 +152,6 @@ class R3BTCalPar : public FairParGenericSet
     Bool_t fMapInit;             /**< a boolean flag for indication whether the indexing map is initialized */
     map<Int_t, Int_t> fIndexMap; /**< a map between index of a container in array and plane,paddle,side */
 
+  public:
     ClassDef(R3BTCalPar, 1);
 };
-
-#endif /* !R3BTCALPAR_H*/

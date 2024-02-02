@@ -25,18 +25,18 @@
 #include "R3BRoluMappedData.h"
 #include "R3BTCalEngine.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
-#include "boost/multi_array.hpp"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
+#include <boost/multi_array.hpp>
 #include <vector>
 
 #define IS_NAN(x) TMath::IsNaN(x)
@@ -111,13 +111,45 @@ InitStatus R3BRoluOnlineSpectra::Init()
             fh_rolu_tot[irolucount]->GetXaxis()->SetTitle("PMT number");
             fh_rolu_tot[irolucount]->GetYaxis()->SetTitle("ToT / ns");
 
-            cRolu[irolucount]->Divide(2, 1);
+            int color;
+            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            {
+                color = ichannelcount + 1;
+                if (color == 3)
+                    color = 8;
+                histName = Form("Rolu%d_tot1D_ch%d", irolucount, ichannelcount);
+                fh_rolu_tot_1D[irolucount][ichannelcount] = new TH1F(histName.Data(), histName.Data(), 151, 0., 150.);
+                fh_rolu_tot_1D[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
+                fh_rolu_tot_1D[irolucount][ichannelcount]->SetLineColor(color);
+
+                histName = Form("Rolu%d_LE_raw_ch%d", irolucount, ichannelcount);
+                fh_rolu_LE_raw[irolucount][ichannelcount] = new TH1F(histName.Data(), histName.Data(), 1050, 0, 10500);
+                fh_rolu_LE_raw[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
+                fh_rolu_LE_raw[irolucount][ichannelcount]->SetLineColor(color);
+            }
+
+            cRolu[irolucount]->Divide(2, 2);
             cRolu[irolucount]->cd(1);
             fh_rolu_channels[irolucount]->Draw();
             gPad->SetLogy();
             cRolu[irolucount]->cd(2);
             gPad->SetLogz();
             fh_rolu_tot[irolucount]->Draw("colz");
+            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            {
+                cRolu[irolucount]->cd(3);
+                if (ichannelcount == 0)
+                    fh_rolu_tot_1D[irolucount][ichannelcount]->Draw();
+                else
+                    fh_rolu_tot_1D[irolucount][ichannelcount]->Draw("same");
+                gPad->SetLogy();
+                cRolu[irolucount]->cd(4);
+                gPad->SetLogy();
+                if (ichannelcount == 0)
+                    fh_rolu_LE_raw[irolucount][ichannelcount]->Draw();
+                else
+                    fh_rolu_LE_raw[irolucount][ichannelcount]->Draw("same");
+            }
             mainfol->Add(cRolu[irolucount]);
         }
 
@@ -137,6 +169,11 @@ void R3BRoluOnlineSpectra::Reset_ROLU_Histo()
         {
             fh_rolu_channels[irolucount]->Reset();
             fh_rolu_tot[irolucount]->Reset();
+            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            {
+                fh_rolu_tot_1D[irolucount][ichannelcount]->Reset();
+                fh_rolu_LE_raw[irolucount][ichannelcount]->Reset();
+            }
         }
     }
 }
@@ -187,10 +224,18 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
                 double time_T = calData->GetTimeT_ns(chan);
                 tot = fmod(time_T - time_L + c_range_ns + c_range_ns / 2., c_range_ns) - c_range_ns / 2.;
                 if (!std::isnan(tot))
-                    fh_rolu_tot[calData->GetDetector() - 1]->Fill(chan, tot);
+                {
+                    fh_rolu_tot[calData->GetDetector() - 1]->Fill(chan + 1, tot);
+                    fh_rolu_tot_1D[calData->GetDetector() - 1][chan]->Fill(tot);
+                    fh_rolu_LE_raw[calData->GetDetector() - 1][chan]->Fill(calData->GetTimeL_ns(chan));
+                }
             }
         }
     } // if fCallItems
+    double maxentries = 0;
+    for (int i = 0; i < 4; i++)
+        maxentries = max(maxentries, fh_rolu_tot_1D[0][i]->GetMaximum());
+    fh_rolu_tot_1D[0][0]->SetMaximum(maxentries);
 }
 
 void R3BRoluOnlineSpectra::FinishEvent()
@@ -213,8 +258,13 @@ void R3BRoluOnlineSpectra::FinishTask()
         {
             fh_rolu_channels[irolucount]->Write();
             fh_rolu_tot[irolucount]->Write();
+            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            {
+                fh_rolu_tot_1D[irolucount][ichannelcount]->Write();
+                fh_rolu_LE_raw[irolucount][ichannelcount]->Write();
+            }
         }
     }
 }
 
-ClassImp(R3BRoluOnlineSpectra);
+ClassImp(R3BRoluOnlineSpectra)
