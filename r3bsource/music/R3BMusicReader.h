@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMUSICREADER_H
-#define R3BMUSICREADER_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -46,7 +45,7 @@ class R3BMusicReader : public R3BReader
     virtual void Reset() override;
 
     /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     Bool_t ReadData201911();
@@ -63,5 +62,3 @@ class R3BMusicReader : public R3BReader
   public:
     ClassDefOverride(R3BMusicReader, 0);
 };
-
-#endif // R3BMUSICREADER_H

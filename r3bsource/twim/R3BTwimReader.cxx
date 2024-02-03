@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 #include <TClonesArray.h>
 
 #include "R3BLogger.h"
@@ -236,4 +236,4 @@ Bool_t R3BTwimReader::ReadData(EXT_STR_h101_SOFTWIM_onion* data, UShort_t sectio
     return kTRUE;
 }
 
-ClassImp(R3BTwimReader);
+ClassImp(R3BTwimReader)

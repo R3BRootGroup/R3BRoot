@@ -11,13 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairRootManager.h"
-
+#include "R3BRpcReader.h"
 #include "R3BLogger.h"
 #include "R3BRpcMappedData.h"
-#include "R3BRpcReader.h"
 
-#include "TClonesArray.h"
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
 
 extern "C"
 {
@@ -219,4 +219,4 @@ void R3BRpcReader::Reset()
     fArrayRpc->Clear();
 }
 
-ClassImp(R3BRpcReader);
+ClassImp(R3BRpcReader)

@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMUSLIREADER_H
-#define R3BMUSLIREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include "TClonesArray.h"
@@ -59,5 +58,3 @@ class R3BMusliReader : public R3BReader
   public:
     ClassDefOverride(R3BMusliReader, 0);
 };
-
-#endif // R3BMUSLIREADER_H

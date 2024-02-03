@@ -21,14 +21,13 @@
 //  Y = L(eading) or T(railing) edge of signal.
 //  Z = C(oarse) or F(ine) time from electronics.
 
-#ifndef R3BFiberReader_H
-#define R3BFiberReader_H 1
+#pragma once
 
 #include "R3BLogger.h"
 #include "R3BReader.h"
 
-#include "TString.h"
 #include <Rtypes.h>
+#include <TString.h>
 
 class TClonesArray;
 
@@ -244,7 +243,7 @@ class R3BFiberReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     TString fShortName; // e.g. "Fi10", "Fi30", "Fi31", ...
@@ -283,5 +282,3 @@ class R3BFiberReader : public R3BReader
   public:
     ClassDefOverride(R3BFiberReader, 1);
 };
-
-#endif

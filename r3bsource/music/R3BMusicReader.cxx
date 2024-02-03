@@ -11,13 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-
-#include "R3BMusicMappedData.h"
 #include "R3BMusicReader.h"
+#include "R3BMusicMappedData.h"
 
-#include "TClonesArray.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
 #include <iostream>
 
 extern "C"
@@ -170,4 +170,4 @@ Bool_t R3BMusicReader::ReadData201911()
     return kTRUE;
 }
 
-ClassImp(R3BMusicReader);
+ClassImp(R3BMusicReader)

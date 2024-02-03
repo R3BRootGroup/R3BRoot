@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 #include <TClonesArray.h>
 
 #include "R3BLogger.h"
@@ -145,4 +145,4 @@ void R3BMwpcReader::Reset()
     fArrayMwpc3->Clear();
 }
 
-ClassImp(R3BMwpcReader);
+ClassImp(R3BMwpcReader)

@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-
+#include "R3BTrloiiScalerReader.h"
 #include "R3BLogger.h"
 #include "R3BTrloiiData.h"
-#include "R3BTrloiiScalerReader.h"
 
-#include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
+#include <ext_data_struct_info.hh>
 
 /**
  ** ext_h101_trlo.h was created by running
@@ -95,4 +95,4 @@ void R3BTrloiiScalerReader::Reset()
     fArray->Clear();
 }
 
-ClassImp(R3BTrloiiScalerReader);
+ClassImp(R3BTrloiiScalerReader)

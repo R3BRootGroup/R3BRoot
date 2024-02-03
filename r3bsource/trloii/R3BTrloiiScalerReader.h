@@ -16,8 +16,7 @@
 // -----             Created 12/05/18 by J.L. Rodriguez-Sanchez     -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BTrloiiScalerReader_H
-#define R3BTrloiiScalerReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -48,7 +47,7 @@ class R3BTrloiiScalerReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     // An event counter
@@ -65,5 +64,3 @@ class R3BTrloiiScalerReader : public R3BReader
   public:
     ClassDefOverride(R3BTrloiiScalerReader, 0);
 };
-
-#endif /* R3BTrloiiScalerReader_H */

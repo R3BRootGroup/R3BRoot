@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BWhiterabbitCalifaReader_H
-#define R3BWhiterabbitCalifaReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -64,4 +63,3 @@ class R3BWhiterabbitCalifaReader : public R3BReader
   public:
     ClassDefOverride(R3BWhiterabbitCalifaReader, 0);
 };
-#endif // R3BWhiterabbitCalifaReader_H

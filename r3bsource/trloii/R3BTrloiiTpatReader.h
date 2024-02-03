@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTRLOIITPATREADER_H
-#define R3BTRLOIITPATREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -38,23 +37,20 @@ class R3BTrloiiTpatReader : public R3BReader
     // Read data from full event structure
     virtual Bool_t R3BRead() override;
 
-    // Reset
-    virtual void Reset() override;
-
     // Set trigger selector
-    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     // Set tpat selector
     // tpatmin is the minimum tpat value
     // tpatmax is the maximum tpat value
-    void SetTpatRange(Int_t tpatmin, Int_t tpatmax)
+    inline void SetTpatRange(Int_t tpatmin, Int_t tpatmax)
     {
         fTpatmin = tpatmin;
         fTpatmax = tpatmax;
     }
 
     // Skip events with Tpat=0
-    void SetSkipEventsTpatZero(Bool_t option = kTRUE) { fSkipTpatZero = option; }
+    inline void SetSkipEventsTpatZero(Bool_t option = kTRUE) { fSkipTpatZero = option; }
 
   private:
     // An event counter
@@ -76,5 +72,3 @@ class R3BTrloiiTpatReader : public R3BReader
   public:
     ClassDefOverride(R3BTrloiiTpatReader, 0);
 };
-
-#endif /* R3BTRLOIITPATREADER_H */

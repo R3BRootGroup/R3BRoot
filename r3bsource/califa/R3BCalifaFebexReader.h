@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCALIFAFEBEXREADER_H
-#define R3BCALIFAFEBEXREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -71,5 +70,3 @@ class R3BCalifaFebexReader : public R3BReader
   public:
     ClassDefOverride(R3BCalifaFebexReader, 0);
 };
-
-#endif // R3BCALIFAFEBEXREADER_H

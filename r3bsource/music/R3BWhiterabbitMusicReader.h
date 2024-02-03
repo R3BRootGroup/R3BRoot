@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BWhiterabbitMusicReader_H
-#define R3BWhiterabbitMusicReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -49,7 +48,7 @@ class R3BWhiterabbitMusicReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     // An event counter
@@ -70,4 +69,3 @@ class R3BWhiterabbitMusicReader : public R3BReader
   public:
     ClassDefOverride(R3BWhiterabbitMusicReader, 0);
 };
-#endif // R3BWhiterabbitMusicReader_H

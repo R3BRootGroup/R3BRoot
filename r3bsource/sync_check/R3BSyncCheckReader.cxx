@@ -11,14 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-
+#include "R3BSyncCheckReader.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BSyncCheckData.h"
-#include "R3BSyncCheckReader.h"
-#include "TClonesArray.h"
+
+#include <FairLogger.h>
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
 
 extern "C"
 {
@@ -94,4 +95,4 @@ Bool_t R3BSyncCheckReader::R3BRead()
 
 void R3BSyncCheckReader::Reset() { fArray->Clear(); }
 
-ClassImp(R3BSyncCheckReader);
+ClassImp(R3BSyncCheckReader)

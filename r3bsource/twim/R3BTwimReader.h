@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTWIMREADER_H
-#define R3BTWIMREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
-#include "TClonesArray.h"
 #include <Rtypes.h>
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_SOFTWIM_t;
 typedef struct EXT_STR_h101_SOFTWIM_t EXT_STR_h101_SOFTWIM;
@@ -73,5 +72,3 @@ class R3BTwimReader : public R3BReader
   public:
     ClassDefOverride(R3BTwimReader, 0);
 };
-
-#endif // R3BTWIMREADER_H

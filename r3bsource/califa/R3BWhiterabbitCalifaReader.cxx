@@ -11,13 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BEventHeader.h"
 #include "R3BWRData.h"
 #include "R3BWhiterabbitCalifaReader.h"
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 
 extern "C"
 {
@@ -146,4 +146,4 @@ void R3BWhiterabbitCalifaReader::Reset()
     fNEvent = 0;
 }
 
-ClassImp(R3BWhiterabbitCalifaReader);
+ClassImp(R3BWhiterabbitCalifaReader)

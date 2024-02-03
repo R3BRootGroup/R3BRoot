@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BPTOFREADER_H
-#define R3BPTOFREADER_H
+#pragma once
 
 /* Include the parent reader class definition */
 #include "R3BReader.h"
@@ -94,5 +93,3 @@ class R3BPtofReader : public R3BReader
   public:
     ClassDef(R3BPtofReader, 0);
 };
-
-#endif

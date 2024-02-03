@@ -11,12 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include <FairLogger.h>
-#include <FairRootManager.h>
-
+#include "R3BTofdReader.h"
 #include "R3BLogger.h"
 #include "R3BTofdMappedData.h"
-#include "R3BTofdReader.h"
+
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include <TClonesArray.h>
 #include <ext_data_struct_info.hh>
