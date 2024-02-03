@@ -149,9 +149,10 @@ InitStatus R3BTofDOnlineSpectra::Init()
         // Canvas to display the Y position as a function of paddle and per plane  ---------------
         auto* cTofd_Y_per_planes =
             new TCanvas("TofD_Ypos_planes_Cal", "TOFD: Y-pos per plane with CAL data", 10, 10, 1100, 1000);
-        cTofd_Y_per_planes->Divide(2, 2);
+        cTofd_Y_per_planes->Divide(2, fNofPlanes);
 
         fh2_tofd_ypos_cal.resize(fNofPlanes);
+        fh2_tofd_timedif_cal.resize(fNofPlanes);
 
         for (Int_t j = 0; j < fNofPlanes; j++)
         {
@@ -270,15 +271,30 @@ InitStatus R3BTofDOnlineSpectra::Init()
             fh2_tofd_ypos_cal[j] = R3B::root_owned<TH2F>(strName13, strName14, 45, 0, 45, 2000., -50., 50.);
             fh2_tofd_ypos_cal[j]->GetXaxis()->SetTitle("Bar number");
             fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitle("Y-position [ns]");
-            fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleOffset(1.);
+            fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleOffset(1.05);
             fh2_tofd_ypos_cal[j]->GetXaxis()->CenterTitle(true);
             fh2_tofd_ypos_cal[j]->GetYaxis()->CenterTitle(true);
             fh2_tofd_ypos_cal[j]->GetXaxis()->SetLabelSize(0.045);
             fh2_tofd_ypos_cal[j]->GetXaxis()->SetTitleSize(0.045);
             fh2_tofd_ypos_cal[j]->GetYaxis()->SetLabelSize(0.045);
             fh2_tofd_ypos_cal[j]->GetYaxis()->SetTitleSize(0.045);
-            cTofd_Y_per_planes->cd(j + 1);
+            cTofd_Y_per_planes->cd(j * 2 + 1);
             fh2_tofd_ypos_cal[j]->Draw("colz");
+
+            sprintf(strName13, "tofd_timediff_plane_%d", j + 1);
+            sprintf(strName14, "Tofd time diff. per PMT for plane %d", j + 1);
+            fh2_tofd_timedif_cal[j] = R3B::root_owned<TH2F>(strName13, strName14, 90, -45, 45, 2000., -5000., 1000.);
+            fh2_tofd_timedif_cal[j]->GetXaxis()->SetTitle("Bar number");
+            fh2_tofd_timedif_cal[j]->GetYaxis()->SetTitle("PMT_time - Trig_time [ns]");
+            fh2_tofd_timedif_cal[j]->GetYaxis()->SetTitleOffset(1.05);
+            fh2_tofd_timedif_cal[j]->GetXaxis()->CenterTitle(true);
+            fh2_tofd_timedif_cal[j]->GetYaxis()->CenterTitle(true);
+            fh2_tofd_timedif_cal[j]->GetXaxis()->SetLabelSize(0.045);
+            fh2_tofd_timedif_cal[j]->GetXaxis()->SetTitleSize(0.045);
+            fh2_tofd_timedif_cal[j]->GetYaxis()->SetLabelSize(0.045);
+            fh2_tofd_timedif_cal[j]->GetYaxis()->SetTitleSize(0.045);
+            cTofd_Y_per_planes->cd(j * 2 + 2);
+            fh2_tofd_timedif_cal[j]->Draw("colz");
         }
 
         cTofd_planes->cd(1);
@@ -584,6 +600,7 @@ void R3BTofDOnlineSpectra::Reset_Histo()
         fh_tofd_multihit_coinc[i]->Reset();
         fh_tofd_TotPm_coinc[i]->Reset();
         fh2_tofd_ypos_cal[i]->Reset();
+        fh2_tofd_timedif_cal[i]->Reset();
     }
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
@@ -943,6 +960,8 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     int iBar = topc->GetBarId();        // 1..n
                     // Histograms to display Y position
                     fh2_tofd_ypos_cal[iPlane - 1]->Fill(iBar, dt_mod);
+                    fh2_tofd_timedif_cal[iPlane - 1]->Fill(iBar, topc_ns);
+                    fh2_tofd_timedif_cal[iPlane - 1]->Fill(-1 * iBar, botc_ns);
                 }
 
                 if (std::abs(dt_mod) < fC_bar_coincidence_ns)
@@ -1113,6 +1132,7 @@ void R3BTofDOnlineSpectra::FinishTask()
             fh_tofd_multihit[i]->Write();
             fh_tofd_multihit_coinc[i]->Write();
             fh2_tofd_ypos_cal[i]->Write();
+            fh2_tofd_timedif_cal[i]->Write();
         }
         for (Int_t i = 0; i < fNofPlanes - 1; i++)
         {

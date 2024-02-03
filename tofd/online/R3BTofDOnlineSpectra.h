@@ -146,6 +146,7 @@ class R3BTofDOnlineSpectra : public FairTask
     std::vector<TH1F*> fh_tofd_multihit_hit;
     std::vector<TH2F*> fh_tofd_dt_hit;
     std::vector<TH2F*> fh2_tofd_ypos_cal;
+    std::vector<TH2F*> fh2_tofd_timedif_cal;
 
     std::vector<TH2F*> fh_tofd_time_los_h2;
     std::vector<TH1F*> fh_tofd_time_los[44];
