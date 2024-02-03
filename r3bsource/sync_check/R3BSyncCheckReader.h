@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BSyncCheckReader_H
-#define R3BSyncCheckReader_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -38,7 +37,7 @@ class R3BSyncCheckReader : public R3BReader
     virtual Bool_t R3BRead() override;
 
     // Store data in the output tree
-    void SetStoreData(Bool_t option) { fStoreData = option; }
+    inline void SetStoreData(Bool_t option) { fStoreData = option; }
 
     // Reset
     virtual void Reset() override;
@@ -58,4 +57,3 @@ class R3BSyncCheckReader : public R3BReader
   public:
     ClassDefOverride(R3BSyncCheckReader, 0);
 };
-#endif // R3BSyncCheckReader_H

@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDTAMEXREADER_H
-#define R3BNEULANDTAMEXREADER_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -43,13 +42,13 @@ class R3BNeulandTamexReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
     // Set the maximum number of planes
-    void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
+    inline void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
 
     // Accessor to skip trigger times
-    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    inline void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
 
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
@@ -63,5 +62,3 @@ class R3BNeulandTamexReader : public R3BReader
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);
 };
-
-#endif

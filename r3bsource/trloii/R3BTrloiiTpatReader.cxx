@@ -11,9 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
 
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -199,6 +199,4 @@ Bool_t R3BTrloiiTpatReader::R3BRead()
     return kTRUE;
 }
 
-void R3BTrloiiTpatReader::Reset() {}
-
-ClassImp(R3BTrloiiTpatReader);
+ClassImp(R3BTrloiiTpatReader)

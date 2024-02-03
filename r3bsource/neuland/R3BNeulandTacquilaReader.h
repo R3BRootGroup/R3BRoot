@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDTACQUILAREADER_H
-#define R3BNEULANDTACQUILAREADER_H
+#pragma once
 
 #include "R3BReader.h"
 
@@ -76,5 +75,3 @@ class R3BNeulandTacquilaReader : public R3BReader
   public:
     ClassDef(R3BNeulandTacquilaReader, 0);
 };
-
-#endif

@@ -11,16 +11,16 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BAmsMappedData.h"
 #include "R3BCalifaJulichReader.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BLogger.h"
 
-#include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
+#include <TClonesArray.h>
+#include <ext_data_struct_info.hh>
 
 /**
  ** ext_h101_califa.h was created by running
@@ -117,4 +117,4 @@ void R3BCalifaJulichReader::Reset()
     fArrayAms->Clear();
 }
 
-ClassImp(R3BCalifaJulichReader);
+ClassImp(R3BCalifaJulichReader)

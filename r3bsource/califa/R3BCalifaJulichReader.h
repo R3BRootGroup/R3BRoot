@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BCalifaJulichREADER_H
-#define R3BCalifaJulichREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -65,5 +64,3 @@ class R3BCalifaJulichReader : public R3BReader
   public:
     ClassDefOverride(R3BCalifaJulichReader, 0);
 };
-
-#endif // R3BCalifaJulichREADER_H

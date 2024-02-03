@@ -11,14 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BCalifaFebexReader.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BLogger.h"
 
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 
 /**
  ** ext_h101_califa.h was created by running
@@ -119,4 +119,4 @@ void R3BCalifaFebexReader::Reset()
     fArraytrig->Clear();
 }
 
-ClassImp(R3BCalifaFebexReader);
+ClassImp(R3BCalifaFebexReader)

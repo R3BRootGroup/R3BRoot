@@ -1,8 +1,20 @@
-#ifndef R3BFRSSCIREADER_H
-#define R3BFRSSCIREADER_H
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
+#pragma once
 
 #include "R3BReader.h"
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 
 #include <Rtypes.h>
 
@@ -47,5 +59,3 @@ class R3BFrsSciReader : public R3BReader
   public:
     ClassDefOverride(R3BFrsSciReader, 0);
 };
-
-#endif // R3BFRSSCIREADER_H

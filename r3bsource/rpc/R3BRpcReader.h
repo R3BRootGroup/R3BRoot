@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPCREADER_H
-#define R3BRPCREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -51,7 +50,7 @@ class R3BRpcReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     /* Reader specific data structure from ucesb */
@@ -73,5 +72,3 @@ class R3BRpcReader : public R3BReader
   public:
     ClassDefOverride(R3BRpcReader, 0);
 };
-
-#endif /* R3BRPCREADER_H */

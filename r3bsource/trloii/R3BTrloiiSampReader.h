@@ -17,8 +17,8 @@
 // sampler reader modified to read the sampler storing master start timestamps
 // along with sampler hits and both the high and low bits
 
-#ifndef R3BTRLOIISAMPREADER_H
-#define R3BTRLOIISAMPREADER_H 1
+#pragma once
+
 #include "R3BReader.h"
 #include <TClonesArray.h>
 
@@ -85,5 +85,3 @@ class R3BTrloiiSampReader : public R3BReader
   public:
     ClassDefOverride(R3BTrloiiSampReader, 0);
 };
-
-#endif

@@ -37,13 +37,12 @@
 // Cal2Hit however does handle electronics channels -> fibers.
 //
 
-#ifndef R3BFIBERMAPMTREADER_H
-#define R3BFIBERMAPMTREADER_H 1
+#pragma once
 
 #include "R3BLogger.h"
 #include "R3BReader.h"
 
-#include "TString.h"
+#include <TString.h>
 
 class TClonesArray;
 
@@ -123,7 +122,7 @@ class R3BFiberMAPMTReader : public R3BReader
     void Reset();
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   protected:
     // Data offset
@@ -141,5 +140,3 @@ class R3BFiberMAPMTReader : public R3BReader
   public:
     ClassDef(R3BFiberMAPMTReader, 1);
 };
-
-#endif

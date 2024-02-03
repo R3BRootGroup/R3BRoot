@@ -12,12 +12,14 @@
  ******************************************************************************/
 
 #include "R3BTrloiiSampReader.h"
-#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BSampLosMappedData.h"
 #include "R3BSamplerMappedData.h"
-#include "TClonesArray.h"
+
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
 
 extern "C"
 {

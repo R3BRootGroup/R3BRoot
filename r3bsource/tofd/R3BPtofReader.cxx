@@ -11,12 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-
-#include "FairRootManager.h"
-#include "R3BPaddleTamexMappedData.h"
 #include "R3BPtofReader.h"
-#include "TClonesArray.h"
+#include "R3BPaddleTamexMappedData.h"
+
+#include <FairLogger.h>
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
 
 extern "C"
 {

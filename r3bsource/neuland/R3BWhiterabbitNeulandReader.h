@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BWhiterabbitNeulandReader_H
-#define R3BWhiterabbitNeulandReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -70,4 +69,3 @@ class R3BWhiterabbitNeulandReader : public R3BReader
   public:
     ClassDefOverride(R3BWhiterabbitNeulandReader, 0);
 };
-#endif // R3BWhiterabbitNeulandReader_H

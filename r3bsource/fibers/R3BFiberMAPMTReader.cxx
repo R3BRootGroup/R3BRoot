@@ -12,10 +12,11 @@
  ******************************************************************************/
 
 #include "R3BFiberMAPMTReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
 #include "R3BFiberMAPMTMappedData.h"
-#include "TClonesArray.h"
+
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <TClonesArray.h>
 
 R3BFiberMAPMTReader::R3BFiberMAPMTReader(char const* a_name, UInt_t a_offset, size_t fiber_num)
     : R3BReader(TString("R3B") + a_name + "Reader")
@@ -155,4 +156,4 @@ Bool_t R3BFiberMAPMTReader::R3BRead()
 
 void R3BFiberMAPMTReader::Reset() { fMappedArray->Clear(); }
 
-ClassImp(R3BFiberMAPMTReader);
+ClassImp(R3BFiberMAPMTReader)

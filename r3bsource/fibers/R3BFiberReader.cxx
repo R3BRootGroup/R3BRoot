@@ -14,9 +14,9 @@
 #include "R3BFiberReader.h"
 #include "R3BFiberMappedData.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "TClonesArray.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <TClonesArray.h>
 
 /**
  ** ext_h101_fib30.h was created by running
@@ -534,4 +534,4 @@ Bool_t R3BFiberReader::R3BRead()
 
 void R3BFiberReader::Reset() { fMappedArray->Clear(); }
 
-ClassImp(R3BFiberReader);
+ClassImp(R3BFiberReader)

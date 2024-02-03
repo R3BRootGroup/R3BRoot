@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
 
 #include "R3BLogger.h"
 #include "R3BNeulandTamexReader.h"
 #include "R3BPaddleTamexMappedData.h"
 
-#include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
+#include <TClonesArray.h>
+#include <ext_data_struct_info.hh>
 
 /**
  ** ext_h101_raw_nnp_tamex.h was created by running
@@ -185,4 +185,4 @@ void R3BNeulandTamexReader::Reset()
         fArrayTrigger->Clear();
 }
 
-ClassImp(R3BNeulandTamexReader);
+ClassImp(R3BNeulandTamexReader)

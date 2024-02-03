@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMWPCREADER_H
-#define R3BMWPCREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
-#include "TClonesArray.h"
 #include <Rtypes.h>
+#include <TClonesArray.h>
 
 struct EXT_STR_h101_SOFMWPC_t;
 typedef struct EXT_STR_h101_SOFMWPC_t EXT_STR_h101_SOFMWPC;
@@ -40,10 +39,10 @@ class R3BMwpcReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select the max. number of mwpcs
-    void SetMaxNbDet(UInt_t d) { fMaxDet = d; }
+    inline void SetMaxNbDet(UInt_t d) { fMaxDet = d; }
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     // Reader specific data structure from ucesb
@@ -63,5 +62,3 @@ class R3BMwpcReader : public R3BReader
   public:
     ClassDefOverride(R3BMwpcReader, 0);
 };
-
-#endif // R3BMWPCREADER_H
