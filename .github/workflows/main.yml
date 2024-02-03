@@ -140,7 +140,7 @@ jobs:
     # another github repo or a self-defined one in .github/actions.
     steps:
       # Fetch updates from pull request branches using a public github action.
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # This allows all commits of all branches to be fetched.
           fetch-depth: 0
