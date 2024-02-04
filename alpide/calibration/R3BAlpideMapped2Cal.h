@@ -61,14 +61,14 @@ class R3BAlpideMapped2Cal : public FairTask
     int GetCol(int reg, int dcol, int ads);
     int GetRow(int ads);
 
-    bool fOnline; // Don't store data for online
+    bool fOnline = false; // Don't store data for online
 
-    R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
-    TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
-    TClonesArray* fAlpideCalData;    // Array with Alpide Cal output data
+    R3BAlpideMappingPar* fMap_Par = nullptr;   /**< Parameter container. >*/
+    TClonesArray* fAlpideMappedData = nullptr; // Array with Alpide Mapped input data
+    TClonesArray* fAlpideCalData = nullptr;    // Array with Alpide Cal output data
 
     // Private method AddCalData
-    R3BAlpideCalData* AddCalData(UShort_t senId, Int_t row, Int_t col);
+    R3BAlpideCalData* AddCalData(uint16_t senId, uint16_t row, uint16_t col);
 
   public:
     // Class definition

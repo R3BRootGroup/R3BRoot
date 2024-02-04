@@ -11,67 +11,57 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// ---------------------------------------------------------------------
+// -----                       R3BMosaicReader                     -----
+// -----             Created 04/02/24 by J.L. Rodriguez-Sanchez    -----
+// ---------------------------------------------------------------------
+
 #pragma once
 
 #include "R3BReader.h"
-#include <Rtypes.h>
+#include <stdint.h>
 
-struct EXT_STR_h101_TPAT_t;
-typedef struct EXT_STR_h101_TPAT_t EXT_STR_h101_TPAT;
+class TClonesArray;
 
+struct EXT_STR_h101_MOSAIC_t;
+typedef struct EXT_STR_h101_MOSAIC_onion_t EXT_STR_h101_MOSAIC_onion;
 class ext_data_struct_info;
-class R3BEventHeader;
 
-class R3BTrloiiTpatReader : public R3BReader
+class R3BMosaicReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BTrloiiTpatReader(EXT_STR_h101_TPAT*, size_t);
+    R3BMosaicReader(EXT_STR_h101_MOSAIC_onion*, size_t);
 
     // Destructor
-    virtual ~R3BTrloiiTpatReader();
+    virtual ~R3BMosaicReader();
 
     // Setup structure information
-    virtual Bool_t Init(ext_data_struct_info*) override;
+    Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t R3BRead() override;
+    Bool_t R3BRead() override;
 
     // Reset
-    virtual void Reset() override;
+    void Reset() override;
 
-    // Set trigger selector
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-
-    // Set tpat selector
-    // tpatmin is the minimum tpat value
-    // tpatmax is the maximum tpat value
-    inline void SetTpatRange(Int_t tpatmin, Int_t tpatmax)
-    {
-        fTpatmin = tpatmin;
-        fTpatmax = tpatmax;
-    }
-
-    // Skip events with Tpat=0
-    inline void SetSkipEventsTpatZero(Bool_t option = kTRUE) { fSkipTpatZero = option; }
+    // Accessor to select online mode
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     // An event counter
-    UInt_t fNEvent;
-    // Trigger selector
-    Int_t fTrigger;
-    // TPat selectors
-    Int_t fTpatmin;
-    Int_t fTpatmax;
-    // Skip events with Tpat=0
-    Bool_t fSkipTpatZero;
+    unsigned int fNEvent = 1;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_TPAT* fData;
-    // Offset of detector specific data in full data structure
-    size_t fOffset;
-    // A pointer to the R3BEventHeader structure
-    R3BEventHeader* fEventHeader;
+    EXT_STR_h101_MOSAIC_onion* fData;
+    // Number of Mosaics
+    int fNbMosaic = 1;
+    // Data offset
+    size_t fOffset = 0;
+    // Don't store data for online
+    bool fOnline = false;
+    // Output array
+    TClonesArray* fArray = nullptr;
 
   public:
-    ClassDefOverride(R3BTrloiiTpatReader, 0);
+    ClassDefOverride(R3BMosaicReader, 1);
 };

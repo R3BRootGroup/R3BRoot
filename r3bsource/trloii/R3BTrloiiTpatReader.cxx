@@ -199,4 +199,6 @@ Bool_t R3BTrloiiTpatReader::R3BRead()
     return kTRUE;
 }
 
+void R3BTrloiiTpatReader::Reset() {}
+
 ClassImp(R3BTrloiiTpatReader)
