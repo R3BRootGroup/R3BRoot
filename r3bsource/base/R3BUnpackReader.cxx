@@ -95,4 +95,4 @@ Bool_t R3BUnpackReader::R3BRead()
 
 void R3BUnpackReader::Reset() {}
 
-ClassImp(R3BUnpackReader);
+ClassImp(R3BUnpackReader)

@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef _R3BREADER_H
-#define _R3BREADER_H 1
+#pragma once
 
-#include "TNamed.h"
-#include "TString.h"
 #include <R3BUcesbMappingFlag.h>
+#include <TNamed.h>
+#include <TString.h>
 
 extern "C"
 {
@@ -59,5 +58,3 @@ class R3BReader : public TNamed
   public:
     ClassDef(R3BReader, 0);
 };
-
-#endif /* _R3BREADER_H */
