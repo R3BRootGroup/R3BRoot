@@ -57,7 +57,6 @@ struct EXT_STR_h101_t
     EXT_STR_h101_WRMASTER_t wrmaster;
 };
 
-constexpr int DEFAULT_EVENT_NUM = 1000;
 constexpr int DEFAULT_PORT_NUM = 11000;
 constexpr int DEFAULT_REFRESH_RATE = 1;
 constexpr int DEFAULT_RUNID = 999;
@@ -75,13 +74,15 @@ auto main(int argc, const char** argv) -> int
     //====================================================================================
     // Program options:
     auto programOptions = R3B::ProgramOptions("Online monitor for neuland data");
+    auto help = programOptions.create_option<bool>("help,h", "help message", false);
+    auto is_cal_disabled = programOptions.create_option<bool>("dis-cal", "disable cal level analysis", false);
+    auto is_hit_disabled = programOptions.create_option<bool>("dis-hit", "disable hit level analysis", false);
     auto input_fstream = programOptions.create_option<std::string>("inStream,i", "set the input data stream");
     auto parameter_file =
         programOptions.create_option<std::string>("par", "set the path of the parameter file (only one allowed)");
-    auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto no_trig_neuland = programOptions.create_option<bool>("no-trig", "NeuLAND trigger times are disabled", false);
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "info");
-    auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
+    auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", -1);
     auto inputRunID = programOptions.create_option<int>("runID,r", "set the input runID", DEFAULT_RUNID);
     auto neulandDP = programOptions.create_option<int>(
         "dp", "set the number of double planes for neuland", NEULAND_DEFAULT_DOUBLE_PLANE);
@@ -162,35 +163,50 @@ auto main(int argc, const char** argv) -> int
 
     //=====================================================================================
     // add tasks
-    auto losMapped2Cal = std::make_unique<R3BLosMapped2Cal>("LosTCalPar", 1);
-    constexpr auto LOS_MODULE_NUM = 8;
-    losMapped2Cal->SetNofModules(1, LOS_MODULE_NUM);
-    losMapped2Cal->SetTrigger(1);
-    losMapped2Cal->SetOnline(true);
-    run.AddTask(losMapped2Cal.release());
+    if (not is_cal_disabled.value())
+    {
+        auto losMapped2Cal = std::make_unique<R3BLosMapped2Cal>("LosTCalPar", 1);
+        constexpr auto LOS_MODULE_NUM = 8;
+        losMapped2Cal->SetNofModules(1, LOS_MODULE_NUM);
+        losMapped2Cal->SetTrigger(1);
+        losMapped2Cal->SetOnline(true);
+        run.AddTask(losMapped2Cal.release());
 
-    auto map2Cal = std::make_unique<R3BNeulandMapped2Cal2>();
-    map2Cal->SetTrigger(R3B::Neuland::CalTrigger::allspill);
-    map2Cal->SetDisableHist();
-    run.AddTask(map2Cal.release());
+        auto map2Cal = std::make_unique<R3BNeulandMapped2Cal2>();
+        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::allspill);
+        map2Cal->SetDisableHist();
+        run.AddTask(map2Cal.release());
+    }
 
-    run.AddTask(std::make_unique<R3BLosProvideTStart>().release());
-    auto cal2hit = std::make_unique<R3B::Neuland::Cal2HitTask>();
-    cal2hit->SetTrigger(R3B::Neuland::CalTrigger::allspill);
-    cal2hit->SetGlobalTimeOffset(NEULAND_GLOBAL_TIME_OFFSET_NS);
-    cal2hit->SetDisableHist();
-    run.AddTask(cal2hit.release());
+    if (not is_hit_disabled.value())
+    {
+        run.AddTask(std::make_unique<R3BLosProvideTStart>().release());
+        auto cal2hit = std::make_unique<R3B::Neuland::Cal2HitTask>();
+        cal2hit->SetTrigger(R3B::Neuland::CalTrigger::allspill);
+        cal2hit->SetGlobalTimeOffset(NEULAND_GLOBAL_TIME_OFFSET_NS);
+        cal2hit->SetDisableHist();
+        run.AddTask(cal2hit.release());
+    }
 
     auto online_spectra = std::make_unique<R3B::Neuland::OnlineSpectra>();
     online_spectra->SetRandomGenerator(&random_gen);
     online_spectra->AddCanvas<R3B::Neuland::EventHeaderCanvas>("EventHeader");
     online_spectra->AddCanvas<R3B::Neuland::MappedCanvas>("NeulandMapped");
-    online_spectra->AddCanvas<R3B::Neuland::CalCanvas>("NeulandCal", R3B::Neuland::CalTrigger::allspill);
-    online_spectra->AddCanvas<R3B::Neuland::TJumpCanvas>("NeulandJumps");
-    online_spectra->AddCanvas<R3B::Neuland::HitCanvas>("NeulandHit", R3B::Neuland::CalTrigger::onspill);
-    online_spectra->AddCanvas<R3B::Neuland::HitXYCanvas>("NeulandPlaneXY", R3B::Neuland::CalTrigger::onspill);
-    online_spectra->AddCanvas<R3B::Neuland::HitCosmicCanvas>("NeulandHitCosmics", R3B::Neuland::CalTrigger::offspill);
-    online_spectra->AddCanvas<R3B::Neuland::TimingCanvas>("NeulandTiming", R3B::Neuland::CalTrigger::onspill);
+
+    if (not is_cal_disabled.value())
+    {
+        online_spectra->AddCanvas<R3B::Neuland::CalCanvas>("NeulandCal", R3B::Neuland::CalTrigger::allspill);
+        online_spectra->AddCanvas<R3B::Neuland::TJumpCanvas>("NeulandJumps");
+    }
+
+    if (not is_hit_disabled.value())
+    {
+        online_spectra->AddCanvas<R3B::Neuland::HitCanvas>("NeulandHit", R3B::Neuland::CalTrigger::onspill);
+        online_spectra->AddCanvas<R3B::Neuland::HitXYCanvas>("NeulandPlaneXY", R3B::Neuland::CalTrigger::onspill);
+        online_spectra->AddCanvas<R3B::Neuland::HitCosmicCanvas>("NeulandHitCosmics",
+                                                                 R3B::Neuland::CalTrigger::offspill);
+        online_spectra->AddCanvas<R3B::Neuland::TimingCanvas>("NeulandTiming", R3B::Neuland::CalTrigger::onspill);
+    }
     run.AddTask(online_spectra.release());
 
     try

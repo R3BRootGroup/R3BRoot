@@ -188,6 +188,7 @@ auto R3BNeulandTamexReader2::extract_plane_signals(const ViewType& signalsPlane,
                      coarse_trailing,
                      fine_trailing))
         {
+            R3BLOG(debug3, fmt::format("No signals at the current event from plane {}.", planeNum));
             continue;
         }
 
@@ -198,6 +199,7 @@ auto R3BNeulandTamexReader2::extract_plane_signals(const ViewType& signalsPlane,
 
         const auto module_size = coarse_leading.BM;
         const auto signal_size = coarse_leading.B;
+        R3BLOG(debug, fmt::format("Signals at the current event from plane {}: {}", planeNum, signal_size));
         mappedData_.reserve(signal_size);
         const auto barNum_divider_view = ranges::zip_view(span(coarse_leading.BMI), span(coarse_leading.BME));
 
@@ -355,7 +357,8 @@ auto R3BNeulandTamexReader2::check_trigger_needed(std::string_view item_name) co
 {
     // TODO: not the exact regex, but it suffices
     const auto neuland_trigger_regex = boost::regex{ "^NN_TRIG(C|F)(v|M)?(I|E)?$" };
-    return is_triggered_ && boost::regex_match(item_name.data(), neuland_trigger_regex);
+    auto res = is_triggered_ && boost::regex_match(item_name.data(), neuland_trigger_regex);
+    return res;
 }
 
 auto R3BNeulandTamexReader2::check_bar_needed(std::string_view item_name) const -> bool

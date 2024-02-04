@@ -25,4 +25,5 @@ target_link_libraries(
     INTERFACE R3BNeulandCalibrationShare
               R3BNeulandMapToCal
               R3BNeulandCalToHit
-              R3BNeulandCalibrationLegacy)
+              R3BNeulandCalibrationLegacy
+              R3BSource)

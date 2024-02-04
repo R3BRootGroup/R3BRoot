@@ -32,9 +32,11 @@ namespace R3B::Neuland
         switch (method_)
         {
             case Cal2HitParMethod::LSQT:
+                R3BLOG(info, "Cal2HitPar method: LSQT.");
                 engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
                 break;
             case Cal2HitParMethod::Millipede:
+                R3BLOG(info, "Cal2HitPar method: Millepede.");
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
                 break;
         }

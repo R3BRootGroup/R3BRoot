@@ -84,6 +84,7 @@ namespace
                     R3BLOG(error, fmt::format("Found another executable \"{}\" but only one is allowed!", split_item));
                     continue;
                 }
+                R3BLOG(info, fmt::format("Ucesb Executable is set to \"{}\" ", split_item));
                 result.executable = std::move(split_item);
             }
             else
@@ -126,7 +127,11 @@ namespace R3B
 {
     void UcesbServerLauncher::Launch(std::string command_string)
     {
-        auto launch_strings = resolve_exe_options_lmd(std::move(command_string));
+        auto launch_strings = resolve_exe_options_lmd(command_string);
+        if (launch_strings.executable.empty())
+        {
+            R3BLOG(error, fmt::format("An unpacker executable doesn't exist in options {:?}", command_string));
+        }
         auto launch_args = std::vector<std::string>{};
         Append_elements(launch_args, std::move(launch_strings.options));
         Append_elements(launch_args, std::move(launch_strings.lmds));

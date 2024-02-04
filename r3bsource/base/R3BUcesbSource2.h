@@ -73,7 +73,7 @@ namespace R3B
       private:
         bool has_raw_data_printing_ = false;
         unsigned int run_id_ = 0;
-        unsigned int max_event_num_ = 0;
+        int max_event_num_ = 0;
         size_t event_struct_size_ = 0;
         EventStructType* event_struct_ = nullptr; // non-owning
         R3BEventHeader* event_header_ = nullptr;  // non-owning

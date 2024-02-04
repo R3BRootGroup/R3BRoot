@@ -47,6 +47,7 @@ auto main(int argc, const char** argv) -> int
 
     auto programOptions = R3B::ProgramOptions("options for neuland exp data analysis");
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
+    auto enable_mille = programOptions.create_option<bool>("mille", "enable millepede", false);
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "info");
     auto input_file = programOptions.create_option<std::string>("in,i", "set the input files (regex)");
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
@@ -102,7 +103,10 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(map2Cal.release());
 
         auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>();
-        cal2hitParTask->SetMethod(R3B::Neuland::Cal2HitParMethod::Millipede);
+        if (enable_mille.value())
+        {
+            cal2hitParTask->SetMethod(R3B::Neuland::Cal2HitParMethod::Millipede);
+        }
         cal2hitParTask->SetTrigger(R3B::Neuland::CalTrigger::offspill);
         cal2hitParTask->SetMinStat(min_stat.value());
         run->AddTask(cal2hitParTask.release());

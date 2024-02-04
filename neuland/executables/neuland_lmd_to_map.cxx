@@ -36,13 +36,15 @@ struct EXT_STR_h101_t
 };
 
 constexpr int DEFAULT_EVENT_NUM = 1000;
+constexpr int DEFAULT_TIME_STITCH = 1000;
 constexpr int DEFAULT_RUN_ID = 999;
-constexpr auto DEFAULT_UNPACKER_PATH = "202205_s509/202205_s509";
+constexpr auto DEFAULT_UNPACKER_PATH = "/../unpack/202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
 
 auto main(int argc, const char** argv) -> int
 {
     using namespace std::string_literals;
+    auto const* ucesb_dir = getenv("UCESB_DIR");
     TStopwatch timer;
     timer.Start();
 
@@ -51,20 +53,18 @@ auto main(int argc, const char** argv) -> int
     auto programOptions = R3B::ProgramOptions("options for neuland data analysis");
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "info");
-    // auto auto_id = programOptions.create_option<bool>("autoTrigID", "auto detect trigID", false);
     auto no_trig_neuland = programOptions.create_option<bool>("no-trig", "auto detect trigID", false);
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
     auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
     auto input_files = programOptions.create_option<std::string>("in,i", "set the input files");
     auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
-    // auto jsonName =
-    //     programOptions.create_option<std::string>("json", "set the json filename of trigIDMap", "TrigMapping.json");
     auto inputRunID = programOptions.create_option<int>("runID,r", "set the input runID", DEFAULT_RUN_ID);
+    auto time_stich =
+        programOptions.create_option<int>("time-stitch,t", "set time stitch for ucesb", DEFAULT_TIME_STITCH);
     auto neulandDP = programOptions.create_option<int>(
         "dp", "set the number of double planes for neuland", NEULAND_DEFAULT_DOUBLE_PLANE);
-    // auto wr_ID = programOptions.create_option<std::string>("wrID", "set the white rabbit id", "0x1000U");
     auto unpacker_path = programOptions.create_option<std::string>(
-        "unpack", "set the path of unpacker executable relative to ${UCESB_DIR}/../unexps/", DEFAULT_UNPACKER_PATH);
+        "unpack", "set the path of unpacker executable", std::string{ ucesb_dir } + DEFAULT_UNPACKER_PATH);
     if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;
@@ -80,17 +80,17 @@ auto main(int argc, const char** argv) -> int
     const auto runID = inputRunID();
     const auto outputfile_path = fs::path{ output_file() };
     const auto outputDir = R3B::GetParentDir(output_file());
-    const auto parfile = outputDir / fmt::format("{}.par{}", outputfile_path.stem().string(), outputfile_path.extension().string());
-    const auto ntuple_options = "RAW,time-stitch=4000"s;
+    const auto parfile =
+        outputDir / fmt::format("{}.par{}", outputfile_path.stem().string(), outputfile_path.extension().string());
     // const auto ntuple_options = "RAW"s;
-    auto const* ucesb_dir = getenv("UCESB_DIR");
     if (ucesb_dir == nullptr)
     {
         R3BLOG(error, "ucesb_dir is not defined!");
         return 1;
     }
     const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
-    const auto upexps_exe = fs::path{ upexps_dir } / unpacker_path();
+    const auto upexps_exe = fs::path{ unpacker_path.value() };
+    const auto ntuple_options = fmt::format("RAW,time-stitch={}", time_stich());
     const auto max_event_num = (eventNum() == 0) ? -1 : eventNum();
 
     auto ucesb_command = upexps_exe.string() + " --allow-errors --input-buffer=150Mi"s;

@@ -185,7 +185,7 @@ namespace R3B
     int UcesbSource::CheckMaxEventNo(int EvtEnd)
     {
         max_event_num_ = (EvtEnd == 0) ? max_event_num_ : EvtEnd;
-        return static_cast<int>(max_event_num_);
+        return max_event_num_ >= 0 ? max_event_num_ : -1;
     }
 
     // readers looping methods:

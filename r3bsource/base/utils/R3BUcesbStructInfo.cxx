@@ -35,6 +35,7 @@ namespace R3B
             return true;
         }
         auto* required_reader = check_struct_item_requried(item->_var_name, source);
+        R3BLOG(debug2, fmt::format("Checking ucesb struct item {:?}.", item->_var_name));
         if (required_reader == nullptr || required_reader->AllowExtraCondition(map_flag, map_success_conditions_))
         {
             // no reader requries this item or reader accepts extra flag
@@ -51,8 +52,11 @@ namespace R3B
 
     void UcesbStructInfo::CheckStructMapping(UcesbSource* source)
     {
+        R3BLOG(debug, "Checking struct mapping.");
         auto* struct_info = static_cast<ext_data_structure_info*>(struct_info_);
         auto is_checking_ok = true;
+        // ext_data_struct_info_print_map_success(struct_info, stderr, EXT_DATA_ITEM_MAP_NO_DEST);
+        // ext_data_struct_info_print_map_success(struct_info, stderr, 0);
         for (auto* item = struct_info->_items; item != nullptr; item = item->_next_off_item)
         {
             is_checking_ok &= check_struct_item(item, source);
