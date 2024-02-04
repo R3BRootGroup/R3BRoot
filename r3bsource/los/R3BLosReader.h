@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BLOSREADER_H
-#define R3BLOSREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -42,10 +41,10 @@ class R3BLosReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
     // Accessor to skip trigger times
-    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    inline void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
 
   private:
     // An event counter
@@ -67,5 +66,3 @@ class R3BLosReader : public R3BReader
   public:
     ClassDefOverride(R3BLosReader, 0);
 };
-
-#endif /* R3BLOSREADER_H */
