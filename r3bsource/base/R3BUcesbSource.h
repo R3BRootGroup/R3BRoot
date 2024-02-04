@@ -18,14 +18,14 @@
  * Date: 29/05/15
  * */
 
-#ifndef __R3BROOT__R3BUCESBSOURCE__
-#define __R3BROOT__R3BUCESBSOURCE__
+#pragma once
 
-#include "FairSource.h"
 #include "R3BReader.h"
-#include "TObjArray.h"
-#include "TString.h"
+
+#include <FairSource.h>
 #include <Rtypes.h>
+#include <TObjArray.h>
+#include <TString.h>
 
 #include <fstream>
 #include <list>
@@ -76,7 +76,9 @@ class R3BUcesbSource : public FairSource
 
     virtual void FillEventHeader(FairEventHeader* feh);
 
-    void SetInputFileName(TString tstr) { fInputFileName = tstr; }
+    inline void SetInputFileName(TString tstr) { fInputFileName = std::move(tstr); }
+
+    inline void SetFullDataStructureValidation() { fFullDataStructureValidation = true; }
 
   private:
     /* File descriptor returned from popen() */
@@ -106,10 +108,9 @@ class R3BUcesbSource : public FairSource
     TString fInputFileName;
     std::ifstream fInputFile;
     Int_t fEntryMax;
+    bool fFullDataStructureValidation = false;
 
   public:
     // Create dictionary
     ClassDef(R3BUcesbSource, 1)
 };
-
-#endif /* __R3BROOT__R3BUCESBSOURCE__ */

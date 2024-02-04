@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BUNPACKREADER_H
-#define R3BUNPACKREADER_H 1
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -53,5 +52,3 @@ class R3BUnpackReader : public R3BReader
   public:
     ClassDefOverride(R3BUnpackReader, 0);
 };
-
-#endif /* R3BUNPACKREADER_H */
