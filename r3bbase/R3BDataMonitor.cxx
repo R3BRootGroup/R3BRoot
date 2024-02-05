@@ -15,7 +15,20 @@
 #include <FairRootFileSink.h>
 #include <FairRunOnline.h>
 #include <FairRuntimeDb.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
+
+namespace
+{
+    auto create_datatime_rootfile(std::string_view base_filename) -> std::unique_ptr<TFile>
+    {
+        auto time = std::chrono::system_clock::now();
+        const auto file_name = fmt::format("{}-{:%Y-%m-%d-%Hh-%Mm-%Ss}.root", base_filename, time);
+        auto* root_file = TFile::Open(file_name.data(), "RECREATE");
+        return std::unique_ptr<TFile>{ root_file };
+    }
+
+} // namespace
 
 namespace R3B
 {
@@ -137,11 +150,25 @@ namespace R3B
         }
     }
 
-    void DataMonitor::reset_all_histograms()
+    void DataMonitor::reset_all_hists()
     {
         for (auto& [name, hist] : histograms_)
         {
             hist->Reset();
+        }
+    }
+
+    void DataMonitor::save_all_hists(std::string_view filename)
+    {
+        if (filename.empty())
+        {
+            filename = save_filename_;
+        }
+        auto rootfile = create_datatime_rootfile(filename);
+        R3BLOG(info, fmt::format("Saving histograms to {}", rootfile->GetName()));
+        for (auto& [name, hist] : histograms_)
+        {
+            rootfile->WriteObject(hist.get(), hist->GetName(), "overwrite");
         }
     }
 } // namespace R3B

@@ -161,13 +161,13 @@ Bool_t R3BNeulandTamexReader::R3BRead()
     if (fArrayTrigger)
     {
         int v_i = 0;
-        for (int i_i = 0; i_i < fData->NN_TRIGCM; ++i_i)
+        for (int i_i = 0; i_i < fData->NN_TRIGCLM; ++i_i)
         {
-            auto ch = fData->NN_TRIGCMI[i_i];
-            for (; v_i < fData->NN_TRIGCME[i_i]; ++v_i)
+            auto ch = fData->NN_TRIGCLMI[i_i];
+            for (; v_i < fData->NN_TRIGCLME[i_i]; ++v_i)
             {
-                auto coarse = fData->NN_TRIGCv[v_i];
-                auto fine = fData->NN_TRIGFv[v_i];
+                auto coarse = fData->NN_TRIGCLv[v_i];
+                auto fine = fData->NN_TRIGFLv[v_i];
                 auto mapped = new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()]) R3BPaddleTamexMappedData(0, ch);
                 mapped->fCoarseTime1LE = coarse;
                 mapped->fFineTime1LE = fine;

@@ -282,7 +282,7 @@ void R3BNeulandTamexReader2::histogram_action(const R3B::PaddleTamexMappedData& 
 }
 
 template <typename ErrorLog, typename... Items>
-auto CheckTrigCondition(ErrorLog& log, EXT_STR_h101_raw_nnp_tamex_onion* inputData)
+auto Checkondition(ErrorLog& log, EXT_STR_h101_raw_nnp_tamex_onion* inputData)
 {
     auto ApplyCriterium = [&log](Errors error, bool criterium) -> bool
     {
@@ -293,33 +293,33 @@ auto CheckTrigCondition(ErrorLog& log, EXT_STR_h101_raw_nnp_tamex_onion* inputDa
         }
         return true;
     };
-    return ApplyCriterium(Errors::module_size, inputData->NN_TRIGCM == inputData->NN_TRIGFM) &&
-           ApplyCriterium(Errors::data_size, inputData->NN_TRIGC == inputData->NN_TRIGF) &&
+    return ApplyCriterium(Errors::module_size, inputData->NN_TRIGCLM == inputData->NN_TRIGFLM) &&
+           ApplyCriterium(Errors::data_size, inputData->NN_TRIGCL == inputData->NN_TRIGFL) &&
            ApplyCriterium(Errors::indices,
-                          ranges::equal(views::take(inputData->NN_TRIGCMI, inputData->NN_TRIGCM),
-                                        views::take(inputData->NN_TRIGFMI, inputData->NN_TRIGFM))) &&
+                          ranges::equal(views::take(inputData->NN_TRIGCLMI, inputData->NN_TRIGCLM),
+                                        views::take(inputData->NN_TRIGFLMI, inputData->NN_TRIGFLM))) &&
            ApplyCriterium(Errors::divider,
-                          ranges::equal(views::take(inputData->NN_TRIGCME, inputData->NN_TRIGCM),
-                                        views::take(inputData->NN_TRIGFME, inputData->NN_TRIGFM)));
+                          ranges::equal(views::take(inputData->NN_TRIGCLME, inputData->NN_TRIGCLM),
+                                        views::take(inputData->NN_TRIGFLME, inputData->NN_TRIGFLM)));
 }
 
 auto R3BNeulandTamexReader2::ReadTriggerSignals(EXT_STR_h101_raw_nnp_tamex_onion* inputData) -> bool
 {
-    if (!is_triggered_ || inputData->NN_TRIGCM == 0 || inputData->NN_TRIGFM == 0)
+    if (!is_triggered_ || inputData->NN_TRIGCLM == 0 || inputData->NN_TRIGFLM == 0)
     {
         return true;
     }
 
-    if (!CheckTrigCondition(error_log_, inputData))
+    if (!Checkondition(error_log_, inputData))
     {
         return false;
     }
 
-    const auto module_size = inputData->NN_TRIGCM;
-    const auto signal_size = inputData->NN_TRIGC;
+    const auto module_size = inputData->NN_TRIGCLM;
+    const auto signal_size = inputData->NN_TRIGCL;
     auto const trigger_signals_view =
-        Zip_from([](const auto& item) { return span(item); }, inputData->NN_TRIGCv, inputData->NN_TRIGFv);
-    auto const moduleNum_divider_view = ranges::zip_view(span(inputData->NN_TRIGCMI), span(inputData->NN_TRIGCME));
+        Zip_from([](const auto& item) { return span(item); }, inputData->NN_TRIGCLv, inputData->NN_TRIGFLv);
+    auto const moduleNum_divider_view = ranges::zip_view(span(inputData->NN_TRIGCLMI), span(inputData->NN_TRIGCLME));
     FillData(ranges::views::take(trigger_signals_view, signal_size),
              ranges::views::take(moduleNum_divider_view, module_size),
              [&](const auto& signal_pack, const auto& module_num)

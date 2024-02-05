@@ -38,8 +38,16 @@ namespace R3B::Neuland
     {
       public:
         explicit OnlineSpectra(std::string_view name = "R3BNeulandOnlineSpectra", int iVerbose = 1);
+
         void ResetHistos();
         void ResetHistosMapped();
+        void SaveAllHists();
+
+        OnlineSpectra(const OnlineSpectra&) = delete;
+        OnlineSpectra(OnlineSpectra&&) = delete;
+        auto operator=(const OnlineSpectra&) -> OnlineSpectra& = delete;
+        auto operator=(OnlineSpectra&&) -> OnlineSpectra& = delete;
+        ~OnlineSpectra() override;
 
         auto GetRandomGenerator() -> TRandom* { return random_gen_; }
 

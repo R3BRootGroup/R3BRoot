@@ -99,9 +99,11 @@ namespace R3B
         void save(std::string_view folderName = "", FairSink* sinkFile = FairRun::Instance()->GetSink());
         void draw_canvases();
         void register_canvases(FairRun* run);
-        void reset_all_histograms();
+        void reset_all_hists();
+        void save_all_hists(std::string_view filename = "");
 
       private:
+        std::string save_filename_{ "histograms_save" };
         std::map<std::string, std::unique_ptr<TH1>> histograms_;
         std::map<std::string, DataMonitorCanvas> canvases_;
         static auto get_hist_dir(FairSink* sinkFile) -> TDirectory*;

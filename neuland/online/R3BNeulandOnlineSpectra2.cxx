@@ -24,6 +24,7 @@ namespace R3B::Neuland
         : CalibrationTask(name, iVerbose)
     {
     }
+    OnlineSpectra::~OnlineSpectra() { SaveAllHists(); }
 
     void OnlineSpectra::HistogramInit(DataMonitor& histograms)
     {
@@ -65,13 +66,21 @@ namespace R3B::Neuland
     {
         const auto reset_neuland_cmd = fmt::format(R"(/Tasks/{}/->ResetHistos())", GetName());
         const auto reset_neuland_mapped_cmd = fmt::format(R"(/Tasks/{}/->ResetHistosMapped())", GetName());
+        const auto save_neuland_hists_cmd = fmt::format(R"(/Tasks/{}/->SaveAllHists())", GetName());
 
         run->GetHttpServer()->Register("/Tasks", this);
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland", reset_neuland_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland_Mapped", reset_neuland_mapped_cmd.c_str());
+        run->GetHttpServer()->RegisterCommand("/Tasks/save_all_histograms", save_neuland_hists_cmd.c_str());
     }
-    void OnlineSpectra::ResetHistos() { GetHistMonitor().reset_all_histograms(); }
+    void OnlineSpectra::ResetHistos()
+    {
+        SaveAllHists();
+        GetHistMonitor().reset_all_hists();
+    }
+
     void OnlineSpectra::ResetHistosMapped() { GetHistMonitor().get_canvas("NeulandMapped").reset(); }
+    void OnlineSpectra::SaveAllHists() { GetHistMonitor().save_all_hists(); }
 } // namespace R3B::Neuland
 
 ClassImp(R3B::Neuland::OnlineSpectra);
