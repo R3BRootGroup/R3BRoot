@@ -239,5 +239,5 @@ set(DIRS
 
 add_library(R3BSource SHARED ${SRCS})
 target_include_directories(R3BSource PUBLIC ${DIRS})
-target_link_libraries(R3BSource PUBLIC R3BData MbsAPI Ucesb Microsoft.GSL::GSL range-v3::range-v3)
+target_link_libraries(R3BSource PUBLIC R3BData Ucesb Microsoft.GSL::GSL range-v3::range-v3)
 root_generate_dictionary(R3BSource_dict ${HEADERS} MODULE R3BSource LINKDEF SourceLinkDef.h)
