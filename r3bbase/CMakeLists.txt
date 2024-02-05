@@ -75,7 +75,7 @@ target_link_libraries(
            ROOT::Spectrum
            FairLogger::FairLogger
            fmt::fmt)
-target_link_directories(R3BBase PUBLIC ${FAIRROOTPATH}/lib)
+target_link_directories(R3BBase PUBLIC ${FAIRROOT_LIBRARY_DIR})
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
     target_link_libraries(R3BBase PUBLIC -lstdc++fs)
