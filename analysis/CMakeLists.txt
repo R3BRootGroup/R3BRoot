@@ -97,7 +97,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF AnaLinkDef.h)
 
 Set(DEPENDENCIES
-GeoBase ParBase MbsAPI Base FairTools R3BPassive R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene R3BTracking
+GeoBase ParBase Base FairTools R3BPassive R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene R3BTracking
 R3BSsd R3BLos R3BCalifa R3BMwpc R3BTofD R3BTwim R3BMusic R3BBunchedFiber
 )
 
