@@ -19,9 +19,6 @@
 #include "R3BMusliCalData.h"
 #include "R3BMusliMappedData.h"
 
-#define MAX_MULT_MUSLI 100
-#define MAX_NB_SIGNALS_MAP 18
-
 class TClonesArray;
 class R3BMusliCalPar;
 class R3BEventHeader;
@@ -66,11 +63,6 @@ class R3BMusliMapped2Cal : public FairTask
 
   private:
     void SetParameters();
-
-    Int_t map_mult[MAX_NB_SIGNALS_MAP];
-    UInt_t map_sig[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t map_eraw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t map_traw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
 
     Int_t fNumSignals;
     Int_t fNumGroupsAnodes;
