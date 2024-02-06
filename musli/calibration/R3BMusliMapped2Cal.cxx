@@ -162,18 +162,19 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
 
     // variables to read map data
     UInt_t sig = 0;
+    UInt_t mult[fNumSignals];
     Double_t pospar[fNumParamsPosFit];
     Double_t enepar[fNumParamsEneFit];
     Double_t dtraw, dtcal, ecal;
 
     for (Int_t i = 0; i < fNumSignals; i++)
     {
-        map_mult[i] = 0;
+        mult[i] = 0;
         for (Int_t j = 0; j < fMaxMult; j++)
         {
-            map_sig[j][i] = 0;
-            map_eraw[j][i] = 0.;
-            map_traw[j][i] = 0.;
+            fMap_sig[j][i] = 0;
+            fMap_eraw[j][i] = 0.;
+            fMap_traw[j][i] = 0.;
         }
     }
 
@@ -186,29 +187,29 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
     {
         R3BMusliMappedData* map = (R3BMusliMappedData*)fMusliMappedDataCA->At(i);
 
-        sig = map->GetSignal() - 1;
+        sig = map->GetSignal() - 1; // 0-based signal Id
 
-        if (0 <= sig && sig < fNumSignals && map_mult[sig] < fMaxMult)
+        if (0 <= sig && sig < fNumSignals && mult[sig] < fMaxMult)
         {
-            map_sig[map_mult[sig]][sig] = sig + 1;
-            map_eraw[map_mult[sig]][sig] = map->GetEnergy();
-            map_traw[map_mult[sig]][sig] = map->GetTime();
+            fMap_sig[mult[sig]][sig] = sig + 1;
+            fMap_eraw[mult[sig]][sig] = (Double_t)map->GetEnergy();
+            fMap_traw[mult[sig]][sig] = (Double_t)map->GetTime();
         }
-        map_mult[sig]++;
+        mult[sig]++;
     }
 
-    for (Int_t i = 0; i < fNumGroupsAnodes; i++)
+    if (fNumGroupsAnodes <= fNumSignals)
     {
-        if (map_mult[i] == 0 || map_mult[i] > fMaxMult)
-            continue;
-        else if (map_mult[16] == 1 && map_mult[i] == 1)
+        for (Int_t i = 0; i < fNumGroupsAnodes; i++)
         {
-            for (Int_t j = 0; j < map_mult[i]; j++)
+            if (mult[i] == 0 || mult[i] > fMaxMult)
+                continue;
+            else if (mult[16] == 1 && mult[i] == 1) // one Tref and one [i] signal
             {
                 dtcal = 0.;
                 for (Int_t k = 0; k < fNumParamsPosFit; k++)
                 {
-                    dtraw = map_traw[j][i] - map_traw[0][16];
+                    dtraw = fMap_traw[0][i] - fMap_traw[0][16];
                     pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
                     dtcal += pospar[k] * pow(dtraw, k);
                 }
@@ -216,56 +217,56 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
                 for (Int_t k = 0; k < fNumParamsEneFit; k++)
                 {
                     enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
-                    ecal += enepar[k] * pow(map_eraw[j][i], k);
+                    ecal += enepar[k] * pow(fMap_eraw[0][i], k);
                 }
                 if (ecal > 0.)
-                    AddCalData(map_sig[j][i], dtcal, ecal);
+                    AddCalData(fMap_sig[0][i], dtcal, ecal);
             }
-        }
-        else if ((map_mult[16] > 1 || map_mult[i] > 1) && fUseMultHit)
-        {
-            Double_t good_tref = -1.;
-            Int_t no_of_tref = 0;
-            if (map_mult[16] == 1)
+            else if ((mult[16] > 1 || mult[i] > 1) && fUseMultHit)
             {
-                no_of_tref = 1;
-                good_tref = map_traw[0][16];
-            }
-            else if (map_mult[16] > 1)
-            {
-                for (Int_t j = 0; j < map_mult[16]; j++)
+                Double_t good_tref = -1.;
+                Int_t no_of_tref = 0;
+                if (mult[16] == 1)
                 {
-                    // TO DO : need to add some comments to explain this condition
-                    Double_t cfd_t = ((map_traw[j][16] * 25. / 256.) - fHeader->GetTStart());
-                    if (cfd_t > winL && cfd_t < winR)
+                    no_of_tref = 1;
+                    good_tref = fMap_traw[0][16];
+                }
+                else if (mult[16] > 1)
+                {
+                    for (Int_t j = 0; j < mult[16]; j++)
                     {
-                        no_of_tref++;
-                        good_tref = map_traw[j][16];
+                        // TO DO : need to add some comments to explain this condition
+                        Double_t cfd_t = ((fMap_traw[j][16] * 25. / 256.) - fHeader->GetTStart());
+                        if (cfd_t > winL && cfd_t < winR)
+                        {
+                            no_of_tref++;
+                            good_tref = fMap_traw[j][16];
+                        }
                     }
                 }
-            }
-            if (no_of_tref == 1)
-            {
-                for (Int_t j = 0; j < map_mult[i]; j++)
+                if (no_of_tref == 1 && good_tref > 0)
                 {
-                    Double_t diff_t = map_traw[j][i] - good_tref;
-                    if (diff_t > fMultHitCalParams->GetAt(fNumParamsMultHit * i + 0) &&
-                        diff_t < fMultHitCalParams->GetAt(fNumParamsMultHit * i + 1))
+                    for (Int_t j = 0; j < mult[i]; j++)
                     {
-                        dtcal = 0.;
-                        for (Int_t k = 0; k < fNumParamsPosFit; k++)
+                        dtraw = fMap_traw[j][i] - good_tref;
+                        if (dtraw > fMultHitCalParams->GetAt(fNumParamsMultHit * i + 0) &&
+                            dtraw < fMultHitCalParams->GetAt(fNumParamsMultHit * i + 1))
                         {
-                            pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
-                            dtcal += pospar[k] * pow(diff_t, k);
+                            dtcal = 0.;
+                            for (Int_t k = 0; k < fNumParamsPosFit; k++)
+                            {
+                                pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
+                                dtcal += pospar[k] * pow(dtraw, k);
+                            }
+                            ecal = 0;
+                            for (Int_t k = 0; k < fNumParamsEneFit; k++)
+                            {
+                                enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
+                                ecal += enepar[k] * pow(fMap_eraw[j][i], k);
+                            }
+                            if (ecal > 0.)
+                                AddCalData(fMap_sig[j][i], dtcal, ecal);
                         }
-                        ecal = 0;
-                        for (Int_t k = 0; k < fNumParamsEneFit; k++)
-                        {
-                            enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
-                            ecal += enepar[k] * pow(map_eraw[j][i], k);
-                        }
-                        if (ecal > 0.)
-                            AddCalData(map_sig[j][i], dtcal, ecal);
                     }
                 }
             }
