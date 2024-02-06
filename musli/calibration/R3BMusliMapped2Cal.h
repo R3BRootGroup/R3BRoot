@@ -67,10 +67,8 @@ class R3BMusliMapped2Cal : public FairTask
   private:
     void SetParameters();
 
-    Int_t map_mult[MAX_NB_SIGNALS_MAP];
-    UInt_t map_sig[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t map_eraw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
-    Double_t map_traw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    Double_t fMap_eraw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
+    Double_t fMap_traw[MAX_MULT_MUSLI][MAX_NB_SIGNALS_MAP];
 
     Int_t fNumSignals;
     Int_t fNumGroupsAnodes;
