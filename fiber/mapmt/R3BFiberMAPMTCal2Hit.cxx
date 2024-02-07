@@ -389,7 +389,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                     auto tot_up = up_tot.tot_ns;
                     Double_t t_down = down_tot.lead_ns;
                     Double_t t_up = up_tot.lead_ns;
-                    Double_t dtime = fTimeStitch->GetTime(t_up - t_down, "clocktdc", "clocktdc");
+                    // Double_t dtime = fTimeStitch->GetTime(t_up - t_down, "clocktdc", "clocktdc");
+                    Double_t dtime = t_up - t_down;
                     Double_t tof =
                         fHeader ? fTimeStitch->GetTime((t_up + t_down) / 2. - fHeader->GetTStart(), "vftx", "clocktdc")
                                 : (t_up + t_down) / 2.;
@@ -519,7 +520,8 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
 
                     if (!fIsCalibrator)
                     {
-                        if (tof >= ftofmin && tof <= ftofmax)
+                        // if (tof >= ftofmin && tof <= ftofmax)
+                        if (fabs(dtime) < fDTime_window)
                         {
                             new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BFiberMAPMTHitData(
                                 fDetId, x, y, eloss, tof, fiber_id, t_down, t_up, tot_down, tot_up);

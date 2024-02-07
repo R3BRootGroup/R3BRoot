@@ -89,24 +89,26 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 
     virtual void FinishTask();
 
-    inline void SetTimeWindow(Double_t tmin, Double_t tmax)
+    inline void SetTofWindow(Double_t tmin, Double_t tmax)
     {
         ftofmin = tmin;
         ftofmax = tmax;
     }
 
-    void SetWriteHisto() { fWrite = kTRUE; }
+    inline void SetDTimeWindow(double dtwin) { fDTime_window = dtwin; }
 
-    void SetTofMin(Double_t min) { ftofmin = min; }
+    inline void SetWriteHisto() { fWrite = kTRUE; }
 
-    void SetTofMax(Double_t max) { ftofmax = max; }
+    inline void SetTofMin(Double_t min) { ftofmin = min; }
 
-    void SetGate(Double_t g) { fGate_ns = g; }
+    inline void SetTofMax(Double_t max) { ftofmax = max; }
 
-    void SetOrientation(Orientation opt) { fOrientation = opt; }
+    inline void SetGate(Double_t g) { fGate_ns = g; }
+
+    inline void SetOrientation(Orientation opt) { fOrientation = opt; }
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     TString fName;
@@ -128,6 +130,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     Bool_t fWrite;
     // Don't store data for online
     Bool_t fOnline;
+    double fDTime_window = 20.; // ns
 
     R3BEventHeader* fHeader; /* Event header  */
     R3BCoarseTimeStitch* fTimeStitch;
