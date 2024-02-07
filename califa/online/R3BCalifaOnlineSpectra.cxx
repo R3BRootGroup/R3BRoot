@@ -230,15 +230,24 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_cryId_energy_cal->Draw("COLZ");
 
     cCalifa_NsNf = new TCanvas("Califa_Cal_NsNf", "Califa_Cal Ns vs Nf", 10, 10, 500, 500);
-    fh2_Califa_NsNf = R3B::root_owned<TH2F>(
-        "fh2_Califa_Cal_NsNf", "Califa PID: Ns vs Nf energies", bins, minE, maxE, bins, minE, maxE);
-    fh2_Califa_NsNf->GetXaxis()->SetTitle("Nf Energy [keV]");
-    fh2_Califa_NsNf->GetYaxis()->SetTitle("Ns Energy [keV]");
-    fh2_Califa_NsNf->GetYaxis()->SetTitleOffset(1.4);
-    fh2_Califa_NsNf->GetXaxis()->CenterTitle(true);
-    fh2_Califa_NsNf->GetYaxis()->CenterTitle(true);
-    gPad->SetLogz();
-    fh2_Califa_NsNf->Draw("COLZ");
+    cCalifa_NsNf->Divide(1, 3);
+    fh2_Califa_NsNf.resize(3);
+
+    for (Int_t i = 0; i < fh2_Califa_NsNf.size(); i++)
+    {
+        std::stringstream ss1;
+        ss1 << "PID_" << (i + 1);
+        fh2_Califa_NsNf[i] =
+            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", bins, 0., 500., bins, 0., 1.);
+        fh2_Califa_NsNf[i]->GetXaxis()->SetTitle("Ns+Nf Energies [MeV]");
+        fh2_Califa_NsNf[i]->GetYaxis()->SetTitle("Nf/(Nf+Ns)");
+        fh2_Califa_NsNf[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_Califa_NsNf[i]->GetXaxis()->CenterTitle(true);
+        fh2_Califa_NsNf[i]->GetYaxis()->CenterTitle(true);
+        gPad->SetLogz();
+        cCalifa_NsNf->cd(i + 1);
+        fh2_Califa_NsNf[i]->Draw("COLZ");
+    }
 
     // Map data
     for (Int_t i = 0; i < fNumRings; i++)
@@ -980,7 +989,10 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     if (fCalItemsCalifa)
     {
         fh2_Califa_cryId_energy_cal->Reset();
-        fh2_Califa_NsNf->Reset();
+        for (const auto& hist : fh2_Califa_NsNf)
+        {
+            hist->Reset();
+        }
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1465,7 +1477,22 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
             fh2_Califa_cryId_energy_cal->Fill(cryId, hit->GetEnergy());
 
-            fh2_Califa_NsNf->Fill(hit->GetNf(), hit->GetNs());
+            auto nf_ns = (hit->GetNs() + hit->GetNf());
+            if (nf_ns > 0. && hit->GetNs() > 0 && hit->GetNf() > 0)
+            {
+                if (cryId <= BarrelCrystals)
+                {
+                    fh2_Califa_NsNf[0]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                }
+                else if (cryId <= iPhosCrystals)
+                {
+                    fh2_Califa_NsNf[1]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                }
+                else
+                {
+                    fh2_Califa_NsNf[2]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                }
+            }
 
             if (fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2)
                 fh1_crystals_cal[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
@@ -1626,7 +1653,10 @@ void R3BCalifaOnlineSpectra::FinishTask()
     if (fCalItemsCalifa)
     {
         cCalifa_cry_energy_cal->Write();
-        cCalifa_NsNf->Write();
+        for (const auto& hist : fh2_Califa_NsNf)
+        {
+            hist->Write();
+        }
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)

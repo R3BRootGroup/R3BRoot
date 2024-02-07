@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "R3BShared.h"
 
@@ -34,7 +35,9 @@ constexpr const int Nb_PreampCh = 16;
 constexpr const int Nb_SlotandModule = 4; // Febex slot and module info: 0 slot and 1 module, (PR) 2 slot and 3 module
 constexpr const int BinsChannelFebex = 5000; // Number of Bins per Febex channel
 constexpr const int MaxBinChannelFebex = 65535;
-constexpr const int MaxNbCrystals = 5088; // gamma + proton range channels
+constexpr const int MaxNbCrystals = 5088;  // gamma + proton range channels
+constexpr const int BarrelCrystals = 3904; // gamma + proton range channels
+constexpr const int iPhosCrystals = 4864;  // gamma + proton range channels
 
 class TClonesArray;
 class R3BCalifaMappingPar;
@@ -273,7 +276,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_openangle;
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
-    TH2F* fh2_Califa_NsNf;
+    std::vector<TH2F*> fh2_Califa_NsNf;
     TH2F* fh2_Califa_EtrigCor[4];
     TH1F* fh1_Califa_Etrig[2];
 
