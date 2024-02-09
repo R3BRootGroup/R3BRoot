@@ -548,7 +548,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName, "Tofd_ToT_plane_%d", iPlane);
         char strName2[255];
         sprintf(strName2, "Tofd ToT plane %d", iPlane);
-        fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 300, 0., 300.);
+        fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 1500, 0., 500.);
         fh_tofd_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
         fh_tofd_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
     }
@@ -598,7 +598,7 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "tofdiff_plane_%d_bar_%d", iPlane, iBar);
-        fh1_tofsync[iPlane - 1][iBar - 1] = new TH1F(strName, strName, 25000, 2950, 3150);
+        fh1_tofsync[iPlane - 1][iBar - 1] = new TH1F(strName, strName, 5000, -250, -100);
         fh1_tofsync[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToF [ns]");
     }
 }

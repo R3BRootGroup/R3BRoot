@@ -540,7 +540,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
         // Adding this canvas to the main folder
         maintofd->Add(cTofd_planes_hit);
 
-        auto* cToFd_los_h2 = new TCanvas("ToFD time - Los time", "ToFD time - Los time", 20, 20, 1120, 1020);
+        auto* cToFd_los_h2 = new TCanvas("ToFD_time_Los_time", "ToFD time - Los time", 20, 20, 1120, 1020);
         cToFd_los_h2->Divide(2, 2);
         fh_tofd_time_los_h2.resize(fNofPlanes);
         for (Int_t j = 0; j < fPaddlesPerPlane; j++)
@@ -549,8 +549,8 @@ InitStatus R3BTofDOnlineSpectra::Init()
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             char strNameLos_c[255];
-            sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
-            fh_tofd_time_los_h2[i] = R3B::root_owned<TH2F>(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, 0, 60);
+            sprintf(strNameLos_c, "tofd_los_timediff_plane_%d", i + 1);
+            fh_tofd_time_los_h2[i] = R3B::root_owned<TH2F>(strNameLos_c, strNameLos_c, 44, 1, 45, 20000, 10, 65);
             fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
             fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF [ns]");
             fh_tofd_time_los_h2[i]->GetXaxis()->CenterTitle(true);
@@ -563,10 +563,10 @@ InitStatus R3BTofDOnlineSpectra::Init()
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 char strNameLos[255];
-                sprintf(strNameLos, "tofd-los_timediff_bar_%d_plane_%d", j + 1, i + 1);
+                sprintf(strNameLos, "tofd_los_timediff_bar_%d_plane_%d", j + 1, i + 1);
                 char strNameLos2[255];
                 sprintf(strNameLos2, "Tofd_time - Los_time bar %d plane %d", j + 1, i + 1);
-                fh_tofd_time_los[j][i] = R3B::root_owned<TH1F>(strNameLos, strNameLos2, 20000, 0, 60);
+                fh_tofd_time_los[j][i] = R3B::root_owned<TH1F>(strNameLos, strNameLos2, 20000, 10, 65);
                 fh_tofd_time_los[j][i]->GetXaxis()->SetTitle("ToF [ns]");
                 fh_tofd_time_los[j][i]->GetYaxis()->SetTitle("counts");
                 fh_tofd_time_los[j][i]->SetFillColor(31);
