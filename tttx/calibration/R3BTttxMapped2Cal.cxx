@@ -35,8 +35,8 @@
 #include "R3BTttxMappedData.h"
 #include "R3BTttxStripCalPar.h"
 
-constexpr int ov_mask = 0x8000;
-constexpr int pu_mask = 0x4000;
+constexpr int ov_mask = 0x80000;
+constexpr int pu_mask = 0x40000;
 
 // R3BTttxMapped2Cal: Default Constructor --------------------------
 R3BTttxMapped2Cal::R3BTttxMapped2Cal()
@@ -204,7 +204,12 @@ void R3BTttxMapped2Cal::CalculateStrip(int idet, int istrip, CalStrip& fStrip, C
         auto itime = fStrip.GetT(imult);
         if (fTrig.GetMult() == 1)
         {
-            itime -= fStrip.GetT(0);
+            itime -= fTrig.GetT(0);
+        }
+        else
+        {
+            R3BLOG(warning, "No Trigger hit found");
+            return;
         }
         auto dtime = fTimeResolution * static_cast<double>(itime);
         if (dtime < fTimeMin || dtime > fTimeMax)

@@ -142,7 +142,7 @@ class R3BTttxCal2Hit : public FairTask
     bool fRequireTref = false;             // Requires Tref in the cluster
     bool fStoreOnlyTwoDetHitEvent = false; // Store only events with two detectors have hits
     double ffixedbeta = 0.7;               // Velocity for the fixed analysis
-    double ftimewindow = 10.;              // in micro seconds
+    double ftimewindow = 1.e4;             // in nano seconds. Default = 10 us.
     uint fneighbours = 2;                  // Num of neighbouring strips, if 0, no clustering
 
     R3BTttxHitPar* fHit_Par = nullptr;
