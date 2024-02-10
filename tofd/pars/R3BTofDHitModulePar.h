@@ -154,5 +154,5 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk; /**< walk correction parameters */
 
   public:
-    ClassDef(R3BTofDHitModulePar, 2);
+    ClassDef(R3BTofDHitModulePar, 3);
 };
