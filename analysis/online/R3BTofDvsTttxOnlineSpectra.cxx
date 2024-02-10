@@ -63,7 +63,7 @@ InitStatus R3BTofDvsTttxOnlineSpectra::Init()
     fHitItemsTofd = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdHit"));
     R3BLOG_IF(fatal, !fHitItemsTofd, "TofdHit not found");
 
-    fHitItemsTttx = dynamic_cast<TClonesArray*>(mgr->GetObject("TttxHitData"));
+    fHitItemsTttx = dynamic_cast<TClonesArray*>(mgr->GetObject("tttxHitData"));
     R3BLOG_IF(fatal, !fHitItemsTttx, "TttxHitData not found");
 
     // Create histograms for detectors
@@ -75,7 +75,7 @@ InitStatus R3BTofDvsTttxOnlineSpectra::Init()
         cCTofDTx->cd(i + 1);
         std::stringstream ss1;
         ss1 << "fh2_TofD_Tttx_charge_" << i;
-        fh2_charges[i] = R3B::root_owned<TH2F>(ss1.str().c_str(), ss1.str().c_str(), 400, -100, 100, 67, -50, 50);
+        fh2_charges[i] = R3B::root_owned<TH2F>(ss1.str().c_str(), ss1.str().c_str(), 400, 0, 10, 400, 0, 10);
         fh2_charges[i]->GetXaxis()->SetTitle("TofD-Charge");
         fh2_charges[i]->GetYaxis()->SetTitle("Tttx-Charge");
         fh2_charges[i]->GetYaxis()->SetTitleOffset(1.2);
@@ -138,19 +138,25 @@ void R3BTofDvsTttxOnlineSpectra::Exec(Option_t* /*option*/)
         auto plane = hit->GetDetId();
         if (plane != fPlaneTofd)
             continue;
-        chargetofd = hit->GetEloss();
+        // Looking for the max. charge
+        if (hit->GetEloss() > chargetofd)
+            chargetofd = hit->GetEloss();
     }
 
+    double chargetttx = 0.;
     for (int ihit = 0; ihit < nHitsTx; ihit++)
     {
         auto hit = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(ihit));
         auto idet = hit->GetDetID();
         if (idet > 0)
             continue;
-        auto charge = hit->GetChargeZ();
-        if (chargetofd > fMinZTofd && chargetofd < fMaxZTofd && charge > 0)
-            fh2_charges[idet]->Fill(chargetofd, charge);
+        // Looking for the max. charge
+        if (hit->GetChargeZ() > chargetttx)
+            chargetttx = hit->GetChargeZ();
     }
+
+    if (chargetofd > fMinZTofd && chargetofd < fMaxZTofd && chargetttx > 0)
+        fh2_charges[0]->Fill(chargetofd, chargetttx);
 
     fNEvents += 1;
 }
