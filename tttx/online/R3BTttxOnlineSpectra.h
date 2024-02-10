@@ -106,6 +106,8 @@ class R3BTttxOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fMappedItemsTttx; /**< Array with mapped items. */
+    TClonesArray* fCalItemsTttx;    /**< Array with cal items. */
+    TClonesArray* fHitItemsTttx;    /**< Array with hit items. */
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
@@ -119,6 +121,8 @@ class R3BTttxOnlineSpectra : public FairTask
 
     // Canvas
     TCanvas* cMap;
+    TCanvas* cCal;
+    TCanvas* cHit;
 
     // Histograms for Mapped data
     std::vector<TH2F*> fh2_EnergyVsStrip_all;
@@ -129,12 +133,31 @@ class R3BTttxOnlineSpectra : public FairTask
     std::vector<TH1F*> fh1_Strip;
     std::vector<TH2F*> fh2_MultVsStrip;
 
+    // Histograms for Cal data
+    std::vector<TH2F*> fh2_CalEnergyVsStrip;
+    std::vector<TH2F*> fh2_CalTimeVsStrip;
+    TH2F* fh2_CalMultCorr;
+    TH2F* fh2_CalECorr;
+    TH2F* fh2_CalTCorr;
+
+    // Histograms for Hit data
+    std::vector<TH2F*> fh2_HitEnergyVsPos;
+    std::vector<TH2F*> fh2_HitTimeVsPos;
+    TH2F* fh2_HitMultCorr;
+    TH2F* fh2_HitECorr;
+    TH2F* fh2_HitTCorr;
+    TH2F* fh2_HitPosCorr;
+
     // Temporal value containers
     std::vector<std::vector<Double_t>> energy;
     std::vector<std::vector<Double_t>> time;
     std::vector<std::vector<Int_t>> mult;
     std::vector<Double_t> highest_e;
     std::vector<UInt_t> highest_e_strip;
+
+    std::vector<Double_t> cal_mult;
+
+    std::vector<Double_t> hit_mult;
 
   public:
     ClassDef(R3BTttxOnlineSpectra, 1)

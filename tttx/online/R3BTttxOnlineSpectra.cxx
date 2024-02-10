@@ -25,6 +25,8 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BShared.h"
+#include "R3BTttxCalData.h"
+#include "R3BTttxHitData.h"
 #include "R3BTttxMappedData.h"
 
 #include "FairLogger.h"
@@ -94,27 +96,49 @@ InitStatus R3BTttxOnlineSpectra::Init()
     }
 
     // get access to cal data of the TTTX
+    fCalItemsTttx = dynamic_cast<TClonesArray*>(rootManager->GetObject("tttxCalData"));
 
     // get access to hit data of the TTTX
+    fHitItemsTttx = dynamic_cast<TClonesArray*>(rootManager->GetObject("tttxHitData"));
 
     // Create histograms for detectors
     char Name1[255];
     char Name2[255];
 
-    // Energy range for strips
-    Double_t binsE = 10000;
-    Double_t minE = 0;
-    Double_t maxE = 500000;
+    // Channel range for pileup/overflow
+    Double_t binsE_pileup = 1000;
+    Double_t minE_pileup = 0;
+    Double_t maxE_pileup = 750000;
 
-    // Time range for strips
-    Double_t binsT = 2000;
-    Double_t minT = -64000;
-    Double_t maxT = 64000;
+    // ADC Channel range
+    Double_t binsE = 1000;
+    Double_t minE = 0;
+    Double_t maxE = 64000;
+
+    // Time channel range
+    Double_t binsT = 1000;
+    Double_t minT = -32000;
+    Double_t maxT = 10000;
 
     // Multiplicity range for strips
     Double_t binsM = 10;
     Double_t minM = -0.5;
     Double_t maxM = 9.5;
+
+    // Energy range [keV]
+    Double_t binsCalE = 2000;
+    Double_t minCalE = 0;
+    Double_t maxCalE = 10000;
+
+    // Time range [ns]
+    Double_t binsCalT = 500;
+    Double_t minCalT = -3000;
+    Double_t maxCalT = 3000;
+
+    // Pos of detector
+    Double_t binsX = 50;
+    Double_t minX = 0;
+    Double_t maxX = 100;
 
     // MAIN FOLDER
     TFolder* mainfolTTTX = new TFolder("TTT10", "TTT10 info");
@@ -122,10 +146,24 @@ InitStatus R3BTttxOnlineSpectra::Init()
     // Folder for mapped data
     TFolder* mapfolTTTX = new TFolder("Map", "Map TTT10 info");
 
+    // Folder for calibrated data
+    TFolder* calfolTTTX = new TFolder("Cal", "Cal TTT10 info");
+
+    // Folder for hit data
+    TFolder* hitfolTTTX = new TFolder("Hit", "Hit TTT10 info");
+
     cMap = new TCanvas("Tttx_Mapped", "Tttx_Mapped", 10, 10, 800, 700);
     cMap->Divide(4, 3);
     mapfolTTTX->Add(cMap);
+    cCal = new TCanvas("Tttx_Cal", "Tttx_Cal", 10, 10, 800, 700);
+    cCal->Divide(4, 2);
+    calfolTTTX->Add(cCal);
+    cHit = new TCanvas("Tttx_Hit", "Tttx_Hit", 10, 10, 800, 700);
+    cHit->Divide(4, 2);
+    hitfolTTTX->Add(cHit);
     mainfolTTTX->Add(mapfolTTTX);
+    mainfolTTTX->Add(calfolTTTX);
+    mainfolTTTX->Add(hitfolTTTX);
 
     //==============================  Mapped Data  ========================================
 
@@ -140,7 +178,7 @@ InitStatus R3BTttxOnlineSpectra::Init()
         sprintf(Name1, "fh2_energy_vs_strip_recent_det_%d", i + 1);
         sprintf(Name2, "Mapped energy vs strip number for TTT10 Det: %d, last %d events", i + 1, fNbEntries);
         fh2_EnergyVsStrip_recent[i] =
-            R3B::root_owned<TH2F>(Name1, Name2, fNbStrips, 1, fNbStrips + 1, binsE, minE, maxE);
+            R3B::root_owned<TH2F>(Name1, Name2, fNbStrips, 1, fNbStrips + 1, binsE_pileup, minE_pileup, maxE_pileup);
         fh2_EnergyVsStrip_recent[i]->GetXaxis()->SetTitle("Strip number");
         fh2_EnergyVsStrip_recent[i]->GetYaxis()->SetTitle("Energy [channels]");
         fh2_EnergyVsStrip_recent[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -219,6 +257,139 @@ InitStatus R3BTttxOnlineSpectra::Init()
         fh2_MultVsStrip[i]->Draw("colz");
     }
 
+    //============================================= CAL DATA ====================================================
+
+    fh2_CalEnergyVsStrip.resize(fNbDets);
+    fh2_CalTimeVsStrip.resize(fNbDets);
+
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        sprintf(Name1, "fh2_cal_energy_vs_strip_det_%d", i + 1);
+        sprintf(Name2, "Calibrated energy vs strip number for TTT10 Det: %d", i + 1);
+        fh2_CalEnergyVsStrip[i] =
+            R3B::root_owned<TH2F>(Name1, Name2, fNbStrips, 1, fNbStrips + 1, binsCalE, minCalE, maxCalE);
+        fh2_CalEnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
+        fh2_CalEnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [keV]");
+        fh2_CalEnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_CalEnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
+        cCal->cd(i + 1);
+        fh2_CalEnergyVsStrip[i]->Draw("colz");
+    }
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        sprintf(Name1, "fh2_cal_time_vs_strip_det_%d", i + 1);
+        sprintf(Name2, "Time vs strip number for TTT10 Det: %d", i + 1);
+        fh2_CalTimeVsStrip[i] =
+            R3B::root_owned<TH2F>(Name1, Name2, fNbStrips, 1, fNbStrips + 1, binsCalT, minCalT, maxCalT);
+        fh2_CalTimeVsStrip[i]->GetXaxis()->SetTitle("Strip number");
+        fh2_CalTimeVsStrip[i]->GetYaxis()->SetTitle("Time [ns]");
+        fh2_CalTimeVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_CalTimeVsStrip[i]->GetXaxis()->CenterTitle(true);
+        cCal->cd(i + 3);
+        fh2_CalTimeVsStrip[i]->Draw("colz");
+    }
+
+    sprintf(Name1, "fh2_cal_mult_correlation");
+    sprintf(Name2, "Multiplicity of Det 2 Vs Multiplicity of Det 1");
+    fh2_CalMultCorr = R3B::root_owned<TH2F>(Name1, Name2, binsM, minM, maxM, binsM, minM, maxM);
+    fh2_CalMultCorr->GetXaxis()->SetTitle("Multiplicity of Det 1");
+    fh2_CalMultCorr->GetYaxis()->SetTitle("Multiplicity of Det 2");
+    fh2_CalMultCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_CalMultCorr->GetXaxis()->CenterTitle(true);
+    cCal->cd(5);
+    fh2_CalMultCorr->Draw("colz");
+
+    sprintf(Name1, "fh2_cal_energy_correlation");
+    sprintf(Name2, "Energy of Det 2 Vs Energy of Det 1");
+    fh2_CalECorr = R3B::root_owned<TH2F>(Name1, Name2, binsCalE, minCalE, maxCalE, binsCalE, minCalE, maxCalE);
+    fh2_CalECorr->GetXaxis()->SetTitle("Energy of Det 1 [keV]");
+    fh2_CalECorr->GetYaxis()->SetTitle("Energy of Det 2 [keV]");
+    fh2_CalECorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_CalECorr->GetXaxis()->CenterTitle(true);
+    cCal->cd(6);
+    fh2_CalECorr->Draw("colz");
+
+    sprintf(Name1, "fh2_cal_time_correlation");
+    sprintf(Name2, "Time of Det 2 Vs Time of Det 1");
+    fh2_CalTCorr = R3B::root_owned<TH2F>(Name1, Name2, binsCalT, minCalT, maxCalT, binsCalT, minCalT, maxCalT);
+    fh2_CalTCorr->GetXaxis()->SetTitle("Time of Det 1 [ns]");
+    fh2_CalTCorr->GetYaxis()->SetTitle("Time of Det 2 [ns]");
+    fh2_CalTCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_CalTCorr->GetXaxis()->CenterTitle(true);
+    cCal->cd(7);
+    fh2_CalTCorr->Draw("colz");
+
+    //============================================= HIT DATA ====================================================
+
+    fh2_HitEnergyVsPos.resize(fNbDets);
+    fh2_HitTimeVsPos.resize(fNbDets);
+
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        sprintf(Name1, "fh2_hit_energy_vs_pos_det_%d", i + 1);
+        sprintf(Name2, "Hit energy vs Position for TTT10 Det: %d", i + 1);
+        fh2_HitEnergyVsPos[i] = R3B::root_owned<TH2F>(Name1, Name2, binsX, minX, maxX, binsCalE, minCalE, maxCalE);
+        fh2_HitEnergyVsPos[i]->GetXaxis()->SetTitle("Position [mm]");
+        fh2_HitEnergyVsPos[i]->GetYaxis()->SetTitle("Energy [keV]");
+        fh2_HitEnergyVsPos[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_HitEnergyVsPos[i]->GetXaxis()->CenterTitle(true);
+        cHit->cd(i + 1);
+        fh2_HitEnergyVsPos[i]->Draw("colz");
+    }
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        sprintf(Name1, "fh2_hit_time_vs_pos_det_%d", i + 1);
+        sprintf(Name2, "Time vs Position for TTT10 Det: %d", i + 1);
+        fh2_HitTimeVsPos[i] = R3B::root_owned<TH2F>(Name1, Name2, binsX, minX, maxX, binsCalT, minCalT, maxCalT);
+        fh2_HitTimeVsPos[i]->GetXaxis()->SetTitle("Position [mm]");
+        fh2_HitTimeVsPos[i]->GetYaxis()->SetTitle("Time [ns]");
+        fh2_HitTimeVsPos[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_HitTimeVsPos[i]->GetXaxis()->CenterTitle(true);
+        cHit->cd(i + 1);
+        fh2_HitTimeVsPos[i]->Draw("colz");
+    }
+
+    sprintf(Name1, "fh2_hit_mult_correlation");
+    sprintf(Name2, "Multiplicity of Det 2 Vs Multiplicity of Det 1");
+    fh2_HitMultCorr = R3B::root_owned<TH2F>(Name1, Name2, binsM, minM, maxM, binsM, minM, maxM);
+    fh2_HitMultCorr->GetXaxis()->SetTitle("Multiplicity of Det 1");
+    fh2_HitMultCorr->GetYaxis()->SetTitle("Multiplicity of Det 2");
+    fh2_HitMultCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_HitMultCorr->GetXaxis()->CenterTitle(true);
+    cHit->cd(5);
+    fh2_HitMultCorr->Draw("colz");
+
+    sprintf(Name1, "fh2_hit_energy_correlation");
+    sprintf(Name2, "Energy of Det 2 Vs Energy of Det 1");
+    fh2_HitECorr = R3B::root_owned<TH2F>(Name1, Name2, binsCalE, minCalE, maxCalE, binsCalE, minCalE, maxCalE);
+    fh2_HitECorr->GetXaxis()->SetTitle("Energy of Det 1 [keV]");
+    fh2_HitECorr->GetYaxis()->SetTitle("Energy of Det 2 [keV]");
+    fh2_HitECorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_HitECorr->GetXaxis()->CenterTitle(true);
+    cHit->cd(6);
+    fh2_HitECorr->Draw("colz");
+
+    sprintf(Name1, "fh2_hit_time_correlation");
+    sprintf(Name2, "Time of Det 2 Vs Time of Det 1");
+    fh2_HitTCorr = R3B::root_owned<TH2F>(Name1, Name2, binsCalT, minCalT, maxCalT, binsCalT, minCalT, maxCalT);
+    fh2_HitTCorr->GetXaxis()->SetTitle("Time of Det 1 [ns]");
+    fh2_HitTCorr->GetYaxis()->SetTitle("Time of Det 2 [ns]");
+    fh2_HitTCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_HitTCorr->GetXaxis()->CenterTitle(true);
+    cHit->cd(7);
+    fh2_HitTCorr->Draw("colz");
+
+    sprintf(Name1, "fh2_hit_pos_correlation");
+    sprintf(Name2, "Position of Det 2 Hit Vs Position of Det 1 Hit");
+    fh2_HitPosCorr = R3B::root_owned<TH2F>(Name1, Name2, binsX, minX, maxX, binsX, minX, maxX);
+    fh2_HitPosCorr->GetXaxis()->SetTitle("x Pos of Det 1 [mm]");
+    fh2_HitPosCorr->GetYaxis()->SetTitle("x Pos of Det 2 [mm]");
+    fh2_HitPosCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_HitPosCorr->GetXaxis()->CenterTitle(true);
+    cHit->cd(8);
+    fh2_HitPosCorr->Draw("colz");
+
+    //===============================================================================================================
     run->AddObject(mainfolTTTX);
 
     // Register command to reset histograms
@@ -242,6 +413,27 @@ void R3BTttxOnlineSpectra::Reset_Histo()
     }
     fh2_E2VsE1->Reset();
     fh2_E2StripVsE1Strip->Reset();
+
+    // Cal data
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        fh2_CalEnergyVsStrip[i]->Reset();
+        fh2_CalTimeVsStrip[i]->Reset();
+    }
+    fh2_CalMultCorr->Reset();
+    fh2_CalECorr->Reset();
+    fh2_CalTCorr->Reset();
+
+    // Hit data
+    for (Int_t i = 0; i < fNbDets; i++)
+    {
+        fh2_HitEnergyVsPos[i]->Reset();
+        fh2_HitTimeVsPos[i]->Reset();
+    }
+    fh2_HitMultCorr->Reset();
+    fh2_HitECorr->Reset();
+    fh2_HitTCorr->Reset();
+    fh2_HitPosCorr->Reset();
 }
 
 void R3BTttxOnlineSpectra::Exec(Option_t* option)
@@ -300,6 +492,9 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
 
         if (strip < fNbStrips)
         {
+            fh2_EnergyVsStrip_recent[det]->Fill(strip + 1, hit->GetEnergy());
+            fh2_EnergyVsStrip_all[det]->Fill(strip + 1, hit->GetEnergy());
+            fh1_Strip[det]->Fill(strip + 1);
             energy[det][strip] = hit->GetEnergy() & 0xffff; // Take only lower 16 bits
             mult[det][strip]++;
             if (!isnan(energy[det][strip]) && energy[det][strip] > highest_e[det])
@@ -309,10 +504,6 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
             }
         }
         time[det][strip] = hit->GetTime();
-
-        fh2_EnergyVsStrip_recent[det]->Fill(strip + 1, hit->GetEnergy());
-        fh2_EnergyVsStrip_all[det]->Fill(strip + 1, hit->GetEnergy());
-        fh1_Strip[det]->Fill(strip + 1);
     }
     for (Int_t i_det = 0; i_det < fNbDets; i_det++)
     {
@@ -337,6 +528,103 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
             fh2_EnergyVsStrip_recent[i_det]->Reset();
         }
     }
+
+    // Fill Cal Data
+    if (!fCalItemsTttx || fCalItemsTttx->GetEntriesFast() == 0)
+    {
+        return;
+    }
+    cal_mult.clear();
+    cal_mult.resize(fNbDets);
+
+    for (Int_t j = 0; j < fNbDets; j++)
+        cal_mult[j] = 0;
+
+    Int_t nCalHits = fCalItemsTttx->GetEntriesFast();
+    for (Int_t ihit = 0; ihit < nCalHits; ihit++)
+    {
+        R3BTttxCalData* hit = dynamic_cast<R3BTttxCalData*>(fCalItemsTttx->At(ihit));
+        if (!hit)
+        {
+            continue;
+        }
+        det = hit->GetDetID() - 1;
+        strip = hit->GetStripID() - 1; // stripID - 1 --> 32 => Tref, 33 => Ttrig
+        if (strip < fNbStrips)
+        {
+            fh2_CalEnergyVsStrip[det]->Fill(strip + 1, hit->GetEnergy());
+            fh2_CalTimeVsStrip[det]->Fill(strip + 1, hit->GetTime());
+            cal_mult[det]++;
+        }
+        for (int jhit = ihit + 1; jhit < nCalHits; jhit++)
+        {
+            R3BTttxCalData* hit2 = dynamic_cast<R3BTttxCalData*>(fCalItemsTttx->At(jhit));
+            if (det == hit2->GetDetID() - 1)
+            {
+                continue;
+            }
+            if (det == 0)
+            {
+                fh2_CalECorr->Fill(hit->GetEnergy(), hit2->GetEnergy());
+                fh2_CalTCorr->Fill(hit->GetTime(), hit2->GetTime());
+            }
+            else
+            {
+                fh2_CalECorr->Fill(hit2->GetEnergy(), hit->GetEnergy());
+                fh2_CalTCorr->Fill(hit2->GetTime(), hit->GetTime());
+            }
+        }
+    }
+    fh2_CalMultCorr->Fill(cal_mult[0], cal_mult[1]);
+
+    // Fill Hit Data
+    if (!fHitItemsTttx || fHitItemsTttx->GetEntriesFast() == 0)
+    {
+        return;
+    }
+    hit_mult.clear();
+    hit_mult.resize(fNbDets);
+
+    Double_t pos = 0;
+    for (Int_t j = 0; j < fNbDets; j++)
+        hit_mult[j] = 0;
+
+    Int_t nHitHits = fHitItemsTttx->GetEntriesFast();
+    for (Int_t ihit = 0; ihit < nHitHits; ihit++)
+    {
+        R3BTttxHitData* hit = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(ihit));
+        if (!hit)
+        {
+            continue;
+        }
+        det = hit->GetDetID() - 1;
+        pos = hit->GetX();
+
+        fh2_HitEnergyVsPos[det]->Fill(pos, hit->GetEnergy());
+        fh2_HitTimeVsPos[det]->Fill(pos, hit->GetTime());
+        hit_mult[det]++;
+        for (int jhit = ihit + 1; jhit < nHitHits; jhit++)
+        {
+            R3BTttxHitData* hit2 = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(jhit));
+            if (det == hit2->GetDetID() - 1)
+            {
+                continue;
+            }
+            if (det == 0)
+            {
+                fh2_HitECorr->Fill(hit->GetEnergy(), hit2->GetEnergy());
+                fh2_HitTCorr->Fill(hit->GetTime(), hit2->GetTime());
+                fh2_HitPosCorr->Fill(hit->GetX(), hit2->GetX());
+            }
+            else
+            {
+                fh2_HitECorr->Fill(hit2->GetEnergy(), hit->GetEnergy());
+                fh2_HitTCorr->Fill(hit2->GetTime(), hit->GetTime());
+                fh2_HitPosCorr->Fill(hit2->GetX(), hit->GetX());
+            }
+        }
+    }
+    fh2_HitMultCorr->Fill(hit_mult[0], hit_mult[1]);
 }
 
 void R3BTttxOnlineSpectra::FinishEvent()
@@ -345,6 +633,14 @@ void R3BTttxOnlineSpectra::FinishEvent()
     {
         fMappedItemsTttx->Clear();
     }
+    if (fCalItemsTttx)
+    {
+        fCalItemsTttx->Clear();
+    }
+    if (fHitItemsTttx)
+    {
+        fHitItemsTttx->Clear();
+    }
 }
 
 void R3BTttxOnlineSpectra::FinishTask()
@@ -352,6 +648,14 @@ void R3BTttxOnlineSpectra::FinishTask()
     if (fMappedItemsTttx)
     {
         cMap->Write();
+    }
+    if (fCalItemsTttx)
+    {
+        cCal->Write();
+    }
+    if (fHitItemsTttx)
+    {
+        cHit->Write();
     }
 }
 
