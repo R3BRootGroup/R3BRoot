@@ -153,17 +153,17 @@ void R3BTttxMapped2Cal::Exec(Option_t* /*option*/)
         auto* hit = dynamic_cast<R3BTttxMappedData*>(fTttxMapData->At(ihit));
         auto idet = static_cast<int>(hit->GetDetID()) - 1;
         auto istrip = static_cast<int>(hit->GetStripID()) - 1;
-        if (istrip == fch_tref)
-        {
-            fTttx.at(idet).GetTref().SetRawValues(hit);
-        }
-        if (istrip == fch_trig)
-        {
-            fTttx.at(idet).GetTrig().SetRawValues(hit);
-        }
         if (istrip < NumStrips)
         {
             fTttx.at(idet).GetStrip(istrip).SetRawValues(hit);
+        }
+        else if (istrip == fch_tref - 1)
+        {
+            fTttx.at(idet).GetTref().SetRawValues(hit);
+        }
+        else if (istrip == fch_trig - 1)
+        {
+            fTttx.at(idet).GetTrig().SetRawValues(hit);
         }
     }
     // End of reading data
@@ -173,7 +173,8 @@ void R3BTttxMapped2Cal::Exec(Option_t* /*option*/)
     {
         auto fTrig = fTttx.at(idet).GetTrig();
         R3BLOG(debug, "Detector" << idet + 1 << "Multiplicity of Trigger: " << fTrig.GetMult());
-        R3BLOG_IF(warning, fTrig.GetMult() > 1, "Multiple Trigger hits: " << fTrig.GetMult());
+        R3BLOG_IF(
+            warning, fTrig.GetMult() > 1, "Multiple Trigger hits: " << fTrig.GetMult() << ". Using the first hit.");
         for (int istrip = 0; istrip < NumStrips; istrip++)
         {
             if (fCal_Par->GetInUse(idet + 1, istrip + 1) != 1)
@@ -201,16 +202,13 @@ void R3BTttxMapped2Cal::CalculateStrip(int idet, int istrip, CalStrip& fStrip, C
 {
     for (int imult = 0; imult < fStrip.GetMult(); imult++)
     {
-        auto itime = fStrip.GetT(imult);
-        if (fTrig.GetMult() == 1)
+        if (fTrig.GetMult() == 0)
         {
-            itime -= fTrig.GetT(0);
-        }
-        else
-        {
-            R3BLOG(warning, "No Trigger hit found");
+            R3BLOG(warning, "No Trigger hit found. Skip this event.");
             return;
         }
+
+        auto itime = fStrip.GetT(imult) - fTrig.GetT(0);
         auto dtime = fTimeResolution * static_cast<double>(itime);
         if (dtime < fTimeMin || dtime > fTimeMax)
             return;
