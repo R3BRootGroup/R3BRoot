@@ -31,7 +31,6 @@ R3BTofDHitModulePar::R3BTofDHitModulePar(const char* name, const char* title, co
     , fLambda(1.)
     , fSync(0)
     , fTofSyncOffset(0)
-    , fTofSyncSlope(0)
     , fPar1a(0)
     , fPar1b(0)
     , fPar1c(0)
@@ -98,7 +97,6 @@ void R3BTofDHitModulePar::printParams()
     LOG(info) << "   fToTOffset2: " << fToTOffset2;
     LOG(info) << "   fSync: " << fSync;
     LOG(info) << "   fTofSyncOffset: " << fTofSyncOffset;
-    LOG(info) << "   fTofSyncSlope: " << fTofSyncSlope;
     LOG(info) << "   fVeff: " << fVeff;
     LOG(info) << "   fLambda: " << fLambda;
     LOG(info) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;

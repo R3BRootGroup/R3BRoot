@@ -20,6 +20,7 @@
 #pragma once
 
 #include <FairTask.h>
+#include <memory>
 #include <vector>
 
 class TClonesArray;
@@ -115,7 +116,7 @@ class R3BTofDOnlineSpectra : public FairTask
 
   private:
     void SetParameter();
-    R3BCoarseTimeStitch* fTimeStitch = nullptr;
+    std::unique_ptr<R3BCoarseTimeStitch> fTimeStitch;
     TClonesArray* fMappedItems = nullptr;
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;

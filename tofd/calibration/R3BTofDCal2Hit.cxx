@@ -60,13 +60,12 @@ R3BTofDCal2Hit::R3BTofDCal2Hit()
 
 R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItems(NULL)
-    , fCalTriggerItems(NULL)
-    , fTimeStitch(nullptr)
+    , fCalItems(nullptr)
+    , fCalTriggerItems(nullptr)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitPars(0)
-    , fHitPar(NULL)
-    , fMapPar(NULL)
+    , fHitPar(nullptr)
+    , fMapPar(nullptr)
     , fTrigger(-1)
     , fTpat1(-1)
     , fTpat2(-1)
@@ -98,21 +97,20 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , goodpair5(0)
     , goodpair6(0)
     , goodpair7(0)
-    , fOnline(kFALSE)
 {
-    fhNoTpat = NULL;
+    fhNoTpat = nullptr;
     for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        fhQ[i] = NULL;
-        fhxy[i] = NULL;
-        fhQvsEvent[i] = NULL;
-        fhTdiff[i] = NULL;
-        fhTsync[i] = NULL;
-        fhQ0Qt[i] = NULL;
-        fhTvsQ[i] = NULL;
+        fhQ[i] = nullptr;
+        fhxy[i] = nullptr;
+        fhQvsEvent[i] = nullptr;
+        fhTdiff[i] = nullptr;
+        fhTsync[i] = nullptr;
+        fhQ0Qt[i] = nullptr;
+        fhTvsQ[i] = nullptr;
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhQvsPos[i][j] = NULL;
+            fhQvsPos[i][j] = nullptr;
         }
     }
 }
@@ -149,7 +147,7 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
     if (fHitItems)
     {
         delete fHitItems;
-        fHitItems = NULL;
+        fHitItems = nullptr;
     }
 }
 
@@ -192,13 +190,13 @@ InitStatus R3BTofDCal2Hit::Init()
     }
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    R3BLOG_IF(fatal, NULL == header, "EventHeader. not found");
+    R3BLOG_IF(fatal, nullptr == header, "EventHeader. not found");
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdCal"));
-    R3BLOG_IF(fatal, NULL == fCalItems, "TofdCal not found");
+    R3BLOG_IF(fatal, nullptr == fCalItems, "TofdCal not found");
 
     fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("TofdTriggerCal"));
-    R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
+    R3BLOG_IF(fatal, nullptr == fCalTriggerItems, "TofdTriggerCal not found");
 
     maxevent = mgr->CheckMaxEventNo();
 
@@ -215,7 +213,7 @@ InitStatus R3BTofDCal2Hit::Init()
     }
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fTimeStitch = std::make_unique<R3BCoarseTimeStitch>();
 
     return kSUCCESS;
 }
@@ -319,11 +317,6 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     {
         auto* hit = dynamic_cast<R3BTofdCalData*>(fCalItems->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
-
-        // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
-        //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << ' '
-        //          << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
-
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
@@ -347,15 +340,6 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
-        //    reset:
-        // for (auto it2 = it->second.top.begin(); it->second.top.end() != it2; ++it2) {
-        // std::cout << "Top: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
-        // (*it2)->GetTimeLeading_ns() << '\n';
-        // }
-        // for (auto it2 = it->second.bot.begin(); it->second.bot.end() != it2; ++it2) {
-        // std::cout << "Bot: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
-        // (*it2)->GetTimeLeading_ns() << '\n';
-        // }
         auto const& top_vec = it->second.top;
         auto const& bot_vec = it->second.bot;
         size_t top_i = 0;
@@ -579,27 +563,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-                // auto tof_corr = par->GetTofSyncOffset() + par->GetTofSyncSlope() * tof;
                 auto tof_corr = tof - par->GetTofSyncOffset();
 
-                // if (parz[1] > 0)
-                // {
                 event.push_back(
                     { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
-                // }
-
-                /* if (parz[0] > 0 && parz[2] > 0)
-                 {
-                     event.push_back(
-                         { parz[0] * TMath::Power(qb, parz[2]) + parz[1], THit, xp, pos, iPlane, iBar, THit_raw, tof });
-                 }
-                 else
-                 {
-                     parz[0] = 1.;
-                     parz[1] = 0.;
-                     parz[2] = 1.;
-                     event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof });
-                 }*/
 
                 if (fTofdHisto)
                 {
