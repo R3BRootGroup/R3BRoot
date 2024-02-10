@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -42,7 +42,7 @@ R3BMusliMapped2Cal::R3BMusliMapped2Cal()
 // R3BMusliMapped2CalPar: Standard Constructor --------------------------
 R3BMusliMapped2Cal::R3BMusliMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fNumSignals(MAX_NB_SIGNALS_MAP)
+    , fNumSignals(18)
     , fNumGroupsAnodes(15)
     , fNumParamsEneFit(2)
     , fNumParamsPosFit(2)
@@ -95,21 +95,21 @@ void R3BMusliMapped2Cal::SetParameters()
     //--- Parameter Container ---
     fNumSignals = fCal_Par->GetNumSignals();           // Number of signals at Mapped
     fNumGroupsAnodes = fCal_Par->GetNumGroupsAnodes(); // Number of groups of anodes
-    fNumParamsEneFit = fCal_Par->GetNumParamsEneFit(); // Number of signals at Mapped
-    fNumParamsPosFit = fCal_Par->GetNumParamsPosFit(); // Number of signals at Mapped
-    fMaxMult = fCal_Par->GetMaxMult();
+    fNumParamsEneFit = fCal_Par->GetNumParamsEneFit(); // Number of ene calib params per group of anodes
+    fNumParamsPosFit = fCal_Par->GetNumParamsPosFit(); // Number of pos calib params per group of anodes
+    fMaxMult = fCal_Par->GetMaxMult();                 // maximum number of hit per output channel
 
-    Int_t array_ene = fNumGroupsAnodes * fNumParamsEneFit;
+    Int_t array_ene = fNumGroupsAnodes * fNumParamsEneFit; // array of ene calibration parameters
     fEneCalParams = new TArrayF();
     fEneCalParams->Set(array_ene);
     fEneCalParams = fCal_Par->GetEneCalParams();
 
-    Int_t array_pos = fNumGroupsAnodes * fNumParamsPosFit;
+    Int_t array_pos = fNumGroupsAnodes * fNumParamsPosFit; // arrays of pos calibration parameters
     fPosCalParams = new TArrayF();
     fPosCalParams->Set(array_pos);
     fPosCalParams = fCal_Par->GetPosCalParams();
 
-    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
+    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit; // array of dtraw limits for map_multi-hit analysis
     fMultHitCalParams = new TArrayF();
     fMultHitCalParams->Set(array_mult);
     fMultHitCalParams = fCal_Par->GetMultHitCalParams();
@@ -160,100 +160,132 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
     // Reset entries in output arrays, local arrays
     Reset();
 
+    // variables to read map data
+    UInt_t sig = 0;
+    UInt_t map_mult[fNumSignals];
+    UInt_t map_sig[fNumSignals * fMaxMult];
+    Double_t map_eraw[fNumSignals * fMaxMult];
+    Double_t map_traw[fNumSignals * fMaxMult];
+    Double_t pospar[fNumParamsPosFit];
+    Double_t enepar[fNumParamsEneFit];
+    Double_t dtraw, dtcal, ecal;
+
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMusliMappedDataCA->GetEntriesFast();
+    UInt_t nHits = fMusliMappedDataCA->GetEntries();
     if (nHits == 0)
         return;
 
-    R3BMusliMappedData** mappedData = new R3BMusliMappedData*[nHits];
-    UInt_t signalId = 0;
-    Double_t pedestal = 0.;
-    Double_t slope = 1.;
-    Double_t pospar[fNumParamsPosFit];
-    Double_t dt, e;
-
+    // init tmp arrays
     for (Int_t i = 0; i < fNumSignals; i++)
     {
-        mult_signalmap[i] = 0;
+        map_mult[i] = 0;
         for (Int_t j = 0; j < fMaxMult; j++)
         {
-            signal[j][i] = 0;
-            energy[j][i] = 0.;
-            time[j][i] = 0.;
+            map_sig[i * fMaxMult + j] = 0;
+            map_eraw[i * fMaxMult + j] = 0.;
+            map_traw[i * fMaxMult + j] = 0.;
         }
     }
 
-    for (Int_t i = 0; i < nHits; i++)
+    // loop over the entries of the fMapped TClonesArray
+    for (UInt_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = dynamic_cast<R3BMusliMappedData*>(fMusliMappedDataCA->At(i));
-        signalId = mappedData[i]->GetSignal() - 1;
+        R3BMusliMappedData* map = (R3BMusliMappedData*)fMusliMappedDataCA->At(i);
 
-        if (0 <= signalId && signalId < fNumSignals)
-        {
-            signal[mult_signalmap[signalId]][signalId] = signalId + 1;
-            energy[mult_signalmap[signalId]][signalId] = mappedData[i]->GetEnergy();
-            time[mult_signalmap[signalId]][signalId] = mappedData[i]->GetTime();
-            mult_signalmap[signalId]++;
-        }
-    }
+        sig = map->GetSignal() - 1; // 0-based signal Id
 
-    for (Int_t i = 0; i < fNumGroupsAnodes; i++)
-    {
-        pedestal = fEneCalParams->GetAt(fNumParamsEneFit * i);
-        slope = fEneCalParams->GetAt(fNumParamsEneFit * i + 1);
-        if (mult_signalmap[16] == 1 && mult_signalmap[i] == 1)
+        if (0 <= sig && sig < fNumSignals)
         {
-            for (Int_t j = 0; j < mult_signalmap[i]; j++)
+            if (map_mult[sig] < fMaxMult)
             {
-                dt = 0.;
+                map_sig[sig * fMaxMult + map_mult[sig]] = sig + 1;
+                map_eraw[sig * fMaxMult + map_mult[sig]] = (Double_t)map->GetEnergy();
+                map_traw[sig * fMaxMult + map_mult[sig]] = (Double_t)map->GetTime();
+            }
+            map_mult[sig]++;
+        }
+        else
+            LOG(info) << "R3BMusliMapped2Cal::Exec WARNING, signal id is " << map->GetSignal();
+    }
+
+    if (fNumGroupsAnodes <= fNumSignals)
+    {
+        for (Int_t i = 0; i < fNumGroupsAnodes; i++)
+        {
+            if (map_mult[i] == 0) // no data or too large multiplicity
+                continue;
+            else if (map_mult[16] == 1 && map_mult[i] == 1 && map_traw[i * fMaxMult] > 0 &&
+                     map_eraw[i * fMaxMult] > 0) // one Tref and one [i] signal with real values
+            {
+                dtcal = 0.;
                 for (Int_t k = 0; k < fNumParamsPosFit; k++)
                 {
+                    dtraw = map_traw[i * fMaxMult] - map_traw[16 * fMaxMult];
                     pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
-                    dt += pospar[k] * pow(time[j][i] - time[0][16], k);
+                    dtcal += pospar[k] * pow(dtraw, k);
                 }
-                e = pedestal + slope * energy[j][i];
-                if (e > 0.)
-                    AddCalData(signal[j][i], dt, e);
-            }
-        }
-
-        else if ((mult_signalmap[16] > 1 || mult_signalmap[i] > 1) && fUseMultHit)
-        {
-            Double_t good_t;
-            Int_t no_of_dt = 0;
-            for (Int_t j = 0; j < mult_signalmap[16]; j++)
-            {
-                Double_t cfd_t = ((time[j][16] * 25. / 256.) - fHeader->GetTStart());
-                if (cfd_t > winL && cfd_t < winR)
+                ecal = 0;
+                for (Int_t k = 0; k < fNumParamsEneFit; k++)
                 {
-                    no_of_dt++;
-                    good_t = time[j][16];
+                    enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
+                    ecal += enepar[k] * pow(map_eraw[i * fMaxMult], k);
                 }
+                if (ecal > 0.)
+                    AddCalData(map_sig[i * fMaxMult], dtcal, ecal);
             }
-            if (no_of_dt == 1)
+            else if ((map_mult[16] > 1 || map_mult[i] > 1) && fUseMultHit)
             {
-                for (Int_t j = 0; j < mult_signalmap[i]; j++)
+                Double_t good_tref = -1.;
+                Int_t no_of_tref = 0;
+                if (map_mult[16] == 1)
                 {
-                    Double_t diff_t = time[j][i] - good_t;
-                    if (diff_t > fMultHitCalParams->GetAt(fNumParamsMultHit * i + 0) &&
-                        diff_t < fMultHitCalParams->GetAt(fNumParamsMultHit * i + 1))
+                    no_of_tref = 1;
+                    good_tref = map_traw[16 * fMaxMult];
+                }
+                else if (map_mult[16] > 1)
+                {
+                    for (Int_t j = 0; j < map_mult[16]; j++)
                     {
-                        dt = 0.;
-                        for (Int_t k = 0; k < fNumParamsPosFit; k++)
+                        // TO DO : need to add some comments to explain this condition
+                        Double_t cfd_t = ((map_traw[16 * fMaxMult + j] * 25. / 256.) - fHeader->GetTStart());
+                        if (cfd_t > winL && cfd_t < winR)
                         {
-                            pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
-                            dt += pospar[k] * pow(diff_t, k);
+                            no_of_tref++;
+                            good_tref = map_traw[16 * fMaxMult + j];
                         }
-                        e = pedestal + slope * energy[j][i];
-                        if (e > 0.)
-                            AddCalData(signal[j][i], dt, e);
+                    }
+                }
+                if (no_of_tref == 1 && good_tref > 0 && map_mult[i] < fMaxMult)
+                {
+                    for (Int_t j = 0; j < map_mult[i]; j++)
+                    {
+                        if (map_traw[i * fMaxMult + j] > 0 && map_eraw[i * fMaxMult + j] > 0)
+                        {
+                            dtraw = map_traw[i * fMaxMult + j] - good_tref;
+                            if (dtraw > fMultHitCalParams->GetAt(fNumParamsMultHit * i + 0) &&
+                                dtraw < fMultHitCalParams->GetAt(fNumParamsMultHit * i + 1))
+                            {
+                                dtcal = 0.;
+                                for (Int_t k = 0; k < fNumParamsPosFit; k++)
+                                {
+                                    pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
+                                    dtcal += pospar[k] * pow(dtraw, k);
+                                }
+                                ecal = 0;
+                                for (Int_t k = 0; k < fNumParamsEneFit; k++)
+                                {
+                                    enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
+                                    ecal += enepar[k] * pow(map_eraw[i * fMaxMult + j], k);
+                                }
+                                if (ecal > 0.)
+                                    AddCalData(map_sig[i * fMaxMult + j], dtcal, ecal);
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    if (mappedData)
-        delete[] mappedData;
     return;
 }
 

@@ -43,7 +43,7 @@ R3BOnlineSpectraFrsSciVsMusli::R3BOnlineSpectraFrsSciVsMusli(const char* name, I
     , fMusli_Hit(NULL)
     , fNEvents(0)
     , fIdS2(1)
-    , fIdCaveC(3)
+    , fIdCaveC(2)
 {
 }
 
@@ -169,7 +169,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                 cCal_EvsAoQ->cd(i + 1);
                 fh2_Cal_EvsAoQ[i]->Draw("col");
             }
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 sprintf(Name1, "SciVsMusliHit_EvsAoQ");
                 cHit_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
@@ -221,7 +221,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
         if (fFrsSci_TofCal && fIdS2 > 0)
         {
             mainfol->Add(cCal_EvsAoQ);
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 mainfol->Add(cHit_EvsAoQ);
                 mainfol->Add(cHit_ZvsAoQ);
@@ -255,7 +255,7 @@ void R3BOnlineSpectraFrsSciVsMusli::Reset_Histo()
                 fh2_Cal_EvsAoQ[i]->Reset();
             }
 
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 for (UShort_t i = 0; i < 4; i++)
                 {
@@ -320,46 +320,51 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
         }
 
         // --- read musli cal data and fill histo at MusliCal level--- //
-        if (fMusli_Cal->GetEntriesFast() > 0)
+        if (fMusli_Cal)
         {
-            nHits = fMusli_Cal->GetEntriesFast();
-            for (UInt_t ihit = 0; ihit < nHits; ihit++)
+            if (fMusli_Cal->GetEntriesFast() > 0)
             {
-                R3BMusliCalData* hitcal = dynamic_cast<R3BMusliCalData*>(fFrsSci_PosCal->At(ihit));
-                if (!hitcal)
-                    continue;
-                iSig = hitcal->GetSignal();
-                if (iSig > 15)
-                    continue;
-                if (iAoQ > 0)
-                    fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
-                if (iSig > 8)
-                    continue;
-                if (iRawPosCaveC != -1000.)
-                    fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
-                if (iCalPosCaveC != -1000.)
-                    fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
-            }
-        }
-
-        // --- read musli hit data and fill histo at MusliHit level--- //
-        if (fMusli_Hit->GetEntriesFast() > 0)
-        {
-            nHits = fMusli_Hit->GetEntriesFast();
-            for (UInt_t ihit = 0; ihit < nHits; ihit++)
-            {
-                R3BMusliHitData* hithit = dynamic_cast<R3BMusliHitData*>(fFrsSci_PosCal->At(ihit));
-                if (!hithit)
-                    continue;
-                iTyp = hithit->GetType();
-                if (iAoQ > 0)
+                nHits = fMusli_Cal->GetEntriesFast();
+                for (UInt_t ihit = 0; ihit < nHits; ihit++)
                 {
-                    fh2_Hit_EvsAoQ[iTyp]->Fill(iAoQ, hithit->GetEave());
-                    fh2_Hit_ZvsAoQ[iTyp]->Fill(iAoQ, hithit->GetZcharge());
+                    R3BMusliCalData* hitcal = dynamic_cast<R3BMusliCalData*>(fFrsSci_PosCal->At(ihit));
+                    if (!hitcal)
+                        continue;
+                    iSig = hitcal->GetSignal();
+                    if (iSig > 15)
+                        continue;
+                    if (iAoQ > 0)
+                        fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
+                    if (iSig > 8)
+                        continue;
+                    if (iRawPosCaveC != -1000.)
+                        fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
+                    if (iCalPosCaveC != -1000.)
+                        fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
+                }
+            }
+
+            // --- read musli hit data and fill histo at MusliHit level--- //
+            if (fMusli_Hit)
+            {
+                if (fMusli_Hit->GetEntriesFast() > 0)
+                {
+                    nHits = fMusli_Hit->GetEntriesFast();
+                    for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                    {
+                        R3BMusliHitData* hithit = dynamic_cast<R3BMusliHitData*>(fFrsSci_PosCal->At(ihit));
+                        if (!hithit)
+                            continue;
+                        iTyp = hithit->GetType() - 1;
+                        if (iAoQ > 0)
+                        {
+                            fh2_Hit_EvsAoQ[iTyp]->Fill(iAoQ, hithit->GetEave());
+                            fh2_Hit_ZvsAoQ[iTyp]->Fill(iAoQ, hithit->GetZcharge());
+                        }
+                    }
                 }
             }
         }
-
         fNEvents++;
     } // end of if fFrsSci_PosCal && fMusli_Cal && fIdCaveC>0
 }
