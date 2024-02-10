@@ -84,8 +84,8 @@ Bool_t R3BFrsSciReader::R3BRead()
     // loop over all detectors
     for (UShort_t d = 0; d < fNumSci; d++)
     {
-        uint32_t numberOfPMTsWithHits_TC = data->FRSSCI[d].VTCM;
-        uint32_t numberOfPMTsWithHits_TF = data->FRSSCI[d].VTFM;
+        uint32_t numberOfPMTsWithHits_TC = (uint32_t)data->FRSSCI[d].VTCM;
+        uint32_t numberOfPMTsWithHits_TF = (uint32_t)data->FRSSCI[d].VTFM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
             LOG(error) << "R3BFrsSciReader::R3BRead() Error in unpacking, unconsistency between TF and TC for FrsSci !";
@@ -96,15 +96,15 @@ Bool_t R3BFrsSciReader::R3BRead()
             uint32_t curChannelStart = 0;
             for (Int_t pmmult = 0; pmmult < numberOfPMTsWithHits_TF; pmmult++)
             {
-                uint32_t pmtid_TC = data->FRSSCI[d].VTCMI[pmmult];
-                uint32_t pmtid_TF = data->FRSSCI[d].VTFMI[pmmult];
+                uint32_t pmtid_TC = (uint32_t)data->FRSSCI[d].VTCMI[pmmult];
+                uint32_t pmtid_TF = (uint32_t)data->FRSSCI[d].VTFMI[pmmult];
                 if (pmtid_TF != pmtid_TC)
                 {
                     LOG(error)
                         << "R3BFrsSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
                            "and TC for FrsSci !";
                 }
-                uint32_t nextChannelStart = data->FRSSCI[d].VTFME[pmmult];
+                uint32_t nextChannelStart = (uint32_t)data->FRSSCI[d].VTFME[pmmult];
                 // put the mapped items {det,pmt,finetime, coarsetime} one after the other in the fArray
                 for (Int_t hit = curChannelStart; hit < nextChannelStart; hit++)
                 {

@@ -33,6 +33,7 @@ ${R3BROOT_SOURCE_DIR}/musli/calibration
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 ${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/r3bdata/frssciData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
 ${R3BROOT_SOURCE_DIR}/tracking
 )
