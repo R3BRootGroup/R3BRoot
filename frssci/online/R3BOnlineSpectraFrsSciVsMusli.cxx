@@ -169,7 +169,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                 cCal_EvsAoQ->cd(i + 1);
                 fh2_Cal_EvsAoQ[i]->Draw("col");
             }
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 sprintf(Name1, "SciVsMusliHit_EvsAoQ");
                 cHit_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
@@ -221,7 +221,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
         if (fFrsSci_TofCal && fIdS2 > 0)
         {
             mainfol->Add(cCal_EvsAoQ);
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 mainfol->Add(cHit_EvsAoQ);
                 mainfol->Add(cHit_ZvsAoQ);
@@ -255,7 +255,7 @@ void R3BOnlineSpectraFrsSciVsMusli::Reset_Histo()
                 fh2_Cal_EvsAoQ[i]->Reset();
             }
 
-            if (fMusli_Hit)
+            if (fMusli_Hit && fIdCaveC > fIdS2)
             {
                 for (UShort_t i = 0; i < 4; i++)
                 {
@@ -355,7 +355,7 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
                         R3BMusliHitData* hithit = dynamic_cast<R3BMusliHitData*>(fFrsSci_PosCal->At(ihit));
                         if (!hithit)
                             continue;
-                        iTyp = hithit->GetType();
+                        iTyp = hithit->GetType() - 1;
                         if (iAoQ > 0)
                         {
                             fh2_Hit_EvsAoQ[iTyp]->Fill(iAoQ, hithit->GetEave());
