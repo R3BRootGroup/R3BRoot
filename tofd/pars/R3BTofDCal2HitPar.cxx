@@ -58,44 +58,20 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar()
 
 R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalTriggerItems(NULL)
-    , fMinStats(100000)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fNofPlanes(4)
-    , fPaddlesPerPlane(44)
-    , fNofModules(fNofPlanes * fPaddlesPerPlane)
-    , fNEvents(0)
-    , fParameter(1)
-    , fHitPar(NULL)
-    , fTofdY(0.)
-    , fTofdQ(0.)
-    , fMaxQ(1500)
-    , fNbZPeaks(1)
-    , fZfitType("pol1")
-    , fTofdTotLow(0.)
-    , fTofdTotHigh(200.)
-    , fMapPar(NULL)
-    , fTofdSmiley(true)
-    , fTofdZ(false)
-    , fMeanTof(20.)
-    , fHeader(nullptr)
-    , maxevent(0)
 {
     for (Int_t i = 0; i < fNofPlanes; i++)
     {
-        fh_tofd_TotPm[i] = NULL;
-        fhTdiff[i] = NULL;
-        fhTsync[i] = NULL;
+        fh_tofd_TotPm[i] = nullptr;
+        fhTdiff[i] = nullptr;
+        fhTsync[i] = nullptr;
         for (Int_t j = 0; j < fPaddlesPerPlane; j++)
         {
-            fhLogTot1vsLogTot2[i][j] = NULL;
-            fhSqrtQvsPosToT[i][j] = NULL;
-            fhQvsPos[i][j] = NULL;
-            fhTot1vsPos[i][j] = NULL;
-            fhTot2vsPos[i][j] = NULL;
-            fh1_tofsync[i][j] = NULL;
-            // fhTot1vsTot2[i][j] = NULL;
+            fhLogTot1vsLogTot2[i][j] = nullptr;
+            fhSqrtQvsPosToT[i][j] = nullptr;
+            fhQvsPos[i][j] = nullptr;
+            fhTot1vsPos[i][j] = nullptr;
+            fhTot2vsPos[i][j] = nullptr;
+            fh1_tofsync[i][j] = nullptr;
         }
     }
 }
@@ -124,10 +100,6 @@ R3BTofDCal2HitPar::~R3BTofDCal2HitPar()
                 delete fhTot2vsPos[i][j];
             if (fh1_tofsync[i][j])
                 delete fh1_tofsync[i][j];
-            /*
-            if (fhTot1vsTot2[i][j])
-                delete fhTot1vsTot2[i][j];
-            */
         }
     }
     if (fHitPar)
@@ -147,13 +119,13 @@ InitStatus R3BTofDCal2HitPar::Init()
     }
 
     fHeader = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
-    R3BLOG_IF(fatal, NULL == fHeader, "EventHeader. not found");
+    R3BLOG_IF(fatal, nullptr == fHeader, "EventHeader. not found");
 
     fCalData = dynamic_cast<TClonesArray*>(rm->GetObject("TofdCal"));
-    R3BLOG_IF(fatal, NULL == fCalData, "TofdCal not found");
+    R3BLOG_IF(fatal, nullptr == fCalData, "TofdCal not found");
 
     fCalTriggerItems = dynamic_cast<TClonesArray*>(rm->GetObject("TofdTriggerCal"));
-    R3BLOG_IF(fatal, NULL == fCalTriggerItems, "TofdTriggerCal not found");
+    R3BLOG_IF(fatal, nullptr == fCalTriggerItems, "TofdTriggerCal not found");
 
     fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
@@ -167,7 +139,7 @@ InitStatus R3BTofDCal2HitPar::Init()
             CreateHistograms(i, j);
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fTimeStitch = std::make_unique<R3BCoarseTimeStitch>();
 
     return kSUCCESS;
 }
@@ -183,7 +155,7 @@ namespace
     uint64_t n1, n2;
 };
 
-void R3BTofDCal2HitPar::Exec(Option_t* option)
+void R3BTofDCal2HitPar::Exec(Option_t* /*option*/)
 {
     // test for requested trigger (if possible)
     if ((fTrigger >= 0) && (fHeader) && (fHeader->GetTrigger() != fTrigger))
@@ -218,7 +190,7 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
         auto* hit = dynamic_cast<R3BTofdCalData*>(fCalData->At(ihit));
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
-        auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
+        auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
         vec.push_back(hit);
     }
 
@@ -440,12 +412,9 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
 
-                // std::cout<< " hola 10" << fTofdZ << std::endl;
-
                 // prepare charge fit / quench correction
                 if (fTofdZ == true && fParameter > 1)
                 {
-                    // std::cout<< " hola 20" << std::endl;
                     LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     auto par = fHitPar->GetModuleParAt(iPlane, iBar);
@@ -473,9 +442,8 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                         qb = TMath::Sqrt(top_tot * bot_tot); //
                                                              //(parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) +
                                                              // parq[3] * pow(posToT, 3));
-                        qb = qb *
-                             fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
-                        // std::cout<< " hola30 " << qb << " , " << fTofdQ << std::endl;
+                        // qb = qb * fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit
+                        // the rest
                     }
                     else
                     {
@@ -1392,4 +1360,4 @@ Double_t R3BTofDCal2HitPar::saturation(Double_t x)
     return kor;
 }
 
-ClassImp(R3BTofDCal2HitPar);
+ClassImp(R3BTofDCal2HitPar)

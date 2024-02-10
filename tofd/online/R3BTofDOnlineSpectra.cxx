@@ -584,7 +584,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
     run->GetHttpServer()->RegisterCommand("Reset_TofD_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     // Definition of a time stich object to correlate times coming from different systems
-    fTimeStitch = new R3BCoarseTimeStitch();
+    fTimeStitch = std::make_unique<R3BCoarseTimeStitch>();
 
     return kSUCCESS;
 }

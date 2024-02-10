@@ -16,8 +16,9 @@
 #define N_TOFD_HIT_PLANE_MAX 4
 #define N_TOFD_HIT_PADDLE_MAX 44
 
-#include "FairTask.h"
-#include "THnSparse.h"
+#include <FairTask.h>
+#include <THnSparse.h>
+#include <memory>
 
 class TClonesArray;
 class R3BTofDHitPar;
@@ -138,12 +139,12 @@ class R3BTofDCal2Hit : public FairTask
      */
     Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
 
-    R3BCoarseTimeStitch* fTimeStitch;
+    std::unique_ptr<R3BCoarseTimeStitch> fTimeStitch;
     R3BEventHeader* header; /**< Event header - input data. */
     R3BTofDHitPar* fHitPar; /**< Hit parameter container. */
     R3BTofDMappingPar* fMapPar;
 
-    Bool_t fOnline;
+    bool fOnline = false;
     TClonesArray* fCalItems;        /**< Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
     TClonesArray* fHitItems;        /**< Array with Hit items - output data. */

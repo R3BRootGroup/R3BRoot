@@ -23,8 +23,9 @@
 
 #include <map>
 
-#include "FairTask.h"
-#include "TObject.h"
+#include <FairTask.h>
+#include <TObject.h>
+#include <memory>
 #include <string.h>
 
 class R3BTofDHitPar;
@@ -72,7 +73,7 @@ class R3BTofDCal2HitPar : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t* /*option*/);
 
     /**
      * Method for finish of the task execution.
@@ -162,7 +163,7 @@ class R3BTofDCal2HitPar : public FairTask
     void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
 
   private:
-    R3BCoarseTimeStitch* fTimeStitch;
+    std::unique_ptr<R3BCoarseTimeStitch> fTimeStitch;
     /**
      * Method for creating histograms.
      */
@@ -197,32 +198,31 @@ class R3BTofDCal2HitPar : public FairTask
      */
     Double_t saturation(Double_t x);
 
-    Int_t fParameter;
-    Int_t fUpdateRate; /* An update rate. */
-    Int_t fMinStats;   /* Minimum statistics required per module. */
-    Int_t fTrigger;    /* Trigger value. */
-    Int_t fTpat;
-    TString fZfitType;
-    UInt_t fNofPlanes;       /* Number of planes. */
-    UInt_t fPaddlesPerPlane; /* Number of bars per plane. */
-    UInt_t fNofModules;      /* Total number of modules (=edges) to calibrate */
+    Int_t fParameter = 1;
+    Int_t fMinStats = 10000; /* Minimum statistics required per module. */
+    Int_t fTrigger = -1;     /* Trigger value. */
+    Int_t fTpat = -1;
+    TString fZfitType = "pol1";
+    UInt_t fNofPlanes = 4;                              /* Number of planes. */
+    UInt_t fPaddlesPerPlane = 44;                       /* Number of bars per plane. */
+    UInt_t fNofModules = fNofPlanes * fPaddlesPerPlane; /* Total number of modules (=edges) to calibrate */
 
-    UInt_t fNEvents; /* Event counter. */
-    R3BTofDMappingPar* fMapPar;
-    R3BTofDHitPar* fHitPar;         /* Parameter container. */
-    TClonesArray* fCalData;         /* Array with mapped data - input data. */
-    TClonesArray* fCalTriggerItems; /* Array with trigger Cal items - input data. */
-    R3BEventHeader* fHeader;        /* Event header  */
-    Double_t fTofdY;
-    Double_t fTofdQ;
-    Double_t fMaxQ;
-    Int_t fNbZPeaks;
-    Bool_t fTofdSmiley;
-    Bool_t fTofdZ;
-    UInt_t maxevent;
-    Double_t fTofdTotLow;
-    Double_t fTofdTotHigh;
-    Double_t fMeanTof;
+    UInt_t fNEvents = 0; /* Event counter. */
+    R3BTofDMappingPar* fMapPar = nullptr;
+    R3BTofDHitPar* fHitPar = nullptr;         /* Parameter container. */
+    TClonesArray* fCalData = nullptr;         /* Array with mapped data - input data. */
+    TClonesArray* fCalTriggerItems = nullptr; /* Array with trigger Cal items - input data. */
+    R3BEventHeader* fHeader = nullptr;        /* Event header  */
+    Double_t fTofdY = 0.;
+    Double_t fTofdQ = 0.;
+    Double_t fMaxQ = 1600.;
+    Int_t fNbZPeaks = 1;
+    Bool_t fTofdSmiley = true;
+    Bool_t fTofdZ = false;
+    UInt_t maxevent = 0;
+    Double_t fTofdTotLow = 0.;
+    Double_t fTofdTotHigh = 200.;
+    Double_t fMeanTof = 50.;
 
     // Arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
