@@ -53,9 +53,12 @@ R3BMusliCal2Hit::R3BMusliCal2Hit(const char* name, Int_t iVerbose)
     , fMusliCalDataCA(NULL)
     , fMusliHitDataCA(NULL)
     , fFrsDataCA(NULL)
+    , fFrsSciTofCal(kFALSE)
     , fOnline(kFALSE)
     , fExpId(522) // s522 at 1.2 A.GeV, s509 at 400 A.MeV
     , fDirectBeta(0.876)
+    , fIdS2(1)
+    , fIdCaveC(2)
 {
 }
 
@@ -134,10 +137,20 @@ InitStatus R3BMusliCal2Hit::Init()
         R3BLOG(info, "R3BMusliCal2Hit::Init() MusliCalData not found.");
     }
 
-    fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsData"));
-    if (!fFrsDataCA)
+    fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsSciCalData"));
+    if (fFrsDataCA)
     {
-        R3BLOG(info, "R3BMusliCal2Hit::Init() FrsData not found.");
+        fFrsSciTofCal = kTRUE;
+    }
+    else
+    {
+        fFrsSciTofCal = kFALSE;
+        fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsData"));
+        if (!fFrsDataCA)
+        {
+            R3BLOG(info, "R3BMusliCal2Hit::Init() FrsSciCalData not found, try FrsData");
+            R3BLOG(info, "R3BMusliCal2Hit::Init() FrsData not found neither");
+        }
     }
 
     // OUTPUT DATA
@@ -165,7 +178,21 @@ void R3BMusliCal2Hit::Exec(Option_t* option)
 
     // Get the Beta of the incoming beam
     Double_t beta = fDirectBeta;
-    if (fFrsDataCA && fFrsDataCA->GetEntriesFast() == 1)
+    if (fFrsSciTofCal == kTRUE && fFrsDataCA && fFrsDataCA->GetEntriesFast() > 0)
+    {
+        UInt_t nHits = fFrsDataCA->GetEntriesFast();
+        for (UInt_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BFrsSciTofCalData* hittofcal = dynamic_cast<R3BFrsSciTofCalData*>(fFrsDataCA->At(ihit));
+            if (!hittofcal)
+                continue;
+            if (hittofcal->GetDetIdSta() == fIdS2 && hittofcal->GetDetIdSto() == fIdCaveC)
+            {
+                beta = hittofcal->GetBeta();
+            }
+        }
+    }
+    else if (fFrsDataCA && fFrsDataCA->GetEntriesFast() == 1)
     {
         R3BFrsData* hit = dynamic_cast<R3BFrsData*>(fFrsDataCA->At(0));
         if (hit)

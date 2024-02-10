@@ -18,6 +18,7 @@
 
 #include "FairTask.h"
 #include "R3BFrsData.h"
+#include "R3BFrsSciTofCalData.h"
 #include "R3BMusliCalData.h"
 #include "R3BMusliHitData.h"
 
@@ -65,6 +66,8 @@ class R3BMusliCal2Hit : public FairTask
         fExpId = exp;
     } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
     void SetDirectBeta(Double_t beta) { fDirectBeta = beta; }
+    void SetIdS2(UShort_t id) { fIdS2 = id; }
+    void SetIdCaveC(UShort_t id) { fIdCaveC = id; }
 
   private:
     void SetParameters();
@@ -84,6 +87,8 @@ class R3BMusliCal2Hit : public FairTask
     Int_t fNumEcorrBeta;
     Int_t fNumZ;
     Double_t fDirectBeta; // if direct beam from SIS
+    UShort_t fIdS2;
+    UShort_t fIdCaveC; // for beta we want to use the S2 -> Cave C Beta
     TArrayD* fEaveVsBetaHitParams;
     TArrayD* fEcorrBetaHitParams;
     TArrayD* fZHitParams;
@@ -108,6 +113,7 @@ class R3BMusliCal2Hit : public FairTask
     TClonesArray* fMusliCalDataCA; /**< Array with Musli Cal-input data. >*/
     TClonesArray* fMusliHitDataCA; /**< Array with Musli Hit-output data. >*/
     TClonesArray* fFrsDataCA;      /**< Array with Frs input data (for beta). >*/
+    Bool_t fFrsSciTofCal;          // need to know if FrsSciTofCal or FrsData is used
 
     Bool_t fOnline; // Don't store data for online
 
