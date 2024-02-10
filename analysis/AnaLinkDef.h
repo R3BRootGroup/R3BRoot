@@ -50,6 +50,7 @@
 #pragma link C++ class R3BFiberTrackingOnlineSpectra+;
 #pragma link C++ class R3BGeneralOnlineSpectra+;
 #pragma link C++ class R3BIncomingIDOnlineSpectra+;
+#pragma link C++ class R3BTofDvsTttxOnlineSpectra+;
 #pragma link C++ class R3BOnlineSyncCheck+;
 
 #endif
