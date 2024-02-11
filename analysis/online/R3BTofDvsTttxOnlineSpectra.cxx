@@ -68,13 +68,18 @@ InitStatus R3BTofDvsTttxOnlineSpectra::Init()
 
     // Create histograms for detectors
     cCTofDTx = std::make_unique<TCanvas>("TofD_Tttx_charges", "TofD vs Tttx-Charges", 10, 10, 500, 500);
-    fh2_charges.resize(fNbHist1);
+    cCTofDTx->Divide(fNbHist_tofd_tttx, 2);
+    fh2_charges.resize(fNbHist_tofd_tttx * 2);
 
-    for (int i = 0; i < fNbHist1; i++)
+    for (int i = 0; i < 2 * fNbHist_tofd_tttx; i++)
     {
         cCTofDTx->cd(i + 1);
+        gPad->SetLogz();
         std::stringstream ss1;
-        ss1 << "fh2_TofD_Tttx_charge_" << i;
+        if (i < fNbHist_tofd_tttx)
+            ss1 << "fh2_TofD_Tttx_charge_" << i;
+        else
+            ss1 << "fh2_TofD_Tttx_charge_highest_" << i;
         fh2_charges[i] = R3B::root_owned<TH2F>(ss1.str().c_str(), ss1.str().c_str(), 400, 0, 10, 400, 0, 10);
         fh2_charges[i]->GetXaxis()->SetTitle("TofD-Charge");
         fh2_charges[i]->GetYaxis()->SetTitle("Tttx-Charge");
@@ -143,20 +148,24 @@ void R3BTofDvsTttxOnlineSpectra::Exec(Option_t* /*option*/)
             chargetofd = hit->GetEloss();
     }
 
-    double chargetttx = 0.;
+    double chargetttx[fNbHist_tofd_tttx] = { 0. };
     for (int ihit = 0; ihit < nHitsTx; ihit++)
     {
         auto hit = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(ihit));
         auto idet = hit->GetDetID();
-        if (idet > 0)
-            continue;
+        // if (idet > 0)
+        //   continue;
+        fh2_charges[idet]->Fill(chargetofd, hit->GetChargeZ());
         // Looking for the max. charge
-        if (hit->GetChargeZ() > chargetttx)
-            chargetttx = hit->GetChargeZ();
+        if (hit->GetChargeZ() > chargetttx[idet])
+            chargetttx[idet] = hit->GetChargeZ();
     }
 
-    if (chargetofd > fMinZTofd && chargetofd < fMaxZTofd && chargetttx > 0)
-        fh2_charges[0]->Fill(chargetofd, chargetttx);
+    for (int i = 0; i < fNbHist_tofd_tttx; i++)
+    {
+        if (chargetofd > fMinZTofd && chargetofd < fMaxZTofd && chargetttx[i] > 0)
+            fh2_charges[i + fNbHist_tofd_tttx]->Fill(chargetofd, chargetttx[i]);
+    }
 
     fNEvents += 1;
 }

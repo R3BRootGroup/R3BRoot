@@ -27,7 +27,7 @@ class TH2F;
 class TClonesArray;
 class R3BEventHeader;
 
-constexpr const int8_t fNbHist1 = 1;
+constexpr const int8_t fNbHist_tofd_tttx = 3;
 
 class R3BTofDvsTttxOnlineSpectra : public FairTask
 {
