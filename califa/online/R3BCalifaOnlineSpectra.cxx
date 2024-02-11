@@ -233,19 +233,20 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifa_NsNf->Divide(1, 3);
     fh2_Califa_NsNf.resize(3);
 
+    std::vector<std::string> region = { "Barrel", "iPhos", "CEPA" };
     for (Int_t i = 0; i < fh2_Califa_NsNf.size(); i++)
     {
         std::stringstream ss1;
-        ss1 << "PID_" << (i + 1);
+        ss1 << "PID_" << region[i];
         fh2_Califa_NsNf[i] =
-            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", 250, 0., 500., 200, 0., 1.);
+            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", 500, 0., 500., 600, 0., 1.);
         fh2_Califa_NsNf[i]->GetXaxis()->SetTitle("Ns+Nf Energies [MeV]");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitle("Nf/(Nf+Ns)");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_Califa_NsNf[i]->GetXaxis()->CenterTitle(true);
         fh2_Califa_NsNf[i]->GetYaxis()->CenterTitle(true);
-        gPad->SetLogz();
         cCalifa_NsNf->cd(i + 1);
+        gPad->SetLogz();
         fh2_Califa_NsNf[i]->Draw("COLZ");
     }
 
@@ -435,7 +436,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                                                                              fMaxBinChannelFebex,
                                                                              fBinsChannelFebex,
                                                                              0,
-                                                                             fMaxBinChannelFebex);
+                                                                             fMaxBinChannelFebex / 3);
                         fh2_crystalsETot[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh2_crystalsETot[s][r][p][j]->GetYaxis()->SetTitle("Tot");
@@ -446,7 +447,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                         fh2_crystalsETot[s][r][p][j]->GetYaxis()->CenterTitle(true);
                         fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitleOffset(1.);
                         cMapCryTot[s][r][p]->cd(j + 1);
-                        fh2_crystalsETot[s][r][p][j]->Draw();
+                        fh2_crystalsETot[s][r][p][j]->Draw("col");
                     }
                     if (fFebexInfo[s][r][p][2] != -1)
                     {
@@ -485,7 +486,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                                                                                fMaxBinChannelFebex,
                                                                                fBinsChannelFebex,
                                                                                0,
-                                                                               fMaxBinChannelFebex);
+                                                                               fMaxBinChannelFebex / 3);
                         fh2_crystalsETot_p[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->SetTitle("Tot");
@@ -496,7 +497,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                         fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->CenterTitle(true);
                         fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitleOffset(1.);
                         cMapCryPTot[s][r][p]->cd(j + 1);
-                        fh2_crystalsETot_p[s][r][p][j]->Draw();
+                        fh2_crystalsETot_p[s][r][p][j]->Draw("col");
                     }
                 }
             }
@@ -1480,17 +1481,20 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             auto nf_ns = (hit->GetNs() + hit->GetNf());
             if (nf_ns > 0. && hit->GetNs() > 0 && hit->GetNf() > 0)
             {
-                if (cryId <= BarrelCrystals)
+                if (cryId > fNbCalifaCrystals / 2)
                 {
-                    fh2_Califa_NsNf[0]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
-                }
-                else if (cryId <= iPhosCrystals)
-                {
-                    fh2_Califa_NsNf[1]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
-                }
-                else
-                {
-                    fh2_Califa_NsNf[2]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                    if (cryId <= BarrelCrystals)
+                    {
+                        fh2_Califa_NsNf[0]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                    }
+                    else if (cryId <= iPhosCrystals)
+                    {
+                        fh2_Califa_NsNf[1]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                    }
+                    else
+                    {
+                        fh2_Califa_NsNf[2]->Fill(nf_ns / 1000., hit->GetNf() / nf_ns);
+                    }
                 }
             }
 
