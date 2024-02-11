@@ -44,5 +44,6 @@
 
 #pragma link C++ class R3BMwpcOnlineSpectra+;
 #pragma link C++ class R3BMwpcCorrelationOnlineSpectra+;
+#pragma link C++ class R3BMwpcVsMusliCorrelationOnlineSpectra+;
 
 #endif
