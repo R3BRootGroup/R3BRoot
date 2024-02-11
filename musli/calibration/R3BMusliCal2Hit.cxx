@@ -137,7 +137,7 @@ InitStatus R3BMusliCal2Hit::Init()
         R3BLOG(info, "R3BMusliCal2Hit::Init() MusliCalData not found.");
     }
 
-    fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsSciCalData"));
+    fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsSciTofCalData"));
     if (fFrsDataCA)
     {
         fFrsSciTofCal = kTRUE;
@@ -148,7 +148,7 @@ InitStatus R3BMusliCal2Hit::Init()
         fFrsDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("FrsData"));
         if (!fFrsDataCA)
         {
-            R3BLOG(info, "R3BMusliCal2Hit::Init() FrsSciCalData not found, try FrsData");
+            R3BLOG(info, "R3BMusliCal2Hit::Init() FrsSciTofCalData not found, try FrsData");
             R3BLOG(info, "R3BMusliCal2Hit::Init() FrsData not found neither");
         }
     }
