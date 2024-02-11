@@ -75,7 +75,9 @@ Bool_t R3BMosaicReader::R3BRead()
         for (int hits = 0; hits < fData->MOSAIC[mosid].CHIP; hits++)
         {
             int fChipId = fData->MOSAIC[mosid].CHIPv[hits];
-            R3BLOG_IF(error, fChipId < 1, "Wrong fChipId: " << fChipId);
+            // R3BLOG_IF(error, fChipId < 1, "Wrong fChipId: " << fChipId);
+            if (fChipId == 0)
+                continue;
 
             int fAlpideId = mosid * 6 + fChipId;
             R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
