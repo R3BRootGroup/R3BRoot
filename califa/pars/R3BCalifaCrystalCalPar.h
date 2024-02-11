@@ -57,7 +57,7 @@ class R3BCalifaCrystalCalPar : public FairParGenericSet
     inline void SetNumParametersFit(int numberParams) { fNumParamsFit = numberParams; }
     inline void SetCryCalParams(Float_t cc, int cry)
     {
-        assert(std::clamp(cry, 1, fNumCrystals) == cry && "Number of crystal out of range");
+        assert(std::clamp(cry, 1, fNumCrystals * fNumParamsFit) == cry && "Number of crystal out of range");
         fCryCalParams->AddAt(cc, cry);
     }
 
