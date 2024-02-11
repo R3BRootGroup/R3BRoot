@@ -101,11 +101,11 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     TString Name2;
 
     cMWPCCal2D =
-        new TCanvas(fNameDet1 + "-" + fNameDet2 + "_cal", fNameDet1 + "-" + fNameDet2 + " cal info", 10, 10, 800, 700);
+        new TCanvas(fNameDet1 + "_" + fNameDet2 + "_cal", fNameDet1 + "-" + fNameDet2 + " cal info", 10, 10, 800, 700);
     cMWPCCal2D->Divide(2, 1);
 
     // MWPC: Cal data
-    Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_calx";
+    Name1 = "fh2_" + fNameDet1 + "_" + fNameDet2 + "_calx";
     Name2 = "Position-X: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
         fh2_mwpc_calx = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
@@ -123,7 +123,7 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     cMWPCCal2D->cd(1);
     fh2_mwpc_calx->Draw("col");
 
-    Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_caly";
+    Name1 = "fh2_" + fNameDet1 + "_" + fNameDet2 + "_caly";
     Name2 = "Position-Y: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
         fh2_mwpc_caly = R3B::root_owned<TH2F>(Name1, Name2, 64, 0.5, 64.5, 64, 0.5, 64.5);
@@ -142,7 +142,7 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     fh2_mwpc_caly->Draw("col");
 
     cMWPCHit2D =
-        new TCanvas(fNameDet1 + "-" + fNameDet2 + "_hit", fNameDet1 + "-" + fNameDet2 + " hit info", 10, 10, 800, 700);
+        new TCanvas(fNameDet1 + "_" + fNameDet2 + "_hit", fNameDet1 + "-" + fNameDet2 + " hit info", 10, 10, 800, 700);
     cMWPCHit2D->Divide(2, 1);
 
     // MWPC: Hit data
@@ -164,7 +164,7 @@ InitStatus R3BMwpcCorrelationOnlineSpectra::Init()
     cMWPCHit2D->cd(1);
     fh2_mwpc_hitx->Draw("col");
 
-    Name1 = "fh2_" + fNameDet1 + "-" + fNameDet2 + "_hity";
+    Name1 = "fh2_" + fNameDet1 + "_" + fNameDet2 + "_hity";
     Name2 = "Position-Y: " + fNameDet1 + " vs " + fNameDet2;
     if (fNameDet2 != "Mwpc3")
         fh2_mwpc_hity = R3B::root_owned<TH2F>(Name1, Name2, 500, -100., 100., 500, -100., 100.);
