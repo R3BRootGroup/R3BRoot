@@ -11,14 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROOT_R3BNEULANDONLINESPECTRA_H
-#define R3BROOT_R3BNEULANDONLINESPECTRA_H
+#pragma once
 
-#include "FairTask.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
 #include "R3BPaddleTamexMappedData.h"
-#include "TCAConnector.h"
+
+#include <FairTask.h>
+#include <TCAConnector.h>
 #include <array>
 
 class TCanvas;
@@ -28,7 +28,6 @@ class R3BEventHeader;
 
 class R3BNeulandOnlineSpectra : public FairTask
 {
-
   public:
     R3BNeulandOnlineSpectra();
 
@@ -38,15 +37,15 @@ class R3BNeulandOnlineSpectra : public FairTask
 
     void ResetHistos();
     void ResetHistosMapped();
-    void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
+    inline void SetDistanceToTarget(double zpos) { fDistanceToTarget = zpos; }
 
-    void SetCosmicTpat(UInt_t CosmicTpat = 0) { fCosmicTpat = CosmicTpat; }
+    inline void SetCosmicTpat(UInt_t CosmicTpat = 0) { fCosmicTpat = CosmicTpat; }
 
   private:
     static const unsigned int fNPlanes = 26;
     static const unsigned int fNBars = fNPlanes * 50;
 
-    R3BEventHeader* fEventHeader;
+    R3BEventHeader* fEventHeader = nullptr;
 
     TCAInputConnector<R3BPaddleTamexMappedData> fNeulandMappedData;
     TCAInputConnector<R3BNeulandCalData> fNeulandCalData;
@@ -96,9 +95,9 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH1D* hTOF;
     TH1D* hTOFc;
 
-    double fDistanceToTarget;
+    double fDistanceToTarget = 0.;
 
-    bool fIsOnline;
+    bool fIsOnline = false;
 
     UInt_t fCosmicTpat = 0;
 
@@ -107,5 +106,3 @@ class R3BNeulandOnlineSpectra : public FairTask
 
     ClassDefOverride(R3BNeulandOnlineSpectra, 0)
 };
-
-#endif // R3BROOT_R3BNEULANDONLINESPECTRA_H

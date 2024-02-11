@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-
-#include "R3BLogger.h"
 #include "R3BNeulandTamexReader.h"
+#include "R3BLogger.h"
 #include "R3BPaddleTamexMappedData.h"
 
-#include "TClonesArray.h"
-#include "ext_data_struct_info.hh"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
+#include <ext_data_struct_info.hh>
 
 /**
  ** ext_h101_raw_nnp_tamex.h was created by running
@@ -184,4 +184,4 @@ void R3BNeulandTamexReader::Reset()
         fArrayTrigger->Clear();
 }
 
-ClassImp(R3BNeulandTamexReader);
+ClassImp(R3BNeulandTamexReader)
