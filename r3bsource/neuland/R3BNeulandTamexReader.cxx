@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,19 +11,19 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include <FairLogger.h>
-#include <FairRootManager.h>
+#include "FairLogger.h"
+#include "FairRootManager.h"
 
 #include "R3BLogger.h"
 #include "R3BNeulandTamexReader.h"
 #include "R3BPaddleTamexMappedData.h"
 
-#include <TClonesArray.h>
-#include <ext_data_struct_info.hh>
+#include "TClonesArray.h"
+#include "ext_data_struct_info.hh"
 
 /**
  ** ext_h101_raw_nnp_tamex.h was created by running
- ** $unpacker --ntuple=STRUCT_HH,RAW:NN_P,id=h101_raw_nnp_tamex,NOTRIGEVENTNO,ext_h101_raw_nnp_tamex.h
+ ** $unpacker --ntuple=STRUCT_HH,RAW:NN,id=h101_raw_nnp_tamex,NOTRIGEVENTNO,ext_h101_raw_nnp_tamex.h
  **/
 
 extern "C"
@@ -40,8 +40,7 @@ R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex_onion* d
     , fSkiptriggertimes(kFALSE)
     , fArray(new TClonesArray("R3BPaddleTamexMappedData"))
     , fArrayTrigger(new TClonesArray("R3BPaddleTamexMappedData"))
-    , fNofPlanes(sizeof(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P) /
-                 sizeof(*(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P)))
+    , fNofPlanes(sizeof(fData->NN_P) / sizeof(fData->NN_P[0]))
 {
 }
 
@@ -161,13 +160,13 @@ Bool_t R3BNeulandTamexReader::R3BRead()
     if (fArrayTrigger)
     {
         int v_i = 0;
-        for (int i_i = 0; i_i < fData->NN_TRIGCM; ++i_i)
+        for (int i_i = 0; i_i < fData->NN_TRIGCLM; ++i_i)
         {
-            auto ch = fData->NN_TRIGCMI[i_i];
-            for (; v_i < fData->NN_TRIGCME[i_i]; ++v_i)
+            auto ch = fData->NN_TRIGCLMI[i_i];
+            for (; v_i < fData->NN_TRIGCLME[i_i]; ++v_i)
             {
-                auto coarse = fData->NN_TRIGCv[v_i];
-                auto fine = fData->NN_TRIGFv[v_i];
+                auto coarse = fData->NN_TRIGCLv[v_i];
+                auto fine = fData->NN_TRIGFLv[v_i];
                 auto mapped = new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()]) R3BPaddleTamexMappedData(0, ch);
                 mapped->fCoarseTime1LE = coarse;
                 mapped->fFineTime1LE = fine;
@@ -185,4 +184,4 @@ void R3BNeulandTamexReader::Reset()
         fArrayTrigger->Clear();
 }
 
-ClassImp(R3BNeulandTamexReader)
+ClassImp(R3BNeulandTamexReader);

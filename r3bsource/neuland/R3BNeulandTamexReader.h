@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,7 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#pragma once
+#ifndef R3BNEULANDTAMEXREADER_H
+#define R3BNEULANDTAMEXREADER_H
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -42,19 +43,19 @@ class R3BNeulandTamexReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    inline void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(Bool_t option) { fOnline = option; }
 
     // Set the maximum number of planes
-    inline void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
+    void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
 
     // Accessor to skip trigger times
-    inline void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
 
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
     size_t fOffset;                          // Data offset
-    TClonesArray* fArray;                    // Output array
-    TClonesArray* fArrayTrigger;             // Output array, cards' trigger
+    TClonesArray* fArray = nullptr;          // Output array
+    TClonesArray* fArrayTrigger = nullptr;   // Output array, cards' trigger
     UInt_t fNofPlanes;                       // Number of planes
     Bool_t fOnline;                          // Don't store data for online
     Bool_t fSkiptriggertimes;                // Skip trigger times
@@ -62,3 +63,5 @@ class R3BNeulandTamexReader : public R3BReader
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);
 };
+
+#endif
