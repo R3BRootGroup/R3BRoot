@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,25 +12,25 @@
  ******************************************************************************/
 
 #include "R3BNeulandOnlineSpectra.h"
-#include "FairRunOnline.h"
 #include "R3BEventHeader.h"
-#include "TCanvas.h"
-#include "TFile.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "THttpServer.h"
+#include "R3BShared.h"
+
+#include <FairRunOnline.h>
+
 #include <FairRootManager.h>
+#include <TCanvas.h>
+#include <TFile.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <THttpServer.h>
 #include <iostream>
 #include <limits>
 
 R3BNeulandOnlineSpectra::R3BNeulandOnlineSpectra()
     : FairTask("R3BNeulandOnlineSpectra", 0)
-    , fEventHeader(nullptr)
     , fNeulandMappedData("NeulandMappedData")
     , fNeulandCalData("NeulandCalData")
     , fNeulandHits("NeulandHits")
-    , fCosmicTpat(0)
-    , fIsOnline(false)
 {
 }
 
@@ -73,28 +73,28 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasMapped->Divide(1, 2);
 
     canvasMapped->cd(1);
-    ahMappedBar1[0] = new TH1D("hMappedBar1fLE", "Mapped: Bars fine 1LE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar1[0] = R3B::root_owned<TH1D>("hMappedBar1fLE", "Mapped: Bars fine 1LE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar1[0]->Draw();
-    ahMappedBar1[1] = new TH1D("hMappedBar1fTE", "Mapped: Bars fine 1TE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar1[1] = R3B::root_owned<TH1D>("hMappedBar1fTE", "Mapped: Bars fine 1TE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar1[1]->SetLineColor(1);
     ahMappedBar1[1]->Draw("same");
-    ahMappedBar1[2] = new TH1D("hMappedBar1cLE", "Mapped: Bars coarse 1LE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar1[2] = R3B::root_owned<TH1D>("hMappedBar1cLE", "Mapped: Bars coarse 1LE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar1[2]->SetLineColor(2);
     ahMappedBar1[2]->Draw("same");
-    ahMappedBar1[3] = new TH1D("hMappedBar1cTE", "Mapped: Bars coarse 1TE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar1[3] = R3B::root_owned<TH1D>("hMappedBar1cTE", "Mapped: Bars coarse 1TE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar1[3]->SetLineColor(6);
     ahMappedBar1[3]->Draw("same");
 
     canvasMapped->cd(2);
-    ahMappedBar2[0] = new TH1D("hMappedBar2fLE", "Mapped: Bars fine 2LE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar2[0] = R3B::root_owned<TH1D>("hMappedBar2fLE", "Mapped: Bars fine 2LE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar2[0]->Draw();
-    ahMappedBar2[1] = new TH1D("hMappedBar2fTE", "Mapped: Bars fine 2TE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar2[1] = R3B::root_owned<TH1D>("hMappedBar2fTE", "Mapped: Bars fine 2TE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar2[1]->SetLineColor(1);
     ahMappedBar2[1]->Draw("same");
-    ahMappedBar2[2] = new TH1D("hMappedBar2cLE", "Mapped: Bars coarse 2LE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar2[2] = R3B::root_owned<TH1D>("hMappedBar2cLE", "Mapped: Bars coarse 2LE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar2[2]->SetLineColor(2);
     ahMappedBar2[2]->Draw("same");
-    ahMappedBar2[3] = new TH1D("hMappedBar2cTE", "Mapped: Bars coarse 2TE", fNBars, 0.5, fNBars + 0.5);
+    ahMappedBar2[3] = R3B::root_owned<TH1D>("hMappedBar2cTE", "Mapped: Bars coarse 2TE", fNBars, 0.5, fNBars + 0.5);
     ahMappedBar2[3]->SetLineColor(6);
     ahMappedBar2[3]->Draw("same");
 
@@ -107,12 +107,13 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     auto canvasJump = new TCanvas("NeulandJumps", "NeulandJumps", 10, 10, 850, 850);
     canvasJump->Divide(1, 2);
 
-    hJumpsvsEvnt = new TH2D("hJumpsvsEvnt", "Jumps vs Evnt", 1000, 0, 10000000, 1000, -11000, 11000);
+    hJumpsvsEvnt = R3B::root_owned<TH2D>("hJumpsvsEvnt", "Jumps vs Evnt", 1000, 0, 10000000, 1000, -11000, 11000);
     canvasJump->cd(1);
     gPad->SetLogz();
     hJumpsvsEvnt->Draw("colz");
 
-    hJumpsvsEvntzoom = new TH2D("hJumpsvsEvntzoom", "Jumps vs Evnt zoomed", 1000, 0, 10000000, 1000, -200, 200);
+    hJumpsvsEvntzoom =
+        R3B::root_owned<TH2D>("hJumpsvsEvntzoom", "Jumps vs Evnt zoomed", 1000, 0, 10000000, 1000, -200, 200);
     canvasJump->cd(2);
     gPad->SetLogz();
     hJumpsvsEvntzoom->Draw("colz");
@@ -126,32 +127,34 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     auto canvasCal = new TCanvas("NeulandCal", "NeulandCal", 10, 10, 850, 850);
     canvasCal->Divide(2, 3);
 
-    hTstart = new TH1D("hTstart", "Tstart", 1000, -10000., 50000.);
+    hTstart = R3B::root_owned<TH1D>("hTstart", "Tstart", 1000, -10000., 50000.);
     canvasCal->cd(1);
     hTstart->Draw();
 
-    hNstart = new TH1D("hNstart", "Nstart", 20, 0.5, 20.5);
-    hTestJump = new TH2D("hTestJump", "Test Jump", fNBars, 0.5, fNBars + 0.5, 1000, -11000., 11000.);
+    hNstart = R3B::root_owned<TH1D>("hNstart", "Nstart", 20, 0.5, 20.5);
+    hTestJump = R3B::root_owned<TH2D>("hTestJump", "Test Jump", fNBars, 0.5, fNBars + 0.5, 1000, -11000., 11000.);
     canvasCal->cd(2);
     // hNstart->Draw();
     gPad->SetLogz();
     hTestJump->Draw("colz");
 
-    ahCalTvsBar[0] =
-        new TH2D("hCalT1vsBar", "CalLevel: Time1 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
+    ahCalTvsBar[0] = R3B::root_owned<TH2D>(
+        "hCalT1vsBar", "CalLevel: Time1 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
     canvasCal->cd(3);
     ahCalTvsBar[0]->Draw("colz");
 
-    ahCalTvsBar[1] =
-        new TH2D("hCalT2vsBar", "CalLevel: Time2 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
+    ahCalTvsBar[1] = R3B::root_owned<TH2D>(
+        "hCalT2vsBar", "CalLevel: Time2 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
     canvasCal->cd(4);
     ahCalTvsBar[1]->Draw("colz");
 
-    ahCalEvsBar[0] = new TH2D("hCalE1vsBar", "CalLevel: Energy1 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
+    ahCalEvsBar[0] =
+        R3B::root_owned<TH2D>("hCalE1vsBar", "CalLevel: Energy1 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
     canvasCal->cd(5);
     ahCalEvsBar[0]->Draw("colz");
 
-    ahCalEvsBar[1] = new TH2D("hCalE2vsBar", "CalLevel: Energy2 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
+    ahCalEvsBar[1] =
+        R3B::root_owned<TH2D>("hCalE2vsBar", "CalLevel: Energy2 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
     canvasCal->cd(6);
     ahCalEvsBar[1]->Draw("colz");
 
@@ -164,22 +167,23 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     auto canvasHit = new TCanvas("NeulandHit", "NeulandHit", 10, 10, 850, 850);
     canvasHit->Divide(2, 2);
 
-    hHitEvsBar = new TH2D("hHitEvsBar", "HitLevel: Energy vs Bars ", fNBars, 0.5, fNBars + 0.5, 1000, 0, 60);
+    hHitEvsBar =
+        R3B::root_owned<TH2D>("hHitEvsBar", "HitLevel: Energy vs Bars ", fNBars, 0.5, fNBars + 0.5, 1000, 0, 60);
     canvasHit->cd(1);
     hHitEvsBar->Draw("colz");
 
-    hTdiffvsBar = new TH2D("hTdiffvsBar", "Tdiff vs Bars", fNBars, 0.5, fNBars + 0.5, 1000, -60, 60);
+    hTdiffvsBar = R3B::root_owned<TH2D>("hTdiffvsBar", "Tdiff vs Bars", fNBars, 0.5, fNBars + 0.5, 1000, -60, 60);
     canvasHit->cd(2);
     hTdiffvsBar->Draw("colz");
 
-    hToFvsBar = new TH2D("hTofvsBar", "Tof vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
-    hToFcvsBar = new TH2D("hTofcvsBar", "Tofc vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
+    hToFvsBar = R3B::root_owned<TH2D>("hTofvsBar", "Tof vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
+    hToFcvsBar = R3B::root_owned<TH2D>("hTofcvsBar", "Tofc vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
     canvasHit->cd(3);
     // hToFcvsBar->Draw("colz");
     hToFvsBar->Draw("colz");
 
-    hTofvsEhit = new TH2D("hTofvsEhit", "Tof vs Ehit", 2000, 0, 120, 6000, -100, 400);
-    hTofcvsEhit = new TH2D("hTofcvsEhit", "Tofc vs Ehit", 2000, 0, 120, 6000, -100, 400);
+    hTofvsEhit = R3B::root_owned<TH2D>("hTofvsEhit", "Tof vs Ehit", 2000, 0, 120, 6000, -100, 400);
+    hTofcvsEhit = R3B::root_owned<TH2D>("hTofcvsEhit", "Tofc vs Ehit", 2000, 0, 120, 6000, -100, 400);
     canvasHit->cd(4);
     // hTofcvsEhit->Draw("colz");
     hTofvsEhit->Draw("colz");
@@ -193,27 +197,31 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     auto canvasHitCosmics = new TCanvas("NeulandHitCosmics", "NeulandHitCosmics", 10, 10, 850, 850);
     canvasHitCosmics->Divide(2, 2);
 
-    hHitEvsBarCosmics =
-        new TH2D("hHitEvsBarCosmics", "HitLevel: Energy vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, 0, 60);
+    hHitEvsBarCosmics = R3B::root_owned<TH2D>(
+        "hHitEvsBarCosmics", "HitLevel: Energy vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, 0, 60);
     canvasHitCosmics->cd(1);
     hHitEvsBarCosmics->Draw("colz");
 
     hTdiffvsBarCosmics =
-        new TH2D("hTdiffvsBarCosmics", "Tdiff vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -60, 60);
+        R3B::root_owned<TH2D>("hTdiffvsBarCosmics", "Tdiff vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -60, 60);
     canvasHitCosmics->cd(2);
     hTdiffvsBarCosmics->Draw("colz");
 
-    hDT675 = new TH2D("hDT675", "Thit - Thit675 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT675 =
+        R3B::root_owned<TH2D>("hDT675", "Thit - Thit675 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
     canvasHitCosmics->cd(3);
     hDT675->Draw("colz");
 
-    hDT675c = new TH2D("hDT675c", "Thit - Thit675 vs Bars cosmics corrected", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT675c = R3B::root_owned<TH2D>(
+        "hDT675c", "Thit - Thit675 vs Bars cosmics corrected", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
 
-    hDT625 = new TH2D("hDT625", "Thit - Thit625 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT625 =
+        R3B::root_owned<TH2D>("hDT625", "Thit - Thit625 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
     canvasHitCosmics->cd(4);
     hDT625->Draw("colz");
 
-    hDT625c = new TH2D("hDT625c", "Thit - Thit625 vs Bars cosmics corrected", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT625c = R3B::root_owned<TH2D>(
+        "hDT625c", "Thit - Thit625 vs Bars cosmics corrected", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
 
     canvasHitCosmics->cd(0);
     if (fIsOnline)
@@ -225,14 +233,14 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasPlaneXY->Divide(5, 6);
     for (unsigned int i = 0; i < fNPlanes; i++)
     {
-        ahXYperPlane[i] = new TH2D("hHitXYPlane" + TString::Itoa(i, 10),
-                                   "Hit XY Plane" + TString::Itoa(i, 10),
-                                   300,
-                                   -150,
-                                   150,
-                                   300,
-                                   -150,
-                                   150);
+        ahXYperPlane[i] = R3B::root_owned<TH2D>("hHitXYPlane" + TString::Itoa(i, 10),
+                                                "Hit XY Plane" + TString::Itoa(i, 10),
+                                                300,
+                                                -150,
+                                                150,
+                                                300,
+                                                -150,
+                                                150);
         canvasPlaneXY->cd(i + 1);
         ahXYperPlane[i]->Draw("colz");
     }
@@ -244,23 +252,24 @@ InitStatus R3BNeulandOnlineSpectra::Init()
 
     auto canvasPlaneSofia = new TCanvas("Timing", "Timing", 10, 10, 850, 850);
     canvasPlaneSofia->Divide(2, 2);
-    hTofvsX = new TH2D("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
-    hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
-    hTofvsY = new TH2D("hTofvsY", "Tof vs Y", 3000, -200., 200., 6000, 0, 300);
-    hTofcvsY = new TH2D("hTofcvsY", "Tofc vs Y", 3000, -200., 200., 6000, 0, 300);
-    hTofvsZ = new TH2D("hTofvsZ", "Tof vs Z", 26, 0, 26, 3000, 0, 300);
-    hTofcvsZ = new TH2D("hTofcvsZ", "Tofc vs Z", 26, 0, 26, 3000, 0, 300);
+    hTofvsX = R3B::root_owned<TH2D>("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
+    hTofcvsX = R3B::root_owned<TH2D>("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
+    hTofvsY = R3B::root_owned<TH2D>("hTofvsY", "Tof vs Y", 3000, -200., 200., 6000, 0, 300);
+    hTofcvsY = R3B::root_owned<TH2D>("hTofcvsY", "Tofc vs Y", 3000, -200., 200., 6000, 0, 300);
+    hTofvsZ = R3B::root_owned<TH2D>("hTofvsZ", "Tof vs Z", 26, 0, 26, 3000, 0, 300);
+    hTofcvsZ = R3B::root_owned<TH2D>("hTofcvsZ", "Tofc vs Z", 26, 0, 26, 3000, 0, 300);
 
-    hSofiaTime = new TH1D("hSofiaTime", "hSofiaTime", 50000, 0, 50000);
+    hSofiaTime = R3B::root_owned<TH1D>("hSofiaTime", "hSofiaTime", 50000, 0, 50000);
     // canvasPlaneSofia->cd(1);
     // hSofiaTime->Draw();
 
-    hNeuLANDvsStart = new TH2D("hNeuLANDvsStart", "hNeuLANDvsStart", 3000, -10000, 40000, 1000, -10000, 10000);
+    hNeuLANDvsStart =
+        R3B::root_owned<TH2D>("hNeuLANDvsStart", "hNeuLANDvsStart", 3000, -10000, 40000, 1000, -10000, 10000);
     canvasPlaneSofia->cd(1);
     hNeuLANDvsStart->Draw("colz");
 
-    hTOF = new TH1D("hTOF", "hTOF", 6000, -11000, 11000);
-    hTOFc = new TH1D("hTOFc", "hTOFc", 6000, -100, 500);
+    hTOF = R3B::root_owned<TH1D>("hTOF", "hTOF", 6000, -11000, 11000);
+    hTOFc = R3B::root_owned<TH1D>("hTOFc", "hTOFc", 6000, -100, 500);
     canvasPlaneSofia->cd(2);
     gPad->SetLogy();
     // hTOF->Draw();

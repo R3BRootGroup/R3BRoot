@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDTAMEXREADER_H
-#define R3BNEULANDTAMEXREADER_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -34,22 +33,22 @@ class R3BNeulandTamexReader : public R3BReader
     virtual ~R3BNeulandTamexReader() override;
 
     // Setup structure information
-    virtual Bool_t Init(ext_data_struct_info*) override;
+    auto Init(ext_data_struct_info* /*unused*/) -> Bool_t override;
 
     // Read data from full event structure
-    virtual Bool_t R3BRead() override;
+    auto R3BRead() -> Bool_t override;
 
     // Reset
-    virtual void Reset() override;
+    void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(Bool_t option) { fOnline = option; }
 
     // Set the maximum number of planes
-    void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
+    inline void SetMaxNbPlanes(UInt_t max) { fNofPlanes = max; }
 
     // Accessor to skip trigger times
-    void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
+    inline void SetSkipTriggerTimes() { fSkiptriggertimes = kTRUE; }
 
   private:
     EXT_STR_h101_raw_nnp_tamex_onion* fData; // Reader specific data structure from ucesb
@@ -63,5 +62,3 @@ class R3BNeulandTamexReader : public R3BReader
   public:
     ClassDefOverride(R3BNeulandTamexReader, 0);
 };
-
-#endif
