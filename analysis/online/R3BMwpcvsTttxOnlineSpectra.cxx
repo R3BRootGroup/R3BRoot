@@ -63,7 +63,7 @@ InitStatus R3BMwpcvsTttxOnlineSpectra::Init()
     fHitItemsMw = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc1HitData"));
     R3BLOG_IF(fatal, !fHitItemsMw, "Mwpc1HitData not found");
 
-    fHitItemsTttx = dynamic_cast<TClonesArray*>(mgr->GetObject("TttxHitData"));
+    fHitItemsTttx = dynamic_cast<TClonesArray*>(mgr->GetObject("tttxHitData"));
     R3BLOG_IF(fatal, !fHitItemsTttx, "TttxHitData not found");
 
     // Create histograms for detectors
@@ -79,6 +79,7 @@ InitStatus R3BMwpcvsTttxOnlineSpectra::Init()
     for (int i = 0; i < fNbHist; i++)
     {
         cCMwTx->cd(i + 1);
+        gPad->SetLogz();
         std::stringstream ss1;
         ss1 << "fh2_Mwpc_Tttx_Xcor_" << i;
         fh2_xcor[i] = R3B::root_owned<TH2F>(ss1.str().c_str(), ss1.str().c_str(), 400, -100, 100, 67, -50, 50);
