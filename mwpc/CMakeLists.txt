@@ -29,6 +29,7 @@ ${R3BROOT_SOURCE_DIR}/mwpc/mwpc1
 ${R3BROOT_SOURCE_DIR}/mwpc/mwpc2
 ${R3BROOT_SOURCE_DIR}/mwpc/mwpc3
 ${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/musliData
 )
 
 if(WITH_SOFIA)
