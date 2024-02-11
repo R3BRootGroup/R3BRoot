@@ -175,6 +175,9 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                 cHit_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
                 cHit_EvsAoQ->Divide(2, 2);
                 fh2_Hit_EvsAoQ = new TH2D*[4];
+                sprintf(Name1, "SciVsMusliHit_ZvsAoQ");
+                cHit_ZvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+                cHit_ZvsAoQ->Divide(2, 2);
                 fh2_Hit_ZvsAoQ = new TH2D*[4];
                 for (UShort_t i = 0; i < 4; i++)
                 {
@@ -196,7 +199,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                     fh2_Hit_ZvsAoQ[i] = new TH2D(Name1, Name1, 600, 0.5, 3.5, 100, -0.5, 9.5);
                     fh2_Hit_ZvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                     fh2_Hit_ZvsAoQ[i]->GetYaxis()->SetTitle(
-                        Form("<E>@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
+                        Form("Z@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
                     fh2_Hit_ZvsAoQ[i]->GetXaxis()->CenterTitle(true);
                     fh2_Hit_ZvsAoQ[i]->GetYaxis()->CenterTitle(true);
                     fh2_Hit_ZvsAoQ[i]->GetXaxis()->SetLabelSize(0.05);
