@@ -238,7 +238,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         std::stringstream ss1;
         ss1 << "PID_" << (i + 1);
         fh2_Califa_NsNf[i] =
-            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", bins, 0., 500., bins, 0., 1.);
+            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", 250, 0., 500., 200, 0., 1.);
         fh2_Califa_NsNf[i]->GetXaxis()->SetTitle("Ns+Nf Energies [MeV]");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitle("Nf/(Nf+Ns)");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitleOffset(1.4);
