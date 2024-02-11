@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -242,7 +242,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         run->AddObject(canvasPlaneXY);
     }
 
-    auto canvasPlaneSofia = new TCanvas("Timing!", "Timing!", 10, 10, 850, 850);
+    auto canvasPlaneSofia = new TCanvas("Timing", "Timing", 10, 10, 850, 850);
     canvasPlaneSofia->Divide(2, 2);
     hTofvsX = new TH2D("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
     hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
