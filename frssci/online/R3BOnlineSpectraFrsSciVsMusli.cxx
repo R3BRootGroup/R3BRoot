@@ -157,7 +157,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             for (UShort_t i = 0; i < 15; i++)
             {
                 sprintf(Name1, "E_vs_AoQ_sig%i", i + 1);
-                fh2_Cal_EvsAoQ[i] = new TH2D(Name1, Name1, 600, 0.5, 3.5, 15000, 0, 60000);
+                fh2_Cal_EvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 1500, 0, 60000);
                 fh2_Cal_EvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                 fh2_Cal_EvsAoQ[i]->GetYaxis()->SetTitle(Form("E@cal for signal%i", i + 1));
                 fh2_Cal_EvsAoQ[i]->GetXaxis()->CenterTitle(true);
@@ -171,6 +171,14 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             }
             if (fMusli_Hit && fIdCaveC > fIdS2)
             {
+                sprintf(Name1, "SciVsMusliHit_EvsTofRaw");
+                cHit_EvsTofRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+                cHit_EvsTofRaw->Divide(2, 2);
+                fh2_Hit_EvsTofRaw = new TH2D*[4];
+                sprintf(Name1, "SciVsMusliHit_EvsBeta");
+                cHit_EvsBeta = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+                cHit_EvsBeta->Divide(2, 2);
+                fh2_Hit_EvsBeta = new TH2D*[4];
                 sprintf(Name1, "SciVsMusliHit_EvsAoQ");
                 cHit_EvsAoQ = new TCanvas(Name1, Name1, 10, 10, 800, 700);
                 cHit_EvsAoQ->Divide(2, 2);
@@ -181,8 +189,36 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                 fh2_Hit_ZvsAoQ = new TH2D*[4];
                 for (UShort_t i = 0; i < 4; i++)
                 {
+                    sprintf(Name1, "Eave_vs_TofRaw_typ%i", i + 1);
+                    fh2_Hit_EvsTofRaw[i] = new TH2D(Name1, Name1, 1200, 1380, 1500, 2000, 0, 40000);
+                    fh2_Hit_EvsTofRaw[i]->GetXaxis()->SetTitle("TofRaw, from S2 to cave C");
+                    fh2_Hit_EvsTofRaw[i]->GetYaxis()->SetTitle(
+                        Form("<E>@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
+                    fh2_Hit_EvsTofRaw[i]->GetXaxis()->CenterTitle(true);
+                    fh2_Hit_EvsTofRaw[i]->GetYaxis()->CenterTitle(true);
+                    fh2_Hit_EvsTofRaw[i]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Hit_EvsTofRaw[i]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Hit_EvsTofRaw[i]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Hit_EvsTofRaw[i]->GetYaxis()->SetTitleSize(0.05);
+                    cHit_EvsTofRaw->cd(i + 1);
+                    fh2_Hit_EvsTofRaw[i]->Draw("col");
+
+                    sprintf(Name1, "Eave_vs_Beta_typ%i", i + 1);
+                    fh2_Hit_EvsBeta[i] = new TH2D(Name1, Name1, 1200, 0.69, 0.81, 2000, 0, 40000);
+                    fh2_Hit_EvsBeta[i]->GetXaxis()->SetTitle("Beta, from S2 to cave C");
+                    fh2_Hit_EvsBeta[i]->GetYaxis()->SetTitle(
+                        Form("<E>@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
+                    fh2_Hit_EvsBeta[i]->GetXaxis()->CenterTitle(true);
+                    fh2_Hit_EvsBeta[i]->GetYaxis()->CenterTitle(true);
+                    fh2_Hit_EvsBeta[i]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Hit_EvsBeta[i]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Hit_EvsBeta[i]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Hit_EvsBeta[i]->GetYaxis()->SetTitleSize(0.05);
+                    cHit_EvsBeta->cd(i + 1);
+                    fh2_Hit_EvsBeta[i]->Draw("col");
+
                     sprintf(Name1, "Eave_vs_AoQ_typ%i", i + 1);
-                    fh2_Hit_EvsAoQ[i] = new TH2D(Name1, Name1, 600, 0.5, 3.5, 1500, 0, 60000);
+                    fh2_Hit_EvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 2000, 0, 40000);
                     fh2_Hit_EvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                     fh2_Hit_EvsAoQ[i]->GetYaxis()->SetTitle(
                         Form("<E>@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
@@ -196,7 +232,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                     fh2_Hit_EvsAoQ[i]->Draw("col");
 
                     sprintf(Name1, "Z_vs_AoQ_typ%i", i + 1);
-                    fh2_Hit_ZvsAoQ[i] = new TH2D(Name1, Name1, 600, 0.5, 3.5, 100, -0.5, 9.5);
+                    fh2_Hit_ZvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 1000, -0.5, 9.5);
                     fh2_Hit_ZvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                     fh2_Hit_ZvsAoQ[i]->GetYaxis()->SetTitle(
                         Form("Z@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
@@ -226,6 +262,8 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             mainfol->Add(cCal_EvsAoQ);
             if (fMusli_Hit && fIdCaveC > fIdS2)
             {
+                mainfol->Add(cHit_EvsTofRaw);
+                mainfol->Add(cHit_EvsBeta);
                 mainfol->Add(cHit_EvsAoQ);
                 mainfol->Add(cHit_ZvsAoQ);
             }
@@ -262,6 +300,8 @@ void R3BOnlineSpectraFrsSciVsMusli::Reset_Histo()
             {
                 for (UShort_t i = 0; i < 4; i++)
                 {
+                    fh2_Hit_EvsTofRaw[i]->Reset();
+                    fh2_Hit_EvsBeta[i]->Reset();
                     fh2_Hit_EvsAoQ[i]->Reset();
                     fh2_Hit_ZvsAoQ[i]->Reset();
                 }
@@ -284,6 +324,9 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
     Double_t iRawPosCaveC = -1000.;
     Double_t iCalPosCaveC = -1000.;
     Double_t iAoQ = -1.;
+    Double_t iRawTof = -1.;
+    Double_t iCalTof = -1.;
+    Double_t iBeta = -1.;
     UInt_t iTyp;
 
     if (fFrsSci_PosCal && fMusli_Cal && fIdCaveC > 0)
@@ -317,53 +360,57 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
                     if (!hittofcal)
                         continue;
                     if (hittofcal->GetDetIdSta() == fIdS2 && hittofcal->GetDetIdSto() == fIdCaveC)
+                    {
+                        iRawTof = hittofcal->GetRawTofNs();
+                        iCalTof = hittofcal->GetCalTofNs();
+                        iBeta = hittofcal->GetBeta();
                         iAoQ = hittofcal->GetAoQ();
+                    }
                 }
             }
         }
 
         // --- read musli cal data and fill histo at MusliCal level--- //
-        if (fMusli_Cal)
+        if (fMusli_Cal->GetEntriesFast() > 0)
         {
-            if (fMusli_Cal->GetEntriesFast() > 0)
+            nHits = fMusli_Cal->GetEntriesFast();
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
             {
-                nHits = fMusli_Cal->GetEntriesFast();
+                R3BMusliCalData* hitcal = dynamic_cast<R3BMusliCalData*>(fMusli_Cal->At(ihit));
+                if (!hitcal)
+                    continue;
+                iSig = hitcal->GetSignal();
+                if (iSig > 15)
+                    continue;
+                if (iAoQ > 0)
+                    fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
+                if (iSig > 8)
+                    continue;
+                if (iRawPosCaveC != -1000.)
+                    fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
+                if (iCalPosCaveC != -1000.)
+                    fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
+            }
+        }
+
+        // --- read musli hit data and fill histo at MusliHit level--- //
+        if (fMusli_Hit)
+        {
+            if (fMusli_Hit->GetEntriesFast() > 0)
+            {
+                nHits = fMusli_Hit->GetEntriesFast();
                 for (UInt_t ihit = 0; ihit < nHits; ihit++)
                 {
-                    R3BMusliCalData* hitcal = dynamic_cast<R3BMusliCalData*>(fFrsSci_PosCal->At(ihit));
-                    if (!hitcal)
+                    R3BMusliHitData* hithit = dynamic_cast<R3BMusliHitData*>(fMusli_Hit->At(ihit));
+                    if (!hithit)
                         continue;
-                    iSig = hitcal->GetSignal();
-                    if (iSig > 15)
-                        continue;
+                    iTyp = hithit->GetType() - 1;
                     if (iAoQ > 0)
-                        fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
-                    if (iSig > 8)
-                        continue;
-                    if (iRawPosCaveC != -1000.)
-                        fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
-                    if (iCalPosCaveC != -1000.)
-                        fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
-                }
-            }
-
-            // --- read musli hit data and fill histo at MusliHit level--- //
-            if (fMusli_Hit)
-            {
-                if (fMusli_Hit->GetEntriesFast() > 0)
-                {
-                    nHits = fMusli_Hit->GetEntriesFast();
-                    for (UInt_t ihit = 0; ihit < nHits; ihit++)
                     {
-                        R3BMusliHitData* hithit = dynamic_cast<R3BMusliHitData*>(fFrsSci_PosCal->At(ihit));
-                        if (!hithit)
-                            continue;
-                        iTyp = hithit->GetType() - 1;
-                        if (iAoQ > 0)
-                        {
-                            fh2_Hit_EvsAoQ[iTyp]->Fill(iAoQ, hithit->GetEave());
-                            fh2_Hit_ZvsAoQ[iTyp]->Fill(iAoQ, hithit->GetZcharge());
-                        }
+                        fh2_Hit_EvsTofRaw[iTyp]->Fill(iRawTof, hithit->GetEave());
+                        fh2_Hit_EvsBeta[iTyp]->Fill(iRawTof, hithit->GetEave());
+                        fh2_Hit_EvsAoQ[iTyp]->Fill(iAoQ, hithit->GetEave());
+                        fh2_Hit_ZvsAoQ[iTyp]->Fill(iAoQ, hithit->GetZcharge());
                     }
                 }
             }
@@ -414,6 +461,8 @@ void R3BOnlineSpectraFrsSciVsMusli::FinishTask()
             {
                 for (UShort_t i = 0; i < 4; i++)
                 {
+                    fh2_Hit_EvsTofRaw[i]->Write();
+                    fh2_Hit_EvsBeta[i]->Write();
                     fh2_Hit_EvsAoQ[i]->Write();
                     fh2_Hit_ZvsAoQ[i]->Write();
                 }

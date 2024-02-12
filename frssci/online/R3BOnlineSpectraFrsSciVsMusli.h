@@ -106,12 +106,16 @@ class R3BOnlineSpectraFrsSciVsMusli : public FairTask
     TH2D** fh2_Cal_EvsAoQ;     // AoQ from S2 to cave C, one histo per signal [15]
 
     // Canvas FrsSciCal vs MusliHit
+    TCanvas* cHit_EvsTofRaw;
+    TCanvas* cHit_EvsBeta;
     TCanvas* cHit_EvsAoQ;
     TCanvas* cHit_ZvsAoQ;
 
     //// Histograms FrsSciCal vs MusliHit
-    TH2D** fh2_Hit_EvsAoQ; // AoQ calculated from S2 to Cave C, one histo per type of data
-    TH2D** fh2_Hit_ZvsAoQ; // AoQ calculated from S2 to Cave C, one histo per type of data
+    TH2D** fh2_Hit_EvsTofRaw; // TofRaw calculated from S2 to Cave C, one histo per type of data
+    TH2D** fh2_Hit_EvsBeta;   // Beta calculated from S2 to Cave C, one histo per type of data
+    TH2D** fh2_Hit_EvsAoQ;    // AoQ calculated from S2 to Cave C, one histo per type of data
+    TH2D** fh2_Hit_ZvsAoQ;    // AoQ calculated from S2 to Cave C, one histo per type of data
 
   public:
     ClassDef(R3BOnlineSpectraFrsSciVsMusli, 1)
