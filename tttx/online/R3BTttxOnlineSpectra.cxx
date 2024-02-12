@@ -135,10 +135,15 @@ InitStatus R3BTttxOnlineSpectra::Init()
     Double_t minCalT = -3000;
     Double_t maxCalT = 3000;
 
+    // Z of detector
+    Double_t binsZ = 100;
+    Double_t minZ = 0;
+    Double_t maxZ = 10;
+
     // Pos of detector
-    Double_t binsX = 50;
-    Double_t minX = 0;
-    Double_t maxX = 100;
+    Double_t binsX = 32;
+    Double_t minX = -50;
+    Double_t maxX = 50;
 
     // MAIN FOLDER
     TFolder* mainfolTTTX = new TFolder("TTT10", "TTT10 info");
@@ -345,7 +350,7 @@ InitStatus R3BTttxOnlineSpectra::Init()
         fh2_HitTimeVsPos[i]->GetYaxis()->SetTitle("Time [ns]");
         fh2_HitTimeVsPos[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_HitTimeVsPos[i]->GetXaxis()->CenterTitle(true);
-        cHit->cd(i + 1);
+        cHit->cd(i + 3);
         fh2_HitTimeVsPos[i]->Draw("colz");
     }
 
@@ -369,15 +374,15 @@ InitStatus R3BTttxOnlineSpectra::Init()
     cHit->cd(6);
     fh2_HitECorr->Draw("colz");
 
-    sprintf(Name1, "fh2_hit_time_correlation");
-    sprintf(Name2, "Time of Det 2 Vs Time of Det 1");
-    fh2_HitTCorr = R3B::root_owned<TH2F>(Name1, Name2, binsCalT, minCalT, maxCalT, binsCalT, minCalT, maxCalT);
-    fh2_HitTCorr->GetXaxis()->SetTitle("Time of Det 1 [ns]");
-    fh2_HitTCorr->GetYaxis()->SetTitle("Time of Det 2 [ns]");
-    fh2_HitTCorr->GetYaxis()->SetTitleOffset(1.4);
-    fh2_HitTCorr->GetXaxis()->CenterTitle(true);
+    sprintf(Name1, "fh2_hit_z_correlation");
+    sprintf(Name2, "Z of Det 2 Vs Z of Det 1");
+    fh2_HitZCorr = R3B::root_owned<TH2F>(Name1, Name2, binsZ, minZ, maxZ, binsZ, minZ, maxZ);
+    fh2_HitZCorr->GetXaxis()->SetTitle("Z of Det 1");
+    fh2_HitZCorr->GetYaxis()->SetTitle("Z of Det 2");
+    fh2_HitZCorr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_HitZCorr->GetXaxis()->CenterTitle(true);
     cHit->cd(7);
-    fh2_HitTCorr->Draw("colz");
+    fh2_HitZCorr->Draw("colz");
 
     sprintf(Name1, "fh2_hit_pos_correlation");
     sprintf(Name2, "Position of Det 2 Hit Vs Position of Det 1 Hit");
@@ -432,7 +437,7 @@ void R3BTttxOnlineSpectra::Reset_Histo()
     }
     fh2_HitMultCorr->Reset();
     fh2_HitECorr->Reset();
-    fh2_HitTCorr->Reset();
+    fh2_HitZCorr->Reset();
     fh2_HitPosCorr->Reset();
 }
 
@@ -584,7 +589,6 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
     }
     hit_mult.clear();
     hit_mult.resize(fNbDets);
-
     Double_t pos = 0;
     for (Int_t j = 0; j < fNbDets; j++)
         hit_mult[j] = 0;
@@ -597,30 +601,33 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
         {
             continue;
         }
-        det = hit->GetDetID() - 1;
-        pos = hit->GetX();
+        if (hit->GetDetID() == 1 || hit->GetDetID() == 2)
+        { // don't consider DetID==0 (both)
+            det = hit->GetDetID() - 1;
+            pos = hit->GetX();
 
-        fh2_HitEnergyVsPos[det]->Fill(pos, hit->GetEnergy());
-        fh2_HitTimeVsPos[det]->Fill(pos, hit->GetTime());
-        hit_mult[det]++;
-        for (int jhit = ihit + 1; jhit < nHitHits; jhit++)
-        {
-            R3BTttxHitData* hit2 = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(jhit));
-            if (det == hit2->GetDetID() - 1)
+            fh2_HitEnergyVsPos[det]->Fill(pos, hit->GetEnergy());
+            fh2_HitTimeVsPos[det]->Fill(pos, hit->GetTime());
+            hit_mult[det]++;
+            for (int jhit = ihit + 1; jhit < nHitHits; jhit++)
             {
-                continue;
-            }
-            if (det == 0)
-            {
-                fh2_HitECorr->Fill(hit->GetEnergy(), hit2->GetEnergy());
-                fh2_HitTCorr->Fill(hit->GetTime(), hit2->GetTime());
-                fh2_HitPosCorr->Fill(hit->GetX(), hit2->GetX());
-            }
-            else
-            {
-                fh2_HitECorr->Fill(hit2->GetEnergy(), hit->GetEnergy());
-                fh2_HitTCorr->Fill(hit2->GetTime(), hit->GetTime());
-                fh2_HitPosCorr->Fill(hit2->GetX(), hit->GetX());
+                R3BTttxHitData* hit2 = dynamic_cast<R3BTttxHitData*>(fHitItemsTttx->At(jhit));
+                if ((hit->GetDetID() == 1 && hit2->GetDetID() == 1) || (hit->GetDetID() == 2 && hit2->GetDetID() == 2))
+                {
+                    continue;
+                }
+                if (hit->GetDetID() == 1 && hit2->GetDetID() == 2)
+                {
+                    fh2_HitECorr->Fill(hit->GetEnergy(), hit2->GetEnergy());
+                    fh2_HitZCorr->Fill(hit->GetChargeZ(), hit2->GetChargeZ());
+                    fh2_HitPosCorr->Fill(hit->GetX(), hit2->GetX());
+                }
+                if (hit->GetDetID() == 1 && hit2->GetDetID() == 2)
+                {
+                    fh2_HitECorr->Fill(hit2->GetEnergy(), hit->GetEnergy());
+                    fh2_HitZCorr->Fill(hit2->GetChargeZ(), hit->GetChargeZ());
+                    fh2_HitPosCorr->Fill(hit2->GetX(), hit->GetX());
+                }
             }
         }
     }
