@@ -20,6 +20,7 @@
 
 #include "R3BReader.h"
 #include <stdint.h>
+#include <vector>
 
 class TClonesArray;
 
@@ -61,6 +62,8 @@ class R3BMosaicReader : public R3BReader
     bool fOnline = false;
     // Output array
     TClonesArray* fArray = nullptr;
+
+    std::vector<int> map_mosaics = { 4, 4, 4, 4, 1, 3, 2, 0 };
 
   public:
     ClassDefOverride(R3BMosaicReader, 1);
