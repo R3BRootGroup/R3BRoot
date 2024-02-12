@@ -79,7 +79,7 @@ Bool_t R3BMosaicReader::R3BRead()
             if (fChipId == 0)
                 continue;
 
-            int fAlpideId = mosid * 6 + fChipId;
+            int fAlpideId = map_mosaics[mosid] * 6 + fChipId;
             R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
 
             new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(
