@@ -145,7 +145,7 @@ class R3BTttxOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_HitTimeVsPos;
     TH2F* fh2_HitMultCorr;
     TH2F* fh2_HitECorr;
-    TH2F* fh2_HitTCorr;
+    TH2F* fh2_HitZCorr;
     TH2F* fh2_HitPosCorr;
 
     // Temporal value containers
