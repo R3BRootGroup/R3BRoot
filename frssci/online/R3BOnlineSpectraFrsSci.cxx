@@ -207,7 +207,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         {
             // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
             sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
-            fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 1000, -250, 250);
+            fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 10000, -50, 50);
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
             fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
@@ -228,7 +228,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                 for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
                 {
                     sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
-                    fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 50000, -25000, 25000);
+                    fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 1700);
                     fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
                     fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
                     fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
@@ -363,7 +363,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                                                            fh1_Tcal1Hit_TofRaw[cpt]->GetBinWidth(nbins));
                     }
                     else
-                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 10000, -50000, 50000);
+                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 1700);
                     fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] in red CAL level, in blue TCAL-MULT1");
                     fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
                     fh1_Cal_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
@@ -378,7 +378,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Tcal1Hit_TofRaw[cpt]->Draw("same");
 
                     sprintf(Name1, "TofCal_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 25000, 500, 3000.);
+                    fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 20000, 500, 1500.);
                     fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitle("calibrated Tof [ns]");
                     fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_TofCal[cpt]->GetXaxis()->CenterTitle(true);
@@ -391,7 +391,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_TofCal[cpt]->Draw();
 
                     sprintf(Name1, "Beta_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 5000, 0.5, 1.);
+                    fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 3000, 0.65, 0.8);
                     fh1_Cal_Beta[cpt]->GetXaxis()->SetTitle("Beta");
                     fh1_Cal_Beta[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_Beta[cpt]->GetXaxis()->CenterTitle(true);
@@ -404,7 +404,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_Beta[cpt]->Draw();
 
                     sprintf(Name1, "BRho_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_BRho[cpt] = new TH1D(Name1, Name1, 5000, 5, 10.);
+                    fh1_Cal_BRho[cpt] = new TH1D(Name1, Name1, 30000, 5.5, 8.5);
                     fh1_Cal_BRho[cpt]->GetXaxis()->SetTitle("BRho [T.m]");
                     fh1_Cal_BRho[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_BRho[cpt]->GetXaxis()->CenterTitle(true);
@@ -417,7 +417,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_BRho[cpt]->Draw();
 
                     sprintf(Name1, "AoQ_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_AoQ[cpt] = new TH1D(Name1, Name1, 3000, 0.5, 3.5);
+                    fh1_Cal_AoQ[cpt] = new TH1D(Name1, Name1, 30000, 0.5, 3.5);
                     fh1_Cal_AoQ[cpt]->GetXaxis()->SetTitle("A/Q");
                     fh1_Cal_AoQ[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_AoQ[cpt]->GetXaxis()->CenterTitle(true);
@@ -622,9 +622,11 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                                     multTcal[sto * fNbPmts + 1] == 1 && multTcal[sto * fNbPmts + 2] == 1)
                                 {
                                     fh1_Tcal1Hit_TofRaw[cpt]->Fill(
+                                        //    0.5 * (Traw[sto * fNbPmts] + Traw[sto * fNbPmts + 1]) -
+                                        //    0.5 * (Traw[sta * fNbPmts] + Traw[sta * fNbPmts + 1])) ;
                                         0.5 * (Traw[sto * fNbPmts] + Traw[sto * fNbPmts + 1]) -
                                         Traw[sto * fNbPmts + 2] -
-                                        0.5 * (Traw[sta + fNbPmts] + Traw[sta * fNbPmts + 1]) +
+                                        0.5 * (Traw[sta * fNbPmts] + Traw[sta * fNbPmts + 1]) +
                                         Traw[sta * fNbPmts + 2]);
                                     cpt++;
                                 } // end of if mult = 1

@@ -61,6 +61,13 @@ class R3BMusliMapped2Cal : public FairTask
         fUseMultHit = kTRUE;
     }
 
+    void SetDTrawMusWindow(Double_t min, Double_t max)
+    {
+        winL = min;
+        winR = max;
+        fUseMultHit = kTRUE;
+    }
+
   private:
     void SetParameters();
 

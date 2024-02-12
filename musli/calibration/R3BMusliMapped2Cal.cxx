@@ -212,10 +212,33 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
     {
         for (Int_t i = 0; i < fNumGroupsAnodes; i++)
         {
-            if (map_mult[i] == 0) // no data or too large multiplicity
+            if (map_mult[i] == 0) // no data
                 continue;
-            else if (map_mult[16] == 1 && map_mult[i] == 1 && map_traw[i * fMaxMult] > 0 &&
+            // else if (map_mult[16] == 1 && map_mult[i] == 1 && map_traw[i * fMaxMult] > 0 &&
+            // hot fix for s091 and s118 due to a bad cable first Tref hit is the good one
+            else if (0 < map_mult[16] && map_mult[16] <= 2 && map_mult[i] == 1 && map_traw[i * fMaxMult] > 0 &&
                      map_eraw[i * fMaxMult] > 0) // one Tref and one [i] signal with real values
+            {
+                dtcal = 0.;
+                for (Int_t k = 0; k < fNumParamsPosFit; k++)
+                {
+                    dtraw = map_traw[i * fMaxMult] - map_traw[16 * fMaxMult];
+                    pospar[k] = fPosCalParams->GetAt(fNumParamsPosFit * i + k);
+                    dtcal += pospar[k] * pow(dtraw, k);
+                }
+                ecal = 0;
+                for (Int_t k = 0; k < fNumParamsEneFit; k++)
+                {
+                    enepar[k] = fEneCalParams->GetAt(fNumParamsEneFit * i + k);
+                    ecal += enepar[k] * pow(map_eraw[i * fMaxMult], k);
+                }
+                if (ecal > 0.)
+                {
+                    AddCalData(map_sig[i * fMaxMult], dtcal, ecal);
+                }
+            }
+            else if (map_mult[16] == 2 && map_mult[i] == 1 && map_traw[i * fMaxMult] > 0 &&
+                     map_eraw[i * fMaxMult] > 0) // first Tref and one [i] signal with real values
             {
                 dtcal = 0.;
                 for (Int_t k = 0; k < fNumParamsPosFit; k++)
@@ -235,6 +258,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
             }
             else if ((map_mult[16] > 1 || map_mult[i] > 1) && fUseMultHit)
             {
+                LOG(info) << "enter in multi hit case";
                 Double_t good_tref = -1.;
                 Int_t no_of_tref = 0;
                 if (map_mult[16] == 1)
@@ -244,6 +268,7 @@ void R3BMusliMapped2Cal::Exec(Option_t* option)
                 }
                 else if (map_mult[16] > 1)
                 {
+                    good_tref = map_traw[16 * fMaxMult];
                     for (Int_t j = 0; j < map_mult[16]; j++)
                     {
                         // TO DO : need to add some comments to explain this condition
