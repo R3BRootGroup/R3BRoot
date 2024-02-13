@@ -493,4 +493,4 @@ void R3BIncomingIDOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BIncomingIDOnlineSpectra);
+ClassImp(R3BIncomingIDOnlineSpectra)
