@@ -90,18 +90,22 @@ class R3BOnlineSpectraFrsSciVsMusli : public FairTask
 
     TClonesArray* fFrsSci_PosCal; /**< Array with R3BFrsSciPosCalData */
     TClonesArray* fFrsSci_TofCal; /**< Array with R3BFrsSciTofCalData */
+    TClonesArray* fMusli_Map;     /**< Array with R3BMusliMappedData */
     TClonesArray* fMusli_Cal;     /**< Array with R3BMusliCalData */
     TClonesArray* fMusli_Hit;     /**< Array with R3BMusliHitData */
     Int_t fNEvents;               /**< Event counter.     */
     UShort_t fIdS2;
     UShort_t fIdCaveC;
 
+    // Canvas FrsSciCal vs MusliMap
+    TCanvas* cMap_Pos;
+
     // Canvas FrsSciCal vs MusliCal
     TCanvas* cCal_Pos;
     TCanvas* cCal_EvsAoQ;
 
     // Histograms FrsSciCal vs MusliCal
-    TH2D** fh2_Cal_PosRawVsDT; // at Cave C only, one histo per pair of anodes [8]
+    TH2D** fh2_Map_PosRawVsDT; // at Cave C only, one histo per pair of anodes [8]
     TH2D** fh2_Cal_PosCalVsDT; // at Cave C only, one histo per pair of anodes [8]
     TH2D** fh2_Cal_EvsAoQ;     // AoQ from S2 to cave C, one histo per signal [15]
 
