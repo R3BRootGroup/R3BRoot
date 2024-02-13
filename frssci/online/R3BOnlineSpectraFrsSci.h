@@ -144,15 +144,21 @@ class R3BOnlineSpectraFrsSci : public FairTask
     TCanvas* cCal_TofCal;
     TCanvas* cCal_Beta;
     TCanvas* cCal_AoQ;
+    TCanvas* cCal_BRhoVsPos;
+    TCanvas* cCal_AoQVsPos;
 
     // Histograms at Tcal level
-    TH1D** fh1_Cal_PosRaw; // [fNbDets]
-    TH1D** fh1_Cal_PosCal; // [fNbDets]
-    TH1D** fh1_Cal_TofRaw; // [fNbTofs]
-    TH1D** fh1_Cal_TofCal; // [fNbTofs]
-    TH1D** fh1_Cal_Beta;   // [fNbTofs]
-    TH1D** fh1_Cal_BRho;   // [fNbTofs]
-    TH1D** fh1_Cal_AoQ;    // [fNbTofs]
+    TH1D** fh1_Cal_PosRaw;       // [fNbDets]
+    TH1D** fh1_Cal_PosCal;       // [fNbDets]
+    TH1D** fh1_Cal_TofRaw;       // [fNbTofs]
+    TH1D** fh1_Cal_TofCal;       // [fNbTofs]
+    TH1D** fh1_Cal_Beta;         // [fNbTofs]
+    TH1D** fh1_Cal_BRho;         // [fNbTofs]
+    TH1D** fh1_Cal_AoQ;          // [fNbTofs]
+    TH2D** fh2_Cal_BRhoVsPosSta; // [fNbTofs]
+    TH2D** fh2_Cal_BRhoVsPosSto; // [fNbTofs]
+    TH2D** fh2_Cal_AoQVsPosSta;  // [fNbTofs]
+    TH2D** fh2_Cal_AoQVsPosSto;  // [fNbTofs]
 
   public:
     ClassDef(R3BOnlineSpectraFrsSci, 1)

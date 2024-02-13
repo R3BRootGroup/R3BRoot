@@ -140,14 +140,15 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
 {
     // Reset entries in output arrays, local arrays
     Reset();
-
     // Variables to read the Tcal data
-    UShort_t nDets = (UShort_t)fCalPar->GetNumDets();
-    UShort_t nPmts = (UShort_t)fCalPar->GetNumPmts();
+    // UShort_t nDets = (UShort_t)fCalPar->GetNumDets();
+    // UShort_t nPmts = (UShort_t)fCalPar->GetNumPmts();
+    UShort_t nDets = 2;
+    UShort_t nPmts = 3;
     UShort_t iDet;
     UShort_t iPmt;
-    Double_t iTraw[nDets * nPmts][64]; // 64 hits max per VFTX channel
-    UShort_t mult[nDets * nPmts];
+    Double_t iTraw[6][64]; // 64 hits max per VFTX channel
+    UShort_t mult[6];
     // ULong64_t maskR[nDets];
     // ULong64_t maskL[nDets];
     for (UShort_t i = 0; i < nDets * nPmts; i++)
@@ -245,7 +246,7 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
             {
                 for (UShort_t multLsto = 0; multLsto < mult[dSto * nPmts + 1]; multLsto++)
                 {
-                    iRawPosSto = (iTraw[dSto * nPmts][multRsto] - iTraw[dSto * nPmts + 1][multLsto]);
+                    iRawPosSto = (Float_t)(iTraw[dSto * nPmts][multRsto] - iTraw[dSto * nPmts + 1][multLsto]);
                     // process only data with valid position
                     if ((iRawPosSto < fCalPar->GetMinPosAtRank(dSto)) || (iRawPosSto > fCalPar->GetMaxPosAtRank(dSto)))
                         continue;
@@ -260,7 +261,8 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
                                 for (UShort_t multLsta = 0; multLsta < mult[dSta * nPmts + 1]; multLsta++)
                                 {
                                     // process only data with vali position
-                                    iRawPosSta = (iTraw[dSta * nPmts][multRsta] - iTraw[dSta * nPmts + 1][multLsta]);
+                                    iRawPosSta =
+                                        (Float_t)(iTraw[dSta * nPmts][multRsta] - iTraw[dSta * nPmts + 1][multLsta]);
                                     if ((iRawPosSta < fCalPar->GetMinPosAtRank(dSta)) ||
                                         (iRawPosSta > fCalPar->GetMaxPosAtRank(dSta)))
                                         continue;
@@ -326,26 +328,27 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
             {
                 iRawTime[det] =
                     0.5 * (iTraw[det * nPmts][selectRightHit[det]] + iTraw[det * nPmts + 1][selectLeftHit[det]]);
-                iRawPos[det] = (iTraw[det * nPmts][selectRightHit[det]] - iTraw[det * nPmts + 1][selectLeftHit[det]]);
+                iRawPos[det] =
+                    (Float_t)(iTraw[det * nPmts][selectRightHit[det]] - iTraw[det * nPmts + 1][selectLeftHit[det]]);
                 iCalPos[det] = fCalPar->GetPosCalGainAtRank(det) * iRawPos[det] + fCalPar->GetPosCalOffsetAtRank(det);
                 AddPosCalData(det + 1, iRawTime[det], iRawPos[det], iCalPos[det]);
             }
         }
         else // use the hit selection from the very first to the very last FrsSci)
         {
-            LOG(info) << "Tcal2Cal for single hit selection, selectSameHit==kFALSE";
             for (UShort_t det = 0; det < nDets - 1; det++)
             {
                 iRawTime[det] =
                     0.5 * (iTraw[det * nPmts][selectRightHit[det]] + iTraw[det * nPmts + 1][selectLeftHit[det]]);
-                iRawPos[det] = (iTraw[det * nPmts][selectRightHit[det]] - iTraw[det * nPmts + 1][selectLeftHit[det]]);
+                iRawPos[det] =
+                    (Float_t)(iTraw[det * nPmts][selectRightHit[det]] - iTraw[det * nPmts + 1][selectLeftHit[det]]);
                 iCalPos[det] = fCalPar->GetPosCalGainAtRank(det) * iRawPos[det] + fCalPar->GetPosCalOffsetAtRank(det);
                 AddPosCalData(det + 1, iRawTime[det], iRawPos[det], iCalPos[det]);
             }
             iRawTime[nDets - 1] = 0.5 * (iTraw[(nDets - 1) * nPmts][selectRightHit_dSto[0]] +
                                          iTraw[(nDets - 1) * nPmts + 1][selectLeftHit_dSto[0]]);
-            iRawPos[nDets - 1] = (iTraw[(nDets - 1) * nPmts][selectLeftHit_dSto[0]] -
-                                  iTraw[(nDets - 1) * nPmts + 1][selectLeftHit_dSto[0]]);
+            iRawPos[nDets - 1] = (Float_t)(iTraw[(nDets - 1) * nPmts][selectLeftHit_dSto[0]] -
+                                           iTraw[(nDets - 1) * nPmts + 1][selectLeftHit_dSto[0]]);
             iCalPos[nDets - 1] = fCalPar->GetPosCalGainAtRank(nDets - 1) * iRawPos[nDets - 1] +
                                  fCalPar->GetPosCalOffsetAtRank(nDets - 1);
             AddPosCalData(nDets, iRawTime[nDets - 1], iRawPos[nDets - 1], iCalPos[nDets - 1]);
@@ -370,10 +373,10 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
                 // Brho : the signs take car of the X direction (increasing from right to left)
                 iBRho = fCalPar->GetBRho0AtRank(rank) * (1 + iCalPos[dSta] / fCalPar->GetDispAtRank(dSta) -
                                                          iCalPos[dSto] / fCalPar->GetDispAtRank(dSto));
+                // iBRho = fCalPar->GetBRho0AtRank(rank) * (1 + iCalPos[dSta] / fCalPar->GetDispAtRank(dSta));
 
                 // AoQ
                 iAoQ = iBRho / (3.10716 * iBeta * iGamma);
-
                 AddTofCalData(
                     rank + 1, dSta + 1, dSto + 1, iCalPos[dSta], iCalPos[dSto], iRawTof, iCalTof, iBeta, iBRho, iAoQ);
                 rank++;

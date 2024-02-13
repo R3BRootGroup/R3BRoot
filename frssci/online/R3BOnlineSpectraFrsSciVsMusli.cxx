@@ -28,6 +28,7 @@
 #include "R3BFrsSciTofCalData.h"
 #include "R3BMusliCalData.h"
 #include "R3BMusliHitData.h"
+#include "R3BMusliMappedData.h"
 #include "R3BOnlineSpectraFrsSciVsMusli.h"
 
 R3BOnlineSpectraFrsSciVsMusli::R3BOnlineSpectraFrsSciVsMusli()
@@ -39,6 +40,7 @@ R3BOnlineSpectraFrsSciVsMusli::R3BOnlineSpectraFrsSciVsMusli(const char* name, I
     : FairTask(name, iVerbose)
     , fFrsSci_PosCal(NULL)
     , fFrsSci_TofCal(NULL)
+    , fMusli_Map(NULL)
     , fMusli_Cal(NULL)
     , fMusli_Hit(NULL)
     , fNEvents(0)
@@ -54,6 +56,8 @@ R3BOnlineSpectraFrsSciVsMusli::~R3BOnlineSpectraFrsSciVsMusli()
         delete fFrsSci_PosCal;
     if (fFrsSci_TofCal)
         delete fFrsSci_TofCal;
+    if (fMusli_Map)
+        delete fMusli_Map;
     if (fMusli_Cal)
         delete fMusli_Cal;
     if (fMusli_Hit)
@@ -94,6 +98,13 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
     }
 
     // === get access to musli cal data ===//
+    fMusli_Map = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliMappedData"));
+    if (!fMusli_Map)
+    {
+        LOG(info) << "R3BOnlineSpectraFrsSciVsMusli::Init() :: MusliMap not found";
+    }
+
+    // === get access to musli cal data ===//
     fMusli_Cal = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliCalData"));
     if (!fMusli_Cal)
     {
@@ -112,29 +123,32 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
 
     if (fFrsSci_PosCal && fMusli_Cal && fIdCaveC > 0)
     {
-        sprintf(Name1, "SciVsMusliCal_Pos");
+        sprintf(Name1, "SciVsMusli_PosRaw");
+        cMap_Pos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cMap_Pos->Divide(2, 4);
+        fh2_Map_PosRawVsDT = new TH2D*[8];
+        sprintf(Name1, "SciVsMusli_PosCal");
         cCal_Pos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
-        cCal_Pos->Divide(2, 8);
-        fh2_Cal_PosRawVsDT = new TH2D*[8];
+        cCal_Pos->Divide(2, 4);
         fh2_Cal_PosCalVsDT = new TH2D*[8];
 
         for (UShort_t i = 0; i < 8; i++)
         {
-            sprintf(Name1, "PosRaw_vs_DT%i", i + 1);
-            fh2_Cal_PosRawVsDT[i] = new TH2D(Name1, Name1, 1000, -20000, 20000, 1000, -1000, 1000);
-            fh2_Cal_PosRawVsDT[i]->GetXaxis()->SetTitle(Form("Drift time pair %i", i + 1));
-            fh2_Cal_PosRawVsDT[i]->GetYaxis()->SetTitle(Form("PosRaw at Cave C FrsSci%i", fIdCaveC));
-            fh2_Cal_PosRawVsDT[i]->GetXaxis()->CenterTitle(true);
-            fh2_Cal_PosRawVsDT[i]->GetYaxis()->CenterTitle(true);
-            fh2_Cal_PosRawVsDT[i]->GetXaxis()->SetLabelSize(0.05);
-            fh2_Cal_PosRawVsDT[i]->GetXaxis()->SetTitleSize(0.05);
-            fh2_Cal_PosRawVsDT[i]->GetYaxis()->SetLabelSize(0.05);
-            fh2_Cal_PosRawVsDT[i]->GetYaxis()->SetTitleSize(0.05);
-            cCal_Pos->cd(2 * i + 1);
-            fh2_Cal_PosRawVsDT[i]->Draw("col");
+            sprintf(Name1, "PosRaw_vs_DTraw%i", i + 1);
+            fh2_Map_PosRawVsDT[i] = new TH2D(Name1, Name1, 2000, -500, 35000, 1000, -5, 5);
+            fh2_Map_PosRawVsDT[i]->GetXaxis()->SetTitle(Form("Drift time pair %i", i + 1));
+            fh2_Map_PosRawVsDT[i]->GetYaxis()->SetTitle(Form("PosRaw at Cave C FrsSci%i", fIdCaveC));
+            fh2_Map_PosRawVsDT[i]->GetXaxis()->CenterTitle(true);
+            fh2_Map_PosRawVsDT[i]->GetYaxis()->CenterTitle(true);
+            fh2_Map_PosRawVsDT[i]->GetXaxis()->SetLabelSize(0.05);
+            fh2_Map_PosRawVsDT[i]->GetXaxis()->SetTitleSize(0.05);
+            fh2_Map_PosRawVsDT[i]->GetYaxis()->SetLabelSize(0.05);
+            fh2_Map_PosRawVsDT[i]->GetYaxis()->SetTitleSize(0.05);
+            cMap_Pos->cd(i + 1);
+            fh2_Map_PosRawVsDT[i]->Draw("col");
 
-            sprintf(Name1, "PosCal_vs_DT%i", i + 1);
-            fh2_Cal_PosCalVsDT[i] = new TH2D(Name1, Name1, 1000, -20000, 20000, 500, -100, 100);
+            sprintf(Name1, "PosCal_vs_DTcal%i", i + 1);
+            fh2_Cal_PosCalVsDT[i] = new TH2D(Name1, Name1, 1000, -200, 200, 500, -100, 100);
             fh2_Cal_PosCalVsDT[i]->GetXaxis()->SetTitle(Form("Drift time pair %i", i + 1));
             fh2_Cal_PosCalVsDT[i]->GetYaxis()->SetTitle(Form("PosCal at Cave C FrsSci%i", fIdCaveC));
             fh2_Cal_PosCalVsDT[i]->GetXaxis()->CenterTitle(true);
@@ -143,7 +157,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             fh2_Cal_PosCalVsDT[i]->GetXaxis()->SetTitleSize(0.05);
             fh2_Cal_PosCalVsDT[i]->GetYaxis()->SetLabelSize(0.05);
             fh2_Cal_PosCalVsDT[i]->GetYaxis()->SetTitleSize(0.05);
-            cCal_Pos->cd(2 * (i + 1));
+            cCal_Pos->cd(i + 1);
             fh2_Cal_PosCalVsDT[i]->Draw("col");
         }
 
@@ -157,7 +171,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
             for (UShort_t i = 0; i < 15; i++)
             {
                 sprintf(Name1, "E_vs_AoQ_sig%i", i + 1);
-                fh2_Cal_EvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 1500, 0, 60000);
+                fh2_Cal_EvsAoQ[i] = new TH2D(Name1, Name1, 3000, 0.5, 3.5, 1500, 0, 60000);
                 fh2_Cal_EvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                 fh2_Cal_EvsAoQ[i]->GetYaxis()->SetTitle(Form("E@cal for signal%i", i + 1));
                 fh2_Cal_EvsAoQ[i]->GetXaxis()->CenterTitle(true);
@@ -218,7 +232,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                     fh2_Hit_EvsBeta[i]->Draw("col");
 
                     sprintf(Name1, "Eave_vs_AoQ_typ%i", i + 1);
-                    fh2_Hit_EvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 2000, 0, 40000);
+                    fh2_Hit_EvsAoQ[i] = new TH2D(Name1, Name1, 3000, 0.5, 3.5, 2000, 0, 40000);
                     fh2_Hit_EvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                     fh2_Hit_EvsAoQ[i]->GetYaxis()->SetTitle(
                         Form("<E>@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
@@ -232,7 +246,7 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
                     fh2_Hit_EvsAoQ[i]->Draw("col");
 
                     sprintf(Name1, "Z_vs_AoQ_typ%i", i + 1);
-                    fh2_Hit_ZvsAoQ[i] = new TH2D(Name1, Name1, 1000, 1.5, 3.5, 1000, -0.5, 9.5);
+                    fh2_Hit_ZvsAoQ[i] = new TH2D(Name1, Name1, 3000, 0.5, 3.5, 1000, -0.5, 9.5);
                     fh2_Hit_ZvsAoQ[i]->GetXaxis()->SetTitle("A/Q, from S2 to cave C");
                     fh2_Hit_ZvsAoQ[i]->GetYaxis()->SetTitle(
                         Form("Z@hit for type%i (data per %i anodes)", i + 1, (int)pow(2, i + 1)));
@@ -254,8 +268,9 @@ InitStatus R3BOnlineSpectraFrsSciVsMusli::Init()
     // --- --------------- --- //
     TFolder* mainfol = new TFolder("FrsSciVsMusli", "FrsSci vs Musli info");
 
-    if (fFrsSci_PosCal && fMusli_Cal && fIdCaveC > 0)
+    if (fFrsSci_PosCal && fMusli_Map && fMusli_Cal && fIdCaveC > 0)
     {
+        mainfol->Add(cMap_Pos);
         mainfol->Add(cCal_Pos);
         if (fFrsSci_TofCal && fIdS2 > 0)
         {
@@ -286,7 +301,7 @@ void R3BOnlineSpectraFrsSciVsMusli::Reset_Histo()
     {
         for (UShort_t i = 0; i < 8; i++)
         {
-            fh2_Cal_PosRawVsDT[i]->Reset();
+            fh2_Map_PosRawVsDT[i]->Reset();
             fh2_Cal_PosCalVsDT[i]->Reset();
         }
         if (fFrsSci_TofCal && fIdS2 > 0)
@@ -348,6 +363,38 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
             }
         }
 
+        // --- read musli mapped data and fill histo at MusliMapped level--- //
+        if (fMusli_Cal->GetEntriesFast() > 0)
+        {
+            nHits = fMusli_Map->GetEntriesFast();
+            UInt_t Tref = 0;
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BMusliMappedData* hitmap = dynamic_cast<R3BMusliMappedData*>(fMusli_Map->At(ihit));
+                if (!hitmap)
+                    continue;
+                iSig = hitmap->GetSignal();
+                if (iSig != 17)
+                    continue;
+                else
+                    Tref = hitmap->GetTime();
+            }
+            if (Tref > 0)
+            {
+                for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                {
+                    R3BMusliMappedData* hitmap = dynamic_cast<R3BMusliMappedData*>(fMusli_Map->At(ihit));
+                    if (!hitmap)
+                        continue;
+                    iSig = hitmap->GetSignal();
+                    if (iSig > 8)
+                        continue;
+                    if (iRawPosCaveC != -1000.)
+                        fh2_Map_PosRawVsDT[iSig - 1]->Fill(hitmap->GetTime() - Tref, iRawPosCaveC);
+                }
+            }
+        }
+
         if (fFrsSci_TofCal)
         {
             // --- read tofcal data and extract AoQ for S2-caveC tof--- //
@@ -386,8 +433,6 @@ void R3BOnlineSpectraFrsSciVsMusli::Exec(Option_t* option)
                     fh2_Cal_EvsAoQ[iSig - 1]->Fill(iAoQ, hitcal->GetEnergy());
                 if (iSig > 8)
                     continue;
-                if (iRawPosCaveC != -1000.)
-                    fh2_Cal_PosRawVsDT[iSig - 1]->Fill(hitcal->GetDT(), iRawPosCaveC);
                 if (iCalPosCaveC != -1000.)
                     fh2_Cal_PosCalVsDT[iSig - 1]->Fill(hitcal->GetDT(), iCalPosCaveC);
             }
@@ -430,6 +475,10 @@ void R3BOnlineSpectraFrsSciVsMusli::FinishEvent()
     {
         fFrsSci_TofCal->Clear();
     }
+    if (fMusli_Map)
+    {
+        fMusli_Map->Clear();
+    }
     if (fMusli_Cal)
     {
         fMusli_Cal->Clear();
@@ -447,7 +496,7 @@ void R3BOnlineSpectraFrsSciVsMusli::FinishTask()
     {
         for (UShort_t i = 0; i < 8; i++)
         {
-            fh2_Cal_PosRawVsDT[i]->Write();
+            fh2_Map_PosRawVsDT[i]->Write();
             fh2_Cal_PosCalVsDT[i]->Write();
         }
 

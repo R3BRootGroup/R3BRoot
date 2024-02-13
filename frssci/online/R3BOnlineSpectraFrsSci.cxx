@@ -207,7 +207,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         {
             // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
             sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
-            fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 10000, -50, 50);
+            fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1, Name1, 10000, -5, 5);
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R");
             fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
@@ -228,7 +228,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                 for (UShort_t sto = sta + 1; sto <= fNbDets; sto++)
                 {
                     sprintf(Name1, "TofRaw_FrsSci%i_to_FrsSci%i_MULT1", sta, sto);
-                    fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 1700);
+                    fh1_Tcal1Hit_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 2500);
                     fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] if mult1 at L, R and Tref");
                     fh1_Tcal1Hit_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
                     fh1_Tcal1Hit_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
@@ -300,7 +300,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
 
             // === TH1F: calibrated Position in Ns at Cal level=== //
             sprintf(Name1, "FrsSci%i_PosCal", i + 1);
-            fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 3000, -150, 150);
+            fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 30000, -150, 150);
             fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Positon [mm]");
             fh1_Cal_PosCal[i]->GetYaxis()->SetTitle("number of counts");
             fh1_Cal_PosCal[i]->GetXaxis()->CenterTitle(true);
@@ -344,6 +344,18 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         fh1_Cal_BRho = new TH1D*[fNbTofs];
         fh1_Cal_AoQ = new TH1D*[fNbTofs];
 
+        sprintf(Name1, "Cal_BRhoVsPos");
+        cCal_BRhoVsPos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_BRhoVsPos->Divide(2, fNbTofs);
+        fh2_Cal_BRhoVsPosSta = new TH2D*[fNbTofs];
+        fh2_Cal_BRhoVsPosSto = new TH2D*[fNbTofs];
+
+        sprintf(Name1, "Cal_AoQVsPos");
+        cCal_AoQVsPos = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cCal_AoQVsPos->Divide(2, fNbTofs);
+        fh2_Cal_AoQVsPosSta = new TH2D*[fNbTofs];
+        fh2_Cal_AoQVsPosSto = new TH2D*[fNbTofs];
+
         if (fNbTofs > 0)
         {
             UShort_t cpt = 0;
@@ -363,7 +375,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                                                            fh1_Tcal1Hit_TofRaw[cpt]->GetBinWidth(nbins));
                     }
                     else
-                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 1700);
+                        fh1_Cal_TofRaw[cpt] = new TH1D(Name1, Name1, 150000, 200, 2500);
                     fh1_Cal_TofRaw[cpt]->GetXaxis()->SetTitle("Raw Tof [ns] in red CAL level, in blue TCAL-MULT1");
                     fh1_Cal_TofRaw[cpt]->GetYaxis()->SetTitle("number of counts with mult1");
                     fh1_Cal_TofRaw[cpt]->GetXaxis()->CenterTitle(true);
@@ -378,7 +390,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Tcal1Hit_TofRaw[cpt]->Draw("same");
 
                     sprintf(Name1, "TofCal_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 20000, 500, 1500.);
+                    fh1_Cal_TofCal[cpt] = new TH1D(Name1, Name1, 16000, 200, 1000.);
                     fh1_Cal_TofCal[cpt]->GetXaxis()->SetTitle("calibrated Tof [ns]");
                     fh1_Cal_TofCal[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_TofCal[cpt]->GetXaxis()->CenterTitle(true);
@@ -391,7 +403,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_TofCal[cpt]->Draw();
 
                     sprintf(Name1, "Beta_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 3000, 0.65, 0.8);
+                    fh1_Cal_Beta[cpt] = new TH1D(Name1, Name1, 2000, 0.7, 0.72);
                     fh1_Cal_Beta[cpt]->GetXaxis()->SetTitle("Beta");
                     fh1_Cal_Beta[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_Beta[cpt]->GetXaxis()->CenterTitle(true);
@@ -404,7 +416,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_Beta[cpt]->Draw();
 
                     sprintf(Name1, "BRho_FrsSci%i_to_FrsSci%i", sta, sto);
-                    fh1_Cal_BRho[cpt] = new TH1D(Name1, Name1, 30000, 5.5, 8.5);
+                    fh1_Cal_BRho[cpt] = new TH1D(Name1, Name1, 10000, 9.5, 9.7);
                     fh1_Cal_BRho[cpt]->GetXaxis()->SetTitle("BRho [T.m]");
                     fh1_Cal_BRho[cpt]->GetYaxis()->SetTitle("number of counts");
                     fh1_Cal_BRho[cpt]->GetXaxis()->CenterTitle(true);
@@ -428,6 +440,58 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                     fh1_Cal_AoQ[cpt]->GetYaxis()->SetTitleSize(0.05);
                     cCal_AoQ->cd(2 * (cpt + 1));
                     fh1_Cal_AoQ[cpt]->Draw();
+
+                    sprintf(Name1, "BRho_Vs_PosFrsSci%i", sta);
+                    fh2_Cal_BRhoVsPosSta[cpt] = new TH2D(Name1, Name1, 150, -2, 0.5, 500, 9.5, 9.7);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetXaxis()->SetTitle("Pos [mm] if calibrated");
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetYaxis()->SetTitle("BRho [T.m]");
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetXaxis()->CenterTitle(true);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetYaxis()->CenterTitle(true);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Cal_BRhoVsPosSta[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_BRhoVsPos->cd(2 * cpt + 1);
+                    fh2_Cal_BRhoVsPosSta[cpt]->Draw("col");
+
+                    sprintf(Name1, "BRho_Vs_PosRawFrsSci%i", sto);
+                    fh2_Cal_BRhoVsPosSto[cpt] = new TH2D(Name1, Name1, 150, 0.5, 2., 500, 9.5, 9.7);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetXaxis()->SetTitle("Pos [mm] if calibrated");
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetYaxis()->SetTitle("BRho [T.m]");
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetXaxis()->CenterTitle(true);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetYaxis()->CenterTitle(true);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Cal_BRhoVsPosSto[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_BRhoVsPos->cd(2 * (cpt + 1));
+                    fh2_Cal_BRhoVsPosSto[cpt]->Draw("col");
+
+                    sprintf(Name1, "AoQ_Vs_PosFrsSci%i", sta);
+                    fh2_Cal_AoQVsPosSta[cpt] = new TH2D(Name1, Name1, 150, -2, 0.5, 600, 2.99, 3.15);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetXaxis()->SetTitle("Pos [mm] if calibrated");
+                    fh2_Cal_AoQVsPosSta[cpt]->GetYaxis()->SetTitle("AoQ [T.m]");
+                    fh2_Cal_AoQVsPosSta[cpt]->GetXaxis()->CenterTitle(true);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetYaxis()->CenterTitle(true);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Cal_AoQVsPosSta[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_AoQVsPos->cd(2 * cpt + 1);
+                    fh2_Cal_AoQVsPosSta[cpt]->Draw("col");
+
+                    sprintf(Name1, "AoQ_Vs_PosRawFrsSci%i", sto);
+                    fh2_Cal_AoQVsPosSto[cpt] = new TH2D(Name1, Name1, 150, 0.5, 2., 600, 2.99, 3.15);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetXaxis()->SetTitle("Pos [mm] if calibrated");
+                    fh2_Cal_AoQVsPosSto[cpt]->GetYaxis()->SetTitle("AoQ [T.m]");
+                    fh2_Cal_AoQVsPosSto[cpt]->GetXaxis()->CenterTitle(true);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetYaxis()->CenterTitle(true);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetXaxis()->SetLabelSize(0.05);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetXaxis()->SetTitleSize(0.05);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetYaxis()->SetLabelSize(0.05);
+                    fh2_Cal_AoQVsPosSto[cpt]->GetYaxis()->SetTitleSize(0.05);
+                    cCal_AoQVsPos->cd(2 * (cpt + 1));
+                    fh2_Cal_AoQVsPosSto[cpt]->Draw("col");
 
                     cpt++;
                 }
@@ -465,6 +529,8 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             mainfolCal->Add(cCal_TofCal);
             mainfolCal->Add(cCal_Beta);
             mainfolCal->Add(cCal_AoQ);
+            mainfolCal->Add(cCal_BRhoVsPos);
+            mainfolCal->Add(cCal_AoQVsPos);
         }
         run->AddObject(mainfolCal);
     }
@@ -510,6 +576,10 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
             fh1_Cal_Beta[i]->Reset();
             fh1_Cal_BRho[i]->Reset();
             fh1_Cal_AoQ[i]->Reset();
+            fh2_Cal_BRhoVsPosSta[i]->Reset();
+            fh2_Cal_BRhoVsPosSto[i]->Reset();
+            fh2_Cal_AoQVsPosSta[i]->Reset();
+            fh2_Cal_AoQVsPosSto[i]->Reset();
         }
     }
 }
@@ -677,6 +747,10 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                         fh1_Cal_Beta[iRank]->Fill(hittofcal->GetBeta());
                         fh1_Cal_BRho[iRank]->Fill(hittofcal->GetBRho());
                         fh1_Cal_AoQ[iRank]->Fill(hittofcal->GetAoQ());
+                        fh2_Cal_BRhoVsPosSta[iRank]->Fill(hittofcal->GetCalPosStaMm(), hittofcal->GetBRho());
+                        fh2_Cal_BRhoVsPosSto[iRank]->Fill(hittofcal->GetCalPosStoMm(), hittofcal->GetBRho());
+                        fh2_Cal_AoQVsPosSta[iRank]->Fill(hittofcal->GetCalPosStaMm(), hittofcal->GetAoQ());
+                        fh2_Cal_AoQVsPosSto[iRank]->Fill(hittofcal->GetCalPosStoMm(), hittofcal->GetAoQ());
                     } // end of loop over tof cal data
                 }     // --- end of if fTofCal->GetEntries() >0 --- //
             }         // end of if fTofCal
@@ -751,6 +825,10 @@ void R3BOnlineSpectraFrsSci::FinishTask()
                 fh1_Cal_Beta[i]->Write();
                 fh1_Cal_BRho[i]->Write();
                 fh1_Cal_AoQ[i]->Write();
+                fh2_Cal_BRhoVsPosSta[i]->Write();
+                fh2_Cal_BRhoVsPosSto[i]->Write();
+                fh2_Cal_AoQVsPosSta[i]->Write();
+                fh2_Cal_AoQVsPosSto[i]->Write();
             }
         }
     }

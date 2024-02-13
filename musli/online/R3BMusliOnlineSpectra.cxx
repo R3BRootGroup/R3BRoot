@@ -302,7 +302,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_Musli_DTmap_mean_a%d_a%d", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "DTraw A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
-        fh1_Muslimap_DT[j] = new TH1I(Name1, Name2, 3500, 0, 35000);
+        fh1_Muslimap_DT[j] = new TH1I(Name1, Name2, 2500, -15000, 35000);
         fh1_Muslimap_DT[j]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh1_Muslimap_DT[j]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_DT[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -323,7 +323,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_Musli_DTmap_mean_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "DTraw A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
-        fh1_Muslimap_DT[j + 8] = new TH1I(Name1, Name2, 3500, 0, 35000);
+        fh1_Muslimap_DT[j + 8] = new TH1I(Name1, Name2, 2500, -15000, 35000);
         fh1_Muslimap_DT[j + 8]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh1_Muslimap_DT[j + 8]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_DT[j + 8]->GetYaxis()->SetTitleOffset(1.1);
@@ -344,7 +344,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh1_Musli_DTmap_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "DTraw A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
-        fh1_Muslimap_DT[j + 12] = new TH1I(Name1, Name2, 3500, 0, 35000);
+        fh1_Muslimap_DT[j + 12] = new TH1I(Name1, Name2, 2500, -15000, 35000);
         fh1_Muslimap_DT[j + 12]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh1_Muslimap_DT[j + 12]->GetYaxis()->SetTitle("Counts");
         fh1_Muslimap_DT[j + 12]->GetYaxis()->SetTitleOffset(1.1);
@@ -362,7 +362,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_DT16 = new TCanvas("Musli_DTmap16", "", 10, 10, 800, 700);
     sprintf(Name1, "fh1_Musli_DTmap_mean_a1_to_a16");
     sprintf(Name2, "DTraw A01 to A16 if mult==1");
-    fh1_Muslimap_DT[14] = new TH1I(Name1, Name2, 3500, 0, 35000);
+    fh1_Muslimap_DT[14] = new TH1I(Name1, Name2, 2500, -15000, 35000);
     fh1_Muslimap_DT[14]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
     fh1_Muslimap_DT[14]->GetYaxis()->SetTitle("Counts");
     fh1_Muslimap_DT[14]->GetYaxis()->SetTitleOffset(1.1);
@@ -388,7 +388,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
                 2 * j + 2,
                 2 * j + 3,
                 2 * j + 4);
-        fh2_Muslimap_DTvsDT[j] = new TH2I(Name1, Name2, 1000, 0, 35000, 1000, 0, 35000);
+        fh2_Muslimap_DTvsDT[j] = new TH2I(Name1, Name2, 1000, -5000, 30000, 1000, -5000, 30000);
         fh2_Muslimap_DTvsDT[j]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_DTvsDT[j]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_DTvsDT[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -414,7 +414,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
                 4 * j + 4,
                 4 * j + 5,
                 4 * j + 8);
-        fh2_Muslimap_DTvsDT[j + 8] = new TH2I(Name1, Name2, 1000, 0, 35000, 1000, 0, 35000);
+        fh2_Muslimap_DTvsDT[j + 8] = new TH2I(Name1, Name2, 1000, -5000, 30000, 1000, -5000, 30000);
         fh2_Muslimap_DTvsDT[j + 8]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_DTvsDT[j + 8]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_DTvsDT[j + 8]->GetYaxis()->SetTitleOffset(1.1);
@@ -432,7 +432,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_DTvsDT8 = new TCanvas("Musli_DTvsDTmap8", "", 10, 10, 800, 700);
     sprintf(Name1, "fh2_Musli_DTa1a8_vs_DTa9a16");
     sprintf(Name2, "DTraw A01 to A08 vs DTraw A09 to A16 if mult==1");
-    fh2_Muslimap_DTvsDT[12] = new TH2I(Name1, Name2, 1000, 0, 35000, 1000, 0, 35000);
+    fh2_Muslimap_DTvsDT[12] = new TH2I(Name1, Name2, 1000, -5000, 30000, 1000, -5000, 30000);
     fh2_Muslimap_DTvsDT[12]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
     fh2_Muslimap_DTvsDT[12]->GetYaxis()->SetTitle("Raw Drift Time [100ps]");
     fh2_Muslimap_DTvsDT[12]->GetYaxis()->SetTitleOffset(1.1);
@@ -453,7 +453,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_a%d", 2 * j + 1, 2 * j + 2);
         sprintf(Name2, "Eraw vs DTraw A%02d and A%02d if mult==1", 2 * j + 1, 2 * j + 2);
-        fh2_Muslimap_EvsDT[j] = new TH2I(Name1, Name2, 1000, 0, 35000, 1280, 0, 64000);
+        fh2_Muslimap_EvsDT[j] = new TH2I(Name1, Name2, 1000, -5000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_EvsDT[j]->GetYaxis()->SetTitle("Raw Energy [channel]");
         fh2_Muslimap_EvsDT[j]->GetYaxis()->SetTitleOffset(1.1);
@@ -474,7 +474,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_to_a%d", j * 4 + 1, j * 4 + 4);
         sprintf(Name2, "Eraw vs DTraw A%02d to A%02d if mult==1", j * 4 + 1, j * 4 + 5);
-        fh2_Muslimap_EvsDT[j + 8] = new TH2I(Name1, Name2, 1000, 0, 35000, 1280, 0, 64000);
+        fh2_Muslimap_EvsDT[j + 8] = new TH2I(Name1, Name2, 1000, -5000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j + 8]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_EvsDT[j + 8]->GetYaxis()->SetTitle("Raw Energy [channel]");
         fh2_Muslimap_EvsDT[j + 8]->GetYaxis()->SetTitleOffset(1.1);
@@ -495,7 +495,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     {
         sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a%d_to_a%d", j * 8 + 1, j * 8 + 8);
         sprintf(Name2, "Eraw vs DTraw A%02d to A%02d if mult==1", j * 8 + 1, j * 8 + 8);
-        fh2_Muslimap_EvsDT[j + 12] = new TH2I(Name1, Name2, 1000, 0, 35000, 1280, 0, 64000);
+        fh2_Muslimap_EvsDT[j + 12] = new TH2I(Name1, Name2, 1000, -5000, 35000, 1280, 0, 64000);
         fh2_Muslimap_EvsDT[j + 12]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
         fh2_Muslimap_EvsDT[j + 12]->GetYaxis()->SetTitle("Raw Energy [channel]");
         fh2_Muslimap_EvsDT[j + 12]->GetYaxis()->SetTitleOffset(1.1);
@@ -513,7 +513,7 @@ InitStatus R3BMusliOnlineSpectra::Init()
     cMusliMap_EvsDT16 = new TCanvas("Musli_EvsDTmap16", "", 10, 10, 800, 700);
     sprintf(Name1, "fh2_Musli_EvsDTmap_mean_a1_to_a16");
     sprintf(Name2, "Eraw vs DTraw A01 to A16 if mult==1");
-    fh2_Muslimap_EvsDT[14] = new TH2I(Name1, Name2, 1000, 0, 35000, 1280, 0, 64000);
+    fh2_Muslimap_EvsDT[14] = new TH2I(Name1, Name2, 1000, -5000, 35000, 1280, 0, 64000);
     fh2_Muslimap_EvsDT[14]->GetXaxis()->SetTitle("Raw Drift Time [100ps]");
     fh2_Muslimap_EvsDT[14]->GetYaxis()->SetTitle("Raw Energy [channel]");
     fh2_Muslimap_EvsDT[14]->GetYaxis()->SetTitleOffset(1.1);

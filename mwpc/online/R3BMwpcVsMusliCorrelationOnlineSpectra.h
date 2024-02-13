@@ -87,6 +87,7 @@ class R3BMwpcVsMusliCorrelationOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fCalItemsMwpc = nullptr;  /**< Array with Mwpc cal items. */
+    TClonesArray* fMapItemsMusli = nullptr; /**< Array with Musli cal items. */
     TClonesArray* fCalItemsMusli = nullptr; /**< Array with Musli cal items. */
 
     // check for trigger should be done globablly (somewhere else)
@@ -94,11 +95,15 @@ class R3BMwpcVsMusliCorrelationOnlineSpectra : public FairTask
     TString fNameDet;
 
     // Canvas
-    TCanvas* cCal;
+    TCanvas* cQvsPad;
+    TCanvas* cPosX;
 
     // Histograms for cal and hit data
-    TH2F* fh2_cal_padxup;
-    TH2F* fh2_cal_padxdown;
+    TH2F* fh2_map_QmaxVsPadXdown;
+    TH2F* fh2_map_QmaxVsPadXup;
+    TH2F* fh2_map_QmaxVsPadY;
+    TH2F* fh2_map_padxup;
+    TH2F* fh2_map_padxdown;
 
   public:
     ClassDefOverride(R3BMwpcVsMusliCorrelationOnlineSpectra, 1)
