@@ -14,6 +14,7 @@
 #include "R3BNeulandOnlineSpectra2.h"
 #include <FairRunOnline.h>
 #include <R3BDataMonitor.h>
+#include <R3BUcesbSource2.h>
 #include <TH2.h>
 #include <THttpServer.h>
 #include <fmt/format.h>
@@ -67,12 +68,15 @@ namespace R3B::Neuland
         const auto reset_neuland_cmd = fmt::format(R"(/Tasks/{}/->ResetHistos())", GetName());
         const auto reset_neuland_mapped_cmd = fmt::format(R"(/Tasks/{}/->ResetHistosMapped())", GetName());
         const auto save_neuland_hists_cmd = fmt::format(R"(/Tasks/{}/->SaveAllHists())", GetName());
+        const auto restart_server_cmd = fmt::format(R"(/Tasks/{}/->RestartUcesbServer())", GetName());
 
         run->GetHttpServer()->Register("/Tasks", this);
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland", reset_neuland_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland_Mapped", reset_neuland_mapped_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/save_all_histograms", save_neuland_hists_cmd.c_str());
+        run->GetHttpServer()->RegisterCommand("/Tasks/restart_ucesb_server", restart_server_cmd.c_str());
     }
+
     void OnlineSpectra::ResetHistos()
     {
         SaveAllHists();
@@ -81,6 +85,15 @@ namespace R3B::Neuland
 
     void OnlineSpectra::ResetHistosMapped() { GetHistMonitor().get_canvas("NeulandMapped").reset(); }
     void OnlineSpectra::SaveAllHists() { GetHistMonitor().save_all_hists(); }
+    void OnlineSpectra::RestartUcesbServer()
+    {
+        if (ucesb_source_ == nullptr)
+        {
+            R3BLOG(warn, "Ucesb source is not set. Cannot restart the server.");
+            return;
+        }
+        ucesb_source_->RestartUcesbServer();
+    }
 } // namespace R3B::Neuland
 
 ClassImp(R3B::Neuland::OnlineSpectra);

@@ -32,42 +32,6 @@ namespace
 
 namespace R3B
 {
-    DataMonitorCanvas::DataMonitorCanvas(DataMonitor* monitor)
-        : monitor_{ monitor }
-    {
-    }
-
-    void DataMonitorCanvas::draw()
-    {
-        for (auto& [div_num, hists] : histograms_)
-        {
-            canvas_->cd(div_num);
-            for (auto iter = hists.begin(); iter != hists.end(); ++iter)
-            {
-                const auto* option = (*iter)->GetOption();
-                if (iter == hists.begin())
-                {
-
-                    (*iter)->Draw(option);
-                }
-                else
-                {
-                    (*iter)->Draw(fmt::format("same {}", option).c_str());
-                }
-            }
-        }
-    }
-    void DataMonitorCanvas::reset()
-    {
-        for (auto& [div_num, hists] : histograms_)
-        {
-            for (auto* hist : hists)
-            {
-                hist->Reset();
-            }
-        }
-    }
-
     auto DataMonitor::get(const std::string& histName) -> TH1*
     {
         if (auto hist = histograms_.find(histName); hist != histograms_.end())
@@ -101,18 +65,6 @@ namespace R3B
             new_dir->WriteObject(histogram.get(), histogram->GetName(), "overwrite");
         }
         // old_dir->cd();
-    }
-
-    auto DataMonitor::add_hist(std::unique_ptr<TH1> hist) -> TH1*
-    {
-        const auto* histName = hist->GetName();
-        if (histograms_.find(std::string{ histName }) != histograms_.end())
-        {
-            throw R3B::logic_error(
-                fmt::format("Histogram with the name {} has been already added. Please use different name!", histName));
-        }
-        const auto [it, is_success] = histograms_.insert({ std::string{ histName }, std::move(hist) });
-        return it->second.get();
     }
 
     auto DataMonitor::get_hist_dir(FairSink* sinkFile) -> TDirectory*

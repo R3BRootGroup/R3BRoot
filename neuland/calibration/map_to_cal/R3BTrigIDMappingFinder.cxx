@@ -168,7 +168,7 @@ namespace R3B::Neuland
     auto TrigMappingIO::Read_json() const -> TrigIDMappingFinder::TrigIDMap
     {
         const auto filepath = fs::path{ fileDir_ } / fs::path{ filename_ };
-        fmt::print("Reading trigIDMap from file {} ...\n", filepath);
+        // fmt::print("Reading trigIDMap from file {} ...\n", filepath);
         auto istream = std::ifstream(filepath);
         if (not istream.is_open())
         {

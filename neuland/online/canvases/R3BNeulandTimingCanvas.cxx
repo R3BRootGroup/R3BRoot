@@ -79,9 +79,12 @@ namespace R3B::Neuland
 
             hTofvsZ_->Fill(plane_id, time);
             hTofcvsX_->Fill(pos_x, correc_time);
+            // fmt::print("hTofvsZ: plane_id: {}, time: {}\n", plane_id, time);
+            // fmt::print("hTofcvsX: pos_x: {}, correc_time: {}\n", pos_x, correc_time);
             if (hit.energy > 0.)
             {
                 hTOFc_->Fill(correc_time);
+                // fmt::print("hTOFc: correc_time: {}\n", correc_time);
             }
         }
     }
@@ -90,6 +93,10 @@ namespace R3B::Neuland
     {
         auto* event_header = GetOnlineSpectra()->GetEventHeader();
         const auto time_start = event_header->GetTStart();
+        if (std::isnan(time_start))
+        {
+            return;
+        }
         for (const auto& cal_signal :
              cal_data_ |
                  rng::views::transform([](const auto& bar_signal)
@@ -98,6 +105,7 @@ namespace R3B::Neuland
         {
             const auto time_cal = cal_signal.leading_time - cal_signal.trigger_time;
             hNeuLANDvsStart_->Fill(time_start, time_cal.value);
+            // fmt::print("NeulandVsStart: time_start: {}, time_cal: {}\n", time_start, time_cal.value);
         }
     }
 

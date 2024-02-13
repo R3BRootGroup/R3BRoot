@@ -20,7 +20,9 @@
 #include <R3BUcesbDecl.h>
 #include <boost/core/span.hpp>
 #include <ext_data_client.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
+#include <thread>
 
 namespace R3B
 {
@@ -54,8 +56,8 @@ namespace R3B
             command_string = fmt::format("{} --max-events={}", command_string, max_event_num_);
         }
         R3BLOG(info, fmt::format("Calling ucesb with command: {}", command_string));
-
-        ucesb_server_launcher_.Launch(std::move(command_string));
+        ucesb_server_launcher_.SetLaunchCmd(command_string);
+        ucesb_server_launcher_.Launch();
     }
 
     bool UcesbSource::InitUnpackers()
@@ -82,6 +84,7 @@ namespace R3B
         // could be initialzed in type UcesbMap. But C++ doesn't allow static cast of enum class pointer to its
         // underlying type
         auto is_struct_map_success = uint32_t{};
+        R3BLOG(info, "Setting up ucesb client...");
         if (ucesb_client_.setup(
                 nullptr, 0, ucesb_client_struct_info_.Get(), &is_struct_map_success, event_struct_size_) == 0)
         {
@@ -95,8 +98,22 @@ namespace R3B
         }
     }
 
+    void UcesbSource::RestartUcesbServer()
+    {
+        auto lock = std::scoped_lock{ event_reader_mutex_ };
+        try
+        {
+            restart_ucesb_server();
+        }
+        catch (std::exception& ex)
+        {
+            throw;
+        }
+    }
+
     int UcesbSource::ReadEvent(unsigned int /*eventID*/)
     {
+        auto lock = std::scoped_lock{ event_reader_mutex_ };
         auto ret_val = ucesb_client_.fetch_event(event_struct_, event_struct_size_);
         if (ret_val > 0)
         {
@@ -105,7 +122,12 @@ namespace R3B
         else if (ret_val == 0)
         {
             R3BLOG(info, "Reached the maximal event num on the ucesb server.");
-            // ending event loop here
+            if (is_infinite_run_)
+            {
+                restart_ucesb_server_delayed();
+                return 0;
+            }
+
             return 1;
         }
         else
@@ -114,7 +136,6 @@ namespace R3B
             const auto* msg = (ucesb_client_.last_error() == nullptr) ? UCESB_NULL_STR_MSG : ucesb_client_.last_error();
             throw R3B::runtime_error(fmt::format("UCESB error: {}", msg));
         }
-
         return 0;
     }
 
@@ -214,5 +235,39 @@ namespace R3B
                 }
             });
         return true;
+    }
+
+    void UcesbSource::restart_ucesb_server()
+    {
+        ucesb_server_launcher_.Close();
+        R3BLOG(info, "Trying to restart ucesb server...");
+        ucesb_server_launcher_.Launch();
+        setup_ucesb();
+    }
+
+    void UcesbSource::restart_ucesb_server_delayed()
+    {
+        constexpr auto minimum_duration = std::chrono::minutes{ 30 };
+        constexpr auto max_waiting_time = std::chrono::minutes{ 600 };
+        constexpr auto waiting_time_increment = std::chrono::minutes{ 30 };
+        auto time_now = std::chrono::system_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::minutes>(time_now - last_start_time_);
+        if (duration < minimum_duration)
+        {
+            R3BLOG(info, fmt::format("The program has been running shortly for {}", duration));
+            waiting_time_ =
+                (waiting_time_ < max_waiting_time) ? waiting_time_ + waiting_time_increment : max_waiting_time;
+        }
+        else
+        {
+            R3BLOG(info, fmt::format("The program has been running for {}", duration));
+            waiting_time_ = std::chrono::minutes{ 0 };
+        }
+        R3BLOG(info,
+               fmt::format(
+                   "Infinite run enabled! Relaunching ucesb server after {}. Time now: {}", waiting_time_, time_now));
+        std::this_thread::sleep_for(waiting_time_);
+        restart_ucesb_server();
+        last_start_time_ = std::chrono::system_clock::now();
     }
 } // namespace R3B

@@ -60,7 +60,7 @@ struct EXT_STR_h101_t
 constexpr int DEFAULT_PORT_NUM = 11000;
 constexpr int DEFAULT_REFRESH_RATE = 1;
 constexpr int DEFAULT_RUNID = 999;
-constexpr int DEFAULT_OFFSPILL_POS = 14;
+// constexpr int DEFAULT_OFFSPILL_POS = 14;
 constexpr auto DEFAULT_UNPACKER_PATH = "202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
 constexpr auto NEULAND_GLOBAL_TIME_OFFSET_NS = -400.;
@@ -77,6 +77,7 @@ auto main(int argc, const char** argv) -> int
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto is_cal_disabled = programOptions.create_option<bool>("dis-cal", "disable cal level analysis", false);
     auto is_hit_disabled = programOptions.create_option<bool>("dis-hit", "disable hit level analysis", false);
+    auto is_infinite_run = programOptions.create_option<bool>("infi", "set to infinite run", false);
     auto input_fstream = programOptions.create_option<std::string>("inStream,i", "set the input data stream");
     auto parameter_file =
         programOptions.create_option<std::string>("par", "set the path of the parameter file (only one allowed)");
@@ -127,6 +128,10 @@ auto main(int argc, const char** argv) -> int
     auto source = std::make_unique<R3BUcesbSource2>(
         lmd_file_path, ntuple_options, ucesb_command, &ucesbStruct, sizeof(ucesbStruct));
     source->SetMaxEvents(max_event_num);
+    if (is_infinite_run.value())
+    {
+        source->SetInfiniteRun();
+    }
 
     //====================================================================================
     // Adding readers
@@ -148,6 +153,7 @@ auto main(int argc, const char** argv) -> int
         static_cast<EXT_STR_h101_WRMASTER*>(&ucesbStruct.wrmaster), offsetof(EXT_STR_h101, wrmaster), whiterabbit_id));
 
     // FairRun:
+    auto* source_ptr = source.get();
     auto run = FairRunOnline{ source.release() };
     run.SetRunId(inputRunID());
     run.ActivateHttpServer(DEFAULT_REFRESH_RATE, port_number());
@@ -190,6 +196,7 @@ auto main(int argc, const char** argv) -> int
 
     auto online_spectra = std::make_unique<R3B::Neuland::OnlineSpectra>();
     online_spectra->SetRandomGenerator(&random_gen);
+    online_spectra->SetUcesbSource(source_ptr);
     online_spectra->AddCanvas<R3B::Neuland::EventHeaderCanvas>("EventHeader");
     online_spectra->AddCanvas<R3B::Neuland::MappedCanvas>("NeulandMapped");
 
@@ -212,6 +219,7 @@ auto main(int argc, const char** argv) -> int
     try
     {
         run.Init();
+        run.Run(-1, eventNum());
     }
     catch (R3B::runtime_error& ex)
     {
@@ -227,7 +235,6 @@ auto main(int argc, const char** argv) -> int
         std::cout << "\n\n";
         return 0;
     }
-    run.Run(-1, eventNum());
 
     return 0;
 }

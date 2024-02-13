@@ -36,28 +36,30 @@ namespace R3B::Neuland
         constexpr auto TOF_MIN = -100;
         constexpr auto TOF_MAX = 400;
 
-        hHitEvsBar_ = canvas.add<1, TH2D>("hHitEvsBar",
-                                          "HitLevel: Energy vs Bars ",
-                                          bar_numbers,
-                                          -0.5,
-                                          bar_numbers + 0.5,
-                                          ENERGY_BIN_SIZE,
-                                          0,
-                                          ENERGY_MAX);
+        hHitEvsBar_ = canvas.add<1, TH2D>(
+            "hHitEvsBar", "Energy of hits", bar_numbers, -0.5, bar_numbers + 0.5, ENERGY_BIN_SIZE, 0, ENERGY_MAX);
+        hHitEvsBar_->GetXaxis()->SetTitle("module ID");
+        hHitEvsBar_->GetYaxis()->SetTitle("energy (MeV)");
 
         hTdiffvsBar_ = canvas.add<2, TH2D>("hTdiffvsBar",
-                                           "Tdiff vs Bars",
+                                           "Time difference between left and right PMT signals",
                                            bar_numbers,
                                            -0.5,
                                            bar_numbers + 0.5,
                                            TIME_DIFF_BIN_SIZE,
                                            -TIME_DIFF_MAX,
                                            TIME_DIFF_MAX);
+        hTdiffvsBar_->GetXaxis()->SetTitle("module ID");
+        hTdiffvsBar_->GetYaxis()->SetTitle("time difference (ns)");
 
         hTofvsBar_ = canvas.add<3, TH2D>(
-            "hTofvsBar", "Tof vs Bars", bar_numbers, -0.5, bar_numbers + 0.5, TOF_BIN_SIZE, TOF_MIN, TOF_MAX);
+            "hTofvsBar", "Time of hits", bar_numbers, -0.5, bar_numbers + 0.5, TOF_BIN_SIZE, TOF_MIN, TOF_MAX);
+        hTofvsBar_->GetXaxis()->SetTitle("module ID");
+        hTofvsBar_->GetYaxis()->SetTitle("time (ns)");
         hTofvsEhit_ = canvas.add<4, TH2D>(
-            "hTofvsEhit", "Tof vs Ehit", ENERGY_BIN_SIZE, 0., ENERGY_MAX, TOF_BIN_SIZE, TOF_MIN, TOF_MAX);
+            "hTofvsEhit", "Time vs energy of hits", ENERGY_BIN_SIZE, 0., ENERGY_MAX, TOF_BIN_SIZE, TOF_MIN, TOF_MAX);
+        hTofvsEhit_->GetXaxis()->SetTitle("energy (MeV)");
+        hTofvsEhit_->GetYaxis()->SetTitle("time (ns)");
     }
 
     void HitCanvas::CanvasFill(DataMonitor& /*histograms*/)
@@ -74,11 +76,15 @@ namespace R3B::Neuland
             hHitEvsBar_->Fill(module_id, hit.energy);
             // std::cout << "energy: " << hit.energy << "\n";
             hTdiffvsBar_->Fill(module_id, hit.tdc_left - hit.tdc_right);
+            // fmt::print("hHitEvsBar_ module id: {} energy: {}\n", module_id, hit.energy);
+            // fmt::print("hTdiffvsBar module id: {} time: {}\n", module_id, hit.tdc_left - hit.tdc_right);
 
             if (hit.energy > 0.)
             {
                 hTofvsBar_->Fill(module_id, hit.time);
                 hTofvsEhit_->Fill(hit.energy, hit.time);
+                // fmt::print("hTofvsBar module id: {} time: {}\n", module_id, hit.time);
+                // fmt::print("hTofvsEhit energy: {} time: {}\n", hit.energy, hit.time);
             }
         }
     }

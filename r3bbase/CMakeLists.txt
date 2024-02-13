@@ -13,6 +13,8 @@
 
 set(SRCS
     # cmake-format: sortable
+    data_monitor/R3BDataMonitor.cxx
+    data_monitor/R3BDataMonitorCanvas.cxx
     R3BCoarseTimeStitch.cxx
     R3BDataPropagator.cxx
     R3BDetector.cxx
@@ -21,7 +23,6 @@ set(SRCS
     R3BException.cxx
     R3BFileSource.cxx
     R3BFileSource2.cxx
-    R3BDataMonitor.cxx
     R3BLogger.cxx
     R3BModule.cxx
     R3BTcutPar.cxx
@@ -30,6 +31,8 @@ set(SRCS
 
 set(HEADERS
     # cmake-format: sortable
+    data_monitor/R3BDataMonitor.h
+    data_monitor/R3BDataMonitorCanvas.h
     R3BCoarseTimeStitch.h
     R3BDataPropagator.h
     R3BDetector.h
@@ -38,7 +41,6 @@ set(HEADERS
     R3BException.h
     R3BFileSource.h
     R3BFileSource2.h
-    R3BDataMonitor.h
     R3BIOConnector.h
     R3BLogger.h
     R3BModule.h
@@ -50,7 +52,7 @@ set(HEADERS
     R3BValueError.h)
 
 add_library(R3BBase SHARED ${SRCS})
-target_include_directories(R3BBase PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(R3BBase PUBLIC data_monitor ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(
     R3BBase # cmake-format: sortable
     PUBLIC GeoBase

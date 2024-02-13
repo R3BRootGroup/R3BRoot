@@ -71,7 +71,12 @@ namespace R3B::Neuland
         }
         last_event_num_ = event_number;
 
-        hTstart_->Fill(event_header->GetTStart());
+        auto time_start = event_header->GetTStart();
+        if (not std::isnan(time_start))
+        {
+            hTstart_->Fill(time_start);
+            // fmt::print("tstart: {}\n", time_start);
+        }
 
         for (const auto& bar_signal_one : cal_data_)
         {

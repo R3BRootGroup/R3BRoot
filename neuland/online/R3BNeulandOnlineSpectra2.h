@@ -32,6 +32,11 @@
 
 class FairRunOnline;
 
+namespace R3B
+{
+    class UcesbSource;
+}
+
 namespace R3B::Neuland
 {
     class OnlineSpectra : public CalibrationTask
@@ -42,6 +47,7 @@ namespace R3B::Neuland
         void ResetHistos();
         void ResetHistosMapped();
         void SaveAllHists();
+        void RestartUcesbServer();
 
         OnlineSpectra(const OnlineSpectra&) = delete;
         OnlineSpectra(OnlineSpectra&&) = delete;
@@ -50,6 +56,7 @@ namespace R3B::Neuland
         ~OnlineSpectra() override;
 
         auto GetRandomGenerator() -> TRandom* { return random_gen_; }
+        [[nodiscard]] auto GetDistanceToTarget() const { return distance_to_target_; }
 
         void SetRandomGenerator(TRandom* rand)
         {
@@ -59,7 +66,7 @@ namespace R3B::Neuland
             }
         }
         void SetDistanceToTarget(double distance) { distance_to_target_ = distance; }
-        [[nodiscard]] auto GetDistanceToTarget() const { return distance_to_target_; }
+        void SetUcesbSource(UcesbSource* source) { ucesb_source_ = source; }
 
         template <typename SpecType, typename = std::enable_if_t<std::is_base_of_v<OnlineCanvas, SpecType>>>
         auto AddCanvas(std::string_view name, CalTrigger trigger = CalTrigger::all) -> SpecType&
@@ -85,6 +92,7 @@ namespace R3B::Neuland
       private:
         double distance_to_target_ = 0.;
         std::vector<std::unique_ptr<OnlineCanvas>> spectra_;
+        UcesbSource* ucesb_source_ = nullptr;
         TRandom* random_gen_ = gRandom; // non-owning
 
         // virtual functions:
