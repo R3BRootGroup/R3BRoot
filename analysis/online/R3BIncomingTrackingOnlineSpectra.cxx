@@ -413,6 +413,57 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_angvsposy->Fill(ytarget, angY * 1000.);
             }
         }
+        else if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && fYearConf == 2024)
+        {
+
+            nHits = fMwpc1HitDataCA->GetEntriesFast();
+            Float_t mwpc1x = -150.;
+            Float_t mwpc1y = -150.;
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(ihit));
+                if (!hit)
+                    continue;
+                mwpc1x = hit->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
+                mwpc1y = hit->GetY() + fMw1GeoPar->GetPosY() * 10.; // mm
+            }
+
+            if (mwpc1x > -150 && mwpc1y > -150)
+            {
+                nHits = fMwpc2HitDataCA->GetEntriesFast();
+                Float_t mwpc2x = -150.;
+                Float_t mwpc2y = -150.;
+                Float_t angX = -500.;
+                Float_t angY = -500.;
+                for (int ihit = 0; ihit < nHits; ihit++)
+                {
+                    auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc2HitDataCA->At(ihit));
+                    if (!hit)
+                        continue;
+                    mwpc2x = hit->GetX() + fMw2GeoPar->GetPosX() * 10.;
+                    mwpc2y = hit->GetY() + fMw2GeoPar->GetPosY() * 10.;
+                    angX = std::atan((mwpc1x - mwpc2x) / (fMw1GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                    angY = std::atan((mwpc1y - mwpc2y) / (fMw1GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                    if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc2x > -150.)
+                    {
+                        zrand = gRandom->Uniform(0., fDist_acelerator_glad);
+                        fh2_tracking_planeYZ->Fill(zrand,
+                                                   mwpc2y - angY * fMw2GeoPar->GetPosZ() * 10. + angY * zrand); // mm
+                        ytarget = mwpc2y - angY * fMw2GeoPar->GetPosZ() * 10. + angY * fPosTarget;
+                        fh2_tracking_planeXZ->Fill(zrand,
+                                                   mwpc2x - angX * fMw2GeoPar->GetPosZ() * 10. + angX * zrand); // mm
+                        xtarget = mwpc2x - angX * fMw2GeoPar->GetPosZ() * 10. + angX * fPosTarget;
+                    }
+                }
+
+                if (xtarget > -500. && ytarget > -500.)
+                {
+                    fh2_target_PosXY->Fill(xtarget, ytarget);
+                    fh2_angvsposx->Fill(xtarget, angX * 1000.); // mrad
+                    fh2_angvsposy->Fill(ytarget, angY * 1000.);
+                }
+            }
+        }
     }
 
     fNEvents += 1;
