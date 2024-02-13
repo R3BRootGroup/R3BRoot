@@ -332,7 +332,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill Mwpc0 Hit data
-    if (fMwpc0HitDataCA && fMwpc0HitDataCA->GetEntriesFast() > 0)
+    // if (fMwpc0HitDataCA && fMwpc0HitDataCA->GetEntriesFast() > 0)
     {
         Int_t nHits = fMwpc0HitDataCA->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)

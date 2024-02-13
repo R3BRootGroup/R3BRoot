@@ -168,6 +168,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         }
         mainfol->Add(calfol);
 
+        auto* cCaltotal = new TCanvas("Ccal mul", "", 10, 10, 500, 500);
         fh1_Calmult_total = R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 50, 0, 50);
         fh1_Calmult_total->GetXaxis()->SetTitle("Pixel multiplicity");
         fh1_Calmult_total->GetYaxis()->SetTitle("Counts");
@@ -176,6 +177,9 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         fh1_Calmult_total->GetYaxis()->CenterTitle(true);
         fh1_Calmult_total->SetLineColor(1);
         fh1_Calmult_total->SetFillColor(31);
+        cCaltotal->cd();
+        fh1_Calmult_total->Draw("colz");
+        mainfol->Add(cCaltotal);
     }
 
     if (fHitItems)
@@ -244,9 +248,6 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
     if (fh1_Calmult_total)
         mainfol->Add(fh1_Calmult_total);
-
-    if (fh2_theta_phi)
-        mainfol->Add(fh2_theta_phi);
 
     run->AddObject(mainfol);
 
@@ -365,7 +366,10 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
             }
             for (int s = 0; s < fNbSensors; s++)
                 if (mult[s] > 0)
+                {
                     fh1_Calmult[s]->Fill(mult[s]);
+                    fh1_Calmult_total->Fill(mult[s]);
+                }
         }
         else
         {

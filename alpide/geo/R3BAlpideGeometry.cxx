@@ -71,7 +71,7 @@ bool R3BAlpideGeometry::Init(Int_t version)
 
         case 2024:
             // Two arms
-            geoPath += "target_area_alpide_twoarms_v24.geo.root";
+            geoPath += "target_area_alpide_twoarms_v2024.2.geo.root";
             fNbSensor = 108;
             fGeometryVersion = version;
             break;
