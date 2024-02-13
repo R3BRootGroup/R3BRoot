@@ -577,6 +577,17 @@ InitStatus R3BTofDOnlineSpectra::Init()
             maintofd->Add(cToFd_los);
         }
         maintofd->Add(cToFd_los_h2);
+
+        auto cToFd_time_charge = new TCanvas("tofd_time_vs_charge", "", 20, 20, 1120, 1020);
+        fh2_tofd_time_vs_charge =
+            R3B::root_owned<TH2F>("fh2_tofd_time_vs_charge", "Time vs Charge", 10000, 40, 75, 1000, 0, 12);
+        fh2_tofd_time_vs_charge->GetXaxis()->SetTitle("ToF [ns]");
+        fh2_tofd_time_vs_charge->GetYaxis()->SetTitle("Charge");
+        fh2_tofd_time_vs_charge->GetXaxis()->CenterTitle(true);
+        fh2_tofd_time_vs_charge->GetYaxis()->CenterTitle(true);
+        fh2_tofd_time_vs_charge->Draw("colz");
+
+        maintofd->Add(cToFd_time_charge);
     }
 
     run->AddObject(maintofd);
@@ -622,6 +633,7 @@ void R3BTofDOnlineSpectra::Reset_Histo()
         {
             fh_tofd_dt_hit[i]->Reset();
         }
+        fh2_tofd_time_vs_charge->Reset();
     }
     return;
 }
@@ -1078,6 +1090,9 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             fh_tofd_bars[iPlane - 1]->Fill(hitTofd->GetBarId());
             fh_tofd_time_los_h2[iPlane - 1]->Fill(hitTofd->GetBarId(), hitTofd->GetTof());
             fh_tofd_time_los[hitTofd->GetBarId() - 1][iPlane - 1]->Fill(hitTofd->GetTof());
+            if (iPlane == 1)
+                fh2_tofd_time_vs_charge->Fill(hitTofd->GetTof(), hitTofd->GetEloss());
+
             iCounts[iPlane - 1] += 1;
             nMulti[iPlane - 1] += 1;
         }
@@ -1154,6 +1169,7 @@ void R3BTofDOnlineSpectra::FinishTask()
         {
             fh_tofd_dt_hit[i]->Write();
         }
+        fh2_tofd_time_vs_charge->Write();
     }
 }
 
