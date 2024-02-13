@@ -20,6 +20,7 @@
 
 #include <FairTask.h>
 #include <Rtypes.h>
+#include <TRotation.h>
 
 #include "R3BAlpideHitData.h"
 
@@ -62,25 +63,29 @@ class R3BAlpideCal2Hit : public FairTask
   private:
     void SetParameter();
     void FindClusters();
-    Double_t fPixelSize;
-    Int_t fNbSensors;
-    bool fOnline; // Don't store data for online
+
+    double fPixelSize = 0.0292968;
+    int fNbSensors = 108;
+    bool fOnline = false;
 
     TVector3 fTargetPos;
     TVector3 fAlpidePos;
     TVector3 fAlpidetoTargetPos;
 
-    R3BTGeoPar* fTargetGeoPar;
-    R3BTGeoPar* fAlpideGeoPar;
-    Int_t fGeoversion;
-    R3BAlpideGeometry* fAlpideGeo;
-    R3BAlpideMappingPar* fMap_Par; /**< Parameter container. >*/
-    TClonesArray* fAlpideCalData;  // Array with Alpide Cal input data
-    TClonesArray* fAlpideHitData;  // Array with Alpide Hit output data
-    TClonesArray* fAlpideCluster;  // Array with clusters
+    TVector3 fTrans;
+    TRotation fRot;
+
+    R3BTGeoPar* fTargetGeoPar = nullptr;
+    R3BTGeoPar* fAlpideGeoPar = nullptr;
+    int fGeoversion = 202402;
+    R3BAlpideGeometry* fAlpideGeo = nullptr;
+    R3BAlpideMappingPar* fMap_Par = nullptr; /**< Parameter container. >*/
+    TClonesArray* fAlpideCalData = nullptr;  // Array with Alpide Cal input data
+    TClonesArray* fAlpideHitData = nullptr;  // Array with Alpide Hit output data
+    TClonesArray* fAlpideCluster = nullptr;  // Array with clusters
 
     // Private method AddHitData
-    R3BAlpideHitData* AddHitData(UShort_t senId, UInt_t clustersize, Double_t x, Double_t y);
+    R3BAlpideHitData* AddHitData(uint16_t senId, uint16_t clustersize, double xpos, double ypos, double zpos);
 
   public:
     // Class definition

@@ -79,6 +79,8 @@ class R3BAlpideOnlineSpectra : public FairTask
      */
     void FinishEvent() override;
 
+    void FinishTask() override;
+
     /**
      * Methods to clean histograms.
      */
@@ -115,6 +117,10 @@ class R3BAlpideOnlineSpectra : public FairTask
     std::vector<TH1F*> fh1_Calmult;
     std::vector<TH1F*> fh1_Clustermult;
     std::vector<TH1F*> fh1_Clustersize;
+
+    TH1F* fh1_Calmult_total;
+
+    TH2F* fh2_theta_phi;
 
   public:
     ClassDefOverride(R3BAlpideOnlineSpectra, 1)
