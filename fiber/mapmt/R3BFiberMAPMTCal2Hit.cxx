@@ -417,7 +417,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                         {
                             gainUp = par->GetGainUp();
                             gainDown = par->GetGainDown();
-                            tsync = par->GetSync();
+                            // tsync = par->GetSync();
                             // offsetUp = par->GetOffsetUp();
                             offsetDT = par->GetOffsetDown();
                         }
@@ -673,4 +673,4 @@ void R3BFiberMAPMTCal2Hit::FinishTask()
     }
 }
 
-ClassImp(R3BFiberMAPMTCal2Hit);
+ClassImp(R3BFiberMAPMTCal2Hit)
