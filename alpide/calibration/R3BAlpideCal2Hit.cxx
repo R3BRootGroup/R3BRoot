@@ -17,14 +17,14 @@
 // -------------------------------------------------------------
 
 // ROOT headers
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 // ALPIDE headers
 #include "R3BAlpideCal2Hit.h"
@@ -45,16 +45,7 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit()
 // R3BAlpideCal2Hit::Standard Constructor --------------------------
 R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fAlpideCalData(NULL)
-    , fAlpideHitData(NULL)
-    // , fAlpidePixel(NULL)
-    , fMap_Par(NULL)
-    , fNbSensors(1)
-    , fPixelSize(0.0292968) // TODO: put the right ones!
-    , fAlpideGeo(NULL)
-    , fGeoversion(2024)
     , fAlpideCluster(new TClonesArray("R3BAlpideCluster"))
-    , fOnline(kFALSE)
 {
     fTargetPos.SetXYZ(0., 0., 0.);
     fAlpidePos.SetXYZ(0., 0., 0.);
@@ -316,10 +307,18 @@ void R3BAlpideCal2Hit::FindClusters()
             if (mult[s][i] > 0)
             {
                 nbcluster++;
-                AddHitData(s + 1,
-                           mult[s][i],
-                           meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
-                           meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0);
+
+                fRot = fAlpideGeo->GetRotation(s + 1);
+                fTrans = fAlpideGeo->GetTranslation(s + 1);
+
+                TVector3 localpos;
+                localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
+                                meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0,
+                                0.);
+
+                // Lab frame
+                TVector3 labpos = fRot * localpos + fTrans;
+                AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z());
             }
 
     R3BLOG(debug, "Number of clusters: " << nbcluster);
@@ -327,12 +326,16 @@ void R3BAlpideCal2Hit::FindClusters()
 }
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BAlpideHitData* R3BAlpideCal2Hit::AddHitData(UShort_t senId, UInt_t clustersize, Double_t x, Double_t y)
+R3BAlpideHitData* R3BAlpideCal2Hit::AddHitData(uint16_t senId,
+                                               uint16_t clustersize,
+                                               double xpos,
+                                               double ypos,
+                                               double zpos)
 {
     // It fills the R3BAlpideHitData
     TClonesArray& clref = *fAlpideHitData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideHitData(senId, clustersize, x, y);
+    return new (clref[size]) R3BAlpideHitData(senId, clustersize, xpos, ypos, zpos);
 }
 
-ClassImp(R3BAlpideCal2Hit);
+ClassImp(R3BAlpideCal2Hit)

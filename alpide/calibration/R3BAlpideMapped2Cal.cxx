@@ -128,10 +128,10 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
         auto col = mappedData->GetCol();
         auto row = mappedData->GetRow();
         // std::cout << det <<" "<< col <<" "<< row <<std::endl;
-        if (fMap_Par->GetInUse(det, col, row) == 1)
-        {
-            AddCalData(det, row, col);
-        }
+        // if (fMap_Par->GetInUse(det, col, row) == 1)
+        //{
+        AddCalData(det, row, col);
+        //}
     }
     return;
 }

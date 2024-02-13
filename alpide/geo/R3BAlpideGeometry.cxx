@@ -76,6 +76,13 @@ bool R3BAlpideGeometry::Init(Int_t version)
             fGeometryVersion = version;
             break;
 
+        case 202402:
+            // Two arms
+            geoPath += "target_area_alpide_singlearms_v202402.geo.root";
+            fNbSensor = 24;
+            fGeometryVersion = version;
+            break;
+
         case 202210:
             // 6 ALPIDEs in a telescope configuration
             geoPath += "tracking_alpide_cern_202210.geo.root";
