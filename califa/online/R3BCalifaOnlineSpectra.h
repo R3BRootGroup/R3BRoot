@@ -269,6 +269,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_crystals_p_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH2F* fh2_Califa_coinE;
     TH2F* fh2_Califa_coinTheta;
+    TH2F* fh2_Califa_coinTheta_cutOPA;
     TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_theta_phi;
     TH2F* fh2_Califa_theta_energy;
