@@ -626,7 +626,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // CANVAS Theta correlations between hits
     cCalifaCoinTheta = new TCanvas("Califa_theta_correlation_hits", "Theta correlations, hit level", 10, 10, 500, 500);
-    cCalifaCoinTheta->Divide(2,1);
+    cCalifaCoinTheta->Divide(2, 1);
     cCalifaCoinTheta->cd(1);
     fh2_Califa_coinTheta =
         R3B::root_owned<TH2F>("fh2_Califa_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
@@ -638,8 +638,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_coinTheta->Draw("COLZ");
 
     cCalifaCoinTheta->cd(2);
-    fh2_Califa_coinTheta_cutOPA = 
-        R3B::root_owned<TH2F>("fh2_Califa_theta_correlations_cutOPA", "Califa theta correlations OPA cut", 500, 0, 100, 500, 0, 100);
+    fh2_Califa_coinTheta_cutOPA = R3B::root_owned<TH2F>(
+        "fh2_Califa_theta_correlations_cutOPA", "Califa theta correlations OPA cut", 500, 0, 100, 500, 0, 100);
     fh2_Califa_coinTheta_cutOPA->GetXaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta_cutOPA->GetYaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta_cutOPA->SetTitleOffset(1.2);
@@ -1578,17 +1578,18 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                     fh2_Califa_coinTheta->Fill(califa_theta[i1], califa_theta[i2]);
                     fh2_Califa_coinPhi->Fill(califa_phi[i1], califa_phi[i2]);
 
-	            if (master[0].Angle(master[1]) * TMath::RadToDeg()>68 && master[0].Angle(master[1]) * TMath::RadToDeg()<82)
+                    if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 &&
+                        master[0].Angle(master[1]) * TMath::RadToDeg() < 82)
                         fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i1], califa_theta[i2]);
-
                 }
                 else
                 {
                     fh2_Califa_coinE->Fill(califa_e[i2], califa_e[i1]);
                     fh2_Califa_coinTheta->Fill(califa_theta[i2], califa_theta[i1]);
                     fh2_Califa_coinPhi->Fill(califa_phi[i2], califa_phi[i1]);
-	            
-		    if (master[0].Angle(master[1]) * TMath::RadToDeg()>68 && master[0].Angle(master[1]) * TMath::RadToDeg()<82)
+
+                    if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 &&
+                        master[0].Angle(master[1]) * TMath::RadToDeg() < 82)
                         fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i2], califa_theta[i1]);
                 }
             }
