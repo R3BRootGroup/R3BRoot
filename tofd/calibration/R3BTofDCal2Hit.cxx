@@ -182,7 +182,7 @@ void R3BTofDCal2Hit::SetParameter()
 InitStatus R3BTofDCal2Hit::Init()
 {
     R3BLOG(info, "");
-    FairRootManager* mgr = FairRootManager::Instance();
+    auto* mgr = FairRootManager::Instance();
     if (!mgr)
     {
         R3BLOG(fatal, "FairRootManager not found");
