@@ -12,10 +12,11 @@
  ******************************************************************************/
 
 #include "R3BLosProvideTStart.h"
-#include "FairRootManager.h"
 #include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+
+#include <FairRootManager.h>
 
 R3BLosProvideTStart::R3BLosProvideTStart()
     : FairTask("R3BLosProvideTStart", 0)
@@ -51,8 +52,7 @@ InitStatus R3BLosProvideTStart::Init()
     fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("EventHeader."));
     if (fEventHeader == nullptr)
     {
-        fEventHeader = dynamic_cast<R3BEventHeader*>(ioman->GetObject("R3BEventHeader"));
-        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(fatal, "EventHeader. not found");
     }
     // Definition of a time stich object to correlate times coming from different systems
     fTimeStitch = new R3BCoarseTimeStitch();
@@ -69,6 +69,20 @@ void R3BLosProvideTStart::Exec(Option_t*)
     }
 
     fEventHeader->SetTStart(GetTStart());
+    fEventHeader->SetTStartSimple(GetTStart_without_trigger());
+}
+
+Double_t R3BLosProvideTStart::GetTStart_without_trigger() const
+{
+    const auto losCalData = fLosCalData.Retrieve();
+    if (losCalData.empty())
+    {
+        return std::numeric_limits<Double_t>::quiet_NaN();
+    }
+    else
+    {
+        return losCalData.back()->GetMeanTimeVFTX();
+    }
 }
 
 Double_t R3BLosProvideTStart::GetTStart() const
@@ -135,4 +149,4 @@ Double_t R3BLosProvideTStart::GetTStartTrigHit() const
 
 bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart()); }
 
-ClassImp(R3BLosProvideTStart);
+ClassImp(R3BLosProvideTStart)

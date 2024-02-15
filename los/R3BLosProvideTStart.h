@@ -49,6 +49,7 @@ class R3BLosProvideTStart : public FairTask
     bool IsBeam() const;
     Double_t GetTStart() const;
     Double_t GetTStartTrigHit() const;
+    Double_t GetTStart_without_trigger() const;
 
     Bool_t fUseTrigHit;
 
