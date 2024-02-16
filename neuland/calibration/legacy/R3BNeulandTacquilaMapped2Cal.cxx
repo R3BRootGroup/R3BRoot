@@ -229,7 +229,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
     Int_t iPlane;
     Int_t iPaddle;
     Int_t iSide;
-    Int_t channel;
+    Int_t channel = 0;
     Int_t tdc;
     R3BTCalModulePar* par;
     Double_t time;
