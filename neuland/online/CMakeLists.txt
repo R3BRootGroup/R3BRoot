@@ -15,6 +15,7 @@
 set(SRCS
     # cmake-format: sortable
     canvases/R3BNeulandCalCanvas.cxx
+    canvases/R3BNeulandCountRateCanvas.cxx
     canvases/R3BNeulandEventHeaderCanvas.cxx
     canvases/R3BNeulandHitCanvas.cxx
     canvases/R3BNeulandHitCosmicCanvas.cxx
@@ -29,6 +30,7 @@ set(SRCS
 set(HEADERS
     # cmake-format: sortable
     canvases/R3BNeulandCalCanvas.h
+    canvases/R3BNeulandCountRateCanvas.h
     canvases/R3BNeulandEventHeaderCanvas.h
     canvases/R3BNeulandHitCanvas.h
     canvases/R3BNeulandHitCosmicCanvas.h

@@ -30,6 +30,11 @@ namespace R3B::Neuland
       private:
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
 
+        CanvasElement<TH2D> hCalTvsBar_L;
+        CanvasElement<TH2D> hCalTvsBar_R;
+        CanvasElement<TH2D> hCalToTvsBar_L;
+        CanvasElement<TH2D> hCalToTvsBar_R;
+
         void DataInit() override;
         void CanvasInit(DataMonitor& histograms) override;
         void CanvasFill(DataMonitor& histograms) override;

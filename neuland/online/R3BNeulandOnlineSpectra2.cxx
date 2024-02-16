@@ -25,7 +25,7 @@ namespace R3B::Neuland
         : CalibrationTask(name, iVerbose)
     {
     }
-    OnlineSpectra::~OnlineSpectra() { SaveAllHists(); }
+    OnlineSpectra::~OnlineSpectra() { SaveAll(); }
 
     void OnlineSpectra::HistogramInit(DataMonitor& histograms)
     {
@@ -67,24 +67,30 @@ namespace R3B::Neuland
     {
         const auto reset_neuland_cmd = fmt::format(R"(/Tasks/{}/->ResetHistos())", GetName());
         const auto reset_neuland_mapped_cmd = fmt::format(R"(/Tasks/{}/->ResetHistosMapped())", GetName());
-        const auto save_neuland_hists_cmd = fmt::format(R"(/Tasks/{}/->SaveAllHists())", GetName());
+        const auto save_neuland_hists_cmd = fmt::format(R"(/Tasks/{}/->SaveAll())", GetName());
         const auto restart_server_cmd = fmt::format(R"(/Tasks/{}/->RestartUcesbServer())", GetName());
+        const auto graph_view_full = fmt::format(R"(/Tasks/{}/->SetCountRateFullView())", GetName());
+        const auto graph_view_two_hours = fmt::format(R"(/Tasks/{}/->SetCountRateViewTwoHours())", GetName());
+        const auto graph_view_four_hours = fmt::format(R"(/Tasks/{}/->SetCountRateViewfourHours())", GetName());
 
         run->GetHttpServer()->Register("/Tasks", this);
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland", reset_neuland_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/Reset_Neuland_Mapped", reset_neuland_mapped_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/save_all_histograms", save_neuland_hists_cmd.c_str());
         run->GetHttpServer()->RegisterCommand("/Tasks/restart_ucesb_server", restart_server_cmd.c_str());
+        run->GetHttpServer()->RegisterCommand("/Tasks/graph_full_view", graph_view_full.c_str());
+        run->GetHttpServer()->RegisterCommand("/Tasks/graph_two_hours_view", graph_view_two_hours.c_str());
+        run->GetHttpServer()->RegisterCommand("/Tasks/graph_four_hours_view", graph_view_four_hours.c_str());
     }
 
     void OnlineSpectra::ResetHistos()
     {
-        SaveAllHists();
+        SaveAll();
         GetHistMonitor().reset_all_hists();
     }
 
     void OnlineSpectra::ResetHistosMapped() { GetHistMonitor().get_canvas("NeulandMapped").reset(); }
-    void OnlineSpectra::SaveAllHists() { GetHistMonitor().save_all_hists(); }
+    void OnlineSpectra::SaveAll() { GetHistMonitor().save_all(); }
     void OnlineSpectra::RestartUcesbServer()
     {
         if (ucesb_source_ == nullptr)

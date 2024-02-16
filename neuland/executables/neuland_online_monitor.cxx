@@ -208,6 +208,7 @@ auto main(int argc, const char** argv) -> int
 
     if (not is_hit_disabled.value())
     {
+        online_spectra->AddCanvas<R3B::Neuland::CountRateCanvas>("NeulandCountRate", R3B::Neuland::CalTrigger::all);
         online_spectra->AddCanvas<R3B::Neuland::HitCanvas>("NeulandHit", R3B::Neuland::CalTrigger::onspill);
         online_spectra->AddCanvas<R3B::Neuland::HitXYCanvas>("NeulandPlaneXY", R3B::Neuland::CalTrigger::onspill);
         online_spectra->AddCanvas<R3B::Neuland::HitCosmicCanvas>("NeulandHitCosmics",

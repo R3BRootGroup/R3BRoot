@@ -17,6 +17,7 @@
 #include <R3BNeulandCalCanvas.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCalibrationTask.h>
+#include <R3BNeulandCountRateCanvas.h>
 #include <R3BNeulandEventHeaderCanvas.h>
 #include <R3BNeulandHit.h>
 #include <R3BNeulandHitCanvas.h>
@@ -43,21 +44,18 @@ namespace R3B::Neuland
     {
       public:
         explicit OnlineSpectra(std::string_view name = "R3BNeulandOnlineSpectra", int iVerbose = 1);
-
-        void ResetHistos();
-        void ResetHistosMapped();
-        void SaveAllHists();
-        void RestartUcesbServer();
-
         OnlineSpectra(const OnlineSpectra&) = delete;
         OnlineSpectra(OnlineSpectra&&) = delete;
         auto operator=(const OnlineSpectra&) -> OnlineSpectra& = delete;
         auto operator=(OnlineSpectra&&) -> OnlineSpectra& = delete;
         ~OnlineSpectra() override;
 
+        // Getters:
         auto GetRandomGenerator() -> TRandom* { return random_gen_; }
         [[nodiscard]] auto GetDistanceToTarget() const { return distance_to_target_; }
+        [[nodiscard]] auto GetGraphViewMode() const { return graph_view_mode_.load(); }
 
+        // Setters:
         void SetRandomGenerator(TRandom* rand)
         {
             if (rand != nullptr)
@@ -86,11 +84,33 @@ namespace R3B::Neuland
             }
         }
 
+        // Methods for https server:
+        void ResetHistos();
+        void ResetHistosMapped();
+        void SaveAll();
+        void RestartUcesbServer();
+        void SetCountRateFullView()
+        {
+            R3BLOG(info, "Graph is changed to full view!");
+            graph_view_mode_.store(CountRateCanvas::RangeViewMode::full);
+        }
+        void SetCountRateViewTwoHours()
+        {
+            R3BLOG(info, "Graph is changed to 2 hour view!");
+            graph_view_mode_.store(CountRateCanvas::RangeViewMode::two_hours);
+        }
+        void SetCountRateViewfourHours()
+        {
+            R3BLOG(info, "Graph is changed to 4 hour view!");
+            graph_view_mode_.store(CountRateCanvas::RangeViewMode::four_hours);
+        }
+
         // for backward compability
         [[deprecated("Please use SetTrigger()")]] void SetCosmicTpat(UInt_t CosmicTpat = 0) {}
 
       private:
         double distance_to_target_ = 0.;
+        std::atomic<CountRateCanvas::RangeViewMode> graph_view_mode_ = CountRateCanvas::RangeViewMode::full;
         std::vector<std::unique_ptr<OnlineCanvas>> spectra_;
         UcesbSource* ucesb_source_ = nullptr;
         TRandom* random_gen_ = gRandom; // non-owning

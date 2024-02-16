@@ -110,7 +110,7 @@ namespace R3B
         }
     }
 
-    void DataMonitor::save_all_hists(std::string_view filename)
+    void DataMonitor::save_all(std::string_view filename)
     {
         if (filename.empty())
         {
@@ -121,6 +121,10 @@ namespace R3B
         for (auto& [name, hist] : histograms_)
         {
             rootfile->WriteObject(hist.get(), hist->GetName(), "overwrite");
+        }
+        for (auto& [name, graph] : graphs_)
+        {
+            rootfile->WriteObject(graph.get(), graph->GetName(), "overwrite");
         }
     }
 } // namespace R3B

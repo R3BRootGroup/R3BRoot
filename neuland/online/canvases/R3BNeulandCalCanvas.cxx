@@ -36,38 +36,38 @@ namespace R3B::Neuland
         constexpr auto TIME_MAX = 15000.;
         constexpr auto TOT_BIN_SIZE = 600;
 
-        canvas.add<1, TH2D>("hCalTvsBar_L",
-                            "CalLevel_left: Time vs Bars  ",
-                            bar_numbers,
-                            0.5,
-                            bar_numbers + 0.5,
-                            TIME_BIN_SIZE,
-                            TIME_MIN,
-                            TIME_MAX);
-        canvas.add<2, TH2D>("hCalTvsBar_R",
-                            "CalLevel_right: Time vs Bars  ",
-                            bar_numbers,
-                            0.5,
-                            bar_numbers + 0.5,
-                            TIME_BIN_SIZE,
-                            TIME_MIN,
-                            TIME_MAX);
-        canvas.add<3, TH2D>("hCalToTvsBar_L",
-                            "CalLevel_left: ToT vs Bars",
-                            bar_numbers,
-                            0.5,
-                            bar_numbers + 0.5,
-                            TOT_BIN_SIZE,
-                            0.,
-                            TOT_BIN_SIZE + 0.);
-        canvas.add<4, TH2D>("hCalToTvsBar_R",
-                            "CalLevel_right: ToT vs Bars",
-                            bar_numbers,
-                            0.5,
-                            bar_numbers + 0.5,
-                            TOT_BIN_SIZE,
-                            0.,
-                            TOT_BIN_SIZE + 0.);
+        hCalTvsBar_L = canvas.add<1, TH2D>("hCalTvsBar_L",
+                                           "CalLevel_left: Time vs Bars  ",
+                                           bar_numbers,
+                                           0.5,
+                                           bar_numbers + 0.5,
+                                           TIME_BIN_SIZE,
+                                           TIME_MIN,
+                                           TIME_MAX);
+        hCalTvsBar_R = canvas.add<2, TH2D>("hCalTvsBar_R",
+                                           "CalLevel_right: Time vs Bars  ",
+                                           bar_numbers,
+                                           0.5,
+                                           bar_numbers + 0.5,
+                                           TIME_BIN_SIZE,
+                                           TIME_MIN,
+                                           TIME_MAX);
+        hCalToTvsBar_L = canvas.add<3, TH2D>("hCalToTvsBar_L",
+                                             "CalLevel_left: ToT vs Bars",
+                                             bar_numbers,
+                                             0.5,
+                                             bar_numbers + 0.5,
+                                             TOT_BIN_SIZE,
+                                             0.,
+                                             TOT_BIN_SIZE + 0.);
+        hCalToTvsBar_R = canvas.add<4, TH2D>("hCalToTvsBar_R",
+                                             "CalLevel_right: ToT vs Bars",
+                                             bar_numbers,
+                                             0.5,
+                                             bar_numbers + 0.5,
+                                             TOT_BIN_SIZE,
+                                             0.,
+                                             TOT_BIN_SIZE + 0.);
     }
 
     void CalCanvas::CanvasFill(DataMonitor& histograms)
