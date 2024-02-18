@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,6 +19,7 @@
 // ROOT headers
 #include <TClonesArray.h>
 #include <TMath.h>
+#include <TRandom.h>
 
 // FAIR headers
 #include <FairLogger.h>
@@ -60,10 +61,7 @@ R3BAlpideCal2Hit::~R3BAlpideCal2Hit()
     {
         delete fAlpideCluster;
     }
-    /* if (fAlpidePixel)
-     {
-         delete fAlpidePixel;
-     }*/
+
     if (fAlpideHitData)
     {
         delete fAlpideHitData;
@@ -90,8 +88,6 @@ void R3BAlpideCal2Hit::SetParContainers()
     R3BLOG(info, "Container AlpideGeoPar found.");
     R3BLOG(info, "Container TargetGeoPar found.");
 
-    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
-    fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
     return;
 }
 
@@ -102,6 +98,10 @@ void R3BAlpideCal2Hit::SetParameter()
     R3BLOG(info, "Geometry version: " << fGeoversion);
     fNbSensors = fMap_Par->GetNbSensors();
     R3BLOG(info, "Nb of sensors: " << fNbSensors);
+
+    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
+    fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
+
     return;
 }
 
@@ -109,12 +109,8 @@ void R3BAlpideCal2Hit::SetParameter()
 InitStatus R3BAlpideCal2Hit::Init()
 {
     R3BLOG(info, "");
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (!mgr)
-    {
-        R3BLOG(fatal, "FairRootManager not found");
-        return kFATAL;
-    }
+    auto* mgr = FairRootManager::Instance();
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
 
     // INPUT DATA
     fAlpideCalData = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideCalData"));
@@ -133,14 +129,6 @@ InitStatus R3BAlpideCal2Hit::Init()
 
     fAlpideGeo = R3BAlpideGeometry::Instance();
     R3BLOG_IF(error, !fAlpideGeo->Init(fGeoversion), "Alpide geometry " << fGeoversion << " not found");
-
-    //  for(int s=0;s<363;s++){
-    //              TVector3 vref = this->GetAnglesVector(s+1);
-    //            auto m = this->GetTransformation(s+1);
-    // std::cout <<"sensorid: "<<s + 1 << " , "<<vref.Mag() <<" , "<<vref.Theta()*TMath::RadToDeg() <<" , "
-    //<<vref.Phi()*TMath::RadToDeg()<<std::endl;
-    //  m.Print();
-    //     }
 
     fAlpidetoTargetPos = fTargetPos - fAlpidePos;
 
@@ -260,10 +248,6 @@ void R3BAlpideCal2Hit::Reset()
     {
         fAlpideCluster->Clear();
     }
-    /*  if (fAlpidePixel)
-      {
-          fAlpidePixel->Clear();
-      }*/
 }
 
 // -----   Private method FindClusters   -----------------------------------------
@@ -312,13 +296,14 @@ void R3BAlpideCal2Hit::FindClusters()
                 fTrans = fAlpideGeo->GetTranslation(s + 1);
 
                 TVector3 localpos;
-                localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
+                localpos.SetXYZ(-meancol[s][i] / double(mult[s][i]) * fPixelSize + 30. / 2.0,
                                 meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0,
-                                0.);
+                                0.0);
 
                 // Lab frame
-                TVector3 labpos = fRot * localpos + fTrans;
-                AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z());
+                TVector3 labpos = fRot * localpos + fTrans * 10.; // 10 because fTrans is in mm
+
+                AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
             }
 
     R3BLOG(debug, "Number of clusters: " << nbcluster);
@@ -330,12 +315,14 @@ R3BAlpideHitData* R3BAlpideCal2Hit::AddHitData(uint16_t senId,
                                                uint16_t clustersize,
                                                double xpos,
                                                double ypos,
-                                               double zpos)
+                                               double zpos,
+                                               double locxpos,
+                                               double locypos)
 {
     // It fills the R3BAlpideHitData
     TClonesArray& clref = *fAlpideHitData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideHitData(senId, clustersize, xpos, ypos, zpos);
+    return new (clref[size]) R3BAlpideHitData(senId, clustersize, xpos, ypos, zpos, locxpos, locypos);
 }
 
 ClassImp(R3BAlpideCal2Hit)

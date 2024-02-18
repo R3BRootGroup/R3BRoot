@@ -260,9 +260,9 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
                                             fNbfibersplot,
                                             1.,
                                             fNbfibersplot + 1.,
-                                            fClockPeriods,
-                                            -fClockPeriods / 2.,
-                                            fClockPeriods / 2.);
+                                            1000,
+                                            -10000,
+                                            10000);
         fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
         fh_time_Fib->GetYaxis()->SetTitle("(tUp+tDown)/2 / ns");
 

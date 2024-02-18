@@ -15,24 +15,24 @@
 #include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "R3BShared.h"
 #include "R3BTofdHitData.h"
 #include "R3BWRData.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
-#include "TCanvas.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TVector3.h"
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TVector3.h>
 
-#include "TClonesArray.h"
-#include "TMath.h"
-#include "TRandom.h"
+#include <TClonesArray.h>
+#include <TMath.h>
+#include <TRandom.h>
 
 R3BCalifavsTofDOnlineSpectra::R3BCalifavsTofDOnlineSpectra()
     : R3BCalifavsTofDOnlineSpectra("CALIFAvsTofDOnlineSpectra", 1)
@@ -41,22 +41,7 @@ R3BCalifavsTofDOnlineSpectra::R3BCalifavsTofDOnlineSpectra()
 
 R3BCalifavsTofDOnlineSpectra::R3BCalifavsTofDOnlineSpectra(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fHitItemsCalifa(NULL)
-    , fHitItemsTofd(NULL)
-    , fNEvents(0)
-    , fTpat(-1)
-    , fMinProtonE(50000.) // 50MeV
-    , fZselection(5.)
 {
-}
-
-R3BCalifavsTofDOnlineSpectra::~R3BCalifavsTofDOnlineSpectra()
-{
-    R3BLOG(debug1, "");
-    if (fHitItemsCalifa)
-        delete fHitItemsCalifa;
-    if (fHitItemsTofd)
-        delete fHitItemsTofd;
 }
 
 void R3BCalifavsTofDOnlineSpectra::SetParContainers()
@@ -72,7 +57,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
 
-    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, nullptr == mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
@@ -91,12 +76,14 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     // CANVAS Theta vs Phi
     cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
     cCalifa_angles->Divide(2, 2);
+    fh2_Califa_theta_phi.resize(2);
+
     for (int i = 0; i < 2; i++)
     {
         cCalifa_angles->cd(i + 1);
         char buf[512];
         snprintf(buf, 512, "%s%s", "fh2_CalifaTofd_theta_vs_phi", (i == 0) ? "" : "_withTofD");
-        fh2_Califa_theta_phi[i] = new TH2F(buf, buf, 50, 0, 90, 180, -180, 180);
+        fh2_Califa_theta_phi[i] = R3B::root_owned<TH2F>(buf, buf, 50, 0, 90, 180, -180, 180);
         fh2_Califa_theta_phi[i]->GetXaxis()->SetTitle("Theta [degrees]");
         fh2_Califa_theta_phi[i]->GetYaxis()->SetTitle("Phi [degrees]");
         fh2_Califa_theta_phi[i]->GetYaxis()->SetTitleOffset(1.2);
@@ -106,8 +93,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     }
 
     cCalifa_angles->cd(3);
-    fh2_Califa_coinTheta =
-        new TH2F("fh2_CalifaTofd_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
+    fh2_Califa_coinTheta = R3B::root_owned<TH2F>(
+        "fh2_CalifaTofd_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
     fh2_Califa_coinTheta->GetXaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta->GetYaxis()->SetTitle("Theta [degrees]");
     fh2_Califa_coinTheta->GetYaxis()->SetTitleOffset(1.2);
@@ -116,8 +103,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     fh2_Califa_coinTheta->Draw("COLZ");
 
     cCalifa_angles->cd(4);
-    fh2_Califa_coinPhi =
-        new TH2F("fh2_CalifaTofd_phi_correlations", "Califa phi correlations", 600, -190, 190, 600, -190, 190);
+    fh2_Califa_coinPhi = R3B::root_owned<TH2F>(
+        "fh2_CalifaTofd_phi_correlations", "Califa phi correlations", 600, -190, 190, 600, -190, 190);
     fh2_Califa_coinPhi->GetXaxis()->SetTitle("Phi [degrees]");
     fh2_Califa_coinPhi->GetYaxis()->SetTitle("Phi [degrees]");
     fh2_Califa_coinPhi->GetYaxis()->SetTitleOffset(1.2);
@@ -126,7 +113,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     fh2_Califa_coinPhi->Draw("COLZ");
 
     // MAIN FOLDER-Califa
-    TFolder* mainfolCalifa = new TFolder("CALIFAvsTofD", "CALIFA vs TofD info");
+    auto* mainfolCalifa = new TFolder("CALIFAvsTofD", "CALIFA vs TofD info");
 
     if (fHitItemsCalifa && fHitItemsTofd)
     {
@@ -151,15 +138,15 @@ InitStatus R3BCalifavsTofDOnlineSpectra::ReInit()
 void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 {
     R3BLOG(info, "");
-    for (int i = 0; i < 2; i++)
+    for (const auto& hist : fh2_Califa_theta_phi)
     {
-        fh2_Califa_theta_phi[i]->Reset();
+        hist->Reset();
     }
     fh2_Califa_coinPhi->Reset();
     fh2_Califa_coinTheta->Reset();
 }
 
-void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
+void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* /*option*/)
 {
     if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
         return;
@@ -191,7 +178,6 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     // Hit data
     if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
-
         Double_t theta = 0., phi = 0.;
         Double_t califa_theta[nHits];
         Double_t califa_phi[nHits];
@@ -262,13 +248,13 @@ void R3BCalifavsTofDOnlineSpectra::FinishTask()
     // Write canvas for Hit data
     if (fHitItemsCalifa)
     {
-        fh2_Califa_theta_phi[0]->Write();
-        if (fHitItemsTofd)
-            fh2_Califa_theta_phi[1]->Write();
-
-        fh2_Califa_coinPhi->Reset();
-        fh2_Califa_coinTheta->Reset();
+        for (const auto& hist : fh2_Califa_theta_phi)
+        {
+            hist->Write();
+        }
+        fh2_Califa_coinPhi->Write();
+        fh2_Califa_coinTheta->Write();
     }
 }
 
-ClassImp(R3BCalifavsTofDOnlineSpectra);
+ClassImp(R3BCalifavsTofDOnlineSpectra)

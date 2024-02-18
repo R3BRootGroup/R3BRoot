@@ -244,6 +244,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_hitenergy;
     TCanvas* cCalifa_opening;
     TCanvas* cCalifa_NsNf;
+    TCanvas* cCalifaTriggers;
+    TCanvas* cCalifa_opening_tpat;
 
     // WR data
     TCanvas* cCalifa_wr;
@@ -275,11 +277,13 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_theta_energy;
     TH1F* fh1_Califa_total_energy;
     TH1F* fh1_openangle;
+    TH2F* fh2_openangle_tpat;
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
     std::vector<TH2F*> fh2_Califa_NsNf;
     TH2F* fh2_Califa_EtrigCor[4];
     TH1F* fh1_Califa_Etrig[2];
+    TH1F* fh1_CalifaTriggers;
 
   public:
     ClassDefOverride(R3BCalifaOnlineSpectra, 1)

@@ -402,4 +402,4 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
     return sensorId;
 }
 
-ClassImp(R3BAlpideGeometry);
+ClassImp(R3BAlpideGeometry)

@@ -83,6 +83,7 @@ ${R3BROOT_SOURCE_DIR}/analysis
 ${R3BROOT_SOURCE_DIR}/analysis/pars
 ${R3BROOT_SOURCE_DIR}/analysis/offline
 ${R3BROOT_SOURCE_DIR}/analysis/online
+${R3BROOT_SOURCE_DIR}/neuland/shared
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

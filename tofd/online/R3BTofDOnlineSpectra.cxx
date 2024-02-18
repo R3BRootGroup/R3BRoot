@@ -543,8 +543,8 @@ InitStatus R3BTofDOnlineSpectra::Init()
         cToFd_los_h2->Divide(2, 2);
         fh_tofd_time_los_h2.resize(fNofPlanes);
 
-        auto* cToFd_los_h2_wt = new TCanvas(
-            "ToFD_Los_time_without_trigger", "ToFD time - Los time without trigger", 20, 20, 1120, 1020);
+        auto* cToFd_los_h2_wt =
+            new TCanvas("ToFD_Los_time_without_trigger", "ToFD time - Los time without trigger", 20, 20, 1120, 1020);
         cToFd_los_h2_wt->Divide(2, 2);
         fh2_tofd_time_los_cal.resize(fNofPlanes);
 
@@ -565,7 +565,8 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
             char strNameLos_c2[255];
             snprintf(strNameLos_c2, sizeof(strNameLos_c2), "tofd_los_time_without_trigger_%d", i + 1);
-            fh2_tofd_time_los_cal[i] = R3B::root_owned<TH2F>(strNameLos_c2, strNameLos_c2, 44, 1, 45, 20000, 30, 75);
+            fh2_tofd_time_los_cal[i] =
+                R3B::root_owned<TH2F>(strNameLos_c2, strNameLos_c2, 44, 1, 45, 20000, -10000, 10000);
             fh2_tofd_time_los_cal[i]->GetXaxis()->SetTitle("Bar");
             fh2_tofd_time_los_cal[i]->GetYaxis()->SetTitle("ToF [ns]");
             fh2_tofd_time_los_cal[i]->GetXaxis()->CenterTitle(true);
@@ -888,13 +889,6 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     continue;
                 }
 
-                auto tof_without_trig = fTimeStitch->GetTime(
-                    (bot->GetTimeTrailing_ns() + bot->GetTimeLeading_ns()) / 2. - header->GetTStartSimple(),
-                    "tamex",
-                    "vftx");
-
-                fh2_tofd_time_los_cal[iPlane - 1]->Fill(iBar, tof_without_trig);
-
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + fC_range_ns, fC_range_ns);
 
                 fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
@@ -981,6 +975,13 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     fh2_tofd_ypos_cal[iPlane - 1]->Fill(iBar, dt_mod);
                     fh2_tofd_timedif_cal[iPlane - 1]->Fill(iBar, topc_ns);
                     fh2_tofd_timedif_cal[iPlane - 1]->Fill(-1 * iBar, botc_ns);
+
+                    auto tof_without_trig = // fTimeStitch->GetTime
+                        (topc->GetTimeLeading_ns() + botc->GetTimeLeading_ns()) / 2. - header->GetTStartSimple();
+                    //					                        "tamex",
+                    //								                    "vftx");
+
+                    fh2_tofd_time_los_cal[iPlane - 1]->Fill(iBar, tof_without_trig);
                 }
 
                 if (std::abs(dt_mod) < fC_bar_coincidence_ns)
