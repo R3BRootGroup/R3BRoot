@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -167,7 +167,9 @@ void R3BCalifavsSpiderOnlineSpectra::Exec(Option_t* /*option*/)
         auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
         if (hit->GetEnergy() < fMinProtonE)
             continue;
-        Vcalifa.push_back(TVector3(hit->GetEnergy(), hit->GetTheta(), hit->GetPhi()));
+        TVector3 temp;
+        temp.SetMagThetaPhi(hit->GetEnergy(), hit->GetTheta(), hit->GetPhi());
+        Vcalifa.push_back(temp);
         fh2_Califa_theta_phi[0]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetPhi() * TMath::RadToDeg());
     }
 
@@ -178,7 +180,9 @@ void R3BCalifavsSpiderOnlineSpectra::Exec(Option_t* /*option*/)
         for (const auto& vcalifa : Vcalifa)
             if (abs(vcalifa.Phi() - track.Phi()) * TMath::RadToDeg() < fMinPhi_Dif)
             {
-                fh2_Califa_coinTheta->Fill(vcalifa.Theta() * TMath::RadToDeg(), track.Theta() * TMath::RadToDeg());
+                if ((vcalifa.Theta() - track.Theta()) * TMath::RadToDeg() < 20.)
+                    fh2_Califa_coinTheta->Fill(vcalifa.Theta() * TMath::RadToDeg(), track.Theta() * TMath::RadToDeg());
+
                 fh2_Califa_coinPhi->Fill(vcalifa.Phi() * TMath::RadToDeg(), track.Phi() * TMath::RadToDeg());
                 fh2_Califa_theta_phi[1]->Fill(vcalifa.Theta() * TMath::RadToDeg(), vcalifa.Phi() * TMath::RadToDeg());
             }
@@ -208,8 +212,8 @@ void R3BCalifavsSpiderOnlineSpectra::FinishTask()
         if (fHitItemsSpider)
             fh2_Califa_theta_phi[1]->Write();
 
-        fh2_Califa_coinPhi->Reset();
-        fh2_Califa_coinTheta->Reset();
+        fh2_Califa_coinPhi->Write();
+        fh2_Califa_coinTheta->Write();
     }
 }
 

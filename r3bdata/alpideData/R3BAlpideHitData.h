@@ -34,7 +34,13 @@ class R3BAlpideHitData : public TObject
     /** Standard Constructor
      *@param track    Reconstructed trajectory
      **/
-    explicit R3BAlpideHitData(uint16_t sensorId, uint16_t clustersize, double posx, double posy, double posz = 0.);
+    explicit R3BAlpideHitData(uint16_t sensorId,
+                              uint16_t clustersize,
+                              double posx,
+                              double posy,
+                              double posz = std::nan(""),
+                              double locposx = std::nan(""),
+                              double locposy = std::nan(""));
 
     // Destructor
     virtual ~R3BAlpideHitData() = default;
@@ -45,8 +51,8 @@ class R3BAlpideHitData : public TObject
     [[nodiscard]] inline const double GetX() const { return fX; }
     [[nodiscard]] inline const double GetY() const { return fY; }
     [[nodiscard]] inline const double GetZ() const { return fZ; }
-    [[nodiscard]] inline const double GetPosl() const { return fX; }
-    [[nodiscard]] inline const double GetPost() const { return fY; }
+    [[nodiscard]] inline const double GetPosl() const { return fXloc; }
+    [[nodiscard]] inline const double GetPost() const { return fYloc; }
     [[nodiscard]] inline const double GetTheta() const { return fTheta; }
     [[nodiscard]] inline const double GetPhi() const { return fPhi; }
     [[nodiscard]] inline const TVector3 GetTrack() const { return fTrack; }
@@ -61,6 +67,8 @@ class R3BAlpideHitData : public TObject
     double fX = std::nan("");
     double fY = std::nan("");
     double fZ = std::nan("");
+    double fXloc = std::nan("");
+    double fYloc = std::nan("");
     TVector3 fTrack;
     double fTheta = std::nan(""); // Reconstructed Theta
     double fPhi = std::nan("");   // Reconstructed Phi

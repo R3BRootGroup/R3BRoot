@@ -630,8 +630,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifaCoinTheta->cd(1);
     fh2_Califa_coinTheta =
         R3B::root_owned<TH2F>("fh2_Califa_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
-    fh2_Califa_coinTheta->GetXaxis()->SetTitle("Theta [degrees]");
-    fh2_Califa_coinTheta->GetYaxis()->SetTitle("Theta [degrees]");
+    fh2_Califa_coinTheta->GetXaxis()->SetTitle("Theta [deg]");
+    fh2_Califa_coinTheta->GetYaxis()->SetTitle("Theta [deg]");
     fh2_Califa_coinTheta->GetYaxis()->SetTitleOffset(1.2);
     fh2_Califa_coinTheta->GetXaxis()->CenterTitle(true);
     fh2_Califa_coinTheta->GetYaxis()->CenterTitle(true);
@@ -640,8 +640,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifaCoinTheta->cd(2);
     fh2_Califa_coinTheta_cutOPA = R3B::root_owned<TH2F>(
         "fh2_Califa_theta_correlations_cutOPA", "Califa theta correlations OPA cut", 500, 0, 100, 500, 0, 100);
-    fh2_Califa_coinTheta_cutOPA->GetXaxis()->SetTitle("Theta [degrees]");
-    fh2_Califa_coinTheta_cutOPA->GetYaxis()->SetTitle("Theta [degrees]");
+    fh2_Califa_coinTheta_cutOPA->GetXaxis()->SetTitle("Theta [deg]");
+    fh2_Califa_coinTheta_cutOPA->GetYaxis()->SetTitle("Theta [deg]");
     fh2_Califa_coinTheta_cutOPA->SetTitleOffset(1.2);
     fh2_Califa_coinTheta_cutOPA->GetXaxis()->CenterTitle(true);
     fh2_Califa_coinTheta_cutOPA->GetYaxis()->CenterTitle(true);
@@ -652,8 +652,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     fh2_Califa_coinPhi =
         R3B::root_owned<TH2F>("fh2_Califa_phi_correlations", "Califa phi correlations", 600, -190, 190, 600, -190, 190);
-    fh2_Califa_coinPhi->GetXaxis()->SetTitle("Phi [degrees]");
-    fh2_Califa_coinPhi->GetYaxis()->SetTitle("Phi [degrees]");
+    fh2_Califa_coinPhi->GetXaxis()->SetTitle("Phi [deg]");
+    fh2_Califa_coinPhi->GetYaxis()->SetTitle("Phi [deg]");
     fh2_Califa_coinPhi->GetYaxis()->SetTitleOffset(1.2);
     fh2_Califa_coinPhi->GetXaxis()->CenterTitle(true);
     fh2_Califa_coinPhi->GetYaxis()->CenterTitle(true);
@@ -663,8 +663,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi", "Theta vs Phi", 10, 10, 500, 500);
     fh2_Califa_theta_phi =
         R3B::root_owned<TH2F>("fh2_Califa_theta_vs_phi", "Califa theta vs phi", 500, 0, 90, 600, -190, 190);
-    fh2_Califa_theta_phi->GetXaxis()->SetTitle("Theta [degrees]");
-    fh2_Califa_theta_phi->GetYaxis()->SetTitle("Phi [degrees]");
+    fh2_Califa_theta_phi->GetXaxis()->SetTitle("Theta [deg]");
+    fh2_Califa_theta_phi->GetYaxis()->SetTitle("Phi [deg]");
     fh2_Califa_theta_phi->GetYaxis()->SetTitleOffset(1.2);
     fh2_Califa_theta_phi->GetXaxis()->CenterTitle(true);
     fh2_Califa_theta_phi->GetYaxis()->CenterTitle(true);
@@ -676,7 +676,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     Name3 = "Califa theta vs energy for full calorimeter";
     cCalifa_theta_energy = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
     fh2_Califa_theta_energy = R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 90, bins, minE, maxE);
-    fh2_Califa_theta_energy->GetXaxis()->SetTitle("Theta [degrees]");
+    fh2_Califa_theta_energy->GetXaxis()->SetTitle("Theta [deg]");
     fh2_Califa_theta_energy->GetYaxis()->SetTitle("Energy [keV]");
     fh2_Califa_theta_energy->GetYaxis()->SetTitleOffset(1.4);
     fh2_Califa_theta_energy->GetXaxis()->CenterTitle(true);
@@ -706,7 +706,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     Name3 = "Califa opening angle";
     cCalifa_opening = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
     fh1_openangle = R3B::root_owned<TH1F>(Name2.c_str(), Name3.c_str(), 160, 10, 170);
-    fh1_openangle->GetXaxis()->SetTitle("Opening angle [degrees]");
+    fh1_openangle->GetXaxis()->SetTitle("Opening angle [deg]");
     fh1_openangle->GetYaxis()->SetTitle("Counts");
     fh1_openangle->GetXaxis()->CenterTitle(true);
     fh1_openangle->GetYaxis()->CenterTitle(true);
@@ -716,6 +716,20 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_openangle->SetLineColor(1);
     fh1_openangle->SetLineWidth(2);
     fh1_openangle->Draw("");
+
+    // CANVAS opening angle
+    Name1 = "Califa_opening_angle_tpats";
+    Name2 = "fh1_Califa_opening_tpats";
+    Name3 = "Califa opening angle vs tpat";
+    cCalifa_opening_tpat = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
+    fh2_openangle_tpat = R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 17, -0.5, 16.5, 160, 10, 170);
+    fh2_openangle_tpat->GetXaxis()->SetTitle("Tpat");
+    fh2_openangle_tpat->GetYaxis()->SetTitle("Opening angle [deg]");
+    fh2_openangle_tpat->GetXaxis()->CenterTitle(true);
+    fh2_openangle_tpat->GetYaxis()->CenterTitle(true);
+    fh2_openangle_tpat->GetYaxis()->SetTitleOffset(1.2);
+    fh2_openangle_tpat->GetXaxis()->SetTitleOffset(1.2);
+    fh2_openangle_tpat->Draw("colz");
 
     // Difference between Califa WRs
     Name1 = "WR_Califa";
@@ -777,6 +791,15 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Cal_wr_energy_r->GetYaxis()->CenterTitle(true);
     cCalifa_wr_energy->cd(2);
     fh2_Cal_wr_energy_r->Draw("COLZ");
+
+    cCalifaTriggers = new TCanvas("Califa_triggers", "Califa_triggers", 10, 10, 500, 500);
+    fh1_CalifaTriggers = R3B::root_owned<TH1F>("califa_triggers", "califa_triggers", 3, -0.5, 2.5);
+    fh1_CalifaTriggers->GetXaxis()->SetTitle("Triggers");
+    fh1_CalifaTriggers->GetXaxis()->CenterTitle(true);
+    fh1_CalifaTriggers->SetFillColor(29);
+    fh1_CalifaTriggers->SetLineColor(1);
+    fh1_CalifaTriggers->SetLineWidth(2);
+    fh1_CalifaTriggers->Draw();
 
     // FOLDERS for Califa
     TFolder* folder_sta = new TFolder("Statistics_per_ring", "Statistics info");
@@ -915,10 +938,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         mainfolCalifa->Add(cCalifaCoinPhi);
         mainfolCalifa->Add(cCalifa_angles);
         mainfolCalifa->Add(cCalifa_opening);
+        mainfolCalifa->Add(cCalifa_opening_tpat);
         mainfolCalifa->Add(cCalifa_theta_energy);
         mainfolCalifa->Add(cCalifa_hitenergy);
         if (fWRItemsCalifa && fWRItemsMaster)
             mainfolCalifa->Add(cCalifa_wr_energy);
+        mainfolCalifa->Add(cCalifaTriggers);
     }
     run->AddObject(mainfolCalifa);
 
@@ -1028,6 +1053,8 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
         fh2_Califa_theta_energy->Reset();
         fh1_Califa_total_energy->Reset();
         fh1_openangle->Reset();
+        fh2_openangle_tpat->Reset();
+        fh1_CalifaTriggers->Reset();
     }
 }
 
@@ -1337,7 +1364,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
     }
 }
 
-void R3BCalifaOnlineSpectra::Exec(Option_t* option)
+void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
 {
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
@@ -1345,15 +1372,29 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     Int_t fTpat_bit1 = fTpat1 - 1;
     Int_t fTpat_bit2 = fTpat2 - 1;
     Int_t tpatbin = 0;
+    std::vector<int> tpatindex;
     if (header && fTpat1 >= 0 && fTpat2 >= 0)
     {
         for (int i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
+
+            if (tpatbin != 0)
+                tpatindex.push_back(i + 1);
+
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
                 return;
             }
+        }
+    }
+    else if (header)
+    {
+        for (Int_t i = 0; i < 16; i++)
+        {
+            tpatbin = (header->GetTpat() & (1 << i));
+            if (tpatbin != 0)
+                tpatindex.push_back(i + 1);
         }
     }
 
@@ -1565,7 +1606,22 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         if (maxEL > fMinProtonE && maxER > fMinProtonE)
         {
             fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+            for (const auto& itpat : tpatindex)
+                fh2_openangle_tpat->Fill(itpat, master[0].Angle(master[1]) * TMath::RadToDeg());
         }
+
+        int tpat_bin; // 0->veto 1->foot 2->inclusive proton
+        if (master[0].Theta() * TMath::RadToDeg() > 90 || master[1].Theta() * TMath::RadToDeg() > 90)
+            tpat_bin = 0;
+        if ((abs(master[0].Phi() * TMath::RadToDeg()) < 45 && master[0].Theta() * TMath::RadToDeg() < 90 &&
+             master[0].Theta() * TMath::RadToDeg() > 45) ||
+            (abs(master[1].Phi() * TMath::RadToDeg()) < 45 && master[1].Theta() * TMath::RadToDeg() < 90 &&
+             master[1].Theta() * TMath::RadToDeg() > 45))
+            tpat_bin = 1;
+        if (master[0].Theta() * TMath::RadToDeg() < 90 && master[1].Theta() * TMath::RadToDeg() < 90)
+            tpat_bin = 2;
+
+        fh1_CalifaTriggers->Fill(tpat_bin);
 
         // Comparison of hits to get energy, theta and phi correlations between them
         for (Int_t i1 = 0; i1 < nHits; i1++)
@@ -1702,6 +1758,7 @@ void R3BCalifaOnlineSpectra::FinishTask()
         cCalifa_theta_energy->Write();
         cCalifa_hitenergy->Write();
         cCalifa_opening->Write();
+        cCalifa_opening_tpat->Write();
     }
 }
 

@@ -16,11 +16,12 @@
 // -----    Created 21/05/22 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------
 
-#ifndef R3BCalifavsTofDOnlineSpectra_H
-#define R3BCalifavsTofDOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "TCanvas.h"
+#include <FairTask.h>
+#include <TCanvas.h>
+#include <memory>
+#include <vector>
 
 class TClonesArray;
 class TH2F;
@@ -47,7 +48,7 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BCalifavsTofDOnlineSpectra();
+    virtual ~R3BCalifavsTofDOnlineSpectra() = default;
 
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
@@ -68,7 +69,7 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t* /*option*/);
 
     /**
      * A method for finish of processing of an event.
@@ -96,24 +97,24 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     /**
      * Method for setting the fTpat
      */
-    void SetTpat(Int_t tpat) { fTpat = tpat; }
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     /**
      * Method for setting the charge of the nuclear residue
      */
-    void SetZCharge(Float_t z) { fZselection = z; }
+    inline void SetZCharge(Float_t z) { fZselection = z; }
 
   private:
-    TClonesArray* fHitItemsCalifa;
-    TClonesArray* fHitItemsTofd;
+    TClonesArray* fHitItemsCalifa = nullptr;
+    TClonesArray* fHitItemsTofd = nullptr;
 
-    R3BEventHeader* header;
-    Int_t fNEvents;
-    Int_t fTpat;
-    Float_t fZselection;
-    Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
+    R3BEventHeader* header = nullptr;
+    Int_t fNEvents = 0;
+    Int_t fTpat = -1;
+    Float_t fZselection = 5.;
+    Float_t fMinProtonE = 50000.; /* Min proton energy (in keV) to calculate the opening angle */
 
-    TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with TofD
+    std::vector<TH2F*> fh2_Califa_theta_phi; // 0: all, 1: with TofD
     TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_coinTheta;
     TCanvas* cCalifa_angles;
@@ -121,5 +122,3 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
   public:
     ClassDef(R3BCalifavsTofDOnlineSpectra, 1)
 };
-
-#endif /* R3BCalifavsTofDOnlineSpectra_H */

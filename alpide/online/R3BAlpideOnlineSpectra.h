@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -119,8 +119,11 @@ class R3BAlpideOnlineSpectra : public FairTask
     std::vector<TH1F*> fh1_Clustersize;
 
     TH1F* fh1_Calmult_total;
-
+    TH2F* fh2_sensor_pixelsize;
     TH2F* fh2_theta_phi;
+
+    TCanvas* cCalPixelSize = nullptr;
+    TCanvas* cHit_angcor = nullptr;
 
   public:
     ClassDefOverride(R3BAlpideOnlineSpectra, 1)

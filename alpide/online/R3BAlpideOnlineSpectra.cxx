@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -168,7 +168,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         }
         mainfol->Add(calfol);
 
-        auto* cCaltotal = new TCanvas("Ccal mul", "", 10, 10, 500, 500);
+        // auto* cCaltotal = new TCanvas("Ccal mul", "", 10, 10, 500, 500);
         fh1_Calmult_total = R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 50, 0, 50);
         fh1_Calmult_total->GetXaxis()->SetTitle("Pixel multiplicity");
         fh1_Calmult_total->GetYaxis()->SetTitle("Counts");
@@ -177,9 +177,29 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         fh1_Calmult_total->GetYaxis()->CenterTitle(true);
         fh1_Calmult_total->SetLineColor(1);
         fh1_Calmult_total->SetFillColor(31);
-        cCaltotal->cd();
-        fh1_Calmult_total->Draw("colz");
-        mainfol->Add(cCaltotal);
+        // cCaltotal->cd();
+        // fh1_Calmult_total->Draw("");
+        // mainfol->Add(cCaltotal);
+
+        cCalPixelSize = new TCanvas("SensorID_PixelSize", "", 10, 10, 500, 500);
+        fh2_sensor_pixelsize = R3B::root_owned<TH2F>(
+            "fh2_sensor_pixelsize", "Pixel multiplicity per sensor", 26, -0.5, 25.5, 50, -0.5, 49.5);
+        fh2_sensor_pixelsize->GetXaxis()->SetTitle("SensorID");
+        fh2_sensor_pixelsize->GetYaxis()->SetTitle("Pixel multiplicity");
+        fh2_sensor_pixelsize->GetYaxis()->SetTitleOffset(1.1);
+        fh2_sensor_pixelsize->GetXaxis()->CenterTitle(true);
+        fh2_sensor_pixelsize->GetYaxis()->CenterTitle(true);
+        gPad->SetLogz();
+        fh2_sensor_pixelsize->Draw("colz");
+        fh2_sensor_pixelsize->SetStats(0);
+        for (int i_mosaic = 1; i_mosaic < 5; i_mosaic++)
+        {
+            auto l = new TLine(6 * i_mosaic + 0.5, 0, 6 * i_mosaic + 0.5, 49);
+            l->Draw("same");
+            l->SetLineStyle(7);
+            l->SetLineWidth(3);
+            l->SetLineColor(2);
+        }
     }
 
     if (fHitItems)
@@ -234,20 +254,26 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             hitfol->Add(cHitm);
         }
 
-        fh2_theta_phi = R3B::root_owned<TH2F>("fh2_theta_phi", "Correlation theta vs phi", 140, 10, 70, 660, -180, 180);
-        fh2_theta_phi->GetXaxis()->SetTitle("Theta [deg]");
-        fh2_theta_phi->GetYaxis()->SetTitle("Phi [deg]");
+        mainfol->Add(hitfol);
+
+        cHit_angcor = new TCanvas("Theta_vs_Phi", "Correlation theta vs phi", 10, 10, 500, 500);
+        fh2_theta_phi = R3B::root_owned<TH2F>("fh2_theta_phi", "Correlation theta vs phi", 400, -180, 180, 140, 10, 80);
+        fh2_theta_phi->GetXaxis()->SetTitle("Phi [deg]");
+        fh2_theta_phi->GetYaxis()->SetTitle("Theta [deg]");
         fh2_theta_phi->GetYaxis()->SetTitleOffset(1.1);
         fh2_theta_phi->GetXaxis()->CenterTitle(true);
         fh2_theta_phi->GetYaxis()->CenterTitle(true);
-        fh2_theta_phi->SetLineColor(1);
-        fh2_theta_phi->SetFillColor(31);
-
-        mainfol->Add(hitfol);
+        gPad->SetLogz();
+        fh2_theta_phi->Draw("colz");
+        fh2_theta_phi->SetStats(0);
     }
 
     if (fh1_Calmult_total)
         mainfol->Add(fh1_Calmult_total);
+    if (cCalPixelSize)
+        mainfol->Add(cCalPixelSize);
+    if (cHit_angcor)
+        mainfol->Add(cHit_angcor);
 
     run->AddObject(mainfol);
 
@@ -288,6 +314,7 @@ void R3BAlpideOnlineSpectra::Reset_Histo()
             hist->Reset();
         }
         fh1_Calmult_total->Reset();
+        fh2_sensor_pixelsize->Reset();
     }
 
     if (fHitItems)
@@ -369,12 +396,8 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
                 {
                     fh1_Calmult[s]->Fill(mult[s]);
                     fh1_Calmult_total->Fill(mult[s]);
+                    fh2_sensor_pixelsize->Fill(s + 0.5, mult[s]);
                 }
-        }
-        else
-        {
-            //            for (int s = 0; s < fNbSensors; s++)
-            //        fh1_Calmult[s]->Fill(0);
         }
     }
 
@@ -391,7 +414,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
             auto senid = hit->GetSensorId() - 1;
             fh1_Clustersize[senid]->Fill(hit->GetClusterSize());
             fh2_PosHit[senid]->Fill(hit->GetPosl(), hit->GetPost());
-            fh2_theta_phi->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetPhi() * TMath::RadToDeg());
+            fh2_theta_phi->Fill(hit->GetPhi() * TMath::RadToDeg(), hit->GetTheta() * TMath::RadToDeg());
             mult[senid]++;
         }
         for (int s = 0; s < fNbSensors; s++)
@@ -438,6 +461,7 @@ void R3BAlpideOnlineSpectra::FinishTask()
             hist->Write();
         }
         fh1_Calmult_total->Write();
+        fh2_sensor_pixelsize->Write();
     }
     if (fHitItems)
     {
