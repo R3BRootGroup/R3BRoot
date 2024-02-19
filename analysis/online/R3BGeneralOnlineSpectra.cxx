@@ -211,6 +211,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 
     // Tpats
     cTpat = new TCanvas("TPats", "Tpat information", 10, 10, 800, 700);
+    cTpat->Divide(2, 1);
+    cTpat->cd(1);
     fh1_tpat = new TH1F("fh1_tpat", "TPat information", 17, -0.5, 16.5);
     fh1_tpat->GetXaxis()->SetTitle("Trigger number (TPat)");
     fh1_tpat->GetYaxis()->SetTitle("Counts");
@@ -224,6 +226,25 @@ InitStatus R3BGeneralOnlineSpectra::Init()
     fh1_tpat->GetYaxis()->SetTitleSize(0.04);
     fh1_tpat->SetFillColor(kBlue + 2);
     fh1_tpat->Draw("");
+    cTpat->cd(2)->SetLogz();
+    fh2_tpat = new TH2F(
+        "fh2_tpat",
+        "TPat correlation (diagonal = no correlating tpats); Lower trigger number (TPat); Higher trigger number (TPat)",
+        17,
+        -0.5,
+        16.5,
+        17,
+        -0.5,
+        16.5);
+    fh2_tpat->GetXaxis()->CenterTitle(true);
+    fh2_tpat->GetYaxis()->CenterTitle(true);
+    fh2_tpat->GetXaxis()->SetLabelSize(0.04);
+    fh2_tpat->GetXaxis()->SetTitleSize(0.04);
+    fh2_tpat->GetYaxis()->SetTitleOffset(1.1);
+    fh2_tpat->GetXaxis()->SetTitleOffset(1.1);
+    fh2_tpat->GetYaxis()->SetLabelSize(0.04);
+    fh2_tpat->GetYaxis()->SetTitleSize(0.04);
+    fh2_tpat->Draw("colz");
 
     // Triggers
     cTrigger = new TCanvas("Triggers", "Trigger information", 10, 10, 800, 700);
@@ -359,6 +380,8 @@ InitStatus R3BGeneralOnlineSpectra::Init()
 void R3BGeneralOnlineSpectra::Reset_GENERAL_Histo()
 {
     R3BLOG(info, "");
+    fh1_tpat->Reset();
+    fh2_tpat->Reset();
     fh1_trigger->Reset();
     if (fWRItemsMaster && fWRItemsSofia)
     {
@@ -426,24 +449,46 @@ void R3BGeneralOnlineSpectra::Reset_GENERAL_Histo()
 void R3BGeneralOnlineSpectra::Exec(Option_t* option)
 {
     // Fill histogram with trigger information
-    Int_t tpatbin;
     if (fEventHeader->GetTpat() > 0)
     {
-        for (Int_t i = 0; i < 16; i++)
+        for (Int_t itpat = 0; itpat < 16; itpat++)
         {
-            tpatbin = (fEventHeader->GetTpat() & (1 << i));
-            if (tpatbin != 0)
-                fh1_tpat->Fill(i + 1);
+            if ((fEventHeader->GetTpat() & (1 << itpat)) == 0)
+                continue;
+            fh1_tpat->Fill(itpat + 1);
+            tpatbin.push_back(itpat + 1);
+        }
+        if (tpatbin.size() == 1)
+        {
+            fh2_tpat->Fill(tpatbin.back(), tpatbin.back()); // if only one tpatbit, fill diagonal
+        }
+        else if (tpatbin.size() > 1)
+        {
+            auto combination = static_cast<Double_t>(tpatbin.size() * (tpatbin.size() - 1) / 2);
+            for (Int_t lower = 0; lower < tpatbin.size() - 1; lower++)
+            {
+                for (Int_t higher = lower + 1; higher < tpatbin.size(); higher++)
+                {
+                    fh2_tpat->Fill(tpatbin.at(lower), tpatbin.at(higher), 1. / combination); // Weighed by combination
+                }
+            }
+        }
+        else
+        {
+            R3BLOG(warn, "No tpat found below 16");
         }
     }
     else if (fEventHeader->GetTpat() == 0)
     {
-        fh1_tpat->Fill(0);
+        fh1_tpat->Fill(0.);
+        fh2_tpat->Fill(0., 0.);
     }
     else
     {
         LOG(info) << fNEvents << " " << fEventHeader->GetTpat();
     }
+
+    // Trigger
     if (fEventHeader)
         fh1_trigger->Fill(fEventHeader->GetTrigger());
 
@@ -536,6 +581,7 @@ void R3BGeneralOnlineSpectra::Exec(Option_t* option)
 
 void R3BGeneralOnlineSpectra::FinishEvent()
 {
+    tpatbin.clear();
     if (fWRItemsMaster)
     {
         fWRItemsMaster->Clear();

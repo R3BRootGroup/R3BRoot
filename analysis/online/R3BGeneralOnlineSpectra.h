@@ -142,6 +142,8 @@ class R3BGeneralOnlineSpectra : public FairTask
     // Unpack
     TH1F *fh1_trigger, *fh1_tpat, *fh1_wr[2];
     TH1F* fh1_wrs[5];
+    TH2F* fh2_tpat;
+    std::vector<int> tpatbin;
 
   public:
     ClassDef(R3BGeneralOnlineSpectra, 0)
