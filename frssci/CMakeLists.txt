@@ -30,6 +30,7 @@ ${R3BROOT_SOURCE_DIR}/frssci/online
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/frssciData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musliData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -51,6 +52,7 @@ calibration/R3BFrsSciMapped2TcalPar.cxx
 calibration/R3BFrsSciTcal2Cal.cxx
 online/R3BOnlineSpectraFrsSci.cxx
 online/R3BOnlineSpectraFrsSciVsMusli.cxx
+online/R3BOnlineSpectraFrsSciVsLos.cxx
 )
 
 # fill list of header files from list of source files
