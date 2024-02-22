@@ -52,5 +52,6 @@
 #pragma link C++ class R3BIncomingIDOnlineSpectra+;
 #pragma link C++ class R3BTofDvsTttxOnlineSpectra+;
 #pragma link C++ class R3BOnlineSyncCheck+;
+#pragma link C++ class R3BScalersOnlineSpectra+;
 
 #endif

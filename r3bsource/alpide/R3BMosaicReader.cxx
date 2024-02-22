@@ -76,12 +76,13 @@ Bool_t R3BMosaicReader::R3BRead()
         {
             int fChipId = fData->MOSAIC[mosid].CHIPv[hits];
             // R3BLOG_IF(error, fChipId < 1, "Wrong fChipId: " << fChipId);
-            if (fChipId == 0)
-                continue;
+            // if (fChipId == 0)
+            //    continue;
 
-            int fAlpideId = map_mosaics[mosid] * 6 + fChipId;
+            int fAlpideId = map_mosaics[mosid] * 6 + fChipId + 1; // 1-base: 1 --> 24 (6*4)
             R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
 
+            fAlpideId = map_sensors[fAlpideId - 1];
             new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(
                 fAlpideId, 0, mosid + 1, fChipId, fData->MOSAIC[mosid].ROWv[hits], fData->MOSAIC[mosid].COLv[hits]);
         }

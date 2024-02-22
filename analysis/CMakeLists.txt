@@ -78,6 +78,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/footData
 ${R3BROOT_SOURCE_DIR}/r3bdata/rpcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/synccheckData
+${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
 ${R3BROOT_SOURCE_DIR}/analysis
 ${R3BROOT_SOURCE_DIR}/analysis/pars
