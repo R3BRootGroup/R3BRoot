@@ -37,7 +37,6 @@ namespace R3B::Digitizing::Neuland
 
       public:
         static constexpr double gHalfLength = 135.;   // [cm]
-        static constexpr double gCMedium = 14.;       // speed of light in material in [cm/ns]
         static constexpr double gAttenuation = 0.008; // light attenuation of plastic scintillator [1/cm]
         static constexpr double gLambda = 1. / 2.1;
         static const double ReverseAttenFac;

@@ -1,19 +1,11 @@
 #pragma once
+#include "MilleEntry.h"
 #include <fmt/core.h>
 #include <fstream>
 #include <string>
-#include <vector>
 
 namespace R3B
 {
-    struct MilleDataPoint
-    {
-        std::vector<float> locals;                  // local derivatives
-        std::vector<std::pair<int, float>> globals; // global label and derivatives pair
-        float measurement = 0.;                     // measurement corresponding to the error value
-        float sigma = 0.;                           // error value
-    };
-
     template <typename IndexType = int, typename ValueType = float>
     class MilleBuffer
     {

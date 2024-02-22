@@ -104,7 +104,8 @@ namespace R3B::Neuland::Calibration
     void LSQREngineAdaptor::EndOfEvent(unsigned int event_num)
     {
         const auto added_points_num = cosmic_tracker_.GetBarIDs().size();
-        if (const auto& track = cosmic_tracker_.GetTrack(); track.Interactions.empty() or added_points_num < 6)
+        const auto& track = cosmic_tracker_.GetTrack();
+        if (track.Interactions.empty() or added_points_num < 6)
         {
             R3BLOG(debug, "Failed to get the cosmic track!");
         }

@@ -3,6 +3,7 @@ ms-gsl/4.0.0
 range-v3/0.12.0
 gtest/cci.20210126
 nlohmann_json/3.11.2
+eigen/3.4.0
 
 [generators]
 CMakeDeps

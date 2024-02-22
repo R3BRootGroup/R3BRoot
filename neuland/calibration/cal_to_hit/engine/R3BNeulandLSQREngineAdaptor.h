@@ -26,6 +26,7 @@ namespace R3B::Neuland::Calibration
         LSQREngineAdaptor() = default;
 
       private:
+        int minimum_signal_size_ = 6;
         HitCalibrationEngine hit_cal_engine_;
         CosmicTracker cosmic_tracker_;
         Cal2HitPar hit_parameters_;
@@ -40,7 +41,10 @@ namespace R3B::Neuland::Calibration
             hit_cal_engine_.Reset();
             cosmic_tracker_.Reset();
         }
-        auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override { return signals.size() > 4; }
+        auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override
+        {
+            return signals.size() > minimum_signal_size_;
+        }
 
         // private non-virtual function
         void add_bar_signal(const BarCalData& barSignal, Side side);

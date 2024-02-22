@@ -39,6 +39,7 @@ namespace R3B::Neuland::Calibration
         virtual void Calibrate() = 0;
         virtual void SetMinStat(int min) {}
         [[nodiscard]] virtual auto ExtractParameters() -> Cal2HitPar = 0;
+        virtual void BeginOfEvent(unsigned int event_num){};
         virtual void EndOfEvent(unsigned int event_num){};
         virtual void Reset(){};
 

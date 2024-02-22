@@ -35,6 +35,9 @@ namespace R3B::Neuland
         return val * val;
     }
 
+    // Miscellaneous defaults:
+    constexpr auto DEFAULT_EFFECTIVE_C = 8.; // cm/ns
+
     // Initialize variables from Birk' s Law
 
     constexpr double BirkdP = 1.032;
