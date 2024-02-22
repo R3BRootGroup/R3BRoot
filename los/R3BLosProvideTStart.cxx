@@ -81,7 +81,7 @@ Double_t R3BLosProvideTStart::GetTStart_without_trigger() const
     }
     else
     {
-        return losCalData.back()->GetMeanTimeVFTX();
+        return losCalData.back()->GetMeanTimeTAMEXL();
     }
 }
 

@@ -114,6 +114,8 @@ class R3BTofDOnlineSpectra : public FairTask
 
     void SetClockCoincidenceRange(Double_t r) { fC_bar_coincidence_ns = r; }
 
+    void SetToFCorrection(std::vector<double> tofcor) { fTofcor = tofcor; }
+
   private:
     void SetParameter();
     std::unique_ptr<R3BCoarseTimeStitch> fTimeStitch;
@@ -133,6 +135,7 @@ class R3BTofDOnlineSpectra : public FairTask
     Double_t fC_range_ns = 2048 * 5.;     // ns
     Double_t fC_bar_coincidence_ns = 20.; // ns
     unsigned long fNEvents = 0;           /**< Event counter. */
+    std::vector<double> fTofcor;
 
     std::vector<TH1F*> fh_tofd_channels;
     std::vector<TH2F*> fh_tofd_multihit;
@@ -154,6 +157,14 @@ class R3BTofDOnlineSpectra : public FairTask
     std::vector<TH1F*> fh_tofd_time_los[44];
 
     TH2F* fh2_tofd_time_vs_charge;
+    TH2F* fh2_tofd_time_wouttrig_vs_charge;
+    TH2F* fh2_tofd_charges13;
+    TH2F* fh2_tofd_charges24;
+    TH2F* fh2_tofd_charges12;
+    TH2F* fh2_tofd_charges23;
+    TH2F* fh2_tofd_charges34;
+    TH1F* fh1_Zcharge;
+    TH2F* fh2_zcharge_tpat;
 
   public:
     ClassDef(R3BTofDOnlineSpectra, 1)

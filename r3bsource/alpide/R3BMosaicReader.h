@@ -63,7 +63,10 @@ class R3BMosaicReader : public R3BReader
     // Output array
     TClonesArray* fArray = nullptr;
 
-    std::vector<int> map_mosaics = { 4, 4, 4, 4, 1, 2, 3, 0 };
+    std::vector<int> map_mosaics = { 0, 0, 0, 0, 1, 2, 3, 0 };
+
+    std::vector<int> map_sensors = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+                                     18, 17, 16, 15, 14, 13, 24, 23, 22, 21, 20, 19 };
 
   public:
     ClassDefOverride(R3BMosaicReader, 1);

@@ -312,7 +312,7 @@ void R3BIncomingTrackingOnlineSpectra::Reset_Histo()
 
 void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    double mwpc0x = -300., mwpc0y = -300., zrand = 0.;
+    double mwpc1x = -300., mwpc1y = -300., zrand = 0.;
     double xtarget = -500., ytarget = -500.;
 
     if (fCutIncoming && fFrsHitDataCA)
@@ -334,18 +334,18 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
     // Fill Mwpc0 Hit data
     // if (fMwpc0HitDataCA && fMwpc0HitDataCA->GetEntriesFast() > 0)
     {
-        Int_t nHits = fMwpc0HitDataCA->GetEntriesFast();
+        Int_t nHits = fMwpc1HitDataCA->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(ihit));
+            auto hit = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(ihit));
             if (!hit)
                 continue;
-            mwpc0x = hit->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
-            mwpc0y = hit->GetY() + fMw0GeoPar->GetPosY() * 10.; // mm
+            mwpc1x = hit->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
+            mwpc1y = hit->GetY() + fMw1GeoPar->GetPosY() * 10.; // mm
         }
 
         // Fill Mwpc1 Hit data
-        if (fMwpc1HitDataCA && fMwpc1HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100. && fYearConf == 2022)
+        /*if (fMwpc1HitDataCA && fMwpc1HitDataCA->GetEntriesFast() > 0 && mwpc1y > -100. && fYearConf == 2022)
         {
             nHits = fMwpc1HitDataCA->GetEntriesFast();
             Float_t mwpc1x = -150.;
@@ -377,10 +377,10 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_angvsposx->Fill(xtarget, angX * 1000.);
                 fh2_angvsposy->Fill(ytarget, angY * 1000.);
             }
-        }
+        }*/
 
         // Fill Mwpc2 Hit data
-        if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && mwpc0y > -100. && fYearConf == 2024)
+        if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && mwpc1x > -100. && fYearConf == 2024)
         {
             nHits = fMwpc2HitDataCA->GetEntriesFast();
             Float_t mwpc2x = -150.;
@@ -394,8 +394,8 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
                     continue;
                 mwpc2x = hit->GetX() + fMw2GeoPar->GetPosX() * 10.;
                 mwpc2y = hit->GetY() + fMw2GeoPar->GetPosY() * 10.;
-                angX = std::atan((mwpc0x - mwpc2x) / (fMw0GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
-                angY = std::atan((mwpc0y - mwpc2y) / (fMw0GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                angX = std::atan((mwpc1x - mwpc2x) / (fMw1GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
+                angY = std::atan((mwpc1y - mwpc2y) / (fMw1GeoPar->GetPosZ() - fMw2GeoPar->GetPosZ()) / 10.);
                 if (TMath::Abs(angX) < 0.075 && TMath::Abs(angY) < 0.075 && mwpc2x > -150.)
                 {
                     zrand = gRandom->Uniform(0., fDist_acelerator_glad);
@@ -413,7 +413,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_angvsposy->Fill(ytarget, angY * 1000.);
             }
         }
-        else if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && fYearConf == 2024)
+        /*else if (fMwpc2HitDataCA && fMwpc2HitDataCA->GetEntriesFast() > 0 && fYearConf == 2024)
         {
 
             nHits = fMwpc1HitDataCA->GetEntriesFast();
@@ -463,7 +463,7 @@ void R3BIncomingTrackingOnlineSpectra::Exec(Option_t* /*option*/)
                     fh2_angvsposy->Fill(ytarget, angY * 1000.);
                 }
             }
-        }
+        }*/
     }
 
     fNEvents += 1;

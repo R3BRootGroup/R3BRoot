@@ -394,6 +394,18 @@ InitStatus R3BTttxOnlineSpectra::Init()
     cHit->cd(8);
     fh2_HitPosCorr->Draw("colz");
 
+    auto cTttx_zcharge_tpat = new TCanvas("Tttx_Charge_vs_tpat", "Charges Z vs tpat", 10, 10, 500, 500);
+    sprintf(Name1, "fh2_tttx_Charge_vs_tpat");
+    sprintf(Name2, "Charges Z vs tpat");
+    fh2_Zcharge_tpat = R3B::root_owned<TH2F>(Name1, Name2, 17, -0.5, 16.5, 1000, 0, 12);
+    fh2_Zcharge_tpat->GetXaxis()->SetTitle("Tpat");
+    fh2_Zcharge_tpat->GetYaxis()->SetTitle("Charge-Z");
+    fh2_Zcharge_tpat->GetXaxis()->SetTitleOffset(1.1);
+    fh2_Zcharge_tpat->GetYaxis()->SetTitleOffset(1.15);
+    fh2_Zcharge_tpat->GetXaxis()->CenterTitle(true);
+    fh2_Zcharge_tpat->Draw("colz");
+    mainfolTTTX->Add(cTttx_zcharge_tpat);
+
     //===============================================================================================================
     run->AddObject(mainfolTTTX);
 
@@ -439,10 +451,24 @@ void R3BTttxOnlineSpectra::Reset_Histo()
     fh2_HitECorr->Reset();
     fh2_HitZCorr->Reset();
     fh2_HitPosCorr->Reset();
+    fh2_Zcharge_tpat->Reset();
 }
 
 void R3BTttxOnlineSpectra::Exec(Option_t* option)
 {
+
+    std::vector<int> tpatindex;
+    int tpatbin = 0;
+    if (header)
+    {
+        for (Int_t i = 0; i < 16; i++)
+        {
+            tpatbin = (header->GetTpat() & (1 << i));
+            if (tpatbin != 0)
+                tpatindex.push_back(i + 1);
+        }
+    }
+
     // Fill Mapped Data
     if (!fMappedItemsTttx || fMappedItemsTttx->GetEntriesFast() == 0)
     {
@@ -523,7 +549,15 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
         }
     }
     if (!isnan(highest_e[0]) && !isnan(highest_e[1]))
+    {
         fh2_E2VsE1->Fill(highest_e[0], highest_e[1]);
+        if (abs(highest_e[0] - highest_e[1]) < 1000.)
+        {
+            auto mean_charge = TMath::Sqrt(highest_e[0] * highest_e[1]) / 1000.;
+            for (const auto& itpat : tpatindex)
+                fh2_Zcharge_tpat->Fill(itpat, mean_charge);
+        }
+    }
     fh2_E2StripVsE1Strip->Fill(highest_e_strip[0], highest_e_strip[1]);
 
     for (Int_t i_det = 0; i_det < fNbDets; i_det++)
@@ -663,6 +697,7 @@ void R3BTttxOnlineSpectra::FinishTask()
     if (fHitItemsTttx)
     {
         cHit->Write();
+        fh2_Zcharge_tpat->Write();
     }
 }
 

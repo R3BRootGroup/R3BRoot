@@ -48,7 +48,7 @@ class R3BEventHeader : public FairEventHeader
 
     [[nodiscard]] inline double GetTStart() const { return fTStart; }
 
-    [[nodiscard]] inline double GetTStartSimple() const { return fTStart; }
+    [[nodiscard]] inline double GetTStartSimple() const { return fTStartSimple; }
 
     [[nodiscard]] inline double GetTprev() const { return fTprev; }
 
