@@ -16,6 +16,7 @@
 #include <fmt/ranges.h>
 #include <fstream>
 
+
 namespace R3B
 {
     void SteerWriter::add_parameter_default(int par_num, const std::pair<float, float>& values)
@@ -51,8 +52,8 @@ namespace R3B
             throw std::runtime_error(fmt::format("Failed to open file {}", filepath_));
         }
 
+        write_parameter_defaults();
         write_data_file(ofile);
-        write_parameter_defaults(ofile);
         write_methods(ofile);
         write_others(ofile);
         ofile << "end\n";
@@ -60,26 +61,33 @@ namespace R3B
 
     void SteerWriter::write_data_file(std::ofstream& ofile)
     {
-        ofile << "CFiles\n";
+        ofile << "Cfiles\n";
         ofile << data_filepath_ << "\n";
+        ofile << DEFAULT_MILLEPEDE_PARAMETER_FILE << "\n";
         ofile << "\n";
     }
 
-    void SteerWriter::write_parameter_defaults(std::ofstream& ofile)
+    void SteerWriter::write_parameter_defaults()
     {
+        auto ofile = std::ofstream{ DEFAULT_MILLEPEDE_PARAMETER_FILE, std::ios_base::out | std::ios_base::trunc };
+
+        if (not ofile.is_open())
+        {
+            throw std::runtime_error(fmt::format("Can't open file {}", DEFAULT_MILLEPEDE_PARAMETER_FILE));
+        }
+
         ofile << "Parameter\n";
         for (const auto& [par_id, values] : parameter_defaults_)
         {
-            ofile << fmt::format("{}\t{:.1f}\t{:.1f}\n", par_id, values.first, values.second);
+            ofile << fmt::format("{} {:.1f} {:.1f}\n", par_id, values.first, values.second);
         }
-        ofile << "\n";
     }
 
     void SteerWriter::write_methods(std::ofstream& ofile)
     {
         for (const auto& [method, values] : methods_)
         {
-            ofile << fmt::format("method\t{}\t{}\t{}\n", method, values.first, values.second);
+            ofile << fmt::format("method {} {} {}\n", method, values.first, values.second);
         }
         ofile << "\n";
     }
@@ -88,7 +96,7 @@ namespace R3B
     {
         for (const auto& other : other_options_)
         {
-            ofile << fmt::format("{}\n", fmt::join(other, "\t"));
+            ofile << fmt::format("{}\n", fmt::join(other, " "));
         }
     }
 } // namespace R3B

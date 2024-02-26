@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
+constexpr auto DEFAULT_MILLEPEDE_PARAMETER_FILE = "parameters.txt";
+
 namespace R3B
 {
     class SteerWriter
@@ -51,8 +53,8 @@ namespace R3B
         std::unordered_map<int, std::pair<float, float>> parameter_defaults_;
         std::vector<std::vector<std::string>> other_options_;
 
+        void write_parameter_defaults();
         void write_data_file(std::ofstream& ofile);
-        void write_parameter_defaults(std::ofstream& ofile);
         void write_methods(std::ofstream& ofile);
         void write_others(std::ofstream& ofile);
     };

@@ -50,7 +50,7 @@ namespace R3B
         throw R3B::logic_error(fmt::format("Canvas with the name {} doesn't exist!", histName));
     }
 
-    void DataMonitor::save(std::string_view folderName, FairSink* sinkFile)
+    void DataMonitor::save_to_sink(std::string_view folderName, FairSink* sinkFile)
     {
         auto* hist_dir = get_hist_dir(sinkFile);
         auto* new_dir = folderName.empty() ? hist_dir : hist_dir->mkdir(folderName.data(), "", true);
@@ -59,11 +59,12 @@ namespace R3B
             throw R3B::runtime_error(
                 fmt::format("Failed to create a sub directory {} for the histrogams!", folderName));
         }
+        R3BLOG(info,
+               fmt::format("Saving figures to the directory {:?} in the root file {:?}",
+                           folderName,
+                           new_dir->GetFile()->GetName()));
 
-        for (const auto& [_, histogram] : histograms_)
-        {
-            new_dir->WriteObject(histogram.get(), histogram->GetName(), "overwrite");
-        }
+        write_all(new_dir);
         // old_dir->cd();
     }
 
@@ -110,7 +111,7 @@ namespace R3B
         }
     }
 
-    void DataMonitor::save_all(std::string_view filename)
+    void DataMonitor::save_to_file(std::string_view filename)
     {
         if (filename.empty())
         {
@@ -118,13 +119,18 @@ namespace R3B
         }
         auto rootfile = create_datatime_rootfile(filename);
         R3BLOG(info, fmt::format("Saving histograms to {}", rootfile->GetName()));
+        write_all(rootfile.get());
+    }
+
+    void DataMonitor::write_all(TDirectory* dir)
+    {
         for (auto& [name, hist] : histograms_)
         {
-            rootfile->WriteObject(hist.get(), hist->GetName(), "overwrite");
+            dir->WriteObject(hist.get(), hist->GetName(), "overwrite");
         }
         for (auto& [name, graph] : graphs_)
         {
-            rootfile->WriteObject(graph.get(), graph->GetName(), "overwrite");
+            dir->WriteObject(graph.get(), graph->GetName(), "overwrite");
         }
     }
 } // namespace R3B

@@ -90,7 +90,7 @@ namespace R3B::Neuland
     }
 
     void OnlineSpectra::ResetHistosMapped() { GetHistMonitor().get_canvas("NeulandMapped").reset(); }
-    void OnlineSpectra::SaveAll() { GetHistMonitor().save_all(); }
+    void OnlineSpectra::SaveAll() { GetHistMonitor().save_to_file(); }
     void OnlineSpectra::RestartUcesbServer()
     {
         if (ucesb_source_ == nullptr)

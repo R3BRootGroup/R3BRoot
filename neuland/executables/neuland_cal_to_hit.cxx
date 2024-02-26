@@ -31,7 +31,8 @@ auto main(int argc, const char** argv) -> int
     auto input_file = programOptions.create_option<std::string>("in,i", "set the input files (regex)");
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
     auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
-    auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
+    auto eventNum =
+        programOptions.create_option<int>("eventNum,n", "set the number of events per run", DEFAULT_EVENT_NUM);
 
     if (!programOptions.verify(argc, argv))
     {
@@ -45,11 +46,9 @@ auto main(int argc, const char** argv) -> int
         outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
     const auto input_filenames = R3B::GetFilesFromRegex(input_file());
 
-
     R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());
     R3BLOG(debug, fmt::format("input data par file: {}", input_par()).c_str());
     R3BLOG(debug, fmt::format("output data file: {}", output_file()).c_str());
-
 
     auto source = std::make_unique<R3BFileSource2>();
     for (const auto& filename : input_filenames)
@@ -83,6 +82,7 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(cal2hit.release());
 
         run->Init();
+
         run->Run(eventNum());
     }
     catch (R3B::runtime_error& ex)
@@ -103,7 +103,7 @@ auto main(int argc, const char** argv) -> int
         std::cerr << ex.what();
         std::cout << "\n\n";
     }
-    catch(...)
+    catch (...)
     {
         std::cout << "An unrecognized error has occured: \n";
         std::cout << "\n\n";

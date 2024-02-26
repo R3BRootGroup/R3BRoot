@@ -75,6 +75,7 @@ namespace R3B::Neuland
         auto GetModuleParAt(unsigned int module_num) const -> const auto& { return module_pars_.at(module_num); }
         auto GetModulePars() const -> const auto& { return module_pars_; }
         auto GetListOfModulePar() const -> const auto& { return module_pars_; }
+        auto GetListOfModuleParRef() -> auto& { return module_pars_; }
 
       private:
         double global_time_offset_ = 0.; // in ns

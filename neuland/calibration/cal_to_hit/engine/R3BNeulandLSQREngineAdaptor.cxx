@@ -115,12 +115,12 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void LSQREngineAdaptor::Calibrate()
+    void LSQREngineAdaptor::Calibrate(Cal2HitPar& hit_par)
     {
-        hit_parameters_.Reset();
+        hit_par.Reset();
         // auto* new_dir = ParDirCreator{}.mkdir(DEFAULT_HIST_MONITOR_DIR);
         auto* new_dir = ParDirCreator{}.mkdir("Histograms");
-        fill_module_parameters(hit_cal_engine_.Calibrate(new_dir), hit_parameters_);
+        fill_module_parameters(hit_cal_engine_.Calibrate(new_dir), hit_par);
     }
 
 } // namespace R3B::Neuland::Calibration

@@ -15,7 +15,6 @@ namespace R3B::Neuland
     CalibrationTask::CalibrationTask(std::string_view name, int iVerbose)
         : FairTask(name.data(), iVerbose)
     {
-        SetDisableHistWrite();
     }
 
     CalibrationTask::CalibrationTask()
@@ -107,9 +106,18 @@ namespace R3B::Neuland
                            passed_num_of_events));
         if (not is_hist_disabled_ and not is_write_hist_disabled_)
         {
-            histograms_.save(GetName());
+            histograms_.save_to_sink(GetName());
+        }
+        else
+        {
+            R3BLOG(info,
+                   fmt::format(
+                       "Figures not saved due to current configuration: hist_disabled = {}, write_hist_disabled = {}",
+                       is_hist_disabled_,
+                       is_write_hist_disabled_));
         }
         ranges::for_each(output_pars_, [](FairParSet* par) { par->setChanged(); });
+        reset();
     }
 
     auto CalibrationTask::check_trigger() const -> bool
@@ -137,5 +145,10 @@ namespace R3B::Neuland
             throw R3B::runtime_error(fmt::format(R"(Calibration parameter "{}" is not initiated from the root file!)",
                                                  (*par_not_changed)->GetName()));
         }
+    }
+    void CalibrationTask::reset()
+    {
+        passed_num_of_events = 0;
+        histograms_.reset_all_hists();
     }
 } // namespace R3B::Neuland

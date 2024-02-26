@@ -13,9 +13,15 @@
 
 #pragma once
 
+#include <R3BDataMonitor.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCalToHitPar.h>
 #include <R3BShared.h>
+
+namespace R3B::Neuland
+{
+    class Cal2HitParTask;
+}
 
 namespace R3B::Neuland::Calibration
 {
@@ -31,20 +37,24 @@ namespace R3B::Neuland::Calibration
         auto operator=(CosmicEngineInterface&&) -> CosmicEngineInterface& = delete;
 
         void SetModuleSize(int module_size) { module_size_ = module_size; }
+        void SetTask(Cal2HitParTask* task) { mother_task_ = task; };
         [[nodiscard]] auto GetModuleSize() const -> auto { return module_size_; }
+        auto GetTask() -> auto* { return mother_task_; }
 
         virtual void Init() {}
         virtual auto SignalFilter(const std::vector<BarCalData>& /*signals*/) -> bool { return true; }
         virtual void AddSignal(const BarCalData& signal) = 0;
-        virtual void Calibrate() = 0;
+        virtual void Calibrate(Cal2HitPar& hit_par) = 0;
         virtual void SetMinStat(int min) {}
-        [[nodiscard]] virtual auto ExtractParameters() -> Cal2HitPar = 0;
         virtual void BeginOfEvent(unsigned int event_num){};
         virtual void EndOfEvent(unsigned int event_num){};
         virtual void Reset(){};
+        virtual void EndOfTask(){};
+        virtual void HistInit(DataMonitor& histograms){};
 
       private:
         int module_size_ = 0;
+        Cal2HitParTask* mother_task_ = nullptr;
     };
 
 } // namespace R3B::Neuland::Calibration

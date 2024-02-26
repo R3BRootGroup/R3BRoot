@@ -92,6 +92,7 @@ namespace R3B::Neuland
         void check_input_par();
         void execute_no_hist();
         void execute_with_hist();
+        void reset();
 
         [[nodiscard]] auto check_trigger() const -> bool;
         template <typename ParType>

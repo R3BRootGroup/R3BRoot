@@ -86,7 +86,7 @@ namespace R3B
         auto new_error = std::sqrt(numerator.error * numerator.error +
                                    denominator.error * denominator.error * new_value * new_value) /
                          denominator.value;
-        return { new_value, new_error };
+        return { new_value, std::abs(new_error) };
     }
 
     template <typename DataType>

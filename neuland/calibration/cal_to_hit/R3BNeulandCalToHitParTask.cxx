@@ -23,7 +23,7 @@ namespace R3B::Neuland
     {
     }
 
-    void Cal2HitParTask::HistogramInit(DataMonitor& histograms) {}
+    void Cal2HitParTask::HistogramInit(DataMonitor& histograms) { engine_->HistInit(histograms); }
 
     void Cal2HitParTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
@@ -46,6 +46,7 @@ namespace R3B::Neuland
         {
             throw R3B::runtime_error("Plane number extracted from Map2CalPar is 0!");
         }
+        engine_->SetTask(this);
         engine_->SetModuleSize(plane_num * BarsPerPlane);
         engine_->SetMinStat(min_stat_);
         engine_->Init();
@@ -66,14 +67,14 @@ namespace R3B::Neuland
 
     void Cal2HitParTask::EndOfTask()
     {
-        R3BLOG(info, "Starting to do cosmic calibration calibration!");
-        engine_->Calibrate();
-
         if (hit_par_ == nullptr)
         {
             throw R3B::runtime_error("Hit parameter is nullptr during the calibration!");
         }
-        *hit_par_ = engine_->ExtractParameters();
+
+        R3BLOG(info, "Starting to do cosmic calibration calibration!");
+        engine_->Calibrate(*hit_par_);
+        engine_->EndOfTask();
     }
 
     auto Cal2HitParTask::CheckConditions() const -> bool { return engine_->SignalFilter(cal_data_.get()); }

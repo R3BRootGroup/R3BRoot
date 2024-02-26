@@ -14,6 +14,7 @@
 #include "R3BNeulandMillepede.h"
 #include <R3BNeulandCommon.h>
 #include <SteerWriter.h>
+#include <TGraphErrors.h>
 #include <optional>
 #include <range/v3/algorithm.hpp>
 #include <range/v3/view.hpp>
@@ -21,35 +22,102 @@
 namespace rng = ranges;
 
 constexpr auto DEFAULT_MEAS_ERROR = 1.F;
+constexpr auto DEFAULT_RES_FILENAME = "millepede.res";
+constexpr auto SCALE_FACTOR = 100.F;
+constexpr auto REFERENCE_BAR_NUM = 25;
 
 namespace
 {
-    enum class Global
+    void calculate_time_offset(R3B::Neuland::Cal2HitPar& cal_to_hit_par)
     {
-        tsync,              // tsync
-        offset_effective_c, // offset times effective_C
-        effective_c         // effective speed of light
-    };
-
-    inline auto get_global_label_id(int module_num, int num_of_module, Global opn) -> int
-    {
-        switch (opn)
+        auto& module_pars = cal_to_hit_par.GetListOfModuleParRef();
+        for (auto& [module_num, module_par] : module_pars)
         {
-            case Global::tsync:
+            if (module_par.effectiveSpeed.value != 0)
+            {
+                module_par.tDiff = module_par.tDiff / module_par.effectiveSpeed;
+            }
+        }
+    }
+} // namespace
+
+namespace R3B::Neuland::Calibration
+{
+    // output: module_num & global label
+    inline auto MillepedeEngine::to_module_num_label(int par_num) -> std::pair<int, GlobalLabel>
+    {
+        const auto num_of_module = GetModuleSize();
+        auto res = std::pair<int, GlobalLabel>{};
+        const auto factor = (par_num - 1) / num_of_module;
+        res.first = (par_num - 1) % num_of_module + 1;
+
+        switch (factor)
+        {
+            case 0:
+                res.second = GlobalLabel::tsync;
+                break;
+            case 1:
+                res.second = GlobalLabel::offset_effective_c;
+                break;
+            case 2:
+                res.second = GlobalLabel::effective_c;
+                break;
+            default:
+                throw R3B::logic_error(fmt::format("An error occured with unrecognized global par id: {}", par_num));
+        }
+
+        return res;
+    }
+
+    inline auto MillepedeEngine::get_global_label_id(int module_num, GlobalLabel label) -> int
+    {
+        const auto num_of_module = GetModuleSize();
+        switch (label)
+        {
+            case GlobalLabel::tsync:
                 return module_num;
-            case Global::offset_effective_c:
+            case GlobalLabel::offset_effective_c:
                 return module_num + num_of_module;
-            case Global::effective_c:
+            case GlobalLabel::effective_c:
                 return module_num + 2 * num_of_module;
             default:
                 throw std::runtime_error("An error occured with unrecognized global tag");
         }
     }
 
-} // namespace
+    void MillepedeEngine::fill_module_parameters(const Millepede::ResultReader& result,
+                                                 Neuland::Cal2HitPar& cal_to_hit_par)
+    {
+        const auto& pars = result.get_pars();
+        for (const auto& [par_id, par] : pars)
+        {
+            const auto [module_num, global_label] = to_module_num_label(par_id);
+            auto& module_pars = cal_to_hit_par.GetListOfModuleParRef();
 
-namespace R3B::Neuland::Calibration
-{
+            auto& par_ref = module_pars.emplace(module_num, HitModulePar{}).first->second;
+            switch (global_label)
+            {
+                case GlobalLabel::tsync:
+                    par_ref.tSync.value = par.value * SCALE_FACTOR;
+                    par_ref.tSync.error = par.error * SCALE_FACTOR;
+                    break;
+                case GlobalLabel::offset_effective_c:
+                    // The value here is the product of tDiff and effectiveSped. Real tDiff will be calculated later
+                    par_ref.tDiff.value = par.value * SCALE_FACTOR;
+                    par_ref.tDiff.error = par.error * SCALE_FACTOR;
+                    break;
+                case GlobalLabel::effective_c:
+                    par_ref.effectiveSpeed.value = par.value;
+                    par_ref.effectiveSpeed.error = par.error;
+                    break;
+                default:
+                    throw std::runtime_error("An error occured with unrecognized global tag");
+            }
+        }
+
+        calculate_time_offset(cal_to_hit_par);
+    }
+
     auto MillepedeEngine::set_minimum_values(const std::vector<R3B::Neuland::BarCalData>& signals) -> bool
     {
         auto filtered_signals = rng::filter_view(
@@ -105,7 +173,6 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::add_signal_t_sum(const BarCalData& signal)
     {
         buffer_clear();
-        const auto module_size = GetModuleSize();
         const auto module_num = static_cast<int>(signal.module_num);
         const auto pos_z = GetModuleZPos<float>(static_cast<int>(module_num));
 
@@ -115,22 +182,18 @@ namespace R3B::Neuland::Calibration
                            (right_signal.leading_time - right_signal.trigger_time) - smallest_time_sum_;
 
         input_data_buffer_.measurement =
-            static_cast<float>(t_sum.value / 100.F / 2.F - BarLength / 100.F / init_effective_c_);
+            static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c_);
         // input_data_buffer_.sigma = static_cast<float>(t_sum.error / 2.);
         input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
-        const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / 100.F - minimum_pos_z_ / 100.F, 0.F, 0.F };
+        const auto local_derivs_t =
+            std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR - minimum_pos_z_ / SCALE_FACTOR, 0.F, 0.F };
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
-        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, module_size, Global::tsync), 1.F);
-        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, module_size, Global::effective_c),
-                                                -BarLength / 100.F / 2.F / init_effective_c_ / init_effective_c_);
+        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
+        input_data_buffer_.globals.emplace_back(
+            get_global_label_id(module_num, GlobalLabel::effective_c),
+            -BarLength / SCALE_FACTOR / 2.F / init_effective_c_ / init_effective_c_);
 
-        // fmt::print("tsum: {} Added entry: {}\n", t_sum.value / 2.F, input_data_buffer_);
         write_to_buffer();
-        // R3BLOG(
-        //     debug,
-        //     fmt::format(
-        //         "Writting Mille data to binary file with meas = {} and z = {}", input_data_buffer_.measurement,
-        //         pos_z));
     }
 
     void MillepedeEngine::add_spacial_local_constraint(int module_num)
@@ -140,11 +203,11 @@ namespace R3B::Neuland::Calibration
         const auto pos_z = static_cast<float>(GetPlaneZPos(plane_id));
         const auto is_horizontal = IsPlaneHorizontal(plane_id);
         const auto pos_bar_vert_disp = GetBarVerticalDisplacement(module_num);
-        const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / 100.F, 0.F, 0.F, 1.F }
-                                                : std::array{ pos_z / 100.F, 0.F, 0.F, 1.F, 0.F };
+        const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F }
+                                                : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
 
-        input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / 100.F);
-        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / 100.F);
+        input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / SCALE_FACTOR);
+        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SCALE_FACTOR);
 
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
         // fmt::print("xy: Added entry: {}\n", input_data_buffer_);
@@ -154,7 +217,6 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::add_signal_t_diff(const BarCalData& signal)
     {
         buffer_clear();
-        const auto module_size = GetModuleSize();
         const auto module_num = static_cast<int>(signal.module_num);
         const auto plane_id = GetPlaneID(static_cast<int>(module_num) - 1);
         const auto is_horizontal = IsPlaneHorizontal(plane_id);
@@ -169,15 +231,13 @@ namespace R3B::Neuland::Calibration
         // input_data_buffer_.sigma = static_cast<float>(t_diff.error / 2.);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR * init_effective_c_ / 2);
         input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR / 2.F);
-        const auto local_derivs = is_horizontal ? std::array{ pos_z / 100.F, 0.F, 0.F, 1.F, 0.F }
-                                                : std::array{ 0.F, pos_z / 100.F, 0.F, 0.F, 1.F };
+        const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F }
+                                                : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
-        input_data_buffer_.globals.emplace_back(
-            get_global_label_id(module_num, module_size, Global::offset_effective_c), -0.5F);
-        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, module_size, Global::effective_c),
+        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::offset_effective_c),
+                                                -0.5F);
+        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
                                                 static_cast<float>(t_diff.value / 100. / 2.));
-        // R3BLOG(info, fmt::format("module num: {}, time diff: {}", module_num, t_diff.value));
-        // fmt::print("tdiff: Added entry: {}\n", input_data_buffer_);
         write_to_buffer();
         R3BLOG(
             debug,
@@ -200,6 +260,8 @@ namespace R3B::Neuland::Calibration
 
     void MillepedeEngine::Init()
     {
+        par_result_.set_filename(DEFAULT_RES_FILENAME);
+
         auto steer_writer = SteerWriter{};
         steer_writer.set_filepath(pede_steer_filename_);
         steer_writer.set_data_filepath(input_data_filename_);
@@ -208,37 +270,56 @@ namespace R3B::Neuland::Calibration
         const auto module_size = GetModuleSize();
         for (int module_num{ 1 }; module_num <= module_size; ++module_num)
         {
-            steer_writer.add_parameter_default(get_global_label_id(module_num, module_size, Global::effective_c),
+            steer_writer.add_parameter_default(get_global_label_id(module_num, GlobalLabel::effective_c),
                                                std::make_pair(static_cast<float>(init_effective_c_), 0.F));
         }
-        steer_writer.add_parameter_default(get_global_label_id(25, module_size, Global::tsync),
+        steer_writer.add_parameter_default(get_global_label_id(REFERENCE_BAR_NUM, GlobalLabel::tsync),
                                            std::make_pair(0.F, -1.F));
         steer_writer.write();
     }
 
-    void MillepedeEngine::Calibrate() {}
+    void MillepedeEngine::Calibrate(Cal2HitPar& hit_par)
+    {
+        hit_par.Reset();
+        par_result_.read();
+        fill_module_parameters(par_result_, hit_par);
+        fill_data_to_figure(hit_par);
+    }
+
+    void MillepedeEngine::fill_data_to_figure(Cal2HitPar& hit_par)
+    {
+        const auto& pars = hit_par.GetListOfModulePar();
+        for (const auto& [module_num, par] : pars)
+        {
+            graph_time_offset_->SetPoint(static_cast<int>(module_num), module_num, par.tDiff.value);
+            graph_time_offset_->SetPointError(static_cast<int>(module_num), 0., par.tDiff.error);
+            graph_time_sync_->SetPoint(static_cast<int>(module_num), module_num, par.tSync.value);
+            graph_time_sync_->SetPointError(static_cast<int>(module_num), 0., par.tSync.error);
+            graph_effective_c_->SetPoint(static_cast<int>(module_num), module_num, par.effectiveSpeed.value);
+            graph_effective_c_->SetPointError(static_cast<int>(module_num), 0., par.effectiveSpeed.error);
+        }
+    }
+
     void MillepedeEngine::EndOfEvent(unsigned int /*event_num*/)
     {
         // TODO: could be an empty event
         binary_data_writer_.end();
-        // if (has_rank_check_)
-        // {
-        //     rank_checker_.calculate();
-        //     auto decomp = rank_checker_.get_decomp();
-        //     decomp.setThreshold(matrix_epsilon_);
-        //     R3BLOG(info, fmt::format("\nrank: {}", decomp.rank()));
-        // }
-        // std::cout << "Event ended.-----------------------------------\n";
     }
 
-    auto MillepedeEngine::ExtractParameters() -> Cal2HitPar { return Cal2HitPar{}; }
+    void MillepedeEngine::Reset() {}
 
-    void MillepedeEngine::Reset()
+    void MillepedeEngine::HistInit(DataMonitor& histograms)
     {
-        // if (has_rank_check_)
-        // {
-        //     rank_checker_.reset();
-        // }
+        const auto module_size = GetModuleSize();
+
+        graph_time_offset_ = histograms.add_graph("time_offset", std::make_unique<TGraphErrors>(module_size));
+        graph_time_offset_->SetTitle("Time offset vs BarNum");
+
+        graph_time_sync_ = histograms.add_graph("time_sync", std::make_unique<TGraphErrors>(module_size));
+        graph_time_sync_->SetTitle("Time sync vs BarNum");
+
+        graph_effective_c_ = histograms.add_graph("effective_c", std::make_unique<TGraphErrors>(module_size));
+        graph_effective_c_->SetTitle("Effective c vs BarNum");
     }
 
     void MillepedeEngine::buffer_clear()
@@ -249,13 +330,10 @@ namespace R3B::Neuland::Calibration
         input_data_buffer_.sigma = 0.F;
     }
 
-    void MillepedeEngine::write_to_buffer()
-    {
-        binary_data_writer_.mille(input_data_buffer_);
-        // if (has_rank_check_)
-        // {
-        //     rank_checker_.add_entry(input_data_buffer_);
-        // }
+    void MillepedeEngine::write_to_buffer() { binary_data_writer_.mille(input_data_buffer_); }
+
+    void MillepedeEngine::EndOfTask()
+    { /* par_result_.print(); */
     }
 
 } // namespace R3B::Neuland::Calibration

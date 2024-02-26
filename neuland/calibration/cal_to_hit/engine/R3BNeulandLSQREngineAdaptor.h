@@ -29,13 +29,11 @@ namespace R3B::Neuland::Calibration
         int minimum_signal_size_ = 6;
         HitCalibrationEngine hit_cal_engine_;
         CosmicTracker cosmic_tracker_;
-        Cal2HitPar hit_parameters_;
 
         void Init() override;
         void AddSignal(const BarCalData& signal) override;
-        void Calibrate() override;
+        void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override;
-        [[nodiscard]] auto ExtractParameters() -> Cal2HitPar override { return std::move(hit_parameters_); }
         void Reset() override
         {
             hit_cal_engine_.Reset();

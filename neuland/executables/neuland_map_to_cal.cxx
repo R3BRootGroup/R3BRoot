@@ -52,9 +52,10 @@ auto main(int argc, const char** argv) -> int
     auto input_file = programOptions.create_option<std::string>("in,i", "set the input files (regex)");
     auto input_par = programOptions.create_option<std::string>("in-par,p", "set the input parameter");
     auto output_file = programOptions.create_option<std::string>("out,o", "set the output file");
-    auto eventNum = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
+    auto event_num = programOptions.create_option<int>("eventNum,n", "set the event number", DEFAULT_EVENT_NUM);
     auto min_stat =
         programOptions.create_option<int>("min-stat,m", "set minimun statistics for calibration", DEFAULT_MIN_STAT);
+    auto run_num = programOptions.create_option<int>("runNum,r", "set the number of runs", 1);
 
     if (!programOptions.verify(argc, argv))
     {
@@ -123,7 +124,11 @@ auto main(int argc, const char** argv) -> int
         rtdb->saveOutput();
 
         run->Init();
-        run->Run(0, eventNum() <= 0 ? 0 : eventNum());
+        for (int run_loop{ 0 }; run_loop < run_num.value(); ++run_loop)
+        {
+            fmt::print("\nStarting run {} ...\n\n", run_loop);
+            run->Run(0, event_num.value() <= 0 ? 0 : event_num.value());
+        }
     }
     catch (R3B::runtime_error& ex)
     {
