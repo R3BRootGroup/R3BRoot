@@ -26,6 +26,7 @@ namespace R3B::Millepede
 {
     void Launcher::launch()
     {
+#ifdef PEDEDIR
         const auto exe_string = fmt::format("{}/{}", PEDEDIR, executable_);
         auto launch_args = std::vector<std::string>{ "-i", steer_filename_ };
         auto exe_path = std::filesystem::path(exe_string);
@@ -56,6 +57,7 @@ namespace R3B::Millepede
                                                  fmt::join(launch_args, " "),
                                                  ex.what()));
         }
+#endif
     }
 
     void Launcher::end()
