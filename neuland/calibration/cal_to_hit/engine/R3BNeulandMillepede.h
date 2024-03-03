@@ -17,6 +17,7 @@
 #include <ParResultReader.h>
 #include <PedeLauncher.h>
 #include <R3BNeulandCommon.h>
+#include <optional>
 // #include <RankChecker.h>
 
 class TGraphErrors;
@@ -40,8 +41,9 @@ namespace R3B::Neuland::Calibration
       private:
         bool has_rank_check_ = false;
         int minimum_hit_ = 1;
-        float minimum_pos_z_ = 0;
-        float smallest_time_sum_ = 0.;
+        // float minimum_pos_z_ = 0;
+        // float smallest_time_sum_ = 0.;
+        std::optional<float> average_t_sum_;
         float init_effective_c_ = -DEFAULT_EFFECTIVE_C;
         MilleDataPoint input_data_buffer_;
         std::string input_data_filename_ = "neuland_cosmic_mille.bin";
@@ -63,7 +65,7 @@ namespace R3B::Neuland::Calibration
         void AddSignal(const BarCalData& signal) override;
         void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override;
-        void Reset() override;
+        void EventReset() override;
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
         void EndOfTask() override;
         void HistInit(DataMonitor& histograms) override;

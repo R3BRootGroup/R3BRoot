@@ -48,7 +48,7 @@ namespace R3B::Neuland::Calibration
         virtual void SetMinStat(int min) {}
         virtual void BeginOfEvent(unsigned int event_num){};
         virtual void EndOfEvent(unsigned int event_num){};
-        virtual void Reset(){};
+        virtual void EventReset(){};
         virtual void EndOfTask(){};
         virtual void HistInit(DataMonitor& histograms){};
 

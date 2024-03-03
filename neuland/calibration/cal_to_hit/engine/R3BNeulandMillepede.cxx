@@ -18,6 +18,7 @@
 #include <TGraphErrors.h>
 #include <optional>
 #include <range/v3/algorithm.hpp>
+#include <range/v3/numeric.hpp>
 #include <range/v3/view.hpp>
 
 namespace rng = ranges;
@@ -133,6 +134,7 @@ namespace R3B::Neuland::Calibration
 
     auto MillepedeEngine::set_minimum_values(const std::vector<R3B::Neuland::BarCalData>& signals) -> bool
     {
+        // make sure only one hit exists in one bar
         auto filtered_signals = rng::filter_view(
             signals | rng::views::all,
             [](const auto& bar_signal) { return bar_signal.left.size() == 1 and bar_signal.right.size() == 1; });
@@ -140,20 +142,22 @@ namespace R3B::Neuland::Calibration
         {
             return false;
         }
-        const auto sum_min =
-            rng::min(filtered_signals | rng::views::transform(
-                                            [](const auto& bar_signal)
-                                            {
-                                                const auto& left_signal = bar_signal.left.front();
-                                                const auto& right_signal = bar_signal.right.front();
-                                                return (left_signal.leading_time - left_signal.trigger_time +
-                                                        right_signal.leading_time - right_signal.trigger_time)
-                                                    .value;
-                                            }));
-        smallest_time_sum_ = static_cast<float>(sum_min);
 
-        const auto& min_module = rng::min(filtered_signals, rng::less{}, &R3B::Neuland::BarCalData::module_num);
-        minimum_pos_z_ = GetModuleZPos<float>(static_cast<int>(min_module.module_num));
+        if (not average_t_sum_.has_value())
+        {
+            auto t_sum_view = filtered_signals | rng::views::transform(
+                                                     [](const auto& bar_signal)
+                                                     {
+                                                         const auto& left_signal = bar_signal.left.front();
+                                                         const auto& right_signal = bar_signal.right.front();
+                                                         return (left_signal.leading_time - left_signal.trigger_time +
+                                                                 right_signal.leading_time - right_signal.trigger_time)
+                                                             .value;
+                                                     });
+            auto sum = rng::accumulate(t_sum_view, 0.F);
+            average_t_sum_ = sum / static_cast<float>(rng::distance(t_sum_view.begin(), t_sum_view.end()));
+            R3BLOG(info, fmt::format("Average t_sum is calculated to be {}", average_t_sum_.value()));
+        }
         return true;
     }
 
@@ -194,22 +198,13 @@ namespace R3B::Neuland::Calibration
         const auto& left_signal = signal.left.front();
         const auto& right_signal = signal.right.front();
         const auto t_sum = (left_signal.leading_time - left_signal.trigger_time) +
-                           // (right_signal.leading_time - right_signal.trigger_time) - smallest_time_sum_;
-                           (right_signal.leading_time - right_signal.trigger_time) + 6000.F;
+                           (right_signal.leading_time - right_signal.trigger_time) - average_t_sum_.value_or(0.F);
 
         input_data_buffer_.measurement =
             static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
         // input_data_buffer_.sigma = static_cast<float>(t_sum.error / 2.);
         input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
-        const auto local_derivs_t =
-            std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR - minimum_pos_z_ / SCALE_FACTOR, 0.F, 0.F };
-        // fmt::print("-------------------\n");
-        // fmt::print("t sum: {}\n", t_sum.value / 2.F);
-        // fmt::print("meas: {}\n", t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
-        // fmt::print("pos_z: {}, min_pos_z: {}, diff: {}\n",
-        //            pos_z / SCALE_FACTOR,
-        //            minimum_pos_z_ / SCALE_FACTOR,
-        //            pos_z / SCALE_FACTOR - minimum_pos_z_ / SCALE_FACTOR);
+        const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
@@ -225,14 +220,13 @@ namespace R3B::Neuland::Calibration
         const auto pos_z = static_cast<float>(GetPlaneZPos(plane_id));
         const auto is_horizontal = IsPlaneHorizontal(plane_id);
         const auto pos_bar_vert_disp = GetBarVerticalDisplacement(module_num);
-        const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F }
-                                                : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
+        const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F }
+                                                : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F };
 
         input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / SCALE_FACTOR);
         input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SCALE_FACTOR);
 
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
-        // fmt::print("xy: Added entry: {}\n", input_data_buffer_);
         write_to_buffer();
     }
 
@@ -253,13 +247,13 @@ namespace R3B::Neuland::Calibration
         // input_data_buffer_.sigma = static_cast<float>(t_diff.error / 2.);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR * init_effective_c_ / 2);
         input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR / 2.F);
-        const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F }
-                                                : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
+        const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F }
+                                                : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::offset_effective_c),
                                                 -0.5F);
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
-                                                static_cast<float>(t_diff.value / 100. / 2.));
+                                                static_cast<float>(t_diff.value / SCALE_FACTOR / 2.));
         write_to_buffer();
         R3BLOG(
             debug,
@@ -283,6 +277,11 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::Calibrate(Cal2HitPar& hit_par)
     {
         hit_par.Reset();
+
+        R3BLOG(info, "Launching pede algorithm..");
+        pede_launcher_.sync_launch();
+        pede_launcher_.end();
+
         par_result_.read();
         fill_module_parameters(par_result_, hit_par);
         fill_data_to_figure(hit_par);
@@ -308,7 +307,7 @@ namespace R3B::Neuland::Calibration
         binary_data_writer_.end();
     }
 
-    void MillepedeEngine::Reset() {}
+    void MillepedeEngine::EventReset() {}
 
     void MillepedeEngine::HistInit(DataMonitor& histograms)
     {
@@ -336,9 +335,8 @@ namespace R3B::Neuland::Calibration
 
     void MillepedeEngine::EndOfTask()
     {
-        R3BLOG(info, "Launching pede algorithm..");
-        pede_launcher_.sync_launch();
-        pede_launcher_.end();
+        average_t_sum_.reset();
+        buffer_clear();
     }
 
     void MillepedeEngine::init_parameter()

@@ -34,7 +34,7 @@ namespace R3B::Neuland::Calibration
         void AddSignal(const BarCalData& signal) override;
         void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override;
-        void Reset() override
+        void EventReset() override
         {
             hit_cal_engine_.Reset();
             cosmic_tracker_.Reset();

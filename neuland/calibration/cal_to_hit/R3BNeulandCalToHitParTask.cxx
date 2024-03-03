@@ -56,7 +56,7 @@ namespace R3B::Neuland
 
     void Cal2HitParTask::TriggeredExec()
     {
-        engine_->Reset();
+        engine_->EventReset();
         for (const auto& bar_signal : cal_data_)
         {
             engine_->AddSignal(bar_signal);
