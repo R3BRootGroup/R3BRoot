@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BNeulandMillepede.h"
+#include <R3BNeulandCalToHitParTask.h>
 #include <R3BNeulandCommon.h>
 #include <SteerWriter.h>
 #include <TGraphErrors.h>
@@ -43,6 +44,18 @@ namespace
 
 namespace R3B::Neuland::Calibration
 {
+    void MillepedeEngine::Init()
+    {
+        cal_to_hit_par_ = GetTask()->GetCal2HitPar();
+
+        par_result_.set_filename(DEFAULT_RES_FILENAME);
+        pede_launcher_.set_steer_filename(pede_steer_filename_);
+        pede_launcher_.set_parameter_filename(parameter_filename_);
+
+        init_steer_writer();
+        init_parameter();
+    }
+
     // output: module_num & global label
     inline auto MillepedeEngine::to_module_num_label(int par_num) -> std::pair<int, GlobalLabel>
     {
@@ -176,22 +189,31 @@ namespace R3B::Neuland::Calibration
         const auto module_num = static_cast<int>(signal.module_num);
         const auto pos_z = GetModuleZPos<float>(static_cast<int>(module_num));
 
+        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effectiveSpeed.value;
+
         const auto& left_signal = signal.left.front();
         const auto& right_signal = signal.right.front();
         const auto t_sum = (left_signal.leading_time - left_signal.trigger_time) +
-                           (right_signal.leading_time - right_signal.trigger_time) - smallest_time_sum_;
+                           // (right_signal.leading_time - right_signal.trigger_time) - smallest_time_sum_;
+                           (right_signal.leading_time - right_signal.trigger_time) + 6000.F;
 
         input_data_buffer_.measurement =
-            static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c_);
+            static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
         // input_data_buffer_.sigma = static_cast<float>(t_sum.error / 2.);
         input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
         const auto local_derivs_t =
             std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR - minimum_pos_z_ / SCALE_FACTOR, 0.F, 0.F };
+        // fmt::print("-------------------\n");
+        // fmt::print("t sum: {}\n", t_sum.value / 2.F);
+        // fmt::print("meas: {}\n", t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
+        // fmt::print("pos_z: {}, min_pos_z: {}, diff: {}\n",
+        //            pos_z / SCALE_FACTOR,
+        //            minimum_pos_z_ / SCALE_FACTOR,
+        //            pos_z / SCALE_FACTOR - minimum_pos_z_ / SCALE_FACTOR);
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
-        input_data_buffer_.globals.emplace_back(
-            get_global_label_id(module_num, GlobalLabel::effective_c),
-            -BarLength / SCALE_FACTOR / 2.F / init_effective_c_ / init_effective_c_);
+        input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
+                                                -BarLength / SCALE_FACTOR / 2.F / init_effective_c / init_effective_c);
 
         write_to_buffer();
     }
@@ -258,26 +280,6 @@ namespace R3B::Neuland::Calibration
         add_spacial_local_constraint(static_cast<int>(signal.module_num));
     }
 
-    void MillepedeEngine::Init()
-    {
-        par_result_.set_filename(DEFAULT_RES_FILENAME);
-
-        auto steer_writer = SteerWriter{};
-        steer_writer.set_filepath(pede_steer_filename_);
-        steer_writer.set_data_filepath(input_data_filename_);
-        steer_writer.add_method(SteerWriter::Method::inversion, std::make_pair(3.F, 0.01F));
-
-        const auto module_size = GetModuleSize();
-        for (int module_num{ 1 }; module_num <= module_size; ++module_num)
-        {
-            steer_writer.add_parameter_default(get_global_label_id(module_num, GlobalLabel::effective_c),
-                                               std::make_pair(static_cast<float>(init_effective_c_), 0.F));
-        }
-        steer_writer.add_parameter_default(get_global_label_id(REFERENCE_BAR_NUM, GlobalLabel::tsync),
-                                           std::make_pair(0.F, -1.F));
-        steer_writer.write();
-    }
-
     void MillepedeEngine::Calibrate(Cal2HitPar& hit_par)
     {
         hit_par.Reset();
@@ -333,7 +335,48 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::write_to_buffer() { binary_data_writer_.mille(input_data_buffer_); }
 
     void MillepedeEngine::EndOfTask()
-    { /* par_result_.print(); */
+    {
+        R3BLOG(info, "Launching pede algorithm..");
+        pede_launcher_.sync_launch();
+        pede_launcher_.end();
     }
 
+    void MillepedeEngine::init_parameter()
+    {
+        auto num_of_modules = GetModuleSize();
+
+        if (cal_to_hit_par_ == nullptr)
+        {
+            throw R3B::runtime_error("Pointer to cal_to_hit_par is nullptr!");
+        }
+
+        auto& module_pars = cal_to_hit_par_->GetListOfModuleParRef();
+        module_pars.clear();
+
+        for (unsigned int module_num{ 1 }; module_num <= num_of_modules; ++module_num)
+        {
+            auto module_par = HitModulePar{};
+            module_par.effectiveSpeed.value = init_effective_c_;
+            module_pars.emplace(module_num, module_par);
+        }
+    }
+
+    void MillepedeEngine::init_steer_writer()
+    {
+        auto steer_writer = SteerWriter{};
+        steer_writer.set_filepath(pede_steer_filename_);
+        steer_writer.set_parameter_file(parameter_filename_);
+        steer_writer.set_data_filepath(input_data_filename_);
+        steer_writer.add_method(SteerWriter::Method::inversion, std::make_pair(3.F, 0.01F));
+
+        const auto module_size = GetModuleSize();
+        for (int module_num{ 1 }; module_num <= module_size; ++module_num)
+        {
+            steer_writer.add_parameter_default(get_global_label_id(module_num, GlobalLabel::effective_c),
+                                               std::make_pair(static_cast<float>(init_effective_c_), 0.F));
+        }
+        steer_writer.add_parameter_default(get_global_label_id(REFERENCE_BAR_NUM, GlobalLabel::tsync),
+                                           std::make_pair(0.F, -1.F));
+        steer_writer.write();
+    }
 } // namespace R3B::Neuland::Calibration

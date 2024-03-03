@@ -15,6 +15,7 @@
 #include "R3BNeulandCosmicEngine.h"
 #include <Mille.h>
 #include <ParResultReader.h>
+#include <PedeLauncher.h>
 #include <R3BNeulandCommon.h>
 // #include <RankChecker.h>
 
@@ -45,13 +46,18 @@ namespace R3B::Neuland::Calibration
         MilleDataPoint input_data_buffer_;
         std::string input_data_filename_ = "neuland_cosmic_mille.bin";
         std::string pede_steer_filename_ = "neuland_steer.txt";
+        std::string parameter_filename_ = "neuland_pars.txt";
         Mille binary_data_writer_{ input_data_filename_ };
         Millepede::ResultReader par_result_;
+        Millepede::Launcher pede_launcher_;
 
         // histograms:
         TGraphErrors* graph_time_offset_ = nullptr;
         TGraphErrors* graph_time_sync_ = nullptr;
         TGraphErrors* graph_effective_c_ = nullptr;
+
+        // parameter:
+        Cal2HitPar* cal_to_hit_par_ = nullptr;
 
         void Init() override;
         void AddSignal(const BarCalData& signal) override;
@@ -72,6 +78,9 @@ namespace R3B::Neuland::Calibration
         inline auto to_module_num_label(int par_num) -> std::pair<int, GlobalLabel>;
         void fill_module_parameters(const Millepede::ResultReader& result, Neuland::Cal2HitPar& cal_to_hit_par);
         void fill_data_to_figure(Cal2HitPar& hit_par);
+
+        void init_parameter();
+        void init_steer_writer();
     };
 
 } // namespace R3B::Neuland::Calibration

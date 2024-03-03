@@ -63,17 +63,17 @@ namespace R3B
     {
         ofile << "Cfiles\n";
         ofile << data_filepath_ << "\n";
-        ofile << DEFAULT_MILLEPEDE_PARAMETER_FILE << "\n";
+        ofile << parameter_file_ << "\n";
         ofile << "\n";
     }
 
     void SteerWriter::write_parameter_defaults()
     {
-        auto ofile = std::ofstream{ DEFAULT_MILLEPEDE_PARAMETER_FILE, std::ios_base::out | std::ios_base::trunc };
+        auto ofile = std::ofstream{ parameter_file_, std::ios_base::out | std::ios_base::trunc };
 
         if (not ofile.is_open())
         {
-            throw std::runtime_error(fmt::format("Can't open file {}", DEFAULT_MILLEPEDE_PARAMETER_FILE));
+            throw std::runtime_error(fmt::format("Can't open file {}", parameter_file_));
         }
 
         ofile << "Parameter\n";

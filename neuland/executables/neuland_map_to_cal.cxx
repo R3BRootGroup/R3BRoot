@@ -129,6 +129,12 @@ auto main(int argc, const char** argv) -> int
             fmt::print("\nStarting run {} ...\n\n", run_loop);
             run->Run(0, event_num.value() <= 0 ? 0 : event_num.value());
         }
+
+        timer.Stop();
+        std::cout << "Cal level data written to file " << outputfile_path << "\n";
+        std::cout << "Cal level parameter written to file " << outputParFileName << "\n";
+        std::cout << "Macro finished successfully." << std::endl;
+        std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
     }
     catch (R3B::runtime_error& ex)
     {
@@ -154,16 +160,11 @@ auto main(int argc, const char** argv) -> int
         std::cout << "\n\n";
     }
 
-    timer.Stop();
     auto* sinkfile = run->GetSink();
     if (sinkfile != nullptr)
     {
         sinkfile->Close();
     }
-    std::cout << "Cal level data written to file " << outputfile_path << "\n";
-    std::cout << "Cal level parameter written to file " << outputParFileName << "\n";
-    std::cout << "Macro finished successfully." << std::endl;
-    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
 
     return 0;
 }

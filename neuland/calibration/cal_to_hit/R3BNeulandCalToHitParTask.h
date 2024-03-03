@@ -35,6 +35,7 @@ namespace R3B::Neuland
         explicit Cal2HitParTask(std::string_view name = "NeulandCal2HitParTask", int iVerbose = 1);
         void SetMethod(Cal2HitParMethod method) { method_ = method; }
         void SetMinStat(int min) { min_stat_ = min; }
+        auto GetCal2HitPar() -> auto* {return hit_par_;}
 
       private:
         int min_stat_ = 1;

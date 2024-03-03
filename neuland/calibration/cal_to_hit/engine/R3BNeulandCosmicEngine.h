@@ -39,7 +39,7 @@ namespace R3B::Neuland::Calibration
         void SetModuleSize(int module_size) { module_size_ = module_size; }
         void SetTask(Cal2HitParTask* task) { mother_task_ = task; };
         [[nodiscard]] auto GetModuleSize() const -> auto { return module_size_; }
-        auto GetTask() -> auto* { return mother_task_; }
+        auto GetTask() -> Cal2HitParTask* { return mother_task_; }
 
         virtual void Init() {}
         virtual auto SignalFilter(const std::vector<BarCalData>& /*signals*/) -> bool { return true; }

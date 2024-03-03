@@ -20,6 +20,8 @@
 #include <vector>
 
 constexpr auto DEFAULT_MILLEPEDE_PARAMETER_FILE = "parameters.txt";
+constexpr auto DEFAULT_STEER_FILENAME = "steer.txt";
+constexpr auto DEFAULT_DATA_FILENAME = "data.bin";
 
 namespace R3B
 {
@@ -40,6 +42,8 @@ namespace R3B
         SteerWriter() = default;
         void set_filepath(std::string_view filepath) { filepath_ = filepath; }
         void set_data_filepath(std::string_view filepath) { data_filepath_ = filepath; }
+        void set_parameter_file(std::string_view filename) { parameter_file_ = filename; }
+
         void add_parameter_default(int par_num, const std::pair<float, float>& values);
         void add_method(Method method, const std::pair<float, float>& values);
         void add_other_options(std::vector<std::string> options);
@@ -48,8 +52,9 @@ namespace R3B
 
       private:
         std::map<Method, std::pair<float, float>> methods_;
-        std::string filepath_ = "steer.txt";
-        std::string data_filepath_ = "data.bin";
+        std::string filepath_ = DEFAULT_STEER_FILENAME;
+        std::string parameter_file_ = DEFAULT_MILLEPEDE_PARAMETER_FILE;
+        std::string data_filepath_ = DEFAULT_DATA_FILENAME;
         std::unordered_map<int, std::pair<float, float>> parameter_defaults_;
         std::vector<std::vector<std::string>> other_options_;
 

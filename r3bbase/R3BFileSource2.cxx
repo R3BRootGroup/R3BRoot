@@ -143,6 +143,10 @@ void R3BEventProgressPrinter::ShowProgress(uint64_t event_num)
 
 void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
 {
+    if (speed_per_ms <= 0.)
+    {
+        return;
+    }
     const auto event_num_str =
         fmt::format(fg(fmt::terminal_color::bright_green) | fmt::emphasis::bold, "{:^5d}k", event_num / 1000);
     const auto speed_str = fmt::format(fg(fmt::color::white), "{:^6.1F}k/s", speed_per_ms);
