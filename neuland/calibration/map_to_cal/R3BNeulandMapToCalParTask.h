@@ -25,16 +25,17 @@ namespace R3B::Neuland
     class Map2CalParTask : public CalibrationTask
     {
       public:
+        using ErrorMethod = calibration::FTCalErrorMethod;
         Map2CalParTask();
         Map2CalParTask(std::string_view name, int iVerbose);
 
-        void SetPlaneNum(unsigned int num) { plane_num_ = num; }
         void SetTrigIDMapPrintFormat(TrigIDMappingPrintFormat format) { trigIDIO.SetFormat(format); }
         void SetTrigEnabled(bool is_enabled) { is_trig_enabled_ = is_enabled; }
         void SetCoarseTimeFreqMHz(float freq) { coarse_time_frequency_ = freq; }
         void SetTrigIDMapAutoFind(bool is_auto = true) { is_trigID_auto_ = is_auto; }
         void SetTrigIDMapDir(std::string_view dirName) { trigIDIO.SetDir(dirName); }
         void SetTrigIDMapFileName(std::string_view fileName) { trigIDIO.SetFileName(fileName); }
+        void SetErrorMethod(ErrorMethod method) { cal_strategy_.Set_error_method(method); }
 
       private:
         bool is_trigID_auto_ = true;

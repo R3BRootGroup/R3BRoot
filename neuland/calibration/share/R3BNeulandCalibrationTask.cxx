@@ -66,6 +66,7 @@ namespace R3B::Neuland
     void CalibrationTask::Exec(Option_t* /*option*/)
     {
         BeginOfEvent();
+        R3BLOG(debug, fmt::format("Event number: {}, tpat: {:016b}", eventHeader_->GetEventno(), eventHeader_->GetTpat()));
         (is_hist_disabled_) ? execute_no_hist() : execute_with_hist();
     }
 

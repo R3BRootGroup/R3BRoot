@@ -14,6 +14,8 @@
 
 #include "TObject.h"
 #include <R3BShared.h>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
 
 namespace R3B
 {
@@ -67,6 +69,43 @@ namespace R3B
         ClassDefNV(PaddleTamexTrigMappedData, 1)
     };
 } // namespace R3B
+
+template <>
+class fmt::formatter<R3B::SingleEdgeSignal>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::SingleEdgeSignal& signal, FmtContent& ctn) const
+    {
+        return format_to(ctn.out(), "{{fine: {}, coarse: {} }}", signal.fine, signal.coarse);
+    }
+};
+
+template <>
+class fmt::formatter<R3B::DoubleEdgeSignal>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::DoubleEdgeSignal& signal, FmtContent& ctn) const
+    {
+        return format_to(ctn.out(), "{{leading: {}, trailing: {} }}", signal.leading, signal.trailing);
+    }
+};
+
+template <>
+class fmt::formatter<R3B::MapBarSignal>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::MapBarSignal& signal, FmtContent& ctn) const
+    {
+        return format_to(
+            ctn.out(), "{{left: [{}], right: [{}] }}", fmt::join(signal.left, ", "), fmt::join(signal.left, ", "));
+    }
+};
 
 using R3BPaddleTamexMappedDataContainer = std::vector<R3B::PaddleTamexMappedData>;
 using R3BPaddleTamexTrigDataContainer = std::map<unsigned int, R3B::PaddleTamexTrigMappedData>;

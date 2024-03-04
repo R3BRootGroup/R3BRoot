@@ -65,10 +65,10 @@ namespace R3B::Neuland
         void calibrate();
         void histogram_monitor(const BarCalData& cal, Side side);
         void fill_cal_data(BarCalData& cal, const MapBarSignal& signals);
-        [[nodiscard]] auto doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& dESignal,
+        [[nodiscard]] auto doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& double_edge_signal,
                                                          R3B::Side side,
                                                          unsigned int module_num) const -> CalDataSignal;
-        [[nodiscard]] auto mapBarSignal_to_calSignals(const MapBarSignal& barSignal,
+        [[nodiscard]] auto mapBarSignal_to_calSignals(const MapBarSignal& map_bar_signals,
                                                       unsigned int module_num,
                                                       R3B::Side side) const -> std::vector<CalDataSignal>;
         [[nodiscard]] auto convert_to_real_time(R3BTCalPar2* calPar,

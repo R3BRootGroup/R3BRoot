@@ -36,7 +36,7 @@ struct EXT_STR_h101_t
 };
 
 constexpr int DEFAULT_EVENT_NUM = 1000;
-constexpr int DEFAULT_TIME_STITCH = 1000;
+constexpr int DEFAULT_TIME_STITCH = 4000;
 constexpr int DEFAULT_RUN_ID = 999;
 constexpr auto DEFAULT_UNPACKER_PATH = "/../unpack/202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
@@ -61,8 +61,8 @@ auto main(int argc, const char** argv) -> int
     auto inputRunID = programOptions.create_option<int>("runID,r", "set the input runID", DEFAULT_RUN_ID);
     auto time_stich =
         programOptions.create_option<int>("time-stitch,t", "set time stitch for ucesb", DEFAULT_TIME_STITCH);
-    auto neulandDP = programOptions.create_option<int>(
-        "dp", "set the number of double planes for neuland", NEULAND_DEFAULT_DOUBLE_PLANE);
+    // auto neulandDP = programOptions.create_option<int>(
+    //     "dp", "set the number of double planes for neuland", NEULAND_DEFAULT_DOUBLE_PLANE);
     auto unpacker_path = programOptions.create_option<std::string>(
         "unpack", "set the path of unpacker executable", std::string{ ucesb_dir } + DEFAULT_UNPACKER_PATH);
     if (!programOptions.verify(argc, argv))
@@ -76,10 +76,10 @@ auto main(int argc, const char** argv) -> int
 
     // const auto whiterabbit_id = std::stoi(wr_ID(), nullptr, 16);
 
-    const unsigned int planeNum = neulandDP() * 2;
-    const auto runID = inputRunID();
-    const auto outputfile_path = fs::path{ output_file() };
-    const auto outputDir = R3B::GetParentDir(output_file());
+    const unsigned int planeNum = NEULAND_DEFAULT_DOUBLE_PLANE * 2;
+    const auto runID = inputRunID.value();
+    const auto outputfile_path = fs::path{ output_file.value() };
+    const auto outputDir = R3B::GetParentDir(output_file.value());
     const auto parfile =
         outputDir / fmt::format("{}.par{}", outputfile_path.stem().string(), outputfile_path.extension().string());
     // const auto ntuple_options = "RAW"s;
@@ -90,10 +90,11 @@ auto main(int argc, const char** argv) -> int
     }
     const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
     const auto upexps_exe = fs::path{ unpacker_path.value() };
-    const auto ntuple_options = fmt::format("RAW,time-stitch={}", time_stich());
-    const auto max_event_num = (eventNum() == 0) ? -1 : eventNum();
+    const auto ntuple_options =
+        (time_stich.value() > 0) ? fmt::format("RAW,time-stitch={}", time_stich.value()) : fmt::format("RAW");
+    const auto max_event_num = (eventNum.value() < 0) ? -1 : eventNum.value();
 
-    auto ucesb_command = upexps_exe.string() + " --allow-errors --input-buffer=150Mi"s;
+    auto ucesb_command = upexps_exe.string() + " --allow-errors --input-buffer=600Mi"s;
     // auto ucesb_command = upexps_exe.string();
     ucesb_command = std::regex_replace(ucesb_command, std::regex("//"), "/");
 
@@ -143,9 +144,10 @@ auto main(int argc, const char** argv) -> int
     //=====================================================================================
     // set tasks:
     auto calPar = std::make_unique<R3B::Neuland::Map2CalParTask>();
-    calPar->SetTrigger(R3B::Neuland::CalTrigger::offspill);
-    calPar->SetPlaneNum(planeNum);
-    calPar->SetTrigEnabled(not no_trig_neuland());
+    calPar->SetTrigger(R3B::Neuland::CalTrigger::all);
+    // calPar->SetPlaneNum(planeNum);
+    calPar->SetTrigEnabled(not no_trig_neuland.value());
+    calPar->SetErrorMethod(R3B::Neuland::Map2CalParTask::ErrorMethod::approx);
     // calPar->SetTrigIDMapPrintFormat(R3B::Neuland::TrigIDMappingPrintFormat::screen);
     calPar->SetTrigIDMapAutoFind(false);
     calPar->SetTrigIDMapDir(outputDir.string());
@@ -158,8 +160,13 @@ auto main(int argc, const char** argv) -> int
     {
         run->Init();
         run->Run(-1, eventNum());
-        std::cout << "Macro finished succesfully." << std::endl;
+        std::cout << "Analysis finished succesfully." << std::endl;
         std::cout << "Output file is " << output_file() << std::endl;
+
+        timer.Stop();
+        const double rtime = timer.RealTime();
+        const double ctime = timer.CpuTime();
+        std::cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << std::endl;
     }
     catch (fair::FatalException& ex)
     {
@@ -178,6 +185,11 @@ auto main(int argc, const char** argv) -> int
         std::cerr << ex.what();
         std::cout << "\n\n";
     }
+    catch (...)
+    {
+        std::cout << "A unrecognised error has occured! \n";
+        std::cout << "\n\n";
+    }
 
     auto* sinkfile = run->GetSink();
     if (sinkfile != nullptr)
@@ -185,9 +197,5 @@ auto main(int argc, const char** argv) -> int
         sinkfile->Close();
     }
 
-    timer.Stop();
-    const double rtime = timer.RealTime();
-    const double ctime = timer.CpuTime();
-    std::cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << std::endl;
     return 0;
 }

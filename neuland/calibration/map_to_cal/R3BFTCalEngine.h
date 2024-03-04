@@ -37,7 +37,7 @@ namespace R3B::Neuland::calibration
       private:
         unsigned int max_bin_number_ = 0;
         double cycle_period_ = 0.; // nano seconds
-        FTCalErrorMethod error_method_ = FTCalErrorMethod::none;
+        FTCalErrorMethod error_method_ = FTCalErrorMethod::uniform_only;
     };
 
     template <typename Derived>

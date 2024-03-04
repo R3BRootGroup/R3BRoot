@@ -70,11 +70,6 @@ namespace R3B::Neuland
     {
         WriteHists();
         write_parameter();
-
-        // if (is_trig_enabled_)
-        // {
-        //     PrintTrigID();
-        // }
     }
 
     void Map2CalParTask::RecordTrigMappingID()
@@ -101,11 +96,12 @@ namespace R3B::Neuland
         for (const auto& planeSignals : mappedData_)
         {
             auto planeID = planeSignals.plane_num;
-            for (const auto& [barID, barSignals] : planeSignals.bars)
+            for (const auto& [barNum, barSignals] : planeSignals.bars)
             {
-                auto barID_tmp = barID;
+                auto barNum_tmp = barNum;
+                R3BLOG(debug, fmt::format("Calibrating with the map-level bar signal: {}, barNum: {}", barSignals, barNum));
                 auto FillData = [&](FTType type, auto value)
-                { FillEngine(mapCalEngine_, type, value, planeID, barID_tmp); };
+                { FillEngine(mapCalEngine_, type, value, planeID, barNum_tmp); };
                 for (const auto& signal : barSignals.left)
                 {
                     FillData(FTType::leftleading, signal.leading.fine);
@@ -122,9 +118,10 @@ namespace R3B::Neuland
 
     void Map2CalParTask::FillTrigMapData()
     {
-        for (const auto& [moduleID, moduleSignals] : trigMappedData_)
+        for (const auto& [moduleNum, moduleSignals] : trigMappedData_)
         {
-            FillEngine(trigMapCalEngine_, FTType::trigger, moduleSignals.signal.fine, moduleID);
+            R3BLOG(debug, fmt::format("Calibrating with the map-level bar trig signal: {}, module num: {}", moduleSignals.signal, moduleNum));
+            FillEngine(trigMapCalEngine_, FTType::trigger, moduleSignals.signal.fine, moduleNum);
         }
     }
 

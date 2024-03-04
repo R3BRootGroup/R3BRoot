@@ -225,28 +225,28 @@ namespace R3B::Neuland
         }
     }
 
-    auto Map2CalTask::doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& dESignal,
+    auto Map2CalTask::doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& double_edge_signal,
                                                     R3B::Side side,
                                                     unsigned int module_num) const -> CalDataSignal
     {
         auto calDataSignal = CalDataSignal{};
         const auto ftType = (side == R3B::Side::left) ? FTType::leftleading : FTType::rightleading;
-        calDataSignal.time_over_threshold = get_tot(dESignal, module_num, side);
+        calDataSignal.time_over_threshold = get_tot(double_edge_signal, module_num, side);
         const auto walk_correction =
             (is_walk_enabled_) ? GetWalkCorrection(calDataSignal.time_over_threshold.value) : 0.;
         calDataSignal.leading_time =
-            convert_to_real_time(calibrationPar_, dESignal.leading, ftType, module_num) + walk_correction;
+            convert_to_real_time(calibrationPar_, double_edge_signal.leading, ftType, module_num) + walk_correction;
         calDataSignal.trigger_time = get_trigger_time(module_num, side);
         overflow_correct(calDataSignal);
         R3BLOG(debug, fmt::format("Adding a new cal signal: {}", calDataSignal));
         return calDataSignal;
     }
 
-    auto Map2CalTask::mapBarSignal_to_calSignals(const MapBarSignal& barSignal,
+    auto Map2CalTask::mapBarSignal_to_calSignals(const MapBarSignal& map_bar_signals,
                                                  unsigned int module_num,
                                                  R3B::Side side) const -> std::vector<CalDataSignal>
     {
-        const auto& signals = (side == Side::left) ? barSignal.left : barSignal.right;
+        const auto& signals = (side == Side::left) ? map_bar_signals.left : map_bar_signals.right;
         auto calSignals = std::vector<CalDataSignal>{};
         calSignals.reserve(signals.size());
         std::transform(signals.begin(),

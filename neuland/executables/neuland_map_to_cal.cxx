@@ -100,7 +100,7 @@ auto main(int argc, const char** argv) -> int
         run->AddTask(runIdTask.release());
 
         auto map2Cal = std::make_unique<R3B::Neuland::Map2CalTask>();
-        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::offspill);
+        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
         run->AddTask(map2Cal.release());
 
         auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>();
@@ -108,7 +108,7 @@ auto main(int argc, const char** argv) -> int
         {
             cal2hitParTask->SetMethod(R3B::Neuland::Cal2HitParMethod::Millipede);
         }
-        cal2hitParTask->SetTrigger(R3B::Neuland::CalTrigger::offspill);
+        cal2hitParTask->SetTrigger(R3B::Neuland::CalTrigger::all);
         cal2hitParTask->SetMinStat(min_stat.value());
         run->AddTask(cal2hitParTask.release());
 
