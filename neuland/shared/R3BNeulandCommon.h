@@ -91,10 +91,10 @@ namespace R3B::Neuland
         const auto bar_num = module_num % BarsPerPlane;
         return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
     }
-    inline constexpr auto IsPlaneHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
-    inline constexpr auto IsPlaneVertical(int plane_id) -> bool { return !IsPlaneHorizontal(plane_id); }
-    inline constexpr auto GetPlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
-    inline constexpr auto GetPlaneNum(int moduleID) -> int { return GetPlaneID(moduleID) + 1; }
+    inline constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
+    inline constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
+    inline constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+    inline constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
     // planeNum, barNum and ModuleNum is 1-based
     inline constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
     {
@@ -102,14 +102,14 @@ namespace R3B::Neuland
         return (planeNum - 1) * BarsPerPlane + barNum;
     }
     template <typename T = double>
-    inline constexpr auto GetPlaneZPos(int plane_id) -> T
+    inline constexpr auto PlaneID2ZPos(int plane_id) -> T
     {
         return static_cast<T>((plane_id + 0.5) * BarSize_Z);
     }
     template <typename T = double>
-    inline constexpr auto GetModuleZPos(int module_num) -> T
+    inline constexpr auto ModuleNum2ZPos(int module_num) -> T
     {
-        return GetPlaneZPos<T>(GetPlaneID(module_num - 1));
+        return PlaneID2ZPos<T>(ModuleID2PlaneID(module_num - 1));
     }
 
     // Average Parameters

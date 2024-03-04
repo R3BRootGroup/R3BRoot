@@ -26,7 +26,9 @@ namespace rng = ranges;
 constexpr auto DEFAULT_MEAS_ERROR = 1.F;
 constexpr auto DEFAULT_RES_FILENAME = "millepede.res";
 constexpr auto SCALE_FACTOR = 100.F;
+constexpr auto ERROR_SCALE_FACTOR = 100.F;
 constexpr auto REFERENCE_BAR_NUM = 25;
+constexpr auto MILLE_BUFFER_SIZE = std::size_t{ 100000 };
 
 namespace
 {
@@ -52,6 +54,7 @@ namespace R3B::Neuland::Calibration
         par_result_.set_filename(DEFAULT_RES_FILENAME);
         pede_launcher_.set_steer_filename(pede_steer_filename_);
         pede_launcher_.set_parameter_filename(parameter_filename_);
+        binary_data_writer_.set_buffer_size(MILLE_BUFFER_SIZE);
 
         init_steer_writer();
         init_parameter();
@@ -172,7 +175,7 @@ namespace R3B::Neuland::Calibration
         // select out vertical cosmic rays
         if (rng::all_of(signals |
                             rng::views::transform([](const auto& bar_signal)
-                                                  { return GetPlaneID(bar_signal.module_num - 1); }) |
+                                                  { return ModuleID2PlaneID(bar_signal.module_num - 1); }) |
                             rng::views::sliding(2),
                         [](const auto& pair) { return pair.front() == pair.back(); }))
         {
@@ -191,7 +194,7 @@ namespace R3B::Neuland::Calibration
     {
         buffer_clear();
         const auto module_num = static_cast<int>(signal.module_num);
-        const auto pos_z = GetModuleZPos<float>(static_cast<int>(module_num));
+        const auto pos_z = ModuleNum2ZPos<float>(static_cast<int>(module_num));
 
         auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effectiveSpeed.value;
 
@@ -202,8 +205,8 @@ namespace R3B::Neuland::Calibration
 
         input_data_buffer_.measurement =
             static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
-        // input_data_buffer_.sigma = static_cast<float>(t_sum.error / 2.);
-        input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
+        input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * ERROR_SCALE_FACTOR);
+        // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
         const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
@@ -216,15 +219,15 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::add_spacial_local_constraint(int module_num)
     {
         buffer_clear();
-        const auto plane_id = GetPlaneID(module_num - 1);
-        const auto pos_z = static_cast<float>(GetPlaneZPos(plane_id));
-        const auto is_horizontal = IsPlaneHorizontal(plane_id);
+        const auto plane_id = ModuleID2PlaneID(module_num - 1);
+        const auto pos_z = PlaneID2ZPos<float>(plane_id);
+        const auto is_horizontal = IsPlaneIDHorizontal(plane_id);
         const auto pos_bar_vert_disp = GetBarVerticalDisplacement(module_num);
         const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F }
                                                 : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F };
 
         input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / SCALE_FACTOR);
-        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SCALE_FACTOR);
+        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SQRT_12 / SCALE_FACTOR * ERROR_SCALE_FACTOR);
 
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
         write_to_buffer();
@@ -234,26 +237,29 @@ namespace R3B::Neuland::Calibration
     {
         buffer_clear();
         const auto module_num = static_cast<int>(signal.module_num);
-        const auto plane_id = GetPlaneID(static_cast<int>(module_num) - 1);
-        const auto is_horizontal = IsPlaneHorizontal(plane_id);
-        const auto pos_z = static_cast<float>(GetPlaneZPos(plane_id));
+        const auto plane_id = ModuleID2PlaneID(static_cast<int>(module_num) - 1);
+        const auto is_horizontal = IsPlaneIDHorizontal(plane_id);
+        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effectiveSpeed.value;
+        const auto pos_z = static_cast<float>(PlaneID2ZPos(plane_id));
 
         const auto& left_signal = signal.left.front();
         const auto& right_signal = signal.right.front();
-        const auto t_diff = (left_signal.leading_time - left_signal.trigger_time) -
-                            (right_signal.leading_time - right_signal.trigger_time);
+        const auto t_diff = (right_signal.leading_time - right_signal.trigger_time) -
+                            (left_signal.leading_time - left_signal.trigger_time);
 
         input_data_buffer_.measurement = 0.F;
         // input_data_buffer_.sigma = static_cast<float>(t_diff.error / 2.);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR * init_effective_c_ / 2);
-        input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR / 2.F);
+        // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR / 2.F);
+        input_data_buffer_.sigma =
+            static_cast<float>(t_diff.error / SCALE_FACTOR / 2. * std::abs(init_effective_c) * ERROR_SCALE_FACTOR);
         const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F }
                                                 : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::offset_effective_c),
                                                 -0.5F);
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
-                                                static_cast<float>(t_diff.value / SCALE_FACTOR / 2.));
+                                                static_cast<float>(-t_diff.value / SCALE_FACTOR / 2.));
         write_to_buffer();
         R3BLOG(
             debug,
@@ -353,9 +359,8 @@ namespace R3B::Neuland::Calibration
 
         for (unsigned int module_num{ 1 }; module_num <= num_of_modules; ++module_num)
         {
-            auto module_par = HitModulePar{};
-            module_par.effectiveSpeed.value = init_effective_c_;
-            module_pars.emplace(module_num, module_par);
+            auto module_par_iter = module_pars.try_emplace(module_num).first;
+            module_par_iter->second.effectiveSpeed.value = init_effective_c_;
         }
     }
 
@@ -365,7 +370,7 @@ namespace R3B::Neuland::Calibration
         steer_writer.set_filepath(pede_steer_filename_);
         steer_writer.set_parameter_file(parameter_filename_);
         steer_writer.set_data_filepath(input_data_filename_);
-        steer_writer.add_method(SteerWriter::Method::inversion, std::make_pair(3.F, 0.01F));
+        steer_writer.add_method(SteerWriter::Method::inversion, std::make_pair(3.F, 0.001F));
 
         const auto module_size = GetModuleSize();
         for (int module_num{ 1 }; module_num <= module_size; ++module_num)

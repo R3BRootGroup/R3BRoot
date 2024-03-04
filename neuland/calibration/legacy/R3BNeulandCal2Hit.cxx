@@ -228,14 +228,14 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
             time = Neuland::NaN;
         }
 
-        const auto plane = Neuland::GetPlaneID(barID);
+        const auto plane = Neuland::ModuleID2PlaneID(barID);
         const auto bar = (barID) % 50;
 
         TVector3 pos;
         TVector3 pixel;
 
         // NOTE: First plane horizontal or not should be decided by IsPlaneHorizontal
-        if (Neuland::IsPlaneHorizontal(plane) == fFirstPlaneHorizontal)
+        if (Neuland::IsPlaneIDHorizontal(plane) == fFirstPlaneHorizontal)
         {
             pos[0] = parameter.GetEffectiveSpeed() * (tdc[1] - tdc[0]);
             pos[1] = (bar + 0.5 - Neuland::BarsPerPlane * 0.5) * Neuland::BarSize_XY;

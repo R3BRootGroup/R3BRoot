@@ -80,7 +80,7 @@ namespace R3B::Neuland::calibration
             const auto bin_prob = input.bin_entry / input.total_entry;
             const auto pre_prob = input.previous_sum / input.total_entry;
             const auto residual_main = -(pre_prob - 0.5) * (pre_prob - 0.5) + 0.25;
-            const auto residual_factor = sqrt_3 / bin_prob;
+            const auto residual_factor = (bin_prob == 0.) ? 0. : sqrt_3 / bin_prob;
 
             return ValueError<double>{ mean, base_error + residual_main * residual_factor };
         }

@@ -49,10 +49,10 @@ namespace R3B::Neuland
         for (const auto& hit : hit_data_)
         {
             const auto module_id = hit.module_id;
-            const auto plane_id = GetPlaneID(module_id);
+            const auto plane_id = ModuleID2PlaneID(module_id);
             const auto bar_width_error = rand_gen->Uniform(-BarSize_XY / 2., BarSize_XY / 2.);
             // TODO: introduce calibration errors
-            if (IsPlaneHorizontal(plane_id))
+            if (IsPlaneIDHorizontal(plane_id))
             {
                 h_xy_per_plane_.at(plane_id)->Fill(hit.position.X(), hit.position.Y() + bar_width_error);
             }

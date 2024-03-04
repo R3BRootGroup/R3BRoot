@@ -30,7 +30,7 @@ namespace
 
     inline auto get_hit_position(double tdc_left, double tdc_right, const HitModulePar& par)
     {
-        const auto plane_id = ::R3B::Neuland::GetPlaneID(static_cast<int>(par.module_num - 1));
+        const auto plane_id = ::R3B::Neuland::ModuleID2PlaneID(static_cast<int>(par.module_num - 1));
         const auto bar_num = par.module_num % ::R3B::Neuland::BarsPerPlane;
         R3BLOG(debug2,
                fmt::format("Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
@@ -45,7 +45,7 @@ namespace
                fmt::format(
                    "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm", pos_along_bar, pos_perp_bar, pos_z));
 
-        auto is_horizontal = ::R3B::Neuland::IsPlaneHorizontal(plane_id);
+        auto is_horizontal = ::R3B::Neuland::IsPlaneIDHorizontal(plane_id);
         return is_horizontal ? TVector3{ pos_along_bar, pos_perp_bar, pos_z }
                              : TVector3{ pos_perp_bar, pos_along_bar, pos_z };
     }

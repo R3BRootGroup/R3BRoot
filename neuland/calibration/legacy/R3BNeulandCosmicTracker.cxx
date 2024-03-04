@@ -83,12 +83,12 @@ namespace R3B::Neuland // NOLINT
         {
             fBarIDs.push_back(barID);
 
-            const auto plane = GetPlaneID(barID);
+            const auto plane = ModuleID2PlaneID(barID);
             const auto bar = barID % BarsPerPlane;
 
             const auto zPosition = fDistances[plane] + 0.5 * BarSize_Z;
 
-            if (IsPlaneHorizontal(plane))
+            if (IsPlaneIDHorizontal(plane))
             {
                 const auto barPoint = fYZ.GetN();
                 // ig fYZ.SetPoint(barPoint, zPosition, (bar - 0.5 * BarsPerPlane + 0.66) * BarSize_XY);
@@ -511,7 +511,7 @@ namespace R3B::Neuland // NOLINT
             {
                 if (planeChanged)
                 {
-                    if (IsPlaneHorizontal(currentPlane))
+                    if (IsPlaneIDHorizontal(currentPlane))
                     {
                         currentBar = (currentPoint.Y() + BarsPerPlane * 0.5 * BarSize_XY) / BarSize_XY;
                         xBorder = { -0.5 * BarLength, 0.5 * BarLength };
@@ -528,7 +528,7 @@ namespace R3B::Neuland // NOLINT
                 }
                 else
                 {
-                    if (IsPlaneHorizontal(currentPlane))
+                    if (IsPlaneIDHorizontal(currentPlane))
                     {
                         currentBar += barDirections[1];
                         yBorder[0] += barDirections[1] * BarSize_XY;
@@ -554,7 +554,7 @@ namespace R3B::Neuland // NOLINT
 
                 const auto barID = currentBar + currentPlane * BarsPerPlane;
                 const auto trackLength = crossTime * CLight;
-                if (IsPlaneHorizontal(currentPlane))
+                if (IsPlaneIDHorizontal(currentPlane))
                 {
                     track.Interactions.emplace_back(barID,
                                                     tof,

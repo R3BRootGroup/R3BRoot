@@ -46,7 +46,7 @@ namespace R3B::Neuland // NOLINT
         void TSyncer::AddBarData(const Int_t barID, const Double_t time)
         {
             const auto bar = barID % BarsPerPlane;
-            const auto plane = GetPlaneID(barID);
+            const auto plane = ModuleID2PlaneID(barID);
             HitMask[plane] |= 1UL << bar;
             EventData[barID] = time;
         }
@@ -62,7 +62,7 @@ namespace R3B::Neuland // NOLINT
             }
 
             const auto bar = barID % BarsPerPlane;
-            const auto plane = GetPlaneID(barID);
+            const auto plane = ModuleID2PlaneID(barID);
 
             if (bar != 0)
             {
@@ -194,7 +194,7 @@ namespace R3B::Neuland // NOLINT
                     ++numberOfEquations;
                 }
 
-                const auto plane = GetPlaneID(b);
+                const auto plane = ModuleID2PlaneID(b);
                 if (plane == nPlanes - 1)
                     continue;
 
@@ -290,7 +290,7 @@ namespace R3B::Neuland // NOLINT
             auto nEQ = 0;
             for (UInt_t id = 0; id < Data.size(); ++id)
             {
-                const auto plane = GetPlaneID(static_cast<int>(id));
+                const auto plane = ModuleID2PlaneID(static_cast<int>(id));
                 if (!std::isnan(Data[id].TSyncNextBar.Value))
                 {
                     const auto weight = 1. / Data[id].TSyncNextBar.Error;

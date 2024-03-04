@@ -22,7 +22,8 @@ namespace R3B
         if (channel_num < finetime_correlation_.at(ftType).value_error.size())
         {
             const auto& relation = finetime_correlation_.at(ftType);
-            return relation.value_error[channel_num];
+            auto value_error = relation.value_error[channel_num];
+            return value_error;
         }
 
         throw R3B::logic_error(fmt::format("channel number {} exceeds the maximal bin number {}!",

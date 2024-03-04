@@ -70,12 +70,12 @@ namespace R3B::Neuland
         for (const auto& hit : hit_data_)
         {
             const auto module_id = hit.module_id;
-            const auto plane_id = GetPlaneID(module_id);
+            const auto plane_id = ModuleID2PlaneID(module_id);
             const auto bar_width_error = rand_gen->Uniform(-BarSize_XY / 2., BarSize_XY / 2.);
 
             const auto time = hit.time;
             const auto correc_time = time - (hit.position.Mag() - distance_to_target) / CLight;
-            const auto pos_x = IsPlaneHorizontal(plane_id) ? hit.position.X() : hit.position.X() + bar_width_error;
+            const auto pos_x = IsPlaneIDHorizontal(plane_id) ? hit.position.X() : hit.position.X() + bar_width_error;
 
             hTofvsZ_->Fill(plane_id, time);
             hTofcvsX_->Fill(pos_x, correc_time);

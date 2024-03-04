@@ -214,7 +214,7 @@ namespace R3B::Neuland
                 const auto& interaction = track.Interactions[i];
                 const auto barID = interaction.BarID;
                 const auto bar = barID % BarsPerPlane;
-                const auto plane = GetPlaneID(barID);
+                const auto plane = ModuleID2PlaneID(barID);
 
                 fBarDistribution.Fill(barID + 1);
                 fTrackLengthDistribution.Fill(interaction.TrackLength);

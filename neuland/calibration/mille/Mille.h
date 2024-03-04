@@ -6,6 +6,7 @@
 
 namespace R3B
 {
+    constexpr auto DEFAULT_BUFFER_SIZE = std::size_t{ 10000 };
     template <typename IndexType = int, typename ValueType = float>
     class MilleBuffer
     {
@@ -36,6 +37,7 @@ namespace R3B
     {
       public:
         explicit Mille(std::string_view outFileName, bool asBinary = true, bool writeZero = false);
+        void set_buffer_size(std::size_t buffer_size) { max_buffer_size_ = buffer_size; }
 
         void mille(const MilleDataPoint& data_point);
         void special(const std::vector<std::pair<int, float>>& special_data);
@@ -51,7 +53,7 @@ namespace R3B
         bool is_binary_ = true;         // if false output as text
         bool is_zero_written_ = false;  // if true also write out derivatives/labels ==0
         MilleBuffer<int, float> buffer_;
-        static constexpr std::size_t max_buffer_size_ = 10000;
+        std::size_t max_buffer_size_ = DEFAULT_BUFFER_SIZE;
         static constexpr unsigned int max_label_size_ = (0xFFFFFFFF - (1U << 31U));
         std::ofstream output_file_; // C-binary for output
 
