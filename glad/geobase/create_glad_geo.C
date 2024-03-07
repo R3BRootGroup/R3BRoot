@@ -33,7 +33,7 @@ void create_glad_geo(bool create_flange_windows = false, const char* geoTag = "v
     TGeoManager* gGeoMan = NULL;
 
     // Global positioning definition
-    Double_t glad_angle = 14.0;        // deg
+    Double_t glad_angle = 14.08;       // deg
     Double_t distanceToTarget = 308.8; // cm
     Double_t zeroLineOffset = -42.0;   // cm
 
@@ -146,6 +146,7 @@ void create_glad_geo(bool create_flange_windows = false, const char* geoTag = "v
     gGeoMan->Test();
 
     TFile* geoFile = new TFile(geoFileName, "RECREATE");
+    top->Draw();
     top->Write();
     geoFile->Close();
 
@@ -2717,7 +2718,7 @@ void ConstructEnceinteI(TGeoVolume* pWorld)
 
     // Add the Nurbs like node to the world
 
-    tr[0] = 185.000000;
+    tr[0] = 185.000000 + 18.5;
     tr[1] = 0.000000;
     tr[2] = 0.000000;
     rot[0] = 1.000000;
@@ -4570,7 +4571,7 @@ void ConstructFonfE(TGeoVolume* pWorld)
     pG2403002_Fonf_cote_sortie->SetLineColor(920);
     pG2403002_Fonf_cote_sortie->SetVisLeaves(kTRUE);
 
-    tr[0] = -221.500000 + 41.;
+    tr[0] = -221.500000 + 41;
     tr[1] = 0.000000;
     tr[2] = 0.000000;
     rot[0] = 1.000000;
