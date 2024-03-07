@@ -95,12 +95,27 @@ bool R3BAlpideGeometry::Init(Int_t version)
             return kFALSE;
     }
 
+
+
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
         // Already set up (MC mode)
         R3BLOG(info, "Using existing geometry");
         fIsSimulation = kTRUE;
-        return kTRUE;
+
+		        
+		        
+//		        R3BLOG(info, "Open geometry file " << geoPath << " for analysis.");
+//			    f = new TFile(geoPath, "READ");
+//			        TGeoVolume* vol = dynamic_cast<TGeoVolume*>(f->Get("TOP"));    
+				        
+//				        gGeoManager->AddVolume(vol);
+
+
+//        gSystem->AccessPathName(geoPath.Data());
+
+
+	return kTRUE;
     }
 
     // Stand alone mode
@@ -402,4 +417,4 @@ int R3BAlpideGeometry::GetSensorId(const char* volumePath)
     return sensorId;
 }
 
-ClassImp(R3BAlpideGeometry)
+ClassImp(R3BAlpideGeometry);

@@ -34,13 +34,7 @@ class R3BAlpideHitData : public TObject
     /** Standard Constructor
      *@param track    Reconstructed trajectory
      **/
-    explicit R3BAlpideHitData(uint16_t sensorId,
-                              uint16_t clustersize,
-                              double posx,
-                              double posy,
-                              double posz = std::nan(""),
-                              double locposx = std::nan(""),
-                              double locposy = std::nan(""));
+    explicit R3BAlpideHitData(uint16_t sensorId, uint16_t clustersize, double posx, double posy, double posz = std::nan(""), double locposx = std::nan(""), double locposy = std::nan(""));
 
     // Destructor
     virtual ~R3BAlpideHitData() = default;

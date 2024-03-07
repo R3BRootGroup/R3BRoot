@@ -18,13 +18,7 @@
 #include "R3BAlpideHitData.h"
 #include <fmt/core.h>
 
-R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId,
-                                   uint16_t clustersize,
-                                   double posx,
-                                   double posy,
-                                   double posz,
-                                   double locposx,
-                                   double locposy)
+R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId, uint16_t clustersize, double posx, double posy, double posz, double locposx, double locposy)
     : fSensorId(sensorId)
     , fClustersize(clustersize)
     , fX(posx)
@@ -40,12 +34,8 @@ R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId,
 
 std::string R3BAlpideHitData::toString() const
 {
-    return fmt::format("SensorID: {}, ClusterSize: {}, Xpos: {}, Ypos: {}, Zpos: {}",
-                       GetSensorId(),
-                       GetClusterSize(),
-                       GetX(),
-                       GetY(),
-                       GetZ());
+    return fmt::format(
+        "SensorID: {}, ClusterSize: {}, Xpos: {}, Ypos: {}, Zpos: {}", GetSensorId(), GetClusterSize(), GetX(), GetY(), GetZ());
 }
 
 void R3BAlpideHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }

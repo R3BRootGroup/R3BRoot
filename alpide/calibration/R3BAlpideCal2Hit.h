@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -79,19 +79,13 @@ class R3BAlpideCal2Hit : public FairTask
     R3BTGeoPar* fAlpideGeoPar = nullptr;
     int fGeoversion = 202402;
     R3BAlpideGeometry* fAlpideGeo = nullptr;
-    R3BAlpideMappingPar* fMap_Par = nullptr;
-    TClonesArray* fAlpideCalData = nullptr; // Array with Alpide Cal input data
-    TClonesArray* fAlpideHitData = nullptr; // Array with Alpide Hit output data
-    TClonesArray* fAlpideCluster = nullptr; // Array with clusters
+    R3BAlpideMappingPar* fMap_Par = nullptr; /**< Parameter container. >*/
+    TClonesArray* fAlpideCalData = nullptr;  // Array with Alpide Cal input data
+    TClonesArray* fAlpideHitData = nullptr;  // Array with Alpide Hit output data
+    TClonesArray* fAlpideCluster = nullptr;  // Array with clusters
 
     // Private method AddHitData
-    R3BAlpideHitData* AddHitData(uint16_t senId,
-                                 uint16_t clustersize,
-                                 double xpos,
-                                 double ypos,
-                                 double zpos,
-                                 double locxpos,
-                                 double locypos);
+    R3BAlpideHitData* AddHitData(uint16_t senId, uint16_t clustersize, double xpos, double ypos, double zpos, double locxpos, double locypos);
 
   public:
     // Class definition

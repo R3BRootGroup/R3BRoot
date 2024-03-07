@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,6 +19,7 @@
 // ROOT headers
 #include <TClonesArray.h>
 #include <TMath.h>
+
 #include <TRandom.h>
 
 // FAIR headers
@@ -61,7 +62,10 @@ R3BAlpideCal2Hit::~R3BAlpideCal2Hit()
     {
         delete fAlpideCluster;
     }
-
+    /* if (fAlpidePixel)
+     {
+         delete fAlpidePixel;
+     }*/
     if (fAlpideHitData)
     {
         delete fAlpideHitData;
@@ -99,8 +103,7 @@ void R3BAlpideCal2Hit::SetParameter()
     fNbSensors = fMap_Par->GetNbSensors();
     R3BLOG(info, "Nb of sensors: " << fNbSensors);
 
-    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
-    fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
+     
 
     return;
 }
@@ -109,8 +112,12 @@ void R3BAlpideCal2Hit::SetParameter()
 InitStatus R3BAlpideCal2Hit::Init()
 {
     R3BLOG(info, "");
-    auto* mgr = FairRootManager::Instance();
-    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (!mgr)
+    {
+        R3BLOG(fatal, "FairRootManager not found");
+        return kFATAL;
+    }
 
     // INPUT DATA
     fAlpideCalData = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideCalData"));
@@ -130,7 +137,17 @@ InitStatus R3BAlpideCal2Hit::Init()
     fAlpideGeo = R3BAlpideGeometry::Instance();
     R3BLOG_IF(error, !fAlpideGeo->Init(fGeoversion), "Alpide geometry " << fGeoversion << " not found");
 
-    fAlpidetoTargetPos = fTargetPos - fAlpidePos;
+    //  for(int s=0;s<363;s++){
+    //              TVector3 vref = this->GetAnglesVector(s+1);
+    //            auto m = this->GetTransformation(s+1);
+    // std::cout <<"sensorid: "<<s + 1 << " , "<<vref.Mag() <<" , "<<vref.Theta()*TMath::RadToDeg() <<" , "
+    //<<vref.Phi()*TMath::RadToDeg()<<std::endl;
+    //  m.Print();
+    //     }
+
+   // fAlpidetoTargetPos = fTargetPos - fAlpidePos;
+
+    //std::cout<<" OK "<<std::endl;
 
     return kSUCCESS;
 }
@@ -248,6 +265,10 @@ void R3BAlpideCal2Hit::Reset()
     {
         fAlpideCluster->Clear();
     }
+    /*  if (fAlpidePixel)
+      {
+          fAlpidePixel->Clear();
+      }*/
 }
 
 // -----   Private method FindClusters   -----------------------------------------
@@ -295,13 +316,46 @@ void R3BAlpideCal2Hit::FindClusters()
                 fRot = fAlpideGeo->GetRotation(s + 1);
                 fTrans = fAlpideGeo->GetTranslation(s + 1);
 
+
+                //std::cout<<"sensor: "<<s + 1<<std::endl;
+		//fRot.Print();
+
+		//std::cout<<"Trans: "<<std::endl;
+		//fTrans.Print();
+
+                //std::cout<<std::endl;
+
+
                 TVector3 localpos;
-                localpos.SetXYZ(-meancol[s][i] / double(mult[s][i]) * fPixelSize + 30. / 2.0,
-                                meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0,
-                                0.0);
+                if (s<12)
+                localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
+				meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0,
+				0.0
+                                );
+                else 
+                localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize - 30. / 2.0,
+				-meanrow[s][i] / double(mult[s][i]) * fPixelSize + 15. / 2.0,
+				0.0
+                                );
+                //localpos.Print();
+		//std::cout<<std::endl;
+
+
+//                localpos.SetXYZ( gRandom->Uniform(1,10),0,gRandom->Uniform(1,10)  );
 
                 // Lab frame
-                TVector3 labpos = fRot * localpos + fTrans * 10.; // 10 because fTrans is in mm
+		//auto rot1 = fRot.Inverse();
+		//fRot.SetYTheta(-1.*fRot.ThetaY());
+                TVector3 labpos = fRot * localpos + fTrans*10.;
+
+//		(fRot * localpos).Print();
+//                                std::cout<<std::endl;
+
+
+//                labpos.Print();
+//		                std::cout<<std::endl;
+
+
 
                 AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
             }
@@ -322,7 +376,7 @@ R3BAlpideHitData* R3BAlpideCal2Hit::AddHitData(uint16_t senId,
     // It fills the R3BAlpideHitData
     TClonesArray& clref = *fAlpideHitData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideHitData(senId, clustersize, xpos, ypos, zpos, locxpos, locypos);
+    return new (clref[size]) R3BAlpideHitData(senId, clustersize, xpos, ypos, zpos,locxpos,locypos);
 }
 
 ClassImp(R3BAlpideCal2Hit)
