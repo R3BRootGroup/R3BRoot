@@ -75,7 +75,10 @@ auto main(int argc, const char** argv) -> int
         }
     };
 
+    //=============================================================================
+    // settings:
     auto tamexParameter = Digitizing::Neuland::Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
+    auto pileup_strategy = Digitizing::Neuland::Tamex::PeakPileUpStrategy::time_window;
     tamexParameter.fPMTThresh = 1.;
     tamexParameter.fTimeMin = 1.;
 
@@ -85,20 +88,22 @@ auto main(int argc, const char** argv) -> int
           [&]()
           {
               return Digitizing::CreateEngine(
-                  UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+                  UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(pileup_strategy, tamexParameter), channelInit);
           } },
         { { "neuland", "tacquila" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
         { { "mock", "tamex" },
-          [&]() {
+          [&]()
+          {
               return Digitizing::CreateEngine(
-                  UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(tamexParameter), channelInit);
+                  UsePaddle<MockPaddle>(), UseChannel<TamexChannel>(pileup_strategy, tamexParameter), channelInit);
           } },
         { { "neuland", "mock" },
           []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
         { { "mock", "mock" },
           []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
     };
+    //=============================================================================
 
     FairLogger::GetLogger()->SetLogScreenLevel(logLevel->value().c_str());
 

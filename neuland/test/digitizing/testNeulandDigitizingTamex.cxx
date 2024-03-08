@@ -19,7 +19,7 @@ namespace
 {
     namespace Digitizing = R3B::Digitizing;
     using TmxChannel = Digitizing::Neuland::Tamex::Channel;
-    using FQTPeak = Digitizing::Neuland::Tamex::Peak;
+    using FQTPeak = Digitizing::Neuland::Tamex::FQTPeak;
     using PMTPeak = Digitizing::Neuland::Tamex::PMTPeak;
     using Channel = Digitizing::Channel;
     using TmxPar = Digitizing::Neuland::Tamex::Params;

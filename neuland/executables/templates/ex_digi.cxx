@@ -65,10 +65,11 @@ auto main(int argc, const char** argv) -> int
 
     // Set up digitization task:
     auto tamexParameter = Digitizing::Neuland::Tamex::Params{ TamexChannel::GetDefaultRandomGen() };
+    auto pileup_strategy = Digitizing::Neuland::Tamex::PeakPileUpStrategy::time_window;
     tamexParameter.fPMTThresh = 1.;
     tamexParameter.fTimeMin = 1.;
     auto digiNeuland = std::make_unique<R3BNeulandDigitizer>();
-    auto engine = CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(tamexParameter));
+    auto engine = CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
     digiNeuland->SetEngine(std::move(engine));
     run->AddTask(digiNeuland.release());
 
