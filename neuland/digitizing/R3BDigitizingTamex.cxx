@@ -16,12 +16,14 @@
 #include <FairRuntimeDb.h>
 #include <cmath>
 
+#include "R3BException.h"
 #include "R3BNeulandHitModulePar.h"
 #include "R3BNeulandHitPar.h"
 #include <FairRunAna.h>
 #include <R3BLogger.h>
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <utility>
 
 namespace R3B::Digitizing::Neuland::Tamex
@@ -39,8 +41,7 @@ namespace R3B::Digitizing::Neuland::Tamex
 
     // global variables for default options:
     const size_t TmxPeaksInitialCapacity = 10;
-    const double PMTPeak::peakWidth = 15.0;              // ns
-    R3BNeulandHitPar* Channel::fNeulandHitPar = nullptr; // NOLINT
+    R3BNeulandHitPar* Channel::neuland_hit_par_ = nullptr; // NOLINT
 
     Params::Params(TRandom3& rnd)
         : fRnd{ &rnd }
@@ -58,74 +59,71 @@ namespace R3B::Digitizing::Neuland::Tamex
     }
 
     PMTPeak::PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel& channel)
+        : time_(pmtHit.time)
     {
         auto par = channel.GetParConstRef();
         // apply saturation coefficent
-        if (par.fExperimentalDataIsCorrectedForSaturation)
-        {
-            fQdc = pmtHit.light / (1. + par.fSaturationCoefficient * pmtHit.light);
-        }
-        else
-        {
-            fQdc = pmtHit.light;
-        }
-        fLETime = pmtHit.time;
-    }
+        qdc_ = pmtHit.light / (1. + par.fSaturationCoefficient * pmtHit.light);
+    };
 
-    auto PMTPeak::operator+=(const PMTPeak& rhs) -> PMTPeak&
+    auto PMTPeak::operator+=(const PMTPeak& other) -> PMTPeak&
     {
-        fQdc += rhs.fQdc;
-        fLETime = (fLETime < rhs.fLETime) ? fLETime : rhs.fLETime;
+        qdc_ += other.qdc_;
+        time_ = (time_ < other.time_) ? time_ : other.time_;
         return *this;
     }
 
-    Peak::Peak(const PMTPeak& pmtPeak, Channel* channel)
-        : fQdc(pmtPeak.GetQDC())
-        , fLETime(pmtPeak.GetLETime())
-        , fChannel(channel)
+    FQTPeak::FQTPeak(const PMTPeak& pmtPeak, Channel* channel)
+        : qdc_(pmtPeak.GetQDC())
+        , leading_edge_time_(pmtPeak.GetLETime())
+        , channel_ptr_(channel)
     {
-        if (fChannel == nullptr)
+        if (channel_ptr_ == nullptr)
         {
             LOG(fatal) << "channel is not bound to FQTPeak object!";
         }
         const auto& par = channel->GetParConstRef();
 
         // calculate the time and the width of the signal
-        fWidth = QdcToWidth(fQdc, par);
-        fTETime = fLETime + fWidth;
+        width_ = QdcToWidth(qdc_, par);
+        trailing_edge_time_ = leading_edge_time_ + width_;
     }
 
-    auto Peak::operator==(const Peak& sig) const -> bool
+    auto FQTPeak::operator==(const FQTPeak& other) const -> bool
     {
-        if (sig.fLETime == 0 && fLETime == 0)
+        if (other.leading_edge_time_ == 0 && leading_edge_time_ == 0)
         {
             LOG(warn) << "the times of both PMT signals are 0!";
         }
-        return (fLETime <= (sig.fLETime + sig.fWidth)) && (sig.fLETime <= (fLETime + fWidth));
+        return (leading_edge_time_ <= (other.leading_edge_time_ + other.width_)) &&
+               (other.leading_edge_time_ <= (leading_edge_time_ + width_));
     }
 
-    void Peak::operator+=(const Peak& sig)
+    void FQTPeak::operator+=(const FQTPeak& other)
     {
-        if (fChannel == nullptr)
+        if (channel_ptr_ == nullptr)
         {
-            LOG(fatal) << "channel is not bound to FQTPeak object!";
+            throw R3B::logic_error("channel is not bound to FQTPeak object!");
         }
-        fLETime = (fLETime < sig.fLETime) ? fLETime : sig.fLETime;
-        fTETime = (fTETime > sig.fTETime) ? fTETime : sig.fTETime;
-        fWidth = fTETime - fLETime;
-        fQdc = WidthToQdc(fWidth, fChannel->GetParConstRef());
+        leading_edge_time_ =
+            (leading_edge_time_ < other.leading_edge_time_) ? leading_edge_time_ : other.leading_edge_time_;
+        trailing_edge_time_ =
+            (trailing_edge_time_ > other.trailing_edge_time_) ? trailing_edge_time_ : other.trailing_edge_time_;
+        width_ = trailing_edge_time_ - leading_edge_time_;
+        qdc_ = WidthToQdc(width_, channel_ptr_->GetParConstRef());
     }
 
-    Channel::Channel(ChannelSide side, TRandom3& rnd)
-        : Channel{ side, Params{ rnd } }
-    {
-    }
-
-    Channel::Channel(ChannelSide side, const Params& par)
+    Channel::Channel(ChannelSide side, PeakPileUpStrategy strategy, const Params& par)
         : Digitizing::Channel{ side }
+        , pileup_strategy_{ strategy }
         , par_{ par }
     {
-        fPMTPeaks.reserve(TmxPeaksInitialCapacity);
+        pmt_peaks_.reserve(TmxPeaksInitialCapacity);
+    }
+
+    Channel::Channel(ChannelSide side, PeakPileUpStrategy strategy, TRandom3& rnd)
+        : Channel{ side, strategy, Params{ rnd } }
+    {
     }
 
     void Channel::GetHitPar(const std::string& hitParName)
@@ -137,8 +135,8 @@ namespace R3B::Digitizing::Neuland::Tamex
         }
         auto* run = FairRunAna::Instance();
         auto* rtdb = run->GetRuntimeDb();
-        fNeulandHitPar = dynamic_cast<R3BNeulandHitPar*>(rtdb->findContainer(hitParName.c_str()));
-        if (fNeulandHitPar != nullptr)
+        neuland_hit_par_ = dynamic_cast<R3BNeulandHitPar*>(rtdb->findContainer(hitParName.c_str()));
+        if (neuland_hit_par_ != nullptr)
         {
             LOG(info) << "DigitizingTamex: HitPar " << hitParName
                       << " has been found in the root file. Using calibration values in rootfile.";
@@ -146,7 +144,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         else
         {
             LOG(info) << "DigitizingTamex: HitPar " << hitParName << " cannot be found. Using default values.";
-            fNeulandHitPar = nullptr;
+            neuland_hit_par_ = nullptr;
         }
     }
 
@@ -160,14 +158,14 @@ namespace R3B::Digitizing::Neuland::Tamex
 
         if (CheckPaddleIDInHitPar())
         {
-            fNeulandHitModulePar = fNeulandHitPar->GetModuleParAt(GetPaddle()->GetPaddleID() - 1);
+            neuland_hit_module_par_ = neuland_hit_par_->GetModuleParAt(GetPaddle()->GetPaddleID() - 1);
             if (CheckPaddleIDInHitModulePar())
             {
                 auto side = GetSide();
-                par_.fSaturationCoefficient = fNeulandHitModulePar->GetPMTSaturation(static_cast<int>(side));
-                par_.fEnergyGain = fNeulandHitModulePar->GetEnergyGain(static_cast<int>(side));
-                par_.fPedestal = fNeulandHitModulePar->GetPedestal(static_cast<int>(side));
-                par_.fPMTThresh = fNeulandHitModulePar->GetPMTThreshold(static_cast<int>(side));
+                par_.fSaturationCoefficient = neuland_hit_module_par_->GetPMTSaturation(static_cast<int>(side));
+                par_.fEnergyGain = neuland_hit_module_par_->GetEnergyGain(static_cast<int>(side));
+                par_.fPedestal = neuland_hit_module_par_->GetPedestal(static_cast<int>(side));
+                par_.fPMTThresh = neuland_hit_module_par_->GetPMTThreshold(static_cast<int>(side));
                 par_.fQdcMin = 1 / par_.fEnergyGain;
             }
         }
@@ -176,12 +174,12 @@ namespace R3B::Digitizing::Neuland::Tamex
     auto Channel::CheckPaddleIDInHitModulePar() const -> bool
     {
         auto is_valid = false;
-        if (fNeulandHitModulePar == nullptr || GetPaddle() == nullptr)
+        if (neuland_hit_module_par_ == nullptr || GetPaddle() == nullptr)
         {
             return false;
         }
 
-        if (GetPaddle()->GetPaddleID() != fNeulandHitModulePar->GetModuleId())
+        if (GetPaddle()->GetPaddleID() != neuland_hit_module_par_->GetModuleId())
         {
             LOG(warn) << "Channel::SetHitModulePar:Wrong paddleID for the parameters!";
             is_valid = false;
@@ -196,17 +194,17 @@ namespace R3B::Digitizing::Neuland::Tamex
     auto Channel::CheckPaddleIDInHitPar() const -> bool
     {
         auto is_valid = false;
-        if (fNeulandHitPar == nullptr)
+        if (neuland_hit_par_ == nullptr)
         {
             return false;
         }
-        if (not fNeulandHitPar->hasChanged())
+        if (not neuland_hit_par_->hasChanged())
         {
             R3BLOG(warn, "Can't setup parameter in the root file correctly!.");
             return false;
         }
 
-        auto PaddleId_max = fNeulandHitPar->GetNumModulePar();
+        auto PaddleId_max = neuland_hit_par_->GetNumModulePar();
         if (GetPaddle()->GetPaddleID() > PaddleId_max)
         {
             LOG(warn) << "Paddle id " << GetPaddle()->GetPaddleID() << " exceeds the id " << PaddleId_max
@@ -229,10 +227,10 @@ namespace R3B::Digitizing::Neuland::Tamex
         }
         InvalidateSignals();
         InvalidateTrigTime();
-        fPMTPeaks.emplace_back(newHit, *this);
+        pmt_peaks_.emplace_back(newHit, *this);
     }
 
-    auto Channel::CreateSignal(const Peak& peak) const -> Signal
+    auto Channel::CreateSignal(const FQTPeak& peak) const -> Signal
     {
         auto peakQdc = peak.GetQDC();
         auto peakTime = peak.GetLETime();
@@ -249,19 +247,94 @@ namespace R3B::Digitizing::Neuland::Tamex
     }
 
     template <typename Peak>
-    void Channel::PeakPilingUp(/* inout */ std::vector<Peak>& peaks)
+    void Channel::PeakPileUp(/* inout */ std::vector<Peak>& peaks)
     {
-        if (peaks.size() == 0)
+        if (peaks.size() <= 1)
         {
             return;
         }
-        for (auto it = peaks.end() - 1; it != peaks.begin(); --it)
+
+        std::sort(peaks.begin(), peaks.end(), std::less{});
+        for (auto front_peak = peaks.begin(); front_peak != peaks.end(); ++front_peak)
         {
-            if (*it == *(it - 1))
-            {
-                *(it - 1) += *it;
-                peaks.erase(it);
-            }
+            auto end_peak = std::remove_if(front_peak + 1,
+                                           peaks.end(),
+                                           [&front_peak](auto& peak)
+                                           {
+                                               if (*front_peak == peak)
+                                               {
+                                                   (*front_peak) += peak;
+                                                   return true;
+                                               }
+                                               return false;
+                                           });
+            peaks.erase(end_peak, peaks.end());
+        }
+    }
+
+    void Channel::PeakPileUpWithDistance(/* inout */ std::vector<FQTPeak>& peaks, double distance)
+    {
+        if (peaks.empty())
+        {
+            return;
+        }
+        std::sort(peaks.begin(), peaks.end(), std::less{});
+
+        for (auto front_peak = peaks.begin(); front_peak != peaks.end(); ++front_peak)
+        {
+            auto last_leading_time = front_peak->GetLETime();
+            auto end_peak = std::remove_if(front_peak + 1,
+                                           peaks.end(),
+                                           [&distance, &front_peak, &last_leading_time](FQTPeak& peak)
+                                           {
+                                               if ((peak - last_leading_time) < distance)
+                                               {
+                                                   front_peak->AddQDC(peak.GetQDC());
+                                                   last_leading_time = peak.GetLETime();
+                                                   return true;
+                                               }
+                                               return false;
+                                           });
+            peaks.erase(end_peak, peaks.end());
+        }
+    }
+
+    void Channel::PeakPileUpInTimeWindow(/* inout */ std::vector<FQTPeak>& peaks, double time_window)
+    {
+        if (peaks.empty())
+        {
+            return;
+        }
+        std::sort(peaks.begin(), peaks.end(), std::less{});
+
+        auto& front_peak = peaks.front();
+        std::for_each(peaks.begin() + 1,
+                      peaks.end(),
+                      [&front_peak, time_window](FQTPeak& peak)
+                      {
+                          if ((peak - front_peak) < time_window)
+                          {
+                              front_peak.AddQDC(peak.GetQDC());
+                          }
+                      });
+        peaks.erase(peaks.begin() + 1, peaks.end());
+    }
+
+    void Channel::FQTPeakPileUp(/* inout */ std::vector<FQTPeak>& peaks)
+    {
+        switch (pileup_strategy_)
+        {
+            case PeakPileUpStrategy::width:
+                PeakPileUp(peaks);
+                break;
+            case PeakPileUpStrategy::distance:
+                PeakPileUpWithDistance(peaks, par_.fPileUpDistance);
+                break;
+            case PeakPileUpStrategy::time_window:
+                PeakPileUpInTimeWindow(peaks, par_.fPileUpTimeWindow);
+                break;
+            default:
+                break;
         }
     }
 
@@ -276,15 +349,15 @@ namespace R3B::Digitizing::Neuland::Tamex
         peaks.erase(it_end, peaks.end());
     }
 
-    auto Channel::ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<Peak>
+    auto Channel::ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<FQTPeak>
     {
-        auto FQTPeaks = std::vector<Peak>{};
+        auto FQTPeaks = std::vector<FQTPeak>{};
         FQTPeaks.reserve(pmtPeaks.size());
 
         // sorting pmt peaks according to time:
         std::sort(pmtPeaks.begin(), pmtPeaks.end());
 
-        PeakPilingUp(pmtPeaks);
+        PeakPileUp(pmtPeaks);
         ApplyThreshold(pmtPeaks);
         for (auto const& peak : pmtPeaks)
         {
@@ -295,29 +368,29 @@ namespace R3B::Digitizing::Neuland::Tamex
 
     auto Channel::ConstructSignals() -> Signals
     {
-        fFQTPeaks = ConstructFQTPeaks(fPMTPeaks);
+        fqt_peaks_ = ConstructFQTPeaks(pmt_peaks_);
         // signal pileup:
-        PeakPilingUp(fFQTPeaks);
+        FQTPeakPileUp(fqt_peaks_);
 
         // construct Channel signals:
         auto signals = std::vector<Signal>{};
-        signals.reserve(fFQTPeaks.size());
+        signals.reserve(fqt_peaks_.size());
 
-        for (const auto& peak : fFQTPeaks)
+        for (const auto& peak : fqt_peaks_)
         {
             signals.emplace_back(CreateSignal(peak));
         }
         return signals;
     }
 
-    auto Channel::GetFQTPeaks() -> const std::vector<Peak>&
+    auto Channel::GetFQTPeaks() -> const std::vector<FQTPeak>&
     {
 
         if (!Is_ValidSignals())
         {
             ConstructSignals();
         }
-        return fFQTPeaks;
+        return fqt_peaks_;
     }
 
     auto Channel::GetPMTPeaks() -> const std::vector<PMTPeak>&
@@ -326,7 +399,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             ConstructSignals();
         }
-        return fPMTPeaks;
+        return pmt_peaks_;
     }
 
     auto Channel::ToQdc(double qdc) const -> double

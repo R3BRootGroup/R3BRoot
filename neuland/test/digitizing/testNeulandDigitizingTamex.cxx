@@ -19,7 +19,7 @@ namespace
 {
     namespace Digitizing = R3B::Digitizing;
     using TmxChannel = Digitizing::Neuland::Tamex::Channel;
-    using FQTPeak = Digitizing::Neuland::Tamex::Peak;
+    using FQTPeak = Digitizing::Neuland::Tamex::FQTPeak;
     using PMTPeak = Digitizing::Neuland::Tamex::PMTPeak;
     using Channel = Digitizing::Channel;
     using TmxPar = Digitizing::Neuland::Tamex::Params;
@@ -134,7 +134,7 @@ namespace
         auto maxTime = GetPeaks().back().GetTETime();
         auto qdc_test = FQTPeak::WidthToQdc(maxTime - minTime + 10., GetPar());
         AddHit(minTime - 5., qdc_test);
-        ASSERT_NE(GetSignals().size(), 1);
+        ASSERT_EQ(GetSignals().size(), 1);
     }
 
     constexpr auto AssessReduction(double inE, double outE) { return (inE - outE) / inE; }

@@ -74,6 +74,8 @@ Following table shows all the parameters that can be modified for the Tamex chan
 | fPedestal                                 | double | 14.0          | Pedestal value (used for the width calculation)        |
 | fTimeMax                                  | double | 1000. [ns]    | Maximum time cutoff                                    |
 | fTimeMin                                  | double | 1. [ns]       | Minimum time cutoff                                    |
+| fPileUpTimeWindow                         | double | 1000. [ns]   | FQT Peaks pileup time window                                   |
+| fPileUpDistance                         | double | 200. [ns]   | FQT Peaks pileup time distance                                   |
 | fQdcMin                                   | double | 0.67 [MeV]    | Minimum energy cutoff                                  |
 
 On the other hand, users are also allowed to set the parameters of each channel according to a parameter container from the calibration process:

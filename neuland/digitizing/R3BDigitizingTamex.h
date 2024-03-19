@@ -35,6 +35,7 @@ namespace R3B::Digitizing::Neuland::Tamex
     class Channel;
     struct Params
     {
+        // NOLINTBEGIN
         double fPMTThresh = 1.;                // [MeV]
         double fSaturationCoefficient = 0.012; // Saturation coefficient of PMTs
         bool fExperimentalDataIsCorrectedForSaturation = true;
@@ -42,19 +43,29 @@ namespace R3B::Digitizing::Neuland::Tamex
         double fEResRel = 0.05; // Gaus(e, fEResRel * e) []
         double fEnergyGain = 15.0;
         double fPedestal = 14.0;
-        double fTimeMax = 1000.; // ns
-        double fTimeMin = 1.;    // ns
-        double fQdcMin = 0.67;
+        double fTimeMax = 1000.;          // ns
+        double fTimeMin = 1.;             // ns
+        double fPileUpTimeWindow = 1000.; // ns
+        double fPileUpDistance = 100.;    // ns
+        double fQdcMin = 0.067;
         TRandom3* fRnd = nullptr;
+        // NOLINTEND
 
         explicit Params(TRandom3&);
 
         // rule of 5
         Params(Params&&) = delete;
-        Params& operator=(const Params&) = default;
-        Params& operator=(Params&&) = delete;
+        auto operator=(const Params&) -> Params& = default;
+        auto operator=(Params&&) -> Params& = delete;
         ~Params() = default;
         Params(const Params& other);
+    };
+
+    enum class PeakPileUpStrategy
+    {
+        width,
+        distance,
+        time_window
     };
 
     class PMTPeak
@@ -62,32 +73,38 @@ namespace R3B::Digitizing::Neuland::Tamex
       public:
         PMTPeak() = default;
         PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel&);
-        auto operator<(const PMTPeak& rhs) const -> bool { return (fLETime < rhs.fLETime); }
-        auto operator==(const PMTPeak& rhs) const -> bool { return std::abs(fLETime - rhs.fLETime) < peakWidth; }
-        auto operator+=(const PMTPeak& rhs) -> PMTPeak&;
-        [[nodiscard]] auto GetQDC() const -> double { return fQdc; }
-        [[nodiscard]] auto GetLETime() const -> double { return fLETime; }
-        static const double peakWidth; // ns
+        auto operator<(const PMTPeak& rhs) const -> bool { return (time_ < rhs.time_); }
+        auto operator==(const PMTPeak& rhs) const -> bool { return std::abs(time_ - rhs.time_) < peakWidth; }
+        auto operator+=(const PMTPeak& other) -> PMTPeak&;
+        [[nodiscard]] auto GetQDC() const -> double { return qdc_; }
+        [[nodiscard]] auto GetLETime() const -> double { return time_; }
+        static constexpr double peakWidth = 15.0; // ns
 
       private:
-        double fQdc = 0.0;
-        double fLETime = 0.0;
+        double qdc_ = 0.0;
+        double time_ = 0.0;
     };
 
-    class Peak
+    class FQTPeak
     {
       public:
-        Peak(const PMTPeak& pmtPeak, Channel* channel);
-        Peak() = default;
+        FQTPeak(const PMTPeak& pmtPeak, Channel* channel);
+        FQTPeak() = default;
 
         // Getters:
-        [[nodiscard]] auto GetWidth() const -> double { return fWidth; }
-        [[nodiscard]] auto GetQDC() const -> double { return fQdc; }
-        [[nodiscard]] auto GetLETime() const -> double { return fLETime; }
-        [[nodiscard]] auto GetTETime() const -> double { return fTETime; }
+        [[nodiscard]] auto GetWidth() const -> double { return width_; }
+        [[nodiscard]] auto GetQDC() const -> double { return qdc_; }
+        [[nodiscard]] auto GetLETime() const -> double { return leading_edge_time_; }
+        [[nodiscard]] auto GetTETime() const -> double { return trailing_edge_time_; }
 
-        auto operator==(const Peak&) const -> bool;
-        void operator+=(const Peak&);
+        auto operator==(const FQTPeak& other) const -> bool;
+        void operator+=(const FQTPeak& other);
+        auto operator-(const FQTPeak& other) const -> double { return leading_edge_time_ - other.leading_edge_time_; }
+        auto operator-(double time) const -> double { return leading_edge_time_ - time; };
+        auto operator>(const FQTPeak& other) const -> bool { return leading_edge_time_ - other.leading_edge_time_ > 0; }
+        auto operator<(const FQTPeak& other) const -> bool { return leading_edge_time_ - other.leading_edge_time_ < 0; }
+
+        void AddQDC(double qdc) { qdc_ += qdc; }
 
         template <typename Par>
         static auto WidthToQdc(double width, const Par& par) -> double
@@ -112,43 +129,48 @@ namespace R3B::Digitizing::Neuland::Tamex
         explicit operator Digitizing::Channel::Signal() const;
 
       private:
-        double fWidth = 0.0;  // the temperal width of the TmxPeak in [ns]
-        double fQdc = 0.0;    // the qdc value in [MeV] (without threshold)
-        double fLETime = 0.0; // leading edge of the TmxPeak in [ns]
-        double fTETime = 0.0; // tailing edge of the TmxPeak
-        Channel* fChannel = nullptr;
+        double width_ = 0.0;              // the temperal width of the TmxPeak in [ns]
+        double qdc_ = 0.0;                // the qdc value in [MeV] (without threshold)
+        double leading_edge_time_ = 0.0;  // leading edge of the TmxPeak in [ns]
+        double trailing_edge_time_ = 0.0; // tailing edge of the TmxPeak
+        Channel* channel_ptr_ = nullptr;
     };
 
     class Channel : public Digitizing::Channel
     {
       public:
-        Channel(ChannelSide, TRandom3&);
-        Channel(ChannelSide, const Params&);
-        explicit Channel(ChannelSide side)
-            : Channel(side, GetDefaultRandomGen())
+        Channel(ChannelSide, PeakPileUpStrategy strategy, TRandom3&);
+        Channel(ChannelSide, PeakPileUpStrategy strategy, const Params&);
+        explicit Channel(ChannelSide side, PeakPileUpStrategy strategy = PeakPileUpStrategy::width)
+            : Channel(side, strategy, GetDefaultRandomGen())
         {
         }
-        void AddHit(Hit /*hit*/) override;
+        // Setters:
+        void SetPileUpStrategy(PeakPileUpStrategy strategy) { pileup_strategy_ = strategy; }
 
         // Getters:
         auto GetPar() -> Tamex::Params& { return par_; }
         auto GetParConstRef() const -> const Tamex::Params& { return par_; }
-        auto GetFQTPeaks() -> const std::vector<Peak>&;
+        auto GetFQTPeaks() -> const std::vector<FQTPeak>&;
         auto GetPMTPeaks() -> const std::vector<PMTPeak>&;
 
-        auto CreateSignal(const Peak& peak) const -> Signal;
+        void AddHit(Hit /*hit*/) override;
+        auto CreateSignal(const FQTPeak& peak) const -> Signal;
         static void GetHitPar(const std::string& hitParName);
 
       private:
-        // mutable std::vector<FQTPeak> fFQTPeaks;
-        auto ConstructSignals() -> Signals override;
-        void AttachToPaddle(Digitizing::Paddle* paddle) override;
-        std::vector<PMTPeak> fPMTPeaks;
-        std::vector<Peak> fFQTPeaks;
-        static R3BNeulandHitPar* fNeulandHitPar; // NOLINT
-        R3BNeulandHitModulePar* fNeulandHitModulePar = nullptr;
+        PeakPileUpStrategy pileup_strategy_ = PeakPileUpStrategy::width;
+        std::vector<PMTPeak> pmt_peaks_;
+        std::vector<FQTPeak> fqt_peaks_;
+        static R3BNeulandHitPar* neuland_hit_par_; // NOLINT
+        R3BNeulandHitModulePar* neuland_hit_module_par_ = nullptr;
         Tamex::Params par_;
 
+        // private virtual functions
+        auto ConstructSignals() -> Signals override;
+        void AttachToPaddle(Digitizing::Paddle* paddle) override;
+
+        // private non-virtual functions
         auto CheckPaddleIDInHitPar() const -> bool;
         auto CheckPaddleIDInHitModulePar() const -> bool;
         void SetHitModulePar(int PaddleId);
@@ -157,9 +179,13 @@ namespace R3B::Digitizing::Neuland::Tamex
         auto ToUnSatQdc(double) const -> double;
         template <typename Peak>
         void ApplyThreshold(/* inout */ std::vector<Peak>&);
-        auto ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<Peak>;
+        auto ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<FQTPeak>;
         template <typename Peak>
-        static void PeakPilingUp(/* inout */ std::vector<Peak>& peaks);
+        static void PeakPileUp(/* inout */ std::vector<Peak>& peaks);
+
+        static void PeakPileUpWithDistance(/* inout */ std::vector<FQTPeak>& peaks, double distance);
+        static void PeakPileUpInTimeWindow(/* inout */ std::vector<FQTPeak>& peaks, double time_window);
+        void FQTPeakPileUp(/* inout */ std::vector<FQTPeak>& peaks);
     };
 
 } // namespace R3B::Digitizing::Neuland::Tamex
