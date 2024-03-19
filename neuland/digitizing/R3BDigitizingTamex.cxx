@@ -249,17 +249,26 @@ namespace R3B::Digitizing::Neuland::Tamex
     template <typename Peak>
     void Channel::PeakPileUp(/* inout */ std::vector<Peak>& peaks)
     {
-        if (peaks.empty() == 0)
+        if (peaks.size() <= 1)
         {
             return;
         }
-        for (auto it = peaks.end() - 1; it != peaks.begin(); --it)
+
+        std::sort(peaks.begin(), peaks.end(), std::less{});
+        for (auto front_peak = peaks.begin(); front_peak != peaks.end(); ++front_peak)
         {
-            if (*it == *(it - 1))
-            {
-                *(it - 1) += *it;
-                peaks.erase(it);
-            }
+            auto end_peak = std::remove_if(front_peak + 1,
+                                           peaks.end(),
+                                           [&front_peak](auto& peak)
+                                           {
+                                               if (*front_peak == peak)
+                                               {
+                                                   (*front_peak) += peak;
+                                                   return true;
+                                               }
+                                               return false;
+                                           });
+            peaks.erase(end_peak, peaks.end());
         }
     }
 
