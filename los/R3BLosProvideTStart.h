@@ -37,6 +37,7 @@ class R3BLosProvideTStart : public FairTask
         edgeR = right;
         fUseTrigHit = kTRUE;
     }
+    void SetUseTrigHit(bool val = kTRUE) { fUseTrigHit = val; }
 
   private:
     TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
