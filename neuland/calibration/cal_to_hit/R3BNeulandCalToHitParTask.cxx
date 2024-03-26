@@ -18,18 +18,10 @@
 
 namespace R3B::Neuland
 {
-    Cal2HitParTask::Cal2HitParTask(std::string_view name, int iVerbose)
+    Cal2HitParTask::Cal2HitParTask(Cal2HitParMethod method, std::string_view name, int iVerbose)
         : CalibrationTask(name, iVerbose)
     {
-    }
-
-    void Cal2HitParTask::HistogramInit(DataMonitor& histograms) { engine_->HistInit(histograms); }
-
-    void Cal2HitParTask::ExtraInit(FairRootManager* /*rootMan*/)
-    {
-        cal_data_.init();
-
-        switch (method_)
+        switch (method)
         {
             case Cal2HitParMethod::LSQT:
                 R3BLOG(info, "Cal2HitPar method: LSQT.");
@@ -40,6 +32,13 @@ namespace R3B::Neuland
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
                 break;
         }
+    }
+
+    void Cal2HitParTask::HistogramInit(DataMonitor& histograms) { engine_->HistInit(histograms); }
+
+    void Cal2HitParTask::ExtraInit(FairRootManager* /*rootMan*/)
+    {
+        cal_data_.init();
 
         const auto plane_num = base_par_->GetNumOfPlanes();
         if (plane_num == 0)

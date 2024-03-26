@@ -35,12 +35,12 @@ namespace R3B::Neuland::Calibration
     {
       public:
         MillepedeEngine() = default;
-        void SetMinStat(int min) override { minimum_hit_ = min; }
         void enable_rank_check(bool rank_check = true) { has_rank_check_ = rank_check; }
 
       private:
         bool has_rank_check_ = false;
         int minimum_hit_ = 1;
+        float error_scale_factor_ = 1000.F;
         // float minimum_pos_z_ = 0;
         // float smallest_time_sum_ = 0.;
         std::optional<float> average_t_sum_;
@@ -69,6 +69,8 @@ namespace R3B::Neuland::Calibration
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
         void EndOfTask() override;
         void HistInit(DataMonitor& histograms) override;
+        void SetMinStat(int min) override { minimum_hit_ = min; }
+        void SetErrorScale(float scale) override { error_scale_factor_ = scale; }
 
         void buffer_clear();
         void write_to_buffer();

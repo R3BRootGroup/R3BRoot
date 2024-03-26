@@ -51,6 +51,7 @@ namespace R3B::Neuland::Calibration
         virtual void EventReset(){};
         virtual void EndOfTask(){};
         virtual void HistInit(DataMonitor& histograms){};
+        virtual void SetErrorScale(float scale) {}
 
       private:
         int module_size_ = 0;

@@ -103,13 +103,12 @@ auto main(int argc, const char** argv) -> int
         map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
         run->AddTask(map2Cal.release());
 
-        auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>();
-        if (enable_mille.value())
-        {
-            cal2hitParTask->SetMethod(R3B::Neuland::Cal2HitParMethod::Millipede);
-        }
-        cal2hitParTask->SetTrigger(R3B::Neuland::CalTrigger::all);
-        cal2hitParTask->SetMinStat(min_stat.value());
+        auto cal2hit_method =
+            (enable_mille.value()) ? R3B::Neuland::Cal2HitParMethod::Millipede : R3B::Neuland::Cal2HitParMethod::LSQT;
+        auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>(cal2hit_method);
+        auto* cal2hitParTaskPtr = cal2hitParTask.get();
+        cal2hitParTaskPtr->SetTrigger(R3B::Neuland::CalTrigger::all);
+        cal2hitParTaskPtr->SetMinStat(min_stat.value());
         run->AddTask(cal2hitParTask.release());
 
         // set par input/output--------------------------------------------------------
@@ -124,9 +123,12 @@ auto main(int argc, const char** argv) -> int
         rtdb->saveOutput();
 
         run->Init();
-        for (int run_loop{ 0 }; run_loop < run_num.value(); ++run_loop)
+
+        const auto error_scales = std::array{ 1000.F, 1000.F, 1000.F, 1000.F };
+        for (const auto error_scale : error_scales)
         {
-            fmt::print("\nStarting run {} ...\n\n", run_loop);
+            cal2hitParTaskPtr->SetErrorScale(error_scale);
+            fmt::print("\nStarting run with error_scale {} ...\n\n", error_scale);
             run->Run(0, event_num.value() <= 0 ? 0 : event_num.value());
         }
 

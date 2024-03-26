@@ -23,10 +23,8 @@
 
 namespace rng = ranges;
 
-constexpr auto DEFAULT_MEAS_ERROR = 1.F;
 constexpr auto DEFAULT_RES_FILENAME = "millepede.res";
 constexpr auto SCALE_FACTOR = 100.F;
-constexpr auto ERROR_SCALE_FACTOR = 100.F;
 constexpr auto REFERENCE_BAR_NUM = 25;
 constexpr auto MILLE_BUFFER_SIZE = std::size_t{ 100000 };
 
@@ -205,7 +203,7 @@ namespace R3B::Neuland::Calibration
 
         input_data_buffer_.measurement =
             static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
-        input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * ERROR_SCALE_FACTOR);
+        input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * error_scale_factor_);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
         const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
@@ -227,7 +225,7 @@ namespace R3B::Neuland::Calibration
                                                 : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F };
 
         input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / SCALE_FACTOR);
-        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SQRT_12 / SCALE_FACTOR * ERROR_SCALE_FACTOR);
+        input_data_buffer_.sigma = static_cast<float>(BarSize_XY / SQRT_12 / SCALE_FACTOR * error_scale_factor_);
 
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
         write_to_buffer();
@@ -252,7 +250,7 @@ namespace R3B::Neuland::Calibration
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR * init_effective_c_ / 2);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR / 2.F);
         input_data_buffer_.sigma =
-            static_cast<float>(t_diff.error / SCALE_FACTOR / 2. * std::abs(init_effective_c) * ERROR_SCALE_FACTOR);
+            static_cast<float>(t_diff.error / SCALE_FACTOR / 2. * std::abs(init_effective_c) * error_scale_factor_);
         const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F }
                                                 : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
