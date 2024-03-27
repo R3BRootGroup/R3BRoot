@@ -29,16 +29,16 @@ typedef int int32_t;
 typedef struct EXT_STR_h101_raw_nnp_tamex_t
 {
     /* RAW */
-    uint32_t NN_TRIGCLM /* [1,169] */;
-    uint32_t NN_TRIGCLMI[169 EXT_STRUCT_CTRL(NN_TRIGCLM)] /* [1,169] */;
-    uint32_t NN_TRIGCLME[169 EXT_STRUCT_CTRL(NN_TRIGCLM)] /* [1,338] */;
-    uint32_t NN_TRIGCL /* [0,338] */;
-    uint32_t NN_TRIGCLv[338 EXT_STRUCT_CTRL(NN_TRIGCL)] /* [0,65535] */;
-    uint32_t NN_TRIGFLM /* [1,169] */;
-    uint32_t NN_TRIGFLMI[169 EXT_STRUCT_CTRL(NN_TRIGFLM)] /* [1,169] */;
-    uint32_t NN_TRIGFLME[169 EXT_STRUCT_CTRL(NN_TRIGFLM)] /* [1,338] */;
-    uint32_t NN_TRIGFL /* [0,338] */;
-    uint32_t NN_TRIGFLv[338 EXT_STRUCT_CTRL(NN_TRIGFL)] /* [0,65535] */;
+    uint32_t NN_TRIGCM /* [1,169] */;
+    uint32_t NN_TRIGCMI[169 EXT_STRUCT_CTRL(NN_TRIGCM)] /* [1,169] */;
+    uint32_t NN_TRIGCME[169 EXT_STRUCT_CTRL(NN_TRIGCM)] /* [1,338] */;
+    uint32_t NN_TRIGC /* [0,338] */;
+    uint32_t NN_TRIGCv[338 EXT_STRUCT_CTRL(NN_TRIGC)] /* [0,65535] */;
+    uint32_t NN_TRIGFM /* [1,169] */;
+    uint32_t NN_TRIGFMI[169 EXT_STRUCT_CTRL(NN_TRIGFM)] /* [1,169] */;
+    uint32_t NN_TRIGFME[169 EXT_STRUCT_CTRL(NN_TRIGFM)] /* [1,338] */;
+    uint32_t NN_TRIGF /* [0,338] */;
+    uint32_t NN_TRIGFv[338 EXT_STRUCT_CTRL(NN_TRIGF)] /* [0,65535] */;
     uint32_t NN_TRIGCTM /* [1,169] */;
     uint32_t NN_TRIGCTMI[169 EXT_STRUCT_CTRL(NN_TRIGCTM)] /* [1,169] */;
     uint32_t NN_TRIGCTME[169 EXT_STRUCT_CTRL(NN_TRIGCTM)] /* [1,338] */;
@@ -49,6 +49,26 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_t
     uint32_t NN_TRIGFTME[169 EXT_STRUCT_CTRL(NN_TRIGFTM)] /* [1,338] */;
     uint32_t NN_TRIGFT /* [0,338] */;
     uint32_t NN_TRIGFTv[338 EXT_STRUCT_CTRL(NN_TRIGFT)] /* [0,65535] */;
+    uint32_t NN_TZEROCLM /* [1,4] */;
+    uint32_t NN_TZEROCLMI[4 EXT_STRUCT_CTRL(NN_TZEROCLM)] /* [1,4] */;
+    uint32_t NN_TZEROCLME[4 EXT_STRUCT_CTRL(NN_TZEROCLM)] /* [1,8] */;
+    uint32_t NN_TZEROCL /* [0,8] */;
+    uint32_t NN_TZEROCLv[8 EXT_STRUCT_CTRL(NN_TZEROCL)] /* [0,65535] */;
+    uint32_t NN_TZEROFLM /* [1,4] */;
+    uint32_t NN_TZEROFLMI[4 EXT_STRUCT_CTRL(NN_TZEROFLM)] /* [1,4] */;
+    uint32_t NN_TZEROFLME[4 EXT_STRUCT_CTRL(NN_TZEROFLM)] /* [1,8] */;
+    uint32_t NN_TZEROFL /* [0,8] */;
+    uint32_t NN_TZEROFLv[8 EXT_STRUCT_CTRL(NN_TZEROFL)] /* [0,65535] */;
+    uint32_t NN_TZEROCTM /* [1,4] */;
+    uint32_t NN_TZEROCTMI[4 EXT_STRUCT_CTRL(NN_TZEROCTM)] /* [1,4] */;
+    uint32_t NN_TZEROCTME[4 EXT_STRUCT_CTRL(NN_TZEROCTM)] /* [1,8] */;
+    uint32_t NN_TZEROCT /* [0,8] */;
+    uint32_t NN_TZEROCTv[8 EXT_STRUCT_CTRL(NN_TZEROCT)] /* [0,65535] */;
+    uint32_t NN_TZEROFTM /* [1,4] */;
+    uint32_t NN_TZEROFTMI[4 EXT_STRUCT_CTRL(NN_TZEROFTM)] /* [1,4] */;
+    uint32_t NN_TZEROFTME[4 EXT_STRUCT_CTRL(NN_TZEROFTM)] /* [1,8] */;
+    uint32_t NN_TZEROFT /* [0,8] */;
+    uint32_t NN_TZEROFTv[8 EXT_STRUCT_CTRL(NN_TZEROFT)] /* [0,65535] */;
     uint32_t NN_P1tcl_T1BM /* [1,50] */;
     uint32_t NN_P1tcl_T1BMI[50 EXT_STRUCT_CTRL(NN_P1tcl_T1BM)] /* [1,50] */;
     uint32_t NN_P1tcl_T1BME[50 EXT_STRUCT_CTRL(NN_P1tcl_T1BM)] /* [1,1000] */;
@@ -1101,16 +1121,16 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_t
 typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
 {
     /* RAW */
-    uint32_t NN_TRIGCLM;
-    uint32_t NN_TRIGCLMI[169 /* NN_TRIGCLM */];
-    uint32_t NN_TRIGCLME[169 /* NN_TRIGCLM */];
-    uint32_t NN_TRIGCL;
-    uint32_t NN_TRIGCLv[338 /* NN_TRIGCL */];
-    uint32_t NN_TRIGFLM;
-    uint32_t NN_TRIGFLMI[169 /* NN_TRIGFLM */];
-    uint32_t NN_TRIGFLME[169 /* NN_TRIGFLM */];
-    uint32_t NN_TRIGFL;
-    uint32_t NN_TRIGFLv[338 /* NN_TRIGFL */];
+    uint32_t NN_TRIGCM;
+    uint32_t NN_TRIGCMI[169 /* NN_TRIGCM */];
+    uint32_t NN_TRIGCME[169 /* NN_TRIGCM */];
+    uint32_t NN_TRIGC;
+    uint32_t NN_TRIGCv[338 /* NN_TRIGC */];
+    uint32_t NN_TRIGFM;
+    uint32_t NN_TRIGFMI[169 /* NN_TRIGFM */];
+    uint32_t NN_TRIGFME[169 /* NN_TRIGFM */];
+    uint32_t NN_TRIGF;
+    uint32_t NN_TRIGFv[338 /* NN_TRIGF */];
     uint32_t NN_TRIGCTM;
     uint32_t NN_TRIGCTMI[169 /* NN_TRIGCTM */];
     uint32_t NN_TRIGCTME[169 /* NN_TRIGCTM */];
@@ -1121,6 +1141,26 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
     uint32_t NN_TRIGFTME[169 /* NN_TRIGFTM */];
     uint32_t NN_TRIGFT;
     uint32_t NN_TRIGFTv[338 /* NN_TRIGFT */];
+    uint32_t NN_TZEROCLM;
+    uint32_t NN_TZEROCLMI[4 /* NN_TZEROCLM */];
+    uint32_t NN_TZEROCLME[4 /* NN_TZEROCLM */];
+    uint32_t NN_TZEROCL;
+    uint32_t NN_TZEROCLv[8 /* NN_TZEROCL */];
+    uint32_t NN_TZEROFLM;
+    uint32_t NN_TZEROFLMI[4 /* NN_TZEROFLM */];
+    uint32_t NN_TZEROFLME[4 /* NN_TZEROFLM */];
+    uint32_t NN_TZEROFL;
+    uint32_t NN_TZEROFLv[8 /* NN_TZEROFL */];
+    uint32_t NN_TZEROCTM;
+    uint32_t NN_TZEROCTMI[4 /* NN_TZEROCTM */];
+    uint32_t NN_TZEROCTME[4 /* NN_TZEROCTM */];
+    uint32_t NN_TZEROCT;
+    uint32_t NN_TZEROCTv[8 /* NN_TZEROCT */];
+    uint32_t NN_TZEROFTM;
+    uint32_t NN_TZEROFTMI[4 /* NN_TZEROFTM */];
+    uint32_t NN_TZEROFTME[4 /* NN_TZEROFTM */];
+    uint32_t NN_TZEROFT;
+    uint32_t NN_TZEROFTv[8 /* NN_TZEROFT */];
     struct
     {
         struct
@@ -1166,24 +1206,22 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
     {                                                                                                                 \
         ok = 1;                                                                                                       \
         /* RAW */                                                                                                     \
-        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGCLM, UINT32, "NN_TRIGCLM", 169, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGCM, UINT32, "NN_TRIGCM", 169, 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGCLMI, UINT32, "NN_TRIGCLMI", "NN_TRIGCLM", 0 /*flags*/);       \
+            ok, si, offset, struct_t, printerr, NN_TRIGCMI, UINT32, "NN_TRIGCMI", "NN_TRIGCM", 0 /*flags*/);          \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGCLME, UINT32, "NN_TRIGCLME", "NN_TRIGCLM", 0 /*flags*/);       \
-        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGCL, UINT32, "NN_TRIGCL", 338, 0 /*flags*/); \
+            ok, si, offset, struct_t, printerr, NN_TRIGCME, UINT32, "NN_TRIGCME", "NN_TRIGCM", 0 /*flags*/);          \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGC, UINT32, "NN_TRIGC", 338, 0 /*flags*/);   \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGCLv, UINT32, "NN_TRIGCLv", "NN_TRIGCL", 0 /*flags*/);          \
-        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGFLM, UINT32, "NN_TRIGFLM", 169, 0 /*flags*/);                  \
+            ok, si, offset, struct_t, printerr, NN_TRIGCv, UINT32, "NN_TRIGCv", "NN_TRIGC", 0 /*flags*/);             \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGFM, UINT32, "NN_TRIGFM", 169, 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGFLMI, UINT32, "NN_TRIGFLMI", "NN_TRIGFLM", 0 /*flags*/);       \
+            ok, si, offset, struct_t, printerr, NN_TRIGFMI, UINT32, "NN_TRIGFMI", "NN_TRIGFM", 0 /*flags*/);          \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGFLME, UINT32, "NN_TRIGFLME", "NN_TRIGFLM", 0 /*flags*/);       \
-        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGFL, UINT32, "NN_TRIGFL", 338, 0 /*flags*/); \
+            ok, si, offset, struct_t, printerr, NN_TRIGFME, UINT32, "NN_TRIGFME", "NN_TRIGFM", 0 /*flags*/);          \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGF, UINT32, "NN_TRIGF", 338, 0 /*flags*/);   \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, NN_TRIGFLv, UINT32, "NN_TRIGFLv", "NN_TRIGFL", 0 /*flags*/);          \
+            ok, si, offset, struct_t, printerr, NN_TRIGFv, UINT32, "NN_TRIGFv", "NN_TRIGF", 0 /*flags*/);             \
         EXT_STR_ITEM_INFO2_LIM(                                                                                       \
             ok, si, offset, struct_t, printerr, NN_TRIGCTM, UINT32, "NN_TRIGCTM", 169, 0 /*flags*/);                  \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
@@ -1202,6 +1240,42 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
         EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TRIGFT, UINT32, "NN_TRIGFT", 338, 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, NN_TRIGFTv, UINT32, "NN_TRIGFTv", "NN_TRIGFT", 0 /*flags*/);          \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCLM, UINT32, "NN_TZEROCLM", 4, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCLMI, UINT32, "NN_TZEROCLMI", "NN_TZEROCLM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCLME, UINT32, "NN_TZEROCLME", "NN_TZEROCLM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TZEROCL, UINT32, "NN_TZEROCL", 8, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCLv, UINT32, "NN_TZEROCLv", "NN_TZEROCL", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFLM, UINT32, "NN_TZEROFLM", 4, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFLMI, UINT32, "NN_TZEROFLMI", "NN_TZEROFLM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFLME, UINT32, "NN_TZEROFLME", "NN_TZEROFLM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TZEROFL, UINT32, "NN_TZEROFL", 8, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFLv, UINT32, "NN_TZEROFLv", "NN_TZEROFL", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCTM, UINT32, "NN_TZEROCTM", 4, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCTMI, UINT32, "NN_TZEROCTMI", "NN_TZEROCTM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCTME, UINT32, "NN_TZEROCTME", "NN_TZEROCTM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TZEROCT, UINT32, "NN_TZEROCT", 8, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROCTv, UINT32, "NN_TZEROCTv", "NN_TZEROCT", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFTM, UINT32, "NN_TZEROFTM", 4, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFTMI, UINT32, "NN_TZEROFTMI", "NN_TZEROFTM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFTME, UINT32, "NN_TZEROFTME", "NN_TZEROFTM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, NN_TZEROFT, UINT32, "NN_TZEROFT", 8, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, NN_TZEROFTv, UINT32, "NN_TZEROFTv", "NN_TZEROFT", 0 /*flags*/);       \
         EXT_STR_ITEM_INFO2_LIM(                                                                                       \
             ok, si, offset, struct_t, printerr, NN_P1tcl_T1BM, UINT32, "NN_P1tcl_T1BM", 50, 0 /*flags*/);             \
         EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                    \
