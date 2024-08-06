@@ -27,8 +27,7 @@
 #include "R3BDataMonitor.h"
 #include "R3BIOConnector.h"
 #include "R3BNeulandHit.h"
-#include "TCAConnector.h"
-#include <string>
+#include <R3BIOConnector.h>
 
 class TH1D;
 class TH2D;

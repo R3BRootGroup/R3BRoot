@@ -23,7 +23,12 @@ namespace R3B::Neuland
         if (auto* detParIo = inputFile->getDetParIo("FairGenericParIo"); detParIo != nullptr)
         {
             R3BLOG(debug, fmt::format("Found DetParIo {}. Try to init with this.", detParIo->GetName()));
-            return (detParIo->init(this));
+            auto res = detParIo->init(this);
+            if (not res)
+            {
+                R3BLOG(error, fmt::format("Parameter {} init failed.", detParIo->GetName()));
+            }
+            return res;
         }
 
         R3BLOG(error, fmt::format("Failed to init parameter {} because no FairDetParIo object is found!", GetName()));

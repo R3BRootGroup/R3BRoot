@@ -27,5 +27,8 @@
 #pragma link C++ class R3B::Digitizing::Neuland::Tamex::Params+;
 #pragma link C++ class R3BNeulandHitMon+;
 #pragma link C++ class R3BNeulandDigitizer+;
+#pragma link C++ class R3B::Neuland::SimCalData+;
+#pragma link C++ class vector<R3B::Neuland::SimCalData>+;
+#pragma link C++ class R3BNeulandDigitizerCalTask+;
 
 #endif

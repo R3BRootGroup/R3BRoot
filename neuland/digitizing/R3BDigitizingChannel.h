@@ -36,6 +36,15 @@ namespace R3B::Digitizing
         ChannelSignal() = default;
     };
 
+    // output data structure for Cal Data
+    struct ChannelCalSignal
+    {
+        double tot{};
+        double tle{};
+        ChannelSide side{};
+        ChannelCalSignal() = default;
+    };
+
     // input data structure of channel
     struct ChannelHit
     {
@@ -54,8 +63,10 @@ namespace R3B::Digitizing
     {
       public:
         using Signal = ChannelSignal;
+        using CalSignal = ChannelCalSignal;
         using Hit = ChannelHit;
         using Signals = std::vector<Signal>;
+        using CalSignals = std::vector<CalSignal>;
 
         explicit Channel(ChannelSide);
 
@@ -68,6 +79,7 @@ namespace R3B::Digitizing
 
         virtual void AddHit(Hit hit) = 0;
         virtual auto HasFired() -> bool;
+        // virtual auto HasCalFired() -> bool;
 
         // Getters:
         virtual auto GetTrigTime() -> double;
@@ -75,18 +87,24 @@ namespace R3B::Digitizing
         auto GetSide() const -> ChannelSide { return fSide; }
         auto GetPaddle() const -> Paddle* { return fPaddle; }
 
+        virtual auto GetCalSignals() -> CalSignals { return {}; }
+
         void SetPaddle(Paddle* v_paddle) { fPaddle = v_paddle; }
         auto Is_ValidSignals() -> bool { return fSignals.valid(); }
+        auto Is_ValidCalSignals() -> bool { return fCalSignals.valid(); }
         void InvalidateSignals() { fSignals.invalidate(); }
+        void InvalidateCalSignals() { fCalSignals.invalidate(); }
         void InvalidateTrigTime() { fTrigTime.invalidate(); }
         virtual void AttachToPaddle(Paddle* paddle) { fPaddle = paddle; };
         static auto GetDefaultRandomGen() -> TRandom3&;
 
       private:
         virtual auto ConstructSignals() -> Signals = 0;
-        Paddle* fPaddle = nullptr;           // pointer to the paddle who owns this channel
-        ChannelSide fSide;                   // side of the channel
-        mutable Validated<Signals> fSignals; // output signals from the channel
+        virtual auto ConstructCalSignals() -> CalSignals { return {}; };
+        Paddle* fPaddle = nullptr;                 // pointer to the paddle who owns this channel
+        ChannelSide fSide;                         // side of the channel
+        mutable Validated<Signals> fSignals;       // output signals from the channel
+        mutable Validated<CalSignals> fCalSignals; // output cal signals from the channel
         mutable Validated<double> fTrigTime;
     };
 } // namespace R3B::Digitizing

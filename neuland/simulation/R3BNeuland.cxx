@@ -74,7 +74,17 @@ R3BNeuland::R3BNeuland(const int nDP, const TGeoCombiTrans& combi)
 {
 }
 
-auto R3BNeuland::ProcessHits(FairVolume* /*v*/) -> bool
+void R3BNeuland::Initialize()
+{
+    LOG(info) << "R3BNeuland initialization ...";
+
+    FairDetector::Initialize();
+
+    WriteParameterFile();
+    ResetValues();
+}
+
+Bool_t R3BNeuland::ProcessHits(FairVolume*)
 {
     // New hit in detector
     if (gMC->IsTrackEntering())

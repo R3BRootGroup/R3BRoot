@@ -15,9 +15,10 @@
 #define R3BNEULAND_H
 
 #include "R3BDetector.h"
-#include "R3BIOConnector.h"
 #include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
+#include <R3BIOConnector.h>
+#include <memory>
 #include <string>
 
 class FairVolume;
@@ -60,6 +61,7 @@ class R3BNeuland : public R3BDetector
      *@param nDP     number of double planes
      *@param combi   position + rotation */
     explicit R3BNeuland(int nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
+
 
   private:
     R3B::OutputVectorConnector<R3BNeulandPoint> fNeulandPoints{ "NeulandPoints" }; //!

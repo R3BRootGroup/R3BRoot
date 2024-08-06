@@ -65,7 +65,7 @@ constexpr auto DEFAULT_UNPACKER_PATH = "202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
 constexpr auto NEULAND_GLOBAL_TIME_OFFSET_NS = -400.;
 
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
     using namespace std::string_literals;
     TStopwatch timer;

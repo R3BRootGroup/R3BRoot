@@ -39,11 +39,20 @@ namespace R3B::Digitizing
         double energy{};
         double time{};
         double position{};
-        const Channel::Signal& leftChannel;
-        const Channel::Signal& rightChannel;
-        explicit PaddleSignal(LRPair<const Channel::Signal&> p_signals)
-            : leftChannel{ p_signals.left }
-            , rightChannel{ p_signals.right }
+        const Channel::Signal* leftChannel{};
+        const Channel::Signal* rightChannel{};
+        const Channel::CalSignal* leftChannelCal{};
+        const Channel::CalSignal* rightChannelCal{};
+
+        explicit PaddleSignal(LRPair< std::reference_wrapper<const Channel::CalSignal>> p_signals)
+            : leftChannelCal{ &p_signals.left.get() }
+            , rightChannelCal{ &p_signals.right.get() }
+        {
+        }
+
+        explicit PaddleSignal(LRPair<std::reference_wrapper<const Channel::Signal>> p_signals)
+            : leftChannel{ &p_signals.left.get() }
+            , rightChannel{ &p_signals.right.get() }
         {
         }
     };
@@ -64,8 +73,8 @@ namespace R3B::Digitizing
         using Hit = PaddleHit;
         using Signals = std::vector<Signal>;
         using ChannelSignalPair = Pair<std::reference_wrapper<const Channel::Signal>>;
-        using SignalCouplingStrategy =
-            std::function<std::vector<ChannelSignalPair>(const Channel::Signals&, const Channel::Signals&)>;
+        using SignalCouplingStrategy = std::function<
+            std::vector<ChannelSignalPair>(const Paddle&, const Channel::Signals&, const Channel::Signals&)>;
 
         explicit Paddle(int paddleID, SignalCouplingStrategy strategy = SignalCouplingByTime);
         auto HasFired() const -> bool;
@@ -81,6 +90,7 @@ namespace R3B::Digitizing
         void DepositLight(const Hit& hit);
 
         void SetChannel(std::unique_ptr<Channel> channel);
+
         void SetSignalCouplingStrategy(const SignalCouplingStrategy& strategy) { fSignalCouplingStrategy = strategy; }
 
         // Getters:
@@ -100,19 +110,26 @@ namespace R3B::Digitizing
         std::unique_ptr<Channel> fRightChannel{};
         SignalCouplingStrategy fSignalCouplingStrategy;
         // virtual std::function<indexMapFunc> IndexMapFunc() const { return ConstructIndexMapByTime; }
+
         virtual auto ConstructPaddelSignals(const Channel::Signals& firstSignals,
                                             const Channel::Signals& secondSignals) const -> Signals;
-        virtual auto ComputeTime(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double = 0;
-        virtual auto ComputeEnergy(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double = 0;
-        virtual auto ComputePosition(const Channel::Signal& rightSignal, const Channel::Signal& leftSignal) const
-            -> double = 0;
+        virtual auto ComputeTime(const Channel::Signal& firstSignal,
+                                 const Channel::Signal& secondSignal) const -> double = 0;
+        virtual auto ComputeEnergy(const Channel::Signal& firstSignal,
+                                   const Channel::Signal& secondSignal) const -> double = 0;
+        virtual auto ComputePosition(const Channel::Signal& rightSignal,
+                                     const Channel::Signal& leftSignal) const -> double = 0;
         virtual auto ComputeChannelHits(const Hit& hit) const -> Pair<Channel::Hit> = 0;
 
       public:
-        static auto SignalCouplingByTime(const Channel::Signals& firstSignals, const Channel::Signals& secondSignals)
-            -> std::vector<ChannelSignalPair>;
+        virtual auto MatchSignals(const Channel::Signal& firstSignal,
+                                  const Channel::Signal& secondSignal) const -> float
+        {
+            return 0.;
+        }
+        static auto SignalCouplingByTime(const Paddle& self,
+                                         const Channel::Signals& firstSignals,
+                                         const Channel::Signals& secondSignals) -> std::vector<ChannelSignalPair>;
     };
 } // namespace R3B::Digitizing
 #endif

@@ -11,10 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandHitMon.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
+#include "R3BNeulandHitMon.h"
 #include "R3BShared.h"
 #include "TDirectory.h"
 #include "TH1D.h"
@@ -141,7 +141,7 @@ auto R3BNeulandHitMon::Init() -> InitStatus
 
 void R3BNeulandHitMon::Exec(Option_t* /*option*/)
 {
-    const auto hits = neuland_hits_.get();
+    const auto& hits = neuland_hits_.get();
 
     // checking paddle multihits
     std::map<Int_t, Int_t> paddlenum;

@@ -128,7 +128,7 @@ void initialize_output_file(TFile* output, std::string_view base)
     output->WriteObject<FairRtdbRun>(par_run, par_run->GetName(), "overwrite");
 }
 
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
 
     using namespace std::string_literals;

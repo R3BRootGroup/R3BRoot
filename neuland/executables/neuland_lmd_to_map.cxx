@@ -41,7 +41,7 @@ constexpr int DEFAULT_RUN_ID = 999;
 constexpr auto DEFAULT_UNPACKER_PATH = "/../unpack/202205_s509/202205_s509";
 constexpr auto NEULAND_DEFAULT_DOUBLE_PLANE = 13;
 
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
     using namespace std::string_literals;
     auto const* ucesb_dir = getenv("UCESB_DIR");

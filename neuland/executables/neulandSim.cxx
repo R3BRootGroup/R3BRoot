@@ -1,8 +1,9 @@
-#include "FairBoxGenerator.h"
+#include "CosmicMuon.h"
+#include "CosmicMuonDistributions.h"
 #include "FairParRootFileIo.h"
-#include "FairPrimaryGenerator.h"
 #include "FairRootFileSink.h"
 #include "FairRunSim.h"
+#include "Generators.h"
 #include "R3BCave.h"
 #include "R3BNeuland.h"
 #include "TStopwatch.h"
@@ -14,13 +15,26 @@
 #include <TG4EventAction.h>
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/program_options.hpp>
+#include <ctime>
 #include <iostream>
 #include <string>
+#ifdef HAS_MPI
+#include <mpi.h>
+#endif
 
-constexpr int DEFAULT_RUNID = 999;
+inline constexpr auto DEFAULT_RUNID = 999;
+inline constexpr auto defaultEventNum = 10;
 
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
+#ifdef HAS_MPI
+    MPI_Init(&argc, &argv);
+    auto num_proc = 0;
+    auto num_rank = 0;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
+    MPI_Comm_rank(MPI_COMM_WORLD, &num_rank);
+#endif
+
     auto timer = TStopwatch{};
     auto const defaultEventNum = 10;
     timer.Start();
@@ -35,6 +49,7 @@ auto main(int argc, const char** argv) -> int
     auto pEnergy = programOptions.create_option<double>("energy", "set energy value (GeV) of the particle", 1);
     auto simuFileName =
         programOptions.create_option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
+    auto generator = programOptions.create_option<std::string>("gen,G", "Set the generator types: muon, box", "box");
     auto paraFileName =
         programOptions.create_option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
@@ -49,6 +64,14 @@ auto main(int argc, const char** argv) -> int
         std::cout << programOptions.get_desc_ref() << std::endl;
         return 0;
     }
+
+    auto simu_file_name = simuFileName.value();
+    auto para_file_name = paraFileName.value();
+
+#ifdef HAS_MPI
+    simu_file_name = fmt::format("{}.{}", simu_file_name, num_rank);
+    para_file_name = fmt::format("{}.{}", para_file_name, num_rank);
+#endif
 
     // Logging
     // FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
@@ -65,34 +88,25 @@ auto main(int argc, const char** argv) -> int
     run->SetRunId(runID->value());
     run->SetStoreTraj(true);
     run->SetMaterials("media_r3b.geo");
-    run->SetSink(std::make_unique<FairRootFileSink>(simuFileName().c_str()));
+    run->SetSink(std::make_unique<FairRootFileSink>(simu_file_name.c_str()));
     auto fairField = std::make_unique<R3BFieldConst>();
     run->SetField(fairField.release());
 
-    // Primary particle generator
-    auto gen = std::make_unique<R3BPhaseSpaceGenerator>();
+    // auto primGen = create_muon_generator();
+    TRandom3 random_gen(0);
+    auto primGen = [&random_gen, gen = generator.value(), multi = multi.value(), energy = pEnergy.value()]()
+    {
+        if (gen == "muon")
+        {
+            return create_muon_generator(random_gen);
+        }
+        if (gen == "box")
+        {
+            return create_box_generator(energy, multi);
+        }
+        throw std::runtime_error(fmt::format("unrecognized generator type: {}!", gen));
+    }();
 
-    constexpr auto beam_energy = 883.;      // MeV
-    constexpr auto rel_energy_max = 10000.; // keV
-    constexpr auto Sn_atomic_number = 50;
-    constexpr auto Sn_mass = 123;
-    constexpr auto neutron_pdg = 2112;
-    gen->GetBeam().SetEnergyDistribution(R3BDistribution1D::Delta(beam_energy));
-    gen->SetErelDistribution(R3BDistribution1D::Flat(0., rel_energy_max));
-    gen->AddParticle(Sn_atomic_number, Sn_mass);
-    gen->AddParticle(neutron_pdg);
-    gen->EnableWhitelist();
-    gen->EnableWrite();
-    gen->AddParticleToWhitelist(neutron_pdg);
-    auto primGen = std::make_unique<FairPrimaryGenerator>();
-    primGen->AddGenerator(gen.release());
-
-    // auto boxGen = std::make_unique<FairBoxGenerator>(PID, multi->value());
-    // boxGen->SetXYZ(0, 0, 0.);
-    // boxGen->SetThetaRange(0., 3.);
-    // boxGen->SetPhiRange(0., 360.);
-    // boxGen->SetEkinRange(pEnergy->value(), pEnergy->value());
-    // primGen->AddGenerator(boxGen.release());
     run->SetGenerator(primGen.release());
 
     // Geometry: Cave
@@ -101,8 +115,8 @@ auto main(int argc, const char** argv) -> int
     run->AddModule(cave.release());
 
     // Geometry: Neuland
-    auto const nDP = 13;
-    auto const neulandGeoTrans = TGeoTranslation{ 0., 0., 1650. };
+    // auto const nDP = 13;
+    auto const neulandGeoTrans = TGeoTranslation{ 0., 0., z_pos };
     auto neuland = std::make_unique<R3BNeuland>(nDP, neulandGeoTrans);
     run->AddModule(neuland.release());
 
@@ -117,7 +131,7 @@ auto main(int argc, const char** argv) -> int
 
     // Connect runtime parameter file
     auto parFileIO = std::make_unique<FairParRootFileIo>(true);
-    parFileIO->open(paraFileName().c_str());
+    parFileIO->open(para_file_name.c_str());
     auto* rtdb = run->GetRuntimeDb();
     rtdb->setOutput(parFileIO.release());
     rtdb->saveOutput();
@@ -129,5 +143,8 @@ auto main(int argc, const char** argv) -> int
     timer.Stop();
     std::cout << "Macro finished successfully." << std::endl;
     std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
+#ifdef HAS_MPI
+    MPI_Finalize();
+#endif
     return 0;
 }

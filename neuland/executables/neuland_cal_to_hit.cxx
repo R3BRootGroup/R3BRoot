@@ -19,7 +19,7 @@ constexpr int DEFAULT_EVENT_NUM = 0;
 constexpr auto NEULAND_GLOBAL_TIME_OFFSET_NS = -400.;
 
 using namespace std::string_literals;
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
 
     auto timer = TStopwatch{};

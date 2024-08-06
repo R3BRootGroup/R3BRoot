@@ -65,7 +65,7 @@ void add_parameter(FairParSet* par, FairRuntimeDb* rtdb)
     }
 }
 
-auto main(int argc, const char** argv) -> int
+auto main(int argc, char** argv) -> int
 {
     constexpr auto DEFAULT_RUN_ID = 999;
     auto programOptions = R3B::ProgramOptions("NeuLAND calibration base parameter generator");

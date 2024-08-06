@@ -83,15 +83,9 @@ namespace R3B
             command_string = fmt::format("{} --max-events={}", command_string, max_event_num_);
         }
         LOGP(info, "Calling ucesb with command: {}", command_string);
-<<<<<<< HEAD
         ucesb_server_launcher_ = std::make_unique<UcesbServerLauncher>(&ucesb_client_); //!
         ucesb_server_launcher_->SetLaunchCmd(command_string);
         ucesb_server_launcher_->Launch();
-=======
-
-        ucesb_server_launcher_.SetLaunchCmd(command_string);
-        ucesb_server_launcher_.Launch();
->>>>>>> 89b2964a (neuland calibration process reformat and millepde)
     }
 
     bool UcesbSource::InitUnpackers()

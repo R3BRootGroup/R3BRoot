@@ -1,5 +1,3 @@
-find_package(Eigen3)
-
 add_library(
     R3BMille SHARED
     Mille.cxx

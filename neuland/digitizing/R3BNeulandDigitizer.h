@@ -12,11 +12,11 @@
  ******************************************************************************/
 
 #pragma once
-
 #include "FairTask.h"
 #include "Filterable.h"
 #include "NeulandPointFilter.h"
 #include "R3BDataMonitor.h"
+#include "NeulandSimCalData.h"
 #include "R3BDigitizingEngine.h"
 #include "R3BDigitizingPaddleNeuland.h"
 #include "R3BDigitizingTacQuila.h"
@@ -27,6 +27,7 @@
 #include "R3BNeulandHitPar.h"
 #include "R3BNeulandPoint.h"
 #include "TCAConnector.h"
+#include <R3BIOConnector.h>
 #include <TClonesArray.h>
 #include <TH1.h>
 
@@ -45,6 +46,7 @@ class TH2F;
  *   Additional output: Some control histograms
  *
  */
+
 namespace Digitizing = R3B::Digitizing;
 
 class R3BNeulandDigitizer : public FairTask
@@ -75,16 +77,24 @@ class R3BNeulandDigitizer : public FairTask
     void Exec(Option_t* /*option*/) override;
     void SetEngine(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine);
     void AddFilter(const Filterable<R3BNeulandHit&>::Filter& filter) { neuland_hit_filters_.Add(filter); }
+    void AddFilterCal(const Filterable<R3B::Neuland::SimCalData&>::Filter& filter) { fCalHitFilters.Add(filter); }
     void SetNeulandPointFilter(R3B::Neuland::BitSetParticle particle);
     void SetNeulandPointFilter(R3B::Neuland::BitSetParticle particle, double minimum_allowed_energy_gev);
 
+    void EnableCalDataOutput(bool calc_cal) { is_cal_output_ = calc_cal; }
+    auto HasCalDataOutput() -> bool { return is_cal_output_; }
+
   private:
+    bool is_cal_output_ = false;
+
     R3B::InputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" };
     R3B::OutputVectorConnector<R3BNeulandHit> neuland_hits_{ "NeulandHits" };
+    R3B::OutputVectorConnector<R3B::Neuland::SimCalData> fCalHits{ "NeulandSimCal" };
 
     std::unique_ptr<Digitizing::DigitizingEngineInterface> digitizing_engine_; // owning
 
-    Filterable<R3BNeulandHit&> neuland_hit_filters_;
+    Filterable<R3BNeulandHit&> fHitFilters;
+    Filterable<R3B::Neuland::SimCalData&> fCalHitFilters;
 
     R3BNeulandGeoPar* neuland_geo_par_ = nullptr; // non-owning
     NeulandPointFilter neuland_point_filter_;
@@ -93,6 +103,8 @@ class R3BNeulandDigitizer : public FairTask
     TH1I* mult_one_ = nullptr;
     TH1I* mult_two_ = nullptr;
     TH1F* rl_time_to_trig_ = nullptr;
+
+    void fill_cal_data(const std::map<int, std::unique_ptr<R3B::Digitizing::Paddle>>& paddles);
 
   public:
     template <typename... Args>

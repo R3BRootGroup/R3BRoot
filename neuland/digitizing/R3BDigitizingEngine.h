@@ -28,6 +28,7 @@ namespace R3B::Digitizing
     class DigitizingEngineInterface
     {
       public:
+
         DigitizingEngineInterface() = default;
         // rule of 5
         virtual ~DigitizingEngineInterface() = default;
@@ -79,6 +80,7 @@ namespace R3B::Digitizing
         InitFunc initFunc_;
 
       public:
+
         DigitizingEngine(
             const UsePaddle<PaddleClass>& p_paddleClass,
             const UseChannel<ChannelClass>& p_channelClass,
@@ -95,8 +97,10 @@ namespace R3B::Digitizing
             if (paddles.find(paddle_id) == paddles.end())
             {
                 auto newPaddle = paddleClass_.BuildPaddle(paddle_id);
-                newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::left));
-                newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::right));
+
+                    newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::left));
+                    newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::right));
+
                 paddles[paddle_id] = std::move(newPaddle);
             }
             paddles.at(paddle_id)->DepositLight({ time, light, dist });

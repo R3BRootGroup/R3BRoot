@@ -67,7 +67,7 @@ namespace R3B
             return OptionHandle{ std::move(option) };
         }
 
-        auto verify(int argc, const char** argv) -> bool;
+        auto verify(int argc, char** argv) -> bool;
         void delete_option(const std::string& optionName) { registries_.erase(optionName); }
         auto get_posDescRef() -> auto& { return pos_desc_; }
         auto get_desc_ref() -> auto& { return desc_; }
