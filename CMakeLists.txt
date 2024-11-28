@@ -289,6 +289,8 @@ if(CONAN_ENABLED)
         CACHE BOOL "disable implicit conversion of JSON" FORCE)
 endif()
 
+include(${CMAKE_SOURCE_DIR}/cmake/modules/FetchAllContents.cmake)
+
 find_package2(PRIVATE GTest)
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
@@ -306,6 +308,7 @@ find_package2(PUBLIC Geant4VMC)
 find_package2(PUBLIC IWYU)
 
 find_package2(PUBLIC GSL)
+find_package2(PUBLIC nlohmann_json)
 
 find_package2(PUBLIC Git)
 set(Git_VERSION ${GIT_VERSION_STRING})

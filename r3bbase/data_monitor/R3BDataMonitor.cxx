@@ -32,6 +32,24 @@ namespace
 
 namespace R3B
 {
+    auto DataMonitor::get(const std::string& histName) -> TH1*
+    {
+        if (auto hist = histograms_.find(histName); hist != histograms_.end())
+        {
+            return hist->second.get();
+        }
+        throw R3B::logic_error(fmt::format("Histogram with the name {} doesn't exist!", histName));
+    }
+
+    auto DataMonitor::get_canvas(const std::string& histName) -> DataMonitorCanvas&
+    {
+        if (auto canvas = canvases_.find(histName); canvas != canvases_.end())
+        {
+            return canvas->second;
+        }
+        throw R3B::logic_error(fmt::format("Canvas with the name {} doesn't exist!", histName));
+    }
+
     void DataMonitor::save_to_sink(std::string_view folderName, FairSink* sinkFile)
     {
         auto* hist_dir = get_hist_dir(sinkFile);

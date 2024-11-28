@@ -86,28 +86,28 @@ namespace R3B::Neuland
     // _num starts at 1 and _id starts at 0
     // module number has the range of 1 ~ BarsPerPlane * NumOfPlanes
     // bar number has the range of 1 ~ BarsPerPlane
-    inline constexpr auto GetBarVerticalDisplacement(int module_num) -> double
+    constexpr auto GetBarVerticalDisplacement(int module_num) -> double
     {
         const auto bar_num = module_num % BarsPerPlane;
         return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
     }
-    inline constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
-    inline constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
-    inline constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
-    inline constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+    constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
+    constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
+    constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+    constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
     // planeNum, barNum and ModuleNum is 1-based
-    inline constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
+    constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
     {
         assert(planeNum > 0);
         return (planeNum - 1) * BarsPerPlane + barNum;
     }
     template <typename T = double>
-    inline constexpr auto PlaneID2ZPos(int plane_id) -> T
+    constexpr auto PlaneID2ZPos(int plane_id) -> T
     {
         return static_cast<T>((plane_id + 0.5) * BarSize_Z);
     }
     template <typename T = double>
-    inline constexpr auto ModuleNum2ZPos(int module_num) -> T
+    constexpr auto ModuleNum2ZPos(int module_num) -> T
     {
         return PlaneID2ZPos<T>(ModuleID2PlaneID(module_num - 1));
     }

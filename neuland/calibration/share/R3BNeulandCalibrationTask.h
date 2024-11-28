@@ -68,6 +68,8 @@ namespace R3B::Neuland
         std::vector<FairParSet*> output_pars_;
 
         CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
+        TH1I* hist_trig_check_ = nullptr;
+        TH1I* hist_condition_check_ = nullptr;
 
         // helpers:
         DataMonitor histograms_;

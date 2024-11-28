@@ -1,0 +1,106 @@
+#include "R3BCave.h"
+#include "R3BNeuland.h"
+#include "R3BNeulandSimApp.h"
+#include <FairRunSim.h>
+#include <G4RunManager.hh>
+#include <R3BFieldConst.h>
+#include <R3BNeulandAppOptionJson.h>
+#include <R3BNeulandGenerators.h>
+#include <TG4EventAction.h>
+#include <TRandom3.h>
+
+namespace R3B::Neuland
+{
+    SimulationApplication::SimulationApplication()
+        : Application{ "neuland_sim", std::make_unique<FairRunSim>(), std::ref(options_.general) }
+    {
+        options_.general.input.par.clear();
+        options_.general.input.data.clear();
+        options_.general.output.data = "sim.output.root";
+        options_.general.output.par = "sim.par.root";
+    }
+
+    void SimulationApplication::pre_init(FairRun* run)
+    {
+        auto* sim_run = dynamic_cast<FairRunSim*>(run);
+        setup_engine(sim_run);
+        setup_generator(sim_run);
+        setup_detectors(sim_run);
+    }
+
+    void SimulationApplication::post_init(FairRun* /*run*/)
+    {
+        const auto& options = options_.simulation;
+        auto* grun = G4RunManager::GetRunManager();
+        grun->SetPrintProgress(options.event_print_num);
+        auto* event =
+            dynamic_cast<TG4EventAction*>(const_cast<G4UserEventAction*>(grun->GetUserEventAction())); // NOLINT
+        event->VerboseLevel(0);
+    }
+
+    void SimulationApplication::setup_engine(FairRunSim* run)
+    {
+        const auto& options = options_;
+        run->SetName(options.simulation.engine.c_str());
+        run->SetRunId(options.general.run_id);
+        run->SetStoreTraj(options.simulation.store_trajectory);
+        run->SetMaterials(options.simulation.material_filename.c_str());
+        auto fairField = std::make_unique<R3BFieldConst>();
+        run->SetField(fairField.release());
+    }
+
+    void SimulationApplication::setup_generator(FairRunSim* run)
+    {
+        const auto& options = options_.simulation.generator;
+        random_gen_ = std::make_unique<TRandom3>(options.random_seed);
+        auto primary_generator = [this, &options]()
+        {
+            if (options.type == "muon")
+            {
+                return create_muon_generator(*random_gen_);
+            }
+            if (options.type == "box")
+            {
+                return create_box_generator(options.energy, options.multiplicity);
+            }
+            throw std::runtime_error(fmt::format("unrecognized generator type: {}!", options.type));
+        }();
+        run->SetGenerator(primary_generator.release());
+    }
+
+    void SimulationApplication::setup_detectors(FairRunSim* run) const
+    {
+        const auto& options = options_.detectors;
+
+        const auto& cave_options = options.cave;
+        if (cave_options.enable)
+        {
+            auto cave = std::make_unique<R3BCave>(cave_options.name.c_str());
+            cave->SetGeometryFileName(cave_options.geo_file.c_str());
+            run->AddModule(cave.release());
+        }
+
+        const auto& neuland_options = options.neuland;
+        if (neuland_options.enable)
+        {
+
+            const auto& location = neuland_options.location;
+            auto const neulandGeoTrans = TGeoTranslation{ location.x, location.y, location.z };
+            auto neuland = std::make_unique<R3BNeuland>(neuland_options.num_of_dp, neulandGeoTrans);
+            if (neuland_options.enable_auto_geo_build)
+            {
+                neuland->EnableAutoGeoBuild();
+            }
+            run->AddModule(neuland.release());
+        }
+    }
+
+    void SimulationApplication::print_json_options() { Application::print_json_options(options_); }
+
+    void SimulationApplication::dump_json_options(const std::string& filename)
+    {
+        Application::dump_json_options(options_, filename);
+    }
+
+    void SimulationApplication::run_action(FairRun* run, int num_of_events) { run->Run(num_of_events); }
+} // namespace R3B::Neuland

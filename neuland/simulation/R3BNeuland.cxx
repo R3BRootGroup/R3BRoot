@@ -18,7 +18,8 @@
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandPoint.h"
 #include <FairRootManager.h>
-#include <fmt/format.h>
+#include <FairVolume.h>
+#include <R3BLogger.h>
 
 // Initialize variables from Birk' s Law
 constexpr auto seconds_to_nanoseconds = 1e9;
@@ -60,7 +61,9 @@ R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoTranslation& trans, con
 }
 
 R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BNeuland", kNEULAND, geoFile, combi)
+    : FairDetector{ "R3BNeuland", true, kNEULAND }
+    , rot_trans_{ combi }
+    , geo_file_{ geoFile.Data() }
 {
 }
 
@@ -72,6 +75,7 @@ R3BNeuland::R3BNeuland(int nDP, const TGeoTranslation& trans, const TGeoRotation
 R3BNeuland::R3BNeuland(const int nDP, const TGeoCombiTrans& combi)
     : R3BNeuland(fmt::format("neuland_v3_{}dp.geo.root", nDP), combi)
 {
+    num_of_planes_ = 2 * nDP;
 }
 
 void R3BNeuland::Initialize()
@@ -80,75 +84,75 @@ void R3BNeuland::Initialize()
 
     FairDetector::Initialize();
 
-    WriteParameterFile();
-    ResetValues();
+    write_parameter_file();
+    reset_values();
 }
 
-Bool_t R3BNeuland::ProcessHits(FairVolume*)
+auto R3BNeuland::ProcessHits(FairVolume* /*v*/) -> bool
 {
     // New hit in detector
     if (gMC->IsTrackEntering())
     {
-        if (!fIsLastHitDone)
+        if (!is_last_hit_done_)
         {
             LOG(warn) << "R3BNeuland: Incomplete hit discarded";
             reset_values();
         }
 
-        fIsLastHitDone = kFALSE;
-        fEnergyLoss = 0.;
-        fLightYield = 0.;
-        fTime = gMC->TrackTime() * seconds_to_nanoseconds;
-        fLength = gMC->TrackLength();
-        gMC->TrackPosition(fPosIn);
-        gMC->TrackMomentum(fMomIn);
+        is_last_hit_done_ = kFALSE;
+        energy_loss_ = 0.;
+        light_yield_ = 0.;
+        time_ = gMC->TrackTime() * seconds_to_nanoseconds;
+        length_ = gMC->TrackLength();
+        gMC->TrackPosition(pos_in_);
+        gMC->TrackMomentum(mom_in_);
         gMC->CurrentVolOffID(1, fPaddleId);
 
-        fParticleId = gMC->TrackPid();
-        fTrackPidMap.emplace(gMC->GetStack()->GetCurrentTrackNumber(), gMC->TrackPid());
-        if (auto search = fTrackPidMap.find(gMC->GetStack()->GetCurrentParentTrackNumber());
-            search != fTrackPidMap.end())
+        particle_id_ = gMC->TrackPid();
+        track_pid_map_.emplace(gMC->GetStack()->GetCurrentTrackNumber(), gMC->TrackPid());
+        if (auto search = track_pid_map_.find(gMC->GetStack()->GetCurrentParentTrackNumber());
+            search != track_pid_map_.end())
         {
-            fParentParticleId = search->first;
+            parent_particle_id_ = search->first;
         }
     }
 
     // Sum energy loss for all steps in the active volume
-    fEnergyLoss += gMC->Edep();
-    fLightYield += GetLightYield(gMC->TrackCharge(), gMC->TrackStep(), gMC->Edep());
+    energy_loss_ += gMC->Edep();
+    light_yield_ += GetLightYield(gMC->TrackCharge(), gMC->TrackStep(), gMC->Edep());
 
     // Set additional parameters at exit of active volume. Create R3BNeulandPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         // Do not save a hit if no energy deposited
         constexpr auto minimum_energy_cutoff = 1e-20;
-        if (fEnergyLoss < minimum_energy_cutoff || fLightYield < minimum_energy_cutoff)
+        if (energy_loss_ < minimum_energy_cutoff || light_yield_ < minimum_energy_cutoff)
         {
             reset_values();
             return kTRUE;
         }
 
         fTrackId = gMC->GetStack()->GetCurrentTrackNumber();
-        gMC->TrackPosition(fPosOut);
-        gMC->TrackMomentum(fMomOut);
+        gMC->TrackPosition(pos_out_);
+        gMC->TrackMomentum(mom_out_);
 
         // Add Point
-        LOG(debug) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
-                   << ") cm,  paddle " << fPaddleId << ", track " << fTrackId << ", energy loss " << fEnergyLoss
+        LOG(debug) << "R3BNeuland: Adding Point at (" << pos_in_.X() << ", " << pos_in_.Y() << ", " << pos_in_.Z()
+                   << ") cm,  paddle " << fPaddleId << ", track " << fTrackId << ", energy loss " << energy_loss_
                    << " GeV " << gMC->GetStack()->GetCurrentParentTrackNumber();
         auto* neuland_point =
-            dynamic_cast<R3BNeulandPoint*>(TCAPointsBuffer->ConstructedAt(TCAPointsBuffer->GetEntriesFast()));
+            dynamic_cast<R3BNeulandPoint*>(tca_points_buffer_->ConstructedAt(tca_points_buffer_->GetEntriesFast()));
         neuland_point->SetTrackID(fTrackId);
         neuland_point->SetDetectorID(fPaddleId);
-        neuland_point->SetPosition(fPosIn.Vect());
-        neuland_point->SetMomentum(fMomIn.Vect());
-        neuland_point->SetTime(fTime);
-        neuland_point->SetLength(fLength);
-        neuland_point->SetEnergyLoss(fEnergyLoss);
+        neuland_point->SetPosition(pos_in_.Vect());
+        neuland_point->SetMomentum(mom_in_.Vect());
+        neuland_point->SetTime(time_);
+        neuland_point->SetLength(length_);
+        neuland_point->SetEnergyLoss(energy_loss_);
         neuland_point->SetEventID(gMC->CurrentEvent());
-        neuland_point->SetLightYield(fLightYield);
-        neuland_point->SetParticleId(fParticleId);
-        neuland_point->SetParentParticleId(fParentParticleId);
+        neuland_point->SetLightYield(light_yield_);
+        neuland_point->SetParticleId(particle_id_);
+        neuland_point->SetParentParticleId(parent_particle_id_);
         // fNeulandPoints.get().emplace_back(fTrackId,
         //                                   fPaddleId,
         //                                   fPosIn.Vect(),
@@ -172,15 +176,6 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
 
 auto R3BNeuland::CheckIfSensitive(std::string name) -> bool { return name == "volBC408"; }
 
-auto R3BNeuland::GetCollection(int iColl) const -> TClonesArray*
-{
-    if (iColl != 0)
-    {
-        return nullptr;
-    }
-    return TCAPointsBuffer.get();
-}
-
 void R3BNeuland::EndOfEvent()
 {
     if (fVerboseLevel != 0)
@@ -192,9 +187,9 @@ void R3BNeuland::EndOfEvent()
 
 void R3BNeuland::FinishEvent()
 {
-    auto& points = fNeulandPoints.get();
-    points.reserve(TCAPointsBuffer->GetEntriesFast());
-    for (auto* point : TRangeDynCast<R3BNeulandPoint>(TCAPointsBuffer.get()))
+    auto& points = neuland_points_.get();
+    points.reserve(tca_points_buffer_->GetEntriesFast());
+    for (auto* point : TRangeDynCast<R3BNeulandPoint>(tca_points_buffer_.get()))
     {
         points.push_back(*point);
     }
@@ -202,37 +197,40 @@ void R3BNeuland::FinishEvent()
 
 void R3BNeuland::Print(Option_t* /*unused*/) const
 {
-    LOG(info) << "R3BNeuland: " << fNeulandPoints.get_constref().size() << " Neuland Points registered in this event";
+    LOG(info) << "R3BNeuland: " << neuland_points_.get_constref().size() << " Neuland Points registered in this event";
 }
 
 void R3BNeuland::Reset()
 {
-    fNeulandPoints.clear();
-    TCAPointsBuffer->Clear();
+    neuland_points_.clear();
+    tca_points_buffer_->Clear();
     reset_values();
-    fTrackPidMap.clear();
+    track_pid_map_.clear();
 }
 
 void R3BNeuland::reset_values()
 {
-    fIsLastHitDone = kTRUE;
+    is_last_hit_done_ = kTRUE;
     fTrackId = 0;
     fPaddleId = -1;
-    fPosIn.Clear();
-    fPosOut.Clear();
-    fMomIn.Clear();
-    fMomOut.Clear();
-    fTime = fLength = fEnergyLoss = fLightYield = 0;
+    time_ = 0;
+    length_ = 0.;
+    energy_loss_ = 0.;
+    light_yield_ = 0.;
+    pos_in_.Clear();
+    pos_out_.Clear();
+    mom_in_.Clear();
+    mom_out_.Clear();
 }
 
 void R3BNeuland::write_parameter_file()
 {
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
-    fNeulandGeoPar = dynamic_cast<R3BNeulandGeoPar*>(rtdb->getContainer("R3BNeulandGeoPar"));
+    neuland_geo_par_ = dynamic_cast<R3BNeulandGeoPar*>(rtdb->getContainer("R3BNeulandGeoPar"));
 
     // Really bad way to find the Neuland *node* (not the volume!)
     TGeoNode* geoNodeNeuland = nullptr;
-    for (int i = 0; i < gGeoManager->GetTopNode()->GetNdaughters(); i++)
+    for (int i{}; i < gGeoManager->GetTopNode()->GetNdaughters(); i++)
     {
         if (TString(gGeoManager->GetTopNode()->GetDaughter(i)->GetVolume()->GetName()) == "volNeuland")
         {
@@ -246,18 +244,82 @@ void R3BNeuland::write_parameter_file()
         LOG(fatal) << "volNeuland not found";
     }
 
-    fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);
-    fNeulandGeoPar->setChanged();
+    neuland_geo_par_->SetNeulandGeoNode(geoNodeNeuland);
+    neuland_geo_par_->setChanged();
 }
 
-void R3BNeuland::Register()
+auto R3BNeuland::GetCollection(int iColl) const -> TClonesArray*
 {
-    LOG(info) << "R3BNeuland initialization ...";
+    if (iColl == 0)
+    {
+        return tca_points_buffer_.get();
+    }
+    return nullptr;
+}
 
-    fNeulandPoints.init();
+void R3BNeuland::Register() { neuland_points_.init(); }
 
-    write_parameter_file();
-    reset_values();
+void R3BNeuland::ConstructGeometry()
+{
+    if (is_geo_auto_built)
+    {
+        create_geo();
+    }
+    else
+    {
+        create_geo_from_root_file();
+    }
+}
+
+void R3BNeuland::create_geo()
+{
+
+    auto* geo_loader = FairGeoLoader::Instance();
+    if (geo_loader == nullptr)
+    {
+        geo_loader = std::make_unique<FairGeoLoader>("TGeo", "FairGeoLoader").release();
+    }
+    auto* neuland_geo = geo_creator_.construct_volume(num_of_planes_, geo_loader);
+    gGeoManager->AddVolume(neuland_geo);
+    if (auto* top_volume = gGeoManager->GetTopVolume(); top_volume != nullptr)
+    {
+        // Use copy_id 0 since only one neuland is needed
+        auto* neuland_node = top_volume->AddNode(neuland_geo, 0, rot_trans_.MakeClone());
+
+        // This will set each bar as a sensitive volume
+        ExpandNode(neuland_node);
+    }
+    else
+    {
+        throw R3B::runtime_error("Top volume from gGeoManager is nullptr!");
+    }
+}
+
+void R3BNeuland::create_geo_from_root_file()
+{
+    SetGeometryFileName(geo_file_.c_str());
+    if (!GetGeometryFileName().EndsWith(".root"))
+    {
+        R3BLOG(fatal, GetName() << " (which is a " << ClassName() << ") geometry file is not specified");
+    }
+    R3BLOG(info,
+           fmt::format("Constructing {} (which is a {}) geometry from ROOT file {} ...",
+                       GetName(),
+                       ClassName(),
+                       GetGeometryFileName().Data()));
+    ConstructRootGeometry();
+    if (not rot_trans_.IsIdentity())
+    {
+        if (auto* top_node = gGeoManager->GetTopNode(); top_node != nullptr)
+        {
+            auto* neuland_node = top_node->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
+            dynamic_cast<TGeoNodeMatrix*>(neuland_node)->SetMatrix(rot_trans_.MakeClone());
+        }
+        else
+        {
+            throw R3B::runtime_error("Top node from gGeoManager is nullptr!");
+        }
+    }
 }
 
 ClassImp(R3BNeuland);

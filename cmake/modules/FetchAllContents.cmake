@@ -7,3 +7,12 @@ if(FETCH_GTEST)
     )
     fetchcontent_makeavailable(googletest)
 endif()
+# fetch CLI11
+
+fetchcontent_declare(
+    cli11_proj
+    QUIET
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG v2.3.2)
+
+fetchcontent_makeavailable(cli11_proj)

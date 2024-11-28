@@ -73,12 +73,37 @@ namespace
     }
 
     template <typename UnaryFunc>
+    void loop_through_branch_elements(TFile* root_file, std::string_view tree_name, UnaryFunc&& action)
+    {
+        auto* tree = root_file->Get<TTree>(tree_name.data());
+        auto* branches = tree->GetListOfBranches();
+        R3BLOG(debug,
+               fmt::format("Get {} branches from the tree file {}", branches->GetEntries(), root_file->GetName()));
+        for (auto* branch_obj : TRangeDynCast<TObject>(branches))
+        {
+            auto* branch = dynamic_cast<TBranchElement*>(branch_obj);
+            if (branch == nullptr)
+            {
+                continue;
+            }
+            action(branch);
+        }
+    }
+
+    template <typename UnaryFunc>
     void loop_through_branches(TFile* root_file, std::string_view tree_name, UnaryFunc&& action)
     {
         auto* tree = root_file->Get<TTree>(tree_name.data());
         auto* branches = tree->GetListOfBranches();
-        for (auto* branch : TRangeDynCast<TBranchElement>(branches))
+        R3BLOG(debug,
+               fmt::format("Get {} branches from the tree file {}", branches->GetEntries(), root_file->GetName()));
+        for (auto* branch_obj : TRangeDynCast<TObject>(branches))
         {
+            auto* branch = dynamic_cast<TBranch*>(branch_obj);
+            if (branch == nullptr)
+            {
+                continue;
+            }
             action(branch);
         }
     }
@@ -87,9 +112,10 @@ namespace
     auto GetBranchListFromTree(TFile* root_file, std::string_view tree_name) -> std::vector<StringType>
     {
         auto branch_name_list = std::vector<StringType>{};
-        loop_through_branches(root_file,
-                              tree_name,
-                              [&branch_name_list](auto* branch) { branch_name_list.emplace_back(branch->GetName()); });
+        loop_through_branch_elements(root_file,
+                                     tree_name,
+                                     [&branch_name_list](auto* branch)
+                                     { branch_name_list.emplace_back(branch->GetName()); });
         return branch_name_list;
     }
 
@@ -112,19 +138,21 @@ namespace
 
     void add_branches_to_folder(TFolder* folder, TFile* root_file, std::string_view tree_name)
     {
-        loop_through_branches(root_file,
-                              tree_name,
-                              [folder](auto* branch)
-                              {
-                                  auto class_name = std::string_view{ branch->GetClassName() };
-                                  if (class_name == "TClonesArray")
-                                  {
-                                      const auto data_class = get_tca_data_class(branch);
-                                      auto tca_obj = std::make_unique<TClonesArray>(data_class.data());
-                                      tca_obj->SetName(branch->GetName());
-                                      folder->Add(tca_obj.release());
-                                  }
-                              });
+        loop_through_branch_elements(root_file,
+                                     tree_name,
+                                     [folder](auto* branch)
+                                     {
+                                         auto class_name = std::string_view{ branch->GetClassName() };
+                                         if (class_name == "TClonesArray")
+                                         {
+                                             const auto data_class = get_tca_data_class(branch);
+                                             auto tca_obj = std::make_unique<TClonesArray>(data_class.data());
+                                             tca_obj->SetName(branch->GetName());
+                                             folder->Add(tca_obj.release());
+                                         }
+                                     });
+
+        // TODO: what if it's branch with signle literal value?
     }
 
     auto HasBranchList(TFile* rootFile, const std::vector<std::string>& branchList) -> bool

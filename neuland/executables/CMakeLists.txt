@@ -1,21 +1,14 @@
-find_package(MPI)
-
-add_executable(neulandSim neulandSim.cxx)
-target_link_libraries(neulandSim PRIVATE R3BNeulandSimulation R3BGen ${Geant4_LIBRARIES}
-                                         ${Geant4VMC_LIBRARIES})
-
-if(MPI_FOUND)
-    target_link_libraries(neulandSim PRIVATE MPI::MPI_CXX)
-    target_compile_definitions(neulandSim PRIVATE HAS_MPI)
-endif()
-
-add_executable(neulandAna neulandAna.cxx)
-target_link_libraries(neulandAna PRIVATE R3BNeulandDigitizing)
-
-add_executable(neulandMuon neulandMuon.cxx)
-target_link_libraries(neulandMuon PRIVATE R3BNeulandDigitizing)
-
 if(CONAN_ENABLED)
+    find_package(MPI COMPONENTS C CXX)
+
+    add_executable(neuland neuland_cli.cxx)
+    target_link_libraries(neuland PRIVATE R3BNeulandApp CLI11::CLI11)
+
+    if(MPI_FOUND)
+        target_link_libraries(neuland PRIVATE MPI::MPI_CXX)
+        target_compile_definitions(neuland PRIVATE HAS_MPI)
+    endif()
+
     add_executable(neuland_lmd_to_map neuland_lmd_to_map.cxx)
     target_link_libraries(neuland_lmd_to_map PRIVATE R3BNeulandCalibration R3BSource -pthread)
 

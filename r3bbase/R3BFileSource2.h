@@ -115,6 +115,7 @@ class R3BFileSource2 : public FairFileSourceBase
     void AddFriend(std::vector<std::string> file_names, bool is_tree_file = false);
 
     [[nodiscard]] auto GetEventEnd() const { return event_end_; }
+    [[nodiscard]] auto IsEmpty() const -> bool { return inputDataFiles_.is_empty(); }
 
     // setters:
     void SetFileHeaderName(std::string_view fileHeaderName) { inputDataFiles_.SetFileHeaderName(fileHeaderName); }

@@ -41,7 +41,7 @@ namespace R3B::Neuland
             if (eventHeader_ = dynamic_cast<R3BEventHeader*>(rootMan->GetObject("EventHeader."));
                 eventHeader_ == nullptr)
             {
-                throw R3B::logic_error("R3BEventHeader is nullptr!");
+                throw R3B::logic_error("R3BEventHeader is required. But it's nullptr!");
             }
 
             check_input_par();
@@ -66,7 +66,8 @@ namespace R3B::Neuland
     void CalibrationTask::Exec(Option_t* /*option*/)
     {
         BeginOfEvent();
-        R3BLOG(debug, fmt::format("Event number: {}, tpat: {:016b}", eventHeader_->GetEventno(), eventHeader_->GetTpat()));
+        R3BLOG(debug,
+               fmt::format("Event number: {}, tpat: {:016b}", eventHeader_->GetEventno(), eventHeader_->GetTpat()));
         (is_hist_disabled_) ? execute_no_hist() : execute_with_hist();
     }
 
@@ -74,16 +75,16 @@ namespace R3B::Neuland
     {
         if (!check_trigger())
         {
-            histograms_.get("trig_check")->Fill(fmt::format("{:016b}", eventHeader_->GetTpat()).c_str(), 1);
+            hist_trig_check_->Fill(fmt::format("{:016b}", eventHeader_->GetTpat()).c_str(), 1);
             return;
         }
-        histograms_.get("trig_check")->Fill("triggered", 1);
+        hist_trig_check_->Fill("triggered", 1);
         if (!CheckConditions())
         {
-            histograms_.get("condition_check")->Fill("failure", 1);
+            hist_condition_check_->Fill("failure", 1);
             return;
         }
-        histograms_.get("condition_check")->Fill("success", 1);
+        hist_condition_check_->Fill("success", 1);
         passed_num_of_events++;
         TriggeredExec();
     }
@@ -133,8 +134,8 @@ namespace R3B::Neuland
 
     void CalibrationTask::init_histogram()
     {
-        histograms_.add_hist<TH1I>("trig_check", "check the triggered or passed events", 1, 0., 0.);
-        histograms_.add_hist<TH1I>("condition_check", "check the condition", 1, 0., 0.);
+        hist_trig_check_ = histograms_.add_hist<TH1I>("trig_check", "check the triggered or passed events", 1, 0., 0.);
+        hist_condition_check_ = histograms_.add_hist<TH1I>("condition_check", "check the condition", 1, 0., 0.);
         HistogramInit(histograms_);
     }
 

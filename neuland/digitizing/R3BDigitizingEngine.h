@@ -28,7 +28,6 @@ namespace R3B::Digitizing
     class DigitizingEngineInterface
     {
       public:
-
         DigitizingEngineInterface() = default;
         // rule of 5
         virtual ~DigitizingEngineInterface() = default;
@@ -44,27 +43,23 @@ namespace R3B::Digitizing
     };
 
     // factory classes for paddle and channel:
-    template <typename ChannelClass,
-              typename = typename std::enable_if<std::is_base_of<Channel, ChannelClass>::value>::type>
+    template <typename ChannelClass, typename = std::enable_if_t<std::is_base_of_v<Channel, ChannelClass>>>
     struct UseChannel
     {
         template <typename... Args>
-        explicit UseChannel(Args&&... args)
-            : BuildChannel([&](ChannelSide side)
-                           { return std::make_unique<ChannelClass>(side, std::forward<Args>(args)...); })
+        explicit UseChannel(const Args&... args)
+            : BuildChannel([=](ChannelSide side) { return std::make_unique<ChannelClass>(side, args...); })
         {
         }
         std::function<std::unique_ptr<ChannelClass>(ChannelSide)> BuildChannel;
     };
 
-    template <typename PaddleClass,
-              typename = typename std::enable_if<std::is_base_of<Paddle, PaddleClass>::value>::type>
+    template <typename PaddleClass, typename = std::enable_if_t<std::is_base_of_v<Paddle, PaddleClass>>>
     struct UsePaddle
     {
         template <typename... Args>
-        explicit UsePaddle(Args&&... args)
-            : BuildPaddle([&](int paddleID)
-                          { return std::make_unique<PaddleClass>(paddleID, std::forward<Args>(args)...); })
+        explicit UsePaddle(const Args&... args)
+            : BuildPaddle([=](int paddleID) { return std::make_unique<PaddleClass>(paddleID, args...); })
         {
         }
         std::function<std::unique_ptr<PaddleClass>(int)> BuildPaddle;
@@ -80,7 +75,6 @@ namespace R3B::Digitizing
         InitFunc initFunc_;
 
       public:
-
         DigitizingEngine(
             const UsePaddle<PaddleClass>& p_paddleClass,
             const UseChannel<ChannelClass>& p_channelClass,
@@ -98,8 +92,8 @@ namespace R3B::Digitizing
             {
                 auto newPaddle = paddleClass_.BuildPaddle(paddle_id);
 
-                    newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::left));
-                    newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::right));
+                newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::left));
+                newPaddle->SetChannel(channelClass_.BuildChannel(Digitizing::ChannelSide::right));
 
                 paddles[paddle_id] = std::move(newPaddle);
             }

@@ -20,7 +20,6 @@
 #include <FairRunAna.h>
 #include <R3BLogger.h>
 #include <algorithm>
-#include <iostream>
 
 namespace R3B::Digitizing::Neuland::Tamex
 {
@@ -54,25 +53,15 @@ namespace R3B::Digitizing::Neuland::Tamex
     const size_t TmxPeaksInitialCapacity = 10;
 
     Params::Params(TRandom3& rnd)
-        : fRnd{ &rnd }
+        : fRnd{ rnd }
     {
-    }
-
-    Params::Params(const Params& other)
-    {
-        if (other.fRnd == nullptr)
-        {
-            throw std::runtime_error(
-                "R3BDigitizingTamex: copy constructor of Params cannot take nullptr of random generator!");
-        }
-        *this = other;
     }
 
     PMTPeak::PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel& channel)
         : time_(pmtHit.time)
     {
-        auto par = channel.GetParConstRef();
-        // apply saturation coefficient
+        const auto& par = channel.GetParConstRef();
+        // apply saturation coefficent
         qdc_ = pmtHit.light / (1. + par.fSaturationCoefficient * pmtHit.light);
     };
 
@@ -143,14 +132,12 @@ namespace R3B::Digitizing::Neuland::Tamex
     void Channel::AttachToPaddle(Digitizing::Paddle* paddle)
     {
 
-        LOG(info) << "AttachToPaddle: used";
         if (paddle == nullptr)
         {
             return;
         }
         if (CheckPaddleIDInHitPar())
         {
-            LOG(info) << "set_par_with_hit_module_par: used";
             const auto& module_par = neuland_hit_par_->GetModuleParAt(paddle->GetPaddleID());
             set_par_with_hit_module_par(par_, module_par, GetSide());
         }
@@ -201,7 +188,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         auto peakTime = peak.GetLETime();
         auto qdc = ToQdc(peakQdc);
 
-        LOG(debug) << "qdc Signal " << qdc << " and tdc " << peakTime << std::endl;
+        LOG(debug) << "qdc Signal " << qdc << " and tdc " << peakTime << "\n";
 
         auto signal = Signal{};
         signal.qdcUnSat = ToUnSatQdc(qdc);
@@ -209,7 +196,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         signal.tdc = ToTdc(peakTime);
         signal.side = this->GetSide();
         LOG(debug) << "R3BDigitizingTamex: Create a signal with qdc " << signal.qdc << " and tdc " << signal.tdc
-                   << std::endl;
+                   << "\n";
         return signal;
     }
 
@@ -219,15 +206,14 @@ namespace R3B::Digitizing::Neuland::Tamex
         auto peakTime = peak.GetLETime();
         auto qdc = ToQdc(peakQdc);
 
-        LOG(debug) << "qdc Cal " << qdc << " and tdc " << peakTime << std::endl;
+        LOG(debug) << "qdc Cal " << qdc << " and tdc " << peakTime << "\n";
 
         auto signal = CalSignal{};
         signal.tot = CalculateTOT(qdc);
         signal.tle = peakTime;
         signal.side = this->GetSide();
         LOG(debug) << "R3BDigitizingTamex: Create a CalSignal with tot " << signal.tot << " and let " << signal.tle
-                   << std::endl
-                   << " qdc: " << qdc << std::endl;
+                   << "\n qdc: " << qdc << "\n";
         return signal;
     }
 
@@ -249,7 +235,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         //  }
 
         auto par = GetParConstRef();
-        return (qdc * par.fEnergyGain + par.fPedestal);
+        return ((qdc * par.fEnergyGain) + par.fPedestal);
     }
 
     template <typename Peak>
@@ -374,7 +360,6 @@ namespace R3B::Digitizing::Neuland::Tamex
 
     auto Channel::ConstructSignals() -> Signals
     {
-        LOG(info) << "  Channel::ConstructSignals: used" << std::endl;
         fqt_peaks_ = ConstructFQTPeaks(pmt_peaks_);
         // signal pileup:
         FQTPeakPileUp(fqt_peaks_);
@@ -431,11 +416,11 @@ namespace R3B::Digitizing::Neuland::Tamex
     auto Channel::ToQdc(double qdc) const -> double
     {
         // apply energy smearing
-        qdc = par_.fRnd->Gaus(qdc, par_.fEResRel * qdc);
+        qdc = par_.fRnd.get().Gaus(qdc, par_.fEResRel * qdc);
         return qdc;
     }
 
-    auto Channel::ToTdc(double time) const -> double { return time + par_.fRnd->Gaus(0., par_.fTimeRes); }
+    auto Channel::ToTdc(double time) const -> double { return time + par_.fRnd.get().Gaus(0., par_.fTimeRes); }
 
     auto Channel::ToUnSatQdc(double qdc) const -> double
     {
@@ -443,7 +428,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         if (par_.fExperimentalDataIsCorrectedForSaturation)
         {
             qdc = qdc / (1 - par_.fSaturationCoefficient * qdc);
-            LOG(info) << "ToUnSatQdc: fSaturationCoefficient = " << par_.fSaturationCoefficient << std::endl;
+            LOG(debug) << "ToUnSatQdc: fSaturationCoefficient = " << par_.fSaturationCoefficient << '\n';
         }
         // Apply reverse attenuation
         return qdc;

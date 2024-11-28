@@ -24,9 +24,7 @@
 #include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
 #include "TRandom3.h"
-#include "Validated.h"
 #include <R3BNeulandCalToHitPar.h>
-#include <optional>
 
 class R3BNeulandHitPar;
 class R3BNeulandHitModulePar;
@@ -49,7 +47,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         double fPileUpTimeWindow = 1000.; // ns
         double fPileUpDistance = 100.;    // ns
         double fQdcMin = 0.067;
-        TRandom3* fRnd = nullptr;
+        std::reference_wrapper<TRandom3> fRnd;
         // NOLINTEND
 
         explicit Params(TRandom3&);
@@ -59,10 +57,10 @@ namespace R3B::Digitizing::Neuland::Tamex
         auto operator=(const Params&) -> Params& = default;
         auto operator=(Params&&) -> Params& = delete;
         ~Params() = default;
-        Params(const Params& other);
+        Params(const Params& other) = default;
     };
 
-    enum class PeakPileUpStrategy
+    enum class PeakPileUpStrategy : uint8_t
     {
         width,
         distance,
@@ -176,7 +174,6 @@ namespace R3B::Digitizing::Neuland::Tamex
         // static R3BNeulandHitPar* neuland_hit_par;                 // NOLINT
         R3B::Neuland::Cal2HitPar* neuland_hit_par_ = nullptr;
         Tamex::Params par_;
-
 
         // private virtual functions
         auto ConstructSignals() -> Signals override;

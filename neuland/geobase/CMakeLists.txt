@@ -35,8 +35,14 @@ else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/neuland_30dp.geo.root")
 message(STATUS "${BYellow}NeuLAND standard root geometry with 30DP already created${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/neuland_30dp.geo.root")
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/geobase/create_neuland_geo.C)
-add_test(NAME NeulandRootGeometry COMMAND ${R3BROOT_BINARY_DIR}/neuland/geobase/create_neuland_geo.sh)
-set_tests_properties(NeulandRootGeometry PROPERTIES TIMEOUT "2000")
-set_tests_properties(NeulandRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
-                                                  "Macro finished successfully.")
+    generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/geobase/create_neuland_geo.C)
+    add_test(NAME NeulandRootGeometry
+             COMMAND ${R3BROOT_BINARY_DIR}/neuland/geobase/create_neuland_geo.sh)
+    set_tests_properties(NeulandRootGeometry PROPERTIES TIMEOUT "2000")
+    set_tests_properties(NeulandRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
+                                                        "Macro finished successfully.")
+endif()
+
+add_library(R3BNeulandGeoBase SHARED R3BNeulandGeoCreator.cxx)
+target_include_directories(R3BNeulandGeoBase PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(R3BNeulandGeoBase PUBLIC R3BNeulandShared)

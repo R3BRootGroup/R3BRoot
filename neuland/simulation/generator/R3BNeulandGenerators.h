@@ -7,19 +7,20 @@
 #include "R3BNeulandCommon.h"
 #include <TRandom3.h>
 
-inline constexpr auto z_pos = 0.;
-inline constexpr auto nDP = 13;
-inline constexpr auto PID = 2112;
+// NOTE: what's the purpose of this file? Just function definitions?
 
 inline auto create_muon_generator(TRandom3& random_gen)
 {
+    constexpr auto num_DP = 13;
+    constexpr auto PID = 2112;
+    constexpr auto z_pos = 0.;
     auto detector_box_size = ::R3B::Neuland::DetectorBoxSize{};
     detector_box_size.xmin = -R3B::Neuland::BarLength / 2;
     detector_box_size.xmax = R3B::Neuland::BarLength / 2;
     detector_box_size.ymin = -R3B::Neuland::BarLength / 2;
     detector_box_size.ymax = R3B::Neuland::BarLength / 2;
-    detector_box_size.zmin = z_pos - (R3B::Neuland::BarSize_Z * nDP);
-    detector_box_size.zmax = z_pos + (R3B::Neuland::BarSize_Z * nDP);
+    detector_box_size.zmin = z_pos - (R3B::Neuland::BarSize_Z * num_DP);
+    detector_box_size.zmax = z_pos + (R3B::Neuland::BarSize_Z * num_DP);
     // detector_box_size.xmin = -R3B::Neuland::BarLength / 2;
     // detector_box_size.xmax = R3B::Neuland::BarLength / 2;
     // detector_box_size.ymin = -R3B::Neuland::BarLength / 2;
@@ -51,6 +52,7 @@ inline auto create_muon_generator(TRandom3& random_gen)
 inline auto create_box_generator(double energy, int multi)
 {
     // Primary particle generator
+    constexpr auto PID = 2112;
     auto boxGen = std::make_unique<FairBoxGenerator>(PID, multi);
     boxGen->SetXYZ(0, 0, 0.);
     boxGen->SetThetaRange(0., 3.);

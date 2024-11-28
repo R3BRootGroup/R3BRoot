@@ -78,13 +78,13 @@ auto R3BNeulandDigitizer::Init() -> InitStatus
     neuland_hits_.init();
     // Initialize control histograms
     auto const PaddleMulSize = 3000;
-    mult_one_ = data_monitor_.add_hist<TH1I>(
+    hist_multi_one_ = data_monitor_.add_hist<TH1I>(
         "MultiplicityOne", "Paddle multiplicity: only one PMT per paddle", PaddleMulSize, 0, PaddleMulSize);
 
-    mult_two_ = data_monitor_.add_hist<TH1I>(
+    hist_multi_two_ = data_monitor_.add_hist<TH1I>(
         "MultiplicityTwo", "Paddle multiplicity: both PMTs of a paddle", PaddleMulSize, 0, PaddleMulSize);
     auto const timeBinSize = 200;
-    rl_time_to_trig_ = data_monitor_.add_hist<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
+    hist_rl_time_to_trig_ = data_monitor_.add_hist<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
 
     return kSUCCESS;
 }
@@ -128,17 +128,17 @@ void R3BNeulandDigitizer::Exec(Option_t* /*option*/)
     const auto paddles = digitizing_engine_->ExtractPaddles();
 
     // Fill control histograms
-    mult_one_->Fill(static_cast<int>(std::count_if(
+    hist_multi_one_->Fill(static_cast<int>(std::count_if(
         paddles.begin(), paddles.end(), [](const auto& keyValue) { return keyValue.second->HasHalfFired(); })));
 
-    mult_two_->Fill(static_cast<int>(std::count_if(
+    hist_multi_two_->Fill(static_cast<int>(std::count_if(
         paddles.begin(), paddles.end(), [](const auto& keyValue) { return keyValue.second->HasFired(); })));
 
-    rl_time_to_trig_->Fill(triggerTime);
+    hist_rl_time_to_trig_->Fill(triggerTime);
 
     // Create Hits
-    fHits.clear();
-    auto& hits = fHits.get();
+    neuland_hits_.clear();
+    auto& hits = neuland_hits_.get();
     for (const auto& [paddleID, paddle] : paddles)
     {
         if (!paddle->HasFired())
@@ -164,73 +164,73 @@ void R3BNeulandDigitizer::Exec(Option_t* /*option*/)
                               hitPositionGlobal,
                               hitPixel);
 
-            if (neuland_hit_filters_.IsValid(hit))
+            if (hit_filters_.IsValid(hit))
             {
                 neuland_hits_.get().emplace_back(std::move(hit));
                 LOG(debug) << "Adding neuland hit with id = " << paddleID << ", time = " << signal.time
                            << ", energy = " << signal.energy;
                 LOG(debug) << "Adding neuland hit with id = " << paddleID
-                           << ", tot_l = " << signal.leftChannel->qdcUnSat * 15 + 14
-                           << ", tot_r = " << signal.rightChannel->qdcUnSat * 15 + 14;
+                           << ", tot_l = " << (signal.leftChannel->qdcUnSat * 15) + 14
+                           << ", tot_r = " << (signal.rightChannel->qdcUnSat * 15) + 14;
             }
         } // loop over all hits for each paddle
     }     // loop over paddles
 
-        if (is_cal_output_)
+    if (is_cal_output_)
+    {
+        fill_cal_data(paddles);
+    }
+    LOG(debug) << "R3BNeulandDigitizer: produced " << hits.size() << " hits";
+}
+
+void R3BNeulandDigitizer::fill_cal_data(const std::map<int, std::unique_ptr<R3B::Digitizing::Paddle>>& paddles)
+{
+    fCalHits.clear();
+    auto& cal_hits = fCalHits.get();
+    for (const auto& [paddleID, paddle] : paddles)
+    {
+        if (!paddle->HasFired())
         {
-            fill_cal_data(paddles);
+            continue;
         }
-        LOG(debug) << "R3BNeulandDigitizer: produced " << hits.size() << " hits";
-    }
 
-    void R3BNeulandDigitizer::fill_cal_data(const std::map<int, std::unique_ptr<R3B::Digitizing::Paddle>>& paddles)
-    {
-        fCalHits.clear();
-        auto& cal_hits = fCalHits.get();
-        for (const auto& [paddleID, paddle] : paddles)
+        auto& left_channel = paddle->GetLeftChannelRef();
+        auto& right_channel = paddle->GetRightChannelRef();
+
+        auto left_channel_signals = left_channel.GetCalSignals();
+        auto right_channel_signals = right_channel.GetCalSignals();
+
+        // LOG(error)<< " Sum pmt_peak_: "<<
+        // std::accumulate(right_channel.pmt_peaks_.begin(),right_channel.pmt_peaks_.end(),0)<<std::endl;
+        for (const auto& [left, right] : ranges::zip_view(left_channel_signals, right_channel_signals))
         {
-            if (!paddle->HasFired())
+
+            auto cal_data = R3B::Neuland::SimCalData{ paddleID, left.tot, right.tot, left.tle, right.tle };
+
+            if (fCalHitFilters.IsValid(cal_data))
             {
-                continue;
+                cal_hits.push_back(std::move(cal_data));
+                LOG(debug) << "Adding cal with id = " << paddleID << " left tot " << left.tot << " right tot "
+                           << right.tot << '\n';
             }
+        } // loop over all hits for each paddle
+    }     // loop over paddles
 
-            auto& left_channel = paddle->GetLeftChannelRef();
-            auto& right_channel = paddle->GetRightChannelRef();
+    LOG(debug) << "R3BNeulandDigitizerCalData: produced " << cal_hits.size() << " hits";
+}
 
-            auto left_channel_signals = left_channel.GetCalSignals();
-            auto right_channel_signals = right_channel.GetCalSignals();
+void R3BNeulandDigitizer::Finish()
+{
+    TDirectory* tmp = gDirectory;
+    FairRootManager::Instance()->GetOutFile()->cd();
 
-            // LOG(error)<< " Sum pmt_peak_: "<<
-            // std::accumulate(right_channel.pmt_peaks_.begin(),right_channel.pmt_peaks_.end(),0)<<std::endl;
-            for (const auto& [left, right] : ranges::zip_view(left_channel_signals, right_channel_signals))
-            {
+    gDirectory->mkdir("R3BNeulandDigitizer");
+    gDirectory->cd("R3BNeulandDigitizer");
 
-                auto cal_data = R3B::Neuland::SimCalData{ paddleID, left.tot, right.tot, left.tle, right.tle };
+    hist_multi_one_->Write();
+    hist_multi_two_->Write();
 
-                if (fCalHitFilters.IsValid(cal_data))
-                {
-                    cal_hits.push_back(std::move(cal_data));
-                    LOG(debug) << "Adding cal with id = " << paddleID << " left tot " << left.tot << " right tot "
-                               << right.tot << std::endl;
-                }
-            } // loop over all hits for each paddle
-        }     // loop over paddles
-
-        LOG(debug) << "R3BNeulandDigitizerCalData: produced " << cal_hits.size() << " hits";
-    }
-
-    void R3BNeulandDigitizer::Finish()
-    {
-        TDirectory* tmp = gDirectory;
-        FairRootManager::Instance()->GetOutFile()->cd();
-
-        gDirectory->mkdir("R3BNeulandDigitizer");
-        gDirectory->cd("R3BNeulandDigitizer");
-
-        hMultOne->Write();
-        hMultTwo->Write();
-
-        gDirectory = tmp;
+    gDirectory = tmp;
 }
 
 ClassImp(R3BNeulandDigitizer); // NOLINT

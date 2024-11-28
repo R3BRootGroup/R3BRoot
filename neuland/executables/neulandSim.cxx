@@ -3,9 +3,9 @@
 #include "FairParRootFileIo.h"
 #include "FairRootFileSink.h"
 #include "FairRunSim.h"
-#include "Generators.h"
 #include "R3BCave.h"
 #include "R3BNeuland.h"
+#include "R3BNeulandGenerators.h"
 #include "TStopwatch.h"
 #include <G4RunManager.hh>
 #include <G4UserEventAction.hh>
@@ -42,6 +42,7 @@ auto main(int argc, char** argv) -> int
     auto programOptions = R3B::ProgramOptions("options for neuland simulation");
 
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
+    auto use_mpi = programOptions.create_option<bool>("mpi", "Enable mpi", false);
     auto eventNum = programOptions.create_option<int>("eventNum", "set total event number", defaultEventNum);
     auto eventPrintNum = programOptions.create_option<int>("eventPrint", "set event print number", 1);
     auto runID = programOptions.create_option<int>("runID", "set runID", DEFAULT_RUNID);
@@ -61,17 +62,23 @@ auto main(int argc, char** argv) -> int
 
     if (help())
     {
-        std::cout << programOptions.get_desc_ref() << std::endl;
+        std::cout << programOptions.get_desc_ref() << "\n";
         return 0;
     }
 
     auto simu_file_name = simuFileName.value();
     auto para_file_name = paraFileName.value();
 
+    if (use_mpi.value())
+    {
 #ifdef HAS_MPI
-    simu_file_name = fmt::format("{}.{}", simu_file_name, num_rank);
-    para_file_name = fmt::format("{}.{}", para_file_name, num_rank);
+        simu_file_name = fmt::format("{}.{}", simu_file_name, num_rank);
+        para_file_name = fmt::format("{}.{}", para_file_name, num_rank);
+#else
+        R3BLOG(error, "R3BRoot is not compiled with MPI libraries! Cannot run the program with MPI.");
+        return EXIT_FAILURE;
 #endif
+    }
 
     // Logging
     // FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
@@ -115,9 +122,11 @@ auto main(int argc, char** argv) -> int
     run->AddModule(cave.release());
 
     // Geometry: Neuland
-    // auto const nDP = 13;
-    auto const neulandGeoTrans = TGeoTranslation{ 0., 0., z_pos };
-    auto neuland = std::make_unique<R3BNeuland>(nDP, neulandGeoTrans);
+    auto const num_DP = 10;
+    constexpr auto default_z_pos = 1650.;
+    auto const neulandGeoTrans = TGeoTranslation{ 0., 0., default_z_pos };
+    auto neuland = std::make_unique<R3BNeuland>(num_DP, neulandGeoTrans);
+    neuland->EnableAutoGeoBuild();
     run->AddModule(neuland.release());
 
     // Init
@@ -141,10 +150,16 @@ auto main(int argc, char** argv) -> int
 
     // Report
     timer.Stop();
-    std::cout << "Macro finished successfully." << std::endl;
-    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
+    std::cout << "Macro finished successfully."
+              << "\n";
+    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s"
+              << "\n";
+
+    if (use_mpi.value())
+    {
 #ifdef HAS_MPI
-    MPI_Finalize();
+        MPI_Finalize();
 #endif
+    }
     return 0;
 }

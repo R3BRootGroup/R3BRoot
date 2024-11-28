@@ -1,0 +1,8 @@
+BootStrap: docker
+From: yanzhaowang/r3bdev:r3broot
+
+%environment
+	source /root/R3BRoot/build/config.sh
+
+%runscript
+	neuland $@

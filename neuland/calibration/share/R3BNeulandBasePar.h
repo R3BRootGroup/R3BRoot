@@ -37,6 +37,10 @@ namespace R3B::Neuland
         friend void to_json(nlohmann::json& jsn, const CalibrationBasePar& par);
         friend void from_json(const nlohmann::json& jsn, CalibrationBasePar& par);
 
+        // setters:
+        void set_num_of_planes(int num_of_plane) { num_of_planes_ = num_of_plane; }
+        void set_exp_ids(const std::string& exp_ids) { exp_ids_ = exp_ids; }
+
       private:
         std::string exp_ids_;
         int offspill_tpat_pos_ = 0;

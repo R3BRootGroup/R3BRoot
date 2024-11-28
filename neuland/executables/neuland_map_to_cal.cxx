@@ -35,7 +35,7 @@
 #include <iostream>
 
 namespace fs = std::filesystem;
-constexpr int DEFAULT_EVENT_NUM = 10;
+constexpr int DEFAULT_EVENT_NUM = -1;
 constexpr int DEFAULT_RUN_ID = 999;
 constexpr int DEFAULT_MIN_STAT = 20;
 
@@ -56,6 +56,10 @@ auto main(int argc, char** argv) -> int
     auto min_stat =
         programOptions.create_option<int>("min-stat,m", "set minimun statistics for calibration", DEFAULT_MIN_STAT);
     auto run_num = programOptions.create_option<int>("runNum,r", "set the number of runs", 1);
+    // Paula: additional flag
+
+    auto disable_task = programOptions.create_option<bool>("no-map2cal", "disable MapToCal task", false);
+
 
     if (!programOptions.verify(argc, argv))
     {
@@ -96,12 +100,15 @@ auto main(int argc, char** argv) -> int
         run->SetSink(sink.release());
 
         // Add analysis task --------------------------------------------------------
-        auto runIdTask = std::make_unique<R3BEventHeaderPropagator>();
-        run->AddTask(runIdTask.release());
 
-        auto map2Cal = std::make_unique<R3B::Neuland::Map2CalTask>();
-        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
-        run->AddTask(map2Cal.release());
+        if (not disable_task.value())
+        {
+            auto runIdTask = std::make_unique<R3BEventHeaderPropagator>();
+            run->AddTask(runIdTask.release());
+            auto map2Cal = std::make_unique<R3B::Neuland::Map2CalTask>();
+            map2Cal->SetTrigger(R3B::Neuland::CalTrigger::all);
+            run->AddTask(map2Cal.release());
+        }
 
         auto cal2hit_method =
             (enable_mille.value()) ? R3B::Neuland::Cal2HitParMethod::Millipede : R3B::Neuland::Cal2HitParMethod::LSQT;
@@ -124,13 +131,13 @@ auto main(int argc, char** argv) -> int
 
         run->Init();
 
-        const auto error_scales = std::array{ 10.F };
-        for (const auto error_scale : error_scales)
-        {
-            cal2hitParTaskPtr->SetErrorScale(error_scale);
-            fmt::print("\nStarting run with error_scale {} ...\n\n", error_scale);
-            run->Run(0, event_num.value() <= 0 ? 0 : event_num.value());
-        }
+        // const auto error_scales = std::array{ 10.F };
+        // for (const auto error_scale : error_scales)
+        // {
+        //     cal2hitParTaskPtr->SetErrorScale(error_scale);
+        //     fmt::print("\nStarting run with error_scale {} ...\n\n", error_scale);
+        run->Run(0, event_num.value() <= 0 ? 0 : event_num.value());
+        // }
 
         timer.Stop();
         std::cout << "Cal level data written to file " << outputfile_path << "\n";
@@ -167,6 +174,7 @@ auto main(int argc, char** argv) -> int
     {
         sinkfile->Close();
     }
+    run->GetRuntimeDb()->writeContainers();
 
     return 0;
 }

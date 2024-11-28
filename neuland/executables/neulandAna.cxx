@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairFileSource.h"
 #include "FairParRootFileIo.h"
 #include "FairRootFileSink.h"
 #include "FairRunAna.h"
@@ -22,13 +21,19 @@
 #include "R3BDigitizingPaddleNeuland.h"
 #include "R3BDigitizingTacQuila.h"
 #include "R3BDigitizingTamex.h"
+#include "R3BEventHeader.h"
 #include "R3BFileSource2.h"
 #include "R3BNeulandDigitizer.h"
 #include "R3BNeulandHitMon.h"
 #include "R3BProgramOptions.h"
 #include "TStopwatch.h"
+#include <R3BNeulandSimCalToCal.h>
 #include <TObjString.h>
 #include <boost/program_options.hpp>
+#include <gsl/span>
+#ifdef HAS_MPI
+#include <mpi.h>
+#endif
 
 namespace Digitizing = R3B::Digitizing;
 using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
@@ -39,13 +44,35 @@ using MockChannel = Digitizing::Neuland::MockChannel;
 using Digitizing::UseChannel;
 using Digitizing::UsePaddle;
 
-// auto GetHitPar(const std::string& parName)
-// {
-//     return []() { Digitizing::Neuland::Tamex::Channel::GetHitPar("test"); };
-// }
+using gsl::span;
+
+namespace
+{
+    template <typename T>
+    auto get_partition_from(const std::vector<T>& elements, int num_of_partitions, int partition_num) -> span<const T>
+    {
+        const auto total_size = elements.size();
+        const auto step =
+            static_cast<int>(std::ceil(static_cast<float>(total_size) / static_cast<float>(num_of_partitions)));
+        if (step * partition_num >= total_size)
+        {
+            return {};
+        }
+        const auto span_size = step * (partition_num + 1) < total_size ? step : total_size - step * partition_num;
+        return span<const T>{ &(elements.at(step * partition_num)), span_size };
+    }
+} // namespace
 
 auto main(int argc, char** argv) -> int
 {
+#ifdef HAS_MPI
+    MPI_Init(&argc, &argv);
+    auto num_proc = 0;
+    auto num_rank = 0;
+    MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
+    MPI_Comm_rank(MPI_COMM_WORLD, &num_rank);
+#endif
+
     auto timer = TStopwatch{};
     timer.Start();
 
@@ -53,6 +80,7 @@ auto main(int argc, char** argv) -> int
     auto help = programOptions.create_option<bool>("help,h", "help message", false);
     auto paddleName =
         programOptions.create_option<std::string>("paddle", R"(set the paddle name. e.g. "neuland")", "neuland");
+    auto use_mpi = programOptions.create_option<bool>("mpi", "Enable mpi", false);
     auto channelName =
         programOptions.create_option<std::string>("channel", R"(set the channel name. e.g. "tamex")", "tamex");
     auto simuFileName =
@@ -63,6 +91,8 @@ auto main(int argc, char** argv) -> int
         programOptions.create_option<std::string>("paraFile", "set the filename of parameter sink", "para.root");
     auto paraFileName2 =
         programOptions.create_option<std::string>("paraFile2", "set the filename of the second parameter sink", "");
+    auto par_output =
+        programOptions.create_option<std::string>("par-out", "set the filename of the output parameter", "");
     auto digiFileName =
         programOptions.create_option<std::string>("digiFile", "set the filename of digitization output", "digi.root");
     auto logLevel = programOptions.create_option<std::string>("logLevel,v", "set log level of fairlog", "error");
@@ -73,6 +103,8 @@ auto main(int argc, char** argv) -> int
 
     // Paula:digi option for Caldata
     auto calData = programOptions.create_option<bool>("calData", "Doing CalData calculations", true);
+    auto calDataOutput =
+        programOptions.create_option<bool>("calDataOutput", "Output CalData2 instead of SimCalData", false);
 
     auto customPara = programOptions.create_option<bool>("customPar", "Custom parameter for CalDataAnalysis", false);
     if (!programOptions.verify(argc, argv))
@@ -82,9 +114,25 @@ auto main(int argc, char** argv) -> int
 
     if (help())
     {
-        std::cout << programOptions.get_desc_ref() << std::endl;
+        std::cout << programOptions.get_desc_ref() << "\n";
         return 0;
     }
+
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
+
+    auto all_filenames = R3B::GetFilesFromRegex(simuFileName());
+    auto filenames = span<const std::string>{};
+    auto digi_output_filename = digiFileName.value();
+    auto par_output_filename = par_output.value();
+
+    if (use_mpi.value())
+    {
+        if (not hitLevelPar.value().empty())
+        {
+            FairRuntimeDb::instance()->getContainer(hitLevelPar.value().c_str());
+            Digitizing::Neuland::Tamex::Channel::GetHitPar(hitLevelPar.value());
+        }
+    };
 
     //=============================================================================
     // settings:
@@ -93,31 +141,37 @@ auto main(int argc, char** argv) -> int
     tamexParameter.fPMTThresh = 1.;
     tamexParameter.fTimeMin = 1.;
 
-    // const auto neulandEngines = std::map<std::pair<const std::string, const std::string>,
-    //                                      std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
-    //     { { "neuland", "tamex" },
-    //       [&]()
-    //       {
-    //           return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
-    //                                           UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
-    //       } },
-    //     { { "neuland", "tacquila" },
-    //       []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
-    //     { { "mock", "tamex" },
-    //       [&]()
-    //       {
-    //           return Digitizing::CreateEngine(UsePaddle<MockPaddle>(),
-    //                                           UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
-    //       } },
-    //     { { "neuland", "mock" },
-    //       []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
-    //     { { "mock", "mock" },
-    //       []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
-    // };
-    // //=============================================================================
-    FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
+    const auto neulandEngines = std::map<std::pair<const std::string, const std::string>,
+                                         std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
+        { { "neuland", "tamex" },
+          [&customPara, &pileup_strategy, &tamexParameter, hit_par_ptr]()
+          {
+              if (customPara.value())
+              {
+                  return Digitizing::CreateEngine(
+                      UsePaddle<NeulandPaddle>(hit_par_ptr),
+                      UseChannel<TamexChannel>(pileup_strategy, tamexParameter, hit_par_ptr));
+              }
 
-    auto filenames = R3B::GetFilesFromRegex(simuFileName());
+              return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
+                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
+          } },
+        { { "neuland", "tacquila" },
+          []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
+        { { "mock", "tamex" },
+          [&]()
+          {
+              return Digitizing::CreateEngine(UsePaddle<MockPaddle>(),
+                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
+          } },
+        { { "neuland", "mock" },
+          []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
+        { { "mock", "mock" },
+          []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
+    };
+    //=============================================================================
+
+    FairLogger::GetLogger()->SetLogScreenLevel(logLevel.value().c_str());
 
     auto run = std::make_unique<FairRunAna>();
     auto fairroot_input_files = R3B::GetFilesFromRegex(simuFileName->value());
@@ -137,60 +191,31 @@ auto main(int argc, char** argv) -> int
     run->SetSink(filesink.release());
 
     auto fileio = std::make_unique<FairParRootFileIo>();
-    fileio->open(paraFileName().c_str());
+    fileio->open(paraFileName.value().c_str());
     run->GetRuntimeDb()->setFirstInput(fileio.release());
 
-    if (const auto& filename = paraFileName2(); not filename.empty())
+    auto parFileIO = std::make_unique<FairParRootFileIo>(true);
+    parFileIO->open("test.para");
+    auto* rtdb = run->GetRuntimeDb();
+    rtdb->setOutput(parFileIO.release());
+
+    if (const auto& filename = paraFileName2.value(); not filename.empty())
     {
         auto fileio2 = std::make_unique<FairParRootFileIo>();
-        fileio2->open(paraFileName2().c_str());
+        fileio2->open(paraFileName2.value().c_str());
         run->GetRuntimeDb()->setSecondInput(fileio2.release());
     }
 
-    // Paula: if statement/flag for second custon paras to be added
-    auto hit_par = std::make_unique<R3B::Neuland::Cal2HitPar>();
-
-    auto* hit_par_ptr = hit_par.get();
-
-    run->GetRuntimeDb()->addContainer(hit_par.release());
-
-    LOG(info) << "before neulandEngines" << std::endl;
-
-    const auto neulandEngines = std::map<std::pair<const std::string, const std::string>,
-                                         std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
-        { { "neuland", "tamex" },
-          [&customPara, &pileup_strategy, &tamexParameter, hit_par_ptr]()
-          {
-              if (customPara.value())
-              {
-                  LOG(info) << "using Custom Params" << std::endl;
-                  return Digitizing::CreateEngine(
-                      UsePaddle<NeulandPaddle>(hit_par_ptr),
-                      UseChannel<TamexChannel>(pileup_strategy, tamexParameter, hit_par_ptr));
-              }
-
-              LOG(info) << "not using Custom Params" << std::endl;
-              return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
-                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
-          } },
-        { { "neuland", "tacquila" },
-          []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
-        { { "mock", "tamex" },
-          [&]()
-          {
-              return Digitizing::CreateEngine(UsePaddle<MockPaddle>(),
-                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter));
-          } },
-        { { "neuland", "mock" },
-          []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
-        { { "mock", "mock" },
-          []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
-    };
-
     auto digiNeuland = std::make_unique<R3BNeulandDigitizer>();
-    digiNeuland->EnableCalDataOutput(calData.value());
-    digiNeuland->SetEngine((neulandEngines.at({ paddleName(), channelName() }))());
+    digiNeuland->SetEngine((neulandEngines.at({ paddleName.value(), channelName.value() }))());
     run->AddTask(digiNeuland.release());
+
+    if (calDataOutput.value())
+    {
+        auto cal_data_converter = std::make_unique<R3B::Neuland::SimCal2Cal>();
+        run->AddTask(cal_data_converter.release());
+    }
+
     auto hitmon = std::make_unique<R3BNeulandHitMon>();
     run->AddTask(hitmon.release());
 
@@ -200,6 +225,14 @@ auto main(int argc, char** argv) -> int
     timer.Stop();
     auto* sink = run->GetSink();
     sink->Close();
-    std::cout << "Macro finished successfully." << std::endl;
-    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
+    rtdb->writeContainers();
+    std::cout << "Macro finished successfully.\n";
+    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s\n";
+    if (use_mpi.value())
+    {
+#ifdef HAS_MPI
+        MPI_Finalize();
+#endif
+    }
+    return 0;
 }

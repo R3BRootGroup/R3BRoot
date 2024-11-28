@@ -307,6 +307,7 @@ namespace R3B::Neuland // NOLINT
                                       const Double_t energy,
                                       const UInt_t eventNumber)
         {
+
             // If we have already a gain calibration, we can log the hits.
             // This way we might get some information about strange behaviour.
             if (IsStatus(Validity, EnergyCalibrationBit))
@@ -325,8 +326,10 @@ namespace R3B::Neuland // NOLINT
                 }
 
                 for (auto side = 0; side < 2; ++side)
+                {
                     Log.TotalHits[side].Fill(lightAtPMT[side]);
-
+                    // std::cout << "???????????????lightAtPMT" << lightAtPMT[side] << " \n";
+                }
                 if (IsStatus(Validity, LeftSideHitBit) && IsStatus(Validity, RightSideHitBit))
                 {
                     for (auto side = 0; side < 2; ++side)

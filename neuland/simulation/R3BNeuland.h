@@ -18,6 +18,8 @@
 #include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
 #include <R3BIOConnector.h>
+#include <R3BNeulandCommon.h>
+#include <R3BNeulandGeoCreator.h>
 #include <memory>
 #include <string>
 
@@ -34,7 +36,7 @@ class R3BNeulandGeoPar;
  * Suitable geometry files require proper naming of the active volume (see CheckIfSensitive) and copy numbers.
  */
 
-class R3BNeuland : public R3BDetector
+class R3BNeuland : public FairDetector
 {
   public:
     /** Default constructor */
@@ -62,27 +64,35 @@ class R3BNeuland : public R3BDetector
      *@param combi   position + rotation */
     explicit R3BNeuland(int nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
+    void EnableAutoGeoBuild(bool is_enabled = true) { is_geo_auto_built = is_enabled; }
+
+    void SetLocationDirection(const TGeoCombiTrans& pos) { rot_trans_ = pos; }
 
   private:
-    R3B::OutputVectorConnector<R3BNeulandPoint> fNeulandPoints{ "NeulandPoints" }; //!
-    R3BNeulandGeoPar* fNeulandGeoPar = nullptr;                                    //!
-    std::unique_ptr<TClonesArray> TCAPointsBuffer = std::make_unique<TClonesArray>(R3BNeulandPoint::Class());
-    std::map<int, int> fTrackPidMap;
+    bool is_geo_auto_built = false;
+    int num_of_planes_ = R3B::Neuland::MaxNumberOfPlanes;
+    R3B::OutputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" }; //!
+    std::unique_ptr<TClonesArray> tca_points_buffer_ = std::make_unique<TClonesArray>(R3BNeulandPoint::Class());
+    R3BNeulandGeoPar* neuland_geo_par_ = nullptr; //!
+    R3B::Neuland::Geometry::Creator geo_creator_; //!
+    TGeoCombiTrans rot_trans_;
+    std::string geo_file_;
+    std::map<int, int> track_pid_map_;
 
     /** Track information to be stored until the track leaves the active volume. */
     int fTrackId = 0;
     int fPaddleId = 0;
-    TLorentzVector fPosIn;
-    TLorentzVector fPosOut;
-    TLorentzVector fMomIn;
-    TLorentzVector fMomOut;
-    double fTime = 0.;
-    double fLength = 0.;
-    double fEnergyLoss = 0.;
-    double fLightYield = 0.;
-    bool fIsLastHitDone = false;
-    int fParticleId = 0;
-    int fParentParticleId = 0;
+    TLorentzVector pos_in_;
+    TLorentzVector pos_out_;
+    TLorentzVector mom_in_;
+    TLorentzVector mom_out_;
+    double time_ = 0.;
+    double length_ = 0.;
+    double energy_loss_ = 0.;
+    double light_yield_ = 0.;
+    bool is_last_hit_done_ = false;
+    int particle_id_ = 0;
+    int parent_particle_id_ = 0;
 
     // private virtual functions:
 
@@ -107,7 +117,17 @@ class R3BNeuland : public R3BDetector
     void reset_values();
     void write_parameter_file();
 
-    ClassDefOverride(R3BNeuland, 3);
+    void ConstructGeometry() override;
+
+    void Initialize() override;
+
+    // non-virtual functions:
+
+    void create_geo();
+
+    void create_geo_from_root_file();
+
+    ClassDefOverride(R3BNeuland, 4);
 };
 
 #endif // R3BNEULAND_H

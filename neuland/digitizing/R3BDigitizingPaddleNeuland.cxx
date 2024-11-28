@@ -25,13 +25,13 @@ namespace R3B::Digitizing::Neuland
     NeulandPaddle::NeulandPaddle(uint16_t paddleID)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
     {
-        LOG(info) << "NeulandPaddle: Using constructor 1" << std::endl;
+        LOG(debug) << "NeulandPaddle: Using constructor 1" << std::endl;
     }
 
     NeulandPaddle::NeulandPaddle(uint16_t paddleID, R3B::Neuland::Cal2HitPar* cal_to_hit_par)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
     {
-        LOG(info) << "NeulandPaddle: Using constructor 2" << std::endl;
+        LOG(debug) << "NeulandPaddle: Using constructor 2" << std::endl;
         const auto& module_par = cal_to_hit_par->GetModulePars().at(paddleID);
         effective_speed_ = module_par.effectiveSpeed.value;
         gAttenuation_ = module_par.lightAttenuationFactor.value;
