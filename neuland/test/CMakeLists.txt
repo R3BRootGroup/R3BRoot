@@ -11,18 +11,20 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-if(GTEST_FOUND)
+if(GTest_FOUND)
+    include(GoogleTest)
     add_executable(
         NeulandUnitTests
         digitizing/testNeulandDigitizingPaddle.cxx
         digitizing/testNeulandDigitizingTamex.cxx
+        digitizing/testNeulandPointFilter.cxx
         NeulandUnitTests.cxx
         testClusteringEngine.cxx
         testNeulandMultiplicityCalorimetricPar.cxx)
     target_link_libraries(NeulandUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BNeulandDigitizing R3BNeulandReconstruction)
-    gtest_discover_tests(NeulandUnitTests DISCOVERY_TIMEOUT "60")
-endif(GTEST_FOUND)
+    gtest_discover_tests(NeulandUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTest_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
 add_test(NeulandSimulationMacro ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandSimulation.sh)
