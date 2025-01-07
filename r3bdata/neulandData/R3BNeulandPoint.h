@@ -25,8 +25,8 @@ class R3BNeulandPoint : public FairMCPoint
   public:
     R3BNeulandPoint()
         : fLightYield{ 0 }
-        , particle_id_{ 0 }
-        , parent_particle_id_{ 0 }
+        , fParticleId{ 0 }
+        , fParentParticleId{ 0 }
     {
     }
     // NOLINTBEGIN
@@ -43,8 +43,8 @@ class R3BNeulandPoint : public FairMCPoint
                     const int parent_particle_id) // NOLINTEND
         : FairMCPoint{ trackID, detID, pos, mom, tof, length, eLoss, EventId }
         , fLightYield{ lightYield }
-        , particle_id_{ particle_id }
-        , parent_particle_id_{ parent_particle_id }
+        , fParticleId{ particle_id }
+        , fParentParticleId{ parent_particle_id }
     {
     }
 
@@ -54,26 +54,30 @@ class R3BNeulandPoint : public FairMCPoint
                     const int parent_particle_id)
         : FairMCPoint{ point }
         , fLightYield{ lightYield }
-        , particle_id_{ particle_id }
-        , parent_particle_id_{ parent_particle_id }
+        , fParticleId{ particle_id }
+        , fParentParticleId{ parent_particle_id }
     {
     }
 
     [[nodiscard]] auto GetMomentum() const -> TVector3;
     [[nodiscard]] auto GetPosition() const -> TVector3;
-    [[nodiscard]] auto GetPaddle() const -> Int_t { return GetDetectorID(); }
-    [[nodiscard]] auto GetLightYield() const -> Double_t { return fLightYield; }
-    [[nodiscard]] auto GetPID() const -> int { return particle_id_; }
-    ClassDefOverride(R3BNeulandPoint, 2);
+    [[nodiscard]] auto GetPaddle() const -> int { return GetDetectorID(); }
+    [[nodiscard]] auto GetLightYield() const -> double { return fLightYield; }
+    [[nodiscard]] auto GetPID() const -> int { return fParticleId; }
+
+    // setters:
+    void SetLightYield(double light_yield) { fLightYield = light_yield; }
+    void SetParticleId(int particle_id) { fParticleId = particle_id; }
+    void SetParentParticleId(int particle_id) { fParentParticleId = particle_id; }
 
     void Print(const Option_t* /*opt*/) const override;
 
-  protected:
-    Double_t fLightYield;
+    ClassDefOverride(R3BNeulandPoint, 2);
 
   private:
-    int particle_id_;
-    int parent_particle_id_;
+    double fLightYield;
+    int fParticleId;
+    int fParentParticleId;
 };
 
 auto operator<<(std::ostream&, const R3BNeulandPoint&) -> std::ostream&; // Support easy printing

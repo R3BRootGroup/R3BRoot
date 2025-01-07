@@ -63,7 +63,7 @@ int main(int argc, const char** argv)
     auto run = std::make_unique<FairRunSim>();
     run->SetName("TGeant4");
     run->SetRunId(runID->value());
-    run->SetStoreTraj(false);
+    run->SetStoreTraj(true);
     run->SetMaterials("media_r3b.geo");
     run->SetSink(std::make_unique<FairRootFileSink>(simuFileName->value().c_str()));
     auto fairField = std::make_unique<R3BFieldConst>();

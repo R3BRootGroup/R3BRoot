@@ -18,7 +18,6 @@
 #include "R3BIOConnector.h"
 #include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
-#include <memory>
 #include <string>
 
 class FairVolume;
@@ -62,9 +61,34 @@ class R3BNeuland : public R3BDetector
      *@param combi   position + rotation */
     explicit R3BNeuland(int nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
+  private:
+    R3B::OutputVectorConnector<R3BNeulandPoint> fNeulandPoints{ "NeulandPoints" }; //!
+    R3BNeulandGeoPar* fNeulandGeoPar = nullptr;                                    //!
+    std::unique_ptr<TClonesArray> TCAPointsBuffer = std::make_unique<TClonesArray>(R3BNeulandPoint::Class());
+    std::map<int, int> fTrackPidMap;
+
+    /** Track information to be stored until the track leaves the active volume. */
+    int fTrackId = 0;
+    int fPaddleId = 0;
+    TLorentzVector fPosIn;
+    TLorentzVector fPosOut;
+    TLorentzVector fMomIn;
+    TLorentzVector fMomOut;
+    double fTime = 0.;
+    double fLength = 0.;
+    double fEnergyLoss = 0.;
+    double fLightYield = 0.;
+    bool fIsLastHitDone = false;
+    int fParticleId = 0;
+    int fParentParticleId = 0;
+
+    // private virtual functions:
+
     auto ProcessHits(FairVolume* /*v*/ = nullptr) -> bool override;
 
     void EndOfEvent() override;
+
+    void FinishEvent() override;
 
     void Print(Option_t* /*unused*/ = "") const override;
 
@@ -72,33 +96,14 @@ class R3BNeuland : public R3BDetector
 
     auto CheckIfSensitive(std::string name) -> bool override;
 
-    [[nodiscard]] auto GetCollection(Int_t /*iColl*/) const -> TClonesArray* override { return nullptr; }
+    [[nodiscard]] auto GetCollection(int iColl) const -> TClonesArray* override;
 
     void Register() override;
 
-  private:
-    R3B::OutputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" }; //!
-    R3BNeulandGeoPar* neuland_geo_par_ = nullptr;                                   //!
-    std::map<int, int> trackid_pid_map_;
+    // private non-virtual member functions:
 
-    /** Track information to be stored until the track leaves the active volume. */
-    int track_id_ = 0;
-    int paddle_id_ = 0;
-    TLorentzVector pos_in_{};
-    TLorentzVector pos_out_{};
-    TLorentzVector mom_in_{};
-    TLorentzVector mom_out_{};
-    double time_ = 0.;
-    double length_ = 0.;
-    double energy_loss_ = 0.;
-    double light_yield_ = 0.;
-    bool is_last_hit_done_ = false;
-    int particle_id_ = 0;
-    int partent_particle_id_ = 0;
-
-    void ResetValues();
-
-    void WriteParameterFile();
+    void reset_values();
+    void write_parameter_file();
 
     ClassDefOverride(R3BNeuland, 3);
 };
