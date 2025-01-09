@@ -15,41 +15,40 @@
 #define R3BROOT_R3BNEULANDPRIMARYCLUSTERFINDER_H
 
 #include "FairTask.h"
-#include "R3BMCTrack.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
 
 class R3BNeulandPrimaryClusterFinder : public FairTask
 {
   public:
-    explicit R3BNeulandPrimaryClusterFinder(TString primaryHits = "NeulandPrimaryHits",
-                                            TString clusters = "NeulandClusters",
-                                            TString primaryClusters = "NeulandPrimaryClusters",
-                                            TString secondaryClusters = "NeulandSecondaryClusters");
+    explicit R3BNeulandPrimaryClusterFinder(std::string_view primaryHits = "NeulandPrimaryHits",
+                                            std::string_view clusters = "NeulandClusters",
+                                            std::string_view primaryClusters = "NeulandPrimaryClusters",
+                                            std::string_view secondaryClusters = "NeulandSecondaryClusters");
 
     ~R3BNeulandPrimaryClusterFinder() override = default;
 
     // No copy and no move is allowed (Rule of three/five)
     R3BNeulandPrimaryClusterFinder(const R3BNeulandPrimaryClusterFinder&) = delete;
     R3BNeulandPrimaryClusterFinder(R3BNeulandPrimaryClusterFinder&&) = delete;
-    R3BNeulandPrimaryClusterFinder& operator=(const R3BNeulandPrimaryClusterFinder&) = delete;
-    R3BNeulandPrimaryClusterFinder& operator=(R3BNeulandPrimaryClusterFinder&&) = delete;
+    auto operator=(const R3BNeulandPrimaryClusterFinder&) -> R3BNeulandPrimaryClusterFinder& = delete;
+    auto operator=(R3BNeulandPrimaryClusterFinder&&) -> R3BNeulandPrimaryClusterFinder& = delete;
 
   protected:
-    InitStatus Init() override;
+    auto Init() -> InitStatus override;
 
   public:
-    void Exec(Option_t*) override;
+    void Exec(Option_t* /*option*/) override;
 
   private:
-    TCAInputConnector<R3BNeulandHit> fPrimaryHits;
-    TCAInputConnector<R3BNeulandCluster> fClusters;
+    R3B::InputVectorConnector<R3BNeulandHit> fPrimaryHits;
+    R3B::InputVectorConnector<R3BNeulandCluster> fClusters;
 
-    TCAOutputConnector<R3BNeulandCluster> fPrimaryClusters;
-    TCAOutputConnector<R3BNeulandCluster> fSecondaryClusters;
+    R3B::OutputVectorConnector<R3BNeulandCluster> fPrimaryClusters;
+    R3B::OutputVectorConnector<R3BNeulandCluster> fSecondaryClusters;
 
-    ClassDefOverride(R3BNeulandPrimaryClusterFinder, 0);
+    ClassDefOverride(R3BNeulandPrimaryClusterFinder, 1);
 };
 
 #endif // R3BROOT_R3BNEULANDPRIMARYCLUSTERFINDER_H

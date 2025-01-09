@@ -96,7 +96,7 @@ A `DigitizingEngine` object handles the actual data processing, which requires a
 ### Interface design
 To minimize the coupling between different algorithm components, users should use the base class of `DigitizingEngine` (`DigitizingEngineInterface`) containing all necessary essential interfaces. The following diagram depicts the correct usage of this class:
 
-![DigiInterface](../docs/figs/DigitizingEngineInterface.svg)
+![DigiInterface](DigitizingEngineInterface.svg)
 
 An example of the digitizer class:
 ```cpp
@@ -151,12 +151,12 @@ class DigitizingEngine : public DigitizingEngineInterface
     }
 ```
 Therefore, an instantiation directly with this constructor is a little bit complicated:
-```c++
+```cpp
 using Digitizing::DigitizingEngine;
 auto myEngine = std::make_unique<DigitizingEngine<MyPaddle, MyChannel>>(UsePaddle<MyPaddle>{}, UseChannel<MyChannel>{});
 ```
 However there is a helper function template called `CreateEngine` that can be used to instantiate this class more easily:
-```c++
+```cpp
 using Digitizing::CreateEngine;
 using Digitizing::UsePaddle;
 using Digitizing::UseChannel;
@@ -165,7 +165,7 @@ auto myEngine = CreateEngine(UsePaddle<MyPaddle>{}, UseChannel<MyChannel>{});
 
 ### InitFunc
 There is a third optional parameter of the constructor of the class template `DigitizingEngine` called `InitFunc`. It takes a `std::function` or a lambda function as an input, which will be invoked inside the member function `DigitizingEngine::Init()`. The existence of such a parameter introduces another dependency injection of any kind of initialization function needed for the paddle or channel classes, such as the parameter initialization before the event loop. One example could be:
-```c++
+```cpp
 auto const channelInit = [&]() { MyChannel::GetHitPar("ParName"); };
 auto myEngine = Digitizing::CreateEngine(UsePaddle<MyPaddle>{}, UseChannel<MyChannel>{}, channelInit);
 ```
@@ -175,7 +175,7 @@ The `UsePaddle` and `UseChannel` class template are two input parameter types of
 
 For example, if the paddle and channel class are defined in the following way:
 
-```c++
+```cpp
 #include "DigitizingChannel.h"
 #include "DigitizingPaddle.h"
 
@@ -200,7 +200,7 @@ class MyPaddle : public Digitizing::Paddle
 };
 ```
 then `UsePaddle` and `UseChannel` should be defined as:
-```c++
+```cpp
 //...
 // auto paddlePar1 = ...
 auto paddle = UsePaddle<MyPaddle>{paddlePar1};
@@ -236,14 +236,14 @@ For these two requirements, there are several pure virtual functions from the cl
 
 ### ComputeChannelHits
 This function is used to calculate the hits of both channels from a paddle hit. The signature is defined as follows:
-```c++
+```cpp
 virtual auto ComputeChannelHits(const Paddle::Hit& hit) const -> Pair<Channel::Hit> = 0;
 ```
 Any real physical processes related to the scintillators, such as light attenuation, could be introduced in this function.
 
 ### ComputeTime
 This function is used to calculate the time of the reconstructed paddle signal from the two channel signals. Its signature is defined as follows:
-```c++
+```cpp
 virtual auto ComputeTime(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
     -> double = 0;
 ```
@@ -251,7 +251,7 @@ Here the sides of the first and second channel signals don't matter as long as t
 
 ### ComputeEnergy
 This function is used to calculate the energy of the paddle signal from two channel signals. Its signature is defined as:
-```c++
+```cpp
 virtual auto ComputeEnergy(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
     -> double = 0;
 ```
@@ -259,7 +259,7 @@ with the input parameter as channel signals coming from different sides.
 
 ### ComputePosition
 This is used to compute the position of the paddle signal with the following signature:
-```c++
+```cpp
 virtual auto ComputePosition(const Channel::Signal& rightSignal, const Channel::Signal& leftSignal) const
     -> double = 0;
 ```
@@ -273,7 +273,7 @@ Channel class is responsible for the simulation of physical processes in the dig
 
 ### AddHit
 This is the input function of the channel class with the parameter to be of the type `Channel::Hit` and the signature as follows:
-```c++
+```cpp
 virtual void AddHit(Channel::Hit hit) = 0;
 ```
 It's called every time an input hit is fed into the digitizingEngine, without any threshold. The input parameter is the return value of the paddle member function `ComputeTime`. In almost all cases, the derived channel class should have a private member variable to store useful input hits for later data processing (such as applying a threshold or pileup effects).
@@ -281,7 +281,7 @@ It's called every time an input hit is fed into the digitizingEngine, without an
 
 ### ConstructSignals
 This function calculates the output from the channel class (`Channel::Signals`) to the paddle class. Its function signature is defined as follows:
-```c++
+```cpp
 virtual auto ConstructSignals() -> Channel::Signals = 0;
 ```
 The return value should be calculated from the hit collections obtained by the input member function `AddHit`. It will then be fed into the paddle object as an input parameter of multiple paddle member functions.

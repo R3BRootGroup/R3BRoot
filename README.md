@@ -133,4 +133,4 @@ Thank you for helping us keep R3BRoot secure and reliable!
 
 * [Static analyzer using Clang-tidy](config/clang_tidy/README.md)
 * [CMake build system for R3BRoot](doc/cmake_usage.md)
-* [How to use an unmerged pull request](doc/git_usage.md#fetch-the-update-from-an-unmerged-pull-request-pr)
+* [How to use an unmerged pull request](doc/git_usage.md)
