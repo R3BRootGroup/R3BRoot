@@ -13,7 +13,7 @@ inline auto create_muon_generator(TRandom3& random_gen)
 {
     constexpr auto num_DP = 13;
     constexpr auto PID = 2112;
-    constexpr auto z_pos = 0.;
+    constexpr auto z_pos = 1650.0;
     auto detector_box_size = ::R3B::Neuland::DetectorBoxSize{};
     detector_box_size.xmin = -R3B::Neuland::BarLength / 2;
     detector_box_size.xmax = R3B::Neuland::BarLength / 2;

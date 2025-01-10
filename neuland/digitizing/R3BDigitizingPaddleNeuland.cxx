@@ -37,6 +37,7 @@ namespace R3B::Digitizing::Neuland
         gAttenuation_ = module_par.lightAttenuationFactor.value;
         time_offset_ = module_par.tDiff.value;
         time_sync_ = module_par.tSync.value;
+        ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * gAttenuation_);
     }
 
     auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal,
