@@ -1,5 +1,5 @@
 {
-    "version": 4,
+    "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
         "minor": 24,
@@ -8,15 +8,16 @@
     "configurePresets": [
         {
             "name": "simple",
-            "displayName": "simple Config for R3BRoot without conan",
-            "description": "simple build with conan package manager",
+            "displayName": "Simple config for R3BRoot without conan",
+            "description": "Simple build with conan package manager",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "BUILD_GEOMETRY": "OFF",
                 "USE_DIFFERENT_COMPILER": "ON",
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "FETCH_GTEST": "ON"
+                "FETCH_GTEST": "ON",
+                "CONAN_ENABLED": "OFF"
             }
         },
         {
@@ -31,12 +32,73 @@
                 "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "util/cmake-conan/conan_provider.cmake",
                 "CONAN_ENABLED": "ON"
             }
+        },
+        {
+            "name": "doxygen",
+            "displayName": "Config for doxygen build of R3BRoot",
+            "description": "Only build the doxygen documentation",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "WITH_DOX": "ON",
+                "NO_BUILD": "ON"
+            }
         }
     ],
     "buildPresets": [
         {
             "name": "default",
             "configurePreset": "default"
+        },
+        {
+            "name": "doxygen",
+            "configurePreset": "doxygen",
+            "targets": "doxygen"
+        },
+        {
+            "name": "simple",
+            "configurePreset": "simple"
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "default",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "default"
+                },
+                {
+                    "type": "build",
+                    "name": "default"
+                }
+            ]
+        },
+        {
+            "name": "simple",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "simple"
+                },
+                {
+                    "type": "build",
+                    "name": "simple"
+                }
+            ]
+        },
+        {
+            "name": "doxygen",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "doxygen"
+                },
+                {
+                    "type": "build",
+                    "name": "doxygen"
+                }
+            ]
         }
     ]
 }

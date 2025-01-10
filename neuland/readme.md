@@ -1,6 +1,7 @@
 # NeuLAND module for r3broot
 
 ## Overview
+
 Code for the NeuLAND Detector is split into different components:
 
 - [simulation](simulation/readme.md)
@@ -25,8 +26,8 @@ The components fill storage containers for each event, which flow into other com
 These tasks are derived from FairTask and used in the steering macros.
 Task ending on a process usually apply a transformation to data, and take the input and output branch names as attributes, e.g.:
 
-- [`R3BNeulandDigitizer`](#digitizing): Detector response, NeulandPoints -> NeulandHits
-- [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandHits -> NeulandClusters
+- `R3BNeulandDigitizer`: Detector response, NeulandPoints -> NeulandHits
+- `R3BNeulandClusterFinder`: Clustering of digitized data, NeulandHits -> NeulandClusters
 
 Task ending on `mon` create control histograms, and might be quite messy. They take the input branch and output folder names as arguments. Examples:
 
@@ -39,23 +40,23 @@ Task ending on `mon` create control histograms, and might be quite messy. They t
 
 Note that the classes indented for storing data (derived from TObject for usage with TClonesArray) are located in `r3bdata/neulandData`.
 
-- `R3BNeulandPoint`: Basic MonteCarlo energy depositions and light yield, see, [Detector Class](#detector-class)
-- `R3BNeulandHit`: Combined NeulandPoints, digitized with detector response, see [Digitizing](#digitizing). Also indented for mapped and calibrated experimental data.
-- `R3BNeulandCluster`: Clusters consisting out of NeulandHits that belong together according to clustering conditions, see [Clustering](#clustering)
+- `R3BNeulandPoint`: Basic MonteCarlo energy depositions and light yield.
+- `R3BNeulandHit`: Combined NeulandPoints, digitized with detector response. Also indented for mapped and calibrated experimental data.
+- `R3BNeulandCluster`: Clusters consisting out of NeulandHits that belong together according to clustering conditions.
 - `R3BNeulandNeutron`: Position, Energy and Time information for neutron interactions found by event reconstruction processes
 
 
 ### Configuration Storage
 
 - `R3BNeulandGeoPar`: The complete NeuLAND GeoNode used in the Simulation
-- `R3BNeulandMultiplicityCalorimetricPar`: Cuts used for the [2D Method](#the-2d-method-for-neutron-multiplicity-determination) to determine neutron multiplicities.
+- `R3BNeulandMultiplicityCalorimetricPar`: Cuts used for the 2D Method to determine neutron multiplicities.
 
 
 ### Auxiliary Classes
 
 - `R3BNeulandContFact`: Container Factory for the configuration storage classes (pure boilerplate)
 - `R3BNeulandVisualizer`: 3D display of events, prepared by the `-Mon` tasks. (Work in progress)
-- [`Neuland::Neutron2DCalibr`](#calibration): Calibration of cuts for the 2D neutron multiplicity method
+- `Neuland::Neutron2DCalibr`: Calibration of cuts for the 2D neutron multiplicity method
 
 
 ## Digitizing

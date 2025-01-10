@@ -30,8 +30,9 @@ set(DOXYGEN_CLASS_GRAPH NO)
 set(DOXYGEN_COLLABORATION_GRAPH NO)
 set(DOXYGEN_USE_MATHJAX YES)
 set(DOXYGEN_MAX_DOT_GRAPH_DEPTH 2)
-set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "README.md")
-set(DOXYGEN_IMAGE_PATH "${PROJECT_SOURCE_DIR}/doc/pics" "${PROJECT_SOURCE_DIR}/neuland/docs/figs" "${PROJECT_SOURCE_DIR}/neuland/shared")
+# set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/README.md")
+set(DOXYGEN_IMAGE_PATH "${PROJECT_SOURCE_DIR}/doc/pics" "${PROJECT_SOURCE_DIR}/neuland/docs/figs"
+                       "${PROJECT_SOURCE_DIR}/neuland/shared")
 
 # For doxygen-awesome
 set(DOXYGEN_HTML_EXTRA_STYLESHEET "${AWESOME_CSS_DIR}/doxygen-awesome.css"
@@ -41,16 +42,21 @@ set(DOXYGEN_FULL_SIDEBAR NO)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_HTML_COLORSTYLE LIGHT)
 set(DOXYGEN_EXCLUDE_PATTERNS "*.py" "ext_h101_*")
+set(DOXYGEN_EXTENSION_MAPPING "md=md")
 
-
+file(GLOB DataSourceFiles ${PROJECT_SOURCE_DIR}/r3bdata/*.cxx)
+file(GLOB DataHeaderFiles ${PROJECT_SOURCE_DIR}/r3bdata/*.h)
 
 doxygen_add_docs(
     doxygen
     ${PROJECT_SOURCE_DIR}/README.md
     ${PROJECT_SOURCE_DIR}/neuland
     ${PROJECT_SOURCE_DIR}/r3bbase
-    ${PROJECT_SOURCE_DIR}/r3bdata
-    ${PROJECT_SOURCE_DIR}/r3bsource
+    ${PROJECT_SOURCE_DIR}/r3bdata/neulandData
+    ${DataSourceFiles}
+    ${DataHeaderFiles}
+    ${PROJECT_SOURCE_DIR}/r3bsource/base
+    ${PROJECT_SOURCE_DIR}/r3bsource/neuland
     ${PROJECT_SOURCE_DIR}/passive
     ${PROJECT_SOURCE_DIR}/config
     ${PROJECT_SOURCE_DIR}/doc

@@ -33,6 +33,25 @@ project(R3BROOT LANGUAGES C CXX Fortran)
 include(GNUInstallDirs)
 
 option(BUILD_LAND_DIR "Build old land module" ON)
+option(WITH_DOX "Generate doxygen documentation" OFF)
+option(NO_BUILD "Don't build anything except documentation" OFF)
+
+if(WITH_DOX)
+    add_subdirectory(doc)
+endif()
+
+if(NO_BUILD)
+    return()
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
+    message(STATUS "  ")
+    message(
+        ERROR
+        " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
+    )
+    message(STATUS "  ")
+endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
 # Check for needed environment variables
 if(NOT DEFINED ENV{SIMPATH})
@@ -85,7 +104,6 @@ option(WITH_ATIMA "Build ATIMA" OFF)
 option(WITH_SOFIA "Build SOFIA" OFF)
 option(WITH_GTPC "Build GTPC" OFF)
 option(WITH_FRS "Build FRS" OFF)
-option(WITH_DOX "Generate doxygen documentation" YES)
 option(WITH_ASYEOS "Build ASYEOS" OFF)
 option(BUILD_C3W "Build C3W" OFF)
 option(CONAN_ENABLED "conan package is enabled. (Use CMakePreset to set it)" OFF)
@@ -551,10 +569,6 @@ include(RootCTest)
 if(MODULE)
     add_subdirectory(${MODULE})
 endif(MODULE)
-
-if(WITH_DOX)
-    add_subdirectory(doc)
-endif()
 
 if(NOT MODULE)
     if(BUILD_GEOMETRY)
