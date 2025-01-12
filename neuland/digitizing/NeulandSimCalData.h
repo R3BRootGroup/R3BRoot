@@ -3,7 +3,6 @@
 #include "TObject.h"
 namespace R3B::Neuland
 {
-
     struct SimCalData : public TObject
     {
         int bar_module{}; // ns
@@ -13,13 +12,11 @@ namespace R3B::Neuland
         double tot_r{};   // ns
         SimCalData() = default;
         SimCalData(Int_t paddleid, double totL, double totR, double tleL, double tleR)
-            :
-
-            bar_module{ paddleid }
-            , tot_l{ totL }
-            , tot_r{ totR }
+            : bar_module{ paddleid }
             , let_l{ tleL }
             , let_r{ tleR }
+            , tot_l{ totL }
+            , tot_r{ totR }
         {
         }
         ClassDefNV(SimCalData, 2);

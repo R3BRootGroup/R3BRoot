@@ -11,6 +11,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
 
 add_subdirectory(calibration)
 add_subdirectory(clustering)
@@ -24,6 +25,9 @@ add_subdirectory(shared)
 add_subdirectory(simulation)
 add_subdirectory(test)
 add_subdirectory(unpack)
-add_subdirectory(application)
-add_subdirectory(executables)
-    add_subdirectory(geobase)
+add_subdirectory(geobase)
+
+if(CONAN_ENABLED)
+    add_subdirectory(application)
+    add_subdirectory(executables)
+endif()

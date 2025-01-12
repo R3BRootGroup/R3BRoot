@@ -1,3 +1,4 @@
+#include "R3BNeulandSimCalToCal.h"
 #include <CLI/CLI.hpp>
 #include <FairRunAna.h>
 #include <R3BDigitizingChannelMock.h>
@@ -128,6 +129,14 @@ namespace R3B::Neuland
         else
         {
             task_option.cluster_finder.enable = false;
+            task_option.sim_cal_to_cal.enable = false;
+        }
+
+        if (task_option.sim_cal_to_cal.enable)
+        {
+            auto task = std::make_unique<R3B::Neuland::SimCal2Cal>();
+            task->SetName(task_option.sim_cal_to_cal.name.c_str());
+            run->AddTask(task.release());
         }
 
         if (task_option.hit_monitor.enable)

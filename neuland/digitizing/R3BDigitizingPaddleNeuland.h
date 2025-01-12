@@ -64,7 +64,7 @@ namespace R3B::Digitizing::Neuland
         // Paula: non static member variables, are not used in TacQuila
         double gHalfLength_ = 135.;   // [cm]
         double gCMedium_ = 14.;       // speed of light in material in [cm/ns]
-        double gAttenuation_ = 0.008; // light attenuation of plastic scintillator [1/cm]
+        double attenuation_ = 0.008; // light attenuation of plastic scintillator [1/cm]
         double gLambda_ = 1. / 2.1;
         double ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * NeulandPaddle::gAttenuation);
         double effective_speed_ = R3B::Neuland::DEFAULT_EFFECTIVE_C;

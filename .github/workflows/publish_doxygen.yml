@@ -7,7 +7,7 @@ on:
 
 jobs:
   artifact-gen:
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     defaults:
       run:
         shell: bash
@@ -18,8 +18,11 @@ jobs:
           submodules: 'true'
       - name: run doxygen
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y doxygen graphviz ninja-build libjs-mathjax cmake
+          brew upgrade
+          brew install doxygen graphviz ninja ghostscript
+          export PATH="/opt/homebrew/bin:$PATH"
+          export FC="gfortran-14"
+
           cmake --workflow --preset doxygen
 
       - uses: actions/upload-pages-artifact@v3

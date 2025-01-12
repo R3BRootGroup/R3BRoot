@@ -26,6 +26,7 @@ runs:
         git config --global --add safe.directory $GITHUB_WORKSPACE
         git submodule update --init --recursive
         git clone https://github.com/R3BRootGroup/macros.git
+        conan remote update conancenter --url="https://center2.conan.io"
         echo ""
         echo "path environment variable: $PATH\n"
         echo ""

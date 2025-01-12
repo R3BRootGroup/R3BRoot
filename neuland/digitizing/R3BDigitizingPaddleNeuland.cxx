@@ -25,19 +25,17 @@ namespace R3B::Digitizing::Neuland
     NeulandPaddle::NeulandPaddle(uint16_t paddleID)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
     {
-        LOG(debug) << "NeulandPaddle: Using constructor 1" << std::endl;
     }
 
     NeulandPaddle::NeulandPaddle(uint16_t paddleID, R3B::Neuland::Cal2HitPar* cal_to_hit_par)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
     {
-        LOG(debug) << "NeulandPaddle: Using constructor 2" << std::endl;
         const auto& module_par = cal_to_hit_par->GetModulePars().at(paddleID);
         effective_speed_ = module_par.effectiveSpeed.value;
-        gAttenuation_ = module_par.lightAttenuationFactor.value;
+        attenuation_ = 1./ module_par.lightAttenuationLength.value;
         time_offset_ = module_par.tDiff.value;
         time_sync_ = module_par.tSync.value;
-        ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * gAttenuation_);
+        ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * attenuation_);
     }
 
     auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal,
@@ -53,13 +51,13 @@ namespace R3B::Digitizing::Neuland
         if (firstT > secondT)
         {
             res = std::abs((firstE / secondE) *
-                               FastExp<4>(static_cast<Float_t>(gAttenuation_ * effective_speed_ * (firstT - secondT))) -
+                               FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ * (firstT - secondT))) -
                            1);
         }
         else
         {
             res =
-                std::abs((secondE / firstE) * FastExp<4>(static_cast<Float_t>(gAttenuation_ * effective_speed_ *
+                std::abs((secondE / firstE) * FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ *
                                                                               static_cast<Float_t>(secondT - firstT))) -
                          1);
         }
@@ -108,7 +106,7 @@ namespace R3B::Digitizing::Neuland
                                            const double dist,
                                            enum ChannelSide channel_side) const -> Channel::Hit
     {
-        auto light = double{ mcLight * std::exp(-NeulandPaddle::gAttenuation_ * (NeulandPaddle::gHalfLength_ - dist)) };
+        auto light = double{ mcLight * std::exp(-NeulandPaddle::attenuation_ * (NeulandPaddle::gHalfLength_ - dist)) };
         int site_sign = (channel_side == ChannelSide::right) ? 1 : -1;
 
         auto time = double{ mcTime + (NeulandPaddle::gHalfLength_ - dist) / effective_speed_ +

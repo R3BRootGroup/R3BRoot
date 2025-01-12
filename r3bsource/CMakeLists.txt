@@ -96,7 +96,6 @@ set(SRCS
     califa/R3BCalifaJulichReader.cxx
     tofd/R3BPtofReader.cxx
     neuland/R3BNeulandTamexReader.cxx
-    neuland/R3BNeulandTamexReader2.cxx
     neuland/R3BNeulandTacquilaReader.cxx
     ams/R3BAmsReader.cxx
     foot/R3BFootReader.cxx
@@ -242,7 +241,6 @@ set(HEADERS
     califa/R3BCalifaJulichReader.h
     tofd/R3BPtofReader.h
     neuland/R3BNeulandTamexReader.h
-    neuland/R3BNeulandTamexReader2.h
     neuland/R3BNeulandTacquilaReader.h
     ams/R3BAmsReader.h
     foot/R3BFootReader.h
@@ -258,6 +256,11 @@ set(HEADERS
     mwpc/R3BMwpcReader.h
     sync_check/R3BSyncCheckReader.h
     actaf/R3BActafReader.h)
+
+if(CONAN_ENABLED)
+    list(APPEND SRCS neuland/R3BNeulandTamexReader2.cxx)
+    list(APPEND HEADERS neuland/R3BNeulandTamexReader2.h)
+endif()
 
 set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
 
@@ -303,11 +306,14 @@ add_library_with_dictionary(
     DEPENDENCIES
     R3BData
     R3BActaf
-    Ucesb
-    PRIVATE_DEPENDENCIES
-    Microsoft.GSL::GSL
-    range-v3::range-v3)
+    Ucesb)
 
 if("${FairRoot_VERSION}" VERSION_GREATER_EQUAL 19.0.0)
     target_compile_definitions(R3BSource PUBLIC FAIRROOT_GE_19)
+endif()
+
+if(CONAN_ENABLED)
+    target_link_libraries(R3BSource PRIVATE Microsoft.GSL::GSL range-v3::range-v3)
+    list(APPEND SRCS neuland/R3BNeulandTamexReader2.cxx)
+    list(APPEND HEADERS neuland/R3BNeulandTamexReader2.h)
 endif()

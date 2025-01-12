@@ -1,5 +1,6 @@
 #include "R3BNeulandAppOptionJson.h"
 #include <fmt/format.h>
+#include <magic_enum/magic_enum.hpp>
 
 using json = nlohmann::ordered_json;
 
@@ -179,7 +180,7 @@ namespace R3B::Neuland
                          { "channel", option.channel },
                          { "paddle", option.paddle },
                          { "par", option.tamex_par },
-                         { "pileup-strategy", option.pileup_strategy },
+                         { "pileup-strategy", magic_enum::enum_name(option.pileup_strategy) },
                          { "enable-sim-cal", option.enable_sim_cal },
                          { "enable-hit-par", option.enable_hit_par },
                          { "name", option.name } };
@@ -192,9 +193,23 @@ namespace R3B::Neuland
         json_obj.at("channel").get_to(option.channel);
         json_obj.at("paddle").get_to(option.paddle);
         json_obj.at("par").get_to(option.tamex_par);
-        json_obj.at("pileup-strategy").get_to(option.pileup_strategy);
         json_obj.at("enable-sim-cal").get_to(option.enable_sim_cal);
         json_obj.at("enable-hit-par").get_to(option.enable_hit_par);
+
+        // parse enum string
+        auto enum_name = std::string{};
+        json_obj.at("pileup-strategy").get_to(enum_name);
+        auto enum_val = magic_enum::enum_cast<Digitizing::Neuland::Tamex::PeakPileUpStrategy>(
+            enum_name, magic_enum::case_insensitive);
+        if (enum_val.has_value())
+        {
+            option.pileup_strategy = enum_val.value();
+        }
+        else
+        {
+            throw R3B::logic_error(fmt::format("Cannot parse the enum string {:?} to PeakPileUpStrategy enum class. "
+                                               "Please check if the enum string is correct!"));
+        }
     }
 
     template <>

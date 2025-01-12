@@ -10,7 +10,7 @@ Go to the [R3BRoot pull request](https://github.com/R3BRootGroup/R3BRoot/pulls) 
 
 In the example above, you could see the pull request is made from `YanzhaoW:edwin_filesource_update`. Here the user who made the PR has the account name "YanzhaoW". The branch, which is used to create the PR, is called "edwin_filesource_update". His remote repository can be checked by clicking this `YanzhaoW:edwin_filesource_update` and you will be redirected to the webpage of his remote repository. As for the example above, the remote url can be check by clicking the green button and choose the `HTTPS` tab:
 
-<img src="pics/git_green_button.png" width="400">
+<img src="pics/git_green_button.png" width="400"/>
 
 In this case, the remote url is `https://github.com/YanzhaoW/R3BRoot.git`.
 

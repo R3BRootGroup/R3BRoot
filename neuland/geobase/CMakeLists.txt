@@ -45,4 +45,4 @@ endif()
 
 add_library(R3BNeulandGeoBase SHARED R3BNeulandGeoCreator.cxx)
 target_include_directories(R3BNeulandGeoBase PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandGeoBase PUBLIC R3BNeulandShared)
+target_link_libraries(R3BNeulandGeoBase PUBLIC R3BNeulandShared GeoBase)
