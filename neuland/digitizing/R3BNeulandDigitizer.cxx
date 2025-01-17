@@ -11,15 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandDigitizer.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "NeulandPointFilter.h"
 #include "R3BDataMonitor.h"
+#include "R3BNeulandDigitizer.h"
 #include <R3BShared.h>
 #include <TFile.h>
-#include <iostream>
 #include <range/v3/view.hpp>
 #include <utility>
 
@@ -124,7 +123,7 @@ void R3BNeulandDigitizer::Exec(Option_t* /*option*/)
             digitizing_engine_->DepositLight(paddleID, point.GetTime(), point.GetLightYield() * GeVToMeVFac, dist);
             paddleEnergyDeposit[paddleID] += point.GetEnergyLoss() * GeVToMeVFac;
         } // eloss
-    } // points
+    }     // points
 
     const Double_t triggerTime = digitizing_engine_->GetTriggerTime();
     const auto paddles = digitizing_engine_->ExtractPaddles();
@@ -176,7 +175,7 @@ void R3BNeulandDigitizer::Exec(Option_t* /*option*/)
                            << ", tot_r = " << (signal.rightChannel->qdcUnSat * 15) + 14;
             }
         } // loop over all hits for each paddle
-    } // loop over paddles
+    }     // loop over paddles
 
     if (is_cal_output_)
     {
@@ -216,7 +215,7 @@ void R3BNeulandDigitizer::fill_cal_data(const std::map<int, std::unique_ptr<R3B:
                            << right.tot << '\n';
             }
         } // loop over all hits for each paddle
-    } // loop over paddles
+    }     // loop over paddles
 
     LOG(debug) << "R3BNeulandDigitizerCalData: produced " << cal_hits.size() << " hits";
 }

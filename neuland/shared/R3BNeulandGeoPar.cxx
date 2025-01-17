@@ -58,14 +58,14 @@ Bool_t R3BNeulandGeoPar::getParams(FairParamList* l)
 
 void R3BNeulandGeoPar::printParams()
 {
-    std::cout << "R3BNeulandGeoPar: Neuland Paddle Positions ..." << std::endl;
+    std::cout << "R3BNeulandGeoPar: Neuland Paddle Positions ...\n";
 
     fNeulandGeoNode->GetMatrix()->Print();
 
     for (Int_t i = 0; i < fNeulandGeoNode->GetNdaughters(); i++)
     {
         TGeoNode* node = fNeulandGeoNode->GetDaughter(i);
-        std::cout << node->GetNumber() << std::endl;
+        std::cout << node->GetNumber() << "\n";
         node->GetMatrix()->Print();
     }
 }

@@ -1,112 +1,113 @@
 #include "R3BNeulandNeutronsRValue.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairRootManager.h>
 #include <IsElastic.h>
-#include <utility>
 
 R3BNeulandNeutronsRValue::R3BNeulandNeutronsRValue(double EkinRefMeV,
-                                                   TString inputMult,
-                                                   TString inputCluster,
-                                                   TString output)
+                                                   std::string_view inputMult,
+                                                   std::string_view inputCluster,
+                                                   std::string_view output)
     : FairTask("R3BNeulandNeutronsRValue")
     , fEkinRefMeV(EkinRefMeV)
-    , fInputMultName(std::move(inputMult))
+    , fInputMultName(inputMult)
     , fMultiplicity(nullptr)
-    , fClusters(std::move(inputCluster))
-    , fNeutrons(std::move(output))
+    , fClusters(inputCluster)
+    , fNeutrons(output)
 {
 }
 
-InitStatus R3BNeulandNeutronsRValue::Init()
+auto R3BNeulandNeutronsRValue::Init() -> InitStatus
 {
-    auto ioman = FairRootManager::Instance();
+    auto* ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(fatal) << "TCAInputConnector: No FairRootManager";
-        return kFATAL;
+        throw R3B::runtime_error("TCAInputConnector: No FairRootManager");
     }
-    fMultiplicity = ioman->InitObjectAs<const R3BNeulandMultiplicity*>(fInputMultName);
+    fMultiplicity = ioman->InitObjectAs<const R3BNeulandMultiplicity*>(fInputMultName.c_str());
 
-    fClusters.Init();
-    fNeutrons.Init();
+    fClusters.init();
+    fNeutrons.init();
     return kSUCCESS;
 }
 
-void R3BNeulandNeutronsRValue::Exec(Option_t*)
+void R3BNeulandNeutronsRValue::Exec(Option_t* /*option*/)
 {
-    fNeutrons.Reset();
+    fNeutrons.clear();
+    cluster_buffer_.clear();
 
-    auto clusters = fClusters.Retrieve();
+    cluster_buffer_ = fClusters.get();
 
     // Recreate R3BNeutronTracker2D Advanced Method
     // FilterClustersByElasticScattering(clusters); // Check all pairs of clusters. Remove clusters from elastic
     // scattering FilterClustersByEnergyDeposit(clusters); FilterClustersByKineticEnergy(clusters);
-    SortClustersByRValue(clusters);
-    PrioritizeTimeWiseFirstCluster(clusters);
+    SortClustersByRValue(cluster_buffer_);
+    PrioritizeTimeWiseFirstCluster(cluster_buffer_);
 
     const auto mult = fMultiplicity->GetMultiplicity();
-    for (size_t n = 0; n < clusters.size() && n < mult; n++)
+    for (size_t index = 0; index < cluster_buffer_.size() && index < mult; index++)
     {
-        fNeutrons.Insert(R3BNeulandNeutron(*clusters.at(n)));
+        fNeutrons.get().emplace_back(cluster_buffer_.at(index));
     }
 }
 
-void R3BNeulandNeutronsRValue::SortClustersByRValue(std::vector<R3BNeulandCluster*>& clusters) const
+void R3BNeulandNeutronsRValue::SortClustersByRValue(std::vector<R3BNeulandCluster>& clusters) const
 {
     std::sort(clusters.begin(),
               clusters.end(),
-              [&](const R3BNeulandCluster* a, const R3BNeulandCluster* b)
-              { return a->GetRECluster(fEkinRefMeV) < b->GetRECluster(fEkinRefMeV); });
+              [this](const R3BNeulandCluster& one, const R3BNeulandCluster& other)
+              { return one.GetRECluster(fEkinRefMeV) < other.GetRECluster(fEkinRefMeV); });
 }
 
-void R3BNeulandNeutronsRValue::PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster*>& clusters) const
+void R3BNeulandNeutronsRValue::PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster>& clusters)
 {
-    auto timewiseFirstCluster =
-        std::min_element(clusters.begin(),
-                         clusters.end(),
-                         [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) { return a->GetT() < b->GetT(); });
+    auto timewiseFirstCluster = std::min_element(clusters.begin(),
+                                                 clusters.end(),
+                                                 [](const R3BNeulandCluster& one, const R3BNeulandCluster& other)
+                                                 { return one.GetT() < other.GetT(); });
     // Put first cluster in front
     std::rotate(clusters.begin(), timewiseFirstCluster, timewiseFirstCluster + 1);
 }
 
-void R3BNeulandNeutronsRValue::FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster*>& clusters) const
+void R3BNeulandNeutronsRValue::FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster>& clusters)
 {
     clusters.erase(
-        std::remove_if(clusters.begin(), clusters.end(), [&](const R3BNeulandCluster* a) { return a->GetE() < 2.5; }),
+        std::remove_if(
+            clusters.begin(), clusters.end(), [&](const R3BNeulandCluster& cluster) { return cluster.GetE() < 2.5; }),
         clusters.end());
 }
 
-void R3BNeulandNeutronsRValue::FilterClustersByKineticEnergy(std::vector<R3BNeulandCluster*>& clusters) const
+void R3BNeulandNeutronsRValue::FilterClustersByKineticEnergy(std::vector<R3BNeulandCluster>& clusters) const
 {
     clusters.erase(std::remove_if(clusters.begin(),
                                   clusters.end(),
-                                  [&](const R3BNeulandCluster* a)
-                                  { return std::abs(a->GetEToF() - fEkinRefMeV) / fEkinRefMeV > 0.05; }),
+                                  [this](const R3BNeulandCluster& cluster)
+                                  { return std::abs(cluster.GetEToF() - fEkinRefMeV) / fEkinRefMeV > 0.05; }),
                    clusters.end());
 }
 
-void R3BNeulandNeutronsRValue::FilterClustersByElasticScattering(std::vector<R3BNeulandCluster*>& clusters) const
+void R3BNeulandNeutronsRValue::FilterClustersByElasticScattering(std::vector<R3BNeulandCluster>& clusters)
 {
     std::map<const R3BNeulandCluster*, bool> marked;
 
-    for (const auto& c : clusters)
+    for (const auto& cluster : clusters)
     {
-        marked[c] = false;
+        marked[&cluster] = false;
     }
 
-    for (const auto& a : clusters)
+    for (const auto& one_cluster : clusters)
     {
-        for (const auto& b : clusters)
+        for (const auto& other_cluster : clusters)
         {
-            if (a != b && a->GetT() < b->GetT() && Neuland::IsElastic(a, b))
+            if (&one_cluster != &other_cluster && one_cluster.GetT() < other_cluster.GetT() &&
+                Neuland::IsElastic(&one_cluster, &other_cluster))
             {
-                marked[b] = true;
+                marked[&other_cluster] = true;
             }
         }
     }
 
     clusters.erase(
-        std::remove_if(clusters.begin(), clusters.end(), [&](const R3BNeulandCluster* a) { return marked.at(a); }),
+        std::remove_if(
+            clusters.begin(), clusters.end(), [&](const R3BNeulandCluster& cluster) { return marked.at(&cluster); }),
         clusters.end());
 }
 

@@ -91,6 +91,7 @@ namespace R3B::Neuland
         }
         void set_num_of_procs(int val) { num_of_procs_ = val; }
         void set_rank_num(int val) { rank_num_ = val; }
+        void set_fail(bool is_failed) { is_failed_ = is_failed; }
 
         // Getters:
 
@@ -110,6 +111,7 @@ namespace R3B::Neuland
         void ParseApplicationOptionImp(const std::string& filename, OptionType& option);
 
       private:
+        bool is_failed_ = false;
         bool is_inited_ = false;
         bool is_already_parsed_ = false; // guards for callbacks.
         bool is_dump_ = false;           // guards for callbacks.

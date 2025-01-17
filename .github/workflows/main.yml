@@ -46,13 +46,13 @@
 
 name: CI-CD-C++17
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow in case of a push or pull request events
   push:
-    branches: [ dev, edwin_dev ]
+    branches: [dev, edwin_dev]
   pull_request:
-    branches: [ dev, edwin_dev ]
+    branches: [dev, edwin_dev]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -91,6 +91,7 @@ jobs:
       matrix:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
+<<<<<<< HEAD
         repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
         os: [ debian11, debian12 , debian13]
         fsv: [ jan24p5 , jan24p6]
@@ -108,6 +109,10 @@ jobs:
             fsv: jan24p6
           - os: debian13
             fsv: jan24p5
+=======
+        repos: [r3broot, r3broot-conan]
+        os: [debian11, debian12]
+>>>>>>> 5735923a (Resolve CI issues)
 
         # The list under "include" defines some properties for each group:
         #
@@ -137,25 +142,6 @@ jobs:
           # This job is only for testing R3BRoot without downloading any
           # dependencies.
           - repos: r3broot
-          # The job for testing with glad-tpc
-          - repos: glad-tpc
-            url: https://github.com/R3BRootGroup/glad-tpc.git
-            cache: glad-tpc
-            # skip-save: true
-          # The job for testing with sofia, frs and asyeos dependencies. All three
-          # repositories are downloaded and run together in the job.
-          - repos: sofia-frs-asy
-            # If more than one repos needs to be downloaded in a job. "url" needs
-            # to be a space separated list of urls using the operator ">-". Append
-            # more urls to this list if more repos need to be added.
-            # The R3BFileSource repo is used for testing unpacking.
-            url: >-
-              https://github.com/R3BRootGroup/sofia.git
-              https://github.com/R3BRootGroup/frs.git
-              https://github.com/R3BRootGroup/asyeos.git
-              https://github.com/R3BRootGroup/R3BFileSource.git
-            # Using own cache file
-            cache: other-repos
 
           # build with conan package manager
           - repos: r3broot-conan
@@ -164,8 +150,13 @@ jobs:
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
+<<<<<<< HEAD
     container: 
       image: r3bdockers/${{ matrix.os }}
+=======
+    container:
+      image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
+>>>>>>> 5735923a (Resolve CI issues)
       volumes:
         - /tmp:/cvmfs
       env:
@@ -206,7 +197,7 @@ jobs:
       - name: install dependencies
         id: restore-cache
         uses: './.github/actions/install-deps'
-        with: 
+        with:
           cache-name: ${{ matrix.cache }}
 
       # A self-defined composite action for the cmake configuration and build
@@ -231,7 +222,7 @@ jobs:
         if: github.event_name == 'push' && matrix.skip-save != true
         id: save-cache
         uses: './.github/actions/cache-save'
-        with: 
+        with:
           cache-name: ${{ matrix.cache }}
           r3b-dev-key: ${{ env.cacheSHA }}
 

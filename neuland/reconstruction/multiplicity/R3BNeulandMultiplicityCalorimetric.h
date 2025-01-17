@@ -1,31 +1,27 @@
-#ifndef R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRIC_H
-#define R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRIC_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandMultiplicityCalorimetricPar.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
 
 class R3BNeulandMultiplicityCalorimetric : public FairTask
 {
   public:
-    R3BNeulandMultiplicityCalorimetric(TString input = "NeulandClusters", TString output = "NeulandMultiplicity");
-    ~R3BNeulandMultiplicityCalorimetric() override;
-
-    void Exec(Option_t*) override;
-
-  protected:
-    InitStatus Init() override;
+    explicit R3BNeulandMultiplicityCalorimetric(std::string_view input = "NeulandClusters",
+                                                std::string_view output = "NeulandMultiplicity");
+    void Exec(Option_t* /*option*/) override;
 
   private:
-    TCAInputConnector<R3BNeulandCluster> fClusters;
-    R3BNeulandMultiplicity* fMultiplicity;
+    R3B::InputVectorConnector<R3BNeulandCluster> fClusters;
+    std::unique_ptr<R3BNeulandMultiplicity> fMultiplicity;
+    R3BNeulandMultiplicity* multiplicity_par_ptr = nullptr;
     TString fOutputName;
 
     R3BNeulandMultiplicityCalorimetricPar* fPar;
 
-    ClassDefOverride(R3BNeulandMultiplicityCalorimetric, 0)
-};
+    auto Init() -> InitStatus override;
 
-#endif // R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRIC_H
+    ClassDefOverride(R3BNeulandMultiplicityCalorimetric, 1);
+};

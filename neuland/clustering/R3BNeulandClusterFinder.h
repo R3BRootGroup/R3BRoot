@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDCLUSTERFINDER_H_NEW
-#define R3BNEULANDCLUSTERFINDER_H_NEW
+#pragma once
 
 /**
  * NeuLAND cluster finder task
@@ -28,39 +27,29 @@
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
-#include "TCAConnector.h"
-#include <TClonesArray.h>
+#include <R3BIOConnector.h>
+
+constexpr auto CLUSTER_FINDER_DISTANCE = 7.5; // cm
 
 class R3BNeulandClusterFinder : public FairTask
 {
   public:
-    R3BNeulandClusterFinder(Double_t dx = 1. * 7.5,
-                            Double_t dy = 1. * 7.5,
-                            Double_t dz = 2. * 7.5,
-                            Double_t dt = 1.,
-                            TString input = "NeulandHits",
-                            TString output = "NeulandClusters");
-
-    ~R3BNeulandClusterFinder() override = default;
-
-    // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandClusterFinder(const R3BNeulandClusterFinder&) = delete;            // copy constructor
-    R3BNeulandClusterFinder(R3BNeulandClusterFinder&&) = delete;                 // move constructor
-    R3BNeulandClusterFinder& operator=(const R3BNeulandClusterFinder&) = delete; // copy assignment
-    R3BNeulandClusterFinder& operator=(R3BNeulandClusterFinder&&) = delete;      // move assignment
-
-  protected:
-    InitStatus Init() override;
-
-  public:
-    void Exec(Option_t*) override;
+    explicit R3BNeulandClusterFinder(double dist_x = 1. * CLUSTER_FINDER_DISTANCE,
+                                     double dist_y = 1. * CLUSTER_FINDER_DISTANCE,
+                                     double dist_z = 2. * CLUSTER_FINDER_DISTANCE,
+                                     double dist_t = 1.,
+                                     std::string_view input = "NeulandHits",
+                                     std::string_view output = "NeulandClusters");
 
   private:
     Neuland::ClusteringEngine<R3BNeulandHit> fClusteringEngine;
-    TCAInputConnector<R3BNeulandHit> fDigis;
-    TCAOutputConnector<R3BNeulandCluster> fClusters;
+    R3B::InputVectorConnector<R3BNeulandHit> fDigis;
+    R3B::OutputVectorConnector<R3BNeulandCluster> fClusters;
 
+    std::vector<R3BNeulandHit> neuland_hits_buffer_;
+    std::vector<std::vector<R3BNeulandHit>> clustered_hits_buffer_;
+
+    auto Init() -> InitStatus override;
+    void Exec(Option_t* /*option*/) override;
     ClassDefOverride(R3BNeulandClusterFinder, 0);
 };
-
-#endif // R3BNEULANDCLUSTERFINDER_H_NEW

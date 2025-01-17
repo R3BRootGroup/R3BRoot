@@ -48,7 +48,7 @@ class R3BNeulandPrimaryInteractionFinder : public FairTask
     void Exec(Option_t* /*option*/) override;
 
   private:
-    R3B::InputVectorConnector<R3BMCTrack> fTracksIn;
+    R3B::InputTCAConnector<R3BMCTrack> fTracksIn;
     R3B::InputVectorConnector<R3BNeulandPoint> fPointsIn;
     R3B::InputVectorConnector<R3BNeulandHit> fHitsIn;
 

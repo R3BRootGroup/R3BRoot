@@ -4,25 +4,25 @@
 #include "FairTask.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandMultiplicity.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
 
 class R3BNeulandMultiplicityCheat : public FairTask
 {
   public:
-    R3BNeulandMultiplicityCheat(TString input = "NeulandPrimaryHits", TString output = "NeulandMultiplicity");
-    ~R3BNeulandMultiplicityCheat() override;
-
-    void Exec(Option_t*) override;
+    explicit R3BNeulandMultiplicityCheat(std::string_view input = "NeulandPrimaryHits",
+                                         std::string_view output = "NeulandMultiplicity");
 
   protected:
-    InitStatus Init() override;
-
   private:
-    TCAInputConnector<R3BNeulandHit> fPrimaryHits;
-    R3BNeulandMultiplicity* fMultiplicity;
-    TString fOutputName;
+    R3B::InputVectorConnector<R3BNeulandHit> fPrimaryHits;
+    std::unique_ptr<R3BNeulandMultiplicity> fMultiplicity;
+    R3BNeulandMultiplicity* multiplicity_ptr_ = nullptr;
+    std::string fOutputName;
 
-    ClassDefOverride(R3BNeulandMultiplicityCheat, 0)
+    auto Init() -> InitStatus override;
+    void Exec(Option_t*) override;
+
+    ClassDefOverride(R3BNeulandMultiplicityCheat, 1)
 };
 
 #endif // R3BROOT_R3BNEULANDMULTIPLICITYCHEAT_H

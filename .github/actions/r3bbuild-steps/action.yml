@@ -30,6 +30,7 @@ runs:
         echo ""
         echo "path environment variable: $PATH\n"
         echo ""
+        export PEDEDIR="~"
         cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
       shell: bash
 

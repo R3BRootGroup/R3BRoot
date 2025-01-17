@@ -39,6 +39,7 @@ target_link_libraries(
     R3BNeulandCalToHit
     PUBLIC R3BNeulandMapToCal R3BNeulandCalibrationLegacy
     PRIVATE R3BMille)
+
 root_generate_dictionary(
     R3BNeulandCalToHit_dict
     ${HEADERS}

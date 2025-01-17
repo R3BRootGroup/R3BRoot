@@ -1,25 +1,26 @@
-#ifndef R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRICTRAIN_H
-#define R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRICTRAIN_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BMCTrack.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicityCalorimetricPar.h"
-#include "TCAConnector.h"
 #include "TCutG.h"
-#include "TH2D.h"
+#include <R3BIOConnector.h>
+
+class TH2D;
 
 class R3BNeulandMultiplicityCalorimetricTrain : public FairTask
 {
   public:
-    R3BNeulandMultiplicityCalorimetricTrain(TString clusters = "NeulandClusters",
-                                            TString tracks = "NeulandPrimaryTracks",
-                                            TString phits = "NeulandPrimaryHits");
-    ~R3BNeulandMultiplicityCalorimetricTrain() override;
+    explicit R3BNeulandMultiplicityCalorimetricTrain(std::string_view clusters = "NeulandClusters",
+                                                     std::string_view tracks = "NeulandPrimaryTracks",
+                                                     std::string_view phits = "NeulandPrimaryHits");
 
-    void Exec(Option_t*) override;
-    void FinishTask() override;
-    void Print(Option_t* = "") const override;
+    R3BNeulandMultiplicityCalorimetricTrain(const R3BNeulandMultiplicityCalorimetricTrain&) = delete;
+    R3BNeulandMultiplicityCalorimetricTrain(R3BNeulandMultiplicityCalorimetricTrain&&) = delete;
+    auto operator=(const R3BNeulandMultiplicityCalorimetricTrain&) -> R3BNeulandMultiplicityCalorimetricTrain& = delete;
+    auto operator=(R3BNeulandMultiplicityCalorimetricTrain&&) -> R3BNeulandMultiplicityCalorimetricTrain& = delete;
+    ~R3BNeulandMultiplicityCalorimetricTrain() override;
 
     void SetEdepOpt(double init, double step, double low, double high) { fEdepOpt = { init, step, low, high }; }
     void SetEdepOffOpt(double init, double step, double low, double high) { fEdepOffOpt = { init, step, low, high }; }
@@ -28,22 +29,19 @@ class R3BNeulandMultiplicityCalorimetricTrain : public FairTask
     {
         fNclusterOffOpt = { init, step, low, high };
     }
-    void SetWeight(double w) { fWeight = w; }
-    void SetUseHits(bool x) { fUseHits = x; }
-
-  protected:
-    InitStatus Init() override;
+    void SetWeight(double weight) { fWeight = weight; }
+    void SetUseHits(bool is_hit_used) { fUseHits = is_hit_used; }
 
   private:
-    TCutG* GetCut(unsigned int nNeutrons, double edep, double edepoff, double ncluster, double nclusteroff);
-    double WastedEfficiency(const double* d);
+    auto GetCut(unsigned int nNeutrons, double edep, double edepoff, double ncluster, double nclusteroff) -> TCutG*;
+    auto WastedEfficiency(const double* cut) -> double;
     void Optimize();
 
-    TH2D* GetOrBuildHist(unsigned int i);
+    auto GetOrBuildHist(unsigned int index) -> TH2D*;
 
-    TCAInputConnector<R3BNeulandCluster> fClusters;
-    TCAInputConnector<R3BMCTrack> fTracks;
-    TCAOptionalInputConnector<R3BNeulandHit> fPHits;
+    R3B::InputVectorConnector<R3BNeulandCluster> fClusters;
+    R3B::InputVectorConnector<R3BMCTrack> fTracks;
+    R3B::InputVectorConnector<R3BNeulandHit> fPHits;
 
     R3BNeulandMultiplicityCalorimetricPar* fPar;
 
@@ -56,9 +54,13 @@ class R3BNeulandMultiplicityCalorimetricTrain : public FairTask
     double fWeight;
 
     std::map<unsigned int, TH2D*> fHists;
+
+    // TODO: use unique_ptr
     std::map<unsigned int, TCutG*> fCuts;
 
-    ClassDefOverride(R3BNeulandMultiplicityCalorimetricTrain, 0)
+    void Exec(Option_t* /*option*/) override;
+    void FinishTask() override;
+    void Print(Option_t* /*option*/ = "") const override;
+    auto Init() -> InitStatus override;
+    ClassDefOverride(R3BNeulandMultiplicityCalorimetricTrain, 1)
 };
-
-#endif // R3BROOT_R3BNEULANDMULTIPLICITYCALORIMETRICTRAIN_H

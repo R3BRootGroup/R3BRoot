@@ -111,7 +111,7 @@ namespace
         {
             // Only look at points traced back to this track:
             // AND where a hit is registered
-            if (map_track == &track && point_to_hit_map.at(map_point) != nullptr)
+            if (map_track == &track && point_to_hit_map.find(map_point) != point_to_hit_map.end())
             {
                 const auto ToF = map_point->GetTime();
                 if (ToF < minHitToF)
@@ -121,7 +121,7 @@ namespace
                 }
             }
         }
-        return minHitPoint == nullptr ? point_to_hit_map.at(minHitPoint) : nullptr;
+        return minHitPoint != nullptr ? point_to_hit_map.at(minHitPoint) : nullptr;
     }
 
 } // namespace
@@ -164,7 +164,7 @@ auto R3BNeulandPrimaryInteractionFinder::Init() -> InitStatus
 
 void R3BNeulandPrimaryInteractionFinder::Exec(Option_t* /*option*/)
 {
-    const auto& tracks = fTracksIn.get();
+    const auto& tracks = fTracksIn.read();
     const auto& points = fPointsIn.get();
     const auto& hits = fHitsIn.get();
     fTracksOut.clear();

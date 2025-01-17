@@ -1,6 +1,7 @@
 #define JSON_USE_IMPLICIT_CONVERSIONS 0
 
 #include <CLI/CLI.hpp>
+#include <R3BLogger.h>
 #include <R3BNeulandAppOptionJson.h>
 #include <fmt/format.h>
 #ifdef HAS_MPI
@@ -9,6 +10,7 @@
 
 auto main(int argc, char** argv) -> int
 {
+    auto is_failed = false;
     auto num_proc = 0;
     auto num_rank = 0;
 #ifdef HAS_MPI
@@ -17,10 +19,10 @@ auto main(int argc, char** argv) -> int
     MPI_Comm_rank(MPI_COMM_WORLD, &num_rank);
 #endif
 
+    auto app = std::unique_ptr<R3B::Neuland::Application>{};
     try
     {
         auto program_options = CLI::App{ "Neuland command line interface" };
-        auto app = std::unique_ptr<R3B::Neuland::Application>{};
 
         auto instantiate_app = [&app, &program_options](std::size_t)
         {
@@ -63,11 +65,18 @@ auto main(int argc, char** argv) -> int
     }
     catch (const std::exception& ex)
     {
-        fmt::print("Exception ocurred: {}\n", ex.what());
+        R3BLOG(error, fmt::format("Exception ocurred: {}\n", ex.what()));
+        is_failed = true;
+        app->set_fail(is_failed);
     }
 
 #ifdef HAS_MPI
     MPI_Finalize();
 #endif
+
+    if (is_failed)
+    {
+        return EXIT_FAILURE;
+    }
     return EXIT_SUCCESS;
 }

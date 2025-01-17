@@ -33,7 +33,7 @@ class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
     Bool_t getParams(FairParamList*) override;
     // void printParams() override;
 
-    void Fill(int n, int nHits, int nClusters, int Edep);
+    void Fill(int n, int nHits, int nClusters, double Edep);
     bool CheckIfProperlyLoaded() const;
     R3BNeulandMultiplicity::MultiplicityProbabilities GetProbabilities(int nHits, int nClusters, int Edep) const;
 

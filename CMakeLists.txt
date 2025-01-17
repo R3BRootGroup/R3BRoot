@@ -64,10 +64,6 @@ if(NOT DEFINED ENV{SIMPATH})
     )
 endif(NOT DEFINED ENV{SIMPATH})
 
-# fairsoft lib path needed to be added for root dictionary detection:
-set(LD_LIBRARY_PATH ${SIMPATH}/lib ${LD_LIBRARY_PATH})
-set(GRAPHVIZ_EXTERNAL_LIBS FALSE)
-
 if(NOT DEFINED ENV{FAIRROOTPATH})
     message(
         FATAL_ERROR
@@ -443,6 +439,9 @@ set(R3BROOT_PATCH_VERSION 0)
 set(R3BROOT_VERSION "${FairRoot_VERSION}")
 set(R3BROOTPATH ${CMAKE_BINARY_DIR})
 
+# added a variable to point to r3broot path in the system
+set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
+
 if(NOT DEFINED ROOT_FOUND_VERSION)
     set(ROOT_FOUND_VERSION "${found_vers}")
 endif()
@@ -560,15 +559,6 @@ set(ROOT_CINT_EXECUTABLE ${ROOT_rootcling_CMD})
 include(CTest)
 include(RootCTest)
 
-find_program(
-    ROOT_CINT_EXECUTABLE
-    NAMES rootcint
-    PATHS ${ROOT_BINDIR}
-    NO_DEFAULT_PATH)
-
-include(CTest)
-include(RootCTest)
-
 if(MODULE)
     add_subdirectory(${MODULE})
 endif(MODULE)
@@ -593,7 +583,9 @@ if(NOT MODULE)
         add_subdirectory(r3bsource)
 	add_subdirectory(pdc)
     endif()
-    add_subdirectory(neuland)
+    if(CONAN_ENABLED)
+        add_subdirectory(neuland)
+    endif()
     add_subdirectory(glad)
     add_subdirectory(fiber)
     if(BUILD_LAND_DIR)
@@ -626,19 +618,6 @@ if(NOT MODULE)
     if(WITH_SOFIA)
         add_subdirectory(sofia)
     endif(WITH_SOFIA)
-
-    #================================================================================
-    # TODO: Since other dependencies still use the old cmake configurations, include(ROOTMacros) has to be used. Please change them using CMake targets ASAP.
-    include(ROOTMacros)
-    if(WITH_EPICS)
-        add_subdirectory(epics)
-    endif(WITH_EPICS)
-    if(Atima_FOUND)
-        add_subdirectory(atima)
-    endif(Atima_FOUND)
-    if(WITH_ACTAR)
-        add_subdirectory(actar)
-    endif(WITH_ACTAR)
     if(WITH_GTPC)
         add_subdirectory(glad-tpc)
     endif(WITH_GTPC)

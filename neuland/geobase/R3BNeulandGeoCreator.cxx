@@ -1,5 +1,6 @@
 #include "R3BNeulandGeoCreator.h"
 #include <FairGeoBuilder.h>
+#include <FairGeoInterface.h>
 #include <FairGeoLoader.h>
 #include <FairGeoMedia.h>
 #include <R3BException.h>

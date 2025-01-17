@@ -5,6 +5,7 @@
 #include <FairRootFileSink.h>
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
+#include <TGeoManager.h>
 #include <fmt/format.h>
 #include <gsl/span>
 #ifdef HAS_MPI
@@ -56,7 +57,14 @@ namespace R3B::Neuland
 
         if (is_inited_)
         {
-            fmt::print("Neuland Application finished successfully.\n");
+            if (is_failed_)
+            {
+                fmt::print("Failed to finish Neuland Application successfully.\n");
+            }
+            else
+            {
+                fmt::print("Neuland Application finished successfully.\n");
+            }
             fmt::print("Real time: {}s, cpu time: {}s\n", timer_.RealTime(), timer_.CpuTime());
         }
     }

@@ -20,6 +20,7 @@
 #include <R3BIOConnector.h>
 #include <R3BNeulandCommon.h>
 #include <R3BNeulandGeoCreator.h>
+#include <TClonesArray.h>
 #include <memory>
 #include <string>
 
@@ -76,12 +77,13 @@ class R3BNeuland : public FairDetector
      */
     void EnableAutoGeoBuild(bool is_enabled = true) { is_geo_auto_built = is_enabled; }
 
-    /** 
+    /**
      * \brief Set the translation and rotation of the NeuLAND detector
      *
-     * Set the translation and rotation of the NeuLAND detector using parameter with the type `TGeoCombiTrans`. This will override the value specified by the constructors.
+     * Set the translation and rotation of the NeuLAND detector using parameter with the type `TGeoCombiTrans`. This
+     * will override the value specified by the constructors.
      * @param pos Input tranlation and rotation matrix.
-     * @see <a href="https://root.cern/doc/master/classTGeoCombiTrans.html">TGeoCombiTrans</a> 
+     * @see <a href="https://root.cern/doc/master/classTGeoCombiTrans.html">TGeoCombiTrans</a>
      */
     void SetLocationDirection(const TGeoCombiTrans& pos) { rot_trans_ = pos; }
 
@@ -116,7 +118,8 @@ class R3BNeuland : public FairDetector
     TGeoCombiTrans rot_trans_;
     /// Geometry file name. The file must be present if EnableAutoGeoBuild() is disabled
     std::string geo_file_;
-    /// A map with the track ID as the key and the particle ID as the value. Used to find the parent particle ID of the current track,
+    /// A map with the track ID as the key and the particle ID as the value. Used to find the parent particle ID of the
+    /// current track,
     std::map<int, int> track_pid_map_;
 
     // private virtual functions:

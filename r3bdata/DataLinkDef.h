@@ -23,6 +23,7 @@
 
 #pragma link C++ class R3BStack+;
 #pragma link C++ class R3BMCTrack+;
+#pragma link C++ class vector<R3BMCTrack>+;
 #pragma link C++ class R3BHit+;
 #pragma link C++ class R3BDouble+;
 #pragma link C++ class R3BTrack+;
@@ -113,9 +114,10 @@
 #pragma link C++ class vector<R3BNeulandHit>+;
 #pragma link C++ class R3BNeulandMultiplicity+;
 #pragma link C++ class R3BNeulandCluster+;
+#pragma link C++ class vector<R3BNeulandCluster>+;
 #pragma link C++ class R3BNeulandNeutron+;
 #pragma link C++ class R3BNeulandCalData+;
-
+#pragma link C++ class vector<R3BNeulandNeutron>+;
 #pragma link C++ class R3BPspxMappedData+;
 #pragma link C++ class R3BPspxPrecalData+;
 #pragma link C++ class R3BPspxCalData+;

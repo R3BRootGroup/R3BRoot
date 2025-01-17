@@ -280,7 +280,6 @@ void R3BNeuland::create_geo()
         geo_loader = std::make_unique<FairGeoLoader>("TGeo", "FairGeoLoader").release();
     }
     auto* neuland_geo = geo_creator_.construct_volume(num_of_planes_, geo_loader);
-    gGeoManager->AddVolume(neuland_geo);
     if (auto* top_volume = gGeoManager->GetTopVolume(); top_volume != nullptr)
     {
         // Use copy_id 0 since only one neuland is needed
