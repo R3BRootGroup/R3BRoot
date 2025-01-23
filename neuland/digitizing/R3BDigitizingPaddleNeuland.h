@@ -47,7 +47,6 @@ namespace R3B::Digitizing::Neuland
         static constexpr double gHalfLength = 135.;   // [cm]
         static constexpr double gAttenuation = 0.008; // light attenuation of plastic scintillator [1/cm]
         static constexpr double gLambda = 1. / 2.1;
-        static const double ReverseAttenFac;
 
         auto MatchSignals(const Channel::Signal& firstSignal,
                           const Channel::Signal& secondSignal) const -> float override;

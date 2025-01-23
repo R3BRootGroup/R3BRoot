@@ -5,22 +5,38 @@
 
 namespace R3B::Digitizing::Neuland
 {
-    static const uint8_t DEFAULT_ITERATION = 8U;
-    static auto CheckMatchValidity(const std::vector<Paddle::ChannelSignalPair>& matchedPairs,
-                                   const Channel::Signal& signal) -> bool;
-
-    const double NeulandPaddle::ReverseAttenFac = std::exp(NeulandPaddle::gHalfLength * NeulandPaddle::gAttenuation);
-
-    template <uint8_t iterations = DEFAULT_ITERATION>
-    auto FastExp(const Float_t val) -> Float_t
+    namespace
     {
-        auto exp = 1.F + val / (iterations >> 1U);
-        for (auto i = 0; i < iterations; ++i)
+        const uint8_t DEFAULT_ITERATION = 8U;
+        // check if a signal is matched to two or more signals. If so, discard the lastest match.
+        auto CheckMatchValidity(const std::vector<Paddle::ChannelSignalPair>& matchedPairs,
+                                const Channel::Signal& signal) -> bool
         {
-            exp *= exp;
+            auto is_valid = true;
+            auto it_existed = find_if(matchedPairs.begin(),
+                                      matchedPairs.end(),
+                                      [&signal](const auto& pair) -> bool { return &(pair.right.get()) == &(signal); });
+            if (it_existed != matchedPairs.end())
+            {
+                LOG(debug)
+                    << "DigitizingPaddleNeuland.cxx::CheckMatchValidity(): one signal is matched again to another "
+                       "signal! The signal is discarded.";
+                is_valid = false;
+            }
+            return is_valid;
         }
-        return exp;
-    }
+
+        template <uint8_t iterations = DEFAULT_ITERATION>
+        auto FastExp(const Float_t val) -> Float_t
+        {
+            auto exp = 1.F + (val / (iterations >> 1U));
+            for (auto i = 0; i < iterations; ++i)
+            {
+                exp *= exp;
+            }
+            return exp;
+        }
+    } // namespace
 
     NeulandPaddle::NeulandPaddle(uint16_t paddleID)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
@@ -30,16 +46,21 @@ namespace R3B::Digitizing::Neuland
     NeulandPaddle::NeulandPaddle(uint16_t paddleID, R3B::Neuland::Cal2HitPar* cal_to_hit_par)
         : Digitizing::Paddle(paddleID, SignalCouplingNeuland)
     {
+        if (cal_to_hit_par == nullptr)
+        {
+            return;
+        }
         const auto& module_par = cal_to_hit_par->GetModulePars().at(paddleID);
         effective_speed_ = module_par.effectiveSpeed.value;
-        attenuation_ = 1./ module_par.lightAttenuationLength.value;
+        attenuation_ = 1. / module_par.lightAttenuationLength.value;
         time_offset_ = module_par.tDiff.value;
         time_sync_ = module_par.tSync.value;
+        // NOLINTNEXTLINE
         ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * attenuation_);
     }
 
-    auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal,
-                                     const Channel::Signal& secondSignal) const -> float
+    auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
+        -> float
     {
         auto firstE = static_cast<Float_t>(firstSignal.qdcUnSat);
         auto secondE = static_cast<Float_t>(secondSignal.qdcUnSat);
@@ -50,16 +71,16 @@ namespace R3B::Digitizing::Neuland
         auto res = 0.F;
         if (firstT > secondT)
         {
-            res = std::abs((firstE / secondE) *
-                               FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ * (firstT - secondT))) -
+            res = std::abs(((firstE / secondE) *
+                            FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ * (firstT - secondT)))) -
                            1);
         }
         else
         {
-            res =
-                std::abs((secondE / firstE) * FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ *
-                                                                              static_cast<Float_t>(secondT - firstT))) -
-                         1);
+            res = std::abs(
+                ((secondE / firstE) * FastExp<4>(static_cast<Float_t>(attenuation_ * effective_speed_ *
+                                                                      static_cast<Float_t>(secondT - firstT)))) -
+                1);
         }
         return res;
     }
@@ -73,8 +94,8 @@ namespace R3B::Digitizing::Neuland
     inline auto NeulandPaddle::ComputeTime(const Channel::Signal& firstSignal,
                                            const Channel::Signal& secondSignal) const -> double
     {
-        //LOG(info) << "ComputeTime: using eff_speed:" << effective_speed_ << std::endl;
-        return (firstSignal.tdc + secondSignal.tdc) / 2 - gHalfLength_ / effective_speed_ - time_sync_;
+        // LOG(info) << "ComputeTime: using eff_speed:" << effective_speed_ << std::endl;
+        return ((firstSignal.tdc + secondSignal.tdc) / 2) - (gHalfLength_ / effective_speed_) - time_sync_;
     }
 
     inline auto NeulandPaddle::ComputePosition(const Channel::Signal& leftSignal,
@@ -109,8 +130,8 @@ namespace R3B::Digitizing::Neuland
         auto light = double{ mcLight * std::exp(-NeulandPaddle::attenuation_ * (NeulandPaddle::gHalfLength_ - dist)) };
         int site_sign = (channel_side == ChannelSide::right) ? 1 : -1;
 
-        auto time = double{ mcTime + (NeulandPaddle::gHalfLength_ - dist) / effective_speed_ +
-                            site_sign * time_offset_ * 0.5 + time_sync_ };
+        auto time = double{ mcTime + ((NeulandPaddle::gHalfLength_ - dist) / effective_speed_) +
+                            (site_sign * time_offset_ * 0.5) + time_sync_ };
 
         return { time, light };
     }

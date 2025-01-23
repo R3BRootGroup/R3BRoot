@@ -2,7 +2,7 @@ name: publish-doc
 on:
   push:
     branches:
-      - neuland_new_calibration
+      - edwin_dev
   workflow_dispatch:
 
 jobs:

@@ -12,7 +12,6 @@
  ******************************************************************************/
 
 #include "R3BDigitizingPaddle.h"
-#include "FairLogger.h"
 
 namespace R3B::Digitizing
 {
