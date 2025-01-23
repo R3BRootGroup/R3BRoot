@@ -73,11 +73,11 @@ namespace R3B::Neuland
             { { "neuland", "tamex" },
               [&tamex_par, pileup_strategy, cal_to_hit_par]()
               {
-                  return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(),
+                  return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par),
                                                   UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
               } },
             { { "neuland", "tacquila" },
-              []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()); } },
+              [cal_to_hit_par]() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par), UseChannel<TacquilaChannel>()); } },
             { { "mock", "tamex" },
               [&tamex_par, pileup_strategy, cal_to_hit_par]()
               {
@@ -85,7 +85,7 @@ namespace R3B::Neuland
                                                   UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
               } },
             { { "neuland", "mock" },
-              []() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<MockChannel>()); } },
+              [cal_to_hit_par]() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par), UseChannel<MockChannel>()); } },
             { { "mock", "mock" },
               []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
         };
