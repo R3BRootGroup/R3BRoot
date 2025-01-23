@@ -1,3 +1,14 @@
+# Requires following secrets and variables:
+#
+# variables:
+# - DOCKER_REPO: repository to be pushed to.
+# - DOCKER_USERNAME: the user name of the repository owner.
+# - SYLABS_USERNAME: the user name of sylab repo owner
+#
+# secrets:
+# - DOCKER_TOKEN: access token to dockerhub
+# - SYLABS_TOKEN: access token to sylab server
+
 name: deploy-container
 
 on:
@@ -27,7 +38,10 @@ jobs:
         with:
           push: true
           context: util/container
-          tags: ${{ vars.DOCKER_USERNAME }}/r3bdev:r3broot
+          tags: ${{ vars.DOCKER_USERNAME }}/${{ vars.DOCKER_REPO }}
+          build-args: |
+            THREAD_NUM=4 
+            R3B_BRNAME=${{ github.head_ref || github.ref_name }}
 
 
   apptainer-build:

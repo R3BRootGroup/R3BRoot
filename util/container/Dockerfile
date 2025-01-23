@@ -1,10 +1,11 @@
 FROM yanzhaowang/r3bdev:fedora41
 
+ARG R3B_BRNAME="edwin_dev"
+ARG THREAD_NUM=4
+
 ENV FAIRROOTPATH="/root/FairRoot"
 ENV UCESB_DIR="/root/ucesb"
 ENV PEDEDIR="/root"
-ENV THREAD_NUM=4
-ENV R3B_BRNAME="neuland_new_calibration"
 
 RUN yes | dnf upgrade --refresh &&\
         dnf install -y byacc && pip install conan --upgrade &&\
