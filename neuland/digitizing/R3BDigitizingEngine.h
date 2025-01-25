@@ -14,10 +14,8 @@
 #ifndef NEULAND_DIGITIZING_ENGINE_H
 #define NEULAND_DIGITIZING_ENGINE_H
 
-#include "FairLogger.h"
 #include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
-#include "Rtypes.h"
 #include <cmath>
 #include <functional>
 #include <map>

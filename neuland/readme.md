@@ -11,7 +11,7 @@ Code for the NeuLAND Detector is split into different components:
 - test
 - unpack
 - shared
-- executables
+- [executables](executables/readme.md)
 - neulandData (in `../r3bdata/neulandData`).
 - [online](online/readme.md)
 

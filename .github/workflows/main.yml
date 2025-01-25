@@ -91,7 +91,6 @@ jobs:
       matrix:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
-<<<<<<< HEAD
         repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
         os: [ debian11, debian12 , debian13]
         fsv: [ jan24p5 , jan24p6]
@@ -109,10 +108,6 @@ jobs:
             fsv: jan24p6
           - os: debian13
             fsv: jan24p5
-=======
-        repos: [r3broot, r3broot-conan]
-        os: [debian11, debian12]
->>>>>>> 5735923a (Resolve CI issues)
 
         # The list under "include" defines some properties for each group:
         #
