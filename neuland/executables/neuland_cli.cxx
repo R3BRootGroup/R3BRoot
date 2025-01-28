@@ -60,6 +60,8 @@ auto main(int argc, char** argv) -> int
             return EXIT_SUCCESS;
         }
 
+        app->set_rank_num(num_rank);
+        app->set_num_of_procs(num_proc);
         app->init();
         app->run();
     }

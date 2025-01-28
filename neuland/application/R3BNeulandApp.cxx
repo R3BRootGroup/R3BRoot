@@ -1,5 +1,5 @@
-#include "R3BFileSource2.h"
 #include "R3BNeulandApp.h"
+#include "R3BFileSource2.h"
 #include <CLI/CLI.hpp>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
@@ -96,7 +96,7 @@ namespace R3B::Neuland
             dump_json_filename_ = filename;
         };
 
-        auto use_config_callback = [this](const std::string& filename)
+        auto use_config_callback = [this](const std::vector<std::string>& filename)
         {
             if (not is_already_parsed_)
             {
@@ -107,10 +107,10 @@ namespace R3B::Neuland
 
         auto& options = option_.get();
         program_options
-            .add_option_function<std::string>("-c, --config-file", use_config_callback, "Set the json config file")
+            .add_option_function<std::vector<std::string>>(
+                "-c, --config-file", use_config_callback, "Set the json config file")
             ->default_val(fmt::format("{}_{}", app_name_, DEFAULT_JSON_FILENAME))
             ->run_callback_for_default()
-            ->expected(0, 1)
             ->trigger_on_parse();
         program_options.add_flag("--print-config", has_print_default_options_, "Print default option value");
         program_options
@@ -150,7 +150,6 @@ namespace R3B::Neuland
     void Application::add_inout_files()
     {
         const auto& option = option_.get();
-        // output files:
         const auto output_name =
             option.enable_mpi ? fmt::format("{}.{}", option.output.data, rank_num_) : option.output.data;
         if (not option_.get().output.data.empty())
@@ -164,6 +163,7 @@ namespace R3B::Neuland
         if (option_.get().run_id >= 0)
         {
             file_source->SetInitRunID(option_.get().run_id);
+            run_->SetRunId(option_.get().run_id);
             R3BLOG(info, fmt::format("Filesource2: Set to run id {}", option_.get().run_id));
         }
         add_input_filename(file_source.get());
@@ -191,8 +191,11 @@ namespace R3B::Neuland
 
         if (not option_.get().output.par.empty())
         {
+            const auto& option = option_.get();
+            const auto output_name =
+                option.enable_mpi ? fmt::format("{}.{}", option.output.par, rank_num_) : option.output.par;
             auto fileio = std::make_unique<FairParRootFileIo>(true);
-            fileio->open(option_.get().output.par.c_str(), "RECREATE");
+            fileio->open(output_name.c_str(), "RECREATE");
             auto* rtdb = run_->GetRuntimeDb();
             rtdb->setOutput(fileio.release());
         }

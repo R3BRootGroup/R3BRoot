@@ -112,7 +112,7 @@ namespace R3B::Neuland
         void print_json_options() override;
         void dump_json_options(const std::string& filename) override;
         void setup_application_options(CLI::App& program_options) override;
-        void ParseApplicationOption(const std::string& filename) override
+        void ParseApplicationOption(const std::vector<std::string>& filename) override
         {
             ParseApplicationOptionImp(filename, options_);
         }

@@ -108,7 +108,7 @@ namespace R3B::Neuland
 
       protected:
         template <typename OptionType>
-        void ParseApplicationOptionImp(const std::string& filename, OptionType& option);
+        void ParseApplicationOptionImp(const std::vector<std::string>& filename, OptionType& option);
 
       private:
         bool is_failed_ = false;
@@ -127,7 +127,7 @@ namespace R3B::Neuland
 
         // private virtual methods:
         virtual void pre_init(FairRun* run) = 0;
-        virtual void ParseApplicationOption(const std::string& filename) = 0;
+        virtual void ParseApplicationOption(const std::vector<std::string>& filename) = 0;
         virtual void post_init(FairRun* run) {}
         void add_input_filename(R3BFileSource2* filesource);
         virtual void print_json_options() {}
@@ -175,11 +175,17 @@ namespace R3B::Neuland
     }
 
     template <typename OptionType>
-    void Application::ParseApplicationOptionImp(const std::string& filename, OptionType& option)
+    void Application::ParseApplicationOptionImp(const std::vector<std::string>& filenames, OptionType& option)
     {
-        auto file = std::ifstream{ filename };
-        auto json_obj = nlohmann::json{};
-        file >> json_obj;
+        auto json_obj = nlohmann::ordered_json{ option };
+        for (const auto& filename : filenames)
+        {
+            auto json_file_obj = nlohmann::ordered_json{};
+            auto file = std::ifstream{ filename };
+            file >> json_file_obj;
+            R3BLOG(info, fmt::format("Reading the configuration from the json file {:?}", filename));
+            json_obj.merge_patch(json_file_obj);
+        }
         json_obj.get_to(option);
     }
 } // namespace R3B::Neuland

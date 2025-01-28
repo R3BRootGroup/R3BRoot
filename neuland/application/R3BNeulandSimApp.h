@@ -68,7 +68,7 @@ namespace R3B::Neuland
         void print_json_options() override;
         void dump_json_options(const std::string& filename) override;
         void run_action(FairRun* run, int num_of_events) override;
-        void ParseApplicationOption(const std::string& filename) override
+        void ParseApplicationOption(const std::vector<std::string>& filename) override
         {
             ParseApplicationOptionImp(filename, options_);
         }
