@@ -34,13 +34,17 @@ set(DOXYGEN_USE_MATHJAX YES)
 set(DOXYGEN_RECURSIVE YES)
 set(DOXYGEN_IMPLICIT_DIR_DOCS NO)
 set(DOXYGEN_MAX_DOT_GRAPH_DEPTH 2)
+set(DOXYGEN_TOC_INCLUDE_HEADINGS 6)
+set(DOXYGEN_MARKDOWN_SUPPORT YES)
 # set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/README.md")
 set(DOXYGEN_IMAGE_PATH "${PROJECT_SOURCE_DIR}/doc/pics" "${PROJECT_SOURCE_DIR}/neuland/docs/figs"
                        "${PROJECT_SOURCE_DIR}/neuland/shared")
 
 # For doxygen-awesome
-set(DOXYGEN_HTML_EXTRA_STYLESHEET "${AWESOME_CSS_DIR}/doxygen-awesome.css"
-                                  "${AWESOME_CSS_DIR}/doxygen-awesome-sidebar-only.css")
+set(DOXYGEN_HTML_EXTRA_STYLESHEET
+    "${AWESOME_CSS_DIR}/doxygen-awesome.css" "${AWESOME_CSS_DIR}/doxygen-awesome-sidebar-only.css"
+    "${AWESOME_CSS_DIR}/doxygen-awesome-interactive-toc.js")
+set(DOXYGEN_HTML_HEADER "${PROJECT_SOURCE_DIR}/config/dox_header.html")
 set(DOXYGEN_DISABLE_INDEX NO)
 set(DOXYGEN_FULL_SIDEBAR NO)
 set(DOXYGEN_GENERATE_TREEVIEW YES)

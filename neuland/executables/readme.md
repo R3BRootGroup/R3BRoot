@@ -2,10 +2,11 @@
 
 The motivation of using a cli executable with a JSON file as the configuration is to provide users a much easier and robust way to run the R3BRoot tasks, such as for simulation and analysis. Compared to a ROOT Macro file, a JSON file only contains two things: strings and numbers. To run a task, users only need to look for some names and change the following values, without being burdened with unnecessary overhead in the ROOT Macro file, such as setting up `FairRun` or `EventHeader` in the correct order. It also provides opportunities for the users who just want to use the software without going deep to the ROOT/C++ programming language and code practices. The usage of a cli executable is also much safer and more robust than a ROOT Macro because the programming logic is fixed and users are only allowed to change the values according to their own needs.
 
+[TOC]
+
 ## General usage
 
 Before running any application, please make sure the `config.sh` script in the `R3BRoot/build` folder is correctly sourced. The NeuLAND cli executable, `neuland`, includes the interfaces to multiple applications (modes), like simulation, offline and online (not yet implemented) analysis. The interface of each application/mode also take in multiple program options for further configurations. Configuration can be specified by either through the program options or a JSON file. When they are both used for the configuration (see below), the final configuration value should be the one specified by the program options.
-
 
 > [!note] 
 > It's highly recommended to use the JSON file as it provides much more detailed options available for each application.
@@ -22,7 +23,7 @@ The available `mode` values from the cli executable are
 - `ana`: interface to offline analysis.
 - `online`: interface to online analysis. (not yet implemented)
 
-For example, 
+For example,
 
 ```bash
 neuland sim -h # also for 'ana' or 'online'
@@ -63,7 +64,7 @@ simulates 5000 events regardless to the event value specified in JSON file.
 > To make this work, `-c file.json` should always come before the other program options.
 
 
-### General JSON configuration
+### General JSON configuration      {#GeneralJsonConfig}
 
 The general JSON configuration exists for every application/mode.
 
