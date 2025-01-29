@@ -10,6 +10,14 @@ namespace R3B::Neuland
     {
         void convert_event_header(FairMCEventHeader* mc_header, R3BEventHeader* header)
         {
+            if (mc_header == nullptr)
+            {
+                throw R3B::runtime_error("MCEventHeader is nullptr!");
+            }
+            if (header == nullptr)
+            {
+                throw R3B::runtime_error("EventHeader is nullptr!");
+            }
             header->SetRunId(mc_header->GetRunID());
             header->SetEventno(mc_header->GetEventID());
         }

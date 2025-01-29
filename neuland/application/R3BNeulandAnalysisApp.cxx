@@ -5,6 +5,7 @@
 #include <R3BDigitizingPaddleMock.h>
 #include <R3BDigitizingPaddleNeuland.h>
 #include <R3BDigitizingTacQuila.h>
+#include <R3BEventHeader.h>
 #include <R3BException.h>
 #include <R3BFileSource2.h>
 #include <R3BLogger.h>
@@ -77,7 +78,10 @@ namespace R3B::Neuland
                                                   UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
               } },
             { { "neuland", "tacquila" },
-              [cal_to_hit_par]() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par), UseChannel<TacquilaChannel>()); } },
+              [cal_to_hit_par]() {
+                  return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par),
+                                                  UseChannel<TacquilaChannel>());
+              } },
             { { "mock", "tamex" },
               [&tamex_par, pileup_strategy, cal_to_hit_par]()
               {
@@ -85,7 +89,9 @@ namespace R3B::Neuland
                                                   UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
               } },
             { { "neuland", "mock" },
-              [cal_to_hit_par]() { return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par), UseChannel<MockChannel>()); } },
+              [cal_to_hit_par]() {
+                  return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par), UseChannel<MockChannel>());
+              } },
             { { "mock", "mock" },
               []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
         };
@@ -115,6 +121,7 @@ namespace R3B::Neuland
     void AnalysisApplication::pre_init(FairRun* run)
     {
         auto task_option = options_.tasks;
+        run->SetEventHeader(std::make_unique<R3BEventHeader>().release());
         const auto& digi_options = task_option.digi;
         if (digi_options.enable)
         {
