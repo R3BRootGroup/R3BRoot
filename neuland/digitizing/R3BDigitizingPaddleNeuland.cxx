@@ -56,11 +56,11 @@ namespace R3B::Digitizing::Neuland
         time_offset_ = module_par.tDiff.value;
         time_sync_ = module_par.tSync.value;
         // NOLINTNEXTLINE
-        ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * attenuation_);
+        ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * attenuation_ * 0.5);
     }
 
-    auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-        -> float
+    auto NeulandPaddle::MatchSignals(const Channel::Signal& firstSignal,
+                                     const Channel::Signal& secondSignal) const -> float
     {
         auto firstE = static_cast<Float_t>(firstSignal.qdcUnSat);
         auto secondE = static_cast<Float_t>(secondSignal.qdcUnSat);

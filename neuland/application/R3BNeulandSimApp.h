@@ -11,12 +11,6 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_NEULAND_Z_POS = 1650.; // cm
     constexpr auto DEFAULT_NEULAND_ENERGY = 0.6;  // GeV
 
-    struct XYZCoordinate
-    {
-        double x{};
-        double y{};
-        double z{};
-    };
 
     class SimulationApplication : public Application
     {

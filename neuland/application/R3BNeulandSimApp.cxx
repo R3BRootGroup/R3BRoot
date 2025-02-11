@@ -1,6 +1,6 @@
+#include "R3BNeulandSimApp.h"
 #include "R3BCave.h"
 #include "R3BNeuland.h"
-#include "R3BNeulandSimApp.h"
 #include <FairRunSim.h>
 #include <G4RunManager.hh>
 #include <R3BFieldConst.h>
@@ -52,12 +52,13 @@ namespace R3B::Neuland
     void SimulationApplication::setup_generator(FairRunSim* run)
     {
         const auto& options = options_.simulation.generator;
+        const auto& options_pos = options_.detectors.neuland;
         random_gen_ = std::make_unique<TRandom3>(options.random_seed);
-        auto primary_generator = [this, &options]()
+        auto primary_generator = [this, &options, &options_pos]()
         {
             if (options.type == "muon")
             {
-                return create_muon_generator(*random_gen_);
+                return create_muon_generator(*random_gen_, options_pos.num_of_dp, options.energy, options_pos.location);
             }
             if (options.type == "box")
             {

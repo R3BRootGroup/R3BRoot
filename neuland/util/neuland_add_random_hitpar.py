@@ -5,6 +5,7 @@ Add random cal_to_hit_par to the parameter file, which could be the output from 
 import math
 import random
 from enum import Enum
+from scipy.signal import square
 
 import ROOT
 
@@ -18,6 +19,8 @@ class Mode(Enum):
     UNIFORM = 1
     ## Generate value according to distribution of a cosine function.
     COSINE = 2
+    ## Generate value according to distribution of a clock function.
+    CLOCK = 3 
 
 
 class ParValueSet:
@@ -63,6 +66,13 @@ class ParValueSet:
         self.amp = amp
         self.period = period
         self.err = err
+
+    def set_clock(self, **kwargs):
+        """Set all random generator parameter with the clock distribution.
+
+        @param kwargs Key-value pairs passed to set() member function
+        """
+        self.set(Mode.CLOCK, **kwargs)
 
     def set_cos(self, **kwargs):
         """Set all random generator parameter with the cosine distribution.
@@ -166,11 +176,13 @@ class NeulandRandHitParAdder:
         value = 0.0
         if par.mode == Mode.COSINE:
             value = par.offset + par.amp * math.cos(
-                module_id * 4 * math.pi / par.period
+                module_id * 2 * math.pi / par.period
             )
+        elif par.mode == Mode.CLOCK:
+            value = square(2 * math.pi * module_id / par.period) * par.amp + par.offset
         else:
             value = random.uniform(par.offset - par.amp, par.offset + par.amp)
-        return round(value + noise, 3)
+        return round(value + noise, 6)
 
     def set_run_id(self, val: int):
         """Set the run id in the parameter file
@@ -262,7 +274,7 @@ class NeulandRandHitParAdder:
         # Neues Parameter-Objekt erstellen und Module hinzufügen
         par_run = input_par_file.Get(f"{self.__run_id}")
         cal_to_hit_par = ROOT.R3B.Neuland.Cal2HitPar("NeulandHitPar")
-        for module_id in range(0, self.__module_num):
+        for module_id in range(1, self.__module_num +1):
             one_module_par = self.__assign_random_values(module_id)
             cal_to_hit_par.AddModulePar(one_module_par)
 

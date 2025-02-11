@@ -124,4 +124,11 @@ namespace R3B::Neuland
 
     // NeuLAND TPAT:
     constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
+
+    struct XYZCoordinate
+    {
+        double x{};
+        double y{};
+        double z{};
+    };
 } // namespace R3B::Neuland
