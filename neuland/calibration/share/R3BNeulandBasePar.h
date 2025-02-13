@@ -12,7 +12,11 @@
  ******************************************************************************/
 #pragma once
 
+#ifdef JSON_USE_IMPLICIT_CONVERSIONS
+#undef JSON_USE_IMPLICIT_CONVERSIONS
+#endif                                  // JSON_USE_IMPLICIT_CONVERSIONS
 #define JSON_USE_IMPLICIT_CONVERSIONS 0 // NOLINT
+
 #include <R3BNeulandParSet.h>
 #include <nlohmann/json.hpp>
 #include <unordered_map>

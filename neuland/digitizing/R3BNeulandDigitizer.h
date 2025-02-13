@@ -64,7 +64,10 @@ class R3BNeulandDigitizer : public FairTask
     using UsePaddle = Digitizing::UsePaddle<Type>;
 
     R3BNeulandDigitizer();
-    explicit R3BNeulandDigitizer(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine);
+    explicit R3BNeulandDigitizer(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine,
+                                 std::string_view points_name = "NeulandPoints",
+                                 std::string_view hits_name = "NeulandHits",
+                                 std::string_view cal_hits_name = "NeulandSimCal");
 
     void SetEngine(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine);
     void AddFilter(const Filterable<R3BNeulandHit&>::Filter& filter) { hit_filters_.Add(filter); }
@@ -80,7 +83,7 @@ class R3BNeulandDigitizer : public FairTask
 
     R3B::InputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" };
     R3B::OutputVectorConnector<R3BNeulandHit> neuland_hits_{ "NeulandHits" };
-    R3B::OutputVectorConnector<R3B::Neuland::SimCalData> fCalHits{ "NeulandSimCal" };
+    R3B::OutputVectorConnector<R3B::Neuland::SimCalData> neuland_cal_hits_{ "NeulandSimCal" };
 
     std::unique_ptr<Digitizing::DigitizingEngineInterface> digitizing_engine_; // owning
 

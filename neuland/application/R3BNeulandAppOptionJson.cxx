@@ -98,15 +98,16 @@ namespace R3B::Neuland
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Input& option)
     {
-        json_obj = nlohmann::ordered_json{ { "data", option.data },
-                                           { "tree-data", option.tree_data },
-                                           { "first-par", option.par },
-                                           { "second-par", option.par_2 } };
+        json_obj = nlohmann::ordered_json{
+            { "working-dir", option.working_dir }, { "data", option.data },        { "tree-data", option.tree_data },
+            { "first-par", option.par },           { "second-par", option.par_2 },
+        };
     }
 
     template <>
     void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Input& option)
     {
+        json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);
         json_obj.at("tree-data").get_to(option.tree_data);
         json_obj.at("first-par").get_to(option.par);
@@ -116,12 +117,17 @@ namespace R3B::Neuland
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Output& option)
     {
-        json_obj = nlohmann::ordered_json{ { "data", option.data }, { "par", option.par } };
+        json_obj = nlohmann::ordered_json{
+            { "working-dir", option.working_dir },
+            { "data", option.data },
+            { "par", option.par },
+        };
     }
 
     template <>
     void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Output& option)
     {
+        json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);
         json_obj.at("par").get_to(option.par);
     }
@@ -153,7 +159,8 @@ namespace R3B::Neuland
                          { option.multi_calorimeter_train.name, option.multi_calorimeter_train },
                          { option.multi_bayes_train.name, option.multi_bayes_train },
                          { option.multi_bayes.name, option.multi_bayes },
-                         { option.neutron_r_value.name, option.neutron_r_value } };
+                         { option.neutron_r_value.name, option.neutron_r_value },
+                         { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task } };
     }
 
     template <>
@@ -169,6 +176,7 @@ namespace R3B::Neuland
         json_obj.at(option.multi_bayes.name).get_to(option.multi_bayes);
         json_obj.at(option.neutron_r_value.name).get_to(option.neutron_r_value);
         json_obj.at(option.sim_cal_to_cal.name).get_to(option.sim_cal_to_cal);
+        json_obj.at(option.cal_to_hit_par_task.name).get_to(option.cal_to_hit_par_task);
     }
 
     // =============================================================================================
@@ -176,14 +184,17 @@ namespace R3B::Neuland
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Digi& option)
     {
-        json_obj = json{ { "enable", option.enable },
-                         { "channel", option.channel },
-                         { "paddle", option.paddle },
-                         { "par", option.tamex_par },
-                         { "pileup-strategy", magic_enum::enum_name(option.pileup_strategy) },
-                         { "enable-sim-cal", option.enable_sim_cal },
-                         { "enable-hit-par", option.enable_hit_par },
-                         { "name", option.name } };
+        json_obj = json{
+            { "enable", option.enable },
+            { "channel", option.channel },
+            { "paddle", option.paddle },
+            { "par", option.tamex_par },
+            { "pileup-strategy", magic_enum::enum_name(option.pileup_strategy) },
+            { "enable-sim-cal", option.enable_sim_cal },
+            { "enable-hit-par", option.enable_hit_par },
+            { "read", option.read },
+            { "write", option.write },
+        };
     }
 
     template <>
@@ -195,6 +206,8 @@ namespace R3B::Neuland
         json_obj.at("par").get_to(option.tamex_par);
         json_obj.at("enable-sim-cal").get_to(option.enable_sim_cal);
         json_obj.at("enable-hit-par").get_to(option.enable_hit_par);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
 
         // parse enum string
         auto enum_name = std::string{};
@@ -215,14 +228,17 @@ namespace R3B::Neuland
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::MultiTrain& option)
     {
-        json_obj = json{ { "enable", option.enable },
-                         { "use-hit", option.use_hit },
-                         { "weight", option.weight },
-                         { "edep-opt", option.edep_opt },
-                         { "edep-off-opt", option.edep_off_opt },
-                         { "n-cluster-opt", option.n_cluster_opt },
-                         { "n-cluster-off-opt", option.n_cluster_off_opt },
-                         { "name", option.name } };
+        json_obj = json{
+            { "enable", option.enable },
+            { "use-hit", option.use_hit },
+            { "weight", option.weight },
+            { "edep-opt", option.edep_opt },
+            { "edep-off-opt", option.edep_off_opt },
+            { "n-cluster-opt", option.n_cluster_opt },
+            { "n-cluster-off-opt", option.n_cluster_off_opt },
+            { "read", option.read },
+            { "write", option.write },
+        };
     }
 
     template <>
@@ -235,14 +251,19 @@ namespace R3B::Neuland
         json_obj.at("edep-off-opt").get_to(option.edep_off_opt);
         json_obj.at("n-cluster-opt").get_to(option.n_cluster_opt);
         json_obj.at("n-cluster-off-opt").get_to(option.n_cluster_off_opt);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
     }
 
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::NeutronRValue& option)
     {
-        json_obj = json{ { "enable", option.enable },
-                         { "neutron-energy-MeV", option.neutron_energy_mev },
-                         { "name", option.name } };
+        json_obj = json{
+            { "enable", option.enable },
+            { "neutron-energy-MeV", option.neutron_energy_mev },
+            { "read", option.read },
+            { "write", option.write },
+        };
     }
 
     template <>
@@ -250,6 +271,42 @@ namespace R3B::Neuland
     {
         json_obj.at("enable").get_to(option.enable);
         json_obj.at("neutron-energy-MeV").get_to(option.neutron_energy_mev);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+    }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Cal2HitParTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "min-stat", option.min_stat },
+            { "method", magic_enum::enum_name(option.method) },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::Cal2HitParTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("min-stat").get_to(option.min_stat);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+
+        auto method_str = std::string{};
+        json_obj.at("method").get_to(method_str);
+
+        auto enum_val = magic_enum::enum_cast<Cal2HitParMethod>(method_str, magic_enum::case_insensitive);
+        if (enum_val.has_value())
+        {
+            option.method = enum_val.value();
+        }
+        else
+        {
+            throw R3B::logic_error(fmt::format("{} cannot be parsed to the enum class Cal2HitParMethod!", method_str));
+        }
     }
 
     // =============================================================================================

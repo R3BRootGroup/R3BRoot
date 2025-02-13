@@ -25,7 +25,7 @@ namespace
     inline auto get_hit_energy(double first_e, double second_e, const HitModulePar& par)
     {
         // const auto attenuation_value = std::exp(R3B::Neuland::TotalBarLength / par.lightAttenuationLength.value);
-        return par.lightAttenuationFactor.value * std::sqrt(first_e * second_e);
+        return par.light_attenuation_factor.value * std::sqrt(first_e * second_e);
     }
 
     inline auto get_hit_position(double tdc_left, double tdc_right, const HitModulePar& par)
@@ -36,9 +36,9 @@ namespace
                fmt::format("Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
                            tdc_left,
                            tdc_right,
-                           par.effectiveSpeed,
+                           par.effective_speed,
                            tdc_right - tdc_left));
-        const auto pos_along_bar = par.effectiveSpeed.value * (tdc_right - tdc_left);
+        const auto pos_along_bar = par.effective_speed.value * (tdc_right - tdc_left);
         const auto pos_perp_bar = (bar_num - 0.5 - ::R3B::Neuland::BarsPerPlane * 0.5) * ::R3B::Neuland::BarSize_XY;
         const auto pos_z = (plane_id + 0.5) * ::R3B::Neuland::BarSize_Z;
         R3BLOG(debug2,
@@ -52,8 +52,10 @@ namespace
 
     inline auto get_hit_pixel(const TVector3& position)
     {
-        const auto pixel_x = std::floor(position.X() / ::R3B::Neuland::BarSize_XY) + ::R3B::Neuland::BarsPerPlane / 2.;
-        const auto pixel_y = std::floor(position.Y() / ::R3B::Neuland::BarSize_XY) + ::R3B::Neuland::BarsPerPlane / 2.;
+        const auto pixel_x =
+            std::floor(position.X() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
+        const auto pixel_y =
+            std::floor(position.Y() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
         const auto pixel_z = std::floor(position.Z() / ::R3B::Neuland::BarSize_Z);
 
         return TVector3{ pixel_x, pixel_y, pixel_z };
@@ -102,8 +104,8 @@ namespace R3B::Neuland
     }
 
     void Cal2HitTask::calculate_calibrated_signals(const BarCalData& calBar,
-                                               /* inout */ std::vector<CalibratedSignal>& signals,
-                                               Side side)
+                                                   /* inout */ std::vector<CalibratedSignal>& signals,
+                                                   Side side)
     {
         const auto calBar_signals = (side == Side::left) ? calBar.left : calBar.right;
 
@@ -115,8 +117,8 @@ namespace R3B::Neuland
         }
     }
 
-    auto Cal2HitTask::construct_hit(const LRPair<CalibratedSignal>& signalPair, const HitModulePar& par) const
-        -> R3BNeulandHit
+    auto Cal2HitTask::construct_hit(const LRPair<CalibratedSignal>& signalPair,
+                                    const HitModulePar& par) const -> R3BNeulandHit
     {
         auto hit = R3BNeulandHit{};
 
@@ -139,9 +141,9 @@ namespace R3B::Neuland
     }
 
     void Cal2HitTask::construct_hits(const std::vector<CalibratedSignal>& left_signals,
-                                 const std::vector<CalibratedSignal>& right_signals,
-                                 const HitModulePar& par,
-                                 /* inout */ std::vector<R3BNeulandHit>& hits)
+                                     const std::vector<CalibratedSignal>& right_signals,
+                                     const HitModulePar& par,
+                                     /* inout */ std::vector<R3BNeulandHit>& hits)
     {
         // TODO: Multi-hits needs to be implemented here
         if (left_signals.size() == 1 and right_signals.size() == 1)
@@ -154,14 +156,14 @@ namespace R3B::Neuland
     }
 
     auto Cal2HitTask::signal_match_checking(const CalibratedSignal& first_signal,
-                                        const CalibratedSignal& second_signal,
-                                        const HitModulePar& par) -> bool
+                                            const CalibratedSignal& second_signal,
+                                            const HitModulePar& par) -> bool
     {
         const auto first_input = SignalMatcher::Input{ first_signal.time.value, first_signal.energy.value };
         const auto second_input = SignalMatcher::Input{ second_signal.time.value, second_signal.energy.value };
 
         const auto match_par =
-            SignalMatcher::Par{ BarLength / par.lightAttenuationLength.value, par.effectiveSpeed.value };
+            SignalMatcher::Par{ BarLength / par.light_attenuation_length.value, par.effective_speed.value };
         const auto match_goodness = SignalMatcher::GetGoodnessOfMatch(first_input, second_input, match_par);
         const auto match_result = std::log10(match_goodness);
         // FIXME: BAD comparison values. They should be 0. Why? Need fixing
@@ -191,31 +193,35 @@ namespace R3B::Neuland
         {
             larger_t -= R3B::Neuland::MaxCalTime;
         }
-        return std::remainder((larger_t + smaller_t) / 2. - global_time_offset_ - GetEventHeader()->GetTStart(),
+        return std::remainder(((larger_t + smaller_t) / 2.) - global_time_offset_ - GetEventHeader()->GetTStart(),
                               R3B::Neuland::MaxCalTime);
     }
 
-    auto Cal2HitTask::get_calibrated_energy(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-        -> ValueErrorD
+    auto Cal2HitTask::get_calibrated_energy(const CalDataSignal& calSignal,
+                                            const HitModulePar& par,
+                                            R3B::Side side) -> ValueErrorD
     {
         const auto tot_no_offset = calSignal.time_over_threshold - par.pedestal.get(side);
 
         // apply minimum 1 ns:
         return (tot_no_offset.value < 1)
                    ? ValueErrorD{}
-                   : tot_no_offset / (par.energyGain.get(side) - par.PMTSaturation.get(side) * tot_no_offset);
+                   : tot_no_offset / (par.energy_gain.get(side) - par.pmt_saturation.get(side) * tot_no_offset);
     }
 
-    auto Cal2HitTask::get_calibrated_time(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-        -> ValueErrorD
+    auto Cal2HitTask::get_calibrated_time(const CalDataSignal& calSignal,
+                                          const HitModulePar& par,
+                                          R3B::Side side) -> ValueErrorD
     {
         // TODO: why positive for left?
-        const auto time_offset = (side == R3B::Side::left) ? (par.tSync - par.tDiff / 2) : (par.tSync + par.tDiff / 2);
+        const auto time_offset =
+            (side == R3B::Side::left) ? (par.t_sync - par.t_diff / 2) : (par.t_sync + par.t_diff / 2);
         return calSignal.leading_time - calSignal.trigger_time - time_offset;
     }
 
-    auto Cal2HitTask::to_calibrated_signal(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-        -> CalibratedSignal
+    auto Cal2HitTask::to_calibrated_signal(const CalDataSignal& calSignal,
+                                           const HitModulePar& par,
+                                           R3B::Side side) -> CalibratedSignal
     {
         const auto energy = get_calibrated_energy(calSignal, par, side);
         const auto time = get_calibrated_time(calSignal, par, side);

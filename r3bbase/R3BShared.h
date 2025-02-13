@@ -145,15 +145,15 @@ namespace R3B
         auto right() const -> const DataType& { return data_.second; }
         auto get(Side side) const -> const DataType& { return (side == Side::left) ? data_.first : data_.second; }
         auto get(Side side) -> DataType& { return (side == Side::left) ? data_.first : data_.second; }
-        void setLeft(const DataType& value) { data_.first = value; }
-        void setRight(const DataType& value) { data_.second = value; }
+        void set_left(const DataType& value) { data_.first = value; }
+        void set_right(const DataType& value) { data_.second = value; }
 
       private:
         std::pair<DataType, DataType> data_;
         bool is_valid = false;
 
       public:
-        ClassDefNV(LRPair, 1);
+        ClassDefNV(LRPair, 2);
     };
 
     // -------------------------------------------------------------------------

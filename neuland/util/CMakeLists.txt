@@ -1,2 +1,2 @@
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/neuland_add_random_hitpar.py
-               ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/neuland_add_random_hitpar.py COPYONLY)
+configure_file(neuland_add_random_hitpar.py ${R3B_PYTHON_LIB} COPYONLY)
+configure_file(neuland_read_hit_par.py ${R3B_PYTHON_LIB} COPYONLY)

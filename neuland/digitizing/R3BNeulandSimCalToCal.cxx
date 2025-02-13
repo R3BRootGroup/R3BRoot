@@ -23,12 +23,17 @@ namespace R3B::Neuland
         }
     } // namespace
 
+    SimCal2Cal::SimCal2Cal(std::string_view sim_cal_data_name, std::string_view cal_data_name)
+        : sim_cal_data_{ sim_cal_data_name }
+        , cal_data_{ cal_data_name }
+    {
+        init_base_par();
+    }
     auto SimCal2Cal::Init() -> InitStatus
     {
         sim_cal_data_.init();
         cal_data_.init();
         init_event_header();
-        init_base_par();
         return kSUCCESS;
     }
 

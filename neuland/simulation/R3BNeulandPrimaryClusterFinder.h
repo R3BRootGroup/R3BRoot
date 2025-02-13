@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROOT_R3BNEULANDPRIMARYCLUSTERFINDER_H
-#define R3BROOT_R3BNEULANDPRIMARYCLUSTERFINDER_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
@@ -26,14 +25,6 @@ class R3BNeulandPrimaryClusterFinder : public FairTask
                                             std::string_view clusters = "NeulandClusters",
                                             std::string_view primaryClusters = "NeulandPrimaryClusters",
                                             std::string_view secondaryClusters = "NeulandSecondaryClusters");
-
-    ~R3BNeulandPrimaryClusterFinder() override = default;
-
-    // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandPrimaryClusterFinder(const R3BNeulandPrimaryClusterFinder&) = delete;
-    R3BNeulandPrimaryClusterFinder(R3BNeulandPrimaryClusterFinder&&) = delete;
-    auto operator=(const R3BNeulandPrimaryClusterFinder&) -> R3BNeulandPrimaryClusterFinder& = delete;
-    auto operator=(R3BNeulandPrimaryClusterFinder&&) -> R3BNeulandPrimaryClusterFinder& = delete;
 
   protected:
     auto Init() -> InitStatus override;
@@ -50,5 +41,3 @@ class R3BNeulandPrimaryClusterFinder : public FairTask
 
     ClassDefOverride(R3BNeulandPrimaryClusterFinder, 1);
 };
-
-#endif // R3BROOT_R3BNEULANDPRIMARYCLUSTERFINDER_H

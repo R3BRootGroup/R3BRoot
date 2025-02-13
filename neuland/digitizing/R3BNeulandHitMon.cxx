@@ -11,23 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
+#include "R3BNeulandHitMon.h"
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
-#include "R3BNeulandHitMon.h"
-#include "R3BShared.h"
-#include "TDirectory.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
 #include <TFile.h>
+#include <TH3.h>
 #include <algorithm>
-#include <iostream>
 #include <numeric>
 #include <utility>
 
-R3BNeulandHitMon::R3BNeulandHitMon(const Option_t* option)
+R3BNeulandHitMon::R3BNeulandHitMon(std::string_view hits_name, const Option_t* option)
     : FairTask("R3B NeuLAND NeulandHit Monitor")
+    , neuland_hits_{ hits_name }
 {
     LOG(info) << "Using R3B NeuLAND NeulandHit Monitor";
 

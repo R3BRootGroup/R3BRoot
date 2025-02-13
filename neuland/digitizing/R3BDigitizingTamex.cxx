@@ -39,10 +39,10 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             auto side = (channel_side == ChannelSide::right) ? Side::right : Side::left;
 
-            par.fSaturationCoefficient = module_par.PMTSaturation.get(side).value;
-            par.fEnergyGain = module_par.energyGain.get(side).value;
-            par.fPedestal = module_par.pedestal.get(side);
-            par.fPMTThresh = module_par.PMTThreshold.get(side).value;
+            par.fSaturationCoefficient = module_par.pmt_saturation.get(side).value;
+            par.fEnergyGain = module_par.energy_gain.get(side).value;
+            par.fPedestal = module_par.pedestal.get(side).value;
+            par.fPMTThresh = module_par.pmt_threshold.get(side).value;
             par.fQdcMin = 1 / par.fEnergyGain;
 
             // TODO: Add other parameters:

@@ -30,6 +30,7 @@
         "BUILD_GEOMETRY": "OFF",
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "util/cmake-conan/conan_provider.cmake",
+        "WITH_MILLEPEDE": "ON",
         "CONAN_ENABLED": "ON",
         "CONAN_INSTALL_ARGS": "--build=missing;--settings:build=compiler.cppstd=gnu17"
       }

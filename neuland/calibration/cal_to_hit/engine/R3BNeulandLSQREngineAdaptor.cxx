@@ -30,30 +30,30 @@ namespace
             auto new_par = R3B::Neuland::HitModulePar{};
             // GetModuleId return 1 based module Num
             new_par.module_num = par.GetModuleId();
-            new_par.tDiff.value = par.GetTDiff();
-            new_par.tSync.value = par.GetTSync();
-            new_par.effectiveSpeed.value = par.GetEffectiveSpeed();
-            new_par.lightAttenuationLength.value = par.GetLightAttenuationLength();
-            new_par.lightAttenuationFactor.value =
-                std::exp(R3B::Neuland::TotalBarLength / new_par.lightAttenuationLength.value / 2);
+            new_par.t_diff.value = par.GetTDiff();
+            new_par.t_sync.value = par.GetTSync();
+            new_par.effective_speed.value = par.GetEffectiveSpeed();
+            new_par.light_attenuation_length.value = par.GetLightAttenuationLength();
+            new_par.light_attenuation_factor.value =
+                std::exp(R3B::Neuland::TotalBarLength / new_par.light_attenuation_length.value / 2);
 
             // Getters accept 1 as the left side and 2 as the right side
 
             const auto left_index = 1 + toIndex(R3B::Side::left);
             const auto right_index = 1 + toIndex(R3B::Side::right);
 
-            new_par.pedestal.left() = par.GetPedestal(left_index);
-            new_par.pedestal.right() = par.GetPedestal(right_index);
+            new_par.pedestal.left().value = par.GetPedestal(left_index);
+            new_par.pedestal.right().value = par.GetPedestal(right_index);
 
-            new_par.energyGain.left().value = par.GetEnergyGain(left_index);
-            new_par.energyGain.right().value = par.GetEnergyGain(right_index);
+            new_par.energy_gain.left().value = par.GetEnergyGain(left_index);
+            new_par.energy_gain.right().value = par.GetEnergyGain(right_index);
 
-            new_par.PMTSaturation.left().value = par.GetPMTSaturation(left_index);
-            new_par.PMTSaturation.right().value = par.GetPMTSaturation(right_index);
+            new_par.pmt_saturation.left().value = par.GetPMTSaturation(left_index);
+            new_par.pmt_saturation.right().value = par.GetPMTSaturation(right_index);
 
-            new_par.PMTThreshold.left().value = par.GetPMTThreshold(left_index);
-            new_par.PMTThreshold.right().value = par.GetPMTThreshold(right_index);
-            new_module_pars.AddModulePar(std::move(new_par));
+            new_par.pmt_threshold.left().value = par.GetPMTThreshold(left_index);
+            new_par.pmt_threshold.right().value = par.GetPMTThreshold(right_index);
+            new_module_pars.AddModulePar(new_par);
         }
     }
 } // namespace

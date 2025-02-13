@@ -178,6 +178,7 @@ namespace R3B::Neuland
     class TrackGenerator : public FairGenerator
     {
       public:
+        TrackGenerator();
         template <typename AngleDist, typename EnergyDist, typename PositionDist>
         TrackGenerator(AngleDist angle_dist, EnergyDist energy_dist, PositionDist position_dist)
             : ptr_{ std::make_unique<TrackGeneratorImp<AngleDist, EnergyDist, PositionDist>>(angle_dist,

@@ -25,26 +25,15 @@ namespace R3B::Millepede
         Launcher() = default;
         void set_steer_filename(std::string_view filename) { steer_filename_ = filename; }
         void set_parameter_filename(std::string_view filename) { parameter_file_ = filename; }
+        void set_binary_dir(std::string_view dir) { binary_directory_ = dir; }
+        void launch();
         void end();
-
-        template <typename T = void*>
-        void sync_launch()
-        {
-#ifndef PEDEDIR
-            static_assert(
-                sizeof(T) and false,
-                R"(Variable "PEDEDIR" is not defined. Please define the environment variable "PEDEDIR" when configure CMake!)");
-#else
-            launch();
-#endif
-        }
 
       private:
         boost::asio::io_service ios_;
         std::string steer_filename_ = DEFAULT_STEER_FILENAME;
         std::string parameter_file_;
+        std::string binary_directory_ = ".";
         std::string executable_ = "pede";
-
-        void launch();
     };
 } // namespace R3B::Millepede

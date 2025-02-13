@@ -21,17 +21,17 @@ namespace R3B::Neuland
 {
     struct HitModulePar
     {
-        unsigned int module_num = 0;               // 1-based
-        ValueError<double> tDiff;                  // ns
-        ValueError<double> tSync;                  // ns
-        ValueError<double> effectiveSpeed;         // cm/ns
-        ValueError<double> lightAttenuationLength; // cm, 1/alpha
-        ValueError<double> lightAttenuationFactor; // exp(alpha*L/2)
-        LRPair<int> pedestal;                      //
-        LRPair<ValueError<double>> energyGain;     //
-        LRPair<ValueError<double>> PMTSaturation;  //
-        LRPair<ValueError<double>> PMTThreshold;   //
-        ClassDefNV(HitModulePar, 1);
+        unsigned int module_num = 0;                 // 1-based
+        ValueError<double> t_diff;                   // ns
+        ValueError<double> t_sync;                   // ns
+        ValueError<double> effective_speed;          // cm/ns
+        ValueError<double> light_attenuation_length; // cm, 1/alpha
+        ValueError<double> light_attenuation_factor; // exp(alpha*L/2)
+        LRPair<ValueError<double>> pedestal;         //
+        LRPair<ValueError<double>> energy_gain;      //
+        LRPair<ValueError<double>> pmt_saturation;   //
+        LRPair<ValueError<double>> pmt_threshold;    //
+        ClassDefNV(HitModulePar, 2);
     };
 
     class Cal2HitPar : public ParSet
@@ -55,10 +55,11 @@ namespace R3B::Neuland
         void SetDistanceToTarget(double distance) { distance_to_target_ = distance; }
         void SetEnergyCutoff(double cutoff) { energy_cut_ = cutoff; }
         void SetGlobalTimeOffset(double offset) { global_time_offset_ = offset; }
-        void AddModulePar(HitModulePar module_par)
+        void SetNumOfModules(int num) { num_of_modules = num; }
+        void AddModulePar(const HitModulePar& module_par)
         {
             const auto mNum = module_par.module_num;
-            module_pars_.insert_or_assign(mNum, std::move(module_par));
+            module_pars_.insert_or_assign(mNum, module_par);
         }
 
         // getter:
@@ -72,16 +73,24 @@ namespace R3B::Neuland
         }
         auto GetDistancesToFirstPlane() const -> const auto& { return distances_to_first_plane_; }
         auto GetNumModulePar() const { return module_pars_.size(); }
-        auto GetModuleParAt(unsigned int module_num) const -> const auto& { return module_pars_.at(module_num); }
-        auto GetModulePars() const -> const auto& { return module_pars_; }
-        //no auto because pybind from pyROOT
+        auto GetModuleParAt(unsigned int module_num) const -> const ::R3B::Neuland::HitModulePar&
+        {
+            return module_pars_.at(module_num);
+        }
+        auto GetModulePars() const -> const std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar>&
+        {
+            return module_pars_;
+        }
+        // no auto because pybind from pyROOT
         auto GetListOfModulePar() const -> const std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar>&
         {
             return module_pars_;
         }
         auto GetListOfModuleParRef() -> auto& { return module_pars_; }
+        auto GetNumOfModules() const -> int { return num_of_modules; }
 
       private:
+        int num_of_modules = 0;
         double global_time_offset_ = 0.; // in ns
         double distance_to_target_ = 0.; // in cm
         double energy_cut_ = 0.;         // in MeV
@@ -97,7 +106,7 @@ namespace R3B::Neuland
         }
 
       public:
-        ClassDefOverride(Cal2HitPar, 1);
+        ClassDefOverride(Cal2HitPar, 2);
     };
 
 } // namespace R3B::Neuland

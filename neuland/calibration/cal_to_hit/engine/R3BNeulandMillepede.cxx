@@ -12,14 +12,20 @@
  ******************************************************************************/
 
 #include "R3BNeulandMillepede.h"
+#include <R3BException.h>
 #include <R3BNeulandCalToHitParTask.h>
 #include <R3BNeulandCommon.h>
 #include <SteerWriter.h>
+
 #include <TGraphErrors.h>
-#include <optional>
-#include <range/v3/algorithm.hpp>
-#include <range/v3/numeric.hpp>
+#include <range/v3/algorithm/all_of.hpp>
+#include <range/v3/numeric/accumulate.hpp>
 #include <range/v3/view.hpp>
+
+#include <cstdlib>
+#include <optional>
+#include <string>
+#include <vector>
 
 namespace rng = ranges;
 
@@ -35,9 +41,9 @@ namespace
         auto& module_pars = cal_to_hit_par.GetListOfModuleParRef();
         for (auto& [module_num, module_par] : module_pars)
         {
-            if (module_par.effectiveSpeed.value != 0)
+            if (module_par.effective_speed.value != 0)
             {
-                module_par.tDiff = module_par.tDiff / module_par.effectiveSpeed;
+                module_par.t_diff = module_par.t_diff / module_par.effective_speed;
             }
         }
     }
@@ -52,6 +58,15 @@ namespace R3B::Neuland::Calibration
         par_result_.set_filename(DEFAULT_RES_FILENAME);
         pede_launcher_.set_steer_filename(pede_steer_filename_);
         pede_launcher_.set_parameter_filename(parameter_filename_);
+        if (const auto* r3b_dir = std::getenv("R3BROOTPATH"); r3b_dir != nullptr)
+        {
+            pede_launcher_.set_binary_dir(r3b_dir);
+        }
+        else
+        {
+            throw R3B::runtime_error(
+                "Environment variable R3BROOTPATH is not defined! Did you forget to source the \"config.sh\" file?");
+        }
         binary_data_writer_.set_buffer_size(MILLE_BUFFER_SIZE);
 
         init_steer_writer();
@@ -100,7 +115,7 @@ namespace R3B::Neuland::Calibration
             case GlobalLabel::offset_effective_c:
                 return module_num + num_of_module;
             case GlobalLabel::effective_c:
-                return module_num + 2 * num_of_module;
+                return module_num + (2 * num_of_module);
             // case GlobalLabel::offset_effective_c:
             //     return module_num;
             // case GlobalLabel::effective_c:
@@ -123,17 +138,17 @@ namespace R3B::Neuland::Calibration
             switch (global_label)
             {
                 case GlobalLabel::tsync:
-                    par_ref.tSync.value = par.value * SCALE_FACTOR;
-                    par_ref.tSync.error = par.error * SCALE_FACTOR;
+                    par_ref.t_sync.value = par.value * SCALE_FACTOR;
+                    par_ref.t_sync.error = par.error * SCALE_FACTOR;
                     break;
                 case GlobalLabel::offset_effective_c:
                     // The value here is the product of tDiff and effectiveSped. Real tDiff will be calculated later
-                    par_ref.tDiff.value = par.value * SCALE_FACTOR;
-                    par_ref.tDiff.error = par.error * SCALE_FACTOR;
+                    par_ref.t_diff.value = par.value * SCALE_FACTOR;
+                    par_ref.t_diff.error = par.error * SCALE_FACTOR;
                     break;
                 case GlobalLabel::effective_c:
-                    par_ref.effectiveSpeed.value = par.value;
-                    par_ref.effectiveSpeed.error = par.error;
+                    par_ref.effective_speed.value = par.value;
+                    par_ref.effective_speed.error = par.error;
                     break;
                 default:
                     throw std::runtime_error("An error occured with unrecognized global tag");
@@ -204,7 +219,7 @@ namespace R3B::Neuland::Calibration
         const auto module_num = static_cast<int>(signal.module_num);
         const auto pos_z = ModuleNum2ZPos<float>(static_cast<int>(module_num));
 
-        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effectiveSpeed.value;
+        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effective_speed.value;
 
         const auto& left_signal = signal.left.front();
         const auto& right_signal = signal.right.front();
@@ -212,7 +227,7 @@ namespace R3B::Neuland::Calibration
                            (right_signal.leading_time - right_signal.trigger_time) - average_t_sum_.value_or(0.F);
 
         input_data_buffer_.measurement =
-            static_cast<float>(t_sum.value / SCALE_FACTOR / 2.F - BarLength / SCALE_FACTOR / init_effective_c);
+            static_cast<float>((t_sum.value / SCALE_FACTOR / 2.F) - (BarLength / SCALE_FACTOR / init_effective_c));
         input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * error_scale_factor_);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
         const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
@@ -249,7 +264,7 @@ namespace R3B::Neuland::Calibration
         const auto module_num = static_cast<int>(signal.module_num);
         const auto plane_id = ModuleID2PlaneID(static_cast<int>(module_num) - 1);
         const auto is_horizontal = IsPlaneIDHorizontal(plane_id);
-        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effectiveSpeed.value;
+        auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effective_speed.value;
         const auto pos_z = static_cast<float>(PlaneID2ZPos(plane_id));
 
         const auto& left_signal = signal.left.front();
@@ -293,7 +308,7 @@ namespace R3B::Neuland::Calibration
         hit_par.Reset();
 
         R3BLOG(info, "Launching pede algorithm..");
-        pede_launcher_.sync_launch();
+        pede_launcher_.launch();
         pede_launcher_.end();
 
         par_result_.read();
@@ -306,12 +321,12 @@ namespace R3B::Neuland::Calibration
         const auto& pars = hit_par.GetListOfModulePar();
         for (const auto& [module_num, par] : pars)
         {
-            graph_time_offset_->SetPoint(static_cast<int>(module_num), module_num, par.tDiff.value);
-            graph_time_offset_->SetPointError(static_cast<int>(module_num), 0., par.tDiff.error);
-            graph_time_sync_->SetPoint(static_cast<int>(module_num), module_num, par.tSync.value);
-            graph_time_sync_->SetPointError(static_cast<int>(module_num), 0., par.tSync.error);
-            graph_effective_c_->SetPoint(static_cast<int>(module_num), module_num, par.effectiveSpeed.value);
-            graph_effective_c_->SetPointError(static_cast<int>(module_num), 0., par.effectiveSpeed.error);
+            graph_time_offset_->SetPoint(static_cast<int>(module_num), module_num, par.t_diff.value);
+            graph_time_offset_->SetPointError(static_cast<int>(module_num), 0., par.t_diff.error);
+            graph_time_sync_->SetPoint(static_cast<int>(module_num), module_num, par.t_sync.value);
+            graph_time_sync_->SetPointError(static_cast<int>(module_num), 0., par.t_sync.error);
+            graph_effective_c_->SetPoint(static_cast<int>(module_num), module_num, par.effective_speed.value);
+            graph_effective_c_->SetPointError(static_cast<int>(module_num), 0., par.effective_speed.error);
         }
     }
 
@@ -368,7 +383,7 @@ namespace R3B::Neuland::Calibration
         for (unsigned int module_num{ 1 }; module_num <= num_of_modules; ++module_num)
         {
             auto module_par_iter = module_pars.try_emplace(module_num).first;
-            module_par_iter->second.effectiveSpeed.value = init_effective_c_;
+            module_par_iter->second.effective_speed.value = init_effective_c_;
         }
     }
 
@@ -386,7 +401,7 @@ namespace R3B::Neuland::Calibration
         for (int module_num{ 1 }; module_num <= module_size; ++module_num)
         {
             steer_writer.add_parameter_default(get_global_label_id(module_num, GlobalLabel::effective_c),
-                                               std::make_pair(static_cast<float>(init_effective_c_), 0.F));
+                                               std::make_pair(init_effective_c_, 0.F));
         }
         steer_writer.add_parameter_default(get_global_label_id(REFERENCE_BAR_NUM, GlobalLabel::tsync),
                                            std::make_pair(0.F, -1.F));

@@ -145,13 +145,8 @@ jobs:
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
-<<<<<<< HEAD
-    container: 
-      image: r3bdockers/${{ matrix.os }}
-=======
     container:
       image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
->>>>>>> 5735923a (Resolve CI issues)
       volumes:
         - /tmp:/cvmfs
       env:

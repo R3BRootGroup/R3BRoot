@@ -51,10 +51,10 @@ namespace R3B::Digitizing::Neuland
             return;
         }
         const auto& module_par = cal_to_hit_par->GetModulePars().at(paddleID);
-        effective_speed_ = module_par.effectiveSpeed.value;
-        attenuation_ = 1. / module_par.lightAttenuationLength.value;
-        time_offset_ = module_par.tDiff.value;
-        time_sync_ = module_par.tSync.value;
+        effective_speed_ = module_par.effective_speed.value;
+        attenuation_ = 1. / module_par.light_attenuation_length.value;
+        time_offset_ = module_par.t_diff.value;
+        time_sync_ = module_par.t_sync.value;
         // NOLINTNEXTLINE
         ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * attenuation_ * 0.5);
     }

@@ -17,13 +17,14 @@ namespace R3B::Neuland
     class SimCal2Cal : public FairTask
     {
       public:
-        SimCal2Cal() = default;
+        explicit SimCal2Cal(std::string_view sim_cal_data_name = "NeulandSimCal",
+                            std::string_view cal_data_name = "NeulandCalData");
         void set_num_of_dp(int number_of_dp) { number_of_dp_ = number_of_dp; }
 
       private:
         int number_of_dp_ = MaxNumberOfPlanes / 2;
-        InputVectorConnector<R3B::Neuland::SimCalData> sim_cal_data_{ "NeulandSimCal" };
-        OutputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
+        InputVectorConnector<R3B::Neuland::SimCalData> sim_cal_data_;
+        OutputVectorConnector<BarCalData> cal_data_;
         CalibrationBasePar* base_par_ = nullptr;
         R3BEventHeader* event_header_ = nullptr;
         FairMCEventHeader* mc_event_header_ = nullptr;

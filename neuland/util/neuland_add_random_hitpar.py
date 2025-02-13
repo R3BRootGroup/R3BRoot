@@ -5,9 +5,9 @@ Add random cal_to_hit_par to the parameter file, which could be the output from 
 import math
 import random
 from enum import Enum
-from scipy.signal import square
 
 import ROOT
+from scipy.signal import square
 
 
 class Mode(Enum):
@@ -20,7 +20,7 @@ class Mode(Enum):
     ## Generate value according to distribution of a cosine function.
     COSINE = 2
     ## Generate value according to distribution of a clock function.
-    CLOCK = 3 
+    CLOCK = 3
 
 
 class ParValueSet:
@@ -217,27 +217,26 @@ class NeulandRandHitParAdder:
         )
 
         # Werte im ROOT-Objekt setzen
-        one_module_par.effectiveSpeed.value = effective_speed
-        one_module_par.effectiveSpeed.error = 0
-        one_module_par.tSync.value = t_sync
-        one_module_par.tSync.error = 0
-        one_module_par.tDiff.value = t_diff
-        one_module_par.tDiff.error = 0
+        one_module_par.effective_speed.value = effective_speed
+        one_module_par.effective_speed.error = 0
+        one_module_par.t_sync.value = t_sync
+        one_module_par.t_sync.error = 0
+        one_module_par.t_diff.value = t_diff
+        one_module_par.t_diff.error = 0
 
-        one_module_par.lightAttenuationLength.value = light_attenuation_length
-        one_module_par.lightAttenuationLength.error = 0
+        one_module_par.light_attenuation_length.value = light_attenuation_length
+        one_module_par.light_attenuation_length.error = 0
 
-        one_module_par.energyGain.setLeft(ROOT.R3B.ValueErrorD(energy_gain, 0))
-        one_module_par.energyGain.setRight(ROOT.R3B.ValueErrorD(energy_gain, 0))
-        one_module_par.pedestal.setLeft(int(pedestal))
-        one_module_par.pedestal.setRight(int(pedestal))
-
-        one_module_par.PMTThreshold.setLeft(ROOT.R3B.ValueErrorD(pmt_thresh, 0.0))
-        one_module_par.PMTThreshold.setRight(ROOT.R3B.ValueErrorD(pmt_thresh, 0.0))
-        one_module_par.PMTSaturation.setLeft(
+        one_module_par.energy_gain.set_left(ROOT.R3B.ValueErrorD(energy_gain, 0))
+        one_module_par.energy_gain.set_right(ROOT.R3B.ValueErrorD(energy_gain, 0))
+        one_module_par.pedestal.set_left(ROOT.R3B.ValueErrorD(pedestal, 0))
+        one_module_par.pedestal.set_right(ROOT.R3B.ValueErrorD(pedestal, 0))
+        one_module_par.pmt_threshold.set_left(ROOT.R3B.ValueErrorD(pmt_thresh, 0.0))
+        one_module_par.pmt_threshold.set_right(ROOT.R3B.ValueErrorD(pmt_thresh, 0.0))
+        one_module_par.pmt_saturation.set_left(
             ROOT.R3B.ValueErrorD(saturation_coefficient, 0.0)
         )
-        one_module_par.PMTSaturation.setRight(
+        one_module_par.pmt_saturation.set_right(
             ROOT.R3B.ValueErrorD(saturation_coefficient, 0.0)
         )
         return one_module_par
@@ -274,7 +273,8 @@ class NeulandRandHitParAdder:
         # Neues Parameter-Objekt erstellen und Module hinzufügen
         par_run = input_par_file.Get(f"{self.__run_id}")
         cal_to_hit_par = ROOT.R3B.Neuland.Cal2HitPar("NeulandHitPar")
-        for module_id in range(1, self.__module_num +1):
+        cal_to_hit_par.SetNumOfModules(self.__module_num)
+        for module_id in range(1, self.__module_num + 1):
             one_module_par = self.__assign_random_values(module_id)
             cal_to_hit_par.AddModulePar(one_module_par)
 

@@ -22,22 +22,22 @@ namespace R3B::Neuland
         };
 
       private:
-        double mean_{ 300. };
-        double sigma_{ 2. };
+        double mean_ = 0.;
+        double sigma_ = 0.;
     };
 
     class AngleDist
     {
       public:
-        double operator()(TRandom* rd_engine_) const
+        auto operator()(TRandom* rd_engine_) const -> double
         {
-            const auto n_steps = int{ 10000 };
+            const auto n_steps = 10000;
             const auto step_size = 0.1;
 
-            auto target_distribution = [](double x) -> double { return std::pow(std::cos(x), 2.); };
+            auto target_distribution = [](double val) -> double { return std::pow(std::cos(val), 2.); };
 
-            double current_angle = 0.0;
-            double new_angle;
+            double current_angle = 0.;
+            double new_angle = 0.;
 
             for (int i = 0; i < n_steps; ++i)
             {

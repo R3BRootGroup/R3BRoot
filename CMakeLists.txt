@@ -104,6 +104,7 @@ option(WITH_SOFIA "Build SOFIA" OFF)
 option(WITH_GTPC "Build GTPC" OFF)
 option(WITH_FRS "Build FRS" OFF)
 option(WITH_ASYEOS "Build ASYEOS" OFF)
+option(WITH_MILLEPEDE "Build millepede" OFF)
 option(BUILD_C3W "Build C3W" OFF)
 option(CONAN_ENABLED "conan package is enabled. (Use CMakePreset to set it)" OFF)
 option(FETCH_GTEST "Fetch GTest from CMake" OFF)
@@ -308,7 +309,7 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/modules/FetchAllContents.cmake)
 
-find_package2(PRIVATE GTest)
+find_package(GTest)
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 find_package2(PUBLIC Protobuf)
@@ -355,6 +356,7 @@ set(CMAKE_CXX_FLAGS "-D_GLIBCXX_ASSERTIONS ${CMAKE_CXX_FLAGS}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # used by clang-tidy
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(R3B_PYTHON_LIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/r3b")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
@@ -438,9 +440,6 @@ set(R3BROOT_MINOR_VERSION 0)
 set(R3BROOT_PATCH_VERSION 0)
 set(R3BROOT_VERSION "${FairRoot_VERSION}")
 set(R3BROOTPATH ${CMAKE_BINARY_DIR})
-
-# added a variable to point to r3broot path in the system
-set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
 if(NOT DEFINED ROOT_FOUND_VERSION)
     set(ROOT_FOUND_VERSION "${found_vers}")
@@ -630,6 +629,17 @@ if(NOT MODULE)
     if(WITH_ASYEOS)
         add_subdirectory(asyeos)
     endif(WITH_ASYEOS)
+    if(WITH_MILLEPEDE)
+        if(EXISTS "${CMAKE_SOURCE_DIR}/util/millepede2/CMakeLists.txt")
+            add_subdirectory(util/millepede2)
+        else()
+            message(
+                FATAL_ERROR
+                    "WITH_MILLEPEDE is enabled but util/millepede2/CMakeLists.txt doens't exist!\n"
+                    "If you forgot to init the git submodule, please do:\n"
+                    "\tgit submodule update --init")
+        endif()
+    endif()
 
     #================================================================================
     # TODO: Since other dependencies still use the old cmake configurations, include(ROOTMacros) has to be used. Please change them using CMake targets ASAP.

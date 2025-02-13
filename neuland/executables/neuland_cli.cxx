@@ -67,7 +67,8 @@ auto main(int argc, char** argv) -> int
     }
     catch (const std::exception& ex)
     {
-        R3BLOG(error, fmt::format("Exception ocurred: {}\n", ex.what()));
+        fmt::println("");
+        R3BLOG(error, fmt::format("Exception ocurred: \n\n{}\n", ex.what()));
         is_failed = true;
         app->set_fail(is_failed);
     }

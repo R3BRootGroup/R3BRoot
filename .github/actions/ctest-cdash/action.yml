@@ -27,7 +27,6 @@ runs:
     - name: running ctest
       run: |
         source $GITHUB_WORKSPACE/util/generate_geo_test.sh
-        export PEDEDIR="~"
         ctest -S cmake/CI_CD/CDash.cmake -DBUILD_J=${NUM_THREADS}\
               -DTEST_MODEL=${TEST_MODEL}\
               -DTEST_NAME=${{ env.TEST_NAME }}\

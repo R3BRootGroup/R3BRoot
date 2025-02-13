@@ -5,7 +5,6 @@ ARG THREAD_NUM=4
 
 ENV FAIRROOTPATH="/root/FairRoot"
 ENV UCESB_DIR="/root/ucesb"
-ENV PEDEDIR="/root"
 
 RUN yes | dnf upgrade --refresh &&\
         dnf install -y byacc && pip install conan --upgrade &&\

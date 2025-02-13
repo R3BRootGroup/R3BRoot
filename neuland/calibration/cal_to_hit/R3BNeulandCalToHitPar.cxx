@@ -22,8 +22,8 @@ namespace
 {
     auto calculate_threshold(const R3B::Neuland::HitModulePar& modulePar, R3B::Side side)
     {
-        const auto value = modulePar.PMTThreshold.get(side).value *
-                           std::exp(R3B::Neuland::TotalBarLength / modulePar.lightAttenuationLength.value);
+        const auto value = modulePar.pmt_threshold.get(side).value *
+                           std::exp(R3B::Neuland::TotalBarLength / modulePar.light_attenuation_length.value);
         const auto err = 0.;
         return R3B::ValueError<double>{ value, err };
     }

@@ -2,6 +2,7 @@
 
 #include "R3BDigitizingTamex.h"
 #include "R3BNeulandApp.h"
+#include <R3BNeulandCalToHitParTask.h>
 
 namespace R3B::Neuland
 {
@@ -21,6 +22,7 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_EDEP_OFF_OPT = MinimizerLimVar{ 5., 1., 0., 250. };
     constexpr auto DEFAULT_N_CLUSTER_OPT = MinimizerLimVar{ 10., 5., 5., 50. };
     constexpr auto DEFAULT_N_CLUSTER_OFF_OPT = MinimizerLimVar{ 2., 1., 0., 10. };
+    constexpr auto DEFAULT_MIN_STAT = 10;
 
     class AnalysisApplication : public Application
     {
@@ -34,7 +36,7 @@ namespace R3B::Neuland
             {
                 struct Digi
                 {
-                    bool enable = true;
+                    bool enable = false;
                     std::string name = "NeulandDigitizer";
                     std::string channel = "tamex";
                     std::string paddle = "neuland";
@@ -43,24 +45,34 @@ namespace R3B::Neuland
                     R3B::Digitizing::Neuland::Tamex::Params tamex_par{ TamexChannel::GetDefaultRandomGen() };
                     Digitizing::Neuland::Tamex::PeakPileUpStrategy pileup_strategy =
                         Digitizing::Neuland::Tamex::PeakPileUpStrategy::width;
+                    std::string read = "NeulandPoints;NeulandHitPar";
+                    std::string write = "NeulandHits;NeulandSimCal";
                 } digi;
                 struct SimCal2Cal
                 {
                     bool enable = false;
                     std::string name = "NeulandSimCal2Cal";
+                    std::string read = "NeulandSimCal";
+                    std::string write = "NeulandCalData";
                 } sim_cal_to_cal;
                 struct HitMon
                 {
                     bool enable = false;
                     std::string name = "NeulandHitMon";
+                    std::string read = "NeulandHits";
+                    std::string write;
                 } hit_monitor;
                 struct PrimInteractionFinder
                 {
                     bool enable = false;
                     std::string name = "NeulandPrimaryInteractionFinder";
+                    std::string read = "NeulandPoints;NeulandHits";
+                    std::string write = "NeulandPrimaryPoints;NeulandPrimaryHits;NeulandPrimaryTracks";
                 } prim_inter_finder;
                 struct ClusterFinder
                 {
+                    std::string read = "read";
+                    std::string write = "write";
                     bool enable = false;
                     std::string name = "NeulandClusterFinder";
                 } cluster_finder;
@@ -68,6 +80,8 @@ namespace R3B::Neuland
                 {
                     bool enable = false;
                     std::string name = "NeulandPrimaryClusterFinder";
+                    std::string read = "NeulandPrimaryHits;NeulandClusters";
+                    std::string write = "NeulandPrimaryClusters;NeulandSecondaryClusters";
                 } prim_cluster_finder;
                 struct MultiTrain
                 {
@@ -79,23 +93,40 @@ namespace R3B::Neuland
                     MinimizerLimVar n_cluster_opt = DEFAULT_N_CLUSTER_OPT;
                     MinimizerLimVar n_cluster_off_opt = DEFAULT_N_CLUSTER_OFF_OPT;
                     std::string name = "NeulandMultiplicityCalorimetricTrain";
+                    std::string read = "NeulandClusters;NeulandPrimaryTracks;NeulandPrimaryHits";
+                    std::string write;
                 } multi_calorimeter_train;
                 struct MultiBayesTrain
                 {
                     bool enable = false;
                     std::string name = "NeulandMultiplicityBayesTrain";
+                    std::string read = "NeulandClusters;NeulandPrimaryTracks";
+                    std::string write;
                 } multi_bayes_train;
                 struct MultiBayes
                 {
                     bool enable = false;
                     std::string name = "NeulandMultiplicityBayes";
+                    std::string read = "NeulandClusters";
+                    std::string write = "NeulandMultiplicity";
                 } multi_bayes;
                 struct NeutronRValue
                 {
                     bool enable = false;
-                    std::string name = "NeulandNeutronsRValue";
                     double neutron_energy_mev = RVAUE_DEFAULT_NEUTRON_ENERGY;
+                    std::string name = "NeulandNeutronsRValue";
+                    std::string read = "NeulandMultiplicity;NeulandClusters";
+                    std::string write = "NeulandNeutrons";
                 } neutron_r_value;
+                struct Cal2HitParTask
+                {
+                    bool enable = false;
+                    int min_stat = DEFAULT_MIN_STAT;
+                    Cal2HitParMethod method = Cal2HitParMethod::LSQT;
+                    std::string name = "NeulandCal2HitParTask";
+                    std::string read = "NeulandCalData;NeulandCalibrationBasePar";
+                    std::string write = "NeulandHitPar";
+                } cal_to_hit_par_task;
             } tasks;
         };
 
@@ -119,8 +150,6 @@ namespace R3B::Neuland
 
         // non-virtual private member functions:
         void set_parameters();
-        auto create_neuland_digi_engine_map(Tamex::PeakPileUpStrategy pileup_strategy,
-                                            const Tamex::Params& tamex_par,
-                                            bool has_cal_to_hit_par = false);
+        auto create_neuland_digi_engine_map(const Options::Tasks::Digi& option, std::string_view hit_par_name);
     };
 } // namespace R3B::Neuland

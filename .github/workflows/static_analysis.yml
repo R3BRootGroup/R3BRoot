@@ -1,96 +1,66 @@
-#
-# SPDX-License-Identifier: LGPL-3.0-or-later
+# #
+# # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: static analysis
-on:
-  push:
-    branches: [dev, edwin_dev]
-  pull_request:
-    branches: [dev, edwin_dev]
+# name: static analysis
+# on:
+#   push:
+#     branches: [dev, edwin_dev]
+#   pull_request:
+#     branches: [dev, edwin_dev]
 
-  workflow_dispatch:
+#   workflow_dispatch:
 
-permissions:
-  pull-requests: write
-  contents: write
+# permissions:
+#   pull-requests: write
+#   contents: write
 
-jobs:
-  clang-lint:
-    runs-on: ubuntu-latest
-<<<<<<< HEAD
+# jobs:
+#   clang-lint:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         shell: bash
+#     strategy:
+#       matrix:
+#         preset: [default]
+#         os: [ubuntu-latest]
+#     container:
+#       image: yanzhaowang/fairroot:${{ matrix.os }}
+#       options: --user root --privileged
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           submodules: 'true'
 
-    steps:
-      - uses: actions/checkout@v5
-      - name: Code formatting
-        run: |
-          cd $GITHUB_WORKSPACE
-          sudo apt-get update
-          sudo apt-get install clang-format-16
-          ./util/clang-format-check.sh clang-format-16
-=======
-    defaults:
-      run:
->>>>>>> 42391c0d (Use cpp-lint for static_analysis CI (#21))
-        shell: bash
-    strategy:
-      matrix:
-<<<<<<< HEAD
-        preset: [ default ]
-        os: [ debian12 ]
-        fsv: [ jan24p5 ]
-        cpp: [ 17 ]
-    container: 
-      image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
-      volumes:
-        - /tmp:/cvmfs
-      env:
-        CVMDIR: /cvmfs/fairsoft.gsi.de
-      options: --user root --privileged  --ulimit nofile=9999:10000 --cap-add SYS_ADMIN --device /dev/fuse
-    steps:
-    - uses: actions/checkout@v5
-      with:
-        fetch-depth: 0
-=======
-        preset: [default]
-        os: [ubuntu-latest]
-    container:
-      image: yanzhaowang/fairroot:${{ matrix.os }}
-      options: --user root --privileged
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: 'true'
->>>>>>> 42391c0d (Use cpp-lint for static_analysis CI (#21))
+#       - name: install sudo
+#         run: |
+#           apt-get install -y sudo
+#           sudo -H python3 -m pip install conan
 
-      - name: install sudo
-        run: |
-          apt-get install -y sudo
-          sudo -H python3 -m pip install conan
+#       - name: configure r3broot
+#         uses: './.github/actions/r3bbuild-steps'
+#         with:
+#           build-needed: 'false'
 
-      - name: configure r3broot
-        uses: './.github/actions/r3bbuild-steps'
-        with:
-          build-needed: 'false'
+#       - name: Run clang-format style check for C/C++/Protobuf programs.
+#         uses: cpp-linter/cpp-linter-action@v2
+#         id: linter
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.CPPLINTER_TOKEN }}
+#         with:
+#           style: 'file'
+#           tidy-checks: ''
+#           version: 18
+#           lines-changed-only: true
+#           database: '${{ github.workspace }}/build'
+#           thread-comments: update
+#           tidy-review: true
+#           file-annotations: true
+#           format-review: true
+#           passive-reviews: true
+#           extensions: 'h,cxx'
+#           ignore: '*|!neuland|!r3bbase|!r3bdata|!r3bsource|ext_h101*'
 
-      - name: Run clang-format style check for C/C++/Protobuf programs.
-        uses: cpp-linter/cpp-linter-action@v2
-        id: linter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          style: 'file'
-          tidy-checks: ''
-          version: 18
-          lines-changed-only: true
-          database: build
-          thread-comments: update
-          tidy-review: true
-          file-annotations: true
-          format-review: true
-          passive-reviews: true
-          extensions: 'h,cxx'
-          ignore: '*|!neuland|!r3bbase|!r3bdata|!r3bsource|ext_h101*'
-
-      - name: Fail fast?!
-        if: steps.linter.outputs.checks-failed > 0
-        run: exit 1
+#       - name: Fail fast?!
+#         if: steps.linter.outputs.checks-failed > 0
+#         run: exit 1

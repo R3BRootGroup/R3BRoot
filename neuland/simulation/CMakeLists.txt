@@ -11,14 +11,24 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-set(SRCS R3BNeuland.cxx R3BNeulandMCMon.cxx R3BNeulandPrimaryClusterFinder.cxx
-         R3BNeulandPrimaryInteractionFinder.cxx)
+set(SRCS
+    R3BNeuland.cxx
+    R3BNeulandMCMon.cxx
+    R3BNeulandPrimaryClusterFinder.cxx
+    R3BNeulandPrimaryInteractionFinder.cxx
+    generator/CosmicMuon.cxx)
 
-set(HEADERS R3BNeuland.h R3BNeulandMCMon.h R3BNeulandPrimaryClusterFinder.h
-    R3BNeulandPrimaryInteractionFinder.h CosmicMuon.h CosmicMuonDistributions.h)
+set(HEADERS
+    R3BNeuland.h
+    R3BNeulandMCMon.h
+    R3BNeulandPrimaryClusterFinder.h
+    R3BNeulandPrimaryInteractionFinder.h
+    generator/CosmicMuon.h
+    CosmicMuonDistributions.h)
 
 add_library(R3BNeulandSimulation SHARED ${SRCS})
-target_include_directories(R3BNeulandSimulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generator ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(R3BNeulandSimulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generator
+                                                       ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(R3BNeulandSimulation PUBLIC R3BNeulandShared R3BPassive R3BNeulandGeoBase)
 root_generate_dictionary(
     R3BNeulandSimulation_dict

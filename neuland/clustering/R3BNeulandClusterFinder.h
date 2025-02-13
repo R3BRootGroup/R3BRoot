@@ -41,6 +41,13 @@ class R3BNeulandClusterFinder : public FairTask
                                      std::string_view input = "NeulandHits",
                                      std::string_view output = "NeulandClusters");
 
+    R3BNeulandClusterFinder(std::string_view input, std::string_view output)
+        : R3BNeulandClusterFinder{
+            1. * CLUSTER_FINDER_DISTANCE, 1. * CLUSTER_FINDER_DISTANCE, 2. * CLUSTER_FINDER_DISTANCE, 1., input, output
+        }
+    {
+    }
+
   private:
     Neuland::ClusteringEngine<R3BNeulandHit> fClusteringEngine;
     R3B::InputVectorConnector<R3BNeulandHit> fDigis;

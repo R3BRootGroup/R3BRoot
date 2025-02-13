@@ -32,6 +32,7 @@ namespace R3B::Neuland
             std::string log_level = "error";
             struct Input
             {
+                std::string working_dir;
                 std::vector<std::string> data;
                 std::vector<std::string> tree_data;
                 std::string par;
@@ -39,6 +40,7 @@ namespace R3B::Neuland
             } input;
             struct Output
             {
+                std::string working_dir;
                 std::string data = "output.root";
                 std::string par = "output.par.root";
             } output;
@@ -177,13 +179,17 @@ namespace R3B::Neuland
     template <typename OptionType>
     void Application::ParseApplicationOptionImp(const std::vector<std::string>& filenames, OptionType& option)
     {
-        auto json_obj = nlohmann::ordered_json{ option };
+        auto json_obj = [&option]()
+        {
+            auto json_obj_tmp = nlohmann::ordered_json{ option };
+            return json_obj_tmp.is_array() ? json_obj_tmp.front() : json_obj_tmp;
+        }();
         for (const auto& filename : filenames)
         {
             auto json_file_obj = nlohmann::ordered_json{};
             auto file = std::ifstream{ filename };
             file >> json_file_obj;
-            R3BLOG(info, fmt::format("Reading the configuration from the json file {:?}", filename));
+            R3BLOG(info, fmt::format("Reading the configuration from the json file {:?}.", filename));
             json_obj.merge_patch(json_file_obj);
         }
         json_obj.get_to(option);

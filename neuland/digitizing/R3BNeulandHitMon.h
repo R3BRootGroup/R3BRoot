@@ -27,7 +27,6 @@
 #include "R3BDataMonitor.h"
 #include "R3BIOConnector.h"
 #include "R3BNeulandHit.h"
-#include <R3BIOConnector.h>
 
 class TH1D;
 class TH2D;
@@ -37,7 +36,7 @@ class TH1I;
 class R3BNeulandHitMon : public FairTask
 {
   public:
-    explicit R3BNeulandHitMon(const Option_t* option = "");
+    explicit R3BNeulandHitMon(std::string_view hits_name = "NeulandHits", const Option_t* option = "");
 
     void Exec(Option_t* /*option*/) override;
 
@@ -50,7 +49,7 @@ class R3BNeulandHitMon : public FairTask
   private:
     std::string output_{ "NeulandHitMon" };
 
-    R3B::InputVectorConnector<R3BNeulandHit> neuland_hits_{ "NeulandHits" };
+    R3B::InputVectorConnector<R3BNeulandHit> neuland_hits_;
 
     double distance_to_target_ = 0.;
 

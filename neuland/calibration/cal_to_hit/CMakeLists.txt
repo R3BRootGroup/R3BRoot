@@ -20,6 +20,7 @@ set(SRCS
     # cmake-format: sortable
     engine/R3BNeulandLSQREngineAdaptor.cxx
     engine/R3BNeulandMillepede.cxx
+    engine/R3BNeulandPredecessor.cxx
     R3BNeulandCalToHitPar.cxx
     R3BNeulandCalToHitParTask.cxx
     R3BNeulandCalToHitTask.cxx)
@@ -29,6 +30,7 @@ set(HEADERS
     engine/R3BNeulandCosmicEngine.h
     engine/R3BNeulandLSQREngineAdaptor.h
     engine/R3BNeulandMillepede.h
+    engine/R3BNeulandPredecessor.h
     R3BNeulandCalToHitPar.h
     R3BNeulandCalToHitParTask.h
     R3BNeulandCalToHitTask.h)

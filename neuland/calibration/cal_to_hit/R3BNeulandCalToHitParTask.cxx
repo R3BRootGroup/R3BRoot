@@ -15,11 +15,22 @@
 #include <R3BLogger.h>
 #include <R3BNeulandLSQREngineAdaptor.h>
 #include <R3BNeulandMillepede.h>
+#include <R3BNeulandPredecessor.h>
 
 namespace R3B::Neuland
 {
-    Cal2HitParTask::Cal2HitParTask(Cal2HitParMethod method, std::string_view name, int iVerbose)
+    // NOLINTBEGIN
+    Cal2HitParTask::Cal2HitParTask(Cal2HitParMethod method,
+                                   std::string_view cal_data_name,
+                                   std::string_view base_par_name,
+                                   std::string_view hit_par_name,
+                                   std::string_view name,
+                                   int iVerbose)
         : CalibrationTask(name, iVerbose)
+        , cal_data_{ cal_data_name }
+        , base_par_{ InputPar<CalibrationBasePar>(base_par_name) }
+        , hit_par_{ OutputPar<Cal2HitPar>(hit_par_name) }
+    // NOLINTEND
     {
         switch (method)
         {
@@ -27,9 +38,13 @@ namespace R3B::Neuland
                 R3BLOG(info, "Cal2HitPar method: LSQT.");
                 engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
                 break;
-            case Cal2HitParMethod::Millipede:
+            case Cal2HitParMethod::millipede:
                 R3BLOG(info, "Cal2HitPar method: Millepede.");
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
+                break;
+            case Cal2HitParMethod::predecessor:
+                R3BLOG(info, "Cal2HitPar method: predecessor.");
+                engine_ = std::make_unique<Calibration::Predecessor>();
                 break;
         }
     }

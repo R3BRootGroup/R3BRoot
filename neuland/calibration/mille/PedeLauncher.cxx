@@ -26,8 +26,11 @@ namespace R3B::Millepede
 {
     void Launcher::launch()
     {
-#ifdef PEDEDIR
-        const auto exe_string = fmt::format("{}/{}", PEDEDIR, executable_);
+#ifndef WITH_MILLEPEDE
+        throw std::runtime_error(
+            "Program is not compiled with with millepde2. Please enable \"WITH_MILLEPEDE=ON\" with CMake.");
+#endif
+        const auto exe_string = fmt::format("{}/{}", binary_directory_, executable_);
         auto launch_args = std::vector<std::string>{ "-i", steer_filename_ };
         auto exe_path = std::filesystem::path(exe_string);
         if (not std::filesystem::exists(exe_path))
@@ -57,7 +60,6 @@ namespace R3B::Millepede
                                                  fmt::join(launch_args, " "),
                                                  ex.what()));
         }
-#endif
     }
 
     void Launcher::end()

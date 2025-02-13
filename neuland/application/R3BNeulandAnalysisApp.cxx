@@ -20,6 +20,7 @@
 #include <R3BNeulandNeutronsRValue.h>
 #include <R3BNeulandPrimaryClusterFinder.h>
 #include <R3BNeulandPrimaryInteractionFinder.h>
+#include <boost/algorithm/string.hpp>
 #include <fstream>
 
 namespace Digitizing = R3B::Digitizing;
@@ -35,6 +36,44 @@ using json = nlohmann::ordered_json;
 
 namespace
 {
+    void resolve_branch_names(const std::string& input, std::vector<std::string>& output)
+    {
+        output.clear();
+        boost::split(output, input, boost::is_any_of(";"));
+        // trim the empty spaces
+        std::for_each(output.begin(), output.end(), [](auto& name) { boost::trim(name); });
+        // remove empty names
+        output.erase(std::remove(output.begin(), output.end(), ""), output.end());
+    }
+
+    template <typename Option>
+    void parse_branch_names(const Option& option,
+                            std::vector<std::string>& read,
+                            int read_num,
+                            std::vector<std::string>& write,
+                            int write_num)
+    {
+        resolve_branch_names(option.read, read);
+        if (read.size() != read_num)
+        {
+            throw R3B::logic_error(fmt::format(
+                "Task {:?} requires {} read branch(es) but only received {} branch(es)! Parsed string: {:?}",
+                option.name,
+                read_num,
+                read.size(),
+                option.read));
+        }
+        resolve_branch_names(option.write, write);
+        if (write.size() != write_num)
+        {
+            throw R3B::logic_error(fmt::format(
+                "Task {:?} requires {} write branch(es) but only received {} branch(es)! Parsed string: {:?}",
+                option.name,
+                read_num,
+                write.size(),
+                option.write));
+        }
+    }
 } // namespace
 
 namespace R3B::Neuland
@@ -54,15 +93,16 @@ namespace R3B::Neuland
         }
     } // namespace
 
-    auto AnalysisApplication::create_neuland_digi_engine_map(Tamex::PeakPileUpStrategy pileup_strategy,
-                                                             const Tamex::Params& tamex_par,
-                                                             bool has_cal_to_hit_par)
+    auto AnalysisApplication::create_neuland_digi_engine_map(const Options::Tasks::Digi& option,
+                                                             std::string_view hit_par_name)
     {
+        auto pileup_strategy = option.pileup_strategy;
+        const auto& tamex_par = option.tamex_par;
         R3B::Neuland::Cal2HitPar* cal_to_hit_par{ nullptr };
-        if (has_cal_to_hit_par)
+        if (option.enable_hit_par)
         {
             R3BLOG(info, "cal_to_hit_par is used in digitization task!");
-            cal_to_hit_par = std::make_unique<R3B::Neuland::Cal2HitPar>().release();
+            cal_to_hit_par = std::make_unique<R3B::Neuland::Cal2HitPar>(hit_par_name).release();
             get_run()->GetRuntimeDb()->addContainer(cal_to_hit_par);
         }
         else
@@ -120,115 +160,129 @@ namespace R3B::Neuland
 
     void AnalysisApplication::pre_init(FairRun* run)
     {
+
+        auto EvntHeader = std::make_unique<R3BEventHeader>();
+        auto read_branch_names = std::vector<std::string>{};
+        auto write_branch_names = std::vector<std::string>{};
+        run->SetEventHeader(EvntHeader.release());
+
         auto task_option = options_.tasks;
         run->SetEventHeader(std::make_unique<R3BEventHeader>().release());
-        const auto& digi_options = task_option.digi;
-        if (digi_options.enable)
+
+        if (const auto& option = task_option.digi; option.enable)
         {
-            auto engine_map = create_neuland_digi_engine_map(
-                digi_options.pileup_strategy, digi_options.tamex_par, digi_options.enable_hit_par);
-            auto engine_gen = engine_map.at({ digi_options.paddle, digi_options.channel });
-            auto task = std::make_unique<R3BNeulandDigitizer>(engine_gen());
-            task->EnableCalDataOutput(digi_options.enable_sim_cal);
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 2);
+            auto engine_map = create_neuland_digi_engine_map(option, read_branch_names.at(1));
+            auto engine_gen = engine_map.at({ option.paddle, option.channel });
+            auto task = std::make_unique<R3BNeulandDigitizer>(
+                engine_gen(), read_branch_names.at(0), write_branch_names.at(0), write_branch_names.at(1));
+            task->EnableCalDataOutput(option.enable_sim_cal);
             task->SetName(task_option.digi.name.c_str());
             run->AddTask(task.release());
         }
-        else
-        {
-            task_option.cluster_finder.enable = false;
-            task_option.sim_cal_to_cal.enable = false;
-        }
 
-        if (task_option.sim_cal_to_cal.enable)
+        if (const auto& option = task_option.sim_cal_to_cal; option.enable)
         {
-            auto task = std::make_unique<R3B::Neuland::SimCal2Cal>();
-            task->SetName(task_option.sim_cal_to_cal.name.c_str());
+            parse_branch_names(option, read_branch_names, 1, write_branch_names, 1);
+            auto task = std::make_unique<R3B::Neuland::SimCal2Cal>(read_branch_names.at(0), write_branch_names.at(0));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.hit_monitor.enable)
+        if (const auto& option = task_option.hit_monitor; option.enable)
         {
-            // requires_dependecy(task_option.hit_monitor, task_option.digi);
-            auto task = std::make_unique<R3BNeulandHitMon>();
-            task->SetName(task_option.hit_monitor.name.c_str());
+            parse_branch_names(option, read_branch_names, 1, write_branch_names, 0);
+            auto task = std::make_unique<R3BNeulandHitMon>(read_branch_names.at(0));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.prim_inter_finder.enable)
+        if (const auto& option = task_option.prim_inter_finder; option.enable)
         {
-            // requires_dependecy(task_option.prim_inter_finder, task_option.digi);
-            auto task = std::make_unique<R3BNeulandPrimaryInteractionFinder>();
-            task->SetName(task_option.prim_inter_finder.name.c_str());
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 3);
+            auto task = std::make_unique<R3BNeulandPrimaryInteractionFinder>(read_branch_names.at(0),
+                                                                             read_branch_names.at(1),
+                                                                             write_branch_names.at(0),
+                                                                             write_branch_names.at(1),
+                                                                             write_branch_names.at(2));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.cluster_finder.enable)
+        if (const auto& option = task_option.cluster_finder; option.enable)
         {
-            // requires_dependecy(task_option.cluster_finder, task_option.digi);
-            auto task = std::make_unique<R3BNeulandClusterFinder>();
-            task->SetName(task_option.cluster_finder.name.c_str());
+            parse_branch_names(option, read_branch_names, 1, write_branch_names, 1);
+            auto task = std::make_unique<R3BNeulandClusterFinder>(read_branch_names.at(0), write_branch_names.at(0));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.prim_cluster_finder.enable)
+        if (const auto& option = task_option.cluster_finder; option.enable)
         {
-            // requires_dependecy(task_option.prim_cluster_finder, task_option.prim_inter_finder);
-            // requires_dependecy(task_option.prim_cluster_finder, task_option.cluster_finder);
-            auto task = std::make_unique<R3BNeulandPrimaryClusterFinder>();
-            task->SetName(task_option.prim_cluster_finder.name.c_str());
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 2);
+            auto task = std::make_unique<R3BNeulandPrimaryClusterFinder>(
+                read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0), write_branch_names.at(1));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.multi_calorimeter_train.enable)
+        if (const auto& option = task_option.multi_calorimeter_train; option.enable)
         {
-            const auto calo_options = task_option.multi_calorimeter_train;
-            // requires_dependecy(calo_options, task_option.prim_inter_finder);
-            // requires_dependecy(calo_options, task_option.cluster_finder);
-            auto task = std::make_unique<R3BNeulandMultiplicityCalorimetricTrain>();
-            task->SetName(calo_options.name.c_str());
-            task->SetUseHits(calo_options.use_hit);
-            task->SetWeight(calo_options.weight);
-            task->SetEdepOpt(calo_options.edep_opt.init,
-                             calo_options.edep_opt.step,
-                             calo_options.edep_opt.lower,
-                             calo_options.edep_opt.upper);
-            task->SetEdepOffOpt(calo_options.edep_off_opt.init,
-                                calo_options.edep_off_opt.step,
-                                calo_options.edep_off_opt.lower,
-                                calo_options.edep_off_opt.upper);
-            task->SetNclusterOffOpt(calo_options.n_cluster_opt.init,
-                                    calo_options.n_cluster_opt.step,
-                                    calo_options.n_cluster_opt.lower,
-                                    calo_options.n_cluster_opt.upper);
-            task->SetNclusterOffOpt(calo_options.n_cluster_off_opt.init,
-                                    calo_options.n_cluster_off_opt.step,
-                                    calo_options.n_cluster_off_opt.lower,
-                                    calo_options.n_cluster_off_opt.upper);
+            parse_branch_names(option, read_branch_names, 3, write_branch_names, 0);
+            auto task = std::make_unique<R3BNeulandMultiplicityCalorimetricTrain>(
+                read_branch_names.at(0), read_branch_names.at(1), read_branch_names.at(2));
+            task->SetName(option.name.c_str());
+            task->SetUseHits(option.use_hit);
+            task->SetWeight(option.weight);
+            task->SetEdepOpt(option.edep_opt.init, option.edep_opt.step, option.edep_opt.lower, option.edep_opt.upper);
+            task->SetEdepOffOpt(option.edep_off_opt.init,
+                                option.edep_off_opt.step,
+                                option.edep_off_opt.lower,
+                                option.edep_off_opt.upper);
+            task->SetNclusterOffOpt(option.n_cluster_opt.init,
+                                    option.n_cluster_opt.step,
+                                    option.n_cluster_opt.lower,
+                                    option.n_cluster_opt.upper);
+            task->SetNclusterOffOpt(option.n_cluster_off_opt.init,
+                                    option.n_cluster_off_opt.step,
+                                    option.n_cluster_off_opt.lower,
+                                    option.n_cluster_off_opt.upper);
             run->AddTask(task.release());
         }
 
-        if (task_option.multi_bayes_train.enable)
+        if (const auto& option = task_option.multi_bayes_train; option.enable)
         {
-            // requires_dependecy(task_option.multi_bayes_train, task_option.cluster_finder);
-            auto task = std::make_unique<R3BNeulandMultiplicityBayesTrain>();
-            task->SetName(task_option.multi_bayes_train.name.c_str());
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 0);
+            auto task =
+                std::make_unique<R3BNeulandMultiplicityBayesTrain>(read_branch_names.at(0), read_branch_names.at(1));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.multi_bayes.enable)
+        if (const auto& option = task_option.multi_bayes; option.enable)
         {
-            // requires_dependecy(task_option.multi_bayes, task_option.cluster_finder);
-            auto task = std::make_unique<R3BNeulandMultiplicityBayes>();
-            task->SetName(task_option.multi_bayes.name.c_str());
+            parse_branch_names(option, read_branch_names, 1, write_branch_names, 1);
+            auto task =
+                std::make_unique<R3BNeulandMultiplicityBayes>(read_branch_names.at(0), write_branch_names.at(0));
+            task->SetName(option.name.c_str());
             run->AddTask(task.release());
         }
 
-        if (task_option.neutron_r_value.enable)
+        if (const auto& option = task_option.neutron_r_value; option.enable)
         {
-            requires_dependecy(task_option.neutron_r_value, task_option.multi_bayes);
-            requires_dependecy(task_option.neutron_r_value, task_option.cluster_finder);
-            auto task = std::make_unique<R3BNeulandNeutronsRValue>(task_option.neutron_r_value.neutron_energy_mev);
-            task->SetName(task_option.neutron_r_value.name.c_str());
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 1);
+            auto task = std::make_unique<R3BNeulandNeutronsRValue>(
+                option.neutron_energy_mev, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
+            task->SetName(option.name.c_str());
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.cal_to_hit_par_task; option.enable)
+        {
+            parse_branch_names(option, read_branch_names, 2, write_branch_names, 1);
+            auto task = std::make_unique<R3B::Neuland::Cal2HitParTask>(
+                option.method, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
+            task->SetMinStat(option.min_stat);
             run->AddTask(task.release());
         }
     }

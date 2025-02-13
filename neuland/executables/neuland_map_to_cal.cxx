@@ -111,7 +111,7 @@ auto main(int argc, char** argv) -> int
         }
 
         auto cal2hit_method =
-            (enable_mille.value()) ? R3B::Neuland::Cal2HitParMethod::Millipede : R3B::Neuland::Cal2HitParMethod::LSQT;
+            (enable_mille.value()) ? R3B::Neuland::Cal2HitParMethod::millipede : R3B::Neuland::Cal2HitParMethod::LSQT;
         auto cal2hitParTask = std::make_unique<R3B::Neuland::Cal2HitParTask>(cal2hit_method);
         auto* cal2hitParTaskPtr = cal2hitParTask.get();
         cal2hitParTaskPtr->SetTrigger(R3B::Neuland::CalTrigger::all);

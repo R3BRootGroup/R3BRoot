@@ -6,6 +6,7 @@
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
 #include <TGeoManager.h>
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <gsl/span>
 #ifdef HAS_MPI
@@ -15,6 +16,7 @@
 using gsl::span;
 namespace
 {
+    namespace fs = std::filesystem;
     template <typename T>
     auto get_partition_from(const std::vector<T>& elements, int num_of_partitions, int partition_num) -> span<const T>
     {
@@ -59,11 +61,13 @@ namespace R3B::Neuland
         {
             if (is_failed_)
             {
-                fmt::print("Failed to finish Neuland Application successfully.\n");
+                fmt::print(fmt::emphasis::bold | fg(fmt::color::red),
+                           "\nNeuland Application finished with a failure!\n\n");
             }
             else
             {
-                fmt::print("Neuland Application finished successfully.\n");
+                fmt::print(fmt::emphasis::bold | fg(fmt::color::green),
+                           "\nNeuland Application finished successfully!\n\n");
             }
             fmt::print("Real time: {}s, cpu time: {}s\n", timer_.RealTime(), timer_.CpuTime());
         }
@@ -150,11 +154,17 @@ namespace R3B::Neuland
     void Application::add_inout_files()
     {
         const auto& option = option_.get();
+
+        // output files:
         const auto output_name =
             option.enable_mpi ? fmt::format("{}.{}", option.output.data, rank_num_) : option.output.data;
         if (not option_.get().output.data.empty())
         {
-            auto file_sink = std::make_unique<FairRootFileSink>(output_name.c_str());
+            // check if path if relative or full
+            auto file_path = option.output.working_dir.empty()
+                                 ? fs::path{ output_name }
+                                 : fs::path{ option.output.working_dir } / fs::path{ output_name };
+            auto file_sink = std::make_unique<FairRootFileSink>(file_path.c_str());
             run_->SetSink(file_sink.release());
         }
 
@@ -175,27 +185,41 @@ namespace R3B::Neuland
 
     void Application::add_inout_pars()
     {
-        if (not option_.get().input.par.empty())
+        auto file_path = fs::path{};
+        const auto& input_option = option_.get().input;
+        const auto& output_option = option_.get().output;
+        const auto& input_wd = input_option.working_dir;
+        const auto& output_wd = output_option.working_dir;
+
+        if (not input_option.par.empty())
         {
+            file_path =
+                input_wd.empty() ? fs::path{ input_option.par } : fs::path{ input_wd } / fs::path{ input_option.par };
             auto fileio = std::make_unique<FairParRootFileIo>();
-            fileio->open(option_.get().input.par.c_str(), "READ");
+            R3BLOG(info, fmt::format("Input first parameter file is {:?}", file_path.string()));
+            fileio->open(file_path.c_str(), "READ");
             run_->GetRuntimeDb()->setFirstInput(fileio.release());
         }
 
-        if (not option_.get().input.par_2.empty())
+        if (not input_option.par_2.empty())
         {
+            file_path = input_wd.empty() ? fs::path{ input_option.par_2 }
+                                         : fs::path{ input_wd } / fs::path{ input_option.par_2 };
             auto fileio = std::make_unique<FairParRootFileIo>();
-            fileio->open(option_.get().input.par_2.c_str(), "READ");
+            R3BLOG(info, fmt::format("Input second parameter file is {:?}", file_path.string()));
+            fileio->open(file_path.c_str(), "READ");
             run_->GetRuntimeDb()->setSecondInput(fileio.release());
         }
 
-        if (not option_.get().output.par.empty())
+        if (not output_option.par.empty())
         {
             const auto& option = option_.get();
             const auto output_name =
-                option.enable_mpi ? fmt::format("{}.{}", option.output.par, rank_num_) : option.output.par;
+                option.enable_mpi ? fmt::format("{}.{}", output_option.par, rank_num_) : output_option.par;
+            file_path = output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
+            R3BLOG(info, fmt::format("Ouptut parameter file is {:?}", file_path.string()));
             auto fileio = std::make_unique<FairParRootFileIo>(true);
-            fileio->open(output_name.c_str(), "RECREATE");
+            fileio->open(file_path.c_str(), "RECREATE");
             auto* rtdb = run_->GetRuntimeDb();
             rtdb->setOutput(fileio.release());
         }
@@ -227,9 +251,13 @@ namespace R3B::Neuland
 
     void Application::extract_input_files()
     {
+        auto file_path = fs::path{};
+        const auto& working_dir = option_.get().input.working_dir;
         for (const auto& filename : option_.get().input.data)
         {
-            auto fairroot_input_files = R3B::GetFilesFromRegex(filename);
+            // check if path if relative or full
+            file_path = working_dir.empty() ? fs::path{ filename } : fs::path{ working_dir } / fs::path{ filename };
+            auto fairroot_input_files = R3B::GetFilesFromRegex(file_path.string());
             for (const auto& fairroot_input_file : fairroot_input_files)
             {
                 input_files_.emplace_back(fairroot_input_file, false);

@@ -20,19 +20,24 @@
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCosmicEngine.h>
 #include <R3BNeulandMapToCalPar.h>
+#include <cstdint>
 
 namespace R3B::Neuland
 {
-    enum class Cal2HitParMethod
+    enum class Cal2HitParMethod : uint8_t
     {
         LSQT,
-        Millipede
+        predecessor,
+        millipede
     };
 
     class Cal2HitParTask : public CalibrationTask
     {
       public:
         explicit Cal2HitParTask(Cal2HitParMethod method = Cal2HitParMethod::LSQT,
+                                std::string_view cal_data_name = "NeulandCalData",
+                                std::string_view base_par_name = "NeulandCalibrationBasePar",
+                                std::string_view hit_par_name = "NeulandHitPar",
                                 std::string_view name = "NeulandCal2HitParTask",
                                 int iVerbose = 1);
         void SetMinStat(int min) { engine_->SetMinStat(min); }
@@ -42,8 +47,8 @@ namespace R3B::Neuland
       private:
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
 
-        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
-        Cal2HitPar* hit_par_ = OutputPar<Cal2HitPar>("NeulandHitPar");
+        CalibrationBasePar* base_par_ = nullptr; // input par
+        Cal2HitPar* hit_par_ = nullptr;          // output par
 
         std::unique_ptr<Calibration::CosmicEngineInterface> engine_;
 
