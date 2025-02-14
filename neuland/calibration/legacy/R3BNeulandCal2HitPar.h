@@ -38,9 +38,10 @@ class R3BNeulandCal2HitPar : public FairTask
 {
   public:
     R3BNeulandCal2HitPar()
-        : R3BNeulandCal2HitPar("R3BNeulandCal2HitPar", 1){};
+        : R3BNeulandCal2HitPar("R3BNeulandCal2HitPar", 1)
+    {
+    }
     R3BNeulandCal2HitPar(const char* name, const Int_t iVerbose = 1);
-    virtual ~R3BNeulandCal2HitPar();
 
     virtual InitStatus Init();
 

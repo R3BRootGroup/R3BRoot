@@ -37,8 +37,8 @@ class R3BNeulandClusterMon : public FairTask
 {
   public:
     explicit R3BNeulandClusterMon(TString input = "NeulandClusters",
-                         TString output = "NeulandClusterMon",
-                         const Option_t* option = "");
+                                  TString output = "NeulandClusterMon",
+                                  const Option_t* option = "");
 
   protected:
     auto Init() -> InitStatus override;

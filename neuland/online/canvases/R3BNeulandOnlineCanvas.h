@@ -52,7 +52,7 @@ namespace R3B::Neuland
         virtual void DataInit() = 0;
         virtual void CanvasInit(DataMonitor& histograms) = 0;
         virtual void CanvasFill(DataMonitor& histograms) = 0;
-        virtual void CanvasFinish(){};
+        virtual void CanvasFinish() {};
 
       private:
         std::string name_;

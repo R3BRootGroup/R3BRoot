@@ -23,7 +23,7 @@ namespace R3B::Neuland::Calibration
         void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override {}
         void EventReset() override {}
-        void EndOfTask() override{}
+        void EndOfTask() override {}
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
         void HistInit(DataMonitor& histograms) override;
         void SetMinStat(int min) override

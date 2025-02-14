@@ -59,8 +59,9 @@ namespace Neuland
     auto NeutronEnergyFromElasticScattering(const R3BNeulandCluster& first,
                                             const R3BNeulandCluster& second,
                                             double target_mass) -> double;
-    auto MaybeElasticScattering(const R3BNeulandCluster& first, const R3BNeulandCluster& second, double targetMass)
-        -> double;
+    auto MaybeElasticScattering(const R3BNeulandCluster& first,
+                                const R3BNeulandCluster& second,
+                                double targetMass) -> double;
     auto ElasticScatteringTargetMass(const R3BNeulandCluster& first, const R3BNeulandCluster& second) -> double;
 } // namespace Neuland
 

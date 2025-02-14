@@ -1,5 +1,5 @@
-#include "FairRootManager.h"
 #include "R3BNeulandNeutronsCheat.h"
+#include "FairRootManager.h"
 
 R3BNeulandNeutronsCheat::R3BNeulandNeutronsCheat(std::string_view inputMult,
                                                  std::string_view inputHit,

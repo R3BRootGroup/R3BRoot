@@ -64,14 +64,17 @@ namespace R3B::Neuland
                             const std::vector<CalibratedSignal>& right_signals,
                             const HitModulePar& par,
                             /* inout */ std::vector<R3BNeulandHit>& hits);
-        [[nodiscard]] auto construct_hit(const LRPair<CalibratedSignal>& signalPair, const HitModulePar& par) const
-            -> R3BNeulandHit;
-        static auto get_calibrated_energy(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-            -> ValueErrorD;
-        static auto get_calibrated_time(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-            -> ValueErrorD;
-        static auto to_calibrated_signal(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
-            -> CalibratedSignal;
+        [[nodiscard]] auto construct_hit(const LRPair<CalibratedSignal>& signalPair,
+                                         const HitModulePar& par) const -> R3BNeulandHit;
+        static auto get_calibrated_energy(const CalDataSignal& calSignal,
+                                          const HitModulePar& par,
+                                          R3B::Side side) -> ValueErrorD;
+        static auto get_calibrated_time(const CalDataSignal& calSignal,
+                                        const HitModulePar& par,
+                                        R3B::Side side) -> ValueErrorD;
+        static auto to_calibrated_signal(const CalDataSignal& calSignal,
+                                         const HitModulePar& par,
+                                         R3B::Side side) -> CalibratedSignal;
         [[nodiscard]] auto signal_match_checking(const CalibratedSignal& first_signal,
                                                  const CalibratedSignal& second_signal,
                                                  const HitModulePar& par) -> bool;

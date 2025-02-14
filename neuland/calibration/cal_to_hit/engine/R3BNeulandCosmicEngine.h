@@ -46,11 +46,11 @@ namespace R3B::Neuland::Calibration
         virtual void AddSignal(const BarCalData& signal) = 0;
         virtual void Calibrate(Cal2HitPar& hit_par) = 0;
         virtual void SetMinStat(int min) {}
-        virtual void BeginOfEvent(unsigned int event_num){};
-        virtual void EndOfEvent(unsigned int event_num){};
-        virtual void EventReset(){};
-        virtual void EndOfTask(){};
-        virtual void HistInit(DataMonitor& histograms){};
+        virtual void BeginOfEvent(unsigned int event_num) {};
+        virtual void EndOfEvent(unsigned int event_num) {};
+        virtual void EventReset() {};
+        virtual void EndOfTask() {};
+        virtual void HistInit(DataMonitor& histograms) {};
         virtual void SetErrorScale(float scale) {}
 
       private:

@@ -1,5 +1,4 @@
 #include "R3BNeulandMapToCalParTask.h"
-#include "R3BEventHeader.h"
 #include "R3BException.h"
 #include <FairParIo.h>
 #include <FairParRootFileIo.h>
@@ -7,7 +6,6 @@
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
 #include <R3BLogger.h>
-#include <iostream>
 
 namespace
 {
@@ -99,7 +97,8 @@ namespace R3B::Neuland
             for (const auto& [barNum, barSignals] : planeSignals.bars)
             {
                 auto barNum_tmp = barNum;
-                R3BLOG(debug, fmt::format("Calibrating with the map-level bar signal: {}, barNum: {}", barSignals, barNum));
+                R3BLOG(debug,
+                       fmt::format("Calibrating with the map-level bar signal: {}, barNum: {}", barSignals, barNum));
                 auto FillData = [&](FTType type, auto value)
                 { FillEngine(mapCalEngine_, type, value, planeID, barNum_tmp); };
                 for (const auto& signal : barSignals.left)
@@ -120,7 +119,10 @@ namespace R3B::Neuland
     {
         for (const auto& [moduleNum, moduleSignals] : trigMappedData_)
         {
-            R3BLOG(debug, fmt::format("Calibrating with the map-level bar trig signal: {}, module num: {}", moduleSignals.signal, moduleNum));
+            R3BLOG(debug,
+                   fmt::format("Calibrating with the map-level bar trig signal: {}, module num: {}",
+                               moduleSignals.signal,
+                               moduleNum));
             FillEngine(trigMapCalEngine_, FTType::trigger, moduleSignals.signal.fine, moduleNum);
         }
     }

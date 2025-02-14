@@ -177,7 +177,6 @@ namespace R3B::Neuland
                 // graph.pad()->RangeChanged();
                 graph.pad()->RedrawAxis();
                 graph.pad()->Update();
-
             });
     }
 

@@ -152,7 +152,7 @@ auto main(int argc, char** argv) -> int
           [&pileup_strategy, &tamexParameter, hit_par_ptr]()
           {
               return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(hit_par_ptr),
-                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter,hit_par_ptr));
+                                              UseChannel<TamexChannel>(pileup_strategy, tamexParameter, hit_par_ptr));
           } }
     };
 

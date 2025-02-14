@@ -18,29 +18,19 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandNeutron.h"
 #include "TCAConnector.h"
-#include "TH1D.h"
+#include <TH1.h>
 #include <iostream>
 
 class R3BNeulandNeutronReconstructionStatistics : public FairTask
 {
   public:
-    R3BNeulandNeutronReconstructionStatistics(const TString primary = "NeulandNeutronClusters",
-                                              const TString secondary = "NeulandPrimaryClusters",
-                                              const TString predicted = "NeulandSecondaryClusters",
-                                              std::ostream& out = std::cout);
-    ~R3BNeulandNeutronReconstructionStatistics() override = default;
-
-    // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandNeutronReconstructionStatistics(const R3BNeulandNeutronReconstructionStatistics&) =
-        delete;                                                                                      // copy constructor
-    R3BNeulandNeutronReconstructionStatistics(R3BNeulandNeutronReconstructionStatistics&&) = delete; // move constructor
-    R3BNeulandNeutronReconstructionStatistics& operator=(const R3BNeulandNeutronReconstructionStatistics&) =
-        delete; // copy assignment
-    R3BNeulandNeutronReconstructionStatistics& operator=(R3BNeulandNeutronReconstructionStatistics&&) =
-        delete; // move assignment
+    explicit R3BNeulandNeutronReconstructionStatistics(TString primary = "NeulandNeutronClusters",
+                                                       TString secondary = "NeulandPrimaryClusters",
+                                                       TString predicted = "NeulandSecondaryClusters",
+                                                       std::ostream& out = std::cout);
 
   protected:
-    InitStatus Init() override;
+    auto Init() -> InitStatus override;
     void Finish() override;
 
   public:

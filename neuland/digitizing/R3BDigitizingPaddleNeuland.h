@@ -61,7 +61,7 @@ namespace R3B::Digitizing::Neuland
 
       private:
         // Paula: non static member variables, are not used in TacQuila
-        double gHalfLength_ = 135.;   // [cm]
+        double gHalfLength_ = 135.;  // [cm]
         double attenuation_ = 0.008; // light attenuation of plastic scintillator [1/cm]
         double gLambda_ = 1. / 2.1;
         double ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * NeulandPaddle::gAttenuation);

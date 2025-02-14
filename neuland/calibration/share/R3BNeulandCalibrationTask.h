@@ -78,9 +78,9 @@ namespace R3B::Neuland
         virtual void HistogramInit(DataMonitor& histograms) {}
         virtual void ExtraInit(FairRootManager* rootMan) {}
         virtual void SetExtraPar(FairRuntimeDb* rtdb) {}
-        virtual void BeginOfEvent(){};
+        virtual void BeginOfEvent() {};
         virtual void TriggeredExec() = 0;
-        virtual void EndOfTask(){};
+        virtual void EndOfTask() {};
         [[nodiscard]] virtual auto CheckConditions() const -> bool { return true; }
 
         // overriden functions:
@@ -98,13 +98,15 @@ namespace R3B::Neuland
 
         [[nodiscard]] auto check_trigger() const -> bool;
         template <typename ParType>
-        [[nodiscard]] auto add_par(std::string_view par_name, std::vector<FairParSet*>& pars, FairRuntimeDb* rtdb)
-            -> ParType*;
+        [[nodiscard]] auto add_par(std::string_view par_name,
+                                   std::vector<FairParSet*>& pars,
+                                   FairRuntimeDb* rtdb) -> ParType*;
     };
 
     template <typename ParType>
-    auto CalibrationTask::add_par(std::string_view par_name, std::vector<FairParSet*>& pars, FairRuntimeDb* rtdb)
-        -> ParType*
+    auto CalibrationTask::add_par(std::string_view par_name,
+                                  std::vector<FairParSet*>& pars,
+                                  FairRuntimeDb* rtdb) -> ParType*
     {
         auto* par = dynamic_cast<ParType*>(rtdb->findContainer(par_name.data()));
         if (par == nullptr)

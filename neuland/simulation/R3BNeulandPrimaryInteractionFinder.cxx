@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
 #include "R3BNeulandPrimaryInteractionFinder.h"
+#include "FairLogger.h"
 #include "TFile.h"
 #include <FairRootManager.h>
 #include <TH1D.h>

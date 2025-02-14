@@ -1,5 +1,5 @@
-#include "FairRootManager.h"
 #include "R3BNeulandMultiplicityCheat.h"
+#include "FairRootManager.h"
 
 R3BNeulandMultiplicityCheat::R3BNeulandMultiplicityCheat(std::string_view input, std::string_view output)
     : FairTask("R3BNeulandMultiplicityCheat")

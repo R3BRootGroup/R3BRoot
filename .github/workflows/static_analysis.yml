@@ -1,66 +1,95 @@
-# #
-# # SPDX-License-Identifier: LGPL-3.0-or-later
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
 
-# name: static analysis
-# on:
-#   push:
-#     branches: [dev, edwin_dev]
-#   pull_request:
-#     branches: [dev, edwin_dev]
+name: static analysis
+on:
+  pull_request:
+    branches: [ dev, edwin_dev ]
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# permissions:
-#   pull-requests: write
-#   contents: write
+permissions: write-all
 
-# jobs:
-#   clang-lint:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         shell: bash
-#     strategy:
-#       matrix:
-#         preset: [default]
-#         os: [ubuntu-latest]
-#     container:
-#       image: yanzhaowang/fairroot:${{ matrix.os }}
-#       options: --user root --privileged
-#     steps:
-#       - uses: actions/checkout@v4
-#         with:
-#           submodules: 'true'
+jobs:
+  # This workflow contains a single job called "clang-format"
+  clang-format:
+    runs-on: ubuntu-latest
 
-#       - name: install sudo
-#         run: |
-#           apt-get install -y sudo
-#           sudo -H python3 -m pip install conan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: 'file'  # Use .clang-format config file
+          tidy-checks: '-*'
+          version: 18
+          verbosity: debug
+          lines-changed-only: false
+          files-changed-only: false
+          step-summary: true
+          thread-comments: update
+          extensions: 'h,cxx'
+          ignore: '*|!neuland|!r3bbase|!r3bdata/neulandData|!r3bsource/neuland|!r3bsource/base|ext_h101*'
+          format-review: true
+      - name: Fail fast?!
+        if: steps.linter.outputs.clang-format-checks-failed > 0
+        run: exit 1
+        
+  clang-tidy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        preset: [ default ]
+        os: [ debian12 ]
+    container: 
+      image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
+      volumes:
+        - /tmp:/cvmfs
+      env:
+        CVMDIR: /cvmfs/fairsoft.gsi.de
+      options: --user root --privileged  --ulimit nofile=9999:10000 --cap-add SYS_ADMIN --device /dev/fuse
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-#       - name: configure r3broot
-#         uses: './.github/actions/r3bbuild-steps'
-#         with:
-#           build-needed: 'false'
+    - name: pre-build
+      uses: './.github/actions/pre-build'
 
-#       - name: Run clang-format style check for C/C++/Protobuf programs.
-#         uses: cpp-linter/cpp-linter-action@v2
-#         id: linter
-#         env:
-#           GITHUB_TOKEN: ${{ secrets.CPPLINTER_TOKEN }}
-#         with:
-#           style: 'file'
-#           tidy-checks: ''
-#           version: 18
-#           lines-changed-only: true
-#           database: '${{ github.workspace }}/build'
-#           thread-comments: update
-#           tidy-review: true
-#           file-annotations: true
-#           format-review: true
-#           passive-reviews: true
-#           extensions: 'h,cxx'
-#           ignore: '*|!neuland|!r3bbase|!r3bdata|!r3bsource|ext_h101*'
+    - name: install deps
+      id: restore-caching
+      uses: './.github/actions/install-deps'
+      with: 
+        cache-name: 'false'
 
-#       - name: Fail fast?!
-#         if: steps.linter.outputs.checks-failed > 0
-#         run: exit 1
+    - name: configure r3broot
+      uses: './.github/actions/r3bbuild-steps'
+      with:
+        build-needed: 'false'
+
+    - name: clang-tidy check
+      run: |
+        mkdir -p clang-tidy-result
+        git diff -U0 HEAD^ | python3 $PWD/util/clang-tidy-diff.py -p1 -path build -j4 -use-color \
+        -iregex '^(.*\/)(?!ext_)([^\/]*\.(cpp|cc|c\+\+|cxx|cl|hpp|hh|h|m|mm|inc))$' \
+        > clang-tidy-result/fixes.yml
+        cat clang-tidy-result/fixes.yml |\
+        sed -e 's/\x1b\[[0-9;]*m//g' |\
+        sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): warning:/::warning file=\1,line=\2,col=\3::/' |\
+        sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): error:/::error file=\1,line=\2,col=\3::/'
+        echo "WARN_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " warning:" | wc -l | xargs)" >> $GITHUB_ENV
+        echo "ERROR_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " error:" | wc -l | xargs)" >> $GITHUB_ENV
+
+    - name: clang-tidy results
+      run: |
+          if [ "${{ env.WARN_NUM }}" -eq "0" ] && [ "${{ env.ERROR_NUM }}" -eq "0" ]; then
+            echo "::notice::All clean, LGTM!"
+          else
+            cat clang-tidy-result/fixes.yml | sed -e 's/\x1b\[[0-9;]*mnote: \x1b\[0m/\x1b\[33mnote: \x1b\[0m/g'
+            echo "::notice::Clang-tidy generates ${{ env.WARN_NUM }} warnings and ${{ env.ERROR_NUM }} errors! Please fix them before being merged."
+            exit 1
+          fi
+      shell: bash
+

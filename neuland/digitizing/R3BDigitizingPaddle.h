@@ -30,7 +30,9 @@ namespace R3B::Digitizing
         Type right{};
         LRPair(Type p_left, Type p_right)
             : left(p_left)
-            , right(p_right){};
+            , right(p_right)
+        {
+        }
         LRPair() = default;
     };
 
@@ -44,7 +46,7 @@ namespace R3B::Digitizing
         const Channel::CalSignal* leftChannelCal{};
         const Channel::CalSignal* rightChannelCal{};
 
-        explicit PaddleSignal(LRPair< std::reference_wrapper<const Channel::CalSignal>> p_signals)
+        explicit PaddleSignal(LRPair<std::reference_wrapper<const Channel::CalSignal>> p_signals)
             : leftChannelCal{ &p_signals.left.get() }
             , rightChannelCal{ &p_signals.right.get() }
         {

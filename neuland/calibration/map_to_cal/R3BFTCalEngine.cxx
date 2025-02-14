@@ -138,8 +138,10 @@ namespace R3B::Neuland::calibration
         }
     } // namespace
 
-    auto calculate_value_errors(TH1* hist, unsigned int max_bin, double total_entry, FTCalErrorMethod methodtype)
-        -> std::pair<ValueErrors, unsigned int>
+    auto calculate_value_errors(TH1* hist,
+                                unsigned int max_bin,
+                                double total_entry,
+                                FTCalErrorMethod methodtype) -> std::pair<ValueErrors, unsigned int>
     {
         auto output = extract_bin_data(hist, max_bin);
 

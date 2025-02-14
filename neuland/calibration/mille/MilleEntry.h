@@ -13,10 +13,8 @@
 
 #pragma once
 
-#include <array>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <unordered_map>
 #include <vector>
 namespace R3B
 {
@@ -29,7 +27,6 @@ namespace R3B
     };
 } // namespace R3B
 
-
 template <>
 class fmt::formatter<R3B::MilleDataPoint>
 {
@@ -38,7 +35,11 @@ class fmt::formatter<R3B::MilleDataPoint>
     template <typename FmtContent>
     constexpr auto format(const R3B::MilleDataPoint& point, FmtContent& ctn) const
     {
-        return format_to(
-            ctn.out(), "measurement: {}, sigma: {}, locals: {}, globals: {}", point.measurement, point.sigma, point.locals, point.globals);
+        return format_to(ctn.out(),
+                         "measurement: {}, sigma: {}, locals: {}, globals: {}",
+                         point.measurement,
+                         point.sigma,
+                         point.locals,
+                         point.globals);
     }
 };

@@ -1,7 +1,7 @@
+#include "R3BNeulandMultiplicityBayes.h"
 #include "FairRootManager.h"
 #include "FairRtdbRun.h"
 #include "FairRuntimeDb.h"
-#include "R3BNeulandMultiplicityBayes.h"
 #include <numeric>
 
 R3BNeulandMultiplicityBayes::R3BNeulandMultiplicityBayes(std::string_view input, std::string_view output)

@@ -75,8 +75,9 @@ namespace R3B::Neuland
                                                 SingleEdgeSignal signal,
                                                 FTType ftType,
                                                 unsigned int module_num) const -> ValueError<double>;
-        [[nodiscard]] auto get_tot(DoubleEdgeSignal pmtSignal, unsigned int module_num, Side side) const
-            -> ValueError<double>;
+        [[nodiscard]] auto get_tot(DoubleEdgeSignal pmtSignal,
+                                   unsigned int module_num,
+                                   Side side) const -> ValueError<double>;
         [[nodiscard]] auto get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>;
         void overflow_correct(R3B::Neuland::CalDataSignal& calSignal) const;
     };

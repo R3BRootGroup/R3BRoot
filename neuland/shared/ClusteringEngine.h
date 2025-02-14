@@ -51,7 +51,7 @@ namespace Neuland
         /* Default Constructor. Note: If the clustering condition is not set, a "bad_function_call" will be thrown upon
          * calling clusterize. This seems better than providing a default function which might produce hard-to-track
          * unwanted results. */
-        ClusteringEngine(){};
+        ClusteringEngine() = default;
         ClusteringEngine(const BinaryPredicate& _f)
             : f(_f)
         {

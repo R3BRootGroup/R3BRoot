@@ -1,5 +1,5 @@
-#include "FairRuntimeDb.h"
 #include "R3BNeulandMultiplicityBayesTrain.h"
+#include "FairRuntimeDb.h"
 #include <numeric>
 
 R3BNeulandMultiplicityBayesTrain::R3BNeulandMultiplicityBayesTrain(std::string_view clusters, std::string_view tracks)

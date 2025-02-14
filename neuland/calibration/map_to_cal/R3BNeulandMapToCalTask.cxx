@@ -204,8 +204,9 @@ namespace R3B::Neuland
         return convert_to_real_time(calibrationTrigPar_, trigData->second.signal, FTType::trigger, trigData->first);
     }
 
-    auto Map2CalTask::get_tot(DoubleEdgeSignal pmtSignal, unsigned int module_num, Side side) const
-        -> ValueError<double>
+    auto Map2CalTask::get_tot(DoubleEdgeSignal pmtSignal,
+                              unsigned int module_num,
+                              Side side) const -> ValueError<double>
     {
         const auto leadFType = (side == Side::left) ? FTType::leftleading : FTType::rightleading;
         const auto trailFType = (side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;

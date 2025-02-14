@@ -43,16 +43,13 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, const Int_t iVerbos
 {
 }
 
-R3BNeulandCal2HitPar::~R3BNeulandCal2HitPar() {}
-
 InitStatus R3BNeulandCal2HitPar::Init()
 {
     FairRootManager* mgr = FairRootManager::Instance();
 
     if (!mgr)
     {
-        LOG(fatal) << "R3BNeulandCal2HitPar::Init: "
-                   << "FairRootManager not found";
+        LOG(fatal) << "R3BNeulandCal2HitPar::Init: FairRootManager not found";
         return kFATAL;
     }
 
@@ -60,8 +57,7 @@ InitStatus R3BNeulandCal2HitPar::Init()
 
     if (!fEventHeader)
     {
-        LOG(info) << "R3BNeulandCal2HitPar::Init: "
-                  << "Branch EventHeader not found, its ok";
+        LOG(info) << "R3BNeulandCal2HitPar::Init Branch EventHeader not found, its ok";
         // return kFATAL;
     }
 
@@ -69,17 +65,14 @@ InitStatus R3BNeulandCal2HitPar::Init()
 
     if (!fCalNeuland)
     {
-        LOG(fatal) << "R3BNeulandCal2HitPar::Init: "
-                   << "Branch NeulandCalData not found";
+        LOG(fatal) << "R3BNeulandCal2HitPar::Init: Branch NeulandCalData not found";
         return kFATAL;
     }
 
     fNeulandHitPar = static_cast<R3BNeulandHitPar*>(FairRuntimeDb::instance()->getContainer("NeulandHitPar"));
-    LOG(info) << "R3BNeulandCal2HitPar::Init: "
-              << "Number of Hit-Paramteres found: " << fNeulandHitPar->GetNumModulePar();
+    LOG(info) << "R3BNeulandCal2HitPar::Init: Number of Hit-Paramteres found: " << fNeulandHitPar->GetNumModulePar();
 
-    LOG(info) << "R3BNeulandCal2HitPar::Init: "
-              << "Initializing NeulandHitCalibrationEngine.";
+    LOG(info) << "R3BNeulandCal2HitPar::Init: Initializing NeulandHitCalibrationEngine.";
     fHitCalEngine->Init(fNeulandHitPar);
 
     if (fNeulandHitPar)
@@ -171,11 +164,10 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
 void R3BNeulandCal2HitPar::FinishTask()
 {
-    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
-              << "Saved " << fAcceptedEventNumber << " Events.                       ";
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: " << "Saved " << fAcceptedEventNumber << " Events.";
 
-    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
-              << "Starting Neuland Hit Calibration with " << fAcceptedEventNumber << " Events.";
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: " << "Starting Neuland Hit Calibration with "
+              << fAcceptedEventNumber << " Events.";
 
     const auto batchMode = gROOT->IsBatch();
     gROOT->SetBatch(kTRUE);
@@ -212,8 +204,8 @@ void R3BNeulandCal2HitPar::FinishTask()
 
     fNeulandHitPar->setChanged();
 
-    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: "
-              << "Number of calibrated Bars: " << fNeulandHitPar->GetNumModulePar();
+    LOG(info) << "R3BNeulandCal2HitPar::FinishTask: " << "Number of calibrated Bars: "
+              << fNeulandHitPar->GetNumModulePar();
 }
 
 bool R3BNeulandCal2HitPar::IsCosmicEvent() const { return ((fEventHeader->GetTpat() & fCosmicTpat) == fCosmicTpat); }

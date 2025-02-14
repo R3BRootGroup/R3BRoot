@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
 #include "R3BNeulandMultiplicityBayesPar.h"
+#include "FairLogger.h"
 #include <numeric>
 #include <string>
 

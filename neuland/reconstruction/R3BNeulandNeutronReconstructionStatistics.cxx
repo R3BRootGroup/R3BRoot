@@ -28,9 +28,9 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_
            || std::abs(x - y) < std::numeric_limits<T>::min();
 }
 
-R3BNeulandNeutronReconstructionStatistics::R3BNeulandNeutronReconstructionStatistics(const TString primary,
-                                                                                     const TString secondary,
-                                                                                     const TString predicted,
+R3BNeulandNeutronReconstructionStatistics::R3BNeulandNeutronReconstructionStatistics(TString primary,
+                                                                                     TString secondary,
+                                                                                     TString predicted,
                                                                                      std::ostream& out)
     : fPrimaryClusters(primary)
     , fSecondaryClusters(secondary)
@@ -157,8 +157,7 @@ void R3BNeulandNeutronReconstructionStatistics::Finish()
     { return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall); };
     const double accuracy = (double)(fTP + fTN) / (double)(fTP + fTN + fFP + fFN);
 
-    fOut << "PREC DATA"
-         << "\n";
+    fOut << "PREC DATA\n";
     fOut << fPredictedName << "\tTruePositive \t" << fTP << "\t" << (double)fTP / ((double)fTP + (double)fFN) << "\n"
          << fPredictedName << "\tFalsePositive\t" << fFP << "\t" << (double)fFP / ((double)fTN + (double)fFP) << "\n"
          << fPredictedName << "\tFalseNegative\t" << fFN << "\t" << (double)fFN / ((double)fTP + (double)fFN) << "\n"
@@ -169,8 +168,7 @@ void R3BNeulandNeutronReconstructionStatistics::Finish()
          << fPredictedName << "\tF1\t" << Fbeta(1.) << "\n"
          << "\n";
 
-    fOut << "MULT DATA"
-         << "\n";
+    fOut << "MULT DATA\n";
     const int sum = std::accumulate(fMult.begin(), fMult.end(), 0);
     for (unsigned int i = 0; i < fMult.size(); i++)
     {

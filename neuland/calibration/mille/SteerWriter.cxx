@@ -16,7 +16,6 @@
 #include <fmt/ranges.h>
 #include <fstream>
 
-
 namespace R3B
 {
     void SteerWriter::add_parameter_default(int par_num, const std::pair<float, float>& values)

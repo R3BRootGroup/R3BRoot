@@ -110,7 +110,8 @@
 //             const TVector3 position = point->GetPosition();
 //             const TVector3 converted_position = fNeulandGeoPar->ConvertToLocalCoordinates(position, paddleID);
 //             LOG(debug2) << "NeulandDigitizer: Point in paddle " << paddleID
-//                         << " with global position XYZ: " << position.X() << " " << position.Y() << " " << position.Z();
+//                         << " with global position XYZ: " << position.X() << " " << position.Y() << " " <<
+//                         position.Z();
 //             LOG(debug2) << "NeulandDigitizer: Converted to local position XYZ: " << converted_position.X() << " "
 //                         << converted_position.Y() << " " << converted_position.Z();
 //

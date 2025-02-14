@@ -60,7 +60,6 @@ auto main(int argc, char** argv) -> int
 
     auto disable_task = programOptions.create_option<bool>("no-map2cal", "disable MapToCal task", false);
 
-
     if (!programOptions.verify(argc, argv))
     {
         return EXIT_FAILURE;

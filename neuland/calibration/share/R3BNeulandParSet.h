@@ -39,7 +39,7 @@ namespace R3B::Neuland
       private:
         auto init(FairParIo* inputFile) -> bool override;
         auto write(FairParIo* outputFile) -> int override;
-        void print() override{};
+        void print() override {};
 
       public:
         ClassDefOverride(ParSet, 1);
