@@ -56,6 +56,7 @@ namespace R3B::Neuland
 
     constexpr auto CLight = 29.9792458;     // Speed of light [cm/ns]
     constexpr auto InvCLight = 1. / CLight; // Speed of light [cm/ns]>
+    constexpr auto MUON_MASS = 0.105;       // Muonmass [GeV]
 
     // Electronics Constants
 

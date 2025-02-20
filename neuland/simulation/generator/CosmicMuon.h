@@ -84,7 +84,6 @@ namespace R3B::Neuland
         using MomentumPosition = std::pair<ROOT::Math::PxPyPzE4D<double>, ROOT::Math::Cartesian3D<double>>;
         using Momentum = ROOT::Math::PxPyPzE4D<double>;
         using AngleRadius = ROOT::Math::Polar3D<double>;
-        static constexpr auto CLight = Neuland::CLight;
         double detector_size_{ default_detector_size };
         int PID_{ default_PID };
 
@@ -96,7 +95,6 @@ namespace R3B::Neuland
 
         // Paula: which methods have to be virtual?
         auto rd_num_gen_angles(const AngleDist& angle_dist) -> AngleRadius;
-        auto calculate_abs_momentum(const double& kinetic_energy) -> double { return kinetic_energy / CLight; };
         auto calculate_momentum_energy(const double& kinetic_energy, const AngleInfo& angle_info) -> Momentum;
 
         auto calculate_external_position_momentum(const AngleDist& angle_dist,
@@ -127,6 +125,7 @@ namespace R3B::Neuland
     {
         auto angles = AngleRadius{};
         angles.SetPhi(rd_engine_->Uniform(0., 2 * M_PI));
+        // angles.SetTheta(0);
         angles.SetTheta(angle_dist(rd_engine_));
 
         return angles;
@@ -137,11 +136,11 @@ namespace R3B::Neuland
                                                                                            const AngleInfo& angle_info)
         -> Momentum
     {
-        auto momentum_energy = Momentum{ 0, 0, 0, kinetic_energy };
-        auto abs_momentum = double{ calculate_abs_momentum(kinetic_energy) };
-        momentum_energy.SetPx(abs_momentum * angle_info.sin_theta * angle_info.cos_phi);
-        momentum_energy.SetPy(abs_momentum * angle_info.cos_theta);
-        momentum_energy.SetPz(abs_momentum * angle_info.sin_theta * angle_info.sin_phi);
+        auto total_energy = kinetic_energy + MUON_MASS;
+        auto momentum_energy = Momentum{ 0, 0, 0, total_energy };
+        momentum_energy.SetPx(kinetic_energy * angle_info.sin_theta * angle_info.cos_phi);
+        momentum_energy.SetPy(kinetic_energy * angle_info.cos_theta);
+        momentum_energy.SetPz(kinetic_energy * angle_info.sin_theta * angle_info.sin_phi);
         return momentum_energy;
     }
 

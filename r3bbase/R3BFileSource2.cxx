@@ -336,8 +336,9 @@ auto R3BInputRootFiles::ValidateFile(const std::string& filename, bool is_tree_f
     }
 
     auto folderKey = ExtractMainFolder(rootFile.get());
-    auto res = folderKey.has_value() && HasBranchList(rootFile.get(), branchList_);
-    if (res)
+    auto res1 = folderKey.has_value();
+    auto res2 = HasBranchList(rootFile.get(), branchList_);
+    if (res1 and res2)
     {
         if (!folderName_.empty() && (folderKey.value()->GetName() != folderName_))
         {
@@ -349,7 +350,18 @@ auto R3BInputRootFiles::ValidateFile(const std::string& filename, bool is_tree_f
             validMainFolders_.push_back((folderKey.value())->ReadObject<TFolder>());
         }
     }
-    return res;
+    else
+    {
+        if (not res1)
+        {
+            R3BLOG(warn, "folder has no key");
+        }
+        if (not res2)
+        {
+            R3BLOG(warn, "HasBranchList is false!");
+        }
+    }
+    return res1 and res2;
 }
 
 auto R3BInputRootFiles::ExtractRunId(TFile* rootFile) -> std::optional<uint>
