@@ -77,6 +77,10 @@ namespace R3B::Neuland
         {
             return module_pars_.at(module_num);
         }
+        auto HasModuleParAt(int module_num) const -> bool
+        {
+            return module_pars_.find(module_num) != module_pars_.end();
+        }
         auto GetModulePars() const -> const std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar>&
         {
             return module_pars_;

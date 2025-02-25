@@ -1,8 +1,19 @@
 #include "R3BNeulandPredecessor.h"
+#include "R3BDataMonitor.h"
+#include "R3BLogger.h"
+#include "R3BNeulandCalData2.h"
+#include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandCommon.h"
+#include "R3BValueError.h"
 #include <R3BNeulandCalToHitParTask.h>
 #include <TF1.h>
 #include <TFitResult.h>
 #include <TFitResultPtr.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <array>
+#include <fmt/core.h>
+#include <vector>
 
 namespace R3B::Neuland::Calibration
 {
@@ -91,14 +102,17 @@ namespace R3B::Neuland::Calibration
 
     void Predecessor::Init() { cal_to_hit_par_ = GetTask()->GetCal2HitPar(); }
 
-    void Predecessor::AddSignal(const BarCalData& signal)
+    void Predecessor::AddSignals(const std::vector<BarCalData>& signals)
     {
         // all bar signal must have one signal on both sides
-        if (signal.left.size() != 1 or signal.right.size() != 1)
+        for (const auto& signal : signals)
         {
-            return;
+            if (signal.left.size() != 1 or signal.right.size() != 1)
+            {
+                continue;
+            }
+            fill_hist(signal);
         }
-        fill_hist(signal);
     }
 
     void Predecessor::fill_hist(const BarCalData& signal)

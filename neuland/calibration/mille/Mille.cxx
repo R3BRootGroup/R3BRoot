@@ -132,6 +132,7 @@ namespace R3B
         output_file_ << fmt::format("{}\n", fmt::join(buffer_.get_values(), " "));
     }
 
+    void Mille::close() { output_file_.close(); }
     void Mille::check_buffer_size(std::size_t nLocal, std::size_t nGlobal)
     {
         if (buffer_.get_current_size() >= max_buffer_size_)

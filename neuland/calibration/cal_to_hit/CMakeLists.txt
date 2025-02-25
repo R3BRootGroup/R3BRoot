@@ -19,6 +19,7 @@ set(LINKDEF NeulandCalToHitLinkDef.h)
 set(SRCS
     # cmake-format: sortable
     engine/R3BNeulandLSQREngineAdaptor.cxx
+    engine/R3BNeulandMilleCalDataProcessor.cxx
     engine/R3BNeulandMillepede.cxx
     engine/R3BNeulandPredecessor.cxx
     R3BNeulandCalToHitPar.cxx
@@ -29,6 +30,7 @@ set(HEADERS
     # cmake-format: sortable
     engine/R3BNeulandCosmicEngine.h
     engine/R3BNeulandLSQREngineAdaptor.h
+    engine/R3BNeulandMilleCalDataProcessor.h
     engine/R3BNeulandMillepede.h
     engine/R3BNeulandPredecessor.h
     R3BNeulandCalToHitPar.h

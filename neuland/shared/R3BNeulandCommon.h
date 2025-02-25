@@ -35,8 +35,10 @@ namespace R3B::Neuland
         return val * val;
     }
 
-    // Miscellaneous defaults:
-    constexpr auto DEFAULT_EFFECTIVE_C = 8.; // cm/ns
+    // Millepede calibration defaults:
+    constexpr auto DEFAULT_EFFECTIVE_C = 8.;                // cm/ns
+    constexpr auto DEFAULT_CALIBRATION_P_VALUE_CUT = 1e-10; // any smaller values will be discarded
+    constexpr auto DEFAULT_T_DIFF_RESIDUAL_CUT = 400;       // any larger values will be discarded
 
     // Initialize variables from Birk' s Law
 

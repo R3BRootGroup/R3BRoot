@@ -12,10 +12,20 @@
  ******************************************************************************/
 
 #include "R3BNeulandCalToHitParTask.h"
+#include "R3BDataMonitor.h"
+#include "R3BException.h"
+#include "R3BNeulandBasePar.h"
+#include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandCalibrationTask.h"
+#include "R3BNeulandCommon.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 #include <R3BLogger.h>
 #include <R3BNeulandLSQREngineAdaptor.h>
 #include <R3BNeulandMillepede.h>
 #include <R3BNeulandPredecessor.h>
+#include <memory>
+#include <string_view>
 
 namespace R3B::Neuland
 {
@@ -29,7 +39,6 @@ namespace R3B::Neuland
         : CalibrationTask(name, iVerbose)
         , cal_data_{ cal_data_name }
         , base_par_{ InputPar<CalibrationBasePar>(base_par_name) }
-        , hit_par_{ OutputPar<Cal2HitPar>(hit_par_name) }
     // NOLINTEND
     {
         switch (method)
@@ -37,14 +46,17 @@ namespace R3B::Neuland
             case Cal2HitParMethod::LSQT:
                 R3BLOG(info, "Cal2HitPar method: LSQT.");
                 engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
+                hit_par_ = OutputPar<Cal2HitPar>(hit_par_name);
                 break;
-            case Cal2HitParMethod::millipede:
+            case Cal2HitParMethod::millepede:
                 R3BLOG(info, "Cal2HitPar method: Millepede.");
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
+                hit_par_ = InputPar<Cal2HitPar>(hit_par_name);
                 break;
             case Cal2HitParMethod::predecessor:
                 R3BLOG(info, "Cal2HitPar method: predecessor.");
                 engine_ = std::make_unique<Calibration::Predecessor>();
+                hit_par_ = OutputPar<Cal2HitPar>(hit_par_name);
                 break;
         }
     }
@@ -70,10 +82,11 @@ namespace R3B::Neuland
     void Cal2HitParTask::TriggeredExec()
     {
         engine_->EventReset();
-        for (const auto& bar_signal : cal_data_)
-        {
-            engine_->AddSignal(bar_signal);
-        }
+        engine_->AddSignals(cal_data_.get());
+        // for (const auto& bar_signal : cal_data_)
+        // {
+        //     engine_->AddSignal(bar_signal);
+        // }
         auto* eventHeader = GetEventHeader();
         if (eventHeader != nullptr)
         {

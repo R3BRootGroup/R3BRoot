@@ -43,7 +43,7 @@ namespace R3B::Neuland::Calibration
 
         virtual void Init() {}
         virtual auto SignalFilter(const std::vector<BarCalData>& /*signals*/) -> bool { return true; }
-        virtual void AddSignal(const BarCalData& signal) = 0;
+        virtual void AddSignals(const std::vector<BarCalData>& signal) = 0;
         virtual void Calibrate(Cal2HitPar& hit_par) = 0;
         virtual void SetMinStat(int min) {}
         virtual void BeginOfEvent(unsigned int event_num) {};

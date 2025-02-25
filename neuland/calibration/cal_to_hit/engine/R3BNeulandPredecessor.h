@@ -1,6 +1,14 @@
 #pragma once
 
+#include "R3BDataMonitor.h"
+#include "R3BLogger.h"
+#include "R3BNeulandCalData2.h"
+#include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCosmicEngine.h"
+
+#include <TH2.h>
+#include <fmt/core.h>
+#include <vector>
 
 namespace R3B::Neuland::Calibration
 {
@@ -19,7 +27,7 @@ namespace R3B::Neuland::Calibration
 
         // private virtual functions:
         void Init() override;
-        void AddSignal(const BarCalData& signal) override;
+        void AddSignals(const std::vector<BarCalData>& signals) override;
         void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override {}
         void EventReset() override {}

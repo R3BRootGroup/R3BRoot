@@ -28,7 +28,7 @@ namespace R3B::Neuland
     {
         LSQT,
         predecessor,
-        millipede
+        millepede
     };
 
     class Cal2HitParTask : public CalibrationTask

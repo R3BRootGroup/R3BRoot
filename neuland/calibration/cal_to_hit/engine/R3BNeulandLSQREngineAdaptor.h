@@ -14,9 +14,13 @@
 #pragma once
 
 #include "R3BNeulandCosmicEngine.h"
+
+#include <R3BNeulandCalData2.h>
+#include <R3BNeulandCalToHitPar.h>
 #include <R3BNeulandCosmicTracker.h>
 #include <R3BNeulandHitCalibrationEngine.h>
 #include <R3BShared.h>
+#include <vector>
 
 namespace R3B::Neuland::Calibration
 {
@@ -31,7 +35,7 @@ namespace R3B::Neuland::Calibration
         CosmicTracker cosmic_tracker_;
 
         void Init() override;
-        void AddSignal(const BarCalData& signal) override;
+        void AddSignals(const std::vector<BarCalData>& signals) override;
         void Calibrate(Cal2HitPar& hit_par) override;
         void EndOfEvent(unsigned int event_num = 0) override;
         void EventReset() override

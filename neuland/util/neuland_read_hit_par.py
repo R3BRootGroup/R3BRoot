@@ -2,6 +2,8 @@
 Checking the values of cal_to_hit parameters in the root file. The corresponding pandas dataframe can be retrieved.
 """
 
+import warnings
+
 import numpy as np
 import pandas as pd
 import ROOT
@@ -101,6 +103,11 @@ class HitParReader:
         num_of_modules = hit_par.GetNumOfModules()
         for bar_id in range(num_of_modules):
             self._par_dict["bar_id"][bar_id] = bar_id
+            if not hit_par.HasModuleParAt(bar_id + 1):
+                warnings.warn(
+                    f"Parameter with module num {bar_id + 1} doesn't exist in the file!"
+                )
+                continue
             module_par = hit_par.GetModuleParAt(bar_id + 1)
             for par_name in self._par_name_list:
                 dicts = dir(getattr(ROOT.R3B.Neuland.HitModulePar(), par_name))

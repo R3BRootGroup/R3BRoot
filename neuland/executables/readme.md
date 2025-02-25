@@ -158,7 +158,7 @@ neuland ana [-h] [options]
   - `NeulandNeutronsRValue`. See `R3BNeulandNeutronsRValue`.
   - `NeulandCal2HitParTask`: See `R3B::Neuland::Cal2HitParTask`.
     - `min-stat`: Minimal number of hits from the events that are used for the calibration.
-    - `method`: Method of the calibration. Available options: `LSQT`, `predecessor` and `millepede`. See `R3B::neuland::Cal2HitParMethod`.
+    - `method`: Method of the calibration. Available options: `LSQT`, `predecessor` and `millepede`. See `R3B::Neuland::Cal2HitParMethod`.
 
 All tasks listed above have three common options: "enable", "read" and "write". The "enable" option specifies whether the task is added or not. If some tasks should be added, simply change its value to `true`.
 

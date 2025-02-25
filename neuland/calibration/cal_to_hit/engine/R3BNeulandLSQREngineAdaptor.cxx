@@ -12,13 +12,19 @@
  ******************************************************************************/
 
 #include "R3BNeulandLSQREngineAdaptor.h"
-#include "R3BDataMonitor.h"
-#include "R3BNeulandHitPar.h"
+
 #include <FairRuntimeDb.h>
+#include <R3BException.h>
 #include <R3BLogger.h>
+#include <R3BNeulandCalData2.h>
+#include <R3BNeulandCalToHitPar.h>
+#include <R3BNeulandCommon.h>
+#include <R3BNeulandHitModulePar.h>
+#include <R3BNeulandHitPar.h>
 #include <R3BNeulandParDirCreator.h>
 #include <R3BShared.h>
-#include <algorithm>
+#include <cmath>
+#include <vector>
 
 namespace
 {
@@ -74,10 +80,13 @@ namespace R3B::Neuland::Calibration
         hit_cal_engine_.Init(&hit_par_temp);
     }
 
-    void LSQREngineAdaptor::AddSignal(const BarCalData& signal)
+    void LSQREngineAdaptor::AddSignals(const std::vector<BarCalData>& signals)
     {
-        add_bar_signal(signal, Side::left);
-        add_bar_signal(signal, Side::right);
+        for (const auto& signal : signals)
+        {
+            add_bar_signal(signal, Side::left);
+            add_bar_signal(signal, Side::right);
+        }
     }
 
     void LSQREngineAdaptor::add_bar_signal(const BarCalData& barSignal, Side side)
