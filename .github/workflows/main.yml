@@ -61,7 +61,23 @@ on:
 # parallelly. As has been specified above, all the jobs below will be
 # triggered either by a pull request or a merge of a pull request.
 jobs:
+  # The job to clean the old caches before new caches are created when the PR is merged.
+  cache-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+      - name: clean-cache
+        if: github.event_name == 'push'
+        uses: './.github/actions/cache-clean'
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # The job to run the main CI pipelines
   build-test:
+    needs: cache-cleanup
     runs-on: ubuntu-latest
     # A strategy matrix gives different settings separately to different jobs
     # which are run parallelly.
@@ -177,7 +193,6 @@ jobs:
         uses: './.github/actions/install-deps'
         with: 
           cache-name: ${{ matrix.cache }}
-          r3b-dev-key: ${{ env.cacheSHA }}
 
       # A self-defined composite action for the cmake configuration and build
       # of r3broot (along with necessary dep repos).

@@ -1,0 +1,56 @@
+name: cache-clean
+description: 'steps to clean the old caches before creating new ones'
+
+inputs:
+  GH_TOKEN:
+    description: 'Github token for the cache cleaning'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Update GitHub CLI
+      run: sudo apt-get install gh
+      shell: bash
+
+    - name: Debug gh CLI
+      run: |
+        gh --version
+        gh auth status
+        gh extension list
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+
+    - name: Install and Verify gh-actions-cache Extension
+      run: |
+        gh extension install actions/gh-actions-cache || exit 1
+        gh extension list | grep gh-actions-cache || (echo "Extension installation failed" && exit 1)
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+
+    - name: Test actions-cache list
+      run: |
+        gh actions-cache list || echo "Failed to list caches"
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+
+    - name: Cleanup
+      run: |
+        echo "Fetching list of cache keys"
+        cacheKeys=$(gh actions-cache list -L 100 | cut -f 1) || exit 1
+
+        set +e
+        echo "Deleting old caches..."
+        for cacheKey in $cacheKeys
+        do
+            gh actions-cache delete $cacheKey --confirm || echo "Failed to delete $cacheKey"
+        done
+        echo "Done"
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        GH_REPO: ${{ github.repository }}
