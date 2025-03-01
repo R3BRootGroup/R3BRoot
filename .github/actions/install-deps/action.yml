@@ -2,10 +2,6 @@ name: install-deps
 description: 'steps to install deps'
 
 inputs:
-  r3b-dev-key:
-    description: 'key for r3b dev cache'
-    required: false
-    default: ''
   cache-name:
     description: 'repository name'
     required: false
@@ -22,7 +18,9 @@ runs:
         path: |
           ${{ env.UCESB_DIR }}
           ${{ github.workspace }}/build/_deps
-        key: build-deps
+        key: build-deps-${{ matrix.os }}
+        restore-keys: |
+          build-deps-${{ matrix.os }}
 
     - name: cache r3b
       if: inputs.cache-name != 'false' && github.event_name == 'pull_request'
@@ -30,9 +28,10 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: .ccache
-        key: r3b-build-${{ inputs.cache-name }}-${{ inputs.r3b-dev-key }}
+        key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
         restore-keys: |
-          r3b-build-${{ inputs.cache-name }}-
+          r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
+          r3b-build-
           r3b-build-
 
     - name: build ucesb
