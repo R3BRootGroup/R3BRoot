@@ -28,7 +28,7 @@
 R3BTofDMappingPar::R3BTofDMappingPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
     , fNumPlanes(4)
-    , fNumPaddles(44)
+    , fNumPaddles(48)
     , fNumPmts(2)
 {
     for (Int_t p = 0; p < fNumPmts; p++)
