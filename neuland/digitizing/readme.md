@@ -1,4 +1,6 @@
-# Neuland Digitizing
+# NeuLAND Digitizing {#neuland_digitizing}
+
+[TOC]
 
 Digitizing is the process of converting the "raw" Monte Carlo energy depositions to experimental look-alike hits.
 

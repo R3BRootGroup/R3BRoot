@@ -1,4 +1,4 @@
-## Fetch the update from an unmerged pull request (PR)
+## Fetch the update from an unmerged pull request (PR) {#git_usage}
 
 More often than not, people need to use new features from a pull request that is not yet merged to the dev branch. In this case, the new features can still be added to your local repository with following steps:
 

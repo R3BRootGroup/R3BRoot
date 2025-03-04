@@ -1,7 +1,11 @@
-# NeuLAND online analysis
+# NeuLAND Online Analysis {#neuland_online}
+
+[TOC]
+
 The NeuLAND online analysis focuses on data visualization of different levels of NeuLAND data converted from the list mode data with existing calibration parameters. The analysis can be done either during the beam time, when the raw data comes from a socket (pipe) or after the beam time, when the raw data is stored in list mode files (file stream). The NeuLAND calibration parameters can be calculated from the cosmic data using [multiple calibration algorithms](../calibration/readme.md). Both NeuLAND and LOS calibration parameters are required in this analysis and must be put in a single root file using a program called `neuland_par_merger`. The output of the analysis are histograms of different NeuLAND data levels and can be checked concurrently through a web browser in the local machine.
 
 ## Running online analysis
+
 Before running the program, please make sure R3BRoot is compiled successfully and the `config.sh` is correctly sourced in the R3BRoot build folder:
 ```shell
 ${R3BRoot}/build.py -a
@@ -38,6 +42,7 @@ _Additional info about the flags above:_
 If more functionalities are required, please edit the source file `neuland_online_monitor.cxx` accordingly and create a pull request for the new features, or directly contact developers in NeuLAND WG.
 
 ### Example 1: Using a file stream
+
 ```shell
 neuland_online_monitor --par "/lustre/r3b/ywang/test/test_online/test.root" -i "/lustre/r3b/202205_s509/lmd/main0159.*.lmd" -v info -r 159 -n 0 -p 10000
 ```
@@ -52,6 +57,7 @@ ssh -L 10000:localhost:10000 user_name@lxir136 -N
 > The first number in `10000:localhost:10000` must be the same as the number in the link used in browser. The second number must be the same as the port number used by `neuland_online_monitor`. Sometimes this port number could be already occupied and the user must choose a different value (see [this page](https://en.wikipedia.org/wiki/Registered_port#:~:text=Ports%20with%20numbers%200–1023,dynamic%2C%20private%20or%20ephemeral%20ports.) to know which values should be chosen).
 
 ### Example 2: Using a socket
+
 _to be tested_
 
 ## Parameter merge
@@ -170,4 +176,5 @@ The pad corresponding to each element can be obtained with:
 ```
 
 ## Screenshot of http output:
+
 ![screen shot of neuland online spectra](../docs/figs/neuland_http_online.png)

@@ -1,4 +1,4 @@
-# Configuration for clang-tidy
+# Configuration for clang-tidy {#clang_tidy}
 
 ## Setup configuration file
 Warnings given by clang-tidy or clangd are configured in `.clang-tidy` yaml file in the nearest folder. Detector specific folders can have different configurations defined in the [global.yml](./global.yml). The customary configuration files in folders for a detector should be symbolic links to a common file located at `config/clang_tidy/${detector_name}.yml`.

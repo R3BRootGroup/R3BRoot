@@ -1,4 +1,4 @@
-# Neuland Command Line Interface
+# NeuLAND Command Line Interface {#neuland_exe}
 
 The motivation of using a cli executable with a JSON file as the configuration is to provide users a much easier and robust way to run the R3BRoot tasks, such as for simulation and analysis. Compared to a ROOT Macro file, a JSON file only contains two things: strings and numbers. To run a task, users only need to look for some names and change the following values, without being burdened with unnecessary overhead in the ROOT Macro file, such as setting up `FairRun` or `EventHeader` in the correct order. It also provides opportunities for the users who just want to use the software without going deep to the ROOT/C++ programming language and code practices. The usage of a cli executable is also much safer and more robust than a ROOT Macro because the programming logic is fixed and users are only allowed to change the values according to their own needs.
 

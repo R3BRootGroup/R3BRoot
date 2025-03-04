@@ -23,7 +23,7 @@ Please visit the [Doxygen documentation](https://yanzhaow.github.io/R3BRoot/) fo
 
 Detector specifics:
 
-- [NeuLAND detector](neuland/readme.md)
+- [NeuLAND detector](neuland/README.md)
 
 ## License
 

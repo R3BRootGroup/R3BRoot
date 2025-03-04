@@ -1,4 +1,4 @@
-# Class interfaces
+# Class interfaces {#class_interface}
 
 ## `R3BIOConnector`
 
