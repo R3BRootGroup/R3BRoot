@@ -20,6 +20,7 @@
 #include <FairRuntimeDb.h>
 
 #include "R3BActafContFact.h"
+#include "R3BActafMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTGeoPar.h"
 
@@ -41,9 +42,12 @@ void R3BActafContFact::setAllContainers()
     // Creates the container objects with all accepted contexts and adds them to
     // the list of containers for the Actaf library.
 
-    auto* p1 = new FairContainer("ActafGeoPar", "ACTAF Geometry Parameters", "GeometryParContext");
+    auto* p1 = new FairContainer("actafGeoPar", "ACTAF Geometry Parameters", "GeometryParContext");
     p1->addContext("GeometryParContext");
     containers->Add(p1);
+    auto* p2 = new FairContainer("actafMappingPar", "ACTAF Mapping Parameters", "ActafMappingParContext");
+    p2->addContext("ActafMappingParContext");
+    containers->Add(p2);
 }
 
 FairParSet* R3BActafContFact::createContainer(FairContainer* c)
@@ -54,9 +58,13 @@ FairParSet* R3BActafContFact::createContainer(FairContainer* c)
     R3BLOG(info, "Create container name: " << name.c_str());
 
     FairParSet* p = nullptr;
-    if (name == "ActafGeoPar")
+    if (name == "actafGeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (name == "actafMappingPar")
+    {
+        p = new R3BActafMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
