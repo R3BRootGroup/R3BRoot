@@ -23,5 +23,7 @@
 #pragma link C++ class R3BActafOnlineSpectra+;
 #pragma link C++ class R3BActafContFact+;
 
+#pragma link C++ class R3BActafMappingPar+;
+
 #endif
 

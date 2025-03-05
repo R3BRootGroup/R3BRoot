@@ -108,13 +108,19 @@ class R3BActafOnlineSpectra : public FairTask
     int fTrigger = -1; /**< Trigger value. */
     int fTpat1 = 0, fTpat2 = 0;
     unsigned long fNEvents = 0;
-    int fPads = 64;
-    int fChn = 16;
-    int fFadcs = 4;
+    const int fChn = 16;
+    const int fFadcs = 8;
+    const int fPads = fChn * fFadcs;
+    bool fDisplaytraces = true;
 
     std::vector<TH2F*> fh2_RawTraces;
+    std::vector<TH1F*> fh1_RawE;
+    std::vector<TH1F*> fh1_Baseline;
 
-    // TH2F* fh2_xxx;
+    TH2F* fh2_ERaw_map;
+    TH2F* fh2_Baseline_map;
+    TH2F* fh2_MaxPos_map;
+    TH2F* fh2_Risetime_map;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1)

@@ -102,33 +102,112 @@ InitStatus R3BActafOnlineSpectra::Init()
     //
     SetParameter();
 
-    fh2_RawTraces.resize(fPads);
+    auto* cSum = new TCanvas("Summary_map", "mapped info", 10, 10, 500, 500);
+    cSum->Divide(1, 4);
+
+    cSum->cd(1);
+    fh2_ERaw_map = R3B::root_owned<TH2F>("fh2_ERaw_vs_pad_map", "ERaw vs Pad", 128, 0.5, 128.5, 500, 0, 30000);
+    fh2_ERaw_map->GetXaxis()->SetTitle("Pad");
+    fh2_ERaw_map->GetYaxis()->SetTitle("Energy [chn]");
+    fh2_ERaw_map->GetYaxis()->SetTitleOffset(1.1);
+    fh2_ERaw_map->GetXaxis()->CenterTitle(true);
+    fh2_ERaw_map->GetYaxis()->CenterTitle(true);
+    fh2_ERaw_map->Draw("colz");
+
+    cSum->cd(2);
+
+    fh2_Baseline_map =
+        R3B::root_owned<TH2F>("fh2_Baseline_vs_pad_map", "Baseline vs Pad", 128, 0.5, 128.5, 300, 7000, 10000);
+    fh2_Baseline_map->GetXaxis()->SetTitle("Pad");
+    fh2_Baseline_map->GetYaxis()->SetTitle("Baseline [chn]");
+    fh2_Baseline_map->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Baseline_map->GetXaxis()->CenterTitle(true);
+    fh2_Baseline_map->GetYaxis()->CenterTitle(true);
+    fh2_Baseline_map->Draw("colz");
+
+    cSum->cd(3);
+    fh2_MaxPos_map =
+        R3B::root_owned<TH2F>("fh2_Maxpos_vs_pad_map", "Max.-position vs Pad", 128, 0.5, 128.5, 300, 0, 2692);
+    fh2_MaxPos_map->GetXaxis()->SetTitle("Pad");
+    fh2_MaxPos_map->GetYaxis()->SetTitle("Max.-position [chn]");
+    fh2_MaxPos_map->GetYaxis()->SetTitleOffset(1.1);
+    fh2_MaxPos_map->GetXaxis()->CenterTitle(true);
+    fh2_MaxPos_map->GetYaxis()->CenterTitle(true);
+    fh2_MaxPos_map->Draw("colz");
+
+    cSum->cd(4);
+    fh2_Risetime_map =
+        R3B::root_owned<TH2F>("fh2_Risetime_vs_pad_map", "Risetime vs Pad", 128, 0.5, 128.5, 100, 0, 100);
+    fh2_Risetime_map->GetXaxis()->SetTitle("Pad");
+    fh2_Risetime_map->GetYaxis()->SetTitle("Risetime [chn]");
+    fh2_Risetime_map->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Risetime_map->GetXaxis()->CenterTitle(true);
+    fh2_Risetime_map->GetYaxis()->CenterTitle(true);
+    fh2_Risetime_map->Draw("colz");
+
+    mapfol->Add(cSum);
 
     for (int adc = 0; adc < fFadcs; adc++)
     {
-        std::string nameCanvas = "Pad_" + std::to_string(adc + 1) + "_traces_map";
+        std::string nameCanvas = "FADC_" + std::to_string(adc + 1) + "_traces_map";
         auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
+        cMap->Divide(4, 4);
+
+        std::string nameCanvasE = "FADC_" + std::to_string(adc + 1) + "_ERaw";
+        auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
+        cMapE->Divide(4, 4);
+
+        std::string nameCanvasB = "FADC_" + std::to_string(adc + 1) + "_Baseline";
+        auto* cMapB = new TCanvas(nameCanvasB.c_str(), "Baseline info", 10, 10, 500, 500);
+        cMapB->Divide(4, 4);
 
         for (int chn = 0; chn < fChn; ++chn)
         {
-            auto index = adc * fChn + chn + 1;
+            auto index = adc * fChn + chn;
             std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
             std::string titleHist = "Raw trace: Pad " + std::to_string(index);
 
-            fh2_RawTraces[index] =
-                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), 1346, 1, 2692, 500, 6000, 13000);
+            fh2_RawTraces.push_back(
+                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), 1346, 1, 2692, 500, 6000, 13000));
 
-            fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Channels]");
+            fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
             fh2_RawTraces[index]->GetYaxis()->SetTitleOffset(1.1);
             fh2_RawTraces[index]->GetXaxis()->CenterTitle(true);
             fh2_RawTraces[index]->GetYaxis()->CenterTitle(true);
-
-            cMap->cd();
+            cMap->cd(chn + 1);
             fh2_RawTraces[index]->Draw("colz");
 
+            std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
+            std::string titleHistE = "ERaw: Pad " + std::to_string(index);
+            fh1_RawE.push_back(R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 500, 0, 30000));
+            fh1_RawE[index]->GetXaxis()->SetTitle("E [Chn]");
+            fh1_RawE[index]->GetYaxis()->SetTitle("Counts");
+            fh1_RawE[index]->GetYaxis()->SetTitleOffset(1.1);
+            fh1_RawE[index]->GetXaxis()->CenterTitle(true);
+            fh1_RawE[index]->GetYaxis()->CenterTitle(true);
+            fh1_RawE[index]->SetFillColor(31);
+            cMapE->cd(chn + 1);
+            fh1_RawE[index]->Draw();
+
+            std::string nameHistB = "fh1_Pad_" + std::to_string(index) + "_Baseline";
+            std::string titleHistB = "Baseline: Pad " + std::to_string(index);
+            fh1_Baseline.push_back(R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000));
+            fh1_Baseline[index]->GetXaxis()->SetTitle("Baseline [Chn]");
+            fh1_Baseline[index]->GetYaxis()->SetTitle("Counts");
+            fh1_Baseline[index]->GetYaxis()->SetTitleOffset(1.1);
+            fh1_Baseline[index]->GetXaxis()->CenterTitle(true);
+            fh1_Baseline[index]->GetYaxis()->CenterTitle(true);
+            fh1_Baseline[index]->SetFillColor(31);
+            cMapB->cd(chn + 1);
+            fh1_Baseline[index]->Draw();
+        }
+        if (fDisplaytraces)
+        {
             mapfol->Add(cMap);
         }
+        mapfol->Add(cMapE);
+        mapfol->Add(cMapB);
     }
     mainfol->Add(mapfol);
 
@@ -154,7 +233,19 @@ void R3BActafOnlineSpectra::Reset_Histo()
 
     if (fMappedItems)
     {
+        fh2_ERaw_map->Reset();
+        fh2_Baseline_map->Reset();
+        fh2_MaxPos_map->Reset();
+        fh2_Risetime_map->Reset();
         for (const auto& hist : fh2_RawTraces)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_RawE)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_Baseline)
         {
             hist->Reset();
         }
@@ -165,7 +256,7 @@ void R3BActafOnlineSpectra::Reset_Histo()
 
 void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    // Check for requested trigger (Todo: should be done globablly / somewhere else)
+    // Check for requested trigger
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
@@ -194,12 +285,28 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto* hit = dynamic_cast<R3BActafMappedData*>(fMappedItems->At(ihit));
             if (!hit)
                 continue;
-            auto chn = hit->GetChannel() - 1;
+            auto pad = hit->GetPad() - 1;
 
-            auto vec = hit->GetTrace(); // std::vector
-            std::size_t index = 0;
-            for (const auto& value : vec)
-                fh2_RawTraces[chn]->Fill(index++, value);
+            if (hit->GetE() > 0)
+            {
+                fh1_RawE[pad]->Fill(hit->GetE());
+                fh2_ERaw_map->Fill(pad + 1, hit->GetE());
+                fh2_Risetime_map->Fill(pad + 1, hit->GetRisetime());
+                fh2_MaxPos_map->Fill(pad + 1, hit->GetMaxpos());
+            }
+            if (hit->GetBaseline() > 0)
+            {
+                fh1_Baseline[pad]->Fill(hit->GetBaseline());
+                fh2_Baseline_map->Fill(pad + 1, hit->GetBaseline());
+            }
+
+            if (fDisplaytraces)
+            {
+                auto vec = hit->GetTrace(); // std::vector
+                std::size_t index = 0;
+                for (const auto& value : vec)
+                    fh2_RawTraces[pad]->Fill(index++, value);
+            }
         }
     }
 
@@ -218,9 +325,24 @@ void R3BActafOnlineSpectra::FinishEvent()
 
 void R3BActafOnlineSpectra::FinishTask()
 {
-    for (const auto& hist : fh2_RawTraces)
+    if (fMappedItems)
     {
-        hist->Write();
+        fh2_ERaw_map->Write();
+        fh2_Baseline_map->Write();
+        fh2_MaxPos_map->Write();
+        fh2_Risetime_map->Write();
+        for (const auto& hist : fh2_RawTraces)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh1_RawE)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh1_Baseline)
+        {
+            hist->Write();
+        }
     }
 }
 ClassImp(R3BActafOnlineSpectra)

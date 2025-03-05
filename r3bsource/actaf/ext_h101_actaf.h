@@ -137,6 +137,102 @@ typedef struct EXT_STR_h101_ACTAF_t
     uint32_t ACTAF4TRACECHMAWv[20440 EXT_STRUCT_CTRL(ACTAF4TRACECHMAW)] /* [0,255] */;
     uint32_t ACTAF4TRACEMAW /* [0,20440] */;
     uint32_t ACTAF4TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF4TRACEMAW)] /* [-1,-1] */;
+    uint32_t ACTAF5TSLO /* [0,20] */;
+    uint32_t ACTAF5TSLOv[20 EXT_STRUCT_CTRL(ACTAF5TSLO)] /* [-1,-1] */;
+    uint32_t ACTAF5TSHI /* [0,20] */;
+    uint32_t ACTAF5TSHIv[20 EXT_STRUCT_CTRL(ACTAF5TSHI)] /* [-1,-1] */;
+    uint32_t ACTAF5ENERGY /* [0,20] */;
+    uint32_t ACTAF5ENERGYv[20 EXT_STRUCT_CTRL(ACTAF5ENERGY)] /* [-1,-1] */;
+    uint32_t ACTAF5BASELINE /* [0,20] */;
+    uint32_t ACTAF5BASELINEv[20 EXT_STRUCT_CTRL(ACTAF5BASELINE)] /* [-1,-1] */;
+    uint32_t ACTAF5MAW1 /* [0,20] */;
+    uint32_t ACTAF5MAW1v[20 EXT_STRUCT_CTRL(ACTAF5MAW1)] /* [-1,-1] */;
+    uint32_t ACTAF5MAW2 /* [0,20] */;
+    uint32_t ACTAF5MAW2v[20 EXT_STRUCT_CTRL(ACTAF5MAW2)] /* [-1,-1] */;
+    uint32_t ACTAF5MAW3 /* [0,20] */;
+    uint32_t ACTAF5MAW3v[20 EXT_STRUCT_CTRL(ACTAF5MAW3)] /* [-1,-1] */;
+    uint32_t ACTAF5CH /* [0,20] */;
+    uint32_t ACTAF5CHv[20 EXT_STRUCT_CTRL(ACTAF5CH)] /* [0,255] */;
+    uint32_t ACTAF5TRACECH /* [0,60000] */;
+    uint32_t ACTAF5TRACECHv[60000 EXT_STRUCT_CTRL(ACTAF5TRACECH)] /* [0,255] */;
+    uint32_t ACTAF5TRACERAW /* [0,60000] */;
+    uint32_t ACTAF5TRACERAWv[60000 EXT_STRUCT_CTRL(ACTAF5TRACERAW)] /* [0,65535] */;
+    uint32_t ACTAF5TRACECHMAW /* [0,20440] */;
+    uint32_t ACTAF5TRACECHMAWv[20440 EXT_STRUCT_CTRL(ACTAF5TRACECHMAW)] /* [0,255] */;
+    uint32_t ACTAF5TRACEMAW /* [0,20440] */;
+    uint32_t ACTAF5TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF5TRACEMAW)] /* [-1,-1] */;
+    uint32_t ACTAF6TSLO /* [0,20] */;
+    uint32_t ACTAF6TSLOv[20 EXT_STRUCT_CTRL(ACTAF6TSLO)] /* [-1,-1] */;
+    uint32_t ACTAF6TSHI /* [0,20] */;
+    uint32_t ACTAF6TSHIv[20 EXT_STRUCT_CTRL(ACTAF6TSHI)] /* [-1,-1] */;
+    uint32_t ACTAF6ENERGY /* [0,20] */;
+    uint32_t ACTAF6ENERGYv[20 EXT_STRUCT_CTRL(ACTAF6ENERGY)] /* [-1,-1] */;
+    uint32_t ACTAF6BASELINE /* [0,20] */;
+    uint32_t ACTAF6BASELINEv[20 EXT_STRUCT_CTRL(ACTAF6BASELINE)] /* [-1,-1] */;
+    uint32_t ACTAF6MAW1 /* [0,20] */;
+    uint32_t ACTAF6MAW1v[20 EXT_STRUCT_CTRL(ACTAF6MAW1)] /* [-1,-1] */;
+    uint32_t ACTAF6MAW2 /* [0,20] */;
+    uint32_t ACTAF6MAW2v[20 EXT_STRUCT_CTRL(ACTAF6MAW2)] /* [-1,-1] */;
+    uint32_t ACTAF6MAW3 /* [0,20] */;
+    uint32_t ACTAF6MAW3v[20 EXT_STRUCT_CTRL(ACTAF6MAW3)] /* [-1,-1] */;
+    uint32_t ACTAF6CH /* [0,20] */;
+    uint32_t ACTAF6CHv[20 EXT_STRUCT_CTRL(ACTAF6CH)] /* [0,255] */;
+    uint32_t ACTAF6TRACECH /* [0,60000] */;
+    uint32_t ACTAF6TRACECHv[60000 EXT_STRUCT_CTRL(ACTAF6TRACECH)] /* [0,255] */;
+    uint32_t ACTAF6TRACERAW /* [0,60000] */;
+    uint32_t ACTAF6TRACERAWv[60000 EXT_STRUCT_CTRL(ACTAF6TRACERAW)] /* [0,65535] */;
+    uint32_t ACTAF6TRACECHMAW /* [0,20440] */;
+    uint32_t ACTAF6TRACECHMAWv[20440 EXT_STRUCT_CTRL(ACTAF6TRACECHMAW)] /* [0,255] */;
+    uint32_t ACTAF6TRACEMAW /* [0,20440] */;
+    uint32_t ACTAF6TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF6TRACEMAW)] /* [-1,-1] */;
+    uint32_t ACTAF7TSLO /* [0,20] */;
+    uint32_t ACTAF7TSLOv[20 EXT_STRUCT_CTRL(ACTAF7TSLO)] /* [-1,-1] */;
+    uint32_t ACTAF7TSHI /* [0,20] */;
+    uint32_t ACTAF7TSHIv[20 EXT_STRUCT_CTRL(ACTAF7TSHI)] /* [-1,-1] */;
+    uint32_t ACTAF7ENERGY /* [0,20] */;
+    uint32_t ACTAF7ENERGYv[20 EXT_STRUCT_CTRL(ACTAF7ENERGY)] /* [-1,-1] */;
+    uint32_t ACTAF7BASELINE /* [0,20] */;
+    uint32_t ACTAF7BASELINEv[20 EXT_STRUCT_CTRL(ACTAF7BASELINE)] /* [-1,-1] */;
+    uint32_t ACTAF7MAW1 /* [0,20] */;
+    uint32_t ACTAF7MAW1v[20 EXT_STRUCT_CTRL(ACTAF7MAW1)] /* [-1,-1] */;
+    uint32_t ACTAF7MAW2 /* [0,20] */;
+    uint32_t ACTAF7MAW2v[20 EXT_STRUCT_CTRL(ACTAF7MAW2)] /* [-1,-1] */;
+    uint32_t ACTAF7MAW3 /* [0,20] */;
+    uint32_t ACTAF7MAW3v[20 EXT_STRUCT_CTRL(ACTAF7MAW3)] /* [-1,-1] */;
+    uint32_t ACTAF7CH /* [0,20] */;
+    uint32_t ACTAF7CHv[20 EXT_STRUCT_CTRL(ACTAF7CH)] /* [0,255] */;
+    uint32_t ACTAF7TRACECH /* [0,60000] */;
+    uint32_t ACTAF7TRACECHv[60000 EXT_STRUCT_CTRL(ACTAF7TRACECH)] /* [0,255] */;
+    uint32_t ACTAF7TRACERAW /* [0,60000] */;
+    uint32_t ACTAF7TRACERAWv[60000 EXT_STRUCT_CTRL(ACTAF7TRACERAW)] /* [0,65535] */;
+    uint32_t ACTAF7TRACECHMAW /* [0,20440] */;
+    uint32_t ACTAF7TRACECHMAWv[20440 EXT_STRUCT_CTRL(ACTAF7TRACECHMAW)] /* [0,255] */;
+    uint32_t ACTAF7TRACEMAW /* [0,20440] */;
+    uint32_t ACTAF7TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF7TRACEMAW)] /* [-1,-1] */;
+    uint32_t ACTAF8TSLO /* [0,20] */;
+    uint32_t ACTAF8TSLOv[20 EXT_STRUCT_CTRL(ACTAF8TSLO)] /* [-1,-1] */;
+    uint32_t ACTAF8TSHI /* [0,20] */;
+    uint32_t ACTAF8TSHIv[20 EXT_STRUCT_CTRL(ACTAF8TSHI)] /* [-1,-1] */;
+    uint32_t ACTAF8ENERGY /* [0,20] */;
+    uint32_t ACTAF8ENERGYv[20 EXT_STRUCT_CTRL(ACTAF8ENERGY)] /* [-1,-1] */;
+    uint32_t ACTAF8BASELINE /* [0,20] */;
+    uint32_t ACTAF8BASELINEv[20 EXT_STRUCT_CTRL(ACTAF8BASELINE)] /* [-1,-1] */;
+    uint32_t ACTAF8MAW1 /* [0,20] */;
+    uint32_t ACTAF8MAW1v[20 EXT_STRUCT_CTRL(ACTAF8MAW1)] /* [-1,-1] */;
+    uint32_t ACTAF8MAW2 /* [0,20] */;
+    uint32_t ACTAF8MAW2v[20 EXT_STRUCT_CTRL(ACTAF8MAW2)] /* [-1,-1] */;
+    uint32_t ACTAF8MAW3 /* [0,20] */;
+    uint32_t ACTAF8MAW3v[20 EXT_STRUCT_CTRL(ACTAF8MAW3)] /* [-1,-1] */;
+    uint32_t ACTAF8CH /* [0,20] */;
+    uint32_t ACTAF8CHv[20 EXT_STRUCT_CTRL(ACTAF8CH)] /* [0,255] */;
+    uint32_t ACTAF8TRACECH /* [0,60000] */;
+    uint32_t ACTAF8TRACECHv[60000 EXT_STRUCT_CTRL(ACTAF8TRACECH)] /* [0,255] */;
+    uint32_t ACTAF8TRACERAW /* [0,60000] */;
+    uint32_t ACTAF8TRACERAWv[60000 EXT_STRUCT_CTRL(ACTAF8TRACERAW)] /* [0,65535] */;
+    uint32_t ACTAF8TRACECHMAW /* [0,20440] */;
+    uint32_t ACTAF8TRACECHMAWv[20440 EXT_STRUCT_CTRL(ACTAF8TRACECHMAW)] /* [0,255] */;
+    uint32_t ACTAF8TRACEMAW /* [0,20440] */;
+    uint32_t ACTAF8TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF8TRACEMAW)] /* [-1,-1] */;
 
 } EXT_STR_h101_ACTAF;
 
@@ -174,7 +270,7 @@ typedef struct EXT_STR_h101_ACTAF_onion_t
         uint32_t TRACECHMAWv[20440 /* TRACECHMAW */];
         uint32_t TRACEMAW;
         uint32_t TRACEMAWv[20440 /* TRACEMAW */];
-    } ACTAF[4];
+    } ACTAF[8];
 
 } EXT_STR_h101_ACTAF_onion;
 
@@ -512,6 +608,334 @@ typedef struct EXT_STR_h101_ACTAF_onion_t
                                UINT32,                                                                                 \
                                "ACTAF4TRACEMAWv",                                                                      \
                                "ACTAF4TRACEMAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5TSLO, UINT32, "ACTAF5TSLO", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TSLOv, UINT32, "ACTAF5TSLOv", "ACTAF5TSLO", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5TSHI, UINT32, "ACTAF5TSHI", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TSHIv, UINT32, "ACTAF5TSHIv", "ACTAF5TSHI", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5ENERGY, UINT32, "ACTAF5ENERGY", 20, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5ENERGYv, UINT32, "ACTAF5ENERGYv", "ACTAF5ENERGY", 0 /*flags*/);  \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5BASELINE, UINT32, "ACTAF5BASELINE", 20, 0 /*flags*/);            \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF5BASELINEv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF5BASELINEv",                                                                      \
+                               "ACTAF5BASELINE",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5MAW1, UINT32, "ACTAF5MAW1", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5MAW1v, UINT32, "ACTAF5MAW1v", "ACTAF5MAW1", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5MAW2, UINT32, "ACTAF5MAW2", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5MAW2v, UINT32, "ACTAF5MAW2v", "ACTAF5MAW2", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5MAW3, UINT32, "ACTAF5MAW3", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5MAW3v, UINT32, "ACTAF5MAW3v", "ACTAF5MAW3", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF5CH, UINT32, "ACTAF5CH", 20, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5CHv, UINT32, "ACTAF5CHv", "ACTAF5CH", 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TRACECH, UINT32, "ACTAF5TRACECH", 60000, 0 /*flags*/);           \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF5TRACECHv,                                                                         \
+                               UINT32,                                                                                 \
+                               "ACTAF5TRACECHv",                                                                       \
+                               "ACTAF5TRACECH",                                                                        \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TRACERAW, UINT32, "ACTAF5TRACERAW", 60000, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF5TRACERAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF5TRACERAWv",                                                                      \
+                               "ACTAF5TRACERAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TRACECHMAW, UINT32, "ACTAF5TRACECHMAW", 20440, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF5TRACECHMAWv,                                                                      \
+                               UINT32,                                                                                 \
+                               "ACTAF5TRACECHMAWv",                                                                    \
+                               "ACTAF5TRACECHMAW",                                                                     \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF5TRACEMAW, UINT32, "ACTAF5TRACEMAW", 20440, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF5TRACEMAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF5TRACEMAWv",                                                                      \
+                               "ACTAF5TRACEMAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6TSLO, UINT32, "ACTAF6TSLO", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TSLOv, UINT32, "ACTAF6TSLOv", "ACTAF6TSLO", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6TSHI, UINT32, "ACTAF6TSHI", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TSHIv, UINT32, "ACTAF6TSHIv", "ACTAF6TSHI", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6ENERGY, UINT32, "ACTAF6ENERGY", 20, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6ENERGYv, UINT32, "ACTAF6ENERGYv", "ACTAF6ENERGY", 0 /*flags*/);  \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6BASELINE, UINT32, "ACTAF6BASELINE", 20, 0 /*flags*/);            \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF6BASELINEv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF6BASELINEv",                                                                      \
+                               "ACTAF6BASELINE",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6MAW1, UINT32, "ACTAF6MAW1", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6MAW1v, UINT32, "ACTAF6MAW1v", "ACTAF6MAW1", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6MAW2, UINT32, "ACTAF6MAW2", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6MAW2v, UINT32, "ACTAF6MAW2v", "ACTAF6MAW2", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6MAW3, UINT32, "ACTAF6MAW3", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6MAW3v, UINT32, "ACTAF6MAW3v", "ACTAF6MAW3", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF6CH, UINT32, "ACTAF6CH", 20, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6CHv, UINT32, "ACTAF6CHv", "ACTAF6CH", 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TRACECH, UINT32, "ACTAF6TRACECH", 60000, 0 /*flags*/);           \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF6TRACECHv,                                                                         \
+                               UINT32,                                                                                 \
+                               "ACTAF6TRACECHv",                                                                       \
+                               "ACTAF6TRACECH",                                                                        \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TRACERAW, UINT32, "ACTAF6TRACERAW", 60000, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF6TRACERAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF6TRACERAWv",                                                                      \
+                               "ACTAF6TRACERAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TRACECHMAW, UINT32, "ACTAF6TRACECHMAW", 20440, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF6TRACECHMAWv,                                                                      \
+                               UINT32,                                                                                 \
+                               "ACTAF6TRACECHMAWv",                                                                    \
+                               "ACTAF6TRACECHMAW",                                                                     \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF6TRACEMAW, UINT32, "ACTAF6TRACEMAW", 20440, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF6TRACEMAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF6TRACEMAWv",                                                                      \
+                               "ACTAF6TRACEMAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7TSLO, UINT32, "ACTAF7TSLO", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TSLOv, UINT32, "ACTAF7TSLOv", "ACTAF7TSLO", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7TSHI, UINT32, "ACTAF7TSHI", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TSHIv, UINT32, "ACTAF7TSHIv", "ACTAF7TSHI", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7ENERGY, UINT32, "ACTAF7ENERGY", 20, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7ENERGYv, UINT32, "ACTAF7ENERGYv", "ACTAF7ENERGY", 0 /*flags*/);  \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7BASELINE, UINT32, "ACTAF7BASELINE", 20, 0 /*flags*/);            \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF7BASELINEv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF7BASELINEv",                                                                      \
+                               "ACTAF7BASELINE",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7MAW1, UINT32, "ACTAF7MAW1", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7MAW1v, UINT32, "ACTAF7MAW1v", "ACTAF7MAW1", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7MAW2, UINT32, "ACTAF7MAW2", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7MAW2v, UINT32, "ACTAF7MAW2v", "ACTAF7MAW2", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7MAW3, UINT32, "ACTAF7MAW3", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7MAW3v, UINT32, "ACTAF7MAW3v", "ACTAF7MAW3", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF7CH, UINT32, "ACTAF7CH", 20, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7CHv, UINT32, "ACTAF7CHv", "ACTAF7CH", 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TRACECH, UINT32, "ACTAF7TRACECH", 60000, 0 /*flags*/);           \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF7TRACECHv,                                                                         \
+                               UINT32,                                                                                 \
+                               "ACTAF7TRACECHv",                                                                       \
+                               "ACTAF7TRACECH",                                                                        \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TRACERAW, UINT32, "ACTAF7TRACERAW", 60000, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF7TRACERAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF7TRACERAWv",                                                                      \
+                               "ACTAF7TRACERAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TRACECHMAW, UINT32, "ACTAF7TRACECHMAW", 20440, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF7TRACECHMAWv,                                                                      \
+                               UINT32,                                                                                 \
+                               "ACTAF7TRACECHMAWv",                                                                    \
+                               "ACTAF7TRACECHMAW",                                                                     \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF7TRACEMAW, UINT32, "ACTAF7TRACEMAW", 20440, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF7TRACEMAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF7TRACEMAWv",                                                                      \
+                               "ACTAF7TRACEMAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8TSLO, UINT32, "ACTAF8TSLO", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TSLOv, UINT32, "ACTAF8TSLOv", "ACTAF8TSLO", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8TSHI, UINT32, "ACTAF8TSHI", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TSHIv, UINT32, "ACTAF8TSHIv", "ACTAF8TSHI", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8ENERGY, UINT32, "ACTAF8ENERGY", 20, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8ENERGYv, UINT32, "ACTAF8ENERGYv", "ACTAF8ENERGY", 0 /*flags*/);  \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8BASELINE, UINT32, "ACTAF8BASELINE", 20, 0 /*flags*/);            \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF8BASELINEv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF8BASELINEv",                                                                      \
+                               "ACTAF8BASELINE",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8MAW1, UINT32, "ACTAF8MAW1", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8MAW1v, UINT32, "ACTAF8MAW1v", "ACTAF8MAW1", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8MAW2, UINT32, "ACTAF8MAW2", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8MAW2v, UINT32, "ACTAF8MAW2v", "ACTAF8MAW2", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8MAW3, UINT32, "ACTAF8MAW3", 20, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8MAW3v, UINT32, "ACTAF8MAW3v", "ACTAF8MAW3", 0 /*flags*/);        \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, ACTAF8CH, UINT32, "ACTAF8CH", 20, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8CHv, UINT32, "ACTAF8CHv", "ACTAF8CH", 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TRACECH, UINT32, "ACTAF8TRACECH", 60000, 0 /*flags*/);           \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF8TRACECHv,                                                                         \
+                               UINT32,                                                                                 \
+                               "ACTAF8TRACECHv",                                                                       \
+                               "ACTAF8TRACECH",                                                                        \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TRACERAW, UINT32, "ACTAF8TRACERAW", 60000, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF8TRACERAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF8TRACERAWv",                                                                      \
+                               "ACTAF8TRACERAW",                                                                       \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TRACECHMAW, UINT32, "ACTAF8TRACECHMAW", 20440, 0 /*flags*/);     \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF8TRACECHMAWv,                                                                      \
+                               UINT32,                                                                                 \
+                               "ACTAF8TRACECHMAWv",                                                                    \
+                               "ACTAF8TRACECHMAW",                                                                     \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, ACTAF8TRACEMAW, UINT32, "ACTAF8TRACEMAW", 20440, 0 /*flags*/);         \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               ACTAF8TRACEMAWv,                                                                        \
+                               UINT32,                                                                                 \
+                               "ACTAF8TRACEMAWv",                                                                      \
+                               "ACTAF8TRACEMAW",                                                                       \
                                0 /*flags*/);                                                                           \
                                                                                                                        \
     } while (0);
