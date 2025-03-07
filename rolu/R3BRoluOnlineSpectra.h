@@ -75,7 +75,7 @@ class R3BRoluOnlineSpectra : public FairTask
     void Reset_ROLU_Histo();
 
     /* Method for setting number of ROLU detectors */
-    void SetNofRoluModules(int nDets) { fNofRoluDetectors = nDets; }
+    inline void SetNofRoluModules(int nDets) { fNofRoluDetectors = nDets; }
 
   private:
     TClonesArray* fMappedItems;
@@ -87,8 +87,8 @@ class R3BRoluOnlineSpectra : public FairTask
     int fTpat = -1;
     double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.; /**< Clock cycle in [ns]. */
     int nRoluEvents = 0;
-    int fNofRoluDetectors = 1;         /**< Number of ROLU detectors. */
-    static constexpr int fNofRolu = 1; /**< Number of ROLU detectors. */
+    int fNofRoluDetectors = 1; /**< Number of ROLU detectors. */
+    static constexpr int fNofRolu = 2;
 
     int counter[4] = { 0 };
 
