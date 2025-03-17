@@ -122,20 +122,25 @@ InitStatus R3BLosOnlineSpectra::Init()
 
     //------------------------------------------------------------------------
     // Los detector
-    TCanvas* cLos[fNofLosDetectors];
-    TCanvas* cLos_diagnosis[fNofLosDetectors];
+    TCanvas* cLos[fNofLosDetectors];                 // NOLINT
+    TCanvas* cLos_diagnosis[fNofLosDetectors];       // NOLINT
+    TCanvas* cLos_mapped_channels[fNofLosDetectors]; // NOLINT
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
         {
+
             char detName[255];
             sprintf(detName, "LOS%d", iloscount + 1);
-
             cLos[iloscount] = new TCanvas(detName, detName, 10, 10, 1010, 810);
 
             char detName2[255];
             sprintf(detName2, "LOS%d_diagnosis", iloscount + 1);
             cLos_diagnosis[iloscount] = new TCanvas(detName2, detName2, 10, 10, 1010, 810);
+
+            char detName3[255];
+            sprintf(detName3, "LOS_mapped_channels%d", iloscount + 1);
+            cLos_mapped_channels[iloscount] = new TCanvas(detName3, detName3, 10, 10, 1010, 810);
 
             fh_los_channels[iloscount] =
                 new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 20, 0., 20.);
@@ -240,6 +245,14 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_vftx_tamex[iloscount]->GetXaxis()->SetTitle("Ttamex-Tvftx / ns");
             fh_los_vftx_tamex[iloscount]->SetFillColor(31);
 
+            fh_los_mapped.resize(24);
+            const char* names[] = { "VFTX", "TMX_L", "TMX_T" };
+            for (Int_t t = 0; t < 24; t++)
+            {
+                TString title = Form("%s_%s_los_channels_%d", detName, names[t / 8], t % 8);
+                fh_los_mapped[t] = new TH1F(title, title, 2048, 0, 4 * 2048 * 5.);
+            }
+
             cLos[iloscount]->Divide(3, 3);
             cLos[iloscount]->cd(1);
             fh_los_channels[iloscount]->Draw();
@@ -288,6 +301,15 @@ InitStatus R3BLosOnlineSpectra::Init()
             gPad->SetLogy();
             fh_los_vftx_tamex[iloscount]->Draw();
             mainfol->Add(cLos_diagnosis[iloscount]);
+
+            cLos_mapped_channels[iloscount]->Divide(8, 3);
+
+            for (int t = 0; t < 24; t++)
+            {
+                cLos_mapped_channels[iloscount]->cd(t + 1);
+                fh_los_mapped[t]->Draw();
+            }
+            mainfol->Add(cLos_mapped_channels[iloscount]);
         }
 
         run->AddObject(mainfol);
@@ -459,8 +481,11 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
             Int_t iDet = hit->GetDetector(); // 1..
             Int_t iCha = hit->GetChannel();  // 1..
             Int_t iTyp = hit->GetType();     // 0,1,2,3
+            // Int_t iFT = hit->GetTimeFine();
+            Int_t iCT = hit->GetTimeCoarse();
             if (iTyp == 0 || iTyp == 1)
                 fh_los_channels[iDet - 1]->Fill(8 * iTyp + iCha); // exclude MTDC data
+            fh_los_mapped[8 * iTyp + iCha - 1]->Fill(iCT * 5);
         }
     }
 
@@ -718,22 +743,33 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                     xV_cm[iDet - 1][iPart] = (xV_cm[iDet - 1][iPart] - flosOffsetXV[iDet - 1]) * flosVeffXV[iDet - 1];
                     yV_cm[iDet - 1][iPart] = (yV_cm[iDet - 1][iPart] - flosOffsetYV[iDet - 1]) * flosVeffYV[iDet - 1];
 
-                    // Position from ToT:
-                    if (tot[iDet - 1][iPart][1] > 0. && tot[iDet - 1][iPart][2] > 0. && tot[iDet - 1][iPart][5] > 0. &&
-                        tot[iDet - 1][iPart][6] > 0. && tot[iDet - 1][iPart][0] > 0. && tot[iDet - 1][iPart][3] > 0. &&
-                        tot[iDet - 1][iPart][4] > 0. && tot[iDet - 1][iPart][7] > 0.)
-                    {
-                        xToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) / 2. -
-                                                     (tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2]) / 2.) /
-                                                    ((tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2] +
-                                                      tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) /
-                                                     4.));
+                    //// Position from ToT:
+                    // if (tot[iDet - 1][iPart][1] > 0. && tot[iDet - 1][iPart][2] > 0. && tot[iDet - 1][iPart][5] > 0.
+                    // &&
+                    //     tot[iDet - 1][iPart][6] > 0. && tot[iDet - 1][iPart][0] > 0. && tot[iDet - 1][iPart][3] > 0.
+                    //     && tot[iDet - 1][iPart][4] > 0. && tot[iDet - 1][iPart][7] > 0.)
+                    //{
+                    //     xToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) / 2. -
+                    //                                  (tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2]) / 2.) /
+                    //                                 ((tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2] +
+                    //                                   tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) /
+                    //                                  4.));
 
-                        yToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][0] + tot[iDet - 1][iPart][7]) / 2. -
-                                                     (tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) / 2.) /
-                                                    ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][0] +
-                                                      tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) /
-                                                     4.));
+                    //    yToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][0] + tot[iDet - 1][iPart][7]) / 2. -
+                    //                                 (tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) / 2.) /
+                    //                                ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][0] +
+                    //                                  tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) /
+                    //                                 4.));
+                    //}
+
+                    // Position from ToT:
+                    if (tot[iDet - 1][iPart][1] > 0. && tot[iDet - 1][iPart][5] > 0. && tot[iDet - 1][iPart][3] > 0. &&
+                        tot[iDet - 1][iPart][7] > 0.)
+                    {
+                        xToT_cm[iDet - 1][iPart] = (tot[iDet - 1][iPart][5] - tot[iDet - 1][iPart][1]) /
+                                                   ((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][1]) / 2.);
+                        yToT_cm[iDet - 1][iPart] = (tot[iDet - 1][iPart][7] - tot[iDet - 1][iPart][3]) /
+                                                   ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][3]) / 2.);
                     }
 
                     xToT_cm[iDet - 1][iPart] =
