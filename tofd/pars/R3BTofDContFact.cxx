@@ -16,16 +16,15 @@
 // -----    Created 18/03/22 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------
 
-#include "FairRuntimeDb.h"
+#include <FairRuntimeDb.h>
+#include <TClass.h>
+#include <string.h>
 
 #include "R3BLogger.h"
 #include "R3BTGeoPar.h"
 #include "R3BTofDContFact.h"
 #include "R3BTofDHitPar.h"
 #include "R3BTofDMappingPar.h"
-#include "TClass.h"
-
-#include <string.h>
 
 static R3BTofDContFact gR3BTofDContFact;
 
@@ -41,44 +40,40 @@ R3BTofDContFact::R3BTofDContFact()
 void R3BTofDContFact::setAllContainers()
 {
     /** Creates the Container objects with all accepted contexts and adds them to
-     *  the list of containers for the STS library.*/
+     *  the list of containers for the TofD library.*/
 
-    FairContainer* p1 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "tofdGeoContext");
+    FairContainer* p1 = new FairContainer("tofdGeoPar", "TofD Geometry parameters", "tofdGeoContext");
     p1->addContext("tofdGeoContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("tofdMappingPar", "Tofd Mapping parameters", "tofdMappingContext");
+    FairContainer* p2 = new FairContainer("tofdMappingPar", "TofD Mapping parameters", "tofdMappingContext");
     p2->addContext("tofdMappingContext");
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("tofdHitPar", "Tofd Hit parameters", "tofdHitContext");
+    FairContainer* p3 = new FairContainer("tofdHitPar", "TofD Hit parameters", "tofdHitContext");
     p3->addContext("tofdHitContext");
     containers->Add(p3);
 }
 
 FairParSet* R3BTofDContFact::createContainer(FairContainer* c)
 {
-    /** Tofd the constructor of the corresponding parameter container.
-     * For an actual context, which is not an empty string and not the default context
-     * of this container, the name is concatinated with the context. */
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
 
-    const char* name = c->GetName();
-    R3BLOG(info, name);
-    FairParSet* p = 0;
-    if (strcmp(name, "tofdGeoPar") == 0)
+    FairParSet* p = nullptr;
+    if (name == "tofdGeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "tofdMappingPar") == 0)
+    else if (name == "tofdMappingPar")
     {
         p = new R3BTofDMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "tofdHitPar") == 0)
+    else if (name == "tofdHitPar")
     {
         p = new R3BTofDHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-
     return p;
 }
 
-ClassImp(R3BTofDContFact);
+ClassImp(R3BTofDContFact)

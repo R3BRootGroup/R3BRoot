@@ -13,18 +13,16 @@
 
 #pragma once
 
-#define N_TOFD_HIT_PLANE_MAX 4
-#define N_TOFD_HIT_PADDLE_MAX 44
-
 #include <FairTask.h>
 #include <THnSparse.h>
 #include <memory>
+
+#include "R3BTofDHitPar.h"
 
 class TClonesArray;
 class R3BTofDHitPar;
 class R3BEventHeader;
 class R3BTofDMappingPar;
-class R3BTofDHitPar;
 class R3BCoarseTimeStitch;
 class TH1F;
 class TH2F;

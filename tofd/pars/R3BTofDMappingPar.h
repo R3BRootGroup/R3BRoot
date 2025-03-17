@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
-#include "TArrayI.h"
-#include "TObjArray.h"
 #include <Rtypes.h>
+#include <TArrayI.h>
+#include <TObjArray.h>
 #include <stdint.h>
 #include <vector>
 
@@ -40,17 +40,23 @@ class R3BTofDMappingPar : public FairParGenericSet
     virtual ~R3BTofDMappingPar();
 
     /** Reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Print values of parameters to the standard output **/
-    virtual void print();
-    void printParams();
+    void print() override;
+
+    /**
+     * Method to print value of parameters to the standard output.
+     * Calls printParams() for every module container.
+     * Accessible from Context menu in TBrowser.
+     */
+    void printParams() override;
 
     /** Accessor functions **/
     const Int_t GetNbPlanes() { return fNumPlanes; }
@@ -70,14 +76,14 @@ class R3BTofDMappingPar : public FairParGenericSet
     }
 
   private:
-    Int_t fNumPlanes;
-    Int_t fNumPaddles;
-    Int_t fNumPmts;
+    Int_t fNumPlanes = 4;
+    Int_t fNumPaddles = 48;
+    Int_t fNumPmts = 2;
     std::vector<TArrayI*> fTrigmap[2]; // Two PMTs per paddle
 
     const R3BTofDMappingPar& operator=(const R3BTofDMappingPar&);
     R3BTofDMappingPar(const R3BTofDMappingPar&);
 
   public:
-    ClassDef(R3BTofDMappingPar, 1);
+    ClassDefOverride(R3BTofDMappingPar, 1);
 };

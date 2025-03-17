@@ -49,7 +49,7 @@ using namespace std;
 namespace
 {
     double c_range_ns = 2048 * 5;
-    double c_bar_coincidence_ns = 20; // nanoseconds.
+    double c_bar_coincidence_ns = 40; // nanoseconds.
     uint64_t n1, n2;
 } // namespace
 
@@ -159,7 +159,7 @@ void R3BTofDCal2Hit::SetParContainers()
     fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
-        R3BLOG(error, "Could not get access to tofdHitPar container");
+        R3BLOG(warn, "Could not get access to tofdHitPar container");
         fNofHitPars = 0;
         return;
     }
@@ -849,7 +849,7 @@ void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
         sprintf(strName2, "Time Diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -8., 8.);
+        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -20., 20.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
     }

@@ -13,9 +13,7 @@
 
 #pragma once
 
-#include "FairParGenericSet.h"
-
-#define NCHMAX 5000
+#include <FairParGenericSet.h>
 
 class FairParamList;
 
@@ -34,8 +32,8 @@ class R3BTofDHitModulePar : public FairParGenericSet
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BTofDHitModulePar(const char* name = "TofdHitModulePar",
-                        const char* title = "TOFd hit calibration of a module",
+    R3BTofDHitModulePar(const char* name = "tofdHitModulePar",
+                        const char* title = "TofD hit calibration of a module",
                         const char* context = "TestDefaultContext",
                         Bool_t own = kTRUE);
 
@@ -43,36 +41,26 @@ class R3BTofDHitModulePar : public FairParGenericSet
      * Destructor.
      * Frees the memory allocated by the object.
      */
-    virtual ~R3BTofDHitModulePar(void);
-
-    /**
-     * A method to reset the parameter values. Sets all parameters to 0.
-     */
-    void clear(void);
+    virtual ~R3BTofDHitModulePar() = default;
 
     /**
      * A method to write parameters using RuntimeDB.
      * @param list a list of parameters.
      */
-    void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /**
      * A method to read parameters using RuntimeDB.
      * @param list a list of parameters.
      * @return kTRUE if successfull, else kFALSE.
      */
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /**
      * A method to print value of parameters to the standard
      * output using FairLogger.
      */
-    void printParams();
-
-    /**
-     * A method to draw vaues of parameters on the current Canvas.
-     */
-    void DrawParams();
+    void printParams() override;
 
     /** Accessor functions **/
     Int_t GetPlane() const { return fPlane; }
@@ -137,22 +125,25 @@ class R3BTofDHitModulePar : public FairParGenericSet
     void SetPar5Walk(Double_t par5Walk) { fPar5walk = par5Walk; }
 
   private:
-    Int_t fPlane;                            /**< Index of a plane. */
-    Int_t fPaddle;                           /**< Index of a paddle. */
-    Double_t fOffset1;                       /**< time offset of PM1 */
-    Double_t fOffset2;                       /**< time offset of PM2 */
-    Double_t fToTOffset1;                    /**< ToT offset of PM1 */
-    Double_t fToTOffset2;                    /**< ToT offset of PM2 */
-    Double_t fVeff;                          /**< effective velocity of light in paddle for position determination */
-    Double_t fLambda;                        /**< light attenuation in paddle for position determination */
-    Double_t fSync;                          /**< time offset between paddles */
-    Double_t fTofSyncOffset;                 /**< tof alignment with respect to the start detector */
-    Double_t fPar1a, fPar1b, fPar1c, fPar1d; /**< double exponential parameters for position dependent charge */
-    Double_t fPar2a, fPar2b, fPar2c, fPar2d; /**< double exponential parameters for position dependent charge */
-    Double_t fPola, fPolb, fPolc, fPold;     /**< polynomial parameters for position dependent charge */
-    Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;                    /**< quench correction parameters */
-    Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk; /**< walk correction parameters */
+    Int_t fPlane = 0;             /**< Index of a plane. */
+    Int_t fPaddle = 0;            /**< Index of a paddle. */
+    Double_t fOffset1 = 0.;       /**< time offset of PM1 */
+    Double_t fOffset2 = 0.;       /**< time offset of PM2 */
+    Double_t fToTOffset1 = 1.;    /**< ToT offset of PM1 */
+    Double_t fToTOffset2 = 1.;    /**< ToT offset of PM2 */
+    Double_t fVeff = 1.;          /**< effective velocity of light in paddle for position determination */
+    Double_t fLambda = 1.;        /**< light attenuation in paddle for position determination */
+    Double_t fSync = 0.;          /**< time offset between paddles */
+    Double_t fTofSyncOffset = 0.; /**< tof alignment with respect to the start detector */
+    Double_t fPar1a = 0., fPar1b = 0., fPar1c = 0.,
+             fPar1d = 0.; /**< double exponential parameters for position dependent charge */
+    Double_t fPar2a = 0., fPar2b = 0., fPar2c = 0.,
+             fPar2d = 0.; /**< double exponential parameters for position dependent charge */
+    Double_t fPola = 1., fPolb = 0., fPolc = 0., fPold = 0.; /**< polynomial parameters for position dependent charge */
+    Double_t fPar1za = 1., fPar1zb = 0., fPar1zc = 0., fPar1zd = 0.; /**< quench correction parameters */
+    Double_t fPar1walk = 0., fPar2walk = 0., fPar3walk = 0., fPar4walk = 0.,
+             fPar5walk = 0.; /**< walk correction parameters */
 
   public:
-    ClassDef(R3BTofDHitModulePar, 3);
+    ClassDefOverride(R3BTofDHitModulePar, 3);
 };

@@ -40,7 +40,6 @@ add_library_with_dictionary(
     R3BCalifa
     R3BMwpc
     R3BSsd
-    R3BTof
     R3BTofD
     R3BTofi
     R3BTwim
