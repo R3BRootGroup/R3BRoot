@@ -14,19 +14,19 @@
 #include "R3BTofDHitPar.h"
 #include "R3BLogger.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
 
 R3BTofDHitPar::R3BTofDHitPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
-    , fHitParams(new TObjArray(NMODULEMAX))
+    , fHitParams(new TObjArray(NPADDLEMAX))
     , fMapInit(kFALSE)
 {
 }
 
 R3BTofDHitPar::~R3BTofDHitPar()
 {
-    clear();
+    this->clear(); // NOLINT
     if (fHitParams)
     {
         delete fHitParams;
@@ -67,7 +67,7 @@ void R3BTofDHitPar::clear()
 }
 
 // ----  Method print ----------------------------------------------------------
-void R3BTofDHitPar::print() { printParams(); }
+void R3BTofDHitPar::print() { this->printParams(); }
 
 void R3BTofDHitPar::printParams()
 {
@@ -151,13 +151,4 @@ void R3BTofDHitPar::PrintModuleParams(Int_t plane, Int_t paddle)
     }
 }
 
-void R3BTofDHitPar::DrawModuleParams(Int_t plane, Int_t paddle)
-{
-    R3BTofDHitModulePar* par = GetModuleParAt(plane, paddle);
-    if (NULL != par)
-    {
-        par->DrawParams();
-    }
-}
-
-ClassImp(R3BTofDHitPar);
+ClassImp(R3BTofDHitPar)

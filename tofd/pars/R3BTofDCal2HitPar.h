@@ -18,9 +18,6 @@
 
 #pragma once
 
-#define N_TOFD_HIT_PLANE_MAX 4
-#define N_TOFD_HIT_PADDLE_MAX 44
-
 #include <map>
 
 #include <FairTask.h>
@@ -28,7 +25,8 @@
 #include <memory>
 #include <string.h>
 
-class R3BTofDHitPar;
+#include "R3BTofDHitPar.h"
+
 class TClonesArray;
 class R3BEventHeader;
 class R3BTofDMappingPar;

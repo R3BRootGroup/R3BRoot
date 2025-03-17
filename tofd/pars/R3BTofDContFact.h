@@ -19,20 +19,16 @@ class FairContainer;
 
 class R3BTofDContFact : public FairContFact
 {
+  public:
+    R3BTofDContFact();
+
+    virtual ~R3BTofDContFact() = default;
+
+    FairParSet* createContainer(FairContainer*) override;
+
   private:
     void setAllContainers();
 
   public:
-    /**
-     * Default constructor.
-     */
-    R3BTofDContFact();
-
-    /**
-     * Destructor.
-     */
-    ~R3BTofDContFact() {}
-
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BTofDContFact, 0) // Factory for all TofD parameter containers
+    ClassDefOverride(R3BTofDContFact, 0) // Factory for all TofD parameter containers
 };

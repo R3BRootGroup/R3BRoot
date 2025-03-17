@@ -13,15 +13,16 @@
 
 #pragma once
 
-#define NMODULEMAX 6000
+#define NPADDLEMAX 250
 
 #define N_TOFD_HIT_PLANE_MAX 4
-#define N_TOFD_HIT_PADDLE_MAX 44
+#define N_TOFD_HIT_PADDLE_MAX 48
 
-#include "FairParGenericSet.h"
-#include "R3BTofDHitModulePar.h"
-#include "TObjArray.h"
+#include <FairParGenericSet.h>
+#include <TObjArray.h>
 #include <map>
+
+#include "R3BTofDHitModulePar.h"
 
 class FairParamList;
 
@@ -35,7 +36,6 @@ class FairParamList;
  */
 class R3BTofDHitPar : public FairParGenericSet
 {
-
   public:
     /**
      * Standard constructor. Creates instance of this class.
@@ -51,35 +51,35 @@ class R3BTofDHitPar : public FairParGenericSet
     /**
      * Destructor. Cleares the memory used by the object.
      */
-    virtual ~R3BTofDHitPar(void);
+    virtual ~R3BTofDHitPar();
 
     /**
      * Method to reset the values of parameters.
      */
-    void clear(void);
+    void clear() override;
 
     /**
      * Method to store parameters using FairRuntimeDB.
      * @param list a list of parameters.
      */
-    void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /**
      * Method to retrieve parameters using FairRuntimeDB.
      * @param list a list of parameters.
      * @return kTRUE if successful, else kFALSE.
      */
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /**
      * Method to print value of parameters to the standard output.
      * Calls printParams() for every module container.
      * Accessible from Context menu in TBrowser.
      */
-    void printParams();
+    void printParams() override;
 
     /** Method to print values of parameters to the standard output **/
-    virtual void print();
+    void print() override;
 
     /**
      * Method to print value of parameters for a specific module.
@@ -89,15 +89,6 @@ class R3BTofDHitPar : public FairParGenericSet
      * Accessible from Context menu in TBrowser.
      */
     void PrintModuleParams(Int_t plane, Int_t paddle); // *MENU*
-
-    /**
-     * Method to draw value of parameters for a specific module on a current Canvas.
-     * @param plane an index of detector plane
-     * @param paddle a paddle index within the plane
-     * @param side a side of a paddle
-     * Accessible from Context menu in TBrowser.
-     */
-    void DrawModuleParams(Int_t plane, Int_t paddle); // *MENU*
 
     /**
      * Method to add parameter container for a module.
@@ -135,5 +126,5 @@ class R3BTofDHitPar : public FairParGenericSet
     std::map<Int_t, Int_t> fIndexMap; /**< a map between index of a container in array and plane,paddle,side */
 
   public:
-    ClassDef(R3BTofDHitPar, 1);
+    ClassDefOverride(R3BTofDHitPar, 1);
 };

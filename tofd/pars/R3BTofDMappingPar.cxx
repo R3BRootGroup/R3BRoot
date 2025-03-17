@@ -17,19 +17,17 @@
 // -------------------------------------------------------------
 
 #include "R3BTofDMappingPar.h"
-
-#include "FairParamList.h"
 #include "R3BLogger.h"
 
-#include "TMath.h"
-#include "TString.h"
+#include <FairParamList.h>
+
+#include <TMath.h>
+#include <TString.h>
+#include <string>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BTofDMappingPar::R3BTofDMappingPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
-    , fNumPlanes(4)
-    , fNumPaddles(48)
-    , fNumPmts(2)
 {
     for (Int_t p = 0; p < fNumPmts; p++)
     {
@@ -47,7 +45,7 @@ R3BTofDMappingPar::R3BTofDMappingPar(const TString& name, const TString& title, 
 // ----  Destructor ------------------------------------------------------------
 R3BTofDMappingPar::~R3BTofDMappingPar()
 {
-    clear();
+    this->clear(); // NOLINT
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
@@ -82,13 +80,13 @@ void R3BTofDMappingPar::putParams(FairParamList* list)
     {
         fTrigmap[p].resize(fNumPlanes);
     }
-    char name[300];
+
     for (Int_t plane = 0; plane < fNumPlanes; plane++)
         for (Int_t p = 0; p < fNumPmts; p++)
         {
             fTrigmap[p][plane]->Set(fNumPaddles);
-            sprintf(name, "tofdplane%dPmt%dPar", plane + 1, p + 1);
-            list->add(name, *fTrigmap[p][plane]);
+            std::string name = "tofdplane" + std::to_string(plane + 1) + "Pmt" + std::to_string(p + 1) + "Par";
+            list->add(name.c_str(), *fTrigmap[p][plane]);
         }
 }
 
@@ -151,4 +149,4 @@ void R3BTofDMappingPar::printParams()
             }
 }
 
-ClassImp(R3BTofDMappingPar);
+ClassImp(R3BTofDMappingPar)
