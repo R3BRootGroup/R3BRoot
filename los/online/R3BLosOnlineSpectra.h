@@ -215,7 +215,7 @@ class R3BLosOnlineSpectra : public FairTask
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     Int_t nLosEvents = 0;
     //   TClonesArray *fbmonMappedItems;
-    Int_t fNofLosDetectors; /**< Number of LOS detectors. */
+    Int_t fNofLosDetectors = 1; /**< Number of LOS detectors. */
 
     Double_t flosVeffXV[2];
     Double_t flosVeffYV[2];
@@ -268,6 +268,7 @@ class R3BLosOnlineSpectra : public FairTask
     std::vector<TH2F*> fh_losTAMEX_vs_Events;
     std::vector<TH2F*> fh_losMCFD_vs_Events;
     std::vector<TH1F*> fh_los_vftx_tamex;
+    std::vector<TH1F*> fh_los_mapped;
 
   public:
     ClassDef(R3BLosOnlineSpectra, 2)
