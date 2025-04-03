@@ -13,12 +13,15 @@
 #pragma once
 
 #include "R3BFTCalEngine.h"
+#include "R3BNeulandMapToCalPar.h"
 #include "R3BPaddleTamexMappedData2.h"
 #include "R3BTrigIDMappingFinder.h"
+#include <FairRootManager.h>
 #include <R3BIOConnector.h>
 #include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCommon.h>
+#include <string_view>
 
 namespace R3B::Neuland
 {

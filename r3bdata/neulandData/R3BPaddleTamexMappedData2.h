@@ -12,18 +12,22 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "TObject.h"
 #include <R3BShared.h>
+#include <Rtypes.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <map>
+#include <unordered_map>
+#include <vector>
 
 namespace R3B
 {
     struct SingleEdgeSignal
     {
-        unsigned int fine = 0;   // fine time value
-        unsigned int coarse = 0; // coarse time value
-        ClassDefNV(SingleEdgeSignal, 1)
+        int fine = 0;   // fine time value
+        int coarse = 0; // coarse time value
+        ClassDefNV(SingleEdgeSignal, 2);
     };
 
     struct DoubleEdgeSignal
@@ -31,14 +35,14 @@ namespace R3B
         SingleEdgeSignal leading{};  // leading edge
         SingleEdgeSignal trailing{}; // trailing edge
                                      //
-        ClassDefNV(DoubleEdgeSignal, 1)
+        ClassDefNV(DoubleEdgeSignal, 1);
     };
 
     struct MapBarSignal
     {
         MapBarSignal() = default;
         MapBarSignal(R3B::Side side, const DoubleEdgeSignal& signal);
-        inline void push_back(R3B::Side side, const DoubleEdgeSignal& signal)
+        void push_back(R3B::Side side, const DoubleEdgeSignal& signal)
         {
             (side == R3B::Side::left ? left : right).push_back(signal);
         }
@@ -51,22 +55,22 @@ namespace R3B
 
     struct PaddleTamexMappedData
     {
-        unsigned int plane_num = 0;                               //... number of plane 1..n
-        std::unordered_map<unsigned int, R3B::MapBarSignal> bars; //... number of bar   1..n
+        int plane_num = 0;                               ///< number of plane 1..n
+        std::unordered_map<int, R3B::MapBarSignal> bars; ///< number of bar   1..n
 
         PaddleTamexMappedData() = default;
-        explicit PaddleTamexMappedData(unsigned int pID);
-        void push_back(R3B::Side side, unsigned int barID, const R3B::DoubleEdgeSignal& signal);
-        inline auto empty() const -> bool { return bars.empty(); };
+        explicit PaddleTamexMappedData(int pID);
+        void push_back(R3B::Side side, int barID, const R3B::DoubleEdgeSignal& signal);
+        auto empty() const -> bool { return bars.empty(); };
 
-        ClassDefNV(PaddleTamexMappedData, 1)
+        ClassDefNV(PaddleTamexMappedData, 1);
     };
 
     struct PaddleTamexTrigMappedData
     {
-        unsigned int module_num = 0; //... number of trigID 1..n
+        int module_num = 0; //... number of trigID 1..n
         R3B::SingleEdgeSignal signal;
-        ClassDefNV(PaddleTamexTrigMappedData, 1)
+        ClassDefNV(PaddleTamexTrigMappedData, 2);
     };
 } // namespace R3B
 
@@ -108,7 +112,7 @@ class fmt::formatter<R3B::MapBarSignal>
 };
 
 using R3BPaddleTamexMappedDataContainer = std::vector<R3B::PaddleTamexMappedData>;
-using R3BPaddleTamexTrigDataContainer = std::map<unsigned int, R3B::PaddleTamexTrigMappedData>;
+using R3BPaddleTamexTrigDataContainer = std::map<int, R3B::PaddleTamexTrigMappedData>;
 
 using R3BPaddleTamexMappedData2 = R3B::PaddleTamexMappedData;
 using R3BPaddleTamexTrigMappedData = R3B::PaddleTamexTrigMappedData;

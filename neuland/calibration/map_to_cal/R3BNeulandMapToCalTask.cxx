@@ -12,18 +12,33 @@
  ******************************************************************************/
 
 #include "R3BNeulandMapToCalTask.h"
+#include "R3BDataMonitor.h"
 #include "R3BNeulandCalData2.h"
+#include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandCommon.h"
+#include "R3BNeulandMapToCalPar.h"
+#include "R3BPaddleTamexMappedData2.h"
+#include "R3BShared.h"
+#include "R3BValueError.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
 #include <R3BEventHeader.h>
 #include <R3BException.h>
 #include <R3BLogger.h>
+#include <TH1.h>
 #include <TH1D.h>
+#include <TH2.h>
 #include <TH2D.h>
+#include <algorithm>
+#include <cmath>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <iterator>
 #include <range/v3/all.hpp>
+#include <range/v3/view/map.hpp>
+#include <string_view>
+#include <vector>
 
 namespace
 {
@@ -204,12 +219,12 @@ namespace R3B::Neuland
         return convert_to_real_time(calibrationTrigPar_, trigData->second.signal, FTType::trigger, trigData->first);
     }
 
-    auto Map2CalTask::get_tot(DoubleEdgeSignal pmtSignal,
+    auto Map2CalTask::get_tot(const DoubleEdgeSignal& pmtSignal,
                               unsigned int module_num,
-                              Side side) const -> ValueError<double>
+                              R3B::Side module_side) const -> ValueError<double>
     {
-        const auto leadFType = (side == Side::left) ? FTType::leftleading : FTType::rightleading;
-        const auto trailFType = (side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;
+        const auto leadFType = (module_side == Side::left) ? FTType::leftleading : FTType::rightleading;
+        const auto trailFType = (module_side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;
         const auto leadingT = convert_to_real_time(calibrationPar_, pmtSignal.leading, leadFType, module_num);
         const auto trailingT = convert_to_real_time(calibrationPar_, pmtSignal.trailing, trailFType, module_num);
         const auto time_over_thres = trailingT - leadingT;

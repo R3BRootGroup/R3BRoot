@@ -13,6 +13,8 @@
 ##############################################################################
 # cmake-format: on
 
+find_package(magic_enum REQUIRED)
+
 add_subdirectory(calibration)
 add_subdirectory(clustering)
 add_subdirectory(online)
@@ -28,4 +30,3 @@ add_subdirectory(digitizing)
 add_subdirectory(geobase)
 add_subdirectory(application)
 add_subdirectory(executables)
-add_subdirectory(util)

@@ -12,6 +12,8 @@
  ******************************************************************************/
 
 #include "R3BPaddleTamexMappedData2.h"
+#include "R3BShared.h"
+#include <utility>
 
 namespace R3B
 {
@@ -21,12 +23,12 @@ namespace R3B
         push_back(side, signal);
     }
 
-    PaddleTamexMappedData::PaddleTamexMappedData(unsigned int pID)
+    PaddleTamexMappedData::PaddleTamexMappedData(int pID)
         : plane_num{ pID }
     {
     }
 
-    void PaddleTamexMappedData::push_back(R3B::Side side, unsigned int barID, const R3B::DoubleEdgeSignal& signal)
+    void PaddleTamexMappedData::push_back(R3B::Side side, int barID, const R3B::DoubleEdgeSignal& signal)
     {
         if (auto barIter = bars.find(barID); barIter != bars.end())
         {
@@ -39,6 +41,3 @@ namespace R3B
         }
     }
 } // namespace R3B
-
-ClassImp(R3B::MapBarSignal);
-ClassImp(R3B::PaddleTamexMappedData)

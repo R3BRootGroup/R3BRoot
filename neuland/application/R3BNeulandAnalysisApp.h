@@ -3,6 +3,9 @@
 #include "R3BDigitizingTamex.h"
 #include "R3BNeulandApp.h"
 #include <R3BNeulandCalToHitParTask.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 namespace R3B::Neuland
 {
@@ -42,6 +45,7 @@ namespace R3B::Neuland
                     std::string paddle = "neuland";
                     bool enable_sim_cal = false;
                     bool enable_hit_par = false;
+                    bool enable_size_monitor = false;
                     R3B::Digitizing::Neuland::Tamex::Params tamex_par{ TamexChannel::GetDefaultRandomGen() };
                     Digitizing::Neuland::Tamex::PeakPileUpStrategy pileup_strategy =
                         Digitizing::Neuland::Tamex::PeakPileUpStrategy::width;
@@ -143,10 +147,7 @@ namespace R3B::Neuland
         void print_json_options() override;
         void dump_json_options(const std::string& filename) override;
         void setup_application_options(CLI::App& program_options) override;
-        void ParseApplicationOption(const std::vector<std::string>& filename) override
-        {
-            ParseApplicationOptionImp(filename, options_);
-        }
+        void ParseApplicationOption(const std::vector<std::string>& filename) override;
 
         // non-virtual private member functions:
         void set_parameters();

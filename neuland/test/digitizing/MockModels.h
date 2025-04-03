@@ -12,8 +12,14 @@
  ******************************************************************************/
 
 #pragma once
+#include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
+#include "R3BShared.h"
+#include <cstdint>
+#include <gmock/gmock-function-mocker.h>
+#include <gmock/gmock-spec-builders.h>
 #include <gmock/gmock.h>
+#include <vector>
 
 /**
  * Simulation of Mock Bar/Paddle
@@ -22,39 +28,65 @@
  */
 namespace R3B::testing::Neuland
 {
-    using Digitizing::Channel;
-    using Digitizing::ChannelSide;
-    using Digitizing::Paddle;
+    using Digitizing::AbstractChannel;
+    using Digitizing::AbstractPaddle;
+    using R3B::Side;
 
-    struct GMockNeulandPaddle : public Paddle
+    struct GMockNeulandPaddle : public AbstractPaddle
     {
         explicit GMockNeulandPaddle(uint16_t paddleID)
-            : Paddle{ paddleID }
+            : AbstractPaddle{ paddleID }
         {
         }
+        // NOLINTBEGIN(modernize-use-trailing-return-type)
         MOCK_METHOD(double,
-                    ComputeTime,
-                    (const Channel::Signal& firstSignal, const Channel::Signal& secondSignal),
+                    compute_time,
+                    (const AbstractChannel::Hit& firstSignal, const AbstractChannel::Hit& secondSignal),
                     (const, override));
         MOCK_METHOD(double,
-                    ComputeEnergy,
-                    (const Channel::Signal& firstSignal, const Channel::Signal& secondSignal),
+                    compute_energy,
+                    (const AbstractChannel::Hit& firstSignal, const AbstractChannel::Hit& secondSignal),
                     (const, override));
         MOCK_METHOD(double,
-                    ComputePosition,
-                    (const Channel::Signal& firstSignal, const Channel::Signal& secondSignal),
+                    compute_position,
+                    (const AbstractChannel::Hit& firstSignal, const AbstractChannel::Hit& secondSignal),
                     (const, override));
-        MOCK_METHOD(Pair<Channel::Hit>, ComputeChannelHits, (const Hit& hit), (const, override));
+        MOCK_METHOD(Pair<AbstractChannel::Signal>, compute_channel_signals, (const Signal& hit), (const, override));
+        // NOLINTEND(modernize-use-trailing-return-type)
     };
 
-    struct GMockChannel : public Channel
+    struct GMockChannel : public AbstractChannel
     {
-        explicit GMockChannel(ChannelSide side)
-            : Digitizing::Channel{ side } {};
-        void AddHit(Hit hit) override { hits_.push_back(hit); }
+        explicit GMockChannel(Side side)
+            : Digitizing::AbstractChannel{ side } {};
+        void add_signal(Signal hit) override { hits_.push_back(hit); }
 
-        MOCK_METHOD(void, AttachToPaddle, (Paddle*), (override));
-        MOCK_METHOD(Signals, ConstructSignals, (), (override));
-        std::vector<Hit> hits_;
+        MOCK_METHOD((void), construct_hits, (Hits&), (override));
+        std::vector<Signal> hits_;
+
+        void DelegateToFake()
+        {
+            ON_CALL(*this, construct_hits)
+                .WillByDefault(
+                    [this](Hits& signal)
+                    {
+                        for (const auto& hit : hits_)
+                        {
+                            signal.emplace_back(convert_hit_to_signal(hit));
+                        }
+                    });
+        }
+        void extra_reset() override { hits_.clear(); }
+
+      private:
+        auto convert_hit_to_signal(const Signal& hit) -> Hit
+        {
+            auto signal = Hit{};
+            signal.qdc = hit.intensity;
+            signal.qdcUnSat = hit.intensity;
+            signal.tdc = hit.time;
+            signal.side = GetSide();
+            return signal;
+        }
     };
 } // namespace R3B::testing::Neuland

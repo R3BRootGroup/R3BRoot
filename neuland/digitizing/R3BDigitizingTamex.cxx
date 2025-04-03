@@ -14,12 +14,21 @@
 #include "R3BDigitizingTamex.h"
 
 #include <FairRuntimeDb.h>
+#include <TRandom3.h>
 #include <cmath>
 
+#include "R3BDigitizingChannel.h"
+#include "R3BDigitizingPaddle.h"
 #include "R3BException.h"
+#include "R3BNeulandCalToHitPar.h"
+#include "R3BShared.h"
 #include <FairRunAna.h>
 #include <R3BLogger.h>
 #include <algorithm>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <functional>
+#include <vector>
 
 namespace R3B::Digitizing::Neuland::Tamex
 {
@@ -35,15 +44,15 @@ namespace R3B::Digitizing::Neuland::Tamex
 
         void set_par_with_hit_module_par(Tamex::Params& par,
                                          const R3B::Neuland::HitModulePar& module_par,
-                                         ChannelSide channel_side)
+                                         Side channel_side)
         {
-            auto side = (channel_side == ChannelSide::right) ? Side::right : Side::left;
+            auto side = (channel_side == Side::right) ? Side::right : Side::left;
 
-            par.fSaturationCoefficient = module_par.pmt_saturation.get(side).value;
-            par.fEnergyGain = module_par.energy_gain.get(side).value;
-            par.fPedestal = module_par.pedestal.get(side).value;
-            par.fPMTThresh = module_par.pmt_threshold.get(side).value;
-            par.fQdcMin = 1 / par.fEnergyGain;
+            par.saturation_coefficient = module_par.pmt_saturation.get(side).value;
+            par.energy_gain = module_par.energy_gain.get(side).value;
+            par.pedestal = module_par.pedestal.get(side).value;
+            par.pmt_thresh = module_par.pmt_threshold.get(side).value;
+            par.min_energy = 1 / par.energy_gain;
 
             // TODO: Add other parameters:
         }
@@ -53,27 +62,27 @@ namespace R3B::Digitizing::Neuland::Tamex
     const size_t TmxPeaksInitialCapacity = 10;
 
     Params::Params(TRandom3& rnd)
-        : fRnd{ rnd }
+        : rnd_gen{ rnd }
     {
     }
 
-    PMTPeak::PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel& channel)
-        : time_(pmtHit.time)
+    PMTPeak::PMTPeak(Digitizing::AbstractChannel::Signal channel_signal, const Channel& channel)
+        : time_(channel_signal.time)
     {
-        const auto& par = channel.GetParConstRef();
+        const auto& par = channel.GetPar();
         // apply saturation coefficent
-        qdc_ = pmtHit.light / (1. + par.fSaturationCoefficient * pmtHit.light);
+        height_ = channel_signal.intensity / (1. + par.saturation_coefficient * channel_signal.intensity);
     };
 
     auto PMTPeak::operator+=(const PMTPeak& other) -> PMTPeak&
     {
-        qdc_ += other.qdc_;
+        height_ += other.height_;
         time_ = (time_ < other.time_) ? time_ : other.time_;
         return *this;
     }
 
     FQTPeak::FQTPeak(const PMTPeak& pmtPeak, Channel* channel)
-        : qdc_(pmtPeak.GetQDC())
+        : energy_(pmtPeak.GetHeight())
         , leading_edge_time_(pmtPeak.GetLETime())
         , channel_ptr_(channel)
     {
@@ -81,11 +90,11 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             LOG(fatal) << "channel is not bound to FQTPeak object!";
         }
-        const auto& par = channel->GetParConstRef();
+        const auto& par = channel->GetPar();
 
         // calculate the time and the width of the signal
-        width_ = QdcToWidth(qdc_, par);
-        trailing_edge_time_ = leading_edge_time_ + width_;
+        time_over_thresh_ = Energy2ToT(energy_, par);
+        trailing_edge_time_ = leading_edge_time_ + time_over_thresh_;
     }
 
     auto FQTPeak::operator==(const FQTPeak& other) const -> bool
@@ -94,8 +103,8 @@ namespace R3B::Digitizing::Neuland::Tamex
         {
             LOG(warn) << "the times of both PMT signals are 0!";
         }
-        return (leading_edge_time_ <= (other.leading_edge_time_ + other.width_)) &&
-               (other.leading_edge_time_ <= (leading_edge_time_ + width_));
+        return (leading_edge_time_ <= (other.leading_edge_time_ + other.time_over_thresh_)) &&
+               (other.leading_edge_time_ <= (leading_edge_time_ + time_over_thresh_));
     }
 
     void FQTPeak::operator+=(const FQTPeak& other)
@@ -108,15 +117,16 @@ namespace R3B::Digitizing::Neuland::Tamex
             (leading_edge_time_ < other.leading_edge_time_) ? leading_edge_time_ : other.leading_edge_time_;
         trailing_edge_time_ =
             (trailing_edge_time_ > other.trailing_edge_time_) ? trailing_edge_time_ : other.trailing_edge_time_;
-        width_ = trailing_edge_time_ - leading_edge_time_;
-        qdc_ = WidthToQdc(width_, channel_ptr_->GetParConstRef());
+        time_over_thresh_ = trailing_edge_time_ - leading_edge_time_;
+        energy_ = ToT2Energy(time_over_thresh_, channel_ptr_->GetPar());
     }
 
-    Channel::Channel(ChannelSide side,
+    Channel::Channel(Side side,
                      PeakPileUpStrategy strategy,
                      const Params& par,
-                     R3B::Neuland::Cal2HitPar* cal_to_hit_par)
-        : Digitizing::Channel{ side }
+                     R3B::Neuland::Cal2HitPar* cal_to_hit_par,
+                     bool has_cal_output)
+        : Digitizing::AbstractChannel{ side, has_cal_output }
         , pileup_strategy_{ strategy }
         , neuland_hit_par_{ cal_to_hit_par }
         , par_{ par }
@@ -124,26 +134,12 @@ namespace R3B::Digitizing::Neuland::Tamex
         pmt_peaks_.reserve(TmxPeaksInitialCapacity);
     }
 
-    Channel::Channel(ChannelSide side, PeakPileUpStrategy strategy, TRandom3& rnd)
+    Channel::Channel(Side side, PeakPileUpStrategy strategy, TRandom3& rnd)
         : Channel{ side, strategy, Params{ rnd } }
     {
     }
 
-    void Channel::AttachToPaddle(Digitizing::Paddle* paddle)
-    {
-
-        if (paddle == nullptr)
-        {
-            return;
-        }
-        if (CheckPaddleIDInHitPar())
-        {
-            const auto& module_par = neuland_hit_par_->GetModuleParAt(paddle->GetPaddleID());
-            set_par_with_hit_module_par(par_, module_par, GetSide());
-        }
-    }
-
-    auto Channel::CheckPaddleIDInHitPar() const -> bool
+    auto Channel::check_paddle_id_in_hit_par() const -> bool
     {
         auto is_valid = false;
         if (neuland_hit_par_ == nullptr)
@@ -171,75 +167,59 @@ namespace R3B::Digitizing::Neuland::Tamex
         return is_valid;
     }
 
-    void Channel::AddHit(Hit newHit)
+    void Channel::add_signal(Signal new_signal)
     {
-        if (newHit.time < par_.fTimeMin || newHit.time > par_.fTimeMax)
+        if (new_signal.time < par_.min_time || new_signal.time > par_.max_time)
         {
             return;
         }
-        InvalidateSignals();
-        InvalidateTrigTime();
-        pmt_peaks_.emplace_back(newHit, *this);
+        pmt_peaks_.emplace_back(new_signal, *this);
     }
 
-    auto Channel::CreateSignal(const FQTPeak& peak) const -> Signal
+    auto Channel::CreateHit(const FQTPeak& peak) const -> Hit
     {
-        auto peakQdc = peak.GetQDC();
+        auto peakQdc = peak.GetEnergy();
         auto peakTime = peak.GetLETime();
-        auto qdc = ToQdc(peakQdc);
+        auto qdc = smear_energy(peakQdc);
 
-        LOG(debug) << "qdc Signal " << qdc << " and tdc " << peakTime << "\n";
-
-        auto signal = Signal{};
-        signal.qdcUnSat = ToUnSatQdc(qdc);
+        auto signal = Hit{};
+        signal.qdcUnSat = to_unsat_energy(qdc);
         signal.qdc = qdc;
-        signal.tdc = ToTdc(peakTime);
+        signal.tdc = smear_time(peakTime);
         signal.side = this->GetSide();
-        LOG(debug) << "R3BDigitizingTamex: Create a signal with qdc " << signal.qdc << " and tdc " << signal.tdc
-                   << "\n";
+        // R3BLOG(debug3, format("Create a signal {}", signal));
         return signal;
+    }
+
+    void Channel::extra_reset()
+    {
+        pmt_peaks_.clear();
+        fqt_peaks_.clear();
+        par_ = Tamex::Params{ par_.rnd_gen };
     }
 
     auto Channel::CreateCalSignal(const FQTPeak& peak) const -> CalSignal
     {
-        auto peakQdc = peak.GetQDC();
+        auto peak_energy = peak.GetEnergy();
         auto peakTime = peak.GetLETime();
-        auto qdc = ToQdc(peakQdc);
-
-        LOG(debug) << "qdc Cal " << qdc << " and tdc " << peakTime << "\n";
+        auto smeared_energy = smear_energy(peak_energy);
 
         auto signal = CalSignal{};
-        signal.tot = CalculateTOT(qdc);
+        signal.tot = calculate_ToT(smeared_energy);
         signal.tle = peakTime;
         signal.side = this->GetSide();
-        LOG(debug) << "R3BDigitizingTamex: Create a CalSignal with tot " << signal.tot << " and let " << signal.tle
-                   << "\n qdc: " << qdc << "\n";
+        // R3BLOG(debug2, fmt::format("Creating a cal signal {}", signal));
         return signal;
     }
 
-    auto Channel::CalculateTOT(const double& qdc) const -> double
+    auto Channel::calculate_ToT(double energy) const -> double
     {
-        // ToDo: Decide if ERROR stuff is needed
-        //  if (GetErrorCalculation())
-        //  {
-        //      ValueError<double> qdc_err_val{ qdc, 0 };
-        //      auto par_err_val = GetParErrVal();
-        //      auto tot_err_val = qdc_err_val * par_err_val.energyGain + par_err_val.pedestal;
-        //      auto randGen = GetDefaultRandomGen();
-        //      return randGen.Gaus(tot_err_val.value, tot_err_val.error);
-        //  }
-        //  else {
-        //
-        //      auto par = GetParConstRef();
-        //      return (qdc * par.fEnergyGain + par.fPedestal);
-        //  }
-
-        auto par = GetParConstRef();
-        return ((qdc * par.fEnergyGain) + par.fPedestal);
+        const auto& par = GetPar();
+        return ((energy * par.energy_gain) + par.pedestal);
     }
 
     template <typename Peak>
-    void Channel::PeakPileUp(/* inout */ std::vector<Peak>& peaks)
+    void Channel::do_peak_pileup(/* inout */ std::vector<Peak>& peaks)
     {
         if (peaks.size() <= 1)
         {
@@ -264,7 +244,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         }
     }
 
-    void Channel::PeakPileUpWithDistance(/* inout */ std::vector<FQTPeak>& peaks, double distance)
+    void Channel::peak_pileup_with_distance(/* inout */ std::vector<FQTPeak>& peaks, double distance)
     {
         if (peaks.empty())
         {
@@ -281,7 +261,7 @@ namespace R3B::Digitizing::Neuland::Tamex
                                            {
                                                if ((peak - last_leading_time) < distance)
                                                {
-                                                   front_peak->AddQDC(peak.GetQDC());
+                                                   front_peak->AddEnergy(peak.GetEnergy());
                                                    last_leading_time = peak.GetLETime();
                                                    return true;
                                                }
@@ -291,7 +271,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         }
     }
 
-    void Channel::PeakPileUpInTimeWindow(/* inout */ std::vector<FQTPeak>& peaks, double time_window)
+    void Channel::peak_pileup_in_time_window(/* inout */ std::vector<FQTPeak>& peaks, double time_window)
     {
         if (peaks.empty())
         {
@@ -306,24 +286,24 @@ namespace R3B::Digitizing::Neuland::Tamex
                       {
                           if ((peak - front_peak) < time_window)
                           {
-                              front_peak.AddQDC(peak.GetQDC());
+                              front_peak.AddEnergy(peak.GetEnergy());
                           }
                       });
         peaks.erase(peaks.begin() + 1, peaks.end());
     }
 
-    void Channel::FQTPeakPileUp(/* inout */ std::vector<FQTPeak>& peaks)
+    void Channel::fqt_peak_pileup(/* inout */ std::vector<FQTPeak>& peaks)
     {
         switch (pileup_strategy_)
         {
             case PeakPileUpStrategy::width:
-                PeakPileUp(peaks);
+                do_peak_pileup(peaks);
                 break;
             case PeakPileUpStrategy::distance:
-                PeakPileUpWithDistance(peaks, par_.fPileUpDistance);
+                peak_pileup_with_distance(peaks, par_.pileup_distance);
                 break;
             case PeakPileUpStrategy::time_window:
-                PeakPileUpInTimeWindow(peaks, par_.fPileUpTimeWindow);
+                peak_pileup_in_time_window(peaks, par_.pileup_time_window);
                 break;
             default:
                 break;
@@ -331,104 +311,79 @@ namespace R3B::Digitizing::Neuland::Tamex
     }
 
     template <typename Peak>
-    void Channel::ApplyThreshold(std::vector<Peak>& peaks)
+    void Channel::apply_threshold(std::vector<Peak>& peaks)
     {
         // apply threshold on energy using c++ erase-remove idiom:
-        auto it_end =
-            std::remove_if(peaks.begin(),
-                           peaks.end(),
-                           [this](const auto& peak) { return peak.GetQDC() < this->GetParConstRef().fPMTThresh; });
+        auto it_end = std::remove_if(peaks.begin(),
+                                     peaks.end(),
+                                     [this](const auto& peak) { return peak.GetHeight() < this->GetPar().pmt_thresh; });
         peaks.erase(it_end, peaks.end());
     }
 
-    auto Channel::ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<FQTPeak>
+    void Channel::construct_FQT_peaks(std::vector<FQTPeak>& FQTPeaks, std::vector<PMTPeak>& pmtPeaks)
     {
-        auto FQTPeaks = std::vector<FQTPeak>{};
         FQTPeaks.reserve(pmtPeaks.size());
 
         // sorting pmt peaks according to time:
         std::sort(pmtPeaks.begin(), pmtPeaks.end());
 
-        PeakPileUp(pmtPeaks);
-        ApplyThreshold(pmtPeaks);
+        do_peak_pileup(pmtPeaks);
+        apply_threshold(pmtPeaks);
         for (auto const& peak : pmtPeaks)
         {
             FQTPeaks.emplace_back(peak, this);
         }
-        return FQTPeaks;
+    }
+    void Channel::pre_construct()
+    {
+        if (check_paddle_id_in_hit_par())
+        {
+            const auto& module_par = neuland_hit_par_->GetModuleParAt(GetPaddle()->GetPaddleID());
+            set_par_with_hit_module_par(par_, module_par, GetSide());
+        }
     }
 
-    auto Channel::ConstructSignals() -> Signals
+    void Channel::construct_hits(Hits& hits)
     {
-        fqt_peaks_ = ConstructFQTPeaks(pmt_peaks_);
+        construct_FQT_peaks(fqt_peaks_, pmt_peaks_);
         // signal pileup:
-        FQTPeakPileUp(fqt_peaks_);
+        fqt_peak_pileup(fqt_peaks_);
 
         // construct Channel signals:
-        auto signals = std::vector<Signal>{};
-        signals.reserve(fqt_peaks_.size());
+        hits.reserve(fqt_peaks_.size());
 
         for (const auto& peak : fqt_peaks_)
         {
-            signals.emplace_back(CreateSignal(peak));
+            hits.emplace_back(CreateHit(peak));
         }
-        return signals;
     }
 
-    auto Channel::ConstructCalSignals() -> CalSignals
+    void Channel::construct_cal_signals(CalSignals& cal_signals) const
     {
-        fqt_peaks_ = ConstructFQTPeaks(pmt_peaks_);
-        // signal pileup:
-        FQTPeakPileUp(fqt_peaks_);
-
         // construct Channel signals:
-        auto cal_signals = std::vector<CalSignal>{};
         cal_signals.reserve(fqt_peaks_.size());
 
         for (const auto& peak : fqt_peaks_)
         {
             cal_signals.emplace_back(CreateCalSignal(peak));
         }
-        return cal_signals;
     }
 
-    auto Channel::GetCalSignals() -> CalSignals { return ConstructCalSignals(); }
-
-    auto Channel::GetFQTPeaks() -> const std::vector<FQTPeak>&
-    {
-
-        if (!Is_ValidSignals())
-        {
-            ConstructSignals();
-        }
-        return fqt_peaks_;
-    }
-
-    auto Channel::GetPMTPeaks() -> const std::vector<PMTPeak>&
-    {
-        if (!Is_ValidSignals())
-        {
-            ConstructSignals();
-        }
-        return pmt_peaks_;
-    }
-
-    auto Channel::ToQdc(double qdc) const -> double
+    auto Channel::smear_energy(double qdc) const -> double
     {
         // apply energy smearing
-        qdc = par_.fRnd.get().Gaus(qdc, par_.fEResRel * qdc);
+        qdc = par_.rnd_gen.get().Gaus(qdc, par_.energy_res_rel * qdc);
         return qdc;
     }
 
-    auto Channel::ToTdc(double time) const -> double { return time + par_.fRnd.get().Gaus(0., par_.fTimeRes); }
+    auto Channel::smear_time(double time) const -> double { return time + par_.rnd_gen.get().Gaus(0., par_.time_res); }
 
-    auto Channel::ToUnSatQdc(double qdc) const -> double
+    auto Channel::to_unsat_energy(double qdc) const -> double
     {
         // Apply reverse saturation
-        if (par_.fExperimentalDataIsCorrectedForSaturation)
+        if (par_.experimental_data_is_corrected_for_saturation)
         {
-            qdc = qdc / (1 - par_.fSaturationCoefficient * qdc);
-            LOG(debug) << "ToUnSatQdc: fSaturationCoefficient = " << par_.fSaturationCoefficient << '\n';
+            qdc = qdc / (1 - par_.saturation_coefficient * qdc);
         }
         // Apply reverse attenuation
         return qdc;

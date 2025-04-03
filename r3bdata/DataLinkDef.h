@@ -149,10 +149,10 @@
 #pragma link C++ class R3B::SingleEdgeSignal+;
 #pragma link C++ class R3B::DoubleEdgeSignal+;
 #pragma link C++ class R3B::MapBarSignal+;
-#pragma link C++ class unordered_map<unsigned int, R3B::MapBarSignal>+;
+#pragma link C++ class unordered_map<int, R3B::MapBarSignal>+;
 #pragma link C++ class R3BPaddleTamexTrigMappedData+;
 #pragma link C++ class R3BPaddleTamexMappedData2+;
-#pragma link C++ class map<unsigned int, R3BPaddleTamexTrigMappedData>+;
+#pragma link C++ class map<int, R3BPaddleTamexTrigMappedData>+;
 #pragma link C++ class vector<R3BPaddleTamexMappedData2>+;
 #pragma link C++ class R3BPaddleCalData+;
 #pragma link C++ class R3BTofdMappedData+;

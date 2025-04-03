@@ -1,6 +1,16 @@
 #include "R3BNeulandAppOptionJson.h"
+#include "R3BDigitizingTamex.h"
+#include "R3BException.h"
+#include "R3BNeulandAnalysisApp.h"
+#include "R3BNeulandApp.h"
+#include "R3BNeulandCalToHitParTask.h"
+#include "R3BNeulandSimApp.h"
+#include <R3BROOTTypeJson.h> //NOLINT
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
+#include <nlohmann/json.hpp>
+#include <string>
 
 using json = nlohmann::ordered_json;
 
@@ -9,35 +19,35 @@ namespace R3B::Digitizing::Neuland::Tamex
     void to_json(json& json_obj, const Params& param)
     {
         json_obj =
-            json{ { "fPMTThresh", param.fPMTThresh },
-                  { "fSaturationCoefficient", param.fSaturationCoefficient },
-                  { "fExperimentalDataIsCorrectedForSaturation", param.fExperimentalDataIsCorrectedForSaturation },
-                  { "fTimeRes", param.fTimeRes },
-                  { "fEResRel", param.fEResRel },
-                  { "fEnergyGain", param.fEnergyGain },
-                  { "fPedestal", param.fPedestal },
-                  { "fTimeMax", param.fTimeMax },
-                  { "fTimeMin", param.fTimeMin },
-                  { "fPileUpTimeWindow", param.fPileUpTimeWindow },
-                  { "fPileUpDistance", param.fPileUpDistance },
-                  { "fQdcMin", param.fQdcMin } };
+            json{ { "fPMTThresh", param.pmt_thresh },
+                  { "fSaturationCoefficient", param.saturation_coefficient },
+                  { "fExperimentalDataIsCorrectedForSaturation", param.experimental_data_is_corrected_for_saturation },
+                  { "fTimeRes", param.time_res },
+                  { "fEResRel", param.energy_res_rel },
+                  { "fEnergyGain", param.energy_gain },
+                  { "fPedestal", param.pedestal },
+                  { "fTimeMax", param.max_time },
+                  { "fTimeMin", param.min_time },
+                  { "fPileUpTimeWindow", param.pileup_time_window },
+                  { "fPileUpDistance", param.pileup_distance },
+                  { "fQdcMin", param.min_energy } };
     }
 
     void from_json(const json& json_obj, Params& param)
     {
-        json_obj.at("fPMTThresh").get_to(param.fPMTThresh);
-        json_obj.at("fSaturationCoefficient").get_to(param.fSaturationCoefficient);
+        json_obj.at("fPMTThresh").get_to(param.pmt_thresh);
+        json_obj.at("fSaturationCoefficient").get_to(param.saturation_coefficient);
         json_obj.at("fExperimentalDataIsCorrectedForSaturation")
-            .get_to(param.fExperimentalDataIsCorrectedForSaturation);
-        json_obj.at("fTimeRes").get_to(param.fTimeRes);
-        json_obj.at("fEResRel").get_to(param.fEResRel);
-        json_obj.at("fEnergyGain").get_to(param.fEnergyGain);
-        json_obj.at("fPedestal").get_to(param.fPedestal);
-        json_obj.at("fTimeMax").get_to(param.fTimeMax);
-        json_obj.at("fTimeMin").get_to(param.fTimeMin);
-        json_obj.at("fPileUpTimeWindow").get_to(param.fPileUpTimeWindow);
-        json_obj.at("fPileUpDistance").get_to(param.fPileUpDistance);
-        json_obj.at("fQdcMin").get_to(param.fQdcMin);
+            .get_to(param.experimental_data_is_corrected_for_saturation);
+        json_obj.at("fTimeRes").get_to(param.time_res);
+        json_obj.at("fEResRel").get_to(param.energy_res_rel);
+        json_obj.at("fEnergyGain").get_to(param.energy_gain);
+        json_obj.at("fPedestal").get_to(param.pedestal);
+        json_obj.at("fTimeMax").get_to(param.max_time);
+        json_obj.at("fTimeMin").get_to(param.min_time);
+        json_obj.at("fPileUpTimeWindow").get_to(param.pileup_time_window);
+        json_obj.at("fPileUpDistance").get_to(param.pileup_distance);
+        json_obj.at("fQdcMin").get_to(param.min_energy);
     }
 
 } // namespace R3B::Digitizing::Neuland::Tamex
@@ -60,19 +70,6 @@ namespace R3B::Neuland
         json_obj.at("upper").get_to(option.upper);
     }
 
-    template <>
-    void to_json(nlohmann::ordered_json& json_obj, const XYZCoordinate& option)
-    {
-        json_obj = nlohmann::ordered_json{ { "x", option.x }, { "y", option.y }, { "z", option.z } };
-    }
-
-    template <>
-    void from_json(const nlohmann::ordered_json& json_obj, XYZCoordinate& option)
-    {
-        json_obj.at("x").get_to(option.x);
-        json_obj.at("y").get_to(option.y);
-        json_obj.at("z").get_to(option.z);
-    }
     // =============================================================================================
     // general options:
     template <>
@@ -150,17 +147,19 @@ namespace R3B::Neuland
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks& option)
     {
-        json_obj = json{ { option.digi.name, option.digi },
-                         { option.sim_cal_to_cal.name, option.sim_cal_to_cal },
-                         { option.hit_monitor.name, option.hit_monitor },
-                         { option.prim_inter_finder.name, option.prim_inter_finder },
-                         { option.cluster_finder.name, option.cluster_finder },
-                         { option.prim_cluster_finder.name, option.prim_cluster_finder },
-                         { option.multi_calorimeter_train.name, option.multi_calorimeter_train },
-                         { option.multi_bayes_train.name, option.multi_bayes_train },
-                         { option.multi_bayes.name, option.multi_bayes },
-                         { option.neutron_r_value.name, option.neutron_r_value },
-                         { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task } };
+        json_obj = json{
+            { option.digi.name, option.digi },
+            { option.sim_cal_to_cal.name, option.sim_cal_to_cal },
+            { option.hit_monitor.name, option.hit_monitor },
+            { option.prim_inter_finder.name, option.prim_inter_finder },
+            { option.cluster_finder.name, option.cluster_finder },
+            { option.prim_cluster_finder.name, option.prim_cluster_finder },
+            { option.multi_calorimeter_train.name, option.multi_calorimeter_train },
+            { option.multi_bayes_train.name, option.multi_bayes_train },
+            { option.multi_bayes.name, option.multi_bayes },
+            { option.neutron_r_value.name, option.neutron_r_value },
+            { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task },
+        };
     }
 
     template <>
@@ -192,6 +191,7 @@ namespace R3B::Neuland
             { "pileup-strategy", magic_enum::enum_name(option.pileup_strategy) },
             { "enable-sim-cal", option.enable_sim_cal },
             { "enable-hit-par", option.enable_hit_par },
+            { "enable-size-monitor", option.enable_size_monitor },
             { "read", option.read },
             { "write", option.write },
         };
@@ -206,6 +206,7 @@ namespace R3B::Neuland
         json_obj.at("par").get_to(option.tamex_par);
         json_obj.at("enable-sim-cal").get_to(option.enable_sim_cal);
         json_obj.at("enable-hit-par").get_to(option.enable_hit_par);
+        json_obj.at("enable-size-monitor").get_to(option.enable_size_monitor);
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
 
@@ -221,7 +222,8 @@ namespace R3B::Neuland
         else
         {
             throw R3B::logic_error(fmt::format("Cannot parse the enum string {:?} to PeakPileUpStrategy enum class. "
-                                               "Please check if the enum string is correct!"));
+                                               "Please check if the enum string is correct!",
+                                               enum_name));
         }
     }
 
@@ -330,11 +332,14 @@ namespace R3B::Neuland
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const SimulationApplication::Options::Simulation& option)
     {
-        json_obj = json{ { "event-print-num", option.event_print_num },
-                         { "store-trajectory", option.store_trajectory },
-                         { "material-filename", option.material_filename },
-                         { "engine", option.engine },
-                         { "generator", option.generator } };
+        json_obj = json{
+            { "event-print-num", option.event_print_num },
+            { "store-trajectory", option.store_trajectory },
+            { "material-filename", option.material_filename },
+            { "engine", option.engine },
+            { "random-seed", option.random_seed },
+            { "generator", option.generator },
+        };
     }
 
     template <>
@@ -345,25 +350,6 @@ namespace R3B::Neuland
         json_obj.at("material-filename").get_to(option.material_filename);
         json_obj.at("engine").get_to(option.engine);
         json_obj.at("generator").get_to(option.generator);
-    }
-
-    template <>
-    void to_json(nlohmann::ordered_json& json_obj, const SimulationApplication::Options::Simulation::Generator& option)
-    {
-        json_obj = json{ { "random-seed", option.random_seed },
-                         { "type", option.type },
-                         { "multiplicity", option.multiplicity },
-                         { "energy", option.energy } };
-    }
-
-    template <>
-    void from_json(const nlohmann::ordered_json& json_obj,
-                   SimulationApplication::Options::Simulation::Generator& option)
-    {
-        json_obj.at("random-seed").get_to(option.random_seed);
-        json_obj.at("type").get_to(option.type);
-        json_obj.at("multiplicity").get_to(option.multiplicity);
-        json_obj.at("energy").get_to(option.energy);
     }
 
     template <>

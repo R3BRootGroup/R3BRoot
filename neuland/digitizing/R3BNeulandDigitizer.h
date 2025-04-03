@@ -18,6 +18,7 @@
 #include "NeulandSimCalData.h"
 #include "R3BDataMonitor.h"
 #include "R3BDigitizingEngine.h"
+#include "R3BDigitizingPaddle.h"
 #include "R3BDigitizingPaddleNeuland.h"
 #include "R3BDigitizingTacQuila.h"
 #include "R3BDigitizingTamex.h"
@@ -26,8 +27,14 @@
 #include "R3BNeulandHit.h"
 #include "R3BNeulandPoint.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TClonesArray.h>
 #include <TH1.h>
+#include <cstdint>
+#include <memory>
+#include <string_view>
+#include <unordered_map>
 
 class TGeoNode;
 class TH1F;
@@ -55,7 +62,7 @@ class R3BNeulandDigitizer : public FairTask
         neulandTamex,
         neulandTacquila
     };
-    using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
+    using NeulandPaddle = Digitizing::Neuland::Paddle;
     using TacquilaChannel = Digitizing::Neuland::TacQuila::Channel;
     using TamexChannel = Digitizing::Neuland::Tamex::Channel;
     template <typename Type>
@@ -64,44 +71,59 @@ class R3BNeulandDigitizer : public FairTask
     using UsePaddle = Digitizing::UsePaddle<Type>;
 
     R3BNeulandDigitizer();
-    explicit R3BNeulandDigitizer(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine,
+    explicit R3BNeulandDigitizer(std::unique_ptr<Digitizing::EngineInterface> engine,
                                  std::string_view points_name = "NeulandPoints",
                                  std::string_view hits_name = "NeulandHits",
                                  std::string_view cal_hits_name = "NeulandSimCal");
 
-    void SetEngine(std::unique_ptr<Digitizing::DigitizingEngineInterface> engine);
+    void SetEngine(std::unique_ptr<Digitizing::EngineInterface> engine);
     void AddFilter(const Filterable<R3BNeulandHit&>::Filter& filter) { hit_filters_.Add(filter); }
-    void AddFilterCal(const Filterable<R3B::Neuland::SimCalData&>::Filter& filter) { fCalHitFilters.Add(filter); }
+    void AddFilterCal(const Filterable<R3B::Neuland::SimCalData&>::Filter& filter) { cal_hit_filter_.Add(filter); }
     void SetNeulandPointFilter(R3B::Neuland::BitSetParticle particle);
     void SetNeulandPointFilter(R3B::Neuland::BitSetParticle particle, double minimum_allowed_energy_gev);
 
-    void EnableCalDataOutput(bool calc_cal) { is_cal_output_ = calc_cal; }
-    [[nodiscard]] auto HasCalDataOutput() const -> bool { return is_cal_output_; }
+    void EnableCalDataOutput(bool calc_cal) { has_cal_output_ = calc_cal; }
+    void EnableSizeMonitor(bool is_enabled = true) { has_size_monitor_ = is_enabled; }
+    [[nodiscard]] auto HasCalDataOutput() const -> bool { return has_cal_output_; }
 
   private:
-    bool is_cal_output_ = false;
+    bool has_cal_output_ = false;
+    bool has_size_monitor_ = false;
 
     R3B::InputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" };
     R3B::OutputVectorConnector<R3BNeulandHit> neuland_hits_{ "NeulandHits" };
     R3B::OutputVectorConnector<R3B::Neuland::SimCalData> neuland_cal_hits_{ "NeulandSimCal" };
 
-    std::unique_ptr<Digitizing::DigitizingEngineInterface> digitizing_engine_; // owning
+    std::unique_ptr<Digitizing::EngineInterface> digitizing_engine_; // owning
 
     Filterable<R3BNeulandHit&> hit_filters_;
-    Filterable<R3B::Neuland::SimCalData&> fCalHitFilters;
+    Filterable<R3B::Neuland::SimCalData&> cal_hit_filter_;
 
     R3BNeulandGeoPar* neuland_geo_par_ = nullptr; // non-owning
     NeulandPointFilter neuland_point_filter_;
+    std::unordered_map<int, int>
+        point_size_tracker_; //<! Tracker to calculate point number per paddle with the paddle number as the key
 
     R3B::DataMonitor data_monitor_;
     TH1I* hist_multi_one_ = nullptr;
     TH1I* hist_multi_two_ = nullptr;
     TH1F* hist_rl_time_to_trig_ = nullptr;
 
-    void fill_cal_data(const std::map<int, std::unique_ptr<R3B::Digitizing::Paddle>>& paddles);
+    TH1D* hist_point_size_ = nullptr;
+    TH1D* hist_channel_signal_size_ = nullptr;
+    TH1D* hist_channel_hit_size_ = nullptr;
+    TH1D* hist_paddle_hit_size_ = nullptr;
+
+    void fill_points_to_engine();
+    void fill_cal_data(const R3B::Digitizing::AbstractPaddle& paddle);
+    void fill_hit_data(const R3B::Digitizing::AbstractPaddle& paddle);
+    void fill_histograms();
+    void fill_size_histograms(const Digitizing::AbstractPaddle& paddle);
+    void init_histograms();
 
     auto Init() -> InitStatus override;
-    void Finish() override;
+    void FinishTask() override;
+    void FinishEvent() override;
     void SetParContainers() override;
     void Exec(Option_t* /*option*/) override;
 

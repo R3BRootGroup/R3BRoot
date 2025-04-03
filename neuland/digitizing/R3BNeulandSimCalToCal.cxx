@@ -1,8 +1,19 @@
 #include "R3BNeulandSimCalToCal.h"
+#include "NeulandSimCalData.h"
+#include "R3BException.h"
+#include "R3BNeulandCalData2.h"
+#include "R3BValueError.h"
 
 #include <FairMCEventHeader.h>
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
+#include <FairTask.h>
 #include <R3BEventHeader.h>
 #include <R3BNeulandBasePar.h>
+#include <RtypesCore.h>
+#include <memory>
+#include <string_view>
+#include <vector>
 
 namespace R3B::Neuland
 {
@@ -83,16 +94,16 @@ namespace R3B::Neuland
         bar_map_data_.clear();
         for (const auto& sim_data : sim_cal_data)
         {
-            auto module_id = sim_data.bar_module;
+            auto module_id = sim_data.module_id;
             auto [iter, _] = bar_map_data_.try_emplace(module_id, static_cast<unsigned int>(module_id));
 
             auto left_signal = CalDataSignal{};
-            left_signal.leading_time = ValueError<double>{ sim_data.let_l, 0 };
-            left_signal.time_over_threshold = ValueError<double>{ sim_data.tot_l, 0 };
+            left_signal.leading_time = ValueError<double>{ sim_data.leading_time.left(), 0 };
+            left_signal.time_over_threshold = ValueError<double>{ sim_data.time_over_thresh.left(), 0 };
 
             auto right_signal = CalDataSignal{};
-            right_signal.leading_time = ValueError<double>{ sim_data.let_r, 0 };
-            right_signal.time_over_threshold = ValueError<double>{ sim_data.tot_r, 0 };
+            right_signal.leading_time = ValueError<double>{ sim_data.leading_time.right(), 0 };
+            right_signal.time_over_threshold = ValueError<double>{ sim_data.time_over_thresh.right(), 0 };
 
             auto& obj = iter->second;
             obj.left.push_back(left_signal);

@@ -29,7 +29,7 @@ jobs:
           lines-changed-only: false
           files-changed-only: false
           step-summary: true
-          thread-comments: update
+          thread-comments: 'false'
           extensions: 'h,cxx'
           ignore: '*|!neuland|!r3bbase|!r3bdata/neulandData|!r3bsource/neuland|!r3bsource/base|ext_h101*'
           format-review: true

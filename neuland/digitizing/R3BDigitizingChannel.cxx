@@ -12,43 +12,54 @@
  ******************************************************************************/
 
 #include "R3BDigitizingChannel.h"
+#include "R3BShared.h"
+#include <TRandom3.h>
 #include <algorithm>
 
 namespace R3B::Digitizing
 {
-    Channel::Channel(ChannelSide side)
-        : fSide(side)
+    AbstractChannel::AbstractChannel(R3B::Side side, bool has_cal_output)
+        : has_cal_output_{ has_cal_output }
+        , side_(side)
+
     {
     }
 
-    auto Channel::GetDefaultRandomGen() -> TRandom3&
+    auto AbstractChannel::GetDefaultRandomGen() -> TRandom3&
     {
         static auto random3 = TRandom3{};
         return random3;
     }
 
-    auto Channel::GetSignals() -> const Signals&
+    void AbstractChannel::Construct()
     {
-        if (!fSignals.valid())
+        hits_.clear();
+        cal_signals_.clear();
+
+        pre_construct();
+        construct_hits(hits_);
+        if (has_cal_output_)
         {
-            fSignals.set(ConstructSignals());
+            construct_cal_signals(cal_signals_);
         }
-        return fSignals.getRef();
+        calculate_trig_time();
     }
 
-    auto Channel::HasFired() -> bool { return (!GetSignals().empty()); }
-
-    auto Channel::GetTrigTime() -> double
+    void AbstractChannel::Reset()
     {
-        if (!fTrigTime.valid())
-        {
-            const auto& signals = GetSignals();
-            auto it =
-                std::min_element(signals.begin(),
-                                 signals.end(),
-                                 [](const auto& left_v, const auto& right_v) { return left_v.tdc < right_v.tdc; });
-            fTrigTime.set((it != signals.end() ? it->tdc : MAXTIME));
-        }
-        return fTrigTime.get();
+        hits_.clear();
+        cal_signals_.clear();
+        trig_time_ = 0.;
+        signal_size_ = 0;
+        extra_reset();
+    }
+
+    void AbstractChannel::calculate_trig_time()
+    {
+        const auto& signals = GetHits();
+        auto it = std::min_element(signals.begin(),
+                                   signals.end(),
+                                   [](const auto& left_v, const auto& right_v) { return left_v.tdc < right_v.tdc; });
+        trig_time_ = it != signals.end() ? it->tdc : MAXTIME;
     }
 } // namespace R3B::Digitizing

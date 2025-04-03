@@ -11,22 +11,40 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairLogger.h"
 #include "FairRootManager.h"
 
+#include "R3BException.h"
 #include "R3BLogger.h"
 #include "R3BNeulandTamexReader2.h"
-#include "TClonesArray.h"
-#include "ext_data_client.h"
+#include "R3BPaddleTamexMappedData2.h"
+#include "R3BReader.h"
 #include "ext_data_struct_info.hh"
 #include "ext_h101_raw_nnp_tamex.h"
 #include <R3BShared.h>
+#include <Rtypes.h>
+#include <TH1.h>
+#include <array>
 #include <boost/regex.hpp>
 
 // TODO: C++20 std::span
+#include <boost/regex/v5/regex.hpp>
+#include <boost/regex/v5/regex_fwd.hpp>
+#include <boost/regex/v5/regex_match.hpp>
+#include <boost/regex/v5/regex_search.hpp>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
 #include <gsl/span>
 // TODO: C++20 std::range
+#include <map>
+#include <range/v3/algorithm/equal.hpp>
 #include <range/v3/view.hpp>
+#include <range/v3/view/iota.hpp>
+#include <range/v3/view/take.hpp>
+#include <range/v3/view/zip.hpp>
+#include <string>
+#include <string_view>
+#include <utility>
 
 /**
  ** ext_h101_raw_nnp_tamex.h was created by running
@@ -52,7 +70,7 @@ namespace
 
     const auto SIDES = std::array<Side, 2>{ Side::left, Side::right };
     template <typename BinaryOperation, typename Item0, typename Item1>
-    inline constexpr auto CheckAmong(BinaryOperation optn, const Item0& item0, const Item1& item1) -> bool
+    constexpr auto CheckAmong(BinaryOperation optn, const Item0& item0, const Item1& item1) -> bool
     {
         return optn(item0, item1);
     }
@@ -99,7 +117,7 @@ R3BNeulandTamexReader2::R3BNeulandTamexReader2(EXT_STR_h101_raw_nnp_tamex_onion*
     : R3BReader("R3BNeulandTamexReader2")
     , max_limit_(PRINT_ERROR_MAX)
     , fOffset(offset)
-    , numPlanes_(R3B::GetSize(inputData_->NN_P))
+    , numPlanes_(static_cast<int>(R3B::GetSize(inputData_->NN_P)))
     , inputData_{ data }
     , mappedDataPtr_{ &mappedData_ }
     , mappedTrigDataPtr_{ &mappedTrigData_ }
@@ -111,7 +129,7 @@ R3BNeulandTamexReader2::R3BNeulandTamexReader2(EXT_STR_h101_raw_nnp_tamex_onion*
     error_log_.insert_or_assign(Errors::divider, 0);
 }
 
-Bool_t R3BNeulandTamexReader2::Init(ext_data_struct_info* a_struct_info) // NOLINT
+bool R3BNeulandTamexReader2::Init(ext_data_struct_info* a_struct_info) // NOLINT
 {
     auto status_ok = 1;
     R3BLOG(info, "");
@@ -137,7 +155,7 @@ Bool_t R3BNeulandTamexReader2::Init(ext_data_struct_info* a_struct_info) // NOLI
     {
         histogram_init();
     }
-    return kTRUE;
+    return true;
 }
 
 void R3BNeulandTamexReader2::histogram_init()
@@ -149,34 +167,39 @@ void R3BNeulandTamexReader2::histogram_init()
         "bar_FT_r", "number of hits on right PMTS for each bar", BarBinSize, 0.5, 0.5 + BarBinSize);
 }
 
-template <typename ErrorLog, typename... Items>
-auto CheckCondition(ErrorLog& log, const Items&... items) -> bool
+namespace
 {
-    auto ApplyCriterium = [&log, &items...](Errors error, auto criterium) -> bool
+    template <typename ErrorLog, typename... Items>
+    auto CheckCondition(ErrorLog& log, const Items&... items) -> bool
     {
-        if (!CheckAmong(criterium, items...))
+        auto ApplyCriterium = [&log, &items...](Errors error, auto criterium) -> bool
         {
-            ++log.at(error);
-            return false;
-        }
-        return true;
-    };
-    return ApplyCriterium(Errors::module_size,
-                          [](const auto& left, const auto& right) { return left.BM == right.BM; }) &&
-           ApplyCriterium(Errors::data_size, [](const auto& left, const auto& right) { return left.B == right.B; }) &&
-           ApplyCriterium(Errors::indices,
-                          [](const auto& left, const auto& right) {
-                              return ranges::equal(views::take(left.BMI, left.BM), views::take(right.BMI, right.BM));
-                          }) &&
-           ApplyCriterium(Errors::divider,
-                          [](const auto& left, const auto& right)
-                          { return ranges::equal(views::take(left.BME, left.BM), views::take(right.BME, right.BM)); });
-}
+            if (!CheckAmong(criterium, items...))
+            {
+                ++log.at(error);
+                return false;
+            }
+            return true;
+        };
+        return ApplyCriterium(Errors::module_size,
+                              [](const auto& left, const auto& right) { return left.BM == right.BM; }) &&
+               ApplyCriterium(Errors::data_size,
+                              [](const auto& left, const auto& right) { return left.B == right.B; }) &&
+               ApplyCriterium(
+                   Errors::indices,
+                   [](const auto& left, const auto& right)
+                   { return ranges::equal(views::take(left.BMI, left.BM), views::take(right.BMI, right.BM)); }) &&
+               ApplyCriterium(
+                   Errors::divider,
+                   [](const auto& left, const auto& right)
+                   { return ranges::equal(views::take(left.BME, left.BM), views::take(right.BME, right.BM)); });
+    }
+} // namespace
 
 template <typename ViewType>
 auto R3BNeulandTamexReader2::extract_plane_signals(const ViewType& signalsPlane, int planeNum)
 {
-    auto planeSignals = R3BPaddleTamexMappedData2{ static_cast<unsigned int>(planeNum) };
+    auto planeSignals = R3BPaddleTamexMappedData2{ planeNum };
     const auto signals_sides_view =
         ranges::zip_view(signalsPlane.tcl_T, signalsPlane.tfl_T, signalsPlane.tct_T, signalsPlane.tft_T, SIDES);
     for (const auto& [coarse_leading, fine_leading, coarse_trailing, fine_trailing, side] : signals_sides_view)
@@ -281,27 +304,30 @@ void R3BNeulandTamexReader2::histogram_action(const R3B::PaddleTamexMappedData& 
     }
 }
 
-template <typename ErrorLog, typename... Items>
-auto Checkondition(ErrorLog& log, EXT_STR_h101_raw_nnp_tamex_onion* inputData)
+namespace
 {
-    auto ApplyCriterium = [&log](Errors error, bool criterium) -> bool
+    template <typename ErrorLog, typename... Items>
+    auto Checkondition(ErrorLog& log, EXT_STR_h101_raw_nnp_tamex_onion* inputData)
     {
-        if (!criterium)
+        auto ApplyCriterium = [&log](Errors error, bool criterium) -> bool
         {
-            ++log.at(error);
-            return false;
-        }
-        return true;
-    };
-    return ApplyCriterium(Errors::module_size, inputData->NN_TRIGCM == inputData->NN_TRIGFM) &&
-           ApplyCriterium(Errors::data_size, inputData->NN_TRIGC == inputData->NN_TRIGF) &&
-           ApplyCriterium(Errors::indices,
-                          ranges::equal(views::take(inputData->NN_TRIGCMI, inputData->NN_TRIGCM),
-                                        views::take(inputData->NN_TRIGFMI, inputData->NN_TRIGFM))) &&
-           ApplyCriterium(Errors::divider,
-                          ranges::equal(views::take(inputData->NN_TRIGCME, inputData->NN_TRIGCM),
-                                        views::take(inputData->NN_TRIGFME, inputData->NN_TRIGFM)));
-}
+            if (!criterium)
+            {
+                ++log.at(error);
+                return false;
+            }
+            return true;
+        };
+        return ApplyCriterium(Errors::module_size, inputData->NN_TRIGCM == inputData->NN_TRIGFM) &&
+               ApplyCriterium(Errors::data_size, inputData->NN_TRIGC == inputData->NN_TRIGF) &&
+               ApplyCriterium(Errors::indices,
+                              ranges::equal(views::take(inputData->NN_TRIGCMI, inputData->NN_TRIGCM),
+                                            views::take(inputData->NN_TRIGFMI, inputData->NN_TRIGFM))) &&
+               ApplyCriterium(Errors::divider,
+                              ranges::equal(views::take(inputData->NN_TRIGCME, inputData->NN_TRIGCM),
+                                            views::take(inputData->NN_TRIGFME, inputData->NN_TRIGFM)));
+    }
+} // namespace
 
 auto R3BNeulandTamexReader2::ReadTriggerSignals(EXT_STR_h101_raw_nnp_tamex_onion* inputData) -> bool
 {

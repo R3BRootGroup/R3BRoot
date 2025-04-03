@@ -14,9 +14,13 @@
 #ifndef NEULAND_DIGITIZING_TACQUILA_H
 #define NEULAND_DIGITIZING_TACQUILA_H
 
-#include "R3BDigitizingEngine.h"
+#include "R3BDigitizingChannel.h"
+#include "R3BShared.h"
 #include "TRandom3.h"
 #include "Validated.h"
+#include <RtypesCore.h>
+#include <memory>
+#include <vector>
 
 namespace R3B::Digitizing::Neuland::TacQuila
 {
@@ -34,40 +38,40 @@ namespace R3B::Digitizing::Neuland::TacQuila
     };
 
     extern const Params TACQUILA_DEFAULT_PARAM;
-    class Channel : public Digitizing::Channel
+    class Channel : public Digitizing::AbstractChannel
     {
       public:
         Channel(const Channel&) = delete;
         Channel(Channel&&) = delete;
-        Channel& operator=(const Channel&) = delete;
-        Channel& operator=(Channel&&) = delete;
-        explicit Channel(ChannelSide, const TacQuila::Params& = TACQUILA_DEFAULT_PARAM);
+        auto operator=(const Channel&) -> Channel& = delete;
+        auto operator=(Channel&&) -> Channel& = delete;
+        explicit Channel(Side, const TacQuila::Params& = TACQUILA_DEFAULT_PARAM);
         ~Channel() override = default;
-        void AddHit(Hit newHit) override;
-        bool HasFired() override;
-        double GetQDC();
-        double GetTDC();
-        double GetEnergy();
-        double GetTrigTime() override { return GetTDC(); }
+        void add_signal(Signal newHit) override;
+        auto HasFired() -> bool override;
+        auto GetQDC() -> double;
+        auto GetTDC() -> double;
+        auto GetEnergy() -> double;
 
       private:
-        // NOTE: Some expensive calculations and random distributions are cached
-        // so they do not need to be recomputed every time a Getter is called
-        auto ConstructSignals() -> Signals override;
-        std::vector<Hit> fPMTHits;
-        mutable Validated<std::vector<Hit>::const_iterator> cachedFirstHitOverThresh;
-        std::vector<Hit>::const_iterator FindThresholdExceedingHit() const;
-
-        double BuildQDC();
+        static constexpr double DEFAULT_LAMBDA = 1. / 2.1;
+        const TacQuila::Params& par;
+        std::vector<Signal> fPMTHits;
+        mutable Validated<std::vector<Signal>::const_iterator> cachedFirstHitOverThresh;
         mutable Validated<double> cachedQDC;
-
-        double BuildTDC();
         mutable Validated<double> cachedTDC;
-
-        double BuildEnergy();
         mutable Validated<double> cachedEnergy;
 
-        const TacQuila::Params& par;
+        void extra_reset() override;
+
+        // NOTE: Some expensive calculations and random distributions are cached
+        // so they do not need to be recomputed every time a Getter is called
+        void construct_hits(Hits& signals) override;
+
+        auto BuildQDC() -> double;
+        auto BuildTDC() -> double;
+        auto BuildEnergy() -> double;
+        auto FindThresholdExceedingHit() const -> std::vector<Signal>::const_iterator;
     };
 
 } // namespace R3B::Digitizing::Neuland::TacQuila

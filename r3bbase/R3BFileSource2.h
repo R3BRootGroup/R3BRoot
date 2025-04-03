@@ -15,9 +15,21 @@
 
 #include "R3BShared.h"
 #include <FairFileSourceBase.h>
+#include <FairSource.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TDirectory.h>
+#include <TFile.h>
 #include <TObjString.h>
+#include <TObject.h>
 #include <chrono>
+#include <cstdint>
 #include <optional>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
+#include <typeinfo>
+#include <vector>
 
 class FairRootManager;
 class TChain;

@@ -12,12 +12,12 @@
  ******************************************************************************/
 
 #pragma once
+#include "R3BValueError.h"
+#include <R3BMinMaxValue.h>
 #include <TObject.h>
 #include <cassert>
 #include <cmath>
-#include <cstdint>
 #include <limits>
-#include <vector>
 
 namespace R3B::Neuland
 {
@@ -30,7 +30,7 @@ namespace R3B::Neuland
     // Useful functions I do not want to redefine in every file
 
     template <typename T>
-    constexpr T Sqr(const T val)
+    constexpr auto Sqr(const T val) -> T
     {
         return val * val;
     }
@@ -46,7 +46,7 @@ namespace R3B::Neuland
     constexpr double BirkC1 = 0.013 / BirkdP;
     constexpr double BirkC2 = 9.6e-6 / (BirkdP * BirkdP);
 
-    constexpr double GetLightYieldAfterBirk(const int charge, const double length_mm, const double edep_MeV)
+    constexpr auto GetLightYieldAfterBirk(const int charge, const double length_mm, const double edep_MeV) -> double
     {
         return (charge * length_mm == 0.
                     ? edep_MeV
@@ -128,10 +128,8 @@ namespace R3B::Neuland
     // NeuLAND TPAT:
     constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
 
-    struct XYZCoordinate
-    {
-        double x{};
-        double y{};
-        double z{};
-    };
+    // Default values:
+    constexpr auto DEFAULT_BOX_GENERATOR_THETA = MinMaxValueD{ 0., 3. }; // degree
+    constexpr auto DEFAULT_BOX_GENERATOR_PHI = MinMaxValueD{ 0., 360. }; // degree
+    constexpr auto DEFAULT_GENERATOR_ENERGY = ValueErrorD{ 1., 0.2 };    // [GeV]
 } // namespace R3B::Neuland

@@ -16,6 +16,8 @@
 #include "TVector3.h"
 #include <R3BFormatters.h>
 #include <Rtypes.h>
+#include <RtypesCore.h>
+#include <fmt/core.h>
 #include <iostream>
 
 constexpr auto NEUTRON_MASS_MEV = 939.565;

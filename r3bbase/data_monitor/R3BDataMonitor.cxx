@@ -12,11 +12,23 @@
  ******************************************************************************/
 
 #include "R3BDataMonitor.h"
+#include "R3BDataMonitorCanvas.h"
+#include "R3BException.h"
+#include "R3BLogger.h"
 #include <FairRootFileSink.h>
 #include <FairRunOnline.h>
 #include <FairRuntimeDb.h>
+#include <FairSink.h>
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TH1.h>
+#include <chrono>
 #include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <memory>
+#include <string>
+#include <string_view>
 
 namespace
 {
@@ -61,7 +73,7 @@ namespace R3B
         }
         R3BLOG(info,
                fmt::format("Saving figures to the directory {:?} in the root file {:?}",
-                           folderName,
+                           new_dir->GetName(),
                            new_dir->GetFile()->GetName()));
 
         write_all(new_dir);

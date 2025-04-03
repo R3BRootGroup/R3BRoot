@@ -1,5 +1,3 @@
-find_package(magic_enum REQUIRED)
-
 add_library(R3BNeulandApp SHARED R3BNeulandAnalysisApp.cxx R3BNeulandApp.cxx
                                  R3BNeulandAppOptionJson.cxx R3BNeulandSimApp.cxx)
 

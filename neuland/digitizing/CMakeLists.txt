@@ -15,8 +15,6 @@
 
 set(SRCS
     # cmake-format: sortable
-    Muon/R3BNeulandDigitizerCalData.cxx
-    Muon/R3BNeulandDigitizerCalData.cxx
     NeulandPointFilter.cxx
     R3BDigitizingChannel.cxx
     R3BDigitizingChannelMock.h
@@ -31,8 +29,6 @@ set(SRCS
 
 set(HEADERS
     # cmake-format: sortable
-    Muon/R3BNeulandDigitizerCalData.h
-    Muon/R3BNeulandDigitizerCalData.h
     NeulandPointFilter.h
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h

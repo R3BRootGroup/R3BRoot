@@ -15,8 +15,6 @@
 
 #include "R3BShared.h"
 #include "R3BValueError.h"
-
-#include <Math/Vector3Dfwd.h>
 #include <TVector3.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -86,5 +84,33 @@ class fmt::formatter<R3B::Side>
             return fmt::format_to(ctn.out(), "{}", "left");
         }
         return fmt::format_to(ctn.out(), "{}", "right");
+    }
+};
+
+template <typename DataType>
+class fmt::formatter<R3B::LRPair<DataType>>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::LRPair<DataType>& data_pair, FmtContent& ctn) const
+    {
+        return format_to(ctn.out(), "[left: {}, right: {}]", data_pair.left(), data_pair.right());
+    }
+};
+
+template <>
+class fmt::formatter<R3B::Side>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::Side& side, FmtContent& ctn) const
+    {
+        if (side == R3B::Side::left)
+        {
+            return format_to(ctn.out(), "{}", "left");
+        }
+        return format_to(ctn.out(), "{}", "right");
     }
 };

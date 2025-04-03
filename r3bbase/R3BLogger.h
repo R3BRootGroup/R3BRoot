@@ -19,6 +19,8 @@
 #pragma once
 
 #include <FairLogger.h>
+#include <Rtypes.h>
+#include <cstdlib>
 #include <fairlogger/Logger.h>
 
 #include <Rtypes.h>

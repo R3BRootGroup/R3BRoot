@@ -27,6 +27,7 @@ Checks: >
   modernize-*,
   performance-*,
   readability-*
+  -bugprone-suspicious-stringview-data-usage
 
 CheckOptions:
   - key: bugprone-argument-comment.StrictMode

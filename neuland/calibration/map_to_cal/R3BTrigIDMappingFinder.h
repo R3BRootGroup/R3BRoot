@@ -6,7 +6,7 @@
 #include <optional>
 #include <unordered_map>
 
-namespace R3B ::Neuland
+namespace R3B::Neuland
 {
 
     struct TrigIDMappingRecorder

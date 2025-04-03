@@ -1,3 +1,0 @@
-name: r3b-python-env
-dependencies:
-  - conda-forge::conan=2.0.9

@@ -20,8 +20,8 @@ fetchcontent_getproperties(doxygen-awesome-css SOURCE_DIR AWESOME_CSS_DIR)
 set(DOXYGEN_PROJECT_BRIEF "R3B analysis software")
 
 set(DOXYGEN_EXTRACT_ALL YES)
-set(DOXYGEN_EXTRACT_PRIVATE NO)
-set(DOXYGEN_EXTRACT_PRIV_VIRTUAL YES)
+set(DOXYGEN_EXTRACT_PRIVATE YES)
+set(DOXYGEN_EXTRACT_PRIV_VIRTUAL NO)
 set(DOXYGEN_EXTRACT_PACKAGE YES)
 set(DOXYGEN_EXTRACT_STATIC YES)
 # set(DOXYGEN_GENERATE_TREEVIEW YES)
@@ -34,6 +34,8 @@ set(DOXYGEN_CLASS_GRAPH NO)
 set(DOXYGEN_COLLABORATION_GRAPH NO)
 set(DOXYGEN_JAVADOC_AUTOBRIEF YES)
 set(DOXYGEN_USE_MATHJAX YES)
+set(DOXYGEN_MATHJAX_VERSION "MathJax_3")
+set(DOXYGEN_MATHJAX_CODEFILE "${PROJECT_SOURCE_DIR}/config/mathjax-config.js")
 set(DOXYGEN_RECURSIVE YES)
 set(DOXYGEN_IMPLICIT_DIR_DOCS NO)
 set(DOXYGEN_MAX_DOT_GRAPH_DEPTH 2)
@@ -42,18 +44,21 @@ set(DOXYGEN_MARKDOWN_SUPPORT YES)
 set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${PROJECT_SOURCE_DIR}/README.md")
 set(DOXYGEN_IMAGE_PATH "${PROJECT_SOURCE_DIR}/doc/pics" "${PROJECT_SOURCE_DIR}/neuland/docs/figs"
                        "${PROJECT_SOURCE_DIR}/neuland/shared")
+set(DOXYGEN_EXAMPLE_PATH "${PROJECT_SOURCE_DIR}/neuland/docs/figs")
 set(DOXYGEN_PYTHON_DOCSTRING NO)
 
 # For doxygen-awesome
+set(DOXYGEN_HTML_EXTRA_FILES "${AWESOME_CSS_DIR}/doxygen-awesome-darkmode-toggle.js"
+                             "${AWESOME_CSS_DIR}/doxygen-awesome-interactive-toc.js")
 set(DOXYGEN_HTML_EXTRA_STYLESHEET
     "${AWESOME_CSS_DIR}/doxygen-awesome.css" "${AWESOME_CSS_DIR}/doxygen-awesome-sidebar-only.css"
-    "${AWESOME_CSS_DIR}/doxygen-awesome-interactive-toc.js")
+    "${AWESOME_CSS_DIR}/doxygen-awesome-sidebar-only-darkmode-toggle.css")
 set(DOXYGEN_HTML_HEADER "${PROJECT_SOURCE_DIR}/config/dox_header.html")
 set(DOXYGEN_DISABLE_INDEX NO)
 set(DOXYGEN_FULL_SIDEBAR NO)
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_HTML_COLORSTYLE LIGHT)
-# set(DOXYGEN_EXCLUDE_PATTERNS "*.py" "ext_h101_*")
+set(DOXYGEN_EXCLUDE_PATTERNS "ext_h101_*" "EXT_STR_h101_*")
 # set(DOXYGEN_FILE_PATTERNS "readme.md")
 # set(DOXYGEN_EXTENSION_MAPPING "md=md")
 

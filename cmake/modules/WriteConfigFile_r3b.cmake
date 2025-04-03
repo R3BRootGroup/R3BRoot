@@ -150,7 +150,6 @@ macro(WRITE_CONFIG_FILE filename)
 
     set(PYTHONPATH
         ${CMAKE_SOURCE_DIR}/python
-        ${R3B_PYTHON_LIB}
         ${SIMPATH}/lib
         ${SIMPATH}/lib/root
         ${SIMPATH}/lib/Geant4

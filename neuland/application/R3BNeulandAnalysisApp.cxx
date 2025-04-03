@@ -1,5 +1,10 @@
+#include "R3BDigitizingEngine.h"
+#include "R3BDigitizingTamex.h"
+#include "R3BNeulandApp.h"
+#include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandSimCalToCal.h"
 #include <CLI/CLI.hpp>
+#include <FairRun.h>
 #include <FairRunAna.h>
 #include <R3BDigitizingChannelMock.h>
 #include <R3BDigitizingPaddleMock.h>
@@ -20,12 +25,25 @@
 #include <R3BNeulandNeutronsRValue.h>
 #include <R3BNeulandPrimaryClusterFinder.h>
 #include <R3BNeulandPrimaryInteractionFinder.h>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <fmt/core.h>
 #include <fstream>
+#include <functional>
+#include <ios>
+#include <map>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace Digitizing = R3B::Digitizing;
 namespace Tamex = Digitizing::Neuland::Tamex;
-using NeulandPaddle = Digitizing::Neuland::NeulandPaddle;
+using NeulandPaddle = Digitizing::Neuland::Paddle;
 using MockPaddle = Digitizing::Neuland::MockPaddle;
 using TamexChannel = Tamex::Channel;
 using TacquilaChannel = Digitizing::Neuland::TacQuila::Channel;
@@ -110,12 +128,13 @@ namespace R3B::Neuland
             R3BLOG(info, "cal_to_hit_par is not used in digitization task!");
         }
         return std::map<std::pair<const std::string, const std::string>,
-                        std::function<std::unique_ptr<Digitizing::DigitizingEngineInterface>()>>{
+                        std::function<std::unique_ptr<Digitizing::EngineInterface>()>>{
             { { "neuland", "tamex" },
-              [&tamex_par, pileup_strategy, cal_to_hit_par]()
+              [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]()
               {
-                  return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par),
-                                                  UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
+                  return Digitizing::CreateEngine(
+                      UsePaddle<NeulandPaddle>(cal_to_hit_par),
+                      UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par, enable_sim_cal));
               } },
             { { "neuland", "tacquila" },
               [cal_to_hit_par]() {
@@ -123,10 +142,11 @@ namespace R3B::Neuland
                                                   UseChannel<TacquilaChannel>());
               } },
             { { "mock", "tamex" },
-              [&tamex_par, pileup_strategy, cal_to_hit_par]()
+              [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]()
               {
-                  return Digitizing::CreateEngine(UsePaddle<MockPaddle>(),
-                                                  UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par));
+                  return Digitizing::CreateEngine(
+                      UsePaddle<MockPaddle>(),
+                      UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par, enable_sim_cal));
               } },
             { { "neuland", "mock" },
               [cal_to_hit_par]() {
@@ -177,6 +197,7 @@ namespace R3B::Neuland
             auto task = std::make_unique<R3BNeulandDigitizer>(
                 engine_gen(), read_branch_names.at(0), write_branch_names.at(0), write_branch_names.at(1));
             task->EnableCalDataOutput(option.enable_sim_cal);
+            task->EnableSizeMonitor(option.enable_size_monitor);
             task->SetName(task_option.digi.name.c_str());
             run->AddTask(task.release());
         }
@@ -317,4 +338,8 @@ namespace R3B::Neuland
         R3BLOG(info, fmt::format("Configuration of neuland_ana is saved into the file {:?}", filename));
     }
 
+    void AnalysisApplication::ParseApplicationOption(const std::vector<std::string>& filename)
+    {
+        ParseApplicationOptionImp(filename, options_);
+    }
 } // namespace R3B::Neuland

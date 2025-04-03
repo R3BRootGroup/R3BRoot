@@ -12,14 +12,20 @@
  ******************************************************************************/
 #pragma once
 
+#include "R3BDataMonitor.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandMapToCalPar.h"
 #include "R3BPaddleTamexMappedData2.h"
+#include "R3BShared.h"
+#include "R3BValueError.h"
+#include <FairRootManager.h>
 #include <R3BIOConnector.h>
 #include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalData.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCommon.h>
+#include <string_view>
+#include <vector>
 
 class R3BEventHeader;
 namespace R3B::Neuland
@@ -75,9 +81,9 @@ namespace R3B::Neuland
                                                 SingleEdgeSignal signal,
                                                 FTType ftType,
                                                 unsigned int module_num) const -> ValueError<double>;
-        [[nodiscard]] auto get_tot(DoubleEdgeSignal pmtSignal,
+        [[nodiscard]] auto get_tot(const DoubleEdgeSignal& pmtSignal,
                                    unsigned int module_num,
-                                   Side side) const -> ValueError<double>;
+                                   R3B::Side module_side) const -> ValueError<double>;
         [[nodiscard]] auto get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>;
         void overflow_correct(R3B::Neuland::CalDataSignal& calSignal) const;
     };

@@ -1,11 +1,19 @@
 #include "R3BNeulandMapToCalParTask.h"
 #include "R3BException.h"
+#include "R3BNeulandCalibrationTask.h"
+#include "R3BNeulandCommon.h"
+#include "R3BNeulandMapToCalPar.h"
+#include "R3BShared.h"
 #include <FairParIo.h>
 #include <FairParRootFileIo.h>
 #include <FairRootManager.h>
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
 #include <R3BLogger.h>
+#include <TDirectory.h>
+#include <fmt/core.h>
+#include <string_view>
+#include <utility>
 
 namespace
 {

@@ -1,0 +1,2 @@
+[tool.pyright]
+include = ["r3b"]

@@ -20,6 +20,14 @@ Here are the steps to run the NeuLAND cli application in HPC clusters:
 
 2. **Download NeuLAND Apptainer image in any folder _under_ `/lustre`:**
 
+   Before pulling the image, please make sure Sylabs has been added to the remote if it has not been done before:
+
+   ```shell
+   apptainer remote add --no-login SylabsCloud cloud.sycloud.io
+   ```
+
+   Then pull the image to your current folder:
+
    ```shell
    apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
    ```

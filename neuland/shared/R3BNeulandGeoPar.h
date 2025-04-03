@@ -44,6 +44,7 @@ class R3BNeulandGeoPar : public FairParGenericSet
     Bool_t getParams(FairParamList*) override;
     void printParams() override;
 
+    [[nodiscard]] auto GetNumberOfModules() const -> int { return fNeulandGeoNode->GetNdaughters(); }
     TGeoNode* GetNeulandGeoNode() { return fNeulandGeoNode; } // FIXME: const?
     void SetNeulandGeoNode(const TGeoNode* const p);
 

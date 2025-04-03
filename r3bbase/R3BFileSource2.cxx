@@ -15,18 +15,38 @@
 
 #include "R3BException.h"
 #include "R3BLogger.h"
+#include "R3BShared.h"
 #include <FairEventHeader.h>
 #include <FairFileHeader.h>
 #include <FairRootManager.h>
 #include <FairRun.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TBranchElement.h>
 #include <TClonesArray.h>
+#include <TCollection.h>
 #include <TFolder.h>
 #include <TKey.h>
+#include <TObjString.h>
+#include <TObject.h>
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <fairlogger/Logger.h>
 #include <fmt/chrono.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
-#include <iostream>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
 #include <vector>
 
 namespace
@@ -248,7 +268,7 @@ void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
                progress_str,
                std::chrono::ceil<std::chrono::seconds>(time_left_ms),
                run_id_);
-    std::cout << std::flush;
+    std::fflush(stdout);
 }
 
 auto R3BInputRootFiles::AddFileName(std::string fileName, bool is_tree_file) -> std::optional<std::string>

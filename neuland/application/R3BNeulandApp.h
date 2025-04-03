@@ -2,11 +2,19 @@
 
 #include <R3BLogger.h>
 #include <TStopwatch.h>
+#include <algorithm>
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <fstream>
+#include <functional>
+#include <ios>
+#include <iterator>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 class FairRun;
 class R3BFileSource2;
@@ -110,7 +118,7 @@ namespace R3B::Neuland
 
       protected:
         template <typename OptionType>
-        void ParseApplicationOptionImp(const std::vector<std::string>& filename, OptionType& option);
+        void ParseApplicationOptionImp(const std::vector<std::string>& filename, OptionType& options);
 
       private:
         bool is_failed_ = false;
@@ -129,7 +137,7 @@ namespace R3B::Neuland
 
         // private virtual methods:
         virtual void pre_init(FairRun* run) = 0;
-        virtual void ParseApplicationOption(const std::vector<std::string>& filename) = 0;
+        virtual void ParseApplicationOption(const std::vector<std::string>& filename_or_option) = 0;
         virtual void post_init(FairRun* run) {}
         void add_input_filename(R3BFileSource2* filesource);
         virtual void print_json_options() {}
@@ -142,6 +150,8 @@ namespace R3B::Neuland
         void add_inout_files();
         void add_inout_pars();
         void extract_input_files();
+        static void patch_files_or_strings(nlohmann::ordered_json& json_obj,
+                                           const std::vector<std::string>& filenames_or_options);
     };
 
     template <typename OptionType>
@@ -177,21 +187,15 @@ namespace R3B::Neuland
     }
 
     template <typename OptionType>
-    void Application::ParseApplicationOptionImp(const std::vector<std::string>& filenames, OptionType& option)
+    void Application::ParseApplicationOptionImp(const std::vector<std::string>& filenames_or_options,
+                                                OptionType& options)
     {
-        auto json_obj = [&option]()
+        auto json_obj = [&options]()
         {
-            auto json_obj_tmp = nlohmann::ordered_json{ option };
+            auto json_obj_tmp = nlohmann::ordered_json{ options };
             return json_obj_tmp.is_array() ? json_obj_tmp.front() : json_obj_tmp;
         }();
-        for (const auto& filename : filenames)
-        {
-            auto json_file_obj = nlohmann::ordered_json{};
-            auto file = std::ifstream{ filename };
-            file >> json_file_obj;
-            R3BLOG(info, fmt::format("Reading the configuration from the json file {:?}.", filename));
-            json_obj.merge_patch(json_file_obj);
-        }
-        json_obj.get_to(option);
+        patch_files_or_strings(json_obj, filenames_or_options);
+        json_obj.get_to(options);
     }
 } // namespace R3B::Neuland

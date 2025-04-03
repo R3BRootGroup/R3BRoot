@@ -12,11 +12,15 @@
  ******************************************************************************/
 
 #include "R3BDigitizingTacQuila.h"
+#include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddleNeuland.h"
+#include "R3BShared.h"
+#include <RtypesCore.h>
+#include <TRandom3.h>
 #include <algorithm>
 #include <cmath>
 #include <memory>
-#include <stdexcept>
+#include <vector>
 
 namespace R3B::Digitizing::Neuland::TacQuila
 {
@@ -32,22 +36,22 @@ namespace R3B::Digitizing::Neuland::TacQuila
     }
 
     const Params TACQUILA_DEFAULT_PARAM = Params{};
-    Channel::Channel(ChannelSide side, const Params& para)
-        : Digitizing::Channel(side)
+    Channel::Channel(Side side, const Params& para)
+        : Digitizing::AbstractChannel(side)
         , par(para)
     {
     }
 
-    void Channel::AddHit(Hit newHit)
+    void Channel::add_signal(Signal newHit)
     {
-        fPMTHits.emplace_back(newHit.time, newHit.light);
+        fPMTHits.emplace_back(newHit.time, newHit.intensity);
         // NOTE: Sorting after every hit may not be efficient, but this way
         // FindThresholdExeeding hit can be made const
         std::sort(fPMTHits.begin(), fPMTHits.end());
         cachedFirstHitOverThresh.invalidate();
     }
 
-    bool Channel::HasFired()
+    auto Channel::HasFired() -> bool
     {
         if (!cachedFirstHitOverThresh.valid())
         {
@@ -60,7 +64,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return cachedFirstHitOverThresh.get() != fPMTHits.end();
     }
 
-    Double_t Channel::GetQDC()
+    auto Channel::GetQDC() -> double
     {
         if (!cachedQDC.valid())
         {
@@ -69,7 +73,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return cachedQDC;
     }
 
-    Double_t Channel::GetTDC()
+    auto Channel::GetTDC() -> double
     {
         if (!cachedTDC.valid())
         {
@@ -78,7 +82,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return cachedTDC;
     }
 
-    Double_t Channel::GetEnergy()
+    auto Channel::GetEnergy() -> double
     {
         if (!cachedEnergy.valid())
         {
@@ -87,7 +91,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return cachedEnergy;
     }
 
-    Double_t Channel::BuildQDC()
+    auto Channel::BuildQDC() -> double
     {
         if (HasFired())
         {
@@ -100,7 +104,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
                 const auto hit = *hit_it;
                 if (hit.time < (*cachedFirstHitOverThresh.get()).time + par.fIntegrationTime)
                 {
-                    light += hit.light;
+                    light += hit.intensity;
                 }
             }
             return light;
@@ -109,7 +113,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return 0.;
     }
 
-    Double_t Channel::BuildTDC()
+    auto Channel::BuildTDC() -> double
     {
         if (HasFired())
         {
@@ -119,7 +123,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return -1.;
     }
 
-    Double_t Channel::BuildEnergy()
+    auto Channel::BuildEnergy() -> double
     {
         Double_t energy = GetQDC();
         // Apply reverse attenuation (TODO: Should be last?)
@@ -136,7 +140,7 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return energy;
     }
 
-    std::vector<Channel::Hit>::const_iterator Channel::FindThresholdExceedingHit() const
+    auto Channel::FindThresholdExceedingHit() const -> std::vector<Channel::Signal>::const_iterator
     {
         // Note that this accumulated light is NOT used for the QDC Value
         // @mheil: Is that actually correct?
@@ -149,15 +153,14 @@ namespace R3B::Digitizing::Neuland::TacQuila
             auto hit = *hit_it;
 
             // Until the light of this hit arrives at the pmt, the previous light pulses have decayed
-            currentHeightOfLightPulse *= exp(-NeulandPaddle::gLambda * (hit.time - previousTime));
+            currentHeightOfLightPulse *= exp(-DEFAULT_LAMBDA * (hit.time - previousTime));
             previousTime = hit.time;
 
             // Add the current light pulse
-            currentHeightOfLightPulse += hit.light;
+            currentHeightOfLightPulse += hit.intensity;
 
             // If the light pulse is higher than the threshold, this hit causes the pmt to fire
-            if (currentHeightOfLightPulse * exp(NeulandPaddle::gAttenuation * NeulandPaddle::gHalfLength) >
-                par.fPMTThresh)
+            if (currentHeightOfLightPulse * exp(Paddle::DEFAULT_ATTENUATION * Paddle::HALF_BAR_LENGTH) > par.fPMTThresh)
             {
                 return hit_it;
             }
@@ -167,13 +170,22 @@ namespace R3B::Digitizing::Neuland::TacQuila
         return fPMTHits.end();
     }
 
-    auto Channel::ConstructSignals() -> Signals
+    void Channel::extra_reset()
     {
-        auto signal = Signal{};
+        fPMTHits.clear();
+        cachedFirstHitOverThresh.invalidate();
+        cachedQDC.invalidate();
+        cachedTDC.invalidate();
+        cachedEnergy.invalidate();
+    }
+
+    void Channel::construct_hits(Hits& signals)
+    {
+        auto signal = Hit{};
         signal.qdcUnSat = GetEnergy();
         signal.qdc = GetQDC();
         signal.tdc = GetTDC();
         signal.side = this->GetSide();
-        return { signal };
+        signals.push_back(signal);
     }
 } // namespace R3B::Digitizing::Neuland::TacQuila

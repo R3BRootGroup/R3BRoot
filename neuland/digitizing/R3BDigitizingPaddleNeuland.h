@@ -11,8 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 #pragma once
-#include "R3BDigitizingEngine.h"
+#include "R3BDigitizingChannel.h"
+#include "R3BDigitizingPaddle.h"
 #include "R3BNeulandCommon.h"
+#include "R3BShared.h"
+#include <cmath>
+#include <vector>
 
 /**
  * Simulation of NeuLAND Bar/Paddle
@@ -27,46 +31,43 @@ namespace R3B::Neuland
 
 namespace R3B::Digitizing::Neuland
 {
-    class NeulandPaddle : public Digitizing::Paddle
+    class Paddle : public Digitizing::AbstractPaddle
     {
       public:
-        explicit NeulandPaddle(uint16_t paddleID);
+        explicit Paddle(int paddle_id);
+        explicit Paddle(int paddle_id, R3B::Neuland::Cal2HitPar* cal_to_hit_par);
 
-        explicit NeulandPaddle(uint16_t paddleID, R3B::Neuland::Cal2HitPar* cal_to_hit_par);
-
-      private:
-        [[nodiscard]] auto ComputeTime(const Channel::Signal& firstSignal,
-                                       const Channel::Signal& secondSignal) const -> double override;
-        [[nodiscard]] auto ComputeEnergy(const Channel::Signal& firstSignal,
-                                         const Channel::Signal& secondSignal) const -> double override;
-        [[nodiscard]] auto ComputePosition(const Channel::Signal& leftSignal,
-                                           const Channel::Signal& rightSignal) const -> double override;
-        auto ComputeChannelHits(const Hit& hit) const -> Pair<Channel::Hit> override;
-
-      public:
-        static constexpr double gHalfLength = 135.;   // [cm]
-        static constexpr double gAttenuation = 0.008; // light attenuation of plastic scintillator [1/cm]
-        static constexpr double gLambda = 1. / 2.1;
-
-        auto MatchSignals(const Channel::Signal& firstSignal,
-                          const Channel::Signal& secondSignal) const -> float override;
-        [[nodiscard]] static auto SignalCouplingNeuland(const Paddle& self,
-                                                        const Channel::Signals& firstSignals,
-                                                        const Channel::Signals& secondSignals)
+        [[nodiscard]] auto match_hits(const AbstractChannel::Hit& firstSignal,
+                                      const AbstractChannel::Hit& secondSignal) const -> float override;
+        [[nodiscard]] static auto HitCouplingNeuland(const AbstractPaddle& self,
+                                                     const AbstractChannel::Hits& firstSignals,
+                                                     const AbstractChannel::Hits& secondSignals)
             -> std::vector<ChannelSignalPair>;
-        auto GenerateChannelHit(double mcTime,
-                                double mcLight,
-                                double dist,
-                                enum ChannelSide channel_side) const -> Channel::Hit;
+        [[nodiscard]] auto GenerateChannelSignal(double mcTime,
+                                                 double mcLight,
+                                                 double dist,
+                                                 enum Side channel_side) const -> AbstractChannel::Signal;
+
+        static constexpr double HALF_BAR_LENGTH = 135.;      // [cm]
+        static constexpr double DEFAULT_ATTENUATION = 0.008; // light attenuation of plastic scintillator [1/cm]
 
       private:
-        // Paula: non static member variables, are not used in TacQuila
-        double gHalfLength_ = 135.;  // [cm]
-        double attenuation_ = 0.008; // light attenuation of plastic scintillator [1/cm]
-        double gLambda_ = 1. / 2.1;
-        double ReverseAttenFac_ = std::exp(NeulandPaddle::gHalfLength * NeulandPaddle::gAttenuation);
+        double attenuation_ = DEFAULT_ATTENUATION;
+        double reverse_atten_fac_ = std::exp(HALF_BAR_LENGTH * DEFAULT_ATTENUATION);
         double effective_speed_ = R3B::Neuland::DEFAULT_EFFECTIVE_C;
         double time_offset_ = 0.0;
         double time_sync_ = 0.0;
+
+        R3B::Neuland::Cal2HitPar* cal_to_hit_par_ = nullptr;
+
+        void pre_construct() override;
+
+        [[nodiscard]] auto compute_time(const AbstractChannel::Hit& firstSignal,
+                                        const AbstractChannel::Hit& secondSignal) const -> double override;
+        [[nodiscard]] auto compute_energy(const AbstractChannel::Hit& firstSignal,
+                                          const AbstractChannel::Hit& secondSignal) const -> double override;
+        [[nodiscard]] auto compute_position(const AbstractChannel::Hit& leftSignal,
+                                            const AbstractChannel::Hit& rightSignal) const -> double override;
+        [[nodiscard]] auto compute_channel_signals(const Signal& hit) const -> Pair<AbstractChannel::Signal> override;
     };
 } // namespace R3B::Digitizing::Neuland

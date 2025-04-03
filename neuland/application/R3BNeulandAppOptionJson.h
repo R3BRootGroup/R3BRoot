@@ -1,8 +1,10 @@
 #pragma once
 
+#include "R3BNeulandApp.h"
 #include <R3BDigitizingTamex.h>
 #include <R3BNeulandAnalysisApp.h>
 #include <R3BNeulandSimApp.h>
+#include <nlohmann/json.hpp>
 
 namespace R3B::Digitizing::Neuland::Tamex
 {
@@ -102,13 +104,6 @@ namespace R3B::Neuland
 
     template <>
     void from_json(const nlohmann::ordered_json& json_obj, SimulationApplication::Options::Simulation& option);
-
-    template <>
-    void to_json(nlohmann::ordered_json& json_obj, const SimulationApplication::Options::Simulation::Generator& option);
-
-    template <>
-    void from_json(const nlohmann::ordered_json& json_obj,
-                   SimulationApplication::Options::Simulation::Generator& option);
 
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const SimulationApplication::Options::Detector& option);

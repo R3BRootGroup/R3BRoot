@@ -1,14 +1,34 @@
 #include "R3BNeulandApp.h"
+#include "R3BException.h"
 #include "R3BFileSource2.h"
+#include "R3BLogger.h"
+#include "R3BShared.h"
 #include <CLI/CLI.hpp>
+#include <FairLogger.h>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
 #include <TGeoManager.h>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+#include <cmath>
+#include <cstdint>
+#include <filesystem>
 #include <fmt/color.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <fstream>
+#include <functional>
 #include <gsl/span>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 #ifdef HAS_MPI
 #include <mpi.h>
 #endif
@@ -16,7 +36,6 @@
 using gsl::span;
 namespace
 {
-    namespace fs = std::filesystem;
     template <typename T>
     auto get_partition_from(const std::vector<T>& elements, int num_of_partitions, int partition_num) -> span<const T>
     {
@@ -30,6 +49,50 @@ namespace
         const auto span_size = step * (partition_num + 1) < total_size ? step : total_size - (step * partition_num);
         return span<const T>{ &(elements.at(step * partition_num)), span_size };
     }
+
+    enum class JSONConfigInputType : uint8_t
+    {
+        file,
+        string,
+        invalid
+    };
+
+    auto check_json_input_type(std::string_view input) -> JSONConfigInputType
+    {
+        auto is_json_string = [](std::string_view string) -> bool { return string.find('=') != std::string::npos; };
+        auto is_a_file = [](std::string_view string) -> bool { return std::filesystem::exists(string); };
+
+        if (is_json_string(input))
+        {
+            return JSONConfigInputType::string;
+        }
+        if (is_a_file(input))
+        {
+            return JSONConfigInputType::file;
+        }
+        return JSONConfigInputType::invalid;
+    }
+
+    auto transform_to_json_string(std::string_view input) -> std::string
+    {
+        auto raw_string = std::string{ input };
+        auto equal_pos = raw_string.find('=');
+        auto keys_string = raw_string.substr(0, equal_pos);
+        auto value_string = raw_string.substr(equal_pos + 1);
+
+        boost::algorithm::trim(keys_string);
+        boost::algorithm::trim(value_string);
+
+        auto keys = std::vector<std::string>{};
+        boost::split(keys, keys_string, boost::is_any_of("."));
+
+        for (const auto& key : boost::adaptors::reverse(keys))
+        {
+            value_string = fmt::format("{{ {:?} : {}}}", key, value_string);
+        }
+        return value_string;
+    }
+
 } // namespace
 
 namespace R3B::Neuland
@@ -100,11 +163,11 @@ namespace R3B::Neuland
             dump_json_filename_ = filename;
         };
 
-        auto use_config_callback = [this](const std::vector<std::string>& filename)
+        auto use_config_callback = [this](const std::vector<std::string>& filename_or_option)
         {
             if (not is_already_parsed_)
             {
-                ParseApplicationOption(filename);
+                ParseApplicationOption(filename_or_option);
                 is_already_parsed_ = true;
             }
         };
@@ -112,9 +175,10 @@ namespace R3B::Neuland
         auto& options = option_.get();
         program_options
             .add_option_function<std::vector<std::string>>(
-                "-c, --config-file", use_config_callback, "Set the json config file")
+                "-c, --use-config", use_config_callback, "Set the json config file")
             ->default_val(fmt::format("{}_{}", app_name_, DEFAULT_JSON_FILENAME))
             ->run_callback_for_default()
+            ->allow_extra_args()
             ->trigger_on_parse();
         program_options.add_flag("--print-config", has_print_default_options_, "Print default option value");
         program_options
@@ -270,6 +334,37 @@ namespace R3B::Neuland
             {
                 input_files_.emplace_back(tree_input_file, true);
             }
+        }
+    }
+
+    void Application::patch_files_or_strings(nlohmann::ordered_json& json_obj,
+                                             const std::vector<std::string>& filenames_or_options)
+    {
+        for (const auto& filename_or_option : filenames_or_options)
+        {
+            auto json_file_obj = [&filename_or_option]()
+            {
+                switch (check_json_input_type(filename_or_option))
+                {
+                    case JSONConfigInputType::string:
+                    {
+                        auto json_string = transform_to_json_string(filename_or_option);
+                        R3BLOG(info, fmt::format("Reading the configuration from the string {:?}.", json_string));
+                        return nlohmann::ordered_json::parse(std::move(json_string), nullptr, true, true);
+                    }
+                    case JSONConfigInputType::file:
+                    {
+                        auto file = std::ifstream{ filename_or_option };
+                        R3BLOG(info,
+                               fmt::format("Reading the configuration from the json file {:?}.", filename_or_option));
+                        return nlohmann::ordered_json::parse(file, nullptr, true, true);
+                    }
+                    case JSONConfigInputType::invalid:
+                        break;
+                }
+                throw R3B::logic_error(fmt::format("Cannot parse the string {:?}", filename_or_option));
+            }();
+            json_obj.merge_patch(json_file_obj);
         }
     }
 } // namespace R3B::Neuland

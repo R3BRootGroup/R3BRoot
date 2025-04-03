@@ -17,7 +17,17 @@
 #include "ext_h101_raw_nnp_tamex.h"
 #include <R3BDataMonitor.h>
 #include <Rtypes.h>
+#include <TH1.h>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <map>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
+#include <type_traits>
+#include <utility>
 
 class TClonesArray;
 
@@ -33,7 +43,7 @@ class R3BNeulandTamexReader2 : public R3BReader
     using MappedDataVector = R3BPaddleTamexMappedDataContainer;
     using TrigMappedDataVector = R3BPaddleTamexTrigDataContainer;
 
-    enum class Errors
+    enum class Errors : uint8_t
     {
         module_size,
         data_size,
@@ -59,7 +69,7 @@ class R3BNeulandTamexReader2 : public R3BReader
     void SetOnline(bool is_online) { is_online_ = is_online; }
 
     // Set the maximum number of planes
-    void SetMaxNbPlanes(uint max) { numPlanes_ = max; }
+    void SetMaxNbPlanes(int max) { numPlanes_ = max; }
 
     // Accessor to skip trigger times
     void SetSkipTriggerTimes() { is_triggered_ = false; }
@@ -75,7 +85,7 @@ class R3BNeulandTamexReader2 : public R3BReader
     size_t counter_ = 0;
     size_t max_limit_ = 0;
     size_t fOffset = 0;                           // Data offset
-    uint numPlanes_ = 0;                          // Number of planes
+    int numPlanes_ = 0;                           // Number of planes
     EXT_STR_h101_raw_nnp_tamex_onion* inputData_; // Reader specific data structure from ucesb
     MappedDataVector mappedData_;                 // Output array
     TrigMappedDataVector mappedTrigData_;         // Output array, cards' trigger

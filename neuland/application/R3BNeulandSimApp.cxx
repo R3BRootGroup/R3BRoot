@@ -1,13 +1,20 @@
 #include "R3BNeulandSimApp.h"
 #include "R3BCave.h"
 #include "R3BNeuland.h"
+#include "R3BNeulandApp.h"
+#include <FairRun.h>
 #include <FairRunSim.h>
 #include <G4RunManager.hh>
 #include <R3BFieldConst.h>
 #include <R3BNeulandAppOptionJson.h>
-#include <R3BNeulandGenerators.h>
+#include <R3BNeulandGeneratorFactory.h>
 #include <TG4EventAction.h>
+#include <TGeoMatrix.h>
 #include <TRandom3.h>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace R3B::Neuland
 {
@@ -51,22 +58,11 @@ namespace R3B::Neuland
 
     void SimulationApplication::setup_generator(FairRunSim* run)
     {
-        const auto& options = options_.simulation.generator;
         const auto& options_pos = options_.detectors.neuland;
-        random_gen_ = std::make_unique<TRandom3>(options.random_seed);
-        auto primary_generator = [this, &options, &options_pos]()
-        {
-            if (options.type == "muon")
-            {
-                return create_muon_generator(*random_gen_, options_pos.num_of_dp, options.energy, options_pos.location);
-            }
-            if (options.type == "box")
-            {
-                return create_box_generator(options.energy, options.multiplicity);
-            }
-            throw std::runtime_error(fmt::format("unrecognized generator type: {}!", options.type));
-        }();
-        run->SetGenerator(primary_generator.release());
+        random_gen_ = std::make_unique<TRandom3>(options_.simulation.random_seed);
+        generator_factory_.SetNumOfPlanes(options_pos.num_of_dp * 2);
+        generator_factory_.SetRandomGen(random_gen_.get());
+        run->SetGenerator(generator_factory_.Create().release());
     }
 
     void SimulationApplication::setup_detectors(FairRunSim* run) const
@@ -86,7 +82,7 @@ namespace R3B::Neuland
         {
 
             const auto& location = neuland_options.location;
-            auto const neulandGeoTrans = TGeoTranslation{ location.x, location.y, location.z };
+            auto const neulandGeoTrans = TGeoTranslation{ location.x(), location.y(), location.z() };
             auto neuland = std::make_unique<R3BNeuland>(neuland_options.num_of_dp, neulandGeoTrans);
             if (neuland_options.enable_auto_geo_build)
             {
@@ -94,6 +90,11 @@ namespace R3B::Neuland
             }
             run->AddModule(neuland.release());
         }
+    }
+
+    void SimulationApplication::ParseApplicationOption(const std::vector<std::string>& filename)
+    {
+        ParseApplicationOptionImp(filename, options_);
     }
 
     void SimulationApplication::print_json_options() { Application::print_json_options(options_); }

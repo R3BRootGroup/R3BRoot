@@ -18,6 +18,7 @@ Code for the NeuLAND Detector is split into different components:
 Other related documentations:
 
 - \subpage NEULANDHPC
+- \subpage neuland_style
 
 Note that in contrast to the old NeuLAND and LAND code in the /land/ directory, the spelling in e.g. class names is "Neuland", with a small "l".
 
