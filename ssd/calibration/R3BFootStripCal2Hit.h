@@ -59,6 +59,9 @@ class R3BFootStripCal2Hit : public FairTask
     /** Virtual method SetParContainers **/
     void SetParContainers() override;
 
+    /** Virtual method SetParContainers **/
+    void SetTimesSigmas(Double_t sigmas) { fTimesSigmas = sigmas; };
+
     /** Accessor for selecting online mode **/
     inline void SetOnline(Bool_t option) { fOnline = option; }
 
@@ -74,6 +77,7 @@ class R3BFootStripCal2Hit : public FairTask
     double fPitch = 157.7;
     double fMiddle = 50.;
     double fThSum = 20.;
+    double fTimesSigmas = 3.;
     int fMaxNumDet = 16;
     int fMaxNumClusters = 10;
     std::vector<double> fDistTarget;
@@ -85,6 +89,7 @@ class R3BFootStripCal2Hit : public FairTask
 
     std::vector<int> ClusterMult;                 // Cluster multiplicity
     std::vector<std::vector<double>> ClusterPos;  // Position of Cluster from Weighted Average
+    std::vector<std::vector<double>> Eta;         // Decimal part of the average position of the cluster
     std::vector<std::vector<double>> ClusterESum; // Sum of Energies in the Cluster
     // std::vector<std::vector<double>> Nu;       // Nu for Energy/Position correction
     std::vector<std::vector<int>> ClusterNStrip;            // Number of Strips in Cluster
@@ -104,7 +109,8 @@ class R3BFootStripCal2Hit : public FairTask
                                double s,
                                TVector3 master,
                                double energy_s,
-                               uint16_t mulS);
+                               uint16_t mulS,
+                               double eta);
 
   public:
     // Class definition

@@ -32,8 +32,9 @@ class R3BFootCalData : public TObject
      *@param fDetId    Detector unique identifier
      *@param fStripId  Strip unique identifier
      *@param fEnergy   Total energy deposited on the strip ([GeV] in sim)
+     *@param fSigma Sigma of the energy after some corrections
      **/
-    explicit R3BFootCalData(uint8_t detid, uint16_t stripid, double energy);
+    explicit R3BFootCalData(uint8_t detid, uint16_t stripid, double energy, double sigma);
 
     /** Destructor **/
     virtual ~R3BFootCalData() = default;
@@ -42,16 +43,19 @@ class R3BFootCalData : public TObject
     [[nodiscard]] inline const uint8_t& GetDetId() const { return fDetId; }
     [[nodiscard]] inline const uint16_t& GetStripId() const { return fStripId; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const double& GetSigma() const { return fSigma; }
 
     // Modifiers
     inline void SetDetId(uint8_t detid) { fDetId = detid; }
     inline void SetStripId(uint16_t stripid) { fStripId = stripid; }
     inline void SetEnergy(double energy) { fEnergy = energy; }
+    inline void SetSigma(double sigma) { fSigma = sigma; }
 
   protected:
     uint8_t fDetId = 0;            // detector unique identifier
     uint16_t fStripId = 0;         // strip unique identifier
     double fEnergy = std::nan(""); // total energy in the strip
+    double fSigma = std::nan("");  // sigma of the energy after corrections
 
   public:
     ClassDefOverride(R3BFootCalData, 1)

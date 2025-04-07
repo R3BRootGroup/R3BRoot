@@ -91,8 +91,8 @@ InitStatus R3BFootOnlineSpectra::Init()
 
     // Create histograms for all the detectors
     // Energy range for strips
-    Double_t binsE = 3000;
-    Double_t minE = 0;
+    Double_t binsE = 1000;
+    Double_t minE = -100;
     Double_t maxE = 3000;
 
     char Name1[255];
@@ -106,24 +106,25 @@ InitStatus R3BFootOnlineSpectra::Init()
     mainfol->Add(mapfol);
 
     auto cMap = new TCanvas("FOOT_mapped", "mapped info", 10, 10, 500, 500);
-    cMap->Divide(4, 3);
+    cMap->Divide(4, 2);
     mapfol->Add(cMap);
 
     //================  Mapped data =====================
     fh2_EnergyVsStrip.resize(fNbDet);
     int i_pad = 1; // pad iterator
+    int i_pad_double = 1;
+    int i_pad_corr = 1;
     for (Int_t i = 0; i < fNbDet; i++)
     { // one histo per detector
         sprintf(Name1, "fh2_energy_vs_strip_det_%d", i + 1);
         sprintf(Name2, "Mapped energy vs strip number for FOOT Det: %d", i + 1);
-        fh2_EnergyVsStrip[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+        fh2_EnergyVsStrip[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, -100, 3000);
         fh2_EnergyVsStrip[i]->GetXaxis()->SetTitle("Strip number");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitle("Energy [channels]");
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_EnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
         int foot_num = i + 1;
-        if (foot_num == 1 || foot_num == 2 || foot_num == 13 || foot_num == 4 || foot_num == 11 || foot_num == 6 ||
-            foot_num == 7 || foot_num == 12 || foot_num == 9 || foot_num == 10 || foot_num == 15 || foot_num == 16)
+        if (foot_num < 9)
         {
             cMap->cd(i_pad);
             fh2_EnergyVsStrip[i]->Draw("col");
@@ -142,7 +143,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     //============ CAL data ==================
 
     auto cCal = new TCanvas("FOOT_cal", "cal info", 10, 10, 500, 500);
-    cCal->Divide(4, 3);
+    cCal->Divide(4, 2);
     calfol->Add(cCal);
 
     if (fCalItems)
@@ -153,15 +154,14 @@ InitStatus R3BFootOnlineSpectra::Init()
         {
             sprintf(Name1, "fh2_energy_vs_strip_cal_det_%d", i + 1);
             sprintf(Name2, "Cal-energy vs strip number for FOOT Det: %d", i + 1);
-            fh2_EnergyVsStrip_cal[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, minE, maxE);
+            fh2_EnergyVsStrip_cal[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, binsE, -100, 1000);
             fh2_EnergyVsStrip_cal[i]->GetXaxis()->SetTitle("Strip number");
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitle("Energy [channels]");
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->SetTitleOffset(1.4);
             fh2_EnergyVsStrip_cal[i]->GetXaxis()->CenterTitle(true);
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->CenterTitle(true);
             int foot_num = i + 1;
-            if (foot_num == 1 || foot_num == 2 || foot_num == 13 || foot_num == 4 || foot_num == 11 || foot_num == 6 ||
-                foot_num == 7 || foot_num == 12 || foot_num == 9 || foot_num == 10 || foot_num == 15 || foot_num == 16)
+            if (foot_num < 9)
             {
                 cCal->cd(i_pad);
                 fh2_EnergyVsStrip_cal[i]->Draw("col");
@@ -178,16 +178,70 @@ InitStatus R3BFootOnlineSpectra::Init()
         }
     }
 
+    //------------- SIGMA -------------------
+
+    auto cSigma = new TCanvas("FOOT_sigma", "Sigma info", 10, 10, 500, 500);
+    cSigma->Divide(4, 2);
+    calfol->Add(cSigma);
+
+    fh2_SigmaVsStrip.resize(fNbDet);
+    i_pad = 1; // pad iterator
+
+    for (Int_t i = 0; i < fNbDet; i++)
+    {
+        sprintf(Name1, "fh2_sigma_vs_strip_det_%d", i + 1);
+        sprintf(Name2, "Sigma vs strip number for FOOT Det: %d", i + 1);
+        fh2_SigmaVsStrip[i] = R3B::root_owned<TH2F>(Name1, Name2, 640, 1, 641, 100, 0, 15);
+        fh2_SigmaVsStrip[i]->GetXaxis()->SetTitle("Strip number");
+        fh2_SigmaVsStrip[i]->GetYaxis()->SetTitle("Sigma");
+        fh2_SigmaVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_SigmaVsStrip[i]->GetXaxis()->CenterTitle(true);
+        fh2_SigmaVsStrip[i]->GetYaxis()->CenterTitle(true);
+
+        int foot_num = i + 1;
+        if (foot_num < 9)
+        {
+            cSigma->cd(i_pad);
+            fh2_SigmaVsStrip[i]->Draw("col");
+            i_pad++;
+        }
+    }
+
     //================ HIT data ==========================
 
-    auto cHit = new TCanvas("FOOT_hit", "hit info", 10, 10, 500, 500);
-    cHit->Divide(3, 2);
+    // General canvas info (cluster position and energy)
+    auto cHit = new TCanvas("FOOT_hit", "hit general info", 10, 10, 500, 500);
+    cHit->Divide(4, 4);
+
+    // Correlation position between detectors
+    auto cHit_PosCorr = new TCanvas("FOOT_posCorr", "hit position correlation info", 10, 10, 500, 500);
+    cHit_PosCorr->Divide(2, 2);
+
+    // Eta
+    auto cHit_Eta = new TCanvas("FOOT_eta", "hit eta plot info", 10, 10, 500, 500);
+    cHit_Eta->Divide(4, 2);
+
+    // Multiplicity and cluster size
+    auto cHit_MultSize = new TCanvas("FOOT_mulSize", "hit multiplicity and size info", 10, 10, 500, 500);
+    cHit_MultSize->Divide(4, 4);
+
     hitfol->Add(cHit);
+    hitfol->Add(cHit_PosCorr);
+    hitfol->Add(cHit_Eta);
+    hitfol->Add(cHit_MultSize);
+
     if (fHitItems)
     {
         i_pad = 1; // pad iterator
+        i_pad_double = 1;
+        i_pad_corr = 1;
         fh1_pos.resize(fNbDet);
         fh1_ene.resize(fNbDet);
+        fh1_mult.resize(fNbDet);
+        fh1_size.resize(fNbDet);
+        fh2_eta.resize(fNbDet);
+        fh2_foot_corr.resize(fNbDet / 2);
+
         for (Int_t i = 0; i < fNbDet; i++)
         { // one histo per detector
             sprintf(Name1, "fh1_pos_det_%d", i + 1);
@@ -198,6 +252,7 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_pos[i]->GetYaxis()->SetTitleOffset(1.4);
             fh1_pos[i]->GetXaxis()->CenterTitle(true);
             fh1_pos[i]->GetYaxis()->CenterTitle(true);
+
             sprintf(Name1, "fh1_ene_det_%d", i + 1);
             sprintf(Name2, "Cluster energy for FOOT Det: %d", i + 1);
             fh1_ene[i] = R3B::root_owned<TH1F>(Name1, Name2, binsE, minE, maxE);
@@ -207,60 +262,80 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_ene[i]->GetXaxis()->CenterTitle(true);
             fh1_ene[i]->GetYaxis()->CenterTitle(true);
 
-            int foot_num = i + 1;
-            if (foot_num == 2 || foot_num == 4 || foot_num == 11)
-            {
-                cHit->cd(i_pad);
-                fh1_pos[i]->Draw();
-                hitfol->Add(fh1_pos[i]);
-                i_pad++;
-                cHit->cd(i_pad);
-                fh1_ene[i]->Draw();
-                hitfol->Add(fh1_ene[i]);
-                i_pad++;
-                hitfol->Add(fh1_pos[i]);
-            }
-        }
-    }
+            sprintf(Name1, "fh2_eta_vs_strip_det_%d", i + 1);
+            sprintf(Name2, "Eta parameter for FOOT Det: %d", i + 1);
+            fh2_eta[i] = R3B::root_owned<TH2F>(Name1, Name2, 100, 0, 1, binsE, 0, maxE);
+            fh2_eta[i]->GetXaxis()->SetTitle("Strip");
+            fh2_eta[i]->GetYaxis()->SetTitle("Eta");
+            fh2_eta[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh2_eta[i]->GetXaxis()->CenterTitle(true);
+            fh2_eta[i]->GetYaxis()->CenterTitle(true);
 
-    auto cInBeam = new TCanvas("FOOT_inBeam", "inBeam info", 10, 10, 500, 500);
-    cInBeam->Divide(3, 2);
-
-    if (fHitItems)
-    {
-        fh1_mult.resize(fNbDet);
-        fh2_BeamSpot = R3B::root_owned<TH2F>("BeamSpot", "BeamSpot", 600, -50., 50., 600, -50., 50.);
-        fh2_BeamSpot->GetYaxis()->SetTitle("Position [mm]");
-        fh2_BeamSpot->GetYaxis()->SetTitleOffset(1.4);
-        fh2_BeamSpot->GetXaxis()->CenterTitle(true);
-        fh2_BeamSpot->GetYaxis()->CenterTitle(true);
-        cInBeam->cd(1);
-        fh2_BeamSpot->Draw("colz");
-
-        fh2_BeamSpotE = R3B::root_owned<TH2F>("BeamSpotEnergy", "BeamSpotEnergy", binsE, minE, maxE, binsE, minE, maxE);
-        fh2_BeamSpotE->GetXaxis()->SetTitle("Energy [ch]");
-        fh2_BeamSpotE->GetYaxis()->SetTitle("Energy [ch]");
-        fh2_BeamSpotE->GetYaxis()->SetTitleOffset(1.4);
-        fh2_BeamSpotE->GetXaxis()->CenterTitle(true);
-        fh2_BeamSpotE->GetYaxis()->CenterTitle(true);
-        cInBeam->cd(4);
-        fh2_BeamSpotE->Draw("colz");
-        for (Int_t i = 0; i < fNbDet; i++)
-        {
-            sprintf(Name1, "fh1_mult_strip_%d", i + 1);
-            sprintf(Name2, "Cluster strip Mult for FOOT Det: %d", i + 1);
-            fh1_mult[i] = R3B::root_owned<TH1F>(Name1, Name2, 10, 0, 10);
-            fh1_mult[i]->GetXaxis()->SetTitle("Multplicity");
+            sprintf(Name1, "fh1_mult_det_%d", i + 1);
+            sprintf(Name2, "Cluster multiplicity for FOOT Det: %d", i + 1);
+            fh1_mult[i] = R3B::root_owned<TH1F>(Name1, Name2, 20, 1, 20);
+            fh1_mult[i]->GetXaxis()->SetTitle("Multiplicity");
             fh1_mult[i]->GetYaxis()->SetTitle("Counts");
             fh1_mult[i]->GetYaxis()->SetTitleOffset(1.4);
             fh1_mult[i]->GetXaxis()->CenterTitle(true);
             fh1_mult[i]->GetYaxis()->CenterTitle(true);
+
+            sprintf(Name1, "fh1_size_det_%d", i + 1);
+            sprintf(Name2, "Cluster size for FOOT Det: %d", i + 1);
+            fh1_size[i] = R3B::root_owned<TH1F>(Name1, Name2, 50, 0, 50);
+            fh1_size[i]->GetXaxis()->SetTitle("Size");
+            fh1_size[i]->GetYaxis()->SetTitle("Counts");
+            fh1_size[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh1_size[i]->GetXaxis()->CenterTitle(true);
+            fh1_size[i]->GetYaxis()->CenterTitle(true);
+
+            if ((i % 2) == 0)
+            {
+                sprintf(Name1, "fh2_pos_corr_dets_%d_%d", i + 1, i + 2);
+                sprintf(Name2, "Cluster position correlation for FOOTs: %d and %d", i + 1, i + 2);
+                fh2_foot_corr[i / 2] = R3B::root_owned<TH2F>(Name1, Name2, 100, -50., 50., 100, -50, 50);
+                fh2_foot_corr[i / 2]->GetXaxis()->SetTitle("x - Position [mm]");
+                fh2_foot_corr[i / 2]->GetYaxis()->SetTitle("y - Position [mm]");
+                fh2_foot_corr[i / 2]->GetYaxis()->SetTitleOffset(1.4);
+                fh2_foot_corr[i / 2]->GetXaxis()->CenterTitle(true);
+                fh2_foot_corr[i / 2]->GetYaxis()->CenterTitle(true);
+            }
+
+            int foot_num = i + 1;
+            if (foot_num < 9)
+            {
+
+                cHit->cd(i_pad_double);
+                fh1_ene[i]->Draw();
+                cHit->cd(i_pad_double + 1);
+                fh1_pos[i]->Draw();
+
+                if ((foot_num % 2) == 1)
+                {
+                    if (foot_num < 12)
+                    {
+                        cHit_PosCorr->cd(i_pad_corr);
+                        fh2_foot_corr[i / 2]->Draw();
+                        i_pad_corr++;
+                    }
+                }
+
+                cHit_Eta->cd(i_pad);
+                fh2_eta[i]->Draw();
+
+                cHit_MultSize->cd(i_pad_double);
+                fh1_size[i]->Draw();
+                cHit_MultSize->cd(i_pad_double + 1);
+                fh1_mult[i]->Draw();
+
+                i_pad_double++;
+                i_pad_double++;
+
+                i_pad++;
+            }
         }
-        cInBeam->cd(2);
-        fh1_mult[1]->Draw();
-        cInBeam->cd(3);
-        fh1_mult[3]->Draw();
     }
+
     if (fCalItems)
     {
         mainfol->Add(calfol);
@@ -293,10 +368,13 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
 
     // Cal data
     if (fCalItems)
+    {
         for (Int_t i = 0; i < fNbDet; i++)
         {
             fh2_EnergyVsStrip_cal[i]->Reset();
+            fh2_SigmaVsStrip[i]->Reset();
         }
+    }
 
     // Hit data
     if (fHitItems)
@@ -306,9 +384,14 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
             fh1_pos[i]->Reset();
             fh1_ene[i]->Reset();
             fh1_mult[i]->Reset();
+            fh1_size[i]->Reset();
+            fh2_eta[i]->Reset();
+
+            if ((i % 2) == 0)
+            {
+                fh2_foot_corr[i / 2]->Reset();
+            }
         }
-        fh2_BeamSpot->Reset();
-        fh2_BeamSpotE->Reset();
     }
     return;
 }
@@ -345,6 +428,11 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             if (!hit)
                 continue;
             fh2_EnergyVsStrip_cal[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetEnergy());
+
+            if ((eventNumber % fSigmaRefreshRate) == 0)
+            {
+                fh2_SigmaVsStrip[hit->GetDetId() - 1]->Fill(hit->GetStripId(), hit->GetSigma());
+            }
         }
     }
 
@@ -359,44 +447,49 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
             fh1_ene[hit->GetDetId() - 1]->Fill(hit->GetEnergy());
+            fh1_size[hit->GetDetId() - 1]->Fill(hit->GetMulStrip());
             fh1_mult[hit->GetDetId() - 1]->Fill(hit->GetNbHit());
-        }
-        for (Int_t ihit = 0; ihit < nHits - 1; ihit++)
-        {
-            for (Int_t jhit = ihit + 1; jhit < nHits; jhit++)
+            fh2_eta[hit->GetDetId() - 1]->Fill(hit->GetEta(), hit->GetEnergy());
+
+            int pairNdx = (hit->GetDetId() - 1) / 2;
+            int pairPos = (hit->GetDetId() - 1) % 2;
+
+            double pos1 = hit->GetPos();
+            double det1 = hit->GetDetId();
+
+            if (det1 > 9)
             {
-                R3BFootHitData* hitI = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
-                R3BFootHitData* hitJ = dynamic_cast<R3BFootHitData*>(fHitItems->At(jhit));
-                if (!hitI)
-                    continue;
-                if (!hitJ)
-                    continue;
-                if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
-                    (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
+                continue;
+            }
+
+            // Correlation position between each pair of FOOTs
+            if (ihit < nHits - 1)
+            {
+                for (Int_t ihit2 = ihit + 1; ihit2 < nHits; ihit2++)
                 {
-                    if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
+                    R3BFootHitData* hit2 = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit2));
+
+                    // The hit is in another pair
+                    if ((hit2->GetDetId() - 1) / 2 != pairNdx)
                     {
-                        fh2_BeamSpot->Fill(hitI->GetPos(), hitJ->GetPos());
-                        fh2_BeamSpotE->Fill(hitI->GetEnergy(), hitJ->GetEnergy());
+                        continue;
+                    }
+
+                    double pos2 = hit2->GetPos();
+                    double det2 = hit2->GetDetId();
+
+                    if (det1 == det2)
+                    {
+                        continue;
+                    }
+
+                    if (pairPos == 0) // Is the first FOOT on the pair
+                    {
+                        fh2_foot_corr[pairNdx]->Fill(pos1, pos2);
                     }
                     else
                     {
-                        fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
-                        fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
-                        if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2) ||
-                            (hitJ->GetDetId() == 4 && hitI->GetDetId() == 2))
-                        {
-                            if ((hitI->GetDetId() == 4 && hitJ->GetDetId() == 2))
-                            {
-                                fh2_BeamSpot->Fill(hitI->GetPos(), hitJ->GetPos());
-                                fh2_BeamSpotE->Fill(hitI->GetEnergy(), hitJ->GetEnergy());
-                            }
-                            else
-                            {
-                                fh2_BeamSpot->Fill(hitJ->GetPos(), hitI->GetPos());
-                                fh2_BeamSpotE->Fill(hitJ->GetEnergy(), hitI->GetEnergy());
-                            }
-                        }
+                        fh2_foot_corr[pairNdx]->Fill(pos2, pos1);
                     }
                 }
             }
@@ -420,6 +513,9 @@ void R3BFootOnlineSpectra::FinishEvent()
     {
         fHitItems->Clear();
     }
+
+    // Increase the event number variable
+    eventNumber++;
     return;
 }
 
@@ -431,10 +527,13 @@ void R3BFootOnlineSpectra::FinishTask()
             fh2_EnergyVsStrip[i]->Write();
     }
     if (fCalItems)
+    {
         for (Int_t i = 0; i < fNbDet; i++)
         {
             fh2_EnergyVsStrip_cal[i]->Write();
+            fh2_SigmaVsStrip[i]->Write();
         }
+    }
 
     if (fHitItems)
     {
@@ -443,9 +542,14 @@ void R3BFootOnlineSpectra::FinishTask()
             fh1_pos[i]->Write();
             fh1_ene[i]->Write();
             fh1_mult[i]->Write();
+            fh1_size[i]->Write();
+            fh2_eta[i]->Write();
+
+            if ((i % 2) == 0)
+            {
+                fh2_foot_corr[i / 2]->Write();
+            }
         }
-        fh2_BeamSpot->Write();
-        fh2_BeamSpotE->Write();
     }
     return;
 }

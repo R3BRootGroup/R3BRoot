@@ -19,7 +19,6 @@
 // ROOT headers
 #include "TClonesArray.h"
 #include "TF1.h"
-#include "TH1F.h"
 #include "TMath.h"
 #include "TSpectrum.h"
 #include <iomanip>

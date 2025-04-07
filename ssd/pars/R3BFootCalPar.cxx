@@ -32,6 +32,7 @@ R3BFootCalPar::R3BFootCalPar(const char* name, const char* title, const char* co
 {
     detName = "FootCal";
     fStripCalParams = new TArrayF(fNumDets * fNumStrips * fNumParsFit);
+    fFineSigmas = new TArrayF(fNumDets * fNumStrips);
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -39,6 +40,7 @@ R3BFootCalPar::~R3BFootCalPar()
 {
     clear();
     delete fStripCalParams;
+    delete fFineSigmas;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -67,6 +69,7 @@ void R3BFootCalPar::putParams(FairParamList* list)
     list->add("footStripNumberPar", fNumStrips);
     list->add("footNumberParsFit", fNumParsFit);
     list->add("footStripCalPar", *fStripCalParams);
+    list->add("footFineSigmas", *fFineSigmas);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -104,6 +107,13 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
     if (!(list->fill("footStripCalPar", fStripCalParams)))
     {
         LOG(fatal) << "R3BFootCalPar::Could not initialize footStripCalPar";
+        return kFALSE;
+    }
+    fFineSigmas->Set(fNumDets * fNumStrips);
+
+    if (!(list->fill("footFineSigmas", fFineSigmas)))
+    {
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footFineSigmas";
         return kFALSE;
     }
 

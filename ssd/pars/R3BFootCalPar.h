@@ -54,6 +54,9 @@ class R3BFootCalPar : public FairParGenericSet
     [[nodiscard]] inline const int GetNumStrips() const { return fNumStrips; }
     [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsFit; }
     TArrayF* GetStripCalParams() { return fStripCalParams; }
+    TArrayF* GetFineSigmas() { return fFineSigmas; }
+
+    inline void SetFineSigma(float value, int index) { fFineSigmas->AddAt(value, index); }
 
     inline void SetNumDets(int ndet) { fNumDets = ndet; }
     inline void SetNumStrips(int nstrip) { fNumStrips = nstrip; }
@@ -67,6 +70,7 @@ class R3BFootCalPar : public FairParGenericSet
     int fNumStrips = 640;     // Number of strips
     int fNumParsFit = 2;      // Number of parameters for the fit
     TArrayF* fStripCalParams; // Calibration Parameters of strip
+    TArrayF* fFineSigmas;     // Fine sigma parameters
 
     const R3BFootCalPar& operator=(const R3BFootCalPar&);
     R3BFootCalPar(const R3BFootCalPar&);
